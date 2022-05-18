@@ -5,13 +5,10 @@ import {
   CreateTransferResponseV1,
   TransfersApiGetTransferRequest,
 } from '../api';
-import {
-  generateStarkWallet,
-  serializeSignature,
-  sign,
-} from '../utils';
+import { generateStarkWallet, serializeSignature, sign } from '../utils';
 import { BurnAddress } from './constants';
 import { GetSignableBurnRequest } from './types';
+import { Errors } from './errors';
 
 export async function burnWorkflow(
   signer: Signer,
@@ -36,7 +33,7 @@ export async function burnWorkflow(
     signableResult.data;
 
   if (signableMessage === undefined || payloadHash === undefined) {
-    throw new Error('Invalid response from Signable registration offchain');
+    throw new Error(Errors.SignableTransferV1InvalidResponse);
   }
 
   // Sign message with L1 credentials
