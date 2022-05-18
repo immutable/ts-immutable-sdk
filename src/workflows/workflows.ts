@@ -119,7 +119,6 @@ export class Workflows {
           this.depositsApi,
           this.usersApi,
           this.encodingApi,
-          coreContract,
           this.config,
         );
       case TokenType.ERC20:
@@ -147,19 +146,12 @@ export class Workflows {
   }
 
   public depositEth(signer: Signer, deposit: ETHDeposit) {
-    // Get instance of contract
-    const coreContract = Core__factory.connect(
-      this.config.starkContractAddress,
-      signer,
-    );
-
     return depositEthWorkflow(
       signer,
       deposit,
       this.depositsApi,
       this.usersApi,
       this.encodingApi,
-      coreContract,
       this.config,
     );
   }
