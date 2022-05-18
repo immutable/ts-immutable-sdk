@@ -104,13 +104,11 @@ export class Workflows {
     return burnWorkflow(signer, request, this.transfersApi);
   }
 
-  public deposit(signer: Signer, deposit: TokenDeposit) {
-    // Get instance of contract
-    const coreContract = Core__factory.connect(
-      this.config.starkContractAddress,
-      signer,
-    );
+  public getBurn(request: TransfersApiGetTransferRequest) {
+    return getBurnWorkflow(request, this.transfersApi);
+  }
 
+  public deposit(signer: Signer, deposit: TokenDeposit) {
     switch (deposit.type) {
       case TokenType.ETH:
         return depositEthWorkflow(
@@ -129,7 +127,6 @@ export class Workflows {
           this.usersApi,
           this.tokensApi,
           this.encodingApi,
-          coreContract,
           this.config,
         );
       case TokenType.ERC721:
@@ -139,7 +136,6 @@ export class Workflows {
           this.depositsApi,
           this.usersApi,
           this.encodingApi,
-          coreContract,
           this.config,
         );
     }
@@ -156,17 +152,7 @@ export class Workflows {
     );
   }
 
-  public getBurn(request: TransfersApiGetTransferRequest) {
-    return getBurnWorkflow(request, this.transfersApi);
-  }
-
   public depositERC20(signer: Signer, deposit: ERC20Deposit) {
-    // Get instance of contract
-    const coreContract = Core__factory.connect(
-      this.config.starkContractAddress,
-      signer,
-    );
-
     return depositERC20Workflow(
       signer,
       deposit,
@@ -174,25 +160,17 @@ export class Workflows {
       this.usersApi,
       this.tokensApi,
       this.encodingApi,
-      coreContract,
       this.config,
     );
   }
 
   public depositERC721(signer: Signer, deposit: ERC721Deposit) {
-    // Get instance of contract
-    const coreContract = Core__factory.connect(
-      this.config.starkContractAddress,
-      signer,
-    );
-
     return depositERC721Workflow(
       signer,
       deposit,
       this.depositsApi,
       this.usersApi,
       this.encodingApi,
-      coreContract,
       this.config,
     );
   }
