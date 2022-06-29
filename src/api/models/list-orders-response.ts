@@ -13,7 +13,7 @@
  */
 
 
-import { Order } from './order';
+import { OrdersOrder } from './orders-order';
 
 /**
  * 
@@ -35,9 +35,9 @@ export interface ListOrdersResponse {
     'remaining': number;
     /**
      * Orders matching query parameters
-     * @type {Array<Order>}
+     * @type {Array<OrdersOrder>}
      * @memberof ListOrdersResponse
      */
-    'result': Array<Order>;
+    'result': Array<OrdersOrder>;
 }
 

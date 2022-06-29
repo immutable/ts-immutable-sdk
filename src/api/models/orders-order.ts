@@ -19,67 +19,67 @@ import { Token } from './token';
 /**
  * 
  * @export
- * @interface Order
+ * @interface OrdersOrder
  */
-export interface Order {
+export interface OrdersOrder {
     /**
      * Amount of the asset already sold by this order
      * @type {string}
-     * @memberof Order
+     * @memberof OrdersOrder
      */
     'amount_sold': string | null;
     /**
      * 
      * @type {Token}
-     * @memberof Order
+     * @memberof OrdersOrder
      */
     'buy': Token;
     /**
      * Expiration timestamp of this order
      * @type {string}
-     * @memberof Order
+     * @memberof OrdersOrder
      */
     'expiration_timestamp': string | null;
     /**
      * Fee information for the order
      * @type {Array<OrderFeeInfo>}
-     * @memberof Order
+     * @memberof OrdersOrder
      */
     'fees'?: Array<OrderFeeInfo>;
     /**
      * ID of the order
      * @type {number}
-     * @memberof Order
+     * @memberof OrdersOrder
      */
     'order_id': number;
     /**
      * 
      * @type {Token}
-     * @memberof Order
+     * @memberof OrdersOrder
      */
     'sell': Token;
     /**
      * Status of the order
      * @type {string}
-     * @memberof Order
+     * @memberof OrdersOrder
      */
     'status': string;
     /**
      * Timestamp this order was created
      * @type {string}
-     * @memberof Order
+     * @memberof OrdersOrder
      */
     'timestamp': string | null;
     /**
      * Updated timestamp of this order
      * @type {string}
-     * @memberof Order
+     * @memberof OrdersOrder
      */
     'updated_timestamp': string | null;
     /**
      * Ethereum address of the user who submitted the order
      * @type {string}
-     * @memberof Order
+     * @memberof OrdersOrder
      */
     'user': string;
 }

@@ -95,7 +95,7 @@ models/mint.ts
 models/mintable-token-details.ts
 models/order-details.ts
 models/order-fee-info.ts
-models/order.ts
+models/orders-order.ts
 models/project.ts
 models/range.ts
 models/register-user-request.ts

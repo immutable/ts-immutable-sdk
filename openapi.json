@@ -1255,7 +1255,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Order"
+              "$ref": "#/definitions/orders.Order"
             }
           }
         }
@@ -2776,13 +2776,11 @@
         },
         "image_url": {
           "description": "Image URL of this asset",
-          "type": "string",
-          "x-nullable": true
+          "type": "string"
         },
         "name": {
           "description": "Name of this asset",
-          "type": "string",
-          "x-nullable": true
+          "type": "string"
         }
       }
     },
@@ -2792,6 +2790,7 @@
         "balance",
         "preparing_withdrawal",
         "symbol",
+        "token_address",
         "withdrawable"
       ],
       "properties": {
@@ -2805,6 +2804,10 @@
         },
         "symbol": {
           "description": "Symbol of the token (e.g. ETH, IMX)",
+          "type": "string"
+        },
+        "token_address": {
+          "description": "Address of the contract that represents this ERC20 token or empty for ETH",
           "type": "string"
         },
         "withdrawable": {
@@ -2900,15 +2903,10 @@
     },
     "CollectionDetails": {
       "type": "object",
-      "required": [
-        "icon_url",
-        "name"
-      ],
       "properties": {
         "icon_url": {
           "description": "URL of the icon of the collection",
-          "type": "string",
-          "x-nullable": true
+          "type": "string"
         },
         "name": {
           "description": "Name of the collection",
@@ -3186,6 +3184,10 @@
         "trade_id"
       ],
       "properties": {
+        "request_id": {
+          "description": "Request ID that returns when a trade initiated through risk-manager",
+          "type": "string"
+        },
         "status": {
           "description": "Current status of trade",
           "type": "string"
@@ -4250,7 +4252,7 @@
           "description": "Orders matching query parameters",
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Order"
+            "$ref": "#/definitions/orders.Order"
           }
         }
       }
@@ -4590,69 +4592,6 @@
         }
       }
     },
-    "Order": {
-      "type": "object",
-      "required": [
-        "amount_sold",
-        "buy",
-        "expiration_timestamp",
-        "order_id",
-        "sell",
-        "status",
-        "timestamp",
-        "updated_timestamp",
-        "user"
-      ],
-      "properties": {
-        "amount_sold": {
-          "description": "Amount of the asset already sold by this order",
-          "type": "string",
-          "x-nullable": true
-        },
-        "buy": {
-          "description": "Details of the asset being bought",
-          "$ref": "#/definitions/Token"
-        },
-        "expiration_timestamp": {
-          "description": "Expiration timestamp of this order",
-          "type": "string",
-          "x-nullable": true
-        },
-        "fees": {
-          "description": "Fee information for the order",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/OrderFeeInfo"
-          }
-        },
-        "order_id": {
-          "description": "ID of the order",
-          "type": "integer"
-        },
-        "sell": {
-          "description": "Details of the asset being sold",
-          "$ref": "#/definitions/Token"
-        },
-        "status": {
-          "description": "Status of the order",
-          "type": "string"
-        },
-        "timestamp": {
-          "description": "Timestamp this order was created",
-          "type": "string",
-          "x-nullable": true
-        },
-        "updated_timestamp": {
-          "description": "Updated timestamp of this order",
-          "type": "string",
-          "x-nullable": true
-        },
-        "user": {
-          "description": "Ethereum address of the user who submitted the order",
-          "type": "string"
-        }
-      }
-    },
     "OrderDetails": {
       "type": "object",
       "properties": {
@@ -4769,6 +4708,10 @@
         "stark_signature"
       ],
       "properties": {
+        "email": {
+          "description": "User email",
+          "type": "string"
+        },
         "eth_signature": {
           "description": "Eth signature",
           "type": "string"
@@ -4899,10 +4842,6 @@
     },
     "Token": {
       "type": "object",
-      "required": [
-        "data",
-        "type"
-      ],
       "properties": {
         "data": {
           "description": "Token details of this asset",
@@ -4916,10 +4855,6 @@
     },
     "TokenData": {
       "type": "object",
-      "required": [
-        "quantity",
-        "quantity_with_fees"
-      ],
       "properties": {
         "decimals": {
           "description": "Number of decimals supported by this asset",
@@ -5054,19 +4989,14 @@
     "Transfer": {
       "type": "object",
       "required": [
-        "data",
         "receiver",
         "status",
         "timestamp",
+        "token",
         "transaction_id",
-        "type",
         "user"
       ],
       "properties": {
-        "data": {
-          "description": "Token details of this asset",
-          "$ref": "#/definitions/TokenData"
-        },
         "receiver": {
           "description": "Ethereum address of the user who received this transfer",
           "type": "string"
@@ -5080,13 +5010,13 @@
           "type": "string",
           "x-nullable": true
         },
+        "token": {
+          "description": "Token transferred by the user",
+          "$ref": "#/definitions/Token"
+        },
         "transaction_id": {
           "description": "Sequential transaction ID",
           "type": "integer"
-        },
-        "type": {
-          "description": "Type of this asset (ETH/ERC20/ERC721)",
-          "type": "string"
         },
         "user": {
           "description": "Ethereum address of the user  who submitted this transfer",
@@ -5226,6 +5156,69 @@
         }
       },
       "x-go-gen-location": "models"
+    },
+    "orders.Order": {
+      "type": "object",
+      "required": [
+        "amount_sold",
+        "buy",
+        "expiration_timestamp",
+        "order_id",
+        "sell",
+        "status",
+        "timestamp",
+        "updated_timestamp",
+        "user"
+      ],
+      "properties": {
+        "amount_sold": {
+          "description": "Amount of the asset already sold by this order",
+          "type": "string",
+          "x-nullable": true
+        },
+        "buy": {
+          "description": "Details of the asset being bought",
+          "$ref": "#/definitions/Token"
+        },
+        "expiration_timestamp": {
+          "description": "Expiration timestamp of this order",
+          "type": "string",
+          "x-nullable": true
+        },
+        "fees": {
+          "description": "Fee information for the order",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrderFeeInfo"
+          }
+        },
+        "order_id": {
+          "description": "ID of the order",
+          "type": "integer"
+        },
+        "sell": {
+          "description": "Details of the asset being sold",
+          "$ref": "#/definitions/Token"
+        },
+        "status": {
+          "description": "Status of the order",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "Timestamp this order was created",
+          "type": "string",
+          "x-nullable": true
+        },
+        "updated_timestamp": {
+          "description": "Updated timestamp of this order",
+          "type": "string",
+          "x-nullable": true
+        },
+        "user": {
+          "description": "Ethereum address of the user who submitted the order",
+          "type": "string"
+        }
+      }
     }
   }
 }

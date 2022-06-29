@@ -39,7 +39,7 @@ import { GetSignableOrderResponse } from '../models';
 // @ts-ignore
 import { ListOrdersResponse } from '../models';
 // @ts-ignore
-import { Order } from '../models';
+import { OrdersOrder } from '../models';
 /**
  * OrdersApi - axios parameter creator
  * @export
@@ -480,7 +480,7 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getOrder(id: string, includeFees?: boolean, auxiliaryFeePercentages?: string, auxiliaryFeeRecipients?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Order>> {
+        async getOrder(id: string, includeFees?: boolean, auxiliaryFeePercentages?: string, auxiliaryFeeRecipients?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrdersOrder>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getOrder(id, includeFees, auxiliaryFeePercentages, auxiliaryFeeRecipients, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -589,7 +589,7 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOrder(id: string, includeFees?: boolean, auxiliaryFeePercentages?: string, auxiliaryFeeRecipients?: string, options?: any): AxiosPromise<Order> {
+        getOrder(id: string, includeFees?: boolean, auxiliaryFeePercentages?: string, auxiliaryFeeRecipients?: string, options?: any): AxiosPromise<OrdersOrder> {
             return localVarFp.getOrder(id, includeFees, auxiliaryFeePercentages, auxiliaryFeeRecipients, options).then((request) => request(axios, basePath));
         },
         /**
