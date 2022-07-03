@@ -8,3 +8,7 @@
 
 # Things worth calling out
 <!--- Give useful tips/gotchas/trade-offs made to the reviewers. -->
+
+# Checklist
+
+- [ ] I have added changes to `CHANGELOG.md`
