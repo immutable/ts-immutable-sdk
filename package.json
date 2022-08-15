@@ -30,7 +30,10 @@
     "release": "release-it",
     "typecheck": "tsc --noEmit",
     "lint": "eslint ./src/utils/** ./src/workflows/**",
-    "lint-fix": "eslint ./src/utils/** ./src/workflows/** --fix"
+    "lint-fix": "eslint ./src/utils/** ./src/workflows/** --fix",
+    "docs:build": "typedoc src/index.ts",
+    "docs:serve": "http-server docs/",
+    "docs": "yarn docs:build && yarn docs:serve"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.8",
