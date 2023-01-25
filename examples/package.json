@@ -37,7 +37,7 @@
     "create-nft-withdrawal": "ts-node -r dotenv/config createNftWithdrawal.ts",
     "complete-nft-withdrawal": "ts-node -r dotenv/config completeNftWithdrawal.ts",
     "complete-erc20-withdrawal": "ts-node -r dotenv/config completeErc20Withdrawal.ts",
-    "create-erc20-withdrawal": "ts-node -r dotenv/config completeErc20Withdrawal.ts"
+    "create-erc20-withdrawal": "ts-node -r dotenv/config completeErc20Withdrawal.ts",
     "list-tokens": "ts-node -r dotenv/config listTokens.ts",
     "get-token": "ts-node -r dotenv/config getToken.ts"
 
