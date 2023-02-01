@@ -47,6 +47,7 @@ export async function registerOffchainWorkflow({
 
 interface IsRegisteredCheckError {
   reason: string;
+  code: string;
 }
 
 export async function isRegisteredOnChainWorkflow(
@@ -57,6 +58,12 @@ export async function isRegisteredOnChainWorkflow(
     return await contract.isRegistered(starkPublicKey);
   } catch (ex) {
     if ((ex as IsRegisteredCheckError).reason === 'USER_UNREGISTERED') {
+      return false;
+    }
+    // To deal with the issue of magic-provider not able to handle exceptions from contract
+    // and returns 'null' result with 'SERVER_ERROR' code
+    // https://immutable.atlassian.net/browse/BT-158
+    if ((ex as IsRegisteredCheckError).code === 'SERVER_ERROR') {
       return false;
     }
     throw ex;
