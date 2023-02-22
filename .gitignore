@@ -1,16 +1,5 @@
 node_modules/
-.DS_Store
+dist/
+
 .env
-.idea
-
-# Hardhat
-coverage
-coverage.json
-typechain
-cache
-artifacts
-
-dist
-docs/
-
-.vscode/
+.env.local
