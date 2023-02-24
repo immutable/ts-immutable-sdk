@@ -4,9 +4,6 @@
   "description": "Immutable Multi-Rollup TypeScript SDK",
   "main": "index.js",
   "type": "module",
-  "files": [
-    "dist/"
-  ],
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
