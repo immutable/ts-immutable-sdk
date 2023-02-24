@@ -1,0 +1,3 @@
+const Checkout = {};
+
+export { Checkout };
