@@ -1,2 +1,3 @@
 /src/modules/dev-auth/ @immutable/imx-developer-experience
 /src/modules/apis/ @immutable/imx-developer-experience
+/src/modules/passport/ @immutable/imx-passport
