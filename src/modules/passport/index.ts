@@ -1,4 +1,4 @@
-const Passport = {};
-const PassportProvider = {};
+import { PassportError } from './errors/passportError';
+import { PassportSDK } from './PassportSDK';
 
-export { Passport, PassportProvider };
+export { PassportSDK, PassportError };
