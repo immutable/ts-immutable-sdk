@@ -1,3 +1,1 @@
-import { IMXProvider } from "./imxProvider";
-
-export {IMXProvider}
+export { IMXProvider } from "./imxProvider";
