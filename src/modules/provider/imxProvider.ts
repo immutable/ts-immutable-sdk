@@ -1,6 +1,6 @@
-import { RegisterUserResponse } from "src/types";
 import {
     AnyToken,
+    RegisterUserResponse,
     CancelOrderResponse,
     CreateOrderResponse,
     CreateTradeResponse,
@@ -13,13 +13,12 @@ import {
     UnsignedExchangeTransferRequest,
     UnsignedOrderRequest,
     UnsignedTransferRequest
-} from "@imtbl/core-sdk";
+} from "src/types";
 import { TransactionResponse } from '@ethersproject/providers';
 
 export interface IMXProvider {
     registerOffchain():Promise<RegisterUserResponse>;
     isRegisteredOnchain():Promise<boolean>;
-    //mint(request: UnsignedMintRequest): Promise<MintTokensResponse>;
     createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse>;
     cancelOrder(request: GetSignableCancelOrderRequest): Promise<CancelOrderResponse>;
     createTrade(request: GetSignableTradeRequest): Promise<CreateTradeResponse>;
