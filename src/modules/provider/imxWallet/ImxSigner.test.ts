@@ -1,0 +1,79 @@
+import { REQUEST_EVENTS, RESPONSE_EVENTS } from './events';
+import { ImxSigner } from './ImxSigner';
+import { postRequestMessage } from './postRequestMessage';
+
+jest.mock('./postRequestMessage');
+
+describe('ImxSigner', () => {
+  const starkAddress = 'Ox1234z';
+
+  describe('getAddress', () => {
+    it('Should return l2Signer address', () => {
+      const imxSigner = new ImxSigner(starkAddress);
+
+      expect(imxSigner.getAddress()).toEqual(starkAddress);
+    });
+  });
+
+  describe('signMessage', () => {
+    const message = 'message';
+    const imxSigner = new ImxSigner(starkAddress);
+    it('Should call the postMessage', async () => {
+      const postRequestMessageMockFn = (postRequestMessage as jest.Mock);
+
+      imxSigner.signMessage(message);
+
+      await new Promise(process.nextTick);
+
+      expect(postRequestMessageMockFn).toBeCalledWith({
+        type: REQUEST_EVENTS.SIGN_MESSAGE_REQUEST,
+        details: { starkPublicKey: starkAddress, message },
+      });
+    });
+
+    it('Should receive signed message if l2Wallet signed successfully', async () => {
+      const signedMessage = 'signedmessage';
+      const mockedSuccessReturnValue = {
+        data: {
+          type: RESPONSE_EVENTS.SIGN_MESSAGE_RESPONSE,
+          details: {
+            success: true,
+            data: { signedMessage },
+          },
+        },
+      };
+      window.addEventListener = jest
+        .fn()
+        .mockImplementationOnce((event, callback) => {
+          callback(mockedSuccessReturnValue);
+        });
+
+      const returnSignedMessage = await imxSigner.signMessage(message);
+
+      expect(returnSignedMessage).toEqual(signedMessage);
+    });
+
+    it('Should throws an error if l2Wallet returns an error when signing the message', async () => {
+      const errorMessage = 'Failed signing message from imxSigner';
+      const mockedFailedReturnValue = {
+        data: {
+          type: RESPONSE_EVENTS.SIGN_MESSAGE_RESPONSE,
+          details: {
+            success: false,
+            error: {
+              code: 500,
+              message: errorMessage,
+            },
+          },
+        },
+      };
+      window.addEventListener = jest
+        .fn()
+        .mockImplementationOnce((event, callback) => {
+          callback(mockedFailedReturnValue);
+        });
+
+      expect(imxSigner.signMessage(message)).rejects.toThrow(errorMessage);
+    });
+  });
+});
