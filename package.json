@@ -26,6 +26,7 @@
   "dependencies": {
     "@imtbl/core-sdk": "^1.0.1",
     "@magic-ext/oidc": "^1.0.1",
+    "@metamask/detect-provider": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
     "eslint": "^8.34.0",
