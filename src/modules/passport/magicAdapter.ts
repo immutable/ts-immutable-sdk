@@ -26,7 +26,9 @@ export default class MagicAdapter {
         jwt: idToken,
         providerId: magicProviderId,
       });
-      return new ethers.providers.Web3Provider(this.magicClient.rpcProvider as any);
+      return new ethers.providers.Web3Provider(
+        this.magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider
+      );
     }, {
       type: PassportErrorType.WALLET_CONNECTION_ERROR,
     })

@@ -12,7 +12,7 @@ export type PassportConfig = {
 const checkRequiredConfiguration = (config: PassportConfig) => {
   const requiredConfiguration = ['clientId', 'redirectUri'];
   const errorMessage = requiredConfiguration
-    .map((key) => !(config as any)[key] && key)
+    .map((key) => !(config as Record<string, string>)[key] && key)
     .filter((n) => n)
     .join(', ');
   if (errorMessage !== '') {
