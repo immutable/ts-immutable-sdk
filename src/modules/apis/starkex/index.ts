@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ImmutableX, Config } from '@imtbl/core-sdk';
 
 const imtblClient = new ImmutableX(Config.SANDBOX);
