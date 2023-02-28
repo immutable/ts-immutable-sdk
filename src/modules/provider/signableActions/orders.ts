@@ -16,7 +16,7 @@ type CancelOrderWorkflowParams = {
   request: GetSignableCancelOrderRequest;
 };
 
-export async function createOrderWorkflow({
+export async function createOrder({
                                             signers,
                                             request,
                                           }: CreateOrderWorkflowParams): Promise<CreateOrderResponse> {
@@ -73,7 +73,7 @@ export async function createOrderWorkflow({
   };
 }
 
-export async function cancelOrderWorkflow({
+export async function cancelOrder({
                                             signers,
                                             request,
                                           }: CancelOrderWorkflowParams): Promise<CancelOrderResponse> {

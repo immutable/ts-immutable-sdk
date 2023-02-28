@@ -53,18 +53,18 @@ interface IsRegisteredCheckError {
 }
 
 export async function isRegisteredOnChain(
-  {ethSigner, starkExSigner}: signableActionParams,
+  signers:Signers,
 ): Promise<boolean> {
-  await validateChain(ethSigner);
+  await validateChain(signers.ethSigner);
 
   //FixMe: use configs same as immutable client
   const registrationContract = Contracts.Registration.connect(
     Config.SANDBOX.ethConfiguration.registrationContractAddress,
-    ethSigner,
+    signers.ethSigner,
   );
 
   try {
-    const starkPublicKey = await starkExSigner.getAddress();
+    const starkPublicKey = await signers.starkExSigner.getAddress();
     return await registrationContract.isRegistered(starkPublicKey);
   } catch (ex) {
     if ((ex as IsRegisteredCheckError).reason === 'USER_UNREGISTERED') {

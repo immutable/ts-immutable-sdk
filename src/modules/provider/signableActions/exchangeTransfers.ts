@@ -1,20 +1,20 @@
-import { signableActionParams } from "./types";
 import { CreateTransferResponseV1, UnsignedExchangeTransferRequest } from "../../../types";
 import { StarkEx } from "../../apis/starkex";
 import { convertToSignableToken } from "./utils/convertToSignableToken";
 import { signRaw } from "./utils/crypto";
+import { Signers } from "./types";
 
 
-type TransfersWorkflowParams = signableActionParams & {
+type TransfersWorkflowParams = {
+  signers: Signers
   request: UnsignedExchangeTransferRequest;
 };
 
 export async function exchangeTransfersWorkflow({
-                                                  ethSigner,
-                                                  starkExSigner,
+                                                  signers,
                                                   request,
                                                 }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
-  const ethAddress = await ethSigner.getAddress();
+  const ethAddress = await signers.ethSigner.getAddress();
 
   const transferAmount = request.amount;
   const signableResult = await StarkEx.exchangeApi.getExchangeSignableTransfer({
@@ -30,9 +30,9 @@ export async function exchangeTransfersWorkflow({
   const { signable_message: signableMessage, payload_hash: payloadHash } =
     signableResult.data;
 
-  const ethSignature = await signRaw(signableMessage, ethSigner);
+  const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 
-  const starkSignature = await starkExSigner.signMessage(payloadHash);
+  const starkSignature = await signers.starkExSigner.signMessage(payloadHash);
 
   const transferSigningParams = {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
