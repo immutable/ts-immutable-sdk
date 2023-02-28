@@ -46,20 +46,7 @@ export class Immutable {
 
     const imx = new ImmutableX(config); // coresdk
 
-    const {
-      deposit,
-      registerOffchain,
-      isRegisteredOnchain,
-      prepareWithdrawal,
-      completeWithdrawal,
-      createOrder,
-      cancelOrder,
-      createTrade,
-      transfer,
-      batchNftTransfer,
-      ...StarkEx
-    } = imx;
-    this.StarkEx = StarkEx;
+    this.StarkEx = {...imx};
   }
 
   public getConfig(): ImmutableXConfiguration {
