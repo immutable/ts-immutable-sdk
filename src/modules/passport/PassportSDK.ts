@@ -1,7 +1,9 @@
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
-import { Networks, User } from './types';
+import { Networks } from './types';
 import { PassportError, PassportErrorType } from './errors/passportError';
+import { PassportWalletProvider } from './passportWalletProvider';
+import PassportImxProvider from './imxProvider/passportImxProvider';
 
 export type PassportConfig = {
   clientId: string;
@@ -26,20 +28,21 @@ const checkRequiredConfiguration = (config: PassportConfig) => {
 export class PassportSDK {
   private authManager: AuthManager;
   private magicAdapter: MagicAdapter;
-
+  private passportWalletProvider: PassportWalletProvider;
   constructor(config: PassportConfig) {
     checkRequiredConfiguration(config);
 
     this.authManager = new AuthManager(config);
     this.magicAdapter = new MagicAdapter(config.network);
+    this.passportWalletProvider = new PassportWalletProvider(this.authManager, this.magicAdapter)
   }
 
-  public async connect(): Promise<User> {
-    const user = await this.authManager.login();
-    if (user.id_token) {
-      await this.magicAdapter.login(user.id_token);
-    }
-    return user;
+  public async connect(): Promise<PassportImxProvider> {
+    return this.passportWalletProvider.connect();
+  }
+
+  public getWalletProvider(): PassportWalletProvider {
+    return this.passportWalletProvider;
   }
 
   public async loginCallback(): Promise<void> {
