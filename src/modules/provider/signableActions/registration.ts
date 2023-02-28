@@ -4,20 +4,24 @@ import { Signers } from "./types";
 import { validateChain } from "./helpers";
 import { Config, Contracts } from "@imtbl/core-sdk";
 import { signRaw } from "./utils/crypto";
+import { Immutable } from "../../apis/starkex/immutable";
 
-export async function registerOffchain(signers: Signers
+export async function registerOffchain(signers: Signers, imx:Immutable
 ): Promise<RegisterUserResponse> {
-  await validateChain(signers.ethSigner);
+  await validateChain(signers.ethSigner, imx.getConfig());
 
   const userAddress = await signers.ethSigner.getAddress();
   const starkPublicKey = await signers.starkExSigner.getAddress();
 
-  const signableResult = await StarkEx.usersApi.getSignableRegistrationOffchain({
+  await StarkEx.usersApi.getSignableRegistrationOffchain({
     getSignableRegistrationRequest: {
       ether_key: userAddress,
       stark_key: starkPublicKey,
     },
-  });
+  })
+
+  const signableResult = await imx.StarkExAPI.usersApi.getSignableRegistrationOffchain({
+    getSignableRegistrationRequest:{ether_key: userAddress, stark_key:starkPublicKey}});
 
   const {
     signable_message: signableMessage,
@@ -28,7 +32,7 @@ export async function registerOffchain(signers: Signers
 
   const starkSignature = await signers.starkExSigner.signMessage(payloadHash);
 
-  const registeredUser = await StarkEx.usersApi.registerUser({
+  const registeredUser = await imx.StarkExAPI.usersApi.registerUser({
     registerUserRequest: {
       eth_signature: ethSignature,
       ether_key: userAddress,
