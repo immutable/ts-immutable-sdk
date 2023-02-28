@@ -4,7 +4,6 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import { MetamaskConnectParams } from './types';
 import { WALLET_ACTION } from './rpc';
 
-// FIXME: keep?
 export const L1_METAMASK_ERRORS = {
   PROVIDER_NOT_FOUND: 'The MetaMask provider was not found.',
 };
