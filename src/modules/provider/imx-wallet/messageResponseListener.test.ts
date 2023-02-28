@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { ENVIRONMENTS } from '../constants';
 import { ConnectResponse } from './types';
 import { RESPONSE_EVENTS } from './events';
@@ -10,7 +14,7 @@ const callbackFn = jest.fn();
 
 function getMessageEvent(
   eventOrigin: string,
-  eventType: RESPONSE_EVENTS,
+  eventType: RESPONSE_EVENTS
 ): MessageEvent {
   return {
     origin: eventOrigin,
@@ -31,28 +35,24 @@ describe('the messageResponseListener function', () => {
   beforeEach(async () => {
     htmlBodyInit();
 
-    const setup = setupIFrame(ENVIRONMENTS.DEVELOPMENT);
+    const iframePromise = setupIFrame(ENVIRONMENTS.DEVELOPMENT);
+    triggerIFrameOnLoad();
 
-    iframe = triggerIFrameOnLoad();
+    iframe = await iframePromise;
 
     if (iframe) {
       iFrameURL = new URL(iframe.src).origin;
     }
-
-    await setup;
   });
 
   afterEach(() => jest.clearAllMocks());
 
   it('should call the callback if the message is valid', () => {
     messageResponseListener<ConnectResponse>(
-      getMessageEvent(
-        iFrameURL,
-        RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
-      ),
+      getMessageEvent(iFrameURL, RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE),
       RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
       iframe,
-      callbackFn,
+      callbackFn
     );
 
     expect(callbackFn).toBeCalled();
@@ -62,11 +62,11 @@ describe('the messageResponseListener function', () => {
     messageResponseListener<ConnectResponse>(
       getMessageEvent(
         'http://anyotherorigin.com',
-        RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+        RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE
       ),
       RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
       iframe,
-      callbackFn,
+      callbackFn
     );
 
     expect(callbackFn).not.toBeCalled();
@@ -74,13 +74,10 @@ describe('the messageResponseListener function', () => {
 
   it('should ignore events if the type does not match', () => {
     messageResponseListener<ConnectResponse>(
-      getMessageEvent(
-        iFrameURL,
-        RESPONSE_EVENTS.SIGN_MESSAGE_RESPONSE,
-      ),
+      getMessageEvent(iFrameURL, RESPONSE_EVENTS.SIGN_MESSAGE_RESPONSE),
       RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
       iframe,
-      callbackFn,
+      callbackFn
     );
 
     expect(callbackFn).not.toBeCalled();

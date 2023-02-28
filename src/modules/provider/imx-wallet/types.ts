@@ -6,23 +6,19 @@ export type ConnectResponse = {
   starkPublicKey: string;
 };
 
-export type GetConnectionRequest = {
-  etherAddress: string;
-};
-export type GetConnectionResponse = ConnectResponse;
-
 export type SignMessageRequest = {
   starkPublicKey: string;
   message: string;
-}
+};
 export type SignMessageResponse = {
   signedMessage: string;
-}
+};
 
 export type DisconnectRequest = {
   starkPublicKey: string;
 };
-export type DisconnectResponse = {};
+// should it be empty object?
+export type DisconnectResponse = object;
 
 export enum ERROR_CODE {
   CANNOT_RETRIEVE_STARK_KEY_PAIR = 100,

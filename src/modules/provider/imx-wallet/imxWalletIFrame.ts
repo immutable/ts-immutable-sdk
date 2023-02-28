@@ -12,7 +12,9 @@ export function getIFrame(): HTMLIFrameElement | null {
   return document.querySelector(`iframe#${IMX_WALLET_IFRAME_ID}`);
 }
 
-export async function setupIFrame(env: ENVIRONMENTS): Promise<HTMLIFrameElement> {
+export async function setupIFrame(
+  env: ENVIRONMENTS
+): Promise<HTMLIFrameElement> {
   return new Promise((resolve) => {
     const iframe = document.createElement('iframe');
 
@@ -26,7 +28,9 @@ export async function setupIFrame(env: ENVIRONMENTS): Promise<HTMLIFrameElement>
   });
 }
 
-export async function getOrSetIframe(env: ENVIRONMENTS): Promise<HTMLIFrameElement> {
+export async function getOrSetIframe(
+  env: ENVIRONMENTS
+): Promise<HTMLIFrameElement> {
   const iframe = getIFrame();
   if (iframe) return iframe;
   return await setupIFrame(env);

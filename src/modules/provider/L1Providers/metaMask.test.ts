@@ -4,7 +4,6 @@ import { connect } from './metaMask';
 import { WALLET_ACTION } from './rpc';
 
 jest.mock('@metamask/detect-provider');
-jest.mock('../events');
 
 describe('the connect function', () => {
   it('Should succeed and return a Web3Provider', async () => {
