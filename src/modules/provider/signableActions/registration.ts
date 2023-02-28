@@ -1,14 +1,8 @@
 import { RegisterUserResponse, StarkEx } from "src";
-import { StarkSigner, GetSignableRegistrationResponse } from "src/types";
-import { EthSigner,  } from "@imtbl/core-sdk";
+import { GetSignableRegistrationResponse } from "src/types";
+import { signableActionParams } from "./types";
 
-
-type workflowParams = {
-  ethSigner: EthSigner;
-  starkExSigner: StarkSigner;
-};
-
-export async function registerOffchain({ethSigner, starkExSigner}: workflowParams): Promise<RegisterUserResponse> {
+export async function registerOffchain({ethSigner, starkExSigner}: signableActionParams): Promise<RegisterUserResponse> {
   const userAddress = await ethSigner.getAddress();
   const starkPublicKey = await starkExSigner.getAddress();
 
