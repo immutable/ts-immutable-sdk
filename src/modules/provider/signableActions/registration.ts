@@ -1,8 +1,11 @@
 import { RegisterUserResponse, StarkEx } from "src";
 import { GetSignableRegistrationResponse } from "src/types";
 import { signableActionParams } from "./types";
+import { validateChain } from "./utils";
 
 export async function registerOffchain({ethSigner, starkExSigner}: signableActionParams): Promise<RegisterUserResponse> {
+  await validateChain(ethSigner);
+
   const userAddress = await ethSigner.getAddress();
   const starkPublicKey = await starkExSigner.getAddress();
 
@@ -35,10 +38,12 @@ export async function registerOffchain({ethSigner, starkExSigner}: signableActio
 }
 
 export async function isRegisteredOnChain(
-  starkPublicKey: string,
+  {ethSigner, starkExSigner}: signableActionParams,
   contract: Registration,
 ): Promise<boolean> {
+  await validateChain(ethSigner);
   try {
+    const starkPublicKey = await starkExSigner.getAddress();
     return await contract.isRegistered(starkPublicKey);
   } catch (ex) {
     if ((ex as IsRegisteredCheckError).reason === 'USER_UNREGISTERED') {
