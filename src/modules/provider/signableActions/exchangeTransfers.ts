@@ -1,23 +1,25 @@
 import { CreateTransferResponseV1, UnsignedExchangeTransferRequest } from "../../../types";
-import { StarkEx } from "../../apis/starkex";
 import { convertToSignableToken } from "./utils/convertToSignableToken";
 import { signRaw } from "./utils/crypto";
 import { Signers } from "./types";
+import { Immutable } from "../../apis/starkex/immutable";
 
 
 type TransfersWorkflowParams = {
   signers: Signers
   request: UnsignedExchangeTransferRequest;
+  imx: Immutable;
 };
 
 export async function exchangeTransfersWorkflow({
-                                                  signers,
-                                                  request,
-                                                }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
+    signers,
+    request,
+    imx,
+  }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
   const ethAddress = await signers.ethSigner.getAddress();
 
   const transferAmount = request.amount;
-  const signableResult = await StarkEx.exchangeApi.getExchangeSignableTransfer({
+  const signableResult = await imx.StarkEx.exchangeApi.getExchangeSignableTransfer({
     id: request.transactionID,
     getSignableTransferRequest: {
       sender: ethAddress,
@@ -47,7 +49,7 @@ export async function exchangeTransfersWorkflow({
     stark_signature: starkSignature,
   };
 
-  const response = await StarkEx.exchangeApi.createExchangeTransfer({
+  const response = await imx.StarkEx.exchangeApi.createExchangeTransfer({
     id: request.transactionID,
     createTransferRequest: transferSigningParams,
     xImxEthAddress: ethAddress,

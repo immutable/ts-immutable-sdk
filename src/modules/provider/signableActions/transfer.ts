@@ -1,17 +1,19 @@
 import { CreateTransferResponse, CreateTransferResponseV1, NftTransferDetails, UnsignedTransferRequest } from "src/types";
 import { Signers } from "./types";
-import { StarkEx } from "../../apis/starkex";
 import { convertToSignableToken } from "./utils/convertToSignableToken";
 import { signRaw } from "./utils/crypto";
+import { Immutable } from "../../apis/starkex/immutable";
 
 type TransfersWorkflowParams = {
   signers: Signers;
   request: UnsignedTransferRequest;
+  imx: Immutable;
 };
 
 type BatchTransfersWorkflowParams = {
   signers: Signers;
   request: Array<NftTransferDetails>;
+  imx: Immutable;
 };
 
 export async function transfers({
@@ -20,11 +22,12 @@ export async function transfers({
       starkExSigner,
     },
     request,
+    imx,
   }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
   const ethAddress = await ethSigner.getAddress();
 
   const transferAmount = request.type === 'ERC721' ? '1' : request.amount;
-  const signableResult = await StarkEx.transfersApi.getSignableTransferV1({
+  const signableResult = await imx.StarkEx.transfersApi.getSignableTransferV1({
     getSignableTransferRequest: {
       sender: ethAddress,
       token: convertToSignableToken(request),
@@ -53,7 +56,7 @@ export async function transfers({
     stark_signature: starkSignature,
   };
 
-  const response = await StarkEx.transfersApi.createTransferV1({
+  const response = await imx.StarkEx.transfersApi.createTransferV1({
     createTransferRequest: transferSigningParams,
     xImxEthAddress: ethAddress,
     xImxEthSignature: ethSignature,
@@ -73,6 +76,7 @@ export async function batchTransfers({
       starkExSigner,
     },
     request,
+    imx,
   }: BatchTransfersWorkflowParams): Promise<CreateTransferResponse> {
   const ethAddress = await ethSigner.getAddress();
 
@@ -88,7 +92,7 @@ export async function batchTransfers({
     };
   });
 
-  const signableResult = await StarkEx.transfersApi.getSignableTransfer({
+  const signableResult = await imx.StarkEx.transfersApi.getSignableTransfer({
     getSignableTransferRequestV2: {
       sender_ether_key: ethAddress,
       signable_requests: signableRequests,
@@ -125,7 +129,7 @@ export async function batchTransfers({
     requests,
   };
 
-  const response = await StarkEx.transfersApi.createTransfer({
+  const response = await imx.StarkEx.transfersApi.createTransfer({
     createTransferRequestV2: transferSigningParams,
     xImxEthAddress: ethAddress,
     xImxEthSignature: ethSignature,

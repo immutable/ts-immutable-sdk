@@ -13,7 +13,7 @@ export async function registerOffchain(signers: Signers, imx:Immutable
   const userAddress = await signers.ethSigner.getAddress();
   const starkPublicKey = await signers.starkExSigner.getAddress();
 
-  const signableResult = await imx.StarkExAPI.usersApi.getSignableRegistrationOffchain({
+  const signableResult = await imx.StarkEx.usersApi.getSignableRegistrationOffchain({
     getSignableRegistrationRequest:{ether_key: userAddress, stark_key:starkPublicKey}});
 
   const {
@@ -25,7 +25,7 @@ export async function registerOffchain(signers: Signers, imx:Immutable
 
   const starkSignature = await signers.starkExSigner.signMessage(payloadHash);
 
-  const registeredUser = await imx.StarkExAPI.usersApi.registerUser({
+  const registeredUser = await imx.StarkEx.usersApi.registerUser({
     registerUserRequest: {
       eth_signature: ethSignature,
       ether_key: userAddress,

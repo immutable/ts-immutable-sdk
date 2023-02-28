@@ -21,7 +21,7 @@ import {
 
 export class Immutable {
   private readonly config: ImmutableXConfiguration;
-  public StarkExAPI:
+  public StarkEx:
     {
       depositsApi: DepositsApi,
       mintsApi: MintsApi,
@@ -59,7 +59,7 @@ export class Immutable {
       batchNftTransfer,
       ...StarkEx
     } = imx;
-    this.StarkExAPI = StarkEx;
+    this.StarkEx = StarkEx;
   }
 
   public getConfig(): ImmutableXConfiguration {
