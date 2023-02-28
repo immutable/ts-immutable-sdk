@@ -49,7 +49,7 @@ export async function connect(
         type: REQUEST_EVENTS.CONNECT_WALLET_REQUEST,
         details: { ethAddress: address, signature },
       },
-      iframe
+      iframe,
     );
   });
 }
