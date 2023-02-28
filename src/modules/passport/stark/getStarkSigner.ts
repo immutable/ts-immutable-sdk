@@ -1,13 +1,16 @@
 import { Signer } from 'ethers';
+import { withPassportError, PassportErrorType } from '../errors/passportError';
 import {
   generateLegacyStarkPrivateKey,
   createStarkSigner,
   StarkSigner,
 } from '@imtbl/core-sdk';
 
-export const getStartSigner = async (
+export const getStarkSigner = async (
   signer: Signer
 ): Promise<StarkSigner> => {
-  const privateKey = await generateLegacyStarkPrivateKey(signer);
-  return createStarkSigner(privateKey);
+  return withPassportError<StarkSigner>(async () => {
+    const privateKey = await generateLegacyStarkPrivateKey(signer);
+    return createStarkSigner(privateKey);
+  }, {type: PassportErrorType.WALLET_CONNECTION_ERROR})
 };
