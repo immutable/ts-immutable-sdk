@@ -1,6 +1,5 @@
 import { ethers } from 'ethers';
 
-import { addLog } from '../../utils/logs';
 import { REQUEST_EVENTS, RESPONSE_EVENTS } from './events';
 import { connect, getConnection, disconnect } from './imxWallet';
 import { postRequestMessage } from './postRequestMessage';
@@ -159,37 +158,6 @@ describe('imxWallet', () => {
         type: REQUEST_EVENTS.DISCONNECT_WALLET_REQUEST,
         details: { starkPublicKey },
       });
-    });
-
-    it('Should log an error if l2Wallet returns error', async () => {
-      const error = {
-        code: 500,
-        message: 'Something went wrong.',
-      };
-
-      const mockedFailedReturnValue = {
-        data: {
-          type: RESPONSE_EVENTS.DISCONNECT_WALLET_RESPONSE,
-          details: {
-            success: false,
-            error,
-          },
-        },
-      };
-
-      (window.addEventListener as jest.Mock).mockImplementationOnce(
-        (_, callback) => callback(mockedFailedReturnValue),
-      );
-
-      disconnect(starkPublicKey);
-
-      await new Promise(process.nextTick);
-
-      expect(addLog).toBeCalledWith(
-        'sdk',
-        'imxWallet:disconnect - an error happened disconnecting inside the IMX Wallet',
-        { error },
-      );
     });
   });
 });

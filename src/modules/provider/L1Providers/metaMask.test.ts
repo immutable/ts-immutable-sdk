@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { connect } from './metaMask';
-import { WALLET_ACTION } from '.';
+import { WALLET_ACTION } from './rpc';
 
 jest.mock('@metamask/detect-provider');
 jest.mock('../events');
