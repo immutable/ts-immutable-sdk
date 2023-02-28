@@ -1,11 +1,20 @@
 import { RegisterUserResponse, StarkEx } from "src";
 import { GetSignableRegistrationResponse } from "src/types";
-import { signableActionParams } from "./types";
+import { Signers } from "./types";
 import { validateChain } from "./helpers";
 import { Config, Contracts } from "@imtbl/core-sdk";
 import { signRaw } from "./utils/crypto";
 
-export async function registerOffchain({ethSigner, starkExSigner}: signableActionParams): Promise<RegisterUserResponse> {
+export type RegisterOffchainParams = {
+  signers: Signers
+};
+
+export async function registerOffchain({
+  signers: {
+    ethSigner,
+    starkExSigner,
+  }
+}: RegisterOffchainParams): Promise<RegisterUserResponse> {
   await validateChain(ethSigner);
 
   const userAddress = await ethSigner.getAddress();

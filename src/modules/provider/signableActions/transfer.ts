@@ -1,22 +1,26 @@
 import { CreateTransferResponse, CreateTransferResponseV1, NftTransferDetails, UnsignedTransferRequest } from "src/types";
-import { signableActionParams } from "./types";
+import { Signers } from "./types";
 import { StarkEx } from "../../apis/starkex";
-import { convertToSignableToken } from "./helpers";
+import { convertToSignableToken } from "./utils/convertToSignableToken";
 import { signRaw } from "./utils/crypto";
 
-type TransfersWorkflowParams = signableActionParams & {
+type TransfersWorkflowParams = {
+  signers: Signers;
   request: UnsignedTransferRequest;
 };
 
-type BatchTransfersWorkflowParams = signableActionParams & {
+type BatchTransfersWorkflowParams = {
+  signers: Signers;
   request: Array<NftTransferDetails>;
 };
 
 export async function transfers({
-                                          ethSigner,
-                                          starkExSigner,
-                                          request,
-                                        }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
+    signers: {
+      ethSigner,
+      starkExSigner,
+    },
+    request,
+  }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
   const ethAddress = await ethSigner.getAddress();
 
   const transferAmount = request.type === 'ERC721' ? '1' : request.amount;
@@ -64,10 +68,12 @@ export async function transfers({
 }
 
 export async function batchTransfers({
-                                               ethSigner,
-                                               starkExSigner,
-                                               request,
-                                             }: BatchTransfersWorkflowParams): Promise<CreateTransferResponse> {
+    signers: {
+      ethSigner,
+      starkExSigner,
+    },
+    request,
+  }: BatchTransfersWorkflowParams): Promise<CreateTransferResponse> {
   const ethAddress = await ethSigner.getAddress();
 
   const signableRequests = request.map(nftTransfer => {

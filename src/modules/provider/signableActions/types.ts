@@ -1,7 +1,7 @@
 import { EthSigner } from "@imtbl/core-sdk";
 import { StarkSigner } from "../../../types";
 
-export type signableActionParams = {
+export type Signers = {
   ethSigner: EthSigner;
   starkExSigner: StarkSigner;
 };

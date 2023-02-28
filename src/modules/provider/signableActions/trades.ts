@@ -1,18 +1,21 @@
 import { CreateTradeResponse, GetSignableTradeRequest } from "src/types";
-import { signableActionParams } from "./types";
+import { Signers } from "./types";
 import { StarkEx } from "../../apis/starkex";
 import { validateChain } from "./helpers";
 import { signRaw } from "./utils/crypto";
 
-type createTradeWorkflowParams = signableActionParams & {
+type createTradeWorkflowParams = {
+  signers: Signers;
   request: GetSignableTradeRequest;
 };
 
 export async function createTrade({
-                                            ethSigner,
-                                            starkExSigner,
-                                            request,
-                                          }: createTradeWorkflowParams): Promise<CreateTradeResponse> {
+    signers: {
+      ethSigner,
+      starkExSigner,
+    },
+    request,
+  }: createTradeWorkflowParams): Promise<CreateTradeResponse> {
   await validateChain(ethSigner);
   const ethAddress = await ethSigner.getAddress();
 
