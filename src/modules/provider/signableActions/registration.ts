@@ -1,7 +1,7 @@
 import { RegisterUserResponse, StarkEx } from "src";
 import { GetSignableRegistrationResponse } from "src/types";
 import { signableActionParams } from "./types";
-import { validateChain } from "./utils";
+import { validateChain } from "./helpers";
 import { Config, Contracts } from "@imtbl/core-sdk";
 import { signRaw } from "./utils/crypto";
 
