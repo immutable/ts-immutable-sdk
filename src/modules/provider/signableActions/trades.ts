@@ -2,6 +2,7 @@ import { CreateTradeResponse, GetSignableTradeRequest } from "src/types";
 import { signableActionParams } from "./types";
 import { StarkEx } from "../../apis/starkex";
 import { validateChain } from "./utils";
+import { signRaw } from "./utils/crypto";
 
 type createTradeWorkflowParams = signableActionParams & {
   request: GetSignableTradeRequest;

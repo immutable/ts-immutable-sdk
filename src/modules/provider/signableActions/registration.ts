@@ -2,6 +2,8 @@ import { RegisterUserResponse, StarkEx } from "src";
 import { GetSignableRegistrationResponse } from "src/types";
 import { signableActionParams } from "./types";
 import { validateChain } from "./utils";
+import { Config, Contracts } from "@imtbl/core-sdk";
+import { signRaw } from "./utils/crypto";
 
 export async function registerOffchain({ethSigner, starkExSigner}: signableActionParams): Promise<RegisterUserResponse> {
   await validateChain(ethSigner);
@@ -37,14 +39,24 @@ export async function registerOffchain({ethSigner, starkExSigner}: signableActio
   return registeredUser.data;
 }
 
+interface IsRegisteredCheckError {
+  reason: string;
+}
+
 export async function isRegisteredOnChain(
   {ethSigner, starkExSigner}: signableActionParams,
-  contract: Registration,
 ): Promise<boolean> {
   await validateChain(ethSigner);
+
+  //FixMe: use configs same as immutable client
+  const registrationContract = Contracts.Registration.connect(
+    Config.SANDBOX.ethConfiguration.registrationContractAddress,
+    ethSigner,
+  );
+
   try {
     const starkPublicKey = await starkExSigner.getAddress();
-    return await contract.isRegistered(starkPublicKey);
+    return await registrationContract.isRegistered(starkPublicKey);
   } catch (ex) {
     if ((ex as IsRegisteredCheckError).reason === 'USER_UNREGISTERED') {
       return false;
