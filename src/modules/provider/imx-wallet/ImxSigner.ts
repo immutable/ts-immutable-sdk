@@ -1,4 +1,4 @@
-import { L2Signer } from '../../WalletSDK';
+
 import { COMMUNICATION_TYPE, REQUEST_EVENTS, RESPONSE_EVENTS } from './events';
 import {
   messageResponseListener,
@@ -8,8 +8,9 @@ import {
   SignMessageRequest,
   SignMessageResponse,
 } from './types';
+import { StarkSigner } from '../../../types';
 
-export class ImxSigner implements L2Signer {
+export class ImxSigner implements StarkSigner {
   private publicAddress;
 
   constructor(publicAddress: string) {

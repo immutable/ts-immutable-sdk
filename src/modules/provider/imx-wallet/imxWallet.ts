@@ -1,33 +1,26 @@
 import { ethers } from 'ethers';
-
-import { addLog } from '../../utils/logs';
-import { L2Signer } from '../../WalletSDK';
 import {
   ConnectRequest,
   ConnectResponse,
-  GetConnectionRequest,
-  GetConnectionResponse,
   DisconnectRequest,
   DisconnectResponse,
+  GetConnectionRequest,
+  GetConnectionResponse,
 } from './types';
+import { StarkSigner } from '../../../types';
 import {
+  COMMUNICATION_TYPE,
   REQUEST_EVENTS,
   RESPONSE_EVENTS,
-  COMMUNICATION_TYPE,
 } from './events';
 import { postRequestMessage } from './postRequestMessage';
 import { messageResponseListener } from './messageResponseListener';
 import { ImxSigner } from './ImxSigner';
 
-const DEFAULT_CONNECTION_MESSAGE =
-  'Only sign this request if you’ve initiated an action with Immutable X.';
+const DEFAULT_CONNECTION_MESSAGE = 'Only sign this request if you’ve initiated an action with ImmutableX.';
 const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed.';
 
-export async function connect(
-  l1Provider: ethers.providers.Web3Provider,
-): Promise<L2Signer> {
-  addLog('sdk', 'imxWallet:connect');
-
+export async function connect(l1Provider: ethers.providers.Web3Provider): Promise<StarkSigner> {
   const l1Signer = l1Provider.getSigner();
   const address = await l1Signer.getAddress();
   const signature = await l1Signer.signMessage(DEFAULT_CONNECTION_MESSAGE);
@@ -57,10 +50,7 @@ export async function connect(
   });
 }
 
-export async function getConnection(
-  etherAddress: string,
-): Promise<L2Signer | undefined> {
-  addLog('sdk', 'imxWallet:getConnection');
+export async function getConnection(etherAddress: string): Promise<StarkSigner | undefined> {
   return new Promise((resolve) => {
     const listener = (event: MessageEvent) => {
       messageResponseListener<GetConnectionResponse>(
@@ -86,11 +76,7 @@ export async function getConnection(
   });
 }
 
-export async function disconnect(
-  starkPublicKey: string,
-): Promise<void> {
-  addLog('sdk', 'imxWallet:disconnect');
-
+export async function disconnect(starkPublicKey: string): Promise<void> {
   return new Promise((resolve) => {
     const listener = (event: MessageEvent) => {
       messageResponseListener<DisconnectResponse>(
@@ -100,11 +86,12 @@ export async function disconnect(
           window.removeEventListener(COMMUNICATION_TYPE, listener);
 
           if (!messageDetails.success && messageDetails.error) {
-            addLog(
-              'sdk',
-              'imxWallet:disconnect - an error happened disconnecting inside the IMX Wallet',
-              { error: messageDetails.error },
-            );
+            // todo: there is just a log here - what should we do? remove this whole if block? reject?
+            // addLog(
+            //   'sdk',
+            //   'imxWallet:disconnect - an error happened disconnecting inside the IMX Wallet',
+            //   { error: messageDetails.error },
+            // );
           }
 
           resolve();

@@ -1,4 +1,4 @@
-import { ENVIRONMENTS } from '../../constants';
+import { ENVIRONMENTS } from './constants';
 import { ConnectResponse } from './types';
 import { RESPONSE_EVENTS } from './events';
 import { messageResponseListener } from './messageResponseListener';

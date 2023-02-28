@@ -1,4 +1,3 @@
-import { addLog } from '../../utils/logs';
 import { REQUEST_EVENTS } from './events';
 import { getIFrame } from './imxWalletIFrame';
 
@@ -8,11 +7,7 @@ export type RequestMessage<T> = {
 };
 
 // TODO: This function would suit better if moved to L2Provider package
-export function postRequestMessage<T>(
-  payload: RequestMessage<T>,
-) {
-  addLog('sdk', 'postRequestMessage', payload);
-
+export function postRequestMessage<T>(payload: RequestMessage<T>) {
   const iFrame = getIFrame();
 
   if (iFrame && iFrame.contentWindow) {

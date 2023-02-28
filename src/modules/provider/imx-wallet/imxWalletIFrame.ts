@@ -1,5 +1,4 @@
-import { ENVIRONMENTS } from '../../constants';
-import { addLog } from '../../utils/logs';
+import { ENVIRONMENTS } from './constants'; // todo: determine if we want to handle envs the same
 
 export const IMX_WALLET_IFRAME_ID = 'imx-wallet-app';
 export const IMX_WALLET_IFRAME_HOSTS = {
@@ -21,11 +20,8 @@ function resetIFrame(): void {
   }
 }
 
-export async function setupIFrame(
-  env: ENVIRONMENTS,
-): Promise<void> {
-  addLog('sdk', 'setupIFrame');
-
+// todo: where do we want to use this?
+export async function setupIFrame(env: ENVIRONMENTS): Promise<void> {
   return new Promise((resolve) => {
     resetIFrame();
 
