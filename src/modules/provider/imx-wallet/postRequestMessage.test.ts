@@ -4,13 +4,14 @@ import { postRequestMessage } from './postRequestMessage';
 import { IMX_WALLET_IFRAME_HOSTS } from './imxWalletIFrame';
 
 const postMessageMock = jest.fn();
+const iframe = {
+  src: 'http://localhost:8080',
+  contentWindow: { postMessage: postMessageMock },
+} as unknown as HTMLIFrameElement;
 
 jest.mock('./imxWalletIFrame', () => ({
   ...jest.requireActual('./imxWalletIFrame'),
-  getIFrame: () => ({
-    src: 'http://localhost:8080',
-    contentWindow: { postMessage: postMessageMock },
-  }),
+  getIFrame: () => iframe,
 }));
 
 describe('the postRequestMessage function', () => {
@@ -20,11 +21,11 @@ describe('the postRequestMessage function', () => {
       details: { ethAddress: '0x000', signature: 'The message' },
     };
 
-    postRequestMessage<ConnectRequest>(postMessage);
+    postRequestMessage<ConnectRequest>(postMessage, iframe);
 
     expect(postMessageMock).toHaveBeenCalledWith(
       postMessage,
-      IMX_WALLET_IFRAME_HOSTS.development,
+      IMX_WALLET_IFRAME_HOSTS.development
     );
   });
 });

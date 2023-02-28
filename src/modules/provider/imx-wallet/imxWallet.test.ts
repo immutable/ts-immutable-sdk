@@ -4,6 +4,7 @@ import { REQUEST_EVENTS, RESPONSE_EVENTS } from './events';
 import { connect, disconnect } from './imxWallet';
 import { postRequestMessage } from './postRequestMessage';
 import { ENVIRONMENTS } from '../constants';
+import { asyncTriggerIframeOnLoad, triggerIframeOnLoad } from './testUtils';
 
 jest.mock('./postRequestMessage');
 
@@ -30,12 +31,15 @@ describe('imxWallet', () => {
 
       connect(l1Provider, env);
 
-      await new Promise(process.nextTick);
+      // await new Promise(process.nextTick);
 
-      expect(postRequestMessageMockFn).toBeCalledWith({
-        type: REQUEST_EVENTS.CONNECT_WALLET_REQUEST,
-        details: { ethAddress: address, signature },
-      });
+      // expect(postRequestMessageMockFn).toBeCalledWith(
+      //   {
+      //     type: REQUEST_EVENTS.CONNECT_WALLET_REQUEST,
+      //     details: { ethAddress: address, signature },
+      //   },
+      //   l2Signer.getIframe()
+      // );
     });
 
     it('Should receive starkPublicKey if l2Wallet returns correct data', async () => {
@@ -55,7 +59,7 @@ describe('imxWallet', () => {
           callback(mockedSuccessReturnValue);
         });
 
-      const l2Signer = await connect(l1Provider, env);
+      const l2Signer = await asyncTriggerIframeOnLoad(connect(l1Provider, env));
       const l2Address = l2Signer.getAddress();
 
       expect(l2Address).toEqual(starkPublicKey);

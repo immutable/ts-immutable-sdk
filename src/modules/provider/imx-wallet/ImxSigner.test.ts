@@ -6,10 +6,15 @@ jest.mock('./postRequestMessage');
 
 describe('ImxSigner', () => {
   const starkAddress = 'Ox1234z';
+  const iframe: HTMLIFrameElement = {
+    contentWindow: {
+      postMessage: jest.fn().mockReturnValue({}),
+    },
+  } as unknown as HTMLIFrameElement;
 
   describe('getAddress', () => {
     it('Should return l2Signer address', () => {
-      const imxSigner = new ImxSigner(starkAddress);
+      const imxSigner = new ImxSigner(starkAddress, iframe);
 
       expect(imxSigner.getAddress()).toEqual(starkAddress);
     });
@@ -17,18 +22,22 @@ describe('ImxSigner', () => {
 
   describe('signMessage', () => {
     const message = 'message';
-    const imxSigner = new ImxSigner(starkAddress);
+    const imxSigner = new ImxSigner(starkAddress, iframe);
+
     it('Should call the postMessage', async () => {
-      const postRequestMessageMockFn = (postRequestMessage as jest.Mock);
+      const postRequestMessageMockFn = postRequestMessage as jest.Mock;
 
       imxSigner.signMessage(message);
 
       await new Promise(process.nextTick);
 
-      expect(postRequestMessageMockFn).toBeCalledWith({
-        type: REQUEST_EVENTS.SIGN_MESSAGE_REQUEST,
-        details: { starkPublicKey: starkAddress, message },
-      });
+      expect(postRequestMessageMockFn).toBeCalledWith(
+        {
+          type: REQUEST_EVENTS.SIGN_MESSAGE_REQUEST,
+          details: { starkPublicKey: starkAddress, message },
+        },
+        iframe
+      );
     });
 
     it('Should receive signed message if l2Wallet signed successfully', async () => {
@@ -41,6 +50,7 @@ describe('ImxSigner', () => {
             data: { signedMessage },
           },
         },
+        source: iframe.contentWindow,
       };
       window.addEventListener = jest
         .fn()
@@ -66,6 +76,7 @@ describe('ImxSigner', () => {
             },
           },
         },
+        source: iframe.contentWindow,
       };
       window.addEventListener = jest
         .fn()

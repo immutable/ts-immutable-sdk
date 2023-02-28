@@ -1,20 +1,17 @@
-/**
- * @jest-environment jsdom
- */
-
 import { ENVIRONMENTS } from '../constants';
 import { ConnectResponse } from './types';
 import { RESPONSE_EVENTS } from './events';
 import { messageResponseListener } from './messageResponseListener';
 import { setupIFrame } from './imxWalletIFrame';
 
-import { htmlBodyInit, triggerIFrameOnLoad } from './testUtils';
+import { htmlBodyInit, asyncTriggerIframeOnLoad } from './testUtils';
 
 const callbackFn = jest.fn();
 
 function getMessageEvent(
   eventOrigin: string,
-  eventType: RESPONSE_EVENTS
+  eventType: RESPONSE_EVENTS,
+  iframe: HTMLIFrameElement
 ): MessageEvent {
   return {
     origin: eventOrigin,
@@ -25,6 +22,7 @@ function getMessageEvent(
         data: { starkPublicKey: '0x000' },
       },
     },
+    source: iframe.contentWindow,
   } as MessageEvent;
 }
 
@@ -35,10 +33,9 @@ describe('the messageResponseListener function', () => {
   beforeEach(async () => {
     htmlBodyInit();
 
-    const iframePromise = setupIFrame(ENVIRONMENTS.DEVELOPMENT);
-    triggerIFrameOnLoad();
-
-    iframe = await iframePromise;
+    iframe = await asyncTriggerIframeOnLoad(
+      setupIFrame(ENVIRONMENTS.DEVELOPMENT)
+    );
 
     if (iframe) {
       iFrameURL = new URL(iframe.src).origin;
@@ -49,7 +46,11 @@ describe('the messageResponseListener function', () => {
 
   it('should call the callback if the message is valid', () => {
     messageResponseListener<ConnectResponse>(
-      getMessageEvent(iFrameURL, RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE),
+      getMessageEvent(
+        iFrameURL,
+        RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+        iframe
+      ),
       RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
       iframe,
       callbackFn
@@ -58,11 +59,14 @@ describe('the messageResponseListener function', () => {
     expect(callbackFn).toBeCalled();
   });
 
-  it('should ignore events from unknown origins', () => {
+  it('should ignore events from unknown iframes', () => {
     messageResponseListener<ConnectResponse>(
       getMessageEvent(
         'http://anyotherorigin.com',
-        RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE
+        RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+        {
+          source: {} as unknown as WindowProxy,
+        } as unknown as HTMLIFrameElement
       ),
       RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
       iframe,
@@ -74,7 +78,7 @@ describe('the messageResponseListener function', () => {
 
   it('should ignore events if the type does not match', () => {
     messageResponseListener<ConnectResponse>(
-      getMessageEvent(iFrameURL, RESPONSE_EVENTS.SIGN_MESSAGE_RESPONSE),
+      getMessageEvent(iFrameURL, RESPONSE_EVENTS.SIGN_MESSAGE_RESPONSE, iframe),
       RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
       iframe,
       callbackFn

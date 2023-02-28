@@ -4,9 +4,14 @@ import {
   IMX_WALLET_IFRAME_HOSTS,
   setupIFrame,
   getIFrame,
+  getOrSetIframe,
   IMX_WALLET_IFRAME_STYLE,
 } from './imxWalletIFrame';
-import { htmlBodyInit, triggerIFrameOnLoad } from './testUtils';
+import {
+  htmlBodyInit,
+  asyncTriggerIframeOnLoad,
+  triggerIframeOnLoad,
+} from './testUtils';
 
 describe('the setupIFrame function', () => {
   beforeEach(htmlBodyInit);
@@ -14,47 +19,43 @@ describe('the setupIFrame function', () => {
   afterEach(() => jest.clearAllMocks());
 
   it('should succeed', async () => {
-    const setup = setupIFrame(ENVIRONMENTS.DEVELOPMENT);
-
-    const iFrame = triggerIFrameOnLoad();
-
-    await setup;
+    const iFrame = await asyncTriggerIframeOnLoad(
+      setupIFrame(ENVIRONMENTS.DEVELOPMENT)
+    );
 
     expect(iFrame?.getAttribute('id')).toEqual(IMX_WALLET_IFRAME_ID);
-    expect(iFrame?.getAttribute('src')).toEqual(IMX_WALLET_IFRAME_HOSTS.development);
+    expect(iFrame?.getAttribute('src')).toEqual(
+      IMX_WALLET_IFRAME_HOSTS.development
+    );
   });
 
   it('should put in the iFrame the correct domain address', async () => {
-    Object.defineProperty(
-      window,
-      'location',
-      {
-        value: {
-          origin: 'https://marketplace.io',
-        },
-        configurable: true,
-        writable: true,
+    Object.defineProperty(window, 'location', {
+      value: {
+        origin: 'https://marketplace.io',
       },
+      configurable: true,
+      writable: true,
+    });
+
+    const iFrame = await asyncTriggerIframeOnLoad(
+      setupIFrame(ENVIRONMENTS.DEVELOPMENT)
     );
 
-    const setup = setupIFrame(ENVIRONMENTS.DEVELOPMENT);
-
-    const iFrame = triggerIFrameOnLoad();
-
-    await setup;
-
     expect(iFrame?.getAttribute('id')).toEqual(IMX_WALLET_IFRAME_ID);
-    expect(iFrame?.getAttribute('src')).toEqual(IMX_WALLET_IFRAME_HOSTS.development);
+    expect(iFrame?.getAttribute('src')).toEqual(
+      IMX_WALLET_IFRAME_HOSTS.development
+    );
     expect(iFrame?.getAttribute('style')).toEqual(IMX_WALLET_IFRAME_STYLE);
   });
 
   it('should prevents more than one iFrame from being created', async () => {
     const setups = [
-      setupIFrame(ENVIRONMENTS.DEVELOPMENT),
-      setupIFrame(ENVIRONMENTS.DEVELOPMENT),
+      getOrSetIframe(ENVIRONMENTS.DEVELOPMENT),
+      getOrSetIframe(ENVIRONMENTS.DEVELOPMENT),
     ];
 
-    triggerIFrameOnLoad();
+    triggerIframeOnLoad();
 
     await Promise.race(setups);
 
@@ -68,12 +69,9 @@ describe('the getIFrame function', () => {
   afterEach(() => jest.clearAllMocks());
 
   it('should return an iFrame', async () => {
-    const setup = setupIFrame(ENVIRONMENTS.DEVELOPMENT);
-
-    const iFrameLoaded = triggerIFrameOnLoad();
-
-    await setup;
-
+    const iFrameLoaded = await asyncTriggerIframeOnLoad(
+      setupIFrame(ENVIRONMENTS.DEVELOPMENT)
+    );
     const iFrame = getIFrame();
 
     expect(iFrame).not.toBeNull();
