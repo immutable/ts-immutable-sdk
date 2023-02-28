@@ -1,6 +1,5 @@
 import { Error as ErrorDetails } from './types';
 import { RESPONSE_EVENTS } from './events';
-import { getIFrame } from './imxWalletIFrame';
 
 export type ResponseMessageDetails<T> = {
   success: boolean;
@@ -8,22 +7,10 @@ export type ResponseMessageDetails<T> = {
   error?: ErrorDetails;
 };
 
-// todo: not using this type atm
-// export type ErrorResponseMessageDetails = {
-//   success: false;
-//   error: ErrorDetails;
-// };
-
 export type ResponseMessage<T> = {
   type: RESPONSE_EVENTS;
   details: ResponseMessageDetails<T>;
 };
-
-// todo: not using this type atm
-// export type ErrorResponseMessage = {
-//   type: RESPONSE_EVENTS;
-//   details: ErrorResponseMessageDetails;
-// };
 
 export function messageResponseListener<T>(
   event: MessageEvent,
