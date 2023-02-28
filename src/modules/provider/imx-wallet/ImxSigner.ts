@@ -12,9 +12,11 @@ import { StarkSigner } from '../../../types';
 
 export class ImxSigner implements StarkSigner {
   private publicAddress;
+  private iframe;
 
-  constructor(publicAddress: string) {
+  constructor(publicAddress: string, iframe: HTMLIFrameElement) {
     this.publicAddress = publicAddress;
+    this.iframe = iframe;
   }
 
   public getAddress(): string {
@@ -27,6 +29,7 @@ export class ImxSigner implements StarkSigner {
         messageResponseListener<SignMessageResponse>(
           event,
           RESPONSE_EVENTS.SIGN_MESSAGE_RESPONSE,
+          this.iframe,
           (messageDetails) => {
             window.removeEventListener(COMMUNICATION_TYPE, listener);
 
@@ -43,7 +46,11 @@ export class ImxSigner implements StarkSigner {
       postRequestMessage<SignMessageRequest>({
         type: REQUEST_EVENTS.SIGN_MESSAGE_REQUEST,
         details: { starkPublicKey: this.publicAddress, message: rawMessage },
-      });
+      }, this.iframe);
     });
+  }
+
+  public getIframe(): HTMLIFrameElement {
+    return this.iframe;
   }
 }

@@ -1,4 +1,4 @@
-import { ENVIRONMENTS } from './constants';
+import { ENVIRONMENTS } from '../constants';
 import { ConnectResponse } from './types';
 import { RESPONSE_EVENTS } from './events';
 import { messageResponseListener } from './messageResponseListener';
@@ -7,7 +7,6 @@ import { setupIFrame } from './imxWalletIFrame';
 import { htmlBodyInit, triggerIFrameOnLoad } from './testUtils';
 
 const callbackFn = jest.fn();
-let iFrameURL = '';
 
 function getMessageEvent(
   eventOrigin: string,
@@ -26,15 +25,18 @@ function getMessageEvent(
 }
 
 describe('the messageResponseListener function', () => {
+  let iframe: HTMLIFrameElement;
+  let iFrameURL = '';
+
   beforeEach(async () => {
     htmlBodyInit();
 
     const setup = setupIFrame(ENVIRONMENTS.DEVELOPMENT);
 
-    const iFrame = triggerIFrameOnLoad();
+    iframe = triggerIFrameOnLoad();
 
-    if (iFrame) {
-      iFrameURL = new URL(iFrame.src).origin;
+    if (iframe) {
+      iFrameURL = new URL(iframe.src).origin;
     }
 
     await setup;
@@ -49,6 +51,7 @@ describe('the messageResponseListener function', () => {
         RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
       ),
       RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+      iframe,
       callbackFn,
     );
 
@@ -62,6 +65,7 @@ describe('the messageResponseListener function', () => {
         RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
       ),
       RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+      iframe,
       callbackFn,
     );
 
@@ -75,6 +79,7 @@ describe('the messageResponseListener function', () => {
         RESPONSE_EVENTS.SIGN_MESSAGE_RESPONSE,
       ),
       RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+      iframe,
       callbackFn,
     );
 

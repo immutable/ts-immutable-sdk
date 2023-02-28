@@ -1,4 +1,4 @@
-import { ENVIRONMENTS } from './constants';
+import { ENVIRONMENTS } from '../constants';
 import {
   IMX_WALLET_IFRAME_ID,
   IMX_WALLET_IFRAME_HOSTS,

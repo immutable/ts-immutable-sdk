@@ -16,20 +16,24 @@ import {
 import { postRequestMessage } from './postRequestMessage';
 import { messageResponseListener } from './messageResponseListener';
 import { ImxSigner } from './ImxSigner';
+import { ENVIRONMENTS } from '../constants';
+import { getOrSetIframe } from './imxWalletIFrame';
 
 const DEFAULT_CONNECTION_MESSAGE = 'Only sign this request if you’ve initiated an action with ImmutableX.';
 const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed.';
 
-export async function connect(l1Provider: ethers.providers.Web3Provider): Promise<StarkSigner> {
+export async function connect(l1Provider: ethers.providers.Web3Provider, env: ENVIRONMENTS): Promise<StarkSigner> {
   const l1Signer = l1Provider.getSigner();
   const address = await l1Signer.getAddress();
   const signature = await l1Signer.signMessage(DEFAULT_CONNECTION_MESSAGE);
+  const iframe = await getOrSetIframe(env);
 
   return new Promise((resolve, reject) => {
     const listener = (event: MessageEvent) => {
       messageResponseListener<ConnectResponse>(
         event,
         RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+        iframe,
         (messageDetails) => {
           window.removeEventListener(COMMUNICATION_TYPE, listener);
 
@@ -37,7 +41,7 @@ export async function connect(l1Provider: ethers.providers.Web3Provider): Promis
             reject(new Error(CONNECTION_FAILED_ERROR));
           }
 
-          resolve(new ImxSigner(messageDetails.data.starkPublicKey));
+          resolve(new ImxSigner(messageDetails.data.starkPublicKey, iframe));
         },
       );
     };
@@ -46,54 +50,28 @@ export async function connect(l1Provider: ethers.providers.Web3Provider): Promis
     postRequestMessage<ConnectRequest>({
       type: REQUEST_EVENTS.CONNECT_WALLET_REQUEST,
       details: { ethAddress: address, signature },
-    });
+    }, iframe);
   });
 }
 
-export async function getConnection(etherAddress: string): Promise<StarkSigner | undefined> {
-  return new Promise((resolve) => {
-    const listener = (event: MessageEvent) => {
-      messageResponseListener<GetConnectionResponse>(
-        event,
-        RESPONSE_EVENTS.GET_CONNECTION_RESPONSE,
-        (messageDetails) => {
-          window.removeEventListener(COMMUNICATION_TYPE, listener);
-          if (!messageDetails.success) {
-            resolve(undefined);
-            return;
-          }
+export async function disconnect(imxSigner: ImxSigner): Promise<void> {
+  const iframe = imxSigner.getIframe();
 
-          resolve(new ImxSigner(messageDetails.data.starkPublicKey));
-        },
-      );
-    };
-    window.addEventListener(COMMUNICATION_TYPE, listener);
-
-    postRequestMessage<GetConnectionRequest>({
-      type: REQUEST_EVENTS.GET_CONNECTION_REQUEST,
-      details: { etherAddress },
-    });
-  });
-}
-
-export async function disconnect(starkPublicKey: string): Promise<void> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const listener = (event: MessageEvent) => {
       messageResponseListener<DisconnectResponse>(
         event,
         RESPONSE_EVENTS.DISCONNECT_WALLET_RESPONSE,
+        iframe,
         (messageDetails) => {
           window.removeEventListener(COMMUNICATION_TYPE, listener);
 
           if (!messageDetails.success && messageDetails.error) {
-            // todo: there is just a log here - what should we do? remove this whole if block? reject?
-            // addLog(
-            //   'sdk',
-            //   'imxWallet:disconnect - an error happened disconnecting inside the IMX Wallet',
-            //   { error: messageDetails.error },
-            // );
+            // investigate if we should reject or log here
+            reject();
           }
 
+          iframe.remove();
           resolve();
         },
       );
@@ -103,7 +81,7 @@ export async function disconnect(starkPublicKey: string): Promise<void> {
 
     postRequestMessage<DisconnectRequest>({
       type: REQUEST_EVENTS.DISCONNECT_WALLET_REQUEST,
-      details: { starkPublicKey },
-    });
+      details: { starkPublicKey: imxSigner.getAddress() },
+    }, iframe);
   });
 }

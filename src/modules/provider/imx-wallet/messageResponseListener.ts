@@ -28,14 +28,13 @@ export type ResponseMessage<T> = {
 export function messageResponseListener<T>(
   event: MessageEvent,
   eventType: RESPONSE_EVENTS,
+  iframe: HTMLIFrameElement,
   callback: (response: ResponseMessageDetails<T>) => void,
 ) {
-  const iFrame = getIFrame();
-  if (iFrame && iFrame.src && event.origin !== new URL(iFrame.src).origin) {
+  if (iframe && event.source !== iframe.contentWindow) {
     return;
   }
 
-  // todo: change l2wallet msg to imxWallet?
   const l2WalletMessage = event.data as ResponseMessage<T>;
   if (l2WalletMessage.type !== eventType) {
     return;

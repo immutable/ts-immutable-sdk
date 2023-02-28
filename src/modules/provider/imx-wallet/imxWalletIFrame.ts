@@ -1,4 +1,4 @@
-import { ENVIRONMENTS } from './constants'; // todo: determine if we want to handle envs the same
+import { ENVIRONMENTS } from '../constants'; // todo: determine if we want to handle envs the same
 
 export const IMX_WALLET_IFRAME_ID = 'imx-wallet-app';
 export const IMX_WALLET_IFRAME_HOSTS = {
@@ -12,19 +12,8 @@ export function getIFrame(): HTMLIFrameElement | null {
   return document.querySelector(`iframe#${IMX_WALLET_IFRAME_ID}`);
 }
 
-function resetIFrame(): void {
-  const iFrame = getIFrame();
-
-  if (iFrame) {
-    iFrame.remove();
-  }
-}
-
-// todo: where do we want to use this?
-export async function setupIFrame(env: ENVIRONMENTS): Promise<void> {
+export async function setupIFrame(env: ENVIRONMENTS): Promise<HTMLIFrameElement> {
   return new Promise((resolve) => {
-    resetIFrame();
-
     const iframe = document.createElement('iframe');
 
     iframe.setAttribute('id', IMX_WALLET_IFRAME_ID);
@@ -33,6 +22,12 @@ export async function setupIFrame(env: ENVIRONMENTS): Promise<void> {
 
     document.body.appendChild(iframe);
 
-    iframe.onload = () => resolve();
+    iframe.onload = () => resolve(iframe);
   });
+}
+
+export async function getOrSetIframe(env: ENVIRONMENTS): Promise<HTMLIFrameElement> {
+  const iframe = getIFrame();
+  if (iframe) return iframe;
+  return await setupIFrame(env);
 }

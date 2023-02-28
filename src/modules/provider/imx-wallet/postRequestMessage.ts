@@ -1,16 +1,13 @@
 import { REQUEST_EVENTS } from './events';
-import { getIFrame } from './imxWalletIFrame';
 
 export type RequestMessage<T> = {
   type: REQUEST_EVENTS;
   details?: T;
 };
 
-// TODO: This function would suit better if moved to L2Provider package
-export function postRequestMessage<T>(payload: RequestMessage<T>) {
-  const iFrame = getIFrame();
-
-  if (iFrame && iFrame.contentWindow) {
-    iFrame.contentWindow.postMessage(payload, new URL(iFrame.src).origin);
+// do we want to move iframe to first param
+export function postRequestMessage<T>(payload: RequestMessage<T>, iframe: HTMLIFrameElement) {
+  if (iframe && iframe.contentWindow) {
+    iframe.contentWindow.postMessage(payload, new URL(iframe.src).origin);
   }
 }
