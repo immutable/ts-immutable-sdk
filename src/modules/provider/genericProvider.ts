@@ -16,13 +16,7 @@ class GenericProvider implements IMXProvider {
     this.signers = { ethSigner, starkExSigner };
   }
 
-  registerOffchain(): Promise<RegisterUserResponse>
-  {
-    this.imx.StarkExAPI.usersApi.getSignableRegistrationOffchain({
-      getSignableRegistrationRequest: {
-        ether_key: "",
-        stark_key: "starkPublicKey",
-      }})
+  registerOffchain(): Promise<RegisterUserResponse> {
     return registerOffchain(this.signers, this.imx)
   }
 }

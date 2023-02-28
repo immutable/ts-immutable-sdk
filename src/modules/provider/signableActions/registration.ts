@@ -13,13 +13,6 @@ export async function registerOffchain(signers: Signers, imx:Immutable
   const userAddress = await signers.ethSigner.getAddress();
   const starkPublicKey = await signers.starkExSigner.getAddress();
 
-  await StarkEx.usersApi.getSignableRegistrationOffchain({
-    getSignableRegistrationRequest: {
-      ether_key: userAddress,
-      stark_key: starkPublicKey,
-    },
-  })
-
   const signableResult = await imx.StarkExAPI.usersApi.getSignableRegistrationOffchain({
     getSignableRegistrationRequest:{ether_key: userAddress, stark_key:starkPublicKey}});
 
@@ -49,9 +42,9 @@ interface IsRegisteredCheckError {
 }
 
 export async function isRegisteredOnChain(
-  signers:Signers,
+  signers:Signers, imx:Immutable
 ): Promise<boolean> {
-  await validateChain(signers.ethSigner);
+  await validateChain(signers.ethSigner, imx.getConfig());
 
   //FixMe: use configs same as immutable client
   const registrationContract = Contracts.Registration.connect(
