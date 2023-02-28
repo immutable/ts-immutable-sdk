@@ -5,20 +5,12 @@ import { validateChain } from "./helpers";
 import { Config, Contracts } from "@imtbl/core-sdk";
 import { signRaw } from "./utils/crypto";
 
-export type RegisterOffchainParams = {
-  signers: Signers
-};
+export async function registerOffchain(signers: Signers
+): Promise<RegisterUserResponse> {
+  await validateChain(signers.ethSigner);
 
-export async function registerOffchain({
-  signers: {
-    ethSigner,
-    starkExSigner,
-  }
-}: RegisterOffchainParams): Promise<RegisterUserResponse> {
-  await validateChain(ethSigner);
-
-  const userAddress = await ethSigner.getAddress();
-  const starkPublicKey = await starkExSigner.getAddress();
+  const userAddress = await signers.ethSigner.getAddress();
+  const starkPublicKey = await signers.starkExSigner.getAddress();
 
   const signableResult = await StarkEx.usersApi.getSignableRegistrationOffchain({
     getSignableRegistrationRequest: {
@@ -32,9 +24,9 @@ export async function registerOffchain({
     payload_hash: payloadHash,
   } = signableResult.data;
 
-  const ethSignature = await signRaw(signableMessage, ethSigner);
+  const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 
-  const starkSignature = await starkExSigner.signMessage(payloadHash);
+  const starkSignature = await signers.starkExSigner.signMessage(payloadHash);
 
   const registeredUser = await StarkEx.usersApi.registerUser({
     registerUserRequest: {
