@@ -9,9 +9,9 @@ import {
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 
 type CompleteEthWithdrawalActionParams = {
-  ethSigner: Signer,
-  starkPublicKey: string,
-  client: Immutable,
+  ethSigner: Signer;
+  starkPublicKey: string;
+  client: Immutable;
 }
 
 async function executeRegisterAndWithdrawEth(

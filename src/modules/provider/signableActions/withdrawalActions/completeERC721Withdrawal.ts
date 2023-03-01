@@ -20,10 +20,10 @@ interface MintableERC721Withdrawal {
 }
 
 type CompleteERC721WithdrawalActionParams = {
-  ethSigner: Signer,
-  starkPublicKey: string
-  token: ERC721Token
-  client: Immutable
+  ethSigner: Signer;
+  starkPublicKey: string;
+  token: ERC721Token;
+  client: Immutable;
 }
 
 async function executeWithdrawMintableERC721(
