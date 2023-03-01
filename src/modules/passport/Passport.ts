@@ -37,7 +37,7 @@ export class Passport {
     this.magicAdapter = new MagicAdapter(config.network);
   }
 
-  public async connect(): Promise<IMXProvider> {
+  public async connectImx(): Promise<IMXProvider> {
     const user = await this.authManager.login();
     if (!user.id_token) {
       throw new PassportError(

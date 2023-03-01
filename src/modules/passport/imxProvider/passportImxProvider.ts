@@ -20,16 +20,21 @@ import {
 import { User } from 'oidc-client-ts';
 import { IMXProvider } from '../../provider/imxProvider';
 
+type JWT = Pick<User, 'access_token' | 'refresh_token'>;
+
 export default class PassportImxProvider implements IMXProvider {
-  private user: User;
-  private signer: StarkSigner;
-  constructor(user: User, signer: StarkSigner) {
-    this.user = user;
-    this.signer = signer;
+  private jwt: JWT;
+  private starkSigner: StarkSigner;
+
+  constructor(jwt: JWT, starkSigner: StarkSigner) {
+    this.jwt = jwt;
+    this.starkSigner = starkSigner;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  transfer(request: UnsignedTransferRequest): Promise<CreateTransferResponseV1> {
+  transfer(
+    request: UnsignedTransferRequest
+  ): Promise<CreateTransferResponseV1> {
     throw new Error('Method not implemented.');
   }
 

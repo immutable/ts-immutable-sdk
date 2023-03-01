@@ -2,9 +2,11 @@ import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { PassportConfig, Passport } from './Passport';
 import { PassportError, PassportErrorType } from './errors/passportError';
+import { getStarkSigner } from './stark/getStarkSigner';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
+jest.mock('./stark/getStarkSigner');
 
 const config = { clientId: '11111', redirectUri: 'http://test.com' };
 
@@ -43,12 +45,14 @@ describe('Passport', () => {
     });
   });
 
-  describe('connect', () => {
+  describe('connectImx', () => {
     it('should execute connect without error', async () => {
-      await passport.connect();
+      magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
+      await passport.connectImx();
 
       expect(authLoginMock).toBeCalledTimes(1);
       expect(magicLoginMock).toBeCalledTimes(1);
+      expect(getStarkSigner).toBeCalledTimes(1);
     });
   });
 
