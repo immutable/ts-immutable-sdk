@@ -28,9 +28,9 @@ export async function connect(
   return new Promise((resolve, reject) => {
     const listener = (event: MessageEvent) => {
       messageResponseListener<ConnectResponse>(
+        iframe,
         event,
         RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
-        iframe,
         (messageDetails) => {
           window.removeEventListener(COMMUNICATION_TYPE, listener);
 
@@ -44,13 +44,10 @@ export async function connect(
     };
     window.addEventListener(COMMUNICATION_TYPE, listener);
 
-    postRequestMessage<ConnectRequest>(
-      {
-        type: REQUEST_EVENTS.CONNECT_WALLET_REQUEST,
-        details: { ethAddress: address, signature },
-      },
-      iframe,
-    );
+    postRequestMessage<ConnectRequest>(iframe, {
+      type: REQUEST_EVENTS.CONNECT_WALLET_REQUEST,
+      details: { ethAddress: address, signature },
+    });
   });
 }
 
@@ -60,9 +57,9 @@ export async function disconnect(imxSigner: ImxSigner): Promise<void> {
   return new Promise((resolve, reject) => {
     const listener = (event: MessageEvent) => {
       messageResponseListener<DisconnectResponse>(
+        iframe,
         event,
         RESPONSE_EVENTS.DISCONNECT_WALLET_RESPONSE,
-        iframe,
         (messageDetails) => {
           window.removeEventListener(COMMUNICATION_TYPE, listener);
 
@@ -79,12 +76,9 @@ export async function disconnect(imxSigner: ImxSigner): Promise<void> {
 
     window.addEventListener(COMMUNICATION_TYPE, listener);
 
-    postRequestMessage<DisconnectRequest>(
-      {
-        type: REQUEST_EVENTS.DISCONNECT_WALLET_REQUEST,
-        details: { starkPublicKey: imxSigner.getAddress() },
-      },
-      iframe
-    );
+    postRequestMessage<DisconnectRequest>(iframe, {
+      type: REQUEST_EVENTS.DISCONNECT_WALLET_REQUEST,
+      details: { starkPublicKey: imxSigner.getAddress() },
+    });
   });
 }

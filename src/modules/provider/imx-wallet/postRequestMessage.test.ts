@@ -21,7 +21,7 @@ describe('the postRequestMessage function', () => {
       details: { ethAddress: '0x000', signature: 'The message' },
     };
 
-    postRequestMessage<ConnectRequest>(postMessage, iframe);
+    postRequestMessage<ConnectRequest>(iframe, postMessage);
 
     expect(postMessageMock).toHaveBeenCalledWith(
       postMessage,

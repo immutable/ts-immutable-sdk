@@ -31,13 +31,10 @@ describe('ImxSigner', () => {
 
       await new Promise(process.nextTick);
 
-      expect(postRequestMessageMockFn).toBeCalledWith(
-        {
-          type: REQUEST_EVENTS.SIGN_MESSAGE_REQUEST,
-          details: { starkPublicKey: starkAddress, message },
-        },
-        iframe
-      );
+      expect(postRequestMessageMockFn).toBeCalledWith(iframe, {
+        type: REQUEST_EVENTS.SIGN_MESSAGE_REQUEST,
+        details: { starkPublicKey: starkAddress, message },
+      });
     });
 
     it('Should receive signed message if l2Wallet signed successfully', async () => {

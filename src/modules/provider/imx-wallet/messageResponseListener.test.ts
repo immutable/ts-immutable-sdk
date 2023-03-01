@@ -46,13 +46,13 @@ describe('the messageResponseListener function', () => {
 
   it('should call the callback if the message is valid', () => {
     messageResponseListener<ConnectResponse>(
+      iframe,
       getMessageEvent(
         iFrameURL,
         RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
         iframe
       ),
       RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
-      iframe,
       callbackFn
     );
 
@@ -61,6 +61,7 @@ describe('the messageResponseListener function', () => {
 
   it('should ignore events from unknown iframes', () => {
     messageResponseListener<ConnectResponse>(
+      iframe,
       getMessageEvent(
         'http://anyotherorigin.com',
         RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
@@ -69,7 +70,6 @@ describe('the messageResponseListener function', () => {
         } as unknown as HTMLIFrameElement
       ),
       RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
-      iframe,
       callbackFn
     );
 
@@ -78,9 +78,9 @@ describe('the messageResponseListener function', () => {
 
   it('should ignore events if the type does not match', () => {
     messageResponseListener<ConnectResponse>(
+      iframe,
       getMessageEvent(iFrameURL, RESPONSE_EVENTS.SIGN_MESSAGE_RESPONSE, iframe),
       RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
-      iframe,
       callbackFn
     );
 

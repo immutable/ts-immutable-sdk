@@ -36,17 +36,14 @@ describe('imxWallet', () => {
 
       await new Promise(process.nextTick);
 
-      expect(postRequestMessageMockFn).toBeCalledWith(
-        {
-          type: REQUEST_EVENTS.CONNECT_WALLET_REQUEST,
-          details: { ethAddress: address, signature },
-        },
-        iframe,
-      );
+      expect(postRequestMessageMockFn).toBeCalledWith(iframe, {
+        type: REQUEST_EVENTS.CONNECT_WALLET_REQUEST,
+        details: { ethAddress: address, signature },
+      });
     });
 
     it('Should receive starkPublicKey if l2Wallet returns correct data', async () => {
-      const iframe = await asyncTriggerIframeOnLoad(getOrSetIframe(env))
+      const iframe = await asyncTriggerIframeOnLoad(getOrSetIframe(env));
 
       const starkPublicKey = '0x4321z';
       const mockedSuccessReturnValue = {
@@ -96,7 +93,7 @@ describe('imxWallet', () => {
     it('Should call the postMessage', async () => {
       const iframe = await asyncTriggerIframeOnLoad(getOrSetIframe(env));
       const postRequestMessageMockFn = postRequestMessage as jest.Mock;
-      const starkPublicKey = "0x123";
+      const starkPublicKey = '0x123';
 
       const l2Signer = new ImxSigner(starkPublicKey, iframe);
 
@@ -104,10 +101,10 @@ describe('imxWallet', () => {
 
       await new Promise(process.nextTick);
 
-      expect(postRequestMessageMockFn).toBeCalledWith({
+      expect(postRequestMessageMockFn).toBeCalledWith(iframe, {
         type: REQUEST_EVENTS.DISCONNECT_WALLET_REQUEST,
         details: { starkPublicKey },
-      }, iframe);
+      });
     });
   });
 });

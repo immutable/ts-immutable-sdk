@@ -6,7 +6,10 @@ export type RequestMessage<T> = {
 };
 
 // do we want to move iframe to first param
-export function postRequestMessage<T>(payload: RequestMessage<T>, iframe: HTMLIFrameElement) {
+export function postRequestMessage<T>(
+  iframe: HTMLIFrameElement,
+  payload: RequestMessage<T>
+) {
   if (iframe && iframe.contentWindow) {
     iframe.contentWindow.postMessage(payload, new URL(iframe.src).origin);
   }
