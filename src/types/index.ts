@@ -202,5 +202,4 @@ export {
   EthConfiguration,
   ImmutableXConfiguration,
   EncodeAssetRequestTokenTypeEnum,
-  EncodingApi,
 } from '@imtbl/core-sdk';
