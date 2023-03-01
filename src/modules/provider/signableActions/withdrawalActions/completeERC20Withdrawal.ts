@@ -8,13 +8,12 @@ import {
   isRegisteredOnChain,
 } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
-import { Contracts, EncodingApi } from '@imtbl/core-sdk';
+import { Contracts, EncodingApi, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
 
 type ExecuteRegisterAndWithdrawERC20Params = {
   ethSigner: Signer;
   assetType: string;
   starkPublicKey: string;
-  contract: Registration;
   client: Immutable;
 }
 
@@ -30,16 +29,22 @@ async function executeRegisterAndWithdrawERC20(
     ethSigner,
     assetType,
     starkPublicKey,
-    contract,
-    client
+    client,
   }: ExecuteRegisterAndWithdrawERC20Params
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
-
+  const config = client.getConfiguration();
+  const usersApi = new UsersApi(config.apiConfiguration)
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
-    client
+    usersApi,
+  );
+
+  const contract = Contracts.Registration.connect(
+    client.getConfiguration()
+      .ethConfiguration.registrationContractAddress,
+    ethSigner,
   );
 
   const populatedTransaction =
@@ -54,20 +59,25 @@ async function executeRegisterAndWithdrawERC20(
 }
 
 async function executeWithdrawERC20(
-  signer: Signer,
+  ethSigner: Signer,
   assetType: string,
   starkPublicKey: string,
-  contract: Core,
+  config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
+  const contract = Contracts.Core.connect(
+    config.ethConfiguration.coreContractAddress,
+    ethSigner,
+  );
+
   const populatedTransaction = await contract.populateTransaction.withdraw(
     starkPublicKey,
     assetType,
   );
 
-  return signer.sendTransaction(populatedTransaction);
+  return ethSigner.sendTransaction(populatedTransaction);
 }
 
-export async function completeERC20WithdrawalWorkflow({
+export async function completeERC20WithdrawalAction({
     signers: { ethSigner },
     starkPublicKey,
     token,
@@ -78,17 +88,6 @@ export async function completeERC20WithdrawalWorkflow({
   const assetType = await getEncodeAssetInfo('asset', 'ERC20', encodingApi, {
     token_address: token.tokenAddress,
   });
-
-  const coreContract = Contracts.Core.connect(
-    config.ethConfiguration.coreContractAddress,
-    ethSigner,
-  );
-
-  const registrationContract = Contracts.Registration.connect(
-    config.ethConfiguration.registrationContractAddress,
-    ethSigner,
-  );
-
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
@@ -99,7 +98,6 @@ export async function completeERC20WithdrawalWorkflow({
     return executeRegisterAndWithdrawERC20({
       ethSigner,
       assetType: assetType.asset_type,
-      contract: registrationContract,
       starkPublicKey,
       client
     }
@@ -109,7 +107,7 @@ export async function completeERC20WithdrawalWorkflow({
       ethSigner,
       assetType.asset_type,
       starkPublicKey,
-      coreContract,
+      config
     );
   }
 }

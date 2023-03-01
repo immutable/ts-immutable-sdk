@@ -13,7 +13,7 @@ type PrepareWithdrawalWorkflowParams = TokenAmount &
     withdrawalsApi: WithdrawalsApi;
   };
 
-export async function prepareWithdrawalWorkflow(
+export async function prepareWithdrawalAction(
   params: PrepareWithdrawalWorkflowParams,
 ): Promise<CreateWithdrawalResponse> {
   const { ethSigner, starkSigner, withdrawalsApi } = params;
