@@ -11,6 +11,5 @@ export class Immutable {
   public getConfiguration(): imtblConfig {
     return this.config;
   }
-
 }
 
