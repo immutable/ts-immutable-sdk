@@ -9,6 +9,6 @@ export async function validateChain(signer: EthSigner, config:ImmutableXConfigur
 
   if (!isChainValid(chainID, config))
     throw new Error(
-      'The wallet used for this operation is not from the correct network.',
+      'The wallet used for this operation is not connected to the correct network.',
     );
 }
