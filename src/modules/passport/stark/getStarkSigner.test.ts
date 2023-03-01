@@ -15,6 +15,15 @@ describe('getStarkSigner', () => {
     expect(starkSigner.getAddress()).toEqual(expectStarkAddress);
   });
 
+  it('should get same Stark address with same eth wallet', async () => {
+    const ethWallet = ethers.Wallet.createRandom();
+
+    const starkSigner = await getStarkSigner(ethWallet);
+    const starkSigner2 = await getStarkSigner(ethWallet);
+
+    expect(starkSigner.getAddress()).toEqual(starkSigner2.getAddress());
+  });
+
   describe('signMessage', () => {
     it('should get signed message', async () => {
       const starkSigner = await getStarkSigner(wallet);
