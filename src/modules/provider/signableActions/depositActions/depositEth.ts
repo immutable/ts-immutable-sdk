@@ -7,7 +7,7 @@ import {
   ImmutableXConfiguration,
   UsersApi
 } from "@imtbl/core-sdk";
-import { Immutable } from "../../../apis/starkex/immutable";
+import { Immutable } from "../../../apis/starkex";
 import { parseUnits } from "@ethersproject/units";
 import { getSignableRegistrationOnchain, isRegisteredOnChain } from "../registration";
 import { BigNumber } from '@ethersproject/bignumber';
