@@ -1,3 +1,10 @@
+// import { IMXProvider } from "./imxProvider";
+// import { ImmutableX } from "../apis/starkex";
+// import { Signers } from "./signableActions/types";
+// import { RegisterUserResponse, StarkSigner } from "src/types";
+// import { EthSigner } from "@imtbl/core-sdk";
+// import { registerOffchain as registerOffchainAction } from "./signableActions/registration";
+//
 // class GenericProvider implements IMXProvider {
 //   private imx: ImmutableX;
 //   private signers: Signers;
@@ -8,6 +15,6 @@
 //   }
 //
 //   registerOffchain(): Promise<RegisterUserResponse> {
-//     return registerOffchain(this.signers, this.imx)
+//     return registerOffchainAction(this.signers, this.imx)
 //   }
 // }
