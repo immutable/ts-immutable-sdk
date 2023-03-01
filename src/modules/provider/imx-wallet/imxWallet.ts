@@ -68,8 +68,7 @@ export async function disconnect(imxSigner: ImxSigner): Promise<void> {
           window.removeEventListener(COMMUNICATION_TYPE, listener);
 
           if (!messageDetails.success && messageDetails.error) {
-            // investigate if we should reject or log here
-            reject();
+            reject(messageDetails.error);
           }
 
           iframe.remove();
