@@ -1,9 +1,9 @@
 // import { IMXProvider } from "./imxProvider";
 // import { Immutable } from "../apis/starkex";
-// import { Signers } from "./signableActions/types";
+// import { Signers } from "./signable-actions/types";
 // import { RegisterUserResponse, StarkSigner } from "src/types";
 // import { EthSigner } from "@imtbl/core-sdk";
-// import { registerOffchain as registerOffchainAction } from "./signableActions/registration";
+// import { registerOffchain as registerOffchainAction } from "./signable-actions/registration";
 //
 // class GenericProvider implements IMXProvider {
 //   private imx: Immutable;
