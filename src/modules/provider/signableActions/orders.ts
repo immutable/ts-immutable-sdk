@@ -5,6 +5,7 @@ import { signRaw } from "./utils/crypto";
 import { Signers } from "./types";
 import { Immutable } from "../../apis/starkex";
 import { OrdersApi } from "@imtbl/core-sdk";
+import { validateChain } from "./helpers";
 
 
 type CreateOrderWorkflowParams = {
@@ -24,6 +25,8 @@ export async function createOrder({
     request,
     imx,
   }: CreateOrderWorkflowParams): Promise<CreateOrderResponse> {
+  await validateChain(signers.ethSigner, imx.getConfiguration());
+
   const ethAddress = await signers.ethSigner.getAddress();
   const ordersApi = new OrdersApi(imx.getConfiguration().apiConfiguration)
 

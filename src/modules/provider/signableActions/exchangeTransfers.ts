@@ -4,6 +4,7 @@ import { signRaw } from "./utils/crypto";
 import { Signers } from "./types";
 import { Immutable } from "../../apis/starkex";
 import { ExchangesApi } from "@imtbl/core-sdk";
+import { validateChain } from "./helpers";
 
 
 type TransfersWorkflowParams = {
@@ -17,6 +18,8 @@ export async function exchangeTransfersWorkflow({
     request,
     imx,
   }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
+  await validateChain(signers.ethSigner, imx.getConfiguration());
+
   const exchangeApi = new ExchangesApi(imx.getConfiguration().apiConfiguration)
   const ethAddress = await signers.ethSigner.getAddress();
 

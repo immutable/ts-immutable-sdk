@@ -4,6 +4,7 @@ import { convertToSignableToken } from "./utils/convertToSignableToken";
 import { signRaw } from "./utils/crypto";
 import { Immutable } from "../../apis/starkex";
 import { TransfersApi } from "@imtbl/core-sdk";
+import { validateChain } from "./helpers";
 
 type TransfersWorkflowParams = {
   signers: Signers;
@@ -25,6 +26,8 @@ export async function transfers({
     request,
     imx,
   }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
+  await validateChain(ethSigner, imx.getConfiguration());
+
   const ethAddress = await ethSigner.getAddress();
   const transfersApi = new TransfersApi(imx.getConfiguration().apiConfiguration)
 
@@ -80,6 +83,8 @@ export async function batchTransfers({
     request,
     imx,
   }: BatchTransfersWorkflowParams): Promise<CreateTransferResponse> {
+  await validateChain(ethSigner, imx.getConfiguration());
+
   const ethAddress = await ethSigner.getAddress();
   const transfersApi = new TransfersApi(imx.getConfiguration().apiConfiguration)
 
