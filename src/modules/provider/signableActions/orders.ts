@@ -3,19 +3,20 @@ import { CancelOrderResponse, CreateOrderResponse, GetSignableCancelOrderRequest
 import { convertToSignableToken } from "./utils/convertToSignableToken";
 import { signRaw } from "./utils/crypto";
 import { Signers } from "./types";
-import { ImmutableX } from "../../apis/starkex";
+import { Immutable } from "../../apis/starkex";
+import { OrdersApi } from "@imtbl/core-sdk";
 
 
 type CreateOrderWorkflowParams = {
   signers: Signers
   request: UnsignedOrderRequest;
-  imx: ImmutableX;
+  imx: Immutable;
 };
 
 type CancelOrderWorkflowParams = {
   signers: Signers
   request: GetSignableCancelOrderRequest;
-  imx: ImmutableX;
+  imx: Immutable;
 };
 
 export async function createOrder({
@@ -24,6 +25,7 @@ export async function createOrder({
     imx,
   }: CreateOrderWorkflowParams): Promise<CreateOrderResponse> {
   const ethAddress = await signers.ethSigner.getAddress();
+  const ordersApi = new OrdersApi(imx.getConfiguration().apiConfiguration)
 
   const amountSell = request.sell.type === 'ERC721' ? '1' : request.sell.amount;
   const amountBuy = request.buy.type === 'ERC721' ? '1' : request.buy.amount;
@@ -37,7 +39,7 @@ export async function createOrder({
     expiration_timestamp: request.expiration_timestamp,
   };
 
-  const getSignableOrderResponse = await imx.StarkEx.ordersApi.getSignableOrder({
+  const getSignableOrderResponse = await ordersApi.getSignableOrder({
     getSignableOrderRequestV3: getSignableOrderRequest,
   });
 
@@ -69,7 +71,7 @@ export async function createOrder({
     xImxEthSignature: ethSignature,
   };
 
-  const createOrderResponse = await imx.StarkEx.ordersApi.createOrder(orderParams);
+  const createOrderResponse = await ordersApi.createOrder(orderParams);
 
   return {
     ...createOrderResponse.data,
@@ -81,7 +83,9 @@ export async function cancelOrder({
     request,
     imx
   }: CancelOrderWorkflowParams): Promise<CancelOrderResponse> {
-  const getSignableCancelOrderResponse = await imx.StarkEx.ordersApi.getSignableCancelOrder(
+  const ordersApi = new OrdersApi(imx.getConfiguration().apiConfiguration)
+
+  const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrder(
     {
       getSignableCancelOrderRequest: {
         order_id: request.order_id,
@@ -98,7 +102,7 @@ export async function cancelOrder({
 
   const ethAddress = await signers.ethSigner.getAddress();
 
-  const cancelOrderResponse = await imx.StarkEx.ordersApi.cancelOrder({
+  const cancelOrderResponse = await ordersApi.cancelOrder({
     id: request.order_id.toString(),
     cancelOrderRequest: {
       order_id: request.order_id,

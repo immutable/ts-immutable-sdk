@@ -2,12 +2,13 @@ import { CreateTradeResponse, GetSignableTradeRequest } from "src/types";
 import { Signers } from "./types";
 import { validateChain } from "./helpers";
 import { signRaw } from "./utils/crypto";
-import { ImmutableX } from "../../apis/starkex";
+import { Immutable } from "../../apis/starkex";
+import { TradesApi } from "@imtbl/core-sdk";
 
 type createTradeWorkflowParams = {
   signers: Signers;
   request: GetSignableTradeRequest;
-  imx: ImmutableX;
+  imx: Immutable;
 };
 
 export async function createTrade({
@@ -18,10 +19,11 @@ export async function createTrade({
     request,
     imx
   }: createTradeWorkflowParams): Promise<CreateTradeResponse> {
-  await validateChain(ethSigner, imx.getConfig());
+  await validateChain(ethSigner, imx.getConfiguration());
   const ethAddress = await ethSigner.getAddress();
+  const tradesApi = new TradesApi(imx.getConfiguration().apiConfiguration)
 
-  const signableResult = await imx.StarkEx.tradesApi.getSignableTrade({
+  const signableResult = await tradesApi.getSignableTrade({
     getSignableTradeRequest: {
       user: ethAddress,
       order_id: request.order_id,
@@ -36,7 +38,7 @@ export async function createTrade({
 
   const starkSignature = await starkExSigner.signMessage(payloadHash);
 
-  const createTradeResponse = await imx.StarkEx.tradesApi.createTrade({
+  const createTradeResponse = await tradesApi.createTrade({
     createTradeRequest: {
       amount_buy: signableResult.data.amount_buy,
       amount_sell: signableResult.data.amount_sell,

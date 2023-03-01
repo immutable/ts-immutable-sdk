@@ -2,13 +2,14 @@ import { CreateTransferResponseV1, UnsignedExchangeTransferRequest } from "../..
 import { convertToSignableToken } from "./utils/convertToSignableToken";
 import { signRaw } from "./utils/crypto";
 import { Signers } from "./types";
-import { ImmutableX } from "../../apis/starkex";
+import { Immutable } from "../../apis/starkex";
+import { ExchangesApi } from "@imtbl/core-sdk";
 
 
 type TransfersWorkflowParams = {
   signers: Signers
   request: UnsignedExchangeTransferRequest;
-  imx: ImmutableX;
+  imx: Immutable;
 };
 
 export async function exchangeTransfersWorkflow({
@@ -16,10 +17,11 @@ export async function exchangeTransfersWorkflow({
     request,
     imx,
   }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
+  const exchangeApi = new ExchangesApi(imx.getConfiguration().apiConfiguration)
   const ethAddress = await signers.ethSigner.getAddress();
 
   const transferAmount = request.amount;
-  const signableResult = await imx.StarkEx.exchangeApi.getExchangeSignableTransfer({
+  const signableResult = await exchangeApi.getExchangeSignableTransfer({
     id: request.transactionID,
     getSignableTransferRequest: {
       sender: ethAddress,
@@ -49,7 +51,7 @@ export async function exchangeTransfersWorkflow({
     stark_signature: starkSignature,
   };
 
-  const response = await imx.StarkEx.exchangeApi.createExchangeTransfer({
+  const response = await exchangeApi.createExchangeTransfer({
     id: request.transactionID,
     createTransferRequest: transferSigningParams,
     xImxEthAddress: ethAddress,

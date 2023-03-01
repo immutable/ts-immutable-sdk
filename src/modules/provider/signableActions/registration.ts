@@ -2,18 +2,19 @@ import { RegisterUserResponse } from "src";
 import { GetSignableRegistrationResponse } from "src/types";
 import { Signers } from "./types";
 import { validateChain } from "./helpers";
-import { EthSigner, Contracts, ImmutableXConfiguration } from "@imtbl/core-sdk";
+import { EthSigner, Contracts, ImmutableXConfiguration, UsersApi } from "@imtbl/core-sdk";
 import { signRaw } from "./utils/crypto";
-import { ImmutableX } from "../../apis/starkex";
+import { Immutable } from "../../apis/starkex";
 
-export async function registerOffchain(signers: Signers, imx:ImmutableX
+export async function registerOffchain(signers: Signers, imx:Immutable
 ): Promise<RegisterUserResponse> {
-  await validateChain(signers.ethSigner, imx.getConfig());
+  await validateChain(signers.ethSigner, imx.getConfiguration());
+  const usersApi = new UsersApi(imx.getConfiguration().apiConfiguration)
 
   const userAddress = await signers.ethSigner.getAddress();
   const starkPublicKey = await signers.starkExSigner.getAddress();
 
-  const signableResult = await imx.StarkEx.usersApi.getSignableRegistrationOffchain({
+  const signableResult = await usersApi.getSignableRegistrationOffchain({
     getSignableRegistrationRequest:{ether_key: userAddress, stark_key:starkPublicKey}});
 
   const {
@@ -25,7 +26,7 @@ export async function registerOffchain(signers: Signers, imx:ImmutableX
 
   const starkSignature = await signers.starkExSigner.signMessage(payloadHash);
 
-  const registeredUser = await imx.StarkEx.usersApi.registerUser({
+  const registeredUser = await usersApi.registerUser({
     registerUserRequest: {
       eth_signature: ethSignature,
       ether_key: userAddress,
@@ -64,9 +65,10 @@ export async function isRegisteredOnChain(
 export async function getSignableRegistrationOnchain(
   etherKey: string,
   starkPublicKey: string,
-  imx:ImmutableX
+  imx:Immutable
 ): Promise<GetSignableRegistrationResponse> {
-  const response = await imx.StarkEx.usersApi.getSignableRegistration({
+  const usersApi = new UsersApi(imx.getConfiguration().apiConfiguration)
+  const response = await usersApi.getSignableRegistration({
     getSignableRegistrationRequest: {
       ether_key: etherKey,
       stark_key: starkPublicKey,
