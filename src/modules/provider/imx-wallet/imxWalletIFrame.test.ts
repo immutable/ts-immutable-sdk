@@ -2,9 +2,9 @@ import { ENVIRONMENTS } from '../constants';
 import {
   IMX_WALLET_IFRAME_ID,
   IMX_WALLET_IFRAME_HOSTS,
-  setupIFrame,
-  getIFrame,
-  getOrSetIframe,
+  setupIframe,
+  getIframe,
+  getOrSetupIframe,
   IMX_WALLET_IFRAME_STYLE,
 } from './imxWalletIFrame';
 import {
@@ -20,7 +20,7 @@ describe('the setupIFrame function', () => {
 
   it('should succeed', async () => {
     const iFrame = await asyncTriggerIframeOnLoad(
-      setupIFrame(ENVIRONMENTS.DEVELOPMENT)
+      setupIframe(ENVIRONMENTS.DEVELOPMENT)
     );
 
     expect(iFrame?.getAttribute('id')).toEqual(IMX_WALLET_IFRAME_ID);
@@ -39,7 +39,7 @@ describe('the setupIFrame function', () => {
     });
 
     const iFrame = await asyncTriggerIframeOnLoad(
-      setupIFrame(ENVIRONMENTS.DEVELOPMENT)
+      setupIframe(ENVIRONMENTS.DEVELOPMENT)
     );
 
     expect(iFrame?.getAttribute('id')).toEqual(IMX_WALLET_IFRAME_ID);
@@ -51,8 +51,8 @@ describe('the setupIFrame function', () => {
 
   it('should prevents more than one iFrame from being created', async () => {
     const setups = [
-      getOrSetIframe(ENVIRONMENTS.DEVELOPMENT),
-      getOrSetIframe(ENVIRONMENTS.DEVELOPMENT),
+      getOrSetupIframe(ENVIRONMENTS.DEVELOPMENT),
+      getOrSetupIframe(ENVIRONMENTS.DEVELOPMENT),
     ];
 
     triggerIframeOnLoad();
@@ -70,9 +70,9 @@ describe('the getIFrame function', () => {
 
   it('should return an iFrame', async () => {
     const iFrameLoaded = await asyncTriggerIframeOnLoad(
-      setupIFrame(ENVIRONMENTS.DEVELOPMENT)
+      setupIframe(ENVIRONMENTS.DEVELOPMENT)
     );
-    const iFrame = getIFrame();
+    const iFrame = getIframe();
 
     expect(iFrame).not.toBeNull();
     expect(iFrame).toEqual(iFrameLoaded);

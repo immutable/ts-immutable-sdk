@@ -10,7 +10,7 @@ import { postRequestMessage } from './postRequestMessage';
 import { messageResponseListener } from './messageResponseListener';
 import { ImxSigner } from './ImxSigner';
 import { ENVIRONMENTS } from '../constants';
-import { getOrSetIframe } from './imxWalletIFrame';
+import { getOrSetupIframe } from './imxWalletIFrame';
 
 const DEFAULT_CONNECTION_MESSAGE =
   'Only sign this request if you’ve initiated an action with Immutable X.';
@@ -23,7 +23,7 @@ export async function connect(
   const l1Signer = l1Provider.getSigner();
   const address = await l1Signer.getAddress();
   const signature = await l1Signer.signMessage(DEFAULT_CONNECTION_MESSAGE);
-  const iframe = await getOrSetIframe(env);
+  const iframe = await getOrSetupIframe(env);
 
   return new Promise((resolve, reject) => {
     const listener = (event: MessageEvent) => {

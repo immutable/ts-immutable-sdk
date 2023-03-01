@@ -5,7 +5,7 @@ import { connect, disconnect } from './imxWallet';
 import { postRequestMessage } from './postRequestMessage';
 import { ENVIRONMENTS } from '../constants';
 import { asyncTriggerIframeOnLoad } from './testUtils';
-import { getOrSetIframe } from './imxWalletIFrame';
+import { getOrSetupIframe } from './imxWalletIFrame';
 import { ImxSigner } from './ImxSigner';
 
 jest.mock('./postRequestMessage');
@@ -29,7 +29,7 @@ describe('imxWallet', () => {
 
   describe('connect', () => {
     it('Should call the postMessage', async () => {
-      const iframe = await asyncTriggerIframeOnLoad(getOrSetIframe(env));
+      const iframe = await asyncTriggerIframeOnLoad(getOrSetupIframe(env));
       const postRequestMessageMockFn = postRequestMessage as jest.Mock;
 
       connect(l1Provider, env);
@@ -43,7 +43,7 @@ describe('imxWallet', () => {
     });
 
     it('Should receive starkPublicKey if l2Wallet returns correct data', async () => {
-      const iframe = await asyncTriggerIframeOnLoad(getOrSetIframe(env));
+      const iframe = await asyncTriggerIframeOnLoad(getOrSetupIframe(env));
 
       const starkPublicKey = '0x4321z';
       const mockedSuccessReturnValue = {
@@ -91,7 +91,7 @@ describe('imxWallet', () => {
 
   describe('disconnection', () => {
     it('Should call the postMessage', async () => {
-      const iframe = await asyncTriggerIframeOnLoad(getOrSetIframe(env));
+      const iframe = await asyncTriggerIframeOnLoad(getOrSetupIframe(env));
       const postRequestMessageMockFn = postRequestMessage as jest.Mock;
       const starkPublicKey = '0x123';
 

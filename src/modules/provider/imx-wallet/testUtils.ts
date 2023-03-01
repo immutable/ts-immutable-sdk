@@ -1,11 +1,11 @@
-import { getIFrame } from './imxWalletIFrame';
+import { getIframe } from './imxWalletIFrame';
 
 export const htmlBodyInit = () => {
   document.body.innerHTML = '<body></body>';
 };
 
 export function triggerIframeOnLoad() {
-  const iFrame = getIFrame();
+  const iFrame = getIframe();
 
   if (iFrame && iFrame.onload) {
     iFrame.onload(new Event('Loaded'));

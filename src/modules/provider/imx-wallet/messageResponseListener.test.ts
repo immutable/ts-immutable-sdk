@@ -2,7 +2,7 @@ import { ENVIRONMENTS } from '../constants';
 import { ConnectResponse } from './types';
 import { RESPONSE_EVENTS } from './events';
 import { messageResponseListener } from './messageResponseListener';
-import { setupIFrame } from './imxWalletIFrame';
+import { setupIframe } from './imxWalletIFrame';
 
 import { htmlBodyInit, asyncTriggerIframeOnLoad } from './testUtils';
 
@@ -34,7 +34,7 @@ describe('the messageResponseListener function', () => {
     htmlBodyInit();
 
     iframe = await asyncTriggerIframeOnLoad(
-      setupIFrame(ENVIRONMENTS.DEVELOPMENT)
+      setupIframe(ENVIRONMENTS.DEVELOPMENT)
     );
 
     if (iframe) {
