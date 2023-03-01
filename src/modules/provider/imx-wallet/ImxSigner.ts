@@ -1,4 +1,8 @@
-import { COMMUNICATION_TYPE, REQUEST_EVENTS, RESPONSE_EVENTS } from './events';
+import {
+  COMMUNICATION_TYPE,
+  ResponseEventType,
+  RequestEventType,
+} from './events';
 import { messageResponseListener } from './messageResponseListener';
 import { postRequestMessage } from './postRequestMessage';
 import { SignMessageRequest, SignMessageResponse } from './types';
@@ -23,7 +27,7 @@ export class ImxSigner implements StarkSigner {
         messageResponseListener<SignMessageResponse>(
           this.iframe,
           event,
-          RESPONSE_EVENTS.SIGN_MESSAGE_RESPONSE,
+          ResponseEventType.SIGN_MESSAGE_RESPONSE,
           (messageDetails) => {
             window.removeEventListener(COMMUNICATION_TYPE, listener);
 
@@ -38,7 +42,7 @@ export class ImxSigner implements StarkSigner {
       window.addEventListener(COMMUNICATION_TYPE, listener);
 
       postRequestMessage<SignMessageRequest>(this.iframe, {
-        type: REQUEST_EVENTS.SIGN_MESSAGE_REQUEST,
+        type: RequestEventType.SIGN_MESSAGE_REQUEST,
         details: { starkPublicKey: this.publicAddress, message: rawMessage },
       });
     });

@@ -1,5 +1,5 @@
 import { Error as ErrorDetails } from './types';
-import { RESPONSE_EVENTS } from './events';
+import { ResponseEventType } from './events';
 
 export type ResponseMessageDetails<T> = {
   success: boolean;
@@ -8,14 +8,14 @@ export type ResponseMessageDetails<T> = {
 };
 
 export type ResponseMessage<T> = {
-  type: RESPONSE_EVENTS;
+  type: ResponseEventType;
   details: ResponseMessageDetails<T>;
 };
 
 export function messageResponseListener<T>(
   iframe: HTMLIFrameElement,
   event: MessageEvent,
-  eventType: RESPONSE_EVENTS,
+  eventType: ResponseEventType,
   callback: (response: ResponseMessageDetails<T>) => void
 ) {
   if (iframe && event.source !== iframe.contentWindow) {

@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 
-import { REQUEST_EVENTS, RESPONSE_EVENTS } from './events';
+import { RequestEventType, ResponseEventType } from './events';
 import { connect, disconnect } from './imxWallet';
 import { postRequestMessage } from './postRequestMessage';
 import { Environment } from '../constants';
@@ -37,7 +37,7 @@ describe('imxWallet', () => {
       await new Promise(process.nextTick);
 
       expect(postRequestMessageMockFn).toBeCalledWith(iframe, {
-        type: REQUEST_EVENTS.CONNECT_WALLET_REQUEST,
+        type: RequestEventType.CONNECT_WALLET_REQUEST,
         details: { ethAddress: address, signature },
       });
     });
@@ -48,7 +48,7 @@ describe('imxWallet', () => {
       const starkPublicKey = '0x4321z';
       const mockedSuccessReturnValue = {
         data: {
-          type: RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+          type: ResponseEventType.CONNECT_WALLET_RESPONSE,
           details: {
             success: true,
             data: { starkPublicKey },
@@ -71,7 +71,7 @@ describe('imxWallet', () => {
     it('Should throws an error if l2Wallet returns error', async () => {
       const mockedFailedReturnValue = {
         data: {
-          type: RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+          type: ResponseEventType.CONNECT_WALLET_RESPONSE,
           details: {
             success: false,
           },
@@ -102,7 +102,7 @@ describe('imxWallet', () => {
       await new Promise(process.nextTick);
 
       expect(postRequestMessageMockFn).toBeCalledWith(iframe, {
-        type: REQUEST_EVENTS.DISCONNECT_WALLET_REQUEST,
+        type: RequestEventType.DISCONNECT_WALLET_REQUEST,
         details: { starkPublicKey },
       });
     });

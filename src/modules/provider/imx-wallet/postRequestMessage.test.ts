@@ -1,5 +1,5 @@
 import { ConnectRequest } from './types';
-import { REQUEST_EVENTS } from './events';
+import { RequestEventType } from './events';
 import { postRequestMessage } from './postRequestMessage';
 import { IMX_WALLET_IFRAME_HOSTS } from './imxWalletIFrame';
 
@@ -17,7 +17,7 @@ jest.mock('./imxWalletIFrame', () => ({
 describe('the postRequestMessage function', () => {
   it('should post the event to the iFrame contentWindow', async () => {
     const postMessage = {
-      type: REQUEST_EVENTS.CONNECT_WALLET_REQUEST,
+      type: RequestEventType.CONNECT_WALLET_REQUEST,
       details: { ethAddress: '0x000', signature: 'The message' },
     };
 

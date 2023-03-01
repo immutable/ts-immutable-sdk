@@ -5,7 +5,11 @@ import {
   DisconnectRequest,
   DisconnectResponse,
 } from './types';
-import { COMMUNICATION_TYPE, REQUEST_EVENTS, RESPONSE_EVENTS } from './events';
+import {
+  COMMUNICATION_TYPE,
+  RequestEventType,
+  ResponseEventType,
+} from './events';
 import { postRequestMessage } from './postRequestMessage';
 import { messageResponseListener } from './messageResponseListener';
 import { ImxSigner } from './ImxSigner';
@@ -30,7 +34,7 @@ export async function connect(
       messageResponseListener<ConnectResponse>(
         iframe,
         event,
-        RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+        ResponseEventType.CONNECT_WALLET_RESPONSE,
         (messageDetails) => {
           window.removeEventListener(COMMUNICATION_TYPE, listener);
 
@@ -45,7 +49,7 @@ export async function connect(
     window.addEventListener(COMMUNICATION_TYPE, listener);
 
     postRequestMessage<ConnectRequest>(iframe, {
-      type: REQUEST_EVENTS.CONNECT_WALLET_REQUEST,
+      type: RequestEventType.CONNECT_WALLET_REQUEST,
       details: { ethAddress: address, signature },
     });
   });
@@ -59,7 +63,7 @@ export async function disconnect(imxSigner: ImxSigner): Promise<void> {
       messageResponseListener<DisconnectResponse>(
         iframe,
         event,
-        RESPONSE_EVENTS.DISCONNECT_WALLET_RESPONSE,
+        ResponseEventType.DISCONNECT_WALLET_RESPONSE,
         (messageDetails) => {
           window.removeEventListener(COMMUNICATION_TYPE, listener);
 
@@ -77,7 +81,7 @@ export async function disconnect(imxSigner: ImxSigner): Promise<void> {
     window.addEventListener(COMMUNICATION_TYPE, listener);
 
     postRequestMessage<DisconnectRequest>(iframe, {
-      type: REQUEST_EVENTS.DISCONNECT_WALLET_REQUEST,
+      type: RequestEventType.DISCONNECT_WALLET_REQUEST,
       details: { starkPublicKey: imxSigner.getAddress() },
     });
   });

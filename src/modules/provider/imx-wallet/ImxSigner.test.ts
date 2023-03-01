@@ -1,4 +1,4 @@
-import { REQUEST_EVENTS, RESPONSE_EVENTS } from './events';
+import { RequestEventType, ResponseEventType } from './events';
 import { ImxSigner } from './ImxSigner';
 import { postRequestMessage } from './postRequestMessage';
 
@@ -32,7 +32,7 @@ describe('ImxSigner', () => {
       await new Promise(process.nextTick);
 
       expect(postRequestMessageMockFn).toBeCalledWith(iframe, {
-        type: REQUEST_EVENTS.SIGN_MESSAGE_REQUEST,
+        type: RequestEventType.SIGN_MESSAGE_REQUEST,
         details: { starkPublicKey: starkAddress, message },
       });
     });
@@ -41,7 +41,7 @@ describe('ImxSigner', () => {
       const signedMessage = 'signedmessage';
       const mockedSuccessReturnValue = {
         data: {
-          type: RESPONSE_EVENTS.SIGN_MESSAGE_RESPONSE,
+          type: ResponseEventType.SIGN_MESSAGE_RESPONSE,
           details: {
             success: true,
             data: { signedMessage },
@@ -64,7 +64,7 @@ describe('ImxSigner', () => {
       const errorMessage = 'Failed signing message from imxSigner';
       const mockedFailedReturnValue = {
         data: {
-          type: RESPONSE_EVENTS.SIGN_MESSAGE_RESPONSE,
+          type: ResponseEventType.SIGN_MESSAGE_RESPONSE,
           details: {
             success: false,
             error: {

@@ -1,6 +1,6 @@
 import { Environment } from '../constants';
 import { ConnectResponse } from './types';
-import { RESPONSE_EVENTS } from './events';
+import { ResponseEventType } from './events';
 import { messageResponseListener } from './messageResponseListener';
 import { setupIframe } from './imxWalletIFrame';
 
@@ -10,7 +10,7 @@ const callbackFn = jest.fn();
 
 function getMessageEvent(
   eventOrigin: string,
-  eventType: RESPONSE_EVENTS,
+  eventType: ResponseEventType,
   iframe: HTMLIFrameElement
 ): MessageEvent {
   return {
@@ -49,10 +49,10 @@ describe('the messageResponseListener function', () => {
       iframe,
       getMessageEvent(
         iFrameURL,
-        RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+        ResponseEventType.CONNECT_WALLET_RESPONSE,
         iframe
       ),
-      RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+      ResponseEventType.CONNECT_WALLET_RESPONSE,
       callbackFn
     );
 
@@ -64,12 +64,12 @@ describe('the messageResponseListener function', () => {
       iframe,
       getMessageEvent(
         'http://anyotherorigin.com',
-        RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+        ResponseEventType.CONNECT_WALLET_RESPONSE,
         {
           source: {} as unknown as WindowProxy,
         } as unknown as HTMLIFrameElement
       ),
-      RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+      ResponseEventType.CONNECT_WALLET_RESPONSE,
       callbackFn
     );
 
@@ -79,8 +79,12 @@ describe('the messageResponseListener function', () => {
   it('should ignore events if the type does not match', () => {
     messageResponseListener<ConnectResponse>(
       iframe,
-      getMessageEvent(iFrameURL, RESPONSE_EVENTS.SIGN_MESSAGE_RESPONSE, iframe),
-      RESPONSE_EVENTS.CONNECT_WALLET_RESPONSE,
+      getMessageEvent(
+        iFrameURL,
+        ResponseEventType.SIGN_MESSAGE_RESPONSE,
+        iframe
+      ),
+      ResponseEventType.CONNECT_WALLET_RESPONSE,
       callbackFn
     );
 

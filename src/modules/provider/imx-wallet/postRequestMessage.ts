@@ -1,7 +1,7 @@
-import { REQUEST_EVENTS } from './events';
+import { RequestEventType } from './events';
 
 export type RequestMessage<T> = {
-  type: REQUEST_EVENTS;
+  type: RequestEventType;
   details?: T;
 };
 

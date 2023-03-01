@@ -20,12 +20,12 @@ export type DisconnectRequest = {
 // should it be empty object?
 export type DisconnectResponse = object;
 
-export enum ERROR_CODE {
+export enum ErrorCode {
   CANNOT_RETRIEVE_STARK_KEY_PAIR = 100,
   GENERIC_ERROR = 500,
 }
 
 export type Error = {
-  code: ERROR_CODE;
+  code: ErrorCode;
   message: string;
 };
