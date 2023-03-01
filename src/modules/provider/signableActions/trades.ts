@@ -2,12 +2,12 @@ import { CreateTradeResponse, GetSignableTradeRequest } from "src/types";
 import { Signers } from "./types";
 import { validateChain } from "./helpers";
 import { signRaw } from "./utils/crypto";
-import { Immutable } from "../../apis/starkex/immutable";
+import { ImmutableX } from "../../apis/starkex";
 
 type createTradeWorkflowParams = {
   signers: Signers;
   request: GetSignableTradeRequest;
-  imx: Immutable;
+  imx: ImmutableX;
 };
 
 export async function createTrade({

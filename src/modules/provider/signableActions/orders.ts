@@ -3,19 +3,19 @@ import { CancelOrderResponse, CreateOrderResponse, GetSignableCancelOrderRequest
 import { convertToSignableToken } from "./utils/convertToSignableToken";
 import { signRaw } from "./utils/crypto";
 import { Signers } from "./types";
-import { Immutable } from "../../apis/starkex/immutable";
+import { ImmutableX } from "../../apis/starkex";
 
 
 type CreateOrderWorkflowParams = {
   signers: Signers
   request: UnsignedOrderRequest;
-  imx: Immutable;
+  imx: ImmutableX;
 };
 
 type CancelOrderWorkflowParams = {
   signers: Signers
   request: GetSignableCancelOrderRequest;
-  imx: Immutable;
+  imx: ImmutableX;
 };
 
 export async function createOrder({

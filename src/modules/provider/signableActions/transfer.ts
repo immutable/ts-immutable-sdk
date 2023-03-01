@@ -2,18 +2,18 @@ import { CreateTransferResponse, CreateTransferResponseV1, NftTransferDetails, U
 import { Signers } from "./types";
 import { convertToSignableToken } from "./utils/convertToSignableToken";
 import { signRaw } from "./utils/crypto";
-import { Immutable } from "../../apis/starkex/immutable";
+import { ImmutableX } from "../../apis/starkex";
 
 type TransfersWorkflowParams = {
   signers: Signers;
   request: UnsignedTransferRequest;
-  imx: Immutable;
+  imx: ImmutableX;
 };
 
 type BatchTransfersWorkflowParams = {
   signers: Signers;
   request: Array<NftTransferDetails>;
-  imx: Immutable;
+  imx: ImmutableX;
 };
 
 export async function transfers({

@@ -2,13 +2,13 @@ import { CreateTransferResponseV1, UnsignedExchangeTransferRequest } from "../..
 import { convertToSignableToken } from "./utils/convertToSignableToken";
 import { signRaw } from "./utils/crypto";
 import { Signers } from "./types";
-import { Immutable } from "../../apis/starkex/immutable";
+import { ImmutableX } from "../../apis/starkex";
 
 
 type TransfersWorkflowParams = {
   signers: Signers
   request: UnsignedExchangeTransferRequest;
-  imx: Immutable;
+  imx: ImmutableX;
 };
 
 export async function exchangeTransfersWorkflow({
