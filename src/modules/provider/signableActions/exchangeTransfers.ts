@@ -8,7 +8,7 @@ import { validateChain } from "./helpers";
 
 
 type TransfersWorkflowParams = {
-  signers: Signers
+  signers: Signers;
   request: UnsignedExchangeTransferRequest;
   imx: Immutable;
 };

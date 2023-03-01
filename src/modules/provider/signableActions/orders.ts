@@ -9,13 +9,13 @@ import { validateChain } from "./helpers";
 
 
 type CreateOrderWorkflowParams = {
-  signers: Signers
+  signers: Signers;
   request: UnsignedOrderRequest;
   imx: Immutable;
 };
 
 type CancelOrderWorkflowParams = {
-  signers: Signers
+  signers: Signers;
   request: GetSignableCancelOrderRequest;
   imx: Immutable;
 };

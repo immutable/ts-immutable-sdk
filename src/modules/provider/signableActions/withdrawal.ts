@@ -10,16 +10,16 @@ import {
 } from "./withdrawalActions";
 
 type CompleteWithdrawalParams = {
-  signers: Signers,
-  starkPublicKey: string,
-  token: AnyToken,
-  client: Immutable
+  signers: Signers;
+  starkPublicKey: string;
+  token: AnyToken;
+  client: Immutable;
 }
 
 type PrepareWithdrawalParams = {
-  signers: Signers,
-  withdrawal: TokenAmount,
-  client:Immutable,
+  signers: Signers;
+  withdrawal: TokenAmount;
+  client:Immutable;
 }
 
 export async function prepareWithdrawal({
