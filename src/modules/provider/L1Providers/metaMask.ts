@@ -27,7 +27,8 @@ export async function connect({
     });
   }
 
-  // NOTE: do we need to listen to events so we can await the user actions?
+  // NOTE: if we want to listen to Metamask events in the future, we can add a
+  // listener here.
 
   return new ethers.providers.Web3Provider(provider);
 }
