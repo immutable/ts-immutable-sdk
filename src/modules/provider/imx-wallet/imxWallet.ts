@@ -13,7 +13,7 @@ import { ENVIRONMENTS } from '../constants';
 import { getOrSetIframe } from './imxWalletIFrame';
 
 const DEFAULT_CONNECTION_MESSAGE =
-  'Only sign this request if you’ve initiated an action with ImmutableX.';
+  'Only sign this request if you’ve initiated an action with Immutable X.';
 const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed.';
 
 export async function connect(
