@@ -1,4 +1,4 @@
-import { Environment } from '../constants'; // todo: determine if we want to handle envs the same
+import { Environment } from '../constants';
 
 export const IMX_WALLET_IFRAME_ID = 'imx-wallet-app';
 export const IMX_WALLET_IFRAME_HOSTS = {
