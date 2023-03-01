@@ -65,9 +65,8 @@ export async function isRegisteredOnChain(
 export async function getSignableRegistrationOnchain(
   etherKey: string,
   starkPublicKey: string,
-  imx:Immutable
+  usersApi: UsersApi
 ): Promise<GetSignableRegistrationResponse> {
-  const usersApi = new UsersApi(imx.getConfiguration().apiConfiguration)
   const response = await usersApi.getSignableRegistration({
     getSignableRegistrationRequest: {
       ether_key: etherKey,
