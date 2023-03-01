@@ -47,7 +47,6 @@ export class Passport {
     }
     const provider = await this.magicAdapter.login(user.id_token);
     const signer = await getStarkSigner(provider.getSigner());
-    //TODO UserRigistration
     return new PassportImxProvider(user, signer);
   }
 
