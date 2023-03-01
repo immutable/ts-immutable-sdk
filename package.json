@@ -24,19 +24,14 @@
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "dependencies": {
-    "@ethersproject/abstract-signer": "^5.7.0",
-    "@ethersproject/providers": "^5.7.2",
     "@imtbl/core-sdk": "^1.0.1",
     "@magic-ext/oidc": "^1.0.1",
-    "@types/elliptic": "^6.4.14",
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
-    "bitwise": "^2.1.0",
     "eslint": "^8.34.0",
     "ethers": "^5.7.2",
     "magic-sdk": "^13.3.1",
-    "oidc-client-ts": "^2.2.1",
-    "soltypes": "^2.0.0"
+    "oidc-client-ts": "^2.2.1"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
