@@ -7,7 +7,7 @@ import {
   completeEthWithdrawalAction,
   completeERC20WithdrawalAction,
   completeERC721WithdrawalAction
-} from "./withdrawalActions";
+} from "./withdrawal-actions";
 
 type CompleteWithdrawalParams = {
   signers: Signers;

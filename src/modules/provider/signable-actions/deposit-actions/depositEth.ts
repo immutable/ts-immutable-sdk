@@ -12,12 +12,15 @@ import { parseUnits } from "@ethersproject/units";
 import { getSignableRegistrationOnchain, isRegisteredOnChain } from "../registration";
 import { BigNumber } from '@ethersproject/bignumber';
 import { TransactionResponse } from "@ethersproject/providers";
+import { validateChain } from "../helpers";
 
 interface ETHTokenData {
   decimals: number;
 }
 
 export async function depositEth(signer: EthSigner, deposit: ETHAmount, imx:Immutable) {
+  await validateChain(signer, imx.getConfiguration());
+
   const user = await signer.getAddress();
   const data: ETHTokenData = {
     decimals: 18,
