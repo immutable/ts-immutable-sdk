@@ -10,6 +10,7 @@ import {
 import { TransactionResponse } from "@ethersproject/providers";
 import { getSignableRegistrationOnchain, isRegisteredOnChain } from "../registration";
 import { Immutable } from "../../../apis/starkex";
+import { validateChain } from "../helpers";
 
 
 interface ERC721TokenData {
@@ -22,6 +23,8 @@ export async function depositERC721(
   deposit: ERC721Token,
   imx:Immutable,
 ): Promise<TransactionResponse> {
+  await validateChain(signer, imx.getConfiguration());
+
   const user = await signer.getAddress();
   const config = imx.getConfiguration();
   const depositsApi = new DepositsApi(config.apiConfiguration)

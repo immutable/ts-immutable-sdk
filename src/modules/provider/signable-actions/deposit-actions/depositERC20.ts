@@ -13,6 +13,7 @@ import { TransactionResponse } from "@ethersproject/providers";
 import { parseUnits } from "@ethersproject/units";
 import { BigNumber } from '@ethersproject/bignumber';
 import { getSignableRegistrationOnchain, isRegisteredOnChain } from "../registration";
+import { validateChain } from "../helpers";
 
 
 interface ERC20TokenData {
@@ -24,6 +25,8 @@ interface ERC20TokenData {
 export async function depositERC20(
   signer: EthSigner, deposit: ERC20Amount, imx:Immutable
 ): Promise<TransactionResponse> {
+  await validateChain(signer, imx.getConfiguration());
+
   const user = await signer.getAddress();
   const config = imx.getConfiguration();
   const tokensApi = new TokensApi(config.apiConfiguration)
