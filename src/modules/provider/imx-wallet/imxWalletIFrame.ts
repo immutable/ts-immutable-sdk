@@ -8,11 +8,11 @@ export const IMX_WALLET_IFRAME_HOSTS = {
 };
 export const IMX_WALLET_IFRAME_STYLE = 'display: none;';
 
-export function getIframe(): HTMLIFrameElement | null {
+export function getIFrame(): HTMLIFrameElement | null {
   return document.querySelector(`iframe#${IMX_WALLET_IFRAME_ID}`);
 }
 
-export async function setupIframe(
+export async function setupIFrame(
   env: Environment
 ): Promise<HTMLIFrameElement> {
   return new Promise((resolve) => {
@@ -28,10 +28,10 @@ export async function setupIframe(
   });
 }
 
-export async function getOrSetupIframe(
+export async function getOrSetupIFrame(
   env: Environment,
 ): Promise<HTMLIFrameElement> {
-  const iframe = getIframe();
+  const iframe = getIFrame();
   if (iframe) return iframe;
-  return await setupIframe(env);
+  return await setupIFrame(env);
 }

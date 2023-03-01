@@ -48,7 +48,7 @@ export class ImxSigner implements StarkSigner {
     });
   }
 
-  public getIframe(): HTMLIFrameElement {
+  public getIFrame(): HTMLIFrameElement {
     return this.iframe;
   }
 }

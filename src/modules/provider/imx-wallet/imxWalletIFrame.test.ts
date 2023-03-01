@@ -2,15 +2,15 @@ import { Environment } from '../constants';
 import {
   IMX_WALLET_IFRAME_ID,
   IMX_WALLET_IFRAME_HOSTS,
-  setupIframe,
-  getIframe,
-  getOrSetupIframe,
+  setupIFrame,
+  getIFrame,
+  getOrSetupIFrame,
   IMX_WALLET_IFRAME_STYLE,
 } from './imxWalletIFrame';
 import {
   htmlBodyInit,
-  asyncTriggerIframeOnLoad,
-  triggerIframeOnLoad,
+  asyncTriggerIFrameOnLoad,
+  triggerIFrameOnLoad,
 } from './testUtils';
 
 describe('the setupIFrame function', () => {
@@ -19,8 +19,8 @@ describe('the setupIFrame function', () => {
   afterEach(() => jest.clearAllMocks());
 
   it('should succeed', async () => {
-    const iFrame = await asyncTriggerIframeOnLoad(
-      setupIframe(Environment.DEVELOPMENT)
+    const iFrame = await asyncTriggerIFrameOnLoad(
+      setupIFrame(Environment.DEVELOPMENT)
     );
 
     expect(iFrame?.getAttribute('id')).toEqual(IMX_WALLET_IFRAME_ID);
@@ -38,8 +38,8 @@ describe('the setupIFrame function', () => {
       writable: true,
     });
 
-    const iFrame = await asyncTriggerIframeOnLoad(
-      setupIframe(Environment.DEVELOPMENT)
+    const iFrame = await asyncTriggerIFrameOnLoad(
+      setupIFrame(Environment.DEVELOPMENT)
     );
 
     expect(iFrame?.getAttribute('id')).toEqual(IMX_WALLET_IFRAME_ID);
@@ -51,11 +51,11 @@ describe('the setupIFrame function', () => {
 
   it('should prevents more than one iFrame from being created', async () => {
     const setups = [
-      getOrSetupIframe(Environment.DEVELOPMENT),
-      getOrSetupIframe(Environment.DEVELOPMENT),
+      getOrSetupIFrame(Environment.DEVELOPMENT),
+      getOrSetupIFrame(Environment.DEVELOPMENT),
     ];
 
-    triggerIframeOnLoad();
+    triggerIFrameOnLoad();
 
     await Promise.race(setups);
 
@@ -69,10 +69,10 @@ describe('the getIFrame function', () => {
   afterEach(() => jest.clearAllMocks());
 
   it('should return an iFrame', async () => {
-    const iFrameLoaded = await asyncTriggerIframeOnLoad(
-      setupIframe(Environment.DEVELOPMENT)
+    const iFrameLoaded = await asyncTriggerIFrameOnLoad(
+      setupIFrame(Environment.DEVELOPMENT)
     );
-    const iFrame = getIframe();
+    const iFrame = getIFrame();
 
     expect(iFrame).not.toBeNull();
     expect(iFrame).toEqual(iFrameLoaded);

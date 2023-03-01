@@ -2,9 +2,9 @@ import { Environment } from '../constants';
 import { ConnectResponse } from './types';
 import { ResponseEventType } from './events';
 import { messageResponseListener } from './messageResponseListener';
-import { setupIframe } from './imxWalletIFrame';
+import { setupIFrame } from './imxWalletIFrame';
 
-import { htmlBodyInit, asyncTriggerIframeOnLoad } from './testUtils';
+import { htmlBodyInit, asyncTriggerIFrameOnLoad } from './testUtils';
 
 const callbackFn = jest.fn();
 
@@ -33,8 +33,8 @@ describe('the messageResponseListener function', () => {
   beforeEach(async () => {
     htmlBodyInit();
 
-    iframe = await asyncTriggerIframeOnLoad(
-      setupIframe(Environment.DEVELOPMENT)
+    iframe = await asyncTriggerIFrameOnLoad(
+      setupIFrame(Environment.DEVELOPMENT)
     );
 
     if (iframe) {
