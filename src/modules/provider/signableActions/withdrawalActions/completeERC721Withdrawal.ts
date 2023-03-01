@@ -1,5 +1,5 @@
 import { Signer } from '@ethersproject/abstract-signer';
-import { EncodingApi, MintsApi, Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
+import { MintsApi, Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
 import * as encUtils from 'enc-utils';
 import { ERC721Token } from '../../../../types';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';

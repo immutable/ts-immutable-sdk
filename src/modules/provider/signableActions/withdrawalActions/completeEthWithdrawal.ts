@@ -1,6 +1,6 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { Contracts, EncodingApi, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
+import { Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
 import { Immutable } from 'src/modules/apis/starkex';
 import {
   getSignableRegistrationOnchain,
