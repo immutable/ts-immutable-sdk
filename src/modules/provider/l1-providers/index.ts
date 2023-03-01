@@ -1,4 +1,2 @@
-import * as metamask from './metaMask';
-
-export { metamask };
+export * as metamask from './metaMask';
 export * from './types';

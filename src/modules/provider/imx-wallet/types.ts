@@ -17,7 +17,7 @@ export type SignMessageResponse = {
 export type DisconnectRequest = {
   starkPublicKey: string;
 };
-// should it be empty object?
+
 export type DisconnectResponse = object;
 
 export enum ErrorCode {

@@ -10,6 +10,6 @@ export function postRequestMessage<T>(
   payload: RequestMessage<T>
 ) {
   if (iframe && iframe.contentWindow) {
-    iframe.contentWindow.postMessage(payload, iframe.contentWindow.origin);
+    iframe.contentWindow.postMessage(payload, new URL(iframe.src).origin);
   }
 }
