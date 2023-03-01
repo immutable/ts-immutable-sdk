@@ -1,4 +1,4 @@
-import { ENVIRONMENTS } from '../constants';
+import { Environment } from '../constants';
 import {
   IMX_WALLET_IFRAME_ID,
   IMX_WALLET_IFRAME_HOSTS,
@@ -20,7 +20,7 @@ describe('the setupIFrame function', () => {
 
   it('should succeed', async () => {
     const iFrame = await asyncTriggerIframeOnLoad(
-      setupIframe(ENVIRONMENTS.DEVELOPMENT)
+      setupIframe(Environment.DEVELOPMENT)
     );
 
     expect(iFrame?.getAttribute('id')).toEqual(IMX_WALLET_IFRAME_ID);
@@ -39,7 +39,7 @@ describe('the setupIFrame function', () => {
     });
 
     const iFrame = await asyncTriggerIframeOnLoad(
-      setupIframe(ENVIRONMENTS.DEVELOPMENT)
+      setupIframe(Environment.DEVELOPMENT)
     );
 
     expect(iFrame?.getAttribute('id')).toEqual(IMX_WALLET_IFRAME_ID);
@@ -51,8 +51,8 @@ describe('the setupIFrame function', () => {
 
   it('should prevents more than one iFrame from being created', async () => {
     const setups = [
-      getOrSetupIframe(ENVIRONMENTS.DEVELOPMENT),
-      getOrSetupIframe(ENVIRONMENTS.DEVELOPMENT),
+      getOrSetupIframe(Environment.DEVELOPMENT),
+      getOrSetupIframe(Environment.DEVELOPMENT),
     ];
 
     triggerIframeOnLoad();
@@ -70,7 +70,7 @@ describe('the getIFrame function', () => {
 
   it('should return an iFrame', async () => {
     const iFrameLoaded = await asyncTriggerIframeOnLoad(
-      setupIframe(ENVIRONMENTS.DEVELOPMENT)
+      setupIframe(Environment.DEVELOPMENT)
     );
     const iFrame = getIframe();
 

@@ -9,7 +9,7 @@ import { COMMUNICATION_TYPE, REQUEST_EVENTS, RESPONSE_EVENTS } from './events';
 import { postRequestMessage } from './postRequestMessage';
 import { messageResponseListener } from './messageResponseListener';
 import { ImxSigner } from './ImxSigner';
-import { ENVIRONMENTS } from '../constants';
+import { Environment } from '../constants';
 import { getOrSetupIframe } from './imxWalletIFrame';
 
 const DEFAULT_CONNECTION_MESSAGE =
@@ -18,7 +18,7 @@ const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed.';
 
 export async function connect(
   l1Provider: ethers.providers.Web3Provider,
-  env: ENVIRONMENTS
+  env: Environment
 ): Promise<ImxSigner> {
   const l1Signer = l1Provider.getSigner();
   const address = await l1Signer.getAddress();

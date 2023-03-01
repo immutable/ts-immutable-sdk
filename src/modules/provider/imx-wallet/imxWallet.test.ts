@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { REQUEST_EVENTS, RESPONSE_EVENTS } from './events';
 import { connect, disconnect } from './imxWallet';
 import { postRequestMessage } from './postRequestMessage';
-import { ENVIRONMENTS } from '../constants';
+import { Environment } from '../constants';
 import { asyncTriggerIframeOnLoad } from './testUtils';
 import { getOrSetupIframe } from './imxWalletIFrame';
 import { ImxSigner } from './ImxSigner';
@@ -11,7 +11,7 @@ import { ImxSigner } from './ImxSigner';
 jest.mock('./postRequestMessage');
 
 describe('imxWallet', () => {
-  const env = ENVIRONMENTS.DEVELOPMENT;
+  const env = Environment.DEVELOPMENT;
   const signature = 'The signature';
   const address = '0x1234';
   let l1Provider: ethers.providers.Web3Provider;

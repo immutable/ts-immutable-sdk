@@ -1,4 +1,4 @@
-import { ENVIRONMENTS } from '../constants';
+import { Environment } from '../constants';
 import { ConnectResponse } from './types';
 import { RESPONSE_EVENTS } from './events';
 import { messageResponseListener } from './messageResponseListener';
@@ -34,7 +34,7 @@ describe('the messageResponseListener function', () => {
     htmlBodyInit();
 
     iframe = await asyncTriggerIframeOnLoad(
-      setupIframe(ENVIRONMENTS.DEVELOPMENT)
+      setupIframe(Environment.DEVELOPMENT)
     );
 
     if (iframe) {
