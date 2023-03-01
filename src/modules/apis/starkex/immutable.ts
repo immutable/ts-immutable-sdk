@@ -4,7 +4,7 @@ import {
   CollectionsApi,
   DepositsApi,
   ExchangesApi,
-  ImmutableX,
+  ImmutableX as imtbl,
   ImmutableXConfiguration,
   MetadataApi,
   MetadataRefreshesApi,
@@ -16,10 +16,11 @@ import {
   TradesApi,
   TransfersApi,
   UsersApi,
-  WithdrawalsApi
+  WithdrawalsApi,
+  EncodingApi
 } from "@imtbl/core-sdk";
 
-export class Immutable {
+export class ImmutableX {
   private readonly config: ImmutableXConfiguration;
   public StarkEx:
     {
@@ -39,14 +40,16 @@ export class Immutable {
       metadataApi: MetadataApi,
       metadataRefreshesApi: MetadataRefreshesApi,
       projectsApi: ProjectsApi
+      encodingApi: EncodingApi
     };
 
   constructor(config: ImmutableXConfiguration) {
     this.config = config;
 
-    const imx = new ImmutableX(config); // coresdk
+    const imx = new imtbl(config); // coresdk
 
-    this.StarkEx = {...imx};
+    const encodingApi = new EncodingApi(config.apiConfiguration)
+    this.StarkEx = {...imx, encodingApi};
   }
 
   public getConfig(): ImmutableXConfiguration {

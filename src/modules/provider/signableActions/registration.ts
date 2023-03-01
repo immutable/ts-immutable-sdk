@@ -1,12 +1,12 @@
-import { RegisterUserResponse, StarkEx } from "src";
+import { RegisterUserResponse } from "src";
 import { GetSignableRegistrationResponse } from "src/types";
 import { Signers } from "./types";
 import { validateChain } from "./helpers";
-import { Config, Contracts } from "@imtbl/core-sdk";
+import { EthSigner, Contracts, ImmutableXConfiguration } from "@imtbl/core-sdk";
 import { signRaw } from "./utils/crypto";
-import { Immutable } from "../../apis/starkex/immutable";
+import { ImmutableX } from "../../apis/starkex";
 
-export async function registerOffchain(signers: Signers, imx:Immutable
+export async function registerOffchain(signers: Signers, imx:ImmutableX
 ): Promise<RegisterUserResponse> {
   await validateChain(signers.ethSigner, imx.getConfig());
 
@@ -42,18 +42,16 @@ interface IsRegisteredCheckError {
 }
 
 export async function isRegisteredOnChain(
-  signers:Signers, imx:Immutable
+  starkPublicKey: string,
+  ethSigner: EthSigner,
+  config: ImmutableXConfiguration,
 ): Promise<boolean> {
-  await validateChain(signers.ethSigner, imx.getConfig());
-
-  //FixMe: use configs same as immutable client
   const registrationContract = Contracts.Registration.connect(
-    Config.SANDBOX.ethConfiguration.registrationContractAddress,
-    signers.ethSigner,
+    config.ethConfiguration.registrationContractAddress,
+    ethSigner,
   );
 
   try {
-    const starkPublicKey = await signers.starkExSigner.getAddress();
     return await registrationContract.isRegistered(starkPublicKey);
   } catch (ex) {
     if ((ex as IsRegisteredCheckError).reason === 'USER_UNREGISTERED') {
@@ -65,9 +63,10 @@ export async function isRegisteredOnChain(
 
 export async function getSignableRegistrationOnchain(
   etherKey: string,
-  starkPublicKey: string
+  starkPublicKey: string,
+  imx:ImmutableX
 ): Promise<GetSignableRegistrationResponse> {
-  const response = await StarkEx.usersApi.getSignableRegistration({
+  const response = await imx.StarkEx.usersApi.getSignableRegistration({
     getSignableRegistrationRequest: {
       ether_key: etherKey,
       stark_key: starkPublicKey,
