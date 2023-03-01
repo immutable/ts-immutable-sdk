@@ -1,4 +1,4 @@
-import { Errors } from '../../workflows/errors';
+import { Errors } from '../../errors';
 import { createStarkSigner } from './starkSigner';
 
 describe('StarkSigner', () => {

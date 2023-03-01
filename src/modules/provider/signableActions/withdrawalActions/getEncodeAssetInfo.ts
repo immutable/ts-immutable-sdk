@@ -1,10 +1,10 @@
 import {
   EncodeAssetRequestTokenTypeEnum,
   EncodeAssetResponse,
-  EncodingApi,
   EncodeAssetTokenData,
   ImmutableXConfiguration,
-} from '../../../../types';
+} from 'src/types';
+import { EncodingApi } from '@imtbl/core-sdk'
 
 export async function getEncodeAssetInfo(
   assetType: string,
