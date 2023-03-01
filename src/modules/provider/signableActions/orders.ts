@@ -1,7 +1,7 @@
 import { CancelOrderResponse, CreateOrderResponse, GetSignableCancelOrderRequest,
   GetSignableOrderRequest, OrdersApiCreateOrderRequest, UnsignedOrderRequest } from "src/types";
 import { convertToSignableToken } from "./utils/convertToSignableToken";
-import { signRaw } from "./utils/crypto";
+import { signRaw } from "./utils";
 import { Signers } from "./types";
 import { Immutable } from "../../apis/starkex";
 import { OrdersApi } from "@imtbl/core-sdk";

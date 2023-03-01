@@ -3,14 +3,16 @@ import {
   EncodeAssetResponse,
   EncodingApi,
   EncodeAssetTokenData,
+  ImmutableXConfiguration,
 } from '../../../../types';
 
 export async function getEncodeAssetInfo(
   assetType: string,
   tokenType: EncodeAssetRequestTokenTypeEnum,
-  encodingApi: EncodingApi,
+  config: ImmutableXConfiguration,
   tokenData?: EncodeAssetTokenData,
 ): Promise<EncodeAssetResponse> {
+  const encodingApi = new EncodingApi(config.apiConfiguration)
   const result = await encodingApi.encodeAsset({
     assetType,
     encodeAssetRequest: {

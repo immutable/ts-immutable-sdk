@@ -4,15 +4,15 @@ import { validateChain } from "./helpers";
 import { Immutable } from "../../apis/starkex";
 import { depositEth, depositERC20, depositERC721 } from "./depositActions";
 
-export async function deposit(signer: Signers, deposit: TokenAmount, imx:Immutable) {
-  await validateChain(signer.ethSigner, imx.getConfiguration());
+export async function deposit(signers: Signers, deposit: TokenAmount, imx:Immutable) {
+  await validateChain(signers.ethSigner, imx.getConfiguration());
 
   switch (deposit.type) {
     case 'ETH':
-      return depositEth(signer.ethSigner, deposit, imx);
+      return depositEth(signers.ethSigner, deposit, imx);
     case 'ERC20':
-      return depositERC20(signer.ethSigner, deposit, imx);
+      return depositERC20(signers.ethSigner, deposit, imx);
     case 'ERC721':
-      return depositERC721(signer.ethSigner, deposit, imx);
+      return depositERC721(signers.ethSigner, deposit, imx);
   }
 }

@@ -3,7 +3,7 @@ import { GetSignableRegistrationResponse } from "src/types";
 import { Signers } from "./types";
 import { validateChain } from "./helpers";
 import { EthSigner, Contracts, ImmutableXConfiguration, UsersApi } from "@imtbl/core-sdk";
-import { signRaw } from "./utils/crypto";
+import { signRaw } from "./utils";
 import { Immutable } from "../../apis/starkex";
 
 export async function registerOffchain(signers: Signers, imx:Immutable

@@ -19,6 +19,13 @@ interface MintableERC721Withdrawal {
   };
 }
 
+type CompleteERC721WithdrawalActionParams = {
+  ethSigner: Signer,
+  starkPublicKey: string
+  token: ERC721Token
+  client: Immutable
+}
+
 async function executeWithdrawMintableERC721(
   ethSigner: Signer,
   assetType: string,
@@ -85,11 +92,10 @@ async function completeMintableERC721Withdrawal(
   client: Immutable
 ) {
   const config = client.getConfiguration();
-  const encodingApi = new EncodingApi(config.apiConfiguration)
   const assetType = await getEncodeAssetInfo(
     'mintable-asset',
     'ERC721',
-    encodingApi,
+    config,
     {
       id: token.data.id,
       token_address: token.data.tokenAddress,
@@ -180,11 +186,10 @@ async function completeERC721Withdrawal(
   ethSigner: Signer,
   starkPublicKey: string,
   token: ERC721Token,
-  encodingApi: EncodingApi,
   client: Immutable,
 ) {
   const config = client.getConfiguration();
-  const assetType = await getEncodeAssetInfo('asset', 'ERC721', encodingApi, {
+  const assetType = await getEncodeAssetInfo('asset', 'ERC721', config, {
     token_id: token.tokenId,
     token_address: token.tokenAddress,
   });
@@ -214,13 +219,12 @@ async function completeERC721Withdrawal(
   }
 }
 
-export async function completeERC721WithdrawalAction(
-  ethSigner: Signer,
-  starkPublicKey: string,
-  token: ERC721Token,
-  encodingApi: EncodingApi,
-  client: Immutable,
-) {
+export async function completeERC721WithdrawalAction({
+  ethSigner,
+  starkPublicKey,
+  token,
+  client,
+}: CompleteERC721WithdrawalActionParams) {
   const tokenAddress = token.tokenAddress;
   const tokenId = token.tokenId;
   const config = client.getConfiguration();
@@ -253,7 +257,6 @@ export async function completeERC721WithdrawalAction(
           ethSigner,
           starkPublicKey,
           token,
-          encodingApi,
           client,
         );
       }

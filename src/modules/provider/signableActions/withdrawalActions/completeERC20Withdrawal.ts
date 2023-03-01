@@ -1,6 +1,5 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { Signers } from '../types';
 import { Immutable } from "../../../apis/starkex";
 import { ERC20Token } from '../../../../types';
 import {
@@ -8,7 +7,7 @@ import {
   isRegisteredOnChain,
 } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
-import { Contracts, EncodingApi, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
+import { Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
 
 type ExecuteRegisterAndWithdrawERC20Params = {
   ethSigner: Signer;
@@ -18,7 +17,7 @@ type ExecuteRegisterAndWithdrawERC20Params = {
 }
 
 type CompleteERC20WithdrawalWorkflowParams = {
-  signers: Signers;
+  ethSigner: Signer;
   starkPublicKey: string;
   token: ERC20Token;
   client: Immutable;
@@ -78,14 +77,13 @@ async function executeWithdrawERC20(
 }
 
 export async function completeERC20WithdrawalAction({
-    signers: { ethSigner },
+    ethSigner,
     starkPublicKey,
     token,
     client,
   }: CompleteERC20WithdrawalWorkflowParams) {
   const config = client.getConfiguration()
-  const encodingApi = new EncodingApi(config.apiConfiguration)
-  const assetType = await getEncodeAssetInfo('asset', 'ERC20', encodingApi, {
+  const assetType = await getEncodeAssetInfo('asset', 'ERC20', config, {
     token_address: token.tokenAddress,
   });
   const isRegistered = await isRegisteredOnChain(

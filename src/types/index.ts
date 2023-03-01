@@ -203,5 +203,4 @@ export {
   ImmutableXConfiguration,
   EncodeAssetRequestTokenTypeEnum,
   EncodingApi,
-  StarkSigner,
 } from '@imtbl/core-sdk';

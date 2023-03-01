@@ -1,7 +1,7 @@
 import { CreateTradeResponse, GetSignableTradeRequest } from "src/types";
 import { Signers } from "./types";
 import { validateChain } from "./helpers";
-import { signRaw } from "./utils/crypto";
+import { signRaw } from "./utils";
 import { Immutable } from "../../apis/starkex";
 import { TradesApi } from "@imtbl/core-sdk";
 

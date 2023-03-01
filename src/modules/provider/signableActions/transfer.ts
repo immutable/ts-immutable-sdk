@@ -1,7 +1,7 @@
 import { CreateTransferResponse, CreateTransferResponseV1, NftTransferDetails, UnsignedTransferRequest } from "src/types";
 import { Signers } from "./types";
 import { convertToSignableToken } from "./utils/convertToSignableToken";
-import { signRaw } from "./utils/crypto";
+import { signRaw } from "./utils";
 import { Immutable } from "../../apis/starkex";
 import { TransfersApi } from "@imtbl/core-sdk";
 import { validateChain } from "./helpers";

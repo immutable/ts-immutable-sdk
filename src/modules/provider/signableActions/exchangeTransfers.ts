@@ -1,6 +1,6 @@
 import { CreateTransferResponseV1, UnsignedExchangeTransferRequest } from "../../../types";
 import { convertToSignableToken } from "./utils/convertToSignableToken";
-import { signRaw } from "./utils/crypto";
+import { signRaw } from "./utils";
 import { Signers } from "./types";
 import { Immutable } from "../../apis/starkex";
 import { ExchangesApi } from "@imtbl/core-sdk";

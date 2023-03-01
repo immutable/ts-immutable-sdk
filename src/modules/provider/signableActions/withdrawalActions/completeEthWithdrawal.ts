@@ -8,6 +8,12 @@ import {
 } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 
+type CompleteEthWithdrawalActionParams = {
+  ethSigner: Signer,
+  starkPublicKey: string,
+  client: Immutable,
+}
+
 async function executeRegisterAndWithdrawEth(
   ethSigner: Signer,
   assetType: string,
@@ -57,14 +63,13 @@ async function executeWithdrawEth(
   return ethSigner.sendTransaction(populatedTransaction);
 }
 
-export async function completeEthWithdrawalAction(
-  ethSigner: Signer,
-  starkPublicKey: string,
-  encodingApi: EncodingApi,
-  client: Immutable,
-) {
+export async function completeEthWithdrawalAction({
+  ethSigner,
+  starkPublicKey,
+  client,
+}: CompleteEthWithdrawalActionParams) {
   const config = client.getConfiguration();
-  const assetType = await getEncodeAssetInfo('asset', 'ETH', encodingApi);
+  const assetType = await getEncodeAssetInfo('asset', 'ETH', config);
 
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
