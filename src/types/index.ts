@@ -201,4 +201,5 @@ export {
   NftTransferDetails,
   EthConfiguration,
   ImmutableXConfiguration,
+  EncodeAssetRequestTokenTypeEnum,
 } from '@imtbl/core-sdk';
