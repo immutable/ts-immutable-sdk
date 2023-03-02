@@ -74,7 +74,7 @@ export async function depositERC721(
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     signer,
-    starkExConfig
+    config
   );
 
   // Approve whether an amount of token from an account can be spent by a third-party account

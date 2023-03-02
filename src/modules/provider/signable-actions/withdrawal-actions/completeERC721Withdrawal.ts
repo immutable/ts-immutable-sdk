@@ -114,7 +114,7 @@ async function completeMintableERC721Withdrawal(
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    starkExConfig
+    config
   );
 
   if (!isRegistered) {
@@ -203,7 +203,7 @@ async function completeERC721Withdrawal(
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    starkExConfig
+    config
   );
 
   if (!isRegistered) {

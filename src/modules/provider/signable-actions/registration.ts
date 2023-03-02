@@ -4,7 +4,6 @@ import { validateChain } from './helpers';
 import {
   EthSigner,
   Contracts,
-  ImmutableXConfiguration,
   UsersApi,
 } from '@imtbl/core-sdk';
 import { signRaw } from './utils';
@@ -53,12 +52,12 @@ interface IsRegisteredCheckError {
 export async function isRegisteredOnChain(
   starkPublicKey: string,
   ethSigner: EthSigner,
-  config: ImmutableXConfiguration
+  config: Configuration
 ): Promise<boolean> {
-  await validateChain(ethSigner, config);
+  await validateChain(ethSigner, config.getStarkExConfig());
 
   const registrationContract = Contracts.Registration.connect(
-    config.ethConfiguration.registrationContractAddress,
+    config.getStarkExConfig().ethConfiguration.registrationContractAddress,
     ethSigner
   );
 

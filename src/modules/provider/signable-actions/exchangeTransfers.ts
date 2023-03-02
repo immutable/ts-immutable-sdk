@@ -15,7 +15,7 @@ type TransfersWorkflowParams = {
   config: Configuration;
 };
 
-export async function exchangeTransfersWorkflow({
+export async function exchangeTransfers({
   signers,
   request,
   config,
