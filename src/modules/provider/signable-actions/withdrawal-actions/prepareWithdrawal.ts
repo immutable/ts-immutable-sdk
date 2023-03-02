@@ -20,12 +20,12 @@ export async function prepareWithdrawalAction(
   const {
     signers: {
       ethSigner,
-      starkExSigner
+      starkExSigner,
     },
     type,
     config,
-  } = params
-  const withdrawalsApi = new WithdrawalsApi(config.apiConfiguration)
+  } = params;
+  const withdrawalsApi = new WithdrawalsApi(config.apiConfiguration);
   const withdrawalAmount = type === 'ERC721' ? '1' : params.amount;
   const signableWithdrawalResult = await withdrawalsApi.getSignableWithdrawal({
     getSignableWithdrawalRequest: {
@@ -35,8 +35,7 @@ export async function prepareWithdrawalAction(
     },
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    signableWithdrawalResult.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = signableWithdrawalResult.data;
 
   const starkSignature = await starkExSigner.signMessage(payloadHash);
 

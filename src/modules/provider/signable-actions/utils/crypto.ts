@@ -13,9 +13,9 @@ function serializeEthSignature(sig: SignatureOptions): string {
   // This is because golang appends a recovery param
   // https://github.com/ethers-io/ethers.js/issues/823
   return encUtils.addHexPrefix(
-    encUtils.padLeft(sig.r.toString(16), 64) +
-    encUtils.padLeft(sig.s.toString(16), 64) +
-    encUtils.padLeft(sig.recoveryParam?.toString(16) || '', 2),
+    encUtils.padLeft(sig.r.toString(16), 64)
+    + encUtils.padLeft(sig.s.toString(16), 64)
+    + encUtils.padLeft(sig.recoveryParam?.toString(16) || '', 2),
   );
 }
 

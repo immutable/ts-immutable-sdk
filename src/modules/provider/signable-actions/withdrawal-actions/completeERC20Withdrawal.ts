@@ -1,14 +1,14 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
 import { Configuration } from 'src/config';
+import { Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
 import { ERC20Token } from '../../../../types';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
 } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
-import { Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
-import { validateChain } from "../helpers";
+import { validateChain } from '../helpers';
 
 type ExecuteRegisterAndWithdrawERC20Params = {
   ethSigner: Signer;
@@ -36,21 +36,20 @@ async function executeRegisterAndWithdrawERC20({
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
-    usersApi
+    usersApi,
   );
 
   const contract = Contracts.Registration.connect(
     config.getStarkExConfig().ethConfiguration.registrationContractAddress,
-    ethSigner
+    ethSigner,
   );
 
-  const populatedTransaction =
-    await contract.populateTransaction.registerAndWithdraw(
-      etherKey,
-      starkPublicKey,
-      signableResult.operator_signature,
-      assetType
-    );
+  const populatedTransaction = await contract.populateTransaction.registerAndWithdraw(
+    etherKey,
+    starkPublicKey,
+    signableResult.operator_signature,
+    assetType,
+  );
 
   return ethSigner.sendTransaction(populatedTransaction);
 }
@@ -59,16 +58,16 @@ async function executeWithdrawERC20(
   ethSigner: Signer,
   assetType: string,
   starkPublicKey: string,
-  config: ImmutableXConfiguration
+  config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const contract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    ethSigner
+    ethSigner,
   );
 
   const populatedTransaction = await contract.populateTransaction.withdraw(
     starkPublicKey,
-    assetType
+    assetType,
   );
 
   return ethSigner.sendTransaction(populatedTransaction);
@@ -89,7 +88,7 @@ export async function completeERC20WithdrawalAction({
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    config
+    config,
   );
 
   if (!isRegistered) {
@@ -99,12 +98,11 @@ export async function completeERC20WithdrawalAction({
       starkPublicKey,
       config,
     });
-  } else {
-    return executeWithdrawERC20(
-      ethSigner,
-      assetType.asset_type,
-      starkPublicKey,
-      starkExConfig
-    );
   }
+  return executeWithdrawERC20(
+    ethSigner,
+    assetType.asset_type,
+    starkPublicKey,
+    starkExConfig,
+  );
 }

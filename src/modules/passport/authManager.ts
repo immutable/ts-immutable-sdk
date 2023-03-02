@@ -23,12 +23,13 @@ const getAuthConfiguration = ({ clientId, redirectUri }: AuthInput) => ({
 
 export default class AuthManager {
   private userManager;
+
   constructor({ clientId, redirectUri }: AuthInput) {
     this.userManager = new UserManager(
       getAuthConfiguration({
         clientId,
         redirectUri,
-      })
+      }),
     );
   }
 
@@ -43,7 +44,7 @@ export default class AuthManager {
       async () => this.userManager.signinPopupCallback(),
       {
         type: PassportErrorType.AUTHENTICATION_ERROR,
-      }
+      },
     );
   }
 }

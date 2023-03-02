@@ -10,6 +10,7 @@ import { StarkSigner } from '../../../types';
 
 export class ImxSigner implements StarkSigner {
   private publicAddress;
+
   private iframe;
 
   constructor(publicAddress: string, iframe: HTMLIFrameElement) {
@@ -36,7 +37,7 @@ export class ImxSigner implements StarkSigner {
             }
 
             resolve(messageDetails.data.signedMessage);
-          }
+          },
         );
       };
       window.addEventListener(COMMUNICATION_TYPE, listener);

@@ -84,7 +84,7 @@ describe('imxWallet', () => {
         });
 
       expect(connect(l1Provider, env)).rejects.toThrow(
-        'The L2 IMX Wallet connection has failed.'
+        'The L2 IMX Wallet connection has failed.',
       );
     });
   });

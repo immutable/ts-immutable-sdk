@@ -8,11 +8,11 @@ import {
   UsersApi,
 } from '@imtbl/core-sdk';
 import { TransactionResponse } from '@ethersproject/providers';
+import { Configuration } from 'src/config';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
 } from '../registration';
-import { Configuration } from 'src/config';
 import { validateChain } from '../helpers';
 
 interface ERC721TokenData {
@@ -23,7 +23,7 @@ interface ERC721TokenData {
 export async function depositERC721(
   signer: EthSigner,
   deposit: ERC721Token,
-  config: Configuration
+  config: Configuration,
 ): Promise<TransactionResponse> {
   await validateChain(signer, config.getStarkExConfig());
 
@@ -74,7 +74,7 @@ export async function depositERC721(
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     signer,
-    config
+    config,
   );
 
   // Approve whether an amount of token from an account can be spent by a third-party account
@@ -89,18 +89,18 @@ export async function depositERC721(
     const signableResult = await getSignableRegistrationOnchain(
       user,
       starkPublicKey,
-      usersApi
+      usersApi,
     );
 
     const coreContract = Contracts.Core.connect(
       starkExConfig.ethConfiguration.coreContractAddress,
-      signer
+      signer,
     );
     // Note: proxy registration contract registerAndDepositNft method is not used as it currently fails erc721 transfer ownership check
     await coreContract.registerUser(
       user,
       starkPublicKey,
-      signableResult.operator_signature
+      signableResult.operator_signature,
     );
   }
 
@@ -110,7 +110,7 @@ export async function depositERC721(
     assetType,
     starkPublicKey,
     vaultId,
-    starkExConfig
+    starkExConfig,
   );
 }
 
@@ -120,19 +120,18 @@ async function executeDepositERC721(
   assetType: string,
   starkPublicKey: string,
   vaultId: number,
-  config: ImmutableXConfiguration
+  config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const coreContract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    signer
+    signer,
   );
-  const populatedTransaction =
-    await coreContract.populateTransaction.depositNft(
-      starkPublicKey,
-      assetType,
-      vaultId,
-      tokenId
-    );
+  const populatedTransaction = await coreContract.populateTransaction.depositNft(
+    starkPublicKey,
+    assetType,
+    vaultId,
+    tokenId,
+  );
 
   return signer.sendTransaction(populatedTransaction);
 }

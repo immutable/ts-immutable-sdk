@@ -1,12 +1,13 @@
-import PassportImxProvider, { JWT } from './passportImxProvider';
 import { StarkSigner } from '@imtbl/core-sdk';
+import PassportImxProvider, { JWT } from './passportImxProvider';
+
 describe('PassportImxProvider', () => {
   let passportImxProvider: PassportImxProvider;
 
   beforeEach(() => {
     passportImxProvider = new PassportImxProvider(
       {} as JWT,
-      {} as StarkSigner
+      {} as StarkSigner,
     );
   });
 

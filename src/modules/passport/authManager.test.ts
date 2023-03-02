@@ -1,5 +1,5 @@
-import AuthManager from './authManager';
 import { User, UserManager } from 'oidc-client-ts';
+import AuthManager from './authManager';
 
 jest.mock('oidc-client-ts');
 

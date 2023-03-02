@@ -6,11 +6,11 @@ import {
   OrdersApiCreateOrderRequest,
   UnsignedOrderRequest,
 } from 'src/types';
+import { Configuration } from 'src/config';
+import { OrdersApi } from '@imtbl/core-sdk';
 import { convertToSignableToken } from './utils/convertToSignableToken';
 import { signRaw } from './utils';
 import { Signers } from './types';
-import { Configuration } from 'src/config';
-import { OrdersApi } from '@imtbl/core-sdk';
 import { validateChain } from './helpers';
 
 type CreateOrderWorkflowParams = {
@@ -51,8 +51,7 @@ export async function createOrder({
     getSignableOrderRequestV3: getSignableOrderRequest,
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    getSignableOrderResponse.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = getSignableOrderResponse.data;
 
   const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 
@@ -98,11 +97,10 @@ export async function cancelOrder({
       getSignableCancelOrderRequest: {
         order_id: request.order_id,
       },
-    }
+    },
   );
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    getSignableCancelOrderResponse.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
 
   const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 

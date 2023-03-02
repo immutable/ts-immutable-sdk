@@ -16,7 +16,7 @@ export function isRequestableProvider(provider: ExternalProvider): provider is R
 
 export async function connectProvider(
   provider: RequestableProvider,
-  chainID: number | undefined
+  chainID: number | undefined,
 ) {
   await provider.request({ method: WALLET_ACTION.CONNECT });
 

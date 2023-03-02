@@ -16,7 +16,7 @@ describe('passportError', () => {
       await expect(
         await withPassportError(anyFn, {
           type: PassportErrorType.AUTHENTICATION_ERROR,
-        })
+        }),
       ).toEqual(returnValue);
     });
 
@@ -27,12 +27,12 @@ describe('passportError', () => {
       await expect(
         withPassportError(errorFunction, {
           type: PassportErrorType.AUTHENTICATION_ERROR,
-        })
+        }),
       ).rejects.toThrow(
         new PassportError(
           'AUTHENTICATION_ERROR: SOMETHINGWRONG',
-          PassportErrorType.AUTHENTICATION_ERROR
-        )
+          PassportErrorType.AUTHENTICATION_ERROR,
+        ),
       );
     });
   });

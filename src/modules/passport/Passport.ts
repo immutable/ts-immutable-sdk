@@ -21,13 +21,14 @@ const checkRequiredConfiguration = (config: PassportConfig) => {
   if (errorMessage !== '') {
     throw new PassportError(
       `${errorMessage} cannot be null`,
-      PassportErrorType.INVALID_CONFIGURATION
+      PassportErrorType.INVALID_CONFIGURATION,
     );
   }
 };
 
 export class Passport {
   private authManager: AuthManager;
+
   private magicAdapter: MagicAdapter;
 
   constructor(config: PassportConfig) {
@@ -42,7 +43,7 @@ export class Passport {
     if (!user.id_token) {
       throw new PassportError(
         'Failed to initialise',
-        PassportErrorType.WALLET_CONNECTION_ERROR
+        PassportErrorType.WALLET_CONNECTION_ERROR,
       );
     }
     const provider = await this.magicAdapter.login(user.id_token);

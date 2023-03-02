@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { Magic } from 'magic-sdk';
-import MagicAdapter from './magicAdapter';
 import { LoginWithOpenIdParams, OpenIdExtension } from '@magic-ext/oidc';
+import MagicAdapter from './magicAdapter';
 import { PassportError, PassportErrorType } from './errors/passportError';
 
 const loginWithOIDCMock: jest.MockedFunction<
@@ -76,8 +76,8 @@ describe('MagicWallet', () => {
       }).rejects.toThrow(
         new PassportError(
           'WALLET_CONNECTION_ERROR: oops',
-          PassportErrorType.WALLET_CONNECTION_ERROR
-        )
+          PassportErrorType.WALLET_CONNECTION_ERROR,
+        ),
       );
     });
   });

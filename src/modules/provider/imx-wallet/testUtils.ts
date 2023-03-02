@@ -13,7 +13,7 @@ export function triggerIFrameOnLoad() {
 }
 
 export async function asyncTriggerIFrameOnLoad<T>(
-  promise: Promise<T>
+  promise: Promise<T>,
 ): Promise<T> {
   triggerIFrameOnLoad();
   return promise;

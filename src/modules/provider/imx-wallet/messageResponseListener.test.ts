@@ -11,7 +11,7 @@ const callbackFn = jest.fn();
 function getMessageEvent(
   eventOrigin: string,
   eventType: ResponseEventType,
-  iframe: HTMLIFrameElement
+  iframe: HTMLIFrameElement,
 ): MessageEvent {
   return {
     origin: eventOrigin,
@@ -34,7 +34,7 @@ describe('the messageResponseListener function', () => {
     htmlBodyInit();
 
     iframe = await asyncTriggerIFrameOnLoad(
-      setupIFrame(Environment.DEVELOPMENT)
+      setupIFrame(Environment.DEVELOPMENT),
     );
 
     if (iframe) {
@@ -50,10 +50,10 @@ describe('the messageResponseListener function', () => {
       getMessageEvent(
         iFrameURL,
         ResponseEventType.CONNECT_WALLET_RESPONSE,
-        iframe
+        iframe,
       ),
       ResponseEventType.CONNECT_WALLET_RESPONSE,
-      callbackFn
+      callbackFn,
     );
 
     expect(callbackFn).toBeCalled();
@@ -67,10 +67,10 @@ describe('the messageResponseListener function', () => {
         ResponseEventType.CONNECT_WALLET_RESPONSE,
         {
           source: {} as unknown as WindowProxy,
-        } as unknown as HTMLIFrameElement
+        } as unknown as HTMLIFrameElement,
       ),
       ResponseEventType.CONNECT_WALLET_RESPONSE,
-      callbackFn
+      callbackFn,
     );
 
     expect(callbackFn).not.toBeCalled();
@@ -82,10 +82,10 @@ describe('the messageResponseListener function', () => {
       getMessageEvent(
         iFrameURL,
         ResponseEventType.SIGN_MESSAGE_RESPONSE,
-        iframe
+        iframe,
       ),
       ResponseEventType.CONNECT_WALLET_RESPONSE,
-      callbackFn
+      callbackFn,
     );
 
     expect(callbackFn).not.toBeCalled();

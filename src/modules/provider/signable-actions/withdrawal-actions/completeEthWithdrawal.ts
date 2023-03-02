@@ -19,28 +19,27 @@ async function executeRegisterAndWithdrawEth(
   ethSigner: Signer,
   assetType: string,
   starkPublicKey: string,
-  config: ImmutableXConfiguration
+  config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
   const usersApi = new UsersApi(config.apiConfiguration);
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
-    usersApi
+    usersApi,
   );
 
   const contract = Contracts.Registration.connect(
     config.ethConfiguration.registrationContractAddress,
-    ethSigner
+    ethSigner,
   );
 
-  const populatedTransaction =
-    await contract.populateTransaction.registerAndWithdraw(
-      etherKey,
-      starkPublicKey,
-      signableResult.operator_signature,
-      assetType
-    );
+  const populatedTransaction = await contract.populateTransaction.registerAndWithdraw(
+    etherKey,
+    starkPublicKey,
+    signableResult.operator_signature,
+    assetType,
+  );
 
   return ethSigner.sendTransaction(populatedTransaction);
 }
@@ -49,16 +48,16 @@ async function executeWithdrawEth(
   ethSigner: Signer,
   assetType: string,
   starkPublicKey: string,
-  config: ImmutableXConfiguration
+  config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const contract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    ethSigner
+    ethSigner,
   );
 
   const populatedTransaction = await contract.populateTransaction.withdraw(
     starkPublicKey,
-    assetType
+    assetType,
   );
 
   return ethSigner.sendTransaction(populatedTransaction);
@@ -77,7 +76,7 @@ export async function completeEthWithdrawalAction({
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    config
+    config,
   );
 
   if (!isRegistered) {
@@ -85,14 +84,13 @@ export async function completeEthWithdrawalAction({
       ethSigner,
       assetType.asset_type,
       starkPublicKey,
-      starkExConfig
-    );
-  } else {
-    return executeWithdrawEth(
-      ethSigner,
-      assetType.asset_type,
-      starkPublicKey,
-      starkExConfig
+      starkExConfig,
     );
   }
+  return executeWithdrawEth(
+    ethSigner,
+    assetType.asset_type,
+    starkPublicKey,
+    starkExConfig,
+  );
 }

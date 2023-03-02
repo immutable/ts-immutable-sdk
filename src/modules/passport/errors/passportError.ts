@@ -11,6 +11,7 @@ type ErrorType = {
 
 export class PassportError extends Error {
   public type: PassportErrorType;
+
   constructor(message: string, type: PassportErrorType) {
     super(message);
     this.type = type;
@@ -19,15 +20,14 @@ export class PassportError extends Error {
 
 export const withPassportError = async <T>(
   fn: () => Promise<T>,
-  customError: ErrorType
+  customError: ErrorType,
 ): Promise<T> => {
   try {
     return await fn();
   } catch (error) {
-    const errorMessage =
-      customError.message ||
-      `${customError.type}: ${(error as Error).message}` ||
-      'UnknownError';
+    const errorMessage = customError.message
+      || `${customError.type}: ${(error as Error).message}`
+      || 'UnknownError';
     throw new PassportError(errorMessage, customError.type);
   }
 };

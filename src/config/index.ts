@@ -1,6 +1,6 @@
 import {
   ImmutableXConfiguration as StarkExConfig,
-} from "@imtbl/core-sdk";
+} from '@imtbl/core-sdk';
 
 export class Configuration {
   private readonly starkExConfig: StarkExConfig;
@@ -8,8 +8,8 @@ export class Configuration {
   constructor(config: StarkExConfig) {
     this.starkExConfig = config;
   }
+
   public getStarkExConfig(): StarkExConfig {
     return this.starkExConfig;
   }
 }
-

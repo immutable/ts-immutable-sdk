@@ -4,11 +4,11 @@ import {
   NftTransferDetails,
   UnsignedTransferRequest,
 } from 'src/types';
+import { Configuration } from 'src/config';
+import { TransfersApi } from '@imtbl/core-sdk';
 import { Signers } from './types';
 import { convertToSignableToken } from './utils/convertToSignableToken';
 import { signRaw } from './utils';
-import { Configuration } from 'src/config';
-import { TransfersApi } from '@imtbl/core-sdk';
 import { validateChain } from './helpers';
 
 type TransfersWorkflowParams = {
@@ -32,7 +32,7 @@ export async function transfers({
 
   const ethAddress = await ethSigner.getAddress();
   const transfersApi = new TransfersApi(
-    config.getStarkExConfig().apiConfiguration
+    config.getStarkExConfig().apiConfiguration,
   );
 
   const transferAmount = request.type === 'ERC721' ? '1' : request.amount;
@@ -45,8 +45,7 @@ export async function transfers({
     },
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    signableResult.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
 
   const ethSignature = await signRaw(signableMessage, ethSigner);
 
@@ -88,20 +87,18 @@ export async function batchTransfers({
 
   const ethAddress = await ethSigner.getAddress();
   const transfersApi = new TransfersApi(
-    config.getStarkExConfig().apiConfiguration
+    config.getStarkExConfig().apiConfiguration,
   );
 
-  const signableRequests = request.map((nftTransfer) => {
-    return {
-      amount: '1',
-      token: convertToSignableToken({
-        type: 'ERC721',
-        tokenId: nftTransfer.tokenId,
-        tokenAddress: nftTransfer.tokenAddress,
-      }),
-      receiver: nftTransfer.receiver,
-    };
-  });
+  const signableRequests = request.map((nftTransfer) => ({
+    amount: '1',
+    token: convertToSignableToken({
+      type: 'ERC721',
+      tokenId: nftTransfer.tokenId,
+      tokenAddress: nftTransfer.tokenAddress,
+    }),
+    receiver: nftTransfer.receiver,
+  }));
 
   const signableResult = await transfersApi.getSignableTransfer({
     getSignableTransferRequestV2: {

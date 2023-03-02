@@ -9,12 +9,12 @@ import {
 } from '@imtbl/core-sdk';
 import { Configuration } from 'src/config';
 import { parseUnits } from '@ethersproject/units';
+import { BigNumber } from '@ethersproject/bignumber';
+import { TransactionResponse } from '@ethersproject/providers';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
 } from '../registration';
-import { BigNumber } from '@ethersproject/bignumber';
-import { TransactionResponse } from '@ethersproject/providers';
 import { validateChain } from '../helpers';
 
 interface ETHTokenData {
@@ -24,7 +24,7 @@ interface ETHTokenData {
 export async function depositEth(
   signer: EthSigner,
   deposit: ETHAmount,
-  config: Configuration
+  config: Configuration,
 ) {
   await validateChain(signer, config.getStarkExConfig());
 
@@ -67,7 +67,7 @@ export async function depositEth(
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     signer,
-    config
+    config,
   );
 
   if (!isRegistered) {
@@ -78,18 +78,17 @@ export async function depositEth(
       starkPublicKey,
       vaultId,
       starkExConfig,
-      usersApi
-    );
-  } else {
-    return executeDepositEth(
-      signer,
-      amount,
-      assetType,
-      starkPublicKey,
-      vaultId,
-      starkExConfig
+      usersApi,
     );
   }
+  return executeDepositEth(
+    signer,
+    amount,
+    assetType,
+    starkPublicKey,
+    vaultId,
+    starkExConfig,
+  );
 }
 
 async function executeRegisterAndDepositEth(
@@ -99,28 +98,27 @@ async function executeRegisterAndDepositEth(
   starkPublicKey: string,
   vaultId: number,
   config: ImmutableXConfiguration,
-  usersApi: UsersApi
+  usersApi: UsersApi,
 ): Promise<TransactionResponse> {
   const etherKey = await signer.getAddress();
   const coreContract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    signer
+    signer,
   );
 
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
-    usersApi
+    usersApi,
   );
 
-  const populatedTransaction =
-    await coreContract.populateTransaction.registerAndDepositEth(
-      etherKey,
-      starkPublicKey,
-      signableResult.operator_signature,
-      assetType,
-      vaultId
-    );
+  const populatedTransaction = await coreContract.populateTransaction.registerAndDepositEth(
+    etherKey,
+    starkPublicKey,
+    signableResult.operator_signature,
+    assetType,
+    vaultId,
+  );
 
   return signer.sendTransaction({ ...populatedTransaction, value: amount });
 }
@@ -131,11 +129,11 @@ async function executeDepositEth(
   assetType: string,
   starkPublicKey: string,
   vaultId: number,
-  config: ImmutableXConfiguration
+  config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const coreContract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    signer
+    signer,
   );
 
   const populatedTransaction = await coreContract.populateTransaction[

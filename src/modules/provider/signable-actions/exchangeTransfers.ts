@@ -1,3 +1,5 @@
+import { Configuration } from 'src/config';
+import { ExchangesApi } from '@imtbl/core-sdk';
 import {
   CreateTransferResponseV1,
   UnsignedExchangeTransferRequest,
@@ -5,8 +7,6 @@ import {
 import { convertToSignableToken } from './utils/convertToSignableToken';
 import { signRaw } from './utils';
 import { Signers } from './types';
-import { Configuration } from 'src/config';
-import { ExchangesApi } from '@imtbl/core-sdk';
 import { validateChain } from './helpers';
 
 type TransfersWorkflowParams = {
@@ -23,7 +23,7 @@ export async function exchangeTransfers({
   await validateChain(signers.ethSigner, config.getStarkExConfig());
 
   const exchangeApi = new ExchangesApi(
-    config.getStarkExConfig().apiConfiguration
+    config.getStarkExConfig().apiConfiguration,
   );
   const ethAddress = await signers.ethSigner.getAddress();
 
@@ -38,8 +38,7 @@ export async function exchangeTransfers({
     },
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    signableResult.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
 
   const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 

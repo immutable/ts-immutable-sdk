@@ -16,13 +16,12 @@ import { ImxSigner } from './ImxSigner';
 import { Environment } from '../constants';
 import { getOrSetupIFrame } from './imxWalletIFrame';
 
-const DEFAULT_CONNECTION_MESSAGE =
-  'Only sign this request if you’ve initiated an action with Immutable X.';
+const DEFAULT_CONNECTION_MESSAGE = 'Only sign this request if you’ve initiated an action with Immutable X.';
 const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed.';
 
 export async function connect(
   l1Provider: ethers.providers.Web3Provider,
-  env: Environment
+  env: Environment,
 ): Promise<ImxSigner> {
   const l1Signer = l1Provider.getSigner();
   const address = await l1Signer.getAddress();
@@ -43,7 +42,7 @@ export async function connect(
           }
 
           resolve(new ImxSigner(messageDetails.data.starkPublicKey, iframe));
-        }
+        },
       );
     };
     window.addEventListener(COMMUNICATION_TYPE, listener);
@@ -73,7 +72,7 @@ export async function disconnect(imxSigner: ImxSigner): Promise<void> {
 
           iframe.remove();
           resolve();
-        }
+        },
       );
     };
 

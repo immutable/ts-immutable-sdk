@@ -1,7 +1,4 @@
-import { IMXProvider } from "./imxProvider";
-import { Signers } from "./signable-actions/types";
-import { EthSigner } from "@imtbl/core-sdk";
-import { Configuration } from "../../config";
+import { EthSigner } from '@imtbl/core-sdk';
 import {
   AnyToken,
   RegisterUserResponse,
@@ -18,19 +15,23 @@ import {
   TokenAmount,
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
-  UnsignedTransferRequest
-} from "src/types";
-import { batchTransfers, transfers } from "./signable-actions/transfer";
-import { cancelOrder, createOrder } from "./signable-actions/orders";
-import { isRegisteredOnChain, registerOffchain } from "./signable-actions/registration";
-import { completeWithdrawal, prepareWithdrawal } from "./signable-actions/withdrawal";
-import { TransactionResponse } from "@ethersproject/providers";
-import { createTrade } from "./signable-actions/trades";
-import { deposit } from "./signable-actions/deposit";
-import { exchangeTransfers } from "./signable-actions/exchangeTransfers";
+  UnsignedTransferRequest,
+} from 'src/types';
+import { TransactionResponse } from '@ethersproject/providers';
+import { IMXProvider } from './imxProvider';
+import { Signers } from './signable-actions/types';
+import { Configuration } from '../../config';
+import { batchTransfers, transfers } from './signable-actions/transfer';
+import { cancelOrder, createOrder } from './signable-actions/orders';
+import { isRegisteredOnChain, registerOffchain } from './signable-actions/registration';
+import { completeWithdrawal, prepareWithdrawal } from './signable-actions/withdrawal';
+import { createTrade } from './signable-actions/trades';
+import { deposit } from './signable-actions/deposit';
+import { exchangeTransfers } from './signable-actions/exchangeTransfers';
 
 export class GenericIMXProvider implements IMXProvider {
   private readonly config: Configuration;
+
   private readonly signers: Signers;
 
   constructor(config: Configuration, ethSigner: EthSigner, starkExSigner: StarkSigner) {
@@ -39,25 +40,26 @@ export class GenericIMXProvider implements IMXProvider {
   }
 
   async getAddress(): Promise<string> {
-    return await this.signers.ethSigner.getAddress()
+    return await this.signers.ethSigner.getAddress();
   }
 
   registerOffchain(): Promise<RegisterUserResponse> {
-    return registerOffchain(this.signers, this.config)
+    return registerOffchain(this.signers, this.config);
   }
 
   batchNftTransfer(request: Array<NftTransferDetails>): Promise<CreateTransferResponse> {
     return batchTransfers({
       signers: this.signers,
       request,
-      config: this.config});
+      config: this.config,
+    });
   }
 
   cancelOrder(request: GetSignableCancelOrderRequest): Promise<CancelOrderResponse> {
     return cancelOrder({
       signers: this.signers,
       request,
-      config: this.config
+      config: this.config,
     });
   }
 
@@ -66,7 +68,7 @@ export class GenericIMXProvider implements IMXProvider {
       config: this.config,
       signers: this.signers,
       token,
-      starkPublicKey
+      starkPublicKey,
     });
   }
 
@@ -74,7 +76,7 @@ export class GenericIMXProvider implements IMXProvider {
     return createOrder({
       signers: this.signers,
       request,
-      config: this.config
+      config: this.config,
     });
   }
 
@@ -82,7 +84,7 @@ export class GenericIMXProvider implements IMXProvider {
     return createTrade({
       signers: this.signers,
       request,
-      config: this.config
+      config: this.config,
     });
   }
 
@@ -94,8 +96,8 @@ export class GenericIMXProvider implements IMXProvider {
     return exchangeTransfers({
       signers: this.signers,
       request,
-      config: this.config
-    })
+      config: this.config,
+    });
   }
 
   async isRegisteredOnchain(): Promise<boolean> {
@@ -107,15 +109,15 @@ export class GenericIMXProvider implements IMXProvider {
     return prepareWithdrawal({
       signers: this.signers,
       withdrawal: request,
-      config: this.config
-    })
+      config: this.config,
+    });
   }
 
   transfer(request: UnsignedTransferRequest): Promise<CreateTransferResponseV1> {
     return transfers({
       signers: this.signers,
       request,
-      config: this.config
-    })
+      config: this.config,
+    });
   }
 }

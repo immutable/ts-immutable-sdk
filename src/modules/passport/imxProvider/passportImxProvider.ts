@@ -24,6 +24,7 @@ export type JWT = Pick<User, 'access_token' | 'refresh_token'>;
 
 export default class PassportImxProvider implements IMXProvider {
   private jwt: JWT;
+
   private starkSigner: StarkSigner;
 
   constructor(jwt: JWT, starkSigner: StarkSigner) {
@@ -33,7 +34,7 @@ export default class PassportImxProvider implements IMXProvider {
 
   transfer(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    request: UnsignedTransferRequest
+    request: UnsignedTransferRequest,
   ): Promise<CreateTransferResponseV1> {
     throw new Error('Method not implemented.');
   }
@@ -53,7 +54,7 @@ export default class PassportImxProvider implements IMXProvider {
 
   cancelOrder(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    request: GetSignableCancelOrderRequest
+    request: GetSignableCancelOrderRequest,
   ): Promise<CancelOrderResponse> {
     throw new Error('Method not implemented.');
   }
@@ -65,14 +66,14 @@ export default class PassportImxProvider implements IMXProvider {
 
   batchNftTransfer(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    request: NftTransferDetails[]
+    request: NftTransferDetails[],
   ): Promise<CreateTransferResponse> {
     throw new Error('Method not implemented.');
   }
 
   exchangeTransfer(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    request: UnsignedExchangeTransferRequest
+    request: UnsignedExchangeTransferRequest,
   ): Promise<CreateTransferResponseV1> {
     throw new Error('Method not implemented.');
   }
@@ -86,11 +87,12 @@ export default class PassportImxProvider implements IMXProvider {
   prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
     throw new Error('Method not implemented.');
   }
+
   completeWithdrawal(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     starkPublicKey: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    token: AnyToken
+    token: AnyToken,
   ): Promise<TransactionResponse> {
     throw new Error('Method not implemented.');
   }

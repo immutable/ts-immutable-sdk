@@ -39,8 +39,8 @@ describe('Passport', () => {
       expect(() => new Passport({} as unknown as PassportConfig)).toThrowError(
         new PassportError(
           'clientId, redirectUri cannot be null',
-          PassportErrorType.INVALID_CONFIGURATION
-        )
+          PassportErrorType.INVALID_CONFIGURATION,
+        ),
       );
     });
   });

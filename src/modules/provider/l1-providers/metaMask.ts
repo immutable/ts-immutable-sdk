@@ -11,8 +11,7 @@ const ERRORS = {
 export async function connect({
   chainID,
 }: MetamaskConnectParams): Promise<ethers.providers.Web3Provider> {
-  const provider =
-    (await detectEthereumProvider()) as ethers.providers.ExternalProvider;
+  const provider = (await detectEthereumProvider()) as ethers.providers.ExternalProvider;
 
   if (!isRequestableProvider(provider)) {
     throw new Error(ERRORS.PROVIDER_NOT_FOUND);

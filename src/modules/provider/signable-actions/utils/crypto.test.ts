@@ -1,6 +1,6 @@
-import { signMessage, signRaw } from './crypto';
 import { getDefaultProvider } from '@ethersproject/providers';
 import { Wallet } from '@ethersproject/wallet';
+import { signMessage, signRaw } from './crypto';
 
 describe('signRaw()', () => {
   test('Correctly signs string', async () => {

@@ -25,7 +25,7 @@ describe('the postRequestMessage function', () => {
 
     expect(postMessageMock).toHaveBeenCalledWith(
       postMessage,
-      IMX_WALLET_IFRAME_HOSTS.development
+      IMX_WALLET_IFRAME_HOSTS.development,
     );
   });
 });

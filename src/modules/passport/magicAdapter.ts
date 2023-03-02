@@ -16,7 +16,7 @@ export default class MagicAdapter {
       network,
       extensions: [
         new OpenIdExtension(),
-      ]
+      ],
     });
   }
 
@@ -27,10 +27,10 @@ export default class MagicAdapter {
         providerId: magicProviderId,
       });
       return new ethers.providers.Web3Provider(
-        this.magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider
+        this.magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider,
       );
     }, {
       type: PassportErrorType.WALLET_CONNECTION_ERROR,
-    })
+    });
   }
 }

@@ -1,18 +1,18 @@
 import { RegisterUserResponse } from 'src';
 import { GetSignableRegistrationResponse } from 'src/types';
-import { Signers } from './types';
-import { validateChain } from './helpers';
 import {
   EthSigner,
   Contracts,
   UsersApi,
 } from '@imtbl/core-sdk';
-import { signRaw } from './utils';
 import { Configuration } from 'src/config';
+import { Signers } from './types';
+import { validateChain } from './helpers';
+import { signRaw } from './utils';
 
 export async function registerOffchain(
   signers: Signers,
-  config: Configuration
+  config: Configuration,
 ): Promise<RegisterUserResponse> {
   await validateChain(signers.ethSigner, config.getStarkExConfig());
   const usersApi = new UsersApi(config.getStarkExConfig().apiConfiguration);
@@ -27,8 +27,7 @@ export async function registerOffchain(
     },
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    signableResult.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
 
   const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 
@@ -53,13 +52,13 @@ interface IsRegisteredCheckError {
 export async function isRegisteredOnChain(
   starkPublicKey: string,
   ethSigner: EthSigner,
-  config: Configuration
+  config: Configuration,
 ): Promise<boolean> {
   await validateChain(ethSigner, config.getStarkExConfig());
 
   const registrationContract = Contracts.Registration.connect(
     config.getStarkExConfig().ethConfiguration.registrationContractAddress,
-    ethSigner
+    ethSigner,
   );
 
   try {
@@ -75,7 +74,7 @@ export async function isRegisteredOnChain(
 export async function getSignableRegistrationOnchain(
   etherKey: string,
   starkPublicKey: string,
-  usersApi: UsersApi
+  usersApi: UsersApi,
 ): Promise<GetSignableRegistrationResponse> {
   const response = await usersApi.getSignableRegistration({
     getSignableRegistrationRequest: {

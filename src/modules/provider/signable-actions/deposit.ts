@@ -1,12 +1,12 @@
 import { TokenAmount } from 'src/types';
-import { Signers } from './types';
 import { Configuration } from 'src/config';
+import { Signers } from './types';
 import { depositEth, depositERC20, depositERC721 } from './deposit-actions';
 
 export async function deposit(
   signers: Signers,
   deposit: TokenAmount,
-  config: Configuration
+  config: Configuration,
 ) {
   switch (deposit.type) {
     case 'ETH':
