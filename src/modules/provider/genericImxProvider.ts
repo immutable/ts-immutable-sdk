@@ -57,7 +57,8 @@ export class GenericIMXProvider implements IMXProvider {
     return cancelOrder({
       signers: this.signers,
       request,
-      config: this.config});
+      config: this.config
+    });
   }
 
   completeWithdrawal(starkPublicKey: string, token: AnyToken): Promise<TransactionResponse> {
