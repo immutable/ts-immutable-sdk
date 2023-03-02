@@ -9,31 +9,31 @@ import {
 import { convertToSignableToken } from './utils/convertToSignableToken';
 import { signRaw } from './utils';
 import { Signers } from './types';
-import { Configuration } from 'src/config/config';
+import { Configuration } from 'src/config';
 import { OrdersApi } from '@imtbl/core-sdk';
 import { validateChain } from './helpers';
 
 type CreateOrderWorkflowParams = {
   signers: Signers;
   request: UnsignedOrderRequest;
-  imx: Configuration;
+  config: Configuration;
 };
 
 type CancelOrderWorkflowParams = {
   signers: Signers;
   request: GetSignableCancelOrderRequest;
-  imx: Configuration;
+  config: Configuration;
 };
 
 export async function createOrder({
   signers,
   request,
-  imx,
+  config,
 }: CreateOrderWorkflowParams): Promise<CreateOrderResponse> {
-  await validateChain(signers.ethSigner, imx.getStarkExConfig());
+  await validateChain(signers.ethSigner, config.getStarkExConfig());
 
   const ethAddress = await signers.ethSigner.getAddress();
-  const ordersApi = new OrdersApi(imx.getStarkExConfig().apiConfiguration);
+  const ordersApi = new OrdersApi(config.getStarkExConfig().apiConfiguration);
 
   const amountSell = request.sell.type === 'ERC721' ? '1' : request.sell.amount;
   const amountBuy = request.buy.type === 'ERC721' ? '1' : request.buy.amount;
@@ -89,9 +89,9 @@ export async function createOrder({
 export async function cancelOrder({
   signers,
   request,
-  imx,
+  config,
 }: CancelOrderWorkflowParams): Promise<CancelOrderResponse> {
-  const ordersApi = new OrdersApi(imx.getStarkExConfig().apiConfiguration);
+  const ordersApi = new OrdersApi(config.getStarkExConfig().apiConfiguration);
 
   const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrder(
     {

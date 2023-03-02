@@ -1,7 +1,7 @@
 import { TokenAmount, AnyToken } from 'src/types';
 import { Signers } from './types';
 import { validateChain } from './helpers';
-import { Configuration } from 'src/config/config';
+import { Configuration } from 'src/config';
 import {
   prepareWithdrawalAction,
   completeEthWithdrawalAction,
@@ -13,26 +13,26 @@ type CompleteWithdrawalParams = {
   signers: Signers;
   starkPublicKey: string;
   token: AnyToken;
-  client: Configuration;
+  config: Configuration;
 };
 
 type PrepareWithdrawalParams = {
   signers: Signers;
   withdrawal: TokenAmount;
-  client: Configuration;
+  config: Configuration;
 };
 
 export async function prepareWithdrawal({
   signers,
   withdrawal,
-  client,
+  config,
 }: PrepareWithdrawalParams) {
-  const config = client.getStarkExConfig();
-  await validateChain(signers.ethSigner, config);
+  const starkExConfig = config.getStarkExConfig();
+  await validateChain(signers.ethSigner, starkExConfig);
 
   return prepareWithdrawalAction({
     signers,
-    config,
+    config: starkExConfig,
     ...withdrawal,
   });
 }
@@ -41,26 +41,26 @@ export async function completeWithdrawal({
   signers: { ethSigner },
   starkPublicKey,
   token,
-  client,
+  config,
 }: CompleteWithdrawalParams) {
-  await validateChain(ethSigner, client.getStarkExConfig());
+  await validateChain(ethSigner, config.getStarkExConfig());
 
   switch (token.type) {
     case 'ETH':
-      return completeEthWithdrawalAction({ ethSigner, starkPublicKey, client });
+      return completeEthWithdrawalAction({ ethSigner, starkPublicKey, config });
     case 'ERC20':
       return completeERC20WithdrawalAction({
         ethSigner,
         starkPublicKey,
         token,
-        client,
+        config,
       });
     case 'ERC721':
       return completeERC721WithdrawalAction({
         ethSigner,
         starkPublicKey,
         token,
-        client,
+        config,
       });
   }
 }

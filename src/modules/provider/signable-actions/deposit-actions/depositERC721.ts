@@ -12,7 +12,7 @@ import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
 } from '../registration';
-import { Configuration } from 'src/config/config';
+import { Configuration } from 'src/config';
 import { validateChain } from '../helpers';
 
 interface ERC721TokenData {
@@ -23,15 +23,15 @@ interface ERC721TokenData {
 export async function depositERC721(
   signer: EthSigner,
   deposit: ERC721Token,
-  imx: Configuration
+  config: Configuration
 ): Promise<TransactionResponse> {
-  await validateChain(signer, imx.getStarkExConfig());
+  await validateChain(signer, config.getStarkExConfig());
 
   const user = await signer.getAddress();
-  const config = imx.getStarkExConfig();
-  const depositsApi = new DepositsApi(config.apiConfiguration);
-  const encodingApi = new EncodingApi(config.apiConfiguration);
-  const usersApi = new UsersApi(config.apiConfiguration);
+  const starkExConfig = config.getStarkExConfig();
+  const depositsApi = new DepositsApi(starkExConfig.apiConfiguration);
+  const encodingApi = new EncodingApi(starkExConfig.apiConfiguration);
+  const usersApi = new UsersApi(starkExConfig.apiConfiguration);
 
   const data: ERC721TokenData = {
     token_address: deposit.tokenAddress,
@@ -74,12 +74,12 @@ export async function depositERC721(
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     signer,
-    config
+    starkExConfig
   );
 
   // Approve whether an amount of token from an account can be spent by a third-party account
   const tokenContract = Contracts.IERC721.connect(deposit.tokenAddress, signer);
-  const operator = config.ethConfiguration.coreContractAddress;
+  const operator = starkExConfig.ethConfiguration.coreContractAddress;
   const isApprovedForAll = await tokenContract.isApprovedForAll(user, operator);
   if (!isApprovedForAll) {
     await tokenContract.setApprovalForAll(operator, true);
@@ -93,7 +93,7 @@ export async function depositERC721(
     );
 
     const coreContract = Contracts.Core.connect(
-      config.ethConfiguration.coreContractAddress,
+      starkExConfig.ethConfiguration.coreContractAddress,
       signer
     );
     // Note: proxy registration contract registerAndDepositNft method is not used as it currently fails erc721 transfer ownership check
@@ -110,7 +110,7 @@ export async function depositERC721(
     assetType,
     starkPublicKey,
     vaultId,
-    config
+    starkExConfig
   );
 }
 

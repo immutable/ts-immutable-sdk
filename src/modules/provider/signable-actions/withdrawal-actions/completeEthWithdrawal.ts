@@ -1,7 +1,7 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
 import { Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
-import { Configuration } from 'src/config/config';
+import { Configuration } from 'src/config';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
@@ -11,7 +11,7 @@ import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 type CompleteEthWithdrawalActionParams = {
   ethSigner: Signer;
   starkPublicKey: string;
-  client: Configuration;
+  config: Configuration;
 };
 
 async function executeRegisterAndWithdrawEth(
@@ -66,15 +66,15 @@ async function executeWithdrawEth(
 export async function completeEthWithdrawalAction({
   ethSigner,
   starkPublicKey,
-  client,
+  config,
 }: CompleteEthWithdrawalActionParams) {
-  const config = client.getStarkExConfig();
-  const assetType = await getEncodeAssetInfo('asset', 'ETH', config);
+  const starkExConfig = config.getStarkExConfig();
+  const assetType = await getEncodeAssetInfo('asset', 'ETH', starkExConfig);
 
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    config
+    starkExConfig
   );
 
   if (!isRegistered) {
@@ -82,14 +82,14 @@ export async function completeEthWithdrawalAction({
       ethSigner,
       assetType.asset_type,
       starkPublicKey,
-      config
+      starkExConfig
     );
   } else {
     return executeWithdrawEth(
       ethSigner,
       assetType.asset_type,
       starkPublicKey,
-      config
+      starkExConfig
     );
   }
 }

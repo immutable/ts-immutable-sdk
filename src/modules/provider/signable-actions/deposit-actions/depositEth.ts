@@ -7,7 +7,7 @@ import {
   ImmutableXConfiguration,
   UsersApi,
 } from '@imtbl/core-sdk';
-import { Configuration } from 'src/config/config';
+import { Configuration } from 'src/config';
 import { parseUnits } from '@ethersproject/units';
 import {
   getSignableRegistrationOnchain,
@@ -24,19 +24,19 @@ interface ETHTokenData {
 export async function depositEth(
   signer: EthSigner,
   deposit: ETHAmount,
-  imx: Configuration
+  config: Configuration
 ) {
-  await validateChain(signer, imx.getStarkExConfig());
+  await validateChain(signer, config.getStarkExConfig());
 
   const user = await signer.getAddress();
   const data: ETHTokenData = {
     decimals: 18,
   };
   const amount = parseUnits(deposit.amount, 'wei');
-  const config = imx.getStarkExConfig();
-  const depositsApi = new DepositsApi(config.apiConfiguration);
-  const encodingApi = new EncodingApi(config.apiConfiguration);
-  const usersApi = new UsersApi(config.apiConfiguration);
+  const starkExConfig = config.getStarkExConfig();
+  const depositsApi = new DepositsApi(starkExConfig.apiConfiguration);
+  const encodingApi = new EncodingApi(starkExConfig.apiConfiguration);
+  const usersApi = new UsersApi(starkExConfig.apiConfiguration);
 
   const getSignableDepositRequest = {
     user,
@@ -67,7 +67,7 @@ export async function depositEth(
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     signer,
-    config
+    starkExConfig
   );
 
   if (!isRegistered) {
@@ -77,7 +77,7 @@ export async function depositEth(
       assetType,
       starkPublicKey,
       vaultId,
-      config,
+      starkExConfig,
       usersApi
     );
   } else {
@@ -87,7 +87,7 @@ export async function depositEth(
       assetType,
       starkPublicKey,
       vaultId,
-      config
+      starkExConfig
     );
   }
 }

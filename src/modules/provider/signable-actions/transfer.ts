@@ -7,32 +7,32 @@ import {
 import { Signers } from './types';
 import { convertToSignableToken } from './utils/convertToSignableToken';
 import { signRaw } from './utils';
-import { Configuration } from 'src/config/config';
+import { Configuration } from 'src/config';
 import { TransfersApi } from '@imtbl/core-sdk';
 import { validateChain } from './helpers';
 
 type TransfersWorkflowParams = {
   signers: Signers;
   request: UnsignedTransferRequest;
-  imx: Configuration;
+  config: Configuration;
 };
 
 type BatchTransfersWorkflowParams = {
   signers: Signers;
   request: Array<NftTransferDetails>;
-  imx: Configuration;
+  config: Configuration;
 };
 
 export async function transfers({
   signers: { ethSigner, starkExSigner },
   request,
-  imx,
+  config,
 }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
-  await validateChain(ethSigner, imx.getStarkExConfig());
+  await validateChain(ethSigner, config.getStarkExConfig());
 
   const ethAddress = await ethSigner.getAddress();
   const transfersApi = new TransfersApi(
-    imx.getStarkExConfig().apiConfiguration
+    config.getStarkExConfig().apiConfiguration
   );
 
   const transferAmount = request.type === 'ERC721' ? '1' : request.amount;
@@ -82,13 +82,13 @@ export async function transfers({
 export async function batchTransfers({
   signers: { ethSigner, starkExSigner },
   request,
-  imx,
+  config,
 }: BatchTransfersWorkflowParams): Promise<CreateTransferResponse> {
-  await validateChain(ethSigner, imx.getStarkExConfig());
+  await validateChain(ethSigner, config.getStarkExConfig());
 
   const ethAddress = await ethSigner.getAddress();
   const transfersApi = new TransfersApi(
-    imx.getStarkExConfig().apiConfiguration
+    config.getStarkExConfig().apiConfiguration
   );
 
   const signableRequests = request.map((nftTransfer) => {

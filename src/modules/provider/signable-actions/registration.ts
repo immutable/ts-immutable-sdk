@@ -9,14 +9,14 @@ import {
   UsersApi,
 } from '@imtbl/core-sdk';
 import { signRaw } from './utils';
-import { Configuration } from 'src/config/config';
+import { Configuration } from 'src/config';
 
 export async function registerOffchain(
   signers: Signers,
-  imx: Configuration
+  config: Configuration
 ): Promise<RegisterUserResponse> {
-  await validateChain(signers.ethSigner, imx.getStarkExConfig());
-  const usersApi = new UsersApi(imx.getStarkExConfig().apiConfiguration);
+  await validateChain(signers.ethSigner, config.getStarkExConfig());
+  const usersApi = new UsersApi(config.getStarkExConfig().apiConfiguration);
 
   const userAddress = await signers.ethSigner.getAddress();
   const starkPublicKey = await signers.starkExSigner.getAddress();

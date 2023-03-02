@@ -8,7 +8,7 @@ import {
   TokensApi,
   UsersApi,
 } from '@imtbl/core-sdk';
-import { Configuration } from 'src/config/config';
+import { Configuration } from 'src/config';
 import { TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -26,16 +26,16 @@ interface ERC20TokenData {
 export async function depositERC20(
   signer: EthSigner,
   deposit: ERC20Amount,
-  imx: Configuration
+  config: Configuration
 ): Promise<TransactionResponse> {
-  await validateChain(signer, imx.getStarkExConfig());
+  await validateChain(signer, config.getStarkExConfig());
 
   const user = await signer.getAddress();
-  const config = imx.getStarkExConfig();
-  const tokensApi = new TokensApi(config.apiConfiguration);
-  const depositsApi = new DepositsApi(config.apiConfiguration);
-  const encodingApi = new EncodingApi(config.apiConfiguration);
-  const usersApi = new UsersApi(config.apiConfiguration);
+  const starkExConfig = config.getStarkExConfig();
+  const tokensApi = new TokensApi(starkExConfig.apiConfiguration);
+  const depositsApi = new DepositsApi(starkExConfig.apiConfiguration);
+  const encodingApi = new EncodingApi(starkExConfig.apiConfiguration);
+  const usersApi = new UsersApi(starkExConfig.apiConfiguration);
 
   // Get decimals for this specific ERC20
   const token = await tokensApi.getToken({ address: deposit.tokenAddress });
@@ -51,7 +51,7 @@ export async function depositERC20(
   // Approve whether an amount of token from an account can be spent by a third-party account
   const tokenContract = Contracts.IERC20.connect(deposit.tokenAddress, signer);
   const approveTransaction = await tokenContract.populateTransaction.approve(
-    config.ethConfiguration.coreContractAddress,
+    starkExConfig.ethConfiguration.coreContractAddress,
     amount
   );
   await signer.sendTransaction(approveTransaction);
@@ -90,7 +90,7 @@ export async function depositERC20(
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     signer,
-    config
+    starkExConfig
   );
 
   if (!isRegistered) {
@@ -100,7 +100,7 @@ export async function depositERC20(
       assetType,
       starkPublicKey,
       vaultId,
-      config,
+      starkExConfig,
       usersApi
     );
   } else {
@@ -110,7 +110,7 @@ export async function depositERC20(
       assetType,
       starkPublicKey,
       vaultId,
-      config
+      starkExConfig
     );
   }
 }

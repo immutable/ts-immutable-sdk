@@ -5,24 +5,26 @@ import {
 import { convertToSignableToken } from './utils/convertToSignableToken';
 import { signRaw } from './utils';
 import { Signers } from './types';
-import { Configuration } from 'src/config/config';
+import { Configuration } from 'src/config';
 import { ExchangesApi } from '@imtbl/core-sdk';
 import { validateChain } from './helpers';
 
 type TransfersWorkflowParams = {
   signers: Signers;
   request: UnsignedExchangeTransferRequest;
-  imx: Configuration;
+  config: Configuration;
 };
 
 export async function exchangeTransfersWorkflow({
   signers,
   request,
-  imx,
+  config,
 }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
-  await validateChain(signers.ethSigner, imx.getStarkExConfig());
+  await validateChain(signers.ethSigner, config.getStarkExConfig());
 
-  const exchangeApi = new ExchangesApi(imx.getStarkExConfig().apiConfiguration);
+  const exchangeApi = new ExchangesApi(
+    config.getStarkExConfig().apiConfiguration
+  );
   const ethAddress = await signers.ethSigner.getAddress();
 
   const transferAmount = request.amount;
