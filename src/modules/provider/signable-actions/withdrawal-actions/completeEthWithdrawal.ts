@@ -7,6 +7,7 @@ import {
   isRegisteredOnChain,
 } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
+import { validateChain } from "../helpers";
 
 type CompleteEthWithdrawalActionParams = {
   ethSigner: Signer;
@@ -68,6 +69,8 @@ export async function completeEthWithdrawalAction({
   starkPublicKey,
   client,
 }: CompleteEthWithdrawalActionParams) {
+  await validateChain(ethSigner, client.getStarkExConfig());
+
   const config = client.getStarkExConfig();
   const assetType = await getEncodeAssetInfo('asset', 'ETH', config);
 

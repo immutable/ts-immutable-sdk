@@ -43,8 +43,6 @@ export async function completeWithdrawal({
   token,
   client,
 }: CompleteWithdrawalParams) {
-  await validateChain(ethSigner, client.getStarkExConfig());
-
   switch (token.type) {
     case 'ETH':
       return completeEthWithdrawalAction({ ethSigner, starkPublicKey, client });
