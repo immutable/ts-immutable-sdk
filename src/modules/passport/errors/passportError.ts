@@ -2,6 +2,7 @@ export enum PassportErrorType {
   AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR', // Failed to Connect with auth provider
   INVALID_CONFIGURATION = 'INVALID_CONFIGURATION', // Missing the configuration
   WALLET_CONNECTION_ERROR = 'WALLET_CONNECTION_ERROR',
+  USER_REGISTRATION_ERROR = 'USER_REGISTRATION_ERROR',
 }
 
 type ErrorType = {

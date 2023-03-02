@@ -1,4 +1,5 @@
-import axios, {AxiosError} from "axios";
+import axios from "axios";
+import {PassportErrorType, withPassportError} from "./errors/passportError";
 
 // TODO: imx apis & env & registration url are static properties that could come from env or config file
 const IMX_API = "https://api.dev.x.immutable.com"
@@ -12,18 +13,18 @@ export type PassportUserRegistrationRequest = {
     stark_signature: string
 }
 
+
 export const registerPassportUser = async (body: PassportUserRegistrationRequest, jwt: string): Promise<number> => {
-    try {
-        const {status} = await axios.post(PASSPORT_REGISTRATION_URL, body, {
-                headers: {
-                    'Authorization': 'Bearer ' + jwt
+    return withPassportError<number>(async () => {
+            const {status} = await axios.post(PASSPORT_REGISTRATION_URL, body, {
+                    headers: {
+                        'Authorization': 'Bearer ' + jwt
+                    }
                 }
-            }
-        )
-        return status
-    } catch (error) {
-        const err = error as AxiosError
-        console.log(err.response?.data)
-        throw new Error('error registering passport user');
-    }
+            )
+            return status
+        }, {
+            type: PassportErrorType.USER_REGISTRATION_ERROR,
+        }
+    )
 }

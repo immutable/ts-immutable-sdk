@@ -1,5 +1,5 @@
 import axios from "axios";
-import {PassportUserRegistrationRequest, registerPassportUser} from './userRegisetration';
+import {PassportUserRegistrationRequest, registerPassportUser} from './userRegistration';
 
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -38,6 +38,6 @@ describe('registerPassportUser', () => {
 
         await expect(registerPassportUser(requestBody, mockToken))
             .rejects
-            .toThrow('error registering passport user');
+            .toThrow('USER_REGISTRATION_ERROR');
     });
 });
