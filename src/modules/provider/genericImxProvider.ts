@@ -26,7 +26,7 @@ import { isRegisteredOnChain, registerOffchain } from "./signable-actions/regist
 import { completeWithdrawal, prepareWithdrawal } from "./signable-actions/withdrawal";
 import { TransactionResponse } from "@ethersproject/providers";
 import { createTrade } from "./signable-actions/trades";
-import { depositAction } from "./signable-actions/depositAction";
+import { deposit } from "./signable-actions/deposit";
 import { exchangeTransfers } from "./signable-actions/exchangeTransfers";
 
 export class GenericIMXProvider implements IMXProvider {
@@ -86,8 +86,8 @@ export class GenericIMXProvider implements IMXProvider {
     });
   }
 
-  deposit(deposit: TokenAmount): Promise<TransactionResponse> {
-    return depositAction(this.signers, deposit, this.config);
+  deposit(tokenAmount: TokenAmount): Promise<TransactionResponse> {
+    return deposit(this.signers, tokenAmount, this.config);
   }
 
   exchangeTransfer(request: UnsignedExchangeTransferRequest): Promise<CreateTransferResponseV1> {

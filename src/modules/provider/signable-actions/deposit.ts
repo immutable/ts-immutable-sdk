@@ -3,7 +3,7 @@ import { Signers } from './types';
 import { Configuration } from 'src/config';
 import { depositEth, depositERC20, depositERC721 } from './deposit-actions';
 
-export async function depositAction(
+export async function deposit(
   signers: Signers,
   deposit: TokenAmount,
   config: Configuration
