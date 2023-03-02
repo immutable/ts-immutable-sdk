@@ -7,7 +7,7 @@ import {
   ImmutableXConfiguration,
   UsersApi,
 } from '@imtbl/core-sdk';
-import { Configuration } from 'src/config';
+import { Configuration } from 'config';
 import { parseUnits } from '@ethersproject/units';
 import {
   getSignableRegistrationOnchain,

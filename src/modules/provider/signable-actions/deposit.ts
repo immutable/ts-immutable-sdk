@@ -1,6 +1,6 @@
-import { TokenAmount } from 'src/types';
+import { TokenAmount } from 'types';
 import { Signers } from './types';
-import { Configuration } from 'src/config';
+import { Configuration } from 'config';
 import { depositEth, depositERC20, depositERC721 } from './deposit-actions';
 
 export async function deposit(

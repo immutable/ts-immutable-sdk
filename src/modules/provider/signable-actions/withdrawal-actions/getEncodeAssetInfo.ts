@@ -3,16 +3,16 @@ import {
   EncodeAssetResponse,
   EncodeAssetTokenData,
   ImmutableXConfiguration,
-} from 'src/types';
-import { EncodingApi } from '@imtbl/core-sdk'
+} from 'types';
+import { EncodingApi } from '@imtbl/core-sdk';
 
 export async function getEncodeAssetInfo(
   assetType: string,
   tokenType: EncodeAssetRequestTokenTypeEnum,
   config: ImmutableXConfiguration,
-  tokenData?: EncodeAssetTokenData,
+  tokenData?: EncodeAssetTokenData
 ): Promise<EncodeAssetResponse> {
-  const encodingApi = new EncodingApi(config.apiConfiguration)
+  const encodingApi = new EncodingApi(config.apiConfiguration);
   const result = await encodingApi.encodeAsset({
     assetType,
     encodeAssetRequest: {

@@ -13,8 +13,8 @@ import {
   isRegisteredOnChain,
 } from '../registration';
 import { TransactionResponse } from '@ethersproject/providers';
-import { Configuration } from 'src/config';
-import { validateChain } from "../helpers";
+import { Configuration } from 'config';
+import { validateChain } from '../helpers';
 
 interface MintableERC721Withdrawal {
   type: 'ERC721';
