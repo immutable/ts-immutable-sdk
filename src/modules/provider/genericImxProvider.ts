@@ -30,12 +30,16 @@ import { depositAction } from "./signable-actions/depositAction";
 import { exchangeTransfers } from "./signable-actions/exchangeTransfers";
 
 export class GenericIMXProvider implements IMXProvider {
-  private config: Configuration;
-  private signers: Signers;
+  private readonly config: Configuration;
+  private readonly signers: Signers;
 
   constructor(config: Configuration, ethSigner: EthSigner, starkExSigner: StarkSigner) {
     this.config= config;
     this.signers = { ethSigner, starkExSigner };
+  }
+
+  async getAddress(): Promise<string> {
+    return await this.signers.ethSigner.getAddress()
   }
 
   registerOffchain(): Promise<RegisterUserResponse> {
