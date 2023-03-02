@@ -98,8 +98,7 @@ export async function completeERC20WithdrawalAction({
       assetType: assetType.asset_type,
       starkPublicKey,
       client
-    }
-    );
+    });
   } else {
     return executeWithdrawERC20(
       ethSigner,

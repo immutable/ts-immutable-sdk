@@ -85,7 +85,6 @@ export async function depositEth(signer: EthSigner, deposit: ETHAmount, imx:Immu
   }
 }
 
-
 async function executeRegisterAndDepositEth(
   signer: EthSigner,
   amount: BigNumber,

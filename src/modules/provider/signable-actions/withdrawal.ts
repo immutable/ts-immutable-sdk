@@ -37,12 +37,14 @@ export async function prepareWithdrawal({
   });
 }
 
-export function completeWithdrawal({
+export async function completeWithdrawal({
   signers: { ethSigner },
   starkPublicKey,
   token,
   client,
 }: CompleteWithdrawalParams) {
+  await validateChain(ethSigner, client.getConfiguration());
+
   switch (token.type) {
     case 'ETH':
       return completeEthWithdrawalAction({ ethSigner, starkPublicKey, client });
