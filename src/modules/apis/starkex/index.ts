@@ -1,20 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ImmutableX, Config } from '@imtbl/core-sdk';
+import { ImmutableX } from '@imtbl/core-sdk';
+import { Configuration } from 'src/config';
 
-const imtblClient = new ImmutableX(Config.SANDBOX);
-// Remove provider specific methods
-const {
-  deposit,
-  registerOffchain,
-  isRegisteredOnchain,
-  prepareWithdrawal,
-  completeWithdrawal,
-  createOrder,
-  cancelOrder,
-  createTrade,
-  transfer,
-  batchNftTransfer,
-  ...StarkEx
-} = imtblClient;
+const StarkExAPIFactory = (config: Configuration) => {
+  const imtblClient = new ImmutableX(config.getStarkExConfig());
+  const {
+    deposit,
+    registerOffchain,
+    isRegisteredOnchain,
+    prepareWithdrawal,
+    completeWithdrawal,
+    createOrder,
+    cancelOrder,
+    createTrade,
+    transfer,
+    batchNftTransfer,
+    ...StarkEx
+  } = imtblClient;
 
-export { StarkEx };
+  return { ...StarkEx };
+};
+
+export { StarkExAPIFactory };

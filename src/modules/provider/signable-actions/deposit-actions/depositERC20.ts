@@ -90,7 +90,7 @@ export async function depositERC20(
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     signer,
-    starkExConfig
+    config
   );
 
   if (!isRegistered) {

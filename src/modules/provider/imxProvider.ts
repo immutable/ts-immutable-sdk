@@ -18,6 +18,7 @@ import {
 import { TransactionResponse } from '@ethersproject/providers';
 
 export interface IMXProvider {
+    getAddress(): Promise<string>;
     registerOffchain(): Promise<RegisterUserResponse>;
     isRegisteredOnchain(): Promise<boolean>;
     createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse>;
