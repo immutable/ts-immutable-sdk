@@ -2,10 +2,10 @@ import { ethers } from 'ethers';
 import detectEthereumProvider from '@metamask/detect-provider';
 
 import { MetamaskConnectParams } from './types';
-import { WALLET_ACTION } from './rpc';
+import { connectProvider, isRequestableProvider } from './rpc';
 
-export const L1_METAMASK_ERRORS = {
-  PROVIDER_NOT_FOUND: 'The MetaMask provider was not found.',
+const ERRORS = {
+  PROVIDER_NOT_FOUND: 'The Metamask provider was not found.',
 };
 
 export async function connect({
@@ -14,18 +14,11 @@ export async function connect({
   const provider =
     (await detectEthereumProvider()) as ethers.providers.ExternalProvider;
 
-  if (!provider?.request) {
-    throw new Error(L1_METAMASK_ERRORS.PROVIDER_NOT_FOUND);
+  if (!isRequestableProvider(provider)) {
+    throw new Error(ERRORS.PROVIDER_NOT_FOUND);
   }
 
-  await provider.request({ method: WALLET_ACTION.CONNECT });
-
-  if (chainID) {
-    await provider.request({
-      method: WALLET_ACTION.SWITCH_CHAIN,
-      params: [{ chainId: `0x${chainID.toString(16)}` }],
-    });
-  }
+  await connectProvider(provider, chainID);
 
   // NOTE: if we want to listen to Metamask events in the future, we can add a
   // listener here.
