@@ -3,7 +3,7 @@ export enum PassportErrorType {
   INVALID_CONFIGURATION = 'INVALID_CONFIGURATION',
   WALLET_CONNECTION_ERROR = 'WALLET_CONNECTION_ERROR',
   NOT_LOGGED_IN_ERROR = 'NOT_LOGGED_IN_ERROR',
-};
+}
 
 type ErrorType = {
   type: PassportErrorType;
@@ -31,4 +31,4 @@ export const withPassportError = async <T>(
       'UnknownError';
     throw new PassportError(errorMessage, customError.type);
   }
-};
+}

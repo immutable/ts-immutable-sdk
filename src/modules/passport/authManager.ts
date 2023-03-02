@@ -48,7 +48,7 @@ export default class AuthManager {
     }
 
     return user;
-  };
+  }
 
   public async login(): Promise<User> {
     return withPassportError<User>(async () => {
