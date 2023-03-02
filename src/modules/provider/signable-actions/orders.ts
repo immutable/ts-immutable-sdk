@@ -5,11 +5,11 @@ import {
   GetSignableOrderRequest,
   OrdersApiCreateOrderRequest,
   UnsignedOrderRequest,
-} from 'src/types';
+} from 'types';
 import { convertToSignableToken } from './utils/convertToSignableToken';
 import { signRaw } from './utils';
 import { Signers } from './types';
-import { Configuration } from 'src/config';
+import { Configuration } from 'config';
 import { OrdersApi } from '@imtbl/core-sdk';
 import { validateChain } from './helpers';
 
