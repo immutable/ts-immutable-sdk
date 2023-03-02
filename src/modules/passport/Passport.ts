@@ -1,10 +1,10 @@
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
-import {Networks, UserProfile} from './types';
+import PassportImxProvider from './imxProvider/passportImxProvider';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { getStarkSigner } from './stark';
-import PassportImxProvider from './imxProvider/passportImxProvider';
-import { IMXProvider } from '../provider/imxProvider';
+import { Networks, UserProfile } from './types';
+import { IMXProvider } from '../provider';
 
 export type PassportConfig = {
   clientId: string;

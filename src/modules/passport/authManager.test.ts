@@ -1,7 +1,7 @@
-import AuthManager from './authManager';
 import { User as OidcUser, UserManager } from 'oidc-client-ts';
-import { User } from "./types";
-import {PassportError, PassportErrorType} from "./errors/passportError";
+import AuthManager from './authManager';
+import { PassportError, PassportErrorType } from './errors/passportError';
+import { User } from './types';
 
 jest.mock('oidc-client-ts');
 

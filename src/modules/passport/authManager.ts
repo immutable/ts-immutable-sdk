@@ -1,6 +1,6 @@
-import {User as OidcUser, UserManager} from 'oidc-client-ts';
-import {PassportError, PassportErrorType, withPassportError} from './errors/passportError';
-import {User} from './types';
+import { User as OidcUser, UserManager } from 'oidc-client-ts';
+import { PassportErrorType, withPassportError } from './errors/passportError';
+import { User } from './types';
 
 type AuthInput = {
   clientId: string;
