@@ -77,7 +77,7 @@ export async function completeEthWithdrawalAction({
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    starkExConfig
+    config
   );
 
   if (!isRegistered) {

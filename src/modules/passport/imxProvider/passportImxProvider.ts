@@ -18,7 +18,7 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { User } from '../types';
-import { IMXProvider } from '../../provider/imxProvider';
+import { IMXProvider } from '../../provider';
 
 export type JWT = Pick<User, 'access_token' | 'refresh_token'>;
 
@@ -92,6 +92,10 @@ export default class PassportImxProvider implements IMXProvider {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     token: AnyToken
   ): Promise<TransactionResponse> {
+    throw new Error('Method not implemented.');
+  }
+
+  getAddress(): Promise<string> {
     throw new Error('Method not implemented.');
   }
 }
