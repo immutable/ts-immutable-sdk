@@ -29,7 +29,7 @@ import { createTrade } from "./signable-actions/trades";
 import { depositAction } from "./signable-actions/depositAction";
 import { exchangeTransfers } from "./signable-actions/exchangeTransfers";
 
-class GenericIMXProvider implements IMXProvider {
+export class GenericIMXProvider implements IMXProvider {
   private config: Configuration;
   private signers: Signers;
 
