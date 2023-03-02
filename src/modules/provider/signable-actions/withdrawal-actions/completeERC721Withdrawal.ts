@@ -14,6 +14,7 @@ import {
 } from '../registration';
 import { TransactionResponse } from '@ethersproject/providers';
 import { Configuration } from 'src/config';
+import { validateChain } from "../helpers";
 
 interface MintableERC721Withdrawal {
   type: 'ERC721';
@@ -230,6 +231,8 @@ export async function completeERC721WithdrawalAction({
   token,
   config,
 }: CompleteERC721WithdrawalActionParams) {
+  await validateChain(ethSigner, config.getStarkExConfig());
+
   const tokenAddress = token.tokenAddress;
   const tokenId = token.tokenId;
   const starkExConfig = config.getStarkExConfig();

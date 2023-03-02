@@ -8,6 +8,7 @@ import {
 } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
+import { validateChain } from "../helpers";
 
 type ExecuteRegisterAndWithdrawERC20Params = {
   ethSigner: Signer;
@@ -79,6 +80,8 @@ export async function completeERC20WithdrawalAction({
   token,
   config,
 }: CompleteERC20WithdrawalWorkflowParams) {
+  await validateChain(ethSigner, config.getStarkExConfig());
+
   const starkExConfig = config.getStarkExConfig();
   const assetType = await getEncodeAssetInfo('asset', 'ERC20', starkExConfig, {
     token_address: token.tokenAddress,
