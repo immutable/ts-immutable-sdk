@@ -17,7 +17,7 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import { User } from 'oidc-client-ts';
+import { User } from '../types';
 import { IMXProvider } from '../../provider/imxProvider';
 
 export type JWT = Pick<User, 'access_token' | 'refresh_token'>;
