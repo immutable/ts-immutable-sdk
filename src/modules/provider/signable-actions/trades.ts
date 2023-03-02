@@ -1,27 +1,24 @@
-import { CreateTradeResponse, GetSignableTradeRequest } from "src/types";
-import { Signers } from "./types";
-import { validateChain } from "./helpers";
-import { signRaw } from "./utils";
-import { Immutable } from "../../apis/starkex";
-import { TradesApi } from "@imtbl/core-sdk";
+import { CreateTradeResponse, GetSignableTradeRequest } from 'src/types';
+import { Signers } from './types';
+import { validateChain } from './helpers';
+import { signRaw } from './utils';
+import { Configuration } from 'src/config/config';
+import { TradesApi } from '@imtbl/core-sdk';
 
 type createTradeWorkflowParams = {
   signers: Signers;
   request: GetSignableTradeRequest;
-  imx: Immutable;
+  imx: Configuration;
 };
 
 export async function createTrade({
-    signers: {
-      ethSigner,
-      starkExSigner,
-    },
-    request,
-    imx
-  }: createTradeWorkflowParams): Promise<CreateTradeResponse> {
-  await validateChain(ethSigner, imx.getConfiguration());
+  signers: { ethSigner, starkExSigner },
+  request,
+  imx,
+}: createTradeWorkflowParams): Promise<CreateTradeResponse> {
+  await validateChain(ethSigner, imx.getStarkExConfig());
   const ethAddress = await ethSigner.getAddress();
-  const tradesApi = new TradesApi(imx.getConfiguration().apiConfiguration)
+  const tradesApi = new TradesApi(imx.getStarkExConfig().apiConfiguration);
 
   const signableResult = await tradesApi.getSignableTrade({
     getSignableTradeRequest: {

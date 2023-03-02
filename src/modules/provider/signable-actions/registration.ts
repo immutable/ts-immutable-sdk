@@ -1,26 +1,35 @@
-import { RegisterUserResponse } from "src";
-import { GetSignableRegistrationResponse } from "src/types";
-import { Signers } from "./types";
-import { validateChain } from "./helpers";
-import { EthSigner, Contracts, ImmutableXConfiguration, UsersApi } from "@imtbl/core-sdk";
-import { signRaw } from "./utils";
-import { Immutable } from "../../apis/starkex";
+import { RegisterUserResponse } from 'src';
+import { GetSignableRegistrationResponse } from 'src/types';
+import { Signers } from './types';
+import { validateChain } from './helpers';
+import {
+  EthSigner,
+  Contracts,
+  ImmutableXConfiguration,
+  UsersApi,
+} from '@imtbl/core-sdk';
+import { signRaw } from './utils';
+import { Configuration } from 'src/config/config';
 
-export async function registerOffchain(signers: Signers, imx:Immutable
+export async function registerOffchain(
+  signers: Signers,
+  imx: Configuration
 ): Promise<RegisterUserResponse> {
-  await validateChain(signers.ethSigner, imx.getConfiguration());
-  const usersApi = new UsersApi(imx.getConfiguration().apiConfiguration)
+  await validateChain(signers.ethSigner, imx.getStarkExConfig());
+  const usersApi = new UsersApi(imx.getStarkExConfig().apiConfiguration);
 
   const userAddress = await signers.ethSigner.getAddress();
   const starkPublicKey = await signers.starkExSigner.getAddress();
 
   const signableResult = await usersApi.getSignableRegistrationOffchain({
-    getSignableRegistrationRequest:{ether_key: userAddress, stark_key:starkPublicKey}});
+    getSignableRegistrationRequest: {
+      ether_key: userAddress,
+      stark_key: starkPublicKey,
+    },
+  });
 
-  const {
-    signable_message: signableMessage,
-    payload_hash: payloadHash,
-  } = signableResult.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } =
+    signableResult.data;
 
   const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 
@@ -45,13 +54,13 @@ interface IsRegisteredCheckError {
 export async function isRegisteredOnChain(
   starkPublicKey: string,
   ethSigner: EthSigner,
-  config: ImmutableXConfiguration,
+  config: ImmutableXConfiguration
 ): Promise<boolean> {
   await validateChain(ethSigner, config);
 
   const registrationContract = Contracts.Registration.connect(
     config.ethConfiguration.registrationContractAddress,
-    ethSigner,
+    ethSigner
   );
 
   try {

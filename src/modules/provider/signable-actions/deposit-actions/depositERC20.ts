@@ -6,33 +6,36 @@ import {
   EthSigner,
   ImmutableXConfiguration,
   TokensApi,
-  UsersApi
-} from "@imtbl/core-sdk";
-import { Immutable } from "../../../apis/starkex";
-import { TransactionResponse } from "@ethersproject/providers";
-import { parseUnits } from "@ethersproject/units";
+  UsersApi,
+} from '@imtbl/core-sdk';
+import { Configuration } from 'src/config/config';
+import { TransactionResponse } from '@ethersproject/providers';
+import { parseUnits } from '@ethersproject/units';
 import { BigNumber } from '@ethersproject/bignumber';
-import { getSignableRegistrationOnchain, isRegisteredOnChain } from "../registration";
-import { validateChain } from "../helpers";
-
+import {
+  getSignableRegistrationOnchain,
+  isRegisteredOnChain,
+} from '../registration';
+import { validateChain } from '../helpers';
 
 interface ERC20TokenData {
   decimals: number;
   token_address: string;
 }
 
-
 export async function depositERC20(
-  signer: EthSigner, deposit: ERC20Amount, imx:Immutable
+  signer: EthSigner,
+  deposit: ERC20Amount,
+  imx: Configuration
 ): Promise<TransactionResponse> {
-  await validateChain(signer, imx.getConfiguration());
+  await validateChain(signer, imx.getStarkExConfig());
 
   const user = await signer.getAddress();
-  const config = imx.getConfiguration();
-  const tokensApi = new TokensApi(config.apiConfiguration)
-  const depositsApi = new DepositsApi(config.apiConfiguration)
-  const encodingApi = new EncodingApi(config.apiConfiguration)
-  const usersApi = new UsersApi(config.apiConfiguration)
+  const config = imx.getStarkExConfig();
+  const tokensApi = new TokensApi(config.apiConfiguration);
+  const depositsApi = new DepositsApi(config.apiConfiguration);
+  const encodingApi = new EncodingApi(config.apiConfiguration);
+  const usersApi = new UsersApi(config.apiConfiguration);
 
   // Get decimals for this specific ERC20
   const token = await tokensApi.getToken({ address: deposit.tokenAddress });
@@ -49,7 +52,7 @@ export async function depositERC20(
   const tokenContract = Contracts.IERC20.connect(deposit.tokenAddress, signer);
   const approveTransaction = await tokenContract.populateTransaction.approve(
     config.ethConfiguration.coreContractAddress,
-    amount,
+    amount
   );
   await signer.sendTransaction(approveTransaction);
 
@@ -87,7 +90,7 @@ export async function depositERC20(
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     signer,
-    config,
+    config
   );
 
   if (!isRegistered) {
@@ -98,7 +101,7 @@ export async function depositERC20(
       starkPublicKey,
       vaultId,
       config,
-      usersApi,
+      usersApi
     );
   } else {
     return executeDepositERC20(
@@ -122,15 +125,16 @@ async function executeDepositERC20(
 ): Promise<TransactionResponse> {
   const coreContract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    signer,
+    signer
   );
 
-  const populatedTransaction = await coreContract.populateTransaction.depositERC20(
-    starkPublicKey,
-    assetType,
-    vaultId,
-    quantizedAmount,
-  );
+  const populatedTransaction =
+    await coreContract.populateTransaction.depositERC20(
+      starkPublicKey,
+      assetType,
+      vaultId,
+      quantizedAmount
+    );
 
   return signer.sendTransaction(populatedTransaction);
 }
@@ -142,17 +146,17 @@ async function executeRegisterAndDepositERC20(
   starkPublicKey: string,
   vaultId: number,
   config: ImmutableXConfiguration,
-  usersApi: UsersApi,
+  usersApi: UsersApi
 ): Promise<TransactionResponse> {
   const etherKey = await signer.getAddress();
   const coreContract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    signer,
+    signer
   );
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
-    usersApi,
+    usersApi
   );
 
   const populatedTransaction =
@@ -162,7 +166,7 @@ async function executeRegisterAndDepositERC20(
       signableResult.operator_signature,
       assetType,
       vaultId,
-      quantizedAmount,
+      quantizedAmount
     );
 
   return signer.sendTransaction(populatedTransaction);

@@ -1,7 +1,7 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
 import { Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
-import { Immutable } from 'src/modules/apis/starkex';
+import { Configuration } from 'src/config/config';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
@@ -11,26 +11,26 @@ import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 type CompleteEthWithdrawalActionParams = {
   ethSigner: Signer;
   starkPublicKey: string;
-  client: Immutable;
-}
+  client: Configuration;
+};
 
 async function executeRegisterAndWithdrawEth(
   ethSigner: Signer,
   assetType: string,
   starkPublicKey: string,
-  config: ImmutableXConfiguration,
+  config: ImmutableXConfiguration
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
   const usersApi = new UsersApi(config.apiConfiguration);
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
-    usersApi,
+    usersApi
   );
 
   const contract = Contracts.Registration.connect(
     config.ethConfiguration.registrationContractAddress,
-    ethSigner,
+    ethSigner
   );
 
   const populatedTransaction =
@@ -38,7 +38,7 @@ async function executeRegisterAndWithdrawEth(
       etherKey,
       starkPublicKey,
       signableResult.operator_signature,
-      assetType,
+      assetType
     );
 
   return ethSigner.sendTransaction(populatedTransaction);
@@ -48,16 +48,16 @@ async function executeWithdrawEth(
   ethSigner: Signer,
   assetType: string,
   starkPublicKey: string,
-  config: ImmutableXConfiguration,
+  config: ImmutableXConfiguration
 ): Promise<TransactionResponse> {
   const contract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    ethSigner,
+    ethSigner
   );
 
   const populatedTransaction = await contract.populateTransaction.withdraw(
     starkPublicKey,
-    assetType,
+    assetType
   );
 
   return ethSigner.sendTransaction(populatedTransaction);
@@ -68,13 +68,13 @@ export async function completeEthWithdrawalAction({
   starkPublicKey,
   client,
 }: CompleteEthWithdrawalActionParams) {
-  const config = client.getConfiguration();
+  const config = client.getStarkExConfig();
   const assetType = await getEncodeAssetInfo('asset', 'ETH', config);
 
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    config,
+    config
   );
 
   if (!isRegistered) {
@@ -89,7 +89,7 @@ export async function completeEthWithdrawalAction({
       ethSigner,
       assetType.asset_type,
       starkPublicKey,
-      config,
+      config
     );
   }
 }

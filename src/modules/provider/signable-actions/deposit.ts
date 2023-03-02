@@ -1,9 +1,13 @@
-import { TokenAmount } from "src/types";
-import { Signers } from "./types";
-import { Immutable } from "../../apis/starkex";
-import { depositEth, depositERC20, depositERC721 } from "./deposit-actions";
+import { TokenAmount } from 'src/types';
+import { Signers } from './types';
+import { Configuration } from 'src/config/config';
+import { depositEth, depositERC20, depositERC721 } from './deposit-actions';
 
-export async function deposit(signers: Signers, deposit: TokenAmount, imx:Immutable) {
+export async function deposit(
+  signers: Signers,
+  deposit: TokenAmount,
+  imx: Configuration
+) {
   switch (deposit.type) {
     case 'ETH':
       return depositEth(signers.ethSigner, deposit, imx);

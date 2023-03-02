@@ -1,33 +1,33 @@
-import { TokenAmount, AnyToken } from "src/types";
-import { Signers } from "./types";
-import { validateChain } from "./helpers";
-import { Immutable } from "../../apis/starkex";
+import { TokenAmount, AnyToken } from 'src/types';
+import { Signers } from './types';
+import { validateChain } from './helpers';
+import { Configuration } from 'src/config/config';
 import {
   prepareWithdrawalAction,
   completeEthWithdrawalAction,
   completeERC20WithdrawalAction,
-  completeERC721WithdrawalAction
-} from "./withdrawal-actions";
+  completeERC721WithdrawalAction,
+} from './withdrawal-actions';
 
 type CompleteWithdrawalParams = {
   signers: Signers;
   starkPublicKey: string;
   token: AnyToken;
-  client: Immutable;
-}
+  client: Configuration;
+};
 
 type PrepareWithdrawalParams = {
   signers: Signers;
   withdrawal: TokenAmount;
-  client:Immutable;
-}
+  client: Configuration;
+};
 
 export async function prepareWithdrawal({
   signers,
   withdrawal,
   client,
 }: PrepareWithdrawalParams) {
-  const config = client.getConfiguration();
+  const config = client.getStarkExConfig();
   await validateChain(signers.ethSigner, config);
 
   return prepareWithdrawalAction({
@@ -43,14 +43,24 @@ export async function completeWithdrawal({
   token,
   client,
 }: CompleteWithdrawalParams) {
-  await validateChain(ethSigner, client.getConfiguration());
+  await validateChain(ethSigner, client.getStarkExConfig());
 
   switch (token.type) {
     case 'ETH':
       return completeEthWithdrawalAction({ ethSigner, starkPublicKey, client });
     case 'ERC20':
-      return completeERC20WithdrawalAction({ ethSigner, starkPublicKey, token, client });
+      return completeERC20WithdrawalAction({
+        ethSigner,
+        starkPublicKey,
+        token,
+        client,
+      });
     case 'ERC721':
-      return completeERC721WithdrawalAction({ ethSigner, starkPublicKey, token, client });
+      return completeERC721WithdrawalAction({
+        ethSigner,
+        starkPublicKey,
+        token,
+        client,
+      });
   }
 }

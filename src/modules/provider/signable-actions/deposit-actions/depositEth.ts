@@ -5,31 +5,38 @@ import {
   ETHAmount,
   EthSigner,
   ImmutableXConfiguration,
-  UsersApi
-} from "@imtbl/core-sdk";
-import { Immutable } from "../../../apis/starkex";
-import { parseUnits } from "@ethersproject/units";
-import { getSignableRegistrationOnchain, isRegisteredOnChain } from "../registration";
+  UsersApi,
+} from '@imtbl/core-sdk';
+import { Configuration } from 'src/config/config';
+import { parseUnits } from '@ethersproject/units';
+import {
+  getSignableRegistrationOnchain,
+  isRegisteredOnChain,
+} from '../registration';
 import { BigNumber } from '@ethersproject/bignumber';
-import { TransactionResponse } from "@ethersproject/providers";
-import { validateChain } from "../helpers";
+import { TransactionResponse } from '@ethersproject/providers';
+import { validateChain } from '../helpers';
 
 interface ETHTokenData {
   decimals: number;
 }
 
-export async function depositEth(signer: EthSigner, deposit: ETHAmount, imx:Immutable) {
-  await validateChain(signer, imx.getConfiguration());
+export async function depositEth(
+  signer: EthSigner,
+  deposit: ETHAmount,
+  imx: Configuration
+) {
+  await validateChain(signer, imx.getStarkExConfig());
 
   const user = await signer.getAddress();
   const data: ETHTokenData = {
     decimals: 18,
   };
   const amount = parseUnits(deposit.amount, 'wei');
-  const config = imx.getConfiguration();
-  const depositsApi = new DepositsApi(config.apiConfiguration)
-  const encodingApi = new EncodingApi(config.apiConfiguration)
-  const usersApi = new UsersApi(config.apiConfiguration)
+  const config = imx.getStarkExConfig();
+  const depositsApi = new DepositsApi(config.apiConfiguration);
+  const encodingApi = new EncodingApi(config.apiConfiguration);
+  const usersApi = new UsersApi(config.apiConfiguration);
 
   const getSignableDepositRequest = {
     user,
@@ -60,7 +67,7 @@ export async function depositEth(signer: EthSigner, deposit: ETHAmount, imx:Immu
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     signer,
-    config,
+    config
   );
 
   if (!isRegistered) {
@@ -71,7 +78,7 @@ export async function depositEth(signer: EthSigner, deposit: ETHAmount, imx:Immu
       starkPublicKey,
       vaultId,
       config,
-      usersApi,
+      usersApi
     );
   } else {
     return executeDepositEth(
@@ -80,7 +87,7 @@ export async function depositEth(signer: EthSigner, deposit: ETHAmount, imx:Immu
       assetType,
       starkPublicKey,
       vaultId,
-      config,
+      config
     );
   }
 }
@@ -92,18 +99,18 @@ async function executeRegisterAndDepositEth(
   starkPublicKey: string,
   vaultId: number,
   config: ImmutableXConfiguration,
-  usersApi: UsersApi,
+  usersApi: UsersApi
 ): Promise<TransactionResponse> {
   const etherKey = await signer.getAddress();
   const coreContract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    signer,
+    signer
   );
 
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
-    usersApi,
+    usersApi
   );
 
   const populatedTransaction =
@@ -112,7 +119,7 @@ async function executeRegisterAndDepositEth(
       starkPublicKey,
       signableResult.operator_signature,
       assetType,
-      vaultId,
+      vaultId
     );
 
   return signer.sendTransaction({ ...populatedTransaction, value: amount });
@@ -128,12 +135,12 @@ async function executeDepositEth(
 ): Promise<TransactionResponse> {
   const coreContract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    signer,
+    signer
   );
 
   const populatedTransaction = await coreContract.populateTransaction[
     'deposit(uint256,uint256,uint256)'
-    ](starkPublicKey, assetType, vaultId);
+  ](starkPublicKey, assetType, vaultId);
 
   return signer.sendTransaction({ ...populatedTransaction, value: amount });
 }

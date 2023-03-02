@@ -1,34 +1,39 @@
-import { CancelOrderResponse, CreateOrderResponse, GetSignableCancelOrderRequest,
-  GetSignableOrderRequest, OrdersApiCreateOrderRequest, UnsignedOrderRequest } from "src/types";
-import { convertToSignableToken } from "./utils/convertToSignableToken";
-import { signRaw } from "./utils";
-import { Signers } from "./types";
-import { Immutable } from "../../apis/starkex";
-import { OrdersApi } from "@imtbl/core-sdk";
-import { validateChain } from "./helpers";
-
+import {
+  CancelOrderResponse,
+  CreateOrderResponse,
+  GetSignableCancelOrderRequest,
+  GetSignableOrderRequest,
+  OrdersApiCreateOrderRequest,
+  UnsignedOrderRequest,
+} from 'src/types';
+import { convertToSignableToken } from './utils/convertToSignableToken';
+import { signRaw } from './utils';
+import { Signers } from './types';
+import { Configuration } from 'src/config/config';
+import { OrdersApi } from '@imtbl/core-sdk';
+import { validateChain } from './helpers';
 
 type CreateOrderWorkflowParams = {
   signers: Signers;
   request: UnsignedOrderRequest;
-  imx: Immutable;
+  imx: Configuration;
 };
 
 type CancelOrderWorkflowParams = {
   signers: Signers;
   request: GetSignableCancelOrderRequest;
-  imx: Immutable;
+  imx: Configuration;
 };
 
 export async function createOrder({
-    signers,
-    request,
-    imx,
-  }: CreateOrderWorkflowParams): Promise<CreateOrderResponse> {
-  await validateChain(signers.ethSigner, imx.getConfiguration());
+  signers,
+  request,
+  imx,
+}: CreateOrderWorkflowParams): Promise<CreateOrderResponse> {
+  await validateChain(signers.ethSigner, imx.getStarkExConfig());
 
   const ethAddress = await signers.ethSigner.getAddress();
-  const ordersApi = new OrdersApi(imx.getConfiguration().apiConfiguration)
+  const ordersApi = new OrdersApi(imx.getStarkExConfig().apiConfiguration);
 
   const amountSell = request.sell.type === 'ERC721' ? '1' : request.sell.amount;
   const amountBuy = request.buy.type === 'ERC721' ? '1' : request.buy.amount;
@@ -82,18 +87,18 @@ export async function createOrder({
 }
 
 export async function cancelOrder({
-    signers,
-    request,
-    imx
-  }: CancelOrderWorkflowParams): Promise<CancelOrderResponse> {
-  const ordersApi = new OrdersApi(imx.getConfiguration().apiConfiguration)
+  signers,
+  request,
+  imx,
+}: CancelOrderWorkflowParams): Promise<CancelOrderResponse> {
+  const ordersApi = new OrdersApi(imx.getStarkExConfig().apiConfiguration);
 
   const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrder(
     {
       getSignableCancelOrderRequest: {
         order_id: request.order_id,
       },
-    },
+    }
   );
 
   const { signable_message: signableMessage, payload_hash: payloadHash } =

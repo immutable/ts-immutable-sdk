@@ -1,26 +1,28 @@
-import { CreateTransferResponseV1, UnsignedExchangeTransferRequest } from "../../../types";
-import { convertToSignableToken } from "./utils/convertToSignableToken";
-import { signRaw } from "./utils";
-import { Signers } from "./types";
-import { Immutable } from "../../apis/starkex";
-import { ExchangesApi } from "@imtbl/core-sdk";
-import { validateChain } from "./helpers";
-
+import {
+  CreateTransferResponseV1,
+  UnsignedExchangeTransferRequest,
+} from '../../../types';
+import { convertToSignableToken } from './utils/convertToSignableToken';
+import { signRaw } from './utils';
+import { Signers } from './types';
+import { Configuration } from 'src/config/config';
+import { ExchangesApi } from '@imtbl/core-sdk';
+import { validateChain } from './helpers';
 
 type TransfersWorkflowParams = {
   signers: Signers;
   request: UnsignedExchangeTransferRequest;
-  imx: Immutable;
+  imx: Configuration;
 };
 
 export async function exchangeTransfersWorkflow({
-    signers,
-    request,
-    imx,
-  }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
-  await validateChain(signers.ethSigner, imx.getConfiguration());
+  signers,
+  request,
+  imx,
+}: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
+  await validateChain(signers.ethSigner, imx.getStarkExConfig());
 
-  const exchangeApi = new ExchangesApi(imx.getConfiguration().apiConfiguration)
+  const exchangeApi = new ExchangesApi(imx.getStarkExConfig().apiConfiguration);
   const ethAddress = await signers.ethSigner.getAddress();
 
   const transferAmount = request.amount;

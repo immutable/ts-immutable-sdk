@@ -1,35 +1,39 @@
-import { CreateTransferResponse, CreateTransferResponseV1, NftTransferDetails, UnsignedTransferRequest } from "src/types";
-import { Signers } from "./types";
-import { convertToSignableToken } from "./utils/convertToSignableToken";
-import { signRaw } from "./utils";
-import { Immutable } from "../../apis/starkex";
-import { TransfersApi } from "@imtbl/core-sdk";
-import { validateChain } from "./helpers";
+import {
+  CreateTransferResponse,
+  CreateTransferResponseV1,
+  NftTransferDetails,
+  UnsignedTransferRequest,
+} from 'src/types';
+import { Signers } from './types';
+import { convertToSignableToken } from './utils/convertToSignableToken';
+import { signRaw } from './utils';
+import { Configuration } from 'src/config/config';
+import { TransfersApi } from '@imtbl/core-sdk';
+import { validateChain } from './helpers';
 
 type TransfersWorkflowParams = {
   signers: Signers;
   request: UnsignedTransferRequest;
-  imx: Immutable;
+  imx: Configuration;
 };
 
 type BatchTransfersWorkflowParams = {
   signers: Signers;
   request: Array<NftTransferDetails>;
-  imx: Immutable;
+  imx: Configuration;
 };
 
 export async function transfers({
-    signers: {
-      ethSigner,
-      starkExSigner,
-    },
-    request,
-    imx,
-  }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
-  await validateChain(ethSigner, imx.getConfiguration());
+  signers: { ethSigner, starkExSigner },
+  request,
+  imx,
+}: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
+  await validateChain(ethSigner, imx.getStarkExConfig());
 
   const ethAddress = await ethSigner.getAddress();
-  const transfersApi = new TransfersApi(imx.getConfiguration().apiConfiguration)
+  const transfersApi = new TransfersApi(
+    imx.getStarkExConfig().apiConfiguration
+  );
 
   const transferAmount = request.type === 'ERC721' ? '1' : request.amount;
   const signableResult = await transfersApi.getSignableTransferV1({
@@ -76,19 +80,18 @@ export async function transfers({
 }
 
 export async function batchTransfers({
-    signers: {
-      ethSigner,
-      starkExSigner,
-    },
-    request,
-    imx,
-  }: BatchTransfersWorkflowParams): Promise<CreateTransferResponse> {
-  await validateChain(ethSigner, imx.getConfiguration());
+  signers: { ethSigner, starkExSigner },
+  request,
+  imx,
+}: BatchTransfersWorkflowParams): Promise<CreateTransferResponse> {
+  await validateChain(ethSigner, imx.getStarkExConfig());
 
   const ethAddress = await ethSigner.getAddress();
-  const transfersApi = new TransfersApi(imx.getConfiguration().apiConfiguration)
+  const transfersApi = new TransfersApi(
+    imx.getStarkExConfig().apiConfiguration
+  );
 
-  const signableRequests = request.map(nftTransfer => {
+  const signableRequests = request.map((nftTransfer) => {
     return {
       amount: '1',
       token: convertToSignableToken({
