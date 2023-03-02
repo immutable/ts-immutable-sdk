@@ -34,7 +34,7 @@ export class GenericIMXProvider implements IMXProvider {
   private readonly signers: Signers;
 
   constructor(config: Configuration, ethSigner: EthSigner, starkExSigner: StarkSigner) {
-    this.config= config;
+    this.config = config;
     this.signers = { ethSigner, starkExSigner };
   }
 
