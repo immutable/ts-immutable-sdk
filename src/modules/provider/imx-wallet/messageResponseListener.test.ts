@@ -1,3 +1,7 @@
+/*
+ * @jest-environment jsdom
+ */
+
 import { Environment } from '../constants';
 import { ConnectResponse } from './types';
 import { ResponseEventType } from './events';

@@ -1,3 +1,7 @@
+/*
+ * @jest-environment jsdom
+ */
+
 import { ethers } from 'ethers';
 
 import { RequestEventType, ResponseEventType } from './events';
