@@ -7,7 +7,7 @@ export const WALLET_ACTION = {
 
 type ExternalProvider = ethers.providers.ExternalProvider;
 type RequestableProvider = ExternalProvider & {
-  request: NonNullable<ethers.providers.ExternalProvider['request']>
+  request: NonNullable<ethers.providers.ExternalProvider['request']>;
 };
 
 export function isRequestableProvider(provider: ExternalProvider): provider is RequestableProvider {
