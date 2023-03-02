@@ -18,4 +18,3 @@ const {
 } = imtblClient;
 
 export { StarkEx };
-export * from "./immutable";
