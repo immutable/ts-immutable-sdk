@@ -81,7 +81,7 @@ describe('Passport', () => {
 
       const result = await passport.getUserInfo();
 
-      expect(result).toEqual(userMock);
+      expect(result).toEqual(userMock.profile);
     });
   });
 });
