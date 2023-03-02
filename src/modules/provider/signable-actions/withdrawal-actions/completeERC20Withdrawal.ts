@@ -89,7 +89,7 @@ export async function completeERC20WithdrawalAction({
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    starkExConfig
+    config
   );
 
   if (!isRegistered) {
