@@ -20,7 +20,7 @@ import {
 import { User } from '../types';
 import { IMXProvider } from '../../provider/imxProvider';
 
-export type JWT = Pick<User, 'access_token' | 'refresh_token'>;
+export type JWT = Pick<User, 'accessToken' | 'refreshToken'>;
 
 export default class PassportImxProvider implements IMXProvider {
   private jwt: JWT;

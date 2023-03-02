@@ -1,6 +1,6 @@
-import { UserManager } from 'oidc-client-ts';
-import { PassportErrorType, withPassportError } from './errors/passportError';
-import { User } from './types';
+import {User as OidcUser, UserManager} from 'oidc-client-ts';
+import {PassportError, PassportErrorType, withPassportError} from './errors/passportError';
+import {User} from './types';
 
 type AuthInput = {
   clientId: string;
@@ -32,8 +32,29 @@ export default class AuthManager {
     );
   }
 
+  private mapOidcUserToDomainModel(oidcUser: OidcUser): User {
+    const user: User = {
+      idToken: oidcUser.id_token,
+      accessToken: oidcUser.access_token,
+      refreshToken: oidcUser.refresh_token,
+    };
+
+    if (oidcUser.profile) {
+      user.profile = {
+        sub: oidcUser.profile.sub,
+        email: oidcUser.profile.email,
+        nickname: oidcUser.profile.nickname,
+      };
+    }
+
+    return user;
+  };
+
   public async login(): Promise<User> {
-    return withPassportError<User>(async () => this.userManager.signinPopup(), {
+    return withPassportError<User>(async () => {
+      const oidcUser = await this.userManager.signinPopup();
+      return this.mapOidcUserToDomainModel(oidcUser);
+    }, {
       type: PassportErrorType.AUTHENTICATION_ERROR,
     });
   }
@@ -45,5 +66,17 @@ export default class AuthManager {
         type: PassportErrorType.AUTHENTICATION_ERROR,
       }
     );
+  }
+
+  public async getUser(): Promise<User> {
+    return withPassportError<User>(async () => {
+      const oidcUser = await this.userManager.getUser();
+      if (!oidcUser) {
+        throw new Error('Failed to retrieve user');
+      }
+      return this.mapOidcUserToDomainModel(oidcUser);
+    }, {
+      type: PassportErrorType.NOT_LOGGED_IN_ERROR,
+    })
   }
 }

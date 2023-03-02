@@ -1,15 +1,9 @@
 import AuthManager from './authManager';
-import { User, UserManager } from 'oidc-client-ts';
+import { User as OidcUser, UserManager } from 'oidc-client-ts';
 
 jest.mock('oidc-client-ts');
 
 const authConfig = { clientId: '11111', redirectUri: 'http://test.com' };
-const mockUser: User = {
-  access_token: 'xxxxx',
-  token_type: 'Bearer',
-  scope: 'openid',
-  expires_in: 167222,
-} as User;
 
 describe('AuthManager', () => {
   afterEach(jest.resetAllMocks);
@@ -28,22 +22,41 @@ describe('AuthManager', () => {
     authManager = new AuthManager(authConfig);
   });
 
-  it('should get the login user', async () => {
-    signInMock.mockResolvedValue(mockUser);
-    const user = await authManager.login();
+  describe('login', () => {
+    it('should get the login user and return the domain model', async () => {
+      const mockUser: OidcUser = {
+        id_token: 'abcd',
+        access_token: 'xxxxx',
+        token_type: 'Bearer',
+        scope: 'openid',
+        expires_in: 167222,
+      } as OidcUser;
+      signInMock.mockResolvedValue(mockUser);
 
-    expect(user).toEqual(mockUser);
+      const user = await authManager.login();
+
+      expect(user).toEqual({
+        idToken: mockUser.id_token,
+        accessToken: mockUser.access_token,
+      });
+    });
+
+    it('should throw the error if user is failed to login', async () => {
+      signInMock.mockRejectedValue(new Error('NONO'));
+
+      await expect(authManager.login()).rejects.toThrow();
+    });
   });
 
-  it('should throw the error if user is failed to login', async () => {
-    signInMock.mockRejectedValue(new Error('NONO'));
+  describe('loginCallback', () => {
+    it('should call login callback', async () => {
+      await authManager.loginCallback();
 
-    await expect(authManager.login()).rejects.toThrow();
+      expect(signinPopupCallbackMock).toBeCalled();
+    });
   });
 
-  it('should call login callback', async () => {
-    await authManager.loginCallback();
+  describe('getUser', () => {
 
-    expect(signinPopupCallbackMock).toBeCalled();
   });
 });
