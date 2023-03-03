@@ -1,3 +1,4 @@
 const Checkout = {};
+const Widgets = {};
 
-export { Checkout };
+export { Checkout, Widgets };
