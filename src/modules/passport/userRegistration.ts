@@ -7,10 +7,10 @@ const PASSPORT_REGISTRATION_URL = `${IMX_API}/v1/passport/users`
 
 
 export type PassportUserRegistrationRequest = {
-    ether_key: string
-    eth_signature: string
-    stark_key: string
-    stark_signature: string
+    ether_key: string;
+    eth_signature: string;
+    stark_key: string;
+    stark_signature: string;
 }
 
 export const registerPassportUser = async (body: PassportUserRegistrationRequest, jwt: string): Promise<number> => {
