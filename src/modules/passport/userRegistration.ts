@@ -13,7 +13,6 @@ export type PassportUserRegistrationRequest = {
     stark_signature: string
 }
 
-
 export const registerPassportUser = async (body: PassportUserRegistrationRequest, jwt: string): Promise<number> => {
     return withPassportError<number>(async () => {
             const { status } = await axios.post(PASSPORT_REGISTRATION_URL, body, {
