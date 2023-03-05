@@ -16,7 +16,7 @@ export type PassportUserRegistrationRequest = {
 
 export const registerPassportUser = async (body: PassportUserRegistrationRequest, jwt: string): Promise<number> => {
     return withPassportError<number>(async () => {
-            const {status} = await axios.post(PASSPORT_REGISTRATION_URL, body, {
+            const { status } = await axios.post(PASSPORT_REGISTRATION_URL, body, {
                     headers: {
                         'Authorization': 'Bearer ' + jwt
                     }
