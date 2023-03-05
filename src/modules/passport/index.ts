@@ -1,4 +1,4 @@
 import { PassportError } from './errors/passportError';
-import { PassportSDK } from './PassportSDK';
+import { Passport } from './Passport';
 
-export { PassportSDK, PassportError };
+export { Passport, PassportError };
