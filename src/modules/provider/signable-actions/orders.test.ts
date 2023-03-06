@@ -1,4 +1,4 @@
-import { configuration, SharedContext } from '../test/sharedContext';
+import { SharedContext, configuration } from '../test/sharedContext';
 import { UnsignedOrderRequest, OrdersApi } from "@imtbl/core-sdk";
 import { parseEther } from '@ethersproject/units';
 import { createOrder } from './orders';
@@ -10,11 +10,13 @@ const sharedContext = new SharedContext();
 const config = new Configuration(configuration);
 
 jest.mock('@imtbl/core-sdk')
+jest.mock('./utils')
 
 describe('Orders', () => {
   describe('createOrder()', () => {
     let getSignableOrderMock: jest.Mock;
     let createOrderMock: jest.Mock;
+    let signRawMock: jest.Mock;
 
     const signableOrderRequest: UnsignedOrderRequest = {
       sell: {
@@ -60,6 +62,8 @@ describe('Orders', () => {
         getSignableOrder: getSignableOrderMock,
         createOrder: createOrderMock,
       });
+
+      (signRaw as jest.Mock).mockReturnValue("raw-eth-signature");
     })
 
     test('should make the correct api requests with the correct params, and return the correct receipt', async () => {
@@ -94,15 +98,13 @@ describe('Orders', () => {
           stark_key: getSignableOrderResponse.stark_key,
           stark_signature:
             getSignableOrderResponse.payload_hash +
+            "STX" +
             sharedContext.getUserOnePrivateKey(),
           vault_id_buy: getSignableOrderResponse.vault_id_buy,
           vault_id_sell: getSignableOrderResponse.vault_id_sell,
         },
         xImxEthAddress: await signers.ethSigner.getAddress(),
-        xImxEthSignature: await signRaw(
-          getSignableOrderResponse.signable_message,
-          signers.ethSigner
-        ),
+        xImxEthSignature: "raw-eth-signature",
       })
       expect(createOrderResponse).toEqual(createOrderResponse);
     })

@@ -1,23 +1,8 @@
-import { Wallet } from '@ethersproject/wallet';
-import {
-  Config,
-  CreateWithdrawalResponse,
-  CreateTransferResponseV1,
-  Balance,
-  CreateTransferResponse,
-  MintResultDetails,
-  UnsignedOrderRequest,
-  createStarkSigner,
-  NftprimarytransactionCreateResponse, ImmutableXConfiguration, StarkSigner
-} from "@imtbl/core-sdk";
-import { env } from './common';
-import { AlchemyProvider } from '@ethersproject/providers';
-import { ethers } from 'ethers';
-import genericErc20Abi from './abi/ERC20.json';
+import { StarkSigner } from "@imtbl/core-sdk";
 import { Signers } from '../signable-actions/types';
 
-const provider = new AlchemyProvider(env.network, env.alchemyApiKey);
-
+export const privateKey1 = "d90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36"
+export const privateKey2 = "013fe4a5265bc6deb3f3b524b987sdf987f8c7a8ec2a998ae0512f493d763c8f"
 export const configuration = {
   ethConfiguration: {
     chainID: 5
@@ -45,11 +30,8 @@ export class SharedContext {
     if (this.userOneSigners !== undefined) {
       return this.userOneSigners;
     }
-    const privateKey = env.privateKey1;
     const signers = await generateSigners(
-      privateKey,
-      env.starkPrivateKey1,
-      provider,
+      privateKey1,
     );
 
     this.userOneSigners = signers;
@@ -57,8 +39,8 @@ export class SharedContext {
     return this.userOneSigners;
   }
 
-  public getUserOnePrivateKey(): string {
-    return env.privateKey1
+  public getUserOnePrivateKey() {
+    return privateKey1;
   }
 
   public async getUserTwoSigners(): Promise<Signers> {
@@ -66,16 +48,17 @@ export class SharedContext {
       return this.userTwoSigners;
     }
 
-    const privateKey = env.privateKeyBanker;
     const signers = await generateSigners(
-      privateKey,
-      env.starkPrivateKeyBanker,
-      provider,
+      privateKey2,
     );
 
     this.userTwoSigners = signers;
 
     return this.userTwoSigners;
+  }
+
+  public getUserTwoPrivateKey() {
+    return privateKey2;
   }
 
   public getTokenAddress(symbol: string): string {
@@ -96,20 +79,6 @@ export class SharedContext {
     const token = tokenAddresses.find(token => token.symbol === symbol);
     return token?.tokenAddress || '';
   }
-
-  public getTokenContract(symbol: string) {
-    const tokenAddress = this.getTokenAddress(symbol);
-    const contract = new ethers.Contract(
-      tokenAddress,
-      genericErc20Abi,
-      provider,
-    );
-    return contract;
-  }
-
-  public getProvider() {
-    return provider;
-  }
 }
 
 /**
@@ -117,22 +86,29 @@ export class SharedContext {
  */
 export const generateSigners = async (
   privateKey: string,
-  starkPrivateKey: string,
-  provider: AlchemyProvider,
 ): Promise<Signers> => {
   if (!privateKey) {
     throw new Error('PrivateKey required!');
   }
 
+  const ethKey = "ETH" + privateKey;
+  const starkKey = "STX" + privateKey;
+
   // L1 credentials
-  const ethSigner = new Wallet(privateKey).connect(provider);
+  const ethSigner = {
+    signMessage: async (message: string) => {
+      return message + ethKey;
+    },
+    getAddress: async () => ethKey,
+    getChainId: async () => 5
+  }
 
   // L2 credentials
   const starkExSigner = {
     signMessage: async (message: string) => {
-      return message+privateKey;
+      return message + starkKey;
     },
-    getAddress: () => privateKey,
+    getAddress: () => starkKey,
   } as StarkSigner;
 
   return {

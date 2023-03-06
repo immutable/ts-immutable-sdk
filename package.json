@@ -30,7 +30,6 @@
     "@metamask/detect-provider": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
-    "dotenv": "^16.0.3",
     "eslint": "^8.34.0",
     "ethers": "^5.7.2",
     "magic-sdk": "^13.3.1",
