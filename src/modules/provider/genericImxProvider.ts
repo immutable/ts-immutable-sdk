@@ -1,6 +1,5 @@
 import { IMXProvider } from './imxProvider';
 import { Signers } from './signable-actions/types';
-import { EthSigner } from '@imtbl/core-sdk';
 import { Configuration } from '../../config';
 import {
   AnyToken,
@@ -19,6 +18,7 @@ import {
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
+  EthSigner,
 } from 'types';
 import { batchTransfers, transfers } from './signable-actions/transfer';
 import { cancelOrder, createOrder } from './signable-actions/orders';
