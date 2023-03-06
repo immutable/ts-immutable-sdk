@@ -1,4 +1,4 @@
-import { Configuration, PRODUCTION } from '../../../config';
+import { Configuration, Environment, PRODUCTION } from '../../../config';
 import { MetaMaskProvider } from './metaMaskWrapper';
 import { connect } from './metaMask';
 import { connect as buildImxSigner } from '../imx-wallet/imxWallet';
@@ -21,10 +21,17 @@ describe('metaMetaWrapper', () => {
 
             (buildImxSigner as jest.Mock).mockResolvedValue(imxSigner);
 
-            await MetaMaskProvider.connect(config);
+            const metamaskProvider = await MetaMaskProvider.connect(config);
 
             expect(connect).toBeCalledTimes(1);
+            expect(connect).toBeCalledWith({ "chainID": 1 });
+            expect(buildImxSigner).toBeCalledTimes(1);
+            expect(buildImxSigner).toBeCalledWith(
+                { "getSigner": getSignerMock },
+                Environment.PRODUCTION
+            );
             expect(getSignerMock).toBeCalledTimes(1);
+            expect(metamaskProvider).toBeInstanceOf(MetaMaskProvider)
         });
     });
 });
