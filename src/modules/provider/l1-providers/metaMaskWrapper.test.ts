@@ -1,4 +1,4 @@
-import { Configuration, Environment, PRODUCTION } from '../../../config';
+import { Configuration, Environment, PRODUCTION } from 'config';
 import { MetaMaskProvider } from './metaMaskWrapper';
 import { connect } from './metaMask';
 import { connect as buildImxSigner } from '../imx-wallet/imxWallet';
