@@ -74,5 +74,4 @@ describe('requestRefreshToken', () => {
         expect(authManager.refreshToken).toHaveBeenCalledTimes(0)
 
     }, 15000);
-
 });
