@@ -16,7 +16,6 @@ describe('Orders', () => {
   describe('createOrder()', () => {
     let getSignableOrderMock: jest.Mock;
     let createOrderMock: jest.Mock;
-    let signRawMock: jest.Mock;
 
     const signableOrderRequest: UnsignedOrderRequest = {
       sell: {
