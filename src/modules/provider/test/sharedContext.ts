@@ -8,7 +8,7 @@ import {
   MintResultDetails,
   UnsignedOrderRequest,
   createStarkSigner,
-  NftprimarytransactionCreateResponse, ImmutableXConfiguration
+  NftprimarytransactionCreateResponse, ImmutableXConfiguration, StarkSigner
 } from "@imtbl/core-sdk";
 import { env } from './common';
 import { AlchemyProvider } from '@ethersproject/providers';
@@ -125,7 +125,12 @@ export const generateSigners = async (
   const ethSigner = new Wallet(privateKey).connect(provider);
 
   // L2 credentials
-  const starkExSigner = createStarkSigner(starkPrivateKey);
+  const starkExSigner = {
+    signMessage: async (message: string) => {
+      return message+privateKey;
+    },
+    getAddress: () => privateKey,
+  } as StarkSigner;
 
   return {
     ethSigner,
