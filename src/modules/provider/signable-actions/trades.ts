@@ -1,8 +1,8 @@
-import { CreateTradeResponse, GetSignableTradeRequest } from 'src/types';
+import { CreateTradeResponse, GetSignableTradeRequest } from 'types';
 import { Signers } from './types';
 import { validateChain } from './helpers';
 import { signRaw } from './utils';
-import { Configuration } from 'src/config';
+import { Configuration } from 'config';
 import { TradesApi } from '@imtbl/core-sdk';
 
 type createTradeWorkflowParams = {

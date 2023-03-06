@@ -1,3 +1,7 @@
+/*
+ * @jest-environment jsdom
+ */
+
 import { ConnectRequest } from './types';
 import { RequestEventType } from './events';
 import { postRequestMessage } from './postRequestMessage';

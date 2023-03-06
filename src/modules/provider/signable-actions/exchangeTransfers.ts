@@ -5,7 +5,7 @@ import {
 import { convertToSignableToken } from './utils/convertToSignableToken';
 import { signRaw } from './utils';
 import { Signers } from './types';
-import { Configuration } from 'src/config';
+import { Configuration } from 'config';
 import { ExchangesApi } from '@imtbl/core-sdk';
 import { validateChain } from './helpers';
 

@@ -1,3 +1,7 @@
+/*
+ * @jest-environment jsdom
+ */
+
 import { Environment } from '../constants';
 import {
   IMX_WALLET_IFRAME_ID,

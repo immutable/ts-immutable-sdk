@@ -12,7 +12,7 @@ import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
 } from '../registration';
-import { Configuration } from 'src/config';
+import { Configuration } from 'config';
 import { validateChain } from '../helpers';
 
 interface ERC721TokenData {

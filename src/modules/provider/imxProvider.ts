@@ -1,20 +1,20 @@
 import {
-    AnyToken,
-    RegisterUserResponse,
-    CancelOrderResponse,
-    CreateOrderResponse,
-    CreateTradeResponse,
-    CreateTransferResponse,
-    CreateTransferResponseV1,
-    CreateWithdrawalResponse,
-    GetSignableCancelOrderRequest,
-    GetSignableTradeRequest,
-    NftTransferDetails,
-    TokenAmount,
-    UnsignedExchangeTransferRequest,
-    UnsignedOrderRequest,
-    UnsignedTransferRequest
-} from "src/types";
+  AnyToken,
+  RegisterUserResponse,
+  CancelOrderResponse,
+  CreateOrderResponse,
+  CreateTradeResponse,
+  CreateTransferResponse,
+  CreateTransferResponseV1,
+  CreateWithdrawalResponse,
+  GetSignableCancelOrderRequest,
+  GetSignableTradeRequest,
+  NftTransferDetails,
+  TokenAmount,
+  UnsignedExchangeTransferRequest,
+  UnsignedOrderRequest,
+  UnsignedTransferRequest,
+} from 'types';
 import { TransactionResponse } from '@ethersproject/providers';
 
 export interface IMXProvider {

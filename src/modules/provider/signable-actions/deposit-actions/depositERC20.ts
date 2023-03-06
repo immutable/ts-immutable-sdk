@@ -8,7 +8,7 @@ import {
   TokensApi,
   UsersApi,
 } from '@imtbl/core-sdk';
-import { Configuration } from 'src/config';
+import { Configuration } from 'config';
 import { TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import { BigNumber } from '@ethersproject/bignumber';

@@ -1,3 +1,7 @@
+/*
+ * @jest-environment jsdom
+ */
+
 import { RequestEventType, ResponseEventType } from './events';
 import { ImxSigner } from './ImxSigner';
 import { postRequestMessage } from './postRequestMessage';
