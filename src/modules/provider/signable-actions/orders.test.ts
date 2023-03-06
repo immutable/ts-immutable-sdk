@@ -1,5 +1,5 @@
 import { configuration, SharedContext } from '../test/sharedContext';
-import { UnsignedOrderRequest, OrdersApi } from '@imtbl/core-sdk';
+import { UnsignedOrderRequest, OrdersApi, createStarkSigner } from "@imtbl/core-sdk";
 import { parseEther } from '@ethersproject/units';
 import { createOrder } from './orders';
 import { Configuration } from '../../../config';
@@ -12,6 +12,13 @@ jest.mock('@imtbl/core-sdk')
 
 describe('Orders', () => {
   let getSignableOrderMock: jest.Mock;
+  let createOrderMock: jest.Mock;
+  const orderResponse = {
+    order_id: 0,
+    request_id: "123456",
+    status: "some-status",
+    time: 0
+  };
 
   beforeEach(() => {
     jest.restoreAllMocks()
@@ -21,9 +28,16 @@ describe('Orders', () => {
         payload_hash: "hash"
       }
     });
+    createOrderMock = jest.fn().mockResolvedValue({
+      data: orderResponse
+    });
     (OrdersApi as jest.Mock).mockReturnValue({
-      getSignableOrder: getSignableOrderMock
-    })
+      getSignableOrder: getSignableOrderMock,
+      createOrder: createOrderMock,
+    });
+    (createStarkSigner as jest.Mock).mockReturnValue({
+      signMessage: ()=>"Signed message"
+    });
   })
 
   test('Correctly signs string', async () => {
@@ -46,10 +60,12 @@ describe('Orders', () => {
     const createOrderResponse = await createOrder({
       signers,
       request,
-      config: config,
+      config,
     });
+    console.log(createOrderResponse)
+    console.log(orderResponse)
 
-    //expect(spy).toHaveBeenCalledTimes(1);
+    expect(createOrderResponse).toEqual(orderResponse);
 
     // throw createOrderResponse
   })

@@ -53,6 +53,8 @@ export class SharedContext {
     );
 
     this.userOneSigners = signers;
+    console.log(this.userOneSigners.starkExSigner)
+    console.log(this.userOneSigners.ethSigner)
     return this.userOneSigners;
   }
 
