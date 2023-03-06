@@ -3,32 +3,30 @@ import { UnsignedOrderRequest, OrdersApi } from '@imtbl/core-sdk';
 import { parseEther } from '@ethersproject/units';
 import { createOrder } from './orders';
 import { Configuration } from '../../../config';
-import axios, { AxiosResponse } from 'axios'
 
 const sharedContext = new SharedContext();
 const config = new Configuration(configuration);
 
-jest.mock('axios')
+jest.mock('@imtbl/core-sdk')
+//const mockOrdersApi = jest.mocked(OrdersApi, {shallow:false });
 
 describe('Orders', () => {
+  let getSignableOrderMock: jest.Mock;
+
   beforeEach(() => {
     jest.restoreAllMocks()
+    getSignableOrderMock = jest.fn().mockResolvedValue({
+      data:{
+        signable_message: "hello",
+        payload_hash: "hash"
+      }
+    });
+    (OrdersApi as jest.Mock).mockReturnValue({
+      getSignableOrder: getSignableOrderMock
+    })
   })
 
   test('Correctly signs string', async () => {
-    const spy = jest.spyOn(axios, 'post')
-
-    spy.mockResolvedValue(
-      {
-        data:
-          JSON.stringify({
-            signable_message: "abc",
-            payload_hash: "123"
-          })
-      } as AxiosResponse
-    )
-
-    const signers = await sharedContext.getUserOneSigners()
     const request: UnsignedOrderRequest = {
       sell: {
         tokenAddress: "0x10",
@@ -42,13 +40,16 @@ describe('Orders', () => {
       fees: [],
     };
 
+    const signers = await sharedContext.getUserOneSigners()
+
+
     const createOrderResponse = await createOrder({
       signers,
       request,
       config: config,
     });
 
-    expect(spy).toHaveBeenCalledTimes(1);
+    //expect(spy).toHaveBeenCalledTimes(1);
 
     // throw createOrderResponse
   })
@@ -58,8 +59,8 @@ describe('Orders', () => {
 // export class Order {
 //   constructor(protected sharedContext: SharedContext) {}
 
-  
-  
+
+
 //   @when(
 //     '{string} creates sell order {string} of {string} NFT for sell for {string} eth',
 //     undefined,

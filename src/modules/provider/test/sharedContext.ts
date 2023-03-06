@@ -8,9 +8,8 @@ import {
   MintResultDetails,
   UnsignedOrderRequest,
   createStarkSigner,
-  NftprimarytransactionCreateResponse,
-  NftsecondarytransactionCreateResponse,
-} from '@imtbl/core-sdk';
+  NftprimarytransactionCreateResponse, ImmutableXConfiguration
+} from "@imtbl/core-sdk";
 import { env } from './common';
 import { AlchemyProvider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
@@ -19,7 +18,24 @@ import { Signers } from '../signable-actions/types';
 
 const provider = new AlchemyProvider(env.network, env.alchemyApiKey);
 
-export const configuration = Config.SANDBOX;
+export const configuration = {
+  ethConfiguration: {
+    chainID: 5
+  },
+  apiConfiguration: {
+    "accessToken": undefined,
+    "apiKey": undefined,
+    "baseOptions": {
+      "headers": {
+        "x-sdk-version": "imx-core-sdk-ts-1.0.1",
+      },
+    },
+    "basePath": "https://api.sandbox.x.immutable.com",
+    "formDataCtor": undefined,
+    "password": undefined,
+    "username": undefined,
+  }
+};
 
 export class SharedContext {
   userOneSigners?: Signers;
