@@ -1,5 +1,4 @@
-import { EthSigner } from 'types';
-import { StarkSigner } from "../../../types";
+import { EthSigner, StarkSigner } from 'types';
 
 export type Signers = {
   ethSigner: EthSigner;
