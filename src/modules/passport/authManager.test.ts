@@ -17,13 +17,16 @@ describe('AuthManager', () => {
   let authManager: AuthManager;
   let signInMock: jest.Mock;
   let signinPopupCallbackMock: jest.Mock;
+  let signinSilentMock: jest.Mock;
 
   beforeEach(() => {
     signInMock = jest.fn();
     signinPopupCallbackMock = jest.fn();
+    signinSilentMock = jest.fn();
     (UserManager as jest.Mock).mockReturnValue({
       signinPopup: signInMock,
       signinPopupCallback: signinPopupCallbackMock,
+      signinSilent: signinSilentMock,
     });
     authManager = new AuthManager(authConfig);
   });
@@ -45,5 +48,11 @@ describe('AuthManager', () => {
     await authManager.loginCallback();
 
     expect(signinPopupCallbackMock).toBeCalled();
+  });
+
+  it('should call refresh token', async () => {
+    await authManager.refreshToken();
+
+    expect(signinSilentMock).toBeCalled();
   });
 });
