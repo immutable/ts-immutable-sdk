@@ -1,6 +1,6 @@
 import axios from "axios";
 import AuthManager from "./authManager";
-import {requestRefreshToken} from './registerationRefreshToken';
+import { requestRefreshToken } from './registerationRefreshToken';
 
 jest.mock('axios');
 jest.mock('./authManager');
@@ -9,11 +9,9 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const passportData = {
     passport: {
-        stark_ex: {
-            ether_key: "0x232",
-            stark_key: "0x232",
-            user_admin_key: "0x123",
-        }
+        ether_key: "0x232",
+        stark_key: "0x232",
+        user_admin_key: "0x123",
     }
 }
 

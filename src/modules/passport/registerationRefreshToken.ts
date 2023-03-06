@@ -15,8 +15,7 @@ const checkWalletAddressExists = async (jwt: string): Promise<boolean> => {
                 Authorization: `Bearer ` + jwt
             }
         });
-        const starkEx = data?.passport?.stark_ex
-        const metadataExists = !!starkEx?.ether_key && !!starkEx?.stark_key && !!starkEx?.user_admin_key;
+        const metadataExists = !!data?.passport?.ether_key && !!data?.passport?.stark_key && !!data?.passport?.user_admin_key;
         if (metadataExists) {
             return true
         }
