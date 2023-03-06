@@ -53,9 +53,12 @@ export class SharedContext {
     );
 
     this.userOneSigners = signers;
-    console.log(this.userOneSigners.starkExSigner)
-    console.log(this.userOneSigners.ethSigner)
+
     return this.userOneSigners;
+  }
+
+  public getUserOnePrivateKey(): string {
+    return env.privateKey1
   }
 
   public async getUserTwoSigners(): Promise<Signers> {
