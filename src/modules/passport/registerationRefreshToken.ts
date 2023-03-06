@@ -2,31 +2,10 @@ import axios from "axios";
 import AuthManager from "./authManager";
 import {User} from "./types";
 import {PassportErrorType, withPassportError} from "./errors/passportError";
+import {retryWithDelay} from "./util/retry";
 
 // TODO: This is a static Auth0 domain that could come from env or config file
 const PASSPORT_AUTH_DOMAIN = 'https://auth.dev.immutable.com';
-const POLL_INTERVAL = 1 * 1000;    // every 2 seconds
-const MAX_RETRIES = 5;
-
-const wait = (ms: number) => new Promise<void>((resolve) => {
-    setTimeout(() => resolve(), ms)
-})
-
-const retryWithDelay = async (
-    fn: any, retries = MAX_RETRIES, interval = POLL_INTERVAL,
-    finalErr = Error('Retry failed querying user metadata')
-): Promise<void> => {
-    try {
-        await fn()
-    } catch (err) {
-        if (retries <= 0) {
-            return Promise.reject(finalErr);
-        }
-        console.info(`retrying remaining ${retries} times`)
-        await wait(interval)
-        return retryWithDelay(fn, (retries - 1), interval, finalErr);
-    }
-}
 
 
 const checkWalletAddressExists = async (jwt: string): Promise<boolean> => {
