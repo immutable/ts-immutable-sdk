@@ -4,7 +4,7 @@ import { parseEther } from '@ethersproject/units';
 import { createOrder } from './orders';
 import { Configuration } from '../../../config';
 import { signRaw } from './utils';
-import { convertToSignableToken } from '../../provider/signable-actions/utils'
+import { convertToSignableToken } from "./utils"
 
 const sharedContext = new SharedContext();
 const config = new Configuration(configuration);
@@ -16,6 +16,7 @@ describe('Orders', () => {
   describe('createOrder()', () => {
     let getSignableOrderMock: jest.Mock;
     let createOrderMock: jest.Mock;
+    const buyAmount = parseEther("30000").toString();
 
     const signableOrderRequest: UnsignedOrderRequest = {
       sell: {
@@ -25,14 +26,14 @@ describe('Orders', () => {
       },
       buy: {
         type: 'ETH',
-        amount: parseEther("30000").toString(),
+        amount: buyAmount,
       },
       fees: [],
     };
     const getSignableOrderResponse = {
       signable_message: "hello",
       payload_hash: "hash",
-      amount_buy: signableOrderRequest.buy.amount,
+      amount_buy: buyAmount,
       amount_sell: 1,
       asset_id_buy: "1234",
       asset_id_sell: "5678",
@@ -76,7 +77,7 @@ describe('Orders', () => {
       expect(getSignableOrderMock).toHaveBeenCalledWith({
         getSignableOrderRequestV3: {
           user: await signers.ethSigner.getAddress(),
-          amount_buy: signableOrderRequest.buy.amount,
+          amount_buy: buyAmount,
           token_buy: convertToSignableToken(signableOrderRequest.buy),
           amount_sell: "1",
           token_sell: convertToSignableToken(signableOrderRequest.sell),

@@ -1,11 +1,13 @@
-import { StarkSigner } from "@imtbl/core-sdk";
-import { Signers } from '../signable-actions/types';
+import { ImmutableXConfiguration, StarkSigner } from "@imtbl/core-sdk";
+import { Signers } from "../signable-actions/types";
 
 export const privateKey1 = "d90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36"
 export const privateKey2 = "013fe4a5265bc6deb3f3b524b987sdf987f8c7a8ec2a998ae0512f493d763c8f"
-export const configuration = {
+export const configuration: ImmutableXConfiguration = {
   ethConfiguration: {
-    chainID: 5
+    chainID: 5,
+    coreContractAddress: '0x7917eDb51ecD6CdB3F9854c3cc593F33de10c623',
+    registrationContractAddress: '0x1C97Ada273C9A52253f463042f29117090Cd7D83',
   },
   apiConfiguration: {
     "accessToken": undefined,
@@ -19,6 +21,9 @@ export const configuration = {
     "formDataCtor": undefined,
     "password": undefined,
     "username": undefined,
+    isJsonMime(): boolean {
+      return true;
+    }
   }
 };
 
@@ -30,11 +35,9 @@ export class SharedContext {
     if (this.userOneSigners !== undefined) {
       return this.userOneSigners;
     }
-    const signers = await generateSigners(
+    this.userOneSigners = await generateSigners(
       privateKey1,
     );
-
-    this.userOneSigners = signers;
 
     return this.userOneSigners;
   }
@@ -48,11 +51,9 @@ export class SharedContext {
       return this.userTwoSigners;
     }
 
-    const signers = await generateSigners(
+    this.userTwoSigners = await generateSigners(
       privateKey2,
     );
-
-    this.userTwoSigners = signers;
 
     return this.userTwoSigners;
   }
