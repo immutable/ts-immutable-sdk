@@ -20,7 +20,8 @@ describe('requestRefreshToken', () => {
         mockedAxios.get.mockClear();
     });
     it('requestRefreshToken successful with user wallet address in metadata', async () => {
-        const mockUpdatedUser = { access_token: '123' };
+        const mockUpdatedUser = { access_token: "123" };
+        const expected = { accessToken: "123", etherKey: passportData.passport.ether_key };
         (AuthManager as jest.Mock).mockReturnValue({
             refreshToken: jest.fn().mockReturnValue(mockUpdatedUser),
         });
@@ -37,7 +38,7 @@ describe('requestRefreshToken', () => {
 
         const res = await requestRefreshToken(authManager, mockToken);
 
-        expect(res).toEqual(mockUpdatedUser)
+        expect(res).toEqual(expected)
         expect(authManager.refreshToken).toHaveBeenCalledTimes(1)
         expect(mockedAxios.get).toHaveBeenCalledWith('https://auth.dev.immutable.com/userinfo', { 'headers': { 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ' } }
         )

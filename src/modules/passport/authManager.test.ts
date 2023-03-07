@@ -1,15 +1,34 @@
+import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import AuthManager from './authManager';
-import { User, UserManager } from 'oidc-client-ts';
+import { PassportError, PassportErrorType } from './errors/passportError';
+import { User } from './types';
 
 jest.mock('oidc-client-ts');
 
 const authConfig = { clientId: '11111', redirectUri: 'http://test.com' };
-const mockUser: User = {
-  access_token: 'xxxxx',
+const mockOidcUser: OidcUser = {
+  id_token: 'id123',
+  access_token: 'access123',
+  refresh_token: 'refresh123',
   token_type: 'Bearer',
   scope: 'openid',
   expires_in: 167222,
-} as User;
+  profile: {
+    sub: 'email|123',
+    email: 'test@immutable.com',
+    nickname: 'test',
+  },
+} as OidcUser;
+const mockUser: User = {
+  idToken: 'id123',
+  accessToken: 'access123',
+  refreshToken: 'refresh123',
+  profile: {
+    sub: 'email|123',
+    email: 'test@immutable.com',
+    nickname: 'test',
+  },
+};
 
 describe('AuthManager', () => {
   afterEach(jest.resetAllMocks);
@@ -17,42 +36,78 @@ describe('AuthManager', () => {
   let authManager: AuthManager;
   let signInMock: jest.Mock;
   let signinPopupCallbackMock: jest.Mock;
+  let getUserMock: jest.Mock;
   let signinSilentMock: jest.Mock;
 
   beforeEach(() => {
     signInMock = jest.fn();
     signinPopupCallbackMock = jest.fn();
+    getUserMock = jest.fn();
     signinSilentMock = jest.fn();
     (UserManager as jest.Mock).mockReturnValue({
       signinPopup: signInMock,
       signinPopupCallback: signinPopupCallbackMock,
+      getUser: getUserMock,
       signinSilent: signinSilentMock,
     });
     authManager = new AuthManager(authConfig);
   });
 
-  it('should get the login user', async () => {
-    signInMock.mockResolvedValue(mockUser);
-    const user = await authManager.login();
+  describe('login', () => {
+    it('should get the login user and return the domain model', async () => {
+      signInMock.mockResolvedValue(mockOidcUser);
 
-    expect(user).toEqual(mockUser);
+      const result = await authManager.login();
+
+      expect(result).toEqual(mockUser);
+    });
+
+    it('should throw the error if user is failed to login', async () => {
+      signInMock.mockRejectedValue(new Error('NONO'));
+
+      await expect(() => authManager.login()).rejects.toThrow(
+        new PassportError(
+          'AUTHENTICATION_ERROR: NONO',
+          PassportErrorType.AUTHENTICATION_ERROR,
+        )
+      );
+    });
   });
 
-  it('should throw the error if user is failed to login', async () => {
-    signInMock.mockRejectedValue(new Error('NONO'));
+  describe('loginCallback', () => {
+    it('should call login callback', async () => {
+      await authManager.loginCallback();
 
-    await expect(authManager.login()).rejects.toThrow();
+      expect(signinPopupCallbackMock).toBeCalled();
+    });
   });
 
-  it('should call login callback', async () => {
-    await authManager.loginCallback();
+  describe('refreshToken', () => {
+    it('should call refreshToken', async () => {
+      await authManager.refreshToken();
 
-    expect(signinPopupCallbackMock).toBeCalled();
+      expect(signinSilentMock).toBeCalled();
+    });
   });
 
-  it('should call refresh token', async () => {
-    await authManager.refreshToken();
+  describe('getUser', () => {
+    it('should retrieve the user from the userManager and return the domain model', async () => {
+      getUserMock.mockReturnValue(mockOidcUser);
 
-    expect(signinSilentMock).toBeCalled();
+      const result = await authManager.getUser();
+
+      expect(result).toEqual(mockUser);
+    });
+
+    it('should throw an error if no user is returned', async () => {
+      getUserMock.mockReturnValue(null);
+
+      await expect(() => authManager.getUser()).rejects.toThrow(
+        new PassportError(
+          'NOT_LOGGED_IN_ERROR: Failed to retrieve user',
+          PassportErrorType.NOT_LOGGED_IN_ERROR,
+        )
+      );
+    });
   });
 });

@@ -1,7 +1,8 @@
 export enum PassportErrorType {
-  AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR', // Failed to Connect with auth provider
-  INVALID_CONFIGURATION = 'INVALID_CONFIGURATION', // Missing the configuration
+  AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR',
+  INVALID_CONFIGURATION = 'INVALID_CONFIGURATION',
   WALLET_CONNECTION_ERROR = 'WALLET_CONNECTION_ERROR',
+  NOT_LOGGED_IN_ERROR = 'NOT_LOGGED_IN_ERROR',
   REFRESH_TOKEN_ERROR = 'REFRESH_TOKEN_ERROR',
   FETCHING_USER_INFO_ERROR = 'FETCHING_USER_INFO_ERROR',
 }
@@ -32,4 +33,4 @@ export const withPassportError = async <T>(
       'UnknownError';
     throw new PassportError(errorMessage, customError.type);
   }
-};
+}

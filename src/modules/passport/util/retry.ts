@@ -13,14 +13,14 @@ const wait = (ms: number) => new Promise<void>((resolve) => {
 
 export const retryWithDelay = async <T>(
     fn: () => Promise<T>, options?: RetryOption
-): Promise<void> => {
+): Promise<T> => {
     const {
         retries = MAX_RETRIES,
         interval = POLL_INTERVAL,
         finalErr = Error('Retry failed')
     } = options || {}
     try {
-        await fn()
+       return await fn()
     } catch (err) {
         if (retries <= 0) {
             return Promise.reject(finalErr);
