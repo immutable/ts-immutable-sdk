@@ -10,7 +10,7 @@ const PASSPORT_AUTH_DOMAIN = 'https://auth.dev.immutable.com';
 
 const checkWalletAddressExists = async (jwt: string): Promise<boolean> => {
     return withPassportError<boolean>(async () => {
-        const {data} = await axios.get(`${PASSPORT_AUTH_DOMAIN}/userinfo`, {
+        const { data } = await axios.get(`${PASSPORT_AUTH_DOMAIN}/userinfo`, {
             headers: {
                 Authorization: `Bearer ` + jwt
             }
