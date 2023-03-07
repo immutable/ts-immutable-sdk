@@ -29,7 +29,7 @@ describe('requestRefreshToken', () => {
                 ...passportData,
             }
         };
-        const authManager = new AuthManager({clientId: "", redirectUri: ""});
+        const authManager = new AuthManager({clientId: '', redirectUri: ''});
         mockedAxios.get.mockImplementationOnce(() => Promise.resolve(response));
 
         const res = await requestRefreshToken(authManager, mockToken);
