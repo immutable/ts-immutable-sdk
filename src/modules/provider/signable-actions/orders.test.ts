@@ -2,11 +2,11 @@ import { testConfig, generateSigners, privateKey1 } from "../test/helpers";
 import { UnsignedOrderRequest, OrdersApi } from "@imtbl/core-sdk";
 import { parseEther } from '@ethersproject/units';
 import { createOrder } from './orders';
-import { Configuration } from '../../../config';
+import { Configuration, Environment } from 'config';
 import { signRaw } from './utils';
 import { convertToSignableToken } from "./utils"
 
-const config = new Configuration(testConfig);
+const config = new Configuration({ ...testConfig, env: Environment.SANDBOX });
 
 jest.mock('@imtbl/core-sdk')
 jest.mock('./utils')
