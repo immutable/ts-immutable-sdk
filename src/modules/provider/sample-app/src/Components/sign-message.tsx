@@ -11,7 +11,6 @@ export const SignMessage = () => {
             <>
                 <Heading size='medium'>Sign a message</Heading>
                 <p>Sign a message using the layer 2 IMX signer</p>
-                <p>Note: This message must be hexadecimal</p>
                 <FormControl>
                     <TextInput
                         sx={{ w: 'base.border.size.100' }}
@@ -24,8 +23,8 @@ export const SignMessage = () => {
     }
 
     const updateSignMessage = (event: any) => {
-        setSignMessage(event.target.value);
-        // Buffer.from(event.target.value, "utf8").toString("hex")
+        const hex = Buffer.from(event.target.value, "utf8").toString("hex");
+        setSignMessage(hex);
     }
 
     const sign = async () => {
