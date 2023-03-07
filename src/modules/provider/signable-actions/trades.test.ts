@@ -7,8 +7,8 @@ import { createTrade } from "./trades";
 jest.mock('@imtbl/core-sdk')
 jest.mock('./utils')
 
-describe('Orders', () => {
-  describe('createOrder()', () => {
+describe('Trades', () => {
+  describe('createTrade()', () => {
     let getSignableTradeMock: jest.Mock;
     let createTradeMock: jest.Mock;
 
@@ -48,7 +48,7 @@ describe('Orders', () => {
       (signRaw as jest.Mock).mockReturnValue("raw-eth-signature");
     })
 
-    test('should make the correct api requests with the correct params, and return the correct receipt', async () => {
+    test('should make the api requests with the correct params', async () => {
       const signers = await generateSigners(privateKey1)
       const ethKey = await signers.ethSigner.getAddress();
 
