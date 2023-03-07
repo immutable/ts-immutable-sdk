@@ -1,6 +1,6 @@
 import axios from 'axios';
 import AuthManager from './authManager';
-import {requestRefreshToken} from './registerationRefreshToken';
+import { requestRefreshToken } from './registerationRefreshToken';
 
 jest.mock('axios');
 jest.mock('./authManager');
