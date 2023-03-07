@@ -5,7 +5,7 @@ import { PassportError, PassportErrorType } from './errors/passportError';
 import { getStarkSigner } from './stark';
 import PassportImxProvider from './imxProvider/passportImxProvider';
 import { IMXProvider } from '../provider/imxProvider';
-import {requestRefreshToken} from "./registerationRefreshToken";
+import { requestRefreshToken } from "./registerationRefreshToken";
 
 export type PassportConfig = {
   clientId: string;
