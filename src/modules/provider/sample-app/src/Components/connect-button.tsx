@@ -1,9 +1,6 @@
 import {Button, Heading } from '@biom3/react'
-import { Web3Provider } from '@ethersproject/providers/lib/web3-provider';
 import { useContext } from 'react';
-import { ImxSigner } from 'ts-immutable-sdk';
 import { connect, imxConnect } from 'ts-immutable-sdk';
-import { Environment } from '../constants';
 import { Actions, AppCtx } from '../Context/app-context';
 
 export const ConnectButton = () => {
