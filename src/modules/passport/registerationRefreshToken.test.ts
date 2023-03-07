@@ -17,7 +17,7 @@ const passportData = {
 
 describe('requestRefreshToken', () => {
     it('requestRefreshToken successful with user wallet address in metadata', async () => {
-        const mockUpdatedUser = {access_token: "123"};
+        const mockUpdatedUser = { access_token: '123' };
         (AuthManager as jest.Mock).mockReturnValue({
             refreshToken: jest.fn().mockReturnValue(mockUpdatedUser),
         });
