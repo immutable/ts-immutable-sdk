@@ -38,5 +38,3 @@ export const SANDBOX: StarkExConfig = {
   ...CoreSDKConfigOptions.SANDBOX,
   env: Environment.SANDBOX,
 };
-
-// FIXME: should we have a createConfig function here also?
