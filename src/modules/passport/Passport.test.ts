@@ -91,6 +91,7 @@ describe('Passport', () => {
       const userMock: User = {
         idToken: 'id123',
         refreshToken: 'refresh123',
+        accessToken: 'access123',
         profile: {
           sub: 'email|123',
         },
