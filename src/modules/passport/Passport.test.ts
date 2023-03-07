@@ -10,7 +10,7 @@ jest.mock('./magicAdapter');
 jest.mock('./stark/getStarkSigner');
 jest.mock('axios');
 
-const config = {clientId: '11111', redirectUri: 'http://test.com'};
+const config = { clientId: '11111', redirectUri: 'http://test.com' };
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Passport', () => {
@@ -62,7 +62,7 @@ describe('Passport', () => {
 
     describe('connectImx', () => {
         it('should execute connect without error', async () => {
-            magicLoginMock.mockResolvedValue({getSigner: jest.fn()});
+            magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
             refreshToken.mockResolvedValue({})
             await passport.connectImx();
 
@@ -72,7 +72,7 @@ describe('Passport', () => {
         }, 15000);
 
         it('should execute connect with refresh error', async () => {
-            magicLoginMock.mockResolvedValue({getSigner: jest.fn()});
+            magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
             refreshToken.mockRejectedValue("");
 
             await expect(passport.connectImx())

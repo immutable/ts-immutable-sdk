@@ -27,6 +27,6 @@ export const retryWithDelay = async <T>(
         }
         console.info(`retrying remaining ${retries} times`)
         await wait(interval)
-        return retryWithDelay(fn, {retries: (retries - 1), finalErr});
+        return retryWithDelay(fn, { retries: (retries - 1), finalErr });
     }
 }
