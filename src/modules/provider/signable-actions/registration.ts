@@ -1,8 +1,7 @@
-import { RegisterUserResponse, GetSignableRegistrationResponse } from 'types';
+import { RegisterUserResponse, GetSignableRegistrationResponse, EthSigner } from 'types';
 import { Signers } from './types';
 import { validateChain } from './helpers';
 import {
-  EthSigner,
   Contracts,
   UsersApi,
 } from '@imtbl/core-sdk';

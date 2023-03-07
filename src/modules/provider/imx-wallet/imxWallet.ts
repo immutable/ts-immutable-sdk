@@ -13,7 +13,7 @@ import {
 import { postRequestMessage } from './postRequestMessage';
 import { messageResponseListener } from './messageResponseListener';
 import { ImxSigner } from './ImxSigner';
-import { Environment } from '../constants';
+import { Environment } from 'config';
 import { getOrSetupIFrame } from './imxWalletIFrame';
 
 const DEFAULT_CONNECTION_MESSAGE =
