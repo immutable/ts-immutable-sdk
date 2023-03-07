@@ -85,7 +85,6 @@ export default class AuthManager {
   public async requestRefreshToken(jwt: string): Promise<User | null> {
     return withPassportError<User | null>(async () => {
       const etherKey = await retryWithDelay(() => getEtherKeyFromUserMetadata(passportAuthDomain, jwt));
-      console.info('requesting refresh token');
       const updatedUser = await this.refreshToken();
       if (!updatedUser) {
         return null;
