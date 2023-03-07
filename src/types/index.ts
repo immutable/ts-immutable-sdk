@@ -8,6 +8,7 @@ export {
   UnsignedTransferRequest,
   UnsignedMintRequest,
   UnsignedExchangeTransferRequest,
+  EthSigner,
   StarkSigner,
   WalletConnection,
   ERC20Token,
