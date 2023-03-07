@@ -2,7 +2,7 @@ import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { User } from './types';
 import { retryWithDelay } from './util/retry';
-import { getEtherKeyFromUserMetadata } from './getEtherKeyFromUserMetadata';
+import { getUserEtherKeyFromMetadata } from './getUserMetadata';
 
 type AuthInput = {
   clientId: string;
@@ -76,16 +76,10 @@ export default class AuthManager {
     });
   }
 
-  public async refreshToken(): Promise<OidcUser | null> {
-    return withPassportError<OidcUser | null>(async () => this.userManager.signinSilent(), {
-      type: PassportErrorType.REFRESH_TOKEN_ERROR,
-    });
-  }
-
   public async requestRefreshToken(jwt: string): Promise<User | null> {
     return withPassportError<User | null>(async () => {
-      const etherKey = await retryWithDelay(() => getEtherKeyFromUserMetadata(passportAuthDomain, jwt));
-      const updatedUser = await this.refreshToken();
+      const etherKey = await retryWithDelay(() => getUserEtherKeyFromMetadata(passportAuthDomain, jwt));
+      const updatedUser = await this.userManager.signinSilent();
       if (!updatedUser) {
         return null;
       }

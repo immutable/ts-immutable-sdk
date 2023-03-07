@@ -86,14 +86,6 @@ describe('AuthManager', () => {
     });
   });
 
-  describe('refreshToken', () => {
-    it('should call refreshToken', async () => {
-      await authManager.refreshToken();
-
-      expect(signinSilentMock).toBeCalled();
-    });
-  });
-
   describe('getUser', () => {
     it('should retrieve the user from the userManager and return the domain model', async () => {
       getUserMock.mockReturnValue(mockOidcUser);
