@@ -1,10 +1,10 @@
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
-import { Networks } from './types';
+import PassportImxProvider from './imxProvider/passportImxProvider';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { getStarkSigner } from './stark';
-import PassportImxProvider from './imxProvider/passportImxProvider';
-import { IMXProvider } from '../provider/imxProvider';
+import { Networks, UserProfile } from './types';
+import { IMXProvider } from '../provider';
 
 export type PassportConfig = {
   clientId: string;
@@ -39,18 +39,23 @@ export class Passport {
 
   public async connectImx(): Promise<IMXProvider> {
     const user = await this.authManager.login();
-    if (!user.id_token) {
+    if (!user.idToken) {
       throw new PassportError(
         'Failed to initialise',
         PassportErrorType.WALLET_CONNECTION_ERROR
       );
     }
-    const provider = await this.magicAdapter.login(user.id_token);
+    const provider = await this.magicAdapter.login(user.idToken);
     const signer = await getStarkSigner(provider.getSigner());
     return new PassportImxProvider(user, signer);
   }
 
   public async loginCallback(): Promise<void> {
     return this.authManager.loginCallback();
+  }
+
+  public async getUserInfo(): Promise<UserProfile> {
+    const user = await this.authManager.getUser();
+    return user.profile;
   }
 }
