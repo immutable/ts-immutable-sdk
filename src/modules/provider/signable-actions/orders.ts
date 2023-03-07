@@ -6,7 +6,7 @@ import {
   OrdersApiCreateOrderRequest,
   UnsignedOrderRequest,
 } from 'types';
-import { convertToSignableToken } from './utils/convertToSignableToken';
+import { convertToSignableToken } from './utils';
 import { signRaw } from './utils';
 import { Signers } from './types';
 import { Configuration } from 'config';
