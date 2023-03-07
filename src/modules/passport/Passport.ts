@@ -54,7 +54,7 @@ export class Passport {
     return this.authManager.loginCallback();
   }
 
-  public async getUserInfo(): Promise<UserProfile | undefined> {
+  public async getUserInfo(): Promise<UserProfile> {
     const user = await this.authManager.getUser();
     return user.profile;
   }
