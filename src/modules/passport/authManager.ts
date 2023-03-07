@@ -32,23 +32,16 @@ export default class AuthManager {
     );
   }
 
-  private mapOidcUserToDomainModel(oidcUser: OidcUser): User {
-    const user: User = {
-      idToken: oidcUser.id_token,
-      accessToken: oidcUser.access_token,
-      refreshToken: oidcUser.refresh_token,
-    };
-
-    if (oidcUser.profile) {
-      user.profile = {
-        sub: oidcUser.profile.sub,
-        email: oidcUser.profile.email,
-        nickname: oidcUser.profile.nickname,
-      };
-    }
-
-    return user;
-  }
+  private mapOidcUserToDomainModel = (oidcUser: OidcUser): User => ({
+    idToken: oidcUser.id_token,
+    accessToken: oidcUser.access_token,
+    refreshToken: oidcUser.refresh_token,
+    profile: {
+      sub: oidcUser.profile.sub,
+      email: oidcUser.profile.email,
+      nickname: oidcUser.profile.nickname,
+    },
+  });
 
   public async login(): Promise<User> {
     return withPassportError<User>(async () => {

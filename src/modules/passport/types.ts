@@ -9,7 +9,7 @@ export type UserProfile = {
 
 export type User = {
   idToken?: string;
-  accessToken?: string;
+  accessToken: string;
   refreshToken?: string;
-  profile?: UserProfile;
+  profile: UserProfile;
 };

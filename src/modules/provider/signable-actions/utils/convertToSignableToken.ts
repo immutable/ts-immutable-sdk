@@ -1,4 +1,4 @@
-import { TokenAmount, SignableToken } from "src/types"
+import { TokenAmount, SignableToken } from 'types';
 
 /**
  * Helper method to convert token type to a SignableToken type

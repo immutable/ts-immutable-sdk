@@ -6,7 +6,7 @@ import {
 import { messageResponseListener } from './messageResponseListener';
 import { postRequestMessage } from './postRequestMessage';
 import { SignMessageRequest, SignMessageResponse } from './types';
-import { StarkSigner } from '../../../types';
+import { StarkSigner } from 'types';
 
 export class ImxSigner implements StarkSigner {
   private publicAddress;

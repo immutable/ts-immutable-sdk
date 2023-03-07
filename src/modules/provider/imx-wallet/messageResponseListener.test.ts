@@ -1,4 +1,8 @@
-import { Environment } from '../constants';
+/*
+ * @jest-environment jsdom
+ */
+
+import { Environment } from 'config';
 import { ConnectResponse } from './types';
 import { ResponseEventType } from './events';
 import { messageResponseListener } from './messageResponseListener';
