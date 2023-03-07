@@ -23,7 +23,7 @@ type BatchTransfersWorkflowParams = {
   config: Configuration;
 };
 
-export async function transfers({
+export async function transfer({
   signers: { ethSigner, starkExSigner },
   request,
   config,
