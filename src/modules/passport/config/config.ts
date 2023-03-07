@@ -7,13 +7,13 @@ export enum Networks {
 }
 
 export interface PassportConfiguration {
-  network: Networks,
+  network: Networks;
   oidcConfiguration: {
-    authenticationDomain: string
+    authenticationDomain: string;
     clientId: string;
     logoutRedirectUri: string;
     redirectUri: string;
-  },
+  };
   magicPublishableApiKey: string;
   magicProviderId: string;
 }
@@ -55,4 +55,4 @@ export const ValidateConfig = ({ oidcConfiguration }: PassportConfiguration) => 
       PassportErrorType.INVALID_CONFIGURATION
     );
   }
-}
+};
