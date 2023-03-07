@@ -1,10 +1,5 @@
 import axios from 'axios';
-
-type PassportMetadata = {
-  ether_key: string;
-  stark_key: string;
-  user_admin_key: string;
-}
+import { PassportMetadata } from './types';
 
 export const getUserEtherKeyFromMetadata = async (authDomain: string, jwt: string): Promise<string> => {
   const passportData = await getUserPassportMetadata(authDomain, jwt);

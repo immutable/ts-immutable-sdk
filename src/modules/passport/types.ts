@@ -14,3 +14,9 @@ export type User = {
   profile: UserProfile;
   etherKey?: string;
 };
+
+export type PassportMetadata = {
+  ether_key: string;
+  stark_key: string;
+  user_admin_key: string;
+}

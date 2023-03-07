@@ -10,6 +10,15 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 jest.mock('oidc-client-ts');
 
 const authConfig = { clientId: '11111', redirectUri: 'http://test.com' };
+
+const passportData = {
+  passport: {
+    ether_key: '0x232',
+    stark_key: '0x567',
+    user_admin_key: '0x123',
+  }
+};
+
 const mockOidcUser: OidcUser = {
   id_token: 'id123',
   access_token: 'access123',
@@ -23,6 +32,11 @@ const mockOidcUser: OidcUser = {
     nickname: 'test',
   },
 } as OidcUser;
+
+const mockOidcUserWithPassportInfo: OidcUser = {
+  ...mockOidcUser,
+  profile: { ...mockOidcUser.profile, ...passportData }
+} as never;
 const mockUser: User = {
   idToken: 'id123',
   accessToken: 'access123',
@@ -32,6 +46,7 @@ const mockUser: User = {
     email: 'test@immutable.com',
     nickname: 'test',
   },
+  etherKey: "",
 };
 
 describe('AuthManager', () => {
@@ -64,6 +79,14 @@ describe('AuthManager', () => {
       const result = await authManager.login();
 
       expect(result).toEqual(mockUser);
+    });
+
+    it('should get the login user and return the user with ether key info', async () => {
+      signInMock.mockResolvedValue(mockOidcUserWithPassportInfo);
+
+      const result = await authManager.login();
+
+      expect(result).toEqual({ ...mockUser, etherKey: passportData.passport.ether_key });
     });
 
     it('should throw the error if user is failed to login', async () => {
@@ -106,18 +129,11 @@ describe('AuthManager', () => {
       );
     });
   });
-  describe('requestRefreshToken', () => {
-    const passportData = {
-      passport: {
-        ether_key: '0x232',
-        stark_key: '0x567',
-        user_admin_key: '0x123',
-      }
-    };
+  describe('requestRefreshTokenAfterRegistration', () => {
     afterEach(() => {
       mockedAxios.get.mockClear();
     });
-    it('requestRefreshToken successful with user wallet address in metadata', async () => {
+    it('requestRefreshTokenAfterRegistration successful with user wallet address in metadata', async () => {
       const mockUpdatedUser = { access_token: "123" };
       const expected = { accessToken: "123", etherKey: passportData.passport.ether_key };
       signinSilentMock.mockReturnValue(mockUpdatedUser);
@@ -131,7 +147,7 @@ describe('AuthManager', () => {
       };
       mockedAxios.get.mockImplementationOnce(() => Promise.resolve(response));
 
-      const res = await authManager.requestRefreshToken(mockToken);
+      const res = await authManager.requestRefreshTokenAfterRegistration(mockToken);
 
       expect(res).toEqual(expected);
       expect(signinSilentMock).toHaveBeenCalledTimes(1);
@@ -139,7 +155,7 @@ describe('AuthManager', () => {
       );
     });
 
-    it('requestRefreshToken failed without user wallet address in metadata with retries', async () => {
+    it('requestRefreshTokenAfterRegistration failed without user wallet address in metadata with retries', async () => {
       const response = {
         data: {
           'sub': 'email|63a3c1ada9d926a4845a3f0c',
@@ -149,7 +165,7 @@ describe('AuthManager', () => {
       const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
       mockedAxios.get.mockImplementationOnce(() => Promise.resolve(response));
 
-      await expect(authManager.requestRefreshToken(mockToken))
+      await expect(authManager.requestRefreshTokenAfterRegistration(mockToken))
         .rejects
         .toThrow('REFRESH_TOKEN_ERROR');
 
@@ -157,14 +173,14 @@ describe('AuthManager', () => {
 
     }, 15000);
 
-    it('requestRefreshToken failed with fetching user info error in metadata with retries', async () => {
+    it('requestRefreshTokenAfterRegistration failed with fetching user info error in metadata with retries', async () => {
       const response = {
         status: 500
       };
       const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
       mockedAxios.get.mockImplementationOnce(() => Promise.reject(response));
 
-      await expect(authManager.requestRefreshToken(mockToken))
+      await expect(authManager.requestRefreshTokenAfterRegistration(mockToken))
         .rejects
         .toThrow('REFRESH_TOKEN_ERROR');
 

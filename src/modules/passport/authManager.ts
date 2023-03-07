@@ -1,6 +1,6 @@
 import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import { PassportErrorType, withPassportError } from './errors/passportError';
-import { User } from './types';
+import { PassportMetadata, User } from './types';
 import { retryWithDelay } from './util/retry';
 import { getUserEtherKeyFromMetadata } from './getUserMetadata';
 
@@ -21,6 +21,7 @@ const getAuthConfiguration = ({ clientId, redirectUri }: AuthInput) => ({
     authorization_endpoint: `${passportAuthDomain}/authorize`,
     token_endpoint: `${passportAuthDomain}/oauth/token`,
   },
+  loadUserInfo: true,
 });
 
 export default class AuthManager {
@@ -35,16 +36,20 @@ export default class AuthManager {
     );
   }
 
-  private mapOidcUserToDomainModel = (oidcUser: OidcUser): User => ({
-    idToken: oidcUser.id_token,
-    accessToken: oidcUser.access_token,
-    refreshToken: oidcUser.refresh_token,
-    profile: {
-      sub: oidcUser.profile.sub,
-      email: oidcUser.profile.email,
-      nickname: oidcUser.profile.nickname,
-    },
-  });
+  private mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
+    const passport = oidcUser.profile?.passport as PassportMetadata
+    return ({
+      idToken: oidcUser.id_token,
+      accessToken: oidcUser.access_token,
+      refreshToken: oidcUser.refresh_token,
+      profile: {
+        sub: oidcUser.profile.sub,
+        email: oidcUser.profile.email,
+        nickname: oidcUser.profile.nickname,
+      },
+      etherKey: passport?.ether_key || ""
+    });
+  };
 
   public async login(): Promise<User> {
     return withPassportError<User>(async () => {
@@ -76,7 +81,7 @@ export default class AuthManager {
     });
   }
 
-  public async requestRefreshToken(jwt: string): Promise<User | null> {
+  public async requestRefreshTokenAfterRegistration(jwt: string): Promise<User | null> {
     return withPassportError<User | null>(async () => {
       const etherKey = await retryWithDelay(() => getUserEtherKeyFromMetadata(passportAuthDomain, jwt));
       const updatedUser = await this.userManager.signinSilent();

@@ -36,7 +36,7 @@ describe('Passport', () => {
       login: authLoginMock,
       loginCallback: loginCallbackMock,
       getUser: getUserMock,
-      requestRefreshToken: refreshToken,
+      requestRefreshTokenAfterRegistration: refreshToken,
     });
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,

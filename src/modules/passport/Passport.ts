@@ -38,7 +38,7 @@ export class Passport {
   }
 
   public async connectImx(): Promise<IMXProvider> {
-    const user = await this.authManager.login();
+    let user = await this.authManager.login();
     if (!user.idToken) {
       throw new PassportError(
         'Failed to initialise',
@@ -47,15 +47,17 @@ export class Passport {
     }
     const provider = await this.magicAdapter.login(user.idToken);
     const signer = await getStarkSigner(provider.getSigner());
-
-    const updatedUser = await this.authManager.requestRefreshToken(user.accessToken);
-    if (!updatedUser) {
-      throw new PassportError(
+    if (!user.etherKey) {
+      const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(user.accessToken);
+      if (!updatedUser) {
+        throw new PassportError(
           'Failed to get refresh token',
           PassportErrorType.REFRESH_TOKEN_ERROR
-      );
+        );
+      }
+      user = updatedUser;
     }
-    return new PassportImxProvider(updatedUser, signer);
+    return new PassportImxProvider(user, signer);
   }
 
   public async loginCallback(): Promise<void> {
