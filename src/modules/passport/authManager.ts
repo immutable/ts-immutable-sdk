@@ -89,10 +89,10 @@ export default class AuthManager {
         return null
       }
       return {
-        idToken: updatedUser?.id_token,
-        accessToken: updatedUser?.access_token,
-        refreshToken: updatedUser?.refresh_token,
-        profile: updatedUser?.profile,
+        idToken: updatedUser.id_token,
+        accessToken: updatedUser.access_token,
+        refreshToken: updatedUser.refresh_token,
+        profile: updatedUser.profile,
         etherKey,
       }
     }, {
