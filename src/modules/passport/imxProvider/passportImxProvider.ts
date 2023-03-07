@@ -78,7 +78,7 @@ export default class PassportImxProvider implements IMXProvider {
         } as TransfersApiCreateTransferV1Request;
 
         const headers = {
-          Authorization: 'Bearer ' + this.jwt.access_token,
+          Authorization: 'Bearer ' + this.jwt.accessToken,
         };
 
         const { data: responseData } = await this.transfersApi.createTransferV1(
