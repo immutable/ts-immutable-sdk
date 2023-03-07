@@ -2,6 +2,10 @@ import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { User } from './types';
+import axios from 'axios';
+
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 jest.mock('oidc-client-ts');
 
@@ -109,5 +113,72 @@ describe('AuthManager', () => {
         )
       );
     });
+  });
+  describe('requestRefreshToken', () => {
+      const passportData = {
+          passport: {
+              ether_key: '0x232',
+              stark_key: '0x567',
+              user_admin_key: '0x123',
+          }
+      }
+      afterEach(() => {
+      mockedAxios.get.mockClear();
+    });
+    it('requestRefreshToken successful with user wallet address in metadata', async () => {
+      const mockUpdatedUser = { access_token: "123" };
+      const expected = { accessToken: "123", etherKey: passportData.passport.ether_key };
+      signinSilentMock.mockReturnValue(mockUpdatedUser)
+      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ'
+      const response = {
+        data: {
+          'sub': 'email|63a3c1ada9d926a4845a3f0c',
+          'nickname': 'yundi.fu',
+          ...passportData,
+        }
+      };
+      mockedAxios.get.mockImplementationOnce(() => Promise.resolve(response));
+
+      const res = await authManager.requestRefreshToken(mockToken);
+
+      expect(res).toEqual(expected)
+      expect(signinSilentMock).toHaveBeenCalledTimes(1)
+      expect(mockedAxios.get).toHaveBeenCalledWith('https://auth.dev.immutable.com/userinfo', { 'headers': { 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ' } }
+      )
+    });
+
+    it('requestRefreshToken failed without user wallet address in metadata with retries', async () => {
+      const response = {
+        data: {
+          'sub': 'email|63a3c1ada9d926a4845a3f0c',
+          'nickname': 'yundi.fu',
+        }
+      };
+      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ'
+      mockedAxios.get.mockImplementationOnce(() => Promise.resolve(response));
+
+      await expect(authManager.requestRefreshToken(mockToken))
+          .rejects
+          .toThrow('REFRESH_TOKEN_ERROR');
+
+      expect(signinSilentMock).toHaveBeenCalledTimes(0)
+
+    }, 15000);
+
+    it('requestRefreshToken failed with fetching user info error in metadata with retries', async () => {
+      const response = {
+        status: 500
+      };
+      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ'
+      mockedAxios.get.mockImplementationOnce(() => Promise.reject(response));
+
+      await expect(authManager.requestRefreshToken(mockToken))
+          .rejects
+          .toThrow('REFRESH_TOKEN_ERROR');
+
+      expect(signinSilentMock).toHaveBeenCalledTimes(0)
+      expect(mockedAxios.get).toHaveBeenCalledTimes(6)
+
+    }, 15000);
   });
 });

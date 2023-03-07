@@ -36,7 +36,7 @@ describe('Passport', () => {
       login: authLoginMock,
       loginCallback: loginCallbackMock,
       getUser: getUserMock,
-      refreshToken: refreshToken,
+      requestRefreshToken: refreshToken,
     });
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,
@@ -67,27 +67,27 @@ describe('Passport', () => {
   describe('connectImx', () => {
     it('should execute connect without error', async () => {
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
-      refreshToken.mockResolvedValue({access_token: "123"});
+      refreshToken.mockResolvedValue({ access_token: "123" });
       await passport.connectImx();
 
-            expect(authLoginMock).toBeCalledTimes(1);
-            expect(magicLoginMock).toBeCalledTimes(1);
-            expect(getStarkSigner).toBeCalledTimes(1);
-        }, 15000);
+      expect(authLoginMock).toBeCalledTimes(1);
+      expect(magicLoginMock).toBeCalledTimes(1);
+      expect(getStarkSigner).toBeCalledTimes(1);
+    }, 15000);
 
-        it('should execute connect with refresh error', async () => {
-            magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
-            refreshToken.mockRejectedValue("");
+    it('should execute connect with refresh error', async () => {
+      magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
+      refreshToken.mockResolvedValue(null);
 
-            await expect(passport.connectImx())
-                .rejects
-                .toThrow('REFRESH_TOKEN_ERROR');
+      await expect(passport.connectImx())
+        .rejects
+        .toThrow('Failed to get refresh token');
 
-            expect(authLoginMock).toBeCalledTimes(1);
-            expect(magicLoginMock).toBeCalledTimes(1);
-            expect(getStarkSigner).toBeCalledTimes(1);
-        });
+      expect(authLoginMock).toBeCalledTimes(1);
+      expect(magicLoginMock).toBeCalledTimes(1);
+      expect(getStarkSigner).toBeCalledTimes(1);
     });
+  });
 
   describe('loginCallback', () => {
     it('should execute login callback', async () => {

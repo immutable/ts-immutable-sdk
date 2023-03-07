@@ -4,7 +4,6 @@ import PassportImxProvider from './imxProvider/passportImxProvider';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { getStarkSigner } from './stark';
 import { IMXProvider } from '../provider/imxProvider';
-import { requestRefreshToken } from "./registerationRefreshToken";
 import { Networks, UserProfile } from './types';
 
 export type PassportConfig = {
@@ -49,7 +48,7 @@ export class Passport {
     const provider = await this.magicAdapter.login(user.idToken);
     const signer = await getStarkSigner(provider.getSigner());
 
-    const updatedUser = await requestRefreshToken(this.authManager, user.accessToken);
+    const updatedUser = await this.authManager.requestRefreshToken(user.accessToken);
     if (!updatedUser) {
       throw new PassportError(
           'Failed to get refresh token',

@@ -1,6 +1,8 @@
 import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { User } from './types';
+import { retryWithDelay } from './util/retry';
+import { getEtherKeyFromUserMetadata } from './getEtherKeyFromUserMetadata';
 
 type AuthInput = {
   clientId: string;
@@ -77,4 +79,25 @@ export default class AuthManager {
         type: PassportErrorType.REFRESH_TOKEN_ERROR,
     });
   }
+
+  public async requestRefreshToken(jwt: string): Promise<User | null> {
+    return withPassportError<User | null>(async () => {
+      const etherKey = await retryWithDelay(() => getEtherKeyFromUserMetadata(jwt))
+      console.info('requesting refresh token')
+      const updatedUser = await this.refreshToken();
+      if (!updatedUser) {
+        return null
+      }
+      return {
+        idToken: updatedUser?.id_token,
+        accessToken: updatedUser?.access_token,
+        refreshToken: updatedUser?.refresh_token,
+        profile: updatedUser?.profile,
+        etherKey,
+      }
+    }, {
+      type: PassportErrorType.REFRESH_TOKEN_ERROR,
+    });
+  }
+
 }
