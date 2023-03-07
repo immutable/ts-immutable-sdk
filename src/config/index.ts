@@ -25,10 +25,6 @@ export class Configuration {
   }
 }
 
-// NOTE: new Configuration(Config.SANDBOX) looks weird because we have "Config"
-// and "Configuration". Maybe we want to have something akin to "Config" but
-// actually named "Options" or "Environments".
-
 export const PRODUCTION: StarkExConfig = {
   ...CoreSDKConfigOptions.PRODUCTION,
   env: Environment.PRODUCTION,
