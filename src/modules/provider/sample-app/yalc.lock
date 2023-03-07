@@ -1,0 +1,13 @@
+{
+  "version": "v1",
+  "packages": {
+    "ts-immutable-sdk": {
+      "signature": "e1cb64bf6d0645c49eb3e995c2b37e1e",
+      "file": true
+    },
+    "@imtbl/core-sdk": {
+      "signature": "4abc2b4e0df3e9322565335d009be056",
+      "file": true
+    }
+  }
+}
