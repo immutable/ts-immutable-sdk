@@ -68,7 +68,7 @@ describe('Orders', () => {
     test('should make the correct api requests with the correct params, and return the correct receipt', async () => {
       const signers = await sharedContext.getUserOneSigners()
 
-      const createOrderResponse = await createOrder({
+      const response = await createOrder({
         signers,
         request: signableOrderRequest,
         config,
@@ -105,7 +105,7 @@ describe('Orders', () => {
         xImxEthAddress: await signers.ethSigner.getAddress(),
         xImxEthSignature: "raw-eth-signature",
       })
-      expect(createOrderResponse).toEqual(createOrderResponse);
+      expect(response).toEqual(createOrderResponse);
     })
   })
 })
