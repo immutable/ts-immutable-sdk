@@ -84,7 +84,6 @@ describe('Registration', () => {
           stark_key: starkKey,
         }
       });
-      console.log(response, registerUserResponse)
       expect(response).toEqual(registerUserResponse);
     })
   })
