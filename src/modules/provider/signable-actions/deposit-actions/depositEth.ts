@@ -3,7 +3,6 @@ import {
   DepositsApi,
   EncodingApi,
   ETHAmount,
-  EthSigner,
   ImmutableXConfiguration,
   UsersApi,
 } from '@imtbl/core-sdk';
@@ -16,6 +15,8 @@ import {
 import { BigNumber } from '@ethersproject/bignumber';
 import { TransactionResponse } from '@ethersproject/providers';
 import { validateChain } from '../helpers';
+import { EthSigner } from 'types';
+
 
 interface ETHTokenData {
   decimals: number;

@@ -7,7 +7,7 @@ import { ethers } from 'ethers';
 import { RequestEventType, ResponseEventType } from './events';
 import { connect, disconnect } from './imxWallet';
 import { postRequestMessage } from './postRequestMessage';
-import { Environment } from '../constants';
+import { Environment } from 'config';
 import { asyncTriggerIFrameOnLoad } from './testUtils';
 import { getOrSetupIFrame } from './imxWalletIFrame';
 import { ImxSigner } from './ImxSigner';

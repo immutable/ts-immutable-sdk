@@ -3,11 +3,11 @@ import {
   DepositsApi,
   EncodingApi,
   ERC20Amount,
-  EthSigner,
   ImmutableXConfiguration,
   TokensApi,
   UsersApi,
 } from '@imtbl/core-sdk';
+import { EthSigner } from "types";
 import { Configuration } from 'config';
 import { TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
