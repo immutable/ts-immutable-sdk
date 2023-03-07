@@ -2,10 +2,16 @@ import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { User } from './types';
+import { PassportConfiguration } from './config/config';
 
 jest.mock('oidc-client-ts');
 
-const authConfig = { clientId: '11111', redirectUri: 'http://test.com' };
+const config: PassportConfiguration = {
+  oidcConfiguration: {
+    clientId: '11111',
+    redirectUri: 'https://test.com',
+  },
+} as PassportConfiguration;
 const mockOidcUser: OidcUser = {
   id_token: 'id123',
   access_token: 'access123',
@@ -47,7 +53,7 @@ describe('AuthManager', () => {
       signinPopupCallback: signinPopupCallbackMock,
       getUser: getUserMock,
     });
-    authManager = new AuthManager(authConfig);
+    authManager = new AuthManager(config);
   });
 
   describe('login', () => {

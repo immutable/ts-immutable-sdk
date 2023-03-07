@@ -1,5 +1,9 @@
 
-export type Networks = 'mainnet' | 'goerli';
+export interface PassportConfigurationArguments {
+  clientId: string;
+  redirectUri: string;
+  logoutRedirectUri: string;
+}
 
 export type UserProfile = {
   email?: string;

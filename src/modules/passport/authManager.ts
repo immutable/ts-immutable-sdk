@@ -1,34 +1,24 @@
 import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { User } from './types';
+import { PassportConfiguration } from './config/config';
 
-type AuthInput = {
-  clientId: string;
-  redirectUri: string;
-};
-
-// TODO: This is a static Auth0 domain that could come from env or config file
-const passportAuthDomain = 'https://auth.dev.immutable.com';
-
-const getAuthConfiguration = ({ clientId, redirectUri }: AuthInput) => ({
-  authority: passportAuthDomain,
-  redirect_uri: redirectUri,
-  popup_redirect_uri: redirectUri,
-  client_id: clientId,
+const getAuthConfiguration = ({ oidcConfiguration }: PassportConfiguration) => ({
+  authority: oidcConfiguration.authenticationDomain,
+  redirect_uri: oidcConfiguration.redirectUri,
+  popup_redirect_uri: oidcConfiguration.redirectUri,
+  client_id: oidcConfiguration.clientId,
   metadata: {
-    authorization_endpoint: `${passportAuthDomain}/authorize`,
-    token_endpoint: `${passportAuthDomain}/oauth/token`,
+    authorization_endpoint: `${oidcConfiguration.authenticationDomain}/authorize`,
+    token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
   },
 });
 
 export default class AuthManager {
   private userManager;
-  constructor({ clientId, redirectUri }: AuthInput) {
+  constructor(config: PassportConfiguration) {
     this.userManager = new UserManager(
-      getAuthConfiguration({
-        clientId,
-        redirectUri,
-      })
+      getAuthConfiguration(config),
     );
   }
 

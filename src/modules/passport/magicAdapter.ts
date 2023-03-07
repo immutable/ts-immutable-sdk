@@ -1,19 +1,17 @@
 import { ethers } from 'ethers';
 import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
-import { Networks } from './types';
 import { PassportErrorType, withPassportError } from './errors/passportError';
-
-// TODO: The apiKey & providerId are static properties that could come from env or config file
-const magicApiKey = 'pk_live_A7D9211D7547A338';
-const magicProviderId = 'mPGZAvZsFkyfT6OWfML1HgTKjPqYOPkhhOj-8qCGeqI=';
+import { PassportConfiguration } from './config/config';
 
 export default class MagicAdapter {
   private readonly magicClient;
+  private readonly config: PassportConfiguration;
 
-  constructor(network: Networks = 'mainnet') {
-    this.magicClient = new Magic(magicApiKey, {
-      network,
+  constructor(config: PassportConfiguration) {
+    this.config = config;
+    this.magicClient = new Magic(config.magicPublishableApiKey, {
+      network: config.network,
       extensions: [
         new OpenIdExtension(),
       ]
@@ -24,7 +22,7 @@ export default class MagicAdapter {
     return withPassportError<ethers.providers.Web3Provider>(async () => {
       await this.magicClient.openid.loginWithOIDC({
         jwt: idToken,
-        providerId: magicProviderId,
+        providerId: this.config.magicProviderId,
       });
       return new ethers.providers.Web3Provider(
         this.magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider

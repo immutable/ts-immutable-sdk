@@ -1,8 +1,9 @@
+import { LoginWithOpenIdParams, OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
 import { Magic } from 'magic-sdk';
 import MagicAdapter from './magicAdapter';
-import { LoginWithOpenIdParams, OpenIdExtension } from '@magic-ext/oidc';
 import { PassportError, PassportErrorType } from './errors/passportError';
+import { Networks, PassportConfiguration } from './config';
 
 const loginWithOIDCMock: jest.MockedFunction<
   (args: LoginWithOpenIdParams) => Promise<void>
@@ -37,18 +38,22 @@ describe('MagicWallet', () => {
   let magicWallet: MagicAdapter;
   const apiKey = 'pk_live_A7D9211D7547A338';
   const providerId = 'mPGZAvZsFkyfT6OWfML1HgTKjPqYOPkhhOj-8qCGeqI=';
-  const network = 'goerli';
+  const config: PassportConfiguration = {
+    network: Networks.SANDBOX,
+    magicPublishableApiKey: apiKey,
+    magicProviderId: providerId,
+  } as PassportConfiguration;
   const idToken = 'e30=.e30=.e30=';
 
   beforeEach(() => {
     jest.clearAllMocks();
-    magicWallet = new MagicAdapter(network);
+    magicWallet = new MagicAdapter(config);
   });
 
   describe('constructor', () => {
     it('should initialise the Magic client with the correct arguments', () => {
       expect(Magic).toHaveBeenCalledWith(apiKey, {
-        network,
+        network: config.network,
         extensions: [new OpenIdExtension()],
       });
     });

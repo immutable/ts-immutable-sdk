@@ -1,15 +1,21 @@
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
-import { PassportConfig, Passport } from './Passport';
-import { PassportError, PassportErrorType } from './errors/passportError';
+import { Passport } from './Passport';
 import { getStarkSigner } from './stark';
 import { User } from './types';
+import { PassportConfiguration, ValidateConfig } from './config';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
 jest.mock('./stark/getStarkSigner');
+jest.mock('./config')
 
-const config = { clientId: '11111', redirectUri: 'http://test.com' };
+const config: PassportConfiguration = {
+  oidcConfiguration: {
+    clientId: '11111',
+    redirectUri: 'https://test.com',
+  },
+} as PassportConfiguration;
 
 describe('Passport', () => {
   afterEach(jest.resetAllMocks);
@@ -39,13 +45,10 @@ describe('Passport', () => {
   });
 
   describe('new Passport', () => {
-    it('should throw passport error if missing the required configuration', () => {
-      expect(() => new Passport({} as unknown as PassportConfig)).toThrowError(
-        new PassportError(
-          'clientId, redirectUri cannot be null',
-          PassportErrorType.INVALID_CONFIGURATION
-        )
-      );
+    it('should validate the config', () => {
+      const config = {} as unknown as PassportConfiguration;
+      new Passport(config);
+      expect(ValidateConfig).toHaveBeenCalledWith(config)
     });
   });
 

@@ -3,38 +3,19 @@ import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { getStarkSigner } from './stark';
-import { Networks, UserProfile } from './types';
+import { UserProfile } from './types';
 import { IMXProvider } from '../provider';
-
-export type PassportConfig = {
-  clientId: string;
-  network?: Networks;
-  redirectUri: string;
-};
-
-const checkRequiredConfiguration = (config: PassportConfig) => {
-  const requiredConfiguration = ['clientId', 'redirectUri'];
-  const errorMessage = requiredConfiguration
-    .map((key) => !(config as Record<string, string>)[key] && key)
-    .filter((n) => n)
-    .join(', ');
-  if (errorMessage !== '') {
-    throw new PassportError(
-      `${errorMessage} cannot be null`,
-      PassportErrorType.INVALID_CONFIGURATION
-    );
-  }
-};
+import { PassportConfiguration, ValidateConfig } from './config';
 
 export class Passport {
   private authManager: AuthManager;
   private magicAdapter: MagicAdapter;
 
-  constructor(config: PassportConfig) {
-    checkRequiredConfiguration(config);
+  constructor(config: PassportConfiguration) {
+    ValidateConfig(config);
 
     this.authManager = new AuthManager(config);
-    this.magicAdapter = new MagicAdapter(config.network);
+    this.magicAdapter = new MagicAdapter(config);
   }
 
   public async connectImx(): Promise<IMXProvider> {
