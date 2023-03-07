@@ -11,7 +11,7 @@
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "typecheck": "tsc --noEmit",
     "test": "jest",
-    "watch": "jest --watch",
+    "test:watch": "jest --watch",
     "lint": "eslint . --ext .ts --max-warnings=0"
   },
   "repository": {

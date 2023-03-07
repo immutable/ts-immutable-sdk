@@ -1,13 +1,12 @@
-import { SharedContext, configuration } from '../test/sharedContext';
+import { testConfig, generateSigners, privateKey1 } from "../test/helpers";
 import { UnsignedOrderRequest, OrdersApi } from "@imtbl/core-sdk";
 import { parseEther } from '@ethersproject/units';
 import { createOrder } from './orders';
 import { Configuration } from '../../../config';
 import { signRaw } from './utils';
-import { convertToSignableToken } from '../../provider/signable-actions/utils'
+import { convertToSignableToken } from "./utils"
 
-const sharedContext = new SharedContext();
-const config = new Configuration(configuration);
+const config = new Configuration(testConfig);
 
 jest.mock('@imtbl/core-sdk')
 jest.mock('./utils')
@@ -16,6 +15,7 @@ describe('Orders', () => {
   describe('createOrder()', () => {
     let getSignableOrderMock: jest.Mock;
     let createOrderMock: jest.Mock;
+    const buyAmount = parseEther("30000").toString();
 
     const signableOrderRequest: UnsignedOrderRequest = {
       sell: {
@@ -25,14 +25,14 @@ describe('Orders', () => {
       },
       buy: {
         type: 'ETH',
-        amount: parseEther("30000").toString(),
+        amount: buyAmount,
       },
       fees: [],
     };
     const getSignableOrderResponse = {
       signable_message: "hello",
       payload_hash: "hash",
-      amount_buy: signableOrderRequest.buy.amount,
+      amount_buy: buyAmount,
       amount_sell: 1,
       asset_id_buy: "1234",
       asset_id_sell: "5678",
@@ -66,7 +66,7 @@ describe('Orders', () => {
     })
 
     test('should make the correct api requests with the correct params, and return the correct receipt', async () => {
-      const signers = await sharedContext.getUserOneSigners()
+      const signers = await generateSigners(privateKey1)
 
       const response = await createOrder({
         signers,
@@ -76,7 +76,7 @@ describe('Orders', () => {
       expect(getSignableOrderMock).toHaveBeenCalledWith({
         getSignableOrderRequestV3: {
           user: await signers.ethSigner.getAddress(),
-          amount_buy: signableOrderRequest.buy.amount,
+          amount_buy: buyAmount,
           token_buy: convertToSignableToken(signableOrderRequest.buy),
           amount_sell: "1",
           token_sell: convertToSignableToken(signableOrderRequest.sell),
@@ -98,7 +98,7 @@ describe('Orders', () => {
           stark_signature:
             getSignableOrderResponse.payload_hash +
             "STX" +
-            sharedContext.getUserOnePrivateKey(),
+            privateKey1,
           vault_id_buy: getSignableOrderResponse.vault_id_buy,
           vault_id_sell: getSignableOrderResponse.vault_id_sell,
         },
