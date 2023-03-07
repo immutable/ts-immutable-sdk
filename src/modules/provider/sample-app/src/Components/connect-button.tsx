@@ -1,4 +1,4 @@
-import {Button } from '@biom3/react'
+import {Button, Heading } from '@biom3/react'
 import { Web3Provider } from '@ethersproject/providers/lib/web3-provider';
 import { useContext } from 'react';
 import { ImxSigner } from 'ts-immutable-sdk';
@@ -30,9 +30,14 @@ export const ConnectButton = () => {
 
    return (
       <>
-         {!state.layer1address && <Button onClick={() => connectMetamask()}>
-            Connect to MetaMask
-         </Button>}
+         {!state.layer1address && 
+            <>
+               <Heading size='medium'>Connect to MetaMask</Heading>
+               <Button onClick={() => connectMetamask()}>
+                  Connect
+               </Button>
+            </>
+         }
       </>
    )
 }

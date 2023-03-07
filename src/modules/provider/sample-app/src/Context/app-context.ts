@@ -68,7 +68,7 @@ export const appReducer: Reducer<AppState, Action> = (state: AppState, action: A
             const { web3provider, imxSigner, layer1address, layer2address } = action.payload;
             return { ...state, web3provider, imxSigner, layer1address, layer2address }
         case Actions.WalletDisconnected:
-            return { ...state, layer1address: "", layer2address: "" }
+            return { ...state, web3provider: null, imxSigner: null, layer1address: "", layer2address: "" }
         default:
             return state;
     }

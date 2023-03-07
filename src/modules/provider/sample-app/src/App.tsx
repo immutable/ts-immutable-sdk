@@ -11,6 +11,7 @@ import { Actions, AppCtx, appReducer, initialState } from './Context/app-context
 import { useEffect, useReducer } from 'react';
 import { WalletDisplay } from './Components/wallet-display';
 import { SignMessage } from './Components/sign-message';
+import { DisconnectButton } from './Components/disconnect-button';
 
 // Connects to metamask to get a ethers web3 provider object
 // Uses metamask as the web3 provider to also get a connection to L2
@@ -45,9 +46,8 @@ export const App = () => {
         <Heading as="h1">Sample App</Heading>
         <WalletDisplay />
         <ConnectButton />
-        {/* <div><button onClick={() => connectMetamask()}>Connect Metamask</button></div>
-        <div><button onClick={() => sign()}>Sign a message</button></div> */}
         <SignMessage />
+        <DisconnectButton />
       </AppCtx.Provider>
     </BiomeThemeProvider>
   );
