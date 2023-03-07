@@ -21,7 +21,7 @@ describe('retryWithDelay', () => {
         }
     )
 
-    it('retryWithDelay should  retry with custom option', async () => {
+    it('retryWithDelay should retry with custom option', async () => {
             const mockFunc = jest.fn().mockRejectedValue("error")
             const option: RetryOption = {
                 retries: 2,
