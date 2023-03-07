@@ -5,13 +5,13 @@ import { Networks } from './types';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 
 // TODO: The apiKey & providerId are static properties that could come from env or config file
-const magicApiKey = 'pk_live_A7D9211D7547A338';
-const magicProviderId = 'mPGZAvZsFkyfT6OWfML1HgTKjPqYOPkhhOj-8qCGeqI=';
+const magicApiKey = 'pk_live_4058236363130CA9';
+const magicProviderId = 'C9odf7hU4EQ5EufcfgYfcBaT5V6LhocXyiPRhIjw2EY=';
 
 export default class MagicAdapter {
   private readonly magicClient;
 
-  constructor(network: Networks = 'mainnet') {
+  constructor(network: Networks = 'goerli') {
     this.magicClient = new Magic(magicApiKey, {
       network,
       extensions: [

@@ -35,8 +35,8 @@ jest.mock('magic-sdk', () => ({
 
 describe('MagicWallet', () => {
   let magicWallet: MagicAdapter;
-  const apiKey = 'pk_live_A7D9211D7547A338';
-  const providerId = 'mPGZAvZsFkyfT6OWfML1HgTKjPqYOPkhhOj-8qCGeqI=';
+  const apiKey = 'pk_live_4058236363130CA9';
+  const providerId = 'C9odf7hU4EQ5EufcfgYfcBaT5V6LhocXyiPRhIjw2EY=';
   const network = 'goerli';
   const idToken = 'e30=.e30=.e30=';
 
