@@ -43,7 +43,7 @@ export const App = () => {
   return (
     <BiomeThemeProvider>
       <AppCtx.Provider value={{state: state, dispatch: dispatch}}>
-        <Heading as="h1">Sample App</Heading>
+        <Heading size="large">Sample App</Heading>
         <WalletDisplay />
         <ConnectButton />
         <SignMessage />
