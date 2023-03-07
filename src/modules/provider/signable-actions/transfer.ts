@@ -79,7 +79,7 @@ export async function transfer({
   };
 }
 
-export async function batchTransfers({
+export async function batchTransfer({
   signers: { ethSigner, starkExSigner },
   request,
   config,
