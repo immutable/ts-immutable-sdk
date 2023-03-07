@@ -115,21 +115,21 @@ describe('AuthManager', () => {
     });
   });
   describe('requestRefreshToken', () => {
-      const passportData = {
-          passport: {
-              ether_key: '0x232',
-              stark_key: '0x567',
-              user_admin_key: '0x123',
-          }
+    const passportData = {
+      passport: {
+        ether_key: '0x232',
+        stark_key: '0x567',
+        user_admin_key: '0x123',
       }
-      afterEach(() => {
+    };
+    afterEach(() => {
       mockedAxios.get.mockClear();
     });
     it('requestRefreshToken successful with user wallet address in metadata', async () => {
       const mockUpdatedUser = { access_token: "123" };
       const expected = { accessToken: "123", etherKey: passportData.passport.ether_key };
-      signinSilentMock.mockReturnValue(mockUpdatedUser)
-      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ'
+      signinSilentMock.mockReturnValue(mockUpdatedUser);
+      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
       const response = {
         data: {
           'sub': 'email|63a3c1ada9d926a4845a3f0c',
@@ -141,10 +141,10 @@ describe('AuthManager', () => {
 
       const res = await authManager.requestRefreshToken(mockToken);
 
-      expect(res).toEqual(expected)
-      expect(signinSilentMock).toHaveBeenCalledTimes(1)
+      expect(res).toEqual(expected);
+      expect(signinSilentMock).toHaveBeenCalledTimes(1);
       expect(mockedAxios.get).toHaveBeenCalledWith('https://auth.dev.immutable.com/userinfo', { 'headers': { 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ' } }
-      )
+      );
     });
 
     it('requestRefreshToken failed without user wallet address in metadata with retries', async () => {
@@ -154,14 +154,14 @@ describe('AuthManager', () => {
           'nickname': 'yundi.fu',
         }
       };
-      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ'
+      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
       mockedAxios.get.mockImplementationOnce(() => Promise.resolve(response));
 
       await expect(authManager.requestRefreshToken(mockToken))
-          .rejects
-          .toThrow('REFRESH_TOKEN_ERROR');
+        .rejects
+        .toThrow('REFRESH_TOKEN_ERROR');
 
-      expect(signinSilentMock).toHaveBeenCalledTimes(0)
+      expect(signinSilentMock).toHaveBeenCalledTimes(0);
 
     }, 15000);
 
@@ -169,15 +169,15 @@ describe('AuthManager', () => {
       const response = {
         status: 500
       };
-      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ'
+      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
       mockedAxios.get.mockImplementationOnce(() => Promise.reject(response));
 
       await expect(authManager.requestRefreshToken(mockToken))
-          .rejects
-          .toThrow('REFRESH_TOKEN_ERROR');
+        .rejects
+        .toThrow('REFRESH_TOKEN_ERROR');
 
-      expect(signinSilentMock).toHaveBeenCalledTimes(0)
-      expect(mockedAxios.get).toHaveBeenCalledTimes(6)
+      expect(signinSilentMock).toHaveBeenCalledTimes(0);
+      expect(mockedAxios.get).toHaveBeenCalledTimes(6);
 
     }, 15000);
   });

@@ -25,6 +25,7 @@ const getAuthConfiguration = ({ clientId, redirectUri }: AuthInput) => ({
 
 export default class AuthManager {
   private userManager;
+
   constructor({ clientId, redirectUri }: AuthInput) {
     this.userManager = new UserManager(
       getAuthConfiguration({
@@ -72,21 +73,22 @@ export default class AuthManager {
       return this.mapOidcUserToDomainModel(oidcUser);
     }, {
       type: PassportErrorType.NOT_LOGGED_IN_ERROR,
-    })
+    });
   }
+
   public async refreshToken(): Promise<OidcUser | null> {
     return withPassportError<OidcUser | null>(async () => this.userManager.signinSilent(), {
-        type: PassportErrorType.REFRESH_TOKEN_ERROR,
+      type: PassportErrorType.REFRESH_TOKEN_ERROR,
     });
   }
 
   public async requestRefreshToken(jwt: string): Promise<User | null> {
     return withPassportError<User | null>(async () => {
-      const etherKey = await retryWithDelay(() => getEtherKeyFromUserMetadata(jwt))
-      console.info('requesting refresh token')
+      const etherKey = await retryWithDelay(() => getEtherKeyFromUserMetadata(passportAuthDomain, jwt));
+      console.info('requesting refresh token');
       const updatedUser = await this.refreshToken();
       if (!updatedUser) {
-        return null
+        return null;
       }
       return {
         idToken: updatedUser.id_token,
@@ -94,10 +96,9 @@ export default class AuthManager {
         refreshToken: updatedUser.refresh_token,
         profile: updatedUser.profile,
         etherKey,
-      }
+      };
     }, {
       type: PassportErrorType.REFRESH_TOKEN_ERROR,
     });
   }
-
 }

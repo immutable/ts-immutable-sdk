@@ -49,7 +49,7 @@ describe('Passport', () => {
           user_admin_key: '0x123',
         }
       }
-    })
+    });
     passport = new Passport(config);
   });
 
