@@ -20,7 +20,7 @@ import {
   UnsignedTransferRequest,
   EthSigner,
 } from 'types';
-import { batchTransfers, transfers } from './signable-actions/transfer';
+import { batchTransfer, transfer } from './signable-actions/transfer';
 import { cancelOrder, createOrder } from './signable-actions/orders';
 import {
   isRegisteredOnChain,
@@ -59,7 +59,7 @@ export class GenericIMXProvider implements IMXProvider {
   batchNftTransfer(
     request: Array<NftTransferDetails>
   ): Promise<CreateTransferResponse> {
-    return batchTransfers({
+    return batchTransfer({
       signers: this.signers,
       request,
       config: this.config,
@@ -138,7 +138,7 @@ export class GenericIMXProvider implements IMXProvider {
   transfer(
     request: UnsignedTransferRequest
   ): Promise<CreateTransferResponseV1> {
-    return transfers({
+    return transfer({
       signers: this.signers,
       request,
       config: this.config,
