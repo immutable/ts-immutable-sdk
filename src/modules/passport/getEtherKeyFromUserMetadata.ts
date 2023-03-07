@@ -10,6 +10,5 @@ export const getEtherKeyFromUserMetadata = async (authDomain: string, jwt: strin
   if (metadataExists) {
     return data.passport.ether_key;
   }
-  console.info('user wallet addresses not exist');
   return Promise.reject('user wallet addresses not exist');
 };
