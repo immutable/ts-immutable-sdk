@@ -1,11 +1,11 @@
 import { BiomeThemeProvider, Heading } from '@biom3/react'
-import { Environment } from './constants';
 import { ConnectButton } from './Components/connect-button';
 import { Actions, AppCtx, appReducer, initialState } from './Context/app-context';
 import { useEffect, useReducer } from 'react';
 import { WalletDisplay } from './Components/wallet-display';
 import { SignMessage } from './Components/sign-message';
 import { DisconnectButton } from './Components/disconnect-button';
+import { Environment } from 'ts-immutable-sdk';
 
 export const App = () => {
   const [state, dispatch] = useReducer(appReducer, initialState);
@@ -14,7 +14,7 @@ export const App = () => {
     dispatch({
       payload: {
           type: Actions.SetEnvironment,
-          env: Environment.PRODUCTION
+          env: Environment.SANDBOX
       }
     });
   }, [])

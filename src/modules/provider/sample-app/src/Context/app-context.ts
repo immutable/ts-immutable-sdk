@@ -1,7 +1,6 @@
 import { createContext } from "react";
 import { Web3Provider } from '@ethersproject/providers/lib/web3-provider';
-import { ImxSigner, MetaMaskProvider } from 'ts-immutable-sdk';
-import { Environment } from "../constants";
+import { ImxSigner, MetaMaskProvider, Environment } from 'ts-immutable-sdk';
 
 export interface AppState {
     metamaskProvider: MetaMaskProvider | null;
