@@ -43,7 +43,12 @@ export class Passport {
     if (!user.etherKey) {
       user = await this.registerUser(ethSigner, starkSigner, user.accessToken);
     }
-    return new PassportImxProvider(user, starkSigner, '');
+    return new PassportImxProvider({
+      jwt: user,
+      starkSigner,
+      //Note: Should remove the `|| ''` part once it is cleared.
+      ethAddress: user.etherKey || '',
+    });
   }
 
   public async loginCallback(): Promise<void> {

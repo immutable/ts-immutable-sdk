@@ -35,11 +35,11 @@ describe('PassportImxProvider', () => {
       createTransferV1: createTransferV1Mock,
     });
 
-    passportImxProvider = new PassportImxProvider(
-      mockJwt,
+    passportImxProvider = new PassportImxProvider({
+      jwt: mockJwt,
       starkSigner,
-      ethAddress
-    );
+      ethAddress,
+    });
   });
 
   describe('transfer', () => {

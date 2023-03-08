@@ -27,6 +27,12 @@ import { PassportErrorType, withPassportError } from '../errors/passportError';
 
 export type JWT = Pick<User, 'accessToken' | 'refreshToken'>;
 
+export type PassportImxProviderInput = {
+  jwt: JWT;
+  starkSigner: StarkSigner;
+  ethAddress: string;
+}
+
 export default class PassportImxProvider implements IMXProvider {
   private jwt: JWT;
   private starkSigner: StarkSigner;
@@ -34,7 +40,7 @@ export default class PassportImxProvider implements IMXProvider {
   //Note: this ethAddress should be the smart contract ethAddress
   private ethAddress: string;
 
-  constructor(jwt: JWT, starkSigner: StarkSigner, ethAddress: string) {
+  constructor({jwt, starkSigner, ethAddress}: PassportImxProviderInput) {
     this.jwt = jwt;
     this.starkSigner = starkSigner;
     this.ethAddress = ethAddress;
