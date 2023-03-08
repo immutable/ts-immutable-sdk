@@ -39,4 +39,9 @@ export class Passport {
     const user = await this.authManager.getUser();
     return user.profile;
   }
+
+  public async getIdToken(): Promise<string | undefined>{
+    const user = await this.authManager.getUser();
+    return user.idToken;
+  }
 }
