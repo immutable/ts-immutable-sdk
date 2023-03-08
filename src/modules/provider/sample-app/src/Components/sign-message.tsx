@@ -1,6 +1,6 @@
 import { AppCtx } from '../Context/app-context';
 import { Button, FormControl, TextInput, Heading } from '@biom3/react';
-import { useContext, useState } from 'react';
+import { ChangeEvent, useContext, useState } from 'react';
 
 export const SignMessage = () => {
     const { state } = useContext(AppCtx);
@@ -22,7 +22,7 @@ export const SignMessage = () => {
         )
     }
 
-    const updateSignMessage = (event: any) => {
+    const updateSignMessage = (event: ChangeEvent<HTMLInputElement>) => {
         const hex = Buffer.from(event.target.value, 'utf8').toString('hex');
         setSignMessage(hex);
     }
