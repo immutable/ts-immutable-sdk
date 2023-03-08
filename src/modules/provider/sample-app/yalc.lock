@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "ts-immutable-sdk": {
-      "signature": "3f89d3eda020b1d7c8a0c356ef9ea0b8",
+      "signature": "5998be42adcded4037e9e9a7d56388e8",
       "file": true
     },
     "@imtbl/core-sdk": {

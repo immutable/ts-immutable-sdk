@@ -1,17 +1,19 @@
 import { createContext } from "react";
 import { Web3Provider } from '@ethersproject/providers/lib/web3-provider';
-import { ImxSigner } from 'ts-immutable-sdk';
+import { ImxSigner, MetaMaskProvider } from 'ts-immutable-sdk';
 import { Environment } from "../constants";
 
 export interface AppState {
-    web3provider: Web3Provider | null,
-    imxSigner: ImxSigner | null,
-    layer1address: string,
+    metamaskProvider: MetaMaskProvider | null
+    web3provider: Web3Provider | null
+    imxSigner: ImxSigner | null
+    layer1address: string
     layer2address: string
     env: string
 }
 
 export const initialState: AppState = {
+    metamaskProvider: null,
     web3provider: null,
     imxSigner: null,
     layer1address: "",
@@ -34,12 +36,14 @@ export interface Action {
 type ActionPayload = 
     SetEnvironment |
     WalletConnected | 
-    WalletDisconnected
+    WalletDisconnected |
+    MetamaskProviderConnected
 
 export enum Actions {
     SetEnvironment = "SET_ENVIRONMENT",
     WalletConnected = "WALLET_CONNECTED",
-    WalletDisconnected = "WALLET_DISCONNECTED"
+    WalletDisconnected = "WALLET_DISCONNECTED",
+    MetamaskProviderConnected = "METAMASK_PROVIDER_CONNECTED"
 }
 
 export interface SetEnvironment {
@@ -57,7 +61,11 @@ export interface WalletConnected {
 
 export interface WalletDisconnected {
     type: Actions.WalletDisconnected
-    metadata: string
+}
+
+export interface MetamaskProviderConnected {
+    type: Actions.MetamaskProviderConnected
+    metamaskProvider: MetaMaskProvider
 }
 
 export const appReducer: Reducer<AppState, Action> = (state: AppState, action: Action) => {
@@ -69,6 +77,8 @@ export const appReducer: Reducer<AppState, Action> = (state: AppState, action: A
             return { ...state, web3provider, imxSigner, layer1address, layer2address }
         case Actions.WalletDisconnected:
             return { ...state, web3provider: null, imxSigner: null, layer1address: "", layer2address: "" }
+        case Actions.MetamaskProviderConnected:
+            return { ...state, metamaskProvider: action.payload.metamaskProvider }
         default:
             return state;
     }

@@ -6,7 +6,7 @@ import { imxDisconnect } from 'ts-immutable-sdk';
 export const DisconnectButton = () => {
     const { state, dispatch } = useContext(AppCtx);
 
-    const disconnectMetamask = async () => {
+    const disconnect = async () => {
         if (state.imxSigner) {
             await imxDisconnect(state.imxSigner);
 
@@ -22,8 +22,8 @@ export const DisconnectButton = () => {
         <>
             {state.layer1address &&
                 <>
-                    <Heading size='medium'>Disconnect from MetaMask</Heading>
-                    <Button onClick={() => disconnectMetamask()}>
+                    <Heading size='medium'>Disconnect</Heading>
+                    <Button onClick={() => disconnect()}>
                         Disconnect
                     </Button>
                 </>
