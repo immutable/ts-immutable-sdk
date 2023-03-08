@@ -17,7 +17,7 @@ export const SignMessage = () => {
                         onChange={updateSignMessage}
                     />
                 </FormControl>
-                <Button onClick={() => sign()} >Sign</Button>
+                <Button onClick={() => sign()}>Sign</Button>
             </>
         )
     }
