@@ -1,5 +1,3 @@
-import './App.css';
-
 import { BiomeThemeProvider, Heading } from '@biom3/react'
 import { Environment } from './constants';
 import { ConnectButton } from './Components/connect-button';
