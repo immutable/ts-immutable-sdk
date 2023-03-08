@@ -4,12 +4,12 @@ import { ImxSigner, MetaMaskProvider } from 'ts-immutable-sdk';
 import { Environment } from "../constants";
 
 export interface AppState {
-    metamaskProvider: MetaMaskProvider | null
-    web3provider: Web3Provider | null
-    imxSigner: ImxSigner | null
-    layer1address: string
-    layer2address: string
-    env: string
+    metamaskProvider: MetaMaskProvider | null;
+    web3provider: Web3Provider | null;
+    imxSigner: ImxSigner | null;
+    layer1address: string;
+    layer2address: string;
+    env: string;
 }
 
 export const initialState: AppState = {
@@ -22,18 +22,19 @@ export const initialState: AppState = {
 }
 
 export interface AppContextState {
-    state: AppState,
-    dispatch: any,
+    state: AppState;
+    dispatch: React.Dispatch<Action>;
 }
 
-export const AppCtx = createContext<AppContextState>({ state: initialState, dispatch: {} });
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export const AppCtx = createContext<AppContextState>({ state: initialState, dispatch: () => {} });
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export interface Action {
-    payload: ActionPayload
+    payload: ActionPayload;
 }
 
-type ActionPayload = 
+type ActionPayload =
     SetEnvironment |
     WalletConnected | 
     WalletDisconnected |
@@ -47,38 +48,55 @@ export enum Actions {
 }
 
 export interface SetEnvironment {
-    type: Actions.SetEnvironment,
-    env: Environment
+    type: Actions.SetEnvironment;
+    env: Environment;
 }
 
 export interface WalletConnected {
-    type: Actions.WalletConnected,
-    web3provider: Web3Provider,
-    imxSigner: ImxSigner,
-    layer1address: string,
-    layer2address: string
+    type: Actions.WalletConnected;
+    web3provider: Web3Provider;
+    imxSigner: ImxSigner;
+    layer1address: string;
+    layer2address: string;
 }
 
 export interface WalletDisconnected {
-    type: Actions.WalletDisconnected
+    type: Actions.WalletDisconnected;
 }
 
 export interface MetamaskProviderConnected {
-    type: Actions.MetamaskProviderConnected
-    metamaskProvider: MetaMaskProvider
+    type: Actions.MetamaskProviderConnected;
+    metamaskProvider: MetaMaskProvider;
 }
 
 export const appReducer: Reducer<AppState, Action> = (state: AppState, action: Action) => {
     switch (action.payload.type) {
         case Actions.SetEnvironment:
-            return { ...state, env: action.payload.env }
+            return {
+                ...state,
+                env: action.payload.env
+            }
         case Actions.WalletConnected:
-            const { web3provider, imxSigner, layer1address, layer2address } = action.payload;
-            return { ...state, web3provider, imxSigner, layer1address, layer2address }
+            return { 
+                ...state,
+                web3provider: action.payload.web3provider,
+                imxSigner: action.payload.imxSigner,
+                layer1address: action.payload.layer1address,
+                layer2address: action.payload.layer2address,
+            }
         case Actions.WalletDisconnected:
-            return { ...state, web3provider: null, imxSigner: null, layer1address: "", layer2address: "" }
+            return {
+                ...state,
+                web3provider: null,
+                imxSigner: null,
+                layer1address: "",
+                layer2address: ""
+            }
         case Actions.MetamaskProviderConnected:
-            return { ...state, metamaskProvider: action.payload.metamaskProvider }
+            return {
+                ...state,
+                metamaskProvider: action.payload.metamaskProvider
+            }
         default:
             return state;
     }
