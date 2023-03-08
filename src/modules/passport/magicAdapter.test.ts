@@ -4,13 +4,9 @@ import MagicAdapter from './magicAdapter';
 import { LoginWithOpenIdParams, OpenIdExtension } from '@magic-ext/oidc';
 import { PassportError, PassportErrorType } from './errors/passportError';
 
-const loginWithOIDCMock: jest.MockedFunction<
-  (args: LoginWithOpenIdParams) => Promise<void>
-> = jest.fn();
+const loginWithOIDCMock: jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
 const web3ProviderInstance = { getSigner: jest.fn() };
-const web3ProviderMock = ethers.providers.Web3Provider as jest.MockedClass<
-  typeof ethers.providers.Web3Provider
->;
+const web3ProviderMock = ethers.providers.Web3Provider as jest.MockedClass<typeof ethers.providers.Web3Provider>;
 
 const rpcProvider = {};
 
