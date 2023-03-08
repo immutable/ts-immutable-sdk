@@ -42,7 +42,7 @@ describe('prepareWithdrawal', () => {
       });
     });
 
-    test('should check stark public key and not throw an error', async () => {
+    test('prepare withdrawal for ERC721', async () => {
       const signers = await generateSigners(privateKey1);
       const ethKey = await signers.ethSigner.getAddress();
 
@@ -73,6 +73,49 @@ describe('prepareWithdrawal', () => {
         createWithdrawalRequest: {
           stark_key: getSignableWithdrawalResponse.stark_key,
           amount: '1',
+          asset_id: getSignableWithdrawalResponse.asset_id,
+          vault_id: getSignableWithdrawalResponse.vault_id,
+          nonce: getSignableWithdrawalResponse.nonce,
+          stark_signature: getSignableWithdrawalResponse.payload_hash +
+            "STX" +
+            privateKey1,
+        },
+        xImxEthAddress: ethKey,
+        xImxEthSignature: 'raw-eth-signature',
+      });
+    });
+
+    test('prepare withdrawal for currency token', async () => {
+      const signers = await generateSigners(privateKey1);
+      const ethKey = await signers.ethSigner.getAddress();
+
+      (signMessage as jest.Mock).mockReturnValue({
+        message: getSignableWithdrawalResponse.signable_message,
+        ethAddress: ethKey,
+        ethSignature: 'raw-eth-signature'
+      });
+
+      const request:PrepareWithdrawalWorkflowParams = {
+        type:'ERC20',
+        config:testConfig.getStarkExConfig(),
+        signers:signers,
+        amount:'1.02',
+        tokenAddress:'asd'
+      }
+      const resposne = await prepareWithdrawalAction(request);
+
+      expect(resposne).toEqual(createWithdrawalResponse)
+      expect(getSignableWithdrawalMock).toHaveBeenCalledWith({
+        getSignableWithdrawalRequest: {
+          user: ethKey,
+          token: convertToSignableToken(request),
+          amount: request.amount
+        }
+      });
+      expect(createWithdrawalMock).toHaveBeenCalledWith({
+        createWithdrawalRequest: {
+          stark_key: getSignableWithdrawalResponse.stark_key,
+          amount: request.amount,
           asset_id: getSignableWithdrawalResponse.asset_id,
           vault_id: getSignableWithdrawalResponse.vault_id,
           nonce: getSignableWithdrawalResponse.nonce,
