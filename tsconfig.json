@@ -15,10 +15,7 @@
     "esModuleInterop": true,
     "declaration": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "lib": ["dom", "es6", "es7", "esnext"],
-    "types": ["node", "jest"],
-    "typeRoots": [ "node_modules/@types", "@types"]
+    "skipLibCheck": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "src/modules/provider/sample-app"]
