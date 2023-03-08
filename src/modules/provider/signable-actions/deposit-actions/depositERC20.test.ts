@@ -4,6 +4,7 @@ import {
   EncodingApi,
   UsersApi,
   TokensApi,
+  ERC20Amount
 } from "@imtbl/core-sdk";
 import { depositERC20 } from './';
 import { Contracts } from "@imtbl/core-sdk";
@@ -19,10 +20,9 @@ describe('Deposit ERC20', () => {
     let getSignableRegistrationMock: jest.Mock;
 
     const signableDepositRequest = {
-      type: 'ERC20',
       tokenAddress: "kljh5kl3j4biu3b59385",
       amount: "1000000000000000000",
-    };
+    } as ERC20Amount;
 
     const getSignableDepositResponse = {
       stark_key: "1111",
