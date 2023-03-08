@@ -2,6 +2,7 @@ import { ImmutableXConfiguration, StarkSigner } from "@imtbl/core-sdk";
 import { Signers } from "../signable-actions/types";
 import { Configuration, Environment } from "../../../config";
 import { TransactionResponse } from '@ethersproject/providers';
+import { Signer } from "@ethersproject/abstract-signer";
 
 export const privateKey1 = "d90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36"
 export const privateKey2 = "013fe4a5265bc6deb3f3b524b987sdf987f8c7a8ec2a998ae0512f493d763c8f"
@@ -71,8 +72,8 @@ export const generateSigners = async (
     },
     getAddress: async () => ethKey,
     getChainId: async () => testChainId,
-    sendTransaction: async () => ({} as TransactionResponse)
-  }
+    sendTransaction: async () => ({} as TransactionResponse),
+  } as unknown as Signer
 
   // L2 credentials
   const starkExSigner = {
