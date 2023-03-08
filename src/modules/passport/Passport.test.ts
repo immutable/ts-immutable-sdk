@@ -85,4 +85,22 @@ describe('Passport', () => {
       expect(result).toEqual(userMock.profile);
     });
   });
+
+  describe('getIdToken', () => {
+    it('should execute getIdToken', async () => {
+      const userMock: User = {
+        idToken: 'id123',
+        refreshToken: 'refresh123',
+        accessToken: 'access123',
+        profile: {
+          sub: 'email|123',
+        },
+      };
+      getUserMock.mockReturnValue(userMock);
+
+      const result = await passport.getIdToken();
+
+      expect(result).toEqual(userMock.idToken);
+    });
+  });
 });

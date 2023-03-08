@@ -33,7 +33,7 @@ import {
 import { TransactionResponse } from '@ethersproject/providers';
 import { createTrade } from './signable-actions/trades';
 import { deposit } from './signable-actions/deposit';
-import { exchangeTransfers } from './signable-actions/exchangeTransfers';
+import { exchangeTransfer } from './signable-actions/exchanges';
 
 export class GenericIMXProvider implements IMXProvider {
   private readonly config: Configuration;
@@ -111,7 +111,7 @@ export class GenericIMXProvider implements IMXProvider {
   exchangeTransfer(
     request: UnsignedExchangeTransferRequest
   ): Promise<CreateTransferResponseV1> {
-    return exchangeTransfers({
+    return exchangeTransfer({
       signers: this.signers,
       request,
       config: this.config,
