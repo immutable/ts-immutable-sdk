@@ -134,9 +134,8 @@ describe('AuthManager', () => {
       mockedAxios.get.mockClear();
     });
     it('requestRefreshTokenAfterRegistration successful with user wallet address in metadata', async () => {
-      const mockUpdatedUser = { access_token: "123" };
-      const expected = { accessToken: "123", etherKey: passportData.passport.ether_key };
-      signinSilentMock.mockReturnValue(mockUpdatedUser);
+      const expected = { ...mockUser, etherKey: passportData.passport.ether_key };
+      signinSilentMock.mockReturnValue(mockOidcUser);
       const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
       const response = {
         data: {

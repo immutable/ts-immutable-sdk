@@ -37,7 +37,7 @@ export default class AuthManager {
   }
 
   private mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
-    const passport = oidcUser.profile?.passport as PassportMetadata
+    const passport = oidcUser.profile?.passport as PassportMetadata;
     return ({
       idToken: oidcUser.id_token,
       accessToken: oidcUser.access_token,
@@ -83,12 +83,14 @@ export default class AuthManager {
 
   public async requestRefreshTokenAfterRegistration(jwt: string): Promise<User | null> {
     return withPassportError<User | null>(async () => {
-      await retryWithDelay(() => getUserEtherKeyFromMetadata(passportAuthDomain, jwt));
+      const etherKey = await retryWithDelay(() => getUserEtherKeyFromMetadata(passportAuthDomain, jwt));
       const updatedUser = await this.userManager.signinSilent();
       if (!updatedUser) {
         return null;
       }
-      return this.mapOidcUserToDomainModel(updatedUser);
+      const user = this.mapOidcUserToDomainModel(updatedUser);
+      user.etherKey = etherKey;
+      return user;
     }, {
       type: PassportErrorType.REFRESH_TOKEN_ERROR,
     });
