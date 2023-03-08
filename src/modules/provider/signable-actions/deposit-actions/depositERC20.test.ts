@@ -19,7 +19,7 @@ describe('Deposit ERC20', () => {
     let getSignableRegistrationMock: jest.Mock;
 
     const signableDepositRequest = {
-      type: 'ERC721',
+      type: 'ERC20',
       tokenAddress: "kljh5kl3j4biu3b59385",
       amount: "1000000000000000000",
     };
@@ -116,7 +116,7 @@ describe('Deposit ERC20', () => {
               decimals: 18,
               token_address: "kljh5kl3j4biu3b59385",
             },
-            type: "ERC721",
+            type: "ERC20",
           },
           user: "ETHd90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36",
         },
@@ -128,7 +128,7 @@ describe('Deposit ERC20', () => {
             data: {
               token_address: "kljh5kl3j4biu3b59385",
             },
-            type: "ERC721",
+            type: "ERC20",
           },
         },
       })
