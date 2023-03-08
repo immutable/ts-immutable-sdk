@@ -83,18 +83,12 @@ export default class AuthManager {
 
   public async requestRefreshTokenAfterRegistration(jwt: string): Promise<User | null> {
     return withPassportError<User | null>(async () => {
-      const etherKey = await retryWithDelay(() => getUserEtherKeyFromMetadata(passportAuthDomain, jwt));
+      await retryWithDelay(() => getUserEtherKeyFromMetadata(passportAuthDomain, jwt));
       const updatedUser = await this.userManager.signinSilent();
       if (!updatedUser) {
         return null;
       }
-      return {
-        idToken: updatedUser.id_token,
-        accessToken: updatedUser.access_token,
-        refreshToken: updatedUser.refresh_token,
-        profile: updatedUser.profile,
-        etherKey,
-      };
+      return this.mapOidcUserToDomainModel(updatedUser);
     }, {
       type: PassportErrorType.REFRESH_TOKEN_ERROR,
     });
