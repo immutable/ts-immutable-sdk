@@ -69,7 +69,8 @@ export const generateSigners = async (
       return message + ethKey;
     },
     getAddress: async () => ethKey,
-    getChainId: async () => testChainId
+    getChainId: async () => testChainId,
+    sendTransaction: async () => (true)
   }
 
   // L2 credentials
