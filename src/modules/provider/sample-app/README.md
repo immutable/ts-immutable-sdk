@@ -2,7 +2,7 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-The provider sample app tests the Metamask provider functionality.
+The provider sample app tests the MetaMask provider functionality.
 
 ## Yalc Setup
 
@@ -24,9 +24,10 @@ From within the sample-app root directory run
 
 ```
 yalc add ts-immutable-sdk
+npm install
 ```
 
-If changes are made to `ts-immutable-sdk` in the root directory of the sdk run
+If changes are made to `ts-immutable-sdk` in the root directory of the sdk after already publishing run
 
 ```
 yalc push

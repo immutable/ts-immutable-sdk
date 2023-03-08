@@ -4,10 +4,6 @@
     "ts-immutable-sdk": {
       "signature": "5998be42adcded4037e9e9a7d56388e8",
       "file": true
-    },
-    "@imtbl/core-sdk": {
-      "signature": "4abc2b4e0df3e9322565335d009be056",
-      "file": true
     }
   }
 }
