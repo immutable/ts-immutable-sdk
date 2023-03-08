@@ -59,7 +59,7 @@ describe('Registration', () => {
       (signRaw as jest.Mock).mockReturnValue("raw-eth-signature");
     })
 
-    test('should make the correct api requests with the correct params, and return the correct result', async () => {
+    test('should make the api requests with the correct params', async () => {
       const signers = await generateSigners(privateKey1)
       const ethKey = await signers.ethSigner.getAddress();
       const starkKey = await signers.starkExSigner.getAddress();

@@ -1,9 +1,10 @@
 import { generateSigners, privateKey1, testConfig } from "../test/helpers";
 import { UnsignedOrderRequest, OrdersApi } from "@imtbl/core-sdk";
 import { parseEther } from '@ethersproject/units';
-import { createOrder } from './orders';
+import { cancelOrder, createOrder } from "./orders";
 import { signRaw } from './utils';
 import { convertToSignableToken } from "./utils"
+import { GetSignableCancelOrderRequest } from "../../../types";
 
 
 jest.mock('@imtbl/core-sdk')
@@ -104,6 +105,67 @@ describe('Orders', () => {
         xImxEthSignature: "raw-eth-signature",
       })
       expect(response).toEqual(createOrderResponse);
+    })
+  });
+  describe('cancelOrder()', () => {
+    let getSignableCancelOrderMock: jest.Mock;
+    let cancelOrderMock: jest.Mock;
+
+    const signableCancelRequest: GetSignableCancelOrderRequest = {
+      order_id: 1212
+    };
+    const getSignableCancelResponse = {
+      signable_message: "hello",
+      payload_hash: "hash",
+      order_id: 1212,
+    }
+    const createCancelResponse = {
+      order_id: 0,
+      status: "some-status",
+    };
+
+    beforeEach(() => {
+      jest.restoreAllMocks()
+      getSignableCancelOrderMock = jest.fn().mockResolvedValue({
+        data: getSignableCancelResponse
+      });
+      cancelOrderMock = jest.fn().mockResolvedValue({
+        data: createCancelResponse
+      });
+      (OrdersApi as jest.Mock).mockReturnValue({
+        getSignableCancelOrder: getSignableCancelOrderMock,
+        cancelOrder: cancelOrderMock,
+      });
+
+      (signRaw as jest.Mock).mockReturnValue("raw-eth-signature");
+    })
+
+    test('should make the correct api requests with the correct params, and return the correct receipt', async () => {
+      const signers = await generateSigners(privateKey1)
+      const starkSignature = getSignableCancelResponse.payload_hash +
+            "STX" +
+            privateKey1;
+
+      const response = await cancelOrder({
+        signers,
+        request: signableCancelRequest,
+        config: testConfig,
+      });
+
+      expect(getSignableCancelOrderMock).toHaveBeenCalledWith({
+        getSignableCancelOrderRequest: signableCancelRequest
+      });
+
+      expect(cancelOrderMock).toHaveBeenCalledWith({
+        id: signableCancelRequest.order_id.toString(),
+        cancelOrderRequest: {
+          order_id: signableCancelRequest.order_id,
+          stark_signature: starkSignature,
+        },
+        xImxEthAddress: await signers.ethSigner.getAddress(),
+        xImxEthSignature: "raw-eth-signature",
+      })
+      expect(response).toEqual(createCancelResponse);
     })
   })
 })
