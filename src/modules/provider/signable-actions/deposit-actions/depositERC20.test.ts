@@ -116,7 +116,6 @@ describe('Deposit ERC20', () => {
               decimals: 18,
               token_address: "kljh5kl3j4biu3b59385",
             },
-            type: "ERC20",
           },
           user: "ETHd90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36",
         },
@@ -128,11 +127,10 @@ describe('Deposit ERC20', () => {
             data: {
               token_address: "kljh5kl3j4biu3b59385",
             },
-            type: "ERC20",
           },
         },
       })
-      expect(response).toEqual(true);
+      expect(response).toEqual({});
     })
   })
 })
