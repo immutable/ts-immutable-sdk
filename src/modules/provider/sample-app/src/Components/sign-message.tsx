@@ -35,7 +35,7 @@ export const SignMessage = () => {
 
     return(
         <>
-            {state.layer2address && renderSignForm() }
+            { state.layer2address && renderSignForm() }
         </>
     )
 }
