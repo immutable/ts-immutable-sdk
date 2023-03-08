@@ -1,36 +1,42 @@
 import { generateSigners, privateKey1, testConfig } from "../test/helpers";
-import { UsersApi } from "@imtbl/core-sdk";
+import { Contracts, UsersApi } from "@imtbl/core-sdk";
 import { signRaw } from "./utils";
-import { registerOffchain } from "./registration";
+import { isRegisteredOnChain, registerOffchain } from "./registration";
 
 
 jest.mock('@imtbl/core-sdk')
 jest.mock('./utils')
 
 describe('Registration', () => {
-  // describe('isRegisteredOnChain workflow', () => {
-  //   let isRegisteredMock: jest.Mock;
-  //   let connectMock: jest.Mock;
-  //
-  //   beforeEach(() => {
-  //     jest.restoreAllMocks();
-  //     isRegisteredMock = jest.fn().mockResolvedValue(true);
-  //     connectMock = jest.fn().mockResolvedValue({
-  //       isRegistered: isRegisteredMock
-  //     });
-  //
-  //     (ContractFactory as unknown as jest.Mock).mockReturnValue({
-  //       connect: connectMock,
-  //     });
-  //   })
-  //
-  //   test('should check stark public key and not throw an error', async () => {
-  //     const signers = await generateSigners(privateKey1)
-  //
-  //     expect(async ()=>await isRegisteredOnChain("stark-key", signers.ethSigner, testConfig))
-  //       .not.toThrowError(Error);
-  //   });
-  // });
+  describe('isRegisteredOnChain workflow', () => {
+
+    beforeEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test('should check stark public key and not throw an error', async () => {
+      const signers = await generateSigners(privateKey1);
+
+      (Contracts.Registration.connect as jest.Mock).mockReturnValue({
+        isRegistered: jest.fn().mockResolvedValue(true)
+      });
+
+      await expect(isRegisteredOnChain("stark-key", signers.ethSigner, testConfig)
+      ).resolves.not.toThrowError(new Error("some err"));
+    });
+
+
+    test('should check stark public key and throw an error', async () => {
+      const signers = await generateSigners(privateKey1);
+      const err = new Error("some error");
+
+      (Contracts.Registration.connect as jest.Mock).mockReturnValue({
+        isRegistered: jest.fn().mockRejectedValue( ()=> { throw err; })
+      });
+      await expect(isRegisteredOnChain("stark-key", signers.ethSigner, testConfig))
+        .rejects.toThrowError(err);
+    });
+  });
 
   describe('registerOffchain', () => {
     let getSignableRegistrationOffchainMock: jest.Mock;
