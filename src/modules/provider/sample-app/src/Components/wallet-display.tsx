@@ -7,12 +7,11 @@ export const WalletDisplay = () => {
 
     return (
         <>
-            {state.layer1address && 
+            {state.address && 
                 <>
                     <Heading size='medium'>Wallet</Heading>
-                    <p>{!state.layer1address && `Connect your wallet to MetaMask`}</p>
-                    <p>{state.layer1address && `Layer 1 address: ${state.layer1address}`}</p>
-                    <p>{state.layer2address && `Layer 2 address: ${state.layer2address}`}</p>
+                    <p>{!state.address && `Connect your wallet to MetaMask`}</p>
+                    <p>{state.address && `Layer 1 address: ${state.address}`}</p>
                 </>
             }
         </>

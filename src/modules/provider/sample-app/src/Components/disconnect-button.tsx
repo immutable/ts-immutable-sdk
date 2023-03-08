@@ -1,26 +1,24 @@
 import { Actions, AppCtx } from '../Context/app-context';
 import { Heading, Button } from '@biom3/react';
-import { imxDisconnect } from 'ts-immutable-sdk';
 import { useContext } from 'react';
 
 export const DisconnectButton = () => {
     const { state, dispatch } = useContext(AppCtx);
 
     const disconnect = async () => {
-        if (state.imxSigner) {
-            await imxDisconnect(state.imxSigner);
+        // todo: implement when disconnect added to wrapper
+        console.log('disconnected from metamask');
 
-            dispatch({
-               payload: {
-                    type: Actions.WalletDisconnected
-               },
-            });
-        }
+        dispatch({
+            payload: {
+               type: Actions.MetaMaskProviderDisconnected,
+            },
+        });
      }
     
     return(
         <>
-            {state.layer1address &&
+            {state.address &&
                 <>
                     <Heading size='medium'>Disconnect</Heading>
                     <Button onClick={() => disconnect()}>

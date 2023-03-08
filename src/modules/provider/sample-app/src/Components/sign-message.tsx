@@ -10,7 +10,6 @@ export const SignMessage = () => {
         return (
             <>
                 <Heading size='medium'>Sign a message</Heading>
-                <p>Sign a message using the layer 2 IMX signer</p>
                 <FormControl>
                     <TextInput
                         sx={{ w: 'base.border.size.100' }}
@@ -28,14 +27,13 @@ export const SignMessage = () => {
     }
 
     const sign = async () => {
-        if (state.imxSigner) {
-            console.log(await state.imxSigner.signMessage(signMessage));
-        }
+        // todo: implement sign when actually implemented in wrapper
+        console.log(signMessage);
     }
 
     return(
         <>
-            { state.layer2address && renderSignForm() }
+            { state.address && renderSignForm() }
         </>
     )
 }
