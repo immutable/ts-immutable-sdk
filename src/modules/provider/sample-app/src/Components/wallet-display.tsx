@@ -1,6 +1,6 @@
-import { useContext } from 'react';
 import { AppCtx } from '../Context/app-context';
 import { Heading } from '@biom3/react';
+import { useContext } from 'react';
 
 export const WalletDisplay = () => {
     const { state } = useContext(AppCtx);

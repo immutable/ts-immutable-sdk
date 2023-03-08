@@ -1,6 +1,6 @@
-import { createContext } from "react";
-import { Web3Provider } from '@ethersproject/providers/lib/web3-provider';
+import { createContext } from 'react';
 import { ImxSigner, MetaMaskProvider, Environment } from 'ts-immutable-sdk';
+import { Web3Provider } from '@ethersproject/providers/lib/web3-provider';
 
 export interface AppState {
     metamaskProvider: MetaMaskProvider | null;
@@ -15,9 +15,9 @@ export const initialState: AppState = {
     metamaskProvider: null,
     web3provider: null,
     imxSigner: null,
-    layer1address: "",
-    layer2address: "",
-    env: ""
+    layer1address: '',
+    layer2address: '',
+    env: ''
 }
 
 export interface AppContextState {
@@ -88,8 +88,8 @@ export const appReducer: Reducer<AppState, Action> = (state: AppState, action: A
                 ...state,
                 web3provider: null,
                 imxSigner: null,
-                layer1address: "",
-                layer2address: ""
+                layer1address: '',
+                layer2address: ''
             }
         case Actions.MetamaskProviderConnected:
             return {

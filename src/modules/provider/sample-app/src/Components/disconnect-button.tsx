@@ -1,7 +1,7 @@
-import { Heading, Button } from '@biom3/react';
-import { useContext } from 'react';
 import { Actions, AppCtx } from '../Context/app-context';
+import { Heading, Button } from '@biom3/react';
 import { imxDisconnect } from 'ts-immutable-sdk';
+import { useContext } from 'react';
 
 export const DisconnectButton = () => {
     const { state, dispatch } = useContext(AppCtx);

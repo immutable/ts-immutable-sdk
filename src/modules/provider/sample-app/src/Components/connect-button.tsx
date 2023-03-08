@@ -1,9 +1,8 @@
-import {Button, Heading } from '@biom3/react'
-import { useContext } from 'react';
-import { connect, imxConnect } from 'ts-immutable-sdk';
 import { Actions, AppCtx } from '../Context/app-context';
-
+import { connect, imxConnect } from 'ts-immutable-sdk';
 import { MetaMaskProvider, Configuration, PRODUCTION } from 'ts-immutable-sdk';
+import { useContext } from 'react';
+import {Button, Heading } from '@biom3/react'
 
 export const ConnectButton = () => {
    const { state, dispatch } = useContext(AppCtx);
@@ -13,8 +12,8 @@ export const ConnectButton = () => {
       const imxSigner = await imxConnect(web3provider, state.env);
       const layer1address = await web3provider.getSigner().getAddress();
       const layer2address = imxSigner.getAddress();
-      console.log("l1 address: ", layer1address);
-      console.log("l2 address: ", layer2address);
+      console.log('l1 address: ', layer1address);
+      console.log('l2 address: ', layer2address);
 
       dispatch({
          payload: {
