@@ -33,7 +33,7 @@ export const Config = {
   createSandboxConfig: (passportArguments: PassportConfigurationArguments): PassportConfiguration => ({
     network: Networks.SANDBOX,
     oidcConfiguration: {
-      authenticationDomain: 'https://auth.dev.immutable.com',
+      authenticationDomain: 'https://auth.immutable.com',
       clientId: passportArguments.clientId,
       logoutRedirectUri: passportArguments.logoutRedirectUri,
       redirectUri: passportArguments.redirectUri,
