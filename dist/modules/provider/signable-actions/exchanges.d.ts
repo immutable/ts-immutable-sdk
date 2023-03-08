@@ -6,5 +6,5 @@ type TransfersWorkflowParams = {
     request: UnsignedExchangeTransferRequest;
     config: Configuration;
 };
-export declare function exchangeTransfers({ signers, request, config, }: TransfersWorkflowParams): Promise<CreateTransferResponseV1>;
+export declare function exchangeTransfer({ signers, request, config, }: TransfersWorkflowParams): Promise<CreateTransferResponseV1>;
 export {};

@@ -1,6 +1,7 @@
 import { ImmutableX, generateLegacyStarkPrivateKey, createStarkSigner, TransfersApi, OrdersApi, UsersApi, Contracts, WithdrawalsApi, EncodingApi, MintsApi, TradesApi, DepositsApi, TokensApi, ExchangesApi } from '@imtbl/core-sdk';
 export { EncodeAssetRequestTokenTypeEnum, EthSigner, FeeTokenTypeEnum, GetMetadataRefreshResponseStatusEnum, MetadataRefreshExcludingSummaryStatusEnum } from '@imtbl/core-sdk';
 import { UserManager } from 'oidc-client-ts';
+import axios from 'axios';
 import { ethers } from 'ethers';
 import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
@@ -26,6 +27,7 @@ var PassportErrorType;
     PassportErrorType["INVALID_CONFIGURATION"] = "INVALID_CONFIGURATION";
     PassportErrorType["WALLET_CONNECTION_ERROR"] = "WALLET_CONNECTION_ERROR";
     PassportErrorType["NOT_LOGGED_IN_ERROR"] = "NOT_LOGGED_IN_ERROR";
+    PassportErrorType["REFRESH_TOKEN_ERROR"] = "REFRESH_TOKEN_ERROR";
 })(PassportErrorType || (PassportErrorType = {}));
 class PassportError extends Error {
     type;
@@ -46,6 +48,42 @@ const withPassportError = async (fn, customError) => {
     }
 };
 
+const POLL_INTERVAL = 1 * 1000; // every 1 second
+const MAX_RETRIES = 5;
+const wait = (ms) => new Promise((resolve) => {
+    setTimeout(() => resolve(), ms);
+});
+const retryWithDelay = async (fn, options) => {
+    const { retries = MAX_RETRIES, interval = POLL_INTERVAL, finalErr = Error('Retry failed') } = options || {};
+    try {
+        return await fn();
+    }
+    catch (err) {
+        if (retries <= 0) {
+            return Promise.reject(finalErr);
+        }
+        await wait(interval);
+        return retryWithDelay(fn, { retries: (retries - 1), finalErr });
+    }
+};
+
+const getUserEtherKeyFromMetadata = async (authDomain, jwt) => {
+    const passportData = await getUserPassportMetadata(authDomain, jwt);
+    const metadataExists = !!passportData?.ether_key && !!passportData?.stark_key && !!passportData?.user_admin_key;
+    if (metadataExists) {
+        return passportData.ether_key;
+    }
+    return Promise.reject('user wallet addresses not exist');
+};
+const getUserPassportMetadata = async (authDomain, jwt) => {
+    const { data } = await axios.get(`${authDomain}/userinfo`, {
+        headers: {
+            Authorization: `Bearer ` + jwt
+        }
+    });
+    return data?.passport;
+};
+
 // TODO: This is a static Auth0 domain that could come from env or config file
 const passportAuthDomain = 'https://auth.dev.immutable.com';
 const getAuthConfiguration = ({ clientId, redirectUri }) => ({
@@ -57,6 +95,7 @@ const getAuthConfiguration = ({ clientId, redirectUri }) => ({
         authorization_endpoint: `${passportAuthDomain}/authorize`,
         token_endpoint: `${passportAuthDomain}/oauth/token`,
     },
+    loadUserInfo: true,
 });
 class AuthManager {
     userManager;
@@ -66,16 +105,20 @@ class AuthManager {
             redirectUri,
         }));
     }
-    mapOidcUserToDomainModel = (oidcUser) => ({
-        idToken: oidcUser.id_token,
-        accessToken: oidcUser.access_token,
-        refreshToken: oidcUser.refresh_token,
-        profile: {
-            sub: oidcUser.profile.sub,
-            email: oidcUser.profile.email,
-            nickname: oidcUser.profile.nickname,
-        },
-    });
+    mapOidcUserToDomainModel = (oidcUser) => {
+        const passport = oidcUser.profile?.passport;
+        return ({
+            idToken: oidcUser.id_token,
+            accessToken: oidcUser.access_token,
+            refreshToken: oidcUser.refresh_token,
+            profile: {
+                sub: oidcUser.profile.sub,
+                email: oidcUser.profile.email,
+                nickname: oidcUser.profile.nickname,
+            },
+            etherKey: passport?.ether_key || ""
+        });
+    };
     async login() {
         return withPassportError(async () => {
             const oidcUser = await this.userManager.signinPopup();
@@ -98,6 +141,20 @@ class AuthManager {
             return this.mapOidcUserToDomainModel(oidcUser);
         }, {
             type: PassportErrorType.NOT_LOGGED_IN_ERROR,
+        });
+    }
+    async requestRefreshTokenAfterRegistration(jwt) {
+        return withPassportError(async () => {
+            const etherKey = await retryWithDelay(() => getUserEtherKeyFromMetadata(passportAuthDomain, jwt));
+            const updatedUser = await this.userManager.signinSilent();
+            if (!updatedUser) {
+                return null;
+            }
+            const user = this.mapOidcUserToDomainModel(updatedUser);
+            user.etherKey = etherKey;
+            return user;
+        }, {
+            type: PassportErrorType.REFRESH_TOKEN_ERROR,
         });
     }
 }
@@ -215,12 +272,19 @@ class Passport {
         this.magicAdapter = new MagicAdapter(config.network);
     }
     async connectImx() {
-        const user = await this.authManager.login();
+        let user = await this.authManager.login();
         if (!user.idToken) {
             throw new PassportError('Failed to initialise', PassportErrorType.WALLET_CONNECTION_ERROR);
         }
         const provider = await this.magicAdapter.login(user.idToken);
         const signer = await getStarkSigner(provider.getSigner());
+        if (!user.etherKey) {
+            const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(user.accessToken);
+            if (!updatedUser) {
+                throw new PassportError('Failed to get refresh token', PassportErrorType.REFRESH_TOKEN_ERROR);
+            }
+            user = updatedUser;
+        }
         return new PassportImxProvider(user, signer);
     }
     async loginCallback() {
@@ -229,6 +293,10 @@ class Passport {
     async getUserInfo() {
         const user = await this.authManager.getUser();
         return user.profile;
+    }
+    async getIdToken() {
+        const user = await this.authManager.getUser();
+        return user.idToken;
     }
 }
 
@@ -987,7 +1055,7 @@ async function deposit(signers, deposit, config) {
     }
 }
 
-async function exchangeTransfers({ signers, request, config, }) {
+async function exchangeTransfer({ signers, request, config, }) {
     await validateChain(signers.ethSigner, config.getStarkExConfig());
     const exchangeApi = new ExchangesApi(config.getStarkExConfig().apiConfiguration);
     const ethAddress = await signers.ethSigner.getAddress();
@@ -1083,7 +1151,7 @@ class GenericIMXProvider {
         return deposit(this.signers, tokenAmount, this.config);
     }
     exchangeTransfer(request) {
-        return exchangeTransfers({
+        return exchangeTransfer({
             signers: this.signers,
             request,
             config: this.config,

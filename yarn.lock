@@ -991,24 +991,24 @@
   resolved "https://registry.yarnpkg.com/@magic-ext/oidc/-/oidc-1.0.1.tgz#0109bd56b7dec8c17040270e8f9f66a142f015f4"
   integrity sha512-S52d/WGBKrL3HgNOHaKq83aEGm1iu8SGyDcXzXHu5rY5FG7SrHEJh7k70Fd+TdPwxjKYIieYs3q9CDVhID8sOA==
 
-"@magic-sdk/commons@^9.5.0":
-  version "9.5.0"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/commons/-/commons-9.5.0.tgz#7ffc366b9fa9a04ffbdd49d25abe986f16d6ba48"
-  integrity sha512-SYpEF8cpzPrsZRD+BZPVkO8N/09fWjDX/wJ67vjdUs78Q7H7bWQm1l+5CBcq3PdimEylm4cxRqmcT31AT155FQ==
+"@magic-sdk/commons@^9.6.0":
+  version "9.6.0"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/commons/-/commons-9.6.0.tgz#28d4c33d91a5933b965f606d4e4ed5e82e46c720"
+  integrity sha512-J8Ys3vYrgeBG2eYH2/SemthIH50KmqGZ5ieTmoZ13EJNMn8MzzGAdu0jh3GYMkw1UYPnFxiWGJA9dcdQJtVj2Q==
 
-"@magic-sdk/provider@^13.5.0":
-  version "13.5.0"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/provider/-/provider-13.5.0.tgz#ec53cf652592dec22b6eac1cdc5ca259f17ab459"
-  integrity sha512-iyyPuBmGNAUSziEthlQHuI+6VM6tZ4fe1C0xsOf50xlyFjInHOZWnIos9GmQ4/jaFvZjkQmB3OnbMegi8Fno3g==
+"@magic-sdk/provider@^13.6.0":
+  version "13.6.0"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/provider/-/provider-13.6.0.tgz#f0a61eeee4d4ac57f447bbe511f0462bb416fc4a"
+  integrity sha512-2LV8cSSQ5BfG5JphmIVYwOW6vBij+eysAGD89QPxvoLYyf8TJ/HJrdD+ijVpjxF0QR2F4Cri2Uxsknkmm8JLYQ==
   dependencies:
-    "@magic-sdk/types" "^11.5.0"
+    "@magic-sdk/types" "^11.6.0"
     eventemitter3 "^4.0.4"
     web3-core "1.5.2"
 
-"@magic-sdk/types@^11.5.0":
-  version "11.5.0"
-  resolved "https://registry.yarnpkg.com/@magic-sdk/types/-/types-11.5.0.tgz#e0c1daa00cac754f1fc377013b24f0151b680a23"
-  integrity sha512-sLNUNMcQy43Q4FD2sG+atuUsrgBvnAwrvUSP2IAc4fS30qkDlo+VWAOVNkNWu1o4HcioqOXUAgV3E24dKkLIqQ==
+"@magic-sdk/types@^11.6.0":
+  version "11.6.0"
+  resolved "https://registry.yarnpkg.com/@magic-sdk/types/-/types-11.6.0.tgz#0087db0464a02fe9eeb763dc6e92a05974a16f7f"
+  integrity sha512-r+sjmhGjJ9AaHnMvbNY2Wj+FL8o2V2FyPOXAZNtgC0Uv8oniJ7zaDx06SULOozoyAVHuzizs27riT4F6SLIaFA==
 
 "@metamask/detect-provider@^2.0.0":
   version "2.0.0"
@@ -2068,9 +2068,9 @@ domexception@^4.0.0:
     webidl-conversions "^7.0.0"
 
 electron-to-chromium@^1.4.284:
-  version "1.4.322"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.322.tgz#e0afa1d115b66c1d47869db40d8f2f3729cecc16"
-  integrity sha512-KovjizNC9XB7dno/2GjxX8VS0SlfPpCjtyoKft+bCO+UfD8bFy16hY4Sh9s0h9BDxbRH2U0zX5VBjpM1LTcNlg==
+  version "1.4.323"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.323.tgz#5f91cb03e6b88c0a208ff66c0203a24c6e689506"
+  integrity sha512-+a0hMEQxE8u1F1vOHcE0M18kQ2+4AwOXdRrU4avZ1LeR/sa9WAallYE3uES/PNcEGt/wCFcOgWcArSLx5C+WNQ==
 
 elliptic@6.5.4, elliptic@^6.4.0, elliptic@^6.5.4:
   version "6.5.4"
@@ -3537,13 +3537,13 @@ lru-cache@^6.0.0:
     yallist "^4.0.0"
 
 magic-sdk@^13.3.1:
-  version "13.5.0"
-  resolved "https://registry.yarnpkg.com/magic-sdk/-/magic-sdk-13.5.0.tgz#1c95f921bd4922e0c41922dc013e89197919be44"
-  integrity sha512-1+TzTN/7KKvvZVA8aE8qWmZ6QEr+dSjwHnbOulbSbYOfQ7u3GHpj3BRT52uucalpFuIer17lISu4hU/T2kOysg==
+  version "13.6.0"
+  resolved "https://registry.yarnpkg.com/magic-sdk/-/magic-sdk-13.6.0.tgz#06db8168d5e39c7c6f74a9eca13e97b9543868ee"
+  integrity sha512-Cmdcd1GAvnXQKl+ORwQ5icN2K1Tnk9ebIFjnR7plwemSbWP87wAk1CabwOG0FqvJvZhyZxv/tLJWDEG8eKK7Qw==
   dependencies:
-    "@magic-sdk/commons" "^9.5.0"
-    "@magic-sdk/provider" "^13.5.0"
-    "@magic-sdk/types" "^11.5.0"
+    "@magic-sdk/commons" "^9.6.0"
+    "@magic-sdk/provider" "^13.6.0"
+    "@magic-sdk/types" "^11.6.0"
     localforage "^1.7.4"
 
 make-dir@^3.0.0:

@@ -1,5 +1,5 @@
+import { IMXProvider } from '../provider/imxProvider';
 import { Networks, UserProfile } from './types';
-import { IMXProvider } from '../provider';
 export type PassportConfig = {
     clientId: string;
     network?: Networks;
@@ -12,4 +12,5 @@ export declare class Passport {
     connectImx(): Promise<IMXProvider>;
     loginCallback(): Promise<void>;
     getUserInfo(): Promise<UserProfile>;
+    getIdToken(): Promise<string | undefined>;
 }

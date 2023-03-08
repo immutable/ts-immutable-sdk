@@ -10,5 +10,6 @@ export default class AuthManager {
     login(): Promise<User>;
     loginCallback(): Promise<void>;
     getUser(): Promise<User>;
+    requestRefreshTokenAfterRegistration(jwt: string): Promise<User | null>;
 }
 export {};
