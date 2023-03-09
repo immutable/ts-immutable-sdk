@@ -14,9 +14,7 @@ export default class MagicAdapter {
   constructor(network: Networks = 'mainnet') {
     this.magicClient = new Magic(magicApiKey, {
       network,
-      extensions: [
-        new OpenIdExtension(),
-      ]
+      extensions: [new OpenIdExtension()],
     });
   }
 
@@ -27,10 +25,9 @@ export default class MagicAdapter {
         providerId: magicProviderId,
       });
       return new ethers.providers.Web3Provider(
-        this.magicClient.rpcProvider as unknown as ethers.providers.ExternalProvider
+        this.magicClient
+          .rpcProvider as unknown as ethers.providers.ExternalProvider
       );
-    }, {
-      type: PassportErrorType.WALLET_CONNECTION_ERROR,
-    })
+    }, PassportErrorType.WALLET_CONNECTION_ERROR);
   }
 }
