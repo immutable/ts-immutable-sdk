@@ -1,14 +1,14 @@
 import { createContext } from 'react';
-import { MetaMaskProvider, Environment } from 'ts-immutable-sdk';
+import { MetaMaskIMXProvider, Environment } from 'ts-immutable-sdk';
 
 export interface AppState {
-    metaMaskProvider: MetaMaskProvider | null;
+    metaMaskIMXProvider: MetaMaskIMXProvider | null;
     address: string;
     env: string;
 }
 
 export const initialState: AppState = {
-    metaMaskProvider: null,
+    metaMaskIMXProvider: null,
     address: '',
     env: '',
 }
@@ -28,13 +28,13 @@ export interface Action {
 
 type ActionPayload =
     SetEnvironment |
-    MetaMaskProviderConnected |
-    MetaMaskProviderDisconnected
+    MetaMaskIMXProviderConnected |
+    MetaMaskIMXProviderDisconnected
 
 export enum Actions {
     SetEnvironment = "SET_ENVIRONMENT",
-    MetaMaskProviderConnected = "METAMASK_PROVIDER_CONNECTED",
-    MetaMaskProviderDisconnected = "METAMASK_PROVIDER_DISCONNECTED"
+    MetaMaskIMXProviderConnected = "METAMASK_PROVIDER_CONNECTED",
+    MetaMaskIMXProviderDisconnected = "METAMASK_PROVIDER_DISCONNECTED"
 }
 
 export interface SetEnvironment {
@@ -42,14 +42,14 @@ export interface SetEnvironment {
     env: Environment;
 }
 
-export interface MetaMaskProviderConnected {
-    type: Actions.MetaMaskProviderConnected;
-    metaMaskProvider: MetaMaskProvider;
+export interface MetaMaskIMXProviderConnected {
+    type: Actions.MetaMaskIMXProviderConnected;
+    metaMaskIMXProvider: MetaMaskIMXProvider;
     address: string;
 }
 
-export interface MetaMaskProviderDisconnected {
-    type: Actions.MetaMaskProviderDisconnected;
+export interface MetaMaskIMXProviderDisconnected {
+    type: Actions.MetaMaskIMXProviderDisconnected;
 }
 
 export const appReducer: Reducer<AppState, Action> = (state: AppState, action: Action) => {
@@ -59,16 +59,16 @@ export const appReducer: Reducer<AppState, Action> = (state: AppState, action: A
                 ...state,
                 env: action.payload.env
             }
-        case Actions.MetaMaskProviderConnected:
+        case Actions.MetaMaskIMXProviderConnected:
             return {
                 ...state,
-                metaMaskProvider: action.payload.metaMaskProvider,
+                metaMaskIMXProvider: action.payload.metaMaskIMXProvider,
                 address: action.payload.address,
             }
-        case Actions.MetaMaskProviderDisconnected:
+        case Actions.MetaMaskIMXProviderDisconnected:
             return {
                 ...state,
-                metaMaskProvider: null,
+                metaMaskIMXProvider: null,
                 address: '',
             }
         default:

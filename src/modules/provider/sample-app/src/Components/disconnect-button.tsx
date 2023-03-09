@@ -11,7 +11,7 @@ export const DisconnectButton = () => {
 
         dispatch({
             payload: {
-               type: Actions.MetaMaskProviderDisconnected,
+               type: Actions.MetaMaskIMXProviderDisconnected,
             },
         });
      }
