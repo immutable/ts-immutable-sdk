@@ -10,7 +10,7 @@ export async function deposit(
 ) {
   switch (deposit.type) {
     case 'ETH':
-      return depositEth(signers.ethSigner, deposit, config);
+      return depositEth({ signers, deposit, config });
     case 'ERC20':
       return depositERC20({ signers, deposit, config });
     case 'ERC721':
