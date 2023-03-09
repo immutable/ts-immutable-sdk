@@ -50,7 +50,7 @@ const withPassportError = async (fn, customError) => {
 };
 
 const POLL_INTERVAL = 1 * 1000; // every 1 second
-const MAX_RETRIES = 60;
+const MAX_RETRIES = 120;
 const wait = (ms) => new Promise((resolve) => {
     setTimeout(() => resolve(), ms);
 });
@@ -70,8 +70,10 @@ const retryWithDelay = async (fn, options) => {
 
 const getUserEtherKeyFromMetadata = async (authDomain, jwt) => {
     const passportData = await getUserPassportMetadata(authDomain, jwt);
+    console.log('passportData', passportData);
     const metadataExists = !!passportData?.ether_key && !!passportData?.stark_key && !!passportData?.user_admin_key;
     if (metadataExists) {
+        console.log('passportData.ether_key', passportData.ether_key);
         return passportData.ether_key;
     }
     return Promise.reject('user wallet addresses not exist');
@@ -82,6 +84,7 @@ const getUserPassportMetadata = async (authDomain, jwt) => {
             Authorization: `Bearer ` + jwt
         }
     });
+    console.log('data', data);
     return data?.passport;
 };
 
@@ -95,9 +98,9 @@ const getAuthConfiguration = ({ clientId, redirectUri }) => ({
     metadata: {
         authorization_endpoint: `${passportAuthDomain}/authorize`,
         token_endpoint: `${passportAuthDomain}/oauth/token`,
-        userinfo_endpoint: `${passportAuthDomain}/userinfo`
+        // userinfo_endpoint: `${passportAuthDomain}/userinfo`
     },
-    loadUserInfo: true,
+    // loadUserInfo: true,
     scope: 'openid offline_access'
 });
 class AuthManager {
@@ -149,6 +152,7 @@ class AuthManager {
     async requestRefreshTokenAfterRegistration(jwt) {
         return withPassportError(async () => {
             const etherKey = await retryWithDelay(() => getUserEtherKeyFromMetadata(passportAuthDomain, jwt));
+            console.log('requestRefreshToken', etherKey);
             const updatedUser = await this.userManager.signinSilent();
             if (!updatedUser) {
                 return null;
@@ -275,14 +279,19 @@ class Passport {
         this.magicAdapter = new MagicAdapter(config.network);
     }
     async connectImx() {
+        console.log('i am running connect');
         let user = await this.authManager.login();
+        console.log('user', user);
         if (!user.idToken) {
             throw new PassportError('Failed to initialise', PassportErrorType.WALLET_CONNECTION_ERROR);
         }
         const provider = await this.magicAdapter.login(user.idToken);
         const signer = await getStarkSigner(provider.getSigner());
+        console.log('signer', signer);
+        console.log('connect etherkey', user.etherKey);
         if (!user.etherKey) {
             const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(user.accessToken);
+            console.log('updatedUser', updatedUser);
             if (!updatedUser) {
                 throw new PassportError('Failed to get refresh token', PassportErrorType.REFRESH_TOKEN_ERROR);
             }

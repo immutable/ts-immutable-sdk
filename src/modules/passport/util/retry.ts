@@ -1,5 +1,5 @@
 const POLL_INTERVAL = 1 * 1000;   // every 1 second
-const MAX_RETRIES = 60;
+const MAX_RETRIES = 120;
 
 
 export type RetryOption = {

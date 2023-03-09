@@ -20,9 +20,9 @@ const getAuthConfiguration = ({ clientId, redirectUri }: AuthInput) => ({
   metadata: {
     authorization_endpoint: `${passportAuthDomain}/authorize`,
     token_endpoint: `${passportAuthDomain}/oauth/token`,
-    userinfo_endpoint: `${passportAuthDomain}/userinfo`
+    // userinfo_endpoint: `${passportAuthDomain}/userinfo`
   },
-  loadUserInfo: true,
+  // loadUserInfo: true,
   scope: 'openid offline_access'
 });
 
@@ -86,6 +86,7 @@ export default class AuthManager {
   public async requestRefreshTokenAfterRegistration(jwt: string): Promise<User | null> {
     return withPassportError<User | null>(async () => {
       const etherKey = await retryWithDelay(() => getUserEtherKeyFromMetadata(passportAuthDomain, jwt));
+      console.log('requestRefreshToken', etherKey)
       const updatedUser = await this.userManager.signinSilent();
       if (!updatedUser) {
         return null;
