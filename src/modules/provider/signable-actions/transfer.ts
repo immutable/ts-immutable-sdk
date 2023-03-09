@@ -3,11 +3,11 @@ import {
   CreateTransferResponseV1,
   NftTransferDetails,
   UnsignedTransferRequest,
-} from 'src/types';
+} from 'types';
 import { Signers } from './types';
 import { convertToSignableToken } from './utils/convertToSignableToken';
 import { signRaw } from './utils';
-import { Configuration } from 'src/config';
+import { Configuration } from 'config';
 import { TransfersApi } from '@imtbl/core-sdk';
 import { validateChain } from './helpers';
 
@@ -23,7 +23,7 @@ type BatchTransfersWorkflowParams = {
   config: Configuration;
 };
 
-export async function transfers({
+export async function transfer({
   signers: { ethSigner, starkExSigner },
   request,
   config,
@@ -79,7 +79,7 @@ export async function transfers({
   };
 }
 
-export async function batchTransfers({
+export async function batchTransfer({
   signers: { ethSigner, starkExSigner },
   request,
   config,

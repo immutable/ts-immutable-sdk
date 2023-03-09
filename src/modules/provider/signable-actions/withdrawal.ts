@@ -1,7 +1,7 @@
-import { TokenAmount, AnyToken } from 'src/types';
+import { TokenAmount, AnyToken } from 'types';
 import { Signers } from './types';
 import { validateChain } from './helpers';
-import { Configuration } from 'src/config';
+import { Configuration } from 'config';
 import {
   prepareWithdrawalAction,
   completeEthWithdrawalAction,

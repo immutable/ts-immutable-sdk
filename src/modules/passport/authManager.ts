@@ -1,6 +1,8 @@
-import { UserManager } from 'oidc-client-ts';
+import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import { PassportErrorType, withPassportError } from './errors/passportError';
-import { User } from './types';
+import { PassportMetadata, User } from './types';
+import { retryWithDelay } from './util/retry';
+import { getUserEtherKeyFromMetadata } from './getUserMetadata';
 
 type AuthInput = {
   clientId: string;
@@ -19,10 +21,12 @@ const getAuthConfiguration = ({ clientId, redirectUri }: AuthInput) => ({
     authorization_endpoint: `${passportAuthDomain}/authorize`,
     token_endpoint: `${passportAuthDomain}/oauth/token`,
   },
+  loadUserInfo: true,
 });
 
 export default class AuthManager {
   private userManager;
+
   constructor({ clientId, redirectUri }: AuthInput) {
     this.userManager = new UserManager(
       getAuthConfiguration({
@@ -32,8 +36,26 @@ export default class AuthManager {
     );
   }
 
+  private mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
+    const passport = oidcUser.profile?.passport as PassportMetadata;
+    return ({
+      idToken: oidcUser.id_token,
+      accessToken: oidcUser.access_token,
+      refreshToken: oidcUser.refresh_token,
+      profile: {
+        sub: oidcUser.profile.sub,
+        email: oidcUser.profile.email,
+        nickname: oidcUser.profile.nickname,
+      },
+      etherKey: passport?.ether_key || ""
+    });
+  };
+
   public async login(): Promise<User> {
-    return withPassportError<User>(async () => this.userManager.signinPopup(), {
+    return withPassportError<User>(async () => {
+      const oidcUser = await this.userManager.signinPopup();
+      return this.mapOidcUserToDomainModel(oidcUser);
+    }, {
       type: PassportErrorType.AUTHENTICATION_ERROR,
     });
   }
@@ -45,5 +67,32 @@ export default class AuthManager {
         type: PassportErrorType.AUTHENTICATION_ERROR,
       }
     );
+  }
+
+  public async getUser(): Promise<User> {
+    return withPassportError<User>(async () => {
+      const oidcUser = await this.userManager.getUser();
+      if (!oidcUser) {
+        throw new Error('Failed to retrieve user');
+      }
+      return this.mapOidcUserToDomainModel(oidcUser);
+    }, {
+      type: PassportErrorType.NOT_LOGGED_IN_ERROR,
+    });
+  }
+
+  public async requestRefreshTokenAfterRegistration(jwt: string): Promise<User | null> {
+    return withPassportError<User | null>(async () => {
+      const etherKey = await retryWithDelay(() => getUserEtherKeyFromMetadata(passportAuthDomain, jwt));
+      const updatedUser = await this.userManager.signinSilent();
+      if (!updatedUser) {
+        return null;
+      }
+      const user = this.mapOidcUserToDomainModel(updatedUser);
+      user.etherKey = etherKey;
+      return user;
+    }, {
+      type: PassportErrorType.REFRESH_TOKEN_ERROR,
+    });
   }
 }

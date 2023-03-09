@@ -1,4 +1,8 @@
-import { Environment } from '../constants';
+/*
+ * @jest-environment jsdom
+ */
+
+import { Environment } from 'config';
 import {
   IMX_WALLET_IFRAME_ID,
   IMX_WALLET_IFRAME_HOSTS,

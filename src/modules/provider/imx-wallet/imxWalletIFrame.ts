@@ -1,9 +1,9 @@
-import { Environment } from '../constants';
+import { Environment } from 'config';
 
 export const IMX_WALLET_IFRAME_ID = 'imx-wallet-app';
 export const IMX_WALLET_IFRAME_HOSTS = {
   [Environment.DEVELOPMENT]: 'http://localhost:8080',
-  [Environment.STAGING]: 'https://wallets.sandbox.immutable.com',
+  [Environment.SANDBOX]: 'https://wallets.sandbox.immutable.com',
   [Environment.PRODUCTION]: 'https://wallets.immutable.com',
 };
 export const IMX_WALLET_IFRAME_STYLE = 'display: none;';
@@ -29,7 +29,7 @@ export async function setupIFrame(
 }
 
 export async function getOrSetupIFrame(
-  env: Environment,
+  env: Environment
 ): Promise<HTMLIFrameElement> {
   const iframe = getIFrame();
   if (iframe) return iframe;

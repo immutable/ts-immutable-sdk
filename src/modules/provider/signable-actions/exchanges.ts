@@ -5,7 +5,7 @@ import {
 import { convertToSignableToken } from './utils/convertToSignableToken';
 import { signRaw } from './utils';
 import { Signers } from './types';
-import { Configuration } from 'src/config';
+import { Configuration } from 'config';
 import { ExchangesApi } from '@imtbl/core-sdk';
 import { validateChain } from './helpers';
 
@@ -15,7 +15,7 @@ type TransfersWorkflowParams = {
   config: Configuration;
 };
 
-export async function exchangeTransfers({
+export async function exchangeTransfer({
   signers,
   request,
   config,

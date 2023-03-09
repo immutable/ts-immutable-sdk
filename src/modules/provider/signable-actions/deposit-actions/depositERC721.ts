@@ -3,7 +3,6 @@ import {
   DepositsApi,
   EncodingApi,
   ERC721Token,
-  EthSigner,
   ImmutableXConfiguration,
   UsersApi,
 } from '@imtbl/core-sdk';
@@ -12,8 +11,9 @@ import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
 } from '../registration';
-import { Configuration } from 'src/config';
+import { Configuration } from 'config';
 import { validateChain } from '../helpers';
+import { EthSigner } from 'types';
 
 interface ERC721TokenData {
   token_id: string;

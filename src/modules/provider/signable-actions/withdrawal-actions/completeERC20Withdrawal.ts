@@ -1,6 +1,6 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { Configuration } from 'src/config';
+import { Configuration } from 'config';
 import { ERC20Token } from '../../../../types';
 import {
   getSignableRegistrationOnchain,
@@ -8,7 +8,7 @@ import {
 } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import { Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
-import { validateChain } from "../helpers";
+import { validateChain } from '../helpers';
 
 type ExecuteRegisterAndWithdrawERC20Params = {
   ethSigner: Signer;

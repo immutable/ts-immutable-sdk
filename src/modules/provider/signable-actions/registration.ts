@@ -1,14 +1,12 @@
-import { RegisterUserResponse } from 'src';
-import { GetSignableRegistrationResponse } from 'src/types';
+import { RegisterUserResponse, GetSignableRegistrationResponse, EthSigner } from 'types';
 import { Signers } from './types';
 import { validateChain } from './helpers';
 import {
-  EthSigner,
   Contracts,
   UsersApi,
 } from '@imtbl/core-sdk';
 import { signRaw } from './utils';
-import { Configuration } from 'src/config';
+import { Configuration } from 'config';
 
 export async function registerOffchain(
   signers: Signers,
