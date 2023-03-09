@@ -1,9 +1,10 @@
-import { AppCtx } from '../Context/app-context';
+import { Actions, AppCtx } from '../context/app-context';
 import { Button, FormControl, TextInput, Heading } from '@biom3/react';
 import { ChangeEvent, useContext, useState } from 'react';
+import { MetaMaskIMXProvider } from 'ts-immutable-sdk';
 
 export const SignMessage = () => {
-    const { state } = useContext(AppCtx);
+    const { state, dispatch } = useContext(AppCtx);
     const [signMessage, setSignMessage] = useState('');
 
     const renderSignForm = () => {
@@ -27,13 +28,19 @@ export const SignMessage = () => {
     }
 
     const sign = async () => {
-        // todo: implement sign when actually implemented in wrapper
-        console.log(signMessage);
+        const signedMessage = await MetaMaskIMXProvider.signMessage(signMessage);
+        dispatch({
+            payload: {
+               type: Actions.MetaMaskIMXProviderSignMessage,
+               signedMessage,
+            },
+        });
     }
 
     return(
         <>
             { state.address && renderSignForm() }
+            { state.signedMessage && <>{`Signed message: ${state.signedMessage}`}</> }
         </>
     )
 }

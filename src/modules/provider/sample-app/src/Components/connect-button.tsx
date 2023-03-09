@@ -1,4 +1,4 @@
-import { Actions, AppCtx } from '../Context/app-context';
+import { Actions, AppCtx } from '../context/app-context';
 import { MetaMaskIMXProvider, Configuration, PRODUCTION } from 'ts-immutable-sdk';
 import { useContext } from 'react';
 import {Button } from '@biom3/react'
