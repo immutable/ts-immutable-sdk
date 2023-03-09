@@ -50,7 +50,7 @@ const withPassportError = async (fn, customError) => {
 };
 
 const POLL_INTERVAL = 1 * 1000; // every 1 second
-const MAX_RETRIES = 120;
+const MAX_RETRIES = 5;
 const wait = (ms) => new Promise((resolve) => {
     setTimeout(() => resolve(), ms);
 });
@@ -98,9 +98,9 @@ const getAuthConfiguration = ({ clientId, redirectUri }) => ({
     metadata: {
         authorization_endpoint: `${passportAuthDomain}/authorize`,
         token_endpoint: `${passportAuthDomain}/oauth/token`,
-        // userinfo_endpoint: `${passportAuthDomain}/userinfo`
+        userinfo_endpoint: `${passportAuthDomain}/userinfo`
     },
-    // loadUserInfo: true,
+    loadUserInfo: true,
     scope: 'openid offline_access'
 });
 class AuthManager {
