@@ -14,6 +14,6 @@ export async function deposit(
     case 'ERC20':
       return depositERC20({ signers, deposit, config });
     case 'ERC721':
-      return depositERC721(signers.ethSigner, deposit, config);
+      return depositERC721({signers, deposit, config});
   }
 }
