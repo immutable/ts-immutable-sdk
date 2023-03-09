@@ -1,4 +1,4 @@
-import { generateSigners, privateKey1, testConfig } from "../../test/helpers";
+import { generateSigners, privateKey1, testConfig, transactionResponse } from "../../test/helpers";
 import {
   DepositsApi,
   EncodingApi,
@@ -93,7 +93,7 @@ describe('Deposit ERC20', () => {
       });
 
       (Contracts.Registration.connect as jest.Mock).mockReturnValue({
-        isRegistered: async () => (true),
+        isRegistered: async () => true,
       });
     })
 
@@ -130,7 +130,7 @@ describe('Deposit ERC20', () => {
           },
         },
       })
-      expect(response).toEqual({});
+      expect(response).toEqual(transactionResponse);
     })
   })
 })

@@ -3,7 +3,7 @@ import { getEncodeAssetInfo } from "./getEncodeAssetInfo";
 import { isRegisteredOnChain } from "../registration";
 import { Contracts } from "@imtbl/core-sdk";
 import { completeERC20WithdrawalAction } from "./completeERC20Withdrawal";
-import { generateSigners, privateKey1, testConfig } from "../../test/helpers";
+import { generateSigners, privateKey1, testConfig, transactionResponse } from "../../test/helpers";
 
 
 jest.mock('@imtbl/core-sdk')
@@ -24,14 +24,13 @@ describe('completeERC20Withdrawal action', () => {
       (isRegisteredOnChain as jest.Mock).mockResolvedValue(true);
       (Contracts.Core.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
-          withdraw: jest.fn().mockResolvedValue({})
+          withdraw: jest.fn().mockResolvedValue(transactionResponse)
         }
       });
     });
     it('should execute withdrawal process for ERC20', async () => {
       const signers = await generateSigners(privateKey1);
-
-      await completeERC20WithdrawalAction({
+      const response = await completeERC20WithdrawalAction({
         ethSigner: signers.ethSigner,
         config: testConfig,
         starkPublicKey: "789912305",
@@ -40,7 +39,8 @@ describe('completeERC20Withdrawal action', () => {
           tokenAddress: "0x12as3"
         }
       });
-      expect(signers.ethSigner.sendTransaction).toHaveBeenCalledWith({})
+      await expect(response).toEqual(transactionResponse);
+
     });
   });
 
