@@ -1,7 +1,7 @@
 import { Actions, AppCtx } from '../context/app-context';
 import { MetaMaskIMXProvider, Configuration, PRODUCTION } from 'ts-immutable-sdk';
 import { useContext } from 'react';
-import {Button } from '@biom3/react'
+import { Box, Button } from '@biom3/react'
 
 export const ConnectButton = () => {
    const { state, dispatch } = useContext(AppCtx);
@@ -21,11 +21,11 @@ export const ConnectButton = () => {
    return (
       <>
          {!state.address && 
-            <>
+            <Box sx={{ padding: 'base.spacing.x5' }}>
                <Button onClick={() => wrapperMetaMaskConnect()}>
                   Connect to MetaMask
                </Button>
-            </>
+            </Box>
          }
       </>
    )

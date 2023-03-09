@@ -1,5 +1,5 @@
 import { Actions, AppCtx } from '../context/app-context';
-import { Heading, Button } from '@biom3/react';
+import { Box, Heading, Button } from '@biom3/react';
 import { useContext } from 'react';
 import { MetaMaskIMXProvider } from 'ts-immutable-sdk';
 
@@ -19,12 +19,12 @@ export const DisconnectButton = () => {
     return(
         <>
             {state.address &&
-                <>
+                <Box sx={{ padding: 'base.spacing.x5' }}>
                     <Heading size='medium'>Disconnect</Heading>
                     <Button onClick={() => disconnect()}>
                         Disconnect
                     </Button>
-                </>
+                </Box>
             }
         </>
     )

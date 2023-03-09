@@ -1,5 +1,5 @@
 import { Actions, AppCtx } from '../context/app-context';
-import { Button, FormControl, TextInput, Heading } from '@biom3/react';
+import { Box, Body, Button, FormControl, TextInput, Heading } from '@biom3/react';
 import { ChangeEvent, useContext, useState } from 'react';
 import { MetaMaskIMXProvider } from 'ts-immutable-sdk';
 
@@ -11,13 +11,12 @@ export const SignMessage = () => {
         return (
             <>
                 <Heading size='medium'>Sign a message</Heading>
-                <FormControl>
-                    <TextInput
-                        sx={{ w: 'base.border.size.100' }}
-                        onChange={updateSignMessage}
-                    />
-                </FormControl>
-                <Button onClick={() => sign()}>Sign</Button>
+                <Box sx={{ display: 'flex', flexDirection: 'row' }} >
+                    <FormControl>
+                        <TextInput onChange={updateSignMessage} />
+                    </FormControl>
+                    <Button onClick={() => sign()}>Sign</Button>
+                </Box>
             </>
         )
     }
@@ -38,9 +37,9 @@ export const SignMessage = () => {
     }
 
     return(
-        <>
+        <Box sx={{ padding: 'base.spacing.x5' }}>
             { state.address && renderSignForm() }
-            { state.signedMessage && <>{`Signed message: ${state.signedMessage}`}</> }
-        </>
+            { state.signedMessage && <Body>{`Signed message: ${state.signedMessage}`}</Body> }
+        </Box>
     )
 }
