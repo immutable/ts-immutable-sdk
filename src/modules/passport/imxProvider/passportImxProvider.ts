@@ -81,6 +81,9 @@ export default class PassportImxProvider implements IMXProvider {
 
         const createTransferRequest = {
           createTransferRequest: transferSigningParams,
+          //Note: fake value to by pass the client check, will update once get the up-to-date api client
+          xImxEthAddress: "",
+          xImxEthSignature: ""
         } as TransfersApiCreateTransferV1Request;
 
         const headers = {
