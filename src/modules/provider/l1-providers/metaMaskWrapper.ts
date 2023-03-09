@@ -23,7 +23,8 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
         await disconnectImxSigner(this.imxSigner);
     }
 
-    public static async signMessage(): Promise<string> {
-        return ""
+    public static async signMessage(message: string): Promise<string> {
+        if (this.imxSigner == undefined) return ""; // todo: do we want to error here?
+        return await this.imxSigner.signMessage(message);
     }
 }
