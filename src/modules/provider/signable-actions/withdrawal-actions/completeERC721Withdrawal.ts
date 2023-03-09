@@ -6,7 +6,7 @@ import {
   UsersApi,
 } from '@imtbl/core-sdk';
 import * as encUtils from 'enc-utils';
-import { ERC721Token } from '../../../../types';
+import { ERC721Token } from 'types';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,
