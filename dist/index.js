@@ -98,6 +98,7 @@ const getAuthConfiguration = ({ clientId, redirectUri }) => ({
         userinfo_endpoint: `${passportAuthDomain}/userinfo`
     },
     loadUserInfo: true,
+    scope: 'openid offline_access'
 });
 class AuthManager {
     userManager;
