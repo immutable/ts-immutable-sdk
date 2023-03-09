@@ -1,4 +1,4 @@
-import { generateSigners, privateKey1, testConfig } from "../../test/helpers";
+import { generateSigners, privateKey1, testConfig, transactionResponse } from "../../test/helpers";
 import {
   DepositsApi,
   EncodingApi,
@@ -119,7 +119,7 @@ describe('Deposit ERC721', () => {
           },
         },
       })
-      expect(response).toEqual({});
+      expect(response).toEqual(transactionResponse);
     })
   })
 })
