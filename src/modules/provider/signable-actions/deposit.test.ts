@@ -2,6 +2,7 @@ import { Configuration } from "config";
 import { deposit } from "./deposit";
 import * as depositActions from './deposit-actions';
 import { Signers } from "./types";
+import { TokenAmount } from "types";
 
 
 jest.mock('@imtbl/core-sdk')
@@ -28,7 +29,7 @@ describe('deposit', () => {
     test('should call depositERC20() when the type in the paylod is ERC20', async () => {
       deposit({
         signers: {} as Signers,
-        deposit: { type: 'ERC20' },
+        deposit: { type: 'ERC20' } as unknown as TokenAmount,
         config: {} as Configuration
       })
 
@@ -40,7 +41,7 @@ describe('deposit', () => {
     test('should call depositERC721() when the type in the paylod is ERC721', async () => {
       deposit({
         signers: {} as Signers,
-        deposit: { type: 'ERC721' },
+        deposit: { type: 'ERC721' } as unknown as TokenAmount,
         config: {} as Configuration
       })
 
@@ -52,7 +53,7 @@ describe('deposit', () => {
     test('should call depositEth() when the type in the paylod is ETH', async () => {
       deposit({
         signers: {} as Signers,
-        deposit: { type: 'ETH' },
+        deposit: { type: 'ETH' } as unknown as TokenAmount,
         config: {} as Configuration
       })
 
