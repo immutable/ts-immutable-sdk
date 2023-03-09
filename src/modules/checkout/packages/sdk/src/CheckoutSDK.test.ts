@@ -1,19 +1,31 @@
 
-import { connect, ConnectionProviders } from './connect/connect'
+import { connectWalletProvider, ConnectionProviders } from './connect'
 
 import { CheckoutSDK } from './CheckoutSDK'
+import { Network, switchWalletNetwork } from './network'
+import { Web3Provider } from '@ethersproject/providers'
 
-jest.mock('./connect/connect')
+jest.mock('./connect')
+jest.mock('./network')
 
 describe('CheckoutSDK Connect', () => {
-  it('should call the connect function', async () => {
+  it('should call the connectWalletProvider function', async () => {
     
     const checkoutSDK = new CheckoutSDK()
 
     const connRes = await checkoutSDK.connect({
-      provider: ConnectionProviders.METAMASK
+      providerPreference: ConnectionProviders.METAMASK
     })
 
-    expect(connect).toBeCalledTimes(1) 
+    expect(connectWalletProvider).toBeCalledTimes(1) 
+  })
+
+  it('should call the switchWalletNetwork function', async () => {
+    
+    const checkoutSDK = new CheckoutSDK()
+
+    await checkoutSDK.switchNetwork({provider: {} as Web3Provider, network: Network.ETHEREUM})
+
+    expect(switchWalletNetwork).toBeCalledTimes(1) 
   })
 })

@@ -5,32 +5,37 @@ export enum ConnectionProviders {
   METAMASK = "metamask"
 }
 
-function ConnectSDK() {
-  const checkout:CheckoutSDK = new CheckoutSDK()
- 
+interface ConnectProps {
+  setProvider: (provider: any) => void;  
+}
+
+function Connect(props: ConnectProps) {
+  const checkout:CheckoutSDK = new CheckoutSDK();
+  const {setProvider} = props;
+
+  async function connectClick(checkout:CheckoutSDK) {
+    const params:ConnectParams = {
+      providerPreference: ConnectionProviders.METAMASK
+    }
+  
+    try {
+      const provider = await checkout.connect(params);
+      setProvider(provider);
+    } catch(err) {
+      console.error(err)
+    }
+  }
+
   return (
     <div className="Connect">
       <Heading size="small" className="sample-heading">Checkout Connect (SDK)</Heading>
       <div className="divider"></div>
       <Button 
-      onClick={() => connectClick(checkout)}>
-        Connect SDK
+        onClick={() => connectClick(checkout)}>
+        Connect Wallet
       </Button>
     </div>
   );
 }
 
-async function connectClick(checkout:CheckoutSDK) {
-  const params:ConnectParams = {
-    provider: ConnectionProviders.METAMASK
-  }
-
-  try {
-    await checkout.connect(params)
-  } catch(err) {
-    console.error(err)
-  }
-  
-}
-
-export default ConnectSDK;
+export default Connect;

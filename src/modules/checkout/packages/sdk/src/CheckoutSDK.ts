@@ -1,12 +1,19 @@
-import { connect as SDKConnect, ConnectParams } from './connect/connect'
+import { Web3Provider } from '@ethersproject/providers'
+import { connectWalletProvider, ConnectParams } from './connect'
+import { SwitchNetworkParams, switchWalletNetwork } from './network';
 
 export class CheckoutSDK {
-  constructor() {}
+  constructor() {
+  }
 
-  public async connect(params: ConnectParams) {
-    console.log('[connect] called with', params)
-    const connectResult = await SDKConnect(params)      
-    return connectResult
+  public async connect(params: ConnectParams): Promise<Web3Provider> {
+    console.log('test hot reload sdk TEST')
+    const provider = await connectWalletProvider(params);
+    return provider;
+  }
+
+  public async switchNetwork(params: SwitchNetworkParams): Promise<void> {
+    await switchWalletNetwork(params.provider, params.network);
   }
 
 }

@@ -1,0 +1,1 @@
+export { TestWidget } from './modules/test/TestWidget'

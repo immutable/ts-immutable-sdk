@@ -6,7 +6,7 @@
     "@biom3/design-tokens": "^0.0.10-alpha",
     "@biom3/react": "^0.0.6-alpha",
     "@imtbl/checkout-sdk-web": "../sdk/imtbl-checkout-sdk-web-0.0.1.tgz",
-    "@imtbl/checkout-ui-types": "../ui/types/imtbl-checkout-ui-types-0.0.1.tgz",
+    "@imtbl/checkout-ui": "../ui/imtbl-checkout-ui-0.0.1.tgz",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",

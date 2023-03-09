@@ -1,3 +1,0 @@
-const Checkout = {};
-
-export { Checkout };
