@@ -2,8 +2,13 @@
   "name": "ts-immutable-sdk",
   "version": "0.0.0",
   "description": "Immutable Multi-Rollup TypeScript SDK",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
