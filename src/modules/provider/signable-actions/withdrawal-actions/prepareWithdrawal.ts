@@ -1,7 +1,7 @@
 import { WithdrawalsApi, CreateWithdrawalResponse, ImmutableXConfiguration } from '@imtbl/core-sdk';
-import { TokenAmount } from '../../../../types';
+import { TokenAmount } from 'types';
 import { signMessage } from '../utils';
-import { convertToSignableToken } from '../utils/convertToSignableToken';
+import { convertToSignableToken } from '../utils';
 import { Signers } from '../types';
 
 const assertIsDefined = <T>(value?: T): T => {
@@ -9,7 +9,7 @@ const assertIsDefined = <T>(value?: T): T => {
   throw new Error('undefined field exception');
 };
 
-type PrepareWithdrawalWorkflowParams = TokenAmount & {
+export type PrepareWithdrawalWorkflowParams = TokenAmount & {
   signers: Signers;
   config: ImmutableXConfiguration;
 };

@@ -14,20 +14,29 @@ import {
 import { Configuration } from 'config';
 import { validateChain } from '../helpers';
 import { EthSigner } from 'types';
+import { Signers } from '../types';
 
 interface ERC721TokenData {
   token_id: string;
   token_address: string;
 }
 
-export async function depositERC721(
-  signer: EthSigner,
-  deposit: ERC721Token,
-  config: Configuration
-): Promise<TransactionResponse> {
-  await validateChain(signer, config.getStarkExConfig());
+type DepositERC721Params = {
+  signers: Signers;
+  deposit: ERC721Token;
+  config: Configuration;
+}
 
-  const user = await signer.getAddress();
+export async function depositERC721(
+  {
+    signers: { ethSigner },
+    deposit,
+    config
+  }: DepositERC721Params
+): Promise<TransactionResponse> {
+  await validateChain(ethSigner, config.getStarkExConfig());
+
+  const user = await ethSigner.getAddress();
   const starkExConfig = config.getStarkExConfig();
   const depositsApi = new DepositsApi(starkExConfig.apiConfiguration);
   const encodingApi = new EncodingApi(starkExConfig.apiConfiguration);
@@ -73,12 +82,12 @@ export async function depositERC721(
 
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
-    signer,
+    ethSigner,
     config
   );
 
   // Approve whether an amount of token from an account can be spent by a third-party account
-  const tokenContract = Contracts.IERC721.connect(deposit.tokenAddress, signer);
+  const tokenContract = Contracts.IERC721.connect(deposit.tokenAddress, ethSigner);
   const operator = starkExConfig.ethConfiguration.coreContractAddress;
   const isApprovedForAll = await tokenContract.isApprovedForAll(user, operator);
   if (!isApprovedForAll) {
@@ -94,7 +103,7 @@ export async function depositERC721(
 
     const coreContract = Contracts.Core.connect(
       starkExConfig.ethConfiguration.coreContractAddress,
-      signer
+      ethSigner
     );
     // Note: proxy registration contract registerAndDepositNft method is not used as it currently fails erc721 transfer ownership check
     await coreContract.registerUser(
@@ -105,7 +114,7 @@ export async function depositERC721(
   }
 
   return executeDepositERC721(
-    signer,
+    ethSigner,
     deposit.tokenId,
     assetType,
     starkPublicKey,
@@ -115,7 +124,7 @@ export async function depositERC721(
 }
 
 async function executeDepositERC721(
-  signer: EthSigner,
+  ethSigner: EthSigner,
   tokenId: string,
   assetType: string,
   starkPublicKey: string,
@@ -124,7 +133,7 @@ async function executeDepositERC721(
 ): Promise<TransactionResponse> {
   const coreContract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    signer
+    ethSigner
   );
   const populatedTransaction =
     await coreContract.populateTransaction.depositNft(
@@ -134,5 +143,5 @@ async function executeDepositERC721(
       tokenId
     );
 
-  return signer.sendTransaction(populatedTransaction);
+  return ethSigner.sendTransaction(populatedTransaction);
 }
