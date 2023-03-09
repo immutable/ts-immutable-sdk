@@ -23,6 +23,7 @@ const getAuthConfiguration = ({ clientId, redirectUri }: AuthInput) => ({
     userinfo_endpoint: `${passportAuthDomain}/userinfo`
   },
   loadUserInfo: true,
+  scope: ['openid', 'offline_access']
 });
 
 export default class AuthManager {
