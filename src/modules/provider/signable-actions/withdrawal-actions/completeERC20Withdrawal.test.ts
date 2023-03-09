@@ -1,0 +1,55 @@
+
+import { getEncodeAssetInfo } from "./getEncodeAssetInfo";
+import { isRegisteredOnChain } from "../registration";
+import { Contracts } from "@imtbl/core-sdk";
+import { completeERC20WithdrawalAction } from "./completeERC20Withdrawal";
+import { generateSigners, privateKey1, testConfig } from "../../test/helpers";
+
+
+jest.mock('@imtbl/core-sdk')
+jest.mock('../utils')
+jest.mock('../registration')
+jest.mock('./getEncodeAssetInfo')
+
+describe('completeERC20Withdrawal action', () => {
+  const encodeAssetResponse = {
+    asset_id: 'asset-id',
+    asset_type: 'asset-type'
+  };
+
+  describe('when user is registered on-chain', () => {
+    beforeEach(() => {
+      jest.restoreAllMocks();
+      (getEncodeAssetInfo as jest.Mock).mockResolvedValue(encodeAssetResponse);
+      (isRegisteredOnChain as jest.Mock).mockResolvedValue(true);
+      (Contracts.Core.connect as jest.Mock).mockReturnValue({
+        populateTransaction: {
+          withdraw: jest.fn().mockResolvedValue({})
+        }
+      });
+    });
+    it('should execute withdrawal process for ERC20', async () => {
+      const signers = await generateSigners(privateKey1);
+
+      await completeERC20WithdrawalAction({
+        ethSigner: signers.ethSigner,
+        config: testConfig,
+        starkPublicKey: "789912305",
+        token: {
+          type: 'ERC20',
+          tokenAddress: "0x12as3"
+        }
+      });
+      expect(signers.ethSigner.sendTransaction).toHaveBeenCalledWith({})
+    });
+  });
+
+  describe('when user is not registered on-chain', () => {
+    beforeEach(() => {
+      jest.restoreAllMocks();
+      (getEncodeAssetInfo as jest.Mock).mockResolvedValue(encodeAssetResponse);
+      (isRegisteredOnChain as jest.Mock).mockResolvedValue(false);
+    });
+  });
+
+})
