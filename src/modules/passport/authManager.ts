@@ -20,9 +20,9 @@ const getAuthConfiguration = ({ clientId, redirectUri }: AuthInput) => ({
   metadata: {
     authorization_endpoint: `${passportAuthDomain}/authorize`,
     token_endpoint: `${passportAuthDomain}/oauth/token`,
-    // userinfo_endpoint: `${passportAuthDomain}/userinfo`
+    userinfo_endpoint: `${passportAuthDomain}/userinfo`
   },
-  // loadUserInfo: true,
+  loadUserInfo: true,
 });
 
 export default class AuthManager {
