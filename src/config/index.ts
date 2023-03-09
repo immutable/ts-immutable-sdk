@@ -13,7 +13,7 @@ type StarkExConfig = CoreSDKConfig & {
   env: Environment;
 };
 
-class Configuration {
+export class Configuration {
   private readonly starkExConfig: StarkExConfig;
 
   constructor(config: StarkExConfig) {
