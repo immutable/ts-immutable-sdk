@@ -11,8 +11,8 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
 
     public static async connect(config: Configuration): Promise<MetaMaskIMXProvider> {
         const starkExConfig = config.getStarkExConfig();
-        const metaMaskIMXProvider = await connect({chainID: starkExConfig.ethConfiguration.chainID});
-        const imxSigner = await buildImxSigner(metaMaskIMXProvider, starkExConfig.env);
-        return new MetaMaskIMXProvider(config, metaMaskIMXProvider.getSigner(), imxSigner);
+        const metaMaskProvider = await connect({chainID: starkExConfig.ethConfiguration.chainID});
+        const imxSigner = await buildImxSigner(metaMaskProvider, starkExConfig.env);
+        return new MetaMaskIMXProvider(config, metaMaskProvider.getSigner(), imxSigner);
     }
 }

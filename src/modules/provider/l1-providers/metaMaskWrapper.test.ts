@@ -8,7 +8,7 @@ jest.mock('../imx-wallet/imxWallet');
 
 describe('metaMetaWrapper', () => {
     describe('connect', () => {
-        it('should create a metamask provider with a eth signer and imx signer', async () => {
+        it('should create a metamask imx provider with a eth signer and imx signer', async () => {
             const config = new Configuration(PRODUCTION);
 
             const ethSigner = {};
