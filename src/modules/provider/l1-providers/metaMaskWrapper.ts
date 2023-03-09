@@ -4,6 +4,7 @@ import { Configuration } from 'config';
 import { EthSigner, StarkSigner } from 'types';
 import { GenericIMXProvider } from '../genericImxProvider';
 import { ImxSigner } from '../imx-wallet/ImxSigner';
+import { ProviderConnectionError } from './types';
 
 export class MetaMaskIMXProvider extends GenericIMXProvider {
     private static imxSigner: ImxSigner;
@@ -24,7 +25,9 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
     }
 
     public static async signMessage(message: string): Promise<string> {
-        if (this.imxSigner == undefined) return ""; // todo: do we want to error here?
+        if (!this.imxSigner) {
+            throw new ProviderConnectionError('Attempted to sign a message with the MetaMask IMX provider without an established connection.');
+        }
         return await this.imxSigner.signMessage(message);
     }
 }

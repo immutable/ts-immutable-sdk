@@ -2,6 +2,7 @@ import { Configuration, Environment, PRODUCTION } from 'config';
 import { MetaMaskIMXProvider } from './metaMaskWrapper';
 import { connect } from './metaMask';
 import { connect as buildImxSigner, disconnect as disconnectImxSigner } from '../imx-wallet/imxWallet';
+import { ProviderConnectionError } from './types';
 
 jest.mock('./metaMask');
 jest.mock('../imx-wallet/imxWallet');
@@ -56,6 +57,10 @@ describe('metaMetaWrapper', () => {
             expect(signMessageMock).toBeCalledTimes(1);
             expect(signMessageMock).toBeCalledWith("Message to sign");
             expect(signedMessage).toEqual("Signed message");
+        });
+
+        it('should throw error when provider not connected when calling sign message', async () => {
+            await expect(MetaMaskIMXProvider.signMessage("Message to sign")).rejects.toThrow(new ProviderConnectionError('Attempted to sign a message with the MetaMask IMX provider without an established connection.'));
         });
     });
 });
