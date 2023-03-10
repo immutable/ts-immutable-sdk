@@ -24,7 +24,7 @@ describe('providerError', () => {
     await expect(withProviderError(errorFunction, {
         type: ProviderErrorType.PROVIDER_CONNECTION_ERROR,
     })).rejects.toThrow(new ProviderError(
-        'PROVIDER_CONNECTION_ERROR: Error message',
+        'Error message',
         ProviderErrorType.PROVIDER_CONNECTION_ERROR
     ));
   });

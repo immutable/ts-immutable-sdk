@@ -25,7 +25,7 @@ export const withProviderError = async <T>(
   } catch (error) {
     const errorMessage =
       customError.message ||
-      `${customError.type}: ${(error as Error).message}` ||
+      `${(error as Error).message}` ||
       'UnknownError';
     throw new ProviderError(errorMessage, customError.type);
   }

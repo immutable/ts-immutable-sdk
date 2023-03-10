@@ -10,11 +10,11 @@ jest.mock('../imx-wallet/imxWallet');
 describe('metaMetaWrapper', () => {
   describe('imxSigner undefined', () => {
     it('should throw error when calling sign message', async () => {
-      await expect(MetaMaskIMXProvider.signMessage("Message to sign")).rejects.toThrow(new ProviderError('PROVIDER_CONNECTION_ERROR: Attempted to sign a message with the MetaMask IMX provider without an established connection.', ProviderErrorType.PROVIDER_CONNECTION_ERROR));
+      await expect(MetaMaskIMXProvider.signMessage("Message to sign")).rejects.toThrow(new ProviderError('Attempted to sign a message with the MetaMask IMX provider without an established connection.', ProviderErrorType.PROVIDER_CONNECTION_ERROR));
     });
 
     it('should throw error when calling disconnect', async () => {
-      await expect(MetaMaskIMXProvider.disconnect()).rejects.toThrow(new ProviderError('PROVIDER_CONNECTION_ERROR: Attempted to disconnect from the MetaMask IMX provider without an established connection.', ProviderErrorType.PROVIDER_CONNECTION_ERROR));
+      await expect(MetaMaskIMXProvider.disconnect()).rejects.toThrow(new ProviderError('Attempted to disconnect from the MetaMask IMX provider without an established connection.', ProviderErrorType.PROVIDER_CONNECTION_ERROR));
     });
   });
 
@@ -49,7 +49,7 @@ describe('metaMetaWrapper', () => {
       const config = new Configuration(PRODUCTION);
       (connect as jest.Mock).mockRejectedValue(new Error('The Metamask provider was not found.'));
 
-      await expect(MetaMaskIMXProvider.connect(config)).rejects.toThrow(new ProviderError('WALLET_CONNECTION_ERROR: The Metamask provider was not found.', ProviderErrorType.WALLET_CONNECTION_ERROR));
+      await expect(MetaMaskIMXProvider.connect(config)).rejects.toThrow(new ProviderError('The Metamask provider was not found.', ProviderErrorType.WALLET_CONNECTION_ERROR));
     });
 
     it('should throw wallet connection error when imx connect fails', async () => {
@@ -57,7 +57,7 @@ describe('metaMetaWrapper', () => {
       (connect as jest.Mock).mockResolvedValue({});
       (buildImxSigner as jest.Mock).mockRejectedValue(new Error('The L2 IMX Wallet connection has failed.'));
 
-      await expect(MetaMaskIMXProvider.connect(config)).rejects.toThrow(new ProviderError('WALLET_CONNECTION_ERROR: The L2 IMX Wallet connection has failed.', ProviderErrorType.WALLET_CONNECTION_ERROR));
+      await expect(MetaMaskIMXProvider.connect(config)).rejects.toThrow(new ProviderError('The L2 IMX Wallet connection has failed.', ProviderErrorType.WALLET_CONNECTION_ERROR));
     });
   });
 
@@ -88,7 +88,7 @@ describe('metaMetaWrapper', () => {
           signMessage: jest.fn().mockRejectedValue(new Error('Error signing the message'))
       });
       await MetaMaskIMXProvider.connect(new Configuration(PRODUCTION));
-      await expect(MetaMaskIMXProvider.signMessage("Message to sign")).rejects.toThrow(new ProviderError('PROVIDER_CONNECTION_ERROR: Error signing the message', ProviderErrorType.PROVIDER_CONNECTION_ERROR));
+      await expect(MetaMaskIMXProvider.signMessage("Message to sign")).rejects.toThrow(new ProviderError('Error signing the message', ProviderErrorType.PROVIDER_CONNECTION_ERROR));
     });
   });
 
@@ -111,7 +111,7 @@ describe('metaMetaWrapper', () => {
       (buildImxSigner as jest.Mock).mockResolvedValue({});
       (disconnectImxSigner as jest.Mock).mockRejectedValue(new Error('Error disconnecting'));
       await MetaMaskIMXProvider.connect(new Configuration(PRODUCTION));
-      await expect(MetaMaskIMXProvider.disconnect()).rejects.toThrow(new ProviderError('PROVIDER_CONNECTION_ERROR: Error disconnecting', ProviderErrorType.PROVIDER_CONNECTION_ERROR));
+      await expect(MetaMaskIMXProvider.disconnect()).rejects.toThrow(new ProviderError('Error disconnecting', ProviderErrorType.PROVIDER_CONNECTION_ERROR));
     });
   });
 });
