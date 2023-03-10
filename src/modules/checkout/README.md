@@ -93,7 +93,12 @@ This currently will break the ui widgets, so they will need to be tested seperat
 ## Widget Development
 
 ```
-cd packages/ui
+cd packages/sdk
+npm i 
+npm run build
+npm pack
+
+cd ../ui
 npm i
 npm run start:react
 ```
@@ -107,7 +112,7 @@ npm i
 npm run build
 npm pack
 
-cd ../../sample-app
+cd ../sample-app
 rm -rf node_modules package-lock.json
 npm i
 npm start

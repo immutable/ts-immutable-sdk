@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { CheckoutSDK } from '@imtbl/checkout-sdk-web';
+import { CheckoutSDK, ConnectionProviders } from '@imtbl/checkout-sdk-web';
 import { ConnectWidget } from './ConnectWidget';
 import { 
   ConnectWidgetParams,
-  ConnectionProviders
+ 
 } from '../../types'
 import { describe, beforeEach, it, cy } from 'local-cypress'
 import { mount } from 'cypress/react18';

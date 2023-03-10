@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ConnectWidget } from './modules/connect/ConnectWidget';
-import { ConnectionProviders, ConnectWidgetParams } from './types'
+import { ConnectWidgetParams } from './types';
+import {ConnectionProviders} from "@imtbl/checkout-sdk-web";
 
 const element = document.getElementById('root') as HTMLElement
 
