@@ -42,7 +42,7 @@ describe('Deposit ERC20', () => {
     const getSignableRegistrationResponse = {}
 
     beforeEach(() => {
-      jest.restoreAllMocks()
+      jest.restoreAllMocks();
 
       getSignableDepositMock = jest.fn().mockResolvedValue({
         data: getSignableDepositResponse
@@ -75,6 +75,7 @@ describe('Deposit ERC20', () => {
       getSignableRegistrationMock = jest.fn().mockResolvedValue({
         data: getSignableRegistrationResponse
       });
+
       (UsersApi as jest.Mock).mockReturnValue({
         getSignableRegistration: getSignableRegistrationMock,
       });
@@ -87,50 +88,57 @@ describe('Deposit ERC20', () => {
 
       (Contracts.Core.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
-          approve: async () => ('test'),
-          depositERC20: async () => ('test')
+          depositERC20: async () => ('test'),
+          registerAndDepositERC20: async () => ('test')
         }
       });
-
-      (Contracts.Registration.connect as jest.Mock).mockReturnValue({
-        isRegistered: async () => true,
-      });
     })
 
-    test('should make the correct api requests with the correct params, and return true', async () => {
-      const signers = await generateSigners(privateKey1)
+    const testCases = [
+      {isRegistered:true},
+      {isRegistered:false}
+    ];
 
-      const response = await depositERC20({
-        signers,
-        deposit: signableDepositRequest,
-        config: testConfig,
+    testCases.forEach( testCase => {
+      test(`should make the correct api requests when user is ${testCase.isRegistered? '' : 'not' } registered on-chain`, async () => {
+        (Contracts.Registration.connect as jest.Mock).mockReturnValue({
+          isRegistered: async () => testCase.isRegistered,
+        });
+
+        const signers = await generateSigners(privateKey1)
+
+        const response = await depositERC20({
+          signers,
+          deposit: signableDepositRequest,
+          config: testConfig,
+        });
+        expect(getTokenMock).toHaveBeenCalledWith({
+          address: "kljh5kl3j4biu3b59385",
+        })
+        expect(getSignableDepositMock).toHaveBeenCalledWith({
+          getSignableDepositRequest: {
+            amount: "1000000000000000000",
+            token: {
+              data: {
+                decimals: 18,
+                token_address: "kljh5kl3j4biu3b59385",
+              },
+            },
+            user: "ETHd90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36",
+          },
+        })
+        expect(encodeAssetMock).toHaveBeenCalledWith({
+          assetType: "asset",
+          encodeAssetRequest: {
+            token: {
+              data: {
+                token_address: "kljh5kl3j4biu3b59385",
+              },
+            },
+          },
+        })
+        expect(response).toEqual(transactionResponse);
       });
-      expect(getTokenMock).toHaveBeenCalledWith({
-        address: "kljh5kl3j4biu3b59385",
-      })
-      expect(getSignableDepositMock).toHaveBeenCalledWith({
-        getSignableDepositRequest: {
-          amount: "1000000000000000000",
-          token: {
-            data: {
-              decimals: 18,
-              token_address: "kljh5kl3j4biu3b59385",
-            },
-          },
-          user: "ETHd90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36",
-        },
-      })
-      expect(encodeAssetMock).toHaveBeenCalledWith({
-        assetType: "asset",
-        encodeAssetRequest: {
-          token: {
-            data: {
-              token_address: "kljh5kl3j4biu3b59385",
-            },
-          },
-        },
-      })
-      expect(response).toEqual(transactionResponse);
-    })
+    });
   })
 })
