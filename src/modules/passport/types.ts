@@ -24,3 +24,21 @@ export type PassportMetadata = {
   stark_key: string;
   user_admin_key: string;
 }
+
+export enum Networks {
+  PRODUCTION = 'mainnet',
+  SANDBOX = 'goerli',
+}
+
+export interface EnvironmentConfiguration {
+  network: Networks;
+  authenticationDomain: string;
+  magicPublishableApiKey: string;
+  magicProviderId: string;
+}
+
+export interface OidcConfiguration {
+  clientId: string;
+  logoutRedirectUri: string;
+  redirectUri: string;
+}

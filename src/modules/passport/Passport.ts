@@ -1,21 +1,27 @@
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
+import { getPassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
-import { getStarkSigner } from './stark';
-import { UserProfile } from './types';
 import { IMXProvider } from '../provider';
-import { PassportConfiguration, ValidateConfig } from './config';
+import { getStarkSigner } from './stark';
+import { EnvironmentConfiguration, OidcConfiguration, UserProfile } from './types';
 
 export class Passport {
   private authManager: AuthManager;
   private magicAdapter: MagicAdapter;
 
-  constructor(config: PassportConfiguration) {
-    ValidateConfig(config);
+  constructor(
+    environmentConfiguration: EnvironmentConfiguration,
+    oidcConfiguration: OidcConfiguration,
+  ) {
+    const passportConfiguration = getPassportConfiguration(
+      environmentConfiguration,
+      oidcConfiguration,
+    );
 
-    this.authManager = new AuthManager(config);
-    this.magicAdapter = new MagicAdapter(config);
+    this.authManager = new AuthManager(passportConfiguration);
+    this.magicAdapter = new MagicAdapter(passportConfiguration);
   }
 
   public async connectImx(): Promise<IMXProvider> {

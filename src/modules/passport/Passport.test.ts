@@ -1,10 +1,10 @@
 import axios from 'axios';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
+import { Config, getPassportConfiguration } from './config';
 import { Passport } from './Passport';
-import { getStarkSigner } from './stark/getStarkSigner';
-import { User } from './types';
-import { PassportConfiguration, ValidateConfig } from './config';
+import { getStarkSigner } from './stark';
+import { OidcConfiguration, User } from './types';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -12,12 +12,11 @@ jest.mock('./stark/getStarkSigner');
 jest.mock('./config')
 jest.mock('axios');
 
-const config: PassportConfiguration = {
-  oidcConfiguration: {
-    clientId: '11111',
-    redirectUri: 'https://test.com',
-  },
-} as PassportConfiguration;
+const oidcConfiguration: OidcConfiguration = {
+  clientId: '11111',
+  redirectUri: 'https://test.com',
+  logoutRedirectUri: 'https://test.com',
+};
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Passport', () => {
@@ -56,14 +55,12 @@ describe('Passport', () => {
         }
       }
     });
-    passport = new Passport(config);
+    passport = new Passport(Config.SANDBOX, oidcConfiguration);
   });
 
   describe('new Passport', () => {
-    it('should validate the config', () => {
-      const config = {} as unknown as PassportConfiguration;
-      new Passport(config);
-      expect(ValidateConfig).toHaveBeenCalledWith(config)
+    it('should get the passportConfiguration', () => {
+      expect(getPassportConfiguration).toHaveBeenCalledWith(Config.SANDBOX, oidcConfiguration);
     });
   });
 

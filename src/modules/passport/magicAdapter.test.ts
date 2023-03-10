@@ -2,8 +2,9 @@ import { LoginWithOpenIdParams, OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
 import { Magic } from 'magic-sdk';
 import MagicAdapter from './magicAdapter';
+import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
-import { Networks, PassportConfiguration } from './config';
+import { Networks } from './types';
 
 const loginWithOIDCMock: jest.MockedFunction<(args: LoginWithOpenIdParams) => Promise<void>> = jest.fn();
 const web3ProviderInstance = { getSigner: jest.fn() };
