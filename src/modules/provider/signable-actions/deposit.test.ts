@@ -26,40 +26,38 @@ describe('deposit', () => {
       (depositActions.depositEth as jest.Mock).mockImplementation(depositEthMock);
     })
 
-    test('should call depositERC20() when the type in the paylod is ERC20', async () => {
-      deposit({
+      const testCases = [
+        {depositType:"ERC20", callsToDepositEth:0, callsToDepositERC20:1, callsToDepositERC721:0},
+        {depositType:"ETH", callsToDepositEth:1, callsToDepositERC20:0, callsToDepositERC721:0},
+        {depositType:"ERC721", callsToDepositEth:0, callsToDepositERC20:0, callsToDepositERC721:1},
+      ];
+
+
+      testCases.forEach((testCase) => {
+        test(`should call deposit${testCase.depositType}() when the type in the paylod is ${testCase.depositType}`, async () => {
+          await deposit({
+            signers: {} as Signers,
+            deposit: { type: testCase.depositType } as unknown as TokenAmount,
+            config: {} as Configuration
+          });
+
+          expect(depositERC20Mock).toBeCalledTimes(testCase.callsToDepositERC20);
+          expect(depositERC721Mock).toBeCalledTimes(testCase.callsToDepositERC721);
+          expect(depositEthMock).toBeCalledTimes(testCase.callsToDepositEth);
+        });
+      });
+
+    test('should not call deposit when deposit type is invalid', async () => {
+      await deposit({
         signers: {} as Signers,
-        deposit: { type: 'ERC20' } as unknown as TokenAmount,
-        config: {} as Configuration
-      })
-
-      expect(depositERC20Mock).toBeCalledTimes(1)
-      expect(depositERC721Mock).toBeCalledTimes(0)
-      expect(depositEthMock).toBeCalledTimes(0)
-    })
-
-    test('should call depositERC721() when the type in the paylod is ERC721', async () => {
-      deposit({
-        signers: {} as Signers,
-        deposit: { type: 'ERC721' } as unknown as TokenAmount,
-        config: {} as Configuration
-      })
-
-      expect(depositERC20Mock).toBeCalledTimes(0)
-      expect(depositERC721Mock).toBeCalledTimes(1)
-      expect(depositEthMock).toBeCalledTimes(0)
-    })
-
-    test('should call depositEth() when the type in the paylod is ETH', async () => {
-      deposit({
-        signers: {} as Signers,
-        deposit: { type: 'ETH' } as unknown as TokenAmount,
+        deposit: { type: 'ETHS' } as unknown as TokenAmount,
         config: {} as Configuration
       })
 
       expect(depositERC20Mock).toBeCalledTimes(0)
       expect(depositERC721Mock).toBeCalledTimes(0)
-      expect(depositEthMock).toBeCalledTimes(1)
-    })
+      expect(depositEthMock).toBeCalledTimes(0)
+    });
+
   })
 })
