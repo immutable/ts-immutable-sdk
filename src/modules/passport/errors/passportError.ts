@@ -6,11 +6,6 @@ export enum PassportErrorType {
   REFRESH_TOKEN_ERROR = 'REFRESH_TOKEN_ERROR',
 }
 
-type ErrorType = {
-  type: PassportErrorType;
-  message?: string;
-};
-
 export class PassportError extends Error {
   public type: PassportErrorType;
   constructor(message: string, type: PassportErrorType) {
@@ -21,15 +16,14 @@ export class PassportError extends Error {
 
 export const withPassportError = async <T>(
   fn: () => Promise<T>,
-  customError: ErrorType
+  customErrorType: PassportErrorType
 ): Promise<T> => {
   try {
     return await fn();
   } catch (error) {
     const errorMessage =
-      customError.message ||
-      `${customError.type}: ${(error as Error).message}` ||
+      `${customErrorType}: ${(error as Error).message}` ||
       'UnknownError';
-    throw new PassportError(errorMessage, customError.type);
+    throw new PassportError(errorMessage, customErrorType);
   }
 }
