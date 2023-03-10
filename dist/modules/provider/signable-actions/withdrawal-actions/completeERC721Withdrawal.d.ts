@@ -1,5 +1,5 @@
 import { Signer } from '@ethersproject/abstract-signer';
-import { ERC721Token } from '../../../../types';
+import { ERC721Token } from 'types';
 import { TransactionResponse } from '@ethersproject/providers';
 import { Configuration } from 'config';
 type CompleteERC721WithdrawalActionParams = {

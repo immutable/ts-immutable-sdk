@@ -5,13 +5,8 @@ export declare enum PassportErrorType {
     NOT_LOGGED_IN_ERROR = "NOT_LOGGED_IN_ERROR",
     REFRESH_TOKEN_ERROR = "REFRESH_TOKEN_ERROR"
 }
-type ErrorType = {
-    type: PassportErrorType;
-    message?: string;
-};
 export declare class PassportError extends Error {
     type: PassportErrorType;
     constructor(message: string, type: PassportErrorType);
 }
-export declare const withPassportError: <T>(fn: () => Promise<T>, customError: ErrorType) => Promise<T>;
-export {};
+export declare const withPassportError: <T>(fn: () => Promise<T>, customErrorType: PassportErrorType) => Promise<T>;

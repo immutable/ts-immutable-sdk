@@ -37,20 +37,19 @@ class PassportError extends Error {
         this.type = type;
     }
 }
-const withPassportError = async (fn, customError) => {
+const withPassportError = async (fn, customErrorType) => {
     try {
         return await fn();
     }
     catch (error) {
-        const errorMessage = customError.message ||
-            `${customError.type}: ${error.message}` ||
+        const errorMessage = `${customErrorType}: ${error.message}` ||
             'UnknownError';
-        throw new PassportError(errorMessage, customError.type);
+        throw new PassportError(errorMessage, customErrorType);
     }
 };
 
 const POLL_INTERVAL = 1 * 1000; // every 1 second
-const MAX_RETRIES = 5;
+const MAX_RETRIES = 3;
 const wait = (ms) => new Promise((resolve) => {
     setTimeout(() => resolve(), ms);
 });
@@ -113,7 +112,7 @@ class AuthManager {
     }
     mapOidcUserToDomainModel = (oidcUser) => {
         const passport = oidcUser.profile?.passport;
-        return ({
+        return {
             idToken: oidcUser.id_token,
             accessToken: oidcUser.access_token,
             refreshToken: oidcUser.refresh_token,
@@ -122,21 +121,17 @@ class AuthManager {
                 email: oidcUser.profile.email,
                 nickname: oidcUser.profile.nickname,
             },
-            etherKey: passport?.ether_key || ""
-        });
+            etherKey: passport?.ether_key || '',
+        };
     };
     async login() {
         return withPassportError(async () => {
             const oidcUser = await this.userManager.signinPopup();
             return this.mapOidcUserToDomainModel(oidcUser);
-        }, {
-            type: PassportErrorType.AUTHENTICATION_ERROR,
-        });
+        }, PassportErrorType.AUTHENTICATION_ERROR);
     }
     async loginCallback() {
-        return withPassportError(async () => this.userManager.signinPopupCallback(), {
-            type: PassportErrorType.AUTHENTICATION_ERROR,
-        });
+        return withPassportError(async () => this.userManager.signinPopupCallback(), PassportErrorType.AUTHENTICATION_ERROR);
     }
     async getUser() {
         return withPassportError(async () => {
@@ -145,14 +140,11 @@ class AuthManager {
                 throw new Error('Failed to retrieve user');
             }
             return this.mapOidcUserToDomainModel(oidcUser);
-        }, {
-            type: PassportErrorType.NOT_LOGGED_IN_ERROR,
-        });
+        }, PassportErrorType.NOT_LOGGED_IN_ERROR);
     }
     async requestRefreshTokenAfterRegistration(jwt) {
         return withPassportError(async () => {
             const etherKey = await retryWithDelay(() => getUserEtherKeyFromMetadata(passportAuthDomain, jwt));
-            console.log('requestRefreshToken', etherKey);
             const updatedUser = await this.userManager.signinSilent();
             if (!updatedUser) {
                 return null;
@@ -160,9 +152,7 @@ class AuthManager {
             const user = this.mapOidcUserToDomainModel(updatedUser);
             user.etherKey = etherKey;
             return user;
-        }, {
-            type: PassportErrorType.REFRESH_TOKEN_ERROR,
-        });
+        }, PassportErrorType.REFRESH_TOKEN_ERROR);
     }
 }
 
@@ -174,9 +164,7 @@ class MagicAdapter {
     constructor(network = 'goerli') {
         this.magicClient = new Magic(magicApiKey, {
             network,
-            extensions: [
-                new OpenIdExtension(),
-            ]
+            extensions: [new OpenIdExtension()],
         });
     }
     async login(idToken) {
@@ -185,10 +173,9 @@ class MagicAdapter {
                 jwt: idToken,
                 providerId: magicProviderId,
             });
-            return new ethers.providers.Web3Provider(this.magicClient.rpcProvider);
-        }, {
-            type: PassportErrorType.WALLET_CONNECTION_ERROR,
-        });
+            return new ethers.providers.Web3Provider(this.magicClient
+                .rpcProvider);
+        }, PassportErrorType.WALLET_CONNECTION_ERROR);
     }
 }
 
@@ -257,7 +244,7 @@ const getStarkSigner = async (signer) => {
     return withPassportError(async () => {
         const privateKey = await generateLegacyStarkPrivateKey(signer);
         return createStarkSigner(privateKey);
-    }, { type: PassportErrorType.WALLET_CONNECTION_ERROR });
+    }, PassportErrorType.WALLET_CONNECTION_ERROR);
 };
 
 const checkRequiredConfiguration = (config) => {
@@ -279,24 +266,23 @@ class Passport {
         this.magicAdapter = new MagicAdapter(config.network);
     }
     async connectImx() {
-        console.log('i am running connect');
-        let user = await this.authManager.login();
-        console.log('user', user);
+        const user = await this.authManager.login();
         if (!user.idToken) {
             throw new PassportError('Failed to initialise', PassportErrorType.WALLET_CONNECTION_ERROR);
         }
         const provider = await this.magicAdapter.login(user.idToken);
         const signer = await getStarkSigner(provider.getSigner());
-        console.log('signer', signer);
-        console.log('connect etherkey', user.etherKey);
-        if (!user.etherKey) {
-            const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(user.accessToken);
-            console.log('updatedUser', updatedUser);
-            if (!updatedUser) {
-                throw new PassportError('Failed to get refresh token', PassportErrorType.REFRESH_TOKEN_ERROR);
-            }
-            user = updatedUser;
-        }
+        // if (!user.etherKey) {
+        //   const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(user.accessToken);
+        //   console.log('updatedUser', updatedUser)
+        //   if (!updatedUser) {
+        //     throw new PassportError(
+        //       'Failed to get refresh token',
+        //       PassportErrorType.REFRESH_TOKEN_ERROR
+        //     );
+        //   }
+        //   user = updatedUser;
+        // }
         return new PassportImxProvider(user, signer);
     }
     async loginCallback() {
@@ -615,6 +601,7 @@ const assertIsDefined = (value) => {
 };
 async function prepareWithdrawalAction(params) {
     const { signers: { ethSigner, starkExSigner }, type, config, } = params;
+    await validateChain(ethSigner, params.config);
     const withdrawalsApi = new WithdrawalsApi(config.apiConfiguration);
     const withdrawalAmount = type === 'ERC721' ? '1' : params.amount;
     const signableWithdrawalResult = await withdrawalsApi.getSignableWithdrawal({
@@ -807,7 +794,6 @@ async function completeEthWithdrawalAction({ ethSigner, starkPublicKey, config, 
 
 async function prepareWithdrawal({ signers, withdrawal, config, }) {
     const starkExConfig = config.getStarkExConfig();
-    await validateChain(signers.ethSigner, starkExConfig);
     return prepareWithdrawalAction({
         signers,
         config: starkExConfig,
@@ -815,7 +801,6 @@ async function prepareWithdrawal({ signers, withdrawal, config, }) {
     });
 }
 async function completeWithdrawal({ signers: { ethSigner }, starkPublicKey, token, config, }) {
-    await validateChain(ethSigner, config.getStarkExConfig());
     switch (token.type) {
         case 'ETH':
             return completeEthWithdrawalAction({ ethSigner, starkPublicKey, config });
@@ -873,9 +858,9 @@ async function createTrade({ signers: { ethSigner, starkExSigner }, request, con
     return createTradeResponse.data;
 }
 
-async function depositEth(signer, deposit, config) {
-    await validateChain(signer, config.getStarkExConfig());
-    const user = await signer.getAddress();
+async function depositEth({ signers: { ethSigner }, deposit, config }) {
+    await validateChain(ethSigner, config.getStarkExConfig());
+    const user = await ethSigner.getAddress();
     const data = {
         decimals: 18,
     };
@@ -906,25 +891,25 @@ async function depositEth(signer, deposit, config) {
     const assetType = encodingResult.data.asset_type;
     const starkPublicKey = signableDepositResult.data.stark_key;
     const vaultId = signableDepositResult.data.vault_id;
-    const isRegistered = await isRegisteredOnChain(starkPublicKey, signer, config);
+    const isRegistered = await isRegisteredOnChain(starkPublicKey, ethSigner, config);
     if (!isRegistered) {
-        return executeRegisterAndDepositEth(signer, amount, assetType, starkPublicKey, vaultId, starkExConfig, usersApi);
+        return executeRegisterAndDepositEth(ethSigner, amount, assetType, starkPublicKey, vaultId, starkExConfig, usersApi);
     }
     else {
-        return executeDepositEth(signer, amount, assetType, starkPublicKey, vaultId, starkExConfig);
+        return executeDepositEth(ethSigner, amount, assetType, starkPublicKey, vaultId, starkExConfig);
     }
 }
-async function executeRegisterAndDepositEth(signer, amount, assetType, starkPublicKey, vaultId, config, usersApi) {
-    const etherKey = await signer.getAddress();
-    const coreContract = Contracts.Core.connect(config.ethConfiguration.coreContractAddress, signer);
+async function executeRegisterAndDepositEth(ethSigner, amount, assetType, starkPublicKey, vaultId, config, usersApi) {
+    const etherKey = await ethSigner.getAddress();
+    const coreContract = Contracts.Core.connect(config.ethConfiguration.coreContractAddress, ethSigner);
     const signableResult = await getSignableRegistrationOnchain(etherKey, starkPublicKey, usersApi);
     const populatedTransaction = await coreContract.populateTransaction.registerAndDepositEth(etherKey, starkPublicKey, signableResult.operator_signature, assetType, vaultId);
-    return signer.sendTransaction({ ...populatedTransaction, value: amount });
+    return ethSigner.sendTransaction({ ...populatedTransaction, value: amount });
 }
-async function executeDepositEth(signer, amount, assetType, starkPublicKey, vaultId, config) {
-    const coreContract = Contracts.Core.connect(config.ethConfiguration.coreContractAddress, signer);
+async function executeDepositEth(ethSigner, amount, assetType, starkPublicKey, vaultId, config) {
+    const coreContract = Contracts.Core.connect(config.ethConfiguration.coreContractAddress, ethSigner);
     const populatedTransaction = await coreContract.populateTransaction['deposit(uint256,uint256,uint256)'](starkPublicKey, assetType, vaultId);
-    return signer.sendTransaction({ ...populatedTransaction, value: amount });
+    return ethSigner.sendTransaction({ ...populatedTransaction, value: amount });
 }
 
 async function depositERC20({ signers: { ethSigner }, deposit, config, }) {
@@ -1056,10 +1041,10 @@ async function executeDepositERC721(ethSigner, tokenId, assetType, starkPublicKe
     return ethSigner.sendTransaction(populatedTransaction);
 }
 
-async function deposit(signers, deposit, config) {
+async function deposit({ signers, deposit, config }) {
     switch (deposit.type) {
         case 'ETH':
-            return depositEth(signers.ethSigner, deposit, config);
+            return depositEth({ signers, deposit, config });
         case 'ERC20':
             return depositERC20({ signers, deposit, config });
         case 'ERC721':
@@ -1160,7 +1145,11 @@ class GenericIMXProvider {
         });
     }
     deposit(tokenAmount) {
-        return deposit(this.signers, tokenAmount, this.config);
+        return deposit({
+            signers: this.signers,
+            deposit: tokenAmount,
+            config: this.config
+        });
     }
     exchangeTransfer(request) {
         return exchangeTransfer({
