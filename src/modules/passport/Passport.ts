@@ -48,7 +48,7 @@ export class Passport {
     const provider = await this.magicAdapter.login(user.idToken);
     const signer = await getStarkSigner(provider.getSigner());
 
-    // TODO: add back once user registration function is done and called
+    // TODO https://immutable.atlassian.net/browse/ID-412: add back once user registration function is done and called
     // if (!user.etherKey) {
     //   const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(user.accessToken);
     //   if (!updatedUser) {
