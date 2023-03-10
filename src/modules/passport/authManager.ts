@@ -21,7 +21,6 @@ const getAuthConfiguration = ({ clientId, redirectUri }: AuthInput) => ({
     authorization_endpoint: `${passportAuthDomain}/authorize`,
     token_endpoint: `${passportAuthDomain}/oauth/token`,
   },
-  loadUserInfo: true,
 });
 
 export default class AuthManager {
