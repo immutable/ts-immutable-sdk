@@ -4,7 +4,7 @@ import { Configuration } from 'config';
 import { EthSigner, StarkSigner } from 'types';
 import { GenericIMXProvider } from '../genericImxProvider';
 import { ImxSigner } from '../imx-wallet/ImxSigner';
-import { ProviderConnectionError } from './types';
+import { ProviderError, ProviderErrorType, withProviderError } from '../errors/providerError';
 
 export class MetaMaskIMXProvider extends GenericIMXProvider {
     private static imxSigner: ImxSigner;
@@ -15,19 +15,30 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
 
     public static async connect(config: Configuration): Promise<MetaMaskIMXProvider> {
         const starkExConfig = config.getStarkExConfig();
-        const metaMaskProvider = await connect({chainID: starkExConfig.ethConfiguration.chainID});
-        this.imxSigner = await buildImxSigner(metaMaskProvider, starkExConfig.env);
-        return new MetaMaskIMXProvider(config, metaMaskProvider.getSigner(), this.imxSigner);
+        return await withProviderError<MetaMaskIMXProvider>(async () => {
+            const metaMaskProvider = await connect({chainID: starkExConfig.ethConfiguration.chainID});
+            this.imxSigner = await buildImxSigner(metaMaskProvider, starkExConfig.env);
+            return new MetaMaskIMXProvider(config, metaMaskProvider.getSigner(), this.imxSigner);
+        }, { type: ProviderErrorType.WALLET_CONNECTION_ERROR });
     }
 
     public static async disconnect(): Promise<void> {
-        await disconnectImxSigner(this.imxSigner);
+        if (!this.imxSigner) {
+            throw new ProviderError('PROVIDER_CONNECTION_ERROR: Attempted to disconnect from the MetaMask IMX provider without an established connection.', ProviderErrorType.PROVIDER_CONNECTION_ERROR)
+        }
+
+        return withProviderError<void>(async () => {
+            await disconnectImxSigner(this.imxSigner);
+        }, { type: ProviderErrorType.PROVIDER_CONNECTION_ERROR });
     }
 
     public static async signMessage(message: string): Promise<string> {
         if (!this.imxSigner) {
-            throw new ProviderConnectionError('Attempted to sign a message with the MetaMask IMX provider without an established connection.');
+            throw new ProviderError('PROVIDER_CONNECTION_ERROR: Attempted to sign a message with the MetaMask IMX provider without an established connection.', ProviderErrorType.PROVIDER_CONNECTION_ERROR)
         }
-        return await this.imxSigner.signMessage(message);
+
+        return withProviderError<string>(async () => {
+            return await this.imxSigner.signMessage(message);
+        }, { type: ProviderErrorType.PROVIDER_CONNECTION_ERROR });
     }
 }
