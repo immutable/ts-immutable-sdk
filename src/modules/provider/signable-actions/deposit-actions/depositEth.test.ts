@@ -39,7 +39,7 @@ describe('Deposit ETH', () => {
     const getSignableRegistrationResponse = {}
 
     beforeEach(() => {
-      jest.restoreAllMocks()
+      jest.restoreAllMocks();
 
       getSignableDepositMock = jest.fn().mockResolvedValue({
         data: getSignableDepositResponse
@@ -62,54 +62,52 @@ describe('Deposit ETH', () => {
         getSignableRegistration: getSignableRegistrationMock,
       });
 
-      getSignableRegistrationMock = jest.fn().mockResolvedValue({
-        data: getSignableRegistrationResponse
-      });
-      (UsersApi as jest.Mock).mockReturnValue({
-        getSignableRegistration: getSignableRegistrationMock,
-      });
-
       (Contracts.Core.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
           registerAndDepositEth: async () => ('test'),
           'deposit(uint256,uint256,uint256)': async () => ('test')
         }
       });
+    });
+    const testCases = [
+      {isRegistered:true},
+      {isRegistered:false}
+    ];
+    testCases.forEach(testcase => {
+      test(`should make the correct api requests when user is ${testcase.isRegistered? '' : 'not' } registered on-chain`, async () => {
+        (Contracts.Registration.connect as jest.Mock).mockReturnValue({
+          isRegistered: async () => testcase.isRegistered,
+        });
 
-      (Contracts.Registration.connect as jest.Mock).mockReturnValue({
-        isRegistered: async () => (true),
-      });
-    })
+        const signers = await generateSigners(privateKey1)
 
-    test('should make the correct api requests with the correct params, and return true', async () => {
-      const signers = await generateSigners(privateKey1)
-
-      const response = await depositEth({
-        signers,
-        deposit: signableDepositRequest,
-        config: testConfig,
-      });
-      expect(getSignableDepositMock).toHaveBeenCalledWith({
-        getSignableDepositRequest: {
-          amount: "1000000000000000000",
-          token: {
-            data: {
-              decimals: 18
+        const response = await depositEth({
+          signers,
+          deposit: signableDepositRequest,
+          config: testConfig,
+        });
+        expect(getSignableDepositMock).toHaveBeenCalledWith({
+          getSignableDepositRequest: {
+            amount: "1000000000000000000",
+            token: {
+              data: {
+                decimals: 18
+              },
+              type: "ETH",
             },
-            type: "ETH",
+            user: "ETHd90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36",
           },
-          user: "ETHd90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36",
-        },
-      })
-      expect(encodeAssetMock).toHaveBeenCalledWith({
-        assetType: "asset",
-        encodeAssetRequest: {
-          token: {
-            type: "ETH",
+        })
+        expect(encodeAssetMock).toHaveBeenCalledWith({
+          assetType: "asset",
+          encodeAssetRequest: {
+            token: {
+              type: "ETH",
+            },
           },
-        },
+        })
+        expect(response).toEqual(transactionResponse);
       })
-      expect(response).toEqual(transactionResponse);
-    })
-  })
-})
+    });
+  });
+});
