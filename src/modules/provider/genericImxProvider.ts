@@ -105,7 +105,11 @@ export class GenericIMXProvider implements IMXProvider {
   }
 
   deposit(tokenAmount: TokenAmount): Promise<TransactionResponse> {
-    return deposit(this.signers, tokenAmount, this.config);
+    return deposit({
+      signers: this.signers,
+      deposit: tokenAmount,
+      config: this.config
+    });
   }
 
   exchangeTransfer(

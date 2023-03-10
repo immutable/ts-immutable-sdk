@@ -1,6 +1,5 @@
 import { TokenAmount, AnyToken } from 'types';
 import { Signers } from './types';
-import { validateChain } from './helpers';
 import { Configuration } from 'config';
 import {
   prepareWithdrawalAction,
@@ -28,7 +27,6 @@ export async function prepareWithdrawal({
   config,
 }: PrepareWithdrawalParams) {
   const starkExConfig = config.getStarkExConfig();
-  await validateChain(signers.ethSigner, starkExConfig);
 
   return prepareWithdrawalAction({
     signers,
@@ -43,8 +41,6 @@ export async function completeWithdrawal({
   token,
   config,
 }: CompleteWithdrawalParams) {
-  await validateChain(ethSigner, config.getStarkExConfig());
-
   switch (token.type) {
     case 'ETH':
       return completeEthWithdrawalAction({ ethSigner, starkPublicKey, config });
