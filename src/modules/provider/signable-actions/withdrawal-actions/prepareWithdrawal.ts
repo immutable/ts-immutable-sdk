@@ -3,6 +3,7 @@ import { TokenAmount } from 'types';
 import { signMessage } from '../utils';
 import { convertToSignableToken } from '../utils';
 import { Signers } from '../types';
+import { validateChain } from "../helpers";
 
 const assertIsDefined = <T>(value?: T): T => {
   if (value !== undefined) return value;
@@ -25,6 +26,7 @@ export async function prepareWithdrawalAction(
     type,
     config,
   } = params
+  await validateChain(ethSigner, params.config);
   const withdrawalsApi = new WithdrawalsApi(config.apiConfiguration)
   const withdrawalAmount = type === 'ERC721' ? '1' : params.amount;
   const signableWithdrawalResult = await withdrawalsApi.getSignableWithdrawal({
