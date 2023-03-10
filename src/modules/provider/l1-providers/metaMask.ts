@@ -5,7 +5,7 @@ import { MetamaskConnectParams } from './types';
 import { connectProvider, isRequestableProvider } from './rpc';
 
 const ERRORS = {
-  PROVIDER_NOT_FOUND: 'The Metamask provider was not found.',
+  PROVIDER_NOT_FOUND: 'The Metamask provider was not found',
 };
 
 export async function connect({

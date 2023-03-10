@@ -4,12 +4,14 @@ import { MetaMaskIMXProvider, Environment } from 'ts-immutable-sdk';
 export interface AppState {
     metaMaskIMXProvider: MetaMaskIMXProvider | null;
     address: string;
+    signedMessage: string;
     env: string;
 }
 
 export const initialState: AppState = {
     metaMaskIMXProvider: null,
     address: '',
+    signedMessage: '',
     env: '',
 }
 
@@ -29,12 +31,14 @@ export interface Action {
 type ActionPayload =
     SetEnvironment |
     MetaMaskIMXProviderConnected |
-    MetaMaskIMXProviderDisconnected
+    MetaMaskIMXProviderDisconnected |
+    MetaMaskIMXProviderSignMessage
 
 export enum Actions {
     SetEnvironment = "SET_ENVIRONMENT",
-    MetaMaskIMXProviderConnected = "METAMASK_PROVIDER_CONNECTED",
-    MetaMaskIMXProviderDisconnected = "METAMASK_PROVIDER_DISCONNECTED"
+    MetaMaskIMXProviderConnected = "METAMASK_IMX_PROVIDER_CONNECTED",
+    MetaMaskIMXProviderDisconnected = "METAMASK_IMX_PROVIDER_DISCONNECTED",
+    MetaMaskIMXProviderSignMessage = "METAMASK_IMX_PROVIDER_SIGN_MESSAGE"
 }
 
 export interface SetEnvironment {
@@ -50,6 +54,11 @@ export interface MetaMaskIMXProviderConnected {
 
 export interface MetaMaskIMXProviderDisconnected {
     type: Actions.MetaMaskIMXProviderDisconnected;
+}
+
+export interface MetaMaskIMXProviderSignMessage {
+    type: Actions.MetaMaskIMXProviderSignMessage;
+    signedMessage: string;
 }
 
 export const appReducer: Reducer<AppState, Action> = (state: AppState, action: Action) => {
@@ -70,6 +79,12 @@ export const appReducer: Reducer<AppState, Action> = (state: AppState, action: A
                 ...state,
                 metaMaskIMXProvider: null,
                 address: '',
+                signedMessage: '',
+            }
+        case Actions.MetaMaskIMXProviderSignMessage:
+            return {
+                ...state,
+                signedMessage: action.payload.signedMessage,
             }
         default:
             return state;
