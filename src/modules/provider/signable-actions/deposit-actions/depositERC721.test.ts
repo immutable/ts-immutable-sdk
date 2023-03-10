@@ -63,63 +63,64 @@ describe('Deposit ERC721', () => {
         getSignableRegistration: getSignableRegistrationMock,
       });
 
-      getSignableRegistrationMock = jest.fn().mockResolvedValue({
-        data: getSignableRegistrationResponse
-      });
-      (UsersApi as jest.Mock).mockReturnValue({
-        getSignableRegistration: getSignableRegistrationMock,
-      });
-
       (Contracts.IERC721.connect as jest.Mock).mockReturnValue({
-        isApprovedForAll: async () => (true)
+        isApprovedForAll: async () => true
       });
 
       (Contracts.Core.connect as jest.Mock).mockReturnValue({
+        registerUser: async () => ('test'),
         populateTransaction: {
           approve: async () => ('test'),
           depositNft: async () => ('test')
         }
       });
 
-      (Contracts.Registration.connect as jest.Mock).mockReturnValue({
-        isRegistered: async () => (true),
-      });
     })
 
-    test('should make the correct api requests with the correct params, and return true', async () => {
-      const signers = await generateSigners(privateKey1)
+    const testCases = [
+      {isRegistered:true},
+      {isRegistered:false}
+    ];
 
-      const response = await depositERC721({
-        signers,
-        deposit: signableDepositRequest,
-        config: testConfig,
-      });
-      expect(getSignableDepositMock).toHaveBeenCalledWith({
-        getSignableDepositRequest: {
-          amount: "1",
-          token: {
-            data: {
-              token_id: "abcd",
-              token_address: "kljh5kl3j4biu3b59385",
+    testCases.forEach(testcase => {
+      test(`should make the correct api requests when user is ${testcase.isRegistered? '' : 'not' } registered on-chain`, async () => {
+        (Contracts.Registration.connect as jest.Mock).mockReturnValue({
+          isRegistered: async () => testcase.isRegistered,
+        });
+        const signers = await generateSigners(privateKey1)
+
+        const response = await depositERC721({
+          signers,
+          deposit: signableDepositRequest,
+          config: testConfig,
+        });
+        expect(getSignableDepositMock).toHaveBeenCalledWith({
+          getSignableDepositRequest: {
+            amount: "1",
+            token: {
+              data: {
+                token_id: "abcd",
+                token_address: "kljh5kl3j4biu3b59385",
+              },
+              type: "ERC721",
             },
-            type: "ERC721",
+            user: "ETHd90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36",
           },
-          user: "ETHd90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36",
-        },
-      })
-      expect(encodeAssetMock).toHaveBeenCalledWith({
-        assetType: "asset",
-        encodeAssetRequest: {
-          token: {
-            data: {
-              token_id: "abcd",
-              token_address: "kljh5kl3j4biu3b59385",
+        })
+        expect(encodeAssetMock).toHaveBeenCalledWith({
+          assetType: "asset",
+          encodeAssetRequest: {
+            token: {
+              data: {
+                token_id: "abcd",
+                token_address: "kljh5kl3j4biu3b59385",
+              },
+              type: "ERC721",
             },
-            type: "ERC721",
           },
-        },
+        })
+        expect(response).toEqual(transactionResponse);
       })
-      expect(response).toEqual(transactionResponse);
-    })
-  })
-})
+    });
+  });
+});
