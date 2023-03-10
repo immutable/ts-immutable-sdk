@@ -24,7 +24,7 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
 
   public static async disconnect(): Promise<void> {
     if (!this.imxSigner) {
-      throw new ProviderError('Attempted to disconnect from the MetaMask IMX provider without an established connection.', ProviderErrorType.PROVIDER_CONNECTION_ERROR)
+      throw new ProviderError('Attempted to disconnect from the MetaMask IMX provider without an established connection', ProviderErrorType.PROVIDER_CONNECTION_ERROR)
     }
 
     return withProviderError<void>(async () => {
@@ -34,7 +34,7 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
 
   public static async signMessage(message: string): Promise<string> {
     if (!this.imxSigner) {
-      throw new ProviderError('Attempted to sign a message with the MetaMask IMX provider without an established connection.', ProviderErrorType.PROVIDER_CONNECTION_ERROR)
+      throw new ProviderError('Attempted to sign a message with the MetaMask IMX provider without an established connection', ProviderErrorType.PROVIDER_CONNECTION_ERROR)
     }
 
     return withProviderError<string>(async () => {
