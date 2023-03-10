@@ -14,9 +14,9 @@ describe('passportError', () => {
       anyFn.mockReturnValue(returnValue);
 
       await expect(
-        await withPassportError(anyFn, {
-          type: PassportErrorType.AUTHENTICATION_ERROR,
-        })
+        await withPassportError(anyFn, 
+          PassportErrorType.AUTHENTICATION_ERROR,
+        )
       ).toEqual(returnValue);
     });
 
@@ -25,9 +25,9 @@ describe('passportError', () => {
       errorFunction.mockRejectedValue(new Error('SOMETHINGWRONG'));
 
       await expect(
-        withPassportError(errorFunction, {
-          type: PassportErrorType.AUTHENTICATION_ERROR,
-        })
+        withPassportError(errorFunction, 
+          PassportErrorType.AUTHENTICATION_ERROR,
+        )
       ).rejects.toThrow(
         new PassportError(
           'AUTHENTICATION_ERROR: SOMETHINGWRONG',
