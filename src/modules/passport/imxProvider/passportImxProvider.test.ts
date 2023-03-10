@@ -89,6 +89,8 @@ describe('PassportImxProvider', () => {
           ...restSignableTransferV1Response,
           stark_signature: starkSignature,
         },
+        xImxEthAddress: '',
+        xImxEthSignature: '',
       };
       const mockHeader = {
         headers: {

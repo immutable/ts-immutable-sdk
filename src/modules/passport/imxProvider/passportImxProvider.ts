@@ -18,7 +18,6 @@ import {
   UnsignedTransferRequest,
   TransfersApi,
   Config,
-  TransfersApiCreateTransferV1Request,
 } from '@imtbl/core-sdk';
 import { User } from '../types';
 import { IMXProvider } from '../../provider/imxProvider';
@@ -31,7 +30,9 @@ export type PassportImxProviderInput = {
   jwt: JWT;
   starkSigner: StarkSigner;
   ethAddress: string;
-}
+};
+
+const ERC721 = 'ERC721';
 
 export default class PassportImxProvider implements IMXProvider {
   private jwt: JWT;
@@ -40,7 +41,7 @@ export default class PassportImxProvider implements IMXProvider {
   //Note: this ethAddress should be the smart contract ethAddress
   private ethAddress: string;
 
-  constructor({jwt, starkSigner, ethAddress}: PassportImxProviderInput) {
+  constructor({ jwt, starkSigner, ethAddress }: PassportImxProviderInput) {
     this.jwt = jwt;
     this.starkSigner = starkSigner;
     this.ethAddress = ethAddress;
@@ -50,60 +51,58 @@ export default class PassportImxProvider implements IMXProvider {
   async transfer(
     request: UnsignedTransferRequest
   ): Promise<CreateTransferResponseV1> {
-    return withPassportError<CreateTransferResponseV1>(
-      async () => {
-        const transferAmount = request.type === 'ERC721' ? '1' : request.amount;
-        const signableResult = await this.transfersApi.getSignableTransferV1({
-          getSignableTransferRequest: {
-            sender: this.ethAddress,
-            token: convertToSignableToken(request),
-            amount: transferAmount,
-            receiver: request.receiver,
-          },
-        });
+    return withPassportError<CreateTransferResponseV1>(async () => {
+      const transferAmount = request.type === ERC721 ? '1' : request.amount;
+      const signableResult = await this.transfersApi.getSignableTransferV1({
+        getSignableTransferRequest: {
+          sender: this.ethAddress,
+          token: convertToSignableToken(request),
+          amount: transferAmount,
+          receiver: request.receiver,
+        },
+      });
 
-        const sigeableResultData = signableResult.data;
-        const { payload_hash: payloadHash } = sigeableResultData;
+      const sigeableResultData = signableResult.data;
+      const { payload_hash: payloadHash } = sigeableResultData;
 
-        const starkSignature = await this.starkSigner.signMessage(payloadHash);
+      const starkSignature = await this.starkSigner.signMessage(payloadHash);
+      const senderStarkKey = await this.starkSigner.getAddress();
 
-        const transferSigningParams = {
-          sender_stark_key: sigeableResultData.sender_stark_key || '',
-          sender_vault_id: sigeableResultData.sender_vault_id,
-          receiver_stark_key: sigeableResultData.receiver_stark_key,
-          receiver_vault_id: sigeableResultData.receiver_vault_id,
-          asset_id: sigeableResultData.asset_id,
-          amount: sigeableResultData.amount,
-          nonce: sigeableResultData.nonce,
-          expiration_timestamp: sigeableResultData.expiration_timestamp,
-          stark_signature: starkSignature,
-        };
+      const transferSigningParams = {
+        sender_stark_key: sigeableResultData.sender_stark_key || senderStarkKey,
+        sender_vault_id: sigeableResultData.sender_vault_id,
+        receiver_stark_key: sigeableResultData.receiver_stark_key,
+        receiver_vault_id: sigeableResultData.receiver_vault_id,
+        asset_id: sigeableResultData.asset_id,
+        amount: sigeableResultData.amount,
+        nonce: sigeableResultData.nonce,
+        expiration_timestamp: sigeableResultData.expiration_timestamp,
+        stark_signature: starkSignature,
+      };
 
-        const createTransferRequest = {
-          createTransferRequest: transferSigningParams,
-          //Note: fake value to by pass the client check, will update once get the up-to-date api client
-          xImxEthAddress: "",
-          xImxEthSignature: ""
-        } as TransfersApiCreateTransferV1Request;
+      const createTransferRequest = {
+        createTransferRequest: transferSigningParams,
+        //Note: fake value to by pass the client check, will update once get the up-to-date api client
+        xImxEthAddress: '',
+        xImxEthSignature: '',
+      };
 
-        const headers = {
-          Authorization: 'Bearer ' + this.jwt.accessToken,
-        };
+      const headers = {
+        Authorization: 'Bearer ' + this.jwt.accessToken,
+      };
 
-        const { data: responseData } = await this.transfersApi.createTransferV1(
-          createTransferRequest,
-          { headers }
-        );
+      const { data: responseData } = await this.transfersApi.createTransferV1(
+        createTransferRequest,
+        { headers }
+      );
 
-        return {
-          sent_signature: responseData.sent_signature,
-          status: responseData.status?.toString(),
-          time: responseData.time,
-          transfer_id: responseData.transfer_id,
-        };
-      },
-      { type: PassportErrorType.TRANSFER_ERROR }
-    );
+      return {
+        sent_signature: responseData.sent_signature,
+        status: responseData.status?.toString(),
+        time: responseData.time,
+        transfer_id: responseData.transfer_id,
+      };
+    }, PassportErrorType.TRANSFER_ERROR);
   }
 
   registerOffchain(): Promise<RegisterUserResponse> {
