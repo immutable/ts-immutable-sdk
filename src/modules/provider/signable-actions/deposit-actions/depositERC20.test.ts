@@ -72,14 +72,6 @@ describe('Deposit ERC20', () => {
         getSignableRegistration: getSignableRegistrationMock,
       });
 
-      getSignableRegistrationMock = jest.fn().mockResolvedValue({
-        data: getSignableRegistrationResponse
-      });
-
-      (UsersApi as jest.Mock).mockReturnValue({
-        getSignableRegistration: getSignableRegistrationMock,
-      });
-
       (Contracts.IERC20.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
           approve: async () => ('test')
