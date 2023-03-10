@@ -1,19 +1,23 @@
 import './App.css';
-import { BiomeThemeProvider, Heading, Button } from '@biom3/react'
 
 function App () {
     return (
-      <BiomeThemeProvider>
+      <div>
         <main className="checkout-sdk-app">
-          <Heading as="h1">Sample App</Heading>
+          <h1>Sample App</h1>
           <p>This is a react app which implements the CheckoutSDK and Widgets, choose which one you would like to preview.</p>
           <div className="button-container">
-          <Button href={"/widgets"}>Widgets</Button>
-          <Button href={"/sdk"}>SDK</Button>
+          <div>
+            <a href={"/widgets"}>Widgets</a>
+          </div>
+          <div>
+           <a href={"/sdk"}>SDK</a>
+
+          </div>
           </div>
           
         </main>
-      </BiomeThemeProvider>
+      </div>
     )
 }
 

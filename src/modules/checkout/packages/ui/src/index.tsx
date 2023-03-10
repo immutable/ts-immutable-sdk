@@ -1,12 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import { ConnectWidget } from './modules/connect/ConnectWidget';
+import { ConnectionProviders, ConnectWidgetParams } from './types'
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const element = document.getElementById('root') as HTMLElement
+
+const root = ReactDOM.createRoot(element);
+
+const params:ConnectWidgetParams = {
+  providerPreference: ConnectionProviders.METAMASK,
+}
+
 root.render(
   <React.StrictMode>
-    <App />
+    <ConnectWidget params={params} theme={'LIGHT'}  />
   </React.StrictMode>
 );
+

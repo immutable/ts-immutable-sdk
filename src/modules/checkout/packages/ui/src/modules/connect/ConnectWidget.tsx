@@ -19,6 +19,7 @@ import {
   InactiveStyle, 
   WidgetHeaderStyle 
 } from './ConnectStyles'
+import { onDarkBase } from '@biom3/design-tokens'
 
 export enum ConnectWidgetViews {
   CONNECT_WALLET = "CONNECT_WALLET",

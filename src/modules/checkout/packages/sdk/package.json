@@ -37,7 +37,6 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@biom3/react": "^0.0.6-alpha",
     "@ethersproject/providers": "^5.7.2",
     "@metamask/detect-provider": "^2.0.0",
     "ethers": "^5.7.2",

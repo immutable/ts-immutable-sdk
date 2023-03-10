@@ -1,5 +1,4 @@
 import { CheckoutSDK, Network } from '@imtbl/checkout-sdk-web'
-import { Box, Button, Heading } from '@biom3/react'
 
 export interface SwitchNetworkProps {
   provider: any;
@@ -15,24 +14,24 @@ function SwitchNetwork(props: SwitchNetworkProps) {
   }
  
   return (
-    <Box>
-      <Heading size="small" className="sample-heading">Checkout Connect (SDK)</Heading>
+    <div>
+      <h1 className="sample-heading">Checkout Connect (SDK)</h1>
       <div className="divider"></div>
-      <Box sx={{display: 'flex', flexDirection: 'column', rowGap: 'base.spacing.x1', width: '300px'}}>
-        <Button 
+      <div>
+        <button 
           onClick={() => switchNetwork(Network.ETHEREUM)}>
           Switch Network to Ethereum
-        </Button>
-        <Button 
+        </button>
+        <button 
           onClick={() => switchNetwork(Network.GOERLI)}>
           Switch Network to Goerli
-        </Button>
-        <Button 
+        </button>
+        <button 
           onClick={() => switchNetwork(Network.POLYGON)}>
           Switch Network to Polygon
-        </Button>
-        </Box>
-    </Box>
+        </button>
+        </div>
+    </div>
   );
 }
 

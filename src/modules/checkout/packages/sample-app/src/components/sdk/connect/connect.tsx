@@ -1,5 +1,4 @@
 import { CheckoutSDK, ConnectParams } from '@imtbl/checkout-sdk-web'
-import { Button, Heading } from '@biom3/react'
 
 export enum ConnectionProviders {
   METAMASK = "metamask"
@@ -28,12 +27,12 @@ function Connect(props: ConnectProps) {
 
   return (
     <div className="Connect">
-      <Heading size="small" className="sample-heading">Checkout Connect (SDK)</Heading>
+      <h1 className="sample-heading">Checkout Connect (SDK)</h1>
       <div className="divider"></div>
-      <Button 
+      <button 
         onClick={() => connectClick(checkout)}>
         Connect Wallet
-      </Button>
+      </button>
     </div>
   );
 }
