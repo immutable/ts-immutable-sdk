@@ -3,6 +3,7 @@ import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { User } from './types';
 import axios from 'axios';
+import { MAX_RETRIES } from './util/retry';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -184,7 +185,7 @@ describe('AuthManager', () => {
         .toThrow('REFRESH_TOKEN_ERROR');
 
       expect(signinSilentMock).toHaveBeenCalledTimes(0);
-      expect(mockedAxios.get).toHaveBeenCalledTimes(6);
+      expect(mockedAxios.get).toHaveBeenCalledTimes(MAX_RETRIES + 1);
 
     }, 15000);
   });
