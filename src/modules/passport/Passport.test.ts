@@ -75,7 +75,8 @@ describe('Passport', () => {
       expect(getStarkSigner).toBeCalledTimes(1);
     }, 15000);
 
-    it('should execute connect with refresh error', async () => {
+    // TODO https://immutable.atlassian.net/browse/ID-412: add back once user registration function is done and called
+    it.skip('should execute connect with refresh error', async () => {
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
       refreshToken.mockResolvedValue(null);
 

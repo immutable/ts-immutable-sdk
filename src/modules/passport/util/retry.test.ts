@@ -1,4 +1,4 @@
-import { RetryOption, retryWithDelay } from './retry';
+import { MAX_RETRIES, RetryOption, retryWithDelay } from './retry';
 
 describe('retryWithDelay', () => {
   it('retryWithDelay should retry with default 5 times', async () => {
@@ -8,7 +8,7 @@ describe('retryWithDelay', () => {
         .rejects
         .toThrow('Retry failed');
 
-      expect(mockFunc).toHaveBeenCalledTimes(6);
+      expect(mockFunc).toHaveBeenCalledTimes(MAX_RETRIES + 1);
     }
     , 15000);
 
