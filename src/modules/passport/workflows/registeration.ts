@@ -7,10 +7,10 @@ type registerPassportWorkflowParams = WalletConnection & {
 };
 
 export async function registerPassportWorkflow({
-                                                 ethSigner,
-                                                 starkSigner,
-                                                 usersApi
-                                               }: registerPassportWorkflowParams, authorization: string): Promise<string> {
+  ethSigner,
+  starkSigner,
+  usersApi
+}: registerPassportWorkflowParams, authorization: string): Promise<string> {
   const userAddress = await ethSigner.getAddress();
   const starkPublicKey = await starkSigner.getAddress();
 
