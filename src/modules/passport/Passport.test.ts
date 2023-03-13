@@ -11,6 +11,7 @@ jest.mock('./magicAdapter');
 jest.mock('./stark/getStarkSigner');
 jest.mock('./config')
 jest.mock('axios');
+jest.mock('./imxProvider/passportImxProvider');
 
 const oidcConfiguration: OidcConfiguration = {
   clientId: '11111',

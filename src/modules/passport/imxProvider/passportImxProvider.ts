@@ -2,11 +2,13 @@ import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   AnyToken,
   CancelOrderResponse,
+  Configuration,
   CreateOrderResponse,
   CreateTradeResponse,
   CreateTransferResponse,
   CreateTransferResponseV1,
   CreateWithdrawalResponse,
+  EthSigner,
   GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
   NftTransferDetails,
@@ -19,16 +21,22 @@ import {
 } from '@imtbl/core-sdk';
 import { User } from '../types';
 import { IMXProvider } from '../../provider';
+import Workflows from '../workflows/workflows';
+import { PassportConfiguration } from '../config';
 
 export type JWT = Pick<User, 'accessToken' | 'refreshToken'>;
 
 export default class PassportImxProvider implements IMXProvider {
   private jwt: JWT;
   private starkSigner: StarkSigner;
+  private ethSigner: EthSigner;
+  private workflows: Workflows;
 
-  constructor(jwt: JWT, starkSigner: StarkSigner) {
+  constructor(jwt: JWT, starkSigner: StarkSigner, ethSigner: EthSigner, config: PassportConfiguration) {
     this.jwt = jwt;
     this.starkSigner = starkSigner;
+    this.ethSigner = ethSigner;
+    this.workflows = new Workflows(new Configuration({ basePath: config.imxAPIConfiguration.basePath }));
   }
 
   transfer(
@@ -38,8 +46,14 @@ export default class PassportImxProvider implements IMXProvider {
     throw new Error('Method not implemented.');
   }
 
-  registerOffchain(): Promise<RegisterUserResponse> {
-    throw new Error('Method not implemented.');
+  async registerOffchain(): Promise<RegisterUserResponse> {
+    await this.workflows.registerPassport({
+      starkSigner: this.starkSigner,
+      ethSigner: this.ethSigner
+    }, this.jwt.accessToken);
+    return {
+      tx_hash: "",
+    };
   }
 
   isRegisteredOnchain(): Promise<boolean> {

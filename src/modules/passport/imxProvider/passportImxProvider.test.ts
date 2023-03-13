@@ -1,13 +1,40 @@
 import PassportImxProvider, { JWT } from './passportImxProvider';
-import { StarkSigner } from '@imtbl/core-sdk';
+import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
+import { Config } from '../config';
+import Workflows from '../workflows/workflows';
+
+jest.mock('../workflows/workflows');
+
 describe('PassportImxProvider', () => {
   let passportImxProvider: PassportImxProvider;
+
+  const passportConfig = {
+    network: Config.SANDBOX.network,
+    oidcConfiguration: {
+      authenticationDomain: Config.SANDBOX.authenticationDomain,
+      clientId: "",
+      logoutRedirectUri: "",
+      redirectUri: "",
+    },
+    imxAPIConfiguration: {
+      basePath: "https://api.sandbox.x.immutable.com",
+    },
+    magicPublishableApiKey: Config.SANDBOX.magicPublishableApiKey,
+    magicProviderId: Config.SANDBOX.magicProviderId,
+
+  };
+  const registerPassportMock = jest.fn();
 
   beforeEach(() => {
     passportImxProvider = new PassportImxProvider(
       {} as JWT,
-      {} as StarkSigner
+      {} as StarkSigner,
+      {} as EthSigner,
+      passportConfig,
     );
+    (Workflows as jest.Mock).mockReturnValue({
+      registerPassport: registerPassportMock,
+    });
   });
 
   describe('transfer', () => {
@@ -17,8 +44,11 @@ describe('PassportImxProvider', () => {
   });
 
   describe('registerOffchain', () => {
-    it('should throw error', async () => {
-      expect(passportImxProvider.registerOffchain).toThrowError();
+    it('should not throw error', async () => {
+      const resp = await passportImxProvider.registerOffchain();
+
+      expect(resp.tx_hash).toEqual("");
+      expect(registerPassportMock).toHaveBeenCalledTimes(1);
     });
   });
 

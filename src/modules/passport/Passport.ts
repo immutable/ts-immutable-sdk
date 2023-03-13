@@ -1,7 +1,7 @@
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
-import { getPassportConfiguration } from './config';
+import { getPassportConfiguration, PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { IMXProvider } from '../provider';
 import { getStarkSigner } from './stark';
@@ -10,6 +10,7 @@ import { EnvironmentConfiguration, OidcConfiguration, UserProfile } from './type
 export class Passport {
   private authManager: AuthManager;
   private magicAdapter: MagicAdapter;
+  private readonly config: PassportConfiguration;
 
   constructor(
     environmentConfiguration: EnvironmentConfiguration,
@@ -20,8 +21,9 @@ export class Passport {
       oidcConfiguration,
     );
 
-    this.authManager = new AuthManager(passportConfiguration);
-    this.magicAdapter = new MagicAdapter(passportConfiguration);
+    this.config = passportConfiguration;
+    this.authManager = new AuthManager(this.config);
+    this.magicAdapter = new MagicAdapter(this.config);
   }
 
   public async connectImx(): Promise<IMXProvider> {
@@ -33,7 +35,8 @@ export class Passport {
       );
     }
     const provider = await this.magicAdapter.login(user.idToken);
-    const signer = await getStarkSigner(provider.getSigner());
+    const ethSigner = provider.getSigner();
+    const starkSigner = await getStarkSigner(ethSigner);
 
     // TODO https://immutable.atlassian.net/browse/ID-412: add back once user registration function is done and called
     // if (!user.etherKey) {
@@ -46,7 +49,7 @@ export class Passport {
     //   }
     //   user = updatedUser;
     // }
-    return new PassportImxProvider(user, signer);
+    return new PassportImxProvider(user, starkSigner, ethSigner, this.config);
   }
 
   public async loginCallback(): Promise<void> {
