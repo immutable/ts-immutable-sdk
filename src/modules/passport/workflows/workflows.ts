@@ -34,6 +34,3 @@ export class Workflows {
     }, authorization);
   }
 }
-
-
-
