@@ -6,7 +6,7 @@ export type registerPassportWorkflowParams = WalletConnection & {
   usersApi: UsersApi;
 };
 
-export async function registerPassportWorkflow({
+export default async function registerPassportWorkflow({
   ethSigner,
   starkSigner,
   usersApi

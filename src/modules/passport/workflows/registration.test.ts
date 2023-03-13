@@ -1,4 +1,4 @@
-import { registerPassportWorkflow, registerPassportWorkflowParams } from './registration';
+import registerPassportWorkflow, { registerPassportWorkflowParams } from './registration';
 
 describe('registerPassportWorkflow', () => {
   const requestBody = {

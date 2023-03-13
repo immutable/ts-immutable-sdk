@@ -18,11 +18,12 @@ import {
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
+  UsersApi,
 } from '@imtbl/core-sdk';
 import { User } from '../types';
 import { IMXProvider } from '../../provider';
-import Workflows from '../workflows/workflows';
 import { PassportConfiguration } from '../config';
+import  registerPassportWorkflow  from '../workflows/registration';
 
 export type JWT = Pick<User, 'accessToken' | 'refreshToken'>;
 
@@ -30,13 +31,15 @@ export default class PassportImxProvider implements IMXProvider {
   private jwt: JWT;
   private starkSigner: StarkSigner;
   private ethSigner: EthSigner;
-  private workflows: Workflows;
+  private readonly usersApi: UsersApi;
+
 
   constructor(jwt: JWT, starkSigner: StarkSigner, ethSigner: EthSigner, config: PassportConfiguration) {
     this.jwt = jwt;
     this.starkSigner = starkSigner;
     this.ethSigner = ethSigner;
-    this.workflows = new Workflows(new Configuration({ basePath: config.imxAPIConfiguration.basePath }));
+    const configuration = new Configuration({ basePath: config.imxAPIConfiguration.basePath });
+    this.usersApi = new UsersApi(configuration);
   }
 
   transfer(
@@ -47,9 +50,10 @@ export default class PassportImxProvider implements IMXProvider {
   }
 
   async registerOffchain(): Promise<RegisterUserResponse> {
-    await this.workflows.registerPassport({
+    await registerPassportWorkflow({
       starkSigner: this.starkSigner,
-      ethSigner: this.ethSigner
+      ethSigner: this.ethSigner,
+      usersApi: this.usersApi,
     }, this.jwt.accessToken);
     return {
       tx_hash: "",
@@ -100,6 +104,7 @@ export default class PassportImxProvider implements IMXProvider {
   prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
     throw new Error('Method not implemented.');
   }
+
   completeWithdrawal(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     starkPublicKey: string,

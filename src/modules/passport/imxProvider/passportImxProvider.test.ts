@@ -1,9 +1,9 @@
 import PassportImxProvider, { JWT } from './passportImxProvider';
 import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { Config } from '../config';
-import Workflows from '../workflows/workflows';
+import registerPassportWorkflow from '../workflows/registration';
 
-jest.mock('../workflows/workflows');
+jest.mock('../workflows/registration');
 
 describe('PassportImxProvider', () => {
   let passportImxProvider: PassportImxProvider;
@@ -23,7 +23,6 @@ describe('PassportImxProvider', () => {
     magicProviderId: Config.SANDBOX.magicProviderId,
 
   };
-  const registerPassportMock = jest.fn();
 
   beforeEach(() => {
     passportImxProvider = new PassportImxProvider(
@@ -32,9 +31,6 @@ describe('PassportImxProvider', () => {
       {} as EthSigner,
       passportConfig,
     );
-    (Workflows as jest.Mock).mockReturnValue({
-      registerPassport: registerPassportMock,
-    });
   });
 
   describe('transfer', () => {
@@ -48,7 +44,7 @@ describe('PassportImxProvider', () => {
       const resp = await passportImxProvider.registerOffchain();
 
       expect(resp.tx_hash).toEqual("");
-      expect(registerPassportMock).toHaveBeenCalledTimes(1);
+      expect(registerPassportWorkflow).toHaveBeenCalledTimes(1);
     });
   });
 
