@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
 import { PassportErrorType, withPassportError } from './errors/passportError';
-import { PassportConfiguration } from './config/config';
+import { PassportConfiguration } from './config';
 
 export default class MagicAdapter {
   private readonly magicClient;

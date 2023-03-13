@@ -3,7 +3,7 @@ import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { User } from './types';
-import { PassportConfiguration } from './config/config';
+import { PassportConfiguration } from './config';
 import { MAX_RETRIES } from './util/retry';
 
 jest.mock('axios');

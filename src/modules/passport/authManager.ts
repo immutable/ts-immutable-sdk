@@ -3,7 +3,7 @@ import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportMetadata, User } from './types';
 import { retryWithDelay } from './util/retry';
 import { getUserEtherKeyFromMetadata } from './getUserMetadata';
-import { PassportConfiguration } from './config/config';
+import { PassportConfiguration } from './config';
 
 const getAuthConfiguration = ({ oidcConfiguration }: PassportConfiguration) => ({
   authority: oidcConfiguration.authenticationDomain,
