@@ -2,7 +2,7 @@ import { signRaw } from '../../provider/signable-actions/utils';
 import { UsersApi, WalletConnection } from '@imtbl/core-sdk';
 
 
-type registerPassportWorkflowParams = WalletConnection & {
+export type registerPassportWorkflowParams = WalletConnection & {
   usersApi: UsersApi;
 };
 
@@ -13,7 +13,6 @@ export async function registerPassportWorkflow({
 }: registerPassportWorkflowParams, authorization: string): Promise<string> {
   const userAddress = await ethSigner.getAddress();
   const starkPublicKey = await starkSigner.getAddress();
-
 
   const signableResult = await usersApi.getSignableRegistrationOffchain({
     getSignableRegistrationRequest: {
@@ -29,7 +28,7 @@ export async function registerPassportWorkflow({
 
   const starkSignature = await starkSigner.signMessage(payloadHash);
 
-  const registeredUser = await usersApi.registerPassportUser({
+  const response = await usersApi.registerPassportUser({
     authorization: authorization,
     registerPassportUserRequest: {
       eth_signature: ethSignature,
@@ -39,5 +38,5 @@ export async function registerPassportWorkflow({
     },
   });
 
-  return registeredUser.statusText;
+  return response.statusText;
 }

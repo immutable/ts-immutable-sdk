@@ -1,6 +1,6 @@
 import { ImmutableXConfiguration, UsersApi, WalletConnection } from '@imtbl/core-sdk';
 import { Signer } from '@ethersproject/abstract-signer';
-import { registerPassportWorkflow } from './registeration';
+import { registerPassportWorkflow } from './registration';
 
 export class Workflows {
   private readonly usersApi: UsersApi;
