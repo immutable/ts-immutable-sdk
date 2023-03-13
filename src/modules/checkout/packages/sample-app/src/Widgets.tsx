@@ -5,8 +5,14 @@ function Widgets () {
       <div>
         <main className="checkout-sdk-app">
           <h1>Sample Widgets</h1>
-          <p>This is a react app which implements the UI widgets as a marketplace would.</p>
-          <ConnectUI></ConnectUI>
+          <p>Choose a widget from the list below</p>
+          <div>
+            <a href={"/widgets/connect"}>Connect Widget</a>
+          </div>
+          <div>
+           <a href={"/widgets/wallet"}>Wallet Widget</a>
+          </div>
+
         </main>
       </div>
     )

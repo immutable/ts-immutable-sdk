@@ -59,9 +59,6 @@ function ConnectUI() {
  
   return (
     <div className="Connect">
-      <h1 className="sample-heading">Checkout Connect (Injected Widget)</h1>
-      <div className="divider"></div>
-      <span id="imtbl-checkout-connect"></span>
       <h1 className="sample-heading">Checkout Connect (React Component)</h1>
        <ConnectWidget params={widgetOptions.params} theme={widgetOptions.theme} ></ConnectWidget> 
     </div>

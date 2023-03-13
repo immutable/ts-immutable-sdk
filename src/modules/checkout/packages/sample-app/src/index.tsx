@@ -9,6 +9,8 @@ import {
 } from "react-router-dom";
 import Widgets from './Widgets';
 import SDK from './SDK';
+import ConnectUI from './components/ui/connect/connect';
+import WalletUI from './components/ui/wallet/wallet';
 
 const router = createBrowserRouter([
   {
@@ -18,6 +20,14 @@ const router = createBrowserRouter([
   {
     path: "/widgets",
     element: <Widgets/>,
+  },
+  {
+    path: "/widgets/connect",
+    element: <ConnectUI/>,
+  },
+  {
+    path: "/widgets/wallet",
+    element: <WalletUI/>,
   },
   {
     path: "/sdk",

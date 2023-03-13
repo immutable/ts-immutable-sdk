@@ -1,20 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ConnectWidget } from './modules/connect/ConnectWidget';
-import { ConnectWidgetParams } from './types';
+import { ConnectWidgetParams, WalletWidgetParams } from './types';
 import {ConnectionProviders} from "@imtbl/checkout-sdk-web";
+import { WalletWidget } from './module';
 
 const element = document.getElementById('root') as HTMLElement
 
 const root = ReactDOM.createRoot(element);
 
-const params:ConnectWidgetParams = {
+const connectParams:ConnectWidgetParams = {
+  providerPreference: ConnectionProviders.METAMASK,
+}
+
+const walletParams:WalletWidgetParams = {
   providerPreference: ConnectionProviders.METAMASK,
 }
 
 root.render(
   <React.StrictMode>
-    <ConnectWidget params={params} theme={'LIGHT'}  />
+    <ConnectWidget params={connectParams} theme={'DARK'}></ConnectWidget>
+    <br />
+    <WalletWidget params={walletParams} theme={'DARK'}></WalletWidget>
   </React.StrictMode>
 );
 
