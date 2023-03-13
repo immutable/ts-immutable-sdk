@@ -1,5 +1,5 @@
 import { PassportError } from './errors/passportError';
 import { Passport } from './Passport';
-import { Workflows } from './workflows/workflows';
+import { Config } from './config';
 
-export { Passport, PassportError, Workflows };
+export { Config, Passport, PassportError };

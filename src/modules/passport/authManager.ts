@@ -3,37 +3,29 @@ import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportMetadata, User } from './types';
 import { retryWithDelay } from './util/retry';
 import { getUserEtherKeyFromMetadata } from './getUserMetadata';
+import { PassportConfiguration } from './config';
 
-type AuthInput = {
-  clientId: string;
-  redirectUri: string;
-};
-
-// TODO: This is a static Auth0 domain that could come from env or config file
-const passportAuthDomain = 'https://auth.dev.immutable.com';
-
-const getAuthConfiguration = ({ clientId, redirectUri }: AuthInput) => ({
-  authority: passportAuthDomain,
-  redirect_uri: redirectUri,
-  popup_redirect_uri: redirectUri,
-  client_id: clientId,
+const getAuthConfiguration = ({ oidcConfiguration }: PassportConfiguration) => ({
+  authority: oidcConfiguration.authenticationDomain,
+  redirect_uri: oidcConfiguration.redirectUri,
+  popup_redirect_uri: oidcConfiguration.redirectUri,
+  client_id: oidcConfiguration.clientId,
   metadata: {
-    authorization_endpoint: `${passportAuthDomain}/authorize`,
-    token_endpoint: `${passportAuthDomain}/oauth/token`,
-    userinfo_endpoint: `${passportAuthDomain}/userinfo`
+    authorization_endpoint: `${oidcConfiguration.authenticationDomain}/authorize`,
+    token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
+    userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`
   },
   loadUserInfo: true,
 });
 
 export default class AuthManager {
   private userManager;
+  private config: PassportConfiguration;
 
-  constructor({ clientId, redirectUri }: AuthInput) {
+  constructor(config: PassportConfiguration) {
+    this.config = config;
     this.userManager = new UserManager(
-      getAuthConfiguration({
-        clientId,
-        redirectUri,
-      })
+      getAuthConfiguration(config),
     );
   }
 
@@ -80,9 +72,9 @@ export default class AuthManager {
     jwt: string
   ): Promise<User | null> {
     return withPassportError<User | null>(async () => {
-      const etherKey = await retryWithDelay(() =>
-        getUserEtherKeyFromMetadata(passportAuthDomain, jwt)
-      );
+      const etherKey = await retryWithDelay(() => (
+        getUserEtherKeyFromMetadata(this.config.oidcConfiguration.authenticationDomain, jwt)
+      ));
       const updatedUser = await this.userManager.signinSilent();
       if (!updatedUser) {
         return null;

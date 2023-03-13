@@ -1,5 +1,9 @@
 
-export type Networks = 'mainnet' | 'goerli';
+export interface PassportConfigurationArguments {
+  clientId: string;
+  redirectUri: string;
+  logoutRedirectUri: string;
+}
 
 export type UserProfile = {
   email?: string;
@@ -19,4 +23,22 @@ export type PassportMetadata = {
   ether_key: string;
   stark_key: string;
   user_admin_key: string;
+}
+
+export enum Networks {
+  PRODUCTION = 'mainnet',
+  SANDBOX = 'goerli',
+}
+
+export interface EnvironmentConfiguration {
+  network: Networks;
+  authenticationDomain: string;
+  magicPublishableApiKey: string;
+  magicProviderId: string;
+}
+
+export interface OidcConfiguration {
+  clientId: string;
+  logoutRedirectUri: string;
+  redirectUri: string;
 }
