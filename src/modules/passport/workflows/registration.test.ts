@@ -1,4 +1,4 @@
-import registerPassportWorkflow, { registerPassportWorkflowParams } from './registration';
+import registerPassport, { registerPassportWorkflowParams } from './registration';
 
 describe('registerPassportWorkflow', () => {
   const requestBody = {
@@ -34,7 +34,7 @@ describe('registerPassportWorkflow', () => {
       usersApi: mockUserApi as never,
     };
 
-    const res = await registerPassportWorkflow(request, mockToken);
+    const res = await registerPassport(request, mockToken);
 
     expect(res).toEqual("No Content");
     expect(mockStarkSigner.signMessage).toHaveBeenCalled();
@@ -72,7 +72,7 @@ describe('registerPassportWorkflow', () => {
       usersApi: mockUserApi as never,
     };
 
-    await expect(registerPassportWorkflow(request, mockToken)).rejects.toEqual("error");
+    await expect(registerPassport(request, mockToken)).rejects.toEqual("error");
 
     expect(mockStarkSigner.signMessage).toHaveBeenCalled();
     expect(mockEthSigner.signMessage).toHaveBeenCalled();

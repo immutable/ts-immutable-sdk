@@ -23,21 +23,21 @@ import {
 import { User } from '../types';
 import { IMXProvider } from '../../provider';
 import { PassportConfiguration } from '../config';
-import  registerPassportWorkflow  from '../workflows/registration';
+import  registerPassport  from '../workflows/registration';
 
 export type JWT = Pick<User, 'accessToken' | 'refreshToken'>;
 
 export default class PassportImxProvider implements IMXProvider {
   private jwt: JWT;
   private starkSigner: StarkSigner;
-  private ethSigner: EthSigner;
+  private userAdminKeySigner: EthSigner;
   private readonly usersApi: UsersApi;
 
 
-  constructor(jwt: JWT, starkSigner: StarkSigner, ethSigner: EthSigner, config: PassportConfiguration) {
+  constructor(jwt: JWT, starkSigner: StarkSigner, userAdminKeySigner: EthSigner, config: PassportConfiguration) {
     this.jwt = jwt;
     this.starkSigner = starkSigner;
-    this.ethSigner = ethSigner;
+    this.userAdminKeySigner = userAdminKeySigner;
     const configuration = new Configuration({ basePath: config.imxAPIConfiguration.basePath });
     this.usersApi = new UsersApi(configuration);
   }
@@ -50,9 +50,9 @@ export default class PassportImxProvider implements IMXProvider {
   }
 
   async registerOffchain(): Promise<RegisterUserResponse> {
-    await registerPassportWorkflow({
+    await registerPassport({
       starkSigner: this.starkSigner,
-      ethSigner: this.ethSigner,
+      ethSigner: this.userAdminKeySigner,
       usersApi: this.usersApi,
     }, this.jwt.accessToken);
     return {

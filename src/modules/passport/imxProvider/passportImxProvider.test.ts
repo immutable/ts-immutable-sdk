@@ -1,7 +1,7 @@
 import PassportImxProvider, { JWT } from './passportImxProvider';
 import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { Config } from '../config';
-import registerPassportWorkflow from '../workflows/registration';
+import registerPassport from '../workflows/registration';
 
 jest.mock('../workflows/registration');
 
@@ -44,7 +44,7 @@ describe('PassportImxProvider', () => {
       const resp = await passportImxProvider.registerOffchain();
 
       expect(resp.tx_hash).toEqual("");
-      expect(registerPassportWorkflow).toHaveBeenCalledTimes(1);
+      expect(registerPassport).toHaveBeenCalledTimes(1);
     });
   });
 
