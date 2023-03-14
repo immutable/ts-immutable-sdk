@@ -1,23 +1,26 @@
 import axios from 'axios';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
-import { Config, getPassportConfiguration } from './config';
+import { Config } from './config';
 import { Passport } from './Passport';
 import { getStarkSigner } from './stark';
 import { OidcConfiguration, User } from './types';
+import registerPassport from './workflows/registration';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
 jest.mock('./stark/getStarkSigner');
-jest.mock('./config')
 jest.mock('axios');
 jest.mock('./imxProvider/passportImxProvider');
+jest.mock('./workflows/registration');
+
 
 const oidcConfiguration: OidcConfiguration = {
   clientId: '11111',
   redirectUri: 'https://test.com',
   logoutRedirectUri: 'https://test.com',
 };
+
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Passport', () => {
@@ -33,6 +36,7 @@ describe('Passport', () => {
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue({
       idToken: '123',
+      etherKey: "0x123"
     });
     loginCallbackMock = jest.fn();
     magicLoginMock = jest.fn();
@@ -59,12 +63,6 @@ describe('Passport', () => {
     passport = new Passport(Config.SANDBOX, oidcConfiguration);
   });
 
-  describe('new Passport', () => {
-    it('should get the passportConfiguration', () => {
-      expect(getPassportConfiguration).toHaveBeenCalledWith(Config.SANDBOX, oidcConfiguration);
-    });
-  });
-
   describe('connectImx', () => {
     it('should execute connect without error', async () => {
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
@@ -76,18 +74,44 @@ describe('Passport', () => {
       expect(getStarkSigner).toBeCalledTimes(1);
     }, 15000);
 
-    // TODO https://immutable.atlassian.net/browse/ID-412: add back once user registration function is done and called
-    it.skip('should execute connect with refresh error', async () => {
+    it('should register user with refresh error', async () => {
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
-      refreshToken.mockResolvedValue(null);
+      refreshToken.mockRejectedValue("error");
+      authLoginMock.mockResolvedValue({ idToken: '123' });
 
       await expect(passport.connectImx())
         .rejects
-        .toThrow('Failed to get refresh token');
+        .toThrow('error registering new passport user');
 
       expect(authLoginMock).toBeCalledTimes(1);
       expect(magicLoginMock).toBeCalledTimes(1);
       expect(getStarkSigner).toBeCalledTimes(1);
+      expect(registerPassport).toBeCalledTimes(1);
+    });
+
+    it('should register user successfully', async () => {
+      const mockUser: User = {
+        idToken: 'id123',
+        accessToken: 'access123',
+        refreshToken: 'refresh123',
+        profile: {
+          sub: 'email|123',
+          email: 'test@immutable.com',
+          nickname: 'test',
+        },
+        etherKey: "",
+      };
+
+      magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
+      refreshToken.mockResolvedValue(mockUser);
+      authLoginMock.mockResolvedValue({ idToken: '123' });
+
+      await passport.connectImx();
+
+      expect(authLoginMock).toBeCalledTimes(1);
+      expect(magicLoginMock).toBeCalledTimes(1);
+      expect(getStarkSigner).toBeCalledTimes(1);
+      expect(registerPassport).toBeCalledTimes(1);
     });
   });
 

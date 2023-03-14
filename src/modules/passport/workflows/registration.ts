@@ -2,7 +2,7 @@ import { signRaw } from '../../provider/signable-actions/utils';
 import { UsersApi, WalletConnection } from '@imtbl/core-sdk';
 
 
-export type registerPassportWorkflowParams = WalletConnection & {
+export type registerPassportParams = WalletConnection & {
   usersApi: UsersApi;
 };
 
@@ -10,7 +10,7 @@ export default async function registerPassport({
   ethSigner,
   starkSigner,
   usersApi
-}: registerPassportWorkflowParams, authorization: string): Promise<string> {
+}: registerPassportParams, authorization: string): Promise<string> {
   const userAddress = await ethSigner.getAddress();
   const starkPublicKey = await starkSigner.getAddress();
 

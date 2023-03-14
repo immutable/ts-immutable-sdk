@@ -2,13 +2,11 @@ import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   AnyToken,
   CancelOrderResponse,
-  Configuration,
   CreateOrderResponse,
   CreateTradeResponse,
   CreateTransferResponse,
   CreateTransferResponseV1,
   CreateWithdrawalResponse,
-  EthSigner,
   GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
   NftTransferDetails,
@@ -18,28 +16,19 @@ import {
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
-  UsersApi,
 } from '@imtbl/core-sdk';
 import { User } from '../types';
 import { IMXProvider } from '../../provider';
-import { PassportConfiguration } from '../config';
-import  registerPassport  from '../workflows/registration';
 
 export type JWT = Pick<User, 'accessToken' | 'refreshToken'>;
 
 export default class PassportImxProvider implements IMXProvider {
   private jwt: JWT;
   private starkSigner: StarkSigner;
-  private userAdminKeySigner: EthSigner;
-  private readonly usersApi: UsersApi;
 
-
-  constructor(jwt: JWT, starkSigner: StarkSigner, userAdminKeySigner: EthSigner, config: PassportConfiguration) {
+  constructor(jwt: JWT, starkSigner: StarkSigner) {
     this.jwt = jwt;
     this.starkSigner = starkSigner;
-    this.userAdminKeySigner = userAdminKeySigner;
-    const configuration = new Configuration({ basePath: config.imxAPIConfiguration.basePath });
-    this.usersApi = new UsersApi(configuration);
   }
 
   transfer(
@@ -49,15 +38,8 @@ export default class PassportImxProvider implements IMXProvider {
     throw new Error('Method not implemented.');
   }
 
-  async registerOffchain(): Promise<RegisterUserResponse> {
-    await registerPassport({
-      starkSigner: this.starkSigner,
-      ethSigner: this.userAdminKeySigner,
-      usersApi: this.usersApi,
-    }, this.jwt.accessToken);
-    return {
-      tx_hash: "",
-    };
+  registerOffchain(): Promise<RegisterUserResponse> {
+    throw new Error('Method not implemented.');
   }
 
   isRegisteredOnchain(): Promise<boolean> {
@@ -104,7 +86,6 @@ export default class PassportImxProvider implements IMXProvider {
   prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
     throw new Error('Method not implemented.');
   }
-
   completeWithdrawal(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     starkPublicKey: string,

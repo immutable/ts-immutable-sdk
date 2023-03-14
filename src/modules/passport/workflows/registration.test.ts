@@ -1,4 +1,4 @@
-import registerPassport, { registerPassportWorkflowParams } from './registration';
+import registerPassport, { registerPassportParams } from './registration';
 
 describe('registerPassportWorkflow', () => {
   const requestBody = {
@@ -28,7 +28,7 @@ describe('registerPassportWorkflow', () => {
       getAddress: jest.fn().mockReturnValue(requestBody.stark_key),
       signMessage: jest.fn().mockReturnValue(requestBody.stark_signature)
     };
-    const request: registerPassportWorkflowParams = {
+    const request: registerPassportParams = {
       ethSigner: mockEthSigner as never,
       starkSigner: mockStarkSigner as never,
       usersApi: mockUserApi as never,
@@ -66,7 +66,7 @@ describe('registerPassportWorkflow', () => {
       getAddress: jest.fn().mockReturnValue(requestBody.stark_key),
       signMessage: jest.fn().mockReturnValue(requestBody.stark_signature)
     };
-    const request: registerPassportWorkflowParams = {
+    const request: registerPassportParams = {
       ethSigner: mockEthSigner as never,
       starkSigner: mockStarkSigner as never,
       usersApi: mockUserApi as never,
