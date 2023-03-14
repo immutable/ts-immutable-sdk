@@ -4,16 +4,12 @@ import { CheckoutSDK, ConnectionProviders } from '@imtbl/checkout-sdk-web';
 import { ConnectWidget } from './ConnectWidget';
 import { 
   ConnectWidgetParams,
- 
 } from '../../types'
-import { describe, beforeEach, it, cy } from 'local-cypress'
+import { describe, it, cy } from 'local-cypress'
 import { mount } from 'cypress/react18';
 import { cySmartGet } from '../../lib/testUtils';
 
 describe('ConnectWidget tests', () => {
-  
-  beforeEach(() => {
-  })
 
   it('should show the connection options and close button on mount', () => {
     const params = {
@@ -62,7 +58,6 @@ describe('ConnectWidget tests', () => {
     mount(<ConnectWidget params={params}  theme={'LIGHT'}  />)
 
     cy.stub(CheckoutSDK.prototype, 'connect').resolves({});
-
     cySmartGet('connect-other').click()
 
     cySmartGet('other-metamask').click()
@@ -84,7 +79,7 @@ describe('ConnectWidget tests', () => {
 
     mount(<ConnectWidget params={params}  theme={'LIGHT'}  />)
 
-    cy.stub(CheckoutSDK.prototype, 'connect').resolves({});
+    cy.stub(CheckoutSDK.prototype, 'connect').as('connectStub').resolves({});
     cy.stub(CheckoutSDK.prototype, 'switchNetwork').resolves({});
 
     cySmartGet('connect-other').click()

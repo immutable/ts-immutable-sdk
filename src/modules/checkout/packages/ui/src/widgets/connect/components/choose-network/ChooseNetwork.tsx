@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@biom3/react'
 import { ConnectWidgetViews } from '../../ConnectWidget'
 import { Network, CheckoutSDK } from '@imtbl/checkout-sdk-web'
 import { Web3Provider } from '@ethersproject/providers'
 
 export interface ChooseNetworkProps {
-  updateView: Function,
-  provider: Web3Provider|null
+  updateView: (newView: ConnectWidgetViews, err?: any) => void;
+  provider: Web3Provider|null;
 }
 
 export function ChooseNetwork (props:ChooseNetworkProps) {

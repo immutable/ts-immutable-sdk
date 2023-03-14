@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ConnectWidget } from './modules/connect/ConnectWidget';
+import { ConnectWidget } from './widgets/connect/ConnectWidget';
 import { ConnectWidgetOptions } from './types'
 export default class IMTBLConnectWidget {
 

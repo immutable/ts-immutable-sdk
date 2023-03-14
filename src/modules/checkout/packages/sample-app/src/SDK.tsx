@@ -2,9 +2,11 @@ import './App.css';
 import Connect from './components/sdk/connect/connect';
 import { useState } from 'react';
 import SwitchNetwork from './components/sdk/switchNetwork/switchNetwork';
+import {Web3Provider} from '@ethersproject/providers'
+
 
 function SDK () {
-  const [provider, setProvider] = useState<any>();
+  const [provider, setProvider] = useState<Web3Provider>();
     return (
       <div>
         <main className="checkout-sdk-app">
