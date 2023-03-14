@@ -17,12 +17,6 @@
     "resolveJsonModule": true,
     "skipLibCheck": true
   },
-  "ts-node": {
-    "esm": true,
-    "compilerOptions": {
-      "module": "commonjs"
-    }
-  },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "src/modules/provider/sample-app"]
 }

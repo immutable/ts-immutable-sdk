@@ -22,7 +22,7 @@ export type PassportMetadata = {
   ether_key: string;
   stark_key: string;
   user_admin_key: string;
-}
+};
 
 export enum Networks {
   PRODUCTION = 'mainnet',
@@ -43,6 +43,6 @@ export interface OidcConfiguration {
   redirectUri: string;
 }
 
-type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
+type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
-export type UserWithEtherKey = WithRequired<User, 'etherKey'>
+export type UserWithEtherKey = WithRequired<User, 'etherKey'>;

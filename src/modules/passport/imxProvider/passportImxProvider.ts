@@ -21,9 +21,8 @@ import {
 } from '@imtbl/core-sdk';
 import { User } from '../types';
 import { IMXProvider } from '../../provider/imxProvider';
-import { convertToSignableToken } from '../../provider/signable-actions/utils/convertToSignableToken';
-import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { ImxApiConfiguration } from '../config';
+import transfer from '../workflows/transfer';
 
 export type JWT = Pick<User, 'accessToken' | 'refreshToken'>;
 
@@ -34,8 +33,6 @@ export type PassportImxProviderInput = {
   apiConfig: ImxApiConfiguration;
 };
 
-const ERC721 = 'ERC721';
-
 export default class PassportImxProvider implements IMXProvider {
   private jwt: JWT;
   private starkSigner: StarkSigner;
@@ -43,7 +40,12 @@ export default class PassportImxProvider implements IMXProvider {
   //Note: this ethAddress should be the smart contract ethAddress
   private ethAddress: string;
 
-  constructor({ jwt, starkSigner, ethAddress, apiConfig }: PassportImxProviderInput) {
+  constructor({
+    jwt,
+    starkSigner,
+    ethAddress,
+    apiConfig,
+  }: PassportImxProviderInput) {
     this.jwt = jwt;
     this.starkSigner = starkSigner;
     this.ethAddress = ethAddress;
@@ -54,54 +56,13 @@ export default class PassportImxProvider implements IMXProvider {
   async transfer(
     request: UnsignedTransferRequest
   ): Promise<CreateTransferResponseV1> {
-    return withPassportError<CreateTransferResponseV1>(async () => {
-      const transferAmount = request.type === ERC721 ? '1' : request.amount;
-      const signableResult = await this.transfersApi.getSignableTransferV1({
-        getSignableTransferRequest: {
-          sender: this.ethAddress,
-          token: convertToSignableToken(request),
-          amount: transferAmount,
-          receiver: request.receiver,
-        },
-      });
-
-      const signableResultData = signableResult.data;
-      const { payload_hash: payloadHash } = signableResultData;
-      const starkSignature = await this.starkSigner.signMessage(payloadHash);
-      const senderStarkKey = await this.starkSigner.getAddress();
-      
-      const transferSigningParams = {
-        sender_stark_key: signableResultData.sender_stark_key || senderStarkKey,
-        sender_vault_id: signableResultData.sender_vault_id,
-        receiver_stark_key: signableResultData.receiver_stark_key,
-        receiver_vault_id: signableResultData.receiver_vault_id,
-        asset_id: signableResultData.asset_id,
-        amount: signableResultData.amount,
-        nonce: signableResultData.nonce,
-        expiration_timestamp: signableResultData.expiration_timestamp,
-        stark_signature: starkSignature,
-      };
-      
-      const createTransferRequest = {
-        createTransferRequest: transferSigningParams,
-      };
-
-      const headers = {
-        Authorization: 'Bearer ' + this.jwt.accessToken,
-      };
-
-      const { data: responseData } = await this.transfersApi.createTransferV1(
-        createTransferRequest,
-        { headers }
-      );
-
-      return {
-        sent_signature: responseData.sent_signature,
-        status: responseData.status?.toString(),
-        time: responseData.time,
-        transfer_id: responseData.transfer_id,
-      };
-    }, PassportErrorType.TRANSFER_ERROR);
+    return transfer({
+      request,
+      ethAddress: this.ethAddress,
+      jwt: this.jwt,
+      starkSigner: this.starkSigner,
+      transferApi: this.transfersApi,
+    });
   }
 
   registerOffchain(): Promise<RegisterUserResponse> {
