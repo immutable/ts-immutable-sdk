@@ -1,15 +1,23 @@
+import axios from 'axios';
 import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { User } from './types';
-import axios from 'axios';
+import { PassportConfiguration } from './config';
+import { MAX_RETRIES } from './util/retry';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 jest.mock('oidc-client-ts');
 
-const authConfig = { clientId: '11111', redirectUri: 'http://test.com' };
+const config: PassportConfiguration = {
+  oidcConfiguration: {
+    clientId: '11111',
+    redirectUri: 'https://test.com',
+    authenticationDomain: 'https://auth.dev.immutable.com',
+  },
+} as PassportConfiguration;
 
 const passportData = {
   passport: {
@@ -18,7 +26,6 @@ const passportData = {
     user_admin_key: '0x123',
   }
 };
-
 const mockOidcUser: OidcUser = {
   id_token: 'id123',
   access_token: 'access123',
@@ -69,7 +76,7 @@ describe('AuthManager', () => {
       getUser: getUserMock,
       signinSilent: signinSilentMock,
     });
-    authManager = new AuthManager(authConfig);
+    authManager = new AuthManager(config);
   });
 
   describe('login', () => {
@@ -184,7 +191,7 @@ describe('AuthManager', () => {
         .toThrow('REFRESH_TOKEN_ERROR');
 
       expect(signinSilentMock).toHaveBeenCalledTimes(0);
-      expect(mockedAxios.get).toHaveBeenCalledTimes(6);
+      expect(mockedAxios.get).toHaveBeenCalledTimes(MAX_RETRIES + 1);
 
     }, 15000);
   });

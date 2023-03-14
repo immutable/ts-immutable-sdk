@@ -1,22 +1,22 @@
-import { AppCtx } from '../Context/app-context';
-import { Button, FormControl, TextInput, Heading } from '@biom3/react';
+import { Actions, AppCtx } from '../context/app-context';
+import { Box, Body, Button, FormControl, TextInput, Heading } from '@biom3/react';
 import { ChangeEvent, useContext, useState } from 'react';
+import { MetaMaskIMXProvider } from 'ts-immutable-sdk';
 
 export const SignMessage = () => {
-    const { state } = useContext(AppCtx);
+    const { state, dispatch } = useContext(AppCtx);
     const [signMessage, setSignMessage] = useState('');
 
     const renderSignForm = () => {
         return (
             <>
                 <Heading size='medium'>Sign a message</Heading>
-                <FormControl>
-                    <TextInput
-                        sx={{ w: 'base.border.size.100' }}
-                        onChange={updateSignMessage}
-                    />
-                </FormControl>
-                <Button onClick={() => sign()}>Sign</Button>
+                <Box sx={{ display: 'flex', flexDirection: 'row' }} >
+                    <FormControl>
+                        <TextInput onChange={updateSignMessage} />
+                    </FormControl>
+                    <Button onClick={() => sign()}>Sign</Button>
+                </Box>
             </>
         )
     }
@@ -27,13 +27,19 @@ export const SignMessage = () => {
     }
 
     const sign = async () => {
-        // todo: implement sign when actually implemented in wrapper
-        console.log(signMessage);
+        const signedMessage = await MetaMaskIMXProvider.signMessage(signMessage);
+        dispatch({
+            payload: {
+               type: Actions.MetaMaskIMXProviderSignMessage,
+               signedMessage,
+            },
+        });
     }
 
     return(
-        <>
+        <Box sx={{ padding: 'base.spacing.x5' }}>
             { state.address && renderSignForm() }
-        </>
+            { state.signedMessage && <Body>{`Signed message: ${state.signedMessage}`}</Body> }
+        </Box>
     )
 }

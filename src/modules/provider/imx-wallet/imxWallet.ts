@@ -18,7 +18,7 @@ import { getOrSetupIFrame } from './imxWalletIFrame';
 
 const DEFAULT_CONNECTION_MESSAGE =
   'Only sign this request if you’ve initiated an action with Immutable X.';
-const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed.';
+const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed';
 
 export async function connect(
   l1Provider: ethers.providers.Web3Provider,

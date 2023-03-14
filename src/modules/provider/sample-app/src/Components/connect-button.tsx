@@ -1,19 +1,19 @@
-import { Actions, AppCtx } from '../Context/app-context';
-import { MetaMaskProvider, Configuration, PRODUCTION } from 'ts-immutable-sdk';
+import { Actions, AppCtx } from '../context/app-context';
+import { MetaMaskIMXProvider, Configuration, PRODUCTION } from 'ts-immutable-sdk';
 import { useContext } from 'react';
-import {Button } from '@biom3/react'
+import { Box, Button } from '@biom3/react'
 
 export const ConnectButton = () => {
    const { state, dispatch } = useContext(AppCtx);
 
    const wrapperMetaMaskConnect = async () => {
-      const metaMaskProvider = await MetaMaskProvider.connect(new Configuration(PRODUCTION));
+      const metaMaskIMXProvider = await MetaMaskIMXProvider.connect(new Configuration(PRODUCTION));
 
       dispatch({
          payload: {
-            type: Actions.MetaMaskProviderConnected,
-            metaMaskProvider,
-            address: await metaMaskProvider.getAddress(),
+            type: Actions.MetaMaskIMXProviderConnected,
+            metaMaskIMXProvider,
+            address: await metaMaskIMXProvider.getAddress(),
          },
       });
    }
@@ -21,11 +21,11 @@ export const ConnectButton = () => {
    return (
       <>
          {!state.address && 
-            <>
+            <Box sx={{ padding: 'base.spacing.x5' }}>
                <Button onClick={() => wrapperMetaMaskConnect()}>
                   Connect to MetaMask
                </Button>
-            </>
+            </Box>
          }
       </>
    )

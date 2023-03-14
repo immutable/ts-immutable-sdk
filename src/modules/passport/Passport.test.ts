@@ -1,17 +1,22 @@
 import axios from 'axios';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
-import { Passport, PassportConfig } from './Passport';
-import { PassportError, PassportErrorType } from './errors/passportError';
-import { getStarkSigner } from './stark/getStarkSigner';
-import { User } from './types';
+import { Config, getPassportConfiguration } from './config';
+import { Passport } from './Passport';
+import { getStarkSigner } from './stark';
+import { OidcConfiguration, User } from './types';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
 jest.mock('./stark/getStarkSigner');
+jest.mock('./config')
 jest.mock('axios');
 
-const config = { clientId: '11111', redirectUri: 'http://test.com' };
+const oidcConfiguration: OidcConfiguration = {
+  clientId: '11111',
+  redirectUri: 'https://test.com',
+  logoutRedirectUri: 'https://test.com',
+};
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Passport', () => {
@@ -50,17 +55,12 @@ describe('Passport', () => {
         }
       }
     });
-    passport = new Passport(config);
+    passport = new Passport(Config.SANDBOX, oidcConfiguration);
   });
 
   describe('new Passport', () => {
-    it('should throw passport error if missing the required configuration', () => {
-      expect(() => new Passport({} as unknown as PassportConfig)).toThrowError(
-        new PassportError(
-          'clientId, redirectUri cannot be null',
-          PassportErrorType.INVALID_CONFIGURATION
-        )
-      );
+    it('should get the passportConfiguration', () => {
+      expect(getPassportConfiguration).toHaveBeenCalledWith(Config.SANDBOX, oidcConfiguration);
     });
   });
 
@@ -75,7 +75,8 @@ describe('Passport', () => {
       expect(getStarkSigner).toBeCalledTimes(1);
     }, 15000);
 
-    it('should execute connect with refresh error', async () => {
+    // TODO https://immutable.atlassian.net/browse/ID-412: add back once user registration function is done and called
+    it.skip('should execute connect with refresh error', async () => {
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
       refreshToken.mockResolvedValue(null);
 

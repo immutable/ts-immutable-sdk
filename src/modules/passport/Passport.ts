@@ -1,44 +1,31 @@
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
+import { getPassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
+import { IMXProvider } from '../provider';
 import { getStarkSigner } from './stark';
-import { IMXProvider } from '../provider/imxProvider';
-import { Networks, UserProfile } from './types';
-
-export type PassportConfig = {
-  clientId: string;
-  network?: Networks;
-  redirectUri: string;
-};
-
-const checkRequiredConfiguration = (config: PassportConfig) => {
-  const requiredConfiguration = ['clientId', 'redirectUri'];
-  const errorMessage = requiredConfiguration
-    .map((key) => !(config as Record<string, string>)[key] && key)
-    .filter((n) => n)
-    .join(', ');
-  if (errorMessage !== '') {
-    throw new PassportError(
-      `${errorMessage} cannot be null`,
-      PassportErrorType.INVALID_CONFIGURATION
-    );
-  }
-};
+import { EnvironmentConfiguration, OidcConfiguration, UserProfile } from './types';
 
 export class Passport {
   private authManager: AuthManager;
   private magicAdapter: MagicAdapter;
 
-  constructor(config: PassportConfig) {
-    checkRequiredConfiguration(config);
+  constructor(
+    environmentConfiguration: EnvironmentConfiguration,
+    oidcConfiguration: OidcConfiguration,
+  ) {
+    const passportConfiguration = getPassportConfiguration(
+      environmentConfiguration,
+      oidcConfiguration,
+    );
 
-    this.authManager = new AuthManager(config);
-    this.magicAdapter = new MagicAdapter(config.network);
+    this.authManager = new AuthManager(passportConfiguration);
+    this.magicAdapter = new MagicAdapter(passportConfiguration);
   }
 
   public async connectImx(): Promise<IMXProvider> {
-    let user = await this.authManager.login();
+    const user = await this.authManager.login();
     if (!user.idToken) {
       throw new PassportError(
         'Failed to initialise',
@@ -47,16 +34,18 @@ export class Passport {
     }
     const provider = await this.magicAdapter.login(user.idToken);
     const signer = await getStarkSigner(provider.getSigner());
-    if (!user.etherKey) {
-      const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(user.accessToken);
-      if (!updatedUser) {
-        throw new PassportError(
-          'Failed to get refresh token',
-          PassportErrorType.REFRESH_TOKEN_ERROR
-        );
-      }
-      user = updatedUser;
-    }
+
+    // TODO https://immutable.atlassian.net/browse/ID-412: add back once user registration function is done and called
+    // if (!user.etherKey) {
+    //   const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(user.accessToken);
+    //   if (!updatedUser) {
+    //     throw new PassportError(
+    //       'Failed to get refresh token',
+    //       PassportErrorType.REFRESH_TOKEN_ERROR
+    //     );
+    //   }
+    //   user = updatedUser;
+    // }
     return new PassportImxProvider(user, signer);
   }
 
