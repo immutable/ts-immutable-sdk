@@ -1,5 +1,6 @@
 export const IMTBL_CHECKOUT_NAMESPACE = 'imtbl-checkout';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function addToLocalStorage(key: string, value: any) {
   return localStorage.setItem(`${IMTBL_CHECKOUT_NAMESPACE}.${key}`, value);
 }

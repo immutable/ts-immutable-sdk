@@ -11,8 +11,8 @@ export enum ConnectEventType {
 }
 
 export type ConnectEvent<T> = {
-  type: ConnectEventType
-  data: T
+  type: ConnectEventType;
+  data: T;
 }
 
 export type ConnectionSuccess = {

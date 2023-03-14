@@ -1,10 +1,10 @@
 interface Window {
     IMTBLConnectWidget: {
-        mount: (ConnectParams) => void,
-        unmount: () => void,
+        mount: (ConnectParams) => void;
+        unmount: () => void;
     };
 }
 
 interface ConnectParams {
-    elementId: string,
+    elementId: string;
 }
