@@ -39,6 +39,7 @@ describe('PassportImxProvider', () => {
       jwt: mockJwt,
       starkSigner,
       ethAddress,
+      apiConfig: { basePath: 'http://test.com' },
     });
   });
 
@@ -89,8 +90,6 @@ describe('PassportImxProvider', () => {
           ...restSignableTransferV1Response,
           stark_signature: starkSignature,
         },
-        xImxEthAddress: '',
-        xImxEthSignature: '',
       };
       const mockHeader = {
         headers: {

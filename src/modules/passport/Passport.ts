@@ -5,8 +5,18 @@ import { getPassportConfiguration, PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { IMXProvider } from '../provider';
 import { getStarkSigner } from './stark';
-import { EnvironmentConfiguration, OidcConfiguration, User, UserProfile } from './types';
-import { Configuration, EthSigner, StarkSigner, UsersApi } from '@imtbl/core-sdk';
+import {
+  EnvironmentConfiguration,
+  OidcConfiguration,
+  UserProfile,
+  UserWithEtherKey,
+} from './types';
+import {
+  Configuration,
+  EthSigner,
+  StarkSigner,
+  UsersApi,
+} from '@imtbl/core-sdk';
 import registerPassport from './workflows/registration';
 
 export class Passport {
@@ -16,20 +26,19 @@ export class Passport {
 
   constructor(
     environmentConfiguration: EnvironmentConfiguration,
-    oidcConfiguration: OidcConfiguration,
+    oidcConfiguration: OidcConfiguration
   ) {
     const passportConfiguration = getPassportConfiguration(
       environmentConfiguration,
-      oidcConfiguration,
+      oidcConfiguration
     );
-
     this.config = passportConfiguration;
     this.authManager = new AuthManager(this.config);
     this.magicAdapter = new MagicAdapter(this.config);
   }
 
   public async connectImx(): Promise<IMXProvider> {
-    let user = await this.authManager.login();
+    const user = await this.authManager.login();
     if (!user.idToken) {
       throw new PassportError(
         'Failed to initialise',
@@ -41,13 +50,23 @@ export class Passport {
     const starkSigner = await getStarkSigner(ethSigner);
 
     if (!user.etherKey) {
-      user = await this.registerUser(ethSigner, starkSigner, user.accessToken);
+      const updatedUser = await this.registerUser(
+        ethSigner,
+        starkSigner,
+        user.accessToken
+      );
+      return new PassportImxProvider({
+        jwt: user,
+        starkSigner,
+        ethAddress: updatedUser.etherKey,
+        apiConfig: this.config.imxAPIConfiguration,
+      });
     }
     return new PassportImxProvider({
       jwt: user,
       starkSigner,
-      //Note: Should remove the `|| ''` part once it is cleared.
-      ethAddress: user.etherKey || '',
+      ethAddress: user.etherKey,
+      apiConfig: this.config.imxAPIConfiguration,
     });
   }
 
@@ -65,14 +84,23 @@ export class Passport {
     return user.idToken;
   }
 
-  private async registerUser(uskSigner: EthSigner, starkSigner: StarkSigner, jwt: string): Promise<User> {
-    const configuration = new Configuration({ basePath: this.config.imxAPIConfiguration.basePath });
+  private async registerUser(
+    uskSigner: EthSigner,
+    starkSigner: StarkSigner,
+    jwt: string
+  ): Promise<UserWithEtherKey> {
+    const configuration = new Configuration({
+      basePath: this.config.imxAPIConfiguration.basePath,
+    });
     const usersApi = new UsersApi(configuration);
-    await registerPassport({
-      ethSigner: uskSigner,
-      starkSigner,
-      usersApi
-    }, jwt);
+    await registerPassport(
+      {
+        ethSigner: uskSigner,
+        starkSigner,
+        usersApi,
+      },
+      jwt
+    );
     const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(jwt);
     if (!updatedUser) {
       throw new PassportError(

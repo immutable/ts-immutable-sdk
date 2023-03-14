@@ -1,6 +1,6 @@
 import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import { PassportErrorType, withPassportError } from './errors/passportError';
-import { PassportMetadata, User } from './types';
+import { PassportMetadata, User, UserWithEtherKey } from './types';
 import { retryWithDelay } from './util/retry';
 import { getUserEtherKeyFromMetadata } from './getUserMetadata';
 import { PassportConfiguration } from './config';
@@ -70,8 +70,8 @@ export default class AuthManager {
 
   public async requestRefreshTokenAfterRegistration(
     jwt: string
-  ): Promise<User | null> {
-    return withPassportError<User | null>(async () => {
+  ): Promise<UserWithEtherKey | null> {
+    return withPassportError<UserWithEtherKey | null>(async () => {
       const etherKey = await retryWithDelay(() => (
         getUserEtherKeyFromMetadata(this.config.oidcConfiguration.authenticationDomain, jwt)
       ));
@@ -80,8 +80,10 @@ export default class AuthManager {
         return null;
       }
       const user = this.mapOidcUserToDomainModel(updatedUser);
-      user.etherKey = etherKey;
-      return user;
+      return {
+        ...user,
+        etherKey
+      }
     }, PassportErrorType.REFRESH_TOKEN_ERROR);
   }
 }

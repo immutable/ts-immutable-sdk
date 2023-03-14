@@ -42,3 +42,7 @@ export interface OidcConfiguration {
   logoutRedirectUri: string;
   redirectUri: string;
 }
+
+type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
+
+export type UserWithEtherKey = WithRequired<User, 'etherKey'>

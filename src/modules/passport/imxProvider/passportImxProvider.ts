@@ -17,12 +17,13 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
   TransfersApi,
-  Config,
+  Configuration,
 } from '@imtbl/core-sdk';
 import { User } from '../types';
 import { IMXProvider } from '../../provider/imxProvider';
 import { convertToSignableToken } from '../../provider/signable-actions/utils/convertToSignableToken';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
+import { ImxApiConfiguration } from '../config';
 
 export type JWT = Pick<User, 'accessToken' | 'refreshToken'>;
 
@@ -30,6 +31,7 @@ export type PassportImxProviderInput = {
   jwt: JWT;
   starkSigner: StarkSigner;
   ethAddress: string;
+  apiConfig: ImxApiConfiguration;
 };
 
 const ERC721 = 'ERC721';
@@ -41,11 +43,12 @@ export default class PassportImxProvider implements IMXProvider {
   //Note: this ethAddress should be the smart contract ethAddress
   private ethAddress: string;
 
-  constructor({ jwt, starkSigner, ethAddress }: PassportImxProviderInput) {
+  constructor({ jwt, starkSigner, ethAddress, apiConfig }: PassportImxProviderInput) {
     this.jwt = jwt;
     this.starkSigner = starkSigner;
     this.ethAddress = ethAddress;
-    this.transfersApi = new TransfersApi(Config.SANDBOX.apiConfiguration);
+    const configuration = new Configuration({ basePath: apiConfig.basePath });
+    this.transfersApi = new TransfersApi(configuration);
   }
 
   async transfer(
@@ -62,29 +65,25 @@ export default class PassportImxProvider implements IMXProvider {
         },
       });
 
-      const sigeableResultData = signableResult.data;
-      const { payload_hash: payloadHash } = sigeableResultData;
-
+      const signableResultData = signableResult.data;
+      const { payload_hash: payloadHash } = signableResultData;
       const starkSignature = await this.starkSigner.signMessage(payloadHash);
       const senderStarkKey = await this.starkSigner.getAddress();
-
+      
       const transferSigningParams = {
-        sender_stark_key: sigeableResultData.sender_stark_key || senderStarkKey,
-        sender_vault_id: sigeableResultData.sender_vault_id,
-        receiver_stark_key: sigeableResultData.receiver_stark_key,
-        receiver_vault_id: sigeableResultData.receiver_vault_id,
-        asset_id: sigeableResultData.asset_id,
-        amount: sigeableResultData.amount,
-        nonce: sigeableResultData.nonce,
-        expiration_timestamp: sigeableResultData.expiration_timestamp,
+        sender_stark_key: signableResultData.sender_stark_key || senderStarkKey,
+        sender_vault_id: signableResultData.sender_vault_id,
+        receiver_stark_key: signableResultData.receiver_stark_key,
+        receiver_vault_id: signableResultData.receiver_vault_id,
+        asset_id: signableResultData.asset_id,
+        amount: signableResultData.amount,
+        nonce: signableResultData.nonce,
+        expiration_timestamp: signableResultData.expiration_timestamp,
         stark_signature: starkSignature,
       };
-
+      
       const createTransferRequest = {
         createTransferRequest: transferSigningParams,
-        //Note: fake value to by pass the client check, will update once get the up-to-date api client
-        xImxEthAddress: '',
-        xImxEthSignature: '',
       };
 
       const headers = {
