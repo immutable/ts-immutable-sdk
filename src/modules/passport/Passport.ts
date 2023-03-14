@@ -61,24 +61,24 @@ export class Passport {
   }
 
   private async registerUser(uskSigner: EthSigner, starkSigner: StarkSigner, jwt: string): Promise<User> {
+    const configuration = new Configuration({ basePath: this.config.imxAPIConfiguration.basePath });
+    const usersApi = new UsersApi(configuration);
     try {
-      const configuration = new Configuration({ basePath: this.config.imxAPIConfiguration.basePath });
-      const usersApi = new UsersApi(configuration);
       await registerPassport({
         ethSigner: uskSigner,
         starkSigner,
         usersApi
       }, jwt);
-      const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(jwt);
-      if (!updatedUser) {
-        throw new PassportError(
-          'Failed to get refresh token',
-          PassportErrorType.REFRESH_TOKEN_ERROR
-        );
-      }
-      return updatedUser;
     } catch (error) {
       throw new Error("error registering new passport user");
     }
+    const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(jwt);
+    if (!updatedUser) {
+      throw new PassportError(
+        'Failed to get refresh token',
+        PassportErrorType.REFRESH_TOKEN_ERROR
+      );
+    }
+    return updatedUser;
   }
 }

@@ -76,12 +76,12 @@ describe('Passport', () => {
 
     it('should register user with refresh error', async () => {
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
-      refreshToken.mockRejectedValue("error");
+      refreshToken.mockResolvedValue(null);
       authLoginMock.mockResolvedValue({ idToken: '123' });
 
       await expect(passport.connectImx())
         .rejects
-        .toThrow('error registering new passport user');
+        .toThrow('Failed to get refresh token');
 
       expect(authLoginMock).toBeCalledTimes(1);
       expect(magicLoginMock).toBeCalledTimes(1);
