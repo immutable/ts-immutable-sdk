@@ -85,7 +85,7 @@ export class Passport {
   }
 
   private async registerUser(
-    uskSigner: EthSigner,
+    userAdminKeySigner: EthSigner,
     starkSigner: StarkSigner,
     jwt: string
   ): Promise<UserWithEtherKey> {
@@ -95,7 +95,7 @@ export class Passport {
     const usersApi = new UsersApi(configuration);
     await registerPassport(
       {
-        ethSigner: uskSigner,
+        ethSigner: userAdminKeySigner,
         starkSigner,
         usersApi,
       },

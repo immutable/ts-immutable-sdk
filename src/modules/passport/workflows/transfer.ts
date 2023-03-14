@@ -7,8 +7,8 @@ import {
 import {
   PassportErrorType,
   withPassportError,
-} from 'modules/passport/errors/passportError';
-import { convertToSignableToken } from 'modules/provider/signable-actions/utils';
+} from '../errors/passportError';
+import { convertToSignableToken } from '../../../modules/provider/signable-actions/utils';
 import { JWT } from '../imxProvider/passportImxProvider';
 
 const ERC721 = 'ERC721';
@@ -27,7 +27,7 @@ const transfer = ({
   transferApi,
   starkSigner,
   jwt,
-}: TrasferRequest) => {
+}: TrasferRequest): Promise<CreateTransferResponseV1> => {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
     const signableResult = await transferApi.getSignableTransferV1({
