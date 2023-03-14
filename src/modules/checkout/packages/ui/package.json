@@ -27,12 +27,6 @@
     "build": "parcel build",
     "build:prod": "NODE_ENV=production parcel build --no-source-maps"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
   "browserslist": {
     "production": [
       ">0.2%",
