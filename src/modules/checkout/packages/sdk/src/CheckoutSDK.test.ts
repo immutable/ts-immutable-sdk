@@ -13,7 +13,7 @@ describe('CheckoutSDK Connect', () => {
     
     const checkoutSDK = new CheckoutSDK()
 
-    const connRes = await checkoutSDK.connect({
+    await checkoutSDK.connect({
       providerPreference: ConnectionProviders.METAMASK
     })
 

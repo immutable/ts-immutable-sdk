@@ -8,11 +8,13 @@ export async function switchWalletNetwork(provider: Web3Provider, network: Netwo
   if(!provider.provider?.request) throw new Error("provider object is missing request function");
     // WT-1146 - Refer to the README in this folder for explantion on the switch network flow
     try {
-      const switchResponse = await switchNetworkInWallet(provider, network);
+      await switchNetworkInWallet(provider, network);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch(err:any) {
       if (err.message.includes("Unrecognized chain ID")) {
         try {
-          const addResponse = await addNetworkToWallet(provider, network);
+          await addNetworkToWallet(provider, network);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch(err: any){
           throw new UserRejectedRequestError("user cancelled the add network request");
         }
@@ -50,4 +52,4 @@ async function addNetworkToWallet(provider: Web3Provider, network: Network) {
       }
     )
   }
-};
+}

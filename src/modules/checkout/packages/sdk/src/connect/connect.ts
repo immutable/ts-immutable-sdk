@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import detectEthereumProvider from "@metamask/detect-provider"
 import { ConnectionProviders, ConnectParams } from "./types"
 import { UserRejectedRequestError, WALLET_ACTION } from "../types";

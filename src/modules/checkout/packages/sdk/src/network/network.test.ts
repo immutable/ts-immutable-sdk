@@ -1,4 +1,5 @@
-import { Web3Provider } from '@ethersproject/providers';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { switchWalletNetwork } from './network'
 import { UserRejectedRequestError, WALLET_ACTION } from '../types'
 import { ConnectionProviders, connectWalletProvider } from '../connect';
@@ -126,7 +127,8 @@ describe("network functions", () => {
           ]
         }
       );
-    } catch(err: any) {
+    } catch(err) {
+      console.log(err)
     }
   })
 

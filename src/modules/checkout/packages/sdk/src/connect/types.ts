@@ -3,5 +3,5 @@ export enum ConnectionProviders {
 }
 
 export type ConnectParams = {
-  providerPreference: ConnectionProviders,
+  providerPreference: ConnectionProviders;
 }

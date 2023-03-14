@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
 import { connectWalletProvider } from './connect'
 import { ConnectProviderError, MetaMaskProviderError } from './errors';
@@ -35,7 +37,7 @@ describe('connect', () => {
 
   it('should throw an error if connect is called with a preference that is not expected', async () => {
     try{
-      const connRes = await connectWalletProvider({
+      await connectWalletProvider({
         providerPreference: 'trust-wallet' as ConnectionProviders
       })
     } catch(err){
@@ -48,7 +50,7 @@ describe('connect', () => {
       removeEventListener: () => {}
     }));
     try{
-      const connRes = await connectWalletProvider({
+      await connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK
       })
     } catch(err){
@@ -63,7 +65,7 @@ describe('connect', () => {
       removeEventListener: () => {}
     }));
     try{
-      const connRes = await connectWalletProvider({
+      await connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK
       })
     } catch(err){
@@ -79,7 +81,7 @@ describe('connect', () => {
       removeEventListener: () => {}
     }));
     try{
-      const connRes = await connectWalletProvider({
+      await connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK
       })
     } catch(err){

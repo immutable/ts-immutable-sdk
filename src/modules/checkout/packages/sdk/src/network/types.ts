@@ -15,7 +15,7 @@ export type NetworkDetails = {
     name: string;
     symbol: string;
     decimals: number;
-  },
+  };
   blockExplorerUrls?: string[];
 }
 

@@ -3,8 +3,6 @@ import { connectWalletProvider, ConnectParams } from './connect'
 import { SwitchNetworkParams, switchWalletNetwork } from './network';
 
 export class CheckoutSDK {
-  constructor() {
-  }
 
   public async connect(params: ConnectParams): Promise<Web3Provider> {
     console.log('test hot reload sdk HOT')
