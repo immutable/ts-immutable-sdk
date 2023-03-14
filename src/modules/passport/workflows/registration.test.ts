@@ -72,7 +72,7 @@ describe('registerPassportWorkflow', () => {
       usersApi: mockUserApi as never,
     };
 
-    await expect(registerPassport(request, mockToken)).rejects.toEqual("error");
+    await expect(registerPassport(request, mockToken)).rejects.toThrow("USER_REGISTRATION_ERROR");
 
     expect(mockStarkSigner.signMessage).toHaveBeenCalled();
     expect(mockEthSigner.signMessage).toHaveBeenCalled();

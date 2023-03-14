@@ -1,5 +1,6 @@
 import { signRaw } from '../../provider/signable-actions/utils';
 import { UsersApi, WalletConnection } from '@imtbl/core-sdk';
+import { PassportErrorType, withPassportError } from '../errors/passportError';
 
 
 export type registerPassportParams = WalletConnection & {
@@ -11,32 +12,32 @@ export default async function registerPassport({
   starkSigner,
   usersApi
 }: registerPassportParams, authorization: string): Promise<string> {
-  const userAddress = await ethSigner.getAddress();
-  const starkPublicKey = await starkSigner.getAddress();
+  return withPassportError<string>(async () => {
 
-  const signableResult = await usersApi.getSignableRegistrationOffchain({
-    getSignableRegistrationRequest: {
-      ether_key: userAddress,
-      stark_key: starkPublicKey,
-    },
-  });
+    const userAddress = await ethSigner.getAddress();
+    const starkPublicKey = await starkSigner.getAddress();
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    signableResult.data;
+    const signableResult = await usersApi.getSignableRegistrationOffchain({
+      getSignableRegistrationRequest: {
+        ether_key: userAddress,
+        stark_key: starkPublicKey,
+      },
+    });
 
-  const ethSignature = await signRaw(signableMessage, ethSigner);
+    const { signable_message: signableMessage, payload_hash: payloadHash } =
+      signableResult.data;
+    const ethSignature = await signRaw(signableMessage, ethSigner);
+    const starkSignature = await starkSigner.signMessage(payloadHash);
 
-  const starkSignature = await starkSigner.signMessage(payloadHash);
-
-  const response = await usersApi.registerPassportUser({
-    authorization: authorization,
-    registerPassportUserRequest: {
-      eth_signature: ethSignature,
-      ether_key: userAddress,
-      stark_signature: starkSignature,
-      stark_key: starkPublicKey,
-    },
-  });
-
-  return response.statusText;
+    const response = await usersApi.registerPassportUser({
+      authorization: authorization,
+      registerPassportUserRequest: {
+        eth_signature: ethSignature,
+        ether_key: userAddress,
+        stark_signature: starkSignature,
+        stark_key: starkPublicKey,
+      },
+    });
+    return response.statusText;
+  }, PassportErrorType.USER_REGISTRATION_ERROR)
 }

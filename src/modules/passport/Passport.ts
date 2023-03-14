@@ -63,15 +63,11 @@ export class Passport {
   private async registerUser(uskSigner: EthSigner, starkSigner: StarkSigner, jwt: string): Promise<User> {
     const configuration = new Configuration({ basePath: this.config.imxAPIConfiguration.basePath });
     const usersApi = new UsersApi(configuration);
-    try {
-      await registerPassport({
-        ethSigner: uskSigner,
-        starkSigner,
-        usersApi
-      }, jwt);
-    } catch (error) {
-      throw new Error("error registering new passport user");
-    }
+    await registerPassport({
+      ethSigner: uskSigner,
+      starkSigner,
+      usersApi
+    }, jwt);
     const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(jwt);
     if (!updatedUser) {
       throw new PassportError(
