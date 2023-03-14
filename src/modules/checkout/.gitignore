@@ -1,0 +1,5 @@
+node_modules
+coverage
+.parcel-cache
+.DS_Store
+imx-checkout-sdk-*.*.*.tgz
