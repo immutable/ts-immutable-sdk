@@ -2,3 +2,4 @@
 /src/modules/apis/ @immutable/imx-developer-experience
 /src/modules/passport/ @immutable/imx-passport
 /src/modules/provider @immutable/imx-wallets
+/src/modules/checkout @immutable/imx-wallets
