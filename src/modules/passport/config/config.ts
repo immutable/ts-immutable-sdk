@@ -1,6 +1,10 @@
 import { EnvironmentConfiguration, Networks, OidcConfiguration } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 
+export interface ImxApiConfiguration {
+  basePath: string;
+}
+
 export interface PassportConfiguration {
   network: Networks;
   oidcConfiguration: {
@@ -9,9 +13,7 @@ export interface PassportConfiguration {
     logoutRedirectUri: string;
     redirectUri: string;
   };
-  imxAPIConfiguration: {
-    basePath: string;
-  };
+  imxAPIConfiguration: ImxApiConfiguration;
   magicPublishableApiKey: string;
   magicProviderId: string;
 }

@@ -31,7 +31,7 @@ describe('Passport', () => {
   let loginCallbackMock: jest.Mock;
   let magicLoginMock: jest.Mock;
   let getUserMock: jest.Mock;
-  let refreshToken: jest.Mock;
+  let requestRefreshTokenMock: jest.Mock;
 
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue({
@@ -41,12 +41,12 @@ describe('Passport', () => {
     loginCallbackMock = jest.fn();
     magicLoginMock = jest.fn();
     getUserMock = jest.fn();
-    refreshToken = jest.fn();
+    requestRefreshTokenMock = jest.fn();
     (AuthManager as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
       getUser: getUserMock,
-      requestRefreshTokenAfterRegistration: refreshToken,
+      requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
     });
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,
@@ -57,8 +57,8 @@ describe('Passport', () => {
           ether_key: '0x232',
           stark_key: '0x567',
           user_admin_key: '0x123',
-        }
-      }
+        },
+      },
     });
     passport = new Passport(Config.SANDBOX, oidcConfiguration);
   });
@@ -66,7 +66,10 @@ describe('Passport', () => {
   describe('connectImx', () => {
     it('should execute connect without error', async () => {
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
-      refreshToken.mockResolvedValue({ access_token: "123" });
+      requestRefreshTokenMock.mockResolvedValue({
+        accessToken: '123',
+        etherKey: '0x232',
+      });
       await passport.connectImx();
 
       expect(authLoginMock).toBeCalledTimes(1);
@@ -76,12 +79,12 @@ describe('Passport', () => {
 
     it('should register user with refresh error', async () => {
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
-      refreshToken.mockResolvedValue(null);
+      requestRefreshTokenMock.mockResolvedValue(null);
       authLoginMock.mockResolvedValue({ idToken: '123' });
 
-      await expect(passport.connectImx())
-        .rejects
-        .toThrow('Failed to get refresh token');
+      await expect(passport.connectImx()).rejects.toThrow(
+        'Failed to get refresh token'
+      );
 
       expect(authLoginMock).toBeCalledTimes(1);
       expect(magicLoginMock).toBeCalledTimes(1);
@@ -103,7 +106,7 @@ describe('Passport', () => {
       };
 
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
-      refreshToken.mockResolvedValue(mockUser);
+      requestRefreshTokenMock.mockResolvedValue(mockUser);
       authLoginMock.mockResolvedValue({ idToken: '123' });
 
       await passport.connectImx();

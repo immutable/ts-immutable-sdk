@@ -16,26 +16,45 @@ import {
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
+  TransfersApi,
+  Configuration,
 } from '@imtbl/core-sdk';
-import { User } from '../types';
-import { IMXProvider } from '../../provider';
+import { UserWithEtherKey } from '../types';
+import { IMXProvider } from '../../provider/imxProvider';
+import { ImxApiConfiguration } from '../config';
+import transfer from '../workflows/transfer';
 
-export type JWT = Pick<User, 'accessToken' | 'refreshToken'>;
+export type PassportImxProviderInput = {
+  user: UserWithEtherKey;
+  starkSigner: StarkSigner;
+  apiConfig: ImxApiConfiguration;
+};
 
 export default class PassportImxProvider implements IMXProvider {
-  private jwt: JWT;
+  private user: UserWithEtherKey;
   private starkSigner: StarkSigner;
+  private transfersApi: TransfersApi;
 
-  constructor(jwt: JWT, starkSigner: StarkSigner) {
-    this.jwt = jwt;
+  constructor({
+    user,
+    starkSigner,
+    apiConfig,
+  }: PassportImxProviderInput) {
+    this.user = user;
     this.starkSigner = starkSigner;
+    const configuration = new Configuration({ basePath: apiConfig.basePath });
+    this.transfersApi = new TransfersApi(configuration);
   }
 
-  transfer(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async transfer(
     request: UnsignedTransferRequest
   ): Promise<CreateTransferResponseV1> {
-    throw new Error('Method not implemented.');
+    return transfer({
+      request,
+      user: this.user,
+      starkSigner: this.starkSigner,
+      transferApi: this.transfersApi,
+    });
   }
 
   registerOffchain(): Promise<RegisterUserResponse> {
