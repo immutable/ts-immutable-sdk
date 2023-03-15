@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ConnectWidget } from './modules/connect/ConnectWidget';
+import { ConnectWidget } from './widgets/connect/ConnectWidget';
 import { ConnectWidgetParams, WalletWidgetParams } from './types';
 import {ConnectionProviders} from "@imtbl/checkout-sdk-web";
-import { WalletWidget } from './module';
+import { WalletWidget } from './widgets/wallet/WalletWidget';
 
 const element = document.getElementById('root') as HTMLElement
 

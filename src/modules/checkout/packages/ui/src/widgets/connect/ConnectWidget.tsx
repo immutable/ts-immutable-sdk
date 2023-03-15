@@ -19,7 +19,7 @@ import {
   InactiveStyle, 
   WidgetHeaderStyle 
 } from './ConnectStyles'
-import { onDarkBase } from '@biom3/design-tokens'
+import { onLightBase } from '@biom3/design-tokens'
 
 export enum ConnectWidgetViews {
   CONNECT_WALLET = "CONNECT_WALLET",
@@ -31,9 +31,13 @@ export enum ConnectWidgetViews {
 }
 
 export function ConnectWidget(props:ConnectWidgetProps) {
+  const { params } = props;
+  console.log(params);
+
   const [currentView, setView] = useState(ConnectWidgetViews.CONNECT_WALLET)
   const [currentProvider, setProvider] = useState<Web3Provider|null>(null)
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateView = async (view:ConnectWidgetViews, err?:any) => {
     setView(view)
     if (view === ConnectWidgetViews.SUCCESS) {
@@ -66,7 +70,7 @@ export function ConnectWidget(props:ConnectWidgetProps) {
   }
 
   return (
-    <BiomeThemeProvider>
+    <BiomeThemeProvider theme={{base: onLightBase}}>
       <Box sx={ConnectWidgetStyle}>
         <Box sx={WidgetHeaderStyle}>
           <Box sx={BackButtonStyle}>

@@ -1,11 +1,12 @@
 import { CheckoutSDK, ConnectParams } from '@imtbl/checkout-sdk-web'
+import {Web3Provider} from '@ethersproject/providers'
 
 export enum ConnectionProviders {
   METAMASK = "metamask"
 }
 
 interface ConnectProps {
-  setProvider: (provider: any) => void;  
+  setProvider: (provider: Web3Provider) => void;  
 }
 
 function Connect(props: ConnectProps) {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@biom3/react'
 import { ConnectionProviders, CheckoutSDK } from '@imtbl/checkout-sdk-web'
 import { ConnectWidgetViews } from '../../ConnectWidget'
@@ -5,8 +6,8 @@ import { Web3Provider } from '@ethersproject/providers'
 import { ButtonWrapperStyle } from '../../ConnectStyles'
 
 export interface OtherWalletProps {
-  updateView: Function,
-  updateProvider: Function,
+  updateView: (newView: ConnectWidgetViews, err?: any) => void;
+  updateProvider: (provider: Web3Provider) => void;
 }
 
 export function OtherWallets (props:OtherWalletProps) {

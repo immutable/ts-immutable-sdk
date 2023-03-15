@@ -90,6 +90,16 @@ Because it hot reloads, any time you modify the SDK the sample app will reload a
 
 This currently will break the ui widgets, so they will need to be tested seperately.
 
+### Jest tests in the SDK
+
+All jest tests within the SDK are run in the jsdom environment. To configure this so that it works in our CI pipeline, please add the following comment to the top of your test file.
+
+```
+/*
+ * @jest-environment jsdom
+ */
+```
+
 ## Widget Development
 
 ```

@@ -1,16 +1,17 @@
 import { CheckoutSDK, Network } from '@imtbl/checkout-sdk-web'
+import {Web3Provider} from '@ethersproject/providers'
 
 export interface SwitchNetworkProps {
-  provider: any;
+  provider: Web3Provider | undefined;
 }
 
 function SwitchNetwork(props: SwitchNetworkProps) {
-  const checkout:CheckoutSDK = new CheckoutSDK()
+  const checkout:CheckoutSDK = new CheckoutSDK();
   const {provider} = props;
 
 
   async function switchNetwork(network: Network) {
-    await checkout.switchNetwork({provider, network})
+    if(provider) await checkout.switchNetwork({provider, network});
   }
  
   return (

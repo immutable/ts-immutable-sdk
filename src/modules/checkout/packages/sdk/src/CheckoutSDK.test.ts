@@ -1,4 +1,6 @@
-
+/*
+ * @jest-environment jsdom
+ */
 import { connectWalletProvider, ConnectionProviders } from './connect'
 
 import { CheckoutSDK } from './CheckoutSDK'
