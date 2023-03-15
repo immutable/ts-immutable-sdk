@@ -6,7 +6,7 @@ import {
 } from '../../types'
 import { CheckoutSDK, ConnectionProviders } from '@imtbl/checkout-sdk-web';
 import { useEffect } from 'react';
-import { formatEther } from 'ethers/lib/utils';
+import { formatEther, formatUnits } from 'ethers/lib/utils';
 
 export function WalletWidget(props:WalletWidgetProps) {
   const { params } = props;
@@ -23,6 +23,12 @@ export function WalletWidget(props:WalletWidgetProps) {
       console.log(balance);
 
       console.log(formatEther(balance));
+
+      const contractAddress = '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF';
+      const erc20balance = await checkoutSDK.getERC20Balance({ provider, contractAddress, walletAddress })
+
+      console.log('ether: ', formatEther(erc20balance.balance));
+      console.log('units: ', formatUnits(erc20balance.balance, erc20balance.decimals))
     }
 
     connectAndGetBalance();

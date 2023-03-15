@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers'
 import { BigNumber } from 'ethers';
-import { getBalance } from './balances';
-import { GetBalanceParams } from './balances/types';
+import { getBalance, getERC20Balance } from './balances';
+import { GetBalanceParams, GetERC20BalanceParams, GetERC20BalanceResult } from './balances/types';
 import { connectWalletProvider, ConnectParams } from './connect'
 import { SwitchNetworkParams, switchWalletNetwork } from './network';
 
@@ -18,5 +18,9 @@ export class CheckoutSDK {
 
   public async getBalance(params: GetBalanceParams): Promise<BigNumber> {
     return await getBalance(params.provider, params.walletAddress);
+  }
+
+  public async getERC20Balance(params: GetERC20BalanceParams): Promise<GetERC20BalanceResult> {
+    return await getERC20Balance(params.provider, params.contractAddress, params.walletAddress);
   }
 }
