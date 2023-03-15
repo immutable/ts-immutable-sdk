@@ -21,6 +21,9 @@ describe('Config', () => {
             logoutRedirectUri: oidcConfiguration.logoutRedirectUri,
             redirectUri: oidcConfiguration.redirectUri,
           },
+          imxAPIConfiguration: {
+            basePath: "https://api.sandbox.x.immutable.com",
+          },
           magicPublishableApiKey: Config.SANDBOX.magicPublishableApiKey,
           magicProviderId: Config.SANDBOX.magicProviderId,
         });

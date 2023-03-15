@@ -1,4 +1,3 @@
-
 export interface PassportConfigurationArguments {
   clientId: string;
   redirectUri: string;
@@ -35,6 +34,7 @@ export interface EnvironmentConfiguration {
   authenticationDomain: string;
   magicPublishableApiKey: string;
   magicProviderId: string;
+  baseIMXApiPath: string;
 }
 
 export interface OidcConfiguration {
