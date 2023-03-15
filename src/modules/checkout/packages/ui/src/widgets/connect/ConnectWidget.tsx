@@ -19,7 +19,7 @@ import {
   InactiveStyle, 
   WidgetHeaderStyle 
 } from './ConnectStyles'
-import { onDarkBase } from '@biom3/design-tokens'
+import { onLightBase } from '@biom3/design-tokens'
 
 export enum ConnectWidgetViews {
   CONNECT_WALLET = "CONNECT_WALLET",
@@ -70,7 +70,7 @@ export function ConnectWidget(props:ConnectWidgetProps) {
   }
 
   return (
-    <BiomeThemeProvider theme={{base: onDarkBase}}>
+    <BiomeThemeProvider theme={{base: onLightBase}}>
       <Box sx={ConnectWidgetStyle}>
         <Box sx={WidgetHeaderStyle}>
           <Box sx={BackButtonStyle}>

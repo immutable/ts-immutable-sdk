@@ -1,5 +1,5 @@
 import { BiomeThemeProvider, Heading } from '@biom3/react'
-import { onDarkBase } from '@biom3/design-tokens'
+import { onLightBase } from '@biom3/design-tokens'
 
 import { 
   WalletWidgetProps,
@@ -10,7 +10,7 @@ export function WalletWidget(props:WalletWidgetProps) {
   console.log(params);
 
   return(
-    <BiomeThemeProvider theme={{base: onDarkBase}}>
+    <BiomeThemeProvider theme={{base: onLightBase}}>
     <Heading>Wallet Widget</Heading>
     </BiomeThemeProvider>
   )
