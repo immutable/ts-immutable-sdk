@@ -1,3 +1,3 @@
-export { ConnectWidget } from './modules/connect/ConnectWidget' 
-export { WalletWidget } from './modules/wallet/WalletWidget'
+export { ConnectWidget } from './widgets/connect/ConnectWidget' 
+export { WalletWidget } from './widgets/wallet/WalletWidget'
 export * from './types'

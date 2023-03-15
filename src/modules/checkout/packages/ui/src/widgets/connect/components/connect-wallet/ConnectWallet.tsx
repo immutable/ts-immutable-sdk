@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@biom3/react'
 import { ButtonWrapperStyle } from '../../ConnectStyles'
 import { ConnectWidgetViews } from '../../ConnectWidget'
 
 export interface ConnectWalletProps {
-  updateView: Function
+  updateView: (newView: ConnectWidgetViews, err?: any) => void;
 }
 
 export function ConnectWallet (props:ConnectWalletProps) {

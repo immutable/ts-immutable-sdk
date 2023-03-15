@@ -1,3 +1,6 @@
+/*
+ * @jest-environment jsdom
+ */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';

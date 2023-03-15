@@ -2,9 +2,7 @@
 
 
 import { useEffect } from 'react';
-import { CheckoutSDK, ConnectParams, ConnectionProviders } from '@imtbl/checkout-sdk-web'
-import { Button, Heading } from '@biom3/react'
-
+import { ConnectionProviders } from '@imtbl/checkout-sdk-web'
 import { ConnectWidgetOptions, 
         ConnectWidgetParams, 
         ConnectEventType, 
@@ -15,7 +13,7 @@ import { ConnectWidgetOptions,
 } from '@imtbl/checkout-ui'
 
 function ConnectUI() {
-  const checkout:CheckoutSDK = new CheckoutSDK()
+  // const checkout:CheckoutSDK = new CheckoutSDK()
 
   const widgetOptions:ConnectWidgetOptions = {
     elementId: "imtbl-checkout-connect",
@@ -65,18 +63,18 @@ function ConnectUI() {
   );
 }
 
-async function connectClick(checkout:CheckoutSDK) {
-  const params:ConnectParams = {
-    providerPreference: ConnectionProviders.METAMASK
-  }
+// async function connectClick(checkout:CheckoutSDK) {
+//   const params:ConnectParams = {
+//     providerPreference: ConnectionProviders.METAMASK
+//   }
 
-  try {
-    await checkout.connect(params)
-  } catch(err) {
-    console.error(err)
-  }
+//   try {
+//     await checkout.connect(params)
+//   } catch(err) {
+//     console.error(err)
+//   }
   
-}
+// }
 
 
 export default ConnectUI;

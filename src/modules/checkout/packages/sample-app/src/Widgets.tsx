@@ -1,5 +1,3 @@
-import ConnectUI from './components/ui/connect/connect';
-
 function Widgets () {
     return (
       <div>
