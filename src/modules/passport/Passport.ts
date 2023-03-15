@@ -56,16 +56,15 @@ export class Passport {
         user.accessToken
       );
       return new PassportImxProvider({
-        jwt: user,
+        user: updatedUser,
         starkSigner,
-        ethAddress: updatedUser.etherKey,
         apiConfig: this.config.imxAPIConfiguration,
       });
     }
+    const userWithEtherKey = user as UserWithEtherKey;
     return new PassportImxProvider({
-      jwt: user,
+      user: userWithEtherKey,
       starkSigner,
-      ethAddress: user.etherKey,
       apiConfig: this.config.imxAPIConfiguration,
     });
   }

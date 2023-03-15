@@ -10,11 +10,14 @@ describe('transfer', () => {
   let getSignableTransferV1Mock: jest.Mock;
   let createTransferV1Mock: jest.Mock;
   let transferApiMock: TransfersApi;
-  const ethAddress = '123';
   let starkSigner: StarkSigner;
-  const mockJwt = {
+  const mockUser = {
+    etherKey: '123',
     accessToken:
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2V4YW1wbGUuYXV0aDAuY29tLyIsImF1ZCI6Imh0dHBzOi8vYXBpLmV4YW1wbGUuY29tL2NhbGFuZGFyL3YxLyIsInN1YiI6InVzcl8xMjMiLCJpYXQiOjE0NTg3ODU3OTYsImV4cCI6MTQ1ODg3MjE5Nn0.CA7eaHjIHz5NxeIJoFK9krqaeZrPLwmMmgI_XiQiIkQ',
+    profile: {
+      sub: "111"
+    }
   };
   const mockReceiver = 'AAA';
   const type = 'ERC721';
@@ -49,7 +52,7 @@ describe('transfer', () => {
       getSignableTransferRequest: {
         amount: '1',
         receiver: mockReceiver,
-        sender: ethAddress,
+        sender: mockUser.etherKey,
         token: {
           data: { token_address: tokenAddress, token_id: tokenId },
           type,
@@ -79,7 +82,7 @@ describe('transfer', () => {
     };
     const mockHeader = {
       headers: {
-        Authorization: `Bearer ${mockJwt.accessToken}`,
+        Authorization: `Bearer ${mockUser.accessToken}`,
       },
     };
     const mockReturnValue = {
@@ -96,10 +99,9 @@ describe('transfer', () => {
     });
 
     const result = await transfer({
-      ethAddress,
       transferApi: transferApiMock,
       starkSigner,
-      jwt: mockJwt,
+      user: mockUser,
       request: mockTransferRequest as UnsignedTransferRequest,
     });
 
@@ -120,10 +122,9 @@ describe('transfer', () => {
     await expect(() =>
       transfer(
         {
-          ethAddress,
           transferApi: transferApiMock,
           starkSigner,
-          jwt: mockJwt,
+          user: mockUser,
           request: mockTransferRequest as UnsignedTransferRequest,
         }
       )

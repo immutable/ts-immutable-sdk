@@ -142,7 +142,7 @@ describe('AuthManager', () => {
     });
     it('requestRefreshTokenAfterRegistration successful with user wallet address in metadata', async () => {
       const expected = { ...mockUser, etherKey: passportData.passport.ether_key };
-      signinSilentMock.mockReturnValue(mockOidcUser);
+      signinSilentMock.mockReturnValue(mockOidcUserWithPassportInfo);
       const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
       const response = {
         data: {

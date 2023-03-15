@@ -19,36 +19,29 @@ import {
   TransfersApi,
   Configuration,
 } from '@imtbl/core-sdk';
-import { User } from '../types';
+import { UserWithEtherKey } from '../types';
 import { IMXProvider } from '../../provider/imxProvider';
 import { ImxApiConfiguration } from '../config';
 import transfer from '../workflows/transfer';
 
-export type JWT = Pick<User, 'accessToken' | 'refreshToken'>;
-
 export type PassportImxProviderInput = {
-  jwt: JWT;
+  user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  ethAddress: string;
   apiConfig: ImxApiConfiguration;
 };
 
 export default class PassportImxProvider implements IMXProvider {
-  private jwt: JWT;
+  private user: UserWithEtherKey;
   private starkSigner: StarkSigner;
   private transfersApi: TransfersApi;
-  //Note: this ethAddress should be the smart contract ethAddress
-  private ethAddress: string;
 
   constructor({
-    jwt,
+    user,
     starkSigner,
-    ethAddress,
     apiConfig,
   }: PassportImxProviderInput) {
-    this.jwt = jwt;
+    this.user = user;
     this.starkSigner = starkSigner;
-    this.ethAddress = ethAddress;
     const configuration = new Configuration({ basePath: apiConfig.basePath });
     this.transfersApi = new TransfersApi(configuration);
   }
@@ -58,8 +51,7 @@ export default class PassportImxProvider implements IMXProvider {
   ): Promise<CreateTransferResponseV1> {
     return transfer({
       request,
-      ethAddress: this.ethAddress,
-      jwt: this.jwt,
+      user: this.user,
       starkSigner: this.starkSigner,
       transferApi: this.transfersApi,
     });

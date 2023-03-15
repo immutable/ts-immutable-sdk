@@ -9,30 +9,28 @@ import {
   withPassportError,
 } from '../errors/passportError';
 import { convertToSignableToken } from '../../../modules/provider/signable-actions/utils';
-import { JWT } from '../imxProvider/passportImxProvider';
+import { UserWithEtherKey } from '../types';
 
 const ERC721 = 'ERC721';
 
 type TrasferRequest = {
   request: UnsignedTransferRequest;
-  jwt: JWT;
+  user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  ethAddress: string;
   transferApi: TransfersApi;
 };
 
 const transfer = ({
-  ethAddress,
   request,
   transferApi,
   starkSigner,
-  jwt,
+  user,
 }: TrasferRequest): Promise<CreateTransferResponseV1> => {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
     const signableResult = await transferApi.getSignableTransferV1({
       getSignableTransferRequest: {
-        sender: ethAddress,
+        sender: user.etherKey,
         token: convertToSignableToken(request),
         amount: transferAmount,
         receiver: request.receiver,
@@ -61,7 +59,7 @@ const transfer = ({
     };
 
     const headers = {
-      Authorization: 'Bearer ' + jwt.accessToken,
+      Authorization: 'Bearer ' + user.accessToken,
     };
 
     const { data: responseData } = await transferApi.createTransferV1(

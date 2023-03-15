@@ -14,10 +14,13 @@ describe('PassportImxProvider', () => {
   let signMessageMock: jest.Mock;
   let getSignableTransferV1Mock: jest.Mock;
   let createTransferV1Mock: jest.Mock;
-  const ethAddress = '123';
-  const mockJwt = {
+  const mockUser = {
+    etherKey: '123',
     accessToken:
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2V4YW1wbGUuYXV0aDAuY29tLyIsImF1ZCI6Imh0dHBzOi8vYXBpLmV4YW1wbGUuY29tL2NhbGFuZGFyL3YxLyIsInN1YiI6InVzcl8xMjMiLCJpYXQiOjE0NTg3ODU3OTYsImV4cCI6MTQ1ODg3MjE5Nn0.CA7eaHjIHz5NxeIJoFK9krqaeZrPLwmMmgI_XiQiIkQ',
+    profile: {
+      sub: "111"
+    }
   };
 
   beforeEach(() => {
@@ -36,9 +39,8 @@ describe('PassportImxProvider', () => {
     });
 
     passportImxProvider = new PassportImxProvider({
-      jwt: mockJwt,
+      user: mockUser,
       starkSigner,
-      ethAddress,
       apiConfig: { basePath: 'http://test.com' },
     });
   });
@@ -61,7 +63,7 @@ describe('PassportImxProvider', () => {
         getSignableTransferRequest: {
           amount: '1',
           receiver: mockReceiver,
-          sender: ethAddress,
+          sender: mockUser.etherKey,
           token: {
             data: { token_address: tokenAddress, token_id: tokenId },
             type,
@@ -93,7 +95,7 @@ describe('PassportImxProvider', () => {
       };
       const mockHeader = {
         headers: {
-          Authorization: `Bearer ${mockJwt.accessToken}`,
+          Authorization: `Bearer ${mockUser.accessToken}`,
         },
       };
       const mockReturnValue = {
