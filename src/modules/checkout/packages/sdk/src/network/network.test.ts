@@ -120,19 +120,13 @@ describe("network functions", () => {
       providerPreference: ConnectionProviders.METAMASK
     });
 
-    try{
-      await switchWalletNetwork(provider, Network.POLYGON);
-      expect(provider.provider.request).toHaveBeenCalledWith(
-        {
-          method: WALLET_ACTION.ADD_NETWORK, 
-          params: [
-            NetworkMap[Network.ETHEREUM]
-          ]
-        }
-      );
-    } catch(err) {
-      console.log(err)
-    }
+    await switchWalletNetwork(provider, Network.POLYGON);
+    expect(provider.provider.request).toHaveBeenCalledWith({
+        method: WALLET_ACTION.ADD_NETWORK, 
+        params: [
+          NetworkMap[Network.POLYGON]
+        ]
+    });
   })
 
   it('should throw an error when the user cancels an add network request', async () => {
