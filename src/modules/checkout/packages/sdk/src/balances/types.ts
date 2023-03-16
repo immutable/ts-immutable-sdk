@@ -13,8 +13,11 @@ export interface GetERC20BalanceParams {
 }
 
 export interface GetERC20BalanceResult {
+    name: string;
+    symbol: string;
     balance: BigNumber;
     decimals: number;
+    formattedBalance: string;
 }
 
 export const ERC20ABI = [
