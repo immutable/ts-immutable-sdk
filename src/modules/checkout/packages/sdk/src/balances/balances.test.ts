@@ -1,7 +1,7 @@
 import { getBalance, getERC20Balance } from './balances';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
-import { BalanceError } from './errors';
+import { BalanceError, ERC20BalanceError } from './errors';
 import { ERC20ABI } from './types';
 
 jest.mock('ethers', () => {
@@ -9,11 +9,11 @@ jest.mock('ethers', () => {
     ...jest.requireActual('ethers'),
     Contract: jest.fn()
   }
-})
+});
 
 describe('balances', () => {
   const currentBalance = BigNumber.from('1000000000000000000');
-  const formattedBalance = "1.0";
+  const formattedBalance = '1.0';
   const mockGetBalance = jest
     .fn()
     .mockResolvedValue(currentBalance);
@@ -38,7 +38,7 @@ describe('balances', () => {
         return {
             getBalance: jest.fn().mockRejectedValue({})
         }
-      })
+      });
 
       await expect(
         getBalance(mockProvider(), '0xAddress')
@@ -68,41 +68,59 @@ describe('balances', () => {
         decimals: decimalsMock,
         name: nameMock,
         symbol: symbolMock,
-      });
-    })
+        });
+    });
 
     it('should balanceOf on the appropriate contract and return the balance', async () => {
       const result = await getERC20Balance(
-          mockProvider(),
-          "abc123",
+        mockProvider(),
+          'abc123',
           '0x10c'
-      )
+      );
 
       expect(balanceOfMock).toBeCalledTimes(1);
       expect(decimalsMock).toBeCalledTimes(1);
       expect(nameMock).toBeCalledTimes(1);
       expect(symbolMock).toBeCalledTimes(1);
       expect(result).toEqual({
-        name: "Ethereum",
-        symbol: "ETH",
+        name: 'Ethereum',
+        symbol: 'ETH',
         balance: currentBalance,
         formattedBalance,
         decimals: 18,
       })
     });
 
+    it('should throw error if call to the contract fails', async () => {
+      (Contract as unknown as jest.Mock).mockReturnValue({
+        balanceOf: balanceOfMock,
+        decimals: decimalsMock,
+        name: jest.fn().mockRejectedValue({}),
+        symbol: symbolMock,
+      });
+
+      await expect(getERC20Balance(
+        mockProvider(),
+        'abc123',
+        '0x10c'
+      )).rejects.toThrow(
+        new ERC20BalanceError(
+          'Error occurred while attempting to get the ERC20 balance for contract address abc123 and wallet address 0x10c'
+        )
+      );
+    });
+
     it('should throw an error if the contract address is invalid', async () => {
       (Contract as unknown as jest.Mock).mockImplementation(
         () => {
-          const contract = jest.requireActual('ethers').Contract
-
-          return new contract(mockProvider(), JSON.stringify(ERC20ABI), null)
+          const contract = jest.requireActual('ethers').Contract;
+          return new contract(mockProvider(), JSON.stringify(ERC20ABI), null);
         }
       );
 
       await expect(getERC20Balance(
         mockProvider(),
-        "abc123",
+        'abc123',
         '0x10c'
       )).rejects.toThrow(new RegExp('^invalid contract address or ENS name'))
     })

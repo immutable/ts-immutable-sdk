@@ -3,3 +3,9 @@ export class BalanceError extends Error {
       super(message);
     }
 }
+
+export class ERC20BalanceError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
