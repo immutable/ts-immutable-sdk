@@ -30,18 +30,18 @@ export const getERC20Balance = async (
   );
 
   try {
-		const name = await contract.name();
-		const symbol = await contract.symbol();
-		const balance = await contract.balanceOf(walletAddress);
-		const decimals = await contract.decimals();
-		const formattedBalance = utils.formatUnits(balance, decimals);
-		return {
-			name,
-			symbol,
-			balance,
-			formattedBalance,
-			decimals,
-		};
+    const name = await contract.name();
+    const symbol = await contract.symbol();
+    const balance = await contract.balanceOf(walletAddress);
+    const decimals = await contract.decimals();
+    const formattedBalance = utils.formatUnits(balance, decimals);
+    return {
+      name,
+      symbol,
+      balance,
+      formattedBalance,
+      decimals,
+    };
   } catch (err: any) {
     console.log(err.message);
     throw new ERC20BalanceError(
