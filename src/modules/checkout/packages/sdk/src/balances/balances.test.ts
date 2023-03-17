@@ -65,7 +65,7 @@ describe('balances', () => {
         });
     });
 
-    it('should balanceOf on the appropriate contract and return the balance', async () => {
+    it('should call balanceOf on the appropriate contract and return the balance', async () => {
       const result = await getERC20Balance(
         mockProvider(),
           'abc123',
