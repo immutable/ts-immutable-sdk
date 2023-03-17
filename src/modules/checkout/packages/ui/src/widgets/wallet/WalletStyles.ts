@@ -1,7 +1,3 @@
-export const ButtonWrapperStyle = {
-  marginBottom: '10px'
-}
-
 export const WalletWidgetStyle = {
   maxWidth: '400px',
   backgroundColor: '#333333',
@@ -16,14 +12,18 @@ export const WidgetHeaderStyle = {
   alignItems: 'center',
 }
 
-export const InactiveStyle = {
-  display: 'none !important',
+export const WidgetSubHeadingStyle = {
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'row',
+  marginBottom: '20px',
+  alignItems: 'center',
 }
-
-export const ActiveStyle = {
-
-}
-
-export const BackButtonStyle = {
-  flexGrow: '4',
+export const WidgetBodyStyle = {
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  marginBottom: '20px',
+  alignItems: 'center',
+  rowGap: '8px',
 }
