@@ -11,7 +11,6 @@ export const getBalance = async (
   try {
     return await provider.getBalance(walletAddress);
   } catch (err: any) {
-    console.log(err.message);
     throw new BalanceError(
       `Error occurred while attempting to get the balance for ${walletAddress}`
     );
@@ -43,7 +42,6 @@ export const getERC20Balance = async (
       decimals,
     };
   } catch (err: any) {
-    console.log(err.message);
     throw new BalanceError(
       `Error occurred while attempting to get the ERC20 balance for contract address ${contractAddress} and wallet address ${walletAddress}`
     );
