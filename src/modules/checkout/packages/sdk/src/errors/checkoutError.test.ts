@@ -1,8 +1,8 @@
 import {
-    CheckoutError,
-    CheckoutErrorType,
-    withCheckoutError,
-  } from './checkoutError';
+  CheckoutError,
+  CheckoutErrorType,
+  withCheckoutError,
+} from './checkoutError';
   
 describe('checkoutError', () => {
   afterEach(jest.resetAllMocks);
@@ -13,7 +13,7 @@ describe('checkoutError', () => {
     anyFn.mockReturnValue(returnValue);
 
     expect(await withCheckoutError(anyFn, {
-        type: CheckoutErrorType.BALANCE_ERROR,
+      type: CheckoutErrorType.BALANCE_ERROR,
     })).toEqual(returnValue);
   });
 
@@ -22,10 +22,10 @@ describe('checkoutError', () => {
     errorFunction.mockRejectedValue(new Error('Error message'));
 
     await expect(withCheckoutError(errorFunction, {
-        type: CheckoutErrorType.BALANCE_ERROR,
+      type: CheckoutErrorType.BALANCE_ERROR,
     })).rejects.toThrow(new CheckoutError(
-        'Error message',
-        CheckoutErrorType.BALANCE_ERROR
+      'Error message',
+      CheckoutErrorType.BALANCE_ERROR
     ));
   });
 
@@ -34,11 +34,11 @@ describe('checkoutError', () => {
     errorFunction.mockRejectedValue(new Error('Error message'));
 
     await expect(withCheckoutError(errorFunction, {
-        type: CheckoutErrorType.BALANCE_ERROR,
-        message: "Custom message"
+      type: CheckoutErrorType.BALANCE_ERROR,
+      message: "Custom message"
     })).rejects.toThrow(new CheckoutError(
-        'Custom message',
-        CheckoutErrorType.BALANCE_ERROR
+      'Custom message',
+      CheckoutErrorType.BALANCE_ERROR
     ));
   });
 });
