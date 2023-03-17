@@ -36,6 +36,13 @@ export const Config = {
     baseIMXApiPath: 'https://api.sandbox.x.immutable.com',
     passportDomain: 'https://passport.sandbox.immutable.com'
   } as EnvironmentConfiguration,
+  DEVELOPMENT: {
+    network: Networks.DEVELOPMENT,
+    authenticationDomain: 'https://auth.dev.immutable.com',
+    magicPublishableApiKey: 'pk_live_4058236363130CA9',
+    magicProviderId: 'C9odf7hU4EQ5EufcfgYfcBaT5V6LhocXyiPRhIjw2EY=',
+    baseIMXApiPath: 'https://api.dev.x.immutable.com'
+  } as EnvironmentConfiguration,
 };
 
 const validateConfiguration = <T>(

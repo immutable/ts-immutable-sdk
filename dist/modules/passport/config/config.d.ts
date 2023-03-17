@@ -17,5 +17,6 @@ export interface PassportConfiguration {
 export declare const Config: {
     PRODUCTION: EnvironmentConfiguration;
     SANDBOX: EnvironmentConfiguration;
+    DEVELOPMENT: EnvironmentConfiguration;
 };
 export declare const getPassportConfiguration: (environmentConfiguration: EnvironmentConfiguration, oidcConfiguration: OidcConfiguration) => PassportConfiguration;
