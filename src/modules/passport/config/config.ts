@@ -33,6 +33,13 @@ export const Config = {
     magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
     baseIMXApiPath: 'https://api.sandbox.x.immutable.com'
   } as EnvironmentConfiguration,
+  DEVELOPMENT: {
+    network: Networks.DEVELOPMENT,
+    authenticationDomain: 'https://auth.dev.immutable.com',
+    magicPublishableApiKey: 'pk_live_4058236363130CA9',
+    magicProviderId: 'C9odf7hU4EQ5EufcfgYfcBaT5V6LhocXyiPRhIjw2EY=',
+    baseIMXApiPath: 'https://api.dev.x.immutable.com'
+  } as EnvironmentConfiguration,
 };
 
 const validateConfiguration = <T>(

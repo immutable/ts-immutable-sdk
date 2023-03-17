@@ -22,7 +22,8 @@ export type PassportMetadata = {
 };
 export declare enum Networks {
     PRODUCTION = "mainnet",
-    SANDBOX = "goerli"
+    SANDBOX = "goerli",
+    DEVELOPMENT = "goerli"
 }
 export interface EnvironmentConfiguration {
     network: Networks;
