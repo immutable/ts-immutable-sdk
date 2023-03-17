@@ -1,11 +1,13 @@
 import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import { PassportErrorType, withPassportError } from './errors/passportError';
-import { PassportMetadata, User } from './types';
+import { PassportMetadata, User, UserWithEtherKey } from './types';
 import { retryWithDelay } from './util/retry';
 import { getUserEtherKeyFromMetadata } from './getUserMetadata';
 import { PassportConfiguration } from './config';
 
-const getAuthConfiguration = ({ oidcConfiguration }: PassportConfiguration) => ({
+const getAuthConfiguration = ({
+  oidcConfiguration,
+}: PassportConfiguration) => ({
   authority: oidcConfiguration.authenticationDomain,
   redirect_uri: oidcConfiguration.redirectUri,
   popup_redirect_uri: oidcConfiguration.redirectUri,
@@ -13,7 +15,7 @@ const getAuthConfiguration = ({ oidcConfiguration }: PassportConfiguration) => (
   metadata: {
     authorization_endpoint: `${oidcConfiguration.authenticationDomain}/authorize`,
     token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
-    userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`
+    userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
   },
   loadUserInfo: true,
 });
@@ -24,9 +26,7 @@ export default class AuthManager {
 
   constructor(config: PassportConfiguration) {
     this.config = config;
-    this.userManager = new UserManager(
-      getAuthConfiguration(config),
-    );
+    this.userManager = new UserManager(getAuthConfiguration(config));
   }
 
   private mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
@@ -70,18 +70,19 @@ export default class AuthManager {
 
   public async requestRefreshTokenAfterRegistration(
     jwt: string
-  ): Promise<User | null> {
-    return withPassportError<User | null>(async () => {
-      const etherKey = await retryWithDelay(() => (
-        getUserEtherKeyFromMetadata(this.config.oidcConfiguration.authenticationDomain, jwt)
-      ));
+  ): Promise<UserWithEtherKey | null> {
+    return withPassportError<UserWithEtherKey | null>(async () => {
+      await retryWithDelay(() =>
+        getUserEtherKeyFromMetadata(
+          this.config.oidcConfiguration.authenticationDomain,
+          jwt
+        )
+      );
       const updatedUser = await this.userManager.signinSilent();
       if (!updatedUser) {
         return null;
       }
-      const user = this.mapOidcUserToDomainModel(updatedUser);
-      user.etherKey = etherKey;
-      return user;
+      return this.mapOidcUserToDomainModel(updatedUser) as UserWithEtherKey;
     }, PassportErrorType.REFRESH_TOKEN_ERROR);
   }
 }
