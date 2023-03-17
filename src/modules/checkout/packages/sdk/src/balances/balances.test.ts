@@ -1,8 +1,8 @@
 import { getBalance, getERC20Balance } from './balances';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
-import { BalanceError } from './errors';
 import { ERC20ABI } from './types';
+import { CheckoutError, CheckoutErrorType } from '../errors/checkoutError';
 
 jest.mock('ethers', () => {
   return {
@@ -33,20 +33,14 @@ describe('balances', () => {
       expect(balance).toEqual(currentBalance);
     });
 
-    it('should catch an error from getBalance() and throw a BalanceError', async () => {
+    it('should catch an error from getBalance() and throw a CheckoutError of type BalanceError', async () => {
       const mockProvider = jest.fn().mockImplementation(() => {
         return {
-            getBalance: jest.fn().mockRejectedValue({})
+            getBalance: jest.fn().mockRejectedValue(new Error('Error getting balance'))
         }
       });
 
-      await expect(
-        getBalance(mockProvider(), '0xAddress')
-      ).rejects.toThrow(
-        new BalanceError(
-          'Error occurred while attempting to get the balance for 0xAddress'
-        )
-      );
+      await expect(getBalance(mockProvider(), '0xAddress')).rejects.toThrow(new CheckoutError('Error getting balance', CheckoutErrorType.BALANCE_ERROR));
     });
   });
 
@@ -95,7 +89,7 @@ describe('balances', () => {
       (Contract as unknown as jest.Mock).mockReturnValue({
         balanceOf: balanceOfMock,
         decimals: decimalsMock,
-        name: jest.fn().mockRejectedValue({}),
+        name: jest.fn().mockRejectedValue(new Error('Error getting name from contract')),
         symbol: symbolMock,
       });
 
@@ -103,11 +97,7 @@ describe('balances', () => {
         mockProvider(),
         'abc123',
         '0x10c'
-      )).rejects.toThrow(
-        new BalanceError(
-          'Error occurred while attempting to get the ERC20 balance for contract address abc123 and wallet address 0x10c'
-        )
-      );
+      )).rejects.toThrow(new CheckoutError('Error getting name from contract', CheckoutErrorType.BALANCE_ERROR));
     });
 
     it('should throw an error if the contract address is invalid', async () => {
@@ -122,7 +112,7 @@ describe('balances', () => {
         mockProvider(),
         'abc123',
         '0x10c'
-      )).rejects.toThrow(new RegExp('^invalid contract address or ENS name'))
+      )).rejects.toThrow(new CheckoutError('invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)', CheckoutErrorType.BALANCE_ERROR));
     })
   });
 });
