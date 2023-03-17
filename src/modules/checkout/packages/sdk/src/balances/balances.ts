@@ -9,7 +9,7 @@ export const getBalance = async (
 ): Promise<BigNumber> => {
   return await withCheckoutError<BigNumber>(async () => {
     return await provider.getBalance(walletAddress);
-  }, { type: CheckoutErrorType.BALANCE_ERROR });
+  }, { type: CheckoutErrorType.GET_BALANCE_ERROR });
 };
 
 export const getERC20Balance = async (
@@ -36,5 +36,5 @@ export const getERC20Balance = async (
       decimals,
     };
 
-  }, { type: CheckoutErrorType.BALANCE_ERROR });
+  }, { type: CheckoutErrorType.GET_ERC20_BALANCE_ERROR });
 };

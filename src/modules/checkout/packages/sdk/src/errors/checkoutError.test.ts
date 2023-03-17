@@ -13,7 +13,7 @@ describe('checkoutError', () => {
     anyFn.mockReturnValue(returnValue);
 
     expect(await withCheckoutError(anyFn, {
-      type: CheckoutErrorType.BALANCE_ERROR,
+      type: CheckoutErrorType.GET_BALANCE_ERROR,
     })).toEqual(returnValue);
   });
 
@@ -22,10 +22,10 @@ describe('checkoutError', () => {
     errorFunction.mockRejectedValue(new Error('Error message'));
 
     await expect(withCheckoutError(errorFunction, {
-      type: CheckoutErrorType.BALANCE_ERROR,
+      type: CheckoutErrorType.GET_BALANCE_ERROR,
     })).rejects.toThrow(new CheckoutError(
       'Error message',
-      CheckoutErrorType.BALANCE_ERROR
+      CheckoutErrorType.GET_BALANCE_ERROR
     ));
   });
 
@@ -34,11 +34,11 @@ describe('checkoutError', () => {
     errorFunction.mockRejectedValue(new Error('Error message'));
 
     await expect(withCheckoutError(errorFunction, {
-      type: CheckoutErrorType.BALANCE_ERROR,
+      type: CheckoutErrorType.GET_BALANCE_ERROR,
       message: "Custom message"
     })).rejects.toThrow(new CheckoutError(
       'Custom message',
-      CheckoutErrorType.BALANCE_ERROR
+      CheckoutErrorType.GET_BALANCE_ERROR
     ));
   });
 });

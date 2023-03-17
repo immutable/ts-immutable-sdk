@@ -1,5 +1,6 @@
 export enum CheckoutErrorType {
-  BALANCE_ERROR = 'BALANCE_ERROR'
+  GET_BALANCE_ERROR = 'GET_BALANCE_ERROR',
+  GET_ERC20_BALANCE_ERROR = 'GET_ERC20_BALANCE_ERROR'
 }
   
 type ErrorType = {

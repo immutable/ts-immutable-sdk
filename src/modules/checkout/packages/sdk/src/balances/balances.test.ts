@@ -40,7 +40,7 @@ describe('balances', () => {
         }
       });
 
-      await expect(getBalance(mockProvider(), '0xAddress')).rejects.toThrow(new CheckoutError('Error getting balance', CheckoutErrorType.BALANCE_ERROR));
+      await expect(getBalance(mockProvider(), '0xAddress')).rejects.toThrow(new CheckoutError('Error getting balance', CheckoutErrorType.GET_BALANCE_ERROR));
     });
   });
 
@@ -97,7 +97,7 @@ describe('balances', () => {
         mockProvider(),
         'abc123',
         '0x10c'
-      )).rejects.toThrow(new CheckoutError('Error getting name from contract', CheckoutErrorType.BALANCE_ERROR));
+      )).rejects.toThrow(new CheckoutError('Error getting name from contract', CheckoutErrorType.GET_ERC20_BALANCE_ERROR));
     });
 
     it('should throw an error if the contract address is invalid', async () => {
@@ -112,7 +112,7 @@ describe('balances', () => {
         mockProvider(),
         'abc123',
         '0x10c'
-      )).rejects.toThrow(new CheckoutError('invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)', CheckoutErrorType.BALANCE_ERROR));
+      )).rejects.toThrow(new CheckoutError('invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)', CheckoutErrorType.GET_ERC20_BALANCE_ERROR));
     })
   });
 });
