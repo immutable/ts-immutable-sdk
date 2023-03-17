@@ -18,7 +18,10 @@ const getAuthConfiguration = ({
   },
   mergeClaims: true,
   loadUserInfo: true,
-  scope: 'openid offline_access profile email'
+  scope: 'openid offline_access profile email create:users',
+  customParamsAuthRequest: {
+    audience: 'platform_api',
+  },
 });
 
 export default class AuthManager {
