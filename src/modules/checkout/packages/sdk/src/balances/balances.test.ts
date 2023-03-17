@@ -36,7 +36,7 @@ describe('balances', () => {
     it('should catch an error from getBalance() and throw a CheckoutError of type BalanceError', async () => {
       const mockProvider = jest.fn().mockImplementation(() => {
         return {
-            getBalance: jest.fn().mockRejectedValue(new Error('Error getting balance'))
+          getBalance: jest.fn().mockRejectedValue(new Error('Error getting balance'))
         }
       });
 
