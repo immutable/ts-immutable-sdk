@@ -18,6 +18,7 @@ const getAuthConfiguration = ({
     userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
   },
   loadUserInfo: true,
+  scope: 'openid offline_access profile email'
 });
 
 export default class AuthManager {

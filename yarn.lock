@@ -307,9 +307,9 @@
     "@jridgewell/trace-mapping" "0.3.9"
 
 "@eslint-community/eslint-utils@^4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@eslint-community/eslint-utils/-/eslint-utils-4.2.0.tgz#a831e6e468b4b2b5ae42bf658bea015bf10bc518"
-  integrity sha512-gB8T4H4DEfX2IV9zGDJPOBgP1e/DbfCPDTtEqUMckpvzS1OYtva8JdFYBqMwYk7xAQ429WGF/UPqn8uQ//h2vQ==
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@eslint-community/eslint-utils/-/eslint-utils-4.2.1.tgz#dcbff07808d38b4852fb5a5fe6ddf9184b65c307"
+  integrity sha512-494d1hNrghSUUYuPYcNvKZewMwSMEDaOdAq/Q0HbkAaLuElBYkz/1xFyR2SqKpMsrb7C7MtXaOLX3H8J5MKTug==
   dependencies:
     eslint-visitor-keys "^3.3.0"
 
