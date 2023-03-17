@@ -18,6 +18,7 @@ const getAuthConfiguration = ({
   },
   mergeClaims: true,
   loadUserInfo: true,
+  scope: 'openid offline_access profile email'
 });
 
 export default class AuthManager {
