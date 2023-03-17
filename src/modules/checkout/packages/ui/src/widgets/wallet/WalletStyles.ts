@@ -18,6 +18,7 @@ export const WidgetSubHeadingStyle = {
   flexDirection: 'row',
   marginBottom: '20px',
   alignItems: 'center',
+  justifyContent: 'space-between'
 }
 export const WidgetBodyStyle = {
   width: '100%',
