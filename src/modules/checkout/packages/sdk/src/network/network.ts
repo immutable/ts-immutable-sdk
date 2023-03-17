@@ -1,11 +1,11 @@
 import { Web3Provider } from "@ethersproject/providers"
-import { UserRejectedRequestError, WALLET_ACTION } from "../types"
-import { NetworkNotSupportedError } from "./errors"
+import { CheckoutError, CheckoutErrorType } from "../errors/checkoutError";
+import { WALLET_ACTION } from "../types"
 import { Network, NetworkMap } from "./types"
 
 export async function switchWalletNetwork(provider: Web3Provider, network: Network) {
-  if(!Object.values(Network).includes(network)) throw new NetworkNotSupportedError(`${network} is not a supported network`);
-  if(!provider.provider?.request) throw new Error("provider object is missing request function");
+  if(!Object.values(Network).includes(network)) throw new CheckoutError(`${network} is not a supported network`, CheckoutErrorType.NETWORK_NOT_SUPPORTED_ERROR);
+  if(!provider.provider?.request) throw new CheckoutError("provider object is missing request function", CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
     // WT-1146 - Refer to the README in this folder for explantion on the switch network flow
     try {
       await switchNetworkInWallet(provider, network);
@@ -16,10 +16,10 @@ export async function switchWalletNetwork(provider: Web3Provider, network: Netwo
           await addNetworkToWallet(provider, network);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch(err: any){
-          throw new UserRejectedRequestError("user cancelled the add network request");
+          throw new CheckoutError("user cancelled the add network request", CheckoutErrorType.USER_REJECTED_REQUEST_ERROR);
         }
       } else{
-        throw new UserRejectedRequestError("user cancelled the switch network request");
+        throw new CheckoutError("user cancelled the switch network request", CheckoutErrorType.USER_REJECTED_REQUEST_ERROR);
       }
     }
 }
