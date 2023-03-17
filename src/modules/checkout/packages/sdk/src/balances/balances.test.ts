@@ -1,7 +1,7 @@
 import { getBalance, getERC20Balance } from './balances';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
-import { BalanceError, ERC20BalanceError } from './errors';
+import { BalanceError } from './errors';
 import { ERC20ABI } from './types';
 
 jest.mock('ethers', () => {
@@ -104,7 +104,7 @@ describe('balances', () => {
         'abc123',
         '0x10c'
       )).rejects.toThrow(
-        new ERC20BalanceError(
+        new BalanceError(
           'Error occurred while attempting to get the ERC20 balance for contract address abc123 and wallet address 0x10c'
         )
       );

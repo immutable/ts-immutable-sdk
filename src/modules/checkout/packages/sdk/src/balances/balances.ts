@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract, utils } from 'ethers';
-import { BalanceError, ERC20BalanceError } from './errors';
+import { BalanceError } from './errors';
 import { ERC20ABI, GetERC20BalanceResult } from './types';
 
 export const getBalance = async (
@@ -44,7 +44,7 @@ export const getERC20Balance = async (
     };
   } catch (err: any) {
     console.log(err.message);
-    throw new ERC20BalanceError(
+    throw new BalanceError(
       `Error occurred while attempting to get the ERC20 balance for contract address ${contractAddress} and wallet address ${walletAddress}`
     );
   }
