@@ -23,14 +23,18 @@ export const getERC20Balance = async (
       JSON.stringify(ERC20ABI),
       provider
     );
+    const name = await contract.name();
+    const symbol = await contract.symbol();
     const balance = await contract.balanceOf(walletAddress);
     const decimals = await contract.decimals();
+    const formattedBalance = utils.formatUnits(balance, decimals);
     return {
-      name: await contract.name(),
-      symbol: await contract.symbol(),
-      formattedBalance: utils.formatUnits(balance, decimals),
+      name,
+      symbol,
+      formattedBalance,
       balance,
       decimals,
     };
+
   }, { type: CheckoutErrorType.BALANCE_ERROR });
 };
