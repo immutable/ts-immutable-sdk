@@ -18,9 +18,9 @@ const getAuthConfiguration = ({
   },
   mergeClaims: true,
   loadUserInfo: true,
-  customParamsAuthRequest: {
+  extraQueryParams: {
     audience: 'platform_api',
-  },
+  }
 });
 
 export default class AuthManager {
