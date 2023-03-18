@@ -95,9 +95,9 @@ const getAuthConfiguration = ({ oidcConfiguration, }) => ({
         userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
     },
     loadUserInfo: true,
-    customParamsAuthRequest: {
+    extraQueryParams: {
         audience: 'platform_api',
-    },
+    }
 });
 class AuthManager {
     userManager;
