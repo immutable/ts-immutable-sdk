@@ -1,4 +1,4 @@
-import { Badge, BiomeThemeProvider, Body, Box, Button, Heading } from "@biom3/react";
+import { Badge, BiomeThemeProvider, Box, Button } from "@biom3/react";
 import { onDarkBase } from "@biom3/design-tokens";
 
 import { WalletWidgetProps } from "../../types";
