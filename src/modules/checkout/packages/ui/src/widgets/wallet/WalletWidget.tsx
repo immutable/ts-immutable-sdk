@@ -181,7 +181,7 @@ export function WalletWidget(props:WalletWidgetProps) {
         <Box sx={WidgetBodyStyle}>
             {tokenBalances?.map((balance) =>
               <TokenBalance key={balance.name} params={balance}></TokenBalance>)}
-          { tokenBalances === undefined && (<Body>No tokens found</Body>)}
+          { tokenBalances?.length==2 && (<Body>No balance in network tokens</Body>)}
         </Box>
         <Box sx={WidgetSubHeadingStyle}>
           {NetworkNameMap[NetworkName.GOERLI]!==getNetworkName() &&
