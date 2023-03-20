@@ -10,11 +10,13 @@ import {
 } from "@imtbl/checkout-sdk-web";
 import { useCallback, useEffect, useState } from "react";
 import { Network as EthersNetwork, Web3Provider } from "@ethersproject/providers";
-import { WalletWidgetStyle, WidgetBodyStyle, WidgetHeaderStyle, WidgetSubHeadingStyle } from "./WalletStyles";
+import { WalletWidgetStyle, WidgetBodyStyle, WidgetHeaderStyle } from "./WalletStyles";
 import { NetworkCurrencyMap, ProviderIdentifiedNetwork, NetworkNameMap } from "../../types/constants";
-import { BalanceInfo, TokenBalance } from "./components/tokenBalance";
 import { utils } from "ethers";
 import { NetworkStatus } from "./components/NetworkStatus";
+import { TotalTokenBalance } from "./components/TotalTokenBalance";
+import { TokenBalanceList } from "./components/TokenBalanceList";
+import { BalanceInfo } from "./components/BalanceItem";
 
 interface TokensData {
   contractAddress:string;
@@ -89,6 +91,17 @@ export function WalletWidget(props:WalletWidgetProps) {
 
       const walletAddress = await provider.getSigner().getAddress();
       const tokenBalances: BalanceInfo[] = [];
+      //get balance for native currency
+      const nativeCurrencyBalance = await checkout.getBalance({
+        provider,
+        walletAddress
+      });
+      const nativeFormattedBalance = utils.formatUnits(nativeCurrencyBalance, 18);
+        tokenBalances.push({
+          balance: nativeFormattedBalance,
+          name: NetworkCurrencyMap[networkName as Network],
+          fiatAmount: '1214.78',
+        });
 
       if (tokens !== undefined && tokens.length > 0) {
         for (const token of tokens) {
@@ -106,17 +119,7 @@ export function WalletWidget(props:WalletWidgetProps) {
           //totalBalance += //todo: use fiat price fetched above
         }
       }
-      //get balance for native currency
-      const nativeCurrencyBalance = await checkout.getBalance({
-        provider,
-        walletAddress
-      });
-      const nativeFormattedBalance = utils.formatUnits(nativeCurrencyBalance, 18);
-        tokenBalances.push({
-          balance: nativeFormattedBalance,
-          name: NetworkCurrencyMap[networkName as Network],
-          fiatAmount: '1214.78',
-        });
+      
       console.log(tokenBalances)
       setTokenBalances(tokenBalances);
       setTotalFiatAmount(totalBalance);
@@ -149,26 +152,16 @@ export function WalletWidget(props:WalletWidgetProps) {
     <BiomeThemeProvider theme={{base: onDarkBase}}>
       <Box sx={WalletWidgetStyle}>
         <Box sx={WidgetHeaderStyle}>
-          <NetworkStatus networkName={networkName}/>
+          <NetworkStatus networkName={networkName} />
           <Button size={'small'} sx={{alignSelf:'flex-end'}}
             testId='close-button'
             onClick={() => console.log('closing wallet widget')}>x</Button>
         </Box>
-        <Box sx={WidgetSubHeadingStyle}>
-          <Box >
-          <Heading size={'medium'}> Tokens</Heading>
-          </Box>
-          <Box sx={{d: 'flex', direction: 'row', columnGap: 'base.spacing.x1'}}>
-            <Body size={'medium'}>Value:</Body>
-            <Body size={'medium'}>${totalFiatAmount.toFixed(2)}</Body>
-          </Box>
-        </Box>
+        <TotalTokenBalance totalBalance={totalFiatAmount} />
         <Box sx={WidgetBodyStyle}>
-            {tokenBalances?.map((balance) =>
-              <TokenBalance key={balance.name} params={balance}></TokenBalance>)}
-          { tokenBalances?.length==2 && (<Body>No tokens found</Body>)}
+          <TokenBalanceList balanceInfoItems={tokenBalances} />
         </Box>
-        <Box sx={WidgetSubHeadingStyle}>
+        <Box sx={{display: 'flex', direction: 'row', justifyContent: 'space-between'}}>
           {NetworkNameMap[ProviderIdentifiedNetwork.GOERLI] !== networkName &&
           (<Button size={'small'}
                   testId='goerli-network-button'
