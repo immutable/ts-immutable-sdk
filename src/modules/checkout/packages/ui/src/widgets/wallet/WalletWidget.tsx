@@ -16,27 +16,17 @@ import { BalanceInfo, TokenBalance } from "./components/tokenBalance";
 import { utils } from "ethers";
 
 interface TokensData {
-  name:string;
   contractAddress:string;
 }
 export function WalletWidget(props:WalletWidgetProps) {
   const { params } = props;
   const [provider, setProvider] = useState<Web3Provider>();
   const [network, setNetwork] = useState<EthersNetwork>();
+  const [networkName, setNetworkName] = useState<string>("");
   const [tokenBalances, setTokenBalances] = useState<BalanceInfo[]>();
   const [tokens, setTokens] = useState<TokensData[]>();
   const [ totalFiatAmount, setTotalFiatAmount] = useState(0.0);
   const checkout = new CheckoutSDK();
-
-  const getNetwork = useCallback(async() => {
-    const network = await provider?.getNetwork();
-    setNetwork(network);
-    }, [provider])
-
-
-  useEffect(()=>{
-    getNetwork();
-  }, [getNetwork]);
 
   const getProvider = useCallback(async() => {
     const providerPreference = params.providerPreference ?? ConnectionProviders.METAMASK;
@@ -44,42 +34,55 @@ export function WalletWidget(props:WalletWidgetProps) {
       providerPreference
     });
     setProvider(prov);
-  }, [provider])
+  }, [provider]);
+
+  const getNetwork = useCallback(async() => {
+    console.log('inside getNetwork')
+    const providerNetwork = await provider?.getNetwork();
+    setNetwork(providerNetwork);
+  }, [provider]);
+
+  const getTokens = useCallback(() => {
+    console.log('inside getTokens')
+    //todo: fetch tokens for the connected network
+        const ethTokens = [
+          {contractAddress:'0xccC8cb5229B0ac8069C51fd58367Fd1e622aFD97'},
+          {contractAddress:'0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF'}
+        ];
+        const goTokens = [
+          {contractAddress:'0xeD578CD4Cce52DBDAc10DC00fEA1335257dFabAe'},
+          {contractAddress:'0x1FACDD0165489f373255A90304650E15481b2c85'}
+        ];
+        const networkName = getNetworkName(network);
+        console.log(networkName)
+        setNetworkName(networkName)
+        switch (networkName) {
+          case NetworkNameMap[ProviderIdentifiedNetwork.GOERLI]:
+            setTokens(goTokens);
+            break;
+          case NetworkNameMap[ProviderIdentifiedNetwork.HOMESTEAD]:
+            setTokens(ethTokens);
+            break;
+          default: setTokens([])
+        }
+      }, [provider, network]);
 
   useEffect(()=>{
     getProvider();
-  }, [])
-
-  const getTokens = useCallback(async() => {
-//todo: fetch tokens for the connected network
-    const ethTokens = [
-      {name:'GODS', contractAddress:'0xccC8cb5229B0ac8069C51fd58367Fd1e622aFD97'},
-      {name:'IMX', contractAddress:'0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF'}
-    ];
-    const goTokens = [
-      {name:'GODS', contractAddress:'0xeD578CD4Cce52DBDAc10DC00fEA1335257dFabAe'},
-      {name:'IMX', contractAddress:'0x1FACDD0165489f373255A90304650E15481b2c85'}
-    ];
-    const networkName = getNetworkName();
-    switch (networkName) {
-      case NetworkNameMap[ProviderIdentifiedNetwork.GOERLI]:
-        setTokens(goTokens);
-        break;
-      case NetworkNameMap[ProviderIdentifiedNetwork.HOMESTEAD]:
-        setTokens(ethTokens);
-        break;
-      default: setTokens([])
-    }
-  }, [provider])
+  }, []);
 
   useEffect(()=>{
-    getProvider();
-  }, [])
+    getNetwork();
+  }, [getNetwork]);
+
+  useEffect(() => {
+    getTokens();
+  }, [network]);
 
   useEffect(()=>{
     const getTokenBalances = async () => {
-      if(provider === undefined){
-        return '';
+      if(provider === undefined || network === undefined || tokens?.length === 0){
+        return;
       }
       const walletAddress = await provider.getSigner().getAddress();
       const tokenBalances: BalanceInfo[] = [{
@@ -119,7 +122,7 @@ export function WalletWidget(props:WalletWidgetProps) {
       const nativeFormattedBalance = utils.formatUnits(nativeCurrencyBalance, 18);
         tokenBalances.push({
           balance: nativeFormattedBalance,
-          name: NetworkCurrencyMap[getNetworkName() as Network],
+          name: NetworkCurrencyMap[networkName as Network],
           fiatAmount: '1214.78',
         });
       console.log(tokenBalances)
@@ -127,26 +130,26 @@ export function WalletWidget(props:WalletWidgetProps) {
       setTotalFiatAmount(totalBalance);
     }
     getTokenBalances();
-  }, [network,provider])
+  }, [network, provider, tokens])
 
-  const getNetworkName = (): string => {
-    if(network === undefined){
+  const getNetworkName = (networkParam: EthersNetwork | undefined): string => {
+    if(networkParam === undefined){
       return '';
     }
-    const networkName = network.name as ProviderIdentifiedNetwork;
+    const networkName = networkParam.name as ProviderIdentifiedNetwork;
 
     if(!Object.values(ProviderIdentifiedNetwork).includes(networkName)){
-      return network.name;
+      return networkParam.name;
     }
     return NetworkNameMap[networkName];
   }
+
   const switchNetwork = async (network:Network) =>{
     await checkout.switchNetwork({
       network: network,
       provider: provider
     } as SwitchNetworkParams);
     await getProvider();
-    await getTokens();
   }
 
   return(
@@ -158,7 +161,7 @@ export function WalletWidget(props:WalletWidgetProps) {
           </Box>
           <Box sx={{width:'85%'}}>
             <Body>
-              Network: <Body sx={{textTransform:'capitalize'}}>{getNetworkName()}</Body>
+              Network: <Body sx={{textTransform:'capitalize'}}>{networkName}</Body>
             </Body>
           </Box>
           <Box sx={{width:'10%'}}>
@@ -181,19 +184,19 @@ export function WalletWidget(props:WalletWidgetProps) {
           { tokenBalances?.length==2 && (<Body>No tokens found</Body>)}
         </Box>
         <Box sx={WidgetSubHeadingStyle}>
-          {NetworkNameMap[ProviderIdentifiedNetwork.GOERLI]!==getNetworkName() &&
+          {NetworkNameMap[ProviderIdentifiedNetwork.GOERLI] !== networkName &&
           (<Button size={'small'}
                   testId='goerli-network-button'
                   onClick={() => switchNetwork(Network.GOERLI)}>
             <Badge isAnimated={false} />
             Switch to Goerli</Button>)}
-          {NetworkNameMap[ProviderIdentifiedNetwork.HOMESTEAD]!==getNetworkName() && (
+          {NetworkNameMap[ProviderIdentifiedNetwork.HOMESTEAD] !== networkName && (
           <Button size={'small'}
                   testId='eth-network-button'
                   onClick={() => switchNetwork(Network.ETHEREUM)}>
             <Badge isAnimated={false} />
             Switch to Ethereum</Button>)}
-          {NetworkNameMap[ProviderIdentifiedNetwork.MATIC]!==getNetworkName() && (
+          {NetworkNameMap[ProviderIdentifiedNetwork.MATIC] !== networkName && (
           <Button size={'small'}
                   testId='poly-network-button'
                   onClick={() => switchNetwork(Network.POLYGON)}>
@@ -203,5 +206,4 @@ export function WalletWidget(props:WalletWidgetProps) {
       </Box>
     </BiomeThemeProvider>
   )
-
 }
