@@ -1,48 +1,21 @@
-import { GetSignableTransferRequest } from '@imtbl/core-sdk';
+import { GetSignableTradeRequest, GetSignableTransferRequest } from '@imtbl/core-sdk';
 
 const ConfirmationDomain = "";
 const ConfirmationTitle = "Confirm this transaction";
 const PopUpWidth = 350;
 const PopUpHeight = 350;
 
-type ConfirmationPayloadType = GetSignableTransferRequest
+type ConfirmationPayloadType = GetSignableTransferRequest | GetSignableTradeRequest
+
+export enum ConfirmationType {
+  TransferV1 = "v1/transfer",
+  Order = "order",
+}
 
 type DisplayConfirmationParams = {
-  type: "transfer" | "order" | "purchase";
+  type: ConfirmationType;
   data: ConfirmationPayloadType;
 }
-
-
-type ConfirmationResult = {
-  confirmed: boolean;
-}
-export const displayConfirmationScreen = async (params: DisplayConfirmationParams): Promise<ConfirmationResult> => {
-  return new Promise((resolve) => {
-    const encodedQueryData = jsonToBase64(params);
-    openPopupCenter({
-      url: ConfirmationDomain,
-      query: encodedQueryData,
-      title: ConfirmationTitle,
-      width: PopUpWidth,
-      height: PopUpHeight
-    });
-
-    // Handle messages posted from confirmation screen
-    window.addEventListener("message", ({ data, origin }) => {
-      if (origin != ConfirmationDomain) {
-        return;
-      }
-      const { type, success } = data;
-      if (type !== 'passport-confirmation') return;
-      console.log('parent received msg: ', data);
-      if (success) {
-        resolve({ confirmed: true });
-      }
-      resolve({ confirmed: false });
-    });
-  });
-};
-
 
 type PopUpProps = { url: string; title: string; width: number; height: number; query?: string }
 const openPopupCenter = ({ url, title, query, width, height }: PopUpProps) => {
@@ -71,6 +44,35 @@ const openPopupCenter = ({ url, title, query, width, height }: PopUpProps) => {
 };
 
 const jsonToBase64 = (data: object): string => {
-  const json = JSON.stringify(data);
-  return Buffer.from(json).toString("base64");
+  return btoa(JSON.stringify(data));
+};
+
+type ConfirmationResult = {
+  confirmed: boolean;
+}
+export const displayConfirmationScreen = async (params: DisplayConfirmationParams): Promise<ConfirmationResult> => {
+  return new Promise((resolve) => {
+    const encodedQueryData = jsonToBase64(params);
+    openPopupCenter({
+      url: ConfirmationDomain,
+      query: encodedQueryData,
+      title: ConfirmationTitle,
+      width: PopUpWidth,
+      height: PopUpHeight
+    });
+
+    // Handle messages posted from confirmation screen
+    window.addEventListener("message", ({ data, origin }) => {
+      if (origin != ConfirmationDomain) {
+        return;
+      }
+      const { type, success } = data;
+      if (!Object.values(ConfirmationType).includes(type)) return;
+      console.log('parent received msg: ', data);
+      if (success) {
+        resolve({ confirmed: true });
+      }
+      resolve({ confirmed: false });
+    });
+  });
 };
