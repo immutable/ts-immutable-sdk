@@ -1,15 +1,8 @@
-import {
-  CreateTransferResponseV1,
-  StarkSigner,
-  TransfersApi,
-  UnsignedTransferRequest,
-} from '@imtbl/core-sdk';
-import {
-  PassportErrorType,
-  withPassportError,
-} from '../errors/passportError';
+import { CreateTransferResponseV1, StarkSigner, TransfersApi, UnsignedTransferRequest, } from '@imtbl/core-sdk';
+import { PassportErrorType, withPassportError, } from '../errors/passportError';
 import { convertToSignableToken } from '../../../modules/provider/signable-actions/utils';
 import { UserWithEtherKey } from '../types';
+import { displayConfirmationScreen } from '../confirmation/confirmation';
 
 const ERC721 = 'ERC721';
 
@@ -21,21 +14,38 @@ type TrasferRequest = {
 };
 
 const transfer = ({
-  request,
-  transferApi,
-  starkSigner,
-  user,
-}: TrasferRequest): Promise<CreateTransferResponseV1> => {
+                    request,
+                    transferApi,
+                    starkSigner,
+                    user,
+                  }: TrasferRequest): Promise<CreateTransferResponseV1> => {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
+    const signableTransferRequest = {
+      sender: user.etherKey,
+      token: convertToSignableToken(request),
+      amount: transferAmount,
+      receiver: request.receiver,
+    };
     const signableResult = await transferApi.getSignableTransferV1({
-      getSignableTransferRequest: {
-        sender: user.etherKey,
-        token: convertToSignableToken(request),
-        amount: transferAmount,
-        receiver: request.receiver,
-      },
+      getSignableTransferRequest: signableTransferRequest,
     });
+
+
+    const result = await displayConfirmationScreen({
+      type: "transfer", data: {
+        sender_ether_key: user.etherKey,
+        signable_requests: [{
+          amount: transferAmount,
+          token: convertToSignableToken(request),
+          receiver: request.receiver
+        }]
+      }
+    });
+
+    if (!result.confirmed) {
+      throw new Error("Transaction rejected by user");
+    }
 
     const signableResultData = signableResult.data;
     const { payload_hash: payloadHash } = signableResultData;
