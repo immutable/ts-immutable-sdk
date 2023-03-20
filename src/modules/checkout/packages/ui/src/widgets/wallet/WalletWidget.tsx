@@ -11,7 +11,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { Network as EthersNetwork, Web3Provider } from "@ethersproject/providers";
 import { WalletWidgetStyle, WidgetBodyStyle, WidgetHeaderStyle, WidgetSubHeadingStyle } from "./WalletStyles";
-import { NetworkName, NetworkNameMap } from "../../types/constants";
+import { NetworkCurrencyMap, ProviderIdentifiedNetwork, NetworkNameMap } from "../../types/constants";
 import { BalanceInfo, TokenBalance } from "./components/tokenBalance";
 import { utils } from "ethers";
 
@@ -62,10 +62,10 @@ export function WalletWidget(props:WalletWidgetProps) {
     ];
     const networkName = getNetworkName();
     switch (networkName) {
-      case NetworkNameMap[NetworkName.GOERLI]:
+      case NetworkNameMap[ProviderIdentifiedNetwork.GOERLI]:
         setTokens(goTokens);
         break;
-      case NetworkNameMap[NetworkName.HOMESTEAD]:
+      case NetworkNameMap[ProviderIdentifiedNetwork.HOMESTEAD]:
         setTokens(ethTokens);
         break;
       default: setTokens([])
@@ -102,7 +102,6 @@ export function WalletWidget(props:WalletWidgetProps) {
             walletAddress,
             contractAddress: token.contractAddress
           });
-          if (balanceResult.formattedBalance === '0.0') continue;
           tokenBalances.push({
             balance: balanceResult.formattedBalance,
             fiatAmount: '23.50', // todo: fetch fiat price from coinGecko apis
@@ -118,29 +117,27 @@ export function WalletWidget(props:WalletWidgetProps) {
         walletAddress
       });
       const nativeFormattedBalance = utils.formatUnits(nativeCurrencyBalance, 18);
-      if (nativeFormattedBalance !== '0.0') {
         tokenBalances.push({
           balance: nativeFormattedBalance,
-          name: 'NATIVE',
-          fiatAmount: 'n/a',
+          name: NetworkCurrencyMap[getNetworkName() as Network],
+          fiatAmount: '1214.78',
         });
-      }
       console.log(tokenBalances)
       setTokenBalances(tokenBalances);
       setTotalFiatAmount(totalBalance);
     }
     getTokenBalances();
-  }, [network])
+  }, [network,provider])
+
   const getNetworkName = (): string => {
     if(network === undefined){
       return '';
     }
-    const networkName = network.name as NetworkName;
+    const networkName = network.name as ProviderIdentifiedNetwork;
 
-    if(!Object.values(NetworkName).includes(networkName)){
+    if(!Object.values(ProviderIdentifiedNetwork).includes(networkName)){
       return network.name;
     }
-
     return NetworkNameMap[networkName];
   }
   const switchNetwork = async (network:Network) =>{
@@ -161,7 +158,7 @@ export function WalletWidget(props:WalletWidgetProps) {
           </Box>
           <Box sx={{width:'75%'}}>
             <Body>
-              Network: {getNetworkName()}
+              Network: <Body sx={{textTransform:'capitalize'}}>{getNetworkName()}</Body>
             </Body>
           </Box>
           <Box sx={{width:'20%'}}>
@@ -184,19 +181,19 @@ export function WalletWidget(props:WalletWidgetProps) {
           { tokenBalances?.length==2 && (<Body>No tokens found</Body>)}
         </Box>
         <Box sx={WidgetSubHeadingStyle}>
-          {NetworkNameMap[NetworkName.GOERLI]!==getNetworkName() &&
+          {NetworkNameMap[ProviderIdentifiedNetwork.GOERLI]!==getNetworkName() &&
           (<Button size={'small'}
                   testId='goerli-network-button'
                   onClick={() => switchNetwork(Network.GOERLI)}>
             <Badge isAnimated={false} />
             Switch to Goerli</Button>)}
-          {NetworkNameMap[NetworkName.HOMESTEAD]!==getNetworkName() && (
+          {NetworkNameMap[ProviderIdentifiedNetwork.HOMESTEAD]!==getNetworkName() && (
           <Button size={'small'}
                   testId='eth-network-button'
                   onClick={() => switchNetwork(Network.ETHEREUM)}>
             <Badge isAnimated={false} />
             Switch to Ethereum</Button>)}
-          {NetworkNameMap[NetworkName.MATIC]!==getNetworkName() && (
+          {NetworkNameMap[ProviderIdentifiedNetwork.MATIC]!==getNetworkName() && (
           <Button size={'small'}
                   testId='poly-network-button'
                   onClick={() => switchNetwork(Network.POLYGON)}>
