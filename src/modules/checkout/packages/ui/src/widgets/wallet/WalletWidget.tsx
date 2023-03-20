@@ -149,6 +149,7 @@ export function WalletWidget(props:WalletWidgetProps) {
       network: network,
       provider: provider
     } as SwitchNetworkParams);
+    setTokens([]);
     await getProvider();
   }
 
