@@ -95,7 +95,7 @@ export function WalletWidget(props:WalletWidgetProps) {
       }];
 
       const totalBalance = 26.50;
-      if (tokens !== undefined) {
+      if (tokens !== undefined && tokens.length > 0) {
         for (const token of tokens) {
           const balanceResult = await checkout.getERC20Balance({
             provider,
@@ -181,7 +181,7 @@ export function WalletWidget(props:WalletWidgetProps) {
         <Box sx={WidgetBodyStyle}>
             {tokenBalances?.map((balance) =>
               <TokenBalance key={balance.name} params={balance}></TokenBalance>)}
-          { tokenBalances?.length==2 && (<Body>No balance in network tokens</Body>)}
+          { tokenBalances?.length==2 && (<Body>No tokens found</Body>)}
         </Box>
         <Box sx={WidgetSubHeadingStyle}>
           {NetworkNameMap[NetworkName.GOERLI]!==getNetworkName() &&
