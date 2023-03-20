@@ -40,13 +40,11 @@ export function WalletWidget(props:WalletWidgetProps) {
   }, [provider]);
 
   const getNetwork = useCallback(async() => {
-    console.log('inside getNetwork')
     const providerNetwork = await provider?.getNetwork();
     setNetwork(providerNetwork);
   }, [provider]);
 
   const getTokens = useCallback(() => {
-    console.log('inside getTokens')
     //todo: fetch tokens for the connected network
         const ethTokens = [
           {contractAddress:'0xccC8cb5229B0ac8069C51fd58367Fd1e622aFD97'},
@@ -57,7 +55,6 @@ export function WalletWidget(props:WalletWidgetProps) {
           {contractAddress:'0x1FACDD0165489f373255A90304650E15481b2c85'}
         ];
         const networkName = getNetworkName(network);
-        console.log(networkName)
         setNetworkName(networkName)
         switch (networkName) {
           case NetworkNameMap[ProviderIdentifiedNetwork.GOERLI]:
@@ -119,8 +116,6 @@ export function WalletWidget(props:WalletWidgetProps) {
           //totalBalance += //todo: use fiat price fetched above
         }
       }
-      
-      console.log(tokenBalances)
       setTokenBalances(tokenBalances);
       setTotalFiatAmount(totalBalance);
     }
@@ -170,14 +165,14 @@ export function WalletWidget(props:WalletWidgetProps) {
             Switch to Goerli</Button>)}
           {NetworkNameMap[ProviderIdentifiedNetwork.HOMESTEAD] !== networkName && (
           <Button size={'small'}
-                  testId='eth-network-button'
-                  onClick={() => switchNetwork(Network.ETHEREUM)}>
+            testId='eth-network-button'
+            onClick={() => switchNetwork(Network.ETHEREUM)}>
             <Badge isAnimated={false} />
             Switch to Ethereum</Button>)}
           {NetworkNameMap[ProviderIdentifiedNetwork.MATIC] !== networkName && (
           <Button size={'small'}
-                  testId='poly-network-button'
-                  onClick={() => switchNetwork(Network.POLYGON)}>
+            testId='poly-network-button'
+            onClick={() => switchNetwork(Network.POLYGON)}>
             <Badge isAnimated={false} />
             Switch to Polygon</Button>)}
         </Box>
