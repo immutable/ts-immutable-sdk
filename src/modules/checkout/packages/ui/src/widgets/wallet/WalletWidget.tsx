@@ -156,12 +156,12 @@ export function WalletWidget(props:WalletWidgetProps) {
           <Box sx={{width:'5%'}}>
             <Badge variant="success" isAnimated />
           </Box>
-          <Box sx={{width:'75%'}}>
+          <Box sx={{width:'85%'}}>
             <Body>
               Network: <Body sx={{textTransform:'capitalize'}}>{getNetworkName()}</Body>
             </Body>
           </Box>
-          <Box sx={{width:'20%'}}>
+          <Box sx={{width:'10%'}}>
           <Button size={'small'} sx={{alignSelf:'flex-end'}}
             testId='close-button'
             onClick={() => console.log('closing wallet widget')}>x</Button>
