@@ -8,48 +8,71 @@ import {
   Network,
   SwitchNetworkParams
 } from "@imtbl/checkout-sdk-web";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Network as EthersNetwork, Web3Provider } from "@ethersproject/providers";
 import { WalletWidgetStyle, WidgetBodyStyle, WidgetHeaderStyle, WidgetSubHeadingStyle } from "./WalletStyles";
 import { NetworkName, NetworkNameMap } from "../../types/constants";
 import { BalanceInfo, TokenBalance } from "./components/tokenBalance";
 import { utils } from "ethers";
 
+interface TokensData {
+  name:string;
+  contractAddress:string;
+}
 export function WalletWidget(props:WalletWidgetProps) {
   const { params } = props;
-  // const balances:BalanceInfo[] = [{
-  //   name:'IMX',
-  //   description:'immutable',
-  //   balance: '20.25',
-  //   fiatAmount:'23.50'
-  // },
-  // {
-  //   name:'GODS',
-  //   balance: '200',
-  //   fiatAmount:'3'
-  // }];
   const [provider, setProvider] = useState<Web3Provider>();
   const [network, setNetwork] = useState<EthersNetwork>();
   const [tokenBalances, setTokenBalances] = useState<BalanceInfo[]>();
+  const [tokens, setTokens] = useState<TokensData[]>();
+  const [ totalFiatAmount, setTotalFiatAmount] = useState(0.0);
   const checkout = new CheckoutSDK();
 
-  useEffect(()=>{
-    const getNetwork = async ()=>{
-      const network = await provider?.getNetwork();
-      setNetwork(network);
-    }
+  const getNetwork = useCallback(async() => {
+    const network = await provider?.getNetwork();
+    setNetwork(network);
+    }, [provider])
 
+
+  useEffect(()=>{
     getNetwork();
-  }, []);
+  }, [getNetwork]);
+
+  const getProvider = useCallback(async() => {
+    const providerPreference = params.providerPreference ?? ConnectionProviders.METAMASK;
+    const prov: Web3Provider = await checkout.connect({
+      providerPreference
+    });
+    setProvider(prov);
+  }, [provider])
 
   useEffect(()=>{
-    const getProvider = async ()=>{
-      const providerPreference = params.providerPreference ?? ConnectionProviders.METAMASK;
-      const prov: Web3Provider = await checkout.connect({
-        providerPreference
-      });
-      setProvider(prov);
+    getProvider();
+  }, [])
+
+  const getTokens = useCallback(async() => {
+//todo: fetch tokens for the connected network
+    const ethTokens = [
+      {name:'GODS', contractAddress:'0xccC8cb5229B0ac8069C51fd58367Fd1e622aFD97'},
+      {name:'IMX', contractAddress:'0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF'}
+    ];
+    const goTokens = [
+      {name:'GODS', contractAddress:'0xeD578CD4Cce52DBDAc10DC00fEA1335257dFabAe'},
+      {name:'IMX', contractAddress:'0x1FACDD0165489f373255A90304650E15481b2c85'}
+    ];
+    const networkName = getNetworkName();
+    switch (networkName) {
+      case NetworkNameMap[NetworkName.GOERLI]:
+        setTokens(goTokens);
+        break;
+      case NetworkNameMap[NetworkName.HOMESTEAD]:
+        setTokens(ethTokens);
+        break;
+      default: setTokens([])
     }
+  }, [provider])
+
+  useEffect(()=>{
     getProvider();
   }, [])
 
@@ -59,43 +82,55 @@ export function WalletWidget(props:WalletWidgetProps) {
         return '';
       }
       const walletAddress = await provider.getSigner().getAddress();
-      const tokenBalances: BalanceInfo[] = [];
+      const tokenBalances: BalanceInfo[] = [{
+        name:'LOL',
+        description:'lol coins',
+        balance: '20.25',
+        fiatAmount:'23.50'
+      },
+      {
+        name:'ROFL',
+        balance: '200',
+        fiatAmount:'3'
+      }];
 
-      //fetch tokens for the connected network
-      //foreach ERC-20 token contract, call checkout.getERC20Balance
-      const tokens = [
-        {name:'GODS', contractAddress:'0xccC8cb5229B0ac8069C51fd58367Fd1e622aFD97'},
-        {name:'IMX', contractAddress:'0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF'}
-      ];
-
-      for (const token of tokens) {
-        const balanceResult = await checkout.getERC20Balance({
-          provider,
-          walletAddress,
-          contractAddress: token.contractAddress
-        });
-        tokenBalances.push({
-          balance: balanceResult.formattedBalance,
-          fiatAmount: 'n/a',
-          name: balanceResult.symbol,
-          description: balanceResult.name
-        });
+      const totalBalance = 26.50;
+      if (tokens !== undefined) {
+        for (const token of tokens) {
+          const balanceResult = await checkout.getERC20Balance({
+            provider,
+            walletAddress,
+            contractAddress: token.contractAddress
+          });
+          if (balanceResult.formattedBalance === '0.0') continue;
+          tokenBalances.push({
+            balance: balanceResult.formattedBalance,
+            fiatAmount: '23.50', // todo: fetch fiat price from coinGecko apis
+            name: balanceResult.symbol,
+            description: balanceResult.name
+          });
+          //totalBalance += //todo: use fiat price fetched above
+        }
       }
       //get balance for native currency
       const nativeCurrencyBalance = await checkout.getBalance({
         provider,
         walletAddress
       });
-      tokenBalances.push({
-        balance:utils.formatUnits(nativeCurrencyBalance),
-        name: 'NATIVE',
-        fiatAmount:'n/a',
-      });
-
-      setTokenBalances(tokenBalances)
+      const nativeFormattedBalance = utils.formatUnits(nativeCurrencyBalance, 18);
+      if (nativeFormattedBalance !== '0.0') {
+        tokenBalances.push({
+          balance: nativeFormattedBalance,
+          name: 'NATIVE',
+          fiatAmount: 'n/a',
+        });
+      }
+      console.log(tokenBalances)
+      setTokenBalances(tokenBalances);
+      setTotalFiatAmount(totalBalance);
     }
     getTokenBalances();
-  }, [])
+  }, [network])
   const getNetworkName = (): string => {
     if(network === undefined){
       return '';
@@ -113,6 +148,8 @@ export function WalletWidget(props:WalletWidgetProps) {
       network: network,
       provider: provider
     } as SwitchNetworkParams);
+    await getProvider();
+    await getTokens();
   }
 
   return(
@@ -138,32 +175,33 @@ export function WalletWidget(props:WalletWidgetProps) {
           <Heading size={'medium'}> Tokens</Heading>
           </Box>
           <Box >
-            <Body sx={{alignSelf:'flex-end'}} size={'medium'}> Value:$26.50</Body>
+            <Body sx={{alignSelf:'flex-end'}} size={'medium'}> Value:${totalFiatAmount}</Body>
           </Box>
         </Box>
         <Box sx={WidgetBodyStyle}>
             {tokenBalances?.map((balance) =>
               <TokenBalance key={balance.name} params={balance}></TokenBalance>)}
+          { tokenBalances === undefined && (<Body>No tokens found</Body>)}
         </Box>
         <Box sx={WidgetSubHeadingStyle}>
-          <Button size={'small'}
-                  sx={{display: NetworkNameMap[NetworkName.GOERLI]===getNetworkName() ? 'none' : 'block'}}
+          {NetworkNameMap[NetworkName.GOERLI]!==getNetworkName() &&
+          (<Button size={'small'}
                   testId='goerli-network-button'
                   onClick={() => switchNetwork(Network.GOERLI)}>
             <Badge isAnimated={false} />
-            Switch to Goerli</Button>
+            Switch to Goerli</Button>)}
+          {NetworkNameMap[NetworkName.HOMESTEAD]!==getNetworkName() && (
           <Button size={'small'}
-                  sx={{display: NetworkNameMap[NetworkName.HOMESTEAD]===getNetworkName() ? 'none' : 'block'}}
                   testId='eth-network-button'
                   onClick={() => switchNetwork(Network.ETHEREUM)}>
             <Badge isAnimated={false} />
-            Switch to Ethereum</Button>
+            Switch to Ethereum</Button>)}
+          {NetworkNameMap[NetworkName.MATIC]!==getNetworkName() && (
           <Button size={'small'}
-                  sx={{display: NetworkNameMap[NetworkName.MATIC]===getNetworkName() ? 'none' : 'block'}}
                   testId='poly-network-button'
                   onClick={() => switchNetwork(Network.POLYGON)}>
             <Badge isAnimated={false} />
-            Switch to Polygon</Button>
+            Switch to Polygon</Button>)}
         </Box>
       </Box>
     </BiomeThemeProvider>

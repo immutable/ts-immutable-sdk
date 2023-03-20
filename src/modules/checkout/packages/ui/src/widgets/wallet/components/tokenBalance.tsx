@@ -14,10 +14,20 @@ export function TokenBalance(props: TokenBalanceInfo) {
   return(
     <Box sx={{display:'flex', width:'100%', justifyContent:'space-between'}}>
       <Box>
-        <Body>{props.params.name}</Body>
+        <Box>
+          <Body>{props.params.name}</Body>
+        </Box>
+        <Box>
+          <Body size="small">{props.params.description}</Body>
+        </Box>
       </Box>
-      <Box>
-      <Body>{props.params.balance}</Body>
+      <Box >
+        <Box sx={{display:'flex', width:'100%', justifyContent:'flex-end'}}>
+          <Body size="small">{props.params.balance}</Body>
+        </Box>
+        <Box>
+        <Body size="xSmall">AUD ${props.params.fiatAmount}</Body>
+      </Box>
       </Box>
     </Box>
 )
