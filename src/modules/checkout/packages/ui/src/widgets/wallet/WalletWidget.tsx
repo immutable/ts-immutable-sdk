@@ -14,6 +14,7 @@ import { WalletWidgetStyle, WidgetBodyStyle, WidgetHeaderStyle, WidgetSubHeading
 import { NetworkCurrencyMap, ProviderIdentifiedNetwork, NetworkNameMap } from "../../types/constants";
 import { BalanceInfo, TokenBalance } from "./components/tokenBalance";
 import { utils } from "ethers";
+import { NetworkStatus } from "./components/NetworkStatus";
 
 interface TokensData {
   contractAddress:string;
@@ -84,20 +85,11 @@ export function WalletWidget(props:WalletWidgetProps) {
       if(provider === undefined || network === undefined || tokens?.length === 0){
         return;
       }
-      const walletAddress = await provider.getSigner().getAddress();
-      const tokenBalances: BalanceInfo[] = [{
-        name:'LOL',
-        description:'lol coins',
-        balance: '20.25',
-        fiatAmount:'23.50'
-      },
-      {
-        name:'ROFL',
-        balance: '200',
-        fiatAmount:'3'
-      }];
+      const totalBalance = 0;
 
-      const totalBalance = 26.50;
+      const walletAddress = await provider.getSigner().getAddress();
+      const tokenBalances: BalanceInfo[] = [];
+
       if (tokens !== undefined && tokens.length > 0) {
         for (const token of tokens) {
           const balanceResult = await checkout.getERC20Balance({
@@ -157,26 +149,18 @@ export function WalletWidget(props:WalletWidgetProps) {
     <BiomeThemeProvider theme={{base: onDarkBase}}>
       <Box sx={WalletWidgetStyle}>
         <Box sx={WidgetHeaderStyle}>
-          <Box sx={{width:'5%'}}>
-            <Badge variant="success" isAnimated />
-          </Box>
-          <Box sx={{width:'85%'}}>
-            <Body>
-              Network: <Body sx={{textTransform:'capitalize'}}>{networkName}</Body>
-            </Body>
-          </Box>
-          <Box sx={{width:'10%'}}>
+          <NetworkStatus networkName={networkName}/>
           <Button size={'small'} sx={{alignSelf:'flex-end'}}
             testId='close-button'
             onClick={() => console.log('closing wallet widget')}>x</Button>
-          </Box>
         </Box>
         <Box sx={WidgetSubHeadingStyle}>
           <Box >
           <Heading size={'medium'}> Tokens</Heading>
           </Box>
-          <Box >
-            <Body sx={{alignSelf:'flex-end'}} size={'medium'}> Value:${totalFiatAmount}</Body>
+          <Box sx={{d: 'flex', direction: 'row', columnGap: 'base.spacing.x1'}}>
+            <Body size={'medium'}>Value:</Body>
+            <Body size={'medium'}>${totalFiatAmount.toFixed(2)}</Body>
           </Box>
         </Box>
         <Box sx={WidgetBodyStyle}>

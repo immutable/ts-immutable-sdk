@@ -8,6 +8,7 @@ export const WidgetHeaderStyle = {
   width: '100%',
   display: 'flex',
   flexDirection: 'row',
+  justifyContent: 'space-between',
   marginBottom: '20px',
   alignItems: 'center',
 }
