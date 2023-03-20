@@ -1,4 +1,4 @@
-import { Badge, BiomeThemeProvider, Body, Box, Button, Heading } from "@biom3/react";
+import { Badge, BiomeThemeProvider, Box, Button } from "@biom3/react";
 import { onDarkBase } from "@biom3/design-tokens";
 
 import { WalletWidgetProps } from "../../types";
@@ -10,10 +10,13 @@ import {
 } from "@imtbl/checkout-sdk-web";
 import { useCallback, useEffect, useState } from "react";
 import { Network as EthersNetwork, Web3Provider } from "@ethersproject/providers";
-import { WalletWidgetStyle, WidgetBodyStyle, WidgetHeaderStyle, WidgetSubHeadingStyle } from "./WalletStyles";
+import { WalletWidgetStyle, WidgetBodyStyle, WidgetHeaderStyle } from "./WalletStyles";
 import { NetworkCurrencyMap, ProviderIdentifiedNetwork, NetworkNameMap } from "../../types/constants";
-import { BalanceInfo, TokenBalance } from "./components/tokenBalance";
 import { utils } from "ethers";
+import { NetworkStatus } from "./components/NetworkStatus";
+import { TotalTokenBalance } from "./components/TotalTokenBalance";
+import { TokenBalanceList } from "./components/TokenBalanceList";
+import { BalanceInfo } from "./components/BalanceItem";
 
 interface TokensData {
   contractAddress:string;
@@ -37,13 +40,11 @@ export function WalletWidget(props:WalletWidgetProps) {
   }, [provider]);
 
   const getNetwork = useCallback(async() => {
-    console.log('inside getNetwork')
     const providerNetwork = await provider?.getNetwork();
     setNetwork(providerNetwork);
   }, [provider]);
 
   const getTokens = useCallback(() => {
-    console.log('inside getTokens')
     //todo: fetch tokens for the connected network
         const ethTokens = [
           {contractAddress:'0xccC8cb5229B0ac8069C51fd58367Fd1e622aFD97'},
@@ -54,7 +55,6 @@ export function WalletWidget(props:WalletWidgetProps) {
           {contractAddress:'0x1FACDD0165489f373255A90304650E15481b2c85'}
         ];
         const networkName = getNetworkName(network);
-        console.log(networkName)
         setNetworkName(networkName)
         switch (networkName) {
           case NetworkNameMap[ProviderIdentifiedNetwork.GOERLI]:
@@ -84,20 +84,22 @@ export function WalletWidget(props:WalletWidgetProps) {
       if(provider === undefined || network === undefined || tokens?.length === 0){
         return;
       }
-      const walletAddress = await provider.getSigner().getAddress();
-      const tokenBalances: BalanceInfo[] = [{
-        name:'LOL',
-        description:'lol coins',
-        balance: '20.25',
-        fiatAmount:'23.50'
-      },
-      {
-        name:'ROFL',
-        balance: '200',
-        fiatAmount:'3'
-      }];
+      const totalBalance = 0;
 
-      const totalBalance = 26.50;
+      const walletAddress = await provider.getSigner().getAddress();
+      const tokenBalances: BalanceInfo[] = [];
+      //get balance for native currency
+      const nativeCurrencyBalance = await checkout.getBalance({
+        provider,
+        walletAddress
+      });
+      const nativeFormattedBalance = utils.formatUnits(nativeCurrencyBalance, 18);
+        tokenBalances.push({
+          balance: nativeFormattedBalance,
+          name: NetworkCurrencyMap[networkName as Network],
+          fiatAmount: '1214.78',
+        });
+
       if (tokens !== undefined && tokens.length > 0) {
         for (const token of tokens) {
           const balanceResult = await checkout.getERC20Balance({
@@ -114,18 +116,6 @@ export function WalletWidget(props:WalletWidgetProps) {
           //totalBalance += //todo: use fiat price fetched above
         }
       }
-      //get balance for native currency
-      const nativeCurrencyBalance = await checkout.getBalance({
-        provider,
-        walletAddress
-      });
-      const nativeFormattedBalance = utils.formatUnits(nativeCurrencyBalance, 18);
-        tokenBalances.push({
-          balance: nativeFormattedBalance,
-          name: NetworkCurrencyMap[networkName as Network],
-          fiatAmount: '1214.78',
-        });
-      console.log(tokenBalances)
       setTokenBalances(tokenBalances);
       setTotalFiatAmount(totalBalance);
     }
@@ -157,34 +147,16 @@ export function WalletWidget(props:WalletWidgetProps) {
     <BiomeThemeProvider theme={{base: onDarkBase}}>
       <Box sx={WalletWidgetStyle}>
         <Box sx={WidgetHeaderStyle}>
-          <Box sx={{width:'5%'}}>
-            <Badge variant="success" isAnimated />
-          </Box>
-          <Box sx={{width:'85%'}}>
-            <Body>
-              Network: <Body sx={{textTransform:'capitalize'}}>{networkName}</Body>
-            </Body>
-          </Box>
-          <Box sx={{width:'10%'}}>
+          <NetworkStatus networkName={networkName} />
           <Button size={'small'} sx={{alignSelf:'flex-end'}}
             testId='close-button'
             onClick={() => console.log('closing wallet widget')}>x</Button>
-          </Box>
         </Box>
-        <Box sx={WidgetSubHeadingStyle}>
-          <Box >
-          <Heading size={'medium'}> Tokens</Heading>
-          </Box>
-          <Box >
-            <Body sx={{alignSelf:'flex-end'}} size={'medium'}> Value:${totalFiatAmount}</Body>
-          </Box>
-        </Box>
+        <TotalTokenBalance totalBalance={totalFiatAmount} />
         <Box sx={WidgetBodyStyle}>
-            {tokenBalances?.map((balance) =>
-              <TokenBalance key={balance.name} params={balance}></TokenBalance>)}
-          { tokenBalances?.length==2 && (<Body>No tokens found</Body>)}
+          <TokenBalanceList balanceInfoItems={tokenBalances} />
         </Box>
-        <Box sx={WidgetSubHeadingStyle}>
+        <Box sx={{display: 'flex', direction: 'row', justifyContent: 'space-between'}}>
           {NetworkNameMap[ProviderIdentifiedNetwork.GOERLI] !== networkName &&
           (<Button size={'small'}
                   testId='goerli-network-button'
@@ -193,14 +165,14 @@ export function WalletWidget(props:WalletWidgetProps) {
             Switch to Goerli</Button>)}
           {NetworkNameMap[ProviderIdentifiedNetwork.HOMESTEAD] !== networkName && (
           <Button size={'small'}
-                  testId='eth-network-button'
-                  onClick={() => switchNetwork(Network.ETHEREUM)}>
+            testId='eth-network-button'
+            onClick={() => switchNetwork(Network.ETHEREUM)}>
             <Badge isAnimated={false} />
             Switch to Ethereum</Button>)}
           {NetworkNameMap[ProviderIdentifiedNetwork.MATIC] !== networkName && (
           <Button size={'small'}
-                  testId='poly-network-button'
-                  onClick={() => switchNetwork(Network.POLYGON)}>
+            testId='poly-network-button'
+            onClick={() => switchNetwork(Network.POLYGON)}>
             <Badge isAnimated={false} />
             Switch to Polygon</Button>)}
         </Box>
