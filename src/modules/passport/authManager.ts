@@ -18,7 +18,7 @@ const getAuthConfiguration = ({
     userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
   },
   loadUserInfo: true,
-  scope: 'openid offline_access profile email create:users',
+  scope: 'openid offline_access profile email create:users passport:user_create',
   extraQueryParams: {
     audience: 'platform_api',
   }
