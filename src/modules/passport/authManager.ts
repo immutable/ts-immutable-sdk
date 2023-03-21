@@ -48,7 +48,6 @@ export default class AuthManager {
   public async login(): Promise<User> {
     return withPassportError<User>(async () => {
       const oidcUser = await this.userManager.signinPopup();
-      console.log("@@@@@@", {oidcUser})
       return this.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
