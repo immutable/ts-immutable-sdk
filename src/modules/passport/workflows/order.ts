@@ -73,7 +73,7 @@ export async function createOrder({
         vault_id_buy: signableResultData.vault_id_buy,
         vault_id_sell: signableResultData.vault_id_sell,
       },
-      // Notes: this is 2 params to bypass the Client non-empty check,
+      // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
       // Should be able to remove it once the Backend have update the API
       // and generated the New Client
       xImxEthAddress: '',
@@ -121,7 +121,7 @@ export async function cancelOrder({
           order_id: request.order_id,
           stark_signature: starkSignature,
         },
-        // Notes: this is 2 params to bypass the Client non-empty check,
+        // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
         // Should be able to remove it once the Backend have update the API
         // and generated the New Client
         xImxEthAddress: '',
