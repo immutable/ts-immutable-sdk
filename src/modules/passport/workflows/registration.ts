@@ -30,7 +30,7 @@ export default async function registerPassport({
     const starkSignature = await starkSigner.signMessage(payloadHash);
 
     const response = await usersApi.registerPassportUser({
-      authorization: authorization,
+      authorization: `Bearer ` + authorization,
       registerPassportUserRequest: {
         eth_signature: ethSignature,
         ether_key: userAddress,
