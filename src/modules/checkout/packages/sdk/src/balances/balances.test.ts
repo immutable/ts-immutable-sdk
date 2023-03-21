@@ -2,7 +2,7 @@ import { getBalance, getERC20Balance } from './balances';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import { ERC20ABI } from './types';
-import { CheckoutError, CheckoutErrorType } from '../errors/checkoutError';
+import { CheckoutError, CheckoutErrorType } from '../errors';
 
 jest.mock('ethers', () => {
   return {

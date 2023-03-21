@@ -7,7 +7,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { connectWalletProvider } from './connect';
 import { ConnectionProviders } from './types';
 import { WALLET_ACTION } from '../types';
-import { CheckoutError, CheckoutErrorType } from '../errors/checkoutError';
+import { CheckoutError, CheckoutErrorType } from '../errors';
 
 let windowSpy:any;
 

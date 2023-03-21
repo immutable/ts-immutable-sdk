@@ -1,5 +1,5 @@
 import { Web3Provider } from "@ethersproject/providers"
-import { CheckoutError, CheckoutErrorType } from "../errors/checkoutError";
+import { CheckoutError, CheckoutErrorType } from "../errors";
 import { WALLET_ACTION } from "../types"
 import { Network, NetworkMap } from "./types"
 

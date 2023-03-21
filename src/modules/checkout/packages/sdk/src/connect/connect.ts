@@ -3,7 +3,7 @@ import detectEthereumProvider from "@metamask/detect-provider"
 import { ConnectionProviders, ConnectParams } from "./types"
 import { WALLET_ACTION } from "../types";
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers'
-import { CheckoutError, CheckoutErrorType, withCheckoutError } from "../errors/checkoutError";
+import { CheckoutError, CheckoutErrorType, withCheckoutError } from "../errors";
 
 export async function connectWalletProvider(params: ConnectParams) : Promise<Web3Provider> {
   let web3Provider: Web3Provider | null = null;

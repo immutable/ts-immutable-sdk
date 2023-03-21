@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract, utils } from 'ethers';
 import { ERC20ABI, GetERC20BalanceResult } from './types';
-import { CheckoutErrorType, withCheckoutError } from '../errors/checkoutError';
+import { CheckoutErrorType, withCheckoutError } from '../errors';
 
 export const getBalance = async (
   provider: Web3Provider,

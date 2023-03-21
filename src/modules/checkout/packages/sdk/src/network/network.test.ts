@@ -7,7 +7,7 @@ import { switchWalletNetwork } from './network'
 import { WALLET_ACTION } from '../types'
 import { ConnectionProviders, connectWalletProvider } from '../connect';
 import { Network, NetworkMap } from './types';
-import { CheckoutError, CheckoutErrorType } from '../errors/checkoutError';
+import { CheckoutError, CheckoutErrorType } from '../errors';
 
 let windowSpy: any;
 
