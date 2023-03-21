@@ -18,11 +18,13 @@ import {
   UnsignedTransferRequest,
   TransfersApi,
   Configuration,
+  OrdersApi,
 } from '@imtbl/core-sdk';
 import { UserWithEtherKey } from '../types';
 import { IMXProvider } from '../../provider/imxProvider';
 import { ImxApiConfiguration } from '../config';
 import transfer from '../workflows/transfer';
+import { cancelOrder, createOrder } from '../workflows/order';
 
 export type PassportImxProviderInput = {
   user: UserWithEtherKey;
@@ -34,16 +36,14 @@ export default class PassportImxProvider implements IMXProvider {
   private user: UserWithEtherKey;
   private starkSigner: StarkSigner;
   private transfersApi: TransfersApi;
+  private ordersApi: OrdersApi;
 
-  constructor({
-    user,
-    starkSigner,
-    apiConfig,
-  }: PassportImxProviderInput) {
+  constructor({ user, starkSigner, apiConfig }: PassportImxProviderInput) {
     this.user = user;
     this.starkSigner = starkSigner;
     const configuration = new Configuration({ basePath: apiConfig.basePath });
     this.transfersApi = new TransfersApi(configuration);
+    this.ordersApi = new OrdersApi(configuration);
   }
 
   async transfer(
@@ -65,16 +65,24 @@ export default class PassportImxProvider implements IMXProvider {
     throw new Error('Method not implemented.');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse> {
-    throw new Error('Method not implemented.');
+    return createOrder({
+      request,
+      user: this.user,
+      starkSigner: this.starkSigner,
+      ordersApi: this.ordersApi,
+    });
   }
 
   cancelOrder(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     request: GetSignableCancelOrderRequest
   ): Promise<CancelOrderResponse> {
-    throw new Error('Method not implemented.');
+    return cancelOrder({
+      request,
+      user: this.user,
+      starkSigner: this.starkSigner,
+      ordersApi: this.ordersApi,
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -105,6 +113,7 @@ export default class PassportImxProvider implements IMXProvider {
   prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
     throw new Error('Method not implemented.');
   }
+
   completeWithdrawal(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     starkPublicKey: string,
