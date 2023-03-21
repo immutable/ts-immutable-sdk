@@ -18,12 +18,12 @@ import {
   UnsignedTransferRequest,
   TransfersApi,
   Configuration,
-  OrdersApi
+  OrdersApi,
 } from '@imtbl/core-sdk';
 import { UserWithEtherKey } from '../types';
 import { IMXProvider } from '../../provider/imxProvider';
 import { ImxApiConfiguration } from '../config';
-import  transfer from '../workflows/transfer';
+import transfer from '../workflows/transfer';
 import { cancelOrder, createOrder } from '../workflows/order';
 
 export type PassportImxProviderInput = {
