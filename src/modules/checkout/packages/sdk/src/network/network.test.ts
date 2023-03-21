@@ -4,11 +4,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { switchWalletNetwork } from './network'
-import { UserRejectedRequestError, WALLET_ACTION } from '../types'
+import { WALLET_ACTION } from '../types'
 import { ConnectionProviders, connectWalletProvider } from '../connect';
 import { Network, NetworkMap } from './types';
-import { NetworkNotSupportedError } from './errors';
-
+import { CheckoutError, CheckoutErrorType } from '../errors';
 
 let windowSpy: any;
 
@@ -52,12 +51,8 @@ describe("network functions", () => {
     const provider = await connectWalletProvider({
       providerPreference: ConnectionProviders.METAMASK
     });
-    try{
-      await switchWalletNetwork(provider, 'Fantom' as Network);
-    } catch(err: any) {
-      expect(err).toBeInstanceOf(NetworkNotSupportedError);
-      expect(err.message).toEqual("Fantom is not a supported network");
-    }
+
+    await expect(switchWalletNetwork(provider, 'Fantom' as Network)).rejects.toThrow(new CheckoutError('Fantom is not a supported network', CheckoutErrorType.NETWORK_NOT_SUPPORTED_ERROR));
   })
 
   it('should throw an error if the user rejects the switch network request', async () => {
@@ -74,12 +69,7 @@ describe("network functions", () => {
       providerPreference: ConnectionProviders.METAMASK
     });
 
-    try{
-      await switchWalletNetwork(provider, Network.POLYGON);
-    } catch(err: any) {
-      expect(err).toBeInstanceOf(UserRejectedRequestError);
-      expect(err.message).toEqual("user cancelled the switch network request");
-    }
+    await expect(switchWalletNetwork(provider, Network.POLYGON)).rejects.toThrow(new CheckoutError('user cancelled the switch network request', CheckoutErrorType.USER_REJECTED_REQUEST_ERROR));
   })
 
   it('should throw an error if the provider does not have a request function', async () => {
@@ -98,12 +88,7 @@ describe("network functions", () => {
     // remove request function from provider
     delete provider.provider.request;
 
-    try{
-      await switchWalletNetwork(provider, Network.POLYGON);
-    } catch(err: any) {
-      expect(err).toBeInstanceOf(Error);
-      expect(err.message).toEqual("provider object is missing request function");
-    }
+    await expect(switchWalletNetwork(provider, Network.POLYGON)).rejects.toThrow(new CheckoutError('provider object is missing request function', CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR));
   })
 
   it('should request the user to add a new network if their wallet does not already have it', async () => {
@@ -120,20 +105,14 @@ describe("network functions", () => {
       providerPreference: ConnectionProviders.METAMASK
     });
 
-    try{
-      await switchWalletNetwork(provider, Network.POLYGON);
-      expect(provider.provider.request).toHaveBeenCalledWith(
-        {
-          method: WALLET_ACTION.ADD_NETWORK, 
-          params: [
-            NetworkMap[Network.ETHEREUM]
-          ]
-        }
-      );
-    } catch(err) {
-      console.log(err)
-    }
-  })
+    await switchWalletNetwork(provider, Network.POLYGON);
+    expect(provider.provider.request).toHaveBeenCalledWith({
+        method: WALLET_ACTION.ADD_NETWORK, 
+        params: [
+          NetworkMap[Network.POLYGON]
+        ]
+    });
+  });
 
   it('should throw an error when the user cancels an add network request', async () => {
     const requestMock = jest.fn()
@@ -152,19 +131,12 @@ describe("network functions", () => {
       providerPreference: ConnectionProviders.METAMASK
     });
 
-    try{
-      await switchWalletNetwork(provider, Network.POLYGON);
-      expect(provider.provider.request).toHaveBeenCalledWith(
-        {
-          method: WALLET_ACTION.ADD_NETWORK, 
-          params: [
-            NetworkMap[Network.ETHEREUM]
-          ]
-        }
-      );
-    } catch(err: any) {
-      expect(err).toBeInstanceOf(UserRejectedRequestError);
-      expect(err.message).toEqual("user cancelled the add network request");
-    }
-  })
-})
+    await expect(switchWalletNetwork(provider, Network.POLYGON)).rejects.toThrow(new CheckoutError('user cancelled the add network request', CheckoutErrorType.USER_REJECTED_REQUEST_ERROR));
+    expect(provider.provider.request).toHaveBeenCalledWith({
+      method: WALLET_ACTION.ADD_NETWORK, 
+      params: [
+        NetworkMap[Network.POLYGON]
+      ]
+    });
+  });
+});
