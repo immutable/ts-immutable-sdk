@@ -26,6 +26,8 @@ type CreateOrderParams = {
   starkSigner: StarkSigner;
 };
 
+const ERC721 = 'ERC721';
+
 export async function createOrder({
   starkSigner,
   user,
@@ -35,8 +37,8 @@ export async function createOrder({
   return withPassportError<CreateOrderResponse>(async () => {
     const ethAddress = user.etherKey;
     const amountSell =
-      request.sell.type === 'ERC721' ? '1' : request.sell.amount;
-    const amountBuy = request.buy.type === 'ERC721' ? '1' : request.buy.amount;
+      request.sell.type === ERC721 ? '1' : request.sell.amount;
+    const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
     const getSignableOrderRequest: GetSignableOrderRequest = {
       user: ethAddress,
       amount_buy: amountBuy,
