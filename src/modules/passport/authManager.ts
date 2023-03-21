@@ -17,6 +17,7 @@ const getAuthConfiguration = ({
     token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
     userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
   },
+  mergeClaims: true,
   loadUserInfo: true,
 });
 
@@ -47,6 +48,7 @@ export default class AuthManager {
   public async login(): Promise<User> {
     return withPassportError<User>(async () => {
       const oidcUser = await this.userManager.signinPopup();
+      console.log("@@@@@@", {oidcUser})
       return this.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
