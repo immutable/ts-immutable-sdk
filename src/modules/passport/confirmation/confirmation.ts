@@ -86,7 +86,7 @@ export const displayConfirmationScreen = async (params: DisplayConfirmationParam
 
     // Handle messages posted from confirmation screen
     window.addEventListener("message", ({ data, origin }: MessageEvent) => {
-      if (origin != ConfirmationDomain || data.messageType != ConfirmationFinishMessageType) {
+      if (origin != ConfirmationDomain || data.eventType != "imx-passport" || data.messageType != ConfirmationFinishMessageType) {
         return;
       }
       const { messageData } = data;
