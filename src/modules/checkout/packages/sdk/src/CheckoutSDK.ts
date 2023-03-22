@@ -1,23 +1,22 @@
-import { BigNumber } from 'ethers';
-import * as balances from './balances';
-import { GetBalanceParams, GetERC20BalanceParams, GetERC20BalanceResult } from './balances/types';
-import { connectWalletProvider, ConnectParams, ConnectResult, getNetworkInfo } from './connect'
-import { SwitchNetworkParams, switchWalletNetwork } from './network';
+import { BigNumber } from "ethers";
+import * as balances from "./balances";
+import { GetBalanceParams, GetERC20BalanceParams, GetERC20BalanceResult } from "./balances/types";
+import { ConnectParams, ConnectResult, connectWalletProvider, getNetworkInfo } from "./connect";
+import { SwitchNetworkParams, switchWalletNetwork } from "./network";
 
 export class CheckoutSDK {
   public async connect(params: ConnectParams): Promise<ConnectResult> {
     const provider = await connectWalletProvider(params);
     const network = await getNetworkInfo(provider);
-    
-    const connectResult: ConnectResult = {
+
+    return {
       provider,
       network
-    };
-    return connectResult;
+    } as ConnectResult;
   }
 
   public async switchNetwork(params: SwitchNetworkParams): Promise<void> {
-    await switchWalletNetwork(params.provider, params.network);
+    await switchWalletNetwork(params.provider, params.chainId);
   }
 
   public async getBalance(params: GetBalanceParams): Promise<BigNumber> {

@@ -1,11 +1,5 @@
 import { Web3Provider } from "@ethersproject/providers";
-
-export enum ChainId {
-  ETHEREUM = 1,
-  GOERLI = 5,
-  POLYGON = 137,
-  // zkEVM = 'zkEVM'
-}
+import { ChainId } from "../types";
 
 export enum Network {
   ETHEREUM = 'mainnet',
@@ -59,10 +53,10 @@ export const ChainIdNetworkMap = {
       decimals: 18
     },
     blockExplorerUrls: ["https://polygonscan.com/"],
-   } 
+   }
 };
 
 export interface SwitchNetworkParams {
   provider: Web3Provider;
-  network: Network;
+  chainId: ChainId;
 }

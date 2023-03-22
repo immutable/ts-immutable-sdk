@@ -6,9 +6,9 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { connectWalletProvider, getNetworkInfo } from './connect';
 import { ConnectionProviders } from './types';
-import { WALLET_ACTION } from '../types';
+import { ChainId, WALLET_ACTION } from "../types";
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { ChainId, ChainIdNetworkMap } from '../network';
+import { ChainIdNetworkMap } from "../network";
 
 let windowSpy:any;
 
@@ -24,7 +24,7 @@ describe('connect', () => {
       removeEventListener: () => {}
     }));
   });
-  
+
   afterEach(() => {
     windowSpy.mockRestore();
   });
@@ -34,40 +34,40 @@ describe('connect', () => {
       const connRes = await connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK
       });
-  
+
       expect(connRes).toBeInstanceOf(Web3Provider)
       expect(connRes?.provider).not.toBe(null);
       expect(connRes?.provider.request).toBeCalledWith({method: WALLET_ACTION.CONNECT, params: []});
     });
-  
+
     it('should throw an error if connect is called with a preference that is not expected', async () => {
       await expect(connectWalletProvider({
         providerPreference: 'trust-wallet' as ConnectionProviders
       })).rejects.toThrow(new CheckoutError('Provider preference was not detected', CheckoutErrorType.CONNECT_PROVIDER_ERROR));
     });
-  
+
     it('should throw an error if metamask provider is not found', async () => {
       windowSpy.mockImplementation(() => ({
         removeEventListener: () => {}
       }));
-  
+
       await expect(connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK
       })).rejects.toThrow(new CheckoutError('window.addEventListener is not a function', CheckoutErrorType.METAMASK_PROVIDER_ERROR));
     });
-  
+
     it('should throw an error if provider.request is not found', async () => {
       windowSpy.mockImplementation(() => ({
         ethereum: {
         },
         removeEventListener: () => {}
       }));
-  
+
       await expect(connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK
       })).rejects.toThrow(new CheckoutError('No MetaMask provider installed.', CheckoutErrorType.METAMASK_PROVIDER_ERROR));
     });
-  
+
     it('should throw an error if the user rejects the connection request', async () => {
       windowSpy.mockImplementation(() => ({
         ethereum: {
@@ -75,13 +75,13 @@ describe('connect', () => {
         },
         removeEventListener: () => {}
       }));
-  
+
       await expect(connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK
       })).rejects.toThrow(new CheckoutError('User rejected request', CheckoutErrorType.USER_REJECTED_REQUEST_ERROR));
     })
   })
-  
+
   describe('getNetworkInfo', () => {
 
     const getNetworkTestCases = [

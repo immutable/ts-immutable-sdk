@@ -12,7 +12,7 @@ jest.mock('./network')
 
 describe('CheckoutSDK Connect', () => {
   it('should call the connectWalletProvider function', async () => {
-    
+
     const checkoutSDK = new CheckoutSDK()
 
     await checkoutSDK.connect({
@@ -24,11 +24,11 @@ describe('CheckoutSDK Connect', () => {
   })
 
   it('should call the switchWalletNetwork function', async () => {
-    
+
     const checkoutSDK = new CheckoutSDK()
 
-    await checkoutSDK.switchNetwork({provider: {} as Web3Provider, network: Network.ETHEREUM})
+    await checkoutSDK.switchNetwork({provider: {} as Web3Provider, chainId: Network.ETHEREUM})
 
-    expect(switchWalletNetwork).toBeCalledTimes(1) 
+    expect(switchWalletNetwork).toBeCalledTimes(1)
   })
 })
