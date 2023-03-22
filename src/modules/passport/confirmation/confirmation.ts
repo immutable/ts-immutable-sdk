@@ -78,7 +78,7 @@ export const displayConfirmationScreen = async (params: PostMessageParams): Prom
         return;
       }
       window.removeEventListener("message", onConfirmationWindowReady);
-      return confirmationWindow.postMessage(params);
+      confirmationWindow.postMessage(params);
     };
 
     window.removeEventListener("message", onConfirmationWindowReady);
