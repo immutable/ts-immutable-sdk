@@ -1,4 +1,15 @@
-export { CheckoutSDK } from './CheckoutSDK'
-export { ConnectionProviders } from './connect'
-export type { ConnectParams } from './connect'
-export { Network } from './network'
+export { CheckoutSDK } from './CheckoutSDK';
+export { 
+  ChainId,
+  ConnectionProviders,
+  } from './types';
+export type { 
+  ConnectParams, 
+  ConnectResult,
+  GetBalanceParams,
+  GetBalanceResult,
+  NetworkInfo,
+  SwitchNetworkParams,
+  SwitchNetworkResult,
+  TokenInfo
+} from './types';
