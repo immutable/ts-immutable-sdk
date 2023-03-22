@@ -47,7 +47,7 @@ export const ChainIdNetworkMap = {
   },
   [ChainId.POLYGON]: {
     chainIdHex: '0x89', // 137
-    chainName: 'Polygon Mainnet',
+    chainName: 'Polygon',
     rpcUrls: ["https://polygon-rpc.com"],
     nativeCurrency: {
       name: "MATIC",
@@ -61,4 +61,8 @@ export const ChainIdNetworkMap = {
 export interface SwitchNetworkParams {
   provider: Web3Provider;
   chainId: ChainId;
+}
+
+export interface SwitchNetworkResult {
+  network: NetworkInfo;
 }

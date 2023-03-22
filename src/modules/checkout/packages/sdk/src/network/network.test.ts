@@ -33,7 +33,7 @@ describe("network functions", () => {
       providerPreference: ConnectionProviders.METAMASK
     });
 
-    await switchWalletNetwork(provider, ChainId.ETHEREUM);
+    const switchNetworkResult = await switchWalletNetwork(provider, ChainId.ETHEREUM);
 
     expect(provider.provider.request).toBeCalledWith(
       {
@@ -45,6 +45,47 @@ describe("network functions", () => {
         ]
       }
     );
+    expect(switchNetworkResult).toEqual({
+      network: {
+        name: 'Ethereum',
+        chainID: '0x1',
+        nativeCurrency: {
+          name: 'Ether',
+          symbol: 'ETH',
+          decimals: 18
+        }
+      }
+    });
+  });
+
+  it('should make request for the user to switch network', async () => {
+    const provider = await connectWalletProvider({
+      providerPreference: ConnectionProviders.METAMASK
+    });
+
+    const switchNetworkResult = await switchWalletNetwork(provider, ChainId.POLYGON);
+
+    expect(provider.provider.request).toBeCalledWith(
+      {
+        method: WALLET_ACTION.SWITCH_NETWORK,
+        params: [
+          {
+            chainId: ChainIdNetworkMap[ChainId.POLYGON].chainIdHex
+          }
+        ]
+      }
+    );
+    expect(switchNetworkResult).toEqual({
+      network: {
+        name: 'Polygon',
+        chainID: '0x89',
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC',
+          decimals: 18
+        }
+      }
+    });
   });
 
   it('should throw an error if the network is not in our whitelist', async () => {

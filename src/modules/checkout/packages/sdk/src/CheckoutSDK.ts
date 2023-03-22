@@ -5,7 +5,8 @@ import {
   ConnectResult,
   GetBalanceParams, 
   GetBalanceResult, 
-  SwitchNetworkParams } from "./types";
+  SwitchNetworkParams, 
+  SwitchNetworkResult} from "./types";
 import {switchWalletNetwork} from './network'
 
 export class CheckoutSDK {
@@ -20,8 +21,8 @@ export class CheckoutSDK {
     } as ConnectResult;
   }
 
-  public async switchNetwork(params: SwitchNetworkParams): Promise<void> {
-    await switchWalletNetwork(params.provider, params.chainId);
+  public async switchNetwork(params: SwitchNetworkParams): Promise<SwitchNetworkResult> {
+    return await switchWalletNetwork(params.provider, params.chainId);
   }
 
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
