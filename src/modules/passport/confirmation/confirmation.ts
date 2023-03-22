@@ -7,13 +7,13 @@ const ConfirmationTitle = "Confirm this transaction";
 const PopUpWidth = 350;
 const PopUpHeight = 350;
 
-const ConfirmationReadyMessageType = "ready";
+const ConfirmationReadyMessageType = "imx-passport-confirmation-ready";
 const ConfirmationFinishMessageType = "transaction_confirmed";
 
 type TransactionPayloadType = GetSignableTransferRequest | GetSignableTradeRequest
 type TransactionType = "v1/transfer" | "order"
 
-type PostMessageType = "transaction_start"
+type PostMessageType = "begin_transfer"
 type PassportEventType = "imx-passport";
 
 type PostMessageData = {
@@ -83,8 +83,7 @@ export const displayConfirmationScreen = async (params: DisplayConfirmationParam
       PassportPostMessage(confirmationWindow, { ...params, eventType: "imx-passport" });
     };
 
-    window.removeEventListener("message", onConfirmationWindowReady);
-
+    window.addEventListener("message", onConfirmationWindowReady);
 
     // Handle messages posted from confirmation screen
     window.addEventListener("message", ({ data, origin }: MessageEvent) => {
