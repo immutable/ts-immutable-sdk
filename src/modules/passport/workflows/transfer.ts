@@ -16,7 +16,7 @@ type TrasferRequest = {
   request: UnsignedTransferRequest;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  transferApi: TransfersApi;
+  transfersApi: TransfersApi;
 };
 
 type BatchTransfersParams = {
@@ -26,15 +26,15 @@ type BatchTransfersParams = {
   transfersApi: TransfersApi;
 };
 
-const transfer = ({
+export const transfer = ({
   request,
-  transferApi,
+  transfersApi,
   starkSigner,
   user,
 }: TrasferRequest): Promise<CreateTransferResponseV1> => {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
-    const signableResult = await transferApi.getSignableTransferV1({
+    const signableResult = await transfersApi.getSignableTransferV1({
       getSignableTransferRequest: {
         sender: user.etherKey,
         token: convertToSignableToken(request),
@@ -68,7 +68,7 @@ const transfer = ({
       Authorization: 'Bearer ' + user.accessToken,
     };
 
-    const { data: responseData } = await transferApi.createTransferV1(
+    const { data: responseData } = await transfersApi.createTransferV1(
       createTransferRequest,
       { headers }
     );
@@ -82,7 +82,7 @@ const transfer = ({
   }, PassportErrorType.TRANSFER_ERROR);
 };
 
-export async function batchNFTTransfers({
+export async function batchNftTransfer({
   user,
   starkSigner,
   request,
@@ -148,5 +148,3 @@ export async function batchNFTTransfers({
     transfer_ids: response?.data.transfer_ids,
   };
 }
-
-export default transfer;

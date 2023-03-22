@@ -3,7 +3,7 @@ import {
   TransfersApi,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import transfer, { batchNFTTransfers } from './transfer';
+import { transfer, batchNftTransfer } from './transfer';
 
 describe('transfer', () => {
   const mockUser = {
@@ -102,7 +102,7 @@ describe('transfer', () => {
       });
   
       const result = await transfer({
-        transferApi: transferApiMock,
+        transfersApi: transferApiMock,
         starkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
@@ -124,7 +124,7 @@ describe('transfer', () => {
   
       await expect(() =>
         transfer({
-          transferApi: transferApiMock,
+          transfersApi: transferApiMock,
           starkSigner,
           user: mockUser,
           request: mockTransferRequest as UnsignedTransferRequest,
@@ -133,7 +133,7 @@ describe('transfer', () => {
     });
   });
   
-  describe('batchNFTTransfers', () => {
+  describe('batchNftTransfer', () => {
     let starkSigner: StarkSigner;
     let signMessageMock: jest.Mock;
     let getSignableTransferMock: jest.Mock;
@@ -165,7 +165,6 @@ describe('transfer', () => {
     });
 
     it('should make a successful batch transfer request', async () => {
-
       const mockTransferResponse = {
         data: {
           transfer_ids: ['transfer_id_1'],
@@ -200,7 +199,7 @@ describe('transfer', () => {
       signMessageMock.mockResolvedValue(starkSignature);
       createTransferMock.mockResolvedValue(mockTransferResponse);
 
-      const result = await batchNFTTransfers({
+      const result = await batchNftTransfer({
         user: mockUser,
         starkSigner,
         request: transferRequest,
@@ -259,7 +258,7 @@ describe('transfer', () => {
       getSignableTransferMock.mockRejectedValue(new Error('Server is down'));
   
       await expect(() =>
-        batchNFTTransfers({
+        batchNftTransfer({
           user: mockUser,
           starkSigner,
           request: transferRequest,

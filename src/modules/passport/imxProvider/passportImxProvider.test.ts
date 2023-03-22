@@ -27,6 +27,8 @@ describe('PassportImxProvider', () => {
   let createOrderMock: jest.Mock;
   let getSignableCancelOrderMock: jest.Mock;
   let cancelOrderMock: jest.Mock;
+  let getSignableTransferMock: jest.Mock;
+  let createTransferMock: jest.Mock;
 
   const mockUser = {
     etherKey: '123',
@@ -47,9 +49,13 @@ describe('PassportImxProvider', () => {
 
     getSignableTransferV1Mock = jest.fn();
     createTransferV1Mock = jest.fn();
+    getSignableTransferMock = jest.fn();
+    createTransferMock = jest.fn();
     (TransfersApi as jest.Mock).mockReturnValue({
       getSignableTransferV1: getSignableTransferV1Mock,
       createTransferV1: createTransferV1Mock,
+      getSignableTransfer: getSignableTransferMock,
+      createTransfer: createTransferMock,
     });
 
     getSignableCreateOrderMock = jest.fn();
@@ -344,8 +350,97 @@ describe('PassportImxProvider', () => {
   });
 
   describe('batchNftTransfer', () => {
-    it('should throw error', async () => {
-      expect(passportImxProvider.batchNftTransfer).toThrowError();
+    it('should returns success transfer result', async () => {
+      const transferRequest = [
+        {
+          tokenId: '1',
+          tokenAddress: 'token_address',
+          receiver: 'receiver_eth_address',
+        },
+      ];
+      const mockTransferResponse = {
+        data: {
+          transfer_ids: ['transfer_id_1'],
+        },
+      };
+      const sender_stark_key = "sender_stark_key";
+      const sender_vault_id = "sender_vault_id";
+      const receiver_stark_key = "receiver_stark_key"
+      const receiver_vault_id = "receiver_vault_id"
+      const asset_id = "asset_id"
+      const amount = "amount"
+      const nonce = "nonce"
+      const expiration_timestamp = "expiration_timestamp"
+
+      const mockSignableTransferResponse = {
+        data: {
+          sender_stark_key,
+          signable_responses: [
+            {
+              sender_vault_id,
+              receiver_stark_key,
+              receiver_vault_id,
+              asset_id,
+              amount,
+              nonce,
+              expiration_timestamp,
+            }
+          ]
+        }
+      }
+      getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
+      signMessageMock.mockResolvedValue(starkSignature);
+      createTransferMock.mockResolvedValue(mockTransferResponse);
+  
+      const result = await passportImxProvider.batchNftTransfer(
+        transferRequest
+      );
+      expect(result).toEqual({ transfer_ids: mockTransferResponse.data.transfer_ids });
+      expect(getSignableTransferMock).toHaveBeenCalledWith({
+        getSignableTransferRequestV2: {
+          sender_ether_key: mockUser.etherKey,
+          signable_requests: [
+            {
+              amount: '1',
+              token: {
+                type: 'ERC721',
+                data: {
+                  token_id: transferRequest[0].tokenId,
+                  token_address: transferRequest[0].tokenAddress,
+                }
+              },
+              receiver: transferRequest[0].receiver,
+            },
+          ],
+        },
+      });
+      expect(signMessageMock).toHaveBeenCalled();
+      expect(createTransferMock).toHaveBeenCalledWith(
+        {
+          createTransferRequestV2: {
+            sender_stark_key,
+            requests: [
+              {
+                sender_vault_id,
+                receiver_stark_key,
+                receiver_vault_id,
+                asset_id,
+                amount,
+                nonce,
+                expiration_timestamp,
+                stark_signature: starkSignature
+              },
+            ],
+          },
+          xImxEthAddress: '',
+          xImxEthSignature: '',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${mockUser.accessToken}`,
+          },
+        }
+      );
     });
   });
 
