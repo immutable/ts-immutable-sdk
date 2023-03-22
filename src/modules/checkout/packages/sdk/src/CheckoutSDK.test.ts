@@ -1,7 +1,7 @@
 /*
  * @jest-environment jsdom
  */
-import { connectWalletProvider, ConnectionProviders } from './connect'
+import { connectWalletProvider, getNetworkInfo, ConnectionProviders } from './connect'
 
 import { CheckoutSDK } from './CheckoutSDK'
 import { Network, switchWalletNetwork } from './network'
@@ -19,7 +19,8 @@ describe('CheckoutSDK Connect', () => {
       providerPreference: ConnectionProviders.METAMASK
     })
 
-    expect(connectWalletProvider).toBeCalledTimes(1) 
+    expect(connectWalletProvider).toBeCalledTimes(1);
+    expect(getNetworkInfo).toBeCalledTimes(1);
   })
 
   it('should call the switchWalletNetwork function', async () => {

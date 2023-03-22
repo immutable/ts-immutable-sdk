@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import detectEthereumProvider from "@metamask/detect-provider"
 import { ConnectionProviders, ConnectParams } from "./types"
-import { WALLET_ACTION } from "../types";
+import { NetworkInfo, WALLET_ACTION } from "../types";
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers'
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from "../errors";
+import { ChainId, ChainIdNetworkMap } from "../network";
 
 export async function connectWalletProvider(params: ConnectParams) : Promise<Web3Provider> {
   let web3Provider: Web3Provider | null = null;
@@ -18,6 +19,22 @@ export async function connectWalletProvider(params: ConnectParams) : Promise<Web
   }
 
   return web3Provider
+}
+
+export async function getNetworkInfo(provider:Web3Provider) : Promise<NetworkInfo> {
+  const network = await provider.getNetwork();
+  if(!Object.values(ChainId).includes(network.chainId)){
+    // ask to switch network
+    // or return no details for network info
+    return {} as NetworkInfo;
+  }
+  const chainIdNetworkInfo = ChainIdNetworkMap[network.chainId as ChainId];
+  const networkInfo = {
+    name: chainIdNetworkInfo.chainName,
+    chainID: chainIdNetworkInfo.chainIdHex,
+    nativeCurrency: chainIdNetworkInfo.nativeCurrency
+  }
+  return networkInfo;
 }
 
 async function connectMetaMaskProvider(): Promise<Web3Provider> {

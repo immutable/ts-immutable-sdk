@@ -1,14 +1,19 @@
-import { Web3Provider } from '@ethersproject/providers'
 import { BigNumber } from 'ethers';
 import * as balances from './balances';
 import { GetBalanceParams, GetERC20BalanceParams, GetERC20BalanceResult } from './balances/types';
-import { connectWalletProvider, ConnectParams } from './connect'
+import { connectWalletProvider, ConnectParams, ConnectResult, getNetworkInfo } from './connect'
 import { SwitchNetworkParams, switchWalletNetwork } from './network';
 
 export class CheckoutSDK {
-  public async connect(params: ConnectParams): Promise<Web3Provider> {
+  public async connect(params: ConnectParams): Promise<ConnectResult> {
     const provider = await connectWalletProvider(params);
-    return provider;
+    const network = await getNetworkInfo(provider);
+    
+    const connectResult: ConnectResult = {
+      provider,
+      network
+    };
+    return connectResult;
   }
 
   public async switchNetwork(params: SwitchNetworkParams): Promise<void> {
