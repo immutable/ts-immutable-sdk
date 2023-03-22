@@ -1,13 +1,12 @@
 import {
+  CreateTransferResponse,
   CreateTransferResponseV1,
+  NftTransferDetails,
   StarkSigner,
   TransfersApi,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import {
-  PassportErrorType,
-  withPassportError,
-} from '../errors/passportError';
+import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { convertToSignableToken } from '../../../modules/provider/signable-actions/utils';
 import { UserWithEtherKey } from '../types';
 
@@ -18,6 +17,13 @@ type TrasferRequest = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
   transferApi: TransfersApi;
+};
+
+type BatchTransfersParams = {
+  request: Array<NftTransferDetails>;
+  user: UserWithEtherKey;
+  starkSigner: StarkSigner;
+  transfersApi: TransfersApi;
 };
 
 const transfer = ({
@@ -75,5 +81,72 @@ const transfer = ({
     };
   }, PassportErrorType.TRANSFER_ERROR);
 };
+
+export async function batchNFTTransfers({
+  user,
+  starkSigner,
+  request,
+  transfersApi,
+}: BatchTransfersParams): Promise<CreateTransferResponse> {
+  const ethAddress = user.etherKey;
+
+  const signableRequests = request.map((nftTransfer) => {
+    return {
+      amount: '1',
+      token: convertToSignableToken({
+        type: ERC721,
+        tokenId: nftTransfer.tokenId,
+        tokenAddress: nftTransfer.tokenAddress,
+      }),
+      receiver: nftTransfer.receiver,
+    };
+  });
+
+  const signableResult = await transfersApi.getSignableTransfer({
+    getSignableTransferRequestV2: {
+      sender_ether_key: ethAddress,
+      signable_requests: signableRequests,
+    },
+  });
+
+  const requests = await Promise.all(signableResult.data.signable_responses.map(async (resp) => {
+    const starkSignature = await starkSigner.signMessage(resp.payload_hash);
+    return {
+      sender_vault_id: resp.sender_vault_id,
+      receiver_stark_key: resp.receiver_stark_key,
+      receiver_vault_id: resp.receiver_vault_id,
+      asset_id: resp.asset_id,
+      amount: resp.amount,
+      nonce: resp.nonce,
+      expiration_timestamp: resp.expiration_timestamp,
+      stark_signature: starkSignature,
+    };
+  }));
+
+  const transferSigningParams = {
+    sender_stark_key: signableResult.data.sender_stark_key,
+    requests,
+  };
+
+  const headers = {
+    Authorization: 'Bearer ' + user.accessToken,
+  };
+
+  const response = await transfersApi.createTransfer(
+    {
+      createTransferRequestV2: transferSigningParams,
+      // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
+      // Should be able to remove it once the Backend have update the API
+      // and generated the New Client
+      xImxEthAddress: '',
+      xImxEthSignature: '',
+    },
+    { headers }
+  );
+
+  return {
+    transfer_ids: response?.data.transfer_ids,
+  };
+}
 
 export default transfer;
