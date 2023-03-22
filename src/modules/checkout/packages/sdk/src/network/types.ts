@@ -1,13 +1,6 @@
 import { Web3Provider } from "@ethersproject/providers";
 import { ChainId } from "../types";
 
-export enum Network {
-  ETHEREUM = 'mainnet',
-  GOERLI = 'goerli',
-  POLYGON = 'polygon',
-  // zkEVM = 'zkEVM'
-}
-
 export type NetworkDetails = {
   chainIdHex: string;
   chainName: string;

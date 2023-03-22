@@ -1,11 +1,12 @@
 /*
  * @jest-environment jsdom
  */
-import { connectWalletProvider, getNetworkInfo, ConnectionProviders } from './connect'
+import { ConnectionProviders, connectWalletProvider, getNetworkInfo } from "./connect";
 
-import { CheckoutSDK } from './CheckoutSDK'
-import { Network, switchWalletNetwork } from './network'
-import { Web3Provider } from '@ethersproject/providers'
+import { CheckoutSDK } from "./CheckoutSDK";
+import { switchWalletNetwork } from "./network";
+import { Web3Provider } from "@ethersproject/providers";
+import { ChainId } from "./types";
 
 jest.mock('./connect')
 jest.mock('./network')
@@ -27,7 +28,7 @@ describe('CheckoutSDK Connect', () => {
 
     const checkoutSDK = new CheckoutSDK()
 
-    await checkoutSDK.switchNetwork({provider: {} as Web3Provider, chainId: Network.ETHEREUM})
+    await checkoutSDK.switchNetwork({provider: {} as Web3Provider, chainId: ChainId.ETHEREUM})
 
     expect(switchWalletNetwork).toBeCalledTimes(1)
   })
