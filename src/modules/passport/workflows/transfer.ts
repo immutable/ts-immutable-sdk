@@ -88,63 +88,67 @@ export async function batchNftTransfer({
   request,
   transfersApi,
 }: BatchTransfersParams): Promise<CreateTransferResponse> {
-  const ethAddress = user.etherKey;
+  return withPassportError<CreateTransferResponse>(async () => {
+    const ethAddress = user.etherKey;
 
-  const signableRequests = request.map((nftTransfer) => {
-    return {
-      amount: '1',
-      token: convertToSignableToken({
-        type: ERC721,
-        tokenId: nftTransfer.tokenId,
-        tokenAddress: nftTransfer.tokenAddress,
-      }),
-      receiver: nftTransfer.receiver,
+    const signableRequests = request.map((nftTransfer) => {
+      return {
+        amount: '1',
+        token: convertToSignableToken({
+          type: ERC721,
+          tokenId: nftTransfer.tokenId,
+          tokenAddress: nftTransfer.tokenAddress,
+        }),
+        receiver: nftTransfer.receiver,
+      };
+    });
+
+    const signableResult = await transfersApi.getSignableTransfer({
+      getSignableTransferRequestV2: {
+        sender_ether_key: ethAddress,
+        signable_requests: signableRequests,
+      },
+    });
+
+    const requests = await Promise.all(
+      signableResult.data.signable_responses.map(async (resp) => {
+        const starkSignature = await starkSigner.signMessage(resp.payload_hash);
+        return {
+          sender_vault_id: resp.sender_vault_id,
+          receiver_stark_key: resp.receiver_stark_key,
+          receiver_vault_id: resp.receiver_vault_id,
+          asset_id: resp.asset_id,
+          amount: resp.amount,
+          nonce: resp.nonce,
+          expiration_timestamp: resp.expiration_timestamp,
+          stark_signature: starkSignature,
+        };
+      })
+    );
+
+    const transferSigningParams = {
+      sender_stark_key: signableResult.data.sender_stark_key,
+      requests,
     };
-  });
 
-  const signableResult = await transfersApi.getSignableTransfer({
-    getSignableTransferRequestV2: {
-      sender_ether_key: ethAddress,
-      signable_requests: signableRequests,
-    },
-  });
-
-  const requests = await Promise.all(signableResult.data.signable_responses.map(async (resp) => {
-    const starkSignature = await starkSigner.signMessage(resp.payload_hash);
-    return {
-      sender_vault_id: resp.sender_vault_id,
-      receiver_stark_key: resp.receiver_stark_key,
-      receiver_vault_id: resp.receiver_vault_id,
-      asset_id: resp.asset_id,
-      amount: resp.amount,
-      nonce: resp.nonce,
-      expiration_timestamp: resp.expiration_timestamp,
-      stark_signature: starkSignature,
+    const headers = {
+      Authorization: 'Bearer ' + user.accessToken,
     };
-  }));
 
-  const transferSigningParams = {
-    sender_stark_key: signableResult.data.sender_stark_key,
-    requests,
-  };
+    const response = await transfersApi.createTransfer(
+      {
+        createTransferRequestV2: transferSigningParams,
+        // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
+        // Should be able to remove it once the Backend have update the API
+        // and generated the New Client
+        xImxEthAddress: '',
+        xImxEthSignature: '',
+      },
+      { headers }
+    );
 
-  const headers = {
-    Authorization: 'Bearer ' + user.accessToken,
-  };
-
-  const response = await transfersApi.createTransfer(
-    {
-      createTransferRequestV2: transferSigningParams,
-      // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
-      // Should be able to remove it once the Backend have update the API
-      // and generated the New Client
-      xImxEthAddress: '',
-      xImxEthSignature: '',
-    },
-    { headers }
-  );
-
-  return {
-    transfer_ids: response?.data.transfer_ids,
-  };
+    return {
+      transfer_ids: response?.data.transfer_ids,
+    };
+  }, PassportErrorType.TRANSFER_ERROR);
 }
