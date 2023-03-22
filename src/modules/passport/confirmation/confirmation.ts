@@ -1,6 +1,8 @@
 import { GetSignableTradeRequest, GetSignableTransferRequest } from '@imtbl/core-sdk';
 
-const ConfirmationDomain = "";
+const ConfirmationDomainURL = "http://localhost:3000/transaction-confirmation"
+const ConfirmationDomain = "http://localhost:3000"
+
 const ConfirmationTitle = "Confirm this transaction";
 const PopUpWidth = 350;
 const PopUpHeight = 350;
@@ -64,7 +66,7 @@ type ConfirmationResult = {
 export const displayConfirmationScreen = async (params: DisplayConfirmationParams): Promise<ConfirmationResult> => {
   return new Promise((resolve) => {
     const confirmationWindow = openPopupCenter({
-      url: ConfirmationDomain,
+      url: ConfirmationDomainURL,
       title: ConfirmationTitle,
       width: PopUpWidth,
       height: PopUpHeight
