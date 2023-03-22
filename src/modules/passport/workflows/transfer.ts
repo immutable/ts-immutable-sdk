@@ -2,7 +2,7 @@ import { CreateTransferResponseV1, StarkSigner, TransfersApi, UnsignedTransferRe
 import { PassportErrorType, withPassportError, } from '../errors/passportError';
 import { convertToSignableToken } from '../../../modules/provider/signable-actions/utils';
 import { UserWithEtherKey } from '../types';
-import { ConfirmationType, displayConfirmationScreen } from '../confirmation/confirmation';
+import { displayConfirmationScreen } from '../confirmation/confirmation';
 
 const ERC721 = 'ERC721';
 
@@ -33,13 +33,16 @@ const transfer = ({
 
 
     const result = await displayConfirmationScreen({
-      type: ConfirmationType.TransferV1, data: {
-        sender_ether_key: user.etherKey,
-        signable_requests: [{
-          amount: transferAmount,
-          token: convertToSignableToken(request),
-          receiver: request.receiver
-        }]
+      messageType: "transaction_start", messageData: {
+        transactionType: "v1/transfer",
+        transactionData: {
+          sender_ether_key: user.etherKey,
+          signable_requests: [{
+            amount: transferAmount,
+            token: convertToSignableToken(request),
+            receiver: request.receiver
+          }]
+        }
       }
     });
 

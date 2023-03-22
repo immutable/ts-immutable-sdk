@@ -5,20 +5,33 @@ const ConfirmationTitle = "Confirm this transaction";
 const PopUpWidth = 350;
 const PopUpHeight = 350;
 
-type ConfirmationPayloadType = GetSignableTransferRequest | GetSignableTradeRequest
+type TransactionPayloadType = GetSignableTransferRequest | GetSignableTradeRequest
 
-export enum ConfirmationType {
-  TransferV1 = "v1/transfer",
-  Order = "order",
-}
+type  TransactionType = "v1/transfer" | "order"
+
 
 type DisplayConfirmationParams = {
-  type: ConfirmationType;
-  data: ConfirmationPayloadType;
+  type: TransactionType;
+  data: TransactionPayloadType;
 }
 
+type PostMessageType = "transaction_start"
+type ReceivedMessageType = "ready" | "transaction_confirmed"
+
+
+type PostMessageData = {
+  transactionType: TransactionType;
+  transactionData: TransactionPayloadType;
+}
+type PostMessageParams = {
+  messageType: PostMessageType;
+  messageData: PostMessageData;
+}
+
+
 type PopUpProps = { url: string; title: string; width: number; height: number; query?: string }
-const openPopupCenter = ({ url, title, query, width, height }: PopUpProps) => {
+
+const openPopupCenter = ({ url, title, width, height }: PopUpProps): Window | null => {
   // Fixes dual-screen position                             Most browsers      Firefox
   const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
   const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
@@ -29,7 +42,7 @@ const openPopupCenter = ({ url, title, query, width, height }: PopUpProps) => {
   const systemZoom = windowWidth / window.screen.availWidth;
   const left = (windowWidth - width) / 2 / systemZoom + dualScreenLeft;
   const top = (windowHeight - height) / 2 / systemZoom + dualScreenTop;
-  const newWindow = window.open(`${url}?${query}`, title,
+  const newWindow = window.open(url, title,
     `
       scrollbars=yes,
       width=${width / systemZoom}, 
@@ -41,33 +54,43 @@ const openPopupCenter = ({ url, title, query, width, height }: PopUpProps) => {
   if (newWindow) {
     newWindow.focus();
   }
+  return newWindow;
 };
 
-const jsonToBase64 = (data: object): string => {
-  return btoa(JSON.stringify(data));
-};
 
 type ConfirmationResult = {
   confirmed: boolean;
 }
-export const displayConfirmationScreen = async (params: DisplayConfirmationParams): Promise<ConfirmationResult> => {
+export const displayConfirmationScreen = async (params: PostMessageParams): Promise<ConfirmationResult> => {
   return new Promise((resolve) => {
-    const encodedQueryData = jsonToBase64(params);
-    openPopupCenter({
+    const confirmationWindow = openPopupCenter({
       url: ConfirmationDomain,
-      query: encodedQueryData,
       title: ConfirmationTitle,
       width: PopUpWidth,
       height: PopUpHeight
     });
 
+    const onConfirmationWindowReady = ({ data, origin }: MessageEvent) => {
+      if (origin != ConfirmationDomain && data != "ready") {
+        return;
+      }
+      if (!confirmationWindow) {
+        return;
+      }
+      window.removeEventListener("message", onConfirmationWindowReady);
+      return confirmationWindow.postMessage(params);
+    };
+
+    window.removeEventListener("message", onConfirmationWindowReady);
+
+
     // Handle messages posted from confirmation screen
-    window.addEventListener("message", ({ data, origin }) => {
+    window.addEventListener("message", ({ data, origin }: MessageEvent) => {
       if (origin != ConfirmationDomain) {
         return;
       }
       const { type, success } = data;
-      if (!Object.values(ConfirmationType).includes(type)) return;
+      if (type != "transaction_confirmed") return;
       console.log('parent received msg: ', data);
       if (success) {
         resolve({ confirmed: true });
