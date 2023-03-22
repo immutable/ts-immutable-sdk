@@ -1,12 +1,12 @@
 /*
  * @jest-environment jsdom
  */
-import { ConnectionProviders, connectWalletProvider, getNetworkInfo } from "./connect";
+import { connectWalletProvider, getNetworkInfo } from "./connect";
 
 import { CheckoutSDK } from "./CheckoutSDK";
 import { switchWalletNetwork } from "./network";
 import { Web3Provider } from "@ethersproject/providers";
-import { ChainId } from "./types";
+import { ChainId, ConnectionProviders } from "./types";
 
 jest.mock('./connect')
 jest.mock('./network')

@@ -1,7 +1,7 @@
 import { Web3Provider } from "@ethersproject/providers"
 import { CheckoutError, CheckoutErrorType } from "../errors";
 import { ChainId, WALLET_ACTION } from "../types";
-import { ChainIdNetworkMap } from "./types"
+import { ChainIdNetworkMap } from "../types"
 
 export async function switchWalletNetwork(provider: Web3Provider, chainId: ChainId) {
   if(!Object.values(ChainId).includes(chainId)) throw new CheckoutError(`${chainId} is not a supported chain`, CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR);

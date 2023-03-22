@@ -5,8 +5,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { switchWalletNetwork } from "./network";
 import { ChainId, WALLET_ACTION } from "../types";
-import { ConnectionProviders, connectWalletProvider } from "../connect";
-import { ChainIdNetworkMap } from "./types";
+import { connectWalletProvider } from "../connect";
+import { ChainIdNetworkMap, ConnectionProviders } from "../types";
 import { CheckoutError, CheckoutErrorType } from "../errors";
 
 let windowSpy: any;

@@ -1,23 +1,17 @@
 import { Web3Provider } from "@ethersproject/providers";
 import { BigNumber } from "ethers";
+import { TokenInfo } from "./token";
 
 export interface GetBalanceParams {
     provider: Web3Provider;
     walletAddress: string;
+    contractAddress?: string;
 }
 
-export interface GetERC20BalanceParams {
-    provider: Web3Provider;
-    contractAddress: string;
-    walletAddress: string;
-}
-
-export interface GetERC20BalanceResult {
-    name: string;
-    symbol: string;
-    balance: BigNumber;
-    decimals: number;
-    formattedBalance: string;
+export interface GetBalanceResult {
+  balance: BigNumber;
+  formattedBalance: string;
+  token: TokenInfo;
 }
 
 export const ERC20ABI = [

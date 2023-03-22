@@ -5,10 +5,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
 import { connectWalletProvider, getNetworkInfo } from './connect';
-import { ConnectionProviders } from './types';
+import { ConnectionProviders } from '../types';
 import { ChainId, WALLET_ACTION } from "../types";
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { ChainIdNetworkMap } from "../network";
+import { ChainIdNetworkMap } from "../types";
 
 let windowSpy:any;
 
