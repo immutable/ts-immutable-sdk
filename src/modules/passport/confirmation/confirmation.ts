@@ -5,29 +5,29 @@ const ConfirmationTitle = "Confirm this transaction";
 const PopUpWidth = 350;
 const PopUpHeight = 350;
 
+const ConfirmationReadyMessageType = "ready";
+const ConfirmationFinishMessageType = "transaction_confirmed";
+
 type TransactionPayloadType = GetSignableTransferRequest | GetSignableTradeRequest
-
-type  TransactionType = "v1/transfer" | "order"
-
-
-type DisplayConfirmationParams = {
-  type: TransactionType;
-  data: TransactionPayloadType;
-}
+type TransactionType = "v1/transfer" | "order"
 
 type PostMessageType = "transaction_start"
-type ReceivedMessageType = "ready" | "transaction_confirmed"
-
+type PassportEventType = "imx-passport";
 
 type PostMessageData = {
   transactionType: TransactionType;
   transactionData: TransactionPayloadType;
 }
-type PostMessageParams = {
+
+
+type DisplayConfirmationParams = {
   messageType: PostMessageType;
   messageData: PostMessageData;
 }
 
+type PostMessageParams = DisplayConfirmationParams & {
+  eventType: PassportEventType;
+}
 
 type PopUpProps = { url: string; title: string; width: number; height: number; query?: string }
 
@@ -61,7 +61,7 @@ const openPopupCenter = ({ url, title, width, height }: PopUpProps): Window | nu
 type ConfirmationResult = {
   confirmed: boolean;
 }
-export const displayConfirmationScreen = async (params: PostMessageParams): Promise<ConfirmationResult> => {
+export const displayConfirmationScreen = async (params: DisplayConfirmationParams): Promise<ConfirmationResult> => {
   return new Promise((resolve) => {
     const confirmationWindow = openPopupCenter({
       url: ConfirmationDomain,
@@ -71,14 +71,14 @@ export const displayConfirmationScreen = async (params: PostMessageParams): Prom
     });
 
     const onConfirmationWindowReady = ({ data, origin }: MessageEvent) => {
-      if (origin != ConfirmationDomain && data != "ready") {
+      if (origin != ConfirmationDomain || data.eventType != "imx-passport" || data.messageType != ConfirmationReadyMessageType) {
         return;
       }
       if (!confirmationWindow) {
         return;
       }
       window.removeEventListener("message", onConfirmationWindowReady);
-      confirmationWindow.postMessage(params);
+      PassportPostMessage(confirmationWindow, { ...params, eventType: "imx-passport" });
     };
 
     window.removeEventListener("message", onConfirmationWindowReady);
@@ -86,16 +86,19 @@ export const displayConfirmationScreen = async (params: PostMessageParams): Prom
 
     // Handle messages posted from confirmation screen
     window.addEventListener("message", ({ data, origin }: MessageEvent) => {
-      if (origin != ConfirmationDomain) {
+      if (origin != ConfirmationDomain || data.messageType != ConfirmationFinishMessageType) {
         return;
       }
-      const { type, success } = data;
-      if (type != "transaction_confirmed") return;
+      const { messageData } = data;
       console.log('parent received msg: ', data);
-      if (success) {
+      if (messageData.success) {
         resolve({ confirmed: true });
       }
       resolve({ confirmed: false });
     });
   });
+};
+
+const PassportPostMessage = (window: Window, message: PostMessageParams) => {
+  window.postMessage(message, "*");
 };
