@@ -33,7 +33,8 @@ const transfer = ({
 
 
     const result = await displayConfirmationScreen({
-      messageType: "transaction_start", messageData: {
+      messageType: "transaction_start",
+      messageData: {
         transactionType: "v1/transfer",
         transactionData: {
           sender_ether_key: user.etherKey,
@@ -43,7 +44,8 @@ const transfer = ({
             receiver: request.receiver
           }]
         }
-      }
+      },
+      accessToken: user.accessToken,
     });
 
     if (!result.confirmed) {
