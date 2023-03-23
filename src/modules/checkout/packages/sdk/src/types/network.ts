@@ -10,7 +10,7 @@ export enum ChainId {
 
 export interface NetworkInfo {
   name: string;
-  chainID: string;
+  chainId: number;
   nativeCurrency: TokenInfo;
 }
 

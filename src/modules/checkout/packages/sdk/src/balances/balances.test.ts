@@ -1,7 +1,7 @@
-import { getBalance } from './balances';
+import { getBalance, getERC20Balance } from './balances';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
-import { ERC20ABI } from '../types';
+import { ERC20ABI, NetworkInfo } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 
 jest.mock('ethers', () => {
@@ -19,7 +19,22 @@ describe('balances', () => {
     .mockResolvedValue(currentBalance);
     const mockGetNetwork = jest
     .fn()
-    .mockResolvedValue({chainID: '0x1', name: 'homestead'});
+    .mockResolvedValue({chainId: 1, name: 'homestead'});
+
+  jest.mock('../connect', () => {
+    return {
+      getNetworkInfo: jest.fn().mockResolvedValue({
+        chainId: 1,
+        name: 'Ethereum',
+        nativeCurrency: {
+          name: 'Ether',
+          symbol: 'ETH',
+          decimals: 18
+        }
+      } as NetworkInfo)
+    }
+  });
+  
   const mockProvider = jest.fn().mockImplementation(() => {
     return {
       getBalance: mockGetBalance,
@@ -49,7 +64,7 @@ describe('balances', () => {
     });
   });
 
-  describe('getBalance() with contract address', () => {
+  describe('getERC20Balance()', () => {
     let balanceOfMock: jest.Mock;
     let decimalsMock: jest.Mock;
     let nameMock: jest.Mock;
@@ -72,7 +87,7 @@ describe('balances', () => {
 
     it('should call balanceOf on the appropriate contract and return the balance', async () => {
       const testContractAddress = '0x10c';
-      const balanceResult = await getBalance(
+      const balanceResult = await getERC20Balance(
         mockProvider(),
           'abc123',
           testContractAddress
@@ -103,7 +118,7 @@ describe('balances', () => {
         symbol: symbolMock,
       });
 
-      await expect(getBalance(
+      await expect(getERC20Balance(
         mockProvider(),
         'abc123',
         '0x10c'
@@ -118,7 +133,7 @@ describe('balances', () => {
         }
       );
 
-      await expect(getBalance(
+      await expect(getERC20Balance(
         mockProvider(),
         'abc123',
         '0x10c'

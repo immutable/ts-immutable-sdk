@@ -7,20 +7,23 @@ import { getNetworkInfo } from '../connect';
 export const getBalance = async (
   provider: Web3Provider,
   walletAddress: string,
-  contractAddress?: string
 ): Promise<GetBalanceResult> => {
-  if(!contractAddress || contractAddress === "") {
     return await withCheckoutError<GetBalanceResult>(async () => {
       const networkInfo = await getNetworkInfo(provider);
       const balance = await provider.getBalance(walletAddress);
       return {
         balance,
-        formattedBalance: utils.formatUnits(balance, 18),
+        formattedBalance: utils.formatUnits(balance, networkInfo.nativeCurrency.decimals),
         token: networkInfo.nativeCurrency
       }
     }, { type: CheckoutErrorType.GET_BALANCE_ERROR });
-  }
+};
 
+export async function getERC20Balance(
+  provider: Web3Provider,
+  walletAddress: string,
+  contractAddress: string
+) {
   return await withCheckoutError<GetBalanceResult>(async () => {
     const contract = new Contract(
       contractAddress,
@@ -43,4 +46,4 @@ export const getBalance = async (
       }
     } as GetBalanceResult;
   }, { type: CheckoutErrorType.GET_ERC20_BALANCE_ERROR });
-};
+}

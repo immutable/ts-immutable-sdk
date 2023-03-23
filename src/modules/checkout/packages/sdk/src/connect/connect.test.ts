@@ -109,7 +109,7 @@ describe('connect', () => {
         }
         const result = await getNetworkInfo(mockProvider as unknown as Web3Provider);
         expect(result.name).toBe(ChainIdNetworkMap[testCase.chainId].chainName);
-        expect(result.chainID).toBe(ChainIdNetworkMap[testCase.chainId].chainIdHex);
+        expect(result.chainId).toBe(parseInt(ChainIdNetworkMap[testCase.chainId].chainIdHex, 16));
         expect(result.nativeCurrency).toEqual(ChainIdNetworkMap[testCase.chainId].nativeCurrency)
       });
     })

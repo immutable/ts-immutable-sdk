@@ -10,7 +10,6 @@ import {
 } from "../types"
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers'
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from "../errors";
-import {  } from "../types";
 
 export async function connectWalletProvider(params: ConnectParams) : Promise<Web3Provider> {
   let web3Provider: Web3Provider | null = null;
@@ -29,14 +28,15 @@ export async function connectWalletProvider(params: ConnectParams) : Promise<Web
 
 export async function getNetworkInfo(provider:Web3Provider) : Promise<NetworkInfo> {
   const network = await provider.getNetwork();
-  if(!Object.values(ChainId).includes(network.chainId)){
+
+  if(!Object.values(ChainId).includes(network.chainId as ChainId)){
     // return empty details
     return {} as NetworkInfo;
   }
   const chainIdNetworkInfo = ChainIdNetworkMap[network.chainId as ChainId];
   const networkInfo = {
     name: chainIdNetworkInfo.chainName,
-    chainID: chainIdNetworkInfo.chainIdHex,
+    chainId: parseInt(chainIdNetworkInfo.chainIdHex, 16),
     nativeCurrency: chainIdNetworkInfo.nativeCurrency
   }
   return networkInfo;

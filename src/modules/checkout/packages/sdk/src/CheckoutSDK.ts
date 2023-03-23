@@ -26,6 +26,9 @@ export class CheckoutSDK {
   }
 
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
-    return await balances.getBalance(params.provider, params.walletAddress, params.contractAddress);
+    if(!params.contractAddress || params.contractAddress === ""){
+      return await balances.getBalance(params.provider, params.walletAddress);
+    }
+    return await balances.getERC20Balance(params.provider, params.walletAddress, params.contractAddress);
   }
 }
