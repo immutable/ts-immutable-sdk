@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import displayConfirmationScreen from './confirmation';
 import SpyInstance = jest.SpyInstance;
 
@@ -25,6 +28,7 @@ describe('confirmation', () => {
   });
 
   describe('displayConfirmationScreen', () => {
+
     it('should handle popup window closed', async () => {
       const messageData = {
         transactionType: "v1/transfer",
@@ -42,6 +46,7 @@ describe('confirmation', () => {
         accessToken: "ehyyy",
         passportDomain: "test.com"
       });
+
       expect(res.confirmed).toEqual(false)
       expect(mockedOpen).toHaveBeenCalledTimes(1);
     });
