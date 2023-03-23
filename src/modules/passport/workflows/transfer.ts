@@ -29,11 +29,11 @@ type BatchTransfersParams = {
 };
 
 export const transfer = ({
-                           request,
-                           transfersApi,
-                           starkSigner,
-                           user
-                         }: TransferRequest, option: WorkflowOption): Promise<CreateTransferResponseV1> => {
+ request,
+ transfersApi,
+ starkSigner,
+ user,
+}: TransferRequest, option: WorkflowOption): Promise<CreateTransferResponseV1> => {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
     const signableResult = await transfersApi.getSignableTransferV1({
@@ -106,11 +106,11 @@ export const transfer = ({
 };
 
 export async function batchNftTransfer({
-                                         user,
-                                         starkSigner,
-                                         request,
-                                         transfersApi,
-                                       }: BatchTransfersParams): Promise<CreateTransferResponse> {
+ user,
+ starkSigner,
+ request,
+ transfersApi,
+}: BatchTransfersParams): Promise<CreateTransferResponse> {
   return withPassportError<CreateTransferResponse>(async () => {
     const ethAddress = user.etherKey;
 
