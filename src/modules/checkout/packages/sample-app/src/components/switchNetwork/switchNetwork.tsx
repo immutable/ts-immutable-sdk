@@ -1,4 +1,4 @@
-import { CheckoutSDK, Network } from '@imtbl/checkout-sdk-web'
+import { CheckoutSDK, ChainId } from '@imtbl/checkout-sdk-web'
 import {Web3Provider} from '@ethersproject/providers'
 
 export interface SwitchNetworkProps {
@@ -10,8 +10,8 @@ function SwitchNetwork(props: SwitchNetworkProps) {
   const {provider} = props;
 
 
-  async function switchNetwork(network: Network) {
-    if(provider) await checkout.switchNetwork({provider, network});
+  async function switchNetwork(chainId: ChainId) {
+    if(provider) await checkout.switchNetwork({provider, chainId});
   }
  
   return (
@@ -20,15 +20,15 @@ function SwitchNetwork(props: SwitchNetworkProps) {
       <div className="divider"></div>
       <div>
         <button 
-          onClick={() => switchNetwork(Network.ETHEREUM)}>
+          onClick={() => switchNetwork(ChainId.ETHEREUM)}>
           Switch Network to Ethereum
         </button>
         <button 
-          onClick={() => switchNetwork(Network.GOERLI)}>
+          onClick={() => switchNetwork(ChainId.GOERLI)}>
           Switch Network to Goerli
         </button>
         <button 
-          onClick={() => switchNetwork(Network.POLYGON)}>
+          onClick={() => switchNetwork(ChainId.POLYGON)}>
           Switch Network to Polygon
         </button>
         </div>

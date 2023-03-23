@@ -29,7 +29,7 @@ export async function switchWalletNetwork(provider: Web3Provider, chainId: Chain
     return {
       network: {
         name: newNetwork.chainName,
-        chainID: newNetwork.chainIdHex,
+        chainId: parseInt(newNetwork.chainIdHex, 16),
         nativeCurrency: newNetwork.nativeCurrency
       }
     } as SwitchNetworkResult;
