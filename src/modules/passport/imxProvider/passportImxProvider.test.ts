@@ -2,6 +2,7 @@ import PassportImxProvider from './passportImxProvider';
 import {
   ERC721Token,
   ETHAmount,
+  ExchangesApi,
   OrdersApi,
   TransfersApi,
   UnsignedTransferRequest,
@@ -13,6 +14,7 @@ jest.mock('@imtbl/core-sdk', () => {
     ...original,
     TransfersApi: jest.fn(),
     OrdersApi: jest.fn(),
+    ExchangesApi: jest.fn(),
   };
 });
 
@@ -20,7 +22,7 @@ describe('PassportImxProvider', () => {
   afterEach(jest.resetAllMocks);
 
   let passportImxProvider: PassportImxProvider;
-  let signMessageMock: jest.Mock;
+  // let signMessageMock: jest.Mock;
   let getSignableTransferV1Mock: jest.Mock;
   let createTransferV1Mock: jest.Mock;
   let getSignableCreateOrderMock: jest.Mock;
@@ -29,7 +31,8 @@ describe('PassportImxProvider', () => {
   let cancelOrderMock: jest.Mock;
   let getSignableTransferMock: jest.Mock;
   let createTransferMock: jest.Mock;
-
+  let getExchangeSignableTransferMock: jest.Mock;
+  let createExchangeTransferMock: jest.Mock;
   const mockUser = {
     etherKey: '123',
     accessToken:
@@ -39,14 +42,12 @@ describe('PassportImxProvider', () => {
     },
   };
 
+  const mockStarkSigner = {
+    signMessage: jest.fn(),
+    getAddress: jest.fn(),
+  };
+
   beforeEach(() => {
-    signMessageMock = jest.fn();
-
-    const starkSigner = {
-      signMessage: signMessageMock,
-      getAddress: jest.fn(),
-    };
-
     getSignableTransferV1Mock = jest.fn();
     createTransferV1Mock = jest.fn();
     getSignableTransferMock = jest.fn();
@@ -69,9 +70,16 @@ describe('PassportImxProvider', () => {
       cancelOrder: cancelOrderMock,
     });
 
+    getExchangeSignableTransferMock = jest.fn();
+    createExchangeTransferMock = jest.fn();
+    (ExchangesApi as jest.Mock).mockReturnValue({
+      getExchangeSignableTransfer: getExchangeSignableTransferMock,
+      createExchangeTransfer: createExchangeTransferMock,
+    });
+
     passportImxProvider = new PassportImxProvider({
       user: mockUser,
-      starkSigner,
+      starkSigner: mockStarkSigner,
       apiConfig: { basePath: 'http://test.com' },
     });
   });
@@ -139,7 +147,7 @@ describe('PassportImxProvider', () => {
       getSignableTransferV1Mock.mockResolvedValue(
         mockSignableTransferV1Response
       );
-      signMessageMock.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
       createTransferV1Mock.mockResolvedValue({
         data: mockReturnValue,
       });
@@ -151,7 +159,7 @@ describe('PassportImxProvider', () => {
       expect(getSignableTransferV1Mock).toBeCalledWith(
         mockSignableTransferRequest
       );
-      expect(signMessageMock).toBeCalledWith(mockPayloadHash);
+      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(createTransferV1Mock).toBeCalledWith(
         mockCreateTransferRequest,
         mockHeader
@@ -260,7 +268,7 @@ describe('PassportImxProvider', () => {
       };
 
       getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
-      signMessageMock.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
       createOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
@@ -270,7 +278,7 @@ describe('PassportImxProvider', () => {
       expect(getSignableCreateOrderMock).toBeCalledWith(
         mockSignableOrderRequest
       );
-      expect(signMessageMock).toBeCalledWith(mockPayloadHash);
+      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(createOrderMock).toBeCalledWith(
         mockCreateOrderRequest,
         mockHeader
@@ -324,7 +332,7 @@ describe('PassportImxProvider', () => {
       getSignableCancelOrderMock.mockResolvedValue(
         mockSignableCancelOrderResponse
       );
-      signMessageMock.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
       cancelOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
@@ -334,7 +342,7 @@ describe('PassportImxProvider', () => {
       expect(getSignableCancelOrderMock).toBeCalledWith(
         mockSignableCancelOrderRequest
       );
-      expect(signMessageMock).toBeCalledWith(mockPayloadHash);
+      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(cancelOrderMock).toBeCalledWith(
         mockCancelOrderRequest,
         mockHeader
@@ -363,14 +371,14 @@ describe('PassportImxProvider', () => {
           transfer_ids: ['transfer_id_1'],
         },
       };
-      const sender_stark_key = "sender_stark_key";
-      const sender_vault_id = "sender_vault_id";
-      const receiver_stark_key = "receiver_stark_key"
-      const receiver_vault_id = "receiver_vault_id"
-      const asset_id = "asset_id"
-      const amount = "amount"
-      const nonce = "nonce"
-      const expiration_timestamp = "expiration_timestamp"
+      const sender_stark_key = 'sender_stark_key';
+      const sender_vault_id = 'sender_vault_id';
+      const receiver_stark_key = 'receiver_stark_key';
+      const receiver_vault_id = 'receiver_vault_id';
+      const asset_id = 'asset_id';
+      const amount = 'amount';
+      const nonce = 'nonce';
+      const expiration_timestamp = 'expiration_timestamp';
 
       const mockSignableTransferResponse = {
         data: {
@@ -384,18 +392,20 @@ describe('PassportImxProvider', () => {
               amount,
               nonce,
               expiration_timestamp,
-            }
-          ]
-        }
-      }
+            },
+          ],
+        },
+      };
       getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
-      signMessageMock.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
       createTransferMock.mockResolvedValue(mockTransferResponse);
-  
+
       const result = await passportImxProvider.batchNftTransfer(
         transferRequest
       );
-      expect(result).toEqual({ transfer_ids: mockTransferResponse.data.transfer_ids });
+      expect(result).toEqual({
+        transfer_ids: mockTransferResponse.data.transfer_ids,
+      });
       expect(getSignableTransferMock).toHaveBeenCalledWith({
         getSignableTransferRequestV2: {
           sender_ether_key: mockUser.etherKey,
@@ -407,14 +417,14 @@ describe('PassportImxProvider', () => {
                 data: {
                   token_id: transferRequest[0].tokenId,
                   token_address: transferRequest[0].tokenAddress,
-                }
+                },
               },
               receiver: transferRequest[0].receiver,
             },
           ],
         },
       });
-      expect(signMessageMock).toHaveBeenCalled();
+      expect(mockStarkSigner.signMessage).toHaveBeenCalled();
       expect(createTransferMock).toHaveBeenCalledWith(
         {
           createTransferRequestV2: {
@@ -428,7 +438,7 @@ describe('PassportImxProvider', () => {
                 amount,
                 nonce,
                 expiration_timestamp,
-                stark_signature: starkSignature
+                stark_signature: starkSignature,
               },
             ],
           },
@@ -445,8 +455,72 @@ describe('PassportImxProvider', () => {
   });
 
   describe('exchangeTransfer', () => {
-    it('should throw error', async () => {
-      expect(passportImxProvider.exchangeTransfer).toThrowError();
+    it('should returns success exchange transfer result', async () => {
+      const ethAmount: ETHAmount = {
+        type: 'ETH',
+        amount: '100',
+      };
+
+      const exchangeTransferRequest = {
+        ...ethAmount,
+        receiver: '0x456...',
+        transactionID: 'abc123',
+      };
+      const mockGetExchangeSignableTransferResponse = {
+        data: {
+          payload_hash: 'hash123',
+          sender_stark_key: 'senderKey',
+          sender_vault_id: 'senderVault',
+          receiver_stark_key: 'receiverKey',
+          receiver_vault_id: 'receiverVault',
+          asset_id: 'assetID',
+          amount: 100,
+          nonce: 'nonce123',
+          expiration_timestamp: 123456789,
+        },
+      };
+
+      const mockCreateExchangeTransferResponse = {
+        data: {
+          sent_signature: 'signature123',
+          status: 'SUCCESS',
+          time: '2022-01-01T00:00:00Z',
+          transfer_id: 'transfer123',
+        },
+      };
+
+      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
+      getExchangeSignableTransferMock.mockResolvedValue(
+        mockGetExchangeSignableTransferResponse
+      );
+      createExchangeTransferMock.mockResolvedValue(
+        mockCreateExchangeTransferResponse
+      );
+
+      const response = await passportImxProvider.exchangeTransfer(
+        exchangeTransferRequest
+      );
+
+      expect(getExchangeSignableTransferMock).toHaveBeenCalledWith({
+        getSignableTransferRequest: {
+          amount: ethAmount.amount,
+          receiver: exchangeTransferRequest.receiver,
+          sender: mockUser.etherKey,
+          token: {
+            data: {
+              decimals: 18,
+            },
+            type: ethAmount.type,
+          },
+        },
+        id: exchangeTransferRequest.transactionID,
+      });
+      expect(response).toEqual({
+        sent_signature: mockCreateExchangeTransferResponse.data.sent_signature,
+        status: mockCreateExchangeTransferResponse.data.status,
+        time: mockCreateExchangeTransferResponse.data.time,
+        transfer_id: mockCreateExchangeTransferResponse.data.transfer_id,
+      });
     });
   });
 
@@ -465,6 +539,14 @@ describe('PassportImxProvider', () => {
   describe('completeWithdrawal', () => {
     it('should throw error', async () => {
       expect(passportImxProvider.completeWithdrawal).toThrowError();
+    });
+  });
+
+  describe('getAddress', () => {
+    it('should return stark signer address', async () => {
+      mockStarkSigner.getAddress.mockResolvedValue('0x1234...');
+      const response = await passportImxProvider.getAddress();
+      expect(response).toEqual('0x1234...');
     });
   });
 });
