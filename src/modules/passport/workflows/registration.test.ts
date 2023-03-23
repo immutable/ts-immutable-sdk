@@ -40,7 +40,7 @@ describe('registerPassportWorkflow', () => {
     expect(mockStarkSigner.signMessage).toHaveBeenCalled();
     expect(mockEthSigner.signMessage).toHaveBeenCalled();
     expect(mockUserApi.registerPassportUser).toHaveBeenCalledWith({
-      authorization: mockToken,
+      authorization: `Bearer ` + mockToken,
       registerPassportUserRequest: {
         ...requestBody,
         eth_signature: "0x0000000000000000000000000000000000000000000000000000000000000123000000000000000000000000000000000000000000000000000000000000000000"
@@ -77,7 +77,7 @@ describe('registerPassportWorkflow', () => {
     expect(mockStarkSigner.signMessage).toHaveBeenCalled();
     expect(mockEthSigner.signMessage).toHaveBeenCalled();
     expect(mockUserApi.registerPassportUser).toHaveBeenCalledWith({
-      authorization: mockToken,
+      authorization: `Bearer ` + mockToken,
       registerPassportUserRequest: {
         ...requestBody,
         eth_signature: "0x0000000000000000000000000000000000000000000000000000000000000123000000000000000000000000000000000000000000000000000000000000000000"

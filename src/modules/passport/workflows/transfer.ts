@@ -1,5 +1,12 @@
-import { CreateTransferResponseV1, StarkSigner, TransfersApi, UnsignedTransferRequest, } from '@imtbl/core-sdk';
-import { PassportErrorType, withPassportError, } from '../errors/passportError';
+import {
+  CreateTransferResponse,
+  CreateTransferResponseV1,
+  NftTransferDetails,
+  StarkSigner,
+  TransfersApi,
+  UnsignedTransferRequest,
+} from '@imtbl/core-sdk';
+import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { convertToSignableToken } from '../../../modules/provider/signable-actions/utils';
 import { UserWithEtherKey } from '../types';
 import { displayConfirmationScreen } from '../confirmation/confirmation';
@@ -7,31 +14,36 @@ import { WorkflowOption } from './types';
 
 const ERC721 = 'ERC721';
 
-type TrasferRequest = {
+type TransferRequest = {
   request: UnsignedTransferRequest;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  transferApi: TransfersApi;
+  transfersApi: TransfersApi;
 };
 
-const transfer = ({
-                    request,
-                    transferApi,
-                    starkSigner,
-                    user,
-                  }: TrasferRequest, option: WorkflowOption): Promise<CreateTransferResponseV1> => {
+type BatchTransfersParams = {
+  request: Array<NftTransferDetails>;
+  user: UserWithEtherKey;
+  starkSigner: StarkSigner;
+  transfersApi: TransfersApi;
+};
+
+export const transfer = ({
+  request,
+  transfersApi,
+  starkSigner,
+  user,
+}: TransferRequest, option: WorkflowOption): Promise<CreateTransferResponseV1> => {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
-    const signableTransferRequest = {
-      sender: user.etherKey,
-      token: convertToSignableToken(request),
-      amount: transferAmount,
-      receiver: request.receiver,
-    };
-    const signableResult = await transferApi.getSignableTransferV1({
-      getSignableTransferRequest: signableTransferRequest,
+    const signableResult = await transfersApi.getSignableTransferV1({
+      getSignableTransferRequest: {
+        sender: user.etherKey,
+        token: convertToSignableToken(request),
+        amount: transferAmount,
+        receiver: request.receiver,
+      },
     });
-
 
     const result = await displayConfirmationScreen({
       messageType: "transaction_start",
@@ -79,7 +91,7 @@ const transfer = ({
       Authorization: 'Bearer ' + user.accessToken,
     };
 
-    const { data: responseData } = await transferApi.createTransferV1(
+    const { data: responseData } = await transfersApi.createTransferV1(
       createTransferRequest,
       { headers }
     );
@@ -93,4 +105,73 @@ const transfer = ({
   }, PassportErrorType.TRANSFER_ERROR);
 };
 
-export default transfer;
+export async function batchNftTransfer({
+  user,
+  starkSigner,
+  request,
+  transfersApi,
+}: BatchTransfersParams): Promise<CreateTransferResponse> {
+  return withPassportError<CreateTransferResponse>(async () => {
+    const ethAddress = user.etherKey;
+
+    const signableRequests = request.map((nftTransfer) => {
+      return {
+        amount: '1',
+        token: convertToSignableToken({
+          type: ERC721,
+          tokenId: nftTransfer.tokenId,
+          tokenAddress: nftTransfer.tokenAddress,
+        }),
+        receiver: nftTransfer.receiver,
+      };
+    });
+
+    const signableResult = await transfersApi.getSignableTransfer({
+      getSignableTransferRequestV2: {
+        sender_ether_key: ethAddress,
+        signable_requests: signableRequests,
+      },
+    });
+
+    const requests = await Promise.all(
+      signableResult.data.signable_responses.map(async (resp) => {
+        const starkSignature = await starkSigner.signMessage(resp.payload_hash);
+        return {
+          sender_vault_id: resp.sender_vault_id,
+          receiver_stark_key: resp.receiver_stark_key,
+          receiver_vault_id: resp.receiver_vault_id,
+          asset_id: resp.asset_id,
+          amount: resp.amount,
+          nonce: resp.nonce,
+          expiration_timestamp: resp.expiration_timestamp,
+          stark_signature: starkSignature,
+        };
+      })
+    );
+
+    const transferSigningParams = {
+      sender_stark_key: signableResult.data.sender_stark_key,
+      requests,
+    };
+
+    const headers = {
+      Authorization: 'Bearer ' + user.accessToken,
+    };
+
+    const response = await transfersApi.createTransfer(
+      {
+        createTransferRequestV2: transferSigningParams,
+        // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
+        // Should be able to remove it once the Backend have update the API
+        // and generated the New Client
+        xImxEthAddress: '',
+        xImxEthSignature: '',
+      },
+      { headers }
+    );
+
+    return {
+      transfer_ids: response?.data.transfer_ids,
+    };
+  }, PassportErrorType.TRANSFER_ERROR);
+}

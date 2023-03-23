@@ -11,6 +11,7 @@ import {
   GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
   NftTransferDetails,
+  OrdersApi,
   RegisterUserResponse,
   StarkSigner,
   TokenAmount,
@@ -21,8 +22,9 @@ import {
 } from '@imtbl/core-sdk';
 import { UserWithEtherKey } from '../types';
 import { IMXProvider } from '../../provider/imxProvider';
+import { batchNftTransfer, transfer } from '../workflows/transfer';
+import { cancelOrder, createOrder } from '../workflows/order';
 import { PassportConfiguration } from '../config';
-import transfer from '../workflows/transfer';
 
 export type PassportImxProviderInput = {
   user: UserWithEtherKey;
@@ -34,18 +36,16 @@ export default class PassportImxProvider implements IMXProvider {
   private user: UserWithEtherKey;
   private starkSigner: StarkSigner;
   private transfersApi: TransfersApi;
-  private passportConfig: PassportConfiguration;
+  private ordersApi: OrdersApi;
+  private readonly passportConfig: PassportConfiguration;
 
-  constructor({
-                user,
-                starkSigner,
-                passportConfig,
-              }: PassportImxProviderInput) {
+  constructor({ user, starkSigner, passportConfig }: PassportImxProviderInput) {
     this.user = user;
     this.starkSigner = starkSigner;
     this.passportConfig = passportConfig;
     const apiConfig = new Configuration({ basePath: passportConfig.imxAPIConfiguration.basePath });
     this.transfersApi = new TransfersApi(apiConfig);
+    this.ordersApi = new OrdersApi(apiConfig);
   }
 
   async transfer(
@@ -55,7 +55,7 @@ export default class PassportImxProvider implements IMXProvider {
       request,
       user: this.user,
       starkSigner: this.starkSigner,
-      transferApi: this.transfersApi,
+      transfersApi: this.transfersApi
     }, { passportDomain: this.passportConfig.passportDomain });
   }
 
@@ -67,16 +67,24 @@ export default class PassportImxProvider implements IMXProvider {
     throw new Error('Method not implemented.');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse> {
-    throw new Error('Method not implemented.');
+    return createOrder({
+      request,
+      user: this.user,
+      starkSigner: this.starkSigner,
+      ordersApi: this.ordersApi,
+    });
   }
 
   cancelOrder(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     request: GetSignableCancelOrderRequest
   ): Promise<CancelOrderResponse> {
-    throw new Error('Method not implemented.');
+    return cancelOrder({
+      request,
+      user: this.user,
+      starkSigner: this.starkSigner,
+      ordersApi: this.ordersApi,
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -85,10 +93,14 @@ export default class PassportImxProvider implements IMXProvider {
   }
 
   batchNftTransfer(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     request: NftTransferDetails[]
   ): Promise<CreateTransferResponse> {
-    throw new Error('Method not implemented.');
+    return batchNftTransfer({
+      request,
+      user: this.user,
+      starkSigner: this.starkSigner,
+      transfersApi: this.transfersApi,
+    });
   }
 
   exchangeTransfer(
@@ -107,6 +119,7 @@ export default class PassportImxProvider implements IMXProvider {
   prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
     throw new Error('Method not implemented.');
   }
+
 
   completeWithdrawal(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
