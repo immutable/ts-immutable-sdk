@@ -23,7 +23,6 @@ describe('PassportImxProvider', () => {
   afterEach(jest.resetAllMocks);
 
   let passportImxProvider: PassportImxProvider;
-  // let signMessageMock: jest.Mock;
   let getSignableTransferV1Mock: jest.Mock;
   let createTransferV1Mock: jest.Mock;
   let getSignableCreateOrderMock: jest.Mock;

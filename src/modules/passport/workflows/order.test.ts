@@ -11,12 +11,15 @@ describe('order', () => {
   afterEach(jest.resetAllMocks);
   const starkSignature = 'starkSignature';
 
+  const mockStarkSigner = {
+    signMessage: jest.fn(),
+    getAddress: jest.fn(),
+  };
+
   describe('createOrder', () => {
-    let signMessageMock: jest.Mock;
     let getSignableCreateOrderMock: jest.Mock;
     let createOrderMock: jest.Mock;
     let ordersApiMock: OrdersApi;
-    let starkSigner: StarkSigner;
 
     const buy = { type: 'ETH', amount: '2' } as ETHAmount;
     const sell = { type: 'ERC721', tokenId: '123', tokenAddress: '0x9999' };
@@ -28,13 +31,6 @@ describe('order', () => {
     };
 
     beforeEach(() => {
-      signMessageMock = jest.fn();
-
-      starkSigner = {
-        signMessage: signMessageMock,
-        getAddress: jest.fn(),
-      };
-
       getSignableCreateOrderMock = jest.fn();
       createOrderMock = jest.fn();
       ordersApiMock = {
@@ -107,14 +103,14 @@ describe('order', () => {
       };
 
       getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
-      signMessageMock.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
       createOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
 
       const result = await createOrder({
         ordersApi: ordersApiMock,
-        starkSigner,
+        starkSigner: mockStarkSigner,
         user: mockUser,
         request: orderRequest as UnsignedOrderRequest,
       });
@@ -122,7 +118,7 @@ describe('order', () => {
       expect(getSignableCreateOrderMock).toBeCalledWith(
         mockSignableOrderRequest
       );
-      expect(signMessageMock).toBeCalledWith(mockPayloadHash);
+      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(createOrderMock).toBeCalledWith(
         mockCreateOrderRequest,
         mockHeader
@@ -136,7 +132,7 @@ describe('order', () => {
       await expect(() =>
         createOrder({
           ordersApi: ordersApiMock,
-          starkSigner,
+          starkSigner: mockStarkSigner,
           user: mockUser,
           request: orderRequest as UnsignedOrderRequest,
         })
@@ -145,24 +141,15 @@ describe('order', () => {
   });
 
   describe('cancelOrder', () => {
-    let signMessageMock: jest.Mock;
     let getSignableCancelOrderMock: jest.Mock;
     let cancelOrderMock: jest.Mock;
     let ordersApiMock: OrdersApi;
-    let starkSigner: StarkSigner;
     const orderId = 54321;
     const cancelOrderRequest = {
       order_id: orderId,
     };
 
     beforeEach(() => {
-      signMessageMock = jest.fn();
-
-      starkSigner = {
-        signMessage: signMessageMock,
-        getAddress: jest.fn(),
-      };
-
       getSignableCancelOrderMock = jest.fn();
       cancelOrderMock = jest.fn();
       ordersApiMock = {
@@ -210,14 +197,14 @@ describe('order', () => {
       getSignableCancelOrderMock.mockResolvedValue(
         mockSignableCancelOrderResponse
       );
-      signMessageMock.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
       cancelOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
 
       const result = await cancelOrder({
         ordersApi: ordersApiMock,
-        starkSigner,
+        starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
       });
@@ -225,7 +212,7 @@ describe('order', () => {
       expect(getSignableCancelOrderMock).toBeCalledWith(
         mockSignableCancelOrderRequest
       );
-      expect(signMessageMock).toBeCalledWith(mockPayloadHash);
+      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(cancelOrderMock).toBeCalledWith(
         mockCancelOrderRequest,
         mockHeader
@@ -239,7 +226,7 @@ describe('order', () => {
       await expect(() =>
         cancelOrder({
           ordersApi: ordersApiMock,
-          starkSigner,
+          starkSigner: mockStarkSigner,
           user: mockUser,
           request: cancelOrderRequest,
         })

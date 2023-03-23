@@ -6,7 +6,7 @@ import { mockUser } from '../test/mocks';
 describe('exchangeTransfer', () => {
   const getExchangeSignableTransferMock = jest.fn();
   const createExchangeTransferMock = jest.fn();
-  const mockStarkAddres = '0x1111...';
+  const mockStarkAddress = '0x1111...';
   let exchangesApiMock: ExchangesApi;
 
   const mockStarkSigner = {
@@ -56,7 +56,7 @@ describe('exchangeTransfer', () => {
       },
     };
 
-    mockStarkSigner.getAddress.mockResolvedValue(mockStarkAddres);
+    mockStarkSigner.getAddress.mockResolvedValue(mockStarkAddress);
     getExchangeSignableTransferMock.mockResolvedValue(
       mockGetExchangeSignableTransferResponse
     );

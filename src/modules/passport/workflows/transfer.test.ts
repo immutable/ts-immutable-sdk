@@ -1,5 +1,4 @@
 import {
-  StarkSigner,
   TransfersApi,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
@@ -9,12 +8,15 @@ import { transfer, batchNftTransfer } from './transfer';
 describe('transfer', () => {
   const starkSignature = 'starkSignature';
 
+  const mockStarkSigner = {
+    signMessage: jest.fn(),
+    getAddress: jest.fn(),
+  };
+
   describe('single transfer', () => {
-    let signMessageMock: jest.Mock;
     let getSignableTransferV1Mock: jest.Mock;
     let createTransferV1Mock: jest.Mock;
     let transferApiMock: TransfersApi;
-    let starkSigner: StarkSigner;
 
     const mockReceiver = 'AAA';
     const type = 'ERC721';
@@ -28,13 +30,6 @@ describe('transfer', () => {
     };
   
     beforeEach(() => {
-      signMessageMock = jest.fn();
-  
-      starkSigner = {
-        signMessage: signMessageMock,
-        getAddress: jest.fn(),
-      };
-  
       getSignableTransferV1Mock = jest.fn();
       createTransferV1Mock = jest.fn();
       transferApiMock = {
@@ -89,14 +84,14 @@ describe('transfer', () => {
       };
   
       getSignableTransferV1Mock.mockResolvedValue(mockSignableTransferV1Response);
-      signMessageMock.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
       createTransferV1Mock.mockResolvedValue({
         data: mockReturnValue,
       });
   
       const result = await transfer({
         transfersApi: transferApiMock,
-        starkSigner,
+        starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
       });
@@ -104,7 +99,7 @@ describe('transfer', () => {
       expect(getSignableTransferV1Mock).toBeCalledWith(
         mockSignableTransferRequest
       );
-      expect(signMessageMock).toBeCalledWith(mockPayloadHash);
+      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(createTransferV1Mock).toBeCalledWith(
         mockCreateTransferRequest,
         mockHeader
@@ -118,7 +113,7 @@ describe('transfer', () => {
       await expect(() =>
         transfer({
           transfersApi: transferApiMock,
-          starkSigner,
+          starkSigner: mockStarkSigner,
           user: mockUser,
           request: mockTransferRequest as UnsignedTransferRequest,
         })
@@ -127,8 +122,6 @@ describe('transfer', () => {
   });
   
   describe('batchNftTransfer', () => {
-    let starkSigner: StarkSigner;
-    let signMessageMock: jest.Mock;
     let getSignableTransferMock: jest.Mock;
     let createTransferMock: jest.Mock;
     let transferApiMock: TransfersApi;
@@ -142,13 +135,6 @@ describe('transfer', () => {
     ];
 
     beforeEach(() => {
-      signMessageMock = jest.fn();
-  
-      starkSigner = {
-        signMessage: signMessageMock,
-        getAddress: jest.fn(),
-      };
-
       getSignableTransferMock = jest.fn();
       createTransferMock = jest.fn();
       transferApiMock = {
@@ -189,12 +175,12 @@ describe('transfer', () => {
         }
       }
       getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
-      signMessageMock.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
       createTransferMock.mockResolvedValue(mockTransferResponse);
 
       const result = await batchNftTransfer({
         user: mockUser,
-        starkSigner,
+        starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
       });
@@ -218,7 +204,7 @@ describe('transfer', () => {
           ],
         },
       });
-      expect(signMessageMock).toHaveBeenCalled();
+      expect(mockStarkSigner.signMessage).toHaveBeenCalled();
       expect(createTransferMock).toHaveBeenCalledWith(
         {
           createTransferRequestV2: {
@@ -253,7 +239,7 @@ describe('transfer', () => {
       await expect(() =>
         batchNftTransfer({
           user: mockUser,
-          starkSigner,
+          starkSigner: mockStarkSigner,
           request: transferRequest,
           transfersApi: transferApiMock,
         })
