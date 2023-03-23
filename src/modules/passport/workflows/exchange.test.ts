@@ -1,6 +1,7 @@
 import { CreateTransferResponseV1, ETHAmount } from '@imtbl/core-sdk';
 import { exchangeTransfer } from './exchange';
 import { ExchangesApi } from '@imtbl/core-sdk';
+import { mockUser } from '../test/mocks';
 
 describe('exchangeTransfer', () => {
   const getExchangeSignableTransferMock = jest.fn();
@@ -8,14 +9,6 @@ describe('exchangeTransfer', () => {
   const mockStarkAddres = '0x1111...';
   let exchangesApiMock: ExchangesApi;
 
-  const mockUser = {
-    etherKey: '0x123...',
-    accessToken:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2V4YW1wbGUuYXV0aDAuY29tLyIsImF1ZCI6Imh0dHBzOi8vYXBpLmV4YW1wbGUuY29tL2NhbGFuZGFyL3YxLyIsInN1YiI6InVzcl8xMjMiLCJpYXQiOjE0NTg3ODU3OTYsImV4cCI6MTQ1ODg3MjE5Nn0.CA7eaHjIHz5NxeIJoFK9krqaeZrPLwmMmgI_XiQiIkQ',
-    profile: {
-      sub: '111',
-    },
-  };
   const mockStarkSigner = {
     getAddress: jest.fn(),
     signMessage: jest.fn(),
