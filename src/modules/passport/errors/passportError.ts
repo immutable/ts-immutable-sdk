@@ -8,12 +8,12 @@ export enum PassportErrorType {
   TRANSFER_ERROR = 'TRANSFER_ERROR',
   CREATE_ORDER_ERROR = 'CREATE_ORDER_ERROR',
   CANCEL_ORDER_ERROR = 'CANCEL_ORDER_ERROR',
+  EXCHANGE_TRANSFER_ERROR = 'EXCHANGE_TRANSFER_ERROR',
   CREATE_TRADE_ERROR = 'CREATE_TRADE_ERROR'
 }
 
 export class PassportError extends Error {
   public type: PassportErrorType;
-
   constructor(message: string, type: PassportErrorType) {
     super(message);
     this.type = type;
