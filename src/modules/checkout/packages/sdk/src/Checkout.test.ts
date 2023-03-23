@@ -3,7 +3,7 @@
  */
 import { connectWalletProvider, getNetworkInfo } from './connect';
 
-import { CheckoutSDK } from './CheckoutSDK';
+import { Checkout } from './Checkout';
 import { switchWalletNetwork } from './network';
 import { Web3Provider } from '@ethersproject/providers';
 import { ChainId, ConnectionProviders, GetBalanceParams } from './types';
@@ -13,14 +13,14 @@ jest.mock('./connect');
 jest.mock('./network');
 jest.mock('./balances');
 
-describe('CheckoutSDK Connect', () => {
+describe(' Connect', () => {
   beforeEach(() => {
     jest.resetAllMocks();
   });
   it('should call the connectWalletProvider function', async () => {
-    const checkoutSDK = new CheckoutSDK();
+    const checkout = new Checkout();
 
-    await checkoutSDK.connect({
+    await checkout.connect({
       providerPreference: ConnectionProviders.METAMASK,
     });
 
@@ -29,8 +29,8 @@ describe('CheckoutSDK Connect', () => {
   });
 
   it('should call getBalance when no contract address provided', async () => {
-    const checkoutSDK = new CheckoutSDK();
-    await checkoutSDK.getBalance({
+    const checkout = new Checkout();
+    await checkout.getBalance({
       provider: {} as unknown as Web3Provider,
       walletAddress: '0x123',
     } as GetBalanceParams);
@@ -40,8 +40,8 @@ describe('CheckoutSDK Connect', () => {
   });
 
   it('should call getERC20Balance when a contract address is provided', async () => {
-    const checkoutSDK = new CheckoutSDK();
-    await checkoutSDK.getBalance({
+    const checkout = new Checkout();
+    await checkout.getBalance({
       provider: {} as unknown as Web3Provider,
       walletAddress: '0x123',
       contractAddress: '0x456',
@@ -56,9 +56,9 @@ describe('CheckoutSDK Connect', () => {
   });
 
   it('should call the switchWalletNetwork function', async () => {
-    const checkoutSDK = new CheckoutSDK();
+    const checkout = new Checkout();
 
-    await checkoutSDK.switchNetwork({
+    await checkout.switchNetwork({
       provider: {} as Web3Provider,
       chainId: ChainId.ETHEREUM,
     });
