@@ -7,6 +7,7 @@ describe('exchangeTransfer', () => {
   const createExchangeTransferMock = jest.fn();
   const mockStarkAddres = '0x1111...';
   let exchangesApiMock: ExchangesApi;
+
   const mockUser = {
     etherKey: '0x123...',
     accessToken:
@@ -30,29 +31,6 @@ describe('exchangeTransfer', () => {
     receiver: '0x456...',
     transactionID: 'abc123',
   };
-  
-  const mockGetExchangeSignableTransferResponse = {
-    data: {
-      payload_hash: 'hash123',
-      sender_stark_key: 'senderKey',
-      sender_vault_id: 'senderVault',
-      receiver_stark_key: 'receiverKey',
-      receiver_vault_id: 'receiverVault',
-      asset_id: 'assetID',
-      amount: 100,
-      nonce: 'nonce123',
-      expiration_timestamp: 123456789,
-    },
-  };
-  
-  const mockCreateExchangeTransferResponse = {
-    data: {
-      sent_signature: 'signature123',
-      status: 'SUCCESS',
-      time: '2022-01-01T00:00:00Z',
-      transfer_id: 'transfer123',
-    },
-  };
 
   beforeEach(() => {
     exchangesApiMock = {
@@ -62,6 +40,29 @@ describe('exchangeTransfer', () => {
   });
 
   it('should returns success exchange transfer result', async () => {
+    const mockGetExchangeSignableTransferResponse = {
+      data: {
+        payload_hash: 'hash123',
+        sender_stark_key: 'senderKey',
+        sender_vault_id: 'senderVault',
+        receiver_stark_key: 'receiverKey',
+        receiver_vault_id: 'receiverVault',
+        asset_id: 'assetID',
+        amount: 100,
+        nonce: 'nonce123',
+        expiration_timestamp: 123456789,
+      },
+    };
+    
+    const mockCreateExchangeTransferResponse = {
+      data: {
+        sent_signature: 'signature123',
+        status: 'SUCCESS',
+        time: '2022-01-01T00:00:00Z',
+        transfer_id: 'transfer123',
+      },
+    };
+
     mockStarkSigner.getAddress.mockResolvedValue(mockStarkAddres);
     getExchangeSignableTransferMock.mockResolvedValue(
       mockGetExchangeSignableTransferResponse
