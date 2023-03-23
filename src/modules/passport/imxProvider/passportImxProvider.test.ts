@@ -6,6 +6,7 @@ import {
   TransfersApi,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
+import displayConfirmationScreen from '../confirmation/confirmation';
 
 jest.mock('@imtbl/core-sdk', () => {
   const original = jest.requireActual('@imtbl/core-sdk');
@@ -15,6 +16,7 @@ jest.mock('@imtbl/core-sdk', () => {
     OrdersApi: jest.fn(),
   };
 });
+jest.mock('../confirmation/confirmation');
 
 describe('PassportImxProvider', () => {
   afterEach(jest.resetAllMocks);
@@ -135,6 +137,10 @@ describe('PassportImxProvider', () => {
         time: 111,
         transfer_id: 123,
       };
+
+      (displayConfirmationScreen as jest.Mock).mockResolvedValue({
+        confirmed: true,
+      });
 
       getSignableTransferV1Mock.mockResolvedValue(
         mockSignableTransferV1Response

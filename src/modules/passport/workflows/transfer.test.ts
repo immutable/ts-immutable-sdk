@@ -1,9 +1,9 @@
-import {
-  StarkSigner,
-  TransfersApi,
-  UnsignedTransferRequest,
-} from '@imtbl/core-sdk';
-import { transfer, batchNftTransfer } from './transfer';
+import { StarkSigner, TransfersApi, UnsignedTransferRequest, } from '@imtbl/core-sdk';
+import { batchNftTransfer, transfer } from './transfer';
+import displayConfirmationScreen from '../confirmation/confirmation';
+
+
+jest.mock('../confirmation/confirmation');
 
 describe('transfer', () => {
   const mockUser = {
@@ -33,15 +33,15 @@ describe('transfer', () => {
       tokenAddress,
       receiver: mockReceiver,
     };
-  
+
     beforeEach(() => {
       signMessageMock = jest.fn();
-  
+
       starkSigner = {
         signMessage: signMessageMock,
         getAddress: jest.fn(),
       };
-  
+
       getSignableTransferV1Mock = jest.fn();
       createTransferV1Mock = jest.fn();
       transferApiMock = {
@@ -49,7 +49,7 @@ describe('transfer', () => {
         createTransferV1: createTransferV1Mock,
       } as unknown as TransfersApi;
     });
-  
+
     it('should returns success transfer result', async () => {
       const mockSignableTransferRequest = {
         getSignableTransferRequest: {
@@ -94,20 +94,23 @@ describe('transfer', () => {
         time: 111,
         transfer_id: 123,
       };
-  
+
+      (displayConfirmationScreen as jest.Mock).mockResolvedValue({
+        confirmed: true,
+      });
       getSignableTransferV1Mock.mockResolvedValue(mockSignableTransferV1Response);
       signMessageMock.mockResolvedValue(starkSignature);
       createTransferV1Mock.mockResolvedValue({
         data: mockReturnValue,
       });
-  
+
       const result = await transfer({
         transfersApi: transferApiMock,
         starkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-      }, {passportDomain: "test.com"});
-  
+      }, { passportDomain: "test.com" });
+
       expect(getSignableTransferV1Mock).toBeCalledWith(
         mockSignableTransferRequest
       );
@@ -118,21 +121,51 @@ describe('transfer', () => {
       );
       expect(result).toEqual(mockReturnValue);
     });
-  
+
     it('should return error if failed to call public api', async () => {
       getSignableTransferV1Mock.mockRejectedValue(new Error('Server is down'));
-  
+
       await expect(() =>
         transfer({
           transfersApi: transferApiMock,
           starkSigner,
           user: mockUser,
           request: mockTransferRequest as UnsignedTransferRequest,
-        }, {passportDomain: "test.com"})
+        }, { passportDomain: "test.com" })
       ).rejects.toThrowError('Server is down');
     });
+
+    it('should return error if transfer is rejected by user', async () => {
+      const mockSignableTransferV1Response = {
+        data: {
+          payload_hash: '123123',
+          sender_stark_key: 'starkKey',
+          sender_vault_id: '111',
+          receiver_stark_key: 'starkKey2',
+          receiver_vault_id: '222',
+          asset_id: tokenId,
+          amount: '1',
+          nonce: '5321',
+          expiration_timestamp: '1234',
+        },
+      };
+
+      getSignableTransferV1Mock.mockResolvedValue(mockSignableTransferV1Response);
+      (displayConfirmationScreen as jest.Mock).mockRejectedValue({
+        confirmed: true,
+      });
+
+      await expect(() =>
+        transfer({
+          transfersApi: transferApiMock,
+          starkSigner,
+          user: mockUser,
+          request: mockTransferRequest as UnsignedTransferRequest,
+        }, { passportDomain: "test.com" })
+      ).rejects.toThrowError('TRANSFER_ERROR');
+    });
   });
-  
+
   describe('batchNftTransfer', () => {
     let starkSigner: StarkSigner;
     let signMessageMock: jest.Mock;
@@ -150,7 +183,7 @@ describe('transfer', () => {
 
     beforeEach(() => {
       signMessageMock = jest.fn();
-  
+
       starkSigner = {
         signMessage: signMessageMock,
         getAddress: jest.fn(),
@@ -205,7 +238,7 @@ describe('transfer', () => {
         request: transferRequest,
         transfersApi: transferApiMock,
       });
-  
+
       expect(result).toEqual({ transfer_ids: mockTransferResponse.data.transfer_ids });
       expect(getSignableTransferMock).toHaveBeenCalledWith({
         getSignableTransferRequestV2: {
@@ -256,7 +289,7 @@ describe('transfer', () => {
 
     it('should return error if failed to call public api', async () => {
       getSignableTransferMock.mockRejectedValue(new Error('Server is down'));
-  
+
       await expect(() =>
         batchNftTransfer({
           user: mockUser,

@@ -9,7 +9,7 @@ import {
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { convertToSignableToken } from '../../../modules/provider/signable-actions/utils';
 import { UserWithEtherKey } from '../types';
-import { displayConfirmationScreen } from '../confirmation/confirmation';
+import displayConfirmationScreen from '../confirmation/confirmation';
 import { WorkflowOption } from './types';
 
 const ERC721 = 'ERC721';
@@ -29,11 +29,10 @@ type BatchTransfersParams = {
 };
 
 export const transfer = ({
-  request,
-  transfersApi,
-  starkSigner,
-  user,
-}: TransferRequest, option: WorkflowOption): Promise<CreateTransferResponseV1> => {
+ request,
+ transfersApi,
+ starkSigner,
+ user }: TransferRequest, option: WorkflowOption): Promise<CreateTransferResponseV1> => {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
     const signableResult = await transfersApi.getSignableTransferV1({
@@ -45,7 +44,7 @@ export const transfer = ({
       },
     });
 
-    const result = await displayConfirmationScreen({
+    await displayConfirmationScreen({
       messageType: "transaction_start",
       messageData: {
         transactionType: "v1/transfer",
@@ -61,10 +60,6 @@ export const transfer = ({
       passportDomain: option.passportDomain,
       accessToken: user.accessToken,
     });
-
-    if (!result.confirmed) {
-      throw new Error("Transaction rejected by user");
-    }
 
     const signableResultData = signableResult.data;
     const { payload_hash: payloadHash } = signableResultData;

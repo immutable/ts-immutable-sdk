@@ -8,8 +8,8 @@ import {
 import { ConfirmationTitle, passportConfirmationType, PopUpHeight, PopUpWidth } from './config';
 import { openPopupCenter } from './popup';
 
-export const displayConfirmationScreen = async (params: DisplayConfirmationParams): Promise<ConfirmationResult> => {
-  return new Promise((resolve) => {
+export default async function displayConfirmationScreen(params: DisplayConfirmationParams): Promise<ConfirmationResult> {
+  return new Promise((resolve, reject) => {
     const confirmationWindow = openPopupCenter({
       url: params.passportDomain,
       title: ConfirmationTitle,
@@ -21,7 +21,8 @@ export const displayConfirmationScreen = async (params: DisplayConfirmationParam
     const timer = setInterval(function () {
       if (confirmationWindow?.closed) {
         clearInterval(timer);
-        resolve({ confirmed: false });
+        window.removeEventListener("message", messageHandler);
+        resolve({confirmed: false});
       }
     }, 1000);
 
@@ -42,7 +43,7 @@ export const displayConfirmationScreen = async (params: DisplayConfirmationParam
           break;
         }
         case 'transaction_error': {
-          resolve({ confirmed: false });
+          reject(new Error("Transaction rejected"));
           break;
         }
         default:
@@ -51,7 +52,7 @@ export const displayConfirmationScreen = async (params: DisplayConfirmationParam
     };
     window.addEventListener("message", messageHandler);
   });
-};
+}
 
 const PassportPostMessage = (window: Window, message: PostMessageParams) => {
   window.postMessage(message, "*");
