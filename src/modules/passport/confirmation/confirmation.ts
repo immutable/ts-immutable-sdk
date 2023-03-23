@@ -57,5 +57,3 @@ export default async function displayConfirmationScreen(params: DisplayConfirmat
 const PassportPostMessage = (window: Window, message: PostMessageParams) => {
   window.postMessage(message, "*");
 };
-
-
