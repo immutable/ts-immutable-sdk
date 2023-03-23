@@ -1,29 +1,20 @@
-import {
-  ETHAmount,
-  OrdersApi,
-  StarkSigner,
-  UnsignedOrderRequest,
-} from '@imtbl/core-sdk';
+import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
+import { PassportError, PassportErrorType } from '../errors/passportError';
+import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { cancelOrder, createOrder } from './order';
 
 describe('order', () => {
   afterEach(jest.resetAllMocks);
-  const mockUser = {
-    etherKey: '123',
-    accessToken:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2V4YW1wbGUuYXV0aDAuY29tLyIsImF1ZCI6Imh0dHBzOi8vYXBpLmV4YW1wbGUuY29tL2NhbGFuZGFyL3YxLyIsInN1YiI6InVzcl8xMjMiLCJpYXQiOjE0NTg3ODU3OTYsImV4cCI6MTQ1ODg3MjE5Nn0.CA7eaHjIHz5NxeIJoFK9krqaeZrPLwmMmgI_XiQiIkQ',
-    profile: {
-      sub: '111',
-    },
+
+  const mockStarkSigner = {
+    signMessage: jest.fn(),
+    getAddress: jest.fn(),
   };
-  const starkSignature = 'starkSignature';
 
   describe('createOrder', () => {
-    let signMessageMock: jest.Mock;
     let getSignableCreateOrderMock: jest.Mock;
     let createOrderMock: jest.Mock;
     let ordersApiMock: OrdersApi;
-    let starkSigner: StarkSigner;
 
     const buy = { type: 'ETH', amount: '2' } as ETHAmount;
     const sell = { type: 'ERC721', tokenId: '123', tokenAddress: '0x9999' };
@@ -35,13 +26,6 @@ describe('order', () => {
     };
 
     beforeEach(() => {
-      signMessageMock = jest.fn();
-
-      starkSigner = {
-        signMessage: signMessageMock,
-        getAddress: jest.fn(),
-      };
-
       getSignableCreateOrderMock = jest.fn();
       createOrderMock = jest.fn();
       ordersApiMock = {
@@ -95,7 +79,7 @@ describe('order', () => {
       const mockCreateOrderRequest = {
         createOrderRequest: {
           ...restSignableOrderResponse,
-          stark_signature: starkSignature,
+          stark_signature: mockStarkSignature,
           fees: undefined,
           include_fees: true,
         },
@@ -114,14 +98,14 @@ describe('order', () => {
       };
 
       getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
-      signMessageMock.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
 
       const result = await createOrder({
         ordersApi: ordersApiMock,
-        starkSigner,
+        starkSigner: mockStarkSigner,
         user: mockUser,
         request: orderRequest as UnsignedOrderRequest,
       });
@@ -129,7 +113,7 @@ describe('order', () => {
       expect(getSignableCreateOrderMock).toBeCalledWith(
         mockSignableOrderRequest
       );
-      expect(signMessageMock).toBeCalledWith(mockPayloadHash);
+      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(createOrderMock).toBeCalledWith(
         mockCreateOrderRequest,
         mockHeader
@@ -138,38 +122,34 @@ describe('order', () => {
     });
 
     it('should return error if failed to call public api', async () => {
-      getSignableCreateOrderMock.mockRejectedValue(new Error('Server is down'));
+      getSignableCreateOrderMock.mockRejectedValue(new Error(mockErrorMessage));
 
       await expect(() =>
         createOrder({
           ordersApi: ordersApiMock,
-          starkSigner,
+          starkSigner: mockStarkSigner,
           user: mockUser,
           request: orderRequest as UnsignedOrderRequest,
         })
-      ).rejects.toThrowError('Server is down');
+      ).rejects.toThrow(
+        new PassportError(
+          `${PassportErrorType.CREATE_ORDER_ERROR}: ${mockErrorMessage}`,
+          PassportErrorType.CREATE_ORDER_ERROR
+        )
+      );
     });
   });
 
   describe('cancelOrder', () => {
-    let signMessageMock: jest.Mock;
     let getSignableCancelOrderMock: jest.Mock;
     let cancelOrderMock: jest.Mock;
     let ordersApiMock: OrdersApi;
-    let starkSigner: StarkSigner;
     const orderId = 54321;
     const cancelOrderRequest = {
       order_id: orderId,
     };
 
     beforeEach(() => {
-      signMessageMock = jest.fn();
-
-      starkSigner = {
-        signMessage: signMessageMock,
-        getAddress: jest.fn(),
-      };
-
       getSignableCancelOrderMock = jest.fn();
       cancelOrderMock = jest.fn();
       ordersApiMock = {
@@ -197,7 +177,7 @@ describe('order', () => {
         id: orderId.toString(),
         cancelOrderRequest: {
           order_id: orderId,
-          stark_signature: starkSignature,
+          stark_signature: mockStarkSignature,
         },
         xImxEthAddress: '',
         xImxEthSignature: '',
@@ -217,14 +197,14 @@ describe('order', () => {
       getSignableCancelOrderMock.mockResolvedValue(
         mockSignableCancelOrderResponse
       );
-      signMessageMock.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       cancelOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
 
       const result = await cancelOrder({
         ordersApi: ordersApiMock,
-        starkSigner,
+        starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
       });
@@ -232,7 +212,7 @@ describe('order', () => {
       expect(getSignableCancelOrderMock).toBeCalledWith(
         mockSignableCancelOrderRequest
       );
-      expect(signMessageMock).toBeCalledWith(mockPayloadHash);
+      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(cancelOrderMock).toBeCalledWith(
         mockCancelOrderRequest,
         mockHeader
@@ -241,16 +221,21 @@ describe('order', () => {
     });
 
     it('should return error if failed to call public api', async () => {
-      getSignableCancelOrderMock.mockRejectedValue(new Error('Server is down'));
+      getSignableCancelOrderMock.mockRejectedValue(new Error(mockErrorMessage));
 
       await expect(() =>
         cancelOrder({
           ordersApi: ordersApiMock,
-          starkSigner,
+          starkSigner: mockStarkSigner,
           user: mockUser,
           request: cancelOrderRequest,
         })
-      ).rejects.toThrowError('Server is down');
+      ).rejects.toThrow(
+        new PassportError(
+          `${PassportErrorType.CANCEL_ORDER_ERROR}: ${mockErrorMessage}`,
+          PassportErrorType.CANCEL_ORDER_ERROR
+        )
+      );
     });
   });
 });
