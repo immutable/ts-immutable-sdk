@@ -1,6 +1,5 @@
 import { GetSignableTradeRequest, GetSignableTransferRequest } from '@imtbl/core-sdk';
 
-
 const ReceiveMessageType = ['confirmation_window_ready', 'transaction_confirmed', 'transaction_error'] as const;
 type ReceiveTypeTuple = typeof ReceiveMessageType;
 export type ReceiveMessage = ReceiveTypeTuple[number];

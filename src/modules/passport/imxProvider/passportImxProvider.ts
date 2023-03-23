@@ -100,7 +100,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       transfersApi: this.transfersApi,
-    });
+    })
   }
 
   exchangeTransfer(
@@ -119,7 +119,6 @@ export default class PassportImxProvider implements IMXProvider {
   prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
     throw new Error('Method not implemented.');
   }
-
 
   completeWithdrawal(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
