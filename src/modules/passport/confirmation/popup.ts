@@ -24,4 +24,3 @@ export const openPopupCenter = ({ url, title, width, height }: PopUpProps): Wind
   }
   return newWindow;
 };
-

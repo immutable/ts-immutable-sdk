@@ -29,10 +29,11 @@ type BatchTransfersParams = {
 };
 
 export const transfer = ({
- request,
- transfersApi,
- starkSigner,
- user }: TransferRequest, option: WorkflowOption): Promise<CreateTransferResponseV1> => {
+                           request,
+                           transfersApi,
+                           starkSigner,
+                           user
+                         }: TransferRequest, option: WorkflowOption): Promise<CreateTransferResponseV1> => {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
     const signableResult = await transfersApi.getSignableTransferV1({
@@ -44,7 +45,7 @@ export const transfer = ({
       },
     });
 
-    await displayConfirmationScreen({
+    const confirmationResult = await displayConfirmationScreen({
       messageType: "transaction_start",
       messageData: {
         transactionType: "v1/transfer",
@@ -60,6 +61,10 @@ export const transfer = ({
       passportDomain: option.passportDomain,
       accessToken: user.accessToken,
     });
+
+    if (!confirmationResult.confirmed) {
+      throw new Error("Transaction rejected by user");
+    }
 
     const signableResultData = signableResult.data;
     const { payload_hash: payloadHash } = signableResultData;
@@ -101,11 +106,11 @@ export const transfer = ({
 };
 
 export async function batchNftTransfer({
-  user,
-  starkSigner,
-  request,
-  transfersApi,
-}: BatchTransfersParams): Promise<CreateTransferResponse> {
+                                         user,
+                                         starkSigner,
+                                         request,
+                                         transfersApi,
+                                       }: BatchTransfersParams): Promise<CreateTransferResponse> {
   return withPassportError<CreateTransferResponse>(async () => {
     const ethAddress = user.etherKey;
 
