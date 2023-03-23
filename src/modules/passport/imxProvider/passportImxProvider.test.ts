@@ -41,7 +41,7 @@ describe('PassportImxProvider', () => {
     passportImxProvider = new PassportImxProvider({
       user: mockUser,
       starkSigner,
-      apiConfig: { basePath: 'http://test.com' },
+      passportConfig: { imxAPIConfiguration: { basePath: 'http://test.com'} } as never,
     });
   });
 

@@ -1,8 +1,4 @@
-import {
-  StarkSigner,
-  TransfersApi,
-  UnsignedTransferRequest,
-} from '@imtbl/core-sdk';
+import { StarkSigner, TransfersApi, UnsignedTransferRequest, } from '@imtbl/core-sdk';
 import transfer from './transfer';
 
 describe('transfer', () => {
@@ -103,7 +99,7 @@ describe('transfer', () => {
       starkSigner,
       user: mockUser,
       request: mockTransferRequest as UnsignedTransferRequest,
-    });
+    }, { passportDomain: "test.com" });
 
     expect(getSignableTransferV1Mock).toBeCalledWith(
       mockSignableTransferRequest
@@ -126,7 +122,7 @@ describe('transfer', () => {
           starkSigner,
           user: mockUser,
           request: mockTransferRequest as UnsignedTransferRequest,
-        }
+        }, { passportDomain: "test.com" }
       )
     ).rejects.toThrowError('Server is down');
   });

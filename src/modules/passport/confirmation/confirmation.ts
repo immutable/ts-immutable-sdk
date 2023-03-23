@@ -5,44 +5,43 @@ import {
   PostMessageParams,
   ReceiveMessage
 } from './types';
-import { ConfirmationDomain, ConfirmationDomainURL, ConfirmationTitle, PopUpHeight, PopUpWidth } from './config';
+import { ConfirmationTitle, passportConfirmationType, PopUpHeight, PopUpWidth } from './config';
 import { openPopupCenter } from './popup';
-
 
 export const displayConfirmationScreen = async (params: DisplayConfirmationParams): Promise<ConfirmationResult> => {
   return new Promise((resolve) => {
     const confirmationWindow = openPopupCenter({
-      url: ConfirmationDomainURL,
+      url: params.passportDomain,
       title: ConfirmationTitle,
       width: PopUpWidth,
       height: PopUpHeight
     });
 
+    // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
+    const timer = setInterval(function () {
+      if (confirmationWindow?.closed) {
+        clearInterval(timer);
+        resolve({ confirmed: false });
+      }
+    }, 1000);
+
     const messageHandler = ({ data, origin }: MessageEvent) => {
-      if (origin != ConfirmationDomain || data.eventType != "imx-passport-confirmation" || isReceiveMessageType(data.messageType)) {
+      if (origin != params.passportDomain || data.eventType != passportConfirmationType || isReceiveMessageType(data.messageType)) {
         return ({ confirmed: false });
       }
       switch (data.messageType as ReceiveMessage) {
-        case "imx-passport-confirmation-ready": {
+        case "confirmation_window_ready": {
           if (!confirmationWindow) {
             return;
           }
-          PassportPostMessage(confirmationWindow, { ...params, eventType: "imx-passport-confirmation" });
+          PassportPostMessage(confirmationWindow, { ...params, eventType: passportConfirmationType });
           break;
         }
         case 'transaction_confirmed': {
-          if (data.messageData.success) {
-            resolve({ confirmed: true });
-            break;
-          }
-          resolve({ confirmed: false });
+          resolve({ confirmed: true });
           break;
         }
         case 'transaction_error': {
-          resolve({ confirmed: false });
-          break;
-        }
-        case 'confirmation_window_close': {
           resolve({ confirmed: false });
           break;
         }

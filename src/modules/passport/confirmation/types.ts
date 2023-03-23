@@ -1,7 +1,7 @@
 import { GetSignableTradeRequest, GetSignableTransferRequest } from '@imtbl/core-sdk';
 
 
-const ReceiveMessageType = ['imx-passport-confirmation-ready', 'transaction_confirmed', 'transaction_error', 'confirmation_window_close'] as const;
+const ReceiveMessageType = ['confirmation_window_ready', 'transaction_confirmed', 'transaction_error'] as const;
 type ReceiveTypeTuple = typeof ReceiveMessageType;
 export type ReceiveMessage = ReceiveTypeTuple[number];
 
@@ -18,6 +18,7 @@ export type DisplayConfirmationParams = {
   messageType: PostMessageType;
   messageData: PostMessageData;
   accessToken: string;
+  passportDomain: string;
 }
 
 export type PostMessageParams = DisplayConfirmationParams & {

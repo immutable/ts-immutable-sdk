@@ -35,6 +35,7 @@ export interface EnvironmentConfiguration {
   magicPublishableApiKey: string;
   magicProviderId: string;
   baseIMXApiPath: string;
+  passportDomain: string;
 }
 
 export interface OidcConfiguration {

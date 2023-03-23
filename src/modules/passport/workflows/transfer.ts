@@ -3,6 +3,7 @@ import { PassportErrorType, withPassportError, } from '../errors/passportError';
 import { convertToSignableToken } from '../../../modules/provider/signable-actions/utils';
 import { UserWithEtherKey } from '../types';
 import { displayConfirmationScreen } from '../confirmation/confirmation';
+import { WorkflowOption } from './types';
 
 const ERC721 = 'ERC721';
 
@@ -18,7 +19,7 @@ const transfer = ({
                     transferApi,
                     starkSigner,
                     user,
-                  }: TrasferRequest): Promise<CreateTransferResponseV1> => {
+                  }: TrasferRequest, option: WorkflowOption): Promise<CreateTransferResponseV1> => {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
     const signableTransferRequest = {
@@ -45,6 +46,7 @@ const transfer = ({
           }]
         }
       },
+      passportDomain: option.passportDomain,
       accessToken: user.accessToken,
     });
 
