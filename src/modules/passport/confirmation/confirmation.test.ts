@@ -1,6 +1,7 @@
 import displayConfirmationScreen from './confirmation';
+import SpyInstance = jest.SpyInstance;
 
-let windowSpy: any;
+let windowSpy: SpyInstance
 const mockNewWindow = { closed: true, focus: jest.fn() };
 const mockedOpen = jest.fn().mockReturnValue(mockNewWindow);
 const addEventListenerMock = jest.fn();
