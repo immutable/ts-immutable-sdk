@@ -5,7 +5,6 @@ const sendMessage = () => {
 }
 
 const openNewWindow = async () => {
-
     const messageData = {
         transactionType: "v1/transfer",
         transactionData: {
@@ -16,7 +15,8 @@ const openNewWindow = async () => {
         },
     }
     const res = await displayConfirmationScreen({messageType: "transaction_start", messageData: messageData})
-    console.log("Resssss", res)
+    alert(res.confirmed)
+    setTimeout(()=> {console.log("ressssss again", res)}, 1000)
 }
 
 const closeWindow = (message) => {
@@ -25,17 +25,68 @@ const closeWindow = (message) => {
 }
 
 
-const ConfirmationDomainURL = "http://localhost:3000/transaction-confirmation"
-const ConfirmationDomain = "http://localhost:3000"
+const displayConfirmationScreen = async params => {
+    return new Promise(resolve => {
+        const confirmationWindow = openPopupCenter({
+            url: ConfirmationDomainURL,
+            title: ConfirmationTitle,
+            width: PopUpWidth,
+            height: PopUpHeight
+        })
 
-const ConfirmationTitle = "Confirm this transaction"
-const PopUpWidth = 350
-const PopUpHeight = 350
+        const timer = setInterval(function () {
+            console.log("timeerrr")
+            if (confirmationWindow?.closed) {
+                console.log("closeddddd")
+                clearInterval(timer);
+                resolve({ confirmed: false })
+            }
+        }, 1000);
 
-const ConfirmationReadyMessageType = "ready"
-const ConfirmationFinishMessageType = "transaction_confirmed"
+        const messageHandler = ({data, origin}) => {
+            // if (
+            //     origin != ConfirmationDomain ||
+            //     data.eventType != "imx-passport-confirmation" ||
+            //     isReceiveMessageType(data.messageType)
+            // ) {
+            //     return { confirmed: false }
+            // }
+            switch (data.messageType) {
+                case "confirmation_window_ready": {
+                    if (!confirmationWindow) {
+                        return
+                    }
+                    PassportPostMessage(confirmationWindow, {
+                        ...params,
+                        eventType: "imx-passport-confirmation"
+                    })
+                    break
+                }
+                case "transaction_confirmed": {
+                    resolve({confirmed: true})
+                    break
+                }
+                case "transaction_error": {
+                    resolve({confirmed: false})
+                    break
+                }
+                case "confirmation_window_close": {
+                    resolve({confirmed: false})
+                    break
+                }
+                default:
+                    throw new Error("Unsupported message type")
+            }
+        }
+        window.addEventListener("message", messageHandler)
+    })
+}
 
-const openPopupCenter = ({ url, title, width, height }) => {
+const PassportPostMessage = (window, message) => {
+    window.postMessage(message, "*")
+}
+
+const openPopupCenter = ({url, title, width, height}) => {
     // Fixes dual-screen position                             Most browsers      Firefox
     const dualScreenLeft =
         window.screenLeft !== undefined ? window.screenLeft : window.screenX
@@ -73,55 +124,20 @@ const openPopupCenter = ({ url, title, width, height }) => {
     return newWindow
 }
 
-const displayConfirmationScreen = async params => {
-    return new Promise(resolve => {
-        const confirmationWindow = openPopupCenter({
-            url: ConfirmationDomain,
-            title: ConfirmationTitle,
-            width: PopUpWidth,
-            height: PopUpHeight
-        })
+const ReceiveMessageType = [
+    "imx-passport-confirmation-ready",
+    "transaction_confirmed",
+    "transaction_error",
+    "confirmation_window_close"
+]
 
-        const onConfirmationWindowReady = ({ data, origin }) => {
-            if (
-                origin != ConfirmationDomain ||
-                data.eventType != "imx-passport" ||
-                data.messageType != ConfirmationReadyMessageType
-            ) {
-                return
-            }
-            if (!confirmationWindow) {
-                return
-            }
-            window.removeEventListener("message", onConfirmationWindowReady)
-            PassportPostMessage(confirmationWindow, {
-                ...params,
-                eventType: "imx-passport"
-            })
-        }
-
-        window.removeEventListener("message", onConfirmationWindowReady)
-
-        // Handle messages posted from confirmation screen
-        window.addEventListener("message", ({ data, origin }) => {
-            if (
-                origin != ConfirmationDomain ||
-                data.eventType != "imx-passport" ||
-                data.messageType != ConfirmationFinishMessageType
-            ) {
-                return
-            }
-            const { messageData } = data
-            console.log("parent received msg: ", data)
-            if (messageData.success) {
-                resolve({ confirmed: true })
-            }
-            resolve({ confirmed: false })
-        })
-    })
+function isReceiveMessageType(value) {
+    return ReceiveMessageType.includes(value)
 }
 
-const PassportPostMessage = (window, message) => {
-    window.postMessage(message, "*")
-}
+const ConfirmationTitle = "Confirm this transaction"
+const PopUpWidth = 350
+const PopUpHeight = 350
 
+const ConfirmationDomainURL = "http://localhost:3000/transaction-confirmation"
+const ConfirmationDomain = "http://localhost:3000"
