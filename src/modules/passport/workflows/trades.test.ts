@@ -1,7 +1,7 @@
 import { StarkSigner, TradesApi } from '@imtbl/core-sdk';
 import { createTrade } from './trades';
 
-const starkSignature = 'starkSignature';
+const mockStarkSignature = 'test_starkSignature';
 const mockPayloadHash = 'test_payload_hash';
 const mockAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2V4YW1wbGUuYXV0aDAuY29tLyIsImF1ZCI6Imh0dHBzOi8vYXBpLmV4YW1wbGUuY29tL2NhbGFuZGFyL3YxLyIsInN1YiI6InVzcl8xMjMiLCJpYXQiOjE0NTg3ODU3OTYsImV4cCI6MTQ1ODg3MjE5Nn0.CA7eaHjIHz5NxeIJoFK9krqaeZrPLwmMmgI_XiQiIkQ';
 const mockEtherKey = '123';
@@ -46,7 +46,7 @@ const mockSignableTradeResponse = {
 const mockCreateTradeRequest = {
   createTradeRequest: {
     ...mockSignableTradeResponseData,
-    stark_signature: starkSignature,
+    stark_signature: mockStarkSignature,
     fees: [],
     include_fees: true,
     order_id: 1234
@@ -98,7 +98,7 @@ describe('trades', () => {
 
       it('should successfully create a trade ', async () => {
         getSignableTradeMock.mockResolvedValue(mockSignableTradeResponse);
-        signMessageMock.mockResolvedValue(starkSignature);
+        signMessageMock.mockResolvedValue(mockStarkSignature);
         createTradeMock.mockResolvedValue({
           data: mockReturnValue,
         });
