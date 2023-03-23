@@ -1,25 +1,15 @@
-import { StarkSigner, TradesApi } from '@imtbl/core-sdk';
+import { TradesApi } from '@imtbl/core-sdk';
 import { createTrade } from './trades';
+import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 
-const mockStarkSignature = 'test_starkSignature';
 const mockPayloadHash = 'test_payload_hash';
-const mockAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2V4YW1wbGUuYXV0aDAuY29tLyIsImF1ZCI6Imh0dHBzOi8vYXBpLmV4YW1wbGUuY29tL2NhbGFuZGFyL3YxLyIsInN1YiI6InVzcl8xMjMiLCJpYXQiOjE0NTg3ODU3OTYsImV4cCI6MTQ1ODg3MjE5Nn0.CA7eaHjIHz5NxeIJoFK9krqaeZrPLwmMmgI_XiQiIkQ';
-const mockEtherKey = '123';
-const mockErrorMessage = 'Server is down'
-
-const mockUser = {
-  etherKey: mockEtherKey,
-  accessToken: mockAccessToken,
-  profile: {
-    sub: '111',
-  },
-};
 const mockSignableTradeRequest = {
   getSignableTradeRequest: {
     expiration_timestamp: 1231234,
     fees: [],
     order_id: 1234,
-    user: mockEtherKey
+    user: mockUser.etherKey
   },
 };
 const mockSignableTradeResponseData = {
@@ -59,53 +49,46 @@ const mockCreateTradeRequest = {
 };
 const mockHeader = {
   headers: {
-    Authorization: `Bearer ${ mockAccessToken }`,
+    Authorization: `Bearer ${ mockUser.accessToken }`,
   },
 };
 const mockReturnValue = {
   status: 'success',
   trade_id: 123,
 };
-
+const mockStarkSigner = {
+  signMessage: jest.fn(),
+  getAddress: jest.fn(),
+};
 describe('trades', () => {
     describe('createTrade', () => {
       let getSignableTradeMock: jest.Mock;
       let createTradeMock: jest.Mock;
-      let signMessageMock: jest.Mock;
-      let getAddressMock: jest.Mock;
 
       let tradesApiMock: TradesApi;
-      let starkSigner: StarkSigner;
 
       beforeEach(() => {
         getSignableTradeMock = jest.fn();
         createTradeMock = jest.fn();
-        signMessageMock = jest.fn();
-        getAddressMock = jest.fn();
 
         tradesApiMock = {
           getSignableTrade: getSignableTradeMock,
           createTrade: createTradeMock,
         } as unknown as TradesApi;
-
-        starkSigner = {
-          signMessage: signMessageMock,
-          getAddress: getAddressMock,
-        };
       });
 
       afterEach(jest.resetAllMocks);
 
       it('should successfully create a trade ', async () => {
         getSignableTradeMock.mockResolvedValue(mockSignableTradeResponse);
-        signMessageMock.mockResolvedValue(mockStarkSignature);
+        mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
         createTradeMock.mockResolvedValue({
           data: mockReturnValue,
         });
 
         const result = await createTrade({
           tradesApi: tradesApiMock,
-          starkSigner,
+          starkSigner: mockStarkSigner,
           user: mockUser,
           request: mockSignableTradeRequest.getSignableTradeRequest
         });
@@ -113,7 +96,7 @@ describe('trades', () => {
         expect(getSignableTradeMock).toBeCalledWith(
           mockSignableTradeRequest
         );
-        expect(signMessageMock).toBeCalledWith(mockPayloadHash);
+        expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
         expect(createTradeMock).toBeCalledWith(
           mockCreateTradeRequest,
           mockHeader
@@ -127,11 +110,16 @@ describe('trades', () => {
         await expect(() =>
           createTrade({
             tradesApi: tradesApiMock,
-            starkSigner,
+            starkSigner: mockStarkSigner,
             user: mockUser,
             request: mockSignableTradeRequest.getSignableTradeRequest
           })
-        ).rejects.toThrowError(mockErrorMessage);
+        ).rejects.toThrow(
+          new PassportError(
+            `${ PassportErrorType.CREATE_TRADE_ERROR }: ${ mockErrorMessage }`,
+            PassportErrorType.CREATE_TRADE_ERROR
+          )
+        );
       });
     })
   }

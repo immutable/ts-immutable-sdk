@@ -137,7 +137,7 @@ describe('PassportImxProvider', () => {
       };
       const mockHeader = {
         headers: {
-          Authorization: `Bearer ${mockUser.accessToken}`,
+          Authorization: `Bearer ${ mockUser.accessToken }`,
         },
       };
       const mockReturnValue = {
@@ -178,7 +178,7 @@ describe('PassportImxProvider', () => {
           mockTransferRequest as UnsignedTransferRequest
         )
       ).rejects.toThrowError(new PassportError(
-        `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
+        `${ PassportErrorType.TRANSFER_ERROR }: ${ mockErrorMessage }`,
         PassportErrorType.TRANSFER_ERROR
       ));
     });
@@ -264,7 +264,7 @@ describe('PassportImxProvider', () => {
       };
       const mockHeader = {
         headers: {
-          Authorization: `Bearer ${mockUser.accessToken}`,
+          Authorization: `Bearer ${ mockUser.accessToken }`,
         },
       };
       const mockReturnValue = {
@@ -326,7 +326,7 @@ describe('PassportImxProvider', () => {
 
       const mockHeader = {
         headers: {
-          Authorization: `Bearer ${mockUser.accessToken}`,
+          Authorization: `Bearer ${ mockUser.accessToken }`,
         },
       };
 
@@ -392,7 +392,7 @@ describe('PassportImxProvider', () => {
     const mockCreateTradeRequest = {
       createTradeRequest: {
         ...mockSignableTradeResponseData,
-        stark_signature: starkSignature,
+        stark_signature: mockStarkSignature,
         fees: [],
         include_fees: true,
         order_id: 1234
@@ -412,7 +412,7 @@ describe('PassportImxProvider', () => {
 
     it('should return a successful createTrade result', async () => {
       getSignableTradeMock.mockResolvedValue(mockSignableTradeResponse);
-      signMessageMock.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTradeMock.mockResolvedValue({
         data: mockReturnValue,
       });
@@ -422,7 +422,7 @@ describe('PassportImxProvider', () => {
       expect(getSignableTradeMock).toBeCalledWith(
         mockSignableTradeRequest
       );
-      expect(signMessageMock).toBeCalledWith(mockPayloadHash);
+      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(createTradeMock).toBeCalledWith(
         mockCreateTradeRequest,
         mockHeader
@@ -442,7 +442,7 @@ describe('PassportImxProvider', () => {
       ];
       const mockTransferResponse = {
         data: {
-          transfer_ids: ['transfer_id_1'],
+          transfer_ids: [ 'transfer_id_1' ],
         },
       };
       const sender_stark_key = 'sender_stark_key';
@@ -521,7 +521,7 @@ describe('PassportImxProvider', () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${mockUser.accessToken}`,
+            Authorization: `Bearer ${ mockUser.accessToken }`,
           },
         }
       );
