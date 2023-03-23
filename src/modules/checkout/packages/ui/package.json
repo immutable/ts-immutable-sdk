@@ -1,0 +1,62 @@
+{
+  "name": "@imtbl/checkout-ui",
+  "version": "0.0.1",
+  "private": true,
+  "source": "src/module.tsx",
+  "main": "dist/main.js",
+  "module": "dist/module.js",
+  "types": "dist/types.d.ts",
+  "dependencies": {
+    "@biom3/design-tokens": "^0.0.15-alpha",
+    "@biom3/react": "^0.0.15-alpha",
+    "@emotion/babel-plugin": "^11.10.6",
+    "@emotion/react": "^11.10.6",
+    "@imtbl/checkout-sdk-web": "../sdk/imtbl-checkout-sdk-web-0.0.1.tgz",
+    "@swc/helpers": "^0.4.14",
+    "ethers": "^5.7.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start:react": "PORT=3001 react-scripts start",
+    "build:react": "react-scripts build",
+    "start": "parcel watch",
+    "serve": "parcel serve",
+    "build": "parcel build",
+    "build:prod": "NODE_ENV=production parcel build --no-source-maps"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@parcel/config-default": "^2.8.3",
+    "@parcel/core": "^2.8.3",
+    "@parcel/packager-ts": "^2.8.3",
+    "@parcel/transformer-typescript-tsc": "^2.8.3",
+    "@parcel/transformer-typescript-types": "^2.8.3",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/cypress": "^1.1.3",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.14",
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "cypress": "^12.7.0",
+    "local-cypress": "^1.2.6",
+    "parcel": "^2.8.3",
+    "process": "^0.11.10",
+    "typescript": "^4.9.5"
+  }
+}
