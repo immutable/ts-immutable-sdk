@@ -1,7 +1,6 @@
 import {
   ETHAmount,
   OrdersApi,
-  StarkSigner,
   UnsignedOrderRequest,
 } from '@imtbl/core-sdk';
 import { mockUser } from '../test/mocks';

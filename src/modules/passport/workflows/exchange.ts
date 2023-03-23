@@ -66,5 +66,5 @@ export async function exchangeTransfer({
       time: response?.data.time,
       transfer_id: response?.data.transfer_id,
     };
-  }, PassportErrorType.CREATE_EXCHANGE_TRANSFER);
+  }, PassportErrorType.EXCHANGE_TRANSFER_ERROR);
 }
