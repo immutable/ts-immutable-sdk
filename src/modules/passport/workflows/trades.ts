@@ -16,11 +16,11 @@ type CreateTradeParams = {
 }
 
 export async function createTrade({
-    request,
-    tradesApi,
-    user,
-    starkSigner
-  }: CreateTradeParams): Promise<CreateTradeResponse> {
+  request,
+  tradesApi,
+  user,
+  starkSigner
+}: CreateTradeParams): Promise<CreateTradeResponse> {
   return withPassportError<CreateTradeResponse>(async () => {
     const ethAddress = user.etherKey;
     const getSignableTradeRequest: GetSignableTradeRequest = {
@@ -34,9 +34,9 @@ export async function createTrade({
       getSignableTradeRequest
     })
 
-    const {data: {payload_hash: payloadHash}} = getSignableTradeResponse;
+    const { data: { payload_hash: payloadHash } } = getSignableTradeResponse;
     const starkSignature = await starkSigner.signMessage(payloadHash);
-    const {data: signableResultData} = getSignableTradeResponse;
+    const { data: signableResultData } = getSignableTradeResponse;
 
     const tradeParams: TradesApiCreateTradeRequest = {
       createTradeRequest: {
@@ -63,8 +63,8 @@ export async function createTrade({
       xImxEthSignature: '',
     }
 
-    const headers = {Authorization: 'Bearer ' + user.accessToken}
-    const {data: createTradeResponse} = await tradesApi.createTrade(tradeParams, {
+    const headers = { Authorization: 'Bearer ' + user.accessToken }
+    const { data: createTradeResponse } = await tradesApi.createTrade(tradeParams, {
       headers,
     })
     return {

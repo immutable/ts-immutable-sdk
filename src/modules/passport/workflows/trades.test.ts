@@ -59,7 +59,7 @@ const mockCreateTradeRequest = {
 };
 const mockHeader = {
   headers: {
-    Authorization: `Bearer ${mockAccessToken}`,
+    Authorization: `Bearer ${ mockAccessToken }`,
   },
 };
 const mockReturnValue = {
