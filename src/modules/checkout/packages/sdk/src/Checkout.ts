@@ -1,4 +1,5 @@
 import * as balances from './balances';
+import * as tokens from './tokens';
 import { connectWalletProvider, getNetworkInfo } from './connect';
 import {
   ConnectParams,
@@ -9,6 +10,7 @@ import {
   SwitchNetworkResult,
 } from './types';
 import { switchWalletNetwork } from './network';
+import { GetTokenAllowListResult } from './tokens/types';
 
 export class Checkout {
   public async connect(params: ConnectParams): Promise<ConnectResult> {
@@ -36,5 +38,9 @@ export class Checkout {
       params.walletAddress,
       params.contractAddress
     );
+  }
+
+  public getTokenAllowList(): GetTokenAllowListResult {
+    return tokens.getTokenAllowList();
   }
 }
