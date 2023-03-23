@@ -7,7 +7,8 @@ import {
   TransfersApi,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import { mockUser } from '../test/mocks';
+import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 
 jest.mock('@imtbl/core-sdk', () => {
   const original = jest.requireActual('@imtbl/core-sdk');
@@ -75,7 +76,6 @@ describe('PassportImxProvider', () => {
       apiConfig: { basePath: 'http://test.com' },
     });
   });
-  const starkSignature = 'starkSignature';
 
   describe('transfer', () => {
     const mockReceiver = 'AAA';
@@ -121,7 +121,7 @@ describe('PassportImxProvider', () => {
       const mockCreateTransferRequest = {
         createTransferRequest: {
           ...restSignableTransferV1Response,
-          stark_signature: starkSignature,
+          stark_signature: mockStarkSignature,
         },
       };
       const mockHeader = {
@@ -139,7 +139,7 @@ describe('PassportImxProvider', () => {
       getSignableTransferV1Mock.mockResolvedValue(
         mockSignableTransferV1Response
       );
-      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferV1Mock.mockResolvedValue({
         data: mockReturnValue,
       });
@@ -160,13 +160,16 @@ describe('PassportImxProvider', () => {
     });
 
     it('should return error if failed to call public api', async () => {
-      getSignableTransferV1Mock.mockRejectedValue(new Error('Server is down'));
+      getSignableTransferV1Mock.mockRejectedValue(new Error(mockErrorMessage));
 
       await expect(() =>
         passportImxProvider.transfer(
           mockTransferRequest as UnsignedTransferRequest
         )
-      ).rejects.toThrowError('Server is down');
+      ).rejects.toThrowError(new PassportError(
+        `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
+        PassportErrorType.TRANSFER_ERROR
+      ));
     });
   });
 
@@ -241,7 +244,7 @@ describe('PassportImxProvider', () => {
       const mockCreateOrderRequest = {
         createOrderRequest: {
           ...restSignableOrderResponse,
-          stark_signature: starkSignature,
+          stark_signature: mockStarkSignature,
           fees: undefined,
           include_fees: true,
         },
@@ -260,7 +263,7 @@ describe('PassportImxProvider', () => {
       };
 
       getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
-      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
@@ -304,7 +307,7 @@ describe('PassportImxProvider', () => {
         id: orderId.toString(),
         cancelOrderRequest: {
           order_id: orderId,
-          stark_signature: starkSignature,
+          stark_signature: mockStarkSignature,
         },
         xImxEthAddress: '',
         xImxEthSignature: '',
@@ -324,7 +327,7 @@ describe('PassportImxProvider', () => {
       getSignableCancelOrderMock.mockResolvedValue(
         mockSignableCancelOrderResponse
       );
-      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       cancelOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
@@ -389,7 +392,7 @@ describe('PassportImxProvider', () => {
         },
       };
       getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
-      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferMock.mockResolvedValue(mockTransferResponse);
 
       const result = await passportImxProvider.batchNftTransfer(
@@ -430,7 +433,7 @@ describe('PassportImxProvider', () => {
                 amount,
                 nonce,
                 expiration_timestamp,
-                stark_signature: starkSignature,
+                stark_signature: mockStarkSignature,
               },
             ],
           },
@@ -481,7 +484,7 @@ describe('PassportImxProvider', () => {
         },
       };
 
-      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       getExchangeSignableTransferMock.mockResolvedValue(
         mockGetExchangeSignableTransferResponse
       );

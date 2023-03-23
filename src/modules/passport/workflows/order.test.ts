@@ -1,14 +1,10 @@
-import {
-  ETHAmount,
-  OrdersApi,
-  UnsignedOrderRequest,
-} from '@imtbl/core-sdk';
-import { mockUser } from '../test/mocks';
+import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
+import { PassportError, PassportErrorType } from '../errors/passportError';
+import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { cancelOrder, createOrder } from './order';
 
 describe('order', () => {
   afterEach(jest.resetAllMocks);
-  const starkSignature = 'starkSignature';
 
   const mockStarkSigner = {
     signMessage: jest.fn(),
@@ -83,7 +79,7 @@ describe('order', () => {
       const mockCreateOrderRequest = {
         createOrderRequest: {
           ...restSignableOrderResponse,
-          stark_signature: starkSignature,
+          stark_signature: mockStarkSignature,
           fees: undefined,
           include_fees: true,
         },
@@ -102,7 +98,7 @@ describe('order', () => {
       };
 
       getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
-      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
@@ -126,7 +122,7 @@ describe('order', () => {
     });
 
     it('should return error if failed to call public api', async () => {
-      getSignableCreateOrderMock.mockRejectedValue(new Error('Server is down'));
+      getSignableCreateOrderMock.mockRejectedValue(new Error(mockErrorMessage));
 
       await expect(() =>
         createOrder({
@@ -135,7 +131,12 @@ describe('order', () => {
           user: mockUser,
           request: orderRequest as UnsignedOrderRequest,
         })
-      ).rejects.toThrowError('Server is down');
+      ).rejects.toThrow(
+        new PassportError(
+          `${PassportErrorType.CREATE_ORDER_ERROR}: ${mockErrorMessage}`,
+          PassportErrorType.CREATE_ORDER_ERROR
+        )
+      );
     });
   });
 
@@ -176,7 +177,7 @@ describe('order', () => {
         id: orderId.toString(),
         cancelOrderRequest: {
           order_id: orderId,
-          stark_signature: starkSignature,
+          stark_signature: mockStarkSignature,
         },
         xImxEthAddress: '',
         xImxEthSignature: '',
@@ -196,7 +197,7 @@ describe('order', () => {
       getSignableCancelOrderMock.mockResolvedValue(
         mockSignableCancelOrderResponse
       );
-      mockStarkSigner.signMessage.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       cancelOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
@@ -220,7 +221,7 @@ describe('order', () => {
     });
 
     it('should return error if failed to call public api', async () => {
-      getSignableCancelOrderMock.mockRejectedValue(new Error('Server is down'));
+      getSignableCancelOrderMock.mockRejectedValue(new Error(mockErrorMessage));
 
       await expect(() =>
         cancelOrder({
@@ -229,7 +230,12 @@ describe('order', () => {
           user: mockUser,
           request: cancelOrderRequest,
         })
-      ).rejects.toThrowError('Server is down');
+      ).rejects.toThrow(
+        new PassportError(
+          `${PassportErrorType.CANCEL_ORDER_ERROR}: ${mockErrorMessage}`,
+          PassportErrorType.CANCEL_ORDER_ERROR
+        )
+      );
     });
   });
 });

@@ -1,9 +1,12 @@
 import { CreateTransferResponseV1, ETHAmount } from '@imtbl/core-sdk';
 import { exchangeTransfer } from './exchange';
 import { ExchangesApi } from '@imtbl/core-sdk';
-import { mockUser } from '../test/mocks';
+import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 
 describe('exchangeTransfer', () => {
+  afterEach(jest.resetAllMocks);
+
   const getExchangeSignableTransferMock = jest.fn();
   const createExchangeTransferMock = jest.fn();
   const mockStarkAddress = '0x1111...';
@@ -13,12 +16,12 @@ describe('exchangeTransfer', () => {
     getAddress: jest.fn(),
     signMessage: jest.fn(),
   };
-  
+
   const ethAmount: ETHAmount = {
     type: 'ETH',
     amount: '100',
   };
-  
+
   const exchangeTransferRequest = {
     ...ethAmount,
     receiver: '0x456...',
@@ -46,7 +49,7 @@ describe('exchangeTransfer', () => {
         expiration_timestamp: 123456789,
       },
     };
-    
+
     const mockCreateExchangeTransferResponse = {
       data: {
         sent_signature: 'signature123',
@@ -63,6 +66,7 @@ describe('exchangeTransfer', () => {
     createExchangeTransferMock.mockResolvedValue(
       mockCreateExchangeTransferResponse
     );
+    mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
 
     const response: CreateTransferResponseV1 = await exchangeTransfer({
       user: mockUser,
@@ -85,6 +89,10 @@ describe('exchangeTransfer', () => {
       },
       id: exchangeTransferRequest.transactionID,
     });
+
+    expect(mockStarkSigner.signMessage).toBeCalledWith(
+      mockGetExchangeSignableTransferResponse.data.payload_hash
+    );
     expect(mockStarkSigner.getAddress).toHaveBeenCalled();
     expect(response).toEqual({
       sent_signature: mockCreateExchangeTransferResponse.data.sent_signature,
@@ -96,7 +104,7 @@ describe('exchangeTransfer', () => {
 
   it('should return error if failed to call public api', async () => {
     getExchangeSignableTransferMock.mockRejectedValue(
-      new Error('Server is down')
+      new Error(mockErrorMessage)
     );
 
     await expect(() =>
@@ -106,6 +114,11 @@ describe('exchangeTransfer', () => {
         request: exchangeTransferRequest,
         exchangesApi: exchangesApiMock,
       })
-    ).rejects.toThrowError('Server is down');
+    ).rejects.toThrow(
+      new PassportError(
+        `${PassportErrorType.EXCHANGE_TRANSFER_ERROR}: ${mockErrorMessage}`,
+        PassportErrorType.EXCHANGE_TRANSFER_ERROR
+      )
+    );
   });
 });
