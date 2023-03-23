@@ -67,8 +67,6 @@ export async function createTrade({
     const { data: createTradeResponse } = await tradesApi.createTrade(tradeParams, {
       headers,
     })
-    return {
-      ...createTradeResponse,
-    }
+    return createTradeResponse
   }, PassportErrorType.CREATE_TRADE_ERROR)
 }
