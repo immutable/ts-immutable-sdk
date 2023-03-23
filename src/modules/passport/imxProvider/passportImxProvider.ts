@@ -24,7 +24,7 @@ import {
 import { UserWithEtherKey } from '../types';
 import { IMXProvider } from '../../provider/imxProvider';
 import { ImxApiConfiguration } from '../config';
-import transfer from '../workflows/transfer';
+import { transfer, batchNftTransfer } from '../workflows/transfer';
 import { cancelOrder, createOrder } from '../workflows/order';
 import { createTrade } from "../workflows/trades";
 
@@ -57,7 +57,7 @@ export default class PassportImxProvider implements IMXProvider {
       request,
       user: this.user,
       starkSigner: this.starkSigner,
-      transferApi: this.transfersApi,
+      transfersApi: this.transfersApi,
     });
   }
 
@@ -99,10 +99,14 @@ export default class PassportImxProvider implements IMXProvider {
   }
 
   batchNftTransfer(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     request: NftTransferDetails[]
   ): Promise<CreateTransferResponse> {
-    throw new Error('Method not implemented.');
+    return batchNftTransfer({
+      request,
+      user: this.user,
+      starkSigner: this.starkSigner,
+      transfersApi: this.transfersApi,
+    })
   }
 
   exchangeTransfer(

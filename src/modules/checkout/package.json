@@ -6,8 +6,6 @@
   "scripts": {
     "test": "jest",
     "test:sdk": "cd packages/sdk && jest",
-    "test:cypress": "cd packages/ui && NODE_ENV=test cypress run --component --headless",
-    "test:cypress:open": "cd packages/ui && NODE_ENV=test cypress open --component --browser electron",
     "test:coverage": "jest --coverage",
     "start": "lerna run --parallel start",
     "bootstrap": "npm install && lerna bootstrap --force-local"

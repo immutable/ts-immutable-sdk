@@ -1,24 +1,24 @@
 import './App.css';
+import Connect from './components/connect/connect';
+import { useState } from 'react';
+import SwitchNetwork from './components/switchNetwork/switchNetwork';
+import { Web3Provider } from '@ethersproject/providers';
+import GetBalance from './components/getBalance/getBalance';
 
-function App () {
-    return (
-      <div>
-        <main className="checkout-sdk-app">
-          <h1>Sample App</h1>
-          <p>This is a react app which implements the CheckoutSDK and Widgets, choose which one you would like to preview.</p>
-          <div className="button-container">
-          <div>
-            <a href={"/widgets"}>Widgets</a>
-          </div>
-          <div>
-           <a href={"/sdk"}>SDK</a>
+function App() {
+  const [provider, setProvider] = useState<Web3Provider>();
 
-          </div>
-          </div>
-          
-        </main>
-      </div>
-    )
+  return (
+    <div>
+      <main className="checkout-sdk-app">
+        <h1>Checkout Sample App</h1>
+        <p>This is a react app which implements Immutable's Checkout</p>
+        <Connect setProvider={setProvider} />
+        <SwitchNetwork provider={provider} />
+        <GetBalance provider={provider} />
+      </main>
+    </div>
+  );
 }
 
 export default App;
