@@ -8,6 +8,7 @@ import {
   CreateTransferResponse,
   CreateTransferResponseV1,
   CreateWithdrawalResponse,
+  ExchangesApi,
   GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
   NftTransferDetails,
@@ -24,6 +25,7 @@ import { UserWithEtherKey } from '../types';
 import { IMXProvider } from '../../provider/imxProvider';
 import { batchNftTransfer, transfer } from '../workflows/transfer';
 import { cancelOrder, createOrder } from '../workflows/order';
+import { exchangeTransfer } from '../workflows/exchange';
 import { PassportConfiguration } from '../config';
 
 export type PassportImxProviderInput = {
@@ -38,6 +40,7 @@ export default class PassportImxProvider implements IMXProvider {
   private transfersApi: TransfersApi;
   private ordersApi: OrdersApi;
   private readonly passportConfig: PassportConfiguration;
+  private exchangesApi: ExchangesApi;
 
   constructor({ user, starkSigner, passportConfig }: PassportImxProviderInput) {
     this.user = user;
@@ -46,6 +49,7 @@ export default class PassportImxProvider implements IMXProvider {
     const apiConfig = new Configuration({ basePath: passportConfig.imxAPIConfiguration.basePath });
     this.transfersApi = new TransfersApi(apiConfig);
     this.ordersApi = new OrdersApi(apiConfig);
+    this.exchangesApi = new ExchangesApi(apiConfig);
   }
 
   async transfer(
@@ -100,14 +104,18 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       transfersApi: this.transfersApi,
-    })
+    });
   }
 
   exchangeTransfer(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     request: UnsignedExchangeTransferRequest
   ): Promise<CreateTransferResponseV1> {
-    throw new Error('Method not implemented.');
+    return exchangeTransfer({
+      request,
+      user: this.user,
+      starkSigner: this.starkSigner,
+      exchangesApi: this.exchangesApi
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -130,6 +138,6 @@ export default class PassportImxProvider implements IMXProvider {
   }
 
   getAddress(): Promise<string> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve(this.starkSigner.getAddress());
   }
 }

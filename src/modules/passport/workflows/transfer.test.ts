@@ -1,27 +1,21 @@
-import { StarkSigner, TransfersApi, UnsignedTransferRequest, } from '@imtbl/core-sdk';
+import { TransfersApi, UnsignedTransferRequest, } from '@imtbl/core-sdk';
+import { PassportError, PassportErrorType } from '../errors/passportError';
+import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
 import displayConfirmationScreen from '../confirmation/confirmation';
-
 
 jest.mock('../confirmation/confirmation');
 
 describe('transfer', () => {
-  const mockUser = {
-    etherKey: '123',
-    accessToken:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2V4YW1wbGUuYXV0aDAuY29tLyIsImF1ZCI6Imh0dHBzOi8vYXBpLmV4YW1wbGUuY29tL2NhbGFuZGFyL3YxLyIsInN1YiI6InVzcl8xMjMiLCJpYXQiOjE0NTg3ODU3OTYsImV4cCI6MTQ1ODg3MjE5Nn0.CA7eaHjIHz5NxeIJoFK9krqaeZrPLwmMmgI_XiQiIkQ',
-    profile: {
-      sub: '111',
-    },
+  const mockStarkSigner = {
+    signMessage: jest.fn(),
+    getAddress: jest.fn(),
   };
-  const starkSignature = 'starkSignature';
 
   describe('single transfer', () => {
-    let signMessageMock: jest.Mock;
     let getSignableTransferV1Mock: jest.Mock;
     let createTransferV1Mock: jest.Mock;
     let transferApiMock: TransfersApi;
-    let starkSigner: StarkSigner;
 
     const mockReceiver = 'AAA';
     const type = 'ERC721';
@@ -35,13 +29,6 @@ describe('transfer', () => {
     };
 
     beforeEach(() => {
-      signMessageMock = jest.fn();
-
-      starkSigner = {
-        signMessage: signMessageMock,
-        getAddress: jest.fn(),
-      };
-
       getSignableTransferV1Mock = jest.fn();
       createTransferV1Mock = jest.fn();
       transferApiMock = {
@@ -80,7 +67,7 @@ describe('transfer', () => {
       const mockCreateTransferRequest = {
         createTransferRequest: {
           ...restSignableTransferV1Response,
-          stark_signature: starkSignature,
+          stark_signature: mockStarkSignature,
         },
       };
       const mockHeader = {
@@ -99,14 +86,14 @@ describe('transfer', () => {
         confirmed: true,
       });
       getSignableTransferV1Mock.mockResolvedValue(mockSignableTransferV1Response);
-      signMessageMock.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferV1Mock.mockResolvedValue({
         data: mockReturnValue,
       });
 
       const result = await transfer({
         transfersApi: transferApiMock,
-        starkSigner,
+        starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
       }, { passportDomain: "test.com" });
@@ -114,7 +101,7 @@ describe('transfer', () => {
       expect(getSignableTransferV1Mock).toBeCalledWith(
         mockSignableTransferRequest
       );
-      expect(signMessageMock).toBeCalledWith(mockPayloadHash);
+      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(createTransferV1Mock).toBeCalledWith(
         mockCreateTransferRequest,
         mockHeader
@@ -123,16 +110,19 @@ describe('transfer', () => {
     });
 
     it('should return error if failed to call public api', async () => {
-      getSignableTransferV1Mock.mockRejectedValue(new Error('Server is down'));
+      getSignableTransferV1Mock.mockRejectedValue(new Error(mockErrorMessage));
 
       await expect(() =>
         transfer({
           transfersApi: transferApiMock,
-          starkSigner,
+          starkSigner: mockStarkSigner,
           user: mockUser,
           request: mockTransferRequest as UnsignedTransferRequest,
         }, { passportDomain: "test.com" })
-      ).rejects.toThrowError('Server is down');
+      ).rejects.toThrow(new PassportError(
+        `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
+        PassportErrorType.TRANSFER_ERROR
+      ));
     });
 
     it('should return error if transfer is rejected by user', async () => {
@@ -158,7 +148,7 @@ describe('transfer', () => {
       await expect(() =>
         transfer({
           transfersApi: transferApiMock,
-          starkSigner,
+          starkSigner: mockStarkSigner,
           user: mockUser,
           request: mockTransferRequest as UnsignedTransferRequest,
         }, { passportDomain: "test.com" })
@@ -167,8 +157,6 @@ describe('transfer', () => {
   });
 
   describe('batchNftTransfer', () => {
-    let starkSigner: StarkSigner;
-    let signMessageMock: jest.Mock;
     let getSignableTransferMock: jest.Mock;
     let createTransferMock: jest.Mock;
     let transferApiMock: TransfersApi;
@@ -182,13 +170,6 @@ describe('transfer', () => {
     ];
 
     beforeEach(() => {
-      signMessageMock = jest.fn();
-
-      starkSigner = {
-        signMessage: signMessageMock,
-        getAddress: jest.fn(),
-      };
-
       getSignableTransferMock = jest.fn();
       createTransferMock = jest.fn();
       transferApiMock = {
@@ -229,12 +210,12 @@ describe('transfer', () => {
         }
       }
       getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
-      signMessageMock.mockResolvedValue(starkSignature);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferMock.mockResolvedValue(mockTransferResponse);
 
       const result = await batchNftTransfer({
         user: mockUser,
-        starkSigner,
+        starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
       });
@@ -258,7 +239,7 @@ describe('transfer', () => {
           ],
         },
       });
-      expect(signMessageMock).toHaveBeenCalled();
+      expect(mockStarkSigner.signMessage).toHaveBeenCalled();
       expect(createTransferMock).toHaveBeenCalledWith(
         {
           createTransferRequestV2: {
@@ -272,7 +253,7 @@ describe('transfer', () => {
                 amount,
                 nonce,
                 expiration_timestamp,
-                stark_signature: starkSignature
+                stark_signature: mockStarkSignature
               },
             ],
           },
@@ -288,16 +269,19 @@ describe('transfer', () => {
     });
 
     it('should return error if failed to call public api', async () => {
-      getSignableTransferMock.mockRejectedValue(new Error('Server is down'));
+      getSignableTransferMock.mockRejectedValue(new Error(mockErrorMessage));
 
       await expect(() =>
         batchNftTransfer({
           user: mockUser,
-          starkSigner,
+          starkSigner: mockStarkSigner,
           request: transferRequest,
           transfersApi: transferApiMock,
         })
-      ).rejects.toThrowError('Server is down');
+      ).rejects.toThrow(new PassportError(
+        `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
+        PassportErrorType.TRANSFER_ERROR
+      ));
     });
   });
 })
