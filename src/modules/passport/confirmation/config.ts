@@ -1,4 +1,4 @@
 export const ConfirmationTitle = "Confirm this transaction";
-export const PopUpWidth = 350;
-export const PopUpHeight = 350;
+export const PopUpWidth = 600;
+export const PopUpHeight = 600;
 export const passportConfirmationType =  "imx-passport-confirmation"
