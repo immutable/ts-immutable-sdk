@@ -49,7 +49,7 @@ function GetBalance(props: BalanceProps) {
 
     try {
       const getBalanceRes = await checkout.getBalance(params);
-      setNative(getBalanceRes.formattedBalance);
+      setERC20(getBalanceRes.formattedBalance);
     } catch (err) {
       console.error(err);
     }
