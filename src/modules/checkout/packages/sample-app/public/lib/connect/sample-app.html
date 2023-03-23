@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Static Sample App</title>
+    <meta name="description" content="Example of how to use CheckoutSDK UI within static HTML">
+  </head>
+  <body>
+    <div id="imtbl-checkout-connect"></div>
+  </body>
+  <script src="./imtbl-connect-widget.js"></script>
+  
+  <script>
+    IMTBLConnectWidget.mount({
+      elementId: 'imtbl-checkout-connect',
+      theme: 'DARK',
+      params: {
+        providerPreference: 'WALLET_CONNECT'
+      }
+    });
+  </script>
+
+</html>
