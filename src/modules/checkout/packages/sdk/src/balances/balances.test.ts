@@ -1,7 +1,7 @@
 import { getBalance, getERC20Balance } from './balances';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
-import { ERC20ABI } from './types';
+import { ERC20ABI, NetworkInfo } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 
 jest.mock('ethers', () => {
@@ -17,26 +17,46 @@ describe('balances', () => {
   const mockGetBalance = jest
     .fn()
     .mockResolvedValue(currentBalance);
+    const mockGetNetwork = jest
+    .fn()
+    .mockResolvedValue({chainId: 1, name: 'homestead'});
+
+  jest.mock('../connect', () => {
+    return {
+      getNetworkInfo: jest.fn().mockResolvedValue({
+        chainId: 1,
+        name: 'Ethereum',
+        nativeCurrency: {
+          name: 'Ether',
+          symbol: 'ETH',
+          decimals: 18
+        }
+      } as NetworkInfo)
+    }
+  });
+  
   const mockProvider = jest.fn().mockImplementation(() => {
     return {
       getBalance: mockGetBalance,
+      getNetwork: mockGetNetwork
     } as unknown as Web3Provider;
   });
 
   describe('getBalance()', () => {
     it('should call getBalance() on provider and return the balance', async () => {
-      const balance = await getBalance(
+      const balanceResult = await getBalance(
         mockProvider() as unknown as Web3Provider,
         '0xAddress'
       );
       expect(mockGetBalance).toBeCalledTimes(1);
-      expect(balance).toEqual(currentBalance);
+      expect(balanceResult.balance).toEqual(currentBalance);
     });
 
     it('should catch an error from getBalance() and throw a CheckoutError of type BalanceError', async () => {
       const mockProvider = jest.fn().mockImplementation(() => {
         return {
-          getBalance: jest.fn().mockRejectedValue(new Error('Error getting balance'))
+          getBalance: jest.fn().mockRejectedValue(new Error('Error getting balance')),
+          getNetwork: mockGetNetwork
         }
       });
 
@@ -66,22 +86,27 @@ describe('balances', () => {
     });
 
     it('should call balanceOf on the appropriate contract and return the balance', async () => {
-      const result = await getERC20Balance(
+      const testContractAddress = '0x10c';
+      const balanceResult = await getERC20Balance(
         mockProvider(),
           'abc123',
-          '0x10c'
+          testContractAddress
       );
 
       expect(balanceOfMock).toBeCalledTimes(1);
       expect(decimalsMock).toBeCalledTimes(1);
       expect(nameMock).toBeCalledTimes(1);
       expect(symbolMock).toBeCalledTimes(1);
-      expect(result).toEqual({
-        name: 'Ethereum',
-        symbol: 'ETH',
+      expect(balanceResult).toEqual({
         balance: currentBalance,
         formattedBalance,
-        decimals: 18,
+        token: {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
+          address: testContractAddress
+        }
+        
       })
     });
 

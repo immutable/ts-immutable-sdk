@@ -3,11 +3,11 @@
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { switchWalletNetwork } from './network'
-import { WALLET_ACTION } from '../types'
-import { ConnectionProviders, connectWalletProvider } from '../connect';
-import { Network, NetworkMap } from './types';
-import { CheckoutError, CheckoutErrorType } from '../errors';
+import { switchWalletNetwork } from "./network";
+import { ChainId, WALLET_ACTION } from "../types";
+import { connectWalletProvider } from "../connect";
+import { ChainIdNetworkMap, ConnectionProviders } from "../types";
+import { CheckoutError, CheckoutErrorType } from "../errors";
 
 let windowSpy: any;
 
@@ -33,18 +33,59 @@ describe("network functions", () => {
       providerPreference: ConnectionProviders.METAMASK
     });
 
-    await switchWalletNetwork(provider, Network.ETHEREUM);
+    const switchNetworkResult = await switchWalletNetwork(provider, ChainId.ETHEREUM);
 
     expect(provider.provider.request).toBeCalledWith(
       {
-        method: WALLET_ACTION.SWITCH_NETWORK, 
+        method: WALLET_ACTION.SWITCH_NETWORK,
         params: [
           {
-            chainId: NetworkMap[Network.ETHEREUM].chainId
+            chainId: ChainIdNetworkMap[ChainId.ETHEREUM].chainIdHex
           }
         ]
       }
     );
+    expect(switchNetworkResult).toEqual({
+      network: {
+        name: 'Ethereum',
+        chainID: '0x1',
+        nativeCurrency: {
+          name: 'Ether',
+          symbol: 'ETH',
+          decimals: 18
+        }
+      }
+    });
+  });
+
+  it('should make request for the user to switch network', async () => {
+    const provider = await connectWalletProvider({
+      providerPreference: ConnectionProviders.METAMASK
+    });
+
+    const switchNetworkResult = await switchWalletNetwork(provider, ChainId.POLYGON);
+
+    expect(provider.provider.request).toBeCalledWith(
+      {
+        method: WALLET_ACTION.SWITCH_NETWORK,
+        params: [
+          {
+            chainId: ChainIdNetworkMap[ChainId.POLYGON].chainIdHex
+          }
+        ]
+      }
+    );
+    expect(switchNetworkResult).toEqual({
+      network: {
+        name: 'Polygon',
+        chainID: '0x89',
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC',
+          decimals: 18
+        }
+      }
+    });
   });
 
   it('should throw an error if the network is not in our whitelist', async () => {
@@ -52,7 +93,7 @@ describe("network functions", () => {
       providerPreference: ConnectionProviders.METAMASK
     });
 
-    await expect(switchWalletNetwork(provider, 'Fantom' as Network)).rejects.toThrow(new CheckoutError('Fantom is not a supported network', CheckoutErrorType.NETWORK_NOT_SUPPORTED_ERROR));
+    await expect(switchWalletNetwork(provider, 56 as ChainId)).rejects.toThrow(new CheckoutError('56 is not a supported chain', CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR));
   })
 
   it('should throw an error if the user rejects the switch network request', async () => {
@@ -69,7 +110,7 @@ describe("network functions", () => {
       providerPreference: ConnectionProviders.METAMASK
     });
 
-    await expect(switchWalletNetwork(provider, Network.POLYGON)).rejects.toThrow(new CheckoutError('user cancelled the switch network request', CheckoutErrorType.USER_REJECTED_REQUEST_ERROR));
+    await expect(switchWalletNetwork(provider, ChainId.POLYGON)).rejects.toThrow(new CheckoutError('user cancelled the switch network request', CheckoutErrorType.USER_REJECTED_REQUEST_ERROR));
   })
 
   it('should throw an error if the provider does not have a request function', async () => {
@@ -88,7 +129,7 @@ describe("network functions", () => {
     // remove request function from provider
     delete provider.provider.request;
 
-    await expect(switchWalletNetwork(provider, Network.POLYGON)).rejects.toThrow(new CheckoutError('provider object is missing request function', CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR));
+    await expect(switchWalletNetwork(provider, ChainId.POLYGON)).rejects.toThrow(new CheckoutError('provider object is missing request function', CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR));
   })
 
   it('should request the user to add a new network if their wallet does not already have it', async () => {
@@ -105,11 +146,17 @@ describe("network functions", () => {
       providerPreference: ConnectionProviders.METAMASK
     });
 
-    await switchWalletNetwork(provider, Network.POLYGON);
+    await switchWalletNetwork(provider, ChainId.POLYGON);
     expect(provider.provider.request).toHaveBeenCalledWith({
-        method: WALLET_ACTION.ADD_NETWORK, 
+        method: WALLET_ACTION.ADD_NETWORK,
         params: [
-          NetworkMap[Network.POLYGON]
+          {
+            chainId: ChainIdNetworkMap[ChainId.POLYGON].chainIdHex,
+            chainName: ChainIdNetworkMap[ChainId.POLYGON].chainName,
+            rpcUrls: ChainIdNetworkMap[ChainId.POLYGON].rpcUrls,
+            nativeCurrency: ChainIdNetworkMap[ChainId.POLYGON].nativeCurrency,
+            blockExplorerUrls: ChainIdNetworkMap[ChainId.POLYGON].blockExplorerUrls
+          }
         ]
     });
   });
@@ -131,11 +178,17 @@ describe("network functions", () => {
       providerPreference: ConnectionProviders.METAMASK
     });
 
-    await expect(switchWalletNetwork(provider, Network.POLYGON)).rejects.toThrow(new CheckoutError('user cancelled the add network request', CheckoutErrorType.USER_REJECTED_REQUEST_ERROR));
+    await expect(switchWalletNetwork(provider, ChainId.POLYGON)).rejects.toThrow(new CheckoutError('user cancelled the add network request', CheckoutErrorType.USER_REJECTED_REQUEST_ERROR));
     expect(provider.provider.request).toHaveBeenCalledWith({
-      method: WALLET_ACTION.ADD_NETWORK, 
+      method: WALLET_ACTION.ADD_NETWORK,
       params: [
-        NetworkMap[Network.POLYGON]
+        {
+          chainId: ChainIdNetworkMap[ChainId.POLYGON].chainIdHex,
+          chainName: ChainIdNetworkMap[ChainId.POLYGON].chainName,
+          rpcUrls: ChainIdNetworkMap[ChainId.POLYGON].rpcUrls,
+          nativeCurrency: ChainIdNetworkMap[ChainId.POLYGON].nativeCurrency,
+          blockExplorerUrls: ChainIdNetworkMap[ChainId.POLYGON].blockExplorerUrls
+        }
       ]
     });
   });

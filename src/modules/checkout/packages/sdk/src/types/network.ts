@@ -1,27 +1,30 @@
 import { Web3Provider } from "@ethersproject/providers";
+import { TokenInfo } from "./token";
 
-export enum Network {
-  ETHEREUM = 'mainnet',
-  GOERLI = 'goerli',
-  POLYGON = 'polygon',
+export enum ChainId {
+  ETHEREUM = 1,
+  GOERLI = 5,
+  POLYGON = 137,
   // zkEVM = 'zkEVM'
 }
 
+export interface NetworkInfo {
+  name: string;
+  chainId: number;
+  nativeCurrency: TokenInfo;
+}
+
 export type NetworkDetails = {
-  chainId: string;
+  chainIdHex: string;
   chainName: string;
   rpcUrls: string[];
-  nativeCurrency: {
-    name: string;
-    symbol: string;
-    decimals: number;
-  };
+  nativeCurrency: TokenInfo;
   blockExplorerUrls?: string[];
 }
 
-export const NetworkMap = {
-  [Network.ETHEREUM]: {
-    chainId: '0x1', // 1
+export const ChainIdNetworkMap = {
+  [ChainId.ETHEREUM]: {
+    chainIdHex: '0x1', // 1
     chainName: 'Ethereum',
     rpcUrls: ["https://mainnet.infura.io/v3/"],
     nativeCurrency: {
@@ -31,8 +34,8 @@ export const NetworkMap = {
     },
     blockExplorerUrls: ['https://etherscan.io/']
   } as NetworkDetails,
-  [Network.GOERLI]: {
-    chainId: '0x5', // 5
+  [ChainId.GOERLI]: {
+    chainIdHex: '0x5', // 5
     chainName: 'Goerli',
     rpcUrls: ["https://goerli.infura.io/v3/"],
     nativeCurrency: {
@@ -42,9 +45,9 @@ export const NetworkMap = {
     },
     blockExplorerUrls: ['https://goerli.etherscan.io/']
   },
-  [Network.POLYGON]: {
-    chainId: '0x89', // 137
-    chainName: 'Polygon Mainnet',
+  [ChainId.POLYGON]: {
+    chainIdHex: '0x89', // 137
+    chainName: 'Polygon',
     rpcUrls: ["https://polygon-rpc.com"],
     nativeCurrency: {
       name: "MATIC",
@@ -52,10 +55,14 @@ export const NetworkMap = {
       decimals: 18
     },
     blockExplorerUrls: ["https://polygonscan.com/"],
-   } 
+   }
 };
 
 export interface SwitchNetworkParams {
   provider: Web3Provider;
-  network: Network;
+  chainId: ChainId;
+}
+
+export interface SwitchNetworkResult {
+  network: NetworkInfo;
 }
