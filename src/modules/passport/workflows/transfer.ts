@@ -19,6 +19,7 @@ type TransferRequest = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
+  passportConfig: PassportConfiguration;
 };
 
 type BatchTransfersParams = {
@@ -33,7 +34,8 @@ export const transfer = ({
  transfersApi,
  starkSigner,
  user,
-}: TransferRequest, config : PassportConfiguration): Promise<CreateTransferResponseV1> => {
+  passportConfig
+}: TransferRequest): Promise<CreateTransferResponseV1> => {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
     const signableResult = await transfersApi.getSignableTransferV1({
@@ -45,7 +47,7 @@ export const transfer = ({
       },
     });
 
-    const confirmationResult = await displayConfirmationScreen(config,{
+    const confirmationResult = await displayConfirmationScreen(passportConfig,{
       messageType: "transaction_start",
       messageData: {
         transactionType: "v1/transfer",

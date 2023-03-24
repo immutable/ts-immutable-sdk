@@ -114,7 +114,8 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-      }, passportConfig);
+        passportConfig,
+      });
 
       expect(getSignableTransferV1Mock).toBeCalledWith(
         mockSignableTransferRequest
@@ -136,7 +137,8 @@ describe('transfer', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: mockTransferRequest as UnsignedTransferRequest,
-        }, passportConfig)
+          passportConfig,
+        })
       ).rejects.toThrow(new PassportError(
         `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
         PassportErrorType.TRANSFER_ERROR
@@ -169,7 +171,8 @@ describe('transfer', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: mockTransferRequest as UnsignedTransferRequest,
-        }, passportConfig)
+          passportConfig,
+        })
       ).rejects.toThrowError('TRANSFER_ERROR');
     });
   });
