@@ -7,13 +7,14 @@ import {
 } from './types';
 import { ConfirmationTitle, PopUpHeight, PopUpWidth } from './config';
 import { openPopupCenter } from './popup';
+import { PassportConfiguration } from '../config';
 
 export const passportConfirmationType = "imx-passport-confirmation";
 
-export default async function displayConfirmationScreen(params: DisplayConfirmationParams): Promise<ConfirmationResult> {
+export default async function displayConfirmationScreen(config: PassportConfiguration, params: DisplayConfirmationParams): Promise<ConfirmationResult> {
   return new Promise((resolve, reject) => {
     const confirmationWindow = openPopupCenter({
-      url: params.passportDomain,
+      url: config.passportDomain,
       title: ConfirmationTitle,
       width: PopUpWidth,
       height: PopUpHeight
@@ -29,7 +30,7 @@ export default async function displayConfirmationScreen(params: DisplayConfirmat
     }, 1000);
 
     const messageHandler = ({ data, origin }: MessageEvent) => {
-      if (origin != params.passportDomain || data.eventType != passportConfirmationType || isReceiveMessageType(data.messageType)) {
+      if (origin != config.passportDomain || data.eventType != passportConfirmationType || isReceiveMessageType(data.messageType)) {
         return;
       }
       switch (data.messageType as ReceiveMessage) {
@@ -40,7 +41,7 @@ export default async function displayConfirmationScreen(params: DisplayConfirmat
           PassportPostMessage(confirmationWindow, {
             ...params,
             eventType: passportConfirmationType
-          }, params.passportDomain);
+          }, config.passportDomain);
           break;
         }
         case 'transaction_confirmed': {

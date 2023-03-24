@@ -64,7 +64,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       transfersApi: this.transfersApi
-    }, { passportDomain: this.passportConfig.passportDomain });
+    }, this.passportConfig );
   }
 
   registerOffchain(): Promise<RegisterUserResponse> {

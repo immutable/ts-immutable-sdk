@@ -2,9 +2,10 @@
  * @jest-environment jsdom
  */
 import displayConfirmationScreen from './confirmation';
+import { Config } from '../config';
 import SpyInstance = jest.SpyInstance;
 
-let windowSpy: SpyInstance
+let windowSpy: SpyInstance;
 const mockNewWindow = { closed: true, focus: jest.fn() };
 const mockedOpen = jest.fn().mockReturnValue(mockNewWindow);
 const addEventListenerMock = jest.fn();
@@ -39,15 +40,29 @@ describe('confirmation', () => {
           tokenAddress: '0xacb3c6a43d15b907e8433077b6d38ae40936fe2c',
         },
       };
+      const config = {
+        network: Config.SANDBOX.network,
+        oidcConfiguration: {
+          authenticationDomain: Config.SANDBOX.authenticationDomain,
+          clientId: "",
+          logoutRedirectUri: "",
+          redirectUri: "",
+        },
+        imxAPIConfiguration: {
+          basePath: "https://api.sandbox.x.immutable.com",
+        },
+        passportDomain: "https://immutable.sandbox.passport.com",
+        magicPublishableApiKey: Config.SANDBOX.magicPublishableApiKey,
+        magicProviderId: Config.SANDBOX.magicProviderId,
+      };
 
-      const res = await displayConfirmationScreen({
+      const res = await displayConfirmationScreen(config, {
         messageType: "transaction_start",
         messageData: messageData as never,
         accessToken: "ehyyy",
-        passportDomain: "test.com"
       });
 
-      expect(res.confirmed).toEqual(false)
+      expect(res.confirmed).toEqual(false);
       expect(mockedOpen).toHaveBeenCalledTimes(1);
     });
   });

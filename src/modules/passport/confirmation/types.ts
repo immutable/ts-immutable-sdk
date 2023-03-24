@@ -17,7 +17,6 @@ export type DisplayConfirmationParams = {
   messageType: PostMessageType;
   messageData: PostMessageData;
   accessToken: string;
-  passportDomain: string;
 }
 
 export type PostMessageParams = DisplayConfirmationParams & {

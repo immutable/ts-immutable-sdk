@@ -3,6 +3,7 @@ import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
 import displayConfirmationScreen from '../confirmation/confirmation';
+import { Config } from '../config';
 
 jest.mock('../confirmation/confirmation');
 
@@ -11,6 +12,23 @@ describe('transfer', () => {
     signMessage: jest.fn(),
     getAddress: jest.fn(),
   };
+
+  const passportConfig = {
+    network: Config.SANDBOX.network,
+    oidcConfiguration: {
+      authenticationDomain: Config.SANDBOX.authenticationDomain,
+      clientId: "",
+      logoutRedirectUri: "",
+      redirectUri: "",
+    },
+    imxAPIConfiguration: {
+      basePath: "https://api.sandbox.x.immutable.com",
+    },
+    passportDomain: "https://immutable.sandbox.passport.com",
+    magicPublishableApiKey: Config.SANDBOX.magicPublishableApiKey,
+    magicProviderId: Config.SANDBOX.magicProviderId,
+  };
+
 
   describe('single transfer', () => {
     let getSignableTransferV1Mock: jest.Mock;
@@ -96,7 +114,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-      }, { passportDomain: "test.com" });
+      }, passportConfig);
 
       expect(getSignableTransferV1Mock).toBeCalledWith(
         mockSignableTransferRequest
@@ -118,7 +136,7 @@ describe('transfer', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: mockTransferRequest as UnsignedTransferRequest,
-        }, { passportDomain: "test.com" })
+        }, passportConfig)
       ).rejects.toThrow(new PassportError(
         `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
         PassportErrorType.TRANSFER_ERROR
@@ -151,7 +169,7 @@ describe('transfer', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: mockTransferRequest as UnsignedTransferRequest,
-        }, { passportDomain: "test.com" })
+        }, passportConfig)
       ).rejects.toThrowError('TRANSFER_ERROR');
     });
   });
