@@ -29,7 +29,7 @@ export type ConfirmationResult = {
 }
 
 type TransactionPayloadType = GetSignableTransferRequest | GetSignableTradeRequest
-type TransactionType = "v1/transfer" | "order"
+type TransactionType = "v1/transfer" | "trade"
 
 type PostMessageType = "transaction_start"
 type PassportEventType = "imx-passport-confirmation";
