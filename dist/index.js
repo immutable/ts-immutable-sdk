@@ -1,4 +1,4 @@
-import { ImmutableX, Configuration as Configuration$1, TransfersApi, generateLegacyStarkPrivateKey, createStarkSigner, UsersApi, OrdersApi, Contracts, WithdrawalsApi, EncodingApi, MintsApi, TradesApi, DepositsApi, TokensApi, ExchangesApi, Config as Config$1 } from '@imtbl/core-sdk';
+import { ImmutableX, Configuration as Configuration$1, TransfersApi, OrdersApi, ExchangesApi, TradesApi, generateLegacyStarkPrivateKey, createStarkSigner, UsersApi, Contracts, WithdrawalsApi, EncodingApi, MintsApi, DepositsApi, TokensApi, Config as Config$1 } from '@imtbl/core-sdk';
 export { EncodeAssetRequestTokenTypeEnum, EthSigner, FeeTokenTypeEnum, GetMetadataRefreshResponseStatusEnum, MetadataRefreshExcludingSummaryStatusEnum } from '@imtbl/core-sdk';
 import { UserManager } from 'oidc-client-ts';
 import axios from 'axios';
@@ -29,6 +29,10 @@ var PassportErrorType;
     PassportErrorType["REFRESH_TOKEN_ERROR"] = "REFRESH_TOKEN_ERROR";
     PassportErrorType["USER_REGISTRATION_ERROR"] = "USER_REGISTRATION_ERROR";
     PassportErrorType["TRANSFER_ERROR"] = "TRANSFER_ERROR";
+    PassportErrorType["CREATE_ORDER_ERROR"] = "CREATE_ORDER_ERROR";
+    PassportErrorType["CANCEL_ORDER_ERROR"] = "CANCEL_ORDER_ERROR";
+    PassportErrorType["EXCHANGE_TRANSFER_ERROR"] = "EXCHANGE_TRANSFER_ERROR";
+    PassportErrorType["CREATE_TRADE_ERROR"] = "CREATE_TRADE_ERROR";
 })(PassportErrorType || (PassportErrorType = {}));
 class PassportError extends Error {
     type;
@@ -94,8 +98,9 @@ const getAuthConfiguration = ({ oidcConfiguration, }) => ({
         token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
         userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
     },
+    mergeClaims: true,
     loadUserInfo: true,
-    scope: 'openid offline_access profile email create:users',
+    scope: 'openid offline_access profile email create:users passport:user_create',
     extraQueryParams: {
         audience: 'platform_api',
     }
@@ -243,11 +248,11 @@ function convertToSignableToken(token) {
     }
 }
 
-const ERC721 = 'ERC721';
-const transfer$1 = ({ request, transferApi, starkSigner, user, }) => {
+const ERC721$1 = 'ERC721';
+const transfer$1 = ({ request, transfersApi, starkSigner, user, }) => {
     return withPassportError(async () => {
-        const transferAmount = request.type === ERC721 ? '1' : request.amount;
-        const signableResult = await transferApi.getSignableTransferV1({
+        const transferAmount = request.type === ERC721$1 ? '1' : request.amount;
+        const signableResult = await transfersApi.getSignableTransferV1({
             getSignableTransferRequest: {
                 sender: user.etherKey,
                 token: convertToSignableToken(request),
@@ -276,7 +281,7 @@ const transfer$1 = ({ request, transferApi, starkSigner, user, }) => {
         const headers = {
             Authorization: 'Bearer ' + user.accessToken,
         };
-        const { data: responseData } = await transferApi.createTransferV1(createTransferRequest, { headers });
+        const { data: responseData } = await transfersApi.createTransferV1(createTransferRequest, { headers });
         return {
             sent_signature: responseData.sent_signature,
             status: responseData.status?.toString(),
@@ -285,23 +290,257 @@ const transfer$1 = ({ request, transferApi, starkSigner, user, }) => {
         };
     }, PassportErrorType.TRANSFER_ERROR);
 };
+async function batchNftTransfer({ user, starkSigner, request, transfersApi, }) {
+    return withPassportError(async () => {
+        const ethAddress = user.etherKey;
+        const signableRequests = request.map((nftTransfer) => {
+            return {
+                amount: '1',
+                token: convertToSignableToken({
+                    type: ERC721$1,
+                    tokenId: nftTransfer.tokenId,
+                    tokenAddress: nftTransfer.tokenAddress,
+                }),
+                receiver: nftTransfer.receiver,
+            };
+        });
+        const signableResult = await transfersApi.getSignableTransfer({
+            getSignableTransferRequestV2: {
+                sender_ether_key: ethAddress,
+                signable_requests: signableRequests,
+            },
+        });
+        const requests = await Promise.all(signableResult.data.signable_responses.map(async (resp) => {
+            const starkSignature = await starkSigner.signMessage(resp.payload_hash);
+            return {
+                sender_vault_id: resp.sender_vault_id,
+                receiver_stark_key: resp.receiver_stark_key,
+                receiver_vault_id: resp.receiver_vault_id,
+                asset_id: resp.asset_id,
+                amount: resp.amount,
+                nonce: resp.nonce,
+                expiration_timestamp: resp.expiration_timestamp,
+                stark_signature: starkSignature,
+            };
+        }));
+        const transferSigningParams = {
+            sender_stark_key: signableResult.data.sender_stark_key,
+            requests,
+        };
+        const headers = {
+            Authorization: 'Bearer ' + user.accessToken,
+        };
+        const response = await transfersApi.createTransfer({
+            createTransferRequestV2: transferSigningParams,
+            // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
+            // Should be able to remove it once the Backend have update the API
+            // and generated the New Client
+            xImxEthAddress: '',
+            xImxEthSignature: '',
+        }, { headers });
+        return {
+            transfer_ids: response?.data.transfer_ids,
+        };
+    }, PassportErrorType.TRANSFER_ERROR);
+}
+
+const ERC721 = 'ERC721';
+async function createOrder$1({ starkSigner, user, request, ordersApi, }) {
+    return withPassportError(async () => {
+        const ethAddress = user.etherKey;
+        const amountSell = request.sell.type === ERC721 ? '1' : request.sell.amount;
+        const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
+        const getSignableOrderRequest = {
+            user: ethAddress,
+            amount_buy: amountBuy,
+            token_buy: convertToSignableToken(request.buy),
+            amount_sell: amountSell,
+            token_sell: convertToSignableToken(request.sell),
+            fees: request.fees,
+            expiration_timestamp: request.expiration_timestamp,
+        };
+        const getSignableOrderResponse = await ordersApi.getSignableOrder({
+            getSignableOrderRequestV3: getSignableOrderRequest,
+        });
+        const { payload_hash: payloadHash } = getSignableOrderResponse.data;
+        const starkSignature = await starkSigner.signMessage(payloadHash);
+        const signableResultData = getSignableOrderResponse.data;
+        const orderParams = {
+            createOrderRequest: {
+                include_fees: true,
+                fees: request.fees,
+                stark_signature: starkSignature,
+                amount_buy: signableResultData.amount_buy,
+                amount_sell: signableResultData.amount_sell,
+                asset_id_buy: signableResultData.asset_id_buy,
+                asset_id_sell: signableResultData.asset_id_sell,
+                expiration_timestamp: signableResultData.expiration_timestamp,
+                nonce: signableResultData.nonce,
+                stark_key: signableResultData.stark_key,
+                vault_id_buy: signableResultData.vault_id_buy,
+                vault_id_sell: signableResultData.vault_id_sell,
+            },
+            // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
+            // Should be able to remove it once the Backend have update the API
+            // and generated the New Client
+            xImxEthAddress: '',
+            xImxEthSignature: '',
+        };
+        const headers = {
+            Authorization: 'Bearer ' + user.accessToken,
+        };
+        const createOrderResponse = await ordersApi.createOrder(orderParams, {
+            headers,
+        });
+        return {
+            ...createOrderResponse.data,
+        };
+    }, PassportErrorType.CREATE_ORDER_ERROR);
+}
+async function cancelOrder$1({ user, starkSigner, request, ordersApi, }) {
+    return withPassportError(async () => {
+        const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrder({
+            getSignableCancelOrderRequest: {
+                order_id: request.order_id,
+            },
+        });
+        const { payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
+        const starkSignature = await starkSigner.signMessage(payloadHash);
+        const headers = {
+            Authorization: 'Bearer ' + user.accessToken,
+        };
+        const cancelOrderResponse = await ordersApi.cancelOrder({
+            id: request.order_id.toString(),
+            cancelOrderRequest: {
+                order_id: request.order_id,
+                stark_signature: starkSignature,
+            },
+            // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
+            // Should be able to remove it once the Backend have update the API
+            // and generated the New Client
+            xImxEthAddress: '',
+            xImxEthSignature: '',
+        }, { headers });
+        return {
+            order_id: cancelOrderResponse.data.order_id,
+            status: cancelOrderResponse.data.status,
+        };
+    }, PassportErrorType.CANCEL_ORDER_ERROR);
+}
+
+async function exchangeTransfer$1({ user, starkSigner, request, exchangesApi, }) {
+    return withPassportError(async () => {
+        const ethAddress = user.etherKey;
+        const transferAmount = request.amount;
+        const signableResult = await exchangesApi.getExchangeSignableTransfer({
+            id: request.transactionID,
+            getSignableTransferRequest: {
+                sender: ethAddress,
+                token: convertToSignableToken(request),
+                amount: transferAmount,
+                receiver: request.receiver,
+            },
+        });
+        const starkAddress = await starkSigner.getAddress();
+        const { payload_hash: payloadHash } = signableResult.data;
+        const starkSignature = await starkSigner.signMessage(payloadHash);
+        const transferSigningParams = {
+            sender_stark_key: signableResult.data.sender_stark_key || starkAddress,
+            sender_vault_id: signableResult.data.sender_vault_id,
+            receiver_stark_key: signableResult.data.receiver_stark_key,
+            receiver_vault_id: signableResult.data.receiver_vault_id,
+            asset_id: signableResult.data.asset_id,
+            amount: signableResult.data.amount,
+            nonce: signableResult.data.nonce,
+            expiration_timestamp: signableResult.data.expiration_timestamp,
+            stark_signature: starkSignature,
+        };
+        const response = await exchangesApi.createExchangeTransfer({
+            id: request.transactionID,
+            createTransferRequest: transferSigningParams,
+            // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
+            // Should be able to remove it once the Backend have update the API
+            // and generated the New Client
+            xImxEthAddress: '',
+            xImxEthSignature: '',
+        });
+        return {
+            sent_signature: response?.data.sent_signature,
+            status: response?.data.status?.toString(),
+            time: response?.data.time,
+            transfer_id: response?.data.transfer_id,
+        };
+    }, PassportErrorType.EXCHANGE_TRANSFER_ERROR);
+}
+
+async function createTrade$1({ request, tradesApi, user, starkSigner }) {
+    return withPassportError(async () => {
+        const ethAddress = user.etherKey;
+        const getSignableTradeRequest = {
+            expiration_timestamp: request.expiration_timestamp,
+            fees: request.fees,
+            order_id: request.order_id,
+            user: ethAddress
+        };
+        const getSignableTradeResponse = await tradesApi.getSignableTrade({
+            getSignableTradeRequest
+        });
+        const { payload_hash: payloadHash } = getSignableTradeResponse.data;
+        const starkSignature = await starkSigner.signMessage(payloadHash);
+        const { data: signableResultData } = getSignableTradeResponse;
+        const tradeParams = {
+            createTradeRequest: {
+                include_fees: true,
+                fees: request?.fees,
+                stark_signature: starkSignature,
+                order_id: request?.order_id,
+                fee_info: signableResultData.fee_info,
+                amount_buy: signableResultData.amount_buy,
+                amount_sell: signableResultData.amount_sell,
+                asset_id_buy: signableResultData.asset_id_buy,
+                asset_id_sell: signableResultData.asset_id_sell,
+                expiration_timestamp: signableResultData.expiration_timestamp,
+                nonce: signableResultData.nonce,
+                stark_key: signableResultData.stark_key,
+                vault_id_buy: signableResultData.vault_id_buy,
+                vault_id_sell: signableResultData.vault_id_sell,
+            },
+            // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
+            // Should be able to remove it once the Backend have update the API
+            // and generated the New Client
+            xImxEthAddress: '',
+            xImxEthSignature: '',
+        };
+        const headers = { Authorization: 'Bearer ' + user.accessToken };
+        const { data: createTradeResponse } = await tradesApi.createTrade(tradeParams, {
+            headers,
+        });
+        return createTradeResponse;
+    }, PassportErrorType.CREATE_TRADE_ERROR);
+}
 
 class PassportImxProvider {
     user;
     starkSigner;
     transfersApi;
-    constructor({ user, starkSigner, apiConfig, }) {
+    ordersApi;
+    exchangesApi;
+    tradesApi;
+    constructor({ user, starkSigner, apiConfig }) {
         this.user = user;
         this.starkSigner = starkSigner;
         const configuration = new Configuration$1({ basePath: apiConfig.basePath });
         this.transfersApi = new TransfersApi(configuration);
+        this.ordersApi = new OrdersApi(configuration);
+        this.exchangesApi = new ExchangesApi(configuration);
+        this.tradesApi = new TradesApi(configuration);
     }
     async transfer(request) {
         return transfer$1({
             request,
             user: this.user,
             starkSigner: this.starkSigner,
-            transferApi: this.transfersApi,
+            transfersApi: this.transfersApi,
         });
     }
     registerOffchain() {
@@ -310,28 +549,45 @@ class PassportImxProvider {
     isRegisteredOnchain() {
         throw new Error('Method not implemented.');
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     createOrder(request) {
-        throw new Error('Method not implemented.');
+        return createOrder$1({
+            request,
+            user: this.user,
+            starkSigner: this.starkSigner,
+            ordersApi: this.ordersApi,
+        });
     }
-    cancelOrder(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    request) {
-        throw new Error('Method not implemented.');
+    cancelOrder(request) {
+        return cancelOrder$1({
+            request,
+            user: this.user,
+            starkSigner: this.starkSigner,
+            ordersApi: this.ordersApi,
+        });
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     createTrade(request) {
-        throw new Error('Method not implemented.');
+        return createTrade$1({
+            request,
+            user: this.user,
+            starkSigner: this.starkSigner,
+            tradesApi: this.tradesApi,
+        });
     }
-    batchNftTransfer(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    request) {
-        throw new Error('Method not implemented.');
+    batchNftTransfer(request) {
+        return batchNftTransfer({
+            request,
+            user: this.user,
+            starkSigner: this.starkSigner,
+            transfersApi: this.transfersApi,
+        });
     }
-    exchangeTransfer(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    request) {
-        throw new Error('Method not implemented.');
+    exchangeTransfer(request) {
+        return exchangeTransfer$1({
+            request,
+            user: this.user,
+            starkSigner: this.starkSigner,
+            exchangesApi: this.exchangesApi
+        });
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     deposit(deposit) {
@@ -349,7 +605,7 @@ class PassportImxProvider {
         throw new Error('Method not implemented.');
     }
     getAddress() {
-        throw new Error('Method not implemented.');
+        return Promise.resolve(this.starkSigner.getAddress());
     }
 }
 
