@@ -12,7 +12,10 @@ export default class PassportImxProvider implements IMXProvider {
     private user;
     private starkSigner;
     private transfersApi;
-    constructor({ user, starkSigner, apiConfig, }: PassportImxProviderInput);
+    private ordersApi;
+    private exchangesApi;
+    private tradesApi;
+    constructor({ user, starkSigner, apiConfig }: PassportImxProviderInput);
     transfer(request: UnsignedTransferRequest): Promise<CreateTransferResponseV1>;
     registerOffchain(): Promise<RegisterUserResponse>;
     isRegisteredOnchain(): Promise<boolean>;
