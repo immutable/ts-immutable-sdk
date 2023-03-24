@@ -8,7 +8,7 @@ describe('tokens', () => {
           "name": "Ethereum",
           "symbol": "ETH",
           "decimals": 18,
-          "icon": Icon.ETHEREUM,
+          "icon": Icon.ETH,
         },
         {
           "name": "Matic",
