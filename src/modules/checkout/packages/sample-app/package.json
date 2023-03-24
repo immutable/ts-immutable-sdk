@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@imtbl/checkout-sdk-web": "../sdk/imtbl-checkout-sdk-web-0.0.1.tgz",
-    "@imtbl/checkout-ui": "../ui/imtbl-checkout-ui-0.0.1.tgz",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -36,5 +35,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@typescript-eslint/parser": "^5.56.0"
   }
 }

@@ -17,6 +17,7 @@ const getAuthConfiguration = ({
     token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
     userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
   },
+  mergeClaims: true,
   loadUserInfo: true,
   scope: 'openid offline_access profile email create:users passport:user_create',
   extraQueryParams: {
