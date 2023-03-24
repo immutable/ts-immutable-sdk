@@ -4,6 +4,7 @@ import {
   ETHAmount,
   ExchangesApi,
   OrdersApi,
+  TradesApi,
   TransfersApi,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
@@ -18,6 +19,7 @@ jest.mock('@imtbl/core-sdk', () => {
     TransfersApi: jest.fn(),
     OrdersApi: jest.fn(),
     ExchangesApi: jest.fn(),
+    TradesApi: jest.fn()
   };
 });
 jest.mock('../confirmation/confirmation');
@@ -36,6 +38,8 @@ describe('PassportImxProvider', () => {
   let createTransferMock: jest.Mock;
   let getExchangeSignableTransferMock: jest.Mock;
   let createExchangeTransferMock: jest.Mock;
+  let getSignableTradeMock: jest.Mock;
+  let createTradeMock: jest.Mock;
 
   const mockStarkSigner = {
     signMessage: jest.fn(),
@@ -70,6 +74,13 @@ describe('PassportImxProvider', () => {
     (ExchangesApi as jest.Mock).mockReturnValue({
       getExchangeSignableTransfer: getExchangeSignableTransferMock,
       createExchangeTransfer: createExchangeTransferMock,
+    });
+
+    getSignableTradeMock = jest.fn();
+    createTradeMock = jest.fn();
+    (TradesApi as jest.Mock).mockReturnValue({
+      getSignableTrade: getSignableTradeMock,
+      createTrade: createTradeMock,
     });
 
     passportImxProvider = new PassportImxProvider({
@@ -128,7 +139,7 @@ describe('PassportImxProvider', () => {
       };
       const mockHeader = {
         headers: {
-          Authorization: `Bearer ${mockUser.accessToken}`,
+          Authorization: `Bearer ${ mockUser.accessToken }`,
         },
       };
       const mockReturnValue = {
@@ -173,7 +184,7 @@ describe('PassportImxProvider', () => {
           mockTransferRequest as UnsignedTransferRequest
         )
       ).rejects.toThrowError(new PassportError(
-        `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
+        `${ PassportErrorType.TRANSFER_ERROR }: ${ mockErrorMessage }`,
         PassportErrorType.TRANSFER_ERROR
       ));
     });
@@ -259,7 +270,7 @@ describe('PassportImxProvider', () => {
       };
       const mockHeader = {
         headers: {
-          Authorization: `Bearer ${mockUser.accessToken}`,
+          Authorization: `Bearer ${ mockUser.accessToken }`,
         },
       };
       const mockReturnValue = {
@@ -321,7 +332,7 @@ describe('PassportImxProvider', () => {
 
       const mockHeader = {
         headers: {
-          Authorization: `Bearer ${mockUser.accessToken}`,
+          Authorization: `Bearer ${ mockUser.accessToken }`,
         },
       };
 
@@ -353,8 +364,76 @@ describe('PassportImxProvider', () => {
   });
 
   describe('createTrade', () => {
-    it('should throw error', async () => {
-      expect(passportImxProvider.createTrade).toThrowError();
+    // mock data
+    const mockPayloadHash = 'test_payload_hash';
+    const mockSignableTradeRequest = {
+      getSignableTradeRequest: {
+        expiration_timestamp: 1231234,
+        fees: [],
+        order_id: 1234,
+        user: mockUser.etherKey
+      },
+    };
+    const mockSignableTradeResponseData = {
+      amount_buy: '2',
+      amount_sell: '1',
+      asset_id_buy: '1234',
+      asset_id_sell: '4321',
+      expiration_timestamp: 0,
+      fee_info: [],
+      nonce: 0,
+      stark_key: '0x1234',
+      vault_id_buy: '0x02705737c',
+      vault_id_sell: '0x04006590f',
+    }
+    const mockSignableTradeResponse = {
+      data: {
+        ...mockSignableTradeResponseData,
+        payload_hash: mockPayloadHash,
+        readable_transaction: 'test_readable_transaction',
+        signable_message: 'test_signable_message',
+        verification_signature: 'test_verification_signature'
+      },
+    };
+    const mockCreateTradeRequest = {
+      createTradeRequest: {
+        ...mockSignableTradeResponseData,
+        stark_signature: mockStarkSignature,
+        fees: [],
+        include_fees: true,
+        order_id: 1234
+      },
+      xImxEthAddress: '',
+      xImxEthSignature: '',
+    };
+    const mockHeader = {
+      headers: {
+        Authorization: `Bearer ${ mockUser.accessToken }`,
+      },
+    };
+    const mockReturnValue = {
+      status: 'success',
+      trade_id: 123,
+    };
+
+    it('should return a successful createTrade result', async () => {
+      getSignableTradeMock.mockResolvedValue(mockSignableTradeResponse);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
+      createTradeMock.mockResolvedValue({
+        data: mockReturnValue,
+      });
+
+      const result = await passportImxProvider.createTrade(mockSignableTradeRequest.getSignableTradeRequest);
+
+      expect(getSignableTradeMock).toBeCalledWith(
+        mockSignableTradeRequest
+      );
+      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
+      expect(createTradeMock).toBeCalledWith(
+        mockCreateTradeRequest,
+        mockHeader
+      );
+      expect(result).toEqual(mockReturnValue);
     });
   });
 
@@ -369,7 +448,7 @@ describe('PassportImxProvider', () => {
       ];
       const mockTransferResponse = {
         data: {
-          transfer_ids: ['transfer_id_1'],
+          transfer_ids: [ 'transfer_id_1' ],
         },
       };
       const sender_stark_key = 'sender_stark_key';
@@ -448,7 +527,7 @@ describe('PassportImxProvider', () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${mockUser.accessToken}`,
+            Authorization: `Bearer ${ mockUser.accessToken }`,
           },
         }
       );

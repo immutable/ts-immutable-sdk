@@ -16,6 +16,7 @@ import {
   RegisterUserResponse,
   StarkSigner,
   TokenAmount,
+  TradesApi,
   TransfersApi,
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
@@ -27,6 +28,7 @@ import { batchNftTransfer, transfer } from '../workflows/transfer';
 import { cancelOrder, createOrder } from '../workflows/order';
 import { exchangeTransfer } from '../workflows/exchange';
 import { PassportConfiguration } from '../config';
+import { createTrade } from "../workflows/trades";
 
 export type PassportImxProviderInput = {
   user: UserWithEtherKey;
@@ -41,6 +43,7 @@ export default class PassportImxProvider implements IMXProvider {
   private ordersApi: OrdersApi;
   private readonly passportConfig: PassportConfiguration;
   private exchangesApi: ExchangesApi;
+  private tradesApi: TradesApi;
 
   constructor({ user, starkSigner, passportConfig }: PassportImxProviderInput) {
     this.user = user;
@@ -50,6 +53,7 @@ export default class PassportImxProvider implements IMXProvider {
     this.transfersApi = new TransfersApi(apiConfig);
     this.ordersApi = new OrdersApi(apiConfig);
     this.exchangesApi = new ExchangesApi(apiConfig);
+    this.tradesApi = new TradesApi(apiConfig);
   }
 
   async transfer(
@@ -91,9 +95,13 @@ export default class PassportImxProvider implements IMXProvider {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   createTrade(request: GetSignableTradeRequest): Promise<CreateTradeResponse> {
-    throw new Error('Method not implemented.');
+    return createTrade({
+      request,
+      user: this.user,
+      starkSigner: this.starkSigner,
+      tradesApi: this.tradesApi,
+    });
   }
 
   batchNftTransfer(
