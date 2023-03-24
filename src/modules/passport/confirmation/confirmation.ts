@@ -5,8 +5,10 @@ import {
   PostMessageParams,
   ReceiveMessage
 } from './types';
-import { ConfirmationTitle, passportConfirmationType, PopUpHeight, PopUpWidth } from './config';
+import { ConfirmationTitle, PopUpHeight, PopUpWidth } from './config';
 import { openPopupCenter } from './popup';
+
+export const passportConfirmationType = "imx-passport-confirmation";
 
 export default async function displayConfirmationScreen(params: DisplayConfirmationParams): Promise<ConfirmationResult> {
   return new Promise((resolve, reject) => {
@@ -22,20 +24,23 @@ export default async function displayConfirmationScreen(params: DisplayConfirmat
       if (confirmationWindow?.closed) {
         clearInterval(timer);
         window.removeEventListener("message", messageHandler);
-        resolve({confirmed: false});
+        resolve({ confirmed: false });
       }
     }, 1000);
 
     const messageHandler = ({ data, origin }: MessageEvent) => {
       if (origin != params.passportDomain || data.eventType != passportConfirmationType || isReceiveMessageType(data.messageType)) {
-        return ({ confirmed: false });
+        return;
       }
       switch (data.messageType as ReceiveMessage) {
         case "confirmation_window_ready": {
           if (!confirmationWindow) {
             return;
           }
-          PassportPostMessage(confirmationWindow, { ...params, eventType: passportConfirmationType }, params.passportDomain);
+          PassportPostMessage(confirmationWindow, {
+            ...params,
+            eventType: passportConfirmationType
+          }, params.passportDomain);
           break;
         }
         case 'transaction_confirmed': {
@@ -54,6 +59,6 @@ export default async function displayConfirmationScreen(params: DisplayConfirmat
   });
 }
 
-const PassportPostMessage = (window: Window, message: PostMessageParams, targetDomain: string ) => {
+const PassportPostMessage = (window: Window, message: PostMessageParams, targetDomain: string) => {
   window.postMessage(message, targetDomain);
 };

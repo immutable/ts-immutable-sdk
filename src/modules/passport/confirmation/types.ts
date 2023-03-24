@@ -1,4 +1,4 @@
-import { GetSignableTradeRequest, GetSignableTransferRequest } from '@imtbl/core-sdk';
+import { GetSignableTransferRequest } from '@imtbl/core-sdk';
 
 const ReceiveMessageType = ['confirmation_window_ready', 'transaction_confirmed', 'transaction_error'] as const;
 type ReceiveTypeTuple = typeof ReceiveMessageType;
@@ -28,8 +28,8 @@ export type ConfirmationResult = {
   confirmed: boolean;
 }
 
-type TransactionPayloadType = GetSignableTransferRequest | GetSignableTradeRequest
-type TransactionType = "v1/transfer" | "trade"
+type TransactionPayloadType = GetSignableTransferRequest
+type TransactionType = "v1/transfer"
 
 type PostMessageType = "transaction_start"
 type PassportEventType = "imx-passport-confirmation";
