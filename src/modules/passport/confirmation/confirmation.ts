@@ -11,10 +11,14 @@ import { PassportConfiguration } from '../config';
 
 export const passportConfirmationType = "imx-passport-confirmation";
 
+const buildTransactionUrl = (passportDomain: string): string => {
+  return `${passportDomain}/transaction-confirmation`;
+};
+
 export default async function displayConfirmationScreen(config: PassportConfiguration, params: DisplayConfirmationParams): Promise<ConfirmationResult> {
   return new Promise((resolve, reject) => {
     const confirmationWindow = openPopupCenter({
-      url: config.passportDomain,
+      url: buildTransactionUrl(config.passportDomain),
       title: ConfirmationTitle,
       width: PopUpWidth,
       height: PopUpHeight
