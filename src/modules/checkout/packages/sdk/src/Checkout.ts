@@ -6,11 +6,11 @@ import {
   ConnectResult,
   GetBalanceParams,
   GetBalanceResult,
+  GetTokenAllowListResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
 } from './types';
 import { switchWalletNetwork } from './network';
-import { GetTokenAllowListResult } from './tokens/types';
 
 export class Checkout {
   public async connect(params: ConnectParams): Promise<ConnectResult> {

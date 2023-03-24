@@ -5,3 +5,7 @@ export interface TokenInfo {
   address?: string;
   icon?: string;
 }
+
+export interface GetTokenAllowListResult {
+  tokens: TokenInfo[];
+}
