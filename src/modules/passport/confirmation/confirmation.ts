@@ -35,7 +35,7 @@ export default async function displayConfirmationScreen(params: DisplayConfirmat
           if (!confirmationWindow) {
             return;
           }
-          PassportPostMessage(confirmationWindow, { ...params, eventType: passportConfirmationType });
+          PassportPostMessage(confirmationWindow, { ...params, eventType: passportConfirmationType }, params.passportDomain);
           break;
         }
         case 'transaction_confirmed': {
@@ -54,6 +54,6 @@ export default async function displayConfirmationScreen(params: DisplayConfirmat
   });
 }
 
-const PassportPostMessage = (window: Window, message: PostMessageParams) => {
-  window.postMessage(message, "*");
+const PassportPostMessage = (window: Window, message: PostMessageParams, targetDomain: string ) => {
+  window.postMessage(message, targetDomain);
 };
