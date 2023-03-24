@@ -1,4 +1,4 @@
-import { getTokenAllowList, icons } from './tokens';
+import { getTokenAllowList, Icon } from './tokens';
 
 describe('tokens', () => {
   it('should return the alphabetically sorted tokens allowlist', () => {
@@ -6,24 +6,23 @@ describe('tokens', () => {
       tokens: [
         {
           "name": "Ethereum",
-          "ticker": "ETH",
-          "contractAddress": "",
-          "decimal": 18,
-          "icon": icons.ETHEREUM,
+          "symbol": "ETH",
+          "decimals": 18,
+          "icon": Icon.ETHEREUM,
         },
         {
           "name": "Matic",
-          "ticker": "MATIC",
-          "contractAddress": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
-          "decimal": 18,
-          "icon": icons.MATIC,
+          "symbol": "MATIC",
+          "address": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
+          "decimals": 18,
+          "icon": Icon.MATIC,
           },
         {
           "name": "ImmutableX",
-          "ticker": "IMX",
-          "contractAddress": "0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF",
-          "decimal": 18,
-          "icon": icons.IMX,
+          "symbol": "IMX",
+          "address": "0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF",
+          "decimals": 18,
+          "icon": Icon.IMX,
         },
       ],
     });

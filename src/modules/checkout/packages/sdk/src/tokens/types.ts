@@ -1,11 +1,5 @@
-export interface GetTokenAllowListResult {
-    tokens: Token[];
-}
+import { TokenInfo } from "../types";
 
-export interface Token {
-    name: string;
-    ticker: string;
-    contractAddress: string;
-    decimal: number;
-    icon: string;
+export interface GetTokenAllowListResult {
+    tokens: TokenInfo[];
 }
