@@ -1,10 +1,12 @@
 import * as balances from './balances';
+import * as tokens from './tokens';
 import { connectWalletProvider, getNetworkInfo } from './connect';
 import {
   ConnectParams,
   ConnectResult,
   GetBalanceParams,
   GetBalanceResult,
+  GetTokenAllowListResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
 } from './types';
@@ -36,5 +38,9 @@ export class Checkout {
       params.walletAddress,
       params.contractAddress
     );
+  }
+
+  public getTokenAllowList(): GetTokenAllowListResult {
+    return tokens.getTokenAllowList();
   }
 }
