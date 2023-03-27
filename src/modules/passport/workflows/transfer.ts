@@ -50,7 +50,7 @@ export const transfer = ({
     const confirmationResult = await displayConfirmationScreen(passportConfig,{
       messageType: "transaction_start",
       messageData: {
-        transactionType: "v1/transfer",
+        transactionType: "v1/transfers",
         transactionData: {
           sender_ether_key: user.etherKey,
           signable_requests: [{

@@ -32,7 +32,7 @@ describe('confirmation', () => {
 
     it('should handle popup window closed', async () => {
       const messageData = {
-        transactionType: "v1/transfer",
+        transactionType: "v1/transfers",
         transactionData: {
           type: 'ERC721',
           tokenId: '194442292',

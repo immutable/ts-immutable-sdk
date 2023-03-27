@@ -9,7 +9,7 @@ import { ConfirmationTitle, PopUpHeight, PopUpWidth } from './config';
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
 
-export const passportConfirmationType = "imx-passport-confirmation";
+export const passportConfirmationType = "imx_passport_confirmation";
 
 const buildTransactionUrl = (passportDomain: string): string => {
   return `${passportDomain}/transaction-confirmation`;
