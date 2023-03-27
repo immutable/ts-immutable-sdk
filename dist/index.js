@@ -100,7 +100,7 @@ const getAuthConfiguration = ({ oidcConfiguration, }) => ({
     },
     mergeClaims: true,
     loadUserInfo: true,
-    scope: 'openid offline_access profile email create:users passport:user_create',
+    scope: 'openid offline_access profile email create:users passport:user_create imx:passport_user.create imx:passport_user.read imx:order.create imx:order.cancel imx:trade.create imx:transfer.create',
     extraQueryParams: {
         audience: 'platform_api',
     }
@@ -112,20 +112,6 @@ class AuthManager {
         this.config = config;
         this.userManager = new UserManager(getAuthConfiguration(config));
     }
-    mapOidcUserToDomainModel = (oidcUser) => {
-        const passport = oidcUser.profile?.passport;
-        return {
-            idToken: oidcUser.id_token,
-            accessToken: oidcUser.access_token,
-            refreshToken: oidcUser.refresh_token,
-            profile: {
-                sub: oidcUser.profile.sub,
-                email: oidcUser.profile.email,
-                nickname: oidcUser.profile.nickname,
-            },
-            etherKey: passport?.ether_key || '',
-        };
-    };
     async login() {
         return withPassportError(async () => {
             const oidcUser = await this.userManager.signinPopup();
@@ -154,6 +140,20 @@ class AuthManager {
             return this.mapOidcUserToDomainModel(updatedUser);
         }, PassportErrorType.REFRESH_TOKEN_ERROR);
     }
+    mapOidcUserToDomainModel = (oidcUser) => {
+        const passport = oidcUser.profile?.passport;
+        return {
+            idToken: oidcUser.id_token,
+            accessToken: oidcUser.access_token,
+            refreshToken: oidcUser.refresh_token,
+            profile: {
+                sub: oidcUser.profile.sub,
+                email: oidcUser.profile.email,
+                nickname: oidcUser.profile.nickname,
+            },
+            etherKey: passport?.ether_key || '',
+        };
+    };
 }
 
 class MagicAdapter {
