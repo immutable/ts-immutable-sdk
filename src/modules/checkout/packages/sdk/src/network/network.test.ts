@@ -50,7 +50,7 @@ describe('network functions', () => {
         name: 'Ethereum',
         chainId: 1,
         nativeCurrency: {
-          name: 'Ether',
+          name: 'Ethereum',
           symbol: 'ETH',
           decimals: 18,
         },

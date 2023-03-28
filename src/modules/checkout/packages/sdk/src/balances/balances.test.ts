@@ -1,8 +1,9 @@
-import { getBalance, getERC20Balance } from './balances';
+import { getAllBalances, getBalance, getERC20Balance } from './balances';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
-import { ERC20ABI, NetworkInfo } from '../types';
+import { ChainId, ERC20ABI, GetAllBalancesResult, NetworkInfo } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
+import { ethTokensList } from '../tokens';
 
 jest.mock('ethers', () => {
   return {
@@ -38,7 +39,7 @@ describe('balances', () => {
   const mockProvider = jest.fn().mockImplementation(() => {
     return {
       getBalance: mockGetBalance,
-      getNetwork: mockGetNetwork
+      getNetwork: mockGetNetwork,
     } as unknown as Web3Provider;
   });
 
@@ -106,7 +107,6 @@ describe('balances', () => {
           decimals: 18,
           address: testContractAddress
         }
-        
       })
     });
 
@@ -139,5 +139,100 @@ describe('balances', () => {
         '0x10c'
       )).rejects.toThrow(new CheckoutError('invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)', CheckoutErrorType.GET_ERC20_BALANCE_ERROR));
     })
+  });
+
+  describe('getAllBalances()', () => {
+    let mockProviderForAllBalances: jest.Mock;
+    let balanceOfMock: jest.Mock;
+    let decimalsMock: jest.Mock;
+    let nameMock: jest.Mock;
+    let symbolMock: jest.Mock;
+
+    let mockGetBalance: jest.Mock; 
+    let mockGetNetwork: jest.Mock; 
+    beforeEach(() => {
+      jest.restoreAllMocks();
+
+      mockGetBalance = jest
+      .fn()
+      .mockResolvedValue(currentBalance);
+
+      mockGetNetwork = jest
+      .fn()
+      .mockResolvedValue({chainId: 1, name: 'homestead'});
+
+      mockProviderForAllBalances = jest.fn().mockImplementation(() => {
+        return {
+          getBalance: mockGetBalance,
+          getNetwork: mockGetNetwork,
+          provider: {
+            request: jest.fn()
+          }
+        } as unknown as Web3Provider;
+      });
+
+      balanceOfMock = jest.fn().mockResolvedValue(currentBalance);
+      decimalsMock = jest.fn().mockResolvedValue(18);
+      nameMock = jest.fn()
+      .mockResolvedValueOnce('Matic')
+      .mockResolvedValueOnce('Immutable X');
+      symbolMock = jest.fn()
+      .mockResolvedValueOnce('MATIC')
+      .mockResolvedValueOnce('IMX');
+      (Contract as unknown as jest.Mock).mockReturnValue({
+        balanceOf: balanceOfMock,
+        decimals: decimalsMock,
+        name: nameMock,
+        symbol: symbolMock,
+        });
+    });
+
+    it('should call getBalance and getERC20Balance functions', async() => {
+      const getAllBalancesResult = await getAllBalances(
+        mockProviderForAllBalances() as unknown as Web3Provider,
+        'abc123',
+        ChainId.ETHEREUM
+      );
+
+      expect(mockGetBalance).toBeCalledTimes(1);
+      expect(balanceOfMock).toBeCalledTimes(2);
+      expect(decimalsMock).toBeCalledTimes(2);
+      expect(nameMock).toBeCalledTimes(2);
+      expect(symbolMock).toBeCalledTimes(2);
+
+      expect(getAllBalancesResult).toEqual({
+        balances: [
+          {
+            balance: currentBalance,
+            formattedBalance,
+            token: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+            }
+          },
+          {
+            balance: currentBalance,
+            formattedBalance,
+            token: {
+              name: 'Matic',
+              symbol: 'MATIC',
+              decimals: 18,
+              address: ethTokensList[1].address
+            }
+          },
+          {
+            balance: currentBalance,
+            formattedBalance,
+            token: {
+              name: 'Immutable X',
+              symbol: 'IMX',
+              decimals: 18,
+              address: ethTokensList[2].address
+            }
+          }
+        ],
+      } as GetAllBalancesResult)
+    });
   });
 });

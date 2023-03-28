@@ -9,4 +9,8 @@ export type {
   SwitchNetworkParams,
   SwitchNetworkResult,
   TokenInfo,
+  GetAllBalancesParams,
+  GetAllBalancesResult,
+  GetTokenAllowListParams,
+  GetTokenAllowListResult
 } from './types';
