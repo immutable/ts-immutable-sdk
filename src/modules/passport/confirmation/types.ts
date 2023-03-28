@@ -1,34 +1,37 @@
 import { UnsignedTransferRequest } from '@imtbl/core-sdk';
 
-const ReceiveMessageType = ['confirmation_window_ready', 'transaction_confirmed', 'transaction_error'] as const;
-type ReceiveTypeTuple = typeof ReceiveMessageType;
-export type ReceiveMessage = ReceiveTypeTuple[number];
-
-export function isReceiveMessageType(value: string): value is ReceiveMessage {
-  return ReceiveMessageType.includes(value as ReceiveMessage);
+export enum ReceiveMessage {
+  CONFIRMATION_WINDOW_READY = 'confirmation_window_ready',
+  TRANSACTION_CONFIRMED = 'transaction_confirmed',
+  TRANSACTION_ERROR = 'transaction_error',
 }
 
-export type PostMessageData = {
-  transactionType: typeof TransactionType;
-  transactionData: TransactionPayloadType;
+export function isReceiveMessage(value: string): value is ReceiveMessage {
+  return Object.values<string>(ReceiveMessage).includes(value);
 }
+
+export enum SendMessage {
+  TRANSACTION_START = 'transaction_start'
+}
+
+export enum TransactionTypes {
+  TRANSFER = 'v1/transfers'
+}
+
+export type Transfer = {
+  transactionType: TransactionTypes.TRANSFER;
+  transactionData: UnsignedTransferRequest;
+}
+
+export type Transaction = Transfer;
 
 export type DisplayConfirmationParams = {
-  messageType: typeof PostMessageType;
-  messageData: PostMessageData;
-  accessToken: string;
-}
-
-export type PostMessageParams = DisplayConfirmationParams & {
-  eventType: PassportEventType;
+  messageType: SendMessage;
+  messageData: Transaction;
 }
 
 export type ConfirmationResult = {
   confirmed: boolean;
 }
 
-type TransactionPayloadType = UnsignedTransferRequest
-export const TransactionType = "v1/transfers"
-
-export const PostMessageType = "transaction_start"
-type PassportEventType = "imx_passport_confirmation";
+export const PassportEventType = 'imx_passport_confirmation';

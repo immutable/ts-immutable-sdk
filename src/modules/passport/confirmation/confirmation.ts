@@ -1,69 +1,73 @@
 import {
   ConfirmationResult,
   DisplayConfirmationParams,
-  isReceiveMessageType,
-  PostMessageParams,
-  ReceiveMessage
+  isReceiveMessage,
+  PassportEventType,
+  ReceiveMessage,
+  SendMessage,
+  Transaction
 } from './types';
-import { ConfirmationTitle, PopUpHeight, PopUpWidth } from './config';
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
 
-export const passportConfirmationType = "imx_passport_confirmation";
+export default class ConfirmationScreen {
+  private config: PassportConfiguration;
 
-const buildTransactionUrl = (passportDomain: string): string => {
-  return `${passportDomain}/transaction-confirmation`;
-};
+  constructor(config: PassportConfiguration) {
+    this.config = config;
+  }
 
-export default async function displayConfirmationScreen(config: PassportConfiguration, params: DisplayConfirmationParams): Promise<ConfirmationResult> {
-  return new Promise((resolve, reject) => {
-    const confirmationWindow = openPopupCenter({
-      url: buildTransactionUrl(config.passportDomain),
-      title: ConfirmationTitle,
-      width: PopUpWidth,
-      height: PopUpHeight
-    });
+  private postMessage(accessToken: string, message: DisplayConfirmationParams) {
+    window.postMessage({
+      eventType: PassportEventType,
+      accessToken,
+      ...message,
+    }, this.config.passportDomain);
+  }
 
-    // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
-    const timer = setInterval(function () {
-      if (confirmationWindow?.closed) {
-        clearInterval(timer);
-        window.removeEventListener("message", messageHandler);
-        resolve({ confirmed: false });
-      }
-    }, 1000);
-
-    const messageHandler = ({ data, origin }: MessageEvent) => {
-      if (origin != config.passportDomain || data.eventType != passportConfirmationType || isReceiveMessageType(data.messageType)) {
-        return;
-      }
-      switch (data.messageType as ReceiveMessage) {
-        case "confirmation_window_ready": {
-          if (!confirmationWindow) {
-            return;
+  startTransaction = (accessToken: string, transaction: Transaction): Promise<ConfirmationResult> => {
+    return new Promise((resolve, reject) => {
+      const messageHandler = ({ data, origin }: MessageEvent) => {
+        if (origin != this.config.passportDomain || data.eventType != PassportEventType || !isReceiveMessage(data.messageType)) {
+          return;
+        }
+        switch (data.messageType as ReceiveMessage) {
+          case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
+            this.postMessage(accessToken, {
+              messageType: SendMessage.TRANSACTION_START,
+              messageData: transaction
+            });
+            break;
           }
-          PassportPostMessage(confirmationWindow, {
-            ...params,
-            eventType: passportConfirmationType
-          }, config.passportDomain);
-          break;
+          case ReceiveMessage.TRANSACTION_CONFIRMED: {
+            resolve({ confirmed: true });
+            break;
+          }
+          case ReceiveMessage.TRANSACTION_ERROR: {
+            reject(new Error('Transaction error'));
+            break;
+          }
+          default:
+            throw new Error('Unsupported message type');
         }
-        case 'transaction_confirmed': {
-          resolve({ confirmed: true });
-          break;
-        }
-        case 'transaction_error': {
-          reject(new Error("Transaction rejected"));
-          break;
-        }
-        default:
-          throw new Error('Unsupported message type');
-      }
-    };
-    window.addEventListener("message", messageHandler);
-  });
-}
+      };
 
-const PassportPostMessage = (window: Window, message: PostMessageParams, targetDomain: string) => {
-  window.postMessage(message, targetDomain);
-};
+      window.addEventListener('message', messageHandler);
+      const confirmationWindow = openPopupCenter({
+        url: `${this.config.passportDomain}/transaction-confirmation`,
+        title: 'Confirm this transaction',
+        width: 600,
+        height: 600,
+      });
+
+      // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
+      const timer = setInterval(function () {
+        if (confirmationWindow.closed) {
+          clearInterval(timer);
+          window.removeEventListener('message', messageHandler);
+          resolve({ confirmed: false });
+        }
+      }, 1000);
+    });
+  }
+}

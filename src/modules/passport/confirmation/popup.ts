@@ -1,5 +1,5 @@
 type PopUpProps = { url: string; title: string; width: number; height: number; query?: string }
-export const openPopupCenter = ({ url, title, width, height }: PopUpProps): Window | null => {
+export const openPopupCenter = ({ url, title, width, height }: PopUpProps): Window => {
   // Fixes dual-screen position                             Most browsers      Firefox
   const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
   const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
@@ -19,8 +19,10 @@ export const openPopupCenter = ({ url, title, width, height }: PopUpProps): Wind
       left=${left}
      `
   );
-  if (newWindow) {
-    newWindow.focus();
+  if (!newWindow) {
+    throw new Error('Failed to open confirmation screen');
   }
+
+  newWindow.focus();
   return newWindow;
 };

@@ -7,11 +7,11 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
-import { convertToSignableToken } from '../../../modules/provider/signable-actions/utils';
-import { UserWithEtherKey } from '../types';
-import displayConfirmationScreen from '../confirmation/confirmation';
+import { convertToSignableToken } from '../../provider/signable-actions/utils';
+import { Transaction, TransactionTypes} from '../confirmation/types';
+import ConfirmationScreen from '../confirmation/confirmation';
 import { PassportConfiguration } from '../config';
-import {PostMessageType, TransactionType} from '../confirmation/types';
+import { UserWithEtherKey } from '../types';
 
 const ERC721 = 'ERC721';
 
@@ -48,14 +48,16 @@ export const transfer = ({
       },
     });
 
-    const confirmationResult = await displayConfirmationScreen(passportConfig,{
-      messageType: PostMessageType,
-      messageData: {
-        transactionType: TransactionType,
-        transactionData: request,
-      },
-      accessToken: user.accessToken,
-    });
+    const transaction: Transaction = {
+      transactionType: TransactionTypes.TRANSFER,
+      transactionData: request,
+    };
+    const confirmationScreen = new ConfirmationScreen(passportConfig);
+    const confirmationResult = await confirmationScreen.startTransaction(
+      user.accessToken,
+      transaction,
+    );
+
 
     if (!confirmationResult.confirmed) {
       throw new Error("Transaction rejected by user");

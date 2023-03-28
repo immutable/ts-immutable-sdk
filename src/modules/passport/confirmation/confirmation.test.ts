@@ -1,8 +1,8 @@
 /**
  * @jest-environment jsdom
  */
-import displayConfirmationScreen from './confirmation';
-import { PostMessageData, PostMessageType, TransactionType } from './types';
+import ConfirmationScreen from './confirmation';
+import { Transaction, TransactionTypes } from './types';
 import { Config } from '../config';
 import SpyInstance = jest.SpyInstance;
 
@@ -14,7 +14,7 @@ const removeEventListenerMock = jest.fn();
 
 describe('confirmation', () => {
   beforeEach(() => {
-    windowSpy = jest.spyOn(window, "window", "get");
+    windowSpy = jest.spyOn(window, 'window', 'get');
     windowSpy.mockImplementation(() => ({
       open: mockedOpen,
       screen: {
@@ -29,11 +29,10 @@ describe('confirmation', () => {
     windowSpy.mockRestore();
   });
 
-  describe('displayConfirmationScreen', () => {
-
+  describe('startTransaction', () => {
     it('should handle popup window closed', async () => {
-      const messageData: PostMessageData = {
-        transactionType: TransactionType,
+      const transaction: Transaction = {
+        transactionType: TransactionTypes.TRANSFER,
         transactionData: {
           type: 'ERC721',
           tokenId: '194442292',
@@ -57,11 +56,11 @@ describe('confirmation', () => {
         magicProviderId: Config.SANDBOX.magicProviderId,
       };
 
-      const res = await displayConfirmationScreen(config, {
-        messageType: PostMessageType,
-        messageData,
-        accessToken: "ehyyy",
-      });
+      const confirmationScreen = new ConfirmationScreen(config);
+      const res = await confirmationScreen.startTransaction(
+        'ehyyy',
+        transaction
+      )
 
       expect(res.confirmed).toEqual(false);
       expect(mockedOpen).toHaveBeenCalledTimes(1);
