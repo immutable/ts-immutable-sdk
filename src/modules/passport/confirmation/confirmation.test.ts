@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 import displayConfirmationScreen from './confirmation';
+import { PostMessageData, PostMessageType, TransactionType } from './types';
 import { Config } from '../config';
 import SpyInstance = jest.SpyInstance;
 
@@ -31,8 +32,8 @@ describe('confirmation', () => {
   describe('displayConfirmationScreen', () => {
 
     it('should handle popup window closed', async () => {
-      const messageData = {
-        transactionType: "v1/transfers",
+      const messageData: PostMessageData = {
+        transactionType: TransactionType,
         transactionData: {
           type: 'ERC721',
           tokenId: '194442292',
@@ -57,8 +58,8 @@ describe('confirmation', () => {
       };
 
       const res = await displayConfirmationScreen(config, {
-        messageType: "transaction_start",
-        messageData: messageData as never,
+        messageType: PostMessageType,
+        messageData,
         accessToken: "ehyyy",
       });
 

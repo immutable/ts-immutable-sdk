@@ -11,6 +11,7 @@ import { convertToSignableToken } from '../../../modules/provider/signable-actio
 import { UserWithEtherKey } from '../types';
 import displayConfirmationScreen from '../confirmation/confirmation';
 import { PassportConfiguration } from '../config';
+import {PostMessageType, TransactionType} from '../confirmation/types';
 
 const ERC721 = 'ERC721';
 
@@ -48,17 +49,10 @@ export const transfer = ({
     });
 
     const confirmationResult = await displayConfirmationScreen(passportConfig,{
-      messageType: "transaction_start",
+      messageType: PostMessageType,
       messageData: {
-        transactionType: "v1/transfers",
-        transactionData: {
-          sender_ether_key: user.etherKey,
-          signable_requests: [{
-            amount: transferAmount,
-            token: convertToSignableToken(request),
-            receiver: request.receiver
-          }]
-        }
+        transactionType: TransactionType,
+        transactionData: request,
       },
       accessToken: user.accessToken,
     });
