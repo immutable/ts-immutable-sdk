@@ -1,7 +1,6 @@
 import {
   ConfirmationResult,
   DisplayConfirmationParams,
-  isReceiveMessage,
   PassportEventType,
   ReceiveMessage,
   SendMessage,
@@ -32,7 +31,7 @@ export default class ConfirmationScreen {
   startTransaction = (accessToken: string, transaction: Transaction): Promise<ConfirmationResult> => {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
-        if (origin != this.config.passportDomain || data.eventType != PassportEventType || !isReceiveMessage(data.messageType)) {
+        if (origin != this.config.passportDomain || data.eventType != PassportEventType) {
           return;
         }
         switch (data.messageType as ReceiveMessage) {
@@ -52,7 +51,7 @@ export default class ConfirmationScreen {
             break;
           }
           default:
-            throw new Error('Unsupported message type');
+            reject(new Error('Unsupported message type'));
         }
       };
 

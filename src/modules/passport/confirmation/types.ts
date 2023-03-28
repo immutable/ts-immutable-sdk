@@ -6,10 +6,6 @@ export enum ReceiveMessage {
   TRANSACTION_ERROR = 'transaction_error',
 }
 
-export function isReceiveMessage(value: string): value is ReceiveMessage {
-  return Object.values<string>(ReceiveMessage).includes(value);
-}
-
 export enum SendMessage {
   TRANSACTION_START = 'transaction_start'
 }
