@@ -2,10 +2,14 @@ import * as balances from './balances';
 import * as tokens from './tokens';
 import { connectWalletProvider, getNetworkInfo } from './connect';
 import {
+  ChainId,
   ConnectParams,
   ConnectResult,
+  GetAllBalancesParams,
+  GetAllBalancesResult,
   GetBalanceParams,
   GetBalanceResult,
+  GetTokenAllowListParams,
   GetTokenAllowListResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
@@ -40,7 +44,15 @@ export class Checkout {
     );
   }
 
-  public getTokenAllowList(): GetTokenAllowListResult {
-    return tokens.getTokenAllowList();
+  public async getAllBalances(params: GetAllBalancesParams): Promise<GetAllBalancesResult> {
+    return balances.getAllBalances(
+        params.provider,
+        params.walletAddress,
+        params.chainId
+      );
+  }
+
+  public getTokenAllowList(params: GetTokenAllowListParams): GetTokenAllowListResult {
+    return tokens.getTokenAllowList(params.chainId);
   }
 }
