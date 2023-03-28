@@ -1,4 +1,5 @@
-type PopUpProps = { url: string; title: string; width: number; height: number; query?: string }
+export type PopUpProps = { url: string; title: string; width: number; height: number; query?: string }
+
 export const openPopupCenter = ({ url, title, width, height }: PopUpProps): Window => {
   // Fixes dual-screen position                             Most browsers      Firefox
   const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
