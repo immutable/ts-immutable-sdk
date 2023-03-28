@@ -2,7 +2,6 @@ import * as balances from './balances';
 import * as tokens from './tokens';
 import { connectWalletProvider, getNetworkInfo } from './connect';
 import {
-  ChainId,
   ConnectParams,
   ConnectResult,
   GetAllBalancesParams,
