@@ -12,6 +12,7 @@ import { PassportConfiguration } from '../config';
 const ConfirmationWindowTitle = 'Confirm this transaction';
 const ConfirmationWindowHeight = 600;
 const ConfirmationWindowWidth = 600;
+const ConfirmationWindowClosedPollingDuration = 1000;
 
 export default class ConfirmationScreen {
   private config: PassportConfiguration;
@@ -70,7 +71,7 @@ export default class ConfirmationScreen {
           window.removeEventListener('message', messageHandler);
           resolve({ confirmed: false });
         }
-      }, 1000);
+      }, ConfirmationWindowClosedPollingDuration);
     });
   }
 }
