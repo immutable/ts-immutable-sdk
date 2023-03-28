@@ -31,10 +31,10 @@ type BatchTransfersParams = {
 };
 
 export const transfer = ({
- request,
- transfersApi,
- starkSigner,
- user,
+  request,
+  transfersApi,
+  starkSigner,
+  user,
   passportConfig
 }: TransferRequest): Promise<CreateTransferResponseV1> => {
   return withPassportError<CreateTransferResponseV1>(async () => {
@@ -102,10 +102,10 @@ export const transfer = ({
 };
 
 export async function batchNftTransfer({
- user,
- starkSigner,
- request,
- transfersApi,
+  user,
+  starkSigner,
+  request,
+  transfersApi,
 }: BatchTransfersParams): Promise<CreateTransferResponse> {
   return withPassportError<CreateTransferResponse>(async () => {
     const ethAddress = user.etherKey;

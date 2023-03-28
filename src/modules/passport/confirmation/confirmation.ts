@@ -29,7 +29,7 @@ export default class ConfirmationScreen {
     }, this.config.passportDomain);
   }
 
-  startTransaction = (accessToken: string, transaction: Transaction): Promise<ConfirmationResult> => {
+  startTransaction(accessToken: string, transaction: Transaction): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (origin != this.config.passportDomain || data.eventType != PassportEventType) {
