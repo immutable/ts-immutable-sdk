@@ -187,7 +187,7 @@ describe('balances', () => {
         });
     });
 
-    it.only('should call getBalance and getERC20Balance functions', async() => {
+    it('should call getBalance and getERC20Balance functions', async() => {
       const getAllBalancesResult = await getAllBalances(
         mockProviderForAllBalances() as unknown as Web3Provider,
         'abc123',
