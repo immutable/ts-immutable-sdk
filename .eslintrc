@@ -1,12 +1,17 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "prettier"],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint"],
   "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
+    "standard-with-typescript"
+    // "eslint:recommended",
+    // "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
-    "prettier/prettier": "error"
+    "@typescript-eslint/semi": ["error", "always"],
+    "@typescript-eslint/no-extra-semi": 2
   }
 }
