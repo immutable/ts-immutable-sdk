@@ -1,8 +1,9 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Contract, utils } from 'ethers';
-import { ERC20ABI, GetBalanceResult } from '../types';
-import { CheckoutErrorType, withCheckoutError } from '../errors';
+import { ChainId, ERC20ABI, GetAllBalancesResult, GetBalanceResult, TokenInfo } from '../types';
+import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { getNetworkInfo } from '../connect';
+import { getTokenAllowList } from '../tokens';
 
 export const getBalance = async (
   provider: Web3Provider,
@@ -46,4 +47,27 @@ export async function getERC20Balance(
       }
     } as GetBalanceResult;
   }, { type: CheckoutErrorType.GET_ERC20_BALANCE_ERROR });
+}
+
+export const getAllBalances = async (
+  provider: Web3Provider,
+  walletAddress: string,
+  chainId: ChainId
+) : Promise<GetAllBalancesResult> => {
+  if(!Object.values(ChainId).includes(chainId)) throw new CheckoutError(`ChainId ${chainId} is not supported`, CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR);
+  if(!provider.provider?.request) throw new CheckoutError("provider object is missing request function", CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
+
+  const tokenList = getTokenAllowList(chainId);
+
+  const allBalancePromises: Promise<GetBalanceResult>[] = [];
+  allBalancePromises.push(getBalance(provider, walletAddress));
+
+  tokenList.tokens.filter((token) => token.address)
+  .forEach((token: TokenInfo) => allBalancePromises.push(getERC20Balance(provider, walletAddress, token.address ?? "")))
+
+  const balanceResults = await Promise.allSettled(allBalancePromises);
+  const getBalanceResults = (balanceResults.filter((result) => result.status === "fulfilled") as PromiseFulfilledResult<GetBalanceResult>[])
+    .map((fulfilledResult: PromiseFulfilledResult<GetBalanceResult>) => fulfilledResult.value) as GetBalanceResult[];
+
+  return { balances: getBalanceResults };
 }

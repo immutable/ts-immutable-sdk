@@ -1,8 +1,9 @@
+import { ChainId } from '../types';
 import { getTokenAllowList, Icon } from './tokens';
 
 describe('tokens', () => {
   it('should return the alphabetically sorted tokens allowlist', () => {
-    expect(getTokenAllowList()).toEqual({
+    expect(getTokenAllowList(ChainId.ETHEREUM)).toEqual({
       tokens: [
         {
           "name": "Ethereum",
@@ -18,7 +19,7 @@ describe('tokens', () => {
           "icon": Icon.MATIC,
           },
         {
-          "name": "ImmutableX",
+          "name": "Immutable X",
           "symbol": "IMX",
           "address": "0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF",
           "decimals": 18,

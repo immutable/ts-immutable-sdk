@@ -28,7 +28,7 @@ export const ChainIdNetworkMap = {
     chainName: 'Ethereum',
     rpcUrls: ["https://mainnet.infura.io/v3/"],
     nativeCurrency: {
-      name: 'Ether',
+      name: 'Ethereum',
       symbol: 'ETH',
       decimals: 18
     },

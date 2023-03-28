@@ -1,5 +1,6 @@
 import { Web3Provider } from "@ethersproject/providers";
 import { BigNumber } from "ethers";
+import { ChainId } from "./network";
 import { TokenInfo } from "./token";
 
 export interface GetBalanceParams {
@@ -12,6 +13,16 @@ export interface GetBalanceResult {
   balance: BigNumber;
   formattedBalance: string;
   token: TokenInfo;
+}
+
+export interface GetAllBalancesParams {
+  provider: Web3Provider;
+  walletAddress: string;
+  chainId: ChainId;
+}
+
+export interface GetAllBalancesResult {
+  balances: GetBalanceResult[];
 }
 
 export const ERC20ABI = [

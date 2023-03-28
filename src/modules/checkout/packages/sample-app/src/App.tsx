@@ -4,6 +4,7 @@ import { useState } from 'react';
 import SwitchNetwork from './components/switchNetwork/switchNetwork';
 import { Web3Provider } from '@ethersproject/providers';
 import GetBalance from './components/getBalance/getBalance';
+import GetAllBalances from './components/getAllBalances/getAllBalances';
 
 function App() {
   const [provider, setProvider] = useState<Web3Provider>();
@@ -16,6 +17,7 @@ function App() {
         <Connect setProvider={setProvider} />
         <SwitchNetwork provider={provider} />
         <GetBalance provider={provider} />
+        <GetAllBalances provider={provider} />
       </main>
     </div>
   );
