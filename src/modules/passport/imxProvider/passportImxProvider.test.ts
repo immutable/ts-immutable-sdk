@@ -8,7 +8,7 @@ import {
   TransfersApi,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import displayConfirmationScreen from '../confirmation/confirmation';
+import ConfirmationScreen from '../confirmation/confirmation';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 
@@ -40,6 +40,7 @@ describe('PassportImxProvider', () => {
   let createExchangeTransferMock: jest.Mock;
   let getSignableTradeMock: jest.Mock;
   let createTradeMock: jest.Mock;
+  let mockStartTransaction: jest.Mock;
 
   const mockStarkSigner = {
     signMessage: jest.fn(),
@@ -82,6 +83,11 @@ describe('PassportImxProvider', () => {
       getSignableTrade: getSignableTradeMock,
       createTrade: createTradeMock,
     });
+
+    mockStartTransaction = jest.fn();
+    (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
+      startTransaction: mockStartTransaction,
+    }));
 
     passportImxProvider = new PassportImxProvider({
       user: mockUser,
@@ -149,7 +155,7 @@ describe('PassportImxProvider', () => {
         transfer_id: 123,
       };
 
-      (displayConfirmationScreen as jest.Mock).mockResolvedValue({
+      mockStartTransaction.mockResolvedValue({
         confirmed: true,
       });
 

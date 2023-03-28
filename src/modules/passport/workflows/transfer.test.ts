@@ -2,15 +2,24 @@ import { TransfersApi, UnsignedTransferRequest, } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
-import ConfirmationScreen from '../confirmation/confirmation';
 import { Config } from '../config';
+import ConfirmationScreen from '../confirmation/confirmation';
+
+jest.mock('../confirmation/confirmation');
 
 describe('transfer', () => {
-  let confirmationStartTransactionSpy: jest.SpyInstance;
+  let mockStartTransaction: jest.Mock;
   const mockStarkSigner = {
     signMessage: jest.fn(),
     getAddress: jest.fn(),
   };
+
+  beforeEach(() => {
+    mockStartTransaction = jest.fn();
+    (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
+      startTransaction: mockStartTransaction,
+    }));
+  })
 
   const passportConfig = {
     network: Config.SANDBOX.network,
@@ -27,10 +36,6 @@ describe('transfer', () => {
     magicPublishableApiKey: Config.SANDBOX.magicPublishableApiKey,
     magicProviderId: Config.SANDBOX.magicProviderId,
   };
-
-  beforeEach(() => {
-    confirmationStartTransactionSpy = jest.spyOn(ConfirmationScreen.prototype, 'startTransaction');
-  });
 
   describe('single transfer', () => {
     let getSignableTransferV1Mock: jest.Mock;
@@ -102,7 +107,7 @@ describe('transfer', () => {
         transfer_id: 123,
       };
 
-      (confirmationStartTransactionSpy).mockResolvedValue({
+      mockStartTransaction.mockResolvedValue({
         confirmed: true,
       });
       getSignableTransferV1Mock.mockResolvedValue(mockSignableTransferV1Response);
@@ -163,7 +168,7 @@ describe('transfer', () => {
       };
 
       getSignableTransferV1Mock.mockResolvedValue(mockSignableTransferV1Response);
-      (confirmationStartTransactionSpy).mockRejectedValue({
+      mockStartTransaction.mockRejectedValue({
         confirmed: false,
       });
 
