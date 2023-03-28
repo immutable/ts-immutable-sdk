@@ -58,7 +58,6 @@ export const transfer = ({
       transaction,
     );
 
-
     if (!confirmationResult.confirmed) {
       throw new Error("Transaction rejected by user");
     }

@@ -10,6 +10,10 @@ import {
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
 
+const ConfirmationWindowTitle = 'Confirm this transaction';
+const ConfirmationWindowHeight = 600;
+const ConfirmationWindowWidth = 600;
+
 export default class ConfirmationScreen {
   private config: PassportConfiguration;
 
@@ -55,9 +59,9 @@ export default class ConfirmationScreen {
       window.addEventListener('message', messageHandler);
       const confirmationWindow = openPopupCenter({
         url: `${this.config.passportDomain}/transaction-confirmation`,
-        title: 'Confirm this transaction',
-        width: 600,
-        height: 600,
+        title: ConfirmationWindowTitle,
+        width: ConfirmationWindowWidth,
+        height: ConfirmationWindowHeight,
       });
 
       // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128

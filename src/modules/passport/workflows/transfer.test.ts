@@ -164,7 +164,7 @@ describe('transfer', () => {
 
       getSignableTransferV1Mock.mockResolvedValue(mockSignableTransferV1Response);
       (confirmationStartTransactionSpy).mockRejectedValue({
-        confirmed: true,
+        confirmed: false,
       });
 
       await expect(() =>
