@@ -18,7 +18,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint ./src/ --ext .ts,.jsx,.tsx --max-warnings=0",
-    "lint-ci": "eslint $(git diff --name-only --diff-filter=ACMRTUXB main | grep  -E \"(.js$|.ts$|.tsx$)\") --ext .ts,.jsx,.tsx --max-warnings=0"
+    "lint-ci": "eslint $(git diff --name-only --diff-filter=ACMRTUXB $(git rev-parse HEAD) | grep  -E \"(.js$|.ts$|.tsx$)\") --ext .ts,.jsx,.tsx --max-warnings=0"
   },
   "repository": {
     "type": "git",
