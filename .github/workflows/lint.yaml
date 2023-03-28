@@ -48,7 +48,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Lint
-        run: yarn lint
+        run: yarn lint-ci
 
       - name: Typecheck
         run: yarn typecheck
