@@ -1,13 +1,15 @@
-import { ImmutableXConfiguration, StarkSigner } from "@imtbl/core-sdk";
-import { Signers } from "../signable-actions/types";
-import { Configuration, Environment } from "../../../config";
-import { Signer } from "@ethersproject/abstract-signer";
+import { ImmutableXConfiguration, StarkSigner } from '@imtbl/core-sdk';
+import { Signers } from '../signable-actions/types';
+import { Configuration, Environment } from '../../../config';
+import { Signer } from '@ethersproject/abstract-signer';
 
-export const privateKey1 = "d90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36"
-export const privateKey2 = "013fe4a5265bc6deb3f3b524b987sdf987f8c7a8ec2a998ae0512f493d763c8f"
+export const privateKey1 =
+  'd90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36';
+export const privateKey2 =
+  '013fe4a5265bc6deb3f3b524b987sdf987f8c7a8ec2a998ae0512f493d763c8f';
 const testChainId = 5;
 export const transactionResponse = {
-  hash: "some-hash"
+  hash: 'some-hash',
 };
 
 const imxConfig: ImmutableXConfiguration = {
@@ -17,25 +19,28 @@ const imxConfig: ImmutableXConfiguration = {
     registrationContractAddress: '0x1C97Ada273C9A52253f463042f29117090Cd7D83',
   },
   apiConfiguration: {
-    "accessToken": undefined,
-    "apiKey": undefined,
-    "baseOptions": {
-      "headers": {
-        "x-sdk-version": "imx-core-sdk-ts-1.0.1",
+    accessToken: undefined,
+    apiKey: undefined,
+    baseOptions: {
+      headers: {
+        'x-sdk-version': 'imx-core-sdk-ts-1.0.1',
       },
     },
-    "basePath": "https://api.sandbox.x.immutable.com",
-    "formDataCtor": undefined,
-    "password": undefined,
-    "username": undefined,
+    basePath: 'https://api.sandbox.x.immutable.com',
+    formDataCtor: undefined,
+    password: undefined,
+    username: undefined,
     isJsonMime(): boolean {
       return true;
-    }
-  }
+    },
+  },
 };
-export const testConfig = new Configuration({ ...imxConfig, env: Environment.SANDBOX });
+export const testConfig = new Configuration({
+  ...imxConfig,
+  env: Environment.SANDBOX,
+});
 
-export const getTokenAddress = (symbol: string): string  => {
+export const getTokenAddress = (symbol: string): string => {
   const tokenAddresses = [
     {
       symbol: 'ETH',
@@ -50,22 +55,20 @@ export const getTokenAddress = (symbol: string): string  => {
       tokenAddress: '0x1facdd0165489f373255a90304650e15481b2c85', // IMX address in goerli
     },
   ];
-  const token = tokenAddresses.find(token => token.symbol === symbol);
+  const token = tokenAddresses.find((token) => token.symbol === symbol);
   return token?.tokenAddress || '';
-}
+};
 
 /**
  * Generate a ethSigner/starkSigner object from a private key.
  */
-export const generateSigners = async (
-  privateKey: string,
-): Promise<Signers> => {
+export const generateSigners = async (privateKey: string): Promise<Signers> => {
   if (!privateKey) {
     throw new Error('PrivateKey required!');
   }
 
-  const ethKey = "ETH" + privateKey;
-  const starkKey = "STX" + privateKey;
+  const ethKey = 'ETH' + privateKey;
+  const starkKey = 'STX' + privateKey;
 
   // L1 credentials
   const ethSigner = {
@@ -74,8 +77,8 @@ export const generateSigners = async (
     },
     getAddress: async () => ethKey,
     getChainId: async () => testChainId,
-    sendTransaction: async () => (transactionResponse),
-  } as unknown as Signer
+    sendTransaction: async () => transactionResponse,
+  } as unknown as Signer;
 
   // L2 credentials
   const starkExSigner = {
@@ -90,5 +93,3 @@ export const generateSigners = async (
     starkExSigner,
   } as Signers;
 };
-
-const foo = 'foo'
