@@ -91,3 +91,4 @@ export const generateSigners = async (
   } as Signers;
 };
 
+const foo = 'foo'
