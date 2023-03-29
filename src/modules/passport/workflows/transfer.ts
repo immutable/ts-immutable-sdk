@@ -7,16 +7,20 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
-import { convertToSignableToken } from '../../../modules/provider/signable-actions/utils';
+import { convertToSignableToken } from '../../provider/signable-actions/utils';
+import { Transaction, TransactionTypes} from '../confirmation/types';
+import ConfirmationScreen from '../confirmation/confirmation';
+import { PassportConfiguration } from '../config';
 import { UserWithEtherKey } from '../types';
 
 const ERC721 = 'ERC721';
 
-type TrasferRequest = {
+type TransferRequest = {
   request: UnsignedTransferRequest;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
+  passportConfig: PassportConfiguration;
 };
 
 type BatchTransfersParams = {
@@ -31,7 +35,8 @@ export const transfer = ({
   transfersApi,
   starkSigner,
   user,
-}: TrasferRequest): Promise<CreateTransferResponseV1> => {
+  passportConfig
+}: TransferRequest): Promise<CreateTransferResponseV1> => {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
     const signableResult = await transfersApi.getSignableTransferV1({
@@ -42,6 +47,22 @@ export const transfer = ({
         receiver: request.receiver,
       },
     });
+
+    if (request.type === 'ERC721') {
+      const transaction: Transaction = {
+        transactionType: TransactionTypes.TRANSFER,
+        transactionData: request,
+      };
+      const confirmationScreen = new ConfirmationScreen(passportConfig);
+      const confirmationResult = await confirmationScreen.startTransaction(
+        user.accessToken,
+        transaction,
+      );
+
+      if (!confirmationResult.confirmed) {
+        throw new Error("Transaction rejected by user");
+      }
+    }
 
     const signableResultData = signableResult.data;
     const { payload_hash: payloadHash } = signableResultData;
@@ -138,11 +159,6 @@ export async function batchNftTransfer({
     const response = await transfersApi.createTransfer(
       {
         createTransferRequestV2: transferSigningParams,
-        // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
-        // Should be able to remove it once the Backend have update the API
-        // and generated the New Client
-        xImxEthAddress: '',
-        xImxEthSignature: '',
       },
       { headers }
     );

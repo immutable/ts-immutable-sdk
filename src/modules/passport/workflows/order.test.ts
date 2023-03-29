@@ -83,8 +83,6 @@ describe('order', () => {
           fees: undefined,
           include_fees: true,
         },
-        xImxEthAddress: '',
-        xImxEthSignature: '',
       };
       const mockHeader = {
         headers: {
@@ -179,8 +177,6 @@ describe('order', () => {
           order_id: orderId,
           stark_signature: mockStarkSignature,
         },
-        xImxEthAddress: '',
-        xImxEthSignature: '',
       };
 
       const mockHeader = {

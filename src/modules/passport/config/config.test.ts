@@ -24,6 +24,7 @@ describe('Config', () => {
           imxAPIConfiguration: {
             basePath: "https://api.sandbox.x.immutable.com",
           },
+          passportDomain: "https://immutable.sandbox.passport.com",
           magicPublishableApiKey: Config.SANDBOX.magicPublishableApiKey,
           magicProviderId: Config.SANDBOX.magicProviderId,
         });

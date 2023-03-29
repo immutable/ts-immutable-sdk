@@ -8,6 +8,7 @@ import {
   TransfersApi,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
+import ConfirmationScreen from '../confirmation/confirmation';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 
@@ -21,6 +22,7 @@ jest.mock('@imtbl/core-sdk', () => {
     TradesApi: jest.fn()
   };
 });
+jest.mock('../confirmation/confirmation');
 
 describe('PassportImxProvider', () => {
   afterEach(jest.resetAllMocks);
@@ -38,6 +40,7 @@ describe('PassportImxProvider', () => {
   let createExchangeTransferMock: jest.Mock;
   let getSignableTradeMock: jest.Mock;
   let createTradeMock: jest.Mock;
+  let mockStartTransaction: jest.Mock;
 
   const mockStarkSigner = {
     signMessage: jest.fn(),
@@ -81,10 +84,15 @@ describe('PassportImxProvider', () => {
       createTrade: createTradeMock,
     });
 
+    mockStartTransaction = jest.fn();
+    (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
+      startTransaction: mockStartTransaction,
+    }));
+
     passportImxProvider = new PassportImxProvider({
       user: mockUser,
       starkSigner: mockStarkSigner,
-      apiConfig: { basePath: 'http://test.com' },
+      passportConfig: { imxAPIConfiguration: { basePath: 'http://test.com'} } as never,
     });
   });
 
@@ -147,6 +155,10 @@ describe('PassportImxProvider', () => {
         transfer_id: 123,
       };
 
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
+
       getSignableTransferV1Mock.mockResolvedValue(
         mockSignableTransferV1Response
       );
@@ -186,13 +198,19 @@ describe('PassportImxProvider', () => {
 
   describe('registerOffchain', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.registerOffchain).toThrowError();
+      expect(passportImxProvider.registerOffchain).toThrow(new PassportError(
+        "Operation not supported",
+        PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      ));
     });
   });
 
   describe('isRegisteredOnchain', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.isRegisteredOnchain).toThrowError();
+      expect(passportImxProvider.isRegisteredOnchain).toThrow(new PassportError(
+        "Operation not supported",
+        PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      ));
     });
   });
 
@@ -259,8 +277,6 @@ describe('PassportImxProvider', () => {
           fees: undefined,
           include_fees: true,
         },
-        xImxEthAddress: '',
-        xImxEthSignature: '',
       };
       const mockHeader = {
         headers: {
@@ -320,8 +336,6 @@ describe('PassportImxProvider', () => {
           order_id: orderId,
           stark_signature: mockStarkSignature,
         },
-        xImxEthAddress: '',
-        xImxEthSignature: '',
       };
 
       const mockHeader = {
@@ -397,8 +411,6 @@ describe('PassportImxProvider', () => {
         include_fees: true,
         order_id: 1234
       },
-      xImxEthAddress: '',
-      xImxEthSignature: '',
     };
     const mockHeader = {
       headers: {
@@ -516,8 +528,6 @@ describe('PassportImxProvider', () => {
               },
             ],
           },
-          xImxEthAddress: '',
-          xImxEthSignature: '',
         },
         {
           headers: {
@@ -600,19 +610,28 @@ describe('PassportImxProvider', () => {
 
   describe('deposit', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.deposit).toThrowError();
+      expect(passportImxProvider.deposit).toThrow(new PassportError(
+        "Operation not supported",
+        PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      ));
     });
   });
 
   describe('prepareWithdrawal', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.prepareWithdrawal).toThrowError();
+      expect(passportImxProvider.prepareWithdrawal).toThrow(new PassportError(
+        "Operation not supported",
+        PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      ));
     });
   });
 
   describe('completeWithdrawal', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.completeWithdrawal).toThrowError();
+      expect(passportImxProvider.completeWithdrawal).toThrow(new PassportError(
+        "Operation not supported",
+        PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      ));
     });
   });
 
