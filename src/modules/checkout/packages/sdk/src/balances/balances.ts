@@ -2,7 +2,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { Contract, utils } from 'ethers';
 import { ChainId, ERC20ABI, GetAllBalancesResult, GetBalanceResult, TokenInfo } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
-import { getNetworkInfo } from '../connect';
+import { getNetworkInfo } from '../network';
 import { getTokenAllowList } from '../tokens';
 
 export const getBalance = async (

@@ -3,9 +3,6 @@ import detectEthereumProvider from "@metamask/detect-provider"
 import { 
   ConnectionProviders, 
   ConnectParams, 
-  ChainId, 
-  ChainIdNetworkMap, 
-  NetworkInfo, 
   WALLET_ACTION,  
   CheckConnectionResult
 } from "../types"
@@ -13,16 +10,16 @@ import { Web3Provider, ExternalProvider } from '@ethersproject/providers'
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from "../errors";
 
 export async function checkIsWalletConnected(providerPreference: ConnectionProviders): Promise<CheckConnectionResult> {
-  const provider = await getWalletProviderForPreference(ConnectionProviders.METAMASK);
+  const provider = await getWalletProviderForPreference(providerPreference);
 
   if(!provider.provider?.request) {
-    throw new CheckoutError("Incorrect provider", CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
+    throw new CheckoutError("Incompatible provider", CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
   }
   const accounts = await provider.provider.request({method: WALLET_ACTION.CHECK_CONNECTION, params:[]});
   // accounts[0] will have the active account if connected.
   
   return {
-    isConnected: accounts.length === 1,
+    isConnected: accounts && accounts.length > 0,
     walletAddress: accounts[0] ?? ""
   }
 }
@@ -59,23 +56,7 @@ async function getMetaMaskProvider(): Promise<Web3Provider> {
     return await detectEthereumProvider()
   }, { type: CheckoutErrorType.METAMASK_PROVIDER_ERROR });
 
-  if(!provider) throw new CheckoutError("Could not detect MetaMask provider", CheckoutErrorType.METAMASK_PROVIDER_ERROR);
+  if(!provider || !provider.request) throw new CheckoutError("No MetaMask provider installed.", CheckoutErrorType.METAMASK_PROVIDER_ERROR);
 
   return new Web3Provider(provider);
-}
-
-export async function getNetworkInfo(provider:Web3Provider) : Promise<NetworkInfo> {
-  const network = await provider.getNetwork();
-
-  if(!Object.values(ChainId).includes(network.chainId as ChainId)){
-    // return empty details
-    return {} as NetworkInfo;
-  }
-  const chainIdNetworkInfo = ChainIdNetworkMap[network.chainId as ChainId];
-  const networkInfo = {
-    name: chainIdNetworkInfo.chainName,
-    chainId: parseInt(chainIdNetworkInfo.chainIdHex, 16),
-    nativeCurrency: chainIdNetworkInfo.nativeCurrency
-  }
-  return networkInfo;
 }
