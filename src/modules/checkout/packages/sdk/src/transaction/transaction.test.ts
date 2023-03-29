@@ -62,7 +62,7 @@ describe('transaction', () => {
 
     await expect(sendTransaction(params)).rejects.toThrow(new CheckoutError(
       'Transaction failed',
-      CheckoutErrorType.TRANSACTION_FAILED
+      CheckoutErrorType.TRANSACTION_ERRORED
     ));
   });
 });

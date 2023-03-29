@@ -9,5 +9,5 @@ export const sendTransaction = async (params: SendTransactionParams): Promise<Se
             status: TransactionStatus.SUCCESS,
             transaction
         }
-      }, { type: CheckoutErrorType.TRANSACTION_FAILED });
+      }, { type: CheckoutErrorType.TRANSACTION_ERRORED });
 }
