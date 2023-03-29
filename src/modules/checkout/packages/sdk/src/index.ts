@@ -6,7 +6,13 @@ export type {
   GetBalanceParams,
   GetBalanceResult,
   NetworkInfo,
+  SendTransactionParams,
+  SendTransactionResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
   TokenInfo,
+  GetAllBalancesParams,
+  GetAllBalancesResult,
+  GetTokenAllowListParams,
+  GetTokenAllowListResult
 } from './types';

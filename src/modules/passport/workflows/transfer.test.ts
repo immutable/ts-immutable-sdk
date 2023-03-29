@@ -1,15 +1,40 @@
-import {
-  TransfersApi,
-  UnsignedTransferRequest,
-} from '@imtbl/core-sdk';
+import { TransfersApi, UnsignedTransferRequest, } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
-import { transfer, batchNftTransfer } from './transfer';
+import { batchNftTransfer, transfer } from './transfer';
+import { Config } from '../config';
+import ConfirmationScreen from '../confirmation/confirmation';
+
+jest.mock('../confirmation/confirmation');
 
 describe('transfer', () => {
+  let mockStartTransaction: jest.Mock;
   const mockStarkSigner = {
     signMessage: jest.fn(),
     getAddress: jest.fn(),
+  };
+
+  beforeEach(() => {
+    mockStartTransaction = jest.fn();
+    (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
+      startTransaction: mockStartTransaction,
+    }));
+  })
+
+  const passportConfig = {
+    network: Config.SANDBOX.network,
+    oidcConfiguration: {
+      authenticationDomain: Config.SANDBOX.authenticationDomain,
+      clientId: "",
+      logoutRedirectUri: "",
+      redirectUri: "",
+    },
+    imxAPIConfiguration: {
+      basePath: "https://api.sandbox.x.immutable.com",
+    },
+    passportDomain: "https://immutable.sandbox.passport.com",
+    magicPublishableApiKey: Config.SANDBOX.magicPublishableApiKey,
+    magicProviderId: Config.SANDBOX.magicProviderId,
   };
 
   describe('single transfer', () => {
@@ -27,7 +52,7 @@ describe('transfer', () => {
       tokenAddress,
       receiver: mockReceiver,
     };
-  
+
     beforeEach(() => {
       getSignableTransferV1Mock = jest.fn();
       createTransferV1Mock = jest.fn();
@@ -36,7 +61,7 @@ describe('transfer', () => {
         createTransferV1: createTransferV1Mock,
       } as unknown as TransfersApi;
     });
-  
+
     it('should returns success transfer result', async () => {
       const mockSignableTransferRequest = {
         getSignableTransferRequest: {
@@ -81,20 +106,24 @@ describe('transfer', () => {
         time: 111,
         transfer_id: 123,
       };
-  
+
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
       getSignableTransferV1Mock.mockResolvedValue(mockSignableTransferV1Response);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferV1Mock.mockResolvedValue({
         data: mockReturnValue,
       });
-  
+
       const result = await transfer({
         transfersApi: transferApiMock,
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
+        passportConfig,
       });
-  
+
       expect(getSignableTransferV1Mock).toBeCalledWith(
         mockSignableTransferRequest
       );
@@ -105,24 +134,56 @@ describe('transfer', () => {
       );
       expect(result).toEqual(mockReturnValue);
     });
-  
+
     it('should return error if failed to call public api', async () => {
       getSignableTransferV1Mock.mockRejectedValue(new Error(mockErrorMessage));
-  
+
       await expect(() =>
         transfer({
           transfersApi: transferApiMock,
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: mockTransferRequest as UnsignedTransferRequest,
+          passportConfig,
         })
       ).rejects.toThrow(new PassportError(
         `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
         PassportErrorType.TRANSFER_ERROR
       ));
     });
+
+    it('should return error if transfer is rejected by user', async () => {
+      const mockSignableTransferV1Response = {
+        data: {
+          payload_hash: '123123',
+          sender_stark_key: 'starkKey',
+          sender_vault_id: '111',
+          receiver_stark_key: 'starkKey2',
+          receiver_vault_id: '222',
+          asset_id: tokenId,
+          amount: '1',
+          nonce: '5321',
+          expiration_timestamp: '1234',
+        },
+      };
+
+      getSignableTransferV1Mock.mockResolvedValue(mockSignableTransferV1Response);
+      mockStartTransaction.mockRejectedValue({
+        confirmed: false,
+      });
+
+      await expect(() =>
+        transfer({
+          transfersApi: transferApiMock,
+          starkSigner: mockStarkSigner,
+          user: mockUser,
+          request: mockTransferRequest as UnsignedTransferRequest,
+          passportConfig,
+        })
+      ).rejects.toThrowError('TRANSFER_ERROR');
+    });
   });
-  
+
   describe('batchNftTransfer', () => {
     let getSignableTransferMock: jest.Mock;
     let createTransferMock: jest.Mock;
@@ -186,7 +247,7 @@ describe('transfer', () => {
         request: transferRequest,
         transfersApi: transferApiMock,
       });
-  
+
       expect(result).toEqual({ transfer_ids: mockTransferResponse.data.transfer_ids });
       expect(getSignableTransferMock).toHaveBeenCalledWith({
         getSignableTransferRequestV2: {
@@ -224,8 +285,6 @@ describe('transfer', () => {
               },
             ],
           },
-          xImxEthAddress: '',
-          xImxEthSignature: '',
         },
         {
           headers: {
@@ -237,7 +296,7 @@ describe('transfer', () => {
 
     it('should return error if failed to call public api', async () => {
       getSignableTransferMock.mockRejectedValue(new Error(mockErrorMessage));
-  
+
       await expect(() =>
         batchNftTransfer({
           user: mockUser,
