@@ -1,5 +1,5 @@
 export { Checkout } from './Checkout';
-export { ChainId, ConnectionProviders, TransactionStatus } from './types';
+export { ChainId, ConnectionProviders } from './types';
 export type {
   ConnectParams,
   ConnectResult,

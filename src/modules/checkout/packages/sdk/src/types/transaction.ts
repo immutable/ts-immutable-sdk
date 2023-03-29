@@ -6,7 +6,6 @@ export interface SendTransactionParams {
 }
 
 export interface SendTransactionResult {
-  status: TransactionStatus;
   transactionResponse: TransactionResponse;
 }
 
@@ -19,9 +18,4 @@ export interface Transaction {
   value: string;
   data: string;
   chainId: number;
-}
-
-export enum TransactionStatus {
-  SUCCESS = 'success',
-  FAIL = 'fail',
 }

@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { SendTransactionParams, TransactionStatus } from '../types';
+import { SendTransactionParams } from '../types';
 import { sendTransaction } from './transaction';
 
 describe('transaction', () => {
@@ -35,7 +35,6 @@ describe('transaction', () => {
     }
 
     await expect(sendTransaction(params)).resolves.toEqual({
-      status: TransactionStatus.SUCCESS,
       transactionResponse
     });
   });
