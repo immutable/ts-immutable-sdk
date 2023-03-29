@@ -1,21 +1,22 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import { AnyToken, CancelOrderResponse, CreateOrderResponse, CreateTradeResponse, CreateTransferResponse, CreateTransferResponseV1, CreateWithdrawalResponse, GetSignableCancelOrderRequest, GetSignableTradeRequest, NftTransferDetails, RegisterUserResponse, StarkSigner, TokenAmount, UnsignedExchangeTransferRequest, UnsignedOrderRequest, UnsignedTransferRequest } from '@imtbl/core-sdk';
 import { UserWithEtherKey } from '../types';
-import { IMXProvider } from '../../provider/imxProvider';
-import { ImxApiConfiguration } from '../config';
+import { IMXProvider } from '../../provider';
+import { PassportConfiguration } from '../config';
 export type PassportImxProviderInput = {
     user: UserWithEtherKey;
     starkSigner: StarkSigner;
-    apiConfig: ImxApiConfiguration;
+    passportConfig: PassportConfiguration;
 };
 export default class PassportImxProvider implements IMXProvider {
     private user;
     private starkSigner;
     private transfersApi;
     private ordersApi;
+    private readonly passportConfig;
     private exchangesApi;
     private tradesApi;
-    constructor({ user, starkSigner, apiConfig }: PassportImxProviderInput);
+    constructor({ user, starkSigner, passportConfig }: PassportImxProviderInput);
     transfer(request: UnsignedTransferRequest): Promise<CreateTransferResponseV1>;
     registerOffchain(): Promise<RegisterUserResponse>;
     isRegisteredOnchain(): Promise<boolean>;

@@ -1,8 +1,3 @@
-export interface PassportConfigurationArguments {
-    clientId: string;
-    redirectUri: string;
-    logoutRedirectUri: string;
-}
 export type UserProfile = {
     email?: string;
     nickname?: string;
@@ -31,6 +26,7 @@ export interface EnvironmentConfiguration {
     magicPublishableApiKey: string;
     magicProviderId: string;
     baseIMXApiPath: string;
+    passportDomain: string;
 }
 export interface OidcConfiguration {
     clientId: string;
