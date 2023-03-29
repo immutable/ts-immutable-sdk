@@ -28,7 +28,8 @@ import { ImxApiConfiguration } from '../config';
 import { transfer, batchNftTransfer } from '../workflows/transfer';
 import { cancelOrder, createOrder } from '../workflows/order';
 import { exchangeTransfer } from '../workflows/exchange';
-import { createTrade } from "../workflows/trades";
+import { createTrade } from '../workflows/trades';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 
 export type PassportImxProviderInput = {
   user: UserWithEtherKey;
@@ -66,11 +67,17 @@ export default class PassportImxProvider implements IMXProvider {
   }
 
   registerOffchain(): Promise<RegisterUserResponse> {
-    throw new Error('Method not implemented.');
+    throw new PassportError(
+      'Operation not supported',
+      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+    );
   }
 
   isRegisteredOnchain(): Promise<boolean> {
-    throw new Error('Method not implemented.');
+    throw new PassportError(
+      'Operation not supported',
+      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+    );
   }
 
   createOrder(request: UnsignedOrderRequest): Promise<CreateOrderResponse> {
@@ -126,12 +133,18 @@ export default class PassportImxProvider implements IMXProvider {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   deposit(deposit: TokenAmount): Promise<TransactionResponse> {
-    throw new Error('Method not implemented.');
+    throw new PassportError(
+      'Operation not supported',
+      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+    );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
-    throw new Error('Method not implemented.');
+    throw new PassportError(
+      'Operation not supported',
+      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+    );
   }
 
   completeWithdrawal(
@@ -140,7 +153,10 @@ export default class PassportImxProvider implements IMXProvider {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     token: AnyToken
   ): Promise<TransactionResponse> {
-    throw new Error('Method not implemented.');
+    throw new PassportError(
+      'Operation not supported',
+      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+    );
   }
 
   getAddress(): Promise<string> {
