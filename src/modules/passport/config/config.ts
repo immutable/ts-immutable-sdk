@@ -74,6 +74,7 @@ export const getPassportConfiguration = (
       'authenticationDomain',
       'magicPublishableApiKey',
       'magicProviderId',
+      'passportDomain',
     ],
   );
   validateConfiguration(
