@@ -8,6 +8,7 @@ import {
   TransfersApi,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
+import ConfirmationScreen from '../confirmation/confirmation';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 
@@ -21,6 +22,7 @@ jest.mock('@imtbl/core-sdk', () => {
     TradesApi: jest.fn()
   };
 });
+jest.mock('../confirmation/confirmation');
 
 describe('PassportImxProvider', () => {
   afterEach(jest.resetAllMocks);
@@ -38,6 +40,7 @@ describe('PassportImxProvider', () => {
   let createExchangeTransferMock: jest.Mock;
   let getSignableTradeMock: jest.Mock;
   let createTradeMock: jest.Mock;
+  let mockStartTransaction: jest.Mock;
 
   const mockStarkSigner = {
     signMessage: jest.fn(),
@@ -81,10 +84,15 @@ describe('PassportImxProvider', () => {
       createTrade: createTradeMock,
     });
 
+    mockStartTransaction = jest.fn();
+    (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
+      startTransaction: mockStartTransaction,
+    }));
+
     passportImxProvider = new PassportImxProvider({
       user: mockUser,
       starkSigner: mockStarkSigner,
-      apiConfig: { basePath: 'http://test.com' },
+      passportConfig: { imxAPIConfiguration: { basePath: 'http://test.com'} } as never,
     });
   });
 
@@ -146,6 +154,10 @@ describe('PassportImxProvider', () => {
         time: 111,
         transfer_id: 123,
       };
+
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
 
       getSignableTransferV1Mock.mockResolvedValue(
         mockSignableTransferV1Response

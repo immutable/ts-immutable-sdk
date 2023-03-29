@@ -23,18 +23,18 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { UserWithEtherKey } from '../types';
-import { IMXProvider } from '../../provider/imxProvider';
-import { ImxApiConfiguration } from '../config';
-import { transfer, batchNftTransfer } from '../workflows/transfer';
+import { IMXProvider } from '../../provider';
+import { batchNftTransfer, transfer } from '../workflows/transfer';
 import { cancelOrder, createOrder } from '../workflows/order';
 import { exchangeTransfer } from '../workflows/exchange';
 import { createTrade } from '../workflows/trades';
 import { PassportError, PassportErrorType } from '../errors/passportError';
+import { PassportConfiguration } from '../config';
 
 export type PassportImxProviderInput = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  apiConfig: ImxApiConfiguration;
+  passportConfig: PassportConfiguration;
 };
 
 export default class PassportImxProvider implements IMXProvider {
@@ -42,17 +42,19 @@ export default class PassportImxProvider implements IMXProvider {
   private starkSigner: StarkSigner;
   private transfersApi: TransfersApi;
   private ordersApi: OrdersApi;
+  private readonly passportConfig: PassportConfiguration;
   private exchangesApi: ExchangesApi;
   private tradesApi: TradesApi;
 
-  constructor({ user, starkSigner, apiConfig }: PassportImxProviderInput) {
+  constructor({ user, starkSigner, passportConfig }: PassportImxProviderInput) {
     this.user = user;
     this.starkSigner = starkSigner;
-    const configuration = new Configuration({ basePath: apiConfig.basePath });
-    this.transfersApi = new TransfersApi(configuration);
-    this.ordersApi = new OrdersApi(configuration);
-    this.exchangesApi = new ExchangesApi(configuration);
-    this.tradesApi = new TradesApi(configuration)
+    this.passportConfig = passportConfig;
+    const apiConfig = new Configuration({ basePath: passportConfig.imxAPIConfiguration.basePath });
+    this.transfersApi = new TransfersApi(apiConfig);
+    this.ordersApi = new OrdersApi(apiConfig);
+    this.exchangesApi = new ExchangesApi(apiConfig);
+    this.tradesApi = new TradesApi(apiConfig);
   }
 
   async transfer(
@@ -63,6 +65,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       transfersApi: this.transfersApi,
+      passportConfig: this.passportConfig,
     });
   }
 
@@ -106,7 +109,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       tradesApi: this.tradesApi,
-    })
+    });
   }
 
   batchNftTransfer(
@@ -117,7 +120,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       transfersApi: this.transfersApi,
-    })
+    });
   }
 
   exchangeTransfer(
@@ -128,7 +131,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       exchangesApi: this.exchangesApi
-    })
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
