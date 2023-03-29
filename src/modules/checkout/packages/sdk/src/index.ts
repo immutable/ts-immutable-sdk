@@ -7,6 +7,7 @@ export type {
   GetBalanceResult,
   NetworkInfo,
   SendTransactionParams,
+  SendTransactionResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
   TokenInfo,

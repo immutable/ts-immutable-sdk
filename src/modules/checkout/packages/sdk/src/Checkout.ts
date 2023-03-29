@@ -48,10 +48,10 @@ export class Checkout {
 
   public async getAllBalances(params: GetAllBalancesParams): Promise<GetAllBalancesResult> {
     return balances.getAllBalances(
-        params.provider,
-        params.walletAddress,
-        params.chainId
-      );
+      params.provider,
+      params.walletAddress,
+      params.chainId
+    );
   }
 
   public getTokenAllowList(params: GetTokenAllowListParams): GetTokenAllowListResult {
