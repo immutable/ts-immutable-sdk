@@ -4,7 +4,7 @@ import { SendTransactionParams, SendTransactionResult, TransactionStatus } from 
 export const sendTransaction = async (params: SendTransactionParams): Promise<SendTransactionResult> => {
     const { provider, transaction } = params;
     return await withCheckoutError<SendTransactionResult>(async () => {
-        const res = await provider.getSigner().sendTransaction(transaction);
+        await provider.getSigner().sendTransaction(transaction);
         return {
             status: TransactionStatus.SUCCESS,
             transaction
