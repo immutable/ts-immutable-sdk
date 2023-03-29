@@ -10,6 +10,7 @@ export interface PassportConfiguration {
         logoutRedirectUri: string;
         redirectUri: string;
     };
+    passportDomain: string;
     imxAPIConfiguration: ImxApiConfiguration;
     magicPublishableApiKey: string;
     magicProviderId: string;

@@ -33,6 +33,7 @@ var PassportErrorType;
     PassportErrorType["CANCEL_ORDER_ERROR"] = "CANCEL_ORDER_ERROR";
     PassportErrorType["EXCHANGE_TRANSFER_ERROR"] = "EXCHANGE_TRANSFER_ERROR";
     PassportErrorType["CREATE_TRADE_ERROR"] = "CREATE_TRADE_ERROR";
+    PassportErrorType["OPERATION_NOT_SUPPORTED_ERROR"] = "OPERATION_NOT_SUPPORTED_ERROR";
 })(PassportErrorType || (PassportErrorType = {}));
 class PassportError extends Error {
     type;
@@ -248,8 +249,108 @@ function convertToSignableToken(token) {
     }
 }
 
+var ReceiveMessage;
+(function (ReceiveMessage) {
+    ReceiveMessage["CONFIRMATION_WINDOW_READY"] = "confirmation_window_ready";
+    ReceiveMessage["TRANSACTION_CONFIRMED"] = "transaction_confirmed";
+    ReceiveMessage["TRANSACTION_ERROR"] = "transaction_error";
+})(ReceiveMessage || (ReceiveMessage = {}));
+var SendMessage;
+(function (SendMessage) {
+    SendMessage["TRANSACTION_START"] = "transaction_start";
+})(SendMessage || (SendMessage = {}));
+var TransactionTypes;
+(function (TransactionTypes) {
+    TransactionTypes["TRANSFER"] = "v1/transfers";
+})(TransactionTypes || (TransactionTypes = {}));
+const PassportEventType = 'imx_passport_confirmation';
+
+const openPopupCenter = ({ url, title, width, height }) => {
+    // Fixes dual-screen position                             Most browsers      Firefox
+    const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+    const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
+    const windowWidth = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+    const windowHeight = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+    const systemZoom = windowWidth / window.screen.availWidth;
+    const left = (windowWidth - width) / 2 / systemZoom + dualScreenLeft;
+    const top = (windowHeight - height) / 2 / systemZoom + dualScreenTop;
+    const newWindow = window.open(url, title, `
+      scrollbars=yes,
+      width=${width / systemZoom}, 
+      height=${height / systemZoom}, 
+      top=${top}, 
+      left=${left}
+     `);
+    if (!newWindow) {
+        throw new Error('Failed to open confirmation screen');
+    }
+    newWindow.focus();
+    return newWindow;
+};
+
+const ConfirmationWindowTitle = 'Confirm this transaction';
+const ConfirmationWindowHeight = 600;
+const ConfirmationWindowWidth = 600;
+const ConfirmationWindowClosedPollingDuration = 1000;
+class ConfirmationScreen {
+    config;
+    constructor(config) {
+        this.config = config;
+    }
+    postMessage(destinationWindow, accessToken, message) {
+        destinationWindow.postMessage({
+            eventType: PassportEventType,
+            accessToken,
+            ...message,
+        }, this.config.passportDomain);
+    }
+    startTransaction(accessToken, transaction) {
+        return new Promise((resolve, reject) => {
+            const messageHandler = ({ data, origin }) => {
+                if (origin != this.config.passportDomain || data.eventType != PassportEventType) {
+                    return;
+                }
+                switch (data.messageType) {
+                    case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
+                        this.postMessage(confirmationWindow, accessToken, {
+                            messageType: SendMessage.TRANSACTION_START,
+                            messageData: transaction,
+                        });
+                        break;
+                    }
+                    case ReceiveMessage.TRANSACTION_CONFIRMED: {
+                        resolve({ confirmed: true });
+                        break;
+                    }
+                    case ReceiveMessage.TRANSACTION_ERROR: {
+                        reject(new Error('Transaction error'));
+                        break;
+                    }
+                    default:
+                        reject(new Error('Unsupported message type'));
+                }
+            };
+            window.addEventListener('message', messageHandler);
+            const confirmationWindow = openPopupCenter({
+                url: `${this.config.passportDomain}/transaction-confirmation`,
+                title: ConfirmationWindowTitle,
+                width: ConfirmationWindowWidth,
+                height: ConfirmationWindowHeight,
+            });
+            // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
+            const timer = setInterval(function () {
+                if (confirmationWindow.closed) {
+                    clearInterval(timer);
+                    window.removeEventListener('message', messageHandler);
+                    resolve({ confirmed: false });
+                }
+            }, ConfirmationWindowClosedPollingDuration);
+        });
+    }
+}
+
 const ERC721$1 = 'ERC721';
-const transfer$1 = ({ request, transfersApi, starkSigner, user, }) => {
+const transfer$1 = ({ request, transfersApi, starkSigner, user, passportConfig }) => {
     return withPassportError(async () => {
         const transferAmount = request.type === ERC721$1 ? '1' : request.amount;
         const signableResult = await transfersApi.getSignableTransferV1({
@@ -260,6 +361,17 @@ const transfer$1 = ({ request, transfersApi, starkSigner, user, }) => {
                 receiver: request.receiver,
             },
         });
+        if (request.type === 'ERC721') {
+            const transaction = {
+                transactionType: TransactionTypes.TRANSFER,
+                transactionData: request,
+            };
+            const confirmationScreen = new ConfirmationScreen(passportConfig);
+            const confirmationResult = await confirmationScreen.startTransaction(user.accessToken, transaction);
+            if (!confirmationResult.confirmed) {
+                throw new Error("Transaction rejected by user");
+            }
+        }
         const signableResultData = signableResult.data;
         const { payload_hash: payloadHash } = signableResultData;
         const starkSignature = await starkSigner.signMessage(payloadHash);
@@ -332,11 +444,6 @@ async function batchNftTransfer({ user, starkSigner, request, transfersApi, }) {
         };
         const response = await transfersApi.createTransfer({
             createTransferRequestV2: transferSigningParams,
-            // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
-            // Should be able to remove it once the Backend have update the API
-            // and generated the New Client
-            xImxEthAddress: '',
-            xImxEthSignature: '',
         }, { headers });
         return {
             transfer_ids: response?.data.transfer_ids,
@@ -380,11 +487,6 @@ async function createOrder$1({ starkSigner, user, request, ordersApi, }) {
                 vault_id_buy: signableResultData.vault_id_buy,
                 vault_id_sell: signableResultData.vault_id_sell,
             },
-            // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
-            // Should be able to remove it once the Backend have update the API
-            // and generated the New Client
-            xImxEthAddress: '',
-            xImxEthSignature: '',
         };
         const headers = {
             Authorization: 'Bearer ' + user.accessToken,
@@ -415,11 +517,6 @@ async function cancelOrder$1({ user, starkSigner, request, ordersApi, }) {
                 order_id: request.order_id,
                 stark_signature: starkSignature,
             },
-            // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
-            // Should be able to remove it once the Backend have update the API
-            // and generated the New Client
-            xImxEthAddress: '',
-            xImxEthSignature: '',
         }, { headers });
         return {
             order_id: cancelOrderResponse.data.order_id,
@@ -504,12 +601,7 @@ async function createTrade$1({ request, tradesApi, user, starkSigner }) {
                 stark_key: signableResultData.stark_key,
                 vault_id_buy: signableResultData.vault_id_buy,
                 vault_id_sell: signableResultData.vault_id_sell,
-            },
-            // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
-            // Should be able to remove it once the Backend have update the API
-            // and generated the New Client
-            xImxEthAddress: '',
-            xImxEthSignature: '',
+            }
         };
         const headers = { Authorization: 'Bearer ' + user.accessToken };
         const { data: createTradeResponse } = await tradesApi.createTrade(tradeParams, {
@@ -524,16 +616,18 @@ class PassportImxProvider {
     starkSigner;
     transfersApi;
     ordersApi;
+    passportConfig;
     exchangesApi;
     tradesApi;
-    constructor({ user, starkSigner, apiConfig }) {
+    constructor({ user, starkSigner, passportConfig }) {
         this.user = user;
         this.starkSigner = starkSigner;
-        const configuration = new Configuration$1({ basePath: apiConfig.basePath });
-        this.transfersApi = new TransfersApi(configuration);
-        this.ordersApi = new OrdersApi(configuration);
-        this.exchangesApi = new ExchangesApi(configuration);
-        this.tradesApi = new TradesApi(configuration);
+        this.passportConfig = passportConfig;
+        const apiConfig = new Configuration$1({ basePath: passportConfig.imxAPIConfiguration.basePath });
+        this.transfersApi = new TransfersApi(apiConfig);
+        this.ordersApi = new OrdersApi(apiConfig);
+        this.exchangesApi = new ExchangesApi(apiConfig);
+        this.tradesApi = new TradesApi(apiConfig);
     }
     async transfer(request) {
         return transfer$1({
@@ -541,13 +635,14 @@ class PassportImxProvider {
             user: this.user,
             starkSigner: this.starkSigner,
             transfersApi: this.transfersApi,
+            passportConfig: this.passportConfig,
         });
     }
     registerOffchain() {
-        throw new Error('Method not implemented.');
+        throw new PassportError('Operation not supported', PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR);
     }
     isRegisteredOnchain() {
-        throw new Error('Method not implemented.');
+        throw new PassportError('Operation not supported', PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR);
     }
     createOrder(request) {
         return createOrder$1({
@@ -591,18 +686,18 @@ class PassportImxProvider {
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     deposit(deposit) {
-        throw new Error('Method not implemented.');
+        throw new PassportError('Operation not supported', PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR);
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     prepareWithdrawal(request) {
-        throw new Error('Method not implemented.');
+        throw new PassportError('Operation not supported', PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR);
     }
     completeWithdrawal(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     starkPublicKey, 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     token) {
-        throw new Error('Method not implemented.');
+        throw new PassportError('Operation not supported', PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR);
     }
     getAddress() {
         return Promise.resolve(this.starkSigner.getAddress());
@@ -623,13 +718,15 @@ const Config = {
         magicPublishableApiKey: 'pk_live_10F423798A540ED7',
         magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
         baseIMXApiPath: 'https://api.x.immutable.com',
+        passportDomain: "https://immutable.passport.com"
     },
     SANDBOX: {
         network: Networks.SANDBOX,
         authenticationDomain: 'https://auth.immutable.com',
         magicPublishableApiKey: 'pk_live_10F423798A540ED7',
         magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
-        baseIMXApiPath: 'https://api.sandbox.x.immutable.com'
+        baseIMXApiPath: 'https://api.sandbox.x.immutable.com',
+        passportDomain: "https://immutable.sandbox.passport.com"
     },
     DEVELOPMENT: {
         network: Networks.DEVELOPMENT,
@@ -657,6 +754,7 @@ const getPassportConfiguration = (environmentConfiguration, oidcConfiguration) =
         'authenticationDomain',
         'magicPublishableApiKey',
         'magicProviderId',
+        'passportDomain',
     ]);
     validateConfiguration('OidcConfiguration', oidcConfiguration, [
         'clientId',
@@ -674,6 +772,7 @@ const getPassportConfiguration = (environmentConfiguration, oidcConfiguration) =
         imxAPIConfiguration: {
             basePath: environmentConfiguration.baseIMXApiPath,
         },
+        passportDomain: environmentConfiguration.passportDomain,
         magicPublishableApiKey: environmentConfiguration.magicPublishableApiKey,
         magicProviderId: environmentConfiguration.magicProviderId,
     };
@@ -735,14 +834,14 @@ class Passport {
             return new PassportImxProvider({
                 user: updatedUser,
                 starkSigner,
-                apiConfig: this.config.imxAPIConfiguration,
+                passportConfig: this.config,
             });
         }
         const userWithEtherKey = user;
         return new PassportImxProvider({
             user: userWithEtherKey,
             starkSigner,
-            apiConfig: this.config.imxAPIConfiguration,
+            passportConfig: this.config,
         });
     }
     async loginCallback() {
