@@ -186,13 +186,19 @@ describe('PassportImxProvider', () => {
 
   describe('registerOffchain', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.registerOffchain).toThrowError();
+      expect(passportImxProvider.registerOffchain).toThrow(new PassportError(
+        "Operation not supported",
+        PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      ));
     });
   });
 
   describe('isRegisteredOnchain', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.isRegisteredOnchain).toThrowError();
+      expect(passportImxProvider.isRegisteredOnchain).toThrow(new PassportError(
+        "Operation not supported",
+        PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      ));
     });
   });
 
@@ -600,19 +606,28 @@ describe('PassportImxProvider', () => {
 
   describe('deposit', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.deposit).toThrowError();
+      expect(passportImxProvider.deposit).toThrow(new PassportError(
+        "Operation not supported",
+        PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      ));
     });
   });
 
   describe('prepareWithdrawal', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.prepareWithdrawal).toThrowError();
+      expect(passportImxProvider.prepareWithdrawal).toThrow(new PassportError(
+        "Operation not supported",
+        PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      ));
     });
   });
 
   describe('completeWithdrawal', () => {
     it('should throw error', async () => {
-      expect(passportImxProvider.completeWithdrawal).toThrowError();
+      expect(passportImxProvider.completeWithdrawal).toThrow(new PassportError(
+        "Operation not supported",
+        PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      ));
     });
   });
 
