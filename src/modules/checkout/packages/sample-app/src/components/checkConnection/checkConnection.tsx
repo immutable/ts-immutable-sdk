@@ -1,21 +1,27 @@
-import { Checkout } from "@imtbl/checkout-sdk-web";
-import { useEffect, useMemo } from "react";
+import { CheckConnectionResult, Checkout, ConnectionProviders } from "@imtbl/checkout-sdk-web";
+import { useMemo, useState } from "react";
 
-function checkConnection(props: {updater: any}) {
-  const {updater} = props;
+function checkConnection() {
   const checkout = useMemo(() => new Checkout(), []);
+  const [checkConnectResult, setCheckConnectResult] = useState<CheckConnectionResult>()
 
-  useEffect(() => {
-    const checky = async ()=> {
-      const connected = await checkout.checkIsWalletConnected();
-      console.log('isConnected: ', connected);
-    };
-
-    checky();
-  }, [updater]);
+  async function checkMyConnection() {
+    const checkConnect = await checkout.checkIsWalletConnected({providerPreference: ConnectionProviders.METAMASK});
+    setCheckConnectResult(checkConnect);
+    console.log('isConnected: ', checkConnect);
+  }
 
   return(
-    <div>Connection checker</div>
+    <div>
+      <h1>Check connnection</h1>
+      <button onClick={checkMyConnection}>Check Wallet Connection</button>
+      {checkConnectResult && (<div>
+        <p>Connected: <strong>{checkConnectResult.isConnected.toString()}</strong></p>
+        <p>Wallet Address: {checkConnectResult.walletAddress}</p>
+        </div>
+        )
+      }
+    </div>
   )
   
 }

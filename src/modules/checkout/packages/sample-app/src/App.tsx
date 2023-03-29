@@ -15,7 +15,7 @@ function App() {
       <main className="checkout-sdk-app">
         <h1>Checkout Sample App</h1>
         <p>This is a react app which implements Immutable's Checkout</p>
-        <CheckConnection updater={provider}/>
+        <CheckConnection />
         <Connect setProvider={setProvider} />
         <SwitchNetwork provider={provider} />
         <GetBalance provider={provider} />
