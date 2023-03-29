@@ -2,6 +2,8 @@ import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
 import {
+  CheckConnectionParams,
+  CheckConnectionResult,
   ConnectParams,
   ConnectResult,
   GetAllBalancesParams,
@@ -17,8 +19,8 @@ import { switchWalletNetwork } from './network';
 
 export class Checkout {
 
-  public async checkIsWalletConnected(): Promise<boolean> {
-    return connect.checkIsWalletConnected();
+  public async checkIsWalletConnected(params: CheckConnectionParams): Promise<CheckConnectionResult> {
+    return connect.checkIsWalletConnected(params.providerPreference);
   }
   
   public async connect(params: ConnectParams): Promise<ConnectResult> {
@@ -28,7 +30,7 @@ export class Checkout {
     return {
       provider,
       network,
-    } as ConnectResult;
+    };
   }
 
   public async switchNetwork(
