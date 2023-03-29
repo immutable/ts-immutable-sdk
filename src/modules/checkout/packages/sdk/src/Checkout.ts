@@ -2,6 +2,7 @@ import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
 import { getNetworkInfo, switchWalletNetwork } from './network';
+import * as transaction from './transaction';
 import {
   CheckConnectionParams,
   CheckConnectionResult,
@@ -13,6 +14,8 @@ import {
   GetBalanceResult,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
+  SendTransactionParams,
+  SendTransactionResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
 } from './types';
@@ -52,13 +55,19 @@ export class Checkout {
 
   public async getAllBalances(params: GetAllBalancesParams): Promise<GetAllBalancesResult> {
     return balances.getAllBalances(
-        params.provider,
-        params.walletAddress,
-        params.chainId
-      );
+      params.provider,
+      params.walletAddress,
+      params.chainId
+    );
   }
 
   public getTokenAllowList(params: GetTokenAllowListParams): GetTokenAllowListResult {
     return tokens.getTokenAllowList(params.chainId);
+  }
+
+  public async sendTransaction(
+    params: SendTransactionParams
+  ): Promise<SendTransactionResult> {
+    return await transaction.sendTransaction(params);
   }
 }

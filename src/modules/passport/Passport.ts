@@ -5,18 +5,8 @@ import { getPassportConfiguration, PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { IMXProvider } from '../provider';
 import { getStarkSigner } from './stark';
-import {
-  EnvironmentConfiguration,
-  OidcConfiguration,
-  UserProfile,
-  UserWithEtherKey,
-} from './types';
-import {
-  Configuration,
-  EthSigner,
-  StarkSigner,
-  UsersApi,
-} from '@imtbl/core-sdk';
+import { EnvironmentConfiguration, OidcConfiguration, UserProfile, UserWithEtherKey, } from './types';
+import { Configuration, EthSigner, StarkSigner, UsersApi, } from '@imtbl/core-sdk';
 import registerPassport from './workflows/registration';
 
 export class Passport {
@@ -58,14 +48,14 @@ export class Passport {
       return new PassportImxProvider({
         user: updatedUser,
         starkSigner,
-        apiConfig: this.config.imxAPIConfiguration,
+        passportConfig: this.config,
       });
     }
     const userWithEtherKey = user as UserWithEtherKey;
     return new PassportImxProvider({
       user: userWithEtherKey,
       starkSigner,
-      apiConfig: this.config.imxAPIConfiguration,
+      passportConfig: this.config,
     });
   }
 

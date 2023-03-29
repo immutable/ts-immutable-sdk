@@ -55,12 +55,7 @@ export async function createTrade({
         stark_key: signableResultData.stark_key,
         vault_id_buy: signableResultData.vault_id_buy,
         vault_id_sell: signableResultData.vault_id_sell,
-      },
-      // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
-      // Should be able to remove it once the Backend have update the API
-      // and generated the New Client
-      xImxEthAddress: '',
-      xImxEthSignature: '',
+      }
     }
 
     const headers = { Authorization: 'Bearer ' + user.accessToken }

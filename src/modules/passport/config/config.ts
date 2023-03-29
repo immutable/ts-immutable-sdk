@@ -13,6 +13,7 @@ export interface PassportConfiguration {
     logoutRedirectUri: string;
     redirectUri: string;
   };
+  passportDomain: string;
   imxAPIConfiguration: ImxApiConfiguration;
   magicPublishableApiKey: string;
   magicProviderId: string;
@@ -25,13 +26,15 @@ export const Config = {
     magicPublishableApiKey: 'pk_live_10F423798A540ED7',
     magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
     baseIMXApiPath: 'https://api.x.immutable.com',
+    passportDomain: "https://immutable.passport.com"
   } as EnvironmentConfiguration,
   SANDBOX: {
     network: Networks.SANDBOX,
     authenticationDomain: 'https://auth.immutable.com',
     magicPublishableApiKey: 'pk_live_10F423798A540ED7',
     magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
-    baseIMXApiPath: 'https://api.sandbox.x.immutable.com'
+    baseIMXApiPath: 'https://api.sandbox.x.immutable.com',
+    passportDomain: "https://immutable.sandbox.passport.com"
   } as EnvironmentConfiguration,
 };
 
@@ -71,6 +74,7 @@ export const getPassportConfiguration = (
       'authenticationDomain',
       'magicPublishableApiKey',
       'magicProviderId',
+      'passportDomain',
     ],
   );
   validateConfiguration(
@@ -94,6 +98,7 @@ export const getPassportConfiguration = (
     imxAPIConfiguration: {
       basePath: environmentConfiguration.baseIMXApiPath,
     },
+    passportDomain: environmentConfiguration.passportDomain,
     magicPublishableApiKey: environmentConfiguration.magicPublishableApiKey,
     magicProviderId: environmentConfiguration.magicProviderId,
   };

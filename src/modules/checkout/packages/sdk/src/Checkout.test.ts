@@ -9,10 +9,12 @@ import { switchWalletNetwork } from './network';
 import { Web3Provider } from '@ethersproject/providers';
 import { ChainId, ConnectionProviders, GetBalanceParams } from './types';
 import { getBalance, getERC20Balance } from './balances';
+import { sendTransaction } from './transaction';
 
 jest.mock('./connect');
 jest.mock('./network');
 jest.mock('./balances');
+jest.mock('./transaction');
 
 describe(' Connect', () => {
   beforeEach(() => {
@@ -65,5 +67,25 @@ describe(' Connect', () => {
     });
 
     expect(switchWalletNetwork).toBeCalledTimes(1);
+  });
+
+  it('should call sendTransaction function', async () => {
+    const checkout = new Checkout();
+
+    await checkout.sendTransaction({
+      provider: {} as Web3Provider,
+      transaction: {
+        nonce: "",
+        gasPrice: "",
+        gas: "",
+        to: "",
+        from: "",
+        value: "",
+        data: "",
+        chainId: 1
+      }
+    })
+
+    expect(sendTransaction).toBeCalledTimes(1);
   });
 });
