@@ -71,10 +71,7 @@ export default {
   // maxWorkers: "50%",
 
   // An array of directory names to be searched recursively up from the requiring module's location
-  moduleDirectories: [
-    "node_modules",
-    "<rootDir>/src"
-  ],
+  moduleDirectories: ['node_modules', '<rootDir>/src/modules'],
 
   // An array of file extensions your modules use
   // moduleFileExtensions: [
@@ -185,7 +182,7 @@ export default {
   // unmockedModulePathPatterns: undefined,
 
   // Indicates whether each individual test should be reported during the run
-  // verbose: undefined,
+  verbose: true,
 
   // An array of regexp patterns that are matched against all source file paths before re-running tests in watch mode
   // watchPathIgnorePatterns: [],

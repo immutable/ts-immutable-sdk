@@ -16,6 +16,11 @@
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "typecheck": "tsc --noEmit --jsx preserve",
     "test": "jest",
+    "test:passport": "jest ./src/modules/passport",
+    "test:devauth": "jest ./src/modules/devauth",
+    "test:checkout": "jest ./src/modules/checkout",
+    "test:apis": "jest ./src/modules/apis",
+    "test:provider": "jest ./src/modules/provider",
     "test:watch": "jest --watch",
     "lint": "eslint . --ext .ts,.jsx,.tsx --max-warnings=0"
   },
