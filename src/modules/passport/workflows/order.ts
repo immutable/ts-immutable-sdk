@@ -8,7 +8,7 @@ import {
   StarkSigner,
   UnsignedOrderRequest,
 } from '@imtbl/core-sdk';
-import { convertToSignableToken } from 'modules/provider/signable-actions/utils';
+import { convertToSignableToken } from '../../../modules/provider/signable-actions/utils';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { UserWithEtherKey } from '../types';
 
@@ -75,11 +75,6 @@ export async function createOrder({
         vault_id_buy: signableResultData.vault_id_buy,
         vault_id_sell: signableResultData.vault_id_sell,
       },
-      // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
-      // Should be able to remove it once the Backend have update the API
-      // and generated the New Client
-      xImxEthAddress: '',
-      xImxEthSignature: '',
     };
     const headers = {
       Authorization: 'Bearer ' + user.accessToken,
@@ -123,11 +118,6 @@ export async function cancelOrder({
           order_id: request.order_id,
           stark_signature: starkSignature,
         },
-        // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
-        // Should be able to remove it once the Backend have update the API
-        // and generated the New Client
-        xImxEthAddress: '',
-        xImxEthSignature: '',
       },
       { headers }
     );
