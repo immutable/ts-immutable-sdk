@@ -285,8 +285,6 @@ describe('transfer', () => {
               },
             ],
           },
-          xImxEthAddress: '',
-          xImxEthSignature: '',
         },
         {
           headers: {

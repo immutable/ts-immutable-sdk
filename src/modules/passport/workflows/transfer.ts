@@ -159,11 +159,6 @@ export async function batchNftTransfer({
     const response = await transfersApi.createTransfer(
       {
         createTransferRequestV2: transferSigningParams,
-        // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
-        // Should be able to remove it once the Backend have update the API
-        // and generated the New Client
-        xImxEthAddress: '',
-        xImxEthSignature: '',
       },
       { headers }
     );
