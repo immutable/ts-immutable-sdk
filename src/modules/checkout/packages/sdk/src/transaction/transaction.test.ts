@@ -5,10 +5,15 @@ import { sendTransaction } from './transaction';
 
 describe('transaction', () => {
   it('should send the transaction and return success', async () => {
+    const transactionResponse = {
+      hash: "123",
+      from: "0x234",
+      confirmations: 5
+    }
     const mockProvider = {
       getSigner: jest.fn().mockReturnValue({
         sendTransaction: () => {
-          return {}
+          return transactionResponse
         }
       })
     } as unknown as Web3Provider;
@@ -31,7 +36,7 @@ describe('transaction', () => {
 
     await expect(sendTransaction(params)).resolves.toEqual({
       status: TransactionStatus.SUCCESS,
-      transaction
+      transactionResponse
     });
   });
 

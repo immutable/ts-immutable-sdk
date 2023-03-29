@@ -1,4 +1,4 @@
-import { Web3Provider } from "@ethersproject/providers";
+import { TransactionResponse, Web3Provider } from "@ethersproject/providers";
 
 export interface SendTransactionParams {
   provider: Web3Provider;
@@ -7,7 +7,7 @@ export interface SendTransactionParams {
 
 export interface SendTransactionResult {
   status: TransactionStatus;
-  transaction: Transaction;
+  transactionResponse: TransactionResponse;
 }
 
 export interface Transaction {
