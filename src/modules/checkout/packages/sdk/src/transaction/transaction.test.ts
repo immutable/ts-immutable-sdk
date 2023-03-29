@@ -35,11 +35,11 @@ describe('transaction', () => {
     });
   });
 
-  it('should return failed status if transaction fails', async () => {
+  it('should return errored status if transaction errors', async () => {
     const mockProvider = {
       getSigner: jest.fn().mockReturnValue({
         sendTransaction: () => {
-          throw new Error('Transaction failed');
+          throw new Error('Transaction errored');
         }
       })
     } as unknown as Web3Provider;
@@ -61,7 +61,7 @@ describe('transaction', () => {
     }
 
     await expect(sendTransaction(params)).rejects.toThrow(new CheckoutError(
-      'Transaction failed',
+      'Transaction errored',
       CheckoutErrorType.TRANSACTION_ERRORED
     ));
   });
