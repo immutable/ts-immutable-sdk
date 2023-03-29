@@ -21,8 +21,8 @@ export default class ConfirmationScreen {
     this.config = config;
   }
 
-  private postMessage(accessToken: string, message: DisplayConfirmationParams) {
-    window.postMessage({
+  private postMessage(destinationWindow: Window, accessToken: string, message: DisplayConfirmationParams) {
+    destinationWindow.postMessage({
       eventType: PassportEventType,
       accessToken,
       ...message,
@@ -37,10 +37,14 @@ export default class ConfirmationScreen {
         }
         switch (data.messageType as ReceiveMessage) {
           case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
-            this.postMessage(accessToken, {
-              messageType: SendMessage.TRANSACTION_START,
-              messageData: transaction
-            });
+            this.postMessage(
+              confirmationWindow,
+              accessToken,
+              {
+                messageType: SendMessage.TRANSACTION_START,
+                messageData: transaction,
+              },
+            );
             break;
           }
           case ReceiveMessage.TRANSACTION_CONFIRMED: {
