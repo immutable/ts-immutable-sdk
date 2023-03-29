@@ -1,6 +1,6 @@
 import * as balances from './balances';
 import * as tokens from './tokens';
-import { connectWalletProvider, getNetworkInfo } from './connect';
+import * as connect from './connect';
 import {
   ConnectParams,
   ConnectResult,
@@ -16,9 +16,14 @@ import {
 import { switchWalletNetwork } from './network';
 
 export class Checkout {
+
+  public async checkIsWalletConnected(): Promise<boolean> {
+    return connect.checkIsWalletConnected();
+  }
+  
   public async connect(params: ConnectParams): Promise<ConnectResult> {
-    const provider = await connectWalletProvider(params);
-    const network = await getNetworkInfo(provider);
+    const provider = await connect.connectWalletProvider(params);
+    const network = await connect.getNetworkInfo(provider);
 
     return {
       provider,

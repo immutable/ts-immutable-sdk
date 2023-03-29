@@ -11,6 +11,18 @@ import {
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers'
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from "../errors";
 
+export async function checkIsWalletConnected(): Promise<boolean> {
+  const provider = await detectEthereumProvider() as ExternalProvider;
+
+  if(!provider?.request) {
+    throw new CheckoutError("No MetaMask provider installed.", CheckoutErrorType.METAMASK_PROVIDER_ERROR);
+  }
+  const accounts = await provider.request({method: 'eth_accounts', params:[]});
+  // accounts[0] will have the active account connected. if empty then we are not connected
+  
+  return accounts.length === 1;
+}
+
 export async function connectWalletProvider(params: ConnectParams) : Promise<Web3Provider> {
   let web3Provider: Web3Provider | null = null;
   
