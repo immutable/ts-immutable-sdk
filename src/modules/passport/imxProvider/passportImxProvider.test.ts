@@ -265,8 +265,6 @@ describe('PassportImxProvider', () => {
           fees: undefined,
           include_fees: true,
         },
-        xImxEthAddress: '',
-        xImxEthSignature: '',
       };
       const mockHeader = {
         headers: {
@@ -326,8 +324,6 @@ describe('PassportImxProvider', () => {
           order_id: orderId,
           stark_signature: mockStarkSignature,
         },
-        xImxEthAddress: '',
-        xImxEthSignature: '',
       };
 
       const mockHeader = {
@@ -403,8 +399,6 @@ describe('PassportImxProvider', () => {
         include_fees: true,
         order_id: 1234
       },
-      xImxEthAddress: '',
-      xImxEthSignature: '',
     };
     const mockHeader = {
       headers: {
@@ -522,8 +516,6 @@ describe('PassportImxProvider', () => {
               },
             ],
           },
-          xImxEthAddress: '',
-          xImxEthSignature: '',
         },
         {
           headers: {
