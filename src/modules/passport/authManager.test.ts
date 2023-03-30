@@ -1,13 +1,9 @@
-import axios from 'axios';
 import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { User } from './types';
 import { PassportConfiguration } from './config';
 import { MAX_RETRIES } from './util/retry';
-
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 jest.mock('oidc-client-ts');
 
@@ -159,75 +155,49 @@ describe('AuthManager', () => {
     });
   });
   describe('requestRefreshTokenAfterRegistration', () => {
-    afterEach(() => {
-      mockedAxios.get.mockClear();
-    });
     it('requestRefreshTokenAfterRegistration successful with user wallet address in metadata', async () => {
       const expected = {
         ...mockUser,
         etherKey: passportData.passport.ether_key,
       };
       signinSilentMock.mockReturnValue(mockOidcUserWithPassportInfo);
-      const mockToken =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
-      const response = {
-        data: {
-          sub: 'email|63a3c1ada9d926a4845a3f0c',
-          nickname: 'yundi.fu',
-          ...passportData,
-        },
-      };
-      mockedAxios.get.mockImplementationOnce(() => Promise.resolve(response));
 
-      const res = await authManager.requestRefreshTokenAfterRegistration(
-        mockToken
-      );
+      const res = await authManager.requestRefreshTokenAfterRegistration();
 
       expect(res).toEqual(expected);
       expect(signinSilentMock).toHaveBeenCalledTimes(1);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        'https://auth.dev.immutable.com/userinfo',
-        {
-          headers: {
-            Authorization:
-              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ',
-          },
-        }
-      );
     });
 
     it('requestRefreshTokenAfterRegistration failed without user wallet address in metadata with retries', async () => {
       const response = {
-        data: {
-          sub: 'email|63a3c1ada9d926a4845a3f0c',
-          nickname: 'yundi.fu',
+        id_token: 'id123',
+        access_token: 'access123',
+        refresh_token: 'refresh123',
+        token_type: 'Bearer',
+        scope: 'openid',
+        expires_in: 167222,
+        profile: {
+          sub: 'email|123',
+          email: 'test@immutable.com',
+          nickname: 'test',
         },
       };
-      const mockToken =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
-      mockedAxios.get.mockImplementationOnce(() => Promise.resolve(response));
+      signinSilentMock.mockResolvedValue(response);
 
       await expect(
-        authManager.requestRefreshTokenAfterRegistration(mockToken)
+        authManager.requestRefreshTokenAfterRegistration()
       ).rejects.toThrow('REFRESH_TOKEN_ERROR');
 
-      expect(signinSilentMock).toHaveBeenCalledTimes(0);
+      expect(signinSilentMock).toHaveBeenCalledTimes(MAX_RETRIES + 1);
     }, 15000);
 
     it('requestRefreshTokenAfterRegistration failed with fetching user info error in metadata with retries', async () => {
-      const response = {
-        status: 500,
-      };
-      const mockToken =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
-      mockedAxios.get.mockImplementationOnce(() => Promise.reject(response));
-
+      signinSilentMock.mockResolvedValue(null);
       await expect(
-        authManager.requestRefreshTokenAfterRegistration(mockToken)
+        authManager.requestRefreshTokenAfterRegistration()
       ).rejects.toThrow('REFRESH_TOKEN_ERROR');
 
-      expect(signinSilentMock).toHaveBeenCalledTimes(0);
-      expect(mockedAxios.get).toHaveBeenCalledTimes(MAX_RETRIES + 1);
+      expect(signinSilentMock).toHaveBeenCalledTimes(MAX_RETRIES + 1);
     }, 15000);
   });
 });
