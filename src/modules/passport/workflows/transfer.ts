@@ -48,20 +48,17 @@ export const transfer = ({
       },
     });
 
-    if (request.type === 'ERC721') {
-      const transaction: Transaction = {
+    const confirmationScreen = new ConfirmationScreen(passportConfig);
+    const confirmationResult = await confirmationScreen.startTransaction(
+      user.accessToken,
+      {
         transactionType: TransactionTypes.TRANSFER,
         transactionData: request,
-      };
-      const confirmationScreen = new ConfirmationScreen(passportConfig);
-      const confirmationResult = await confirmationScreen.startTransaction(
-        user.accessToken,
-        transaction,
-      );
-
-      if (!confirmationResult.confirmed) {
-        throw new Error("Transaction rejected by user");
       }
+    );
+
+    if (!confirmationResult.confirmed) {
+      throw new Error("Transaction rejected by user");
     }
 
     const signableResultData = signableResult.data;
