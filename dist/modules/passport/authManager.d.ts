@@ -7,6 +7,6 @@ export default class AuthManager {
     login(): Promise<User>;
     loginCallback(): Promise<void>;
     getUser(): Promise<User>;
-    requestRefreshTokenAfterRegistration(jwt: string): Promise<UserWithEtherKey | null>;
+    requestRefreshTokenAfterRegistration(): Promise<UserWithEtherKey | null>;
     private mapOidcUserToDomainModel;
 }

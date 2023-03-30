@@ -1,7 +1,6 @@
 import { ImmutableX, Configuration as Configuration$1, TransfersApi, OrdersApi, ExchangesApi, TradesApi, generateLegacyStarkPrivateKey, createStarkSigner, UsersApi, Contracts, WithdrawalsApi, EncodingApi, MintsApi, DepositsApi, TokensApi, Config as Config$1 } from '@imtbl/core-sdk';
 export { EncodeAssetRequestTokenTypeEnum, EthSigner, FeeTokenTypeEnum, GetMetadataRefreshResponseStatusEnum, MetadataRefreshExcludingSummaryStatusEnum } from '@imtbl/core-sdk';
 import { UserManager } from 'oidc-client-ts';
-import axios from 'axios';
 import { ethers } from 'ethers';
 import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
@@ -59,7 +58,7 @@ const wait = (ms) => new Promise((resolve) => {
     setTimeout(() => resolve(), ms);
 });
 const retryWithDelay = async (fn, options) => {
-    const { retries = MAX_RETRIES, interval = POLL_INTERVAL, finalErr = Error('Retry failed') } = options || {};
+    const { retries = MAX_RETRIES, interval = POLL_INTERVAL, finalErr = Error('Retry failed'), } = options || {};
     try {
         return await fn();
     }
@@ -68,25 +67,8 @@ const retryWithDelay = async (fn, options) => {
             return Promise.reject(finalErr);
         }
         await wait(interval);
-        return retryWithDelay(fn, { retries: (retries - 1), finalErr });
+        return retryWithDelay(fn, { retries: retries - 1, finalErr });
     }
-};
-
-const getUserEtherKeyFromMetadata = async (authDomain, jwt) => {
-    const passportData = await getUserPassportMetadata(authDomain, jwt);
-    const metadataExists = !!passportData?.ether_key && !!passportData?.stark_key && !!passportData?.user_admin_key;
-    if (metadataExists) {
-        return passportData.ether_key;
-    }
-    return Promise.reject('user wallet addresses not exist');
-};
-const getUserPassportMetadata = async (authDomain, jwt) => {
-    const { data } = await axios.get(`${authDomain}/userinfo`, {
-        headers: {
-            Authorization: `Bearer ` + jwt
-        }
-    });
-    return data?.passport;
 };
 
 const getAuthConfiguration = ({ oidcConfiguration, }) => ({
@@ -131,10 +113,19 @@ class AuthManager {
             return this.mapOidcUserToDomainModel(oidcUser);
         }, PassportErrorType.NOT_LOGGED_IN_ERROR);
     }
-    async requestRefreshTokenAfterRegistration(jwt) {
+    async requestRefreshTokenAfterRegistration() {
         return withPassportError(async () => {
-            await retryWithDelay(() => getUserEtherKeyFromMetadata(this.config.oidcConfiguration.authenticationDomain, jwt));
-            const updatedUser = await this.userManager.signinSilent();
+            const updatedUser = await retryWithDelay(async () => {
+                const user = await this.userManager.signinSilent();
+                const passportMetadata = user?.profile?.passport;
+                const metadataExists = !!passportMetadata?.ether_key &&
+                    !!passportMetadata?.stark_key &&
+                    !!passportMetadata?.user_admin_key;
+                if (metadataExists) {
+                    return user;
+                }
+                return Promise.reject('user wallet addresses not exist');
+            });
             if (!updatedUser) {
                 return null;
             }
@@ -865,7 +856,7 @@ class Passport {
             starkSigner,
             usersApi,
         }, jwt);
-        const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(jwt);
+        const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration();
         if (!updatedUser) {
             throw new PassportError('Failed to get refresh token', PassportErrorType.REFRESH_TOKEN_ERROR);
         }
