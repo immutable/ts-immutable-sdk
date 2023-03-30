@@ -1,4 +1,3 @@
-import axios from 'axios';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { Config } from './config';
@@ -10,18 +9,14 @@ import registerPassport from './workflows/registration';
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
 jest.mock('./stark/getStarkSigner');
-jest.mock('axios');
 jest.mock('./imxProvider/passportImxProvider');
 jest.mock('./workflows/registration');
-
 
 const oidcConfiguration: OidcConfiguration = {
   clientId: '11111',
   redirectUri: 'https://test.com',
   logoutRedirectUri: 'https://test.com',
 };
-
-const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Passport', () => {
   afterEach(jest.resetAllMocks);
@@ -36,7 +31,7 @@ describe('Passport', () => {
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue({
       idToken: '123',
-      etherKey: "0x123"
+      etherKey: '0x123',
     });
     loginCallbackMock = jest.fn();
     magicLoginMock = jest.fn();
@@ -50,15 +45,6 @@ describe('Passport', () => {
     });
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,
-    });
-    mockedAxios.get.mockResolvedValue({
-      data: {
-        passport: {
-          ether_key: '0x232',
-          stark_key: '0x567',
-          user_admin_key: '0x123',
-        },
-      },
     });
     passport = new Passport(Config.SANDBOX, oidcConfiguration);
   });
@@ -102,7 +88,7 @@ describe('Passport', () => {
           email: 'test@immutable.com',
           nickname: 'test',
         },
-        etherKey: "",
+        etherKey: '',
       };
 
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
