@@ -18,7 +18,7 @@ const getAuthConfiguration = ({
   },
   mergeClaims: true,
   loadUserInfo: true,
-  scope: 'openid offline_access profile email create:users passport:user_create imx:passport_user.create imx:passport_user.read imx:order.create imx:order.cancel imx:trade.create imx:transfer.create wallet:transfer wallet:trade',
+  scope: 'openid offline_access profile email create:users passport:user_create imx:passport_user.create imx:passport_user.read imx:order.create imx:order.cancel imx:trade.create imx:transfer.create wallet:transfer wallet:trade wallet:order_cancel wallet:order_create',
   extraQueryParams: {
     audience: 'platform_api',
   }
