@@ -10,7 +10,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=14.0.0 <17.0.0"
+    "node": ">=14.0.0 <19.0.0"
   },
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
