@@ -58,19 +58,6 @@ export default class AuthManager {
     );
   }
 
-  private async signinSilent(): Promise<OidcUser | null> {
-    const user = await this.userManager.signinSilent();
-    const passportMetadata = user?.profile?.passport as PassportMetadata;
-    const metadataExists =
-      !!passportMetadata?.ether_key &&
-      !!passportMetadata?.stark_key &&
-      !!passportMetadata?.user_admin_key;
-    if (metadataExists) {
-      return user;
-    }
-    return Promise.reject('user wallet addresses not exist');
-  }
-
   public async getUser(): Promise<User> {
     return withPassportError<User>(async () => {
       const oidcUser = await this.userManager.getUser();
@@ -83,7 +70,18 @@ export default class AuthManager {
 
   public async requestRefreshTokenAfterRegistration(): Promise<UserWithEtherKey | null> {
     return withPassportError<UserWithEtherKey | null>(async () => {
-      const updatedUser = await retryWithDelay(() => this.signinSilent());
+      const updatedUser = await retryWithDelay(async () => {
+        const user = await this.userManager.signinSilent();
+        const passportMetadata = user?.profile?.passport as PassportMetadata;
+        const metadataExists =
+          !!passportMetadata?.ether_key &&
+          !!passportMetadata?.stark_key &&
+          !!passportMetadata?.user_admin_key;
+        if (metadataExists) {
+          return user;
+        }
+        return Promise.reject('user wallet addresses not exist');
+      });
       if (!updatedUser) {
         return null;
       }
