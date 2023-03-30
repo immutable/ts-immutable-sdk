@@ -8,7 +8,7 @@ import {
 } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { convertToSignableToken } from '../../provider/signable-actions/utils';
-import { Transaction, TransactionTypes} from '../confirmation/types';
+import { TransactionTypes } from '../confirmation/types';
 import ConfirmationScreen from '../confirmation/confirmation';
 import { PassportConfiguration } from '../config';
 import { UserWithEtherKey } from '../types';
