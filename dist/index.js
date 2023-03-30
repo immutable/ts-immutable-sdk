@@ -718,7 +718,7 @@ const Config = {
         magicPublishableApiKey: 'pk_live_10F423798A540ED7',
         magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
         baseIMXApiPath: 'https://api.x.immutable.com',
-        passportDomain: "https://immutable.passport.com"
+        passportDomain: 'https://passport.immutable.com',
     },
     SANDBOX: {
         network: Networks.SANDBOX,
@@ -726,7 +726,7 @@ const Config = {
         magicPublishableApiKey: 'pk_live_10F423798A540ED7',
         magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
         baseIMXApiPath: 'https://api.sandbox.x.immutable.com',
-        passportDomain: "https://immutable.sandbox.passport.com"
+        passportDomain: 'https://passport.sandbox.immutable.com'
     },
     DEVELOPMENT: {
         network: Networks.DEVELOPMENT,
