@@ -32,7 +32,7 @@ To run tests specific to a module, you can run one of the following commands, as
 
 ```sh
 yarn test:passport # Runs ALL tests within src/modules/passport
-yarn test:devauth # Runs ALL tests within src/modules/devauth
+yarn test:dev-auth # Runs ALL tests within src/modules/dev-auth
 yarn test:checkout # Runs ALL tests within src/modules/checkout
 yarn test:apis # Runs ALL tests within src/modules/apis
 yarn test:provider # Runs ALL tests within src/modules/provider
