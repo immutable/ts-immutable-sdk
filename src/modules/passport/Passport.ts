@@ -90,7 +90,7 @@ export class Passport {
       },
       jwt
     );
-    const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration(jwt);
+    const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration();
     if (!updatedUser) {
       throw new PassportError(
         'Failed to get refresh token',

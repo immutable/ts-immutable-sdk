@@ -2,7 +2,6 @@ import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportMetadata, User, UserWithEtherKey } from './types';
 import { retryWithDelay } from './util/retry';
-import { getUserEtherKeyFromMetadata } from './getUserMetadata';
 import { PassportConfiguration } from './config';
 
 const getAuthConfiguration = ({
@@ -58,17 +57,20 @@ export default class AuthManager {
     }, PassportErrorType.NOT_LOGGED_IN_ERROR);
   }
 
-  public async requestRefreshTokenAfterRegistration(
-    jwt: string
-  ): Promise<UserWithEtherKey | null> {
+  public async requestRefreshTokenAfterRegistration(): Promise<UserWithEtherKey | null> {
     return withPassportError<UserWithEtherKey | null>(async () => {
-      await retryWithDelay(() =>
-        getUserEtherKeyFromMetadata(
-          this.config.oidcConfiguration.authenticationDomain,
-          jwt
-        )
-      );
-      const updatedUser = await this.userManager.signinSilent();
+      const updatedUser = await retryWithDelay(async () => {
+        const user = await this.userManager.signinSilent();
+        const passportMetadata = user?.profile?.passport as PassportMetadata;
+        const metadataExists =
+          !!passportMetadata?.ether_key &&
+          !!passportMetadata?.stark_key &&
+          !!passportMetadata?.user_admin_key;
+        if (metadataExists) {
+          return user;
+        }
+        return Promise.reject('user wallet addresses not exist');
+      });
       if (!updatedUser) {
         return null;
       }
