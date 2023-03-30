@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit --jsx preserve",
     "test": "jest",
     "test:passport": "jest --rootDir=src/modules/passport",
-    "test:devauth": "jest --rootDir=src/modules/devauth",
+    "test:dev-auth": "jest --rootDir=src/modules/dev-auth",
     "test:checkout": "jest --rootDir=src/modules/checkout",
     "test:apis": "jest --rootDir=src/modules/apis",
     "test:provider": "jest --rootDir=src/modules/provider",
