@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@imx/economy-sdk": ["packages/sdk/src/index.ts"]
+      "@imtbl/economy-sdk": ["packages/sdk/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
