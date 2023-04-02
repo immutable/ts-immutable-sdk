@@ -18,6 +18,18 @@ const oidcConfiguration: OidcConfiguration = {
   logoutRedirectUri: 'https://test.com',
 };
 
+const mockUser: User = {
+  idToken: 'id123',
+  accessToken: 'access123',
+  refreshToken: 'refresh123',
+  profile: {
+    sub: 'email|123',
+    email: 'test@immutable.com',
+    nickname: 'test',
+  },
+  etherKey: '',
+};
+
 describe('Passport', () => {
   afterEach(jest.resetAllMocks);
 
@@ -79,18 +91,6 @@ describe('Passport', () => {
     });
 
     it('should register user successfully', async () => {
-      const mockUser: User = {
-        idToken: 'id123',
-        accessToken: 'access123',
-        refreshToken: 'refresh123',
-        profile: {
-          sub: 'email|123',
-          email: 'test@immutable.com',
-          nickname: 'test',
-        },
-        etherKey: '',
-      };
-
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
       requestRefreshTokenMock.mockResolvedValue(mockUser);
       authLoginMock.mockResolvedValue({ idToken: '123' });
@@ -114,37 +114,31 @@ describe('Passport', () => {
 
   describe('getUserInfo', () => {
     it('should execute getUser', async () => {
-      const userMock: User = {
-        idToken: 'id123',
-        refreshToken: 'refresh123',
-        accessToken: 'access123',
-        profile: {
-          sub: 'email|123',
-        },
-      };
-      getUserMock.mockReturnValue(userMock);
+      getUserMock.mockReturnValue(mockUser);
 
       const result = await passport.getUserInfo();
 
-      expect(result).toEqual(userMock.profile);
+      expect(result).toEqual(mockUser.profile);
     });
   });
 
   describe('getIdToken', () => {
     it('should execute getIdToken', async () => {
-      const userMock: User = {
-        idToken: 'id123',
-        refreshToken: 'refresh123',
-        accessToken: 'access123',
-        profile: {
-          sub: 'email|123',
-        },
-      };
-      getUserMock.mockReturnValue(userMock);
+      getUserMock.mockReturnValue(mockUser);
 
       const result = await passport.getIdToken();
 
-      expect(result).toEqual(userMock.idToken);
+      expect(result).toEqual(mockUser.idToken);
+    });
+  });
+
+  describe('getAccessToken', () => {
+    it('should execute getAccessToken', async () => {
+      getUserMock.mockReturnValue(mockUser);
+
+      const result = await passport.getAccessToken();
+
+      expect(result).toEqual(mockUser.accessToken);
     });
   });
 });
