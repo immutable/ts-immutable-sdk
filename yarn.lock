@@ -724,7 +724,7 @@
     ethers "^5.6.9"
     hash.js "^1.1.7"
 
-"@imtbl/core-sdk@^1.0.2-alpha.3":
+"@imtbl/core-sdk@^1.0.2-alpha.2":
   version "1.0.2-alpha.3"
   resolved "https://registry.yarnpkg.com/@imtbl/core-sdk/-/core-sdk-1.0.2-alpha.3.tgz#c77fe0e4ffc3b47d822b2d7f7a513e50421d24c5"
   integrity sha512-E+9fxQyOUiqvGtCNaCxhKWaPsJn50NLH6hNN74PTeX4P07QmSrBx4IZw72i9Rt/mP6KS5m07e+2eV63A8Mry+A==

@@ -3,7 +3,7 @@ import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
 import { getPassportConfiguration, PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
-import { IMXProvider } from '../provider';
+import { IMXProvider } from '@imtbl/provider';
 import { getStarkSigner } from './stark';
 import { EnvironmentConfiguration, OidcConfiguration, UserProfile, UserWithEtherKey, } from './types';
 import { Configuration, EthSigner, StarkSigner, UsersApi, } from '@imtbl/core-sdk';
