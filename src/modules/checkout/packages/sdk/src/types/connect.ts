@@ -13,3 +13,12 @@ export interface ConnectResult {
   provider: Web3Provider;
   network: NetworkInfo;
 }
+
+export interface CheckConnectionParams {
+  providerPreference: ConnectionProviders;
+}
+
+export interface CheckConnectionResult {
+  isConnected: boolean;
+  walletAddress: string;
+}

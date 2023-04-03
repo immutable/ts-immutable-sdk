@@ -4,7 +4,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
-import { connectWalletProvider, getNetworkInfo } from './connect';
+import { checkIsWalletConnected, connectWalletProvider } from './connect';
+import { getNetworkInfo } from '../network';
 import { ConnectionProviders } from '../types';
 import { ChainId, WALLET_ACTION } from "../types";
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -13,13 +14,13 @@ import { ChainIdNetworkMap } from "../types";
 let windowSpy:any;
 
 describe('connect', () => {
-
+  const providerRequestMock: jest.Mock = jest.fn();
   beforeEach(() => {
     windowSpy = jest.spyOn(window, "window", "get");
 
     windowSpy.mockImplementation(() => ({
       ethereum: {
-        request: jest.fn()
+        request: providerRequestMock
       },
       removeEventListener: () => {}
     }));
@@ -28,6 +29,31 @@ describe('connect', () => {
   afterEach(() => {
     windowSpy.mockRestore();
   });
+
+  describe('checkIsWalletConnected', () => {
+
+    it('should call request with eth_accounts method', async () => {
+      providerRequestMock.mockResolvedValue([]);
+      await checkIsWalletConnected(ConnectionProviders.METAMASK);
+      expect(providerRequestMock).toBeCalledWith({method: WALLET_ACTION.CHECK_CONNECTION, params: []});
+    })
+
+    it('should return isConnected as true when accounts array has an entry', async () => {
+      // mock return array with active wallet address so we are connected
+      providerRequestMock.mockResolvedValue(['0xmyWallet']);
+      const checkConnection = await checkIsWalletConnected(ConnectionProviders.METAMASK);
+      expect(checkConnection.isConnected).toBe(true);
+      expect(checkConnection.walletAddress).toBe("0xmyWallet");
+    })
+
+    it('should return isConnected as false when no accounts returned', async () => {
+      // mock return empty array of accounts so not connected
+      providerRequestMock.mockResolvedValue([]);
+      const checkConnection = await checkIsWalletConnected(ConnectionProviders.METAMASK);
+      expect(checkConnection.isConnected).toBe(false);
+      expect(checkConnection.walletAddress).toBe("");
+    })
+  })
 
   describe('connectWalletProvider', () => {
     it('should call the connect function with metamask and return a Web3Provider', async () => {
