@@ -22,9 +22,9 @@ describe('Config', () => {
             redirectUri: oidcConfiguration.redirectUri,
           },
           imxAPIConfiguration: {
-            basePath: "https://api.sandbox.x.immutable.com",
+            basePath: 'https://api.sandbox.x.immutable.com',
           },
-          passportDomain: "https://immutable.sandbox.passport.com",
+          passportDomain: 'https://passport.sandbox.immutable.com',
           magicPublishableApiKey: Config.SANDBOX.magicPublishableApiKey,
           magicProviderId: Config.SANDBOX.magicProviderId,
         });
