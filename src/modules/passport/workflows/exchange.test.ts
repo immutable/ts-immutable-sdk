@@ -95,8 +95,6 @@ describe('exchangeTransfer', () => {
           stark_signature: 'starkSignature',
         },
         id: 'abc123',
-        xImxEthAddress: '',
-        xImxEthSignature: '',
       },
       mockHeader
     );
