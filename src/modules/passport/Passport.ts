@@ -73,6 +73,11 @@ export class Passport {
     return user.idToken;
   }
 
+  public async getAccessToken(): Promise<string> {
+    const user = await this.authManager.getUser();
+    return user.accessToken;
+  }
+
   private async registerUser(
     userAdminKeySigner: EthSigner,
     starkSigner: StarkSigner,
