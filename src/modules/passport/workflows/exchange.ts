@@ -49,7 +49,7 @@ export async function exchangeTransfer({
       expiration_timestamp: signableResult.data.expiration_timestamp,
       stark_signature: starkSignature,
     };
-    
+
     const headers = {
       Authorization: 'Bearer ' + user.accessToken,
     };
@@ -58,11 +58,6 @@ export async function exchangeTransfer({
       {
         id: request.transactionID,
         createTransferRequest: transferSigningParams,
-        // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
-        // Should be able to remove it once the Backend have update the API
-        // and generated the New Client
-        xImxEthAddress: '',
-        xImxEthSignature: '',
       },
       { headers }
     );
