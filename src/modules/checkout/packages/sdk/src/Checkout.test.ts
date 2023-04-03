@@ -1,7 +1,8 @@
 /*
  * @jest-environment jsdom
  */
-import { connectWalletProvider, getNetworkInfo } from './connect';
+import { connectWalletProvider } from './connect';
+import { getNetworkInfo } from './network';
 
 import { Checkout } from './Checkout';
 import { switchWalletNetwork } from './network';

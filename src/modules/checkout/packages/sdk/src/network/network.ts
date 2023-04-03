@@ -1,7 +1,23 @@
 import { Web3Provider } from "@ethersproject/providers"
 import { CheckoutError, CheckoutErrorType } from "../errors";
-import { ChainId, SwitchNetworkResult, WALLET_ACTION } from "../types";
+import { ChainId, NetworkInfo, SwitchNetworkResult, WALLET_ACTION } from "../types";
 import { ChainIdNetworkMap } from "../types"
+
+export async function getNetworkInfo(provider:Web3Provider) : Promise<NetworkInfo> {
+  const network = await provider.getNetwork();
+
+  if(!Object.values(ChainId).includes(network.chainId as ChainId)){
+    // return empty details
+    return {} as NetworkInfo;
+  }
+  const chainIdNetworkInfo = ChainIdNetworkMap[network.chainId as ChainId];
+  const networkInfo = {
+    name: chainIdNetworkInfo.chainName,
+    chainId: parseInt(chainIdNetworkInfo.chainIdHex, 16),
+    nativeCurrency: chainIdNetworkInfo.nativeCurrency
+  }
+  return networkInfo;
+}
 
 export async function switchWalletNetwork(provider: Web3Provider, chainId: ChainId): Promise<SwitchNetworkResult> {
   if(!Object.values(ChainId).includes(chainId)) throw new CheckoutError(`${chainId} is not a supported chain`, CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR);

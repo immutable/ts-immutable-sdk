@@ -1,6 +1,8 @@
 export { Checkout } from './Checkout';
 export { ChainId, ConnectionProviders } from './types';
 export type {
+  CheckConnectionParams,
+  CheckConnectionResult,
   ConnectParams,
   ConnectResult,
   GetBalanceParams,

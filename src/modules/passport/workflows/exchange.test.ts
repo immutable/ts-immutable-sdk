@@ -68,6 +68,12 @@ describe('exchangeTransfer', () => {
     );
     mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
 
+    const mockHeader = {
+      headers: {
+        Authorization: `Bearer ${mockUser.accessToken}`,
+      },
+    };
+
     const response: CreateTransferResponseV1 = await exchangeTransfer({
       user: mockUser,
       starkSigner: mockStarkSigner,
@@ -75,6 +81,25 @@ describe('exchangeTransfer', () => {
       exchangesApi: exchangesApiMock,
     });
 
+    expect(createExchangeTransferMock).toHaveBeenCalledWith(
+      {
+        createTransferRequest: {
+          amount: 100,
+          asset_id: 'assetID',
+          expiration_timestamp: 123456789,
+          nonce: 'nonce123',
+          receiver_stark_key: 'receiverKey',
+          receiver_vault_id: 'receiverVault',
+          sender_stark_key: 'senderKey',
+          sender_vault_id: 'senderVault',
+          stark_signature: 'starkSignature',
+        },
+        id: 'abc123',
+        xImxEthAddress: '',
+        xImxEthSignature: '',
+      },
+      mockHeader
+    );
     expect(getExchangeSignableTransferMock).toHaveBeenCalledWith({
       getSignableTransferRequest: {
         amount: ethAmount.amount,

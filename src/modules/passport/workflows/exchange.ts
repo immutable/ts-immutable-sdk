@@ -23,7 +23,6 @@ export async function exchangeTransfer({
 }: TransfersParams): Promise<CreateTransferResponseV1> {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const ethAddress = user.etherKey;
-
     const transferAmount = request.amount;
     const signableResult = await exchangesApi.getExchangeSignableTransfer({
       id: request.transactionID,
@@ -34,6 +33,7 @@ export async function exchangeTransfer({
         receiver: request.receiver,
       },
     });
+
     const starkAddress = await starkSigner.getAddress();
     const { payload_hash: payloadHash } = signableResult.data;
     const starkSignature = await starkSigner.signMessage(payloadHash);
@@ -49,16 +49,23 @@ export async function exchangeTransfer({
       expiration_timestamp: signableResult.data.expiration_timestamp,
       stark_signature: starkSignature,
     };
+    
+    const headers = {
+      Authorization: 'Bearer ' + user.accessToken,
+    };
 
-    const response = await exchangesApi.createExchangeTransfer({
-      id: request.transactionID,
-      createTransferRequest: transferSigningParams,
-      // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
-      // Should be able to remove it once the Backend have update the API
-      // and generated the New Client
-      xImxEthAddress: '',
-      xImxEthSignature: '',
-    });
+    const response = await exchangesApi.createExchangeTransfer(
+      {
+        id: request.transactionID,
+        createTransferRequest: transferSigningParams,
+        // Notes[ID-451]: this is 2 params to bypass the Client non-empty check,
+        // Should be able to remove it once the Backend have update the API
+        // and generated the New Client
+        xImxEthAddress: '',
+        xImxEthSignature: '',
+      },
+      { headers }
+    );
 
     return {
       sent_signature: response?.data.sent_signature,
