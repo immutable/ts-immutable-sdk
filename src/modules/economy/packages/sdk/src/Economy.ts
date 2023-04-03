@@ -8,6 +8,7 @@ export class Economy {
    * @returns crafting status
    */
   async craft(input: CraftInput): Promise<ICraftStatus> {
+    console.log('Economy->craft(input):', input);
     return craft(input);
   }
 }

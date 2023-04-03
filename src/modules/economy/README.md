@@ -22,12 +22,45 @@ To learn more read:
 * [ Problem Statements](https://immutable.atlassian.net/wiki/spaces/IS/pages/2102427822/C1+2023+Problem+Statements) + [Solution 1 pagers](https://immutable.atlassian.net/wiki/spaces/IS/pages/2104623149/C1+2023+Solution+1+Pagers)
 * [Economy Building Blocks | PRD](https://immutable.atlassian.net/wiki/spaces/IS/pages/2135949338/Economy+Building+Blocks+PRD+Craft+SDK)
 
-## Understand this module
+## Dependencies
+
+| Dependency | Version |
+|------------|---------|
+| Node       | v16     |
+
+
+## Install
+```bash
+  cd src/modules/economy
+  nvm install && nvm use
+  npm install
+```
+
+## Folder structure
+```
+/
+│
+└───depends -> locally built NPM modules for: Checkout SDK & Passport SDK
+|
+└───packages
+│   │
+│   └───playground --> application where devs see how the SDK is used
+│   │
+│   └───sdk --> source code of the Economy building blocks SDK
+│   │
+│   tools --> nx tooling (generators, executors, etc...)
+│
+└───package.json 
+│
+└───README.md
+```
+
+## Check module dependencies
 
 Run the following to see a diagram of this project dependencies
 ```bash
-cd src/modules/economy
-nx graph
+  cd src/modules/economy
+  npx nx graph
 ```
 
 ## This module uses Nx
