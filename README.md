@@ -32,7 +32,7 @@ Or,
 
 #### **Run test suites specific to a package**
 
-To run test suites specific to a package, you will require to change directory to a package, and run `yarn test` there. You can also extend this command, by using Jest syntax such as regex or to target specific tests to run:
+To run test suites specific to a package, you will require to change directory to a package, and run `yarn test` there:
 
 ```sh
 cd packages/passport && yarn test
