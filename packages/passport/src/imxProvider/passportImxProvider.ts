@@ -1,4 +1,4 @@
-import { TransactionResponse } from "@ethersproject/abstract-provider";
+import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   AnyToken,
   CancelOrderResponse,
@@ -21,15 +21,15 @@ import {
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
-} from "@imtbl/core-sdk";
-import { UserWithEtherKey } from "../types";
-import { IMXProvider } from "@imtbl/provider";
-import { batchNftTransfer, transfer } from "../workflows/transfer";
-import { cancelOrder, createOrder } from "../workflows/order";
-import { exchangeTransfer } from "../workflows/exchange";
-import { createTrade } from "../workflows/trades";
-import { PassportError, PassportErrorType } from "../errors/passportError";
-import { PassportConfiguration } from "../config";
+} from '@imtbl/core-sdk';
+import { UserWithEtherKey } from '../types';
+import { IMXProvider } from '@imtbl/provider/src';
+import { batchNftTransfer, transfer } from '../workflows/transfer';
+import { cancelOrder, createOrder } from '../workflows/order';
+import { exchangeTransfer } from '../workflows/exchange';
+import { createTrade } from '../workflows/trades';
+import { PassportError, PassportErrorType } from '../errors/passportError';
+import { PassportConfiguration } from '../config';
 
 export type PassportImxProviderInput = {
   user: UserWithEtherKey;
@@ -73,14 +73,14 @@ export default class PassportImxProvider implements IMXProvider {
 
   registerOffchain(): Promise<RegisterUserResponse> {
     throw new PassportError(
-      "Operation not supported",
+      'Operation not supported',
       PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
     );
   }
 
   isRegisteredOnchain(): Promise<boolean> {
     throw new PassportError(
-      "Operation not supported",
+      'Operation not supported',
       PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
     );
   }
@@ -139,7 +139,7 @@ export default class PassportImxProvider implements IMXProvider {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   deposit(deposit: TokenAmount): Promise<TransactionResponse> {
     throw new PassportError(
-      "Operation not supported",
+      'Operation not supported',
       PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
     );
   }
@@ -147,7 +147,7 @@ export default class PassportImxProvider implements IMXProvider {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
     throw new PassportError(
-      "Operation not supported",
+      'Operation not supported',
       PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
     );
   }
@@ -159,7 +159,7 @@ export default class PassportImxProvider implements IMXProvider {
     token: AnyToken
   ): Promise<TransactionResponse> {
     throw new PassportError(
-      "Operation not supported",
+      'Operation not supported',
       PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
     );
   }

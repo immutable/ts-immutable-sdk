@@ -3,7 +3,7 @@ import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
 import { getPassportConfiguration, PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
-import { IMXProvider } from '../../provider/src';
+import { IMXProvider } from '@imtbl/provider/src';
 import { getStarkSigner } from './stark';
 import {
   EnvironmentConfiguration,

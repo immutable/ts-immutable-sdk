@@ -4,7 +4,7 @@ import {
   StarkSigner,
   UnsignedExchangeTransferRequest,
 } from '@imtbl/core-sdk';
-import { convertToSignableToken } from '../../../internal/toolkit/src';
+import { convertToSignableToken } from '@imtbl/toolkit/src';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { UserWithEtherKey } from '../types';
 

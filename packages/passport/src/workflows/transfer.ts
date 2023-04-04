@@ -7,7 +7,7 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
-import { convertToSignableToken } from '../../../internal/toolkit/src';
+import { convertToSignableToken } from '@imtbl/toolkit/src';
 import { TransactionTypes } from '../confirmation/types';
 import ConfirmationScreen from '../confirmation/confirmation';
 import { PassportConfiguration } from '../config';
