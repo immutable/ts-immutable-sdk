@@ -12,11 +12,13 @@
 
 ## Testing
 
-This repository consumes Jest as a unit-testing framework, and is configured at the root level.
+This repository consumes Jest as a default unit-testing framework, and is configured independently at each package directory. Due to the build system, you have the flexibility within each package to test appropriately
 
 ### Running tests
 
-To test this SDK locally, you can run the following commands from the ROOT directory:
+To test this SDK locally, you can:
+
+#### **Run ALL test suites (mimicking what our CI workflow does)**
 
 ```sh
 # Install dependencies
@@ -26,28 +28,28 @@ yarn
 yarn test
 ```
 
-This will run ALL test suites in the repository, mimicking what our CI workflow does.
+Or,
 
-To run tests specific to a module, you can run one of the following commands, as defined in the root [`package.json`](package.json#L18):
+#### **Run test suites specific to a package**
+
+To run test suites specific to a package, you will require to change directory to a package, and run `yarn test` there. You can also extend this command, by using Jest syntax such as regex or to target specific tests to run:
 
 ```sh
-yarn test:passport # Runs ALL tests within src/modules/passport
-yarn test:dev-auth # Runs ALL tests within src/modules/dev-auth
-yarn test:checkout # Runs ALL tests within src/modules/checkout
-yarn test:apis # Runs ALL tests within src/modules/apis
-yarn test:provider # Runs ALL tests within src/modules/provider
+cd packages/passport && yarn test
+cd packages/checkout && yarn test
+cd packages/internal/toolkit && yarn test
+cd packages/provider && yarn test
+cd packages/starkex && yarn test
 ```
 
 You can also extend these commands, by using Jest syntax such as regex or to target specific tests to run:
 
 ```sh
-yarn test:checkout -t "this is a test name"
+cd packages/passport && yarn test -t "this is a test name within passport testing suite"
 ```
-
-Please note that few directories are intentionally ignored for testing, such as sample apps, due to a conflict of multiple technologies.
 
 ### Writing tests
 
-We are currently not enforcing a preference for testing practices. It is completely up to your team (i.e. module) to decide how you wish to structure your tests within the modules.
+We are currently not enforcing a preference for testing practices. It is completely up to your team to decide how you test your package.
 
-Currently, few modules in this repository have their own `package.json` configs. The root [`package.json`](package.json) is the entry point for this SDK and for all CI testing purposes. Therefore, if you wish to write tests, please consider that the root `yarn test` command must pick it up, and that the root Jest [`jest.config.ts`](jest.config.ts) configuration applies.
+The root [`package.json`](package.json) is the entry point for all CI testing purposes. Therefore, if you wish to write tests for an existing or new package, please ensure that a `"test"` script exists in the associated `package.json` file so that it is picked up by the [`root "test" command.`](package.json#L19)
