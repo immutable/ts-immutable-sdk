@@ -5,8 +5,18 @@ import { getPassportConfiguration, PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { IMXProvider } from '@imtbl/provider';
 import { getStarkSigner } from './stark';
-import { EnvironmentConfiguration, OidcConfiguration, UserProfile, UserWithEtherKey, } from './types';
-import { Configuration, EthSigner, StarkSigner, UsersApi, } from '@imtbl/core-sdk';
+import {
+  EnvironmentConfiguration,
+  OidcConfiguration,
+  UserProfile,
+  UserWithEtherKey,
+} from './types';
+import {
+  Configuration,
+  EthSigner,
+  StarkSigner,
+  UsersApi,
+} from '@imtbl/core-sdk';
 import registerPassport from './workflows/registration';
 
 export class Passport {
@@ -63,6 +73,10 @@ export class Passport {
     return this.authManager.loginCallback();
   }
 
+  public async logout(): Promise<void> {
+    return this.authManager.logout();
+  }
+
   public async getUserInfo(): Promise<UserProfile> {
     const user = await this.authManager.getUser();
     return user.profile;
@@ -95,7 +109,8 @@ export class Passport {
       },
       jwt
     );
-    const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration();
+    const updatedUser =
+      await this.authManager.requestRefreshTokenAfterRegistration();
     if (!updatedUser) {
       throw new PassportError(
         'Failed to get refresh token',

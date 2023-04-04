@@ -36,6 +36,7 @@ describe('Passport', () => {
   let passport: Passport;
   let authLoginMock: jest.Mock;
   let loginCallbackMock: jest.Mock;
+  let logoutMock: jest.Mock;
   let magicLoginMock: jest.Mock;
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
@@ -109,6 +110,15 @@ describe('Passport', () => {
       await passport.loginCallback();
 
       expect(loginCallbackMock).toBeCalledTimes(1);
+    });
+  });
+
+  describe('logout', () => {
+    it('should execute logout without error', async () => {
+      await passport.logout();
+
+      expect(logoutMock).toBeCalledTimes(1);
+      // mock session is empty
     });
   });
 
