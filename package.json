@@ -8,7 +8,9 @@
     "packages/starkex",
     "packages/passport",
     "packages/provider",
-    "packages/internal/toolkit"
+    "packages/internal/toolkit",
+    "packages/checkout/sdk",
+    "packages/checkout/sample-app"
   ],
   "private": true,
   "engines": {

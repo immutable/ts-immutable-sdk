@@ -3,6 +3,7 @@ dist/
 .idea/
 .DS_Store
 .vscode
+.parcel-cache
 
 .env
 .env.local
