@@ -7,6 +7,7 @@ export declare class Passport {
     constructor(environmentConfiguration: EnvironmentConfiguration, oidcConfiguration: OidcConfiguration);
     connectImx(): Promise<IMXProvider>;
     loginCallback(): Promise<void>;
+    logout(): Promise<void>;
     getUserInfo(): Promise<UserProfile>;
     getIdToken(): Promise<string | undefined>;
     private registerUser;

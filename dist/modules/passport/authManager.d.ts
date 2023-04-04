@@ -6,7 +6,8 @@ export default class AuthManager {
     constructor(config: PassportConfiguration);
     login(): Promise<User>;
     loginCallback(): Promise<void>;
+    logout(): Promise<void>;
     getUser(): Promise<User>;
-    requestRefreshTokenAfterRegistration(jwt: string): Promise<UserWithEtherKey | null>;
+    requestRefreshTokenAfterRegistration(): Promise<UserWithEtherKey | null>;
     private mapOidcUserToDomainModel;
 }
