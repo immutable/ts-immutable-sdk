@@ -1,11 +1,14 @@
-import type {Config} from 'jest';
+import type { Config } from "jest";
 
 const config: Config = {
-  verbose: true,
-  testEnvironment: 'jsdom',
+  clearMocks: true,
+  coverageProvider: "v8",
+  moduleDirectories: ["node_modules", "src"],
+  testEnvironment: "node",
   transform: {
-    '\\.ts$': ['babel-jest', { configFile: './babel.test.config.js' }]
+    "^.+\\.(t|j)sx?$": "@swc/jest",
   },
+  transformIgnorePatterns: [],
 };
 
 export default config;
