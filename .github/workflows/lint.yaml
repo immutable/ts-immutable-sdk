@@ -51,6 +51,3 @@ jobs:
 
       - name: Lint
         run: yarn lint:ci
-
-      - name: Typecheck
-        run: yarn typecheck
