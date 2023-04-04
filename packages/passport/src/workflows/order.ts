@@ -7,10 +7,10 @@ import {
   OrdersApiCreateOrderRequest,
   StarkSigner,
   UnsignedOrderRequest,
-} from "@imtbl/core-sdk";
-import { convertToSignableToken } from "@imtbl/toolkit";
-import { PassportErrorType, withPassportError } from "../errors/passportError";
-import { UserWithEtherKey } from "../types";
+} from '@imtbl/core-sdk';
+import { convertToSignableToken } from '../../../internal/toolkit/src';
+import { PassportErrorType, withPassportError } from '../errors/passportError';
+import { UserWithEtherKey } from '../types';
 
 type CancelOrderParams = {
   request: GetSignableCancelOrderRequest;
@@ -26,7 +26,7 @@ type CreateOrderParams = {
   starkSigner: StarkSigner;
 };
 
-const ERC721 = "ERC721";
+const ERC721 = 'ERC721';
 
 export async function createOrder({
   starkSigner,
@@ -36,8 +36,8 @@ export async function createOrder({
 }: CreateOrderParams): Promise<CreateOrderResponse> {
   return withPassportError<CreateOrderResponse>(async () => {
     const ethAddress = user.etherKey;
-    const amountSell = request.sell.type === ERC721 ? "1" : request.sell.amount;
-    const amountBuy = request.buy.type === ERC721 ? "1" : request.buy.amount;
+    const amountSell = request.sell.type === ERC721 ? '1' : request.sell.amount;
+    const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
     const getSignableOrderRequest: GetSignableOrderRequest = {
       user: ethAddress,
       amount_buy: amountBuy,
@@ -76,7 +76,7 @@ export async function createOrder({
       },
     };
     const headers = {
-      Authorization: "Bearer " + user.accessToken,
+      Authorization: 'Bearer ' + user.accessToken,
     };
     const createOrderResponse = await ordersApi.createOrder(orderParams, {
       headers,
@@ -107,7 +107,7 @@ export async function cancelOrder({
     const starkSignature = await starkSigner.signMessage(payloadHash);
 
     const headers = {
-      Authorization: "Bearer " + user.accessToken,
+      Authorization: 'Bearer ' + user.accessToken,
     };
 
     const cancelOrderResponse = await ordersApi.cancelOrder(

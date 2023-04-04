@@ -48,11 +48,13 @@ describe('Passport', () => {
     });
     loginCallbackMock = jest.fn();
     magicLoginMock = jest.fn();
+    logoutMock = jest.fn();
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
     (AuthManager as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
+      logout: logoutMock,
       getUser: getUserMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
     });
