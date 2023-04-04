@@ -118,7 +118,6 @@ describe('Passport', () => {
       await passport.logout();
 
       expect(logoutMock).toBeCalledTimes(1);
-      // mock session is empty
     });
   });
 
