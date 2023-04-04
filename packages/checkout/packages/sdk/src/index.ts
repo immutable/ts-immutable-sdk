@@ -1,5 +1,5 @@
-export { Checkout } from "./Checkout";
-export { ChainId, ConnectionProviders } from "./types";
+export { Checkout } from './Checkout';
+export { ChainId, ConnectionProviders } from './types';
 export type {
   CheckConnectionParams,
   CheckConnectionResult,
@@ -16,5 +16,5 @@ export type {
   GetAllBalancesParams,
   GetAllBalancesResult,
   GetTokenAllowListParams,
-  GetTokenAllowListResult,
-} from "./types";
+  GetTokenAllowListResult
+} from './types';
