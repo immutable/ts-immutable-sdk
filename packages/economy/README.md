@@ -31,7 +31,7 @@ To learn more read:
 
 ## Install
 ```bash
-  cd src/modules/economy
+  cd packages/economy
   nvm install && nvm use
   npm install
 ```
@@ -59,7 +59,7 @@ To learn more read:
 
 Run the following to see a diagram of this project dependencies
 ```bash
-  cd src/modules/economy
+  cd packages/economy
   npx nx graph
 ```
 
