@@ -80,6 +80,9 @@ const getAuthConfiguration = ({ oidcConfiguration, }) => ({
         authorization_endpoint: `${oidcConfiguration.authenticationDomain}/authorize`,
         token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
         userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
+        end_session_endpoint: `${oidcConfiguration.authenticationDomain}/v2/logout`
+            + `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}`
+            + `&client_id=${oidcConfiguration.clientId}`,
     },
     mergeClaims: true,
     loadUserInfo: true,
