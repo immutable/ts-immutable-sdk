@@ -12,7 +12,7 @@
 
 ## Testing
 
-This repository consumes Jest as a default unit-testing framework, and is configured independently at each package directory. Due to the build system, you have the flexibility within each package to test appropriately
+This repository uses Jest as the default unit-testing framework, and is configured independently at each package directory. Due to the build system, you have the flexibility within each package to test appropriately.
 
 ### Running tests
 
