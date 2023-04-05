@@ -294,6 +294,9 @@ describe('PassportImxProvider', () => {
       createOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
 
       const result = await passportImxProvider.createOrder(orderRequest);
 
@@ -355,6 +358,9 @@ describe('PassportImxProvider', () => {
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       cancelOrderMock.mockResolvedValue({
         data: mockReturnValue,
+      });
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
       });
 
       const result = await passportImxProvider.cancelOrder(cancelOrderRequest);
