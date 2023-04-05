@@ -21,7 +21,7 @@ describe('confirmation', () => {
         availWidth: 123,
       },
       addEventListener: addEventListenerMock,
-      removeEventListener: removeEventListenerMock
+      removeEventListener: removeEventListenerMock,
     }));
   });
 
@@ -32,8 +32,10 @@ describe('confirmation', () => {
   describe('startTransaction', () => {
     it('should handle popup window closed', async () => {
       const transaction: Transaction = {
-        transactionType: TransactionTypes.TRANSFER,
+        transactionType: TransactionTypes.Transfer,
         transactionData: {
+          // TODO: Fix up this issue with the types
+          // @ts-ignore
           type: 'ERC721',
           tokenId: '194442292',
           receiver: '0x0000000000000000000000000000000000000000',
@@ -44,9 +46,9 @@ describe('confirmation', () => {
         network: Config.SANDBOX.network,
         oidcConfiguration: {
           authenticationDomain: Config.SANDBOX.authenticationDomain,
-          clientId: "",
-          logoutRedirectUri: "",
-          redirectUri: "",
+          clientId: '',
+          logoutRedirectUri: '',
+          redirectUri: '',
         },
         imxAPIConfiguration: {
           basePath: 'https://api.sandbox.x.immutable.com',
@@ -60,11 +62,10 @@ describe('confirmation', () => {
       const res = await confirmationScreen.startTransaction(
         'ehyyy',
         transaction
-      )
+      );
 
       expect(res.confirmed).toEqual(false);
       expect(mockedOpen).toHaveBeenCalledTimes(1);
     });
   });
 });
-
