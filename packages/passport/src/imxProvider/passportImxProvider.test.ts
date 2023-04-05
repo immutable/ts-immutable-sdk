@@ -85,9 +85,9 @@ describe('PassportImxProvider', () => {
     });
 
     mockStartTransaction = jest.fn();
-    (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
+    (ConfirmationScreen as jest.Mock).mockReturnValue({
       startTransaction: mockStartTransaction,
-    }));
+    });
 
     passportImxProvider = new PassportImxProvider({
       user: mockUser,
@@ -428,7 +428,7 @@ describe('PassportImxProvider', () => {
       createTradeMock.mockResolvedValue({
         data: mockReturnValue,
       });
-      mockStartTransaction.mockRejectedValue({
+      mockStartTransaction.mockResolvedValue({
         confirmed: true,
       });
 
@@ -488,6 +488,9 @@ describe('PassportImxProvider', () => {
       getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferMock.mockResolvedValue(mockTransferResponse);
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
 
       const result = await passportImxProvider.batchNftTransfer(
         transferRequest
