@@ -1,4 +1,4 @@
-import {ETHAmount, OrdersApi, UnsignedOrderRequest, UnsignedTransferRequest} from '@imtbl/core-sdk';
+import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { cancelOrder, createOrder } from './order';
@@ -32,8 +32,8 @@ describe('order', () => {
     let createOrderMock: jest.Mock;
     let ordersApiMock: OrdersApi;
 
-    const buy = {type: 'ETH', amount: '2'} as ETHAmount;
-    const sell = {type: 'ERC721', tokenId: '123', tokenAddress: '0x9999'};
+    const buy = { type: 'ETH', amount: '2' } as ETHAmount;
+    const sell = { type: 'ERC721', tokenId: '123', tokenAddress: '0x9999' };
     const expiration_timestamp = 1334302;
     const orderRequest = {
       buy,
@@ -90,7 +90,7 @@ describe('order', () => {
             '0x04006590f0986f008231e309b980e81f8a55944a702ec633b47ceb326242c9f8',
         },
       };
-      const {payload_hash: mockPayloadHash, ...restSignableOrderResponse} =
+      const { payload_hash: mockPayloadHash, ...restSignableOrderResponse } =
         mockSignableOrderResponse.data;
       const mockCreateOrderRequest = {
         createOrderRequest: {

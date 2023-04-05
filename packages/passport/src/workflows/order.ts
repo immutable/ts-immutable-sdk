@@ -11,9 +11,9 @@ import {
 import { convertToSignableToken } from "@imtbl/toolkit";
 import { PassportErrorType, withPassportError } from "../errors/passportError";
 import { UserWithEtherKey } from "../types";
-import ConfirmationScreen from "../confirmation/confirmation";
 import { PassportConfiguration} from "../config";
 import { TransactionTypes } from "../confirmation/types";
+import ConfirmationScreen from "../confirmation/confirmation";
 
 type CancelOrderParams = {
   request: GetSignableCancelOrderRequest;
