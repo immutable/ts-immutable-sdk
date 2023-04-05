@@ -294,6 +294,9 @@ describe('PassportImxProvider', () => {
       createOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
 
       const result = await passportImxProvider.createOrder(orderRequest);
 
@@ -355,6 +358,9 @@ describe('PassportImxProvider', () => {
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       cancelOrderMock.mockResolvedValue({
         data: mockReturnValue,
+      });
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
       });
 
       const result = await passportImxProvider.cancelOrder(cancelOrderRequest);
@@ -452,6 +458,7 @@ describe('PassportImxProvider', () => {
         {
           tokenId: '1',
           tokenAddress: 'token_address',
+          sender: '123',
           receiver: 'receiver_eth_address',
         },
       ];
@@ -511,6 +518,7 @@ describe('PassportImxProvider', () => {
                   token_address: transferRequest[0].tokenAddress,
                 },
               },
+              sender: transferRequest[0].sender,
               receiver: transferRequest[0].receiver,
             },
           ],

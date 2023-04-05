@@ -194,6 +194,7 @@ describe('transfer', () => {
         tokenId: '1',
         tokenAddress: 'token_address',
         receiver: 'receiver_eth_address',
+        sender: '123',
       },
     ];
 
@@ -240,12 +241,16 @@ describe('transfer', () => {
       getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferMock.mockResolvedValue(mockTransferResponse);
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
 
       const result = await batchNftTransfer({
         user: mockUser,
         starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
+        passportConfig: passportConfig,
       });
 
       expect(result).toEqual({ transfer_ids: mockTransferResponse.data.transfer_ids });
@@ -262,6 +267,7 @@ describe('transfer', () => {
                   token_address: transferRequest[0].tokenAddress,
                 }
               },
+              sender: transferRequest[0].sender,
               receiver: transferRequest[0].receiver,
             },
           ],
@@ -303,11 +309,54 @@ describe('transfer', () => {
           starkSigner: mockStarkSigner,
           request: transferRequest,
           transfersApi: transferApiMock,
+          passportConfig: passportConfig,
         })
       ).rejects.toThrow(new PassportError(
         `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
         PassportErrorType.TRANSFER_ERROR
       ));
+    });
+
+    it('should return error if transfer is rejected by user', async () => {
+      const sender_stark_key = "sender_stark_key";
+      const sender_vault_id = "sender_vault_id";
+      const receiver_stark_key = "receiver_stark_key"
+      const receiver_vault_id = "receiver_vault_id"
+      const asset_id = "asset_id"
+      const amount = "amount"
+      const nonce = "nonce"
+      const expiration_timestamp = "expiration_timestamp"
+
+      const mockSignableTransferResponse = {
+        data: {
+          sender_stark_key,
+          signable_responses: [
+            {
+              sender_vault_id,
+              receiver_stark_key,
+              receiver_vault_id,
+              asset_id,
+              amount,
+              nonce,
+              expiration_timestamp,
+            }
+          ]
+        }
+      }
+      getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
+      mockStartTransaction.mockRejectedValue({
+        confirmed: false,
+      });
+
+      await expect(() =>
+        batchNftTransfer({
+          user: mockUser,
+          starkSigner: mockStarkSigner,
+          request: transferRequest,
+          transfersApi: transferApiMock,
+          passportConfig: passportConfig,
+        })
+      ).rejects.toThrowError('TRANSFER_ERROR');
     });
   });
 })
