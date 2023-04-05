@@ -62,7 +62,7 @@ export async function createOrder({
     const confirmationResult = await confirmationScreen.startTransaction(
       user.accessToken,
       {
-        transactionType: TransactionTypes.Order,
+        transactionType: TransactionTypes.CreateOrder,
         transactionData: getSignableOrderRequestV3,
       }
     );
