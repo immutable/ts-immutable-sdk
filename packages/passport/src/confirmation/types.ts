@@ -1,6 +1,7 @@
 import {
   GetSignableCancelOrderRequest,
   GetSignableOrderRequest,
+  GetSignableTradeRequest,
   GetSignableTransferRequest,
   GetSignableTransferRequestV1,
 } from '@imtbl/core-sdk';
@@ -18,6 +19,7 @@ export enum SendMessage {
 export enum TransactionTypes {
   CancelOrder = 'v1/cancel',
   Order = 'v1/orders',
+  CreateTrade = 'v1/trades',
   Transfer = 'v1/transfers',
   MultiTransfer = 'v1/multi-transfers',
 }
@@ -32,6 +34,11 @@ export type Order = {
   transactionData: GetSignableOrderRequest,
 }
 
+export type CreateTrade = {
+  transactionType: TransactionTypes.CreateTrade;
+  transactionData: GetSignableTradeRequest,
+}
+
 export type Transfer = {
   transactionType: TransactionTypes.Transfer;
   transactionData: GetSignableTransferRequestV1;
@@ -42,7 +49,7 @@ export type MultiTransfer = {
   transactionData: GetSignableTransferRequest,
 }
 
-export type Transaction = CancelOrder | Order | Transfer | MultiTransfer;
+export type Transaction = CancelOrder | CreateTrade | Order | Transfer | MultiTransfer;
 
 export type DisplayConfirmationParams = {
   messageType: SendMessage;

@@ -85,9 +85,9 @@ describe('PassportImxProvider', () => {
     });
 
     mockStartTransaction = jest.fn();
-    (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
+    (ConfirmationScreen as jest.Mock).mockReturnValue({
       startTransaction: mockStartTransaction,
-    }));
+    });
 
     passportImxProvider = new PassportImxProvider({
       user: mockUser,
@@ -433,6 +433,9 @@ describe('PassportImxProvider', () => {
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTradeMock.mockResolvedValue({
         data: mockReturnValue,
+      });
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
       });
 
       const result = await passportImxProvider.createTrade(mockSignableTradeRequest.getSignableTradeRequest);
