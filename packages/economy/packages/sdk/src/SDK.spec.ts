@@ -71,6 +71,7 @@ describe('SDK Class', () => {
       expect(eventHandlerFn).not.toHaveBeenCalledTimes(2);
     });
   });
+
   describe('events handler utility', () => {
     it('should return a function', () => {
       const handler = sdkMock['getEmitEventHandler']('test');
