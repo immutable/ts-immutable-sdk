@@ -8,6 +8,7 @@
     "@swc/helpers": "~0.4.11",
     "core-js": "^3.6.5",
     "regenerator-runtime": "0.13.7",
+    "rxjs": "^7.8.0",
     "tslib": "^2.3.0"
   },
   "devDependencies": {

@@ -1,6 +1,8 @@
-import { CraftInput, craftStatuses } from './crafting';
 import { Economy } from './Economy';
 import { SDKError } from './Errors';
+import { craftStatuses } from './crafting';
+
+import type { CraftInput } from './crafting';
 
 jest.mock('./crafting', () => ({
   craft: jest.fn(),
@@ -8,7 +10,7 @@ jest.mock('./crafting', () => ({
 
 describe('Economy Class', () => {
   let economy: Economy;
-  const craftInput: CraftInput = { requiresWeb3: false, web3Assets: {} };
+  const craftInput: CraftInput = { requiresWeb3: true, web3Assets: {} };
 
   beforeEach(() => {
     economy = new Economy();
@@ -16,6 +18,43 @@ describe('Economy Class', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  it.only('should call the subscription when an event is emitted', () => {
+    const eventHandler = jest.fn();
+    const subscription = economy.subscribe(eventHandler);
+
+    economy['emitEvent']('CRAFT', 'INITIAL');
+
+    expect(eventHandler).toHaveBeenCalledWith({
+      type: 'CRAFT',
+      status: 'INITIAL',
+    });
+
+    subscription.unsubscribe();
+  });
+
+  it('handle events', async () => {
+    const emitEventSpy = jest
+      .spyOn(economy, 'emitEvent' as keyof Economy)
+      .mockImplementation(jest.fn());
+
+    economy.craft(craftInput);
+
+    // const craftFn = jest
+    //   .requireMock('./crafting')
+    //   .craft.mockImplementation(async () => {
+    //     return 'COMPLETE';
+    //   });
+
+    expect(emitEventSpy).toHaveBeenCalledWith('CRAFT', 'INITIAL');
+    expect(emitEventSpy).toHaveBeenCalledWith('CRAFT', 'COMPLETE');
+
+    // expect(craftFn).toHaveBeenCalledWith(craftInput, emitEventFn);
+
+    economy.subscribe((event) => {
+      console.log('###############', event);
+    });
   });
 
   it('should capture crafting errors', async () => {

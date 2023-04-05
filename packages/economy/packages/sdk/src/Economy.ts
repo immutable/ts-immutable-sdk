@@ -1,8 +1,12 @@
-import { CraftInput, ICraftStatus, craft } from './crafting';
-import { withSDKError } from './Errors';
 import { SDK } from './SDK';
+import { craft } from './crafting';
+import { withSDKError } from './Errors';
 
-export class Economy extends SDK {
+import type { CraftInput, CraftStatuses } from './crafting';
+
+export type EconomyEventType = 'CRAFT' | 'PURCHASE';
+
+export class Economy extends SDK<EconomyEventType> {
   /** Lifecycle method: Self invoked after class instanciation */
   connect(): void {
     this.log('mounted');
@@ -15,8 +19,10 @@ export class Economy extends SDK {
    * @returns crafting status
    */
   @withSDKError({ type: 'CRAFTING_ERROR' })
-  async craft(input: CraftInput): Promise<ICraftStatus> {
-    const status = await craft(input);
+  async craft(input: CraftInput): Promise<CraftStatuses> {
+    this.emitEvent('CRAFT', 'INITIAL');
+
+    const status = await craft(input, this.getEmitEventHandler('CRAFT'));
 
     return status;
   }
