@@ -15,9 +15,7 @@ export class SDKMock extends SDK<string> {
 
 describe('SDK Class', () => {
   let sdkMock: SDKMock;
-  const eventHandlerFn = jest.fn().mockImplementation(() => {
-    console.log('🚀 ~ file: SDK.spec.ts:21 ~ eventHandlerFn ~ eventHandlerFn:');
-  });
+  const eventHandlerFn = jest.fn();
   const configInput: Configuration = { env: 'production' };
 
   beforeEach(() => {
