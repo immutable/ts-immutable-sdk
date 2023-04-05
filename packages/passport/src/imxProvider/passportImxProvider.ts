@@ -124,6 +124,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       transfersApi: this.transfersApi,
+      passportConfig: this.passportConfig,
     });
   }
 

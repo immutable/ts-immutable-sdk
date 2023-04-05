@@ -455,6 +455,7 @@ describe('PassportImxProvider', () => {
         {
           tokenId: '1',
           tokenAddress: 'token_address',
+          sender: '123',
           receiver: 'receiver_eth_address',
         },
       ];
@@ -491,6 +492,9 @@ describe('PassportImxProvider', () => {
       getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferMock.mockResolvedValue(mockTransferResponse);
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
 
       const result = await passportImxProvider.batchNftTransfer(
         transferRequest
@@ -511,6 +515,7 @@ describe('PassportImxProvider', () => {
                   token_address: transferRequest[0].tokenAddress,
                 },
               },
+              sender: transferRequest[0].sender,
               receiver: transferRequest[0].receiver,
             },
           ],
