@@ -25,6 +25,9 @@
     "prepare": "husky install",
     "typecheck": "wsrun --exclude-missing --stages typecheck"
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/immutable/ts-immutable-sdk.git"

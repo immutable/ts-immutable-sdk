@@ -1,4 +1,4 @@
-name: Lint
+name: Build, Lint, Typecheck
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Lint
+    name: Build, Lint, Typecheck
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -48,7 +48,7 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-       
+
       - name: Lint
         run: yarn lint:ci
 
