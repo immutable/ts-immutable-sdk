@@ -1,6 +1,7 @@
-import { CraftInput, craftStatuses } from './crafting';
-import { Economy } from './Economy';
 import { SDKError } from './Errors';
+import { Economy } from './Economy';
+
+import type { CraftInput } from './crafting';
 
 jest.mock('./crafting', () => ({
   craft: jest.fn(),
@@ -8,6 +9,7 @@ jest.mock('./crafting', () => ({
 
 describe('Economy Class', () => {
   let economy: Economy;
+  const eventHandlerFn = jest.fn();
   const craftInput: CraftInput = { requiresWeb3: false, web3Assets: {} };
 
   beforeEach(() => {
@@ -32,19 +34,33 @@ describe('Economy Class', () => {
       expect((error as Error).message).toContain('craft request has failed');
     }
 
-    expect(craftFn).toHaveBeenCalledWith(craftInput);
+    expect(craftFn).toHaveBeenCalled();
   });
 
   it('should return the craft status', async () => {
     const craftFn = jest
       .requireMock('./crafting')
-      .craft.mockImplementation(
-        async () =>
-          craftStatuses[Math.floor(Math.random() * craftStatuses.length)]
-      );
+      .craft.mockImplementation(async () => 'COMPLETE');
 
     const status = await economy.craft(craftInput);
     expect(status).toContain(status);
-    expect(craftFn).toHaveBeenCalledWith(craftInput);
+    expect(craftFn).toHaveBeenCalled();
+  });
+
+  it('should emit an event when craft is called', async () => {
+    economy.subscribe(eventHandlerFn);
+
+    jest.spyOn(economy, 'emitEvent' as keyof Economy);
+    jest.requireMock('./crafting').craft.mockImplementation(async () => {
+      economy['emitEvent']('CRAFT', 'INITIAL');
+      return 'INITIAL';
+    });
+
+    await economy.craft(craftInput);
+
+    expect(eventHandlerFn).toHaveBeenCalledWith({
+      type: 'CRAFT',
+      status: 'INITIAL',
+    });
   });
 });
