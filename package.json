@@ -22,7 +22,8 @@
     "lint": "eslint ./packages/ --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:path": "eslint --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:ci": "eslint $(git diff --name-only --diff-filter=ACMRTUXB $(git rev-parse HEAD) | grep  -E \"(.js$|.ts$|.tsx$)\") --ext .ts,.jsx,.tsx --max-warnings=0",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "typecheck": "wsrun --exclude-missing --stages typecheck"
   },
   "repository": {
     "type": "git",
