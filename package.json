@@ -1,6 +1,6 @@
 {
   "name": "ts-immutable-sdk",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Immutable Unified TypeScript SDK",
   "workspaces": [
     "packages/sdk",
