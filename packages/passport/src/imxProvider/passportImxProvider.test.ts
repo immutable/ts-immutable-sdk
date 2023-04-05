@@ -485,6 +485,9 @@ describe('PassportImxProvider', () => {
       getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferMock.mockResolvedValue(mockTransferResponse);
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
 
       const result = await passportImxProvider.batchNftTransfer(
         transferRequest
