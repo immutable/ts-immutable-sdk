@@ -17,7 +17,8 @@
     "node": ">=14.0.0"
   },
   "scripts": {
-    "build": "wsrun -x @imtbl/checkout-sample-app --stages build",
+    "build": "wsrun -p @imtbl/sdk -r --stages build",
+    "build:all": "wsrun --stages build",
     "test": "wsrun test",
     "lint": "eslint ./packages/ --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:path": "eslint --ext .ts,.jsx,.tsx --max-warnings=0",
