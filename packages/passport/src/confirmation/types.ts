@@ -1,4 +1,4 @@
-import { UnsignedTransferRequest } from '@imtbl/core-sdk';
+import { GetSignableCancelOrderRequest, GetSignableOrderRequest, UnsignedTransferRequest } from '@imtbl/core-sdk';
 
 export enum ReceiveMessage {
   CONFIRMATION_WINDOW_READY = 'confirmation_window_ready',
@@ -11,7 +11,19 @@ export enum SendMessage {
 }
 
 export enum TransactionTypes {
+  CancelOrder = 'v1/cancel',
+  Order = 'v1/orders',
   TRANSFER = 'v1/transfers'
+}
+
+export type CancelOrder = {
+  transactionType: TransactionTypes.CancelOrder,
+  transactionData: GetSignableCancelOrderRequest,
+}
+
+export type Order = {
+  transactionType: TransactionTypes.Order,
+  transactionData: GetSignableOrderRequest,
 }
 
 export type Transfer = {
@@ -19,7 +31,7 @@ export type Transfer = {
   transactionData: UnsignedTransferRequest;
 }
 
-export type Transaction = Transfer;
+export type Transaction = CancelOrder | Order | Transfer;
 
 export type DisplayConfirmationParams = {
   messageType: SendMessage;
