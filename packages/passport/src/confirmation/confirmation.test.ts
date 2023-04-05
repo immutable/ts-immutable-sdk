@@ -32,7 +32,7 @@ describe('confirmation', () => {
   describe('startTransaction', () => {
     it('should handle popup window closed', async () => {
       const transaction: Transaction = {
-        transactionType: TransactionTypes.TRANSFER,
+        transactionType: TransactionTypes.Transfer,
         transactionData: {
           type: 'ERC721',
           tokenId: '194442292',
