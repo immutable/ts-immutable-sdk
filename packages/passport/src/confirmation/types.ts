@@ -13,7 +13,7 @@ export enum ReceiveMessage {
 }
 
 export enum SendMessage {
-  TRANSACTION_START = 'transaction_start'
+  TRANSACTION_START = 'transaction_start',
 }
 
 export enum TransactionTypes {
@@ -25,29 +25,29 @@ export enum TransactionTypes {
 }
 
 export type CancelOrder = {
-  transactionType: TransactionTypes.CancelOrder,
-  transactionData: GetSignableCancelOrderRequest,
-}
+  transactionType: TransactionTypes.CancelOrder;
+  transactionData: GetSignableCancelOrderRequest;
+};
 
 export type CreateOrder = {
-  transactionType: TransactionTypes.CreateOrder,
-  transactionData: GetSignableOrderRequest,
-}
+  transactionType: TransactionTypes.CreateOrder;
+  transactionData: GetSignableOrderRequest;
+};
 
 export type CreateTrade = {
   transactionType: TransactionTypes.CreateTrade;
-  transactionData: GetSignableTradeRequest,
-}
+  transactionData: GetSignableTradeRequest;
+};
 
 export type CreateTransfer = {
   transactionType: TransactionTypes.CreateTransfer;
   transactionData: GetSignableTransferRequestV1;
-}
+};
 
 export type CreateBatchTransfer = {
   transactionType: TransactionTypes.CreateBatchTransfer;
-  transactionData: GetSignableTransferRequest,
-}
+  transactionData: GetSignableTransferRequest;
+};
 
 export type Transaction =
   | CancelOrder
@@ -59,10 +59,10 @@ export type Transaction =
 export type DisplayConfirmationParams = {
   messageType: SendMessage;
   messageData: Transaction;
-}
+};
 
 export type ConfirmationResult = {
   confirmed: boolean;
-}
+};
 
 export const PassportEventType = 'imx_passport_confirmation';

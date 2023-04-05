@@ -34,12 +34,16 @@ describe('confirmation', () => {
       const transaction: Transaction = {
         transactionType: TransactionTypes.CreateTransfer,
         transactionData: {
-          // TODO: Fix up this issue with the types
-          // @ts-ignore
-          type: 'ERC721',
-          tokenId: '194442292',
+          amount: '1',
+          token: {
+            type: 'ERC721',
+            data: {
+              token_id: '194442292',
+              token_address: '0xacb3c6a43d15b907e8433077b6d38ae40936fe2c',
+            },
+          },
+          sender: '0x0000000000000000000000000000000000000001',
           receiver: '0x0000000000000000000000000000000000000000',
-          tokenAddress: '0xacb3c6a43d15b907e8433077b6d38ae40936fe2c',
         },
       };
       const config = {
