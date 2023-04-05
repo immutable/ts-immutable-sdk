@@ -44,3 +44,12 @@ export async function craft(craftInput: CraftInput): Promise<ICraftStatus> {
 
   return 'COMPLETE';
 }
+
+/** List of valid craft status values */
+export const craftStatuses: ICraftStatus[] = [
+  'AWAITING_WEB3_INTERACTION',
+  'SUBMITTED',
+  'PENDING',
+  'COMPLETE',
+  'ERROR',
+];
