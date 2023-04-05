@@ -1,6 +1,6 @@
 {
   "name": "ts-immutable-sdk",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Immutable Unified TypeScript SDK",
   "workspaces": [
     "packages/sdk",
@@ -22,7 +22,8 @@
     "test": "wsrun --exclude-missing -e test",
     "lint": "wsrun --exclude-missing -e lint",
     "typecheck": "wsrun --exclude-missing typecheck",
-    "postinstall": "husky install"
+    "postinstall": "husky install",
+    "update-changelog": "changelog -o CHANGELOG.md"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint"
@@ -37,6 +38,9 @@
     "url": "https://github.com/immutable/ts-immutable-sdk/issues"
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "dependencies": {
+    "@changesets/cli": "^2.26.1"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
