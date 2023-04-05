@@ -20,10 +20,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Read .nvmrc
-      #   run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
-      #   id: nvm
-
       - name: Use Node.js ${{ steps.nvm.outputs.NODE_VERSION }}
         uses: actions/setup-node@v2
         with:
