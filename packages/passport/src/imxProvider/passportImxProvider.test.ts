@@ -428,6 +428,9 @@ describe('PassportImxProvider', () => {
       createTradeMock.mockResolvedValue({
         data: mockReturnValue,
       });
+      mockStartTransaction.mockRejectedValue({
+        confirmed: true,
+      });
 
       const result = await passportImxProvider.createTrade(mockSignableTradeRequest.getSignableTradeRequest);
 

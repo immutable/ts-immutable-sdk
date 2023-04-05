@@ -2,6 +2,10 @@ import { TradesApi } from '@imtbl/core-sdk';
 import { createTrade } from './trades';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
+import { PassportConfiguration } from '../config';
+import ConfirmationScreen from '../confirmation/confirmation';
+
+jest.mock('../confirmation/confirmation');
 
 const mockPayloadHash = 'test_payload_hash';
 const mockSignableTradeRequest = {
@@ -55,21 +59,30 @@ const mockStarkSigner = {
   signMessage: jest.fn(),
   getAddress: jest.fn(),
 };
+const passportConfig: Partial<PassportConfiguration> = {
+};
+
 describe('trades', () => {
     describe('createTrade', () => {
       let getSignableTradeMock: jest.Mock;
       let createTradeMock: jest.Mock;
+      let mockStartTransaction: jest.Mock;
 
       let tradesApiMock: TradesApi;
 
       beforeEach(() => {
         getSignableTradeMock = jest.fn();
         createTradeMock = jest.fn();
+        mockStartTransaction = jest.fn();
 
         tradesApiMock = {
           getSignableTrade: getSignableTradeMock,
           createTrade: createTradeMock,
         } as unknown as TradesApi;
+
+        (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
+          startTransaction: mockStartTransaction,
+        }));
       });
 
       afterEach(jest.resetAllMocks);
@@ -80,12 +93,16 @@ describe('trades', () => {
         createTradeMock.mockResolvedValue({
           data: mockReturnValue,
         });
+        mockStartTransaction.mockResolvedValue({
+          confirmed: true,
+        });
 
         const result = await createTrade({
           tradesApi: tradesApiMock,
           starkSigner: mockStarkSigner,
           user: mockUser,
-          request: mockSignableTradeRequest.getSignableTradeRequest
+          request: mockSignableTradeRequest.getSignableTradeRequest,
+          passportConfig: passportConfig as PassportConfiguration,
         });
 
         expect(getSignableTradeMock).toBeCalledWith(
@@ -99,6 +116,23 @@ describe('trades', () => {
         expect(result).toEqual(mockReturnValue);
       });
 
+      it('should return error if transfer is rejected by user', async () => {
+        getSignableTradeMock.mockResolvedValue(mockSignableTradeResponse);
+        mockStartTransaction.mockResolvedValue({
+          confirmed: true,
+        });
+
+        await expect(() =>
+          createTrade({
+            tradesApi: tradesApiMock,
+            starkSigner: mockStarkSigner,
+            user: mockUser,
+            request: mockSignableTradeRequest.getSignableTradeRequest,
+            passportConfig: passportConfig as PassportConfiguration,
+          })
+        ).rejects.toThrowError('TRADE_ERROR');
+      });
+
       it('should return error if failed to call public api', async () => {
         getSignableTradeMock.mockRejectedValue(new Error(mockErrorMessage));
 
@@ -107,11 +141,12 @@ describe('trades', () => {
             tradesApi: tradesApiMock,
             starkSigner: mockStarkSigner,
             user: mockUser,
-            request: mockSignableTradeRequest.getSignableTradeRequest
+            request: mockSignableTradeRequest.getSignableTradeRequest,
+            passportConfig: passportConfig as PassportConfiguration,
           })
         ).rejects.toThrow(
           new PassportError(
-            `${ PassportErrorType.CREATE_TRADE_ERROR }: ${ mockErrorMessage }`,
+            `${PassportErrorType.CREATE_TRADE_ERROR}: ${mockErrorMessage}`,
             PassportErrorType.CREATE_TRADE_ERROR
           )
         );
