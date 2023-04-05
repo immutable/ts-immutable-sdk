@@ -449,6 +449,7 @@ describe('PassportImxProvider', () => {
         {
           tokenId: '1',
           tokenAddress: 'token_address',
+          sender: '123',
           receiver: 'receiver_eth_address',
         },
       ];
@@ -508,6 +509,7 @@ describe('PassportImxProvider', () => {
                   token_address: transferRequest[0].tokenAddress,
                 },
               },
+              sender: transferRequest[0].sender,
               receiver: transferRequest[0].receiver,
             },
           ],
