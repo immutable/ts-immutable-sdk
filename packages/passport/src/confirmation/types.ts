@@ -13,51 +13,56 @@ export enum ReceiveMessage {
 }
 
 export enum SendMessage {
-  TRANSACTION_START = 'transaction_start'
+  TRANSACTION_START = 'transaction_start',
 }
 
 export enum TransactionTypes {
-  CancelOrder = 'v1/cancel',
-  Order = 'v1/orders',
-  CreateTrade = 'v1/trades',
-  Transfer = 'v1/transfers',
-  MultiTransfer = 'v1/multi-transfers',
+  CancelOrder = 'delete:v1/orders',
+  CreateOrder = 'post:v1/orders',
+  CreateTrade = 'post:v1/trades',
+  CreateTransfer = 'post:v1/transfers',
+  CreateBatchTransfer = 'post:v2/transfers',
 }
 
 export type CancelOrder = {
-  transactionType: TransactionTypes.CancelOrder,
-  transactionData: GetSignableCancelOrderRequest,
-}
+  transactionType: TransactionTypes.CancelOrder;
+  transactionData: GetSignableCancelOrderRequest;
+};
 
-export type Order = {
-  transactionType: TransactionTypes.Order,
-  transactionData: GetSignableOrderRequest,
-}
+export type CreateOrder = {
+  transactionType: TransactionTypes.CreateOrder;
+  transactionData: GetSignableOrderRequest;
+};
 
 export type CreateTrade = {
   transactionType: TransactionTypes.CreateTrade;
-  transactionData: GetSignableTradeRequest,
-}
+  transactionData: GetSignableTradeRequest;
+};
 
-export type Transfer = {
-  transactionType: TransactionTypes.Transfer;
+export type CreateTransfer = {
+  transactionType: TransactionTypes.CreateTransfer;
   transactionData: GetSignableTransferRequestV1;
-}
+};
 
-export type MultiTransfer = {
-  transactionType: TransactionTypes.MultiTransfer;
-  transactionData: GetSignableTransferRequest,
-}
+export type CreateBatchTransfer = {
+  transactionType: TransactionTypes.CreateBatchTransfer;
+  transactionData: GetSignableTransferRequest;
+};
 
-export type Transaction = CancelOrder | CreateTrade | Order | Transfer | MultiTransfer;
+export type Transaction =
+  | CancelOrder
+  | CreateTrade
+  | CreateOrder
+  | CreateTransfer
+  | CreateBatchTransfer;
 
 export type DisplayConfirmationParams = {
   messageType: SendMessage;
   messageData: Transaction;
-}
+};
 
 export type ConfirmationResult = {
   confirmed: boolean;
-}
+};
 
 export const PassportEventType = 'imx_passport_confirmation';

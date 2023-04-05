@@ -56,7 +56,7 @@ export const transfer = ({
     const confirmationResult = await confirmationScreen.startTransaction(
       user.accessToken,
       {
-        transactionType: TransactionTypes.Transfer,
+        transactionType: TransactionTypes.CreateTransfer,
         transactionData: getSignableTransferRequest,
       }
     );
@@ -140,7 +140,7 @@ export async function batchNftTransfer({
     const confirmationResult = await confirmationScreen.startTransaction(
       user.accessToken,
       {
-        transactionType: TransactionTypes.MultiTransfer,
+        transactionType: TransactionTypes.CreateBatchTransfer,
         transactionData: getSignableTransferRequestV2,
       }
     );
