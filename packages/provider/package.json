@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit --jsx preserve",
     "test": "jest",
     "test:watch": "jest --watch",
-    "lint": "eslint . --ext .ts,.jsx,.tsx --max-warnings=0",
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "prepare": "wsrun -r build"
   },
   "repository": {
@@ -31,9 +31,9 @@
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "dependencies": {
+    "@imtbl/config": "*",
     "@imtbl/core-sdk": "^1.0.2-alpha.2",
     "@imtbl/toolkit": "*",
-    "@imtbl/config": "*",
     "@magic-ext/oidc": "^1.0.1",
     "@metamask/detect-provider": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^5.53.0",

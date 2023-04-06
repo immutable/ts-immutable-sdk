@@ -15,9 +15,7 @@
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "typecheck": "tsc --noEmit --jsx preserve",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "lint": "eslint . --ext .ts,.jsx,.tsx --max-warnings=0"
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0"
   },
   "repository": {
     "type": "git",
@@ -30,8 +28,8 @@
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "dependencies": {
-    "@imtbl/core-sdk": "^1.0.2-alpha.2",
-    "@imtbl/config": "*"
+    "@imtbl/config": "*",
+    "@imtbl/core-sdk": "^1.0.2-alpha.2"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
