@@ -4,6 +4,7 @@ import {
   GetSignableTransferRequest,
   GetSignableTransferRequestV1,
   NftTransferDetails,
+  SignableTransferDetails,
   StarkSigner,
   TransfersApi,
   UnsignedTransferRequest,
@@ -115,7 +116,7 @@ export async function batchNftTransfer({
     const ethAddress = user.etherKey;
 
     const signableRequests = request.map(
-      (nftTransfer): GetSignableTransferRequestV1 => {
+      (nftTransfer): SignableTransferDetails => {
         return {
           amount: '1',
           token: convertToSignableToken({
@@ -123,7 +124,6 @@ export async function batchNftTransfer({
             tokenId: nftTransfer.tokenId,
             tokenAddress: nftTransfer.tokenAddress,
           }),
-          sender: ethAddress,
           receiver: nftTransfer.receiver,
         };
       }
