@@ -21,7 +21,7 @@ describe('confirmation', () => {
         availWidth: 123,
       },
       addEventListener: addEventListenerMock,
-      removeEventListener: removeEventListenerMock
+      removeEventListener: removeEventListenerMock,
     }));
   });
 
@@ -32,21 +32,27 @@ describe('confirmation', () => {
   describe('startTransaction', () => {
     it('should handle popup window closed', async () => {
       const transaction: Transaction = {
-        transactionType: TransactionTypes.TRANSFER,
+        transactionType: TransactionTypes.CreateTransfer,
         transactionData: {
-          type: 'ERC721',
-          tokenId: '194442292',
+          amount: '1',
+          token: {
+            type: 'ERC721',
+            data: {
+              token_id: '194442292',
+              token_address: '0xacb3c6a43d15b907e8433077b6d38ae40936fe2c',
+            },
+          },
+          sender: '0x0000000000000000000000000000000000000001',
           receiver: '0x0000000000000000000000000000000000000000',
-          tokenAddress: '0xacb3c6a43d15b907e8433077b6d38ae40936fe2c',
         },
       };
       const config = {
         network: Config.SANDBOX.network,
         oidcConfiguration: {
           authenticationDomain: Config.SANDBOX.authenticationDomain,
-          clientId: "",
-          logoutRedirectUri: "",
-          redirectUri: "",
+          clientId: '',
+          logoutRedirectUri: '',
+          redirectUri: '',
         },
         imxAPIConfiguration: {
           basePath: 'https://api.sandbox.x.immutable.com',
@@ -60,11 +66,10 @@ describe('confirmation', () => {
       const res = await confirmationScreen.startTransaction(
         'ehyyy',
         transaction
-      )
+      );
 
       expect(res.confirmed).toEqual(false);
       expect(mockedOpen).toHaveBeenCalledTimes(1);
     });
   });
 });
-

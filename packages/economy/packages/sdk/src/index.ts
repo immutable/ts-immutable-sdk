@@ -1,2 +1,3 @@
 export * from './Economy';
-export type { CraftInput, ICraftStatus } from './crafting';
+export { craftStatuses } from './crafting';
+export type { CraftInput, CraftStatuses } from './crafting';

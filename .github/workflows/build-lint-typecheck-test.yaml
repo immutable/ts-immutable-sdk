@@ -1,4 +1,4 @@
-name: Lint
+name: Build, Lint, Typecheck, Test
 
 on:
   push:
@@ -8,22 +8,22 @@ on:
 
 jobs:
   build:
-    name: Lint
+    name: Build, Lint, Typecheck, Test
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['14', '16', '18']
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Read .nvmrc
-        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
-        id: nvm
-
       - name: Use Node.js ${{ steps.nvm.outputs.NODE_VERSION }}
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
+          node-version: v16.16.0
           registry-url: https://registry.npmjs.org/
 
       - name: Install yarn
@@ -46,7 +46,13 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Lint
-        run: yarn lint
+        run: yarn lint:ci
+
+      - name: Build
+        run: yarn build
 
       - name: Typecheck
         run: yarn typecheck
+
+      - name: Test
+        run: yarn test
