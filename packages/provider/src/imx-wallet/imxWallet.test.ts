@@ -2,22 +2,22 @@
  * @jest-environment jsdom
  */
 
-import { ethers } from "ethers";
+import { ethers } from 'ethers';
 
-import { RequestEventType, ResponseEventType } from "./events";
-import { connect, disconnect } from "./imxWallet";
-import { postRequestMessage } from "./postRequestMessage";
-import { Environment } from "@imtbl/config";
-import { asyncTriggerIFrameOnLoad } from "./testUtils";
-import { getOrSetupIFrame } from "./imxWalletIFrame";
-import { ImxSigner } from "./ImxSigner";
+import { RequestEventType, ResponseEventType } from './events';
+import { connect, disconnect } from './imxWallet';
+import { postRequestMessage } from './postRequestMessage';
+import { Environment } from '@imtbl/config';
+import { asyncTriggerIFrameOnLoad } from './testUtils';
+import { getOrSetupIFrame } from './imxWalletIFrame';
+import { ImxSigner } from './ImxSigner';
 
-jest.mock("./postRequestMessage");
+jest.mock('./postRequestMessage');
 
-describe("imxWallet", () => {
+describe('imxWallet', () => {
   const env = Environment.DEVELOPMENT;
-  const signature = "The signature";
-  const address = "0x1234";
+  const signature = 'The signature';
+  const address = '0x1234';
   let l1Provider: ethers.providers.Web3Provider;
 
   beforeEach(() => {
@@ -31,8 +31,8 @@ describe("imxWallet", () => {
 
   afterEach(() => jest.clearAllMocks());
 
-  describe("connect", () => {
-    it("Should call the postMessage", async () => {
+  describe('connect', () => {
+    it('Should call the postMessage', async () => {
       const iframe = await asyncTriggerIFrameOnLoad(getOrSetupIFrame(env));
       const postRequestMessageMockFn = postRequestMessage as jest.Mock;
 
@@ -46,10 +46,10 @@ describe("imxWallet", () => {
       });
     });
 
-    it("Should receive starkPublicKey if l2Wallet returns correct data", async () => {
+    it('Should receive starkPublicKey if l2Wallet returns correct data', async () => {
       const iframe = await asyncTriggerIFrameOnLoad(getOrSetupIFrame(env));
 
-      const starkPublicKey = "0x4321z";
+      const starkPublicKey = '0x4321z';
       const mockedSuccessReturnValue = {
         data: {
           type: ResponseEventType.CONNECT_WALLET_RESPONSE,
@@ -72,7 +72,7 @@ describe("imxWallet", () => {
       expect(l2Address).toEqual(starkPublicKey);
     });
 
-    it("Should throws an error if l2Wallet returns error", async () => {
+    it('Should throws an error if l2Wallet returns error', async () => {
       const mockedFailedReturnValue = {
         data: {
           type: ResponseEventType.CONNECT_WALLET_RESPONSE,
@@ -88,16 +88,16 @@ describe("imxWallet", () => {
         });
 
       expect(connect(l1Provider, env)).rejects.toThrow(
-        "The L2 IMX Wallet connection has failed."
+        'The L2 IMX Wallet connection has failed.'
       );
     });
   });
 
-  describe("disconnection", () => {
-    it("Should call the postMessage", async () => {
+  describe('disconnection', () => {
+    it('Should call the postMessage', async () => {
       const iframe = await asyncTriggerIFrameOnLoad(getOrSetupIFrame(env));
       const postRequestMessageMockFn = postRequestMessage as jest.Mock;
-      const starkPublicKey = "0x123";
+      const starkPublicKey = '0x123';
 
       const l2Signer = new ImxSigner(starkPublicKey, iframe);
 

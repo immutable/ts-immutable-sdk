@@ -1,17 +1,17 @@
-import { Config, getPassportConfiguration } from "./config";
-import { PassportError, PassportErrorType } from "../errors/passportError";
-import { EnvironmentConfiguration, OidcConfiguration } from "../types";
+import { Config, getPassportConfiguration } from './config';
+import { PassportError, PassportErrorType } from '../errors/passportError';
+import { EnvironmentConfiguration, OidcConfiguration } from '../types';
 
-describe("Config", () => {
-  describe("getPassportConfiguration", () => {
+describe('Config', () => {
+  describe('getPassportConfiguration', () => {
     const oidcConfiguration = {
-      clientId: "client123",
-      redirectUri: "redirect123",
-      logoutRedirectUri: "logout123",
+      clientId: 'client123',
+      redirectUri: 'redirect123',
+      logoutRedirectUri: 'logout123',
     };
 
-    describe("when both configurations are valid", () => {
-      it("returns a PassportConfiguration", () => {
+    describe('when both configurations are valid', () => {
+      it('returns a PassportConfiguration', () => {
         const passport = getPassportConfiguration(
           Config.SANDBOX,
           oidcConfiguration
@@ -25,16 +25,16 @@ describe("Config", () => {
             redirectUri: oidcConfiguration.redirectUri,
           },
           imxAPIConfiguration: {
-            basePath: "https://api.sandbox.x.immutable.com",
+            basePath: 'https://api.sandbox.x.immutable.com',
           },
-          passportDomain: "https://passport.sandbox.immutable.com",
+          passportDomain: 'https://passport.sandbox.immutable.com',
           magicPublishableApiKey: Config.SANDBOX.magicPublishableApiKey,
           magicProviderId: Config.SANDBOX.magicProviderId,
         });
       });
     });
-    describe("when the environmentConfiguration is null", () => {
-      it("throws an error", () => {
+    describe('when the environmentConfiguration is null', () => {
+      it('throws an error', () => {
         expect(() =>
           getPassportConfiguration(
             undefined as unknown as EnvironmentConfiguration,
@@ -42,14 +42,14 @@ describe("Config", () => {
           )
         ).toThrow(
           new PassportError(
-            "EnvironmentConfiguration cannot be null",
+            'EnvironmentConfiguration cannot be null',
             PassportErrorType.AUTHENTICATION_ERROR
           )
         );
       });
     });
-    describe("when the environmentConfiguration is missing a required value", () => {
-      it("throws an error", () => {
+    describe('when the environmentConfiguration is missing a required value', () => {
+      it('throws an error', () => {
         const environmentConfiguration = {
           ...Config.SANDBOX,
           authenticationDomain: undefined,
@@ -61,14 +61,14 @@ describe("Config", () => {
           )
         ).toThrow(
           new PassportError(
-            "EnvironmentConfiguration - authenticationDomain cannot be null",
+            'EnvironmentConfiguration - authenticationDomain cannot be null',
             PassportErrorType.AUTHENTICATION_ERROR
           )
         );
       });
     });
-    describe("when the oidcConfiguration is null", () => {
-      it("throws an error", () => {
+    describe('when the oidcConfiguration is null', () => {
+      it('throws an error', () => {
         expect(() =>
           getPassportConfiguration(
             Config.SANDBOX,
@@ -76,14 +76,14 @@ describe("Config", () => {
           )
         ).toThrow(
           new PassportError(
-            "OidcConfiguration cannot be null",
+            'OidcConfiguration cannot be null',
             PassportErrorType.AUTHENTICATION_ERROR
           )
         );
       });
     });
-    describe("when the oidcConfiguration is missing a required value", () => {
-      it("throws an error", () => {
+    describe('when the oidcConfiguration is missing a required value', () => {
+      it('throws an error', () => {
         const invalidOidcConfiguration = {
           ...oidcConfiguration,
           clientId: undefined,
@@ -95,7 +95,7 @@ describe("Config", () => {
           )
         ).toThrow(
           new PassportError(
-            "OidcConfiguration - clientId cannot be null",
+            'OidcConfiguration - clientId cannot be null',
             PassportErrorType.AUTHENTICATION_ERROR
           )
         );

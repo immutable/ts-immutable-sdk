@@ -1,12 +1,12 @@
-import { Web3Provider } from "@ethersproject/providers";
-import { BigNumber } from "ethers";
-import { ChainId } from "./network";
-import { TokenInfo } from "./token";
+import { Web3Provider } from '@ethersproject/providers';
+import { BigNumber } from 'ethers';
+import { ChainId } from './network';
+import { TokenInfo } from './token';
 
 export interface GetBalanceParams {
-    provider: Web3Provider;
-    walletAddress: string;
-    contractAddress?: string;
+  provider: Web3Provider;
+  walletAddress: string;
+  contractAddress?: string;
 }
 
 export interface GetBalanceResult {
@@ -27,60 +27,60 @@ export interface GetAllBalancesResult {
 
 export const ERC20ABI = [
   {
-    "constant": true,
-    "inputs": [],
-    "name": "name",
-    "outputs": [
+    constant: true,
+    inputs: [],
+    name: 'name',
+    outputs: [
       {
-        "name": "",
-        "type": "string"
-      }
+        name: '',
+        type: 'string',
+      },
     ],
-    "payable": false,
-    "type": "function"
+    payable: false,
+    type: 'function',
   },
   {
-    "constant": true,
-    "inputs": [],
-    "name": "decimals",
-    "outputs": [
+    constant: true,
+    inputs: [],
+    name: 'decimals',
+    outputs: [
       {
-        "name": "",
-        "type": "uint8"
-      }
+        name: '',
+        type: 'uint8',
+      },
     ],
-    "payable": false,
-    "type": "function"
+    payable: false,
+    type: 'function',
   },
   {
-    "constant": true,
-    "inputs": [
+    constant: true,
+    inputs: [
       {
-        "name": "_owner",
-        "type": "address"
-      }
+        name: '_owner',
+        type: 'address',
+      },
     ],
-    "name": "balanceOf",
-    "outputs": [
+    name: 'balanceOf',
+    outputs: [
       {
-        "name": "balance",
-        "type": "uint256"
-      }
+        name: 'balance',
+        type: 'uint256',
+      },
     ],
-    "payable": false,
-    "type": "function"
+    payable: false,
+    type: 'function',
   },
   {
-    "constant": true,
-    "inputs": [],
-    "name": "symbol",
-    "outputs": [
+    constant: true,
+    inputs: [],
+    name: 'symbol',
+    outputs: [
       {
-        "name": "",
-        "type": "string"
-      }
+        name: '',
+        type: 'string',
+      },
     ],
-    "payable": false,
-    "type": "function"
-  }
+    payable: false,
+    type: 'function',
+  },
 ];

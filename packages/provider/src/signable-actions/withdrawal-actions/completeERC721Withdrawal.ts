@@ -1,23 +1,23 @@
-import { Signer } from "@ethersproject/abstract-signer";
+import { Signer } from '@ethersproject/abstract-signer';
 import {
   MintsApi,
   Contracts,
   ImmutableXConfiguration,
   UsersApi,
-} from "@imtbl/core-sdk";
-import * as encUtils from "enc-utils";
-import { ERC721Token } from "types";
-import { getEncodeAssetInfo } from "./getEncodeAssetInfo";
+} from '@imtbl/core-sdk';
+import * as encUtils from 'enc-utils';
+import { ERC721Token } from 'types';
+import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
-} from "../registration";
-import { TransactionResponse } from "@ethersproject/providers";
-import { Configuration } from "@imtbl/config";
-import { validateChain } from "../helpers";
+} from '../registration';
+import { TransactionResponse } from '@ethersproject/providers';
+import { Configuration } from '@imtbl/config';
+import { validateChain } from '../helpers';
 
 interface MintableERC721Withdrawal {
-  type: "ERC721";
+  type: 'ERC721';
   data: {
     id: string;
     blueprint?: string;
@@ -87,7 +87,7 @@ async function executeRegisterAndWithdrawMintableERC721(
 
 function getMintingBlob(token: MintableERC721Withdrawal): string {
   const id = token.data.id;
-  const blueprint = token.data.blueprint || "";
+  const blueprint = token.data.blueprint || '';
   return encUtils.sanitizeHex(encUtils.utf8ToHex(`{${id}}:{${blueprint}}`));
 }
 
@@ -99,8 +99,8 @@ async function completeMintableERC721Withdrawal(
 ) {
   const starkExConfig = config.getStarkExConfig();
   const assetType = await getEncodeAssetInfo(
-    "mintable-asset",
-    "ERC721",
+    'mintable-asset',
+    'ERC721',
     starkExConfig,
     {
       id: token.data.id,
@@ -195,7 +195,7 @@ async function completeERC721Withdrawal(
   config: Configuration
 ) {
   const starkExConfig = config.getStarkExConfig();
-  const assetType = await getEncodeAssetInfo("asset", "ERC721", starkExConfig, {
+  const assetType = await getEncodeAssetInfo('asset', 'ERC721', starkExConfig, {
     token_id: token.tokenId,
     token_address: token.tokenAddress,
   });
@@ -248,7 +248,7 @@ export async function completeERC721WithdrawalAction({
         ethSigner,
         starkPublicKey,
         {
-          type: "ERC721",
+          type: 'ERC721',
           data: {
             id: tokenId,
             tokenAddress: tokenAddress,

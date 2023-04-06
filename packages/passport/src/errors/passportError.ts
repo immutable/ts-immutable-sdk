@@ -10,7 +10,7 @@ export enum PassportErrorType {
   CANCEL_ORDER_ERROR = 'CANCEL_ORDER_ERROR',
   EXCHANGE_TRANSFER_ERROR = 'EXCHANGE_TRANSFER_ERROR',
   CREATE_TRADE_ERROR = 'CREATE_TRADE_ERROR',
-  OPERATION_NOT_SUPPORTED_ERROR = 'OPERATION_NOT_SUPPORTED_ERROR'
+  OPERATION_NOT_SUPPORTED_ERROR = 'OPERATION_NOT_SUPPORTED_ERROR',
 }
 
 export class PassportError extends Error {
@@ -29,8 +29,7 @@ export const withPassportError = async <T>(
     return await fn();
   } catch (error) {
     const errorMessage =
-      `${customErrorType}: ${(error as Error).message}` ||
-      'UnknownError';
+      `${customErrorType}: ${(error as Error).message}` || 'UnknownError';
     throw new PassportError(errorMessage, customErrorType);
   }
-}
+};

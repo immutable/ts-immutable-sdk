@@ -4,9 +4,9 @@ import {
   StarkSigner,
   TradesApi,
   TradesApiCreateTradeRequest,
-} from "@imtbl/core-sdk";
-import { PassportErrorType, withPassportError } from "../errors/passportError";
-import { UserWithEtherKey } from "../types";
+} from '@imtbl/core-sdk';
+import { PassportErrorType, withPassportError } from '../errors/passportError';
+import { UserWithEtherKey } from '../types';
 import { TransactionTypes } from '../confirmation/types';
 import { PassportConfiguration } from '../config';
 import ConfirmationScreen from '../confirmation/confirmation';
@@ -16,7 +16,7 @@ type CreateTradeParams = {
   tradesApi: TradesApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  passportConfig: PassportConfiguration,
+  passportConfig: PassportConfiguration;
 };
 
 export async function createTrade({
@@ -49,7 +49,7 @@ export async function createTrade({
     );
 
     if (!confirmationResult.confirmed) {
-      throw new Error("Transaction rejected by user");
+      throw new Error('Transaction rejected by user');
     }
 
     const { payload_hash: payloadHash } = getSignableTradeResponse.data;
@@ -76,7 +76,7 @@ export async function createTrade({
       },
     };
 
-    const headers = { Authorization: "Bearer " + user.accessToken };
+    const headers = { Authorization: 'Bearer ' + user.accessToken };
     const { data: createTradeResponse } = await tradesApi.createTrade(
       tradeParams,
       {

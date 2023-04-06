@@ -5,19 +5,19 @@ import {
   ERC20Amount,
   TokensApi,
   UsersApi,
-} from "@imtbl/core-sdk";
-import { EthSigner } from "types";
-import { Configuration } from "@imtbl/config";
-import { TransactionResponse } from "@ethersproject/providers";
-import { parseUnits } from "@ethersproject/units";
-import { BigNumber } from "@ethersproject/bignumber";
+} from '@imtbl/core-sdk';
+import { EthSigner } from 'types';
+import { Configuration } from '@imtbl/config';
+import { TransactionResponse } from '@ethersproject/providers';
+import { parseUnits } from '@ethersproject/units';
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
-} from "../registration";
-import { validateChain } from "../helpers";
-import { EthConfiguration } from "@imtbl/core-sdk";
-import { Signers } from "../types";
+} from '../registration';
+import { validateChain } from '../helpers';
+import { EthConfiguration } from '@imtbl/core-sdk';
+import { Signers } from '../types';
 
 interface ERC20TokenData {
   decimals: number;
@@ -81,7 +81,7 @@ export async function depositERC20({
 
   // Perform encoding on asset details to get an assetType (required for stark contract request)
   const encodingResult = await encodingApi.encodeAsset({
-    assetType: "asset",
+    assetType: 'asset',
     encodeAssetRequest: {
       token: {
         type: deposit.type,

@@ -10,7 +10,9 @@ type RequestableProvider = ExternalProvider & {
   request: NonNullable<ethers.providers.ExternalProvider['request']>;
 };
 
-export function isRequestableProvider(provider: ExternalProvider): provider is RequestableProvider {
+export function isRequestableProvider(
+  provider: ExternalProvider
+): provider is RequestableProvider {
   return !!provider?.request;
 }
 

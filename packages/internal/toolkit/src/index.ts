@@ -1,2 +1,2 @@
 export * from './crypto';
-export * from './convertToSignableToken'
+export * from './convertToSignableToken';

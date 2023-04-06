@@ -41,7 +41,7 @@ describe('openPopupCenter', () => {
     expect(mockWindow.open).toHaveBeenCalledWith(
       'https://www.example.com',
       'Example Popup',
-      expect.any(String),
+      expect.any(String)
     );
     expect(mockPopup.focus).toHaveBeenCalledTimes(1);
     const screenArgs = (mockWindow.open as jest.Mock).mock.calls[0][2];
@@ -54,11 +54,13 @@ describe('openPopupCenter', () => {
   it('should throw an error if the new window fails to open', () => {
     (mockWindow.open as jest.Mock).mockImplementationOnce(() => null);
 
-    expect(() => openPopupCenter({
-      url: 'https://www.example.com',
-      title: 'Example Popup',
-      width: 800,
-      height: 600,
-    })).toThrow('Failed to open confirmation screen');
+    expect(() =>
+      openPopupCenter({
+        url: 'https://www.example.com',
+        title: 'Example Popup',
+        width: 800,
+        height: 600,
+      })
+    ).toThrow('Failed to open confirmation screen');
   });
 });

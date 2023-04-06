@@ -1,37 +1,37 @@
-import { getEncodeAssetInfo } from "./getEncodeAssetInfo";
+import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
-} from "../registration";
-import { Contracts, MintableTokenDetails, MintsApi } from "@imtbl/core-sdk";
+} from '../registration';
+import { Contracts, MintableTokenDetails, MintsApi } from '@imtbl/core-sdk';
 import {
   generateSigners,
   privateKey1,
   testConfig,
   transactionResponse,
-} from "../../test/helpers";
-import { completeERC721WithdrawalAction } from "./completeERC721Withdrawal";
-import * as encUtils from "enc-utils";
-import { TransactionResponse } from "@ethersproject/providers";
+} from '../../test/helpers';
+import { completeERC721WithdrawalAction } from './completeERC721Withdrawal';
+import * as encUtils from 'enc-utils';
+import { TransactionResponse } from '@ethersproject/providers';
 
-jest.mock("@imtbl/core-sdk");
-jest.mock("@imtbl/toolkit");
-jest.mock("enc-utils");
-jest.mock("../registration");
-jest.mock("./getEncodeAssetInfo");
+jest.mock('@imtbl/core-sdk');
+jest.mock('@imtbl/toolkit');
+jest.mock('enc-utils');
+jest.mock('../registration');
+jest.mock('./getEncodeAssetInfo');
 
-describe("completeERC721Withdrawal action", () => {
-  describe("when ERC721 is mintable", () => {
+describe('completeERC721Withdrawal action', () => {
+  describe('when ERC721 is mintable', () => {
     const mintableErc721Token: MintableTokenDetails = {
-      token_id: "23",
-      client_token_id: "12",
-      blueprint: "blueprint",
+      token_id: '23',
+      client_token_id: '12',
+      blueprint: 'blueprint',
     };
     const encodeAssetResponse = {
-      asset_id: "asset-id",
-      asset_type: "mintable-asset",
+      asset_id: 'asset-id',
+      asset_type: 'mintable-asset',
     };
-    const mintingBlob = "mintingBlob";
+    const mintingBlob = 'mintingBlob';
 
     beforeEach(() => {
       jest.restoreAllMocks();
@@ -43,7 +43,7 @@ describe("completeERC721Withdrawal action", () => {
         }),
       });
     });
-    it("should complete ERC721 withdrawal with on-chain registered user", async () => {
+    it('should complete ERC721 withdrawal with on-chain registered user', async () => {
       (Contracts.Core.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
           withdrawAndMint: jest.fn().mockResolvedValue(transactionResponse),
@@ -55,7 +55,7 @@ describe("completeERC721Withdrawal action", () => {
 
       await expect(response).toEqual(transactionResponse);
     });
-    it("should complete ERC721 withdrawal with unregistered user", async () => {
+    it('should complete ERC721 withdrawal with unregistered user', async () => {
       (Contracts.Registration.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
           regsiterAndWithdrawAndMint: jest
@@ -70,12 +70,12 @@ describe("completeERC721Withdrawal action", () => {
     });
   });
 
-  describe("when ERC721 is already minted on L1", () => {
+  describe('when ERC721 is already minted on L1', () => {
     const encodeAssetResponse = {
-      asset_id: "asset-id",
-      asset_type: "mintable-asset",
+      asset_id: 'asset-id',
+      asset_type: 'mintable-asset',
     };
-    const mintingBlob = "mintingBlob";
+    const mintingBlob = 'mintingBlob';
 
     beforeEach(() => {
       jest.restoreAllMocks();
@@ -92,7 +92,7 @@ describe("completeERC721Withdrawal action", () => {
           .mockRejectedValue(error),
       });
     });
-    it("should complete ERC721 withdrawal with on-chain registered user", async () => {
+    it('should complete ERC721 withdrawal with on-chain registered user', async () => {
       (Contracts.Core.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
           withdrawNft: jest.fn().mockResolvedValue(transactionResponse),
@@ -102,7 +102,7 @@ describe("completeERC721Withdrawal action", () => {
       const response = await act();
       await expect(response).toEqual(transactionResponse);
     });
-    it("should complete ERC721 withdrawal with unregistered user", async () => {
+    it('should complete ERC721 withdrawal with unregistered user', async () => {
       (Contracts.Registration.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
           registerAndWithdrawNft: jest
@@ -117,7 +117,7 @@ describe("completeERC721Withdrawal action", () => {
     });
   });
 
-  describe("when mint api encountered server error", () => {
+  describe('when mint api encountered server error', () => {
     beforeEach(() => {
       jest.restoreAllMocks();
       const error = {
@@ -134,17 +134,17 @@ describe("completeERC721Withdrawal action", () => {
       });
     });
 
-    it("should throw error", async () => {
+    it('should throw error', async () => {
       const signers = await generateSigners(privateKey1);
       await expect(
         completeERC721WithdrawalAction({
           ethSigner: signers.ethSigner,
           config: testConfig,
-          starkPublicKey: "789912305",
+          starkPublicKey: '789912305',
           token: {
-            type: "ERC721",
-            tokenId: "23",
-            tokenAddress: "0x23cv1",
+            type: 'ERC721',
+            tokenId: '23',
+            tokenAddress: '0x23cv1',
           },
         })
       ).rejects.toThrowError();
@@ -157,11 +157,11 @@ async function act(): Promise<TransactionResponse> {
   return await completeERC721WithdrawalAction({
     ethSigner: signers.ethSigner,
     config: testConfig,
-    starkPublicKey: "789912305",
+    starkPublicKey: '789912305',
     token: {
-      type: "ERC721",
-      tokenId: "23",
-      tokenAddress: "0x23cv1",
+      type: 'ERC721',
+      tokenId: '23',
+      tokenAddress: '0x23cv1',
     },
   });
 }

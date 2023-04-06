@@ -17,7 +17,7 @@ describe('order', () => {
   };
 
   const passportConfig = {
-    network: Networks.SANDBOX
+    network: Networks.SANDBOX,
   } as Partial<PassportConfiguration>;
 
   beforeEach(() => {
@@ -114,7 +114,7 @@ describe('order', () => {
       getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       mockStartTransaction.mockResolvedValue({
-        confirmed: true
+        confirmed: true,
       });
       createOrderMock.mockResolvedValue({
         data: mockReturnValue,
@@ -179,7 +179,7 @@ describe('order', () => {
       getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       mockStartTransaction.mockResolvedValue({
-        confirmed: true
+        confirmed: true,
       });
 
       await expect(() =>
@@ -254,7 +254,7 @@ describe('order', () => {
         data: mockReturnValue,
       });
       mockStartTransaction.mockResolvedValue({
-        confirmed: true
+        confirmed: true,
       });
 
       const result = await cancelOrder({

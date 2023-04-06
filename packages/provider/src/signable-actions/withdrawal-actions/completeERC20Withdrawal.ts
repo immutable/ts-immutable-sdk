@@ -1,14 +1,14 @@
-import { Signer } from "@ethersproject/abstract-signer";
-import { TransactionResponse } from "@ethersproject/providers";
-import { Configuration } from "@imtbl/config";
-import { ERC20Token } from "types";
+import { Signer } from '@ethersproject/abstract-signer';
+import { TransactionResponse } from '@ethersproject/providers';
+import { Configuration } from '@imtbl/config';
+import { ERC20Token } from 'types';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
-} from "../registration";
-import { getEncodeAssetInfo } from "./getEncodeAssetInfo";
-import { Contracts, ImmutableXConfiguration, UsersApi } from "@imtbl/core-sdk";
-import { validateChain } from "../helpers";
+} from '../registration';
+import { getEncodeAssetInfo } from './getEncodeAssetInfo';
+import { Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
+import { validateChain } from '../helpers';
 
 type ExecuteRegisterAndWithdrawERC20Params = {
   ethSigner: Signer;
@@ -83,7 +83,7 @@ export async function completeERC20WithdrawalAction({
   await validateChain(ethSigner, config.getStarkExConfig());
 
   const starkExConfig = config.getStarkExConfig();
-  const assetType = await getEncodeAssetInfo("asset", "ERC20", starkExConfig, {
+  const assetType = await getEncodeAssetInfo('asset', 'ERC20', starkExConfig, {
     token_address: token.tokenAddress,
   });
   const isRegistered = await isRegisteredOnChain(

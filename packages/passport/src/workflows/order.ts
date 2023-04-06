@@ -7,13 +7,13 @@ import {
   OrdersApiCreateOrderRequest,
   StarkSigner,
   UnsignedOrderRequest,
-} from "@imtbl/core-sdk";
-import { convertToSignableToken } from "@imtbl/toolkit";
-import { PassportErrorType, withPassportError } from "../errors/passportError";
-import { UserWithEtherKey } from "../types";
-import { PassportConfiguration} from "../config";
-import { TransactionTypes } from "../confirmation/types";
-import ConfirmationScreen from "../confirmation/confirmation";
+} from '@imtbl/core-sdk';
+import { convertToSignableToken } from '@imtbl/toolkit';
+import { PassportErrorType, withPassportError } from '../errors/passportError';
+import { UserWithEtherKey } from '../types';
+import { PassportConfiguration } from '../config';
+import { TransactionTypes } from '../confirmation/types';
+import ConfirmationScreen from '../confirmation/confirmation';
 
 type CancelOrderParams = {
   request: GetSignableCancelOrderRequest;
@@ -31,7 +31,7 @@ type CreateOrderParams = {
   passportConfig: PassportConfiguration;
 };
 
-const ERC721 = "ERC721";
+const ERC721 = 'ERC721';
 
 export async function createOrder({
   starkSigner,
@@ -42,8 +42,8 @@ export async function createOrder({
 }: CreateOrderParams): Promise<CreateOrderResponse> {
   return withPassportError<CreateOrderResponse>(async () => {
     const ethAddress = user.etherKey;
-    const amountSell = request.sell.type === ERC721 ? "1" : request.sell.amount;
-    const amountBuy = request.buy.type === ERC721 ? "1" : request.buy.amount;
+    const amountSell = request.sell.type === ERC721 ? '1' : request.sell.amount;
+    const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
     const getSignableOrderRequestV3: GetSignableOrderRequest = {
       user: ethAddress,
       amount_buy: amountBuy,
@@ -67,7 +67,7 @@ export async function createOrder({
       }
     );
     if (!confirmationResult.confirmed) {
-      throw new Error("Transaction rejected by user");
+      throw new Error('Transaction rejected by user');
     }
 
     const { payload_hash: payloadHash } = getSignableOrderResponse.data;
@@ -94,7 +94,7 @@ export async function createOrder({
       },
     };
     const headers = {
-      Authorization: "Bearer " + user.accessToken,
+      Authorization: 'Bearer ' + user.accessToken,
     };
     const createOrderResponse = await ordersApi.createOrder(orderParams, {
       headers,
@@ -131,7 +131,7 @@ export async function cancelOrder({
       }
     );
     if (!confirmationResult.confirmed) {
-      throw new Error("Transaction rejected by user");
+      throw new Error('Transaction rejected by user');
     }
 
     const { payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
@@ -139,7 +139,7 @@ export async function cancelOrder({
     const starkSignature = await starkSigner.signMessage(payloadHash);
 
     const headers = {
-      Authorization: "Bearer " + user.accessToken,
+      Authorization: 'Bearer ' + user.accessToken,
     };
 
     const cancelOrderResponse = await ordersApi.cancelOrder(

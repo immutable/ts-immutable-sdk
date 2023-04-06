@@ -7,15 +7,15 @@ import {
   StarkSigner,
   TransfersApi,
   UnsignedTransferRequest,
-} from "@imtbl/core-sdk";
-import { PassportErrorType, withPassportError } from "../errors/passportError";
-import { convertToSignableToken } from "@imtbl/toolkit";
-import { TransactionTypes } from "../confirmation/types";
-import ConfirmationScreen from "../confirmation/confirmation";
-import { PassportConfiguration } from "../config";
-import { UserWithEtherKey } from "../types";
+} from '@imtbl/core-sdk';
+import { PassportErrorType, withPassportError } from '../errors/passportError';
+import { convertToSignableToken } from '@imtbl/toolkit';
+import { TransactionTypes } from '../confirmation/types';
+import ConfirmationScreen from '../confirmation/confirmation';
+import { PassportConfiguration } from '../config';
+import { UserWithEtherKey } from '../types';
 
-const ERC721 = "ERC721";
+const ERC721 = 'ERC721';
 
 type TransferRequest = {
   request: UnsignedTransferRequest;
@@ -41,7 +41,7 @@ export const transfer = ({
   passportConfig,
 }: TransferRequest): Promise<CreateTransferResponseV1> => {
   return withPassportError<CreateTransferResponseV1>(async () => {
-    const transferAmount = request.type === ERC721 ? "1" : request.amount;
+    const transferAmount = request.type === ERC721 ? '1' : request.amount;
     const getSignableTransferRequest: GetSignableTransferRequestV1 = {
       sender: user.etherKey,
       token: convertToSignableToken(request),
@@ -62,7 +62,7 @@ export const transfer = ({
     );
 
     if (!confirmationResult.confirmed) {
-      throw new Error("Transaction rejected by user");
+      throw new Error('Transaction rejected by user');
     }
 
     const signableResultData = signableResult.data;
@@ -87,7 +87,7 @@ export const transfer = ({
     };
 
     const headers = {
-      Authorization: "Bearer " + user.accessToken,
+      Authorization: 'Bearer ' + user.accessToken,
     };
 
     const { data: responseData } = await transfersApi.createTransferV1(
@@ -109,23 +109,25 @@ export async function batchNftTransfer({
   starkSigner,
   request,
   transfersApi,
-  passportConfig
+  passportConfig,
 }: BatchTransfersParams): Promise<CreateTransferResponse> {
   return withPassportError<CreateTransferResponse>(async () => {
     const ethAddress = user.etherKey;
 
-    const signableRequests = request.map((nftTransfer): GetSignableTransferRequestV1 => {
-      return {
-        amount: "1",
-        token: convertToSignableToken({
-          type: ERC721,
-          tokenId: nftTransfer.tokenId,
-          tokenAddress: nftTransfer.tokenAddress,
-        }),
-        sender: ethAddress,
-        receiver: nftTransfer.receiver,
-      };
-    });
+    const signableRequests = request.map(
+      (nftTransfer): GetSignableTransferRequestV1 => {
+        return {
+          amount: '1',
+          token: convertToSignableToken({
+            type: ERC721,
+            tokenId: nftTransfer.tokenId,
+            tokenAddress: nftTransfer.tokenAddress,
+          }),
+          sender: ethAddress,
+          receiver: nftTransfer.receiver,
+        };
+      }
+    );
 
     const getSignableTransferRequestV2: GetSignableTransferRequest = {
       sender_ether_key: ethAddress,
@@ -146,7 +148,7 @@ export async function batchNftTransfer({
     );
 
     if (!confirmationResult.confirmed) {
-      throw new Error("Transaction rejected by user");
+      throw new Error('Transaction rejected by user');
     }
 
     const requests = await Promise.all(
@@ -171,7 +173,7 @@ export async function batchNftTransfer({
     };
 
     const headers = {
-      Authorization: "Bearer " + user.accessToken,
+      Authorization: 'Bearer ' + user.accessToken,
     };
 
     const response = await transfersApi.createTransfer(

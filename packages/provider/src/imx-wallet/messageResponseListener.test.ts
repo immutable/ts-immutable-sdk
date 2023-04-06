@@ -2,13 +2,13 @@
  * @jest-environment jsdom
  */
 
-import { Environment } from "@imtbl/config";
-import { ConnectResponse } from "./types";
-import { ResponseEventType } from "./events";
-import { messageResponseListener } from "./messageResponseListener";
-import { setupIFrame } from "./imxWalletIFrame";
+import { Environment } from '@imtbl/config';
+import { ConnectResponse } from './types';
+import { ResponseEventType } from './events';
+import { messageResponseListener } from './messageResponseListener';
+import { setupIFrame } from './imxWalletIFrame';
 
-import { htmlBodyInit, asyncTriggerIFrameOnLoad } from "./testUtils";
+import { htmlBodyInit, asyncTriggerIFrameOnLoad } from './testUtils';
 
 const callbackFn = jest.fn();
 
@@ -23,16 +23,16 @@ function getMessageEvent(
       type: eventType,
       details: {
         success: true,
-        data: { starkPublicKey: "0x000" },
+        data: { starkPublicKey: '0x000' },
       },
     },
     source: iframe.contentWindow,
   } as MessageEvent;
 }
 
-describe("the messageResponseListener function", () => {
+describe('the messageResponseListener function', () => {
   let iframe: HTMLIFrameElement;
-  let iFrameURL = "";
+  let iFrameURL = '';
 
   beforeEach(async () => {
     htmlBodyInit();
@@ -48,7 +48,7 @@ describe("the messageResponseListener function", () => {
 
   afterEach(() => jest.clearAllMocks());
 
-  it("should call the callback if the message is valid", () => {
+  it('should call the callback if the message is valid', () => {
     messageResponseListener<ConnectResponse>(
       iframe,
       getMessageEvent(
@@ -63,11 +63,11 @@ describe("the messageResponseListener function", () => {
     expect(callbackFn).toBeCalled();
   });
 
-  it("should ignore events from unknown iframes", () => {
+  it('should ignore events from unknown iframes', () => {
     messageResponseListener<ConnectResponse>(
       iframe,
       getMessageEvent(
-        "http://anyotherorigin.com",
+        'http://anyotherorigin.com',
         ResponseEventType.CONNECT_WALLET_RESPONSE,
         {
           source: {} as unknown as WindowProxy,
@@ -80,7 +80,7 @@ describe("the messageResponseListener function", () => {
     expect(callbackFn).not.toBeCalled();
   });
 
-  it("should ignore events if the type does not match", () => {
+  it('should ignore events if the type does not match', () => {
     messageResponseListener<ConnectResponse>(
       iframe,
       getMessageEvent(
