@@ -29,7 +29,7 @@
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "dependencies": {
     "@imtbl/config": "*",
-    "@imtbl/core-sdk": "^1.0.2-alpha.2"
+    "@imtbl/core-sdk": "^1.0.2-alpha.5"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",

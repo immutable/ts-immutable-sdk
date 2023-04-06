@@ -32,7 +32,7 @@
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "dependencies": {
     "@imtbl/config": "*",
-    "@imtbl/core-sdk": "^1.0.2-alpha.2",
+    "@imtbl/core-sdk": "^1.0.2-alpha.5",
     "@imtbl/toolkit": "*",
     "@magic-ext/oidc": "^1.0.1",
     "@metamask/detect-provider": "^2.0.0",
