@@ -1,23 +1,27 @@
-import { EncodeAssetResponse, EncodingApi, EncodingApiEncodeAssetRequest } from "@imtbl/core-sdk";
-import { getEncodeAssetInfo } from "./getEncodeAssetInfo";
-import { testConfig } from "../../test/helpers";
+import {
+  EncodeAssetResponse,
+  EncodingApi,
+  EncodingApiEncodeAssetRequest,
+} from '@imtbl/core-sdk';
+import { getEncodeAssetInfo } from './getEncodeAssetInfo';
+import { testConfig } from '../../test/helpers';
 
-jest.mock('@imtbl/core-sdk')
+jest.mock('@imtbl/core-sdk');
 
-describe('getEncodeAssetInfo',()=>{
-  let encodeAssetMock:jest.Mock;
-  let encodeAssetResponse : EncodeAssetResponse;
+describe('getEncodeAssetInfo', () => {
+  let encodeAssetMock: jest.Mock;
+  let encodeAssetResponse: EncodeAssetResponse;
   const assetType = 'asset-type';
 
-  beforeEach(()=>{
+  beforeEach(() => {
     jest.restoreAllMocks();
     encodeAssetResponse = {
       asset_id: 'asset-id',
-      asset_type: assetType
+      asset_type: assetType,
     };
 
     encodeAssetMock = jest.fn().mockResolvedValue({
-      data: encodeAssetResponse
+      data: encodeAssetResponse,
     });
 
     (EncodingApi as jest.Mock).mockReturnValue({
@@ -27,18 +31,23 @@ describe('getEncodeAssetInfo',()=>{
 
   it('encode asset correctly', async () => {
     const tokenType = 'ERC20';
-    const tokenData = { token_address:"0x12as3" };
-    const response = await getEncodeAssetInfo(assetType, tokenType, testConfig.getStarkExConfig(), tokenData);
+    const tokenData = { token_address: '0x12as3' };
+    const response = await getEncodeAssetInfo(
+      assetType,
+      tokenType,
+      testConfig.getStarkExConfig(),
+      tokenData
+    );
 
     expect(response).toEqual(encodeAssetResponse);
     expect(encodeAssetMock).toHaveBeenCalledWith({
       assetType,
-      encodeAssetRequest:{
-        token:{
+      encodeAssetRequest: {
+        token: {
           type: tokenType,
-          data: tokenData
-        }
-      }
-    } as EncodingApiEncodeAssetRequest)
+          data: tokenData,
+        },
+      },
+    } as EncodingApiEncodeAssetRequest);
   });
-})
+});

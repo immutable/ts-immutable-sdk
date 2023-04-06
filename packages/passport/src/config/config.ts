@@ -2,8 +2,8 @@ import {
   EnvironmentConfiguration,
   Networks,
   OidcConfiguration,
-} from "../types";
-import { PassportError, PassportErrorType } from "../errors/passportError";
+} from '../types';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 
 export interface ImxApiConfiguration {
   basePath: string;
@@ -26,19 +26,19 @@ export interface PassportConfiguration {
 export const Config = {
   PRODUCTION: {
     network: Networks.PRODUCTION,
-    authenticationDomain: "https://auth.immutable.com",
-    magicPublishableApiKey: "pk_live_10F423798A540ED7",
-    magicProviderId: "fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=",
-    baseIMXApiPath: "https://api.x.immutable.com",
-    passportDomain: "https://passport.immutable.com",
+    authenticationDomain: 'https://auth.immutable.com',
+    magicPublishableApiKey: 'pk_live_10F423798A540ED7',
+    magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
+    baseIMXApiPath: 'https://api.x.immutable.com',
+    passportDomain: 'https://passport.immutable.com',
   } as EnvironmentConfiguration,
   SANDBOX: {
     network: Networks.SANDBOX,
-    authenticationDomain: "https://auth.immutable.com",
-    magicPublishableApiKey: "pk_live_10F423798A540ED7",
-    magicProviderId: "fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=",
-    baseIMXApiPath: "https://api.sandbox.x.immutable.com",
-    passportDomain: "https://passport.sandbox.immutable.com",
+    authenticationDomain: 'https://auth.immutable.com',
+    magicPublishableApiKey: 'pk_live_10F423798A540ED7',
+    magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
+    baseIMXApiPath: 'https://api.sandbox.x.immutable.com',
+    passportDomain: 'https://passport.sandbox.immutable.com',
   } as EnvironmentConfiguration,
 };
 
@@ -57,8 +57,8 @@ const validateConfiguration = <T>(
   const missingKeys = requiredKeys
     .map((key) => !configuration[key] && key)
     .filter((n) => n)
-    .join(", ");
-  if (missingKeys !== "") {
+    .join(', ');
+  if (missingKeys !== '') {
     throw new PassportError(
       `${configurationName} - ${missingKeys} cannot be null`,
       PassportErrorType.INVALID_CONFIGURATION
@@ -70,17 +70,17 @@ export const getPassportConfiguration = (
   environmentConfiguration: EnvironmentConfiguration,
   oidcConfiguration: OidcConfiguration
 ): PassportConfiguration => {
-  validateConfiguration("EnvironmentConfiguration", environmentConfiguration, [
-    "network",
-    "authenticationDomain",
-    "magicPublishableApiKey",
-    "magicProviderId",
-    "passportDomain",
+  validateConfiguration('EnvironmentConfiguration', environmentConfiguration, [
+    'network',
+    'authenticationDomain',
+    'magicPublishableApiKey',
+    'magicProviderId',
+    'passportDomain',
   ]);
-  validateConfiguration("OidcConfiguration", oidcConfiguration, [
-    "clientId",
-    "logoutRedirectUri",
-    "redirectUri",
+  validateConfiguration('OidcConfiguration', oidcConfiguration, [
+    'clientId',
+    'logoutRedirectUri',
+    'redirectUri',
   ]);
 
   return {

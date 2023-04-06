@@ -7,22 +7,22 @@ import { Web3Provider } from '@ethersproject/providers';
 import { checkIsWalletConnected, connectWalletProvider } from './connect';
 import { getNetworkInfo } from '../network';
 import { ConnectionProviders } from '../types';
-import { ChainId, WALLET_ACTION } from "../types";
+import { ChainId, WALLET_ACTION } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { ChainIdNetworkMap } from "../types";
+import { ChainIdNetworkMap } from '../types';
 
-let windowSpy:any;
+let windowSpy: any;
 
 describe('connect', () => {
   const providerRequestMock: jest.Mock = jest.fn();
   beforeEach(() => {
-    windowSpy = jest.spyOn(window, "window", "get");
+    windowSpy = jest.spyOn(window, 'window', 'get');
 
     windowSpy.mockImplementation(() => ({
       ethereum: {
-        request: providerRequestMock
+        request: providerRequestMock,
       },
-      removeEventListener: () => {}
+      removeEventListener: () => {},
     }));
   });
 
@@ -31,85 +31,122 @@ describe('connect', () => {
   });
 
   describe('checkIsWalletConnected', () => {
-
     it('should call request with eth_accounts method', async () => {
       providerRequestMock.mockResolvedValue([]);
       await checkIsWalletConnected(ConnectionProviders.METAMASK);
-      expect(providerRequestMock).toBeCalledWith({method: WALLET_ACTION.CHECK_CONNECTION, params: []});
-    })
+      expect(providerRequestMock).toBeCalledWith({
+        method: WALLET_ACTION.CHECK_CONNECTION,
+        params: [],
+      });
+    });
 
     it('should return isConnected as true when accounts array has an entry', async () => {
       // mock return array with active wallet address so we are connected
       providerRequestMock.mockResolvedValue(['0xmyWallet']);
-      const checkConnection = await checkIsWalletConnected(ConnectionProviders.METAMASK);
+      const checkConnection = await checkIsWalletConnected(
+        ConnectionProviders.METAMASK
+      );
       expect(checkConnection.isConnected).toBe(true);
-      expect(checkConnection.walletAddress).toBe("0xmyWallet");
-    })
+      expect(checkConnection.walletAddress).toBe('0xmyWallet');
+    });
 
     it('should return isConnected as false when no accounts returned', async () => {
       // mock return empty array of accounts so not connected
       providerRequestMock.mockResolvedValue([]);
-      const checkConnection = await checkIsWalletConnected(ConnectionProviders.METAMASK);
+      const checkConnection = await checkIsWalletConnected(
+        ConnectionProviders.METAMASK
+      );
       expect(checkConnection.isConnected).toBe(false);
-      expect(checkConnection.walletAddress).toBe("");
-    })
-  })
+      expect(checkConnection.walletAddress).toBe('');
+    });
+  });
 
   describe('connectWalletProvider', () => {
     it('should call the connect function with metamask and return a Web3Provider', async () => {
       const connRes = await connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK
+        providerPreference: ConnectionProviders.METAMASK,
       });
 
-      expect(connRes).toBeInstanceOf(Web3Provider)
+      expect(connRes).toBeInstanceOf(Web3Provider);
       expect(connRes?.provider).not.toBe(null);
-      expect(connRes?.provider.request).toBeCalledWith({method: WALLET_ACTION.CONNECT, params: []});
+      expect(connRes?.provider.request).toBeCalledWith({
+        method: WALLET_ACTION.CONNECT,
+        params: [],
+      });
     });
 
     it('should throw an error if connect is called with a preference that is not expected', async () => {
-      await expect(connectWalletProvider({
-        providerPreference: 'trust-wallet' as ConnectionProviders
-      })).rejects.toThrow(new CheckoutError('Provider preference was not detected', CheckoutErrorType.CONNECT_PROVIDER_ERROR));
+      await expect(
+        connectWalletProvider({
+          providerPreference: 'trust-wallet' as ConnectionProviders,
+        })
+      ).rejects.toThrow(
+        new CheckoutError(
+          'Provider preference was not detected',
+          CheckoutErrorType.CONNECT_PROVIDER_ERROR
+        )
+      );
     });
 
     it('should throw an error if metamask provider is not found', async () => {
       windowSpy.mockImplementation(() => ({
-        removeEventListener: () => {}
+        removeEventListener: () => {},
       }));
 
-      await expect(connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK
-      })).rejects.toThrow(new CheckoutError('window.addEventListener is not a function', CheckoutErrorType.METAMASK_PROVIDER_ERROR));
+      await expect(
+        connectWalletProvider({
+          providerPreference: ConnectionProviders.METAMASK,
+        })
+      ).rejects.toThrow(
+        new CheckoutError(
+          'window.addEventListener is not a function',
+          CheckoutErrorType.METAMASK_PROVIDER_ERROR
+        )
+      );
     });
 
     it('should throw an error if provider.request is not found', async () => {
       windowSpy.mockImplementation(() => ({
-        ethereum: {
-        },
-        removeEventListener: () => {}
+        ethereum: {},
+        removeEventListener: () => {},
       }));
 
-      await expect(connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK
-      })).rejects.toThrow(new CheckoutError('No MetaMask provider installed.', CheckoutErrorType.METAMASK_PROVIDER_ERROR));
+      await expect(
+        connectWalletProvider({
+          providerPreference: ConnectionProviders.METAMASK,
+        })
+      ).rejects.toThrow(
+        new CheckoutError(
+          'No MetaMask provider installed.',
+          CheckoutErrorType.METAMASK_PROVIDER_ERROR
+        )
+      );
     });
 
     it('should throw an error if the user rejects the connection request', async () => {
       windowSpy.mockImplementation(() => ({
         ethereum: {
-          request: jest.fn().mockRejectedValue(new Error("User rejected request"))
+          request: jest
+            .fn()
+            .mockRejectedValue(new Error('User rejected request')),
         },
-        removeEventListener: () => {}
+        removeEventListener: () => {},
       }));
 
-      await expect(connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK
-      })).rejects.toThrow(new CheckoutError('User rejected request', CheckoutErrorType.USER_REJECTED_REQUEST_ERROR));
-    })
-  })
+      await expect(
+        connectWalletProvider({
+          providerPreference: ConnectionProviders.METAMASK,
+        })
+      ).rejects.toThrow(
+        new CheckoutError(
+          'User rejected request',
+          CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
+        )
+      );
+    });
+  });
 
   describe('getNetworkInfo', () => {
-
     const getNetworkTestCases = [
       {
         chainId: 1 as ChainId,
@@ -123,7 +160,7 @@ describe('connect', () => {
         chainId: 137 as ChainId,
         chainName: 'matic',
       },
-    ]
+    ];
     getNetworkTestCases.forEach((testCase) => {
       it(`should return the network info for the ${testCase.chainName} network`, async () => {
         const getNetworkMock = jest.fn().mockResolvedValue({
@@ -131,14 +168,20 @@ describe('connect', () => {
           name: testCase.chainName,
         });
         const mockProvider = {
-          getNetwork: getNetworkMock
-        }
-        const result = await getNetworkInfo(mockProvider as unknown as Web3Provider);
+          getNetwork: getNetworkMock,
+        };
+        const result = await getNetworkInfo(
+          mockProvider as unknown as Web3Provider
+        );
         expect(result.name).toBe(ChainIdNetworkMap[testCase.chainId].chainName);
-        expect(result.chainId).toBe(parseInt(ChainIdNetworkMap[testCase.chainId].chainIdHex, 16));
-        expect(result.nativeCurrency).toEqual(ChainIdNetworkMap[testCase.chainId].nativeCurrency)
+        expect(result.chainId).toBe(
+          parseInt(ChainIdNetworkMap[testCase.chainId].chainIdHex, 16)
+        );
+        expect(result.nativeCurrency).toEqual(
+          ChainIdNetworkMap[testCase.chainId].nativeCurrency
+        );
       });
-    })
+    });
 
     it('should return empty object for an unsupported network', async () => {
       const getNetworkMock = jest.fn().mockResolvedValue({
@@ -146,10 +189,12 @@ describe('connect', () => {
         name: 'ropsten',
       });
       const mockProvider = {
-        getNetwork: getNetworkMock
-      }
-      const result = await getNetworkInfo(mockProvider as unknown as Web3Provider);
+        getNetwork: getNetworkMock,
+      };
+      const result = await getNetworkInfo(
+        mockProvider as unknown as Web3Provider
+      );
       expect(result).toEqual({});
     });
-  })
-})
+  });
+});

@@ -21,11 +21,12 @@ import {
 } from './types';
 
 export class Checkout {
-
-  public async checkIsWalletConnected(params: CheckConnectionParams): Promise<CheckConnectionResult> {
+  public async checkIsWalletConnected(
+    params: CheckConnectionParams
+  ): Promise<CheckConnectionResult> {
     return connect.checkIsWalletConnected(params.providerPreference);
   }
-  
+
   public async connect(params: ConnectParams): Promise<ConnectResult> {
     const provider = await connect.connectWalletProvider(params);
     const network = await getNetworkInfo(provider);
@@ -53,7 +54,9 @@ export class Checkout {
     );
   }
 
-  public async getAllBalances(params: GetAllBalancesParams): Promise<GetAllBalancesResult> {
+  public async getAllBalances(
+    params: GetAllBalancesParams
+  ): Promise<GetAllBalancesResult> {
     return balances.getAllBalances(
       params.provider,
       params.walletAddress,
@@ -61,7 +64,9 @@ export class Checkout {
     );
   }
 
-  public getTokenAllowList(params: GetTokenAllowListParams): GetTokenAllowListResult {
+  public getTokenAllowList(
+    params: GetTokenAllowListParams
+  ): GetTokenAllowListResult {
     return tokens.getTokenAllowList(params.chainId);
   }
 

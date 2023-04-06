@@ -1,36 +1,36 @@
-import { generateSigners, privateKey1, testConfig } from "../test/helpers";
-import { UnsignedExchangeTransferRequest, ExchangesApi } from "@imtbl/core-sdk";
-import { exchangeTransfer } from "./exchanges";
-import { signRaw } from "@imtbl/toolkit";
+import { generateSigners, privateKey1, testConfig } from '../test/helpers';
+import { UnsignedExchangeTransferRequest, ExchangesApi } from '@imtbl/core-sdk';
+import { exchangeTransfer } from './exchanges';
+import { signRaw } from '@imtbl/toolkit';
 
-jest.mock("@imtbl/core-sdk");
-jest.mock("@imtbl/toolkit");
+jest.mock('@imtbl/core-sdk');
+jest.mock('@imtbl/toolkit');
 
-describe("ExchangeTransfer", () => {
-  describe("exchangeTransfer()", () => {
+describe('ExchangeTransfer', () => {
+  describe('exchangeTransfer()', () => {
     let getSignableExchangeTransferMock: jest.Mock;
     let createExchangeTransferMock: jest.Mock;
 
-    const receiver = "abc123";
+    const receiver = 'abc123';
 
     const signableExchangeTransferRequest: UnsignedExchangeTransferRequest = {
-      type: "ETH",
-      amount: "1000000000000000000",
-      transactionID: "abc123",
+      type: 'ETH',
+      amount: '1000000000000000000',
+      transactionID: 'abc123',
       receiver,
     };
 
     const getSignableExchangeTransferResponse = {
-      sender_stark_key: "1111",
-      sender_vault_id: "2222",
-      receiver_stark_key: "aaaa",
-      receiver_vault_id: "bbbb",
-      asset_id: "112233",
-      amount: "1",
+      sender_stark_key: '1111',
+      sender_vault_id: '2222',
+      receiver_stark_key: 'aaaa',
+      receiver_vault_id: 'bbbb',
+      asset_id: '112233',
+      amount: '1',
       nonce: 0,
       expiration_timestamp: 0,
-      signable_message: "signable-message",
-      payload_hash: "payload-hash",
+      signable_message: 'signable-message',
+      payload_hash: 'payload-hash',
     };
 
     const createExchangeTransferResponse = {};
@@ -48,10 +48,10 @@ describe("ExchangeTransfer", () => {
         createExchangeTransfer: createExchangeTransferMock,
       });
 
-      (signRaw as jest.Mock).mockReturnValue("raw-eth-signature");
+      (signRaw as jest.Mock).mockReturnValue('raw-eth-signature');
     });
 
-    test("should make the correct api requests with the correct params, and return the correct receipt", async () => {
+    test('should make the correct api requests with the correct params, and return the correct receipt', async () => {
       const signers = await generateSigners(privateKey1);
 
       const response = await exchangeTransfer({
@@ -60,16 +60,16 @@ describe("ExchangeTransfer", () => {
         config: testConfig,
       });
       expect(getSignableExchangeTransferMock).toHaveBeenCalledWith({
-        id: "abc123",
+        id: 'abc123',
         getSignableTransferRequest: {
           sender: await signers.ethSigner.getAddress(),
           token: {
             data: {
               decimals: 18,
             },
-            type: "ETH",
+            type: 'ETH',
           },
-          amount: "1000000000000000000",
+          amount: '1000000000000000000',
           receiver: receiver,
         },
       });
@@ -88,11 +88,11 @@ describe("ExchangeTransfer", () => {
           expiration_timestamp:
             getSignableExchangeTransferResponse.expiration_timestamp,
           stark_signature:
-            "payload-hashSTXd90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36",
+            'payload-hashSTXd90915fa5bce418a23184c9asdfasfasdf5c8e900e3035cf34e2dd36',
         },
-        id: "abc123",
+        id: 'abc123',
         xImxEthAddress: await signers.ethSigner.getAddress(),
-        xImxEthSignature: "raw-eth-signature",
+        xImxEthSignature: 'raw-eth-signature',
       });
       expect(response).toEqual(createExchangeTransferResponse);
     });

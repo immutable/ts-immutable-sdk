@@ -1,4 +1,4 @@
-import { TransactionResponse, Web3Provider } from "@ethersproject/providers";
+import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
 
 export interface SendTransactionParams {
   provider: Web3Provider;

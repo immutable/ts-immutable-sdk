@@ -4,7 +4,7 @@ import {
   PassportEventType,
   ReceiveMessage,
   SendMessage,
-  Transaction
+  Transaction,
 } from './types';
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
@@ -21,30 +21,39 @@ export default class ConfirmationScreen {
     this.config = config;
   }
 
-  private postMessage(destinationWindow: Window, accessToken: string, message: DisplayConfirmationParams) {
-    destinationWindow.postMessage({
-      eventType: PassportEventType,
-      accessToken,
-      ...message,
-    }, this.config.passportDomain);
+  private postMessage(
+    destinationWindow: Window,
+    accessToken: string,
+    message: DisplayConfirmationParams
+  ) {
+    destinationWindow.postMessage(
+      {
+        eventType: PassportEventType,
+        accessToken,
+        ...message,
+      },
+      this.config.passportDomain
+    );
   }
 
-  startTransaction(accessToken: string, transaction: Transaction): Promise<ConfirmationResult> {
+  startTransaction(
+    accessToken: string,
+    transaction: Transaction
+  ): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
-        if (origin != this.config.passportDomain || data.eventType != PassportEventType) {
+        if (
+          origin != this.config.passportDomain ||
+          data.eventType != PassportEventType
+        ) {
           return;
         }
         switch (data.messageType as ReceiveMessage) {
           case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
-            this.postMessage(
-              confirmationWindow,
-              accessToken,
-              {
-                messageType: SendMessage.TRANSACTION_START,
-                messageData: transaction,
-              },
-            );
+            this.postMessage(confirmationWindow, accessToken, {
+              messageType: SendMessage.TRANSACTION_START,
+              messageData: transaction,
+            });
             break;
           }
           case ReceiveMessage.TRANSACTION_CONFIRMED: {

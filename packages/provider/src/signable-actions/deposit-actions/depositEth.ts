@@ -5,18 +5,18 @@ import {
   ETHAmount,
   ImmutableXConfiguration,
   UsersApi,
-} from "@imtbl/core-sdk";
-import { Configuration } from "@imtbl/config";
-import { parseUnits } from "@ethersproject/units";
+} from '@imtbl/core-sdk';
+import { Configuration } from '@imtbl/config';
+import { parseUnits } from '@ethersproject/units';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
-} from "../registration";
-import { BigNumber } from "@ethersproject/bignumber";
-import { TransactionResponse } from "@ethersproject/providers";
-import { validateChain } from "../helpers";
-import { EthSigner } from "types";
-import { Signers } from "../types";
+} from '../registration';
+import { BigNumber } from '@ethersproject/bignumber';
+import { TransactionResponse } from '@ethersproject/providers';
+import { validateChain } from '../helpers';
+import { EthSigner } from 'types';
+import { Signers } from '../types';
 
 interface ETHTokenData {
   decimals: number;
@@ -39,7 +39,7 @@ export async function depositEth({
   const data: ETHTokenData = {
     decimals: 18,
   };
-  const amount = parseUnits(deposit.amount, "wei");
+  const amount = parseUnits(deposit.amount, 'wei');
   const starkExConfig = config.getStarkExConfig();
   const depositsApi = new DepositsApi(starkExConfig.apiConfiguration);
   const encodingApi = new EncodingApi(starkExConfig.apiConfiguration);
@@ -59,7 +59,7 @@ export async function depositEth({
   });
 
   const encodingResult = await encodingApi.encodeAsset({
-    assetType: "asset",
+    assetType: 'asset',
     encodeAssetRequest: {
       token: {
         type: deposit.type,
@@ -146,7 +146,7 @@ async function executeDepositEth(
   );
 
   const populatedTransaction = await coreContract.populateTransaction[
-    "deposit(uint256,uint256,uint256)"
+    'deposit(uint256,uint256,uint256)'
   ](starkPublicKey, assetType, vaultId);
 
   return ethSigner.sendTransaction({ ...populatedTransaction, value: amount });

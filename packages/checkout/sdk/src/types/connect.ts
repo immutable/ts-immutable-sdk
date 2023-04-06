@@ -1,13 +1,13 @@
-import { Web3Provider } from "@ethersproject/providers";
-import { NetworkInfo } from "../types";
+import { Web3Provider } from '@ethersproject/providers';
+import { NetworkInfo } from '../types';
 
 export enum ConnectionProviders {
-  METAMASK = "metamask"
+  METAMASK = 'metamask',
 }
 
 export type ConnectParams = {
   providerPreference: ConnectionProviders;
-}
+};
 
 export interface ConnectResult {
   provider: Web3Provider;

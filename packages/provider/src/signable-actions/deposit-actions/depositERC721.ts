@@ -5,16 +5,16 @@ import {
   ERC721Token,
   ImmutableXConfiguration,
   UsersApi,
-} from "@imtbl/core-sdk";
-import { TransactionResponse } from "@ethersproject/providers";
+} from '@imtbl/core-sdk';
+import { TransactionResponse } from '@ethersproject/providers';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
-} from "../registration";
-import { Configuration } from "@imtbl/config";
-import { validateChain } from "../helpers";
-import { EthSigner } from "types";
-import { Signers } from "../types";
+} from '../registration';
+import { Configuration } from '@imtbl/config';
+import { validateChain } from '../helpers';
+import { EthSigner } from 'types';
+import { Signers } from '../types';
 
 interface ERC721TokenData {
   token_id: string;
@@ -45,7 +45,7 @@ export async function depositERC721({
     token_id: deposit.tokenId,
   };
 
-  const amount = "1";
+  const amount = '1';
 
   const getSignableDepositRequest = {
     user,
@@ -62,7 +62,7 @@ export async function depositERC721({
 
   // Perform encoding on asset details to get an assetType (required for stark contract request)
   const encodingResult = await encodingApi.encodeAsset({
-    assetType: "asset",
+    assetType: 'asset',
     encodeAssetRequest: {
       token: {
         type: deposit.type,

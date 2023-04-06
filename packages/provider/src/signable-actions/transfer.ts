@@ -3,12 +3,12 @@ import {
   CreateTransferResponseV1,
   NftTransferDetails,
   UnsignedTransferRequest,
-} from "types";
-import { Signers } from "./types";
-import { signRaw, convertToSignableToken } from "@imtbl/toolkit";
-import { Configuration } from "@imtbl/config";
-import { TransfersApi } from "@imtbl/core-sdk";
-import { validateChain } from "./helpers";
+} from 'types';
+import { Signers } from './types';
+import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
+import { Configuration } from '@imtbl/config';
+import { TransfersApi } from '@imtbl/core-sdk';
+import { validateChain } from './helpers';
 
 type TransfersWorkflowParams = {
   signers: Signers;
@@ -34,7 +34,7 @@ export async function transfer({
     config.getStarkExConfig().apiConfiguration
   );
 
-  const transferAmount = request.type === "ERC721" ? "1" : request.amount;
+  const transferAmount = request.type === 'ERC721' ? '1' : request.amount;
   const signableResult = await transfersApi.getSignableTransferV1({
     getSignableTransferRequest: {
       sender: ethAddress,
@@ -92,9 +92,9 @@ export async function batchTransfer({
 
   const signableRequests = request.map((nftTransfer) => {
     return {
-      amount: "1",
+      amount: '1',
       token: convertToSignableToken({
-        type: "ERC721",
+        type: 'ERC721',
         tokenId: nftTransfer.tokenId,
         tokenAddress: nftTransfer.tokenAddress,
       }),
@@ -112,7 +112,7 @@ export async function batchTransfer({
   const signableMessage = signableResult.data.signable_message;
 
   if (signableMessage === undefined) {
-    throw new Error("Invalid response from Signable registration offchain");
+    throw new Error('Invalid response from Signable registration offchain');
   }
 
   const ethSignature = await signRaw(signableMessage, ethSigner);

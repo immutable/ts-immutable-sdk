@@ -75,16 +75,16 @@ describe(' Connect', () => {
     await checkout.sendTransaction({
       provider: {} as Web3Provider,
       transaction: {
-        nonce: "",
-        gasPrice: "",
-        gas: "",
-        to: "",
-        from: "",
-        value: "",
-        data: "",
-        chainId: 1
-      }
-    })
+        nonce: '',
+        gasPrice: '',
+        gas: '',
+        to: '',
+        from: '',
+        value: '',
+        data: '',
+        chainId: 1,
+      },
+    });
 
     expect(sendTransaction).toBeCalledTimes(1);
   });

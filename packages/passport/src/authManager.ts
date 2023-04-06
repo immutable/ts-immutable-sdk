@@ -1,8 +1,8 @@
-import { User as OidcUser, UserManager } from "oidc-client-ts";
-import { PassportErrorType, withPassportError } from "./errors/passportError";
-import { PassportMetadata, User, UserWithEtherKey } from "./types";
-import { retryWithDelay } from "./util/retry";
-import { PassportConfiguration } from "./config";
+import { User as OidcUser, UserManager } from 'oidc-client-ts';
+import { PassportErrorType, withPassportError } from './errors/passportError';
+import { PassportMetadata, User, UserWithEtherKey } from './types';
+import { retryWithDelay } from './util/retry';
+import { PassportConfiguration } from './config';
 
 const getAuthConfiguration = ({
   oidcConfiguration,
@@ -40,7 +40,7 @@ export default class AuthManager {
         email: oidcUser.profile.email,
         nickname: oidcUser.profile.nickname,
       },
-      etherKey: passport?.ether_key || "",
+      etherKey: passport?.ether_key || '',
     };
   };
 
@@ -62,7 +62,7 @@ export default class AuthManager {
     return withPassportError<User>(async () => {
       const oidcUser = await this.userManager.getUser();
       if (!oidcUser) {
-        throw new Error("Failed to retrieve user");
+        throw new Error('Failed to retrieve user');
       }
       return this.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.NOT_LOGGED_IN_ERROR);
@@ -80,7 +80,7 @@ export default class AuthManager {
         if (metadataExists) {
           return user;
         }
-        return Promise.reject("user wallet addresses not exist");
+        return Promise.reject('user wallet addresses not exist');
       });
       if (!updatedUser) {
         return null;

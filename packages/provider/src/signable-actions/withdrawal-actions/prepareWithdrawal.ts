@@ -2,15 +2,15 @@ import {
   WithdrawalsApi,
   CreateWithdrawalResponse,
   ImmutableXConfiguration,
-} from "@imtbl/core-sdk";
-import { TokenAmount } from "types";
-import { signMessage, convertToSignableToken } from "@imtbl/toolkit";
-import { Signers } from "../types";
-import { validateChain } from "../helpers";
+} from '@imtbl/core-sdk';
+import { TokenAmount } from 'types';
+import { signMessage, convertToSignableToken } from '@imtbl/toolkit';
+import { Signers } from '../types';
+import { validateChain } from '../helpers';
 
 const assertIsDefined = <T>(value?: T): T => {
   if (value !== undefined) return value;
-  throw new Error("undefined field exception");
+  throw new Error('undefined field exception');
 };
 
 export type PrepareWithdrawalWorkflowParams = TokenAmount & {
@@ -28,7 +28,7 @@ export async function prepareWithdrawalAction(
   } = params;
   await validateChain(ethSigner, params.config);
   const withdrawalsApi = new WithdrawalsApi(config.apiConfiguration);
-  const withdrawalAmount = type === "ERC721" ? "1" : params.amount;
+  const withdrawalAmount = type === 'ERC721' ? '1' : params.amount;
   const signableWithdrawalResult = await withdrawalsApi.getSignableWithdrawal({
     getSignableWithdrawalRequest: {
       user: await ethSigner.getAddress(),

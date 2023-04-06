@@ -1,6 +1,6 @@
 export enum ProviderErrorType {
   PROVIDER_CONNECTION_ERROR = 'PROVIDER_CONNECTION_ERROR',
-  WALLET_CONNECTION_ERROR = 'WALLET_CONNECTION_ERROR'
+  WALLET_CONNECTION_ERROR = 'WALLET_CONNECTION_ERROR',
 }
 
 type ErrorType = {
@@ -24,9 +24,7 @@ export const withProviderError = async <T>(
     return await fn();
   } catch (error) {
     const errorMessage =
-      customError.message ||
-      `${(error as Error).message}` ||
-      'UnknownError';
+      customError.message || `${(error as Error).message}` || 'UnknownError';
     throw new ProviderError(errorMessage, customError.type);
   }
-}
+};

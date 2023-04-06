@@ -6,7 +6,7 @@ export enum CheckoutErrorType {
   CHAIN_NOT_SUPPORTED_ERROR = 'CHAIN_NOT_SUPPORTED_ERROR',
   PROVIDER_REQUEST_MISSING_ERROR = 'PROVIDER_REQUEST_MISSING_ERROR',
   USER_REJECTED_REQUEST_ERROR = 'USER_REJECTED_REQUEST_ERROR',
-  TRANSACTION_ERROR = 'TRANSACTION_ERROR'
+  TRANSACTION_ERROR = 'TRANSACTION_ERROR',
 }
 
 type ErrorType = {
@@ -25,14 +25,12 @@ export class CheckoutError extends Error {
 export const withCheckoutError = async <T>(
   fn: () => Promise<T>,
   customError: ErrorType
- ): Promise<T> => {
+): Promise<T> => {
   try {
     return await fn();
   } catch (error) {
     const errorMessage =
-      customError.message ||
-      `${(error as Error).message}` ||
-      'UnknownError';
+      customError.message || `${(error as Error).message}` || 'UnknownError';
     throw new CheckoutError(errorMessage, customError.type);
   }
-}
+};

@@ -4,28 +4,26 @@ import { useContext } from 'react';
 import { MetaMaskIMXProvider } from 'ts-immutable-sdk';
 
 export const DisconnectButton = () => {
-    const { state, dispatch } = useContext(AppCtx);
+  const { state, dispatch } = useContext(AppCtx);
 
-    const disconnect = async () => {
-        await MetaMaskIMXProvider.disconnect();
+  const disconnect = async () => {
+    await MetaMaskIMXProvider.disconnect();
 
-        dispatch({
-            payload: {
-               type: Actions.MetaMaskIMXProviderDisconnected,
-            },
-        });
-     }
-    
-    return(
-        <>
-            {state.address &&
-                <Box sx={{ padding: 'base.spacing.x5' }}>
-                    <Heading size='medium'>Disconnect</Heading>
-                    <Button onClick={() => disconnect()}>
-                        Disconnect
-                    </Button>
-                </Box>
-            }
-        </>
-    )
-}
+    dispatch({
+      payload: {
+        type: Actions.MetaMaskIMXProviderDisconnected,
+      },
+    });
+  };
+
+  return (
+    <>
+      {state.address && (
+        <Box sx={{ padding: 'base.spacing.x5' }}>
+          <Heading size="medium">Disconnect</Heading>
+          <Button onClick={() => disconnect()}>Disconnect</Button>
+        </Box>
+      )}
+    </>
+  );
+};

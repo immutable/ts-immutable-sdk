@@ -108,7 +108,7 @@ export class GenericIMXProvider implements IMXProvider {
     return deposit({
       signers: this.signers,
       deposit: tokenAmount,
-      config: this.config
+      config: this.config,
     });
   }
 

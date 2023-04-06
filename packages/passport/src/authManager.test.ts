@@ -1,38 +1,38 @@
-import { User as OidcUser, UserManager } from "oidc-client-ts";
-import AuthManager from "./authManager";
-import { PassportError, PassportErrorType } from "./errors/passportError";
-import { User } from "./types";
-import { PassportConfiguration } from "./config";
-import { MAX_RETRIES } from "./util/retry";
+import { User as OidcUser, UserManager } from 'oidc-client-ts';
+import AuthManager from './authManager';
+import { PassportError, PassportErrorType } from './errors/passportError';
+import { User } from './types';
+import { PassportConfiguration } from './config';
+import { MAX_RETRIES } from './util/retry';
 
-jest.mock("oidc-client-ts");
+jest.mock('oidc-client-ts');
 
 const config: PassportConfiguration = {
   oidcConfiguration: {
-    clientId: "11111",
-    redirectUri: "https://test.com",
-    authenticationDomain: "https://auth.dev.immutable.com",
+    clientId: '11111',
+    redirectUri: 'https://test.com',
+    authenticationDomain: 'https://auth.dev.immutable.com',
   },
 } as PassportConfiguration;
 
 const passportData = {
   passport: {
-    ether_key: "0x232",
-    stark_key: "0x567",
-    user_admin_key: "0x123",
+    ether_key: '0x232',
+    stark_key: '0x567',
+    user_admin_key: '0x123',
   },
 };
 const mockOidcUser: OidcUser = {
-  id_token: "id123",
-  access_token: "access123",
-  refresh_token: "refresh123",
-  token_type: "Bearer",
-  scope: "openid",
+  id_token: 'id123',
+  access_token: 'access123',
+  refresh_token: 'refresh123',
+  token_type: 'Bearer',
+  scope: 'openid',
   expires_in: 167222,
   profile: {
-    sub: "email|123",
-    email: "test@immutable.com",
-    nickname: "test",
+    sub: 'email|123',
+    email: 'test@immutable.com',
+    nickname: 'test',
   },
 } as OidcUser;
 
@@ -41,18 +41,18 @@ const mockOidcUserWithPassportInfo: OidcUser = {
   profile: { ...mockOidcUser.profile, ...passportData },
 } as never;
 const mockUser: User = {
-  idToken: "id123",
-  accessToken: "access123",
-  refreshToken: "refresh123",
+  idToken: 'id123',
+  accessToken: 'access123',
+  refreshToken: 'refresh123',
   profile: {
-    sub: "email|123",
-    email: "test@immutable.com",
-    nickname: "test",
+    sub: 'email|123',
+    email: 'test@immutable.com',
+    nickname: 'test',
   },
-  etherKey: "",
+  etherKey: '',
 };
 
-describe("AuthManager", () => {
+describe('AuthManager', () => {
   afterEach(jest.resetAllMocks);
 
   let authManager: AuthManager;
@@ -75,8 +75,8 @@ describe("AuthManager", () => {
     authManager = new AuthManager(config);
   });
 
-  describe("constructor", () => {
-    it("should initial AuthManager the default configuration", () => {
+  describe('constructor', () => {
+    it('should initial AuthManager the default configuration', () => {
       new AuthManager(config);
       expect(UserManager).toBeCalledWith({
         authority: config.oidcConfiguration.authenticationDomain,
@@ -94,8 +94,8 @@ describe("AuthManager", () => {
     });
   });
 
-  describe("login", () => {
-    it("should get the login user and return the domain model", async () => {
+  describe('login', () => {
+    it('should get the login user and return the domain model', async () => {
       signInMock.mockResolvedValue(mockOidcUser);
 
       const result = await authManager.login();
@@ -103,7 +103,7 @@ describe("AuthManager", () => {
       expect(result).toEqual(mockUser);
     });
 
-    it("should get the login user and return the user with ether key info", async () => {
+    it('should get the login user and return the user with ether key info', async () => {
       signInMock.mockResolvedValue(mockOidcUserWithPassportInfo);
 
       const result = await authManager.login();
@@ -114,28 +114,28 @@ describe("AuthManager", () => {
       });
     });
 
-    it("should throw the error if user is failed to login", async () => {
-      signInMock.mockRejectedValue(new Error("NONO"));
+    it('should throw the error if user is failed to login', async () => {
+      signInMock.mockRejectedValue(new Error('NONO'));
 
       await expect(() => authManager.login()).rejects.toThrow(
         new PassportError(
-          "AUTHENTICATION_ERROR: NONO",
+          'AUTHENTICATION_ERROR: NONO',
           PassportErrorType.AUTHENTICATION_ERROR
         )
       );
     });
   });
 
-  describe("loginCallback", () => {
-    it("should call login callback", async () => {
+  describe('loginCallback', () => {
+    it('should call login callback', async () => {
       await authManager.loginCallback();
 
       expect(signinPopupCallbackMock).toBeCalled();
     });
   });
 
-  describe("getUser", () => {
-    it("should retrieve the user from the userManager and return the domain model", async () => {
+  describe('getUser', () => {
+    it('should retrieve the user from the userManager and return the domain model', async () => {
       getUserMock.mockReturnValue(mockOidcUser);
 
       const result = await authManager.getUser();
@@ -143,19 +143,19 @@ describe("AuthManager", () => {
       expect(result).toEqual(mockUser);
     });
 
-    it("should throw an error if no user is returned", async () => {
+    it('should throw an error if no user is returned', async () => {
       getUserMock.mockReturnValue(null);
 
       await expect(() => authManager.getUser()).rejects.toThrow(
         new PassportError(
-          "NOT_LOGGED_IN_ERROR: Failed to retrieve user",
+          'NOT_LOGGED_IN_ERROR: Failed to retrieve user',
           PassportErrorType.NOT_LOGGED_IN_ERROR
         )
       );
     });
   });
-  describe("requestRefreshTokenAfterRegistration", () => {
-    it("requestRefreshTokenAfterRegistration successful with user wallet address in metadata", async () => {
+  describe('requestRefreshTokenAfterRegistration', () => {
+    it('requestRefreshTokenAfterRegistration successful with user wallet address in metadata', async () => {
       const expected = {
         ...mockUser,
         etherKey: passportData.passport.ether_key,
@@ -168,34 +168,34 @@ describe("AuthManager", () => {
       expect(signinSilentMock).toHaveBeenCalledTimes(1);
     });
 
-    it("requestRefreshTokenAfterRegistration failed without user wallet address in metadata with retries", async () => {
+    it('requestRefreshTokenAfterRegistration failed without user wallet address in metadata with retries', async () => {
       const response = {
-        id_token: "id123",
-        access_token: "access123",
-        refresh_token: "refresh123",
-        token_type: "Bearer",
-        scope: "openid",
+        id_token: 'id123',
+        access_token: 'access123',
+        refresh_token: 'refresh123',
+        token_type: 'Bearer',
+        scope: 'openid',
         expires_in: 167222,
         profile: {
-          sub: "email|123",
-          email: "test@immutable.com",
-          nickname: "test",
+          sub: 'email|123',
+          email: 'test@immutable.com',
+          nickname: 'test',
         },
       };
       signinSilentMock.mockResolvedValue(response);
 
       await expect(
         authManager.requestRefreshTokenAfterRegistration()
-      ).rejects.toThrow("REFRESH_TOKEN_ERROR");
+      ).rejects.toThrow('REFRESH_TOKEN_ERROR');
 
       expect(signinSilentMock).toHaveBeenCalledTimes(MAX_RETRIES + 1);
     }, 15000);
 
-    it("requestRefreshTokenAfterRegistration failed with fetching user info error in metadata with retries", async () => {
+    it('requestRefreshTokenAfterRegistration failed with fetching user info error in metadata with retries', async () => {
       signinSilentMock.mockResolvedValue(null);
       await expect(
         authManager.requestRefreshTokenAfterRegistration()
-      ).rejects.toThrow("REFRESH_TOKEN_ERROR");
+      ).rejects.toThrow('REFRESH_TOKEN_ERROR');
 
       expect(signinSilentMock).toHaveBeenCalledTimes(MAX_RETRIES + 1);
     }, 15000);

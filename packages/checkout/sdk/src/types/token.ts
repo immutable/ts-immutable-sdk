@@ -1,4 +1,4 @@
-import { ChainId } from "./network";
+import { ChainId } from './network';
 
 export interface TokenInfo {
   name: string;
@@ -8,7 +8,7 @@ export interface TokenInfo {
   icon?: string;
 }
 
-export interface GetTokenAllowListParams{
+export interface GetTokenAllowListParams {
   chainId: ChainId;
 }
 
