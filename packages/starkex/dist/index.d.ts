@@ -1,0 +1,20 @@
+import { Configuration } from "@imtbl/config";
+declare const StarkExAPIFactory: (config: Configuration) => {
+    depositsApi: import("@imtbl/core-sdk").DepositsApi;
+    mintsApi: import("@imtbl/core-sdk").MintsApi;
+    ordersApi: import("@imtbl/core-sdk").OrdersApi;
+    tokensApi: import("@imtbl/core-sdk").TokensApi;
+    tradesApi: import("@imtbl/core-sdk").TradesApi;
+    transfersApi: import("@imtbl/core-sdk").TransfersApi;
+    exchangeApi: import("@imtbl/core-sdk").ExchangesApi;
+    nftCheckoutPrimaryApi: import("@imtbl/core-sdk").NftCheckoutPrimaryApi;
+    usersApi: import("@imtbl/core-sdk").UsersApi;
+    withdrawalsApi: import("@imtbl/core-sdk").WithdrawalsApi;
+    balanceApi: import("@imtbl/core-sdk").BalancesApi;
+    assetApi: import("@imtbl/core-sdk").AssetsApi;
+    collectionApi: import("@imtbl/core-sdk").CollectionsApi;
+    metadataApi: import("@imtbl/core-sdk").MetadataApi;
+    metadataRefreshesApi: import("@imtbl/core-sdk").MetadataRefreshesApi;
+    projectsApi: import("@imtbl/core-sdk").ProjectsApi;
+};
+export { StarkExAPIFactory };

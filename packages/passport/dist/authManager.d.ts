@@ -1,0 +1,12 @@
+import { User, UserWithEtherKey } from './types';
+import { PassportConfiguration } from './config';
+export default class AuthManager {
+    private userManager;
+    private config;
+    constructor(config: PassportConfiguration);
+    private mapOidcUserToDomainModel;
+    login(): Promise<User>;
+    loginCallback(): Promise<void>;
+    getUser(): Promise<User>;
+    requestRefreshTokenAfterRegistration(): Promise<UserWithEtherKey | null>;
+}
