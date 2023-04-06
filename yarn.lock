@@ -2233,7 +2233,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/config@workspace:packages/config"
   dependencies:
-    "@imtbl/core-sdk": ^1.0.2-alpha.2
+    "@imtbl/core-sdk": ^1.0.2-alpha.5
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
@@ -2260,7 +2260,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/core-sdk@npm:^1.0.2-alpha.2":
+"@imtbl/core-sdk@npm:^1.0.2-alpha.5":
   version: 1.0.2-alpha.5
   resolution: "@imtbl/core-sdk@npm:1.0.2-alpha.5"
   dependencies:
@@ -2283,7 +2283,7 @@ __metadata:
   resolution: "@imtbl/passport@workspace:packages/passport"
   dependencies:
     "@imtbl/config": "*"
-    "@imtbl/core-sdk": ^1.0.2-alpha.2
+    "@imtbl/core-sdk": ^1.0.2-alpha.5
     "@imtbl/provider": "*"
     "@imtbl/toolkit": "*"
     "@magic-ext/oidc": ^1.0.1
@@ -2317,7 +2317,7 @@ __metadata:
   resolution: "@imtbl/provider@workspace:packages/provider"
   dependencies:
     "@imtbl/config": "*"
-    "@imtbl/core-sdk": ^1.0.2-alpha.2
+    "@imtbl/core-sdk": ^1.0.2-alpha.5
     "@imtbl/toolkit": "*"
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
@@ -2369,7 +2369,7 @@ __metadata:
   resolution: "@imtbl/starkex@workspace:packages/starkex"
   dependencies:
     "@imtbl/config": "*"
-    "@imtbl/core-sdk": ^1.0.2-alpha.2
+    "@imtbl/core-sdk": ^1.0.2-alpha.5
     "@rollup/plugin-typescript": ^11.0.0
     eslint: ^8.34.0
     rollup: ^3.17.2
@@ -2382,7 +2382,7 @@ __metadata:
   resolution: "@imtbl/toolkit@workspace:packages/internal/toolkit"
   dependencies:
     "@imtbl/config": "*"
-    "@imtbl/core-sdk": ^1.0.2-alpha.2
+    "@imtbl/core-sdk": ^1.0.2-alpha.5
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
