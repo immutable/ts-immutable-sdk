@@ -17,13 +17,15 @@
     "node": ">=14.0.0"
   },
   "scripts": {
-    "build": "wsrun --stages build",
-    "test": "wsrun test",
-    "lint": "eslint ./packages/ --ext .ts,.jsx,.tsx --max-warnings=0",
-    "lint:path": "eslint --ext .ts,.jsx,.tsx --max-warnings=0",
-    "lint:ci": "eslint $(git diff --name-only --diff-filter=ACMRTUXB $(git rev-parse HEAD) | grep  -E \"(.js$|.ts$|.tsx$)\") --ext .ts,.jsx,.tsx --max-warnings=0",
-    "prepare": "husky install",
-    "postinstall": "cd packages/economy && npm install"
+    "build": "wsrun -p @imtbl/sdk -r --stages build",
+    "build:all": "wsrun --stages build",
+    "test": "wsrun --exclude-missing -e test",
+    "lint": "wsrun --exclude-missing -e lint",
+    "typecheck": "wsrun --exclude-missing typecheck",
+    "postinstall": "husky install"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint"
   },
   "repository": {
     "type": "git",
@@ -36,7 +38,6 @@
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "devDependencies": {
-    "@nrwl/eslint-plugin-nx": "^15.9.2",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "eslint": "^8.37.0",
@@ -46,5 +47,6 @@
     "lint-staged": "^13.2.0",
     "prettier": "^2.8.7",
     "wsrun": "^5.2.4"
-  }
+  },
+  "packageManager": "yarn@3.5.0"
 }

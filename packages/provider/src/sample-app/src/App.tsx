@@ -1,4 +1,9 @@
-import { Actions, AppCtx, appReducer, initialState } from './context/app-context';
+import {
+  Actions,
+  AppCtx,
+  appReducer,
+  initialState,
+} from './context/app-context';
 import { BiomeThemeProvider, Heading } from '@biom3/react';
 import { ConnectButton } from './components/connect-button';
 import { DisconnectButton } from './components/disconnect-button';
@@ -13,23 +18,23 @@ export const App = () => {
   useEffect(() => {
     dispatch({
       payload: {
-          type: Actions.SetEnvironment,
-          env: Environment.SANDBOX
-      }
+        type: Actions.SetEnvironment,
+        env: Environment.SANDBOX,
+      },
     });
-  }, [])
+  }, []);
 
   return (
     <BiomeThemeProvider>
-      <AppCtx.Provider value={{state: state, dispatch: dispatch}}>
-        <Heading size='large'>Sample App</Heading>
+      <AppCtx.Provider value={{ state: state, dispatch: dispatch }}>
+        <Heading size="large">Sample App</Heading>
         <WalletDisplay />
         <ConnectButton />
         <SignMessage />
-          <DisconnectButton />
+        <DisconnectButton />
       </AppCtx.Provider>
     </BiomeThemeProvider>
   );
-}
+};
 
 export default App;

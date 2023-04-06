@@ -85,9 +85,9 @@ describe('PassportImxProvider', () => {
     });
 
     mockStartTransaction = jest.fn();
-    (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
+    (ConfirmationScreen as jest.Mock).mockReturnValue({
       startTransaction: mockStartTransaction,
-    }));
+    });
 
     passportImxProvider = new PassportImxProvider({
       user: mockUser,
@@ -302,6 +302,9 @@ describe('PassportImxProvider', () => {
       createOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
 
       const result = await passportImxProvider.createOrder(orderRequest);
 
@@ -363,6 +366,9 @@ describe('PassportImxProvider', () => {
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       cancelOrderMock.mockResolvedValue({
         data: mockReturnValue,
+      });
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
       });
 
       const result = await passportImxProvider.cancelOrder(cancelOrderRequest);
@@ -436,6 +442,9 @@ describe('PassportImxProvider', () => {
       createTradeMock.mockResolvedValue({
         data: mockReturnValue,
       });
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
 
       const result = await passportImxProvider.createTrade(
         mockSignableTradeRequest.getSignableTradeRequest
@@ -457,6 +466,7 @@ describe('PassportImxProvider', () => {
         {
           tokenId: '1',
           tokenAddress: 'token_address',
+          sender: '123',
           receiver: 'receiver_eth_address',
         },
       ];
@@ -493,6 +503,9 @@ describe('PassportImxProvider', () => {
       getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferMock.mockResolvedValue(mockTransferResponse);
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
 
       const result = await passportImxProvider.batchNftTransfer(
         transferRequest
@@ -513,6 +526,7 @@ describe('PassportImxProvider', () => {
                   token_address: transferRequest[0].tokenAddress,
                 },
               },
+              sender: transferRequest[0].sender,
               receiver: transferRequest[0].receiver,
             },
           ],

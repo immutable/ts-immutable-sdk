@@ -1,4 +1,10 @@
-import { UnsignedTransferRequest } from '@imtbl/core-sdk';
+import {
+  GetSignableCancelOrderRequest,
+  GetSignableOrderRequest,
+  GetSignableTradeRequest,
+  GetSignableTransferRequest,
+  GetSignableTransferRequestV1,
+} from '@imtbl/core-sdk';
 
 export enum ReceiveMessage {
   CONFIRMATION_WINDOW_READY = 'confirmation_window_ready',
@@ -11,15 +17,44 @@ export enum SendMessage {
 }
 
 export enum TransactionTypes {
-  TRANSFER = 'v1/transfers',
+  CancelOrder = 'delete:v1/orders',
+  CreateOrder = 'post:v1/orders',
+  CreateTrade = 'post:v1/trades',
+  CreateTransfer = 'post:v1/transfers',
+  CreateBatchTransfer = 'post:v2/transfers',
 }
 
-export type Transfer = {
-  transactionType: TransactionTypes.TRANSFER;
-  transactionData: UnsignedTransferRequest;
+export type CancelOrder = {
+  transactionType: TransactionTypes.CancelOrder;
+  transactionData: GetSignableCancelOrderRequest;
 };
 
-export type Transaction = Transfer;
+export type CreateOrder = {
+  transactionType: TransactionTypes.CreateOrder;
+  transactionData: GetSignableOrderRequest;
+};
+
+export type CreateTrade = {
+  transactionType: TransactionTypes.CreateTrade;
+  transactionData: GetSignableTradeRequest;
+};
+
+export type CreateTransfer = {
+  transactionType: TransactionTypes.CreateTransfer;
+  transactionData: GetSignableTransferRequestV1;
+};
+
+export type CreateBatchTransfer = {
+  transactionType: TransactionTypes.CreateBatchTransfer;
+  transactionData: GetSignableTransferRequest;
+};
+
+export type Transaction =
+  | CancelOrder
+  | CreateTrade
+  | CreateOrder
+  | CreateTransfer
+  | CreateBatchTransfer;
 
 export type DisplayConfirmationParams = {
   messageType: SendMessage;

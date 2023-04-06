@@ -7,12 +7,16 @@ import {
 } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { UserWithEtherKey } from '../types';
+import { TransactionTypes } from '../confirmation/types';
+import { PassportConfiguration } from '../config';
+import ConfirmationScreen from '../confirmation/confirmation';
 
 type CreateTradeParams = {
   request: GetSignableTradeRequest;
   tradesApi: TradesApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
+  passportConfig: PassportConfiguration;
 };
 
 export async function createTrade({
@@ -20,6 +24,7 @@ export async function createTrade({
   tradesApi,
   user,
   starkSigner,
+  passportConfig,
 }: CreateTradeParams): Promise<CreateTradeResponse> {
   return withPassportError<CreateTradeResponse>(async () => {
     const ethAddress = user.etherKey;
@@ -33,6 +38,19 @@ export async function createTrade({
     const getSignableTradeResponse = await tradesApi.getSignableTrade({
       getSignableTradeRequest,
     });
+
+    const confirmationScreen = new ConfirmationScreen(passportConfig);
+    const confirmationResult = await confirmationScreen.startTransaction(
+      user.accessToken,
+      {
+        transactionType: TransactionTypes.CreateTrade,
+        transactionData: getSignableTradeRequest,
+      }
+    );
+
+    if (!confirmationResult.confirmed) {
+      throw new Error('Transaction rejected by user');
+    }
 
     const { payload_hash: payloadHash } = getSignableTradeResponse.data;
     const starkSignature = await starkSigner.signMessage(payloadHash);

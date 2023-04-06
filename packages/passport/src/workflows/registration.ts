@@ -1,4 +1,4 @@
-import { signRaw } from '@imtbl/toolkit/src';
+import { signRaw } from '@imtbl/toolkit';
 import { UsersApi, WalletConnection } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 

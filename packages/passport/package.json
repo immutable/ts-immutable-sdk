@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit --jsx preserve",
     "test": "jest",
     "test:watch": "jest --watch",
-    "lint": "eslint . --ext .ts,.jsx,.tsx --max-warnings=0"
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0"
   },
   "repository": {
     "type": "git",

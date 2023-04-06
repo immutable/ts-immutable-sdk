@@ -2,14 +2,30 @@ import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { cancelOrder, createOrder } from './order';
+import { PassportConfiguration } from '../config';
+import { Networks } from '../types';
+import ConfirmationScreen from '../confirmation/confirmation';
+
+jest.mock('../confirmation/confirmation');
 
 describe('order', () => {
-  afterEach(jest.resetAllMocks);
+  const mockStartTransaction = jest.fn();
 
   const mockStarkSigner = {
     signMessage: jest.fn(),
     getAddress: jest.fn(),
   };
+
+  const passportConfig = {
+    network: Networks.SANDBOX,
+  } as Partial<PassportConfiguration>;
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+    (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
+      startTransaction: mockStartTransaction,
+    }));
+  });
 
   describe('createOrder', () => {
     let getSignableCreateOrderMock: jest.Mock;
@@ -97,6 +113,9 @@ describe('order', () => {
 
       getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
       createOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
@@ -106,6 +125,7 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: orderRequest as UnsignedOrderRequest,
+        passportConfig: passportConfig as PassportConfiguration,
       });
 
       expect(getSignableCreateOrderMock).toBeCalledWith(
@@ -128,6 +148,7 @@ describe('order', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: orderRequest as UnsignedOrderRequest,
+          passportConfig: passportConfig as PassportConfiguration,
         })
       ).rejects.toThrow(
         new PassportError(
@@ -135,6 +156,41 @@ describe('order', () => {
           PassportErrorType.CREATE_ORDER_ERROR
         )
       );
+    });
+
+    it('should return error if transfer is rejected by user', async () => {
+      const mockSignableOrderResponse = {
+        data: {
+          payload_hash: '123123',
+          amount_buy: buy.amount,
+          amount_sell: '1',
+          asset_id_buy: '5530812',
+          asset_id_sell: '8024836',
+          expiration_timestamp: expiration_timestamp,
+          nonce: '847570072',
+          stark_key: '0x1234',
+          vault_id_buy:
+            '0x02705737cd248ac819034b5de474c8f0368224f72a0fda9e031499d519992d9e',
+          vault_id_sell:
+            '0x04006590f0986f008231e309b980e81f8a55944a702ec633b47ceb326242c9f8',
+        },
+      };
+
+      getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
+
+      await expect(() =>
+        createOrder({
+          ordersApi: ordersApiMock,
+          starkSigner: mockStarkSigner,
+          user: mockUser,
+          request: orderRequest as UnsignedOrderRequest,
+          passportConfig: passportConfig as PassportConfiguration,
+        })
+      ).rejects.toThrowError('CREATE_ORDER_ERROR');
     });
   });
 
@@ -197,12 +253,16 @@ describe('order', () => {
       cancelOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
+      mockStartTransaction.mockResolvedValue({
+        confirmed: true,
+      });
 
       const result = await cancelOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
+        passportConfig: passportConfig as PassportConfiguration,
       });
 
       expect(getSignableCancelOrderMock).toBeCalledWith(
@@ -216,6 +276,37 @@ describe('order', () => {
       expect(result).toEqual(mockReturnValue);
     });
 
+    it('should return error if transfer is rejected by user', async () => {
+      const mockSignableCancelOrderResponse = {
+        data: {
+          payload_hash: '123123',
+        },
+      };
+
+      const mockReturnValue = {
+        order_id: orderId,
+        status: 'success',
+      };
+
+      getSignableCancelOrderMock.mockResolvedValue(
+        mockSignableCancelOrderResponse
+      );
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
+      cancelOrderMock.mockResolvedValue({
+        data: mockReturnValue,
+      });
+
+      await expect(() =>
+        cancelOrder({
+          ordersApi: ordersApiMock,
+          starkSigner: mockStarkSigner,
+          user: mockUser,
+          request: cancelOrderRequest,
+          passportConfig: passportConfig as PassportConfiguration,
+        })
+      ).rejects.toThrowError('CANCEL_ORDER_ERROR');
+    });
+
     it('should return error if failed to call public api', async () => {
       getSignableCancelOrderMock.mockRejectedValue(new Error(mockErrorMessage));
 
@@ -225,6 +316,7 @@ describe('order', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: cancelOrderRequest,
+          passportConfig: passportConfig as PassportConfiguration,
         })
       ).rejects.toThrow(
         new PassportError(

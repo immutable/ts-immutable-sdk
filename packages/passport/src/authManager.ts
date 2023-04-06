@@ -33,6 +33,21 @@ export default class AuthManager {
     this.userManager = new UserManager(getAuthConfiguration(config));
   }
 
+  private mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
+    const passport = oidcUser.profile?.passport as PassportMetadata;
+    return {
+      idToken: oidcUser.id_token,
+      accessToken: oidcUser.access_token,
+      refreshToken: oidcUser.refresh_token,
+      profile: {
+        sub: oidcUser.profile.sub,
+        email: oidcUser.profile.email,
+        nickname: oidcUser.profile.nickname,
+      },
+      etherKey: passport?.ether_key || '',
+    };
+  };
+
   public async login(): Promise<User> {
     return withPassportError<User>(async () => {
       const oidcUser = await this.userManager.signinPopup();
@@ -84,19 +99,4 @@ export default class AuthManager {
       return this.mapOidcUserToDomainModel(updatedUser) as UserWithEtherKey;
     }, PassportErrorType.REFRESH_TOKEN_ERROR);
   }
-
-  private mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
-    const passport = oidcUser.profile?.passport as PassportMetadata;
-    return {
-      idToken: oidcUser.id_token,
-      accessToken: oidcUser.access_token,
-      refreshToken: oidcUser.refresh_token,
-      profile: {
-        sub: oidcUser.profile.sub,
-        email: oidcUser.profile.email,
-        nickname: oidcUser.profile.nickname,
-      },
-      etherKey: passport?.ether_key || '',
-    };
-  };
 }

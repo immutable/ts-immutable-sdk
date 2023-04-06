@@ -23,7 +23,7 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { UserWithEtherKey } from '../types';
-import { IMXProvider } from '@imtbl/provider/src';
+import { IMXProvider } from '@imtbl/provider';
 import { batchNftTransfer, transfer } from '../workflows/transfer';
 import { cancelOrder, createOrder } from '../workflows/order';
 import { exchangeTransfer } from '../workflows/exchange';
@@ -91,6 +91,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       ordersApi: this.ordersApi,
+      passportConfig: this.passportConfig,
     });
   }
 
@@ -102,6 +103,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       ordersApi: this.ordersApi,
+      passportConfig: this.passportConfig,
     });
   }
 
@@ -111,6 +113,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       tradesApi: this.tradesApi,
+      passportConfig: this.passportConfig,
     });
   }
 
@@ -122,6 +125,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       transfersApi: this.transfersApi,
+      passportConfig: this.passportConfig,
     });
   }
 

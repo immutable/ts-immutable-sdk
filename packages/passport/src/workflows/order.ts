@@ -8,15 +8,19 @@ import {
   StarkSigner,
   UnsignedOrderRequest,
 } from '@imtbl/core-sdk';
-import { convertToSignableToken } from '@imtbl/toolkit/src';
+import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { UserWithEtherKey } from '../types';
+import { PassportConfiguration } from '../config';
+import { TransactionTypes } from '../confirmation/types';
+import ConfirmationScreen from '../confirmation/confirmation';
 
 type CancelOrderParams = {
   request: GetSignableCancelOrderRequest;
   ordersApi: OrdersApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
+  passportConfig: PassportConfiguration;
 };
 
 type CreateOrderParams = {
@@ -24,6 +28,7 @@ type CreateOrderParams = {
   ordersApi: OrdersApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
+  passportConfig: PassportConfiguration;
 };
 
 const ERC721 = 'ERC721';
@@ -33,12 +38,13 @@ export async function createOrder({
   user,
   request,
   ordersApi,
+  passportConfig,
 }: CreateOrderParams): Promise<CreateOrderResponse> {
   return withPassportError<CreateOrderResponse>(async () => {
     const ethAddress = user.etherKey;
     const amountSell = request.sell.type === ERC721 ? '1' : request.sell.amount;
     const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
-    const getSignableOrderRequest: GetSignableOrderRequest = {
+    const getSignableOrderRequestV3: GetSignableOrderRequest = {
       user: ethAddress,
       amount_buy: amountBuy,
       token_buy: convertToSignableToken(request.buy),
@@ -49,8 +55,20 @@ export async function createOrder({
     };
 
     const getSignableOrderResponse = await ordersApi.getSignableOrder({
-      getSignableOrderRequestV3: getSignableOrderRequest,
+      getSignableOrderRequestV3,
     });
+
+    const confirmationScreen = new ConfirmationScreen(passportConfig);
+    const confirmationResult = await confirmationScreen.startTransaction(
+      user.accessToken,
+      {
+        transactionType: TransactionTypes.CreateOrder,
+        transactionData: getSignableOrderRequestV3,
+      }
+    );
+    if (!confirmationResult.confirmed) {
+      throw new Error('Transaction rejected by user');
+    }
 
     const { payload_hash: payloadHash } = getSignableOrderResponse.data;
 
@@ -93,14 +111,28 @@ export async function cancelOrder({
   starkSigner,
   request,
   ordersApi,
+  passportConfig,
 }: CancelOrderParams): Promise<CancelOrderResponse> {
   return withPassportError<CancelOrderResponse>(async () => {
+    const getSignableCancelOrderRequest: GetSignableCancelOrderRequest = {
+      order_id: request.order_id,
+    };
     const getSignableCancelOrderResponse =
       await ordersApi.getSignableCancelOrder({
-        getSignableCancelOrderRequest: {
-          order_id: request.order_id,
-        },
+        getSignableCancelOrderRequest,
       });
+
+    const confirmationScreen = new ConfirmationScreen(passportConfig);
+    const confirmationResult = await confirmationScreen.startTransaction(
+      user.accessToken,
+      {
+        transactionType: TransactionTypes.CancelOrder,
+        transactionData: getSignableCancelOrderRequest,
+      }
+    );
+    if (!confirmationResult.confirmed) {
+      throw new Error('Transaction rejected by user');
+    }
 
     const { payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
 
