@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit --jsx preserve",
     "test": "jest",
     "test:watch": "jest --watch",
-    "lint": "eslint . --ext .ts,.jsx,.tsx --max-warnings=0"
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0"
   },
   "repository": {
     "type": "git",
@@ -30,8 +30,8 @@
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "dependencies": {
-    "@imtbl/core-sdk": "^1.0.2-alpha.2",
     "@imtbl/config": "*",
+    "@imtbl/core-sdk": "^1.0.2-alpha.2",
     "@imtbl/provider": "*",
     "@imtbl/toolkit": "*",
     "@magic-ext/oidc": "^1.0.1",
