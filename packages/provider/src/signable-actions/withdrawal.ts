@@ -1,12 +1,12 @@
-import { TokenAmount, AnyToken } from "types";
-import { Signers } from "./types";
-import { Configuration } from "@imtbl/config";
+import { TokenAmount, AnyToken } from 'types';
+import { Signers } from './types';
+import { Configuration } from '@imtbl/config';
 import {
   prepareWithdrawalAction,
   completeEthWithdrawalAction,
   completeERC20WithdrawalAction,
   completeERC721WithdrawalAction,
-} from "./withdrawal-actions";
+} from './withdrawal-actions';
 
 type CompleteWithdrawalParams = {
   signers: Signers;
@@ -42,16 +42,16 @@ export async function completeWithdrawal({
   config,
 }: CompleteWithdrawalParams) {
   switch (token.type) {
-    case "ETH":
+    case 'ETH':
       return completeEthWithdrawalAction({ ethSigner, starkPublicKey, config });
-    case "ERC20":
+    case 'ERC20':
       return completeERC20WithdrawalAction({
         ethSigner,
         starkPublicKey,
         token,
         config,
       });
-    case "ERC721":
+    case 'ERC721':
       return completeERC721WithdrawalAction({
         ethSigner,
         starkPublicKey,

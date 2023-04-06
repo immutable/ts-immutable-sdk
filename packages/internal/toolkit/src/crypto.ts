@@ -14,8 +14,8 @@ function serializeEthSignature(sig: SignatureOptions): string {
   // https://github.com/ethers-io/ethers.js/issues/823
   return encUtils.addHexPrefix(
     encUtils.padLeft(sig.r.toString(16), 64) +
-    encUtils.padLeft(sig.s.toString(16), 64) +
-    encUtils.padLeft(sig.recoveryParam?.toString(16) || '', 2),
+      encUtils.padLeft(sig.s.toString(16), 64) +
+      encUtils.padLeft(sig.recoveryParam?.toString(16) || '', 2)
   );
 }
 
@@ -39,7 +39,7 @@ function deserializeSignature(sig: string, size = 64): SignatureOptions {
 
 export async function signRaw(
   payload: string,
-  signer: Signer,
+  signer: Signer
 ): Promise<string> {
   const signature = deserializeSignature(await signer.signMessage(payload));
   return serializeEthSignature(signature);
@@ -51,7 +51,7 @@ type IMXAuthorisationHeaders = {
 };
 
 export async function generateIMXAuthorisationHeaders(
-  ethSigner: Signer,
+  ethSigner: Signer
 ): Promise<IMXAuthorisationHeaders> {
   const timestamp = Math.floor(Date.now() / 1000).toString();
   const signature = await signRaw(timestamp, ethSigner);
@@ -64,7 +64,7 @@ export async function generateIMXAuthorisationHeaders(
 
 export async function signMessage(
   message: string,
-  signer: Signer,
+  signer: Signer
 ): Promise<{ message: string; ethAddress: string; ethSignature: string }> {
   const ethAddress = await signer.getAddress();
   const ethSignature = await signRaw(message, signer);

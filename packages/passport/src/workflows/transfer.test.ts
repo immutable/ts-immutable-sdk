@@ -1,4 +1,4 @@
-import { TransfersApi, UnsignedTransferRequest, } from '@imtbl/core-sdk';
+import { TransfersApi, UnsignedTransferRequest } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
@@ -19,15 +19,15 @@ describe('transfer', () => {
     (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
       startTransaction: mockStartTransaction,
     }));
-  })
+  });
 
   const passportConfig = {
     network: Config.SANDBOX.network,
     oidcConfiguration: {
       authenticationDomain: Config.SANDBOX.authenticationDomain,
-      clientId: "",
-      logoutRedirectUri: "",
-      redirectUri: "",
+      clientId: '',
+      logoutRedirectUri: '',
+      redirectUri: '',
     },
     imxAPIConfiguration: {
       basePath: 'https://api.sandbox.x.immutable.com',
@@ -87,8 +87,10 @@ describe('transfer', () => {
           expiration_timestamp: '1234',
         },
       };
-      const { payload_hash: mockPayloadHash, ...restSignableTransferV1Response } =
-        mockSignableTransferV1Response.data;
+      const {
+        payload_hash: mockPayloadHash,
+        ...restSignableTransferV1Response
+      } = mockSignableTransferV1Response.data;
       const mockCreateTransferRequest = {
         createTransferRequest: {
           ...restSignableTransferV1Response,
@@ -110,7 +112,9 @@ describe('transfer', () => {
       mockStartTransaction.mockResolvedValue({
         confirmed: true,
       });
-      getSignableTransferV1Mock.mockResolvedValue(mockSignableTransferV1Response);
+      getSignableTransferV1Mock.mockResolvedValue(
+        mockSignableTransferV1Response
+      );
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferV1Mock.mockResolvedValue({
         data: mockReturnValue,
@@ -146,10 +150,12 @@ describe('transfer', () => {
           request: mockTransferRequest as UnsignedTransferRequest,
           passportConfig,
         })
-      ).rejects.toThrow(new PassportError(
-        `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
-        PassportErrorType.TRANSFER_ERROR
-      ));
+      ).rejects.toThrow(
+        new PassportError(
+          `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
+          PassportErrorType.TRANSFER_ERROR
+        )
+      );
     });
 
     it('should return error if transfer is rejected by user', async () => {
@@ -167,7 +173,9 @@ describe('transfer', () => {
         },
       };
 
-      getSignableTransferV1Mock.mockResolvedValue(mockSignableTransferV1Response);
+      getSignableTransferV1Mock.mockResolvedValue(
+        mockSignableTransferV1Response
+      );
       mockStartTransaction.mockRejectedValue({
         confirmed: false,
       });
@@ -212,14 +220,14 @@ describe('transfer', () => {
           transfer_ids: ['transfer_id_1'],
         },
       };
-      const sender_stark_key = "sender_stark_key";
-      const sender_vault_id = "sender_vault_id";
-      const receiver_stark_key = "receiver_stark_key"
-      const receiver_vault_id = "receiver_vault_id"
-      const asset_id = "asset_id"
-      const amount = "amount"
-      const nonce = "nonce"
-      const expiration_timestamp = "expiration_timestamp"
+      const sender_stark_key = 'sender_stark_key';
+      const sender_vault_id = 'sender_vault_id';
+      const receiver_stark_key = 'receiver_stark_key';
+      const receiver_vault_id = 'receiver_vault_id';
+      const asset_id = 'asset_id';
+      const amount = 'amount';
+      const nonce = 'nonce';
+      const expiration_timestamp = 'expiration_timestamp';
 
       const mockSignableTransferResponse = {
         data: {
@@ -233,10 +241,10 @@ describe('transfer', () => {
               amount,
               nonce,
               expiration_timestamp,
-            }
-          ]
-        }
-      }
+            },
+          ],
+        },
+      };
       getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferMock.mockResolvedValue(mockTransferResponse);
@@ -248,7 +256,9 @@ describe('transfer', () => {
         transfersApi: transferApiMock,
       });
 
-      expect(result).toEqual({ transfer_ids: mockTransferResponse.data.transfer_ids });
+      expect(result).toEqual({
+        transfer_ids: mockTransferResponse.data.transfer_ids,
+      });
       expect(getSignableTransferMock).toHaveBeenCalledWith({
         getSignableTransferRequestV2: {
           sender_ether_key: mockUser.etherKey,
@@ -260,7 +270,7 @@ describe('transfer', () => {
                 data: {
                   token_id: transferRequest[0].tokenId,
                   token_address: transferRequest[0].tokenAddress,
-                }
+                },
               },
               receiver: transferRequest[0].receiver,
             },
@@ -281,7 +291,7 @@ describe('transfer', () => {
                 amount,
                 nonce,
                 expiration_timestamp,
-                stark_signature: mockStarkSignature
+                stark_signature: mockStarkSignature,
               },
             ],
           },
@@ -304,11 +314,12 @@ describe('transfer', () => {
           request: transferRequest,
           transfersApi: transferApiMock,
         })
-      ).rejects.toThrow(new PassportError(
-        `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
-        PassportErrorType.TRANSFER_ERROR
-      ));
+      ).rejects.toThrow(
+        new PassportError(
+          `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
+          PassportErrorType.TRANSFER_ERROR
+        )
+      );
     });
   });
-})
-
+});

@@ -30,9 +30,9 @@
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "dependencies": {
     "@imtbl/config": "*",
-    "@imtbl/starkex": "*",
+    "@imtbl/passport": "*",
     "@imtbl/provider": "*",
-    "@imtbl/passport": "*"
+    "@imtbl/starkex": "*"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",

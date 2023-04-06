@@ -5,12 +5,12 @@ import {
   GetSignableOrderRequest,
   OrdersApiCreateOrderRequest,
   UnsignedOrderRequest,
-} from "types";
-import { convertToSignableToken, signRaw } from "@imtbl/toolkit";
-import { Signers } from "./types";
-import { Configuration } from "@imtbl/config";
-import { OrdersApi } from "@imtbl/core-sdk";
-import { validateChain } from "./helpers";
+} from 'types';
+import { convertToSignableToken, signRaw } from '@imtbl/toolkit';
+import { Signers } from './types';
+import { Configuration } from '@imtbl/config';
+import { OrdersApi } from '@imtbl/core-sdk';
+import { validateChain } from './helpers';
 
 type CreateOrderWorkflowParams = {
   signers: Signers;
@@ -34,8 +34,8 @@ export async function createOrder({
   const ethAddress = await signers.ethSigner.getAddress();
   const ordersApi = new OrdersApi(config.getStarkExConfig().apiConfiguration);
 
-  const amountSell = request.sell.type === "ERC721" ? "1" : request.sell.amount;
-  const amountBuy = request.buy.type === "ERC721" ? "1" : request.buy.amount;
+  const amountSell = request.sell.type === 'ERC721' ? '1' : request.sell.amount;
+  const amountBuy = request.buy.type === 'ERC721' ? '1' : request.buy.amount;
   const getSignableOrderRequest: GetSignableOrderRequest = {
     user: ethAddress,
     amount_buy: amountBuy,

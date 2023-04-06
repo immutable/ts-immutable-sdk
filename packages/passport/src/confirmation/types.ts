@@ -7,27 +7,27 @@ export enum ReceiveMessage {
 }
 
 export enum SendMessage {
-  TRANSACTION_START = 'transaction_start'
+  TRANSACTION_START = 'transaction_start',
 }
 
 export enum TransactionTypes {
-  TRANSFER = 'v1/transfers'
+  TRANSFER = 'v1/transfers',
 }
 
 export type Transfer = {
   transactionType: TransactionTypes.TRANSFER;
   transactionData: UnsignedTransferRequest;
-}
+};
 
 export type Transaction = Transfer;
 
 export type DisplayConfirmationParams = {
   messageType: SendMessage;
   messageData: Transaction;
-}
+};
 
 export type ConfirmationResult = {
   confirmed: boolean;
-}
+};
 
 export const PassportEventType = 'imx_passport_confirmation';

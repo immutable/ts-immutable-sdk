@@ -1,10 +1,10 @@
-import type {Config} from 'jest';
+import type { Config } from 'jest';
 
 const config: Config = {
   verbose: true,
   testEnvironment: 'jsdom',
   transform: {
-    '\\.ts$': ['babel-jest', { configFile: './babel.test.config.js' }]
+    '\\.ts$': ['babel-jest', { configFile: './babel.test.config.js' }],
   },
 };
 

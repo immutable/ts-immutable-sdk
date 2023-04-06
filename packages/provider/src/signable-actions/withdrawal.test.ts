@@ -1,14 +1,14 @@
-import { Configuration } from "@imtbl/config";
-import { completeWithdrawal } from "./withdrawal";
-import { Signers } from "./types";
-import * as WithdrawalActions from "./withdrawal-actions";
-import { AnyToken } from "../types";
+import { Configuration } from '@imtbl/config';
+import { completeWithdrawal } from './withdrawal';
+import { Signers } from './types';
+import * as WithdrawalActions from './withdrawal-actions';
+import { AnyToken } from '../types';
 
-jest.mock("@imtbl/core-sdk");
-jest.mock("./withdrawal-actions");
+jest.mock('@imtbl/core-sdk');
+jest.mock('./withdrawal-actions');
 
-describe("withdrawal", () => {
-  describe("completeWithdrawal()", () => {
+describe('withdrawal', () => {
+  describe('completeWithdrawal()', () => {
     let completeERC721WithdrawalMock: jest.Mock;
     let completeERC20WithdrawalMock: jest.Mock;
     let completeEthWithdrawalMock: jest.Mock;
@@ -33,19 +33,19 @@ describe("withdrawal", () => {
 
     const testCases = [
       {
-        withdrawalType: "ERC20",
+        withdrawalType: 'ERC20',
         callsToWithdrawalEth: 0,
         callsToWithdrawalERC20: 1,
         callsToWithdrawalERC721: 0,
       },
       {
-        withdrawalType: "ETH",
+        withdrawalType: 'ETH',
         callsToWithdrawalEth: 1,
         callsToWithdrawalERC20: 0,
         callsToWithdrawalERC721: 0,
       },
       {
-        withdrawalType: "ERC721",
+        withdrawalType: 'ERC721',
         callsToWithdrawalEth: 0,
         callsToWithdrawalERC20: 0,
         callsToWithdrawalERC721: 1,
@@ -56,7 +56,7 @@ describe("withdrawal", () => {
       test(`should call withdrawal${testCase.withdrawalType}() when the type in the paylod is ${testCase.withdrawalType}`, async () => {
         await completeWithdrawal({
           signers: {} as Signers,
-          starkPublicKey: "",
+          starkPublicKey: '',
           token: { type: testCase.withdrawalType } as unknown as AnyToken,
           config: {} as Configuration,
         });
@@ -73,11 +73,11 @@ describe("withdrawal", () => {
       });
     });
 
-    test("should not call withdrawal when withdrawal type is invalid", async () => {
+    test('should not call withdrawal when withdrawal type is invalid', async () => {
       await completeWithdrawal({
         signers: {} as Signers,
-        starkPublicKey: "",
-        token: { type: "ETHS" } as unknown as AnyToken,
+        starkPublicKey: '',
+        token: { type: 'ETHS' } as unknown as AnyToken,
         config: {} as Configuration,
       });
 

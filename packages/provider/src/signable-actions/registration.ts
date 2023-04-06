@@ -2,12 +2,12 @@ import {
   RegisterUserResponse,
   GetSignableRegistrationResponse,
   EthSigner,
-} from "types";
-import { Signers } from "./types";
-import { validateChain } from "./helpers";
-import { Contracts, UsersApi } from "@imtbl/core-sdk";
-import { signRaw } from "@imtbl/toolkit";
-import { Configuration } from "@imtbl/config";
+} from 'types';
+import { Signers } from './types';
+import { validateChain } from './helpers';
+import { Contracts, UsersApi } from '@imtbl/core-sdk';
+import { signRaw } from '@imtbl/toolkit';
+import { Configuration } from '@imtbl/config';
 
 export async function registerOffchain(
   signers: Signers,
@@ -64,7 +64,7 @@ export async function isRegisteredOnChain(
   try {
     return await registrationContract.isRegistered(starkPublicKey);
   } catch (ex) {
-    if ((ex as IsRegisteredCheckError).reason === "USER_UNREGISTERED") {
+    if ((ex as IsRegisteredCheckError).reason === 'USER_UNREGISTERED') {
       return false;
     }
     throw ex;

@@ -8,10 +8,10 @@
 // import { CheckoutWidgets, WidgetParams } from '@imbl/checkout/ui'
 // import { ImmutableX, Config as IMXConfig } from '@imtbl/core-sdk'
 
-// // Build IMX client 
+// // Build IMX client
 // const imxClient = new ImmutableX(IMXConfig.SANDBOX);
 
-// // Build WalletManager 
+// // Build WalletManager
 // const walletManager = new WalletManager({ env: "STARKEX", stage: CheckoutConfig.SANDBOX });
 
 // // Get asset order
@@ -59,7 +59,7 @@
 //   const buyOptionsResponse = await checkoutUI.showBuyFlowOptions({
 //     render: '#imx-buy-options',
 //     options: getBuyUptionsResponse.buyFlows,
-    
+
 //   } as WidgetParams)
 
 //   const canCompleteResponse = await CheckoutSDK.canCompleteOrder({
@@ -106,15 +106,15 @@
 //       render: '#imx-complete',
 //       orderID,
 //       provider: walletManager,
-      
+
 //     } as WidgetParams)
 //   }
 
-//   //possibly we could simply call .next() but perhaps that's for the smart checkout flow? 
-  
+//   //possibly we could simply call .next() but perhaps that's for the smart checkout flow?
+
 //   checkoutUI.next({
 //     render: '#imx-checkout',
 //     provider: walletManager,
 //   })
-  
+
 // }

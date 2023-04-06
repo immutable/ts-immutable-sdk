@@ -4,9 +4,9 @@ import {
   StarkSigner,
   TradesApi,
   TradesApiCreateTradeRequest,
-} from "@imtbl/core-sdk";
-import { PassportErrorType, withPassportError } from "../errors/passportError";
-import { UserWithEtherKey } from "../types";
+} from '@imtbl/core-sdk';
+import { PassportErrorType, withPassportError } from '../errors/passportError';
+import { UserWithEtherKey } from '../types';
 
 type CreateTradeParams = {
   request: GetSignableTradeRequest;
@@ -58,7 +58,7 @@ export async function createTrade({
       },
     };
 
-    const headers = { Authorization: "Bearer " + user.accessToken };
+    const headers = { Authorization: 'Bearer ' + user.accessToken };
     const { data: createTradeResponse } = await tradesApi.createTrade(
       tradeParams,
       {

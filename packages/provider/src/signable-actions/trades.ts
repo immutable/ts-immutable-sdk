@@ -1,9 +1,9 @@
-import { CreateTradeResponse, GetSignableTradeRequest } from "types";
-import { Signers } from "./types";
-import { validateChain } from "./helpers";
-import { signRaw } from "@imtbl/toolkit";
-import { Configuration } from "@imtbl/config";
-import { TradesApi } from "@imtbl/core-sdk";
+import { CreateTradeResponse, GetSignableTradeRequest } from 'types';
+import { Signers } from './types';
+import { validateChain } from './helpers';
+import { signRaw } from '@imtbl/toolkit';
+import { Configuration } from '@imtbl/config';
+import { TradesApi } from '@imtbl/core-sdk';
 
 type createTradeWorkflowParams = {
   signers: Signers;

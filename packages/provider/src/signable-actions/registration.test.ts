@@ -1,18 +1,18 @@
-import { generateSigners, privateKey1, testConfig } from "../test/helpers";
-import { Contracts, UsersApi } from "@imtbl/core-sdk";
-import { signRaw } from "@imtbl/toolkit";
-import { isRegisteredOnChain, registerOffchain } from "./registration";
+import { generateSigners, privateKey1, testConfig } from '../test/helpers';
+import { Contracts, UsersApi } from '@imtbl/core-sdk';
+import { signRaw } from '@imtbl/toolkit';
+import { isRegisteredOnChain, registerOffchain } from './registration';
 
-jest.mock("@imtbl/core-sdk");
-jest.mock("@imtbl/toolkit");
+jest.mock('@imtbl/core-sdk');
+jest.mock('@imtbl/toolkit');
 
-describe("Registration", () => {
-  describe("isRegisteredOnChain workflow", () => {
+describe('Registration', () => {
+  describe('isRegisteredOnChain workflow', () => {
     beforeEach(() => {
       jest.restoreAllMocks();
     });
 
-    test("should check stark public key and not throw an error", async () => {
+    test('should check stark public key and not throw an error', async () => {
       const signers = await generateSigners(privateKey1);
 
       (Contracts.Registration.connect as jest.Mock).mockReturnValue({
@@ -20,13 +20,13 @@ describe("Registration", () => {
       });
 
       await expect(
-        isRegisteredOnChain("stark-key", signers.ethSigner, testConfig)
-      ).resolves.not.toThrowError(new Error("some err"));
+        isRegisteredOnChain('stark-key', signers.ethSigner, testConfig)
+      ).resolves.not.toThrowError(new Error('some err'));
     });
 
-    test("should check stark public key and throw an error", async () => {
+    test('should check stark public key and throw an error', async () => {
       const signers = await generateSigners(privateKey1);
-      const err = new Error("some error");
+      const err = new Error('some error');
 
       (Contracts.Registration.connect as jest.Mock).mockReturnValue({
         isRegistered: jest.fn().mockRejectedValue(() => {
@@ -34,24 +34,24 @@ describe("Registration", () => {
         }),
       });
       await expect(
-        isRegisteredOnChain("stark-key", signers.ethSigner, testConfig)
+        isRegisteredOnChain('stark-key', signers.ethSigner, testConfig)
       ).rejects.toThrowError(err);
     });
   });
 
-  describe("registerOffchain", () => {
+  describe('registerOffchain', () => {
     let getSignableRegistrationOffchainMock: jest.Mock;
     let registerUserMock: jest.Mock;
     const registerUserResponse = {
-      tx_hash: "tx_hash",
+      tx_hash: 'tx_hash',
     };
 
     beforeEach(() => {
       jest.restoreAllMocks();
 
       const getSignableRegistrationResponse = {
-        signable_message: "signable",
-        payload_hash: "hash",
+        signable_message: 'signable',
+        payload_hash: 'hash',
       };
 
       getSignableRegistrationOffchainMock = jest.fn().mockResolvedValue({
@@ -65,10 +65,10 @@ describe("Registration", () => {
         registerUser: registerUserMock,
       });
 
-      (signRaw as jest.Mock).mockReturnValue("raw-eth-signature");
+      (signRaw as jest.Mock).mockReturnValue('raw-eth-signature');
     });
 
-    test("should make the api requests with the correct params", async () => {
+    test('should make the api requests with the correct params', async () => {
       const signers = await generateSigners(privateKey1);
       const ethKey = await signers.ethSigner.getAddress();
       const starkKey = await signers.starkExSigner.getAddress();
@@ -84,9 +84,9 @@ describe("Registration", () => {
       });
       expect(registerUserMock).toHaveBeenCalledWith({
         registerUserRequest: {
-          eth_signature: "raw-eth-signature",
+          eth_signature: 'raw-eth-signature',
           ether_key: ethKey,
-          stark_signature: await signers.starkExSigner.signMessage("hash"),
+          stark_signature: await signers.starkExSigner.signMessage('hash'),
           stark_key: starkKey,
         },
       });

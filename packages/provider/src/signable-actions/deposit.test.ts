@@ -1,14 +1,14 @@
-import { Configuration } from "@imtbl/config";
-import { deposit } from "./deposit";
-import * as depositActions from "./deposit-actions";
-import { Signers } from "./types";
-import { TokenAmount } from "types";
+import { Configuration } from '@imtbl/config';
+import { deposit } from './deposit';
+import * as depositActions from './deposit-actions';
+import { Signers } from './types';
+import { TokenAmount } from 'types';
 
-jest.mock("@imtbl/core-sdk");
-jest.mock("./deposit-actions");
+jest.mock('@imtbl/core-sdk');
+jest.mock('./deposit-actions');
 
-describe("deposit", () => {
-  describe("deposit()", () => {
+describe('deposit', () => {
+  describe('deposit()', () => {
     let depositERC721Mock: jest.Mock;
     let depositERC20Mock: jest.Mock;
     let depositEthMock: jest.Mock;
@@ -33,19 +33,19 @@ describe("deposit", () => {
 
     const testCases = [
       {
-        depositType: "ERC20",
+        depositType: 'ERC20',
         callsToDepositEth: 0,
         callsToDepositERC20: 1,
         callsToDepositERC721: 0,
       },
       {
-        depositType: "ETH",
+        depositType: 'ETH',
         callsToDepositEth: 1,
         callsToDepositERC20: 0,
         callsToDepositERC721: 0,
       },
       {
-        depositType: "ERC721",
+        depositType: 'ERC721',
         callsToDepositEth: 0,
         callsToDepositERC20: 0,
         callsToDepositERC721: 1,
@@ -68,10 +68,10 @@ describe("deposit", () => {
       });
     });
 
-    test("should not call deposit when deposit type is invalid", async () => {
+    test('should not call deposit when deposit type is invalid', async () => {
       await deposit({
         signers: {} as Signers,
-        deposit: { type: "ETHS" } as unknown as TokenAmount,
+        deposit: { type: 'ETHS' } as unknown as TokenAmount,
         config: {} as Configuration,
       });
 

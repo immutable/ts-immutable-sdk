@@ -1,13 +1,13 @@
-import { Signer } from "@ethersproject/abstract-signer";
-import { TransactionResponse } from "@ethersproject/providers";
-import { Contracts, ImmutableXConfiguration, UsersApi } from "@imtbl/core-sdk";
-import { Configuration } from "@imtbl/config";
+import { Signer } from '@ethersproject/abstract-signer';
+import { TransactionResponse } from '@ethersproject/providers';
+import { Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
+import { Configuration } from '@imtbl/config';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
-} from "../registration";
-import { getEncodeAssetInfo } from "./getEncodeAssetInfo";
-import { validateChain } from "../helpers";
+} from '../registration';
+import { getEncodeAssetInfo } from './getEncodeAssetInfo';
+import { validateChain } from '../helpers';
 
 type CompleteEthWithdrawalActionParams = {
   ethSigner: Signer;
@@ -72,7 +72,7 @@ export async function completeEthWithdrawalAction({
   await validateChain(ethSigner, config.getStarkExConfig());
 
   const starkExConfig = config.getStarkExConfig();
-  const assetType = await getEncodeAssetInfo("asset", "ETH", starkExConfig);
+  const assetType = await getEncodeAssetInfo('asset', 'ETH', starkExConfig);
 
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,

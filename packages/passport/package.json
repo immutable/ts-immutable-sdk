@@ -30,8 +30,8 @@
   },
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "dependencies": {
-    "@imtbl/core-sdk": "^1.0.2-alpha.2",
     "@imtbl/config": "*",
+    "@imtbl/core-sdk": "^1.0.2-alpha.2",
     "@imtbl/provider": "*",
     "@imtbl/toolkit": "*",
     "@magic-ext/oidc": "^1.0.1",
