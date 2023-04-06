@@ -3,7 +3,7 @@ import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
 import { getPassportConfiguration, PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
-import { IMXProvider } from '@imtbl/provider';
+import { IMXProvider } from '@imtbl/provider/src';
 import { getStarkSigner } from './stark';
 import {
   EnvironmentConfiguration,
@@ -71,6 +71,10 @@ export class Passport {
 
   public async loginCallback(): Promise<void> {
     return this.authManager.loginCallback();
+  }
+
+  public async logout(): Promise<void> {
+    return this.authManager.logout();
   }
 
   public async getUserInfo(): Promise<UserProfile> {

@@ -15,6 +15,10 @@ const getAuthConfiguration = ({
     authorization_endpoint: `${oidcConfiguration.authenticationDomain}/authorize`,
     token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
     userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
+    end_session_endpoint:
+      `${oidcConfiguration.authenticationDomain}/v2/logout` +
+      `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}` +
+      `&client_id=${oidcConfiguration.clientId}`,
   },
   mergeClaims: true,
   loadUserInfo: true,
@@ -55,6 +59,13 @@ export default class AuthManager {
     return withPassportError<void>(
       async () => this.userManager.signinPopupCallback(),
       PassportErrorType.AUTHENTICATION_ERROR
+    );
+  }
+
+  public async logout(): Promise<void> {
+    return withPassportError<void>(
+      async () => this.userManager.signoutRedirect(),
+      PassportErrorType.LOGOUT_ERROR
     );
   }
 
