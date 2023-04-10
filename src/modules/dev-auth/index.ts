@@ -1,3 +1,0 @@
-const Auth = {};
-
-export { Auth };

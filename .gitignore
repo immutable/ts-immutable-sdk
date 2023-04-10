@@ -3,6 +3,15 @@ node_modules/
 .idea/
 .DS_Store
 .vscode
+.parcel-cache
 
 .env
 .env.local
+
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
