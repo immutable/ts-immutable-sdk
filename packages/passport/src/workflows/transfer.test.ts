@@ -202,7 +202,6 @@ describe('transfer', () => {
         tokenId: '1',
         tokenAddress: 'token_address',
         receiver: 'receiver_eth_address',
-        sender: '123',
       },
     ];
 
@@ -277,7 +276,6 @@ describe('transfer', () => {
                   token_address: transferRequest[0].tokenAddress,
                 },
               },
-              sender: transferRequest[0].sender,
               receiver: transferRequest[0].receiver,
             },
           ],
