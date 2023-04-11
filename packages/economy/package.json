@@ -5,8 +5,6 @@
   "scripts": {},
   "private": true,
   "dependencies": {
-    "@imtbl/checkout-sdk-web": "file:.yalc/@imtbl/checkout-sdk-web",
-    "@imtbl/checkout-sdk-widgets": "file:.yalc/@imtbl/checkout-sdk-widgets",
     "@swc/helpers": "~0.4.11",
     "core-js": "^3.6.5",
     "regenerator-runtime": "0.13.7",
@@ -14,6 +12,8 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
+    "@imtbl/checkout-sdk-web": "file:.yalc/@imtbl/checkout-sdk-web",
+    "@imtbl/checkout-sdk-widgets": "file:.yalc/@imtbl/checkout-sdk-widgets",
     "@nrwl/cypress": "15.9.2",
     "@nrwl/eslint-plugin-nx": "15.9.2",
     "@nrwl/jest": "15.9.2",
