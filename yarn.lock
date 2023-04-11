@@ -2408,7 +2408,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/toolkit@workspace:packages/internal/toolkit"
   dependencies:
-    "@imtbl/config": "*"
     "@imtbl/core-sdk": ^1.0.2-alpha.5
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
