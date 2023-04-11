@@ -28,14 +28,15 @@ describe('getStarkSigner', () => {
   });
 
   it('should return a PassportError when an error is thrown', async () => {
+    const errorMessage = 'oops';
     (generateLegacyStarkPrivateKey as jest.Mock).mockImplementation(() => {
-      throw new Error('oops');
+      throw new Error(errorMessage);
     });
     await expect(async () => {
       await getStarkSigner(wallet);
     }).rejects.toThrow(
       new PassportError(
-        'WALLET_CONNECTION_ERROR: oops',
+        `${PassportErrorType.WALLET_CONNECTION_ERROR}: ${errorMessage}`,
         PassportErrorType.WALLET_CONNECTION_ERROR
       )
     );
