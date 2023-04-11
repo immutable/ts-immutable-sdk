@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Immutable Unified TypeScript SDK",
   "workspaces": [
-    "packages/sdk",
+    "publish",
     "packages/config",
     "packages/starkex",
     "packages/passport",
