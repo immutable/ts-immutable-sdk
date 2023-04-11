@@ -1,7 +1,7 @@
 import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 import { UnsignedExchangeTransferRequest, ExchangesApi } from '@imtbl/core-sdk';
 import { exchangeTransfer } from './exchanges';
-import { signRaw } from '@imtbl/toolkit';
+import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
@@ -54,6 +54,12 @@ describe('ExchangeTransfer', () => {
     test('should make the correct api requests with the correct params, and return the correct receipt', async () => {
       const signers = await generateSigners(privateKey1);
 
+      (convertToSignableToken as jest.Mock).mockReturnValue({
+        type: 'ETH',
+        data: {
+          decimals: 18,
+        },
+      });
       const response = await exchangeTransfer({
         signers,
         request: signableExchangeTransferRequest,

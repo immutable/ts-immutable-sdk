@@ -5,7 +5,7 @@ import {
   NftTransferDetails,
 } from '@imtbl/core-sdk';
 import { transfer, batchTransfer } from './transfer';
-import { signRaw } from '@imtbl/toolkit';
+import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
@@ -58,6 +58,13 @@ describe('Transfer', () => {
     test('should make the correct api requests with the correct params, and return the correct receipt', async () => {
       const signers = await generateSigners(privateKey1);
 
+      (convertToSignableToken as jest.Mock).mockReturnValue({
+        type: 'ERC721',
+        data: {
+          token_address: signableTransferRequest.tokenAddress,
+          token_id: signableTransferRequest.tokenId,
+        },
+      });
       const response = await transfer({
         signers,
         request: signableTransferRequest,
@@ -150,6 +157,13 @@ describe('Transfer', () => {
     test('should make the correct api requests with the correct params, and return the correct receipt', async () => {
       const signers = await generateSigners(privateKey1);
 
+      (convertToSignableToken as jest.Mock).mockReturnValue({
+        type: 'ERC721',
+        data: {
+          token_address: signableTransferRequest[0].tokenAddress,
+          token_id: signableTransferRequest[0].tokenId,
+        },
+      });
       const response = await batchTransfer({
         signers,
         request: signableTransferRequest,

@@ -36,6 +36,7 @@ describe('Passport', () => {
   let passport: Passport;
   let authLoginMock: jest.Mock;
   let loginCallbackMock: jest.Mock;
+  let logoutMock: jest.Mock;
   let magicLoginMock: jest.Mock;
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
@@ -47,11 +48,13 @@ describe('Passport', () => {
     });
     loginCallbackMock = jest.fn();
     magicLoginMock = jest.fn();
+    logoutMock = jest.fn();
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
     (AuthManager as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
+      logout: logoutMock,
       getUser: getUserMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
     });
@@ -109,6 +112,14 @@ describe('Passport', () => {
       await passport.loginCallback();
 
       expect(loginCallbackMock).toBeCalledTimes(1);
+    });
+  });
+
+  describe('logout', () => {
+    it('should execute logout without error', async () => {
+      await passport.logout();
+
+      expect(logoutMock).toBeCalledTimes(1);
     });
   });
 
