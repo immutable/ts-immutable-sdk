@@ -4,25 +4,35 @@ import { PassportMetadata, User, UserWithEtherKey } from './types';
 import { retryWithDelay } from './util/retry';
 import { PassportConfiguration } from './config';
 
-const getAuthConfiguration = ({
-  oidcConfiguration,
-}: PassportConfiguration) => ({
-  authority: oidcConfiguration.authenticationDomain,
-  redirect_uri: oidcConfiguration.redirectUri,
-  popup_redirect_uri: oidcConfiguration.redirectUri,
-  client_id: oidcConfiguration.clientId,
-  metadata: {
-    authorization_endpoint: `${oidcConfiguration.authenticationDomain}/authorize`,
-    token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
-    userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
-    end_session_endpoint:
-      `${oidcConfiguration.authenticationDomain}/v2/logout` +
-      `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}` +
-      `&client_id=${oidcConfiguration.clientId}`,
-  },
-  mergeClaims: true,
-  loadUserInfo: true,
-});
+const getAuthConfiguration = ({ oidcConfiguration }: PassportConfiguration) => {
+  const baseConfiguration = {
+    authority: oidcConfiguration.authenticationDomain,
+    redirect_uri: oidcConfiguration.redirectUri,
+    popup_redirect_uri: oidcConfiguration.redirectUri,
+    client_id: oidcConfiguration.clientId,
+    metadata: {
+      authorization_endpoint: `${oidcConfiguration.authenticationDomain}/authorize`,
+      token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
+      userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
+      end_session_endpoint:
+        `${oidcConfiguration.authenticationDomain}/v2/logout` +
+        `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}` +
+        `&client_id=${oidcConfiguration.clientId}`,
+    },
+    mergeClaims: true,
+    loadUserInfo: true,
+    scope: oidcConfiguration.scope,
+  };
+
+  return oidcConfiguration.audience
+    ? {
+        ...baseConfiguration,
+        extraQueryParams: {
+          audience: oidcConfiguration.audience,
+        },
+      }
+    : baseConfiguration;
+};
 
 export default class AuthManager {
   private userManager;

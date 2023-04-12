@@ -12,6 +12,7 @@ const config: PassportConfiguration = {
     clientId: '11111',
     redirectUri: 'https://test.com',
     authenticationDomain: 'https://auth.dev.immutable.com',
+    scope: 'email profile',
   },
 } as PassportConfiguration;
 
@@ -80,27 +81,65 @@ describe('AuthManager', () => {
   });
 
   describe('constructor', () => {
-    it('should initial AuthManager the default configuration', () => {
-      new AuthManager(config);
+    it('should initial AuthManager the configuration contains audience params', () => {
+      const configWithAudience: PassportConfiguration = {
+        oidcConfiguration: {
+          clientId: '11111',
+          redirectUri: 'https://test.com',
+          authenticationDomain: 'https://auth.dev.immutable.com',
+          scope: 'email profile',
+          audience: 'audience',
+        },
+      } as PassportConfiguration;
+
+      new AuthManager(configWithAudience);
       expect(UserManager).toBeCalledWith({
-        authority: config.oidcConfiguration.authenticationDomain,
-        client_id: config.oidcConfiguration.clientId,
+        authority: configWithAudience.oidcConfiguration.authenticationDomain,
+        client_id: configWithAudience.oidcConfiguration.clientId,
         loadUserInfo: true,
         mergeClaims: true,
         metadata: {
-          authorization_endpoint: `${config.oidcConfiguration.authenticationDomain}/authorize`,
-          token_endpoint: `${config.oidcConfiguration.authenticationDomain}/oauth/token`,
-          userinfo_endpoint: `${config.oidcConfiguration.authenticationDomain}/userinfo`,
+          authorization_endpoint: `${configWithAudience.oidcConfiguration.authenticationDomain}/authorize`,
+          token_endpoint: `${configWithAudience.oidcConfiguration.authenticationDomain}/oauth/token`,
+          userinfo_endpoint: `${configWithAudience.oidcConfiguration.authenticationDomain}/userinfo`,
           end_session_endpoint:
-            `${config.oidcConfiguration.authenticationDomain}/v2/logout` +
+            `${configWithAudience.oidcConfiguration.authenticationDomain}/v2/logout` +
             `?returnTo=${encodeURIComponent(
-              config.oidcConfiguration.logoutRedirectUri
+              configWithAudience.oidcConfiguration.logoutRedirectUri
             )}` +
-            `&client_id=${config.oidcConfiguration.clientId}`,
+            `&client_id=${configWithAudience.oidcConfiguration.clientId}`,
         },
-        popup_redirect_uri: config.oidcConfiguration.redirectUri,
-        redirect_uri: config.oidcConfiguration.redirectUri,
+        popup_redirect_uri: configWithAudience.oidcConfiguration.redirectUri,
+        redirect_uri: configWithAudience.oidcConfiguration.redirectUri,
+        scope: configWithAudience.oidcConfiguration.scope,
+        extraQueryParams: {
+          audience: configWithAudience.oidcConfiguration.audience,
+        },
       });
+    });
+  });
+
+  it('should initial AuthManager the default configuration', () => {
+    new AuthManager(config);
+    expect(UserManager).toBeCalledWith({
+      authority: config.oidcConfiguration.authenticationDomain,
+      client_id: config.oidcConfiguration.clientId,
+      loadUserInfo: true,
+      mergeClaims: true,
+      metadata: {
+        authorization_endpoint: `${config.oidcConfiguration.authenticationDomain}/authorize`,
+        token_endpoint: `${config.oidcConfiguration.authenticationDomain}/oauth/token`,
+        userinfo_endpoint: `${config.oidcConfiguration.authenticationDomain}/userinfo`,
+        end_session_endpoint:
+          `${config.oidcConfiguration.authenticationDomain}/v2/logout` +
+          `?returnTo=${encodeURIComponent(
+            config.oidcConfiguration.logoutRedirectUri
+          )}` +
+          `&client_id=${config.oidcConfiguration.clientId}`,
+      },
+      popup_redirect_uri: config.oidcConfiguration.redirectUri,
+      redirect_uri: config.oidcConfiguration.redirectUri,
+      scope: config.oidcConfiguration.scope,
     });
   });
 

@@ -8,6 +8,8 @@ describe('Config', () => {
       clientId: 'client123',
       redirectUri: 'redirect123',
       logoutRedirectUri: 'logout123',
+      scope: 'email profile',
+      audience: 'xxx_api',
     };
 
     describe('when both configurations are valid', () => {
@@ -23,6 +25,8 @@ describe('Config', () => {
             clientId: oidcConfiguration.clientId,
             logoutRedirectUri: oidcConfiguration.logoutRedirectUri,
             redirectUri: oidcConfiguration.redirectUri,
+            scope: oidcConfiguration.scope,
+            audience: oidcConfiguration.audience,
           },
           imxAPIConfiguration: {
             basePath: 'https://api.sandbox.x.immutable.com',
@@ -33,6 +37,7 @@ describe('Config', () => {
         });
       });
     });
+
     describe('when the environmentConfiguration is null', () => {
       it('throws an error', () => {
         expect(() =>
