@@ -11,10 +11,9 @@ const packages = JSON.parse(
 
 const getPackages = () => packages.map((pkg) => pkg.name);
 
-export default [
-  // Export ES Modules
+const getFileBuild = (inputFilename) => [
   {
-    input: 'src/index.ts',
+    input: `./src/${inputFilename}.ts`,
     output: {
       dir: 'dist',
       format: 'es',
@@ -31,12 +30,10 @@ export default [
       json(),
     ],
   },
-
-  // Export Types
   {
-    input: 'dist/types/index.d.ts',
+    input: `./dist/types/${inputFilename}.d.ts`,
     output: {
-      file: 'dist/index.d.ts',
+      file: `./dist/${inputFilename}.d.ts`,
       format: 'es',
     },
     plugins: [
@@ -45,4 +42,29 @@ export default [
       }),
     ],
   },
+];
+
+export default [
+  // CommonJS build
+  {
+    input: 'src/index.ts',
+    output: {
+      file: 'dist/index.cjs',
+      format: 'cjs',
+    },
+    plugins: [
+      typescript(),
+      nodeResolve({
+        resolveOnly: getPackages(),
+      }),
+      commonJs(),
+      json(),
+    ],
+  },
+  // Export ES Modules
+  ...getFileBuild('index'),
+  ...getFileBuild('base'),
+  ...getFileBuild('starkex'),
+  ...getFileBuild('provider'),
+  ...getFileBuild('passport'),
 ];
