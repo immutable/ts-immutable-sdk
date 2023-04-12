@@ -26,8 +26,8 @@ jobs:
           node-version: v16.16.0
           registry-url: https://registry.npmjs.org/
 
-      - name: Install yarn
-        run: npm i -g yarn
+      # - name: Install yarn
+      #   run: npm i -g yarn
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -44,6 +44,9 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --immutable
+
+      - name: Check Single Package Version Policy
+        run: yarn syncpack:check
 
       - name: Lint
         run: yarn lint
