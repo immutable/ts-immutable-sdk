@@ -3,7 +3,7 @@ import {
   CreateTransferResponseV1,
   NftTransferDetails,
   UnsignedTransferRequest,
-} from 'types';
+} from '@imtbl/core-sdk';
 import { Signers } from './types';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 import { Configuration } from '@imtbl/config';

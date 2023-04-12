@@ -1,7 +1,7 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
 import { Configuration } from '@imtbl/config';
-import { ERC20Token } from 'types';
+import { ERC20Token } from '@imtbl/core-sdk';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,

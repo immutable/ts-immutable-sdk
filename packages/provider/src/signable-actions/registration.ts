@@ -2,7 +2,7 @@ import {
   RegisterUserResponse,
   GetSignableRegistrationResponse,
   EthSigner,
-} from 'types';
+} from '@imtbl/core-sdk';
 import { Signers } from './types';
 import { validateChain } from './helpers';
 import { Contracts, UsersApi } from '@imtbl/core-sdk';

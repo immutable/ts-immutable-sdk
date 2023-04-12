@@ -14,7 +14,7 @@ import {
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
-} from 'types';
+} from '@imtbl/core-sdk';
 import { TransactionResponse } from '@ethersproject/providers';
 
 export interface IMXProvider {

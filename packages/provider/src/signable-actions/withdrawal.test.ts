@@ -2,7 +2,7 @@ import { Configuration } from '@imtbl/config';
 import { completeWithdrawal } from './withdrawal';
 import { Signers } from './types';
 import * as WithdrawalActions from './withdrawal-actions';
-import { AnyToken } from '../types';
+import { AnyToken } from '@imtbl/core-sdk';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('./withdrawal-actions');

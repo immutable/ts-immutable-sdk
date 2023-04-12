@@ -4,7 +4,7 @@ import {
   disconnect as disconnectImxSigner,
 } from '../imx-wallet/imxWallet';
 import { Configuration } from '@imtbl/config';
-import { EthSigner, StarkSigner } from 'types';
+import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { GenericIMXProvider } from '../genericImxProvider';
 import { ImxSigner } from '../imx-wallet/ImxSigner';
 import {

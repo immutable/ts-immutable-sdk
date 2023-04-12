@@ -1,4 +1,4 @@
-import { TokenAmount, AnyToken } from 'types';
+import { TokenAmount, AnyToken } from '@imtbl/core-sdk';
 import { Signers } from './types';
 import { Configuration } from '@imtbl/config';
 import {

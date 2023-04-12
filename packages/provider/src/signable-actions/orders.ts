@@ -5,7 +5,7 @@ import {
   GetSignableOrderRequest,
   OrdersApiCreateOrderRequest,
   UnsignedOrderRequest,
-} from 'types';
+} from '@imtbl/core-sdk';
 import { convertToSignableToken, signRaw } from '@imtbl/toolkit';
 import { Signers } from './types';
 import { Configuration } from '@imtbl/config';

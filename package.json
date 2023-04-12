@@ -28,10 +28,10 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "wsrun -p @imtbl/sdk -r --stages build",
+    "build": "wsrun -p @imtbl/sdk -e -r --stages build",
     "build:all": "wsrun --stages build",
-    "checkMismatchedPackaged": "yarn syncpack list-mismatches",
-    "fixMismatchedPackaged": "yarn syncpack fix-mismatches && yarn syncpack format",
+    "syncpack:check": "yarn syncpack list-mismatches",
+    "syncpack:fix": "yarn syncpack fix-mismatches && yarn syncpack format",
     "lint": "wsrun --exclude-missing -e lint",
     "postinstall": "husky install",
     "test": "wsrun --exclude-missing -e test",

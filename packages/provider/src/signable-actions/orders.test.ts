@@ -3,7 +3,7 @@ import { UnsignedOrderRequest, OrdersApi } from '@imtbl/core-sdk';
 import { parseEther } from '@ethersproject/units';
 import { cancelOrder, createOrder } from './orders';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
-import { GetSignableCancelOrderRequest } from 'types';
+import { GetSignableCancelOrderRequest } from '@imtbl/core-sdk';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');

@@ -1,11 +1,11 @@
 import {
   CreateTransferResponseV1,
   UnsignedExchangeTransferRequest,
-} from 'types';
+  ExchangesApi,
+} from '@imtbl/core-sdk';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 import { Signers } from './types';
 import { Configuration } from '@imtbl/config';
-import { ExchangesApi } from '@imtbl/core-sdk';
 import { validateChain } from './helpers';
 
 type TransfersWorkflowParams = {
