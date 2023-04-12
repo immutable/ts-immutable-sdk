@@ -2213,15 +2213,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sample-app@workspace:packages/checkout/sample-app"
   dependencies:
-    "@imtbl/checkout-sdk-web": "*"
+    "@imtbl/checkout-sdk-web": 0.0.0
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
     "@testing-library/user-event": ^13.5.0
     "@types/jest": ^29.4.0
-    "@types/node": ^16.18.12
+    "@types/node": ^18.14.2
     "@types/react": ^18.0.28
-    "@types/react-dom": ^18.0.10
-    "@typescript-eslint/parser": ^5.56.0
+    "@types/react-dom": ^18.0.11
+    "@typescript-eslint/parser": ^5.57.1
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     react: ^18.2.0
@@ -2233,7 +2233,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/checkout-sdk-web@*, @imtbl/checkout-sdk-web@workspace:packages/checkout/sdk":
+"@imtbl/checkout-sdk-web@0.0.0, @imtbl/checkout-sdk-web@workspace:packages/checkout/sdk":
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-web@workspace:packages/checkout/sdk"
   dependencies:
@@ -2244,7 +2244,7 @@ __metadata:
     "@parcel/packager-ts": ^2.8.3
     "@parcel/transformer-typescript-types": ^2.8.3
     babel-jest: ^29.5.0
-    eslint: ^8.34.0
+    eslint: ^8.37.0
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
@@ -2253,7 +2253,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/config@*, @imtbl/config@workspace:packages/config":
+"@imtbl/config@0.0.0, @imtbl/config@workspace:packages/config":
   version: 0.0.0-use.local
   resolution: "@imtbl/config@workspace:packages/config"
   dependencies:
@@ -2268,16 +2268,16 @@ __metadata:
     "@types/node": ^18.14.2
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
-    "@typescript-eslint/eslint-plugin": ^5.53.0
-    "@typescript-eslint/parser": ^5.53.0
+    "@typescript-eslint/eslint-plugin": ^5.57.1
+    "@typescript-eslint/parser": ^5.57.1
     axios: ^1.3.4
-    eslint: ^8.34.0
+    eslint: ^8.37.0
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     magic-sdk: ^13.3.1
     oidc-client-ts: ^2.2.1
-    prettier: 2.8.4
+    prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
     typescript: ^4.9.5
@@ -2302,14 +2302,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@imtbl/passport@*, @imtbl/passport@workspace:packages/passport":
+"@imtbl/passport@0.0.0, @imtbl/passport@workspace:packages/passport":
   version: 0.0.0-use.local
   resolution: "@imtbl/passport@workspace:packages/passport"
   dependencies:
-    "@imtbl/config": "*"
+    "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^1.0.2-alpha.5
-    "@imtbl/provider": "*"
-    "@imtbl/toolkit": "*"
+    "@imtbl/provider": 0.0.0
+    "@imtbl/toolkit": 0.0.0
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
@@ -2320,29 +2320,29 @@ __metadata:
     "@types/node": ^18.14.2
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
-    "@typescript-eslint/eslint-plugin": ^5.53.0
-    "@typescript-eslint/parser": ^5.53.0
+    "@typescript-eslint/eslint-plugin": ^5.57.1
+    "@typescript-eslint/parser": ^5.57.1
     axios: ^1.3.4
-    eslint: ^8.34.0
+    eslint: ^8.37.0
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     magic-sdk: ^13.3.1
     oidc-client-ts: ^2.2.1
-    prettier: 2.8.4
+    prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
     typescript: ^4.9.5
   languageName: unknown
   linkType: soft
 
-"@imtbl/provider@*, @imtbl/provider@workspace:packages/provider":
+"@imtbl/provider@0.0.0, @imtbl/provider@workspace:packages/provider":
   version: 0.0.0-use.local
   resolution: "@imtbl/provider@workspace:packages/provider"
   dependencies:
-    "@imtbl/config": "*"
+    "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^1.0.2-alpha.5
-    "@imtbl/toolkit": "*"
+    "@imtbl/toolkit": 0.0.0
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
@@ -2353,16 +2353,16 @@ __metadata:
     "@types/node": ^18.14.2
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
-    "@typescript-eslint/eslint-plugin": ^5.53.0
-    "@typescript-eslint/parser": ^5.53.0
+    "@typescript-eslint/eslint-plugin": ^5.57.1
+    "@typescript-eslint/parser": ^5.57.1
     axios: ^1.3.4
-    eslint: ^8.34.0
+    eslint: ^8.37.0
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     magic-sdk: ^13.3.1
     oidc-client-ts: ^2.2.1
-    prettier: 2.8.4
+    prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
     typescript: ^4.9.5
@@ -2373,17 +2373,30 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/sdk@workspace:publish"
   dependencies:
-    "@imtbl/config": "*"
-    "@imtbl/passport": "*"
-    "@imtbl/provider": "*"
-    "@imtbl/starkex": "*"
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/config": 0.0.0
+    "@imtbl/core-sdk": ^1.0.2-alpha.5
+    "@imtbl/passport": 0.0.0
+    "@imtbl/provider": 0.0.0
+    "@imtbl/starkex": 0.0.0
+    "@magic-ext/oidc": ^1.0.1
+    "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
     "@rollup/plugin-node-resolve": ^15.0.2
     "@rollup/plugin-typescript": ^11.0.0
+    "@typescript-eslint/eslint-plugin": ^5.57.1
+    "@typescript-eslint/parser": ^5.57.1
     "@yarnpkg/cli": 3.5.0
     "@yarnpkg/core": 3.5.0
-    eslint: ^8.34.0
+    axios: ^1.3.4
+    eslint: ^8.37.0
+    ethers: ^5.7.2
+    magic-sdk: ^13.3.1
+    oidc-client-ts: ^2.2.1
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    react-router-dom: ^6.8.2
     rollup: ^3.17.2
     rollup-plugin-dts: ^5.3.0
     semver: ^7.4.0
@@ -2391,20 +2404,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/starkex@*, @imtbl/starkex@workspace:packages/starkex":
+"@imtbl/starkex@0.0.0, @imtbl/starkex@workspace:packages/starkex":
   version: 0.0.0-use.local
   resolution: "@imtbl/starkex@workspace:packages/starkex"
   dependencies:
-    "@imtbl/config": "*"
+    "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^1.0.2-alpha.5
     "@rollup/plugin-typescript": ^11.0.0
-    eslint: ^8.34.0
+    eslint: ^8.37.0
     rollup: ^3.17.2
     typescript: ^4.9.5
   languageName: unknown
   linkType: soft
 
-"@imtbl/toolkit@*, @imtbl/toolkit@workspace:packages/internal/toolkit":
+"@imtbl/toolkit@0.0.0, @imtbl/toolkit@workspace:packages/internal/toolkit":
   version: 0.0.0-use.local
   resolution: "@imtbl/toolkit@workspace:packages/internal/toolkit"
   dependencies:
@@ -2419,16 +2432,16 @@ __metadata:
     "@types/node": ^18.14.2
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
-    "@typescript-eslint/eslint-plugin": ^5.53.0
-    "@typescript-eslint/parser": ^5.53.0
+    "@typescript-eslint/eslint-plugin": ^5.57.1
+    "@typescript-eslint/parser": ^5.57.1
     axios: ^1.3.4
-    eslint: ^8.34.0
+    eslint: ^8.37.0
     ethers: ^5.7.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     magic-sdk: ^13.3.1
     oidc-client-ts: ^2.2.1
-    prettier: 2.8.4
+    prettier: ^2.8.7
     rollup: ^3.17.2
     ts-node: ^10.9.1
     typescript: ^4.9.5
@@ -3144,6 +3157,13 @@ __metadata:
     "@lezer/lr": ^0.15.4
     json5: ^2.2.1
   checksum: a30eda9eb02db5213b7aa2dc3c688257884a8969849ffa5a3a7c64c5f2a1cfed06691d94f02b37294a3a3b9efe7f88ee6b86c9ef20a799af54807ff2de2d253e
+  languageName: node
+  linkType: hard
+
+"@mobily/ts-belt@npm:3.13.1":
+  version: 3.13.1
+  resolution: "@mobily/ts-belt@npm:3.13.1"
+  checksum: 507417608ddf4ecadf6f4f5dbdc32083000727d1a7a3604dc22670861f617d8bbb53622348649eab36d4d5c81b4331da7c4a3707b610866ebfadea3af27c60de
   languageName: node
   linkType: hard
 
@@ -4948,13 +4968,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^16.18.12":
-  version: 16.18.23
-  resolution: "@types/node@npm:16.18.23"
-  checksum: 00e51db28fc7a182747f37215b3f25400b1c7a8525e09fa14e55be5798891a118ebf636a49d3197335a3580fcb8222fd4ecc20c2ccff69f1c0d233fc5697465d
-  languageName: node
-  linkType: hard
-
 "@types/parse-json@npm:^4.0.0":
   version: 4.0.0
   resolution: "@types/parse-json@npm:4.0.0"
@@ -5006,7 +5019,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.0.10, @types/react-dom@npm:^18.0.11":
+"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.0.11":
   version: 18.0.11
   resolution: "@types/react-dom@npm:18.0.11"
   dependencies:
@@ -5189,7 +5202,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^5.5.0, @typescript-eslint/eslint-plugin@npm:^5.53.0, @typescript-eslint/eslint-plugin@npm:^5.57.1":
+"@typescript-eslint/eslint-plugin@npm:^5.5.0, @typescript-eslint/eslint-plugin@npm:^5.57.1":
   version: 5.57.1
   resolution: "@typescript-eslint/eslint-plugin@npm:5.57.1"
   dependencies:
@@ -5224,7 +5237,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^5.5.0, @typescript-eslint/parser@npm:^5.53.0, @typescript-eslint/parser@npm:^5.56.0, @typescript-eslint/parser@npm:^5.57.1":
+"@typescript-eslint/parser@npm:^5.5.0, @typescript-eslint/parser@npm:^5.57.1":
   version: 5.57.1
   resolution: "@typescript-eslint/parser@npm:5.57.1"
   dependencies:
@@ -7159,6 +7172,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chalk@npm:4.1.2, chalk@npm:^4.0.0, chalk@npm:^4.0.2, chalk@npm:^4.1.0, chalk@npm:^4.1.2":
+  version: 4.1.2
+  resolution: "chalk@npm:4.1.2"
+  dependencies:
+    ansi-styles: ^4.1.0
+    supports-color: ^7.1.0
+  checksum: fe75c9d5c76a7a98d45495b91b2172fa3b7a09e0cc9370e5c8feb1c567b85c4288e2b3fded7cfdd7359ac28d6b3844feb8b82b8686842e93d23c827c417e83fc
+  languageName: node
+  linkType: hard
+
 "chalk@npm:5.2.0":
   version: 5.2.0
   resolution: "chalk@npm:5.2.0"
@@ -7184,16 +7207,6 @@ __metadata:
     ansi-styles: ^4.1.0
     supports-color: ^7.1.0
   checksum: 8e3ddf3981c4da405ddbd7d9c8d91944ddf6e33d6837756979f7840a29272a69a5189ecae0ff84006750d6d1e92368d413335eab4db5476db6e6703a1d1e0505
-  languageName: node
-  linkType: hard
-
-"chalk@npm:^4.0.0, chalk@npm:^4.0.2, chalk@npm:^4.1.0, chalk@npm:^4.1.2":
-  version: 4.1.2
-  resolution: "chalk@npm:4.1.2"
-  dependencies:
-    ansi-styles: ^4.1.0
-    supports-color: ^7.1.0
-  checksum: fe75c9d5c76a7a98d45495b91b2172fa3b7a09e0cc9370e5c8feb1c567b85c4288e2b3fded7cfdd7359ac28d6b3844feb8b82b8686842e93d23c827c417e83fc
   languageName: node
   linkType: hard
 
@@ -7487,7 +7500,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^10.0.0":
+"commander@npm:10.0.0, commander@npm:^10.0.0":
   version: 10.0.0
   resolution: "commander@npm:10.0.0"
   checksum: 9f6495651f878213005ac744dd87a85fa3d9f2b8b90d1c19d0866d666bda7f735adfd7c2f10dfff345782e2f80ea258f98bb4efcef58e4e502f25f883940acfd
@@ -7673,6 +7686,18 @@ __metadata:
   version: 1.0.3
   resolution: "core-util-is@npm:1.0.3"
   checksum: 9de8597363a8e9b9952491ebe18167e3b36e7707569eed0ebf14f8bba773611376466ae34575bca8cfe3c767890c859c74056084738f09d4e4a6f902b2ad7d99
+  languageName: node
+  linkType: hard
+
+"cosmiconfig@npm:8.0.0":
+  version: 8.0.0
+  resolution: "cosmiconfig@npm:8.0.0"
+  dependencies:
+    import-fresh: ^3.2.1
+    js-yaml: ^4.1.0
+    parse-json: ^5.0.0
+    path-type: ^4.0.0
+  checksum: ff4cdf89ac1ae52e7520816622c21a9e04380d04b82d653f5139ec581aa4f7f29e096d46770bc76c4a63c225367e88a1dfa233ea791669a35101f5f9b972c7d1
   languageName: node
   linkType: hard
 
@@ -9207,7 +9232,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8.3.0, eslint@npm:^8.34.0, eslint@npm:^8.37.0":
+"eslint@npm:^8.3.0, eslint@npm:^8.37.0":
   version: 8.37.0
   resolution: "eslint@npm:8.37.0"
   dependencies:
@@ -9543,6 +9568,13 @@ __metadata:
   version: 0.1.2
   resolution: "exit@npm:0.1.2"
   checksum: abc407f07a875c3961e4781dfcb743b58d6c93de9ab263f4f8c9d23bb6da5f9b7764fc773f86b43dd88030444d5ab8abcb611cb680fba8ca075362b77114bba3
+  languageName: node
+  linkType: hard
+
+"expect-more@npm:1.3.0":
+  version: 1.3.0
+  resolution: "expect-more@npm:1.3.0"
+  checksum: 8d6b0692fbc22ad327161cfaa4f5920aad98e459873ba57f959fc07ce19dab9408e6b13afca812c50261b77a1c404b6d6ba64a928c5650cb1b76b3e0900155c0
   languageName: node
   linkType: hard
 
@@ -9912,6 +9944,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fs-extra@npm:11.1.0":
+  version: 11.1.0
+  resolution: "fs-extra@npm:11.1.0"
+  dependencies:
+    graceful-fs: ^4.2.0
+    jsonfile: ^6.0.1
+    universalify: ^2.0.0
+  checksum: 5ca476103fa1f5ff4a9b3c4f331548f8a3c1881edaae323a4415d3153b5dc11dc6a981c8d1dd93eec8367ceee27b53f8bd27eecbbf66ffcdd04927510c171e7f
+  languageName: node
+  linkType: hard
+
 "fs-extra@npm:^10.0.0":
   version: 10.1.0
   resolution: "fs-extra@npm:10.1.0"
@@ -10158,6 +10201,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"glob@npm:8.1.0, glob@npm:^8.0.1, glob@npm:^8.0.3":
+  version: 8.1.0
+  resolution: "glob@npm:8.1.0"
+  dependencies:
+    fs.realpath: ^1.0.0
+    inflight: ^1.0.4
+    inherits: 2
+    minimatch: ^5.0.1
+    once: ^1.3.0
+  checksum: 92fbea3221a7d12075f26f0227abac435de868dd0736a17170663783296d0dd8d3d532a5672b4488a439bf5d7fb85cdd07c11185d6cd39184f0385cbdfb86a47
+  languageName: node
+  linkType: hard
+
 "glob@npm:^7.1.1, glob@npm:^7.1.2, glob@npm:^7.1.3, glob@npm:^7.1.4, glob@npm:^7.1.6":
   version: 7.2.3
   resolution: "glob@npm:7.2.3"
@@ -10169,19 +10225,6 @@ __metadata:
     once: ^1.3.0
     path-is-absolute: ^1.0.0
   checksum: 29452e97b38fa704dabb1d1045350fb2467cf0277e155aa9ff7077e90ad81d1ea9d53d3ee63bd37c05b09a065e90f16aec4a65f5b8de401d1dac40bc5605d133
-  languageName: node
-  linkType: hard
-
-"glob@npm:^8.0.1, glob@npm:^8.0.3":
-  version: 8.1.0
-  resolution: "glob@npm:8.1.0"
-  dependencies:
-    fs.realpath: ^1.0.0
-    inflight: ^1.0.4
-    inherits: 2
-    minimatch: ^5.0.1
-    once: ^1.3.0
-  checksum: 92fbea3221a7d12075f26f0227abac435de868dd0736a17170663783296d0dd8d3d532a5672b4488a439bf5d7fb85cdd07c11185d6cd39184f0385cbdfb86a47
   languageName: node
   linkType: hard
 
@@ -12490,7 +12533,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^4.1.0":
+"js-yaml@npm:^4.0.0, js-yaml@npm:^4.1.0":
   version: 4.1.0
   resolution: "js-yaml@npm:4.1.0"
   dependencies:
@@ -13444,6 +13487,15 @@ __metadata:
   version: 1.0.1
   resolution: "minimalistic-crypto-utils@npm:1.0.1"
   checksum: 6e8a0422b30039406efd4c440829ea8f988845db02a3299f372fceba56ffa94994a9c0f2fd70c17f9969eedfbd72f34b5070ead9656a34d3f71c0bd72583a0ed
+  languageName: node
+  linkType: hard
+
+"minimatch@npm:6.2.0":
+  version: 6.2.0
+  resolution: "minimatch@npm:6.2.0"
+  dependencies:
+    brace-expansion: ^2.0.1
+  checksum: 0ffb77d05bd483fcc344ba3e64a501d569e658fa6c592d94e9716ffc7925de7a8c2ac294cafa822b160bd8b2cbf7e01012917e06ffb9a85cfa9604629b3f2c04
   languageName: node
   linkType: hard
 
@@ -15428,15 +15480,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:2.8.4":
-  version: 2.8.4
-  resolution: "prettier@npm:2.8.4"
-  bin:
-    prettier: bin-prettier.js
-  checksum: c173064bf3df57b6d93d19aa98753b9b9dd7657212e33b41ada8e2e9f9884066bb9ca0b4005b89b3ab137efffdf8fbe0b462785aba20364798ff4303aadda57e
-  languageName: node
-  linkType: hard
-
 "prettier@npm:^2.8.7":
   version: 2.8.7
   resolution: "prettier@npm:2.8.7"
@@ -15946,6 +15989,16 @@ __metadata:
   dependencies:
     pify: ^2.3.0
   checksum: cffc728b9ede1e0667399903f9ecaf3789888b041c46ca53382fa3a06303e5132774dc0a96d0c16aa702dbac1ea0833d5a868d414f5ab2af1e1438e19e6657c6
+  languageName: node
+  linkType: hard
+
+"read-yaml-file@npm:2.1.0":
+  version: 2.1.0
+  resolution: "read-yaml-file@npm:2.1.0"
+  dependencies:
+    js-yaml: ^4.0.0
+    strip-bom: ^4.0.0
+  checksum: 52765eb183e79466f51eebeb19b933cc0f0e907052d062d67300b97e79910064a24b370cdb0b5dd8b05afff3d0ec57282670fd9070dc608e13b11820ac79183d
   languageName: node
   linkType: hard
 
@@ -16583,6 +16636,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"semver@npm:7.3.8, semver@npm:^7.3.2, semver@npm:^7.3.5, semver@npm:^7.3.7, semver@npm:^7.3.8":
+  version: 7.3.8
+  resolution: "semver@npm:7.3.8"
+  dependencies:
+    lru-cache: ^6.0.0
+  bin:
+    semver: bin/semver.js
+  checksum: ba9c7cbbf2b7884696523450a61fee1a09930d888b7a8d7579025ad93d459b2d1949ee5bbfeb188b2be5f4ac163544c5e98491ad6152df34154feebc2cc337c1
+  languageName: node
+  linkType: hard
+
 "semver@npm:^5.5.0, semver@npm:^5.7.0, semver@npm:^5.7.1":
   version: 5.7.1
   resolution: "semver@npm:5.7.1"
@@ -16609,17 +16673,6 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: debf7f4d6fa36fdc5ef82bd7fc3603b6412165c8a3963a30be0c45a587be1a49e7681e80aa109da1875765741af24edc6e021cee1ba16ae96f649d06c5df296d
-  languageName: node
-  linkType: hard
-
-"semver@npm:^7.3.2, semver@npm:^7.3.5, semver@npm:^7.3.7, semver@npm:^7.3.8":
-  version: 7.3.8
-  resolution: "semver@npm:7.3.8"
-  dependencies:
-    lru-cache: ^6.0.0
-  bin:
-    semver: bin/semver.js
-  checksum: ba9c7cbbf2b7884696523450a61fee1a09930d888b7a8d7579025ad93d459b2d1949ee5bbfeb188b2be5f4ac163544c5e98491ad6152df34154feebc2cc337c1
   languageName: node
   linkType: hard
 
@@ -17496,6 +17549,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"syncpack@npm:^9.8.4":
+  version: 9.8.4
+  resolution: "syncpack@npm:9.8.4"
+  dependencies:
+    "@mobily/ts-belt": 3.13.1
+    chalk: 4.1.2
+    commander: 10.0.0
+    cosmiconfig: 8.0.0
+    expect-more: 1.3.0
+    fs-extra: 11.1.0
+    glob: 8.1.0
+    minimatch: 6.2.0
+    read-yaml-file: 2.1.0
+    semver: 7.3.8
+    zod: 3.20.6
+  bin:
+    syncpack: dist/bin.js
+    syncpack-fix-mismatches: dist/bin-fix-mismatches/index.js
+    syncpack-format: dist/bin-format/index.js
+    syncpack-lint-semver-ranges: dist/bin-lint-semver-ranges/index.js
+    syncpack-list: dist/bin-list/index.js
+    syncpack-list-mismatches: dist/bin-list-mismatches/index.js
+    syncpack-set-semver-ranges: dist/bin-set-semver-ranges/index.js
+  checksum: 03bf4451662e5d03484ac041bbeac0081dff24a325d2e77a00bd6c69d34a2bd1ef776ccf19151af822ededafe96e33c4197a4d629aa507af79c5f1d00ccc28e4
+  languageName: node
+  linkType: hard
+
 "tailwindcss@npm:^3.0.2":
   version: 3.3.1
   resolution: "tailwindcss@npm:3.3.1"
@@ -17827,14 +17907,26 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ts-immutable-sdk@workspace:."
   dependencies:
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/core-sdk": ^1.0.2-alpha.5
+    "@magic-ext/oidc": ^1.0.1
+    "@metamask/detect-provider": ^2.0.0
     "@typescript-eslint/eslint-plugin": ^5.57.1
     "@typescript-eslint/parser": ^5.57.1
+    axios: ^1.3.4
     eslint: ^8.37.0
     eslint-config-prettier: ^8.8.0
     eslint-plugin-prettier: ^4.2.1
+    ethers: ^5.7.2
     husky: ^8.0.3
     lint-staged: ^13.2.0
+    magic-sdk: ^13.3.1
+    oidc-client-ts: ^2.2.1
     prettier: ^2.8.7
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    react-router-dom: ^6.8.2
+    syncpack: ^9.8.4
     wsrun: ^5.2.4
   languageName: unknown
   linkType: soft
@@ -19419,5 +19511,12 @@ __metadata:
     property-expr: ^2.0.4
     toposort: ^2.0.2
   checksum: 43a16786b47cc910fed4891cebdd89df6d6e31702e9462e8f969c73eac88551ce750732608012201ea6b93802c8847cb0aa27b5d57370640f4ecf30f9f97d4b0
+  languageName: node
+  linkType: hard
+
+"zod@npm:3.20.6":
+  version: 3.20.6
+  resolution: "zod@npm:3.20.6"
+  checksum: 804b1934b8b5e2fa3750bec90043e8118b201f330b9957b8b768389a971acadf812d2060cf62921086512dab4af691d10490acb03333da58fc485c0791893c89
   languageName: node
   linkType: hard

@@ -1,42 +1,9 @@
 {
   "name": "ts-immutable-sdk",
-  "version": "0.0.0",
   "description": "Immutable Unified TypeScript SDK",
-  "workspaces": [
-    "publish",
-    "packages/config",
-    "packages/starkex",
-    "packages/passport",
-    "packages/provider",
-    "packages/internal/toolkit",
-    "packages/checkout/sdk",
-    "packages/checkout/sample-app"
-  ],
-  "private": true,
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "scripts": {
-    "build": "wsrun -p @imtbl/sdk -r --stages build",
-    "build:all": "wsrun --stages build",
-    "test": "wsrun --exclude-missing -e test",
-    "lint": "wsrun --exclude-missing -e lint",
-    "typecheck": "wsrun --exclude-missing typecheck",
-    "postinstall": "husky install"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": "eslint"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/immutable/ts-immutable-sdk.git"
-  },
+  "version": "0.0.0",
   "author": "Immutable",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/immutable/ts-immutable-sdk/issues"
-  },
-  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
@@ -46,24 +13,38 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
     "prettier": "^2.8.7",
+    "syncpack": "^9.8.4",
     "wsrun": "^5.2.4"
   },
-  "packageManager": "yarn@3.5.0",
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.8.2",
-    "@ethersproject/providers": "^5.7.2",
-    "@metamask/detect-provider": "^2.0.0",
-    "ethers": "^5.7.2",
-    "@imtbl/core-sdk": "^1.0.2-alpha.5",
-    "@magic-ext/oidc": "^1.0.1",
-    "axios": "^1.3.4",
-    "eslint": "^8.34.0",
-    "magic-sdk": "^13.3.1",
-    "oidc-client-ts": "^2.2.1",
-    "@typescript-eslint/eslint-plugin": "^5.53.0",
-    "@typescript-eslint/parser": "^5.53.0"
+  "engines": {
+    "node": ">=14.0.0"
   },
-  "peerDependencies": {}
+  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "license": "Apache-2.0",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint"
+  },
+  "packageManager": "yarn@3.5.0",
+  "private": true,
+  "repository": "immutable/ts-immutable-sdk.git",
+  "scripts": {
+    "build": "wsrun -p @imtbl/sdk -r --stages build",
+    "build:all": "wsrun --stages build",
+    "lint": "wsrun --exclude-missing -e lint",
+    "postinstall": "husky install",
+    "test": "wsrun --exclude-missing -e test",
+    "typecheck": "wsrun --exclude-missing typecheck",
+    "checkMismatchedPackaged": "yarn syncpack list-mismatches",
+    "fixMismatchedPackaged": "yarn syncpack fix-mismatches && yarn syncpack format"
+  },
+  "workspaces": [
+    "publish",
+    "packages/config",
+    "packages/starkex",
+    "packages/passport",
+    "packages/provider",
+    "packages/internal/toolkit",
+    "packages/checkout/sdk",
+    "packages/checkout/sample-app"
+  ]
 }

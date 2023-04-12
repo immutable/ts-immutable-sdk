@@ -1,40 +1,35 @@
 {
   "name": "@imtbl/starkex",
-  "version": "0.0.0",
   "description": "StarkEx Client for Immutable SDK",
-  "private": true,
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "type": "module",
-  "files": [
-    "dist"
-  ],
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "scripts": {
-    "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "typecheck": "tsc --noEmit --jsx preserve",
-    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/immutable/ts-immutable-sdk.git"
-  },
+  "version": "0.0.0",
   "author": "Immutable",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/immutable/ts-immutable-sdk/issues"
-  },
-  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/core-sdk": "^1.0.2-alpha.5"
   },
   "devDependencies": {
-    "@imtbl/config": "*",
+    "@imtbl/config": "0.0.0",
     "@rollup/plugin-typescript": "^11.0.0",
-    "eslint": "^8.34.0",
+    "eslint": "^8.37.0",
     "rollup": "^3.17.2",
     "typescript": "^4.9.5"
-  }
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "private": true,
+  "repository": "immutable/ts-immutable-sdk.git",
+  "scripts": {
+    "build": "NODE_ENV=production rollup --config rollup.config.js",
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
+    "typecheck": "tsc --noEmit --jsx preserve"
+  },
+  "type": "module",
+  "types": "dist/index.d.ts"
 }
