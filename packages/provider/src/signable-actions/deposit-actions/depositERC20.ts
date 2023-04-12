@@ -6,7 +6,7 @@ import {
   TokensApi,
   UsersApi,
 } from '@imtbl/core-sdk';
-import { EthSigner } from 'types';
+import { EthSigner } from '@imtbl/core-sdk';
 import { Configuration } from '@imtbl/config';
 import { TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';

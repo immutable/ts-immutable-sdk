@@ -1,4 +1,4 @@
-import { CreateTradeResponse, GetSignableTradeRequest } from 'types';
+import { CreateTradeResponse, GetSignableTradeRequest } from '@imtbl/core-sdk';
 import { Signers } from './types';
 import { validateChain } from './helpers';
 import { signRaw } from '@imtbl/toolkit';

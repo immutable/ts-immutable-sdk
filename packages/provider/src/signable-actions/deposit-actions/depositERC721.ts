@@ -13,7 +13,7 @@ import {
 } from '../registration';
 import { Configuration } from '@imtbl/config';
 import { validateChain } from '../helpers';
-import { EthSigner } from 'types';
+import { EthSigner } from '@imtbl/core-sdk';
 import { Signers } from '../types';
 
 interface ERC721TokenData {

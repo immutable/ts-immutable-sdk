@@ -19,7 +19,7 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
   EthSigner,
-} from 'types';
+} from '@imtbl/core-sdk';
 import { batchTransfer, transfer } from './signable-actions/transfer';
 import { cancelOrder, createOrder } from './signable-actions/orders';
 import {

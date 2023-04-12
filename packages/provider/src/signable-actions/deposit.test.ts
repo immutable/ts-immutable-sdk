@@ -2,7 +2,7 @@ import { Configuration } from '@imtbl/config';
 import { deposit } from './deposit';
 import * as depositActions from './deposit-actions';
 import { Signers } from './types';
-import { TokenAmount } from 'types';
+import { TokenAmount } from '@imtbl/core-sdk';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('./deposit-actions');

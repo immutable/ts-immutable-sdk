@@ -3,7 +3,7 @@ import {
   EncodeAssetResponse,
   EncodeAssetTokenData,
   ImmutableXConfiguration,
-} from 'types';
+} from '@imtbl/core-sdk';
 import { EncodingApi } from '@imtbl/core-sdk';
 
 export async function getEncodeAssetInfo(

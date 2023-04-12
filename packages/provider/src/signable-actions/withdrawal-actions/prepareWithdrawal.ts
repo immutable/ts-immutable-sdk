@@ -3,7 +3,7 @@ import {
   CreateWithdrawalResponse,
   ImmutableXConfiguration,
 } from '@imtbl/core-sdk';
-import { TokenAmount } from 'types';
+import { TokenAmount } from '@imtbl/core-sdk';
 import { signMessage, convertToSignableToken } from '@imtbl/toolkit';
 import { Signers } from '../types';
 import { validateChain } from '../helpers';

@@ -15,7 +15,7 @@ import {
 import { BigNumber } from '@ethersproject/bignumber';
 import { TransactionResponse } from '@ethersproject/providers';
 import { validateChain } from '../helpers';
-import { EthSigner } from 'types';
+import { EthSigner } from '@imtbl/core-sdk';
 import { Signers } from '../types';
 
 interface ETHTokenData {
