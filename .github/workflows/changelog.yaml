@@ -33,5 +33,5 @@ jobs:
       uses: mshick/add-pr-comment@v2
       with:
         message: |
-          Changelog updated detected. Good work!
+          Changelog update detected. Good work!
           
