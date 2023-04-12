@@ -30,10 +30,10 @@
   "scripts": {
     "build": "wsrun -p @imtbl/sdk -e -r --stages build",
     "build:all": "wsrun --stages build",
-    "syncpack:check": "yarn syncpack list-mismatches",
-    "syncpack:fix": "yarn syncpack fix-mismatches && yarn syncpack format",
     "lint": "wsrun --exclude-missing -e lint",
     "postinstall": "husky install",
+    "syncpack:check": "yarn syncpack list-mismatches",
+    "syncpack:fix": "yarn syncpack fix-mismatches && yarn syncpack format",
     "test": "wsrun --exclude-missing -e test",
     "typecheck": "wsrun --exclude-missing typecheck"
   },

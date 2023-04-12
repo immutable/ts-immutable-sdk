@@ -37,6 +37,9 @@
     "semver": "^7.4.0",
     "typescript": "^4.9.5"
   },
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "exports": {
     "./package.json": "./package.json",
     ".": {
@@ -55,9 +58,6 @@
       "types": "./dist/provider.d.ts",
       "import": "./dist/provider.js"
     }
-  },
-  "engines": {
-    "node": ">=14.0.0"
   },
   "files": [
     "dist"
