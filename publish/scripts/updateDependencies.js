@@ -67,14 +67,14 @@ const main = async () => {
   const __dirname = path.resolve();
 
   const packageJson = JSON.parse(
-    fs.readFileSync(path.resolve(__dirname, '../package.json'), 'utf8')
+    fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf8')
   );
 
   packageJson.dependencies = dependencies;
   packageJson.peerDependencies = peerDependencies;
 
   fs.writeFileSync(
-    path.resolve(__dirname, '../package.json'),
+    path.resolve(__dirname, 'package.json'),
     JSON.stringify(packageJson, null, 2)
   );
 };
