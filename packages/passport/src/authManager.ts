@@ -1,30 +1,17 @@
-import { User as OidcUser, UserManager } from 'oidc-client-ts';
+import {
+  User as OidcUser,
+  UserManager,
+  UserManagerSettings,
+} from 'oidc-client-ts';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportMetadata, User, UserWithEtherKey } from './types';
 import { retryWithDelay } from './util/retry';
 import { PassportConfiguration } from './config';
 
-type AuthConfiguration = {
-  authority: string;
-  redirect_uri: string;
-  popup_redirect_uri: string;
-  client_id: string;
-  metadata: {
-    authorization_endpoint: string;
-    token_endpoint: string;
-    userinfo_endpoint: string;
-    end_session_endpoint: string;
-  };
-  mergeClaims: boolean;
-  loadUserInfo: boolean;
-  scope?: string;
-  extraQueryParams?: { audience: string };
-};
-
 const getAuthConfiguration = ({
   oidcConfiguration,
-}: PassportConfiguration): AuthConfiguration => {
-  const baseConfiguration: AuthConfiguration = {
+}: PassportConfiguration): UserManagerSettings => {
+  const baseConfiguration: UserManagerSettings = {
     authority: oidcConfiguration.authenticationDomain,
     redirect_uri: oidcConfiguration.redirectUri,
     popup_redirect_uri: oidcConfiguration.redirectUri,
