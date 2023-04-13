@@ -15,11 +15,6 @@ jobs:
       with:
         fetch-depth: 2
 
-    - name : Print Title of PR
-      run: |
-        echo The Title of your PR is ${{ github.event.pull_request.title }}
-        echo ${{ contains( github.event.pull_request.title, 'no-changelog') == true}}
-
     - if: ${{ contains(github.event.pull_request.title, 'no-changelog') }}
       name: Add comment about skipping check
       uses: mshick/add-pr-comment@v2
