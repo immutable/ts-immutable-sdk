@@ -11,6 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "@imtbl/economy": "workspace:^",
+    "@imtbl/passport": "workspace:^",
     "@imtbl/checkout-sdk-web": "workspace:^",
     "@imtbl/checkout-ui-types": "file:../../../.yalc/@imtbl/checkout-ui-types",
     "@imtbl/checkout-sdk-widgets": "file:../../../.yalc/@imtbl/checkout-sdk-widgets"
