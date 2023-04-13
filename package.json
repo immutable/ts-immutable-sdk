@@ -47,6 +47,7 @@
     "packages/internal/toolkit",
     "packages/checkout/sdk",
     "packages/checkout/sample-app",
-    "packages/economy/sdk"
+    "packages/economy/sdk",
+    "packages/economy/playground"
   ]
 }

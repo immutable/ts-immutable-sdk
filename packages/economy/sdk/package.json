@@ -1,5 +1,5 @@
 {
-  "name": "@imtbl/economy-sdk",
+  "name": "@imtbl/economy",
   "description": "Economy module for Immutable SDK",
   "version": "0.0.1",
   "type": "module",
