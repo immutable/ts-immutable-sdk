@@ -1,4 +1,8 @@
-import { User as OidcUser, UserManager } from 'oidc-client-ts';
+import {
+  User as OidcUser,
+  UserManager,
+  UserManagerSettings,
+} from 'oidc-client-ts';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportMetadata, User, UserWithEtherKey } from './types';
 import { retryWithDelay } from './util/retry';
@@ -6,23 +10,33 @@ import { PassportConfiguration } from './config';
 
 const getAuthConfiguration = ({
   oidcConfiguration,
-}: PassportConfiguration) => ({
-  authority: oidcConfiguration.authenticationDomain,
-  redirect_uri: oidcConfiguration.redirectUri,
-  popup_redirect_uri: oidcConfiguration.redirectUri,
-  client_id: oidcConfiguration.clientId,
-  metadata: {
-    authorization_endpoint: `${oidcConfiguration.authenticationDomain}/authorize`,
-    token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
-    userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
-    end_session_endpoint:
-      `${oidcConfiguration.authenticationDomain}/v2/logout` +
-      `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}` +
-      `&client_id=${oidcConfiguration.clientId}`,
-  },
-  mergeClaims: true,
-  loadUserInfo: true,
-});
+}: PassportConfiguration): UserManagerSettings => {
+  const baseConfiguration: UserManagerSettings = {
+    authority: oidcConfiguration.authenticationDomain,
+    redirect_uri: oidcConfiguration.redirectUri,
+    popup_redirect_uri: oidcConfiguration.redirectUri,
+    client_id: oidcConfiguration.clientId,
+    metadata: {
+      authorization_endpoint: `${oidcConfiguration.authenticationDomain}/authorize`,
+      token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
+      userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
+      end_session_endpoint:
+        `${oidcConfiguration.authenticationDomain}/v2/logout` +
+        `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}` +
+        `&client_id=${oidcConfiguration.clientId}`,
+    },
+    mergeClaims: true,
+    loadUserInfo: true,
+    scope: oidcConfiguration.scope,
+  };
+
+  if (oidcConfiguration.audience) {
+    baseConfiguration.extraQueryParams = {
+      audience: oidcConfiguration.audience,
+    };
+  }
+  return baseConfiguration;
+};
 
 export default class AuthManager {
   private userManager;
