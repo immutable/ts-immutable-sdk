@@ -11,7 +11,15 @@
     <imtbl-craft-button>
       <button>Craft Button</button>
     </imtbl-craft-button>
-
+    <imtbl-craft-connect>
+      <button slot="connect-button">Craft Connect Wallet</button>
+      <imtbl-connect
+        slot="connect-widget"
+        id="imtbl-connect"
+        providerPreference="metamask"
+        theme="dark"
+      ></imtbl-connect>
+    </imtbl-craft-connect>
     <script type="module" src="index.ts"></script>
   </body>
 </html>

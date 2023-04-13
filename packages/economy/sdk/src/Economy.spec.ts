@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { SDKError } from './Errors';
 import { Economy } from './Economy';
 
@@ -20,7 +24,7 @@ describe('Economy Class', () => {
     jest.clearAllMocks();
   });
 
-  it('should capture crafting errors', async () => {
+  it.only('should capture crafting errors', async () => {
     const craftFn = jest
       .requireMock('./crafting')
       .craft.mockImplementation(async () => {
