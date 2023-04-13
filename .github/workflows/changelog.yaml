@@ -1,10 +1,9 @@
 name: Changelog Checker
 
 on:
-  push:
+  pull_request:
     branches:
       - main
-  pull_request:
 
 jobs:
   change:
@@ -16,22 +15,32 @@ jobs:
       with:
         fetch-depth: 2
 
-    - name: Check Changelog Updated 
+    - name : Print Title of PR
+      run: |
+        echo The Title of your PR is ${{ github.event.pull_request.title }}
+        echo ${{ contains( github.event.pull_request.title, 'no-changelog') == true}}
+
+    - if: ${{ contains(github.event.pull_request.title, 'no-changelog') }}
+      name: Add comment about skipping check
+      uses: mshick/add-pr-comment@v2
+      with:
+        message: |
+          Skipping changelog updated check. Detected 'no-changelog' in PR title.
+
+    - if: ${{ !contains(github.event.pull_request.title, 'no-changelog') }}
+      name: Check Changelog Updated
       id: changelog
       run: |
         echo "CHANGELOG_UPDATED=$(git diff --name-only -r origin/main origin/${GITHUB_HEAD_REF} CHANGELOG.md)" >> $GITHUB_OUTPUT
         
-    - name: Run step only when any of the above files changed. 
-      if: steps.changelog.outputs.CHANGELOG_UPDATED != 'CHANGELOG.md'
+    - if: contains(github.event.pull_request.title, 'no-changelog') == false && steps.changelog.outputs.CHANGELOG_UPDATED != 'CHANGELOG.md'
+      name: Run step only when any of the above files changed.
       uses: mshick/add-pr-comment@v2
       with:
         message: |
-          No changelog updated detected, please add a summary of changes to CHANGELOG.md!
+          No changelog updated detected, please add a summary of changes to CHANGELOG.md. We follow this format https://keepachangelog.com/en/1.1.0/#how
 
-    - name: Run step only when any of the above files changed test 
-      if: steps.changelog.outputs.CHANGELOG_UPDATED == 'CHANGELOG.md'
-      uses: mshick/add-pr-comment@v2
-      with:
-        message: |
-          Changelog update detected. Good work!
-          
+    - if: contains(github.event.pull_request.title, 'no-changelog') == false && steps.changelog.outputs.CHANGELOG_UPDATED != 'CHANGELOG.md'
+      run: |
+        exit 1
+
