@@ -46,6 +46,7 @@
     "packages/provider",
     "packages/internal/toolkit",
     "packages/checkout/sdk",
-    "packages/checkout/sample-app"
+    "packages/checkout/sample-app",
+    "packages/economy/sdk"
   ]
 }
