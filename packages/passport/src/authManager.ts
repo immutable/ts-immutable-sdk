@@ -4,8 +4,27 @@ import { PassportMetadata, User, UserWithEtherKey } from './types';
 import { retryWithDelay } from './util/retry';
 import { PassportConfiguration } from './config';
 
-const getAuthConfiguration = ({ oidcConfiguration }: PassportConfiguration) => {
-  const baseConfiguration = {
+type AuthConfiguration = {
+  authority: string;
+  redirect_uri: string;
+  popup_redirect_uri: string;
+  client_id: string;
+  metadata: {
+    authorization_endpoint: string;
+    token_endpoint: string;
+    userinfo_endpoint: string;
+    end_session_endpoint: string;
+  };
+  mergeClaims: boolean;
+  loadUserInfo: boolean;
+  scope?: string;
+  extraQueryParams?: { audience: string };
+};
+
+const getAuthConfiguration = ({
+  oidcConfiguration,
+}: PassportConfiguration): AuthConfiguration => {
+  const baseConfiguration: AuthConfiguration = {
     authority: oidcConfiguration.authenticationDomain,
     redirect_uri: oidcConfiguration.redirectUri,
     popup_redirect_uri: oidcConfiguration.redirectUri,
@@ -24,14 +43,12 @@ const getAuthConfiguration = ({ oidcConfiguration }: PassportConfiguration) => {
     scope: oidcConfiguration.scope,
   };
 
-  return oidcConfiguration.audience
-    ? {
-        ...baseConfiguration,
-        extraQueryParams: {
-          audience: oidcConfiguration.audience,
-        },
-      }
-    : baseConfiguration;
+  if (oidcConfiguration.audience) {
+    baseConfiguration.extraQueryParams = {
+      audience: oidcConfiguration.audience,
+    };
+  }
+  return baseConfiguration;
 };
 
 export default class AuthManager {
