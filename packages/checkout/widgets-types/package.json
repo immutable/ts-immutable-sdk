@@ -22,8 +22,7 @@
   "scripts": {
     "build": "parcel build",
     "build:dist": "npm i && npm run build && npm run dist",
-    "dist": "npm pack && cp imtbl-checkout-ui-types-0.0.1.tgz ../../depends/",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dist": "npm pack && cp imtbl-checkout-ui-types-0.0.1.tgz ../../depends/"
   },
   "source": "index.ts",
   "types": "dist/types.d.ts"
