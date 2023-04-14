@@ -27,6 +27,9 @@ on:
         type: string
 
 jobs:
+  call-workflow-1-in-local-repo:
+    uses: immutable/ts-/.github/workflows/build-lint-typecheck-test.yaml
+
   packages:
     name: Packages
     runs-on: ubuntu-latest
@@ -36,21 +39,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Release Type
-        if: ${{ (contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta')) && (contains(github.event.inputs.release_type, 'patch') || contains(github.event.inputs.release_type, 'minor') || contains(github.event.inputs.release_type, 'major')) }}
-        run: echo "Version - ${{github.event.inputs.release_type}}"
-
-      - name: Check Input
-        run: echo "Version - ${{github.event.inputs.tag}}"
-
-      - name: Use Node.js
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          registry-url: https://registry.npmjs.org/
+          node-version: lts/*
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
 
       - name: Cache node modules
         uses: actions/cache@v3
@@ -62,7 +58,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Build
         run: yarn build
