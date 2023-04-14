@@ -21,7 +21,7 @@ jobs:
       uses: mshick/add-pr-comment@v2
       with:
         message: |
-          Skipping changelog updated check. Detected 'NO-CHANGELOG' in PR title.
+          Skipping changelog updated check. Detected `NO-CHANGELOG` in PR title.
 
     - if: ${{ !contains(github.event.pull_request.title, 'NO-CHANGELOG') }}
       name: Check Changelog Updated
