@@ -40,6 +40,6 @@
     "reload:sdk": "npm uninstall @imtbl/checkout-sdk-web --no-save",
     "reload:types": "npm uninstall @imtbl/checkout-ui-types --no-save",
     "start": "GENERATE_SOURCEMAP=false react-scripts start",
-    "test": "react-scripts test"
+    "test": "react-scripts test --passWithNoTests"
   }
 }
