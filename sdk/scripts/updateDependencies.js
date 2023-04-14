@@ -82,7 +82,10 @@ const main = async () => {
   );
 
   packageJson.dependencies = dependencies;
-  packageJson.peerDependencies = peerDependencies;
+  // Only add peerDependencies if there are any
+  if (Object.values(peerDependencies).length > 0) {
+    packageJson.peerDependencies = peerDependencies;
+  }
 
   fs.writeFileSync(
     path.resolve(__dirname, 'package.json'),
