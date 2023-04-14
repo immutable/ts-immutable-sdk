@@ -63,13 +63,13 @@ jobs:
       - name: Build
         run: yarn build
 
-      - name: Update package.json version for alpha, beta releases
-        if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
-        run: |
-          tmp=$(mktemp)
-          jq '.version = "${{github.event.inputs.tag}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
-
       #  Commenting out as this is still WIP
+
+      # - name: Update package.json version for alpha, beta releases
+      #   if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
+      #   run: |
+      #     tmp=$(mktemp)
+      #     jq '.version = "${{github.event.inputs.tag}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
       # - name: Alpha/Beta Release
       #   if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
