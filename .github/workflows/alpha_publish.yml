@@ -1,0 +1,65 @@
+name: Alpha Publish to NPM
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version number'
+        required: true
+        type: string
+      revision:
+        description: 'Alpha revision number'
+        required: true
+        type: string
+
+jobs:
+  packages:
+    name: Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Build
+        run: yarn build
+
+      - name: Typecheck
+        run: yarn typecheck
+
+      - name: Test
+        run: yarn test
+
+      - name: Update package.json version for alpha, beta releases
+        run: |
+          tmp=$(mktemp)
+          jq '.version = "${{github.event.inputs.version}}-alpha.${{github.event.inputs.revision}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
+
+      - name: Alpha/Beta Release
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+          access: public
+          package: ./sdk/package.json
+          tag: alpha
+          dry-run: true

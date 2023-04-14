@@ -78,18 +78,20 @@ jobs:
           tmp=$(mktemp)
           jq '.version = "${{github.event.inputs.tag}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
-      - name: Alpha/Beta Release
-        if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
-          access: public
-          package: ./sdk/package.json
-          tag: ${{ (contains(github.event.inputs.tag, 'alpha') && 'alpha') || (contains(github.event.inputs.tag, 'beta') && 'beta') || 'latest' }}
+      #  Commenting out as this is still WIP
 
-      - name: Authenticate NPM
-        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+      # - name: Alpha/Beta Release
+      #   if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
+      #   uses: JS-DevTools/npm-publish@v1
+      #   with:
+      #     token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+      #     access: public
+      #     package: ./sdk/package.json
+      #     tag: ${{ (contains(github.event.inputs.tag, 'alpha') && 'alpha') || (contains(github.event.inputs.tag, 'beta') && 'beta') || 'latest' }}
 
-      - name: Release
-        if: ${{ contains(github.event.inputs.release_type, 'patch') || contains(github.event.inputs.release_type, 'minor') || contains(github.event.inputs.release_type, 'major') }}
-        run: yarn release ${{github.event.inputs.release_type}} --ci
+      # - name: Authenticate NPM
+      #   run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+
+      # - name: Release
+      #   if: ${{ contains(github.event.inputs.release_type, 'patch') || contains(github.event.inputs.release_type, 'minor') || contains(github.event.inputs.release_type, 'major') }}
+      #   run: yarn release ${{github.event.inputs.release_type}} --ci
