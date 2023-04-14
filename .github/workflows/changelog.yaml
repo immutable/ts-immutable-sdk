@@ -15,27 +15,27 @@ jobs:
       with:
         fetch-depth: 2
 
-    - if: ${{ contains(github.event.pull_request.title, 'no-changelog') }}
+    - if: ${{ contains(github.event.pull_request.title, 'NO-CHANGELOG') }}
       name: Add comment about skipping check
       uses: mshick/add-pr-comment@v2
       with:
         message: |
-          Skipping changelog updated check. Detected 'no-changelog' in PR title.
+          Skipping changelog updated check. Detected 'NO-CHANGELOG' in PR title.
 
-    - if: ${{ !contains(github.event.pull_request.title, 'no-changelog') }}
+    - if: ${{ !contains(github.event.pull_request.title, 'NO-CHANGELOG') }}
       name: Check Changelog Updated
       id: changelog
       run: |
         echo "CHANGELOG_UPDATED=$(git diff --name-only -r origin/main origin/${GITHUB_HEAD_REF} CHANGELOG.md)" >> $GITHUB_OUTPUT
         
-    - if: contains(github.event.pull_request.title, 'no-changelog') == false && steps.changelog.outputs.CHANGELOG_UPDATED != 'CHANGELOG.md'
+    - if: contains(github.event.pull_request.title, 'NO-CHANGELOG') == false && steps.changelog.outputs.CHANGELOG_UPDATED != 'CHANGELOG.md'
       name: Run step only when any of the above files changed.
       uses: mshick/add-pr-comment@v2
       with:
         message: |
-          No changelog updated detected, please add a summary of changes to CHANGELOG.md. We follow this format https://keepachangelog.com/en/1.1.0/#how
+          No changelog updated detected, please add a summary of changes to CHANGELOG.md. For changelog format please see [this](https://immutable.atlassian.net/wiki/spaces/PPS/pages/2146862207/Changelog+Guidelines+for+Unified+SDK)
 
-    - if: contains(github.event.pull_request.title, 'no-changelog') == false && steps.changelog.outputs.CHANGELOG_UPDATED != 'CHANGELOG.md'
+    - if: contains(github.event.pull_request.title, 'NO-CHANGELOG') == false && steps.changelog.outputs.CHANGELOG_UPDATED != 'CHANGELOG.md'
       run: |
         exit 1
 
