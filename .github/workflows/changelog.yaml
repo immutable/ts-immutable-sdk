@@ -33,7 +33,7 @@ jobs:
       uses: mshick/add-pr-comment@v2
       with:
         message: |
-          No changelog updated detected, please add a summary of changes to CHANGELOG.md. For changelog format please see [this](https://immutable.atlassian.net/wiki/spaces/PPS/pages/2146862207/Changelog+Guidelines+for+Unified+SDK)
+          No changelog updated detected, please add a summary of changes to CHANGELOG.md. For changelog format please see [this](https://immutable.atlassian.net/wiki/spaces/PPS/pages/2146862207/Changelog+Guidelines+for+Unified+SDK). If no notable changes to be added to changelog, please add `NO-CHANGELOG` to PR title.
 
     - if: contains(github.event.pull_request.title, 'NO-CHANGELOG') == false && steps.changelog.outputs.CHANGELOG_UPDATED != 'CHANGELOG.md'
       run: |
