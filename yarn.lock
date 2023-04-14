@@ -2313,7 +2313,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/economy-playground@workspace:packages/economy/playground"
   dependencies:
-    "@imtbl/economy": "workspace:^"
+    "@imtbl/economy": 0.0.1
     "@parcel/transformer-sass": 2.8.3
     "@parcel/transformer-typescript-tsc": ^2.8.3
     lit: ^2.7.0
@@ -2324,7 +2324,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/economy@workspace:^, @imtbl/economy@workspace:packages/economy/sdk":
+"@imtbl/economy@0.0.1, @imtbl/economy@workspace:packages/economy/sdk":
   version: 0.0.0-use.local
   resolution: "@imtbl/economy@workspace:packages/economy/sdk"
   dependencies:

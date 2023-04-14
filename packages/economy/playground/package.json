@@ -10,7 +10,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@imtbl/economy": "workspace:^"
+    "@imtbl/economy": "0.0.1"
   },
   "devDependencies": {
     "@parcel/transformer-sass": "2.8.3",
