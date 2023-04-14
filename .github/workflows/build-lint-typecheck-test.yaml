@@ -26,9 +26,6 @@ jobs:
           node-version: v16.16.0
           registry-url: https://registry.npmjs.org/
 
-      # - name: Install yarn
-      #   run: npm i -g yarn
-
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn config get cacheFolder)"

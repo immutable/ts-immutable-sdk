@@ -1,0 +1,95 @@
+name: Publish to NPM
+
+on:
+  workflow_dispatch:
+    inputs:
+      upgrade_type:
+        type: choice
+        description: Upgrade Type
+        options:
+          - patch
+          - minor
+          - major
+        required: true
+        default: patch
+      release_type:
+        type: choice
+        description: Release Type
+        options:
+          - alpha
+          - beta
+          - public
+        required: true
+        default: alpha
+      alpha_beta_version:
+        description: '(optional) alpha/beta version number'
+        required: false
+        type: string
+
+jobs:
+  packages:
+    name: Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Release Type
+        if: ${{ (contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta')) && (contains(github.event.inputs.release_type, 'patch') || contains(github.event.inputs.release_type, 'minor') || contains(github.event.inputs.release_type, 'major')) }}
+        run: echo "Version - ${{github.event.inputs.release_type}}"
+
+      - name: Check Input
+        run: echo "Version - ${{github.event.inputs.tag}}"
+
+      - name: Read .nvmrc
+        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+        id: nvm
+
+      - name: Use Node.js ${{ steps.nvm.outputs.NODE_VERSION }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
+          registry-url: https://registry.npmjs.org/
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Update package.json version for alpha, beta releases
+        if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
+        run: |
+          tmp=$(mktemp)
+          jq '.version = "${{github.event.inputs.tag}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
+
+      - name: Alpha/Beta Release
+        if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+          access: public
+          package: ./sdk/package.json
+          tag: ${{ (contains(github.event.inputs.tag, 'alpha') && 'alpha') || (contains(github.event.inputs.tag, 'beta') && 'beta') || 'latest' }}
+
+      - name: Authenticate NPM
+        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+
+      - name: Release
+        if: ${{ contains(github.event.inputs.release_type, 'patch') || contains(github.event.inputs.release_type, 'minor') || contains(github.event.inputs.release_type, 'major') }}
+        run: yarn release ${{github.event.inputs.release_type}} --ci
