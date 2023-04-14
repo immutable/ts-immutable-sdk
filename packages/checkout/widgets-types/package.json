@@ -11,7 +11,7 @@
   "devDependencies": {
     "@parcel/packager-ts": "^2.8.3",
     "@parcel/transformer-typescript-types": "^2.8.3",
-    "@types/node": "*",
+    "@types/node": "^18.14.2",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "parcel": "^2.8.3",
