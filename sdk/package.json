@@ -5,6 +5,8 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
+    "@biom3/design-tokens": "0.1.4-beta",
+    "@biom3/react": "^0.1.3-beta",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/core-sdk": "^1.0.2-alpha.5",
     "@magic-ext/oidc": "^1.0.1",
@@ -18,9 +20,11 @@
     "oidc-client-ts": "^2.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.8.2"
+    "react-router-dom": "^6.10.0"
   },
   "devDependencies": {
+    "@imtbl/checkout-sdk-web": "0.0.0",
+    "@imtbl/checkout-ui-types": "0.0.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/provider": "0.0.0",
@@ -57,6 +61,14 @@
     "./provider": {
       "types": "./dist/provider.d.ts",
       "import": "./dist/provider.js"
+    },
+    "./checkout_sdk": {
+      "types": "./dist/checkout_sdk.d.ts",
+      "import": "./dist/checkout_sdk.js"
+    },
+    "./checkout_widgets": {
+      "types": "./dist/checkout_widgets.d.ts",
+      "import": "./dist/checkout_widgets.js"
     }
   },
   "files": [
@@ -67,7 +79,7 @@
   "main": "./dist/index.cjs",
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "yarn packageList & yarn updateDependencies && rm -rf dist && NODE_ENV=production rollup --config rollup.config.js && rm -rf dist/types",
+    "build": "yarn packageList && yarn updateDependencies && rm -rf dist && NODE_ENV=production rollup --config rollup.config.js && rm -rf dist/types",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "packageList": "./scripts/generate-package-list.sh",
     "typecheck": "tsc --noEmit --jsx preserve",

@@ -4,7 +4,7 @@ import semver from 'semver';
 import fs from 'fs';
 import path from 'path';
 
-async function collectDependencies() {
+async function collectDependencies(workspacePackages) {
   const cwd = process.cwd();
   const pluginConfiguration = getPluginConfiguration();
   const configuration = await Configuration.find(cwd, pluginConfiguration);
@@ -14,6 +14,9 @@ async function collectDependencies() {
   const peerDependenciesMap = new Map();
 
   const updateVersion = (map, dependency, version) => {
+    // Don't add any workspace packages as a dependency
+    if (workspacePackages.includes(dependency)) return;
+
     const existingVersion = map.get(dependency);
 
     if (
@@ -62,9 +65,17 @@ const parseVersion = (version) => {
 
 // Update package.json with the dependencies and peerDependencies
 const main = async () => {
-  const { dependencies, peerDependencies } = await collectDependencies();
-
   const __dirname = path.resolve();
+
+  const workspacePackages = JSON.parse(
+    fs.readFileSync(path.resolve(__dirname, 'workspace-packages.json'), {
+      encoding: 'utf8',
+    })
+  ).map((pkg) => pkg.name);
+
+  const { dependencies, peerDependencies } = await collectDependencies(
+    workspacePackages
+  );
 
   const packageJson = JSON.parse(
     fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf8')

@@ -30,8 +30,11 @@
   "packageManager": "yarn@3.5.0",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
+  "resolutions": {
+    "@biom3/design-tokens": "0.1.4-beta"
+  },
   "scripts": {
-    "build": "wsrun -p @imtbl/sdk -e -r --stages build && yarn syncpack:format",
+    "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets -e -r --stages build && yarn syncpack:format",
     "build:all": "wsrun --stages build",
     "lint": "wsrun --exclude-missing -e lint",
     "postinstall": "husky install",
@@ -49,6 +52,9 @@
     "packages/provider",
     "packages/internal/toolkit",
     "packages/checkout/sdk",
-    "packages/checkout/sample-app"
+    "packages/checkout/sdk-sample-app",
+    "packages/checkout/widgets",
+    "packages/checkout/widgets-sample-app",
+    "packages/checkout/widgets-types"
   ]
 }
