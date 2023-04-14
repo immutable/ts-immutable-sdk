@@ -67,4 +67,3 @@ jobs:
           access: public
           package: ./sdk/package.json
           tag: alpha
-          dry-run: true
