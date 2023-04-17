@@ -27,8 +27,9 @@ on:
         description: '(Optional) Pre release revision bump'
         required: false
         options:
+          - ""
           - revision
-        default: revision
+        default: ""
 
 
 jobs:
@@ -87,10 +88,14 @@ jobs:
           jq '.version = "${{github.event.inputs.tag}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
           
       - name: Get next version string
+        id: version
         run: |
           echo "NEXT_VERSION=./.github/scripts/version.sh --${{ github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} --${{ github.event.inputs.pre_release_revision }}">> $GITHUB_OUTPUT
         shell: bash
 
+      - name: Print Next Version
+        run: |
+          echo "Next Version: ${{steps.version.NEXT_VERSION}}"
       #  Commenting out as this is still WIP
 
       # - name: Alpha/Beta Release
