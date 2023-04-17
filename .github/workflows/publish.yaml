@@ -18,10 +18,10 @@ on:
         description: Upgrade Type
         options:
           - ""
-          - patch
+          - patch 
           - minor
           - major
-        required: true
+        required: false
         default: ""
       pre_release_revision:
         type: choice
@@ -31,7 +31,11 @@ on:
           - ""
           - revision
         default: ""
-
+      dry_run:
+        type: boolean
+        description: '(Optional) Dry run'
+        required: false
+        default: false
 
 jobs:
   Publish:
@@ -86,10 +90,10 @@ jobs:
       #   run: yarn test
 
       - name: Update package.json version for pre (alpha, beta) releases
-        if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') || contains(github.event.inputs.tag, 'release-candidate') }}
+        if: ${{ contains(github.event.inputs.release_type, 'alpha') || contains(github.event.inputs.release_type, 'beta') || contains(github.event.inputs.release_type, 'release-candidate') }}
         run: |
           tmp=$(mktemp)
-          jq '.version = "${{github.event.inputs.tag}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
+          jq '.version = "${{github.event.inputs.release_type}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
           
       - name: Get next version string
         id: version
@@ -105,21 +109,21 @@ jobs:
       #  Commenting out as this is still WIP
 
       - name: Pre Release Step
-        if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }} || contains(github.event.inputs.tag, 'release-candidate') }}
+        if: ${{ contains(github.event.inputs.release_type, 'alpha') || contains(github.event.inputs.release_type, 'beta') }} || contains(github.event.inputs.release_type, 'release-candidate') }}
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
           access: public
           package: ./sdk/package.json
           tag: ${{ steps.version.outputs.NEXT_VERSION }}
-          dry-run: true
+          dry-run: ${{ github.event.inputs.dry_run }}
 
       - name: Print New Version
         id: publish
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
-          dry-run: true
+          dry-run: ${{ github.event.inputs.dry_run }}
       - if: steps.publish.outputs.type != 'none'
         run: |
           echo "Version changed: ${{ steps.publish.outputs.old-version }} => ${{ steps.publish.outputs.version }}"
