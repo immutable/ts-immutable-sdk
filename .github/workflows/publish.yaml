@@ -23,16 +23,17 @@ on:
         required: true
         default: alpha
       pre_release_revision:
+        type: choice
         description: '(Optional) Pre release revision bump'
         required: false
-        type: boolean
+        options:
+          - revision
+        default: revision
+
 
 jobs:
-  call-workflow-1-in-local-repo:
-    uses: immutable/ts-/.github/workflows/build-lint-typecheck-test.yaml
-
-  packages:
-    name: Packages
+  Publish:
+    name: Publish Workflow
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -64,6 +65,21 @@ jobs:
       - name: Build
         run: yarn build
 
+      - name: Check Single Package Version Policy
+        run: yarn syncpack:check
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Build
+        run: yarn build
+
+      - name: Typecheck
+        run: yarn typecheck
+
+      - name: Test
+        run: yarn test
+
       - name: Update package.json version for pre (alpha, beta) releases
         if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
         run: |
@@ -72,7 +88,7 @@ jobs:
           
       - name: Get next version string
         run: |
-          echo "NEXT_VERSION=./.github/scripts/version.sh --${{ github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} ${{github.event.inputs.pre_release_revision ? -e : "" }}">> $GITHUB_OUTPUT
+          echo "NEXT_VERSION=./.github/scripts/version.sh --${{ github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} --${{ github.event.inputs.pre_release_revision }}">> $GITHUB_OUTPUT
         shell: bash
 
       #  Commenting out as this is still WIP
