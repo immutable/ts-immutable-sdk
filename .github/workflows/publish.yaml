@@ -90,7 +90,7 @@ jobs:
       - name: Get next version string
         id: version
         run: |
-          echo "NEXT_VERSION=./.github/scripts/version.sh --${{ github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} --${{ github.event.inputs.pre_release_revision }}">> $GITHUB_OUTPUT
+          echo "NEXT_VERSION=$(./.github/scripts/version.sh --github.event.inputs.release_type --github.event.inputs.upgrade_type --github.event.inputs.pre_release_revision)">> $GITHUB_OUTPUT
         shell: bash
 
       - name: Print Next Version
