@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@biom3/react'
-import {ConnectionProviders, ConnectResult} from '@imtbl/checkout-sdk-web'
+import {ConnectionProviders} from '@imtbl/checkout-sdk-web'
 import { ButtonWrapperStyle } from '../../ConnectStyles'
 import { Actions, ConnectContext } from '../../context/ConnectContext'
 import { useContext } from 'react'
