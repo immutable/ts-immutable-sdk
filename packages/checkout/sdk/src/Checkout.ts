@@ -67,6 +67,7 @@ export class Checkout {
   public getTokenAllowList(
     params: GetTokenAllowListParams
   ): GetTokenAllowListResult {
+    //fix me
     return tokens.getTokenAllowList(params);
   }
 
