@@ -18,13 +18,14 @@ on:
         options:
           - alpha
           - beta
-          - public
+          - release
+          - release-candidate
         required: true
         default: alpha
-      alpha_beta_version:
-        description: '(optional) alpha/beta version number'
+      pre_release_revision:
+        description: '(Optional) Pre release revision bump'
         required: false
-        type: string
+        type: boolean
 
 jobs:
   call-workflow-1-in-local-repo:
@@ -39,37 +40,42 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
+      # - name: Setup Node
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: lts/*
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      # - name: Get yarn cache directory path
+      #   id: yarn-cache-dir-path
+      #   run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+      # - name: Cache node modules
+      #   uses: actions/cache@v3
+      #   id: yarn-cache
+      #   with:
+      #     path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+      #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-yarn-
 
-      - name: Install dependencies
-        run: yarn install --immutable
+      # - name: Install dependencies
+      #   run: yarn install --immutable
 
-      - name: Build
-        run: yarn build
+      # - name: Build
+      #   run: yarn build
 
-      #  Commenting out as this is still WIP
-
-      # - name: Update package.json version for alpha, beta releases
+      # - name: Update package.json version for pre (alpha, beta) releases
       #   if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
       #   run: |
       #     tmp=$(mktemp)
       #     jq '.version = "${{github.event.inputs.tag}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
+          
+      - name: Get next version string
+        run: |
+          echo "NEXT_VERSION=./.github/scripts/version.sh --${{ github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} ${{github.event.inputs.pre_release_revision ? -e : "" }}">> $GITHUB_OUTPUT
+        shell: bash
+
+      #  Commenting out as this is still WIP
 
       # - name: Alpha/Beta Release
       #   if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
