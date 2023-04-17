@@ -10,7 +10,7 @@ export class ImmutableBridge extends HTMLElement {
 
   static get observedAttributes() { return ['theme']; }
 
-  theme = WidgetTheme.DARK
+  theme = WidgetTheme.LIGHT
   fromNetwork = Network.ETHEREUM
   fromContract = ''
   amount = ''
@@ -21,18 +21,21 @@ export class ImmutableBridge extends HTMLElement {
     this.connectedCallback()
   }
 
-  attributeChangedCallback() {
-    this.connectedCallback()
+  attributeChangedCallback(name, oldValue, newValue) {
+    this[name] = newValue
+    this.renderWidget()
   }
 
   connectedCallback() {
-
     this.theme = this.getAttribute('theme') as WidgetTheme;
     this.fromContract = this.getAttribute('fromContractAddress') as string;
     this.fromNetwork = this.getAttribute('fromNetwork') as Network;
     this.amount = this.getAttribute('amount') as string;
     this.providerPreference = this.getAttribute('providerPreference') as ConnectionProviders;
+    this.renderWidget()
+  }
 
+  renderWidget() {
     const params:BridgeWidgetParams = {
       providerPreference: this.providerPreference,
       fromContractAddress: this.fromContract,

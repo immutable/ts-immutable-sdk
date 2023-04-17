@@ -33,7 +33,6 @@ export class ImmutableExample extends HTMLElement {
     this.fromNetwork = this.getAttribute('fromNetwork') as Network;
     this.amount = this.getAttribute('amount') as string;
     this.providerPreference = this.getAttribute('providerPreference') as ConnectionProviders;
-
     this.renderWidget()
   }
 

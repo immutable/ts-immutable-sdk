@@ -1,7 +1,7 @@
 import { BiomeThemeProvider, Body, Box, Heading } from '@biom3/react';
 import { Checkout, ConnectResult } from '@imtbl/checkout-sdk-web';
 import { ConnectionProviders, WidgetTheme } from '@imtbl/checkout-ui-types';
-import { onDarkBase } from '@biom3/design-tokens';
+import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { SwapForm } from './components/SwapForm';
 import { SwapWidgetStyle } from './SwapStyles';
 import { useEffect, useState, useMemo, useCallback } from 'react';
@@ -28,8 +28,9 @@ export interface SwapWidgetParams {
 export function SwapWidget(props: SwapWidgetProps) {
   const [connection, setConnection] = useState<ConnectResult>();
   const [view, setView] = useState(SwapWidgetViews.SWAP);
-  const { params } = props;
+  const { params, theme } = props;
   const { amount, fromContractAddress, toContractAddress, providerPreference } = params;
+  const biomeTheme:BaseTokens = (theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()) ? onLightBase : onDarkBase
   const checkout = useMemo(() => new Checkout(), []);
   const connectToCheckout = useCallback(async () => {
     const result = providerPreference && await checkout.connect({
@@ -80,7 +81,7 @@ export function SwapWidget(props: SwapWidgetProps) {
   }
   
   return (
-    <BiomeThemeProvider theme={{ base: onDarkBase }}>
+    <BiomeThemeProvider theme={{ base: biomeTheme }}>
       <Box sx={SwapWidgetStyle}>
         <Heading size={'medium'}>Swap Widget</Heading>
         {view === SwapWidgetViews.SWAP && renderSwapForm()}

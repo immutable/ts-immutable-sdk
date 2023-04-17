@@ -8,21 +8,24 @@ export class ImmutableConnect extends HTMLElement {
 
   reactRoot?:ReactDOM.Root
 
-  static get observedAttributes() { return ['name']; }
+  static get observedAttributes() { return ['theme']; }
 
-  theme = WidgetTheme.DARK
+  theme = WidgetTheme.LIGHT
   providerPreference = ConnectionProviders.METAMASK
   
 
-  attributeChangedCallback() {
-    this.connectedCallback()
+  attributeChangedCallback(name, oldValue, newValue) {
+    this[name] = newValue
+    this.renderWidget()
   }
 
   connectedCallback() {
-
     this.theme = this.getAttribute('theme') as WidgetTheme;
     this.providerPreference = this.getAttribute('providerPreference') as ConnectionProviders;
+    this.renderWidget()
+  }
 
+  renderWidget() {
     const connectParams:ConnectWidgetParams = {
       providerPreference: this.providerPreference,
     }

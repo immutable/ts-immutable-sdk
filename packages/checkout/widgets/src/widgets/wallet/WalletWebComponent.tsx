@@ -8,25 +8,23 @@ export class ImmutableWallet extends HTMLElement {
 
   reactRoot?:ReactDOM.Root
 
-  static get observedAttributes() { return ['name']; }
+  static get observedAttributes() { return ['theme']; }
 
   theme = WidgetTheme.DARK
   providerPreference = ConnectionProviders.METAMASK
 
-  setTheme(theme:WidgetTheme) {
-    this.theme = theme
-    this.connectedCallback()
-  }
-
-  attributeChangedCallback() {
-    this.connectedCallback()
+  attributeChangedCallback(name, oldValue, newValue) {
+    this[name] = newValue
+    this.renderWidget()
   }
 
   connectedCallback() {
-  
     this.theme = this.getAttribute('theme') as WidgetTheme;
     this.providerPreference = this.getAttribute('providerPreference') as ConnectionProviders;
+    this.renderWidget()    
+  }
 
+  renderWidget() {
     const walletParams:WalletWidgetParams = {
       providerPreference: this.providerPreference,
     }
@@ -41,4 +39,5 @@ export class ImmutableWallet extends HTMLElement {
       </React.StrictMode>
     );
   }
+
 }

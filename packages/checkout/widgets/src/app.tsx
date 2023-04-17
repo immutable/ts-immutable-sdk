@@ -7,23 +7,29 @@ import {
 } from "react-router-dom";
 import ExampleWebView from './widgets/example/ExampleWebView';
 import BuyWebView from './widgets/buy/BuyWebView';
+import ConnectWebView from './widgets/connect/ConnectWebView';
+import SwapWebView from './widgets/swap/SwapWebView';
+import BridgeWebView from './widgets/bridge/BridgeWebView';
+import WalletWebView from './widgets/wallet/WalletWebView';
 
 require('./build.tsx')
 
 function App() {
   return(
     <div>
-      <imtbl-connect theme="DARK" providerPreference="metamask"></imtbl-connect>
+      <h1>Checkout Widgets</h1>
       <br />
-      <imtbl-wallet theme="DARK" providerPreference="metamask"></imtbl-wallet>
+      <h2><a href="/connect">Connect Widget</a></h2>
       <br />
-      <imtbl-swap theme="DARK" providerPreference="metamask" amount="50000000000000000000" fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0" toContractAddress=""></imtbl-swap>
+      <h2><a href="/wallet">Wallet Widget</a></h2>
       <br />
-      <imtbl-bridge theme="DARK" providerPreference="metamask" amount="50" fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0" fromNetwork="Goerli"></imtbl-bridge>
+      <h2><a href="/swap">Swap Widget</a></h2>
       <br />
-      <imtbl-buy theme="dark" providerPreference="metamask" orderId="1234"></imtbl-buy>
+      <h2><a href="/bridge">Bridge Widget</a></h2>
       <br />
-      <imtbl-example theme="light" providerPreference="metamask"></imtbl-example>
+      <h2><a href="/buy">Buy Widget</a></h2>
+      <br />
+      <h2><a href="/example">Example Widget</a></h2>
     </div>
   )
 }
@@ -36,6 +42,22 @@ const router = createBrowserRouter([
   {
     path: "/example",
     element: <ExampleWebView />,
+  },
+  {
+    path: "/connect",
+    element: <ConnectWebView />,
+  },
+  {
+    path: "/swap",
+    element: <SwapWebView />,
+  },
+  {
+    path: "/bridge",
+    element: <BridgeWebView />,
+  },
+  {
+    path: "/wallet",
+    element: <WalletWebView />,
   },
   {
     path: "/buy",

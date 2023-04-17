@@ -1,5 +1,5 @@
 import {Badge, BiomeThemeProvider, Body, Box, Button} from "@biom3/react";
-import {onDarkBase} from "@biom3/design-tokens";
+import {BaseTokens, onDarkBase, onLightBase} from "@biom3/design-tokens";
 
 import {WidgetTheme, Network} from "@imtbl/checkout-ui-types";
 
@@ -30,7 +30,9 @@ export interface WalletWidgetParams {
 }
 
 export function WalletWidget(props:WalletWidgetProps) {
-  const { params } = props;
+  const { params, theme } = props;
+  const biomeTheme:BaseTokens = (theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()) ? onLightBase : onDarkBase
+
   const [provider, setProvider] = useState<Web3Provider>();
   const [networkName, setNetworkName] = useState<string>("");
   const [tokenBalances, setTokenBalances] = useState<BalanceInfo[]>();
@@ -101,7 +103,7 @@ export function WalletWidget(props:WalletWidgetProps) {
   }
 
   return(
-    <BiomeThemeProvider theme={{base: onDarkBase}}>
+    <BiomeThemeProvider theme={{base: biomeTheme}}>
       <Box sx={WalletWidgetStyle}>
         <Box sx={WidgetHeaderStyle}>
           <NetworkStatus networkName={networkName} />
