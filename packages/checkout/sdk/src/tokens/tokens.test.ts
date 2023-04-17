@@ -8,7 +8,7 @@ const enum Icon {
 }
 
 describe('tokens', () => {
-  it.only('should return the alphabetically sorted tokens allowlist', async () => {
+  it('should return the filtered list of allowed tokens for a given chain id and all action types', async () => {
     await expect(
       await getTokenAllowList({
         type: TokenFilterTypes.ALL,
