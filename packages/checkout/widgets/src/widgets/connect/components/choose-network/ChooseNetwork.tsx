@@ -1,18 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {Button} from '@biom3/react'
-import {ConnectWidgetViews} from '../../ConnectWidget'
 import {ChainId, Checkout} from '@imtbl/checkout-sdk-web'
-import {Web3Provider} from '@ethersproject/providers'
+import { ConnectContext } from '../../context/ConnectContext';
+import { useContext } from 'react';
+import { ConnectWidgetViews } from '../../ConnectWidget';
 
 export interface ChooseNetworkProps {
   updateView: (newView: ConnectWidgetViews, err?: any) => void;
-  provider: Web3Provider|null;
 }
 
 export function ChooseNetwork (props:ChooseNetworkProps) {
+  const { state } = useContext(ConnectContext);
+  const { provider } = state;
+
+  // todo: do we want to move this to context?
   const checkout:Checkout = new Checkout()
 
-  const { updateView, provider } = props
+  const { updateView } = props
 
   async function connectPolygonClick() {
     try {
@@ -27,7 +31,6 @@ export function ChooseNetwork (props:ChooseNetworkProps) {
       updateView(ConnectWidgetViews.FAIL, err)
       return
     }
-
   }
 
   return (
