@@ -36,6 +36,8 @@ export interface OidcConfiguration {
   clientId: string;
   logoutRedirectUri: string;
   redirectUri: string;
+  scope?: string;
+  audience?: string;
 }
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
