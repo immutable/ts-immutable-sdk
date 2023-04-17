@@ -8,9 +8,7 @@ on:
         description: Release Type
         options:
           - alpha
-          - beta
           - release
-          - release-candidate
         required: true
         default: alpha
       upgrade_type:
@@ -89,12 +87,6 @@ jobs:
       # - name: Test
       #   run: yarn test
 
-      - name: Update package.json version for pre (alpha, beta) releases
-        if: ${{ contains(github.event.inputs.release_type, 'alpha') || contains(github.event.inputs.release_type, 'beta') || contains(github.event.inputs.release_type, 'release-candidate') }}
-        run: |
-          tmp=$(mktemp)
-          jq '.version = "${{github.event.inputs.release_type}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
-          
       - name: Get next version string
         id: version
         run: |
@@ -106,16 +98,21 @@ jobs:
       - name: Print Next Version
         run: |
           echo "Next Version: ${{steps.version.outputs.NEXT_VERSION}}"
-      #  Commenting out as this is still WIP
+
+      - name: Update package.json version for pre (alpha) releases
+        if: ${{ contains(github.event.inputs.release_type, 'alpha') }}
+        run: |
+          tmp=$(mktemp)
+          jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
       - name: Pre Release Step
-        if: ${{ contains(github.event.inputs.release_type, 'alpha') || contains(github.event.inputs.release_type, 'beta') }} || contains(github.event.inputs.release_type, 'release-candidate') }}
+        if: ${{ contains(github.event.inputs.release_type, 'alpha') }}
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
           access: public
           package: ./sdk/package.json
-          tag: ${{ steps.version.outputs.NEXT_VERSION }}
+          tag: ${{ contains(github.event.inputs.release_type, 'alpha') && 'alpha' }}
           dry-run: ${{ github.event.inputs.dry_run }}
 
       - name: Print New Version
