@@ -1,5 +1,5 @@
 import { Box, Body } from '@biom3/react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Checkout, ConnectResult, TokenInfo } from '@imtbl/checkout-sdk-web';
 import { SelectStyle, OptionsContainerStyle, OptionStyle, SelectedOptionStyle } from '../SwapStyles';
 import { alphaSortTokensList } from '../helpers';
@@ -26,11 +26,11 @@ const TokenSelect = ({ testId, onChange, token, connection, filter }: TokenSelec
     setIsOpen(!isOpen);
   };
 
-  const selectOption = (token: TokenInfo) => {
+  const selectOption = useCallback((token: TokenInfo) => {
     setOption(token?.symbol);
     setIcon(token?.icon);
     onChange(token);
-  }
+  }, [setOption, setIcon, onChange]);
 
   useEffect(()=>{
     token && selectOption(token)
