@@ -34,12 +34,12 @@ export function OtherWallets (props:OtherWalletProps) {
 
   return (
     <div className="imtbl-other-wallets">
-    <Button
-      testId='other-metamask'
-      sx={ButtonWrapperStyle} onClick={metamaskClick}>MetaMask</Button>
-    <Button
-      testId='other-walletconnect'
-      onClick={() => updateView(ConnectWidgetViews.CHOOSE_NETWORKS)}>Wallet Connect</Button>
+      <Button
+        testId='other-metamask'
+        sx={ButtonWrapperStyle} onClick={metamaskClick}>MetaMask</Button>
+      <Button
+        testId='other-walletconnect'
+        onClick={() => updateView(ConnectWidgetViews.CHOOSE_NETWORKS)}>Wallet Connect</Button>
     </div>
   )
 }
