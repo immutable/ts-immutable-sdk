@@ -16,23 +16,19 @@ export function OtherWallets (props:OtherWalletProps) {
   const { updateView } = props
 
   async function metamaskClick() {
-    let connectResult:ConnectResult
-
     try {
       if (!checkout) return;
-      connectResult = await checkout.connect({ providerPreference: ConnectionProviders.METAMASK });
+      const connectResult = await checkout.connect({ providerPreference: ConnectionProviders.METAMASK });
+      dispatch({
+        payload: {
+          type: Actions.SET_PROVIDER,
+          provider: connectResult.provider,
+        },
+      });
     } catch (err:any) {
       updateView(ConnectWidgetViews.FAIL, err)
       return
     }
-
-    dispatch({
-      payload: {
-        type: Actions.SET_PROVIDER,
-        provider: connectResult.provider,
-      },
-    });
-
     updateView(ConnectWidgetViews.CHOOSE_NETWORKS)
   }
 
