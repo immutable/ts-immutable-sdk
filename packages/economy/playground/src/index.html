@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="styles.scss" />
   </head>
   <body>
-    <!-- <imtbl-craft-button>
+    <imtbl-craft-button>
       <button>Craft Button</button>
     </imtbl-craft-button>
     <imtbl-craft-connect>
@@ -19,7 +19,7 @@
         providerPreference="metamask"
         theme="dark"
       ></imtbl-connect>
-    </imtbl-craft-connect> -->
+    </imtbl-craft-connect>
     <imtbl-craft-passport
       env="dev"
       clientId="3Xt3vBGjrsuLnBKK3mtJsIU5j5WikfQC"
@@ -28,6 +28,7 @@
     >
       <button>Connect passport</button>
     </imtbl-craft-passport>
-    <script type="module" src="index.ts"></script>
+    <script defer src="../public/js/imtbl-checkout-widgets.js"></script>
+    <script defer type="module" src="index.ts"></script>
   </body>
 </html>

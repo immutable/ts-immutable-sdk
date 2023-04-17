@@ -2,9 +2,6 @@
   "name": "@imtbl/economy",
   "description": "Economy module for Immutable SDK",
   "version": "0.0.0",
-  "type": "module",
-  "types": "dist/index.d.ts",
-  "main": "dist/index.js",
   "dependencies": {
     "@imtbl/checkout-sdk-web": "0.0.0",
     "@imtbl/checkout-ui-types": "0.0.0",
@@ -26,7 +23,8 @@
     "prettier": "^2.8.7",
     "rollup": "^3.17.2",
     "ts-node": "^10.9.1",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "wsrun": "^5.2.4"
   },
   "engines": {
     "node": ">=16"
@@ -34,11 +32,15 @@
   "files": [
     "dist"
   ],
+  "main": "dist/index.js",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
+    "build:all": "wsrun -p @imtbl/economy --stages build",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit --jsx preserve"
-  }
+  },
+  "type": "module",
+  "types": "dist/index.d.ts"
 }

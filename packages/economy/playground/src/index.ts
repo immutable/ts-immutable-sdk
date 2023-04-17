@@ -1,4 +1,3 @@
-// import '@imtbl/checkout-sdk-widgets';
-
-import './components/crafting-button';
-import './components/crafting-passport';
+import './components/craft-button';
+import './components/craft-connect';
+import './components/craft-passport';

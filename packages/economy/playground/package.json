@@ -1,14 +1,7 @@
 {
   "name": "@imtbl/economy-playground",
-  "version": "0.0.1",
   "description": "Playground application for Immutable Economy SDK",
-  "source": "index.html",
-  "scripts": {
-    "start": "npm run clean && parcel src/index.html -p 4200",
-    "build": "npm run clean && parcel build src/index.html --public-url ./",
-    "clean": "rimraf ./dist ./.cache"
-  },
-  "license": "MIT",
+  "version": "0.0.1",
   "dependencies": {
     "@imtbl/checkout-sdk-web": "0.0.0",
     "@imtbl/checkout-ui-types": "0.0.0",
@@ -20,14 +13,23 @@
     "@parcel/transformer-sass": "2.8.3",
     "@parcel/transformer-typescript-tsc": "^2.8.3",
     "assert": "^2.0.0",
-    "lit": "^2.7.0",
-    "parcel-bundler": "^1.12.3",
+    "lit": "^2.7.2",
     "parcel": "^2.8.3",
+    "parcel-bundler": "^1.12.3",
     "rimraf": "^5.0.0",
     "stream-browserify": "^3.0.0",
     "typescript": "^4.9.5"
   },
   "engines": {
     "node": ">=16"
-  }
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "npm run build:deps && npm run build:app",
+    "build:app": "npm run clean && parcel build src/index.html --public-url ./",
+    "build:deps": "yarn workspace @imtbl/checkout-widgets build && cp ../../../sdk/dist/browser/checkout.js public/js/imtbl-checkout-widgets.js",
+    "clean": "rimraf ./dist ./.cache",
+    "start": "npm run clean && npm run build:deps && parcel src/index.html -p 4200"
+  },
+  "source": "index.html"
 }

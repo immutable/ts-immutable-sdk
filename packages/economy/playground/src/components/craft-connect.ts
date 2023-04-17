@@ -39,6 +39,7 @@ export class CraftingWrapper extends LitElement {
       isConnectOpen:
         value === undefined ? !this.state.isConnectOpen : Boolean(value),
     };
+    this.requestUpdate();
   }
 
   handleConnectEvent(event: CustomEvent) {

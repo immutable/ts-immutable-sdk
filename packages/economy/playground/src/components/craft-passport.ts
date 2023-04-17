@@ -11,8 +11,8 @@ import { IMXProvider } from '@imtbl/provider';
 const devEnvConfig = {
   network: 'goerli',
   authenticationDomain: 'https://auth.dev.immutable.com',
-  magicPublishableApiKey: 'pk_live_10F423798A540ED7',
-  magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
+  magicPublishableApiKey: 'pk_live_4058236363130CA9',
+  magicProviderId: 'C9odf7hU4EQ5EufcfgYfcBaT5V6LhocXyiPRhIjw2EY=',
   baseIMXApiPath: 'https://api.dev.x.immutable.com',
   passportDomain: 'https://passport.dev.immutable.com',
 };
@@ -42,13 +42,34 @@ export class CraftPassport extends LitElement {
   };
 
   @eventOptions({ capture: true })
-  async handleClick(event: MouseEvent) {
+  async handleLoginClick(event: MouseEvent) {
     event.preventDefault();
-    this.provider = await this.passport.connectImx();
+
+    try {
+      this.provider = await this.passport.connectImx();
+      const accessToken = await this.passport?.getAccessToken();
+
+      this.state = { ...this.state, accessToken };
+
+      console.log({
+        state: this.state,
+      });
+    } catch (error) {
+      this.onLoginPopupCloseEvent(error);
+    }
   }
 
   async connectedCallback() {
     super.connectedCallback();
+    this.setup();
+  }
+
+  setup() {
+    this.create();
+    this.connect();
+  }
+
+  create() {
     const config = this.env === 'dev' ? devEnvConfig : Config[this.env];
 
     this.passport = new Passport(config as any, {
@@ -56,14 +77,25 @@ export class CraftPassport extends LitElement {
       redirectUri: this.redirectUri,
       logoutRedirectUri: this.logoutRedirectUri,
     });
+  }
 
+  connect() {
+    this.onLoginCallbackEvent();
+  }
+
+  onLoginCallbackEvent() {
     window.addEventListener('load', async () => {
-      this.passport.loginCallback();
-      this.state = {
-        ...this.state,
-        accessToken: await this.passport?.getAccessToken(),
-      };
+      try {
+        await this.passport.loginCallback();
+      } catch {}
     });
+  }
+
+  async onLoginPopupCloseEvent(error: any) {
+    console.log(
+      '🚀 ~ file: craft-passport.ts:87 ~ CraftPassport ~ onLoginPopupCloseEvent ~ error:',
+      error
+    );
   }
 
   firstUpdated() {
@@ -73,7 +105,7 @@ export class CraftPassport extends LitElement {
   }
 
   render() {
-    return html`<div @click=${this.handleClick}>
+    return html`<div @click=${this.handleLoginClick}>
       <slot></slot>
     </div>`;
   }
