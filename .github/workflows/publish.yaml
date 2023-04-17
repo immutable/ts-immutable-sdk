@@ -82,7 +82,7 @@ jobs:
       - name: Get next version string
         id: version
         run: |
-          ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} --apply "$( ${{ contains(github.event.inputs.release_type, 'alpha')}} && '--revision' || '')"
+          ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} --apply $( ${{ contains(github.event.inputs.release_type, 'alpha')}} && echo '--revision' || echo '')
           echo "$(git push --tags)"
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
         shell: bash
