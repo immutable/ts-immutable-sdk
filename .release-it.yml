@@ -1,0 +1,19 @@
+git:
+  commitMessage: 'Release ${version}'
+npm:
+  publish: true
+  publishPath: "sdk",
+hooks:
+  before:init:
+    - 'yarn lint'
+    - 'yarn syncpack:check'
+    - 'yarn build'
+    - 'yarn typecheck'
+    - 'yarn test'
+  after:release:
+    - 'echo Successfully released ${name} v${version} to ${repo.repository}.'
+plugins:
+  '@release-it-plugins/workspaces':
+    workspaces: ['sdk']
+  '@release-it/keep-a-changelog':
+    filename: 'CHANGELOG.md'

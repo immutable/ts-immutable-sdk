@@ -10,11 +10,11 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@imtbl/economy": "workspace:^",
-    "@imtbl/passport": "workspace:^",
-    "@imtbl/checkout-sdk-web": "workspace:^",
-    "@imtbl/checkout-ui-types": "file:../../../.yalc/@imtbl/checkout-ui-types",
-    "@imtbl/checkout-sdk-widgets": "file:../../../.yalc/@imtbl/checkout-sdk-widgets"
+    "@imtbl/checkout-sdk-web": "0.0.0",
+    "@imtbl/checkout-ui-types": "0.0.0",
+    "@imtbl/checkout-widgets": "0.0.0",
+    "@imtbl/economy": "0.0.0",
+    "@imtbl/passport": "0.0.0"
   },
   "devDependencies": {
     "@parcel/transformer-sass": "2.8.3",

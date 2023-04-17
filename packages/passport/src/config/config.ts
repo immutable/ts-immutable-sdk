@@ -16,6 +16,8 @@ export interface PassportConfiguration {
     clientId: string;
     logoutRedirectUri: string;
     redirectUri: string;
+    scope?: string;
+    audience?: string;
   };
   passportDomain: string;
   imxAPIConfiguration: ImxApiConfiguration;
@@ -90,6 +92,8 @@ export const getPassportConfiguration = (
       clientId: oidcConfiguration.clientId,
       logoutRedirectUri: oidcConfiguration.logoutRedirectUri,
       redirectUri: oidcConfiguration.redirectUri,
+      scope: oidcConfiguration.scope,
+      audience: oidcConfiguration.audience,
     },
     imxAPIConfiguration: {
       basePath: environmentConfiguration.baseIMXApiPath,
