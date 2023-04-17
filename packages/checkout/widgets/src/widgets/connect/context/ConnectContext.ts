@@ -1,11 +1,14 @@
 import { Web3Provider } from "@ethersproject/providers";
 import { createContext } from "react";
+import { Checkout } from '@imtbl/checkout-sdk-web';
 
 export interface ConnectState {
+    checkout: Checkout | null
     provider: Web3Provider | null
 }
 
 export const initialState: ConnectState = {
+    checkout: null,
     provider: null
 }
 
@@ -18,10 +21,16 @@ export interface Action {
     payload: ActionPayload
 }
 
-type ActionPayload = SetProvider
+type ActionPayload = SetCheckout | SetProvider
 
 export enum Actions {
+    SET_CHECKOUT = "set-checkout",
     SET_PROVIDER = "set-provider",
+}
+
+export interface SetCheckout {
+    type: Actions.SET_CHECKOUT,
+    checkout: Checkout
 }
 
 export interface SetProvider {
@@ -38,6 +47,11 @@ export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export const connectReducer: Reducer<ConnectState, Action> = (state: ConnectState, action: Action) => {
     switch (action.payload.type) {
+        case Actions.SET_CHECKOUT:
+            return {
+                ...state,
+                checkout: action.payload.checkout
+            }
         case Actions.SET_PROVIDER:
             return {
                 ...state,

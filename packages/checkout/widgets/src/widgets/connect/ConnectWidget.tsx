@@ -1,11 +1,11 @@
 import { BiomeThemeProvider, Button, Body, Box } from '@biom3/react'
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web'
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web'
 import { WidgetTheme } from '@imtbl/checkout-ui-types'
 import { sendConnectFailedEvent, sendConnectSuccessEvent} from './ConnectWidgetEvents'
 import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
 import { OtherWallets } from './components/other-wallets/OtherWallets';
 import { ChooseNetwork } from './components/choose-network/ChooseNetwork';
-import { useReducer, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { 
   ActiveStyle, 
   BackButtonStyle, 
@@ -14,7 +14,7 @@ import {
   WidgetHeaderStyle 
 } from './ConnectStyles'
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens'
-import { ConnectContext, connectReducer, initialState } from './context/ConnectContext'
+import { Actions, ConnectContext, connectReducer, initialState } from './context/ConnectContext'
 
 export enum ConnectWidgetViews {
   CONNECT_WALLET = "CONNECT_WALLET",
@@ -42,6 +42,15 @@ export function ConnectWidget(props:ConnectWidgetProps) {
   const [currentView, setView] = useState(ConnectWidgetViews.CONNECT_WALLET)
 
   const biomeTheme:BaseTokens = (theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()) ? onLightBase : onDarkBase
+
+  useEffect(() => {
+    dispatch({
+      payload: {
+        type: Actions.SET_CHECKOUT,
+        checkout: new Checkout(),
+      },
+    });
+  }, [])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateView = async (view:ConnectWidgetViews, err?:any) => {

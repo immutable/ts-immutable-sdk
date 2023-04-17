@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@biom3/react'
-import {ConnectionProviders, Checkout, ConnectResult} from '@imtbl/checkout-sdk-web'
+import {ConnectionProviders, ConnectResult} from '@imtbl/checkout-sdk-web'
 import { ButtonWrapperStyle } from '../../ConnectStyles'
 import { Actions, ConnectContext } from '../../context/ConnectContext'
 import { useContext } from 'react'
@@ -11,18 +11,15 @@ export interface OtherWalletProps {
 }
 
 export function OtherWallets (props:OtherWalletProps) {
-  const { dispatch } = useContext(ConnectContext);
-
-  // todo: maybe move checkout onto context
-  const checkout:Checkout = new Checkout()
-
+  const { state, dispatch } = useContext(ConnectContext);
+  const { checkout } = state;
   const { updateView } = props
 
   async function metamaskClick() {
-
     let connectResult:ConnectResult
 
     try {
+      if (!checkout) return;
       connectResult = await checkout.connect({ providerPreference: ConnectionProviders.METAMASK });
     } catch (err:any) {
       updateView(ConnectWidgetViews.FAIL, err)

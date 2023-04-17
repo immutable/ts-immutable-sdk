@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {Button} from '@biom3/react'
-import {ChainId, Checkout} from '@imtbl/checkout-sdk-web'
+import { Button } from '@biom3/react'
+import { ChainId } from '@imtbl/checkout-sdk-web'
 import { ConnectContext } from '../../context/ConnectContext';
 import { useContext } from 'react';
 import { ConnectWidgetViews } from '../../ConnectWidget';
@@ -11,10 +11,7 @@ export interface ChooseNetworkProps {
 
 export function ChooseNetwork (props:ChooseNetworkProps) {
   const { state } = useContext(ConnectContext);
-  const { provider } = state;
-
-  // todo: do we want to move this to context?
-  const checkout:Checkout = new Checkout()
+  const { checkout, provider } = state;
 
   const { updateView } = props
 
@@ -24,7 +21,7 @@ export function ChooseNetwork (props:ChooseNetworkProps) {
         updateView(ConnectWidgetViews.FAIL, 'No wallet provider connected')
         return
       }
-      await checkout.switchNetwork({ provider, chainId: ChainId.POLYGON });
+      checkout && await checkout.switchNetwork({ provider, chainId: ChainId.POLYGON });
       updateView(ConnectWidgetViews.SUCCESS)
 
     } catch (err:any) {
