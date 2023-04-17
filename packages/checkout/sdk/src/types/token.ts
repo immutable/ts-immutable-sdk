@@ -9,14 +9,14 @@ export interface TokenInfo {
 }
 
 export interface TokenMasterInfo extends TokenInfo {
-  chainId: ChainId,
-  tokenFeatures: TokenFilterTypes[]
+  chainId: ChainId;
+  tokenFeatures: TokenFilterTypes[];
 }
 
 export interface GetTokenAllowListParams {
-  type: TokenFilterTypes,
-  chainId: ChainId,
-  exclude?: TokenFilter[],
+  type: TokenFilterTypes;
+  chainId: ChainId;
+  exclude?: TokenFilter[];
 }
 
 export interface GetTokenAllowListResult {
@@ -24,11 +24,11 @@ export interface GetTokenAllowListResult {
 }
 
 export enum TokenFilterTypes {
-  SWAP = "swap",
-  BRIDGE = "bridge",
-  ALL = "all"
+  SWAP = 'swap',
+  BRIDGE = 'bridge',
+  ALL = 'all',
 }
 
 export interface TokenFilter {
-  address: string,
+  address: string;
 }
