@@ -82,33 +82,51 @@ function latest_revision(){
 
 ## parse last found tag, extract it PARTS
 function parse_last(){
-  local position=$(($1-1))
-
-  # two parts found only
-  local SUBS=( ${PARTS[$position]//-/ } )
-  #echo ${SUBS[@]}, size: ${#SUBS}
-
-  # found NUMBER
-  PARTS[$position]=${SUBS[0]}
-  #echo ${PARTS[@]}
-
-  # found SUFFIX
-  if [[ ${#SUBS} -ge 1 ]]; then
-    PARTS[4]=${SUBS[1],,} #lowercase
-    #echo ${PARTS[@]}, ${SUBS[@]}
+  
+  local lastPosition=$(expr ${#PARTS[@]} - 1)
+  local position=$lastPosition
+  local num=${PARTS[position]}
+  
+  # Check if pre-release tag
+  if [ "${num##*[!0-9]*}" ]
+  then
+      position=$(expr $position - 1)
+      num=${PARTS[position]}
+      # Check if pre-release tag
+      if [ "${num##*[!0-9]*}" ]
+      then
+        # Do nothing and return
+        return
+      fi
   fi
+
+  # Extract parts of pre-release tag
+  SUBS=( ${num//-/ } )
+
+  PARTS[$position]=${SUBS[0]}
+  if [ $position -eq $lastPosition ]
+  then
+      PARTS[$(expr $position + 1)]=${SUBS[1]}
+  else
+      temp=${PARTS[$lastPosition]}
+      PARTS[$(expr $position + 1)]=${SUBS[1]}
+      PARTS[$(expr $position + 2)]=$temp
+  fi
+  # echo ${PARTS[@]}
 }
 
 ## increment REVISION part, don't touch STAGE
 function increment_revision(){
-  PARTS[3]=$(( PARTS[3] + 1 ))
+  PARTS[4]=$(( PARTS[4] + 1 ))
   IS_DIRTY=1
 }
 
 ## increment PATCH part, reset all other lower PARTS, don't touch STAGE
 function increment_patch(){
+  echo "i"${PARTS[2]}
   PARTS[2]=$(( PARTS[2] + 1 ))
-  PARTS[3]=0
+  echo "i"${PARTS[2]}
+  PARTS[4]=0
   IS_DIRTY=1
 }
 
@@ -116,7 +134,7 @@ function increment_patch(){
 function increment_minor(){
     PARTS[1]=$(( PARTS[1] + 1 ))
     PARTS[2]=0
-    PARTS[3]=0
+    PARTS[4]=0
     IS_DIRTY=1
 }
 
@@ -125,13 +143,13 @@ function incremet_major(){
   PARTS[0]=$(( PARTS[0] + 1 ))
   PARTS[1]=0
   PARTS[2]=0
-  PARTS[3]=0
+  PARTS[4]=0
   IS_DIRTY=1
 }
 
 ## increment the number only of last found PART: REVISION --> PATCH --> MINOR. don't touch STAGE
 function increment_last_found(){
-  if [[ "${#PARTS[3]}" == 0 || "${PARTS[3]}" == "0" ]]; then
+  if [[ "${#PARTS[4]}" == 0 || "${PARTS[4]}" == "0" ]]; then
     if [[ "${#PARTS[2]}" == 0 || "${PARTS[2]}" == "0" ]]; then
       increment_minor
     else
@@ -142,7 +160,7 @@ function increment_last_found(){
   fi
 
   # stage part is not EMPTY
-  if [[ "${#PARTS[4]}" != 0 ]]; then
+  if [[ "${#PARTS[3]}" != 0 ]]; then
     IS_SHIFT=1
   fi
 }
@@ -152,8 +170,8 @@ function compose(){
   MAJOR="${PARTS[0]}"
   MINOR=".${PARTS[1]}"
   PATCH=".${PARTS[2]}"
-  REVISION=".${PARTS[3]}"
-  SUFFIX="-${PARTS[4]}"
+  SUFFIX="-${PARTS[3]}"
+  REVISION=".${PARTS[4]}"
 
   if [[ "${#PATCH}" == 1 ]]; then # if empty {PATCH}
     PATCH=""
@@ -163,7 +181,7 @@ function compose(){
     REVISION=""
   fi
 
-  if [[ "${PARTS[3]}" == "0" ]]; then # if revision is ZERO
+  if [[ "${PARTS[4]}" == "0" ]]; then # if revision is ZERO
     REVISION=""
   fi
 
@@ -184,11 +202,11 @@ function compose(){
   fi
 
 
-  echo "${MAJOR}${MINOR}${PATCH}${REVISION}${SUFFIX}" #full format
+  echo "${MAJOR}${MINOR}${PATCH}${SUFFIX}${REVISION}" #full format
 }
 
 # initial version used for repository without tags
-INIT_VERSION=0.0.0.0-alpha
+INIT_VERSION=0.0.0-alpha
 
 # do GIT data extracting
 TAG=$(latest_tag)
@@ -259,19 +277,19 @@ do
 
   case $key in
     -a|--alpha)                 # switched to ALPHA
-    PARTS[4]="alpha"
+    PARTS[3]="alpha"
     IS_SHIFT=1
     ;;
     -b|--beta)                  # switched to BETA
-    PARTS[4]="beta"
+    PARTS[3]="beta"
     IS_SHIFT=1
     ;;
     -c|--release-candidate)     # switched to RC
-    PARTS[4]="rc"
+    PARTS[3]="rc"
     IS_SHIFT=1
     ;;
     -r|--release)               # switched to RELEASE
-    PARTS[4]=""
+    PARTS[3]=""
     IS_SHIFT=1
     ;;
     -p|--patch)                 # increment of PATCH
@@ -281,7 +299,7 @@ do
     increment_revision
     ;;
     -g|--git-revision)          # use git revision number as a revision part§
-    PARTS[3]=$(( REVISION ))
+    PARTS[4]=$(( REVISION ))
     IS_DIRTY=1
     ;;
     -i|--minor)                 # increment of MINOR by default
@@ -310,15 +328,15 @@ done
 # detected shift, but no increment
 if [[ "$IS_SHIFT" == "1" ]]; then
     # temporary disable stage shift
-    stage=${PARTS[4]}
-    PARTS[4]=''
+    stage=${PARTS[3]}
+    PARTS[3]=''
 
     # detect first run on repository, INIT_VERSION was used
     if [[ "$(compose)" == "0.0" ]]; then
         increment_minor
     fi
 
-    PARTS[4]=$stage
+    PARTS[3]=$stage
 fi
 
 # no increment applied yet and no shift of state, do minor increase
