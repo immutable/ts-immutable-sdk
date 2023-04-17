@@ -104,15 +104,15 @@ jobs:
           echo "Next Version: ${{steps.version.outputs.NEXT_VERSION}}"
       #  Commenting out as this is still WIP
 
-      # - name: Alpha/Beta Release
-      #   if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }} || contains(github.event.inputs.tag, 'release-candidate') }}
-      #   uses: JS-DevTools/npm-publish@v1
-      #   with:
-      #     token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
-      #     access: public
-      #     package: ./sdk/package.json
-      #     tag: ${{ (contains(github.event.inputs.tag, 'alpha') && 'alpha') || (contains(github.event.inputs.tag, 'beta') && 'beta') || 'latest' }} -- not this one!
-      #     tag: ${{ steps.version.outputs.NEXT_VERSION }}
+      - name: Pre Release Step
+        if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }} || contains(github.event.inputs.tag, 'release-candidate') }}
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+          access: public
+          package: ./sdk/package.json
+          tag: ${{ steps.version.outputs.NEXT_VERSION }}
+          dry-run: true
 
       # - name: Authenticate NPM
       #   run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}

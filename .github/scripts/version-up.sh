@@ -123,9 +123,7 @@ function increment_revision(){
 
 ## increment PATCH part, reset all other lower PARTS, don't touch STAGE
 function increment_patch(){
-  echo "i"${PARTS[2]}
   PARTS[2]=$(( PARTS[2] + 1 ))
-  echo "i"${PARTS[2]}
   PARTS[4]=0
   IS_DIRTY=1
 }
