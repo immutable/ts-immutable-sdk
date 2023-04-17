@@ -98,12 +98,12 @@ jobs:
         run: |
           echo "$(./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} --apply --${{ github.event.inputs.pre_release_revision }})"
           echo "$(git push --tags)"
-          echo "NEXT_VERSION=$(git describe --tags)" >> $GITHUB_OUTPUT
+          echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Print Next Version
         run: |
-          echo "Next Version: ${{steps.version.NEXT_VERSION}}"
+          echo "Next Version: ${{steps.version.outputs.NEXT_VERSION}}"
       #  Commenting out as this is still WIP
 
       # - name: Alpha/Beta Release
