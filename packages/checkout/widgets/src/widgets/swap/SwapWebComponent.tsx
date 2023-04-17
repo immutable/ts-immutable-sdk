@@ -8,7 +8,7 @@ export class ImmutableSwap extends HTMLElement {
 
   reactRoot?:ReactDOM.Root
 
-  static get observedAttributes() { return ['name']; }
+  static get observedAttributes() { return ['theme']; }
 
   theme = WidgetTheme.DARK
   providerPreference = ConnectionProviders.METAMASK
@@ -16,18 +16,20 @@ export class ImmutableSwap extends HTMLElement {
   fromContractAddress = ''
   toContractAddress = ''
 
-  attributeChangedCallback() {
-    this.connectedCallback()
+  attributeChangedCallback(name, oldValue, newValue) {
+    this[name] = newValue
+    this.renderWidget()
   }
 
   connectedCallback() {
-
     this.theme = this.getAttribute('theme') as WidgetTheme;
     this.providerPreference = this.getAttribute('providerPreference') as ConnectionProviders;
     this.amount = this.getAttribute('amount') as string;
     this.fromContractAddress = this.getAttribute('fromContractAddress') as string;
     this.toContractAddress = this.getAttribute('toContractAddress') as string;
-
+    this.renderWidget()    
+  }
+  renderWidget() {
     const swapParams: SwapWidgetParams = {
       providerPreference: this.providerPreference,
       amount: this.amount,

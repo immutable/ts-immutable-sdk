@@ -22,7 +22,7 @@
   "scripts": {
     "build": "parcel build",
     "build:dist": "npm i && npm run build && npm run dist",
-    "dist": "npm pack && cp imtbl-checkout-ui-types-0.0.1.tgz ../../depends/"
+    "start": "parcel watch"
   },
   "source": "index.ts",
   "types": "dist/types.d.ts"

@@ -2,10 +2,22 @@
 <html>
   <head>
     <title>Static Sample App</title>
-    <meta name="description" content="Example of how to use CheckoutSDK UI within static HTML">
+    <meta
+      name="description"
+      content="Example of how to use CheckoutSDK UI within static HTML"
+    />
+    <style>
+      iframe {
+        border: none;
+      }
+    </style>
   </head>
-  <body >
-    <iframe height="180" width="400" src="http://localhost:3001/buy?theme=dark"></iframe>
+  <body>
+    <h1>Checkout Buy (WebView)</h1>
+    <iframe
+      height="500"
+      width="500"
+      src="http://localhost:3001/buy?theme=dark"
+    ></iframe>
   </body>
-
 </html>

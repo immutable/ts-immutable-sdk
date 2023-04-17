@@ -33,7 +33,7 @@ export function ExampleWidget(props:ExampleWidgetProps) {
   return(
     <BiomeThemeProvider theme={{base: biomeTheme}}>
       <Box sx={ExampleWidgetStyle}>
-        <Heading>Example Widget</Heading>
+        <Heading>Example Widget TEST</Heading>
         <br />
         <Button onClick={logProvider}>Log Provider</Button>
         <br />

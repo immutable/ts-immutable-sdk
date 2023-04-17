@@ -1,6 +1,6 @@
 import { TextInput, Box, Body } from '@biom3/react'
 import { BigNumber, utils, BigNumberish } from 'ethers'
-import React, { useEffect, useState, useMemo, useCallback } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { ConnectResult, TokenInfo, Checkout, GetBalanceResult } from '@imtbl/checkout-sdk-web'
 import TokenSelect from './TokenSelect'
 import { QuoteResponse } from './SwapForm';
@@ -75,7 +75,7 @@ export default function With(props: WithProps) {
     )
   }
 
-  const fetchBalances = useCallback(async () => {
+  const fetchBalances = async () => {
     const walletAddress = await connection.provider.getSigner().getAddress()
     const result = await checkout.getAllBalances({
       provider: connection.provider,
@@ -99,7 +99,7 @@ export default function With(props: WithProps) {
     if(resolvedBalances.length > 0){
       onTokenChange(resolvedBalances[0].token)
     }
-  }, [connection, checkout, tokenAllowList, onTokenChange])
+  }
 
   const generateQuote = async () => {
     const newQuote = await getQuoteFromAmountOut(
