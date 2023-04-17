@@ -6,8 +6,8 @@ import {
   state,
 } from 'lit/decorators.js';
 
-import { Economy } from '@imtbl/economy-sdk';
-import { CraftInput } from '@imtbl/economy-sdk';
+import { Economy } from '@imtbl/economy';
+import { CraftInput } from '@imtbl/economy';
 
 @customElement('imtbl-craft-button')
 export class CraftButton extends LitElement {

@@ -15,8 +15,7 @@ This is a single page website that can be use to preview and test the SDK functi
 
 Run the following to serve the playground application on `http://127.0.0.1:4200/`
 ```bash
-  cd packages/economy
-  npx nx serve playground
+  yarn workspace @imtbl/economy-playground start
 ```
 
 # Contributing

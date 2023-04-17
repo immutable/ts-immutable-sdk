@@ -1,5 +1,7 @@
 /* eslint-disable */
 
+import type { Config } from 'jest';
+
 const swcJestConfig = {
   swcrc: false,
   jsc: {
@@ -25,12 +27,15 @@ const swcJestConfig = {
   sourceMaps: true,
 };
 
-export default {
-  displayName: 'sdk',
-  preset: '../../jest.preset.js',
+const config: Config = {
+  clearMocks: true,
+  coverageProvider: 'v8',
+  moduleDirectories: ['node_modules', 'src'],
+  testEnvironment: 'node',
   transform: {
-    '^.+\\.[tj]s$': ['@swc/jest', swcJestConfig],
+    '^.+\\.(t|j)sx?$': ['@swc/jest', swcJestConfig],
   },
-  moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/packages/sdk',
+  transformIgnorePatterns: [],
 };
+
+export default config;

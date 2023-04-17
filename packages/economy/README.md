@@ -9,6 +9,9 @@
 
 # Overview
 
+> **Warning** **IMMUTABLE ECONOMY SDK IS UNSTABLE** <br/>
+> Since it has not hit the version 1.0 yet, its public interface should not be considered final. Future releases may include breaking changes without further notice. We will do our best to keep this documentation updated providing visibility on breaking changes planned.
+
 Game partners such Gods Unchained, Shardbound, and others will all define , build and run their economies around systems like primary sales, crafting/forging, loot box opening and others.
 
 Running a game economy is complex and requires handling web3 interactions and async communication with backend systems.
@@ -31,38 +34,20 @@ To learn more read:
 
 ## Install
 ```bash
-  cd packages/economy
   nvm install && nvm use
-  npm install
+  yarn install
 ```
 
 ## Folder structure
 ```
-/
-│
-└───depends -> locally built NPM modules for: Checkout SDK & Passport SDK
 |
-└───packages
-│   │
-│   └───playground --> application where devs see how the SDK is used
-│   │
-│   └───sdk --> source code of the Economy building blocks SDK
-│   │
-│   tools --> nx tooling (generators, executors, etc...)
+└───playground --> application where devs see how the SDK is used
 │
-└───package.json 
+└───sdk --> source code of the Economy building blocks SDK
 │
 └───README.md
 ```
 
-## Check module dependencies
+## This module uses Yarn workspaces
 
-Run the following to see a diagram of this project dependencies
-```bash
-  cd packages/economy
-  npx nx graph
-```
-
-## This module uses Nx
-
-Visit the [Nx Documentation](https://nx.dev) to learn more.
+Visit the [Yarn workspaces Documentation](https://classic.yarnpkg.com/lang/en/docs/workspaces/) to learn more.
