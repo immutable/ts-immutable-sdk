@@ -11,8 +11,11 @@
 # Immutable TypeScript SDK
 
 Table of contents
+
 - [Immutable TypeScript SDK](#immutable-typescript-sdk)
   - [How to guides](#how-to-guides)
+    - [Adding your project](#adding-your-project)
+    - [Link packages to each other](#link-packages-to-each-other)
     - [Buiding](#buiding)
     - [Linting](#linting)
       - [ESLint Tooling](#eslint-tooling)
@@ -30,10 +33,40 @@ Table of contents
       - [Writing tests](#writing-tests)
     - [Versioning \& Changelog](#versioning--changelog)
 
-
 ## How to guides
 
+### Adding your project
+
+1. Add the project as a package within the `packages` folder. If it's internal (i.e. we don't intend to export the package out from the root level), then you can add it within the `packages/internal` folder.
+2. Add the package folder to the list of `workspaces` in the `packages.json` (at the root level).
+3. Run `yarn` again for workspaces to register the new project, and map internals.
+4. If your project is intended to be exported at the SDK root level (i.e. not internal):
+5. Add your project to the list of `devDependencies` of the root project
+6. Add a new file in the `sdk/src` folder, importing all your exports from project, and re-export them.
+7. Add this file to the `rollup.config.js` file for this to be built.
+8. You'll need to add this to the `exports` of the `package.json` of the SDK too.
+
+Please name your project as `@imtbl/PROJECT_NAME`. Please also mark your project as `private: true` in your package.json, as we don't intend to publish your package.
+
+### Link packages to each other
+
+Say you want to link `@imtbl/a` to `@imtbl/b`:
+
+1. If the local version of `imtbl/a` is `0.0.0`, then add `@imtbl/a` to the `package.json` with version `0.0.0`.
+2. Then run `yarn` at the project root.
+3. Then run `yarn wsrun -p @imtbl/b --recursive --stages build` at the project root. This will all the dependencies, and then build your project `b`.
+
+As long as both these packages are workspaces (in the root `package.json`), yarn will link them all internally.
+
 ### Buiding
+
+From a root level, if you want to build the dependencies of the core SDK and other dependencies, have a look at the `build` script at the root `package.json`.
+
+If your package isn't part of the dependency tree for the main SDK, then you might need to manually build your project using:
+
+```sh
+yarn wsrun -p @imtbl/your_project --recursive --stages build
+```
 
 ### Linting
 
@@ -145,6 +178,5 @@ cd packages/passport && yarn test -t "this is a test name within passport testin
 We are currently not enforcing a preference for testing practices. It is completely up to your team to decide how you test your package.
 
 The root [`package.json`](package.json) is the entry point for all CI testing purposes. Therefore, if you wish to write tests for an existing or new package, please ensure that a `"test"` script exists in the associated `package.json` file so that it is picked up by the [`root "test" command.`](package.json#L19)
-
 
 ### Versioning & Changelog
