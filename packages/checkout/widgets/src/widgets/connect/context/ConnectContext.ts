@@ -21,19 +21,19 @@ export interface Action {
     payload: ActionPayload
 }
 
-type ActionPayload = SetCheckout | SetProvider
+type ActionPayload = SetCheckoutPayload | SetProviderPayload
 
 export enum Actions {
     SET_CHECKOUT = "set-checkout",
     SET_PROVIDER = "set-provider",
 }
 
-export interface SetCheckout {
+export interface SetCheckoutPayload {
     type: Actions.SET_CHECKOUT,
     checkout: Checkout
 }
 
-export interface SetProvider {
+export interface SetProviderPayload {
     type: Actions.SET_PROVIDER,
     provider: Web3Provider
 }
