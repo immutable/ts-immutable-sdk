@@ -113,6 +113,9 @@ To test this SDK locally, you can:
 # Install dependencies
 yarn
 
+# Build
+yarn build
+
 # Runs ALL tests
 yarn test
 ```

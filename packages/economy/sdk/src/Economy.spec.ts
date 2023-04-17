@@ -24,7 +24,7 @@ describe('Economy Class', () => {
     jest.clearAllMocks();
   });
 
-  it.only('should capture crafting errors', async () => {
+  it('should capture crafting errors', async () => {
     const craftFn = jest
       .requireMock('./crafting')
       .craft.mockImplementation(async () => {

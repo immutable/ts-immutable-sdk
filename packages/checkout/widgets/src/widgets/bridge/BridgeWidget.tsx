@@ -1,5 +1,5 @@
 import {BiomeCombinedProviders, Body, Box, Button, Heading, OptionKey} from "@biom3/react";
-import {onDarkBase} from "@biom3/design-tokens";
+import {BaseTokens, onDarkBase, onLightBase} from "@biom3/design-tokens";
 
 import {Network, WidgetTheme} from "@imtbl/checkout-ui-types";
 import {BridgeWidgetStyle} from "./BridgeStyles";
@@ -39,8 +39,9 @@ export const NetworkChainMap = {
 }
 
 export function BridgeWidget(props:BridgeWidgetProps) {
-  const { params } = props;
+  const { params, theme } = props;
   const { providerPreference, fromContractAddress, amount, fromNetwork } = params;
+  const biomeTheme:BaseTokens = (theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()) ? onLightBase : onDarkBase
   const defaultFromChainId = useMemo(()=>{
     return (fromNetwork && bridgingNetworks.includes(fromNetwork))
         ? NetworkChainMap[fromNetwork]
@@ -212,7 +213,7 @@ export function BridgeWidget(props:BridgeWidgetProps) {
   }
 
   return(
-    <BiomeCombinedProviders theme={{base: onDarkBase}}>
+    <BiomeCombinedProviders theme={{base: biomeTheme}}>
       <Box sx={BridgeWidgetStyle}>
         <>
           <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>

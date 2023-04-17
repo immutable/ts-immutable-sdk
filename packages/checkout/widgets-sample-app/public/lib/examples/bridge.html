@@ -2,10 +2,21 @@
 <html>
   <head>
     <title>Static Sample App</title>
-    <meta name="description" content="Example of how to use CheckoutSDK UI within static HTML">
+    <meta
+      name="description"
+      content="Example of how to use CheckoutSDK UI within static HTML"
+    />
   </head>
   <body>
-    <imtbl-bridge providerPreference="metamask" theme="light" amount="50" fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0" toNetwork="Ethereum"></imtbl-bridge>
+    <h1>Checkout Bridge (Static)</h1>
+    <br />
+    <imtbl-bridge
+      providerPreference="metamask"
+      theme="dark"
+      amount="50"
+      fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
+      toNetwork="Ethereum"
+    ></imtbl-bridge>
   </body>
   <script defer src="../js/imtbl-checkout.js"></script>
 </html>
