@@ -8,10 +8,27 @@ export interface TokenInfo {
   icon?: string;
 }
 
+export interface TokenMasterInfo extends TokenInfo {
+  chainId: ChainId,
+  tokenFeatures: TokenFilterTypes[]
+}
+
 export interface GetTokenAllowListParams {
-  chainId: ChainId;
+  type: TokenFilterTypes,
+  chainId: ChainId,
+  exclude?: TokenFilter[],
 }
 
 export interface GetTokenAllowListResult {
   tokens: TokenInfo[];
+}
+
+export enum TokenFilterTypes {
+  SWAP = "swap",
+  BRIDGE = "bridge",
+  ALL = "all"
+}
+
+export interface TokenFilter {
+  address: string,
 }

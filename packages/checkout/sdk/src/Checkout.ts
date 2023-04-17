@@ -67,7 +67,7 @@ export class Checkout {
   public getTokenAllowList(
     params: GetTokenAllowListParams
   ): GetTokenAllowListResult {
-    return tokens.getTokenAllowList(params.chainId);
+    return tokens.getTokenAllowList(params);
   }
 
   public async sendTransaction(
