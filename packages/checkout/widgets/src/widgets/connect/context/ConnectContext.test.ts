@@ -4,7 +4,7 @@ import {describe, expect, test} from '@jest/globals';
 import { Actions, connectReducer, initialState, SetCheckoutPayload, SetProviderPayload } from './ConnectContext';
 
 describe('connect-context', () => {
-  test('when reducer called with SET_CHECKOUT payload > state updated with new checkout', () => {
+  it('should update state with checkout when reducer called with SET_CHECKOUT action', () => {
     const setCheckoutPayload: SetCheckoutPayload = {
       type: Actions.SET_CHECKOUT,
       checkout: new Checkout()
@@ -14,7 +14,7 @@ describe('connect-context', () => {
     expect(checkout).toBeInstanceOf(Checkout);
   });
 
-  test('when reducer called with SET_PROVIDER payload > state updated with new provider', () => {
+  it('should update state with provider when reducer called with SET_PROVIDER action', () => {
     const SetProviderPayload: SetProviderPayload = {
       type: Actions.SET_PROVIDER,
       provider: {} as Web3Provider
