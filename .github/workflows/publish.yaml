@@ -97,6 +97,7 @@ jobs:
         id: version
         run: |
           echo "$(./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} --apply --${{ github.event.inputs.pre_release_revision }})"
+          echo "$(git push --tags)"
           echo "NEXT_VERSION=$(git describe --tags)" >> $GITHUB_OUTPUT
         shell: bash
 
