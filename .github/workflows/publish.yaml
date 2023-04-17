@@ -21,14 +21,6 @@ on:
           - major
         required: false
         default: ""
-      pre_release_revision:
-        type: choice
-        description: '(Optional) Pre release revision bump'
-        required: false
-        options:
-          - ""
-          - revision
-        default: ""
       dry_run:
         type: boolean
         description: '(Optional) Dry run'
@@ -90,8 +82,7 @@ jobs:
       - name: Get next version string
         id: version
         run: |
-          echo ${{ contains(github.event.inputs.release_type, "alpha") && -e || ''}}
-          ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} --apply --$( ${{ contains(github.event.inputs.release_type, "alpha")}} && -e || '')
+          ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} --apply --$( ${{ contains(github.event.inputs.release_type, 'alpha')}} && -e || '')
           echo "$(git push --tags)"
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
         shell: bash
@@ -116,15 +107,6 @@ jobs:
           tag: ${{ contains(github.event.inputs.release_type, 'alpha') && 'alpha' }}
           dry-run: ${{ github.event.inputs.dry_run }}
 
-      - name: Print New Version
-        id: publish
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
-          dry-run: ${{ github.event.inputs.dry_run }}
-      - if: steps.publish.outputs.type != 'none'
-        run: |
-          echo "Version changed: ${{ steps.publish.outputs.old-version }} => ${{ steps.publish.outputs.version }}"
 
       # - name: Authenticate NPM
       #   run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
