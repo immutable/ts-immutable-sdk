@@ -91,7 +91,7 @@ jobs:
         id: version
         run: |
           echo ${{ contains(github.event.inputs.release_type, "alpha") && -e || ''}}
-          echo "$(./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} --apply ${{ contains(github.event.inputs.release_type, "alpha") && -e || ''}})"
+          ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} --apply --$( ${{ contains(github.event.inputs.release_type, "alpha")}} && -e || '')
           echo "$(git push --tags)"
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
         shell: bash
