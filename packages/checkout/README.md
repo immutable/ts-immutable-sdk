@@ -133,6 +133,10 @@ yarn run start
 
 The WebViews will hot reload on change since they are being pulled from the Widgets App, but you will need to run the `build:dist` command in the widgets folder to get the widgets to compile and copy over to test the Web Components & Static versions. You shouldn't need to restart the Widgets Sample App, it should reload automatically when it detects the updated Widgets package being copied over.
 
+# Linting
+
+Linting gets run across the project when you try to commit to your banch and it wont let you push unless the linting passes.
+
 # Running tests
 
 - Coming Soon &trade;
