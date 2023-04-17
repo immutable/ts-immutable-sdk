@@ -3,15 +3,6 @@ name: Publish to NPM
 on:
   workflow_dispatch:
     inputs:
-      upgrade_type:
-        type: choice
-        description: Upgrade Type
-        options:
-          - patch
-          - minor
-          - major
-        required: true
-        default: patch
       release_type:
         type: choice
         description: Release Type
@@ -22,6 +13,16 @@ on:
           - release-candidate
         required: true
         default: alpha
+      upgrade_type:
+        type: choice
+        description: Upgrade Type
+        options:
+          - patch
+          - minor
+          - major
+          - ""
+        required: true
+        default: patch
       pre_release_revision:
         type: choice
         description: '(Optional) Pre release revision bump'
@@ -44,9 +45,6 @@ jobs:
       
       - name: Get tags
         run: git fetch --tags
-
-      - name: Get tags
-        run: git describe --tags
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -88,7 +86,7 @@ jobs:
       #   run: yarn test
 
       - name: Update package.json version for pre (alpha, beta) releases
-        if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
+        if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') || contains(github.event.inputs.tag, 'release-candidate') }}
         run: |
           tmp=$(mktemp)
           jq '.version = "${{github.event.inputs.tag}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
@@ -107,13 +105,14 @@ jobs:
       #  Commenting out as this is still WIP
 
       # - name: Alpha/Beta Release
-      #   if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
+      #   if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }} || contains(github.event.inputs.tag, 'release-candidate') }}
       #   uses: JS-DevTools/npm-publish@v1
       #   with:
       #     token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
       #     access: public
       #     package: ./sdk/package.json
-      #     tag: ${{ (contains(github.event.inputs.tag, 'alpha') && 'alpha') || (contains(github.event.inputs.tag, 'beta') && 'beta') || 'latest' }}
+      #     tag: ${{ (contains(github.event.inputs.tag, 'alpha') && 'alpha') || (contains(github.event.inputs.tag, 'beta') && 'beta') || 'latest' }} -- not this one!
+      #     tag: ${{ steps.version.outputs.NEXT_VERSION }}
 
       # - name: Authenticate NPM
       #   run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
