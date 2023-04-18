@@ -83,10 +83,10 @@ jobs:
         id: version
         run: |
           upgrade_type=${{github.event.inputs.upgrade_type}}
-          if [ contains(github.event.inputs.upgrade_type, 'none') ]
+          if [ ${{ contains(github.event.inputs.upgrade_type, 'none') }} == true ]
           then
             upgrade_type=""
-            if [ contains(github.event.inputs.release_type, 'release') ]
+            if [ contains(github.event.inputs.release_type, 'release') == true ]
             then
               echo "A release_type of release should be one of patch, minor, major"
               exit 1
@@ -102,13 +102,13 @@ jobs:
           echo "Next Version: ${{steps.version.outputs.NEXT_VERSION}}"
 
       - name: Update package.json version for pre (alpha) releases
-        if: ${{ contains(github.event.inputs.release_type, 'alpha') }}
+        if: contains(github.event.inputs.release_type, 'alpha')
         run: |
           tmp=$(mktemp)
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
       - name: Pre Release Step
-        if: ${{ contains(github.event.inputs.release_type, 'alpha') }}
+        if: contains(github.event.inputs.release_type, 'alpha')
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
@@ -118,9 +118,9 @@ jobs:
           dry-run: ${{ github.event.inputs.dry_run }}
 
       - name: Authenticate NPM
-        if: ${{ contains(github.event.inputs.release_type, 'release') }}
+        if: contains(github.event.inputs.release_type, 'release')
         run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
 
       - name: Release
-        if: ${{ contains(github.event.inputs.release_type, 'release') }}
+        if: contains(github.event.inputs.release_type, 'release')
         run: yarn release ${{github.event.inputs.release_type}} --ci
