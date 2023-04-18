@@ -79,8 +79,7 @@ jobs:
       # - name: Test
       #   run: yarn test
 
-      - name: Get next version string
-        id: version
+      - name: Workout next version string
         run: |
           upgrade_type=${{ github.event.inputs.upgrade_type }}
           if [ ${{ contains(github.event.inputs.upgrade_type, 'none') }} == true ]
@@ -94,12 +93,13 @@ jobs:
           fi
           ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $( ${{ contains(github.event.inputs.release_type, 'alpha')}} && echo '--revision' || echo '')
           echo "$(git push --tags)"
-          echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
         shell: bash
 
-      - name: Print Next Version
+      - name: Get next version string
+        id: version
         run: |
-          echo "Next Version: ${{steps.version.outputs.NEXT_VERSION}}"
+          echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+          echo "${{ NEXT_VERSION }}"
 
       - name: Update package.json version for pre (alpha) releases
         if: contains(github.event.inputs.release_type, 'alpha')
