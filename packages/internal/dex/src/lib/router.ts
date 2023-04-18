@@ -5,7 +5,7 @@ import JSBI from 'jsbi';
 import { poolEquals } from './utils';
 import { QuoteResult, getQuotesForRoutes } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
-import { QuoteResponse, TradeInfo } from '../types';
+import { QuoteResponse } from '../types';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
 import { Multicall, Multicall__factory } from '../contracts/types';
 import { COMMON_ROUTING_TOKENS, MULTICALL_ADDRESS_CREATE2 } from '../constants';
