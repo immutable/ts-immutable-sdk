@@ -7,14 +7,14 @@ export interface ConnectState {
   provider: Web3Provider | null
 }
 
-export const initialState: ConnectState = {
+export const initialConnectState: ConnectState = {
   checkout: null,
   provider: null
 }
 
 export interface ConnectContextState {
-  state: ConnectState,
-  dispatch: React.Dispatch<Action>,
+  connectState: ConnectState,
+  connectDispatch: React.Dispatch<Action>,
 }
 
 export interface Action {
@@ -24,8 +24,8 @@ export interface Action {
 type ActionPayload = SetCheckoutPayload | SetProviderPayload
 
 export enum Actions {
-  SET_CHECKOUT = "set-checkout",
-  SET_PROVIDER = "set-provider",
+  SET_CHECKOUT = "SET_CHECKOUT",
+  SET_PROVIDER = "SET_PROVIDER",
 }
 
 export interface SetCheckoutPayload {
@@ -39,8 +39,8 @@ export interface SetProviderPayload {
 }
 
 export const ConnectContext = createContext<ConnectContextState>({
-  state: initialState,
-  dispatch: () => {},
+  connectState: initialConnectState,
+  connectDispatch: () => {},
 });
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;

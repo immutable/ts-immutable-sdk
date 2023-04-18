@@ -3,31 +3,49 @@ import { Button } from '@biom3/react'
 import { ChainId } from '@imtbl/checkout-sdk-web'
 import { ConnectContext } from '../../context/ConnectContext';
 import { useContext } from 'react';
-import { ConnectWidgetViews } from '../../ConnectWidget';
+import { ViewActions, ViewContext } from '../../../../context/ViewContext';
+import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 
-export interface ChooseNetworkProps {
-  updateView: (newView: ConnectWidgetViews, err?: any) => void;
-}
+export function ChooseNetwork () {
+  const { viewDispatch } = useContext(ViewContext);
+  const { connectState } = useContext(ConnectContext);
+  const { checkout, provider } = connectState;
 
-export function ChooseNetwork (props:ChooseNetworkProps) {
-  const { state } = useContext(ConnectContext);
-  const { checkout, provider } = state;
+  const dispatchFail = (error: any) => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: ConnectWidgetViews.FAIL,
+          error
+        }
+      }
+    });
+  }
 
-  const { updateView } = props
+  const dispatchSuccess = () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: ConnectWidgetViews.SUCCESS
+        }
+      }
+    });
+  }
 
   async function connectPolygonClick() {
     try {
       if (!provider) {
-        updateView(ConnectWidgetViews.FAIL, 'No wallet provider connected')
+        dispatchFail(new Error('No wallet provider connected'))
         return
       }
       if (checkout) {
         await checkout.switchNetwork({ provider, chainId: ChainId.POLYGON });
-        updateView(ConnectWidgetViews.SUCCESS)
+        dispatchSuccess();
       }
-
-    } catch (err:any) {
-      updateView(ConnectWidgetViews.FAIL, err)
+    } catch (err: any) {
+      dispatchFail(err)
       return
     }
   }
@@ -39,5 +57,4 @@ export function ChooseNetwork (props:ChooseNetworkProps) {
       onClick={() => connectPolygonClick()}>Connect Polygon</Button>
     </div>
   )
-
 }
