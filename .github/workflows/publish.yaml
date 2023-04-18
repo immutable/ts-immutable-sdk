@@ -99,13 +99,16 @@ jobs:
         id: version
         run: |
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
-          echo "${NEXT_VERSION}"
-
+          
       - name: Update package.json version for pre (alpha) releases
-        if: contains(github.event.inputs.release_type, 'alpha')
         run: |
           tmp=$(mktemp)
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
+          
+      - if: contains(github.event.inputs.release_type, 'release')
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Updated Changelog to version ${{steps.version.outputs.NEXT_VERSION}}
 
       - name: Pre Release Step
         if: contains(github.event.inputs.release_type, 'alpha')
