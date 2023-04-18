@@ -1,9 +1,9 @@
 import { Actions, AppCtx } from '../context/app-context';
 import {
   MetaMaskIMXProvider,
-  Configuration,
-  PRODUCTION,
-} from 'ts-immutable-sdk';
+  ProviderConfiguration,
+} from '@imtbl/provider';
+import { Environment } from '@imtbl/config';
 import { useContext } from 'react';
 import { Box, Button } from '@biom3/react';
 
@@ -12,7 +12,7 @@ export const ConnectButton = () => {
 
   const wrapperMetaMaskConnect = async () => {
     const metaMaskIMXProvider = await MetaMaskIMXProvider.connect(
-      new Configuration(PRODUCTION)
+      new ProviderConfiguration(Environment.PRODUCTION),
     );
 
     dispatch({

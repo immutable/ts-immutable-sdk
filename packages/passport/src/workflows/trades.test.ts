@@ -2,7 +2,7 @@ import { TradesApi } from '@imtbl/core-sdk';
 import { createTrade } from './trades';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
-import { PassportConfiguration } from '../config';
+import { Config } from '../config';
 import ConfirmationScreen from '../confirmation/confirmation';
 
 jest.mock('../confirmation/confirmation');
@@ -59,7 +59,7 @@ const mockStarkSigner = {
   signMessage: jest.fn(),
   getAddress: jest.fn(),
 };
-const passportConfig: Partial<PassportConfiguration> = {};
+const passportConfig: Partial<Config> = {};
 
 describe('trades', () => {
   describe('createTrade', () => {
@@ -101,7 +101,7 @@ describe('trades', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockSignableTradeRequest.getSignableTradeRequest,
-        passportConfig: passportConfig as PassportConfiguration,
+        passportConfig: passportConfig as Config,
       });
 
       expect(getSignableTradeMock).toBeCalledWith(mockSignableTradeRequest);
@@ -125,7 +125,7 @@ describe('trades', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: mockSignableTradeRequest.getSignableTradeRequest,
-          passportConfig: passportConfig as PassportConfiguration,
+          passportConfig: passportConfig as Config,
         })
       ).rejects.toThrowError('TRADE_ERROR');
     });
@@ -139,7 +139,7 @@ describe('trades', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: mockSignableTradeRequest.getSignableTradeRequest,
-          passportConfig: passportConfig as PassportConfiguration,
+          passportConfig: passportConfig as Config,
         })
       ).rejects.toThrow(
         new PassportError(

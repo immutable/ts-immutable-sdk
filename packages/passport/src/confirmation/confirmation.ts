@@ -7,7 +7,7 @@ import {
   Transaction,
 } from './types';
 import { openPopupCenter } from './popup';
-import { PassportConfiguration } from '../config';
+import { Config } from '../config';
 
 const ConfirmationWindowTitle = 'Confirm this transaction';
 const ConfirmationWindowHeight = 600;
@@ -15,9 +15,9 @@ const ConfirmationWindowWidth = 600;
 const ConfirmationWindowClosedPollingDuration = 1000;
 
 export default class ConfirmationScreen {
-  private config: PassportConfiguration;
+  private config: Config;
 
-  constructor(config: PassportConfiguration) {
+  constructor(config: Config) {
     this.config = config;
   }
 

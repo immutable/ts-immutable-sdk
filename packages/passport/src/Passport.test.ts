@@ -1,10 +1,10 @@
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
-import { Config } from './config';
 import { Passport } from './Passport';
 import { getStarkSigner } from './stark';
 import { OidcConfiguration, User } from './types';
 import registerPassport from './workflows/registration';
+import { Environment } from '@imtbl/config';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -61,7 +61,10 @@ describe('Passport', () => {
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,
     });
-    passport = new Passport(Config.SANDBOX, oidcConfiguration);
+    passport = new Passport({
+      environment: Environment.SANDBOX,
+      ...oidcConfiguration,
+    });
   });
 
   describe('connectImx', () => {

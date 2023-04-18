@@ -11,7 +11,7 @@ import {
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { UserWithEtherKey } from '../types';
-import { PassportConfiguration } from '../config';
+import { Config } from '../config';
 import { TransactionTypes } from '../confirmation/types';
 import ConfirmationScreen from '../confirmation/confirmation';
 
@@ -20,7 +20,7 @@ type CancelOrderParams = {
   ordersApi: OrdersApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  passportConfig: PassportConfiguration;
+  passportConfig: Config;
 };
 
 type CreateOrderParams = {
@@ -28,7 +28,7 @@ type CreateOrderParams = {
   ordersApi: OrdersApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  passportConfig: PassportConfiguration;
+  passportConfig: Config;
 };
 
 const ERC721 = 'ERC721';

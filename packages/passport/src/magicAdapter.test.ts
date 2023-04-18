@@ -2,7 +2,7 @@ import { LoginWithOpenIdParams, OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
 import { Magic } from 'magic-sdk';
 import MagicAdapter from './magicAdapter';
-import { PassportConfiguration } from './config';
+import { Config } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { Networks } from './types';
 
@@ -39,11 +39,11 @@ describe('MagicWallet', () => {
   let magicWallet: MagicAdapter;
   const apiKey = 'pk_live_A7D9211D7547A338';
   const providerId = 'mPGZAvZsFkyfT6OWfML1HgTKjPqYOPkhhOj-8qCGeqI=';
-  const config: PassportConfiguration = {
+  const config: Config = {
     network: Networks.SANDBOX,
     magicPublishableApiKey: apiKey,
     magicProviderId: providerId,
-  } as PassportConfiguration;
+  } as Config;
   const idToken = 'e30=.e30=.e30=';
 
   beforeEach(() => {

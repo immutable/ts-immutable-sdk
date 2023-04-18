@@ -1,37 +1,26 @@
-import AuthManager from './authManager';
-import MagicAdapter from './magicAdapter';
-import PassportImxProvider from './imxProvider/passportImxProvider';
-import { getPassportConfiguration, PassportConfiguration } from './config';
-import { PassportError, PassportErrorType } from './errors/passportError';
-import { IMXProvider } from '@imtbl/provider';
-import { getStarkSigner } from './stark';
-import {
-  EnvironmentConfiguration,
-  OidcConfiguration,
-  UserProfile,
-  UserWithEtherKey,
-} from './types';
 import {
   Configuration,
   EthSigner,
   StarkSigner,
   UsersApi,
 } from '@imtbl/core-sdk';
+import { IMXProvider } from '@imtbl/provider';
+import AuthManager from './authManager';
+import MagicAdapter from './magicAdapter';
+import PassportImxProvider from './imxProvider/passportImxProvider';
+import { Config } from './config';
+import { PassportError, PassportErrorType } from './errors/passportError';
+import { getStarkSigner } from './stark';
+import { PassportConfiguration, UserProfile, UserWithEtherKey } from './types';
 import registerPassport from './workflows/registration';
 
 export class Passport {
   private authManager: AuthManager;
   private magicAdapter: MagicAdapter;
-  private readonly config: PassportConfiguration;
+  private readonly config: Config;
 
-  constructor(
-    environmentConfiguration: EnvironmentConfiguration,
-    oidcConfiguration: OidcConfiguration
-  ) {
-    const passportConfiguration = getPassportConfiguration(
-      environmentConfiguration,
-      oidcConfiguration
-    );
+  constructor(passportArguments: PassportConfiguration) {
+    const passportConfiguration = new Config(passportArguments);
     this.config = passportConfiguration;
     this.authManager = new AuthManager(this.config);
     this.magicAdapter = new MagicAdapter(this.config);
@@ -98,7 +87,7 @@ export class Passport {
     jwt: string
   ): Promise<UserWithEtherKey> {
     const configuration = new Configuration({
-      basePath: this.config.imxAPIConfiguration.basePath,
+      basePath: this.config.imxApiBasePath,
     });
     const usersApi = new UsersApi(configuration);
     await registerPassport(

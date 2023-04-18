@@ -6,22 +6,23 @@ import {
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportMetadata, User, UserWithEtherKey } from './types';
 import { retryWithDelay } from './util/retry';
-import { PassportConfiguration } from './config';
+import { Config } from './config';
 
 const getAuthConfiguration = ({
   oidcConfiguration,
-}: PassportConfiguration): UserManagerSettings => {
+  authenticationDomain,
+}: Config): UserManagerSettings => {
   const baseConfiguration: UserManagerSettings = {
-    authority: oidcConfiguration.authenticationDomain,
+    authority: authenticationDomain,
     redirect_uri: oidcConfiguration.redirectUri,
     popup_redirect_uri: oidcConfiguration.redirectUri,
     client_id: oidcConfiguration.clientId,
     metadata: {
-      authorization_endpoint: `${oidcConfiguration.authenticationDomain}/authorize`,
-      token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
-      userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
+      authorization_endpoint: `${authenticationDomain}/authorize`,
+      token_endpoint: `${authenticationDomain}/oauth/token`,
+      userinfo_endpoint: `${authenticationDomain}/userinfo`,
       end_session_endpoint:
-        `${oidcConfiguration.authenticationDomain}/v2/logout` +
+        `${authenticationDomain}/v2/logout` +
         `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}` +
         `&client_id=${oidcConfiguration.clientId}`,
     },
@@ -40,9 +41,9 @@ const getAuthConfiguration = ({
 
 export default class AuthManager {
   private userManager;
-  private config: PassportConfiguration;
+  private config: Config;
 
-  constructor(config: PassportConfiguration) {
+  constructor(config: Config) {
     this.config = config;
     this.userManager = new UserManager(getAuthConfiguration(config));
   }

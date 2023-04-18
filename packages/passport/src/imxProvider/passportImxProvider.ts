@@ -29,12 +29,12 @@ import { cancelOrder, createOrder } from '../workflows/order';
 import { exchangeTransfer } from '../workflows/exchange';
 import { createTrade } from '../workflows/trades';
 import { PassportError, PassportErrorType } from '../errors/passportError';
-import { PassportConfiguration } from '../config';
+import { Config } from '../config';
 
 export type PassportImxProviderInput = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  passportConfig: PassportConfiguration;
+  passportConfig: Config;
 };
 
 export default class PassportImxProvider implements IMXProvider {
@@ -42,7 +42,7 @@ export default class PassportImxProvider implements IMXProvider {
   private starkSigner: StarkSigner;
   private transfersApi: TransfersApi;
   private ordersApi: OrdersApi;
-  private readonly passportConfig: PassportConfiguration;
+  private readonly passportConfig: Config;
   private exchangesApi: ExchangesApi;
   private tradesApi: TradesApi;
 

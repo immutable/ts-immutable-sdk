@@ -1,3 +1,5 @@
+import { Configuration } from '@imtbl/config';
+
 export type UserProfile = {
   email?: string;
   nickname?: string;
@@ -28,8 +30,8 @@ export interface EnvironmentConfiguration {
   authenticationDomain: string;
   magicPublishableApiKey: string;
   magicProviderId: string;
-  baseIMXApiPath: string;
   passportDomain: string;
+  imxApiBasePath: string;
 }
 
 export interface OidcConfiguration {
@@ -38,6 +40,12 @@ export interface OidcConfiguration {
   redirectUri: string;
   scope?: string;
   audience?: string;
+}
+
+export interface PassportConfiguration
+  extends Configuration,
+    OidcConfiguration {
+  overrides?: EnvironmentConfiguration;
 }
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };

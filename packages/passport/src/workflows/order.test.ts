@@ -2,7 +2,7 @@ import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { cancelOrder, createOrder } from './order';
-import { PassportConfiguration } from '../config';
+import { Config } from '../config';
 import { Networks } from '../types';
 import ConfirmationScreen from '../confirmation/confirmation';
 
@@ -18,7 +18,7 @@ describe('order', () => {
 
   const passportConfig = {
     network: Networks.SANDBOX,
-  } as Partial<PassportConfiguration>;
+  } as Partial<Config>;
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -125,7 +125,7 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: orderRequest as UnsignedOrderRequest,
-        passportConfig: passportConfig as PassportConfiguration,
+        passportConfig: passportConfig as Config,
       });
 
       expect(getSignableCreateOrderMock).toBeCalledWith(
@@ -148,7 +148,7 @@ describe('order', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: orderRequest as UnsignedOrderRequest,
-          passportConfig: passportConfig as PassportConfiguration,
+          passportConfig: passportConfig as Config,
         })
       ).rejects.toThrow(
         new PassportError(
@@ -188,7 +188,7 @@ describe('order', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: orderRequest as UnsignedOrderRequest,
-          passportConfig: passportConfig as PassportConfiguration,
+          passportConfig: passportConfig as Config,
         })
       ).rejects.toThrowError('CREATE_ORDER_ERROR');
     });
@@ -262,7 +262,7 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
-        passportConfig: passportConfig as PassportConfiguration,
+        passportConfig: passportConfig as Config,
       });
 
       expect(getSignableCancelOrderMock).toBeCalledWith(
@@ -302,7 +302,7 @@ describe('order', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: cancelOrderRequest,
-          passportConfig: passportConfig as PassportConfiguration,
+          passportConfig: passportConfig as Config,
         })
       ).rejects.toThrowError('CANCEL_ORDER_ERROR');
     });
@@ -316,7 +316,7 @@ describe('order', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: cancelOrderRequest,
-          passportConfig: passportConfig as PassportConfiguration,
+          passportConfig: passportConfig as Config,
         })
       ).rejects.toThrow(
         new PassportError(
