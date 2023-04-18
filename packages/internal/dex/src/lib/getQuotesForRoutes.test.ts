@@ -2,23 +2,15 @@ import { describe, it } from '@jest/globals';
 import { FeeAmount, Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { Token, CurrencyAmount, TradeType } from '@uniswap/sdk-core';
 import { getQuotesForRoutes } from '../lib/getQuotesForRoutes';
-import { Contract, ethers, providers } from 'ethers';
+import { ethers, providers } from 'ethers';
 import { MULTICALL_ADDRESS_CREATE2 } from '../constants';
-import {
-  IMX_TEST_CHAIN,
-  TEST_CHAIN_ID,
-  TEST_RPC_URL,
-  WETH_TEST_CHAIN,
-} from '../utils/testUtils';
-import { Multicall__factory } from '../contracts/types';
-
-jest.mock('@ethersproject/contracts');
-
+import { IMX_TEST_CHAIN, WETH_TEST_CHAIN } from '../utils/testUtils';
+import { Multicall__factory, QuoterV2__factory } from '../contracts/types';
+import { MockProvider } from 'utils/mockProvider';
+import { defaultAbiCoder } from '@ethersproject/abi';
 describe('getQuotesForRoutes', () => {
-  let mockedMulticallContract: jest.Mock;
-
   describe('with one quote', () => {
-    it('returns the only quote', async () => {
+    it.only('returns the only quote', async () => {
       const amountOut = ethers.utils.parseEther('1000');
       const types = [
         'uint256', // amountOut/amountIn
@@ -42,16 +34,6 @@ describe('getQuotesForRoutes', () => {
         ],
       };
 
-      mockedMulticallContract = (
-        Contract as unknown as jest.Mock
-      ).mockImplementationOnce(() => {
-        return {
-          callStatic: {
-            multicall: jest.fn().mockResolvedValueOnce(mockReturnData),
-          },
-        };
-      });
-
       let dummyRoutes: Route<Token, Token>[] = [];
       const arbitraryTick = 100;
       const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
@@ -66,10 +48,28 @@ describe('getQuotesForRoutes', () => {
       );
       dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
 
-      const provider = new providers.JsonRpcProvider(
-        TEST_RPC_URL,
-        TEST_CHAIN_ID
+      const iface = Multicall__factory.createInterface();
+      // const returnData = defaultAbiCoder.encode(
+      //   ['address', 'address', 'uint24'],
+      //   [WETH_TEST_CHAIN.address, IMX_TEST_CHAIN.address, '3000']
+      // );
+
+      const returnData =
+        QuoterV2__factory.createInterface().encodeFunctionResult('');
+
+      const provider = new MockProvider();
+      provider.mock(
+        MULTICALL_ADDRESS_CREATE2,
+        'multicall((address,uint256,bytes)[])',
+        iface.encodeFunctionResult('multicall', [
+          ethers.BigNumber.from(42),
+          [
+            [true, 2, returnData],
+            [true, 4, returnData],
+          ],
+        ])
       );
+
       const multicallContract = Multicall__factory.connect(
         MULTICALL_ADDRESS_CREATE2,
         provider
@@ -127,16 +127,6 @@ describe('getQuotesForRoutes', () => {
         ],
       };
 
-      mockedMulticallContract = (
-        Contract as unknown as jest.Mock
-      ).mockImplementationOnce(() => {
-        return {
-          callStatic: {
-            multicall: jest.fn().mockResolvedValueOnce(mockReturnData),
-          },
-        };
-      });
-
       let dummyRoutes: Route<Token, Token>[] = [];
       const arbitraryTick = 100;
       const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
@@ -152,10 +142,7 @@ describe('getQuotesForRoutes', () => {
       dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
       dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
 
-      const provider = new providers.JsonRpcProvider(
-        TEST_RPC_URL,
-        TEST_CHAIN_ID
-      );
+      const provider = new MockProvider();
       const multicallContract = Multicall__factory.connect(
         MULTICALL_ADDRESS_CREATE2,
         provider

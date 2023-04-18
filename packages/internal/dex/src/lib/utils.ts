@@ -42,7 +42,7 @@ export class DuplicateAddress extends Error {
 
 export async function getERC20Decimals(
   tokenAddress: string,
-  provider: ethers.providers.JsonRpcProvider
+  provider: ethers.providers.Provider
 ): Promise<number> {
   const decimalsFunctionSig = ethers.utils.id('decimals()').substring(0, 10);
   return parseInt(

@@ -5,7 +5,6 @@ import { multicallSingleCallDataMultipleContracts } from '../multicall';
 import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromERC20Pairs';
 import { ERC20Pair } from './generateERC20Pairs';
 import { Multicall, UniswapV3Pool__factory } from '../../contracts/types';
-import { UniswapV3PoolInterface } from '../../contracts/types/UniswapV3Pool';
 
 export type Slot0 = {
   sqrtPriceX96: BigNumber;
@@ -50,8 +49,7 @@ export const fetchValidPools = async (
   const slot0s = slot0Results.returnData;
   const liquidities = liquidityResults.returnData;
 
-  const uniswapV3Pool: UniswapV3PoolInterface =
-    UniswapV3Pool__factory.createInterface();
+  const uniswapV3Pool = UniswapV3Pool__factory.createInterface();
 
   const validPools: Pool[] = [];
   poolIDs.forEach((poolID, index) => {

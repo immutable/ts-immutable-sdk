@@ -55,6 +55,7 @@ export async function multicallMultipleCallDataSingContract(
   address: Address,
   options: SingleContractCallOptions
 ): Promise<MulticallResponse> {
+  console.log({ calldata });
   // Create call objects
   const calls = new Array(calldata.length);
   for (const i in calldata) {

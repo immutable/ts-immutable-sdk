@@ -29,15 +29,18 @@ export async function getQuotesForRoutes(
       }).calldata
   );
 
+  console.log(32);
   const quoteResults = await multicallMultipleCallDataSingContract(
     multicallContract,
     callData,
     QUOTER_ADDRESS_CREATE2,
     { gasRequired: DEFAULT_GAS_QUOTE }
   );
+  console.log({ quoteResults });
 
   let decodedQuoteResults: QuoteResult[] = [];
   for (let i in quoteResults.returnData) {
+    console.log({ cd: callData[i] });
     const functionSig = callData[i].substring(0, 10);
     const returnTypes = quoteReturnMapping[functionSig];
     if (!returnTypes) {
