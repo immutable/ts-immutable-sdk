@@ -72,12 +72,23 @@
   {
     "address": "0x123456789",
     "chainId": 5,
-    "name": "Craig Coin",
-    "symbol": "CGC",
+    "name": "Swap Coin",
+    "symbol": "SWC",
     "decimals": 18,
     "tokenFeatures": [
       "swap",
-      "bridge"
+      "fakeFeature"
+    ]
+  },
+  {
+    "address": "0x123456789",
+    "chainId": 5,
+    "name": "Bridge Coin",
+    "symbol": "BDC",
+    "decimals": 18,
+    "tokenFeatures": [
+      "bridge",
+      "fakeFeature"
     ]
   }
 ]

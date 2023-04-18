@@ -11,12 +11,14 @@ export const getTokenAllowList = function ({
   chainId,
   exclude,
 }: GetTokenAllowListParams): GetTokenAllowListResult {
+  // For API call, use the CheckoutError with errorType:API_CALL_ERROR?? or any other
+
   const filteredTokenList = masterTokenList
     .filter((token) => {
       const chainIdMatches = token.chainId == chainId;
-      const tokenNotExcluded = !exclude?.includes({
-        address: token.address || '',
-      });
+      const tokenNotExcluded = !exclude
+        ?.map((excludeToken) => excludeToken.address)
+        .includes(token.address || '');
       const allowAllTokens = type === TokenFilterTypes.ALL;
       const tokenAllowedForType = token.tokenFeatures.includes(type);
 
