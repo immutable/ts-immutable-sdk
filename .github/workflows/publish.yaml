@@ -91,7 +91,7 @@ jobs:
               exit 1
             fi
           fi
-          ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $( ${{ contains(github.event.inputs.release_type, 'alpha')}} && echo '--revision' || echo '')
+          ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $( ${{ contains(github.event.inputs.release_type, 'alpha') }} && echo '--revision' || echo '')
           echo "$(git push --tags)"
         shell: bash
 
@@ -99,7 +99,7 @@ jobs:
         id: version
         run: |
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
-          echo "$NEXT_VERSION"
+          echo "${NEXT_VERSION}"
 
       - name: Update package.json version for pre (alpha) releases
         if: contains(github.event.inputs.release_type, 'alpha')
@@ -123,4 +123,4 @@ jobs:
 
       - name: Release
         if: contains(github.event.inputs.release_type, 'release')
-        run: yarn release ${{github.event.inputs.release_type}} --ci
+        run: yarn release ${{github.event.inputs.release_type}} --ci $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "")
