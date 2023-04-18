@@ -20,3 +20,13 @@ export type QuoteResponse =
       success: false;
       trade: undefined;
     };
+
+export type TransactionResponse =
+  | {
+      transactionRequest: ethers.providers.TransactionRequest;
+      success: true;
+    }
+  | {
+      success: false;
+      transactionRequest: undefined;
+    };
