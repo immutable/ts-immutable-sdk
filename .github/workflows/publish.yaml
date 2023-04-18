@@ -123,4 +123,4 @@ jobs:
 
       - name: Release
         if: contains(github.event.inputs.release_type, 'release')
-        run: yarn release ${{github.event.inputs.release_type}} --ci $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "")
+        run: yarn release ${{github.event.inputs.upgrade_type}} --ci $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "")
