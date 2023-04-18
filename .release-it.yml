@@ -1,5 +1,6 @@
 git:
   commitMessage: 'Release ${version}'
+  requireCleanWorkingDir: true
 npm:
   publish: true
   publishPath: "sdk"
@@ -15,7 +16,7 @@ hooks:
 plugins:
   '@release-it-plugins/workspaces':
     workspaces: ['sdk']
-  '@release-it/keep-a-changelog':
+  './keep-a-changelog.mjs':
     filename: 'CHANGELOG.md'
     addUnreleased: true
     strictLatest: false	
