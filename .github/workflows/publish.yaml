@@ -105,11 +105,11 @@ jobs:
           tmp=$(mktemp)
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
           
-      - name: Commit package.json with new version
-        if: contains(github.event.inputs.release_type, 'release')
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Updated Changelog to version ${{steps.version.outputs.NEXT_VERSION}}
+      # - name: Commit package.json with new version
+      #   if: contains(github.event.inputs.release_type, 'release')
+      #   uses: stefanzweifel/git-auto-commit-action@v4
+      #   with:
+      #     commit_message: Updated Changelog to version ${{steps.version.outputs.NEXT_VERSION}}
 
       - name: Pre Release Step
         if: contains(github.event.inputs.release_type, 'alpha')
@@ -127,4 +127,4 @@ jobs:
 
       - name: Release
         if: contains(github.event.inputs.release_type, 'release')
-        run: yarn release --ci --no-increment --no-npm $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "")
+        run: yarn release --ci --no-increment --no-npm $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
