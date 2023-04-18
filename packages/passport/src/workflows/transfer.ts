@@ -139,12 +139,14 @@ export async function batchNftTransfer({
     });
 
     const confirmationScreen = new ConfirmationScreen(passportConfig);
+    const popupWindowSize = { width: 480, height: 784 };
     const confirmationResult = await confirmationScreen.startTransaction(
       user.accessToken,
       {
         transactionType: TransactionTypes.CreateBatchTransfer,
         transactionData: getSignableTransferRequestV2,
-      }
+      },
+      popupWindowSize
     );
 
     if (!confirmationResult.confirmed) {
