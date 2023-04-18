@@ -41,7 +41,7 @@
     "test": "jest test",
     "test:watch": "jest --watch",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
-    "lint:fix": "cd ../../../ && yarn wsrun -p ./ -c lint --fix"
+    "lint:fix": "cd ../../../ && yarn wsrun -p @imtbl/dex-sdk -c lint --fix"
   },
   "engines": {
     "node": ">=16.0.0"
