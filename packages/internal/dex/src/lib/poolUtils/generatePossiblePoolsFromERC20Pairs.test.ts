@@ -1,12 +1,12 @@
 import { describe, it } from '@jest/globals';
 import { Token } from '@uniswap/sdk-core';
-import { ERC20Pair } from '../lib/poolUtils/generateERC20Pairs';
-import { generatePossiblePoolsFromERC20Pair } from '../lib/poolUtils/generatePossiblePoolsFromERC20Pairs';
+import { ERC20Pair } from './generateERC20Pairs';
+import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromERC20Pairs';
 import {
   IMX_TEST_CHAIN,
   USDC_TEST_CHAIN,
   WETH_TEST_CHAIN,
-} from '../utils/testUtils';
+} from '../../utils/testUtils';
 
 describe('generatePoolsFromTokenPairs', () => {
   describe('when given one TokenPair and one CommonRoutingTokens', () => {
