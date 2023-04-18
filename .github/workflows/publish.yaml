@@ -85,12 +85,11 @@ jobs:
           upgrade_type=${{github.event.inputs.upgrade_type}}
           if [ ${{ contains(github.event.inputs.upgrade_type, 'none') }} ]
           then
+            upgrade_type=""
             if [ ${{ contains(github.event.inputs.release_type, 'release') }} ]
             then
               echo "A release_type of release should be one of patch, minor, major"
               exit 1
-            else
-              upgrade_type=""
             fi
           fi
           ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $( ${{ contains(github.event.inputs.release_type, 'alpha')}} && echo '--revision' || echo '')
