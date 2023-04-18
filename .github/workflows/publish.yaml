@@ -61,20 +61,20 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      # - name: Build
-      #   run: yarn build
+      - name: Build
+        run: yarn build
 
-      # - name: Check Single Package Version Policy
-      #   run: yarn syncpack:check
+      - name: Check Single Package Version Policy
+        run: yarn syncpack:check
 
-      # - name: Lint
-      #   run: yarn lint
+      - name: Lint
+        run: yarn lint
 
-      # - name: Build
-      #   run: yarn build
+      - name: Build
+        run: yarn build
 
-      # - name: Typecheck
-      #   run: yarn typecheck
+      - name: Typecheck
+        run: yarn typecheck
 
       # - name: Test
       #   run: yarn test
@@ -101,6 +101,7 @@ jobs:
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
           
       - name: Update package.json version for pre (alpha) releases
+        if: contains(github.event.inputs.release_type, 'alpha')
         run: |
           tmp=$(mktemp)
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json

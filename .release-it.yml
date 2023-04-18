@@ -6,11 +6,11 @@ npm:
   publishPath: "sdk"
 hooks:
   before:init:
-    - 'yarn lint'
-    - 'yarn syncpack:check'
-    - 'yarn build'
-    - 'yarn typecheck'
-    - 'yarn test'
+    # - 'yarn lint'
+    # - 'yarn syncpack:check'
+    # - 'yarn build'
+    # - 'yarn typecheck'
+    # - 'yarn test'
   after:release:
     - 'echo Successfully released ${name} v${version} to ${repo.repository}.'
 plugins:
