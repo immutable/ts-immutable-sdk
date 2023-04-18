@@ -1,16 +1,11 @@
 import { BiomeThemeProvider, Button, Body, Box } from '@biom3/react'
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web'
-import { Web3Provider } from '@ethersproject/providers'
-
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web'
 import { WidgetTheme } from '@imtbl/checkout-ui-types'
-
 import { sendConnectFailedEvent, sendConnectSuccessEvent} from './ConnectWidgetEvents'
-
 import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
 import { OtherWallets } from './components/other-wallets/OtherWallets';
 import { ChooseNetwork } from './components/choose-network/ChooseNetwork';
-
-import { useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { 
   ActiveStyle, 
   BackButtonStyle, 
@@ -19,6 +14,7 @@ import {
   WidgetHeaderStyle 
 } from './ConnectStyles'
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens'
+import { Actions, ConnectContext, connectReducer, initialState } from './context/ConnectContext'
 
 export enum ConnectWidgetViews {
   CONNECT_WALLET = "CONNECT_WALLET",
@@ -39,13 +35,22 @@ export interface ConnectWidgetParams {
 }
 
 export function ConnectWidget(props:ConnectWidgetProps) {
+  const [state, dispatch] = useReducer(connectReducer, initialState);
+
   const { theme } = props;
 
   const [currentView, setView] = useState(ConnectWidgetViews.CONNECT_WALLET)
-  const [currentProvider, setProvider] = useState<Web3Provider|null>(null)
 
   const biomeTheme:BaseTokens = (theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()) ? onLightBase : onDarkBase
 
+  useEffect(() => {
+    dispatch({
+      payload: {
+        type: Actions.SET_CHECKOUT,
+        checkout: new Checkout(),
+      },
+    });
+  }, [])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateView = async (view:ConnectWidgetViews, err?:any) => {
@@ -58,10 +63,6 @@ export function ConnectWidget(props:ConnectWidgetProps) {
       sendConnectFailedEvent(err.message);
       return
     }
-  }
-
-  const updateProvider = async(provider:Web3Provider|null) => {
-    setProvider(provider)
   }
 
   const goBack = async () => {
@@ -81,47 +82,49 @@ export function ConnectWidget(props:ConnectWidgetProps) {
 
   return (
     <BiomeThemeProvider theme={{base: biomeTheme}}>
-      <Box sx={ConnectWidgetStyle}>
-        <Box sx={WidgetHeaderStyle}>
-          <Box sx={BackButtonStyle}>
-          <Button 
-            testId='back-button'
-            sx={(currentView === ConnectWidgetViews.CONNECT_WALLET) ? InactiveStyle : ActiveStyle}
-            onClick={() => goBack()}>Back</Button>
-          </Box>  
-          <Box>
+      <ConnectContext.Provider value={{ state: state, dispatch: dispatch }}>
+        <Box sx={ConnectWidgetStyle}>
+          <Box sx={WidgetHeaderStyle}>
+            <Box sx={BackButtonStyle}>
             <Button 
-            testId='close-button'
-            onClick={() => updateView(ConnectWidgetViews.FAIL, new Error("User closed the connect widget"))}>x</Button>
-          </Box>
-        </Box>       
+              testId='back-button'
+              sx={(currentView === ConnectWidgetViews.CONNECT_WALLET) ? InactiveStyle : ActiveStyle}
+              onClick={() => goBack()}>Back</Button>
+            </Box>  
+            <Box>
+              <Button 
+              testId='close-button'
+              onClick={() => updateView(ConnectWidgetViews.FAIL, new Error("User closed the connect widget"))}>x</Button>
+            </Box>
+          </Box>       
 
-        <Box 
-          testId="connect-wallet" 
-          sx={(currentView === ConnectWidgetViews.CONNECT_WALLET) ? ActiveStyle : InactiveStyle}>
-          <ConnectWallet updateView={updateView} />
+          <Box 
+            testId="connect-wallet" 
+            sx={(currentView === ConnectWidgetViews.CONNECT_WALLET) ? ActiveStyle : InactiveStyle}>
+            <ConnectWallet updateView={updateView} />
+          </Box>
+          <Box 
+            testId="other-wallets" 
+            sx={(currentView === ConnectWidgetViews.OTHER_WALLETS) ? ActiveStyle : InactiveStyle}>
+            <OtherWallets updateView={updateView} />
+          </Box>
+          <Box 
+            testId="choose-networks" 
+            sx={(currentView === ConnectWidgetViews.CHOOSE_NETWORKS) ? ActiveStyle : InactiveStyle}>
+            <ChooseNetwork updateView={updateView} />
+          </Box>
+          <Box 
+            testId="fail"
+            sx={(currentView === ConnectWidgetViews.FAIL) ? ActiveStyle : InactiveStyle}>
+            <Body style={{color:'#FFF'}}>User did not connect</Body>
+          </Box>
+          <Box 
+            testId="success"
+            sx={(currentView === ConnectWidgetViews.SUCCESS) ? ActiveStyle : InactiveStyle}>
+            <Body style={{color:'#FFF'}}>User connected</Body>
+          </Box>
         </Box>
-        <Box 
-          testId="other-wallets" 
-          sx={(currentView === ConnectWidgetViews.OTHER_WALLETS) ? ActiveStyle : InactiveStyle}>
-          <OtherWallets updateView={updateView} updateProvider={updateProvider} />
-        </Box>
-        <Box 
-          testId="choose-networks" 
-          sx={(currentView === ConnectWidgetViews.CHOOSE_NETWORKS) ? ActiveStyle : InactiveStyle}>
-          <ChooseNetwork provider={currentProvider} updateView={updateView} />
-        </Box>
-        <Box 
-          testId="fail"
-          sx={(currentView === ConnectWidgetViews.FAIL) ? ActiveStyle : InactiveStyle}>
-          <Body style={{color:'#FFF'}}>User did not connect</Body>
-        </Box>
-        <Box 
-          testId="success"
-          sx={(currentView === ConnectWidgetViews.SUCCESS) ? ActiveStyle : InactiveStyle}>
-          <Body style={{color:'#FFF'}}>User connected</Body>
-        </Box>
-      </Box>
+      </ConnectContext.Provider>
     </BiomeThemeProvider>
   )
 }
