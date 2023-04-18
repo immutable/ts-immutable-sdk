@@ -356,6 +356,7 @@ if [[ "${#PROPOSED_HASH}" -gt 0 && "$NO_APPLY_MSG" == "" ]]; then
   echo -e "\033[31mERROR:\033[0m To Resolve try to add --revision or --patch modifier."
   echo -e "\033[31mERROR:\033[0m "
   echo ""
+  exit 1
 fi
 
 if [[ "$NO_APPLY_MSG" == "" ]]; then
