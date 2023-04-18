@@ -1,8 +1,8 @@
-import { Box, Body } from '@biom3/react';
-import { useCallback, useEffect, useState } from 'react';
-import { Checkout, ConnectResult, TokenInfo } from '@imtbl/checkout-sdk-web';
-import { SelectStyle, OptionsContainerStyle, OptionStyle, SelectedOptionStyle } from '../SwapStyles';
-import { alphaSortTokensList } from '../helpers';
+import { Body, Box } from "@biom3/react";
+import { useCallback, useEffect, useState } from "react";
+import { Checkout, ConnectResult, TokenFilterTypes, TokenInfo } from "@imtbl/checkout-sdk-web";
+import { OptionsContainerStyle, OptionStyle, SelectedOptionStyle, SelectStyle } from "../SwapStyles";
+import { alphaSortTokensList } from "../helpers";
 
 export interface TokenSelectProps {
   onChange: (token: TokenInfo) => void;
@@ -14,7 +14,7 @@ export interface TokenSelectProps {
 
 const TokenSelect = ({ testId, onChange, token, connection, filter }: TokenSelectProps) => {
   const checkout = new Checkout();
-  const allowList = checkout.getTokenAllowList({chainId: 1}); // TODO: THIS NEEDS TO BE SET BACK TO THE NETWORK CHAIN ID
+  const allowList = checkout.getTokenAllowList({chainId: 1, type:TokenFilterTypes.SWAP}); // TODO: THIS NEEDS TO BE SET BACK TO THE NETWORK CHAIN ID
 
   const sortedAllowList = alphaSortTokensList(allowList.tokens);
 

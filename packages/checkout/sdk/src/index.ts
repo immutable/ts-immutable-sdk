@@ -17,4 +17,6 @@ export type {
   GetAllBalancesResult,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
+  TokenFilterTypes,
+  TokenFilter,
 } from './types';
