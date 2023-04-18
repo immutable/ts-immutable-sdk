@@ -2,7 +2,7 @@ git:
   commitMessage: 'Release ${version}'
 npm:
   publish: true
-  publishPath: "sdk",
+  publishPath: "sdk"
 hooks:
   before:init:
     - 'yarn lint'
