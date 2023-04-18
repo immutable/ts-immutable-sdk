@@ -17,3 +17,5 @@ plugins:
     workspaces: ['sdk']
   '@release-it/keep-a-changelog':
     filename: 'CHANGELOG.md'
+    addUnreleased: true
+    strictLatest: false
