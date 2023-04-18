@@ -5,7 +5,7 @@ import { ButtonWrapperStyle } from '../../ConnectStyles'
 import { Actions, ConnectContext } from '../../context/ConnectContext'
 import { useContext } from 'react'
 import { ViewActions, ViewContext } from '../../../../context/ViewContext'
-import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes'
+import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes'
 
 export function OtherWallets () {
   const { connectState, connectDispatch } = useContext(ConnectContext);

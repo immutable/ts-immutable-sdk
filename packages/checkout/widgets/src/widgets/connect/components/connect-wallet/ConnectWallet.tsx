@@ -3,7 +3,7 @@ import { Button } from '@biom3/react'
 import { useContext } from 'react';
 import { ViewActions, ViewContext } from '../../../../context/ViewContext';
 import { ButtonWrapperStyle } from '../../ConnectStyles'
-import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
+import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
 
 export function ConnectWallet () {
   const { viewDispatch } = useContext(ViewContext);

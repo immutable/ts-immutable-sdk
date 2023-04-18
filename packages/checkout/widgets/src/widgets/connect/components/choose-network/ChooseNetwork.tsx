@@ -4,7 +4,7 @@ import { ChainId } from '@imtbl/checkout-sdk-web'
 import { ConnectContext } from '../../context/ConnectContext';
 import { useContext } from 'react';
 import { ViewActions, ViewContext } from '../../../../context/ViewContext';
-import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
+import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
 
 export function ChooseNetwork () {
   const { viewDispatch } = useContext(ViewContext);

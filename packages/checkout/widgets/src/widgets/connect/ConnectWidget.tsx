@@ -16,7 +16,7 @@ import {
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens'
 import { Actions, ConnectContext, connectReducer, initialConnectState } from './context/ConnectContext'
 import { initialViewState, ViewActions, ViewContext, viewReducer } from '../../context/ViewContext';
-import { ConnectWidgetViews } from './context/ConnectViewContextTypes';
+import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
