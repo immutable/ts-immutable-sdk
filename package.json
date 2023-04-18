@@ -42,7 +42,8 @@
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
     "test": "wsrun --exclude-missing -e test",
-    "typecheck": "wsrun --exclude-missing typecheck"
+    "typecheck": "wsrun --exclude-missing typecheck",
+    "release": "release-it"
   },
   "workspaces": [
     "sdk",

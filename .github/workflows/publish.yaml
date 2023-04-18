@@ -99,7 +99,7 @@ jobs:
         id: version
         run: |
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
-          echo "${{ NEXT_VERSION }}"
+          echo "$NEXT_VERSION"
 
       - name: Update package.json version for pre (alpha) releases
         if: contains(github.event.inputs.release_type, 'alpha')
