@@ -3,7 +3,6 @@ import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
 import { ChainId, ERC20ABI, GetAllBalancesResult, NetworkInfo } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { ethTokensList } from '../tokens';
 
 jest.mock('ethers', () => {
   return {
@@ -184,12 +183,12 @@ describe('balances', () => {
       decimalsMock = jest.fn().mockResolvedValue(18);
       nameMock = jest
         .fn()
-        .mockResolvedValueOnce('Matic')
-        .mockResolvedValueOnce('Immutable X');
+        .mockResolvedValueOnce('Immutable X')
+        .mockResolvedValueOnce('Matic');
       symbolMock = jest
         .fn()
-        .mockResolvedValueOnce('MATIC')
-        .mockResolvedValueOnce('IMX');
+        .mockResolvedValueOnce('IMX')
+        .mockResolvedValueOnce('MATIC');
       (Contract as unknown as jest.Mock).mockReturnValue({
         balanceOf: balanceOfMock,
         decimals: decimalsMock,
@@ -226,20 +225,20 @@ describe('balances', () => {
             balance: currentBalance,
             formattedBalance,
             token: {
-              name: 'Matic',
-              symbol: 'MATIC',
+              name: 'Immutable X',
+              symbol: 'IMX',
               decimals: 18,
-              address: ethTokensList[1].address,
+              address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF', //from token master list
             },
           },
           {
             balance: currentBalance,
             formattedBalance,
             token: {
-              name: 'Immutable X',
-              symbol: 'IMX',
+              name: 'Matic',
+              symbol: 'MATIC',
               decimals: 18,
-              address: ethTokensList[2].address,
+              address: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0', //from token master list
             },
           },
         ],

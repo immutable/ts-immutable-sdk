@@ -5,6 +5,7 @@ import {
   ERC20ABI,
   GetAllBalancesResult,
   GetBalanceResult,
+  TokenFilterTypes,
   TokenInfo,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
@@ -80,8 +81,10 @@ export const getAllBalances = async (
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
     );
 
-  const tokenList = getTokenAllowList(chainId);
-
+  const tokenList = getTokenAllowList({
+    type: TokenFilterTypes.ALL,
+    chainId,
+  });
   const allBalancePromises: Promise<GetBalanceResult>[] = [];
   allBalancePromises.push(getBalance(provider, walletAddress));
 

@@ -11,7 +11,7 @@ export const getTokenAllowList = function ({
   chainId,
   exclude,
 }: GetTokenAllowListParams): GetTokenAllowListResult {
-  // For API call, use the CheckoutError with errorType:API_CALL_ERROR?? or any other
+  // todo:For API call, use the CheckoutError with errorType:API_CALL_ERROR?? or any other
 
   const filteredTokenList = masterTokenList
     .filter((token) => {
