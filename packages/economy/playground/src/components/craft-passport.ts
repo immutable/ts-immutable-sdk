@@ -23,6 +23,7 @@ export class CraftPassport extends LitElement {
 
   private passport!: Passport;
   private provider!: IMXProvider;
+  private button!: HTMLButtonElement;
 
   @property()
   env: keyof typeof Config | 'dev' = 'SANDBOX';
@@ -39,6 +40,8 @@ export class CraftPassport extends LitElement {
   @state()
   private state = {
     accessToken: '',
+    userInfo: {},
+    user: {},
   };
 
   @eventOptions({ capture: true })
@@ -47,13 +50,7 @@ export class CraftPassport extends LitElement {
 
     try {
       this.provider = await this.passport.connectImx();
-      const accessToken = await this.passport?.getAccessToken();
-
-      this.state = { ...this.state, accessToken };
-
-      console.log({
-        state: this.state,
-      });
+      this.setStateProperties();
     } catch (error) {
       this.onLoginPopupCloseEvent(error);
     }
@@ -64,9 +61,15 @@ export class CraftPassport extends LitElement {
     this.setup();
   }
 
+  get _slottedChildren() {
+    const slot = this.shadowRoot?.querySelector('slot');
+    return slot?.assignedElements({ flatten: true });
+  }
+
   setup() {
     this.create();
     this.connect();
+    this.setStateProperties();
   }
 
   create() {
@@ -76,6 +79,8 @@ export class CraftPassport extends LitElement {
       clientId: this.clientId,
       redirectUri: this.redirectUri,
       logoutRedirectUri: this.logoutRedirectUri,
+      scope: 'openid offline_access transact',
+      audience: 'platform_api',
     });
   }
 
@@ -92,20 +97,46 @@ export class CraftPassport extends LitElement {
   }
 
   async onLoginPopupCloseEvent(error: any) {
-    console.log(
-      '🚀 ~ file: craft-passport.ts:87 ~ CraftPassport ~ onLoginPopupCloseEvent ~ error:',
-      error
-    );
+    console.log('CraftPassport ~ onLoginPopupCloseEvent ~ error:', error);
+  }
+
+  async setStateProperties() {
+    const [accessToken, userInfo] = await Promise.all([
+      this.passport.getAccessToken(),
+      this.passport.getUserInfo(),
+    ]);
+    const user = (this.provider as any)?.user || {};
+    this.state = { ...this.state, accessToken, userInfo, user };
+    this.requestUpdate();
+    console.log({ state: this.state });
   }
 
   firstUpdated() {
     console.log('Component mounted!', {
       passport: this.passport,
     });
+    this.button = this._slottedChildren?.[0] as HTMLButtonElement;
+  }
+
+  renderConnected() {
+    this.button.textContent = 'reconnect';
+    return html`
+      <b>Connected to Passport</b><br />
+      <pre>${JSON.stringify(this.state, undefined, 2)}</pre>
+    `;
+  }
+
+  renderDetails() {
+    if (this.state.accessToken) {
+      return this.renderConnected();
+    }
+
+    return html`<b>Not connected</b>`;
   }
 
   render() {
     return html`<div @click=${this.handleLoginClick}>
+      ${this.renderDetails()}
       <slot></slot>
     </div>`;
   }
