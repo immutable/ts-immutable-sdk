@@ -15,12 +15,12 @@ on:
         type: choice
         description: Upgrade Type
         options:
-          - ""
           - patch 
           - minor
           - major
+          - none
         required: false
-        default: ""
+        default: patch
       dry_run:
         type: boolean
         description: '(Optional) Dry run'
@@ -82,7 +82,18 @@ jobs:
       - name: Get next version string
         id: version
         run: |
-          ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --${{ github.event.inputs.upgrade_type }} --apply $( ${{ contains(github.event.inputs.release_type, 'alpha')}} && echo '--revision' || echo '')
+          upgrade_type=${{github.event.inputs.upgrade_type}}
+          if [ ${{ contains(github.event.inputs.upgrade_type, 'none') }} ]
+          then
+            if [ ${{ contains(github.event.inputs.release_type, 'release') }} ]
+            then
+              echo "A release_type of release should be one of patch, minor, major"
+              exit 1
+            else
+              upgrade_type=""
+            fi
+          fi
+          ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $( ${{ contains(github.event.inputs.release_type, 'alpha')}} && echo '--revision' || echo '')
           echo "$(git push --tags)"
           echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
         shell: bash
@@ -107,10 +118,10 @@ jobs:
           tag: ${{ contains(github.event.inputs.release_type, 'alpha') && 'alpha' }}
           dry-run: ${{ github.event.inputs.dry_run }}
 
+      - name: Authenticate NPM
+        if: ${{ contains(github.event.inputs.release_type, 'release') }}
+        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
 
-      # - name: Authenticate NPM
-      #   run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
-
-      # - name: Release
-      #   if: ${{ contains(github.event.inputs.release_type, 'patch') || contains(github.event.inputs.release_type, 'minor') || contains(github.event.inputs.release_type, 'major') }}
-      #   run: yarn release ${{github.event.inputs.release_type}} --ci
+      - name: Release
+        if: ${{ contains(github.event.inputs.release_type, 'release') }}
+        run: yarn release ${{github.event.inputs.release_type}} --ci
