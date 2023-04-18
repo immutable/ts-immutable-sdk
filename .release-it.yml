@@ -1,6 +1,6 @@
 git:
   commitMessage: 'Release ${version}'
-  requireCleanWorkingDir: true
+  requireCleanWorkingDir: false
 npm:
   publish: true
   publishPath: "sdk"
