@@ -12,33 +12,21 @@ export const openPopupCenter = ({
   width,
   height,
 }: PopUpProps): Window => {
-  // Fixes dual-screen position                             Most browsers      Firefox
-  const dualScreenLeft =
-    window.screenLeft !== undefined ? window.screenLeft : window.screenX;
-  const dualScreenTop =
-    window.screenTop !== undefined ? window.screenTop : window.screenY;
-
-  const windowWidth = window.innerWidth
-    ? window.innerWidth
-    : document.documentElement.clientWidth
-    ? document.documentElement.clientWidth
-    : screen.width;
-  const windowHeight = window.innerHeight
-    ? window.innerHeight
-    : document.documentElement.clientHeight
-    ? document.documentElement.clientHeight
-    : screen.height;
-
-  const systemZoom = windowWidth / window.screen.availWidth;
-  const left = (windowWidth - width) / 2 / systemZoom + dualScreenLeft;
-  const top = (windowHeight - height) / 2 / systemZoom + dualScreenTop;
+  const left = Math.max(
+    0,
+    Math.round(window.screenX + (window.outerWidth - width) / 2)
+  );
+  const top = Math.max(
+    0,
+    Math.round(window.screenY + (window.outerHeight - height) / 2)
+  );
   const newWindow = window.open(
     url,
     title,
     `
       scrollbars=yes,
-      width=${width / systemZoom}, 
-      height=${height / systemZoom}, 
+      width=${width}, 
+      height=${height}, 
       top=${top}, 
       left=${left}
      `
