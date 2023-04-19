@@ -3,7 +3,6 @@ import {
   connect as buildImxSigner,
   disconnect as disconnectImxSigner,
 } from '../imx-wallet/imxWallet';
-import { Configuration } from '@imtbl/config';
 import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { GenericIMXProvider } from '../genericImxProvider';
 import { ImxSigner } from '../imx-wallet/ImxSigner';
@@ -12,12 +11,13 @@ import {
   ProviderErrorType,
   withProviderError,
 } from '../errors/providerError';
+import { ProviderConfiguration } from 'config';
 
 export class MetaMaskIMXProvider extends GenericIMXProvider {
   private static imxSigner: ImxSigner;
 
   constructor(
-    config: Configuration,
+    config: ProviderConfiguration,
     ethSigner: EthSigner,
     starkExSigner: StarkSigner
   ) {
@@ -25,17 +25,16 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
   }
 
   public static async connect(
-    config: Configuration
+    config: ProviderConfiguration
   ): Promise<MetaMaskIMXProvider> {
-    const starkExConfig = config.getStarkExConfig();
     return await withProviderError<MetaMaskIMXProvider>(
       async () => {
         const metaMaskProvider = await connect({
-          chainID: starkExConfig.ethConfiguration.chainID,
+          chainID: config.immutableXConfig.ethConfiguration.chainID,
         });
         this.imxSigner = await buildImxSigner(
           metaMaskProvider,
-          starkExConfig.env
+          config.baseConfig.environment
         );
         return new MetaMaskIMXProvider(
           config,

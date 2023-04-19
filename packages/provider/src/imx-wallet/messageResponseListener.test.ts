@@ -37,9 +37,7 @@ describe('the messageResponseListener function', () => {
   beforeEach(async () => {
     htmlBodyInit();
 
-    iframe = await asyncTriggerIFrameOnLoad(
-      setupIFrame(Environment.DEVELOPMENT)
-    );
+    iframe = await asyncTriggerIFrameOnLoad(setupIFrame(Environment.SANDBOX));
 
     if (iframe) {
       iFrameURL = new URL(iframe.src).origin;

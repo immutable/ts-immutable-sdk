@@ -10,18 +10,19 @@ import { PassportConfiguration } from './config';
 
 const getAuthConfiguration = ({
   oidcConfiguration,
+  authenticationDomain,
 }: PassportConfiguration): UserManagerSettings => {
   const baseConfiguration: UserManagerSettings = {
-    authority: oidcConfiguration.authenticationDomain,
+    authority: authenticationDomain,
     redirect_uri: oidcConfiguration.redirectUri,
     popup_redirect_uri: oidcConfiguration.redirectUri,
     client_id: oidcConfiguration.clientId,
     metadata: {
-      authorization_endpoint: `${oidcConfiguration.authenticationDomain}/authorize`,
-      token_endpoint: `${oidcConfiguration.authenticationDomain}/oauth/token`,
-      userinfo_endpoint: `${oidcConfiguration.authenticationDomain}/userinfo`,
+      authorization_endpoint: `${authenticationDomain}/authorize`,
+      token_endpoint: `${authenticationDomain}/oauth/token`,
+      userinfo_endpoint: `${authenticationDomain}/userinfo`,
       end_session_endpoint:
-        `${oidcConfiguration.authenticationDomain}/v2/logout` +
+        `${authenticationDomain}/v2/logout` +
         `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}` +
         `&client_id=${oidcConfiguration.clientId}`,
     },

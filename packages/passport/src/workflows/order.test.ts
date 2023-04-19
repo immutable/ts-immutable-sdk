@@ -3,8 +3,8 @@ import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { cancelOrder, createOrder } from './order';
 import { PassportConfiguration } from '../config';
-import { Networks } from '../types';
 import ConfirmationScreen from '../confirmation/confirmation';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 
 jest.mock('../confirmation/confirmation');
 
@@ -16,9 +16,14 @@ describe('order', () => {
     getAddress: jest.fn(),
   };
 
-  const passportConfig = {
-    network: Networks.SANDBOX,
-  } as Partial<PassportConfiguration>;
+  const passportConfig = new PassportConfiguration({
+    baseConfig: new ImmutableConfiguration({
+      environment: Environment.PRODUCTION,
+    }),
+    clientId: 'clientId123',
+    logoutRedirectUri: 'http://localhost:3000',
+    redirectUri: 'http://localhost:3000',
+  });
 
   beforeEach(() => {
     jest.resetAllMocks();

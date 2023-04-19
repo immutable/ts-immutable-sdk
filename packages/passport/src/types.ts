@@ -1,3 +1,5 @@
+import { ModuleConfiguration } from '@imtbl/config';
+
 export type UserProfile = {
   email?: string;
   nickname?: string;
@@ -23,15 +25,6 @@ export enum Networks {
   SANDBOX = 'goerli',
 }
 
-export interface EnvironmentConfiguration {
-  network: Networks;
-  authenticationDomain: string;
-  magicPublishableApiKey: string;
-  magicProviderId: string;
-  baseIMXApiPath: string;
-  passportDomain: string;
-}
-
 export interface OidcConfiguration {
   clientId: string;
   logoutRedirectUri: string;
@@ -39,6 +32,19 @@ export interface OidcConfiguration {
   scope?: string;
   audience?: string;
 }
+
+export interface PassportOverrides {
+  network: Networks;
+  authenticationDomain: string;
+  magicPublishableApiKey: string;
+  magicProviderId: string;
+  passportDomain: string;
+  imxApiBasePath: string;
+}
+
+export interface PassportModuleConfiguration
+  extends ModuleConfiguration<PassportOverrides>,
+    OidcConfiguration {}
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 

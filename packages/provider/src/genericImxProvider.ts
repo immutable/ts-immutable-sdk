@@ -1,6 +1,6 @@
 import { IMXProvider } from './imxProvider';
 import { Signers } from './signable-actions/types';
-import { Configuration } from '../../config';
+import { ProviderConfiguration } from 'config';
 import {
   AnyToken,
   RegisterUserResponse,
@@ -36,11 +36,11 @@ import { deposit } from './signable-actions/deposit';
 import { exchangeTransfer } from './signable-actions/exchanges';
 
 export class GenericIMXProvider implements IMXProvider {
-  private readonly config: Configuration;
+  private readonly config: ProviderConfiguration;
   private readonly signers: Signers;
 
   constructor(
-    config: Configuration,
+    config: ProviderConfiguration,
     ethSigner: EthSigner,
     starkExSigner: StarkSigner
   ) {

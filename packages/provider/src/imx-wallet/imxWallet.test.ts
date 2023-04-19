@@ -15,7 +15,7 @@ import { ImxSigner } from './ImxSigner';
 jest.mock('./postRequestMessage');
 
 describe('imxWallet', () => {
-  const env = Environment.DEVELOPMENT;
+  const env = Environment.SANDBOX;
   const signature = 'The signature';
   const address = '0x1234';
   let l1Provider: ethers.providers.Web3Provider;

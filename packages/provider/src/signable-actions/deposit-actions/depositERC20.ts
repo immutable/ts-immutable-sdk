@@ -7,7 +7,6 @@ import {
   UsersApi,
 } from '@imtbl/core-sdk';
 import { EthSigner } from '@imtbl/core-sdk';
-import { Configuration } from '@imtbl/config';
 import { TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -18,6 +17,7 @@ import {
 import { validateChain } from '../helpers';
 import { EthConfiguration } from '@imtbl/core-sdk';
 import { Signers } from '../types';
+import { ProviderConfiguration } from '../../config';
 
 interface ERC20TokenData {
   decimals: number;
@@ -27,7 +27,7 @@ interface ERC20TokenData {
 type DepositERC20Params = {
   signers: Signers;
   deposit: ERC20Amount;
-  config: Configuration;
+  config: ProviderConfiguration;
 };
 
 export async function depositERC20({
@@ -35,9 +35,9 @@ export async function depositERC20({
   deposit,
   config,
 }: DepositERC20Params): Promise<TransactionResponse> {
-  await validateChain(ethSigner, config.getStarkExConfig());
+  await validateChain(ethSigner, config.immutableXConfig);
 
-  const { apiConfiguration, ethConfiguration } = config.getStarkExConfig();
+  const { apiConfiguration, ethConfiguration } = config.immutableXConfig;
   const user = await ethSigner.getAddress();
   const tokensApi = new TokensApi(apiConfiguration);
   const depositsApi = new DepositsApi(apiConfiguration);

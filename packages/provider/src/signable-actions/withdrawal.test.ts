@@ -1,13 +1,20 @@
-import { Configuration } from '@imtbl/config';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { completeWithdrawal } from './withdrawal';
 import { Signers } from './types';
 import * as WithdrawalActions from './withdrawal-actions';
 import { AnyToken } from '@imtbl/core-sdk';
+import { ProviderConfiguration } from '../config';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('./withdrawal-actions');
 
 describe('withdrawal', () => {
+  const config = new ProviderConfiguration({
+    baseConfig: new ImmutableConfiguration({
+      environment: Environment.SANDBOX,
+    }),
+  });
+
   describe('completeWithdrawal()', () => {
     let completeERC721WithdrawalMock: jest.Mock;
     let completeERC20WithdrawalMock: jest.Mock;
@@ -58,7 +65,7 @@ describe('withdrawal', () => {
           signers: {} as Signers,
           starkPublicKey: '',
           token: { type: testCase.withdrawalType } as unknown as AnyToken,
-          config: {} as Configuration,
+          config,
         });
 
         expect(completeERC20WithdrawalMock).toBeCalledTimes(
@@ -78,7 +85,7 @@ describe('withdrawal', () => {
         signers: {} as Signers,
         starkPublicKey: '',
         token: { type: 'ETHS' } as unknown as AnyToken,
-        config: {} as Configuration,
+        config,
       });
 
       expect(completeERC20WithdrawalMock).toBeCalledTimes(0);

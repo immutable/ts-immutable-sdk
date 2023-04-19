@@ -1,13 +1,20 @@
-import { Configuration } from '@imtbl/config';
 import { deposit } from './deposit';
 import * as depositActions from './deposit-actions';
 import { Signers } from './types';
 import { TokenAmount } from '@imtbl/core-sdk';
+import { ProviderConfiguration } from 'config';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('./deposit-actions');
 
 describe('deposit', () => {
+  const config = new ProviderConfiguration({
+    baseConfig: new ImmutableConfiguration({
+      environment: Environment.SANDBOX,
+    }),
+  });
+
   describe('deposit()', () => {
     let depositERC721Mock: jest.Mock;
     let depositERC20Mock: jest.Mock;
@@ -57,7 +64,7 @@ describe('deposit', () => {
         await deposit({
           signers: {} as Signers,
           deposit: { type: testCase.depositType } as unknown as TokenAmount,
-          config: {} as Configuration,
+          config,
         });
 
         expect(depositERC20Mock).toBeCalledTimes(testCase.callsToDepositERC20);
@@ -72,7 +79,7 @@ describe('deposit', () => {
       await deposit({
         signers: {} as Signers,
         deposit: { type: 'ETHS' } as unknown as TokenAmount,
-        config: {} as Configuration,
+        config,
       });
 
       expect(depositERC20Mock).toBeCalledTimes(0);

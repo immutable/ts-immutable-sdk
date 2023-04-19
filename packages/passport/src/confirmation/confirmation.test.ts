@@ -1,9 +1,10 @@
 /**
  * @jest-environment jsdom
  */
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import ConfirmationScreen from './confirmation';
 import { Transaction, TransactionTypes } from './types';
-import { Config } from '../config';
+import { PassportConfiguration } from '../config';
 import SpyInstance = jest.SpyInstance;
 
 let windowSpy: SpyInstance;
@@ -46,21 +47,14 @@ describe('confirmation', () => {
           receiver: '0x0000000000000000000000000000000000000000',
         },
       };
-      const config = {
-        network: Config.SANDBOX.network,
-        oidcConfiguration: {
-          authenticationDomain: Config.SANDBOX.authenticationDomain,
-          clientId: '',
-          logoutRedirectUri: '',
-          redirectUri: '',
-        },
-        imxAPIConfiguration: {
-          basePath: 'https://api.sandbox.x.immutable.com',
-        },
-        passportDomain: 'https://passport.sandbox.immutable.com',
-        magicPublishableApiKey: Config.SANDBOX.magicPublishableApiKey,
-        magicProviderId: Config.SANDBOX.magicProviderId,
-      };
+      const config = new PassportConfiguration({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        clientId: 'clientId123',
+        logoutRedirectUri: 'http://localhost:3000',
+        redirectUri: 'http://localhost:3000',
+      });
 
       const confirmationScreen = new ConfirmationScreen(config);
       const res = await confirmationScreen.startTransaction(

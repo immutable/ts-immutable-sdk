@@ -2,7 +2,6 @@ import { Environment } from '@imtbl/config';
 
 export const IMX_WALLET_IFRAME_ID = 'imx-wallet-app';
 export const IMX_WALLET_IFRAME_HOSTS = {
-  [Environment.DEVELOPMENT]: 'http://localhost:8080',
   [Environment.SANDBOX]: 'https://wallets.sandbox.immutable.com',
   [Environment.PRODUCTION]: 'https://wallets.immutable.com',
 };

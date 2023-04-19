@@ -5,13 +5,13 @@ import {
 } from '@imtbl/core-sdk';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
 import { Signers } from './types';
-import { Configuration } from '@imtbl/config';
 import { validateChain } from './helpers';
+import { ProviderConfiguration } from '../config';
 
 type TransfersWorkflowParams = {
   signers: Signers;
   request: UnsignedExchangeTransferRequest;
-  config: Configuration;
+  config: ProviderConfiguration;
 };
 
 export async function exchangeTransfer({
@@ -19,10 +19,10 @@ export async function exchangeTransfer({
   request,
   config,
 }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
-  await validateChain(signers.ethSigner, config.getStarkExConfig());
+  await validateChain(signers.ethSigner, config.immutableXConfig);
 
   const exchangeApi = new ExchangesApi(
-    config.getStarkExConfig().apiConfiguration
+    config.immutableXConfig.apiConfiguration
   );
   const ethAddress = await signers.ethSigner.getAddress();
 

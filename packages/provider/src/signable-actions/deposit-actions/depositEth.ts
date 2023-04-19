@@ -3,10 +3,10 @@ import {
   DepositsApi,
   EncodingApi,
   ETHAmount,
+  EthSigner,
   ImmutableXConfiguration,
   UsersApi,
 } from '@imtbl/core-sdk';
-import { Configuration } from '@imtbl/config';
 import { parseUnits } from '@ethersproject/units';
 import {
   getSignableRegistrationOnchain,
@@ -15,8 +15,8 @@ import {
 import { BigNumber } from '@ethersproject/bignumber';
 import { TransactionResponse } from '@ethersproject/providers';
 import { validateChain } from '../helpers';
-import { EthSigner } from '@imtbl/core-sdk';
 import { Signers } from '../types';
+import { ProviderConfiguration } from '../../config';
 
 interface ETHTokenData {
   decimals: number;
@@ -25,7 +25,7 @@ interface ETHTokenData {
 type DepositEthParams = {
   signers: Signers;
   deposit: ETHAmount;
-  config: Configuration;
+  config: ProviderConfiguration;
 };
 
 export async function depositEth({
@@ -33,14 +33,14 @@ export async function depositEth({
   deposit,
   config,
 }: DepositEthParams) {
-  await validateChain(ethSigner, config.getStarkExConfig());
+  await validateChain(ethSigner, config.immutableXConfig);
 
   const user = await ethSigner.getAddress();
   const data: ETHTokenData = {
     decimals: 18,
   };
   const amount = parseUnits(deposit.amount, 'wei');
-  const starkExConfig = config.getStarkExConfig();
+  const starkExConfig = config.immutableXConfig;
   const depositsApi = new DepositsApi(starkExConfig.apiConfiguration);
   const encodingApi = new EncodingApi(starkExConfig.apiConfiguration);
   const usersApi = new UsersApi(starkExConfig.apiConfiguration);

@@ -1,105 +1,93 @@
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
-  EnvironmentConfiguration,
   Networks,
   OidcConfiguration,
+  PassportModuleConfiguration,
 } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 
-export interface ImxApiConfiguration {
-  basePath: string;
-}
-
-export interface PassportConfiguration {
-  network: Networks;
-  oidcConfiguration: {
-    authenticationDomain: string;
-    clientId: string;
-    logoutRedirectUri: string;
-    redirectUri: string;
-    scope?: string;
-    audience?: string;
-  };
-  passportDomain: string;
-  imxAPIConfiguration: ImxApiConfiguration;
-  magicPublishableApiKey: string;
-  magicProviderId: string;
-}
-
-export const Config = {
-  PRODUCTION: {
-    network: Networks.PRODUCTION,
-    authenticationDomain: 'https://auth.immutable.com',
-    magicPublishableApiKey: 'pk_live_10F423798A540ED7',
-    magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
-    baseIMXApiPath: 'https://api.x.immutable.com',
-    passportDomain: 'https://passport.immutable.com',
-  } as EnvironmentConfiguration,
-  SANDBOX: {
-    network: Networks.SANDBOX,
-    authenticationDomain: 'https://auth.immutable.com',
-    magicPublishableApiKey: 'pk_live_10F423798A540ED7',
-    magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
-    baseIMXApiPath: 'https://api.sandbox.x.immutable.com',
-    passportDomain: 'https://passport.sandbox.immutable.com',
-  } as EnvironmentConfiguration,
-};
-
 const validateConfiguration = <T>(
-  configurationName: string,
   configuration: T,
-  requiredKeys: Array<keyof T>
+  requiredKeys: Array<keyof T>,
+  prefix?: string
 ) => {
-  if (!configuration) {
-    throw new PassportError(
-      `${configurationName} cannot be null`,
-      PassportErrorType.INVALID_CONFIGURATION
-    );
-  }
-
   const missingKeys = requiredKeys
     .map((key) => !configuration[key] && key)
     .filter((n) => n)
     .join(', ');
   if (missingKeys !== '') {
+    const errorMessage = prefix
+      ? `${prefix} - ${missingKeys} cannot be null`
+      : `${missingKeys} cannot be null`;
     throw new PassportError(
-      `${configurationName} - ${missingKeys} cannot be null`,
+      errorMessage,
       PassportErrorType.INVALID_CONFIGURATION
     );
   }
 };
 
-export const getPassportConfiguration = (
-  environmentConfiguration: EnvironmentConfiguration,
-  oidcConfiguration: OidcConfiguration
-): PassportConfiguration => {
-  validateConfiguration('EnvironmentConfiguration', environmentConfiguration, [
-    'network',
-    'authenticationDomain',
-    'magicPublishableApiKey',
-    'magicProviderId',
-    'passportDomain',
-  ]);
-  validateConfiguration('OidcConfiguration', oidcConfiguration, [
-    'clientId',
-    'logoutRedirectUri',
-    'redirectUri',
-  ]);
+export class PassportConfiguration {
+  readonly network: Networks;
+  readonly authenticationDomain: string;
+  readonly passportDomain: string;
+  readonly magicPublishableApiKey: string;
+  readonly magicProviderId: string;
+  readonly imxApiBasePath: string;
+  readonly oidcConfiguration: OidcConfiguration;
+  readonly baseConfig: ImmutableConfiguration;
 
-  return {
-    network: environmentConfiguration.network,
-    oidcConfiguration: {
-      authenticationDomain: environmentConfiguration.authenticationDomain,
-      clientId: oidcConfiguration.clientId,
-      logoutRedirectUri: oidcConfiguration.logoutRedirectUri,
-      redirectUri: oidcConfiguration.redirectUri,
-      scope: oidcConfiguration.scope,
-      audience: oidcConfiguration.audience,
-    },
-    imxAPIConfiguration: {
-      basePath: environmentConfiguration.baseIMXApiPath,
-    },
-    passportDomain: environmentConfiguration.passportDomain,
-    magicPublishableApiKey: environmentConfiguration.magicPublishableApiKey,
-    magicProviderId: environmentConfiguration.magicProviderId,
-  };
-};
+  constructor({
+    baseConfig,
+    overrides,
+    ...oidcConfiguration
+  }: PassportModuleConfiguration) {
+    validateConfiguration(oidcConfiguration, [
+      'clientId',
+      'logoutRedirectUri',
+      'redirectUri',
+    ]);
+    this.oidcConfiguration = oidcConfiguration;
+    this.baseConfig = baseConfig;
+    if (overrides) {
+      validateConfiguration(
+        overrides,
+        [
+          'network',
+          'authenticationDomain',
+          'magicPublishableApiKey',
+          'magicProviderId',
+          'passportDomain',
+          'imxApiBasePath',
+        ],
+        'overrides'
+      );
+      this.network = overrides.network;
+      this.authenticationDomain = overrides.authenticationDomain;
+      this.passportDomain = overrides.passportDomain;
+      this.magicPublishableApiKey = overrides.magicPublishableApiKey;
+      this.magicProviderId = overrides.magicProviderId;
+      this.imxApiBasePath = overrides.imxApiBasePath;
+    } else {
+      switch (baseConfig.environment) {
+        case Environment.SANDBOX: {
+          this.network = Networks.SANDBOX;
+          this.authenticationDomain = 'https://auth.immutable.com';
+          this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
+          this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
+          this.passportDomain = 'https://passport.immutable.com';
+          this.imxApiBasePath = 'https://api.x.immutable.com';
+          break;
+        }
+        case Environment.PRODUCTION: {
+          this.network = Networks.PRODUCTION;
+          this.authenticationDomain = 'https://auth.immutable.com';
+          this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
+          this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
+          this.passportDomain = 'https://passport.sandbox.immutable.com';
+          this.imxApiBasePath = 'https://api.sandbox.x.immutable.com';
+          break;
+        }
+      }
+    }
+  }
+}

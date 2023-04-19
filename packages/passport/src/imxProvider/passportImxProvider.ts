@@ -51,7 +51,7 @@ export default class PassportImxProvider implements IMXProvider {
     this.starkSigner = starkSigner;
     this.passportConfig = passportConfig;
     const apiConfig = new Configuration({
-      basePath: passportConfig.imxAPIConfiguration.basePath,
+      basePath: passportConfig.imxApiBasePath,
     });
     this.transfersApi = new TransfersApi(apiConfig);
     this.ordersApi = new OrdersApi(apiConfig);

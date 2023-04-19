@@ -1,12 +1,12 @@
 import { TokenAmount } from '@imtbl/core-sdk';
 import { Signers } from './types';
-import { Configuration } from '@imtbl/config';
 import { depositEth, depositERC20, depositERC721 } from './deposit-actions';
+import { ProviderConfiguration } from '../config';
 
 type DepositParams = {
   signers: Signers;
   deposit: TokenAmount;
-  config: Configuration;
+  config: ProviderConfiguration;
 };
 
 export async function deposit({ signers, deposit, config }: DepositParams) {
