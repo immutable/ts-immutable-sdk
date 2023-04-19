@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Ethereum",
+    "chainId": 1,
+    "nativeCurrency": {
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "decimals": 18,
+      "icon": ""
+    }
+  },
+  {
+    "name": "Goerli",
+    "chainId": 5,
+    "nativeCurrency": {
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "decimals": 18,
+      "icon": ""
+    }
+  }
+]
