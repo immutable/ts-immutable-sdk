@@ -1,5 +1,5 @@
 import { describe, it } from '@jest/globals';
-import { BigNumber, ethers, providers, utils } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { fetchValidPools } from './fetchValidPools';
 import { TickMath } from '@uniswap/v3-sdk';
 import {

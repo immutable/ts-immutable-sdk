@@ -17,9 +17,10 @@ import {
   USDC_TEST_CHAIN,
   WETH_TEST_CHAIN,
 } from '../utils/testUtils';
-import { Multicall__factory } from '../contracts/types';
+import { Multicall__factory, UniswapV3Pool__factory } from '../contracts/types';
 import { DEFAULT_GAS_QUOTE } from './getQuotesForRoutes';
 import { MockProvider } from 'utils/mockProvider';
+import { TickMath } from '@uniswap/v3-sdk';
 
 const slot0 = 'slot0';
 const token0 = 'token0';
@@ -82,15 +83,23 @@ describe('callMultipleContractSingleData', () => {
   });
 
   describe('when call slot0 on multiple pools', () => {
-    it.skip('returns the result', async () => {
-      const returnData = defaultAbiCoder.encode(
-        ['address', 'address', 'uint24'],
-        [WETH_TEST_CHAIN.address, IMX_TEST_CHAIN.address, '10000']
-      );
+    it('returns the result', async () => {
+      const arbitraryTick = 100;
+      const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
+      const slot0ReturnData =
+        UniswapV3Pool__factory.createInterface().encodeFunctionResult('slot0', [
+          sqrtPriceAtTick.toString(),
+          arbitraryTick,
+          0,
+          1,
+          1,
+          0,
+          true,
+        ]);
       const coreFactoryV3 = V3_CORE_FACTORY_ADDRESS_CREATE2;
       const addr = getCreate2Address(
         coreFactoryV3,
-        keccak256(['bytes'], [returnData]),
+        keccak256(['bytes'], [slot0ReturnData]),
         POOL_INIT_CODE_HASH
       );
       const addresses = [addr];
@@ -102,8 +111,8 @@ describe('callMultipleContractSingleData', () => {
         [
           ethers.BigNumber.from(42),
           [
-            [true, ethers.BigNumber.from(2), returnData],
-            [true, ethers.BigNumber.from(2), returnData],
+            [true, ethers.BigNumber.from(2), slot0ReturnData],
+            [true, ethers.BigNumber.from(2), slot0ReturnData],
           ],
         ]
       );
@@ -119,10 +128,11 @@ describe('callMultipleContractSingleData', () => {
       );
 
       const encodedSlot0 = result.returnData[0].returnData;
-      const decodedSlot0 = ethers.utils.defaultAbiCoder.decode(
-        ['uint160', 'int24', 'uint16', 'uint16', 'uint16', 'uint8', 'bool'],
-        encodedSlot0
-      );
+      const decodedSlot0 =
+        UniswapV3Pool__factory.createInterface().decodeFunctionResult(
+          'slot0',
+          encodedSlot0
+        );
 
       // 1<<96
       const sqrtPriceX96 = ethers.BigNumber.from(decodedSlot0[0]);
@@ -130,7 +140,7 @@ describe('callMultipleContractSingleData', () => {
       const oneNineTwo = ethers.BigNumber.from('192');
       const priceX96 = sqrtPriceX96.mul(sqrtPriceX96);
       const price = priceX96.div(two.pow(oneNineTwo));
-      console.log(price.toString());
+      expect(price.toString()).toEqual('1');
     });
   });
 });
