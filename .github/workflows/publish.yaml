@@ -126,4 +126,4 @@ jobs:
 
       - name: Release
         if: contains(github.event.inputs.release_type, 'release')
-        run: yarn release --ci --no-increment --no-npm --no-git.push --no-git.tag --no-git.commit $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
+        run: yarn release --ci --no-increment --no-npm --no-git.push --no-git.commit $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
