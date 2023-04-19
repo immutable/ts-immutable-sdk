@@ -1,5 +1,7 @@
-/src/modules/dev-auth/ @immutable/imx-developer-experience
-/src/modules/apis/ @immutable/imx-developer-experience
-/src/modules/passport/ @immutable/imx-passport
-/src/modules/provider @immutable/imx-wallets
-/src/modules/checkout @immutable/imx-wallets
+/src/packages/dev-auth/ @immutable/imx-developer-experience
+/src/packages/apis/ @immutable/imx-developer-experience
+/src/packages/config/ @immutable/imx-developer-experience
+/src/packages/passport/ @immutable/imx-passport
+/src/packages/provider @immutable/imx-wallets
+/src/packages/checkout @immutable/imx-wallets
+/src/packages/internal/dex @immutable/imx-tokens
