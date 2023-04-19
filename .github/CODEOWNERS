@@ -1,6 +1,7 @@
 /packages/starkex @immutable/developer-experience
 /packages/config @immutable/developer-experience
-/packages/internal @immutable/developer-experience
+/packages/internal/toolkit @immutable/developer-experience
+/packages/internal/dex @immutable/tokens
 /packages/passport @immutable/passport
 /packages/provider @immutable/wallets
 /packages/checkout @immutable/wallets
