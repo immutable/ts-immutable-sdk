@@ -95,7 +95,9 @@ describe('network functions', () => {
         providerPreference: ConnectionProviders.METAMASK,
       });
 
-      await expect(switchWalletNetwork(provider, 56 as ChainId)).rejects.toThrow(
+      await expect(
+        switchWalletNetwork(provider, 56 as ChainId)
+      ).rejects.toThrow(
         new CheckoutError(
           '56 is not a supported chain',
           CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR
@@ -224,55 +226,51 @@ describe('network functions', () => {
         ],
       });
     });
-  })
+  });
 
   describe('getNetworkAllowList()', () => {
     it('should return all the networks if no exclude filter is provided', () => {
-      expect(getNetworkAllowList({})).toEqual(
-        {
-          networks: [
-            {
-              name: "Ethereum",
-              chainId: 1,
-              nativeCurrency: {
-                name: "Ethereum",
-                symbol: "ETH",
-                decimals: 18,
-                icon: ""
-              }
+      expect(getNetworkAllowList({})).toEqual({
+        networks: [
+          {
+            name: 'Ethereum',
+            chainId: 1,
+            nativeCurrency: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+              icon: '',
             },
-            {
-              name: "Goerli",
-              chainId: 5,
-              nativeCurrency: {
-                name: "Ethereum",
-                symbol: "ETH",
-                decimals: 18,
-                icon: ""
-              }
-            }
-          ]
-        }
-      )
-    })
+          },
+          {
+            name: 'Goerli',
+            chainId: 5,
+            nativeCurrency: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+              icon: '',
+            },
+          },
+        ],
+      });
+    });
 
     it('should exclude the right networks if an exclude filter is provided', () => {
-      expect(getNetworkAllowList({exclude: [{chainId: 5}]})).toEqual(
-        {
-          networks: [
-            {
-              name: "Ethereum",
-              chainId: 1,
-              nativeCurrency: {
-                name: "Ethereum",
-                symbol: "ETH",
-                decimals: 18,
-                icon: ""
-              }
-            }
-          ]
-        }
-      )
-    })
+      expect(getNetworkAllowList({ exclude: [{ chainId: 5 }] })).toEqual({
+        networks: [
+          {
+            name: 'Ethereum',
+            chainId: 1,
+            nativeCurrency: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+              icon: '',
+            },
+          },
+        ],
+      });
+    });
   });
 });

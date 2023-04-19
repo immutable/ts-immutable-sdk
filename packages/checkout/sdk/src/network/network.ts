@@ -9,7 +9,7 @@ import {
   WALLET_ACTION,
 } from '../types';
 import { ChainIdNetworkMap } from '../types';
-import networkAllowMasterList from './network_allow_master_list.json'
+import networkAllowMasterList from './network_allow_master_list.json';
 
 export async function getNetworkInfo(
   provider: Web3Provider
@@ -83,16 +83,15 @@ export async function switchWalletNetwork(
   } as SwitchNetworkResult;
 }
 
-export function getNetworkAllowList({ exclude }: GetNetworkAllowListParams): GetNetworkAllowListResult {
+export function getNetworkAllowList({
+  exclude,
+}: GetNetworkAllowListParams): GetNetworkAllowListResult {
   return {
     networks: networkAllowMasterList.filter(
-      (network) => (
-        !(exclude || [])
-          .map((exc) => exc.chainId)
-          .includes(network.chainId)
-      )
-    )
-  }
+      (network) =>
+        !(exclude || []).map((exc) => exc.chainId).includes(network.chainId)
+    ),
+  };
 }
 
 // these functions should not be exported. These functions should be used as part of an exported function e.g switchWalletNetwork() above.
