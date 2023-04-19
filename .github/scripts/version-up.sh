@@ -172,7 +172,7 @@ function compose(){
   REVISION=".${PARTS[4]}"
 
   if [[ "${#PATCH}" == 1 ]]; then # if empty {PATCH}
-    PATCH=""
+    PATCH="0"
   fi
 
   if [[ "${#REVISION}" == 1 ]]; then # if empty {REVISION}
@@ -181,17 +181,6 @@ function compose(){
 
   if [[ "${PARTS[4]}" == "0" ]]; then # if revision is ZERO
     REVISION=""
-  fi
-
-  # shrink patch and revision
-  if [[ -z "${REVISION// }" ]]; then
-    if [[ "${PARTS[2]}" == "0" ]]; then
-      PATCH=""
-    fi
-  else # revision is not EMPTY
-    if [[ "${#PATCH}" == 0 ]]; then
-      PATCH=".0"
-    fi
   fi
 
   # remove suffix if we don't have a alpha/beta/rc
@@ -370,7 +359,7 @@ fi
 
 # compose version override file
 if [[ "$TAG" == "$INIT_VERSION" ]]; then
-    TAG='0.0'
+    TAG='0.0.0'
 fi
 VERSION_FILE=version.properties
 
@@ -388,7 +377,7 @@ if [[ "$DO_APPLY" == "1" ]]; then
     echo "Applying git repository version up... no push, only local tag assignment!"
     echo ''
 
-    git tag $(compose)
+    git tag -a $(compose)
 
     # confirm that tag applied
     git --no-pager log --pretty=format:"%h%x09%Cblue%cr%Cgreen%x09%an%Creset%x09%s%Cred%d%Creset" -n 2 --date=short | nl -w2 -s"  "
