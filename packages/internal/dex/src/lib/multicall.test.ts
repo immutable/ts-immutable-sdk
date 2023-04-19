@@ -47,8 +47,8 @@ describe('callMultipleContractSingleData', () => {
         iface.encodeFunctionResult('multicall', [
           ethers.BigNumber.from(42),
           [
-            [true, 2, returnData],
-            [true, 4, returnData],
+            [true, ethers.BigNumber.from(2), returnData],
+            [true, ethers.BigNumber.from(2), returnData],
           ],
         ])
       );
@@ -101,8 +101,8 @@ describe('callMultipleContractSingleData', () => {
         iface.encodeFunctionResult('multicall', [
           ethers.BigNumber.from(42),
           [
-            [true, 2, returnData],
-            [true, 4, returnData],
+            [true, ethers.BigNumber.from(2), returnData],
+            [true, ethers.BigNumber.from(2), returnData],
           ],
         ])
       );
@@ -158,10 +158,7 @@ describe('callSingleContractWithCallData', () => {
         'multicall((address,uint256,bytes)[])',
         iface.encodeFunctionResult('multicall', [
           ethers.BigNumber.from(42),
-          [
-            [true, 2, returnData],
-            [true, 4, returnData],
-          ],
+          [[true, ethers.BigNumber.from(2), returnData]],
         ])
       );
       const multicallContract = Multicall__factory.connect(

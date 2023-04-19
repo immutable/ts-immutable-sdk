@@ -12,16 +12,16 @@ import type {
   PopulatedTransaction,
   Signer,
   utils,
-} from "ethers";
-import type { FunctionFragment, Result } from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
+} from 'ethers';
+import type { FunctionFragment, Result } from '@ethersproject/abi';
+import type { Listener, Provider } from '@ethersproject/providers';
 import type {
   TypedEventFilter,
   TypedEvent,
   TypedListener,
   OnEvent,
   PromiseOrValue,
-} from "./common";
+} from './common';
 
 export declare namespace UniswapInterfaceMulticall {
   export type CallStruct = {
@@ -51,45 +51,55 @@ export declare namespace UniswapInterfaceMulticall {
 
 export interface MulticallInterface extends utils.Interface {
   functions: {
-    "getCurrentBlockTimestamp()": FunctionFragment;
-    "getEthBalance(address)": FunctionFragment;
-    "multicall((address,uint256,bytes)[])": FunctionFragment;
+    'getCurrentBlockTimestamp()': FunctionFragment;
+    'getEthBalance(address)': FunctionFragment;
+    'multicall((address,uint256,bytes)[])': FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
-      | "getCurrentBlockTimestamp"
-      | "getEthBalance"
-      | "multicall"
+      | 'getCurrentBlockTimestamp'
+      | 'getEthBalance'
+      | 'multicall'
   ): FunctionFragment;
 
   encodeFunctionData(
-    functionFragment: "getCurrentBlockTimestamp",
+    functionFragment: 'getCurrentBlockTimestamp',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getEthBalance",
+    functionFragment: 'getEthBalance',
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "multicall",
+    functionFragment: 'multicall',
     values: [UniswapInterfaceMulticall.CallStruct[]]
   ): string;
 
+  encodeFunctionResult(
+    functionFragment: 'multicall',
+    values: [
+      BigNumber,
+      Pick<UniswapInterfaceMulticall.ResultStructOutput, '0' | '1' | '2'>[]
+    ]
+  ): string;
+
   decodeFunctionResult(
-    functionFragment: "getCurrentBlockTimestamp",
+    functionFragment: 'getCurrentBlockTimestamp',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getEthBalance",
+    functionFragment: 'getEthBalance',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "multicall", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'multicall', data: BytesLike): Result;
 
   events: {};
 }
 
 export interface Multicall extends BaseContract {
+  contractName: 'Multicall';
+
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;

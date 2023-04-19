@@ -1013,6 +1013,7 @@ export class UniswapV3Pool__factory extends ContractFactory {
     } else {
       super(_abi, _bytecode, args[0]);
     }
+    this.contractName = "UniswapV3Pool";
   }
 
   override deploy(
@@ -1031,6 +1032,9 @@ export class UniswapV3Pool__factory extends ContractFactory {
   override connect(signer: Signer): UniswapV3Pool__factory {
     return super.connect(signer) as UniswapV3Pool__factory;
   }
+  static readonly contractName: "UniswapV3Pool";
+
+  public readonly contractName: "UniswapV3Pool";
 
   static readonly bytecode = _bytecode;
   static readonly abi = _abi;

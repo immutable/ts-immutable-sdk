@@ -145,6 +145,8 @@ export interface QuoterV2Interface extends utils.Interface {
 }
 
 export interface QuoterV2 extends BaseContract {
+  contractName: "QuoterV2";
+
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
