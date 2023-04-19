@@ -8,6 +8,8 @@ dist/
 .env
 .env.local
 
+*version.properties
+
 .pnp.*
 .yarn/*
 !.yarn/patches

@@ -1,19 +1,16 @@
 git:
   commitMessage: 'Release ${version}'
+  requireCleanWorkingDir: false
 npm:
   publish: true
-  publishPath: "sdk",
+  publishPath: "sdk"
 hooks:
-  before:init:
-    - 'yarn lint'
-    - 'yarn syncpack:check'
-    - 'yarn build'
-    - 'yarn typecheck'
-    - 'yarn test'
   after:release:
     - 'echo Successfully released ${name} v${version} to ${repo.repository}.'
 plugins:
   '@release-it-plugins/workspaces':
     workspaces: ['sdk']
-  '@release-it/keep-a-changelog':
+  './.github/scripts/keep-a-changelog.mjs':
     filename: 'CHANGELOG.md'
+    addUnreleased: true
+    strictLatest: false	

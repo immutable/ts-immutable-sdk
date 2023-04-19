@@ -3,41 +3,47 @@ name: Publish to NPM
 on:
   workflow_dispatch:
     inputs:
-      upgrade_type:
-        type: choice
-        description: Upgrade Type
-        options:
-          - patch
-          - minor
-          - major
-        required: true
-        default: patch
       release_type:
         type: choice
         description: Release Type
         options:
           - alpha
-          - beta
-          - public
+          - release
         required: true
         default: alpha
-      alpha_beta_version:
-        description: '(optional) alpha/beta version number'
+      upgrade_type:
+        type: choice
+        description: Upgrade Type
+        options:
+          - none
+          - patch
+          - minor
+          - major
         required: false
-        type: string
+        default: none
+      dry_run:
+        type: boolean
+        description: '(Optional) Dry run'
+        required: false
+        default: false
 
 jobs:
-  call-workflow-1-in-local-repo:
-    uses: immutable/ts-/.github/workflows/build-lint-typecheck-test.yaml
-
-  packages:
-    name: Packages
+  Publish:
+    name: Publish Workflow
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      - name: Setup Github
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Get tags
+        run: git fetch --tags
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -60,29 +66,64 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      # - name: Lint
+      #   run: yarn lint
+
+      - name: Check Single Package Version Policy
+        run: yarn syncpack:check
+
       - name: Build
         run: yarn build
 
-      #  Commenting out as this is still WIP
+      - name: Typecheck
+        run: yarn typecheck
 
-      # - name: Update package.json version for alpha, beta releases
-      #   if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
-      #   run: |
-      #     tmp=$(mktemp)
-      #     jq '.version = "${{github.event.inputs.tag}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
+      # - name: Test
+      #   run: yarn test
 
-      # - name: Alpha/Beta Release
-      #   if: ${{ contains(github.event.inputs.tag, 'alpha') || contains(github.event.inputs.tag, 'beta') }}
-      #   uses: JS-DevTools/npm-publish@v1
-      #   with:
-      #     token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
-      #     access: public
-      #     package: ./sdk/package.json
-      #     tag: ${{ (contains(github.event.inputs.tag, 'alpha') && 'alpha') || (contains(github.event.inputs.tag, 'beta') && 'beta') || 'latest' }}
+      - name: Workout next version string
+        run: |
+          upgrade_type=${{ github.event.inputs.upgrade_type }}
+          if [ ${{ contains(github.event.inputs.upgrade_type, 'none') }} == true ]
+          then
+            upgrade_type=""
+            revision_upgrade=$( ${{ contains(github.event.inputs.release_type, 'alpha') }} && echo '--revision' || echo '')
+            echo $revision
+          fi
+          ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $revision_upgrade
+        shell: bash
 
-      # - name: Authenticate NPM
-      #   run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+      - name: Get next version string
+        id: version
+        run: |
+          echo "NEXT_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
-      # - name: Release
-      #   if: ${{ contains(github.event.inputs.release_type, 'patch') || contains(github.event.inputs.release_type, 'minor') || contains(github.event.inputs.release_type, 'major') }}
-      #   run: yarn release ${{github.event.inputs.release_type}} --ci
+      - name: Update package.json version for pre (alpha) releases
+        if: contains(github.event.inputs.release_type, 'alpha')
+        run: |
+          tmp=$(mktemp)
+          jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
+
+      - name: Push tags
+        # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
+        if: github.event.inputs.dry_run == 'false'
+        run: |
+          echo "$(git push --tags)"
+
+      - name: Pre Release Step
+        if: contains(github.event.inputs.release_type, 'alpha')
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+          access: public
+          package: ./sdk/package.json
+          tag: ${{ contains(github.event.inputs.release_type, 'alpha') && 'alpha' }}
+          dry-run: ${{ github.event.inputs.dry_run }}
+
+      - name: Authenticate NPM
+        if: contains(github.event.inputs.release_type, 'release')
+        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+
+      - name: Release
+        if: contains(github.event.inputs.release_type, 'release')
+        run: yarn release --ci --no-increment --no-npm --no-git $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}

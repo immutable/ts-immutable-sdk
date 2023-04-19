@@ -50,5 +50,24 @@
   },
   "engines": {
     "node": ">=16.0.0"
-  }
+  },
+  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "keywords": [
+    "immutablex"
+  ],
+  "license": "Apache-2.0",
+  "main": "dist/main.js",
+  "module": "dist/module.js",
+  "private": true,
+  "repository": "immutable/ts-immutable-sdk.git",
+  "scripts": {
+    "generate-types": "typechain --target ethers-v5 --out-dir ./src/contracts/types ./src/contracts/ABIs/*.json",
+    "lint": "eslint ./src --ext .ts --max-warnings=0",
+    "lint:fix": "cd ../../../ && yarn wsrun -p @imtbl/dex-sdk -c lint --fix",
+    "test": "jest test",
+    "test:watch": "jest --watch"
+  },
+  "source": "src/index.ts",
+  "type": "module",
+  "types": "dist/types.d.ts"
 }
