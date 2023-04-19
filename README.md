@@ -7,8 +7,7 @@
 </div>
 
 ---
-![Build Status](https://github.com/immutable/ts-immutable-sdk/actions/workflows/build-lint-typecheck-test.yml/badge.svg)
-
+![Build Status](https://github.com/immutable/ts-immutable-sdk/actions/workflows/build-lint-typecheck-test.yaml/badge.svg)
 # Immutable TypeScript SDK
 
 Table of contents
