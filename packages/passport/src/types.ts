@@ -25,15 +25,6 @@ export enum Networks {
   SANDBOX = 'goerli',
 }
 
-export interface EnvironmentConfiguration {
-  network: Networks;
-  authenticationDomain: string;
-  magicPublishableApiKey: string;
-  magicProviderId: string;
-  passportDomain: string;
-  imxApiBasePath: string;
-}
-
 export interface OidcConfiguration {
   clientId: string;
   logoutRedirectUri: string;
@@ -42,10 +33,19 @@ export interface OidcConfiguration {
   audience?: string;
 }
 
+export interface PassportOverrides {
+  network: Networks;
+  authenticationDomain: string;
+  magicPublishableApiKey: string;
+  magicProviderId: string;
+  passportDomain: string;
+  imxApiBasePath: string;
+}
+
 export interface PassportModuleConfiguration
   extends ModuleConfiguration,
     OidcConfiguration {
-  overrides?: EnvironmentConfiguration;
+  overrides?: PassportOverrides;
 }
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };

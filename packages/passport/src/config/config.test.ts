@@ -1,8 +1,8 @@
 import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
-  EnvironmentConfiguration,
   Networks,
+  PassportOverrides,
   PassportModuleConfiguration,
 } from '../types';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
@@ -16,7 +16,7 @@ describe('Config', () => {
     audience: 'xxx_api',
   };
 
-  const overrides: EnvironmentConfiguration = {
+  const overrides: PassportOverrides = {
     authenticationDomain: 'authenticationDomain123',
     imxApiBasePath: 'basePath123',
     magicProviderId: 'providerId123',
