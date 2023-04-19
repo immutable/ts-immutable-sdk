@@ -66,8 +66,8 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      # - name: Lint
-      #   run: yarn lint
+      - name: Lint
+        run: yarn lint
 
       - name: Check Single Package Version Policy
         run: yarn syncpack:check
@@ -78,8 +78,8 @@ jobs:
       - name: Typecheck
         run: yarn typecheck
 
-      # - name: Test
-      #   run: yarn test
+      - name: Test
+        run: yarn test
 
       - name: Workout next version string
         run: |
