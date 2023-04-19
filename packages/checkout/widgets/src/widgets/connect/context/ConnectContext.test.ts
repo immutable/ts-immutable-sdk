@@ -1,12 +1,12 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout } from '@imtbl/checkout-sdk-web';
 import { describe, expect } from '@jest/globals';
-import { Actions, connectReducer, initialConnectState, SetCheckoutPayload, SetProviderPayload } from './ConnectContext';
+import { ConnectActions, connectReducer, initialConnectState, SetCheckoutPayload, SetProviderPayload } from './ConnectContext';
 
 describe('connect-context', () => {
   it('should update state with checkout when reducer called with SET_CHECKOUT action', () => {
     const setCheckoutPayload: SetCheckoutPayload = {
-      type: Actions.SET_CHECKOUT,
+      type: ConnectActions.SET_CHECKOUT,
       checkout: new Checkout()
     }
     expect(initialConnectState.checkout).toBeNull();
@@ -15,12 +15,12 @@ describe('connect-context', () => {
   });
 
   it('should update state with provider when reducer called with SET_PROVIDER action', () => {
-    const SetProviderPayload: SetProviderPayload = {
-      type: Actions.SET_PROVIDER,
+    const setProviderPayload: SetProviderPayload = {
+      type: ConnectActions.SET_PROVIDER,
       provider: {} as Web3Provider
     }
     expect(initialConnectState.provider).toBeNull();
-    const { provider } = connectReducer(initialConnectState, { payload: SetProviderPayload });
+    const { provider } = connectReducer(initialConnectState, { payload: setProviderPayload });
     expect(provider).not.toBeNull();
   });
 });

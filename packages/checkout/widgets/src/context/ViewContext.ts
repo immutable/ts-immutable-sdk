@@ -23,14 +23,14 @@ export const initialViewState: ViewState = {
 
 export interface ViewContextState {
   viewState: ViewState;
-  viewDispatch: React.Dispatch<Action>;
+  viewDispatch: React.Dispatch<ViewAction>;
 }
 
-export interface Action {
-  payload: ActionPayload;
+export interface ViewAction {
+  payload: ViewActionPayload;
 }
 
-type ActionPayload = UpdateViewPayload | GoBackPayload;
+type ViewActionPayload = UpdateViewPayload | GoBackPayload;
 
 export enum ViewActions {
   UPDATE_VIEW = 'UPDATE_VIEW',
@@ -53,15 +53,15 @@ export const ViewContext = createContext<ViewContextState>({
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
-export const viewReducer: Reducer<ViewState, Action> = (
+export const viewReducer: Reducer<ViewState, ViewAction> = (
   state: ViewState,
-  action: Action
+  action: ViewAction
 ) => {
   switch (action.payload.type) {
     case ViewActions.UPDATE_VIEW:
       const view = action.payload.view;
-      const history = state.history.slice();
-      if (history[history.length - 1] !== view) {
+      const history = state.history;
+      if (history.length === 0 || history[history.length - 1].type !== view.type) {
         history.push(view);
       }
       return {
@@ -70,12 +70,13 @@ export const viewReducer: Reducer<ViewState, Action> = (
         history
       };
     case ViewActions.GO_BACK:
+      if (state.history.length <= 1) return { ...state };
       const updatedHistory = state.history.slice(0, -1);
       return {
         ...state,
         history: updatedHistory,
-        view: updatedHistory[updatedHistory.length - 1]
-      }
+        view: updatedHistory[updatedHistory.length - 1],
+    }
     default:
       return state;
   }

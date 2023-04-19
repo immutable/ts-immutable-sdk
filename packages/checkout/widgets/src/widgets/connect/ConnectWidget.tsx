@@ -14,7 +14,7 @@ import {
   WidgetHeaderStyle 
 } from './ConnectStyles'
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens'
-import { Actions, ConnectContext, connectReducer, initialConnectState } from './context/ConnectContext'
+import { ConnectActions, ConnectContext, connectReducer, initialConnectState } from './context/ConnectContext'
 import { initialViewState, ViewActions, ViewContext, viewReducer } from '../../context/ViewContext';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 
@@ -37,7 +37,7 @@ export function ConnectWidget(props:ConnectWidgetProps) {
   useEffect(() => {
     connectDispatch({
       payload: {
-        type: Actions.SET_CHECKOUT,
+        type: ConnectActions.SET_CHECKOUT,
         checkout: new Checkout(),
       },
     });
@@ -50,7 +50,7 @@ export function ConnectWidget(props:ConnectWidgetProps) {
         }
       },
     });
-  }, [])
+  }, []);
 
   useEffect(() => {
     switch (viewState.view.type) {
@@ -99,7 +99,6 @@ export function ConnectWidget(props:ConnectWidgetProps) {
                 }>x</Button>
               </Box>
             </Box>       
-
             <Box 
               testId="connect-wallet" 
               sx={(viewState.view.type === ConnectWidgetViews.CONNECT_WALLET) ? ActiveStyle : InactiveStyle}

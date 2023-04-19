@@ -14,27 +14,27 @@ export const initialConnectState: ConnectState = {
 
 export interface ConnectContextState {
   connectState: ConnectState,
-  connectDispatch: React.Dispatch<Action>,
+  connectDispatch: React.Dispatch<ConnectAction>,
 }
 
-export interface Action {
+export interface ConnectAction {
   payload: ActionPayload
 }
 
 type ActionPayload = SetCheckoutPayload | SetProviderPayload
 
-export enum Actions {
+export enum ConnectActions {
   SET_CHECKOUT = "SET_CHECKOUT",
   SET_PROVIDER = "SET_PROVIDER",
 }
 
 export interface SetCheckoutPayload {
-  type: Actions.SET_CHECKOUT,
+  type: ConnectActions.SET_CHECKOUT,
   checkout: Checkout
 }
 
 export interface SetProviderPayload {
-  type: Actions.SET_PROVIDER,
+  type: ConnectActions.SET_PROVIDER,
   provider: Web3Provider
 }
 
@@ -45,14 +45,14 @@ export const ConnectContext = createContext<ConnectContextState>({
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
-export const connectReducer: Reducer<ConnectState, Action> = (state: ConnectState, action: Action) => {
+export const connectReducer: Reducer<ConnectState, ConnectAction> = (state: ConnectState, action: ConnectAction) => {
   switch (action.payload.type) {
-    case Actions.SET_CHECKOUT:
+    case ConnectActions.SET_CHECKOUT:
       return {
         ...state,
         checkout: action.payload.checkout
       }
-    case Actions.SET_PROVIDER:
+    case ConnectActions.SET_PROVIDER:
       return {
         ...state,
         provider: action.payload.provider

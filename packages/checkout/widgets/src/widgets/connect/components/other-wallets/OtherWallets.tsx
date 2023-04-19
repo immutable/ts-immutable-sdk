@@ -2,7 +2,7 @@
 import { Button } from '@biom3/react'
 import {ConnectionProviders} from '@imtbl/checkout-sdk-web'
 import { ButtonWrapperStyle } from '../../ConnectStyles'
-import { Actions, ConnectContext } from '../../context/ConnectContext'
+import { ConnectActions, ConnectContext } from '../../context/ConnectContext'
 import { useContext } from 'react'
 import { ViewActions, ViewContext } from '../../../../context/ViewContext'
 import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes'
@@ -18,7 +18,7 @@ export function OtherWallets () {
       const connectResult = await checkout.connect({ providerPreference: ConnectionProviders.METAMASK });
       connectDispatch({
         payload: {
-          type: Actions.SET_PROVIDER,
+          type: ConnectActions.SET_PROVIDER,
           provider: connectResult.provider,
         },
       });
