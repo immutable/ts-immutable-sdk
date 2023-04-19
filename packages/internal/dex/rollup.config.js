@@ -7,7 +7,22 @@ export default {
   input: './src/index.ts',
   output: {
     dir: 'dist',
-    declarationDir: "types",
   },
-  plugins: [json(), commonjs(), nodeResolve(), typescript({exclude: ["**/ABIs/*", "**/*.test.*", "**/utils/testUtils.ts"]})],
+  plugins: [
+    json(),
+    commonjs(),
+    nodeResolve({
+      resolveOnly: [
+        '@uniswap/router-sdk',
+        '@uniswap/swap-router-contracts',
+        '@uniswap/v3-core',
+        '@uniswap/v3-periphery',
+        '@uniswap/v3-sdk',
+        'ethers',
+      ],
+    }),
+    typescript({
+      exclude: ['**/ABIs/*', '**/*.test.*', '**/utils/testUtils.ts'],
+    }),
+  ],
 };

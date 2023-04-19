@@ -15,7 +15,7 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "source": "src/index.ts",
   "type": "module",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/index.d.ts",
   "dependencies": {
     "@uniswap/router-sdk": "^1.4.0",
     "@uniswap/swap-router-contracts": "^1.3.0",
