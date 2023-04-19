@@ -53,6 +53,7 @@ export class MockProvider extends ethers.providers.BaseProvider {
 
     contract.set(fnSig, mockFn);
     this.mockedContracts.set(address, contract);
+    return mockFn;
   }
 
   mockOnce<I extends Interface>(
@@ -73,5 +74,6 @@ export class MockProvider extends ethers.providers.BaseProvider {
 
     contract.set(fnSig, mockFn);
     this.mockedContracts.set(address, contract);
+    return mockFn;
   }
 }

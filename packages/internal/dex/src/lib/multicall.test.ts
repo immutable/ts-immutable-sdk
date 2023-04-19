@@ -40,7 +40,7 @@ describe('callMultipleContractSingleData', () => {
       );
 
       const provider = new MockProvider();
-      provider.mock(
+      const mockedFn = provider.mock(
         MULTICALL_ADDRESS_CREATE2,
         Multicall__factory.createInterface(),
         'multicall',
@@ -77,6 +77,7 @@ describe('callMultipleContractSingleData', () => {
 
       expect(decodedToken0First === IMX_TEST_CHAIN);
       expect(decodedToken0Second === WETH_TEST_CHAIN);
+      expect(mockedFn).toBeCalledTimes(1);
     });
   });
 
@@ -152,7 +153,7 @@ describe('callSingleContractWithCallData', () => {
       );
 
       const provider = new MockProvider();
-      provider.mock(
+      const mockedFn = provider.mock(
         MULTICALL_ADDRESS_CREATE2,
         Multicall__factory.createInterface(),
         'multicall',
@@ -173,6 +174,7 @@ describe('callSingleContractWithCallData', () => {
         { gasRequired: DEFAULT_GAS_QUOTE }
       );
       expect(result.returnData.length).toBe(1);
+      expect(mockedFn).toBeCalledTimes(1);
     });
   });
 });
