@@ -8,11 +8,12 @@ import {
   ModuleConfiguration,
 } from '@imtbl/config';
 
-interface StarkExModuleConfiguration extends ModuleConfiguration {
-  overrides?: {
-    immutableXConfig: ImmutableXConfiguration;
-  };
+interface StarkExOverrides {
+  immutableXConfig: ImmutableXConfiguration;
 }
+
+interface StarkExModuleConfiguration
+  extends ModuleConfiguration<StarkExOverrides> {}
 
 export class StarkExConfiguration {
   readonly immutableXConfig: ImmutableXConfiguration;
