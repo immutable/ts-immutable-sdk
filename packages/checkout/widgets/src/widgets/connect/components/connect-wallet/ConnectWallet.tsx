@@ -1,25 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@biom3/react'
+import { useContext } from 'react';
+import { ViewActions, ViewContext } from '../../../../context/ViewContext';
 import { ButtonWrapperStyle } from '../../ConnectStyles'
-import { ConnectWidgetViews } from '../../ConnectWidget'
+import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
 
-export interface ConnectWalletProps {
-  updateView: (newView: ConnectWidgetViews, err?: any) => void;
-}
+export function ConnectWallet () {
+  const { viewDispatch } = useContext(ViewContext);
 
-export function ConnectWallet (props:ConnectWalletProps) {
+  const dispatch = (type: ConnectWidgetViews.PASSPORT | ConnectWidgetViews.OTHER_WALLETS) => viewDispatch({
+    payload: {
+      type: ViewActions.UPDATE_VIEW,
+      view: { type }
+    }
+  });
 
-  const { updateView } = props
-
-    return (
-      <div>
-      <Button 
-        testId='connect-passport'
-        sx={ButtonWrapperStyle} 
-        onClick={() => updateView(ConnectWidgetViews.PASSPORT)}>Passport</Button>
-      <Button 
-        testId='connect-other'
-        onClick={() => updateView(ConnectWidgetViews.OTHER_WALLETS)}>Other Wallets</Button>
-      </div>
-    )
+  return (
+    <div>
+    <Button 
+      testId='connect-passport'
+      sx={ButtonWrapperStyle} 
+      onClick={() => dispatch(ConnectWidgetViews.PASSPORT)}>Passport</Button>
+    <Button 
+      testId='connect-other'
+      onClick={() => dispatch(ConnectWidgetViews.OTHER_WALLETS)}>Other Wallets</Button>
+    </div>
+  )
 }
