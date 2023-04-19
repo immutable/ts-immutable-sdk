@@ -2,6 +2,9 @@
   "name": "@imtbl/economy",
   "description": "Economy module for Immutable SDK",
   "version": "0.0.1",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
   "dependencies": {
     "@swc/helpers": "~0.5.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
@@ -28,14 +31,11 @@
   "files": [
     "dist"
   ],
-  "main": "dist/index.js",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit --jsx preserve"
-  },
-  "type": "module",
-  "types": "dist/index.d.ts"
+  }
 }

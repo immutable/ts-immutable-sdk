@@ -1,7 +1,14 @@
 {
   "name": "@imtbl/economy-playground",
-  "description": "Playground application for Immutable Economy SDK",
   "version": "0.0.1",
+  "description": "Playground application for Immutable Economy SDK",
+  "source": "index.html",
+  "scripts": {
+    "start": "npm run clean && parcel src/index.html -p 4200",
+    "build": "npm run clean && parcel build src/index.html --public-url ./",
+    "clean": "rimraf ./dist ./.cache"
+  },
+  "license": "MIT",
   "dependencies": {
     "@imtbl/economy": "0.0.1"
   },
@@ -16,12 +23,5 @@
   },
   "engines": {
     "node": ">=16"
-  },
-  "license": "MIT",
-  "scripts": {
-    "build": "npm run clean && parcel build src/index.html --public-url ./",
-    "clean": "rimraf ./dist ./.cache",
-    "start": "npm run clean && parcel src/index.html -p 4200"
-  },
-  "source": "index.html"
+  }
 }
