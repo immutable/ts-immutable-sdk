@@ -33,24 +33,24 @@ describe('getQuotesForRoutes', () => {
       );
       dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
 
-      const iface = Multicall__factory.createInterface();
-
       const provider = new MockProvider();
 
-      provider.mock(MULTICALL_ADDRESS_CREATE2, iface, 'multicall', [
-        ethers.BigNumber.from(42),
-        [[true, ethers.BigNumber.from(2), returnData]],
-      ]);
+      provider.mock(
+        MULTICALL_ADDRESS_CREATE2,
+        Multicall__factory.createInterface(),
+        'multicall',
+        [
+          ethers.BigNumber.from(42),
+          [[true, ethers.BigNumber.from(2), returnData]],
+        ]
+      );
 
       const multicallContract = Multicall__factory.connect(
         MULTICALL_ADDRESS_CREATE2,
         provider
       );
 
-      const amount: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
-        WETH_TEST_CHAIN,
-        '123123'
-      );
+      const amount = CurrencyAmount.fromRawAmount(WETH_TEST_CHAIN, '123123');
       const amountOutReceived = await getQuotesForRoutes(
         multicallContract,
         dummyRoutes,
@@ -96,16 +96,19 @@ describe('getQuotesForRoutes', () => {
       dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
       dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
 
-      const iface = Multicall__factory.createInterface();
-
       const provider = new MockProvider();
-      provider.mock(MULTICALL_ADDRESS_CREATE2, iface, 'multicall', [
-        ethers.BigNumber.from(42),
+      provider.mock(
+        MULTICALL_ADDRESS_CREATE2,
+        Multicall__factory.createInterface(),
+        'multicall',
         [
-          [true, ethers.BigNumber.from(2), returnData1],
-          [true, ethers.BigNumber.from(2), returnData2],
-        ],
-      ]);
+          ethers.BigNumber.from(42),
+          [
+            [true, ethers.BigNumber.from(2), returnData1],
+            [true, ethers.BigNumber.from(2), returnData2],
+          ],
+        ]
+      );
       const multicallContract = Multicall__factory.connect(
         MULTICALL_ADDRESS_CREATE2,
         provider
