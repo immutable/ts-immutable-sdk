@@ -1,7 +1,8 @@
-/src/packages/dev-auth/ @immutable/imx-developer-experience
-/src/packages/apis/ @immutable/imx-developer-experience
-/src/packages/config/ @immutable/imx-developer-experience
-/src/packages/passport/ @immutable/imx-passport
-/src/packages/provider @immutable/imx-wallets
-/src/packages/checkout @immutable/imx-wallets
-/src/packages/internal/dex @immutable/imx-tokens
+/packages/starkex @immutable/developer-experience
+/packages/config @immutable/developer-experience
+/packages/internal/toolkit @immutable/developer-experience
+/packages/internal/dex @immutable/imx-tokens
+/packages/passport @immutable/passport
+/packages/provider @immutable/wallets
+/packages/checkout @immutable/wallets
+/packages/economy @immutable/igs-frontend

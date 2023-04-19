@@ -3,14 +3,9 @@
     "baseUrl": "./src",
     "outDir": "./dist",
     "rootDirs": ["src"],
-    "target": "esnext",
-    "module": "esnext",
+    "target": "es2022",
+    "module": "es2022",
     "moduleResolution": "node",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -22,7 +17,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "declaration": true,
   },
-  "include": ["src", "src/types.d.ts"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
