@@ -170,8 +170,6 @@ export type WithdrawalEvent = TypedEvent<
 export type WithdrawalEventFilter = TypedEventFilter<WithdrawalEvent>;
 
 export interface WETH extends BaseContract {
-  contractName: "WETH";
-
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;

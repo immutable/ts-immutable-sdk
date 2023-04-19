@@ -117,7 +117,6 @@ export class Multicall__factory extends ContractFactory {
     } else {
       super(_abi, _bytecode, args[0]);
     }
-    this.contractName = "Multicall";
   }
 
   override deploy(
@@ -136,9 +135,6 @@ export class Multicall__factory extends ContractFactory {
   override connect(signer: Signer): Multicall__factory {
     return super.connect(signer) as Multicall__factory;
   }
-  static readonly contractName: "Multicall";
-
-  public readonly contractName: "Multicall";
 
   static readonly bytecode = _bytecode;
   static readonly abi = _abi;

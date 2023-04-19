@@ -414,8 +414,6 @@ export type SwapEvent = TypedEvent<
 export type SwapEventFilter = TypedEventFilter<SwapEvent>;
 
 export interface UniswapV3Pool extends BaseContract {
-  contractName: "UniswapV3Pool";
-
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;

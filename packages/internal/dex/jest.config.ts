@@ -5,7 +5,7 @@ const config: Config = {
   coverageProvider: 'v8',
   moduleDirectories: ['node_modules', 'src'],
   verbose: true,
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
