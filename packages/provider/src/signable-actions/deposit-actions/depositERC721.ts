@@ -35,10 +35,10 @@ export async function depositERC721({
   await validateChain(ethSigner, config.immutableXConfig);
 
   const user = await ethSigner.getAddress();
-  const starkExConfig = config.immutableXConfig;
-  const depositsApi = new DepositsApi(starkExConfig.apiConfiguration);
-  const encodingApi = new EncodingApi(starkExConfig.apiConfiguration);
-  const usersApi = new UsersApi(starkExConfig.apiConfiguration);
+  const { immutableXConfig } = config;
+  const depositsApi = new DepositsApi(immutableXConfig.apiConfiguration);
+  const encodingApi = new EncodingApi(immutableXConfig.apiConfiguration);
+  const usersApi = new UsersApi(immutableXConfig.apiConfiguration);
 
   const data: ERC721TokenData = {
     token_address: deposit.tokenAddress,
@@ -89,7 +89,7 @@ export async function depositERC721({
     deposit.tokenAddress,
     ethSigner
   );
-  const operator = starkExConfig.ethConfiguration.coreContractAddress;
+  const operator = immutableXConfig.ethConfiguration.coreContractAddress;
   const isApprovedForAll = await tokenContract.isApprovedForAll(user, operator);
   if (!isApprovedForAll) {
     await tokenContract.setApprovalForAll(operator, true);
@@ -103,7 +103,7 @@ export async function depositERC721({
     );
 
     const coreContract = Contracts.Core.connect(
-      starkExConfig.ethConfiguration.coreContractAddress,
+      immutableXConfig.ethConfiguration.coreContractAddress,
       ethSigner
     );
     // Note: proxy registration contract registerAndDepositNft method is not used as it currently fails erc721 transfer ownership check
@@ -120,7 +120,7 @@ export async function depositERC721({
     assetType,
     starkPublicKey,
     vaultId,
-    starkExConfig
+    immutableXConfig
   );
 }
 
