@@ -11,16 +11,7 @@ export default {
   plugins: [
     json(),
     commonjs(),
-    nodeResolve({
-      resolveOnly: [
-        '@uniswap/router-sdk',
-        '@uniswap/swap-router-contracts',
-        '@uniswap/v3-core',
-        '@uniswap/v3-periphery',
-        '@uniswap/v3-sdk',
-        'ethers',
-      ],
-    }),
+    nodeResolve(),
     typescript({
       exclude: ['**/ABIs/*', '**/*.test.*', '**/utils/testUtils.ts'],
     }),
