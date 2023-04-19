@@ -8,19 +8,25 @@ import { IMXProvider } from '@imtbl/provider';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
-import { Config } from './config';
+import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { getStarkSigner } from './stark';
-import { PassportConfiguration, UserProfile, UserWithEtherKey } from './types';
+import {
+  PassportModuleConfiguration,
+  UserProfile,
+  UserWithEtherKey,
+} from './types';
 import registerPassport from './workflows/registration';
 
 export class Passport {
   private authManager: AuthManager;
   private magicAdapter: MagicAdapter;
-  private readonly config: Config;
+  private readonly config: PassportConfiguration;
 
-  constructor(passportArguments: PassportConfiguration) {
-    const passportConfiguration = new Config(passportArguments);
+  constructor(passportModuleConfiguration: PassportModuleConfiguration) {
+    const passportConfiguration = new PassportConfiguration(
+      passportModuleConfiguration
+    );
     this.config = passportConfiguration;
     this.authManager = new AuthManager(this.config);
     this.magicAdapter = new MagicAdapter(this.config);

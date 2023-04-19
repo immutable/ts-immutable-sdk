@@ -1,4 +1,4 @@
-import { Configuration } from '@imtbl/config';
+import { ModuleConfiguration } from '@imtbl/config';
 
 export type UserProfile = {
   email?: string;
@@ -42,8 +42,8 @@ export interface OidcConfiguration {
   audience?: string;
 }
 
-export interface PassportConfiguration
-  extends Configuration,
+export interface PassportModuleConfiguration
+  extends ModuleConfiguration,
     OidcConfiguration {
   overrides?: EnvironmentConfiguration;
 }

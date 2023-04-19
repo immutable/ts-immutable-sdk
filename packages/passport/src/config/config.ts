@@ -1,32 +1,32 @@
 import { Environment } from '@imtbl/config';
-import { Networks, OidcConfiguration, PassportConfiguration } from '../types';
+import {
+  Networks,
+  OidcConfiguration,
+  PassportModuleConfiguration,
+} from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 
 const validateConfiguration = <T>(
-  configurationName: string,
   configuration: T,
-  requiredKeys: Array<keyof T>
+  requiredKeys: Array<keyof T>,
+  prefix?: string
 ) => {
-  if (!configuration) {
-    throw new PassportError(
-      `${configurationName} cannot be null`,
-      PassportErrorType.INVALID_CONFIGURATION
-    );
-  }
-
   const missingKeys = requiredKeys
     .map((key) => !configuration[key] && key)
     .filter((n) => n)
     .join(', ');
   if (missingKeys !== '') {
+    const errorMessage = prefix
+      ? `${prefix} - ${missingKeys} cannot be null`
+      : `${missingKeys} cannot be null`;
     throw new PassportError(
-      `${configurationName} - ${missingKeys} cannot be null`,
+      errorMessage,
       PassportErrorType.INVALID_CONFIGURATION
     );
   }
 };
 
-export class Config {
+export class PassportConfiguration {
   readonly network: Networks;
   readonly authenticationDomain: string;
   readonly passportDomain: string;
@@ -36,26 +36,29 @@ export class Config {
   readonly oidcConfiguration: OidcConfiguration;
 
   constructor({
-    environment,
+    baseConfig,
     overrides,
     ...oidcConfiguration
-  }: PassportConfiguration) {
-    validateConfiguration('OidcConfiguration', oidcConfiguration, [
+  }: PassportModuleConfiguration) {
+    validateConfiguration(oidcConfiguration, [
       'clientId',
       'logoutRedirectUri',
       'redirectUri',
     ]);
     this.oidcConfiguration = oidcConfiguration;
     if (overrides) {
-      validateConfiguration('overrides', overrides, [
-        'network',
-        'authenticationDomain',
-        'magicPublishableApiKey',
-        'magicProviderId',
-        'passportDomain',
-        'imxApiBasePath',
-      ]);
-
+      validateConfiguration(
+        overrides,
+        [
+          'network',
+          'authenticationDomain',
+          'magicPublishableApiKey',
+          'magicProviderId',
+          'passportDomain',
+          'imxApiBasePath',
+        ],
+        'overrides'
+      );
       this.network = overrides.network;
       this.authenticationDomain = overrides.authenticationDomain;
       this.passportDomain = overrides.passportDomain;
@@ -63,7 +66,7 @@ export class Config {
       this.magicProviderId = overrides.magicProviderId;
       this.imxApiBasePath = overrides.imxApiBasePath;
     } else {
-      switch (environment) {
+      switch (baseConfig.getEnvironment()) {
         case Environment.SANDBOX: {
           this.network = Networks.SANDBOX;
           this.authenticationDomain = 'https://auth.immutable.com';

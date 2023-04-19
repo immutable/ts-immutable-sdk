@@ -1,11 +1,11 @@
-import { Config } from './config';
+import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
   EnvironmentConfiguration,
   Networks,
-  PassportConfiguration,
+  PassportModuleConfiguration,
 } from '../types';
-import { Environment } from '@imtbl/config';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 
 describe('Config', () => {
   const oidcConfiguration = {
@@ -25,10 +25,13 @@ describe('Config', () => {
     passportDomain: 'customDomain123',
   };
 
-  describe('when the environment is SANDBOX', () => {
+  describe('when the baseConfig environment is SANDBOX', () => {
     it('returns a Config', () => {
-      const config = new Config({
+      const immutableConfig = new ImmutableConfiguration({
         environment: Environment.SANDBOX,
+      });
+      const config = new PassportConfiguration({
+        baseConfig: immutableConfig,
         ...oidcConfiguration,
       });
       expect(config).toEqual(
@@ -45,10 +48,13 @@ describe('Config', () => {
     });
   });
 
-  describe('when the environment is PRODUCTION', () => {
+  describe('when the baseConfig environment is PRODUCTION', () => {
     it('returns a Config', () => {
-      const config = new Config({
+      const immutableConfig = new ImmutableConfiguration({
         environment: Environment.PRODUCTION,
+      });
+      const config = new PassportConfiguration({
+        baseConfig: immutableConfig,
         ...oidcConfiguration,
       });
       expect(config).toEqual(
@@ -68,8 +74,11 @@ describe('Config', () => {
   describe('when overrides is specified', () => {
     describe('and all keys are specified', () => {
       it('returns a Config', () => {
-        const config = new Config({
+        const immutableConfig = new ImmutableConfiguration({
           environment: Environment.SANDBOX,
+        });
+        const config = new PassportConfiguration({
+          baseConfig: immutableConfig,
           overrides,
           ...oidcConfiguration,
         });
@@ -84,8 +93,11 @@ describe('Config', () => {
 
     describe('and a key is missing', () => {
       it('throws an error', () => {
-        const passportConfiguration = {
+        const immutableConfig = new ImmutableConfiguration({
           environment: Environment.SANDBOX,
+        });
+        const passportConfiguration = {
+          baseConfig: immutableConfig,
           overrides: {
             ...overrides,
             authenticationDomain: undefined,
@@ -94,8 +106,8 @@ describe('Config', () => {
         };
         expect(
           () =>
-            new Config(
-              passportConfiguration as unknown as PassportConfiguration
+            new PassportConfiguration(
+              passportConfiguration as unknown as PassportModuleConfiguration
             )
         ).toThrow(
           new PassportError(
@@ -109,16 +121,22 @@ describe('Config', () => {
 
   describe('when an oidcConfiguration key is missing', () => {
     it('throws an error', () => {
-      const config = {
-        environment: Environment.PRODUCTION,
+      const immutableConfig = new ImmutableConfiguration({
+        environment: Environment.SANDBOX,
+      });
+      const passportConfiguration = {
+        baseConfig: immutableConfig,
         ...oidcConfiguration,
         clientId: undefined,
       };
       expect(
-        () => new Config(config as unknown as PassportConfiguration)
+        () =>
+          new PassportConfiguration(
+            passportConfiguration as unknown as PassportModuleConfiguration
+          )
       ).toThrow(
         new PassportError(
-          'OidcConfiguration - clientId cannot be null',
+          'clientId cannot be null',
           PassportErrorType.AUTHENTICATION_ERROR
         )
       );

@@ -6,12 +6,12 @@ import {
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportMetadata, User, UserWithEtherKey } from './types';
 import { retryWithDelay } from './util/retry';
-import { Config } from './config';
+import { PassportConfiguration } from './config';
 
 const getAuthConfiguration = ({
   oidcConfiguration,
   authenticationDomain,
-}: Config): UserManagerSettings => {
+}: PassportConfiguration): UserManagerSettings => {
   const baseConfiguration: UserManagerSettings = {
     authority: authenticationDomain,
     redirect_uri: oidcConfiguration.redirectUri,
@@ -41,9 +41,9 @@ const getAuthConfiguration = ({
 
 export default class AuthManager {
   private userManager;
-  private config: Config;
+  private config: PassportConfiguration;
 
-  constructor(config: Config) {
+  constructor(config: PassportConfiguration) {
     this.config = config;
     this.userManager = new UserManager(getAuthConfiguration(config));
   }

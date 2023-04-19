@@ -1,15 +1,18 @@
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { User } from './types';
-import { Config } from './config';
+import { PassportConfiguration } from './config';
 import { MAX_RETRIES } from './util/retry';
-import { Environment } from '@imtbl/config';
 
 jest.mock('oidc-client-ts');
 
-const config = new Config({
+const baseConfig = new ImmutableConfiguration({
   environment: Environment.SANDBOX,
+});
+const config = new PassportConfiguration({
+  baseConfig,
   logoutRedirectUri: 'https://test.com',
   clientId: '11111',
   redirectUri: 'https://test.com',
@@ -82,9 +85,9 @@ describe('AuthManager', () => {
 
   describe('constructor', () => {
     it('should initial AuthManager the configuration contains audience params', () => {
-      const configWithAudience = new Config({
+      const configWithAudience = new PassportConfiguration({
+        baseConfig,
         logoutRedirectUri: 'https://test.com',
-        environment: Environment.SANDBOX,
         clientId: '11111',
         redirectUri: 'https://test.com',
         scope: 'email profile',
