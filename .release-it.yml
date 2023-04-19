@@ -1,3 +1,6 @@
+git:
+  commitMessage: 'Release ${version}'
+  requireCleanWorkingDir: false
 npm:
   publish: true
   publishPath: "sdk"
