@@ -39,18 +39,18 @@ describe('callMultipleContractSingleData', () => {
         POOL_INIT_CODE_HASH
       );
 
-      const iface = Multicall__factory.createInterface();
       const provider = new MockProvider();
       provider.mock(
         MULTICALL_ADDRESS_CREATE2,
-        'multicall((address,uint256,bytes)[])',
-        iface.encodeFunctionResult('multicall', [
+        Multicall__factory.createInterface(),
+        'multicall',
+        [
           ethers.BigNumber.from(42),
           [
             [true, ethers.BigNumber.from(2), returnData],
             [true, ethers.BigNumber.from(2), returnData],
           ],
-        ])
+        ]
       );
 
       const multicallContract = Multicall__factory.connect(
@@ -93,18 +93,18 @@ describe('callMultipleContractSingleData', () => {
         POOL_INIT_CODE_HASH
       );
       const addresses = [addr];
-      const iface = Multicall__factory.createInterface();
       const provider = new MockProvider();
       provider.mock(
         MULTICALL_ADDRESS_CREATE2,
-        'multicall((address,uint256,bytes)[])',
-        iface.encodeFunctionResult('multicall', [
+        Multicall__factory.createInterface(),
+        'multicall',
+        [
           ethers.BigNumber.from(42),
           [
             [true, ethers.BigNumber.from(2), returnData],
             [true, ethers.BigNumber.from(2), returnData],
           ],
-        ])
+        ]
       );
       const multicallContract = Multicall__factory.connect(
         MULTICALL_ADDRESS_CREATE2,
@@ -151,15 +151,15 @@ describe('callSingleContractWithCallData', () => {
         POOL_INIT_CODE_HASH
       );
 
-      const iface = Multicall__factory.createInterface();
       const provider = new MockProvider();
       provider.mock(
         MULTICALL_ADDRESS_CREATE2,
-        'multicall((address,uint256,bytes)[])',
-        iface.encodeFunctionResult('multicall', [
+        Multicall__factory.createInterface(),
+        'multicall',
+        [
           ethers.BigNumber.from(42),
           [[true, ethers.BigNumber.from(2), returnData]],
-        ])
+        ]
       );
       const multicallContract = Multicall__factory.connect(
         MULTICALL_ADDRESS_CREATE2,

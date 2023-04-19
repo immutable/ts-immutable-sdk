@@ -37,14 +37,10 @@ describe('getQuotesForRoutes', () => {
 
       const provider = new MockProvider();
 
-      provider.mock(
-        MULTICALL_ADDRESS_CREATE2,
-        'multicall((address,uint256,bytes)[])',
-        iface.encodeFunctionResult('multicall', [
-          ethers.BigNumber.from(42),
-          [[true, ethers.BigNumber.from(2), returnData]],
-        ])
-      );
+      provider.mock(MULTICALL_ADDRESS_CREATE2, iface, 'multicall', [
+        ethers.BigNumber.from(42),
+        [[true, ethers.BigNumber.from(2), returnData]],
+      ]);
 
       const multicallContract = Multicall__factory.connect(
         MULTICALL_ADDRESS_CREATE2,
@@ -103,17 +99,13 @@ describe('getQuotesForRoutes', () => {
       const iface = Multicall__factory.createInterface();
 
       const provider = new MockProvider();
-      provider.mock(
-        MULTICALL_ADDRESS_CREATE2,
-        'multicall((address,uint256,bytes)[])',
-        iface.encodeFunctionResult('multicall', [
-          ethers.BigNumber.from(42),
-          [
-            [true, ethers.BigNumber.from(2), returnData1],
-            [true, ethers.BigNumber.from(2), returnData2],
-          ],
-        ])
-      );
+      provider.mock(MULTICALL_ADDRESS_CREATE2, iface, 'multicall', [
+        ethers.BigNumber.from(42),
+        [
+          [true, ethers.BigNumber.from(2), returnData1],
+          [true, ethers.BigNumber.from(2), returnData2],
+        ],
+      ]);
       const multicallContract = Multicall__factory.connect(
         MULTICALL_ADDRESS_CREATE2,
         provider

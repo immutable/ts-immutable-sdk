@@ -21,12 +21,12 @@ describe('fetchPools', () => {
       const slot0ReturnData = '0x';
       const liquiditiesReturnData = '0x';
 
-      const iface = Multicall__factory.createInterface();
       const provider = new MockProvider();
       provider.mockOnce(
         MULTICALL_ADDRESS_CREATE2,
-        'multicall((address,uint256,bytes)[])',
-        iface.encodeFunctionResult('multicall', [
+        Multicall__factory.createInterface(),
+        'multicall',
+        [
           ethers.BigNumber.from(42),
           [
             [true, ethers.BigNumber.from(2), slot0ReturnData],
@@ -34,12 +34,13 @@ describe('fetchPools', () => {
             [true, ethers.BigNumber.from(2), slot0ReturnData],
             [true, ethers.BigNumber.from(2), slot0ReturnData],
           ],
-        ])
+        ]
       );
       provider.mockOnce(
         MULTICALL_ADDRESS_CREATE2,
-        'multicall((address,uint256,bytes)[])',
-        iface.encodeFunctionResult('multicall', [
+        Multicall__factory.createInterface(),
+        'multicall',
+        [
           ethers.BigNumber.from(42),
           [
             [true, ethers.BigNumber.from(2), liquiditiesReturnData],
@@ -47,7 +48,7 @@ describe('fetchPools', () => {
             [true, ethers.BigNumber.from(2), liquiditiesReturnData],
             [true, ethers.BigNumber.from(2), liquiditiesReturnData],
           ],
-        ])
+        ]
       );
       const multicallContract = Multicall__factory.connect(
         MULTICALL_ADDRESS_CREATE2,
@@ -83,12 +84,12 @@ describe('fetchPools', () => {
           [BigNumber.from(0)]
         );
 
-      const iface = Multicall__factory.createInterface();
       const provider = new MockProvider();
       provider.mockOnce(
         MULTICALL_ADDRESS_CREATE2,
-        'multicall((address,uint256,bytes)[])',
-        iface.encodeFunctionResult('multicall', [
+        Multicall__factory.createInterface(),
+        'multicall',
+        [
           ethers.BigNumber.from(42),
           [
             [true, ethers.BigNumber.from(2), slot0ReturnData],
@@ -96,12 +97,13 @@ describe('fetchPools', () => {
             [true, ethers.BigNumber.from(2), slot0ReturnData],
             [true, ethers.BigNumber.from(2), slot0ReturnData],
           ],
-        ])
+        ]
       );
       provider.mockOnce(
         MULTICALL_ADDRESS_CREATE2,
-        'multicall((address,uint256,bytes)[])',
-        iface.encodeFunctionResult('multicall', [
+        Multicall__factory.createInterface(),
+        'multicall',
+        [
           ethers.BigNumber.from(42),
           [
             [true, ethers.BigNumber.from(2), liquiditiesReturnData],
@@ -109,7 +111,7 @@ describe('fetchPools', () => {
             [true, ethers.BigNumber.from(2), liquiditiesReturnData],
             [true, ethers.BigNumber.from(2), liquiditiesReturnData],
           ],
-        ])
+        ]
       );
       const multicallContract = Multicall__factory.connect(
         MULTICALL_ADDRESS_CREATE2,
@@ -148,12 +150,12 @@ describe('fetchPools', () => {
           [BigNumber.from(1000000)]
         );
 
-      const iface = Multicall__factory.createInterface();
       const provider = new MockProvider();
       provider.mockOnce(
         MULTICALL_ADDRESS_CREATE2,
-        'multicall((address,uint256,bytes)[])',
-        iface.encodeFunctionResult('multicall', [
+        Multicall__factory.createInterface(),
+        'multicall',
+        [
           ethers.BigNumber.from(42),
           [
             [true, ethers.BigNumber.from(2), slot0ReturnData],
@@ -161,12 +163,13 @@ describe('fetchPools', () => {
             [true, ethers.BigNumber.from(2), slot0ReturnData],
             [true, ethers.BigNumber.from(2), slot0ReturnData],
           ],
-        ])
+        ]
       );
       provider.mockOnce(
         MULTICALL_ADDRESS_CREATE2,
-        'multicall((address,uint256,bytes)[])',
-        iface.encodeFunctionResult('multicall', [
+        Multicall__factory.createInterface(),
+        'multicall',
+        [
           ethers.BigNumber.from(42),
           [
             [true, ethers.BigNumber.from(2), liquiditiesReturnData],
@@ -174,7 +177,7 @@ describe('fetchPools', () => {
             [true, ethers.BigNumber.from(2), liquiditiesReturnData],
             [true, ethers.BigNumber.from(2), liquiditiesReturnData],
           ],
-        ])
+        ]
       );
 
       const multicallContract = Multicall__factory.connect(

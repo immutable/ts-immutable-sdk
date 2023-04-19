@@ -1,6 +1,8 @@
 import { ethers } from 'ethers';
 import { BytesLike, Deferrable, isBytesLike } from 'ethers/lib/utils';
 import { TransactionRequest } from '@ethersproject/abstract-provider';
+import { Interface } from '@ethersproject/abi';
+import { Multicall__factory } from 'contracts/types';
 
 export class MockProvider extends ethers.providers.BaseProvider {
   mockedContracts: Map<string, Map<ethers.BytesLike, jest.Mock>>;
@@ -25,34 +27,49 @@ export class MockProvider extends ethers.providers.BaseProvider {
     if (!contract) throw new Error('no mock contract deployed at ' + address);
 
     if (isBytesLike(transaction.data)) {
-      const result = contract.get(transaction.data.toString().substring(0, 10));
+      const fnSig = transaction.data.toString().substring(0, 10);
+      const result = contract.get(fnSig);
       if (typeof result !== 'undefined') return result();
-      throw new Error(
-        'data not mocked for fn ' + transaction.data.toString().substring(0, 10)
-      );
+      throw new Error('data not mocked for fn ' + fnSig);
     }
 
     throw new Error('invalid transaction data');
   }
 
-  mock(address: string, fn: string, result: string) {
-    const fnSig = ethers.utils.id(fn).substring(0, 10);
+  mock<I extends Interface>(
+    address: string,
+    iface: I,
+    fn: Parameters<I['getFunction']>[0],
+    result: readonly any[]
+  ) {
+    const fullFnSig = iface.getFunction(fn).format();
+    const fnSig = ethers.utils.id(fullFnSig).substring(0, 10);
     const contract =
       this.mockedContracts.get(address) ?? new Map<BytesLike, jest.Mock>();
 
-    const mockFn = jest.fn().mockReturnValue(result);
+    const resultStr = iface.encodeFunctionResult(fn, result);
+
+    const mockFn = jest.fn().mockReturnValue(resultStr);
 
     contract.set(fnSig, mockFn);
     this.mockedContracts.set(address, contract);
   }
 
-  mockOnce(address: string, fn: string, result: string) {
-    const fnSig = ethers.utils.id(fn).substring(0, 10);
+  mockOnce<I extends Interface>(
+    address: string,
+    iface: I,
+    fn: Parameters<I['getFunction']>[0],
+    result: readonly any[]
+  ) {
+    const fullFnSig = iface.getFunction(fn).format();
+    const fnSig = ethers.utils.id(fullFnSig).substring(0, 10);
     const contract =
       this.mockedContracts.get(address) ?? new Map<BytesLike, jest.Mock>();
 
+    const resultStr = iface.encodeFunctionResult(fn, result);
+
     const mockFn = contract.get(fnSig) ?? jest.fn();
-    mockFn.mockReturnValueOnce(result);
+    mockFn.mockReturnValueOnce(resultStr);
 
     contract.set(fnSig, mockFn);
     this.mockedContracts.set(address, contract);
