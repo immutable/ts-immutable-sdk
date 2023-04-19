@@ -8,11 +8,12 @@ import {
   ModuleConfiguration,
 } from '@imtbl/config';
 
-interface ProviderModuleConfiguration extends ModuleConfiguration {
-  overrides?: {
-    immutableXConfig: ImmutableXConfiguration;
-  };
+interface ProviderOverrides {
+  immutableXConfig: ImmutableXConfiguration;
 }
+
+interface ProviderModuleConfiguration
+  extends ModuleConfiguration<ProviderOverrides> {}
 
 export class ProviderConfiguration {
   readonly immutableXConfig: ImmutableXConfiguration;

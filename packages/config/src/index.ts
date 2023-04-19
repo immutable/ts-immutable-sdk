@@ -12,7 +12,7 @@ export class ImmutableConfiguration {
   }
 }
 
-export interface ModuleConfiguration {
+export interface ModuleConfiguration<T> {
   baseConfig: ImmutableConfiguration;
-  overrides?: Object;
+  overrides?: T;
 }
