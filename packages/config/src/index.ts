@@ -3,19 +3,12 @@ export enum Environment {
   SANDBOX = 'sandbox',
 }
 export class ImmutableConfiguration {
-  private readonly environment: Environment;
-  private readonly apiKey?: string;
+  readonly environment: Environment;
+  readonly apiKey?: string;
 
   constructor(options: { environment: Environment; apiKey?: string }) {
     this.environment = options.environment;
     this.apiKey = options.apiKey;
-  }
-
-  getEnvironment(): Environment {
-    return this.environment;
-  }
-  getApiKey(): string | undefined {
-    return this.apiKey;
   }
 }
 

@@ -13,7 +13,7 @@ import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { TransactionTypes } from '../confirmation/types';
 import ConfirmationScreen from '../confirmation/confirmation';
-import { Config } from '../config';
+import { PassportConfiguration } from '../config';
 import { UserWithEtherKey } from '../types';
 
 const ERC721 = 'ERC721';
@@ -23,7 +23,7 @@ type TransferRequest = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
-  passportConfig: Config;
+  passportConfig: PassportConfiguration;
 };
 
 type BatchTransfersParams = {
@@ -31,7 +31,7 @@ type BatchTransfersParams = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
-  passportConfig: Config;
+  passportConfig: PassportConfiguration;
 };
 
 export const transfer = ({

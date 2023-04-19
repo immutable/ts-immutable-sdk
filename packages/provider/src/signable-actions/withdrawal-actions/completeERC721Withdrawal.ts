@@ -13,8 +13,8 @@ import {
   isRegisteredOnChain,
 } from '../registration';
 import { TransactionResponse } from '@ethersproject/providers';
-import { Configuration } from '@imtbl/config';
 import { validateChain } from '../helpers';
+import { ProviderConfiguration } from 'config';
 
 interface MintableERC721Withdrawal {
   type: 'ERC721';
@@ -29,7 +29,7 @@ type CompleteERC721WithdrawalActionParams = {
   ethSigner: Signer;
   starkPublicKey: string;
   token: ERC721Token;
-  config: Configuration;
+  config: ProviderConfiguration;
 };
 
 async function executeWithdrawMintableERC721(
@@ -95,9 +95,9 @@ async function completeMintableERC721Withdrawal(
   ethSigner: Signer,
   starkPublicKey: string,
   token: MintableERC721Withdrawal,
-  config: Configuration
+  config: ProviderConfiguration
 ) {
-  const starkExConfig = config.getStarkExConfig();
+  const starkExConfig = config.immutableXConfig;
   const assetType = await getEncodeAssetInfo(
     'mintable-asset',
     'ERC721',
@@ -192,9 +192,9 @@ async function completeERC721Withdrawal(
   ethSigner: Signer,
   starkPublicKey: string,
   token: ERC721Token,
-  config: Configuration
+  config: ProviderConfiguration
 ) {
-  const starkExConfig = config.getStarkExConfig();
+  const starkExConfig = config.immutableXConfig;
   const assetType = await getEncodeAssetInfo('asset', 'ERC721', starkExConfig, {
     token_id: token.tokenId,
     token_address: token.tokenAddress,
@@ -231,11 +231,11 @@ export async function completeERC721WithdrawalAction({
   token,
   config,
 }: CompleteERC721WithdrawalActionParams) {
-  await validateChain(ethSigner, config.getStarkExConfig());
+  await validateChain(ethSigner, config.immutableXConfig);
 
   const tokenAddress = token.tokenAddress;
   const tokenId = token.tokenId;
-  const starkExConfig = config.getStarkExConfig();
+  const starkExConfig = config.immutableXConfig;
   const mintsApi = new MintsApi(starkExConfig.apiConfiguration);
 
   return await mintsApi

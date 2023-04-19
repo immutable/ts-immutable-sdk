@@ -8,7 +8,7 @@ import {
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { UserWithEtherKey } from '../types';
 import { TransactionTypes } from '../confirmation/types';
-import { Config } from '../config';
+import { PassportConfiguration } from '../config';
 import ConfirmationScreen from '../confirmation/confirmation';
 
 type CreateTradeParams = {
@@ -16,7 +16,7 @@ type CreateTradeParams = {
   tradesApi: TradesApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  passportConfig: Config;
+  passportConfig: PassportConfiguration;
 };
 
 export async function createTrade({

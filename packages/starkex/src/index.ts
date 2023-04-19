@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ImmutableX } from '@imtbl/core-sdk';
-import { Configuration } from '@imtbl/config';
+import { StarkExConfiguration } from 'config';
 
-const StarkExAPIFactory = (config: Configuration) => {
-  const imtblClient = new ImmutableX(config.getStarkExConfig());
+const StarkExAPIFactory = (config: StarkExConfiguration) => {
+  const imtblClient = new ImmutableX(config.immutableXConfig);
   const {
     deposit,
     registerOffchain,

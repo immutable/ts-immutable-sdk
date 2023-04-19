@@ -1,27 +1,31 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { Configuration } from '@imtbl/config';
-import { ERC20Token } from '@imtbl/core-sdk';
+import {
+  Contracts,
+  ERC20Token,
+  ImmutableXConfiguration,
+  UsersApi,
+} from '@imtbl/core-sdk';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
 } from '../registration';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
-import { Contracts, ImmutableXConfiguration, UsersApi } from '@imtbl/core-sdk';
 import { validateChain } from '../helpers';
+import { ProviderConfiguration } from '../../config';
 
 type ExecuteRegisterAndWithdrawERC20Params = {
   ethSigner: Signer;
   assetType: string;
   starkPublicKey: string;
-  config: Configuration;
+  config: ProviderConfiguration;
 };
 
 type CompleteERC20WithdrawalWorkflowParams = {
   ethSigner: Signer;
   starkPublicKey: string;
   token: ERC20Token;
-  config: Configuration;
+  config: ProviderConfiguration;
 };
 
 async function executeRegisterAndWithdrawERC20({
@@ -31,7 +35,7 @@ async function executeRegisterAndWithdrawERC20({
   config,
 }: ExecuteRegisterAndWithdrawERC20Params): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
-  const starkExConfig = config.getStarkExConfig();
+  const starkExConfig = config.immutableXConfig;
   const usersApi = new UsersApi(starkExConfig.apiConfiguration);
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
@@ -40,7 +44,7 @@ async function executeRegisterAndWithdrawERC20({
   );
 
   const contract = Contracts.Registration.connect(
-    config.getStarkExConfig().ethConfiguration.registrationContractAddress,
+    config.immutableXConfig.ethConfiguration.registrationContractAddress,
     ethSigner
   );
 
@@ -80,9 +84,9 @@ export async function completeERC20WithdrawalAction({
   token,
   config,
 }: CompleteERC20WithdrawalWorkflowParams) {
-  await validateChain(ethSigner, config.getStarkExConfig());
+  await validateChain(ethSigner, config.immutableXConfig);
 
-  const starkExConfig = config.getStarkExConfig();
+  const starkExConfig = config.immutableXConfig;
   const assetType = await getEncodeAssetInfo('asset', 'ERC20', starkExConfig, {
     token_address: token.tokenAddress,
   });

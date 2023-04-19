@@ -2,13 +2,13 @@ import { ethers } from 'ethers';
 import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
 import { PassportErrorType, withPassportError } from './errors/passportError';
-import { Config } from './config';
+import { PassportConfiguration } from './config';
 
 export default class MagicAdapter {
   private readonly magicClient;
-  private readonly config: Config;
+  private readonly config: PassportConfiguration;
 
-  constructor(config: Config) {
+  constructor(config: PassportConfiguration) {
     this.config = config;
     this.magicClient = new Magic(config.magicPublishableApiKey, {
       network: config.network,

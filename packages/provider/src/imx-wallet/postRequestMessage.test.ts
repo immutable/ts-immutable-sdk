@@ -9,7 +9,7 @@ import { IMX_WALLET_IFRAME_HOSTS } from './imxWalletIFrame';
 
 const postMessageMock = jest.fn();
 const iframe = {
-  src: 'http://localhost:8080',
+  src: 'https://wallets.sandbox.immutable.com',
   contentWindow: { postMessage: postMessageMock },
 } as unknown as HTMLIFrameElement;
 
@@ -29,7 +29,7 @@ describe('the postRequestMessage function', () => {
 
     expect(postMessageMock).toHaveBeenCalledWith(
       postMessage,
-      IMX_WALLET_IFRAME_HOSTS.development
+      IMX_WALLET_IFRAME_HOSTS.sandbox
     );
   });
 });

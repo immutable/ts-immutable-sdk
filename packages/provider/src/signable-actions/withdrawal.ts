@@ -1,6 +1,6 @@
 import { TokenAmount, AnyToken } from '@imtbl/core-sdk';
 import { Signers } from './types';
-import { Configuration } from '@imtbl/config';
+import { ProviderConfiguration } from 'config';
 import {
   prepareWithdrawalAction,
   completeEthWithdrawalAction,
@@ -12,13 +12,13 @@ type CompleteWithdrawalParams = {
   signers: Signers;
   starkPublicKey: string;
   token: AnyToken;
-  config: Configuration;
+  config: ProviderConfiguration;
 };
 
 type PrepareWithdrawalParams = {
   signers: Signers;
   withdrawal: TokenAmount;
-  config: Configuration;
+  config: ProviderConfiguration;
 };
 
 export async function prepareWithdrawal({
@@ -26,11 +26,9 @@ export async function prepareWithdrawal({
   withdrawal,
   config,
 }: PrepareWithdrawalParams) {
-  const starkExConfig = config.getStarkExConfig();
-
   return prepareWithdrawalAction({
     signers,
-    config: starkExConfig,
+    config: config.immutableXConfig,
     ...withdrawal,
   });
 }

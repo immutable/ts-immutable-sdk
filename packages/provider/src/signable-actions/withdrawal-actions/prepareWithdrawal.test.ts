@@ -60,7 +60,7 @@ describe('prepareWithdrawal', () => {
 
       const request: PrepareWithdrawalWorkflowParams = {
         type: 'ERC721',
-        config: testConfig.getStarkExConfig(),
+        config: testConfig.immutableXConfig,
         signers: signers,
         tokenId: '1',
         tokenAddress: 'asd',
@@ -102,7 +102,7 @@ describe('prepareWithdrawal', () => {
 
       const request: PrepareWithdrawalWorkflowParams = {
         type: 'ERC20',
-        config: testConfig.getStarkExConfig(),
+        config: testConfig.immutableXConfig,
         signers: signers,
         amount: '1.02',
         tokenAddress: 'asd',

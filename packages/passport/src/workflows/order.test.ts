@@ -2,9 +2,9 @@ import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { cancelOrder, createOrder } from './order';
-import { Config } from '../config';
-import { Networks } from '../types';
+import { PassportConfiguration } from '../config';
 import ConfirmationScreen from '../confirmation/confirmation';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 
 jest.mock('../confirmation/confirmation');
 
@@ -16,9 +16,14 @@ describe('order', () => {
     getAddress: jest.fn(),
   };
 
-  const passportConfig = {
-    network: Networks.SANDBOX,
-  } as Partial<Config>;
+  const passportConfig = new PassportConfiguration({
+    baseConfig: new ImmutableConfiguration({
+      environment: Environment.PRODUCTION,
+    }),
+    clientId: 'clientId123',
+    logoutRedirectUri: 'http://localhost:3000',
+    redirectUri: 'http://localhost:3000',
+  });
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -125,7 +130,7 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: orderRequest as UnsignedOrderRequest,
-        passportConfig: passportConfig as Config,
+        passportConfig: passportConfig as PassportConfiguration,
       });
 
       expect(getSignableCreateOrderMock).toBeCalledWith(
@@ -148,7 +153,7 @@ describe('order', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: orderRequest as UnsignedOrderRequest,
-          passportConfig: passportConfig as Config,
+          passportConfig: passportConfig as PassportConfiguration,
         })
       ).rejects.toThrow(
         new PassportError(
@@ -188,7 +193,7 @@ describe('order', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: orderRequest as UnsignedOrderRequest,
-          passportConfig: passportConfig as Config,
+          passportConfig: passportConfig as PassportConfiguration,
         })
       ).rejects.toThrowError('CREATE_ORDER_ERROR');
     });
@@ -262,7 +267,7 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
-        passportConfig: passportConfig as Config,
+        passportConfig: passportConfig as PassportConfiguration,
       });
 
       expect(getSignableCancelOrderMock).toBeCalledWith(
@@ -302,7 +307,7 @@ describe('order', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: cancelOrderRequest,
-          passportConfig: passportConfig as Config,
+          passportConfig: passportConfig as PassportConfiguration,
         })
       ).rejects.toThrowError('CANCEL_ORDER_ERROR');
     });
@@ -316,7 +321,7 @@ describe('order', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: cancelOrderRequest,
-          passportConfig: passportConfig as Config,
+          passportConfig: passportConfig as PassportConfiguration,
         })
       ).rejects.toThrow(
         new PassportError(

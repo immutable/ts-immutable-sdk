@@ -1,4 +1,4 @@
-import { Environment } from '@imtbl/config';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   Networks,
   OidcConfiguration,
@@ -34,6 +34,7 @@ export class PassportConfiguration {
   readonly magicProviderId: string;
   readonly imxApiBasePath: string;
   readonly oidcConfiguration: OidcConfiguration;
+  readonly baseConfig: ImmutableConfiguration;
 
   constructor({
     baseConfig,
@@ -46,6 +47,7 @@ export class PassportConfiguration {
       'redirectUri',
     ]);
     this.oidcConfiguration = oidcConfiguration;
+    this.baseConfig = baseConfig;
     if (overrides) {
       validateConfiguration(
         overrides,
@@ -66,7 +68,7 @@ export class PassportConfiguration {
       this.magicProviderId = overrides.magicProviderId;
       this.imxApiBasePath = overrides.imxApiBasePath;
     } else {
-      switch (baseConfig.getEnvironment()) {
+      switch (baseConfig.environment) {
         case Environment.SANDBOX: {
           this.network = Networks.SANDBOX;
           this.authenticationDomain = 'https://auth.immutable.com';

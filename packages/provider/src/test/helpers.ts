@@ -1,7 +1,7 @@
-import { ImmutableXConfiguration, StarkSigner } from '@imtbl/core-sdk';
-import { Signers } from '../signable-actions/types';
-import { Environment } from '@imtbl/config';
 import { Signer } from '@ethersproject/abstract-signer';
+import { ImmutableXConfiguration, StarkSigner } from '@imtbl/core-sdk';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { Signers } from '../signable-actions/types';
 import { ProviderConfiguration } from '../config';
 
 export const privateKey1 =
@@ -37,8 +37,14 @@ const imxConfig: ImmutableXConfiguration = {
   },
 };
 export const testConfig = new ProviderConfiguration({
-  environment: Environment.SANDBOX,
-  ...imxConfig,
+  baseConfig: new ImmutableConfiguration({
+    environment: Environment.SANDBOX,
+  }),
+  overrides: {
+    immutableXConfig: {
+      ...imxConfig,
+    },
+  },
 });
 
 export const getTokenAddress = (symbol: string): string => {

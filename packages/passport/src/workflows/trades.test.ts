@@ -2,8 +2,9 @@ import { TradesApi } from '@imtbl/core-sdk';
 import { createTrade } from './trades';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
-import { Config } from '../config';
+import { PassportConfiguration } from '../config';
 import ConfirmationScreen from '../confirmation/confirmation';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 
 jest.mock('../confirmation/confirmation');
 
@@ -59,7 +60,14 @@ const mockStarkSigner = {
   signMessage: jest.fn(),
   getAddress: jest.fn(),
 };
-const passportConfig: Partial<Config> = {};
+const passportConfig = new PassportConfiguration({
+  baseConfig: new ImmutableConfiguration({
+    environment: Environment.SANDBOX,
+  }),
+  clientId: 'clientId123',
+  logoutRedirectUri: 'http://localhost:3000',
+  redirectUri: 'http://localhost:3000',
+});
 
 describe('trades', () => {
   describe('createTrade', () => {
@@ -101,7 +109,7 @@ describe('trades', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockSignableTradeRequest.getSignableTradeRequest,
-        passportConfig: passportConfig as Config,
+        passportConfig: passportConfig,
       });
 
       expect(getSignableTradeMock).toBeCalledWith(mockSignableTradeRequest);
@@ -125,7 +133,7 @@ describe('trades', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: mockSignableTradeRequest.getSignableTradeRequest,
-          passportConfig: passportConfig as Config,
+          passportConfig: passportConfig,
         })
       ).rejects.toThrowError('TRADE_ERROR');
     });
@@ -139,7 +147,7 @@ describe('trades', () => {
           starkSigner: mockStarkSigner,
           user: mockUser,
           request: mockSignableTradeRequest.getSignableTradeRequest,
-          passportConfig: passportConfig as Config,
+          passportConfig: passportConfig,
         })
       ).rejects.toThrow(
         new PassportError(

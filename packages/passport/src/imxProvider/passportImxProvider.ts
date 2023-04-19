@@ -29,12 +29,12 @@ import { cancelOrder, createOrder } from '../workflows/order';
 import { exchangeTransfer } from '../workflows/exchange';
 import { createTrade } from '../workflows/trades';
 import { PassportError, PassportErrorType } from '../errors/passportError';
-import { Config } from '../config';
+import { PassportConfiguration } from '../config';
 
 export type PassportImxProviderInput = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  passportConfig: Config;
+  passportConfig: PassportConfiguration;
 };
 
 export default class PassportImxProvider implements IMXProvider {
@@ -42,7 +42,7 @@ export default class PassportImxProvider implements IMXProvider {
   private starkSigner: StarkSigner;
   private transfersApi: TransfersApi;
   private ordersApi: OrdersApi;
-  private readonly passportConfig: Config;
+  private readonly passportConfig: PassportConfiguration;
   private exchangesApi: ExchangesApi;
   private tradesApi: TradesApi;
 
@@ -51,7 +51,7 @@ export default class PassportImxProvider implements IMXProvider {
     this.starkSigner = starkSigner;
     this.passportConfig = passportConfig;
     const apiConfig = new Configuration({
-      basePath: passportConfig.imxAPIConfiguration.basePath,
+      basePath: passportConfig.imxApiBasePath,
     });
     this.transfersApi = new TransfersApi(apiConfig);
     this.ordersApi = new OrdersApi(apiConfig);
