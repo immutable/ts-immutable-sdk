@@ -14,6 +14,8 @@ import {
   GetBalanceResult,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
+  GetWalletAllowListParams,
+  GetWalletAllowListResult,
   SendTransactionParams,
   SendTransactionResult,
   SwitchNetworkParams,
@@ -68,6 +70,12 @@ export class Checkout {
     params: GetTokenAllowListParams
   ): GetTokenAllowListResult {
     return tokens.getTokenAllowList(params);
+  }
+
+  public async getWalletsAllowList(
+    params: GetWalletAllowListParams
+  ): Promise<GetWalletAllowListResult> {
+    return await connect.getWalletAllowList(params);
   }
 
   public async sendTransaction(
