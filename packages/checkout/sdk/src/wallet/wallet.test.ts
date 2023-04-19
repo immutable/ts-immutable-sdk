@@ -1,5 +1,5 @@
 import { ConnectionProviders, WalletFilterTypes } from '../types';
-import { getWalletAllowList } from './connect';
+import { getWalletAllowList } from './wallet';
 
 describe('getWalletAllowList', () => {
   const testcases = [
@@ -29,7 +29,7 @@ describe('getWalletAllowList', () => {
       ],
     },
     {
-      text: 'exclusion of Gamestop wallet applied',
+      text: 'exclusion of MetaMask wallet applied',
       type: WalletFilterTypes.ALL,
       exclude: [{ connectionProvider: ConnectionProviders.METAMASK }],
       result: [
