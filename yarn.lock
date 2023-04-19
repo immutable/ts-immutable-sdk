@@ -2600,7 +2600,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/dex-sdk@workspace:packages/internal/dex"
   dependencies:
-    "@rollup/plugin-commonjs": ^24.1.0
+    "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
     "@rollup/plugin-node-resolve": ^15.0.2
     "@swc/core": ^1.3.36
@@ -4814,7 +4814,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-commonjs@npm:^24.0.1, @rollup/plugin-commonjs@npm:^24.1.0":
+"@rollup/plugin-commonjs@npm:^24.0.1":
   version: 24.1.0
   resolution: "@rollup/plugin-commonjs@npm:24.1.0"
   dependencies:
