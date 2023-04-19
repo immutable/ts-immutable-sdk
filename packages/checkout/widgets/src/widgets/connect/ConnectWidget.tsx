@@ -17,7 +17,10 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens'
 import { ConnectActions, ConnectContext, connectReducer, initialConnectState } from './context/ConnectContext'
 import { initialViewState, ViewActions, ViewContext, viewReducer } from '../../context/ViewContext';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
-import { Layout } from '../../components/Layout';
+import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
+import { HeaderNavigation } from '../../components/HeaderNavigation';
+import { FooterNavigation } from '../../components/FooterNavigation';
+import immutableNetwork from '../../components/SimpleLayout/ImmutableNetwork.svg';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
@@ -72,11 +75,36 @@ export function ConnectWidget(props:ConnectWidgetProps) {
     });
   }
 
+  const close = () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: ConnectWidgetViews.FAIL,
+          error: new Error('User closed the connect widget')
+        }
+      }
+    })        
+  }
+
+  useEffect(() => {
+    console.log("Connect Widget current view ", viewState.view.type);
+  }, [viewState.view.type])
+
   return (
     <BiomeThemeProvider theme={{base: biomeTheme}}>
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         <ConnectContext.Provider value={{ connectState, connectDispatch }}>
-          <Layout header={<>Header</>} footer={<>Footer</>} >
+          <SimpleLayout 
+            header={
+              <HeaderNavigation
+                title='Connect a wallet' 
+                showClose
+                />
+            }
+            heroImage={immutableNetwork}
+            footer={<FooterNavigation />}
+            >
             <Box sx={ConnectWidgetStyle}>
               <Box sx={WidgetHeaderStyle}>
                 <Box sx={BackButtonStyle}>
@@ -88,17 +116,7 @@ export function ConnectWidget(props:ConnectWidgetProps) {
                 <Box>
                   <Button 
                   testId='close-button'
-                  onClick={() => 
-                    viewDispatch({
-                      payload: {
-                        type: ViewActions.UPDATE_VIEW,
-                        view: {
-                          type: ConnectWidgetViews.FAIL,
-                          error: new Error('User closed the connect widget')
-                        }
-                      }
-                    })                
-                  }>x</Button>
+                  onClick={close}>x</Button>
                 </Box>
               </Box>       
               <Box 
@@ -132,7 +150,7 @@ export function ConnectWidget(props:ConnectWidgetProps) {
                 <Body style={{color:'#FFF'}}>User connected</Body>
               </Box>
             </Box>
-          </Layout>
+          </SimpleLayout>
         </ConnectContext.Provider>
       </ViewContext.Provider>
     </BiomeThemeProvider>
