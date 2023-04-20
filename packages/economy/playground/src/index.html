@@ -11,7 +11,24 @@
     <imtbl-craft-button>
       <button>Craft Button</button>
     </imtbl-craft-button>
-
-    <script type="module" src="index.ts"></script>
+    <imtbl-craft-connect>
+      <button slot="connect-button">Craft Connect Wallet</button>
+      <imtbl-connect
+        slot="connect-widget"
+        id="imtbl-connect"
+        providerPreference="metamask"
+        theme="dark"
+      ></imtbl-connect>
+    </imtbl-craft-connect>
+    <imtbl-craft-passport
+      env="dev"
+      clientId="3Xt3vBGjrsuLnBKK3mtJsIU5j5WikfQC"
+      redirectUri="http://localhost:4200/"
+      logoutRedirectUri="http://localhost:4200/"
+    >
+      <button>Connect passport</button>
+    </imtbl-craft-passport>
+    <script defer src="../public/js/imtbl-checkout-widgets.js"></script>
+    <script defer type="module" src="index.ts"></script>
   </body>
 </html>

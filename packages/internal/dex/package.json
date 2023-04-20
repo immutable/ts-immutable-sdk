@@ -15,7 +15,7 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "source": "src/index.ts",
   "type": "module",
-  "types": "dist/index.d.ts",
+  "types": "dist/types.d.ts",
   "dependencies": {
     "@uniswap/router-sdk": "^1.4.0",
     "@uniswap/swap-router-contracts": "^1.3.0",
@@ -41,33 +41,13 @@
     "typescript": "^4.9.5"
   },
   "scripts": {
-    "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "test": "jest test",
-    "test:watch": "jest --watch",
-    "lint": "eslint ./src --ext .ts --max-warnings=0",
-    "lint:fix": "cd ../../../ && yarn wsrun -p @imtbl/dex-sdk -c lint --fix",
-    "generate-types": "typechain --target ethers-v5 --out-dir ./src/contracts/types ./src/contracts/ABIs/*.json"
-  },
-  "engines": {
-    "node": ">=16.0.0"
-  },
-  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
-  "keywords": [
-    "immutablex"
-  ],
-  "license": "Apache-2.0",
-  "main": "dist/main.js",
-  "module": "dist/module.js",
-  "private": true,
-  "repository": "immutable/ts-immutable-sdk.git",
-  "scripts": {
     "generate-types": "typechain --target ethers-v5 --out-dir ./src/contracts/types ./src/contracts/ABIs/*.json",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "lint:fix": "cd ../../../ && yarn wsrun -p @imtbl/dex-sdk -c lint --fix",
     "test": "jest test",
     "test:watch": "jest --watch"
   },
-  "source": "src/index.ts",
-  "type": "module",
-  "types": "dist/types.d.ts"
+  "engines": {
+    "node": ">=16.0.0"
+  }
 }

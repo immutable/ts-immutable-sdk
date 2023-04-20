@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { SDKError } from './Errors';
 import { Economy } from './Economy';
 
