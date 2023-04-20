@@ -36,3 +36,5 @@ router.get("/path/to/resource", (req, res) => {
 
 export default router;
 ```
+
+For further examples refer to [ExpressJS Routing docs](https://expressjs.com/en/guide/routing.html).
