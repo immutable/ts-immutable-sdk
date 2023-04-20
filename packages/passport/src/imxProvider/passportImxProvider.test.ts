@@ -81,7 +81,7 @@ describe('PassportImxProvider', () => {
     createTradeMock = jest.fn();
     (TradesApi as jest.Mock).mockReturnValue({
       getSignableTrade: getSignableTradeMock,
-      createTrade: createTradeMock,
+      createTradeV3: createTradeMock,
     });
 
     mockStartTransaction = jest.fn();
