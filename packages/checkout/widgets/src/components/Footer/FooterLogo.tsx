@@ -1,8 +1,9 @@
 import { Body, Box } from "@biom3/react"
+import { FooterLogoStyles } from "./FooterStyles"
 
 export const FooterLogo = () => {
   return(
-    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+    <Box sx={FooterLogoStyles}>
       <Body size="medium">Footer goes here</Body>
     </Box>
   )

@@ -1,22 +1,20 @@
-import { BiomeThemeProvider, Body, Box } from '@biom3/react'
+import { BiomeThemeProvider, Body } from '@biom3/react'
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web'
 import { WidgetTheme } from '@imtbl/checkout-ui-types'
 import { sendConnectFailedEvent, sendConnectSuccessEvent} from './ConnectWidgetEvents'
 import { OtherWallets } from './components/other-wallets/OtherWallets';
 import { ChooseNetwork } from './components/choose-network/ChooseNetwork';
 import { useEffect, useReducer } from 'react'
-import { 
-  ActiveStyle, 
-  InactiveStyle, 
-} from './ConnectStyles'
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens'
 import { ConnectActions, ConnectContext, connectReducer, initialConnectState } from './context/ConnectContext'
 import { initialViewState, ViewActions, ViewContext, viewReducer } from '../../context/ViewContext';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
-import { HeaderNavigation } from '../../components/HeaderNavigation';
+import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
+import { FooterNavigation } from '../../components/Footer/FooterNavigation';
+
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
   theme: WidgetTheme;
@@ -62,10 +60,6 @@ export function ConnectWidget(props:ConnectWidgetProps) {
     }
   }, [viewState])
 
-  useEffect(() => {
-    console.log("Connect Widget current view ", viewState.view.type);
-  }, [viewState.view.type])
-
   const renderOutcome = () => {
     return (
     <SimpleLayout 
@@ -77,8 +71,8 @@ export function ConnectWidget(props:ConnectWidgetProps) {
       }
       footer={<FooterLogo />}
       >
-        {viewState.view.type === ConnectWidgetViews.SUCCESS && <Body style={{color:'#FFF'}}>User connected</Body>}
-        {viewState.view.type === ConnectWidgetViews.FAIL && <Body style={{color:'#FFF'}}>User did not connect</Body>}
+        {viewState.view.type === ConnectWidgetViews.SUCCESS && <Body testId='success'>User connected</Body>}
+        {viewState.view.type === ConnectWidgetViews.FAIL && <Body testId='fail'>User did not connect</Body>}
     </SimpleLayout>)
   }
 
@@ -87,15 +81,9 @@ export function ConnectWidget(props:ConnectWidgetProps) {
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         <ConnectContext.Provider value={{ connectState, connectDispatch }}>
           <>
-            {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && 
-              <ConnectWallet />
-            }
-            {viewState.view.type === ConnectWidgetViews.OTHER_WALLETS && 
-              <OtherWallets />
-            }
-            {viewState.view.type === ConnectWidgetViews.CHOOSE_NETWORKS && 
-              <ChooseNetwork />
-            }
+            {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && <ConnectWallet />}
+            {viewState.view.type === ConnectWidgetViews.OTHER_WALLETS && <OtherWallets />}
+            {viewState.view.type === ConnectWidgetViews.CHOOSE_NETWORKS && <ChooseNetwork />}
             {(viewState.view.type === ConnectWidgetViews.SUCCESS || viewState.view.type === ConnectWidgetViews.FAIL) && renderOutcome()}
           </>
         </ConnectContext.Provider>

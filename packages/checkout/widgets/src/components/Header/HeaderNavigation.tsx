@@ -1,13 +1,15 @@
 import { AppHeaderBar, ButtCon } from "@biom3/react";
 import { useContext } from "react";
-import { ViewActions, ViewContext } from "../context/ViewContext";
-import { ConnectWidgetViews } from "../context/ConnectViewContextTypes";
+import { ViewActions, ViewContext } from "../../context/ViewContext";
+import { ConnectWidgetViews } from "../../context/ConnectViewContextTypes";
+import { HeaderNavigationStyles, ButtonNavigationStyles } from "./HeaderStyles";
 
 export interface HeaderNavigationProps {
   title?: string;
   showBack?: boolean;
   showClose?: boolean;
   showSettings?: boolean;
+  transparent?: boolean;
   onSettingsClick?: () => void;
 }
 
@@ -16,7 +18,8 @@ export const HeaderNavigation = ({
   showBack = false, 
   showClose = false, 
   showSettings = false,
-  onSettingsClick 
+  transparent = false,
+  onSettingsClick
   } : HeaderNavigationProps) => {
   const { viewDispatch } = useContext(ViewContext);
 
@@ -41,12 +44,12 @@ export const HeaderNavigation = ({
   }
 
   return (
-    <AppHeaderBar elevated={false}>
-      {showBack && <AppHeaderBar.LeftButtCon icon="ArrowBackward" iconVariant="bold" onClick={goBack} />}
-      {title && <AppHeaderBar.Title size='medium' sx={{ textAlign: 'left' }}>{title}</AppHeaderBar.Title>}
+    <AppHeaderBar sx={HeaderNavigationStyles(transparent)} elevated={false}>
+      {showBack && <AppHeaderBar.LeftButtCon icon="ArrowBackward" iconVariant="bold" onClick={goBack} testId='back-button' />}
+      <AppHeaderBar.Title size='medium' sx={{ textAlign: 'left' }}>{title}</AppHeaderBar.Title>
       <AppHeaderBar.RightHandButtons>
-        {showSettings && onSettingsClick && <ButtCon icon="SettingsCog" onClick={onSettingsClick} />}
-        {showClose && <ButtCon icon="Close" onClick={close} />}
+        {showSettings && onSettingsClick && <ButtCon icon="SettingsCog" onClick={onSettingsClick} testId='settings-button' />}
+        {showClose && <ButtCon sx={ButtonNavigationStyles(transparent)} icon="Close" onClick={close} testId='close-button' />}
       </AppHeaderBar.RightHandButtons>
     </AppHeaderBar>
   )

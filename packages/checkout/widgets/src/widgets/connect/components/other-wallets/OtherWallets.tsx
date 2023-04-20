@@ -7,7 +7,7 @@ import { useContext } from 'react'
 import { ViewActions, ViewContext } from '../../../../context/ViewContext'
 import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes'
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout'
-import { HeaderNavigation } from '../../../../components/HeaderNavigation'
+import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation'
 import { FooterLogo } from '../../../../components/Footer/FooterLogo'
 
 export function OtherWallets () {

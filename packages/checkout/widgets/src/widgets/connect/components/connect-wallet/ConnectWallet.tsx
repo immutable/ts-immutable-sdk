@@ -1,5 +1,5 @@
 import { Box, Button } from "@biom3/react"
-import { HeaderNavigation } from "../../../../components/HeaderNavigation"
+import { HeaderNavigation } from "../../../../components/Header/HeaderNavigation"
 import { SimpleLayout } from "../../../../components/SimpleLayout/SimpleLayout"
 import { useContext } from "react"
 import { ViewActions, ViewContext } from "../../../../context/ViewContext"
@@ -23,20 +23,18 @@ export const ConnectWallet = () => {
         <HeaderNavigation
           title='Connect a wallet' 
           showClose
-          />
+        />
       }
       footer={<FooterLogo />}
-      >
-        <Box>
-          <Button 
-            testId='connect-passport'
-            onClick={() => dispatch(ConnectWidgetViews.PASSPORT)}>Passport</Button>
-          <Button 
-            testId='connect-other'
-            onClick={() => dispatch(ConnectWidgetViews.OTHER_WALLETS)}>Other Wallets</Button>
-        </Box>
+    >
+      <Box>
+        <Button 
+          testId='connect-passport'
+          onClick={() => dispatch(ConnectWidgetViews.PASSPORT)}>Passport</Button>
+        <Button 
+          testId='connect-other'
+          onClick={() => dispatch(ConnectWidgetViews.OTHER_WALLETS)}>Other Wallets</Button>
+      </Box>
     </SimpleLayout>
   )
 }
-
-

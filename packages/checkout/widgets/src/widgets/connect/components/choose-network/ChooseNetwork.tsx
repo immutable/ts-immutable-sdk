@@ -6,8 +6,9 @@ import { useContext } from 'react';
 import { ViewActions, ViewContext } from '../../../../context/ViewContext';
 import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
-import { HeaderNavigation } from '../../../../components/HeaderNavigation';
+import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
+import ImmutableNetwork from '../../../../components/SimpleLayout/ImmutableNetwork.svg';
 
 export function ChooseNetwork () {
   const { viewDispatch } = useContext(ViewContext);
@@ -57,11 +58,14 @@ export function ChooseNetwork () {
     <SimpleLayout 
       header={
         <HeaderNavigation
-            showClose
-            showBack
-          />
+          showClose
+          showBack
+          transparent={true}
+        />
       }
       footer={<FooterLogo />}
+      heroImage={ImmutableNetwork}
+      floatHeader={true}
     >
       <Button
         testId='network-zkevm'
