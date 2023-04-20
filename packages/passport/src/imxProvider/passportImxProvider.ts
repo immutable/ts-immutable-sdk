@@ -52,6 +52,7 @@ export default class PassportImxProvider implements IMXProvider {
     this.passportConfig = passportConfig;
     const apiConfig = new Configuration({
       basePath: passportConfig.imxApiBasePath,
+      sdkVersion: 'ts-immutable-sdk-0.0.1-alpha',
     });
     this.transfersApi = new TransfersApi(apiConfig);
     this.ordersApi = new OrdersApi(apiConfig);

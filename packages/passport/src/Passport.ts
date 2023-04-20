@@ -94,6 +94,7 @@ export class Passport {
   ): Promise<UserWithEtherKey> {
     const configuration = new Configuration({
       basePath: this.config.imxApiBasePath,
+      sdkVersion: 'ts-immutable-sdk-0.0.1-alpha',
     });
     const usersApi = new UsersApi(configuration);
     await registerPassport(
