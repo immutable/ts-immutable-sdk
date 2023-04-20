@@ -1,4 +1,4 @@
-import { BiomeThemeProvider, Body } from '@biom3/react'
+import { BiomeThemeProvider } from '@biom3/react'
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web'
 import { WidgetTheme } from '@imtbl/checkout-ui-types'
 import { sendConnectFailedEvent, sendConnectSuccessEvent} from './ConnectWidgetEvents'
@@ -10,9 +10,7 @@ import { ConnectActions, ConnectContext, connectReducer, initialConnectState } f
 import { initialViewState, ViewActions, ViewContext, viewReducer } from '../../context/ViewContext';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
-import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
-import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
-import { FooterLogo } from '../../components/Footer/FooterLogo';
+import { ConnectResult } from './components/connect-result/ConnectResult';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
@@ -59,22 +57,6 @@ export function ConnectWidget(props:ConnectWidgetProps) {
     }
   }, [viewState])
 
-  const renderOutcome = () => {
-    return (
-    <SimpleLayout 
-      header={
-        <HeaderNavigation
-          showClose
-          showBack
-        />
-      }
-      footer={<FooterLogo />}
-      >
-        {viewState.view.type === ConnectWidgetViews.SUCCESS && <Body testId='success'>User connected</Body>}
-        {viewState.view.type === ConnectWidgetViews.FAIL && <Body testId='fail'>User did not connect</Body>}
-    </SimpleLayout>)
-  }
-
   return (
     <BiomeThemeProvider theme={{base: biomeTheme}}>
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
@@ -83,7 +65,7 @@ export function ConnectWidget(props:ConnectWidgetProps) {
             {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && <ConnectWallet />}
             {viewState.view.type === ConnectWidgetViews.OTHER_WALLETS && <OtherWallets />}
             {viewState.view.type === ConnectWidgetViews.CHOOSE_NETWORKS && <ChooseNetwork />}
-            {(viewState.view.type === ConnectWidgetViews.SUCCESS || viewState.view.type === ConnectWidgetViews.FAIL) && renderOutcome()}
+            {(viewState.view.type === ConnectWidgetViews.SUCCESS || viewState.view.type === ConnectWidgetViews.FAIL) && <ConnectResult />}
           </>
         </ConnectContext.Provider>
       </ViewContext.Provider>
