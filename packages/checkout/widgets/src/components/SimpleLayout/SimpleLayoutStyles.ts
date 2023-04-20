@@ -9,10 +9,12 @@ export const SimpleLayoutStyle = {
 }
 
 export const RelativeHeader = {
+  height: '15%',
   position: 'relative',
 }
 
 export const FloatingHeader = {
+  height: '15%',
   position: 'absolute',
   top: 0,
   left: 0,
