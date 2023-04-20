@@ -77,6 +77,27 @@ describe('balances', () => {
         )
       );
     });
+
+    it('should throw a CheckoutError of type BalanceError with the right message if the current network is unsupported', async () => {
+      const mockProvider = jest.fn().mockImplementation(() => {
+        return {
+          getBalance: jest
+            .fn()
+            .mockRejectedValue(new Error('Error getting balance')),
+          getNetwork: jest.fn().mockResolvedValue({
+            chainId: 0,
+            name: 'homestead',
+          }),
+        };
+      });
+
+      await expect(getBalance(mockProvider(), '0xAddress')).rejects.toThrow(
+        new CheckoutError(
+          'Unsupported Network',
+          CheckoutErrorType.GET_BALANCE_ERROR
+        )
+      );
+    });
   });
 
   describe('getERC20Balance()', () => {
