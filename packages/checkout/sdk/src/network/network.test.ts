@@ -235,6 +235,7 @@ describe('network functions', () => {
           {
             name: 'Ethereum',
             chainId: 1,
+            isSupported: true,
             nativeCurrency: {
               name: 'Ethereum',
               symbol: 'ETH',
@@ -245,6 +246,7 @@ describe('network functions', () => {
           {
             name: 'Goerli',
             chainId: 5,
+            isSupported: true,
             nativeCurrency: {
               name: 'Ethereum',
               symbol: 'ETH',
@@ -264,6 +266,7 @@ describe('network functions', () => {
           {
             name: 'Ethereum',
             chainId: 1,
+            isSupported: true,
             nativeCurrency: {
               name: 'Ethereum',
               symbol: 'ETH',
