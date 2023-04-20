@@ -40,8 +40,8 @@ describe('Config', () => {
           authenticationDomain: 'https://auth.immutable.com',
           magicPublishableApiKey: 'pk_live_10F423798A540ED7',
           magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
-          passportDomain: 'https://passport.immutable.com',
-          imxApiBasePath: 'https://api.x.immutable.com',
+          passportDomain: 'https://passport.sandbox.immutable.com',
+          imxApiBasePath: 'https://api.sandbox.x.immutable.com',
           oidcConfiguration,
         })
       );
@@ -63,8 +63,8 @@ describe('Config', () => {
           authenticationDomain: 'https://auth.immutable.com',
           magicPublishableApiKey: 'pk_live_10F423798A540ED7',
           magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
-          passportDomain: 'https://passport.sandbox.immutable.com',
-          imxApiBasePath: 'https://api.sandbox.x.immutable.com',
+          passportDomain: 'https://passport.immutable.com',
+          imxApiBasePath: 'https://api.x.immutable.com',
           oidcConfiguration,
         })
       );

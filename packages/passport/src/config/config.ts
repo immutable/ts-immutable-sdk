@@ -74,8 +74,8 @@ export class PassportConfiguration {
           this.authenticationDomain = 'https://auth.immutable.com';
           this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
           this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
-          this.passportDomain = 'https://passport.immutable.com';
-          this.imxApiBasePath = 'https://api.x.immutable.com';
+          this.passportDomain = 'https://passport.sandbox.immutable.com';
+          this.imxApiBasePath = 'https://api.sandbox.x.immutable.com';
           break;
         }
         case Environment.PRODUCTION: {
@@ -83,8 +83,8 @@ export class PassportConfiguration {
           this.authenticationDomain = 'https://auth.immutable.com';
           this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
           this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
-          this.passportDomain = 'https://passport.sandbox.immutable.com';
-          this.imxApiBasePath = 'https://api.sandbox.x.immutable.com';
+          this.passportDomain = 'https://passport.immutable.com';
+          this.imxApiBasePath = 'https://api.x.immutable.com';
           break;
         }
       }
