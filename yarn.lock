@@ -1536,26 +1536,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.1.3-beta":
-  version: 0.1.3-beta
-  resolution: "@biom3/react@npm:0.1.3-beta"
-  dependencies:
-    "@biom3/design-tokens": "*"
-    "@emotion/css": "*"
-    "@emotion/react": "*"
-    framer-motion: ^9.1.7
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.throttle: ^4.1.1
-    next: "*"
-    querystring: ^0.2.1
-    react: "*"
-    react-is: ^18.2.0
-    ts-deepmerge: "*"
-  checksum: 5de42c4024b4c624ffeb277a183bf83523a3ab5ef92a4dc0143cf22e97b773de6f2127ab93d5878ad76a7b6994201c8e5236013622e388b1fb29e83eb312344f
-  languageName: node
-  linkType: hard
-
 "@biom3/react@npm:^0.2.4-beta":
   version: 0.2.4-beta
   resolution: "@biom3/react@npm:0.2.4-beta"
@@ -2752,7 +2732,7 @@ __metadata:
   resolution: "@imtbl/sdk@workspace:sdk"
   dependencies:
     "@biom3/design-tokens": 0.1.4-beta
-    "@biom3/react": ^0.1.3-beta
+    "@biom3/react": ^0.2.4-beta
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk-web": 0.0.0
     "@imtbl/checkout-ui-types": 0.0.0
@@ -12805,22 +12785,6 @@ __metadata:
     react-dom:
       optional: true
   checksum: c131b546539937b5dbec6a89f2e3db946d5127f1cbf2f88268ef75089df30e81cdd0f4a5786f84b1bc98397d43a99aa6f7e187e6bba178548a9eeb3d39df7b91
-  languageName: node
-  linkType: hard
-
-"framer-motion@npm:^9.1.7":
-  version: 9.1.7
-  resolution: "framer-motion@npm:9.1.7"
-  dependencies:
-    "@emotion/is-prop-valid": ^0.8.2
-    tslib: ^2.4.0
-  peerDependencies:
-    react: ^18.0.0
-    react-dom: ^18.0.0
-  dependenciesMeta:
-    "@emotion/is-prop-valid":
-      optional: true
-  checksum: 8ab21a2c15eb2494644b09c91c91aec3c01575e2148ff17621df4fca44bc64a8c03bc1cf6a5261ec0cebb7504fea8d75480e93b1799e8842337f8b1863af8c14
   languageName: node
   linkType: hard
 
