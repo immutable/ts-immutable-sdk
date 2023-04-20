@@ -15,7 +15,7 @@ export const HeaderNavigation = ({
   title, 
   showBack = false, 
   showClose = false, 
-  showSettings = false, 
+  showSettings = false,
   onSettingsClick 
   } : HeaderNavigationProps) => {
   const { viewDispatch } = useContext(ViewContext);

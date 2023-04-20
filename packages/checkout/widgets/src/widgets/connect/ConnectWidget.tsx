@@ -8,8 +8,7 @@ import { ChooseNetwork } from './components/choose-network/ChooseNetwork';
 import { useEffect, useReducer } from 'react'
 import { 
   ActiveStyle, 
-  BackButtonStyle, 
-  ConnectWidgetStyle, 
+  BackButtonStyle,
   InactiveStyle, 
   WidgetHeaderStyle 
 } from './ConnectStyles'
@@ -19,9 +18,8 @@ import { initialViewState, ViewActions, ViewContext, viewReducer } from '../../c
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../components/HeaderNavigation';
-import { FooterNavigation } from '../../components/FooterNavigation';
-import immutableNetwork from '../../components/SimpleLayout/ImmutableNetwork.svg';
-
+import { FooterNavigation } from '../../components/Footer/FooterNavigation';
+import immutableNetwork from '../../components/SimpleLayout/PurpleDownGradient.svg';
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
   theme: WidgetTheme;
@@ -95,6 +93,14 @@ export function ConnectWidget(props:ConnectWidgetProps) {
     <BiomeThemeProvider theme={{base: biomeTheme}}>
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         <ConnectContext.Provider value={{ connectState, connectDispatch }}>
+          {/** We want to move towards this pattern with each view being conditionally
+           * rendered based upon the current viewState
+           * These views are components which are made up of a layout and content components
+           * and handle the behaviour of the view 
+           */}
+          {/* {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && 
+            <ConnectAWallet />
+          } */}
           <SimpleLayout 
             header={
               <HeaderNavigation
@@ -105,7 +111,7 @@ export function ConnectWidget(props:ConnectWidgetProps) {
             heroImage={immutableNetwork}
             footer={<FooterNavigation />}
             >
-            <Box sx={ConnectWidgetStyle}>
+            <Box>
               <Box sx={WidgetHeaderStyle}>
                 <Box sx={BackButtonStyle}>
                 <Button 

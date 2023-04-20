@@ -26,7 +26,13 @@ export const SimpleLayout = ({ header, footer, children, heroImage, floatHeader 
         }
         {children && <Box sx={{flex: 1}}>{children}</Box>}
       </Box>
-      {footer && <Box>{footer}</Box>}
+      {footer && <Box sx={{
+        height: '10%', 
+        display: 'flex', 
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        }}>{footer}</Box>}
     </Box>
   )
 }

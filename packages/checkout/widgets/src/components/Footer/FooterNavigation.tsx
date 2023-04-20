@@ -6,12 +6,11 @@ export interface FooterProps {
 export const FooterNavigation = () => {
   return (
     <Box sx={{
-      height: "100px",
-      padding: 'base.spacing.x4',
-      display: 'flex', 
+      width: '100%',
+      display: 'flex',
       flexDirection: 'row', 
       justifyContent: 'flex-end', 
-      alignItems: 'center'
+      alignItems: 'center',
       }}>
       <Button variant='secondary'>Let's go</Button>
     </Box>

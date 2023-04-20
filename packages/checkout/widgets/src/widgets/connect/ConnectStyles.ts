@@ -2,10 +2,6 @@ export const ButtonWrapperStyle = {
   marginBottom: '10px'
 }
 
-export const ConnectWidgetStyle = {
-  padding: '20px',
-}
-
 export const WidgetHeaderStyle = {
   width: '100%',
   display: 'flex',

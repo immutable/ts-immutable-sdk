@@ -5,7 +5,7 @@ export const SimpleLayoutStyle = {
   flexDirection: 'column',
   backgroundColor: 'base.color.brand.2',
   height: '680px', 
-  width: '450px'
+  width: '450px',
 }
 
 export const RelativeHeader = {
