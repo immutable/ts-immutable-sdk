@@ -2,12 +2,6 @@ export const ButtonWrapperStyle = {
   marginBottom: '10px'
 }
 
-export const ConnectWidgetStyle = {
-  maxWidth: '400px',
-  backgroundColor: '#333333',
-  padding: '20px',
-}
-
 export const WidgetHeaderStyle = {
   width: '100%',
   display: 'flex',

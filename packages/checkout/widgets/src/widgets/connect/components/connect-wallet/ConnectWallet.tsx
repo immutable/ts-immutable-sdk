@@ -1,11 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button } from '@biom3/react'
-import { useContext } from 'react';
-import { ViewActions, ViewContext } from '../../../../context/ViewContext';
-import { ButtonWrapperStyle } from '../../ConnectStyles'
-import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
+import { Box, Button } from "@biom3/react"
+import { HeaderNavigation } from "../../../../components/Header/HeaderNavigation"
+import { SimpleLayout } from "../../../../components/SimpleLayout/SimpleLayout"
+import { useContext } from "react"
+import { ViewActions, ViewContext } from "../../../../context/ViewContext"
+import { ConnectWidgetViews } from "../../../../context/ConnectViewContextTypes"
+import { FooterLogo } from "../../../../components/Footer/FooterLogo"
 
-export function ConnectWallet () {
+export const ConnectWallet = () => {
+
   const { viewDispatch } = useContext(ViewContext);
 
   const dispatch = (type: ConnectWidgetViews.PASSPORT | ConnectWidgetViews.OTHER_WALLETS) => viewDispatch({
@@ -15,15 +17,24 @@ export function ConnectWallet () {
     }
   });
 
-  return (
-    <div>
-    <Button 
-      testId='connect-passport'
-      sx={ButtonWrapperStyle} 
-      onClick={() => dispatch(ConnectWidgetViews.PASSPORT)}>Passport</Button>
-    <Button 
-      testId='connect-other'
-      onClick={() => dispatch(ConnectWidgetViews.OTHER_WALLETS)}>Other Wallets</Button>
-    </div>
+  return(
+    <SimpleLayout 
+      header={
+        <HeaderNavigation
+          title='Connect a wallet' 
+          showClose
+        />
+      }
+      footer={<FooterLogo />}
+    >
+      <Box>
+        <Button 
+          testId='connect-passport'
+          onClick={() => dispatch(ConnectWidgetViews.PASSPORT)}>Passport</Button>
+        <Button 
+          testId='connect-other'
+          onClick={() => dispatch(ConnectWidgetViews.OTHER_WALLETS)}>Other Wallets</Button>
+      </Box>
+    </SimpleLayout>
   )
 }
