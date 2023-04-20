@@ -13,14 +13,11 @@ export interface TokenSelectProps {
 }
 
 const TokenSelect = ({ testId, onChange, token, connection, filter }: TokenSelectProps) => {
-  const checkout = new Checkout();
-  const allowList = checkout.getTokenAllowList({chainId: 1, type:TokenFilterTypes.SWAP}); // TODO: THIS NEEDS TO BE SET BACK TO THE NETWORK CHAIN ID
-
-  const sortedAllowList = alphaSortTokensList(allowList.tokens);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [option, setOption] = useState(token?.symbol || sortedAllowList[0]?.symbol);
-  const [icon, setIcon] = useState(token?.icon || sortedAllowList[0]?.icon)
+  const [option, setOption] = useState(token?.symbol);
+  const [icon, setIcon] = useState(token?.icon)
+  const [allowedList, setAllowedList] = useState<TokenInfo[]>([]);
 
   const toggleOpen = () => {
     setIsOpen(!isOpen);
@@ -36,6 +33,19 @@ const TokenSelect = ({ testId, onChange, token, connection, filter }: TokenSelec
     token && selectOption(token)
   }, [token, selectOption])
 
+  const getTokens = useCallback(async ()=>{
+    const checkout = new Checkout();
+
+    const allowList = await checkout.getTokenAllowList({chainId: 1, type:TokenFilterTypes.SWAP}); // TODO: THIS NEEDS TO BE SET BACK TO THE NETWORK CHAIN ID
+    const sortedAllowList = alphaSortTokensList(allowList.tokens);
+    setAllowedList(sortedAllowList);
+    setOption(sortedAllowList[0]?.symbol);
+    setIcon(sortedAllowList[0]?.icon);
+  },[]);
+  useEffect(()=>{
+    getTokens();
+  }, [getTokens])
+
   return (
     <Box sx={SelectStyle} onClick={() => toggleOpen()} >
       <Box testId={`${testId}__selected-option`} sx={SelectedOptionStyle}>
@@ -44,7 +54,7 @@ const TokenSelect = ({ testId, onChange, token, connection, filter }: TokenSelec
       </Box>
       {isOpen &&
         <Box sx={OptionsContainerStyle}>
-          {sortedAllowList.map((token) => {
+          {allowedList.map((token) => {
             return (!filter || filter.includes(token.address || "")) ? (
               <Box testId={`${testId}__option-${token.symbol}`} sx={OptionStyle} key={token.symbol} onClick={() => selectOption(token)} >
                 <img  style={{ width: '16px', height: '16px' }} src={token.icon} alt={token.symbol} />

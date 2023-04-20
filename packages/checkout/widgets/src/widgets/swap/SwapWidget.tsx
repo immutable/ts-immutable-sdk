@@ -1,5 +1,5 @@
 import { BiomeThemeProvider, Body, Box, Heading } from '@biom3/react';
-import { Checkout, ConnectResult } from '@imtbl/checkout-sdk-web';
+import { Checkout, ConnectResult, GetTokenAllowListResult, TokenFilterTypes, TokenInfo } from "@imtbl/checkout-sdk-web";
 import { ConnectionProviders, WidgetTheme } from '@imtbl/checkout-ui-types';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { SwapForm } from './components/SwapForm';
@@ -27,6 +27,7 @@ export interface SwapWidgetParams {
 
 export function SwapWidget(props: SwapWidgetProps) {
   const [connection, setConnection] = useState<ConnectResult>();
+  const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [view, setView] = useState(SwapWidgetViews.SWAP);
   const { params, theme } = props;
   const { amount, fromContractAddress, toContractAddress, providerPreference } = params;
@@ -36,7 +37,13 @@ export function SwapWidget(props: SwapWidgetProps) {
     const result = providerPreference && await checkout.connect({
       providerPreference
     });
-    result && setConnection(result);
+    if(result) {
+      setConnection(result);
+      const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
+        {chainId: 1, type: TokenFilterTypes.SWAP } // TODO: THIS NEEDS TO BE CHANGED BACK TO THE NETWORK CHAIN ID
+      )
+      setAllowedTokens(allowList.tokens)
+    }
   }, [checkout, providerPreference]);
 
   useEffect(() => {
@@ -59,7 +66,7 @@ export function SwapWidget(props: SwapWidgetProps) {
   const renderSwapForm = () => {
     if (!connection) return;
     return (
-      <SwapForm
+      <SwapForm allowedTokens={allowedTokens}
         amount={amount}
         fromContractAddress={fromContractAddress}
         toContractAddress={toContractAddress}
@@ -79,7 +86,7 @@ export function SwapWidget(props: SwapWidgetProps) {
       <Body>Failure</Body>
     )
   }
-  
+
   return (
     <BiomeThemeProvider theme={{ base: biomeTheme }}>
       <Box sx={SwapWidgetStyle}>
