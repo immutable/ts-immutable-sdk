@@ -1,8 +1,9 @@
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { TransfersApi, UnsignedTransferRequest } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
-import { Config } from '../config';
+import { PassportConfiguration } from '../config';
 import ConfirmationScreen from '../confirmation/confirmation';
 
 jest.mock('../confirmation/confirmation');
@@ -21,21 +22,14 @@ describe('transfer', () => {
     }));
   });
 
-  const passportConfig = {
-    network: Config.SANDBOX.network,
-    oidcConfiguration: {
-      authenticationDomain: Config.SANDBOX.authenticationDomain,
-      clientId: '',
-      logoutRedirectUri: '',
-      redirectUri: '',
-    },
-    imxAPIConfiguration: {
-      basePath: 'https://api.sandbox.x.immutable.com',
-    },
-    passportDomain: 'https://passport.sandbox.immutable.com',
-    magicPublishableApiKey: Config.SANDBOX.magicPublishableApiKey,
-    magicProviderId: Config.SANDBOX.magicProviderId,
-  };
+  const passportConfig = new PassportConfiguration({
+    baseConfig: new ImmutableConfiguration({
+      environment: Environment.SANDBOX,
+    }),
+    clientId: 'clientId123',
+    logoutRedirectUri: 'http://localhost:3000',
+    redirectUri: 'http://localhost:3000',
+  });
 
   describe('single transfer', () => {
     let getSignableTransferV1Mock: jest.Mock;

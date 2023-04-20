@@ -1,3 +1,4 @@
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
@@ -7,14 +8,16 @@ import { MAX_RETRIES } from './util/retry';
 
 jest.mock('oidc-client-ts');
 
-const config: PassportConfiguration = {
-  oidcConfiguration: {
-    clientId: '11111',
-    redirectUri: 'https://test.com',
-    authenticationDomain: 'https://auth.dev.immutable.com',
-    scope: 'email profile',
-  },
-} as PassportConfiguration;
+const baseConfig = new ImmutableConfiguration({
+  environment: Environment.SANDBOX,
+});
+const config = new PassportConfiguration({
+  baseConfig,
+  logoutRedirectUri: 'https://test.com',
+  clientId: '11111',
+  redirectUri: 'https://test.com',
+  scope: 'email profile',
+});
 
 const passportData = {
   passport: {
@@ -82,28 +85,27 @@ describe('AuthManager', () => {
 
   describe('constructor', () => {
     it('should initial AuthManager the configuration contains audience params', () => {
-      const configWithAudience: PassportConfiguration = {
-        oidcConfiguration: {
-          clientId: '11111',
-          redirectUri: 'https://test.com',
-          authenticationDomain: 'https://auth.dev.immutable.com',
-          scope: 'email profile',
-          audience: 'audience',
-        },
-      } as PassportConfiguration;
+      const configWithAudience = new PassportConfiguration({
+        baseConfig,
+        logoutRedirectUri: 'https://test.com',
+        clientId: '11111',
+        redirectUri: 'https://test.com',
+        scope: 'email profile',
+        audience: 'audience',
+      });
 
       new AuthManager(configWithAudience);
       expect(UserManager).toBeCalledWith({
-        authority: configWithAudience.oidcConfiguration.authenticationDomain,
+        authority: configWithAudience.authenticationDomain,
         client_id: configWithAudience.oidcConfiguration.clientId,
         loadUserInfo: true,
         mergeClaims: true,
         metadata: {
-          authorization_endpoint: `${configWithAudience.oidcConfiguration.authenticationDomain}/authorize`,
-          token_endpoint: `${configWithAudience.oidcConfiguration.authenticationDomain}/oauth/token`,
-          userinfo_endpoint: `${configWithAudience.oidcConfiguration.authenticationDomain}/userinfo`,
+          authorization_endpoint: `${configWithAudience.authenticationDomain}/authorize`,
+          token_endpoint: `${configWithAudience.authenticationDomain}/oauth/token`,
+          userinfo_endpoint: `${configWithAudience.authenticationDomain}/userinfo`,
           end_session_endpoint:
-            `${configWithAudience.oidcConfiguration.authenticationDomain}/v2/logout` +
+            `${configWithAudience.authenticationDomain}/v2/logout` +
             `?returnTo=${encodeURIComponent(
               configWithAudience.oidcConfiguration.logoutRedirectUri
             )}` +
@@ -122,16 +124,16 @@ describe('AuthManager', () => {
   it('should initial AuthManager the default configuration', () => {
     new AuthManager(config);
     expect(UserManager).toBeCalledWith({
-      authority: config.oidcConfiguration.authenticationDomain,
+      authority: config.authenticationDomain,
       client_id: config.oidcConfiguration.clientId,
       loadUserInfo: true,
       mergeClaims: true,
       metadata: {
-        authorization_endpoint: `${config.oidcConfiguration.authenticationDomain}/authorize`,
-        token_endpoint: `${config.oidcConfiguration.authenticationDomain}/oauth/token`,
-        userinfo_endpoint: `${config.oidcConfiguration.authenticationDomain}/userinfo`,
+        authorization_endpoint: `${config.authenticationDomain}/authorize`,
+        token_endpoint: `${config.authenticationDomain}/oauth/token`,
+        userinfo_endpoint: `${config.authenticationDomain}/userinfo`,
         end_session_endpoint:
-          `${config.oidcConfiguration.authenticationDomain}/v2/logout` +
+          `${config.authenticationDomain}/v2/logout` +
           `?returnTo=${encodeURIComponent(
             config.oidcConfiguration.logoutRedirectUri
           )}` +

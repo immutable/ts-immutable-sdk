@@ -1,7 +1,7 @@
 {
   "name": "@imtbl/economy-playground",
   "description": "Playground application for Immutable Economy SDK",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "dependencies": {
     "@imtbl/checkout-sdk-web": "0.0.0",
     "@imtbl/checkout-ui-types": "0.0.0",
@@ -23,7 +23,7 @@
   "engines": {
     "node": ">=16"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "npm run build:deps && npm run build:app",
     "build:app": "npm run clean && parcel build src/index.html --public-url ./",

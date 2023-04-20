@@ -1,13 +1,20 @@
-import { alphaSortTokensList, findTokenByAddress } from '../helpers';
-import { BigNumber, utils } from 'ethers';
-import { Box } from '@biom3/react';
-import { Buy } from './Buy';
-import { Checkout, ConnectResult, GetTokenAllowListResult, TokenInfo, Transaction} from '@imtbl/checkout-sdk-web';
-import { Fees } from './Fees';
-import { SwapButton } from './SwapButton';
-import { SwapWidgetViews } from '../SwapWidget';
-import { useState, useMemo } from 'react';
-import With from './With';
+import { alphaSortTokensList, findTokenByAddress } from "../helpers";
+import { BigNumber, utils } from "ethers";
+import { Box } from "@biom3/react";
+import { Buy } from "./Buy";
+import {
+  Checkout,
+  ConnectResult,
+  GetTokenAllowListResult,
+  TokenFilterTypes,
+  TokenInfo,
+  Transaction
+} from "@imtbl/checkout-sdk-web";
+import { Fees } from "./Fees";
+import { SwapButton } from "./SwapButton";
+import { SwapWidgetViews } from "../SwapWidget";
+import { useMemo, useState } from "react";
+import With from "./With";
 
 type AmountAndPercentage = {
   amount: {
@@ -66,7 +73,7 @@ export function SwapForm(props: SwapFormProps) {
 
   const checkout = useMemo(() => new Checkout(), []);
   const allowList: GetTokenAllowListResult = checkout.getTokenAllowList(
-    {chainId: 1} // TODO: THIS NEEDS TO BE CHANGED BACK TO THE NETWORK CHAIN ID
+    {chainId: 1, type: TokenFilterTypes.SWAP } // TODO: THIS NEEDS TO BE CHANGED BACK TO THE NETWORK CHAIN ID
   )
   const sortedAllowList: TokenInfo[] = alphaSortTokensList(allowList.tokens);
   const validatedAmount = isNaN(Number(amount)) ? BigNumber.from(0) : BigNumber.from(amount);

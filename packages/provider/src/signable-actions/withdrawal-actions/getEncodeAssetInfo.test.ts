@@ -35,7 +35,7 @@ describe('getEncodeAssetInfo', () => {
     const response = await getEncodeAssetInfo(
       assetType,
       tokenType,
-      testConfig.getStarkExConfig(),
+      testConfig.immutableXConfig,
       tokenData
     );
 

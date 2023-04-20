@@ -39,6 +39,7 @@
     "build:all": "wsrun --stages build",
     "lint": "wsrun --exclude-missing -e lint",
     "postinstall": "husky install",
+    "release": "release-it",
     "syncpack:check": "yarn syncpack list-mismatches",
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",

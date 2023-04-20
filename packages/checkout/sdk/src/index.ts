@@ -1,5 +1,10 @@
 export { Checkout } from './Checkout';
-export { ChainId, ConnectionProviders } from './types';
+export {
+  ChainId,
+  ConnectionProviders,
+  TokenFilterTypes,
+  WalletFilterTypes,
+} from './types';
 export type {
   CheckConnectionParams,
   CheckConnectionResult,
@@ -17,4 +22,9 @@ export type {
   GetAllBalancesResult,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
+  TokenFilter,
+  WalletFilter,
+  GetWalletAllowListParams,
+  GetWalletAllowListResult,
+  WalletInfo,
 } from './types';

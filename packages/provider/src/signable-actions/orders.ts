@@ -3,25 +3,25 @@ import {
   CreateOrderResponse,
   GetSignableCancelOrderRequest,
   GetSignableOrderRequest,
+  OrdersApi,
   OrdersApiCreateOrderRequest,
   UnsignedOrderRequest,
 } from '@imtbl/core-sdk';
 import { convertToSignableToken, signRaw } from '@imtbl/toolkit';
 import { Signers } from './types';
-import { Configuration } from '@imtbl/config';
-import { OrdersApi } from '@imtbl/core-sdk';
 import { validateChain } from './helpers';
+import { ProviderConfiguration } from '../config';
 
 type CreateOrderWorkflowParams = {
   signers: Signers;
   request: UnsignedOrderRequest;
-  config: Configuration;
+  config: ProviderConfiguration;
 };
 
 type CancelOrderWorkflowParams = {
   signers: Signers;
   request: GetSignableCancelOrderRequest;
-  config: Configuration;
+  config: ProviderConfiguration;
 };
 
 export async function createOrder({
@@ -29,10 +29,10 @@ export async function createOrder({
   request,
   config,
 }: CreateOrderWorkflowParams): Promise<CreateOrderResponse> {
-  await validateChain(signers.ethSigner, config.getStarkExConfig());
+  await validateChain(signers.ethSigner, config.immutableXConfig);
 
   const ethAddress = await signers.ethSigner.getAddress();
-  const ordersApi = new OrdersApi(config.getStarkExConfig().apiConfiguration);
+  const ordersApi = new OrdersApi(config.immutableXConfig.apiConfiguration);
 
   const amountSell = request.sell.type === 'ERC721' ? '1' : request.sell.amount;
   const amountBuy = request.buy.type === 'ERC721' ? '1' : request.buy.amount;
@@ -90,7 +90,7 @@ export async function cancelOrder({
   request,
   config,
 }: CancelOrderWorkflowParams): Promise<CancelOrderResponse> {
-  const ordersApi = new OrdersApi(config.getStarkExConfig().apiConfiguration);
+  const ordersApi = new OrdersApi(config.immutableXConfig.apiConfiguration);
 
   const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrder(
     {

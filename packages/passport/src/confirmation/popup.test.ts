@@ -10,14 +10,10 @@ describe('openPopupCenter', () => {
     screen: {},
   };
   const mockWindow = {
-    screenLeft: 100,
-    screenTop: 200,
-    innerWidth: 1200,
-    innerHeight: 800,
-    screen: {
-      availWidth: 1920,
-      height: 1080,
-    },
+    screenX: 100,
+    screenY: 200,
+    outerWidth: 1200,
+    outerHeight: 800,
     open: jest.fn().mockReturnValue(mockPopup),
   } as unknown as Window;
 
@@ -45,10 +41,10 @@ describe('openPopupCenter', () => {
     );
     expect(mockPopup.focus).toHaveBeenCalledTimes(1);
     const screenArgs = (mockWindow.open as jest.Mock).mock.calls[0][2];
-    expect(screenArgs.includes('width=1280')).toBeTruthy();
-    expect(screenArgs.includes('height=960')).toBeTruthy();
-    expect(screenArgs.includes('left=420')).toBeTruthy();
-    expect(screenArgs.includes('top=360')).toBeTruthy();
+    expect(screenArgs.includes('width=800')).toBeTruthy();
+    expect(screenArgs.includes('height=600')).toBeTruthy();
+    expect(screenArgs.includes('left=300')).toBeTruthy();
+    expect(screenArgs.includes('top=300')).toBeTruthy();
   });
 
   it('should throw an error if the new window fails to open', () => {

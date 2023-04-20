@@ -1,20 +1,21 @@
 import {
+  Contracts,
   RegisterUserResponse,
   GetSignableRegistrationResponse,
   EthSigner,
+  UsersApi,
 } from '@imtbl/core-sdk';
 import { Signers } from './types';
 import { validateChain } from './helpers';
-import { Contracts, UsersApi } from '@imtbl/core-sdk';
 import { signRaw } from '@imtbl/toolkit';
-import { Configuration } from '@imtbl/config';
+import { ProviderConfiguration } from '../config';
 
 export async function registerOffchain(
   signers: Signers,
-  config: Configuration
+  config: ProviderConfiguration
 ): Promise<RegisterUserResponse> {
-  await validateChain(signers.ethSigner, config.getStarkExConfig());
-  const usersApi = new UsersApi(config.getStarkExConfig().apiConfiguration);
+  await validateChain(signers.ethSigner, config.immutableXConfig);
+  const usersApi = new UsersApi(config.immutableXConfig.apiConfiguration);
 
   const userAddress = await signers.ethSigner.getAddress();
   const starkPublicKey = await signers.starkExSigner.getAddress();
@@ -52,12 +53,12 @@ interface IsRegisteredCheckError {
 export async function isRegisteredOnChain(
   starkPublicKey: string,
   ethSigner: EthSigner,
-  config: Configuration
+  config: ProviderConfiguration
 ): Promise<boolean> {
-  await validateChain(ethSigner, config.getStarkExConfig());
+  await validateChain(ethSigner, config.immutableXConfig);
 
   const registrationContract = Contracts.Registration.connect(
-    config.getStarkExConfig().ethConfiguration.registrationContractAddress,
+    config.immutableXConfig.ethConfiguration.registrationContractAddress,
     ethSigner
   );
 

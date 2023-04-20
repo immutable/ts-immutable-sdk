@@ -1,6 +1,6 @@
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
-import { Config } from './config';
 import { Passport } from './Passport';
 import { getStarkSigner } from './stark';
 import { OidcConfiguration, User } from './types';
@@ -61,7 +61,12 @@ describe('Passport', () => {
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,
     });
-    passport = new Passport(Config.SANDBOX, oidcConfiguration);
+    passport = new Passport({
+      baseConfig: new ImmutableConfiguration({
+        environment: Environment.SANDBOX,
+      }),
+      ...oidcConfiguration,
+    });
   });
 
   describe('connectImx', () => {

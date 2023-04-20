@@ -1,36 +1,18 @@
-import {
-  ImmutableXConfiguration as CoreSDKConfig,
-  Config as CoreSDKConfigOptions,
-} from '@imtbl/core-sdk';
-
 export enum Environment {
-  DEVELOPMENT = 'development',
-  SANDBOX = 'sandbox',
   PRODUCTION = 'production',
+  SANDBOX = 'sandbox',
 }
+export class ImmutableConfiguration {
+  readonly environment: Environment;
+  readonly apiKey?: string;
 
-type StarkExConfig = CoreSDKConfig & {
-  env: Environment;
-};
-
-export class Configuration {
-  private readonly starkExConfig: StarkExConfig;
-
-  constructor(config: StarkExConfig) {
-    this.starkExConfig = config;
-  }
-
-  public getStarkExConfig(): StarkExConfig {
-    return this.starkExConfig;
+  constructor(options: { environment: Environment; apiKey?: string }) {
+    this.environment = options.environment;
+    this.apiKey = options.apiKey;
   }
 }
 
-export const PRODUCTION: StarkExConfig = {
-  ...CoreSDKConfigOptions.PRODUCTION,
-  env: Environment.PRODUCTION,
-};
-
-export const SANDBOX: StarkExConfig = {
-  ...CoreSDKConfigOptions.SANDBOX,
-  env: Environment.SANDBOX,
-};
+export interface ModuleConfiguration<T> {
+  baseConfig: ImmutableConfiguration;
+  overrides?: T;
+}
