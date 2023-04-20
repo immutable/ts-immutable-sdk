@@ -1,4 +1,11 @@
 /**
+ * Event types for Custom Event Subscriptions
+ */
+export enum CustomEventTypes {
+  ECONOMY = 'imtbl-economy-event',
+}
+
+/**
  * Generic status use to track progress in any SDK action
  */
 export type EventStatus = 'INITIAL' | 'IN_PROGRESS' | 'COMPLETE' | 'FAILED';

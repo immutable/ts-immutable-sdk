@@ -1,5 +1,6 @@
 import { Subject, Subscription } from 'rxjs';
 
+import { CustomEventTypes } from './types';
 import type { EventStatus, IEventType } from './types';
 
 /** Standard SDK Configuration interface */
@@ -58,7 +59,7 @@ export abstract class SDK<ActionType extends string> {
   }
 
   /**
-   * Notify observers of lifecycle event
+   * Notify observers of a lifecycle event
    * @param type action event type
    * @param status action event status
    */
@@ -66,7 +67,35 @@ export abstract class SDK<ActionType extends string> {
     type: ActionType,
     status: S
   ): void {
+    this.emitNativeEvent({ type, status });
     this.events$$.next({ type, status });
+  }
+
+  /**
+   * Notify DOM listeners of a lifecycle event
+   * @param detail event payload
+   */
+  private emitNativeEvent<T>(detail: T): void {
+    if (!this.isClientSide) {
+      this.log(
+        'Cannot dispatch native event: not running in a browser environment'
+      );
+      return;
+    }
+
+    const event = new CustomEvent<T>(CustomEventTypes.ECONOMY, {
+      detail,
+      bubbles: true,
+      cancelable: true,
+    });
+    document.dispatchEvent(event);
+  }
+
+  /**
+   * Utility: Checks if the class was mounted in a browser environment
+   */
+  private get isClientSide(): boolean {
+    return typeof window !== 'undefined' && typeof document !== 'undefined';
   }
 
   /**
