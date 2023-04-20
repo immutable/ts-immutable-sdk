@@ -18,21 +18,24 @@ import {
   getERC20Decimals,
   validateDifferentAddresses,
 } from './lib/utils';
-import { QuoteResponse, TransactionResponse } from './types';
+import {
+  DexModuleConfiguration,
+  QuoteResponse,
+  TransactionResponse,
+} from './types';
 import { createSwapParameters } from './lib/swap';
 import { POLYGON_TESTNET_CHAIN_ID } from './constants/tokens/polygon';
 import { MAX_MAX_HOPS } from './constants';
+import { DexConfiguration } from './config/config';
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;
   private router: Router;
   private chainId: number;
 
-  constructor(chainId?: number) {
-    if (!chainId) {
-      chainId = POLYGON_TESTNET_CHAIN_ID; // TODO: What configuration object should we expect here?
-    }
-    this.chainId = chainId;
+  constructor(configuration: DexModuleConfiguration) {
+    const config = new DexConfiguration(configuration);
+    this.chainId = config.chainId;
     this.provider = new ethers.providers.JsonRpcProvider(
       POLYGON_ZKEVM_TESTNET_RPC_URL
     ); // TODO add logic for fallback RPCs

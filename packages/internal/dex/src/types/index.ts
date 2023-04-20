@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import { Currency, TradeType } from '@uniswap/sdk-core';
 import { Route } from '@uniswap/v3-sdk';
+import { ModuleConfiguration } from '@imtbl/config/src';
 
 export type TradeInfo = {
   route: Route<Currency, Currency>;
@@ -30,3 +31,10 @@ export type TransactionResponse =
       success: false;
       transactionRequest: undefined;
     };
+
+export interface DexOverrides {
+  chainId: number;
+}
+
+export interface DexModuleConfiguration
+  extends ModuleConfiguration<DexOverrides> {}
