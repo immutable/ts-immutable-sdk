@@ -84,7 +84,7 @@ describe('trades', () => {
 
       tradesApiMock = {
         getSignableTrade: getSignableTradeMock,
-        createTrade: createTradeMock,
+        createTradeV3: createTradeMock,
       } as unknown as TradesApi;
 
       (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
