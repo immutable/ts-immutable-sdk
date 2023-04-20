@@ -10,7 +10,14 @@ function SwitchNetwork(props: SwitchNetworkProps) {
   const { provider } = props;
 
   async function switchNetwork(chainId: ChainId) {
-    if (provider) await checkout.switchNetwork({ provider, chainId });
+    if (provider)
+      try {
+        await checkout.switchNetwork({ provider, chainId });
+      } catch (err: any) {
+        console.error(err);
+        console.log(err.type);
+        console.log(err.data);
+      }
   }
 
   return (

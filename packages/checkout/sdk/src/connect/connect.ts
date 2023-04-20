@@ -20,10 +20,23 @@ export async function checkIsWalletConnected(
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
     );
   }
-  const accounts = await provider.provider.request({
-    method: WALLET_ACTION.CHECK_CONNECTION,
-    params: [],
-  });
+
+  let accounts = [];
+  try {
+    accounts = await provider.provider.request({
+      method: WALLET_ACTION.CHECK_CONNECTION,
+      params: [],
+    });
+  } catch (err: any) {
+    throw new CheckoutError(
+      `Check wallet connection request failed`,
+      CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR,
+      {
+        ...err,
+        rpcMethod: WALLET_ACTION.CHECK_CONNECTION,
+      }
+    );
+  }
   // accounts[0] will have the active account if connected.
 
   return {
@@ -43,8 +56,8 @@ export async function connectWalletProvider(
     async () => {
       if (!web3Provider || !web3Provider?.provider?.request) {
         throw new CheckoutError(
-          'No MetaMask provider installed.',
-          CheckoutErrorType.METAMASK_PROVIDER_ERROR
+          'Incompatible provider',
+          CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
         );
       }
       // this makes the request to the wallet to connect i.e request eth accounts ('eth_requestAccounts')
@@ -59,7 +72,7 @@ export async function connectWalletProvider(
   return web3Provider;
 }
 
-async function getWalletProviderForPreference(
+export async function getWalletProviderForPreference(
   providerPreference: ConnectionProviders
 ): Promise<Web3Provider> {
   let web3Provider: Web3Provider | null = null;
@@ -77,7 +90,7 @@ async function getWalletProviderForPreference(
   return web3Provider;
 }
 
-async function getMetaMaskProvider(): Promise<Web3Provider> {
+export async function getMetaMaskProvider(): Promise<Web3Provider> {
   const provider = await withCheckoutError<ExternalProvider | null>(
     async () => {
       return await detectEthereumProvider();

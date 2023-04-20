@@ -1,5 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
-import { CheckoutError, CheckoutErrorType } from '../errors';
+import {
+  CheckoutError,
+  CheckoutErrorType,
+  CheckoutInternalError,
+  CheckoutInternalErrorType,
+} from '../errors';
 import {
   ChainId,
   ChainIdNetworkMap,
@@ -10,6 +16,8 @@ import {
   WALLET_ACTION,
 } from '../types';
 import networkMasterList from './network_master_list.json';
+
+const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 
 export async function getNetworkInfo(
   provider: Web3Provider
@@ -37,34 +45,54 @@ export async function switchWalletNetwork(
   provider: Web3Provider,
   chainId: ChainId
 ): Promise<SwitchNetworkResult> {
-  if (!Object.values(ChainId).includes(chainId))
+  if (!Object.values(ChainId).includes(chainId)) {
     throw new CheckoutError(
       `${chainId} is not a supported chain`,
       CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR
     );
-  if (!provider.provider?.request)
+  }
+
+  if (!provider.provider?.request) {
     throw new CheckoutError(
-      'provider object is missing request function',
+      'Incompatible provider',
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
     );
+  }
+
   // WT-1146 - Refer to the README in this folder for explantion on the switch network flow
   try {
     await switchNetworkInWallet(provider, chainId);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line
   } catch (err: any) {
-    if (err.message.includes('Unrecognized chain ID')) {
+    if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE) {
       try {
         await addNetworkToWallet(provider, chainId);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+        if ((await provider.getNetwork()).chainId !== chainId) {
+          // user didn't actually switch
+          throw new CheckoutInternalError(
+            CheckoutInternalErrorType.REJECTED_SWITCH_AFTER_ADDING_NETWORK
+          );
+        }
       } catch (err: any) {
+        if (
+          err?.type ===
+          CheckoutInternalErrorType.REJECTED_SWITCH_AFTER_ADDING_NETWORK
+        ) {
+          throw new CheckoutError(
+            'User cancelled switch network request',
+            CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
+          );
+        }
+
         throw new CheckoutError(
-          'user cancelled the add network request',
+          'User cancelled add network request',
           CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
         );
       }
     } else {
       throw new CheckoutError(
-        'user cancelled the switch network request',
+        'User cancelled switch network request',
         CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
       );
     }
