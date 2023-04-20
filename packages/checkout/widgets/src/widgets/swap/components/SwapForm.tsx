@@ -3,17 +3,14 @@ import { BigNumber, utils } from "ethers";
 import { Box } from "@biom3/react";
 import { Buy } from "./Buy";
 import {
-  Checkout,
   ConnectResult,
-  GetTokenAllowListResult,
-  TokenFilterTypes,
   TokenInfo,
   Transaction
 } from "@imtbl/checkout-sdk-web";
 import { Fees } from "./Fees";
 import { SwapButton } from "./SwapButton";
 import { SwapWidgetViews } from "../SwapWidget";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import With from "./With";
 
 type AmountAndPercentage = {
@@ -60,6 +57,7 @@ export interface SwapFormProps {
   toContractAddress?: string;
   connection: ConnectResult;
   updateView: (view: SwapWidgetViews, err?: any) => void;
+  allowedTokens: TokenInfo[];
 }
 
 export function SwapForm(props: SwapFormProps) {
@@ -68,14 +66,11 @@ export function SwapForm(props: SwapFormProps) {
     fromContractAddress,
     toContractAddress,
     connection,
+    allowedTokens,
     updateView
   } = props;
 
-  const checkout = useMemo(() => new Checkout(), []);
-  const allowList: GetTokenAllowListResult = checkout.getTokenAllowList(
-    {chainId: 1, type: TokenFilterTypes.SWAP } // TODO: THIS NEEDS TO BE CHANGED BACK TO THE NETWORK CHAIN ID
-  )
-  const sortedAllowList: TokenInfo[] = alphaSortTokensList(allowList.tokens);
+  const sortedAllowList: TokenInfo[] = alphaSortTokensList(allowedTokens);
   const validatedAmount = isNaN(Number(amount)) ? BigNumber.from(0) : BigNumber.from(amount);
   const [buyAmount, setBuyAmount] = useState<BigNumber>(validatedAmount || 0);
   const [buyToken, setBuyToken] = useState<TokenInfo>(

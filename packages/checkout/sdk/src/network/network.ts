@@ -15,13 +15,18 @@ export async function getNetworkInfo(
 
   if (!Object.values(ChainId).includes(network.chainId as ChainId)) {
     // return empty details
-    return {} as NetworkInfo;
+    return {
+      chainId: network.chainId,
+      name: network.name,
+      isSupported: false,
+    } as NetworkInfo;
   }
   const chainIdNetworkInfo = ChainIdNetworkMap[network.chainId as ChainId];
   const networkInfo = {
     name: chainIdNetworkInfo.chainName,
     chainId: parseInt(chainIdNetworkInfo.chainIdHex, 16),
     nativeCurrency: chainIdNetworkInfo.nativeCurrency,
+    isSupported: true,
   };
   return networkInfo;
 }

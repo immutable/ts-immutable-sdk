@@ -6,11 +6,11 @@ import {
 } from '../types';
 import masterTokenList from './token_master_list.json';
 
-export const getTokenAllowList = function ({
+export const getTokenAllowList = async function ({
   type = TokenFilterTypes.ALL,
   chainId,
   exclude,
-}: GetTokenAllowListParams): GetTokenAllowListResult {
+}: GetTokenAllowListParams): Promise<GetTokenAllowListResult> {
   // todo:For API call, use the CheckoutError with errorType:API_CALL_ERROR?? or any other
 
   const filteredTokenList = masterTokenList

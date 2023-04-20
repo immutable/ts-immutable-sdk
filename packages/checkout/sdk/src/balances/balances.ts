@@ -19,6 +19,14 @@ export const getBalance = async (
   return await withCheckoutError<GetBalanceResult>(
     async () => {
       const networkInfo = await getNetworkInfo(provider);
+
+      if (!networkInfo.isSupported) {
+        throw new CheckoutError(
+          'Unsupported Network',
+          CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR
+        );
+      }
+
       const balance = await provider.getBalance(walletAddress);
       return {
         balance,
@@ -81,7 +89,7 @@ export const getAllBalances = async (
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
     );
 
-  const tokenList = getTokenAllowList({
+  const tokenList = await getTokenAllowList({
     type: TokenFilterTypes.ALL,
     chainId,
   });

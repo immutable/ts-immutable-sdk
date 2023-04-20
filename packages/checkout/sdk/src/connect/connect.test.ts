@@ -194,7 +194,11 @@ describe('connect', () => {
       const result = await getNetworkInfo(
         mockProvider as unknown as Web3Provider
       );
-      expect(result).toEqual({});
+      expect(result).toEqual({
+        chainId: 3,
+        name: 'ropsten',
+        isSupported: false,
+      });
     });
   });
 });

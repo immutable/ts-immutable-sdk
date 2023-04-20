@@ -4,6 +4,7 @@ import * as connect from './connect';
 import * as wallet from './wallet';
 import { getNetworkInfo, switchWalletNetwork } from './network';
 import * as transaction from './transaction';
+import { Web3Provider } from '@ethersproject/providers';
 import {
   CheckConnectionParams,
   CheckConnectionResult,
@@ -17,11 +18,13 @@ import {
   GetTokenAllowListResult,
   GetWalletAllowListParams,
   GetWalletAllowListResult,
+  NetworkInfo,
   SendTransactionParams,
   SendTransactionResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
 } from './types';
+import { withCheckoutError, CheckoutErrorType } from './errors';
 
 export class Checkout {
   public async checkIsWalletConnected(
@@ -67,10 +70,10 @@ export class Checkout {
     );
   }
 
-  public getTokenAllowList(
+  public async getTokenAllowList(
     params: GetTokenAllowListParams
-  ): GetTokenAllowListResult {
-    return tokens.getTokenAllowList(params);
+  ): Promise<GetTokenAllowListResult> {
+    return await tokens.getTokenAllowList(params);
   }
 
   public async getWalletsAllowList(
@@ -83,5 +86,11 @@ export class Checkout {
     params: SendTransactionParams
   ): Promise<SendTransactionResult> {
     return await transaction.sendTransaction(params);
+  }
+
+  public async getNetworkInfo(provider: Web3Provider): Promise<NetworkInfo> {
+    return await withCheckoutError(() => getNetworkInfo(provider), {
+      type: CheckoutErrorType.GET_NETWORK_INFO_ERROR,
+    });
   }
 }
