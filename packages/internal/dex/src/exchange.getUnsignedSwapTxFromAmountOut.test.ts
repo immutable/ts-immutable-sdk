@@ -6,6 +6,7 @@ import {
   decodeMulticallData,
   mockRouterImplementation,
   setupSwapTxTest,
+  TestDexConfiguration,
 } from './utils/testUtils';
 import * as utils from './lib/utils';
 
@@ -28,7 +29,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
-      const exchange = new Exchange(params.chainID);
+      const exchange = new Exchange(TestDexConfiguration);
 
       const provider = new ethers.providers.JsonRpcProvider(
         process.env.RPC_URL
@@ -74,7 +75,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
-      const exchange = new Exchange(params.chainID);
+      const exchange = new Exchange(TestDexConfiguration);
 
       const tx = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
@@ -116,7 +117,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
-      const exchange = new Exchange(params.chainID);
+      const exchange = new Exchange(TestDexConfiguration);
 
       const tx = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
@@ -153,7 +154,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const higherSlippage = new Percent(2, 1000); // 0.2%
       const params = setupSwapTxTest(higherSlippage);
 
-      const exchange = new Exchange(params.chainID);
+      const exchange = new Exchange(TestDexConfiguration);
 
       const invalidAddress = '0x0123abcdef';
 
@@ -197,7 +198,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const exchange = new Exchange(params.chainID);
+      const exchange = new Exchange(TestDexConfiguration);
 
       await expect(
         exchange.getUnsignedSwapTxFromAmountOut(

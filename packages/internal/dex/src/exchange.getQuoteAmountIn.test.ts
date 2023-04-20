@@ -1,4 +1,4 @@
-import { expect, describe, it } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import { ethers } from 'ethers';
 import { Exchange } from './exchange';
 import { Router } from './lib/router';
@@ -7,8 +7,10 @@ import { FeeAmount, Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import {
   IMX_TEST_CHAIN,
   TEST_CHAIN_ID,
+  TestDexConfiguration,
   WETH_TEST_CHAIN,
 } from './utils/testUtils';
+import { DexConfiguration } from './config/config';
 
 jest.mock('./lib/router');
 jest.mock('./lib/utils', () => {
@@ -18,6 +20,8 @@ jest.mock('./lib/utils', () => {
     getERC20Decimals: async () => 18,
   };
 });
+
+jest.mock('./config/config');
 
 const chainId: number = TEST_CHAIN_ID;
 const wethToken: Token = WETH_TEST_CHAIN;
@@ -75,7 +79,9 @@ describe('getQuoteFromAmountIn', () => {
         };
       });
 
-      const exchange = new Exchange(chainId);
+      const configuration = new DexConfiguration(TestDexConfiguration);
+      configuration.chainId = TestDexConfiguration.overrides?.chainId as number;
+      const exchange = new Exchange(configuration);
       const result = await exchange.getQuoteFromAmountIn(
         wethToken.address,
         imxToken.address,
@@ -108,7 +114,8 @@ describe('getQuoteFromAmountIn', () => {
         };
       });
 
-      const exchange = new Exchange(chainId);
+      const configuration = new DexConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
       const result = await exchange.getQuoteFromAmountIn(
         wethToken.address,
         imxToken.address,
@@ -136,7 +143,8 @@ describe('getQuoteFromAmountIn', () => {
         };
       });
 
-      const exchange = new Exchange(chainId);
+      const configuration = new DexConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
       const result = await exchange.getQuoteFromAmountIn(
         wethToken.address,
         imxToken.address,

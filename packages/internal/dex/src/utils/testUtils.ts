@@ -1,15 +1,18 @@
 import {
+  Currency,
+  Fraction,
   Percent,
   Token,
-  Fraction,
   TradeType,
-  Currency,
 } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { hexDataSlice } from 'ethers/lib/utils';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
-import { Router, TradeInfo } from '../lib';
+import { DexModuleConfiguration, Router, TradeInfo } from '../lib';
+import { Environment, ImmutableConfiguration } from '@imtbl/config/src';
+import { POLYGON_TESTNET_CHAIN_ID } from '../constants/tokens/polygon';
+import { DexConfiguration } from '../config/config';
 
 export const testChainId: number = 1;
 
@@ -17,6 +20,18 @@ export const TEST_CHAIN_ID = 999;
 export const TEST_RPC_URL = 'https://0.net';
 
 export const TEST_FROM_ADDRESS = '0x94fC2BcA2E71e26D874d7E937d89ce2c9113af6e';
+
+export const TestImmutableConfiguration: ImmutableConfiguration =
+  new ImmutableConfiguration({
+    environment: Environment.SANDBOX,
+  });
+
+export const TestDexConfiguration: DexModuleConfiguration = {
+  baseConfig: TestImmutableConfiguration,
+  overrides: {
+    chainId: TEST_CHAIN_ID,
+  },
+};
 
 export const IMX_TEST_CHAIN = new Token(
   TEST_CHAIN_ID,
@@ -127,7 +142,8 @@ export function getMaximumAmountIn(
 
 export type SwapTest = {
   fromAddress: string;
-  chainID: number;
+
+  chainId: number;
 
   arbitraryTick: number;
   arbitraryLiquidity: number;
@@ -158,7 +174,7 @@ export function setupSwapTxTest(slippage: Percent): SwapTest {
 
   return {
     fromAddress: fromAddress,
-    chainID: TEST_CHAIN_ID,
+    chainId: TEST_CHAIN_ID,
 
     arbitraryTick: arbitraryTick,
     arbitraryLiquidity: arbitraryLiquidity,

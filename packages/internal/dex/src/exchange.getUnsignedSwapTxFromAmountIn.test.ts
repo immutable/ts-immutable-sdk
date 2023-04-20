@@ -5,6 +5,7 @@ import {
   decodeMulticallData,
   mockRouterImplementation,
   setupSwapTxTest,
+  TestDexConfiguration,
 } from './utils/testUtils';
 import * as utils from './lib/utils';
 
@@ -28,7 +29,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const exchange = new Exchange(params.chainID);
+      const exchange = new Exchange(TestDexConfiguration);
 
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
@@ -63,7 +64,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const exchange = new Exchange(params.chainID);
+      const exchange = new Exchange(TestDexConfiguration);
 
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
@@ -98,7 +99,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const higherSlippage = new Percent(2, 1000); // 0.2%
       const params = setupSwapTxTest(higherSlippage);
 
-      const exchange = new Exchange(params.chainID);
+      const exchange = new Exchange(TestDexConfiguration);
 
       const invalidAddress = '0x0123abcdef';
 
@@ -142,7 +143,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const exchange = new Exchange(params.chainID);
+      const exchange = new Exchange(TestDexConfiguration);
 
       await expect(
         exchange.getUnsignedSwapTxFromAmountIn(

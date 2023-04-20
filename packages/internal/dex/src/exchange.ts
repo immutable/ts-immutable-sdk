@@ -33,9 +33,8 @@ export class Exchange {
   private router: Router;
   private chainId: number;
 
-  constructor(configuration: DexModuleConfiguration) {
-    const config = new DexConfiguration(configuration);
-    this.chainId = config.chainId;
+  constructor(configuration: DexConfiguration) {
+    this.chainId = configuration.chainId;
     this.provider = new ethers.providers.JsonRpcProvider(
       POLYGON_ZKEVM_TESTNET_RPC_URL
     ); // TODO add logic for fallback RPCs
@@ -210,6 +209,7 @@ export class Exchange {
       getERC20Decimals(tokenInAddress, this.provider),
       getERC20Decimals(tokenOutAddress, this.provider),
     ]);
+    console.log('----', this.chainId);
     const tokenIn: Token = new Token(
       this.chainId,
       tokenInAddress,

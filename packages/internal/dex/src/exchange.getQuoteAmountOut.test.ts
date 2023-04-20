@@ -7,8 +7,12 @@ import { FeeAmount, Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import {
   IMX_TEST_CHAIN,
   TEST_CHAIN_ID,
+  TestDexConfiguration,
   WETH_TEST_CHAIN,
 } from './utils/testUtils';
+import { DexModuleConfiguration } from './types';
+import { Environment, ImmutableConfiguration } from '@imtbl/config/src';
+import { POLYGON_TESTNET_CHAIN_ID } from './constants/tokens/polygon';
 
 jest.mock('./lib/router');
 jest.mock('./lib/utils', () => {
@@ -75,7 +79,7 @@ describe('getQuoteFromAmountOut', () => {
         };
       });
 
-      const uniswap = new Exchange(chainId);
+      const uniswap = new Exchange(TestDexConfiguration);
       const result = await uniswap.getQuoteFromAmountOut(
         wethToken.address,
         imxToken.address,
@@ -108,7 +112,7 @@ describe('getQuoteFromAmountOut', () => {
         };
       });
 
-      const uniswap = new Exchange(chainId);
+      const uniswap = new Exchange(TestDexConfiguration);
       const result = await uniswap.getQuoteFromAmountOut(
         wethToken.address,
         imxToken.address,
@@ -136,7 +140,7 @@ describe('getQuoteFromAmountOut', () => {
         };
       });
 
-      const uniswap = new Exchange(chainId);
+      const uniswap = new Exchange(TestDexConfiguration);
       const result = await uniswap.getQuoteFromAmountOut(
         wethToken.address,
         imxToken.address,
