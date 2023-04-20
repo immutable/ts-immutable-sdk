@@ -14,25 +14,27 @@ export const SimpleLayout = ({ header, footer, children, heroImage, floatHeader 
   return (
     <Box sx={SimpleLayoutStyle}>
       {header && 
-        <Box sx={(floatHeader ? FloatingHeader : RelativeHeader)}>
+        <Box id="header" sx={(floatHeader ? FloatingHeader : RelativeHeader)}>
           {header}
         </Box>
       }
-      <Box sx={{flex: 'auto'}}>
+      <Box id="body" sx={{flex: 'auto'}}>
         {heroImage && 
-          <Box sx={{height: '50%'}}>
+          <Box id="hero-image" sx={{height: '50%'}}>
             <img alt="hello" src={heroImage} height={'100%'} />
           </Box>
         }
         {children && <Box sx={{flex: 1}}>{children}</Box>}
       </Box>
-      {footer && <Box sx={{
-        height: '10%', 
-        display: 'flex', 
-        flexDirection: 'row', 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        }}>{footer}</Box>}
+      {footer && <Box 
+        id="footer" 
+        sx={{
+          height: '10%', 
+          display: 'flex', 
+          flexDirection: 'row', 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          }}>{footer}</Box>}
     </Box>
   )
 }
