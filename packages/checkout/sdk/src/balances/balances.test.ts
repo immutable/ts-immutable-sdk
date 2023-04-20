@@ -1,9 +1,18 @@
 import { getAllBalances, getBalance, getERC20Balance } from './balances';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
-import { ChainId, ERC20ABI, GetAllBalancesResult, NetworkInfo } from '../types';
+import {
+  ChainId,
+  ERC20ABI,
+  GetAllBalancesResult,
+  GetTokenAllowListResult,
+  NetworkInfo,
+  TokenInfo,
+} from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
+import * as tokens from '../tokens';
 
+jest.mock('../tokens');
 jest.mock('ethers', () => {
   return {
     ...jest.requireActual('ethers'),
@@ -160,8 +169,30 @@ describe('balances', () => {
 
     let mockGetBalance: jest.Mock;
     let mockGetNetwork: jest.Mock;
+
+    let getTokenAllowListMock: jest.Mock;
+
     beforeEach(() => {
       jest.restoreAllMocks();
+      getTokenAllowListMock = jest.fn().mockReturnValue({
+        tokens: [
+          {
+            name: 'Immutable X',
+            address: '0xaddr',
+            symbol: 'IMX',
+            decimals: 18,
+          } as TokenInfo,
+          {
+            name: 'Matic',
+            address: '0xmaticAddr',
+            symbol: 'MATIC',
+            decimals: '18',
+          },
+        ],
+      } as GetTokenAllowListResult);
+      (tokens.getTokenAllowList as jest.Mock).mockImplementation(
+        getTokenAllowListMock
+      );
 
       mockGetBalance = jest.fn().mockResolvedValue(currentBalance);
 
@@ -228,7 +259,7 @@ describe('balances', () => {
               name: 'Immutable X',
               symbol: 'IMX',
               decimals: 18,
-              address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF', //from token master list
+              address: '0xaddr',
             },
           },
           {
@@ -238,7 +269,7 @@ describe('balances', () => {
               name: 'Matic',
               symbol: 'MATIC',
               decimals: 18,
-              address: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0', //from token master list
+              address: '0xmaticAddr',
             },
           },
         ],

@@ -67,10 +67,10 @@ export class Checkout {
     );
   }
 
-  public getTokenAllowList(
+  public async getTokenAllowList(
     params: GetTokenAllowListParams
-  ): GetTokenAllowListResult {
-    return tokens.getTokenAllowList(params);
+  ): Promise<GetTokenAllowListResult> {
+    return await tokens.getTokenAllowList(params);
   }
 
   public async getWalletsAllowList(

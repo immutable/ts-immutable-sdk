@@ -81,7 +81,7 @@ export const getAllBalances = async (
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
     );
 
-  const tokenList = getTokenAllowList({
+  const tokenList = await getTokenAllowList({
     type: TokenFilterTypes.ALL,
     chainId,
   });
