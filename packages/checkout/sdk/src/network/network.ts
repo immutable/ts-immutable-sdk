@@ -83,9 +83,9 @@ export async function switchWalletNetwork(
   } as SwitchNetworkResult;
 }
 
-export function getNetworkAllowList({
+export async function getNetworkAllowList({
   exclude,
-}: GetNetworkAllowListParams): GetNetworkAllowListResult {
+}: GetNetworkAllowListParams): Promise<GetNetworkAllowListResult> {
   return {
     networks: networkAllowMasterList.filter(
       (network) =>

@@ -229,8 +229,8 @@ describe('network functions', () => {
   });
 
   describe('getNetworkAllowList()', () => {
-    it('should return all the networks if no exclude filter is provided', () => {
-      expect(getNetworkAllowList({})).toEqual({
+    it('should return all the networks if no exclude filter is provided', async () => {
+      await expect(await getNetworkAllowList({})).toEqual({
         networks: [
           {
             name: 'Ethereum',
@@ -256,8 +256,10 @@ describe('network functions', () => {
       });
     });
 
-    it('should exclude the right networks if an exclude filter is provided', () => {
-      expect(getNetworkAllowList({ exclude: [{ chainId: 5 }] })).toEqual({
+    it('should exclude the right networks if an exclude filter is provided', async () => {
+      await expect(
+        await getNetworkAllowList({ exclude: [{ chainId: 5 }] })
+      ).toEqual({
         networks: [
           {
             name: 'Ethereum',
