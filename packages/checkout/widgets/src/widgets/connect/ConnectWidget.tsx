@@ -13,7 +13,10 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens'
 import { ConnectActions, ConnectContext, connectReducer, initialConnectState } from './context/ConnectContext'
 import { initialViewState, ViewActions, ViewContext, viewReducer } from '../../context/ViewContext';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
-import { ConnectAWallet } from './components/connect-a-wallet/ConnectAWallet';
+import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
+import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
+import { HeaderNavigation } from '../../components/HeaderNavigation';
+import { FooterLogo } from '../../components/Footer/FooterLogo';
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
   theme: WidgetTheme;
@@ -63,42 +66,38 @@ export function ConnectWidget(props:ConnectWidgetProps) {
     console.log("Connect Widget current view ", viewState.view.type);
   }, [viewState.view.type])
 
+  const renderOutcome = () => {
+    return (
+    <SimpleLayout 
+      header={
+        <HeaderNavigation
+          showClose
+          showBack
+        />
+      }
+      footer={<FooterLogo />}
+      >
+        {viewState.view.type === ConnectWidgetViews.SUCCESS && <Body style={{color:'#FFF'}}>User connected</Body>}
+        {viewState.view.type === ConnectWidgetViews.FAIL && <Body style={{color:'#FFF'}}>User did not connect</Body>}
+    </SimpleLayout>)
+  }
+
   return (
     <BiomeThemeProvider theme={{base: biomeTheme}}>
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         <ConnectContext.Provider value={{ connectState, connectDispatch }}>
-          {/** We want to move towards this pattern with each view being conditionally
-           * rendered based upon the current viewState
-           * These views are components which are made up of a layout and content components
-           * and handle the behaviour of the view 
-           */}
-          {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && 
-            <ConnectAWallet />
-          }
-          <Box 
-            testId="other-wallets" 
-            sx={(viewState.view.type === ConnectWidgetViews.OTHER_WALLETS) ? ActiveStyle : InactiveStyle}
-          >
-            <OtherWallets />
-          </Box>
-          <Box 
-            testId="choose-networks" 
-            sx={(viewState.view.type === ConnectWidgetViews.CHOOSE_NETWORKS) ? ActiveStyle : InactiveStyle}
-          >
-            <ChooseNetwork />
-          </Box>
-          <Box 
-            testId="fail"
-            sx={(viewState.view.type === ConnectWidgetViews.FAIL) ? ActiveStyle : InactiveStyle}
-          >
-            <Body style={{color:'#FFF'}}>User did not connect</Body>
-          </Box>
-          <Box 
-            testId="success"
-            sx={(viewState.view.type === ConnectWidgetViews.SUCCESS) ? ActiveStyle : InactiveStyle}
-          >
-            <Body style={{color:'#FFF'}}>User connected</Body>
-          </Box>
+          <>
+            {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && 
+              <ConnectWallet />
+            }
+            {viewState.view.type === ConnectWidgetViews.OTHER_WALLETS && 
+              <OtherWallets />
+            }
+            {viewState.view.type === ConnectWidgetViews.CHOOSE_NETWORKS && 
+              <ChooseNetwork />
+            }
+            {(viewState.view.type === ConnectWidgetViews.SUCCESS || viewState.view.type === ConnectWidgetViews.FAIL) && renderOutcome()}
+          </>
         </ConnectContext.Provider>
       </ViewContext.Provider>
     </BiomeThemeProvider>

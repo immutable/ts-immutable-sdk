@@ -5,6 +5,9 @@ import { ConnectContext } from '../../context/ConnectContext';
 import { useContext } from 'react';
 import { ViewActions, ViewContext } from '../../../../context/ViewContext';
 import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
+import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
+import { HeaderNavigation } from '../../../../components/HeaderNavigation';
+import { FooterLogo } from '../../../../components/Footer/FooterLogo';
 
 export function ChooseNetwork () {
   const { viewDispatch } = useContext(ViewContext);
@@ -51,10 +54,18 @@ export function ChooseNetwork () {
   }
 
   return (
-    <div>
-    <Button
-      testId='network-zkevm'
-      onClick={() => connectPolygonClick()}>Connect Polygon</Button>
-    </div>
+    <SimpleLayout 
+      header={
+        <HeaderNavigation
+            showClose
+            showBack
+          />
+      }
+      footer={<FooterLogo />}
+    >
+      <Button
+        testId='network-zkevm'
+        onClick={() => connectPolygonClick()}>Connect Polygon</Button>
+    </SimpleLayout>
   )
 }
