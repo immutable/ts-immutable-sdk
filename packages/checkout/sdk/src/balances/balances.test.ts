@@ -33,6 +33,7 @@ describe('balances', () => {
       getNetworkInfo: jest.fn().mockResolvedValue({
         chainId: 1,
         name: 'Ethereum',
+        isSupported: true,
         nativeCurrency: {
           name: 'Ether',
           symbol: 'ETH',

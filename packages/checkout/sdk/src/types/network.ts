@@ -12,6 +12,7 @@ export interface NetworkInfo {
   name: string;
   chainId: number;
   nativeCurrency: TokenInfo;
+  isSupported: boolean;
 }
 
 export type NetworkDetails = {
