@@ -13,7 +13,6 @@ import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
-import { FooterNavigation } from '../../components/Footer/FooterNavigation';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
