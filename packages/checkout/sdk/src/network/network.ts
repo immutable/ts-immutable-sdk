@@ -9,7 +9,7 @@ import {
   WALLET_ACTION,
 } from '../types';
 import { ChainIdNetworkMap } from '../types';
-import networkAllowMasterList from './network_allow_master_list.json';
+import networkMasterList from './network_master_list.json';
 
 export async function getNetworkInfo(
   provider: Web3Provider
@@ -87,7 +87,7 @@ export async function getNetworkAllowList({
   exclude,
 }: GetNetworkAllowListParams): Promise<GetNetworkAllowListResult> {
   return {
-    networks: networkAllowMasterList.filter(
+    networks: networkMasterList.filter(
       (network) =>
         !(exclude || []).map((exc) => exc.chainId).includes(network.chainId)
     ),

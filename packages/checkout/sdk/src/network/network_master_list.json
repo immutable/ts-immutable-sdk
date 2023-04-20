@@ -2,6 +2,7 @@
   {
     "name": "Ethereum",
     "chainId": 1,
+    "isSupported": true,
     "nativeCurrency": {
       "name": "Ethereum",
       "symbol": "ETH",
@@ -12,6 +13,7 @@
   {
     "name": "Goerli",
     "chainId": 5,
+    "isSupported": true,
     "nativeCurrency": {
       "name": "Ethereum",
       "symbol": "ETH",
