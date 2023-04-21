@@ -48,9 +48,17 @@ export const withCheckoutError = async <T>(
 ): Promise<T> => {
   try {
     return await fn();
-  } catch (error) {
+  } catch (error: any) {
     const errorMessage =
       customError.message || `${(error as Error).message}` || 'UnknownError';
-    throw new CheckoutError(errorMessage, customError.type);
+    if (error instanceof CheckoutError) {
+      throw new CheckoutError(errorMessage, customError.type, {
+        ...error.data,
+        ...customError.data,
+      });
+    }
+    throw new CheckoutError(errorMessage, customError.type, {
+      ...customError.data,
+    });
   }
 };

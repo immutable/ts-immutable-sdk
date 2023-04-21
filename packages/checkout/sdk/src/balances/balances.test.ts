@@ -93,7 +93,7 @@ describe('balances', () => {
 
       await expect(getBalance(mockProvider(), '0xAddress')).rejects.toThrow(
         new CheckoutError(
-          'Unsupported Network',
+          'Chain:0 is not a supported chain',
           CheckoutErrorType.GET_BALANCE_ERROR
         )
       );

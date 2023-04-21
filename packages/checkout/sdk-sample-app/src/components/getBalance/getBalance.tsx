@@ -29,8 +29,12 @@ function GetBalance(props: BalanceProps) {
       const getBalanceRes = await checkout.getBalance(params);
       console.log('getBalanceRes', getBalanceRes);
       setNative(getBalanceRes.formattedBalance);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      console.log(err.name);
+      console.log(err.message);
+      console.log(err.stack);
+      console.log(err.data); //shd have data: { chainName: networkInfo.name }
     }
   }
 

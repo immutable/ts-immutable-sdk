@@ -20,6 +20,17 @@ function SwitchNetwork(props: SwitchNetworkProps) {
       }
   }
 
+  async function getNetworkInfo() {
+    if (provider) {
+      try {
+        const info = await checkout.getNetworkInfo(provider);
+        console.log(info);
+      } catch (error: any) {
+        console.log(error);
+      }
+    }
+  }
+
   return (
     <div>
       <h1 className="sample-heading">Switch Network</h1>
@@ -34,6 +45,7 @@ function SwitchNetwork(props: SwitchNetworkProps) {
         <button onClick={() => switchNetwork(ChainId.POLYGON)}>
           Switch Network to Polygon
         </button>
+        <button onClick={() => getNetworkInfo()}>Get Network info</button>
       </div>
     </div>
   );
