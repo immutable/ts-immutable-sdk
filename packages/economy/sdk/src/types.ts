@@ -1,7 +1,7 @@
 /**
  * Event types for Custom Event Subscriptions
  */
-export enum CustomEventTypes {
+export enum CustomEventType {
   ECONOMY = 'imtbl-economy-event',
 }
 
