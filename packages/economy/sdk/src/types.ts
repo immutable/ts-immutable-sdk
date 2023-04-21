@@ -1,17 +1,25 @@
 /**
- * Event types for Custom Event Subscriptions
+ * Namespaces for Custom Events emitted by the Economy SDK
  */
-export enum CustomEventType {
-  ECONOMY = 'imtbl-economy-event',
+export const EconomyCustomEvents = {
+  DEFAULT: 'imtbl-economy-event',
+} as const;
+export type EconomyCustomEvent =
+  (typeof EconomyCustomEvents)[keyof typeof EconomyCustomEvents];
+
+/**
+ * Generic status use to track progress in any Economy SDK action
+ */
+export enum EventStatuses {
+  'INITIAL' = 'INITIAL',
+  'IN_PROGRESS' = 'IN_PROGRESS',
+  'COMPLETE' = 'COMPLETE',
+  'FAILED' = 'FAILED',
 }
+export type EventStatus = keyof typeof EventStatuses;
 
 /**
- * Generic status use to track progress in any SDK action
- */
-export type EventStatus = 'INITIAL' | 'IN_PROGRESS' | 'COMPLETE' | 'FAILED';
-
-/**
- * Generic event status object used to track progress in a particular SDK action
+ * Generic event status object used to track progress in a particular Economy SDK action
  */
 export interface IEventType<
   Type extends string,

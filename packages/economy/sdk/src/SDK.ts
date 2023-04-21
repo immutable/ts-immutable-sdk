@@ -1,6 +1,6 @@
 import { Subject, Subscription } from 'rxjs';
 
-import { CustomEventType } from './types';
+import { EconomyCustomEvents } from './types';
 import type { EventStatus, IEventType } from './types';
 
 /** Standard SDK Configuration interface */
@@ -83,7 +83,7 @@ export abstract class SDK<ActionType extends string> {
       return;
     }
 
-    const event = new CustomEvent<T>(CustomEventType.ECONOMY, {
+    const event = new CustomEvent(EconomyCustomEvents.DEFAULT, {
       detail,
       bubbles: true,
       cancelable: true,

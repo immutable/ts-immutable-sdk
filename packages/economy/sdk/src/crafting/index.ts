@@ -18,18 +18,21 @@ export type CraftInput = {
   web3Assets: Record<string, unknown>;
 };
 
-export type CraftStatuses =
-  | 'AWAITING_WEB3_INTERACTION'
-  | 'VALIDATING'
-  | 'SUBMITTED'
-  | 'PENDING'
-  | 'COMPLETE'
-  | 'ERROR';
+/** List of valid craft status values */
+export enum CraftStatuses {
+  'AWAITING_WEB3_INTERACTION' = 'AWAITING_WEB3_INTERACTION',
+  'VALIDATING' = 'VALIDATING',
+  'SUBMITTED' = 'SUBMITTED',
+  'PENDING' = 'PENDING',
+  'COMPLETE' = 'COMPLETE',
+  'ERROR' = 'ERROR',
+}
+export type CraftStatus = keyof typeof CraftStatuses;
 
 export async function craft(
   craftInput: CraftInput,
-  onEvents: (status: CraftStatuses) => void
-): Promise<CraftStatuses> {
+  onEvents: (status: CraftStatus) => void
+): Promise<CraftStatus> {
   // 1. validate inputs
   onEvents('VALIDATING');
   await StudioBEService.validateCraft(craftInput);
@@ -52,13 +55,3 @@ export async function craft(
   onEvents('COMPLETE');
   return 'COMPLETE';
 }
-
-/** List of valid craft status values */
-export const craftStatuses: CraftStatuses[] = [
-  'AWAITING_WEB3_INTERACTION',
-  'VALIDATING',
-  'SUBMITTED',
-  'PENDING',
-  'COMPLETE',
-  'ERROR',
-];

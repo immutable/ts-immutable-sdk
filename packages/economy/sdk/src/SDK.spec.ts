@@ -5,7 +5,7 @@
 import { Subject } from 'rxjs';
 
 import { Configuration, SDK } from './SDK';
-import { CustomEventType, IEventType } from './types';
+import { EconomyCustomEvents, IEventType } from './types';
 
 export class SDKMock extends SDK<string> {
   constructor(config: Configuration) {
@@ -88,7 +88,7 @@ describe('SDK Class', () => {
       expect(dispatchEventSpy).toHaveBeenCalledTimes(1);
       expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
       expect(dispatchEventSpy.mock.calls[0][0].type).toBe(
-        CustomEventType.ECONOMY
+        EconomyCustomEvents.DEFAULT
       );
       expect((dispatchEventSpy.mock.calls[0][0] as CustomEvent).detail).toEqual(
         detail

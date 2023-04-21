@@ -6,7 +6,7 @@ import {
   state,
 } from 'lit/decorators.js';
 
-import { Economy, CustomEventType } from '@imtbl/economy';
+import { Economy, EconomyCustomEvents } from '@imtbl/economy';
 import type { CraftInput } from '@imtbl/economy';
 
 @customElement('imtbl-craft-button')
@@ -38,7 +38,7 @@ export class CraftButton extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener(
-      CustomEventType.ECONOMY,
+      EconomyCustomEvents.DEFAULT,
       this.handleCustomEvent(this.handleConnectEvent)
     );
   }
