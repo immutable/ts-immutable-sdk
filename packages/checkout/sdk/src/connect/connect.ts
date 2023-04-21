@@ -17,7 +17,8 @@ export async function checkIsWalletConnected(
   if (!provider.provider?.request) {
     throw new CheckoutError(
       'Incompatible provider',
-      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
+      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
+      { details: `Missing web3provider for ${providerPreference}` }
     );
   }
 
@@ -57,7 +58,8 @@ export async function connectWalletProvider(
       if (!web3Provider || !web3Provider?.provider?.request) {
         throw new CheckoutError(
           'Incompatible provider',
-          CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
+          CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
+          { details: `Missing web3provider for ${params.providerPreference}` }
         );
       }
       // this makes the request to the wallet to connect i.e request eth accounts ('eth_requestAccounts')

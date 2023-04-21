@@ -47,7 +47,7 @@ export async function switchWalletNetwork(
 ): Promise<SwitchNetworkResult> {
   if (!Object.values(ChainId).includes(chainId)) {
     throw new CheckoutError(
-      `${chainId} is not a supported chain`,
+      `Chain:${chainId} is not a supported chain`,
       CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR
     );
   }
@@ -55,7 +55,8 @@ export async function switchWalletNetwork(
   if (!provider.provider?.request) {
     throw new CheckoutError(
       'Incompatible provider',
-      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
+      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
+      { details: `Missing web3provider` }
     );
   }
 
