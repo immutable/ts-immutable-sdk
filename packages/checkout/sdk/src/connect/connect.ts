@@ -18,7 +18,7 @@ export async function checkIsWalletConnected(
     throw new CheckoutError(
       'Incompatible provider',
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
-      { details: `Missing web3provider for ${providerPreference}` }
+      { details: `Unsupported provider for ${providerPreference}` }
     );
   }
 
@@ -33,7 +33,6 @@ export async function checkIsWalletConnected(
       `Check wallet connection request failed`,
       CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR,
       {
-        ...err,
         rpcMethod: WALLET_ACTION.CHECK_CONNECTION,
       }
     );
@@ -59,7 +58,7 @@ export async function connectWalletProvider(
         throw new CheckoutError(
           'Incompatible provider',
           CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
-          { details: `Missing web3provider for ${params.providerPreference}` }
+          { details: `Unsupported provider for ${params.providerPreference}` }
         );
       }
       // this makes the request to the wallet to connect i.e request eth accounts ('eth_requestAccounts')
@@ -85,8 +84,8 @@ export async function getWalletProviderForPreference(
     }
     default:
       throw new CheckoutError(
-        'Provider preference was not detected',
-        CheckoutErrorType.CONNECT_PROVIDER_ERROR
+        'Provider preference is not supported',
+        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR
       );
   }
   return web3Provider;

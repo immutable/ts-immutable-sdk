@@ -5,6 +5,7 @@ import {
   CheckoutErrorType,
   CheckoutInternalError,
   CheckoutInternalErrorType,
+  withCheckoutError,
 } from '../errors';
 import {
   ChainId,
@@ -22,23 +23,30 @@ const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 export async function getNetworkInfo(
   provider: Web3Provider
 ): Promise<NetworkInfo> {
-  const network = await provider.getNetwork();
+  return withCheckoutError(
+    async () => {
+      const network = await provider.getNetwork();
 
-  if (!Object.values(ChainId).includes(network.chainId as ChainId)) {
-    // return empty details
-    return {
-      chainId: network.chainId,
-      name: network.name,
-      isSupported: false,
-    } as NetworkInfo;
-  }
-  const chainIdNetworkInfo = ChainIdNetworkMap[network.chainId as ChainId];
-  return {
-    name: chainIdNetworkInfo.chainName,
-    chainId: parseInt(chainIdNetworkInfo.chainIdHex, 16),
-    nativeCurrency: chainIdNetworkInfo.nativeCurrency,
-    isSupported: true,
-  };
+      if (!Object.values(ChainId).includes(network.chainId as ChainId)) {
+        // return empty details
+        return {
+          chainId: network.chainId,
+          name: network.name,
+          isSupported: false,
+        } as NetworkInfo;
+      }
+      const chainIdNetworkInfo = ChainIdNetworkMap[network.chainId as ChainId];
+      return {
+        name: chainIdNetworkInfo.chainName,
+        chainId: parseInt(chainIdNetworkInfo.chainIdHex, 16),
+        nativeCurrency: chainIdNetworkInfo.nativeCurrency,
+        isSupported: true,
+      };
+    },
+    {
+      type: CheckoutErrorType.GET_NETWORK_INFO_ERROR,
+    }
+  );
 }
 
 export async function switchWalletNetwork(
@@ -52,11 +60,11 @@ export async function switchWalletNetwork(
     );
   }
 
-  if (!provider.provider?.request) {
+  if (!provider || !provider.provider?.request) {
     throw new CheckoutError(
       'Incompatible provider',
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
-      { details: `Missing web3provider` }
+      { details: `Unsupported provider` }
     );
   }
 

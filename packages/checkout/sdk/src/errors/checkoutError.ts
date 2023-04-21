@@ -1,4 +1,5 @@
 export enum CheckoutErrorType {
+  PROVIDER_PREFERENCE_ERROR = 'PROVIDER_PREFERENCE_ERROR',
   CONNECT_PROVIDER_ERROR = 'CONNECT_PROVIDER_ERROR',
   GET_BALANCE_ERROR = 'GET_BALANCE_ERROR',
   GET_ERC20_BALANCE_ERROR = 'GET_ERC20_BALANCE_ERROR',
@@ -18,6 +19,7 @@ type ErrorType = {
 };
 
 export class CheckoutError extends Error {
+  public message: string;
   public type: CheckoutErrorType;
   public data?: { [key: string]: string };
   constructor(
@@ -26,6 +28,7 @@ export class CheckoutError extends Error {
     data?: { [key: string]: string }
   ) {
     super(message);
+    this.message = message;
     this.type = type;
     this.data = data;
   }

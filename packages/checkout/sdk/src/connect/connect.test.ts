@@ -80,7 +80,7 @@ describe('connect', () => {
         })
       ).rejects.toThrow(
         new CheckoutError(
-          'Provider preference was not detected',
+          'Provider preference is not supported',
           CheckoutErrorType.CONNECT_PROVIDER_ERROR
         )
       );
