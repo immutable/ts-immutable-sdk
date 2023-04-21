@@ -28,7 +28,10 @@ describe('checkoutError', () => {
         type: CheckoutErrorType.GET_BALANCE_ERROR,
       })
     ).rejects.toThrow(
-      new CheckoutError('Error message', CheckoutErrorType.GET_BALANCE_ERROR)
+      new CheckoutError(
+        '[GET_BALANCE_ERROR] Cause:Error message',
+        CheckoutErrorType.GET_BALANCE_ERROR
+      )
     );
   });
 
@@ -43,7 +46,7 @@ describe('checkoutError', () => {
       })
     ).rejects.toThrow(
       new CheckoutError(
-        'Custom message. Cause:Error message',
+        '[GET_BALANCE_ERROR]:Custom message. Cause:Error message',
         CheckoutErrorType.GET_BALANCE_ERROR
       )
     );
@@ -53,24 +56,26 @@ describe('checkoutError', () => {
     const errorFunction = jest.fn();
     errorFunction.mockRejectedValue(new Error('Error message'));
 
-    await expect(
-      withCheckoutError(errorFunction, {
+    try {
+      await withCheckoutError(errorFunction, {
         type: CheckoutErrorType.GET_BALANCE_ERROR,
         message: 'Custom message',
         data: { details: 'some error details' },
-      })
-    ).rejects.toThrow(
-      new CheckoutError(
-        'Custom message. Cause:Error message',
-        CheckoutErrorType.GET_BALANCE_ERROR,
-        {
-          details: 'some error details',
-        }
-      )
-    );
+      });
+    } catch (errorObject: any) {
+      // 3 separate assertions because rejects.toThrow does not match any object details except for the message field
+      // https://github.com/facebook/jest/issues/11693
+      expect(errorObject.type).toEqual(CheckoutErrorType.GET_BALANCE_ERROR);
+      expect(errorObject.message).toEqual(
+        '[GET_BALANCE_ERROR]:Custom message. Cause:Error message'
+      );
+      expect(errorObject.data).toEqual({
+        details: 'some error details',
+      });
+    }
   });
 
-  it('should throw CheckoutError with the with internal CheckoutError details', async () => {
+  it('should throw CheckoutError with the inner CheckoutError details', async () => {
     const errorFunction = jest.fn();
     errorFunction.mockRejectedValue(
       new CheckoutError(
@@ -79,22 +84,24 @@ describe('checkoutError', () => {
         { innerDetails: 'inner details of main error' }
       )
     );
-
-    await expect(
-      withCheckoutError(errorFunction, {
+    try {
+      await withCheckoutError(errorFunction, {
         type: CheckoutErrorType.GET_BALANCE_ERROR,
         message: 'Custom message',
         data: { details: 'some error details' },
-      })
-    ).rejects.toThrow(
-      new CheckoutError(
-        'Custom message. Cause:Error message',
-        CheckoutErrorType.GET_BALANCE_ERROR,
-        {
-          details: 'some error details',
-          innerDetails: 'inner details of main error',
-        }
-      )
-    );
+      });
+    } catch (errorObject: any) {
+      // 3 separate assertions because rejects.toThrow does not match any object details except for the message field
+      // https://github.com/facebook/jest/issues/11693
+      expect(errorObject.type).toEqual(CheckoutErrorType.GET_BALANCE_ERROR);
+      expect(errorObject.message).toEqual(
+        '[GET_BALANCE_ERROR]:Custom message. Cause:Error message'
+      );
+      expect(errorObject.data).toEqual({
+        details: 'some error details',
+        innerErrorType: CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
+        innerDetails: 'inner details of main error',
+      });
+    }
   });
 });

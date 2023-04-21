@@ -13,10 +13,9 @@ import { connectWalletProvider } from '../connect';
 import { ChainIdNetworkMap, ConnectionProviders } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { Web3Provider } from '@ethersproject/providers';
-
+let windowSpy: any;
 describe('network functions', () => {
   describe('switchWalletNetwork()', () => {
-    let windowSpy: any;
     beforeEach(() => {
       windowSpy = jest.spyOn(window, 'window', 'get');
 
@@ -63,7 +62,7 @@ describe('network functions', () => {
       });
     });
 
-    it('should make request for the user to switch network', async () => {
+    it('should make request for the user to switch network Polygon', async () => {
       const provider = await connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK,
       });
@@ -128,7 +127,7 @@ describe('network functions', () => {
         switchWalletNetwork(provider, ChainId.POLYGON)
       ).rejects.toThrow(
         new CheckoutError(
-          'user cancelled the switch network request',
+          'User cancelled switch network request',
           CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
         )
       );
@@ -153,7 +152,7 @@ describe('network functions', () => {
         switchWalletNetwork(provider, ChainId.POLYGON)
       ).rejects.toThrow(
         new CheckoutError(
-          'provider object is missing request function',
+          'Incompatible provider',
           CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
         )
       );
@@ -231,6 +230,7 @@ describe('network functions', () => {
       });
     });
   });
+
   describe('getNetworkInfo', () => {
     const getNetworkTestCases = [
       {
@@ -286,6 +286,7 @@ describe('network functions', () => {
       });
     });
   });
+
   describe('getNetworkAllowList()', () => {
     it('should return all the networks if no exclude filter is provided', async () => {
       await expect(await getNetworkAllowList({})).toEqual({

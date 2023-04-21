@@ -30,11 +30,8 @@ function GetBalance(props: BalanceProps) {
       console.log('getBalanceRes', getBalanceRes);
       setNative(getBalanceRes.formattedBalance);
     } catch (err: any) {
-      console.error(err);
-      console.log(err.name);
+      console.error({ ...err });
       console.log(err.message);
-      console.log(err.stack);
-      console.log(err.data); //shd have data: { chainName: networkInfo.name }
     }
   }
 

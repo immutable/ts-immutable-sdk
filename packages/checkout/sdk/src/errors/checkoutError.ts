@@ -52,13 +52,14 @@ export const withCheckoutError = async <T>(
     const cause = `${(error as Error).message}` || 'UnknownError';
 
     const errorMessage = customError.message
-      ? `${customError.message}. Cause:${cause}`
-      : cause;
+      ? `[${customError.type}]:${customError.message}. Cause:${cause}`
+      : `[${customError.type}] Cause:${cause}`;
 
     if (error instanceof CheckoutError) {
       throw new CheckoutError(errorMessage, customError.type, {
-        ...error.data,
         ...customError.data,
+        innerErrorType: error.type,
+        ...error.data,
       });
     }
     throw new CheckoutError(errorMessage, customError.type, {
