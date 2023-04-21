@@ -94,7 +94,7 @@ export abstract class SDK<ActionType extends string> {
   /**
    * Utility: Checks if the class was mounted in a browser environment
    */
-  private get isClientSide(): boolean {
+  protected get isClientSide(): boolean {
     return typeof window !== 'undefined' && typeof document !== 'undefined';
   }
 
