@@ -67,3 +67,15 @@ export interface SwitchNetworkParams {
 export interface SwitchNetworkResult {
   network: NetworkInfo;
 }
+
+export interface NetworkFilter {
+  chainId: ChainId;
+}
+
+export interface GetNetworkAllowListParams {
+  exclude?: NetworkFilter[];
+}
+
+export interface GetNetworkAllowListResult {
+  networks: NetworkInfo[];
+}

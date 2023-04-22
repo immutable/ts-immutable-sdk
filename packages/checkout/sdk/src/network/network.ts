@@ -2,11 +2,14 @@ import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import {
   ChainId,
+  ChainIdNetworkMap,
+  GetNetworkAllowListParams,
+  GetNetworkAllowListResult,
   NetworkInfo,
   SwitchNetworkResult,
   WALLET_ACTION,
 } from '../types';
-import { ChainIdNetworkMap } from '../types';
+import networkMasterList from './network_master_list.json';
 
 export async function getNetworkInfo(
   provider: Web3Provider
@@ -22,13 +25,12 @@ export async function getNetworkInfo(
     } as NetworkInfo;
   }
   const chainIdNetworkInfo = ChainIdNetworkMap[network.chainId as ChainId];
-  const networkInfo = {
+  return {
     name: chainIdNetworkInfo.chainName,
     chainId: parseInt(chainIdNetworkInfo.chainIdHex, 16),
     nativeCurrency: chainIdNetworkInfo.nativeCurrency,
     isSupported: true,
   };
-  return networkInfo;
 }
 
 export async function switchWalletNetwork(
@@ -78,6 +80,29 @@ export async function switchWalletNetwork(
       nativeCurrency: newNetwork.nativeCurrency,
     },
   } as SwitchNetworkResult;
+}
+
+export async function getNetworkAllowList({
+  exclude,
+}: GetNetworkAllowListParams): Promise<GetNetworkAllowListResult> {
+  const list = networkMasterList.filter(
+    (network) =>
+      !(exclude || []).map((exc) => exc.chainId).includes(network.chainId)
+  );
+  const allowedNetworks: NetworkInfo[] = [];
+  list.forEach((element) => {
+    const newNetwork = ChainIdNetworkMap[element.chainId as ChainId];
+    allowedNetworks.push({
+      name: newNetwork.chainName,
+      chainId: parseInt(newNetwork.chainIdHex, 16),
+      nativeCurrency: newNetwork.nativeCurrency,
+      isSupported: true,
+    });
+  });
+
+  return {
+    networks: allowedNetworks,
+  };
 }
 
 // these functions should not be exported. These functions should be used as part of an exported function e.g switchWalletNetwork() above.
