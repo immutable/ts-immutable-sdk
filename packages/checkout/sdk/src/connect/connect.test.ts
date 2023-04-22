@@ -5,11 +5,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
 import { checkIsWalletConnected, connectWalletProvider } from './connect';
-import { getNetworkInfo } from '../network';
 import { ConnectionProviders } from '../types';
-import { ChainId, WALLET_ACTION } from '../types';
+import { WALLET_ACTION } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { ChainIdNetworkMap } from '../types';
 
 let windowSpy: any;
 
@@ -143,62 +141,6 @@ describe('connect', () => {
           CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
         )
       );
-    });
-  });
-
-  describe('getNetworkInfo', () => {
-    const getNetworkTestCases = [
-      {
-        chainId: 1 as ChainId,
-        chainName: 'homestead',
-      },
-      {
-        chainId: 5 as ChainId,
-        chainName: 'goerli',
-      },
-      {
-        chainId: 137 as ChainId,
-        chainName: 'matic',
-      },
-    ];
-    getNetworkTestCases.forEach((testCase) => {
-      it(`should return the network info for the ${testCase.chainName} network`, async () => {
-        const getNetworkMock = jest.fn().mockResolvedValue({
-          chainId: testCase.chainId,
-          name: testCase.chainName,
-        });
-        const mockProvider = {
-          getNetwork: getNetworkMock,
-        };
-        const result = await getNetworkInfo(
-          mockProvider as unknown as Web3Provider
-        );
-        expect(result.name).toBe(ChainIdNetworkMap[testCase.chainId].chainName);
-        expect(result.chainId).toBe(
-          parseInt(ChainIdNetworkMap[testCase.chainId].chainIdHex, 16)
-        );
-        expect(result.nativeCurrency).toEqual(
-          ChainIdNetworkMap[testCase.chainId].nativeCurrency
-        );
-      });
-    });
-
-    it('should return empty object for an unsupported network', async () => {
-      const getNetworkMock = jest.fn().mockResolvedValue({
-        chainId: 3,
-        name: 'ropsten',
-      });
-      const mockProvider = {
-        getNetwork: getNetworkMock,
-      };
-      const result = await getNetworkInfo(
-        mockProvider as unknown as Web3Provider
-      );
-      expect(result).toEqual({
-        chainId: 3,
-        name: 'ropsten',
-        isSupported: false,
-      });
     });
   });
 });
