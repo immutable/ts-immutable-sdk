@@ -9,10 +9,9 @@ import { connectWalletProvider } from '../connect';
 import { ChainIdNetworkMap, ConnectionProviders } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 
-let windowSpy: any;
-
 describe('network functions', () => {
   describe('switchWalletNetwork()', () => {
+    let windowSpy: any;
     beforeEach(() => {
       windowSpy = jest.spyOn(window, 'window', 'get');
 
@@ -240,7 +239,6 @@ describe('network functions', () => {
               name: 'Ethereum',
               symbol: 'ETH',
               decimals: 18,
-              icon: '',
             },
           },
           {
@@ -248,10 +246,19 @@ describe('network functions', () => {
             chainId: 5,
             isSupported: true,
             nativeCurrency: {
-              name: 'Ethereum',
+              name: 'Goerli Eth',
               symbol: 'ETH',
               decimals: 18,
-              icon: '',
+            },
+          },
+          {
+            name: 'Polygon',
+            chainId: 137,
+            isSupported: true,
+            nativeCurrency: {
+              name: 'MATIC',
+              symbol: 'MATIC',
+              decimals: 18,
             },
           },
         ],
@@ -260,7 +267,9 @@ describe('network functions', () => {
 
     it('should exclude the right networks if an exclude filter is provided', async () => {
       await expect(
-        await getNetworkAllowList({ exclude: [{ chainId: 5 }] })
+        await getNetworkAllowList({
+          exclude: [{ chainId: 5 }, { chainId: 137 }],
+        })
       ).toEqual({
         networks: [
           {
@@ -271,7 +280,6 @@ describe('network functions', () => {
               name: 'Ethereum',
               symbol: 'ETH',
               decimals: 18,
-              icon: '',
             },
           },
         ],

@@ -1,24 +1,11 @@
 [
   {
-    "name": "Ethereum",
-    "chainId": 1,
-    "isSupported": true,
-    "nativeCurrency": {
-      "name": "Ethereum",
-      "symbol": "ETH",
-      "decimals": 18,
-      "icon": ""
-    }
+    "chainId": 1
   },
   {
-    "name": "Goerli",
-    "chainId": 5,
-    "isSupported": true,
-    "nativeCurrency": {
-      "name": "Ethereum",
-      "symbol": "ETH",
-      "decimals": 18,
-      "icon": ""
-    }
+    "chainId": 5
+  },
+  {
+    "chainId": 137
   }
 ]
