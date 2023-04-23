@@ -3,11 +3,16 @@
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { switchWalletNetwork, getNetworkAllowList } from './network';
+import {
+  switchWalletNetwork,
+  getNetworkAllowList,
+  getNetworkInfo,
+} from './network';
 import { ChainId, WALLET_ACTION } from '../types';
 import { connectWalletProvider } from '../connect';
 import { ChainIdNetworkMap, ConnectionProviders } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
+import { Web3Provider } from '@ethersproject/providers';
 
 describe('network functions', () => {
   describe('switchWalletNetwork()', () => {
@@ -226,7 +231,61 @@ describe('network functions', () => {
       });
     });
   });
+  describe('getNetworkInfo', () => {
+    const getNetworkTestCases = [
+      {
+        chainId: 1 as ChainId,
+        chainName: 'homestead',
+      },
+      {
+        chainId: 5 as ChainId,
+        chainName: 'goerli',
+      },
+      {
+        chainId: 137 as ChainId,
+        chainName: 'matic',
+      },
+    ];
+    getNetworkTestCases.forEach((testCase) => {
+      it(`should return the network info for the ${testCase.chainName} network`, async () => {
+        const getNetworkMock = jest.fn().mockResolvedValue({
+          chainId: testCase.chainId,
+          name: testCase.chainName,
+        });
+        const mockProvider = {
+          getNetwork: getNetworkMock,
+        };
+        const result = await getNetworkInfo(
+          mockProvider as unknown as Web3Provider
+        );
+        expect(result.name).toBe(ChainIdNetworkMap[testCase.chainId].chainName);
+        expect(result.chainId).toBe(
+          parseInt(ChainIdNetworkMap[testCase.chainId].chainIdHex, 16)
+        );
+        expect(result.nativeCurrency).toEqual(
+          ChainIdNetworkMap[testCase.chainId].nativeCurrency
+        );
+      });
+    });
 
+    it('should return basic details for an unsupported network', async () => {
+      const getNetworkMock = jest.fn().mockResolvedValue({
+        chainId: 3,
+        name: 'ropsten',
+      });
+      const mockProvider = {
+        getNetwork: getNetworkMock,
+      };
+      const result = await getNetworkInfo(
+        mockProvider as unknown as Web3Provider
+      );
+      expect(result).toEqual({
+        chainId: 3,
+        name: 'ropsten',
+        isSupported: false,
+      });
+    });
+  });
   describe('getNetworkAllowList()', () => {
     it('should return all the networks if no exclude filter is provided', async () => {
       await expect(await getNetworkAllowList({})).toEqual({
