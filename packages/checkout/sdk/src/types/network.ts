@@ -75,6 +75,10 @@ export interface GetNetworkParams {
   provider: Web3Provider;
 }
 
+export enum NetworkFilterTypes {
+  ALL = 'all',
+}
+
 export interface NetworkFilter {
   chainId: ChainId;
 }
