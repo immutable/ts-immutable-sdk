@@ -8,7 +8,7 @@
     "@biom3/design-tokens": "0.1.4-beta",
     "@biom3/react": "^0.2.4-beta",
     "@ethersproject/providers": "^5.7.2",
-    "@imtbl/core-sdk": "^1.1.0",
+    "@imtbl/core-sdk": "^1.1.1-alpha.1",
     "@magic-ext/oidc": "^1.0.1",
     "@metamask/detect-provider": "^2.0.0",
     "@swc/helpers": "~0.5.0",
