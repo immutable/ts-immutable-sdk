@@ -5,6 +5,7 @@ import {
   ImtblBridgeProps,
   ImtblExampleProps,
   ImtblBuyProps,
+  ImtblTransitionExampleProps,
 } from '@imtbl/checkout-ui-types'
 
 declare global {
@@ -16,6 +17,7 @@ declare global {
       'imtbl-bridge': ImtblBridgeProps,
       'imtbl-buy': ImtblBuyProps,
       'imtbl-example': ImtblExampleProps,
+      'imtbl-transition-example': ImtblTransitionExampleProps,
     }
   }
 }

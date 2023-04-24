@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 import { ConnectWidgetView } from './ConnectViewContextTypes';
+import { TransitionExampleWidgetView } from './TransitionExampleViewContextTypes';
 
 export enum BaseViews {
   LOADING_VIEW = 'LOADING_VIEW',
@@ -7,7 +8,7 @@ export enum BaseViews {
 
 export type BaseView = { type: BaseViews.LOADING_VIEW }
 
-export type View = BaseView | ConnectWidgetView;
+export type View = BaseView | ConnectWidgetView | TransitionExampleWidgetView;
 
 export interface ViewState {
   view: View;

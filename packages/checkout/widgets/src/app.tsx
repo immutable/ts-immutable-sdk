@@ -11,6 +11,7 @@ import ConnectWebView from './widgets/connect/ConnectWebView';
 import SwapWebView from './widgets/swap/SwapWebView';
 import BridgeWebView from './widgets/bridge/BridgeWebView';
 import WalletWebView from './widgets/wallet/WalletWebView';
+import TransitionExampleWebView from './widgets/transition-example/TransitionExampleWebView';
 
 require('./build.tsx')
 
@@ -30,6 +31,8 @@ function App() {
       <h2><a href="/buy">Buy Widget</a></h2>
       <br />
       <h2><a href="/example">Example Widget</a></h2>
+      <br />
+      <h2><a href="/transition-example">Transition Example Widget</a></h2>
     </div>
   )
 }
@@ -42,6 +45,10 @@ const router = createBrowserRouter([
   {
     path: "/example",
     element: <ExampleWebView />,
+  },
+  {
+    path: "/transition-example",
+    element: <TransitionExampleWebView />,
   },
   {
     path: "/connect",

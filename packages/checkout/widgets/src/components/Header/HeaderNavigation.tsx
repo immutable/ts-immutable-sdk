@@ -11,6 +11,7 @@ export interface HeaderNavigationProps {
   showSettings?: boolean;
   transparent?: boolean;
   onSettingsClick?: () => void;
+  onBackButtonClick?: () => void;
 }
 
 export const HeaderNavigation = ({ 
@@ -19,8 +20,9 @@ export const HeaderNavigation = ({
   showClose = false, 
   showSettings = false,
   transparent = false,
-  onSettingsClick
-  } : HeaderNavigationProps) => {
+  onSettingsClick,
+  onBackButtonClick
+  } : HeaderNavigationProps) => {  
   const { viewDispatch } = useContext(ViewContext);
 
   const goBack = async () => {
@@ -43,9 +45,13 @@ export const HeaderNavigation = ({
     })
   }
 
+  const backButton = () => {
+    onBackButtonClick ? onBackButtonClick() : goBack()
+  }
+
   return (
     <AppHeaderBar testId="header-navigation-container" sx={HeaderNavigationStyles(transparent)} elevated={false}>
-      {showBack && <AppHeaderBar.LeftButtCon icon="ArrowBackward" iconVariant="bold" onClick={goBack} testId='back-button' />}
+      {showBack && <AppHeaderBar.LeftButtCon icon="ArrowBackward" iconVariant="bold" onClick={backButton} testId='back-button' />}
       <AppHeaderBar.Title testId="header-title" size='medium' sx={{ textAlign: 'left' }}>{title}</AppHeaderBar.Title>
       <AppHeaderBar.RightHandButtons>
         {showSettings && onSettingsClick && <ButtCon icon="SettingsCog" iconVariant="bold" onClick={onSettingsClick} testId='settings-button' />}
