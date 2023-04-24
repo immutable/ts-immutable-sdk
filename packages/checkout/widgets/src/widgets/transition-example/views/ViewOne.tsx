@@ -7,7 +7,7 @@ import { TransitionExampleWidgetViews } from "../../../context/TransitionExample
 import { ViewContext, ViewActions } from "../../../context/ViewContext"
 
 
-export const PageOne = () => {
+export const ViewOne = () => {
   const { viewDispatch } = useContext(ViewContext);
   
   return (
@@ -20,19 +20,19 @@ export const PageOne = () => {
       }
       footer={<FooterLogo />}
     >
-      <Heading>Page One</Heading>
+      <Heading>View One</Heading>
       <Button onClick={() => {
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
               view: {
-                type: TransitionExampleWidgetViews.PAGE_TWO
+                type: TransitionExampleWidgetViews.VIEW_TWO
               }
             }
           })
         }}
       >
-          Go To Page Two
+        Go To View Two
       </Button>
     </SimpleLayout>
   )

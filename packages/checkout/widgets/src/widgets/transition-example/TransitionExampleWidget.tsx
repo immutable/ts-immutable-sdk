@@ -3,12 +3,12 @@ import { BaseTokens, onDarkBase, onLightBase } from "@biom3/design-tokens";
 import { WidgetTheme } from "@imtbl/checkout-ui-types";
 import { ConnectionProviders } from "@imtbl/checkout-sdk-web";
 import { Web3Provider } from "@ethersproject/providers";
-import { PageOne } from "./views/PageOne";
+import { ViewOne } from "./views/ViewOne";
 import { useEffect, useReducer } from "react";
 import { initialViewState, ViewActions, ViewContext, viewReducer } from "../../context/ViewContext";
 import { TransitionExampleWidgetViews } from "../../context/TransitionExampleViewContextTypes";
-import { PageTwo } from "./views/PageTwo";
-import { PageThree } from "./views/PageThree";
+import { ViewTwo } from "./views/ViewTwo";
+import { ViewThree } from "./views/ViewThree";
 
 export interface TransitionExampleWidgetProps {
   params: TransitionExampleWidgetParams;
@@ -33,7 +33,7 @@ export function TransitionExampleWidget(props:TransitionExampleWidgetProps) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: TransitionExampleWidgetViews.PAGE_ONE
+          type: TransitionExampleWidgetViews.VIEW_ONE
         }
       }
     })
@@ -42,9 +42,9 @@ export function TransitionExampleWidget(props:TransitionExampleWidgetProps) {
   return(
     <BiomeThemeProvider theme={{base: biomeTheme}}>
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
-        {viewState.view.type === TransitionExampleWidgetViews.PAGE_ONE && <PageOne/>}
-        {viewState.view.type === TransitionExampleWidgetViews.PAGE_TWO && <PageTwo/>}
-        {viewState.view.type === TransitionExampleWidgetViews.PAGE_THREE && <PageThree/>}
+        {viewState.view.type === TransitionExampleWidgetViews.VIEW_ONE && <ViewOne/>}
+        {viewState.view.type === TransitionExampleWidgetViews.VIEW_TWO && <ViewTwo/>}
+        {viewState.view.type === TransitionExampleWidgetViews.VIEW_THREE && <ViewThree/>}
       </ViewContext.Provider>
     </BiomeThemeProvider>
   )

@@ -8,23 +8,23 @@ import { useContext, useState } from "react";
 import { TransitionExampleWidgetViews } from "../../../context/TransitionExampleViewContextTypes";
 import { ViewActions, ViewContext } from "../../../context/ViewContext";
 
-export const PageTwo = () => {
+export const ViewTwo = () => {
   const { viewDispatch } = useContext(ViewContext);
   const [buttonText, setButtonText] = useState("Next");
-  const [body, setBody] = useState(PageTwoContentOne);
+  const [body, setBody] = useState(ViewTwoContentOne);
   const [hero, setHero] = useState<string | undefined>(PurpleDownGradient);
   const [actionFunction, setActionFunction] = useState(() => actionPrevious);
 
   function actionPrevious () {
     setButtonText("Previous");
-    setBody(PageTwoContentTwo);
+    setBody(ViewTwoContentTwo);
     setActionFunction(() => actionNext);
     setHero(ImmutableNetwork);
   }
 
   function actionNext () {
     setButtonText("Next");
-    setBody(PageTwoContentOne);
+    setBody(ViewTwoContentOne);
     setActionFunction(() => actionPrevious);
     setHero(PurpleDownGradient);
   }
@@ -53,31 +53,31 @@ export const PageTwo = () => {
             payload: {
               type: ViewActions.UPDATE_VIEW,
               view: {
-                type: TransitionExampleWidgetViews.PAGE_THREE
+                type: TransitionExampleWidgetViews.VIEW_THREE
               }
             }
           })
         }}
       >
-          Go To Page Three
+          Go To View Three
       </Button>
     </SimpleLayout>
   )
 }
 
-const PageTwoContentOne = () => {
+const ViewTwoContentOne = () => {
   return (
     <>
-      <Heading>Page Two</Heading>
+      <Heading>View Two</Heading>
       <Body>Some content here</Body>
     </>
   )
 }
 
-const PageTwoContentTwo = () => {
+const ViewTwoContentTwo = () => {
   return (
     <>
-      <Heading>Page Two More</Heading>
+      <Heading>View Two More</Heading>
       <Body>More content</Body>
     </>
   )

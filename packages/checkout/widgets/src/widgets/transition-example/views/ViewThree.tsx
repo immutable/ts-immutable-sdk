@@ -5,13 +5,13 @@ import { FooterNavigation } from "../../../components/Footer/FooterNavigation"
 import { HeaderNavigation } from "../../../components/Header/HeaderNavigation"
 import { SimpleLayout } from "../../../components/SimpleLayout/SimpleLayout"
 
-export const PageThree = () => {
+export const ViewThree = () => {
   const [buttonText, setButtonText] = useState("Next");
-  const [body, setBody] = useState(PageThreeContentOne);
-  const [footer, setFooter] = useState<JSX.Element | undefined>(PageThreeFooterNavigation);
+  const [body, setBody] = useState(ViewThreeContentOne);
+  const [footer, setFooter] = useState<JSX.Element | undefined>(ViewThreeFooterNavigation);
   const [actionFunction, setActionFunction] = useState<() => void | undefined>();
 
-  function PageThreeFooterNavigation () {
+  function ViewThreeFooterNavigation () {
     return (
       <FooterNavigation
         text={buttonText}
@@ -20,23 +20,23 @@ export const PageThree = () => {
     )
   }
 
-  function PageThreeFooterLogo () {
+  function ViewThreeFooterLogo () {
     return (
       <FooterLogo />
     )
   }
 
   function actionPrevious () {
-    setBody(PageThreeContentOne);
+    setBody(ViewThreeContentOne);
     setActionFunction(undefined);
-    setFooter(PageThreeFooterNavigation);
+    setFooter(ViewThreeFooterNavigation);
   }
 
   function actionNext () {
     setButtonText("Next");
-    setBody(PageThreeContentTwo);
+    setBody(ViewThreeContentTwo);
     setActionFunction(() => actionPrevious);
-    setFooter(PageThreeFooterLogo);
+    setFooter(ViewThreeFooterLogo);
   }
 
   return (
@@ -55,19 +55,19 @@ export const PageThree = () => {
   )
 }
 
-const PageThreeContentOne = () => {
+const ViewThreeContentOne = () => {
     return (
       <>
-        <Heading>Page Three</Heading>
+        <Heading>View Three</Heading>
         <Body>Some content here</Body>
       </>
     )
   }
   
-const PageThreeContentTwo = () => {
+const ViewThreeContentTwo = () => {
   return (
     <>
-      <Heading>Page Three More</Heading>
+      <Heading>View Three More</Heading>
       <Body>More content</Body>
     </>
   )

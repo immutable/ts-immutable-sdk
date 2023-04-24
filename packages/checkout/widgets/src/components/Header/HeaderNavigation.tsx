@@ -45,13 +45,13 @@ export const HeaderNavigation = ({
     })
   }
 
-  const backButton = () => {
+  const handleBackButtonClick = () => {
     onBackButtonClick ? onBackButtonClick() : goBack()
   }
 
   return (
     <AppHeaderBar testId="header-navigation-container" sx={HeaderNavigationStyles(transparent)} elevated={false}>
-      {showBack && <AppHeaderBar.LeftButtCon icon="ArrowBackward" iconVariant="bold" onClick={backButton} testId='back-button' />}
+      {showBack && <AppHeaderBar.LeftButtCon icon="ArrowBackward" iconVariant="bold" onClick={handleBackButtonClick} testId='back-button' />}
       <AppHeaderBar.Title testId="header-title" size='medium' sx={{ textAlign: 'left' }}>{title}</AppHeaderBar.Title>
       <AppHeaderBar.RightHandButtons>
         {showSettings && onSettingsClick && <ButtCon icon="SettingsCog" iconVariant="bold" onClick={onSettingsClick} testId='settings-button' />}

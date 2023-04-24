@@ -2,8 +2,8 @@ import { Box, Button } from "@biom3/react";
 import { FooterNavigationStyles } from "./FooterStyles";
 
 export interface FooterProps {
-  text?: string
-  callToAction?: () => void
+  text: string
+  callToAction: () => void
 }
 
 export const FooterNavigation = (props: FooterProps) => {
