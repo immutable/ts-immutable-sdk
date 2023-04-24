@@ -13,7 +13,7 @@ function checkConnection() {
   async function checkMyConnection() {
     try {
       const checkConnect = await checkout.checkIsWalletConnected({
-        providerPreference: 'trust-wallet' as any as ConnectionProviders, //ConnectionProviders.METAMASK,
+        providerPreference: ConnectionProviders.METAMASK, //'trust-wallet' as any as ConnectionProviders, //ConnectionProviders.METAMASK,
       });
       setCheckConnectResult(checkConnect);
       console.log('isConnected: ', checkConnect);

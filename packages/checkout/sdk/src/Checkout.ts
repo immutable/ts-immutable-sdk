@@ -2,7 +2,7 @@ import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
 import * as wallet from './wallet';
-import { getNetworkInfo, switchWalletNetwork } from './network';
+import * as network from './network';
 import * as transaction from './transaction';
 import { Web3Provider } from '@ethersproject/providers';
 import {
@@ -14,6 +14,8 @@ import {
   GetAllBalancesResult,
   GetBalanceParams,
   GetBalanceResult,
+  GetNetworkAllowListParams,
+  GetNetworkAllowListResult,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
   GetWalletAllowListParams,
@@ -34,18 +36,18 @@ export class Checkout {
 
   public async connect(params: ConnectParams): Promise<ConnectResult> {
     const provider = await connect.connectWalletProvider(params);
-    const network = await getNetworkInfo(provider);
+    const networkInfo = await network.getNetworkInfo(provider);
 
     return {
       provider,
-      network,
+      network: networkInfo,
     };
   }
 
   public async switchNetwork(
     params: SwitchNetworkParams
   ): Promise<SwitchNetworkResult> {
-    return await switchWalletNetwork(params.provider, params.chainId);
+    return await network.switchWalletNetwork(params.provider, params.chainId);
   }
 
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
@@ -69,6 +71,12 @@ export class Checkout {
     );
   }
 
+  public async getNetworkAllowList(
+    params: GetNetworkAllowListParams
+  ): Promise<GetNetworkAllowListResult> {
+    return await network.getNetworkAllowList(params);
+  }
+
   public async getTokenAllowList(
     params: GetTokenAllowListParams
   ): Promise<GetTokenAllowListResult> {
@@ -88,6 +96,6 @@ export class Checkout {
   }
 
   public async getNetworkInfo(provider: Web3Provider): Promise<NetworkInfo> {
-    return await getNetworkInfo(provider);
+    return await network.getNetworkInfo(provider);
   }
 }
