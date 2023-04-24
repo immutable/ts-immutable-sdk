@@ -24,7 +24,6 @@ import {
   SwitchNetworkParams,
   SwitchNetworkResult,
 } from './types';
-import { withCheckoutError, CheckoutErrorType, CheckoutError } from './errors';
 
 export class Checkout {
   public async checkIsWalletConnected(

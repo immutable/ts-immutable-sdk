@@ -73,7 +73,7 @@ export async function connectWalletProvider(
   return web3Provider;
 }
 
-export async function getWalletProviderForPreference(
+async function getWalletProviderForPreference(
   providerPreference: ConnectionProviders
 ): Promise<Web3Provider> {
   let web3Provider: Web3Provider | null = null;
@@ -91,7 +91,7 @@ export async function getWalletProviderForPreference(
   return web3Provider;
 }
 
-export async function getMetaMaskProvider(): Promise<Web3Provider> {
+async function getMetaMaskProvider(): Promise<Web3Provider> {
   const provider = await withCheckoutError<ExternalProvider | null>(
     async () => {
       return await detectEthereumProvider();

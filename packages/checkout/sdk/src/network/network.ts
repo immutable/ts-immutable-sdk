@@ -71,7 +71,6 @@ export async function switchWalletNetwork(
   // WT-1146 - Refer to the README in this folder for explantion on the switch network flow
   try {
     await switchNetworkInWallet(provider, chainId);
-    // eslint-disable-next-line
   } catch (err: any) {
     if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE) {
       try {
