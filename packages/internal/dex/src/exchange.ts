@@ -4,12 +4,10 @@ import { Percent, CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
 import JSBI from 'jsbi';
 
-import { POLYGON_ZKEVM_TESTNET_RPC_URL } from './constants/rpc';
 import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
   DEFAULT_SLIPPAGE,
-  PERIPHERY_ROUTER_ADDRESS_CREATE2,
 } from './constants';
 
 import { Router } from './lib/router';
@@ -18,11 +16,7 @@ import {
   getERC20Decimals,
   validateDifferentAddresses,
 } from './lib/utils';
-import {
-  ExchangeModuleConfiguration,
-  QuoteResponse,
-  TransactionResponse,
-} from './types';
+import { QuoteResponse, TransactionResponse } from './types';
 import { createSwapParameters } from './lib/swap';
 import { MAX_MAX_HOPS } from './constants';
 import { ExchangeConfiguration } from './config/config';
@@ -33,11 +27,20 @@ export class Exchange {
   private chainId: number;
 
   constructor(configuration: ExchangeConfiguration) {
-    this.chainId = configuration.chainId;
+    this.chainId = configuration.chain.chainId;
     this.provider = new ethers.providers.JsonRpcProvider(
-      POLYGON_ZKEVM_TESTNET_RPC_URL
-    ); // TODO add logic for fallback RPCs
-    this.router = new Router(this.provider);
+      configuration.chain.rpcUrl
+    );
+    this.router = new Router(
+      this.provider,
+      configuration.chain.commonRoutingTokens,
+      {
+        multicallAddress: configuration.chain.contracts.multicall,
+        factoryAddress: configuration.chain.contracts.coreFactory,
+        quoterAddress: configuration.chain.contracts.quoterV2,
+        peripheryRouterAddress: configuration.chain.contracts.peripheryRouter,
+      }
+    );
   }
 
   private static validate(
@@ -113,7 +116,7 @@ export class Exchange {
       success: true,
       transactionRequest: {
         data: params.calldata,
-        to: PERIPHERY_ROUTER_ADDRESS_CREATE2,
+        to: this.router.routingContracts.peripheryRouterAddress,
         value: params.value,
         from: fromAddress,
       },
@@ -208,7 +211,6 @@ export class Exchange {
       getERC20Decimals(tokenInAddress, this.provider),
       getERC20Decimals(tokenOutAddress, this.provider),
     ]);
-    console.log('----', this.chainId);
     const tokenIn: Token = new Token(
       this.chainId,
       tokenInAddress,

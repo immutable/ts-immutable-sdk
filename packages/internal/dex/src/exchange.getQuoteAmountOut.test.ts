@@ -10,9 +10,7 @@ import {
   TestDexConfiguration,
   WETH_TEST_CHAIN,
 } from './utils/testUtils';
-import { ExchangeModuleConfiguration } from './types';
-import { Environment, ImmutableConfiguration } from '@imtbl/config/src';
-import { POLYGON_TESTNET_CHAIN_ID } from './constants/tokens/polygon';
+import { ExchangeConfiguration } from 'config/config';
 
 jest.mock('./lib/router');
 jest.mock('./lib/utils', () => {
@@ -79,8 +77,9 @@ describe('getQuoteFromAmountOut', () => {
         };
       });
 
-      const uniswap = new Exchange(TestDexConfiguration);
-      const result = await uniswap.getQuoteFromAmountOut(
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
+      const result = await exchange.getQuoteFromAmountOut(
         wethToken.address,
         imxToken.address,
         amountOut,
@@ -112,8 +111,9 @@ describe('getQuoteFromAmountOut', () => {
         };
       });
 
-      const uniswap = new Exchange(TestDexConfiguration);
-      const result = await uniswap.getQuoteFromAmountOut(
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
+      const result = await exchange.getQuoteFromAmountOut(
         wethToken.address,
         imxToken.address,
         amountOut,
@@ -140,8 +140,9 @@ describe('getQuoteFromAmountOut', () => {
         };
       });
 
-      const uniswap = new Exchange(TestDexConfiguration);
-      const result = await uniswap.getQuoteFromAmountOut(
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
+      const result = await exchange.getQuoteFromAmountOut(
         wethToken.address,
         imxToken.address,
         amountOut,

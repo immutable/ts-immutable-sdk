@@ -8,6 +8,7 @@ import {
   TestDexConfiguration,
 } from './utils/testUtils';
 import * as utils from './lib/utils';
+import { ExchangeConfiguration } from 'config/config';
 
 jest.mock('./lib/router');
 jest.mock('./lib/utils', () => {
@@ -29,7 +30,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const exchange = new Exchange(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
 
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
@@ -55,6 +57,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.minAmountOut.toString()
       ); // minAmountOut
       expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+      // TODO Also check that tx.transactionRequest.to and .from are correct.
     });
   });
 
@@ -64,7 +67,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const exchange = new Exchange(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
 
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
@@ -99,7 +103,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const higherSlippage = new Percent(2, 1000); // 0.2%
       const params = setupSwapTxTest(higherSlippage);
 
-      const exchange = new Exchange(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
 
       const invalidAddress = '0x0123abcdef';
 
@@ -143,7 +148,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const exchange = new Exchange(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
 
       await expect(
         exchange.getUnsignedSwapTxFromAmountIn(

@@ -21,9 +21,6 @@ jest.mock('./lib/utils', () => {
   };
 });
 
-jest.mock('./config/config');
-
-const chainId: number = TEST_CHAIN_ID;
 const wethToken: Token = WETH_TEST_CHAIN;
 const imxToken: Token = IMX_TEST_CHAIN;
 
@@ -80,7 +77,6 @@ describe('getQuoteFromAmountIn', () => {
       });
 
       const configuration = new ExchangeConfiguration(TestDexConfiguration);
-      configuration.chainId = TestDexConfiguration.overrides?.chainId as number;
       const exchange = new Exchange(configuration);
       const result = await exchange.getQuoteFromAmountIn(
         wethToken.address,

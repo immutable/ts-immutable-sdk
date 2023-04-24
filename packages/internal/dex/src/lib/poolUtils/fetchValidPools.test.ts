@@ -2,14 +2,15 @@ import { describe, it } from '@jest/globals';
 import { BigNumber, Contract, providers, utils } from 'ethers';
 import { fetchValidPools } from './fetchValidPools';
 import { TickMath } from '@uniswap/v3-sdk';
-import { Multicall__factory } from '../../contracts/types';
+import { Multicall__factory, factories } from '../../contracts/types';
 import {
   IMX_TEST_CHAIN,
   TEST_CHAIN_ID,
+  TEST_MULTICALL_ADDRESS,
   TEST_RPC_URL,
+  TEST_V3_CORE_FACTORY_ADDRESS,
   WETH_TEST_CHAIN,
 } from '../../utils/testUtils';
-import { MULTICALL_ADDRESS_CREATE2 } from '../../constants';
 
 jest.mock('@ethersproject/contracts');
 
@@ -71,14 +72,15 @@ describe('fetchPools', () => {
         TEST_CHAIN_ID
       );
       const multicallContract = Multicall__factory.connect(
-        MULTICALL_ADDRESS_CREATE2,
+        TEST_MULTICALL_ADDRESS,
         provider
       );
 
       const pools = await fetchValidPools(
         multicallContract,
         [WETH_TEST_CHAIN, IMX_TEST_CHAIN],
-        []
+        [],
+        TEST_V3_CORE_FACTORY_ADDRESS
       );
 
       expect(pools).toHaveLength(0);
@@ -196,14 +198,15 @@ describe('fetchPools', () => {
         TEST_CHAIN_ID
       );
       const multicallContract = Multicall__factory.connect(
-        MULTICALL_ADDRESS_CREATE2,
+        TEST_MULTICALL_ADDRESS,
         provider
       );
 
       const pools = await fetchValidPools(
         multicallContract,
         [WETH_TEST_CHAIN, IMX_TEST_CHAIN],
-        []
+        [],
+        TEST_V3_CORE_FACTORY_ADDRESS
       );
 
       expect(pools).toHaveLength(0);
@@ -324,14 +327,15 @@ describe('fetchPools', () => {
         TEST_CHAIN_ID
       );
       const multicallContract = Multicall__factory.connect(
-        MULTICALL_ADDRESS_CREATE2,
+        TEST_MULTICALL_ADDRESS,
         provider
       );
 
       const pools = await fetchValidPools(
         multicallContract,
         [WETH_TEST_CHAIN, IMX_TEST_CHAIN],
-        []
+        [],
+        TEST_V3_CORE_FACTORY_ADDRESS
       );
 
       expect(pools).toHaveLength(4);

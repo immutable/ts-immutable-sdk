@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { Currency, TradeType, CurrencyAmount } from '@uniswap/sdk-core';
+import { Currency, TradeType, CurrencyAmount, Token } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import JSBI from 'jsbi';
 import { poolEquals } from './utils';
@@ -8,13 +8,27 @@ import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { QuoteResponse } from '../types';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
 import { Multicall, Multicall__factory } from '../contracts/types';
-import { COMMON_ROUTING_TOKENS, MULTICALL_ADDRESS_CREATE2 } from '../constants';
+
+export type RoutingContracts = {
+  multicallAddress: string;
+  factoryAddress: string;
+  quoterAddress: string;
+  peripheryRouterAddress: string;
+};
 
 export class Router {
   public provider: ethers.providers.JsonRpcProvider;
+  public routingTokens: Token[];
+  public routingContracts: RoutingContracts;
 
-  constructor(provider: ethers.providers.JsonRpcProvider) {
+  constructor(
+    provider: ethers.providers.JsonRpcProvider,
+    routingTokens: Token[],
+    routingContracts: RoutingContracts
+  ) {
     this.provider = provider;
+    this.routingTokens = routingTokens;
+    this.routingContracts = routingContracts;
   }
 
   public async findOptimalRoute(
@@ -30,7 +44,7 @@ export class Router {
     );
 
     const multicallContract = Multicall__factory.connect(
-      MULTICALL_ADDRESS_CREATE2,
+      this.routingContracts.multicallAddress,
       this.provider
     );
     const erc20Pair: ERC20Pair = [currencyIn.wrapped, currencyOut.wrapped];
@@ -39,7 +53,8 @@ export class Router {
     const pools: Pool[] = await fetchValidPools(
       multicallContract,
       erc20Pair,
-      COMMON_ROUTING_TOKENS
+      this.routingTokens,
+      this.routingContracts.factoryAddress
     );
     const noValidPools = pools.length === 0;
     if (noValidPools) {

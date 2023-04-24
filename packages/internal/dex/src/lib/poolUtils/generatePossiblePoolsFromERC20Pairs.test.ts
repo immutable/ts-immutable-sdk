@@ -4,6 +4,7 @@ import { ERC20Pair } from './generateERC20Pairs';
 import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromERC20Pairs';
 import {
   IMX_TEST_CHAIN,
+  TEST_V3_CORE_FACTORY_ADDRESS,
   USDC_TEST_CHAIN,
   WETH_TEST_CHAIN,
 } from '../../utils/testUtils';
@@ -16,7 +17,8 @@ describe('generatePoolsFromTokenPairs', () => {
 
       const pools = generatePossiblePoolsFromERC20Pair(
         erc20Pair,
-        commonRoutingERC20s
+        commonRoutingERC20s,
+        TEST_V3_CORE_FACTORY_ADDRESS
       );
       expect(pools).toMatchInlineSnapshot(`
         [
@@ -128,7 +130,8 @@ describe('generatePoolsFromTokenPairs', () => {
 
       const pools = generatePossiblePoolsFromERC20Pair(
         erc20Pair,
-        commonRoutingERC20s
+        commonRoutingERC20s,
+        TEST_V3_CORE_FACTORY_ADDRESS
       );
 
       expect(pools).toHaveLength(12);

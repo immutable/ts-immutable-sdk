@@ -11,8 +11,6 @@ import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { ExchangeModuleConfiguration, Router, TradeInfo } from '../lib';
 import { Environment, ImmutableConfiguration } from '@imtbl/config/src';
-import { POLYGON_TESTNET_CHAIN_ID } from '../constants/tokens/polygon';
-import { ExchangeConfiguration } from '../config/config';
 
 export const testChainId: number = 1;
 
@@ -28,10 +26,35 @@ export const TestImmutableConfiguration: ImmutableConfiguration =
 
 export const TestDexConfiguration: ExchangeModuleConfiguration = {
   baseConfig: TestImmutableConfiguration,
+  chainId: TEST_CHAIN_ID,
   overrides: {
-    chainId: TEST_CHAIN_ID,
+    rpcURL: TEST_RPC_URL,
+    exchangeContracts: {
+      multicall: '',
+      coreFactory: '',
+      quoterV2: '',
+      peripheryRouter: '',
+      migrator: '',
+      nonfungiblePositionManager: '',
+      tickLens: '',
+    },
+    commonRoutingTokens: [],
   },
 };
+
+export const TEST_MULTICALL_ADDRESS =
+  '0x66d0aB680ACEe44308edA2062b910405CC51A190';
+export const TEST_V3_CORE_FACTORY_ADDRESS =
+  '0x23490b262829ACDAD3EF40e555F23d77D1B69e4e';
+export const TEST_QUOTER_ADDRESS = '0x9B323E56215aAdcD4f45a6Be660f287DE154AFC5';
+export const TEST_PERIPHERY_ROUTER_ADDRESS =
+  '0x615FFbea2af24C55d737dD4264895A56624Da072';
+export const TEST_V3_MIGRATOR_ADDRESSES =
+  '0x0Df0d2d5Cf4739C0b579C33Fdb3d8B04Bee85729';
+export const TEST_NONFUNGIBLE_POSITION_MANAGER_ADDRESSES =
+  '0x446c78D97b1E78bC35864FC49AcE1f7404F163F6';
+export const TEST_TICK_LENS_ADDRESSES =
+  '0x3aC4F8094b21A6c5945453007d9c52B7e15340c0';
 
 export const IMX_TEST_CHAIN = new Token(
   TEST_CHAIN_ID,
@@ -195,10 +218,11 @@ export function mockRouterImplementation(
 ) {
   (Router as unknown as jest.Mock).mockImplementationOnce(() => {
     return {
+      routingContracts: { peripheryRouterAddress: '0x00000' },
       findOptimalRoute: () => {
-        const tokenIn: Token = new Token(params.chainID, params.inputToken, 18);
+        const tokenIn: Token = new Token(params.chainId, params.inputToken, 18);
         const tokenOut: Token = new Token(
-          params.chainID,
+          params.chainId,
           params.outputToken,
           18
         );

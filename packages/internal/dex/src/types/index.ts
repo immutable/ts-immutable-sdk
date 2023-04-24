@@ -34,20 +34,20 @@ export type TransactionResponse =
     };
 
 export type TokenInfo = {
-  chainId: number,
-  address: string,
-  decimals: number,
-  symbol: string,
-  name: string
-}
+  chainId: number;
+  address: string;
+  decimals: number;
+  symbol?: string;
+  name?: string;
+};
 
 export interface ExchangeOverrides {
-  rpcURL: string,
-  exchangeContracts: ExchangeContracts
-  commonRoutingTokens: TokenInfo[]
+  rpcURL: string;
+  exchangeContracts: ExchangeContracts;
+  commonRoutingTokens: TokenInfo[];
 }
 
 export interface ExchangeModuleConfiguration
   extends ModuleConfiguration<ExchangeOverrides> {
-    chainId: number; // TODO - union of Sandbox/Prod chains?
+  chainId: number; // TODO - union of Sandbox/Prod chains?
 }

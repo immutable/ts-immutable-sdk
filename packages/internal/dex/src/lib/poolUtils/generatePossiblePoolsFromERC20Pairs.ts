@@ -5,7 +5,6 @@ import {
   generateERC20Pairs as generateERC20Pairs,
   ERC20Pair,
 } from './generateERC20Pairs';
-import { V3_CORE_FACTORY_ADDRESS_CREATE2 } from '../../constants/addresses';
 
 type PoolIDs = PoolID[];
 type PoolID = {
@@ -24,7 +23,8 @@ const PoolFees = [
 // generatePossiblePoolsFromERC20Pair will compute all possible pool combinations from the erc20Pair, commonRoutingERC20s and PoolFees
 export const generatePossiblePoolsFromERC20Pair = (
   erc20Pair: ERC20Pair,
-  commonRoutingERC20s: Token[]
+  commonRoutingERC20s: Token[],
+  factoryAddress: string
 ): PoolIDs => {
   const erc20Pairs = generateERC20Pairs(erc20Pair, commonRoutingERC20s);
   const poolIDs: PoolIDs = [];
@@ -33,7 +33,7 @@ export const generatePossiblePoolsFromERC20Pair = (
       // Compute the address of the pool using its unique identifier (tokenA, tokenB, fee)
       // Computing an address does not mean the pool is guaranteed to exist
       const poolAddress = computePoolAddress({
-        factoryAddress: V3_CORE_FACTORY_ADDRESS_CREATE2,
+        factoryAddress: factoryAddress,
         erc20Pair: erc20Pair,
         fee: PoolFees[j],
       });

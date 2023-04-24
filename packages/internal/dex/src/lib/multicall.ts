@@ -16,10 +16,6 @@ export type MulticallResponse = {
   returnData: UniswapInterfaceMulticall.ResultStructOutput[];
 };
 
-// multicallSingleCallDataMultipleContracts
-
-// multicallMultipleCallDataSingContract
-
 // TODO: Better description of function and args
 export async function multicallSingleCallDataMultipleContracts(
   multicallContract: Multicall,
