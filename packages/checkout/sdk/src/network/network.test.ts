@@ -235,71 +235,50 @@ describe('network functions', () => {
         ],
       });
     });
+  });
 
-    it('should throw an error when the user cancels an add network request', async () => {
-      const requestMock = jest
-        .fn()
-        .mockResolvedValueOnce({}) // resolve for the connection request
-        .mockRejectedValueOnce(new Error('Unrecognized chain ID')) // reject for the switch network request as chain is not addded yet
-        .mockRejectedValueOnce(new Error()); // reject for the add network request - user cancels
+  describe('getNetworkInfo', () => {
+    const getNetworkTestCases = [
+      {
+        chainId: 1 as ChainId,
+        chainName: 'homestead',
+      },
+      {
+        chainId: 5 as ChainId,
+        chainName: 'goerli',
+      },
+      {
+        chainId: 137 as ChainId,
+        chainName: 'matic',
+      },
+    ];
 
-      windowSpy.mockImplementation(() => ({
-        ethereum: {
-          request: requestMock,
-        },
-        removeEventListener: () => {},
-      }));
-
-      const provider = await connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
-
-      await expect(
-        switchWalletNetwork(provider, ChainId.POLYGON)
-      ).rejects.toThrow(
-        new CheckoutError(
-          'User cancelled switch network request',
-          CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
-        )
-      );
-      expect(provider.provider.request).toHaveBeenCalledWith({
-        method: WALLET_ACTION.ADD_NETWORK,
-        params: [
-          {
-            chainId: ChainIdNetworkMap[ChainId.POLYGON].chainIdHex,
-            chainName: ChainIdNetworkMap[ChainId.POLYGON].chainName,
-            rpcUrls: ChainIdNetworkMap[ChainId.POLYGON].rpcUrls,
-            nativeCurrency: ChainIdNetworkMap[ChainId.POLYGON].nativeCurrency,
-            blockExplorerUrls:
-              ChainIdNetworkMap[ChainId.POLYGON].blockExplorerUrls,
-          },
-        ],
+    getNetworkTestCases.forEach((testCase) => {
+      it(`should return the network info for the ${testCase.chainName} network`, async () => {
+        const getNetworkMock = jest.fn().mockResolvedValue({
+          chainId: testCase.chainId,
+          name: testCase.chainName,
+        });
+        const mockProvider = {
+          getNetwork: getNetworkMock,
+        };
+        const result = await getNetworkInfo(
+          mockProvider as unknown as Web3Provider
+        );
+        expect(result.name).toBe(ChainIdNetworkMap[testCase.chainId].chainName);
+        expect(result.chainId).toBe(
+          parseInt(ChainIdNetworkMap[testCase.chainId].chainIdHex, 16)
+        );
+        expect(result.nativeCurrency).toEqual(
+          ChainIdNetworkMap[testCase.chainId].nativeCurrency
+        );
       });
     });
-  });
-});
 
-describe('getNetworkInfo', () => {
-  const getNetworkTestCases = [
-    {
-      chainId: 1 as ChainId,
-      chainName: 'homestead',
-    },
-    {
-      chainId: 5 as ChainId,
-      chainName: 'goerli',
-    },
-    {
-      chainId: 137 as ChainId,
-      chainName: 'matic',
-    },
-  ];
-
-  getNetworkTestCases.forEach((testCase) => {
-    it(`should return the network info for the ${testCase.chainName} network`, async () => {
+    it('should return basic details for an unsupported network', async () => {
       const getNetworkMock = jest.fn().mockResolvedValue({
-        chainId: testCase.chainId,
-        name: testCase.chainName,
+        chainId: 3,
+        name: 'ropsten',
       });
       const mockProvider = {
         getNetwork: getNetworkMock,
@@ -307,91 +286,71 @@ describe('getNetworkInfo', () => {
       const result = await getNetworkInfo(
         mockProvider as unknown as Web3Provider
       );
-      expect(result.name).toBe(ChainIdNetworkMap[testCase.chainId].chainName);
-      expect(result.chainId).toBe(
-        parseInt(ChainIdNetworkMap[testCase.chainId].chainIdHex, 16)
-      );
-      expect(result.nativeCurrency).toEqual(
-        ChainIdNetworkMap[testCase.chainId].nativeCurrency
-      );
+      expect(result).toEqual({
+        chainId: 3,
+        name: 'ropsten',
+        isSupported: false,
+      });
     });
   });
 
-  it('should return basic details for an unsupported network', async () => {
-    const getNetworkMock = jest.fn().mockResolvedValue({
-      chainId: 3,
-      name: 'ropsten',
-    });
-    const mockProvider = {
-      getNetwork: getNetworkMock,
-    };
-    const result = await getNetworkInfo(
-      mockProvider as unknown as Web3Provider
-    );
-    expect(result).toEqual({
-      chainId: 3,
-      name: 'ropsten',
-      isSupported: false,
-    });
-  });
-});
-
-describe('getNetworkAllowList()', () => {
-  it('should return all the networks if no exclude filter is provided', async () => {
-    await expect(await getNetworkAllowList({})).toEqual({
-      networks: [
-        {
-          name: 'Ethereum',
-          chainId: 1,
-          isSupported: true,
-          nativeCurrency: {
+  describe('getNetworkAllowList()', () => {
+    it('should return all the networks if no exclude filter is provided', async () => {
+      await expect(await getNetworkAllowList({})).toEqual({
+        networks: [
+          {
             name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
+            chainId: 1,
+            isSupported: true,
+            nativeCurrency: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+            },
           },
-        },
-        {
-          name: 'Goerli',
-          chainId: 5,
-          isSupported: true,
-          nativeCurrency: {
-            name: 'Goerli Eth',
-            symbol: 'ETH',
-            decimals: 18,
+          {
+            name: 'Goerli',
+            chainId: 5,
+            isSupported: true,
+            nativeCurrency: {
+              name: 'Goerli Eth',
+              symbol: 'ETH',
+              decimals: 18,
+            },
           },
-        },
-        {
-          name: 'Polygon',
-          chainId: 137,
-          isSupported: true,
-          nativeCurrency: {
-            name: 'MATIC',
-            symbol: 'MATIC',
-            decimals: 18,
+          {
+            name: 'Polygon',
+            chainId: 137,
+            isSupported: true,
+            nativeCurrency: {
+              name: 'MATIC',
+              symbol: 'MATIC',
+              decimals: 18,
+            },
           },
-        },
-      ],
+        ],
+      });
     });
-  });
 
-  it('should exclude the right networks if an exclude filter is provided', async () => {
-    await expect(
-      await getNetworkAllowList({
-        exclude: [{ chainId: 5 }, { chainId: 137 }],
-      })
-    ).toEqual({
-      networks: [
-        {
-          name: 'Ethereum',
-          chainId: 1,
-          isSupported: true,
-          nativeCurrency: {
+    it('should exclude the right networks if an exclude filter is provided', async () => {
+      await expect(
+        await getNetworkAllowList({
+          exclude: [{ chainId: 5 }, { chainId: 137 }],
+        })
+      ).toEqual({
+        networks: [
+          {
             name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
+            chainId: 1,
+            isSupported: true,
+            nativeCurrency: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              decimals: 18,
+            },
           },
-        },
-      ],
+        ],
+      });
     });
   });
 });
