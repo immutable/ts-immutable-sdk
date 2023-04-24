@@ -10,7 +10,7 @@ import {
   TestDexConfiguration,
   WETH_TEST_CHAIN,
 } from './utils/testUtils';
-import { DexConfiguration } from './config/config';
+import { ExchangeConfiguration } from './config/config';
 
 jest.mock('./lib/router');
 jest.mock('./lib/utils', () => {
@@ -79,7 +79,7 @@ describe('getQuoteFromAmountIn', () => {
         };
       });
 
-      const configuration = new DexConfiguration(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
       configuration.chainId = TestDexConfiguration.overrides?.chainId as number;
       const exchange = new Exchange(configuration);
       const result = await exchange.getQuoteFromAmountIn(
@@ -114,7 +114,7 @@ describe('getQuoteFromAmountIn', () => {
         };
       });
 
-      const configuration = new DexConfiguration(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
       const exchange = new Exchange(configuration);
       const result = await exchange.getQuoteFromAmountIn(
         wethToken.address,
@@ -143,7 +143,7 @@ describe('getQuoteFromAmountIn', () => {
         };
       });
 
-      const configuration = new DexConfiguration(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
       const exchange = new Exchange(configuration);
       const result = await exchange.getQuoteFromAmountIn(
         wethToken.address,

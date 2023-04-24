@@ -1,6 +1,7 @@
 import { Token } from '@uniswap/sdk-core';
 
 export const POLYGON_TESTNET_CHAIN_ID = 1442;
+export const IMX_PRIVATE_TESTNET_CHAIN_ID = 1337;
 
 export const IMX_POLYGON_TESTNET = new Token(
   POLYGON_TESTNET_CHAIN_ID,

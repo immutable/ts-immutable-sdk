@@ -9,10 +9,10 @@ import { ethers } from 'ethers';
 import { hexDataSlice } from 'ethers/lib/utils';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
-import { DexModuleConfiguration, Router, TradeInfo } from '../lib';
+import { ExchangeModuleConfiguration, Router, TradeInfo } from '../lib';
 import { Environment, ImmutableConfiguration } from '@imtbl/config/src';
 import { POLYGON_TESTNET_CHAIN_ID } from '../constants/tokens/polygon';
-import { DexConfiguration } from '../config/config';
+import { ExchangeConfiguration } from '../config/config';
 
 export const testChainId: number = 1;
 
@@ -26,7 +26,7 @@ export const TestImmutableConfiguration: ImmutableConfiguration =
     environment: Environment.SANDBOX,
   });
 
-export const TestDexConfiguration: DexModuleConfiguration = {
+export const TestDexConfiguration: ExchangeModuleConfiguration = {
   baseConfig: TestImmutableConfiguration,
   overrides: {
     chainId: TEST_CHAIN_ID,

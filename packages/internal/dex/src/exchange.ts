@@ -19,21 +19,20 @@ import {
   validateDifferentAddresses,
 } from './lib/utils';
 import {
-  DexModuleConfiguration,
+  ExchangeModuleConfiguration,
   QuoteResponse,
   TransactionResponse,
 } from './types';
 import { createSwapParameters } from './lib/swap';
-import { POLYGON_TESTNET_CHAIN_ID } from './constants/tokens/polygon';
 import { MAX_MAX_HOPS } from './constants';
-import { DexConfiguration } from './config/config';
+import { ExchangeConfiguration } from './config/config';
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;
   private router: Router;
   private chainId: number;
 
-  constructor(configuration: DexConfiguration) {
+  constructor(configuration: ExchangeConfiguration) {
     this.chainId = configuration.chainId;
     this.provider = new ethers.providers.JsonRpcProvider(
       POLYGON_ZKEVM_TESTNET_RPC_URL

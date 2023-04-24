@@ -10,7 +10,7 @@ import {
   TestDexConfiguration,
   WETH_TEST_CHAIN,
 } from './utils/testUtils';
-import { DexModuleConfiguration } from './types';
+import { ExchangeModuleConfiguration } from './types';
 import { Environment, ImmutableConfiguration } from '@imtbl/config/src';
 import { POLYGON_TESTNET_CHAIN_ID } from './constants/tokens/polygon';
 
