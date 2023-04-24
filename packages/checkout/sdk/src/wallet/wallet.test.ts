@@ -94,7 +94,7 @@ describe('getWalletAllowList', () => {
           exclude: testcase.exclude,
         })
       ).toEqual({
-        allowedWallets: testcase.result,
+        wallets: testcase.result,
       });
     });
   });

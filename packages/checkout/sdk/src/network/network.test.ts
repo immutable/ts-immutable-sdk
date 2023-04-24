@@ -4,13 +4,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import {
-  switchWalletNetwork,
   getNetworkAllowList,
   getNetworkInfo,
+  switchWalletNetwork,
 } from './network';
-import { ChainId, WALLET_ACTION } from '../types';
+import {
+  ChainId,
+  ChainIdNetworkMap,
+  ConnectionProviders,
+  NetworkFilterTypes,
+  WALLET_ACTION,
+} from '../types';
 import { connectWalletProvider } from '../connect';
-import { ChainIdNetworkMap, ConnectionProviders } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { Web3Provider } from '@ethersproject/providers';
 
@@ -296,7 +301,9 @@ describe('network functions', () => {
 
   describe('getNetworkAllowList()', () => {
     it('should return all the networks if no exclude filter is provided', async () => {
-      await expect(await getNetworkAllowList({})).toEqual({
+      await expect(
+        await getNetworkAllowList({ type: NetworkFilterTypes.ALL })
+      ).toEqual({
         networks: [
           {
             name: 'Ethereum',
@@ -335,6 +342,7 @@ describe('network functions', () => {
     it('should exclude the right networks if an exclude filter is provided', async () => {
       await expect(
         await getNetworkAllowList({
+          type: NetworkFilterTypes.ALL,
           exclude: [{ chainId: 5 }, { chainId: 137 }],
         })
       ).toEqual({

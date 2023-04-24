@@ -68,11 +68,16 @@ export interface SwitchNetworkResult {
   network: NetworkInfo;
 }
 
+export enum NetworkFilterTypes {
+  ALL = 'all',
+}
+
 export interface NetworkFilter {
   chainId: ChainId;
 }
 
 export interface GetNetworkAllowListParams {
+  type: NetworkFilterTypes;
   exclude?: NetworkFilter[];
 }
 

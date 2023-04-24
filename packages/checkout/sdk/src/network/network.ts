@@ -12,6 +12,7 @@ import {
   ChainIdNetworkMap,
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
+  NetworkFilterTypes,
   NetworkInfo,
   SwitchNetworkResult,
   WALLET_ACTION,
@@ -119,12 +120,17 @@ export async function switchWalletNetwork(
 }
 
 export async function getNetworkAllowList({
+  type = NetworkFilterTypes.ALL,
   exclude,
 }: GetNetworkAllowListParams): Promise<GetNetworkAllowListResult> {
-  const list = networkMasterList.filter(
-    (network) =>
-      !(exclude || []).map((exc) => exc.chainId).includes(network.chainId)
-  );
+  const list = networkMasterList.filter((network) => {
+    const allowAllTokens = type === NetworkFilterTypes.ALL;
+    const networkNotExcluded = !(exclude || [])
+      .map((exc) => exc.chainId)
+      .includes(network.chainId);
+    return allowAllTokens && networkNotExcluded;
+  });
+
   const allowedNetworks: NetworkInfo[] = [];
   list.forEach((element) => {
     const newNetwork = ChainIdNetworkMap[element.chainId as ChainId];

@@ -6,6 +6,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import GetBalance from './components/getBalance/getBalance';
 import GetAllBalances from './components/getAllBalances/getAllBalances';
 import CheckConnection from './components/checkConnection/checkConnection';
+import GetAllowedLists from './components/allowedLists/getAllowedList';
 
 function App() {
   const [provider, setProvider] = useState<Web3Provider>();
@@ -20,6 +21,7 @@ function App() {
         <SwitchNetwork provider={provider} />
         <GetBalance provider={provider} />
         <GetAllBalances provider={provider} />
+        <GetAllowedLists provider={provider} />
       </main>
     </div>
   );
