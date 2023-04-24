@@ -56,15 +56,15 @@ describe('Economy Class', () => {
 
     jest.spyOn(economy, 'emitEvent' as keyof Economy);
     jest.requireMock('./crafting').craft.mockImplementation(async () => {
-      economy['emitEvent']('CRAFT', 'INITIAL');
-      return 'INITIAL';
+      economy['emitEvent']({ action: 'CRAFT', status: 'STARTED' });
+      return 'STARTED';
     });
 
     await economy.craft(craftInput);
 
     expect(eventHandlerFn).toHaveBeenCalledWith({
-      type: 'CRAFT',
-      status: 'INITIAL',
+      action: 'CRAFT',
+      status: 'STARTED',
     });
   });
 });
