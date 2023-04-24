@@ -80,7 +80,7 @@ describe('connect', () => {
         })
       ).rejects.toThrow(
         new CheckoutError(
-          'Provider preference was not detected',
+          'Provider preference is not supported',
           CheckoutErrorType.CONNECT_PROVIDER_ERROR
         )
       );
@@ -97,7 +97,7 @@ describe('connect', () => {
         })
       ).rejects.toThrow(
         new CheckoutError(
-          'window.addEventListener is not a function',
+          '[METAMASK_PROVIDER_ERROR] Cause:window.addEventListener is not a function',
           CheckoutErrorType.METAMASK_PROVIDER_ERROR
         )
       );
@@ -137,7 +137,7 @@ describe('connect', () => {
         })
       ).rejects.toThrow(
         new CheckoutError(
-          'User rejected request',
+          '[USER_REJECTED_REQUEST_ERROR] Cause:User rejected request',
           CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
         )
       );

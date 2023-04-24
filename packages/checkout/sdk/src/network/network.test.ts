@@ -14,9 +14,9 @@ import { ChainIdNetworkMap, ConnectionProviders } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { Web3Provider } from '@ethersproject/providers';
 
+let windowSpy: any;
 describe('network functions', () => {
   describe('switchWalletNetwork()', () => {
-    let windowSpy: any;
     beforeEach(() => {
       windowSpy = jest.spyOn(window, 'window', 'get');
 
@@ -63,7 +63,7 @@ describe('network functions', () => {
       });
     });
 
-    it('should make request for the user to switch network', async () => {
+    it('should make request for the user to switch network Polygon', async () => {
       const provider = await connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK,
       });
@@ -103,7 +103,7 @@ describe('network functions', () => {
         switchWalletNetwork(provider, 56 as ChainId)
       ).rejects.toThrow(
         new CheckoutError(
-          '56 is not a supported chain',
+          'Chain:56 is not a supported chain',
           CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR
         )
       );
@@ -128,7 +128,7 @@ describe('network functions', () => {
         switchWalletNetwork(provider, ChainId.POLYGON)
       ).rejects.toThrow(
         new CheckoutError(
-          'user cancelled the switch network request',
+          'User cancelled switch network request',
           CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
         )
       );
@@ -153,53 +153,19 @@ describe('network functions', () => {
         switchWalletNetwork(provider, ChainId.POLYGON)
       ).rejects.toThrow(
         new CheckoutError(
-          'provider object is missing request function',
+          'Incompatible provider',
           CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
         )
       );
     });
 
-    it('should request the user to add a new network if their wallet does not already have it', async () => {
+    it('should throw an error if the user rejects the switch network request', async () => {
       windowSpy.mockImplementation(() => ({
         ethereum: {
           request: jest
             .fn()
             .mockResolvedValueOnce({})
-            .mockRejectedValueOnce(new Error('Unrecognized chain ID')),
-        },
-        removeEventListener: () => {},
-      }));
-
-      const provider = await connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
-
-      await switchWalletNetwork(provider, ChainId.POLYGON);
-      expect(provider.provider.request).toHaveBeenCalledWith({
-        method: WALLET_ACTION.ADD_NETWORK,
-        params: [
-          {
-            chainId: ChainIdNetworkMap[ChainId.POLYGON].chainIdHex,
-            chainName: ChainIdNetworkMap[ChainId.POLYGON].chainName,
-            rpcUrls: ChainIdNetworkMap[ChainId.POLYGON].rpcUrls,
-            nativeCurrency: ChainIdNetworkMap[ChainId.POLYGON].nativeCurrency,
-            blockExplorerUrls:
-              ChainIdNetworkMap[ChainId.POLYGON].blockExplorerUrls,
-          },
-        ],
-      });
-    });
-
-    it('should throw an error when the user cancels an add network request', async () => {
-      const requestMock = jest
-        .fn()
-        .mockResolvedValueOnce({}) // resolve for the connection request
-        .mockRejectedValueOnce(new Error('Unrecognized chain ID')) // reject for the switch network request as chain is not addded yet
-        .mockRejectedValueOnce(new Error()); // reject for the add network request - user cancels
-
-      windowSpy.mockImplementation(() => ({
-        ethereum: {
-          request: requestMock,
+            .mockRejectedValue(new Error()),
         },
         removeEventListener: () => {},
       }));
@@ -212,11 +178,50 @@ describe('network functions', () => {
         switchWalletNetwork(provider, ChainId.POLYGON)
       ).rejects.toThrow(
         new CheckoutError(
-          'user cancelled the add network request',
+          'User cancelled switch network request',
           CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
         )
       );
-      expect(provider.provider.request).toHaveBeenCalledWith({
+    });
+
+    it('should throw an error if the provider does not have a request function', async () => {
+      windowSpy.mockImplementation(() => ({
+        ethereum: {
+          request: jest.fn().mockResolvedValueOnce({}),
+        },
+        removeEventListener: () => {},
+      }));
+
+      const provider = await connectWalletProvider({
+        providerPreference: ConnectionProviders.METAMASK,
+      });
+
+      // remove request function from provider
+      delete provider.provider.request;
+
+      await expect(
+        switchWalletNetwork(provider, ChainId.POLYGON)
+      ).rejects.toThrow(
+        new CheckoutError(
+          'Incompatible provider',
+          CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
+        )
+      );
+    });
+
+    it('should request the user to add a new network if their wallet does not already have it', async () => {
+      const mockProvider = {
+        getNetwork: jest.fn().mockResolvedValue({ chainId: 137 }),
+        provider: {
+          request: jest
+            .fn()
+            .mockRejectedValueOnce({ code: 4902 })
+            .mockResolvedValue({}),
+        },
+      } as any as Web3Provider;
+
+      await switchWalletNetwork(mockProvider, ChainId.POLYGON);
+      expect(mockProvider.provider.request).toHaveBeenCalledWith({
         method: WALLET_ACTION.ADD_NETWORK,
         params: [
           {
@@ -231,6 +236,7 @@ describe('network functions', () => {
       });
     });
   });
+
   describe('getNetworkInfo', () => {
     const getNetworkTestCases = [
       {
@@ -246,6 +252,7 @@ describe('network functions', () => {
         chainName: 'matic',
       },
     ];
+
     getNetworkTestCases.forEach((testCase) => {
       it(`should return the network info for the ${testCase.chainName} network`, async () => {
         const getNetworkMock = jest.fn().mockResolvedValue({
@@ -286,6 +293,7 @@ describe('network functions', () => {
       });
     });
   });
+
   describe('getNetworkAllowList()', () => {
     it('should return all the networks if no exclude filter is provided', async () => {
       await expect(await getNetworkAllowList({})).toEqual({

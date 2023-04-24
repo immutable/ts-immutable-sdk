@@ -1,5 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
-import { CheckoutError, CheckoutErrorType } from '../errors';
+import {
+  CheckoutError,
+  CheckoutErrorType,
+  CheckoutInternalError,
+  CheckoutInternalErrorType,
+  withCheckoutError,
+} from '../errors';
 import {
   ChainId,
   ChainIdNetworkMap,
@@ -11,60 +18,89 @@ import {
 } from '../types';
 import networkMasterList from './network_master_list.json';
 
+const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
+
 export async function getNetworkInfo(
   provider: Web3Provider
 ): Promise<NetworkInfo> {
-  const network = await provider.getNetwork();
+  return withCheckoutError(
+    async () => {
+      const network = await provider.getNetwork();
 
-  if (!Object.values(ChainId).includes(network.chainId as ChainId)) {
-    // return empty details
-    return {
-      chainId: network.chainId,
-      name: network.name,
-      isSupported: false,
-    } as NetworkInfo;
-  }
-  const chainIdNetworkInfo = ChainIdNetworkMap[network.chainId as ChainId];
-  return {
-    name: chainIdNetworkInfo.chainName,
-    chainId: parseInt(chainIdNetworkInfo.chainIdHex, 16),
-    nativeCurrency: chainIdNetworkInfo.nativeCurrency,
-    isSupported: true,
-  };
+      if (!Object.values(ChainId).includes(network.chainId as ChainId)) {
+        // return empty details
+        return {
+          chainId: network.chainId,
+          name: network.name,
+          isSupported: false,
+        } as NetworkInfo;
+      }
+      const chainIdNetworkInfo = ChainIdNetworkMap[network.chainId as ChainId];
+      return {
+        name: chainIdNetworkInfo.chainName,
+        chainId: parseInt(chainIdNetworkInfo.chainIdHex, 16),
+        nativeCurrency: chainIdNetworkInfo.nativeCurrency,
+        isSupported: true,
+      };
+    },
+    {
+      type: CheckoutErrorType.GET_NETWORK_INFO_ERROR,
+    }
+  );
 }
 
 export async function switchWalletNetwork(
   provider: Web3Provider,
   chainId: ChainId
 ): Promise<SwitchNetworkResult> {
-  if (!Object.values(ChainId).includes(chainId))
+  if (!Object.values(ChainId).includes(chainId)) {
     throw new CheckoutError(
-      `${chainId} is not a supported chain`,
+      `Chain:${chainId} is not a supported chain`,
       CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR
     );
-  if (!provider.provider?.request)
+  }
+
+  if (!provider || !provider.provider?.request) {
     throw new CheckoutError(
-      'provider object is missing request function',
-      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
+      'Incompatible provider',
+      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
+      { details: `Unsupported provider` }
     );
+  }
+
   // WT-1146 - Refer to the README in this folder for explantion on the switch network flow
   try {
     await switchNetworkInWallet(provider, chainId);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    if (err.message.includes('Unrecognized chain ID')) {
+    if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE) {
       try {
         await addNetworkToWallet(provider, chainId);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+        if ((await provider.getNetwork()).chainId !== chainId) {
+          // user didn't actually switch
+          throw new CheckoutInternalError(
+            CheckoutInternalErrorType.REJECTED_SWITCH_AFTER_ADDING_NETWORK
+          );
+        }
       } catch (err: any) {
+        if (
+          err?.type ===
+          CheckoutInternalErrorType.REJECTED_SWITCH_AFTER_ADDING_NETWORK
+        ) {
+          throw new CheckoutError(
+            'User cancelled switch network request',
+            CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
+          );
+        }
+
         throw new CheckoutError(
-          'user cancelled the add network request',
+          'User cancelled add network request',
           CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
         );
       }
     } else {
       throw new CheckoutError(
-        'user cancelled the switch network request',
+        'User cancelled switch network request',
         CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
       );
     }
