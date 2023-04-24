@@ -215,12 +215,7 @@ describe('AuthManager', () => {
       it('should throw an error if no user is returned', async () => {
         getUserMock.mockReturnValue(null);
 
-        await expect(() => authManager.getUser()).rejects.toThrow(
-          new PassportError(
-            'NOT_LOGGED_IN_ERROR: Failed to retrieve user',
-            PassportErrorType.NOT_LOGGED_IN_ERROR
-          )
-        );
+        expect(await authManager.getUser()).toBeNull();
       });
     });
     describe('requestRefreshTokenAfterRegistration', () => {

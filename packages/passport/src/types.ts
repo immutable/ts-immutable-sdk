@@ -12,6 +12,7 @@ export type User = {
   refreshToken?: string;
   profile: UserProfile;
   etherKey?: string;
+  expired: boolean;
 };
 
 export type PassportMetadata = {

@@ -15,6 +15,7 @@ import {
   PassportModuleConfiguration,
   UserProfile,
   UserWithEtherKey,
+  User,
 } from './types';
 import registerPassport from './workflows/registration';
 
@@ -32,9 +33,8 @@ export class Passport {
     this.magicAdapter = new MagicAdapter(this.config);
   }
 
-  public async connectImx(): Promise<IMXProvider> {
-    const user = await this.authManager.login();
-    if (!user.idToken) {
+  private async getImxProvider(user: User | null) {
+    if (!user || !user.idToken) {
       throw new PassportError(
         'Failed to initialise',
         PassportErrorType.WALLET_CONNECTION_ERROR
@@ -64,6 +64,22 @@ export class Passport {
     });
   }
 
+  public async reconnectImx(): Promise<IMXProvider | null> {
+    const user = await this.authManager.getUser();
+    if (!user || user.expired) {
+      return null;
+    }
+    return this.getImxProvider(user);
+  }
+
+  public async connectImx(): Promise<IMXProvider> {
+    let user = await this.authManager.getUser();
+    if (!user || user.expired) {
+      user = await this.authManager.login();
+    }
+    return this.getImxProvider(user);
+  }
+
   public async loginCallback(): Promise<void> {
     return this.authManager.loginCallback();
   }
@@ -72,19 +88,19 @@ export class Passport {
     return this.authManager.logout();
   }
 
-  public async getUserInfo(): Promise<UserProfile> {
+  public async getUserInfo(): Promise<UserProfile | undefined> {
     const user = await this.authManager.getUser();
-    return user.profile;
+    return user?.profile;
   }
 
   public async getIdToken(): Promise<string | undefined> {
     const user = await this.authManager.getUser();
-    return user.idToken;
+    return user?.idToken;
   }
 
-  public async getAccessToken(): Promise<string> {
+  public async getAccessToken(): Promise<string | undefined> {
     const user = await this.authManager.getUser();
-    return user.accessToken;
+    return user?.accessToken;
   }
 
   private async registerUser(
