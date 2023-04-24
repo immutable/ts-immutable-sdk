@@ -180,3 +180,8 @@ We are currently not enforcing a preference for testing practices. It is complet
 The root [`package.json`](package.json) is the entry point for all CI testing purposes. Therefore, if you wish to write tests for an existing or new package, please ensure that a `"test"` script exists in the associated `package.json` file so that it is picked up by the [`root "test" command.`](package.json#L19)
 
 ### Versioning & Changelog
+
+
+## Disclaimer for Alpha Releases
+
+Please note that alpha releases are still in development and may contain bugs or breaking changes. Please do not use these versions as we do not intend to support for them.
