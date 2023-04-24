@@ -22,8 +22,9 @@ export const getBalance = async (
 
       if (!networkInfo.isSupported) {
         throw new CheckoutError(
-          'Unsupported Network',
-          CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR
+          `Chain:${networkInfo.chainId} is not a supported chain`,
+          CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
+          { chainName: networkInfo.name }
         );
       }
 

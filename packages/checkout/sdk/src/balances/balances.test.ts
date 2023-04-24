@@ -72,7 +72,7 @@ describe('balances', () => {
 
       await expect(getBalance(mockProvider(), '0xAddress')).rejects.toThrow(
         new CheckoutError(
-          'Error getting balance',
+          '[GET_BALANCE_ERROR] Cause:Error getting balance',
           CheckoutErrorType.GET_BALANCE_ERROR
         )
       );
@@ -93,7 +93,7 @@ describe('balances', () => {
 
       await expect(getBalance(mockProvider(), '0xAddress')).rejects.toThrow(
         new CheckoutError(
-          'Unsupported Network',
+          '[GET_BALANCE_ERROR] Cause:Chain:0 is not a supported chain',
           CheckoutErrorType.GET_BALANCE_ERROR
         )
       );
@@ -159,7 +159,7 @@ describe('balances', () => {
         getERC20Balance(mockProvider(), 'abc123', '0x10c')
       ).rejects.toThrow(
         new CheckoutError(
-          'Error getting name from contract',
+          '[GET_ERC20_BALANCE_ERROR] Cause:Error getting name from contract',
           CheckoutErrorType.GET_ERC20_BALANCE_ERROR
         )
       );
@@ -175,7 +175,7 @@ describe('balances', () => {
         getERC20Balance(mockProvider(), 'abc123', '0x10c')
       ).rejects.toThrow(
         new CheckoutError(
-          'invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)',
+          '[GET_ERC20_BALANCE_ERROR] Cause:invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)',
           CheckoutErrorType.GET_ERC20_BALANCE_ERROR
         )
       );

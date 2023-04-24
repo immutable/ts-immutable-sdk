@@ -24,7 +24,6 @@ import {
   SwitchNetworkParams,
   SwitchNetworkResult,
 } from './types';
-import { withCheckoutError, CheckoutErrorType } from './errors';
 
 export class Checkout {
   public async checkIsWalletConnected(
@@ -89,8 +88,6 @@ export class Checkout {
   }
 
   public async getNetworkInfo(provider: Web3Provider): Promise<NetworkInfo> {
-    return await withCheckoutError(() => getNetworkInfo(provider), {
-      type: CheckoutErrorType.GET_NETWORK_INFO_ERROR,
-    });
+    return await getNetworkInfo(provider);
   }
 }

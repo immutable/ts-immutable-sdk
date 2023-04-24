@@ -1,5 +1,3 @@
-export * from './Economy';
-
 export type {
   EconomyCustomEventType,
   EconomyCustomEventTypes,
@@ -8,4 +6,5 @@ export type {
   EventStatus,
   EventStatuses,
 } from './types';
+export * from './Economy';
 export type { CraftInput, CraftStatus, CraftEvent } from './crafting';

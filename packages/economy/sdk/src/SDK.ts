@@ -7,6 +7,9 @@ export type Configuration = {
   env: 'production' | 'dev';
 };
 
+/**
+ * @private Default SDK Configuration
+ */
 const defaultConfig: Configuration = {
   env: 'dev',
 };

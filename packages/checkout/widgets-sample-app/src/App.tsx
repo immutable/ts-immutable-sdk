@@ -50,6 +50,10 @@ function App() {
             Example Widget (Web View)
           </a>
         </div>
+        <br />
+        <div>
+          <a href={'/marketplace-orchestrator'}>Marketplace Orchestrator</a>
+        </div>
       </main>
     </div>
   );

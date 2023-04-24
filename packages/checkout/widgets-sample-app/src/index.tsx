@@ -10,6 +10,7 @@ import SwapUI from './components/ui/swap/swap';
 import BridgeUI from './components/ui/bridge/bridge';
 import ExampleUI from './components/ui/example/example';
 import BuyUI from './components/ui/buy/buy';
+import { Marketplace } from './components/ui/marketplace-orchestrator';
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
   {
     path: '/buy',
     element: <BuyUI />,
+  },
+  {
+    path: '/marketplace-orchestrator',
+    element: <Marketplace />,
   },
 ]);
 

@@ -27,4 +27,7 @@ export type {
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   WalletInfo,
+  NetworkFilter,
+  GetNetworkAllowListParams,
+  GetNetworkAllowListResult,
 } from './types';
