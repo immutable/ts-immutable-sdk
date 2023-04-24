@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ImmutableX } from '@imtbl/core-sdk';
-import { StarkExConfiguration } from 'config';
+import { StarkExConfiguration, StarkExOverrides } from './config';
 
 const StarkExAPIFactory = (config: StarkExConfiguration) => {
   const imtblClient = new ImmutableX(config.immutableXConfig);
@@ -21,4 +20,4 @@ const StarkExAPIFactory = (config: StarkExConfiguration) => {
   return { ...StarkEx };
 };
 
-export { StarkExAPIFactory };
+export { StarkExAPIFactory, StarkExConfiguration, StarkExOverrides };
