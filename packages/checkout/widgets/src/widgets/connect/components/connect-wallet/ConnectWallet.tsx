@@ -5,6 +5,7 @@ import { useContext } from "react"
 import { ViewActions, ViewContext } from "../../../../context/ViewContext"
 import { ConnectWidgetViews } from "../../../../context/ConnectViewContextTypes"
 import { FooterLogo } from "../../../../components/Footer/FooterLogo"
+import { SuccessScreen } from "../../../../components/Success/SuccessScreen";
 
 export const ConnectWallet = () => {
 
@@ -18,23 +19,6 @@ export const ConnectWallet = () => {
   });
 
   return(
-    <SimpleLayout 
-      header={
-        <HeaderNavigation
-          title='Connect a wallet' 
-          showClose
-        />
-      }
-      footer={<FooterLogo />}
-    >
-      <Box>
-        <Button 
-          testId='connect-passport'
-          onClick={() => dispatch(ConnectWidgetViews.PASSPORT)}>Passport</Button>
-        <Button 
-          testId='connect-other'
-          onClick={() => dispatch(ConnectWidgetViews.OTHER_WALLETS)}>Other Wallets</Button>
-      </Box>
-    </SimpleLayout>
+    <SuccessScreen successText='Connection secure' actionText='click me'/>
   )
 }

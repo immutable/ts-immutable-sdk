@@ -71,6 +71,9 @@ export interface SwitchNetworkResult {
 export enum NetworkFilterTypes {
   ALL = 'all',
 }
+export interface GetNetworkParams {
+  provider: Web3Provider;
+}
 
 export interface NetworkFilter {
   chainId: ChainId;
