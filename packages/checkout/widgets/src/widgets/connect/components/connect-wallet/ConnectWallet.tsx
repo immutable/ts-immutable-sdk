@@ -19,6 +19,24 @@ export const ConnectWallet = () => {
   });
 
   return(
-    <SuccessScreen successText='Connection secure' actionText='click me'/>
+    <SuccessScreen successText='User connected' actionText='click me'/>
+  // <SimpleLayout
+  //   header={
+  //     <HeaderNavigation
+  //       title='Connect a wallet'
+  //       showClose
+  //     />
+  //   }
+  //   footer={<FooterLogo />}
+  // >
+  //   <Box>
+  //     <Button
+  //       testId='connect-passport'
+  //       onClick={() => dispatch(ConnectWidgetViews.PASSPORT)}>Passport</Button>
+  //     <Button
+  //       testId='connect-other'
+  //       onClick={() => dispatch(ConnectWidgetViews.OTHER_WALLETS)}>Other Wallets</Button>
+  //   </Box>
+  // </SimpleLayout>
   )
 }
