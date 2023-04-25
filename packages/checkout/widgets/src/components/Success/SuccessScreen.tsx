@@ -1,7 +1,7 @@
 import { SimpleLayout } from "../SimpleLayout/SimpleLayout";
 import { FooterNavigation } from "../Footer/FooterNavigation";
 import { Body, Box, Icon, SvgIcon } from "@biom3/react";
-import { SuccessScreenStyles } from "./SuccessStyles";
+import { SuccessLogoStyles, SuccessScreenStyles } from "./SuccessStyles";
 import { sendCloseWidgetEvent } from "../../widgets/connect/ConnectWidgetEvents";
 
 export interface SuccessScreenProps {
@@ -24,9 +24,9 @@ export const SuccessScreen = ({successText, actionText, onActionClick}: SuccessS
     <SimpleLayout
       footer={<FooterNavigation actionText={actionText} onActionClick={onSuccessActionClick}/>}>
       <Box sx={SuccessScreenStyles} testId='success-box'>
-        <SvgIcon sx={{ width: 'base.icon.size.500', borderRadius: '24px', background: '#ABF790' }}>
-          <Icon icon="Tick" sx={{ width: 'base.icon.size.500', fill:'base.color.brand.2' }} />
-        </SvgIcon>
+        <Box sx={SuccessLogoStyles}>
+          <Icon icon="Tick" variant="bold" sx={{ width: 'base.icon.size.400', fill:'base.color.brand.2' }} />
+        </Box>
         <Body size='medium' weight='bold'>
           {successText}
         </Body>
