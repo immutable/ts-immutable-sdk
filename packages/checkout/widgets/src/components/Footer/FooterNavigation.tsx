@@ -3,13 +3,14 @@ import { FooterNavigationStyles } from "./FooterStyles";
 
 export interface FooterProps {
   actionText: string;
+  onActionClick: () => void;
 }
 
-export const FooterNavigation = (props:FooterProps) => {
-  const actionButtonText = props.actionText || 'Let\'s go'
+export const FooterNavigation = ({actionText, onActionClick}:FooterProps) => {
+  const actionButtonText = actionText || 'Let\'s go'
   return (
     <Box sx={FooterNavigationStyles}>
-      <Button variant='secondary'>{actionButtonText}</Button>
+      <Button size="large" variant='secondary' onClick={onActionClick}>{actionButtonText}</Button>
     </Box>
   )
 }
