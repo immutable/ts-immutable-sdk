@@ -11,6 +11,7 @@ import { initialViewState, ViewActions, ViewContext, viewReducer } from '../../c
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
 import { ConnectResult } from './components/connect-result/ConnectResult';
+import { SuccessScreen } from '../../components/Success/SuccessScreen';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
@@ -65,7 +66,8 @@ export function ConnectWidget(props:ConnectWidgetProps) {
             {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && <ConnectWallet />}
             {viewState.view.type === ConnectWidgetViews.OTHER_WALLETS && <OtherWallets />}
             {viewState.view.type === ConnectWidgetViews.CHOOSE_NETWORKS && <ChooseNetwork />}
-            {(viewState.view.type === ConnectWidgetViews.SUCCESS || viewState.view.type === ConnectWidgetViews.FAIL) && <ConnectResult />}
+            {viewState.view.type === ConnectWidgetViews.SUCCESS && <SuccessScreen successText='Connection secure' actionText='Continue'/>}
+            {viewState.view.type === ConnectWidgetViews.FAIL && <ConnectResult />}
           </>
         </ConnectContext.Provider>
       </ViewContext.Provider>
