@@ -5,9 +5,13 @@
 import { Subject } from 'rxjs';
 
 import { Configuration, SDK } from './SDK';
-import { EconomyCustomEvents, IEventType } from './types';
+import { EconomyCustomEventTypes, EventData, EventType } from './types';
 
-export class SDKMock extends SDK<string> {
+type SDKMockEventType = EventType<
+  'test',
+  EventData<'test-status', { foo?: 'bar' }>
+>;
+export class SDKMock extends SDK<SDKMockEventType> {
   constructor(config: Configuration) {
     super(config);
   }
@@ -57,7 +61,10 @@ describe('SDK Class', () => {
 
   describe('events', () => {
     it('should emit events to subscribers', () => {
-      const event: IEventType<string> = { type: 'test', status: 'COMPLETE' };
+      const event: SDKMockEventType = {
+        action: 'test',
+        status: 'test-status',
+      };
 
       sdkMock.subscribe(eventHandlerFn);
       sdkMock['events$$'].next(event);
@@ -65,30 +72,34 @@ describe('SDK Class', () => {
     });
 
     it('should unsubscribe from events', () => {
-      const eventsSubject = new Subject<IEventType<string>>();
+      const eventsSubject = new Subject<SDKMockEventType>();
 
       sdkMock['events$$'] = eventsSubject;
 
       sdkMock.subscribe(eventHandlerFn);
 
-      eventsSubject.next({ type: 'test', status: 'COMPLETE' });
+      eventsSubject.next({ action: 'test', status: 'test-status' });
       expect(eventHandlerFn).toHaveBeenCalledTimes(1);
 
       sdkMock.disconnect();
-      eventsSubject.next({ type: 'test', status: 'COMPLETE' });
+      eventsSubject.next({ action: 'test', status: 'test-status' });
       expect(eventHandlerFn).not.toHaveBeenCalledTimes(2);
     });
 
     it('emitNativeEvent should dispatch CustomEvent on client side', () => {
       const dispatchEventSpy = jest.spyOn(document, 'dispatchEvent');
-      const detail = { foo: 'bar' };
+      const detail: SDKMockEventType = {
+        action: 'test',
+        status: 'test-status',
+        foo: 'bar',
+      };
 
       sdkMock['emitNativeEvent'](detail);
 
       expect(dispatchEventSpy).toHaveBeenCalledTimes(1);
       expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
       expect(dispatchEventSpy.mock.calls[0][0].type).toBe(
-        EconomyCustomEvents.DEFAULT
+        EconomyCustomEventTypes.DEFAULT
       );
       expect((dispatchEventSpy.mock.calls[0][0] as CustomEvent).detail).toEqual(
         detail
@@ -99,7 +110,11 @@ describe('SDK Class', () => {
 
     it('emitNativeEvent should not dispatch CustomEvent on server side', () => {
       const dispatchEventSpy = jest.spyOn(document, 'dispatchEvent');
-      const detail = { foo: 'bar' };
+      const detail: SDKMockEventType = {
+        action: 'test',
+        status: 'test-status',
+        foo: 'bar',
+      };
 
       const isClientSideMock = jest.spyOn(sdkMock, 'isClientSide', 'get');
       isClientSideMock.mockReturnValue(false);
@@ -115,23 +130,26 @@ describe('SDK Class', () => {
 
   describe('events handler utility', () => {
     it('should return a function', () => {
-      const handler = sdkMock['getEmitEventHandler']('test');
+      const handler = sdkMock['getEmitEventHandler']();
       expect(typeof handler).toBe('function');
     });
 
     it('should emit an event when the returned handler is invoked', () => {
-      const eventsSubject = new Subject<IEventType<string>>();
+      const eventsSubject = new Subject<SDKMockEventType>();
       sdkMock['events$$'] = eventsSubject;
 
       sdkMock.subscribe(eventHandlerFn);
 
-      const emitHandler = sdkMock['getEmitEventHandler']('test');
-      emitHandler('COMPLETE');
+      const emitHandler = sdkMock['getEmitEventHandler']();
+      emitHandler({
+        action: 'test',
+        status: 'test-status',
+      });
 
       expect(eventHandlerFn).toHaveBeenCalledTimes(1);
       expect(eventHandlerFn).toHaveBeenCalledWith({
-        type: 'test',
-        status: 'COMPLETE',
+        action: 'test',
+        status: 'test-status',
       });
     });
   });

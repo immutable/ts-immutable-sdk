@@ -1,13 +1,15 @@
 import { Subject, Subscription } from 'rxjs';
 
-import { EconomyCustomEvents } from './types';
-import type { EventStatus, IEventType } from './types';
+import { EconomyCustomEventTypes } from './types';
 
-/** Standard SDK Configuration interface */
+/** @public Standard SDK Configuration interface */
 export type Configuration = {
   env: 'production' | 'dev';
 };
 
+/**
+ * @private Default SDK Configuration
+ */
 const defaultConfig: Configuration = {
   env: 'dev',
 };
@@ -16,14 +18,14 @@ const defaultConfig: Configuration = {
  * Base class from which all SDK classes inherit a common interface
  * with default lifecycle implementations
  */
-export abstract class SDK<ActionType extends string> {
+export abstract class SDK<SDKEvent> {
   constructor(protected config = defaultConfig) {
     this.config = config;
     this.connect();
   }
 
   /** Produces lifecycle events so consumer can hook into the SDK workflow */
-  private events$$ = new Subject<IEventType<ActionType>>();
+  private events$$ = new Subject<SDKEvent>();
   private eventsSubscription!: Subscription;
 
   private get events$() {
@@ -53,7 +55,7 @@ export abstract class SDK<ActionType extends string> {
   }
 
   /** Utility: Subscribe to craft and purchase events */
-  subscribe(handler: (event: IEventType<ActionType>) => void): Subscription {
+  subscribe(handler: (event: SDKEvent) => void): Subscription {
     this.eventsSubscription = this.events$.subscribe(handler);
     return this.eventsSubscription;
   }
@@ -63,19 +65,16 @@ export abstract class SDK<ActionType extends string> {
    * @param type action event type
    * @param status action event status
    */
-  protected emitEvent<S extends EventStatus>(
-    type: ActionType,
-    status: S
-  ): void {
-    this.emitNativeEvent({ type, status });
-    this.events$$.next({ type, status });
+  protected emitEvent(event: SDKEvent): void {
+    this.emitNativeEvent(event);
+    this.events$$.next(event);
   }
 
   /**
    * Notify DOM listeners of a lifecycle event
    * @param detail event payload
    */
-  private emitNativeEvent<T>(detail: T): void {
+  private emitNativeEvent(detail: SDKEvent): void {
     if (!this.isClientSide) {
       this.log(
         'Cannot dispatch native event: not running in a browser environment'
@@ -83,7 +82,7 @@ export abstract class SDK<ActionType extends string> {
       return;
     }
 
-    const event = new CustomEvent(EconomyCustomEvents.DEFAULT, {
+    const event = new CustomEvent(EconomyCustomEventTypes.DEFAULT, {
       detail,
       bubbles: true,
       cancelable: true,
@@ -101,12 +100,11 @@ export abstract class SDK<ActionType extends string> {
   /**
    * Produce an event handler callback that can be passed to SDK functions
    * to allow them to trigger SDK events that will bubble up to subscriber
-   * @param type EconomyEventType
+   * @param type EconomySDKEvent
    * @returns Function that will emit an event
    */
-  protected getEmitEventHandler<T extends ActionType>(type: T) {
-    const handler = <Status>(status: Status) =>
-      this.emitEvent(type, status as EventStatus);
+  protected getEmitEventHandler() {
+    const handler = (event: SDKEvent) => this.emitEvent(event);
     return handler.bind(this);
   }
 }
