@@ -44,9 +44,9 @@ export const HeaderNavigation = ({
   }
 
   return (
-    <AppHeaderBar sx={HeaderNavigationStyles(transparent)} elevated={false}>
+    <AppHeaderBar testId="header-navigation-container" sx={HeaderNavigationStyles(transparent)} elevated={false}>
       {showBack && <AppHeaderBar.LeftButtCon icon="ArrowBackward" iconVariant="bold" onClick={goBack} testId='back-button' />}
-      <AppHeaderBar.Title size='medium' sx={{ textAlign: 'left' }}>{title}</AppHeaderBar.Title>
+      <AppHeaderBar.Title testId="header-title" size='medium' sx={{ textAlign: 'left' }}>{title}</AppHeaderBar.Title>
       <AppHeaderBar.RightHandButtons>
         {showSettings && onSettingsClick && <ButtCon icon="SettingsCog" onClick={onSettingsClick} testId='settings-button' />}
         {showClose && <ButtCon sx={ButtonNavigationStyles(transparent)} icon="Close" onClick={close} testId='close-button' />}
