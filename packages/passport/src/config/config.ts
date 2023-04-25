@@ -58,7 +58,6 @@ export class PassportConfiguration {
           'magicProviderId',
           'passportDomain',
           'imxApiBasePath',
-          'starkExOverrides',
         ],
         'overrides'
       );
