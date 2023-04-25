@@ -66,7 +66,7 @@ export class Passport {
 
   public async reconnectImx(): Promise<IMXProvider | null> {
     const user = await this.authManager.getUser();
-    if (!user || user.expired) {
+    if (!user || user.expired == undefined || user.expired) {
       return null;
     }
     return this.getImxProvider(user);
@@ -74,7 +74,7 @@ export class Passport {
 
   public async connectImx(): Promise<IMXProvider> {
     let user = await this.authManager.getUser();
-    if (!user || user.expired) {
+    if (!user || user.expired == undefined || user.expired) {
       user = await this.authManager.login();
     }
     return this.getImxProvider(user);
@@ -131,3 +131,11 @@ export class Passport {
     return updatedUser;
   }
 }
+
+export const createPassport = (
+  passportModuleConfiguration: PassportModuleConfiguration
+) => {
+  const passport = new Passport(passportModuleConfiguration);
+  const provider = passport.reconnectImx();
+  return { passport, provider };
+};

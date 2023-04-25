@@ -38,12 +38,14 @@ const mockOidcUser: OidcUser = {
     email: 'test@immutable.com',
     nickname: 'test',
   },
+  expired: false,
 } as OidcUser;
 
 const mockOidcUserWithPassportInfo: OidcUser = {
   ...mockOidcUser,
   profile: { ...mockOidcUser.profile, ...passportData },
 } as never;
+
 const mockUser: User = {
   idToken: 'id123',
   accessToken: 'access123',
@@ -54,6 +56,7 @@ const mockUser: User = {
     nickname: 'test',
   },
   etherKey: '',
+  expired: false,
 };
 const mockErrorMsg = 'NONO';
 

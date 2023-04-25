@@ -27,7 +27,7 @@ const mockUser: User = {
     email: 'test@immutable.com',
     nickname: 'test',
   },
-  etherKey: '',
+  etherKey: '123',
 };
 
 describe('Passport', () => {
@@ -83,6 +83,20 @@ describe('Passport', () => {
       expect(getStarkSigner).toBeCalledTimes(1);
     }, 15000);
 
+    it('should execute connect without login if user have logged in', async () => {
+      getUserMock.mockReturnValue({ ...mockUser, expired: false });
+      magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
+      requestRefreshTokenMock.mockResolvedValue({
+        accessToken: '123',
+        etherKey: '0x232',
+      });
+      const provider = await passport.connectImx();
+
+      expect(authLoginMock).toBeCalledTimes(0);
+      expect(magicLoginMock).toBeCalledTimes(1);
+      expect(getStarkSigner).toBeCalledTimes(1);
+    });
+
     it('should register user with refresh error', async () => {
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
       requestRefreshTokenMock.mockResolvedValue(null);
@@ -112,6 +126,48 @@ describe('Passport', () => {
     });
   });
 
+  describe('reconnectImx', () => {
+    it('should get imx provider is user existed and is not expired', async () => {
+      getUserMock.mockReturnValue({ ...mockUser, expired: false });
+      magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
+      requestRefreshTokenMock.mockResolvedValue({
+        accessToken: '123',
+        etherKey: '0x232',
+      });
+      await passport.reconnectImx();
+
+      expect(magicLoginMock).toBeCalledTimes(1);
+      expect(getStarkSigner).toBeCalledTimes(1);
+    });
+
+    it('should return null if no existed user', async () => {
+      getUserMock.mockReturnValue(null);
+      const provider = await passport.reconnectImx();
+
+      expect(magicLoginMock).toBeCalledTimes(0);
+      expect(getStarkSigner).toBeCalledTimes(0);
+      expect(provider).toBeNull();
+    });
+
+    it('should return null if user is expired', async () => {
+      getUserMock.mockReturnValue({ ...mockUser, expired: true });
+      const provider = await passport.reconnectImx();
+
+      expect(magicLoginMock).toBeCalledTimes(0);
+      expect(getStarkSigner).toBeCalledTimes(0);
+      expect(provider).toBeNull();
+    });
+
+    it('should return null if user is no expired indicator', async () => {
+      getUserMock.mockReturnValue(mockUser);
+      const provider = await passport.reconnectImx();
+
+      expect(magicLoginMock).toBeCalledTimes(0);
+      expect(getStarkSigner).toBeCalledTimes(0);
+      expect(provider).toBeNull();
+    });
+  });
+
   describe('loginCallback', () => {
     it('should execute login callback', async () => {
       await passport.loginCallback();
@@ -136,6 +192,14 @@ describe('Passport', () => {
 
       expect(result).toEqual(mockUser.profile);
     });
+
+    it('should return undefined if there is no user', async () => {
+      getUserMock.mockReturnValue(null);
+
+      const result = await passport.getUserInfo();
+
+      expect(result).toEqual(undefined);
+    });
   });
 
   describe('getIdToken', () => {
@@ -146,6 +210,14 @@ describe('Passport', () => {
 
       expect(result).toEqual(mockUser.idToken);
     });
+
+    it('should return undefined if there is no user', async () => {
+      getUserMock.mockReturnValue(null);
+
+      const result = await passport.getIdToken();
+
+      expect(result).toEqual(undefined);
+    });
   });
 
   describe('getAccessToken', () => {
@@ -155,6 +227,14 @@ describe('Passport', () => {
       const result = await passport.getAccessToken();
 
       expect(result).toEqual(mockUser.accessToken);
+    });
+
+    it('should return undefined if there is no user', async () => {
+      getUserMock.mockReturnValue(null);
+
+      const result = await passport.getAccessToken();
+
+      expect(result).toEqual(undefined);
     });
   });
 });

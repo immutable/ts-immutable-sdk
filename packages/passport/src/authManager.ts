@@ -95,15 +95,7 @@ export default class AuthManager {
       if (!oidcUser) {
         return null;
       }
-      if (!oidcUser.expired) {
-        return this.mapOidcUserToDomainModel(oidcUser);
-      }
-
-      const newOidcUser = await this.userManager.signinSilent();
-      if (!newOidcUser) {
-        return null;
-      }
-      return this.mapOidcUserToDomainModel(newOidcUser);
+      return this.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.NOT_LOGGED_IN_ERROR);
   }
 
