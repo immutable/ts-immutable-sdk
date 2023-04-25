@@ -11,11 +11,18 @@ function checkConnection() {
     useState<CheckConnectionResult>();
 
   async function checkMyConnection() {
-    const checkConnect = await checkout.checkIsWalletConnected({
-      providerPreference: ConnectionProviders.METAMASK,
-    });
-    setCheckConnectResult(checkConnect);
-    console.log('isConnected: ', checkConnect);
+    try {
+      const checkConnect = await checkout.checkIsWalletConnected({
+        providerPreference: ConnectionProviders.METAMASK, //'trust-wallet' as any as ConnectionProviders
+      });
+      setCheckConnectResult(checkConnect);
+      console.log('isConnected: ', checkConnect);
+    } catch (err: any) {
+      console.log(err.message);
+      console.log(err.type);
+      console.log(err.data);
+      console.log(err.stack);
+    }
   }
 
   return (

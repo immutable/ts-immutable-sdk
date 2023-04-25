@@ -4,6 +4,7 @@ export {
   ConnectionProviders,
   TokenFilterTypes,
   WalletFilterTypes,
+  NetworkFilterTypes,
 } from './types';
 export type {
   CheckConnectionParams,
@@ -27,4 +28,7 @@ export type {
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   WalletInfo,
+  NetworkFilter,
+  GetNetworkAllowListParams,
+  GetNetworkAllowListResult,
 } from './types';

@@ -29,8 +29,9 @@ function GetBalance(props: BalanceProps) {
       const getBalanceRes = await checkout.getBalance(params);
       console.log('getBalanceRes', getBalanceRes);
       setNative(getBalanceRes.formattedBalance);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error({ ...err });
+      console.log(err.message);
     }
   }
 

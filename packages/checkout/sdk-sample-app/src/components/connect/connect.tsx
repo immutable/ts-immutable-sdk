@@ -21,8 +21,10 @@ function Connect(props: ConnectProps) {
     try {
       const connectRes = await checkout.connect(params);
       setProvider(connectRes.provider);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      console.log(err.type); // inspect type
+      console.log(err.data); // inspect data
     }
   }
 

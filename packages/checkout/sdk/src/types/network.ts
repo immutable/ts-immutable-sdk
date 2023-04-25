@@ -12,6 +12,7 @@ export interface NetworkInfo {
   name: string;
   chainId: number;
   nativeCurrency: TokenInfo;
+  isSupported: boolean;
 }
 
 export type NetworkDetails = {
@@ -65,4 +66,21 @@ export interface SwitchNetworkParams {
 
 export interface SwitchNetworkResult {
   network: NetworkInfo;
+}
+
+export enum NetworkFilterTypes {
+  ALL = 'all',
+}
+
+export interface NetworkFilter {
+  chainId: ChainId;
+}
+
+export interface GetNetworkAllowListParams {
+  type: NetworkFilterTypes;
+  exclude?: NetworkFilter[];
+}
+
+export interface GetNetworkAllowListResult {
+  networks: NetworkInfo[];
 }

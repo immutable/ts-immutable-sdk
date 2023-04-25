@@ -34,8 +34,12 @@ function GetAllBalances(props: BalanceProps) {
       const getAllBalancesResult = await checkout.getAllBalances(params);
       console.log('getAllBalanceResult', getAllBalancesResult);
       setAllBalances(getAllBalancesResult.balances);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      console.log(err.name);
+      console.log(err.message);
+      console.log(err.stack);
+      console.log(err.data);
     }
   }
 
