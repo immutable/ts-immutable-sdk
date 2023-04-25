@@ -1,6 +1,6 @@
 import { SimpleLayout } from "../SimpleLayout/SimpleLayout";
 import { FooterNavigation } from "../Footer/FooterNavigation";
-import { Body, Box, Icon, SvgIcon } from "@biom3/react";
+import { Body, Box, Icon } from "@biom3/react";
 import { SuccessLogoStyles, SuccessScreenStyles } from "./SuccessStyles";
 import { sendCloseWidgetEvent } from "../../widgets/connect/ConnectWidgetEvents";
 
