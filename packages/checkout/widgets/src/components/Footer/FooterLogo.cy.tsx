@@ -11,6 +11,15 @@ describe('Footer Logo', () => {
       <SimpleLayout footer={<FooterLogo /> }></SimpleLayout>
     </BiomeThemeProvider>)
 
-  cySmartGet('footer-logo-image').should('exist');
+    cySmartGet('footer-logo-image').should('exist');
+  });
+
+  it('should hide the logo when configured', () => {
+    mount(<BiomeThemeProvider theme={{base: onDarkBase}}>
+      <SimpleLayout footer={<FooterLogo hideLogo /> }></SimpleLayout>
+    </BiomeThemeProvider>)
+
+    cySmartGet('footer-logo-container').should('exist');
+    cySmartGet('footer-logo-image').should('not.exist');
   });
 })
