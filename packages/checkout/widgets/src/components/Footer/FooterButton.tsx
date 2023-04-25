@@ -8,8 +8,8 @@ export interface FooterButtonProps {
 
 export const FooterButton = ({actionText, onActionClick}: FooterButtonProps) => {
   return (
-    <Box sx={FooterButtonStyles}>
-      <Button size="large" variant='secondary' onClick={onActionClick}>{actionText}</Button>
+    <Box testId="footer-button-container" sx={FooterButtonStyles}>
+      <Button testId="footer-button" size="large" variant='secondary' onClick={onActionClick}>{actionText}</Button>
     </Box>
   )
 }

@@ -1,0 +1,16 @@
+import { onDarkBase } from "@biom3/design-tokens"
+import { BiomeThemeProvider } from "@biom3/react"
+import { SimpleLayout } from "../SimpleLayout/SimpleLayout"
+import { mount } from "cypress/react18"
+import { cySmartGet } from "../../lib/testUtils"
+import { FooterLogo } from "./FooterLogo"
+
+describe('Footer Logo', () => {
+  it('should show the power by immutable logo', () => {
+    mount(<BiomeThemeProvider theme={{base: onDarkBase}}>
+      <SimpleLayout footer={<FooterLogo /> }></SimpleLayout>
+    </BiomeThemeProvider>)
+
+  cySmartGet('footer-logo-image').should('exist');
+  });
+})
