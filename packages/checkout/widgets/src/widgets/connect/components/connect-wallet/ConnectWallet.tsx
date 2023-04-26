@@ -1,42 +1,19 @@
-import { Box, Button } from '@biom3/react';
+import { Body, Box } from '@biom3/react';
 import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
-import { useContext } from 'react';
-import { ViewActions, ViewContext } from '../../../../context/ViewContext';
-import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
+import { WalletList } from '../wallet-list/WalletList';
 
+const connectWalletContent = "You’ll need to connect or create a digital wallet to buy, sell, trade and store your coins and collectibles."
 export const ConnectWallet = () => {
-  const { viewDispatch } = useContext(ViewContext);
-
-  const dispatch = (
-    type: ConnectWidgetViews.PASSPORT | ConnectWidgetViews.OTHER_WALLETS
-  ) =>
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type },
-      },
-    });
-
   return (
     <SimpleLayout
       header={<HeaderNavigation title="Connect a wallet" showClose />}
       footer={<FooterLogo />}
     >
-      <Box>
-        <Button
-          testId="connect-passport"
-          onClick={() => dispatch(ConnectWidgetViews.PASSPORT)}
-        >
-          Passport
-        </Button>
-        <Button
-          testId="connect-other"
-          onClick={() => dispatch(ConnectWidgetViews.OTHER_WALLETS)}
-        >
-          Other Wallets
-        </Button>
+      <Box id="connect-wallet-content" sx={{display: 'flex', flexDirection: 'column', paddingX: 'base.spacing.x2', rowGap: 'base.spacing.x9'}}>
+        <Body size="small" sx={{color: 'base.color.text.secondary', paddingX: 'base.spacing.x2'}}>{connectWalletContent}</Body>
+        <WalletList />
       </Box>
     </SimpleLayout>
   );

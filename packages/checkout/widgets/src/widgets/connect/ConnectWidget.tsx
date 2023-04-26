@@ -26,6 +26,7 @@ import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
 import { ConnectResult } from './components/connect-result/ConnectResult';
 import { SuccessView } from '../../components/Success/SuccessView';
+import { ReadyToConnect } from './components/ready-to-connect/ReadyToConnect';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
@@ -82,6 +83,9 @@ export function ConnectWidget(props: ConnectWidgetProps) {
           <>
             {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && (
               <ConnectWallet />
+            )}
+            {viewState.view.type === ConnectWidgetViews.READY_TO_CONNECT && (
+              <ReadyToConnect />
             )}
             {viewState.view.type === ConnectWidgetViews.OTHER_WALLETS && (
               <OtherWallets />
