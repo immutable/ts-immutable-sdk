@@ -8,11 +8,13 @@ import { ConnectionProviders } from "@imtbl/checkout-sdk-web"
 import { ConnectWidgetViews } from "../../../../context/ConnectViewContextTypes"
 import { Body, Box, Heading } from "@biom3/react"
 import { MetamaskConnectHero } from "../../../../components/Hero/MetamaskConnectHero"
+import { language } from "../../language/languageConfig"
 
 export const ReadyToConnect = () => {
   const { connectState: { checkout }, connectDispatch } = useContext(ConnectContext);
   const { viewDispatch} = useContext(ViewContext);
-  const [footerButtonText, setFooterButtonText] = useState("Ready to connect");
+  const {body, footer} = language.views[ConnectWidgetViews.READY_TO_CONNECT];
+  const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
 
   const onConnectClick = useCallback(async () => {
     if(checkout) {
@@ -33,11 +35,11 @@ export const ReadyToConnect = () => {
           }
         })
       } catch(err: any) {
-        setFooterButtonText("Try again");
+        setFooterButtonText(footer.buttonText2);
       }
     }
     
-  },[checkout, connectDispatch, viewDispatch])
+  },[checkout, connectDispatch, viewDispatch, footer.buttonText2])
 
   return (
     <SimpleLayout
@@ -48,8 +50,8 @@ export const ReadyToConnect = () => {
       footer={<FooterButton actionText={footerButtonText} onActionClick={onConnectClick} />}
       >
         <Box sx={{paddingY: 'base.spacing.x10', paddingX: 'base.spacing.x9', display: 'flex', flexDirection: 'column', rowGap: 'base.spacing.x4'}}>
-          <Heading size="small" weight="bold" sx={{color: 'base.color.text.primary'}}>Check for the pop-up from MetaMask</Heading>
-          <Body size="small" sx={{color: 'base.color.text.secondary'}}>Follow the prompts in the Metamask popup to connect</Body>
+          <Heading size="small" weight="bold" sx={{color: 'base.color.text.primary'}}>{body.heading}</Heading>
+          <Body size="small" sx={{color: 'base.color.text.secondary'}}>{body.content}</Body>
         </Box>
     </SimpleLayout>
   )
