@@ -28,14 +28,26 @@ export const FooterStyle = {
 }
 
 export const ContentStyle = {
-  flex: 'auto'
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-start',
+  alignItems: 'center'
 }
 
 export const HeroImageStyle = {
-  height: '50%'
+  flex: '1 0 0', // needed to set flex-basis to 0 for even distribution with BodyStyle
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
 }
 
 export const BodyStyle = {
-  flex: 1,
-  padding: 'base.spacing.x3'
+  flex: '1 0 0', // needed to set flex-basis to 0 for even distribution with HeroImageStyle
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
 }

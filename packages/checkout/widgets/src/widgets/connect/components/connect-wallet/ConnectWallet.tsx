@@ -18,23 +18,23 @@ export const ConnectWallet = () => {
   });
 
   return(
-    <SimpleLayout 
-      header={
-        <HeaderNavigation
-          title='Connect a wallet' 
-          showClose
-        />
-      }
-      footer={<FooterLogo />}
-    >
-      <Box>
-        <Button 
-          testId='connect-passport'
-          onClick={() => dispatch(ConnectWidgetViews.PASSPORT)}>Passport</Button>
-        <Button 
-          testId='connect-other'
-          onClick={() => dispatch(ConnectWidgetViews.OTHER_WALLETS)}>Other Wallets</Button>
-      </Box>
-    </SimpleLayout>
+  <SimpleLayout
+    header={
+      <HeaderNavigation
+        title='Connect a wallet'
+        showClose
+      />
+    }
+    footer={<FooterLogo />}
+  >
+    <Box>
+      <Button
+        testId='connect-passport'
+        onClick={() => dispatch(ConnectWidgetViews.PASSPORT)}>Passport</Button>
+      <Button
+        testId='connect-other'
+        onClick={() => dispatch(ConnectWidgetViews.OTHER_WALLETS)}>Other Wallets</Button>
+    </Box>
+  </SimpleLayout>
   )
 }

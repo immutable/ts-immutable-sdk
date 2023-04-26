@@ -16,6 +16,7 @@ import {
   GetBalanceResult,
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
+  GetNetworkParams,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
   GetWalletAllowListParams,
@@ -95,7 +96,7 @@ export class Checkout {
     return await transaction.sendTransaction(params);
   }
 
-  public async getNetworkInfo(provider: Web3Provider): Promise<NetworkInfo> {
-    return await network.getNetworkInfo(provider);
+  public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
+    return await network.getNetworkInfo(params.provider);
   }
 }

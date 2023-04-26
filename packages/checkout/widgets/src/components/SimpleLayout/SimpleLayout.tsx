@@ -26,10 +26,10 @@ export const SimpleLayout = ({
       <Box id="content" sx={ContentStyle}>
         {heroImage && 
           <Box id="hero-image" sx={HeroImageStyle}>
-            <img alt='hero' src={heroImage} height={'100%'} width={'100%'} />
+            <img alt='hero' src={heroImage} style={{height: '100%', objectFit: 'contain'}} />
           </Box>
         }
-        {children && <Box sx={BodyStyle}>{children}</Box>}
+        {children && <Box id="body" sx={BodyStyle}>{children}</Box>}
       </Box>
       {footer && 
         <Box id="footer" sx={FooterStyle}>

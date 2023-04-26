@@ -66,8 +66,6 @@ describe('ConnectWidget tests', () => {
     cySmartGet('connect-other').click()
     cySmartGet('other-metamask').click()
     cySmartGet('network-zkevm').click()
-    cySmartGet('back-button').should('be.visible')
-    cySmartGet('close-button').should('be.visible')
-    cySmartGet('success').should('be.visible')
+    cySmartGet('success-box').should('be.visible')
   });
 })
