@@ -1,6 +1,6 @@
 {
-  "name": "@imtbl/starkex",
-  "description": "StarkEx Client for Immutable SDK",
+  "name": "@imtbl/imx",
+  "description": "IMX Client for Immutable SDK",
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",

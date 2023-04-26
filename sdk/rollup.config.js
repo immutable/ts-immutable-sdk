@@ -64,7 +64,7 @@ export default [
   // Export ES Modules
   ...getFileBuild('index'),
   ...getFileBuild('base'),
-  ...getFileBuild('starkex'),
+  ...getFileBuild('imx'),
   ...getFileBuild('provider'),
   ...getFileBuild('passport'),
   ...getFileBuild('checkout_sdk'),

@@ -15,10 +15,10 @@ const StarkExAPIFactory = (config: StarkExConfiguration) => {
     createTrade,
     transfer,
     batchNftTransfer,
-    ...StarkEx
+    ...imx
   } = imtblClient;
 
-  return { ...StarkEx };
+  return { ...imx };
 };
 
 export { StarkExAPIFactory };

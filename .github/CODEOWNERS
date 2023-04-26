@@ -1,4 +1,4 @@
-/packages/starkex @immutable/developer-experience
+/packages/imx @immutable/developer-experience
 /packages/config @immutable/developer-experience
 /packages/internal/toolkit @immutable/developer-experience
 /packages/internal/dex @immutable/tokens

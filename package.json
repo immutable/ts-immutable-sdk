@@ -49,7 +49,7 @@
   "workspaces": [
     "sdk",
     "packages/config",
-    "packages/starkex",
+    "packages/imx",
     "packages/passport",
     "packages/provider",
     "packages/internal/toolkit",
