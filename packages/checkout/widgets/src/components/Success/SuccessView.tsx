@@ -27,9 +27,9 @@ export const SuccessView = ({successText, actionText, onActionClick, successEven
       footer={<FooterButton actionText={actionText} onActionClick={onSuccessActionClick}/>}>
       <Box sx={SuccessViewStyles} testId='success-box'>
         <Box sx={SuccessLogoStyles}>
-          <Icon icon="Tick" variant="bold" sx={{ width: 'base.icon.size.400', fill:'base.color.brand.2' }} />
+          <Icon icon="Tick" testId='success-icon' variant="bold" sx={{ width: 'base.icon.size.400', fill:'base.color.brand.2' }} />
         </Box>
-        <Body size='medium' weight='bold'>
+        <Body size='medium' weight='bold' testId='success-text'>
           {successText}
         </Body>
       </Box>
