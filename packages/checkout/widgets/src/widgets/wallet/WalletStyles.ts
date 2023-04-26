@@ -2,7 +2,7 @@ export const WalletWidgetStyle = {
   maxWidth: '400px',
   backgroundColor: '#333333',
   padding: '20px',
-}
+};
 
 export const WidgetHeaderStyle = {
   width: '100%',
@@ -11,7 +11,7 @@ export const WidgetHeaderStyle = {
   justifyContent: 'space-between',
   marginBottom: '20px',
   alignItems: 'center',
-}
+};
 
 export const WidgetSubHeadingStyle = {
   width: '100%',
@@ -19,8 +19,8 @@ export const WidgetSubHeadingStyle = {
   flexDirection: 'row',
   marginBottom: '20px',
   alignItems: 'center',
-  justifyContent: 'space-between'
-}
+  justifyContent: 'space-between',
+};
 export const WidgetBodyStyle = {
   width: '100%',
   display: 'flex',
@@ -28,4 +28,4 @@ export const WidgetBodyStyle = {
   marginBottom: '20px',
   alignItems: 'center',
   rowGap: '8px',
-}
+};

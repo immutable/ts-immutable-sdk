@@ -8,9 +8,8 @@ export const SuccessViewStyles = {
   width: '270px',
   borderRadius: '12px',
   background: 'base.color.translucent.standard.100',
-  rowGap: 'base.spacing.x4'
-}
-
+  rowGap: 'base.spacing.x4',
+};
 
 export const SuccessLogoStyles = {
   display: 'flex',
@@ -20,5 +19,5 @@ export const SuccessLogoStyles = {
   height: 'base.spacing.x12',
   width: 'base.spacing.x12',
   borderRadius: '50%',
-  backgroundColor: 'base.color.status.success.bright'
-}
+  backgroundColor: 'base.color.status.success.bright',
+};

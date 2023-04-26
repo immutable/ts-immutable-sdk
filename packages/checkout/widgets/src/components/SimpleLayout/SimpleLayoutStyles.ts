@@ -1,4 +1,3 @@
-
 export const SimpleLayoutStyle = {
   position: 'relative',
   display: 'flex',
@@ -6,7 +5,7 @@ export const SimpleLayoutStyle = {
   backgroundColor: 'base.color.brand.2',
   minHeight: '680px',
   width: '450px',
-}
+};
 
 export const HeaderStyle = (floatHeader: boolean) => {
   return {
@@ -15,25 +14,25 @@ export const HeaderStyle = (floatHeader: boolean) => {
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    position: floatHeader ? 'absolute' : 'relative'
-  }
-}
+    position: floatHeader ? 'absolute' : 'relative',
+  };
+};
 
 export const FooterStyle = {
-  height: '10%', 
-  display: 'flex', 
-  flexDirection: 'row', 
-  justifyContent: 'center', 
+  height: '10%',
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
   alignItems: 'center',
-}
+};
 
 export const ContentStyle = {
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-start',
-  alignItems: 'center'
-}
+  alignItems: 'center',
+};
 
 export const HeroImageStyle = {
   flex: '1 0 0', // needed to set flex-basis to 0 for even distribution with BodyStyle
@@ -42,7 +41,7 @@ export const HeroImageStyle = {
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-}
+};
 
 export const BodyStyle = {
   flex: '1 0 0', // needed to set flex-basis to 0 for even distribution with HeroImageStyle
@@ -50,4 +49,4 @@ export const BodyStyle = {
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-}
+};

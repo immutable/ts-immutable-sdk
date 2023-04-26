@@ -7,40 +7,41 @@ import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web';
 
 describe('BuyWidget tests', () => {
   beforeEach(() => {
-    cy.stub(Checkout.prototype, 'checkIsWalletConnected').as('isConnectedStub')
-      .resolves({ isConnected: true })
+    cy.stub(Checkout.prototype, 'checkIsWalletConnected')
+      .as('isConnectedStub')
+      .resolves({ isConnected: true });
 
-    cy.stub(Checkout.prototype, 'connect').as('connectStub')
+    cy.stub(Checkout.prototype, 'connect')
+      .as('connectStub')
       .resolves({
         provider: {
           getSigner: () => ({
-            getAddress: () => (Promise.resolve("dss"))
+            getAddress: () => Promise.resolve('dss'),
           }),
           getNetwork: async () => ({
             chainId: 1,
             name: 'Ethereum',
           }),
           provider: {
-            request: async () => null
-          }
+            request: async () => null,
+          },
         },
-        network:{
+        network: {
           chainId: 1,
           name: 'Ethereum',
           nativeCurrency: {
             name: 'ETH',
             symbol: 'ETH',
-            decimals: 18
-          }
-        }
-      }
-    )
-  })
+            decimals: 18,
+          },
+        },
+      });
+  });
 
   it('should show buy widget on mount with the correct information displayed', () => {
     const params = {
       providerPreference: ConnectionProviders.METAMASK,
-      orderId: "123"
+      orderId: '123',
     } as BuyWidgetParams;
 
     mount(<BuyWidget params={params} theme={WidgetTheme.DARK} />);

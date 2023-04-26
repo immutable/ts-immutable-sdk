@@ -1,13 +1,27 @@
-import { BiomeThemeProvider } from '@biom3/react'
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web'
-import { WidgetTheme } from '@imtbl/checkout-ui-types'
-import { sendCloseWidgetEvent, sendConnectFailedEvent, sendConnectSuccessEvent } from "./ConnectWidgetEvents";
+import { BiomeThemeProvider } from '@biom3/react';
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import {
+  sendCloseWidgetEvent,
+  sendConnectFailedEvent,
+  sendConnectSuccessEvent,
+} from './ConnectWidgetEvents';
 import { OtherWallets } from './components/other-wallets/OtherWallets';
 import { ChooseNetwork } from './components/choose-network/ChooseNetwork';
-import { useEffect, useReducer } from 'react'
-import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens'
-import { ConnectActions, ConnectContext, connectReducer, initialConnectState } from './context/ConnectContext'
-import { initialViewState, ViewActions, ViewContext, viewReducer } from '../../context/ViewContext';
+import { useEffect, useReducer } from 'react';
+import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
+import {
+  ConnectActions,
+  ConnectContext,
+  connectReducer,
+  initialConnectState,
+} from './context/ConnectContext';
+import {
+  initialViewState,
+  ViewActions,
+  ViewContext,
+  viewReducer,
+} from '../../context/ViewContext';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
 import { ConnectResult } from './components/connect-result/ConnectResult';
@@ -22,12 +36,18 @@ export interface ConnectWidgetParams {
   providerPreference?: ConnectionProviders;
 }
 
-export function ConnectWidget(props:ConnectWidgetProps) {
+export function ConnectWidget(props: ConnectWidgetProps) {
   const { theme } = props;
-  const [connectState, connectDispatch] = useReducer(connectReducer, initialConnectState);
+  const [connectState, connectDispatch] = useReducer(
+    connectReducer,
+    initialConnectState
+  );
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
-  const biomeTheme:BaseTokens = (theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()) ? onDarkBase : onLightBase;
+  const biomeTheme: BaseTokens =
+    theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+      ? onDarkBase
+      : onLightBase;
 
   useEffect(() => {
     connectDispatch({
@@ -41,8 +61,8 @@ export function ConnectWidget(props:ConnectWidgetProps) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: ConnectWidgetViews.CONNECT_WALLET
-        }
+          type: ConnectWidgetViews.CONNECT_WALLET,
+        },
       },
     });
   }, []);
@@ -53,27 +73,38 @@ export function ConnectWidget(props:ConnectWidgetProps) {
         sendConnectFailedEvent(viewState.view.error.message);
         break;
     }
-  }, [viewState])
+  }, [viewState]);
 
   return (
-    <BiomeThemeProvider theme={{base: biomeTheme}}>
+    <BiomeThemeProvider theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         <ConnectContext.Provider value={{ connectState, connectDispatch }}>
           <>
-            {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && <ConnectWallet />}
-            {viewState.view.type === ConnectWidgetViews.OTHER_WALLETS && <OtherWallets />}
-            {viewState.view.type === ConnectWidgetViews.CHOOSE_NETWORKS && <ChooseNetwork />}
-            {viewState.view.type === ConnectWidgetViews.SUCCESS &&
+            {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && (
+              <ConnectWallet />
+            )}
+            {viewState.view.type === ConnectWidgetViews.OTHER_WALLETS && (
+              <OtherWallets />
+            )}
+            {viewState.view.type === ConnectWidgetViews.CHOOSE_NETWORKS && (
+              <ChooseNetwork />
+            )}
+            {viewState.view.type === ConnectWidgetViews.SUCCESS && (
               <SuccessView
-                successText='Connection secure'
-                actionText='Continue'
-                successEventAction={()=>sendConnectSuccessEvent(ConnectionProviders.METAMASK)}
-                onActionClick={()=>sendCloseWidgetEvent()}
-              />}
-            {viewState.view.type === ConnectWidgetViews.FAIL && <ConnectResult />}
+                successText="Connection secure"
+                actionText="Continue"
+                successEventAction={() =>
+                  sendConnectSuccessEvent(ConnectionProviders.METAMASK)
+                }
+                onActionClick={() => sendCloseWidgetEvent()}
+              />
+            )}
+            {viewState.view.type === ConnectWidgetViews.FAIL && (
+              <ConnectResult />
+            )}
           </>
         </ConnectContext.Provider>
       </ViewContext.Provider>
     </BiomeThemeProvider>
-  )
+  );
 }

@@ -1,7 +1,7 @@
-import { Link } from "@biom3/react";
+import { Link } from '@biom3/react';
 
 interface EtherscanLinkProps {
-    hash: string
+  hash: string;
 }
 
 export const EtherscanLink = (props: EtherscanLinkProps) => {
@@ -9,11 +9,11 @@ export const EtherscanLink = (props: EtherscanLinkProps) => {
 
   return (
     <Link
-      testId='etherscan-link'
+      testId="etherscan-link"
       href={`https://etherscan.io/tx/${hash}`}
-      target='_blank'
+      target="_blank"
     >
       View your transaction on Etherscan
     </Link>
-  )
-}
+  );
+};
