@@ -8,6 +8,7 @@ const connectWalletContent = "You’ll need to connect or create a digital walle
 export const ConnectWallet = () => {
   return (
     <SimpleLayout
+      testId='connect-wallet'
       header={<HeaderNavigation title="Connect a wallet" showClose />}
       footer={<FooterLogo />}
     >

@@ -13,6 +13,7 @@ export interface SimpleLayoutProps {
   footer?: React.ReactNode;
   children?: React.ReactNode;
   heroContent?: React.ReactNode;
+  testId?: string;
   floatHeader?: boolean;
 }
 
@@ -21,10 +22,11 @@ export const SimpleLayout = ({
   footer,
   children,
   heroContent,
+  testId,
   floatHeader = false,
 }: SimpleLayoutProps) => {
   return (
-    <Box sx={SimpleLayoutStyle}>
+    <Box testId={testId} sx={SimpleLayoutStyle}>
       {header && (
         <Box id="header" sx={HeaderStyle(floatHeader)}>
           {header}

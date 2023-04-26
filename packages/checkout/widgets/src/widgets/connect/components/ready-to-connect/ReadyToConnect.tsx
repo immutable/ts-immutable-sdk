@@ -41,6 +41,7 @@ export const ReadyToConnect = () => {
 
   return (
     <SimpleLayout
+      testId="ready-to-connect"
       header={<HeaderNavigation showBack title="" showClose transparent />}
       floatHeader
       heroContent={<MetamaskConnectHero />}

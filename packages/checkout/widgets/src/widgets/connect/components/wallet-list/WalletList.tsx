@@ -30,8 +30,8 @@ export const WalletList = () => {
   // filter down list
 
   return(
-    <Box sx={{width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start'}}>
-      <MenuItem elevated size="medium" onClick={() => onWalletClick(ConnectionProviders.METAMASK)}>
+    <Box testId="wallet-list" sx={{width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start'}}>
+      <MenuItem testId="wallet-list-metamask" elevated size="medium" onClick={() => onWalletClick(ConnectionProviders.METAMASK)}>
         <MenuItem.FramedLogo logo="MetaMaskSymbol" sx={{width: 'base.icon.size.500', backgroundColor: 'base.color.translucent.container.200', borderRadius: 'base.borderRadius.x2'}}/>
         <MenuItem.Label size="medium">Metamask</MenuItem.Label>
         <MenuItem.IntentIcon></MenuItem.IntentIcon>
