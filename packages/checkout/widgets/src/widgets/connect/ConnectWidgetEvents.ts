@@ -1,9 +1,9 @@
-import {  
-  IMTBLWidgetEvents, 
-  ConnectEvent, 
-  ConnectionSuccess, 
-  ConnectionFailed, 
-  ConnectEventType 
+import {
+  IMTBLWidgetEvents,
+  ConnectEvent,
+  ConnectionSuccess,
+  ConnectionFailed,
+  ConnectEventType
 } from '@imtbl/checkout-ui-types'
 
 import { ConnectionProviders } from '@imtbl/checkout-sdk-web'
@@ -20,6 +20,7 @@ export function sendConnectSuccessEvent(providerPreference: ConnectionProviders)
       }
     }
   })
+  console.log(successEvent.detail)
   if(window !== undefined) window.dispatchEvent(successEvent)
 }
 

@@ -1,4 +1,4 @@
-export const SuccessScreenStyles = {
+export const SuccessViewStyles = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',

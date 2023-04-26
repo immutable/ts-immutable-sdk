@@ -1,7 +1,7 @@
 import { BiomeThemeProvider } from '@biom3/react'
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web'
 import { WidgetTheme } from '@imtbl/checkout-ui-types'
-import { sendConnectFailedEvent, sendConnectSuccessEvent} from './ConnectWidgetEvents'
+import { sendCloseWidgetEvent, sendConnectFailedEvent, sendConnectSuccessEvent } from "./ConnectWidgetEvents";
 import { OtherWallets } from './components/other-wallets/OtherWallets';
 import { ChooseNetwork } from './components/choose-network/ChooseNetwork';
 import { useEffect, useReducer } from 'react'
@@ -11,7 +11,7 @@ import { initialViewState, ViewActions, ViewContext, viewReducer } from '../../c
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
 import { ConnectResult } from './components/connect-result/ConnectResult';
-import { SuccessScreen } from '../../components/Success/SuccessScreen';
+import { SuccessView } from '../../components/Success/SuccessView';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
@@ -49,9 +49,6 @@ export function ConnectWidget(props:ConnectWidgetProps) {
 
   useEffect(() => {
     switch (viewState.view.type) {
-      case ConnectWidgetViews.SUCCESS:
-        sendConnectSuccessEvent(ConnectionProviders.METAMASK);
-        break;
       case ConnectWidgetViews.FAIL:
         sendConnectFailedEvent(viewState.view.error.message);
         break;
@@ -66,7 +63,13 @@ export function ConnectWidget(props:ConnectWidgetProps) {
             {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && <ConnectWallet />}
             {viewState.view.type === ConnectWidgetViews.OTHER_WALLETS && <OtherWallets />}
             {viewState.view.type === ConnectWidgetViews.CHOOSE_NETWORKS && <ChooseNetwork />}
-            {viewState.view.type === ConnectWidgetViews.SUCCESS && <SuccessScreen successText='Connection secure' actionText='Continue'/>}
+            {viewState.view.type === ConnectWidgetViews.SUCCESS &&
+              <SuccessView
+                successText='Connection secure'
+                actionText='Continue'
+                successEventAction={()=>sendConnectSuccessEvent(ConnectionProviders.METAMASK)}
+                onActionClick={()=>sendCloseWidgetEvent()}
+              />}
             {viewState.view.type === ConnectWidgetViews.FAIL && <ConnectResult />}
           </>
         </ConnectContext.Provider>

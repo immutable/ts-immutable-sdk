@@ -1,29 +1,31 @@
 import { SimpleLayout } from "../SimpleLayout/SimpleLayout";
 import { Body, Box, Icon } from "@biom3/react";
-import { SuccessLogoStyles, SuccessScreenStyles } from "./SuccessStyles";
-import { sendCloseWidgetEvent } from "../../widgets/connect/ConnectWidgetEvents";
+import { SuccessLogoStyles, SuccessViewStyles } from "./SuccessViewStyles";
 import { FooterButton } from "../Footer/FooterButton";
 
-export interface SuccessScreenProps {
+export interface SuccessViewProps {
   successText: string;
   actionText: string;
-  onActionClick?: () => void;
+  onActionClick: () => void;
+  successEventAction?: () => void;
 }
 
-export const SuccessScreen = ({successText, actionText, onActionClick}: SuccessScreenProps) => {
+export const SuccessView = ({successText, actionText, onActionClick, successEventAction}: SuccessViewProps) => {
+
+  if(successEventAction !== undefined && typeof successEventAction === 'function') {
+    successEventAction();
+  }
 
   const onSuccessActionClick = () => {
     if(onActionClick !== undefined && typeof onActionClick === 'function'){
       onActionClick();
-    } else {
-      sendCloseWidgetEvent();
     }
   }
 
   return (
     <SimpleLayout
       footer={<FooterButton actionText={actionText} onActionClick={onSuccessActionClick}/>}>
-      <Box sx={SuccessScreenStyles} testId='success-box'>
+      <Box sx={SuccessViewStyles} testId='success-box'>
         <Box sx={SuccessLogoStyles}>
           <Icon icon="Tick" variant="bold" sx={{ width: 'base.icon.size.400', fill:'base.color.brand.2' }} />
         </Box>
