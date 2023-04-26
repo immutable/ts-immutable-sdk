@@ -1,5 +1,12 @@
 export const SuccessViewStyles = {
   display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '100%',
+};
+
+export const SuccessBoxStyles = {
+  display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',

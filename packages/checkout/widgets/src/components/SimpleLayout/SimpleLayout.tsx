@@ -36,7 +36,7 @@ export const SimpleLayout = ({
             <img
               alt="hero"
               src={heroImage}
-              style={{ height: '100%', objectFit: 'contain' }}
+              style={{ height: '100%', width: '100%' }}
             />
           </Box>
         )}
