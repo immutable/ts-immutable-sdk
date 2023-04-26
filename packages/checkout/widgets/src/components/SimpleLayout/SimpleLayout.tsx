@@ -39,5 +39,3 @@ export const SimpleLayout = ({
     </Box>
   )
 }
-
-
