@@ -1,4 +1,5 @@
 import { ModuleConfiguration } from '@imtbl/config';
+import { StarkExOverrides } from '@imtbl/starkex';
 
 export type UserProfile = {
   email?: string;
@@ -40,6 +41,7 @@ export interface PassportOverrides {
   magicProviderId: string;
   passportDomain: string;
   imxApiBasePath: string;
+  starkExOverrides?: StarkExOverrides;
 }
 
 export interface PassportModuleConfiguration

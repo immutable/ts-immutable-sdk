@@ -1,13 +1,9 @@
-import {
-  Configuration,
-  EthSigner,
-  StarkSigner,
-  UsersApi,
-} from '@imtbl/core-sdk';
+import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { IMXProvider } from '@imtbl/provider';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
+import { StarkExAPIFactory, StarkExConfiguration } from '@imtbl/starkex';
 import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { getStarkSigner } from './stark';
@@ -92,10 +88,10 @@ export class Passport {
     starkSigner: StarkSigner,
     jwt: string
   ): Promise<UserWithEtherKey> {
-    const configuration = new Configuration({
-      basePath: this.config.imxApiBasePath,
+    const starkExConfig = new StarkExConfiguration({
+      baseConfig: this.config.baseConfig,
     });
-    const usersApi = new UsersApi(configuration);
+    const { usersApi } = StarkExAPIFactory(starkExConfig);
     await registerPassport(
       {
         ethSigner: userAdminKeySigner,

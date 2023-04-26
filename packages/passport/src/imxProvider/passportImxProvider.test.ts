@@ -1,5 +1,6 @@
 import PassportImxProvider from './passportImxProvider';
 import {
+  Config,
   ERC721Token,
   ETHAmount,
   ExchangesApi,
@@ -93,7 +94,20 @@ describe('PassportImxProvider', () => {
       user: mockUser,
       starkSigner: mockStarkSigner,
       passportConfig: {
-        imxAPIConfiguration: { basePath: 'http://test.com' },
+        baseConfig: '',
+        imxAPIConfiguration: {
+          basePath: 'http://test.com',
+        },
+        overrides: {
+          starkExOverrides: Config.createConfig({
+            basePath: 'https://api.x.immutable.com',
+            chainID: 1,
+            coreContractAddress: '0x5FDCCA53617f4d2b9134B29090C87D01058e27e9',
+            registrationContractAddress:
+              '0x72a06bf2a1CE5e39cBA06c0CAb824960B587d64c',
+            // sdkVersion,
+          }),
+        },
       } as never,
     });
   });

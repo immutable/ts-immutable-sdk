@@ -5,6 +5,7 @@ import {
   PassportModuleConfiguration,
 } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
+import { StarkExConfiguration } from '@imtbl/starkex';
 
 const validateConfiguration = <T>(
   configuration: T,
@@ -35,6 +36,7 @@ export class PassportConfiguration {
   readonly imxApiBasePath: string;
   readonly oidcConfiguration: OidcConfiguration;
   readonly baseConfig: ImmutableConfiguration;
+  readonly starkExConfiguration: StarkExConfiguration;
 
   constructor({
     baseConfig,
@@ -58,6 +60,7 @@ export class PassportConfiguration {
           'magicProviderId',
           'passportDomain',
           'imxApiBasePath',
+          'starkExOverrides',
         ],
         'overrides'
       );
@@ -67,6 +70,10 @@ export class PassportConfiguration {
       this.magicPublishableApiKey = overrides.magicPublishableApiKey;
       this.magicProviderId = overrides.magicProviderId;
       this.imxApiBasePath = overrides.imxApiBasePath;
+      this.starkExConfiguration = new StarkExConfiguration({
+        baseConfig,
+        overrides: overrides.starkExOverrides,
+      });
     } else {
       switch (baseConfig.environment) {
         case Environment.SANDBOX: {
@@ -88,6 +95,9 @@ export class PassportConfiguration {
           break;
         }
       }
+      this.starkExConfiguration = new StarkExConfiguration({
+        baseConfig,
+      });
     }
   }
 }
