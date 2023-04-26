@@ -1,6 +1,6 @@
 import { Box, useTheme } from "@biom3/react"
 import { FooterLogoStyles } from "./FooterStyles"
-import { ReactComponent as PoweredByImmutableLogo } from './PoweredByImmutableLogo.svg'
+import { ReactComponent as PoweredByImmutableLogo } from '../../assets/PoweredByImmutableLogo.svg'
 export interface FooterLogoProps {
   hideLogo?: boolean;
 }
