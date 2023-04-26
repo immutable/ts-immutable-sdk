@@ -8,7 +8,7 @@ import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes'
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
-import ImmutableNetwork from '../../../../components/SimpleLayout/ImmutableNetwork.svg';
+import ImmutableNetwork from '../../../../assets/ImmutableNetwork.svg';
 
 export function ChooseNetwork () {
   const { viewDispatch } = useContext(ViewContext);
