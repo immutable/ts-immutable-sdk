@@ -1,6 +1,5 @@
 import { HeaderNavigation } from "../../../../components/Header/HeaderNavigation"
 import { SimpleLayout } from "../../../../components/SimpleLayout/SimpleLayout"
-import purpleDownGradient from "../../../../assets/PurpleDownGradient.svg"
 import { FooterButton } from "../../../../components/Footer/FooterButton"
 import { useCallback, useContext, useState } from "react"
 import { ConnectActions, ConnectContext } from "../../context/ConnectContext"
@@ -8,6 +7,7 @@ import { ViewActions, ViewContext } from "../../../../context/ViewContext"
 import { ConnectionProviders } from "@imtbl/checkout-sdk-web"
 import { ConnectWidgetViews } from "../../../../context/ConnectViewContextTypes"
 import { Body, Box, Heading } from "@biom3/react"
+import { MetamaskConnectHero } from "../../../../components/Hero/MetamaskConnectHero"
 
 export const ReadyToConnect = () => {
   const { connectState: { checkout }, connectDispatch } = useContext(ConnectContext);
@@ -43,7 +43,7 @@ export const ReadyToConnect = () => {
     <SimpleLayout
       header={<HeaderNavigation showBack title="" showClose transparent />}
       floatHeader
-      heroImage={purpleDownGradient}
+      heroContent={<MetamaskConnectHero />}
       footer={<FooterButton actionText={footerButtonText} onActionClick={onConnectClick} />}
       >
         <Box sx={{paddingY: 'base.spacing.x10', paddingX: 'base.spacing.x9', display: 'flex', flexDirection: 'column', rowGap: 'base.spacing.x4'}}>

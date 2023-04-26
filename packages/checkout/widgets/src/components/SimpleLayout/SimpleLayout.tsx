@@ -4,15 +4,15 @@ import {
   HeaderStyle,
   FooterStyle,
   BodyStyle,
-  HeroImageStyle,
   ContentStyle,
+  HeroContent,
 } from './SimpleLayoutStyles';
 
 export interface SimpleLayoutProps {
   header?: React.ReactNode;
   footer?: React.ReactNode;
   children?: React.ReactNode;
-  heroImage?: string;
+  heroContent?: React.ReactNode;
   floatHeader?: boolean;
 }
 
@@ -20,7 +20,7 @@ export const SimpleLayout = ({
   header,
   footer,
   children,
-  heroImage,
+  heroContent,
   floatHeader = false,
 }: SimpleLayoutProps) => {
   return (
@@ -31,13 +31,9 @@ export const SimpleLayout = ({
         </Box>
       )}
       <Box id="content" sx={ContentStyle}>
-        {heroImage && (
-          <Box id="hero-image" sx={HeroImageStyle}>
-            <img
-              alt="hero"
-              src={heroImage}
-              style={{ height: '100%', width: '100%' }}
-            />
+        {heroContent && (
+          <Box id="hero-content" sx={HeroContent}>
+            {heroContent}
           </Box>
         )}
         {children && (

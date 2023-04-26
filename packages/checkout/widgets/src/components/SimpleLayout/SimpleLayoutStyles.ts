@@ -33,7 +33,7 @@ export const ContentStyle = {
   justifyContent: 'flex-start',
 };
 
-export const HeroImageStyle = {
+export const HeroContent = {
   flex: '1 0 0', // needed to set flex-basis to 0 for even distribution with BodyStyle
   width: '100%',
 };

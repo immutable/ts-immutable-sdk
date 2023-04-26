@@ -1,18 +1,17 @@
 import { Body, Button, Heading } from '@biom3/react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import PurpleDownGradient from '../../../assets/PurpleDownGradient.svg';
-import ImmutableNetwork from '../../../assets/ImmutableNetwork.svg';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { useContext, useState } from 'react';
 import { TransitionExampleWidgetViews } from '../../../context/TransitionExampleViewContextTypes';
 import { ViewActions, ViewContext } from '../../../context/ViewContext';
+import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkHero';
 
 export const ViewTwo = () => {
   const { viewDispatch } = useContext(ViewContext);
   const [buttonText, setButtonText] = useState('Next');
   const [body, setBody] = useState(ViewTwoContentOne);
-  const [hero, setHero] = useState<string | undefined>(PurpleDownGradient);
+  const [hero, setHero] = useState<React.ReactNode>(<ImmutableNetworkHero />);
   // This is just an example of how we could set a function with react state
   // See ViewThree for how to change content using an enum and a useCallback function to ensure its only created once with no dependencies
   // The ViewThree implementation is the preferred method as in this case for ViewTwo the functions are recreated on re-render
@@ -22,14 +21,14 @@ export const ViewTwo = () => {
     setButtonText('Previous');
     setBody(ViewTwoContentTwo);
     setActionFunction(() => actionNext);
-    setHero(ImmutableNetwork);
+    setHero(<ImmutableNetworkHero />);
   }
 
   function actionNext() {
     setButtonText('Next');
     setBody(ViewTwoContentOne);
     setActionFunction(() => actionPrevious);
-    setHero(PurpleDownGradient);
+    setHero(<ImmutableNetworkHero />);
   }
 
   return (
@@ -41,7 +40,7 @@ export const ViewTwo = () => {
           onActionClick={() => actionFunction()}
         />
       }
-      heroImage={hero}
+      heroContent={hero}
       floatHeader={true}
     >
       {body}
