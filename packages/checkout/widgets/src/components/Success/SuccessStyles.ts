@@ -7,7 +7,7 @@ export const SuccessScreenStyles = {
   padding: '24px 16px 24px 12px',
   width: '270px',
   borderRadius: '12px',
-  background: '#F3F3F30A',
+  background: 'base.color.translucent.standard.100',
   rowGap: 'base.spacing.x4'
 }
 
@@ -19,6 +19,6 @@ export const SuccessLogoStyles = {
   alignItems: 'center',
   height: 'base.spacing.x12',
   width: 'base.spacing.x12',
-  borderRadius: 'base.spacing.x6',
-  backgroundColor: '#ABF790'
+  borderRadius: '50%',
+  backgroundColor: 'base.color.status.success.bright'
 }

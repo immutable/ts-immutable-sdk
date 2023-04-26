@@ -1,8 +1,8 @@
 import { SimpleLayout } from "../SimpleLayout/SimpleLayout";
-import { FooterNavigation } from "../Footer/FooterNavigation";
 import { Body, Box, Icon } from "@biom3/react";
 import { SuccessLogoStyles, SuccessScreenStyles } from "./SuccessStyles";
 import { sendCloseWidgetEvent } from "../../widgets/connect/ConnectWidgetEvents";
+import { FooterButton } from "../Footer/FooterButton";
 
 export interface SuccessScreenProps {
   successText: string;
@@ -11,7 +11,7 @@ export interface SuccessScreenProps {
 }
 
 export const SuccessScreen = ({successText, actionText, onActionClick}: SuccessScreenProps) => {
-  
+
   const onSuccessActionClick = () => {
     if(onActionClick !== undefined && typeof onActionClick === 'function'){
       onActionClick();
@@ -22,7 +22,7 @@ export const SuccessScreen = ({successText, actionText, onActionClick}: SuccessS
 
   return (
     <SimpleLayout
-      footer={<FooterNavigation actionText={actionText} onActionClick={onSuccessActionClick}/>}>
+      footer={<FooterButton actionText={actionText} onActionClick={onSuccessActionClick}/>}>
       <Box sx={SuccessScreenStyles} testId='success-box'>
         <Box sx={SuccessLogoStyles}>
           <Icon icon="Tick" variant="bold" sx={{ width: 'base.icon.size.400', fill:'base.color.brand.2' }} />
