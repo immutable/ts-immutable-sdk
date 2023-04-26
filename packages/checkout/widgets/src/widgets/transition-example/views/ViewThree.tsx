@@ -1,21 +1,21 @@
 import { Body, Heading } from "@biom3/react"
 import { useState } from "react"
 import { FooterLogo } from "../../../components/Footer/FooterLogo"
-import { FooterNavigation } from "../../../components/Footer/FooterNavigation"
+import { FooterButton } from "../../../components/Footer/FooterButton"
 import { HeaderNavigation } from "../../../components/Header/HeaderNavigation"
 import { SimpleLayout } from "../../../components/SimpleLayout/SimpleLayout"
 
 export const ViewThree = () => {
   const [buttonText, setButtonText] = useState("Next");
   const [body, setBody] = useState(ViewThreeContentOne);
-  const [footer, setFooter] = useState<JSX.Element | undefined>(ViewThreeFooterNavigation);
+  const [footer, setFooter] = useState<JSX.Element | undefined>(ViewThreeFooterButton);
   const [actionFunction, setActionFunction] = useState<() => void | undefined>();
 
-  function ViewThreeFooterNavigation () {
+  function ViewThreeFooterButton () {
     return (
-      <FooterNavigation
-        text={buttonText}
-        callToAction={actionNext}
+      <FooterButton
+        actionText={buttonText}
+        onActionClick={actionNext}
       />
     )
   }
@@ -29,7 +29,7 @@ export const ViewThree = () => {
   function actionPrevious () {
     setBody(ViewThreeContentOne);
     setActionFunction(undefined);
-    setFooter(ViewThreeFooterNavigation);
+    setFooter(ViewThreeFooterButton);
   }
 
   function actionNext () {
