@@ -2,6 +2,7 @@ import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   AnyToken,
   CancelOrderResponse,
+  Configuration,
   CreateOrderResponse,
   CreateTradeResponse,
   CreateTransferResponse,
@@ -23,7 +24,6 @@ import {
 } from '@imtbl/core-sdk';
 import { UserWithEtherKey } from '../types';
 import { IMXProvider } from '@imtbl/provider';
-import { StarkExAPIFactory, StarkExConfiguration } from '@imtbl/starkex';
 import { batchNftTransfer, transfer } from '../workflows/transfer';
 import { cancelOrder, createOrder } from '../workflows/order';
 import { exchangeTransfer } from '../workflows/exchange';
@@ -50,19 +50,13 @@ export default class PassportImxProvider implements IMXProvider {
     this.user = user;
     this.starkSigner = starkSigner;
     this.passportConfig = passportConfig;
-
-    const starkExConfig = new StarkExConfiguration({
-      baseConfig: passportConfig.baseConfig,
-      overrides: passportConfig.starkExConfiguration,
+    const apiConfig = new Configuration({
+      basePath: passportConfig.imxApiBasePath,
     });
-
-    const { transfersApi, ordersApi, exchangeApi, tradesApi } =
-      StarkExAPIFactory(starkExConfig);
-
-    this.transfersApi = transfersApi;
-    this.ordersApi = ordersApi;
-    this.exchangesApi = exchangeApi;
-    this.tradesApi = tradesApi;
+    this.transfersApi = new TransfersApi(apiConfig);
+    this.ordersApi = new OrdersApi(apiConfig);
+    this.exchangesApi = new ExchangesApi(apiConfig);
+    this.tradesApi = new TradesApi(apiConfig);
   }
 
   async transfer(
