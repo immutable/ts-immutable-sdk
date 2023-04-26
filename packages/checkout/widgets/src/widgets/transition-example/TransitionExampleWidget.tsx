@@ -1,7 +1,6 @@
 import { BiomeThemeProvider } from "@biom3/react";
 import { BaseTokens, onDarkBase, onLightBase } from "@biom3/design-tokens";
 import { WidgetTheme } from "@imtbl/checkout-ui-types";
-import { ConnectionProviders } from "@imtbl/checkout-sdk-web";
 import { ViewOne } from "./views/ViewOne";
 import { useEffect, useReducer } from "react";
 import { initialViewState, ViewActions, ViewContext, viewReducer } from "../../context/ViewContext";
@@ -14,9 +13,7 @@ export interface TransitionExampleWidgetProps {
   theme: WidgetTheme;
 }
 
-export interface TransitionExampleWidgetParams {
-  providerPreference?: ConnectionProviders;
-}
+export interface TransitionExampleWidgetParams {}
 
 export function TransitionExampleWidget(props:TransitionExampleWidgetProps) {
   const { theme } = props;
