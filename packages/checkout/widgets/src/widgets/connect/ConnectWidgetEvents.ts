@@ -3,45 +3,55 @@ import {
   ConnectEvent,
   ConnectionSuccess,
   ConnectionFailed,
-  ConnectEventType
-} from '@imtbl/checkout-ui-types'
+  ConnectEventType,
+} from '@imtbl/checkout-ui-types';
 
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web'
+import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
 
-import { addToLocalStorage } from '../../lib'
+import { addToLocalStorage } from '../../lib';
 
-export function sendConnectSuccessEvent(providerPreference: ConnectionProviders){
-  addToLocalStorage('providerPreference', providerPreference)
-  const successEvent = new CustomEvent<ConnectEvent<ConnectionSuccess>>(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT , {
-    detail: {
-      type: ConnectEventType.SUCCESS,
-      data: {
-        providerPreference: providerPreference
-      }
+export function sendConnectSuccessEvent(
+  providerPreference: ConnectionProviders
+) {
+  addToLocalStorage('providerPreference', providerPreference);
+  const successEvent = new CustomEvent<ConnectEvent<ConnectionSuccess>>(
+    IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
+    {
+      detail: {
+        type: ConnectEventType.SUCCESS,
+        data: {
+          providerPreference: providerPreference,
+        },
+      },
     }
-  })
-  console.log(successEvent.detail)
-  if(window !== undefined) window.dispatchEvent(successEvent)
+  );
+  if (window !== undefined) window.dispatchEvent(successEvent);
 }
 
 export function sendCloseWidgetEvent() {
-  const closeWidgetEvent = new CustomEvent<ConnectEvent<any>>(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, {
-    detail: {
-      type: ConnectEventType.CLOSE_WIDGET,
-      data: {}
+  const closeWidgetEvent = new CustomEvent<ConnectEvent<any>>(
+    IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
+    {
+      detail: {
+        type: ConnectEventType.CLOSE_WIDGET,
+        data: {},
+      },
     }
-  })
-  if(window !== undefined) window.dispatchEvent(closeWidgetEvent)
+  );
+  if (window !== undefined) window.dispatchEvent(closeWidgetEvent);
 }
 
-export function sendConnectFailedEvent(reason: string){
-  const failedEvent = new CustomEvent<ConnectEvent<ConnectionFailed>>(IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT, {
-    detail: {
-      type: ConnectEventType.FAILURE,
-      data: {
-        reason
-      }
+export function sendConnectFailedEvent(reason: string) {
+  const failedEvent = new CustomEvent<ConnectEvent<ConnectionFailed>>(
+    IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
+    {
+      detail: {
+        type: ConnectEventType.FAILURE,
+        data: {
+          reason,
+        },
+      },
     }
-  })
-  if(window !== undefined) window.dispatchEvent(failedEvent)
+  );
+  if (window !== undefined) window.dispatchEvent(failedEvent);
 }

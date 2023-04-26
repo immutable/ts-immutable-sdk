@@ -1,7 +1,7 @@
-import { Button } from "@biom3/react"
-import { Checkout, Transaction } from "@imtbl/checkout-sdk-web";
+import { Button } from '@biom3/react';
+import { Checkout, Transaction } from '@imtbl/checkout-sdk-web';
 import { Web3Provider } from '@ethersproject/providers';
-import { SwapWidgetViews } from "../SwapWidget";
+import { SwapWidgetViews } from '../SwapWidget';
 
 export interface SwapButtonProps {
   provider?: Web3Provider;
@@ -18,7 +18,7 @@ export const SwapButton = (props: SwapButtonProps) => {
     try {
       await checkout.sendTransaction({
         provider,
-        transaction
+        transaction,
       });
       updateView(SwapWidgetViews.SUCCESS);
     } catch (err: any) {
@@ -26,15 +26,15 @@ export const SwapButton = (props: SwapButtonProps) => {
       // transaction will always error out currently
       updateView(SwapWidgetViews.SUCCESS, err);
     }
-  }
+  };
 
-  return(
+  return (
     <Button
       disabled={!provider || !transaction}
-      variant={!provider || !transaction ? "tertiary" : "primary"}
+      variant={!provider || !transaction ? 'tertiary' : 'primary'}
       onClick={sendTransaction}
     >
       Swap
     </Button>
-  )
-}
+  );
+};

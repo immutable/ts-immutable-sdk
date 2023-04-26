@@ -1,4 +1,4 @@
-import {cy} from 'local-cypress';
+import { cy } from 'local-cypress';
 
 /**
  * Allows the simple selection of testid's
@@ -12,10 +12,10 @@ export const cyGetByTestId = (
   testId: string,
   options?: {
     domElement?: string;
-  },
+  }
 ) => {
   return cy.get(
-    `${options?.domElement ? options.domElement : ''}[data-testid="${testId}"]`,
+    `${options?.domElement ? options.domElement : ''}[data-testid="${testId}"]`
   );
 };
 
@@ -31,4 +31,3 @@ export const cySmartGet = (selector: string) =>
   selector.includes('@') || selector.includes(' ')
     ? cy.get(selector)
     : cyGetByTestId(selector);
-    

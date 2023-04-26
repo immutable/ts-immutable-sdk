@@ -4,37 +4,38 @@ import { mount } from 'cypress/react18';
 import { WidgetTheme } from '@imtbl/checkout-ui-types';
 import { cySmartGet } from '../../lib/testUtils';
 import { Checkout } from '@imtbl/checkout-sdk-web';
-import { BigNumber } from 'ethers'
+import { BigNumber } from 'ethers';
 
 describe('SwapWidget tests', () => {
   beforeEach(() => {
-    cy.stub(Checkout.prototype, 'connect').as('connectStub')
+    cy.stub(Checkout.prototype, 'connect')
+      .as('connectStub')
       .resolves({
         provider: {
           getSigner: () => ({
-            getAddress: () => (Promise.resolve("dss"))
+            getAddress: () => Promise.resolve('dss'),
           }),
           getNetwork: async () => ({
             chainId: 1,
             name: 'Ethereum',
           }),
           provider: {
-            request: async () => null
-          }
+            request: async () => null,
+          },
         },
-        network:{
+        network: {
           chainId: 1,
           name: 'Ethereum',
           nativeCurrency: {
             name: 'ETH',
             symbol: 'ETH',
-            decimals: 18
-          }
-        }
-      }
-    )
+            decimals: 18,
+          },
+        },
+      });
 
-    cy.stub(Checkout.prototype, 'getAllBalances').as('getAllBalancesStub')
+    cy.stub(Checkout.prototype, 'getAllBalances')
+      .as('getAllBalancesStub')
       .resolves({
         balances: [
           {
@@ -44,18 +45,17 @@ describe('SwapWidget tests', () => {
               name: 'Matic',
               symbol: 'MATIC',
               decimals: 18,
-              address: "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
-              icon: "123",
-            }
-          }
-        ]
-      }
-    )
-  })
+              address: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
+              icon: '123',
+            },
+          },
+        ],
+      });
+  });
 
   it('should show swap widget on mount', () => {
     const params = {
-      providerPreference: 'metamask'
+      providerPreference: 'metamask',
     } as SwapWidgetParams;
     mount(<SwapWidget params={params} theme={WidgetTheme.DARK} />);
     cySmartGet('buyField__selected-option').should('be.visible');
@@ -67,7 +67,7 @@ describe('SwapWidget tests', () => {
       const params = {
         toContractAddress: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
         amount: '50000000000000000000',
-        providerPreference: 'metamask'
+        providerPreference: 'metamask',
       } as SwapWidgetParams;
 
       mount(<SwapWidget params={params} theme={WidgetTheme.DARK} />);
@@ -99,7 +99,7 @@ describe('SwapWidget tests', () => {
       const params = {
         toContractAddress: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
         amount: '50000000000000000000',
-        providerPreference: 'metamask'
+        providerPreference: 'metamask',
       } as SwapWidgetParams;
 
       mount(<SwapWidget params={params} theme={WidgetTheme.DARK} />);
@@ -107,9 +107,12 @@ describe('SwapWidget tests', () => {
       cySmartGet('withField__option-ETH').should('not.exist');
       cySmartGet('withField__option-IMX').should('not.exist');
       cySmartGet('withField__option-MATIC').should('not.exist');
-      cy.wait(1000) //wait for the debounce delay
+      cy.wait(1000); //wait for the debounce delay
       cySmartGet('withField__amount__input').should('have.value', '500.0');
-      cySmartGet('withField__selected-option-text').should('have.text', 'MATIC');
+      cySmartGet('withField__selected-option-text').should(
+        'have.text',
+        'MATIC'
+      );
     });
   });
 });
