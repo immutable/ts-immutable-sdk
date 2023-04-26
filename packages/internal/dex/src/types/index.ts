@@ -1,6 +1,8 @@
 import { ethers } from 'ethers';
 import { Currency, TradeType } from '@uniswap/sdk-core';
 import { Route } from '@uniswap/v3-sdk';
+import { ModuleConfiguration } from '@imtbl/config/src';
+import { ExchangeContracts } from 'config/config';
 
 export type TradeInfo = {
   route: Route<Currency, Currency>;
@@ -30,3 +32,22 @@ export type TransactionResponse =
       success: false;
       transactionRequest: undefined;
     };
+
+export type TokenInfo = {
+  chainId: number;
+  address: string;
+  decimals: number;
+  symbol?: string;
+  name?: string;
+};
+
+export interface ExchangeOverrides {
+  rpcURL: string;
+  exchangeContracts: ExchangeContracts;
+  commonRoutingTokens: TokenInfo[];
+}
+
+export interface ExchangeModuleConfiguration
+  extends ModuleConfiguration<ExchangeOverrides> {
+  chainId: number; // TODO - union of Sandbox/Prod chains?
+}

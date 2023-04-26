@@ -3,10 +3,10 @@ import { FeeAmount, Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { Token, CurrencyAmount, TradeType } from '@uniswap/sdk-core';
 import { getQuotesForRoutes } from '../lib/getQuotesForRoutes';
 import { Contract, ethers, providers } from 'ethers';
-import { MULTICALL_ADDRESS_CREATE2 } from '../constants';
 import {
   IMX_TEST_CHAIN,
   TEST_CHAIN_ID,
+  TEST_MULTICALL_ADDRESS,
   TEST_RPC_URL,
   WETH_TEST_CHAIN,
 } from '../utils/testUtils';
@@ -71,7 +71,7 @@ describe('getQuotesForRoutes', () => {
         TEST_CHAIN_ID
       );
       const multicallContract = Multicall__factory.connect(
-        MULTICALL_ADDRESS_CREATE2,
+        TEST_MULTICALL_ADDRESS,
         provider
       );
 
@@ -157,7 +157,7 @@ describe('getQuotesForRoutes', () => {
         TEST_CHAIN_ID
       );
       const multicallContract = Multicall__factory.connect(
-        MULTICALL_ADDRESS_CREATE2,
+        TEST_MULTICALL_ADDRESS,
         provider
       );
 
