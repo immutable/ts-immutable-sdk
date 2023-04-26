@@ -42,7 +42,7 @@ export const ViewThree = () => {
           <FooterButton
             actionText="Next"
             onActionClick={() => switchContent(currentContent)}
-          /> 
+          />
         : <FooterLogo />
       }
     >

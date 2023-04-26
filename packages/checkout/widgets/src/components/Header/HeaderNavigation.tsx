@@ -10,8 +10,8 @@ export interface HeaderNavigationProps {
   showClose?: boolean;
   showSettings?: boolean;
   transparent?: boolean;
-  onSettingsClick?: (...args: any[]) => void;
-  onBackButtonClick?: (...args: any[]) => void;
+  onSettingsClick?: () => void;
+  onBackButtonClick?: () => void;
 }
 
 export const HeaderNavigation = ({ 
