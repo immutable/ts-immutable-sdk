@@ -19,13 +19,11 @@ function ConnectUI() {
         case ConnectEventType.SUCCESS: {
           const eventData = event.detail.data as ConnectionSuccess;
           console.log(eventData.providerPreference);
-          console.log(eventData.timestamp);
           break;
         }
         case ConnectEventType.FAILURE: {
           const eventData = event.detail.data as ConnectionFailed;
           console.log(eventData.reason);
-          console.log(eventData.timestamp);
           break;
         }
         default:

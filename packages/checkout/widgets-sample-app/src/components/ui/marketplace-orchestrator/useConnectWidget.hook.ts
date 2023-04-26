@@ -18,7 +18,6 @@ export function useConnectWidget() {
         case ConnectEventType.SUCCESS: {
           const eventData = event.detail.data as ConnectionSuccess;
           console.log(eventData.providerPreference);
-          console.log(eventData.timestamp);
           setProviderPreference(eventData.providerPreference);
           setShowConnectWidget(false);
           break;
@@ -26,7 +25,6 @@ export function useConnectWidget() {
         case ConnectEventType.FAILURE: {
           const eventData = event.detail.data as ConnectionFailed;
           console.log(eventData.reason);
-          console.log(eventData.timestamp);
           setShowConnectWidget(false);
           break;
         }
