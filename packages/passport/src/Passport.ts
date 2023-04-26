@@ -131,11 +131,3 @@ export class Passport {
     return updatedUser;
   }
 }
-
-export const createPassport = (
-  passportModuleConfiguration: PassportModuleConfiguration
-) => {
-  const passport = new Passport(passportModuleConfiguration);
-  const provider = passport.reconnectImx();
-  return { passport, provider };
-};
