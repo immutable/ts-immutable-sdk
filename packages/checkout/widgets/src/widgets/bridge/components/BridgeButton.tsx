@@ -20,28 +20,24 @@ export const BridgeButton = (props: BridgeButtonProps) => {
     balance,
     fromNetwork,
     updateTransactionResponse,
-    updateView
+    updateView,
   } = props;
 
   const isDisabled = (): boolean => {
-    if (
-      !amount ||
-      !balance ||
-      !fromNetwork ||
-      isNaN(Number(amount))
-    ) return true;
+    if (!amount || !balance || !fromNetwork || isNaN(Number(amount)))
+      return true;
 
     const bnAmount = utils.parseUnits(amount, balance?.token.decimals);
     if (bnAmount.lte(0)) return true;
     if (bnAmount.gt(balance.balance)) return true;
 
     return false;
-  }
+  };
 
   const getUnsignedTransaction = () => {
     // get the bridge transaction
     // Bridge.getBridgeTx(...)
-    
+
     return {
       nonce: '0x00', // ignored by MetaMask
       gasPrice: '0x000', // customizable by user during MetaMask confirmation.
@@ -51,8 +47,8 @@ export const BridgeButton = (props: BridgeButtonProps) => {
       value: '0x00', // Only required to send ether to the recipient from the initiating external account.
       data: '0x000', // Optional, but used for defining smart contract creation and interaction.
       chainId: 5, // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
-    }
-  }
+    };
+  };
 
   const submitBridge = async () => {
     if (!provider) return;
@@ -64,23 +60,23 @@ export const BridgeButton = (props: BridgeButtonProps) => {
     try {
       const response = await checkout.sendTransaction({
         provider,
-        transaction
+        transaction,
       });
       updateTransactionResponse(response.transactionResponse);
       updateView(BridgeWidgetViews.SUCCESS);
     } catch (err: any) {
       updateView(BridgeWidgetViews.FAIL, err);
     }
-  }
+  };
 
   return (
     <Button
-      testId='bridge-button'
+      testId="bridge-button"
       disabled={isDisabled()}
-      variant={isDisabled() ? 'tertiary' : 'primary'} 
+      variant={isDisabled() ? 'tertiary' : 'primary'}
       onClick={submitBridge}
     >
       Bridge
     </Button>
-  )
-}
+  );
+};

@@ -1,0 +1,79 @@
+[
+  {
+    "id": "9b25e21e-1741-4a3e-a983-a9b69a420f51",
+    "game_id": "shardbound",
+    "name": "Prestige",
+    "description": "Shardbound Prestige",
+    "status": "draft",
+    "inputs": [
+      {
+        "id": "22a01f44-c5d9-46ce-b9b1-b2731f12834f",
+        "type": "single_item",
+        "name": "Card to upgrade",
+        "conditions": [
+          {
+            "type": "",
+            "ref": "item_type",
+            "comparison": "eq",
+            "expected": "Card"
+          },
+          {
+            "type": "",
+            "ref": "properties.level",
+            "comparison": "eq",
+            "expected": "5"
+          },
+          {
+            "type": "",
+            "ref": "properties.tier",
+            "comparison": "eq",
+            "expected": "Common"
+          },
+          {
+            "type": "",
+            "ref": "properties.location",
+            "comparison": "eq",
+            "expected": "off-chain"
+          }
+        ]
+      },
+      {
+        "id": "0be743b7-f38b-4e22-8612-7538cf9c3c96",
+        "type": "single_item",
+        "name": "Convertible Item",
+        "conditions": [
+          {
+            "type": "",
+            "ref": "item_type",
+            "comparison": "eq",
+            "expected": "Convertible"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "id": "1fc425fc-8cde-44b9-a1eb-416110c62a78",
+        "type": "item_definition",
+        "name": "",
+        "ref": "something",
+        "data": {
+          "properties.level": "2"
+        }
+      }
+    ],
+    "created_at": "2023-04-11T07:50:45.763723Z",
+    "updated_at": "2023-04-11T07:50:45.763723Z"
+  },
+  {
+    "id": "3b081349-e5a5-4b0e-a7cf-557d525682ff",
+    "game_id": "shardbound",
+    "name": "test 1",
+    "description": "dsdfsdf",
+    "status": "draft",
+    "inputs": [],
+    "outputs": [],
+    "created_at": "2023-04-13T00:51:24.205505Z",
+    "updated_at": "2023-04-13T00:51:39.058877Z"
+  }
+]

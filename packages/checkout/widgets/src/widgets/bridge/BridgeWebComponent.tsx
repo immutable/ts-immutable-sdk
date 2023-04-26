@@ -1,29 +1,30 @@
 import React from 'react';
 import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
 import ReactDOM from 'react-dom/client';
-import {Network, WidgetTheme} from '@imtbl/checkout-ui-types';
+import { Network, WidgetTheme } from '@imtbl/checkout-ui-types';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 
 export class ImmutableBridge extends HTMLElement {
+  reactRoot?: ReactDOM.Root;
 
-  reactRoot?:ReactDOM.Root
+  static get observedAttributes() {
+    return ['theme'];
+  }
 
-  static get observedAttributes() { return ['theme']; }
+  theme = WidgetTheme.LIGHT;
+  fromNetwork = Network.ETHEREUM;
+  fromContract = '';
+  amount = '';
+  providerPreference: ConnectionProviders = ConnectionProviders.METAMASK;
 
-  theme = WidgetTheme.LIGHT
-  fromNetwork = Network.ETHEREUM
-  fromContract = ''
-  amount = ''
-  providerPreference:ConnectionProviders = ConnectionProviders.METAMASK
-
-  setTheme(theme:WidgetTheme) {
-    this.theme = theme
-    this.connectedCallback()
+  setTheme(theme: WidgetTheme) {
+    this.theme = theme;
+    this.connectedCallback();
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    this[name] = newValue
-    this.renderWidget()
+    this[name] = newValue;
+    this.renderWidget();
   }
 
   connectedCallback() {
@@ -31,17 +32,19 @@ export class ImmutableBridge extends HTMLElement {
     this.fromContract = this.getAttribute('fromContractAddress') as string;
     this.fromNetwork = this.getAttribute('fromNetwork') as Network;
     this.amount = this.getAttribute('amount') as string;
-    this.providerPreference = this.getAttribute('providerPreference') as ConnectionProviders;
-    this.renderWidget()
+    this.providerPreference = this.getAttribute(
+      'providerPreference'
+    ) as ConnectionProviders;
+    this.renderWidget();
   }
 
   renderWidget() {
-    const params:BridgeWidgetParams = {
+    const params: BridgeWidgetParams = {
       providerPreference: this.providerPreference,
       fromContractAddress: this.fromContract,
       fromNetwork: this.fromNetwork,
       amount: this.amount,
-    }
+    };
 
     if (!this.reactRoot) {
       this.reactRoot = ReactDOM.createRoot(this);

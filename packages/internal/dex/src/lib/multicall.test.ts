@@ -5,18 +5,15 @@ import {
 } from '../lib/multicall';
 import { ethers, providers } from 'ethers';
 import { getCreate2Address } from '@ethersproject/address';
-import {
-  MULTICALL_ADDRESS_CREATE2,
-  V3_CORE_FACTORY_ADDRESS_CREATE2,
-  V3_MIGRATOR_ADDRESSES_CREATE2,
-} from '../constants/addresses';
 import { keccak256 } from '@ethersproject/solidity';
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { Contract } from '@ethersproject/contracts';
 import {
   IMX_TEST_CHAIN,
   TEST_CHAIN_ID,
+  TEST_MULTICALL_ADDRESS,
   TEST_RPC_URL,
+  TEST_V3_CORE_FACTORY_ADDRESS,
   USDC_TEST_CHAIN,
   WETH_TEST_CHAIN,
 } from '../utils/testUtils';
@@ -65,7 +62,7 @@ describe('callMultipleContractSingleData', () => {
 
   describe('when call token0 on multiple pools', () => {
     it('returns the result', async () => {
-      const coreFactoryV3 = V3_CORE_FACTORY_ADDRESS_CREATE2;
+      const coreFactoryV3 = TEST_V3_CORE_FACTORY_ADDRESS;
       const addr: string = getCreate2Address(
         coreFactoryV3,
         keccak256(
@@ -99,7 +96,7 @@ describe('callMultipleContractSingleData', () => {
         TEST_CHAIN_ID
       );
       const multicallContract = Multicall__factory.connect(
-        MULTICALL_ADDRESS_CREATE2,
+        TEST_MULTICALL_ADDRESS,
         provider
       );
 
@@ -126,9 +123,9 @@ describe('callMultipleContractSingleData', () => {
     });
   });
 
-  describe('when call slot0 on multiple pools', () => {
-    it.skip('returns the result', async () => {
-      const coreFactoryV3 = V3_CORE_FACTORY_ADDRESS_CREATE2;
+  describe('Spot price calculation PoC', () => {
+    it.skip('calculates', async () => {
+      const coreFactoryV3 = TEST_V3_CORE_FACTORY_ADDRESS;
       const addr: string = getCreate2Address(
         coreFactoryV3,
         keccak256(
@@ -148,7 +145,7 @@ describe('callMultipleContractSingleData', () => {
         TEST_CHAIN_ID
       );
       const multicallContract = Multicall__factory.connect(
-        MULTICALL_ADDRESS_CREATE2,
+        TEST_MULTICALL_ADDRESS,
         provider
       );
 
@@ -207,7 +204,7 @@ describe('callSingleContractWithCallData', () => {
       const testCallData = [
         '0xc6a5026a0000000000000000000000004f062a3eaec3730560ab89b5ce5ac0ab2c5517ae00000000000000000000000093733225ccc07ba02b1449aa3379418ddc37f6ec000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000000000000000000000027100000000000000000000000000000000000000000000000000000000000000000',
       ];
-      const coreFactoryV3 = V3_MIGRATOR_ADDRESSES_CREATE2;
+      const coreFactoryV3 = TEST_V3_CORE_FACTORY_ADDRESS;
       const addrToken0: string = getCreate2Address(
         coreFactoryV3,
         keccak256(
@@ -227,7 +224,7 @@ describe('callSingleContractWithCallData', () => {
         TEST_CHAIN_ID
       );
       const multicallContract = Multicall__factory.connect(
-        MULTICALL_ADDRESS_CREATE2,
+        TEST_MULTICALL_ADDRESS,
         provider
       );
 

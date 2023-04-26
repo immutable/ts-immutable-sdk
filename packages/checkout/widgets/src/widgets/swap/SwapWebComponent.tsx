@@ -5,48 +5,50 @@ import { WidgetTheme } from '@imtbl/checkout-ui-types';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 
 export class ImmutableSwap extends HTMLElement {
+  reactRoot?: ReactDOM.Root;
 
-  reactRoot?:ReactDOM.Root
+  static get observedAttributes() {
+    return ['theme'];
+  }
 
-  static get observedAttributes() { return ['theme']; }
-
-  theme = WidgetTheme.DARK
-  providerPreference = ConnectionProviders.METAMASK
-  amount = ''
-  fromContractAddress = ''
-  toContractAddress = ''
+  theme = WidgetTheme.DARK;
+  providerPreference = ConnectionProviders.METAMASK;
+  amount = '';
+  fromContractAddress = '';
+  toContractAddress = '';
 
   attributeChangedCallback(name, oldValue, newValue) {
-    this[name] = newValue
-    this.renderWidget()
+    this[name] = newValue;
+    this.renderWidget();
   }
 
   connectedCallback() {
     this.theme = this.getAttribute('theme') as WidgetTheme;
-    this.providerPreference = this.getAttribute('providerPreference') as ConnectionProviders;
+    this.providerPreference = this.getAttribute(
+      'providerPreference'
+    ) as ConnectionProviders;
     this.amount = this.getAttribute('amount') as string;
-    this.fromContractAddress = this.getAttribute('fromContractAddress') as string;
+    this.fromContractAddress = this.getAttribute(
+      'fromContractAddress'
+    ) as string;
     this.toContractAddress = this.getAttribute('toContractAddress') as string;
-    this.renderWidget()    
+    this.renderWidget();
   }
   renderWidget() {
     const swapParams: SwapWidgetParams = {
       providerPreference: this.providerPreference,
       amount: this.amount,
       fromContractAddress: this.fromContractAddress,
-      toContractAddress: this.toContractAddress
-    }
+      toContractAddress: this.toContractAddress,
+    };
 
     if (!this.reactRoot) {
       this.reactRoot = ReactDOM.createRoot(this);
     }
-    
+
     this.reactRoot.render(
       <React.StrictMode>
-        <SwapWidget
-          params={swapParams}
-          theme={this.theme}
-        />
+        <SwapWidget params={swapParams} theme={this.theme} />
       </React.StrictMode>
     );
   }

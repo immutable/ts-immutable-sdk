@@ -1,6 +1,6 @@
 export const ButtonWrapperStyle = {
-  marginBottom: '10px'
-}
+  marginBottom: '10px',
+};
 
 export const WidgetHeaderStyle = {
   width: '100%',
@@ -8,16 +8,14 @@ export const WidgetHeaderStyle = {
   flexWrap: 'nowrap',
   justifyContent: 'flex-end',
   marginBottom: '20px',
-}
+};
 
 export const InactiveStyle = {
   display: 'none !important',
-}
+};
 
-export const ActiveStyle = {
-
-}
+export const ActiveStyle = {};
 
 export const BackButtonStyle = {
   flexGrow: '4',
-}
+};

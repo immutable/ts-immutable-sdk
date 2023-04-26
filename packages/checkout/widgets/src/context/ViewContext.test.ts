@@ -13,9 +13,9 @@ describe('view-context', () => {
     const updateViewPayload: UpdateViewPayload = {
       type: ViewActions.UPDATE_VIEW,
       view: {
-        type: ConnectWidgetViews.CHOOSE_NETWORKS
-      }
-    }
+        type: ConnectWidgetViews.CHOOSE_NETWORKS,
+      },
+    };
 
     expect(initialViewState).toEqual({
       view: {
@@ -33,21 +33,21 @@ describe('view-context', () => {
     });
   });
 
-  it ('should not add view to history if view is the current view when reducer called with UPDATE_VIEW action', () => {
+  it('should not add view to history if view is the current view when reducer called with UPDATE_VIEW action', () => {
     const state = viewReducer(
       {
         view: {
           type: ConnectWidgetViews.CONNECT_WALLET,
         },
-        history: [{ type: ConnectWidgetViews.CONNECT_WALLET }]
+        history: [{ type: ConnectWidgetViews.CONNECT_WALLET }],
       },
-      { 
+      {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: ConnectWidgetViews.CONNECT_WALLET
-          }
-        }
+            type: ConnectWidgetViews.CONNECT_WALLET,
+          },
+        },
       }
     );
 
@@ -55,24 +55,29 @@ describe('view-context', () => {
       view: {
         type: ConnectWidgetViews.CONNECT_WALLET,
       },
-      history: [{
-        type: ConnectWidgetViews.CONNECT_WALLET,
-      }],
+      history: [
+        {
+          type: ConnectWidgetViews.CONNECT_WALLET,
+        },
+      ],
     });
   });
 
-  it ('should add view to history if view is not the current view when reducer called with UPDATE_VIEW action', () => {
+  it('should add view to history if view is not the current view when reducer called with UPDATE_VIEW action', () => {
     const state = viewReducer(
-      { view: {
+      {
+        view: {
           type: ConnectWidgetViews.CONNECT_WALLET,
         },
-        history: [{ type: ConnectWidgetViews.CONNECT_WALLET }]},
-      { payload: {
+        history: [{ type: ConnectWidgetViews.CONNECT_WALLET }],
+      },
+      {
+        payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: ConnectWidgetViews.OTHER_WALLETS
-          }
-        }
+            type: ConnectWidgetViews.OTHER_WALLETS,
+          },
+        },
       }
     );
 
@@ -80,7 +85,10 @@ describe('view-context', () => {
       view: {
         type: ConnectWidgetViews.OTHER_WALLETS,
       },
-      history: [{ type: ConnectWidgetViews.CONNECT_WALLET }, { type: ConnectWidgetViews.OTHER_WALLETS }],
+      history: [
+        { type: ConnectWidgetViews.CONNECT_WALLET },
+        { type: ConnectWidgetViews.OTHER_WALLETS },
+      ],
     });
   });
 
@@ -88,18 +96,18 @@ describe('view-context', () => {
     const state = viewReducer(
       {
         view: {
-          type: ConnectWidgetViews.OTHER_WALLETS
+          type: ConnectWidgetViews.OTHER_WALLETS,
         },
         history: [
           { type: ConnectWidgetViews.OTHER_WALLETS },
           { type: ConnectWidgetViews.CONNECT_WALLET },
-          { type: ConnectWidgetViews.CHOOSE_NETWORKS }
-        ]
-      }, 
+          { type: ConnectWidgetViews.CHOOSE_NETWORKS },
+        ],
+      },
       {
         payload: {
           type: ViewActions.GO_BACK,
-        }
+        },
       }
     );
 
@@ -109,28 +117,31 @@ describe('view-context', () => {
       },
       history: [
         { type: ConnectWidgetViews.OTHER_WALLETS },
-        { type: ConnectWidgetViews.CONNECT_WALLET }
-      ]
+        { type: ConnectWidgetViews.CONNECT_WALLET },
+      ],
     });
   });
 
-  it ('should not change state if reducer called with GO_BACK action and only one item in history', () => {
-    const state = viewReducer({
-      view: {
-        type: ConnectWidgetViews.CHOOSE_NETWORKS,
+  it('should not change state if reducer called with GO_BACK action and only one item in history', () => {
+    const state = viewReducer(
+      {
+        view: {
+          type: ConnectWidgetViews.CHOOSE_NETWORKS,
+        },
+        history: [{ type: ConnectWidgetViews.CHOOSE_NETWORKS }],
       },
-      history: [{ type: ConnectWidgetViews.CHOOSE_NETWORKS }]
-    },
-      { payload: { type: ViewActions.GO_BACK }}
+      { payload: { type: ViewActions.GO_BACK } }
     );
 
     expect(state).toEqual({
       view: {
         type: ConnectWidgetViews.CHOOSE_NETWORKS,
       },
-      history: [{
-        type: ConnectWidgetViews.CHOOSE_NETWORKS,
-      }],
+      history: [
+        {
+          type: ConnectWidgetViews.CHOOSE_NETWORKS,
+        },
+      ],
     });
   });
 });

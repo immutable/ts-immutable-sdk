@@ -1,16 +1,31 @@
-import {BiomeCombinedProviders, Body, Box, Button, Heading, OptionKey} from "@biom3/react";
-import {BaseTokens, onDarkBase, onLightBase} from "@biom3/design-tokens";
+import {
+  BiomeCombinedProviders,
+  Body,
+  Box,
+  Button,
+  Heading,
+  OptionKey,
+} from '@biom3/react';
+import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 
-import {Network, WidgetTheme} from "@imtbl/checkout-ui-types";
-import {BridgeWidgetStyle} from "./BridgeStyles";
+import { Network, WidgetTheme } from '@imtbl/checkout-ui-types';
+import { BridgeWidgetStyle } from './BridgeStyles';
 
-import {ChainId, Checkout, ConnectionProviders, GetBalanceResult} from "@imtbl/checkout-sdk-web";
-import {useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {TransactionResponse, Web3Provider} from '@ethersproject/providers'
-import {BridgeForm} from "./components/BridgeForm";
-import {getAllBalances} from "./utils";
-import {sendBridgeFailedEvent, sendBridgeSuccessEvent} from "./BridgeWidgetEvents";
-import {EtherscanLink} from "./components/EtherscanLink";
+import {
+  ChainId,
+  Checkout,
+  ConnectionProviders,
+  GetBalanceResult,
+} from '@imtbl/checkout-sdk-web';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
+import { BridgeForm } from './components/BridgeForm';
+import { getAllBalances } from './utils';
+import {
+  sendBridgeFailedEvent,
+  sendBridgeSuccessEvent,
+} from './BridgeWidgetEvents';
+import { EtherscanLink } from './components/EtherscanLink';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -19,34 +34,40 @@ export interface BridgeWidgetProps {
 
 export interface BridgeWidgetParams {
   providerPreference: ConnectionProviders;
-  fromContractAddress?: string,
-  amount?: string,
+  fromContractAddress?: string;
+  amount?: string;
   fromNetwork?: Network;
 }
 
 export enum BridgeWidgetViews {
-  BRIDGE = "BRIDGE",
-  SUCCESS = "SUCCESS",
-  FAIL = "FAIL"
+  BRIDGE = 'BRIDGE',
+  SUCCESS = 'SUCCESS',
+  FAIL = 'FAIL',
 }
 
-const bridgingNetworks = Object.values(Network).filter((network) => network.toString() !== Network.GOERLI);
+const bridgingNetworks = Object.values(Network).filter(
+  (network) => network.toString() !== Network.GOERLI
+);
 
 export const NetworkChainMap = {
   [Network.ETHEREUM]: ChainId.ETHEREUM,
   [Network.POLYGON]: ChainId.POLYGON,
-  [Network.GOERLI]: ChainId.GOERLI
-}
+  [Network.GOERLI]: ChainId.GOERLI,
+};
 
-export function BridgeWidget(props:BridgeWidgetProps) {
+export function BridgeWidget(props: BridgeWidgetProps) {
   const { params, theme } = props;
-  const { providerPreference, fromContractAddress, amount, fromNetwork } = params;
-  const biomeTheme:BaseTokens = (theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()) ? onLightBase : onDarkBase
-  const defaultFromChainId = useMemo(()=>{
-    return (fromNetwork && bridgingNetworks.includes(fromNetwork))
-        ? NetworkChainMap[fromNetwork]
-        : ChainId.ETHEREUM;
-  },[fromNetwork]);
+  const { providerPreference, fromContractAddress, amount, fromNetwork } =
+    params;
+  const biomeTheme: BaseTokens =
+    theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+      ? onLightBase
+      : onDarkBase;
+  const defaultFromChainId = useMemo(() => {
+    return fromNetwork && bridgingNetworks.includes(fromNetwork)
+      ? NetworkChainMap[fromNetwork]
+      : ChainId.ETHEREUM;
+  }, [fromNetwork]);
 
   const firstRender = useRef(true);
   const checkout = useMemo(() => new Checkout(), []);
@@ -55,10 +76,11 @@ export function BridgeWidget(props:BridgeWidgetProps) {
   const [connectedChainId, setConnectedChainId] = useState<ChainId>();
   const [selectedNetwork, setSelectedNetwork] = useState<OptionKey>();
   const [nativeCurrencySymbol, setNativeCurrencySymbol] = useState('');
-  const [toNetwork, setToNetwork] = useState("");
+  const [toNetwork, setToNetwork] = useState('');
   const [view, setView] = useState(BridgeWidgetViews.BRIDGE);
-  const [transactionResponse, setTransactionResponse] = useState<TransactionResponse | undefined>();
-
+  const [transactionResponse, setTransactionResponse] = useState<
+    TransactionResponse | undefined
+  >();
 
   /**
    * This effect is used to set up the BridgeWidget state for the first time.
@@ -71,38 +93,43 @@ export function BridgeWidget(props:BridgeWidgetProps) {
    */
   useEffect(() => {
     const bridgetWidgetSetup = async () => {
-      let connectResult = await checkout.connect({providerPreference});
+      let connectResult = await checkout.connect({ providerPreference });
       let theProvider;
       let chainId;
       chainId = connectResult.network.chainId;
       theProvider = connectResult.provider;
 
-      const connectedNetworkNotWhitelisted = !bridgingNetworks.includes(connectResult.network.name as Network);
-      const requiresNetworkSwitch = defaultFromChainId !== connectResult.network.chainId;
+      const connectedNetworkNotWhitelisted = !bridgingNetworks.includes(
+        connectResult.network.name as Network
+      );
+      const requiresNetworkSwitch =
+        defaultFromChainId !== connectResult.network.chainId;
 
-      if(connectedNetworkNotWhitelisted || requiresNetworkSwitch) {
-          const switchNetworkResponse = await checkout.switchNetwork({
-            provider: connectResult.provider,
-            chainId: defaultFromChainId
-          });
-          chainId = switchNetworkResponse.network.chainId;
-          connectResult = await checkout.connect({providerPreference});
-          theProvider = connectResult.provider;
+      if (connectedNetworkNotWhitelisted || requiresNetworkSwitch) {
+        const switchNetworkResponse = await checkout.switchNetwork({
+          provider: connectResult.provider,
+          chainId: defaultFromChainId,
+        });
+        chainId = switchNetworkResponse.network.chainId;
+        connectResult = await checkout.connect({ providerPreference });
+        theProvider = connectResult.provider;
       }
 
       setProvider(theProvider);
       setConnectedChainId(chainId);
       setSelectedNetwork(chainId as OptionKey);
-      const toNetworkOption = bridgingNetworks.filter((network) => network.toString() !== connectResult.network.name.toString());
+      const toNetworkOption = bridgingNetworks.filter(
+        (network) =>
+          network.toString() !== connectResult.network.name.toString()
+      );
       setToNetwork(toNetworkOption[0]);
       setNativeCurrencySymbol(connectResult.network.nativeCurrency.symbol);
-    }
+    };
 
-    if(firstRender.current){
+    if (firstRender.current) {
       firstRender.current = false;
       bridgetWidgetSetup();
     }
-
   }, [checkout, providerPreference, defaultFromChainId, firstRender]);
 
   /**
@@ -111,7 +138,7 @@ export function BridgeWidget(props:BridgeWidgetProps) {
    */
   useEffect(() => {
     const refreshBalances = async () => {
-      if(checkout && provider){
+      if (checkout && provider) {
         const getAllBalancesResult = await getAllBalances(checkout, provider);
 
         const nonZeroBalances = getAllBalancesResult.balances
@@ -120,28 +147,33 @@ export function BridgeWidget(props:BridgeWidgetProps) {
 
         setBalances(nonZeroBalances);
       }
-    }
+    };
     refreshBalances();
-  }, [checkout, provider, selectedNetwork])
-
+  }, [checkout, provider, selectedNetwork]);
 
   /**
    * When we switch network, we need to refresh the provider object to avoid errors
    * After a switch network, update the new toNetwork and associated native currency
    */
-  const handleSelectNetwork = useCallback(async (selectedOption: OptionKey) => {
-    if(!provider) return;
-    const switchNetworkResponse = await checkout.switchNetwork({
-      provider,
-      chainId: selectedOption as ChainId
-    });
-    const connectResult = await checkout.connect({providerPreference});
-    setProvider(connectResult.provider)
-    setSelectedNetwork(switchNetworkResponse.network.chainId as OptionKey);
-    const toNetworkOption = bridgingNetworks.filter((network) => network.toString() !== switchNetworkResponse.network.name.toString())
-    setToNetwork(toNetworkOption[0]);
-    setNativeCurrencySymbol(connectResult.network.nativeCurrency.symbol)
-  } ,[checkout, provider, providerPreference])
+  const handleSelectNetwork = useCallback(
+    async (selectedOption: OptionKey) => {
+      if (!provider) return;
+      const switchNetworkResponse = await checkout.switchNetwork({
+        provider,
+        chainId: selectedOption as ChainId,
+      });
+      const connectResult = await checkout.connect({ providerPreference });
+      setProvider(connectResult.provider);
+      setSelectedNetwork(switchNetworkResponse.network.chainId as OptionKey);
+      const toNetworkOption = bridgingNetworks.filter(
+        (network) =>
+          network.toString() !== switchNetworkResponse.network.name.toString()
+      );
+      setToNetwork(toNetworkOption[0]);
+      setNativeCurrencySymbol(connectResult.network.nativeCurrency.symbol);
+    },
+    [checkout, provider, providerPreference]
+  );
 
   function sendBridgeWidgetCloseEvent() {
     console.log('add close event to fire here');
@@ -149,25 +181,27 @@ export function BridgeWidget(props:BridgeWidgetProps) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateView = async (view: BridgeWidgetViews, err?: any) => {
-    setView(view)
+    setView(view);
     if (view === BridgeWidgetViews.SUCCESS) {
-      sendBridgeSuccessEvent()
-      return
+      sendBridgeSuccessEvent();
+      return;
     }
     if (view === BridgeWidgetViews.FAIL) {
       sendBridgeFailedEvent(err.message);
-      return
+      return;
     }
-  }
+  };
 
-  const updateTransactionResponse = (transactionResponse: TransactionResponse) => {
+  const updateTransactionResponse = (
+    transactionResponse: TransactionResponse
+  ) => {
     setTransactionResponse(transactionResponse);
-  }
+  };
 
   const renderBridgeForm = () => {
     return (
       <>
-        {checkout && provider &&
+        {checkout && provider && (
           <BridgeForm
             provider={provider}
             balances={balances}
@@ -181,10 +215,10 @@ export function BridgeWidget(props:BridgeWidgetProps) {
             updateTransactionResponse={updateTransactionResponse}
             updateView={updateView}
           />
-        }
+        )}
       </>
-    )
-  }
+    );
+  };
 
   const renderView = () => {
     switch (view) {
@@ -195,37 +229,46 @@ export function BridgeWidget(props:BridgeWidgetProps) {
       case BridgeWidgetViews.FAIL:
         return renderFailure();
     }
-  }
+  };
 
   const renderSuccess = () => {
     return (
       <>
-        <Body testId='bridge-success'>Success</Body>
+        <Body testId="bridge-success">Success</Body>
         <EtherscanLink hash={transactionResponse?.hash || ''} />
       </>
-    )
-  }
+    );
+  };
 
   const renderFailure = () => {
-    return (
-      <Body testId='bridge-failure'>Failure</Body>
-    )
-  }
+    return <Body testId="bridge-failure">Failure</Body>;
+  };
 
-  return(
-    <BiomeCombinedProviders theme={{base: biomeTheme}}>
+  return (
+    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <Box sx={BridgeWidgetStyle}>
         <>
-          <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-            <Heading testId='heading'>Bridge Widget</Heading>
-            <Button size={'small'} sx={{alignSelf:'flex-end'}}
-                testId='close-button'
-                onClick={() => sendBridgeWidgetCloseEvent()}>x</Button>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <Heading testId="heading">Bridge Widget</Heading>
+            <Button
+              size={'small'}
+              sx={{ alignSelf: 'flex-end' }}
+              testId="close-button"
+              onClick={() => sendBridgeWidgetCloseEvent()}
+            >
+              x
+            </Button>
           </Box>
           {provider && checkout && renderView()}
           {(!provider || !checkout) && <Body size={'small'}>Loading...</Body>}
         </>
       </Box>
     </BiomeCombinedProviders>
-  )
+  );
 }

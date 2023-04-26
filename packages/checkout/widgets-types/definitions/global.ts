@@ -60,3 +60,12 @@ export interface ImtblBuyProps
   theme: string;
   orderId: string;
 }
+
+export interface ImtblTransitionExampleProps
+  extends React.DetailedHTMLProps<
+    React.HTMLAttributes<HTMLElement>,
+    HTMLElement
+  > {
+  providerPreference: string;
+  theme: string;
+}

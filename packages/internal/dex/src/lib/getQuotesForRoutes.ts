@@ -1,11 +1,11 @@
 import { Route, SwapQuoter } from '@uniswap/v3-sdk';
 import { Currency, TradeType, CurrencyAmount } from '@uniswap/sdk-core';
 import JSBI from 'jsbi';
-import { QUOTER_ADDRESS_CREATE2 } from '../constants';
 import { ethers } from 'ethers';
 import { multicallMultipleCallDataSingContract } from './multicall';
 import { quoteReturnMapping } from './utils';
 import { Multicall } from '../contracts/types';
+import { TEST_QUOTER_ADDRESS } from 'utils/testUtils';
 
 export const DEFAULT_GAS_QUOTE = 2_000_000;
 const amountIndex = 0;
@@ -32,7 +32,7 @@ export async function getQuotesForRoutes(
   const quoteResults = await multicallMultipleCallDataSingContract(
     multicallContract,
     callData,
-    QUOTER_ADDRESS_CREATE2,
+    TEST_QUOTER_ADDRESS,
     { gasRequired: DEFAULT_GAS_QUOTE }
   );
 

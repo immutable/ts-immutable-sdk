@@ -67,6 +67,9 @@ export interface SwitchNetworkParams {
 export interface SwitchNetworkResult {
   network: NetworkInfo;
 }
+export interface GetNetworkParams {
+  provider: Web3Provider;
+}
 
 export enum NetworkFilterTypes {
   ALL = 'all',

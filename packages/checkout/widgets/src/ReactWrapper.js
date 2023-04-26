@@ -3,7 +3,6 @@ import { render, unmountComponentAtNode } from 'react-dom';
 import Greeting from './widgets/greeting/Greeting';
 
 class ReactElement extends HTMLElement {
-  
   constructor() {
     super();
     this.observer = new MutationObserver(() => this.update());
@@ -29,7 +28,7 @@ class ReactElement extends HTMLElement {
     const props = {
       ...this.getProps(this.attributes),
       ...this.getEvents(),
-      children: this.parseHtmlToReact(this.innerHTML)
+      children: this.parseHtmlToReact(this.innerHTML),
     };
     render(<Greeting {...props} />, this);
   }
@@ -43,37 +42,36 @@ class ReactElement extends HTMLElement {
   }
 
   getProps(attributes) {
-    return [ ...attributes ]         
-      .filter(attr => attr.name !== 'style')         
-      .map(attr => this.convert(attr.name, attr.value))
-      .reduce((props, prop) => 
-        ({ ...props, [prop.name]: prop.value }), {});
+    return [...attributes]
+      .filter((attr) => attr.name !== 'style')
+      .map((attr) => this.convert(attr.name, attr.value))
+      .reduce((props, prop) => ({ ...props, [prop.name]: prop.value }), {});
   }
 
   getEvents() {
     return Object.values(this.attributes)
-      .filter(key => /on([a-z].*)/.exec(key.name))
-      .reduce((events, ev) => ({
-        ...events,
-        [ev.name]: args => 
-        this.dispatchEvent(new CustomEvent(ev.name, { ...args }))
-      }), {});
+      .filter((key) => /on([a-z].*)/.exec(key.name))
+      .reduce(
+        (events, ev) => ({
+          ...events,
+          [ev.name]: (args) =>
+            this.dispatchEvent(new CustomEvent(ev.name, { ...args })),
+        }),
+        {}
+      );
   }
 
   convert(attrName, attrValue) {
     let value = attrValue;
-    if (attrValue === 'true' || attrValue === 'false') 
-      value = attrValue === 'true';      
-    else if (!isNaN(attrValue) && attrValue !== '') 
-      value = +attrValue;      
-    else if (/^{.*}/.exec(attrValue)) 
-      value = JSON.parse(attrValue);
-    return {         
-      name: attrName,         
-      value: value      
+    if (attrValue === 'true' || attrValue === 'false')
+      value = attrValue === 'true';
+    else if (!isNaN(attrValue) && attrValue !== '') value = +attrValue;
+    else if (/^{.*}/.exec(attrValue)) value = JSON.parse(attrValue);
+    return {
+      name: attrName,
+      value: value,
     };
   }
-
 }
 
 customElements.define('rating-element', ReactElement);
