@@ -5,6 +5,7 @@ import commonJs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import dts from 'rollup-plugin-dts';
 import replace from '@rollup/plugin-replace';
+import pkg from './package.json' assert { type: 'json' };
 
 const packages = JSON.parse(
   readFileSync('./workspace-packages.json', { encoding: 'utf8' })
@@ -20,12 +21,12 @@ const getFileBuild = (inputFilename) => [
       format: 'es',
     },
     plugins: [
+      replace({
+        __SDK_VERSION__: pkg.version,
+      }),
       typescript({
         declaration: true,
         declarationDir: './dist/types',
-      }),
-      replace({
-        __SDK_VERSION__: '0.0.0',
       }),
       nodeResolve({
         resolveOnly: getPackages(),
