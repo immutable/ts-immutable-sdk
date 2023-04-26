@@ -182,6 +182,7 @@ describe('AuthManager', () => {
 
   describe('loginSilent', () => {
     it('should get the login user and return the domain model', async () => {
+      getUserMock.mockReturnValue(mockOidcUser);
       signinSilentMock.mockResolvedValue(mockOidcUser);
 
       const result = await authManager.loginSilent();
@@ -189,15 +190,21 @@ describe('AuthManager', () => {
       expect(result).toEqual(mockUser);
     });
 
-    it('should return null if user is returned', async () => {
-      signinSilentMock.mockResolvedValue(mockOidcUserWithPassportInfo);
+    it('should return null if there is no existed user', async () => {
+      getUserMock.mockReturnValue(null);
 
       const result = await authManager.loginSilent();
 
-      expect(result).toEqual({
-        ...mockUser,
-        etherKey: passportData.passport.ether_key,
-      });
+      expect(result).toBeNull();
+    });
+
+    it('should return null if user is returned', async () => {
+      getUserMock.mockReturnValue(mockOidcUser);
+      signinSilentMock.mockResolvedValue(null);
+
+      const result = await authManager.loginSilent();
+
+      expect(result).toBeNull();
     });
   });
 

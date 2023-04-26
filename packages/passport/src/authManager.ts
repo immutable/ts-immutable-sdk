@@ -91,6 +91,10 @@ export default class AuthManager {
 
   public async loginSilent(): Promise<UserWithEtherKey | null> {
     return withPassportError<UserWithEtherKey | null>(async () => {
+      const existedUser = await this.getUser();
+      if (!existedUser) {
+        return null;
+      }
       const oidcUser = await this.userManager.signinSilent();
       if (!oidcUser) {
         return null;
