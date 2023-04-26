@@ -13,7 +13,7 @@ This is a single page website that can be use to preview and test the SDK functi
 
 ## Running
 
-Run the following to serve the playground application on `http://127.0.0.1:4200/`
+Run the following to serve the playground application on `http://127.0.0.1:3030/`
 ```bash
   yarn workspace @imtbl/economy-playground start
 ```

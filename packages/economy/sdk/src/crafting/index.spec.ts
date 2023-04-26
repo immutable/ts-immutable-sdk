@@ -6,6 +6,6 @@ describe('craft', () => {
     const result = await craft(input, () => {
       /** */
     });
-    expect(result).toEqual('COMPLETE');
+    expect(result).toEqual('COMPLETED');
   });
 });

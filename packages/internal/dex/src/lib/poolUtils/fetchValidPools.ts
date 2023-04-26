@@ -24,11 +24,13 @@ const noDataResult = '0x';
 export const fetchValidPools = async (
   multicallContract: Multicall,
   erc20Pair: ERC20Pair,
-  commonRoutingERC20s: Token[]
+  commonRoutingERC20s: Token[],
+  factoryAddress: string
 ): Promise<Pool[]> => {
   const poolIDs = generatePossiblePoolsFromERC20Pair(
     erc20Pair,
-    commonRoutingERC20s
+    commonRoutingERC20s,
+    factoryAddress
   );
   const poolAddresses = poolIDs.map((pool) => pool.poolAddress);
 

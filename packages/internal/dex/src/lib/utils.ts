@@ -1,5 +1,7 @@
 import { Pool } from '@uniswap/v3-sdk';
+import { Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
+import { TokenInfo } from '../types';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
   '0xcdca1753': ['uint256', 'uint160[]', 'uint32[]', 'uint256'],
@@ -77,3 +79,21 @@ export function validateDifferentAddresses(
     );
   }
 }
+
+export const tokenInfoToUniswapToken = (tokenInfos: TokenInfo[]): Token[] => {
+  const tokens = [];
+
+  for (let tokenInfo of tokenInfos) {
+    tokens.push(
+      new Token(
+        tokenInfo.chainId,
+        tokenInfo.address,
+        tokenInfo.decimals,
+        tokenInfo.symbol,
+        tokenInfo.name
+      )
+    );
+  }
+
+  return tokens;
+};

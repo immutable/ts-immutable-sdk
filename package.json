@@ -60,6 +60,7 @@
     "packages/checkout/widgets-sample-app",
     "packages/checkout/widgets-types",
     "packages/economy/sdk",
-    "packages/economy/playground"
+    "packages/economy/playground",
+    "packages/economy/services"
   ]
 }

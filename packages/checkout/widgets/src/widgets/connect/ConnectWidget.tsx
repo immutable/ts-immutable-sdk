@@ -27,7 +27,7 @@ export function ConnectWidget(props:ConnectWidgetProps) {
   const [connectState, connectDispatch] = useReducer(connectReducer, initialConnectState);
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
-  const biomeTheme:BaseTokens = (theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()) ? onLightBase : onDarkBase;
+  const biomeTheme:BaseTokens = (theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()) ? onDarkBase : onLightBase;
 
   useEffect(() => {
     connectDispatch({
