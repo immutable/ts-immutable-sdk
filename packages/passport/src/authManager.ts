@@ -89,6 +89,16 @@ export default class AuthManager {
     );
   }
 
+  public async loginSilent(): Promise<UserWithEtherKey | null> {
+    return withPassportError<UserWithEtherKey | null>(async () => {
+      const oidcUser = await this.userManager.signinSilent();
+      if (!oidcUser) {
+        return null;
+      }
+      return this.mapOidcUserToDomainModel(oidcUser) as UserWithEtherKey;
+    }, PassportErrorType.SILENT_LOGIN_ERROR);
+  }
+
   public async getUser(): Promise<User | null> {
     return withPassportError<User | null>(async () => {
       const oidcUser = await this.userManager.getUser();

@@ -180,6 +180,27 @@ describe('AuthManager', () => {
     });
   });
 
+  describe('loginSilent', () => {
+    it('should get the login user and return the domain model', async () => {
+      signinSilentMock.mockResolvedValue(mockOidcUser);
+
+      const result = await authManager.loginSilent();
+
+      expect(result).toEqual(mockUser);
+    });
+
+    it('should return null if user is returned', async () => {
+      signinSilentMock.mockResolvedValue(mockOidcUserWithPassportInfo);
+
+      const result = await authManager.loginSilent();
+
+      expect(result).toEqual({
+        ...mockUser,
+        etherKey: passportData.passport.ether_key,
+      });
+    });
+  });
+
   describe('loginCallback', () => {
     it('should call login callback', async () => {
       await authManager.loginCallback();
@@ -205,67 +226,67 @@ describe('AuthManager', () => {
         )
       );
     });
+  });
 
-    describe('getUser', () => {
-      it('should retrieve the user from the userManager and return the domain model', async () => {
-        getUserMock.mockReturnValue(mockOidcUser);
+  describe('getUser', () => {
+    it('should retrieve the user from the userManager and return the domain model', async () => {
+      getUserMock.mockReturnValue(mockOidcUser);
 
-        const result = await authManager.getUser();
+      const result = await authManager.getUser();
 
-        expect(result).toEqual(mockUser);
-      });
-
-      it('should throw an error if no user is returned', async () => {
-        getUserMock.mockReturnValue(null);
-
-        expect(await authManager.getUser()).toBeNull();
-      });
+      expect(result).toEqual(mockUser);
     });
-    describe('requestRefreshTokenAfterRegistration', () => {
-      it('requestRefreshTokenAfterRegistration successful with user wallet address in metadata', async () => {
-        const expected = {
-          ...mockUser,
-          etherKey: passportData.passport.ether_key,
-        };
-        signinSilentMock.mockReturnValue(mockOidcUserWithPassportInfo);
 
-        const res = await authManager.requestRefreshTokenAfterRegistration();
+    it('should return null if no user is returned', async () => {
+      getUserMock.mockReturnValue(null);
 
-        expect(res).toEqual(expected);
-        expect(signinSilentMock).toHaveBeenCalledTimes(1);
-      });
-
-      it('requestRefreshTokenAfterRegistration failed without user wallet address in metadata with retries', async () => {
-        const response = {
-          id_token: 'id123',
-          access_token: 'access123',
-          refresh_token: 'refresh123',
-          token_type: 'Bearer',
-          scope: 'openid',
-          expires_in: 167222,
-          profile: {
-            sub: 'email|123',
-            email: 'test@immutable.com',
-            nickname: 'test',
-          },
-        };
-        signinSilentMock.mockResolvedValue(response);
-
-        await expect(
-          authManager.requestRefreshTokenAfterRegistration()
-        ).rejects.toThrow('REFRESH_TOKEN_ERROR');
-
-        expect(signinSilentMock).toHaveBeenCalledTimes(MAX_RETRIES + 1);
-      }, 15000);
-
-      it('requestRefreshTokenAfterRegistration failed with fetching user info error in metadata with retries', async () => {
-        signinSilentMock.mockResolvedValue(null);
-        await expect(
-          authManager.requestRefreshTokenAfterRegistration()
-        ).rejects.toThrow('REFRESH_TOKEN_ERROR');
-
-        expect(signinSilentMock).toHaveBeenCalledTimes(MAX_RETRIES + 1);
-      }, 15000);
+      expect(await authManager.getUser()).toBeNull();
     });
+  });
+  describe('requestRefreshTokenAfterRegistration', () => {
+    it('requestRefreshTokenAfterRegistration successful with user wallet address in metadata', async () => {
+      const expected = {
+        ...mockUser,
+        etherKey: passportData.passport.ether_key,
+      };
+      signinSilentMock.mockReturnValue(mockOidcUserWithPassportInfo);
+
+      const res = await authManager.requestRefreshTokenAfterRegistration();
+
+      expect(res).toEqual(expected);
+      expect(signinSilentMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('requestRefreshTokenAfterRegistration failed without user wallet address in metadata with retries', async () => {
+      const response = {
+        id_token: 'id123',
+        access_token: 'access123',
+        refresh_token: 'refresh123',
+        token_type: 'Bearer',
+        scope: 'openid',
+        expires_in: 167222,
+        profile: {
+          sub: 'email|123',
+          email: 'test@immutable.com',
+          nickname: 'test',
+        },
+      };
+      signinSilentMock.mockResolvedValue(response);
+
+      await expect(
+        authManager.requestRefreshTokenAfterRegistration()
+      ).rejects.toThrow('REFRESH_TOKEN_ERROR');
+
+      expect(signinSilentMock).toHaveBeenCalledTimes(MAX_RETRIES + 1);
+    }, 15000);
+
+    it('requestRefreshTokenAfterRegistration failed with fetching user info error in metadata with retries', async () => {
+      signinSilentMock.mockResolvedValue(null);
+      await expect(
+        authManager.requestRefreshTokenAfterRegistration()
+      ).rejects.toThrow('REFRESH_TOKEN_ERROR');
+
+      expect(signinSilentMock).toHaveBeenCalledTimes(MAX_RETRIES + 1);
+    }, 15000);
   });
 });

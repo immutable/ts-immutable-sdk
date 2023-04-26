@@ -64,9 +64,9 @@ export class Passport {
     });
   }
 
-  public async reconnectImx(): Promise<IMXProvider | null> {
-    const user = await this.authManager.getUser();
-    if (!user || user.expired == undefined || user.expired) {
+  public async connectImxSilent(): Promise<IMXProvider | null> {
+    const user = await this.authManager.loginSilent();
+    if (!user) {
       return null;
     }
     return this.getImxProvider(user);

@@ -40,6 +40,7 @@ describe('Passport', () => {
   let magicLoginMock: jest.Mock;
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
+  let loginSilentMock: jest.Mock;
 
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue({
@@ -51,11 +52,13 @@ describe('Passport', () => {
     logoutMock = jest.fn();
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
+    loginSilentMock = jest.fn();
     (AuthManager as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
       logout: logoutMock,
       getUser: getUserMock,
+      loginSilent: loginSilentMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
     });
     (MagicAdapter as jest.Mock).mockReturnValue({
@@ -126,41 +129,25 @@ describe('Passport', () => {
     });
   });
 
-  describe('reconnectImx', () => {
+  describe('connectImxSilent', () => {
     it('should get imx provider is user existed and is not expired', async () => {
-      getUserMock.mockReturnValue({ ...mockUser, expired: false });
+      loginSilentMock.mockReturnValue(mockUser);
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
       requestRefreshTokenMock.mockResolvedValue({
         accessToken: '123',
         etherKey: '0x232',
       });
-      await passport.reconnectImx();
+
+      await passport.connectImxSilent();
 
       expect(magicLoginMock).toBeCalledTimes(1);
       expect(getStarkSigner).toBeCalledTimes(1);
     });
 
-    it('should return null if no existed user', async () => {
-      getUserMock.mockReturnValue(null);
-      const provider = await passport.reconnectImx();
+    it('should return null if user failed to silent login', async () => {
+      loginSilentMock.mockReturnValue(null);
 
-      expect(magicLoginMock).toBeCalledTimes(0);
-      expect(getStarkSigner).toBeCalledTimes(0);
-      expect(provider).toBeNull();
-    });
-
-    it('should return null if user is expired', async () => {
-      getUserMock.mockReturnValue({ ...mockUser, expired: true });
-      const provider = await passport.reconnectImx();
-
-      expect(magicLoginMock).toBeCalledTimes(0);
-      expect(getStarkSigner).toBeCalledTimes(0);
-      expect(provider).toBeNull();
-    });
-
-    it('should return null if user is no expired indicator', async () => {
-      getUserMock.mockReturnValue(mockUser);
-      const provider = await passport.reconnectImx();
+      const provider = await passport.connectImxSilent();
 
       expect(magicLoginMock).toBeCalledTimes(0);
       expect(getStarkSigner).toBeCalledTimes(0);
