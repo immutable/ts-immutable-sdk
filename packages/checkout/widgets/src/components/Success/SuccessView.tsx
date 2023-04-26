@@ -1,6 +1,10 @@
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { Body, Box, Icon } from '@biom3/react';
-import { SuccessLogoStyles, SuccessViewStyles } from './SuccessViewStyles';
+import {
+  SuccessBoxStyles,
+  SuccessLogoStyles,
+  SuccessViewStyles,
+} from './SuccessViewStyles';
 import { FooterButton } from '../Footer/FooterButton';
 
 export interface SuccessViewProps {
@@ -39,17 +43,19 @@ export const SuccessView = ({
       }
     >
       <Box sx={SuccessViewStyles} testId="success-box">
-        <Box sx={SuccessLogoStyles}>
-          <Icon
-            icon="Tick"
-            testId="success-icon"
-            variant="bold"
-            sx={{ width: 'base.icon.size.400', fill: 'base.color.brand.2' }}
-          />
+        <Box sx={SuccessBoxStyles} testId="success-box">
+          <Box sx={SuccessLogoStyles}>
+            <Icon
+              icon="Tick"
+              testId="success-icon"
+              variant="bold"
+              sx={{ width: 'base.icon.size.400', fill: 'base.color.brand.2' }}
+            />
+          </Box>
+          <Body size="medium" weight="bold" testId="success-text">
+            {successText}
+          </Body>
         </Box>
-        <Body size="medium" weight="bold" testId="success-text">
-          {successText}
-        </Body>
       </Box>
     </SimpleLayout>
   );

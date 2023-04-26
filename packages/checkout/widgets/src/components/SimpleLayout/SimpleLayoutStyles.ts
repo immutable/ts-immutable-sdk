@@ -31,22 +31,14 @@ export const ContentStyle = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-start',
-  alignItems: 'center',
 };
 
 export const HeroImageStyle = {
   flex: '1 0 0', // needed to set flex-basis to 0 for even distribution with BodyStyle
   width: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
 };
 
 export const BodyStyle = {
   flex: '1 0 0', // needed to set flex-basis to 0 for even distribution with HeroImageStyle
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
+  width: '100%'
 };

@@ -46,8 +46,8 @@ export function ConnectWidget(props: ConnectWidgetProps) {
 
   const biomeTheme: BaseTokens =
     theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-      ? onDarkBase
-      : onLightBase;
+      ? onLightBase
+      : onDarkBase;
 
   useEffect(() => {
     connectDispatch({
