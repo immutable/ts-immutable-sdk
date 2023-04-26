@@ -77,7 +77,7 @@ export async function createTrade({
     };
 
     const headers = { Authorization: 'Bearer ' + user.accessToken };
-    const { data: createTradeResponse } = await tradesApi.createTrade(
+    const { data: createTradeResponse } = await tradesApi.createTradeV3(
       tradeParams,
       {
         headers,

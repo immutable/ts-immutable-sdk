@@ -1,3 +1,6 @@
+export * from './types';
+
 export * from './Economy';
-export { craftStatuses } from './crafting';
-export type { CraftInput, CraftStatuses } from './crafting';
+
+export { CraftStatuses } from './crafting';
+export type { CraftInput, CraftStatus } from './crafting';

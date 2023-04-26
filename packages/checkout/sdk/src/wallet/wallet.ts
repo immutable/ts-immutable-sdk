@@ -30,6 +30,6 @@ export async function getWalletAllowList({
     });
 
   return {
-    allowedWallets: filteredWalletsList,
+    wallets: filteredWalletsList,
   };
 }

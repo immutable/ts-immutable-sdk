@@ -1,7 +1,11 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { Subject } from 'rxjs';
 
 import { Configuration, SDK } from './SDK';
-import { IEventType } from './types';
+import { EconomyCustomEvents, IEventType } from './types';
 
 export class SDKMock extends SDK<string> {
   constructor(config: Configuration) {
@@ -10,6 +14,10 @@ export class SDKMock extends SDK<string> {
 
   connect(): void {
     // ...
+  }
+
+  public override get isClientSide(): boolean {
+    return super.isClientSide;
   }
 }
 
@@ -70,6 +78,39 @@ describe('SDK Class', () => {
       eventsSubject.next({ type: 'test', status: 'COMPLETE' });
       expect(eventHandlerFn).not.toHaveBeenCalledTimes(2);
     });
+
+    it('emitNativeEvent should dispatch CustomEvent on client side', () => {
+      const dispatchEventSpy = jest.spyOn(document, 'dispatchEvent');
+      const detail = { foo: 'bar' };
+
+      sdkMock['emitNativeEvent'](detail);
+
+      expect(dispatchEventSpy).toHaveBeenCalledTimes(1);
+      expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
+      expect(dispatchEventSpy.mock.calls[0][0].type).toBe(
+        EconomyCustomEvents.DEFAULT
+      );
+      expect((dispatchEventSpy.mock.calls[0][0] as CustomEvent).detail).toEqual(
+        detail
+      );
+
+      dispatchEventSpy.mockRestore();
+    });
+
+    it('emitNativeEvent should not dispatch CustomEvent on server side', () => {
+      const dispatchEventSpy = jest.spyOn(document, 'dispatchEvent');
+      const detail = { foo: 'bar' };
+
+      const isClientSideMock = jest.spyOn(sdkMock, 'isClientSide', 'get');
+      isClientSideMock.mockReturnValue(false);
+
+      sdkMock['emitNativeEvent'](detail);
+
+      expect(dispatchEventSpy).toHaveBeenCalledTimes(0);
+
+      isClientSideMock.mockRestore();
+      dispatchEventSpy.mockRestore();
+    });
   });
 
   describe('events handler utility', () => {
@@ -95,7 +136,7 @@ describe('SDK Class', () => {
     });
   });
 
-  describe('logs', () => {
+  describe('utilities', () => {
     it('should log the arguments passed to it', () => {
       const consoleLogFn = jest.spyOn(console, 'log');
 
@@ -103,6 +144,16 @@ describe('SDK Class', () => {
       expect(consoleLogFn).toHaveBeenCalledWith('SDKMock:', 'test message');
 
       consoleLogFn.mockRestore();
+    });
+
+    it('should return false if not running in a browser environment', () => {
+      const oldWindow = window;
+      // @ts-ignore
+      delete global.window;
+
+      expect(sdkMock['isClientSide']).toBe(false);
+
+      global.window = oldWindow;
     });
   });
 });

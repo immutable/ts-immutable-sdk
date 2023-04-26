@@ -62,7 +62,7 @@ describe(' Connect', () => {
     const checkout = new Checkout();
 
     await checkout.switchNetwork({
-      provider: {} as Web3Provider,
+      provider: { provider: { request: () => {} } } as any as Web3Provider,
       chainId: ChainId.ETHEREUM,
     });
 

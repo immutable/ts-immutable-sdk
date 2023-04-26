@@ -17,13 +17,26 @@ export async function checkIsWalletConnected(
   if (!provider.provider?.request) {
     throw new CheckoutError(
       'Incompatible provider',
-      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
+      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
+      { details: `Unsupported provider for ${providerPreference}` }
     );
   }
-  const accounts = await provider.provider.request({
-    method: WALLET_ACTION.CHECK_CONNECTION,
-    params: [],
-  });
+
+  let accounts = [];
+  try {
+    accounts = await provider.provider.request({
+      method: WALLET_ACTION.CHECK_CONNECTION,
+      params: [],
+    });
+  } catch (err: any) {
+    throw new CheckoutError(
+      `Check wallet connection request failed`,
+      CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR,
+      {
+        rpcMethod: WALLET_ACTION.CHECK_CONNECTION,
+      }
+    );
+  }
   // accounts[0] will have the active account if connected.
 
   return {
@@ -43,8 +56,9 @@ export async function connectWalletProvider(
     async () => {
       if (!web3Provider || !web3Provider?.provider?.request) {
         throw new CheckoutError(
-          'No MetaMask provider installed.',
-          CheckoutErrorType.METAMASK_PROVIDER_ERROR
+          'Incompatible provider',
+          CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
+          { details: `Unsupported provider for ${params.providerPreference}` }
         );
       }
       // this makes the request to the wallet to connect i.e request eth accounts ('eth_requestAccounts')
@@ -70,8 +84,8 @@ async function getWalletProviderForPreference(
     }
     default:
       throw new CheckoutError(
-        'Provider preference was not detected',
-        CheckoutErrorType.CONNECT_PROVIDER_ERROR
+        'Provider preference is not supported',
+        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR
       );
   }
   return web3Provider;

@@ -30,5 +30,5 @@ export interface WalletInfo {
 }
 
 export interface GetWalletAllowListResult {
-  allowedWallets: WalletInfo[];
+  wallets: WalletInfo[];
 }

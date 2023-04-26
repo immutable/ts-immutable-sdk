@@ -25,11 +25,12 @@
   },
   "license": "Apache-2.0",
   "scripts": {
-    "build": "npm run build:deps && npm run build:app",
-    "build:app": "npm run clean && parcel build src/index.html --public-url ./",
-    "build:deps": "yarn workspace @imtbl/checkout-widgets build && cp ../../../sdk/dist/browser/checkout.js public/js/imtbl-checkout-widgets.js",
+    "build": "npm run setup && npm run build:app",
+    "build:app": "parcel build src/index.html --public-url ./",
+    "setup": "npm run clean && yarn workspace @imtbl/checkout-widgets build && cp ../../../sdk/dist/browser/checkout.js public/js/imtbl-checkout-widgets.js",
     "clean": "rimraf ./dist ./.cache",
-    "start": "npm run clean && npm run build:deps && parcel src/index.html -p 3030"
+    "prestart": "[ -f public/js/imtbl-checkout-widgets.js ] || { echo 'Error: checkout-widgets deps not found. Please run `npm run setup` first.' ; exit 1; }",
+    "start": "npm run prestart && parcel src/index.html -p 4200"
   },
   "source": "index.html"
 }

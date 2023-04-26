@@ -1,9 +1,18 @@
 import { getAllBalances, getBalance, getERC20Balance } from './balances';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber, Contract } from 'ethers';
-import { ChainId, ERC20ABI, GetAllBalancesResult, NetworkInfo } from '../types';
+import {
+  ChainId,
+  ERC20ABI,
+  GetAllBalancesResult,
+  GetTokenAllowListResult,
+  NetworkInfo,
+  TokenInfo,
+} from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
+import * as tokens from '../tokens';
 
+jest.mock('../tokens');
 jest.mock('ethers', () => {
   return {
     ...jest.requireActual('ethers'),
@@ -24,6 +33,7 @@ describe('balances', () => {
       getNetworkInfo: jest.fn().mockResolvedValue({
         chainId: 1,
         name: 'Ethereum',
+        isSupported: true,
         nativeCurrency: {
           name: 'Ether',
           symbol: 'ETH',
@@ -62,7 +72,28 @@ describe('balances', () => {
 
       await expect(getBalance(mockProvider(), '0xAddress')).rejects.toThrow(
         new CheckoutError(
-          'Error getting balance',
+          '[GET_BALANCE_ERROR] Cause:Error getting balance',
+          CheckoutErrorType.GET_BALANCE_ERROR
+        )
+      );
+    });
+
+    it('should throw a CheckoutError of type BalanceError with the right message if the current network is unsupported', async () => {
+      const mockProvider = jest.fn().mockImplementation(() => {
+        return {
+          getBalance: jest
+            .fn()
+            .mockRejectedValue(new Error('Error getting balance')),
+          getNetwork: jest.fn().mockResolvedValue({
+            chainId: 0,
+            name: 'homestead',
+          }),
+        };
+      });
+
+      await expect(getBalance(mockProvider(), '0xAddress')).rejects.toThrow(
+        new CheckoutError(
+          '[GET_BALANCE_ERROR] Cause:Chain:0 is not a supported chain',
           CheckoutErrorType.GET_BALANCE_ERROR
         )
       );
@@ -128,7 +159,7 @@ describe('balances', () => {
         getERC20Balance(mockProvider(), 'abc123', '0x10c')
       ).rejects.toThrow(
         new CheckoutError(
-          'Error getting name from contract',
+          '[GET_ERC20_BALANCE_ERROR] Cause:Error getting name from contract',
           CheckoutErrorType.GET_ERC20_BALANCE_ERROR
         )
       );
@@ -144,7 +175,7 @@ describe('balances', () => {
         getERC20Balance(mockProvider(), 'abc123', '0x10c')
       ).rejects.toThrow(
         new CheckoutError(
-          'invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)',
+          '[GET_ERC20_BALANCE_ERROR] Cause:invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)',
           CheckoutErrorType.GET_ERC20_BALANCE_ERROR
         )
       );
@@ -160,8 +191,30 @@ describe('balances', () => {
 
     let mockGetBalance: jest.Mock;
     let mockGetNetwork: jest.Mock;
+
+    let getTokenAllowListMock: jest.Mock;
+
     beforeEach(() => {
       jest.restoreAllMocks();
+      getTokenAllowListMock = jest.fn().mockReturnValue({
+        tokens: [
+          {
+            name: 'Immutable X',
+            address: '0xaddr',
+            symbol: 'IMX',
+            decimals: 18,
+          } as TokenInfo,
+          {
+            name: 'Matic',
+            address: '0xmaticAddr',
+            symbol: 'MATIC',
+            decimals: '18',
+          },
+        ],
+      } as GetTokenAllowListResult);
+      (tokens.getTokenAllowList as jest.Mock).mockImplementation(
+        getTokenAllowListMock
+      );
 
       mockGetBalance = jest.fn().mockResolvedValue(currentBalance);
 
@@ -228,7 +281,7 @@ describe('balances', () => {
               name: 'Immutable X',
               symbol: 'IMX',
               decimals: 18,
-              address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF', //from token master list
+              address: '0xaddr',
             },
           },
           {
@@ -238,7 +291,7 @@ describe('balances', () => {
               name: 'Matic',
               symbol: 'MATIC',
               decimals: 18,
-              address: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0', //from token master list
+              address: '0xmaticAddr',
             },
           },
         ],
