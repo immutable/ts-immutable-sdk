@@ -6,7 +6,6 @@ import {
   sendConnectFailedEvent,
   sendConnectSuccessEvent,
 } from './ConnectWidgetEvents';
-import { OtherWallets } from './components/other-wallets/OtherWallets';
 import { ChooseNetwork } from './components/choose-network/ChooseNetwork';
 import { useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
@@ -86,9 +85,6 @@ export function ConnectWidget(props: ConnectWidgetProps) {
             )}
             {viewState.view.type === ConnectWidgetViews.READY_TO_CONNECT && (
               <ReadyToConnect />
-            )}
-            {viewState.view.type === ConnectWidgetViews.OTHER_WALLETS && (
-              <OtherWallets />
             )}
             {viewState.view.type === ConnectWidgetViews.CHOOSE_NETWORKS && (
               <ChooseNetwork />
