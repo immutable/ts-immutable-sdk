@@ -12,7 +12,7 @@ import {
 } from './events';
 import { postRequestMessage } from './postRequestMessage';
 import { messageResponseListener } from './messageResponseListener';
-import { StarkSigner } from './StarkSigner';
+import { ImxSigner } from './ImxSigner';
 import { Environment } from '@imtbl/config';
 import { getOrSetupIFrame } from './imxWalletIFrame';
 
@@ -23,7 +23,7 @@ const CONNECTION_FAILED_ERROR = 'The L2 IMX Wallet connection has failed';
 export async function connect(
   l1Provider: ethers.providers.Web3Provider,
   env: Environment
-): Promise<StarkSigner> {
+): Promise<ImxSigner> {
   const l1Signer = l1Provider.getSigner();
   const address = await l1Signer.getAddress();
   const signature = await l1Signer.signMessage(DEFAULT_CONNECTION_MESSAGE);
@@ -42,7 +42,7 @@ export async function connect(
             reject(new Error(CONNECTION_FAILED_ERROR));
           }
 
-          resolve(new StarkSigner(messageDetails.data.starkPublicKey, iframe));
+          resolve(new ImxSigner(messageDetails.data.starkPublicKey, iframe));
         }
       );
     };
@@ -55,8 +55,8 @@ export async function connect(
   });
 }
 
-export async function disconnect(starkSigner: StarkSigner): Promise<void> {
-  const iframe = starkSigner.getIFrame();
+export async function disconnect(imxSigner: ImxSigner): Promise<void> {
+  const iframe = imxSigner.getIFrame();
 
   return new Promise((resolve, reject) => {
     const listener = (event: MessageEvent) => {
@@ -81,7 +81,7 @@ export async function disconnect(starkSigner: StarkSigner): Promise<void> {
 
     postRequestMessage<DisconnectRequest>(iframe, {
       type: RequestEventType.DISCONNECT_WALLET_REQUEST,
-      details: { starkPublicKey: starkSigner.getAddress() },
+      details: { starkPublicKey: imxSigner.getAddress() },
     });
   });
 }

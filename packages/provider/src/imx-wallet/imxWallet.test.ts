@@ -10,7 +10,7 @@ import { postRequestMessage } from './postRequestMessage';
 import { Environment } from '@imtbl/config';
 import { asyncTriggerIFrameOnLoad } from './testUtils';
 import { getOrSetupIFrame } from './imxWalletIFrame';
-import { StarkSigner } from './StarkSigner';
+import { ImxSigner } from './ImxSigner';
 
 jest.mock('./postRequestMessage');
 
@@ -99,7 +99,7 @@ describe('imxWallet', () => {
       const postRequestMessageMockFn = postRequestMessage as jest.Mock;
       const starkPublicKey = '0x123';
 
-      const l2Signer = new StarkSigner(starkPublicKey, iframe);
+      const l2Signer = new ImxSigner(starkPublicKey, iframe);
 
       disconnect(l2Signer);
 

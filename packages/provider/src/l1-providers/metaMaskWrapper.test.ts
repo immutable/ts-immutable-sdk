@@ -2,8 +2,8 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { MetaMaskIMXProvider } from './metaMaskWrapper';
 import { connect } from './metaMask';
 import {
-  connect as buildStarkSigner,
-  disconnect as disconnectStarkSigner,
+  connect as buildImxSigner,
+  disconnect as disconnectImxSigner,
 } from '../imx-wallet/imxWallet';
 import { ProviderError, ProviderErrorType } from '../errors/providerError';
 import { ProviderConfiguration } from 'config';
@@ -18,7 +18,7 @@ describe('metaMetaWrapper', () => {
     }),
   });
 
-  describe('starkSigner undefined', () => {
+  describe('imxSigner undefined', () => {
     it('should throw error when calling sign message', async () => {
       await expect(
         MetaMaskIMXProvider.signMessage('Message to sign')
@@ -43,21 +43,21 @@ describe('metaMetaWrapper', () => {
   describe('connect', () => {
     it('should create a metamask imx provider with a eth signer and imx signer when calling connect', async () => {
       const ethSigner = {};
-      const starkSigner = {};
+      const imxSigner = {};
 
       const getSignerMock = jest.fn().mockReturnValue(ethSigner);
       (connect as jest.Mock).mockResolvedValue({
         getSigner: getSignerMock,
       });
 
-      (buildStarkSigner as jest.Mock).mockResolvedValue(starkSigner);
+      (buildImxSigner as jest.Mock).mockResolvedValue(imxSigner);
 
       const metamaskIMXProvider = await MetaMaskIMXProvider.connect(config);
 
       expect(connect).toBeCalledTimes(1);
       expect(connect).toBeCalledWith({ chainID: 1 });
-      expect(buildStarkSigner).toBeCalledTimes(1);
-      expect(buildStarkSigner).toBeCalledWith(
+      expect(buildImxSigner).toBeCalledTimes(1);
+      expect(buildImxSigner).toBeCalledWith(
         { getSigner: getSignerMock },
         Environment.PRODUCTION
       );
@@ -80,7 +80,7 @@ describe('metaMetaWrapper', () => {
 
     it('should throw wallet connection error when imx connect fails', async () => {
       (connect as jest.Mock).mockResolvedValue({});
-      (buildStarkSigner as jest.Mock).mockRejectedValue(
+      (buildImxSigner as jest.Mock).mockRejectedValue(
         new Error('The L2 IMX Wallet connection has failed')
       );
 
@@ -100,7 +100,7 @@ describe('metaMetaWrapper', () => {
         getSigner: getSignerMock,
       });
       const signMessageMock = jest.fn().mockReturnValue('Signed message');
-      (buildStarkSigner as jest.Mock).mockResolvedValue({
+      (buildImxSigner as jest.Mock).mockResolvedValue({
         signMessage: signMessageMock,
       });
 
@@ -118,7 +118,7 @@ describe('metaMetaWrapper', () => {
       (connect as jest.Mock).mockResolvedValue({
         getSigner: jest.fn().mockReturnValue({}),
       });
-      (buildStarkSigner as jest.Mock).mockResolvedValue({
+      (buildImxSigner as jest.Mock).mockResolvedValue({
         signMessage: jest
           .fn()
           .mockRejectedValue(new Error('Error signing the message')),
@@ -140,19 +140,19 @@ describe('metaMetaWrapper', () => {
       (connect as jest.Mock).mockResolvedValue({
         getSigner: jest.fn(),
       });
-      (buildStarkSigner as jest.Mock).mockResolvedValue({});
-      (disconnectStarkSigner as jest.Mock).mockResolvedValue({});
+      (buildImxSigner as jest.Mock).mockResolvedValue({});
+      (disconnectImxSigner as jest.Mock).mockResolvedValue({});
       await MetaMaskIMXProvider.connect(config);
       await MetaMaskIMXProvider.disconnect();
-      expect(disconnectStarkSigner).toBeCalledTimes(1);
+      expect(disconnectImxSigner).toBeCalledTimes(1);
     });
 
     it('should throw provider error when error calling disconnect', async () => {
       (connect as jest.Mock).mockResolvedValue({
         getSigner: jest.fn().mockReturnValue({}),
       });
-      (buildStarkSigner as jest.Mock).mockResolvedValue({});
-      (disconnectStarkSigner as jest.Mock).mockRejectedValue(
+      (buildImxSigner as jest.Mock).mockResolvedValue({});
+      (disconnectImxSigner as jest.Mock).mockRejectedValue(
         new Error('Error disconnecting')
       );
       await MetaMaskIMXProvider.connect(config);
