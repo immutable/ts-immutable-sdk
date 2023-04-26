@@ -2551,7 +2551,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/config@workspace:packages/config"
   dependencies:
-    "@imtbl/core-sdk": ^1.1.0
+    "@imtbl/core-sdk": ^1.1.1-alpha.1
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
@@ -2578,9 +2578,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/core-sdk@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "@imtbl/core-sdk@npm:1.1.0"
+"@imtbl/core-sdk@npm:^1.1.1-alpha.1":
+  version: 1.1.1-alpha.1
+  resolution: "@imtbl/core-sdk@npm:1.1.1-alpha.1"
   dependencies:
     "@ethersproject/abi": ^5.0.0
     "@ethersproject/bytes": ^5.0.0
@@ -2592,7 +2592,7 @@ __metadata:
     ethereumjs-wallet: ^1.0.2
     ethers: ^5.6.9
     hash.js: ^1.1.7
-  checksum: 7de0077c3d6b625072f8322cf690e31b680f9f267358431907f04b362677e2cf73d5858556a41a41ce2ec75bcab15dd37bf783985941fc49723b03e0a5ce487b
+  checksum: c61c08c401b364a42a4ae9b00bb126a5ed6a58c5acfbc1ca5729b002c875fcec65503caaaf969bb7f9016ebc1f00562be466ed526a9f02d95c5e08ee59cc9a1a
   languageName: node
   linkType: hard
 
@@ -2701,7 +2701,7 @@ __metadata:
   resolution: "@imtbl/passport@workspace:packages/passport"
   dependencies:
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^1.1.0
+    "@imtbl/core-sdk": ^1.1.1-alpha.1
     "@imtbl/provider": 0.0.0
     "@imtbl/toolkit": 0.0.0
     "@magic-ext/oidc": ^1.0.1
@@ -2735,7 +2735,7 @@ __metadata:
   resolution: "@imtbl/provider@workspace:packages/provider"
   dependencies:
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^1.1.0
+    "@imtbl/core-sdk": ^1.1.1-alpha.1
     "@imtbl/toolkit": 0.0.0
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
@@ -2773,7 +2773,7 @@ __metadata:
     "@imtbl/checkout-sdk-web": 0.0.0
     "@imtbl/checkout-ui-types": 0.0.0
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^1.1.0
+    "@imtbl/core-sdk": ^1.1.1-alpha.1
     "@imtbl/passport": 0.0.0
     "@imtbl/provider": 0.0.0
     "@imtbl/starkex": 0.0.0
@@ -2782,6 +2782,7 @@ __metadata:
     "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
     "@rollup/plugin-node-resolve": ^15.0.2
+    "@rollup/plugin-replace": ^5.0.2
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/helpers": ~0.5.0
     "@typescript-eslint/eslint-plugin": ^5.57.1
@@ -2814,9 +2815,13 @@ __metadata:
   resolution: "@imtbl/starkex@workspace:packages/starkex"
   dependencies:
     "@imtbl/config": 0.0.0
-    "@imtbl/core-sdk": ^1.1.0
+    "@imtbl/core-sdk": ^1.1.1-alpha.1
     "@rollup/plugin-typescript": ^11.0.0
+    "@swc/jest": ^0.2.24
+    "@types/jest": ^29.4.3
     eslint: ^8.37.0
+    jest: ^29.4.3
+    jest-environment-jsdom: ^29.4.3
     rollup: ^3.17.2
     typescript: ^4.9.5
   languageName: unknown
@@ -2826,7 +2831,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/toolkit@workspace:packages/internal/toolkit"
   dependencies:
-    "@imtbl/core-sdk": ^1.1.0
+    "@imtbl/core-sdk": ^1.1.1-alpha.1
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
     "@rollup/plugin-typescript": ^11.0.0
@@ -4927,6 +4932,21 @@ __metadata:
   peerDependencies:
     rollup: ^1.20.0 || ^2.0.0
   checksum: b2f1618ee5526d288e2f8ae328dcb326e20e8dc8bd1f60d3e14d6708a5832e4aa44811f7d493f4aed2deeadca86e3b6b0503cd39bf50cfb4b595bb9da027fad0
+  languageName: node
+  linkType: hard
+
+"@rollup/plugin-replace@npm:^5.0.2":
+  version: 5.0.2
+  resolution: "@rollup/plugin-replace@npm:5.0.2"
+  dependencies:
+    "@rollup/pluginutils": ^5.0.1
+    magic-string: ^0.27.0
+  peerDependencies:
+    rollup: ^1.20.0||^2.0.0||^3.0.0
+  peerDependenciesMeta:
+    rollup:
+      optional: true
+  checksum: 3a91b5fa2ce5acfe67c1faf8d479585da30f398f29499cf8a2d2153c899af0b2ef0363012db0e6edc2ebbb3d9fad6dd7ad591c9d977c1ae2ca3256b52e86d950
   languageName: node
   linkType: hard
 
