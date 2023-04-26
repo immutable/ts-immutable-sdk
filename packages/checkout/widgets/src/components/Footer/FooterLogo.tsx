@@ -1,14 +1,15 @@
-import { Box } from "@biom3/react"
+import { Box, useTheme } from "@biom3/react"
 import { FooterLogoStyles } from "./FooterStyles"
-import poweredByImmutable from './PoweredByImmutableLogo.svg'
+import { ReactComponent as PoweredByImmutableLogo } from './PoweredByImmutableLogo.svg'
 export interface FooterLogoProps {
   hideLogo?: boolean;
 }
 export const FooterLogo = ({hideLogo}: FooterLogoProps) => {
   const showLogo = !hideLogo;
+  const {base: {color}} = useTheme();
   return(
     <Box testId="footer-logo-container" sx={FooterLogoStyles}>
-      {showLogo && <img data-testid="footer-logo-image" alt="Powered by Immutable" src={poweredByImmutable} style={{color:'white'}} />}
+      {showLogo && <PoweredByImmutableLogo fill={color.brand[1]} />}
     </Box>
   )
 }
