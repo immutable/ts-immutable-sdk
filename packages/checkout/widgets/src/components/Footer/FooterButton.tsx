@@ -4,7 +4,7 @@ import { FooterButtonStyles } from "./FooterStyles";
 export interface FooterButtonProps {
   hideActionButton?: boolean;
   actionText: string;
-  onActionClick: () => void;
+  onActionClick: (...args: any[]) => void;
 }
 
 export const FooterButton = ({actionText, onActionClick, hideActionButton = false}: FooterButtonProps) => {

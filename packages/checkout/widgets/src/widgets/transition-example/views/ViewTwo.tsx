@@ -13,6 +13,9 @@ export const ViewTwo = () => {
   const [buttonText, setButtonText] = useState("Next");
   const [body, setBody] = useState(ViewTwoContentOne);
   const [hero, setHero] = useState<string | undefined>(PurpleDownGradient);
+  // This is just an example of how we could set a function with react state
+  // See ViewThree for how to change content using an enum and a useCallback function to ensure its only created once with no dependencies
+  // The ViewThree implementation is the preferred method as in this case for ViewTwo the functions are recreated on re-render
   const [actionFunction, setActionFunction] = useState(() => actionPrevious);
 
   function actionPrevious () {
