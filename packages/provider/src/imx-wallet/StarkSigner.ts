@@ -8,7 +8,7 @@ import { postRequestMessage } from './postRequestMessage';
 import { SignMessageRequest, SignMessageResponse } from './types';
 import { StarkSigner } from '@imtbl/core-sdk';
 
-export class ImxSigner implements StarkSigner {
+export class StarkSigner implements StarkSigner {
   private publicAddress;
   private iframe;
 

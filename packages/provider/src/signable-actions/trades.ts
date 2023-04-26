@@ -12,7 +12,7 @@ type createTradeWorkflowParams = {
 };
 
 export async function createTrade({
-  signers: { ethSigner, imxSigner },
+  signers: { ethSigner, starkSigner },
   request,
   config,
 }: createTradeWorkflowParams): Promise<CreateTradeResponse> {
@@ -33,7 +33,7 @@ export async function createTrade({
 
   const ethSignature = await signRaw(signableMessage, ethSigner);
 
-  const starkSignature = await imxSigner.signMessage(payloadHash);
+  const starkSignature = await starkSigner.signMessage(payloadHash);
 
   const createTradeResponse = await tradesApi.createTrade({
     createTradeRequest: {

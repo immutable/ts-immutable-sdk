@@ -18,7 +18,7 @@ export async function registerOffchain(
   const usersApi = new UsersApi(config.immutableXConfig.apiConfiguration);
 
   const userAddress = await signers.ethSigner.getAddress();
-  const starkPublicKey = await signers.imxSigner.getAddress();
+  const starkPublicKey = await signers.starkSigner.getAddress();
 
   const signableResult = await usersApi.getSignableRegistrationOffchain({
     getSignableRegistrationRequest: {
@@ -32,7 +32,7 @@ export async function registerOffchain(
 
   const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 
-  const starkSignature = await signers.imxSigner.signMessage(payloadHash);
+  const starkSignature = await signers.starkSigner.signMessage(payloadHash);
 
   const registeredUser = await usersApi.registerUser({
     registerUserRequest: {

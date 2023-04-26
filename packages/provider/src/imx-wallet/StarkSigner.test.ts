@@ -3,12 +3,12 @@
  */
 
 import { RequestEventType, ResponseEventType } from './events';
-import { ImxSigner } from './ImxSigner';
+import { StarkSigner } from './StarkSigner';
 import { postRequestMessage } from './postRequestMessage';
 
 jest.mock('./postRequestMessage');
 
-describe('ImxSigner', () => {
+describe('StarkSigner', () => {
   const starkAddress = 'Ox1234z';
   const iframe: HTMLIFrameElement = {
     contentWindow: {
@@ -18,20 +18,20 @@ describe('ImxSigner', () => {
 
   describe('getAddress', () => {
     it('Should return l2Signer address', () => {
-      const imxSigner = new ImxSigner(starkAddress, iframe);
+      const starkSigner = new StarkSigner(starkAddress, iframe);
 
-      expect(imxSigner.getAddress()).toEqual(starkAddress);
+      expect(starkSigner.getAddress()).toEqual(starkAddress);
     });
   });
 
   describe('signMessage', () => {
     const message = 'message';
-    const imxSigner = new ImxSigner(starkAddress, iframe);
+    const starkSigner = new StarkSigner(starkAddress, iframe);
 
     it('Should call the postMessage', async () => {
       const postRequestMessageMockFn = postRequestMessage as jest.Mock;
 
-      imxSigner.signMessage(message);
+      starkSigner.signMessage(message);
 
       await new Promise(process.nextTick);
 
@@ -59,13 +59,13 @@ describe('ImxSigner', () => {
           callback(mockedSuccessReturnValue);
         });
 
-      const returnSignedMessage = await imxSigner.signMessage(message);
+      const returnSignedMessage = await starkSigner.signMessage(message);
 
       expect(returnSignedMessage).toEqual(signedMessage);
     });
 
     it('Should throws an error if l2Wallet returns an error when signing the message', async () => {
-      const errorMessage = 'Failed signing message from imxSigner';
+      const errorMessage = 'Failed signing message from starkSigner';
       const mockedFailedReturnValue = {
         data: {
           type: ResponseEventType.SIGN_MESSAGE_RESPONSE,
@@ -85,7 +85,7 @@ describe('ImxSigner', () => {
           callback(mockedFailedReturnValue);
         });
 
-      expect(imxSigner.signMessage(message)).rejects.toThrow(errorMessage);
+      expect(starkSigner.signMessage(message)).rejects.toThrow(errorMessage);
     });
   });
 });

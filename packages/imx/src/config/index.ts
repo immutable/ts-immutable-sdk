@@ -8,17 +8,17 @@ import {
   ModuleConfiguration,
 } from '@imtbl/config';
 
-interface imxOverrides {
+interface ImxOverrides {
   immutableXConfig: ImmutableXConfiguration;
 }
 
-interface imxModuleConfiguration extends ModuleConfiguration<imxOverrides> {}
+interface ImxModuleConfiguration extends ModuleConfiguration<ImxOverrides> {}
 
-export class imxConfiguration {
+export class ImxConfiguration {
   readonly immutableXConfig: ImmutableXConfiguration;
   readonly baseConfig: ImmutableConfiguration;
 
-  constructor({ baseConfig, overrides }: imxModuleConfiguration) {
+  constructor({ baseConfig, overrides }: ImxModuleConfiguration) {
     this.baseConfig = baseConfig;
     if (overrides) {
       this.immutableXConfig = overrides.immutableXConfig;
