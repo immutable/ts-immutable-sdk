@@ -35,8 +35,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "dev": "npm run build -- --watch",
     "build:all": "wsrun -p @imtbl/economy --stages build",
+    "dev": "npm run build -- --watch",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",

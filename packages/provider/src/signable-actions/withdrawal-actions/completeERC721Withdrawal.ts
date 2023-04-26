@@ -97,11 +97,11 @@ async function completeMintableERC721Withdrawal(
   token: MintableERC721Withdrawal,
   config: ProviderConfiguration
 ) {
-  const starkExConfig = config.immutableXConfig;
+  const imxConfig = config.immutableXConfig;
   const assetType = await getEncodeAssetInfo(
     'mintable-asset',
     'ERC721',
-    starkExConfig,
+    imxConfig,
     {
       id: token.data.id,
       token_address: token.data.tokenAddress,
@@ -123,7 +123,7 @@ async function completeMintableERC721Withdrawal(
       assetType.asset_type,
       starkPublicKey,
       mintingBlob,
-      starkExConfig
+      imxConfig
     );
   } else {
     return executeWithdrawMintableERC721(
@@ -131,7 +131,7 @@ async function completeMintableERC721Withdrawal(
       assetType.asset_type,
       starkPublicKey,
       mintingBlob,
-      starkExConfig
+      imxConfig
     );
   }
 }
@@ -194,8 +194,8 @@ async function completeERC721Withdrawal(
   token: ERC721Token,
   config: ProviderConfiguration
 ) {
-  const starkExConfig = config.immutableXConfig;
-  const assetType = await getEncodeAssetInfo('asset', 'ERC721', starkExConfig, {
+  const imxConfig = config.immutableXConfig;
+  const assetType = await getEncodeAssetInfo('asset', 'ERC721', imxConfig, {
     token_id: token.tokenId,
     token_address: token.tokenAddress,
   });
@@ -212,7 +212,7 @@ async function completeERC721Withdrawal(
       assetType.asset_type,
       starkPublicKey,
       token.tokenId,
-      starkExConfig
+      imxConfig
     );
   } else {
     return executeWithdrawERC721(
@@ -220,7 +220,7 @@ async function completeERC721Withdrawal(
       assetType.asset_type,
       starkPublicKey,
       token.tokenId,
-      starkExConfig
+      imxConfig
     );
   }
 }
@@ -235,8 +235,8 @@ export async function completeERC721WithdrawalAction({
 
   const tokenAddress = token.tokenAddress;
   const tokenId = token.tokenId;
-  const starkExConfig = config.immutableXConfig;
-  const mintsApi = new MintsApi(starkExConfig.apiConfiguration);
+  const imxConfig = config.immutableXConfig;
+  const mintsApi = new MintsApi(imxConfig.apiConfiguration);
 
   return await mintsApi
     .getMintableTokenDetailsByClientTokenId({

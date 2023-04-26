@@ -71,7 +71,7 @@ describe('Registration', () => {
     test('should make the api requests with the correct params', async () => {
       const signers = await generateSigners(privateKey1);
       const ethKey = await signers.ethSigner.getAddress();
-      const starkKey = await signers.starkExSigner.getAddress();
+      const starkKey = await signers.imxSigner.getAddress();
 
       const getSignableRegistrationRequest = {
         ether_key: ethKey,
@@ -86,7 +86,7 @@ describe('Registration', () => {
         registerUserRequest: {
           eth_signature: 'raw-eth-signature',
           ether_key: ethKey,
-          stark_signature: await signers.starkExSigner.signMessage('hash'),
+          stark_signature: await signers.imxSigner.signMessage('hash'),
           stark_key: starkKey,
         },
       });

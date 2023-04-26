@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ImmutableX } from '@imtbl/core-sdk';
-import { StarkExConfiguration } from 'config';
+import { imxConfiguration } from 'config';
 
-const StarkExAPIFactory = (config: StarkExConfiguration) => {
-  const imtblClient = new ImmutableX(config.immutableXConfig);
+const imxAPIFactory = (config: imxConfiguration) => {
+  const imxClient = new ImmutableX(config.immutableXConfig);
   const {
     deposit,
     registerOffchain,
@@ -16,9 +15,9 @@ const StarkExAPIFactory = (config: StarkExConfiguration) => {
     transfer,
     batchNftTransfer,
     ...imx
-  } = imtblClient;
+  } = imxClient;
 
   return { ...imx };
 };
 
-export { StarkExAPIFactory };
+export { imxAPIFactory };

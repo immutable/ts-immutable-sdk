@@ -22,7 +22,7 @@ export async function prepareWithdrawalAction(
   params: PrepareWithdrawalWorkflowParams
 ): Promise<CreateWithdrawalResponse> {
   const {
-    signers: { ethSigner, starkExSigner },
+    signers: { ethSigner, imxSigner },
     type,
     config,
   } = params;
@@ -40,7 +40,7 @@ export async function prepareWithdrawalAction(
   const { signable_message: signableMessage, payload_hash: payloadHash } =
     signableWithdrawalResult.data;
 
-  const starkSignature = await starkExSigner.signMessage(payloadHash);
+  const starkSignature = await imxSigner.signMessage(payloadHash);
 
   const { ethAddress, ethSignature } = await signMessage(
     signableMessage,

@@ -23,7 +23,7 @@ type BatchTransfersWorkflowParams = {
 };
 
 export async function transfer({
-  signers: { ethSigner, starkExSigner },
+  signers: { ethSigner, imxSigner },
   request,
   config,
 }: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
@@ -49,7 +49,7 @@ export async function transfer({
 
   const ethSignature = await signRaw(signableMessage, ethSigner);
 
-  const starkSignature = await starkExSigner.signMessage(payloadHash);
+  const starkSignature = await imxSigner.signMessage(payloadHash);
 
   const transferSigningParams = {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -79,7 +79,7 @@ export async function transfer({
 }
 
 export async function batchTransfer({
-  signers: { ethSigner, starkExSigner },
+  signers: { ethSigner, imxSigner },
   request,
   config,
 }: BatchTransfersWorkflowParams): Promise<CreateTransferResponse> {
@@ -119,7 +119,7 @@ export async function batchTransfer({
 
   const requests = [];
   for (const resp of signableResult.data.signable_responses) {
-    const starkSignature = await starkExSigner.signMessage(resp.payload_hash);
+    const starkSignature = await imxSigner.signMessage(resp.payload_hash);
     const req = {
       sender_vault_id: resp.sender_vault_id,
       receiver_stark_key: resp.receiver_stark_key,

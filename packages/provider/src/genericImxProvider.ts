@@ -42,10 +42,10 @@ export class GenericIMXProvider implements IMXProvider {
   constructor(
     config: ProviderConfiguration,
     ethSigner: EthSigner,
-    starkExSigner: StarkSigner
+    imxSigner: StarkSigner
   ) {
     this.config = config;
-    this.signers = { ethSigner, starkExSigner };
+    this.signers = { ethSigner, imxSigner };
   }
 
   async getAddress(): Promise<string> {
@@ -123,7 +123,7 @@ export class GenericIMXProvider implements IMXProvider {
   }
 
   async isRegisteredOnchain(): Promise<boolean> {
-    const starkPublicKey = await this.signers.starkExSigner.getAddress();
+    const starkPublicKey = await this.signers.imxSigner.getAddress();
     return isRegisteredOnChain(
       starkPublicKey,
       this.signers.ethSigner,

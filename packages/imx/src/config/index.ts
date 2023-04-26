@@ -8,18 +8,17 @@ import {
   ModuleConfiguration,
 } from '@imtbl/config';
 
-interface StarkExOverrides {
+interface imxOverrides {
   immutableXConfig: ImmutableXConfiguration;
 }
 
-interface StarkExModuleConfiguration
-  extends ModuleConfiguration<StarkExOverrides> {}
+interface imxModuleConfiguration extends ModuleConfiguration<imxOverrides> {}
 
-export class StarkExConfiguration {
+export class imxConfiguration {
   readonly immutableXConfig: ImmutableXConfiguration;
   readonly baseConfig: ImmutableConfiguration;
 
-  constructor({ baseConfig, overrides }: StarkExModuleConfiguration) {
+  constructor({ baseConfig, overrides }: imxModuleConfiguration) {
     this.baseConfig = baseConfig;
     if (overrides) {
       this.immutableXConfig = overrides.immutableXConfig;

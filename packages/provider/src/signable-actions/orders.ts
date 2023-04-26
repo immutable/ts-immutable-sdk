@@ -55,7 +55,7 @@ export async function createOrder({
 
   const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 
-  const starkSignature = await signers.starkExSigner.signMessage(payloadHash);
+  const starkSignature = await signers.imxSigner.signMessage(payloadHash);
 
   const resp = getSignableOrderResponse.data;
 
@@ -105,7 +105,7 @@ export async function cancelOrder({
 
   const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 
-  const starkSignature = await signers.starkExSigner.signMessage(payloadHash);
+  const starkSignature = await signers.imxSigner.signMessage(payloadHash);
 
   const ethAddress = await signers.ethSigner.getAddress();
 

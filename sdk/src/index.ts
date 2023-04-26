@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 export * from '@imtbl/config';
 export * from '@imtbl/imx';
 export * from '@imtbl/provider';
