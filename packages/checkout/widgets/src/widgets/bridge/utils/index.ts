@@ -1,1 +1,1 @@
-export * from './getAllBalances'
+export * from './getAllBalances';

@@ -1,41 +1,41 @@
-import { Web3Provider } from "@ethersproject/providers";
-import { createContext } from "react";
+import { Web3Provider } from '@ethersproject/providers';
+import { createContext } from 'react';
 import { Checkout } from '@imtbl/checkout-sdk-web';
 
 export interface ConnectState {
-  checkout: Checkout | null
-  provider: Web3Provider | null
+  checkout: Checkout | null;
+  provider: Web3Provider | null;
 }
 
 export const initialConnectState: ConnectState = {
   checkout: null,
-  provider: null
-}
+  provider: null,
+};
 
 export interface ConnectContextState {
-  connectState: ConnectState,
-  connectDispatch: React.Dispatch<ConnectAction>,
+  connectState: ConnectState;
+  connectDispatch: React.Dispatch<ConnectAction>;
 }
 
 export interface ConnectAction {
-  payload: ActionPayload
+  payload: ActionPayload;
 }
 
-type ActionPayload = SetCheckoutPayload | SetProviderPayload
+type ActionPayload = SetCheckoutPayload | SetProviderPayload;
 
 export enum ConnectActions {
-  SET_CHECKOUT = "SET_CHECKOUT",
-  SET_PROVIDER = "SET_PROVIDER",
+  SET_CHECKOUT = 'SET_CHECKOUT',
+  SET_PROVIDER = 'SET_PROVIDER',
 }
 
 export interface SetCheckoutPayload {
-  type: ConnectActions.SET_CHECKOUT,
-  checkout: Checkout
+  type: ConnectActions.SET_CHECKOUT;
+  checkout: Checkout;
 }
 
 export interface SetProviderPayload {
-  type: ConnectActions.SET_PROVIDER,
-  provider: Web3Provider
+  type: ConnectActions.SET_PROVIDER;
+  provider: Web3Provider;
 }
 
 export const ConnectContext = createContext<ConnectContextState>({
@@ -45,19 +45,22 @@ export const ConnectContext = createContext<ConnectContextState>({
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
-export const connectReducer: Reducer<ConnectState, ConnectAction> = (state: ConnectState, action: ConnectAction) => {
+export const connectReducer: Reducer<ConnectState, ConnectAction> = (
+  state: ConnectState,
+  action: ConnectAction
+) => {
   switch (action.payload.type) {
     case ConnectActions.SET_CHECKOUT:
       return {
         ...state,
-        checkout: action.payload.checkout
-      }
+        checkout: action.payload.checkout,
+      };
     case ConnectActions.SET_PROVIDER:
       return {
         ...state,
-        provider: action.payload.provider
-      }
+        provider: action.payload.provider,
+      };
     default:
       return state;
   }
-}
+};

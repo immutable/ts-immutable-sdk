@@ -23,7 +23,7 @@ function SwitchNetwork(props: SwitchNetworkProps) {
   async function getNetworkInfo() {
     if (provider) {
       try {
-        const info = await checkout.getNetworkInfo(provider);
+        const info = await checkout.getNetworkInfo({ provider });
         console.log(info);
       } catch (error: any) {
         console.log(error);

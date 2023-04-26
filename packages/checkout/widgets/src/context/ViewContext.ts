@@ -1,13 +1,14 @@
 import { createContext } from 'react';
 import { ConnectWidgetView } from './ConnectViewContextTypes';
+import { TransitionExampleWidgetView } from './TransitionExampleViewContextTypes';
 
 export enum BaseViews {
   LOADING_VIEW = 'LOADING_VIEW',
 }
 
-export type BaseView = { type: BaseViews.LOADING_VIEW }
+export type BaseView = { type: BaseViews.LOADING_VIEW };
 
-export type View = BaseView | ConnectWidgetView;
+export type View = BaseView | ConnectWidgetView | TransitionExampleWidgetView;
 
 export interface ViewState {
   view: View;
@@ -34,7 +35,7 @@ type ViewActionPayload = UpdateViewPayload | GoBackPayload;
 
 export enum ViewActions {
   UPDATE_VIEW = 'UPDATE_VIEW',
-  GO_BACK = 'GO_BACK'
+  GO_BACK = 'GO_BACK',
 }
 
 export interface UpdateViewPayload {
@@ -61,13 +62,16 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
     case ViewActions.UPDATE_VIEW:
       const view = action.payload.view;
       const history = state.history;
-      if (history.length === 0 || history[history.length - 1].type !== view.type) {
+      if (
+        history.length === 0 ||
+        history[history.length - 1].type !== view.type
+      ) {
         history.push(view);
       }
       return {
         ...state,
         view,
-        history
+        history,
       };
     case ViewActions.GO_BACK:
       if (state.history.length <= 1) return { ...state };
@@ -76,7 +80,7 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
         ...state,
         history: updatedHistory,
         view: updatedHistory[updatedHistory.length - 1],
-    }
+      };
     default:
       return state;
   }

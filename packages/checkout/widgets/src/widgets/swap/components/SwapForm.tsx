@@ -1,31 +1,27 @@
-import { alphaSortTokensList, findTokenByAddress } from "../helpers";
-import { BigNumber, utils } from "ethers";
-import { Box } from "@biom3/react";
-import { Buy } from "./Buy";
-import {
-  ConnectResult,
-  TokenInfo,
-  Transaction
-} from "@imtbl/checkout-sdk-web";
-import { Fees } from "./Fees";
-import { SwapButton } from "./SwapButton";
-import { SwapWidgetViews } from "../SwapWidget";
-import { useState } from "react";
-import With from "./With";
+import { alphaSortTokensList, findTokenByAddress } from '../helpers';
+import { BigNumber, utils } from 'ethers';
+import { Box } from '@biom3/react';
+import { Buy } from './Buy';
+import { ConnectResult, TokenInfo, Transaction } from '@imtbl/checkout-sdk-web';
+import { Fees } from './Fees';
+import { SwapButton } from './SwapButton';
+import { SwapWidgetViews } from '../SwapWidget';
+import { useState } from 'react';
+import With from './With';
 
 type AmountAndPercentage = {
   amount: {
     bn: BigNumber;
     formatted: string;
-  }
+  };
   percent: number;
-}
+};
 
 type QuoteSlippage = AmountAndPercentage;
 
 type QuoteFees = AmountAndPercentage & {
   token: TokenInfo;
-}
+};
 
 type TradeInfo = {
   amountIn: BigNumber;
@@ -34,22 +30,22 @@ type TradeInfo = {
   tokenOut: TokenInfo;
   fees: QuoteFees;
   slippage: QuoteSlippage;
-}
+};
 
 export type QuoteResponse = {
   status: string;
   trade: TradeInfo;
-}
+};
 
 export type BuyField = {
   amount?: BigNumber;
   token?: TokenInfo;
-}
+};
 
 export type WithField = {
   quote?: QuoteResponse;
   token?: TokenInfo;
-}
+};
 
 export interface SwapFormProps {
   amount?: string;
@@ -67,11 +63,13 @@ export function SwapForm(props: SwapFormProps) {
     toContractAddress,
     connection,
     allowedTokens,
-    updateView
+    updateView,
   } = props;
 
   const sortedAllowList: TokenInfo[] = alphaSortTokensList(allowedTokens);
-  const validatedAmount = isNaN(Number(amount)) ? BigNumber.from(0) : BigNumber.from(amount);
+  const validatedAmount = isNaN(Number(amount))
+    ? BigNumber.from(0)
+    : BigNumber.from(amount);
   const [buyAmount, setBuyAmount] = useState<BigNumber>(validatedAmount || 0);
   const [buyToken, setBuyToken] = useState<TokenInfo>(
     findTokenByAddress(sortedAllowList, toContractAddress) || sortedAllowList[0]
@@ -88,23 +86,26 @@ export function SwapForm(props: SwapFormProps) {
     if (!newAmount || isNaN(newAmount)) {
       resolvedValue = BigNumber.from(0);
     } else {
-      resolvedValue = utils.parseUnits(newAmount.toString(), buyToken?.decimals);
+      resolvedValue = utils.parseUnits(
+        newAmount.toString(),
+        buyToken?.decimals
+      );
     }
 
     setBuyAmount(resolvedValue);
-  }
+  };
 
   const onBuyFieldTokenChange = (token: TokenInfo) => {
     setBuyToken(token);
-  }
+  };
 
   const onWithFieldTokenChange = (token: TokenInfo) => {
     setWithToken(token);
-  }
+  };
 
   const onWithFieldQuoteChange = (newQuote: QuoteResponse) => {
     setWithQuote(newQuote);
-  }
+  };
 
   const getTransaction = (): Transaction => {
     // Stubbed exchange.getTransaction
@@ -117,8 +118,8 @@ export function SwapForm(props: SwapFormProps) {
       value: '0x00', // Only required to send ether to the recipient from the initiating external account.
       data: '0x000', // Optional, but used for defining smart contract creation and interaction.
       chainId: 5, // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
-    }
-  }
+    };
+  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -127,7 +128,8 @@ export function SwapForm(props: SwapFormProps) {
         onAmountChange={onBuyFieldAmountChange}
         token={buyToken}
         amount={buyAmount}
-        connection={connection} />
+        connection={connection}
+      />
       <With
         onTokenChange={onWithFieldTokenChange}
         onQuoteChange={onWithFieldQuoteChange}
@@ -136,17 +138,20 @@ export function SwapForm(props: SwapFormProps) {
         buyToken={buyToken}
         buyAmount={buyAmount}
         connection={connection}
-        tokenAllowList={sortedAllowList} />
-      {withQuote && <Fees
-        fees={withQuote.trade.fees.amount.formatted}
-        slippage={withQuote.trade.slippage.amount.formatted}
-        tokenSymbol='imx'
-      />}
+        tokenAllowList={sortedAllowList}
+      />
+      {withQuote && (
+        <Fees
+          fees={withQuote.trade.fees.amount.formatted}
+          slippage={withQuote.trade.slippage.amount.formatted}
+          tokenSymbol="imx"
+        />
+      )}
       <SwapButton
         provider={connection.provider}
         transaction={getTransaction()}
         updateView={updateView}
       />
     </Box>
-  )
+  );
 }
