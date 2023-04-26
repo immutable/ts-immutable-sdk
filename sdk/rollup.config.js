@@ -4,6 +4,7 @@ import { readFileSync } from 'fs';
 import commonJs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import dts from 'rollup-plugin-dts';
+import replace from '@rollup/plugin-replace';
 
 const packages = JSON.parse(
   readFileSync('./workspace-packages.json', { encoding: 'utf8' })
@@ -22,6 +23,9 @@ const getFileBuild = (inputFilename) => [
       typescript({
         declaration: true,
         declarationDir: './dist/types',
+      }),
+      replace({
+        __SDK_VERSION__: '0.0.0',
       }),
       nodeResolve({
         resolveOnly: getPackages(),

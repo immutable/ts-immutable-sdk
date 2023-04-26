@@ -5,8 +5,6 @@ import {
   ModuleConfiguration,
 } from '@imtbl/config';
 
-import { version as sdkVersion } from '../../../../sdk/package.json';
-
 // Set `sdkVersion` on config
 const PRODUCTION = () => {
   return Config.createConfig({
@@ -14,7 +12,7 @@ const PRODUCTION = () => {
     chainID: 1,
     coreContractAddress: '0x5FDCCA53617f4d2b9134B29090C87D01058e27e9',
     registrationContractAddress: '0x72a06bf2a1CE5e39cBA06c0CAb824960B587d64c',
-    sdkVersion,
+    sdkVersion: '__SDK_VERSION__',
   });
 };
 
@@ -25,7 +23,7 @@ const SANDBOX = () => {
     chainID: 5,
     coreContractAddress: '0x7917eDb51ecD6CdB3F9854c3cc593F33de10c623',
     registrationContractAddress: '0x1C97Ada273C9A52253f463042f29117090Cd7D83',
-    sdkVersion,
+    sdkVersion: '__SDK_VERSION__',
   });
 };
 
