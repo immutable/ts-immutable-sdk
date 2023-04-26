@@ -72,15 +72,6 @@ jobs:
       - name: Check Single Package Version Policy
         run: yarn syncpack:check
 
-      - name: Build
-        run: yarn build
-
-      - name: Typecheck
-        run: yarn typecheck
-
-      - name: Test
-        run: yarn test
-
       - name: Workout next version string
         run: |
           upgrade_type=${{ github.event.inputs.upgrade_type }}
@@ -104,6 +95,15 @@ jobs:
           tmp=$(mktemp)
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
+      - name: Build
+        run: yarn build
+
+      - name: Typecheck
+        run: yarn typecheck
+
+      - name: Test
+        run: yarn test
+        
       - name: Push tags
         # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
         if: github.event.inputs.dry_run == 'false'
