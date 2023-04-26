@@ -25,7 +25,6 @@ export function sendConnectSuccessEvent(
       },
     }
   );
-  console.log(successEvent.detail);
   if (window !== undefined) window.dispatchEvent(successEvent);
 }
 
