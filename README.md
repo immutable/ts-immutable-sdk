@@ -184,4 +184,4 @@ The root [`package.json`](package.json) is the entry point for all CI testing pu
 
 ## Disclaimer for Alpha Releases
 
-Please note that alpha releases are still in development and may contain bugs or breaking changes. Please do not use these versions as we do not intend to support for them.
+Please note that alpha releases are still in development and may contain bugs or breaking changes. Please do not use these versions as we do not intend to support them.
