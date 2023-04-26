@@ -1,0 +1,110 @@
+{
+  "limit": 100,
+  "page": 1,
+  "sort": "created_at",
+  "direction": "DESC",
+  "total_rows": 4,
+  "total_pages": 1,
+  "rows": [
+    {
+      "id": "sb::item::63850a2b-79f1-480f-9131-cf46a6fe5b07::2OIkhqz67yJ5mcQiCjdcdErYVNe",
+      "game_id": "sb",
+      "token_id": null,
+      "contract_id": null,
+      "item_definition_id": "63850a2b-79f1-480f-9131-cf46a6fe5b07",
+      "owner": "user_BenPartridge",
+      "status": "offchain",
+      "location": "offchain",
+      "last_traded": null,
+      "metadata": {
+        "Attack": 1,
+        "Health": 1,
+        "Mana": 2,
+        "Tier": "Common",
+        "Type": "Human",
+        "description": "After you cast a spell, gain +2 Attack this turn.",
+        "dust_cost": 200,
+        "image": "https://pbs.twimg.com/media/CtzRKd5WEAAZj5S.jpg",
+        "name": "Spellboxer3"
+      },
+      "created_at": "2023-04-11T23:26:45.267736Z",
+      "updated_at": null,
+      "deleted_at": null
+    },
+    {
+      "id": "sb::item::dbdb5d8d-f36d-4cdf-abc7-55c61b57520a::2OIkaBxfEfhrniDRGsQlfyukKFX",
+      "game_id": "sb",
+      "token_id": null,
+      "contract_id": null,
+      "item_definition_id": "dbdb5d8d-f36d-4cdf-abc7-55c61b57520a",
+      "owner": "user_BenPartridge",
+      "status": "offchain",
+      "location": "offchain",
+      "last_traded": null,
+      "metadata": {
+        "Attack": 1,
+        "Health": 2,
+        "Mana": 2,
+        "Tier": "Rare",
+        "Type": "Human",
+        "description": "After you cast a spell, give your hero <Em>+1 Attack</> this turn.",
+        "dust_power": 100,
+        "image": "https://cdnb.artstation.com/p/assets/images/images/004/931/795/large/omnom-workshop-arcanumsteward-pose01.jpg?1487285098",
+        "name": "Arcanum Steward"
+      },
+      "created_at": "2023-04-11T23:25:44.86844Z",
+      "updated_at": null,
+      "deleted_at": null
+    },
+    {
+      "id": "sb::item::dbdb5d8d-f36d-4cdf-abc7-55c61b57520a::2OIkZfx8wdnOPlojdy5dh5q77MR",
+      "game_id": "sb",
+      "token_id": null,
+      "contract_id": null,
+      "item_definition_id": "dbdb5d8d-f36d-4cdf-abc7-55c61b57520a",
+      "owner": "user_BenPartridge",
+      "status": "offchain",
+      "location": "offchain",
+      "last_traded": null,
+      "metadata": {
+        "Attack": 1,
+        "Health": 2,
+        "Mana": 2,
+        "Tier": "Rare",
+        "Type": "Human",
+        "description": "After you cast a spell, give your hero <Em>+1 Attack</> this turn.",
+        "dust_power": 100,
+        "image": "https://cdnb.artstation.com/p/assets/images/images/004/931/795/large/omnom-workshop-arcanumsteward-pose01.jpg?1487285098",
+        "name": "Arcanum Steward"
+      },
+      "created_at": "2023-04-11T23:25:40.298975Z",
+      "updated_at": null,
+      "deleted_at": null
+    },
+    {
+      "id": "sb::item::7d2c2e51-92a5-4fa6-88a8-1ad6ec921e4a::2OIkCpNf0ijT6reXLukIWjc1tRq",
+      "game_id": "sb",
+      "token_id": null,
+      "contract_id": null,
+      "item_definition_id": "7d2c2e51-92a5-4fa6-88a8-1ad6ec921e4a",
+      "owner": "user_BenPartridge",
+      "status": "offchain",
+      "location": "offchain",
+      "last_traded": null,
+      "metadata": {
+        "Attack": 5,
+        "Health": 1,
+        "Level": 2,
+        "Mana": 3,
+        "Tier": "Legendary",
+        "Type": "Devil Cat",
+        "description": "A floofy little friend",
+        "image": "https://1.bp.blogspot.com/-fLYHUrYvaSw/VH4zk4ci69I/AAAAAAAAAFo/pBFXnzC-aBQ/s1600/8138205118_50aa61e03c_z.jpg",
+        "name": "Mugman"
+      },
+      "created_at": "2023-04-11T23:22:38.995562Z",
+      "updated_at": null,
+      "deleted_at": null
+    }
+  ]
+}
