@@ -51,6 +51,7 @@ export default class AuthManager {
   private mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
     const passport = oidcUser.profile?.passport as PassportMetadata;
     return {
+      expired: oidcUser.expired,
       idToken: oidcUser.id_token,
       accessToken: oidcUser.access_token,
       refreshToken: oidcUser.refresh_token,
@@ -88,11 +89,25 @@ export default class AuthManager {
     );
   }
 
-  public async getUser(): Promise<User> {
-    return withPassportError<User>(async () => {
+  public async loginSilent(): Promise<UserWithEtherKey | null> {
+    return withPassportError<UserWithEtherKey | null>(async () => {
+      const existedUser = await this.getUser();
+      if (!existedUser) {
+        return null;
+      }
+      const oidcUser = await this.userManager.signinSilent();
+      if (!oidcUser) {
+        return null;
+      }
+      return this.mapOidcUserToDomainModel(oidcUser) as UserWithEtherKey;
+    }, PassportErrorType.SILENT_LOGIN_ERROR);
+  }
+
+  public async getUser(): Promise<User | null> {
+    return withPassportError<User | null>(async () => {
       const oidcUser = await this.userManager.getUser();
       if (!oidcUser) {
-        throw new Error('Failed to retrieve user');
+        return null;
       }
       return this.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.NOT_LOGGED_IN_ERROR);
