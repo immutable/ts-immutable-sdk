@@ -26,6 +26,7 @@ import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
 import { ConnectResult } from './components/connect-result/ConnectResult';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { ReadyToConnect } from './components/ready-to-connect/ReadyToConnect';
+import { SwitchNetwork } from './view/SwitchNetwork';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
@@ -101,6 +102,9 @@ export function ConnectWidget(props: ConnectWidgetProps) {
             )}
             {viewState.view.type === ConnectWidgetViews.FAIL && (
               <ConnectResult />
+            )}
+            {viewState.view.type === ConnectWidgetViews.SWITCH_NETWORK && (
+              <SwitchNetwork />
             )}
           </>
         </ConnectContext.Provider>
