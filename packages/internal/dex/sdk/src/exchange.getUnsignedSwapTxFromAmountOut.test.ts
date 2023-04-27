@@ -9,7 +9,7 @@ import {
   TestDexConfiguration,
 } from './utils/testUtils';
 import * as utils from './lib/utils';
-import { ExchangeConfiguration } from 'config/config';
+import { ExchangeConfiguration } from 'config';
 
 jest.mock('./lib/router');
 jest.mock('./lib/utils', () => {

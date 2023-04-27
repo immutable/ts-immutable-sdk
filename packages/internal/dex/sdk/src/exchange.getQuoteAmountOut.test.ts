@@ -10,7 +10,7 @@ import {
   TestDexConfiguration,
   WETH_TEST_CHAIN,
 } from './utils/testUtils';
-import { ExchangeConfiguration } from 'config/config';
+import { ExchangeConfiguration } from 'config';
 
 jest.mock('./lib/router');
 jest.mock('./lib/utils', () => {

@@ -5,7 +5,6 @@ import { ethers } from 'ethers';
 import { multicallMultipleCallDataSingContract } from './multicall';
 import { quoteReturnMapping } from './utils';
 import { Multicall } from '../contracts/types';
-import { TEST_QUOTER_ADDRESS } from 'utils/testUtils';
 
 export const DEFAULT_GAS_QUOTE = 2_000_000;
 const amountIndex = 0;
@@ -32,7 +31,7 @@ export async function getQuotesForRoutes(
   const quoteResults = await multicallMultipleCallDataSingContract(
     multicallContract,
     callData,
-    TEST_QUOTER_ADDRESS,
+    '', // TODO fix this to be read from the config
     { gasRequired: DEFAULT_GAS_QUOTE }
   );
 

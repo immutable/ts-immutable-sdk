@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { ExchangeModuleConfiguration } from '../types';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ExchangeConfiguration } from './config';
+import { ExchangeConfiguration } from './index';
 import { POLYGON_TESTNET_CHAIN_ID } from '../constants/tokens/polygon';
 describe('config', () => {
   it('should create successfully', () => {

@@ -19,7 +19,7 @@ import {
 import { QuoteResponse, TransactionResponse } from './types';
 import { createSwapParameters } from './lib/swap';
 import { MAX_MAX_HOPS } from './constants';
-import { ExchangeConfiguration } from './config/config';
+import { ExchangeConfiguration } from './config';
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;

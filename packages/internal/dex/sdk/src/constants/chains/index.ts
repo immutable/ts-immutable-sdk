@@ -1,5 +1,5 @@
 import { Token } from '@uniswap/sdk-core';
-import { ExchangeContracts } from 'config/config';
+import { ExchangeContracts } from 'config';
 
 export type Chain = {
   chainId: number;

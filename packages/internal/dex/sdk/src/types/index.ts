@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { Currency, TradeType } from '@uniswap/sdk-core';
 import { Route } from '@uniswap/v3-sdk';
 import { ModuleConfiguration } from '@imtbl/config';
-import { ExchangeContracts } from 'config/config';
+import { ExchangeContracts } from 'config';
 
 export type TradeInfo = {
   route: Route<Currency, Currency>;

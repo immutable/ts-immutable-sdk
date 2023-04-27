@@ -5,8 +5,8 @@ import {
   POLYGON_ZKEVM_COMMON_ROUTING_TOKENS,
 } from 'constants/tokens';
 import { POLYGON_ZKEVM_TESTNET_RPC_URL } from 'constants/rpc';
-import { Chain } from 'constants/chains';
 import { tokenInfoToUniswapToken } from 'lib';
+import { Chain } from '../constants/chains';
 
 export class ExchangeConfiguration {
   public baseConfig: ImmutableConfiguration;
