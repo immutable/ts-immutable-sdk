@@ -1,16 +1,7 @@
 {
   "name": "@imtbl/economy-services",
-  "version": "0.0.0",
   "description": "Mock server application for the Economy SDK",
-  "main": "src/index.ts",
-  "scripts": {
-    "start": "node --inspect=5858 -r ts-node/register ./src/index.ts | pino-pretty",
-    "start:watch": "nodemon",
-    "build": "tsc",
-    "watch": "tsc -w",
-    "server": "tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/index.js\""
-  },
-  "license": "Apache-2.0",
+  "version": "0.0.0",
   "dependencies": {
     "compression": "^1.7.4",
     "dotenv": "^16.0.3",
@@ -36,5 +27,14 @@
   },
   "engines": {
     "node": ">=16"
+  },
+  "license": "Apache-2.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "server": "tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/index.js\"",
+    "start": "node --inspect=5858 -r ts-node/register ./src/index.ts | pino-pretty",
+    "start:watch": "nodemon",
+    "watch": "tsc -w"
   }
 }

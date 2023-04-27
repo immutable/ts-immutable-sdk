@@ -22,6 +22,7 @@ const getFileBuild = (inputFilename) => [
     },
     plugins: [
       replace({
+        preventAssignment: true,
         __SDK_VERSION__: pkg.version,
       }),
       typescript({
