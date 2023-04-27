@@ -5,30 +5,51 @@ import { HeaderNavigation } from '../../../../../components/Header/HeaderNavigat
 import { SimpleLayout } from '../../../../../components/SimpleLayout/SimpleLayout';
 import { ViewContext, ViewActions } from '../../../../../context/ViewContext';
 import { InnerExampleWidgetViews } from '../../../../../context/InnerExampleViewContextTypes';
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web';
 
 export const ViewOne = () => {
   const { viewDispatch } = useContext(ViewContext);
+
+  const checkout = new Checkout();
+
+  async function metamaskClick() {
+    try {
+      const connectResult = await checkout.connect({
+        providerPreference: ConnectionProviders.METAMASK,
+      });
+    } catch (err: any) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: InnerExampleWidgetViews.VIEW_THREE,
+          },
+        },
+      });
+      return;
+    }
+
+    dispatchChooseNetworks();
+  }
+
+  const dispatchChooseNetworks = () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: InnerExampleWidgetViews.VIEW_TWO,
+        },
+      },
+    });
+  };
 
   return (
     <SimpleLayout
       header={<HeaderNavigation title="Inner Widget Example" showClose />}
       footer={<FooterLogo />}
     >
-      <Heading>View One</Heading>
-      <Button
-        onClick={() => {
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: InnerExampleWidgetViews.VIEW_TWO,
-              },
-            },
-          });
-        }}
-      >
-        Go To View Two
-      </Button>
+      <Heading>Connect your wallet</Heading>
+      <Button onClick={metamaskClick}>Connect to Metamask</Button>
     </SimpleLayout>
   );
 };

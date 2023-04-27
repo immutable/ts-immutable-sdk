@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import { ConnectionProviders, WidgetTheme } from '@imtbl/checkout-ui-types';
 import { OuterWidget, OuterWidgetParams } from './OuterWidget';
+import { InnerWidget } from '../inner-widget/InnerWidget';
+import { ConnectionLoader } from '../connection-loader/connection-loader';
 
 export class ImmutableOuterExample extends HTMLElement {
   reactRoot?: ReactDOM.Root;
@@ -31,7 +33,9 @@ export class ImmutableOuterExample extends HTMLElement {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <OuterWidget params={params} theme={this.theme}></OuterWidget>
+        <ConnectionLoader params={params} theme={this.theme}>
+          <OuterWidget params={params} theme={this.theme}></OuterWidget>
+        </ConnectionLoader>
       </React.StrictMode>
     );
   }

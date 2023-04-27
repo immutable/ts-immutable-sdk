@@ -16,12 +16,14 @@ import { InnerExampleWidgetViews } from '../../../../context/InnerExampleViewCon
 export interface InnerWidgetProps {
   params: InnerWidgetParams;
   theme: WidgetTheme;
+  deepLink?: InnerExampleWidgetViews;
+  callBack?: () => void;
 }
 
 export interface InnerWidgetParams {}
 
 export function InnerWidget(props: InnerWidgetProps) {
-  const { theme } = props;
+  const { theme, deepLink, callBack } = props;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const biomeTheme: BaseTokens =
     theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
@@ -33,7 +35,7 @@ export function InnerWidget(props: InnerWidgetProps) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: InnerExampleWidgetViews.VIEW_ONE,
+          type: deepLink ?? InnerExampleWidgetViews.VIEW_ONE,
         },
       },
     });
@@ -46,7 +48,7 @@ export function InnerWidget(props: InnerWidgetProps) {
           <ViewOne />
         )}
         {viewState.view.type === InnerExampleWidgetViews.VIEW_TWO && (
-          <ViewTwo />
+          <ViewTwo callBack={callBack} />
         )}
         {viewState.view.type === InnerExampleWidgetViews.VIEW_THREE && (
           <ViewThree />

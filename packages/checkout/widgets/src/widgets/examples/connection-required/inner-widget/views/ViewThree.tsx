@@ -14,7 +14,7 @@ export const ViewThree = () => {
       header={<HeaderNavigation title="Inner Widget Example" showClose />}
       footer={<FooterLogo />}
     >
-      <Heading>View Three</Heading>
+      <Heading>Something went wrong</Heading>
       <Button
         onClick={() => {
           viewDispatch({
@@ -27,7 +27,7 @@ export const ViewThree = () => {
           });
         }}
       >
-        Go To View One
+        Start Over
       </Button>
     </SimpleLayout>
   );
