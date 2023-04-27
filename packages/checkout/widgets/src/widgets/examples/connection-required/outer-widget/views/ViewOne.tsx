@@ -4,7 +4,7 @@ import { FooterLogo } from '../../../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../../../components/SimpleLayout/SimpleLayout';
 import { ViewContext, ViewActions } from '../../../../../context/ViewContext';
-import { OuterExampleWidgetViews } from '../../../../../context/OuterExampleViewContextTypes copy';
+import { OuterExampleWidgetViews } from '../../../../../context/OuterExampleViewContextTypes';
 
 export const ViewOne = () => {
   const { viewDispatch } = useContext(ViewContext);

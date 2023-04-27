@@ -2,7 +2,7 @@ import { createContext } from 'react';
 import { ConnectWidgetView } from './ConnectViewContextTypes';
 import { TransitionExampleWidgetView } from './TransitionExampleViewContextTypes';
 import { InnerExampleWidgetView } from './InnerExampleViewContextTypes';
-import { OuterExampleWidgetView } from './OuterExampleViewContextTypes copy';
+import { OuterExampleWidgetView } from './OuterExampleViewContextTypes';
 
 export enum BaseViews {
   LOADING_VIEW = 'LOADING_VIEW',
