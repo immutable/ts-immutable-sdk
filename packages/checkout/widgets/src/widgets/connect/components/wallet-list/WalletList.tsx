@@ -46,8 +46,8 @@ export const WalletList = () => {
     >
       <MenuItem
         testId={`wallet-list-${ConnectionProviders.METAMASK}`}
-        elevated
         size="medium"
+        emphasized={true}
         onClick={() => onWalletClick(ConnectionProviders.METAMASK)}
       >
         <MenuItem.FramedLogo
