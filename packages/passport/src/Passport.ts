@@ -73,10 +73,7 @@ export class Passport {
   }
 
   public async connectImx(): Promise<IMXProvider> {
-    let user = await this.authManager.getUser();
-    if (!user || user.expired == undefined || user.expired) {
-      user = await this.authManager.login();
-    }
+    const user = await this.authManager.login();
     return this.getImxProvider(user);
   }
 

@@ -86,20 +86,6 @@ describe('Passport', () => {
       expect(getStarkSigner).toBeCalledTimes(1);
     }, 15000);
 
-    it('should execute connect without login if user have logged in', async () => {
-      getUserMock.mockReturnValue({ ...mockUser, expired: false });
-      magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
-      requestRefreshTokenMock.mockResolvedValue({
-        accessToken: '123',
-        etherKey: '0x232',
-      });
-      const provider = await passport.connectImx();
-
-      expect(authLoginMock).toBeCalledTimes(0);
-      expect(magicLoginMock).toBeCalledTimes(1);
-      expect(getStarkSigner).toBeCalledTimes(1);
-    });
-
     it('should register user with refresh error', async () => {
       magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
       requestRefreshTokenMock.mockResolvedValue(null);
