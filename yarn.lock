@@ -1543,26 +1543,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.2.4-beta":
-  version: 0.2.4-beta
-  resolution: "@biom3/react@npm:0.2.4-beta"
-  dependencies:
-    "@biom3/design-tokens": "*"
-    "@emotion/css": "*"
-    "@emotion/react": "*"
-    framer-motion: "*"
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.throttle: ^4.1.1
-    next: "*"
-    querystring: ^0.2.1
-    react: "*"
-    react-is: ^18.2.0
-    ts-deepmerge: "*"
-  checksum: 2467aa04869e025879eb2c6f2d33b257565024709bbd47771b79f20482e73f5ed72600bfbae51eb791d7986554eba1967d6921858d2ea549ec26024c77fc68a3
-  languageName: node
-  linkType: hard
-
 "@biom3/react@npm:^0.2.7-beta":
   version: 0.2.7-beta
   resolution: "@biom3/react@npm:0.2.7-beta"
@@ -2795,7 +2775,7 @@ __metadata:
   resolution: "@imtbl/sdk@workspace:sdk"
   dependencies:
     "@biom3/design-tokens": 0.1.4-beta
-    "@biom3/react": ^0.2.4-beta
+    "@biom3/react": ^0.2.7-beta
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk-web": 0.0.0
     "@imtbl/checkout-ui-types": 0.0.0

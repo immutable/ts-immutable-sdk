@@ -6,7 +6,7 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@biom3/design-tokens": "0.1.4-beta",
-    "@biom3/react": "^0.2.4-beta",
+    "@biom3/react": "^0.2.7-beta",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/core-sdk": "^1.1.1-alpha.1",
     "@magic-ext/oidc": "^1.0.1",
