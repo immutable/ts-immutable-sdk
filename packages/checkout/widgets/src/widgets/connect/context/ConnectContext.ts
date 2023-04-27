@@ -23,12 +23,15 @@ export interface ConnectAction {
   payload: ActionPayload;
 }
 
-type ActionPayload = SetCheckoutPayload | SetProviderPayload | SetProviderPreferencePayload;
+type ActionPayload =
+  | SetCheckoutPayload
+  | SetProviderPayload
+  | SetProviderPreferencePayload;
 
 export enum ConnectActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
-  SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE'
+  SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
 }
 
 export interface SetCheckoutPayload {

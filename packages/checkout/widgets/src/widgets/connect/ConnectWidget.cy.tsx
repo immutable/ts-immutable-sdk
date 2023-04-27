@@ -1,4 +1,8 @@
-import { Checkout, ConnectParams, ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import {
+  Checkout,
+  ConnectParams,
+  ConnectionProviders,
+} from '@imtbl/checkout-sdk-web';
 import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
 import { WidgetTheme } from '@imtbl/checkout-ui-types';
 import { describe, it, cy } from 'local-cypress';
@@ -12,40 +16,39 @@ describe('ConnectWidget tests', () => {
       providerPreference: ConnectionProviders.METAMASK,
     } as ConnectWidgetParams;
 
-    mount(<ConnectWidget params={params} theme={WidgetTheme.DARK} />)
-  }
+    mount(<ConnectWidget params={params} theme={WidgetTheme.DARK} />);
+  };
 
   const mountConnectWidgetAndGoToReadyToConnect = () => {
     mountConnectWidget();
     cySmartGet('wallet-list-metamask').click();
-  }
+  };
 
   beforeEach(() => {
-    cy.viewport('ipad-2')
-  })
+    cy.viewport('ipad-2');
+  });
 
   describe('Connect Wallet screen', () => {
-
     it('should show MetaMask wallet option on desktop', () => {
       mountConnectWidget();
 
       cySmartGet('wallet-list').should('exist');
       cySmartGet('wallet-list-metamask').should('be.visible');
-    })
+    });
 
     it('should show the Immutable Logo in the footer', () => {
       mountConnectWidget();
-      
+
       cySmartGet('footer-logo-container').should('exist');
       cySmartGet('footer-logo-image').should('exist');
-    })
+    });
 
     it('should update the view to Ready to Connect screen when MetaMask is clicked', () => {
       mountConnectWidget();
 
       cySmartGet('wallet-list-metamask').click();
       cySmartGet('ready-to-connect').should('be.visible');
-    })
+    });
   });
 
   describe('Ready to connect screen', () => {
@@ -62,7 +65,9 @@ describe('ConnectWidget tests', () => {
       cySmartGet('ready-to-connect').should('be.visible');
       cySmartGet('footer-button').should('have.text', 'Ready to connect');
       cySmartGet('footer-button').click();
-      cySmartGet('@connectStub').should('have.been.calledOnceWith', {providerPreference: ConnectionProviders.METAMASK} as ConnectParams)
+      cySmartGet('@connectStub').should('have.been.calledOnceWith', {
+        providerPreference: ConnectionProviders.METAMASK,
+      } as ConnectParams);
     });
 
     it('should update footer button text to Try again when user rejects connection request', () => {
@@ -71,7 +76,9 @@ describe('ConnectWidget tests', () => {
       cySmartGet('ready-to-connect').should('be.visible');
       cySmartGet('footer-button').should('have.text', 'Ready to connect');
       cySmartGet('footer-button').click();
-      cySmartGet('@connectStub').should('have.been.calledOnceWith', {providerPreference: ConnectionProviders.METAMASK} as ConnectParams)
+      cySmartGet('@connectStub').should('have.been.calledOnceWith', {
+        providerPreference: ConnectionProviders.METAMASK,
+      } as ConnectParams);
       cySmartGet('footer-button').should('have.text', 'Try again');
     });
 
@@ -81,10 +88,12 @@ describe('ConnectWidget tests', () => {
       cySmartGet('ready-to-connect').should('be.visible');
       cySmartGet('footer-button').should('have.text', 'Ready to connect');
       cySmartGet('footer-button').click();
-      cySmartGet('@connectStub').should('have.been.calledOnceWith', {providerPreference: ConnectionProviders.METAMASK} as ConnectParams)
+      cySmartGet('@connectStub').should('have.been.calledOnceWith', {
+        providerPreference: ConnectionProviders.METAMASK,
+      } as ConnectParams);
       cySmartGet('footer-button').should('have.text', 'Try again');
       cySmartGet('footer-button').click();
-      cySmartGet('@connectStub').should('have.been.calledTwice')
+      cySmartGet('@connectStub').should('have.been.calledTwice');
     });
 
     it('should go back to Connect A Wallet screen when back is clicked', () => {

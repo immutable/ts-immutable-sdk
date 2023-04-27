@@ -11,7 +11,12 @@ export const FooterLogo = ({ hideLogo }: FooterLogoProps) => {
   } = useTheme();
   return (
     <Box testId="footer-logo-container" sx={FooterLogoStyles}>
-      {showLogo && <PoweredByImmutableLogo data-testid="footer-logo-image" fill={color.brand[1]} />}
+      {showLogo && (
+        <PoweredByImmutableLogo
+          data-testid="footer-logo-image"
+          fill={color.brand[1]}
+        />
+      )}
     </Box>
   );
 };

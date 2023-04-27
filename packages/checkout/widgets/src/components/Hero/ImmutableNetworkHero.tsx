@@ -1,6 +1,6 @@
-import { Box } from "@biom3/react"
+import { Box } from '@biom3/react';
 import immutableNetwork from '../../assets/ImmutableNetwork.svg';
-import { HeroBackGroundStyles, HeroImageStyles } from "./HeroImageStyles";
+import { HeroBackGroundStyles, HeroImageStyles } from './HeroImageStyles';
 
 export const ImmutableNetworkHero = () => {
   return (
@@ -9,5 +9,5 @@ export const ImmutableNetworkHero = () => {
         <img alt="Immutable Network" src={immutableNetwork} />
       </Box>
     </Box>
-  )
-}
+  );
+};
