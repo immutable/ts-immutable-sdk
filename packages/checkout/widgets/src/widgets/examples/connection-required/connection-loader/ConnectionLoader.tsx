@@ -1,4 +1,4 @@
-import { BiomeThemeProvider, Body, Box, Button, Icon } from '@biom3/react';
+import { BiomeThemeProvider, Body, Box, Icon } from '@biom3/react';
 import {
   ChainId,
   Checkout,
