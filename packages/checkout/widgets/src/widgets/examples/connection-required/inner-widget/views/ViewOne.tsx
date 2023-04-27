@@ -14,7 +14,7 @@ export const ViewOne = () => {
 
   async function metamaskClick() {
     try {
-      const connectResult = await checkout.connect({
+      await checkout.connect({
         providerPreference: ConnectionProviders.METAMASK,
       });
     } catch (err: any) {

@@ -39,7 +39,7 @@ export function InnerWidget(props: InnerWidgetProps) {
         },
       },
     });
-  }, []);
+  }, [deepLink]);
 
   return (
     <BiomeThemeProvider theme={{ base: biomeTheme }}>
