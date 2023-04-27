@@ -2,10 +2,10 @@ import React from 'react';
 import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
 import ReactDOM from 'react-dom/client';
 import { WidgetTheme, Network } from '@imtbl/checkout-ui-types';
-import { ExampleWidget, ExampleWidgetParams } from './ExampleWidget';
+import { ExampleWidget, ExampleWidgetParams } from './DiExampleWidget';
 import { Web3Provider } from '@ethersproject/providers';
 
-export class ImmutableExample extends HTMLElement {
+export class ImmutableDiExample extends HTMLElement {
   reactRoot?: ReactDOM.Root;
 
   static get observedAttributes() {

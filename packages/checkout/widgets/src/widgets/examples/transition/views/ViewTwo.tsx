@@ -1,11 +1,11 @@
 import { Body, Button, Heading } from '@biom3/react';
-import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { FooterButton } from '../../../components/Footer/FooterButton';
+import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
+import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
+import { FooterButton } from '../../../../components/Footer/FooterButton';
 import { useContext, useState } from 'react';
-import { TransitionExampleWidgetViews } from '../../../context/TransitionExampleViewContextTypes';
-import { ViewActions, ViewContext } from '../../../context/ViewContext';
-import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkHero';
+import { TransitionExampleWidgetViews } from '../../../../context/TransitionExampleViewContextTypes';
+import { ViewActions, ViewContext } from '../../../../context/ViewContext';
+import { ImmutableNetworkHero } from '../../../../components/Hero/ImmutableNetworkHero';
 
 export const ViewTwo = () => {
   const { viewDispatch } = useContext(ViewContext);

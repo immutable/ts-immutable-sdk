@@ -8,8 +8,8 @@ import {
   ViewActions,
   ViewContext,
   viewReducer,
-} from '../../context/ViewContext';
-import { TransitionExampleWidgetViews } from '../../context/TransitionExampleViewContextTypes';
+} from '../../../context/ViewContext';
+import { TransitionExampleWidgetViews } from '../../../context/TransitionExampleViewContextTypes';
 import { ViewTwo } from './views/ViewTwo';
 import { ViewThree } from './views/ViewThree';
 

@@ -6,6 +6,8 @@ import {
   ImtblExampleProps,
   ImtblBuyProps,
   ImtblTransitionExampleProps,
+  ImtblInnerWidgetExampleProps,
+  ImtblOuterWidgetExampleProps,
 } from '@imtbl/checkout-ui-types';
 
 declare global {
@@ -18,6 +20,8 @@ declare global {
       'imtbl-buy': ImtblBuyProps;
       'imtbl-example': ImtblExampleProps;
       'imtbl-transition-example': ImtblTransitionExampleProps;
+      'imtbl-inner-widget-example': ImtblInnerWidgetExampleProps;
+      'imtbl-outer-widget-example': ImtblOuterWidgetExampleProps;
     }
   }
 }
