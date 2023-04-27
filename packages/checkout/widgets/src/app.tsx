@@ -2,13 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import ExampleWebView from './widgets/example/ExampleWebView';
 import BuyWebView from './widgets/buy/BuyWebView';
 import ConnectWebView from './widgets/connect/ConnectWebView';
 import SwapWebView from './widgets/swap/SwapWebView';
 import BridgeWebView from './widgets/bridge/BridgeWebView';
 import WalletWebView from './widgets/wallet/WalletWebView';
-import TransitionExampleWebView from './widgets/transition-example/TransitionExampleWebView';
+import TransitionExampleWebView from './widgets/examples/transition/TransitionExampleWebView';
+import DiExampleWebView from './widgets/examples/dependency-injection/DiExampleWebView';
+import OuterWidgetWebView from './widgets/examples/connection-required/outer-widget/OuterWidgetWebView';
 
 require('./build.tsx');
 
@@ -37,12 +38,21 @@ function App() {
         <a href="/buy">Buy Widget</a>
       </h2>
       <br />
+      <hr />
+      <h1>Examples</h1>
+      <br />
       <h2>
-        <a href="/example">Example Widget</a>
+        <a href="/examples/dependency-injection">Dependency Injection Widget</a>
       </h2>
       <br />
       <h2>
-        <a href="/transition-example">Transition Example Widget</a>
+        <a href="/examples/transition">Transition Example Widget</a>
+      </h2>
+      <br />
+      <h2>
+        <a href="/examples/connection-required">
+          Connection Required Example Widget
+        </a>
       </h2>
     </div>
   );
@@ -54,12 +64,16 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
-    path: '/example',
-    element: <ExampleWebView />,
+    path: '/examples/dependency-injection',
+    element: <DiExampleWebView />,
   },
   {
-    path: '/transition-example',
+    path: '/examples/transition',
     element: <TransitionExampleWebView />,
+  },
+  {
+    path: '/examples/connection-required',
+    element: <OuterWidgetWebView />,
   },
   {
     path: '/connect',

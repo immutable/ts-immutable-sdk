@@ -69,3 +69,21 @@ export interface ImtblTransitionExampleProps
   providerPreference: string;
   theme: string;
 }
+
+export interface ImtblInnerWidgetExampleProps
+  extends React.DetailedHTMLProps<
+    React.HTMLAttributes<HTMLElement>,
+    HTMLElement
+  > {
+  providerPreference: string;
+  theme: string;
+}
+
+export interface ImtblOuterWidgetExampleProps
+  extends React.DetailedHTMLProps<
+    React.HTMLAttributes<HTMLElement>,
+    HTMLElement
+  > {
+  providerPreference: string;
+  theme: string;
+}

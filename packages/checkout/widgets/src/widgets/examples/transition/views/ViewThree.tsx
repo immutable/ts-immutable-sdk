@@ -1,9 +1,9 @@
 import { Body, Heading } from '@biom3/react';
 import { useCallback, useState } from 'react';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
-import { FooterButton } from '../../../components/Footer/FooterButton';
-import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
+import { FooterLogo } from '../../../../components/Footer/FooterLogo';
+import { FooterButton } from '../../../../components/Footer/FooterButton';
+import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
+import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
 
 enum ViewThreeContents {
   CONTENT_ONE = 'CONTENT_ONE',

@@ -1,7 +1,7 @@
 import { WidgetTheme, ConnectionProviders } from '@imtbl/checkout-ui-types';
 import { useState, useEffect } from 'react';
 
-function ExampleWebView() {
+function InnerWidgetWebView() {
   const [theme, setTheme] = useState(WidgetTheme.DARK);
 
   const queryParams = new URLSearchParams(window.location.search);
@@ -12,11 +12,11 @@ function ExampleWebView() {
   }, [themeParam]);
 
   return (
-    <imtbl-example
+    <imtbl-inner-widget-example
       providerPreference={ConnectionProviders.METAMASK}
       theme={theme}
-    ></imtbl-example>
+    ></imtbl-inner-widget-example>
   );
 }
 
-export default ExampleWebView;
+export default InnerWidgetWebView;

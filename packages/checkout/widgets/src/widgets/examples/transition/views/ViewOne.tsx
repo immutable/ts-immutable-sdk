@@ -1,10 +1,10 @@
 import { Button, Heading } from '@biom3/react';
 import { useContext } from 'react';
-import { FooterLogo } from '../../../components/Footer/FooterLogo';
-import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { TransitionExampleWidgetViews } from '../../../context/TransitionExampleViewContextTypes';
-import { ViewContext, ViewActions } from '../../../context/ViewContext';
+import { FooterLogo } from '../../../../components/Footer/FooterLogo';
+import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
+import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
+import { TransitionExampleWidgetViews } from '../../../../context/TransitionExampleViewContextTypes';
+import { ViewContext, ViewActions } from '../../../../context/ViewContext';
 
 export const ViewOne = () => {
   const { viewDispatch } = useContext(ViewContext);

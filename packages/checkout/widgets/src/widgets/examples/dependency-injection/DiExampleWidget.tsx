@@ -1,7 +1,7 @@
 import { BiomeThemeProvider, Body, Box, Button, Heading } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { WidgetTheme } from '@imtbl/checkout-ui-types';
-import { ExampleWidgetStyle } from './ExampleStyles';
+import { DiExampleWidgetStyle } from './DiExampleStyles';
 import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
 import { Web3Provider } from '@ethersproject/providers';
 import { useState } from 'react';
@@ -35,7 +35,7 @@ export function ExampleWidget(props: ExampleWidgetProps) {
 
   return (
     <BiomeThemeProvider theme={{ base: biomeTheme }}>
-      <Box sx={ExampleWidgetStyle}>
+      <Box sx={DiExampleWidgetStyle}>
         <Heading>Example Widget</Heading>
         <br />
         <Button onClick={logProvider}>Log Provider</Button>

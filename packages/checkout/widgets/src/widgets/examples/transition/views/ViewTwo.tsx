@@ -1,12 +1,12 @@
 import { Body, Button, Heading } from '@biom3/react';
-import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import PurpleDownGradient from '../../../assets/PurpleDownGradient.svg';
-import ImmutableNetwork from '../../../assets/ImmutableNetwork.svg';
-import { FooterButton } from '../../../components/Footer/FooterButton';
+import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
+import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
+import PurpleDownGradient from '../../../../assets/PurpleDownGradient.svg';
+import ImmutableNetwork from '../../../../assets/ImmutableNetwork.svg';
+import { FooterButton } from '../../../../components/Footer/FooterButton';
 import { useContext, useState } from 'react';
-import { TransitionExampleWidgetViews } from '../../../context/TransitionExampleViewContextTypes';
-import { ViewActions, ViewContext } from '../../../context/ViewContext';
+import { TransitionExampleWidgetViews } from '../../../../context/TransitionExampleViewContextTypes';
+import { ViewActions, ViewContext } from '../../../../context/ViewContext';
 
 export const ViewTwo = () => {
   const { viewDispatch } = useContext(ViewContext);
