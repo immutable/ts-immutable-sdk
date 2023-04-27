@@ -8,7 +8,7 @@ import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes'
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
-import ImmutableNetwork from '../../../../assets/ImmutableNetwork.svg';
+import { ImmutableNetworkHero } from '../../../../components/Hero/ImmutableNetworkHero';
 
 export function ChooseNetwork() {
   const { viewDispatch } = useContext(ViewContext);
@@ -58,7 +58,7 @@ export function ChooseNetwork() {
     <SimpleLayout
       header={<HeaderNavigation showClose showBack transparent={true} />}
       footer={<FooterLogo />}
-      heroImage={ImmutableNetwork}
+      heroContent={<ImmutableNetworkHero />}
       floatHeader={true}
     >
       <Button testId="network-zkevm" onClick={() => connectPolygonClick()}>
