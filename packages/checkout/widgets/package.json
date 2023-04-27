@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@biom3/design-tokens": "0.1.4-beta",
-    "@biom3/react": "^0.2.6-beta",
+    "@biom3/react": "^0.2.7-beta",
     "@ethersproject/providers": "^5.7.2",
     "ethers": "^5.7.2",
     "react": "^18.2.0",
