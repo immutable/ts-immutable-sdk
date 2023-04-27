@@ -10,7 +10,7 @@ import { hexDataSlice } from 'ethers/lib/utils';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { ExchangeModuleConfiguration, Router, TradeInfo } from '../lib';
-import { Environment, ImmutableConfiguration } from '@imtbl/config/src';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 
 export const testChainId: number = 1;
 

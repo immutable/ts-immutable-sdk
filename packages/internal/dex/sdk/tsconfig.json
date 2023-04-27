@@ -2,7 +2,9 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "outDir": "./dist",
-    "rootDirs": ["src"],
+    "rootDirs": [
+      "src"
+    ],
     "target": "es2022",
     "module": "es2022",
     "moduleResolution": "node",
@@ -17,7 +19,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "declaration": true,
+    "declaration": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

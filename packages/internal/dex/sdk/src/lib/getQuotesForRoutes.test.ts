@@ -1,7 +1,7 @@
 import { describe, it } from '@jest/globals';
 import { FeeAmount, Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { Token, CurrencyAmount, TradeType } from '@uniswap/sdk-core';
-import { getQuotesForRoutes } from '../lib/getQuotesForRoutes';
+import { getQuotesForRoutes } from './getQuotesForRoutes';
 import { Contract, ethers, providers } from 'ethers';
 import {
   IMX_TEST_CHAIN,

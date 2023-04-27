@@ -2596,9 +2596,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@imtbl/dex-sdk@workspace:packages/internal/dex":
+"@imtbl/dex-sdk@workspace:packages/internal/dex/sdk":
   version: 0.0.0-use.local
-  resolution: "@imtbl/dex-sdk@workspace:packages/internal/dex"
+  resolution: "@imtbl/dex-sdk@workspace:packages/internal/dex/sdk"
   dependencies:
     "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0

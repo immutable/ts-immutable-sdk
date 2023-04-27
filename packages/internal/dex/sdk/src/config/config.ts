@@ -1,5 +1,5 @@
 import { ExchangeModuleConfiguration } from '../types';
-import { Environment, ImmutableConfiguration } from '@imtbl/config/src';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   POLYGON_TESTNET_CHAIN_ID,
   POLYGON_ZKEVM_COMMON_ROUTING_TOKENS,
