@@ -31,14 +31,15 @@
   "engines": {
     "node": ">=16.0.0"
   },
+  "files": [
+    "dist"
+  ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "keywords": [
     "immutablex"
   ],
-  "files": [
-    "dist"
-  ],
   "license": "Apache-2.0",
+  "main": "dist/index.js",
   "module": "dist/module.js",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
@@ -50,8 +51,7 @@
     "test": "jest test",
     "test:watch": "jest --watch"
   },
-  "main": "dist/index.js",
   "source": "src/index.ts",
-  "types": "dist/types/index.d.ts",
-  "type": "module"
+  "type": "module",
+  "types": "dist/types/index.d.ts"
 }
