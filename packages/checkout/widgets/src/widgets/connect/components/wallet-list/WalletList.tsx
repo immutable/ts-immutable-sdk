@@ -4,12 +4,12 @@ import { ViewActions, ViewContext } from "../../../../context/ViewContext";
 import { ConnectWidgetViews } from "../../../../context/ConnectViewContextTypes";
 import { ConnectionProviders } from "@imtbl/checkout-sdk-web";
 import { ConnectActions, ConnectContext } from "../../context/ConnectContext";
-import { language } from "../../language/languageConfig";
+import { text } from "../../../../resources/text/textConfig";
 
 export const WalletList = () => {
   const { connectDispatch } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
-  const {wallets} = language;
+  const {wallets} = text;
 
   const onWalletClick = (providerPreference: ConnectionProviders) => {
     connectDispatch({
@@ -25,7 +25,7 @@ export const WalletList = () => {
       },
     });
   };
-    
+
 
   // get wallet list
   // check if browser extensions enabled

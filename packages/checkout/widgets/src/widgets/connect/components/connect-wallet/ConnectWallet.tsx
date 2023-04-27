@@ -4,10 +4,10 @@ import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
 import { WalletList } from '../wallet-list/WalletList';
 import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
-import { language } from '../../language/languageConfig';
+import { text } from '../../../../resources/text/textConfig';
 
 export const ConnectWallet = () => {
-  const {header, body} = language.views[ConnectWidgetViews.CONNECT_WALLET];
+  const {header, body} = text.views[ConnectWidgetViews.CONNECT_WALLET];
   return (
     <SimpleLayout
       testId='connect-wallet'

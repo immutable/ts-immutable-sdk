@@ -1,7 +1,7 @@
-import { ConnectionProviders } from "@imtbl/checkout-sdk-web";
-import { ConnectWidgetViews } from "../../../context/ConnectViewContextTypes";
+import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 
-export const language = {
+export const text = {
   views: {
     [ConnectWidgetViews.CONNECT_WALLET]: {
       header: {

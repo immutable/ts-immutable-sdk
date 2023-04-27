@@ -8,12 +8,12 @@ import { ConnectionProviders } from "@imtbl/checkout-sdk-web"
 import { ConnectWidgetViews } from "../../../../context/ConnectViewContextTypes"
 import { Body, Box, Heading } from "@biom3/react"
 import { MetamaskConnectHero } from "../../../../components/Hero/MetamaskConnectHero"
-import { language } from "../../language/languageConfig"
+import { text } from "../../../../resources/text/textConfig"
 
 export const ReadyToConnect = () => {
   const { connectState: { checkout }, connectDispatch } = useContext(ConnectContext);
   const { viewDispatch} = useContext(ViewContext);
-  const {body, footer} = language.views[ConnectWidgetViews.READY_TO_CONNECT];
+  const {body, footer} = text.views[ConnectWidgetViews.READY_TO_CONNECT];
   const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
 
   const onConnectClick = useCallback(async () => {
@@ -38,7 +38,7 @@ export const ReadyToConnect = () => {
         setFooterButtonText(footer.buttonText2);
       }
     }
-    
+
   },[checkout, connectDispatch, viewDispatch, footer.buttonText2])
 
   return (
