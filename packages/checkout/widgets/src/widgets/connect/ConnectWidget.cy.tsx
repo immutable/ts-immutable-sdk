@@ -61,6 +61,9 @@ describe('ConnectWidget tests', () => {
 
     it('should call checkout.connect() when Ready to connect is clicked', () => {
       cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({});
+      cy.stub(Checkout.prototype, 'getNetworkInfo')
+        .as('getNetworkInfoStub')
+        .resolves({});
       mountConnectWidgetAndGoToReadyToConnect();
       cySmartGet('ready-to-connect').should('be.visible');
       cySmartGet('footer-button').should('have.text', 'Ready to connect');
