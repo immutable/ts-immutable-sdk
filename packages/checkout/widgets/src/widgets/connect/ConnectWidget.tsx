@@ -26,7 +26,7 @@ import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
 import { ConnectResult } from './components/connect-result/ConnectResult';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { ReadyToConnect } from './components/ready-to-connect/ReadyToConnect';
-import { SwitchNetwork } from './view/SwitchNetwork';
+import { SwitchNetwork } from './views/SwitchNetwork';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;

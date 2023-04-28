@@ -1,22 +1,20 @@
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import ImmutableNetwork from '../../../assets/ImmutableNetwork.svg';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { useContext, useState } from 'react';
 import { ConnectContext } from '../context/ConnectContext';
-import {
-  ChainId,
-  ConnectionProviders,
-  ConnectResult,
-} from '@imtbl/checkout-sdk-web';
+import { ChainId, ConnectionProviders } from '@imtbl/checkout-sdk-web';
 import { ViewActions, ViewContext } from '../../../context/ViewContext';
 import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
+import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkHero';
+import { text } from '../../../resources/text/textConfig';
 
 export const SwitchNetwork = () => {
   const { viewDispatch } = useContext(ViewContext);
   const { connectState } = useContext(ConnectContext);
   const { checkout, provider } = connectState;
+  const { heading, body } = text.views.SWITCH_NETWORK;
 
   const [buttonText, setButtonText] = useState('Ready to Switch');
 
@@ -24,18 +22,10 @@ export const SwitchNetwork = () => {
     if (!provider) return;
 
     try {
-      const switchNetwork = await checkout!.switchNetwork({
+      await checkout!.switchNetwork({
         provider,
         chainId: ChainId.POLYGON,
       });
-
-      const connectResult: ConnectResult = await checkout!.connect({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
-
-      if (switchNetwork.network.chainId !== ChainId.POLYGON) {
-        // Is this a failure page?
-      }
 
       viewDispatch({
         payload: {
@@ -60,16 +50,10 @@ export const SwitchNetwork = () => {
           onActionClick={() => switchNetwork()}
         />
       }
-      heroImage={ImmutableNetwork}
+      heroContent={<ImmutableNetworkHero />}
       floatHeader={true}
     >
-      <SimpleTextBody
-        heading="To trade here, MetaMask will ask you to switch to the Immutable zkEVM
-        network"
-      >
-        Check for the pop-up from MetaMask and ‘Approve’ to switch. If this is
-        the first time, MetaMask will also ask you to add the network.
-      </SimpleTextBody>
+      <SimpleTextBody heading={heading}>{body}</SimpleTextBody>
     </SimpleLayout>
   );
 };

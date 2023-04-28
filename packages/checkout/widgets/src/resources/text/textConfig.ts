@@ -22,6 +22,10 @@ export const text = {
         buttonText2: 'Try again',
       },
     },
+    [ConnectWidgetViews.SWITCH_NETWORK]: {
+      heading: 'To trade here, MetaMask will ask you to switch to the Immutable zkEVM network',
+      body: 'Check for the pop-up from MetaMask and ‘Approve’ to switch. If this is the first time, MetaMask will also ask you to add the network.'
+    }
   },
   wallets: {
     [ConnectionProviders.METAMASK]: {
