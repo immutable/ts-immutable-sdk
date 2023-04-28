@@ -1,8 +1,8 @@
 import { AppHeaderBar, ButtCon } from '@biom3/react';
 import { useContext } from 'react';
 import { ViewActions, ViewContext } from '../../context/ViewContext';
-import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 import { HeaderNavigationStyles, ButtonNavigationStyles } from './HeaderStyles';
+import { sendCloseWidgetEvent } from "../../widgets/connect/ConnectWidgetEvents";
 
 export interface HeaderNavigationProps {
   title?: string;
@@ -34,15 +34,8 @@ export const HeaderNavigation = ({
   };
 
   const close = () => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: ConnectWidgetViews.FAIL,
-          error: new Error('User closed the connect widget'),
-        },
-      },
-    });
+    //todo: need a reference to specific widget to call specific Close-Widget event
+    sendCloseWidgetEvent();
   };
 
   const handleBackButtonClick = () => {
