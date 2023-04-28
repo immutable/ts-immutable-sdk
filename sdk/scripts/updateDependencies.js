@@ -47,7 +47,7 @@ const collectDependenciesRecusively = async (workspace) => {
 
     // Don't process the root SDK package dependencies
     // Check it's dev dependencies
-    if (workspace.manifest.raw.name === SDK_PACKAGE) {
+    if (manifest.raw.name === SDK_PACKAGE) {
       // Dev dependencies, only check if they're project packages
       // This is for the root SDK package.
       devDependencies.forEach((dep) => {
