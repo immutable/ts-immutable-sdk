@@ -41,7 +41,7 @@
     "test:coverage": "jest --coverage",
     "test:watch": "jest test --watch",
     "typecheck": "tsc --noEmit",
-    "docs": "typedoc --skipErrorChecking --out docs src/index.ts"
+    "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --out docs src/index.ts"
   },
   "source": "src/index.ts",
   "types": "dist/types.d.ts"
