@@ -29,6 +29,7 @@ import {
 } from './types';
 
 export class Checkout {
+  private providerPreference;
   public async checkIsWalletConnected(
     params: CheckConnectionParams
   ): Promise<CheckConnectionResult> {
@@ -36,6 +37,7 @@ export class Checkout {
   }
 
   public async connect(params: ConnectParams): Promise<ConnectResult> {
+    this.providerPreference = params.providerPreference;
     const provider = await connect.connectWalletProvider(params);
     const networkInfo = await network.getNetworkInfo(provider);
 
@@ -48,7 +50,11 @@ export class Checkout {
   public async switchNetwork(
     params: SwitchNetworkParams
   ): Promise<SwitchNetworkResult> {
-    return await network.switchWalletNetwork(params.provider, params.chainId);
+    return await network.switchWalletNetwork(
+      this.providerPreference,
+      params.provider,
+      params.chainId
+    );
   }
 
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {

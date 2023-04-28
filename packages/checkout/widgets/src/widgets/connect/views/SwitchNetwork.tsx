@@ -4,7 +4,7 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { useContext, useState } from 'react';
 import { ConnectContext } from '../context/ConnectContext';
-import { ChainId, ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { ChainId } from '@imtbl/checkout-sdk-web';
 import { ViewActions, ViewContext } from '../../../context/ViewContext';
 import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
 import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkHero';

@@ -1,12 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
-import {
-  CheckoutError,
-  CheckoutErrorType,
-  CheckoutInternalError,
-  CheckoutInternalErrorType,
-  withCheckoutError,
-} from '../errors';
+import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import {
   ChainId,
   ChainIdNetworkMap,
@@ -16,7 +10,9 @@ import {
   NetworkInfo,
   SwitchNetworkResult,
   WALLET_ACTION,
+  ConnectionProviders,
 } from '../types';
+import { connectWalletProvider } from '../connect/connect';
 import networkMasterList from './network_master_list.json';
 
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
@@ -51,9 +47,12 @@ export async function getNetworkInfo(
 }
 
 export async function switchWalletNetwork(
+  providerPreference: ConnectionProviders,
   provider: Web3Provider,
   chainId: ChainId
 ): Promise<SwitchNetworkResult> {
+  let currentProvider = provider;
+
   if (!Object.values(ChainId).includes(chainId)) {
     throw new CheckoutError(
       `Chain:${chainId} is not a supported chain`,
@@ -61,7 +60,7 @@ export async function switchWalletNetwork(
     );
   }
 
-  if (!provider || !provider.provider?.request) {
+  if (!currentProvider || !currentProvider.provider?.request) {
     throw new CheckoutError(
       'Incompatible provider',
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
@@ -71,29 +70,12 @@ export async function switchWalletNetwork(
 
   // WT-1146 - Refer to the README in this folder for explantion on the switch network flow
   try {
-    await switchNetworkInWallet(provider, chainId);
+    await switchNetworkInWallet(currentProvider, chainId);
   } catch (err: any) {
     if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE) {
       try {
-        await addNetworkToWallet(provider, chainId);
-
-        if ((await provider.getNetwork()).chainId !== chainId) {
-          // user didn't actually switch
-          throw new CheckoutInternalError(
-            CheckoutInternalErrorType.REJECTED_SWITCH_AFTER_ADDING_NETWORK
-          );
-        }
+        await addNetworkToWallet(currentProvider, chainId);
       } catch (err: any) {
-        if (
-          err?.type ===
-          CheckoutInternalErrorType.REJECTED_SWITCH_AFTER_ADDING_NETWORK
-        ) {
-          throw new CheckoutError(
-            'User cancelled switch network request',
-            CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
-          );
-        }
-
         throw new CheckoutError(
           'User cancelled add network request',
           CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
@@ -106,6 +88,15 @@ export async function switchWalletNetwork(
       );
     }
   }
+  currentProvider = await connectWalletProvider({ providerPreference });
+
+  if ((await currentProvider.getNetwork()).chainId !== chainId) {
+    // user didn't actually switch
+    throw new CheckoutError(
+      'User cancelled switch network request',
+      CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
+    );
+  }
 
   // we can assume that if the above succeeds then user has successfully
   // switched to the network specified
@@ -116,6 +107,7 @@ export async function switchWalletNetwork(
       chainId: parseInt(newNetwork.chainIdHex, 16),
       nativeCurrency: newNetwork.nativeCurrency,
     },
+    provider: currentProvider,
   } as SwitchNetworkResult;
 }
 
