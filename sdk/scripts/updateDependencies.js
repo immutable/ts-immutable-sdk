@@ -45,22 +45,14 @@ const collectDependenciesRecusively = async (sdkWorkspace) => {
     const manifest = workspace.manifest;
     const { dependencies, peerDependencies, devDependencies } = manifest;
 
-    // Don't process the root SDK package dependencies
-    // Check it's dev dependencies
-    if (manifest.raw.name === SDK_PACKAGE) {
-      // Dev dependencies, only check if they're project packages
-      // This is for the root SDK package.
-      devDependencies.forEach((dep) => {
-        const depWorkspace = workspace.project.tryWorkspaceByIdent(dep);
-        if (depWorkspace) {
-          processWorkspace(depWorkspace);
-        }
-      });
-
-      // Early exit for root workspace. No peer or dev dependencies.
-      // These will be filled in from the recusive calls
-      return;
-    }
+    // Dev dependencies, only check if they're workspace packages
+    // And then process them
+    devDependencies.forEach((dep) => {
+      const depWorkspace = workspace.project.tryWorkspaceByIdent(dep);
+      if (depWorkspace) {
+        processWorkspace(depWorkspace);
+      }
+    });
 
     // UpdateVersion for dependencies
     dependencies.forEach((dep) => {
