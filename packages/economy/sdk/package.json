@@ -34,6 +34,12 @@
     "dist"
   ],
   "main": "dist/index.js",
+  "config": {
+    "item_definition": "https://e609qotq4d.execute-api.us-east-2.amazonaws.com/sandbox/item-definition/swagger/doc.json",
+    "crafting": "https://e609qotq4d.execute-api.us-east-2.amazonaws.com/sandbox/crafting/swagger/doc.json",
+    "inventory": "https://api.dev.games.immutable.com/inventory/swagger/doc.json",
+    "recipes": "https://api.dev.games.immutable.com/recipe/swagger/doc.json"
+  },
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "build:all": "wsrun -p @imtbl/economy --stages build",
@@ -41,7 +47,12 @@
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",
-    "typecheck": "tsc --noEmit --jsx preserve"
+    "typecheck": "tsc --noEmit --jsx preserve",
+    "codegen:item-definition": "rm -rf http-client/item-definition-api.ts; swagger-typescript-api -p $npm_package_config_item_definition -o ./http-client -n item-definition-api.ts",
+    "codegen:crafting": "rm -rf http-client/crafting-api.ts; swagger-typescript-api -p $npm_package_config_crafting -o ./http-client -n crafting-api.ts",
+    "codegen:recipes": "rm -rf http-client/recipes-api.ts; swagger-typescript-api -p $npm_package_config_recipes -o ./http-client -n recipes-api.ts",
+    "codegen:inventory": "rm -rf http-client/inventory-api.ts; swagger-typescript-api -p $npm_package_config_inventory -o ./http-client -n inventory-api.ts",
+    "codegen": "rm -rf http-client; npm run codegen:item-definition & npm run codegen:crafting & npm run codegen:recipes & npm run codegen:inventory"
   },
   "type": "module",
   "types": "dist/index.d.ts"
