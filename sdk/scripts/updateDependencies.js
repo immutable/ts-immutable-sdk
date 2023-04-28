@@ -119,7 +119,7 @@ const main = async () => {
   );
 
   if (!targetWorkspace) {
-    throw Error('@imtbl/sdk package not found');
+    throw Error(`${SDK_PACKAGE} package not found`);
   }
 
   const { dependencies, peerDependencies } =
