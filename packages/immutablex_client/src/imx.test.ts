@@ -1,14 +1,14 @@
-import { StarkExConfiguration } from './config';
-import { StarkExAPIFactory } from 'index';
+import { ImxConfiguration } from './config';
+import { ImmutableXClientFactory } from 'index';
 import { Environment } from '@imtbl/config';
 import { Config } from '@imtbl/core-sdk';
 
-describe('StarkExAPIFactory', () => {
-  it('should instantiate a SANDBOX StarkExAPIFactory', async () => {
-    const config = new StarkExConfiguration({
+describe('ImmutableXClientFactory', () => {
+  it('should instantiate a SANDBOX ImmutableXClientFactory', async () => {
+    const config = new ImxConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
     });
-    const { assetApi } = StarkExAPIFactory(config);
+    const { assetApi } = ImmutableXClientFactory(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);
@@ -17,11 +17,11 @@ describe('StarkExAPIFactory', () => {
     );
   });
 
-  it('should instantiate a PRODUCTION StarkExAPIFactory', async () => {
-    const config = new StarkExConfiguration({
+  it('should instantiate a PRODUCTION ImmutableXClientFactory', async () => {
+    const config = new ImxConfiguration({
       baseConfig: { environment: Environment.PRODUCTION },
     });
-    const { assetApi } = StarkExAPIFactory(config);
+    const { assetApi } = ImmutableXClientFactory(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);
@@ -30,9 +30,9 @@ describe('StarkExAPIFactory', () => {
     );
   });
 
-  it('should instantiate a StarkExAPIFactory with starkExOverride and custom version', async () => {
+  it('should instantiate a ImmutableXClientFactory with override and custom version', async () => {
     const sdkVersion = 'ts-immutable-sdk-0.0.1';
-    const config = new StarkExConfiguration({
+    const config = new ImxConfiguration({
       baseConfig: { environment: Environment.PRODUCTION },
       overrides: {
         immutableXConfig: Config.createConfig({
@@ -45,7 +45,7 @@ describe('StarkExAPIFactory', () => {
         }),
       },
     });
-    const { assetApi } = StarkExAPIFactory(config);
+    const { assetApi } = ImmutableXClientFactory(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);

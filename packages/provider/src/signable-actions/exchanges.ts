@@ -42,7 +42,7 @@ export async function exchangeTransfer({
 
   const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 
-  const starkSignature = await signers.starkExSigner.signMessage(payloadHash);
+  const starkSignature = await signers.starkSigner.signMessage(payloadHash);
 
   const transferSigningParams = {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

@@ -164,7 +164,7 @@ cd packages/passport && yarn test
 cd packages/checkout && yarn test
 cd packages/internal/toolkit && yarn test
 cd packages/provider && yarn test
-cd packages/starkex && yarn test
+cd packages/immutablex_client && yarn test
 ```
 
 You can also extend these commands, by using Jest syntax such as regex or to target specific tests to run:
@@ -180,7 +180,6 @@ We are currently not enforcing a preference for testing practices. It is complet
 The root [`package.json`](package.json) is the entry point for all CI testing purposes. Therefore, if you wish to write tests for an existing or new package, please ensure that a `"test"` script exists in the associated `package.json` file so that it is picked up by the [`root "test" command.`](package.json#L19)
 
 ### Versioning & Changelog
-
 
 ## Disclaimer for Alpha Releases
 

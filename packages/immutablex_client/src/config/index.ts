@@ -27,18 +27,17 @@ const SANDBOX = () => {
   });
 };
 
-export interface StarkExOverrides {
+export interface ImxOverrides {
   immutableXConfig: ImmutableXConfiguration;
 }
 
-interface StarkExModuleConfiguration
-  extends ModuleConfiguration<StarkExOverrides> {}
+interface ImxModuleConfiguration extends ModuleConfiguration<ImxOverrides> {}
 
-export class StarkExConfiguration {
+export class ImxConfiguration {
   readonly immutableXConfig: ImmutableXConfiguration;
   readonly baseConfig: ImmutableConfiguration;
 
-  constructor({ baseConfig, overrides }: StarkExModuleConfiguration) {
+  constructor({ baseConfig, overrides }: ImxModuleConfiguration) {
     this.baseConfig = baseConfig;
     if (overrides) {
       this.immutableXConfig = overrides.immutableXConfig;

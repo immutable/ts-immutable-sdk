@@ -70,7 +70,7 @@ export default [
   // Export ES Modules
   ...getFileBuild('index'),
   ...getFileBuild('base'),
-  ...getFileBuild('starkex'),
+  ...getFileBuild('immutablex_client'),
   ...getFileBuild('provider'),
   ...getFileBuild('passport'),
   ...getFileBuild('checkout_sdk'),
