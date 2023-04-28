@@ -121,6 +121,7 @@ describe('ConnectWidget tests', () => {
       cySmartGet('footer-button').should('have.text', 'Ready to connect');
       cySmartGet('footer-button').click();
       cySmartGet('switch-network-view').should('not.exist');
+      cySmartGet('success-view').should('be.visible');
     });
 
     it('should show switch to zkEVM network if not connected to polygon', () => {
@@ -180,6 +181,33 @@ describe('ConnectWidget tests', () => {
       cySmartGet('switch-network-view').should('be.visible');
       cySmartGet('footer-button').click();
       cySmartGet('footer-button').should('have.text', 'Try Again');
+    });
+
+    it('should show success if try again and switch network succeeds', () => {
+      cy.stub(Checkout.prototype, 'connect')
+        .as('connectStub')
+        .resolves({ provider: {} });
+      cy.stub(Checkout.prototype, 'getNetworkInfo')
+        .as('getNetworkInfoStub')
+        .resolves({
+          name: 'Ethereum',
+          chainId: 1,
+        });
+      cy.stub(Checkout.prototype, 'switchNetwork')
+        .as('switchNetworkStub')
+        .onFirstCall()
+        .rejects({})
+        .onSecondCall()
+        .resolves();
+      mountConnectWidgetAndGoToReadyToConnect();
+      cySmartGet('ready-to-connect').should('be.visible');
+      cySmartGet('footer-button').should('have.text', 'Ready to connect');
+      cySmartGet('footer-button').click();
+      cySmartGet('switch-network-view').should('be.visible');
+      cySmartGet('footer-button').click();
+      cySmartGet('footer-button').should('have.text', 'Try Again');
+      cySmartGet('footer-button').click();
+      cySmartGet('success-view').should('be.visible');
     });
   });
 });
