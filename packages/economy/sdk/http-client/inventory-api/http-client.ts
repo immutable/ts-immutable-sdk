@@ -9,41 +9,6 @@
  * ---------------------------------------------------------------
  */
 
-export interface CraftCraftOutputResult {
-  /** JSON object containing properties of the crafted item */
-  properties?: object;
-  /** ID of the crafted item */
-  result_item_id?: string;
-}
-
-export interface CraftExecuteRecipeInput {
-  ingredients: CraftIngredient[];
-  recipe_id: string;
-  user_id: string;
-}
-
-export interface CraftExecuteRecipeSuccessOutput {
-  /** ID of this crafting execution. Can be used to look up details of the craft later. */
-  craft_id?: string;
-  /** List of items crated from this crafting execution */
-  results?: CraftCraftOutputResult[];
-}
-
-export interface CraftFieldError {
-  error?: string;
-  name?: string;
-}
-
-export interface CraftIngredient {
-  condition_id: string;
-  item_id: string;
-}
-
-export interface CraftValidationErrors {
-  errors?: CraftFieldError[];
-  message?: string;
-}
-
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, 'body' | 'bodyUsed'>;
 
@@ -90,7 +55,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = '/crafting/v1';
+  public baseUrl: string = '/inventory/v1';
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>['securityWorker'];
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -251,35 +216,5 @@ export class HttpClient<SecurityDataType = unknown> {
       if (!response.ok) throw data;
       return data;
     });
-  };
-}
-
-/**
- * @title Crafting API
- * @version 1.0
- * @baseUrl /crafting/v1
- * @contact
- *
- * Crafting API
- */
-export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
-  craft = {
-    /**
-     * No description
-     *
-     * @tags root
-     * @name CraftCreate
-     * @summary Recipe execution from user inputs
-     * @request POST:/craft
-     */
-    craftCreate: (request: CraftExecuteRecipeInput, params: RequestParams = {}) =>
-      this.request<CraftExecuteRecipeSuccessOutput, CraftValidationErrors>({
-        path: `/craft`,
-        method: 'POST',
-        body: request,
-        type: ContentType.Json,
-        format: 'json',
-        ...params,
-      }),
   };
 }
