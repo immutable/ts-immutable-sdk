@@ -79,7 +79,7 @@
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "packageList": "./scripts/generate-package-list.sh",
     "typecheck": "tsc --noEmit --jsx preserve",
-    "updateDependencies": "node ./scripts/updateDependencies.js"
+    "updateDependencies": "yarn packageList && node ./scripts/updateDependencies.js"
   },
   "type": "module",
   "types": "./dist/index.d.ts"

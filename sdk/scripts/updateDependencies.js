@@ -16,29 +16,29 @@ const getWorkspacePackages = () => {
   ).map((pkg) => pkg.name);
   return workspacePackages;
 };
+const workspacePackages = getWorkspacePackages();
+
+// Update the map with the dependency if it doesn't exist, or if the
+// version is greater than the existing version
+const updateVersion = (map, dependency, version) => {
+  // Don't add any workspace packages as a dependency
+  if (workspacePackages.includes(dependency)) return;
+
+  const existingVersion = map.get(dependency);
+
+  if (
+    !existingVersion ||
+    semver.gt(parseVersion(version), parseVersion(existingVersion))
+  ) {
+    map.set(dependency, version);
+  }
+};
 
 // Recusively go through a workspace, and return it's dependencies
 // and peer dependencies
-const collectDependenciesRecusively = async (workspace) => {
-  const workspacePackages = getWorkspacePackages();
+const collectDependenciesRecusively = async (sdkWorkspace) => {
   const dependenciesMap = new Map();
   const peerDependenciesMap = new Map();
-
-  // Update the map with the dependency if it doesn't exist, or if the
-  // version is greater than the existing version
-  const updateVersion = (map, dependency, version) => {
-    // Don't add any workspace packages as a dependency
-    if (workspacePackages.includes(dependency)) return;
-
-    const existingVersion = map.get(dependency);
-
-    if (
-      !existingVersion ||
-      semver.gt(parseVersion(version), parseVersion(existingVersion))
-    ) {
-      dependenciesMap.set(dependency, version);
-    }
-  };
 
   // Recursively go through a workspace and update the dependencies
   const processWorkspace = (workspace) => {
@@ -87,7 +87,7 @@ const collectDependenciesRecusively = async (workspace) => {
   };
 
   // Start the recursive process
-  processWorkspace(workspace);
+  processWorkspace(sdkWorkspace);
 
   return {
     dependencies: Object.fromEntries(dependenciesMap.entries()),
@@ -107,7 +107,6 @@ const parseVersion = (version) => {
 
 // Update package.json with the dependencies and peerDependencies
 const main = async () => {
-
   const cwd = process.cwd();
   const pluginConfiguration = getPluginConfiguration();
   const configuration = await Configuration.find(cwd, pluginConfiguration);
