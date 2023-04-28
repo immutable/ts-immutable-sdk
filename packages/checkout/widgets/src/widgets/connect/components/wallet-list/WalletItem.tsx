@@ -22,7 +22,7 @@ export const WalletItem = (props: WalletProps) => {
         <MenuItem
           testId={`wallet-list-${wallet.connectionProvider}`}
           size="medium"
-          emphasized={true}
+          emphasized
           onClick={() => onWalletClick(wallet.connectionProvider)}
         >
           <MenuItem.FramedLogo

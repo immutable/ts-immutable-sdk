@@ -9,7 +9,7 @@ import {
   WalletInfo,
 } from '@imtbl/checkout-sdk-web';
 import { ConnectActions, ConnectContext } from '../../context/ConnectContext';
-import { WalletItem } from './wallet-item';
+import { WalletItem } from './WalletItem';
 
 export interface WalletListProps {
   walletFilterTypes?: WalletFilterTypes;
@@ -31,7 +31,6 @@ export const WalletList = (props: WalletListProps) => {
         type: walletFilterTypes ?? WalletFilterTypes.DESKTOP,
         exclude: excludeWallets,
       });
-      console.log(allowedWallets);
       setWallets(allowedWallets?.wallets || []);
     };
     getAllowedWallets();
