@@ -5,9 +5,9 @@ export enum ConnectionProviders {
   METAMASK = 'metamask',
 }
 
-export type ConnectParams = {
+export interface ConnectParams {
   providerPreference: ConnectionProviders;
-};
+}
 
 export interface ConnectResult {
   provider: Web3Provider;

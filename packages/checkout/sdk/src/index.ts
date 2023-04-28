@@ -7,6 +7,7 @@ export {
   NetworkFilterTypes,
 } from './types';
 export type {
+  GetNetworkParams,
   CheckConnectionParams,
   CheckConnectionResult,
   ConnectParams,
@@ -14,6 +15,7 @@ export type {
   GetBalanceParams,
   GetBalanceResult,
   NetworkInfo,
+  Transaction,
   SendTransactionParams,
   SendTransactionResult,
   SwitchNetworkParams,
@@ -32,3 +34,5 @@ export type {
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
 } from './types';
+export type { ErrorType } from './errors';
+export { CheckoutErrorType } from './errors';

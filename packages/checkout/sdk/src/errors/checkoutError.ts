@@ -12,7 +12,7 @@ export enum CheckoutErrorType {
   TRANSACTION_ERROR = 'TRANSACTION_ERROR',
 }
 
-type ErrorType = {
+export type ErrorType = {
   type: CheckoutErrorType;
   message?: string;
   data?: { [key: string]: string };
@@ -37,6 +37,7 @@ export class CheckoutError extends Error {
 export enum CheckoutInternalErrorType {
   REJECTED_SWITCH_AFTER_ADDING_NETWORK = 'REJECTED_SWITCH_AFTER_ADDING_NETWORK',
 }
+
 export class CheckoutInternalError extends Error {
   public type: CheckoutInternalErrorType;
   constructor(type: CheckoutInternalErrorType) {
