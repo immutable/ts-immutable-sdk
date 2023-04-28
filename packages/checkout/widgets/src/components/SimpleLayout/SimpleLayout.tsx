@@ -5,8 +5,8 @@ import {
   FooterStyle,
   BodyStyle,
   ContentStyle,
-  HeroContent,
-} from './SimpleLayoutStyles';
+  HeroContent, ResponsiveStyles
+} from "./SimpleLayoutStyles";
 
 export interface SimpleLayoutProps {
   header?: React.ReactNode;
@@ -26,6 +26,7 @@ export const SimpleLayout = ({
   floatHeader = false,
 }: SimpleLayoutProps) => {
   return (
+    <Box sx={ResponsiveStyles}>
     <Box testId={testId} sx={SimpleLayoutStyle}>
       {header && (
         <Box id="header" sx={HeaderStyle(floatHeader)}>
@@ -49,6 +50,7 @@ export const SimpleLayout = ({
           {footer}
         </Box>
       )}
+    </Box>
     </Box>
   );
 };
