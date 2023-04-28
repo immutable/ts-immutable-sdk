@@ -2,7 +2,7 @@ export const ResponsiveStyles = {
   width: `clamp(320px, 100vw, 430px)`,
   minHeight: '500px',
   height: '100vh',
-  maxHeight: '650px'
+  maxHeight: '650px',
 };
 
 export const SimpleLayoutStyle = {
