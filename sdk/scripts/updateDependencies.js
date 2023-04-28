@@ -107,7 +107,6 @@ const parseVersion = (version) => {
 
 // Update package.json with the dependencies and peerDependencies
 const main = async () => {
-  // const workspacePackages = getWorkspacePackages();
 
   const cwd = process.cwd();
   const pluginConfiguration = getPluginConfiguration();
