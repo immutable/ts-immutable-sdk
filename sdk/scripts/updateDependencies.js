@@ -52,9 +52,6 @@ const collectDependenciesRecusively = async (workspace) => {
       // This is for the root SDK package.
       devDependencies.forEach((dep) => {
         const depWorkspace = workspace.project.tryWorkspaceByIdent(dep);
-        console.log('DevDependencies', {
-          name: depWorkspace?.manifest.raw.name,
-        });
         if (depWorkspace) {
           processWorkspace(depWorkspace);
         }
@@ -74,9 +71,6 @@ const collectDependenciesRecusively = async (workspace) => {
       );
 
       const depWorkspace = workspace.project.tryWorkspaceByIdent(dep);
-      console.log('Dependencies', {
-        name: depWorkspace?.manifest.raw.name,
-      });
       if (depWorkspace) {
         processWorkspace(depWorkspace);
       }
