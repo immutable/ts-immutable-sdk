@@ -43,6 +43,7 @@ export const SwitchNetwork = () => {
 
   return (
     <SimpleLayout
+      testId="switch-network-view"
       header={<HeaderNavigation showClose transparent={true} />}
       footer={
         <FooterButton

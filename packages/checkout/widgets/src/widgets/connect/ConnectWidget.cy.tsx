@@ -106,4 +106,80 @@ describe('ConnectWidget tests', () => {
       cySmartGet('connect-wallet').should('be.visible');
     });
   });
+
+  describe('SwitchNetwork', () => {
+    it('should not show switch to zkEVM network if already connected to polygon', () => {
+      cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({});
+      cy.stub(Checkout.prototype, 'getNetworkInfo')
+        .as('getNetworkInfoStub')
+        .resolves({
+          name: 'Polygon',
+          chainId: 137,
+        });
+      mountConnectWidgetAndGoToReadyToConnect();
+      cySmartGet('ready-to-connect').should('be.visible');
+      cySmartGet('footer-button').should('have.text', 'Ready to connect');
+      cySmartGet('footer-button').click();
+      cySmartGet('switch-network-view').should('not.exist');
+    });
+
+    it('should show switch to zkEVM network if not connected to polygon', () => {
+      cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({});
+      cy.stub(Checkout.prototype, 'getNetworkInfo')
+        .as('getNetworkInfoStub')
+        .resolves({
+          name: 'Ethereum',
+          chainId: 1,
+        });
+      mountConnectWidgetAndGoToReadyToConnect();
+      cySmartGet('ready-to-connect').should('be.visible');
+      cySmartGet('footer-button').should('have.text', 'Ready to connect');
+      cySmartGet('footer-button').click();
+      cySmartGet('switch-network-view').should('be.visible');
+    });
+
+    it('should show success when ready to connect pressed and network switched', () => {
+      cy.stub(Checkout.prototype, 'connect')
+        .as('connectStub')
+        .resolves({ provider: {} });
+      cy.stub(Checkout.prototype, 'getNetworkInfo')
+        .as('getNetworkInfoStub')
+        .resolves({
+          name: 'Ethereum',
+          chainId: 1,
+        });
+      cy.stub(Checkout.prototype, 'switchNetwork')
+        .as('switchNetworkStub')
+        .resolves({});
+      mountConnectWidgetAndGoToReadyToConnect();
+      cySmartGet('ready-to-connect').should('be.visible');
+      cySmartGet('footer-button').should('have.text', 'Ready to connect');
+      cySmartGet('footer-button').click();
+      cySmartGet('switch-network-view').should('be.visible');
+      cySmartGet('footer-button').click();
+      cySmartGet('success-view').should('be.visible');
+    });
+
+    it('should show try again if network switch was rejected', () => {
+      cy.stub(Checkout.prototype, 'connect')
+        .as('connectStub')
+        .resolves({ provider: {} });
+      cy.stub(Checkout.prototype, 'getNetworkInfo')
+        .as('getNetworkInfoStub')
+        .resolves({
+          name: 'Ethereum',
+          chainId: 1,
+        });
+      cy.stub(Checkout.prototype, 'switchNetwork')
+        .as('switchNetworkStub')
+        .rejects({});
+      mountConnectWidgetAndGoToReadyToConnect();
+      cySmartGet('ready-to-connect').should('be.visible');
+      cySmartGet('footer-button').should('have.text', 'Ready to connect');
+      cySmartGet('footer-button').click();
+      cySmartGet('switch-network-view').should('be.visible');
+      cySmartGet('footer-button').click();
+      cySmartGet('footer-button').should('have.text', 'Try Again');
+    });
+  });
 });
