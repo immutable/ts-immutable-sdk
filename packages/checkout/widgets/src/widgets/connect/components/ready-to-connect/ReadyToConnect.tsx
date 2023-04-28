@@ -21,6 +21,27 @@ export const ReadyToConnect = () => {
   const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
 
   const onConnectClick = useCallback(async () => {
+    const handleConnectViewUpdate = async (provider: Web3Provider) => {
+      const networkInfo = await checkout!.getNetworkInfo({ provider });
+
+      if (networkInfo.chainId !== ChainId.POLYGON) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+          },
+        });
+        return;
+      }
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: ConnectWidgetViews.SUCCESS },
+        },
+      });
+    };
+
     if (checkout) {
       try {
         const connectResult = await checkout.connect({
@@ -38,27 +59,6 @@ export const ReadyToConnect = () => {
       }
     }
   }, [checkout, connectDispatch, viewDispatch, footer.buttonText2]);
-
-  const handleConnectViewUpdate = async (provider: Web3Provider) => {
-    const networkInfo = await checkout!.getNetworkInfo({ provider });
-
-    if (networkInfo.chainId !== ChainId.POLYGON) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: ConnectWidgetViews.SWITCH_NETWORK },
-        },
-      });
-      return;
-    }
-
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type: ConnectWidgetViews.SUCCESS },
-      },
-    });
-  };
 
   return (
     <SimpleLayout
