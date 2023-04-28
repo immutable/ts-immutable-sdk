@@ -22,6 +22,7 @@ const getFileBuild = (inputFilename) => [
     },
     plugins: [
       replace({
+        preventAssignment: true,
         __SDK_VERSION__: pkg.version,
       }),
       typescript({
@@ -69,7 +70,7 @@ export default [
   // Export ES Modules
   ...getFileBuild('index'),
   ...getFileBuild('base'),
-  ...getFileBuild('imx'),
+  ...getFileBuild('immutablex_client'),
   ...getFileBuild('provider'),
   ...getFileBuild('passport'),
   ...getFileBuild('checkout_sdk'),

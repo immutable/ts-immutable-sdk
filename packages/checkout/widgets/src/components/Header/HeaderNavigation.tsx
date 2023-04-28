@@ -53,7 +53,6 @@ export const HeaderNavigation = ({
     <AppHeaderBar
       testId="header-navigation-container"
       sx={HeaderNavigationStyles(transparent)}
-      elevated={false}
     >
       {showBack && (
         <AppHeaderBar.LeftButtCon

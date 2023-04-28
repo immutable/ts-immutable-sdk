@@ -27,7 +27,7 @@ const mockUser: User = {
     email: 'test@immutable.com',
     nickname: 'test',
   },
-  etherKey: '',
+  etherKey: '123',
 };
 
 describe('Passport', () => {
@@ -40,6 +40,7 @@ describe('Passport', () => {
   let magicLoginMock: jest.Mock;
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
+  let loginSilentMock: jest.Mock;
 
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue({
@@ -51,11 +52,13 @@ describe('Passport', () => {
     logoutMock = jest.fn();
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
+    loginSilentMock = jest.fn();
     (AuthManager as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
       logout: logoutMock,
       getUser: getUserMock,
+      loginSilent: loginSilentMock,
       requestRefreshTokenAfterRegistration: requestRefreshTokenMock,
     });
     (MagicAdapter as jest.Mock).mockReturnValue({
@@ -112,6 +115,32 @@ describe('Passport', () => {
     });
   });
 
+  describe('connectImxSilent', () => {
+    it('should get imx provider is user existed and is not expired', async () => {
+      loginSilentMock.mockReturnValue(mockUser);
+      magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
+      requestRefreshTokenMock.mockResolvedValue({
+        accessToken: '123',
+        etherKey: '0x232',
+      });
+
+      await passport.connectImxSilent();
+
+      expect(magicLoginMock).toBeCalledTimes(1);
+      expect(getStarkSigner).toBeCalledTimes(1);
+    });
+
+    it('should return null if user failed to silent login', async () => {
+      loginSilentMock.mockReturnValue(null);
+
+      const provider = await passport.connectImxSilent();
+
+      expect(magicLoginMock).toBeCalledTimes(0);
+      expect(getStarkSigner).toBeCalledTimes(0);
+      expect(provider).toBeNull();
+    });
+  });
+
   describe('loginCallback', () => {
     it('should execute login callback', async () => {
       await passport.loginCallback();
@@ -136,6 +165,14 @@ describe('Passport', () => {
 
       expect(result).toEqual(mockUser.profile);
     });
+
+    it('should return undefined if there is no user', async () => {
+      getUserMock.mockReturnValue(null);
+
+      const result = await passport.getUserInfo();
+
+      expect(result).toEqual(undefined);
+    });
   });
 
   describe('getIdToken', () => {
@@ -146,6 +183,14 @@ describe('Passport', () => {
 
       expect(result).toEqual(mockUser.idToken);
     });
+
+    it('should return undefined if there is no user', async () => {
+      getUserMock.mockReturnValue(null);
+
+      const result = await passport.getIdToken();
+
+      expect(result).toEqual(undefined);
+    });
   });
 
   describe('getAccessToken', () => {
@@ -155,6 +200,14 @@ describe('Passport', () => {
       const result = await passport.getAccessToken();
 
       expect(result).toEqual(mockUser.accessToken);
+    });
+
+    it('should return undefined if there is no user', async () => {
+      getUserMock.mockReturnValue(null);
+
+      const result = await passport.getAccessToken();
+
+      expect(result).toEqual(undefined);
     });
   });
 });

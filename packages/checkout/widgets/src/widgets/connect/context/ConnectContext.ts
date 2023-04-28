@@ -1,15 +1,17 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { createContext } from 'react';
-import { Checkout } from '@imtbl/checkout-sdk-web';
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web';
 
 export interface ConnectState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
+  providerPreference: ConnectionProviders | null;
 }
 
 export const initialConnectState: ConnectState = {
   checkout: null,
   provider: null,
+  providerPreference: null,
 };
 
 export interface ConnectContextState {
@@ -21,11 +23,15 @@ export interface ConnectAction {
   payload: ActionPayload;
 }
 
-type ActionPayload = SetCheckoutPayload | SetProviderPayload;
+type ActionPayload =
+  | SetCheckoutPayload
+  | SetProviderPayload
+  | SetProviderPreferencePayload;
 
 export enum ConnectActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
+  SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
 }
 
 export interface SetCheckoutPayload {
@@ -36,6 +42,11 @@ export interface SetCheckoutPayload {
 export interface SetProviderPayload {
   type: ConnectActions.SET_PROVIDER;
   provider: Web3Provider;
+}
+
+export interface SetProviderPreferencePayload {
+  type: ConnectActions.SET_PROVIDER_PREFERENCE;
+  providerPreference: ConnectionProviders;
 }
 
 export const ConnectContext = createContext<ConnectContextState>({
@@ -59,6 +70,11 @@ export const connectReducer: Reducer<ConnectState, ConnectAction> = (
       return {
         ...state,
         provider: action.payload.provider,
+      };
+    case ConnectActions.SET_PROVIDER_PREFERENCE:
+      return {
+        ...state,
+        providerPreference: action.payload.providerPreference,
       };
     default:
       return state;

@@ -1,8 +1,8 @@
 import { ImmutableX } from '@imtbl/core-sdk';
 import { ImxConfiguration } from 'config';
 
-const ImxAPIFactory = (config: ImxConfiguration) => {
-  const imxClient = new ImmutableX(config.immutableXConfig);
+const ImmutableXClientFactory = (config: ImxConfiguration) => {
+  const immutableXClient = new ImmutableX(config.immutableXConfig);
   const {
     deposit,
     registerOffchain,
@@ -15,9 +15,9 @@ const ImxAPIFactory = (config: ImxConfiguration) => {
     transfer,
     batchNftTransfer,
     ...imx
-  } = imxClient;
+  } = immutableXClient;
 
   return { ...imx };
 };
 
-export { ImxAPIFactory };
+export { ImmutableXClientFactory };

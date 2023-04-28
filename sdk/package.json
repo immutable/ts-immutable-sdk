@@ -6,7 +6,7 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@biom3/design-tokens": "0.1.4-beta",
-    "@biom3/react": "^0.2.4-beta",
+    "@biom3/react": "^0.2.9-beta",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/core-sdk": "^1.1.1-alpha.1",
     "@magic-ext/oidc": "^1.0.1",
@@ -42,7 +42,7 @@
     "@imtbl/checkout-sdk-web": "0.0.0",
     "@imtbl/checkout-ui-types": "0.0.0",
     "@imtbl/config": "0.0.0",
-    "@imtbl/imx": "0.0.0",
+    "@imtbl/immutablex-client": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/provider": "0.0.0",
     "@rollup/plugin-commonjs": "^24.0.1",
@@ -58,7 +58,7 @@
     "typescript": "^4.9.5"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.11.0"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -66,9 +66,9 @@
       "types": "./dist/base.d.ts",
       "import": "./dist/base.js"
     },
-    "./imx": {
-      "types": "./dist/imx.d.ts",
-      "import": "./dist/imx.js"
+    "./immutablex_client": {
+      "types": "./dist/immutablex_client.d.ts",
+      "import": "./dist/immutablex_client.js"
     },
     "./passport": {
       "types": "./dist/passport.d.ts",

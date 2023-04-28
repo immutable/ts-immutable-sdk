@@ -1,14 +1,14 @@
 import { ImxConfiguration } from './config';
-import { ImxAPIFactory } from 'index';
+import { ImmutableXClientFactory } from 'index';
 import { Environment } from '@imtbl/config';
 import { Config } from '@imtbl/core-sdk';
 
-describe('ImxAPIFactory', () => {
-  it('should instantiate a SANDBOX ImxAPIFactory', async () => {
+describe('ImmutableXClientFactory', () => {
+  it('should instantiate a SANDBOX ImmutableXClientFactory', async () => {
     const config = new ImxConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
     });
-    const { assetApi } = ImxAPIFactory(config);
+    const { assetApi } = ImmutableXClientFactory(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);
@@ -17,11 +17,11 @@ describe('ImxAPIFactory', () => {
     );
   });
 
-  it('should instantiate a PRODUCTION ImxAPIFactory', async () => {
+  it('should instantiate a PRODUCTION ImmutableXClientFactory', async () => {
     const config = new ImxConfiguration({
       baseConfig: { environment: Environment.PRODUCTION },
     });
-    const { assetApi } = ImxAPIFactory(config);
+    const { assetApi } = ImmutableXClientFactory(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);
@@ -30,7 +30,7 @@ describe('ImxAPIFactory', () => {
     );
   });
 
-  it('should instantiate a ImxAPIFactory with override and custom version', async () => {
+  it('should instantiate a ImmutableXClientFactory with override and custom version', async () => {
     const sdkVersion = 'ts-immutable-sdk-0.0.1';
     const config = new ImxConfiguration({
       baseConfig: { environment: Environment.PRODUCTION },
@@ -45,7 +45,7 @@ describe('ImxAPIFactory', () => {
         }),
       },
     });
-    const { assetApi } = ImxAPIFactory(config);
+    const { assetApi } = ImmutableXClientFactory(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);
