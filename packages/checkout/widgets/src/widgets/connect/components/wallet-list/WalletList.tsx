@@ -38,7 +38,6 @@ export const WalletList = (props: WalletListProps) => {
   }, [checkout, excludeWallets, walletFilterTypes]);
 
   const onWalletClick = (providerPreference: ConnectionProviders) => {
-    console.log('clicked');
     connectDispatch({
       payload: {
         type: ConnectActions.SET_PROVIDER_PREFERENCE,
