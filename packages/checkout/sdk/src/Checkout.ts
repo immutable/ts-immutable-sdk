@@ -32,6 +32,48 @@ import { CheckoutError, CheckoutErrorType } from './errors';
 export class Checkout {
   private providerPreference: ConnectionProviders | undefined;
 
+  /**
+   * Check if a wallet is connected to the current application without requesting permission from the wallet and hence triggering a connect popup.
+   * @param {CheckConnectionParams} params - The necessary data required to verify a wallet connection status.
+   * @returns Wallet connection status details.
+   * @example
+   * ```
+   * const checkConnectionResult = await checkout.checkIsWalletConnected({
+   *   providerPreference: ConnectionProviders.METAMASK
+   * });
+   *
+   * if(checkConnectionResult.isConnected) {
+   *   // create provider object
+   * } else {
+   *   // redirect somewhere else
+   * }
+   * ```
+   * @throws {@link ErrorType}
+   * ```
+   * // Provider preference is not supported
+   * {
+   *   type: "PROVIDER_PREFERENCE_ERROR",
+   *   ...
+   * }
+   * ```
+   * ```
+   * // Provider request funtion is missing (unsupported provider)
+   * // Fix: checkout sdk needs to create a supported provider (unlikely to occur)
+   * {
+   *   type: "PROVIDER_REQUEST_MISSING_ERROR",
+   *   ...
+   * }
+   * ```
+   * ```
+   * // Check wallet connection request failed
+   * // Fix: unsure, this would be if the wallet threw an error
+   * {
+   *   type: "PROVIDER_REQUEST_FAILED_ERROR",
+   *   data: { rpcMethod: "eth_accounts"},
+   *   ...
+   * }
+   * ```
+   */
   public async checkIsWalletConnected(
     params: CheckConnectionParams
   ): Promise<CheckConnectionResult> {
@@ -242,12 +284,13 @@ export class Checkout {
    * });
    * ```
    * @throws {@link ErrorType}
-   * // Error fetching allowed-network list
    * ```
+   * // Error fetching allowed-network list
    * {
    *   type:"API_ERROR",
    *   ...
    * }
+   * ```
    */
   public async getNetworkAllowList(
     params: GetNetworkAllowListParams
@@ -268,12 +311,13 @@ export class Checkout {
    * });
    * ```
    * @throws {@link ErrorType}
-   * // Error fetching allowed-tokens list
    * ```
+   * // Error fetching allowed-tokens list
    * {
    *   type:"API_ERROR",
    *   ...
    * }
+   * ```
    */
   public async getTokenAllowList(
     params: GetTokenAllowListParams
@@ -293,12 +337,13 @@ export class Checkout {
    * });
    * ```
    * @throws {@link ErrorType}
-   * // Error fetching allowed-wallets list
    * ```
+   * // Error fetching allowed-wallets list
    * {
    *   type:"API_ERROR",
    *   ...
    * }
+   * ```
    */
   public async getWalletAllowList(
     params: GetWalletAllowListParams
