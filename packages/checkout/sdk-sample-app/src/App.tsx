@@ -1,30 +1,15 @@
-import './App.css';
-import Connect from './components/connect/connect';
-import { useState } from 'react';
-import SwitchNetwork from './components/switchNetwork/switchNetwork';
-import { Web3Provider } from '@ethersproject/providers';
-import GetBalance from './components/getBalance/getBalance';
-import GetAllBalances from './components/getAllBalances/getAllBalances';
-import CheckConnection from './components/checkConnection/checkConnection';
-import GetAllowedLists from './components/allowedLists/getAllowedList';
+import { Link } from 'react-router-dom';
 
-function App() {
-  const [provider, setProvider] = useState<Web3Provider>();
-
+export default function App() {
   return (
     <div>
-      <main className="checkout-sdk-app">
-        <h1>Checkout Sample App</h1>
-        <p>This is a react app which implements Immutable's Checkout</p>
-        <CheckConnection />
-        <Connect setProvider={setProvider} />
-        <SwitchNetwork provider={provider} />
-        <GetBalance provider={provider} />
-        <GetAllBalances provider={provider} />
-        <GetAllowedLists provider={provider} />
-      </main>
+      <nav>
+        <ul>
+          <li>
+            <Link to="/connect">Connect</Link>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 }
-
-export default App;
