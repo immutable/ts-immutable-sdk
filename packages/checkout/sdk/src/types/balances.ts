@@ -3,24 +3,46 @@ import { BigNumber } from 'ethers';
 import { ChainId } from './network';
 import { TokenInfo } from './token';
 
+/**
+ * Interface representing the parameters for {@link Checkout.getBalance}.
+ * @property {@link Web3Provider} provider - The provider to connect to the network.
+ * @property {string} walletAddress - The wallet address.
+ * @property {string | undefined} contractAddress - The contract address of the token.
+ */
 export interface GetBalanceParams {
   provider: Web3Provider;
   walletAddress: string;
   contractAddress?: string;
 }
 
+/**
+ * Interface representing the result of {@link Checkout.getBalance}.
+ * @property {BigNumber} balance - The balance of the wallet for the token.
+ * @property {string} formattedBalance - The formatted balance of the wallet for the token.
+ * @property {TokenInfo} token - The token information.
+ */
 export interface GetBalanceResult {
   balance: BigNumber;
   formattedBalance: string;
   token: TokenInfo;
 }
 
+/**
+ * Interface representing the parameters for {@link Checkout.getAllBalances}.
+ * @property {Web3Provider} provider - The provider to connect to the network.
+ * @property {string} walletAddress - The wallet address.
+ * @property {ChainId} chainId - The ID of the network.
+ */
 export interface GetAllBalancesParams {
   provider: Web3Provider;
   walletAddress: string;
   chainId: ChainId;
 }
 
+/**
+ * Interface representing the result of {@link Checkout.getAllBalances}.
+ * @property {GetBalanceResult[]} balances - The array of balances of the wallet for every token.
+ */
 export interface GetAllBalancesResult {
   balances: GetBalanceResult[];
 }
