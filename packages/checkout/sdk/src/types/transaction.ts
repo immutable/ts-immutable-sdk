@@ -2,7 +2,7 @@ import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
 
 /**
  * Interface representing the parameters for {@link Checkout.sendTransaction}.
- * @property {Web3Provider} provider - The provider to connect to the Ethereum network.
+ * @property {Web3Provider} provider - The provider to connect to the network.
  * @property {Transaction} transaction - The transaction to send.
  */
 export interface SendTransactionParams {
@@ -19,7 +19,7 @@ export interface SendTransactionResult {
 }
 
 /**
- * Interface representing an Ethereum transaction.
+ * Interface representing a blockchain transaction.
  * @property {string} nonce - The transaction nonce.
  * @property {string} gasPrice - The gas price of the transaction.
  * @property {string} gas - The gas limit for the transaction.

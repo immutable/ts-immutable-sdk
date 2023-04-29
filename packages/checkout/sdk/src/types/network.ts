@@ -82,7 +82,7 @@ export const ChainIdNetworkMap = {
 
 /**
  * Interface representing the parameters for {@link Checkout.switchNetwork}.
- * @property {Web3Provider} provider - The provider to connect to the Ethereum network.
+ * @property {Web3Provider} provider - The provider to connect to the network.
  * @property {ChainId} chainId - The ID of the network to switch to.
  */
 export interface SwitchNetworkParams {
@@ -101,7 +101,7 @@ export interface SwitchNetworkResult {
 
 /**
  * * Interface representing the parameters for {@link Checkout.getNetworkInfo}.
- * @property {Web3Provider} provider - The provider to connect to the Ethereum network.
+ * @property {Web3Provider} provider - The provider to connect to the network.
  */
 export interface GetNetworkParams {
   provider: Web3Provider;
