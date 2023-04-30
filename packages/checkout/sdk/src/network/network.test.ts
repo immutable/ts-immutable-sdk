@@ -74,7 +74,6 @@ describe('network functions', () => {
       });
 
       const switchNetworkResult = await switchWalletNetwork(
-        ConnectionProviders.METAMASK,
         provider,
         ChainId.ETHEREUM
       );
@@ -99,24 +98,16 @@ describe('network functions', () => {
     });
 
     it('should make request for the user to switch network Polygon', async () => {
-      (Web3Provider as unknown as jest.Mock)
-        .mockReturnValueOnce({
-          provider: providerMock,
-          getNetwork: async () => ethNetworkInfo,
-        })
-        .mockReturnValueOnce({
-          provider: {
-            request: jest.fn(),
-          },
-          getNetwork: async () => polygonNetworkInfo,
-        });
+      (Web3Provider as unknown as jest.Mock).mockReturnValueOnce({
+        provider: providerMock,
+        getNetwork: async () => polygonNetworkInfo,
+      });
 
       const provider = await connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK,
       });
 
       const switchNetworkResult = await switchWalletNetwork(
-        ConnectionProviders.METAMASK,
         provider,
         ChainId.POLYGON
       );
@@ -129,6 +120,7 @@ describe('network functions', () => {
           },
         ],
       });
+
       expect(switchNetworkResult.network).toEqual({
         name: 'Polygon',
         chainId: 137,
@@ -151,11 +143,7 @@ describe('network functions', () => {
       });
 
       await expect(
-        switchWalletNetwork(
-          ConnectionProviders.METAMASK,
-          provider,
-          56 as ChainId
-        )
+        switchWalletNetwork(provider, 56 as ChainId)
       ).rejects.toThrow(
         new CheckoutError(
           'Chain:56 is not a supported chain',
@@ -185,11 +173,7 @@ describe('network functions', () => {
       });
 
       await expect(
-        switchWalletNetwork(
-          ConnectionProviders.METAMASK,
-          provider,
-          ChainId.POLYGON
-        )
+        switchWalletNetwork(provider, ChainId.POLYGON)
       ).rejects.toThrow(
         new CheckoutError(
           'User cancelled switch network request',
@@ -214,11 +198,7 @@ describe('network functions', () => {
       delete provider.provider.request;
 
       await expect(
-        switchWalletNetwork(
-          ConnectionProviders.METAMASK,
-          provider,
-          ChainId.POLYGON
-        )
+        switchWalletNetwork(provider, ChainId.POLYGON)
       ).rejects.toThrow(
         new CheckoutError(
           'Incompatible provider',
@@ -249,11 +229,7 @@ describe('network functions', () => {
         providerPreference: ConnectionProviders.METAMASK,
       });
 
-      await switchWalletNetwork(
-        ConnectionProviders.METAMASK,
-        provider,
-        ChainId.POLYGON
-      );
+      await switchWalletNetwork(provider, ChainId.POLYGON);
 
       expect(provider.provider.request).toHaveBeenCalledWith({
         method: WALLET_ACTION.ADD_NETWORK,

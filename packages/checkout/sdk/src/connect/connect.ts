@@ -99,11 +99,14 @@ async function getMetaMaskProvider(): Promise<Web3Provider> {
     { type: CheckoutErrorType.METAMASK_PROVIDER_ERROR }
   );
 
-  if (!provider || !provider.request)
+  if (!provider || !provider.request) {
     throw new CheckoutError(
       'No MetaMask provider installed.',
       CheckoutErrorType.METAMASK_PROVIDER_ERROR
     );
+  }
 
-  return new Web3Provider(provider);
+  // For more info about the 'any' param checkout
+  // https://github.com/ethers-io/ethers.js/issues/866
+  return new Web3Provider(provider, 'any');
 }

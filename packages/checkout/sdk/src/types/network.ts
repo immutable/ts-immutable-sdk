@@ -66,8 +66,8 @@ export interface SwitchNetworkParams {
 
 export interface SwitchNetworkResult {
   network: NetworkInfo;
-  provider: Web3Provider;
 }
+
 export interface GetNetworkParams {
   provider: Web3Provider;
 }
