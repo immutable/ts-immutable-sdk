@@ -15,8 +15,10 @@ export default function ConnectWidget() {
     <div>
       <Heading>Connect</Heading>
       <Body>
-        This page demonstrates how to utilise the Checkout SDK in order to
-        replicate the features of the Connect Widget.
+        Manage connections, switch networks, and access vital wallet/SDK
+        information. Monitor wallet balances, retrieve balance data, and manage
+        allowed lists for networks, wallets, and tokens, providing a streamlined
+        experience for your digital asset needs.
       </Body>
 
       <Divider
