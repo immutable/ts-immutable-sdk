@@ -53,16 +53,16 @@ describe('getWalletAllowList', () => {
       exclude: [],
       result: [
         {
-          connectionProvider: 'metamask',
-          icon: 'some-icon-url',
-          name: 'MetaMask',
-          description: 'complete web3 wallet solution',
-        },
-        {
           connectionProvider: 'passport',
           icon: 'pp-icon',
           name: 'Passport',
           description: 'Web3 with your email!',
+        },
+        {
+          connectionProvider: 'gamestop',
+          icon: 'gme-icon',
+          name: 'GameStop',
+          description: 'Never stopping the game!',
         },
       ],
     },
@@ -78,10 +78,10 @@ describe('getWalletAllowList', () => {
           description: 'complete web3 wallet solution',
         },
         {
-          connectionProvider: 'gamestop',
-          icon: 'gme-icon',
-          name: 'GameStop',
-          description: 'Never stopping the game!',
+          connectionProvider: 'passport',
+          icon: 'pp-icon',
+          name: 'Passport',
+          description: 'Web3 with your email!',
         },
       ],
     },
