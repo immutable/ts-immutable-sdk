@@ -2792,6 +2792,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/sdk@workspace:sdk"
   dependencies:
+    "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk-web": 0.0.0
     "@imtbl/checkout-ui-types": 0.0.0
     "@imtbl/config": 0.0.0
@@ -2813,6 +2814,8 @@ __metadata:
     ethers: ^5.7.2
     magic-sdk: ^13.3.1
     oidc-client-ts: ^2.2.1
+    react: ^18.2.0
+    react-dom: ^18.2.0
     rollup: ^3.17.2
     rollup-plugin-dts: ^5.3.0
     semver: ^7.4.0
