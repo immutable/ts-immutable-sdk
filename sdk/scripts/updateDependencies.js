@@ -54,6 +54,9 @@ const collectDependenciesRecusively = async (sdkWorkspace) => {
       }
     });
 
+    // If sdkpackage, exit early
+    if (manifest.raw.name === SDK_PACKAGE) return;
+
     // UpdateVersion for dependencies
     dependencies.forEach((dep) => {
       updateVersion(
