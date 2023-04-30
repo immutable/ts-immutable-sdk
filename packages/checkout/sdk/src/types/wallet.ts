@@ -19,7 +19,7 @@ export interface WalletFilter {
 }
 
 /**
- * Interface representing the parameters for {@link Checkout.getWalletsAllowList}.
+ * Interface representing the parameters for {@link Checkout.getWalletAllowList}.
  * @property {WalletFilterTypes} type - The type of wallets to filter by.
  * @property {WalletFilter[]} [exclude] - An optional list of wallet filters to exclude from the allowed wallets list.
  */
@@ -43,7 +43,7 @@ export interface WalletInfo {
 }
 
 /**
- * Interface representing the result of {@link Checkout.getWalletsAllowList}.
+ * Interface representing the result of {@link Checkout.getWalletAllowList}.
  * @property {WalletInfo[]} wallets - A list of {@link WalletInfo} objects representing the allowed wallets.
  */
 export interface GetWalletAllowListResult {

@@ -37,7 +37,7 @@ export class Checkout {
    * @param {CheckConnectionParams} params - The necessary data required to verify a wallet connection status.
    * @returns Wallet connection status details.
    * @example
-   * ```
+   * ```typescript
    * const checkConnectionResult = await checkout.checkIsWalletConnected({
    *   providerPreference: ConnectionProviders.METAMASK
    * });
@@ -49,14 +49,14 @@ export class Checkout {
    * }
    * ```
    * @throws {@link ErrorType}
-   * ```
+   * ```typescript
    * // Provider preference is not supported
    * {
    *   type: "PROVIDER_PREFERENCE_ERROR",
    *   ...
    * }
    * ```
-   * ```
+   * ```typescript
    * // Provider request funtion is missing (unsupported provider)
    * // Fix: checkout sdk needs to create a supported provider (unlikely to occur)
    * {
@@ -64,7 +64,7 @@ export class Checkout {
    *   ...
    * }
    * ```
-   * ```
+   * ```typescript
    * // Check wallet connection request failed
    * // Fix: unsure, this would be if the wallet threw an error
    * {
@@ -85,34 +85,34 @@ export class Checkout {
    * @param {ConnectParams} params - The necessary data required to establish a connection with a wallet provider.
    * @returns Wallet provider and current network information.
    * @example
-   * ```
+   * ```typescript
    * const provider = await checkout.connect({
    *   providerPreference: ConnectionProviders.METAMASK
    * });
    * ```
    * @throws {@link ErrorType}
-   * ```
+   * ```typescript
    * // Provider preference is not supported
    * {
    *   type: "PROVIDER_PREFERENCE_ERROR",
    *   ...
    * }
    * ```
-   * ```
+   * ```typescript
    * // Problem with detecting MetaMask provider
    * {
    *   type: "METAMASK_PROVIDER_ERROR",
    *   ...
    * }
    * ```
-   * ```
+   * ```typescript
    * // Provider request funtion is missing (unsupported provider)
    * {
    *   type: "PROVIDER_REQUEST_MISSING_ERROR",
    *   ...
    * }
    * ```
-   * ```
+   * ```typescript
    * // User rejected connection request
    * {
    *   type: "USER_REJECTED_REQUEST_ERROR",
@@ -136,35 +136,35 @@ export class Checkout {
    * @param {SwitchNetworkParams} params - The necessary data required to switch network.
    * @returns The new network information.
    * @example
-   * ```
+   * ```typescript
    * const switchNetworkResponse = await checkout.switchNetwork({
    *  provider,
    *  chainId
    * });
    * ```
    * @throws {@link ErrorType}
-   * ```
+   * ```typescript
    * // ChainId not supported by Checkout
    * {
    *   type: "CHAIN_NOT_SUPPORTED_ERROR",
    *   ...
    * }
    * ```
-   * ```
+   * ```typescript
    * // Provider is not supported
    * {
    *   type: "PROVIDER_REQUEST_MISSING_ERROR",
    *   ...
    * }
    * ```
-   * ```
+   * ```typescript
    * // User rejected switch network request
    * {
    *   type: "USER_REJECTED_REQUEST_ERROR",
    *   ...
    * }
    * ```
-   * ```
+   * ```typescript
    * // User rejected add network request
    * {
    *   type: "USER_REJECTED_REQUEST_ERROR",
@@ -194,21 +194,21 @@ export class Checkout {
    * @param {GetBalanceParams} params - The necessary data required to fetch the wallet balance.
    * @returns Native token balance for the given wallet.
    * @example
-   * ```
+   * ```typescript
    * const balanceResult = await checkout.getBalance({
    *   provider,
    *   walletAddress
    * });
    * ```
    * @throws {@link ErrorType}
-   * ```
+   * ```typescript
    * // When current connected network in not-supported
    * {
    *   type: "CHAIN_NOT_SUPPORTED_ERROR",
    *   ...
    * }
    * ```
-   * ```
+   * ```typescript
    * // Other errors
    * {
    *   type: "GET_BALANCE_ERROR",
@@ -232,7 +232,7 @@ export class Checkout {
    * @param {GetAllBalancesParams} params - The necessary data required to fetch all the wallet balances.
    * @returns List of tokens balance for the given wallet.
    * @example
-   * ```
+   * ```typescript
    * const getAllBalancesResult = await checkout.getAllBalances({
    *   provider,
    *   walletAddress,
@@ -240,21 +240,21 @@ export class Checkout {
    * });
    * ```
    * @throws {@link ErrorType}
-   * ```
+   * ```typescript
    * // When current connected network in not-supported
    * {
    *   type: "CHAIN_NOT_SUPPORTED_ERROR",
    *   ...
    * }
    * ```
-   * ```
+   * ```typescript
    * // Error with provider
    * {
    *   type: "PROVIDER_REQUEST_MISSING_ERROR",
    *   ...
    * }
    * ```
-   * ```
+   * ```typescript
    * // Error fetching allowed-tokens list
    * {
    *   type:"API_ERROR",
@@ -277,14 +277,14 @@ export class Checkout {
    * @param {GetNetworkAllowListParams} params - The necessary data required to fetch the list of available networks.
    * @returns List of networks.
    * @example
-   * ```
+   * ```typescript
    * const allowedNetworks = await checkoutSDK.getNetworkAllowList({
    *  type: walletFilter.ALL,
    *  exclude: [{chainId: ChainId.GOERLI}, ...],
    * });
    * ```
    * @throws {@link ErrorType}
-   * ```
+   * ```typescript
    * // Error fetching allowed-network list
    * {
    *   type:"API_ERROR",
@@ -303,7 +303,7 @@ export class Checkout {
    * @param {GetTokenAllowListParams} params - The necessary data required to fetch the list of allowed tokens.
    * @returns List of allowed tokens.
    * @example
-   * ```
+   * ```typescript
    * const allowedNetworks = await checkoutSDK.getTokenAllowList({
    *  type: TokenFilterTypes.SWAP,
    *  chainID: ChainId.ZKEVM,
@@ -311,7 +311,7 @@ export class Checkout {
    * });
    * ```
    * @throws {@link ErrorType}
-   * ```
+   * ```typescript
    * // Error fetching allowed-tokens list
    * {
    *   type:"API_ERROR",
@@ -330,14 +330,14 @@ export class Checkout {
    * @param {GetWalletAllowListParams} params - The necessary data required to fetch the list of allowed wallets.
    * @returns List of allowed wallets.
    * @example
-   * ```
+   * ```typescript
    * const allowedNetworks = await checkoutSDK.getWalletAllowList({
    *   type: WalletFilterTypes.ALL,
    *   exclude: [{connectionProvider: ConnectionProviders.PASSPORT}, ...],
    * });
    * ```
    * @throws {@link ErrorType}
-   * ```
+   * ```typescript
    * // Error fetching allowed-wallets list
    * {
    *   type:"API_ERROR",
@@ -356,11 +356,11 @@ export class Checkout {
    * @param {SendTransactionParams} params - The necessary data required to send a transaction.
    * @returns Transaction response.
    * @example
-   * ```
+   * ```typescript
    * const transactionResult = await checkoutSDK.sendTransaction({ provider, transaction });
    * ```
    * @throws {@link ErrorType}
-   * ```
+   * ```typescript
    * // Generic transaction error.
    * {
    *   type:"TRANSACTION_ERROR",
@@ -381,11 +381,11 @@ export class Checkout {
    * @param {GetNetworkParams} params - The necessary data required to get the current network information.
    * @returns Network details.
    * @example
-   * ```
+   * ```typescript
    * const transactionResult = await checkoutSDK.getNetworkInfo({ provider });
    * ```
    * @throws {@link ErrorType}
-   * ```
+   * ```typescript
    * // Generic transaction error.
    * {
    *   type:"GET_NETWORK_INFO_ERROR",
