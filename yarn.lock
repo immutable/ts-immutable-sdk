@@ -2442,9 +2442,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@imtbl/bridge-sdk@workspace:packages/internal/bridge":
+"@imtbl/bridge-sdk@workspace:packages/internal/bridge/sdk":
   version: 0.0.0-use.local
-  resolution: "@imtbl/bridge-sdk@workspace:packages/internal/bridge"
+  resolution: "@imtbl/bridge-sdk@workspace:packages/internal/bridge/sdk"
   dependencies:
     "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
