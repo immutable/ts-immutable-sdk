@@ -22,7 +22,7 @@ const exports = {
   '.': {
     types: './dist/config.d.ts',
     import: './dist/config.js',
-    require: './dist/index.cjs',
+    // require: './dist/index.cjs',
   },
 };
 
