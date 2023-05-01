@@ -20,6 +20,32 @@ import { CheckoutError, CheckoutErrorType } from '../errors';
 import { Web3Provider } from '@ethersproject/providers';
 
 let windowSpy: any;
+const providerMock = {
+  request: jest.fn(),
+};
+const ethNetworkInfo = {
+  name: 'Ethereum',
+  chainId: ChainId.ETHEREUM,
+  nativeCurrency: {
+    name: 'Ethereum',
+    symbol: 'ETH',
+    decimals: 18,
+  },
+};
+const polygonNetworkInfo = {
+  name: 'Polygon',
+  chainId: ChainId.POLYGON,
+  nativeCurrency: {
+    name: 'MATIC',
+    symbol: 'MATIC',
+    decimals: 18,
+  },
+};
+
+jest.mock('@ethersproject/providers', () => ({
+  Web3Provider: jest.fn(),
+}));
+
 describe('network functions', () => {
   describe('switchWalletNetwork()', () => {
     beforeEach(() => {
@@ -38,11 +64,17 @@ describe('network functions', () => {
     });
 
     it('should make request for the user to switch network', async () => {
+      (Web3Provider as unknown as jest.Mock).mockReturnValue({
+        provider: providerMock,
+        getNetwork: async () => ethNetworkInfo,
+      });
+
       const provider = await connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK,
       });
 
       const switchNetworkResult = await switchWalletNetwork(
+        ConnectionProviders.METAMASK,
         provider,
         ChainId.ETHEREUM
       );
@@ -55,25 +87,36 @@ describe('network functions', () => {
           },
         ],
       });
-      expect(switchNetworkResult).toEqual({
-        network: {
+      expect(switchNetworkResult.network).toEqual({
+        name: 'Ethereum',
+        chainId: 1,
+        nativeCurrency: {
           name: 'Ethereum',
-          chainId: 1,
-          nativeCurrency: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
+          symbol: 'ETH',
+          decimals: 18,
         },
       });
     });
 
     it('should make request for the user to switch network Polygon', async () => {
+      (Web3Provider as unknown as jest.Mock)
+        .mockReturnValueOnce({
+          provider: providerMock,
+          getNetwork: async () => ethNetworkInfo,
+        })
+        .mockReturnValueOnce({
+          provider: {
+            request: jest.fn(),
+          },
+          getNetwork: async () => polygonNetworkInfo,
+        });
+
       const provider = await connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK,
       });
 
       const switchNetworkResult = await switchWalletNetwork(
+        ConnectionProviders.METAMASK,
         provider,
         ChainId.POLYGON
       );
@@ -86,26 +129,33 @@ describe('network functions', () => {
           },
         ],
       });
-      expect(switchNetworkResult).toEqual({
-        network: {
-          name: 'Polygon',
-          chainId: 137,
-          nativeCurrency: {
-            name: 'MATIC',
-            symbol: 'MATIC',
-            decimals: 18,
-          },
+      expect(switchNetworkResult.network).toEqual({
+        name: 'Polygon',
+        chainId: 137,
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC',
+          decimals: 18,
         },
       });
     });
 
     it('should throw an error if the network is not in our whitelist', async () => {
+      (Web3Provider as unknown as jest.Mock).mockReturnValueOnce({
+        provider: providerMock,
+        getNetwork: async () => ethNetworkInfo,
+      });
+
       const provider = await connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK,
       });
 
       await expect(
-        switchWalletNetwork(provider, 56 as ChainId)
+        switchWalletNetwork(
+          ConnectionProviders.METAMASK,
+          provider,
+          56 as ChainId
+        )
       ).rejects.toThrow(
         new CheckoutError(
           'Chain:56 is not a supported chain',
@@ -115,6 +165,11 @@ describe('network functions', () => {
     });
 
     it('should throw an error if the user rejects the switch network request', async () => {
+      (Web3Provider as unknown as jest.Mock).mockReturnValue({
+        provider: providerMock,
+        getNetwork: async () => ethNetworkInfo,
+      });
+
       windowSpy.mockImplementation(() => ({
         ethereum: {
           request: jest
@@ -130,7 +185,11 @@ describe('network functions', () => {
       });
 
       await expect(
-        switchWalletNetwork(provider, ChainId.POLYGON)
+        switchWalletNetwork(
+          ConnectionProviders.METAMASK,
+          provider,
+          ChainId.POLYGON
+        )
       ).rejects.toThrow(
         new CheckoutError(
           'User cancelled switch network request',
@@ -155,57 +214,11 @@ describe('network functions', () => {
       delete provider.provider.request;
 
       await expect(
-        switchWalletNetwork(provider, ChainId.POLYGON)
-      ).rejects.toThrow(
-        new CheckoutError(
-          'Incompatible provider',
-          CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
+        switchWalletNetwork(
+          ConnectionProviders.METAMASK,
+          provider,
+          ChainId.POLYGON
         )
-      );
-    });
-
-    it('should throw an error if the user rejects the switch network request', async () => {
-      windowSpy.mockImplementation(() => ({
-        ethereum: {
-          request: jest
-            .fn()
-            .mockResolvedValueOnce({})
-            .mockRejectedValue(new Error()),
-        },
-        removeEventListener: () => {},
-      }));
-
-      const provider = await connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
-
-      await expect(
-        switchWalletNetwork(provider, ChainId.POLYGON)
-      ).rejects.toThrow(
-        new CheckoutError(
-          'User cancelled switch network request',
-          CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
-        )
-      );
-    });
-
-    it('should throw an error if the provider does not have a request function', async () => {
-      windowSpy.mockImplementation(() => ({
-        ethereum: {
-          request: jest.fn().mockResolvedValueOnce({}),
-        },
-        removeEventListener: () => {},
-      }));
-
-      const provider = await connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
-
-      // remove request function from provider
-      delete provider.provider.request;
-
-      await expect(
-        switchWalletNetwork(provider, ChainId.POLYGON)
       ).rejects.toThrow(
         new CheckoutError(
           'Incompatible provider',
@@ -215,18 +228,34 @@ describe('network functions', () => {
     });
 
     it('should request the user to add a new network if their wallet does not already have it', async () => {
-      const mockProvider = {
-        getNetwork: jest.fn().mockResolvedValue({ chainId: 137 }),
-        provider: {
-          request: jest
-            .fn()
-            .mockRejectedValueOnce({ code: 4902 })
-            .mockResolvedValue({}),
-        },
-      } as any as Web3Provider;
+      (Web3Provider as unknown as jest.Mock)
+        .mockReturnValueOnce({
+          provider: {
+            request: jest
+              .fn()
+              .mockResolvedValueOnce({})
+              .mockRejectedValueOnce({ code: 4902 })
+              .mockResolvedValueOnce({}),
+          },
+          getNetwork: async () => polygonNetworkInfo,
+        })
+        .mockReturnValueOnce({
+          provider: {
+            request: jest.fn().mockResolvedValueOnce({}),
+          },
+          getNetwork: async () => polygonNetworkInfo,
+        });
+      const provider = await connectWalletProvider({
+        providerPreference: ConnectionProviders.METAMASK,
+      });
 
-      await switchWalletNetwork(mockProvider, ChainId.POLYGON);
-      expect(mockProvider.provider.request).toHaveBeenCalledWith({
+      await switchWalletNetwork(
+        ConnectionProviders.METAMASK,
+        provider,
+        ChainId.POLYGON
+      );
+
+      expect(provider.provider.request).toHaveBeenCalledWith({
         method: WALLET_ACTION.ADD_NETWORK,
         params: [
           {

@@ -95,7 +95,7 @@ describe('HeaderNavigation', () => {
       cySmartGet('header-navigation-container').should(
         'have.css',
         'background-color',
-        'rgb(240, 240, 240)'
+        'rgb(236, 236, 236)'
       );
     });
 

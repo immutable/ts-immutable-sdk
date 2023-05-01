@@ -71,8 +71,8 @@ export async function completeEthWithdrawalAction({
 }: CompleteEthWithdrawalActionParams) {
   await validateChain(ethSigner, config.immutableXConfig);
 
-  const starkExConfig = config.immutableXConfig;
-  const assetType = await getEncodeAssetInfo('asset', 'ETH', starkExConfig);
+  const imxConfig = config.immutableXConfig;
+  const assetType = await getEncodeAssetInfo('asset', 'ETH', imxConfig);
 
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
@@ -85,14 +85,14 @@ export async function completeEthWithdrawalAction({
       ethSigner,
       assetType.asset_type,
       starkPublicKey,
-      starkExConfig
+      imxConfig
     );
   } else {
     return executeWithdrawEth(
       ethSigner,
       assetType.asset_type,
       starkPublicKey,
-      starkExConfig
+      imxConfig
     );
   }
 }

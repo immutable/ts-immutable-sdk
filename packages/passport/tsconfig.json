@@ -3,7 +3,7 @@
     "baseUrl": "./src",
     "outDir": "./dist",
     "rootDirs": ["src"],
-    "target": "esnext",
+    "target": "es2022",
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
@@ -18,5 +18,10 @@
     "skipLibCheck": true
   },
   "include": ["src", "src/types.ts"],
-  "exclude": ["node_modules", "dist", "src/modules/provider/sample-app", "src/modules/checkout"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/modules/provider/sample-app",
+    "src/modules/checkout"
+  ]
 }

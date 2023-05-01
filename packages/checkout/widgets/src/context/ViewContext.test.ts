@@ -13,7 +13,7 @@ describe('view-context', () => {
     const updateViewPayload: UpdateViewPayload = {
       type: ViewActions.UPDATE_VIEW,
       view: {
-        type: ConnectWidgetViews.CHOOSE_NETWORKS,
+        type: ConnectWidgetViews.READY_TO_CONNECT,
       },
     };
 
@@ -27,9 +27,9 @@ describe('view-context', () => {
     const state = viewReducer(initialViewState, { payload: updateViewPayload });
     expect(state).toEqual({
       view: {
-        type: ConnectWidgetViews.CHOOSE_NETWORKS,
+        type: ConnectWidgetViews.READY_TO_CONNECT,
       },
-      history: [{ type: ConnectWidgetViews.CHOOSE_NETWORKS }],
+      history: [{ type: ConnectWidgetViews.READY_TO_CONNECT }],
     });
   });
 
@@ -75,7 +75,7 @@ describe('view-context', () => {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: ConnectWidgetViews.OTHER_WALLETS,
+            type: ConnectWidgetViews.READY_TO_CONNECT,
           },
         },
       }
@@ -83,11 +83,11 @@ describe('view-context', () => {
 
     expect(state).toEqual({
       view: {
-        type: ConnectWidgetViews.OTHER_WALLETS,
+        type: ConnectWidgetViews.READY_TO_CONNECT,
       },
       history: [
         { type: ConnectWidgetViews.CONNECT_WALLET },
-        { type: ConnectWidgetViews.OTHER_WALLETS },
+        { type: ConnectWidgetViews.READY_TO_CONNECT },
       ],
     });
   });
@@ -96,12 +96,12 @@ describe('view-context', () => {
     const state = viewReducer(
       {
         view: {
-          type: ConnectWidgetViews.OTHER_WALLETS,
+          type: ConnectWidgetViews.READY_TO_CONNECT,
         },
         history: [
-          { type: ConnectWidgetViews.OTHER_WALLETS },
+          { type: ConnectWidgetViews.READY_TO_CONNECT },
           { type: ConnectWidgetViews.CONNECT_WALLET },
-          { type: ConnectWidgetViews.CHOOSE_NETWORKS },
+          { type: ConnectWidgetViews.SUCCESS },
         ],
       },
       {
@@ -116,7 +116,7 @@ describe('view-context', () => {
         type: ConnectWidgetViews.CONNECT_WALLET,
       },
       history: [
-        { type: ConnectWidgetViews.OTHER_WALLETS },
+        { type: ConnectWidgetViews.READY_TO_CONNECT },
         { type: ConnectWidgetViews.CONNECT_WALLET },
       ],
     });
@@ -126,20 +126,20 @@ describe('view-context', () => {
     const state = viewReducer(
       {
         view: {
-          type: ConnectWidgetViews.CHOOSE_NETWORKS,
+          type: ConnectWidgetViews.READY_TO_CONNECT,
         },
-        history: [{ type: ConnectWidgetViews.CHOOSE_NETWORKS }],
+        history: [{ type: ConnectWidgetViews.READY_TO_CONNECT }],
       },
       { payload: { type: ViewActions.GO_BACK } }
     );
 
     expect(state).toEqual({
       view: {
-        type: ConnectWidgetViews.CHOOSE_NETWORKS,
+        type: ConnectWidgetViews.READY_TO_CONNECT,
       },
       history: [
         {
-          type: ConnectWidgetViews.CHOOSE_NETWORKS,
+          type: ConnectWidgetViews.READY_TO_CONNECT,
         },
       ],
     });

@@ -15,16 +15,16 @@
   },
   "dependencies": {
     "@biom3/design-tokens": "0.1.4-beta",
-    "@biom3/react": "^0.2.4-beta",
+    "@biom3/react": "^0.2.9-beta",
     "@ethersproject/providers": "^5.7.2",
+    "@imtbl/checkout-sdk-web": "0.0.0",
+    "@imtbl/checkout-ui-types": "0.0.0",
     "ethers": "^5.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.10.0"
   },
   "devDependencies": {
-    "@imtbl/checkout-sdk-web": "0.0.0",
-    "@imtbl/checkout-ui-types": "0.0.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",

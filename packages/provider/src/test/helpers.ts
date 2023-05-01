@@ -88,7 +88,7 @@ export const generateSigners = async (privateKey: string): Promise<Signers> => {
   } as unknown as Signer;
 
   // L2 credentials
-  const starkExSigner = {
+  const starkSigner = {
     signMessage: async (message: string) => {
       return message + starkKey;
     },
@@ -97,6 +97,6 @@ export const generateSigners = async (privateKey: string): Promise<Signers> => {
 
   return {
     ethSigner,
-    starkExSigner,
+    starkSigner,
   } as Signers;
 };
