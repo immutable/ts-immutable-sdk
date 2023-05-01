@@ -1,10 +1,3 @@
-export const LoadingViewStyles = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: '100%',
-};
-
 export const LoadingBoxStyles = {
   display: 'flex',
   flexDirection: 'column',

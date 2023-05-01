@@ -1,10 +1,7 @@
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
-import { Box } from '@biom3/react';
-import {
-  SuccessViewStyles,
-} from './SuccessViewStyles';
 import { FooterButton } from '../Footer/FooterButton';
 import { SuccessBox } from './SuccessBox';
+import { CenteredBoxContent } from '../CenteredBoxContent/CenteredBoxContent';
 
 export interface SuccessViewProps {
   successText: string;
@@ -41,9 +38,9 @@ export const SuccessView = ({
         />
       }
     >
-      <Box sx={SuccessViewStyles} testId="success-view">
+      <CenteredBoxContent testId="success-view">
         <SuccessBox successText={successText} />
-      </Box>
+      </CenteredBoxContent>
     </SimpleLayout>
   );
 };

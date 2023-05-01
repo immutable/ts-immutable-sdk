@@ -1,7 +1,6 @@
-import { Box } from "@biom3/react"
 import { SimpleLayout } from "../SimpleLayout/SimpleLayout"
-import { LoadingViewStyles } from "./LoadingStyles"
 import { LoadingBox } from "./LoadingBox";
+import { CenteredBoxContent } from "../CenteredBoxContent/CenteredBoxContent";
 
 export interface LoadingViewProps {
   loadingText: string;
@@ -9,9 +8,9 @@ export interface LoadingViewProps {
 export const LoadingView = ({loadingText}: LoadingViewProps) => {
   return(
     <SimpleLayout>
-      <Box sx={LoadingViewStyles}>
+      <CenteredBoxContent>
         <LoadingBox loadingText={loadingText}/>
-      </Box>
+      </CenteredBoxContent>
     </SimpleLayout>
   )
 }
