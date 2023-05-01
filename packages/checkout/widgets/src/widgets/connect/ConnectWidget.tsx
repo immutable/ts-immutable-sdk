@@ -6,7 +6,6 @@ import {
   sendConnectFailedEvent,
   sendConnectSuccessEvent,
 } from './ConnectWidgetEvents';
-import { ChooseNetwork } from './components/choose-network/ChooseNetwork';
 import { useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
@@ -86,9 +85,6 @@ export function ConnectWidget(props: ConnectWidgetProps) {
             )}
             {viewState.view.type === ConnectWidgetViews.READY_TO_CONNECT && (
               <ReadyToConnect />
-            )}
-            {viewState.view.type === ConnectWidgetViews.CHOOSE_NETWORKS && (
-              <ChooseNetwork />
             )}
             {viewState.view.type === ConnectWidgetViews.SUCCESS && (
               <SuccessView
