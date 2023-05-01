@@ -1,5 +1,6 @@
 import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
+import { BaseViews } from '../../context/ViewContext';
 
 export const text = {
   views: {
@@ -26,6 +27,10 @@ export const text = {
       heading: 'To trade here, MetaMask will ask you to switch to the Immutable zkEVM network',
       body: 'Check for the pop-up from MetaMask and ‘Approve’ to switch. If this is the first time, MetaMask will also ask you to add the network.',
     },
+    [BaseViews.ERROR]: {
+      heading: `Something's gone wrong`,
+      body: ['You can try again or contact', 'support', 'for help.']
+    }
   },
   wallets: {
     [ConnectionProviders.METAMASK]: {
