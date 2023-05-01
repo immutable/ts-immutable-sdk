@@ -27,7 +27,7 @@ export const WalletList = (props: WalletListProps) => {
 
   useEffect(() => {
     const getAllowedWallets = async () => {
-      const allowedWallets = await checkout?.getWalletsAllowList({
+      const allowedWallets = await checkout?.getWalletAllowList({
         type: walletFilterTypes ?? WalletFilterTypes.DESKTOP,
         exclude: excludeWallets,
       });

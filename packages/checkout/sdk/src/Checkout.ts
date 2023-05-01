@@ -84,7 +84,7 @@ export class Checkout {
     return await tokens.getTokenAllowList(params);
   }
 
-  public async getWalletsAllowList(
+  public async getWalletAllowList(
     params: GetWalletAllowListParams
   ): Promise<GetWalletAllowListResult> {
     return await wallet.getWalletAllowList(params);

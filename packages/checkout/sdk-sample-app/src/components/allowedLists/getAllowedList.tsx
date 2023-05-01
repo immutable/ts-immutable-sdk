@@ -29,7 +29,7 @@ function GetAllowedLists(props: AllowedListProps) {
   async function getWalletsAllowedList() {
     if (provider) {
       try {
-        const info = await checkout.getWalletsAllowList({
+        const info = await checkout.getWalletAllowList({
           type: WalletFilterTypes.ALL,
         });
         console.log(info);
