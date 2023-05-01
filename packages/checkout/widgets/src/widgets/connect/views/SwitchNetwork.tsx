@@ -1,14 +1,14 @@
+import { ChainId } from '@imtbl/checkout-sdk-web';
+import { useContext, useState } from 'react';
+import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
-import { useContext, useState } from 'react';
-import { ConnectContext } from '../context/ConnectContext';
-import { ChainId } from '@imtbl/checkout-sdk-web';
-import { ViewActions, ViewContext } from '../../../context/ViewContext';
-import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
 import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkHero';
+import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
+import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
+import { ViewContext, ViewActions } from '../../../context/ViewContext';
 import { text } from '../../../resources/text/textConfig';
+import { ConnectContext } from '../context/ConnectContext';
 
 export const SwitchNetwork = () => {
   const { viewDispatch } = useContext(ViewContext);

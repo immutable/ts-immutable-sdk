@@ -1,10 +1,10 @@
 import { Body, Box } from '@biom3/react';
-import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
-import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
-import { FooterLogo } from '../../../../components/Footer/FooterLogo';
-import { WalletList } from '../wallet-list/WalletList';
-import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
-import { text } from '../../../../resources/text/textConfig';
+import { FooterLogo } from '../../../components/Footer/FooterLogo';
+import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
+import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
+import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
+import { text } from '../../../resources/text/textConfig';
+import { WalletList } from '../components/WalletList';
 
 export const ConnectWallet = () => {
   const { header, body } = text.views[ConnectWidgetViews.CONNECT_WALLET];

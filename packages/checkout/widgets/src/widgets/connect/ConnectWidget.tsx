@@ -21,10 +21,10 @@ import {
   viewReducer,
 } from '../../context/ViewContext';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
-import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
-import { ConnectResult } from './components/connect-result/ConnectResult';
+import { ConnectWallet } from './views/ConnectWallet';
+import { ConnectResult } from './views/ConnectResult';
 import { SuccessView } from '../../components/Success/SuccessView';
-import { ReadyToConnect } from './components/ready-to-connect/ReadyToConnect';
+import { ReadyToConnect } from './views/ReadyToConnect';
 import { SwitchNetwork } from './views/SwitchNetwork';
 
 export interface ConnectWidgetProps {

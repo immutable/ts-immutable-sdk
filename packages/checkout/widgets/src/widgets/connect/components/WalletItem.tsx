@@ -1,6 +1,6 @@
 import { ConnectionProviders, WalletInfo } from '@imtbl/checkout-sdk-web';
 import { MenuItem } from '@biom3/react';
-import { text } from '../../../../resources/text/textConfig';
+import { text } from '../../../resources/text/textConfig';
 
 export interface WalletProps {
   onWalletClick: (providerPreference: ConnectionProviders) => void;
