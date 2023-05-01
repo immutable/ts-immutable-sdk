@@ -1,17 +1,9 @@
 import { MenuItem } from '@biom3/react';
-import { useNavigate } from 'react-router-dom';
 
 export default function App() {
-  const navigate = useNavigate();
-
   return (
     <>
-      <MenuItem
-        href="#/moo"
-        emphasized
-        size="medium"
-        onClick={() => navigate('/connect')}
-      >
+      <MenuItem href="/connect" emphasized size="medium">
         <MenuItem.IntentIcon icon="ArrowForward" />
         <MenuItem.Label>Connect</MenuItem.Label>
         <MenuItem.Caption>
