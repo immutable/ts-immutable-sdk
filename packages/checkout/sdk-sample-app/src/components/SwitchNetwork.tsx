@@ -6,13 +6,13 @@ import { useMemo, useState } from 'react';
 import { Box } from '@biom3/react';
 
 export interface SwitchNetworkProps {
+  checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
+  setProvider: (provider: Web3Provider) => void;
 }
 
 export default function SwitchNetwork(props: SwitchNetworkProps) {
-  const checkout = useMemo(() => new Checkout(), []);
-
-  const { provider } = props;
+  const { provider, checkout, setProvider } = props;
 
   const [result, setResult] = useState<NetworkInfo>();
   const [error, setError] = useState<any>(null);
@@ -23,14 +23,21 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
   const [loadingNetInfo, setLoadingNetInfo] = useState<boolean>(false);
 
   async function switchNetwork(chainId: ChainId) {
+    if (!checkout) {
+      console.error('missing checkout, please connect frist');
+      return;
+    }
     if (!provider) {
       console.error('missing provider, please connect frist');
       return;
     }
+
     setError(null);
     setLoading(true);
+
     try {
       const resp = await checkout.switchNetwork({ provider, chainId });
+      setProvider(resp.provider);
       setResult(resp.network);
       setLoading(false);
     } catch (err: any) {
@@ -44,12 +51,18 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
   }
 
   async function getNetworkInfo() {
+    if (!checkout) {
+      console.error('missing checkout, please connect frist');
+      return;
+    }
     if (!provider) {
       console.error('missing provider, please connect frist');
       return;
     }
+
     setErrorNetInfo(null);
     setLoadingNetInfo(true);
+
     try {
       const resp = await checkout.getNetworkInfo({ provider });
       setResultNetInfo(resp);

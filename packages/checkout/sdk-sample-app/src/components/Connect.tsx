@@ -1,21 +1,24 @@
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web';
 import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 
 interface ConnectProps {
+  setCheckout: (provider: Checkout) => void;
   setProvider: (provider: Web3Provider) => void;
 }
 
 export default function Connect(props: ConnectProps) {
   const checkout = useMemo(() => new Checkout(), []);
 
-  const { setProvider } = props;
+  const { setProvider, setCheckout } = props;
 
   const [result, setResult] = useState<Web3Provider>();
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => setCheckout(checkout), [checkout]);
 
   async function connectClick() {
     setError(null);

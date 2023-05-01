@@ -6,18 +6,22 @@ import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import { Box } from '@biom3/react';
 
 interface BalanceProps {
+  checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
 }
 
 export default function GetAllBalances(props: BalanceProps) {
-  const checkout = useMemo(() => new Checkout(), []);
-  const { provider } = props;
+  const { provider, checkout } = props;
 
   const [result, setResult] = useState<GetBalanceResult[]>();
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   async function getAllBalances() {
+    if (!checkout) {
+      console.error('missing checkout, please connect frist');
+      return;
+    }
     if (!provider) {
       console.error('missing provider, please connect frist');
       return;

@@ -10,18 +10,23 @@ import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import { Box } from '@biom3/react';
 
 interface CheckConnectionProps {
+  checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
 }
 
 export default function CheckConnection(props: CheckConnectionProps) {
-  const checkout = useMemo(() => new Checkout(), []);
-  const { provider } = props;
+  const { provider, checkout } = props;
 
   const [result, setResult] = useState<CheckConnectionResult>();
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   async function checkMyConnection() {
+    if (!checkout) {
+      console.error('missing checkout, please connect frist');
+      return;
+    }
+
     setError(null);
     setLoading(true);
     try {

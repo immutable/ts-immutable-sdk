@@ -7,8 +7,10 @@ import CheckConnection from '../components/CheckConnection';
 import GetAllowList from '../components/GetAllowList';
 import { Body, Divider, Heading } from '@biom3/react';
 import GetBalance from '../components/GetBalance';
+import { Checkout } from '@imtbl/checkout-sdk-web';
 
 export default function ConnectWidget() {
+  const [checkout, setCheckout] = useState<Checkout>();
   const [provider, setProvider] = useState<Web3Provider>();
 
   return (
@@ -29,7 +31,7 @@ export default function ConnectWidget() {
       >
         Connect
       </Divider>
-      <Connect setProvider={setProvider} />
+      <Connect setCheckout={setCheckout} setProvider={setProvider} />
 
       <Divider
         sx={{
@@ -39,7 +41,7 @@ export default function ConnectWidget() {
       >
         Check connection
       </Divider>
-      <CheckConnection provider={provider} />
+      <CheckConnection checkout={checkout} provider={provider} />
 
       <Divider
         sx={{
@@ -49,7 +51,11 @@ export default function ConnectWidget() {
       >
         Switch network
       </Divider>
-      <SwitchNetwork provider={provider} />
+      <SwitchNetwork
+        checkout={checkout}
+        provider={provider}
+        setProvider={setProvider}
+      />
 
       <Divider
         sx={{
@@ -59,7 +65,7 @@ export default function ConnectWidget() {
       >
         Get wallet balance
       </Divider>
-      <GetBalance provider={provider} />
+      <GetBalance checkout={checkout} provider={provider} />
 
       <Divider
         sx={{
@@ -69,7 +75,7 @@ export default function ConnectWidget() {
       >
         Get wallet balances
       </Divider>
-      <GetAllBalances provider={provider} />
+      <GetAllBalances checkout={checkout} provider={provider} />
 
       <Divider
         sx={{
@@ -79,7 +85,7 @@ export default function ConnectWidget() {
       >
         Get allowed lists
       </Divider>
-      <GetAllowList provider={provider} />
+      <GetAllowList checkout={checkout} provider={provider} />
     </div>
   );
 }

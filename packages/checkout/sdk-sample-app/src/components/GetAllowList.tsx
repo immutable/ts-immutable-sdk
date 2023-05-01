@@ -15,12 +15,12 @@ import { WalletInfo } from '@imtbl/checkout-sdk-web';
 import { TokenInfo } from '@imtbl/checkout-sdk-web';
 
 export interface AllowListProps {
+  checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
 }
 
 export default function GetAllowList(props: AllowListProps) {
-  const checkout = useMemo(() => new Checkout(), []);
-  const { provider } = props;
+  const { provider, checkout } = props;
 
   const [resultNetwork, setResultNetwork] = useState<NetworkInfo[]>();
   const [errorNetwork, setErrorNetwork] = useState<any>(null);
@@ -35,6 +35,10 @@ export default function GetAllowList(props: AllowListProps) {
   const [loadingToken, setLoadingToken] = useState<boolean>(false);
 
   async function getNetworkAllowList() {
+    if (!checkout) {
+      console.error('missing checkout, please connect frist');
+      return;
+    }
     if (!provider) {
       console.error('missing provider, please connect frist');
       return;
@@ -58,6 +62,10 @@ export default function GetAllowList(props: AllowListProps) {
   }
 
   async function getWalletsAllowList() {
+    if (!checkout) {
+      console.error('missing checkout, please connect frist');
+      return;
+    }
     if (!provider) {
       console.error('missing provider, please connect frist');
       return;
@@ -81,6 +89,10 @@ export default function GetAllowList(props: AllowListProps) {
   }
 
   async function getTokensAllowList() {
+    if (!checkout) {
+      console.error('missing checkout, please connect frist');
+      return;
+    }
     if (!provider) {
       console.error('missing provider, please connect frist');
       return;

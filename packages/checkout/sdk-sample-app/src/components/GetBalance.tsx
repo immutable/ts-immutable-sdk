@@ -6,14 +6,14 @@ import LoadingButton from './LoadingButton';
 import { Box } from '@biom3/react';
 
 interface BalanceProps {
+  checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
 }
 
 export default function GetBalance(props: BalanceProps) {
-  const checkout = useMemo(() => new Checkout(), []);
   const contractAddress = '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF';
 
-  const { provider } = props;
+  const { provider, checkout } = props;
 
   const [resultBalance, setResultBalance] = useState<GetBalanceResult>();
   const [errorBalance, setErrorBalance] = useState<any>(null);
@@ -24,10 +24,15 @@ export default function GetBalance(props: BalanceProps) {
   const [loadingNative, setLoadingNative] = useState<boolean>(false);
 
   async function getNativeBalanceClick() {
+    if (!checkout) {
+      console.error('missing checkout, please connect frist');
+      return;
+    }
     if (!provider) {
       console.error('missing provider, please connect frist');
       return;
     }
+
     setErrorNative(null);
     setLoadingNative(true);
 
@@ -50,10 +55,15 @@ export default function GetBalance(props: BalanceProps) {
   }
 
   async function getERC20BalanceClick() {
+    if (!checkout) {
+      console.error('missing checkout, please connect frist');
+      return;
+    }
     if (!provider) {
       console.error('missing provider, please connect frist');
       return;
     }
+
     setErrorBalance(null);
     setLoadingBalance(true);
 
