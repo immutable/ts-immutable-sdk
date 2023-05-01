@@ -4,11 +4,18 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import ConnectWidget from './pages/ConnectWidget';
+import { onLightBase } from '@biom3/design-tokens';
+import { BiomeThemeProvider, Box } from '@biom3/react';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+  },
+  {
+    path: '/connect',
+    element: <ConnectWidget />,
   },
 ]);
 
@@ -17,7 +24,16 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <BiomeThemeProvider theme={{ base: onLightBase }}>
+      <Box
+        sx={{
+          m: 'auto',
+          padding: 'base.spacing.x10',
+        }}
+      >
+        <RouterProvider router={router} />
+      </Box>
+    </BiomeThemeProvider>
   </React.StrictMode>
 );
 
