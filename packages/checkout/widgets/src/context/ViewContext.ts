@@ -13,7 +13,7 @@ export type BaseView = { type: BaseViews.LOADING_VIEW } | ErrorView;
 
 interface ErrorView {
   type: BaseViews.ERROR;
-  error?: Error;
+  error: Error;
 }
 
 export type View =
