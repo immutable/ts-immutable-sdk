@@ -4,7 +4,11 @@ import { FooterButton } from '../../../../components/Footer/FooterButton';
 import { useCallback, useContext, useState } from 'react';
 import { ConnectActions, ConnectContext } from '../../context/ConnectContext';
 import { ViewActions, ViewContext } from '../../../../context/ViewContext';
-import { ChainId, ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import {
+  ChainId,
+  Checkout,
+  ConnectionProviders,
+} from '@imtbl/checkout-sdk-web';
 import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
 import { Body, Box, Heading } from '@biom3/react';
 import { MetamaskConnectHero } from '../../../../components/Hero/MetamaskConnectHero';
@@ -21,8 +25,11 @@ export const ReadyToConnect = () => {
   const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
 
   const onConnectClick = useCallback(async () => {
-    const handleConnectViewUpdate = async (provider: Web3Provider) => {
-      const networkInfo = await checkout!.getNetworkInfo({ provider });
+    const handleConnectViewUpdate = async (
+      checkout: Checkout,
+      provider: Web3Provider
+    ) => {
+      const networkInfo = await checkout.getNetworkInfo({ provider });
 
       if (networkInfo.chainId !== ChainId.POLYGON) {
         viewDispatch({
@@ -53,7 +60,7 @@ export const ReadyToConnect = () => {
             provider: connectResult.provider,
           },
         });
-        handleConnectViewUpdate(connectResult.provider);
+        handleConnectViewUpdate(checkout, connectResult.provider);
       } catch (err: any) {
         setFooterButtonText(footer.buttonText2);
       }
