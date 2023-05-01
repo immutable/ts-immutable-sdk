@@ -14,6 +14,7 @@ import { Body, Box, Heading } from '@biom3/react';
 import { MetamaskConnectHero } from '../../../../components/Hero/MetamaskConnectHero';
 import { text } from '../../../../resources/text/textConfig';
 import { Web3Provider } from '@ethersproject/providers';
+import { SimpleTextBody } from '../../../../components/Body/SimpleTextBody';
 
 export const ReadyToConnect = () => {
   const {
@@ -80,26 +81,7 @@ export const ReadyToConnect = () => {
         />
       }
     >
-      <Box
-        sx={{
-          paddingY: 'base.spacing.x10',
-          paddingX: 'base.spacing.x9',
-          display: 'flex',
-          flexDirection: 'column',
-          rowGap: 'base.spacing.x4',
-        }}
-      >
-        <Heading
-          size="small"
-          weight="bold"
-          sx={{ color: 'base.color.text.primary' }}
-        >
-          {body.heading}
-        </Heading>
-        <Body size="small" sx={{ color: 'base.color.text.secondary' }}>
-          {body.content}
-        </Body>
-      </Box>
+      <SimpleTextBody heading={body.heading}>{body.content}</SimpleTextBody>
     </SimpleLayout>
   );
 };
