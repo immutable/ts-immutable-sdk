@@ -50,7 +50,7 @@ export class CheckoutError extends Error {
  * The different types of internal errors that can be returned by the checkout process.
  */
 export enum CheckoutInternalErrorType {
-  REJECTED_SWITCH_AFTER_ADDING_NETWORK = 'REJECTED_SWITCH_AFTER_ADDING_NETWORK', // Error type for when a switch request is rejected after adding a network
+  REJECTED_SWITCH_AFTER_ADDING_NETWORK = 'REJECTED_SWITCH_AFTER_ADDING_NETWORK',
 }
 
 /**
