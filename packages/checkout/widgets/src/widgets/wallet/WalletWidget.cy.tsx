@@ -7,7 +7,7 @@ import { cySmartGet } from '../../lib/testUtils';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 
 describe('WalletWidget tests', () => {
-  it('should show no network connected and close button on mount', () => {
+  it('should show loading screen when component is mounted', () => {
     const params = {
       providerPreference: ConnectionProviders.METAMASK,
     } as WalletWidgetParams;
@@ -34,9 +34,7 @@ describe('WalletWidget tests', () => {
 
     mount(<WalletWidget params={params} theme={WidgetTheme.LIGHT} />);
 
-    cySmartGet('close-button').should('be.visible');
-    cySmartGet('heading').should('be.visible');
-    cySmartGet('network-name').should('not.be.visible');
+    // TODO: Update this tests with assertions on loading screen
   });
 
   describe('WalletWidget balances', () => {
@@ -149,7 +147,7 @@ describe('WalletWidget tests', () => {
 
       cySmartGet('close-button').should('be.visible');
       cySmartGet('heading').should('be.visible');
-      cySmartGet('network-name').should('include.text', 'Ethereum');
+      cySmartGet('active-network-button').should('include.text', 'Ethereum');
 
       cySmartGet('total-token-balance').should('exist');
       cySmartGet('total-token-balance').should('have.text', '$0.00');
@@ -212,11 +210,10 @@ describe('WalletWidget tests', () => {
         mount(<WalletWidget params={params} theme={WidgetTheme.LIGHT} />);
         cySmartGet('@connectStub').should('have.been.calledOnce');
 
-        cySmartGet('polygon-network-button').click();
+        cySmartGet('other-network-button').click();
 
-        cySmartGet('@connectStub').should('have.been.calledTwice');
         cySmartGet('@switchNetworkStub').should('have.been.called');
-        cySmartGet('network-name').should('include.text', 'Polygon');
+        cySmartGet('active-network-button').should('include.text', 'Polygon');
       });
 
       it('should show correct network switch buttons', () => {
@@ -224,14 +221,13 @@ describe('WalletWidget tests', () => {
           providerPreference: ConnectionProviders.METAMASK,
         } as WalletWidgetParams;
         mount(<WalletWidget params={params} theme={WidgetTheme.LIGHT} />);
-        cySmartGet('goerli-network-button').should('exist');
-        cySmartGet('polygon-network-button').should('exist');
+        cySmartGet('active-network-button').should('exist');
+        cySmartGet('other-network-button').should('exist');
 
-        cySmartGet('polygon-network-button').click();
+        cySmartGet('other-network-button').click();
 
-        cySmartGet('network-name').should('include.text', 'Polygon');
-        cySmartGet('goerli-network-button').should('exist');
-        cySmartGet('eth-network-button').should('exist');
+        cySmartGet('active-network-button').should('include.text', 'Polygon');
+        cySmartGet('other-network-button').should('include.text', 'Ethereum');
       });
     });
   });

@@ -1,5 +1,6 @@
 import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
+import { WalletWidgetViews } from '../../context/WalletViewContextTypes';
 
 export const text = {
   views: {
@@ -26,6 +27,16 @@ export const text = {
       heading: 'To trade here, MetaMask will ask you to switch to the Immutable zkEVM network',
       body: 'Check for the pop-up from MetaMask and ‘Approve’ to switch. If this is the first time, MetaMask will also ask you to add the network.',
     },
+    [WalletWidgetViews.WALLET_BALANCES]: {
+      header: {
+        title: 'Wallet'
+      },
+      networkStatus: {
+        heading: 'Network',
+        network1Name: 'Polygon',
+        network2Name: 'Ethereum'
+      }
+    }
   },
   wallets: {
     [ConnectionProviders.METAMASK]: {
