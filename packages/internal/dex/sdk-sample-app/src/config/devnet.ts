@@ -29,17 +29,24 @@ const contractOverrides: ExchangeContracts = {
 const commonRoutingTokens: TokenInfo[] = [
   {
     chainId: devChainID,
-    address: '0x5893A5c7bc615Dfd36D7383366d00FFFca5f7178',
+    address: process.env.NEXT_PUBLIC_COMMON_ROUTING_FUN,
     decimals: 18,
     symbol: 'FUN',
     name: 'The Fungibles Token',
   },
   {
     chainId: devChainID,
-    address: '0xd8f1D29a1572FbCeF0B0C9541E50637Ad8804F21',
+    address: process.env.NEXT_PUBLIC_COMMON_ROUTING_USDC,
     decimals: 18,
     symbol: 'USDC',
     name: 'US Dollar Coin',
+  },
+  {
+    chainId: devChainID,
+    address: process.env.NEXT_PUBLIC_COMMON_ROUTING_WETH,
+    decimals: 18,
+    symbol: 'WETH',
+    name: 'Wrapped Ether',
   },
 ];
 

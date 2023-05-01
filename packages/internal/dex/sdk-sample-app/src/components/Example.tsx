@@ -12,8 +12,8 @@ type RouteType = {
 export function Example() {
   // Create and use the exchange as per normal
   const exchange = new Exchange(configuration);
-  const DEVNET_USDC = '0xd8f1D29a1572FbCeF0B0C9541E50637Ad8804F21';
-  const DEVNET_FUN = '0x5893A5c7bc615Dfd36D7383366d00FFFca5f7178';
+  const DEVNET_USDC = '0xBB587517EC25e545F8Fe7c450161319c35677C86';
+  const DEVNET_FUN = '0x1a4B77b638d55f320e0a453394EC18Ab69F762F2';
 
   const [result, setResult] = useState<TradeInfo>();
   const [isFetching, setIsFetching] = useState(false);
