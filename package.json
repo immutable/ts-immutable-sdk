@@ -54,6 +54,7 @@
     "packages/provider",
     "packages/internal/toolkit",
     "packages/internal/dex/sdk",
+    "packages/internal/bridge",
     "packages/internal/dex/sdk-sample-app",
     "packages/checkout/sdk",
     "packages/checkout/sdk-sample-app",
