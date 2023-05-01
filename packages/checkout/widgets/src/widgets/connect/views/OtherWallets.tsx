@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@biom3/react';
 import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
-import { ButtonWrapperStyle } from '../../ConnectStyles';
-import { ConnectActions, ConnectContext } from '../../context/ConnectContext';
 import { useContext } from 'react';
-import { ViewActions, ViewContext } from '../../../../context/ViewContext';
-import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
-import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
-import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
-import { FooterLogo } from '../../../../components/Footer/FooterLogo';
+import { FooterLogo } from '../../../components/Footer/FooterLogo';
+import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
+import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
+import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
+import { ViewContext, ViewActions } from '../../../context/ViewContext';
+import { ButtonWrapperStyle } from '../ConnectStyles';
+import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 
 export function OtherWallets() {
   const { connectState, connectDispatch } = useContext(ConnectContext);

@@ -1,14 +1,14 @@
 import { Box } from '@biom3/react';
-import { useContext, useEffect, useState } from 'react';
-import { ViewActions, ViewContext } from '../../../../context/ViewContext';
-import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
 import {
-  ConnectionProviders,
-  WalletFilter,
   WalletFilterTypes,
+  WalletFilter,
   WalletInfo,
+  ConnectionProviders,
 } from '@imtbl/checkout-sdk-web';
-import { ConnectActions, ConnectContext } from '../../context/ConnectContext';
+import { useContext, useState, useEffect } from 'react';
+import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
+import { ViewContext, ViewActions } from '../../../context/ViewContext';
+import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
 
 export interface WalletListProps {

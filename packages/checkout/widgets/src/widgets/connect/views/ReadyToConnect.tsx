@@ -1,19 +1,19 @@
-import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
-import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
-import { FooterButton } from '../../../../components/Footer/FooterButton';
-import { useCallback, useContext, useState } from 'react';
-import { ConnectActions, ConnectContext } from '../../context/ConnectContext';
-import { ViewActions, ViewContext } from '../../../../context/ViewContext';
+import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
   Checkout,
   ConnectionProviders,
 } from '@imtbl/checkout-sdk-web';
-import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
-import { MetamaskConnectHero } from '../../../../components/Hero/MetamaskConnectHero';
-import { text } from '../../../../resources/text/textConfig';
-import { Web3Provider } from '@ethersproject/providers';
-import { SimpleTextBody } from '../../../../components/Body/SimpleTextBody';
+import { useContext, useState, useCallback } from 'react';
+import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
+import { FooterButton } from '../../../components/Footer/FooterButton';
+import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
+import { MetamaskConnectHero } from '../../../components/Hero/MetamaskConnectHero';
+import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
+import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
+import { ViewContext, ViewActions } from '../../../context/ViewContext';
+import { text } from '../../../resources/text/textConfig';
+import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 
 export const ReadyToConnect = () => {
   const {
