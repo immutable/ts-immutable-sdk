@@ -10,7 +10,6 @@ import {
   ConnectionProviders,
 } from '@imtbl/checkout-sdk-web';
 import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
-import { Body, Box, Heading } from '@biom3/react';
 import { MetamaskConnectHero } from '../../../../components/Hero/MetamaskConnectHero';
 import { text } from '../../../../resources/text/textConfig';
 import { Web3Provider } from '@ethersproject/providers';
