@@ -42,7 +42,7 @@ export const SuccessView = ({
         />
       }
     >
-      <Box sx={SuccessViewStyles} testId="success-box">
+      <Box sx={SuccessViewStyles} testId="success-view">
         <Box sx={SuccessBoxStyles} testId="success-box">
           <Box sx={SuccessLogoStyles}>
             <Icon

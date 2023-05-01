@@ -48,7 +48,7 @@ export function OtherWallets() {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: ConnectWidgetViews.CHOOSE_NETWORKS,
+          type: ConnectWidgetViews.SWITCH_NETWORK,
         },
       },
     });

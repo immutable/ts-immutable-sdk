@@ -6,7 +6,6 @@ import {
   sendConnectFailedEvent,
   sendConnectSuccessEvent,
 } from './ConnectWidgetEvents';
-import { ChooseNetwork } from './components/choose-network/ChooseNetwork';
 import { useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
@@ -26,6 +25,7 @@ import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
 import { ConnectResult } from './components/connect-result/ConnectResult';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { ReadyToConnect } from './components/ready-to-connect/ReadyToConnect';
+import { SwitchNetwork } from './views/SwitchNetwork';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
@@ -86,9 +86,6 @@ export function ConnectWidget(props: ConnectWidgetProps) {
             {viewState.view.type === ConnectWidgetViews.READY_TO_CONNECT && (
               <ReadyToConnect />
             )}
-            {viewState.view.type === ConnectWidgetViews.CHOOSE_NETWORKS && (
-              <ChooseNetwork />
-            )}
             {viewState.view.type === ConnectWidgetViews.SUCCESS && (
               <SuccessView
                 successText="Connection secure"
@@ -101,6 +98,9 @@ export function ConnectWidget(props: ConnectWidgetProps) {
             )}
             {viewState.view.type === ConnectWidgetViews.FAIL && (
               <ConnectResult />
+            )}
+            {viewState.view.type === ConnectWidgetViews.SWITCH_NETWORK && (
+              <SwitchNetwork />
             )}
           </>
         </ConnectContext.Provider>

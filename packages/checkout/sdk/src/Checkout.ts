@@ -8,6 +8,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   CheckConnectionParams,
   CheckConnectionResult,
+  ConnectionProviders,
   ConnectParams,
   ConnectResult,
   GetAllBalancesParams,
@@ -27,8 +28,11 @@ import {
   SwitchNetworkParams,
   SwitchNetworkResult,
 } from './types';
+import { CheckoutError, CheckoutErrorType } from './errors';
 
 export class Checkout {
+  private providerPreference: ConnectionProviders | undefined;
+
   public async checkIsWalletConnected(
     params: CheckConnectionParams
   ): Promise<CheckConnectionResult> {
@@ -36,6 +40,7 @@ export class Checkout {
   }
 
   public async connect(params: ConnectParams): Promise<ConnectResult> {
+    this.providerPreference = params.providerPreference;
     const provider = await connect.connectWalletProvider(params);
     const networkInfo = await network.getNetworkInfo(provider);
 
@@ -48,7 +53,18 @@ export class Checkout {
   public async switchNetwork(
     params: SwitchNetworkParams
   ): Promise<SwitchNetworkResult> {
-    return await network.switchWalletNetwork(params.provider, params.chainId);
+    if (!this.providerPreference) {
+      throw new CheckoutError(
+        `connect should be called before switchNetwork to set the provider preference`,
+        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR
+      );
+    }
+
+    return await network.switchWalletNetwork(
+      this.providerPreference,
+      params.provider,
+      params.chainId
+    );
   }
 
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {

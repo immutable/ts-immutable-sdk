@@ -10,6 +10,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { ChainId, ConnectionProviders, GetBalanceParams } from './types';
 import { getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
+import { CheckoutError, CheckoutErrorType } from './errors';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -61,12 +62,32 @@ describe(' Connect', () => {
   it('should call the switchWalletNetwork function', async () => {
     const checkout = new Checkout();
 
+    await checkout.connect({
+      providerPreference: ConnectionProviders.METAMASK,
+    });
+
     await checkout.switchNetwork({
       provider: { provider: { request: () => {} } } as any as Web3Provider,
       chainId: ChainId.ETHEREUM,
     });
 
     expect(switchWalletNetwork).toBeCalledTimes(1);
+  });
+
+  it('should throw error when calling the switchWalletNetwork function', async () => {
+    const checkout = new Checkout();
+
+    await expect(
+      checkout.switchNetwork({
+        provider: { provider: { request: () => {} } } as any as Web3Provider,
+        chainId: ChainId.ETHEREUM,
+      })
+    ).rejects.toThrow(
+      new CheckoutError(
+        'connect should be called before switchNetwork to set the provider preference',
+        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR
+      )
+    );
   });
 
   it('should call sendTransaction function', async () => {
