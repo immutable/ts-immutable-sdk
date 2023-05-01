@@ -2442,7 +2442,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@imtbl/bridge-sdk@workspace:packages/internal/bridge/sdk":
+"@imtbl/bridge-sdk@0.0.0, @imtbl/bridge-sdk@workspace:packages/internal/bridge/sdk":
   version: 0.0.0-use.local
   resolution: "@imtbl/bridge-sdk@workspace:packages/internal/bridge/sdk"
   dependencies:
@@ -8642,6 +8642,27 @@ __metadata:
   checksum: 007d9dc507bbb1d770ca2fb3a9c1b5f4710592ff160535e959ceaed47a481a08c8a3bce3ea7eecbb781e7fff9801eca6da58a968f66668e89df83d559b624f19
   languageName: node
   linkType: hard
+
+"bridge-sample-app@workspace:packages/internal/bridge/bridge-sample-app":
+  version: 0.0.0-use.local
+  resolution: "bridge-sample-app@workspace:packages/internal/bridge/bridge-sample-app"
+  dependencies:
+    "@imtbl/bridge-sdk": 0.0.0
+    "@types/node": ^18.14.2
+    "@types/react": ^18.0.28
+    "@types/react-dom": ^18.0.11
+    autoprefixer: 10.4.14
+    eslint: ^8.37.0
+    eslint-config-next: 13.3.1
+    ethers: ^5.7.2
+    next: 13.3.1
+    postcss: 8.4.23
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    tailwindcss: 3.3.2
+    typescript: ^4.9.5
+  languageName: unknown
+  linkType: soft
 
 "brorand@npm:^1.0.1, brorand@npm:^1.1.0":
   version: 1.1.0
