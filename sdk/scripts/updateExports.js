@@ -37,10 +37,11 @@ for (const moduleName in moduleData.modules) {
     releaseType === 'alpha' ||
     (releaseType !== 'alpha' && moduleReleaseType === 'prod')
   ) {
-    const modulePath = `./${moduleName}`;
+    const moduleExport = `./${moduleName}`;
+    const modulePath = `./dist/${moduleName}.js`;
     const typesPath = `./dist/${moduleName}.d.ts`;
 
-    exports[modulePath] = {
+    exports[moduleExport] = {
       types: typesPath,
       import: modulePath,
     };
