@@ -7,5 +7,5 @@ export const BodyBoxStyle = {
 };
 
 export const BodyStyle = {
-    color: 'base.color.brand.4'
+    color: 'base.color.text.secondary'
 }
