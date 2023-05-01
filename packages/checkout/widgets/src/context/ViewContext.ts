@@ -6,14 +6,14 @@ import { OuterExampleWidgetView } from './OuterExampleViewContextTypes';
 
 export enum BaseViews {
   LOADING_VIEW = 'LOADING_VIEW',
-  ERROR = 'ERROR'
+  ERROR = 'ERROR',
 }
 
 export type BaseView = { type: BaseViews.LOADING_VIEW } | ErrorView;
 
 interface ErrorView {
-  type: BaseViews.ERROR,
-  error?: Error
+  type: BaseViews.ERROR;
+  error?: Error;
 }
 
 export type View =

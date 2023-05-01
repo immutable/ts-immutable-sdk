@@ -29,8 +29,8 @@ export const text = {
     },
     [BaseViews.ERROR]: {
       heading: `Something's gone wrong`,
-      body: ['You can try again or contact', 'support', 'for help.']
-    }
+      body: ['You can try again or contact', 'support', 'for help.'],
+    },
   },
   wallets: {
     [ConnectionProviders.METAMASK]: {
