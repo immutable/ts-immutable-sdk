@@ -5,8 +5,6 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@biom3/design-tokens": "0.1.4-beta",
-    "@biom3/react": "^0.3.0-beta",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/core-sdk": "^1.1.1-alpha.1",
     "@magic-ext/oidc": "^1.0.1",
@@ -17,10 +15,7 @@
     "magic-sdk": "^13.3.1",
     "oidc-client-ts": "^2.2.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.11.0",
-    "rxjs": "^7.8.0",
-    "tsc-watch": "^6.0.0"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@imtbl/checkout-sdk-web": "0.0.0",
