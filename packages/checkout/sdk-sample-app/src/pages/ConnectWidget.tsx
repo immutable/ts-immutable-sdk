@@ -4,7 +4,7 @@ import SwitchNetwork from '../components/SwitchNetwork';
 import { Web3Provider } from '@ethersproject/providers';
 import GetAllBalances from '../components/GetAllBalances';
 import CheckConnection from '../components/CheckConnection';
-import GetAllowedLists from '../components/GetAllowedList';
+import GetAllowList from '../components/GetAllowList';
 import { Body, Divider, Heading } from '@biom3/react';
 import GetBalance from '../components/GetBalance';
 
@@ -79,7 +79,7 @@ export default function ConnectWidget() {
       >
         Get allowed lists
       </Divider>
-      <GetAllowedLists provider={provider} />
+      <GetAllowList provider={provider} />
     </div>
   );
 }

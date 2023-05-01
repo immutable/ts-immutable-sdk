@@ -1,5 +1,4 @@
 import { MenuItem } from '@biom3/react';
-import { Body, Box, ButtCon, Divider } from '@biom3/react';
 import { useNavigate } from 'react-router-dom';
 
 export default function App() {

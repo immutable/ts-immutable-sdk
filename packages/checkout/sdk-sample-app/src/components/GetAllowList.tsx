@@ -14,11 +14,11 @@ import { NetworkInfo } from '@imtbl/checkout-sdk-web';
 import { WalletInfo } from '@imtbl/checkout-sdk-web';
 import { TokenInfo } from '@imtbl/checkout-sdk-web';
 
-export interface AllowedListProps {
+export interface AllowListProps {
   provider: Web3Provider | undefined;
 }
 
-export default function GetAllowedLists(props: AllowedListProps) {
+export default function GetAllowList(props: AllowListProps) {
   const checkout = useMemo(() => new Checkout(), []);
   const { provider } = props;
 
@@ -34,7 +34,7 @@ export default function GetAllowedLists(props: AllowedListProps) {
   const [errorToken, setErrorToken] = useState<any>(null);
   const [loadingToken, setLoadingToken] = useState<boolean>(false);
 
-  async function getNetworkAllowedList() {
+  async function getNetworkAllowList() {
     if (!provider) {
       console.error('missing provider, please connect frist');
       return;
@@ -57,7 +57,7 @@ export default function GetAllowedLists(props: AllowedListProps) {
     }
   }
 
-  async function getWalletsAllowedList() {
+  async function getWalletsAllowList() {
     if (!provider) {
       console.error('missing provider, please connect frist');
       return;
@@ -65,7 +65,7 @@ export default function GetAllowedLists(props: AllowedListProps) {
     setErrorWallet(null);
     setLoadingWallet(true);
     try {
-      const resp = await checkout.getWalletsAllowList({
+      const resp = await checkout.getWalletAllowList({
         type: WalletFilterTypes.ALL,
       });
       setResultWallet(resp.wallets);
@@ -80,7 +80,7 @@ export default function GetAllowedLists(props: AllowedListProps) {
     }
   }
 
-  async function getTokensAllowedList() {
+  async function getTokensAllowList() {
     if (!provider) {
       console.error('missing provider, please connect frist');
       return;
@@ -114,13 +114,13 @@ export default function GetAllowedLists(props: AllowedListProps) {
           gap: 'base.spacing.x4',
         }}
       >
-        <LoadingButton onClick={getNetworkAllowedList} loading={loadingNetwork}>
+        <LoadingButton onClick={getNetworkAllowList} loading={loadingNetwork}>
           Get network allowed list
         </LoadingButton>
-        <LoadingButton onClick={getWalletsAllowedList} loading={loadingWallet}>
+        <LoadingButton onClick={getWalletsAllowList} loading={loadingWallet}>
           Get wallets allowed list
         </LoadingButton>
-        <LoadingButton onClick={getTokensAllowedList} loading={loadingToken}>
+        <LoadingButton onClick={getTokensAllowList} loading={loadingToken}>
           Get tokens allowed list
         </LoadingButton>
       </Box>
