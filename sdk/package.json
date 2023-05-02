@@ -13,7 +13,9 @@
     "eslint": "^8.37.0",
     "ethers": "^5.7.2",
     "magic-sdk": "^13.3.1",
-    "oidc-client-ts": "^2.2.1",
+    "oidc-client-ts": "^2.2.1"
+  },
+  "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
