@@ -6,11 +6,11 @@ import { Web3Provider } from "@ethersproject/providers";
 import { text } from "../../../../resources/text/textConfig";
 import { WalletWidgetViews } from "../../../../context/WalletViewContextTypes";
 import { sendNetworkSwitchEvent } from "../../WalletWidgetEvents";
-import { ActiveNetworkButtonStyle, NetworkHeadingStyle, NetworkMenuStyle } from "./NetworkMenuStyle";
+import { ActiveNetworkButtonStyle, NetworkHeadingStyle, NetworkMenuStyles } from "./NetworkMenuStyles";
 import { BaseViews, ViewActions, ViewContext } from "../../../../context/ViewContext";
 
 interface NetworkStatusProps {
-  getTokenBalances: (checkout: Checkout, provider: Web3Provider, networkName: string, chainId: ChainId) => void;
+  getTokenBalances?: (checkout: Checkout, provider: Web3Provider, networkName: string, chainId: ChainId) => void;
 }
 
 export const NetworkMenu = (props: NetworkStatusProps) => {
@@ -77,11 +77,11 @@ export const NetworkMenu = (props: NetworkStatusProps) => {
 
   return (
     <Box
-      sx={NetworkMenuStyle}
+      sx={NetworkMenuStyles}
     >
       <Box sx={NetworkHeadingStyle}>
-        <Body size="medium">{networkStatus.heading}</Body>
-        <Icon icon='InformationCircle' sx={{width: 'base.icon.size.100'}} />
+        <Body testId='network-heading' size="medium">{networkStatus.heading}</Body>
+        <Icon testId='network-icon' icon='InformationCircle' sx={{width: 'base.icon.size.100'}} />
       </Box>
       <HorizontalMenu>
         {allowedNetworks?.map((networkItem)=>

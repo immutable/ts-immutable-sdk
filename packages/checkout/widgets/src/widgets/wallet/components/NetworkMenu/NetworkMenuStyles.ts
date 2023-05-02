@@ -1,4 +1,4 @@
-export const NetworkMenuStyle = {
+export const NetworkMenuStyles = {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',

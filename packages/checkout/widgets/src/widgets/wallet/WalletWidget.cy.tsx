@@ -147,10 +147,10 @@ describe('WalletWidget tests', () => {
 
       cySmartGet('close-button').should('be.visible');
       cySmartGet('heading').should('be.visible');
-      cySmartGet('active-network-button').should('include.text', 'Ethereum');
+      cySmartGet('Ethereum-network-button').should('include.text', 'Ethereum');
 
       cySmartGet('total-token-balance').should('exist');
-      cySmartGet('total-token-balance').should('have.text', '$0.00');
+      cySmartGet('total-token-balance').should('have.text', '≈ USD $0.00');
 
       cySmartGet('balance-item-ETH').should('exist');
       cySmartGet('balance-item-GODS').should('exist');
@@ -210,10 +210,10 @@ describe('WalletWidget tests', () => {
         mount(<WalletWidget params={params} theme={WidgetTheme.LIGHT} />);
         cySmartGet('@connectStub').should('have.been.calledOnce');
 
-        cySmartGet('other-network-button').click();
+        cySmartGet('Polygon-network-button').click();
 
         cySmartGet('@switchNetworkStub').should('have.been.called');
-        cySmartGet('active-network-button').should('include.text', 'Polygon');
+        cySmartGet('Polygon-network-button').should('include.text', 'Polygon');
       });
 
       it('should show correct network switch buttons', () => {
@@ -221,13 +221,16 @@ describe('WalletWidget tests', () => {
           providerPreference: ConnectionProviders.METAMASK,
         } as WalletWidgetParams;
         mount(<WalletWidget params={params} theme={WidgetTheme.LIGHT} />);
-        cySmartGet('active-network-button').should('exist');
-        cySmartGet('other-network-button').should('exist');
+        cySmartGet('Polygon-network-button').should('exist');
+        cySmartGet('Ethereum-network-button').should('exist');
+        cySmartGet('Ethereum-network-button').should('have.css', 'border-style', 'solid');
+        cySmartGet('Polygon-network-button').should('not.have.css', 'border-style', 'solid');
 
-        cySmartGet('other-network-button').click();
+        cySmartGet('Polygon-network-button').click();
 
-        cySmartGet('active-network-button').should('include.text', 'Polygon');
-        cySmartGet('other-network-button').should('include.text', 'Ethereum');
+        cySmartGet('Polygon-network-button').should('have.css', 'border-style', 'solid');
+        cySmartGet('Ethereum-network-button').should('not.have.css', 'border-style', 'solid');
+
       });
     });
   });
