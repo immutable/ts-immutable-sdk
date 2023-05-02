@@ -46,7 +46,8 @@ let getNetworkAllowListStub;
       checkout: new Checkout(),
       network: null,
       provider: null,
-      providerPreference: ConnectionProviders.METAMASK
+      providerPreference: ConnectionProviders.METAMASK,
+      tokenBalances: []
     }
     mount(<BiomeThemeProvider>
       <WalletContext.Provider value={{walletState, walletDispatch: () => {}}}>
@@ -82,7 +83,8 @@ let getNetworkAllowListStub;
         isSupported: false
       },
       provider: {} as unknown as Web3Provider,
-      providerPreference: ConnectionProviders.METAMASK
+      providerPreference: ConnectionProviders.METAMASK,
+      tokenBalances: []
     }
     mount(<BiomeThemeProvider>
       <WalletContext.Provider value={{walletState, walletDispatch: () => {}}}>

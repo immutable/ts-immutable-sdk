@@ -6,25 +6,32 @@ import { WalletWidgetViews } from "../../../context/WalletViewContextTypes"
 import { text } from '../../../resources/text/textConfig';
 import { TotalTokenBalance } from "../components/TotalTokenBalance";
 import { TokenBalanceList } from "../components/TokenBalanceList";
-import { BalanceInfo } from "../components/BalanceItem";
 import { WidgetBodyStyle } from "../WalletStyles";
 import { NetworkMenu } from "../components/NetworkMenu/NetworkMenu";
 import { ChainId, Checkout } from "@imtbl/checkout-sdk-web";
 import { Web3Provider } from "@ethersproject/providers";
+import { useContext } from "react";
+import { WalletContext } from "../context/WalletContext";
 
 export interface WalletBalancesProps {
-  tokenBalances: BalanceInfo[];
   totalFiatAmount: number;
-  networkName: string;
   getTokenBalances: (checkout: Checkout, provider: Web3Provider, networkName: string, chainId: ChainId) => void;
 }
 
-export const WalletBalances = ({ tokenBalances, totalFiatAmount, getTokenBalances}: WalletBalancesProps) => {
+export const WalletBalances = ({ totalFiatAmount, getTokenBalances}: WalletBalancesProps) => {
+  const {walletState: {tokenBalances}} = useContext(WalletContext);
   const {header} = text.views[WalletWidgetViews.WALLET_BALANCES];
+
   return(
     <SimpleLayout
       testId="wallet-balances"
-      header={<HeaderNavigation title={header.title} showSettings showClose onSettingsClick={() => console.log('settings click')} />}
+      header={<HeaderNavigation 
+        title={header.title} 
+        showSettings 
+        showClose 
+        onSettingsClick={() => console.log('settings click')} 
+        />
+      }
       footer={<FooterLogo />}
     >
       <Box sx={{

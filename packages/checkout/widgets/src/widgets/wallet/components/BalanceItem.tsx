@@ -1,17 +1,11 @@
 import { Body, Box } from '@biom3/react';
 import React from 'react';
-export interface BalanceInfo {
-  id: string;
-  symbol: string;
-  description?: string;
-  balance: string;
-  fiatAmount: string;
-  iconLogo?: string;
-}
-export interface TokenBalanceInfo {
+import { BalanceInfo } from '../types/BalanceInfo';
+
+export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
 }
-export const BalanceItem = (props: TokenBalanceInfo) => {
+export const BalanceItem = (props: BalanceItemProps) => {
   const { balanceInfo } = props;
   return (
     <Box

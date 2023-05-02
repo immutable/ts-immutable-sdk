@@ -1,6 +1,7 @@
 import { Body } from '@biom3/react';
 import React from 'react';
-import { BalanceItem, BalanceInfo } from './BalanceItem';
+import { BalanceItem } from './BalanceItem';
+import { BalanceInfo } from '../types/BalanceInfo';
 
 interface TokenBalanceListProps {
   balanceInfoItems: BalanceInfo[] | undefined;
