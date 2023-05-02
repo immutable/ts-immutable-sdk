@@ -58,9 +58,14 @@ import {
   NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest,
   NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest,
 } from '@imtbl/core-sdk';
-import { ImxConfiguration } from './config';
+import { ImxConfiguration, ImxModuleConfiguration } from './config';
 
-export { generateLegacyStarkPrivateKey, createStarkSigner, WalletConnection };
+export {
+  ImxModuleConfiguration as ImxClientModuleConfiguration,
+  generateLegacyStarkPrivateKey as imxClientGenerateLegacyStarkPrivateKey,
+  createStarkSigner as imxClientCreateStarkSigner,
+  WalletConnection as ImxClientWalletConnection,
+};
 
 export class ImmutableXClient {
   private immutableX: ImmutableX;
@@ -81,8 +86,9 @@ export class ImmutableXClient {
   public metadataRefreshesApi: MetadataRefreshesApi;
   public projectsApi: ProjectsApi;
 
-  constructor(config: ImxConfiguration) {
-    this.immutableX = new ImmutableX(config.immutableXConfig);
+  constructor(config: ImxModuleConfiguration) {
+    const imxConfig = new ImxConfiguration(config);
+    this.immutableX = new ImmutableX(imxConfig.immutableXConfig);
     this.depositsApi = this.immutableX.depositsApi;
     this.mintsApi = this.immutableX.mintsApi;
     this.ordersApi = this.immutableX.ordersApi;
