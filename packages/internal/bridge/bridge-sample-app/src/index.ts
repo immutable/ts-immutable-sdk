@@ -1,2 +1,5 @@
 import { ethers } from 'ethers';
-console.log(ethers);
+
+describe('getQuoteFromAmountIn', () => {
+  console.log(ethers.version);
+});
