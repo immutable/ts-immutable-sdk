@@ -3,6 +3,7 @@ import { ConnectWidgetView } from './ConnectViewContextTypes';
 import { TransitionExampleWidgetView } from './TransitionExampleViewContextTypes';
 import { InnerExampleWidgetView } from './InnerExampleViewContextTypes';
 import { OuterExampleWidgetView } from './OuterExampleViewContextTypes';
+import { WalletWidgetView } from './WalletViewContextTypes';
 
 export enum BaseViews {
   LOADING_VIEW = 'LOADING_VIEW',
@@ -19,6 +20,7 @@ interface ErrorView {
 export type View =
   | BaseView
   | ConnectWidgetView
+  | WalletWidgetView
   | TransitionExampleWidgetView
   | InnerExampleWidgetView
   | OuterExampleWidgetView;

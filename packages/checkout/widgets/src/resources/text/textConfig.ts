@@ -1,6 +1,7 @@
 import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 import { BaseViews } from '../../context/ViewContext';
+import { WalletWidgetViews } from '../../context/WalletViewContextTypes';
 
 export const text = {
   views: {
@@ -32,6 +33,16 @@ export const text = {
       heading: "Something's gone wrong",
       body: ['You can try again or contact', 'support', 'for help.'],
     },
+    [WalletWidgetViews.WALLET_BALANCES]: {
+      header: {
+        title: 'Wallet'
+      },
+      networkStatus: {
+        heading: 'Network',
+        network1Name: 'Polygon',
+        network2Name: 'Ethereum'
+      }
+    }
   },
   wallets: {
     [ConnectionProviders.METAMASK]: {
