@@ -100,14 +100,14 @@ jobs:
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
       - name: Build
-        run: yarn build
+        run: RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
 
       - name: Typecheck
         run: yarn typecheck
 
       - name: Test
         run: yarn test
-        
+
       - name: Push tags
         # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
         if: github.event.inputs.dry_run == 'false'
