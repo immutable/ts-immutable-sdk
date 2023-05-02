@@ -1,3 +1,3 @@
 import { ethers } from 'ethers';
 
-console.log(ethers);
+console.log(ethers.version);
