@@ -12,10 +12,9 @@ import { Web3Provider } from "@ethersproject/providers";
 
 
 describe('Network Menu',()=>{
-let getNetworkAllowListStub;
-
-  beforeEach(()=>{
-    getNetworkAllowListStub = cy.stub(Checkout.prototype, 'getNetworkAllowList')
+  
+  beforeEach(()=> {
+    cy.stub(Checkout.prototype, 'getNetworkAllowList')
       .as('getNetworkAllowListStub')
       .resolves({
         networks: [
@@ -31,13 +30,13 @@ let getNetworkAllowListStub;
       });
   })
   it('should have heading',()=>{
-    mount(<BiomeThemeProvider><NetworkMenu /></BiomeThemeProvider>);
+    mount(<BiomeThemeProvider><NetworkMenu getTokenBalances={() => {}} /></BiomeThemeProvider>);
 
     cySmartGet('network-heading').should('include.text', text.views[WalletWidgetViews.WALLET_BALANCES].networkStatus.heading);
 
   });
   it('should have info icon',()=>{
-    mount(<BiomeThemeProvider><NetworkMenu /></BiomeThemeProvider>);
+    mount(<BiomeThemeProvider><NetworkMenu getTokenBalances={() => {}}/></BiomeThemeProvider>);
 
     cySmartGet('network-icon').should('exist');
   });
@@ -51,7 +50,7 @@ let getNetworkAllowListStub;
     }
     mount(<BiomeThemeProvider>
       <WalletContext.Provider value={{walletState, walletDispatch: () => {}}}>
-      <NetworkMenu />
+      <NetworkMenu getTokenBalances={() => {}}/>
       </WalletContext.Provider>
     </BiomeThemeProvider>);
     cySmartGet('@getNetworkAllowListStub').should('have.been.called');
@@ -88,7 +87,7 @@ let getNetworkAllowListStub;
     }
     mount(<BiomeThemeProvider>
       <WalletContext.Provider value={{walletState, walletDispatch: () => {}}}>
-        <NetworkMenu />
+        <NetworkMenu getTokenBalances={() => {}}/>
       </WalletContext.Provider>
     </BiomeThemeProvider>);
 

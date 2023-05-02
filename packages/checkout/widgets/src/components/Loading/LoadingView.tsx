@@ -8,7 +8,7 @@ export interface LoadingViewProps {
 export const LoadingView = ({loadingText}: LoadingViewProps) => {
   return(
     <SimpleLayout>
-      <CenteredBoxContent>
+      <CenteredBoxContent testId="loading-view">
         <LoadingBox loadingText={loadingText}/>
       </CenteredBoxContent>
     </SimpleLayout>

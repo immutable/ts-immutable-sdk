@@ -52,8 +52,7 @@ export function WalletWidget(props: WalletWidgetProps) {
       networkName: string,
       chainId: ChainId
     ) => {
-      if(!checkout || !provider || !chainId) return;
-      
+      if(checkout && provider && chainId){
       const totalBalance = 0;
       // TODO: handle possible errors here
       const walletAddress = await provider.getSigner().getAddress();
@@ -81,6 +80,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         }
       });
       setTotalFiatAmount(totalBalance);
+    }
     },
     []
   );
@@ -146,10 +146,7 @@ export function WalletWidget(props: WalletWidgetProps) {
               <LoadingView loadingText="Loading" />
             )}
             {viewState.view.type === WalletWidgetViews.WALLET_BALANCES &&
-              (<WalletBalances
-                totalFiatAmount={totalFiatAmount}
-                getTokenBalances={getTokenBalances}
-                />)
+              (<WalletBalances totalFiatAmount={totalFiatAmount} getTokenBalances={getTokenBalances} />)
             }
           {viewState.view.type === BaseViews.ERROR && (
             <ErrorView actionText='Try again' onActionClick={errorAction} onCloseClick={closeWalletWidget}/>

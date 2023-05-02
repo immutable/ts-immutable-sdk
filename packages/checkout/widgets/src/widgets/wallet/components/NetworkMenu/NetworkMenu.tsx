@@ -10,10 +10,10 @@ import { ActiveNetworkButtonStyle, NetworkHeadingStyle, NetworkMenuStyles } from
 import { BaseViews, ViewActions, ViewContext } from "../../../../context/ViewContext";
 
 interface NetworkStatusProps {
-  getTokenBalances?: (checkout: Checkout, provider: Web3Provider, networkName: string, chainId: ChainId) => void;
+  getTokenBalances: (checkout: Checkout, provider: Web3Provider, networkName: string, chainId: ChainId) => void;
 }
 
-export const NetworkMenu = (props: NetworkStatusProps) => {
+export const NetworkMenu = ({getTokenBalances}: NetworkStatusProps) => {
   const {walletState, walletDispatch} = useContext(WalletContext);
   const {viewDispatch} = useContext(ViewContext);
 
@@ -47,6 +47,12 @@ export const NetworkMenu = (props: NetworkStatusProps) => {
             network: switchNetworkResult.network
           }
         });
+        await getTokenBalances(
+          checkout, 
+          switchNetworkResult.provider, 
+          switchNetworkResult.network.name, 
+          switchNetworkResult.network.chainId
+        );
         sendNetworkSwitchEvent(switchNetworkResult.network);
       } catch (err: any) {
         if(err.type === 'USER_REJECTED_REQUEST_ERROR'){
@@ -60,7 +66,7 @@ export const NetworkMenu = (props: NetworkStatusProps) => {
         }
       }
     }
-  }, [checkout, provider, network?.chainId, walletDispatch, viewDispatch]);
+  }, [checkout, provider, network?.chainId, walletDispatch, viewDispatch, getTokenBalances]);
 
   useEffect(()=>{
     (async ()=>{
