@@ -7,8 +7,6 @@
   <h1>Immutable Unified TypeScript SDK</h1>
 </div>
 
-# Immutable Unified TypeScript SDK
-
 ## Documentation
 
 See our [developer documentation](https://docs.immutable.com) for information on building on Immutable.
