@@ -7,9 +7,9 @@ export enum WalletWidgetViews {
 export type WalletWidgetView =
   | { type: WalletWidgetViews.WALLET_BALANCES }
   | { type: WalletWidgetViews.SUCCESS }
-  | WalletFailureView;
+  | WalletFailView;
 
-interface WalletFailureView {
+interface WalletFailView {
   type: WalletWidgetViews.FAIL;
-  error: Error;
+  reason: string;
 }
