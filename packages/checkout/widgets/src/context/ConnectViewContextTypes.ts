@@ -13,9 +13,9 @@ export type ConnectWidgetView =
   | { type: ConnectWidgetViews.SWITCH_NETWORK }
   | { type: ConnectWidgetViews.PASSPORT }
   | { type: ConnectWidgetViews.SUCCESS }
-  | ConnectFailureView;
+  | ConnectFailView;
 
-interface ConnectFailureView {
+interface ConnectFailView {
   type: ConnectWidgetViews.FAIL;
-  error: Error;
+  reason: string;
 }

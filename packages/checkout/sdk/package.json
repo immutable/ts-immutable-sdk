@@ -35,13 +35,13 @@
   "scripts": {
     "build": "parcel build",
     "build:prod": "NODE_ENV=production parcel build --no-source-maps",
+    "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "start": "parcel watch",
     "test": "jest test",
     "test:coverage": "jest --coverage",
     "test:watch": "jest test --watch",
-    "typecheck": "tsc --noEmit",
-    "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts"
+    "typecheck": "tsc --noEmit"
   },
   "source": "src/index.ts",
   "types": "dist/types.d.ts"

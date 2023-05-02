@@ -43,8 +43,13 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/base.d.ts",
-      "import": "./dist/base.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config.js"
     },
     "./immutablex_client": {
       "types": "./dist/immutablex_client.d.ts",
@@ -73,13 +78,18 @@
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
   "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
-    "build": "yarn packageList && yarn updateDependencies && rm -rf dist && NODE_ENV=production rollup --config rollup.config.js && rm -rf dist/types",
+    "build": "yarn packageList && yarn updateDependencies && yarn regenModules && rm -rf dist && NODE_ENV=production rollup --config rollup.config.js && rm -rf dist/types",
+    "build:only": "rm -rf dist && NODE_ENV=production rollup --config rollup.config.js && rm -rf dist/types",
+    "generateIndex": "node scripts/generateIndex.js",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "packageList": "./scripts/generate-package-list.sh",
+    "regenModules": "yarn generateIndex && yarn updateExports",
     "typecheck": "tsc --noEmit --jsx preserve",
-    "updateDependencies": "yarn packageList && node ./scripts/updateDependencies.js"
+    "updateDependencies": "yarn packageList && node ./scripts/updateDependencies.js",
+    "updateExports": "node scripts/updateExports.js"
   },
   "type": "module",
   "types": "./dist/index.d.ts"

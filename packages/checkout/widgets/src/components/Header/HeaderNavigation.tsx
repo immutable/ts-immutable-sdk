@@ -2,7 +2,7 @@ import { AppHeaderBar, ButtCon } from '@biom3/react';
 import { useContext } from 'react';
 import { ViewActions, ViewContext } from '../../context/ViewContext';
 import { HeaderNavigationStyles, ButtonNavigationStyles } from './HeaderStyles';
-import { sendCloseWidgetEvent } from "../../widgets/connect/ConnectWidgetEvents";
+import { sendCloseWidgetEvent } from '../../widgets/connect/ConnectWidgetEvents';
 import { sendWalletWidgetCloseEvent } from '../../widgets/wallet/WalletWidgetEvents';
 
 export interface HeaderNavigationProps {

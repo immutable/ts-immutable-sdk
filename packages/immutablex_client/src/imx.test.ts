@@ -1,14 +1,14 @@
 import { ImxConfiguration } from './config';
-import { ImmutableXClientFactory } from 'index';
+import { ImmutableXClient } from 'index';
 import { Environment } from '@imtbl/config';
 import { Config } from '@imtbl/core-sdk';
 
-describe('ImmutableXClientFactory', () => {
-  it('should instantiate a SANDBOX ImmutableXClientFactory', async () => {
+describe('ImmutableXClient', () => {
+  it('should instantiate a SANDBOX ImmutableXClient', async () => {
     const config = new ImxConfiguration({
       baseConfig: { environment: Environment.SANDBOX },
     });
-    const { assetApi } = ImmutableXClientFactory(config);
+    const { assetApi } = new ImmutableXClient(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);
@@ -17,11 +17,11 @@ describe('ImmutableXClientFactory', () => {
     );
   });
 
-  it('should instantiate a PRODUCTION ImmutableXClientFactory', async () => {
+  it('should instantiate a PRODUCTION ImmutableXClient', async () => {
     const config = new ImxConfiguration({
       baseConfig: { environment: Environment.PRODUCTION },
     });
-    const { assetApi } = ImmutableXClientFactory(config);
+    const { assetApi } = new ImmutableXClient(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);
@@ -30,7 +30,7 @@ describe('ImmutableXClientFactory', () => {
     );
   });
 
-  it('should instantiate a ImmutableXClientFactory with override and custom version', async () => {
+  it('should instantiate a ImmutableXClient with override and custom version', async () => {
     const sdkVersion = 'ts-immutable-sdk-0.0.1';
     const config = new ImxConfiguration({
       baseConfig: { environment: Environment.PRODUCTION },
@@ -45,7 +45,7 @@ describe('ImmutableXClientFactory', () => {
         }),
       },
     });
-    const { assetApi } = ImmutableXClientFactory(config);
+    const { assetApi } = new ImmutableXClient(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);
