@@ -6,7 +6,7 @@ import { Web3Provider } from "@ethersproject/providers";
 import { text } from "../../../../resources/text/textConfig";
 import { WalletWidgetViews } from "../../../../context/WalletViewContextTypes";
 import { sendNetworkSwitchEvent } from "../../WalletWidgetEvents";
-import { ActiveNetworkButtonStyles } from "./NetworkMenuStyles";
+import { ActiveNetworkButtonStyle, NetworkHeadingStyle, NetworkMenuStyle } from "./NetworkMenuStyle";
 import { BaseViews, ViewActions, ViewContext } from "../../../../context/ViewContext";
 
 interface NetworkStatusProps {
@@ -77,19 +77,9 @@ export const NetworkMenu = (props: NetworkStatusProps) => {
 
   return (
     <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-      }}
+      sx={NetworkMenuStyle}
     >
-      <Box sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        columnGap: 'base.spacing.x1',
-        paddingX: 'base.spacing.x3',
-        paddingY: 'base.spacing.x2'
-        }}>
+      <Box sx={NetworkHeadingStyle}>
         <Body size="medium">{networkStatus.heading}</Body>
         <Icon icon='InformationCircle' sx={{width: 'base.icon.size.100'}} />
       </Box>
@@ -97,7 +87,7 @@ export const NetworkMenu = (props: NetworkStatusProps) => {
         {allowedNetworks?.map((networkItem)=>
           <HorizontalMenu.Button key={networkItem.chainId}
             testId={`${networkItem.name}-network-button`}
-            sx={networkItem.chainId === network?.chainId ? ActiveNetworkButtonStyles : {}}
+            sx={networkItem.chainId === network?.chainId ? ActiveNetworkButtonStyle : {}}
             size="medium"
             onClick={() => switchNetwork(networkItem.chainId)}>
             <Button.Logo
