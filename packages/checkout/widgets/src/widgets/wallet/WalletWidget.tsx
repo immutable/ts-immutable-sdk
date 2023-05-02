@@ -1,4 +1,4 @@
-import { BiomeThemeProvider } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 
 import { WidgetTheme } from '@imtbl/checkout-ui-types';
@@ -139,7 +139,7 @@ export function WalletWidget(props: WalletWidgetProps) {
   }
 
   return (
-    <BiomeThemeProvider theme={{ base: biomeTheme }}>
+    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={{viewState, viewDispatch}}>
         <WalletContext.Provider value={{walletState, walletDispatch}}>
             {viewState.view.type === BaseViews.LOADING_VIEW && (
@@ -153,6 +153,6 @@ export function WalletWidget(props: WalletWidgetProps) {
           )}
         </WalletContext.Provider>
       </ViewContext.Provider>
-    </BiomeThemeProvider>
+    </BiomeCombinedProviders>
   );
 }

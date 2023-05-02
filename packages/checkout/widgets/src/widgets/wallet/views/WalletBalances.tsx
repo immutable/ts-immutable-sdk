@@ -12,7 +12,6 @@ import { Web3Provider } from "@ethersproject/providers";
 import { useContext } from "react";
 import { WalletContext } from "../context/WalletContext";
 import { closeWalletWidget } from "../functions/closeWalletWidget";
-import { Network } from "@imtbl/checkout-ui-types";
 
 export interface WalletBalancesProps {
   totalFiatAmount: number;
@@ -22,7 +21,7 @@ export interface WalletBalancesProps {
 export const WalletBalances = ({ totalFiatAmount, getTokenBalances}: WalletBalancesProps) => {
   const {walletState}  = useContext(WalletContext);
   const {header} = text.views[WalletWidgetViews.WALLET_BALANCES];
-  const showAddCoins = walletState.network?.name === Network.POLYGON;
+
   return(
     <SimpleLayout
       testId="wallet-balances"
