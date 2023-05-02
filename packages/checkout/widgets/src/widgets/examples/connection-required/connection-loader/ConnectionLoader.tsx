@@ -14,8 +14,8 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   SuccessBoxStyles,
   SuccessLogoStyles,
-  SuccessViewStyles,
 } from '../../../../components/Success/SuccessViewStyles';
+import { CenteredBoxContent } from '../../../../components/CenteredBoxContent/CenteredBoxContent';
 
 export interface ConnectionLoaderProps {
   children?: React.ReactNode;
@@ -88,7 +88,7 @@ export function ConnectionLoader({
       {connStatus === ConnectionStatus.UNKNOWN && (
         <BiomeThemeProvider theme={{ base: biomeTheme }}>
           <SimpleLayout footer={<FooterLogo />}>
-            <Box sx={SuccessViewStyles}>
+            <CenteredBoxContent>
               <Box sx={SuccessBoxStyles}>
                 <Box sx={SuccessLogoStyles}>
                   <Icon
@@ -104,7 +104,7 @@ export function ConnectionLoader({
                   Checking Connection
                 </Body>
               </Box>
-            </Box>
+            </CenteredBoxContent>
           </SimpleLayout>
         </BiomeThemeProvider>
       )}
