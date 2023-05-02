@@ -8,7 +8,7 @@ import { TotalTokenBalance } from "../components/TotalTokenBalance";
 import { TokenBalanceList } from "../components/TokenBalanceList";
 import { BalanceInfo } from "../components/BalanceItem";
 import { WidgetBodyStyle } from "../WalletStyles";
-import { NetworkStatus } from "../components/NetworkStatus/NetworkStatus";
+import { NetworkMenu } from "../components/NetworkStatus/NetworkMenu";
 import { ChainId, Checkout } from "@imtbl/checkout-sdk-web";
 import { Web3Provider } from "@ethersproject/providers";
 
@@ -19,7 +19,7 @@ export interface WalletBalancesProps {
   getTokenBalances: (checkout: Checkout, provider: Web3Provider, networkName: string, chainId: ChainId) => void;
 }
 
-export const WalletBalances = ({ tokenBalances, totalFiatAmount, networkName, getTokenBalances}: WalletBalancesProps) => {
+export const WalletBalances = ({ tokenBalances, totalFiatAmount, getTokenBalances}: WalletBalancesProps) => {
   const {header} = text.views[WalletWidgetViews.WALLET_BALANCES];
   return(
     <SimpleLayout
@@ -33,7 +33,7 @@ export const WalletBalances = ({ tokenBalances, totalFiatAmount, networkName, ge
         paddingX: 'base.spacing.x1',
         borderRadius: 'base.borderRadius.x6'
         }}>
-        <NetworkStatus networkName={networkName} getTokenBalances={getTokenBalances} />
+        <NetworkMenu getTokenBalances={getTokenBalances} />
         <TotalTokenBalance totalBalance={totalFiatAmount} />
         <Box sx={WidgetBodyStyle}>
           <TokenBalanceList balanceInfoItems={tokenBalances} />
