@@ -1,4 +1,5 @@
 import { ChainId } from './network';
+import { BigNumber } from 'ethers';
 
 /**
  * Interface representing token information.
@@ -35,7 +36,7 @@ export interface TokenMasterInfo extends TokenInfo {
  */
 export interface GetTokenAllowListParams {
   type: TokenFilterTypes;
-  chainId: ChainId;
+  chainId?: ChainId;
   exclude?: TokenFilter[];
 }
 
@@ -62,4 +63,41 @@ export enum TokenFilterTypes {
  */
 export interface TokenFilter {
   address: string;
+}
+
+/**
+ * Enum representing the types of token filters available.
+ */
+export enum SupportFiatCurrencies {
+  USD = 'USD',
+}
+
+/**
+ * Interface representing the parameters for {@link Checkout.convertTokenToFiat}.
+ * @property {BigNumber} amount - The the amount of token we are converting.
+ * @property {TokenInfo} token - The token we are converting from.
+ * @property {SupportFiatCurrencies}  fiatSymbol - The fiat currency we are converting to.
+ */
+export interface ConvertTokenToFiatParams {
+  amount: BigNumber;
+  token: TokenInfo;
+  fiatSymbol: SupportFiatCurrencies;
+}
+
+/**
+ * Interface representing the result of {@link Checkout.convertTokenToFiat}.
+ * @property {TokenInfo} token - The token that we converted from.
+ * @property {string} fiatSymbol - The fiat currency we converted to.
+ * @property {number} quotedAt - The unix timestamp for when the quote was generated.
+ * @property {number} quote - The quote at the given timestamp.
+ * @property {BigNumber} amount - The amount we converted.
+ * @property {number} convertedAmount - The converted amount.
+ */
+export interface ConvertTokenToFiatResult {
+  token: TokenInfo;
+  fiatSymbol: string;
+  quotedAt: number;
+  quote: number;
+  amount: BigNumber;
+  convertedAmount: number;
 }
