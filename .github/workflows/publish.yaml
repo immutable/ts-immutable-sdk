@@ -67,15 +67,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Lint
-        run: yarn lint
-
-      - name: Check Single Package Version Policy
-        run: yarn syncpack:check
-
       - name: Workout next version string
         run: |
           upgrade_type=${{ github.event.inputs.upgrade_type }}
@@ -87,6 +78,15 @@ jobs:
           fi
           ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $revision_upgrade
         shell: bash
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Check Single Package Version Policy
+        run: yarn syncpack:check
 
       - name: Get next version string
         id: version
