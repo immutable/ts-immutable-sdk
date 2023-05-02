@@ -20,16 +20,16 @@ const packageJson = JSON.parse(packageJsonData);
 const exports = {
   './package.json': './package.json',
   '.': {
-    types: './dist/config.d.ts',
-    import: './dist/config.js',
-    // require: './dist/index.cjs',
+    types: './dist/index.d.ts',
+    import: './dist/index.js',
+    require: './dist/index.cjs',
   },
 };
 
 for (const moduleName in moduleData.modules) {
-  if (moduleName === 'config') {
-    continue; // Skip config module as it's explicitly defined for '.'
-  }
+  // if (moduleName === 'config') {
+  //   continue; // Skip config module as it's explicitly defined for '.'
+  // }
 
   const moduleReleaseType = moduleData.modules[moduleName];
 
