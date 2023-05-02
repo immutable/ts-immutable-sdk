@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@biom3/react';
-import { ChainId } from '@imtbl/checkout-sdk-web';
+import { ChainId } from '@imtbl/checkout-sdk';
 import { ConnectContext } from '../../context/ConnectContext';
 import { useContext } from 'react';
 import { ViewActions, ViewContext } from '../../../../context/ViewContext';

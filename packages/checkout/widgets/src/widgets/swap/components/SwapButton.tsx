@@ -1,5 +1,5 @@
 import { Button } from '@biom3/react';
-import { Checkout, Transaction } from '@imtbl/checkout-sdk-web';
+import { Checkout, Transaction } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { SwapWidgetViews } from '../SwapWidget';
 

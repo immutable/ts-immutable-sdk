@@ -2,9 +2,9 @@ import {
   Checkout,
   ConnectParams,
   ConnectionProviders,
-} from '@imtbl/checkout-sdk-web';
+} from '@imtbl/checkout-sdk';
 import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
-import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { cySmartGet } from '../../lib/testUtils';

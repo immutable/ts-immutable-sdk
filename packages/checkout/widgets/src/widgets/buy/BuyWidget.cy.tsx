@@ -1,9 +1,9 @@
 import { BuyWidget, BuyWidgetParams } from './BuyWidget';
 import { describe, it, cy, beforeEach } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { cySmartGet } from '../../lib/testUtils';
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 
 describe('BuyWidget tests', () => {
   beforeEach(() => {

@@ -1,7 +1,7 @@
 import { Badge, BiomeThemeProvider, Body, Box, Button } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 
-import { WidgetTheme, Network } from '@imtbl/checkout-ui-types';
+import { WidgetTheme, Network } from '@imtbl/checkout-widgets-react';
 
 import {
   ChainId,
@@ -9,7 +9,7 @@ import {
   ConnectionProviders,
   ConnectResult,
   SwitchNetworkParams,
-} from '@imtbl/checkout-sdk-web';
+} from '@imtbl/checkout-sdk';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Web3Provider } from '@ethersproject/providers';

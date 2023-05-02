@@ -1,4 +1,4 @@
-import { Checkout, GetAllBalancesResult } from '@imtbl/checkout-sdk-web';
+import { Checkout, GetAllBalancesResult } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 
 export async function getAllBalances(

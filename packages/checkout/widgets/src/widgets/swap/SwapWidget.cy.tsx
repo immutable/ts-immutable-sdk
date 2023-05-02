@@ -1,9 +1,9 @@
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { describe, it, cy, beforeEach } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { cySmartGet } from '../../lib/testUtils';
-import { Checkout } from '@imtbl/checkout-sdk-web';
+import { Checkout } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 
 describe('SwapWidget tests', () => {

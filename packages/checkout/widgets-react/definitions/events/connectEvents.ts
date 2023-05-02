@@ -1,4 +1,4 @@
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
 
 export enum ConnectEventType {
   SUCCESS = 'success',

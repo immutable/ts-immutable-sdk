@@ -1,7 +1,7 @@
 import React from 'react';
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { WidgetTheme, Network } from '@imtbl/checkout-ui-types';
+import { WidgetTheme, Network } from '@imtbl/checkout-widgets-react';
 import { ExampleWidget, ExampleWidgetParams } from './DiExampleWidget';
 import { Web3Provider } from '@ethersproject/providers';
 

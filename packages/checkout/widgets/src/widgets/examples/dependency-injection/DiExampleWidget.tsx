@@ -1,8 +1,8 @@
 import { BiomeThemeProvider, Body, Box, Button, Heading } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { DiExampleWidgetStyle } from './DiExampleStyles';
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useState } from 'react';
 

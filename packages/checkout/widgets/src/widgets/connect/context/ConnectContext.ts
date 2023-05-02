@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { createContext } from 'react';
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 
 export interface ConnectState {
   checkout: Checkout | null;

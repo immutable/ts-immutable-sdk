@@ -1,7 +1,7 @@
 import { Box, Body, TextInput } from '@biom3/react';
 import TokenSelect from './TokenSelect';
 import { BigNumber, utils } from 'ethers';
-import { TokenInfo, ConnectResult } from '@imtbl/checkout-sdk-web';
+import { TokenInfo, ConnectResult } from '@imtbl/checkout-sdk';
 export interface BuyProps {
   onTokenChange: (token: TokenInfo) => void;
   onAmountChange: (event: any) => void;

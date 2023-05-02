@@ -1,6 +1,6 @@
 import { BiomeThemeProvider } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { ViewOne } from './views/ViewOne';
 import { useEffect, useReducer } from 'react';
 import {

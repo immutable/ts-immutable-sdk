@@ -1,9 +1,9 @@
 {
-  "name": "@imtbl/checkout-sdk-web",
+  "name": "@imtbl/checkout-sdk",
   "description": "Provides both programatical and user interfaces for interacting with various wallets and L2 networks",
   "version": "0.0.0",
   "author": "proletesseract",
-  "bugs": "https://github.com/immutable/imx-checkout-sdk/issues",
+  "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
     "@metamask/detect-provider": "^2.0.0",
@@ -21,7 +21,7 @@
     "parcel": "^2.8.3",
     "typescript": "^4.9.5"
   },
-  "homepage": "https://github.com/immutable/imx-checkout-sdk#readme",
+  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "keywords": [
     "immutablex"
   ],
@@ -29,7 +29,7 @@
   "main": "dist/main.js",
   "module": "dist/module.js",
   "private": true,
-  "repository": "immutable/imx-checkout-sdk.git",
+  "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "parcel build",
     "build:prod": "NODE_ENV=production parcel build --no-source-maps",

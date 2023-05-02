@@ -5,11 +5,7 @@ import { HeaderNavigation } from '../../../../../components/Header/HeaderNavigat
 import { SimpleLayout } from '../../../../../components/SimpleLayout/SimpleLayout';
 import { ViewContext, ViewActions } from '../../../../../context/ViewContext';
 import { InnerExampleWidgetViews } from '../../../../../context/InnerExampleViewContextTypes';
-import {
-  ChainId,
-  Checkout,
-  ConnectionProviders,
-} from '@imtbl/checkout-sdk-web';
+import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 
 export interface ViewTwoProps {
   callBack?: () => void;

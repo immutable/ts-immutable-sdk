@@ -1,4 +1,4 @@
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '../constants';
 
 export type CheckoutWidgetsConfig = {

@@ -5,7 +5,7 @@ import {
   ConnectResult,
   TokenFilterTypes,
   TokenInfo,
-} from '@imtbl/checkout-sdk-web';
+} from '@imtbl/checkout-sdk';
 import {
   OptionsContainerStyle,
   OptionStyle,

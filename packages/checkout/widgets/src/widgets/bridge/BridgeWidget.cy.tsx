@@ -5,9 +5,9 @@ import {
 } from './BridgeWidget';
 import { describe, it, cy, beforeEach } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { Network, WidgetTheme } from '@imtbl/checkout-ui-types';
+import { Network, WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { cySmartGet } from '../../lib/testUtils';
-import { Checkout, SwitchNetworkResult } from '@imtbl/checkout-sdk-web';
+import { Checkout, SwitchNetworkResult } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { BiomeCombinedProviders, BiomeThemeProvider } from '@biom3/react';
 import { onDarkBase } from '@biom3/design-tokens';

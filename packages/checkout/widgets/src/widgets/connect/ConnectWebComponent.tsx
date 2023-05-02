@@ -1,7 +1,7 @@
 import React from 'react';
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
 
 export class ImmutableConnect extends HTMLElement {

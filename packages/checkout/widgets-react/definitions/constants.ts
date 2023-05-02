@@ -9,7 +9,7 @@ export enum WidgetTheme {
   DARK = 'dark',
   CUSTOM = 'custom',
 }
-export { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+export { ConnectionProviders } from '@imtbl/checkout-sdk';
 
 export enum CheckoutWidgetTagNames {
   CONNECT = 'imtbl-connect',

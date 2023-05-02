@@ -1,4 +1,4 @@
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 
 export const text = {

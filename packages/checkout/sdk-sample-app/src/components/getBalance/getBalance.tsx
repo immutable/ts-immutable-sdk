@@ -1,4 +1,4 @@
-import { Checkout, GetBalanceParams } from '@imtbl/checkout-sdk-web';
+import { Checkout, GetBalanceParams } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useState } from 'react';
 

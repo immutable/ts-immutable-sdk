@@ -2,7 +2,7 @@ import { alphaSortTokensList, findTokenByAddress } from '../helpers';
 import { BigNumber, utils } from 'ethers';
 import { Box } from '@biom3/react';
 import { Buy } from './Buy';
-import { ConnectResult, TokenInfo, Transaction } from '@imtbl/checkout-sdk-web';
+import { ConnectResult, TokenInfo, Transaction } from '@imtbl/checkout-sdk';
 import { Fees } from './Fees';
 import { SwapButton } from './SwapButton';
 import { SwapWidgetViews } from '../SwapWidget';

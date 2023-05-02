@@ -1,10 +1,10 @@
-import { NetworkInfo } from '@imtbl/checkout-sdk-web';
+import { NetworkInfo } from '@imtbl/checkout-sdk';
 import {
   IMTBLWidgetEvents,
   WalletEvent,
   WalletEventType,
   WalletNetworkSwitchEvent,
-} from '@imtbl/checkout-ui-types';
+} from '@imtbl/checkout-widgets-react';
 
 export function sendWalletWidgetCloseEvent() {
   console.log(WalletEventType.CLOSE_WIDGET);

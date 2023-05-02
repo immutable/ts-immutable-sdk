@@ -1,6 +1,6 @@
 import { BiomeThemeProvider } from '@biom3/react';
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web';
-import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,

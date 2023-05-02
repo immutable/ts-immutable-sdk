@@ -4,7 +4,7 @@ import { FooterButton } from '../../../../components/Footer/FooterButton';
 import { useCallback, useContext, useState } from 'react';
 import { ConnectActions, ConnectContext } from '../../context/ConnectContext';
 import { ViewActions, ViewContext } from '../../../../context/ViewContext';
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
 import { Body, Box, Heading } from '@biom3/react';
 import { MetamaskConnectHero } from '../../../../components/Hero/MetamaskConnectHero';

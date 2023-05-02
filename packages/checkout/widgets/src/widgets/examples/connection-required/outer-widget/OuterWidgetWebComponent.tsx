@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { OuterWidget, OuterWidgetParams } from './OuterWidget';
 import { ConnectionLoader } from '../connection-loader/ConnectionLoader';
 

@@ -1,4 +1,7 @@
-import { WidgetTheme, ConnectionProviders } from '@imtbl/checkout-ui-types';
+import {
+  WidgetTheme,
+  ConnectionProviders,
+} from '@imtbl/checkout-widgets-react';
 import { useState, useEffect } from 'react';
 
 function WalletWebView() {

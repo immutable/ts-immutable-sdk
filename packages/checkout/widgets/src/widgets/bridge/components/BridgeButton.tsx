@@ -1,5 +1,5 @@
 import { Button, OptionKey } from '@biom3/react';
-import { Checkout, GetBalanceResult } from '@imtbl/checkout-sdk-web';
+import { Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { Web3Provider, TransactionResponse } from '@ethersproject/providers';
 import { utils } from 'ethers';
 import { BridgeWidgetViews } from '../BridgeWidget';

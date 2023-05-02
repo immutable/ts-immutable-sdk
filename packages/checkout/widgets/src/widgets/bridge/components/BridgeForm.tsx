@@ -1,7 +1,7 @@
 import { Body, Box, Option, OptionKey, Select, TextInput } from '@biom3/react';
-import { ChainId, GetBalanceResult } from '@imtbl/checkout-sdk-web';
+import { ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { useEffect, useState } from 'react';
-import { Network } from '@imtbl/checkout-ui-types';
+import { Network } from '@imtbl/checkout-widgets-react';
 import { BridgeButton } from './BridgeButton';
 import { Web3Provider, TransactionResponse } from '@ethersproject/providers';
 import { BridgeWidgetViews } from '../BridgeWidget';

@@ -8,7 +8,7 @@ import {
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 
-import { Network, WidgetTheme } from '@imtbl/checkout-ui-types';
+import { Network, WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { BridgeWidgetStyle } from './BridgeStyles';
 
 import {
@@ -16,7 +16,7 @@ import {
   Checkout,
   ConnectionProviders,
   GetBalanceResult,
-} from '@imtbl/checkout-sdk-web';
+} from '@imtbl/checkout-sdk';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import { BridgeForm } from './components/BridgeForm';

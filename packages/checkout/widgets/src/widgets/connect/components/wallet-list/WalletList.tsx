@@ -2,7 +2,7 @@ import { Box, MenuItem } from '@biom3/react';
 import { useContext } from 'react';
 import { ViewActions, ViewContext } from '../../../../context/ViewContext';
 import { ConnectWidgetViews } from '../../../../context/ConnectViewContextTypes';
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { ConnectActions, ConnectContext } from '../../context/ConnectContext';
 import { text } from '../../../../resources/text/textConfig';
 

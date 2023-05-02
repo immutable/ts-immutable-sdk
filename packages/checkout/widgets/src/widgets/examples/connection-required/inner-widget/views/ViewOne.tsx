@@ -5,7 +5,7 @@ import { HeaderNavigation } from '../../../../../components/Header/HeaderNavigat
 import { SimpleLayout } from '../../../../../components/SimpleLayout/SimpleLayout';
 import { ViewContext, ViewActions } from '../../../../../context/ViewContext';
 import { InnerExampleWidgetViews } from '../../../../../context/InnerExampleViewContextTypes';
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 
 export const ViewOne = () => {
   const { viewDispatch } = useContext(ViewContext);

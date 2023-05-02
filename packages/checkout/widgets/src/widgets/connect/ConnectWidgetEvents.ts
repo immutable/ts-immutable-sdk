@@ -4,9 +4,9 @@ import {
   ConnectionSuccess,
   ConnectionFailed,
   ConnectEventType,
-} from '@imtbl/checkout-ui-types';
+} from '@imtbl/checkout-widgets-react';
 
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
 
 import { addToLocalStorage } from '../../lib';
 

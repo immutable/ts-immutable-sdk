@@ -1,4 +1,4 @@
-import { Checkout, ConnectParams } from '@imtbl/checkout-sdk-web';
+import { Checkout, ConnectParams } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 
 export enum ConnectionProviders {

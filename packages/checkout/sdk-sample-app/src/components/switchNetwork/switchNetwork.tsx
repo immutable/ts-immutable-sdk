@@ -1,4 +1,4 @@
-import { Checkout, ChainId } from '@imtbl/checkout-sdk-web';
+import { Checkout, ChainId } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 
 export interface SwitchNetworkProps {

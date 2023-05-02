@@ -6,7 +6,7 @@ import {
   BuyFailed,
   BuyClose,
   BuyNotConnected,
-} from '@imtbl/checkout-ui-types';
+} from '@imtbl/checkout-widgets-react';
 
 export const sendBuySuccessEvent = () => {
   const successEvent = new CustomEvent<BuyEvent<BuySuccess>>(

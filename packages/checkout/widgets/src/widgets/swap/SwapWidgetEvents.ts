@@ -4,7 +4,7 @@ import {
   SwapSuccess,
   IMTBLWidgetEvents,
   SwapFailed,
-} from '@imtbl/checkout-ui-types';
+} from '@imtbl/checkout-widgets-react';
 
 export const sendSwapSuccessEvent = () => {
   const successEvent = new CustomEvent<SwapEvent<SwapSuccess>>(

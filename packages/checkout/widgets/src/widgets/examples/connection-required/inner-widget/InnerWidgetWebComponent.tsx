@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { InnerWidget, InnerWidgetParams } from './InnerWidget';
 
 export class ImmutableInnerExample extends HTMLElement {

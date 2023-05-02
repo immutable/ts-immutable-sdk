@@ -1,7 +1,7 @@
 import React from 'react';
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 
 export class ImmutableWallet extends HTMLElement {

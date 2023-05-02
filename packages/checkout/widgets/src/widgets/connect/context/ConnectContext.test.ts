@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout } from '@imtbl/checkout-sdk-web';
+import { Checkout } from '@imtbl/checkout-sdk';
 import { describe, expect } from '@jest/globals';
 import {
   ConnectActions,

@@ -6,7 +6,7 @@ import {
   TokenInfo,
   Checkout,
   GetBalanceResult,
-} from '@imtbl/checkout-sdk-web';
+} from '@imtbl/checkout-sdk';
 import TokenSelect from './TokenSelect';
 import { QuoteResponse } from './SwapForm';
 import { findTokenByAddress } from '../helpers';

@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { BiomeThemeProvider, Box, Heading, Button, Body } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { BuyWidgetStyle } from './BuyStyles';
 import {
   ChainId,
   Checkout,
   ConnectionProviders,
   Transaction,
-} from '@imtbl/checkout-sdk-web';
+} from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import AssetDetails from './AssetDetails';

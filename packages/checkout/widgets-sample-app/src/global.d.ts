@@ -5,7 +5,7 @@
 //   ImtblBridgeProps,
 //   ImtblExampleProps,
 //   ImtblBuyProps,
-// } from '@imtbl/checkout-ui-types';
+// } from '@imtbl/checkout-widgets-react';
 
 // declare global {
 //   namespace JSX {

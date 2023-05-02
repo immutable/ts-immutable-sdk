@@ -1,6 +1,6 @@
 import React from 'react';
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web';
-import { WidgetTheme } from '@imtbl/checkout-ui-types';
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { cySmartGet } from '../../lib/testUtils';

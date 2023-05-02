@@ -2,7 +2,7 @@ import React from 'react';
 import { GetOrderResponse, Orderbook, BuyWidgetViews } from './BuyWidget';
 import { Button } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout, ChainId } from '@imtbl/checkout-sdk-web';
+import { Checkout, ChainId } from '@imtbl/checkout-sdk';
 import { sendBuySuccessEvent, sendBuyFailedEvent } from './BuyWidgetEvents';
 
 export interface BuyButtonProps {

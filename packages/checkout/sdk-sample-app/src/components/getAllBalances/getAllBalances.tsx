@@ -3,7 +3,7 @@ import {
   Checkout,
   GetAllBalancesParams,
   GetBalanceResult,
-} from '@imtbl/checkout-sdk-web';
+} from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useState } from 'react';
 

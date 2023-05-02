@@ -39,8 +39,8 @@
     "tsc-watch": "^6.0.0"
   },
   "devDependencies": {
-    "@imtbl/checkout-sdk-web": "0.0.0",
-    "@imtbl/checkout-ui-types": "0.0.0",
+    "@imtbl/checkout-sdk": "0.0.0",
+    "@imtbl/checkout-widgets-react": "0.0.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/provider": "0.0.0",

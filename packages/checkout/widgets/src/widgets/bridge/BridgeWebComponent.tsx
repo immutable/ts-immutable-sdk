@@ -1,7 +1,7 @@
 import React from 'react';
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { Network, WidgetTheme } from '@imtbl/checkout-ui-types';
+import { Network, WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 
 export class ImmutableBridge extends HTMLElement {

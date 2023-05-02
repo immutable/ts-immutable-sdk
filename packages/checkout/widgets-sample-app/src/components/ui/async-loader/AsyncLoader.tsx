@@ -7,7 +7,7 @@ import {
   UpdateConfig,
   CheckoutWidgetTagNames,
   // SetProvider,
-} from '@imtbl/checkout-ui-types';
+} from '@imtbl/checkout-widgets-react';
 
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider } from '@ethersproject/providers';

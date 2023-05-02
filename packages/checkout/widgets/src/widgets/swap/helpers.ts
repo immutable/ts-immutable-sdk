@@ -1,4 +1,4 @@
-import { TokenInfo } from '@imtbl/checkout-sdk-web';
+import { TokenInfo } from '@imtbl/checkout-sdk';
 
 export const findTokenByAddress = (
   tokens: TokenInfo[],

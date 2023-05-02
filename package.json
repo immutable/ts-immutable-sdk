@@ -58,7 +58,7 @@
     "packages/checkout/sdk-sample-app",
     "packages/checkout/widgets",
     "packages/checkout/widgets-sample-app",
-    "packages/checkout/widgets-types",
+    "packages/checkout/widgets-react",
     "packages/economy/sdk",
     "packages/economy/playground",
     "packages/economy/services"

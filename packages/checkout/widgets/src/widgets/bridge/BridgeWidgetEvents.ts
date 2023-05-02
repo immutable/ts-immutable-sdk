@@ -4,7 +4,7 @@ import {
   BridgeSuccess,
   IMTBLWidgetEvents,
   BridgeFailed,
-} from '@imtbl/checkout-ui-types';
+} from '@imtbl/checkout-widgets-react';
 
 export const sendBridgeSuccessEvent = () => {
   const successEvent = new CustomEvent<BridgeEvent<BridgeSuccess>>(

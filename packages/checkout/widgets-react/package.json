@@ -1,10 +1,11 @@
 {
-  "name": "@imtbl/checkout-ui-types",
-  "description": "TypeScript definitions for @imtbl/checkout-ui",
+  "name": "@imtbl/checkout-widgets-react",
+  "description": "React components for @imtbl/checkout-widgets",
   "version": "0.0.0",
   "author": "",
+  "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@imtbl/checkout-sdk-web": "0.0.0",
+    "@imtbl/checkout-sdk": "0.0.0",
     "ethers": "^5.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
