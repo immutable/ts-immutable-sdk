@@ -74,7 +74,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   useEffect(() => {
     switch (viewState.view.type) {
       case ConnectWidgetViews.FAIL:
-        sendConnectFailedEvent(viewState.view.error.message);
+        sendConnectFailedEvent(viewState.view.reason);
         break;
     }
   }, [viewState]);
