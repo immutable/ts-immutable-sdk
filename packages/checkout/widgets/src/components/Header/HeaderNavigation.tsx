@@ -1,7 +1,7 @@
 import { AppHeaderBar, ButtCon } from '@biom3/react';
 import { useContext } from 'react';
 import { ViewActions, ViewContext } from '../../context/ViewContext';
-import { HeaderNavigationStyles, ButtonNavigationStyles } from './HeaderStyles';
+import { HeaderNavigationStyles } from './HeaderStyles';
 import { sendCloseWidgetEvent } from '../../widgets/connect/ConnectWidgetEvents';
 import { sendWalletWidgetCloseEvent } from '../../widgets/wallet/WalletWidgetEvents';
 
@@ -50,6 +50,7 @@ export const HeaderNavigation = ({
     <AppHeaderBar
       testId="header-navigation-container"
       sx={HeaderNavigationStyles(transparent)}
+      contentAlign="left"
     >
       {showBack && (
         <AppHeaderBar.LeftButtCon
@@ -59,11 +60,7 @@ export const HeaderNavigation = ({
           testId="back-button"
         />
       )}
-      <AppHeaderBar.Title
-        testId="header-title"
-        size="medium"
-        sx={{ textAlign: 'left' }}
-      >
+      <AppHeaderBar.Title testId="header-title" size="medium">
         {title}
       </AppHeaderBar.Title>
       <AppHeaderBar.RightHandButtons>
@@ -78,7 +75,6 @@ export const HeaderNavigation = ({
         {showClose && (
           <ButtCon
             iconVariant="bold"
-            sx={ButtonNavigationStyles(transparent)}
             icon="Close"
             onClick={close}
             testId="close-button"
