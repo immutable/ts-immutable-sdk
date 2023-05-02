@@ -1,18 +1,11 @@
 {
-  "root": true,
+  "extends": ["airbnb", "airbnb-typescript"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 2020,
-    "project": ["tsconfig.json"],
-    "sourceType": "module"
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "."
   },
-  "plugins": ["@typescript-eslint", "prettier"],
-  "extends": ["plugin:prettier/recommended"],
   "rules": {
-    "prettier/prettier": "error",
-    "no-unused-vars": "error",
-    "no-use-before-define": "error",
-    "arrow-body-style": "warn",
     "@typescript-eslint/naming-convention": [
       "error",
       {
@@ -56,8 +49,7 @@
       {
         "selector": "memberLike",
         "modifiers": ["private"],
-        "format": ["camelCase", "UPPER_CASE"],
-        "leadingUnderscore": "require"
+        "format": ["camelCase", "UPPER_CASE"]
       },
       {
         "selector": "typeLike",
