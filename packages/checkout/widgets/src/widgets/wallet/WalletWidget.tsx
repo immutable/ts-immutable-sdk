@@ -13,9 +13,10 @@ import { useCallback, useEffect, useReducer, useState } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { BalanceInfo } from './components/BalanceItem';
 import { initialWalletState, WalletActions, WalletContext, walletReducer } from './context/WalletContext';
-import { initialViewState, ViewActions, ViewContext, viewReducer } from '../../context/ViewContext';
+import { BaseViews, initialViewState, ViewActions, ViewContext, viewReducer } from "../../context/ViewContext";
 import { WalletWidgetViews } from '../../context/WalletViewContextTypes';
 import { WalletBalances } from './views/WalletBalances';
+import { ErrorView } from "../../components/Error/ErrorView";
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
@@ -79,7 +80,6 @@ export function WalletWidget(props: WalletWidgetProps) {
   );
 
   useEffect(()=>{
-    // set checkout in context
     const checkout = new Checkout();
     walletDispatch({
       payload: {
@@ -97,7 +97,6 @@ export function WalletWidget(props: WalletWidgetProps) {
         providerPreference: params.providerPreference ?? ConnectionProviders.METAMASK
       });
 
-      // create provider and set in context
       walletDispatch({
         payload: {
           type: WalletActions.SET_PROVIDER,
@@ -105,7 +104,6 @@ export function WalletWidget(props: WalletWidgetProps) {
         }
       });
 
-      // set network info in context
       walletDispatch({
         payload: {
           type: WalletActions.SET_NETWORK_INFO,
@@ -130,6 +128,10 @@ export function WalletWidget(props: WalletWidgetProps) {
     })();
   }, [params.providerPreference, checkout, getTokenBalances]);
 
+  const errorAction = () =>{
+    console.log('Something went wrong')
+  }
+
   return (
     <BiomeThemeProvider theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={{viewState, viewDispatch}}>
@@ -142,6 +144,9 @@ export function WalletWidget(props: WalletWidgetProps) {
                 getTokenBalances={getTokenBalances}
                 />)
             }
+          {viewState.view.type === BaseViews.ERROR && (
+            <ErrorView actionText='Try again' onActionClick={errorAction}/>
+          )}
         </WalletContext.Provider>
       </ViewContext.Provider>
     </BiomeThemeProvider>

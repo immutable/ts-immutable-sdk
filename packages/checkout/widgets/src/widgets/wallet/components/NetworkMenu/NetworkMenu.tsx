@@ -7,6 +7,7 @@ import { text } from "../../../../resources/text/textConfig";
 import { WalletWidgetViews } from "../../../../context/WalletViewContextTypes";
 import { sendNetworkSwitchEvent } from "../../WalletWidgetEvents";
 import { ActiveNetworkButtonStyles } from "./NetworkMenuStyles";
+import { BaseViews, ViewActions, ViewContext } from "../../../../context/ViewContext";
 
 interface NetworkStatusProps {
   getTokenBalances: (checkout: Checkout, provider: Web3Provider, networkName: string, chainId: ChainId) => void;
@@ -14,6 +15,8 @@ interface NetworkStatusProps {
 
 export const NetworkMenu = (props: NetworkStatusProps) => {
   const {walletState, walletDispatch} = useContext(WalletContext);
+  const {viewDispatch} = useContext(ViewContext);
+
   const {networkStatus} = text.views[WalletWidgetViews.WALLET_BALANCES]
   const {checkout, network, provider} = walletState;
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[]|undefined>([]);
@@ -45,12 +48,19 @@ export const NetworkMenu = (props: NetworkStatusProps) => {
           }
         });
         sendNetworkSwitchEvent(switchNetworkResult.network);
-      } catch (err) {
-        // user proably rejected the switch network request
-        // should we do anything here...
+      } catch (err: any) {
+        if(err.type === 'USER_REJECTED_REQUEST_ERROR'){
+          //ignore error
+        }
+        else{
+          viewDispatch({payload:{
+            type: ViewActions.UPDATE_VIEW,
+              view: { type: BaseViews.ERROR, error: err}
+            }})
+        }
       }
     }
-  }, [checkout, provider, network?.chainId, walletDispatch]);
+  }, [checkout, provider, network?.chainId, walletDispatch, viewDispatch]);
 
   useEffect(()=>{
     (async ()=>{
@@ -85,7 +95,7 @@ export const NetworkMenu = (props: NetworkStatusProps) => {
       </Box>
       <HorizontalMenu>
         {allowedNetworks?.map((networkItem)=>
-          <HorizontalMenu.Button
+          <HorizontalMenu.Button key={networkItem.chainId}
             testId={`${networkItem.name}-network-button`}
             sx={networkItem.chainId === network?.chainId ? ActiveNetworkButtonStyles : {}}
             size="medium"
