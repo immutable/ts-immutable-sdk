@@ -12,8 +12,6 @@
   },
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "lint": "next lint",
-    "start": "next start"
+    "lint": "eslint ./src --ext .ts --max-warnings=0"
   }
 }
