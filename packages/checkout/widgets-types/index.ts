@@ -6,3 +6,8 @@ export * from './definitions/events/bridgeEvents';
 export * from './definitions/events/buyEvents';
 export * from './definitions/global';
 export * from './definitions/constants';
+
+export * from './definitions/props/connect';
+
+export * from './components/CheckoutWidgets';
+export * from './components/ConnectWidget';

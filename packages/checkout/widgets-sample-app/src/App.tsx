@@ -6,7 +6,7 @@ function App() {
       <main className="checkout-sdk-app">
         <h1>Sample Widgets</h1>
         <p>Choose a widget from the list below</p>
-        <br />
+        {/* <br />
         <div>
           <a href={'/connect'}>Connect Widget (React)</a> |{' '}
           <a href={'/lib/examples/connect.html'}>Connect Widget (Static)</a> |{' '}
@@ -53,6 +53,10 @@ function App() {
         <br />
         <div>
           <a href={'/marketplace-orchestrator'}>Marketplace Orchestrator</a>
+        </div>
+        <br /> */}
+        <div>
+          <a href={'/async-loader'}>Async Loader</a>
         </div>
       </main>
     </div>

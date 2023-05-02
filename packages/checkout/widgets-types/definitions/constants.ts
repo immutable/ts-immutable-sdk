@@ -10,3 +10,7 @@ export enum WidgetTheme {
   CUSTOM = 'custom',
 }
 export { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+
+export enum CheckoutWidgetTagNames {
+  CONNECT = 'imtbl-connect',
+}
