@@ -18,6 +18,7 @@ import { WalletBalances } from './views/WalletBalances';
 import { ErrorView } from "../../components/Error/ErrorView";
 import { LoadingView } from '../../components/Loading/LoadingView';
 import { BalanceInfo } from './types/BalanceInfo';
+import { closeWalletWidget } from './functions/closeWalletWidget';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
@@ -151,7 +152,7 @@ export function WalletWidget(props: WalletWidgetProps) {
                 />)
             }
           {viewState.view.type === BaseViews.ERROR && (
-            <ErrorView actionText='Try again' onActionClick={errorAction} onCloseClick={() => console.log('close')}/>
+            <ErrorView actionText='Try again' onActionClick={errorAction} onCloseClick={closeWalletWidget}/>
           )}
         </WalletContext.Provider>
       </ViewContext.Provider>

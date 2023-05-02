@@ -12,6 +12,7 @@ import { ChainId, Checkout } from "@imtbl/checkout-sdk-web";
 import { Web3Provider } from "@ethersproject/providers";
 import { useContext } from "react";
 import { WalletContext } from "../context/WalletContext";
+import { closeWalletWidget } from "../functions/closeWalletWidget";
 
 export interface WalletBalancesProps {
   totalFiatAmount: number;
@@ -29,7 +30,8 @@ export const WalletBalances = ({ totalFiatAmount, getTokenBalances}: WalletBalan
         title={header.title} 
         showSettings 
         showClose 
-        onSettingsClick={() => console.log('settings click')} 
+        onSettingsClick={() => console.log('settings click')}
+        onCloseButtonClick={closeWalletWidget}
         />
       }
       footer={<FooterLogo />}

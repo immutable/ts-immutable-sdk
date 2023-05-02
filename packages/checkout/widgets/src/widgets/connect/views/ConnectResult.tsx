@@ -5,12 +5,13 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ViewContext } from '../../../context/ViewContext';
 import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
 import { Body } from '@biom3/react';
+import { closeConnectWidget } from '../functions/closeConnectWidget';
 
 export const ConnectResult = () => {
   const { viewState } = useContext(ViewContext);
   return (
     <SimpleLayout
-      header={<HeaderNavigation showClose showBack />}
+      header={<HeaderNavigation showClose showBack onCloseButtonClick={closeConnectWidget} />}
       footer={<FooterLogo />}
     >
       {viewState.view.type === ConnectWidgetViews.SUCCESS && (

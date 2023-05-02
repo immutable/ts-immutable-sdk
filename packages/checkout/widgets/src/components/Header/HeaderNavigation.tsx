@@ -2,8 +2,6 @@ import { AppHeaderBar, ButtCon } from '@biom3/react';
 import { useContext } from 'react';
 import { ViewActions, ViewContext } from '../../context/ViewContext';
 import { HeaderNavigationStyles, ButtonNavigationStyles } from './HeaderStyles';
-import { sendCloseWidgetEvent } from '../../widgets/connect/ConnectWidgetEvents';
-import { sendWalletWidgetCloseEvent } from '../../widgets/wallet/WalletWidgetEvents';
 
 export interface HeaderNavigationProps {
   title?: string;
@@ -13,6 +11,7 @@ export interface HeaderNavigationProps {
   transparent?: boolean;
   onSettingsClick?: () => void;
   onBackButtonClick?: () => void;
+  onCloseButtonClick?: () => void;
 }
 
 export const HeaderNavigation = ({
@@ -23,6 +22,7 @@ export const HeaderNavigation = ({
   transparent = false,
   onSettingsClick,
   onBackButtonClick,
+  onCloseButtonClick
 }: HeaderNavigationProps) => {
   const { viewDispatch } = useContext(ViewContext);
 
@@ -32,14 +32,6 @@ export const HeaderNavigation = ({
         type: ViewActions.GO_BACK,
       },
     });
-  };
-
-  const close = () => {
-    //todo: need a reference to specific widget to call specific Close-Widget event
-    sendCloseWidgetEvent();
-
-    // this one if for the wallet widget close
-    sendWalletWidgetCloseEvent()
   };
 
   const handleBackButtonClick = () => {
@@ -75,12 +67,12 @@ export const HeaderNavigation = ({
             testId="settings-button"
           />
         )}
-        {showClose && (
+        {showClose && onCloseButtonClick && (
           <ButtCon
             iconVariant="bold"
             sx={ButtonNavigationStyles(transparent)}
             icon="Close"
-            onClick={close}
+            onClick={onCloseButtonClick}
             testId="close-button"
           />
         )}
