@@ -19,10 +19,10 @@ export class ImmutableDiExample extends HTMLElement {
   providerPreference: ConnectionProviders = ConnectionProviders.METAMASK;
   provider: Web3Provider | undefined = undefined;
 
-  setProvider(provider: Web3Provider) {
-    this.provider = provider;
-    this.renderWidget();
-  }
+  // setProvider(provider: Web3Provider) {
+  //   this.provider = provider;
+  //   this.renderWidget();
+  // }
 
   attributeChangedCallback(name, oldValue, newValue) {
     this[name] = newValue;

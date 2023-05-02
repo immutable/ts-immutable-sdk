@@ -3,6 +3,7 @@ import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
+import { Web3Provider } from '@ethersproject/providers';
 
 export class ImmutableWallet extends HTMLElement {
   reactRoot?: ReactDOM.Root;
@@ -13,6 +14,12 @@ export class ImmutableWallet extends HTMLElement {
 
   theme = WidgetTheme.DARK;
   providerPreference = ConnectionProviders.METAMASK;
+  provider: Web3Provider | undefined = undefined;
+
+  // setProvider(provider: Web3Provider): void {
+  //   this.provider = provider;
+  //   this.renderWidget();
+  // }
 
   attributeChangedCallback(name, oldValue, newValue) {
     this[name] = newValue;
@@ -30,6 +37,7 @@ export class ImmutableWallet extends HTMLElement {
   renderWidget() {
     const walletParams: WalletWidgetParams = {
       providerPreference: this.providerPreference,
+      provider: this.provider,
     };
 
     if (!this.reactRoot) {

@@ -6,7 +6,8 @@ import {
   ConnectWidgetReact,
   UpdateConfig,
   CheckoutWidgetTagNames,
-  // SetProvider,
+  WalletWidgetReact,
+  SetProvider,
 } from '@imtbl/checkout-widgets-react';
 
 import detectEthereumProvider from '@metamask/detect-provider';
@@ -27,18 +28,18 @@ export function AsyncLoader() {
   UpdateConfig(widgetsConfig2);
 
   useEffect(() => {
-    async () => {
+    (async () => {
       const provider: Web3Provider | null = await detectEthereumProvider();
       if (provider) {
-        // SetProvider(CheckoutWidgetTagNames.CONNECT, provider);
+        SetProvider(CheckoutWidgetTagNames.WALLET, provider);
       }
-    };
+    })();
   });
 
   return (
     <div>
       <h1>Async Loader Test</h1>
-      <ConnectWidgetReact providerPreference={ConnectionProviders.METAMASK} />
+      <WalletWidgetReact providerPreference={ConnectionProviders.METAMASK} />
     </div>
   );
 }

@@ -2483,13 +2483,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets-react@workspace:packages/checkout/widgets-react"
   dependencies:
+    "@babel/core": ^7.21.0
+    "@babel/preset-env": ^7.20.2
     "@imtbl/checkout-sdk": 0.0.0
     "@parcel/packager-ts": ^2.8.3
     "@parcel/transformer-typescript-types": ^2.8.3
     "@types/node": ^18.14.2
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
+    babel-jest: ^29.5.0
+    eslint: ^8.37.0
     ethers: ^5.7.2
+    jest: ^29.4.3
+    jest-environment-jsdom: ^29.4.3
     parcel: ^2.8.3
     react: ^18.2.0
     react-dom: ^18.2.0
@@ -22628,8 +22634,8 @@ __metadata:
   linkType: hard
 
 "rollup@npm:^3.17.2":
-  version: 3.21.2
-  resolution: "rollup@npm:3.21.2"
+  version: 3.21.3
+  resolution: "rollup@npm:3.21.3"
   dependencies:
     fsevents: ~2.3.2
   dependenciesMeta:
@@ -22637,7 +22643,7 @@ __metadata:
       optional: true
   bin:
     rollup: dist/bin/rollup
-  checksum: 1a0261b551ea7846f4ef7514930263c28c67e356ab1cbbe9e69e923a081b571fb483576ea53b69e851df9e58be36ab135057d21635d8bbdb5e63c3ccc34a0419
+  checksum: 430c0c66f1480586ccea77b190524efb6a3af3da5308c7bc77eca3160c3f387c9a56ebb3eef5bfb24f683764bdfdd3dafdea175d215e4b875bbde752619bec12
   languageName: node
   linkType: hard
 

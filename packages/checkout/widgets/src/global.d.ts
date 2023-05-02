@@ -11,6 +11,9 @@ import {
 } from '@imtbl/checkout-widgets-react';
 
 declare global {
+  interface Window {
+    ImtblCheckoutWidgetConfig: any;
+  }
   namespace JSX {
     interface IntrinsicElements {
       'imtbl-connect': ImtblConnectProps;
@@ -23,5 +26,9 @@ declare global {
       'imtbl-inner-widget-example': ImtblInnerWidgetExampleProps;
       'imtbl-outer-widget-example': ImtblOuterWidgetExampleProps;
     }
+  }
+  interface Element {
+    setCallback: Function;
+    setProvider: Function;
   }
 }

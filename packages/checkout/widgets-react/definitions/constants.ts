@@ -13,4 +13,5 @@ export { ConnectionProviders } from '@imtbl/checkout-sdk';
 
 export enum CheckoutWidgetTagNames {
   CONNECT = 'imtbl-connect',
+  WALLET = 'imtbl-wallet',
 }

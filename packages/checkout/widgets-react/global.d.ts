@@ -5,6 +5,9 @@ import {
   ImtblBridgeProps,
   ImtblExampleProps,
   ImtblBuyProps,
+  ImtblTransitionExampleProps,
+  ImtblInnerWidgetExampleProps,
+  ImtblOuterWidgetExampleProps,
 } from './index';
 
 declare global {
@@ -17,8 +20,11 @@ declare global {
       'imtbl-wallet': ImtblWalletProps;
       'imtbl-swap': ImtblSwapProps;
       'imtbl-bridge': ImtblBridgeProps;
-      'imtbl-example': ImtblExampleProps;
       'imtbl-buy': ImtblBuyProps;
+      'imtbl-example': ImtblExampleProps;
+      'imtbl-transition-example': ImtblTransitionExampleProps;
+      'imtbl-inner-widget-example': ImtblInnerWidgetExampleProps;
+      'imtbl-outer-widget-example': ImtblOuterWidgetExampleProps;
     }
   }
   interface Element {

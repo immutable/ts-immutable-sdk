@@ -1,6 +1,6 @@
-import { CheckoutWidgetTagNames, WidgetTheme } from '../definitions/constants';
+import { CheckoutWidgetsConfig } from '../definitions/config';
+import { CheckoutWidgetTagNames } from '../definitions/constants';
 import { Web3Provider } from '@ethersproject/providers';
-import { CheckoutWidgetsConfig } from '../definitions/props/connect';
 
 export function CheckoutWidgets(config: CheckoutWidgetsConfig) {
   console.log('CheckoutWidgets.constructor', config);
@@ -13,9 +13,6 @@ export function CheckoutWidgets(config: CheckoutWidgetsConfig) {
   );
 
   document.head.appendChild(checkoutWidgetJS);
-
-  //window.localStorage.setItem('imtbl.checkout.global', JSON.stringify(config));
-
   window.ImtblCheckoutWidgetConfig = config;
 }
 
@@ -23,13 +20,15 @@ export function UpdateConfig(config: CheckoutWidgetsConfig) {
   window.ImtblCheckoutWidgetConfig = config;
 }
 
-// export function SetProvider(
-//   tagName: CheckoutWidgetTagNames,
-//   provider: Web3Provider
-// ) {
-//   const el = document.getElementsByTagName(tagName);
+export function SetProvider(
+  tagName: CheckoutWidgetTagNames,
+  provider: Web3Provider
+) {
+  const el = document.getElementsByTagName(tagName);
 
-//   console.log('provider', provider);
+  console.log('provider', provider);
 
-//   console.log('element', el);
-// }
+  console.log('element', el);
+
+  el[0].setProvider(provider);
+}

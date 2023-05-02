@@ -34,6 +34,7 @@ export interface WalletWidgetProps {
 
 export interface WalletWidgetParams {
   providerPreference?: ConnectionProviders;
+  provider?: Web3Provider;
 }
 
 export function WalletWidget(props: WalletWidgetProps) {
@@ -106,6 +107,7 @@ export function WalletWidget(props: WalletWidgetProps) {
   }, [checkout, params.providerPreference, getTokenBalances]);
 
   useEffect(() => {
+    console.log('provider', params.provider);
     getProvider();
   }, [getProvider]);
 

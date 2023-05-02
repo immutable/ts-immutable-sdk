@@ -1,7 +1,10 @@
 import React from 'react';
 
 import { ConnectionProviders, WidgetTheme } from '../definitions/constants';
-import { ConnectWidgetReactProps } from '../definitions/props/connect';
+
+export interface ConnectWidgetReactProps {
+  providerPreference: ConnectionProviders;
+}
 
 export function ConnectWidgetReact(props: ConnectWidgetReactProps) {
   console.log('props', props);
