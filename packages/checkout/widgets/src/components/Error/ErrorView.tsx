@@ -20,18 +20,10 @@ export const ErrorView = ({
 }: ErrorViewProps) => {
   const errorText = text.views[BaseViews.ERROR];
 
-  if (
-    errorEventAction !== undefined &&
-    typeof errorEventAction === 'function'
-  ) {
-    errorEventAction();
-  }
+  if (typeof errorEventAction === 'function') errorEventAction();
 
-  const onErrorActionClick = () => {
-    if (onActionClick !== undefined && typeof onActionClick === 'function') {
-      onActionClick();
-    }
-  };
+  const onErrorActionClick = () =>
+    typeof onActionClick === 'function' && onActionClick();
 
   return (
     <SimpleLayout
