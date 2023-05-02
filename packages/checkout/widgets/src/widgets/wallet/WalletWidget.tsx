@@ -41,6 +41,7 @@ export function WalletWidget(props: WalletWidgetProps) {
 
   const [tokenBalances, setTokenBalances] = useState<BalanceInfo[]>([]);
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
+  const {checkout} = walletState;
 
   const getTokenBalances = useCallback(
     async (
@@ -57,7 +58,7 @@ export function WalletWidget(props: WalletWidgetProps) {
           walletAddress,
           chainId,
         });
-  
+
         const tokenBalances: BalanceInfo[] = [];
         getAllBalancesResult.balances.forEach((balance) => {
           tokenBalances.push({
@@ -68,25 +69,29 @@ export function WalletWidget(props: WalletWidgetProps) {
             description: balance.token.name,
           });
         });
-  
+
         setTokenBalances(tokenBalances);
         setTotalFiatAmount(totalBalance);
       }
-      
+
     },
     []
   );
 
+  useEffect(()=>{
+    // set checkout in context
+    const checkout = new Checkout();
+    walletDispatch({
+      payload: {
+        type: WalletActions.SET_CHECKOUT,
+        checkout: checkout
+      },
+    });
+  }, []);
+
   useEffect(() => {
     (async () => {
-      // set checkout in context
-      const checkout = new Checkout();
-      walletDispatch({
-        payload: {
-          type: WalletActions.SET_CHECKOUT,
-          checkout: checkout
-        },
-      });
+      if(!checkout) return;
 
       const connectResult = await checkout.connect({
         providerPreference: params.providerPreference ?? ConnectionProviders.METAMASK
@@ -123,18 +128,16 @@ export function WalletWidget(props: WalletWidgetProps) {
         }
       });
     })();
-  }, [params.providerPreference, getTokenBalances]);
-
-
+  }, [params.providerPreference, checkout, getTokenBalances]);
 
   return (
     <BiomeThemeProvider theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={{viewState, viewDispatch}}>
         <WalletContext.Provider value={{walletState, walletDispatch}}>
-            {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && 
-              (<WalletBalances 
-                tokenBalances={tokenBalances} 
-                totalFiatAmount={totalFiatAmount}  
+            {viewState.view.type === WalletWidgetViews.WALLET_BALANCES &&
+              (<WalletBalances
+                tokenBalances={tokenBalances}
+                totalFiatAmount={totalFiatAmount}
                 networkName={walletState.network?.name ?? ""}
                 getTokenBalances={getTokenBalances}
                 />)

@@ -5,8 +5,8 @@ import { ChainId, Checkout, NetworkFilterTypes, NetworkInfo, SwitchNetworkParams
 import { Web3Provider } from "@ethersproject/providers";
 import { text } from "../../../../resources/text/textConfig";
 import { WalletWidgetViews } from "../../../../context/WalletViewContextTypes";
-import { ActiveNetworkButtonStyles } from "./NetworkStatusStyles";
 import { sendNetworkSwitchEvent } from "../../WalletWidgetEvents";
+import { ActiveNetworkButtonStyles } from "./NetworkMenuStyles";
 
 interface NetworkStatusProps {
   getTokenBalances: (checkout: Checkout, provider: Web3Provider, networkName: string, chainId: ChainId) => void;

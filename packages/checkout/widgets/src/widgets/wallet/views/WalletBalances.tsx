@@ -8,7 +8,7 @@ import { TotalTokenBalance } from "../components/TotalTokenBalance";
 import { TokenBalanceList } from "../components/TokenBalanceList";
 import { BalanceInfo } from "../components/BalanceItem";
 import { WidgetBodyStyle } from "../WalletStyles";
-import { NetworkMenu } from "../components/NetworkStatus/NetworkMenu";
+import { NetworkMenu } from "../components/NetworkMenu/NetworkMenu";
 import { ChainId, Checkout } from "@imtbl/checkout-sdk-web";
 import { Web3Provider } from "@ethersproject/providers";
 
