@@ -56,7 +56,10 @@ const fetchTokenIdFor = async (symbol: string) => {
   );
 
   if (!token) {
-    throw 'no token lmao';
+    throw new CheckoutError(
+      'No conversion available for selected token',
+      CheckoutErrorType.FIAT_CONVERSION_ERROR
+    );
   }
 
   return token.id;
@@ -68,7 +71,7 @@ const fetchQuoteFromCoinGecko = async (
 ): Promise<{ quote: number; quotedAt: number }> => {
   const tokenId = await fetchTokenIdFor(token.symbol);
   const timeNow = Math.floor(Date.now() / 1000);
-  const fromTime = timeNow - 3600 * 1000;
+  const fromTime = timeNow - 3600 * 1000; // 1hr in ms
   const quoteApi = `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart/range?vs_currency=${fiatSymbol}&from=${fromTime}&to=${timeNow}`;
   const {
     data: { prices },
