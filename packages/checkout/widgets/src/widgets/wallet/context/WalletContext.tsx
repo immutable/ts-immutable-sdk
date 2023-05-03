@@ -36,7 +36,7 @@ type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
   | SetProviderPreferencePayload
-  | SetNetworkInfoPayload;
+  | SetSwitchNetworkPayload;
 
 export enum WalletActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
@@ -60,7 +60,7 @@ export interface SetProviderPreferencePayload {
   providerPreference: ConnectionProviders;
 }
 
-export interface SetNetworkInfoPayload {
+export interface SetSwitchNetworkPayload {
   type: WalletActions.SWITCH_NETWORK;
   network: NetworkInfo;
   tokenBalances: BalanceInfo[];
