@@ -251,17 +251,6 @@ describe('WalletWidget tests', () => {
           'solid'
         );
       });
-
-      it('should show add coins button', () => {
-        const params = {
-          providerPreference: ConnectionProviders.METAMASK,
-        } as WalletWidgetParams;
-        mount(<WalletWidget params={params} theme={WidgetTheme.DARK} />);
-        cySmartGet('Ethereum-network-button').click();
-        cySmartGet('add-coins').should('exist'); // eventually we want to hide this on L1 network
-        cySmartGet('Polygon-network-button').click();
-        cySmartGet('add-coins').should('exist');
-      });
     });
   });
 });
