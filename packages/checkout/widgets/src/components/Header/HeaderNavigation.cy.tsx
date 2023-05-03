@@ -102,9 +102,7 @@ describe('HeaderNavigation', () => {
     it('should set transparent background when configured', () => {
       mount(
         <BiomeThemeProvider theme={{ base: onLightBase }}>
-          <SimpleLayout
-            header={<HeaderNavigation showBack showClose transparent />}
-          />
+          <SimpleLayout header={<HeaderNavigation showBack showClose />} />
         </BiomeThemeProvider>
       );
 

@@ -33,7 +33,7 @@ export const ViewTwo = () => {
 
   return (
     <SimpleLayout
-      header={<HeaderNavigation showClose showBack transparent={true} />}
+      header={<HeaderNavigation showClose showBack />}
       footer={
         <FooterButton
           actionText={buttonText}

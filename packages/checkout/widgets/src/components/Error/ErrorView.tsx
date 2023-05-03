@@ -27,9 +27,7 @@ export const ErrorView = ({
 
   return (
     <SimpleLayout
-      header={
-        <HeaderNavigation showBack={true} showClose={true} transparent={true} />
-      }
+      header={<HeaderNavigation showBack showClose />}
       footer={
         <FooterButton
           actionText={actionText}

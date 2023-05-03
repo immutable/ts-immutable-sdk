@@ -70,7 +70,7 @@ export const ReadyToConnect = () => {
   return (
     <SimpleLayout
       testId="ready-to-connect"
-      header={<HeaderNavigation showBack title="" showClose transparent />}
+      header={<HeaderNavigation showBack title="" showClose />}
       floatHeader
       heroContent={<MetamaskConnectHero />}
       footer={

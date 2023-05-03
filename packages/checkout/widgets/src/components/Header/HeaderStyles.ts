@@ -1,5 +1,5 @@
 export const HeaderNavigationStyles = (transparent: boolean) => {
   return {
-    backgroundColor: transparent ? 'transparent' : '',
+    backgroundColor: 'transparent',
   };
 };

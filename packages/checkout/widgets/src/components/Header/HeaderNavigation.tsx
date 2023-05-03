@@ -20,7 +20,7 @@ export const HeaderNavigation = ({
   showBack = false,
   showClose = false,
   showSettings = false,
-  transparent = false,
+  transparent = true,
   onSettingsClick,
   onBackButtonClick,
 }: HeaderNavigationProps) => {
@@ -39,7 +39,7 @@ export const HeaderNavigation = ({
     sendCloseWidgetEvent();
 
     // this one if for the wallet widget close
-    sendWalletWidgetCloseEvent()
+    sendWalletWidgetCloseEvent();
   };
 
   const handleBackButtonClick = () => {
