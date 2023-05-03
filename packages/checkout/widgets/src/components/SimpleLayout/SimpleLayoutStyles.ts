@@ -47,5 +47,5 @@ export const HeroContent = {
 export const BodyStyle = {
   flex: '1 0 0', // needed to set flex-basis to 0 for even distribution with HeroContent
   width: '100%',
-  paddingX: 'base.spacing.x2', // TODO: come back to this and/or fix up for other components
+  paddingX: 'base.spacing.x2',
 };

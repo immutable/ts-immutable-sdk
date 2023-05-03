@@ -14,7 +14,7 @@ export const BalanceItem = (props: BalanceItemProps) => {
       sx={BalanceItemContainerStyles}
     >
       <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: 'base.spacing.x5'}}>
-        <Icon icon='EthToken' sx={{width: 'base.icon.size.300'}}/>
+        <Icon icon='Dollar' sx={{width: 'base.icon.size.300'}}/>
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Body>{balanceInfo.symbol}</Body>
           <Body size="small">{balanceInfo.description}</Body>
@@ -33,8 +33,7 @@ export const BalanceItem = (props: BalanceItemProps) => {
           use={Heading}
           size="xSmall"
           price={balanceInfo.balance}
-          fiatAmount={`USD ${balanceInfo.fiatAmount}`}
-          // currencyImageUrl="https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--eth.svg"
+          fiatAmount={`USD $ -.--`}
         />
         <OverflowPopoverMenu size='small'>
           <MenuItem>

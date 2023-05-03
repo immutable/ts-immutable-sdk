@@ -103,6 +103,9 @@ export function WalletWidget(props: WalletWidgetProps) {
         providerPreference: params.providerPreference ?? ConnectionProviders.METAMASK
       });
 
+      // check here that the user's wallet is on the correct network
+      // if on a network we don't support, switch to zkEVM.
+
       walletDispatch({
         payload: {
           type: WalletActions.SET_PROVIDER,
