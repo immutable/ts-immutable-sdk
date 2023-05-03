@@ -4,11 +4,12 @@ import {
   TokenFilterTypes,
   TokenInfo,
   ConvertTokenToFiatParams,
-  SupportFiatCurrencies,
+  SupportedFiatCurrencies,
 } from '../types';
 import masterTokenList from './token_master_list.json';
 import { utils } from 'ethers';
 import axios from 'axios';
+import { withCheckoutError } from '../errors';
 
 export const getTokenAllowList = async function ({
   type = TokenFilterTypes.ALL,
@@ -44,26 +45,34 @@ export const getTokenAllowList = async function ({
 
 const fetchTokenIdFor = async (symbol: string) => {
   const coinListApi = 'https://api.coingecko.com/api/v3/coins/list';
-  const { data } = await axios.get(coinListApi);
-  const { id: tokenId } = data.find(
-    (tkn: { symbol: string }) => tkn.symbol == symbol
+  let res;
+
+  try {
+    res = await axios.get(coinListApi);
+  } catch {
+    throw 'Network Error';
+  }
+
+  const token = res.data.find(
+    (tkn: { symbol: string }) => tkn.symbol == symbol.toLowerCase()
   );
 
-  if (!tokenId) {
+  if (!token) {
     throw 'no token lmao';
   }
 
-  return tokenId;
+  return token.id;
 };
 
 const fetchQuoteFromCoinGecko = async (
   token: TokenInfo,
   fiatSymbol: string
 ): Promise<{ quote: number; quotedAt: number }> => {
-  const tokenId = fetchTokenIdFor(token.symbol);
+  const tokenId = await fetchTokenIdFor(token.symbol);
+  console.log(tokenId);
   const timeNow = Math.floor(Date.now() / 1000);
   const fromTime = timeNow - 3600 * 1000;
-  const quoteApi = `something${tokenId}${fiatSymbol}${fromTime}${timeNow}`;
+  const quoteApi = `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart/range?vs_currency=${fiatSymbol}&from=${fromTime}&to=${timeNow}`;
   const {
     data: { prices },
   } = await axios.get(quoteApi);
@@ -111,7 +120,7 @@ export const convertTokenToFiat = async ({
     throw 'error lol';
   }
 
-  if (!Object.values(SupportFiatCurrencies).includes(fiatSymbol)) {
+  if (!Object.values(SupportedFiatCurrencies).includes(fiatSymbol)) {
     throw 'another error lol';
   }
   const { quote, quotedAt } = await fetchConversionRateFor(token, fiatSymbol);

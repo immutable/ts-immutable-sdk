@@ -68,7 +68,7 @@ export interface TokenFilter {
 /**
  * Enum representing the types of token filters available.
  */
-export enum SupportFiatCurrencies {
+export enum SupportedFiatCurrencies {
   USD = 'USD',
 }
 
@@ -76,12 +76,12 @@ export enum SupportFiatCurrencies {
  * Interface representing the parameters for {@link Checkout.convertTokenToFiat}.
  * @property {BigNumber} amount - The the amount of token we are converting.
  * @property {TokenInfo} token - The token we are converting from.
- * @property {SupportFiatCurrencies}  fiatSymbol - The fiat currency we are converting to.
+ * @property {SupportedFiatCurrencies}  fiatSymbol - The fiat currency we are converting to.
  */
 export interface ConvertTokenToFiatParams {
   amount: BigNumber;
   token: TokenInfo;
-  fiatSymbol: SupportFiatCurrencies;
+  fiatSymbol: SupportedFiatCurrencies;
 }
 
 /**
