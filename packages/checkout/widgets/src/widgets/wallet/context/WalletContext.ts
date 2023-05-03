@@ -5,7 +5,7 @@ import {
   NetworkInfo,
 } from '@imtbl/checkout-sdk-web';
 import { createContext } from 'react';
-import { BalanceInfo } from '../types/BalanceInfo';
+import { BalanceInfo } from '../functions/tokenBalances';
 
 export interface WalletState {
   checkout: Checkout | null;

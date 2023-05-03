@@ -1,6 +1,14 @@
 import { Web3Provider } from "@ethersproject/providers";
 import { Checkout, ChainId } from "@imtbl/checkout-sdk-web";
-import { BalanceInfo } from "../types/BalanceInfo";
+
+export interface BalanceInfo {
+  id: string;
+  symbol: string;
+  description?: string;
+  balance: string;
+  fiatAmount: string;
+  iconLogo?: string;
+}
 
 export const getTokenBalances = async (
     checkout: Checkout,

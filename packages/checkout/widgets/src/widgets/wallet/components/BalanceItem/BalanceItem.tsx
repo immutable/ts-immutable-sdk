@@ -1,7 +1,14 @@
-import { Body, Box, Heading, Icon, MenuItem, OverflowPopoverMenu, PriceDisplay } from '@biom3/react';
-import React from 'react';
-import { BalanceInfo } from '../../types/BalanceInfo';
+import {
+  Body,
+  Box,
+  Heading,
+  Icon,
+  MenuItem,
+  OverflowPopoverMenu,
+  PriceDisplay,
+} from '@biom3/react';
 import { BalanceItemContainerStyles } from './BalanceItemStyles';
+import { BalanceInfo } from '../../functions/tokenBalances';
 
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
@@ -13,8 +20,15 @@ export const BalanceItem = (props: BalanceItemProps) => {
       testId={`balance-item-${balanceInfo.symbol}`}
       sx={BalanceItemContainerStyles}
     >
-      <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: 'base.spacing.x5'}}>
-        <Icon icon='Dollar' sx={{width: 'base.icon.size.300'}}/>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          columnGap: 'base.spacing.x5',
+        }}
+      >
+        <Icon icon="Dollar" sx={{ width: 'base.icon.size.300' }} />
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Body>{balanceInfo.symbol}</Body>
           <Body size="small">{balanceInfo.description}</Body>
@@ -25,7 +39,7 @@ export const BalanceItem = (props: BalanceItemProps) => {
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
-          columnGap: 'base.spacing.x4'
+          columnGap: 'base.spacing.x4',
         }}
       >
         <PriceDisplay
@@ -33,9 +47,9 @@ export const BalanceItem = (props: BalanceItemProps) => {
           use={Heading}
           size="xSmall"
           price={balanceInfo.balance}
-          fiatAmount={`USD $ -.--`}
+          fiatAmount={`≈ USD $ -.--`}
         />
-        <OverflowPopoverMenu size='small'>
+        <OverflowPopoverMenu size="small">
           <MenuItem>
             <MenuItem.Icon icon="Add"></MenuItem.Icon>
             <MenuItem.Label>{`Add ${balanceInfo.symbol}`}</MenuItem.Label>
