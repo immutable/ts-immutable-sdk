@@ -26,6 +26,7 @@ export abstract class SDK<SDKEvent> {
 
   /** Produces lifecycle events so consumer can hook into the SDK workflow */
   private events$$ = new Subject<SDKEvent>();
+
   private eventsSubscription!: Subscription;
 
   private get events$() {
@@ -46,6 +47,7 @@ export abstract class SDK<SDKEvent> {
 
   /** Utility: Use to print logs in console */
   log(...args: unknown[]): void {
+    // eslint-disable-next-line no-console
     console.log(`${this.constructor.name}:`, ...args);
   }
 
@@ -75,9 +77,9 @@ export abstract class SDK<SDKEvent> {
    * @param detail event payload
    */
   private emitNativeEvent(detail: SDKEvent): void {
-    if (!this.isClientSide) {
+    if (!SDK.isClientSide) {
       this.log(
-        'Cannot dispatch native event: not running in a browser environment'
+        'Cannot dispatch native event: not running in a browser environment',
       );
       return;
     }
@@ -93,7 +95,7 @@ export abstract class SDK<SDKEvent> {
   /**
    * Utility: Checks if the class was mounted in a browser environment
    */
-  protected get isClientSide(): boolean {
+  protected static get isClientSide(): boolean {
     return typeof window !== 'undefined' && typeof document !== 'undefined';
   }
 

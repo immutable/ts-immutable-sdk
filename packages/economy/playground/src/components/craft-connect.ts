@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { LitElement, css, html } from 'lit';
 import { customElement, eventOptions, state } from 'lit/decorators.js';
 import { cache } from 'lit/directives/cache.js';
@@ -6,15 +7,12 @@ import { cache } from 'lit/directives/cache.js';
 export class CraftingWrapper extends LitElement {
   static styles = css``;
 
-  constructor() {
-    super();
-  }
-
   @state()
   private state = {
-    isConnectOpen: false,
-  };
+      isConnectOpen: false,
+    };
 
+  // eslint-disable-next-line class-methods-use-this
   firstUpdated() {
     console.log('Component mounted!');
   }
@@ -29,7 +27,7 @@ export class CraftingWrapper extends LitElement {
     super.connectedCallback();
     window.addEventListener(
       'imtbl-connect-widget',
-      this.handleCustomEvent(this.handleConnectEvent)
+      this.handleCustomEvent(this.handleConnectEvent),
     );
   }
 
@@ -66,8 +64,8 @@ export class CraftingWrapper extends LitElement {
     // TODO: event detail could better provide a type for each reason.
     // ie: { type: 'failure', data: { reason: 'client closed widget', type: 'closed' } }
     if (
-      `${data?.reason}`.toLowerCase().includes('closed') &&
-      this.state.isConnectOpen === true
+      `${data?.reason}`.toLowerCase().includes('closed')
+      && this.state.isConnectOpen === true
     ) {
       this.toggleIsConnectOpen(false);
     }

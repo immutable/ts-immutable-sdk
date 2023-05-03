@@ -21,8 +21,6 @@ app.disable('x-powered-by');
 routes.forEach((router) => app.use(router));
 
 const port = process.env.PORT || 3031;
-const server = app.listen(port, () =>
-  logger.info(`⚡️[Economy SDK]: Services running @ http://127.0.0.1:${port}`)
-);
+const server = app.listen(port, () => logger.info(`⚡️[Economy SDK]: Services running @ http://127.0.0.1:${port}`));
 
 export default server;
