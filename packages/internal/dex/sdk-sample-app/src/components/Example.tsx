@@ -2,8 +2,7 @@ import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import { Exchange, TradeInfo } from '@imtbl/dex-sdk';
 import { configuration } from '@/config/devnet';
-import { Simulate } from 'react-dom/test-utils';
-import input = Simulate.input;
+import { getERC20ApproveCalldata } from '@/utils/approve';
 
 type RouteType = {
   fee: any;
@@ -17,11 +16,9 @@ export function Example() {
   const DEVNET_USDC = process.env.NEXT_PUBLIC_COMMON_ROUTING_USDC || '';
   const DEVNET_FUN = process.env.NEXT_PUBLIC_COMMON_ROUTING_FUN || '';
   const DEVNET_ETH = process.env.NEXT_PUBLIC_COMMON_ROUTING_WETH || '';
-
-  type mapping = {
-    [address: string]: string;
-  };
-
+  const [isMetamaskInstalled, setIsMetamaskInstalled] =
+    useState<boolean>(false);
+  const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
   const [result, setResult] = useState<TradeInfo | null>();
   const [error, setError] = useState('');
   const [isFetching, setIsFetching] = useState(false);
@@ -29,11 +26,20 @@ export function Example() {
   const [addressToSymbolMapping, setAddressToSymbolMapping] = useState<mapping>(
     {}
   );
+  const [approved, setApproved] = useState<boolean>(false);
+  const [swapStatus, setSwapStatus] = useState<boolean>(false);
 
   const inputToken = DEVNET_FUN;
   const outputToken = DEVNET_ETH;
 
   const amountIn = ethers.utils.parseEther('1000');
+
+  useEffect(() => {
+    if ((window as any).ethereum) {
+      //check if Metamask wallet is installed
+      setIsMetamaskInstalled(true);
+    }
+  }, []);
 
   useEffect(() => {
     Promise.all([getTokenSymbol(inputToken), getTokenSymbol(outputToken)]).then(
@@ -47,6 +53,44 @@ export function Example() {
       }
     );
   }, []);
+
+  //Does the User have an Ethereum wallet/account?
+  async function connectMetamaskWallet(): Promise<void> {
+    //to get around type checking
+    (window as any).ethereum
+      .request({
+        method: 'eth_requestAccounts',
+      })
+      .then((accounts: string[]) => {
+        setEthereumAccount(accounts[0]);
+      })
+      .catch((error: any) => {
+        alert(`Something went wrong: ${error}`);
+      });
+  }
+
+  if (ethereumAccount === null) {
+    return (
+      <div className="App App-header">
+        {isMetamaskInstalled ? (
+          <div>
+            <button
+              className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+              onClick={connectMetamaskWallet}
+            >
+              Connect Your Metamask Wallet
+            </button>
+          </div>
+        ) : (
+          <p>Install Your Metamask wallet</p>
+        )}
+      </div>
+    );
+  }
+
+  type mapping = {
+    [address: string]: string;
+  };
 
   async function getTokenSymbol(tokenAddress: string): Promise<string> {
     const provider = new ethers.providers.JsonRpcProvider(
@@ -99,7 +143,6 @@ export function Example() {
       outputToken,
       amountIn
     );
-    console.log({ result });
 
     if (result.success) {
       setResult(result.trade);
@@ -115,8 +158,63 @@ export function Example() {
     setIsFetching(false);
   };
 
+  const performSwap = async (result: any) => {
+    setIsFetching(true);
+    const provider = new ethers.providers.JsonRpcProvider(
+      process.env.NEXT_PUBLIC_RPC_URL_DEV
+    );
+
+    const quote = await exchange.getUnsignedSwapTxFromAmountIn(
+      ethereumAccount,
+      inputToken,
+      outputToken,
+      amountIn
+    );
+
+    if (!approved) {
+      const approveCalldata = getERC20ApproveCalldata();
+      const transactionRequest = {
+        data: approveCalldata,
+        to: DEVNET_FUN,
+        value: '0',
+        from: ethereumAccount,
+      };
+      try {
+        const approveReceipt = await (window as any).ethereum.send(
+          'eth_sendTransaction',
+          [transactionRequest]
+        );
+        console.log({ approveReceipt });
+        await provider.waitForTransaction(approveReceipt.result, 1, 150000);
+        setApproved(true);
+      } catch (e) {
+        console.error(e);
+        setIsFetching(false);
+        return;
+      }
+    }
+
+    try {
+      const receipt = await (window as any).ethereum.send(
+        'eth_sendTransaction',
+        [quote.transactionRequest]
+      );
+      await provider.waitForTransaction(receipt.result, 1, 150000);
+    } catch (e) {
+      console.error(e);
+      setIsFetching(false);
+      return;
+    }
+
+    setIsFetching(false);
+    setSwapStatus(true);
+  };
+
   return (
     <div>
+      <h3 style={{ marginBottom: '12px' }}>
+        Your wallet address: {ethereumAccount}
+      </h3>
       <h3>
         Input Token: {inputToken} ({addressToSymbolMapping[inputToken]})
       </h3>
@@ -163,6 +261,21 @@ export function Example() {
                   );
                 })}
               </h3>
+
+              <button
+                className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                onClick={() => performSwap(result)}
+                disabled={isFetching}
+              >
+                {approved ? 'Swap' : 'Approve'}
+              </button>
+              {isFetching && <h3>loading...</h3>}
+              {swapStatus && (
+                <h3 style={{ marginTop: '12px' }}>
+                  Swap successful! Check your metamask activity to see updated
+                  balances
+                </h3>
+              )}
             </>
           )}
         </>
