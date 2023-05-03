@@ -14,12 +14,9 @@ type RouteType = {
 export function Example() {
   // Create and use the exchange as per normal
   const exchange = new Exchange(configuration);
-  // const DEVNET_USDC = process.env.NEXT_PUBLIC_COMMON_ROUTING_USDC;
-  // const DEVNET_FUN = process.env.NEXT_PUBLIC_COMMON_ROUTING_FUN;
-  // const DEVNET_ETH = process.env.NEXT_PUBLIC_COMMON_ROUTING_WETH;
-  const DEVNET_USDC = '0xBB587517EC25e545F8Fe7c450161319c35677C86';
-  const DEVNET_FUN = '0x1a4B77b638d55f320e0a453394EC18Ab69F762F2';
-  const DEVNET_ETH = '0x1Eb14749E962E4f592be1Ce2147d50F39E7ab2dD';
+  const DEVNET_USDC = process.env.NEXT_PUBLIC_COMMON_ROUTING_USDC || '';
+  const DEVNET_FUN = process.env.NEXT_PUBLIC_COMMON_ROUTING_FUN || '';
+  const DEVNET_ETH = process.env.NEXT_PUBLIC_COMMON_ROUTING_WETH || '';
 
   type mapping = {
     [address: string]: string;
@@ -37,8 +34,6 @@ export function Example() {
   const outputToken = DEVNET_ETH;
 
   const amountIn = ethers.utils.parseEther('1000');
-
-  console.log({ addressToSymbolMapping });
 
   useEffect(() => {
     Promise.all([getTokenSymbol(inputToken), getTokenSymbol(outputToken)]).then(

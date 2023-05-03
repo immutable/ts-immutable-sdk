@@ -2,6 +2,8 @@
 
 First, run the setup:
 
+**Note**: There may be some errors in the terminal, that's ok! You can ignore these.
+
 ```bash
 yarn setup
 ```
