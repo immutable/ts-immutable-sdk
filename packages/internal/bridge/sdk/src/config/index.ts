@@ -51,6 +51,7 @@ export class BridgeConfiguration {
   }
 }
 
+// TODO: Add correct addresses
 export const ContractsForBridge = new Map<BridgeInstance, BridgeContracts>()
   .set(ETH_SEPOLIA_TO_ZKEVM_DEVNET, {
     rootChainERC20Predicate: '0x',
