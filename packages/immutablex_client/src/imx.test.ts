@@ -1,7 +1,7 @@
-import { ImxConfiguration, ImxModuleConfiguration } from './config';
 import { ImmutableXClient } from 'index';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { Config } from '@imtbl/core-sdk';
+import { ImxConfiguration, ImxModuleConfiguration } from './config';
 
 describe('ImmutableXClient', () => {
   it('should instantiate a SANDBOX ImmutableXClient', async () => {
@@ -16,7 +16,7 @@ describe('ImmutableXClient', () => {
 
     expect(assetsResponse.status).toEqual(200);
     expect(assetsResponse.config.headers?.['x-sdk-version']).toContain(
-      'ts-immutable-sdk'
+      'ts-immutable-sdk',
     );
   });
 
@@ -29,14 +29,11 @@ describe('ImmutableXClient', () => {
 
     expect(assetsResponse.status).toEqual(200);
     expect(assetsResponse.config.headers?.['x-sdk-version']).toContain(
-      'ts-immutable-sdk'
+      'ts-immutable-sdk',
     );
   });
 
   it('should instantiate a ImmutableXClient with override and custom version', async () => {
-    const imtblConfig = new ImmutableConfiguration({
-      environment: Environment.SANDBOX,
-    });
     const sdkVersion = 'ts-immutable-sdk-0.0.1';
 
     const config: ImxModuleConfiguration = {
@@ -58,7 +55,7 @@ describe('ImmutableXClient', () => {
 
     expect(assetsResponse.status).toEqual(200);
     expect(assetsResponse.config.headers?.['x-sdk-version']).toEqual(
-      sdkVersion
+      sdkVersion,
     );
   });
 });
