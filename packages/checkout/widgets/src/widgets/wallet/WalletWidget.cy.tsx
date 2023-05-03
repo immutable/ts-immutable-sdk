@@ -35,6 +35,20 @@ describe('WalletWidget tests', () => {
       network: { name: '' },
     });
 
+    cy.stub(Checkout.prototype, 'switchNetwork')
+      .as('switchNetworkStub')
+      .resolves({
+        network: {
+          chainId: 137,
+          name: 'Polygon',
+          nativeCurrency: {
+            name: 'MATIC',
+            symbol: 'MATIC',
+            decimals: 18,
+          },
+        },
+      });
+
     mount(<WalletWidget params={params} theme={WidgetTheme.DARK} />);
 
     cySmartGet('loading-view').should('be.visible');
