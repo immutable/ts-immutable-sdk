@@ -12,13 +12,18 @@ export const generateERC20Pairs = (
   erc20Pair: ERC20Pair,
   commonRoutingERC20s: Token[]
 ): ERC20Pairs => {
-  // Make an array of all the erc20 addresses, removing any duplicates
   const uniqueERC20Addresses = new Set([...erc20Pair, ...commonRoutingERC20s]);
-  const erc20Addresses = [...uniqueERC20Addresses];
+  const erc20Addresses = [...erc20Pair, ...commonRoutingERC20s]; // 3
   const erc20Pairs: ERC20Pairs = [];
 
   for (let i = 0; i < erc20Addresses.length; i++) {
     for (let j = i + 1; j < erc20Addresses.length; j++) {
+      const isDuplicate =
+        erc20Addresses[i].address === erc20Addresses[j].address;
+      if (isDuplicate) {
+        continue;
+      }
+
       erc20Pairs.push([erc20Addresses[i], erc20Addresses[j]]);
     }
   }
