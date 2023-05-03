@@ -15,6 +15,7 @@ import {
   initialConnectState,
 } from './context/ConnectContext';
 import {
+  BaseViews,
   initialViewState,
   ViewActions,
   ViewContext,
@@ -26,6 +27,7 @@ import { ConnectResult } from './views/ConnectResult';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { ReadyToConnect } from './views/ReadyToConnect';
 import { SwitchNetwork } from './views/SwitchNetwork';
+import { LoadingView } from '../../components/Loading/LoadingView';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
@@ -50,27 +52,29 @@ export function ConnectWidget(props: ConnectWidgetProps) {
       : onDarkBase;
 
   useEffect(() => {
-    connectDispatch({
-      payload: {
-        type: ConnectActions.SET_CHECKOUT,
-        checkout: new Checkout(),
-      },
-    });
-
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: ConnectWidgetViews.CONNECT_WALLET,
+    setTimeout(() => {
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_CHECKOUT,
+          checkout: new Checkout(),
         },
-      },
-    });
+      });
+  
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: ConnectWidgetViews.CONNECT_WALLET,
+          },
+        },
+      });
+    }, 200);
   }, []);
 
   useEffect(() => {
     switch (viewState.view.type) {
       case ConnectWidgetViews.FAIL:
-        sendConnectFailedEvent(viewState.view.error.message);
+        sendConnectFailedEvent(viewState.view.reason);
         break;
     }
   }, [viewState]);
@@ -80,6 +84,9 @@ export function ConnectWidget(props: ConnectWidgetProps) {
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         <ConnectContext.Provider value={{ connectState, connectDispatch }}>
           <>
+            {viewState.view.type === BaseViews.LOADING_VIEW && (
+              <LoadingView loadingText={'Connecting'} />
+            )}
             {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && (
               <ConnectWallet />
             )}

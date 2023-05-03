@@ -1,31 +1,22 @@
-import { Badge, BiomeThemeProvider, Body, Box, Button } from '@biom3/react';
+import { BiomeThemeProvider } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 
-import { WidgetTheme, Network } from '@imtbl/checkout-ui-types';
+import { WidgetTheme } from '@imtbl/checkout-ui-types';
 
 import {
   ChainId,
   Checkout,
   ConnectionProviders,
-  ConnectResult,
-  SwitchNetworkParams,
 } from '@imtbl/checkout-sdk-web';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
-import {
-  WalletWidgetStyle,
-  WidgetBodyStyle,
-  WidgetHeaderStyle,
-} from './WalletStyles';
-import { NetworkStatus } from './components/NetworkStatus';
-import { TotalTokenBalance } from './components/TotalTokenBalance';
-import { TokenBalanceList } from './components/TokenBalanceList';
 import { BalanceInfo } from './components/BalanceItem';
-import {
-  sendNetworkSwitchEvent,
-  sendWalletWidgetCloseEvent,
-} from './WalletWidgetEvents';
+import { initialWalletState, WalletActions, WalletContext, walletReducer } from './context/WalletContext';
+import { BaseViews, initialViewState, ViewActions, ViewContext, viewReducer } from "../../context/ViewContext";
+import { WalletWidgetViews } from '../../context/WalletViewContextTypes';
+import { WalletBalances } from './views/WalletBalances';
+import { ErrorView } from "../../components/Error/ErrorView";
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
@@ -43,12 +34,15 @@ export function WalletWidget(props: WalletWidgetProps) {
       ? onLightBase
       : onDarkBase;
 
-  const [provider, setProvider] = useState<Web3Provider>();
-  const [networkName, setNetworkName] = useState<string>('');
-  const [tokenBalances, setTokenBalances] = useState<BalanceInfo[]>();
+  const [walletState, walletDispatch] = useReducer(
+    walletReducer,
+    initialWalletState
+  );
+  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+
+  const [tokenBalances, setTokenBalances] = useState<BalanceInfo[]>([]);
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
-  const [isLoading, setIsLoading] = useState(false);
-  const checkout = useMemo(() => new Checkout(), []);
+  const {checkout} = walletState;
 
   const getTokenBalances = useCallback(
     async (
@@ -57,139 +51,104 @@ export function WalletWidget(props: WalletWidgetProps) {
       networkName: string,
       chainId: ChainId
     ) => {
-      const totalBalance = 0;
-      const walletAddress = await provider.getSigner().getAddress();
-      const getAllBalancesResult = await checkout.getAllBalances({
-        provider,
-        walletAddress,
-        chainId,
-      });
-
-      const tokenBalances: BalanceInfo[] = [];
-      getAllBalancesResult.balances.forEach((balance) => {
-        tokenBalances.push({
-          id: networkName + '-' + balance.token.symbol,
-          balance: balance.formattedBalance,
-          fiatAmount: '23.50', // todo: fetch fiat price from coinGecko apis
-          symbol: balance.token.symbol,
-          description: balance.token.name,
+      if(checkout && provider && chainId) {
+        const totalBalance = 0;
+        const walletAddress = await provider.getSigner().getAddress();
+        const getAllBalancesResult = await checkout.getAllBalances({
+          provider,
+          walletAddress,
+          chainId,
         });
-      });
 
-      setTokenBalances(tokenBalances);
-      setTotalFiatAmount(totalBalance);
+        const tokenBalances: BalanceInfo[] = [];
+        getAllBalancesResult.balances.forEach((balance) => {
+          tokenBalances.push({
+            id: networkName + '-' + balance.token.symbol,
+            balance: balance.formattedBalance,
+            fiatAmount: '23.50', // todo: fetch fiat price from coinGecko apis
+            symbol: balance.token.symbol,
+            description: balance.token.name,
+          });
+        });
+
+        setTokenBalances(tokenBalances);
+        setTotalFiatAmount(totalBalance);
+      }
+
     },
     []
   );
 
-  const getProvider = useCallback(async () => {
-    if (checkout) {
-      const providerPreference =
-        params.providerPreference ?? ConnectionProviders.METAMASK;
+  useEffect(()=>{
+    const checkout = new Checkout();
+    walletDispatch({
+      payload: {
+        type: WalletActions.SET_CHECKOUT,
+        checkout: checkout
+      },
+    });
+  }, []);
 
-      const connectResult: ConnectResult = await checkout.connect({
-        providerPreference,
+  useEffect(() => {
+    (async () => {
+      if(!checkout) return;
+
+      const connectResult = await checkout.connect({
+        providerPreference: params.providerPreference ?? ConnectionProviders.METAMASK
       });
 
-      const networkName = connectResult.network.name as Network;
-      const chainId = connectResult.network.chainId as ChainId;
+      walletDispatch({
+        payload: {
+          type: WalletActions.SET_PROVIDER,
+          provider: connectResult.provider,
+        }
+      });
+
+      walletDispatch({
+        payload: {
+          type: WalletActions.SET_NETWORK_INFO,
+          network: connectResult.network,
+        }
+      });
+
+      // getBalances and set in context
       await getTokenBalances(
         checkout,
         connectResult.provider,
-        networkName,
-        chainId
+        connectResult.network.name,
+        connectResult.network.chainId
       );
 
-      setNetworkName(networkName);
-      setProvider(connectResult.provider);
-    }
-  }, [checkout, params.providerPreference, getTokenBalances]);
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {type: WalletWidgetViews.WALLET_BALANCES}
+        }
+      });
+    })();
+  }, [params.providerPreference, checkout, getTokenBalances]);
 
-  useEffect(() => {
-    getProvider();
-  }, [getProvider]);
-
-  const switchNetwork = async (chainId: ChainId) => {
-    setIsLoading(true);
-    try {
-      const switchedNetwork = await checkout.switchNetwork({
-        provider: provider,
-        chainId: chainId,
-      } as SwitchNetworkParams);
-      await getProvider();
-      sendNetworkSwitchEvent(switchedNetwork.network);
-    } catch (err) {
-      // user proably rejected the switch network request
-      // should we do anything here...
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const errorAction = () =>{
+    console.log('Something went wrong')
+  }
 
   return (
     <BiomeThemeProvider theme={{ base: biomeTheme }}>
-      <Box sx={WalletWidgetStyle}>
-        <Box sx={WidgetHeaderStyle}>
-          <NetworkStatus networkName={networkName} />
-          <Button
-            size={'small'}
-            sx={{ alignSelf: 'flex-end' }}
-            testId="close-button"
-            onClick={() => sendWalletWidgetCloseEvent()}
-          >
-            x
-          </Button>
-        </Box>
-        <TotalTokenBalance totalBalance={totalFiatAmount} />
-        <Box sx={WidgetBodyStyle}>
-          {!isLoading && <TokenBalanceList balanceInfoItems={tokenBalances} />}
-          {isLoading && (
-            <Box sx={{ width: '100%', height: '100px' }}>
-              <Body>Loading</Body>
-            </Box>
+      <ViewContext.Provider value={{viewState, viewDispatch}}>
+        <WalletContext.Provider value={{walletState, walletDispatch}}>
+            {viewState.view.type === WalletWidgetViews.WALLET_BALANCES &&
+              (<WalletBalances
+                tokenBalances={tokenBalances}
+                totalFiatAmount={totalFiatAmount}
+                networkName={walletState.network?.name ?? ""}
+                getTokenBalances={getTokenBalances}
+                />)
+            }
+          {viewState.view.type === BaseViews.ERROR && (
+            <ErrorView actionText='Try again' onActionClick={errorAction}/>
           )}
-        </Box>
-        {networkName && (
-          <Box
-            sx={{
-              display: 'flex',
-              direction: 'row',
-              justifyContent: 'space-between',
-            }}
-          >
-            {Network.GOERLI !== networkName && (
-              <Button
-                size={'small'}
-                testId="goerli-network-button"
-                onClick={() => switchNetwork(ChainId.GOERLI)}
-              >
-                <Badge isAnimated={false} />
-                Switch to Goerli
-              </Button>
-            )}
-            {Network.ETHEREUM !== networkName && (
-              <Button
-                size={'small'}
-                testId="eth-network-button"
-                onClick={() => switchNetwork(ChainId.ETHEREUM)}
-              >
-                <Badge isAnimated={false} />
-                Switch to Ethereum
-              </Button>
-            )}
-            {Network.POLYGON !== networkName && (
-              <Button
-                size={'small'}
-                testId="polygon-network-button"
-                onClick={() => switchNetwork(ChainId.POLYGON)}
-              >
-                <Badge isAnimated={false} />
-                Switch to Polygon
-              </Button>
-            )}
-          </Box>
-        )}
-      </Box>
+        </WalletContext.Provider>
+      </ViewContext.Provider>
     </BiomeThemeProvider>
   );
 }

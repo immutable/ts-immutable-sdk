@@ -1543,9 +1543,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.2.9-beta":
-  version: 0.2.9-beta
-  resolution: "@biom3/react@npm:0.2.9-beta"
+"@biom3/react@npm:^0.3.0-beta":
+  version: 0.3.0-beta
+  resolution: "@biom3/react@npm:0.3.0-beta"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.10.5
@@ -1560,7 +1560,7 @@ __metadata:
     react-dom: ^18.2.0
     react-is: ^18.2.0
     ts-deepmerge: ^5.0.0
-  checksum: d69e2e9da9d313c80bf7739dfbb6ed370658b46ba8bd98dcb349a776200639969f7a38d9706dc00843f658fc2a7a2a3c33cc2a985a677fa2b400f773fa37e309
+  checksum: a0ee69dc63e149b2547571a3c0cafb8681dd6c5f8e95b9aba88d2116437922dcb10ed670acea5e947cdabd73e71bcf8e5884a7ee7fbfd4697fe28907a3acdf52
   languageName: node
   linkType: hard
 
@@ -2468,6 +2468,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
+    "@biom3/react": ^0.3.0-beta
     "@imtbl/checkout-sdk-web": 0.0.0
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
@@ -2481,7 +2482,7 @@ __metadata:
     jest-environment-jsdom: ^29.4.3
     react: ^18.2.0
     react-dom: ^18.2.0
-    react-router-dom: ^6.10.0
+    react-router-dom: ^6.11.0
     react-scripts: 5.0.1
     typescript: ^4.9.5
     web-vitals: ^2.1.4
@@ -2521,9 +2522,10 @@ __metadata:
     "@types/react": ^18.0.28
     "@types/react-dom": ^18.0.11
     parcel: ^2.8.3
+    typescript: ^4.9.5
+  peerDependencies:
     react: ^18.2.0
     react-dom: ^18.2.0
-    typescript: ^4.9.5
   languageName: unknown
   linkType: soft
 
@@ -2542,7 +2544,7 @@ __metadata:
     "@types/react-dom": ^18.0.11
     react: ^18.2.0
     react-dom: ^18.2.0
-    react-router-dom: ^6.10.0
+    react-router-dom: ^6.11.0
     react-scripts: 5.0.1
     typescript: ^4.9.5
     web-vitals: ^2.1.4
@@ -2554,7 +2556,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets@workspace:packages/checkout/widgets"
   dependencies:
     "@biom3/design-tokens": 0.1.4-beta
-    "@biom3/react": ^0.2.9-beta
+    "@biom3/react": ^0.3.0-beta
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk-web": 0.0.0
     "@imtbl/checkout-ui-types": 0.0.0
@@ -2571,7 +2573,7 @@ __metadata:
     local-cypress: ^1.2.6
     react: ^18.2.0
     react-dom: ^18.2.0
-    react-router-dom: ^6.10.0
+    react-router-dom: ^6.11.0
     react-scripts: 5.0.1
     ts-jest: ^29.1.0
     typescript: ^4.9.5
@@ -2835,12 +2837,13 @@ __metadata:
     ethers: ^5.7.2
     magic-sdk: ^13.3.1
     oidc-client-ts: ^2.2.1
-    react: ^18.2.0
-    react-dom: ^18.2.0
     rollup: ^3.17.2
     rollup-plugin-dts: ^5.3.0
     semver: ^7.4.0
     typescript: ^4.9.5
+  peerDependencies:
+    react: ^18.2.0
+    react-dom: ^18.2.0
   languageName: unknown
   linkType: soft
 
@@ -4969,10 +4972,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@remix-run/router@npm:1.5.0":
-  version: 1.5.0
-  resolution: "@remix-run/router@npm:1.5.0"
-  checksum: 9c510c174af1553edd1f039ba16e7e3d34e04d53b3bac18814660e31cd0c48297ea4291ff86d0736b560123ebc63ecb62fa525829181d16a8dad15270d6672d7
+"@remix-run/router@npm:1.6.0":
+  version: 1.6.0
+  resolution: "@remix-run/router@npm:1.6.0"
+  checksum: 9f08f20500b2fc9d689c06c3c25504baf2ece861a9f4d0c49ba043ef4040a96b85c15a57a1c11377e64bf78b727ce8fb58b300345642efb05a75d49e4b638344
   languageName: node
   linkType: hard
 
@@ -22024,27 +22027,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:^6.10.0":
-  version: 6.10.0
-  resolution: "react-router-dom@npm:6.10.0"
+"react-router-dom@npm:^6.11.0":
+  version: 6.11.0
+  resolution: "react-router-dom@npm:6.11.0"
   dependencies:
-    "@remix-run/router": 1.5.0
-    react-router: 6.10.0
+    "@remix-run/router": 1.6.0
+    react-router: 6.11.0
   peerDependencies:
     react: ">=16.8"
     react-dom: ">=16.8"
-  checksum: d048d8cc66e5aec782bd675097d6bf0e5f867f3f0539bff9acdc4a314b5e0e34093944762960ca0977a54c6255272edd262231242b18c4e260d68df6b5288464
+  checksum: 85c9e302de8f5730bd63fc1f0f712ca0645b7ec843828f43b60712b0a38105d101c7412487eeb35cc25d940cc026e8832e6492eba9772d26779e2856f18e7923
   languageName: node
   linkType: hard
 
-"react-router@npm:6.10.0":
-  version: 6.10.0
-  resolution: "react-router@npm:6.10.0"
+"react-router@npm:6.11.0":
+  version: 6.11.0
+  resolution: "react-router@npm:6.11.0"
   dependencies:
-    "@remix-run/router": 1.5.0
+    "@remix-run/router": 1.6.0
   peerDependencies:
     react: ">=16.8"
-  checksum: c9fce46147c04257d7d6fa1f5bbfac96c5fdd0b15f26918bd12b2e5fe9143977c5a4452272f9b85795a22e29ec105a60d0bbe036118efc52b383d163cd8829ab
+  checksum: c27d64b074da711d59a94d7b64fe82360da8a49077a5e8326c27e9fb48a7650080f73b5ba3b94d0b11f2d7e315255fabc3bad818cd26d1cec3a52220ad9d64cd
   languageName: node
   linkType: hard
 

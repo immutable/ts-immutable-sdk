@@ -31,7 +31,8 @@ export interface ImxOverrides {
   immutableXConfig: ImmutableXConfiguration;
 }
 
-interface ImxModuleConfiguration extends ModuleConfiguration<ImxOverrides> {}
+export interface ImxModuleConfiguration
+  extends ModuleConfiguration<ImxOverrides> {}
 
 export class ImxConfiguration {
   readonly immutableXConfig: ImmutableXConfiguration;
