@@ -36,10 +36,7 @@ describe('WalletBalances', () => {
         <WalletContext.Provider
           value={{ walletState, walletDispatch: () => {} }}
         >
-          <WalletBalances
-            totalFiatAmount={100}
-            getTokenBalances={(checkout, provider, networkName, chainId) => {}}
-          />
+          <WalletBalances />
         </WalletContext.Provider>
       </BiomeCombinedProviders>
     );

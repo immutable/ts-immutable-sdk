@@ -9,7 +9,7 @@ import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 describe('WalletWidget tests', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
-  })
+  });
   it('should show loading screen when component is mounted', () => {
     const params = {
       providerPreference: ConnectionProviders.METAMASK,
@@ -154,7 +154,7 @@ describe('WalletWidget tests', () => {
       cySmartGet('Ethereum-network-button').should('include.text', 'Ethereum');
 
       cySmartGet('total-token-balance').should('exist');
-      cySmartGet('total-token-balance').should('have.text', '≈ USD $0.00');
+      cySmartGet('total-token-balance').should('have.text', '≈ USD $70.50');
 
       cySmartGet('balance-item-ETH').should('exist');
       cySmartGet('balance-item-GODS').should('exist');
@@ -227,14 +227,29 @@ describe('WalletWidget tests', () => {
         mount(<WalletWidget params={params} theme={WidgetTheme.DARK} />);
         cySmartGet('Polygon-network-button').should('exist');
         cySmartGet('Ethereum-network-button').should('exist');
-        cySmartGet('Ethereum-network-button').should('have.css', 'border-style', 'solid');
-        cySmartGet('Polygon-network-button').should('not.have.css', 'border-style', 'solid');
+        cySmartGet('Ethereum-network-button').should(
+          'have.css',
+          'border-style',
+          'solid'
+        );
+        cySmartGet('Polygon-network-button').should(
+          'not.have.css',
+          'border-style',
+          'solid'
+        );
 
         cySmartGet('Polygon-network-button').click();
 
-        cySmartGet('Polygon-network-button').should('have.css', 'border-style', 'solid');
-        cySmartGet('Ethereum-network-button').should('not.have.css', 'border-style', 'solid');
-
+        cySmartGet('Polygon-network-button').should(
+          'have.css',
+          'border-style',
+          'solid'
+        );
+        cySmartGet('Ethereum-network-button').should(
+          'not.have.css',
+          'border-style',
+          'solid'
+        );
       });
 
       it('should show add coins button', () => {
@@ -246,7 +261,7 @@ describe('WalletWidget tests', () => {
         cySmartGet('add-coins').should('exist'); // eventually we want to hide this on L1 network
         cySmartGet('Polygon-network-button').click();
         cySmartGet('add-coins').should('exist');
-      })
+      });
     });
   });
 });

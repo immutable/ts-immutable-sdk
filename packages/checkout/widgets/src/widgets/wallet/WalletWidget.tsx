@@ -1,24 +1,27 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-
 import { WidgetTheme } from '@imtbl/checkout-ui-types';
-
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { useEffect, useReducer } from 'react';
 import {
-  ChainId,
-  Checkout,
-  ConnectionProviders,
-} from '@imtbl/checkout-sdk-web';
-
-import { useCallback, useEffect, useReducer, useState } from 'react';
-import { Web3Provider } from '@ethersproject/providers';
-import { initialWalletState, WalletActions, WalletContext, walletReducer } from './context/WalletContext';
-import { BaseViews, initialViewState, ViewActions, ViewContext, viewReducer } from "../../context/ViewContext";
+  initialWalletState,
+  WalletActions,
+  WalletContext,
+  walletReducer,
+} from './context/WalletContext';
+import {
+  BaseViews,
+  initialViewState,
+  ViewActions,
+  ViewContext,
+  viewReducer,
+} from '../../context/ViewContext';
 import { WalletWidgetViews } from '../../context/WalletViewContextTypes';
 import { WalletBalances } from './views/WalletBalances';
-import { ErrorView } from "../../components/Error/ErrorView";
+import { ErrorView } from '../../components/Error/ErrorView';
 import { LoadingView } from '../../components/Loading/LoadingView';
-import { BalanceInfo } from './types/BalanceInfo';
 import { closeWalletWidget } from './functions/closeWalletWidget';
+import { getTokenBalances } from './functions/tokenBalances';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
@@ -35,72 +38,31 @@ export function WalletWidget(props: WalletWidgetProps) {
     theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
       ? onLightBase
       : onDarkBase;
-
+  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const [walletState, walletDispatch] = useReducer(
     walletReducer,
     initialWalletState
   );
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
-  const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
-  const {checkout} = walletState;
+  const { checkout } = walletState;
 
-  const getTokenBalances = useCallback(
-    async (
-      checkout: Checkout,
-      provider: Web3Provider,
-      networkName: string,
-      chainId: ChainId
-    ) => {
-      if(checkout && provider && chainId){
-      const totalBalance = 0;
-      // TODO: handle possible errors here
-      const walletAddress = await provider.getSigner().getAddress();
-      const getAllBalancesResult = await checkout.getAllBalances({
-        provider,
-        walletAddress,
-        chainId,
-      });
-
-      const tokenBalances: BalanceInfo[] = [];
-      getAllBalancesResult.balances.forEach((balance) => {
-        tokenBalances.push({
-          id: networkName + '-' + balance.token.symbol,
-          balance: balance.formattedBalance,
-          fiatAmount: '23.50', // todo: fetch fiat price from coinGecko apis
-          symbol: balance.token.symbol,
-          description: balance.token.name,
-        });
-      });
-
-      walletDispatch({
-        payload: {
-          type: WalletActions.SET_TOKEN_BALANCES,
-          tokenBalances: tokenBalances
-        }
-      });
-      setTotalFiatAmount(totalBalance);
-    }
-    },
-    []
-  );
-
-  useEffect(()=>{
+  useEffect(() => {
     const checkout = new Checkout();
     walletDispatch({
       payload: {
         type: WalletActions.SET_CHECKOUT,
-        checkout: checkout
+        checkout: checkout,
       },
     });
   }, []);
 
   useEffect(() => {
     (async () => {
-      if(!checkout) return;
+      if (!checkout) return;
 
-      const connectResult = await checkout.connect({
-        providerPreference: params.providerPreference ?? ConnectionProviders.METAMASK
+      const { provider, network } = await checkout.connect({
+        providerPreference:
+          params.providerPreference ?? ConnectionProviders.METAMASK,
       });
 
       // check here that the user's wallet is on the correct network
@@ -109,50 +71,52 @@ export function WalletWidget(props: WalletWidgetProps) {
       walletDispatch({
         payload: {
           type: WalletActions.SET_PROVIDER,
-          provider: connectResult.provider,
-        }
+          provider,
+        },
       });
 
       walletDispatch({
         payload: {
-          type: WalletActions.SET_NETWORK_INFO,
-          network: connectResult.network,
-        }
+          type: WalletActions.SWITCH_NETWORK,
+          network,
+          tokenBalances: await getTokenBalances(
+            checkout,
+            provider,
+            network.name,
+            network.chainId
+          ),
+        },
       });
-
-      // getBalances and set in context
-      await getTokenBalances(
-        checkout,
-        connectResult.provider,
-        connectResult.network.name,
-        connectResult.network.chainId
-      );
 
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: {type: WalletWidgetViews.WALLET_BALANCES}
-        }
+          view: { type: WalletWidgetViews.WALLET_BALANCES },
+        },
       });
     })();
-  }, [params.providerPreference, checkout, getTokenBalances]);
+  }, [params.providerPreference, checkout]);
 
-  const errorAction = () =>{
-    console.log('Something went wrong')
-  }
+  const errorAction = () => {
+    console.log('Something went wrong');
+  };
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-      <ViewContext.Provider value={{viewState, viewDispatch}}>
-        <WalletContext.Provider value={{walletState, walletDispatch}}>
-            {viewState.view.type === BaseViews.LOADING_VIEW && (
-              <LoadingView loadingText="Loading" />
-            )}
-            {viewState.view.type === WalletWidgetViews.WALLET_BALANCES &&
-              (<WalletBalances totalFiatAmount={totalFiatAmount} getTokenBalances={getTokenBalances} />)
-            }
+      <ViewContext.Provider value={{ viewState, viewDispatch }}>
+        <WalletContext.Provider value={{ walletState, walletDispatch }}>
+          {viewState.view.type === BaseViews.LOADING_VIEW && (
+            <LoadingView loadingText="Loading" />
+          )}
+          {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
+            <WalletBalances />
+          )}
           {viewState.view.type === BaseViews.ERROR && (
-            <ErrorView actionText='Try again' onActionClick={errorAction} onCloseClick={closeWalletWidget}/>
+            <ErrorView
+              actionText="Try again"
+              onActionClick={errorAction}
+              onCloseClick={closeWalletWidget}
+            />
           )}
         </WalletContext.Provider>
       </ViewContext.Provider>
