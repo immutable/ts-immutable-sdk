@@ -2,6 +2,8 @@ import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import { Exchange, TradeInfo } from '@imtbl/dex-sdk';
 import { configuration } from '@/config/devnet';
+import { Simulate } from 'react-dom/test-utils';
+import input = Simulate.input;
 
 type RouteType = {
   fee: any;
@@ -12,51 +14,71 @@ type RouteType = {
 export function Example() {
   // Create and use the exchange as per normal
   const exchange = new Exchange(configuration);
-  const DEVNET_USDC = '0xBB587517EC25e545F8Fe7c450161319c35677C86';
-  const DEVNET_FUN = '0x1a4B77b638d55f320e0a453394EC18Ab69F762F2';
+  const DEVNET_USDC = process.env.NEXT_PUBLIC_COMMON_ROUTING_USDC || '';
+  const DEVNET_FUN = process.env.NEXT_PUBLIC_COMMON_ROUTING_FUN || '';
+  const DEVNET_ETH = process.env.NEXT_PUBLIC_COMMON_ROUTING_WETH || '';
 
-  const [result, setResult] = useState<TradeInfo>();
+  type mapping = {
+    [address: string]: string;
+  };
+
+  const [result, setResult] = useState<TradeInfo | null>();
+  const [error, setError] = useState('');
   const [isFetching, setIsFetching] = useState(false);
   const [routes, setRoutes] = useState<RouteType[]>([]);
-  const [inputTokenSymbol, setInputTokenSymbol] = useState('');
-  const [outputTokenSymbol, setOutputTokenSymbol] = useState('');
+  const [addressToSymbolMapping, setAddressToSymbolMapping] = useState<mapping>(
+    {}
+  );
 
-  const inputToken = DEVNET_USDC;
-  const outputToken = DEVNET_FUN;
+  const inputToken = DEVNET_FUN;
+  const outputToken = DEVNET_ETH;
 
   const amountIn = ethers.utils.parseEther('1000');
 
-  // useEffect(() => {
-  //   getTokenSymbol(inputToken).then((symbol: string) => {
-  //     setInputTokenSymbol(symbol);
-  //   });
-  //
-  //   getTokenSymbol(outputToken).then((symbol: string) => {
-  //     setOutputTokenSymbol(symbol);
-  //   });
-  // });
-  //
-  // async function getTokenSymbol(tokenAddress: string): Promise<string> {
-  //   const provider = new ethers.providers.JsonRpcProvider(
-  //     RPC_URLS[SupportedChainId.POLYGON_ZKEVM_TESTNET][0]
-  //   );
-  //   const symbolFunctionSig = ethers.utils.id('symbol()').substring(0, 10);
-  //   const returnValue = await provider.call({
-  //     to: tokenAddress,
-  //     data: symbolFunctionSig,
-  //   });
-  //   return ethers.utils.defaultAbiCoder.decode(['string'], returnValue)[0];
-  // }
+  useEffect(() => {
+    Promise.all([getTokenSymbol(inputToken), getTokenSymbol(outputToken)]).then(
+      ([inputTokenSymbol, outputTokenSymbol]) => {
+        console.log(inputTokenSymbol, outputTokenSymbol);
+        setAddressToSymbolMapping({
+          [inputToken]: inputTokenSymbol,
+          [outputToken]: outputTokenSymbol,
+        });
+        console.log(inputTokenSymbol);
+      }
+    );
+  }, []);
+
+  async function getTokenSymbol(tokenAddress: string): Promise<string> {
+    const provider = new ethers.providers.JsonRpcProvider(
+      process.env.NEXT_PUBLIC_RPC_URL_DEV
+    );
+    const symbolFunctionSig = ethers.utils.id('symbol()').substring(0, 10);
+    const returnValue = await provider.call({
+      to: tokenAddress,
+      data: symbolFunctionSig,
+    });
+    return ethers.utils.defaultAbiCoder.decode(['string'], returnValue)[0];
+  }
 
   async function getPaths(trade: TradeInfo): Promise<RouteType[]> {
     const promises = trade.route.pools.map(async ({ fee, token0, token1 }) => {
-      // const token0Symbol = await getTokenSymbol(token0.address);
-      // const token1Symbol = await getTokenSymbol(token1.address);
+      const token0Symbol = await getTokenSymbol(token0.address);
+      const token1Symbol = await getTokenSymbol(token1.address);
 
-      const token0Symbol = 'IMZ';
-      const token1Symbol = 'ETH';
+      if (!addressToSymbolMapping[token0.address]) {
+        setAddressToSymbolMapping({
+          ...addressToSymbolMapping,
+          [token0.address]: token0Symbol,
+        });
+      }
 
-      console.log({ token0Symbol, token1Symbol });
+      if (!addressToSymbolMapping[token1.address]) {
+        setAddressToSymbolMapping({
+          ...addressToSymbolMapping,
+          [token1.address]: token1Symbol,
+        });
+      }
+
       return {
         fee,
         token0: token0Symbol,
@@ -79,27 +101,27 @@ export function Example() {
     );
     console.log({ result });
 
-    // if (result?.state == TradeState.VALID) {
-    //   setResult(result.trade);
-    //
-    //   const mapping = await getPaths(result.trade);
-    //   setRoutes(mapping);
-    // }
+    if (result.success) {
+      setResult(result.trade);
+
+      const mapping = await getPaths(result.trade);
+      setRoutes(mapping);
+    } else {
+      setError('Error fetching the quotes...');
+      setResult(null);
+      setRoutes([]);
+    }
 
     setIsFetching(false);
   };
 
-  // if (!inputTokenSymbol || !outputTokenSymbol) {
-  //   return null;
-  // }
-
   return (
     <div>
       <h3>
-        Input Token: {inputTokenSymbol} - {inputToken}
+        Input Token: {inputToken} ({addressToSymbolMapping[inputToken]})
       </h3>
       <h3>
-        Output Token: {outputTokenSymbol} - {outputToken}
+        Output Token: {outputToken} ({addressToSymbolMapping[outputToken]})
       </h3>
       <h3>Amount In: {ethers.utils.formatEther(amountIn)}</h3>
       <button
@@ -111,20 +133,39 @@ export function Example() {
       </button>
       <hr className="my-4" />
       {result && (
-        <h3>Amount out: {ethers.utils.formatEther(result.amountOut)}</h3>
-      )}
-      {routes.length > 0 && (
-        <h3>
-          {routes.map((route: any, index: number) => {
-            const key = `${route.token0}-${route.token1}-${route.fee}`;
-            return (
-              <span key={key}>
-                {route.token0}/{route.token1} - {route.fee / 10000}%{' '}
-                {index !== routes.length - 1 ? `--->` : ''}{' '}
-              </span>
-            );
-          })}
-        </h3>
+        <>
+          <h3>Amount out: {ethers.utils.formatEther(result.amountOut)}</h3>
+          {routes.length > 0 && (
+            <>
+              <h3>
+                Token Path:&nbsp;
+                {result.route.tokenPath.map((token: any, index: number) => {
+                  const key = token.address;
+                  return (
+                    <span key={key}>
+                      {addressToSymbolMapping[token.address]}{' '}
+                      {index !== result.route.tokenPath.length - 1
+                        ? `--->`
+                        : ''}{' '}
+                    </span>
+                  );
+                })}
+              </h3>
+              <h3>
+                Pools used:&nbsp;
+                {routes.map((route: any, index: number) => {
+                  const key = `${route.token0}-${route.token1}-${route.fee}`;
+                  return (
+                    <span key={key}>
+                      ({route.token0}/{route.token1} - {route.fee / 10000}%){' '}
+                      {index !== routes.length - 1 ? `--->` : ''}{' '}
+                    </span>
+                  );
+                })}
+              </h3>
+            </>
+          )}
+        </>
       )}
     </div>
   );

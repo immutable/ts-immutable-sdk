@@ -34,7 +34,7 @@ export const generatePossiblePoolsFromERC20Pair = (
       // Computing an address does not mean the pool is guaranteed to exist
       const poolAddress = computePoolAddress({
         factoryAddress: factoryAddress,
-        erc20Pair: erc20Pair,
+        erc20Pair: erc20Pairs[i],
         fee: PoolFees[j],
       });
 
