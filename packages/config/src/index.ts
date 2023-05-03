@@ -4,6 +4,7 @@ export enum Environment {
 }
 export class ImmutableConfiguration {
   readonly environment: Environment;
+
   readonly apiKey?: string;
 
   constructor(options: { environment: Environment; apiKey?: string }) {
