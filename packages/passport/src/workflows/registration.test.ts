@@ -7,8 +7,7 @@ describe('registerPassportWorkflow', () => {
     stark_signature: '0x123',
     eth_signature: '0x123',
   };
-  const mockToken =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
+  const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
 
   it('registerPassportWorkflow successfully called api client to register passport user', async () => {
     const mockUserApi = {
@@ -42,7 +41,7 @@ describe('registerPassportWorkflow', () => {
     expect(mockStarkSigner.signMessage).toHaveBeenCalled();
     expect(mockEthSigner.signMessage).toHaveBeenCalled();
     expect(mockUserApi.registerPassportUser).toHaveBeenCalledWith({
-      authorization: `Bearer ` + mockToken,
+      authorization: `Bearer ${mockToken}`,
       registerPassportUserRequest: {
         ...requestBody,
         eth_signature:
@@ -75,13 +74,13 @@ describe('registerPassportWorkflow', () => {
     };
 
     await expect(registerPassport(request, mockToken)).rejects.toThrow(
-      'USER_REGISTRATION_ERROR'
+      'USER_REGISTRATION_ERROR',
     );
 
     expect(mockStarkSigner.signMessage).toHaveBeenCalled();
     expect(mockEthSigner.signMessage).toHaveBeenCalled();
     expect(mockUserApi.registerPassportUser).toHaveBeenCalledWith({
-      authorization: `Bearer ` + mockToken,
+      authorization: `Bearer ${mockToken}`,
       registerPassportUserRequest: {
         ...requestBody,
         eth_signature:

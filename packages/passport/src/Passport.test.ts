@@ -92,7 +92,7 @@ describe('Passport', () => {
       authLoginMock.mockResolvedValue({ idToken: '123' });
 
       await expect(passport.connectImx()).rejects.toThrow(
-        'Failed to get refresh token'
+        'Failed to get refresh token',
       );
 
       expect(authLoginMock).toBeCalledTimes(1);

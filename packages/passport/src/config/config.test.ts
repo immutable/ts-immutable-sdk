@@ -1,3 +1,4 @@
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
@@ -5,7 +6,6 @@ import {
   PassportOverrides,
   PassportModuleConfiguration,
 } from '../types';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
 
 describe('Config', () => {
   const oidcConfiguration = {
@@ -43,7 +43,7 @@ describe('Config', () => {
           passportDomain: 'https://passport.sandbox.immutable.com',
           imxApiBasePath: 'https://api.sandbox.x.immutable.com',
           oidcConfiguration,
-        })
+        }),
       );
     });
   });
@@ -66,7 +66,7 @@ describe('Config', () => {
           passportDomain: 'https://passport.immutable.com',
           imxApiBasePath: 'https://api.x.immutable.com',
           oidcConfiguration,
-        })
+        }),
       );
     });
   });
@@ -86,7 +86,7 @@ describe('Config', () => {
           expect.objectContaining({
             ...overrides,
             oidcConfiguration,
-          })
+          }),
         );
       });
     });
@@ -105,15 +105,14 @@ describe('Config', () => {
           ...oidcConfiguration,
         };
         expect(
-          () =>
-            new PassportConfiguration(
-              passportConfiguration as unknown as PassportModuleConfiguration
-            )
+          () => new PassportConfiguration(
+            passportConfiguration as unknown as PassportModuleConfiguration,
+          ),
         ).toThrow(
           new PassportError(
             'overrides - authenticationDomain cannot be null',
-            PassportErrorType.AUTHENTICATION_ERROR
-          )
+            PassportErrorType.AUTHENTICATION_ERROR,
+          ),
         );
       });
     });
@@ -130,15 +129,14 @@ describe('Config', () => {
         clientId: undefined,
       };
       expect(
-        () =>
-          new PassportConfiguration(
-            passportConfiguration as unknown as PassportModuleConfiguration
-          )
+        () => new PassportConfiguration(
+          passportConfiguration as unknown as PassportModuleConfiguration,
+        ),
       ).toThrow(
         new PassportError(
           'clientId cannot be null',
-          PassportErrorType.AUTHENTICATION_ERROR
-        )
+          PassportErrorType.AUTHENTICATION_ERROR,
+        ),
       );
     });
   });
