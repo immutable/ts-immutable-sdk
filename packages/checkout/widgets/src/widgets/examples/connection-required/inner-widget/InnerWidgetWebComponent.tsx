@@ -4,6 +4,10 @@ import { InnerWidget, InnerWidgetParams } from './InnerWidget';
 import { ImmutableWebComponent } from '../../../ImmutableWebComponent';
 
 export class ImmutableInnerExample extends ImmutableWebComponent {
+  connectedCallback() {
+    super.connectedCallback();
+    this.renderWidget();
+  }
   renderWidget() {
     const params: InnerWidgetParams = {};
 

@@ -7,6 +7,11 @@ import {
 import { ImmutableWebComponent } from '../../ImmutableWebComponent';
 
 export class ImmutableTransitionExample extends ImmutableWebComponent {
+  connectedCallback() {
+    super.connectedCallback();
+    this.renderWidget();
+  }
+
   renderWidget() {
     const params: TransitionExampleWidgetParams = {};
 
