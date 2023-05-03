@@ -1,4 +1,4 @@
-import { ChainId } from '@imtbl/checkout-sdk-web';
+import { ChainId } from '@imtbl/checkout-sdk';
 import { useContext, useState } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';

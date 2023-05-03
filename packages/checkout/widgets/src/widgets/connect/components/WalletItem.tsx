@@ -1,4 +1,4 @@
-import { ConnectionProviders, WalletInfo } from '@imtbl/checkout-sdk-web';
+import { ConnectionProviders, WalletInfo } from '@imtbl/checkout-sdk';
 import { MenuItem } from '@biom3/react';
 import { text } from '../../../resources/text/textConfig';
 

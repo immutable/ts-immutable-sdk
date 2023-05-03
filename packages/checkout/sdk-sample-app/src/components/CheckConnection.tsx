@@ -2,7 +2,7 @@ import {
   CheckConnectionResult,
   Checkout,
   ConnectionProviders,
-} from '@imtbl/checkout-sdk-web';
+} from '@imtbl/checkout-sdk';
 import { useMemo, useState } from 'react';
 import LoadingButton from './LoadingButton';
 import { Web3Provider } from '@ethersproject/providers';

@@ -1,9 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import {
-  ChainId,
-  Checkout,
-  ConnectionProviders,
-} from '@imtbl/checkout-sdk-web';
+import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { useContext, useState, useCallback } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';

@@ -29,10 +29,6 @@
   },
   "license": "ISC",
   "module": "dist/index.js",
-  "peerDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
   "scripts": {
     "build": "parcel build",
     "build:dist": "npm i && npm run build && npm run dist",

@@ -4,7 +4,7 @@ import {
   WalletFilter,
   WalletInfo,
   ConnectionProviders,
-} from '@imtbl/checkout-sdk-web';
+} from '@imtbl/checkout-sdk';
 import { useContext, useState, useEffect } from 'react';
 import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
 import { ViewContext, ViewActions } from '../../../context/ViewContext';

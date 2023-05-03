@@ -1,6 +1,10 @@
-import { Web3Provider } from "@ethersproject/providers";
-import { Checkout, ConnectionProviders, NetworkInfo } from "@imtbl/checkout-sdk-web";
-import { createContext } from "react";
+import { Web3Provider } from '@ethersproject/providers';
+import {
+  Checkout,
+  ConnectionProviders,
+  NetworkInfo,
+} from '@imtbl/checkout-sdk';
+import { createContext } from 'react';
 
 export interface WalletState {
   checkout: Checkout | null;
@@ -35,7 +39,7 @@ export enum WalletActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
-  SET_NETWORK_INFO = 'SET_NETWORK_INFO'
+  SET_NETWORK_INFO = 'SET_NETWORK_INFO',
 }
 
 export interface SetCheckoutPayload {
@@ -60,7 +64,7 @@ export interface SetNetworkInfoPayload {
 
 export const WalletContext = createContext<WalletContextState>({
   walletState: initialWalletState,
-  walletDispatch: () => {}
+  walletDispatch: () => {},
 });
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
@@ -86,9 +90,9 @@ export const walletReducer: Reducer<WalletState, WalletAction> = (
         providerPreference: action.payload.providerPreference,
       };
     case WalletActions.SET_NETWORK_INFO:
-      return{
+      return {
         ...state,
-        network: action.payload.network
+        network: action.payload.network,
       };
     default:
       return state;

@@ -1,4 +1,4 @@
-import { Checkout, ChainId, NetworkInfo } from '@imtbl/checkout-sdk-web';
+import { Checkout, ChainId, NetworkInfo } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import LoadingButton from './LoadingButton';
