@@ -40,6 +40,7 @@ export const transfer = ({
   starkSigner,
   user,
   passportConfig,
+// eslint-disable-next-line max-len
 }: TransferRequest): Promise<CreateTransferResponseV1> => withPassportError<CreateTransferResponseV1>(async () => {
   const transferAmount = request.type === ERC721 ? '1' : request.amount;
   const getSignableTransferRequest: GetSignableTransferRequestV1 = {

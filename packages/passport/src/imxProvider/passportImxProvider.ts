@@ -77,6 +77,8 @@ export default class PassportImxProvider implements IMXProvider {
     });
   }
 
+  // remove ignore when implemented
+  // eslint-disable-next-line class-methods-use-this
   registerOffchain(): Promise<RegisterUserResponse> {
     throw new PassportError(
       'Operation not supported',
@@ -84,6 +86,8 @@ export default class PassportImxProvider implements IMXProvider {
     );
   }
 
+  // remove ignore when implemented
+  // eslint-disable-next-line class-methods-use-this
   isRegisteredOnchain(): Promise<boolean> {
     throw new PassportError(
       'Operation not supported',
@@ -146,7 +150,8 @@ export default class PassportImxProvider implements IMXProvider {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // remove ignore when implemented
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
   deposit(deposit: TokenAmount): Promise<TransactionResponse> {
     throw new PassportError(
       'Operation not supported',
@@ -154,7 +159,8 @@ export default class PassportImxProvider implements IMXProvider {
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // remove ignore when implemented
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
   prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
     throw new PassportError(
       'Operation not supported',
@@ -162,6 +168,8 @@ export default class PassportImxProvider implements IMXProvider {
     );
   }
 
+  // remove ignore when implemented
+  // eslint-disable-next-line class-methods-use-this
   completeWithdrawal(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     starkPublicKey: string,

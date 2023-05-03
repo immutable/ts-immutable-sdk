@@ -44,13 +44,15 @@ export default class ConfirmationScreen {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
-          origin != this.config.passportDomain
-          || data.eventType != PassportEventType
+          origin !== this.config.passportDomain
+          || data.eventType !== PassportEventType
         ) {
           return;
         }
         switch (data.messageType as ReceiveMessage) {
           case ReceiveMessage.CONFIRMATION_WINDOW_READY: {
+            // remove once fixed
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
             this.postMessage(confirmationWindow, accessToken, {
               messageType: SendMessage.TRANSACTION_START,
               messageData: transaction,

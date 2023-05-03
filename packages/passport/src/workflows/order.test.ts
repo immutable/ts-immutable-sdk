@@ -95,7 +95,10 @@ describe('order', () => {
             '0x04006590f0986f008231e309b980e81f8a55944a702ec633b47ceb326242c9f8',
         },
       };
-      const { payload_hash: mockPayloadHash, ...restSignableOrderResponse } = mockSignableOrderResponse.data;
+      const {
+        payload_hash: mockPayloadHash,
+        ...restSignableOrderResponse
+      } = mockSignableOrderResponse.data;
       const mockCreateOrderRequest = {
         createOrderRequest: {
           ...restSignableOrderResponse,

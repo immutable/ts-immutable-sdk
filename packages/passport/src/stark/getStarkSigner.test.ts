@@ -9,20 +9,21 @@ import { PassportError, PassportErrorType } from '../errors/passportError';
 jest.mock('@imtbl/core-sdk');
 
 describe('getStarkSigner', () => {
+  // trunk-ignore(gitleaks/generic-api-key)
   const privateKey = '0x610855bbd7dad4efa59587e97041baa5ec96d483cac2ae78f2c2fb124fc391c1';
   const wallet = new ethers.Wallet(privateKey);
 
   it('should call generateLegacyStarkPrivateKey and return createStarkSigner', async () => {
-    const privateKey = 'private_key_123';
+    const privKey = 'priv_key_123';
     const starkSigner = {};
 
-    (generateLegacyStarkPrivateKey as jest.Mock).mockReturnValue(privateKey);
+    (generateLegacyStarkPrivateKey as jest.Mock).mockReturnValue(privKey);
     (createStarkSigner as jest.Mock).mockReturnValue(starkSigner);
 
     const result = await getStarkSigner(wallet);
 
     expect(generateLegacyStarkPrivateKey).toHaveBeenCalledWith(wallet);
-    expect(createStarkSigner).toHaveBeenCalledWith(privateKey);
+    expect(createStarkSigner).toHaveBeenCalledWith(privKey);
     expect(result).toEqual(starkSigner);
   });
 

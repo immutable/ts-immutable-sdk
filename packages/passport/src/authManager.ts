@@ -49,7 +49,7 @@ export default class AuthManager {
     this.userManager = new UserManager(getAuthConfiguration(config));
   }
 
-  private mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
+  private static mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
     const passport = oidcUser.profile?.passport as PassportMetadata;
     return {
       expired: oidcUser.expired,
@@ -72,7 +72,7 @@ export default class AuthManager {
         popupWindowFeatures,
       });
 
-      return this.mapOidcUserToDomainModel(oidcUser);
+      return AuthManager.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
@@ -100,7 +100,7 @@ export default class AuthManager {
       if (!oidcUser) {
         return null;
       }
-      return this.mapOidcUserToDomainModel(oidcUser) as UserWithEtherKey;
+      return AuthManager.mapOidcUserToDomainModel(oidcUser) as UserWithEtherKey;
     }, PassportErrorType.SILENT_LOGIN_ERROR);
   }
 
@@ -110,7 +110,7 @@ export default class AuthManager {
       if (!oidcUser) {
         return null;
       }
-      return this.mapOidcUserToDomainModel(oidcUser);
+      return AuthManager.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.NOT_LOGGED_IN_ERROR);
   }
 
@@ -125,12 +125,12 @@ export default class AuthManager {
         if (metadataExists) {
           return user;
         }
-        return Promise.reject('user wallet addresses not exist');
+        return Promise.reject(new Error('user wallet addresses not exist'));
       });
       if (!updatedUser) {
         return null;
       }
-      return this.mapOidcUserToDomainModel(updatedUser) as UserWithEtherKey;
+      return AuthManager.mapOidcUserToDomainModel(updatedUser) as UserWithEtherKey;
     }, PassportErrorType.REFRESH_TOKEN_ERROR);
   }
 }
