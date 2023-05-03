@@ -32,6 +32,10 @@ jobs:
     name: Publish Workflow
     runs-on: ubuntu-latest
     steps:
+      - name: Check Public Release Branch
+        if: contains(github.event.inputs.release_type, 'release') && (github.ref != 'refs/heads/main')
+        run: failure("Public releases should be only done from main branch, current branch ${{ github.ref }}")
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -63,15 +67,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Lint
-        run: yarn lint
-
-      - name: Check Single Package Version Policy
-        run: yarn syncpack:check
-
       - name: Workout next version string
         run: |
           upgrade_type=${{ github.event.inputs.upgrade_type }}
@@ -83,6 +78,15 @@ jobs:
           fi
           ./.github/scripts/version-up.sh --${{github.event.inputs.release_type }} --$upgrade_type --apply $revision_upgrade
         shell: bash
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Check Single Package Version Policy
+        run: yarn syncpack:check
 
       - name: Get next version string
         id: version
@@ -96,14 +100,14 @@ jobs:
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
       - name: Build
-        run: yarn build
+        run: RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
 
       - name: Typecheck
         run: yarn typecheck
 
       - name: Test
         run: yarn test
-        
+
       - name: Push tags
         # Boolean inputs are not actually booleans, see https://github.com/actions/runner/issues/1483
         if: github.event.inputs.dry_run == 'false'

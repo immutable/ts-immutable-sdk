@@ -6,7 +6,6 @@ import {
   sendConnectFailedEvent,
   sendConnectSuccessEvent,
 } from './ConnectWidgetEvents';
-import { ChooseNetwork } from './components/choose-network/ChooseNetwork';
 import { useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
@@ -16,16 +15,19 @@ import {
   initialConnectState,
 } from './context/ConnectContext';
 import {
+  BaseViews,
   initialViewState,
   ViewActions,
   ViewContext,
   viewReducer,
 } from '../../context/ViewContext';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
-import { ConnectWallet } from './components/connect-wallet/ConnectWallet';
-import { ConnectResult } from './components/connect-result/ConnectResult';
+import { ConnectWallet } from './views/ConnectWallet';
+import { ConnectResult } from './views/ConnectResult';
 import { SuccessView } from '../../components/Success/SuccessView';
-import { ReadyToConnect } from './components/ready-to-connect/ReadyToConnect';
+import { ReadyToConnect } from './views/ReadyToConnect';
+import { SwitchNetwork } from './views/SwitchNetwork';
+import { LoadingView } from '../../components/Loading/LoadingView';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
@@ -50,27 +52,29 @@ export function ConnectWidget(props: ConnectWidgetProps) {
       : onDarkBase;
 
   useEffect(() => {
-    connectDispatch({
-      payload: {
-        type: ConnectActions.SET_CHECKOUT,
-        checkout: new Checkout(),
-      },
-    });
-
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: ConnectWidgetViews.CONNECT_WALLET,
+    setTimeout(() => {
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_CHECKOUT,
+          checkout: new Checkout(),
         },
-      },
-    });
+      });
+  
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: ConnectWidgetViews.CONNECT_WALLET,
+          },
+        },
+      });
+    }, 200);
   }, []);
 
   useEffect(() => {
     switch (viewState.view.type) {
       case ConnectWidgetViews.FAIL:
-        sendConnectFailedEvent(viewState.view.error.message);
+        sendConnectFailedEvent(viewState.view.reason);
         break;
     }
   }, [viewState]);
@@ -80,14 +84,14 @@ export function ConnectWidget(props: ConnectWidgetProps) {
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         <ConnectContext.Provider value={{ connectState, connectDispatch }}>
           <>
+            {viewState.view.type === BaseViews.LOADING_VIEW && (
+              <LoadingView loadingText={'Connecting'} />
+            )}
             {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && (
               <ConnectWallet />
             )}
             {viewState.view.type === ConnectWidgetViews.READY_TO_CONNECT && (
               <ReadyToConnect />
-            )}
-            {viewState.view.type === ConnectWidgetViews.CHOOSE_NETWORKS && (
-              <ChooseNetwork />
             )}
             {viewState.view.type === ConnectWidgetViews.SUCCESS && (
               <SuccessView
@@ -101,6 +105,9 @@ export function ConnectWidget(props: ConnectWidgetProps) {
             )}
             {viewState.view.type === ConnectWidgetViews.FAIL && (
               <ConnectResult />
+            )}
+            {viewState.view.type === ConnectWidgetViews.SWITCH_NETWORK && (
+              <SwitchNetwork />
             )}
           </>
         </ConnectContext.Provider>

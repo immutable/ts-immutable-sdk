@@ -35,8 +35,8 @@ async function executeRegisterAndWithdrawERC20({
   config,
 }: ExecuteRegisterAndWithdrawERC20Params): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
-  const starkExConfig = config.immutableXConfig;
-  const usersApi = new UsersApi(starkExConfig.apiConfiguration);
+  const imxConfig = config.immutableXConfig;
+  const usersApi = new UsersApi(imxConfig.apiConfiguration);
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
@@ -86,8 +86,8 @@ export async function completeERC20WithdrawalAction({
 }: CompleteERC20WithdrawalWorkflowParams) {
   await validateChain(ethSigner, config.immutableXConfig);
 
-  const starkExConfig = config.immutableXConfig;
-  const assetType = await getEncodeAssetInfo('asset', 'ERC20', starkExConfig, {
+  const imxConfig = config.immutableXConfig;
+  const assetType = await getEncodeAssetInfo('asset', 'ERC20', imxConfig, {
     token_address: token.tokenAddress,
   });
   const isRegistered = await isRegisteredOnChain(
@@ -108,7 +108,7 @@ export async function completeERC20WithdrawalAction({
       ethSigner,
       assetType.asset_type,
       starkPublicKey,
-      starkExConfig
+      imxConfig
     );
   }
 }

@@ -6,6 +6,7 @@ import {
   BodyStyle,
   ContentStyle,
   HeroContent,
+  ResponsiveStyles,
 } from './SimpleLayoutStyles';
 
 export interface SimpleLayoutProps {
@@ -26,29 +27,31 @@ export const SimpleLayout = ({
   floatHeader = false,
 }: SimpleLayoutProps) => {
   return (
-    <Box testId={testId} sx={SimpleLayoutStyle}>
-      {header && (
-        <Box id="header" sx={HeaderStyle(floatHeader)}>
-          {header}
-        </Box>
-      )}
-      <Box id="content" sx={ContentStyle}>
-        {heroContent && (
-          <Box id="hero-content" sx={HeroContent}>
-            {heroContent}
+    <Box sx={ResponsiveStyles}>
+      <Box testId={testId} sx={SimpleLayoutStyle}>
+        {header && (
+          <Box id="header" sx={HeaderStyle(floatHeader)}>
+            {header}
           </Box>
         )}
-        {children && (
-          <Box id="body" sx={BodyStyle}>
-            {children}
+        <Box id="content" sx={ContentStyle}>
+          {heroContent && (
+            <Box id="hero-content" sx={HeroContent}>
+              {heroContent}
+            </Box>
+          )}
+          {children && (
+            <Box id="body" sx={BodyStyle}>
+              {children}
+            </Box>
+          )}
+        </Box>
+        {footer && (
+          <Box id="footer" sx={FooterStyle}>
+            {footer}
           </Box>
         )}
       </Box>
-      {footer && (
-        <Box id="footer" sx={FooterStyle}>
-          {footer}
-        </Box>
-      )}
     </Box>
   );
 };

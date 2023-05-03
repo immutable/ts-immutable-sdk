@@ -38,7 +38,7 @@ export const BalanceItem = (props: TokenBalanceInfo) => {
           {balanceInfo.balance}
         </Body>
         <Body testId={`balance-item-${balanceInfo.symbol}-fiat`} size="xSmall">
-          AUD ${balanceInfo.fiatAmount}
+          &asymp; USD ${balanceInfo.fiatAmount}
         </Body>
       </Box>
     </Box>

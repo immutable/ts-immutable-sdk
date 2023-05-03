@@ -1,4 +1,5 @@
-/packages/starkex @immutable/developer-experience
+/sdk @immutable/developer-experience
+/packages/immutablex_client @immutable/developer-experience
 /packages/config @immutable/developer-experience
 /packages/internal/toolkit @immutable/developer-experience
 /packages/internal/dex @immutable/tokens

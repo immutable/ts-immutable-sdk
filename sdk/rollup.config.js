@@ -6,12 +6,32 @@ import json from '@rollup/plugin-json';
 import dts from 'rollup-plugin-dts';
 import replace from '@rollup/plugin-replace';
 import pkg from './package.json' assert { type: 'json' };
+import moduleReleases from './module-release.json' assert { type: 'json' };
+
+// RELEASE_TYPE environment variable is set by the CI/CD pipeline
+const releaseType = process.env.RELEASE_TYPE || 'alpha';
 
 const packages = JSON.parse(
   readFileSync('./workspace-packages.json', { encoding: 'utf8' })
 );
 
 const getPackages = () => packages.map((pkg) => pkg.name);
+
+// Get relevant files to bundle
+const getFilesToBuild = () => {
+  // Always build the index file
+  const files = ['index'];
+
+  const moduleFiles = Object.keys(moduleReleases.modules);
+  if (releaseType === 'alpha') {
+    return [...files, ...moduleFiles];
+  }
+
+  const returnModules = moduleFiles.filter(
+    (file) => moduleReleases.modules[file] === 'prod'
+  );
+  return [...files, ...returnModules];
+};
 
 const getFileBuild = (inputFilename) => [
   {
@@ -50,8 +70,17 @@ const getFileBuild = (inputFilename) => [
   },
 ];
 
+const buildBundles = () => {
+  const modules = [];
+  const filesToBuild = getFilesToBuild();
+  for (const file of filesToBuild) {
+    modules.push(...getFileBuild(file));
+  }
+  return modules;
+};
+
 export default [
-  // CommonJS build
+  // Main build entry
   {
     input: 'src/index.ts',
     output: {
@@ -67,12 +96,7 @@ export default [
       json(),
     ],
   },
+
   // Export ES Modules
-  ...getFileBuild('index'),
-  ...getFileBuild('base'),
-  ...getFileBuild('starkex'),
-  ...getFileBuild('provider'),
-  ...getFileBuild('passport'),
-  ...getFileBuild('checkout_sdk'),
-  ...getFileBuild('checkout_widgets'),
+  ...buildBundles(),
 ];

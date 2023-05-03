@@ -1,10 +1,17 @@
+export const ResponsiveStyles = {
+  width: `clamp(320px, 100vw, 430px)`,
+  minHeight: '500px',
+  height: '100vh',
+  maxHeight: '650px',
+};
+
 export const SimpleLayoutStyle = {
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
   backgroundColor: 'base.color.brand.2',
-  minHeight: '680px',
-  width: '450px',
+  height: '100%',
+  width: '100%',
 };
 
 export const HeaderStyle = (floatHeader: boolean) => {
@@ -19,7 +26,6 @@ export const HeaderStyle = (floatHeader: boolean) => {
 };
 
 export const FooterStyle = {
-  height: '10%',
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
@@ -41,4 +47,5 @@ export const HeroContent = {
 export const BodyStyle = {
   flex: '1 0 0', // needed to set flex-basis to 0 for even distribution with HeroImageStyle
   width: '100%',
+  padding: 'base.spacing.x3',
 };

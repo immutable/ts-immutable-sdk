@@ -19,9 +19,9 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
   constructor(
     config: ProviderConfiguration,
     ethSigner: EthSigner,
-    starkExSigner: StarkSigner
+    starkSigner: StarkSigner
   ) {
-    super(config, ethSigner, starkExSigner);
+    super(config, ethSigner, starkSigner);
   }
 
   public static async connect(

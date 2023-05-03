@@ -40,10 +40,10 @@ export async function depositEth({
     decimals: 18,
   };
   const amount = parseUnits(deposit.amount, 'wei');
-  const starkExConfig = config.immutableXConfig;
-  const depositsApi = new DepositsApi(starkExConfig.apiConfiguration);
-  const encodingApi = new EncodingApi(starkExConfig.apiConfiguration);
-  const usersApi = new UsersApi(starkExConfig.apiConfiguration);
+  const imxConfig = config.immutableXConfig;
+  const depositsApi = new DepositsApi(imxConfig.apiConfiguration);
+  const encodingApi = new EncodingApi(imxConfig.apiConfiguration);
+  const usersApi = new UsersApi(imxConfig.apiConfiguration);
 
   const getSignableDepositRequest = {
     user,
@@ -84,7 +84,7 @@ export async function depositEth({
       assetType,
       starkPublicKey,
       vaultId,
-      starkExConfig,
+      imxConfig,
       usersApi
     );
   } else {
@@ -94,7 +94,7 @@ export async function depositEth({
       assetType,
       starkPublicKey,
       vaultId,
-      starkExConfig
+      imxConfig
     );
   }
 }
