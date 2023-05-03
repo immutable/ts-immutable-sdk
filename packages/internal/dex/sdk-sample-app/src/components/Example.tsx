@@ -48,6 +48,7 @@ export function Example() {
           [inputToken]: inputTokenSymbol,
           [outputToken]: outputTokenSymbol,
         });
+        console.log(inputTokenSymbol);
       }
     );
   }, []);
@@ -161,7 +162,7 @@ export function Example() {
                   const key = `${route.token0}-${route.token1}-${route.fee}`;
                   return (
                     <span key={key}>
-                      ({route.token0}/{route.token1} - {route.fee / 10000})%{' '}
+                      ({route.token0}/{route.token1} - {route.fee / 10000}%){' '}
                       {index !== routes.length - 1 ? `--->` : ''}{' '}
                     </span>
                   );
