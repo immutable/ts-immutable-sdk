@@ -15,3 +15,4 @@ export * from './components/CheckoutWidgets';
 export * from './components/ConnectWidget';
 export * from './components/SwapWidget';
 export * from './components/WalletWidget';
+export * from './components/ExampleWidget';

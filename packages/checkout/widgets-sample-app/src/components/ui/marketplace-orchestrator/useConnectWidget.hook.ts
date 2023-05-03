@@ -3,7 +3,7 @@ import {
   ConnectionFailed,
   ConnectionSuccess,
   IMTBLWidgetEvents,
-} from '@imtbl/checkout-ui-types';
+} from '@imtbl/checkout-widgets-react';
 import { useEffect, useState } from 'react';
 
 export function useConnectWidget() {

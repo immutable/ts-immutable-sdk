@@ -2,7 +2,7 @@ import { CheckoutWidgetsConfig } from '../definitions/config';
 import { CheckoutWidgetTagNames } from '../definitions/constants';
 import { Web3Provider } from '@ethersproject/providers';
 
-export function CheckoutWidgets(config: CheckoutWidgetsConfig) {
+export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
   var checkoutWidgetJS = document.createElement('script');
 
   checkoutWidgetJS.setAttribute(
@@ -20,8 +20,12 @@ export function UpdateConfig(config: CheckoutWidgetsConfig) {
 
 export function SetProvider(
   tagName: CheckoutWidgetTagNames,
-  provider: Web3Provider
+  provider: Web3Provider | null
 ) {
+  if (!provider) {
+    console.error('no provider parsed');
+    return;
+  }
   const elements = document.getElementsByTagName(tagName);
 
   const widget = elements[0] as unknown as ImmutableWebComponent;

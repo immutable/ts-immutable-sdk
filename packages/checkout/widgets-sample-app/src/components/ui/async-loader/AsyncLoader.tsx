@@ -15,11 +15,9 @@ import { Web3Provider } from '@ethersproject/providers';
 import { useEffect } from 'react';
 
 export function AsyncLoader() {
-  const widgetsConfig: CheckoutWidgetsConfig = {
-    theme: WidgetTheme.LIGHT,
-  };
-
-  CheckoutWidgets(widgetsConfig);
+  CheckoutWidgets({
+    theme: WidgetTheme.DARK,
+  });
 
   const widgetsConfig2: CheckoutWidgetsConfig = {
     theme: WidgetTheme.DARK,
@@ -30,9 +28,7 @@ export function AsyncLoader() {
   useEffect(() => {
     (async () => {
       const provider: Web3Provider | null = await detectEthereumProvider();
-      if (provider) {
-        SetProvider(CheckoutWidgetTagNames.WALLET, provider);
-      }
+      SetProvider(CheckoutWidgetTagNames.WALLET, provider);
     })();
   });
 

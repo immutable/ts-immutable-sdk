@@ -7,9 +7,14 @@ import {
   IMTBLWidgetEvents,
   WidgetTheme,
   ConnectionProviders,
-} from '@imtbl/checkout-ui-types';
+  ConnectWidgetReact,
+  CheckoutWidgets,
+} from '@imtbl/checkout-widgets-react';
 
 function ConnectUI() {
+  CheckoutWidgets({
+    theme: WidgetTheme.DARK,
+  });
   useEffect(() => {
     // Add event listeners for the IMXConnectWidget and handle event types appropriately
     const handleConnectEvent = ((event: CustomEvent) => {
@@ -46,10 +51,7 @@ function ConnectUI() {
   return (
     <div className="Connect">
       <h1 className="sample-heading">Checkout Connect (Web Component)</h1>
-      <imtbl-connect
-        providerPreference={ConnectionProviders.METAMASK}
-        theme={WidgetTheme.DARK}
-      ></imtbl-connect>
+      <ConnectWidgetReact providerPreference={ConnectionProviders.METAMASK} />
     </div>
   );
 }
