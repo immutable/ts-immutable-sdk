@@ -1,7 +1,12 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { WidgetTheme } from '@imtbl/checkout-ui-types';
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import {
+  ChainId,
+  Checkout,
+  ConnectionProviders,
+  GetNetworkParams,
+} from '@imtbl/checkout-sdk-web';
 import { useEffect, useReducer } from 'react';
 import {
   initialWalletState,
@@ -60,13 +65,29 @@ export function WalletWidget(props: WalletWidgetProps) {
     (async () => {
       if (!checkout) return;
 
-      const { provider, network } = await checkout.connect({
+      let provider;
+      let network;
+
+      const connectResult = await checkout.connect({
         providerPreference:
           params.providerPreference ?? ConnectionProviders.METAMASK,
       });
 
-      // check here that the user's wallet is on the correct network
-      // if on a network we don't support, switch to zkEVM.
+      provider = connectResult.provider;
+      network = connectResult.network;
+
+      const isSupportedNetwork = (
+        await checkout.getNetworkInfo({ provider } as GetNetworkParams)
+      ).isSupported;
+
+      if (!isSupportedNetwork) {
+        const result = await checkout.switchNetwork({
+          provider,
+          chainId: ChainId.POLYGON,
+        });
+        provider = result.provider;
+        network = result.network;
+      }
 
       walletDispatch({
         payload: {
