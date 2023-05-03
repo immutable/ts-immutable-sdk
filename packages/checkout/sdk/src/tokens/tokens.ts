@@ -9,7 +9,7 @@ import {
 import masterTokenList from './token_master_list.json';
 import { utils } from 'ethers';
 import axios from 'axios';
-import { withCheckoutError } from '../errors';
+import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 
 export const getTokenAllowList = async function ({
   type = TokenFilterTypes.ALL,
@@ -47,11 +47,9 @@ const fetchTokenIdFor = async (symbol: string) => {
   const coinListApi = 'https://api.coingecko.com/api/v3/coins/list';
   let res;
 
-  try {
-    res = await axios.get(coinListApi);
-  } catch {
-    throw 'Network Error';
-  }
+  res = await withCheckoutError(async () => await axios.get(coinListApi), {
+    type: CheckoutErrorType.FIAT_CONVERSION_ERROR,
+  });
 
   const token = res.data.find(
     (tkn: { symbol: string }) => tkn.symbol == symbol.toLowerCase()
@@ -69,15 +67,15 @@ const fetchQuoteFromCoinGecko = async (
   fiatSymbol: string
 ): Promise<{ quote: number; quotedAt: number }> => {
   const tokenId = await fetchTokenIdFor(token.symbol);
-  console.log(tokenId);
   const timeNow = Math.floor(Date.now() / 1000);
   const fromTime = timeNow - 3600 * 1000;
   const quoteApi = `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart/range?vs_currency=${fiatSymbol}&from=${fromTime}&to=${timeNow}`;
   const {
     data: { prices },
-  } = await axios.get(quoteApi);
+  } = await withCheckoutError(async () => await axios.get(quoteApi), {
+    type: CheckoutErrorType.FIAT_CONVERSION_ERROR,
+  });
 
-  // we are going to sort the quotes by timestamp so we can assert on the order
   const sortedPrices = prices.sort((a: number[], b: number[]) => {
     if (a[0] < b[0]) {
       return -1;
@@ -89,7 +87,6 @@ const fetchQuoteFromCoinGecko = async (
     return 0;
   });
 
-  // take the most recent quote
   const quote = sortedPrices.pop();
 
   return {
@@ -102,8 +99,6 @@ const fetchConversionRateFor = async (
   token: TokenInfo,
   fiatSymbol: string
 ): Promise<{ quote: number; quotedAt: number }> => {
-  // TODO: Do we want to make this more generic? e.g. to/from as we may want to convert from token to token in the future or something
-
   return await fetchQuoteFromCoinGecko(token, fiatSymbol);
 };
 
@@ -117,11 +112,17 @@ export const convertTokenToFiat = async ({
   ).tokens.map((tkn: TokenInfo) => tkn.address);
 
   if (!allowedTokens.includes(token.address)) {
-    throw 'error lol';
+    throw new CheckoutError(
+      'Token is not supported',
+      CheckoutErrorType.FIAT_CONVERSION_ERROR
+    );
   }
 
   if (!Object.values(SupportedFiatCurrencies).includes(fiatSymbol)) {
-    throw 'another error lol';
+    throw new CheckoutError(
+      'Fiat currency is not supported',
+      CheckoutErrorType.FIAT_CONVERSION_ERROR
+    );
   }
   const { quote, quotedAt } = await fetchConversionRateFor(token, fiatSymbol);
   const decimalAmount = Number(utils.formatUnits(amount, token.decimals)); // maybe some protection against NaN
