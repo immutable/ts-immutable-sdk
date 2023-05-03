@@ -9,7 +9,7 @@ import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
 import { ViewContext, ViewActions } from '../../../context/ViewContext';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectContext } from '../context/ConnectContext';
-import { closeConnectWidget } from '../functions/closeConnectWidget';
+import { sendConnectWidgetCloseEvent } from '../ConnectWidgetEvents';
 
 export const SwitchNetwork = () => {
   const { viewDispatch } = useContext(ViewContext);
@@ -45,7 +45,13 @@ export const SwitchNetwork = () => {
   return (
     <SimpleLayout
       testId="switch-network-view"
-      header={<HeaderNavigation showClose transparent={true} onCloseButtonClick={closeConnectWidget} />}
+      header={
+        <HeaderNavigation
+          showClose
+          transparent={true}
+          onCloseButtonClick={sendConnectWidgetCloseEvent}
+        />
+      }
       footer={
         <FooterButton
           actionText={buttonText}

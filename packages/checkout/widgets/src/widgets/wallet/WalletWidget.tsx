@@ -25,8 +25,8 @@ import { WalletWidgetViews } from '../../context/WalletViewContextTypes';
 import { WalletBalances } from './views/WalletBalances';
 import { ErrorView } from '../../components/Error/ErrorView';
 import { LoadingView } from '../../components/Loading/LoadingView';
-import { closeWalletWidget } from './functions/closeWalletWidget';
 import { getTokenBalances } from './functions/tokenBalances';
+import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
@@ -136,7 +136,7 @@ export function WalletWidget(props: WalletWidgetProps) {
             <ErrorView
               actionText="Try again"
               onActionClick={errorAction}
-              onCloseClick={closeWalletWidget}
+              onCloseClick={sendWalletWidgetCloseEvent}
             />
           )}
         </WalletContext.Provider>

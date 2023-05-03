@@ -5,7 +5,7 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { WalletList } from '../components/WalletList';
-import { closeConnectWidget } from '../functions/closeConnectWidget';
+import { sendConnectWidgetCloseEvent } from '../ConnectWidgetEvents';
 
 export const ConnectWallet = () => {
   const { header, body } = text.views[ConnectWidgetViews.CONNECT_WALLET];
@@ -13,7 +13,13 @@ export const ConnectWallet = () => {
   return (
     <SimpleLayout
       testId="connect-wallet"
-      header={<HeaderNavigation title={header.title} showClose onCloseButtonClick={closeConnectWidget} />}
+      header={
+        <HeaderNavigation
+          title={header.title}
+          showClose
+          onCloseButtonClick={sendConnectWidgetCloseEvent}
+        />
+      }
       footer={<FooterLogo />}
     >
       <Box

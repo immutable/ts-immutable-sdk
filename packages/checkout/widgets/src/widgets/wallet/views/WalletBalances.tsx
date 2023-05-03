@@ -9,7 +9,7 @@ import { TokenBalanceList } from '../components/TokenBalanceList/TokenBalanceLis
 import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
 import { useContext, useEffect, useState } from 'react';
 import { WalletContext } from '../context/WalletContext';
-import { closeWalletWidget } from '../functions/closeWalletWidget';
+import { sendWalletWidgetCloseEvent } from '../WalletWidgetEvents';
 
 export const WalletBalances = () => {
   const { walletState } = useContext(WalletContext);
@@ -37,7 +37,7 @@ export const WalletBalances = () => {
           showSettings
           showClose
           onSettingsClick={() => console.log('settings click')}
-          onCloseButtonClick={closeWalletWidget}
+          onCloseButtonClick={sendWalletWidgetCloseEvent}
         />
       }
       footer={<FooterLogo />}
