@@ -1,4 +1,5 @@
 import { ModuleConfiguration } from '@imtbl/config';
+import { ethers } from 'ethers';
 
 export type BridgeInstance = {
   rootChainID: string;
@@ -10,13 +11,28 @@ export interface BridgeOverrides {
 }
 
 export type BridgeContracts = {
-  rootChainERC20Predicate: string;
-  rootChainStateSender: string;
-  childChainERC20Predicate: string;
-  childChainStateReceiver: string;
+  rootChainERC20Predicate: Address;
+  rootChainStateSender: Address;
+  childChainERC20Predicate: Address;
+  childChainStateReceiver: Address;
 };
 
 export interface BridgeModuleConfiguration
   extends ModuleConfiguration<BridgeOverrides> {
   bridgeInstance: BridgeInstance;
+}
+
+export type Address = string;
+
+export type FungibleToken = Address | 'NATIVE';
+
+export interface BridgeDepositRequest {
+  depositorAddress: Address;
+  recipientAddress: Address;
+  token: FungibleToken;
+  depositAmount: ethers.BigNumber;
+}
+
+export interface BridgeDepositResponse {
+  unsignedTx: ethers.providers.TransactionRequest;
 }
