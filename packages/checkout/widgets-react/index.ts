@@ -9,6 +9,9 @@ export * from './definitions/constants';
 
 export * from './definitions/config';
 
+export * from './components/BridgeWidget';
+export * from './components/BuyWidget';
 export * from './components/CheckoutWidgets';
 export * from './components/ConnectWidget';
+export * from './components/SwapWidget';
 export * from './components/WalletWidget';

@@ -3,8 +3,6 @@ import { CheckoutWidgetTagNames } from '../definitions/constants';
 import { Web3Provider } from '@ethersproject/providers';
 
 export function CheckoutWidgets(config: CheckoutWidgetsConfig) {
-  console.log('CheckoutWidgets.constructor', config);
-
   var checkoutWidgetJS = document.createElement('script');
 
   checkoutWidgetJS.setAttribute(
@@ -24,11 +22,29 @@ export function SetProvider(
   tagName: CheckoutWidgetTagNames,
   provider: Web3Provider
 ) {
-  const el = document.getElementsByTagName(tagName);
+  const elements = document.getElementsByTagName(tagName);
 
-  console.log('provider', provider);
+  const widget = elements[0] as unknown as ImmutableWebComponent;
 
-  console.log('element', el);
+  widget.setAttribute('test', 'new value');
 
-  el[0].setProvider(provider);
+  let attempts = 0;
+  const maxAttempts = 10;
+  let timer;
+
+  const attemptToSetProvider = () => {
+    try {
+      widget.setProvider(provider);
+      window.clearInterval(timer);
+    } catch (err) {
+      attempts++;
+      if (attempts >= maxAttempts) {
+        window.clearInterval(timer);
+        console.error('failed to set the provider');
+      }
+    }
+  };
+
+  timer = window.setInterval(attemptToSetProvider, 10);
+  attemptToSetProvider();
 }

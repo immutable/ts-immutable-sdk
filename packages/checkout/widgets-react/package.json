@@ -6,9 +6,7 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/checkout-sdk": "0.0.0",
-    "ethers": "^5.7.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "ethers": "^5.7.2"
   },
   "devDependencies": {
     "@babel/core": "^7.21.0",
@@ -24,6 +22,10 @@
     "jest-environment-jsdom": "^29.4.3",
     "parcel": "^2.8.3",
     "typescript": "^4.9.5"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "license": "ISC",
   "module": "dist/index.js",

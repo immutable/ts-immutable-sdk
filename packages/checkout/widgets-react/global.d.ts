@@ -27,8 +27,8 @@ declare global {
       'imtbl-outer-widget-example': ImtblOuterWidgetExampleProps;
     }
   }
-  interface Element {
-    setCallback: Function;
+  interface ImmutableWebComponent {
     setProvider: Function;
+    setAttribute: Function;
   }
 }

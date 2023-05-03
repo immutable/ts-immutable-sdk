@@ -3,7 +3,7 @@ import {
   CheckoutWidgetsConfig,
   ConnectionProviders,
   WidgetTheme,
-  ConnectWidgetReact,
+  // ConnectWidgetReact,
   UpdateConfig,
   CheckoutWidgetTagNames,
   WalletWidgetReact,
@@ -16,13 +16,13 @@ import { useEffect } from 'react';
 
 export function AsyncLoader() {
   const widgetsConfig: CheckoutWidgetsConfig = {
-    theme: WidgetTheme.DARK,
+    theme: WidgetTheme.LIGHT,
   };
 
   CheckoutWidgets(widgetsConfig);
 
   const widgetsConfig2: CheckoutWidgetsConfig = {
-    theme: WidgetTheme.LIGHT,
+    theme: WidgetTheme.DARK,
   };
 
   UpdateConfig(widgetsConfig2);

@@ -1,36 +1,23 @@
 import React from 'react';
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { WidgetTheme, Network } from '@imtbl/checkout-widgets-react';
+import { Network } from '@imtbl/checkout-widgets-react';
 import { ExampleWidget, ExampleWidgetParams } from './DiExampleWidget';
 import { Web3Provider } from '@ethersproject/providers';
+import { ImmutableWebComponent } from '../../ImmutableWebComponent';
 
-export class ImmutableDiExample extends HTMLElement {
-  reactRoot?: ReactDOM.Root;
-
+export class ImmutableDiExample extends ImmutableWebComponent {
   static get observedAttributes() {
-    return ['theme'];
+    return [...ImmutableWebComponent.observedAttributes, 'test'];
   }
-
-  theme = WidgetTheme.LIGHT;
   fromNetwork = Network.ETHEREUM;
   fromContract = '';
   amount = '';
   providerPreference: ConnectionProviders = ConnectionProviders.METAMASK;
   provider: Web3Provider | undefined = undefined;
 
-  // setProvider(provider: Web3Provider) {
-  //   this.provider = provider;
-  //   this.renderWidget();
-  // }
-
-  attributeChangedCallback(name, oldValue, newValue) {
-    this[name] = newValue;
-    this.renderWidget();
-  }
-
   connectedCallback() {
-    this.theme = this.getAttribute('theme') as WidgetTheme;
+    super.connectedCallback();
     this.fromContract = this.getAttribute('fromContractAddress') as string;
     this.fromNetwork = this.getAttribute('fromNetwork') as Network;
     this.amount = this.getAttribute('amount') as string;

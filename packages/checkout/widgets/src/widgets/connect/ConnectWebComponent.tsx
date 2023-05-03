@@ -1,26 +1,14 @@
 import React from 'react';
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
+import { ImmutableWebComponent } from '../ImmutableWebComponent';
 
-export class ImmutableConnect extends HTMLElement {
-  reactRoot?: ReactDOM.Root;
-
-  static get observedAttributes() {
-    return ['theme'];
-  }
-
-  theme = WidgetTheme.LIGHT;
+export class ImmutableConnect extends ImmutableWebComponent {
   providerPreference = ConnectionProviders.METAMASK;
 
-  attributeChangedCallback(name, oldValue, newValue) {
-    this[name] = newValue;
-    this.renderWidget();
-  }
-
   connectedCallback() {
-    this.theme = this.getAttribute('theme') as WidgetTheme;
+    super.connectedCallback();
     this.providerPreference = this.getAttribute(
       'providerPreference'
     ) as ConnectionProviders;

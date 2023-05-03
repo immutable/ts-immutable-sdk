@@ -1,33 +1,14 @@
 import React from 'react';
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
-import { Web3Provider } from '@ethersproject/providers';
+import { ImmutableWebComponent } from '../ImmutableWebComponent';
 
-export class ImmutableWallet extends HTMLElement {
-  reactRoot?: ReactDOM.Root;
-
-  static get observedAttributes() {
-    return ['theme'];
-  }
-
-  theme = WidgetTheme.DARK;
+export class ImmutableWallet extends ImmutableWebComponent {
   providerPreference = ConnectionProviders.METAMASK;
-  provider: Web3Provider | undefined = undefined;
-
-  // setProvider(provider: Web3Provider): void {
-  //   this.provider = provider;
-  //   this.renderWidget();
-  // }
-
-  attributeChangedCallback(name, oldValue, newValue) {
-    this[name] = newValue;
-    this.renderWidget();
-  }
 
   connectedCallback() {
-    this.theme = this.getAttribute('theme') as WidgetTheme;
+    super.connectedCallback();
     this.providerPreference = this.getAttribute(
       'providerPreference'
     ) as ConnectionProviders;

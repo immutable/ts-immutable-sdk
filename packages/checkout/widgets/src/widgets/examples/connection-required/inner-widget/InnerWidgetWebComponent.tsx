@@ -1,27 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { InnerWidget, InnerWidgetParams } from './InnerWidget';
+import { ImmutableWebComponent } from '../../../ImmutableWebComponent';
 
-export class ImmutableInnerExample extends HTMLElement {
-  reactRoot?: ReactDOM.Root;
-
-  static get observedAttributes() {
-    return ['theme'];
-  }
-
-  theme = WidgetTheme.LIGHT;
-
-  attributeChangedCallback(name, oldValue, newValue) {
-    this[name] = newValue;
-    this.renderWidget();
-  }
-
-  connectedCallback() {
-    this.theme = this.getAttribute('theme') as WidgetTheme;
-    this.renderWidget();
-  }
-
+export class ImmutableInnerExample extends ImmutableWebComponent {
   renderWidget() {
     const params: InnerWidgetParams = {};
 

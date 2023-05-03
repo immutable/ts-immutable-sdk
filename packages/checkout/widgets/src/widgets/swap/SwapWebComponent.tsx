@@ -3,27 +3,16 @@ import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
+import { ImmutableWebComponent } from '../ImmutableWebComponent';
 
-export class ImmutableSwap extends HTMLElement {
-  reactRoot?: ReactDOM.Root;
-
-  static get observedAttributes() {
-    return ['theme'];
-  }
-
-  theme = WidgetTheme.DARK;
+export class ImmutableSwap extends ImmutableWebComponent {
   providerPreference = ConnectionProviders.METAMASK;
   amount = '';
   fromContractAddress = '';
   toContractAddress = '';
 
-  attributeChangedCallback(name, oldValue, newValue) {
-    this[name] = newValue;
-    this.renderWidget();
-  }
-
   connectedCallback() {
-    this.theme = this.getAttribute('theme') as WidgetTheme;
+    super.connectedCallback();
     this.providerPreference = this.getAttribute(
       'providerPreference'
     ) as ConnectionProviders;

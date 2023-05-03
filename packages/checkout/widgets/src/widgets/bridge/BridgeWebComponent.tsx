@@ -1,34 +1,18 @@
 import React from 'react';
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { Network, WidgetTheme } from '@imtbl/checkout-widgets-react';
+import { Network } from '@imtbl/checkout-widgets-react';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
+import { ImmutableWebComponent } from '../ImmutableWebComponent';
 
-export class ImmutableBridge extends HTMLElement {
-  reactRoot?: ReactDOM.Root;
-
-  static get observedAttributes() {
-    return ['theme'];
-  }
-
-  theme = WidgetTheme.LIGHT;
+export class ImmutableBridge extends ImmutableWebComponent {
   fromNetwork = Network.ETHEREUM;
   fromContract = '';
   amount = '';
   providerPreference: ConnectionProviders = ConnectionProviders.METAMASK;
 
-  setTheme(theme: WidgetTheme) {
-    this.theme = theme;
-    this.connectedCallback();
-  }
-
-  attributeChangedCallback(name, oldValue, newValue) {
-    this[name] = newValue;
-    this.renderWidget();
-  }
-
   connectedCallback() {
-    this.theme = this.getAttribute('theme') as WidgetTheme;
+    super.connectedCallback();
     this.fromContract = this.getAttribute('fromContractAddress') as string;
     this.fromNetwork = this.getAttribute('fromNetwork') as Network;
     this.amount = this.getAttribute('amount') as string;

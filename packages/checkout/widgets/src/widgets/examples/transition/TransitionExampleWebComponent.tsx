@@ -1,30 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import {
   TransitionExampleWidget,
   TransitionExampleWidgetParams,
 } from './TransitionExampleWidget';
+import { ImmutableWebComponent } from '../../ImmutableWebComponent';
 
-export class ImmutableTransitionExample extends HTMLElement {
-  reactRoot?: ReactDOM.Root;
-
-  static get observedAttributes() {
-    return ['theme'];
-  }
-
-  theme = WidgetTheme.LIGHT;
-
-  attributeChangedCallback(name, oldValue, newValue) {
-    this[name] = newValue;
-    this.renderWidget();
-  }
-
-  connectedCallback() {
-    this.theme = this.getAttribute('theme') as WidgetTheme;
-    this.renderWidget();
-  }
-
+export class ImmutableTransitionExample extends ImmutableWebComponent {
   renderWidget() {
     const params: TransitionExampleWidgetParams = {};
 

@@ -107,7 +107,6 @@ export function WalletWidget(props: WalletWidgetProps) {
   }, [checkout, params.providerPreference, getTokenBalances]);
 
   useEffect(() => {
-    console.log('provider', params.provider);
     getProvider();
   }, [getProvider]);
 
