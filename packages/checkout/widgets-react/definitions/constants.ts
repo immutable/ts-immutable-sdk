@@ -14,4 +14,8 @@ export { ConnectionProviders } from '@imtbl/checkout-sdk';
 export enum CheckoutWidgetTagNames {
   CONNECT = 'imtbl-connect',
   WALLET = 'imtbl-wallet',
+  SWAP = 'imtbl-swap',
+  BUY = 'imtbl-buy',
+  BRIDGE = 'imtbl-bridge',
+  EXAMPLe = 'imtbl-example',
 }
