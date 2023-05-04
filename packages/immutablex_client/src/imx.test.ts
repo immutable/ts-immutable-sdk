@@ -1,14 +1,17 @@
-import { ImxConfiguration } from './config';
-import { ImmutableXClientFactory } from 'index';
-import { Environment } from '@imtbl/config';
+import { ImxConfiguration, ImxModuleConfiguration } from './config';
+import { ImmutableXClient } from 'index';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { Config } from '@imtbl/core-sdk';
 
-describe('ImmutableXClientFactory', () => {
-  it('should instantiate a SANDBOX ImmutableXClientFactory', async () => {
-    const config = new ImxConfiguration({
-      baseConfig: { environment: Environment.SANDBOX },
+describe('ImmutableXClient', () => {
+  it('should instantiate a SANDBOX ImmutableXClient', async () => {
+    const imtblConfig = new ImmutableConfiguration({
+      environment: Environment.SANDBOX,
     });
-    const { assetApi } = ImmutableXClientFactory(config);
+
+    const { assetApi } = new ImmutableXClient({
+      baseConfig: imtblConfig,
+    });
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);
@@ -17,11 +20,11 @@ describe('ImmutableXClientFactory', () => {
     );
   });
 
-  it('should instantiate a PRODUCTION ImmutableXClientFactory', async () => {
+  it('should instantiate a PRODUCTION ImmutableXClient', async () => {
     const config = new ImxConfiguration({
       baseConfig: { environment: Environment.PRODUCTION },
     });
-    const { assetApi } = ImmutableXClientFactory(config);
+    const { assetApi } = new ImmutableXClient(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);
@@ -30,9 +33,13 @@ describe('ImmutableXClientFactory', () => {
     );
   });
 
-  it('should instantiate a ImmutableXClientFactory with override and custom version', async () => {
+  it('should instantiate a ImmutableXClient with override and custom version', async () => {
+    const imtblConfig = new ImmutableConfiguration({
+      environment: Environment.SANDBOX,
+    });
     const sdkVersion = 'ts-immutable-sdk-0.0.1';
-    const config = new ImxConfiguration({
+
+    const config: ImxModuleConfiguration = {
       baseConfig: { environment: Environment.PRODUCTION },
       overrides: {
         immutableXConfig: Config.createConfig({
@@ -44,8 +51,9 @@ describe('ImmutableXClientFactory', () => {
           sdkVersion,
         }),
       },
-    });
-    const { assetApi } = ImmutableXClientFactory(config);
+    };
+
+    const { assetApi } = new ImmutableXClient(config);
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);

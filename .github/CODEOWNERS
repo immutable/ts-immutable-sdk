@@ -1,7 +1,9 @@
+/sdk @immutable/developer-experience
 /packages/immutablex_client @immutable/developer-experience
 /packages/config @immutable/developer-experience
 /packages/internal/toolkit @immutable/developer-experience
 /packages/internal/dex @immutable/tokens
+/packages/internal/bridge @immutable/rollups
 /packages/passport @immutable/passport
 /packages/provider @immutable/wallets
 /packages/checkout @immutable/wallets

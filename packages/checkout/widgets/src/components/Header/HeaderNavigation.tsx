@@ -2,7 +2,8 @@ import { AppHeaderBar, ButtCon } from '@biom3/react';
 import { useContext } from 'react';
 import { ViewActions, ViewContext } from '../../context/ViewContext';
 import { HeaderNavigationStyles, ButtonNavigationStyles } from './HeaderStyles';
-import { sendCloseWidgetEvent } from "../../widgets/connect/ConnectWidgetEvents";
+import { sendCloseWidgetEvent } from '../../widgets/connect/ConnectWidgetEvents';
+import { sendWalletWidgetCloseEvent } from '../../widgets/wallet/WalletWidgetEvents';
 
 export interface HeaderNavigationProps {
   title?: string;
@@ -36,6 +37,9 @@ export const HeaderNavigation = ({
   const close = () => {
     //todo: need a reference to specific widget to call specific Close-Widget event
     sendCloseWidgetEvent();
+
+    // this one if for the wallet widget close
+    sendWalletWidgetCloseEvent()
   };
 
   const handleBackButtonClick = () => {

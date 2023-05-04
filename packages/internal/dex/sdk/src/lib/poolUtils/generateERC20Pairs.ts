@@ -18,13 +18,9 @@ export const generateERC20Pairs = (
 
   for (let i = 0; i < erc20Addresses.length; i++) {
     for (let j = i + 1; j < erc20Addresses.length; j++) {
-      const isDuplicate =
-        erc20Addresses[i].address === erc20Addresses[j].address;
-      if (isDuplicate) {
-        continue;
+      if (erc20Addresses[i].address !== erc20Addresses[j].address) {
+        erc20Pairs.push([erc20Addresses[i], erc20Addresses[j]]);
       }
-
-      erc20Pairs.push([erc20Addresses[i], erc20Addresses[j]]);
     }
   }
 

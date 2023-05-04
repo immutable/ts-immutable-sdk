@@ -1,30 +1,18 @@
-import './App.css';
-import Connect from './components/connect/connect';
-import { useState } from 'react';
-import SwitchNetwork from './components/switchNetwork/switchNetwork';
-import { Web3Provider } from '@ethersproject/providers';
-import GetBalance from './components/getBalance/getBalance';
-import GetAllBalances from './components/getAllBalances/getAllBalances';
-import CheckConnection from './components/checkConnection/checkConnection';
-import GetAllowedLists from './components/allowedLists/getAllowedList';
+import { MenuItem } from '@biom3/react';
 
-function App() {
-  const [provider, setProvider] = useState<Web3Provider>();
-
+export default function App() {
   return (
-    <div>
-      <main className="checkout-sdk-app">
-        <h1>Checkout Sample App</h1>
-        <p>This is a react app which implements Immutable's Checkout</p>
-        <CheckConnection />
-        <Connect setProvider={setProvider} />
-        <SwitchNetwork provider={provider} />
-        <GetBalance provider={provider} />
-        <GetAllBalances provider={provider} />
-        <GetAllowedLists provider={provider} />
-      </main>
-    </div>
+    <>
+      <MenuItem href="/connect" emphasized size="medium">
+        <MenuItem.IntentIcon icon="ArrowForward" />
+        <MenuItem.Label>Connect</MenuItem.Label>
+        <MenuItem.Caption>
+          Manage connections, switch networks, and access vital wallet/SDK
+          information. Monitor wallet balances, retrieve balance data, and
+          manage allowed lists for networks, wallets, and tokens, providing a
+          streamlined experience for your digital asset needs.
+        </MenuItem.Caption>
+      </MenuItem>
+    </>
   );
 }
-
-export default App;

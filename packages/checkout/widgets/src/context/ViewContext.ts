@@ -3,16 +3,24 @@ import { ConnectWidgetView } from './ConnectViewContextTypes';
 import { TransitionExampleWidgetView } from './TransitionExampleViewContextTypes';
 import { InnerExampleWidgetView } from './InnerExampleViewContextTypes';
 import { OuterExampleWidgetView } from './OuterExampleViewContextTypes';
+import { WalletWidgetView } from './WalletViewContextTypes';
 
 export enum BaseViews {
   LOADING_VIEW = 'LOADING_VIEW',
+  ERROR = 'ERROR',
 }
 
-export type BaseView = { type: BaseViews.LOADING_VIEW };
+export type BaseView = { type: BaseViews.LOADING_VIEW } | ErrorView;
+
+interface ErrorView {
+  type: BaseViews.ERROR;
+  error: Error;
+}
 
 export type View =
   | BaseView
   | ConnectWidgetView
+  | WalletWidgetView
   | TransitionExampleWidgetView
   | InnerExampleWidgetView
   | OuterExampleWidgetView;
