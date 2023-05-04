@@ -1,5 +1,8 @@
 import { Body, Box } from '@biom3/react';
-import { TotalTokenBalanceStyle } from './TotalTokenBalanceStyles';
+import {
+  TotalTokenBalanceStyle,
+  TotalTokenBalanceValueStyle,
+} from './TotalTokenBalanceStyles';
 
 interface TotalTokenBalanceProps {
   totalBalance: number;
@@ -12,9 +15,7 @@ export const TotalTokenBalance = (props: TotalTokenBalanceProps) => {
       <Body testId="heading" size={'medium'}>
         Coins
       </Body>
-      <Box
-        sx={{ display: 'flex', direction: 'row', columnGap: 'base.spacing.x1' }}
-      >
+      <Box sx={TotalTokenBalanceValueStyle}>
         <Body size={'medium'} weight="bold">
           Value
         </Body>
