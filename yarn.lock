@@ -2693,6 +2693,7 @@ __metadata:
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/economy": 0.0.0
     "@imtbl/passport": 0.0.0
+    "@imtbl/provider": 0.0.0
     "@parcel/transformer-sass": 2.8.3
     "@parcel/transformer-typescript-tsc": ^2.8.3
     assert: ^2.0.0
