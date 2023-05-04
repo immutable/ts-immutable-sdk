@@ -45,10 +45,5 @@
     "typecheck": "tsc --noEmit"
   },
   "source": "src/index.ts",
-  "types": "dist/types.d.ts",
-  "jest": {
-    "moduleNameMapper": {
-      "axios": "axios/dist/node/axios.cjs"
-    }
-  }
+  "types": "dist/types.d.ts"
 }

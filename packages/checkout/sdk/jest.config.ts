@@ -9,7 +9,7 @@ const config: Config = {
   transform: {
     '\\.ts$': ['babel-jest', { configFile: './babel.test.config.js' }],
   },
-  transformIgnorePatterns: [],
+  transformIgnorePatterns: ['node_modules/(?!axios)'],
 };
 
 export default config;
