@@ -7,6 +7,7 @@ export interface BalanceInfo {
   symbol: string;
   description?: string;
   balance: string;
+  address: string;
   fiatAmount: string;
   iconLogo?: string;
 }
@@ -37,6 +38,7 @@ export const getTokenBalances = async (
       tokenBalances.push({
         id: networkName + '-' + balance.token.symbol,
         balance: balance.formattedBalance,
+        address: balance.token.address ?? "",
         fiatAmount: '23.50', // todo: fetch fiat price from coinGecko apis
         symbol: balance.token.symbol,
         description: balance.token.name,

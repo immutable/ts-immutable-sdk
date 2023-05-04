@@ -9,15 +9,22 @@ import { TokenBalanceList } from '../components/TokenBalanceList/TokenBalanceLis
 import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
 import { useContext, useEffect, useState } from 'react';
 import { WalletContext } from '../context/WalletContext';
-import { sendWalletWidgetCloseEvent } from '../WalletWidgetEvents';
+import {
+  sendWalletWidgetCloseEvent,
+  sendWalletWidgetRequestBridgeEvent,
+} from '../WalletWidgetEvents';
 import {
   WalletBalanceContainerStyle,
   WalletBalanceItemStyle,
 } from './WalletBalancesStyles';
+import { ChainId } from '@imtbl/checkout-sdk-web';
 
 export const WalletBalances = () => {
   const { walletState } = useContext(WalletContext);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
+  const showAddCoins =
+    (walletState.network && walletState.network?.chainId === ChainId.POLYGON) ??
+    false;
 
   useEffect(() => {
     let totalAmount = 0.0;
@@ -49,17 +56,19 @@ export const WalletBalances = () => {
         <NetworkMenu />
         <TotalTokenBalance totalBalance={totalFiatAmount} />
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Box sx={WalletBalanceItemStyle}>
+          <Box sx={WalletBalanceItemStyle(showAddCoins)}>
             <TokenBalanceList balanceInfoItems={walletState.tokenBalances} />
           </Box>
-          <MenuItem
-            testId="add-coins"
-            emphasized
-            onClick={() => console.log('add coins')}
-          >
-            <MenuItem.FramedIcon icon="Add"></MenuItem.FramedIcon>
-            <MenuItem.Label>Add coins</MenuItem.Label>
-          </MenuItem>
+          {showAddCoins && (
+            <MenuItem
+              testId="add-coins"
+              emphasized
+              onClick={() => sendWalletWidgetRequestBridgeEvent('', '')}
+            >
+              <MenuItem.FramedIcon icon="Add"></MenuItem.FramedIcon>
+              <MenuItem.Label>Add coins</MenuItem.Label>
+            </MenuItem>
+          )}
         </Box>
       </Box>
     </SimpleLayout>
