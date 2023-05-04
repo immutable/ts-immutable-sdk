@@ -124,7 +124,7 @@ describe('generatePoolsFromTokenPairs', () => {
   });
 
   describe('when given one TokenPair and four fees', () => {
-    it('should return twelve combinations', () => {
+    it('should return twelve unique combinations', () => {
       const erc20Pair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
       const commonRoutingERC20s: Token[] = [WETH_TEST_CHAIN];
 
@@ -135,6 +135,17 @@ describe('generatePoolsFromTokenPairs', () => {
       );
 
       expect(pools).toHaveLength(12);
+
+      for (let i = 0; i < pools.length; i++) {
+        // The pool address is unique to the combination of token0, token1 and fee
+        // We expect there to be no repeating pool addresses
+        const poolToCompare = pools[i].poolAddress.toLowerCase();
+
+        for (let j = i + 1; j < pools.length; j++) {
+          const otherPoolToCompare = pools[j].poolAddress.toLowerCase();
+          expect(poolToCompare).not.toEqual(otherPoolToCompare);
+        }
+      }
     });
   });
 });
