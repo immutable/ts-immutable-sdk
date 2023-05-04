@@ -4,7 +4,7 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { WalletWidgetViews } from '../../../context/WalletViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
-import { TotalTokenBalance } from '../components/TotalTokenBalance';
+import { TotalTokenBalance } from '../components/TotalTokenBalance/TotalTokenBalance';
 import { TokenBalanceList } from '../components/TokenBalanceList/TokenBalanceList';
 import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
 import { useContext, useEffect, useState } from 'react';

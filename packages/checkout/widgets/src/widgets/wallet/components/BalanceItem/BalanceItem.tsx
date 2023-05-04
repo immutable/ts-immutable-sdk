@@ -7,7 +7,11 @@ import {
   OverflowPopoverMenu,
   PriceDisplay,
 } from '@biom3/react';
-import { BalanceItemContainerStyles } from './BalanceItemStyles';
+import {
+  BalanceItemContainerStyle,
+  BalanceItemCoinBoxStyle,
+  BalanceItemPriceBoxStyle,
+} from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
 
 export interface BalanceItemProps {
@@ -18,30 +22,16 @@ export const BalanceItem = (props: BalanceItemProps) => {
   return (
     <Box
       testId={`balance-item-${balanceInfo.symbol}`}
-      sx={BalanceItemContainerStyles}
+      sx={BalanceItemContainerStyle}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          columnGap: 'base.spacing.x5',
-        }}
-      >
+      <Box sx={BalanceItemCoinBoxStyle}>
         <Icon icon="Dollar" sx={{ width: 'base.icon.size.300' }} />
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Body>{balanceInfo.symbol}</Body>
           <Body size="small">{balanceInfo.description}</Body>
         </Box>
       </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          columnGap: 'base.spacing.x4',
-        }}
-      >
+      <Box sx={BalanceItemPriceBoxStyle}>
         <PriceDisplay
           testId={`balance-item-${balanceInfo.symbol}`}
           use={Heading}

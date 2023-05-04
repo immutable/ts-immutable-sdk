@@ -1,4 +1,4 @@
-export const TokenBalanceListStyles = {
+export const TokenBalanceListStyle = {
   width:'100%',
   display: 'flex', 
   flexDirection: 'column', 
