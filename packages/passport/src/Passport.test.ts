@@ -3,8 +3,9 @@ import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { Passport } from './Passport';
 import { getStarkSigner } from './stark';
-import { OidcConfiguration, User } from './types';
+import { Networks, OidcConfiguration, User } from './types';
 import registerPassport from './workflows/registration';
+import { ImmutableXClient } from '@imtbl/immutablex-client';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -69,6 +70,32 @@ describe('Passport', () => {
         environment: Environment.SANDBOX,
       }),
       ...oidcConfiguration,
+    });
+  });
+
+  describe('constructor', () => {
+    describe('when modules have been overridden', () => {
+      it('sets the private property to the overridden value', () => {
+        const baseConfig = new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        });
+        const immutableXClient = new ImmutableXClient({
+          baseConfig,
+        });
+        const passport = new Passport({
+          baseConfig,
+          overrides: {
+            authenticationDomain: 'authenticationDomain123',
+            magicProviderId: 'providerId123',
+            magicPublishableApiKey: 'publishableKey123',
+            network: Networks.SANDBOX,
+            passportDomain: 'customDomain123',
+            immutableXClient,
+          },
+          ...oidcConfiguration,
+        });
+        expect(passport['immutableXClient']).toEqual(immutableXClient);
+      });
     });
   });
 

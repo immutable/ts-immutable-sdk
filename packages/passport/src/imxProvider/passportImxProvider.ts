@@ -2,61 +2,54 @@ import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   AnyToken,
   CancelOrderResponse,
-  Configuration,
   CreateOrderResponse,
   CreateTradeResponse,
   CreateTransferResponse,
   CreateTransferResponseV1,
   CreateWithdrawalResponse,
-  ExchangesApi,
   GetSignableCancelOrderRequest,
   GetSignableTradeRequest,
   NftTransferDetails,
-  OrdersApi,
   RegisterUserResponse,
   StarkSigner,
   TokenAmount,
-  TradesApi,
-  TransfersApi,
   UnsignedExchangeTransferRequest,
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import { UserWithEtherKey } from '../types';
+import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { IMXProvider } from '@imtbl/provider';
+import { PassportConfiguration } from '../config';
+import { UserWithEtherKey } from '../types';
+import { PassportError, PassportErrorType } from '../errors/passportError';
 import { batchNftTransfer, transfer } from '../workflows/transfer';
 import { cancelOrder, createOrder } from '../workflows/order';
 import { exchangeTransfer } from '../workflows/exchange';
 import { createTrade } from '../workflows/trades';
-import { PassportError, PassportErrorType } from '../errors/passportError';
-import { PassportConfiguration } from '../config';
 
 export type PassportImxProviderInput = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
   passportConfig: PassportConfiguration;
+  immutableXClient: ImmutableXClient;
 };
 
 export default class PassportImxProvider implements IMXProvider {
-  private user: UserWithEtherKey;
-  private starkSigner: StarkSigner;
-  private transfersApi: TransfersApi;
-  private ordersApi: OrdersApi;
+  private readonly user: UserWithEtherKey;
+  private readonly starkSigner: StarkSigner;
   private readonly passportConfig: PassportConfiguration;
-  private exchangesApi: ExchangesApi;
-  private tradesApi: TradesApi;
+  private readonly immutableXClient: ImmutableXClient;
 
-  constructor({ user, starkSigner, passportConfig }: PassportImxProviderInput) {
+  constructor({
+    user,
+    starkSigner,
+    passportConfig,
+    immutableXClient,
+  }: PassportImxProviderInput) {
     this.user = user;
     this.starkSigner = starkSigner;
     this.passportConfig = passportConfig;
-    const apiConfig = new Configuration({
-      basePath: passportConfig.imxApiBasePath,
-    });
-    this.transfersApi = new TransfersApi(apiConfig);
-    this.ordersApi = new OrdersApi(apiConfig);
-    this.exchangesApi = new ExchangesApi(apiConfig);
-    this.tradesApi = new TradesApi(apiConfig);
+    this.immutableXClient = immutableXClient;
   }
 
   async transfer(
@@ -66,7 +59,7 @@ export default class PassportImxProvider implements IMXProvider {
       request,
       user: this.user,
       starkSigner: this.starkSigner,
-      transfersApi: this.transfersApi,
+      transfersApi: this.immutableXClient.transfersApi,
       passportConfig: this.passportConfig,
     });
   }
@@ -90,7 +83,7 @@ export default class PassportImxProvider implements IMXProvider {
       request,
       user: this.user,
       starkSigner: this.starkSigner,
-      ordersApi: this.ordersApi,
+      ordersApi: this.immutableXClient.ordersApi,
       passportConfig: this.passportConfig,
     });
   }
@@ -102,7 +95,7 @@ export default class PassportImxProvider implements IMXProvider {
       request,
       user: this.user,
       starkSigner: this.starkSigner,
-      ordersApi: this.ordersApi,
+      ordersApi: this.immutableXClient.ordersApi,
       passportConfig: this.passportConfig,
     });
   }
@@ -112,7 +105,7 @@ export default class PassportImxProvider implements IMXProvider {
       request,
       user: this.user,
       starkSigner: this.starkSigner,
-      tradesApi: this.tradesApi,
+      tradesApi: this.immutableXClient.tradesApi,
       passportConfig: this.passportConfig,
     });
   }
@@ -124,7 +117,7 @@ export default class PassportImxProvider implements IMXProvider {
       request,
       user: this.user,
       starkSigner: this.starkSigner,
-      transfersApi: this.transfersApi,
+      transfersApi: this.immutableXClient.transfersApi,
       passportConfig: this.passportConfig,
     });
   }
@@ -136,7 +129,7 @@ export default class PassportImxProvider implements IMXProvider {
       request,
       user: this.user,
       starkSigner: this.starkSigner,
-      exchangesApi: this.exchangesApi,
+      exchangesApi: this.immutableXClient.exchangeApi,
     });
   }
 

@@ -1,9 +1,4 @@
-import {
-  Configuration,
-  EthSigner,
-  StarkSigner,
-  UsersApi,
-} from '@imtbl/core-sdk';
+import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { IMXProvider } from '@imtbl/provider';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
@@ -18,19 +13,23 @@ import {
   User,
 } from './types';
 import registerPassport from './workflows/registration';
+import { ImmutableXClient } from '@imtbl/immutablex-client';
 
 export class Passport {
-  private authManager: AuthManager;
-  private magicAdapter: MagicAdapter;
+  private readonly authManager: AuthManager;
+  private readonly magicAdapter: MagicAdapter;
   private readonly config: PassportConfiguration;
+  private readonly immutableXClient: ImmutableXClient;
 
   constructor(passportModuleConfiguration: PassportModuleConfiguration) {
-    const passportConfiguration = new PassportConfiguration(
-      passportModuleConfiguration
-    );
-    this.config = passportConfiguration;
+    this.config = new PassportConfiguration(passportModuleConfiguration);
     this.authManager = new AuthManager(this.config);
     this.magicAdapter = new MagicAdapter(this.config);
+    this.immutableXClient =
+      passportModuleConfiguration.overrides?.immutableXClient ||
+      new ImmutableXClient({
+        baseConfig: passportModuleConfiguration.baseConfig,
+      });
   }
 
   private async getImxProvider(user: User | null) {
@@ -54,6 +53,7 @@ export class Passport {
         user: updatedUser,
         starkSigner,
         passportConfig: this.config,
+        immutableXClient: this.immutableXClient,
       });
     }
     const userWithEtherKey = user as UserWithEtherKey;
@@ -61,6 +61,7 @@ export class Passport {
       user: userWithEtherKey,
       starkSigner,
       passportConfig: this.config,
+      immutableXClient: this.immutableXClient,
     });
   }
 
@@ -105,15 +106,11 @@ export class Passport {
     starkSigner: StarkSigner,
     jwt: string
   ): Promise<UserWithEtherKey> {
-    const configuration = new Configuration({
-      basePath: this.config.imxApiBasePath,
-    });
-    const usersApi = new UsersApi(configuration);
     await registerPassport(
       {
         ethSigner: userAdminKeySigner,
         starkSigner,
-        usersApi,
+        usersApi: this.immutableXClient.usersApi,
       },
       jwt
     );
