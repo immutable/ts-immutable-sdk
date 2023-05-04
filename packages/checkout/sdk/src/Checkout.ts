@@ -10,8 +10,8 @@ import {
   ConnectionProviders,
   ConnectParams,
   ConnectResult,
-  ConvertTokenToFiatParams,
-  ConvertTokenToFiatResult,
+  ConvertTokensToFiatParams,
+  ConvertTokensToFiatResult,
   GetAllBalancesParams,
   GetAllBalancesResult,
   GetBalanceParams,
@@ -179,9 +179,9 @@ export class Checkout {
     return await network.getNetworkInfo(params.provider);
   }
 
-  public async convertTokenToFiat(
-    params: ConvertTokenToFiatParams
-  ): Promise<ConvertTokenToFiatResult> {
-    return await tokens.convertTokenToFiat(params);
+  public async convertTokensToFiat(
+    params: ConvertTokensToFiatParams
+  ): Promise<ConvertTokensToFiatResult> {
+    return await tokens.convertTokensToFiat(params);
   }
 }

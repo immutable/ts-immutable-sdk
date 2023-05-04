@@ -3,8 +3,10 @@ import {
   GetTokenAllowListResult,
   TokenFilterTypes,
   TokenInfo,
-  ConvertTokenToFiatParams,
+  ConvertTokensToFiatParams,
   SupportedFiatCurrencies,
+  FetchQuotesResult,
+  ConvertTokensToFiatResult,
 } from '../types';
 import masterTokenList from './token_master_list.json';
 import { utils } from 'ethers';
@@ -43,83 +45,82 @@ export const getTokenAllowList = async function ({
   };
 };
 
-const fetchTokenIdFor = async (symbol: string) => {
+const fetchTokenIdsFor = async (tokens: TokenInfo[]) => {
   const coinListApi = 'https://api.coingecko.com/api/v3/coins/list';
+  const tokenSymbols = tokens.map((token) => token.symbol.toLowerCase());
   let res;
 
   res = await withCheckoutError(async () => await axios.get(coinListApi), {
     type: CheckoutErrorType.FIAT_CONVERSION_ERROR,
   });
 
-  const token = res.data.find(
-    (tkn: { symbol: string }) => tkn.symbol == symbol.toLowerCase()
+  const tokenIds = res.data.reduce(
+    (acc: object, token: { id: string; symbol: string }) => {
+      if (!tokenSymbols.includes(token.symbol)) {
+        return acc;
+      }
+
+      return {
+        ...acc,
+        [token.id]: token.symbol.toUpperCase(),
+      };
+    },
+    {}
   );
 
-  if (!token) {
-    throw new CheckoutError(
-      'No conversion available for selected token',
-      CheckoutErrorType.FIAT_CONVERSION_ERROR
-    );
-  }
-
-  return token.id;
+  return tokenIds;
 };
 
-const fetchQuoteFromCoinGecko = async (
-  token: TokenInfo,
+const fetchQuotesFromCoinGecko = async (
+  tokens: TokenInfo[],
   fiatSymbol: string
-): Promise<{ quote: number; quotedAt: number }> => {
-  const tokenId = await fetchTokenIdFor(token.symbol);
-  const timeNow = Math.floor(Date.now() / 1000);
-  const fromTime = timeNow - 3600 * 1000; // 1hr in ms
-  const quoteApi = `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart/range?vs_currency=${fiatSymbol}&from=${fromTime}&to=${timeNow}`;
-  const {
-    data: { prices },
-  } = await withCheckoutError(async () => await axios.get(quoteApi), {
-    type: CheckoutErrorType.FIAT_CONVERSION_ERROR,
+): Promise<FetchQuotesResult> => {
+  const tokenIds: { [key: string]: string } = await fetchTokenIdsFor(tokens);
+  const idsString = Object.keys(tokenIds).join(',');
+  const quoteApi = `https://api.coingecko.com/api/v3/simple/price?ids=${idsString}&precision=full&vs_currencies=${fiatSymbol}&include_last_updated_at=true`;
+  const { data } = await withCheckoutError(
+    async () => await axios.get(quoteApi),
+    {
+      type: CheckoutErrorType.FIAT_CONVERSION_ERROR,
+    }
+  );
+
+  const result: FetchQuotesResult = {};
+
+  Object.values(data).forEach((quote: any, idx: number) => {
+    result[Object.values(tokenIds)[idx]] = {
+      quote: quote[fiatSymbol.toLowerCase()],
+      quotedAt: quote.last_updated_at,
+    };
   });
 
-  const sortedPrices = prices.sort((a: number[], b: number[]) => {
-    if (a[0] < b[0]) {
-      return -1;
-    }
-    if (a[0] > b[0]) {
-      return 1;
-    }
-
-    return 0;
-  });
-
-  const quote = sortedPrices.pop();
-
-  return {
-    quote: quote[1],
-    quotedAt: quote[0],
-  };
+  return result;
 };
 
-const fetchConversionRateFor = async (
-  token: TokenInfo,
+const fetchConversionRatesFor = async (
+  tokens: TokenInfo[],
   fiatSymbol: string
-): Promise<{ quote: number; quotedAt: number }> => {
-  return await fetchQuoteFromCoinGecko(token, fiatSymbol);
+): Promise<FetchQuotesResult> => {
+  return await fetchQuotesFromCoinGecko(tokens, fiatSymbol);
 };
 
-export const convertTokenToFiat = async ({
-  amount,
-  token,
+export const convertTokensToFiat = async ({
+  amounts,
   fiatSymbol,
-}: ConvertTokenToFiatParams) => {
+}: ConvertTokensToFiatParams) => {
   const allowedTokens = (
     await getTokenAllowList({} as GetTokenAllowListParams)
   ).tokens.map((tkn: TokenInfo) => tkn.address);
+  const tokens = Object.values(amounts).map((amt) => amt.token);
 
-  if (!allowedTokens.includes(token.address)) {
-    throw new CheckoutError(
-      'Token is not supported',
-      CheckoutErrorType.FIAT_CONVERSION_ERROR
-    );
-  }
+  tokens.forEach((token: TokenInfo) => {
+    if (!allowedTokens.includes(token.address)) {
+      throw new CheckoutError(
+        'Token is not supported',
+        CheckoutErrorType.FIAT_CONVERSION_ERROR
+      );
+    }
+  });
 
   if (!Object.values(SupportedFiatCurrencies).includes(fiatSymbol)) {
     throw new CheckoutError(
@@ -127,16 +128,30 @@ export const convertTokenToFiat = async ({
       CheckoutErrorType.FIAT_CONVERSION_ERROR
     );
   }
-  const { quote, quotedAt } = await fetchConversionRateFor(token, fiatSymbol);
-  const decimalAmount = Number(utils.formatUnits(amount, token.decimals)); // maybe some protection against NaN
-  const convertedAmount = decimalAmount * quote;
+  const quotes: any = await fetchConversionRatesFor(tokens, fiatSymbol);
+  console.log(quotes);
+  const conversions = tokens.reduce((acc: object, token: TokenInfo) => {
+    const quote = quotes[token.symbol];
+    if (!quote) {
+      return acc;
+    }
 
-  return {
-    token,
-    fiatSymbol,
-    quotedAt,
-    quote,
-    amount,
-    convertedAmount,
-  };
+    const amount = amounts[token.symbol].amount;
+    const decimalAmount = Number(utils.formatUnits(amount, token.decimals)); // maybe some protection against NaN
+    const convertedAmount = decimalAmount * quote.quote;
+
+    return {
+      ...acc,
+      [token.symbol]: {
+        token,
+        fiatSymbol,
+        quotedAt: quote.quotedAt,
+        quote: quote.quote,
+        amount,
+        convertedAmount,
+      },
+    };
+  }, {});
+
+  return conversions as ConvertTokensToFiatResult;
 };

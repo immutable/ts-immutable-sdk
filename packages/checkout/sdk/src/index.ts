@@ -34,8 +34,9 @@ export type {
   NetworkFilter,
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
-  ConvertTokenToFiatParams,
-  ConvertTokenToFiatResult,
+  ConvertTokensToFiatParams,
+  ConvertTokensToFiatResult,
+  TokenToFiatConversion,
 } from './types';
 export type { ErrorType } from './errors';
 export { CheckoutErrorType } from './errors';

@@ -78,9 +78,13 @@ export enum SupportedFiatCurrencies {
  * @property {TokenInfo} token - The token we are converting from.
  * @property {SupportedFiatCurrencies}  fiatSymbol - The fiat currency we are converting to.
  */
-export interface ConvertTokenToFiatParams {
-  amount: BigNumber;
-  token: TokenInfo;
+export interface ConvertTokensToFiatParams {
+  amounts: {
+    [key: string]: {
+      amount: BigNumber;
+      token: TokenInfo;
+    };
+  };
   fiatSymbol: SupportedFiatCurrencies;
 }
 
@@ -93,11 +97,25 @@ export interface ConvertTokenToFiatParams {
  * @property {BigNumber} amount - The amount we converted.
  * @property {number} convertedAmount - The converted amount.
  */
-export interface ConvertTokenToFiatResult {
+
+export interface TokenToFiatConversion {
   token: TokenInfo;
   fiatSymbol: string;
   quotedAt: number;
   quote: number;
   amount: BigNumber;
   convertedAmount: number;
+}
+
+export interface ConvertTokensToFiatResult {
+  [key: string]: TokenToFiatConversion;
+}
+
+export interface FiatConversionQuote {
+  quote: number;
+  quotedAt: number;
+}
+
+export interface FetchQuotesResult {
+  [key: string]: FiatConversionQuote;
 }
