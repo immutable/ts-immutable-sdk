@@ -25,10 +25,11 @@ export function sendConnectSuccessEvent(
       },
     }
   );
+  console.log('connect success event', successEvent);
   if (window !== undefined) window.dispatchEvent(successEvent);
 }
 
-export function sendCloseWidgetEvent() {
+export function sendConnectWidgetCloseEvent() {
   const closeWidgetEvent = new CustomEvent<ConnectEvent<any>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
@@ -38,6 +39,7 @@ export function sendCloseWidgetEvent() {
       },
     }
   );
+  console.log('close widget  event', closeWidgetEvent);
   if (window !== undefined) window.dispatchEvent(closeWidgetEvent);
 }
 
@@ -53,5 +55,6 @@ export function sendConnectFailedEvent(reason: string) {
       },
     }
   );
+  console.log('failed event', failedEvent);
   if (window !== undefined) window.dispatchEvent(failedEvent);
 }

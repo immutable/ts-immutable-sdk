@@ -11,7 +11,8 @@ export const ViewTwo = () => {
 
   return (
     <SimpleLayout
-      header={<HeaderNavigation title="Outer Widget Example" showClose />}
+      header={<HeaderNavigation title="Outer Widget Example"
+                                onCloseButtonClick={()=>console.log('clicked!')}/>}
       footer={<FooterLogo />}
     >
       <Heading>View Two</Heading>

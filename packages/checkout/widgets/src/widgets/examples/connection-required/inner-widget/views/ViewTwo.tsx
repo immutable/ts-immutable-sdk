@@ -53,7 +53,8 @@ export const ViewTwo = ({ callBack }: ViewTwoProps) => {
 
   return (
     <SimpleLayout
-      header={<HeaderNavigation title="Inner Widget Example" showClose />}
+      header={<HeaderNavigation title="Inner Widget Example"
+                                onCloseButtonClick={()=>console.log('clicked!')}/>}
       footer={<FooterLogo />}
     >
       <Heading>Connect to our Network</Heading>

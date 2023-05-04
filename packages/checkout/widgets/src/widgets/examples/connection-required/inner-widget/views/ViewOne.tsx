@@ -45,7 +45,7 @@ export const ViewOne = () => {
 
   return (
     <SimpleLayout
-      header={<HeaderNavigation title="Inner Widget Example" showClose />}
+      header={<HeaderNavigation title="Inner Widget Example" onCloseButtonClick={()=>console.log('clicked!')} />}
       footer={<FooterLogo />}
     >
       <Heading>Connect your wallet</Heading>

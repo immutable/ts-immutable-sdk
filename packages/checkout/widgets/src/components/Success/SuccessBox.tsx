@@ -1,9 +1,9 @@
-import { Body, Box, Icon } from "@biom3/react"
-import { SuccessBoxStyles, SuccessLogoStyles } from "./SuccessViewStyles"
+import { Body, Box, Icon } from '@biom3/react';
+import { SuccessBoxStyles, SuccessLogoStyles } from './SuccessViewStyles';
 export interface SuccessProps {
   successText: string;
 }
-export const SuccessBox = ({successText}: SuccessProps) => {
+export const SuccessBox = ({ successText }: SuccessProps) => {
   return (
     <Box sx={SuccessBoxStyles} testId="success-box">
       <Box sx={SuccessLogoStyles}>
@@ -18,5 +18,5 @@ export const SuccessBox = ({successText}: SuccessProps) => {
         {successText}
       </Body>
     </Box>
-  )
-}
+  );
+};

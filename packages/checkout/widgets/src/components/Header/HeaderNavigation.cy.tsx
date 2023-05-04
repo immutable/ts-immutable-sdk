@@ -24,7 +24,13 @@ describe('HeaderNavigation', () => {
     it('should show close button when configured', () => {
       mount(
         <BiomeThemeProvider theme={{ base: onDarkBase }}>
-          <SimpleLayout header={<HeaderNavigation showClose />} />
+          <SimpleLayout
+            header={
+              <HeaderNavigation
+                onCloseButtonClick={() => console.log('close clicked')}
+              />
+            }
+          />
         </BiomeThemeProvider>
       );
 
@@ -58,7 +64,12 @@ describe('HeaderNavigation', () => {
       mount(
         <BiomeThemeProvider theme={{ base: onDarkBase }}>
           <SimpleLayout
-            header={<HeaderNavigation title="Test title" showClose />}
+            header={
+              <HeaderNavigation
+                title="Test title"
+                onCloseButtonClick={() => console.log('close clicked')}
+              />
+            }
           />
         </BiomeThemeProvider>
       );
@@ -72,7 +83,14 @@ describe('HeaderNavigation', () => {
     it('should show back and close when configured', () => {
       mount(
         <BiomeThemeProvider theme={{ base: onDarkBase }}>
-          <SimpleLayout header={<HeaderNavigation showBack showClose />} />
+          <SimpleLayout
+            header={
+              <HeaderNavigation
+                showBack
+                onCloseButtonClick={() => console.log('close clicked')}
+              />
+            }
+          />
         </BiomeThemeProvider>
       );
 
@@ -87,7 +105,14 @@ describe('HeaderNavigation', () => {
     it('should set solid background when configured', () => {
       mount(
         <BiomeThemeProvider theme={{ base: onLightBase }}>
-          <SimpleLayout header={<HeaderNavigation showBack showClose />} />
+          <SimpleLayout
+            header={
+              <HeaderNavigation
+                showBack
+                onCloseButtonClick={() => console.log('close clicked')}
+              />
+            }
+          />
         </BiomeThemeProvider>
       );
 
@@ -103,7 +128,13 @@ describe('HeaderNavigation', () => {
       mount(
         <BiomeThemeProvider theme={{ base: onLightBase }}>
           <SimpleLayout
-            header={<HeaderNavigation showBack showClose transparent />}
+            header={
+              <HeaderNavigation
+                showBack
+                transparent
+                onCloseButtonClick={() => console.log('close clicked')}
+              />
+            }
           />
         </BiomeThemeProvider>
       );
