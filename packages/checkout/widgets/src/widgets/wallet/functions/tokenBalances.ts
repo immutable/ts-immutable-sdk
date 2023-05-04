@@ -1,5 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, ChainId } from '@imtbl/checkout-sdk-web';
+import { sortTokensByAmount } from '../../../lib/utils';
 
 export interface BalanceInfo {
   id: string;
@@ -26,8 +27,13 @@ export const getTokenBalances = async (
       chainId,
     });
 
+    const sortedTokens = sortTokensByAmount(
+      getAllBalancesResult.balances,
+      chainId
+    );
+
     const tokenBalances: BalanceInfo[] = [];
-    getAllBalancesResult.balances.forEach((balance) => {
+    sortedTokens.forEach((balance) => {
       tokenBalances.push({
         id: networkName + '-' + balance.token.symbol,
         balance: balance.formattedBalance,

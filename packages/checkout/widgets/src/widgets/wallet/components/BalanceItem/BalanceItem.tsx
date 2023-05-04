@@ -13,19 +13,19 @@ import {
   BalanceItemPriceBoxStyle,
 } from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
-
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
 }
 export const BalanceItem = (props: BalanceItemProps) => {
   const { balanceInfo } = props;
+
   return (
     <Box
       testId={`balance-item-${balanceInfo.symbol}`}
       sx={BalanceItemContainerStyle}
     >
       <Box sx={BalanceItemCoinBoxStyle}>
-        <Icon icon="Dollar" sx={{ width: 'base.icon.size.300' }} />
+        <Icon icon="Coins" sx={{ width: 'base.icon.size.300' }} />
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Body>{balanceInfo.symbol}</Body>
           <Body size="small">{balanceInfo.description}</Body>

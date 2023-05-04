@@ -22,6 +22,7 @@ describe('token balance tests', () => {
         formattedBalance: '26.34',
       },
     ];
+
     const mockProvider = {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xaddress'),
