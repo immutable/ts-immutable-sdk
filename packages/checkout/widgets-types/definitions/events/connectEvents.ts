@@ -1,4 +1,5 @@
 import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import { OrchestrationEventType } from './orchestrationEvents';
 
 export enum ConnectEventType {
   SUCCESS = 'success',
@@ -7,7 +8,7 @@ export enum ConnectEventType {
 }
 
 export type ConnectEvent<T> = {
-  type: ConnectEventType;
+  type: ConnectEventType | OrchestrationEventType;
   data: T;
 };
 

@@ -1,4 +1,5 @@
 export * from './definitions/events/events';
+export * from './definitions/events/orchestrationEvents';
 export * from './definitions/events/connectEvents';
 export * from './definitions/events/walletEvents';
 export * from './definitions/events/swapEvents';

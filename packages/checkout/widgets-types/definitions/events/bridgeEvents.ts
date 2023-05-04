@@ -1,5 +1,7 @@
+import { OrchestrationEventType } from './orchestrationEvents';
+
 export type BridgeEvent<T> = {
-  type: BridgeEventType;
+  type: BridgeEventType | OrchestrationEventType;
   data: T;
 };
 

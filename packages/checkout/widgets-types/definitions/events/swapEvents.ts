@@ -1,5 +1,7 @@
+import { OrchestrationEventType } from './orchestrationEvents';
+
 export type SwapEvent<T> = {
-  type: SwapEventType;
+  type: SwapEventType | OrchestrationEventType;
   data: T;
 };
 

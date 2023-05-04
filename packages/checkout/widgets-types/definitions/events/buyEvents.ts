@@ -1,5 +1,7 @@
+import { OrchestrationEventType } from './orchestrationEvents';
+
 export type BuyEvent<T> = {
-  type: BuyEventType;
+  type: BuyEventType | OrchestrationEventType;
   data: T;
 };
 
