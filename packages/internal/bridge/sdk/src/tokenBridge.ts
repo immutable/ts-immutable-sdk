@@ -64,7 +64,7 @@ export class TokenBridge {
         BridgeErrorType.INVALID_ADDRESS
       );
     }
-
+    // The deposit amount cannot be <= 0
     if (req.depositAmount.isNegative() || req.depositAmount.isZero()) {
       throw new BridgeError(
         `deposit amount ${req.depositAmount.toString()} is invalid`,
@@ -72,6 +72,7 @@ export class TokenBridge {
       );
     }
 
+    // Convert the addresses to correct format addresses (e.g. prepend 0x if not already)
     const depositor = ethers.utils.getAddress(req.depositorAddress);
     const receipient = ethers.utils.getAddress(req.recipientAddress);
     const token = ethers.utils.getAddress(req.token);
@@ -87,6 +88,7 @@ export class TokenBridge {
       BridgeErrorType.INTERNAL_ERROR
     );
 
+    // Encode the function data into a payload
     const data = await withBridgeError<string>(async () => {
       return rootERC20PredicateContract.interface.encodeFunctionData(
         'depositTo',
@@ -131,6 +133,7 @@ export class TokenBridge {
       );
     }
 
+    // The deposit amount cannot be <= 0
     if (req.depositAmount.isNegative() || req.depositAmount.isZero()) {
       throw new BridgeError(
         `deposit amount ${req.depositAmount.toString()} is invalid`,
@@ -143,6 +146,7 @@ export class TokenBridge {
         return new ethers.Contract(req.token, ERC20, this.config.rootProvider);
       }, BridgeErrorType.INTERNAL_ERROR);
 
+    // Get the current approved allowance of the RootERC20Predicate
     const rootERC20PredicateAllowance: ethers.BigNumber =
       await withBridgeError<ethers.BigNumber>(async () => {
         return await erc20Contract.allowance(
@@ -165,7 +169,7 @@ export class TokenBridge {
 
     // Encode the approve function call data for the ERC20 contract
     const data: string = await withBridgeError<string>(async () => {
-      erc20Contract.interface.encodeFunctionData('approve', [
+      return erc20Contract.interface.encodeFunctionData('approve', [
         this.config.bridgeContracts.rootChainERC20Predicate,
         approvalAmountRequired,
       ]);
