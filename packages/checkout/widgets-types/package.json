@@ -13,6 +13,8 @@
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "parcel": "^2.8.3",
+    "typedoc": "^0.24.6",
+    "typedoc-plugin-markdown": "^3.15.2",
     "typescript": "^4.9.5"
   },
   "license": "ISC",
@@ -24,7 +26,8 @@
   "scripts": {
     "build": "parcel build",
     "build:dist": "npm i && npm run build && npm run dist",
-    "start": "parcel watch"
+    "start": "parcel watch",
+    "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs index.ts"
   },
   "source": "index.ts",
   "types": "dist/types.d.ts"
