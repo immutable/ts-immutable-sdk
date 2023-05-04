@@ -11,10 +11,10 @@ import { text } from '../../../../resources/text/textConfig';
 import { WalletWidgetViews } from '../../../../context/WalletViewContextTypes';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
 import {
-  ActiveNetworkButtonStyle,
+  ActiveNetworkButtonStyle, LogoStyle,
   NetworkHeadingStyle,
-  NetworkMenuStyles,
-} from './NetworkMenuStyles';
+  NetworkMenuStyles
+} from "./NetworkMenuStyles";
 import {
   BaseViews,
   ViewActions,
@@ -31,12 +31,15 @@ export const NetworkMenu = () => {
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[] | undefined>(
     []
   );
+  const LogoColor = {
+    [ChainId.POLYGON]: 'base.color.text.link.primary',
+    [ChainId.ETHEREUM]: 'base.color.accent.5',
+  };
 
   //todo: add corresponding network symbols
   const NetworkLogo = {
     [ChainId.POLYGON]: 'ImmutableSymbol',
     [ChainId.ETHEREUM]: 'ImmutableSymbol',
-    [ChainId.GOERLI]: 'ImmutableSymbol',
   };
 
   const switchNetwork = useCallback(
@@ -125,7 +128,7 @@ export const NetworkMenu = () => {
           >
             <Button.Logo
               logo={NetworkLogo[networkItem.chainId]}
-              sx={{ paddingRight: 'base.spacing.x1', width: '22px' }}
+              sx={LogoStyle(LogoColor[networkItem.chainId], networkItem.chainId === network?.chainId)}
             />
             {networkItem.name}
           </HorizontalMenu.Button>
