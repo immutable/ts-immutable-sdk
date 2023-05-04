@@ -1,4 +1,5 @@
 import { ModuleConfiguration } from '@imtbl/config';
+import { ImmutableXClient } from '@imtbl/immutablex-client';
 
 export type UserProfile = {
   email?: string;
@@ -40,7 +41,7 @@ export interface PassportOverrides {
   magicPublishableApiKey: string;
   magicProviderId: string;
   passportDomain: string;
-  imxApiBasePath: string;
+  immutableXClient: ImmutableXClient;
 }
 
 export interface PassportModuleConfiguration
