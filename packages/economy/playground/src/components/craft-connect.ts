@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { LitElement, css, html } from 'lit';
-import { customElement, eventOptions, state } from 'lit/decorators.js';
-import { cache } from 'lit/directives/cache.js';
+import { customElement, eventOptions, state } from 'lit/decorators';
+import { cache } from 'lit/directives/cache';
 
 @customElement('imtbl-craft-connect')
 export class CraftingWrapper extends LitElement {
