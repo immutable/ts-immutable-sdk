@@ -8,15 +8,23 @@ import { BridgeError, BridgeErrorType } from 'errors';
 
 describe('Token Bridge', () => {
   it('Constructor works correctly', async () => {
+    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+
     const bridgeConfig = new BridgeConfiguration({
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }),
       bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      rootProvider: voidRootProvider,
+      childProvider: voidChildProvider,
     });
     new TokenBridge(bridgeConfig);
   });
   describe('getUnsignedDepositTokenTx', () => {
+    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+
     let tokenBridge: TokenBridge;
     let bridgeConfig: BridgeConfiguration;
     beforeEach(() => {
@@ -25,6 +33,8 @@ describe('Token Bridge', () => {
           environment: Environment.SANDBOX,
         }),
         bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        rootProvider: voidRootProvider,
+        childProvider: voidChildProvider,
       });
       tokenBridge = new TokenBridge(bridgeConfig);
     });

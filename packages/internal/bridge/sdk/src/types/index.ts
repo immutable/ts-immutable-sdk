@@ -20,6 +20,8 @@ export type BridgeContracts = {
 export interface BridgeModuleConfiguration
   extends ModuleConfiguration<BridgeOverrides> {
   bridgeInstance: BridgeInstance;
+  rootProvider: ethers.providers.Provider;
+  childProvider: ethers.providers.Provider;
 }
 
 export type Address = string;
@@ -44,7 +46,7 @@ export interface ApproveBridgeRequest {
 }
 
 export interface ApproveBridgeResponse {
-  unsignedTx: ethers.providers.TransactionRequest;
+  unsignedTx: ethers.providers.TransactionRequest | null;
   required: boolean;
 }
 
