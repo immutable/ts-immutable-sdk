@@ -39,7 +39,8 @@
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "lint:fix": "cd ../../../ && yarn wsrun -p @imtbl/bridge-sdk -c lint --fix",
     "test": "jest test",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "build": "NODE_ENV=production rollup --config rollup.config.js"
   },
   "source": "src/index.ts",
   "type": "module",
