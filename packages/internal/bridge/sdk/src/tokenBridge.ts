@@ -69,6 +69,10 @@ export class TokenBridge {
       );
     }
 
+    const depositor = ethers.utils.getAddress(req.depositorAddress);
+    const receipient = ethers.utils.getAddress(req.recipientAddress);
+    const token = ethers.utils.getAddress(req.token);
+
     const rootERC20PredicateContract = await withBridgeError<ethers.Contract>(
       async () => {
         const rootERC20PredicateContract = new ethers.Contract(
@@ -83,7 +87,7 @@ export class TokenBridge {
     const data = await withBridgeError<string>(async () => {
       return rootERC20PredicateContract.interface.encodeFunctionData(
         'depositTo',
-        [req.token, req.recipientAddress, req.depositAmount]
+        [token, receipient, req.depositAmount]
       );
     }, BridgeErrorType.INTERNAL_ERROR);
 
@@ -92,7 +96,7 @@ export class TokenBridge {
         data: data,
         to: this.config.bridgeContracts.rootChainERC20Predicate,
         value: 0,
-        from: req.depositorAddress,
+        from: depositor,
       },
     };
   }
