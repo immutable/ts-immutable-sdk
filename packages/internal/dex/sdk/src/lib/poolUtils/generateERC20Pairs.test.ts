@@ -129,32 +129,16 @@ describe('generateERC20Pairs', () => {
       // We expect...
       // TI TO [TI] = [TI / TO]
       const tokenPair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
-      const commonRoutingTokens: Token[] = [USDC_TEST_CHAIN];
+
+      // Create a copy of the Token object so that we do not have the same
+      // instance of the object in the tokenPair and commonRoutingTokens
+      const usdc = Object.assign(USDC_TEST_CHAIN);
+      const commonRoutingTokens: Token[] = [usdc];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
       expect(tokenPairs.length).toEqual(1);
       expect(tokenPairs).toMatchInlineSnapshot(`
         [
-          [
-            Token {
-              "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
-              "chainId": 999,
-              "decimals": 18,
-              "isNative": false,
-              "isToken": true,
-              "name": "Immutable X",
-              "symbol": "IMX",
-            },
-            Token {
-              "address": "0x93733225CCc07Ba02b1449aA3379418Ddc37F6EC",
-              "chainId": 999,
-              "decimals": 6,
-              "isNative": false,
-              "isToken": true,
-              "name": "USD Coin",
-              "symbol": "USDC",
-            },
-          ],
           [
             Token {
               "address": "0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851",
@@ -201,6 +185,35 @@ describe('generateERC20Pairs', () => {
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
       expect(tokenPairs).toHaveLength(6);
+    });
+
+    it('should not repeat pairs', async () => {
+      // We expect...
+      // TI TO [TX, TZ] = [TI / TO, TI / TX, TI / TZ, TO / TX, TO / TZ, TX / TZ]
+      const tokenPair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
+      const commonRoutingTokens: Token[] = [WETH_TEST_CHAIN, FUN_TEST_CHAIN];
+
+      const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
+
+      for (let i = 0; i < tokenPairs.length; i++) {
+        // We use the address because it uniquely identifies the token
+        const tokenPairAddressesToCompare = [
+          tokenPairs[i][0].address,
+          tokenPairs[i][1].address,
+        ];
+
+        for (let j = i + 1; j < tokenPairs.length; j++) {
+          const currentTokenPairAddresses = [
+            tokenPairs[j][0].address,
+            tokenPairs[j][1].address,
+          ];
+
+          // Ensure this pair of tokens does not repeat
+          expect(tokenPairAddressesToCompare).not.toEqual(
+            currentTokenPairAddresses
+          );
+        }
+      }
     });
   });
 });

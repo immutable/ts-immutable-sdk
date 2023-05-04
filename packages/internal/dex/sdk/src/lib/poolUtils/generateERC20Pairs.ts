@@ -12,14 +12,23 @@ export const generateERC20Pairs = (
   erc20Pair: ERC20Pair,
   commonRoutingERC20s: Token[]
 ): ERC20Pairs => {
-  const uniqueERC20Addresses = new Set([...erc20Pair, ...commonRoutingERC20s]);
-  const erc20Addresses = [...erc20Pair, ...commonRoutingERC20s]; // 3
+  const contractAddressMap = new Map<string, Token>();
+  const contractAddresses: string[] = [];
+  [...erc20Pair, ...commonRoutingERC20s].forEach((erc20) => {
+    contractAddressMap.set(erc20.address, erc20);
+    contractAddresses.push(erc20.address);
+  });
+
+  const uniqueERC20Addresses = new Set([...contractAddresses]);
+  const erc20Addresses = [...uniqueERC20Addresses];
   const erc20Pairs: ERC20Pairs = [];
 
   for (let i = 0; i < erc20Addresses.length; i++) {
     for (let j = i + 1; j < erc20Addresses.length; j++) {
-      if (erc20Addresses[i].address !== erc20Addresses[j].address) {
-        erc20Pairs.push([erc20Addresses[i], erc20Addresses[j]]);
+      const firstToken = contractAddressMap.get(erc20Addresses[i]);
+      const secondToken = contractAddressMap.get(erc20Addresses[j]);
+      if (firstToken && secondToken) {
+        erc20Pairs.push([firstToken, secondToken]);
       }
     }
   }
