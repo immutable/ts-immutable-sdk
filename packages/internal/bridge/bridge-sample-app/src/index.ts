@@ -5,7 +5,7 @@ import {
   BridgeConfiguration,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
   BridgeFeeRequest,
-} from '../../sdk/dist/index';
+} from '../../sdk/src/index';
 
 async function deposit() {
   if (!process.env.ROOT_PROVIDER) {
