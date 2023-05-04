@@ -1,5 +1,8 @@
 export enum BridgeErrorType {
   UNSUPPORTED_ERROR = 'UNSUPPORTED_ERROR',
+  INVALID_ADDRESS = 'INVALID_ADDRESS',
+  INVALID_AMOUNT = 'INVALID_AMOUNT',
+  INTERNAL_ERROR = 'INTERNAL_ERROR',
 }
 
 export class BridgeError extends Error {

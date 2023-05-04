@@ -36,3 +36,23 @@ export interface BridgeDepositRequest {
 export interface BridgeDepositResponse {
   unsignedTx: ethers.providers.TransactionRequest;
 }
+
+export interface ApproveBridgeRequest {
+  depositorAddress: string;
+  token: FungibleToken;
+  depositAmount: ethers.BigNumber;
+}
+
+export interface ApproveBridgeResponse {
+  unsignedTx: ethers.providers.TransactionRequest;
+  required: boolean;
+}
+
+export interface BridgeFeeRequest {
+  token: FungibleToken;
+}
+
+export interface BridgeFeeResponse {
+  bridgeable: boolean;
+  feeAmount: ethers.BigNumber;
+}
