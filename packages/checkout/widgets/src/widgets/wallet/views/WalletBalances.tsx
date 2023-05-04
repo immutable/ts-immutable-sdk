@@ -39,7 +39,6 @@ export const WalletBalances = () => {
         <HeaderNavigation
           title={header.title}
           showSettings
-          showClose
           onSettingsClick={() => console.log('settings click')}
           onCloseButtonClick={sendWalletWidgetCloseEvent}
         />

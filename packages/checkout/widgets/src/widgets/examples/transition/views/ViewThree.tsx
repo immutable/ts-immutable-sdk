@@ -34,7 +34,7 @@ export const ViewThree = () => {
     <SimpleLayout
       header={
         <HeaderNavigation
-          showClose
+          onCloseButtonClick={()=>console.log('clicked!')}
           showBack
           onBackButtonClick={
             currentContent === ViewThreeContents.CONTENT_TWO

@@ -47,7 +47,6 @@ export const SwitchNetwork = () => {
       testId="switch-network-view"
       header={
         <HeaderNavigation
-          showClose
           transparent={true}
           onCloseButtonClick={sendConnectWidgetCloseEvent}
         />

@@ -13,7 +13,6 @@ export const ConnectResult = () => {
     <SimpleLayout
       header={
         <HeaderNavigation
-          showClose
           showBack
           onCloseButtonClick={sendConnectWidgetCloseEvent}
         />

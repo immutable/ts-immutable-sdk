@@ -6,7 +6,6 @@ import { HeaderNavigationStyles, ButtonNavigationStyles } from './HeaderStyles';
 export interface HeaderNavigationProps {
   title?: string;
   showBack?: boolean;
-  showClose?: boolean;
   showSettings?: boolean;
   transparent?: boolean;
   onSettingsClick?: () => void;
@@ -17,7 +16,6 @@ export interface HeaderNavigationProps {
 export const HeaderNavigation = ({
   title,
   showBack = false,
-  showClose = false,
   showSettings = false,
   transparent = false,
   onSettingsClick,
@@ -67,7 +65,7 @@ export const HeaderNavigation = ({
             testId="settings-button"
           />
         )}
-        {showClose && onCloseButtonClick && (
+        {onCloseButtonClick && (
           <ButtCon
             iconVariant="bold"
             sx={ButtonNavigationStyles(transparent)}

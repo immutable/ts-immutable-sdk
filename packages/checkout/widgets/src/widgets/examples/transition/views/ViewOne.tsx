@@ -11,7 +11,8 @@ export const ViewOne = () => {
 
   return (
     <SimpleLayout
-      header={<HeaderNavigation title="Transition Example" showClose />}
+      header={<HeaderNavigation title="Transition Example"
+                                onCloseButtonClick={()=>console.log('clicked!')}/>}
       footer={<FooterLogo />}
     >
       <Heading>View One</Heading>

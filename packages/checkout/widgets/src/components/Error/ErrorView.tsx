@@ -32,7 +32,6 @@ export const ErrorView = ({
       header={
         <HeaderNavigation
           showBack={true}
-          showClose={true}
           transparent={true}
           onCloseButtonClick={onCloseClick}
         />

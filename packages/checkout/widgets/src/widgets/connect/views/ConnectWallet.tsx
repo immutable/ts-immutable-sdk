@@ -16,7 +16,6 @@ export const ConnectWallet = () => {
       header={
         <HeaderNavigation
           title={header.title}
-          showClose
           onCloseButtonClick={sendConnectWidgetCloseEvent}
         />
       }

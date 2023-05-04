@@ -27,7 +27,6 @@ describe('HeaderNavigation', () => {
           <SimpleLayout
             header={
               <HeaderNavigation
-                showClose
                 onCloseButtonClick={() => console.log('close clicked')}
               />
             }
@@ -68,7 +67,6 @@ describe('HeaderNavigation', () => {
             header={
               <HeaderNavigation
                 title="Test title"
-                showClose
                 onCloseButtonClick={() => console.log('close clicked')}
               />
             }
@@ -89,7 +87,6 @@ describe('HeaderNavigation', () => {
             header={
               <HeaderNavigation
                 showBack
-                showClose
                 onCloseButtonClick={() => console.log('close clicked')}
               />
             }
@@ -112,7 +109,6 @@ describe('HeaderNavigation', () => {
             header={
               <HeaderNavigation
                 showBack
-                showClose
                 onCloseButtonClick={() => console.log('close clicked')}
               />
             }
@@ -135,7 +131,6 @@ describe('HeaderNavigation', () => {
             header={
               <HeaderNavigation
                 showBack
-                showClose
                 transparent
                 onCloseButtonClick={() => console.log('close clicked')}
               />
