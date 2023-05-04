@@ -59,7 +59,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
           checkout: new Checkout(),
         },
       });
-  
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,

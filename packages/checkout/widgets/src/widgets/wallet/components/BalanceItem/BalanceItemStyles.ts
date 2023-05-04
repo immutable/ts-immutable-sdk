@@ -5,19 +5,19 @@ export const BalanceItemContainerStyle = {
   justifyContent: 'space-between',
   padding: '24px 16px 24px 16px',
   backgroundColor: 'base.color.translucent.container.100',
-  borderRadius: 'base.borderRadius.x6'
-}
+  borderRadius: 'base.borderRadius.x6',
+};
 
 export const BalanceItemCoinBoxStyle = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   columnGap: 'base.spacing.x5',
-}
+};
 
 export const BalanceItemPriceBoxStyle = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   columnGap: 'base.spacing.x4',
-}
+};

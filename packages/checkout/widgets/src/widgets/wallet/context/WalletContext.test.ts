@@ -1,7 +1,14 @@
-import { Checkout } from "@imtbl/checkout-sdk-web";
-import { SetCheckoutPayload, SetProviderPayload, SetSwitchNetworkPayload, WalletActions, initialWalletState, walletReducer } from "./WalletContext";
-import { Web3Provider } from "@ethersproject/providers";
-import { BalanceInfo } from "../functions/tokenBalances";
+import { Checkout } from '@imtbl/checkout-sdk-web';
+import {
+  SetCheckoutPayload,
+  SetProviderPayload,
+  SetSwitchNetworkPayload,
+  WalletActions,
+  initialWalletState,
+  walletReducer,
+} from './WalletContext';
+import { Web3Provider } from '@ethersproject/providers';
+import { BalanceInfo } from '../functions/tokenBalances';
 
 describe('WalletContext', () => {
   it('should update state with checkout when reducer called with SET_CHECKOUT action', () => {
@@ -32,14 +39,14 @@ describe('WalletContext', () => {
     const setSwitchNetworkPayload: SetSwitchNetworkPayload = {
       type: WalletActions.SWITCH_NETWORK,
       network: {
-        name: 'Ethereum', 
-        chainId: 1, 
+        name: 'Ethereum',
+        chainId: 1,
         nativeCurrency: {
           symbol: 'ETH',
           decimals: 18,
-          name: 'Ethereum'
-        }, 
-        isSupported: true
+          name: 'Ethereum',
+        },
+        isSupported: true,
       },
       tokenBalances: [
         {
@@ -47,9 +54,9 @@ describe('WalletContext', () => {
           symbol: 'ETH',
           description: 'Ethereum',
           balance: '1000000000000000000',
-          fiatAmount: '1800.00'
-        } as BalanceInfo
-      ]
+          fiatAmount: '1800.00',
+        } as BalanceInfo,
+      ],
     };
     expect(initialWalletState.network).toBeNull();
     expect(initialWalletState.tokenBalances).toEqual([]);
@@ -57,14 +64,14 @@ describe('WalletContext', () => {
       payload: setSwitchNetworkPayload,
     });
     expect(network).toEqual({
-      name: 'Ethereum', 
-      chainId: 1, 
+      name: 'Ethereum',
+      chainId: 1,
       nativeCurrency: {
         symbol: 'ETH',
         decimals: 18,
-        name: 'Ethereum'
-      }, 
-      isSupported: true
+        name: 'Ethereum',
+      },
+      isSupported: true,
     });
     expect(tokenBalances).toEqual([
       {
@@ -72,8 +79,8 @@ describe('WalletContext', () => {
         symbol: 'ETH',
         description: 'Ethereum',
         balance: '1000000000000000000',
-        fiatAmount: '1800.00'
-      } as BalanceInfo
+        fiatAmount: '1800.00',
+      } as BalanceInfo,
     ]);
   });
-})
+});

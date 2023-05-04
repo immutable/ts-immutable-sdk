@@ -11,10 +11,11 @@ import { text } from '../../../../resources/text/textConfig';
 import { WalletWidgetViews } from '../../../../context/WalletViewContextTypes';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
 import {
-  ActiveNetworkButtonStyle, LogoStyle,
+  ActiveNetworkButtonStyle,
+  LogoStyle,
   NetworkHeadingStyle,
-  NetworkMenuStyles
-} from "./NetworkMenuStyles";
+  NetworkMenuStyles,
+} from './NetworkMenuStyles';
 import {
   BaseViews,
   ViewActions,
@@ -128,7 +129,10 @@ export const NetworkMenu = () => {
           >
             <Button.Logo
               logo={NetworkLogo[networkItem.chainId]}
-              sx={LogoStyle(LogoColor[networkItem.chainId], networkItem.chainId === network?.chainId)}
+              sx={LogoStyle(
+                LogoColor[networkItem.chainId],
+                networkItem.chainId === network?.chainId
+              )}
             />
             {networkItem.name}
           </HorizontalMenu.Button>

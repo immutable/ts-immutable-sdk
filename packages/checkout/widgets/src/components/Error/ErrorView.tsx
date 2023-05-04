@@ -18,7 +18,7 @@ export const ErrorView = ({
   actionText,
   onActionClick,
   errorEventAction,
-  onCloseClick
+  onCloseClick,
 }: ErrorViewProps) => {
   const errorText = text.views[BaseViews.ERROR];
 
@@ -30,7 +30,12 @@ export const ErrorView = ({
   return (
     <SimpleLayout
       header={
-        <HeaderNavigation showBack={true} showClose={true} transparent={true} onCloseButtonClick={onCloseClick}/>
+        <HeaderNavigation
+          showBack={true}
+          showClose={true}
+          transparent={true}
+          onCloseButtonClick={onCloseClick}
+        />
       }
       footer={
         <FooterButton

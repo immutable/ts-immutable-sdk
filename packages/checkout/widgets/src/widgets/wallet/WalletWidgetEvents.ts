@@ -33,5 +33,6 @@ export function sendNetworkSwitchEvent(network: NetworkInfo) {
     },
   });
   console.log('switch network event:', walletWidgetSwitchNetworkEvent);
-  if (window !== undefined) window.dispatchEvent(walletWidgetSwitchNetworkEvent);
+  if (window !== undefined)
+    window.dispatchEvent(walletWidgetSwitchNetworkEvent);
 }

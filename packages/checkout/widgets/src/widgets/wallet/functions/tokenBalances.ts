@@ -1,5 +1,5 @@
-import { Web3Provider } from "@ethersproject/providers";
-import { Checkout, ChainId } from "@imtbl/checkout-sdk-web";
+import { Web3Provider } from '@ethersproject/providers';
+import { Checkout, ChainId } from '@imtbl/checkout-sdk-web';
 
 export interface BalanceInfo {
   id: string;
@@ -11,10 +11,10 @@ export interface BalanceInfo {
 }
 
 export const getTokenBalances = async (
-    checkout: Checkout,
-    provider: Web3Provider,
-    networkName: string,
-    chainId: ChainId
+  checkout: Checkout,
+  provider: Web3Provider,
+  networkName: string,
+  chainId: ChainId
 ): Promise<BalanceInfo[]> => {
   if (!checkout || !provider || !chainId) return [];
 
@@ -25,20 +25,20 @@ export const getTokenBalances = async (
       walletAddress,
       chainId,
     });
-  
+
     const tokenBalances: BalanceInfo[] = [];
     getAllBalancesResult.balances.forEach((balance) => {
       tokenBalances.push({
-      id: networkName + '-' + balance.token.symbol,
-      balance: balance.formattedBalance,
-      fiatAmount: '23.50', // todo: fetch fiat price from coinGecko apis
-      symbol: balance.token.symbol,
-      description: balance.token.name,
+        id: networkName + '-' + balance.token.symbol,
+        balance: balance.formattedBalance,
+        fiatAmount: '23.50', // todo: fetch fiat price from coinGecko apis
+        symbol: balance.token.symbol,
+        description: balance.token.name,
       });
     });
-  
-    return tokenBalances;    
-  } catch(err: any) {
+
+    return tokenBalances;
+  } catch (err: any) {
     return []; // todo: what are the error scenarios?
   }
 };

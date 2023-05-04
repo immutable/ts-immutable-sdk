@@ -22,7 +22,7 @@ export const HeaderNavigation = ({
   transparent = false,
   onSettingsClick,
   onBackButtonClick,
-  onCloseButtonClick
+  onCloseButtonClick,
 }: HeaderNavigationProps) => {
   const { viewDispatch } = useContext(ViewContext);
 

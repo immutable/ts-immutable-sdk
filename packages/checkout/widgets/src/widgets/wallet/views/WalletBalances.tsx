@@ -10,6 +10,10 @@ import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
 import { useContext, useEffect, useState } from 'react';
 import { WalletContext } from '../context/WalletContext';
 import { sendWalletWidgetCloseEvent } from '../WalletWidgetEvents';
+import {
+  WalletBalanceContainerStyle,
+  WalletBalanceItemStyle,
+} from './WalletBalancesStyles';
 
 export const WalletBalances = () => {
   const { walletState } = useContext(WalletContext);
@@ -22,7 +26,7 @@ export const WalletBalances = () => {
       const fiatAmount = parseFloat(balance.fiatAmount);
       if (!isNaN(fiatAmount)) totalAmount += fiatAmount;
     });
-
+    console.log(totalAmount);
     setTotalFiatAmount(totalAmount);
   }, [walletState.tokenBalances]);
 
@@ -42,29 +46,11 @@ export const WalletBalances = () => {
       }
       footer={<FooterLogo />}
     >
-      <Box
-        sx={{
-          backgroundColor: 'base.color.neutral.800',
-          paddingY: 'base.spacing.x4',
-          paddingX: 'base.spacing.x1',
-          borderRadius: 'base.borderRadius.x6',
-        }}
-      >
+      <Box sx={WalletBalanceContainerStyle}>
         <NetworkMenu />
         <TotalTokenBalance totalBalance={totalFiatAmount} />
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Box
-            sx={{
-              /**
-               * Need fixed height set to enable vertical scrolling within div
-               * ({height of balance item} + {vertical space}) x {number of items to show}
-               * ( 92px + 8px ) x 2 = 200px
-               */
-              height: '200px',
-              overflowY: 'auto',
-              paddingBottom: '8px', // Add space for when scrolled all the way down
-            }}
-          >
+          <Box sx={WalletBalanceItemStyle}>
             <TokenBalanceList balanceInfoItems={walletState.tokenBalances} />
           </Box>
           <MenuItem

@@ -35,17 +35,17 @@ export const text = {
     },
     [WalletWidgetViews.WALLET_BALANCES]: {
       header: {
-        title: 'Wallet'
+        title: 'Wallet',
       },
       networkStatus: {
         heading: 'Network',
         network1Name: 'Polygon',
-        network2Name: 'Ethereum'
+        network2Name: 'Ethereum',
       },
       tokenBalancesList: {
-        noTokensFound: 'No tokens found'
-      }
-    }
+        noTokensFound: 'No tokens found',
+      },
+    },
   },
   wallets: {
     [ConnectionProviders.METAMASK]: {
