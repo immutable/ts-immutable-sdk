@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom/client';
 import { WidgetTheme } from '@imtbl/checkout-widgets-react';
 import { Web3Provider } from '@ethersproject/providers';
 
-export class ImmutableWebComponent extends HTMLElement {
+export abstract class ImmutableWebComponent extends HTMLElement {
   reactRoot?: ReactDOM.Root;
 
   theme = WidgetTheme.DARK;
@@ -19,14 +19,12 @@ export class ImmutableWebComponent extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     this[name] = newValue;
+    this.renderWidget();
   }
 
   connectedCallback() {
     this.theme = this.getAttribute('theme') as WidgetTheme;
   }
 
-  renderWidget() {
-    //must be overloaded by child
-    console.error('no render function set in child');
-  }
+  abstract renderWidget(): void;
 }

@@ -30,11 +30,9 @@ export function SetProvider(
 
   const widget = elements[0] as unknown as ImmutableWebComponent;
 
-  widget.setAttribute('test', 'new value');
-
   let attempts = 0;
   const maxAttempts = 10;
-  let timer;
+  let timer: number;
 
   const attemptToSetProvider = () => {
     try {

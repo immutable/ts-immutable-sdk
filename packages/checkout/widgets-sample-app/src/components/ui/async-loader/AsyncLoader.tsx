@@ -3,7 +3,7 @@ import {
   CheckoutWidgetsConfig,
   ConnectionProviders,
   WidgetTheme,
-  // ConnectWidgetReact,
+  ConnectWidgetReact,
   UpdateConfig,
   CheckoutWidgetTagNames,
   WalletWidgetReact,
@@ -35,7 +35,7 @@ export function AsyncLoader() {
   return (
     <div>
       <h1>Async Loader Test</h1>
-      <WalletWidgetReact providerPreference={ConnectionProviders.METAMASK} />
+      <ConnectWidgetReact providerPreference={ConnectionProviders.METAMASK} />
     </div>
   );
 }
