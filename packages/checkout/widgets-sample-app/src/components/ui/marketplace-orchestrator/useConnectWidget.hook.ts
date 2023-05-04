@@ -4,10 +4,13 @@ import {
   ConnectionSuccess,
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-ui-types';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { WidgetAction, WidgetActions, WidgetContext } from './WidgetContext';
 
-export function useConnectWidget() {
-  const [showConnectWidget, setShowConnectWidget] = useState(false);
+export function useConnectWidget(
+  showConnectWidget: boolean,
+  widgetDispatch: React.Dispatch<WidgetAction>
+) {
   const [providerPreference, setProviderPreference] = useState('');
 
   useEffect(() => {
@@ -19,13 +22,21 @@ export function useConnectWidget() {
           const eventData = event.detail.data as ConnectionSuccess;
           console.log(eventData.providerPreference);
           setProviderPreference(eventData.providerPreference);
-          setShowConnectWidget(false);
+          widgetDispatch({
+            payload: {
+              type: WidgetActions.CLOSE_WIDGET,
+            },
+          });
           break;
         }
         case ConnectEventType.FAILURE: {
           const eventData = event.detail.data as ConnectionFailed;
           console.log(eventData.reason);
-          setShowConnectWidget(false);
+          widgetDispatch({
+            payload: {
+              type: WidgetActions.CLOSE_WIDGET,
+            },
+          });
           break;
         }
         default:
@@ -49,9 +60,7 @@ export function useConnectWidget() {
   }, [showConnectWidget]);
 
   return {
-    showConnectWidget,
     providerPreference,
-    setShowConnectWidget,
     setProviderPreference,
   };
 }

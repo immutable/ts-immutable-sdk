@@ -1,13 +1,18 @@
 import {
   IMTBLWidgetEvents,
+  OrchestrationEventType,
+  RequestBridgeEvent,
+  RequestSwapEvent,
   WalletEventType,
   WalletNetworkSwitchEvent,
 } from '@imtbl/checkout-ui-types';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { WidgetAction, WidgetActions } from './WidgetContext';
 
-export function useWalletWidget() {
-  const [showWalletWidget, setShowWalletWidget] = useState(false);
-
+export function useWalletWidget(
+  showWalletWidget: boolean,
+  widgetDispatch: React.Dispatch<WidgetAction>
+) {
   useEffect(() => {
     const handleWalletWidgetEvents = ((event: CustomEvent) => {
       console.log(event);
@@ -15,12 +20,36 @@ export function useWalletWidget() {
         case WalletEventType.CLOSE_WIDGET: {
           const eventData = event.detail.data as any;
           console.log(eventData);
-          setShowWalletWidget(false);
+          widgetDispatch({
+            payload: {
+              type: WidgetActions.CLOSE_WIDGET,
+            },
+          });
           break;
         }
         case WalletEventType.NETWORK_SWITCH: {
           const eventData = event.detail.data as WalletNetworkSwitchEvent;
           console.log(eventData.network);
+          break;
+        }
+        case OrchestrationEventType.REQUEST_SWAP: {
+          const eventData = event.detail.data as RequestSwapEvent;
+          widgetDispatch({
+            payload: {
+              type: WidgetActions.SHOW_SWAP_WIDGET,
+              swapWidgetInputs: {},
+            },
+          });
+          break;
+        }
+        case OrchestrationEventType.REQUEST_BRIDGE: {
+          const eventData = event.detail.data as RequestBridgeEvent;
+          widgetDispatch({
+            payload: {
+              type: WidgetActions.SHOW_BRIDGE_WIDGET,
+              bridgeWidgetInputs: {},
+            },
+          });
           break;
         }
         default:
@@ -41,9 +70,4 @@ export function useWalletWidget() {
       );
     };
   }, [showWalletWidget]);
-
-  return {
-    showWalletWidget,
-    setShowWalletWidget,
-  };
 }
