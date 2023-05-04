@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import { ChainId, SupportedFiatCurrencies, TokenFilterTypes } from '../types';
-import { getTokenAllowList, convertTokenToFiat } from './tokens';
+import { getTokenAllowList, convertTokensToFiat } from './tokens';
 import axios from 'axios';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 
@@ -132,8 +132,8 @@ describe('token related functions', () => {
     });
   });
 
-  describe('convertTokenToFiat', () => {
-    it('should convert a given amount of token to a given fiat currency, using the most recent quote available', async () => {
+  describe('convertTokensToFiat', () => {
+    it('should convert a given amount of token to a given fiat currency', async () => {
       (axios.get as unknown as jest.Mock)
         .mockResolvedValueOnce({
           data: [
@@ -145,67 +145,37 @@ describe('token related functions', () => {
         })
         .mockResolvedValueOnce({
           data: {
-            prices: [
-              [12344, 500.0],
-              [12345, 1000.0],
-            ],
-          },
-        });
-
-      const amount = BigNumber.from('1000000000000000000');
-      const res = await convertTokenToFiat({
-        amount: amount,
-        token: ethTokenInfo,
-        fiatSymbol: SupportedFiatCurrencies.USD,
-      });
-
-      expect(res).toEqual({
-        token: ethTokenInfo,
-        fiatSymbol: SupportedFiatCurrencies.USD,
-        quotedAt: 12345,
-        quote: 1000.0,
-        amount: amount,
-        convertedAmount: 1000.0,
-      });
-    });
-
-    it('should sort the array of quotes by timestamp (the first element) asc so that it can be sure the last quote is the most recent', async () => {
-      (axios.get as unknown as jest.Mock)
-        .mockResolvedValueOnce({
-          data: [
-            {
-              id: 'ethereum',
-              symbol: 'eth',
+            ethereum: {
+              usd: 1000.0,
+              last_updated_at: 12345,
             },
-          ],
-        })
-        .mockResolvedValueOnce({
-          data: {
-            prices: [
-              [12345, 1000.0],
-              [12344, 500.0],
-            ],
           },
         });
 
       const amount = BigNumber.from('1000000000000000000');
-      const res = await convertTokenToFiat({
-        amount: amount,
-        token: ethTokenInfo,
+      const res = await convertTokensToFiat({
+        amounts: {
+          ETH: {
+            amount,
+            token: ethTokenInfo,
+          },
+        },
         fiatSymbol: SupportedFiatCurrencies.USD,
       });
 
       expect(res).toEqual({
-        token: ethTokenInfo,
-        fiatSymbol: SupportedFiatCurrencies.USD,
-        quotedAt: 12345,
-        quote: 1000.0,
-        amount: amount,
-        convertedAmount: 1000.0,
+        ETH: {
+          token: ethTokenInfo,
+          fiatSymbol: SupportedFiatCurrencies.USD,
+          quotedAt: 12345,
+          quote: 1000.0,
+          amount: amount,
+          convertedAmount: 1000.0,
+        },
       });
     });
 
-    it('should throw a checkout error if the token cant be found on the exchange', async () => {
+    it('should not return a conversion if the token cant be found on the exchange', async () => {
       (axios.get as unknown as jest.Mock)
         .mockResolvedValueOnce({
           data: [],
@@ -221,18 +191,17 @@ describe('token related functions', () => {
 
       const amount = BigNumber.from('1000000000000000000');
 
-      await expect(
-        convertTokenToFiat({
-          amount: amount,
-          token: ethTokenInfo,
-          fiatSymbol: SupportedFiatCurrencies.USD,
-        })
-      ).rejects.toThrow(
-        new CheckoutError(
-          'No conversion available for selected token',
-          CheckoutErrorType.FIAT_CONVERSION_ERROR
-        )
-      );
+      const res = await convertTokensToFiat({
+        amounts: {
+          ETH: {
+            amount,
+            token: ethTokenInfo,
+          },
+        },
+        fiatSymbol: SupportedFiatCurrencies.USD,
+      });
+
+      expect(res).toEqual({});
     });
 
     it('should throw a checkout error if the token isnt supported by immutable', async () => {
@@ -252,14 +221,18 @@ describe('token related functions', () => {
       const amount = BigNumber.from('1000000000000000000');
 
       await expect(
-        convertTokenToFiat({
-          amount: amount,
-          token: {
-            symbol: 'WTF',
-            name: 'wtf',
-            icon: '',
-            decimals: 18,
-            address: 'abc123',
+        convertTokensToFiat({
+          amounts: {
+            WTF: {
+              amount,
+              token: {
+                symbol: 'WTF',
+                name: 'wtf',
+                icon: '',
+                decimals: 18,
+                address: 'abc123',
+              },
+            },
           },
           fiatSymbol: SupportedFiatCurrencies.USD,
         })
@@ -288,9 +261,13 @@ describe('token related functions', () => {
       const amount = BigNumber.from('1000000000000000000');
 
       await expect(
-        convertTokenToFiat({
-          amount: amount,
-          token: ethTokenInfo,
+        convertTokensToFiat({
+          amounts: {
+            ETH: {
+              amount,
+              token: ethTokenInfo,
+            },
+          },
           fiatSymbol: 'EUR' as SupportedFiatCurrencies,
         })
       ).rejects.toThrow(
