@@ -54,10 +54,10 @@ export class BridgeConfiguration {
 // TODO: Add correct addresses
 export const ContractsForBridge = new Map<BridgeInstance, BridgeContracts>()
   .set(ETH_SEPOLIA_TO_ZKEVM_DEVNET, {
-    rootChainERC20Predicate: '0x',
-    rootChainStateSender: '0x',
-    childChainERC20Predicate: '0x',
-    childChainStateReceiver: '0x',
+    rootChainERC20Predicate: '0xA401eA44cDAc48569322b1166A0696b9412977D9',
+    rootChainStateSender: '0xA002CfC25D1DDdE53FBD5d8bCF8E26c821B87ceD',
+    childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
+    childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
   .set(ETH_MAINNET_TO_ZKEVM_MAINNET, {
     rootChainERC20Predicate: '0x',
@@ -68,9 +68,7 @@ export const ContractsForBridge = new Map<BridgeInstance, BridgeContracts>()
 
 const SupportedSandboxBridges: BridgeInstance[] = [ETH_SEPOLIA_TO_ZKEVM_DEVNET];
 
-const SupportedProductionBridges: BridgeInstance[] = [
-  ETH_MAINNET_TO_ZKEVM_MAINNET,
-];
+const SupportedProductionBridges: BridgeInstance[] = [];
 
 export const SupportedBridgesForEnvironment: {
   [key in Environment]: BridgeInstance[];
