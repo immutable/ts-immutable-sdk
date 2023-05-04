@@ -3,6 +3,7 @@ import {
   ETH_MAINNET_TO_ZKEVM_MAINNET,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
 } from 'constants/bridges';
+import { ethers } from 'ethers';
 import {
   BridgeContracts,
   BridgeInstance,
@@ -13,14 +14,20 @@ export class BridgeConfiguration {
   public baseConfig: ImmutableConfiguration;
   public bridgeInstance: BridgeInstance;
   public bridgeContracts: BridgeContracts;
+  public rootProvider: ethers.providers.Provider;
+  public childProvider: ethers.providers.Provider;
 
   constructor({
     bridgeInstance,
+    rootProvider,
+    childProvider,
     baseConfig,
     overrides,
   }: BridgeModuleConfiguration) {
     this.baseConfig = baseConfig;
     this.bridgeInstance = bridgeInstance;
+    this.rootProvider = rootProvider;
+    this.childProvider = childProvider;
 
     if (overrides) {
       this.bridgeContracts = overrides.bridgeContracts;

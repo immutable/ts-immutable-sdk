@@ -8,15 +8,23 @@ import { BridgeError, BridgeErrorType } from 'errors';
 
 describe('Token Bridge', () => {
   it('Constructor works correctly', async () => {
+    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+
     const bridgeConfig = new BridgeConfiguration({
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }),
       bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      rootProvider: voidRootProvider,
+      childProvider: voidChildProvider,
     });
     new TokenBridge(bridgeConfig);
   });
   describe('getUnsignedDepositTokenTx', () => {
+    const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+    const voidChildProvider = new ethers.providers.JsonRpcProvider('x');
+
     let tokenBridge: TokenBridge;
     let bridgeConfig: BridgeConfiguration;
     beforeEach(() => {
@@ -25,6 +33,8 @@ describe('Token Bridge', () => {
           environment: Environment.SANDBOX,
         }),
         bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+        rootProvider: voidRootProvider,
+        childProvider: voidChildProvider,
       });
       tokenBridge = new TokenBridge(bridgeConfig);
     });
@@ -41,7 +51,7 @@ describe('Token Bridge', () => {
         token,
       };
       const response: BridgeDepositResponse =
-        await tokenBridge.getUnsignedDepositTokenTx(request);
+        await tokenBridge.getUnsignedDepositTx(request);
       expect(response.unsignedTx.from).toBe(depositorAddress);
       expect(response.unsignedTx.to).toBe(
         bridgeConfig.bridgeContracts.rootChainERC20Predicate
@@ -63,7 +73,7 @@ describe('Token Bridge', () => {
       };
 
       await expect(async () => {
-        await tokenBridge.getUnsignedDepositTokenTx(request);
+        await tokenBridge.getUnsignedDepositTx(request);
       }).rejects.toThrow(
         new BridgeError(
           'native token deposit is not yet supported',
@@ -84,7 +94,7 @@ describe('Token Bridge', () => {
         token,
       };
       const response: BridgeDepositResponse =
-        await tokenBridge.getUnsignedDepositTokenTx(request);
+        await tokenBridge.getUnsignedDepositTx(request);
       expect(response.unsignedTx.from).toBe(`0x${depositorAddress}`);
       expect(response.unsignedTx.to).toBe(
         bridgeConfig.bridgeContracts.rootChainERC20Predicate
@@ -106,7 +116,7 @@ describe('Token Bridge', () => {
       };
 
       await expect(async () => {
-        await tokenBridge.getUnsignedDepositTokenTx(request);
+        await tokenBridge.getUnsignedDepositTx(request);
       }).rejects.toThrow(
         new BridgeError(
           'depositor address xxxx3095171469a0db24D9Fb9C789D62dF22BBAfa816 is not a valid address',
@@ -127,7 +137,7 @@ describe('Token Bridge', () => {
       };
 
       await expect(async () => {
-        await tokenBridge.getUnsignedDepositTokenTx(request);
+        await tokenBridge.getUnsignedDepositTx(request);
       }).rejects.toThrow(
         new BridgeError(
           'recipient address zzzz3095171469a0db24D9Fb9C789D62dF22BBAfa816 is not a valid address',
@@ -148,7 +158,7 @@ describe('Token Bridge', () => {
       };
 
       await expect(async () => {
-        await tokenBridge.getUnsignedDepositTokenTx(request);
+        await tokenBridge.getUnsignedDepositTx(request);
       }).rejects.toThrow(
         new BridgeError(
           'token address zzzzf14582947E292a2eCd20C430B46f2d27CFE213c is not a valid address',
@@ -170,7 +180,7 @@ describe('Token Bridge', () => {
       };
 
       await expect(async () => {
-        await tokenBridge.getUnsignedDepositTokenTx(request);
+        await tokenBridge.getUnsignedDepositTx(request);
       }).rejects.toThrow(
         new BridgeError(
           'deposit amount 0 is invalid',
@@ -191,7 +201,7 @@ describe('Token Bridge', () => {
       };
 
       await expect(async () => {
-        await tokenBridge.getUnsignedDepositTokenTx(request);
+        await tokenBridge.getUnsignedDepositTx(request);
       }).rejects.toThrow(
         new BridgeError(
           'deposit amount -1000000000000000000 is invalid',
