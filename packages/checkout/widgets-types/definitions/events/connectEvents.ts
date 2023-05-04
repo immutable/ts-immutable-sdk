@@ -1,12 +1,7 @@
 import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
 
 /**
- * Represents an event object emitted by the Connect Widget.
- * @readonly
- * @enum {string}
- * @property {string} SUCCESS - Indicates a successful connection.
- * @property {string} FAILURE - Indicates a failed connection attempt.
- * @property {string} CLOSE_WIDGET - Indicates the user closed the connection widget.
+ * Enum representing possible Connect Widget event types.
  */
 export enum ConnectEventType {
   SUCCESS = 'success',
@@ -15,10 +10,9 @@ export enum ConnectEventType {
 }
 
 /**
- * Generic type representing a connection event.
- * @template T - The type of data associated with the event.
- * @property {ConnectEventType} type - The type of event.
- * @property {T} data - The data associated with the event.
+ * Represents an event object emitted by the Connect Widget.
+ * @property {BuyEventType} type - The type of the event.
+ * @property {T} data - The data contained in the event.
  */
 export type ConnectEvent<T> = {
   type: ConnectEventType;
@@ -26,7 +20,7 @@ export type ConnectEvent<T> = {
 };
 
 /**
- * Type representing data associated with a successful connection event.
+ * Type representing a Connect Widget event with type SUCCESS.
  * @property {ConnectionProviders} providerPreference - The user's preferred connection provider.
  */
 export type ConnectionSuccess = {
@@ -34,7 +28,7 @@ export type ConnectionSuccess = {
 };
 
 /**
- * Type representing data associated with a failed connection event.
+ * Type representing a Connect Widget event with type FAILURE.
  * @property {string} reason - A description of the reason for the failed connection attempt.
  */
 export type ConnectionFailed = {

@@ -1,7 +1,5 @@
 /**
- * Network enum representing the available networks for the Checkout Widgets.
- * @enum {string}
- * @readonly
+ * Enum representing the available networks for the Checkout Widgets.
  */
 export enum Network {
   ETHEREUM = 'Ethereum',
@@ -10,9 +8,7 @@ export enum Network {
 }
 
 /**
- * WidgetTheme enum representing the available themes for the Checkout Widgets.
- * @enum {string}
- * @readonly
+ * Enum representing the available themes for the Checkout Widgets.
  */
 export enum WidgetTheme {
   LIGHT = 'light',

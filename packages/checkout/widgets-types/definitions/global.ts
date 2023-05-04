@@ -33,8 +33,8 @@ export interface ImtblWalletProps
  * @property {string} providerPreference - The preferred wallet provider to connect to.
  * @property {string} theme - The theme to use.
  * @property {string} amount - The amount to swap.
- * @property {string} fromContractAddress - The Ethereum contract address of the source token.
- * @property {string} toContractAddress - The Ethereum contract address of the destination token.
+ * @property {string} fromContractAddress - The contract address of the source token.
+ * @property {string} toContractAddress - The contract address of the destination token.
  */
 export interface ImtblSwapProps
   extends React.DetailedHTMLProps<
@@ -52,7 +52,7 @@ export interface ImtblSwapProps
  * Props for the Bridge Widget component
  * @property {string} providerPreference - The preferred wallet provider to connect to.
  * @property {string} theme - The theme to use.
- * @property {string} fromContractAddress - The Ethereum contract address of the source token.
+ * @property {string} fromContractAddress - The contract address of the source token.
  * @property {string} fromNetwork - The network of the source token.
  * @property {string} amount - The amount to bridge.
  */

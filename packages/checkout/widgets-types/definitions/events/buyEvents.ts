@@ -1,7 +1,5 @@
 /**
  * Represents an event object emitted by the Buy Widget.
- * @see {@link BuyEventType} for possible event types.
- * @typeparam T - The type of data contained in the event.
  * @property {BuyEventType} type - The type of the event.
  * @property {T} data - The data contained in the event.
  */
@@ -11,13 +9,7 @@ export type BuyEvent<T> = {
 };
 
 /**
- * Enum representing possible Buy Widget types.
- * @readonly
- * @enum {string}
- * @property {string} SUCCESS - Event emitted when a buy is successfully completed.
- * @property {string} FAILURE - Event emitted when a buy fails.
- * @property {string} NOT_CONNECTED - Event emitted when a provider is not connected.
- * @property {string} CLOSE - Event emitted when the checkout modal is closed.
+ * Enum representing possible Buy Widget event types.
  */
 export enum BuyEventType {
   SUCCESS = 'success',
@@ -27,21 +19,20 @@ export enum BuyEventType {
 }
 
 /**
- * Type representing a Buy Widget with type CLOSE.
- * @property {object} data - Does not contain any data.
+ * Type representing a Buy Widget event with type CLOSE.
  */
 export type BuyClose = {};
 
 /**
- * Type representing a Buy Widget with type NOT_CONNECTED.
- * @property {string} providerPreference - The preferred provider for the Buy Widget.
+ * Type representing a Buy Widget event with type NOT_CONNECTED.
+ * @property {string} providerPreference - The preferred provider used for the connection within the Buy Widget.
  */
 export type BuyNotConnected = {
   providerPreference: string;
 };
 
 /**
- * Type representing a Buy Widget with type SUCCESS.
+ * Type representing a Buy Widget event with type SUCCESS.
  * @property {number} timestamp - The timestamp of the successful buy.
  */
 export type BuySuccess = {
@@ -49,7 +40,7 @@ export type BuySuccess = {
 };
 
 /**
- * Type representing a Buy Widget with type FAILURE.
+ * Type representing a Buy Widget event with type FAILURE.
  * @property {string} reason - The reason why the buy failed.
  * @property {number} timestamp - The timestamp of the failed buy.
  */

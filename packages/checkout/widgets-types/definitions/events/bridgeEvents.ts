@@ -1,6 +1,5 @@
 /**
  * Represents an event object emitted by the Bridge Widget.
- * @template T - the type of data associated with this event
  * @property {BridgeEventType} type - The type of the event.
  * @property {T} data - The data associated with the event.
  */
@@ -10,7 +9,7 @@ export type BridgeEvent<T> = {
 };
 
 /**
- * Enumeration of possible Bridge Widget event types.
+ * Enum of possible Bridge Widget event types.
  */
 export enum BridgeEventType {
   CLOSE_WIDGET = 'close-widget',
@@ -19,7 +18,7 @@ export enum BridgeEventType {
 }
 
 /**
- * Represents the data associated with a successful Bridge Widget event.
+ * Type representing a Buy Widget event with type SUCCESS
  * @property {number} timestamp - The UNIX timestamp (in milliseconds) when the event occurred.
  */
 export type BridgeSuccess = {
@@ -27,7 +26,7 @@ export type BridgeSuccess = {
 };
 
 /**
- * Represents the data associated with a failed Bridge Widget event.
+ * Type representing a Buy Widget event with type FAILURE
  * @property {string} reason - The reason for the failure.
  * @property {number} timestamp - The UNIX timestamp (in milliseconds) when the event occurred.
  */

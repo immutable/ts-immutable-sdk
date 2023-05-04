@@ -1,8 +1,7 @@
 /**
- * Generic type definition for Swap Widget event object.
- * @template T - Type parameter for event data.
- * @property {SwapEventType} type - The type of event.
- * @property {T} data - The event data.
+ * Represents an event object emitted by the Swap Widget.
+ * @property {BuyEventType} type - The type of the event.
+ * @property {T} data - The data contained in the event.
  */
 export type SwapEvent<T> = {
   type: SwapEventType;
@@ -10,7 +9,7 @@ export type SwapEvent<T> = {
 };
 
 /**
- * Enumeration for Swap Widget event types.
+ * Enum representing possible Swap Widget event types.
  */
 export enum SwapEventType {
   SUCCESS = 'success',

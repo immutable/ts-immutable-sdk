@@ -1,5 +1,5 @@
 /**
- * Enum representing the types of events emitted by the Wallet Widget.
+ * Enum representing possible Switch Widget event types.
  */
 export enum WalletEventType {
   CLOSE_WIDGET = 'close-widget',
@@ -17,9 +17,9 @@ export type WalletNetworkSwitchEvent = {
 };
 
 /**
- * Type representing a Wallet Widget event.
+ * Represents an event object emitted by the Switch Widget.
  * @property {WalletEventType} type - The type of the event.
- * @property {T} data - The data associated with the event.
+ * @property {T} data - The data contained in the event.
  */
 export type WalletEvent<T> = {
   type: WalletEventType;
