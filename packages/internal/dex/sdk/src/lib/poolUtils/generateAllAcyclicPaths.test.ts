@@ -1,27 +1,29 @@
 import { describe, it } from '@jest/globals';
-import { FeeAmount, Pool, Route, TickMath } from '@uniswap/v3-sdk';
+import {
+  FeeAmount, Pool, Route, TickMath,
+} from '@uniswap/v3-sdk';
 import { Token, Currency } from '@uniswap/sdk-core';
 import { generateAllAcyclicPaths } from '../router';
 
 const token0 = new Token(
   123,
   '0x4A062A3EAeC3730560aB89b5CE5aC0ab2C5517aE'.toLowerCase(),
-  18
+  18,
 );
 const token1 = new Token(
   123,
   '0x4B062a3EAeC3730560aB89b5CE5aC0ab2C5517aE'.toLowerCase(),
-  18
+  18,
 );
 const token2 = new Token(
   123,
   '0x4C062a3EAeC3730560aB89b5CE5aC0ab2C5517aE'.toLowerCase(),
-  18
+  18,
 );
 const token3 = new Token(
   123,
   '0x4D062a3EAeC3730560aB89b5CE5aC0ab2C5517aE'.toLowerCase(),
-  18
+  18,
 );
 
 describe('generateAllAcyclicPaths', () => {
@@ -30,7 +32,7 @@ describe('generateAllAcyclicPaths', () => {
       const maxHops = 3;
       const arbitraryTick = 100;
       const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
-      let pools: Pool[] = [];
+      const pools: Pool[] = [];
       pools.push(
         new Pool(
           token0,
@@ -38,8 +40,8 @@ describe('generateAllAcyclicPaths', () => {
           FeeAmount.HIGH,
           sqrtPriceAtTick,
           1000,
-          arbitraryTick
-        )
+          arbitraryTick,
+        ),
       );
       pools.push(
         new Pool(
@@ -48,8 +50,8 @@ describe('generateAllAcyclicPaths', () => {
           FeeAmount.HIGH,
           sqrtPriceAtTick,
           1000,
-          arbitraryTick
-        )
+          arbitraryTick,
+        ),
       );
       pools.push(
         new Pool(
@@ -58,8 +60,8 @@ describe('generateAllAcyclicPaths', () => {
           FeeAmount.HIGH,
           sqrtPriceAtTick,
           1000,
-          arbitraryTick
-        )
+          arbitraryTick,
+        ),
       );
       pools.push(
         new Pool(
@@ -68,8 +70,8 @@ describe('generateAllAcyclicPaths', () => {
           FeeAmount.HIGH,
           sqrtPriceAtTick,
           1000,
-          arbitraryTick
-        )
+          arbitraryTick,
+        ),
       );
 
       const routes: Route<Currency, Currency>[] = generateAllAcyclicPaths(
@@ -79,12 +81,12 @@ describe('generateAllAcyclicPaths', () => {
         [],
         [],
         token0,
-        maxHops
+        maxHops,
       );
 
       // There are two routes of maxHops = 3 that go from token0 to token3.
       expect(routes.length).toBe(2);
-      for (let route of routes) {
+      for (const route of routes) {
         // The only two paths available are:
         //    token0 -> token1 -> token2 -> token3 (3 pools)
         //    token0 -> token1 -> token3 (2 pools)
@@ -113,7 +115,7 @@ describe('generateAllAcyclicPaths', () => {
       const maxHops = 2;
       const arbitraryTick = 100;
       const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
-      let pools: Pool[] = [];
+      const pools: Pool[] = [];
       pools.push(
         new Pool(
           token0,
@@ -121,8 +123,8 @@ describe('generateAllAcyclicPaths', () => {
           FeeAmount.HIGH,
           sqrtPriceAtTick,
           1000,
-          arbitraryTick
-        )
+          arbitraryTick,
+        ),
       );
       pools.push(
         new Pool(
@@ -131,8 +133,8 @@ describe('generateAllAcyclicPaths', () => {
           FeeAmount.HIGH,
           sqrtPriceAtTick,
           1000,
-          arbitraryTick
-        )
+          arbitraryTick,
+        ),
       );
       pools.push(
         new Pool(
@@ -141,8 +143,8 @@ describe('generateAllAcyclicPaths', () => {
           FeeAmount.HIGH,
           sqrtPriceAtTick,
           1000,
-          arbitraryTick
-        )
+          arbitraryTick,
+        ),
       );
       pools.push(
         new Pool(
@@ -151,8 +153,8 @@ describe('generateAllAcyclicPaths', () => {
           FeeAmount.HIGH,
           sqrtPriceAtTick,
           1000,
-          arbitraryTick
-        )
+          arbitraryTick,
+        ),
       );
 
       const routes: Route<Currency, Currency>[] = generateAllAcyclicPaths(
@@ -162,7 +164,7 @@ describe('generateAllAcyclicPaths', () => {
         [],
         [],
         token0,
-        maxHops
+        maxHops,
       );
 
       // There is one route of maxHops = 2 that goes from token0 to token3.
@@ -182,7 +184,7 @@ describe('generateAllAcyclicPaths', () => {
       const maxHops = 4;
       const arbitraryTick = 100;
       const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
-      let pools: Pool[] = [];
+      const pools: Pool[] = [];
       pools.push(
         new Pool(
           token0,
@@ -190,8 +192,8 @@ describe('generateAllAcyclicPaths', () => {
           FeeAmount.HIGH,
           sqrtPriceAtTick,
           1000,
-          arbitraryTick
-        )
+          arbitraryTick,
+        ),
       );
       pools.push(
         new Pool(
@@ -200,8 +202,8 @@ describe('generateAllAcyclicPaths', () => {
           FeeAmount.HIGH,
           sqrtPriceAtTick,
           1000,
-          arbitraryTick
-        )
+          arbitraryTick,
+        ),
       );
       pools.push(
         new Pool(
@@ -210,8 +212,8 @@ describe('generateAllAcyclicPaths', () => {
           FeeAmount.LOW,
           sqrtPriceAtTick,
           1000,
-          arbitraryTick
-        )
+          arbitraryTick,
+        ),
       );
       pools.push(
         new Pool(
@@ -220,8 +222,8 @@ describe('generateAllAcyclicPaths', () => {
           FeeAmount.HIGH,
           sqrtPriceAtTick,
           1000,
-          arbitraryTick
-        )
+          arbitraryTick,
+        ),
       );
       pools.push(
         new Pool(
@@ -230,8 +232,8 @@ describe('generateAllAcyclicPaths', () => {
           FeeAmount.HIGH,
           sqrtPriceAtTick,
           1000,
-          arbitraryTick
-        )
+          arbitraryTick,
+        ),
       );
 
       const routes: Route<Currency, Currency>[] = generateAllAcyclicPaths(
@@ -241,12 +243,12 @@ describe('generateAllAcyclicPaths', () => {
         [],
         [],
         token0,
-        maxHops
+        maxHops,
       );
 
       // There are five route of maxHops = 4 that goes from token0 to token3.
       expect(routes.length).toBe(5);
-      for (let route of routes) {
+      for (const route of routes) {
         // The five paths available are:
         //    token0 -> token1 -> token2 -> token1 -> token3 (4 pools)
         //    token0 -> token1 -> token2 -> token1 -> token3 (4 pools) (Switching the token1/token2 fees around)
@@ -254,9 +256,9 @@ describe('generateAllAcyclicPaths', () => {
         //    token0 -> token1 -> token2 -> token3 (3 pools) (Switching the token1/token2 fees around)
         //    token0 -> token1 -> token3 (2 pools)
         expect(
-          route.pools.length == 4 ||
-            route.pools.length == 3 ||
-            route.pools.length == 2
+          route.pools.length == 4
+            || route.pools.length == 3
+            || route.pools.length == 2,
         );
         if (route.pools.length == 4) {
           expect(route.pools[0].token0).toBe(token0);

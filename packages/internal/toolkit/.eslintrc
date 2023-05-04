@@ -1,0 +1,12 @@
+{
+  "extends": ["../../../.eslintrc"],
+  "rules": {
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "objectLiteralProperty",
+        "format": ["camelCase", "snake_case"]
+      }
+    ]
+  }
+}

@@ -1,13 +1,13 @@
 import { expect, describe, it } from '@jest/globals';
-import {
-  multicallSingleCallDataMultipleContracts,
-  multicallMultipleCallDataSingContract,
-} from './multicall';
 import { ethers, providers } from 'ethers';
 import { getCreate2Address } from '@ethersproject/address';
 import { keccak256 } from '@ethersproject/solidity';
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { Contract } from '@ethersproject/contracts';
+import {
+  multicallSingleCallDataMultipleContracts,
+  multicallMultipleCallDataSingContract,
+} from './multicall';
 import {
   IMX_TEST_CHAIN,
   TEST_CHAIN_ID,
@@ -22,8 +22,7 @@ import { DEFAULT_GAS_QUOTE } from './getQuotesForRoutes';
 
 const slot0 = 'slot0';
 const token0 = 'token0';
-const POOL_INIT_CODE_HASH =
-  '0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54';
+const POOL_INIT_CODE_HASH = '0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54';
 
 jest.mock('@ethersproject/contracts');
 
@@ -31,32 +30,26 @@ describe('callMultipleContractSingleData', () => {
   let mockedContract: jest.Mock;
   beforeEach(() => {
     mockedContract = (Contract as unknown as jest.Mock).mockImplementation(
-      () => {
-        return {
-          callStatic: {
-            multicall: () => {
-              return new Promise((resolve, reject) => {
-                return resolve({
-                  returnData: [
-                    {
-                      returnData: ethers.utils.defaultAbiCoder.encode(
-                        ['address'],
-                        [WETH_TEST_CHAIN.address]
-                      ),
-                    },
-                    {
-                      returnData: ethers.utils.defaultAbiCoder.encode(
-                        ['address'],
-                        [WETH_TEST_CHAIN.address]
-                      ),
-                    },
-                  ],
-                });
-              });
-            },
-          },
-        };
-      }
+      () => ({
+        callStatic: {
+          multicall: () => new Promise((resolve, reject) => resolve({
+            returnData: [
+              {
+                returnData: ethers.utils.defaultAbiCoder.encode(
+                  ['address'],
+                  [WETH_TEST_CHAIN.address],
+                ),
+              },
+              {
+                returnData: ethers.utils.defaultAbiCoder.encode(
+                  ['address'],
+                  [WETH_TEST_CHAIN.address],
+                ),
+              },
+            ],
+          })),
+        },
+      }),
     );
   });
 
@@ -70,11 +63,11 @@ describe('callMultipleContractSingleData', () => {
           [
             defaultAbiCoder.encode(
               ['address', 'address', 'uint24'],
-              [WETH_TEST_CHAIN.address, IMX_TEST_CHAIN.address, '3000']
+              [WETH_TEST_CHAIN.address, IMX_TEST_CHAIN.address, '3000'],
             ),
-          ]
+          ],
         ),
-        POOL_INIT_CODE_HASH
+        POOL_INIT_CODE_HASH,
       );
       const addrToken0: string = getCreate2Address(
         coreFactoryV3,
@@ -83,38 +76,38 @@ describe('callMultipleContractSingleData', () => {
           [
             defaultAbiCoder.encode(
               ['address', 'address', 'uint24'],
-              [WETH_TEST_CHAIN.address, IMX_TEST_CHAIN.address, '10000']
+              [WETH_TEST_CHAIN.address, IMX_TEST_CHAIN.address, '10000'],
             ),
-          ]
+          ],
         ),
-        POOL_INIT_CODE_HASH
+        POOL_INIT_CODE_HASH,
       );
 
       const addresses = [addr, addrToken0];
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
-        TEST_CHAIN_ID
+        TEST_CHAIN_ID,
       );
       const multicallContract = Multicall__factory.connect(
         TEST_MULTICALL_ADDRESS,
-        provider
+        provider,
       );
 
       const result = await multicallSingleCallDataMultipleContracts(
         multicallContract,
         token0,
-        addresses
+        addresses,
       );
 
       const encodedToken0First = result.returnData[0].returnData;
       const encodedToken0Second = result.returnData[1].returnData;
       const decodedToken0First = ethers.utils.defaultAbiCoder.decode(
         ['address'],
-        encodedToken0First
+        encodedToken0First,
       )[0];
       const decodedToken0Second = ethers.utils.defaultAbiCoder.decode(
         ['address'],
-        encodedToken0Second
+        encodedToken0Second,
       )[0];
 
       expect(decodedToken0First === IMX_TEST_CHAIN);
@@ -133,32 +126,32 @@ describe('callMultipleContractSingleData', () => {
           [
             defaultAbiCoder.encode(
               ['address', 'address', 'uint24'],
-              [WETH_TEST_CHAIN.address, IMX_TEST_CHAIN.address, '10000']
+              [WETH_TEST_CHAIN.address, IMX_TEST_CHAIN.address, '10000'],
             ),
-          ]
+          ],
         ),
-        POOL_INIT_CODE_HASH
+        POOL_INIT_CODE_HASH,
       );
       const addresses = [addr];
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
-        TEST_CHAIN_ID
+        TEST_CHAIN_ID,
       );
       const multicallContract = Multicall__factory.connect(
         TEST_MULTICALL_ADDRESS,
-        provider
+        provider,
       );
 
       const result = await multicallSingleCallDataMultipleContracts(
         multicallContract,
         slot0,
-        addresses
+        addresses,
       );
 
       const encodedSlot0 = result.returnData[0].returnData;
       const decodedSlot0 = ethers.utils.defaultAbiCoder.decode(
         ['uint160', 'int24', 'uint16', 'uint16', 'uint16', 'uint8', 'bool'],
-        encodedSlot0
+        encodedSlot0,
       );
 
       // 1<<96
@@ -176,26 +169,20 @@ describe('callSingleContractWithCallData', () => {
   let mockedContract: jest.Mock;
   beforeEach(() => {
     mockedContract = (Contract as unknown as jest.Mock).mockImplementation(
-      () => {
-        return {
-          callStatic: {
-            multicall: () => {
-              return new Promise((resolve, reject) => {
-                return resolve({
-                  returnData: [
-                    {
-                      returnData: ethers.utils.defaultAbiCoder.encode(
-                        ['address'],
-                        [WETH_TEST_CHAIN.address]
-                      ),
-                    },
-                  ],
-                });
-              });
-            },
-          },
-        };
-      }
+      () => ({
+        callStatic: {
+          multicall: () => new Promise((resolve, reject) => resolve({
+            returnData: [
+              {
+                returnData: ethers.utils.defaultAbiCoder.encode(
+                  ['address'],
+                  [WETH_TEST_CHAIN.address],
+                ),
+              },
+            ],
+          })),
+        },
+      }),
     );
   });
 
@@ -212,27 +199,27 @@ describe('callSingleContractWithCallData', () => {
           [
             defaultAbiCoder.encode(
               ['address', 'address', 'uint24'],
-              [WETH_TEST_CHAIN.address, USDC_TEST_CHAIN.address, '10000']
+              [WETH_TEST_CHAIN.address, USDC_TEST_CHAIN.address, '10000'],
             ),
-          ]
+          ],
         ),
-        POOL_INIT_CODE_HASH
+        POOL_INIT_CODE_HASH,
       );
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
-        TEST_CHAIN_ID
+        TEST_CHAIN_ID,
       );
       const multicallContract = Multicall__factory.connect(
         TEST_MULTICALL_ADDRESS,
-        provider
+        provider,
       );
 
       const result = await multicallMultipleCallDataSingContract(
         multicallContract,
         testCallData,
         addrToken0,
-        { gasRequired: DEFAULT_GAS_QUOTE }
+        { gasRequired: DEFAULT_GAS_QUOTE },
       );
       expect(result.returnData.length).toBe(1);
       expect(mockedContract).toBeCalledTimes(1);

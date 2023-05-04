@@ -1,8 +1,9 @@
 import { describe, expect, it } from '@jest/globals';
-import { ExchangeModuleConfiguration } from '../types';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { ExchangeModuleConfiguration } from '../types';
 import { ExchangeConfiguration } from './index';
 import { POLYGON_TESTNET_CHAIN_ID } from '../constants/tokens/polygon';
+
 describe('config', () => {
   it('should create successfully', () => {
     const exchangeConfiguration: ExchangeModuleConfiguration = {
@@ -26,7 +27,7 @@ describe('config', () => {
     };
 
     expect(() => new ExchangeConfiguration(exchangeConfiguration)).toThrow(
-      new Error('Chain 1 is not supported in environment sandbox')
+      new Error('Chain 1 is not supported in environment sandbox'),
     );
   });
 });

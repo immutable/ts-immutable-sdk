@@ -15,23 +15,23 @@ export type TradeInfo = {
 
 export type QuoteResponse =
   | {
-      success: true;
-      trade: TradeInfo;
-    }
+    success: true;
+    trade: TradeInfo;
+  }
   | {
-      success: false;
-      trade: undefined;
-    };
+    success: false;
+    trade: undefined;
+  };
 
 export type TransactionResponse =
   | {
-      transactionRequest: ethers.providers.TransactionRequest;
-      success: true;
-    }
+    transactionRequest: ethers.providers.TransactionRequest;
+    success: true;
+  }
   | {
-      success: false;
-      transactionRequest: undefined;
-    };
+    success: false;
+    transactionRequest: undefined;
+  };
 
 export type TokenInfo = {
   chainId: number;

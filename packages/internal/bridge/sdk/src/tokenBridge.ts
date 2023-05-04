@@ -21,7 +21,7 @@ export class TokenBridge {
     if (!ethers.utils.isAddress(req.token)) {
       throw new BridgeError(
         `token address ${req.token} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS
+        BridgeErrorType.INVALID_ADDRESS,
       );
     }
     return {
@@ -31,26 +31,26 @@ export class TokenBridge {
   }
 
   public async getUnsignedDepositTokenTx(
-    req: BridgeDepositRequest
+    req: BridgeDepositRequest,
   ): Promise<BridgeDepositResponse> {
     if (req.token === 'NATIVE') {
       throw new BridgeError(
         'native token deposit is not yet supported',
-        BridgeErrorType.UNSUPPORTED_ERROR
+        BridgeErrorType.UNSUPPORTED_ERROR,
       );
     }
 
     if (!ethers.utils.isAddress(req.depositorAddress)) {
       throw new BridgeError(
         `depositor address ${req.depositorAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS
+        BridgeErrorType.INVALID_ADDRESS,
       );
     }
 
     if (!ethers.utils.isAddress(req.recipientAddress)) {
       throw new BridgeError(
         `recipient address ${req.recipientAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS
+        BridgeErrorType.INVALID_ADDRESS,
       );
     }
 
@@ -58,14 +58,14 @@ export class TokenBridge {
     if (req.token !== 'NATIVE' && !ethers.utils.isAddress(req.token)) {
       throw new BridgeError(
         `token address ${req.token} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS
+        BridgeErrorType.INVALID_ADDRESS,
       );
     }
 
     if (req.depositAmount.isNegative() || req.depositAmount.isZero()) {
       throw new BridgeError(
         `deposit amount ${req.depositAmount.toString()} is invalid`,
-        BridgeErrorType.INVALID_AMOUNT
+        BridgeErrorType.INVALID_AMOUNT,
       );
     }
 
@@ -77,23 +77,21 @@ export class TokenBridge {
       async () => {
         const rootERC20PredicateContract = new ethers.Contract(
           this.config.bridgeContracts.rootChainERC20Predicate,
-          RootERC20Predicate
+          RootERC20Predicate,
         );
         return rootERC20PredicateContract;
       },
-      BridgeErrorType.INTERNAL_ERROR
+      BridgeErrorType.INTERNAL_ERROR,
     );
 
-    const data = await withBridgeError<string>(async () => {
-      return rootERC20PredicateContract.interface.encodeFunctionData(
-        'depositTo',
-        [token, receipient, req.depositAmount]
-      );
-    }, BridgeErrorType.INTERNAL_ERROR);
+    const data = await withBridgeError<string>(async () => rootERC20PredicateContract.interface.encodeFunctionData(
+      'depositTo',
+      [token, receipient, req.depositAmount],
+    ), BridgeErrorType.INTERNAL_ERROR);
 
     return {
       unsignedTx: {
-        data: data,
+        data,
         to: this.config.bridgeContracts.rootChainERC20Predicate,
         value: 0,
         from: depositor,
@@ -102,7 +100,7 @@ export class TokenBridge {
   }
 
   private async getFeeForToken(
-    token: FungibleToken
+    token: FungibleToken,
   ): Promise<ethers.BigNumber> {
     return ethers.BigNumber.from(0);
   }

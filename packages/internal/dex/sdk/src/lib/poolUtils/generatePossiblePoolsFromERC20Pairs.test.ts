@@ -18,7 +18,7 @@ describe('generatePoolsFromTokenPairs', () => {
       const pools = generatePossiblePoolsFromERC20Pair(
         erc20Pair,
         commonRoutingERC20s,
-        TEST_V3_CORE_FACTORY_ADDRESS
+        TEST_V3_CORE_FACTORY_ADDRESS,
       );
       expect(pools).toMatchInlineSnapshot(`
         [
@@ -131,7 +131,7 @@ describe('generatePoolsFromTokenPairs', () => {
       const pools = generatePossiblePoolsFromERC20Pair(
         erc20Pair,
         commonRoutingERC20s,
-        TEST_V3_CORE_FACTORY_ADDRESS
+        TEST_V3_CORE_FACTORY_ADDRESS,
       );
 
       expect(pools).toHaveLength(12);

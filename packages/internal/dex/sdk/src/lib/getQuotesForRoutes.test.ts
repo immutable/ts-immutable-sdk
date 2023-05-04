@@ -1,8 +1,10 @@
 import { describe, it } from '@jest/globals';
-import { FeeAmount, Pool, Route, TickMath } from '@uniswap/v3-sdk';
+import {
+  FeeAmount, Pool, Route, TickMath,
+} from '@uniswap/v3-sdk';
 import { Token, CurrencyAmount, TradeType } from '@uniswap/sdk-core';
-import { getQuotesForRoutes } from './getQuotesForRoutes';
 import { Contract, ethers, providers } from 'ethers';
+import { getQuotesForRoutes } from './getQuotesForRoutes';
 import {
   IMX_TEST_CHAIN,
   TEST_CHAIN_ID,
@@ -44,15 +46,13 @@ describe('getQuotesForRoutes', () => {
 
       mockedMulticallContract = (
         Contract as unknown as jest.Mock
-      ).mockImplementationOnce(() => {
-        return {
-          callStatic: {
-            multicall: jest.fn().mockResolvedValueOnce(mockReturnData),
-          },
-        };
-      });
+      ).mockImplementationOnce(() => ({
+        callStatic: {
+          multicall: jest.fn().mockResolvedValueOnce(mockReturnData),
+        },
+      }));
 
-      let dummyRoutes: Route<Token, Token>[] = [];
+      const dummyRoutes: Route<Token, Token>[] = [];
       const arbitraryTick = 100;
       const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
       // Since we will be mocking the multicall, routes doesn't matter, as long as the length is correct.
@@ -62,32 +62,32 @@ describe('getQuotesForRoutes', () => {
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
-        arbitraryTick
+        arbitraryTick,
       );
       dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
-        TEST_CHAIN_ID
+        TEST_CHAIN_ID,
       );
       const multicallContract = Multicall__factory.connect(
         TEST_MULTICALL_ADDRESS,
-        provider
+        provider,
       );
 
       const amount: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
         WETH_TEST_CHAIN,
-        '123123'
+        '123123',
       );
       const amountOutReceived = await getQuotesForRoutes(
         multicallContract,
         dummyRoutes,
         amount,
-        TradeType.EXACT_INPUT
+        TradeType.EXACT_INPUT,
       );
       expect(amountOutReceived.length).toBe(1);
       expect(amountOutReceived[0].quoteAmount.toString()).toBe(
-        amountOut.toString()
+        amountOut.toString(),
       );
     });
   });
@@ -129,15 +129,13 @@ describe('getQuotesForRoutes', () => {
 
       mockedMulticallContract = (
         Contract as unknown as jest.Mock
-      ).mockImplementationOnce(() => {
-        return {
-          callStatic: {
-            multicall: jest.fn().mockResolvedValueOnce(mockReturnData),
-          },
-        };
-      });
+      ).mockImplementationOnce(() => ({
+        callStatic: {
+          multicall: jest.fn().mockResolvedValueOnce(mockReturnData),
+        },
+      }));
 
-      let dummyRoutes: Route<Token, Token>[] = [];
+      const dummyRoutes: Route<Token, Token>[] = [];
       const arbitraryTick = 100;
       const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
       // Since we will be mocking the multicall, routes doesn't matter, as long as the length is correct.
@@ -147,36 +145,36 @@ describe('getQuotesForRoutes', () => {
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
-        arbitraryTick
+        arbitraryTick,
       );
       dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
       dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
-        TEST_CHAIN_ID
+        TEST_CHAIN_ID,
       );
       const multicallContract = Multicall__factory.connect(
         TEST_MULTICALL_ADDRESS,
-        provider
+        provider,
       );
 
       const amount: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
         WETH_TEST_CHAIN,
-        '123123'
+        '123123',
       );
       const amountOutReceived = await getQuotesForRoutes(
         multicallContract,
         dummyRoutes,
         amount,
-        TradeType.EXACT_INPUT
+        TradeType.EXACT_INPUT,
       );
       expect(amountOutReceived.length).toBe(2);
       expect(amountOutReceived[0].quoteAmount.toString()).toBe(
-        amountOut1.toString()
+        amountOut1.toString(),
       );
       expect(amountOutReceived[1].quoteAmount.toString()).toBe(
-        amountOut2.toString()
+        amountOut2.toString(),
       );
     });
   });

@@ -2,7 +2,7 @@ import { FeeAmount } from '@uniswap/v3-sdk';
 import { Token } from '@uniswap/sdk-core';
 import { computePoolAddress } from './computePoolAddress';
 import {
-  generateERC20Pairs as generateERC20Pairs,
+  generateERC20Pairs,
   ERC20Pair,
 } from './generateERC20Pairs';
 
@@ -24,7 +24,7 @@ const PoolFees = [
 export const generatePossiblePoolsFromERC20Pair = (
   erc20Pair: ERC20Pair,
   commonRoutingERC20s: Token[],
-  factoryAddress: string
+  factoryAddress: string,
 ): PoolIDs => {
   const erc20Pairs = generateERC20Pairs(erc20Pair, commonRoutingERC20s);
   const poolIDs: PoolIDs = [];
@@ -33,7 +33,7 @@ export const generatePossiblePoolsFromERC20Pair = (
       // Compute the address of the pool using its unique identifier (tokenA, tokenB, fee)
       // Computing an address does not mean the pool is guaranteed to exist
       const poolAddress = computePoolAddress({
-        factoryAddress: factoryAddress,
+        factoryAddress,
         erc20Pair: erc20Pairs[i],
         fee: PoolFees[j],
       });
@@ -41,7 +41,7 @@ export const generatePossiblePoolsFromERC20Pair = (
       poolIDs.push({
         erc20Pair: erc20Pairs[i],
         fee: PoolFees[j],
-        poolAddress: poolAddress,
+        poolAddress,
       });
     }
   }

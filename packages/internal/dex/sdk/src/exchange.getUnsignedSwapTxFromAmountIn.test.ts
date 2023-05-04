@@ -1,6 +1,7 @@
 import { describe, it } from '@jest/globals';
-import { Exchange } from './exchange';
 import { Percent, TradeType } from '@uniswap/sdk-core';
+import { ExchangeConfiguration } from 'config';
+import { Exchange } from './exchange';
 import {
   decodeMulticallData,
   mockRouterImplementation,
@@ -8,16 +9,13 @@ import {
   TestDexConfiguration,
 } from './utils/testUtils';
 import * as utils from './lib/utils';
-import { ExchangeConfiguration } from 'config';
 
 jest.mock('./lib/router');
-jest.mock('./lib/utils', () => {
-  return {
-    __esmodule: true,
-    ...jest.requireActual('./lib/utils'),
-    getERC20Decimals: async () => 18,
-  };
-});
+jest.mock('./lib/utils', () => ({
+  __esmodule: true,
+  ...jest.requireActual('./lib/utils'),
+  getERC20Decimals: async () => 18,
+}));
 
 const exactInputSingleSignature = '0x04e45aaf';
 
@@ -37,10 +35,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountIn
+        params.amountIn,
       );
 
-      let data = tx.transactionRequest?.data?.toString() || '';
+      const data = tx.transactionRequest?.data?.toString() || '';
 
       const { functionCallParams, topLevelParams } = decodeMulticallData(data);
 
@@ -51,10 +49,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(functionCallParams.fee).toBe(10000); // fee
       expect(functionCallParams.recipient).toBe(params.fromAddress); // Recipient
       expect(functionCallParams.firstAmount.toString()).toBe(
-        params.amountIn.toString()
+        params.amountIn.toString(),
       ); // amountin
       expect(functionCallParams.secondAmount.toString()).toBe(
-        params.minAmountOut.toString()
+        params.minAmountOut.toString(),
       ); // minAmountOut
       expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
       // TODO Also check that tx.transactionRequest.to and .from are correct.
@@ -75,10 +73,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.inputToken,
         params.outputToken,
         params.amountIn,
-        higherSlippage
+        higherSlippage,
       );
 
-      let data = tx.transactionRequest?.data?.toString() || '';
+      const data = tx.transactionRequest?.data?.toString() || '';
 
       const { functionCallParams, topLevelParams } = decodeMulticallData(data);
 
@@ -89,10 +87,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(functionCallParams.fee).toBe(10000); // fee
       expect(functionCallParams.recipient).toBe(params.fromAddress); // Recipient
       expect(functionCallParams.firstAmount.toString()).toBe(
-        params.amountIn.toString()
+        params.amountIn.toString(),
       ); // amountin
       expect(functionCallParams.secondAmount.toString()).toBe(
-        params.minAmountOut.toString()
+        params.minAmountOut.toString(),
       ); // minAmountOut
       expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
@@ -114,10 +112,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.inputToken,
           params.outputToken,
           params.amountIn,
-          higherSlippage
-        )
+          higherSlippage,
+        ),
       ).rejects.toThrow(
-        new utils.InvalidAddress('Address is not valid: 0x0123abcdef')
+        new utils.InvalidAddress('Address is not valid: 0x0123abcdef'),
       );
 
       await expect(
@@ -126,8 +124,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           invalidAddress,
           params.outputToken,
           params.amountIn,
-          higherSlippage
-        )
+          higherSlippage,
+        ),
       ).rejects.toThrow(utils.InvalidAddress);
 
       await expect(
@@ -136,8 +134,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.inputToken,
           invalidAddress,
           params.amountIn,
-          higherSlippage
-        )
+          higherSlippage,
+        ),
       ).rejects.toThrow(utils.InvalidAddress);
     });
   });
@@ -158,8 +156,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.outputToken,
           params.amountIn,
           higherSlippage,
-          11
-        )
+          11,
+        ),
       ).rejects.toThrow();
     });
   });

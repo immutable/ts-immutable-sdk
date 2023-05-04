@@ -53,10 +53,10 @@ const commonRoutingTokens: TokenInfo[] = [
 const overrides: ExchangeOverrides = {
   rpcURL: process.env.NEXT_PUBLIC_RPC_URL_DEV,
   exchangeContracts: contractOverrides,
-  commonRoutingTokens: commonRoutingTokens,
+  commonRoutingTokens,
 };
 export const configuration = new ExchangeConfiguration({
   chainId: devChainID,
   baseConfig: immutableConfig,
-  overrides: overrides,
+  overrides,
 });

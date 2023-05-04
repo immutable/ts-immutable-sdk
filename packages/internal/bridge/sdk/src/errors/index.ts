@@ -16,13 +16,12 @@ export class BridgeError extends Error {
 
 export const withBridgeError = async <T>(
   fn: () => Promise<T>,
-  customErrorType: BridgeErrorType
+  customErrorType: BridgeErrorType,
 ): Promise<T> => {
   try {
     return await fn();
   } catch (error) {
-    const errorMessage =
-      `${customErrorType}: ${(error as Error).message}` || 'UnknownError';
+    const errorMessage = `${customErrorType}: ${(error as Error).message}` || 'UnknownError';
     throw new BridgeError(errorMessage, customErrorType);
   }
 };

@@ -1,3 +1,5 @@
+// TODO: fix eslint dependency errors
+/* eslint-disable import/no-extraneous-dependencies */
 import BN from 'bn.js';
 import * as encUtils from 'enc-utils';
 import { Signer } from '@ethersproject/abstract-signer';
@@ -13,13 +15,15 @@ function serializeEthSignature(sig: SignatureOptions): string {
   // This is because golang appends a recovery param
   // https://github.com/ethers-io/ethers.js/issues/823
   return encUtils.addHexPrefix(
-    encUtils.padLeft(sig.r.toString(16), 64) +
-      encUtils.padLeft(sig.s.toString(16), 64) +
-      encUtils.padLeft(sig.recoveryParam?.toString(16) || '', 2)
+    encUtils.padLeft(sig.r.toString(16), 64)
+      + encUtils.padLeft(sig.s.toString(16), 64)
+      + encUtils.padLeft(sig.recoveryParam?.toString(16) || '', 2),
   );
 }
 
 function importRecoveryParam(v: string): number | undefined {
+  // TODO: fix eslint nested turnary error
+  // eslint-disable-next-line no-nested-ternary
   return v.trim()
     ? new BN(v, 16).cmp(new BN(27)) !== -1
       ? new BN(v, 16).sub(new BN(27)).toNumber()
@@ -29,6 +33,8 @@ function importRecoveryParam(v: string): number | undefined {
 
 // used chained with serializeEthSignature. serializeEthSignature(deserializeSignature(...))
 function deserializeSignature(sig: string, size = 64): SignatureOptions {
+  // TODO: fix eslint error
+  // eslint-disable-next-line no-param-reassign
   sig = encUtils.removeHexPrefix(sig);
   return {
     r: new BN(sig.substring(0, size), 'hex'),
@@ -39,7 +45,7 @@ function deserializeSignature(sig: string, size = 64): SignatureOptions {
 
 export async function signRaw(
   payload: string,
-  signer: Signer
+  signer: Signer,
 ): Promise<string> {
   const signature = deserializeSignature(await signer.signMessage(payload));
   return serializeEthSignature(signature);
@@ -51,7 +57,7 @@ type IMXAuthorisationHeaders = {
 };
 
 export async function generateIMXAuthorisationHeaders(
-  ethSigner: Signer
+  ethSigner: Signer,
 ): Promise<IMXAuthorisationHeaders> {
   const timestamp = Math.floor(Date.now() / 1000).toString();
   const signature = await signRaw(timestamp, ethSigner);
@@ -64,7 +70,7 @@ export async function generateIMXAuthorisationHeaders(
 
 export async function signMessage(
   message: string,
-  signer: Signer
+  signer: Signer,
 ): Promise<{ message: string; ethAddress: string; ethSignature: string }> {
   const ethAddress = await signer.getAddress();
   const ethSignature = await signRaw(message, signer);

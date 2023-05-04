@@ -1,4 +1,3 @@
-import { ExchangeModuleConfiguration } from '../types';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   POLYGON_TESTNET_CHAIN_ID,
@@ -6,10 +5,12 @@ import {
 } from 'constants/tokens';
 import { POLYGON_ZKEVM_TESTNET_RPC_URL } from 'constants/rpc';
 import { tokenInfoToUniswapToken } from 'lib';
+import { ExchangeModuleConfiguration } from '../types';
 import { Chain } from '../constants/chains';
 
 export class ExchangeConfiguration {
   public baseConfig: ImmutableConfiguration;
+
   public chain: Chain;
 
   constructor({ chainId, baseConfig, overrides }: ExchangeModuleConfiguration) {
@@ -17,22 +18,21 @@ export class ExchangeConfiguration {
 
     if (overrides) {
       this.chain = {
-        chainId: chainId,
+        chainId,
         rpcUrl: overrides.rpcURL,
         contracts: overrides.exchangeContracts,
         commonRoutingTokens: tokenInfoToUniswapToken(
-          overrides.commonRoutingTokens
+          overrides.commonRoutingTokens,
         ),
       };
 
       return;
     }
 
-    const chain =
-      SupportedChainIdsForEnvironment[baseConfig.environment][chainId];
+    const chain = SupportedChainIdsForEnvironment[baseConfig.environment][chainId];
     if (!chain) {
       throw new Error(
-        `Chain ${chainId} is not supported in environment ${baseConfig.environment}`
+        `Chain ${chainId} is not supported in environment ${baseConfig.environment}`,
       );
     }
 

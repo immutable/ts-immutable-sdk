@@ -18,25 +18,24 @@ export async function getQuotesForRoutes(
   multicallContract: Multicall,
   routes: Route<Currency, Currency>[],
   amountSpecified: CurrencyAmount<Currency>,
-  tradeType: TradeType
+  tradeType: TradeType,
 ): Promise<QuoteResult[]> {
   // With all valid routes, get the best quotes
   const callData = routes.map(
-    (route) =>
-      SwapQuoter.quoteCallParameters(route, amountSpecified, tradeType, {
-        useQuoterV2: true,
-      }).calldata
+    (route) => SwapQuoter.quoteCallParameters(route, amountSpecified, tradeType, {
+      useQuoterV2: true,
+    }).calldata,
   );
 
   const quoteResults = await multicallMultipleCallDataSingContract(
     multicallContract,
     callData,
     '0x66d0aB680ACEe44308edA2062b910405CC51A190', // TODO fix this to be read from the config
-    { gasRequired: DEFAULT_GAS_QUOTE }
+    { gasRequired: DEFAULT_GAS_QUOTE },
   );
 
-  let decodedQuoteResults: QuoteResult[] = [];
-  for (let i in quoteResults.returnData) {
+  const decodedQuoteResults: QuoteResult[] = [];
+  for (const i in quoteResults.returnData) {
     const functionSig = callData[i].substring(0, 10);
     const returnTypes = quoteReturnMapping[functionSig];
     if (!returnTypes) {
@@ -51,7 +50,7 @@ export async function getQuotesForRoutes(
 
       const decodedQuoteResult = ethers.utils.defaultAbiCoder.decode(
         returnTypes,
-        quoteResults.returnData[i].returnData
+        quoteResults.returnData[i].returnData,
       );
       const quoteResult = {
         route: routes[i],
@@ -60,7 +59,7 @@ export async function getQuotesForRoutes(
       decodedQuoteResults.push(quoteResult);
     } catch {
       console.warn(
-        `Quote failed with reason ${quoteResults.returnData[i].returnData}`
+        `Quote failed with reason ${quoteResults.returnData[i].returnData}`,
       );
     }
   }

@@ -16,15 +16,14 @@ export function Example() {
   const DEVNET_USDC = process.env.NEXT_PUBLIC_COMMON_ROUTING_USDC || '';
   const DEVNET_FUN = process.env.NEXT_PUBLIC_COMMON_ROUTING_FUN || '';
   const DEVNET_ETH = process.env.NEXT_PUBLIC_COMMON_ROUTING_WETH || '';
-  const [isMetamaskInstalled, setIsMetamaskInstalled] =
-    useState<boolean>(false);
+  const [isMetamaskInstalled, setIsMetamaskInstalled] = useState<boolean>(false);
   const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
   const [result, setResult] = useState<TradeInfo | null>();
   const [error, setError] = useState('');
   const [isFetching, setIsFetching] = useState(false);
   const [routes, setRoutes] = useState<RouteType[]>([]);
   const [addressToSymbolMapping, setAddressToSymbolMapping] = useState<mapping>(
-    {}
+    {},
   );
   const [approved, setApproved] = useState<boolean>(false);
   const [swapStatus, setSwapStatus] = useState<boolean>(false);
@@ -36,7 +35,7 @@ export function Example() {
 
   useEffect(() => {
     if ((window as any).ethereum) {
-      //check if Metamask wallet is installed
+      // check if Metamask wallet is installed
       setIsMetamaskInstalled(true);
     }
   }, []);
@@ -50,13 +49,13 @@ export function Example() {
           [outputToken]: outputTokenSymbol,
         });
         console.log(inputTokenSymbol);
-      }
+      },
     );
   }, []);
 
-  //Does the User have an Ethereum wallet/account?
+  // Does the User have an Ethereum wallet/account?
   async function connectMetamaskWallet(): Promise<void> {
-    //to get around type checking
+    // to get around type checking
     (window as any).ethereum
       .request({
         method: 'eth_requestAccounts',
@@ -94,7 +93,7 @@ export function Example() {
 
   async function getTokenSymbol(tokenAddress: string): Promise<string> {
     const provider = new ethers.providers.JsonRpcProvider(
-      process.env.NEXT_PUBLIC_RPC_URL_DEV
+      process.env.NEXT_PUBLIC_RPC_URL_DEV,
     );
     const symbolFunctionSig = ethers.utils.id('symbol()').substring(0, 10);
     const returnValue = await provider.call({
@@ -141,7 +140,7 @@ export function Example() {
     const result = await exchange.getQuoteFromAmountIn(
       inputToken,
       outputToken,
-      amountIn
+      amountIn,
     );
 
     if (result.success) {
@@ -161,14 +160,14 @@ export function Example() {
   const performSwap = async (result: any) => {
     setIsFetching(true);
     const provider = new ethers.providers.JsonRpcProvider(
-      process.env.NEXT_PUBLIC_RPC_URL_DEV
+      process.env.NEXT_PUBLIC_RPC_URL_DEV,
     );
 
     const quote = await exchange.getUnsignedSwapTxFromAmountIn(
       ethereumAccount,
       inputToken,
       outputToken,
-      amountIn
+      amountIn,
     );
 
     if (!approved) {
@@ -182,7 +181,7 @@ export function Example() {
       try {
         const approveReceipt = await (window as any).ethereum.send(
           'eth_sendTransaction',
-          [transactionRequest]
+          [transactionRequest],
         );
         console.log({ approveReceipt });
         await provider.waitForTransaction(approveReceipt.result, 1, 150000);
@@ -197,7 +196,7 @@ export function Example() {
     try {
       const receipt = await (window as any).ethereum.send(
         'eth_sendTransaction',
-        [quote.transactionRequest]
+        [quote.transactionRequest],
       );
       await provider.waitForTransaction(receipt.result, 1, 150000);
     } catch (e) {
@@ -213,18 +212,35 @@ export function Example() {
   return (
     <div>
       <h3 style={{ marginBottom: '12px' }}>
-        Your wallet address: {ethereumAccount}
+        Your wallet address:
+        {' '}
+        {ethereumAccount}
       </h3>
       <h3>
-        Input Token: {inputToken} ({addressToSymbolMapping[inputToken]})
+        Input Token:
+        {' '}
+        {inputToken}
+        {' '}
+        (
+        {addressToSymbolMapping[inputToken]}
+        )
       </h3>
       <h3>
-        Output Token: {outputToken} ({addressToSymbolMapping[outputToken]})
+        Output Token:
+        {' '}
+        {outputToken}
+        {' '}
+        (
+        {addressToSymbolMapping[outputToken]}
+        )
       </h3>
-      <h3>Amount In: {ethers.utils.formatEther(amountIn)}</h3>
+      <h3>
+        Amount In:
+        {ethers.utils.formatEther(amountIn)}
+      </h3>
       <button
         className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
-        onClick={async () => await getQuote()}
+        onClick={async () => getQuote()}
         disabled={isFetching}
       >
         GET QUOTE
@@ -232,7 +248,10 @@ export function Example() {
       <hr className="my-4" />
       {result && (
         <>
-          <h3>Amount out: {ethers.utils.formatEther(result.amountOut)}</h3>
+          <h3>
+            Amount out:
+            {ethers.utils.formatEther(result.amountOut)}
+          </h3>
           {routes.length > 0 && (
             <>
               <h3>
@@ -241,10 +260,12 @@ export function Example() {
                   const key = token.address;
                   return (
                     <span key={key}>
-                      {addressToSymbolMapping[token.address]}{' '}
+                      {addressToSymbolMapping[token.address]}
+                      {' '}
                       {index !== result.route.tokenPath.length - 1
-                        ? `--->`
-                        : ''}{' '}
+                        ? '--->'
+                        : ''}
+                      {' '}
                     </span>
                   );
                 })}
@@ -255,8 +276,18 @@ export function Example() {
                   const key = `${route.token0}-${route.token1}-${route.fee}`;
                   return (
                     <span key={key}>
-                      ({route.token0}/{route.token1} - {route.fee / 10000}%){' '}
-                      {index !== routes.length - 1 ? `--->` : ''}{' '}
+                      (
+                      {route.token0}
+                      /
+                      {route.token1}
+                      {' '}
+                      -
+                      {' '}
+                      {route.fee / 10000}
+                      %)
+                      {' '}
+                      {index !== routes.length - 1 ? '--->' : ''}
+                      {' '}
                     </span>
                   );
                 })}
