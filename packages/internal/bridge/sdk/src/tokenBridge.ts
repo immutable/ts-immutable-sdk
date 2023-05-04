@@ -30,7 +30,7 @@ export class TokenBridge {
     };
   }
 
-  public async getUnsignedDepositTokenTx(
+  public async getUnsignedDepositTx(
     req: BridgeDepositRequest
   ): Promise<BridgeDepositResponse> {
     if (req.token === 'NATIVE') {
