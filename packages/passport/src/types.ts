@@ -46,7 +46,7 @@ export interface PassportOverrides {
 
 export interface PassportModuleConfiguration
   extends ModuleConfiguration<PassportOverrides>,
-    OidcConfiguration {}
+  OidcConfiguration {}
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 

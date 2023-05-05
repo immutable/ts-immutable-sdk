@@ -1,10 +1,10 @@
 import { TradesApi } from '@imtbl/core-sdk';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { createTrade } from './trades';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportConfiguration } from '../config';
 import ConfirmationScreen from '../confirmation/confirmation';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
 
 jest.mock('../confirmation/confirmation');
 
@@ -109,14 +109,14 @@ describe('trades', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockSignableTradeRequest.getSignableTradeRequest,
-        passportConfig: passportConfig,
+        passportConfig,
       });
 
       expect(getSignableTradeMock).toBeCalledWith(mockSignableTradeRequest);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(createTradeMock).toBeCalledWith(
         mockCreateTradeRequest,
-        mockHeader
+        mockHeader,
       );
       expect(result).toEqual(mockReturnValue);
     });
@@ -127,33 +127,29 @@ describe('trades', () => {
         confirmed: true,
       });
 
-      await expect(() =>
-        createTrade({
-          tradesApi: tradesApiMock,
-          starkSigner: mockStarkSigner,
-          user: mockUser,
-          request: mockSignableTradeRequest.getSignableTradeRequest,
-          passportConfig: passportConfig,
-        })
-      ).rejects.toThrowError('TRADE_ERROR');
+      await expect(() => createTrade({
+        tradesApi: tradesApiMock,
+        starkSigner: mockStarkSigner,
+        user: mockUser,
+        request: mockSignableTradeRequest.getSignableTradeRequest,
+        passportConfig,
+      })).rejects.toThrowError('TRADE_ERROR');
     });
 
     it('should return error if failed to call public api', async () => {
       getSignableTradeMock.mockRejectedValue(new Error(mockErrorMessage));
 
-      await expect(() =>
-        createTrade({
-          tradesApi: tradesApiMock,
-          starkSigner: mockStarkSigner,
-          user: mockUser,
-          request: mockSignableTradeRequest.getSignableTradeRequest,
-          passportConfig: passportConfig,
-        })
-      ).rejects.toThrow(
+      await expect(() => createTrade({
+        tradesApi: tradesApiMock,
+        starkSigner: mockStarkSigner,
+        user: mockUser,
+        request: mockSignableTradeRequest.getSignableTradeRequest,
+        passportConfig,
+      })).rejects.toThrow(
         new PassportError(
           `${PassportErrorType.CREATE_TRADE_ERROR}: ${mockErrorMessage}`,
-          PassportErrorType.CREATE_TRADE_ERROR
-        )
+          PassportErrorType.CREATE_TRADE_ERROR,
+        ),
       );
     });
   });

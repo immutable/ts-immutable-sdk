@@ -9,8 +9,7 @@ import { PassportError, PassportErrorType } from '../errors/passportError';
 jest.mock('@imtbl/core-sdk');
 
 describe('getStarkSigner', () => {
-  const privateKey =
-    '0x610855bbd7dad4efa59587e97041baa5ec96d483cac2ae78f2c2fb124fc391c1';
+  const privateKey = '0x610855bbd7dad4efa59587e97041baa5ec96d483cac2ae78f2c2fb124fc391c1';
   const wallet = new ethers.Wallet(privateKey);
 
   it('should call generateLegacyStarkPrivateKey and return createStarkSigner', async () => {
@@ -37,8 +36,8 @@ describe('getStarkSigner', () => {
     }).rejects.toThrow(
       new PassportError(
         `${PassportErrorType.WALLET_CONNECTION_ERROR}: ${errorMessage}`,
-        PassportErrorType.WALLET_CONNECTION_ERROR
-      )
+        PassportErrorType.WALLET_CONNECTION_ERROR,
+      ),
     );
   });
 });

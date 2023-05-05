@@ -108,11 +108,11 @@ describe('AuthManager', () => {
           token_endpoint: `${configWithAudience.authenticationDomain}/oauth/token`,
           userinfo_endpoint: `${configWithAudience.authenticationDomain}/userinfo`,
           end_session_endpoint:
-            `${configWithAudience.authenticationDomain}/v2/logout` +
-            `?returnTo=${encodeURIComponent(
-              configWithAudience.oidcConfiguration.logoutRedirectUri
-            )}` +
-            `&client_id=${configWithAudience.oidcConfiguration.clientId}`,
+            `${configWithAudience.authenticationDomain}/v2/logout`
+            + `?returnTo=${encodeURIComponent(
+              configWithAudience.oidcConfiguration.logoutRedirectUri,
+            )}`
+            + `&client_id=${configWithAudience.oidcConfiguration.clientId}`,
         },
         popup_redirect_uri: configWithAudience.oidcConfiguration.redirectUri,
         redirect_uri: configWithAudience.oidcConfiguration.redirectUri,
@@ -136,11 +136,11 @@ describe('AuthManager', () => {
         token_endpoint: `${config.authenticationDomain}/oauth/token`,
         userinfo_endpoint: `${config.authenticationDomain}/userinfo`,
         end_session_endpoint:
-          `${config.authenticationDomain}/v2/logout` +
-          `?returnTo=${encodeURIComponent(
-            config.oidcConfiguration.logoutRedirectUri
-          )}` +
-          `&client_id=${config.oidcConfiguration.clientId}`,
+          `${config.authenticationDomain}/v2/logout`
+          + `?returnTo=${encodeURIComponent(
+            config.oidcConfiguration.logoutRedirectUri,
+          )}`
+          + `&client_id=${config.oidcConfiguration.clientId}`,
       },
       popup_redirect_uri: config.oidcConfiguration.redirectUri,
       redirect_uri: config.oidcConfiguration.redirectUri,
@@ -174,8 +174,8 @@ describe('AuthManager', () => {
       await expect(() => authManager.login()).rejects.toThrow(
         new PassportError(
           `${PassportErrorType.AUTHENTICATION_ERROR}: ${mockErrorMsg}`,
-          PassportErrorType.AUTHENTICATION_ERROR
-        )
+          PassportErrorType.AUTHENTICATION_ERROR,
+        ),
       );
     });
   });
@@ -229,8 +229,8 @@ describe('AuthManager', () => {
       await expect(() => authManager.logout()).rejects.toThrow(
         new PassportError(
           `${PassportErrorType.LOGOUT_ERROR}: ${mockErrorMsg}`,
-          PassportErrorType.LOGOUT_ERROR
-        )
+          PassportErrorType.LOGOUT_ERROR,
+        ),
       );
     });
   });
@@ -281,7 +281,7 @@ describe('AuthManager', () => {
       signinSilentMock.mockResolvedValue(response);
 
       await expect(
-        authManager.requestRefreshTokenAfterRegistration()
+        authManager.requestRefreshTokenAfterRegistration(),
       ).rejects.toThrow('REFRESH_TOKEN_ERROR');
 
       expect(signinSilentMock).toHaveBeenCalledTimes(MAX_RETRIES + 1);
@@ -290,7 +290,7 @@ describe('AuthManager', () => {
     it('requestRefreshTokenAfterRegistration failed with fetching user info error in metadata with retries', async () => {
       signinSilentMock.mockResolvedValue(null);
       await expect(
-        authManager.requestRefreshTokenAfterRegistration()
+        authManager.requestRefreshTokenAfterRegistration(),
       ).rejects.toThrow('REFRESH_TOKEN_ERROR');
 
       expect(signinSilentMock).toHaveBeenCalledTimes(MAX_RETRIES + 1);

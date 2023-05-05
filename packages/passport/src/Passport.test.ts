@@ -1,11 +1,11 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { ImmutableXClient } from '@imtbl/immutablex-client';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { Passport } from './Passport';
 import { getStarkSigner } from './stark';
 import { Networks, OidcConfiguration, User } from './types';
 import registerPassport from './workflows/registration';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -94,7 +94,7 @@ describe('Passport', () => {
           },
           ...oidcConfiguration,
         });
-        expect(passport['immutableXClient']).toEqual(immutableXClient);
+        expect(passport.immutableXClient).toEqual(immutableXClient);
       });
     });
   });
@@ -119,7 +119,7 @@ describe('Passport', () => {
       authLoginMock.mockResolvedValue({ idToken: '123' });
 
       await expect(passport.connectImx()).rejects.toThrow(
-        'Failed to get refresh token'
+        'Failed to get refresh token',
       );
 
       expect(authLoginMock).toBeCalledTimes(1);

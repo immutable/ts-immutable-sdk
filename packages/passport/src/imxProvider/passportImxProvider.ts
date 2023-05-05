@@ -36,8 +36,11 @@ export type PassportImxProviderInput = {
 
 export default class PassportImxProvider implements IMXProvider {
   private readonly user: UserWithEtherKey;
+
   private readonly starkSigner: StarkSigner;
+
   private readonly passportConfig: PassportConfiguration;
+
   private readonly immutableXClient: ImmutableXClient;
 
   constructor({
@@ -53,7 +56,7 @@ export default class PassportImxProvider implements IMXProvider {
   }
 
   async transfer(
-    request: UnsignedTransferRequest
+    request: UnsignedTransferRequest,
   ): Promise<CreateTransferResponseV1> {
     return transfer({
       request,
@@ -67,14 +70,14 @@ export default class PassportImxProvider implements IMXProvider {
   registerOffchain(): Promise<RegisterUserResponse> {
     throw new PassportError(
       'Operation not supported',
-      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
     );
   }
 
   isRegisteredOnchain(): Promise<boolean> {
     throw new PassportError(
       'Operation not supported',
-      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
     );
   }
 
@@ -89,7 +92,7 @@ export default class PassportImxProvider implements IMXProvider {
   }
 
   cancelOrder(
-    request: GetSignableCancelOrderRequest
+    request: GetSignableCancelOrderRequest,
   ): Promise<CancelOrderResponse> {
     return cancelOrder({
       request,
@@ -111,7 +114,7 @@ export default class PassportImxProvider implements IMXProvider {
   }
 
   batchNftTransfer(
-    request: NftTransferDetails[]
+    request: NftTransferDetails[],
   ): Promise<CreateTransferResponse> {
     return batchNftTransfer({
       request,
@@ -123,7 +126,7 @@ export default class PassportImxProvider implements IMXProvider {
   }
 
   exchangeTransfer(
-    request: UnsignedExchangeTransferRequest
+    request: UnsignedExchangeTransferRequest,
   ): Promise<CreateTransferResponseV1> {
     return exchangeTransfer({
       request,
@@ -137,7 +140,7 @@ export default class PassportImxProvider implements IMXProvider {
   deposit(deposit: TokenAmount): Promise<TransactionResponse> {
     throw new PassportError(
       'Operation not supported',
-      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
     );
   }
 
@@ -145,7 +148,7 @@ export default class PassportImxProvider implements IMXProvider {
   prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
     throw new PassportError(
       'Operation not supported',
-      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
     );
   }
 
@@ -153,11 +156,11 @@ export default class PassportImxProvider implements IMXProvider {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     starkPublicKey: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    token: AnyToken
+    token: AnyToken,
   ): Promise<TransactionResponse> {
     throw new PassportError(
       'Operation not supported',
-      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
+      PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
     );
   }
 

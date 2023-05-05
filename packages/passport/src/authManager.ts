@@ -22,9 +22,9 @@ const getAuthConfiguration = ({
       token_endpoint: `${authenticationDomain}/oauth/token`,
       userinfo_endpoint: `${authenticationDomain}/userinfo`,
       end_session_endpoint:
-        `${authenticationDomain}/v2/logout` +
-        `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}` +
-        `&client_id=${oidcConfiguration.clientId}`,
+        `${authenticationDomain}/v2/logout`
+        + `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}`
+        + `&client_id=${oidcConfiguration.clientId}`,
     },
     mergeClaims: true,
     loadUserInfo: true,
@@ -41,6 +41,7 @@ const getAuthConfiguration = ({
 
 export default class AuthManager {
   private userManager;
+
   private config: PassportConfiguration;
 
   constructor(config: PassportConfiguration) {
@@ -78,14 +79,14 @@ export default class AuthManager {
   public async loginCallback(): Promise<void> {
     return withPassportError<void>(
       async () => this.userManager.signinPopupCallback(),
-      PassportErrorType.AUTHENTICATION_ERROR
+      PassportErrorType.AUTHENTICATION_ERROR,
     );
   }
 
   public async logout(): Promise<void> {
     return withPassportError<void>(
       async () => this.userManager.signoutRedirect(),
-      PassportErrorType.LOGOUT_ERROR
+      PassportErrorType.LOGOUT_ERROR,
     );
   }
 
@@ -118,10 +119,9 @@ export default class AuthManager {
       const updatedUser = await retryWithDelay(async () => {
         const user = await this.userManager.signinSilent();
         const passportMetadata = user?.profile?.passport as PassportMetadata;
-        const metadataExists =
-          !!passportMetadata?.ether_key &&
-          !!passportMetadata?.stark_key &&
-          !!passportMetadata?.user_admin_key;
+        const metadataExists = !!passportMetadata?.ether_key
+          && !!passportMetadata?.stark_key
+          && !!passportMetadata?.user_admin_key;
         if (metadataExists) {
           return user;
         }

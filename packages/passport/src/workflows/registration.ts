@@ -8,7 +8,7 @@ export type registerPassportParams = WalletConnection & {
 
 export default async function registerPassport(
   { ethSigner, starkSigner, usersApi }: registerPassportParams,
-  authorization: string
+  authorization: string,
 ): Promise<string> {
   return withPassportError<string>(async () => {
     const userAddress = await ethSigner.getAddress();
@@ -21,13 +21,12 @@ export default async function registerPassport(
       },
     });
 
-    const { signable_message: signableMessage, payload_hash: payloadHash } =
-      signableResult.data;
+    const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
     const ethSignature = await signRaw(signableMessage, ethSigner);
     const starkSignature = await starkSigner.signMessage(payloadHash);
 
     const response = await usersApi.registerPassportUser({
-      authorization: `Bearer ` + authorization,
+      authorization: `Bearer ${authorization}`,
       registerPassportUserRequest: {
         eth_signature: ethSignature,
         ether_key: userAddress,

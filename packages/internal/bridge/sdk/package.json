@@ -36,11 +36,11 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
+    "build": "NODE_ENV=production rollup --config rollup.config.js",
     "lint": "eslint ./src --ext .ts --max-warnings=0",
     "lint:fix": "cd ../../../ && yarn wsrun -p @imtbl/bridge-sdk -c lint --fix",
     "test": "jest test",
-    "test:watch": "jest --watch",
-    "build": "NODE_ENV=production rollup --config rollup.config.js"
+    "test:watch": "jest --watch"
   },
   "source": "src/index.ts",
   "type": "module",
