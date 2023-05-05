@@ -1,1 +1,1 @@
-export * from '@imtbl/checkout-sdk-web';
+export * from '@imtbl/checkout-sdk';
