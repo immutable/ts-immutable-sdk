@@ -9,6 +9,7 @@
     "@imtbl/core-sdk": "^1.1.1-alpha.1",
     "@magic-ext/oidc": "^1.0.1",
     "@metamask/detect-provider": "^2.0.0",
+    "@opensea/seaport-js": "^1.2.0",
     "axios": "^1.3.5",
     "ethers": "^5.7.2",
     "magic-sdk": "^13.3.1",
@@ -19,6 +20,7 @@
     "@imtbl/checkout-ui-types": "0.0.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
+    "@imtbl/orderbook": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/provider": "0.0.0",
     "@rollup/plugin-commonjs": "^24.0.1",
@@ -55,18 +57,6 @@
     "./passport": {
       "types": "./dist/passport.d.ts",
       "import": "./dist/passport.js"
-    },
-    "./provider": {
-      "types": "./dist/provider.d.ts",
-      "import": "./dist/provider.js"
-    },
-    "./checkout_sdk": {
-      "types": "./dist/checkout_sdk.d.ts",
-      "import": "./dist/checkout_sdk.js"
-    },
-    "./checkout_widgets": {
-      "types": "./dist/checkout_widgets.d.ts",
-      "import": "./dist/checkout_widgets.js"
     }
   },
   "files": [
