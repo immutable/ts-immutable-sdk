@@ -97,8 +97,10 @@ async function deposit() {
     const txResponseApprove = await checkout.sendTransaction(
       approveResp.unsignedTx
     );
-    await txResponseApprove.wait();
-    console.log('Approval Tx Completed');
+    const txApprovalReceipt = await txResponseApprove.wait();
+    console.log(
+      `Approval Tx Completed with hash: ${txApprovalReceipt.transactionHash}`
+    );
   } else {
     console.log(`Approval not required`);
   }
