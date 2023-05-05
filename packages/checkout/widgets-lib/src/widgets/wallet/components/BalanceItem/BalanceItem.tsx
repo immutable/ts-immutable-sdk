@@ -11,6 +11,7 @@ import {
   BalanceItemContainerStyle,
   BalanceItemCoinBoxStyle,
   BalanceItemPriceBoxStyle,
+  ShowMenuItem,
 } from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';
@@ -46,6 +47,7 @@ export const BalanceItem = (props: BalanceItemProps) => {
       (supportedTopUps?.isExchangeEnabled ?? true);
     setIsSwapCoinEnabled(enableSwapCoin);
   }, [network, supportedTopUps]);
+
   return (
     <Box
       testId={`balance-item-${balanceInfo.symbol}`}
@@ -66,18 +68,20 @@ export const BalanceItem = (props: BalanceItemProps) => {
           price={balanceInfo.balance}
           fiatAmount={`≈ USD $ -.--`}
         />
-        {((isAddCoinEnabled && isSwapCoinEnabled) || isMoveCoinEnabled) && (
-          <OverflowPopoverMenu size="small">
-            <MenuItem>
-              <MenuItem.Icon icon="Add"></MenuItem.Icon>
-              <MenuItem.Label>{`Add ${balanceInfo.symbol}`}</MenuItem.Label>
-            </MenuItem>
-            <MenuItem>
-              <MenuItem.Icon icon="Exchange"></MenuItem.Icon>
-              <MenuItem.Label>{`Swap ${balanceInfo.symbol}`}</MenuItem.Label>
-            </MenuItem>
-          </OverflowPopoverMenu>
-        )}
+        <OverflowPopoverMenu size="small">
+          <MenuItem sx={ShowMenuItem(isAddCoinEnabled)}>
+            <MenuItem.Icon icon="Add"></MenuItem.Icon>
+            <MenuItem.Label>{`Add ${balanceInfo.symbol}`}</MenuItem.Label>
+          </MenuItem>
+          <MenuItem sx={ShowMenuItem(isSwapCoinEnabled)}>
+            <MenuItem.Icon icon="Exchange"></MenuItem.Icon>
+            <MenuItem.Label>{`Swap ${balanceInfo.symbol}`}</MenuItem.Label>
+          </MenuItem>
+          <MenuItem sx={ShowMenuItem(isMoveCoinEnabled)}>
+            <MenuItem.Icon icon="Minting"></MenuItem.Icon>
+            <MenuItem.Label>{`Move ${balanceInfo.symbol}`}</MenuItem.Label>
+          </MenuItem>
+        </OverflowPopoverMenu>
       </Box>
     </Box>
   );

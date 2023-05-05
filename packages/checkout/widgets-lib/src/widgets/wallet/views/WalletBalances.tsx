@@ -29,7 +29,6 @@ export const WalletBalances = () => {
       const fiatAmount = parseFloat(balance.fiatAmount);
       if (!isNaN(fiatAmount)) totalAmount += fiatAmount;
     });
-    console.log('totalAmount:', totalAmount);
     setTotalFiatAmount(totalAmount);
   }, [walletState.tokenBalances]);
 
