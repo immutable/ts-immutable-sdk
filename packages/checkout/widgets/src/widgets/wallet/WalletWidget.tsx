@@ -10,6 +10,7 @@ import {
 import { useEffect, useReducer } from 'react';
 import {
   initialWalletState,
+  TopUpFeature,
   WalletActions,
   WalletContext,
   walletReducer,
@@ -35,10 +36,12 @@ export interface WalletWidgetProps {
 
 export interface WalletWidgetParams {
   providerPreference?: ConnectionProviders;
+  topUpFeatures?: TopUpFeature;
 }
 
 export function WalletWidget(props: WalletWidgetProps) {
   const { params, theme } = props;
+  const { providerPreference, topUpFeatures } = params;
   const biomeTheme: BaseTokens =
     theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
       ? onLightBase
@@ -59,7 +62,13 @@ export function WalletWidget(props: WalletWidgetProps) {
         checkout: checkout,
       },
     });
-  }, []);
+    walletDispatch({
+      payload: {
+        type: WalletActions.SET_SUPPORTED_TOP_UPS,
+        supportedTopUps: { ...topUpFeatures },
+      },
+    });
+  }, [topUpFeatures]);
 
   useEffect(() => {
     (async () => {
@@ -69,8 +78,7 @@ export function WalletWidget(props: WalletWidgetProps) {
       let network;
 
       const connectResult = await checkout.connect({
-        providerPreference:
-          params.providerPreference ?? ConnectionProviders.METAMASK,
+        providerPreference: providerPreference ?? ConnectionProviders.METAMASK,
       });
 
       provider = connectResult.provider;
@@ -116,7 +124,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         },
       });
     })();
-  }, [params.providerPreference, checkout]);
+  }, [providerPreference, checkout]);
 
   const errorAction = () => {
     console.log('Something went wrong');
