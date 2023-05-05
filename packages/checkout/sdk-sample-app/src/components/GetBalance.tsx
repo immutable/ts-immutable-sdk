@@ -1,4 +1,4 @@
-import { Checkout, GetBalanceResult } from '@imtbl/checkout-sdk-web';
+import { Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useMemo, useState } from 'react';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';

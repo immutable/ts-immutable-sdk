@@ -1,4 +1,4 @@
-import { ChainId, Checkout, GetBalanceResult } from '@imtbl/checkout-sdk-web';
+import { ChainId, Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useMemo, useState } from 'react';

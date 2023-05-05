@@ -54,6 +54,10 @@ function App() {
         <div>
           <a href={'/marketplace-orchestrator'}>Marketplace Orchestrator</a>
         </div>
+        <br />
+        <div>
+          <a href={'/async-loader'}>Async Loader</a>
+        </div>
       </main>
     </div>
   );

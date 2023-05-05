@@ -1,18 +1,21 @@
 import {
   WidgetTheme,
-  ConnectionProviders,
-  Network,
-} from '@imtbl/checkout-ui-types';
+  WidgetConnectionProviders,
+  CheckoutWidgets,
+  BuyReact,
+} from '@imtbl/checkout-widgets';
 
 function BuyUI() {
+  CheckoutWidgets({
+    theme: WidgetTheme.DARK,
+  });
   return (
     <div className="Buy">
       <h1 className="sample-heading">Checkout Buy Order (Web Component)</h1>
-      <imtbl-buy
-        providerPreference={ConnectionProviders.METAMASK}
-        theme={WidgetTheme.DARK}
+      <BuyReact
+        providerPreference={WidgetConnectionProviders.METAMASK}
         orderId={`1234`}
-      ></imtbl-buy>
+      />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@imtbl/checkout-sdk-web",
+  "name": "@imtbl/checkout-sdk",
   "description": "Provides both programatical and user interfaces for interacting with various wallets and L2 networks",
   "version": "0.0.0",
   "author": "proletesseract",
