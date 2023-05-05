@@ -5,7 +5,7 @@ import {
   BridgeConfiguration,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
   BridgeFeeRequest,
-} from '../../sdk/src/index';
+} from '@imtbl/bridge-sdk';
 
 async function deposit() {
   if (!process.env.ROOT_PROVIDER) {
@@ -73,5 +73,5 @@ async function deposit() {
 }
 
 (async () => {
-  await deposit();
+  await deposit().finally(() => process.exit(0));
 })();

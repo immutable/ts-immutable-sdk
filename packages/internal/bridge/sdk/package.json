@@ -31,7 +31,7 @@
     "immutablex"
   ],
   "license": "Apache-2.0",
-  "main": "dist/main.js",
+  "main": "dist/index.js",
   "module": "dist/module.js",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
@@ -44,5 +44,5 @@
   },
   "source": "src/index.ts",
   "type": "module",
-  "types": "dist/types.d.ts"
+  "types": "dist/index.d.ts"
 }
