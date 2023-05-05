@@ -56,6 +56,8 @@ describe('Passport', () => {
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
     loginSilentMock = jest.fn();
+    // TODO: Remove once fixed
+    // @ts-ignore
     (AuthManager as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
@@ -98,6 +100,8 @@ describe('Passport', () => {
           },
           ...oidcConfiguration,
         });
+        // TODO: This is a private member
+        // @ts-ignore
         expect(passport.immutableXClient).toEqual(immutableXClient);
       });
     });

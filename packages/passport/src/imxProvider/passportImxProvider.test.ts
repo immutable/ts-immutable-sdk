@@ -58,9 +58,14 @@ describe('PassportImxProvider', () => {
 
   describe('constructor', () => {
     it('sets the private properties', () => {
+      // TODO: Remove once fixed
+      // @ts-ignore
       expect(passportImxProvider.user).toEqual(mockUser);
+      // @ts-ignore
       expect(passportImxProvider.starkSigner).toEqual(mockStarkSigner);
+      // @ts-ignore
       expect(passportImxProvider.passportConfig).toEqual(passportConfig);
+      // @ts-ignore
       expect(passportImxProvider.immutableXClient).toEqual(immutableXClient);
     });
   });
