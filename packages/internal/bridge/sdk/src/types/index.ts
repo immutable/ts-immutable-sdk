@@ -1,4 +1,5 @@
 import { ModuleConfiguration } from '@imtbl/config';
+import { BridgeError } from 'errors';
 import { ethers } from 'ethers';
 
 export type BridgeInstance = {
@@ -57,4 +58,19 @@ export interface BridgeFeeRequest {
 export interface BridgeFeeResponse {
   bridgeable: boolean;
   feeAmount: ethers.BigNumber;
+}
+
+export interface WaitForRequest {
+  transactionHash: string;
+}
+
+export enum CompletionStatus {
+  SUCCESS = 'SUCCESS',
+  PENDING = 'PENDING',
+  FAILED = 'FAILED',
+}
+
+export interface WaitForResponse {
+  status: CompletionStatus;
+  error: BridgeError | null;
 }
