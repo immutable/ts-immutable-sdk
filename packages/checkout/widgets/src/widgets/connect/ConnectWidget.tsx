@@ -39,6 +39,7 @@ export interface ConnectWidgetParams {
 }
 
 export function ConnectWidget(props: ConnectWidgetProps) {
+  console.log('test') 
   const { theme } = props;
   const [connectState, connectDispatch] = useReducer(
     connectReducer,
