@@ -1,1 +1,1 @@
-export * from '@imtbl/checkout-ui-types';
+export * from '@imtbl/checkout-widgets';

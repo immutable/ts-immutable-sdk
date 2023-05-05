@@ -15,8 +15,8 @@
     "oidc-client-ts": "^2.2.1"
   },
   "devDependencies": {
-    "@imtbl/checkout-sdk-web": "0.0.0",
-    "@imtbl/checkout-ui-types": "0.0.0",
+    "@imtbl/checkout-sdk": "0.0.0",
+    "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
     "@imtbl/passport": "0.0.0",

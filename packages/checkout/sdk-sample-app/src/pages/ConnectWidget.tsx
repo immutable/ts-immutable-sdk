@@ -7,7 +7,7 @@ import CheckConnection from '../components/CheckConnection';
 import GetAllowList from '../components/GetAllowList';
 import { Body, Divider, Heading } from '@biom3/react';
 import GetBalance from '../components/GetBalance';
-import { Checkout } from '@imtbl/checkout-sdk-web';
+import { Checkout } from '@imtbl/checkout-sdk';
 
 export default function ConnectWidget() {
   const [checkout, setCheckout] = useState<Checkout>();

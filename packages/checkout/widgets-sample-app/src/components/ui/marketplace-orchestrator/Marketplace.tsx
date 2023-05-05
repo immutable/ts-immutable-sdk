@@ -1,14 +1,22 @@
 import {
+  CheckoutWidgets,
   ConnectEventType,
+  ConnectReact,
   ConnectionFailed,
+  WidgetConnectionProviders,
   ConnectionSuccess,
   IMTBLWidgetEvents,
-} from '@imtbl/checkout-ui-types';
+  WalletReact,
+  WidgetTheme,
+} from '@imtbl/checkout-widgets';
 import { useEffect, useMemo, useState } from 'react';
 import { useConnectWidget } from './useConnectWidget.hook';
 import { useWalletWidget } from './useWalletWidget.hook';
 
 export const Marketplace = () => {
+  CheckoutWidgets({
+    theme: WidgetTheme.DARK,
+  });
   const {
     showConnectWidget,
     providerPreference,
@@ -32,17 +40,14 @@ export const Marketplace = () => {
       {!providerPreference && (
         <button onClick={openConnectWidget}>Connect Wallet</button>
       )}
-      {showConnectWidget && (
-        <imtbl-connect providerPreference="" theme="dark"></imtbl-connect>
-      )}
+      {showConnectWidget && <ConnectReact />}
       {providerPreference && !showWalletWidget && (
         <button onClick={openWalletWidget}>My Wallet</button>
       )}
       {showWalletWidget && (
-        <imtbl-wallet
-          providerPreference={providerPreference}
-          theme="dark"
-        ></imtbl-wallet>
+        <WalletReact
+          providerPreference={providerPreference as WidgetConnectionProviders}
+        />
       )}
     </div>
   );
