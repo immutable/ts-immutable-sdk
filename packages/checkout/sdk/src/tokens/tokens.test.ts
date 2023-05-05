@@ -178,15 +178,15 @@ describe('token related functions', () => {
     it('should not return a conversion if the token cant be found on the exchange', async () => {
       (axios.get as unknown as jest.Mock)
         .mockResolvedValueOnce({
-          data: [],
+          data: [
+            {
+              id: 'ethereum',
+              symbol: 'eth',
+            },
+          ],
         })
         .mockResolvedValueOnce({
-          data: {
-            prices: [
-              [12345, 1000.0],
-              [12344, 500.0],
-            ],
-          },
+          data: [],
         });
 
       const amount = BigNumber.from('1000000000000000000');
@@ -205,18 +205,9 @@ describe('token related functions', () => {
     });
 
     it('should throw a checkout error if the token isnt supported by immutable', async () => {
-      (axios.get as unknown as jest.Mock)
-        .mockResolvedValueOnce({
-          data: [],
-        })
-        .mockResolvedValueOnce({
-          data: {
-            prices: [
-              [12345, 1000.0],
-              [12344, 500.0],
-            ],
-          },
-        });
+      (axios.get as unknown as jest.Mock).mockResolvedValueOnce({
+        data: [],
+      });
 
       const amount = BigNumber.from('1000000000000000000');
 
@@ -245,18 +236,9 @@ describe('token related functions', () => {
     });
 
     it('should throw a checkout error if the fiat currency isnt supported by immutable', async () => {
-      (axios.get as unknown as jest.Mock)
-        .mockResolvedValueOnce({
-          data: [],
-        })
-        .mockResolvedValueOnce({
-          data: {
-            prices: [
-              [12345, 1000.0],
-              [12344, 500.0],
-            ],
-          },
-        });
+      (axios.get as unknown as jest.Mock).mockResolvedValueOnce({
+        data: [],
+      });
 
       const amount = BigNumber.from('1000000000000000000');
 

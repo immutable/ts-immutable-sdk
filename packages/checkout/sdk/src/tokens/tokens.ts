@@ -129,7 +129,6 @@ export const convertTokensToFiat = async ({
     );
   }
   const quotes: any = await fetchConversionRatesFor(tokens, fiatSymbol);
-  console.log(quotes);
   const conversions = tokens.reduce((acc: object, token: TokenInfo) => {
     const quote = quotes[token.symbol];
     if (!quote) {
