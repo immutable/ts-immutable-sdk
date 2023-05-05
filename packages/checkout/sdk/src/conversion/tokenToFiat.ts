@@ -94,7 +94,10 @@ export const convertTokensToFiat = async ({
       CheckoutErrorType.FIAT_CURRENCY_NOT_SUPPORTED_ERROR
     );
   }
-  const quotes: any = await fetchConversionRatesFor(tokens, fiatSymbol);
+  const quotes: FetchQuotesResult = await fetchConversionRatesFor(
+    tokens,
+    fiatSymbol
+  );
   const conversions = tokens.reduce((acc: object, token: TokenInfo) => {
     const quote = quotes[token.symbol];
     if (!quote) {

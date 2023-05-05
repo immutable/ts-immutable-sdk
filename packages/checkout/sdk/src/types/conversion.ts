@@ -25,7 +25,7 @@ export interface ConvertTokensToFiatParams {
 }
 
 /**
- * Interface representing the result of {@link Checkout.convertTokenToFiat}.
+ * Interface representing the result of a specific token to fiat conversion.
  * @property {TokenInfo} token - The token that we converted from.
  * @property {string} fiatSymbol - The fiat currency we converted to.
  * @property {number} quotedAt - The unix timestamp for when the quote was generated.
@@ -33,25 +33,33 @@ export interface ConvertTokensToFiatParams {
  * @property {BigNumber} amount - The amount we converted.
  * @property {number} convertedAmount - The converted amount.
  */
-
-export interface TokenToFiatConversion {
+export interface TokenToFiatConversionResult extends FiatConversionQuote {
   token: TokenInfo;
   fiatSymbol: string;
-  quotedAt: number;
-  quote: number;
   amount: BigNumber;
   convertedAmount: number;
 }
 
+/**
+ * Interface representing the result of {@link Checkout.convertTokenToFiat}.
+ */
 export interface ConvertTokensToFiatResult {
-  [key: string]: TokenToFiatConversion;
+  [key: string]: TokenToFiatConversionResult;
 }
 
+/**
+ * Interface representing the result of a specific token to fiat conversion.
+ * @property {number} quotedAt - The unix timestamp for when the quote was generated.
+ * @property {number} quote - The quote at the given timestamp.
+ */
 export interface FiatConversionQuote {
   quote: number;
   quotedAt: number;
 }
 
+/**
+ * Interface representing the transformed api result for currency conversion quotes.
+ */
 export interface FetchQuotesResult {
   [key: string]: FiatConversionQuote;
 }
