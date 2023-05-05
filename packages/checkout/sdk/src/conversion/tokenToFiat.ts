@@ -11,7 +11,7 @@ import { utils } from 'ethers';
 import axios from 'axios';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 
-const fetchTokenIdsFor = async (tokens: TokenInfo[]) => {
+const fetchTokenIds = async (tokens: TokenInfo[]) => {
   const coinListApi = 'https://api.coingecko.com/api/v3/coins/list';
   const tokenSymbols = tokens.map((token) => token.symbol.toLowerCase());
   let res;
@@ -41,7 +41,7 @@ const fetchQuotesFromCoinGecko = async (
   tokens: TokenInfo[],
   fiatSymbol: string
 ): Promise<FetchQuotesResult> => {
-  const tokenIds: { [key: string]: string } = await fetchTokenIdsFor(tokens);
+  const tokenIds: { [key: string]: string } = await fetchTokenIds(tokens);
   const idsString = Object.keys(tokenIds).join(',');
   const quoteApi = `https://api.coingecko.com/api/v3/simple/price?ids=${idsString}&precision=full&vs_currencies=${fiatSymbol}&include_last_updated_at=true`;
   const { data } = await withCheckoutError(
@@ -63,7 +63,7 @@ const fetchQuotesFromCoinGecko = async (
   return result;
 };
 
-const fetchConversionRatesFor = async (
+const fetchConversionRates = async (
   tokens: TokenInfo[],
   fiatSymbol: string
 ): Promise<FetchQuotesResult> => {
@@ -94,7 +94,7 @@ export const convertTokensToFiat = async ({
       CheckoutErrorType.FIAT_CURRENCY_NOT_SUPPORTED_ERROR
     );
   }
-  const quotes: FetchQuotesResult = await fetchConversionRatesFor(
+  const quotes: FetchQuotesResult = await fetchConversionRates(
     tokens,
     fiatSymbol
   );
