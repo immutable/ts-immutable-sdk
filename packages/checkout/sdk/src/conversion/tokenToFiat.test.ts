@@ -1,5 +1,8 @@
-import { ChainId, TokenFilterTypes } from '../types';
-import { getTokenAllowList } from './tokens';
+import { BigNumber } from 'ethers';
+import { SupportedFiatCurrencies } from '../types';
+import { convertTokensToFiat } from './tokenToFiat';
+import axios from 'axios';
+import { CheckoutError, CheckoutErrorType } from '../errors';
 
 const enum Icon {
   ETH = `data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg xmlns='http://www.w3.org/2000/svg' xml:space='preserve' width='100%25' height='100%25' version='1.1' shape-rendering='geometricPrecision' text-rendering='geometricPrecision' image-rendering='optimizeQuality' fill-rule='evenodd' clip-rule='evenodd'%0AviewBox='0 0 784.37 1277.39' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:xodm='http://www.corel.com/coreldraw/odm/2003'%3E%3Cg id='Layer_x0020_1'%3E%3Cmetadata id='CorelCorpID_0Corel-Layer'/%3E%3Cg id='_1421394342400'%3E%3Cg%3E%3Cpolygon fill='%23343434' fill-rule='nonzero' points='392.07,0 383.5,29.11 383.5,873.74 392.07,882.29 784.13,650.54 '/%3E%3Cpolygon fill='%238C8C8C' fill-rule='nonzero' points='392.07,0 -0,650.54 392.07,882.29 392.07,472.33 '/%3E%3Cpolygon fill='%233C3C3B' fill-rule='nonzero' points='392.07,956.52 387.24,962.41 387.24,1263.28 392.07,1277.38 784.37,724.89 '/%3E%3Cpolygon fill='%238C8C8C' fill-rule='nonzero' points='392.07,1277.38 392.07,956.52 -0,724.89 '/%3E%3Cpolygon fill='%23141414' fill-rule='nonzero' points='392.07,882.29 784.13,650.54 392.07,472.33 '/%3E%3Cpolygon fill='%23393939' fill-rule='nonzero' points='0,650.54 392.07,882.29 392.07,472.33 '/%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E%0A`,
@@ -14,114 +17,137 @@ const ethTokenInfo = {
   icon: Icon.ETH,
 };
 
-describe('token related functions', () => {
-  describe('getTokenAllowList', () => {
-    const testcases = [
-      {
-        text: 'Eth chain with no filters (ALL type)',
-        type: TokenFilterTypes.ALL,
-        chainId: ChainId.ETHEREUM,
-        exclude: [],
-        result: [
-          ethTokenInfo,
-          {
-            name: 'Immutable X',
-            symbol: 'IMX',
-            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-            decimals: 18,
-            icon: Icon.IMX,
-          },
-          {
-            name: 'Matic',
-            symbol: 'MATIC',
-            address: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
-            decimals: 18,
-            icon: Icon.MATIC,
-          },
-        ],
-      },
-      {
-        text: 'Goerli chain with Bridge feature',
-        type: TokenFilterTypes.BRIDGE,
-        chainId: ChainId.GOERLI,
-        exclude: [],
-        result: [
-          ethTokenInfo,
-          {
-            name: 'Immutable X',
-            symbol: 'IMX',
-            address: '0x1facdd0165489f373255a90304650e15481b2c85',
-            decimals: 18,
-            icon: Icon.IMX,
-          },
-          {
-            name: 'Bridge Coin',
-            symbol: 'BDC',
-            address: '0x123456789',
-            decimals: 18,
-          },
-        ],
-      },
-      {
-        text: 'Goerli chain with swap feature (no exclude list)',
-        type: TokenFilterTypes.SWAP,
-        chainId: ChainId.GOERLI,
-        exclude: [],
-        result: [
-          ethTokenInfo,
-          {
-            name: 'Immutable X',
-            symbol: 'IMX',
-            address: '0x1facdd0165489f373255a90304650e15481b2c85',
-            decimals: 18,
-            icon: Icon.IMX,
-          },
-          {
-            name: 'Swap Coin',
-            symbol: 'SWC',
-            address: '0x123456789',
-            decimals: 18,
-          },
-        ],
-      },
-      {
-        text: 'exclude list on Goerli chain with swap feature',
-        type: TokenFilterTypes.SWAP,
-        chainId: ChainId.GOERLI,
-        exclude: [
-          { address: '' },
-          { address: '0x1facdd0165489f373255a90304650e15481b2c85' },
-        ],
-        result: [
-          {
-            name: 'Swap Coin',
-            symbol: 'SWC',
-            address: '0x123456789',
-            decimals: 18,
-          },
-        ],
-      },
-      {
-        text: 'Unsupported chain',
-        type: TokenFilterTypes.SWAP,
-        chainId: 23,
-        exclude: [],
-        result: [],
-      },
-    ];
+jest.mock('axios', () => ({
+  get: jest.fn(),
+}));
 
-    testcases.forEach((testcase) => {
-      it(`should return the filtered list of allowed tokens for a given ${testcase.text}`, async () => {
-        await expect(
-          await getTokenAllowList({
-            type: testcase.type,
-            chainId: testcase.chainId,
-            exclude: testcase.exclude,
-          })
-        ).toEqual({
-          tokens: testcase.result,
+describe('tokenToFiat', () => {
+  describe('convertTokensToFiat', () => {
+    it('should convert a given amount of token to a given fiat currency', async () => {
+      (axios.get as unknown as jest.Mock)
+        .mockResolvedValueOnce({
+          data: [
+            {
+              id: 'ethereum',
+              symbol: 'eth',
+            },
+          ],
+        })
+        .mockResolvedValueOnce({
+          data: {
+            ethereum: {
+              usd: 1000.0,
+              last_updated_at: 12345,
+            },
+          },
         });
+
+      const amount = BigNumber.from('1000000000000000000');
+      const res = await convertTokensToFiat({
+        amounts: {
+          ETH: {
+            amount,
+            token: ethTokenInfo,
+          },
+        },
+        fiatSymbol: SupportedFiatCurrencies.USD,
       });
+
+      expect(res).toEqual({
+        ETH: {
+          token: ethTokenInfo,
+          fiatSymbol: SupportedFiatCurrencies.USD,
+          quotedAt: 12345,
+          quote: 1000.0,
+          amount: amount,
+          convertedAmount: 1000.0,
+        },
+      });
+    });
+
+    it('should not return a conversion if the token cant be found on the exchange', async () => {
+      (axios.get as unknown as jest.Mock)
+        .mockResolvedValueOnce({
+          data: [
+            {
+              id: 'ethereum',
+              symbol: 'eth',
+            },
+          ],
+        })
+        .mockResolvedValueOnce({
+          data: [],
+        });
+
+      const amount = BigNumber.from('1000000000000000000');
+
+      const res = await convertTokensToFiat({
+        amounts: {
+          ETH: {
+            amount,
+            token: ethTokenInfo,
+          },
+        },
+        fiatSymbol: SupportedFiatCurrencies.USD,
+      });
+
+      expect(res).toEqual({});
+    });
+
+    it('should throw a checkout error if the token isnt supported by immutable', async () => {
+      (axios.get as unknown as jest.Mock).mockResolvedValueOnce({
+        data: [],
+      });
+
+      const amount = BigNumber.from('1000000000000000000');
+
+      await expect(
+        convertTokensToFiat({
+          amounts: {
+            WTF: {
+              amount,
+              token: {
+                symbol: 'WTF',
+                name: 'wtf',
+                icon: '',
+                decimals: 18,
+                address: 'abc123',
+              },
+            },
+          },
+          fiatSymbol: SupportedFiatCurrencies.USD,
+        })
+      ).rejects.toThrow(
+        new CheckoutError(
+          'Token is not supported',
+          CheckoutErrorType.FIAT_CONVERSION_ERROR
+        )
+      );
+    });
+
+    it('should throw a checkout error if the fiat currency isnt supported by immutable', async () => {
+      (axios.get as unknown as jest.Mock).mockResolvedValueOnce({
+        data: [],
+      });
+
+      const amount = BigNumber.from('1000000000000000000');
+
+      await expect(
+        convertTokensToFiat({
+          amounts: {
+            ETH: {
+              amount,
+              token: ethTokenInfo,
+            },
+          },
+          fiatSymbol: 'EUR' as SupportedFiatCurrencies,
+        })
+      ).rejects.toThrow(
+        new CheckoutError(
+          'Fiat currency is not supported',
+          CheckoutErrorType.FIAT_CONVERSION_ERROR
+        )
+      );
     });
   });
 });
