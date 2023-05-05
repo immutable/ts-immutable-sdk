@@ -3,7 +3,7 @@ import {
   ConnectionProviders,
   SwapWidgetReact,
   CheckoutWidgets,
-} from '@imtbl/checkout-widgets-react';
+} from '@imtbl/checkout-widgets';
 
 function SwapUI() {
   CheckoutWidgets({

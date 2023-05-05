@@ -3,7 +3,7 @@ import {
   ConnectionProviders,
   CheckoutWidgets,
   BuyWidgetReact,
-} from '@imtbl/checkout-widgets-react';
+} from '@imtbl/checkout-widgets';
 
 function BuyUI() {
   CheckoutWidgets({

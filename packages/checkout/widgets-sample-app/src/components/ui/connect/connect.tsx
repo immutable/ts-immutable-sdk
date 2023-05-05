@@ -9,7 +9,7 @@ import {
   ConnectionProviders,
   ConnectWidgetReact,
   CheckoutWidgets,
-} from '@imtbl/checkout-widgets-react';
+} from '@imtbl/checkout-widgets';
 
 function ConnectUI() {
   CheckoutWidgets({

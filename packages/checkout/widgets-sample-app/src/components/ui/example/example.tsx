@@ -6,7 +6,7 @@ import {
   CheckoutWidgets,
   CheckoutWidgetTagNames,
   ExampleWidgetReact,
-} from '@imtbl/checkout-widgets-react';
+} from '@imtbl/checkout-widgets';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider } from '@ethersproject/providers';
 import { useState } from 'react';

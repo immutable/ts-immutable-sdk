@@ -59,9 +59,9 @@
     "packages/internal/bridge/bridge-sample-app",
     "packages/checkout/sdk",
     "packages/checkout/sdk-sample-app",
-    "packages/checkout/widgets",
+    "packages/checkout/widgets-lib",
     "packages/checkout/widgets-sample-app",
-    "packages/checkout/widgets-react",
+    "packages/checkout/widgets",
     "packages/economy/sdk",
     "packages/economy/playground",
     "packages/economy/services"

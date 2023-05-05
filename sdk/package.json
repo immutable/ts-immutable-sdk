@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@imtbl/checkout-sdk": "0.0.0",
-    "@imtbl/checkout-widgets-react": "0.0.0",
+    "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
     "@imtbl/passport": "0.0.0",

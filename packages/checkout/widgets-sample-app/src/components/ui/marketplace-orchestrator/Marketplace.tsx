@@ -8,7 +8,7 @@ import {
   IMTBLWidgetEvents,
   WalletWidgetReact,
   WidgetTheme,
-} from '@imtbl/checkout-widgets-react';
+} from '@imtbl/checkout-widgets';
 import { useEffect, useMemo, useState } from 'react';
 import { useConnectWidget } from './useConnectWidget.hook';
 import { useWalletWidget } from './useWalletWidget.hook';

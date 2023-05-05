@@ -4,7 +4,7 @@ import {
   Network,
   BridgeWidgetReact,
   CheckoutWidgets,
-} from '@imtbl/checkout-widgets-react';
+} from '@imtbl/checkout-widgets';
 
 function BridgeUI() {
   CheckoutWidgets({

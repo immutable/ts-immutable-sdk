@@ -8,7 +8,7 @@ import {
   WalletNetworkSwitchEvent,
   CheckoutWidgets,
   WalletWidgetReact,
-} from '@imtbl/checkout-widgets-react';
+} from '@imtbl/checkout-widgets';
 
 function WalletUI() {
   CheckoutWidgets({
