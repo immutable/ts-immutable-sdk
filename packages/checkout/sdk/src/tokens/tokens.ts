@@ -117,7 +117,7 @@ export const convertTokensToFiat = async ({
     if (!allowedTokens.includes(token.address)) {
       throw new CheckoutError(
         'Token is not supported',
-        CheckoutErrorType.FIAT_CONVERSION_ERROR
+        CheckoutErrorType.TOKEN_NOT_SUPPORTED_ERROR
       );
     }
   });
@@ -125,7 +125,7 @@ export const convertTokensToFiat = async ({
   if (!Object.values(SupportedFiatCurrencies).includes(fiatSymbol)) {
     throw new CheckoutError(
       'Fiat currency is not supported',
-      CheckoutErrorType.FIAT_CONVERSION_ERROR
+      CheckoutErrorType.FIAT_CURRENCY_NOT_SUPPORTED_ERROR
     );
   }
   const quotes: any = await fetchConversionRatesFor(tokens, fiatSymbol);
