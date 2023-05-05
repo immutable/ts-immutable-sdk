@@ -7,7 +7,7 @@ import { text } from '../../../resources/text/textConfig';
 import { TotalTokenBalance } from '../components/TotalTokenBalance/TotalTokenBalance';
 import { TokenBalanceList } from '../components/TokenBalanceList/TokenBalanceList';
 import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { WalletContext } from '../context/WalletContext';
 import {
   sendAddCoinsEvent,
@@ -17,10 +17,15 @@ import {
   WalletBalanceContainerStyle,
   WalletBalanceItemStyle,
 } from './WalletBalancesStyles';
+import { ChainId } from '@imtbl/checkout-sdk';
 
 export const WalletBalances = () => {
   const { walletState } = useContext(WalletContext);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
+  const showAddCoins = useMemo(
+    () => walletState.network?.chainId === ChainId.POLYGON,
+    [walletState.network?.chainId]
+  );
 
   useEffect(() => {
     let totalAmount = 0.0;
@@ -47,15 +52,26 @@ export const WalletBalances = () => {
       }
       footer={<FooterLogo />}
     >
-      <Box sx={WalletBalanceContainerStyle}>
-        <NetworkMenu />
-        <TotalTokenBalance totalBalance={totalFiatAmount} />
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          rowGap: 'base.spacing.x2',
+        }}
+      >
+        <Box sx={WalletBalanceContainerStyle}>
+          <NetworkMenu />
+          <TotalTokenBalance totalBalance={totalFiatAmount} />
           <Box
-            sx={WalletBalanceItemStyle(walletState.tokenBalances.length > 2)}
+            sx={WalletBalanceItemStyle(
+              showAddCoins,
+              walletState.tokenBalances.length > 2
+            )}
           >
             <TokenBalanceList balanceInfoItems={walletState.tokenBalances} />
           </Box>
+        </Box>
+        {showAddCoins && (
           <MenuItem
             testId="add-coins"
             emphasized
@@ -68,7 +84,7 @@ export const WalletBalances = () => {
             <MenuItem.FramedIcon icon="Add"></MenuItem.FramedIcon>
             <MenuItem.Label>Add coins</MenuItem.Label>
           </MenuItem>
-        </Box>
+        )}
       </Box>
     </SimpleLayout>
   );

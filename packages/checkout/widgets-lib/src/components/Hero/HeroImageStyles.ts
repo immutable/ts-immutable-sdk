@@ -1,6 +1,7 @@
-import purpleDownGradient from '../../assets/PurpleDownGradient.svg';
-
 export const HeroImageStyles = {
+  position: 'absolute',
+  top: '0',
+  left: '0',
   height: '100%',
   width: '100%',
   display: 'flex',
@@ -9,7 +10,7 @@ export const HeroImageStyles = {
   alignItems: 'center',
 };
 export const HeroBackGroundStyles = {
+  position: 'relative',
   height: '100%',
   width: '100%',
-  backgroundImage: `url(${purpleDownGradient})`,
 };

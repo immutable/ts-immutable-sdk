@@ -9,7 +9,7 @@ export const SimpleLayoutStyle = {
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
-  backgroundColor: 'base.color.brand.2',
+  backgroundColor: 'base.color.neutral.1000',
   height: '100%',
   width: '100%',
 };
@@ -22,6 +22,7 @@ export const HeaderStyle = (floatHeader: boolean) => {
     alignItems: 'center',
     width: '100%',
     position: floatHeader ? 'absolute' : 'relative',
+    zIndex: 10
   };
 };
 
