@@ -72,5 +72,4 @@ export enum CompletionStatus {
 
 export interface WaitForResponse {
   status: CompletionStatus;
-  error: BridgeError | null;
 }

@@ -1,5 +1,5 @@
 import { ImmutableConfiguration, Environment } from '@imtbl/config';
-import { ethers, utils } from 'ethers';
+import { ethers } from 'ethers';
 import {
   TokenBridge,
   BridgeConfiguration,
@@ -141,7 +141,7 @@ async function deposit() {
   } else {
     // Alert condition. Shouldn't happen
     console.log(
-      `Deposit Failed on L2 with status ${bridgeResult.status} and error ${bridgeResult.error} `
+      `Deposit Failed on L2 with status ${bridgeResult.status}`
     );
   }
 }

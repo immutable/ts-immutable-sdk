@@ -4,6 +4,7 @@ export enum BridgeErrorType {
   INVALID_AMOUNT = 'INVALID_AMOUNT',
   INTERNAL_ERROR = 'INTERNAL_ERROR',
   PROVIDER_ERROR = 'PROVIDER_ERROR',
+  TRANSACTION_REVERTED = 'TRANSACTION_REVERTED'
 }
 
 export class BridgeError extends Error {

@@ -15,6 +15,8 @@ import {
 import { RootERC20Predicate } from 'contracts/ABIs/RootERC20Predicate';
 import { ERC20 } from 'contracts/ABIs/ERC20';
 import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
+import { RootStateSender } from 'contracts/ABIs/RootStateSender';
+import { ChildStateReceiver } from 'contracts/ABIs/ChildStateReceiver';
 
 export class TokenBridge {
   private config: BridgeConfiguration;
@@ -193,12 +195,80 @@ export class TokenBridge {
   }
 
   public async waitForDeposit(
-    txHash: WaitForRequest
+    req: WaitForRequest
   ): Promise<WaitForResponse> {
+    const rootTxReceipt: ethers.providers.TransactionReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(async () => {
+      return await this.config.rootProvider.waitForTransaction(req.transactionHash, 3)
+    }, BridgeErrorType.PROVIDER_ERROR);
+
+    // Throw an error if the transaction was reverted
+    if (rootTxReceipt.status !== 1) {
+      throw new BridgeError(`${rootTxReceipt.transactionHash} on rootchain was reverted`, BridgeErrorType.TRANSACTION_REVERTED);
+    }
+
+    // Get the state sync ID from the transaction receipt
+    const stateSyncID = await withBridgeError<string>(async () => {
+      return await this.getRootStateSyncID(rootTxReceipt);
+    }, BridgeErrorType.PROVIDER_ERROR)
+
+    const result: CompletionStatus = await withBridgeError<CompletionStatus>(async () => {
+      return await this.waitForChildStateSync(stateSyncID, 10000);
+    }, BridgeErrorType.PROVIDER_ERROR);
+
     return {
-      status: CompletionStatus.SUCCESS,
-      error: null,
+      status: result,
     };
+  }
+  private async waitForChildStateSync(    
+    stateSyncID: string,
+    interval: number) : Promise<CompletionStatus> {
+      const childStateReceiver = new ethers.Contract(this.config.bridgeContracts.childChainStateReceiver, ChildStateReceiver, this.config.childProvider);
+
+      // Set up an event filter for the StateSyncResult event
+      const eventFilter = childStateReceiver.filters["StateSyncResult"]();
+  
+      let childDepositEvent;
+      while (true) {  
+        // Query for past events that match the event filter
+        const pastEvents = await childStateReceiver.queryFilter(eventFilter);
+        childDepositEvent = pastEvents.find((ev) => {
+          if (!ev.args) return false;
+          if (!ev.args.counter) return false;
+          return (ev.args.counter.toString() === stateSyncID) 
+        });
+        if (childDepositEvent) {
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, interval));
+      }
+      if (!childDepositEvent) throw new Error("failed to find child deposit event");
+      if (!childDepositEvent.args) throw new Error("child deposit event has no args");
+      if (!childDepositEvent.args.status) throw new Error("child deposit event has no status")
+      if (childDepositEvent.args.status) {
+        return CompletionStatus.SUCCESS
+      } else {
+        return CompletionStatus.FAILED
+      }
+  }
+
+  private async getRootStateSyncID(txReceipt: ethers.providers.TransactionReceipt): Promise<string> {
+    const stateSenderInterface = new ethers.utils.Interface(RootStateSender);
+
+    // Get the StateSynced event log from the transaction receipt
+    const stateSenderLogs = txReceipt.logs.filter((log) => log.address.toLowerCase() == this.config.bridgeContracts.rootChainStateSender.toLowerCase())
+    if (stateSenderLogs.length !== 1) {
+      throw new Error(`expected at least 1 log in tx ${txReceipt.transactionHash}`);
+    }
+    const stateSyncEvent = stateSenderInterface.parseLog(stateSenderLogs[0]);
+
+    // Throw an error if the event log doesn't match the expected format
+    if (stateSyncEvent.signature !== "StateSynced(uint256,address,address,bytes)") {
+      throw new Error(`expected state sync event in tx ${txReceipt.transactionHash}`);
+    }
+
+    // Return the state sync ID as a string
+    const stateSyncID = stateSyncEvent.args.id.toString();
+    return stateSyncID;
   }
 
   private async getFeeForToken(
