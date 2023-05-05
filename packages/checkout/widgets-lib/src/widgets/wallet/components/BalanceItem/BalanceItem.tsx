@@ -68,20 +68,22 @@ export const BalanceItem = (props: BalanceItemProps) => {
           price={balanceInfo.balance}
           fiatAmount={`≈ USD $ -.--`}
         />
-        <OverflowPopoverMenu size="small">
-          <MenuItem sx={ShowMenuItem(isAddCoinEnabled)}>
-            <MenuItem.Icon icon="Add"></MenuItem.Icon>
-            <MenuItem.Label>{`Add ${balanceInfo.symbol}`}</MenuItem.Label>
-          </MenuItem>
-          <MenuItem sx={ShowMenuItem(isSwapCoinEnabled)}>
-            <MenuItem.Icon icon="Exchange"></MenuItem.Icon>
-            <MenuItem.Label>{`Swap ${balanceInfo.symbol}`}</MenuItem.Label>
-          </MenuItem>
-          <MenuItem sx={ShowMenuItem(isMoveCoinEnabled)}>
-            <MenuItem.Icon icon="Minting"></MenuItem.Icon>
-            <MenuItem.Label>{`Move ${balanceInfo.symbol}`}</MenuItem.Label>
-          </MenuItem>
-        </OverflowPopoverMenu>
+        {(isAddCoinEnabled || isSwapCoinEnabled || isMoveCoinEnabled) && (
+          <OverflowPopoverMenu size="small">
+            <MenuItem sx={ShowMenuItem(isAddCoinEnabled)}>
+              <MenuItem.Icon icon="Add"></MenuItem.Icon>
+              <MenuItem.Label>{`Add ${balanceInfo.symbol}`}</MenuItem.Label>
+            </MenuItem>
+            <MenuItem sx={ShowMenuItem(isSwapCoinEnabled)}>
+              <MenuItem.Icon icon="Exchange"></MenuItem.Icon>
+              <MenuItem.Label>{`Swap ${balanceInfo.symbol}`}</MenuItem.Label>
+            </MenuItem>
+            <MenuItem sx={ShowMenuItem(isMoveCoinEnabled)}>
+              <MenuItem.Icon icon="Minting"></MenuItem.Icon>
+              <MenuItem.Label>{`Move ${balanceInfo.symbol}`}</MenuItem.Label>
+            </MenuItem>
+          </OverflowPopoverMenu>
+        )}
       </Box>
     </Box>
   );

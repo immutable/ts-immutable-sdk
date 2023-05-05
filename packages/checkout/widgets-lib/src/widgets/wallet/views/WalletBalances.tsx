@@ -22,10 +22,16 @@ import { ChainId } from '@imtbl/checkout-sdk';
 export const WalletBalances = () => {
   const { walletState } = useContext(WalletContext);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
-  const showAddCoins = useMemo(
-    () => walletState.network?.chainId === ChainId.POLYGON,
-    [walletState.network?.chainId]
-  );
+  const showAddCoins = useMemo(() => {
+    return (
+      walletState.network?.chainId === ChainId.POLYGON &&
+      Boolean(
+        walletState.supportedTopUps?.isBridgeEnabled ||
+          walletState.supportedTopUps?.isExchangeEnabled ||
+          walletState.supportedTopUps?.isOnRampEnabled
+      )
+    );
+  }, [walletState.network?.chainId, walletState.supportedTopUps]);
 
   useEffect(() => {
     let totalAmount = 0.0;
