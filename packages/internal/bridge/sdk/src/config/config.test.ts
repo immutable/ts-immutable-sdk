@@ -3,14 +3,19 @@ import { BridgeModuleConfiguration } from '../types';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { BridgeConfiguration } from './index';
 import { ETH_SEPOLIA_TO_ZKEVM_DEVNET } from 'constants/bridges';
+import { ethers } from 'ethers';
 
 describe('config', () => {
+  const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
+  const voidChildProvider = new ethers.providers.JsonRpcProvider('y');
   it('should create successfully', () => {
     const bridgeModuleConfiguration: BridgeModuleConfiguration = {
       baseConfig: new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }),
       bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      rootProvider: voidRootProvider,
+      childProvider: voidChildProvider,
     };
 
     const bridgeConfig = new BridgeConfiguration(bridgeModuleConfiguration);
@@ -23,6 +28,8 @@ describe('config', () => {
         environment: Environment.PRODUCTION,
       }),
       bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      rootProvider: voidRootProvider,
+      childProvider: voidChildProvider,
     };
 
     expect(() => new BridgeConfiguration(bridgeModuleConfiguration)).toThrow(
@@ -45,6 +52,8 @@ describe('config', () => {
           childChainStateReceiver: '0x',
         },
       },
+      rootProvider: voidRootProvider,
+      childProvider: voidChildProvider,
     };
     const bridgeConfig = new BridgeConfiguration(bridgeModuleConfiguration);
     expect(bridgeConfig.baseConfig.environment).toBe(Environment.PRODUCTION);
