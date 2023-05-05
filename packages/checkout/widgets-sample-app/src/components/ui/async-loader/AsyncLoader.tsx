@@ -3,10 +3,10 @@ import {
   CheckoutWidgetsConfig,
   ConnectionProviders,
   WidgetTheme,
-  ConnectWidgetReact,
+  ConnectReact,
   UpdateConfig,
   CheckoutWidgetTagNames,
-  WalletWidgetReact,
+  WalletReact,
   SetProvider,
 } from '@imtbl/checkout-widgets';
 
@@ -35,7 +35,7 @@ export function AsyncLoader() {
   return (
     <div>
       <h1>Async Loader Test</h1>
-      <ConnectWidgetReact providerPreference={ConnectionProviders.METAMASK} />
+      <ConnectReact providerPreference={ConnectionProviders.METAMASK} />
     </div>
   );
 }

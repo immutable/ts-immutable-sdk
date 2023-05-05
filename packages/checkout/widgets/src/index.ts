@@ -9,10 +9,10 @@ export * from './definitions/constants';
 
 export * from './definitions/config';
 
-export * from './components/BridgeWidget';
-export * from './components/BuyWidget';
-export * from './components/CheckoutWidgets';
-export * from './components/ConnectWidget';
-export * from './components/SwapWidget';
-export * from './components/WalletWidget';
-export * from './components/ExampleWidget';
+export * from './react/BridgeWidget';
+export * from './react/BuyWidget';
+export * from './CheckoutWidgets';
+export * from './react/ConnectWidget';
+export * from './react/SwapWidget';
+export * from './react/WalletWidget';
+export * from './react/ExampleWidget';

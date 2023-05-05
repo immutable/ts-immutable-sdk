@@ -1,5 +1,5 @@
-import { CheckoutWidgetsConfig } from '../definitions/config';
-import { CheckoutWidgetTagNames } from '../definitions/constants';
+import { CheckoutWidgetsConfig } from './definitions/config';
+import { CheckoutWidgetTagNames } from './definitions/constants';
 import { Web3Provider } from '@ethersproject/providers';
 
 export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {

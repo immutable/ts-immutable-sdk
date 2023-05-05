@@ -5,7 +5,7 @@ import {
   SetProvider,
   CheckoutWidgets,
   CheckoutWidgetTagNames,
-  ExampleWidgetReact,
+  ExampleReact,
 } from '@imtbl/checkout-widgets';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider } from '@ethersproject/providers';
@@ -34,7 +34,7 @@ function ExampleUI() {
   return (
     <div className="Swap">
       <h1 className="sample-heading">Checkout Example (Web Component)</h1>
-      <ExampleWidgetReact providerPreference={ConnectionProviders.METAMASK} />
+      <ExampleReact providerPreference={ConnectionProviders.METAMASK} />
       <br />
       <button onClick={() => setProvider()}>Set Provider</button>
       <br />

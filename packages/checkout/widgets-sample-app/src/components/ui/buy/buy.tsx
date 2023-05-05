@@ -2,7 +2,7 @@ import {
   WidgetTheme,
   ConnectionProviders,
   CheckoutWidgets,
-  BuyWidgetReact,
+  BuyReact,
 } from '@imtbl/checkout-widgets';
 
 function BuyUI() {
@@ -12,7 +12,7 @@ function BuyUI() {
   return (
     <div className="Buy">
       <h1 className="sample-heading">Checkout Buy Order (Web Component)</h1>
-      <BuyWidgetReact
+      <BuyReact
         providerPreference={ConnectionProviders.METAMASK}
         orderId={`1234`}
       />

@@ -1,12 +1,12 @@
 import {
   CheckoutWidgets,
   ConnectEventType,
-  ConnectWidgetReact,
+  ConnectReact,
   ConnectionFailed,
   ConnectionProviders,
   ConnectionSuccess,
   IMTBLWidgetEvents,
-  WalletWidgetReact,
+  WalletReact,
   WidgetTheme,
 } from '@imtbl/checkout-widgets';
 import { useEffect, useMemo, useState } from 'react';
@@ -40,12 +40,12 @@ export const Marketplace = () => {
       {!providerPreference && (
         <button onClick={openConnectWidget}>Connect Wallet</button>
       )}
-      {showConnectWidget && <ConnectWidgetReact />}
+      {showConnectWidget && <ConnectReact />}
       {providerPreference && !showWalletWidget && (
         <button onClick={openWalletWidget}>My Wallet</button>
       )}
       {showWalletWidget && (
-        <WalletWidgetReact
+        <WalletReact
           providerPreference={providerPreference as ConnectionProviders}
         />
       )}

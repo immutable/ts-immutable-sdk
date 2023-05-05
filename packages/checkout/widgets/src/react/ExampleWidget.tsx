@@ -6,26 +6,23 @@ import {
   WidgetTheme,
 } from '../definitions/constants';
 
-export interface BridgeWidgetReactProps {
+export interface ExampleReactProps {
   providerPreference: ConnectionProviders;
   fromContractAddress?: string;
   amount?: string;
   fromNetwork?: Network;
 }
 
-export function BridgeWidgetReact(props: BridgeWidgetReactProps) {
+export function ExampleReact(props: ExampleReactProps) {
   const { providerPreference, fromContractAddress, amount, fromNetwork } =
     props;
 
   const config = window.ImtblCheckoutWidgetConfig;
 
   return (
-    <imtbl-bridge
+    <imtbl-example
       providerPreference={providerPreference ?? ConnectionProviders.METAMASK}
       theme={config.theme ?? WidgetTheme.DARK}
-      fromContractAddress={fromContractAddress ?? ''}
-      fromNetwork={fromNetwork ?? ''}
-      amount={amount ?? ''}
-    ></imtbl-bridge>
+    ></imtbl-example>
   );
 }

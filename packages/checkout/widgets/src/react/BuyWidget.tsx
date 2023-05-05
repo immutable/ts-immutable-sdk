@@ -2,19 +2,21 @@ import React from 'react';
 
 import { ConnectionProviders, WidgetTheme } from '../definitions/constants';
 
-export interface ConnectWidgetReactProps {
-  providerPreference?: ConnectionProviders;
+export interface BuyReactProps {
+  providerPreference: ConnectionProviders;
+  orderId: string;
 }
 
-export function ConnectWidgetReact(props: ConnectWidgetReactProps) {
-  const { providerPreference } = props;
+export function BuyReact(props: BuyReactProps) {
+  const { providerPreference, orderId } = props;
 
   const config = window.ImtblCheckoutWidgetConfig;
 
   return (
-    <imtbl-connect
+    <imtbl-buy
       providerPreference={providerPreference ?? ConnectionProviders.METAMASK}
       theme={config.theme ?? WidgetTheme.DARK}
-    ></imtbl-connect>
+      orderId={orderId}
+    ></imtbl-buy>
   );
 }

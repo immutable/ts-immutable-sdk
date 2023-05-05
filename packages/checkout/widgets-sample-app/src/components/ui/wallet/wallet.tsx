@@ -7,7 +7,7 @@ import {
   WidgetTheme,
   WalletNetworkSwitchEvent,
   CheckoutWidgets,
-  WalletWidgetReact,
+  WalletReact,
 } from '@imtbl/checkout-widgets';
 
 function WalletUI() {
@@ -46,7 +46,7 @@ function WalletUI() {
   return (
     <div className="Connect">
       <h1 className="sample-heading">Checkout Wallet (Web Component)</h1>
-      <WalletWidgetReact providerPreference={ConnectionProviders.METAMASK} />
+      <WalletReact providerPreference={ConnectionProviders.METAMASK} />
     </div>
   );
 }

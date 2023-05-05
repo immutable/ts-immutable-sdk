@@ -2,7 +2,7 @@ import {
   WidgetTheme,
   ConnectionProviders,
   Network,
-  BridgeWidgetReact,
+  BridgeReact,
   CheckoutWidgets,
 } from '@imtbl/checkout-widgets';
 
@@ -15,7 +15,7 @@ function BridgeUI() {
     <div className="Swap">
       <h1 className="sample-heading">Checkout Bridge (Web Component)</h1>
 
-      <BridgeWidgetReact
+      <BridgeReact
         providerPreference={ConnectionProviders.METAMASK}
         amount="50"
         fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"

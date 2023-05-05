@@ -2,19 +2,19 @@ import React from 'react';
 
 import { ConnectionProviders, WidgetTheme } from '../definitions/constants';
 
-export interface WalletWidgetReactProps {
+export interface ConnectReactProps {
   providerPreference?: ConnectionProviders;
 }
 
-export function WalletWidgetReact(props: WalletWidgetReactProps) {
+export function ConnectReact(props: ConnectReactProps) {
   const { providerPreference } = props;
 
   const config = window.ImtblCheckoutWidgetConfig;
 
   return (
-    <imtbl-wallet
+    <imtbl-connect
       providerPreference={providerPreference ?? ConnectionProviders.METAMASK}
       theme={config.theme ?? WidgetTheme.DARK}
-    ></imtbl-wallet>
+    ></imtbl-connect>
   );
 }
