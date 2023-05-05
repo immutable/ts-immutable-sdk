@@ -8,7 +8,7 @@ import {
   ImtblTransitionExampleProps,
   ImtblInnerWidgetExampleProps,
   ImtblOuterWidgetExampleProps,
-} from './index';
+} from './src/index';
 
 declare global {
   interface Window {

@@ -9,7 +9,9 @@ export enum WidgetTheme {
   DARK = 'dark',
   CUSTOM = 'custom',
 }
-export { ConnectionProviders } from '@imtbl/checkout-sdk';
+export enum ConnectionProviders {
+  METAMASK = 'metamask',
+}
 
 export enum CheckoutWidgetTagNames {
   CONNECT = 'imtbl-connect',

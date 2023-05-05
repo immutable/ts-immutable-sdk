@@ -34,5 +34,6 @@
     "build:dist": "npm i && npm run build && npm run dist",
     "start": "parcel watch"
   },
-  "source": "index.ts"
+  "source": "src/index.ts",
+  "types": "dist/index.d.ts"
 }
