@@ -9,7 +9,7 @@ export enum WidgetTheme {
   DARK = 'dark',
   CUSTOM = 'custom',
 }
-export enum ConnectionProviders {
+export enum WidgetConnectionProviders {
   METAMASK = 'metamask',
 }
 

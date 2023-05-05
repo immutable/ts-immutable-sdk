@@ -1,4 +1,4 @@
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WidgetConnectionProviders } from '../constants';
 
 export enum ConnectEventType {
   SUCCESS = 'success',
@@ -12,7 +12,7 @@ export type ConnectEvent<T> = {
 };
 
 export type ConnectionSuccess = {
-  providerPreference: ConnectionProviders;
+  providerPreference: WidgetConnectionProviders;
 };
 
 export type ConnectionFailed = {

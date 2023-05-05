@@ -1,4 +1,7 @@
-import { WidgetTheme, ConnectionProviders } from '@imtbl/checkout-widgets';
+import {
+  WidgetTheme,
+  WidgetConnectionProviders,
+} from '@imtbl/checkout-widgets';
 import { useState, useEffect } from 'react';
 
 function BuyWebView() {
@@ -13,7 +16,7 @@ function BuyWebView() {
 
   return (
     <imtbl-buy
-      providerPreference={ConnectionProviders.METAMASK}
+      providerPreference={WidgetConnectionProviders.METAMASK}
       theme={theme}
       orderId={'2345'}
     ></imtbl-buy>

@@ -3,7 +3,7 @@ import {
   ConnectEventType,
   ConnectReact,
   ConnectionFailed,
-  ConnectionProviders,
+  WidgetConnectionProviders,
   ConnectionSuccess,
   IMTBLWidgetEvents,
   WalletReact,
@@ -46,7 +46,7 @@ export const Marketplace = () => {
       )}
       {showWalletWidget && (
         <WalletReact
-          providerPreference={providerPreference as ConnectionProviders}
+          providerPreference={providerPreference as WidgetConnectionProviders}
         />
       )}
     </div>

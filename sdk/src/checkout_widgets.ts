@@ -1,1 +1,1 @@
-export * from '../../packages/checkout/widgets-react/dist/types';
+export * from '@imtbl/checkout-widgets';

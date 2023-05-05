@@ -5,8 +5,9 @@ import {
   GetTokenAllowListResult,
   TokenFilterTypes,
   TokenInfo,
+  ConnectionProviders,
 } from '@imtbl/checkout-sdk';
-import { ConnectionProviders, WidgetTheme } from '@imtbl/checkout-widgets';
+import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { SwapForm } from './components/SwapForm';
 import { SwapWidgetStyle } from './SwapStyles';

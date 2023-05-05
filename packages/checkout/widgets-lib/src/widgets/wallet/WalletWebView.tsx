@@ -1,4 +1,7 @@
-import { WidgetTheme, ConnectionProviders } from '@imtbl/checkout-widgets';
+import {
+  WidgetTheme,
+  WidgetConnectionProviders,
+} from '@imtbl/checkout-widgets';
 import { useState, useEffect } from 'react';
 
 function WalletWebView() {
@@ -13,7 +16,7 @@ function WalletWebView() {
 
   return (
     <imtbl-wallet
-      providerPreference={ConnectionProviders.METAMASK}
+      providerPreference={WidgetConnectionProviders.METAMASK}
       theme={theme}
     ></imtbl-wallet>
   );

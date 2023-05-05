@@ -1,9 +1,12 @@
 import React from 'react';
 
-import { ConnectionProviders, WidgetTheme } from '../definitions/constants';
+import {
+  WidgetConnectionProviders,
+  WidgetTheme,
+} from '../definitions/constants';
 
 export interface SwapReactProps {
-  providerPreference: ConnectionProviders;
+  providerPreference: WidgetConnectionProviders;
   fromContractAddress?: string;
   amount?: string;
   toContractAddress?: string;
@@ -17,7 +20,9 @@ export function SwapReact(props: SwapReactProps) {
 
   return (
     <imtbl-swap
-      providerPreference={providerPreference ?? ConnectionProviders.METAMASK}
+      providerPreference={
+        providerPreference ?? WidgetConnectionProviders.METAMASK
+      }
       theme={config.theme ?? WidgetTheme.DARK}
       fromContractAddress={fromContractAddress ?? ''}
       toContractAddress={toContractAddress ?? ''}

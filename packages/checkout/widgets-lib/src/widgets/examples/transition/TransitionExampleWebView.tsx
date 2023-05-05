@@ -1,6 +1,6 @@
 import {
   WidgetTheme,
-  ConnectionProviders,
+  WidgetConnectionProviders,
   CheckoutWidgets,
 } from '@imtbl/checkout-widgets';
 import { useState, useEffect } from 'react';
@@ -18,7 +18,7 @@ function TransitionExampleWebView() {
 
   return (
     <imtbl-transition-example
-      providerPreference={ConnectionProviders.METAMASK}
+      providerPreference={WidgetConnectionProviders.METAMASK}
       theme={theme}
     ></imtbl-transition-example>
   );

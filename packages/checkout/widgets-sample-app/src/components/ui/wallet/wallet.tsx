@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WidgetConnectionProviders } from '@imtbl/checkout-widgets';
 
 import {
   WalletEventType,
@@ -46,7 +46,7 @@ function WalletUI() {
   return (
     <div className="Connect">
       <h1 className="sample-heading">Checkout Wallet (Web Component)</h1>
-      <WalletReact providerPreference={ConnectionProviders.METAMASK} />
+      <WalletReact providerPreference={WidgetConnectionProviders.METAMASK} />
     </div>
   );
 }

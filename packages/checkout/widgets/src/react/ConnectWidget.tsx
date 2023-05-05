@@ -1,9 +1,12 @@
 import React from 'react';
 
-import { ConnectionProviders, WidgetTheme } from '../definitions/constants';
+import {
+  WidgetConnectionProviders,
+  WidgetTheme,
+} from '../definitions/constants';
 
 export interface ConnectReactProps {
-  providerPreference?: ConnectionProviders;
+  providerPreference?: WidgetConnectionProviders;
 }
 
 export function ConnectReact(props: ConnectReactProps) {
@@ -13,7 +16,9 @@ export function ConnectReact(props: ConnectReactProps) {
 
   return (
     <imtbl-connect
-      providerPreference={providerPreference ?? ConnectionProviders.METAMASK}
+      providerPreference={
+        providerPreference ?? WidgetConnectionProviders.METAMASK
+      }
       theme={config.theme ?? WidgetTheme.DARK}
     ></imtbl-connect>
   );

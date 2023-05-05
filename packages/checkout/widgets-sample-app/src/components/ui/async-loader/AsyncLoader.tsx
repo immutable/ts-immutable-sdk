@@ -1,7 +1,7 @@
 import {
   CheckoutWidgets,
   CheckoutWidgetsConfig,
-  ConnectionProviders,
+  WidgetConnectionProviders,
   WidgetTheme,
   ConnectReact,
   UpdateConfig,
@@ -35,7 +35,7 @@ export function AsyncLoader() {
   return (
     <div>
       <h1>Async Loader Test</h1>
-      <ConnectReact providerPreference={ConnectionProviders.METAMASK} />
+      <ConnectReact providerPreference={WidgetConnectionProviders.METAMASK} />
     </div>
   );
 }

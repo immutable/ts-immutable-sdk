@@ -1,13 +1,13 @@
 import React from 'react';
 
 import {
-  ConnectionProviders,
+  WidgetConnectionProviders,
   Network,
   WidgetTheme,
 } from '../definitions/constants';
 
 export interface BridgeReactProps {
-  providerPreference: ConnectionProviders;
+  providerPreference: WidgetConnectionProviders;
   fromContractAddress?: string;
   amount?: string;
   fromNetwork?: Network;
@@ -21,7 +21,9 @@ export function BridgeReact(props: BridgeReactProps) {
 
   return (
     <imtbl-bridge
-      providerPreference={providerPreference ?? ConnectionProviders.METAMASK}
+      providerPreference={
+        providerPreference ?? WidgetConnectionProviders.METAMASK
+      }
       theme={config.theme ?? WidgetTheme.DARK}
       fromContractAddress={fromContractAddress ?? ''}
       fromNetwork={fromNetwork ?? ''}

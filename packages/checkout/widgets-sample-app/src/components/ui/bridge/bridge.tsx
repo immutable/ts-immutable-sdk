@@ -1,6 +1,6 @@
 import {
   WidgetTheme,
-  ConnectionProviders,
+  WidgetConnectionProviders,
   Network,
   BridgeReact,
   CheckoutWidgets,
@@ -16,7 +16,7 @@ function BridgeUI() {
       <h1 className="sample-heading">Checkout Bridge (Web Component)</h1>
 
       <BridgeReact
-        providerPreference={ConnectionProviders.METAMASK}
+        providerPreference={WidgetConnectionProviders.METAMASK}
         amount="50"
         fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
         fromNetwork={Network.ETHEREUM}

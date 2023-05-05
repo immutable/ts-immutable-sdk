@@ -1,9 +1,12 @@
 import React from 'react';
 
-import { ConnectionProviders, WidgetTheme } from '../definitions/constants';
+import {
+  WidgetConnectionProviders,
+  WidgetTheme,
+} from '../definitions/constants';
 
 export interface WalletReactProps {
-  providerPreference?: ConnectionProviders;
+  providerPreference?: WidgetConnectionProviders;
 }
 
 export function WalletReact(props: WalletReactProps) {
@@ -13,7 +16,9 @@ export function WalletReact(props: WalletReactProps) {
 
   return (
     <imtbl-wallet
-      providerPreference={providerPreference ?? ConnectionProviders.METAMASK}
+      providerPreference={
+        providerPreference ?? WidgetConnectionProviders.METAMASK
+      }
       theme={config.theme ?? WidgetTheme.DARK}
     ></imtbl-wallet>
   );

@@ -1,6 +1,6 @@
 import {
   WidgetTheme,
-  ConnectionProviders,
+  WidgetConnectionProviders,
   CheckoutWidgets,
   BuyReact,
 } from '@imtbl/checkout-widgets';
@@ -13,7 +13,7 @@ function BuyUI() {
     <div className="Buy">
       <h1 className="sample-heading">Checkout Buy Order (Web Component)</h1>
       <BuyReact
-        providerPreference={ConnectionProviders.METAMASK}
+        providerPreference={WidgetConnectionProviders.METAMASK}
         orderId={`1234`}
       />
     </div>

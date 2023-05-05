@@ -1,13 +1,13 @@
 import React from 'react';
 
 import {
-  ConnectionProviders,
+  WidgetConnectionProviders,
   Network,
   WidgetTheme,
 } from '../definitions/constants';
 
 export interface ExampleReactProps {
-  providerPreference: ConnectionProviders;
+  providerPreference: WidgetConnectionProviders;
   fromContractAddress?: string;
   amount?: string;
   fromNetwork?: Network;
@@ -21,7 +21,9 @@ export function ExampleReact(props: ExampleReactProps) {
 
   return (
     <imtbl-example
-      providerPreference={providerPreference ?? ConnectionProviders.METAMASK}
+      providerPreference={
+        providerPreference ?? WidgetConnectionProviders.METAMASK
+      }
       theme={config.theme ?? WidgetTheme.DARK}
     ></imtbl-example>
   );

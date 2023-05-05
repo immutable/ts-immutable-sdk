@@ -1,4 +1,7 @@
-import { WidgetTheme, ConnectionProviders } from '@imtbl/checkout-widgets';
+import {
+  WidgetTheme,
+  WidgetConnectionProviders,
+} from '@imtbl/checkout-widgets';
 import { useState, useEffect } from 'react';
 
 function DiExampleWebView() {
@@ -13,7 +16,7 @@ function DiExampleWebView() {
 
   return (
     <imtbl-example
-      providerPreference={ConnectionProviders.METAMASK}
+      providerPreference={WidgetConnectionProviders.METAMASK}
       theme={theme}
     ></imtbl-example>
   );

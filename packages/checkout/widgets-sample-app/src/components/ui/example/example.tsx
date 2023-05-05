@@ -1,6 +1,6 @@
 import {
   WidgetTheme,
-  ConnectionProviders,
+  WidgetConnectionProviders,
   Network,
   SetProvider,
   CheckoutWidgets,
@@ -34,7 +34,7 @@ function ExampleUI() {
   return (
     <div className="Swap">
       <h1 className="sample-heading">Checkout Example (Web Component)</h1>
-      <ExampleReact providerPreference={ConnectionProviders.METAMASK} />
+      <ExampleReact providerPreference={WidgetConnectionProviders.METAMASK} />
       <br />
       <button onClick={() => setProvider()}>Set Provider</button>
       <br />

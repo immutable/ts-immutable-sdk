@@ -1,9 +1,12 @@
 import React from 'react';
 
-import { ConnectionProviders, WidgetTheme } from '../definitions/constants';
+import {
+  WidgetConnectionProviders,
+  WidgetTheme,
+} from '../definitions/constants';
 
 export interface BuyReactProps {
-  providerPreference: ConnectionProviders;
+  providerPreference: WidgetConnectionProviders;
   orderId: string;
 }
 
@@ -14,7 +17,9 @@ export function BuyReact(props: BuyReactProps) {
 
   return (
     <imtbl-buy
-      providerPreference={providerPreference ?? ConnectionProviders.METAMASK}
+      providerPreference={
+        providerPreference ?? WidgetConnectionProviders.METAMASK
+      }
       theme={config.theme ?? WidgetTheme.DARK}
       orderId={orderId}
     ></imtbl-buy>
