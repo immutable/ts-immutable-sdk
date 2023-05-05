@@ -9,8 +9,8 @@ import {
   BridgeFeeResponse,
   FungibleToken,
 } from 'types';
-import RootERC20Predicate from 'contracts/ABIs/RootERC20Predicate.json';
-import ERC20 from 'contracts/ABIs/ERC20.json';
+import { RootERC20Predicate } from 'contracts/ABIs/RootERC20Predicate';
+import { ERC20 } from 'contracts/ABIs/ERC20';
 import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
 
 export class TokenBridge {
