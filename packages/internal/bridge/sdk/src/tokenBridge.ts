@@ -7,7 +7,10 @@ import {
   BridgeDepositResponse,
   BridgeFeeRequest,
   BridgeFeeResponse,
+  CompletionStatus,
   FungibleToken,
+  WaitForRequest,
+  WaitForResponse,
 } from 'types';
 import { RootERC20Predicate } from 'contracts/ABIs/RootERC20Predicate';
 import { ERC20 } from 'contracts/ABIs/ERC20';
@@ -186,6 +189,15 @@ export class TokenBridge {
     return {
       unsignedTx: unsignedTx,
       required: true,
+    };
+  }
+
+  public async waitForDeposit(
+    txHash: WaitForRequest
+  ): Promise<WaitForResponse> {
+    return {
+      status: CompletionStatus.SUCCESS,
+      error: null,
     };
   }
 
