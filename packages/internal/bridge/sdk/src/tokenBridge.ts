@@ -18,9 +18,20 @@ import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
 import { RootStateSender } from 'contracts/ABIs/RootStateSender';
 import { ChildStateReceiver } from 'contracts/ABIs/ChildStateReceiver';
 
+/**
+ * Represents a token bridge, which manages asset transfers between two chains.
+ */
 export class TokenBridge {
+  /**
+   * @property {BridgeConfiguration} config - The bridge configuration object.
+   */
   private config: BridgeConfiguration;
 
+  /**
+   * Constructs a TokenBridge instance.
+   *
+   * @param {BridgeConfiguration} config - The bridge configuration object.
+   */
   constructor(config: BridgeConfiguration) {
     this.config = config;
   }
