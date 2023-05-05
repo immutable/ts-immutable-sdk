@@ -9,7 +9,10 @@ import { TokenBalanceList } from '../components/TokenBalanceList/TokenBalanceLis
 import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
 import { useContext, useEffect, useState } from 'react';
 import { WalletContext } from '../context/WalletContext';
-import { sendWalletWidgetCloseEvent } from '../WalletWidgetEvents';
+import {
+  sendAddCoinsEvent,
+  sendWalletWidgetCloseEvent,
+} from '../WalletWidgetEvents';
 import {
   WalletBalanceContainerStyle,
   WalletBalanceItemStyle,
@@ -26,7 +29,7 @@ export const WalletBalances = () => {
       const fiatAmount = parseFloat(balance.fiatAmount);
       if (!isNaN(fiatAmount)) totalAmount += fiatAmount;
     });
-    console.log(totalAmount);
+    console.log('totalAmount:', totalAmount);
     setTotalFiatAmount(totalAmount);
   }, [walletState.tokenBalances]);
 
@@ -49,13 +52,19 @@ export const WalletBalances = () => {
         <NetworkMenu />
         <TotalTokenBalance totalBalance={totalFiatAmount} />
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Box sx={WalletBalanceItemStyle}>
+          <Box
+            sx={WalletBalanceItemStyle(walletState.tokenBalances.length > 2)}
+          >
             <TokenBalanceList balanceInfoItems={walletState.tokenBalances} />
           </Box>
           <MenuItem
             testId="add-coins"
             emphasized
-            onClick={() => console.log('add coins')}
+            onClick={() => {
+              sendAddCoinsEvent({
+                network: walletState.network ?? undefined,
+              });
+            }}
           >
             <MenuItem.FramedIcon icon="Add"></MenuItem.FramedIcon>
             <MenuItem.Label>Add coins</MenuItem.Label>
