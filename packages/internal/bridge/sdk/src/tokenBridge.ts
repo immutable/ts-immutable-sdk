@@ -25,6 +25,27 @@ export class TokenBridge {
     this.config = config;
   }
 
+  /**
+   * Retrieves the bridge fee for a specific token.
+   *
+   * @param {BridgeFeeRequest} req - The fee request object containing the token address for which the fee is required.
+   * @returns {Promise<BridgeFeeResponse>} - A promise that resolves to an object containing the bridge fee for the specified token and a flag indicating if the token is bridgeable.
+   * @throws {BridgeError} - If an error occurs during the fee retrieval, a BridgeError will be thrown with a specific error type.
+   *
+   * @example
+   * const feeRequest = {
+   *   token: '0x123456...', // ERC20 token address
+   * };
+   *
+   * bridgeSdk.getFee(feeRequest)
+   *   .then((feeResponse) => {
+   *     console.log('Bridgeable:', feeResponse.bridgeable);
+   *     console.log('Fee Amount:', feeResponse.feeAmount.toString());
+   *   })
+   *   .catch((error) => {
+   *     console.error('Error:', error.message);
+   *   });
+   */
   public async getFee(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
     if (!ethers.utils.isAddress(req.token)) {
       throw new BridgeError(
@@ -38,6 +59,29 @@ export class TokenBridge {
     };
   }
 
+    /**
+   * Generates an unsigned deposit transaction for a user to sign and submit to the bridge.
+   *
+   * @param {BridgeDepositRequest} req - The deposit request object containing the required data for depositing tokens.
+   * @returns {Promise<BridgeDepositResponse>} - A promise that resolves to an object containing the unsigned transaction data.
+   * @throws {BridgeError} - If an error occurs during the generation of the unsigned transaction, a BridgeError will be thrown with a specific error type.
+   *
+   * @example
+   * const depositRequest = {
+   *   token: '0x123456...', // ERC20 token address
+   *   depositorAddress: '0xabcdef...', // User's wallet address
+   *   recipientAddress: '0x987654...', // Destination wallet address on the target chain
+   *   depositAmount: ethers.utils.parseUnits('100', 18), // Deposit amount in wei
+   * };
+   *
+   * bridgeSdk.getUnsignedDepositTx(depositRequest)
+   *   .then((depositResponse) => {
+   *     console.log(depositResponse.unsignedTx);
+   *   })
+   *   .catch((error) => {
+   *     console.error('Error:', error.message);
+   *   });
+   */
   public async getUnsignedDepositTx(
     req: BridgeDepositRequest
   ): Promise<BridgeDepositResponse> {
@@ -111,6 +155,29 @@ export class TokenBridge {
     };
   }
 
+  /**
+   * Retrieves the unsigned approval transaction for a deposit to the bridge.
+   *
+   * @param {ApproveBridgeRequest} req - The approve bridge request object containing the depositor address, token address, and deposit amount.
+   * @returns {Promise<ApproveBridgeResponse>} - A promise that resolves to an object containing the unsigned approval transaction and a flag indicating if the approval is required.
+   * @throws {BridgeError} - If an error occurs during the transaction creation, a BridgeError will be thrown with a specific error type.
+   *
+   * @example
+   * const approveRequest = {
+   *   depositorAddress: '0x123456...', // Depositor's Ethereum address
+   *   token: '0xabcdef...', // ERC20 token address
+   *   depositAmount: ethers.utils.parseUnits('100', 18), // Deposit amount in token's smallest unit (e.g., wei for Ether)
+   * };
+   *
+   * bridgeSdk.getUnsignedApproveBridgeTx(approveRequest)
+   *   .then((approveResponse) => {
+   *     console.log('Approval Required:', approveResponse.required);
+   *     console.log('Unsigned Approval Transaction:', approveResponse.unsignedTx);
+   *   })
+   *   .catch((error) => {
+   *     console.error('Error:', error.message);
+   *   });
+   */
   public async getUnsignedApproveBridgeTx(
     req: ApproveBridgeRequest
   ): Promise<ApproveBridgeResponse> {
@@ -193,7 +260,26 @@ export class TokenBridge {
       required: true,
     };
   }
-
+  /**
+   * Waits for the deposit transaction to be confirmed and synced from the root chain to the child chain.
+   *
+   * @param {WaitForRequest} req - The wait for request object containing the transaction hash.
+   * @returns {Promise<WaitForResponse>} - A promise that resolves to an object containing the status of the deposit transaction.
+   * @throws {BridgeError} - If an error occurs during the transaction confirmation or state sync, a BridgeError will be thrown with a specific error type.
+   *
+   * @example
+   * const waitForRequest = {
+   *   transactionHash: '0x123456...', // Deposit transaction hash on the root chain
+   * };
+   *
+   * bridgeSdk.waitForDeposit(waitForRequest)
+   *   .then((waitForResponse) => {
+   *     console.log('Deposit Transaction Status:', waitForResponse.status);
+   *   })
+   *   .catch((error) => {
+   *     console.error('Error:', error.message);
+   *   });
+   */
   public async waitForDeposit(
     req: WaitForRequest
   ): Promise<WaitForResponse> {
