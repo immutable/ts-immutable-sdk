@@ -94,6 +94,7 @@ export async function createOrder({
       },
     };
     const headers = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       Authorization: `Bearer ${user.accessToken}`,
     };
     const createOrderResponse = await ordersApi.createOrder(orderParams, {
@@ -138,6 +139,7 @@ export async function cancelOrder({
     const starkSignature = await starkSigner.signMessage(payloadHash);
 
     const headers = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       Authorization: `Bearer ${user.accessToken}`,
     };
 

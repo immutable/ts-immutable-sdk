@@ -15,11 +15,11 @@
       },
       {
         "selector": "objectLiteralProperty",
-        "format": ["camelCase"]
+        "format": ["camelCase","snake_case"]
       },
       {
         "selector": "variable",
-        "format": ["camelCase", "UPPER_CASE"]
+        "format": ["camelCase", "UPPER_CASE", "snake_case"]
       },
       {
         "selector": "variable",
@@ -58,7 +58,7 @@
       },
       {
         "selector": "typeProperty",
-        "format": ["camelCase"]
+        "format": ["camelCase","snake_case"]
       }
     ],
     "import/prefer-default-export": ["off"]

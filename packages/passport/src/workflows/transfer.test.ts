@@ -93,6 +93,7 @@ describe('transfer', () => {
       };
       const mockHeader = {
         headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           Authorization: `Bearer ${mockUser.accessToken}`,
         },
       };
@@ -292,6 +293,7 @@ describe('transfer', () => {
         },
         {
           headers: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             Authorization: `Bearer ${mockUser.accessToken}`,
           },
         },

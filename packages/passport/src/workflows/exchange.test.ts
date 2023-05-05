@@ -69,6 +69,7 @@ describe('exchangeTransfer', () => {
 
     const mockHeader = {
       headers: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         Authorization: `Bearer ${mockUser.accessToken}`,
       },
     };

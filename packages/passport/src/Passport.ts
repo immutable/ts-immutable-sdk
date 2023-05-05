@@ -1,5 +1,7 @@
 import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { IMXProvider } from '@imtbl/provider';
+// TODO: Remove this once the dependency has been added
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';

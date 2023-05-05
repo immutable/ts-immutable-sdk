@@ -2,12 +2,12 @@ import { signRaw } from '@imtbl/toolkit';
 import { UsersApi, WalletConnection } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 
-export type registerPassportParams = WalletConnection & {
+export type RegisterPassportParams = WalletConnection & {
   usersApi: UsersApi;
 };
 
 export default async function registerPassport(
-  { ethSigner, starkSigner, usersApi }: registerPassportParams,
+  { ethSigner, starkSigner, usersApi }: RegisterPassportParams,
   authorization: string,
 ): Promise<string> {
   return withPassportError<string>(async () => {

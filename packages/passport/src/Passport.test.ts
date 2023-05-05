@@ -1,4 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+// TODO: Remove this once the dependency has been fixed
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
@@ -82,6 +84,8 @@ describe('Passport', () => {
         const immutableXClient = new ImmutableXClient({
           baseConfig,
         });
+        // TODO: Remove this once the shadowing issue has been fixed
+        // eslint-disable-next-line @typescript-eslint/no-shadow
         const passport = new Passport({
           baseConfig,
           overrides: {

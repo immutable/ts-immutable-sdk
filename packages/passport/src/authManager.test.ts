@@ -97,7 +97,9 @@ describe('AuthManager', () => {
         audience: 'audience',
       });
 
-      new AuthManager(configWithAudience);
+      // to work around new being used as a side effect, which would cause a lint failure
+      const am = new AuthManager(configWithAudience);
+      expect(am).toBeDefined();
       expect(UserManager).toBeCalledWith({
         authority: configWithAudience.authenticationDomain,
         client_id: configWithAudience.oidcConfiguration.clientId,
@@ -125,7 +127,9 @@ describe('AuthManager', () => {
   });
 
   it('should initial AuthManager the default configuration', () => {
-    new AuthManager(config);
+    // to work around new being used as a side effect, which would cause a lint failure
+    const am = new AuthManager(config);
+    expect(am).toBeDefined();
     expect(UserManager).toBeCalledWith({
       authority: config.authenticationDomain,
       client_id: config.oidcConfiguration.clientId,

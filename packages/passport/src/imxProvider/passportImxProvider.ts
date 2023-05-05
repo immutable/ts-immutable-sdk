@@ -1,3 +1,5 @@
+// TODO: Remove this once the dependency has been added
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   AnyToken,
@@ -17,6 +19,8 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
+// TODO: Remove this once the dependency has been added
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { IMXProvider } from '@imtbl/provider';
 import { PassportConfiguration } from '../config';
@@ -67,6 +71,8 @@ export default class PassportImxProvider implements IMXProvider {
     });
   }
 
+  // TODO: Remove once implemented
+  // eslint-disable-next-line class-methods-use-this
   registerOffchain(): Promise<RegisterUserResponse> {
     throw new PassportError(
       'Operation not supported',
@@ -74,6 +80,8 @@ export default class PassportImxProvider implements IMXProvider {
     );
   }
 
+  // TODO: Remove once implemented
+  // eslint-disable-next-line class-methods-use-this
   isRegisteredOnchain(): Promise<boolean> {
     throw new PassportError(
       'Operation not supported',
@@ -136,7 +144,8 @@ export default class PassportImxProvider implements IMXProvider {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // TODO: Remove once implemented
+  // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
   deposit(deposit: TokenAmount): Promise<TransactionResponse> {
     throw new PassportError(
       'Operation not supported',
@@ -144,7 +153,8 @@ export default class PassportImxProvider implements IMXProvider {
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // TODO: Remove once implemented
+  // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
   prepareWithdrawal(request: TokenAmount): Promise<CreateWithdrawalResponse> {
     throw new PassportError(
       'Operation not supported',
@@ -152,6 +162,8 @@ export default class PassportImxProvider implements IMXProvider {
     );
   }
 
+  // TODO: Remove once implemented
+  // eslint-disable-next-line class-methods-use-this
   completeWithdrawal(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     starkPublicKey: string,

@@ -40,6 +40,8 @@ export const transfer = ({
   starkSigner,
   user,
   passportConfig,
+// TODO: remove this eslint disable once we have a better solution
+// eslint-disable-next-line max-len
 }: TransferRequest): Promise<CreateTransferResponseV1> => withPassportError<CreateTransferResponseV1>(async () => {
   const transferAmount = request.type === ERC721 ? '1' : request.amount;
   const getSignableTransferRequest: GetSignableTransferRequestV1 = {
@@ -87,6 +89,7 @@ export const transfer = ({
   };
 
   const headers = {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     Authorization: `Bearer ${user.accessToken}`,
   };
 
@@ -171,6 +174,7 @@ export async function batchNftTransfer({
     };
 
     const headers = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       Authorization: `Bearer ${user.accessToken}`,
     };
 

@@ -51,6 +51,7 @@ export async function exchangeTransfer({
     };
 
     const headers = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       Authorization: `Bearer ${user.accessToken}`,
     };
 

@@ -13,16 +13,16 @@ describe('getStarkSigner', () => {
   const wallet = new ethers.Wallet(privateKey);
 
   it('should call generateLegacyStarkPrivateKey and return createStarkSigner', async () => {
-    const privateKey = 'private_key_123';
+    const privKey = 'private_key_123';
     const starkSigner = {};
 
-    (generateLegacyStarkPrivateKey as jest.Mock).mockReturnValue(privateKey);
+    (generateLegacyStarkPrivateKey as jest.Mock).mockReturnValue(privKey);
     (createStarkSigner as jest.Mock).mockReturnValue(starkSigner);
 
     const result = await getStarkSigner(wallet);
 
     expect(generateLegacyStarkPrivateKey).toHaveBeenCalledWith(wallet);
-    expect(createStarkSigner).toHaveBeenCalledWith(privateKey);
+    expect(createStarkSigner).toHaveBeenCalledWith(privKey);
     expect(result).toEqual(starkSigner);
   });
 

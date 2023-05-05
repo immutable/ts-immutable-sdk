@@ -76,6 +76,7 @@ export async function createTrade({
       },
     };
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const headers = { Authorization: `Bearer ${user.accessToken}` };
     const { data: createTradeResponse } = await tradesApi.createTradeV3(
       tradeParams,

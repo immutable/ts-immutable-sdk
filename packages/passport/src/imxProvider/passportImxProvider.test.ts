@@ -1,4 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+// TODO: Remove once the dependency has been added
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import {
   CancelOrderResponse,
