@@ -2,7 +2,7 @@ import { BiomeThemeProvider } from '@biom3/react';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk-web';
 import { WidgetTheme } from '@imtbl/checkout-ui-types';
 import {
-  sendCloseWidgetEvent,
+  sendConnectWidgetCloseEvent,
   sendConnectFailedEvent,
   sendConnectSuccessEvent,
 } from './ConnectWidgetEvents';
@@ -59,7 +59,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
           checkout: new Checkout(),
         },
       });
-  
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -100,7 +100,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
                 successEventAction={() =>
                   sendConnectSuccessEvent(ConnectionProviders.METAMASK)
                 }
-                onActionClick={() => sendCloseWidgetEvent()}
+                onActionClick={() => sendConnectWidgetCloseEvent()}
               />
             )}
             {viewState.view.type === ConnectWidgetViews.FAIL && (

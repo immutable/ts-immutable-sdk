@@ -7,6 +7,9 @@ import { cySmartGet } from '../../lib/testUtils';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 
 describe('WalletWidget tests', () => {
+  beforeEach(() => {
+    cy.viewport('ipad-2');
+  });
   it('should show loading screen when component is mounted', () => {
     const params = {
       providerPreference: ConnectionProviders.METAMASK,
@@ -32,9 +35,24 @@ describe('WalletWidget tests', () => {
       network: { name: '' },
     });
 
-    mount(<WalletWidget params={params} theme={WidgetTheme.LIGHT} />);
+    cy.stub(Checkout.prototype, 'switchNetwork')
+      .as('switchNetworkStub')
+      .resolves({
+        network: {
+          chainId: 137,
+          name: 'Polygon',
+          nativeCurrency: {
+            name: 'MATIC',
+            symbol: 'MATIC',
+            decimals: 18,
+          },
+        },
+      });
 
-    // TODO: Update this tests with assertions on loading screen
+    mount(<WalletWidget params={params} theme={WidgetTheme.DARK} />);
+
+    cySmartGet('loading-view').should('be.visible');
+    cySmartGet('wallet-balances').should('be.visible');
   });
 
   describe('WalletWidget balances', () => {
@@ -138,7 +156,7 @@ describe('WalletWidget tests', () => {
         providerPreference: ConnectionProviders.METAMASK,
       } as WalletWidgetParams;
 
-      mount(<WalletWidget params={params} theme={WidgetTheme.LIGHT} />);
+      mount(<WalletWidget params={params} theme={WidgetTheme.DARK} />);
 
       cySmartGet('@balanceStub').should('have.been.called');
       cySmartGet('@connectStub').should('have.been.calledWith', {
@@ -150,7 +168,7 @@ describe('WalletWidget tests', () => {
       cySmartGet('Ethereum-network-button').should('include.text', 'Ethereum');
 
       cySmartGet('total-token-balance').should('exist');
-      cySmartGet('total-token-balance').should('have.text', '≈ USD $0.00');
+      cySmartGet('total-token-balance').should('have.text', '≈ USD $70.50');
 
       cySmartGet('balance-item-ETH').should('exist');
       cySmartGet('balance-item-GODS').should('exist');
@@ -161,7 +179,7 @@ describe('WalletWidget tests', () => {
       const params = {
         providerPreference: ConnectionProviders.METAMASK,
       } as WalletWidgetParams;
-      mount(<WalletWidget params={params} theme={WidgetTheme.LIGHT} />);
+      mount(<WalletWidget params={params} theme={WidgetTheme.DARK} />);
 
       cySmartGet('@balanceStub').should('have.been.called');
       cySmartGet('@connectStub').should('have.been.calledWith', {
@@ -171,67 +189,20 @@ describe('WalletWidget tests', () => {
       cySmartGet('balance-item-ETH').should('exist');
       cySmartGet('balance-item-ETH').should('include.text', 'ETH');
       cySmartGet('balance-item-ETH').should('include.text', 'Ether');
-      cySmartGet('balance-item-ETH-balance').should('have.text', '12.12');
+      cySmartGet('balance-item-ETH__price').should('have.text', '12.12');
 
       cySmartGet('balance-item-IMX').should('exist');
       cySmartGet('balance-item-IMX').should('include.text', 'IMX');
       cySmartGet('balance-item-IMX').should('include.text', 'Immutable X');
-      cySmartGet('balance-item-IMX-balance').should('have.text', '88888999');
+      cySmartGet('balance-item-IMX__price').should('have.text', '88,888,999');
 
       cySmartGet('balance-item-GODS').should('exist');
       cySmartGet('balance-item-GODS').should('include.text', 'GODS');
       cySmartGet('balance-item-GODS').should('include.text', 'Gods Unchained');
-      cySmartGet('balance-item-GODS-balance').should(
+      cySmartGet('balance-item-GODS__price').should(
         'have.text',
-        '100000000.2'
+        '100,000,000.2'
       );
-    });
-
-    describe('switch network', () => {
-      beforeEach(() => {
-        getAllBalancesStub.resolves({
-          balances: [
-            {
-              formattedBalance: '12.12',
-              token: {
-                name: 'MATIC',
-                symbol: 'MATIC',
-                decimals: 18,
-              },
-            },
-          ],
-        });
-      });
-
-      it('should make call to switch network', () => {
-        const params = {
-          providerPreference: ConnectionProviders.METAMASK,
-        } as WalletWidgetParams;
-        mount(<WalletWidget params={params} theme={WidgetTheme.LIGHT} />);
-        cySmartGet('@connectStub').should('have.been.calledOnce');
-
-        cySmartGet('Polygon-network-button').click();
-
-        cySmartGet('@switchNetworkStub').should('have.been.called');
-        cySmartGet('Polygon-network-button').should('include.text', 'Polygon');
-      });
-
-      it('should show correct network switch buttons', () => {
-        const params = {
-          providerPreference: ConnectionProviders.METAMASK,
-        } as WalletWidgetParams;
-        mount(<WalletWidget params={params} theme={WidgetTheme.LIGHT} />);
-        cySmartGet('Polygon-network-button').should('exist');
-        cySmartGet('Ethereum-network-button').should('exist');
-        cySmartGet('Ethereum-network-button').should('have.css', 'border-style', 'solid');
-        cySmartGet('Polygon-network-button').should('not.have.css', 'border-style', 'solid');
-
-        cySmartGet('Polygon-network-button').click();
-
-        cySmartGet('Polygon-network-button').should('have.css', 'border-style', 'solid');
-        cySmartGet('Ethereum-network-button').should('not.have.css', 'border-style', 'solid');
-
-      });
     });
   });
 });

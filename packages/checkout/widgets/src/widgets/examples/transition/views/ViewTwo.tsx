@@ -33,7 +33,9 @@ export const ViewTwo = () => {
 
   return (
     <SimpleLayout
-      header={<HeaderNavigation showClose showBack transparent={true} />}
+      header={<HeaderNavigation
+        onCloseButtonClick={()=>console.log('clicked!')}
+        showBack transparent={true} />}
       footer={
         <FooterButton
           actionText={buttonText}

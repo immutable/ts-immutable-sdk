@@ -11,12 +11,14 @@ export interface ErrorViewProps {
   actionText: string;
   onActionClick: () => void;
   errorEventAction?: () => void;
+  onCloseClick: () => void;
 }
 
 export const ErrorView = ({
   actionText,
   onActionClick,
   errorEventAction,
+  onCloseClick,
 }: ErrorViewProps) => {
   const errorText = text.views[BaseViews.ERROR];
 
@@ -28,7 +30,11 @@ export const ErrorView = ({
   return (
     <SimpleLayout
       header={
-        <HeaderNavigation showBack={true} showClose={true} transparent={true} />
+        <HeaderNavigation
+          showBack={true}
+          transparent={true}
+          onCloseButtonClick={onCloseClick}
+        />
       }
       footer={
         <FooterButton

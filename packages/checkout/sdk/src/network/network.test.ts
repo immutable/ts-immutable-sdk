@@ -345,16 +345,6 @@ describe('network functions', () => {
             },
           },
           {
-            name: 'Goerli',
-            chainId: 5,
-            isSupported: true,
-            nativeCurrency: {
-              name: 'Goerli Eth',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-          },
-          {
             name: 'Polygon',
             chainId: 137,
             isSupported: true,

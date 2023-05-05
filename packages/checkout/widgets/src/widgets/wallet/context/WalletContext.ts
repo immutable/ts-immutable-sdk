@@ -1,12 +1,18 @@
-import { Web3Provider } from "@ethersproject/providers";
-import { Checkout, ConnectionProviders, NetworkInfo } from "@imtbl/checkout-sdk-web";
-import { createContext } from "react";
+import { Web3Provider } from '@ethersproject/providers';
+import {
+  Checkout,
+  ConnectionProviders,
+  NetworkInfo,
+} from '@imtbl/checkout-sdk-web';
+import { createContext } from 'react';
+import { BalanceInfo } from '../functions/tokenBalances';
 
 export interface WalletState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
   providerPreference: ConnectionProviders | null;
   network: NetworkInfo | null;
+  tokenBalances: BalanceInfo[];
 }
 
 export const initialWalletState: WalletState = {
@@ -14,6 +20,7 @@ export const initialWalletState: WalletState = {
   provider: null,
   providerPreference: null,
   network: null,
+  tokenBalances: [],
 };
 
 export interface WalletContextState {
@@ -29,13 +36,13 @@ type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
   | SetProviderPreferencePayload
-  | SetNetworkInfoPayload;
+  | SetSwitchNetworkPayload;
 
 export enum WalletActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
-  SET_NETWORK_INFO = 'SET_NETWORK_INFO'
+  SWITCH_NETWORK = 'SWITCH_NETWORK',
 }
 
 export interface SetCheckoutPayload {
@@ -53,14 +60,15 @@ export interface SetProviderPreferencePayload {
   providerPreference: ConnectionProviders;
 }
 
-export interface SetNetworkInfoPayload {
-  type: WalletActions.SET_NETWORK_INFO;
+export interface SetSwitchNetworkPayload {
+  type: WalletActions.SWITCH_NETWORK;
   network: NetworkInfo;
+  tokenBalances: BalanceInfo[];
 }
 
 export const WalletContext = createContext<WalletContextState>({
   walletState: initialWalletState,
-  walletDispatch: () => {}
+  walletDispatch: () => {},
 });
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
@@ -85,10 +93,11 @@ export const walletReducer: Reducer<WalletState, WalletAction> = (
         ...state,
         providerPreference: action.payload.providerPreference,
       };
-    case WalletActions.SET_NETWORK_INFO:
-      return{
+    case WalletActions.SWITCH_NETWORK:
+      return {
         ...state,
-        network: action.payload.network
+        network: action.payload.network,
+        tokenBalances: action.payload.tokenBalances,
       };
     default:
       return state;
