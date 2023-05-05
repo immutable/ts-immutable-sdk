@@ -1,13 +1,9 @@
-import {
-  Checkout,
-  ConnectionProviders,
-  TokenInfo,
-} from '@imtbl/checkout-sdk';
+import { Checkout, ConnectionProviders, TokenInfo } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { WalletBalances } from './WalletBalances';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { WalletContext } from '../context/WalletContext';
+import { WalletContext, WalletState } from '../context/WalletContext';
 import { Web3Provider } from '@ethersproject/providers';
 import { cySmartGet } from '../../../lib/testUtils';
 
@@ -19,7 +15,7 @@ describe('WalletBalances', () => {
   it('should show add coins button', () => {
     const checkout = new Checkout();
     const provider = {} as unknown as Web3Provider;
-    const walletState = {
+    const walletState: WalletState = {
       checkout: checkout,
       network: {
         chainId: 1,
@@ -30,6 +26,7 @@ describe('WalletBalances', () => {
       provider,
       providerPreference: ConnectionProviders.METAMASK,
       tokenBalances: [],
+      supportedTopUps: null,
     };
     mount(
       <BiomeCombinedProviders>
