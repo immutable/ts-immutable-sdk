@@ -7,8 +7,6 @@
   <h1>Immutable Checkout SDK</h1>
 </div>
 
-TEST
-
 # Overview
 
 > **Warning** **IMMUTABLE CHECKOUT SDK IS UNSTABLE** <br/>
