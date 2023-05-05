@@ -13,6 +13,7 @@ import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
 import {
   ActiveNetworkButtonStyle,
   LogoStyle,
+  NetworkButtonStyle,
   NetworkHeadingStyle,
   NetworkMenuStyles,
 } from './NetworkMenuStyles';
@@ -22,6 +23,7 @@ import {
   ViewContext,
 } from '../../../../context/ViewContext';
 import { getTokenBalances } from '../../functions/tokenBalances';
+import { sortNetworksCompareFn } from '../../../../lib/utils';
 
 export const NetworkMenu = () => {
   const { walletState, walletDispatch } = useContext(WalletContext);
@@ -38,9 +40,9 @@ export const NetworkMenu = () => {
   };
 
   //todo: add corresponding network symbols
-  const NetworkLogo = {
-    [ChainId.POLYGON]: 'ImmutableSymbol',
-    [ChainId.ETHEREUM]: 'ImmutableSymbol',
+  const NetworkIcon = {
+    [ChainId.POLYGON]: 'Immutable',
+    [ChainId.ETHEREUM]: 'EthToken',
   };
 
   const switchNetwork = useCallback(
@@ -95,7 +97,7 @@ export const NetworkMenu = () => {
         const allowedNetworks = await checkout.getNetworkAllowList({
           type: NetworkFilterTypes.ALL,
         });
-        setNetworks(allowedNetworks?.networks);
+        setNetworks(allowedNetworks?.networks ?? []);
       } else {
         setNetworks([]);
       }
@@ -115,28 +117,33 @@ export const NetworkMenu = () => {
         />
       </Box>
       <HorizontalMenu>
-        {allowedNetworks?.map((networkItem) => (
-          <HorizontalMenu.Button
-            key={networkItem.chainId}
-            testId={`${networkItem.name}-network-button`}
-            sx={
-              networkItem.chainId === network?.chainId
-                ? ActiveNetworkButtonStyle
-                : {}
-            }
-            size="medium"
-            onClick={() => switchNetwork(networkItem.chainId)}
-          >
-            <Button.Logo
-              logo={NetworkLogo[networkItem.chainId]}
-              sx={LogoStyle(
-                LogoColor[networkItem.chainId],
+        {allowedNetworks
+          ?.sort((a: NetworkInfo, b: NetworkInfo) =>
+            sortNetworksCompareFn(a, b)
+          )
+          .map((networkItem) => (
+            <HorizontalMenu.Button
+              key={networkItem.chainId}
+              testId={`${networkItem.name}-network-button`}
+              sx={
                 networkItem.chainId === network?.chainId
-              )}
-            />
-            {networkItem.name}
-          </HorizontalMenu.Button>
-        ))}
+                  ? ActiveNetworkButtonStyle
+                  : NetworkButtonStyle
+              }
+              size="small"
+              onClick={() => switchNetwork(networkItem.chainId)}
+            >
+              <Button.Icon
+                icon={NetworkIcon[networkItem.chainId]}
+                iconVariant="bold"
+                sx={LogoStyle(
+                  LogoColor[networkItem.chainId],
+                  networkItem.chainId === network?.chainId
+                )}
+              />
+              {networkItem.name}
+            </HorizontalMenu.Button>
+          ))}
       </HorizontalMenu>
     </Box>
   );
