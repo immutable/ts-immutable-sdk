@@ -34,7 +34,7 @@
   "scripts": {
     "build": "parcel build",
     "build:dist": "npm i && npm run build && npm run dist",
-    "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/CheckoutWidgets.tsx src/definitions/constants.ts src/definitions/config.ts src/definitions/events/**.ts src/react/**.tsx",
+    "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "start": "parcel watch"
   },
   "source": "src/index.ts",
