@@ -6,6 +6,7 @@ import { PassportConfiguration } from './config';
 
 export default class MagicAdapter {
   private readonly magicClient;
+
   private readonly config: PassportConfiguration;
 
   constructor(config: PassportConfiguration) {
@@ -24,7 +25,7 @@ export default class MagicAdapter {
       });
       return new ethers.providers.Web3Provider(
         this.magicClient
-          .rpcProvider as unknown as ethers.providers.ExternalProvider
+          .rpcProvider as unknown as ethers.providers.ExternalProvider,
       );
     }, PassportErrorType.WALLET_CONNECTION_ERROR);
   }
