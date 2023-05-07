@@ -1,4 +1,3 @@
-import { Network } from '@ethersproject/providers';
 import { ChainId, GetBalanceResult, NetworkInfo } from '@imtbl/checkout-sdk';
 
 export const sortTokensByAmount = (
