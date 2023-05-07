@@ -21,6 +21,8 @@
     "jest": "^29.4.3",
     "jest-environment-jsdom": "^29.4.3",
     "parcel": "^2.8.3",
+    "typedoc": "^0.24.6",
+    "typedoc-plugin-markdown": "^3.15.2",
     "typescript": "^4.9.5"
   },
   "license": "ISC",
@@ -32,6 +34,7 @@
   "scripts": {
     "build": "parcel build",
     "build:dist": "npm i && npm run build && npm run dist",
+    "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/CheckoutWidgets.tsx src/definitions/constants.ts src/definitions/config.ts src/definitions/events/**.ts src/react/**.tsx",
     "start": "parcel watch"
   },
   "source": "src/index.ts",
