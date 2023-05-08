@@ -38,7 +38,7 @@ export function sendOnRampCoinsEvent(eventData: WalletRequestOnrampEvent) {
 
 export function sendSwapCoinsEvent(eventData: WalletRequestSwapEvent) {
   const swapCoinsEvent = new CustomEvent<WalletEvent<WalletRequestSwapEvent>>(
-    IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
+    IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
     {
       detail: {
         type: WalletEventType.REQUEST_SWAP,
@@ -52,7 +52,7 @@ export function sendSwapCoinsEvent(eventData: WalletRequestSwapEvent) {
 
 export function sendBridgeCoinsEvent(eventData: WalletRequestBridgeEvent) {
   const bridgeCoinsEvent = new CustomEvent<WalletEvent<WalletRequestBridgeEvent>>(
-    IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
+    IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
     {
       detail: {
         type: WalletEventType.REQUEST_BRIDGE,
