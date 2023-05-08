@@ -192,13 +192,26 @@ export class CraftingCardUpgrade extends LitElement {
     return (event: MouseEvent) => {
       event.preventDefault();
       console.log(item);
-      // Fix what we push into the array
-      if (this.state.craftInput.ingredients.includes(item.id)) {
-        this.state.craftInput.ingredients.splice(item.id);
+      const ingredients = {
+        conditionId: 'f8f716ad-5191-478e-85d7-f3f1e7bcad02',
+        itemId: item.id,
+      };
+      if (
+        this.state.craftInput.ingredients.find(
+          (ingredient) => ingredient.itemId === item.id
+        )
+      ) {
+        this.state.craftInput.ingredients =
+          this.state.craftInput.ingredients.filter(
+            (ingredient) => ingredient.itemId !== item.id
+          );
+        this.requestUpdate();
+        return;
       } else {
-        this.state.craftInput.ingredients.push(item.id);
+        this.state.craftInput.ingredients.push(ingredients);
+        this.requestUpdate();
+        return;
       }
-      this.requestUpdate();
     };
   }
 
