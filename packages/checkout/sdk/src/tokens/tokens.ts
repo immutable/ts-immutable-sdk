@@ -3,18 +3,18 @@ import {
   GetTokenAllowListResult,
   TokenFilterTypes,
   TokenInfo,
+  TokenMasterInfo,
 } from '../types';
 import masterTokenList from './token_master_list.json';
 
-export const getTokenAllowList = async function ({
-  type = TokenFilterTypes.ALL,
+const filterTokenList = function ({
+  type,
   chainId,
   exclude,
-}: GetTokenAllowListParams): Promise<GetTokenAllowListResult> {
-  // todo:For API call, use the CheckoutError with errorType:API_CALL_ERROR?? or any other
-
-  const filteredTokenList = masterTokenList
+}: GetTokenAllowListParams): TokenMasterInfo[] {
+  return masterTokenList
     .filter((token) => {
+      const skipChainIdCheck = !chainId;
       const chainIdMatches = token.chainId == chainId;
       const tokenNotExcluded = !exclude
         ?.map((excludeToken) => excludeToken.address)
@@ -23,12 +23,22 @@ export const getTokenAllowList = async function ({
       const tokenAllowedForType = token.tokenFeatures.includes(type);
 
       return (
-        chainIdMatches &&
+        (skipChainIdCheck || chainIdMatches) &&
         tokenNotExcluded &&
         (allowAllTokens || tokenAllowedForType)
       );
-    })
-    .map((token) => {
+    }) as TokenMasterInfo[]
+}
+
+export const getTokenAllowList = async function ({
+  type = TokenFilterTypes.ALL,
+  chainId,
+  exclude,
+}: GetTokenAllowListParams): Promise<GetTokenAllowListResult> {
+  // todo:For API call, use the CheckoutError with errorType:API_CALL_ERROR?? or any other
+
+  const filteredTokenList = filterTokenList({ type, chainId, exclude }).map(
+    (token) => {
       const { chainId, tokenFeatures, ...tokenInfo } = token;
       return tokenInfo as TokenInfo;
     });
