@@ -28,11 +28,12 @@ export interface BalanceItemProps {
 }
 export const BalanceItem = (props: BalanceItemProps) => {
   const { balanceInfo } = props;
+  const fiatAmount = `≈ USD $${balanceInfo.fiatAmount ?? '-.--'}`;
   const { walletState } = useContext(WalletContext);
   const { supportedTopUps, network } = walletState;
-  const [isAddCoinEnabled, setIsAddCoinEnabled] = useState<boolean>();
-  const [isMoveCoinEnabled, setIsMoveCoinEnabled] = useState<boolean>();
-  const [isSwapCoinEnabled, setIsSwapCoinEnabled] = useState<boolean>();
+  const [isOnRampEnabled, setIsOnRampEnabled] = useState<boolean>();
+  const [isBridgeEnabled, setIsBridgeEnabled] = useState<boolean>();
+  const [isSwapEnabled, setIsSwapEnabled] = useState<boolean>();
 
   useEffect(() => {
     if (!network || !supportedTopUps) return;
@@ -40,17 +41,17 @@ export const BalanceItem = (props: BalanceItemProps) => {
     const enableAddCoin =
       network.chainId === ChainId.POLYGON &&
       (supportedTopUps?.isOnRampEnabled ?? true);
-    setIsAddCoinEnabled(enableAddCoin);
+    setIsOnRampEnabled(enableAddCoin);
 
     const enableMoveCoin =
       network.chainId === ChainId.ETHEREUM &&
       (supportedTopUps?.isBridgeEnabled ?? true);
-    setIsMoveCoinEnabled(enableMoveCoin);
+    setIsBridgeEnabled(enableMoveCoin);
 
     const enableSwapCoin =
       network.chainId === ChainId.POLYGON &&
       (supportedTopUps?.isSwapEnabled ?? true);
-    setIsSwapCoinEnabled(enableSwapCoin);
+    setIsSwapEnabled(enableSwapCoin);
   }, [network, supportedTopUps]);
 
   return (
@@ -71,12 +72,12 @@ export const BalanceItem = (props: BalanceItemProps) => {
           use={Heading}
           size="xSmall"
           price={balanceInfo.balance}
-          fiatAmount={`≈ USD $ -.--`}
+          fiatAmount={fiatAmount}
         />
-        {(isAddCoinEnabled || isSwapCoinEnabled || isMoveCoinEnabled) && (
-          <OverflowPopoverMenu size="small">
+        {(isOnRampEnabled || isSwapEnabled || isBridgeEnabled) && (
+          <OverflowPopoverMenu size="small" testId="token-menu">
             <MenuItem
-              sx={ShowMenuItem(isAddCoinEnabled)}
+              sx={ShowMenuItem(isOnRampEnabled)}
               onClick={() => {
                 sendOnRampCoinsEvent({
                   network: walletState.network ?? undefined,
@@ -93,7 +94,7 @@ export const BalanceItem = (props: BalanceItemProps) => {
               <MenuItem.Label>{`Add ${balanceInfo.symbol}`}</MenuItem.Label>
             </MenuItem>
             <MenuItem
-              sx={ShowMenuItem(isSwapCoinEnabled)}
+              sx={ShowMenuItem(isSwapEnabled)}
               onClick={() => {
                 sendSwapCoinsEvent({
                   network: walletState.network ?? undefined,
@@ -110,7 +111,7 @@ export const BalanceItem = (props: BalanceItemProps) => {
               <MenuItem.Label>{`Swap ${balanceInfo.symbol}`}</MenuItem.Label>
             </MenuItem>
             <MenuItem
-              sx={ShowMenuItem(isMoveCoinEnabled)}
+              sx={ShowMenuItem(isBridgeEnabled)}
               onClick={() => {
                 sendBridgeCoinsEvent({
                   network: walletState.network ?? undefined,
