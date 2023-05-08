@@ -32,7 +32,7 @@ export async function getQuotesForRoutes(
   const quoteResults = await multicallMultipleCallDataSingContract(
     multicallContract,
     callData,
-    quoterContractAddress, // TODO fix this to be read from the config
+    quoterContractAddress,
     { gasRequired: DEFAULT_GAS_QUOTE }
   );
 
