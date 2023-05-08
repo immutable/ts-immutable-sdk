@@ -41,6 +41,7 @@ export const ConnectLoader = ({
     initialConnectLoaderState
   );
   const { connectionStatus } = connectLoaderState;
+  const { providerPreference } = params;
 
   const biomeTheme: BaseTokens =
     theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
@@ -49,9 +50,19 @@ export const ConnectLoader = ({
 
   useEffect(() => {
     const checkConnection = async (checkout: Checkout) => {
+      if (!providerPreference) {
+        connectLoaderDispatch({
+          payload: {
+            type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+            connectionStatus: ConnectionStatus.NOT_CONNECTED,
+          },
+        });
+        return;
+      }
+
       try {
         const { isConnected } = await checkout.checkIsWalletConnected({
-          providerPreference: ConnectionProviders.METAMASK,
+          providerPreference,
         });
 
         if (!isConnected) {
@@ -65,7 +76,7 @@ export const ConnectLoader = ({
         }
 
         const { provider } = await checkout.connect({
-          providerPreference: ConnectionProviders.METAMASK,
+          providerPreference,
         });
 
         const isSupportedNetwork = (
@@ -100,7 +111,7 @@ export const ConnectLoader = ({
 
     const checkout = new Checkout();
     checkConnection(checkout);
-  }, []);
+  }, [providerPreference]);
 
   return (
     <>

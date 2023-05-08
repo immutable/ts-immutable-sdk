@@ -10,6 +10,21 @@ describe('ConnectLoader', () => {
     cy.viewport('ipad-2');
   });
 
+  it('should show connect widget when no provider preference', () => {
+    const params = {} as ConnectLoaderParams;
+    mount(
+      <ConnectLoader
+        params={params}
+        theme={WidgetTheme.DARK}
+        closeEvent={() => {}}
+      >
+        <div id="inner-widget">Inner Widget</div>
+      </ConnectLoader>
+    );
+    cySmartGet('wallet-list-metamask').should('be.visible');
+    cy.get('#inner-widget').should('not.exist');
+  });
+
   it('should show connect widget when user not connected', () => {
     const params = {
       providerPreference: ConnectionProviders.METAMASK,
