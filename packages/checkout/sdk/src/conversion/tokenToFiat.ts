@@ -11,7 +11,7 @@ import { utils } from 'ethers';
 import axios from 'axios';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 
-const fetchTokenIds = async (tokens: TokenInfo[]) => {
+export const fetchTokenIds = async (tokens: TokenInfo[]) => {
   const coinListApi = 'https://api.coingecko.com/api/v3/coins/list';
   const tokenSymbols = tokens.map((token) => token.symbol.toLowerCase());
   let res;
@@ -37,7 +37,7 @@ const fetchTokenIds = async (tokens: TokenInfo[]) => {
   return tokenIds;
 };
 
-const fetchQuotesFromCoinGecko = async (
+export const fetchQuotesFromCoinGecko = async (
   tokens: TokenInfo[],
   fiatSymbol: string
 ): Promise<FetchQuotesResult> => {
@@ -63,7 +63,7 @@ const fetchQuotesFromCoinGecko = async (
   return result;
 };
 
-const fetchConversionRates = async (
+export const fetchConversionRates = async (
   tokens: TokenInfo[],
   fiatSymbol: string
 ): Promise<FetchQuotesResult> => {
