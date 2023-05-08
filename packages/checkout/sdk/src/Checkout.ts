@@ -1,5 +1,6 @@
 import * as balances from './balances';
 import * as tokens from './tokens';
+import * as conversion from './conversion';
 import * as connect from './connect';
 import * as wallet from './wallet';
 import * as network from './network';
@@ -182,6 +183,6 @@ export class Checkout {
   public async convertTokensToFiat(
     params: ConvertTokensToFiatParams
   ): Promise<ConvertTokensToFiatResult> {
-    return await tokens.convertTokensToFiat(params);
+    return await conversion.convertTokensToFiat(params);
   }
 }
