@@ -36,7 +36,7 @@ export type {
   GetNetworkAllowListResult,
   ConvertTokensToFiatParams,
   ConvertTokensToFiatResult,
-  TokenToFiatConversion,
+  TokenToFiatConversionResult,
 } from './types';
 export type { ErrorType } from './errors';
 export { CheckoutErrorType } from './errors';
