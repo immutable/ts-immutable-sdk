@@ -5,11 +5,11 @@ const config: Config = {
   coverageProvider: 'v8',
   moduleDirectories: ['node_modules', 'src'],
   verbose: true,
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   transform: {
-    '^.+\\.(t|j)sx?$': '@swc/jest',
+    '\\.ts$': ['babel-jest', { configFile: './babel.test.config.js' }],
   },
-  transformIgnorePatterns: ['/axios/'],
+  transformIgnorePatterns: [],
 };
 
 export default config;
