@@ -13,7 +13,7 @@ import { ConnectContext } from '../context/ConnectContext';
 export const SwitchNetwork = () => {
   const { viewDispatch } = useContext(ViewContext);
   const { connectState } = useContext(ConnectContext);
-  const { checkout, provider } = connectState;
+  const { checkout, provider, sendCloseEvent } = connectState;
   const { heading, body } = text.views.SWITCH_NETWORK;
 
   const [buttonText, setButtonText] = useState('Ready to Switch');
@@ -44,7 +44,12 @@ export const SwitchNetwork = () => {
   return (
     <SimpleLayout
       testId="switch-network-view"
-      header={<HeaderNavigation transparent={true} />}
+      header={
+        <HeaderNavigation
+          transparent={true}
+          onCloseButtonClick={sendCloseEvent}
+        />
+      }
       footer={
         <FooterButton
           actionText={buttonText}

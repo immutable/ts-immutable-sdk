@@ -7,6 +7,7 @@ import {
   initialConnectState,
   SetCheckoutPayload,
   SetProviderPayload,
+  SetSendCloseEventPayload,
 } from './ConnectContext';
 
 describe('connect-context', () => {
@@ -32,5 +33,17 @@ describe('connect-context', () => {
       payload: setProviderPayload,
     });
     expect(provider).not.toBeNull();
+  });
+
+  it('should update state with send close function when reducer called with SET_SEND_CLOSE_EVENT action', () => {
+    const newSendCloseEvent = () => { console.log("Send close event") };
+    const SetSendCloseEventPayload: SetSendCloseEventPayload = {
+      type: ConnectActions.SET_SEND_CLOSE_EVENT,
+      sendCloseEvent: newSendCloseEvent,
+    };
+    const { sendCloseEvent } = connectReducer(initialConnectState, {
+      payload: SetSendCloseEventPayload,
+    });
+    expect(sendCloseEvent).toEqual(newSendCloseEvent);
   });
 });

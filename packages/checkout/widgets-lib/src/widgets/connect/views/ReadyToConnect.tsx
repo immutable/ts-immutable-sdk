@@ -10,11 +10,10 @@ import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
 import { ViewContext, ViewActions } from '../../../context/ViewContext';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
-import { sendCloseWidgetEvent } from '../ConnectWidgetEvents';
 
 export const ReadyToConnect = () => {
   const {
-    connectState: { checkout },
+    connectState: { checkout, sendCloseEvent },
     connectDispatch,
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
@@ -72,7 +71,7 @@ export const ReadyToConnect = () => {
           showBack
           title=""
           transparent
-          onCloseButtonClick={() => sendCloseWidgetEvent()}
+          onCloseButtonClick={sendCloseEvent}
         />
       }
       floatHeader
