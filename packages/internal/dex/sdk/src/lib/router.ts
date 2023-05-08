@@ -1,13 +1,21 @@
 import { ethers } from 'ethers';
-import { Currency, TradeType, CurrencyAmount, Token } from '@uniswap/sdk-core';
+import {
+  Currency,
+  CurrencyAmount,
+  Percent,
+  Token,
+  TradeType,
+} from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import JSBI from 'jsbi';
 import { poolEquals } from './utils';
-import { QuoteResult, getQuotesForRoutes } from './getQuotesForRoutes';
+import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
-import { QuoteResponse } from '../types';
+import { Amount, QuoteResponse, TokenInfo } from '../types';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
 import { Multicall, Multicall__factory } from '../contracts/types';
+import { DEFAULT_SLIPPAGE } from '../constants';
+import { getAmountWithSlippageImpact } from './swap';
 
 export type RoutingContracts = {
   multicallAddress: string;
@@ -35,7 +43,8 @@ export class Router {
     amountSpecified: CurrencyAmount<Currency>,
     otherCurrency: Currency,
     tradeType: TradeType,
-    maxHops: number = 2
+    maxHops: number = 2,
+    slippagePercent: Percent = DEFAULT_SLIPPAGE
   ): Promise<QuoteResponse> {
     const [currencyIn, currencyOut] = this.determineERC20InAndERC20Out(
       tradeType,
@@ -107,9 +116,57 @@ export class Router {
       amountOut.multiply(amountOut.decimalScale).toExact()
     );
 
+    let quote: Amount;
+    let quoteWithMaxSlippage: Amount;
+
+    let wrappedResultToken: Token = otherCurrency.wrapped;
+    let resultToken: TokenInfo = {
+      chainId: wrappedResultToken.chainId,
+      address: wrappedResultToken.address,
+      decimals: wrappedResultToken.decimals,
+      symbol: wrappedResultToken.symbol,
+      name: wrappedResultToken.name,
+    };
+
+    if (tradeType === TradeType.EXACT_INPUT) {
+      const amountWithSlippageImpact = getAmountWithSlippageImpact(
+        tradeType,
+        amountOutWei,
+        slippagePercent
+      );
+
+      quote = {
+        token: resultToken,
+        amount: amountOutWei,
+      };
+
+      quoteWithMaxSlippage = {
+        token: resultToken,
+        amount: amountWithSlippageImpact,
+      };
+    } else {
+      const amountWithSlippageImpact = getAmountWithSlippageImpact(
+        tradeType,
+        amountInWei,
+        slippagePercent
+      );
+
+      quote = {
+        token: resultToken,
+        amount: amountInWei,
+      };
+
+      quoteWithMaxSlippage = {
+        token: resultToken,
+        amount: amountWithSlippageImpact,
+      };
+    }
+
     return {
       success: true,
       trade: {
+        quote,
+        quoteWithMaxSlippage,
         route: bestQuoteForRoute.route,
         amountIn: amountInWei,
         tokenIn: currencyIn,

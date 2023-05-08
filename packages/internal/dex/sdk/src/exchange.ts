@@ -17,9 +17,10 @@ import {
   validateDifferentAddresses,
 } from './lib/utils';
 import { QuoteResponse, TransactionResponse } from './types';
-import { createSwapParameters } from './lib/swap';
+import { createSwapParameters, getAmountWithSlippageImpact } from './lib/swap';
 import { MAX_MAX_HOPS } from './constants';
 import { ExchangeConfiguration } from './config';
+import { QuoteResult } from './lib/getQuotesForRoutes';
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;
@@ -102,7 +103,11 @@ export class Exchange {
       maxHops
     );
     if (!routeAndQuote.success) {
-      return { success: false, transactionRequest: undefined };
+      return {
+        success: false,
+        transactionRequest: undefined,
+        trade: undefined,
+      };
     }
 
     const params: MethodParameters = await createSwapParameters(
@@ -119,6 +124,12 @@ export class Exchange {
         to: this.router.routingContracts.peripheryRouterAddress,
         value: params.value,
         from: fromAddress,
+      },
+      trade: {
+        route: routeAndQuote.trade.route,
+        quote: routeAndQuote.trade.quote,
+        quoteWithMaxSlippage: routeAndQuote.trade.quoteWithMaxSlippage,
+        slippage: slippagePercent.toSignificant(),
       },
     };
   }
