@@ -1,5 +1,3 @@
-import { NetworkInfo, TokenInfo } from '@imtbl/checkout-sdk';
-
 /**
  * Represents an event object emitted by the Bridge Widget.
  * @property {BridgeEventType} type - The type of the event.

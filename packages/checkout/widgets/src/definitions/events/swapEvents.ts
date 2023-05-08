@@ -1,5 +1,3 @@
-import { NetworkInfo, TokenInfo } from '@imtbl/checkout-sdk';
-
 /**
  * Represents an event object emitted by the Swap Widget.
  * @property {SwapEventType} type - The type of the event.

@@ -16,7 +16,7 @@ import {
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';
 import { useContext, useEffect, useState } from 'react';
-import { ChainId, TokenInfo } from '@imtbl/checkout-sdk';
+import { ChainId } from '@imtbl/checkout-sdk';
 import {
   sendBridgeCoinsEvent,
   sendOnRampCoinsEvent,
@@ -81,13 +81,8 @@ export const BalanceItem = (props: BalanceItemProps) => {
               sx={ShowMenuItem(isOnRampEnabled)}
               onClick={() => {
                 sendOnRampCoinsEvent({
-                  network: walletState.network ?? undefined,
-                  token: {
-                    name: balanceInfo.symbol,
-                    symbol: balanceInfo.symbol,
-                    icon: balanceInfo.iconLogo,
-                  } as unknown as TokenInfo,
-                  maxTokenAmount: balanceInfo.balance,
+                  tokenAddress: '',
+                  amount: '',
                 });
               }}
             >
@@ -99,13 +94,9 @@ export const BalanceItem = (props: BalanceItemProps) => {
               sx={ShowMenuItem(isSwapEnabled)}
               onClick={() => {
                 sendSwapCoinsEvent({
-                  network: walletState.network ?? undefined,
-                  token: {
-                    name: balanceInfo.symbol,
-                    symbol: balanceInfo.symbol,
-                    icon: balanceInfo.iconLogo,
-                  } as unknown as TokenInfo,
-                  maxTokenAmount: balanceInfo.balance,
+                  fromTokenAddress: '',
+                  toTokenAddress: '',
+                  amount: '',
                 });
               }}
             >
@@ -117,13 +108,9 @@ export const BalanceItem = (props: BalanceItemProps) => {
               sx={ShowMenuItem(isBridgeEnabled)}
               onClick={() => {
                 sendBridgeCoinsEvent({
-                  network: walletState.network ?? undefined,
-                  token: {
-                    name: balanceInfo.symbol,
-                    symbol: balanceInfo.symbol,
-                    icon: balanceInfo.iconLogo,
-                  } as unknown as TokenInfo,
-                  maxTokenAmount: balanceInfo.balance,
+                  fromNetwork: '',
+                  tokenAddress: '',
+                  amount: '',
                 });
               }}
             >
