@@ -1,6 +1,5 @@
 import * as balances from './balances';
 import * as tokens from './tokens';
-import * as conversion from './conversion';
 import * as connect from './connect';
 import * as wallet from './wallet';
 import * as network from './network';
@@ -11,8 +10,6 @@ import {
   ConnectionProviders,
   ConnectParams,
   ConnectResult,
-  ConvertTokensToFiatParams,
-  ConvertTokensToFiatResult,
   GetAllBalancesParams,
   GetAllBalancesResult,
   GetBalanceParams,
@@ -178,11 +175,5 @@ export class Checkout {
    */
   public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
     return await network.getNetworkInfo(params.provider);
-  }
-
-  public async convertTokensToFiat(
-    params: ConvertTokensToFiatParams
-  ): Promise<ConvertTokensToFiatResult> {
-    return await conversion.convertTokensToFiat(params);
   }
 }
