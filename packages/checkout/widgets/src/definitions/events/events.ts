@@ -7,4 +7,5 @@ export enum IMTBLWidgetEvents {
   IMTBL_SWAP_WIDGET_EVENT = 'imtbl-swap-widget',
   IMTBL_BRIDGE_WIDGET_EVENT = 'imtbl-bridge-widget',
   IMTBL_BUY_WIDGET_EVENT = 'imtbl-buy-widget',
+  IMTBL_ONRAMP_WIDGET_EVENT = 'imtbl-onramp-widget',
 }

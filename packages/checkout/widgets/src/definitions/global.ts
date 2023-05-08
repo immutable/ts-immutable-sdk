@@ -25,6 +25,9 @@ export interface ImtblWalletProps
     HTMLElement
   > {
   providerPreference: string;
+  isOnRampEnabled?: string;
+  isSwapEnabled?: string;
+  isBridgeEnabled?: string;
   theme: string;
 }
 

@@ -6,11 +6,7 @@ import { text } from '../../../../resources/text/textConfig';
 import { WalletWidgetViews } from '../../../../context/WalletViewContextTypes';
 import { BiomeThemeProvider } from '@biom3/react';
 import { cy, it } from 'local-cypress';
-import {
-  Checkout,
-  ConnectionProviders,
-  TokenInfo,
-} from '@imtbl/checkout-sdk';
+import { Checkout, ConnectionProviders, TokenInfo } from '@imtbl/checkout-sdk';
 import { WalletContext, WalletState } from '../../context/WalletContext';
 import { Web3Provider } from '@ethersproject/providers';
 
@@ -59,6 +55,7 @@ describe('Network Menu', () => {
       provider: null,
       providerPreference: ConnectionProviders.METAMASK,
       tokenBalances: [],
+      supportedTopUps: null,
     };
     mount(
       <BiomeThemeProvider>
@@ -100,6 +97,7 @@ describe('Network Menu', () => {
       provider: {} as unknown as Web3Provider,
       providerPreference: ConnectionProviders.METAMASK,
       tokenBalances: [],
+      supportedTopUps: null,
     };
     mount(
       <BiomeThemeProvider>

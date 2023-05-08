@@ -21,3 +21,9 @@ export const BalanceItemPriceBoxStyle = {
   alignItems: 'center',
   columnGap: 'base.spacing.x4',
 };
+
+export const ShowMenuItem = (show: boolean | undefined) => {
+  return {
+    display: show ? '' : 'none'
+  }
+}

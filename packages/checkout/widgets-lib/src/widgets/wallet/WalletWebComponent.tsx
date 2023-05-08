@@ -13,6 +13,9 @@ export class ImmutableWallet extends HTMLElement {
 
   theme = WidgetTheme.DARK;
   providerPreference = ConnectionProviders.METAMASK;
+  isOnRampEnabled?: boolean;
+  isSwapEnabled?: boolean;
+  isBridgeEnabled?: boolean;
 
   attributeChangedCallback(name, oldValue, newValue) {
     this[name] = newValue;
@@ -24,12 +27,29 @@ export class ImmutableWallet extends HTMLElement {
     this.providerPreference = this.getAttribute(
       'providerPreference'
     ) as ConnectionProviders;
+    const isOnRampEnabledProp = this.getAttribute('isOnRampEnabled');
+    const isSwapEnabledProp = this.getAttribute('isSwapEnabled');
+    const isBridgeEnabledProp = this.getAttribute('isBridgeEnabled');
+    this.isOnRampEnabled = isOnRampEnabledProp
+      ? isOnRampEnabledProp.toLowerCase() === 'true'
+      : undefined;
+    this.isSwapEnabled = isSwapEnabledProp
+      ? isSwapEnabledProp.toLowerCase() === 'true'
+      : undefined;
+    this.isBridgeEnabled = isBridgeEnabledProp
+      ? isBridgeEnabledProp.toLowerCase() === 'true'
+      : undefined;
     this.renderWidget();
   }
 
   renderWidget() {
     const walletParams: WalletWidgetParams = {
       providerPreference: this.providerPreference,
+      topUpFeatures: {
+        isBridgeEnabled: this.isBridgeEnabled,
+        isSwapEnabled: this.isSwapEnabled,
+        isOnRampEnabled: this.isOnRampEnabled,
+      },
     };
 
     if (!this.reactRoot) {
