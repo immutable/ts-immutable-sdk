@@ -46,7 +46,7 @@ export function Example() {
         });
       }
     );
-  }, []);
+  }, [inputToken, outputToken]);
 
   if (ethereumAccount === null) {
     return <ConnectAccount setAccount={setEthereumAccount}/>
@@ -142,8 +142,8 @@ export function Example() {
         // Wait for the Approve transaction to complete
         await provider.waitForTransaction(approveReceipt.result, 1, 250000);
         setApproved(true);
-      } catch (e) {
-        alert(e);
+      } catch (e: any) {
+        alert(e.message);
         setIsFetching(false);
         return;
       }
@@ -158,8 +158,8 @@ export function Example() {
 
       // Wait for the Swap transaction to complete
       await provider.waitForTransaction(receipt.result, 1, 250000);
-    } catch (e) {
-      alert(e);
+    } catch (e: any) {
+      alert(e.message);
       setIsFetching(false);
       return;
     }
