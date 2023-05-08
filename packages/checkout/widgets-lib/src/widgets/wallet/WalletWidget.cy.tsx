@@ -5,11 +5,14 @@ import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { cySmartGet } from '../../lib/testUtils';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
+import { Web3Provider } from '@ethersproject/providers';
+import { BigNumber } from 'ethers';
 
 describe('WalletWidget tests', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
+
   it('should show loading screen when component is mounted', () => {
     const params = {
       providerPreference: ConnectionProviders.METAMASK,
@@ -110,6 +113,7 @@ describe('WalletWidget tests', () => {
       getAllBalancesStub.resolves({
         balances: [
           {
+            balance: BigNumber.from(1),
             formattedBalance: '12.12',
             token: {
               name: 'Ether',
@@ -118,6 +122,7 @@ describe('WalletWidget tests', () => {
             },
           },
           {
+            balance: BigNumber.from(2),
             formattedBalance: '88888999',
             token: {
               name: 'Immutable X',
@@ -126,6 +131,7 @@ describe('WalletWidget tests', () => {
             },
           },
           {
+            balance: BigNumber.from(3),
             formattedBalance: '100000000.2',
             token: {
               name: 'Gods Unchained',
@@ -149,6 +155,11 @@ describe('WalletWidget tests', () => {
             },
           },
         });
+
+      const signerStub = {
+        getAddress: cy.stub().resolves('0x123'),
+      };
+      cy.stub(Web3Provider.prototype, 'getSigner').returns(signerStub);
     });
 
     it('should show the network and user balances on that network', () => {
