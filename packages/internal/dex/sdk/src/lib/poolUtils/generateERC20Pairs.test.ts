@@ -6,7 +6,9 @@ import {
   IMX_TEST_CHAIN,
   USDC_TEST_CHAIN,
   WETH_TEST_CHAIN,
+  uniqBy,
 } from '../../utils/testUtils';
+import { ensureCorrectERC20AddressOrder } from './computePoolAddress';
 
 // TI TO [] = [TI / TO]
 // TI TO [TX] = [TI / TO, TI / TX, TO / TX]
@@ -174,18 +176,6 @@ describe('generateERC20Pairs', () => {
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
       expect(tokenPairs).toHaveLength(6);
     });
-  });
-
-  describe('when given a TokenIn and TokenOut pair and there are three CommonRoutingTokens, and one of the CommonRoutingTokens is the same as TokenIn', () => {
-    it('should create six pairs', async () => {
-      // We expect...
-      // TI TO [TX, TZ] = [TI / TO, TI / TX, TI / TZ, TO / TX, TO / TZ, TX / TZ]
-      const tokenPair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
-      const commonRoutingTokens: Token[] = [WETH_TEST_CHAIN, FUN_TEST_CHAIN];
-
-      const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
-      expect(tokenPairs).toHaveLength(6);
-    });
 
     it('should not repeat pairs', async () => {
       // We expect...
@@ -195,25 +185,12 @@ describe('generateERC20Pairs', () => {
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
 
-      for (let i = 0; i < tokenPairs.length; i++) {
-        // We use the address because it uniquely identifies the token
-        const tokenPairAddressesToCompare = [
-          tokenPairs[i][0].address,
-          tokenPairs[i][1].address,
-        ];
+      const uniquePairs = uniqBy(tokenPairs, (tp) => {
+        const orderedPair = ensureCorrectERC20AddressOrder(tp);
 
-        for (let j = i + 1; j < tokenPairs.length; j++) {
-          const currentTokenPairAddresses = [
-            tokenPairs[j][0].address,
-            tokenPairs[j][1].address,
-          ];
-
-          // Ensure this pair of tokens does not repeat
-          expect(tokenPairAddressesToCompare).not.toEqual(
-            currentTokenPairAddresses
-          );
-        }
-      }
+        return JSON.stringify([orderedPair[0].address, orderedPair[1].address]);
+      });
+      expect(uniquePairs.length).toEqual(6);
     });
   });
 });
