@@ -16,11 +16,12 @@ export const fetchTokenIds = async (tokens: TokenInfo[]) => {
   const tokenSymbols = tokens.map((token) => token.symbol.toLowerCase());
   let res;
 
-  res = await withCheckoutError(async () => await axios.get(coinListApi), {
+  res = await withCheckoutError(
+    async () => await (await fetch(coinListApi)).json(), {
     type: CheckoutErrorType.FIAT_CONVERSION_ERROR,
   });
 
-  const tokenIds = res.data.reduce(
+  const tokenIds = res.reduce(
     (acc: object, token: { id: string; symbol: string }) => {
       if (!tokenSymbols.includes(token.symbol)) {
         return acc;
@@ -45,7 +46,7 @@ export const fetchQuotesFromCoinGecko = async (
   const idsString = Object.keys(tokenIds).join(',');
   const quoteApi = `https://api.coingecko.com/api/v3/simple/price?ids=${idsString}&precision=full&vs_currencies=${fiatSymbol}&include_last_updated_at=true`;
   const { data } = await withCheckoutError(
-    async () => await axios.get(quoteApi),
+    async () => await (await fetch(quoteApi)).json(),
     {
       type: CheckoutErrorType.FIAT_CONVERSION_ERROR,
     }
