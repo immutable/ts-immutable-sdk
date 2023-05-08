@@ -7,6 +7,7 @@ import {
   TEST_V3_CORE_FACTORY_ADDRESS,
   USDC_TEST_CHAIN,
   WETH_TEST_CHAIN,
+  uniqBy,
 } from '../../utils/testUtils';
 
 describe('generatePoolsFromTokenPairs', () => {
@@ -124,7 +125,7 @@ describe('generatePoolsFromTokenPairs', () => {
   });
 
   describe('when given one TokenPair and four fees', () => {
-    it('should return twelve combinations', () => {
+    it('should return twelve unique combinations', () => {
       const erc20Pair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
       const commonRoutingERC20s: Token[] = [WETH_TEST_CHAIN];
 
@@ -134,7 +135,11 @@ describe('generatePoolsFromTokenPairs', () => {
         TEST_V3_CORE_FACTORY_ADDRESS
       );
 
-      expect(pools).toHaveLength(12);
+
+      // The pool address is unique to the combination of token0, token1 and fee
+      // We expect there to be no repeating pool addresses
+      const uniquePools = uniqBy(pools, (pool) => pool.poolAddress.toLowerCase())
+      expect(uniquePools).toHaveLength(12);
     });
   });
 });

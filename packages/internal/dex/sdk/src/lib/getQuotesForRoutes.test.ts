@@ -7,6 +7,7 @@ import {
   IMX_TEST_CHAIN,
   TEST_CHAIN_ID,
   TEST_MULTICALL_ADDRESS,
+  TEST_QUOTER_ADDRESS,
   TEST_RPC_URL,
   WETH_TEST_CHAIN,
 } from '../utils/testUtils';
@@ -81,6 +82,7 @@ describe('getQuotesForRoutes', () => {
       );
       const amountOutReceived = await getQuotesForRoutes(
         multicallContract,
+        TEST_QUOTER_ADDRESS,
         dummyRoutes,
         amount,
         TradeType.EXACT_INPUT
@@ -167,6 +169,7 @@ describe('getQuotesForRoutes', () => {
       );
       const amountOutReceived = await getQuotesForRoutes(
         multicallContract,
+        TEST_QUOTER_ADDRESS,
         dummyRoutes,
         amount,
         TradeType.EXACT_INPUT

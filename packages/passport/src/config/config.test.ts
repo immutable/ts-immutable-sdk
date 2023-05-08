@@ -1,3 +1,7 @@
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
+// TODO: Remove this once the dependency has been fixed
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
@@ -5,8 +9,6 @@ import {
   PassportOverrides,
   PassportModuleConfiguration,
 } from '../types';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
 
 describe('Config', () => {
   const oidcConfiguration = {
@@ -43,7 +45,7 @@ describe('Config', () => {
           magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
           passportDomain: 'https://passport.sandbox.immutable.com',
           oidcConfiguration,
-        })
+        }),
       );
     });
   });
@@ -65,7 +67,7 @@ describe('Config', () => {
           magicProviderId: 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=',
           passportDomain: 'https://passport.immutable.com',
           oidcConfiguration,
-        })
+        }),
       );
     });
   });
@@ -90,7 +92,7 @@ describe('Config', () => {
             network: overrides.network,
             passportDomain: overrides.passportDomain,
             oidcConfiguration,
-          })
+          }),
         );
       });
     });
@@ -109,15 +111,14 @@ describe('Config', () => {
           ...oidcConfiguration,
         };
         expect(
-          () =>
-            new PassportConfiguration(
-              passportConfiguration as unknown as PassportModuleConfiguration
-            )
+          () => new PassportConfiguration(
+            passportConfiguration as unknown as PassportModuleConfiguration,
+          ),
         ).toThrow(
           new PassportError(
             'overrides - authenticationDomain cannot be null',
-            PassportErrorType.AUTHENTICATION_ERROR
-          )
+            PassportErrorType.AUTHENTICATION_ERROR,
+          ),
         );
       });
     });
@@ -134,15 +135,14 @@ describe('Config', () => {
         clientId: undefined,
       };
       expect(
-        () =>
-          new PassportConfiguration(
-            passportConfiguration as unknown as PassportModuleConfiguration
-          )
+        () => new PassportConfiguration(
+          passportConfiguration as unknown as PassportModuleConfiguration,
+        ),
       ).toThrow(
         new PassportError(
           'clientId cannot be null',
-          PassportErrorType.AUTHENTICATION_ERROR
-        )
+          PassportErrorType.AUTHENTICATION_ERROR,
+        ),
       );
     });
   });
