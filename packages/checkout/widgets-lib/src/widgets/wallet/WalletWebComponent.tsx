@@ -3,7 +3,10 @@ import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
-import { ConnectLoader } from '../../components/ConnectLoader/ConnectLoader';
+import {
+  ConnectLoader,
+  ConnectLoaderParams,
+} from '../../components/ConnectLoader/ConnectLoader';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 
 export class ImmutableWallet extends HTMLElement {
@@ -45,6 +48,10 @@ export class ImmutableWallet extends HTMLElement {
   }
 
   renderWidget() {
+    const connectLoaderParams: ConnectLoaderParams = {
+      providerPreference: this.providerPreference,
+    };
+
     const walletParams: WalletWidgetParams = {
       providerPreference: this.providerPreference,
       topUpFeatures: {
@@ -62,7 +69,7 @@ export class ImmutableWallet extends HTMLElement {
       <React.StrictMode>
         <ConnectLoader
           theme={this.theme}
-          params={walletParams}
+          params={connectLoaderParams}
           closeEvent={sendWalletWidgetCloseEvent}
         >
           <WalletWidget params={walletParams} theme={this.theme}></WalletWidget>
