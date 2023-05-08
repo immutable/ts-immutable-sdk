@@ -7,6 +7,9 @@ export enum WalletEventType {
   CLOSE_WIDGET = 'close-widget',
   NETWORK_SWITCH = 'network-switch',
   ADD_COINS = 'add-coins',
+  REQUEST_SWAP = 'request-swap',
+  REQUEST_BRIDGE = 'request-bridge',
+  REQUEST_ONRAMP = 'request-onramp',
 }
 
 /**
@@ -23,6 +26,23 @@ export type WalletAddCoinsEvent = {
   network?: NetworkInfo;
   token?: TokenInfo;
   tokenAmount?: string;
+};
+
+export type WalletRequestSwapEvent = {
+  fromTokenAddress: string;
+  toTokenAddress: string;
+  amount: string;
+};
+
+export type WalletRequestBridgeEvent = {
+  fromNetwork: string;
+  tokenAddress: string;
+  amount: string;
+};
+
+export type WalletRequestOnrampEvent = {
+  tokenAddress: string;
+  amount: string;
 };
 
 /**

@@ -1,17 +1,11 @@
 import {
-  BridgeEvent,
-  BridgeEventType,
   IMTBLWidgetEvents,
-  OnRampCoinsEvent,
-  OnRampEvent,
-  OnRampEventType,
-  SwapEvent,
-  SwapEventType,
   WalletEventType,
-  BridgeCoinsEvent,
-  SwapCoinsEvent,
   WalletAddCoinsEvent,
   WalletEvent,
+  WalletRequestOnrampEvent,
+  WalletRequestSwapEvent,
+  WalletRequestBridgeEvent,
 } from '@imtbl/checkout-widgets';
 
 export function sendAddCoinsEvent(eventData: WalletAddCoinsEvent) {
@@ -28,12 +22,12 @@ export function sendAddCoinsEvent(eventData: WalletAddCoinsEvent) {
   if (window !== undefined) window.dispatchEvent(addCoinsEvent);
 }
 
-export function sendOnRampCoinsEvent(eventData: OnRampCoinsEvent) {
-  const addCoinsEvent = new CustomEvent<OnRampEvent<OnRampCoinsEvent>>(
+export function sendOnRampCoinsEvent(eventData: WalletRequestOnrampEvent) {
+  const addCoinsEvent = new CustomEvent<WalletEvent<WalletRequestOnrampEvent>>(
     IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
     {
       detail: {
-        type: OnRampEventType.ONRAMP_COINS,
+        type: WalletEventType.REQUEST_ONRAMP,
         data: eventData,
       },
     }
@@ -42,12 +36,12 @@ export function sendOnRampCoinsEvent(eventData: OnRampCoinsEvent) {
   if (window !== undefined) window.dispatchEvent(addCoinsEvent);
 }
 
-export function sendSwapCoinsEvent(eventData: SwapCoinsEvent) {
-  const swapCoinsEvent = new CustomEvent<SwapEvent<SwapCoinsEvent>>(
+export function sendSwapCoinsEvent(eventData: WalletRequestSwapEvent) {
+  const swapCoinsEvent = new CustomEvent<WalletEvent<WalletRequestSwapEvent>>(
     IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
     {
       detail: {
-        type: SwapEventType.SWAP_COINS,
+        type: WalletEventType.REQUEST_SWAP,
         data: eventData,
       },
     }
@@ -56,12 +50,12 @@ export function sendSwapCoinsEvent(eventData: SwapCoinsEvent) {
   if (window !== undefined) window.dispatchEvent(swapCoinsEvent);
 }
 
-export function sendBridgeCoinsEvent(eventData: BridgeCoinsEvent) {
-  const bridgeCoinsEvent = new CustomEvent<BridgeEvent<BridgeCoinsEvent>>(
+export function sendBridgeCoinsEvent(eventData: WalletRequestBridgeEvent) {
+  const bridgeCoinsEvent = new CustomEvent<WalletEvent<WalletRequestBridgeEvent>>(
     IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
     {
       detail: {
-        type: BridgeEventType.BRIDGE_COINS,
+        type: WalletEventType.REQUEST_BRIDGE,
         data: eventData,
       },
     }

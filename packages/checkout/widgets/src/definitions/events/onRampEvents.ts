@@ -6,11 +6,4 @@ export type OnRampEvent<T> = {
 };
 
 export enum OnRampEventType {
-  ONRAMP_COINS = 'onramp-coins',
 }
-
-export type OnRampCoinsEvent = {
-  network?: NetworkInfo;
-  token?: TokenInfo;
-  maxTokenAmount?: string;
-};
