@@ -3,8 +3,7 @@
   "description": "Economy module for Immutable SDK",
   "version": "0.0.0",
   "dependencies": {
-    "@imtbl/checkout-sdk-web": "0.0.0",
-    "@imtbl/checkout-ui-types": "0.0.0",
+    "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/checkout-widgets": "0.0.0",
     "@swc/helpers": "~0.5.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",

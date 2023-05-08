@@ -64,7 +64,7 @@ export async function createOrder({
       {
         transactionType: TransactionTypes.CreateOrder,
         transactionData: getSignableOrderRequestV3,
-      }
+      },
     );
     if (!confirmationResult.confirmed) {
       throw new Error('Transaction rejected by user');
@@ -94,7 +94,8 @@ export async function createOrder({
       },
     };
     const headers = {
-      Authorization: 'Bearer ' + user.accessToken,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Authorization: `Bearer ${user.accessToken}`,
     };
     const createOrderResponse = await ordersApi.createOrder(orderParams, {
       headers,
@@ -117,10 +118,9 @@ export async function cancelOrder({
     const getSignableCancelOrderRequest: GetSignableCancelOrderRequest = {
       order_id: request.order_id,
     };
-    const getSignableCancelOrderResponse =
-      await ordersApi.getSignableCancelOrder({
-        getSignableCancelOrderRequest,
-      });
+    const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrder({
+      getSignableCancelOrderRequest,
+    });
 
     const confirmationScreen = new ConfirmationScreen(passportConfig);
     const confirmationResult = await confirmationScreen.startTransaction(
@@ -128,7 +128,7 @@ export async function cancelOrder({
       {
         transactionType: TransactionTypes.CancelOrder,
         transactionData: getSignableCancelOrderRequest,
-      }
+      },
     );
     if (!confirmationResult.confirmed) {
       throw new Error('Transaction rejected by user');
@@ -139,7 +139,8 @@ export async function cancelOrder({
     const starkSignature = await starkSigner.signMessage(payloadHash);
 
     const headers = {
-      Authorization: 'Bearer ' + user.accessToken,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Authorization: `Bearer ${user.accessToken}`,
     };
 
     const cancelOrderResponse = await ordersApi.cancelOrder(
@@ -150,7 +151,7 @@ export async function cancelOrder({
           stark_signature: starkSignature,
         },
       },
-      { headers }
+      { headers },
     );
 
     return {

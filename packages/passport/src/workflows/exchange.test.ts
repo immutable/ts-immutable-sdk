@@ -1,6 +1,5 @@
-import { CreateTransferResponseV1, ETHAmount } from '@imtbl/core-sdk';
+import { CreateTransferResponseV1, ETHAmount, ExchangesApi } from '@imtbl/core-sdk';
 import { exchangeTransfer } from './exchange';
-import { ExchangesApi } from '@imtbl/core-sdk';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 
@@ -61,15 +60,16 @@ describe('exchangeTransfer', () => {
 
     mockStarkSigner.getAddress.mockResolvedValue(mockStarkAddress);
     getExchangeSignableTransferMock.mockResolvedValue(
-      mockGetExchangeSignableTransferResponse
+      mockGetExchangeSignableTransferResponse,
     );
     createExchangeTransferMock.mockResolvedValue(
-      mockCreateExchangeTransferResponse
+      mockCreateExchangeTransferResponse,
     );
     mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
 
     const mockHeader = {
       headers: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         Authorization: `Bearer ${mockUser.accessToken}`,
       },
     };
@@ -96,7 +96,7 @@ describe('exchangeTransfer', () => {
         },
         id: 'abc123',
       },
-      mockHeader
+      mockHeader,
     );
     expect(getExchangeSignableTransferMock).toHaveBeenCalledWith({
       getSignableTransferRequest: {
@@ -114,7 +114,7 @@ describe('exchangeTransfer', () => {
     });
 
     expect(mockStarkSigner.signMessage).toBeCalledWith(
-      mockGetExchangeSignableTransferResponse.data.payload_hash
+      mockGetExchangeSignableTransferResponse.data.payload_hash,
     );
     expect(mockStarkSigner.getAddress).toHaveBeenCalled();
     expect(response).toEqual({
@@ -127,21 +127,19 @@ describe('exchangeTransfer', () => {
 
   it('should return error if failed to call public api', async () => {
     getExchangeSignableTransferMock.mockRejectedValue(
-      new Error(mockErrorMessage)
+      new Error(mockErrorMessage),
     );
 
-    await expect(() =>
-      exchangeTransfer({
-        user: mockUser,
-        starkSigner: mockStarkSigner,
-        request: exchangeTransferRequest,
-        exchangesApi: exchangesApiMock,
-      })
-    ).rejects.toThrow(
+    await expect(() => exchangeTransfer({
+      user: mockUser,
+      starkSigner: mockStarkSigner,
+      request: exchangeTransferRequest,
+      exchangesApi: exchangesApiMock,
+    })).rejects.toThrow(
       new PassportError(
         `${PassportErrorType.EXCHANGE_TRANSFER_ERROR}: ${mockErrorMessage}`,
-        PassportErrorType.EXCHANGE_TRANSFER_ERROR
-      )
+        PassportErrorType.EXCHANGE_TRANSFER_ERROR,
+      ),
     );
   });
 });

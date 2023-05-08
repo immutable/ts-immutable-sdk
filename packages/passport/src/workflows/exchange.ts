@@ -51,7 +51,8 @@ export async function exchangeTransfer({
     };
 
     const headers = {
-      Authorization: 'Bearer ' + user.accessToken,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Authorization: `Bearer ${user.accessToken}`,
     };
 
     const response = await exchangesApi.createExchangeTransfer(
@@ -59,7 +60,7 @@ export async function exchangeTransfer({
         id: request.transactionID,
         createTransferRequest: transferSigningParams,
       },
-      { headers }
+      { headers },
     );
 
     return {

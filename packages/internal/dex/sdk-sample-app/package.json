@@ -21,7 +21,7 @@
   "scripts": {
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start",
-    "setup": "cd ../../../../ && yarn build:all"
+    "setup": "cd ../../../../ && yarn build:all",
+    "start": "next start"
   }
 }

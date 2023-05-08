@@ -1,4 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+// TODO: Remove once the dependency has been added
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import {
   CancelOrderResponse,
@@ -56,10 +58,15 @@ describe('PassportImxProvider', () => {
 
   describe('constructor', () => {
     it('sets the private properties', () => {
-      expect(passportImxProvider['user']).toEqual(mockUser);
-      expect(passportImxProvider['starkSigner']).toEqual(mockStarkSigner);
-      expect(passportImxProvider['passportConfig']).toEqual(passportConfig);
-      expect(passportImxProvider['immutableXClient']).toEqual(immutableXClient);
+      // TODO: Remove once fixed
+      // @ts-ignore
+      expect(passportImxProvider.user).toEqual(mockUser);
+      // @ts-ignore
+      expect(passportImxProvider.starkSigner).toEqual(mockStarkSigner);
+      // @ts-ignore
+      expect(passportImxProvider.passportConfig).toEqual(passportConfig);
+      // @ts-ignore
+      expect(passportImxProvider.immutableXClient).toEqual(immutableXClient);
     });
   });
 
@@ -87,8 +94,8 @@ describe('PassportImxProvider', () => {
       expect(passportImxProvider.registerOffchain).toThrow(
         new PassportError(
           'Operation not supported',
-          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
-        )
+          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
+        ),
       );
     });
   });
@@ -98,8 +105,8 @@ describe('PassportImxProvider', () => {
       expect(passportImxProvider.isRegisteredOnchain).toThrow(
         new PassportError(
           'Operation not supported',
-          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
-        )
+          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
+        ),
       );
     });
   });
@@ -203,8 +210,8 @@ describe('PassportImxProvider', () => {
       expect(passportImxProvider.deposit).toThrow(
         new PassportError(
           'Operation not supported',
-          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
-        )
+          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
+        ),
       );
     });
   });
@@ -214,8 +221,8 @@ describe('PassportImxProvider', () => {
       expect(passportImxProvider.prepareWithdrawal).toThrow(
         new PassportError(
           'Operation not supported',
-          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
-        )
+          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
+        ),
       );
     });
   });
@@ -225,8 +232,8 @@ describe('PassportImxProvider', () => {
       expect(passportImxProvider.completeWithdrawal).toThrow(
         new PassportError(
           'Operation not supported',
-          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR
-        )
+          PassportErrorType.OPERATION_NOT_SUPPORTED_ERROR,
+        ),
       );
     });
   });

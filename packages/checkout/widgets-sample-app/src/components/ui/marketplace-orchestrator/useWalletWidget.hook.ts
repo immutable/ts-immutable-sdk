@@ -2,7 +2,7 @@ import {
   IMTBLWidgetEvents,
   WalletEventType,
   WalletNetworkSwitchEvent,
-} from '@imtbl/checkout-ui-types';
+} from '@imtbl/checkout-widgets';
 import { useEffect, useState } from 'react';
 
 export function useWalletWidget() {

@@ -5,10 +5,11 @@ import { ExchangeConfiguration } from './index';
 import { POLYGON_TESTNET_CHAIN_ID } from '../constants/tokens/polygon';
 describe('config', () => {
   it('should create successfully', () => {
+    const baseConfig = new ImmutableConfiguration({
+      environment: Environment.SANDBOX,
+    });
     const exchangeConfiguration: ExchangeModuleConfiguration = {
-      baseConfig: new ImmutableConfiguration({
-        environment: Environment.SANDBOX,
-      }),
+      baseConfig: baseConfig,
       chainId: POLYGON_TESTNET_CHAIN_ID,
     };
 
@@ -18,10 +19,11 @@ describe('config', () => {
   });
 
   it('throw error if incorrect chainId provided', () => {
+    const baseConfig = new ImmutableConfiguration({
+      environment: Environment.SANDBOX,
+    });
     const exchangeConfiguration: ExchangeModuleConfiguration = {
-      baseConfig: new ImmutableConfiguration({
-        environment: Environment.SANDBOX,
-      }),
+      baseConfig: baseConfig,
       chainId: 1,
     };
 

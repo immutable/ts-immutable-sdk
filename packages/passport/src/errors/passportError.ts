@@ -26,13 +26,12 @@ export class PassportError extends Error {
 
 export const withPassportError = async <T>(
   fn: () => Promise<T>,
-  customErrorType: PassportErrorType
+  customErrorType: PassportErrorType,
 ): Promise<T> => {
   try {
     return await fn();
   } catch (error) {
-    const errorMessage =
-      `${customErrorType}: ${(error as Error).message}` || 'UnknownError';
+    const errorMessage = `${customErrorType}: ${(error as Error).message}` || 'UnknownError';
     throw new PassportError(errorMessage, customErrorType);
   }
 };

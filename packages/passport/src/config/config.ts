@@ -9,7 +9,7 @@ import { PassportError, PassportErrorType } from '../errors/passportError';
 const validateConfiguration = <T>(
   configuration: T,
   requiredKeys: Array<keyof T>,
-  prefix?: string
+  prefix?: string,
 ) => {
   const missingKeys = requiredKeys
     .map((key) => !configuration[key] && key)
@@ -21,18 +21,24 @@ const validateConfiguration = <T>(
       : `${missingKeys} cannot be null`;
     throw new PassportError(
       errorMessage,
-      PassportErrorType.INVALID_CONFIGURATION
+      PassportErrorType.INVALID_CONFIGURATION,
     );
   }
 };
 
 export class PassportConfiguration {
   readonly network: Networks;
+
   readonly authenticationDomain: string;
+
   readonly passportDomain: string;
+
   readonly magicPublishableApiKey: string;
+
   readonly magicProviderId: string;
+
   readonly oidcConfiguration: OidcConfiguration;
+
   readonly baseConfig: ImmutableConfiguration;
 
   constructor({
@@ -57,7 +63,7 @@ export class PassportConfiguration {
           'magicProviderId',
           'passportDomain',
         ],
-        'overrides'
+        'overrides',
       );
       this.network = overrides.network;
       this.authenticationDomain = overrides.authenticationDomain;
@@ -66,20 +72,21 @@ export class PassportConfiguration {
       this.magicProviderId = overrides.magicProviderId;
     } else {
       switch (baseConfig.environment) {
-        case Environment.SANDBOX: {
-          this.network = Networks.SANDBOX;
-          this.authenticationDomain = 'https://auth.immutable.com';
-          this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
-          this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
-          this.passportDomain = 'https://passport.sandbox.immutable.com';
-          break;
-        }
         case Environment.PRODUCTION: {
           this.network = Networks.PRODUCTION;
           this.authenticationDomain = 'https://auth.immutable.com';
           this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
           this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
           this.passportDomain = 'https://passport.immutable.com';
+          break;
+        }
+        case Environment.SANDBOX:
+        default: {
+          this.network = Networks.SANDBOX;
+          this.authenticationDomain = 'https://auth.immutable.com';
+          this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
+          this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
+          this.passportDomain = 'https://passport.sandbox.immutable.com';
           break;
         }
       }

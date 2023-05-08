@@ -1,6 +1,6 @@
 # SDK Sample Application
 
-Before being able to run this project, you will need to build the `@imtbl/checkout-sdk-web` package. 
+Before being able to run this project, you will need to build the `@imtbl/checkout-sdk` package. 
 
 Open the `ts-immutable-sdk` root folder and run:
 ```

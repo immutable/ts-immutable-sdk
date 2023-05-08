@@ -13,7 +13,7 @@ export default {
     commonjs(),
     nodeResolve(),
     typescript({
-      exclude: ['**/ABIs/*', '**/*.test.*', '**/utils/testUtils.ts'],
+      exclude: [],
     }),
   ],
 };

@@ -108,6 +108,22 @@ type ExactInputOutputSingleParams = {
   sqrtPriceLimitX96: ethers.BigNumber;
 };
 
+// uniqBy returns the unique items in an array using the given comparator
+export function uniqBy<K, T extends string | number>(
+  array: K[],
+  comparator: (arg: K) => T
+): K[] {
+  const uniqArr: Partial<Record<T, K>> = {};
+
+  for (let i = 0; i < array.length; i++) {
+    const firstCompare = comparator(array[i]);
+
+    uniqArr[firstCompare] = array[i];
+  }
+
+  return Object.values(uniqArr);
+}
+
 export function decodeMulticallData(data: ethers.utils.BytesLike): {
   topLevelParams: ethers.utils.Result;
   functionCallParams: ExactInputOutputSingleParams;

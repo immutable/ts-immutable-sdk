@@ -17,10 +17,20 @@ export enum SendMessage {
 }
 
 export enum TransactionTypes {
+  // TODO: remove this once the naming has been fixed
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   CancelOrder = 'delete:v1/orders',
+  // TODO: remove this once the naming has been fixed
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   CreateOrder = 'post:v1/orders',
+  // TODO: remove this once the naming has been fixed
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   CreateTrade = 'post:v1/trades',
+  // TODO: remove this once the naming has been fixed
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   CreateTransfer = 'post:v1/transfers',
+  // TODO: remove this once the naming has been fixed
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   CreateBatchTransfer = 'post:v2/transfers',
 }
 
@@ -65,4 +75,6 @@ export type ConfirmationResult = {
   confirmed: boolean;
 };
 
+// TODO: remove this once the naming has been fixed
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const PassportEventType = 'imx_passport_confirmation';

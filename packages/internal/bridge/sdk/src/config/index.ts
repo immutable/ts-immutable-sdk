@@ -10,13 +10,28 @@ import {
   BridgeModuleConfiguration,
 } from '../types';
 
+/**
+ * Represents the configuration for a bridge between two chains.
+ */
 export class BridgeConfiguration {
+    /**
+   * @property {ImmutableConfiguration} baseConfig - The base configuration for the module.
+   * @property {BridgeInstance} bridgeInstance - The bridge instance configuration for the root and child chains.
+   * @property {BridgeContracts} bridgeContracts - The configuration of the contracts associated with the bridge.
+   * @property {ethers.providers.Provider} rootProvider - The Ethereum provider for the root chain.
+   * @property {ethers.providers.Provider} childProvider - The Ethereum provider for the child chain.
+   */
   public baseConfig: ImmutableConfiguration;
   public bridgeInstance: BridgeInstance;
   public bridgeContracts: BridgeContracts;
   public rootProvider: ethers.providers.Provider;
   public childProvider: ethers.providers.Provider;
-
+  
+  /**
+   * Constructs a BridgeConfiguration instance.
+   *
+   * @param {BridgeModuleConfiguration} options - The configuration options for the bridge module.
+   */
   constructor({
     bridgeInstance,
     rootProvider,
@@ -58,8 +73,10 @@ export class BridgeConfiguration {
   }
 }
 
-// TODO: Add correct addresses
-export const ContractsForBridge = new Map<BridgeInstance, BridgeContracts>()
+/**
+ * @constant {Map<BridgeInstance, BridgeContracts>} ContractsForBridge - A map of bridge instances to their associated contract addresses.
+ */
+const ContractsForBridge = new Map<BridgeInstance, BridgeContracts>()
   .set(ETH_SEPOLIA_TO_ZKEVM_DEVNET, {
     rootChainERC20Predicate: '0xA401eA44cDAc48569322b1166A0696b9412977D9',
     rootChainStateSender: '0xA002CfC25D1DDdE53FBD5d8bCF8E26c821B87ceD',
@@ -73,10 +90,19 @@ export const ContractsForBridge = new Map<BridgeInstance, BridgeContracts>()
     childChainStateReceiver: '0x',
   });
 
+/**
+ * @constant {BridgeInstance[]} SupportedSandboxBridges - An array of supported bridge instances for the sandbox environment.
+ */
 const SupportedSandboxBridges: BridgeInstance[] = [ETH_SEPOLIA_TO_ZKEVM_DEVNET];
 
+/**
+ * @constant {BridgeInstance[]} SupportedProductionBridges - An array of supported bridge instances for the production environment.
+ */
 const SupportedProductionBridges: BridgeInstance[] = [];
 
+/**
+ * @constant {Object} SupportedBridgesForEnvironment - An object mapping environment types to their supported bridge instances.
+ */
 export const SupportedBridgesForEnvironment: {
   [key in Environment]: BridgeInstance[];
 } = {

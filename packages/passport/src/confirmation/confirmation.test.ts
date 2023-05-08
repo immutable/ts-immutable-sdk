@@ -59,7 +59,7 @@ describe('confirmation', () => {
       const confirmationScreen = new ConfirmationScreen(config);
       const res = await confirmationScreen.startTransaction(
         'ehyyy',
-        transaction
+        transaction,
       );
 
       expect(res.confirmed).toEqual(false);

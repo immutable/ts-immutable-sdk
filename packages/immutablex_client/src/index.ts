@@ -69,21 +69,37 @@ export {
 
 export class ImmutableXClient {
   private immutableX: ImmutableX;
+
   public depositsApi: DepositsApi;
+
   public mintsApi: MintsApi;
+
   public ordersApi: OrdersApi;
+
   public tokensApi: TokensApi;
+
   public tradesApi: TradesApi;
+
   public transfersApi: TransfersApi;
+
   public exchangeApi: ExchangesApi;
+
   public nftCheckoutPrimaryApi: NftCheckoutPrimaryApi;
+
   public usersApi: UsersApi;
+
   public withdrawalsApi: WithdrawalsApi;
+
   public balanceApi: BalancesApi;
+
   public assetApi: AssetsApi;
+
   public collectionApi: CollectionsApi;
+
   public metadataApi: MetadataApi;
+
   public metadataRefreshesApi: MetadataRefreshesApi;
+
   public projectsApi: ProjectsApi;
 
   constructor(config: ImxModuleConfiguration) {
@@ -119,7 +135,7 @@ export class ImmutableXClient {
 
   /**
    * Get a list of Deposits
-   * @param request - optional request object containing the parameters to be provided in the API request
+   * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Deposits
    * @throws {@link index.IMXError}
    */
@@ -149,7 +165,7 @@ export class ImmutableXClient {
 
   /**
    * Get a list of Assets
-   * @param request - optional request object containing the parameters to be provided in the API request
+   * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Assets
    * @throws {@link index.IMXError}
    */
@@ -166,7 +182,7 @@ export class ImmutableXClient {
    */
   public createCollection(
     ethSigner: EthSigner,
-    request: CreateCollectionRequest
+    request: CreateCollectionRequest,
   ) {
     return this.immutableX.createCollection(ethSigner, request);
   }
@@ -188,14 +204,14 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public listCollectionFilters(
-    request: CollectionsApiListCollectionFiltersRequest
+    request: CollectionsApiListCollectionFiltersRequest,
   ) {
     return this.immutableX.listCollectionFilters(request);
   }
 
   /**
    * Get a list of Collections
-   * @param request - optional request object containing the parameters to be provided in the API request
+   * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Collections
    * @throws {@link index.IMXError}
    */
@@ -214,12 +230,12 @@ export class ImmutableXClient {
   public updateCollection(
     ethSigner: EthSigner,
     collectionAddress: string,
-    request: UpdateCollectionRequest
+    request: UpdateCollectionRequest,
   ) {
     return this.immutableX.updateCollection(
       ethSigner,
       collectionAddress,
-      request
+      request,
     );
   }
 
@@ -234,12 +250,12 @@ export class ImmutableXClient {
   public addMetadataSchemaToCollection(
     ethSigner: EthSigner,
     collectionAddress: string,
-    request: AddMetadataSchemaToCollectionRequest
+    request: AddMetadataSchemaToCollectionRequest,
   ) {
     return this.immutableX.addMetadataSchemaToCollection(
       ethSigner,
       collectionAddress,
-      request
+      request,
     );
   }
 
@@ -266,13 +282,13 @@ export class ImmutableXClient {
     ethSigner: EthSigner,
     collectionAddress: string,
     name: string,
-    request: MetadataSchemaRequest
+    request: MetadataSchemaRequest,
   ) {
     return this.immutableX.updateMetadataSchemaByName(
       ethSigner,
       collectionAddress,
       name,
-      request
+      request,
     );
   }
 
@@ -289,13 +305,13 @@ export class ImmutableXClient {
     ethSigner: EthSigner,
     collectionAddress?: string,
     pageSize?: number,
-    cursor?: string
+    cursor?: string,
   ) {
     return this.immutableX.listMetadataRefreshes(
       ethSigner,
       collectionAddress,
       pageSize,
-      cursor
+      cursor,
     );
   }
 
@@ -312,13 +328,13 @@ export class ImmutableXClient {
     ethSigner: EthSigner,
     refreshId: string,
     pageSize?: number,
-    cursor?: string
+    cursor?: string,
   ) {
     return this.immutableX.getMetadataRefreshErrors(
       ethSigner,
       refreshId,
       pageSize,
-      cursor
+      cursor,
     );
   }
 
@@ -342,7 +358,7 @@ export class ImmutableXClient {
    */
   public createMetadataRefresh(
     ethSigner: EthSigner,
-    request: CreateMetadataRefreshRequest
+    request: CreateMetadataRefreshRequest,
   ) {
     return this.immutableX.createMetadataRefresh(ethSigner, request);
   }
@@ -356,7 +372,7 @@ export class ImmutableXClient {
    */
   public async createProject(
     ethSigner: EthSigner,
-    request: CreateProjectRequest
+    request: CreateProjectRequest,
   ) {
     return this.immutableX.createProject(ethSigner, request);
   }
@@ -387,14 +403,14 @@ export class ImmutableXClient {
     pageSize?: number,
     cursor?: string,
     orderBy?: string,
-    direction?: string
+    direction?: string,
   ) {
     return this.immutableX.getProjects(
       ethSigner,
       pageSize,
       cursor,
       orderBy,
-      direction
+      direction,
     );
   }
 
@@ -430,7 +446,7 @@ export class ImmutableXClient {
 
   /**
    * Get a list of Mints
-   * @param request optional request object containing the parameters to be provided in the API request
+   * @param request optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Mints
    * @throws {@link index.IMXError}
    */
@@ -451,7 +467,7 @@ export class ImmutableXClient {
 
   /**
    * Get a list of Withdrawals
-   * @param request - optional request object containing the parameters to be provided in the API request
+   * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Withdrawals
    * @throws {@link index.IMXError}
    */
@@ -481,7 +497,7 @@ export class ImmutableXClient {
 
   /**
    * Get a list of Orders
-   * @param request - optional request object containing the parameters to be provided in the API request
+   * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Orders
    * @throws {@link index.IMXError}
    */
@@ -501,7 +517,7 @@ export class ImmutableXClient {
 
   /**
    * Get a list of Trades
-   * @param request - optional request object containing the parameters to be provided in the API request
+   * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Trades
    * @throws {@link index.IMXError}
    */
@@ -521,7 +537,7 @@ export class ImmutableXClient {
 
   /**
    * Get a list of Tokens
-   * @param request - optional request object containing the parameters to be provided in the API request
+   * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Tokens
    * @throws {@link index.IMXError}
    */
@@ -541,7 +557,7 @@ export class ImmutableXClient {
 
   /**
    * Get a list of Transfers
-   * @param request - optional request object containing the parameters to be provided in the API request
+   * @param request - optional object containing the parameters to be provided in the API request
    * @returns a promise that resolves with the requested list of Transfers
    * @throws {@link index.IMXError}
    */
@@ -588,7 +604,7 @@ export class ImmutableXClient {
    */
   public exchangeTransfer(
     walletConnection: WalletConnection,
-    request: UnsignedExchangeTransferRequest
+    request: UnsignedExchangeTransferRequest,
   ) {
     return this.immutableX.exchangeTransfer(walletConnection, request);
   }
@@ -600,7 +616,7 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public createNftPrimary(
-    request: NftCheckoutPrimaryApiCreateNftPrimaryRequest
+    request: NftCheckoutPrimaryApiCreateNftPrimaryRequest,
   ) {
     return this.immutableX.createNftPrimary(request).then((res) => res.data);
   }
@@ -612,7 +628,7 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getCurrenciesNFTCheckoutPrimary(
-    request: NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest
+    request: NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest,
   ) {
     return this.immutableX
       .getCurrenciesNFTCheckoutPrimary(request)
@@ -626,7 +642,7 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getNftPrimaryTransaction(
-    request: NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest
+    request: NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest,
   ) {
     return this.immutableX
       .getNftPrimaryTransaction(request)
@@ -640,7 +656,7 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getNftPrimaryTransactions(
-    request: NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest
+    request: NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest,
   ) {
     return this.immutableX
       .getNftPrimaryTransactions(request)

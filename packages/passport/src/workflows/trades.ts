@@ -45,7 +45,7 @@ export async function createTrade({
       {
         transactionType: TransactionTypes.CreateTrade,
         transactionData: getSignableTradeRequest,
-      }
+      },
     );
 
     if (!confirmationResult.confirmed) {
@@ -76,12 +76,13 @@ export async function createTrade({
       },
     };
 
-    const headers = { Authorization: 'Bearer ' + user.accessToken };
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const headers = { Authorization: `Bearer ${user.accessToken}` };
     const { data: createTradeResponse } = await tradesApi.createTradeV3(
       tradeParams,
       {
         headers,
-      }
+      },
     );
     return createTradeResponse;
   }, PassportErrorType.CREATE_TRADE_ERROR);

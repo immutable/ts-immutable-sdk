@@ -22,9 +22,9 @@ const getAuthConfiguration = ({
       token_endpoint: `${authenticationDomain}/oauth/token`,
       userinfo_endpoint: `${authenticationDomain}/userinfo`,
       end_session_endpoint:
-        `${authenticationDomain}/v2/logout` +
-        `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}` +
-        `&client_id=${oidcConfiguration.clientId}`,
+        `${authenticationDomain}/v2/logout`
+        + `?returnTo=${encodeURIComponent(oidcConfiguration.logoutRedirectUri)}`
+        + `&client_id=${oidcConfiguration.clientId}`,
     },
     mergeClaims: true,
     loadUserInfo: true,
@@ -41,6 +41,7 @@ const getAuthConfiguration = ({
 
 export default class AuthManager {
   private userManager;
+
   private config: PassportConfiguration;
 
   constructor(config: PassportConfiguration) {
@@ -48,7 +49,7 @@ export default class AuthManager {
     this.userManager = new UserManager(getAuthConfiguration(config));
   }
 
-  private mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
+  private static mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
     const passport = oidcUser.profile?.passport as PassportMetadata;
     return {
       expired: oidcUser.expired,
@@ -71,21 +72,21 @@ export default class AuthManager {
         popupWindowFeatures,
       });
 
-      return this.mapOidcUserToDomainModel(oidcUser);
+      return AuthManager.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
 
   public async loginCallback(): Promise<void> {
     return withPassportError<void>(
       async () => this.userManager.signinPopupCallback(),
-      PassportErrorType.AUTHENTICATION_ERROR
+      PassportErrorType.AUTHENTICATION_ERROR,
     );
   }
 
   public async logout(): Promise<void> {
     return withPassportError<void>(
       async () => this.userManager.signoutRedirect(),
-      PassportErrorType.LOGOUT_ERROR
+      PassportErrorType.LOGOUT_ERROR,
     );
   }
 
@@ -99,7 +100,7 @@ export default class AuthManager {
       if (!oidcUser) {
         return null;
       }
-      return this.mapOidcUserToDomainModel(oidcUser) as UserWithEtherKey;
+      return AuthManager.mapOidcUserToDomainModel(oidcUser) as UserWithEtherKey;
     }, PassportErrorType.SILENT_LOGIN_ERROR);
   }
 
@@ -109,7 +110,7 @@ export default class AuthManager {
       if (!oidcUser) {
         return null;
       }
-      return this.mapOidcUserToDomainModel(oidcUser);
+      return AuthManager.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.NOT_LOGGED_IN_ERROR);
   }
 
@@ -118,19 +119,18 @@ export default class AuthManager {
       const updatedUser = await retryWithDelay(async () => {
         const user = await this.userManager.signinSilent();
         const passportMetadata = user?.profile?.passport as PassportMetadata;
-        const metadataExists =
-          !!passportMetadata?.ether_key &&
-          !!passportMetadata?.stark_key &&
-          !!passportMetadata?.user_admin_key;
+        const metadataExists = !!passportMetadata?.ether_key
+          && !!passportMetadata?.stark_key
+          && !!passportMetadata?.user_admin_key;
         if (metadataExists) {
           return user;
         }
-        return Promise.reject('user wallet addresses not exist');
+        return Promise.reject(new Error('user wallet addresses not exist'));
       });
       if (!updatedUser) {
         return null;
       }
-      return this.mapOidcUserToDomainModel(updatedUser) as UserWithEtherKey;
+      return AuthManager.mapOidcUserToDomainModel(updatedUser) as UserWithEtherKey;
     }, PassportErrorType.REFRESH_TOKEN_ERROR);
   }
 }
