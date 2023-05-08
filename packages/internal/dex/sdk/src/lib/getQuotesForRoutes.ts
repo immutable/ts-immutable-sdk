@@ -16,6 +16,7 @@ export type QuoteResult = {
 
 export async function getQuotesForRoutes(
   multicallContract: Multicall,
+  quoterContractAddress: string,
   routes: Route<Currency, Currency>[],
   amountSpecified: CurrencyAmount<Currency>,
   tradeType: TradeType
@@ -31,7 +32,7 @@ export async function getQuotesForRoutes(
   const quoteResults = await multicallMultipleCallDataSingContract(
     multicallContract,
     callData,
-    '0x66d0aB680ACEe44308edA2062b910405CC51A190', // TODO fix this to be read from the config
+    quoterContractAddress, // TODO fix this to be read from the config
     { gasRequired: DEFAULT_GAS_QUOTE }
   );
 
