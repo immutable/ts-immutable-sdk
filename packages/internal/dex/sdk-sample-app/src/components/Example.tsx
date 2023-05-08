@@ -1,10 +1,10 @@
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import { Exchange, TradeInfo } from '@imtbl/dex-sdk';
-import { configuration } from '@/config/devnet';
+import { configuration } from '../config';
 import { getERC20ApproveCalldata } from '@/utils/approve';
 import { ConnectAccount } from './ConnectAccount';
-import { getTokenSymbol } from '@/utils/getTokenSymbol';
+import { getTokenSymbol } from '../utils/getTokenSymbol';
 import { AmountInput } from './AmountInput';
 
 type RouteType = {
