@@ -4,7 +4,6 @@ import {
   WalletEvent,
   WalletEventType,
   WalletNetworkSwitchEvent,
-  WalletAddCoinsEvent,
 } from '@imtbl/checkout-widgets';
 
 export function sendWalletWidgetCloseEvent() {
@@ -36,18 +35,4 @@ export function sendNetworkSwitchEvent(network: NetworkInfo) {
   console.log('switch network event:', walletWidgetSwitchNetworkEvent);
   if (window !== undefined)
     window.dispatchEvent(walletWidgetSwitchNetworkEvent);
-}
-
-export function sendAddCoinsEvent(eventData: WalletAddCoinsEvent) {
-  const addCoinsEvent = new CustomEvent<WalletEvent<WalletAddCoinsEvent>>(
-    IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
-    {
-      detail: {
-        type: WalletEventType.ADD_COINS,
-        data: eventData,
-      },
-    }
-  );
-  console.log('add coins event:', addCoinsEvent);
-  if (window !== undefined) window.dispatchEvent(addCoinsEvent);
 }

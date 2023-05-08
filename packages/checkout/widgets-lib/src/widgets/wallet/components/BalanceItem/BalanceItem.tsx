@@ -16,7 +16,12 @@ import {
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';
 import { useContext, useEffect, useState } from 'react';
-import { ChainId } from '@imtbl/checkout-sdk';
+import { ChainId, TokenInfo } from '@imtbl/checkout-sdk';
+import {
+  sendBridgeCoinsEvent,
+  sendOnRampCoinsEvent,
+  sendSwapCoinsEvent,
+} from '../../CoinTopUpEvents';
 
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
@@ -70,15 +75,54 @@ export const BalanceItem = (props: BalanceItemProps) => {
         />
         {(isAddCoinEnabled || isSwapCoinEnabled || isMoveCoinEnabled) && (
           <OverflowPopoverMenu size="small">
-            <MenuItem sx={ShowMenuItem(isAddCoinEnabled)}>
+            <MenuItem
+              sx={ShowMenuItem(isAddCoinEnabled)}
+              onClick={() => {
+                sendOnRampCoinsEvent({
+                  network: walletState.network ?? undefined,
+                  token: {
+                    name: balanceInfo.symbol,
+                    symbol: balanceInfo.symbol,
+                    icon: balanceInfo.iconLogo,
+                  } as unknown as TokenInfo,
+                  maxTokenAmount: balanceInfo.balance,
+                });
+              }}
+            >
               <MenuItem.Icon icon="Add"></MenuItem.Icon>
               <MenuItem.Label>{`Add ${balanceInfo.symbol}`}</MenuItem.Label>
             </MenuItem>
-            <MenuItem sx={ShowMenuItem(isSwapCoinEnabled)}>
+            <MenuItem
+              sx={ShowMenuItem(isSwapCoinEnabled)}
+              onClick={() => {
+                sendSwapCoinsEvent({
+                  network: walletState.network ?? undefined,
+                  token: {
+                    name: balanceInfo.symbol,
+                    symbol: balanceInfo.symbol,
+                    icon: balanceInfo.iconLogo,
+                  } as unknown as TokenInfo,
+                  maxTokenAmount: balanceInfo.balance,
+                });
+              }}
+            >
               <MenuItem.Icon icon="Exchange"></MenuItem.Icon>
               <MenuItem.Label>{`Swap ${balanceInfo.symbol}`}</MenuItem.Label>
             </MenuItem>
-            <MenuItem sx={ShowMenuItem(isMoveCoinEnabled)}>
+            <MenuItem
+              sx={ShowMenuItem(isMoveCoinEnabled)}
+              onClick={() => {
+                sendBridgeCoinsEvent({
+                  network: walletState.network ?? undefined,
+                  token: {
+                    name: balanceInfo.symbol,
+                    symbol: balanceInfo.symbol,
+                    icon: balanceInfo.iconLogo,
+                  } as unknown as TokenInfo,
+                  maxTokenAmount: balanceInfo.balance,
+                });
+              }}
+            >
               <MenuItem.Icon icon="Minting"></MenuItem.Icon>
               <MenuItem.Label>{`Move ${balanceInfo.symbol}`}</MenuItem.Label>
             </MenuItem>

@@ -9,15 +9,13 @@ import { TokenBalanceList } from '../components/TokenBalanceList/TokenBalanceLis
 import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { WalletContext } from '../context/WalletContext';
-import {
-  sendAddCoinsEvent,
-  sendWalletWidgetCloseEvent,
-} from '../WalletWidgetEvents';
+import { sendWalletWidgetCloseEvent } from '../WalletWidgetEvents';
 import {
   WalletBalanceContainerStyle,
   WalletBalanceItemStyle,
 } from './WalletBalancesStyles';
 import { ChainId } from '@imtbl/checkout-sdk';
+import { sendAddCoinsEvent } from '../CoinTopUpEvents';
 
 export const WalletBalances = () => {
   const { walletState } = useContext(WalletContext);
