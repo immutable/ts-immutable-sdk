@@ -25,8 +25,12 @@ export class CraftButton extends LitElement {
 
   @state()
   private craftInput: CraftInput = {
-    requiresWeb3: true,
-    web3Assets: {},
+    requiresWeb3: false,
+    input: {
+      userId: '',
+      recipeId: '',
+      ingredients: [],
+    },
   };
 
   handleCustomEvent<T extends Event>(listener: (event: T) => void) {

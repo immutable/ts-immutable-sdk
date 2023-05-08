@@ -2,11 +2,19 @@ import { withSDKError } from 'Errors';
 import type { EventData, EventType } from '../types';
 import { asyncFn } from '../utils';
 
+// FIXME: Use generated types
+// FIXME: Update to include recipe payload from spec
+// https://api.dev.games.immutable.com/crafting/swagger/index.html#/
 export type CraftInput = {
   requiresWeb3: boolean;
-  web3Assets: Record<string, unknown>;
-  // TODO: Update to include recipe payload from spec
-  // https://api.dev.games.immutable.com/crafting/swagger/index.html#/
+  input: {
+    userId: string;
+    recipeId: string;
+    ingredients: Array<{
+      conditionId: string;
+      itemId: string;
+    }>;
+  };
 };
 
 // TODO: Use Checkout SDK
