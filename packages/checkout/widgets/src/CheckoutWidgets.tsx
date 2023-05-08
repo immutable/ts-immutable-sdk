@@ -33,7 +33,7 @@ export function UpdateConfig(config: CheckoutWidgetsConfig) {
  */
 export function SetProvider(
   tagName: CheckoutWidgetTagNames,
-  provider?: Web3Provider
+  provider: Web3Provider | null
 ) {
   if (!provider) {
     console.error('no provider parsed');
