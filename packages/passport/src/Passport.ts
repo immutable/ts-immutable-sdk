@@ -1,5 +1,8 @@
 import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { IMXProvider } from '@imtbl/provider';
+// TODO: Remove this once the dependency has been added
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { ImmutableXClient } from '@imtbl/immutablex-client';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
@@ -13,21 +16,22 @@ import {
   User,
 } from './types';
 import registerPassport from './workflows/registration';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
 
 export class Passport {
   private readonly authManager: AuthManager;
+
   private readonly magicAdapter: MagicAdapter;
+
   private readonly config: PassportConfiguration;
+
   private readonly immutableXClient: ImmutableXClient;
 
   constructor(passportModuleConfiguration: PassportModuleConfiguration) {
     this.config = new PassportConfiguration(passportModuleConfiguration);
     this.authManager = new AuthManager(this.config);
     this.magicAdapter = new MagicAdapter(this.config);
-    this.immutableXClient =
-      passportModuleConfiguration.overrides?.immutableXClient ||
-      new ImmutableXClient({
+    this.immutableXClient = passportModuleConfiguration.overrides?.immutableXClient
+      || new ImmutableXClient({
         baseConfig: passportModuleConfiguration.baseConfig,
       });
   }
@@ -36,7 +40,7 @@ export class Passport {
     if (!user || !user.idToken) {
       throw new PassportError(
         'Failed to initialise',
-        PassportErrorType.WALLET_CONNECTION_ERROR
+        PassportErrorType.WALLET_CONNECTION_ERROR,
       );
     }
     const provider = await this.magicAdapter.login(user.idToken);
@@ -47,7 +51,7 @@ export class Passport {
       const updatedUser = await this.registerUser(
         ethSigner,
         starkSigner,
-        user.accessToken
+        user.accessToken,
       );
       return new PassportImxProvider({
         user: updatedUser,
@@ -104,7 +108,7 @@ export class Passport {
   private async registerUser(
     userAdminKeySigner: EthSigner,
     starkSigner: StarkSigner,
-    jwt: string
+    jwt: string,
   ): Promise<UserWithEtherKey> {
     await registerPassport(
       {
@@ -112,14 +116,13 @@ export class Passport {
         starkSigner,
         usersApi: this.immutableXClient.usersApi,
       },
-      jwt
+      jwt,
     );
-    const updatedUser =
-      await this.authManager.requestRefreshTokenAfterRegistration();
+    const updatedUser = await this.authManager.requestRefreshTokenAfterRegistration();
     if (!updatedUser) {
       throw new PassportError(
         'Failed to get refresh token',
-        PassportErrorType.REFRESH_TOKEN_ERROR
+        PassportErrorType.REFRESH_TOKEN_ERROR,
       );
     }
     return updatedUser;

@@ -1,11 +1,13 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+// TODO: Remove this once the dependency has been fixed
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { ImmutableXClient } from '@imtbl/immutablex-client';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { Passport } from './Passport';
 import { getStarkSigner } from './stark';
 import { Networks, OidcConfiguration, User } from './types';
 import registerPassport from './workflows/registration';
-import { ImmutableXClient } from '@imtbl/immutablex-client';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -54,6 +56,8 @@ describe('Passport', () => {
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
     loginSilentMock = jest.fn();
+    // TODO: Remove once fixed
+    // @ts-ignore
     (AuthManager as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
@@ -82,6 +86,8 @@ describe('Passport', () => {
         const immutableXClient = new ImmutableXClient({
           baseConfig,
         });
+        // TODO: Remove this once the shadowing issue has been fixed
+        // eslint-disable-next-line @typescript-eslint/no-shadow
         const passport = new Passport({
           baseConfig,
           overrides: {
@@ -94,7 +100,9 @@ describe('Passport', () => {
           },
           ...oidcConfiguration,
         });
-        expect(passport['immutableXClient']).toEqual(immutableXClient);
+        // TODO: This is a private member
+        // @ts-ignore
+        expect(passport.immutableXClient).toEqual(immutableXClient);
       });
     });
   });
@@ -119,7 +127,7 @@ describe('Passport', () => {
       authLoginMock.mockResolvedValue({ idToken: '123' });
 
       await expect(passport.connectImx()).rejects.toThrow(
-        'Failed to get refresh token'
+        'Failed to get refresh token',
       );
 
       expect(authLoginMock).toBeCalledTimes(1);

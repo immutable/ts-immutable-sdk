@@ -1,5 +1,5 @@
 import { ImmutableConfiguration, Environment } from '@imtbl/config';
-import { ethers, utils } from 'ethers';
+import { ethers } from 'ethers';
 import {
   TokenBridge,
   BridgeConfiguration,
@@ -15,7 +15,15 @@ import {
   CompletionStatus,
 } from '@imtbl/bridge-sdk';
 
+
+/**
+ * Deposit function to handle the deposit process from L1 to L2.
+ * It uses environment variables for configuration values.
+ * It creates a token bridge instance, gets the bridge fee, calculates the deposit amount,
+ * approves the deposit, and waits for the deposit to complete on L2.
+ */
 async function deposit() {
+  // Check and throw errors if required environment variables are not set
   if (!process.env.ROOT_PROVIDER) {
     console.log(process.env.ROOT_PROVIDER);
     throw new Error('ROOT_PROVIDER not set');
@@ -38,12 +46,13 @@ async function deposit() {
   if (!process.env.DEPOSIT_AMOUNT) {
     throw new Error('DEPOSIT_AMOUNT not set');
   }
-
+  // Parse deposit amount from environment variable
   const depositAmountBeforeFee = ethers.utils.parseUnits(
     process.env.DEPOSIT_AMOUNT,
     18
   );
 
+  // Create providers for root and child chains
   const rootChainProvider = new ethers.providers.JsonRpcProvider(
     process.env.ROOT_PROVIDER
   );
@@ -51,12 +60,13 @@ async function deposit() {
     process.env.CHILD_PROVIDER
   );
 
-  // Create a fake checkout instance
+  // Create a wallet instance to simulate the user's wallet
   const checkout = new ethers.Wallet(
     process.env.PRIVATE_KEY,
     rootChainProvider
   );
 
+  // Create a bridge configuration instance
   const bridgeConfig = new BridgeConfiguration({
     baseConfig: new ImmutableConfiguration({
       environment: Environment.SANDBOX,
@@ -66,10 +76,10 @@ async function deposit() {
     childProvider: childChainProvider,
   });
 
-  // Create a token bridge
+  // Create a token bridge instance using the bridge configuration
   const tokenBridge = new TokenBridge(bridgeConfig);
 
-  // Get the bridge fee
+  // Get the bridge fee and calculate the total deposit amount
   const bridgeFeeReq: BridgeFeeRequest = { token: process.env.TOKEN_ADDRESS };
   const bridgeFeeResponse: BridgeFeeResponse = await tokenBridge.getFee(
     bridgeFeeReq
@@ -85,10 +95,11 @@ async function deposit() {
     depositAmount: depositAmount,
   };
 
-  console.log(`Getting unsigned approve bridge tx`);
+  // Get the unsigned approval transaction for the deposit
   const approveResp: ApproveBridgeResponse =
     await tokenBridge.getUnsignedApproveBridgeTx(approveReq);
 
+  // If approval is required, sign and send the approval transaction
   if (approveResp.required) {
     if (!approveResp.unsignedTx) {
       throw new Error('tx is null');
@@ -105,7 +116,7 @@ async function deposit() {
     console.log(`Approval not required`);
   }
 
-  // Get the unsigned deposit transaction
+  // Get the unsigned deposit transaction and send it on L1
   const depositArgs: BridgeDepositRequest = {
     depositorAddress: process.env.DEPOSITOR_ADDRESS,
     recipientAddress: process.env.RECIPIENT_ADDRESS,
@@ -122,7 +133,7 @@ async function deposit() {
   );
   console.log('Sent Deposit Transaction...waiting for L1 completion');
 
-  // Wait for the transaction to be included on L1
+  // Wait for the deposit transaction to be included on L1
   const txReceipt = await txResponse.wait();
   console.log(
     'Transaction successful on L1 with hash:',
@@ -130,6 +141,7 @@ async function deposit() {
   );
   console.log(`MUST BE CONNECTED TO VPN to connect to zkEVM`);
   console.log('Waiting for Deposit to complete on L2...');
+  // Wait for the deposit to complete on L2
   const waitReq: WaitForRequest = {
     transactionHash: txReceipt.transactionHash,
   };
@@ -141,11 +153,12 @@ async function deposit() {
   } else {
     // Alert condition. Shouldn't happen
     console.log(
-      `Deposit Failed on L2 with status ${bridgeResult.status} and error ${bridgeResult.error} `
+      `Deposit Failed on L2 with status ${bridgeResult.status}`
     );
   }
 }
 
+// Run the deposit function and exit the process when completed
 (async () => {
   await deposit().finally(() => process.exit(0));
 })();

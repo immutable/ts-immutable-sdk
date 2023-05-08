@@ -6,7 +6,7 @@ import {
   state,
 } from 'lit/decorators.js';
 
-import { Economy, EconomyCustomEvents } from '@imtbl/economy';
+import { Economy, EconomyCustomEventTypes } from '@imtbl/economy';
 import type { CraftInput } from '@imtbl/economy';
 
 @customElement('imtbl-craft-button')
@@ -38,7 +38,7 @@ export class CraftButton extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener(
-      EconomyCustomEvents.DEFAULT,
+      EconomyCustomEventTypes.DEFAULT,
       this.handleCustomEvent(this.handleConnectEvent)
     );
   }
@@ -46,7 +46,7 @@ export class CraftButton extends LitElement {
   @eventOptions({ capture: true })
   handleClick(event: MouseEvent) {
     event.preventDefault();
-    this.economy.craft(this.craftInput);
+    this.economy.crafting.craft(this.craftInput);
   }
 
   handleConnectEvent(event: CustomEvent) {

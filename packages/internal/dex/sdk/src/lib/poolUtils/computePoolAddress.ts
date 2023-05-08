@@ -35,7 +35,9 @@ export function computePoolAddress({
   );
 }
 
-const ensureCorrectERC20AddressOrder = (erc20Pair: ERC20Pair): ERC20Pair => {
+export const ensureCorrectERC20AddressOrder = (
+  erc20Pair: ERC20Pair
+): ERC20Pair => {
   if (erc20Pair[0].address.toLowerCase() > erc20Pair[1].address.toLowerCase()) {
     const temp = erc20Pair[0];
     erc20Pair[0] = erc20Pair[1];

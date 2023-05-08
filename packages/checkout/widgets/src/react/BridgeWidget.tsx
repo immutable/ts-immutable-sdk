@@ -6,6 +6,13 @@ import {
   WidgetTheme,
 } from '../definitions/constants';
 
+/**
+ * Interface representing the props for the Bridge Widget component.
+ * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Bridge Widget (default: {@link WidgetConnectionProviders.METAMASK}).
+ * @property {string} fromContractAddress - The contract address to send tokens from.
+ * @property {string} amount - The amount of tokens to send.
+ * @property {Network} fromNetwork - The network to send tokens from.
+ */
 export interface BridgeReactProps {
   providerPreference: WidgetConnectionProviders;
   fromContractAddress?: string;
@@ -13,7 +20,12 @@ export interface BridgeReactProps {
   fromNetwork?: Network;
 }
 
-export function BridgeReact(props: BridgeReactProps) {
+/**
+ * A React functional component that renders the Checkout Bridge Widget.
+ * @param {BridgeReactProps} props - The props for the Bridge Widget component.
+ * @returns {JSX.Element} - The rendered Bridge Widget component.
+ */
+export function BridgeReact(props: BridgeReactProps): JSX.Element {
   const { providerPreference, fromContractAddress, amount, fromNetwork } =
     props;
 
