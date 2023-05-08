@@ -8,7 +8,6 @@ import {
 } from '../types';
 import { getTokenAllowList } from '../tokens';
 import { utils } from 'ethers';
-import axios from 'axios';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 
 export const fetchTokenIds = async (tokens: TokenInfo[]) => {
