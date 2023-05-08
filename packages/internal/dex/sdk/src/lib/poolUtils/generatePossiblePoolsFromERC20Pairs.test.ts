@@ -7,6 +7,7 @@ import {
   TEST_V3_CORE_FACTORY_ADDRESS,
   USDC_TEST_CHAIN,
   WETH_TEST_CHAIN,
+  uniqBy,
 } from '../../utils/testUtils';
 
 describe('generatePoolsFromTokenPairs', () => {
@@ -134,18 +135,11 @@ describe('generatePoolsFromTokenPairs', () => {
         TEST_V3_CORE_FACTORY_ADDRESS
       );
 
-      expect(pools).toHaveLength(12);
 
-      for (let i = 0; i < pools.length; i++) {
-        // The pool address is unique to the combination of token0, token1 and fee
-        // We expect there to be no repeating pool addresses
-        const poolToCompare = pools[i].poolAddress.toLowerCase();
-
-        for (let j = i + 1; j < pools.length; j++) {
-          const otherPoolToCompare = pools[j].poolAddress.toLowerCase();
-          expect(poolToCompare).not.toEqual(otherPoolToCompare);
-        }
-      }
+      // The pool address is unique to the combination of token0, token1 and fee
+      // We expect there to be no repeating pool addresses
+      const uniquePools = uniqBy(pools, (pool) => pool.poolAddress.toLowerCase())
+      expect(uniquePools).toHaveLength(12);
     });
   });
 });
