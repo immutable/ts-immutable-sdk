@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 
 import routes from './routes';
 import pino from 'pino';
+import cors from 'cors';
 
 const logger = pino();
 const app = express();
@@ -19,6 +20,12 @@ const paths: { path: string; methods: string }[] = routes.reduce(
 );
 
 logger.info(paths);
+
+app.use(
+  cors({
+    origin: '*',
+  })
+);
 
 /**
  * Root must only be used the resources directory
