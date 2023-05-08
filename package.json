@@ -38,7 +38,7 @@
     "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets -e -r --stages build && yarn syncpack:format",
     "build:all": "wsrun --stages build",
     "lint": "wsrun --exclude-missing -e lint",
-    "lint:ci": "eslint $(git diff --name-only --diff-filter=ACMRTUXB $(git rev-parse HEAD^1) | grep  -E '(.js$|.ts$|.tsx$)') --ext .ts,.jsx,.tsx --max-warnings=0",
+    "lint:ci": "eslint $(git diff --name-only --diff-filter=ACMRTUXB $(git rev-parse HEAD^1) | grep  -E '(.js$|.ts$|.tsx$)') --ext .ts,.jsx,.tsx --max-warnings=0 --no-error-on-unmatched-pattern",
     "postinstall": "husky install",
     "release": "release-it",
     "syncpack:check": "yarn syncpack list-mismatches",
