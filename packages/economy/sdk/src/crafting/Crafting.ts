@@ -1,6 +1,8 @@
-import { withSDKError } from 'Errors';
 import type { EventData, EventType } from '../types';
 import { asyncFn } from '../utils';
+import { withSDKError } from '../Errors';
+
+import { CraftingService } from './CraftingService';
 
 // FIXME: Use generated types
 // FIXME: Update to include recipe payload from spec
@@ -42,7 +44,7 @@ const CraftServiceMock = {
 export type CraftEvent = EventType<
   'CRAFT',
   | EventData<'STARTED' | 'IN_PROGRESS'>
-  | EventData<'COMPLETED', { data: { output: { id: string } } }>
+  | EventData<'COMPLETED', { data: {} }>
   | EventData<'FAILED', { error: { code: string; reason: string } }>
   | EventData<
       'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
@@ -55,10 +57,13 @@ export type CraftStatus = CraftEvent['status'];
 export class Crafting {
   private emitEvent: (event: CraftEvent) => void;
   private service: CraftService;
+  private craftingService: CraftingService;
 
   constructor(emitEvent: (event: CraftEvent) => void, service?: CraftService) {
     this.service = service || CraftServiceMock;
     this.emitEvent = emitEvent;
+    // FIXME: make injectable
+    this.craftingService = new CraftingService();
   }
 
   /**
@@ -78,22 +83,26 @@ export class Crafting {
     let signature;
     if (input.requiresWeb3) {
       this.emitEvent({ status: 'AWAITING_WEB3_INTERACTION', action: 'CRAFT' });
-      txIds = await Checkout.transfer(input.web3Assets);
+      txIds = await Checkout.transfer(input.input);
       signature = await Checkout.sign();
     }
 
     // 3. submit craft to BE
     this.emitEvent({ status: 'SUBMITTED', action: 'CRAFT' });
-    await this.service.submitCraft(input, txIds, signature);
+    const { data, status } = await this.craftingService.craft(input.input);
 
-    // ? notify the caller of `craft` in real time the status/results
+    if (status !== 200) {
+      this.emitEvent({
+        status: 'FAILED',
+        action: 'CRAFT',
+        error: { code: `${status}`, reason: 'unknown' },
+      });
+    }
 
     this.emitEvent({
       status: 'COMPLETED',
       action: 'CRAFT',
-      data: {
-        output: { id: 'stirng' },
-      },
+      data,
     });
 
     return 'COMPLETED';
