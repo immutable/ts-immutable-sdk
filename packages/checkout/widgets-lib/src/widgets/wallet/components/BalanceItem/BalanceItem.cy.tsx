@@ -1,37 +1,39 @@
-import { BiomeThemeProvider, OverflowPopoverMenu } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { WalletContext, WalletState } from '../../context/WalletContext';
 import React from 'react';
 import { mount } from 'cypress/react18';
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { BalanceItem } from './BalanceItem';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { cySmartGet } from '../../../../lib/testUtils';
 
 describe('BalanceItem', () => {
+  let baseWalletState: WalletState = {
+    checkout: new Checkout(),
+    network: null,
+    provider: null,
+    providerPreference: ConnectionProviders.METAMASK,
+    tokenBalances: [],
+    supportedTopUps: null,
+  };
+
+  const testBalanceInfo: BalanceInfo = {
+    fiatAmount: '3412.08',
+    id: '1',
+    symbol: 'IMX',
+    balance: '21.32',
+    description: 'some description',
+  };
+
   it('should show balance details', () => {
-    const walletState: WalletState = {
-      checkout: new Checkout(),
-      network: null,
-      provider: null,
-      providerPreference: ConnectionProviders.METAMASK,
-      tokenBalances: [],
-      supportedTopUps: null,
-    };
-    const balanceInfo: BalanceInfo = {
-      fiatAmount: '3412.08',
-      id: '1',
-      symbol: 'IMX',
-      balance: '21.32',
-      description: 'some description',
-    };
     mount(
-      <BiomeThemeProvider>
+      <BiomeCombinedProviders>
         <WalletContext.Provider
-          value={{ walletState, walletDispatch: () => {} }}
+          value={{ walletState: baseWalletState, walletDispatch: () => {} }}
         >
-          <BalanceItem balanceInfo={balanceInfo}></BalanceItem>
+          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
         </WalletContext.Provider>
-      </BiomeThemeProvider>
+      </BiomeCombinedProviders>
     );
 
     cySmartGet('balance-item-IMX').should('include.text', 'IMX');
@@ -42,63 +44,174 @@ describe('BalanceItem', () => {
       '≈ USD $3,412.08'
     );
   });
-  it('should NOT show menu options for the token', () => {
-    const walletState: WalletState = {
-      checkout: new Checkout(),
-      network: null,
-      provider: null,
-      providerPreference: ConnectionProviders.METAMASK,
-      tokenBalances: [],
-      supportedTopUps: null,
-    };
-    const balanceInfo: BalanceInfo = {
-      fiatAmount: '3412.08',
-      id: '1',
-      symbol: 'IMX',
-      balance: '21.32',
-      description: 'some description',
-    };
-    mount(
-      <BiomeThemeProvider>
-        <WalletContext.Provider
-          value={{ walletState, walletDispatch: () => {} }}
-        >
-          <BalanceItem balanceInfo={balanceInfo}></BalanceItem>
-        </WalletContext.Provider>
-      </BiomeThemeProvider>
-    );
-    cySmartGet('token-menu').should('not.exist');
-  });
+
   it('should show menu options for the token', () => {
-    const walletState: WalletState = {
-      checkout: new Checkout(),
-      network: null,
-      provider: null,
-      providerPreference: ConnectionProviders.METAMASK,
-      tokenBalances: [],
+    const testWalletState = {
+      ...baseWalletState,
+      network: {
+        chainId: ChainId.POLYGON,
+        name: 'Polygon',
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC',
+          decimals: 18,
+        },
+        isSupported: true,
+      },
+      tokenBalances: [testBalanceInfo],
       supportedTopUps: {
         isOnRampEnabled: true,
         isSwapEnabled: true,
         isBridgeEnabled: true,
       },
     };
-    const balanceInfo: BalanceInfo = {
-      fiatAmount: '3412.08',
-      id: '1',
-      symbol: 'IMX',
-      balance: '21.32',
-      description: 'some description',
+
+    mount(
+      <BiomeCombinedProviders>
+        <WalletContext.Provider
+          value={{ walletState: testWalletState, walletDispatch: () => {} }}
+        >
+          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
+        </WalletContext.Provider>
+      </BiomeCombinedProviders>
+    );
+
+    cySmartGet('token-menu').should('exist');
+  });
+
+  it('should show ONLY the add and swap options on Polygon when all topUps are enabled', () => {
+    const testWalletState = {
+      ...baseWalletState,
+      network: {
+        chainId: ChainId.POLYGON,
+        name: 'Polygon',
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC',
+          decimals: 18,
+        },
+        isSupported: true,
+      },
+      tokenBalances: [testBalanceInfo],
+      supportedTopUps: {
+        isOnRampEnabled: true,
+        isSwapEnabled: true,
+        isBridgeEnabled: true,
+      },
+    };
+
+    mount(
+      <BiomeCombinedProviders>
+        <WalletContext.Provider
+          value={{ walletState: testWalletState, walletDispatch: () => {} }}
+        >
+          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
+        </WalletContext.Provider>
+      </BiomeCombinedProviders>
+    );
+    cySmartGet('token-menu').should('exist');
+    cySmartGet('token-menu').click();
+    cySmartGet('balance-item-add-option').should('be.visible');
+    cySmartGet('balance-item-add-option').should('have.text', 'Add IMX');
+    cySmartGet('balance-item-swap-option').should('be.visible');
+    cySmartGet('balance-item-swap-option').should('have.text', 'Swap IMX');
+    cySmartGet('balance-item-move-option').should('not.be.visible');
+  });
+
+  it('should ONLY show swap option on Polygon if onramp is disabled', () => {
+    const testWalletState = {
+      ...baseWalletState,
+      network: {
+        chainId: ChainId.POLYGON,
+        name: 'Polygon',
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC',
+          decimals: 18,
+        },
+        isSupported: true,
+      },
+      tokenBalances: [testBalanceInfo],
+      supportedTopUps: {
+        isOnRampEnabled: false,
+        isSwapEnabled: true,
+        isBridgeEnabled: true,
+      },
+    };
+
+    mount(
+      <BiomeCombinedProviders>
+        <WalletContext.Provider
+          value={{ walletState: testWalletState, walletDispatch: () => {} }}
+        >
+          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
+        </WalletContext.Provider>
+      </BiomeCombinedProviders>
+    );
+    cySmartGet('token-menu').should('exist');
+    cySmartGet('token-menu').click();
+    cySmartGet('balance-item-add-option').should('not.be.visible');
+    cySmartGet('balance-item-swap-option').should('be.visible');
+    cySmartGet('balance-item-swap-option').should('have.text', 'Swap IMX');
+    cySmartGet('balance-item-move-option').should('not.be.visible');
+  });
+
+  it('should show ONLY the move option on Ethereum when all topUps are enabled', () => {
+    const testWalletState = {
+      ...baseWalletState,
+      network: {
+        chainId: ChainId.ETHEREUM,
+        name: 'Ethereum',
+        nativeCurrency: {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
+        },
+        isSupported: true,
+      },
+      tokenBalances: [testBalanceInfo],
+      supportedTopUps: {
+        isOnRampEnabled: true,
+        isSwapEnabled: true,
+        isBridgeEnabled: true,
+      },
+    };
+
+    mount(
+      <BiomeCombinedProviders>
+        <WalletContext.Provider
+          value={{ walletState: testWalletState, walletDispatch: () => {} }}
+        >
+          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
+        </WalletContext.Provider>
+      </BiomeCombinedProviders>
+    );
+    cySmartGet('token-menu').should('exist');
+    cySmartGet('token-menu').click();
+    cySmartGet('balance-item-add-option').should('not.be.visible');
+    cySmartGet('balance-item-swap-option').should('not.be.visible');
+    cySmartGet('balance-item-move-option').should('be.visible');
+    cySmartGet('balance-item-move-option').should('have.text', 'Move IMX');
+  });
+
+  it('should NOT show menu options for the token when all top ups are disabled', () => {
+    const testWalletState = {
+      ...baseWalletState,
+      supportedTopUps: {
+        isOnRampEnabled: false,
+        isSwapEnabled: false,
+        isBridgeEnabled: false,
+      },
     };
     mount(
-      <BiomeThemeProvider>
+      <BiomeCombinedProviders>
         <WalletContext.Provider
-          value={{ walletState, walletDispatch: () => {} }}
+          value={{ walletState: testWalletState, walletDispatch: () => {} }}
         >
-          <BalanceItem balanceInfo={balanceInfo}></BalanceItem>
+          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
         </WalletContext.Provider>
-      </BiomeThemeProvider>
+      </BiomeCombinedProviders>
     );
-    //todo: how to fetch pop-over menu??????
-    cySmartGet('token-menu').should('exist');
+    cySmartGet('token-menu').should('not.exist');
   });
 });

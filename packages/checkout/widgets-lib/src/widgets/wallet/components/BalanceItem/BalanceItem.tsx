@@ -77,6 +77,7 @@ export const BalanceItem = (props: BalanceItemProps) => {
         {(isOnRampEnabled || isSwapEnabled || isBridgeEnabled) && (
           <OverflowPopoverMenu size="small" testId="token-menu">
             <MenuItem
+              testId="balance-item-add-option"
               sx={ShowMenuItem(isOnRampEnabled)}
               onClick={() => {
                 sendOnRampCoinsEvent({
@@ -94,6 +95,7 @@ export const BalanceItem = (props: BalanceItemProps) => {
               <MenuItem.Label>{`Add ${balanceInfo.symbol}`}</MenuItem.Label>
             </MenuItem>
             <MenuItem
+              testId="balance-item-swap-option"
               sx={ShowMenuItem(isSwapEnabled)}
               onClick={() => {
                 sendSwapCoinsEvent({
@@ -111,6 +113,7 @@ export const BalanceItem = (props: BalanceItemProps) => {
               <MenuItem.Label>{`Swap ${balanceInfo.symbol}`}</MenuItem.Label>
             </MenuItem>
             <MenuItem
+              testId="balance-item-move-option"
               sx={ShowMenuItem(isBridgeEnabled)}
               onClick={() => {
                 sendBridgeCoinsEvent({
