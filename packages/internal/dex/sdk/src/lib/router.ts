@@ -136,6 +136,7 @@ export class Router {
   > {
     const quotes = await getQuotesForRoutes(
       multicallContract,
+      this.routingContracts.quoterAddress,
       routes,
       amountSpecified,
       tradeType
