@@ -14,7 +14,8 @@ const filterTokenList = function ({
 }: GetTokenAllowListParams): TokenMasterInfo[] {
   return masterTokenList
     .filter((token) => {
-      const chainIdMatches = !chainId || token.chainId == chainId;
+      const skipChainIdCheck = !chainId;
+      const chainIdMatches = token.chainId == chainId;
       const tokenNotExcluded = !exclude
         ?.map((excludeToken) => excludeToken.address)
         .includes(token.address || '');
@@ -22,7 +23,7 @@ const filterTokenList = function ({
       const tokenAllowedForType = token.tokenFeatures.includes(type);
 
       return (
-        chainIdMatches &&
+        (skipChainIdCheck || chainIdMatches) &&
         tokenNotExcluded &&
         (allowAllTokens || tokenAllowedForType)
       );
