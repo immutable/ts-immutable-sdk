@@ -9,7 +9,7 @@ export enum ConnectionStatus {
 }
 
 export interface ConnectLoaderState {
-  connectionStatus: ConnectionStatus
+  connectionStatus: ConnectionStatus;
 }
 
 export const initialConnectLoaderState: ConnectLoaderState = {
@@ -43,16 +43,16 @@ export const ConnectLoaderContext = createContext<ConnectLoaderContextState>({
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
-export const connectLoaderReducer: Reducer<ConnectLoaderState, ConnectLoaderAction> = (
-  state: ConnectLoaderState,
-  action: ConnectLoaderAction
-) => {
+export const connectLoaderReducer: Reducer<
+  ConnectLoaderState,
+  ConnectLoaderAction
+> = (state: ConnectLoaderState, action: ConnectLoaderAction) => {
   switch (action.payload.type) {
     case ConnectLoaderActions.UPDATE_CONNECTION_STATUS:
       return {
         ...state,
         connectionStatus: action.payload.connectionStatus,
-      }
+      };
     default:
       return state;
   }

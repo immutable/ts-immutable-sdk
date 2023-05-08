@@ -36,7 +36,9 @@ describe('connect-context', () => {
   });
 
   it('should update state with send close function when reducer called with SET_SEND_CLOSE_EVENT action', () => {
-    const newSendCloseEvent = () => { console.log("Send close event") };
+    const newSendCloseEvent = () => {
+      console.log('Send close event');
+    };
     const SetSendCloseEventPayload: SetSendCloseEventPayload = {
       type: ConnectActions.SET_SEND_CLOSE_EVENT,
       sendCloseEvent: newSendCloseEvent,

@@ -13,7 +13,7 @@ export const initialConnectState: ConnectState = {
   checkout: null,
   provider: null,
   providerPreference: null,
-  sendCloseEvent: () => {}
+  sendCloseEvent: () => {},
 };
 
 export interface ConnectContextState {
@@ -35,7 +35,7 @@ export enum ConnectActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
-  SET_SEND_CLOSE_EVENT = 'SET_SEND_CLOSE_EVENT'
+  SET_SEND_CLOSE_EVENT = 'SET_SEND_CLOSE_EVENT',
 }
 
 export interface SetCheckoutPayload {
@@ -89,7 +89,7 @@ export const connectReducer: Reducer<ConnectState, ConnectAction> = (
       return {
         ...state,
         sendCloseEvent: action.payload.sendCloseEvent,
-      }
+      };
     default:
       return state;
   }
