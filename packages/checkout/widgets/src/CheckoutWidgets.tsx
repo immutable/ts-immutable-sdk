@@ -2,6 +2,10 @@ import { CheckoutWidgetsConfig } from './definitions/config';
 import { CheckoutWidgetTagNames } from './definitions/constants';
 import { Web3Provider } from '@ethersproject/providers';
 
+/**
+ * CheckoutWidgets allows to inject the Checkout Widgets into your application.
+ * @param {CheckoutWidgetsConfig|undefined} config - Checkout Widget global configurations.
+ */
 export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
   var checkoutWidgetJS = document.createElement('script');
 
@@ -14,10 +18,19 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
   window.ImtblCheckoutWidgetConfig = config;
 }
 
+/**
+ * UpdateConfig allows to update the configuration of an existing Checkout Widgets instance.
+ * @param {CheckoutWidgetsConfig} config - new Checkout Widget global configurations.
+ */
 export function UpdateConfig(config: CheckoutWidgetsConfig) {
   window.ImtblCheckoutWidgetConfig = config;
 }
 
+/**
+ * SetProvider allows to set the provider for an existing Checkout Widgets instance.
+ * @param {CheckoutWidgetTagNames} tagName - target Checkout Widget widget.
+ * @param {Web3Provider} provider - the provider to connect to the blockchain network.
+ */
 export function SetProvider(
   tagName: CheckoutWidgetTagNames,
   provider: Web3Provider | null

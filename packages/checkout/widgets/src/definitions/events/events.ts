@@ -1,3 +1,6 @@
+/**
+ * Enum representing the events emitted by the widgets.
+ */
 export enum IMTBLWidgetEvents {
   IMTBL_CONNECT_WIDGET_EVENT = 'imtbl-connect-widget',
   IMTBL_WALLET_WIDGET_EVENT = 'imtbl-wallet-widget',
