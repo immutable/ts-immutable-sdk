@@ -6,17 +6,17 @@ import {
 } from '../definitions/constants';
 
 /**
- * Interface representing the props for the Walley Widget component.
- * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Walley Widget (default: {@link WidgetConnectionProviders.METAMASK}).
+ * Interface representing the props for the Wallet Widget component.
+ * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Wallet Widget (default: {@link WidgetConnectionProviders.METAMASK}).
  */
 export interface WalletReactProps {
   providerPreference?: WidgetConnectionProviders;
 }
 
 /**
- * A React functional component that renders the Checkout Waller Widget.
- * @param {WallerReactProps} props - The props for the Waller Widget component.
- * @returns {JSX.Element} - The rendered Waller Widget component.
+ * A React functional component that renders the Checkout Wallet Widget.
+ * @param {WalletReactProps} props - The props for the Wallet Widget component.
+ * @returns {JSX.Element} - The rendered Wallet Widget component.
  */
 export function WalletReact(props: WalletReactProps): JSX.Element {
   const { providerPreference } = props;

@@ -18,7 +18,7 @@ export enum BridgeEventType {
 }
 
 /**
- * Type representing a Buy Widget event with type SUCCESS
+ * Type representing a Bridge Widget event with type SUCCESS
  * @property {number} timestamp - The UNIX timestamp (in milliseconds) when the event occurred.
  */
 export type BridgeSuccess = {
@@ -26,7 +26,7 @@ export type BridgeSuccess = {
 };
 
 /**
- * Type representing a Buy Widget event with type FAILURE
+ * Type representing a Bridge Widget event with type FAILURE
  * @property {string} reason - The reason for the failure.
  * @property {number} timestamp - The UNIX timestamp (in milliseconds) when the event occurred.
  */

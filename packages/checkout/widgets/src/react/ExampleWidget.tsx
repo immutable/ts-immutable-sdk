@@ -7,8 +7,8 @@ import {
 } from '../definitions/constants';
 
 /**
- * @experimental
  * Interface representing the props for the Example Widget component.
+ * @experimental
  */
 export interface ExampleReactProps {
   providerPreference: WidgetConnectionProviders;
@@ -18,7 +18,7 @@ export interface ExampleReactProps {
 }
 
 /**
- * A React functional component that renders the Checkout Exmaple Widget.
+ * A React functional component that renders the Checkout Example Widget.
  * @experimental
  */
 export function ExampleReact(props: ExampleReactProps) {

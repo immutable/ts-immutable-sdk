@@ -1,6 +1,6 @@
 /**
  * Represents an event object emitted by the Swap Widget.
- * @property {BuyEventType} type - The type of the event.
+ * @property {SwapEventType} type - The type of the event.
  * @property {T} data - The data contained in the event.
  */
 export type SwapEvent<T> = {
