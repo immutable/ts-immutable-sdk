@@ -27,7 +27,7 @@ export const WalletBalances = () => {
       walletState.network?.chainId === ChainId.POLYGON &&
       Boolean(
         walletState.supportedTopUps?.isBridgeEnabled ||
-          walletState.supportedTopUps?.isExchangeEnabled ||
+          walletState.supportedTopUps?.isSwapEnabled ||
           walletState.supportedTopUps?.isOnRampEnabled
       )
     );

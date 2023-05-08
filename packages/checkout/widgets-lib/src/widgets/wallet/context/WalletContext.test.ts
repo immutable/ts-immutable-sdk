@@ -101,7 +101,7 @@ describe('WalletContext', () => {
       payload: setSupportedTopUpPayload,
     });
     expect(supportedTopUps).toEqual({
-      isExchangeEnabled: true,
+      isSwapEnabled: true,
       isBridgeEnabled: false,
       isOnRampEnabled: false,
     });

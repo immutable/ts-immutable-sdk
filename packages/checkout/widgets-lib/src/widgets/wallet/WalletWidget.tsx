@@ -62,6 +62,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         checkout: checkout,
       },
     });
+
     walletDispatch({
       payload: {
         type: WalletActions.SET_SUPPORTED_TOP_UPS,

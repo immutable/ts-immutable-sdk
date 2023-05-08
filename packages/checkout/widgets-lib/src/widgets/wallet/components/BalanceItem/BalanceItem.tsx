@@ -44,7 +44,7 @@ export const BalanceItem = (props: BalanceItemProps) => {
 
     const enableSwapCoin =
       network.chainId === ChainId.POLYGON &&
-      (supportedTopUps?.isExchangeEnabled ?? true);
+      (supportedTopUps?.isSwapEnabled ?? true);
     setIsSwapCoinEnabled(enableSwapCoin);
   }, [network, supportedTopUps]);
 
