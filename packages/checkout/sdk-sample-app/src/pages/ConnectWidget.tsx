@@ -1,17 +1,29 @@
 import Connect from '../components/Connect';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import SwitchNetwork from '../components/SwitchNetwork';
 import { Web3Provider } from '@ethersproject/providers';
 import GetAllBalances from '../components/GetAllBalances';
 import CheckConnection from '../components/CheckConnection';
 import GetAllowList from '../components/GetAllowList';
-import { Body, Divider, Heading } from '@biom3/react';
+import { Body, Divider, Heading, Toggle } from '@biom3/react';
 import GetBalance from '../components/GetBalance';
 import { Checkout } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 
 export default function ConnectWidget() {
-  const [checkout, setCheckout] = useState<Checkout>();
+  const [environment, setEnvironment] = useState(Environment.PRODUCTION);
+  const checkout = useMemo(() => {
+    return new Checkout({ environment: environment });
+  }, [environment]);
   const [provider, setProvider] = useState<Web3Provider>();
+
+  function toggleEnvironment() {
+    if (environment === Environment.PRODUCTION) {
+      setEnvironment(Environment.SANDBOX);
+    } else {
+      setEnvironment(Environment.PRODUCTION);
+    }
+  }
 
   return (
     <div>
@@ -29,9 +41,23 @@ export default function ConnectWidget() {
           marginBottom: 'base.spacing.x2',
         }}
       >
+        Toggle Checkout Environment
+      </Divider>
+      <Heading size="small">Environment: {environment.toUpperCase()}</Heading>
+      <Toggle
+        checked={environment === Environment.PRODUCTION}
+        onChange={toggleEnvironment}
+      />
+
+      <Divider
+        sx={{
+          marginTop: 'base.spacing.x6',
+          marginBottom: 'base.spacing.x2',
+        }}
+      >
         Connect
       </Divider>
-      <Connect setCheckout={setCheckout} setProvider={setProvider} />
+      <Connect checkout={checkout} setProvider={setProvider} />
 
       <Divider
         sx={{
@@ -52,6 +78,7 @@ export default function ConnectWidget() {
         Switch network
       </Divider>
       <SwitchNetwork
+        environment={environment}
         checkout={checkout}
         provider={provider}
         setProvider={setProvider}

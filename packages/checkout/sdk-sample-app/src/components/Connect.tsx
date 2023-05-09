@@ -3,22 +3,19 @@ import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
 import { useEffect, useMemo, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
+import { Environment } from '@imtbl/config';
 
 interface ConnectProps {
-  setCheckout: (provider: Checkout) => void;
+  checkout: Checkout;
   setProvider: (provider: Web3Provider) => void;
 }
 
 export default function Connect(props: ConnectProps) {
-  const checkout = useMemo(() => new Checkout(), []);
-
-  const { setProvider, setCheckout } = props;
+  const { setProvider, checkout } = props;
 
   const [result, setResult] = useState<Web3Provider>();
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
-
-  useEffect(() => setCheckout(checkout), [checkout]);
 
   async function connectClick() {
     setError(null);
