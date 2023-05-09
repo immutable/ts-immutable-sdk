@@ -18,6 +18,7 @@ export class ImmutableWallet extends HTMLElement {
 
   theme = WidgetTheme.DARK;
   providerPreference = ConnectionProviders.METAMASK;
+  useConnectWidget?: boolean;
   isOnRampEnabled?: boolean;
   isSwapEnabled?: boolean;
   isBridgeEnabled?: boolean;
@@ -32,9 +33,13 @@ export class ImmutableWallet extends HTMLElement {
     this.providerPreference = this.getAttribute(
       'providerPreference'
     ) as ConnectionProviders;
+    const useConnectWidgetProp = this.getAttribute('useConnectWidget');
     const isOnRampEnabledProp = this.getAttribute('isOnRampEnabled');
     const isSwapEnabledProp = this.getAttribute('isSwapEnabled');
     const isBridgeEnabledProp = this.getAttribute('isBridgeEnabled');
+    this.useConnectWidget = useConnectWidgetProp
+      ? useConnectWidgetProp.toLowerCase() === 'true'
+      : undefined;
     this.isOnRampEnabled = isOnRampEnabledProp
       ? isOnRampEnabledProp.toLowerCase() === 'true'
       : undefined;
@@ -67,13 +72,20 @@ export class ImmutableWallet extends HTMLElement {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <ConnectLoader
-          theme={this.theme}
-          params={connectLoaderParams}
-          closeEvent={sendWalletWidgetCloseEvent}
-        >
+        {this.useConnectWidget ? (
+          <ConnectLoader
+            theme={this.theme}
+            params={connectLoaderParams}
+            closeEvent={sendWalletWidgetCloseEvent}
+          >
+            <WalletWidget
+              params={walletParams}
+              theme={this.theme}
+            ></WalletWidget>
+          </ConnectLoader>
+        ) : (
           <WalletWidget params={walletParams} theme={this.theme}></WalletWidget>
-        </ConnectLoader>
+        )}
       </React.StrictMode>
     );
   }
