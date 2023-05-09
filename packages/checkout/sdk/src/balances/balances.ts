@@ -12,15 +12,16 @@ import {
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { getNetworkInfo } from '../network';
 import { getTokenAllowList } from '../tokens';
+import { CheckoutConfiguration } from '../config';
 
 export const getBalance = async (
-  networkMap: NetworkMap,
+  config: CheckoutConfiguration,
   provider: Web3Provider,
   walletAddress: string
 ): Promise<GetBalanceResult> => {
   return await withCheckoutError<GetBalanceResult>(
     async () => {
-      const networkInfo = await getNetworkInfo(networkMap, provider);
+      const networkInfo = await getNetworkInfo(config, provider);
 
       if (!networkInfo.isSupported) {
         throw new CheckoutError(
@@ -77,7 +78,7 @@ export async function getERC20Balance(
 }
 
 export const getAllBalances = async (
-  networkMap: NetworkMap,
+  config: CheckoutConfiguration,
   provider: Web3Provider,
   walletAddress: string,
   chainId: ChainId
@@ -98,7 +99,7 @@ export const getAllBalances = async (
     chainId,
   });
   const allBalancePromises: Promise<GetBalanceResult>[] = [];
-  allBalancePromises.push(getBalance(networkMap, provider, walletAddress));
+  allBalancePromises.push(getBalance(config, provider, walletAddress));
 
   tokenList.tokens
     .filter((token) => token.address)

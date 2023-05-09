@@ -59,7 +59,7 @@ export class Checkout {
   public async connect(params: ConnectParams): Promise<ConnectResult> {
     this.providerPreference = params.providerPreference;
     const provider = await connect.connectWalletProvider(params);
-    const networkInfo = await network.getNetworkInfo(this.config.networkMap, provider);
+    const networkInfo = await network.getNetworkInfo(this.config, provider);
 
     return {
       provider,
@@ -84,7 +84,7 @@ export class Checkout {
     }
 
     return await network.switchWalletNetwork(
-      this.config.networkMap,
+      this.config,
       this.providerPreference,
       params.provider,
       params.chainId
@@ -99,7 +99,7 @@ export class Checkout {
    */
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
     if (!params.contractAddress || params.contractAddress === '') {
-      return await balances.getBalance(this.config.networkMap, params.provider, params.walletAddress);
+      return await balances.getBalance(this.config, params.provider, params.walletAddress);
     }
     return await balances.getERC20Balance(
       params.provider,
@@ -118,7 +118,7 @@ export class Checkout {
     params: GetAllBalancesParams
   ): Promise<GetAllBalancesResult> {
     return balances.getAllBalances(
-      this.config.networkMap,
+      this.config,
       params.provider,
       params.walletAddress,
       params.chainId
@@ -134,7 +134,7 @@ export class Checkout {
   public async getNetworkAllowList(
     params: GetNetworkAllowListParams
   ): Promise<GetNetworkAllowListResult> {
-    return await network.getNetworkAllowList(this.config.networkMap, params);
+    return await network.getNetworkAllowList(this.config, params);
   }
 
   /**
@@ -182,6 +182,6 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
-    return await network.getNetworkInfo(this.config.networkMap, params.provider);
+    return await network.getNetworkInfo(this.config, params.provider);
   }
 }

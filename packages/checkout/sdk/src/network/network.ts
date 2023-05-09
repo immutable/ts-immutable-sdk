@@ -19,9 +19,10 @@ import { CheckoutConfiguration } from '../config';
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 
 export async function getNetworkInfo(
-  networkMap: NetworkMap,
+  config: CheckoutConfiguration,
   provider: Web3Provider
 ): Promise<NetworkInfo> {
+  const {networkMap} = config;
   return withCheckoutError(
     async () => {
       const network = await provider.getNetwork();
@@ -51,12 +52,13 @@ export async function getNetworkInfo(
 }
 
 export async function switchWalletNetwork(
-  networkMap: NetworkMap,
+  config: CheckoutConfiguration,
   providerPreference: ConnectionProviders,
   provider: Web3Provider,
   chainId: ChainId
 ): Promise<SwitchNetworkResult> {
   let currentProvider = provider;
+  const {networkMap} = config;
 
   if (!Object.values(ChainId).includes(chainId)) {
     throw new CheckoutError(
@@ -117,11 +119,12 @@ export async function switchWalletNetwork(
 }
 
 export async function getNetworkAllowList(
-  networkMap: NetworkMap,
+  config: CheckoutConfiguration,
   {
   type = NetworkFilterTypes.ALL,
   exclude,
 }: GetNetworkAllowListParams): Promise<GetNetworkAllowListResult> {
+  const {networkMap} = config;
   
   const list = networkMasterList.filter((network) => {
     const allowAllTokens = type === NetworkFilterTypes.ALL;
