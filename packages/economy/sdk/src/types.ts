@@ -30,5 +30,6 @@ export type EventStatus = keyof typeof EventStatuses;
 export enum EventActions {
   'CRAFT' = 'CRAFT',
   'INVENTORY' = 'INVENTORY',
+  'ITEM_DEFINITION' = 'ITEM_DEFINITION',
 }
 export type EventAction = keyof typeof EventActions;
