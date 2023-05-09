@@ -241,7 +241,6 @@ export function mockRouterImplementation(
     return {
       routingContracts: { peripheryRouterAddress: '0x00000' },
       findOptimalRoute: () => {
-        console.log('hey....');
         const tokenIn: Token = new Token(params.chainId, params.inputToken, 18);
         const tokenOut: Token = new Token(
           params.chainId,

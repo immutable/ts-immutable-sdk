@@ -40,7 +40,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.amountIn
       );
 
-      let data = tx.transactionRequest?.data?.toString() || '';
+      let data = tx.transaction?.data?.toString() || '';
 
       const { functionCallParams, topLevelParams } = decodeMulticallData(data);
 
@@ -78,7 +78,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         higherSlippage
       );
 
-      let data = tx.transactionRequest?.data?.toString() || '';
+      let data = tx.transaction?.data?.toString() || '';
 
       const { functionCallParams, topLevelParams } = decodeMulticallData(data);
 
