@@ -33,13 +33,14 @@ export class ImmutableWallet extends HTMLElement {
     this.providerPreference = this.getAttribute(
       'providerPreference'
     ) as ConnectionProviders;
+
     const useConnectWidgetProp = this.getAttribute('useConnectWidget');
+    this.useConnectWidget =
+      useConnectWidgetProp?.toLowerCase() === 'false' ? false : true;
+
     const isOnRampEnabledProp = this.getAttribute('isOnRampEnabled');
     const isSwapEnabledProp = this.getAttribute('isSwapEnabled');
     const isBridgeEnabledProp = this.getAttribute('isBridgeEnabled');
-    this.useConnectWidget = useConnectWidgetProp
-      ? useConnectWidgetProp.toLowerCase() === 'true'
-      : undefined;
     this.isOnRampEnabled = isOnRampEnabledProp
       ? isOnRampEnabledProp.toLowerCase() === 'true'
       : undefined;
@@ -49,6 +50,7 @@ export class ImmutableWallet extends HTMLElement {
     this.isBridgeEnabled = isBridgeEnabledProp
       ? isBridgeEnabledProp.toLowerCase() === 'true'
       : undefined;
+
     this.renderWidget();
   }
 
