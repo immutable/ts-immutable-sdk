@@ -110,8 +110,6 @@ describe('CryptoFiat', () => {
     const cryptoFiat = new CryptoFiat(config);
     const result = await cryptoFiat.convert({ tokenSymbols: ['btc', 'eth'] });
 
-    console.log(result);
-
     expect(mockedAxios.get).toHaveBeenCalledTimes(2);
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       1,
