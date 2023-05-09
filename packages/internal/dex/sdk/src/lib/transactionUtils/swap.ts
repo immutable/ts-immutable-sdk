@@ -1,16 +1,17 @@
 import { MethodParameters, Trade } from '@uniswap/v3-sdk';
-import { SwapRouter, SwapOptions } from '@uniswap/router-sdk';
-import { TradeInfo } from '../types';
+import { SwapOptions, SwapRouter } from '@uniswap/router-sdk';
+import { Amount, QuoteTradeInfo } from '../../types';
 import {
-  CurrencyAmount,
-  TradeType,
-  Percent,
   Currency,
+  CurrencyAmount,
+  Percent,
+  TradeType,
 } from '@uniswap/sdk-core';
 import JSBI from 'jsbi';
+import { ethers } from 'ethers';
 
 export async function createSwapParameters(
-  trade: TradeInfo,
+  trade: QuoteTradeInfo,
   fromAddress: string,
   slippage: Percent,
   deadline: number
