@@ -1,0 +1,12 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "ignorePatterns": ["jest.config.*", "rollup.config.*"],
+  "parserOptions": {
+      "project": "./tsconfig.json",
+      "tsconfigRootDir": ".",
+      "sourceType": "module"
+  },
+  "rules":{
+    "no-restricted-syntax": "off"
+  }
+}
