@@ -24,6 +24,7 @@
   },
   "license": "Apache-2.0",
   "scripts": {
+    "lint": "npx eslint ./src --ext .ts --max-warnings=0",
     "build": "npm run setup && npm run build:app",
     "build:app": "parcel build src/*.html --public-url ./",
     "clean": "rimraf ./dist ./.cache",

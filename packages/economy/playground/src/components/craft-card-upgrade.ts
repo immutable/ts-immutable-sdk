@@ -3,7 +3,7 @@ import { LitElement, css, html } from 'lit';
 import { customElement, eventOptions, state } from 'lit/decorators.js';
 import { cache } from 'lit/directives/cache.js';
 
-// FIXME: Use auto generated types
+// FIXME: Use auto generated types from ts codegen
 type CraftInput = {
   ingredients: CraftIngredient[];
   recipeId: string;
