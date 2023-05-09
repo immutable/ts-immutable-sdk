@@ -10,6 +10,11 @@ function WalletWebView() {
   const queryParams = new URLSearchParams(window.location.search);
   const themeParam = queryParams.get('theme');
 
+  const useConnectWidget = queryParams.get('useConnectWidget') || undefined;
+  const isOnRampEnabled = queryParams.get('isOnRampEnabled') || undefined;
+  const isSwapEnabled = queryParams.get('isSwapEnabled') || undefined;
+  const isBridgeEnabled = queryParams.get('isBridgeEnabled') || undefined;
+
   useEffect(() => {
     if (themeParam) setTheme(themeParam as WidgetTheme);
   }, [themeParam]);
@@ -18,6 +23,10 @@ function WalletWebView() {
     <imtbl-wallet
       providerPreference={WidgetConnectionProviders.METAMASK}
       theme={theme}
+      useConnectWidget={useConnectWidget}
+      isOnRampEnabled={isOnRampEnabled}
+      isSwapEnabled={isSwapEnabled}
+      isBridgeEnabled={isBridgeEnabled}
     ></imtbl-wallet>
   );
 }

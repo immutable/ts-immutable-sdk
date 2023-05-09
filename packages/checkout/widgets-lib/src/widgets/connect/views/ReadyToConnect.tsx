@@ -13,7 +13,7 @@ import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 
 export const ReadyToConnect = () => {
   const {
-    connectState: { checkout },
+    connectState: { checkout, sendCloseEvent },
     connectDispatch,
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
@@ -66,7 +66,14 @@ export const ReadyToConnect = () => {
   return (
     <SimpleLayout
       testId="ready-to-connect"
-      header={<HeaderNavigation showBack title="" transparent />}
+      header={
+        <HeaderNavigation
+          showBack
+          title=""
+          transparent
+          onCloseButtonClick={sendCloseEvent}
+        />
+      }
       floatHeader
       heroContent={<MetamaskConnectHero />}
       footer={

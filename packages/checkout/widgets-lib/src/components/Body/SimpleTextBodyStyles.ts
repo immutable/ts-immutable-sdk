@@ -1,5 +1,6 @@
 export const SimpleTextBodyStyle = {
-  padding: 'base.spacing.x3',
+  paddingX: 'base.spacing.x2',
+  paddingTop: 'base.spacing.x10'
 };
 
 export const BodyBoxStyle = {

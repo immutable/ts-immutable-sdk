@@ -1,4 +1,4 @@
-import { ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
+import { ChainId, GetBalanceResult, NetworkInfo } from '@imtbl/checkout-sdk';
 
 export const sortTokensByAmount = (
   tokens: GetBalanceResult[],
@@ -22,3 +22,14 @@ export const sortTokensByAmount = (
     return 0;
   });
 };
+
+export const sortNetworksCompareFn = (a: NetworkInfo, b: NetworkInfo) => {
+  // make sure POLYGON at start of the list
+  if(a.chainId === ChainId.POLYGON){
+    return -1;
+  }
+  if(a.chainId === ChainId.ETHEREUM) {
+    return 0;
+  }
+  return 1;
+}

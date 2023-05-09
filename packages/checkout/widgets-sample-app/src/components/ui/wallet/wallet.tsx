@@ -46,7 +46,11 @@ function WalletUI() {
   return (
     <div className="Connect">
       <h1 className="sample-heading">Checkout Wallet (Web Component)</h1>
-      <WalletReact providerPreference={WidgetConnectionProviders.METAMASK} />
+      <WalletReact
+        providerPreference={WidgetConnectionProviders.METAMASK}
+        useConnectWidget={true}
+        isOnRampEnabled={false}
+      />
     </div>
   );
 }

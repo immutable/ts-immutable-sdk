@@ -9,6 +9,12 @@ import { cache } from 'lit/directives/cache.js';
 //   recipeId: string;
 //   userId: string;
 // };
+// FIXME: Use auto generated types from ts codegen
+type CraftInput = {
+  ingredients: CraftIngredient[];
+  recipeId: string;
+  userId: string;
+};
 
 type CraftIngredient = {
   conditionId: string;
@@ -163,6 +169,9 @@ export class CraftingCardUpgrade extends LitElement {
     // await for results then update the craft results in state
 
     this.economy.inventory.getItems('jimmy-test');
+    // TODO: process the crafting request
+    // SDK.craft(...this.craftInput) // send the arguments required, taken from state's craftInput
+    // await for results then update the craft results in state
   }
 
   render() {

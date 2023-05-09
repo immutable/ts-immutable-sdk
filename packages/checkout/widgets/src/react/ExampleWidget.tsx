@@ -6,6 +6,10 @@ import {
   WidgetTheme,
 } from '../definitions/constants';
 
+/**
+ * Interface representing the props for the Example Widget component.
+ * @experimental
+ */
 export interface ExampleReactProps {
   providerPreference: WidgetConnectionProviders;
   fromContractAddress?: string;
@@ -13,6 +17,10 @@ export interface ExampleReactProps {
   fromNetwork?: Network;
 }
 
+/**
+ * A React functional component that renders the Checkout Example Widget.
+ * @experimental
+ */
 export function ExampleReact(props: ExampleReactProps) {
   const { providerPreference, fromContractAddress, amount, fromNetwork } =
     props;

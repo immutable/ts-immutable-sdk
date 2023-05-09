@@ -1,10 +1,11 @@
-import { ethers } from 'ethers';
+import { BigNumberish, utils } from 'ethers';
 
-export const getERC20ApproveCalldata = (): string => {
+export const getERC20ApproveCalldata = (amount: BigNumberish): string => {
   const ABI = ['function approve(address to, uint amount)'];
-  const iface = new ethers.utils.Interface(ABI);
-  return iface.encodeFunctionData('approve', [
-    process.env.NEXT_PUBLIC_PERIPHERY_ROUTER_DEV,
-    ethers.constants.MaxUint256,
+  const approveInterface = new utils.Interface(ABI);
+
+  return approveInterface.encodeFunctionData('approve', [
+    process.env.NEXT_PUBLIC_PERIPHERY_ROUTER,
+    amount,
   ]);
 };
