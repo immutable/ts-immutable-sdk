@@ -6,6 +6,7 @@ import {
   decodeMulticallData,
   mockRouterImplementation,
   setupSwapTxTest,
+  TEST_PERIPHERY_ROUTER_ADDRESS,
   TestDexConfiguration,
 } from './utils/testUtils';
 import * as utils from './lib/utils';
@@ -61,6 +62,9 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(functionCallParams.tokenOut).toBe(params.outputToken); // output token
       expect(functionCallParams.fee).toBe(10000); // fee
       expect(functionCallParams.recipient).toBe(wallet.address); // Recipient
+      expect(tx.transaction?.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
+      expect(tx.transaction?.from).toBe(params.fromAddress); // from address
+      expect(tx.transaction?.value).toBe('0x00'); // refers to 0ETH
       expect(functionCallParams.firstAmount.toString()).toBe(
         params.amountOut.toString()
       ); // amountOut
@@ -131,6 +135,9 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(functionCallParams.tokenOut).toBe(params.outputToken); // output token
       expect(functionCallParams.fee).toBe(10000); // fee
       expect(functionCallParams.recipient).toBe(params.fromAddress); // Recipient
+      expect(tx.transaction?.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
+      expect(tx.transaction?.from).toBe(params.fromAddress); // from address
+      expect(tx.transaction?.value).toBe('0x00'); // refers to 0ETH
       expect(functionCallParams.firstAmount.toString()).toBe(
         params.amountOut.toString()
       ); // amountOut
