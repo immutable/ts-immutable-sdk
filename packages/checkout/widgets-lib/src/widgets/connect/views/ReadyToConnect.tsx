@@ -10,6 +10,7 @@ import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
 import { ViewContext, ViewActions } from '../../../context/ViewContext';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
+import { sendCloseWidgetEvent } from '../ConnectWidgetEvents';
 
 export const ReadyToConnect = () => {
   const {
@@ -66,7 +67,14 @@ export const ReadyToConnect = () => {
   return (
     <SimpleLayout
       testId="ready-to-connect"
-      header={<HeaderNavigation showBack title="" transparent />}
+      header={
+        <HeaderNavigation
+          showBack
+          title=""
+          transparent
+          onCloseButtonClick={() => sendCloseWidgetEvent()}
+        />
+      }
       floatHeader
       heroContent={<MetamaskConnectHero />}
       footer={

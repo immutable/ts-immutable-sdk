@@ -6,6 +6,8 @@ import {
   WalletActions,
   initialWalletState,
   walletReducer,
+  SetSupportedTopUpPayload,
+  TopUpFeature,
 } from './WalletContext';
 import { Web3Provider } from '@ethersproject/providers';
 import { BalanceInfo } from '../functions/tokenBalances';
@@ -82,5 +84,26 @@ describe('WalletContext', () => {
         fiatAmount: '1800.00',
       } as BalanceInfo,
     ]);
+  });
+
+  it('should update state with supported top-ups when reducer called with SET_SUPPORTED_TOP_UPS action', () => {
+    const enabledTopUps: TopUpFeature = {
+      isBridgeEnabled: false,
+      isOnRampEnabled: false,
+    };
+
+    const setSupportedTopUpPayload: SetSupportedTopUpPayload = {
+      type: WalletActions.SET_SUPPORTED_TOP_UPS,
+      supportedTopUps: { ...enabledTopUps },
+    };
+    expect(initialWalletState.supportedTopUps).toBeNull();
+    const { supportedTopUps } = walletReducer(initialWalletState, {
+      payload: setSupportedTopUpPayload,
+    });
+    expect(supportedTopUps).toEqual({
+      isSwapEnabled: true,
+      isBridgeEnabled: false,
+      isOnRampEnabled: false,
+    });
   });
 });

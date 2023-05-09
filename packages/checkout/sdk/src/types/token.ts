@@ -1,4 +1,5 @@
 import { ChainId } from './network';
+import { BigNumber } from 'ethers';
 
 /**
  * Interface representing token information.
@@ -35,7 +36,7 @@ export interface TokenMasterInfo extends TokenInfo {
  */
 export interface GetTokenAllowListParams {
   type: TokenFilterTypes;
-  chainId: ChainId;
+  chainId?: ChainId;
   exclude?: TokenFilter[];
 }
 

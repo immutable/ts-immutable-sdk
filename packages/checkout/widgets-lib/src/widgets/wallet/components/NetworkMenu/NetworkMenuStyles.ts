@@ -13,9 +13,14 @@ export const NetworkHeadingStyle = {
 };
 
 export const ActiveNetworkButtonStyle = {
+  fontWeight: 'base.text.caption.small.bold.fontWeight',
   borderColor: 'base.color.translucent.container.1000',
   borderStyle: 'solid',
   borderWidth: 'base.border.size.200',
+};
+
+export const NetworkButtonStyle = {
+  fontWeight: 'base.text.caption.small.bold.fontWeight',
 };
 
 export const LogoStyle = (logoColor: string, isActive: boolean) => {

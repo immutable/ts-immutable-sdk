@@ -6,7 +6,9 @@ import {
   IMX_TEST_CHAIN,
   USDC_TEST_CHAIN,
   WETH_TEST_CHAIN,
+  uniqBy,
 } from '../../utils/testUtils';
+import { ensureCorrectERC20AddressOrder } from './computePoolAddress';
 
 // TI TO [] = [TI / TO]
 // TI TO [TX] = [TI / TO, TI / TX, TO / TX]
@@ -20,6 +22,7 @@ describe('generateERC20Pairs', () => {
       const commonRoutingTokens: Token[] = [];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
+      expect(tokenPairs.length).toEqual(1);
       expect(tokenPairs).toMatchInlineSnapshot(`
         [
           [
@@ -55,6 +58,7 @@ describe('generateERC20Pairs', () => {
       const commonRoutingTokens: Token[] = [WETH_TEST_CHAIN];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
+      expect(tokenPairs.length).toEqual(3);
       expect(tokenPairs).toMatchInlineSnapshot(`
         [
           [
@@ -127,9 +131,14 @@ describe('generateERC20Pairs', () => {
       // We expect...
       // TI TO [TI] = [TI / TO]
       const tokenPair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
-      const commonRoutingTokens: Token[] = [USDC_TEST_CHAIN];
+
+      // Create a copy of the Token object so that we do not have the same
+      // instance of the object in the tokenPair and commonRoutingTokens
+      const usdc = Object.assign(USDC_TEST_CHAIN);
+      const commonRoutingTokens: Token[] = [usdc];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
+      expect(tokenPairs.length).toEqual(1);
       expect(tokenPairs).toMatchInlineSnapshot(`
         [
           [
@@ -167,17 +176,21 @@ describe('generateERC20Pairs', () => {
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
       expect(tokenPairs).toHaveLength(6);
     });
-  });
 
-  describe('when given a TokenIn and TokenOut pair and there are three CommonRoutingTokens, and one of the CommonRoutingTokens is the same as TokenIn', () => {
-    it('should create six pairs', async () => {
+    it('should not repeat pairs', async () => {
       // We expect...
       // TI TO [TX, TZ] = [TI / TO, TI / TX, TI / TZ, TO / TX, TO / TZ, TX / TZ]
       const tokenPair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
       const commonRoutingTokens: Token[] = [WETH_TEST_CHAIN, FUN_TEST_CHAIN];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
-      expect(tokenPairs).toHaveLength(6);
+
+      const uniquePairs = uniqBy(tokenPairs, (tp) => {
+        const orderedPair = ensureCorrectERC20AddressOrder(tp);
+
+        return JSON.stringify([orderedPair[0].address, orderedPair[1].address]);
+      });
+      expect(uniquePairs.length).toEqual(6);
     });
   });
 });
