@@ -28,6 +28,7 @@ import { SuccessView } from '../../components/Success/SuccessView';
 import { ReadyToConnect } from './views/ReadyToConnect';
 import { SwitchNetwork } from './views/SwitchNetwork';
 import { LoadingView } from '../../components/Loading/LoadingView';
+import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
@@ -105,14 +106,16 @@ export function ConnectWidget(props: ConnectWidgetProps) {
               <ReadyToConnect />
             )}
             {view.type === ConnectWidgetViews.SUCCESS && (
-              <SuccessView
-                successText="Connection secure"
-                actionText="Continue"
-                successEventAction={() =>
-                  sendConnectSuccessEvent(ConnectionProviders.METAMASK)
-                }
-                onActionClick={() => sendCloseEvent()}
-              />
+              <ConnectLoaderSuccess>
+                <SuccessView
+                  successText="Connection secure"
+                  actionText="Continue"
+                  successEventAction={() =>
+                    sendConnectSuccessEvent(ConnectionProviders.METAMASK)
+                  }
+                  onActionClick={() => sendCloseEvent()}
+                />
+              </ConnectLoaderSuccess>
             )}
             {view.type === ConnectWidgetViews.FAIL && <ConnectResult />}
             {view.type === ConnectWidgetViews.SWITCH_NETWORK && (
