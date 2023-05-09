@@ -1,23 +1,7 @@
-import { EconomyCustomEventTypes, Economy } from '@imtbl/economy';
+import { EconomyCustomEventTypes, Economy, CraftInput } from '@imtbl/economy';
 import { LitElement, css, html } from 'lit';
 import { customElement, eventOptions, state } from 'lit/decorators.js';
 import { cache } from 'lit/directives/cache.js';
-
-// FIXME: Use auto generated types from ts codegen
-type CraftInput = {
-  ingredients: CraftIngredient[];
-  recipe_id: string;
-  user_id: string;
-};
-
-type CraftIngredient = {
-  condition_id: string;
-  item_id: string;
-};
-
-type State = {
-  craftInput: CraftInput;
-};
 
 const HardcodedCardUpgradeRecipe = {
   id: 'f3f3e906-6da9-4d0f-85c6-31b20b159310',
@@ -188,10 +172,11 @@ export class CraftingCardUpgrade extends LitElement {
   }
 
   @state()
-  private state: State = {
-    craftInput: {
-      user_id: '123',
-      recipe_id: HardcodedCardUpgradeRecipe.id,
+  private state: CraftInput = {
+    requiresWeb3: false,
+    input: {
+      userId: '123',
+      recipeId: HardcodedCardUpgradeRecipe.id,
       ingredients: [],
     },
   };
@@ -388,17 +373,17 @@ export class CraftingCardUpgrade extends LitElement {
   }
 
   prepareIngredientsForCraft() {
-    this.state.craftInput.ingredients = [
+    this.state.input.ingredients = [
       {
-        item_id: this.cardToUpgrade.id,
-        condition_id: HardcodedCardUpgradeRecipe.inputs[0].id,
+        itemId: this.cardToUpgrade.id,
+        conditionId: HardcodedCardUpgradeRecipe.inputs[0].id,
       },
     ];
 
     this.selectedDustItems.forEach((item) => {
-      this.state.craftInput.ingredients.push({
-        item_id: item.id,
-        condition_id: HardcodedCardUpgradeRecipe.inputs[1].id,
+      this.state.input.ingredients.push({
+        itemId: item.id,
+        conditionId: HardcodedCardUpgradeRecipe.inputs[1].id,
       });
     });
   }
