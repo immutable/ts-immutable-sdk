@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "dependencies": {
     "@imtbl/checkout-sdk": "0.0.0",
-    "@imtbl/checkout-sdk-web": "file:.yalc/@imtbl/checkout-sdk-web",
-    "@imtbl/checkout-sdk-widgets": "file:.yalc/@imtbl/checkout-sdk-widgets",
+    "@imtbl/checkout-sdk-web": "0.0.0",
+    "@imtbl/checkout-sdk-widgets": "0.0.0",
     "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/economy": "0.0.0",
     "@imtbl/passport": "0.0.0"
