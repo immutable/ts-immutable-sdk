@@ -13,6 +13,13 @@ export interface WalletState {
   providerPreference: ConnectionProviders | null;
   network: NetworkInfo | null;
   tokenBalances: BalanceInfo[];
+  supportedTopUps: TopUpFeature | null;
+}
+
+export interface TopUpFeature {
+  isOnRampEnabled?: boolean;
+  isSwapEnabled?: boolean;
+  isBridgeEnabled?: boolean;
 }
 
 export const initialWalletState: WalletState = {
@@ -21,6 +28,7 @@ export const initialWalletState: WalletState = {
   providerPreference: null,
   network: null,
   tokenBalances: [],
+  supportedTopUps: null,
 };
 
 export interface WalletContextState {
@@ -36,13 +44,15 @@ type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
   | SetProviderPreferencePayload
-  | SetSwitchNetworkPayload;
+  | SetSwitchNetworkPayload
+  | SetSupportedTopUpPayload;
 
 export enum WalletActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
   SWITCH_NETWORK = 'SWITCH_NETWORK',
+  SET_SUPPORTED_TOP_UPS = 'SUPPORTED_TOP_UPS',
 }
 
 export interface SetCheckoutPayload {
@@ -64,6 +74,11 @@ export interface SetSwitchNetworkPayload {
   type: WalletActions.SWITCH_NETWORK;
   network: NetworkInfo;
   tokenBalances: BalanceInfo[];
+}
+
+export interface SetSupportedTopUpPayload {
+  type: WalletActions.SET_SUPPORTED_TOP_UPS;
+  supportedTopUps: TopUpFeature;
 }
 
 export const WalletContext = createContext<WalletContextState>({
@@ -98,6 +113,17 @@ export const walletReducer: Reducer<WalletState, WalletAction> = (
         ...state,
         network: action.payload.network,
         tokenBalances: action.payload.tokenBalances,
+      };
+    case WalletActions.SET_SUPPORTED_TOP_UPS:
+      return {
+        ...state,
+        supportedTopUps: {
+          isSwapEnabled: action.payload.supportedTopUps.isSwapEnabled ?? true,
+          isOnRampEnabled:
+            action.payload.supportedTopUps.isOnRampEnabled ?? true,
+          isBridgeEnabled:
+            action.payload.supportedTopUps.isBridgeEnabled ?? true,
+        },
       };
     default:
       return state;

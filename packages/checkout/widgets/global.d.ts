@@ -8,12 +8,13 @@ import {
   ImtblTransitionExampleProps,
   ImtblInnerWidgetExampleProps,
   ImtblOuterWidgetExampleProps,
-} from './src/index';
+} from './src';
 
 declare global {
   interface Window {
     ImtblCheckoutWidgetConfig: any;
   }
+
   namespace JSX {
     interface IntrinsicElements {
       'imtbl-connect': ImtblConnectProps;
@@ -27,6 +28,7 @@ declare global {
       'imtbl-outer-widget-example': ImtblOuterWidgetExampleProps;
     }
   }
+
   interface ImmutableWebComponent {
     setProvider: Function;
     setAttribute: Function;

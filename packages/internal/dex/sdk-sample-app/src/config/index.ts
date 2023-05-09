@@ -7,42 +7,42 @@ import {
   ExchangeOverrides,
 } from '@imtbl/dex-sdk';
 
-const devChainID = +process.env.NEXT_PUBLIC_CHAIN_ID_DEV;
+const chainId = +process.env.NEXT_PUBLIC_CHAIN_ID;
 
 const immutableConfig = new ImmutableConfiguration({
   environment: Environment.SANDBOX,
 }); // doesn't really matter what we use here because we'll be overriding all of the config values
 
 const contractOverrides: ExchangeContracts = {
-  multicall: process.env.NEXT_PUBLIC_MULTICALL_CONTRACT_DEV,
-  coreFactory: process.env.NEXT_PUBLIC_CORE_FACTORY_DEV,
-  quoterV2: process.env.NEXT_PUBLIC_QUOTER_V2_DEV,
-  peripheryRouter: process.env.NEXT_PUBLIC_PERIPHERY_ROUTER_DEV,
-  migrator: process.env.NEXT_PUBLIC_MIGRATOR_DEV,
+  multicall: process.env.NEXT_PUBLIC_MULTICALL_CONTRACT,
+  coreFactory: process.env.NEXT_PUBLIC_CORE_FACTORY,
+  quoterV2: process.env.NEXT_PUBLIC_QUOTER_V2,
+  peripheryRouter: process.env.NEXT_PUBLIC_PERIPHERY_ROUTER,
+  migrator: process.env.NEXT_PUBLIC_MIGRATOR,
   nonfungiblePositionManager:
-    process.env.NEXT_PUBLIC_NONFUNGIBLE_POSITION_MANAGER_DEV,
-  tickLens: process.env.NEXT_PUBLIC_TICK_LENS_DEV,
+    process.env.NEXT_PUBLIC_NONFUNGIBLE_POSITION_MANAGER,
+  tickLens: process.env.NEXT_PUBLIC_TICK_LENS,
 };
 
-// This list can be updated with any Tokens that are deployed to devnet
+// This list can be updated with any Tokens that are deployed to the chain being configured
 // These tokens will be used to find available pools for a swap
 const commonRoutingTokens: TokenInfo[] = [
   {
-    chainId: devChainID,
+    chainId: chainId,
     address: process.env.NEXT_PUBLIC_COMMON_ROUTING_FUN,
     decimals: 18,
     symbol: 'FUN',
     name: 'The Fungibles Token',
   },
   {
-    chainId: devChainID,
+    chainId: chainId,
     address: process.env.NEXT_PUBLIC_COMMON_ROUTING_USDC,
     decimals: 18,
     symbol: 'USDC',
     name: 'US Dollar Coin',
   },
   {
-    chainId: devChainID,
+    chainId: chainId,
     address: process.env.NEXT_PUBLIC_COMMON_ROUTING_WETH,
     decimals: 18,
     symbol: 'WETH',
@@ -51,12 +51,12 @@ const commonRoutingTokens: TokenInfo[] = [
 ];
 
 const overrides: ExchangeOverrides = {
-  rpcURL: process.env.NEXT_PUBLIC_RPC_URL_DEV,
+  rpcURL: process.env.NEXT_PUBLIC_RPC_URL,
   exchangeContracts: contractOverrides,
   commonRoutingTokens: commonRoutingTokens,
 };
 export const configuration = new ExchangeConfiguration({
-  chainId: devChainID,
+  chainId: chainId,
   baseConfig: immutableConfig,
   overrides: overrides,
 });

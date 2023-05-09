@@ -6,7 +6,6 @@ import {
   ConnectReact,
   UpdateConfig,
   CheckoutWidgetTagNames,
-  WalletReact,
   SetProvider,
 } from '@imtbl/checkout-widgets';
 

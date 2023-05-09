@@ -5,6 +5,7 @@ export {
   TokenFilterTypes,
   WalletFilterTypes,
   NetworkFilterTypes,
+  SupportedFiatCurrencies,
 } from './types';
 export type {
   GetNetworkParams,
@@ -33,6 +34,9 @@ export type {
   NetworkFilter,
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
+  ConvertTokensToFiatParams,
+  ConvertTokensToFiatResult,
+  TokenToFiatConversionResult,
 } from './types';
 export type { ErrorType } from './errors';
 export { CheckoutErrorType } from './errors';
