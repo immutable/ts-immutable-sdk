@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { MethodParameters } from '@uniswap/v3-sdk';
-import { Percent, CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core';
+import { CurrencyAmount, Percent, Token, TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
 import JSBI from 'jsbi';
 
@@ -8,22 +8,18 @@ import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
   DEFAULT_SLIPPAGE,
+  MAX_MAX_HOPS,
 } from './constants';
 
 import { Router } from './lib/router';
 import {
-  validateAddress,
   getERC20Decimals,
+  validateAddress,
   validateDifferentAddresses,
 } from './lib/utils';
 import { QuoteResponse, TransactionResponse } from './types';
-import {
-  createSwapParameters,
-  getAmountWithSlippageImpact,
-} from './lib/transactionUtils/swap';
-import { MAX_MAX_HOPS } from './constants';
+import { createSwapParameters } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
-import { QuoteResult } from './lib/getQuotesForRoutes';
 import { constructQuoteWithSlippage } from './lib/transactionUtils/constructQuoteWithSlippage';
 
 export class Exchange {
@@ -109,7 +105,7 @@ export class Exchange {
     if (!routeAndQuote.success) {
       return {
         success: false,
-        request: undefined,
+        transaction: undefined,
         info: undefined,
       };
     }
@@ -130,7 +126,7 @@ export class Exchange {
 
     return {
       success: true,
-      request: {
+      transaction: {
         data: params.calldata,
         to: this.router.routingContracts.peripheryRouterAddress,
         value: params.value,

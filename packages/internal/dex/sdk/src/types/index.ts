@@ -38,14 +38,14 @@ export type TradeInfo = {
 
 export type TransactionResponse =
   | {
-      request: ethers.providers.TransactionRequest;
+      transaction: ethers.providers.TransactionRequest;
       info: TradeInfo;
       success: true;
     }
   | {
-      success: false;
       info: undefined;
-      request: undefined;
+      success: false;
+      transaction: undefined;
     };
 
 export type TokenInfo = {

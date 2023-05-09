@@ -9,7 +9,12 @@ import { ethers } from 'ethers';
 import { hexDataSlice } from 'ethers/lib/utils';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
-import { ExchangeModuleConfiguration, Router, TradeInfo } from '../lib';
+import {
+  ExchangeModuleConfiguration,
+  QuoteTradeInfo,
+  Router,
+  TradeInfo,
+} from '../lib';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 
 export const testChainId: number = 1;
@@ -220,6 +225,7 @@ export function mockRouterImplementation(
     return {
       routingContracts: { peripheryRouterAddress: '0x00000' },
       findOptimalRoute: () => {
+        console.log('hey....');
         const tokenIn: Token = new Token(params.chainId, params.inputToken, 18);
         const tokenOut: Token = new Token(
           params.chainId,
@@ -243,7 +249,7 @@ export function mockRouterImplementation(
           tokenOut
         );
 
-        const trade: TradeInfo = {
+        const trade: QuoteTradeInfo = {
           route: route,
           amountIn: ethers.BigNumber.from(params.amountIn),
           tokenIn: tokenIn,

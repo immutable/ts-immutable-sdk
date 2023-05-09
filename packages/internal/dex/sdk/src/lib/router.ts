@@ -1,21 +1,13 @@
 import { ethers } from 'ethers';
-import {
-  Currency,
-  CurrencyAmount,
-  Percent,
-  Token,
-  TradeType,
-} from '@uniswap/sdk-core';
+import { Currency, CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import JSBI from 'jsbi';
 import { poolEquals } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
-import { Amount, QuoteResponse, TokenInfo } from '../types';
+import { QuoteResponse } from '../types';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
 import { Multicall, Multicall__factory } from '../contracts/types';
-import { DEFAULT_SLIPPAGE } from '../constants';
-import { getAmountWithSlippageImpact } from './transactionUtils/swap';
 
 export type RoutingContracts = {
   multicallAddress: string;

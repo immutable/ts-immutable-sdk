@@ -53,7 +53,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.amountOut
       );
 
-      let data = tx.transactionRequest?.data?.toString() || '';
+      let data = tx.request?.data?.toString() || '';
 
       const { functionCallParams, topLevelParams } = decodeMulticallData(data);
 
@@ -89,7 +89,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         higherSlippage
       );
 
-      let data = tx.transactionRequest?.data?.toString() || '';
+      let data = tx.request?.data?.toString() || '';
 
       if (!data) {
         return;
@@ -129,7 +129,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         higherSlippage
       );
 
-      let data = tx.transactionRequest?.data?.toString() || '';
+      let data = tx.request?.data?.toString() || '';
 
       const { functionCallParams, topLevelParams } = decodeMulticallData(data);
 
