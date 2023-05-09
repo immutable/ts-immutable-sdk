@@ -6,7 +6,7 @@ describe('config', () => {
   it('should create successfully with API key', () => {
     const apiKey = 'test-api-key';
     const cryptoFiatConfiguration: CryptoFiatModuleConfiguration = {
-      apiKey: apiKey,
+      apiKey,
     };
 
     const config = new CryptoFiatConfiguration(cryptoFiatConfiguration);

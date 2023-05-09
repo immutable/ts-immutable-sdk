@@ -16,6 +16,7 @@ const DEFAULT_FIAT_SYMBOL = 'usd';
  */
 export class CryptoFiat {
   private cache: Map<string, string> | null;
+
   private apiKey?: string;
 
   /**
@@ -41,11 +42,11 @@ export class CryptoFiat {
 
     if (response.status !== 200) {
       throw new Error(
-        `Error fetching coin list: ${response.status} ${response.statusText}`
+        `Error fetching coin list: ${response.status} ${response.statusText}`,
       );
     }
 
-    const data = response.data;
+    const { data } = response;
 
     this.cache = new Map<string, string>();
     for (const coin of data) {
@@ -55,48 +56,42 @@ export class CryptoFiat {
 
   /**
    * Converts tokens with fiat currencies.
-   * @param {CryptoFiatConvertParams} - object containing the token symbols to get a conversion for and the optional fiat symbols to convert to.
-   * @returns {Promise<CryptoFiatConvertReturn>} - promise to return the map that associates token symbol to its conversion value object with fiat currencies.
+   * @param {CryptoFiatConvertParams} - object containing the token symbols to get a conversion
+   *                                    for and the optional fiat symbols to convert to.
+   * @returns {Promise<CryptoFiatConvertReturn>} - promise to return the map that associates
+   *                                               token symbol to its conversion value object
+   *                                               with fiat currencies.
    */
   async convert({
     tokenSymbols,
-    fiatSymbols,
   }: CryptoFiatConvertParams): Promise<CryptoFiatConvertReturn> {
     if (!tokenSymbols || tokenSymbols.length === 0) {
-      throw new Error(`Error missing token symbols to convert`);
+      throw new Error('Error missing token symbols to convert');
     }
 
     await this.fetchSymbols();
-
-    if (!fiatSymbols || fiatSymbols.length === 0) {
-      fiatSymbols = [DEFAULT_FIAT_SYMBOL];
-    }
 
     const ids = tokenSymbols
       .map((s) => this.cache!.get(s.toUpperCase()))
       .join(',');
     const url = this.withApiKey(
-      `/simple/price?ids=${ids}&vs_currencies=${fiatSymbols}`
+      `/simple/price?ids=${ids}&vs_currencies=${DEFAULT_FIAT_SYMBOL}`,
     );
 
     const response = await axios.get(url);
 
     if (response.status !== 200) {
       throw new Error(
-        `Error fetching prices: ${response.status} ${response.statusText}`
+        `Error fetching prices: ${response.status} ${response.statusText}`,
       );
     }
 
-    const data = response.data;
+    const { data } = response;
 
     const result = new Map<string, FiatConversion>();
     for (const symbol of tokenSymbols) {
       const id = this.cache!.get(symbol.toUpperCase());
-      if (!id) {
-        result.set(symbol, {});
-        continue;
-      }
-      result.set(symbol, data[id] || {});
+      id ? result.set(symbol, data[id] || {}) : result.set(symbol, {});
     }
 
     return result;

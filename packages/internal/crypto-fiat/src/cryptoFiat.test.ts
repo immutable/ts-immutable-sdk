@@ -1,6 +1,7 @@
+import { describe, expect } from '@jest/globals';
 import { CryptoFiatConfiguration } from 'config';
-import { CryptoFiat } from './index';
 import axios from 'axios';
+import { CryptoFiat } from './cryptoFiat';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -37,15 +38,15 @@ describe('CryptoFiat', () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(3);
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       1,
-      'https://api.coingecko.com/api/v3/coins/list'
+      'https://api.coingecko.com/api/v3/coins/list',
     );
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       2,
-      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'
+      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
     );
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       3,
-      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'
+      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
     );
   });
 
@@ -75,11 +76,11 @@ describe('CryptoFiat', () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(2);
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       1,
-      'https://api.coingecko.com/api/v3/coins/list'
+      'https://api.coingecko.com/api/v3/coins/list',
     );
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       2,
-      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd'
+      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd',
     );
     expect(result.get('btc')).toEqual({ usd: 50000 });
     expect(result.get('eth')).toEqual({ usd: 4000 });
@@ -112,11 +113,11 @@ describe('CryptoFiat', () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(2);
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       1,
-      'https://pro-api.coingecko.com/api/v3/coins/list?x_cg_pro_api_key=fake-api'
+      'https://pro-api.coingecko.com/api/v3/coins/list?x_cg_pro_api_key=fake-api',
     );
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       2,
-      'https://pro-api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&x_cg_pro_api_key=fake-api'
+      'https://pro-api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&x_cg_pro_api_key=fake-api',
     );
     expect(result.get('btc')).toEqual({ usd: 50000 });
     expect(result.get('eth')).toEqual({ usd: 4000 });
@@ -127,7 +128,7 @@ describe('CryptoFiat', () => {
     const cryptoFiat = new CryptoFiat(config);
 
     await expect(cryptoFiat.convert({ tokenSymbols: [] })).rejects.toThrow(
-      'Error missing token symbols to convert'
+      'Error missing token symbols to convert',
     );
   });
 
@@ -141,7 +142,7 @@ describe('CryptoFiat', () => {
     const config = new CryptoFiatConfiguration({});
     const cryptoFiat = new CryptoFiat(config);
     await expect(
-      cryptoFiat.convert({ tokenSymbols: ['btc', 'eth'] })
+      cryptoFiat.convert({ tokenSymbols: ['btc', 'eth'] }),
     ).rejects.toThrow('Error fetching coin list: 400 Bad Request');
   });
 
@@ -164,7 +165,7 @@ describe('CryptoFiat', () => {
     const config = new CryptoFiatConfiguration({});
     const cryptoFiat = new CryptoFiat(config);
     await expect(
-      cryptoFiat.convert({ tokenSymbols: ['btc', 'eth'] })
+      cryptoFiat.convert({ tokenSymbols: ['btc', 'eth'] }),
     ).rejects.toThrow('Error fetching prices: 400 Bad Request');
   });
 });

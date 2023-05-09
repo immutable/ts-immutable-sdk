@@ -9,16 +9,15 @@ export interface CryptoFiatModuleConfiguration {
 /**
  * Type representing the parameters for converting cryptocurrency to fiat.
  * @property {string[]} tokenSymbols - Array of cryptocurrency symbols to convert.
- * @property {string[]} fiatSymbols - Optional, array of fiat symbols to convert cryptocurrency to. Default is USD.
  */
 export type CryptoFiatConvertParams = {
   tokenSymbols: string[];
-  fiatSymbols?: string[];
 };
 
 /**
  * Type representing the fiat conversion rates for a specific cryptocurrency.
- * @property {[fiatSymbol: string]: number} - Conversion rate of the cryptocurrency to the fiat currency.
+ * @property {[fiatSymbol: string]: number} - Conversion rate of the cryptocurrency
+ *                                            to the fiat currency.
  */
 export type FiatConversion = {
   [fiatSymbol: string]: number;
@@ -26,6 +25,7 @@ export type FiatConversion = {
 
 /**
  * Type representing the return value of the conversion function.
- * @property {Map<string, FiatConversion>} - Conversion rates of all the cryptocurrency to all the fiat currencies.
+ * @property {Map<string, FiatConversion>} - Conversion rates of all the cryptocurrency
+ *                                           to all the fiat currencies.
  */
 export type CryptoFiatConvertReturn = Map<string, FiatConversion>;
