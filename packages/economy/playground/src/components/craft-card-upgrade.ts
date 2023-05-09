@@ -454,7 +454,7 @@ export class CraftingCardUpgrade extends LitElement {
   }
 
   renderOutput() {
-    return html`<div class="modal is-active">
+    return html`<div id="upgraded-card-modal" class="modal is-active">
       <div class="modal-background"></div>
       <div class="modal-content">
       <div class="card">
@@ -479,9 +479,15 @@ export class CraftingCardUpgrade extends LitElement {
       </div>
       </div>
       </div>
-        <button class="modal-close is-large" aria-label="close"></button>
+        <button class="modal-close is-large" aria-label="close" @click=${this.closeUpgradedCardModal}></button>
       </div>
     </div>`;
+  }
+
+  closeUpgradedCardModal() {
+    const modalEl = document.getElementById('upgraded-card-modal');
+    modalEl?.classList.remove('is-active');
+    this.requestUpdate();
   }
 
   render() {
