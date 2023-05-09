@@ -19,7 +19,10 @@ describe('Token Bridge', () => {
       rootProvider: voidRootProvider,
       childProvider: voidChildProvider,
     });
-    new TokenBridge(bridgeConfig);
+
+    // to work around using new for side-effects
+    const bridge = new TokenBridge(bridgeConfig);
+    expect(bridge).toBeDefined();
   });
   describe('getUnsignedDepositTokenTx', () => {
     const voidRootProvider = new ethers.providers.JsonRpcProvider('x');

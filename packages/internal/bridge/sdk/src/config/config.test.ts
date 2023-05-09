@@ -1,5 +1,5 @@
-import { describe, expect, it } from '@jest/globals';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { describe, expect } from '@jest/globals';
 import { ETH_SEPOLIA_TO_ZKEVM_DEVNET } from 'constants/bridges';
 import { ethers } from 'ethers';
 import { BridgeConfiguration } from './index';

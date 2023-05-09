@@ -11,6 +11,43 @@ import {
 } from '../types';
 
 /**
+ * @constant {BridgeInstance[]} SupportedSandboxBridges - An array of supported bridge instances for the sandbox environment.
+ */
+const SUPPORTED_SANDBOX_BRIDGES: BridgeInstance[] = [ETH_SEPOLIA_TO_ZKEVM_DEVNET];
+
+/**
+ * @constant {BridgeInstance[]} SUPPORTED_PRODUCTION_BRIDGES - An array of supported bridge instances for the production environment.
+ */
+const SUPPORTED_PRODUCTION_BRIDGES: BridgeInstance[] = [];
+
+/**
+ * @constant {Object} SUPPORTED_BRIDGES_FOR_ENVIRONMENT - An object mapping environment types to their supported bridge instances.
+ */
+export const SUPPORTED_BRIDGES_FOR_ENVIRONMENT: {
+  [key in Environment]: BridgeInstance[];
+} = {
+  [Environment.SANDBOX]: SUPPORTED_SANDBOX_BRIDGES,
+  [Environment.PRODUCTION]: SUPPORTED_PRODUCTION_BRIDGES,
+};
+
+/**
+ * @constant {Map<BridgeInstance, BridgeContracts>} CONTRACTS_FOR_BRIDGE - A map of bridge instances to their associated contract addresses.
+ */
+const CONTRACTS_FOR_BRIDGE = new Map<BridgeInstance, BridgeContracts>()
+  .set(ETH_SEPOLIA_TO_ZKEVM_DEVNET, {
+    rootChainERC20Predicate: '0xA401eA44cDAc48569322b1166A0696b9412977D9',
+    rootChainStateSender: '0xA002CfC25D1DDdE53FBD5d8bCF8E26c821B87ceD',
+    childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
+    childChainStateReceiver: '0x0000000000000000000000000000000000001001',
+  })
+  .set(ETH_MAINNET_TO_ZKEVM_MAINNET, {
+    rootChainERC20Predicate: '0x',
+    rootChainStateSender: '0x',
+    childChainERC20Predicate: '0x',
+    childChainStateReceiver: '0x',
+  });
+
+/**
  * Represents the configuration for a bridge between two chains.
  */
 export class BridgeConfiguration {
@@ -53,7 +90,7 @@ export class BridgeConfiguration {
       return;
     }
 
-    const supported = SupportedBridgesForEnvironment[baseConfig.environment].includes(
+    const supported = SUPPORTED_BRIDGES_FOR_ENVIRONMENT[baseConfig.environment].includes(
       bridgeInstance,
     );
     if (!supported) {
@@ -61,12 +98,12 @@ export class BridgeConfiguration {
         `Bridge instance with rootchain ${bridgeInstance.rootChainID} and childchain ${bridgeInstance.childChainID} is not supported in environment ${baseConfig.environment}`,
       );
     }
-    if (!ContractsForBridge.has(bridgeInstance)) {
+    if (!CONTRACTS_FOR_BRIDGE.has(bridgeInstance)) {
       throw new Error(
         `Bridge instance with rootchain ${bridgeInstance.rootChainID} and childchain ${bridgeInstance.childChainID} is not supported in environment ${baseConfig.environment}`,
       );
     }
-    const bridgeContracts = ContractsForBridge.get(bridgeInstance);
+    const bridgeContracts = CONTRACTS_FOR_BRIDGE.get(bridgeInstance);
     if (!bridgeContracts) {
       throw new Error(
         `Bridge instance with rootchain ${bridgeInstance.rootChainID} and childchain ${bridgeInstance.childChainID} is not supported in environment ${baseConfig.environment}`,
@@ -75,40 +112,3 @@ export class BridgeConfiguration {
     this.bridgeContracts = bridgeContracts;
   }
 }
-
-/**
- * @constant {Map<BridgeInstance, BridgeContracts>} ContractsForBridge - A map of bridge instances to their associated contract addresses.
- */
-const ContractsForBridge = new Map<BridgeInstance, BridgeContracts>()
-  .set(ETH_SEPOLIA_TO_ZKEVM_DEVNET, {
-    rootChainERC20Predicate: '0xA401eA44cDAc48569322b1166A0696b9412977D9',
-    rootChainStateSender: '0xA002CfC25D1DDdE53FBD5d8bCF8E26c821B87ceD',
-    childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
-    childChainStateReceiver: '0x0000000000000000000000000000000000001001',
-  })
-  .set(ETH_MAINNET_TO_ZKEVM_MAINNET, {
-    rootChainERC20Predicate: '0x',
-    rootChainStateSender: '0x',
-    childChainERC20Predicate: '0x',
-    childChainStateReceiver: '0x',
-  });
-
-/**
- * @constant {BridgeInstance[]} SupportedSandboxBridges - An array of supported bridge instances for the sandbox environment.
- */
-const SupportedSandboxBridges: BridgeInstance[] = [ETH_SEPOLIA_TO_ZKEVM_DEVNET];
-
-/**
- * @constant {BridgeInstance[]} SupportedProductionBridges - An array of supported bridge instances for the production environment.
- */
-const SupportedProductionBridges: BridgeInstance[] = [];
-
-/**
- * @constant {Object} SupportedBridgesForEnvironment - An object mapping environment types to their supported bridge instances.
- */
-export const SupportedBridgesForEnvironment: {
-  [key in Environment]: BridgeInstance[];
-} = {
-  [Environment.SANDBOX]: SupportedSandboxBridges,
-  [Environment.PRODUCTION]: SupportedProductionBridges,
-};

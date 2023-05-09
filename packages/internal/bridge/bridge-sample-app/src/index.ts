@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { ethers } from 'ethers';
 import {

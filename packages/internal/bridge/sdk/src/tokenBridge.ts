@@ -12,11 +12,11 @@ import {
   WaitForRequest,
   WaitForResponse,
 } from 'types';
-import { RootERC20Predicate } from 'contracts/ABIs/RootERC20Predicate';
+import { ROOT_ERC20_PREDICATE } from 'contracts/ABIs/RootERC20Predicate';
 import { ERC20 } from 'contracts/ABIs/ERC20';
 import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
-import { RootStateSender } from 'contracts/ABIs/RootStateSender';
-import { ChildStateReceiver } from 'contracts/ABIs/ChildStateReceiver';
+import { ROOT_STATE_SENDER } from 'contracts/ABIs/RootStateSender';
+import { CHILD_STATE_RECEIVER } from 'contracts/ABIs/ChildStateReceiver';
 
 /**
  * Represents a token bridge, which manages asset transfers between two chains.
@@ -139,11 +139,11 @@ export class TokenBridge {
 
     const rootERC20PredicateContract = await withBridgeError<ethers.Contract>(
       async () => {
-        const rootERC20PredicateContract = new ethers.Contract(
+        const contract = new ethers.Contract(
           this.config.bridgeContracts.rootChainERC20Predicate,
-          RootERC20Predicate,
+          ROOT_ERC20_PREDICATE,
         );
-        return rootERC20PredicateContract;
+        return contract;
       },
       BridgeErrorType.INTERNAL_ERROR,
     );
@@ -225,7 +225,7 @@ export class TokenBridge {
     const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(async () => new ethers.Contract(req.token, ERC20, this.config.rootProvider), BridgeErrorType.INTERNAL_ERROR);
 
     // Get the current approved allowance of the RootERC20Predicate
-    const rootERC20PredicateAllowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(async () => await erc20Contract.allowance(
+    const rootERC20PredicateAllowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract.allowance(
       req.depositorAddress,
       this.config.bridgeContracts.rootChainERC20Predicate,
     ), BridgeErrorType.PROVIDER_ERROR);
@@ -285,6 +285,8 @@ export class TokenBridge {
   public async waitForDeposit(
     req: WaitForRequest,
   ): Promise<WaitForResponse> {
+    // TODO: remove once fixed
+    // eslint-disable-next-line @typescript-eslint/return-await
     const rootTxReceipt: ethers.providers.TransactionReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(async () => await this.config.rootProvider.waitForTransaction(req.transactionHash, 3), BridgeErrorType.PROVIDER_ERROR);
 
     // Throw an error if the transaction was reverted
@@ -306,14 +308,19 @@ export class TokenBridge {
     stateSyncID: string,
     interval: number,
   ) : Promise<CompletionStatus> {
-    const childStateReceiver = new ethers.Contract(this.config.bridgeContracts.childChainStateReceiver, ChildStateReceiver, this.config.childProvider);
+    const childStateReceiver = new ethers.Contract(this.config.bridgeContracts.childChainStateReceiver, CHILD_STATE_RECEIVER, this.config.childProvider);
 
     // Set up an event filter for the StateSyncResult event
     const eventFilter = childStateReceiver.filters.StateSyncResult();
 
     let childDepositEvent;
+    // TODO: please fix
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       // Query for past events that match the event filter
+
+      // TODO: please fix
+      // eslint-disable-next-line no-await-in-loop
       const pastEvents = await childStateReceiver.queryFilter(eventFilter);
       childDepositEvent = pastEvents.find((ev) => {
         if (!ev.args) return false;
@@ -323,6 +330,8 @@ export class TokenBridge {
       if (childDepositEvent) {
         break;
       }
+      // TODO: please fix
+      // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
       await new Promise((resolve) => setTimeout(resolve, interval));
     }
     if (!childDepositEvent) throw new Error('failed to find child deposit event');
@@ -335,10 +344,10 @@ export class TokenBridge {
   }
 
   private async getRootStateSyncID(txReceipt: ethers.providers.TransactionReceipt): Promise<string> {
-    const stateSenderInterface = new ethers.utils.Interface(RootStateSender);
+    const stateSenderInterface = new ethers.utils.Interface(ROOT_STATE_SENDER);
 
     // Get the StateSynced event log from the transaction receipt
-    const stateSenderLogs = txReceipt.logs.filter((log) => log.address.toLowerCase() == this.config.bridgeContracts.rootChainStateSender.toLowerCase());
+    const stateSenderLogs = txReceipt.logs.filter((log) => log.address.toLowerCase() === this.config.bridgeContracts.rootChainStateSender.toLowerCase());
     if (stateSenderLogs.length !== 1) {
       throw new Error(`expected at least 1 log in tx ${txReceipt.transactionHash}`);
     }
@@ -354,7 +363,10 @@ export class TokenBridge {
     return stateSyncID;
   }
 
+  // TODO: please fix this
+  // eslint-disable-next-line class-methods-use-this
   private async getFeeForToken(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     token: FungibleToken,
   ): Promise<ethers.BigNumber> {
     return ethers.BigNumber.from(0);

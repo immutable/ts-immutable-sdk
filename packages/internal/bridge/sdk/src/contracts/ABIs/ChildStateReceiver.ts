@@ -1,4 +1,4 @@
-export const ChildStateReceiver = [
+export const CHILD_STATE_RECEIVER = [
   {
     inputs: [
       {

@@ -1,4 +1,4 @@
-export const RootStateSender = [
+export const ROOT_STATE_SENDER = [
   {
     anonymous: false,
     inputs: [
