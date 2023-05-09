@@ -11,7 +11,7 @@ describe('config', () => {
   it('should create successfully', () => {
     const baseConfig = new ImmutableConfiguration({
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      ENVIRONMENT: Environment.SANDBOX,
+      environment: Environment.SANDBOX,
     });
     const exchangeConfiguration: ExchangeModuleConfiguration = {
       baseConfig,
@@ -26,7 +26,7 @@ describe('config', () => {
   it('throw error if incorrect chainId provided', () => {
     const baseConfig = new ImmutableConfiguration({
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      ENVIRONMENT: Environment.SANDBOX,
+      environment: Environment.SANDBOX,
     });
     const exchangeConfiguration: ExchangeModuleConfiguration = {
       baseConfig,
