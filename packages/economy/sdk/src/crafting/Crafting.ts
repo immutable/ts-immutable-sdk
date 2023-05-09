@@ -9,6 +9,7 @@ import { CraftingService } from './CraftingService';
 // https://api.dev.games.immutable.com/crafting/swagger/index.html#/
 export type CraftInput = {
   requiresWeb3: boolean;
+  web3Assets?: any;
   input: {
     userId: string;
     recipeId: string;
@@ -55,6 +56,7 @@ export type CraftEvent = EventType<
 export type CraftStatus = CraftEvent['status'];
 
 export class Crafting {
+  public x: string = 'test';
   private emitEvent: (event: CraftEvent) => void;
   private service: CraftService;
   private craftingService: CraftingService;
@@ -74,6 +76,8 @@ export class Crafting {
    */
   @withSDKError({ type: 'CRAFTING_ERROR' })
   public async craft(input: CraftInput): Promise<CraftStatus> {
+    console.log('@@@@@@@@@ economy/sdk/src/crafting/Crafting.ts craft', input);
+    // return 'FAILED';
     // 1. validate inputs
     this.emitEvent({ status: 'STARTED', action: 'CRAFT' });
     await this.validate(input);

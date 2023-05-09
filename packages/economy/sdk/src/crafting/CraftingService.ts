@@ -19,7 +19,7 @@ type CraftIngredient = {
 // FIXME: target https://api.dev.games.immutable.com/crafting/swagger/index.html#/root/post_craft
 // const defaultBaseURL = 'http://127.0.0.1:3031/crafting';
 const defaultBaseURL =
-  'https://api.sandbox.games.immutable.com/crafting/v1/craft';
+  'https://api.sandbox.games.immutable.com/crafting/v1/crafts';
 
 export class CraftingService {
   private httpClient: HttpClient;
@@ -36,7 +36,7 @@ export class CraftingService {
   }
 
   public async craft(input: CraftInput): Promise<AxiosResponse<CraftOutput>> {
-    const url = `/craft`;
+    const url = ``;
     // FIXME: transform
     const data = {
       recipe_id: input.recipeId,
