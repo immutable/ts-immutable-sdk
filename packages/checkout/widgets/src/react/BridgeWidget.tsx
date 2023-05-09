@@ -5,6 +5,7 @@ import {
   Network,
   WidgetTheme,
 } from '../definitions/constants';
+import { Environment } from '@imtbl/config';
 
 /**
  * Interface representing the props for the Bridge Widget component.
@@ -33,6 +34,7 @@ export function BridgeReact(props: BridgeReactProps): JSX.Element {
 
   return (
     <imtbl-bridge
+      environment={Environment.PRODUCTION}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }

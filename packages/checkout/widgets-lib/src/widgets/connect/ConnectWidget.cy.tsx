@@ -8,6 +8,7 @@ import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { cySmartGet } from '../../lib/testUtils';
+import { Environment } from '@imtbl/config';
 
 describe('ConnectWidget tests', () => {
   /** mounting the connect widget should be done to start all tests */
@@ -16,7 +17,13 @@ describe('ConnectWidget tests', () => {
       providerPreference: ConnectionProviders.METAMASK,
     } as ConnectWidgetParams;
 
-    mount(<ConnectWidget params={params} theme={WidgetTheme.DARK} />);
+    mount(
+      <ConnectWidget
+        environment={Environment.PRODUCTION}
+        params={params}
+        theme={WidgetTheme.DARK}
+      />
+    );
   };
 
   const mountConnectWidgetAndGoToReadyToConnect = () => {

@@ -4,6 +4,7 @@ import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
+import { Environment } from '@imtbl/config';
 
 describe('ConnectLoader', () => {
   beforeEach(() => {
@@ -14,6 +15,7 @@ describe('ConnectLoader', () => {
     const params = {} as ConnectLoaderParams;
     mount(
       <ConnectLoader
+        environment={Environment.SANDBOX}
         params={params}
         theme={WidgetTheme.DARK}
         closeEvent={() => {}}
@@ -38,6 +40,7 @@ describe('ConnectLoader', () => {
 
     mount(
       <ConnectLoader
+        environment={Environment.SANDBOX}
         params={params}
         theme={WidgetTheme.DARK}
         closeEvent={() => {}}
@@ -84,6 +87,7 @@ describe('ConnectLoader', () => {
 
     mount(
       <ConnectLoader
+        environment={Environment.SANDBOX}
         params={params}
         theme={WidgetTheme.DARK}
         closeEvent={() => {}}
@@ -131,6 +135,7 @@ describe('ConnectLoader', () => {
 
     mount(
       <ConnectLoader
+        environment={Environment.SANDBOX}
         params={params}
         theme={WidgetTheme.DARK}
         closeEvent={() => {}}
@@ -172,6 +177,7 @@ describe('ConnectLoader', () => {
 
     mount(
       <ConnectLoader
+        environment={Environment.SANDBOX}
         params={params}
         theme={WidgetTheme.DARK}
         closeEvent={() => {}}

@@ -14,6 +14,7 @@ import { onDarkBase } from '@biom3/design-tokens';
 import Sinon from 'cypress/types/sinon';
 import { BridgeButton } from './components/BridgeButton';
 import { TransactionResponse } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 
 type CypressStub = Cypress.Agent<Sinon.SinonStub<any[], any>>;
 describe('Bridge Widget tests', () => {
@@ -90,7 +91,13 @@ describe('Bridge Widget tests', () => {
       const params = {
         providerPreference: 'metamask',
       } as BridgeWidgetParams;
-      mount(<BridgeWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <BridgeWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
       cySmartGet('heading').should('be.visible');
       cySmartGet('close-button').should('be.visible');
       cySmartGet('select-network__target').should('be.visible');
@@ -111,7 +118,13 @@ describe('Bridge Widget tests', () => {
         fromNetwork: Network.ETHEREUM.toString(),
         fromContractAddress: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
       } as BridgeWidgetParams;
-      mount(<BridgeWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <BridgeWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
       cySmartGet('heading').should('be.visible');
       cySmartGet('close-button').should('be.visible');
       cySmartGet('select-network__target').should('be.visible');
@@ -132,7 +145,13 @@ describe('Bridge Widget tests', () => {
         fromNetwork: Network.ETHEREUM.toString(),
         fromContractAddress: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
       } as BridgeWidgetParams;
-      mount(<BridgeWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <BridgeWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
       cy.wait(50);
       cySmartGet('select-token__target').should('have.text', 'MATIC');
       cySmartGet('select-token__target').click();
@@ -148,7 +167,13 @@ describe('Bridge Widget tests', () => {
         fromNetwork: Network.ETHEREUM.toString(),
         fromContractAddress: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
       } as BridgeWidgetParams;
-      mount(<BridgeWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <BridgeWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
       cy.wait(50);
       cySmartGet('select-token__target').should('have.text', 'MATIC');
       cySmartGet('select-token__target').click();
@@ -180,7 +205,11 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget params={params} theme={WidgetTheme.DARK} />
+          <BridgeWidget
+            environment={Environment.PRODUCTION}
+            params={params}
+            theme={WidgetTheme.DARK}
+          />
         </BiomeCombinedProviders>
       );
 
@@ -242,7 +271,11 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget params={params} theme={WidgetTheme.DARK} />
+          <BridgeWidget
+            environment={Environment.PRODUCTION}
+            params={params}
+            theme={WidgetTheme.DARK}
+          />
         </BiomeCombinedProviders>
       );
 
@@ -324,7 +357,11 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget params={params} theme={WidgetTheme.DARK} />
+          <BridgeWidget
+            environment={Environment.PRODUCTION}
+            params={params}
+            theme={WidgetTheme.DARK}
+          />
         </BiomeCombinedProviders>
       );
 
@@ -380,7 +417,11 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget params={params} theme={WidgetTheme.DARK} />
+          <BridgeWidget
+            environment={Environment.PRODUCTION}
+            params={params}
+            theme={WidgetTheme.DARK}
+          />
         </BiomeCombinedProviders>
       );
 
@@ -461,7 +502,11 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget params={params} theme={WidgetTheme.DARK} />
+          <BridgeWidget
+            environment={Environment.PRODUCTION}
+            params={params}
+            theme={WidgetTheme.DARK}
+          />
         </BiomeCombinedProviders>
       );
 
@@ -489,7 +534,13 @@ describe('Bridge Widget tests', () => {
         amount: '0.1',
         fromNetwork: Network.ETHEREUM.toString(),
       } as BridgeWidgetParams;
-      mount(<BridgeWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <BridgeWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
 
       cySmartGet('bridge-button').should('be.visible');
       cySmartGet('bridge-button').should('be.enabled');
@@ -511,7 +562,13 @@ describe('Bridge Widget tests', () => {
         amount: '0.1',
         fromNetwork: Network.ETHEREUM.toString(),
       } as BridgeWidgetParams;
-      mount(<BridgeWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <BridgeWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
 
       cySmartGet('bridge-button').should('be.visible');
       cySmartGet('bridge-button').should('be.enabled');

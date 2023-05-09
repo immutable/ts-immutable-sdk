@@ -11,12 +11,15 @@ import {
 } from './WalletContext';
 import { Web3Provider } from '@ethersproject/providers';
 import { BalanceInfo } from '../functions/tokenBalances';
+import { Environment } from '@imtbl/config';
 
 describe('WalletContext', () => {
   it('should update state with checkout when reducer called with SET_CHECKOUT action', () => {
     const setCheckoutPayload: SetCheckoutPayload = {
       type: WalletActions.SET_CHECKOUT,
-      checkout: new Checkout(),
+      checkout: new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      }),
     };
     expect(initialWalletState.checkout).toBeNull();
     const { checkout } = walletReducer(initialWalletState, {

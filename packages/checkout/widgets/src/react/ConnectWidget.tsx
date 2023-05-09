@@ -4,6 +4,7 @@ import {
   WidgetConnectionProviders,
   WidgetTheme,
 } from '../definitions/constants';
+import { Environment } from '@imtbl/config';
 
 /**
  * Interface representing the props for the Connect Widget component.
@@ -25,6 +26,7 @@ export function ConnectReact(props: ConnectReactProps): JSX.Element {
 
   return (
     <imtbl-connect
+      environment={config.theme ?? Environment.PRODUCTION}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }

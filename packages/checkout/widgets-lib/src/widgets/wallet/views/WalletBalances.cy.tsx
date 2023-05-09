@@ -6,13 +6,16 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import { WalletContext, WalletState } from '../context/WalletContext';
 import { Web3Provider } from '@ethersproject/providers';
 import { cySmartGet } from '../../../lib/testUtils';
+import { Environment } from '@imtbl/config';
 
 describe('WalletBalances', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
 
-  const checkout = new Checkout();
+  const checkout = new Checkout({
+    baseConfig: { environment: Environment.PRODUCTION },
+  });
   const provider = {} as unknown as Web3Provider;
   const baseWalletState: WalletState = {
     checkout: checkout,
@@ -88,7 +91,9 @@ describe('WalletBalances', () => {
   });
 
   it('should NOT show add coins button on Ethereum', () => {
-    const checkout = new Checkout();
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
     const provider = {} as unknown as Web3Provider;
     const walletState: WalletState = {
       checkout: checkout,

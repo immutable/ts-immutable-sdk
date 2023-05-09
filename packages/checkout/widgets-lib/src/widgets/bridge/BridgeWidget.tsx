@@ -26,10 +26,12 @@ import {
   sendBridgeSuccessEvent,
 } from './BridgeWidgetEvents';
 import { EtherscanLink } from './components/EtherscanLink';
+import { Environment } from '@imtbl/config';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
   theme: WidgetTheme;
+  environment: Environment;
 }
 
 export interface BridgeWidgetParams {
@@ -56,7 +58,7 @@ export const NetworkChainMap = {
 };
 
 export function BridgeWidget(props: BridgeWidgetProps) {
-  const { params, theme } = props;
+  const { environment, params, theme } = props;
   const { providerPreference, fromContractAddress, amount, fromNetwork } =
     params;
   const biomeTheme: BaseTokens =
@@ -70,7 +72,10 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   }, [fromNetwork]);
 
   const firstRender = useRef(true);
-  const checkout = useMemo(() => new Checkout(), []);
+  const checkout = useMemo(
+    () => new Checkout({ baseConfig: { environment } }),
+    [environment]
+  );
   const [provider, setProvider] = useState<Web3Provider>();
   const [balances, setBalances] = useState<GetBalanceResult[]>([]);
   const [connectedChainId, setConnectedChainId] = useState<ChainId>();

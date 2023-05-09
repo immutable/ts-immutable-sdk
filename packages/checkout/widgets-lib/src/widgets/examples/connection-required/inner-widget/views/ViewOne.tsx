@@ -6,11 +6,14 @@ import { SimpleLayout } from '../../../../../components/SimpleLayout/SimpleLayou
 import { ViewContext, ViewActions } from '../../../../../context/ViewContext';
 import { InnerExampleWidgetViews } from '../../../../../context/InnerExampleViewContextTypes';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 
 export const ViewOne = () => {
   const { viewDispatch } = useContext(ViewContext);
 
-  const checkout = new Checkout();
+  const checkout = new Checkout({
+    baseConfig: { environment: Environment.PRODUCTION },
+  });
 
   async function metamaskClick() {
     try {

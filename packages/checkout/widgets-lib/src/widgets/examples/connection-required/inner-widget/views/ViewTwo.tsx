@@ -7,6 +7,7 @@ import { ViewContext, ViewActions } from '../../../../../context/ViewContext';
 import { InnerExampleWidgetViews } from '../../../../../context/InnerExampleViewContextTypes';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { zkEVMNetwork } from '../../../../../lib/networkUtils';
+import { Environment } from '@imtbl/config';
 
 export interface ViewTwoProps {
   callBack?: () => void;
@@ -15,7 +16,9 @@ export interface ViewTwoProps {
 export const ViewTwo = ({ callBack }: ViewTwoProps) => {
   const { viewDispatch } = useContext(ViewContext);
 
-  const checkout = new Checkout();
+  const checkout = new Checkout({
+    baseConfig: { environment: Environment.PRODUCTION },
+  });
 
   async function connectPolygonClick() {
     try {

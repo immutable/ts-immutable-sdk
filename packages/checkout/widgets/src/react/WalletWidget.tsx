@@ -4,6 +4,7 @@ import {
   WidgetConnectionProviders,
   WidgetTheme,
 } from '../definitions/constants';
+import { Environment } from '@imtbl/config';
 
 /**
  * Interface representing the props for the Wallet Widget component.
@@ -37,6 +38,7 @@ export function WalletReact(props: WalletReactProps) {
   // converting them to string for compatible webComponent properties
   return (
     <imtbl-wallet
+      environment={Environment.PRODUCTION}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }

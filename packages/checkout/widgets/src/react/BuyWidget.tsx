@@ -4,6 +4,7 @@ import {
   WidgetConnectionProviders,
   WidgetTheme,
 } from '../definitions/constants';
+import { Environment } from '@imtbl/config';
 
 /**
  * Interface representing the props for the Buy Widget component.
@@ -27,6 +28,7 @@ export function BuyReact(props: BuyReactProps): JSX.Element {
 
   return (
     <imtbl-buy
+      environment={Environment.PRODUCTION}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }

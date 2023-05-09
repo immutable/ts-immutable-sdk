@@ -12,6 +12,7 @@ export interface ImtblConnectProps
   > {
   providerPreference: string;
   theme: string;
+  environment: string;
 }
 
 /**
@@ -30,6 +31,7 @@ export interface ImtblWalletProps
   isSwapEnabled?: string;
   isBridgeEnabled?: string;
   theme: string;
+  environment: string;
 }
 
 /**
@@ -45,6 +47,7 @@ export interface ImtblSwapProps
     React.HTMLAttributes<HTMLElement>,
     HTMLElement
   > {
+  environment: string;
   providerPreference: string;
   theme: string;
   amount: string;
@@ -65,6 +68,7 @@ export interface ImtblBridgeProps
     React.HTMLAttributes<HTMLElement>,
     HTMLElement
   > {
+  environment: string;
   providerPreference: string;
   theme: string;
   fromContractAddress: string;
@@ -83,6 +87,7 @@ export interface ImtblExampleProps
     React.HTMLAttributes<HTMLElement>,
     HTMLElement
   > {
+  environment: string;
   providerPreference: string;
   theme: string;
 }
@@ -98,6 +103,7 @@ export interface ImtblBuyProps
     React.HTMLAttributes<HTMLElement>,
     HTMLElement
   > {
+  environment: string;
   providerPreference: string;
   theme: string;
   orderId: string;
@@ -113,6 +119,7 @@ export interface ImtblTransitionExampleProps
     React.HTMLAttributes<HTMLElement>,
     HTMLElement
   > {
+  environment: string;
   providerPreference: string;
   theme: string;
 }
@@ -127,6 +134,7 @@ export interface ImtblInnerWidgetExampleProps
     React.HTMLAttributes<HTMLElement>,
     HTMLElement
   > {
+  environment: string;
   providerPreference: string;
   theme: string;
 }
@@ -141,6 +149,7 @@ export interface ImtblOuterWidgetExampleProps
     React.HTMLAttributes<HTMLElement>,
     HTMLElement
   > {
+  environment: string;
   providerPreference: string;
   theme: string;
 }

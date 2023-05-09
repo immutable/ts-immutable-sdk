@@ -29,8 +29,10 @@ import { ReadyToConnect } from './views/ReadyToConnect';
 import { SwitchNetwork } from './views/SwitchNetwork';
 import { LoadingView } from '../../components/Loading/LoadingView';
 import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
+import { Environment } from '@imtbl/config';
 
 export interface ConnectWidgetProps {
+  environment: Environment;
   params: ConnectWidgetParams;
   theme: WidgetTheme;
   deepLink?: ConnectWidgetViews.CONNECT_WALLET;
@@ -42,7 +44,7 @@ export interface ConnectWidgetParams {
 }
 
 export function ConnectWidget(props: ConnectWidgetProps) {
-  const { theme, deepLink, sendCloseEventOverride } = props;
+  const { environment, theme, deepLink, sendCloseEventOverride } = props;
   const [connectState, connectDispatch] = useReducer(
     connectReducer,
     initialConnectState
@@ -61,7 +63,9 @@ export function ConnectWidget(props: ConnectWidgetProps) {
       connectDispatch({
         payload: {
           type: ConnectActions.SET_CHECKOUT,
-          checkout: new Checkout(),
+          checkout: new Checkout({
+            baseConfig: { environment: environment },
+          }),
         },
       });
 

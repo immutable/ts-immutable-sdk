@@ -3,6 +3,7 @@ import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { BuyWidget, BuyWidgetParams } from './BuyWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
+import { Environment } from '@imtbl/config';
 
 export class ImmutableBuy extends ImmutableWebComponent {
   orderId = '';
@@ -14,6 +15,7 @@ export class ImmutableBuy extends ImmutableWebComponent {
       'providerPreference'
     ) as ConnectionProviders;
     this.orderId = this.getAttribute('orderId') as string;
+    this.environment = this.getAttribute('environment') as Environment;
 
     this.renderWidget();
   }
@@ -30,7 +32,11 @@ export class ImmutableBuy extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <BuyWidget params={params} theme={this.theme}></BuyWidget>
+        <BuyWidget
+          params={params}
+          theme={this.theme}
+          environment={this.environment}
+        ></BuyWidget>
       </React.StrictMode>
     );
   }

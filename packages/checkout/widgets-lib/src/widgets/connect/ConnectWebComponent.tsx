@@ -3,6 +3,7 @@ import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
+import { Environment } from '@imtbl/config';
 
 export class ImmutableConnect extends ImmutableWebComponent {
   providerPreference = ConnectionProviders.METAMASK;
@@ -12,6 +13,7 @@ export class ImmutableConnect extends ImmutableWebComponent {
     this.providerPreference = this.getAttribute(
       'providerPreference'
     ) as ConnectionProviders;
+    this.environment = this.getAttribute('environment') as Environment;
     this.renderWidget();
   }
 
@@ -29,6 +31,7 @@ export class ImmutableConnect extends ImmutableWebComponent {
         <ConnectWidget
           params={connectParams}
           theme={this.theme}
+          environment={this.environment}
         ></ConnectWidget>
       </React.StrictMode>
     );

@@ -13,6 +13,7 @@ import {
 } from '../../../../components/Success/SuccessViewStyles';
 import { CenteredBoxContent } from '../../../../components/CenteredBoxContent/CenteredBoxContent';
 import { zkEVMNetwork } from '../../../../lib/networkUtils';
+import { Environment } from '@imtbl/config';
 
 export interface ConnectionLoaderProps {
   children?: React.ReactNode;
@@ -37,7 +38,9 @@ export function ConnectionLoader({
   params,
   theme,
 }: ConnectionLoaderProps) {
-  const checkout = new Checkout();
+  const checkout = new Checkout({
+    baseConfig: { environment: Environment.PRODUCTION },
+  });
   const [connStatus, setConnStatus] = useState(ConnectionStatus.UNKNOWN);
 
   const biomeTheme: BaseTokens =
