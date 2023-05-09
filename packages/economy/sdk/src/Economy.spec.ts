@@ -16,7 +16,11 @@ describe('Economy Class', () => {
     submitCraft: jest.fn(),
   };
 
-  const craftInput: CraftInput = { requiresWeb3: false, web3Assets: {} };
+  const craftInput: CraftInput = {
+    requiresWeb3: false,
+    web3Assets: {},
+    input: { userId: 'asd', recipeId: '123', ingredients: [] },
+  };
 
   beforeEach(() => {
     crafting = new Crafting(eventHandlerFn, serviceHandlerFn);
