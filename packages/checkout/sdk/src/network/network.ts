@@ -3,7 +3,6 @@ import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import {
   ChainId,
-  ChainIdNetworkMap,
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
   NetworkFilterTypes,
@@ -11,34 +10,39 @@ import {
   SwitchNetworkResult,
   WALLET_ACTION,
   ConnectionProviders,
+  NetworkMap,
 } from '../types';
 import { connectWalletProvider } from '../connect/connect';
 import networkMasterList from './network_master_list.json';
+import { CheckoutConfiguration } from '../config';
 
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 
 export async function getNetworkInfo(
+  networkMap: NetworkMap,
   provider: Web3Provider
 ): Promise<NetworkInfo> {
   return withCheckoutError(
     async () => {
       const network = await provider.getNetwork();
 
-      if (!Object.values(ChainId).includes(network.chainId as ChainId)) {
+      if (!Array.from(networkMap.keys()).includes(network.chainId as ChainId)) {
         // return empty details
         return {
           chainId: network.chainId,
           name: network.name,
           isSupported: false,
         } as NetworkInfo;
+      } else{
+        const chainIdNetworkInfo = networkMap.get(network.chainId as ChainId);
+        return {
+          name: chainIdNetworkInfo!.chainName,
+          chainId: parseInt(chainIdNetworkInfo!.chainIdHex, 16),
+          nativeCurrency: chainIdNetworkInfo!.nativeCurrency,
+          isSupported: true,
+        };
       }
-      const chainIdNetworkInfo = ChainIdNetworkMap[network.chainId as ChainId];
-      return {
-        name: chainIdNetworkInfo.chainName,
-        chainId: parseInt(chainIdNetworkInfo.chainIdHex, 16),
-        nativeCurrency: chainIdNetworkInfo.nativeCurrency,
-        isSupported: true,
-      };
+      
     },
     {
       type: CheckoutErrorType.GET_NETWORK_INFO_ERROR,
@@ -47,6 +51,7 @@ export async function getNetworkInfo(
 }
 
 export async function switchWalletNetwork(
+  networkMap: NetworkMap,
   providerPreference: ConnectionProviders,
   provider: Web3Provider,
   chainId: ChainId
@@ -70,11 +75,11 @@ export async function switchWalletNetwork(
 
   // WT-1146 - Refer to the README in this folder for explantion on the switch network flow
   try {
-    await switchNetworkInWallet(currentProvider, chainId);
+    await switchNetworkInWallet(networkMap, currentProvider, chainId);
   } catch (err: any) {
     if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE) {
       try {
-        await addNetworkToWallet(currentProvider, chainId);
+        await addNetworkToWallet(networkMap, currentProvider, chainId);
       } catch (err: any) {
         throw new CheckoutError(
           'User cancelled add network request',
@@ -100,21 +105,24 @@ export async function switchWalletNetwork(
 
   // we can assume that if the above succeeds then user has successfully
   // switched to the network specified
-  const newNetwork = ChainIdNetworkMap[chainId as ChainId];
+  const newNetwork = networkMap.get(chainId as ChainId);
   return {
     network: {
-      name: newNetwork.chainName,
-      chainId: parseInt(newNetwork.chainIdHex, 16),
-      nativeCurrency: newNetwork.nativeCurrency,
+      name: newNetwork?.chainName,
+      chainId: parseInt(newNetwork?.chainIdHex ?? "", 16),
+      nativeCurrency: newNetwork?.nativeCurrency,
     },
     provider: currentProvider,
   } as SwitchNetworkResult;
 }
 
-export async function getNetworkAllowList({
+export async function getNetworkAllowList(
+  networkMap: NetworkMap,
+  {
   type = NetworkFilterTypes.ALL,
   exclude,
 }: GetNetworkAllowListParams): Promise<GetNetworkAllowListResult> {
+  
   const list = networkMasterList.filter((network) => {
     const allowAllTokens = type === NetworkFilterTypes.ALL;
     const networkNotExcluded = !(exclude || [])
@@ -125,13 +133,15 @@ export async function getNetworkAllowList({
 
   const allowedNetworks: NetworkInfo[] = [];
   list.forEach((element) => {
-    const newNetwork = ChainIdNetworkMap[element.chainId as ChainId];
-    allowedNetworks.push({
-      name: newNetwork.chainName,
-      chainId: parseInt(newNetwork.chainIdHex, 16),
-      nativeCurrency: newNetwork.nativeCurrency,
-      isSupported: true,
-    });
+    const newNetwork = networkMap.get(element.chainId as ChainId);
+    if(newNetwork) {
+      allowedNetworks.push({
+        name: newNetwork.chainName,
+        chainId: parseInt(newNetwork.chainIdHex, 16),
+        nativeCurrency: newNetwork.nativeCurrency,
+        isSupported: true,
+      });
+    }
   });
 
   return {
@@ -141,27 +151,28 @@ export async function getNetworkAllowList({
 
 // these functions should not be exported. These functions should be used as part of an exported function e.g switchWalletNetwork() above.
 // make sure to check if(provider.provider?.request) in the exported function and throw an error
-async function switchNetworkInWallet(provider: Web3Provider, chainId: ChainId) {
+async function switchNetworkInWallet(networkMap: NetworkMap, provider: Web3Provider, chainId: ChainId) {
   if (provider.provider?.request) {
     return await provider.provider.request({
       method: WALLET_ACTION.SWITCH_NETWORK,
       params: [
         {
-          chainId: ChainIdNetworkMap[chainId].chainIdHex,
+          chainId: networkMap.get(chainId)?.chainIdHex,
         },
       ],
     });
   }
 }
 
-async function addNetworkToWallet(provider: Web3Provider, chainId: ChainId) {
+async function addNetworkToWallet(networkMap: NetworkMap, provider: Web3Provider, chainId: ChainId) {
   if (provider.provider?.request) {
+    const networkDetails = networkMap.get(chainId);
     const addNetwork = {
-      chainId: ChainIdNetworkMap[chainId].chainIdHex,
-      chainName: ChainIdNetworkMap[chainId].chainName,
-      rpcUrls: ChainIdNetworkMap[chainId].rpcUrls,
-      nativeCurrency: ChainIdNetworkMap[chainId].nativeCurrency,
-      blockExplorerUrls: ChainIdNetworkMap[chainId].blockExplorerUrls,
+      chainId: networkDetails?.chainIdHex,
+      chainName: networkDetails?.chainName,
+      rpcUrls: networkDetails?.rpcUrls,
+      nativeCurrency: networkDetails?.nativeCurrency,
+      blockExplorerUrls: networkDetails?.blockExplorerUrls,
     };
     return await provider.provider.request({
       method: WALLET_ACTION.ADD_NETWORK,

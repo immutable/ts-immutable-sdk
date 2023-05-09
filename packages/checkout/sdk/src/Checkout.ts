@@ -28,9 +28,15 @@ import {
   SwitchNetworkResult,
 } from './types';
 import { CheckoutError, CheckoutErrorType } from './errors';
+import { CheckoutConfig, CheckoutConfiguration } from './config';
 
 export class Checkout {
+  readonly config: CheckoutConfiguration;
   private providerPreference: ConnectionProviders | undefined;
+
+  constructor(config: CheckoutConfig) {
+    this.config = new CheckoutConfiguration(config);
+  }
 
   /**
    * Check if a wallet is connected to the current application without requesting permission from the wallet and hence triggering a connect popup.
@@ -53,7 +59,7 @@ export class Checkout {
   public async connect(params: ConnectParams): Promise<ConnectResult> {
     this.providerPreference = params.providerPreference;
     const provider = await connect.connectWalletProvider(params);
-    const networkInfo = await network.getNetworkInfo(provider);
+    const networkInfo = await network.getNetworkInfo(this.config.networkMap, provider);
 
     return {
       provider,
@@ -78,6 +84,7 @@ export class Checkout {
     }
 
     return await network.switchWalletNetwork(
+      this.config.networkMap,
       this.providerPreference,
       params.provider,
       params.chainId
@@ -92,7 +99,7 @@ export class Checkout {
    */
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
     if (!params.contractAddress || params.contractAddress === '') {
-      return await balances.getBalance(params.provider, params.walletAddress);
+      return await balances.getBalance(this.config.networkMap, params.provider, params.walletAddress);
     }
     return await balances.getERC20Balance(
       params.provider,
@@ -111,6 +118,7 @@ export class Checkout {
     params: GetAllBalancesParams
   ): Promise<GetAllBalancesResult> {
     return balances.getAllBalances(
+      this.config.networkMap,
       params.provider,
       params.walletAddress,
       params.chainId
@@ -126,7 +134,7 @@ export class Checkout {
   public async getNetworkAllowList(
     params: GetNetworkAllowListParams
   ): Promise<GetNetworkAllowListResult> {
-    return await network.getNetworkAllowList(params);
+    return await network.getNetworkAllowList(this.config.networkMap, params);
   }
 
   /**
@@ -174,6 +182,6 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
-    return await network.getNetworkInfo(params.provider);
+    return await network.getNetworkInfo(this.config.networkMap, params.provider);
   }
 }

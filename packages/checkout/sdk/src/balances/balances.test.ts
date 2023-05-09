@@ -7,6 +7,7 @@ import {
   GetAllBalancesResult,
   GetTokenAllowListResult,
   NetworkInfo,
+  ProductionChainIdNetworkMap,
   TokenInfo,
 } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -53,6 +54,7 @@ describe('balances', () => {
   describe('getBalance()', () => {
     it('should call getBalance() on provider and return the balance', async () => {
       const balanceResult = await getBalance(
+        ProductionChainIdNetworkMap,
         mockProvider() as unknown as Web3Provider,
         '0xAddress'
       );
@@ -70,7 +72,7 @@ describe('balances', () => {
         };
       });
 
-      await expect(getBalance(mockProvider(), '0xAddress')).rejects.toThrow(
+      await expect(getBalance(ProductionChainIdNetworkMap, mockProvider(), '0xAddress')).rejects.toThrow(
         new CheckoutError(
           '[GET_BALANCE_ERROR] Cause:Error getting balance',
           CheckoutErrorType.GET_BALANCE_ERROR
@@ -91,7 +93,7 @@ describe('balances', () => {
         };
       });
 
-      await expect(getBalance(mockProvider(), '0xAddress')).rejects.toThrow(
+      await expect(getBalance(ProductionChainIdNetworkMap, mockProvider(), '0xAddress')).rejects.toThrow(
         new CheckoutError(
           '[GET_BALANCE_ERROR] Cause:Chain:0 is not a supported chain',
           CheckoutErrorType.GET_BALANCE_ERROR
@@ -252,6 +254,7 @@ describe('balances', () => {
 
     it('should call getBalance and getERC20Balance functions', async () => {
       const getAllBalancesResult = await getAllBalances(
+        ProductionChainIdNetworkMap,
         mockProviderForAllBalances() as unknown as Web3Provider,
         'abc123',
         ChainId.ETHEREUM

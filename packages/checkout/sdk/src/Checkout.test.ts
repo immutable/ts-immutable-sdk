@@ -7,10 +7,11 @@ import { getNetworkInfo } from './network';
 import { Checkout } from './Checkout';
 import { switchWalletNetwork } from './network';
 import { Web3Provider } from '@ethersproject/providers';
-import { ChainId, ConnectionProviders, GetBalanceParams } from './types';
+import { ChainId, ConnectionProviders, GetBalanceParams, ProductionChainIdNetworkMap } from './types';
 import { getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
 import { CheckoutError, CheckoutErrorType } from './errors';
+import { Environment } from '@imtbl/config';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -22,7 +23,7 @@ describe(' Connect', () => {
     jest.resetAllMocks();
   });
   it('should call the connectWalletProvider function', async () => {
-    const checkout = new Checkout();
+    const checkout = new Checkout({environment: Environment.PRODUCTION});
 
     await checkout.connect({
       providerPreference: ConnectionProviders.METAMASK,
@@ -33,18 +34,18 @@ describe(' Connect', () => {
   });
 
   it('should call getBalance when no contract address provided', async () => {
-    const checkout = new Checkout();
+    const checkout = new Checkout({environment: Environment.PRODUCTION});
     await checkout.getBalance({
       provider: {} as unknown as Web3Provider,
       walletAddress: '0x123',
     } as GetBalanceParams);
     expect(getERC20Balance).toBeCalledTimes(0);
     expect(getBalance).toBeCalledTimes(1);
-    expect(getBalance).toBeCalledWith({} as unknown as Web3Provider, '0x123');
+    expect(getBalance).toBeCalledWith(ProductionChainIdNetworkMap, {} as unknown as Web3Provider, '0x123');
   });
 
   it('should call getERC20Balance when a contract address is provided', async () => {
-    const checkout = new Checkout();
+    const checkout = new Checkout({environment: Environment.PRODUCTION});
     await checkout.getBalance({
       provider: {} as unknown as Web3Provider,
       walletAddress: '0x123',
@@ -60,7 +61,7 @@ describe(' Connect', () => {
   });
 
   it('should call the switchWalletNetwork function', async () => {
-    const checkout = new Checkout();
+    const checkout = new Checkout({environment: Environment.PRODUCTION});
 
     await checkout.connect({
       providerPreference: ConnectionProviders.METAMASK,
@@ -75,7 +76,7 @@ describe(' Connect', () => {
   });
 
   it('should throw error when calling the switchWalletNetwork function', async () => {
-    const checkout = new Checkout();
+    const checkout = new Checkout({environment: Environment.PRODUCTION});
 
     await expect(
       checkout.switchNetwork({
@@ -91,7 +92,7 @@ describe(' Connect', () => {
   });
 
   it('should call sendTransaction function', async () => {
-    const checkout = new Checkout();
+    const checkout = new Checkout({environment: Environment.PRODUCTION});
 
     await checkout.sendTransaction({
       provider: {} as Web3Provider,
