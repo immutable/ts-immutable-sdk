@@ -167,7 +167,7 @@ export class Exchange {
     maxHops: number = DEFAULT_MAX_HOPS,
     deadline: number = DEFAULT_DEADLINE,
   ): Promise<TransactionResponse> {
-    return this.getUnsignedSwapTx(
+    return await this.getUnsignedSwapTx(
       fromAddress,
       tokenInAddress,
       tokenOutAddress,
