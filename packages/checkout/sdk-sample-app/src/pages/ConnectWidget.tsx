@@ -78,7 +78,6 @@ export default function ConnectWidget() {
         Switch network
       </Divider>
       <SwitchNetwork
-        environment={environment}
         checkout={checkout}
         provider={provider}
         setProvider={setProvider}
