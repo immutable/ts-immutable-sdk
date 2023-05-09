@@ -32,6 +32,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
     configuration = new ExchangeConfiguration(TestDexConfiguration);
     exchange = new Exchange(configuration);
   });
+
   describe('Swap with single pool and default slippage tolerance', () => {
     it('Generates valid calldata', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
@@ -73,11 +74,38 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       ); // maxAmountIn
       expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
+
+    it('returns valid quote', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+      mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
+
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
+
+      const { info, success } = await exchange.getUnsignedSwapTxFromAmountOut(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountIn
+      );
+
+      expect(success).toBe(true);
+      expect(info).not.toBe(undefined);
+      expect(info?.quote?.token.address).toEqual(params.inputToken);
+      expect(info?.slippage).toBe('0.1%');
+      expect(info?.quote?.amount.toString()).toEqual('12300000000000');
+      expect(info?.quoteWithMaxSlippage?.token.address).toEqual(
+        params.inputToken
+      );
+      expect(info?.quoteWithMaxSlippage?.amount.toString()).toEqual(
+        '12312300000000'
+      );
+    });
   });
 
   describe('Swap with single pool and higher slippage tolerance', () => {
+    const higherSlippage = new Percent(2, 1000); // 0.2%
     it('Generates valid calldata', async () => {
-      const higherSlippage = new Percent(2, 1000); // 0.2%
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
@@ -112,6 +140,34 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.maxAmountIn.toString()
       ); // amountIn
       expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+    });
+
+    it('returns valid quote', async () => {
+      const params = setupSwapTxTest(higherSlippage);
+      mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
+
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
+
+      const { info, success } = await exchange.getUnsignedSwapTxFromAmountOut(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountIn,
+        higherSlippage
+      );
+
+      expect(success).toBe(true);
+      expect(info).not.toBe(undefined);
+      expect(info?.quote?.token.address).toEqual(params.inputToken);
+      expect(info?.slippage).toBe('0.2%');
+      expect(info?.quote?.amount.toString()).toEqual('12300000000000');
+      expect(info?.quoteWithMaxSlippage?.token.address).toEqual(
+        params.inputToken
+      );
+      expect(info?.quoteWithMaxSlippage?.amount.toString()).toEqual(
+        '12324600000000'
+      );
     });
   });
 

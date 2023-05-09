@@ -136,7 +136,7 @@ export class Exchange {
         route: routeAndQuote.trade.route,
         quote: quoteInfo.quote,
         quoteWithMaxSlippage: quoteInfo.quoteWithMaxSlippage,
-        slippage: slippagePercent.toSignificant(),
+        slippage: `${slippagePercent.toSignificant()}%`,
       },
     };
   }

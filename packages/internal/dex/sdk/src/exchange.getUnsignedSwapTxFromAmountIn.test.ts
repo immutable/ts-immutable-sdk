@@ -59,11 +59,40 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
       // TODO Also check that tx.transactionRequest.to and .from are correct.
     });
+
+    it('returns valid quote', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
+
+      const { info, success } = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountIn
+      );
+
+      expect(success).toBe(true);
+      expect(info).not.toBe(undefined);
+      expect(info?.quote?.token.address).toEqual(params.outputToken);
+      expect(info?.slippage).toBe('0.1%');
+      expect(info?.quote?.amount.toString()).toEqual('10000000000000000000000');
+      expect(info?.quoteWithMaxSlippage?.token.address).toEqual(
+        params.outputToken
+      );
+      expect(info?.quoteWithMaxSlippage?.amount.toString()).toEqual(
+        '9990000000000000000000'
+      );
+    });
   });
 
   describe('Swap with single pool and higher slippage tolerance', () => {
+    const higherSlippage = new Percent(2, 1000); // 0.2%
+
     it('Generates valid calldata', async () => {
-      const higherSlippage = new Percent(2, 1000); // 0.2%
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
@@ -95,6 +124,34 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.minAmountOut.toString()
       ); // minAmountOut
       expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+    });
+
+    it('returns valid quote', async () => {
+      const params = setupSwapTxTest(higherSlippage);
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
+
+      const { info, success } = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountIn,
+        higherSlippage
+      );
+
+      expect(success).toBe(true);
+      expect(info).not.toBe(undefined);
+      expect(info?.quote?.token.address).toEqual(params.outputToken);
+      expect(info?.slippage).toBe('0.2%');
+      expect(info?.quote?.amount.toString()).toEqual('10000000000000000000000');
+      expect(info?.quoteWithMaxSlippage?.token.address).toEqual(
+        params.outputToken
+      );
+      expect(info?.quoteWithMaxSlippage?.amount.toString()).toEqual(
+        '9980000000000000000000'
+      );
     });
   });
 
