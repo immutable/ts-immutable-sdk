@@ -1,7 +1,7 @@
 import { describe, expect } from '@jest/globals';
 import { CryptoFiatConfiguration } from 'config';
 import axios from 'axios';
-import { CryptoFiat } from './cryptoFiat';
+import { CryptoFiat } from './cryptofiat';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
