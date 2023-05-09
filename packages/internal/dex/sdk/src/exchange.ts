@@ -17,10 +17,14 @@ import {
   validateDifferentAddresses,
 } from './lib/utils';
 import { QuoteResponse, TransactionResponse } from './types';
-import { createSwapParameters, getAmountWithSlippageImpact } from './lib/swap';
+import {
+  createSwapParameters,
+  getAmountWithSlippageImpact,
+} from './lib/transactionUtils/swap';
 import { MAX_MAX_HOPS } from './constants';
 import { ExchangeConfiguration } from './config';
 import { QuoteResult } from './lib/getQuotesForRoutes';
+import { constructQuoteWithSlippage } from './lib/transactionUtils/constructQuoteWithSlippage';
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;
@@ -105,8 +109,8 @@ export class Exchange {
     if (!routeAndQuote.success) {
       return {
         success: false,
-        transactionRequest: undefined,
-        trade: undefined,
+        request: undefined,
+        info: undefined,
       };
     }
 
@@ -117,18 +121,25 @@ export class Exchange {
       deadline
     );
 
+    const quoteInfo = constructQuoteWithSlippage(
+      otherToken,
+      tradeType,
+      routeAndQuote.trade,
+      slippagePercent
+    );
+
     return {
       success: true,
-      transactionRequest: {
+      request: {
         data: params.calldata,
         to: this.router.routingContracts.peripheryRouterAddress,
         value: params.value,
         from: fromAddress,
       },
-      trade: {
+      info: {
         route: routeAndQuote.trade.route,
-        quote: routeAndQuote.trade.quote,
-        quoteWithMaxSlippage: routeAndQuote.trade.quoteWithMaxSlippage,
+        quote: quoteInfo.quote,
+        quoteWithMaxSlippage: quoteInfo.quoteWithMaxSlippage,
         slippage: slippagePercent.toSignificant(),
       },
     };

@@ -1,12 +1,11 @@
 import { MethodParameters, Trade } from '@uniswap/v3-sdk';
-import { SwapRouter, SwapOptions, ONE } from '@uniswap/router-sdk';
-import { Amount, QuoteTradeInfo, TradeInfo } from '../types';
+import { SwapOptions, SwapRouter } from '@uniswap/router-sdk';
+import { Amount, QuoteTradeInfo } from '../../types';
 import {
-  CurrencyAmount,
-  TradeType,
-  Percent,
   Currency,
-  Fraction,
+  CurrencyAmount,
+  Percent,
+  TradeType,
 } from '@uniswap/sdk-core';
 import JSBI from 'jsbi';
 import { ethers } from 'ethers';
@@ -40,19 +39,4 @@ export async function createSwapParameters(
 
   // Generate the parameters.
   return SwapRouter.swapCallParameters([uncheckedTrade], options);
-}
-
-export function getAmountWithSlippageImpact(
-  tradeType: TradeType,
-  amount: ethers.BigNumber,
-  slippagePercent: Percent
-): ethers.BigNumber {
-  // TODO: comeback to calculate the impact
-  console.log('amount', amount.toString());
-  const s = ethers.BigNumber.from(slippagePercent.toSignificant());
-  console.log('s', s.toString());
-  const slippageEffect = amount.mul(slippagePercent.toSignificant());
-  console.log('slippage', slippageEffect.toString());
-
-  return amount;
 }

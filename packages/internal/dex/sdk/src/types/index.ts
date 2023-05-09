@@ -15,8 +15,6 @@ export type QuoteTradeInfo = {
   tokenIn: Currency;
   amountOut: ethers.BigNumberish;
   tokenOut: Currency;
-  quote: Amount;
-  quoteWithMaxSlippage: Amount;
   tradeType: TradeType;
 };
 
@@ -40,14 +38,14 @@ export type TradeInfo = {
 
 export type TransactionResponse =
   | {
-      transactionRequest: ethers.providers.TransactionRequest;
-      trade: TradeInfo;
+      request: ethers.providers.TransactionRequest;
+      info: TradeInfo;
       success: true;
     }
   | {
       success: false;
-      trade: undefined;
-      transactionRequest: undefined;
+      info: undefined;
+      request: undefined;
     };
 
 export type TokenInfo = {

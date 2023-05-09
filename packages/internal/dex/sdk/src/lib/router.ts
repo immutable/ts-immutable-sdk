@@ -15,7 +15,7 @@ import { Amount, QuoteResponse, TokenInfo } from '../types';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
 import { Multicall, Multicall__factory } from '../contracts/types';
 import { DEFAULT_SLIPPAGE } from '../constants';
-import { getAmountWithSlippageImpact } from './swap';
+import { getAmountWithSlippageImpact } from './transactionUtils/swap';
 
 export type RoutingContracts = {
   multicallAddress: string;
@@ -43,8 +43,7 @@ export class Router {
     amountSpecified: CurrencyAmount<Currency>,
     otherCurrency: Currency,
     tradeType: TradeType,
-    maxHops: number = 2,
-    slippagePercent: Percent = DEFAULT_SLIPPAGE
+    maxHops: number = 2
   ): Promise<QuoteResponse> {
     const [currencyIn, currencyOut] = this.determineERC20InAndERC20Out(
       tradeType,
@@ -116,57 +115,9 @@ export class Router {
       amountOut.multiply(amountOut.decimalScale).toExact()
     );
 
-    let quote: Amount;
-    let quoteWithMaxSlippage: Amount;
-
-    let wrappedResultToken: Token = otherCurrency.wrapped;
-    let resultToken: TokenInfo = {
-      chainId: wrappedResultToken.chainId,
-      address: wrappedResultToken.address,
-      decimals: wrappedResultToken.decimals,
-      symbol: wrappedResultToken.symbol,
-      name: wrappedResultToken.name,
-    };
-
-    if (tradeType === TradeType.EXACT_INPUT) {
-      const amountWithSlippageImpact = getAmountWithSlippageImpact(
-        tradeType,
-        amountOutWei,
-        slippagePercent
-      );
-
-      quote = {
-        token: resultToken,
-        amount: amountOutWei,
-      };
-
-      quoteWithMaxSlippage = {
-        token: resultToken,
-        amount: amountWithSlippageImpact,
-      };
-    } else {
-      const amountWithSlippageImpact = getAmountWithSlippageImpact(
-        tradeType,
-        amountInWei,
-        slippagePercent
-      );
-
-      quote = {
-        token: resultToken,
-        amount: amountInWei,
-      };
-
-      quoteWithMaxSlippage = {
-        token: resultToken,
-        amount: amountWithSlippageImpact,
-      };
-    }
-
     return {
       success: true,
       trade: {
-        quote,
-        quoteWithMaxSlippage,
         route: bestQuoteForRoute.route,
         amountIn: amountInWei,
         tokenIn: currencyIn,
