@@ -2573,8 +2573,6 @@ __metadata:
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
     parcel: ^2.8.3
-    typedoc: ^0.24.6
-    typedoc-plugin-markdown: ^3.15.2
     typescript: ^4.9.5
   peerDependencies:
     react: ^18.2.0
@@ -2666,6 +2664,8 @@ __metadata:
     "@parcel/transformer-sass": 2.8.3
     "@parcel/transformer-typescript-tsc": ^2.8.3
     assert: ^2.0.0
+    bulma: ^0.9.4
+    bulma-list: ^1.2.0
     lit: ^2.7.2
     parcel: ^2.8.3
     parcel-bundler: ^1.12.3
@@ -8957,6 +8957,20 @@ __metadata:
   version: 3.0.0
   resolution: "builtin-status-codes@npm:3.0.0"
   checksum: 1119429cf4b0d57bf76b248ad6f529167d343156ebbcc4d4e4ad600484f6bc63002595cbb61b67ad03ce55cd1d3c4711c03bbf198bf24653b8392420482f3773
+  languageName: node
+  linkType: hard
+
+"bulma-list@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "bulma-list@npm:1.2.0"
+  checksum: 88bf444129121a57f8341bac462a67cd8671f982eef8b117f515f87e774b5e8ab2ade97315e07aaa30d8c03dbf737cfcca832c49dbaa0cf3a11f3e164e125579
+  languageName: node
+  linkType: hard
+
+"bulma@npm:^0.9.4":
+  version: 0.9.4
+  resolution: "bulma@npm:0.9.4"
+  checksum: bc0ab8c203deb0ae200fab5b38547ad4bc8ed1e3abcf6f4ac8a2229af46540419bbcb78c9d2e80f3ddda8825d64fa186ed8775674656cdcabe5544be4d0f3d85
   languageName: node
   linkType: hard
 
@@ -25151,6 +25165,7 @@ __metadata:
     "@release-it/keep-a-changelog": ^3.1.0
     "@typescript-eslint/eslint-plugin": ^5.57.1
     "@typescript-eslint/parser": ^5.57.1
+    buffer: ^5.5.0
     eslint: ^8.37.0
     eslint-config-airbnb: ^19.0.4
     eslint-config-airbnb-typescript: ^17.0.0
