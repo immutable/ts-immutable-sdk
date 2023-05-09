@@ -17,9 +17,9 @@ type CraftIngredient = {
 
 // TODO: Read from .env
 // FIXME: target https://api.dev.games.immutable.com/crafting/swagger/index.html#/root/post_craft
-// const defaultBaseURL = 'http://127.0.0.1:3031/crafting';
-const defaultBaseURL =
-  'https://api.sandbox.games.immutable.com/crafting/v1/crafts';
+const defaultBaseURL = 'http://127.0.0.1:3031/crafting/v1/crafts';
+// const defaultBaseURL =
+//   'https://api.sandbox.games.immutable.com/crafting/v1/crafts';
 
 export class CraftingService {
   private httpClient: HttpClient;

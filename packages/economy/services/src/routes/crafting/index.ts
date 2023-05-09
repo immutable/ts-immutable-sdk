@@ -7,7 +7,7 @@ const router = Router();
 /**
  * https://api.dev.games.immutable.com/crafting/swagger/index.html#/root/post_craft
  */
-router.post('/crafting/craft', (req, res) => {
+router.post('/crafting/v1/crafts', (req, res) => {
   const testCase = req.get('Test-Case');
   const testCaseCode = Number(req.get('Test-Case-Code'));
 
