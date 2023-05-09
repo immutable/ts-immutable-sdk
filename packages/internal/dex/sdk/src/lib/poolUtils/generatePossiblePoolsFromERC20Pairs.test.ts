@@ -1,3 +1,5 @@
+// TODO: Fix missing dependency for jest globals
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, it } from '@jest/globals';
 import { Token } from '@uniswap/sdk-core';
 import { ERC20Pair } from './generateERC20Pairs';
@@ -19,7 +21,7 @@ describe('generatePoolsFromTokenPairs', () => {
       const pools = generatePossiblePoolsFromERC20Pair(
         erc20Pair,
         commonRoutingERC20s,
-        TEST_V3_CORE_FACTORY_ADDRESS
+        TEST_V3_CORE_FACTORY_ADDRESS,
       );
       expect(pools).toMatchInlineSnapshot(`
         [
@@ -132,13 +134,12 @@ describe('generatePoolsFromTokenPairs', () => {
       const pools = generatePossiblePoolsFromERC20Pair(
         erc20Pair,
         commonRoutingERC20s,
-        TEST_V3_CORE_FACTORY_ADDRESS
+        TEST_V3_CORE_FACTORY_ADDRESS,
       );
-
 
       // The pool address is unique to the combination of token0, token1 and fee
       // We expect there to be no repeating pool addresses
-      const uniquePools = uniqBy(pools, (pool) => pool.poolAddress.toLowerCase())
+      const uniquePools = uniqBy(pools, (pool) => pool.poolAddress.toLowerCase());
       expect(uniquePools).toHaveLength(12);
     });
   });

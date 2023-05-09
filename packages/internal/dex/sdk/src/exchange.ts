@@ -1,6 +1,9 @@
+/* eslint-disable max-len */
 import { ethers } from 'ethers';
 import { MethodParameters } from '@uniswap/v3-sdk';
-import { CurrencyAmount, Percent, Token, TradeType } from '@uniswap/sdk-core';
+import {
+  CurrencyAmount, Percent, Token, TradeType,
+} from '@uniswap/sdk-core';
 import assert from 'assert';
 import JSBI from 'jsbi';
 
@@ -24,13 +27,15 @@ import { constructQuoteWithSlippage } from './lib/transactionUtils/constructQuot
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;
+
   private router: Router;
+
   private chainId: number;
 
   constructor(configuration: ExchangeConfiguration) {
     this.chainId = configuration.chain.chainId;
     this.provider = new ethers.providers.JsonRpcProvider(
-      configuration.chain.rpcUrl
+      configuration.chain.rpcUrl,
     );
     this.router = new Router(
       this.provider,
@@ -40,7 +45,7 @@ export class Exchange {
         factoryAddress: configuration.chain.contracts.coreFactory,
         quoterAddress: configuration.chain.contracts.quoterV2,
         peripheryRouterAddress: configuration.chain.contracts.peripheryRouter,
-      }
+      },
     );
   }
 
@@ -48,7 +53,7 @@ export class Exchange {
     tokenInAddress: string,
     tokenOutAddress: string,
     maxHops: number,
-    fromAddress?: string
+    fromAddress?: string,
   ) {
     if (fromAddress) validateAddress(fromAddress);
     validateAddress(tokenInAddress);
@@ -65,7 +70,7 @@ export class Exchange {
     slippagePercent: Percent,
     maxHops: number,
     deadline: number,
-    tradeType: TradeType
+    tradeType: TradeType,
   ): Promise<TransactionResponse> {
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, fromAddress);
 
@@ -77,18 +82,18 @@ export class Exchange {
     const tokenIn: Token = new Token(
       this.chainId,
       tokenInAddress,
-      tokenInDecimals
+      tokenInDecimals,
     );
     const tokenOut: Token = new Token(
       this.chainId,
       tokenOutAddress,
-      tokenOutDecimals
+      tokenOutDecimals,
     );
 
     let amountSpecified: CurrencyAmount<Token>;
     let otherToken: Token;
     const amountJsbi = JSBI.BigInt(amount.toString());
-    if (tradeType == TradeType.EXACT_INPUT) {
+    if (tradeType === TradeType.EXACT_INPUT) {
       amountSpecified = CurrencyAmount.fromRawAmount(tokenIn, amountJsbi);
       otherToken = tokenOut;
     } else {
@@ -100,7 +105,7 @@ export class Exchange {
       amountSpecified,
       otherToken,
       tradeType,
-      maxHops
+      maxHops,
     );
     if (!routeAndQuote.success) {
       return {
@@ -114,14 +119,14 @@ export class Exchange {
       routeAndQuote.trade,
       fromAddress,
       slippagePercent,
-      deadline
+      deadline,
     );
 
     const quoteInfo = constructQuoteWithSlippage(
       otherToken,
       tradeType,
       routeAndQuote.trade,
-      slippagePercent
+      slippagePercent,
     );
 
     return {
@@ -160,9 +165,9 @@ export class Exchange {
     amountIn: ethers.BigNumberish,
     slippagePercent: Percent = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
-    deadline: number = DEFAULT_DEADLINE
+    deadline: number = DEFAULT_DEADLINE,
   ): Promise<TransactionResponse> {
-    return await this.getUnsignedSwapTx(
+    return this.getUnsignedSwapTx(
       fromAddress,
       tokenInAddress,
       tokenOutAddress,
@@ -170,7 +175,7 @@ export class Exchange {
       slippagePercent,
       maxHops,
       deadline,
-      TradeType.EXACT_INPUT
+      TradeType.EXACT_INPUT,
     );
   }
 
@@ -194,9 +199,9 @@ export class Exchange {
     amountOut: ethers.BigNumberish,
     slippagePercent: Percent = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
-    deadline: number = DEFAULT_DEADLINE
+    deadline: number = DEFAULT_DEADLINE,
   ): Promise<TransactionResponse> {
-    return await this.getUnsignedSwapTx(
+    return this.getUnsignedSwapTx(
       fromAddress,
       tokenInAddress,
       tokenOutAddress,
@@ -204,7 +209,7 @@ export class Exchange {
       slippagePercent,
       maxHops,
       deadline,
-      TradeType.EXACT_OUTPUT
+      TradeType.EXACT_OUTPUT,
     );
   }
 
@@ -221,7 +226,7 @@ export class Exchange {
     tokenInAddress: string,
     tokenOutAddress: string,
     amountIn: ethers.BigNumberish,
-    maxHops = DEFAULT_MAX_HOPS
+    maxHops = DEFAULT_MAX_HOPS,
   ): Promise<QuoteResponse> {
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops);
     // get decimals of token
@@ -232,24 +237,24 @@ export class Exchange {
     const tokenIn: Token = new Token(
       this.chainId,
       tokenInAddress,
-      tokenInDecimals
+      tokenInDecimals,
     );
     const tokenOut: Token = new Token(
       this.chainId,
       tokenOutAddress,
-      tokenOutDecimals
+      tokenOutDecimals,
     );
     const amountInJsbi = JSBI.BigInt(amountIn.toString());
     const amountSpecified: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
       tokenIn,
-      amountInJsbi
+      amountInJsbi,
     );
 
-    return await this.router.findOptimalRoute(
+    return this.router.findOptimalRoute(
       amountSpecified,
       tokenOut,
       TradeType.EXACT_INPUT,
-      maxHops
+      maxHops,
     );
   }
 
@@ -266,7 +271,7 @@ export class Exchange {
     tokenInAddress: string,
     tokenOutAddress: string,
     amountOut: ethers.BigNumberish,
-    maxHops = DEFAULT_MAX_HOPS
+    maxHops = DEFAULT_MAX_HOPS,
   ): Promise<QuoteResponse> {
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops);
     // get decimals of token
@@ -277,24 +282,24 @@ export class Exchange {
     const tokenIn: Token = new Token(
       this.chainId,
       tokenInAddress,
-      tokenInDecimals
+      tokenInDecimals,
     );
     const tokenOut: Token = new Token(
       this.chainId,
       tokenOutAddress,
-      tokenOutDecimals
+      tokenOutDecimals,
     );
     const amountOutJsbi = JSBI.BigInt(amountOut.toString());
     const amountSpecified: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
       tokenOut,
-      amountOutJsbi
+      amountOutJsbi,
     );
 
-    return await this.router.findOptimalRoute(
+    return this.router.findOptimalRoute(
       amountSpecified,
       tokenIn,
       TradeType.EXACT_OUTPUT,
-      maxHops
+      maxHops,
     );
   }
 }

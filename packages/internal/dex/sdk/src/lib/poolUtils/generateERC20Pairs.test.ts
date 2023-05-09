@@ -1,3 +1,5 @@
+// TODO: Fix missing dependency for jest globals
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, it } from '@jest/globals';
 import { Token } from '@uniswap/sdk-core';
 import { generateERC20Pairs, ERC20Pair } from './generateERC20Pairs';

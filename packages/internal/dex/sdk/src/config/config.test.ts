@@ -1,15 +1,20 @@
+// TODO: Fix dependency error
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, expect, it } from '@jest/globals';
-import { ExchangeModuleConfiguration } from '../types';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { ExchangeModuleConfiguration } from '../types';
 import { ExchangeConfiguration } from './index';
 import { POLYGON_TESTNET_CHAIN_ID } from '../constants/tokens/polygon';
+
 describe('config', () => {
   it('should create successfully', () => {
     const baseConfig = new ImmutableConfiguration({
-      environment: Environment.SANDBOX,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      ENVIRONMENT: Environment.SANDBOX,
     });
     const exchangeConfiguration: ExchangeModuleConfiguration = {
-      baseConfig: baseConfig,
+      baseConfig,
       chainId: POLYGON_TESTNET_CHAIN_ID,
     };
 
@@ -20,15 +25,16 @@ describe('config', () => {
 
   it('throw error if incorrect chainId provided', () => {
     const baseConfig = new ImmutableConfiguration({
-      environment: Environment.SANDBOX,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      ENVIRONMENT: Environment.SANDBOX,
     });
     const exchangeConfiguration: ExchangeModuleConfiguration = {
-      baseConfig: baseConfig,
+      baseConfig,
       chainId: 1,
     };
 
     expect(() => new ExchangeConfiguration(exchangeConfiguration)).toThrow(
-      new Error('Chain 1 is not supported in environment sandbox')
+      new Error('Chain 1 is not supported in environment sandbox'),
     );
   });
 });

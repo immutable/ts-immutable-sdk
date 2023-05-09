@@ -4,9 +4,13 @@ import { ethers } from 'ethers';
 import { TokenInfo } from '../types';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   '0xcdca1753': ['uint256', 'uint160[]', 'uint32[]', 'uint256'],
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   '0xc6a5026a': ['uint256', 'uint160', 'uint32', 'uint256'],
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   '0x2f80bb1d': ['uint256', 'uint160[]', 'uint32[]', 'uint256'],
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   '0xbd21704a': ['uint256', 'uint160', 'uint32', 'uint256'],
 };
 
@@ -17,10 +21,10 @@ export const quoteReturnMapping: { [signature: string]: string[] } = {
  */
 export function poolEquals(poolA: Pool, poolB: Pool): boolean {
   return (
-    poolA === poolB ||
-    (poolA.token0.equals(poolB.token0) &&
-      poolA.token1.equals(poolB.token1) &&
-      poolA.fee === poolB.fee)
+    poolA === poolB
+    || (poolA.token0.equals(poolB.token0)
+      && poolA.token1.equals(poolB.token1)
+      && poolA.fee === poolB.fee)
   );
 }
 
@@ -44,7 +48,7 @@ export class DuplicateAddress extends Error {
 
 export async function getERC20Decimals(
   tokenAddress: string,
-  provider: ethers.providers.JsonRpcProvider
+  provider: ethers.providers.JsonRpcProvider,
 ): Promise<number> {
   const decimalsFunctionSig = ethers.utils.id('decimals()').substring(0, 10);
   return parseInt(
@@ -52,7 +56,7 @@ export async function getERC20Decimals(
       to: tokenAddress,
       data: decimalsFunctionSig,
     }),
-    16
+    16,
   );
 }
 
@@ -69,13 +73,13 @@ export function validateAddress(address: string) {
 
 export function validateDifferentAddresses(
   tokenInAddress: string,
-  tokenOutAddress: string
+  tokenOutAddress: string,
 ) {
   if (
     tokenInAddress.toLocaleLowerCase() === tokenOutAddress.toLocaleLowerCase()
   ) {
     throw new DuplicateAddress(
-      `tokenInAddress and tokenOutAddress should be different but got: ${tokenInAddress}, ${tokenOutAddress}`
+      `tokenInAddress and tokenOutAddress should be different but got: ${tokenInAddress}, ${tokenOutAddress}`,
     );
   }
 }
@@ -83,15 +87,16 @@ export function validateDifferentAddresses(
 export const tokenInfoToUniswapToken = (tokenInfos: TokenInfo[]): Token[] => {
   const tokens = [];
 
-  for (let tokenInfo of tokenInfos) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const tokenInfo of tokenInfos) {
     tokens.push(
       new Token(
         tokenInfo.chainId,
         tokenInfo.address,
         tokenInfo.decimals,
         tokenInfo.symbol,
-        tokenInfo.name
-      )
+        tokenInfo.name,
+      ),
     );
   }
 

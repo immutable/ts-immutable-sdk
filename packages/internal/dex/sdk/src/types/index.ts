@@ -1,6 +1,8 @@
 import { ethers } from 'ethers';
 import { Currency, TradeType } from '@uniswap/sdk-core';
 import { Route } from '@uniswap/v3-sdk';
+// TODO: Fix dependency error
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { ModuleConfiguration } from '@imtbl/config';
 import { ExchangeContracts } from 'config';
 
@@ -20,13 +22,13 @@ export type QuoteTradeInfo = {
 
 export type QuoteResponse =
   | {
-      success: true;
-      trade: QuoteTradeInfo;
-    }
+    success: true;
+    trade: QuoteTradeInfo;
+  }
   | {
-      success: false;
-      trade: undefined;
-    };
+    success: false;
+    trade: undefined;
+  };
 
 export type TradeInfo = {
   route: Route<Currency, Currency>;
@@ -38,15 +40,15 @@ export type TradeInfo = {
 
 export type TransactionResponse =
   | {
-      transaction: ethers.providers.TransactionRequest;
-      info: TradeInfo;
-      success: true;
-    }
+    transaction: ethers.providers.TransactionRequest;
+    info: TradeInfo;
+    success: true;
+  }
   | {
-      info: undefined;
-      success: false;
-      transaction: undefined;
-    };
+    info: undefined;
+    success: false;
+    transaction: undefined;
+  };
 
 export type TokenInfo = {
   chainId: number;
