@@ -160,6 +160,28 @@ let mockInventoryItems = [
   },
 ];
 
+const mockOutputItem = {
+  id: '0f89554b-2c92-4220-b43e-8317a0b117c5',
+  game_id: 'shardbound',
+  item_template_id: 'b7a41354-d8ec-11ed-afa1-0242ac120002',
+  type: 'Card',
+  name: 'Demogorgon+',
+  description: 'Deal 3 damage to a random sleeping enemy creature',
+  properties: {
+    Attack: 8,
+    Health: 6,
+    Level: 2,
+    Mana: 7,
+    dust_power: 100,
+  },
+  image: 'https://images.godsunchained.com/art2/500/94.webp',
+  property_schema: {},
+  status: 'draft',
+  published_at: null,
+  created_at: '2023-04-12T04:48:01.764483Z',
+  updated_at: '2023-04-12T04:48:01.764483Z',
+};
+
 @customElement('imtbl-craft-card-upgrade-widget')
 export class CraftingCardUpgrade extends LitElement {
   static styles = css``;
@@ -184,6 +206,8 @@ export class CraftingCardUpgrade extends LitElement {
   private cardToUpgrade: any = undefined;
   private selectedDustItems: any[] = [];
   private craftingDisabled: boolean = true;
+  private craftLoading: boolean = false;
+  private showOutput: boolean = false;
   private inventoryItems: any[] = [];
 
   connectedCallback() {
@@ -220,7 +244,6 @@ export class CraftingCardUpgrade extends LitElement {
   }
 
   selectItem(item: any) {
-    console.log('selectItem');
     return (event: MouseEvent) => {
       event.preventDefault();
       console.log(item);
@@ -276,7 +299,7 @@ export class CraftingCardUpgrade extends LitElement {
   }
 
   renderSelectedDustCard(item: any) {
-    return html` <div class="list-item" @click=${this.selectItem(item)}>
+    return html` <div class="list-item">
       <div class="list-item-image">
         <figure class="image is-64x64">
           <img class="is-rounded" src="${item.metadata.image}" />
@@ -294,14 +317,43 @@ export class CraftingCardUpgrade extends LitElement {
           </div>
         </div>
       </div>
+      <button @click=${this.handleRemoveDustItem(item)}>🗑️</button>
     </div>`;
   }
 
-  renderOutputs() {
+  handleRemoveDustItem(item: any) {
+    console.log(item);
+    return (event: MouseEvent) => {
+      event.preventDefault();
+      this.inventoryItems.push(item);
+      this.selectedDustItems = this.selectedDustItems.filter(
+        (i) => i.id !== item.id
+      );
+      this.requestUpdate();
+    };
+  }
+
+  resetCraftItems() {
+    this.inventoryItems.push(this.cardToUpgrade);
+    this.cardToUpgrade = undefined;
+    this.inventoryItems.push(...this.selectedDustItems);
+    this.selectedDustItems = [];
+    this.requestUpdate();
+  }
+
+  renderCardUpgradeInfo() {
     return html`<div>
-      <h2 class="mb-4 is-size-3">Craft outputs</h2>
+      <h2 class="mb-4 is-size-3">Card To Upgrade</h2>
       <div class="is-flex is-flex-direction-column">
-        <div class="columns mb-8">${cache(this.renderCardToUpgrade())}</div>
+        <div class="columns is-flex is-flex-direction-column">
+          ${cache(this.renderCardToUpgrade())}
+          <button @click=${this.resetCraftItems}>🗑️ Reset</button>
+        </div>
+        <div class="">
+          <p>EXP REQUIRED:</p>
+          <p>Upgrade Level from 1 to 2</p>
+          <p>Upgrade Attack from 1 to 2</p>
+        </div>
         ${cache(this.renderCraftButton())}
       </div>
     </div>`;
@@ -327,11 +379,6 @@ export class CraftingCardUpgrade extends LitElement {
           </div>
         </div>
       </div>
-      <div class="column">
-        <p>EXP REQUIRED:</p>
-        <p>Upgrade Level from 1 to 2</p>
-        <p>Upgrade Attack from 1 to 2</p>
-      </div>
     `;
   }
 
@@ -353,18 +400,13 @@ export class CraftingCardUpgrade extends LitElement {
 
   renderCraftButton() {
     if (this.craftingDisabled) {
-      return html` <button
-        id="craft-button"
-        class="button is-info"
-        disabled
-        @click=${this.handleCraftClick}
-      >
+      return html` <button id="craft-button" class="button is-info" disabled>
         Craft
       </button>`;
     } else {
       return html` <button
         id="craft-button"
-        class="button is-info"
+        class="button is-info ${this.craftLoading ? 'is-loading' : ''}}"
         @click=${this.handleCraftClick}
       >
         Craft
@@ -392,18 +434,65 @@ export class CraftingCardUpgrade extends LitElement {
   async submitCrafting() {
     this.prepareIngredientsForCraft();
     console.log('CraftingCardUpgrade :: submitCrafting');
-    // TODO: process the crafting request
-    // SDK.craft(...this.state.craftInput.ingredients) // send the arguments required, taken from state's craftInput
-    // await for results then update the craft results in state
+    this.economy.crafting.craft(this.state);
+    this.economy.subscribe((events) => {
+      console.log(events, 'events');
+      if (events.action !== 'CRAFT') {
+        return;
+      }
+      if (events.status === 'IN_PROGRESS') {
+        this.craftLoading = true;
+      }
+      if (['COMPLETED', 'FAILED'].includes(events.status)) {
+        this.craftLoading = false;
+      }
+      if (events.status === 'COMPLETED') {
+        this.showOutput = true;
+      }
+      this.requestUpdate();
+    });
+  }
+
+  renderOutput() {
+    return html`<div class="modal is-active">
+      <div class="modal-background"></div>
+      <div class="modal-content">
+      <div class="card">
+        <div class="card-image">
+        <figure class="image is-4by3">
+          <img src="${mockOutputItem.image}" alt="Placeholder image" />
+        </figure>
+      </div>
+      <div class="card-content">
+        <div class="content">
+          <p class="title is-4">${mockOutputItem.name}</p>
+          <p class="subtitle is-6">${mockOutputItem.description}</p>
+        </div>
+      </div>
+      <div class="content py-4 is-flex is-flex-direction-column is-align-items-center">
+        <strong class="is-size-4 mb-3">Card Upgraded! 🎉</strong>
+        <p class="is-size-5">Level from 1 ➜ ${mockOutputItem.properties.Level}</p>
+        <p class="is-size-5">Attack from 1 ➜ ${mockOutputItem.properties.Attack}</p>
+        <p class="is-size-5">Health from 1 ➜ ${mockOutputItem.properties.Health}</p>
+        <p class="is-size-5">Mana ${mockOutputItem.properties.Mana}</p>
+        <p class="is-size-5">${mockOutputItem.properties.dust_power} Dust</p>
+      </div>
+      </div>
+      </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+      </div>
+    </div>`;
   }
 
   render() {
-    return html` <div class="columns">
+    return html` ${this.showOutput ? cache(this.renderOutput()) : ''}
+      <div class="columns">
         <div class="column">${cache(this.renderInventory())}</div>
         <div class="column">${cache(this.renderSelectedDustCards())}</div>
-        <div class="column">${cache(this.renderOutputs())}</div>
+        <div class="column">${cache(this.renderCardUpgradeInfo())}</div>
       </div>
       <pre>${JSON.stringify(this.state, null, 2)}</pre>
+      <pre>${JSON.stringify(this.inventoryItems, null, 2)}</pre>
       <pre>cardToUpgrade: ${JSON.stringify(this.cardToUpgrade, null, 2)}</pre>
       <pre>
 selectedDustItems: ${JSON.stringify(this.selectedDustItems, null, 2)}</pre
