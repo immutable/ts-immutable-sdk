@@ -1,3 +1,5 @@
+import * as _ from '../global';
+
 // Definitions | Events
 export * from './definitions/events/events';
 export * from './definitions/events/connectEvents';
