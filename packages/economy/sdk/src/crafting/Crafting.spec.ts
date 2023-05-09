@@ -8,8 +8,9 @@ describe('Crafting', () => {
   beforeEach(() => {
     emitEvent = jest.fn();
     input = {
-      requiresWeb3: true,
+      requiresWeb3: false,
       web3Assets: {},
+      input: { userId: 'asd', recipeId: '123', ingredients: [] },
     };
   });
 
