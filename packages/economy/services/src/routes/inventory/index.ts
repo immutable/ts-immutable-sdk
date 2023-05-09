@@ -7,7 +7,7 @@ const router = Router();
 /**
  * https://api.dev.games.immutable.com/inventory/swagger/index.html#/root/get_items__id_
  */
-router.get('/inventory/items', (_req, res) => {
+router.get('/inventory/v1/sb/items', (_req, res) => {
   res.status(200).send(itemsGet);
 });
 

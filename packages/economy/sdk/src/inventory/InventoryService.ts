@@ -10,9 +10,9 @@ type GetItemsInput = {
 
 // TODO: Read from .env
 // FIXME: target https://api.dev.games.immutable.com/inventory/swagger/index.html#/root/post_craft
-// const defaultBaseURL = 'http://127.0.0.1:3031/inventory';
-const defaultBaseURL =
-  'https://api.sandbox.games.immutable.com/inventory/v1/sb/items';
+const defaultBaseURL = 'http://127.0.0.1:3031/inventory/v1/sb/items';
+// const defaultBaseURL =
+//   'https://api.sandbox.games.immutable.com/inventory/v1/sb/items';
 
 export class InventoryService {
   private httpClient: HttpClient;
