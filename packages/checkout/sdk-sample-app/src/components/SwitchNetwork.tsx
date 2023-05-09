@@ -2,11 +2,13 @@ import { Checkout, ChainId, NetworkInfo } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import LoadingButton from './LoadingButton';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Box } from '@biom3/react';
+import { Environment } from '@imtbl/config';
 import { NetworkFilterTypes } from '@imtbl/checkout-sdk';
 
 export interface SwitchNetworkProps {
+  environment: Environment;
   checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
   setProvider: (provider: Web3Provider) => void;
