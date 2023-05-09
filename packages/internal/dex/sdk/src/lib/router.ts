@@ -1,9 +1,9 @@
 import { ethers } from 'ethers';
-import { Currency, TradeType, CurrencyAmount, Token } from '@uniswap/sdk-core';
+import { Currency, CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import JSBI from 'jsbi';
 import { poolEquals } from './utils';
-import { QuoteResult, getQuotesForRoutes } from './getQuotesForRoutes';
+import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { QuoteResponse } from '../types';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';

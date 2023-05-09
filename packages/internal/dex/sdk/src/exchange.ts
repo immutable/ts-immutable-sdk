@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { MethodParameters } from '@uniswap/v3-sdk';
-import { Percent, CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core';
+import { CurrencyAmount, Percent, Token, TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
 import JSBI from 'jsbi';
 
@@ -8,18 +8,19 @@ import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
   DEFAULT_SLIPPAGE,
+  MAX_MAX_HOPS,
 } from './constants';
 
 import { Router } from './lib/router';
 import {
-  validateAddress,
   getERC20Decimals,
+  validateAddress,
   validateDifferentAddresses,
 } from './lib/utils';
 import { QuoteResponse, TransactionResponse } from './types';
-import { createSwapParameters } from './lib/swap';
-import { MAX_MAX_HOPS } from './constants';
+import { createSwapParameters } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
+import { constructQuoteWithSlippage } from './lib/transactionUtils/constructQuoteWithSlippage';
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;
@@ -102,7 +103,11 @@ export class Exchange {
       maxHops
     );
     if (!routeAndQuote.success) {
-      return { success: false, transactionRequest: undefined };
+      return {
+        success: false,
+        transaction: undefined,
+        info: undefined,
+      };
     }
 
     const params: MethodParameters = await createSwapParameters(
@@ -112,13 +117,26 @@ export class Exchange {
       deadline
     );
 
+    const quoteInfo = constructQuoteWithSlippage(
+      otherToken,
+      tradeType,
+      routeAndQuote.trade,
+      slippagePercent
+    );
+
     return {
       success: true,
-      transactionRequest: {
+      transaction: {
         data: params.calldata,
         to: this.router.routingContracts.peripheryRouterAddress,
         value: params.value,
         from: fromAddress,
+      },
+      info: {
+        route: routeAndQuote.trade.route,
+        quote: quoteInfo.quote,
+        quoteWithMaxSlippage: quoteInfo.quoteWithMaxSlippage,
+        slippage: `${slippagePercent.toSignificant()}%`,
       },
     };
   }
