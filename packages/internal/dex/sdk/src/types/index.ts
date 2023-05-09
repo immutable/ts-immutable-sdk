@@ -4,7 +4,12 @@ import { Route } from '@uniswap/v3-sdk';
 import { ModuleConfiguration } from '@imtbl/config';
 import { ExchangeContracts } from 'config';
 
-export type TradeInfo = {
+export type Amount = {
+  token: TokenInfo;
+  amount: ethers.BigNumberish;
+};
+
+export type QuoteTradeInfo = {
   route: Route<Currency, Currency>;
   amountIn: ethers.BigNumberish;
   tokenIn: Currency;
@@ -16,21 +21,31 @@ export type TradeInfo = {
 export type QuoteResponse =
   | {
       success: true;
-      trade: TradeInfo;
+      trade: QuoteTradeInfo;
     }
   | {
       success: false;
       trade: undefined;
     };
 
+export type TradeInfo = {
+  route: Route<Currency, Currency>;
+
+  quote: Amount;
+  quoteWithMaxSlippage: Amount;
+  slippage: string;
+};
+
 export type TransactionResponse =
   | {
-      transactionRequest: ethers.providers.TransactionRequest;
+      transaction: ethers.providers.TransactionRequest;
+      info: TradeInfo;
       success: true;
     }
   | {
+      info: undefined;
       success: false;
-      transactionRequest: undefined;
+      transaction: undefined;
     };
 
 export type TokenInfo = {
