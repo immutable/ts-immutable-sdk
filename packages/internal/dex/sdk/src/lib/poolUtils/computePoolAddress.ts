@@ -1,6 +1,4 @@
 import { defaultAbiCoder, getCreate2Address } from 'ethers/lib/utils';
-// TODO: Fix missing dependency
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { keccak256 } from '@ethersproject/solidity';
 import { FeeAmount } from '@uniswap/v3-sdk';
 import { ERC20Pair } from './generateERC20Pairs';

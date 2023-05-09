@@ -1,6 +1,4 @@
 import { BigNumber } from 'ethers';
-// TODO: Fix missing dependency
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { Interface } from '@ethersproject/abi';
 import {
   Multicall,

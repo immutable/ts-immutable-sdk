@@ -1,5 +1,3 @@
-// TODO: Fix dependency error
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { expect, describe, it } from '@jest/globals';
 import { ethers } from 'ethers';
 import { Currency, Token, TradeType } from '@uniswap/sdk-core';
@@ -11,7 +9,7 @@ import { Exchange } from './exchange';
 import { Router } from './lib/router';
 import {
   IMX_TEST_CHAIN,
-  testDexConfiguration,
+  TEST_DEX_CONFIGURATION,
   WETH_TEST_CHAIN,
 } from './utils/testUtils';
 
@@ -74,7 +72,7 @@ describe('getQuoteFromAmountOut', () => {
         }),
       }));
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
       const result = await exchange.getQuoteFromAmountOut(
         wethToken.address,
@@ -104,7 +102,7 @@ describe('getQuoteFromAmountOut', () => {
         }),
       }));
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
       const result = await exchange.getQuoteFromAmountOut(
         wethToken.address,
@@ -129,7 +127,7 @@ describe('getQuoteFromAmountOut', () => {
         }),
       }));
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
       const result = await exchange.getQuoteFromAmountOut(
         wethToken.address,

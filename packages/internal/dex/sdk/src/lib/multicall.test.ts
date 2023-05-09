@@ -1,14 +1,8 @@
-// TODO: Fix missing dependency errors
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { expect, describe, it } from '@jest/globals';
 import { ethers, providers } from 'ethers';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { getCreate2Address } from '@ethersproject/address';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { keccak256 } from '@ethersproject/solidity';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { defaultAbiCoder } from '@ethersproject/abi';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { Contract } from '@ethersproject/contracts';
 import {
   multicallSingleCallDataMultipleContracts,
@@ -201,6 +195,7 @@ describe('callSingleContractWithCallData', () => {
   describe('when something happens', () => {
     it('has this result', async () => {
       const testCallData = [
+        // eslint-disable-next-line max-len
         '0xc6a5026a0000000000000000000000004f062a3eaec3730560ab89b5ce5ac0ab2c5517ae00000000000000000000000093733225ccc07ba02b1449aa3379418ddc37f6ec000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000000000000000000000027100000000000000000000000000000000000000000000000000000000000000000',
       ];
       const coreFactoryV3 = TEST_V3_CORE_FACTORY_ADDRESS;

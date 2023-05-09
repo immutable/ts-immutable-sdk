@@ -1,7 +1,4 @@
-// TODO: Fix dependency error
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, expect, it } from '@jest/globals';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ExchangeModuleConfiguration } from '../types';
 import { ExchangeConfiguration } from './index';

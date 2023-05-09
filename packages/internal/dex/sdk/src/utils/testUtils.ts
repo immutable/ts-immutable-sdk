@@ -9,7 +9,6 @@ import { ethers } from 'ethers';
 import { hexDataSlice } from 'ethers/lib/utils';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   ExchangeModuleConfiguration,
@@ -24,12 +23,12 @@ export const TEST_RPC_URL = 'https://0.net';
 
 export const TEST_FROM_ADDRESS = '0x94fC2BcA2E71e26D874d7E937d89ce2c9113af6e';
 
-export const testImmutableConfiguration: ImmutableConfiguration = new ImmutableConfiguration({
+export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new ImmutableConfiguration({
   environment: Environment.SANDBOX,
 });
 
-export const testDexConfiguration: ExchangeModuleConfiguration = {
-  baseConfig: testImmutableConfiguration,
+export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
+  baseConfig: TEST_IMMUTABLE_CONFIGURATION,
   chainId: TEST_CHAIN_ID,
   overrides: {
     rpcURL: TEST_RPC_URL,

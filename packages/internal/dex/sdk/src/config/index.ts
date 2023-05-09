@@ -1,5 +1,3 @@
-// TODO: Fix dependency errors
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   POLYGON_TESTNET_CHAIN_ID,

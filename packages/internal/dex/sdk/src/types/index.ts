@@ -1,8 +1,6 @@
 import { ethers } from 'ethers';
 import { Currency, TradeType } from '@uniswap/sdk-core';
 import { Route } from '@uniswap/v3-sdk';
-// TODO: Fix dependency error
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { ModuleConfiguration } from '@imtbl/config';
 import { ExchangeContracts } from 'config';
 

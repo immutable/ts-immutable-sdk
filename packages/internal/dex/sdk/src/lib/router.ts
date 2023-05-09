@@ -234,7 +234,6 @@ export const generateAllAcyclicPaths = (
 
   const tokenOut = currencyOut.wrapped;
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const pool of pools) {
     // if the pool doesn't have the tokenIn or if it has already been traversed,
     // skip to the next pool

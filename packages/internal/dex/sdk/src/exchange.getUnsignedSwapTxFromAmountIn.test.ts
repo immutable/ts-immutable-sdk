@@ -1,5 +1,3 @@
-// TODO: Fix dependency error
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, it } from '@jest/globals';
 import { Percent, TradeType } from '@uniswap/sdk-core';
 import { ExchangeConfiguration } from 'config';
@@ -9,7 +7,7 @@ import {
   mockRouterImplementation,
   setupSwapTxTest,
   TEST_PERIPHERY_ROUTER_ADDRESS,
-  testDexConfiguration,
+  TEST_DEX_CONFIGURATION,
 } from './utils/testUtils';
 import * as utils from './lib/utils';
 
@@ -32,7 +30,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -69,7 +67,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const { info, success } = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -100,7 +98,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -137,7 +135,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const { info, success } = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -167,7 +165,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const higherSlippage = new Percent(2, 1000); // 0.2%
       const params = setupSwapTxTest(higherSlippage);
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const invalidAddress = '0x0123abcdef';
@@ -212,7 +210,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       await expect(

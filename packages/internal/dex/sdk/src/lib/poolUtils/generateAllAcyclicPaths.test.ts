@@ -1,5 +1,3 @@
-// TODO: Fix missing dependency for jest globals
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, it } from '@jest/globals';
 import {
   FeeAmount, Pool, Route, TickMath,
@@ -88,7 +86,6 @@ describe('generateAllAcyclicPaths', () => {
 
       // There are two routes of maxHops = 3 that go from token0 to token3.
       expect(routes.length).toBe(2);
-      // eslint-disable-next-line no-restricted-syntax
       for (const route of routes) {
         // The only two paths available are:
         //    token0 -> token1 -> token2 -> token3 (3 pools)
@@ -251,15 +248,12 @@ describe('generateAllAcyclicPaths', () => {
 
       // There are five route of maxHops = 4 that goes from token0 to token3.
       expect(routes.length).toBe(5);
-      // eslint-disable-next-line no-restricted-syntax
       for (const route of routes) {
         // The five paths available are:
         //    token0 -> token1 -> token2 -> token1 -> token3 (4 pools)
-        //    token0 -> token1 -> token2 -> token1 -> token3 (4 pools)
-        //        (Switching the token1/token2 fees around)
+        //    token0 -> token1 -> token2 -> token1 -> token3 (4 pools) (Switching the token1/token2 fees around)
         //    token0 -> token1 -> token2 -> token3 (3 pools)
-        //    token0 -> token1 -> token2 -> token3 (3 pools)
-        //       (Switching the token1/token2 fees around)
+        //    token0 -> token1 -> token2 -> token3 (3 pools) (Switching the token1/token2 fees around)
         //    token0 -> token1 -> token3 (2 pools)
         expect(
           route.pools.length === 4

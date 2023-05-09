@@ -1,5 +1,3 @@
-// TODO: Fix missing dependency for jest globals
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, it } from '@jest/globals';
 import {
   BigNumber, Contract, providers, utils,

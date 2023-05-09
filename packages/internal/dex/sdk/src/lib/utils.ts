@@ -87,7 +87,6 @@ export function validateDifferentAddresses(
 export const tokenInfoToUniswapToken = (tokenInfos: TokenInfo[]): Token[] => {
   const tokens = [];
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const tokenInfo of tokenInfos) {
     tokens.push(
       new Token(

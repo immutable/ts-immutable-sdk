@@ -10,7 +10,7 @@ import {
   mockRouterImplementation,
   setupSwapTxTest,
   TEST_PERIPHERY_ROUTER_ADDRESS,
-  testDexConfiguration,
+  TEST_DEX_CONFIGURATION,
 } from './utils/testUtils';
 import * as utils from './lib/utils';
 
@@ -32,7 +32,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const provider = new ethers.providers.JsonRpcProvider(
@@ -79,7 +79,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const { info, success } = await exchange.getUnsignedSwapTxFromAmountOut(
@@ -109,7 +109,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const tx = await exchange.getUnsignedSwapTxFromAmountOut(
@@ -152,7 +152,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const { info, success } = await exchange.getUnsignedSwapTxFromAmountOut(
@@ -183,7 +183,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const tx = await exchange.getUnsignedSwapTxFromAmountOut(
@@ -221,7 +221,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const higherSlippage = new Percent(2, 1000); // 0.2%
       const params = setupSwapTxTest(higherSlippage);
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const invalidAddress = '0x0123abcdef';
@@ -266,7 +266,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(testDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       await expect(

@@ -1,5 +1,3 @@
-// TODO: Fix dependency error
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, it } from '@jest/globals';
 import {
   FeeAmount, Pool, Route, TickMath,

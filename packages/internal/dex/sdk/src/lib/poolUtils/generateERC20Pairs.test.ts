@@ -1,5 +1,3 @@
-// TODO: Fix missing dependency for jest globals
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, it } from '@jest/globals';
 import { Token } from '@uniswap/sdk-core';
 import { generateERC20Pairs, ERC20Pair } from './generateERC20Pairs';
@@ -168,6 +166,7 @@ describe('generateERC20Pairs', () => {
     });
   });
 
+  // eslint-disable-next-line max-len
   describe('when given a TokenIn and TokenOut pair and there are two CommonRoutingTokens, and neither of the CommonRoutingTokens are the same as TokenIn or TokenOut', () => {
     it('should create six pairs', () => {
       // We expect...
