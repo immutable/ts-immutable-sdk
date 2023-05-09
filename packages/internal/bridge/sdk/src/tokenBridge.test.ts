@@ -50,11 +50,10 @@ describe('Token Bridge', () => {
         recipientAddress,
         token,
       };
-      const response: BridgeDepositResponse =
-        await tokenBridge.getUnsignedDepositTx(request);
+      const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
       expect(response.unsignedTx.from).toBe(depositorAddress);
       expect(response.unsignedTx.to).toBe(
-        bridgeConfig.bridgeContracts.rootChainERC20Predicate
+        bridgeConfig.bridgeContracts.rootChainERC20Predicate,
       );
       expect(response.unsignedTx.value).toBe(0);
       expect(response.unsignedTx.data).not.toBeNull();
@@ -77,8 +76,8 @@ describe('Token Bridge', () => {
       }).rejects.toThrow(
         new BridgeError(
           'native token deposit is not yet supported',
-          BridgeErrorType.INVALID_ADDRESS
-        )
+          BridgeErrorType.INVALID_ADDRESS,
+        ),
       );
     });
 
@@ -93,11 +92,10 @@ describe('Token Bridge', () => {
         recipientAddress,
         token,
       };
-      const response: BridgeDepositResponse =
-        await tokenBridge.getUnsignedDepositTx(request);
+      const response: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(request);
       expect(response.unsignedTx.from).toBe(`0x${depositorAddress}`);
       expect(response.unsignedTx.to).toBe(
-        bridgeConfig.bridgeContracts.rootChainERC20Predicate
+        bridgeConfig.bridgeContracts.rootChainERC20Predicate,
       );
       expect(response.unsignedTx.value).toBe(0);
       expect(response.unsignedTx.data).not.toBeNull();
@@ -120,8 +118,8 @@ describe('Token Bridge', () => {
       }).rejects.toThrow(
         new BridgeError(
           'depositor address xxxx3095171469a0db24D9Fb9C789D62dF22BBAfa816 is not a valid address',
-          BridgeErrorType.INVALID_ADDRESS
-        )
+          BridgeErrorType.INVALID_ADDRESS,
+        ),
       );
     });
     it('ERC20 token with invalid receipient address fails', async () => {
@@ -141,8 +139,8 @@ describe('Token Bridge', () => {
       }).rejects.toThrow(
         new BridgeError(
           'recipient address zzzz3095171469a0db24D9Fb9C789D62dF22BBAfa816 is not a valid address',
-          BridgeErrorType.INVALID_ADDRESS
-        )
+          BridgeErrorType.INVALID_ADDRESS,
+        ),
       );
     });
     it('ERC20 token with invalid token address fails', async () => {
@@ -162,8 +160,8 @@ describe('Token Bridge', () => {
       }).rejects.toThrow(
         new BridgeError(
           'token address zzzzf14582947E292a2eCd20C430B46f2d27CFE213c is not a valid address',
-          BridgeErrorType.INVALID_ADDRESS
-        )
+          BridgeErrorType.INVALID_ADDRESS,
+        ),
       );
     });
 
@@ -184,8 +182,8 @@ describe('Token Bridge', () => {
       }).rejects.toThrow(
         new BridgeError(
           'deposit amount 0 is invalid',
-          BridgeErrorType.INVALID_AMOUNT
-        )
+          BridgeErrorType.INVALID_AMOUNT,
+        ),
       );
     });
     it('ERC20 token with negative amount fails', async () => {
@@ -205,8 +203,8 @@ describe('Token Bridge', () => {
       }).rejects.toThrow(
         new BridgeError(
           'deposit amount -1000000000000000000 is invalid',
-          BridgeErrorType.INVALID_AMOUNT
-        )
+          BridgeErrorType.INVALID_AMOUNT,
+        ),
       );
     });
   });

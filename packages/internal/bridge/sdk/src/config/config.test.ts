@@ -1,9 +1,9 @@
 import { describe, expect, it } from '@jest/globals';
-import { BridgeModuleConfiguration } from '../types';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { BridgeConfiguration } from './index';
 import { ETH_SEPOLIA_TO_ZKEVM_DEVNET } from 'constants/bridges';
 import { ethers } from 'ethers';
+import { BridgeConfiguration } from './index';
+import { BridgeModuleConfiguration } from '../types';
 
 describe('config', () => {
   const voidRootProvider = new ethers.providers.JsonRpcProvider('x');
@@ -34,8 +34,8 @@ describe('config', () => {
 
     expect(() => new BridgeConfiguration(bridgeModuleConfiguration)).toThrow(
       new Error(
-        'Bridge instance with rootchain eip155:11155111 and childchain eip155:13373 is not supported in environment production'
-      )
+        'Bridge instance with rootchain eip155:11155111 and childchain eip155:13373 is not supported in environment production',
+      ),
     );
   });
   it('valid configuration if overrides used', () => {

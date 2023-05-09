@@ -61,7 +61,7 @@ export class TokenBridge {
     if (!ethers.utils.isAddress(req.token)) {
       throw new BridgeError(
         `token address ${req.token} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS
+        BridgeErrorType.INVALID_ADDRESS,
       );
     }
     return {
@@ -70,7 +70,7 @@ export class TokenBridge {
     };
   }
 
-    /**
+  /**
    * Generates an unsigned deposit transaction for a user to sign and submit to the bridge.
    *
    * @param {BridgeDepositRequest} req - The deposit request object containing the required data for depositing tokens.
@@ -94,26 +94,26 @@ export class TokenBridge {
    *   });
    */
   public async getUnsignedDepositTx(
-    req: BridgeDepositRequest
+    req: BridgeDepositRequest,
   ): Promise<BridgeDepositResponse> {
     if (req.token === 'NATIVE') {
       throw new BridgeError(
         'native token deposit is not yet supported',
-        BridgeErrorType.UNSUPPORTED_ERROR
+        BridgeErrorType.UNSUPPORTED_ERROR,
       );
     }
 
     if (!ethers.utils.isAddress(req.depositorAddress)) {
       throw new BridgeError(
         `depositor address ${req.depositorAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS
+        BridgeErrorType.INVALID_ADDRESS,
       );
     }
 
     if (!ethers.utils.isAddress(req.recipientAddress)) {
       throw new BridgeError(
         `recipient address ${req.recipientAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS
+        BridgeErrorType.INVALID_ADDRESS,
       );
     }
 
@@ -121,14 +121,14 @@ export class TokenBridge {
     if (req.token !== 'NATIVE' && !ethers.utils.isAddress(req.token)) {
       throw new BridgeError(
         `token address ${req.token} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS
+        BridgeErrorType.INVALID_ADDRESS,
       );
     }
     // The deposit amount cannot be <= 0
     if (req.depositAmount.isNegative() || req.depositAmount.isZero()) {
       throw new BridgeError(
         `deposit amount ${req.depositAmount.toString()} is invalid`,
-        BridgeErrorType.INVALID_AMOUNT
+        BridgeErrorType.INVALID_AMOUNT,
       );
     }
 
@@ -141,24 +141,22 @@ export class TokenBridge {
       async () => {
         const rootERC20PredicateContract = new ethers.Contract(
           this.config.bridgeContracts.rootChainERC20Predicate,
-          RootERC20Predicate
+          RootERC20Predicate,
         );
         return rootERC20PredicateContract;
       },
-      BridgeErrorType.INTERNAL_ERROR
+      BridgeErrorType.INTERNAL_ERROR,
     );
 
     // Encode the function data into a payload
-    const data = await withBridgeError<string>(async () => {
-      return rootERC20PredicateContract.interface.encodeFunctionData(
-        'depositTo',
-        [token, receipient, req.depositAmount]
-      );
-    }, BridgeErrorType.INTERNAL_ERROR);
+    const data = await withBridgeError<string>(async () => rootERC20PredicateContract.interface.encodeFunctionData(
+      'depositTo',
+      [token, receipient, req.depositAmount],
+    ), BridgeErrorType.INTERNAL_ERROR);
 
     return {
       unsignedTx: {
-        data: data,
+        data,
         to: this.config.bridgeContracts.rootChainERC20Predicate,
         value: 0,
         from: depositor,
@@ -190,21 +188,21 @@ export class TokenBridge {
    *   });
    */
   public async getUnsignedApproveBridgeTx(
-    req: ApproveBridgeRequest
+    req: ApproveBridgeRequest,
   ): Promise<ApproveBridgeResponse> {
     // If the token is NATIVE, no approval is required
     if (req.token === 'NATIVE') {
       // When native tokens are supported, change this to return required: false
       throw new BridgeError(
         'native token deposit is not yet supported',
-        BridgeErrorType.UNSUPPORTED_ERROR
+        BridgeErrorType.UNSUPPORTED_ERROR,
       );
     }
 
     if (!ethers.utils.isAddress(req.depositorAddress)) {
       throw new BridgeError(
         `depositor address ${req.depositorAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS
+        BridgeErrorType.INVALID_ADDRESS,
       );
     }
 
@@ -212,7 +210,7 @@ export class TokenBridge {
     if (req.token !== 'NATIVE' && !ethers.utils.isAddress(req.token)) {
       throw new BridgeError(
         `token address ${req.token} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS
+        BridgeErrorType.INVALID_ADDRESS,
       );
     }
 
@@ -220,23 +218,17 @@ export class TokenBridge {
     if (req.depositAmount.isNegative() || req.depositAmount.isZero()) {
       throw new BridgeError(
         `deposit amount ${req.depositAmount.toString()} is invalid`,
-        BridgeErrorType.INVALID_AMOUNT
+        BridgeErrorType.INVALID_AMOUNT,
       );
     }
 
-    const erc20Contract: ethers.Contract =
-      await withBridgeError<ethers.Contract>(async () => {
-        return new ethers.Contract(req.token, ERC20, this.config.rootProvider);
-      }, BridgeErrorType.INTERNAL_ERROR);
+    const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(async () => new ethers.Contract(req.token, ERC20, this.config.rootProvider), BridgeErrorType.INTERNAL_ERROR);
 
     // Get the current approved allowance of the RootERC20Predicate
-    const rootERC20PredicateAllowance: ethers.BigNumber =
-      await withBridgeError<ethers.BigNumber>(async () => {
-        return await erc20Contract.allowance(
-          req.depositorAddress,
-          this.config.bridgeContracts.rootChainERC20Predicate
-        );
-      }, BridgeErrorType.PROVIDER_ERROR);
+    const rootERC20PredicateAllowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(async () => await erc20Contract.allowance(
+      req.depositorAddress,
+      this.config.bridgeContracts.rootChainERC20Predicate,
+    ), BridgeErrorType.PROVIDER_ERROR);
 
     // If the allowance is greater than or equal to the deposit amount, no approval is required
     if (rootERC20PredicateAllowance.gte(req.depositAmount)) {
@@ -247,30 +239,29 @@ export class TokenBridge {
     }
     // Calculate the amount of tokens that need to be approved for deposit
     const approvalAmountRequired = req.depositAmount.sub(
-      rootERC20PredicateAllowance
+      rootERC20PredicateAllowance,
     );
 
     // Encode the approve function call data for the ERC20 contract
-    const data: string = await withBridgeError<string>(async () => {
-      return erc20Contract.interface.encodeFunctionData('approve', [
-        this.config.bridgeContracts.rootChainERC20Predicate,
-        approvalAmountRequired,
-      ]);
-    }, BridgeErrorType.INTERNAL_ERROR);
+    const data: string = await withBridgeError<string>(async () => erc20Contract.interface.encodeFunctionData('approve', [
+      this.config.bridgeContracts.rootChainERC20Predicate,
+      approvalAmountRequired,
+    ]), BridgeErrorType.INTERNAL_ERROR);
 
     // Create the unsigned transaction for the approval
     const unsignedTx: ethers.providers.TransactionRequest = {
-      data: data,
+      data,
       to: req.token,
       value: 0,
       from: req.depositorAddress,
     };
 
     return {
-      unsignedTx: unsignedTx,
+      unsignedTx,
       required: true,
     };
   }
+
   /**
    * Waits for the deposit transaction to be confirmed and synced from the root chain to the child chain.
    *
@@ -292,11 +283,9 @@ export class TokenBridge {
    *   });
    */
   public async waitForDeposit(
-    req: WaitForRequest
+    req: WaitForRequest,
   ): Promise<WaitForResponse> {
-    const rootTxReceipt: ethers.providers.TransactionReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(async () => {
-      return await this.config.rootProvider.waitForTransaction(req.transactionHash, 3)
-    }, BridgeErrorType.PROVIDER_ERROR);
+    const rootTxReceipt: ethers.providers.TransactionReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(async () => await this.config.rootProvider.waitForTransaction(req.transactionHash, 3), BridgeErrorType.PROVIDER_ERROR);
 
     // Throw an error if the transaction was reverted
     if (rootTxReceipt.status !== 1) {
@@ -304,62 +293,59 @@ export class TokenBridge {
     }
 
     // Get the state sync ID from the transaction receipt
-    const stateSyncID = await withBridgeError<string>(async () => {
-      return await this.getRootStateSyncID(rootTxReceipt);
-    }, BridgeErrorType.PROVIDER_ERROR)
+    const stateSyncID = await withBridgeError<string>(async () => this.getRootStateSyncID(rootTxReceipt), BridgeErrorType.PROVIDER_ERROR);
 
-    const result: CompletionStatus = await withBridgeError<CompletionStatus>(async () => {
-      return await this.waitForChildStateSync(stateSyncID, 10000);
-    }, BridgeErrorType.PROVIDER_ERROR);
+    const result: CompletionStatus = await withBridgeError<CompletionStatus>(async () => this.waitForChildStateSync(stateSyncID, 10000), BridgeErrorType.PROVIDER_ERROR);
 
     return {
       status: result,
     };
   }
-  private async waitForChildStateSync(    
-    stateSyncID: string,
-    interval: number) : Promise<CompletionStatus> {
-      const childStateReceiver = new ethers.Contract(this.config.bridgeContracts.childChainStateReceiver, ChildStateReceiver, this.config.childProvider);
 
-      // Set up an event filter for the StateSyncResult event
-      const eventFilter = childStateReceiver.filters["StateSyncResult"]();
-  
-      let childDepositEvent;
-      while (true) {  
-        // Query for past events that match the event filter
-        const pastEvents = await childStateReceiver.queryFilter(eventFilter);
-        childDepositEvent = pastEvents.find((ev) => {
-          if (!ev.args) return false;
-          if (!ev.args.counter) return false;
-          return (ev.args.counter.toString() === stateSyncID) 
-        });
-        if (childDepositEvent) {
-          break;
-        }
-        await new Promise((resolve) => setTimeout(resolve, interval));
+  private async waitForChildStateSync(
+    stateSyncID: string,
+    interval: number,
+  ) : Promise<CompletionStatus> {
+    const childStateReceiver = new ethers.Contract(this.config.bridgeContracts.childChainStateReceiver, ChildStateReceiver, this.config.childProvider);
+
+    // Set up an event filter for the StateSyncResult event
+    const eventFilter = childStateReceiver.filters.StateSyncResult();
+
+    let childDepositEvent;
+    while (true) {
+      // Query for past events that match the event filter
+      const pastEvents = await childStateReceiver.queryFilter(eventFilter);
+      childDepositEvent = pastEvents.find((ev) => {
+        if (!ev.args) return false;
+        if (!ev.args.counter) return false;
+        return (ev.args.counter.toString() === stateSyncID);
+      });
+      if (childDepositEvent) {
+        break;
       }
-      if (!childDepositEvent) throw new Error("failed to find child deposit event");
-      if (!childDepositEvent.args) throw new Error("child deposit event has no args");
-      if (!childDepositEvent.args.status) throw new Error("child deposit event has no status")
-      if (childDepositEvent.args.status) {
-        return CompletionStatus.SUCCESS
-      } else {
-        return CompletionStatus.FAILED
-      }
+      await new Promise((resolve) => setTimeout(resolve, interval));
+    }
+    if (!childDepositEvent) throw new Error('failed to find child deposit event');
+    if (!childDepositEvent.args) throw new Error('child deposit event has no args');
+    if (!childDepositEvent.args.status) throw new Error('child deposit event has no status');
+    if (childDepositEvent.args.status) {
+      return CompletionStatus.SUCCESS;
+    }
+    return CompletionStatus.FAILED;
   }
 
   private async getRootStateSyncID(txReceipt: ethers.providers.TransactionReceipt): Promise<string> {
     const stateSenderInterface = new ethers.utils.Interface(RootStateSender);
 
     // Get the StateSynced event log from the transaction receipt
-    const stateSenderLogs = txReceipt.logs.filter((log) => log.address.toLowerCase() == this.config.bridgeContracts.rootChainStateSender.toLowerCase())
+    const stateSenderLogs = txReceipt.logs.filter((log) => log.address.toLowerCase() == this.config.bridgeContracts.rootChainStateSender.toLowerCase());
     if (stateSenderLogs.length !== 1) {
       throw new Error(`expected at least 1 log in tx ${txReceipt.transactionHash}`);
     }
     const stateSyncEvent = stateSenderInterface.parseLog(stateSenderLogs[0]);
 
     // Throw an error if the event log doesn't match the expected format
-    if (stateSyncEvent.signature !== "StateSynced(uint256,address,address,bytes)") {
+    if (stateSyncEvent.signature !== 'StateSynced(uint256,address,address,bytes)') {
       throw new Error(`expected state sync event in tx ${txReceipt.transactionHash}`);
     }
 
@@ -369,7 +355,7 @@ export class TokenBridge {
   }
 
   private async getFeeForToken(
-    token: FungibleToken
+    token: FungibleToken,
   ): Promise<ethers.BigNumber> {
     return ethers.BigNumber.from(0);
   }

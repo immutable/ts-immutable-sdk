@@ -14,7 +14,7 @@ import {
  * Represents the configuration for a bridge between two chains.
  */
 export class BridgeConfiguration {
-    /**
+  /**
    * @property {ImmutableConfiguration} baseConfig - The base configuration for the module.
    * @property {BridgeInstance} bridgeInstance - The bridge instance configuration for the root and child chains.
    * @property {BridgeContracts} bridgeContracts - The configuration of the contracts associated with the bridge.
@@ -22,11 +22,15 @@ export class BridgeConfiguration {
    * @property {ethers.providers.Provider} childProvider - The Ethereum provider for the child chain.
    */
   public baseConfig: ImmutableConfiguration;
+
   public bridgeInstance: BridgeInstance;
+
   public bridgeContracts: BridgeContracts;
+
   public rootProvider: ethers.providers.Provider;
+
   public childProvider: ethers.providers.Provider;
-  
+
   /**
    * Constructs a BridgeConfiguration instance.
    *
@@ -49,24 +53,23 @@ export class BridgeConfiguration {
       return;
     }
 
-    const supported =
-      SupportedBridgesForEnvironment[baseConfig.environment].includes(
-        bridgeInstance
-      );
+    const supported = SupportedBridgesForEnvironment[baseConfig.environment].includes(
+      bridgeInstance,
+    );
     if (!supported) {
       throw new Error(
-        `Bridge instance with rootchain ${bridgeInstance.rootChainID} and childchain ${bridgeInstance.childChainID} is not supported in environment ${baseConfig.environment}`
+        `Bridge instance with rootchain ${bridgeInstance.rootChainID} and childchain ${bridgeInstance.childChainID} is not supported in environment ${baseConfig.environment}`,
       );
     }
     if (!ContractsForBridge.has(bridgeInstance)) {
       throw new Error(
-        `Bridge instance with rootchain ${bridgeInstance.rootChainID} and childchain ${bridgeInstance.childChainID} is not supported in environment ${baseConfig.environment}`
+        `Bridge instance with rootchain ${bridgeInstance.rootChainID} and childchain ${bridgeInstance.childChainID} is not supported in environment ${baseConfig.environment}`,
       );
     }
     const bridgeContracts = ContractsForBridge.get(bridgeInstance);
     if (!bridgeContracts) {
       throw new Error(
-        `Bridge instance with rootchain ${bridgeInstance.rootChainID} and childchain ${bridgeInstance.childChainID} is not supported in environment ${baseConfig.environment}`
+        `Bridge instance with rootchain ${bridgeInstance.rootChainID} and childchain ${bridgeInstance.childChainID} is not supported in environment ${baseConfig.environment}`,
       );
     }
     this.bridgeContracts = bridgeContracts;
