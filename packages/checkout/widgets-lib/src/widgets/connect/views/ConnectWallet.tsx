@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import { Body, Box } from '@biom3/react';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -5,13 +6,22 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { WalletList } from '../components/WalletList';
+import { ConnectContext } from '../context/ConnectContext';
 
 export const ConnectWallet = () => {
   const { header, body } = text.views[ConnectWidgetViews.CONNECT_WALLET];
+  const {
+    connectState: { sendCloseEvent },
+  } = useContext(ConnectContext);
   return (
     <SimpleLayout
       testId="connect-wallet"
-      header={<HeaderNavigation title={header.title} />}
+      header={
+        <HeaderNavigation
+          title={header.title}
+          onCloseButtonClick={sendCloseEvent}
+        />
+      }
       footer={<FooterLogo />}
     >
       <Box
