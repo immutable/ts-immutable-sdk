@@ -1,21 +1,22 @@
-import { Environment } from '@imtbl/config';
+import { Environment, ImmutableConfiguration, ModuleConfiguration } from '@imtbl/config';
 import { NetworkDetails, NetworkMap, ProductionChainIdNetworkMap, SandboxChainIdNetworkMap } from '../types';
 
-export interface CheckoutConfig {
-  environment: Environment
+
+export interface CheckoutOverrides{}
+export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {
 }
 
 export class CheckoutConfiguration {
   readonly environment: Environment;
   readonly networkMap: NetworkMap;
 
-  constructor(config: CheckoutConfig) {
+  constructor(config: CheckoutModuleConfiguration) {
     // validate input
-    if(!Object.values(Environment).includes(config.environment)){
+    if(!Object.values(Environment).includes(config.baseConfig.environment)){
       throw new CheckoutConfigurtionError("Invalid checkout configuration of environment");
     }
-    this.environment = config.environment;
-    this.networkMap = config.environment === Environment.PRODUCTION 
+    this.environment = config.baseConfig.environment;
+    this.networkMap = config.baseConfig.environment === Environment.PRODUCTION 
     ? ProductionChainIdNetworkMap 
     : SandboxChainIdNetworkMap;
   }

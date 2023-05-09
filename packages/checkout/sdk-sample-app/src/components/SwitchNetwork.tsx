@@ -2,13 +2,11 @@ import { Checkout, ChainId, NetworkInfo } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import LoadingButton from './LoadingButton';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box } from '@biom3/react';
-import { Environment } from '@imtbl/config';
 import { NetworkFilterTypes } from '@imtbl/checkout-sdk';
 
 export interface SwitchNetworkProps {
-  environment: Environment;
   checkout: Checkout | undefined;
   provider: Web3Provider | undefined;
   setProvider: (provider: Web3Provider) => void;
@@ -37,10 +35,18 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
       });
 
       setAvailableNetworks(result.networks);
+
+      // reset state wehn checkout changes from environment switch
+      setResult(undefined);
+      setError(null);
+      setLoading(false);
+      setResultNetInfo(undefined);
+      setErrorNetInfo(null);
+      setLoadingNetInfo(false);
     }
 
     getNetworks();
-  }, [checkout, props.environment]);
+  }, [checkout]);
 
   async function switchNetwork(chainId: ChainId) {
     if (!checkout) {

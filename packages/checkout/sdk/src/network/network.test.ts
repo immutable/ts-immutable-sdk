@@ -11,7 +11,6 @@ import {
 import {
   ChainId,
   ProductionChainIdNetworkMap,
-  SandboxChainIdNetworkMap,
   ConnectionProviders,
   NetworkFilterTypes,
   WALLET_ACTION,
@@ -19,6 +18,8 @@ import {
 import { connectWalletProvider } from '../connect';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { Web3Provider } from '@ethersproject/providers';
+import { CheckoutConfiguration } from '../config';
+import { Environment } from '@imtbl/config';
 
 let windowSpy: any;
 const providerMock = {
@@ -48,6 +49,7 @@ jest.mock('@ethersproject/providers', () => ({
 }));
 
 describe('network functions', () => {
+  const testCheckoutConfiguration = new CheckoutConfiguration({baseConfig: {environment: Environment.PRODUCTION}});
   describe('switchWalletNetwork()', () => {
     beforeEach(() => {
       windowSpy = jest.spyOn(window, 'window', 'get');
@@ -75,7 +77,7 @@ describe('network functions', () => {
       });
 
       const switchNetworkResult = await switchWalletNetwork(
-        ProductionChainIdNetworkMap,
+        testCheckoutConfiguration,
         ConnectionProviders.METAMASK,
         provider,
         ChainId.ETHEREUM
@@ -118,7 +120,7 @@ describe('network functions', () => {
       });
 
       const switchNetworkResult = await switchWalletNetwork(
-        ProductionChainIdNetworkMap,
+        testCheckoutConfiguration,
         ConnectionProviders.METAMASK,
         provider,
         ChainId.POLYGON
@@ -128,7 +130,7 @@ describe('network functions', () => {
         method: WALLET_ACTION.SWITCH_NETWORK,
         params: [
           {
-            chainId: ProductionChainIdNetworkMap.get(ChainId.POLYGON)?.chainIdHex,
+            chainId: testCheckoutConfiguration.networkMap.get(ChainId.POLYGON)?.chainIdHex,
           },
         ],
       });
@@ -155,7 +157,7 @@ describe('network functions', () => {
 
       await expect(
         switchWalletNetwork(
-          ProductionChainIdNetworkMap,
+          testCheckoutConfiguration,
           ConnectionProviders.METAMASK,
           provider,
           56 as ChainId
@@ -190,7 +192,7 @@ describe('network functions', () => {
 
       await expect(
         switchWalletNetwork(
-          ProductionChainIdNetworkMap,
+          testCheckoutConfiguration,
           ConnectionProviders.METAMASK,
           provider,
           ChainId.POLYGON
@@ -220,7 +222,7 @@ describe('network functions', () => {
 
       await expect(
         switchWalletNetwork(
-          ProductionChainIdNetworkMap,
+          testCheckoutConfiguration,
           ConnectionProviders.METAMASK,
           provider,
           ChainId.POLYGON
@@ -256,7 +258,7 @@ describe('network functions', () => {
       });
 
       await switchWalletNetwork(
-        ProductionChainIdNetworkMap,
+        testCheckoutConfiguration,
         ConnectionProviders.METAMASK,
         provider,
         ChainId.POLYGON
@@ -266,12 +268,12 @@ describe('network functions', () => {
         method: WALLET_ACTION.ADD_NETWORK,
         params: [
           {
-            chainId: ProductionChainIdNetworkMap.get(ChainId.POLYGON)?.chainIdHex,
-            chainName: ProductionChainIdNetworkMap.get(ChainId.POLYGON)?.chainName,
-            rpcUrls: ProductionChainIdNetworkMap.get(ChainId.POLYGON)?.rpcUrls,
-            nativeCurrency: ProductionChainIdNetworkMap.get(ChainId.POLYGON)?.nativeCurrency,
+            chainId: testCheckoutConfiguration.networkMap.get(ChainId.POLYGON)?.chainIdHex,
+            chainName: testCheckoutConfiguration.networkMap.get(ChainId.POLYGON)?.chainName,
+            rpcUrls: testCheckoutConfiguration.networkMap.get(ChainId.POLYGON)?.rpcUrls,
+            nativeCurrency: testCheckoutConfiguration.networkMap.get(ChainId.POLYGON)?.nativeCurrency,
             blockExplorerUrls:
-              ProductionChainIdNetworkMap.get(ChainId.POLYGON)?.blockExplorerUrls,
+            testCheckoutConfiguration.networkMap.get(ChainId.POLYGON)?.blockExplorerUrls,
           },
         ],
       });
@@ -300,7 +302,7 @@ describe('network functions', () => {
           getNetwork: getNetworkMock,
         };
         const result = await getNetworkInfo(
-          ProductionChainIdNetworkMap,
+          testCheckoutConfiguration,
           mockProvider as unknown as Web3Provider
         );
         expect(result.name).toBe(ProductionChainIdNetworkMap.get(testCase.chainId)?.chainName);
@@ -322,7 +324,7 @@ describe('network functions', () => {
         getNetwork: getNetworkMock,
       };
       const result = await getNetworkInfo(
-        ProductionChainIdNetworkMap,
+        testCheckoutConfiguration,
         mockProvider as unknown as Web3Provider
       );
       expect(result).toEqual({
@@ -336,7 +338,7 @@ describe('network functions', () => {
   describe('getNetworkAllowList()', () => {
     it('should return all the networks if no exclude filter is provided', async () => {
       await expect(
-        await getNetworkAllowList(ProductionChainIdNetworkMap, { type: NetworkFilterTypes.ALL })
+        await getNetworkAllowList(testCheckoutConfiguration, { type: NetworkFilterTypes.ALL })
       ).toEqual({
         networks: [
           {
@@ -365,7 +367,7 @@ describe('network functions', () => {
 
     it('should exclude the right networks if an exclude filter is provided', async () => {
       await expect(
-        await getNetworkAllowList(ProductionChainIdNetworkMap, {
+        await getNetworkAllowList(testCheckoutConfiguration, {
           type: NetworkFilterTypes.ALL,
           exclude: [{ chainId: 137 }],
         })

@@ -37,6 +37,13 @@ export default function Connect(props: ConnectProps) {
     }
   }
 
+  useEffect(() => {
+    // reset state wehn checkout changes from environment switch
+    setResult(undefined);
+    setError(null);
+    setLoading(false);
+  }, [checkout]);
+
   return (
     <div>
       <LoadingButton onClick={connectClick} loading={loading}>

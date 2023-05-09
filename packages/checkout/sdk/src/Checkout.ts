@@ -28,13 +28,13 @@ import {
   SwitchNetworkResult,
 } from './types';
 import { CheckoutError, CheckoutErrorType } from './errors';
-import { CheckoutConfig, CheckoutConfiguration } from './config';
+import { CheckoutModuleConfiguration, CheckoutConfiguration } from './config';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
   private providerPreference: ConnectionProviders | undefined;
 
-  constructor(config: CheckoutConfig) {
+  constructor(config: CheckoutModuleConfiguration) {
     this.config = new CheckoutConfiguration(config);
   }
 

@@ -13,7 +13,7 @@ import { Environment } from '@imtbl/config';
 export default function ConnectWidget() {
   const [environment, setEnvironment] = useState(Environment.PRODUCTION);
   const checkout = useMemo(() => {
-    return new Checkout({ environment: environment });
+    return new Checkout({ baseConfig: { environment: environment } });
   }, [environment]);
   const [provider, setProvider] = useState<Web3Provider>();
 
@@ -43,7 +43,7 @@ export default function ConnectWidget() {
       >
         Toggle Checkout Environment
       </Divider>
-      <Heading size="small">Environment: {environment.toUpperCase()}</Heading>
+      <Heading size="xSmall">Environment: {environment.toUpperCase()}</Heading>
       <Toggle
         checked={environment === Environment.PRODUCTION}
         onChange={toggleEnvironment}
@@ -78,7 +78,6 @@ export default function ConnectWidget() {
         Switch network
       </Divider>
       <SwitchNetwork
-        environment={environment}
         checkout={checkout}
         provider={provider}
         setProvider={setProvider}

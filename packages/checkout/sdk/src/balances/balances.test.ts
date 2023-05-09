@@ -12,6 +12,8 @@ import {
 } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import * as tokens from '../tokens';
+import { CheckoutConfiguration } from '../config';
+import { Environment } from '@imtbl/config';
 
 jest.mock('../tokens');
 jest.mock('ethers', () => {
@@ -22,6 +24,7 @@ jest.mock('ethers', () => {
 });
 
 describe('balances', () => {
+  const testCheckoutConfig = new CheckoutConfiguration({baseConfig: {environment: Environment.PRODUCTION}})
   const currentBalance = BigNumber.from('1000000000000000000');
   const formattedBalance = '1.0';
   const mockGetBalance = jest.fn().mockResolvedValue(currentBalance);
@@ -54,7 +57,7 @@ describe('balances', () => {
   describe('getBalance()', () => {
     it('should call getBalance() on provider and return the balance', async () => {
       const balanceResult = await getBalance(
-        ProductionChainIdNetworkMap,
+        testCheckoutConfig,
         mockProvider() as unknown as Web3Provider,
         '0xAddress'
       );
@@ -72,7 +75,7 @@ describe('balances', () => {
         };
       });
 
-      await expect(getBalance(ProductionChainIdNetworkMap, mockProvider(), '0xAddress')).rejects.toThrow(
+      await expect(getBalance(testCheckoutConfig, mockProvider(), '0xAddress')).rejects.toThrow(
         new CheckoutError(
           '[GET_BALANCE_ERROR] Cause:Error getting balance',
           CheckoutErrorType.GET_BALANCE_ERROR
@@ -93,7 +96,7 @@ describe('balances', () => {
         };
       });
 
-      await expect(getBalance(ProductionChainIdNetworkMap, mockProvider(), '0xAddress')).rejects.toThrow(
+      await expect(getBalance(testCheckoutConfig, mockProvider(), '0xAddress')).rejects.toThrow(
         new CheckoutError(
           '[GET_BALANCE_ERROR] Cause:Chain:0 is not a supported chain',
           CheckoutErrorType.GET_BALANCE_ERROR
@@ -254,7 +257,7 @@ describe('balances', () => {
 
     it('should call getBalance and getERC20Balance functions', async () => {
       const getAllBalancesResult = await getAllBalances(
-        ProductionChainIdNetworkMap,
+        testCheckoutConfig,
         mockProviderForAllBalances() as unknown as Web3Provider,
         'abc123',
         ChainId.ETHEREUM
