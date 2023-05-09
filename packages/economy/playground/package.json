@@ -14,6 +14,8 @@
     "@parcel/transformer-sass": "2.8.3",
     "@parcel/transformer-typescript-tsc": "^2.8.3",
     "assert": "^2.0.0",
+    "bulma": "^0.9.4",
+    "bulma-list": "^1.2.0",
     "lit": "^2.7.2",
     "parcel": "^2.8.3",
     "parcel-bundler": "^1.12.3",
@@ -26,12 +28,11 @@
   },
   "license": "Apache-2.0",
   "scripts": {
-    "lint": "npx eslint ./src --ext .ts --max-warnings=0",
     "build": "npm run setup && npm run build:app",
     "build:app": "parcel build src/*.html --public-url ./",
     "clean": "rimraf ./dist ./.cache",
     "prestart": "[ -f public/js/imtbl-checkout-widgets.js ] || { echo 'Error: checkout-widgets deps not found. Please run `npm run setup` first.' ; exit 1; }",
-    "setup": "npm run clean && yarn workspace @imtbl/checkout-widgets-lib build && yarn workspace @imtbl/checkout-widgets-lib dist:sdk && cp ../../../sdk/dist/browser/checkout.js public/js/imtbl-checkout-widgets.js",
+    "setup": "npm run clean && yarn workspace @imtbl/economy build && yarn workspace @imtbl/checkout-widgets-lib build && yarn workspace @imtbl/checkout-widgets-lib dist:sdk && cp ../../../sdk/dist/browser/checkout.js public/js/imtbl-checkout-widgets.js",
     "start": "npm run prestart && parcel src/*.html -p 4200"
   },
   "source": "index.html"
