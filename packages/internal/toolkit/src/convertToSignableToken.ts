@@ -23,6 +23,7 @@ export function convertToSignableToken(token: TokenAmount): SignableToken {
         },
       };
     case 'ETH':
+    default:
       return {
         type: 'ETH',
         data: {
