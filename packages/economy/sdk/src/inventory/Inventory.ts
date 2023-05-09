@@ -72,6 +72,8 @@ export class Inventory {
       '@@@@@@@@@ economy/sdk/src/inventory/Inventory.ts getItems',
       userId
     );
+    this.emitEvent({ status: 'STARTED', action: 'INVENTORY' });
+
     // 1. fetch assets from BE
     // this.emitEvent({ status: 'SUBMITTED', action: 'Assets' });
     const { data, status } = await this.inventoryService.getItems({ userId });
