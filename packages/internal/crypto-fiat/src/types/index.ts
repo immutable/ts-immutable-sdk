@@ -25,7 +25,7 @@ export type FiatConversion = {
 
 /**
  * Type representing the return value of the conversion function.
- * @property {Map<string, FiatConversion>} - Conversion rates of all the cryptocurrency
- *                                           to all the fiat currencies.
+ * @property { [tokenSymbol: string]: FiatConversion } - Conversion rates of all the cryptocurrency
+ *                                               to all the fiat currencies.
  */
-export type CryptoFiatConvertReturn = Map<string, FiatConversion>;
+export type CryptoFiatConvertReturn = { [tokenSymbol: string]: FiatConversion };

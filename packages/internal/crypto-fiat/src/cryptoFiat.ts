@@ -1,10 +1,6 @@
 import axios from 'axios';
 import { CryptoFiatConfiguration } from 'config';
-import {
-  CryptoFiatConvertParams,
-  CryptoFiatConvertReturn,
-  FiatConversion,
-} from 'types';
+import { CryptoFiatConvertParams, CryptoFiatConvertReturn } from 'types';
 
 const COINGECKO_API_BASE_URL = 'https://api.coingecko.com/api/v3';
 const COINGECKO_API_PRO_BASE_URL = 'https://pro-api.coingecko.com/api/v3';
@@ -42,7 +38,7 @@ export class CryptoFiat {
 
     if (response.status !== 200) {
       throw new Error(
-        `Error fetching coin list: ${response.status} ${response.statusText}`,
+        `Error fetching coin list: ${response.status} ${response.statusText}`
       );
     }
 
@@ -75,23 +71,24 @@ export class CryptoFiat {
       .map((s) => this.cache!.get(s.toUpperCase()))
       .join(',');
     const url = this.withApiKey(
-      `/simple/price?ids=${ids}&vs_currencies=${DEFAULT_FIAT_SYMBOL}`,
+      `/simple/price?ids=${ids}&vs_currencies=${DEFAULT_FIAT_SYMBOL}`
     );
 
     const response = await axios.get(url);
-
     if (response.status !== 200) {
       throw new Error(
-        `Error fetching prices: ${response.status} ${response.statusText}`,
+        `Error fetching prices: ${response.status} ${response.statusText}`
       );
     }
 
     const { data } = response;
 
-    const result = new Map<string, FiatConversion>();
+    const result: CryptoFiatConvertReturn = {};
     for (const symbol of tokenSymbols) {
-      const id = this.cache!.get(symbol.toUpperCase());
-      id ? result.set(symbol, data[id] || {}) : result.set(symbol, {});
+      const symbolKey = symbol.toUpperCase();
+      const coinId = this.cache!.get(symbolKey);
+      result[symbolKey] = {};
+      if (coinId) result[symbolKey] = data[coinId] || {};
     }
 
     return result;
