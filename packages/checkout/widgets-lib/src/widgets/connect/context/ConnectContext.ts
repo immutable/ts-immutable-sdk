@@ -6,12 +6,14 @@ export interface ConnectState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
   providerPreference: ConnectionProviders | null;
+  sendCloseEvent: () => void;
 }
 
 export const initialConnectState: ConnectState = {
   checkout: null,
   provider: null,
   providerPreference: null,
+  sendCloseEvent: () => {},
 };
 
 export interface ConnectContextState {
@@ -26,12 +28,14 @@ export interface ConnectAction {
 type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
-  | SetProviderPreferencePayload;
+  | SetProviderPreferencePayload
+  | SetSendCloseEventPayload;
 
 export enum ConnectActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
+  SET_SEND_CLOSE_EVENT = 'SET_SEND_CLOSE_EVENT',
 }
 
 export interface SetCheckoutPayload {
@@ -47,6 +51,11 @@ export interface SetProviderPayload {
 export interface SetProviderPreferencePayload {
   type: ConnectActions.SET_PROVIDER_PREFERENCE;
   providerPreference: ConnectionProviders;
+}
+
+export interface SetSendCloseEventPayload {
+  type: ConnectActions.SET_SEND_CLOSE_EVENT;
+  sendCloseEvent: () => void;
 }
 
 export const ConnectContext = createContext<ConnectContextState>({
@@ -75,6 +84,11 @@ export const connectReducer: Reducer<ConnectState, ConnectAction> = (
       return {
         ...state,
         providerPreference: action.payload.providerPreference,
+      };
+    case ConnectActions.SET_SEND_CLOSE_EVENT:
+      return {
+        ...state,
+        sendCloseEvent: action.payload.sendCloseEvent,
       };
     default:
       return state;

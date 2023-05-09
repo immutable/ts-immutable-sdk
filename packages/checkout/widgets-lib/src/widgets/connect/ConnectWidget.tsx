@@ -28,10 +28,13 @@ import { SuccessView } from '../../components/Success/SuccessView';
 import { ReadyToConnect } from './views/ReadyToConnect';
 import { SwitchNetwork } from './views/SwitchNetwork';
 import { LoadingView } from '../../components/Loading/LoadingView';
+import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
   theme: WidgetTheme;
+  deepLink?: ConnectWidgetViews.CONNECT_WALLET;
+  sendCloseEventOverride?: () => void;
 }
 
 export interface ConnectWidgetParams {
@@ -39,12 +42,14 @@ export interface ConnectWidgetParams {
 }
 
 export function ConnectWidget(props: ConnectWidgetProps) {
-  const { theme } = props;
+  const { theme, deepLink, sendCloseEventOverride } = props;
   const [connectState, connectDispatch] = useReducer(
     connectReducer,
     initialConnectState
   );
+  const { sendCloseEvent } = connectState;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+  const { view } = viewState;
 
   const biomeTheme: BaseTokens =
     theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
@@ -60,16 +65,23 @@ export function ConnectWidget(props: ConnectWidgetProps) {
         },
       });
 
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_SEND_CLOSE_EVENT,
+          sendCloseEvent: sendCloseEventOverride ?? sendCloseWidgetEvent,
+        },
+      });
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: ConnectWidgetViews.CONNECT_WALLET,
+            type: deepLink ?? ConnectWidgetViews.CONNECT_WALLET,
           },
         },
       });
     }, 200);
-  }, []);
+  }, [deepLink, sendCloseEventOverride]);
 
   useEffect(() => {
     switch (viewState.view.type) {
@@ -84,29 +96,29 @@ export function ConnectWidget(props: ConnectWidgetProps) {
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         <ConnectContext.Provider value={{ connectState, connectDispatch }}>
           <>
-            {viewState.view.type === BaseViews.LOADING_VIEW && (
+            {view.type === BaseViews.LOADING_VIEW && (
               <LoadingView loadingText={'Connecting'} />
             )}
-            {viewState.view.type === ConnectWidgetViews.CONNECT_WALLET && (
+            {view.type === ConnectWidgetViews.CONNECT_WALLET && (
               <ConnectWallet />
             )}
-            {viewState.view.type === ConnectWidgetViews.READY_TO_CONNECT && (
+            {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
               <ReadyToConnect />
             )}
-            {viewState.view.type === ConnectWidgetViews.SUCCESS && (
-              <SuccessView
-                successText="Connection secure"
-                actionText="Continue"
-                successEventAction={() =>
-                  sendConnectSuccessEvent(ConnectionProviders.METAMASK)
-                }
-                onActionClick={() => sendCloseWidgetEvent()}
-              />
+            {view.type === ConnectWidgetViews.SUCCESS && (
+              <ConnectLoaderSuccess>
+                <SuccessView
+                  successText="Connection secure"
+                  actionText="Continue"
+                  successEventAction={() =>
+                    sendConnectSuccessEvent(ConnectionProviders.METAMASK)
+                  }
+                  onActionClick={() => sendCloseEvent()}
+                />
+              </ConnectLoaderSuccess>
             )}
-            {viewState.view.type === ConnectWidgetViews.FAIL && (
-              <ConnectResult />
-            )}
-            {viewState.view.type === ConnectWidgetViews.SWITCH_NETWORK && (
+            {view.type === ConnectWidgetViews.FAIL && <ConnectResult />}
+            {view.type === ConnectWidgetViews.SWITCH_NETWORK && (
               <SwitchNetwork />
             )}
           </>

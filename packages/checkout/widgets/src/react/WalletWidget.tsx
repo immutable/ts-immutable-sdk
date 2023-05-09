@@ -11,6 +11,7 @@ import {
  */
 export interface WalletReactProps {
   providerPreference?: WidgetConnectionProviders;
+  useConnectWidget?: boolean;
   isOnRampEnabled?: boolean;
   isSwapEnabled?: boolean;
   isBridgeEnabled?: boolean;
@@ -24,6 +25,7 @@ export interface WalletReactProps {
 export function WalletReact(props: WalletReactProps) {
   const {
     providerPreference,
+    useConnectWidget,
     isBridgeEnabled,
     isOnRampEnabled,
     isSwapEnabled,
@@ -39,6 +41,7 @@ export function WalletReact(props: WalletReactProps) {
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }
       theme={config.theme ?? WidgetTheme.DARK}
+      useConnectWidget={useConnectWidget?.toString()}
       isBridgeEnabled={isBridgeEnabled?.toString()}
       isSwapEnabled={isSwapEnabled?.toString()}
       isOnRampEnabled={isOnRampEnabled?.toString()}
