@@ -1,5 +1,5 @@
 {
-  "name": "@imtbl/crypto-fiat",
+  "name": "@imtbl/cryptofiat",
   "description": "Crypto to Fiat SDK powered by Coingecko",
   "version": "0.0.0",
   "author": "Immutable",
