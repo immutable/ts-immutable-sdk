@@ -8,6 +8,7 @@ export enum ChainId {
   ETHEREUM = 1,
   GOERLI = 5,
   POLYGON = 137,
+  POLYGON_ZKEVM_TESTNET = 1442
   // zkEVM = 'zkEVM'
 }
 
@@ -88,6 +89,17 @@ export const SandboxChainIdNetworkMap: NetworkMap = new Map<ChainId, NetworkDeta
       decimals: 18,
     },
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
+  }],
+  [ChainId.POLYGON_ZKEVM_TESTNET, {
+    chainIdHex: '0x5A2',
+    chainName: 'Polygon zkEVM Testnet',
+    rpcUrls: ['https://rpc.public.zkevm-test.net'],
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    blockExplorerUrls: ['https://testnet-zkevm.polygonscan.com']
   }]
 ])
 
