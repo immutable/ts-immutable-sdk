@@ -1,3 +1,5 @@
+// TODO: Fix dependency error
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, it } from '@jest/globals';
 import { ethers } from 'ethers';
 import { Percent, TradeType } from '@uniswap/sdk-core';
@@ -12,7 +14,7 @@ describe('getAmountWithSlippageImpact', () => {
       const result = getAmountWithSlippageImpact(
         TradeType.EXACT_INPUT,
         amountInWei,
-        DEFAULT_SLIPPAGE
+        DEFAULT_SLIPPAGE,
       );
 
       const formattedResult = ethers.utils.formatEther(result);
@@ -28,7 +30,7 @@ describe('getAmountWithSlippageImpact', () => {
         const result = getAmountWithSlippageImpact(
           TradeType.EXACT_INPUT,
           amountInWei,
-          ZERO_PERCENT
+          ZERO_PERCENT,
         );
 
         const formattedResult = ethers.utils.formatEther(result);
@@ -45,7 +47,7 @@ describe('getAmountWithSlippageImpact', () => {
       const result = getAmountWithSlippageImpact(
         TradeType.EXACT_OUTPUT,
         amountOutWei,
-        DEFAULT_SLIPPAGE
+        DEFAULT_SLIPPAGE,
       );
 
       const formattedResult = ethers.utils.formatEther(result);
@@ -61,7 +63,7 @@ describe('getAmountWithSlippageImpact', () => {
         const result = getAmountWithSlippageImpact(
           TradeType.EXACT_OUTPUT,
           amountOutWei,
-          ZERO_PERCENT
+          ZERO_PERCENT,
         );
 
         const formattedResult = ethers.utils.formatEther(result);

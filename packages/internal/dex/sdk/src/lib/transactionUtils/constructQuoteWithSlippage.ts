@@ -1,12 +1,14 @@
-import { Amount, QuoteTradeInfo, TokenInfo } from '../../types';
-import { Currency, Percent, Token, TradeType } from '@uniswap/sdk-core';
+import {
+  Currency, Percent, Token, TradeType,
+} from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
+import { Amount, QuoteTradeInfo, TokenInfo } from '../../types';
 
 export function constructQuoteWithSlippage(
   otherCurrency: Currency,
   tradeType: TradeType,
   tradeInfo: QuoteTradeInfo,
-  slippagePercent: Percent
+  slippagePercent: Percent,
 ): { quote: Amount; quoteWithMaxSlippage: Amount } {
   let quote: Amount;
   let quoteWithMaxSlippage: Amount;
@@ -32,12 +34,15 @@ export function constructQuoteWithSlippage(
     };
   }
 
+  // TODO: Fix no use before defined error
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const amountWithSlippageImpact = getAmountWithSlippageImpact(
     tradeType,
     quote.amount,
-    slippagePercent
+    slippagePercent,
   );
 
+  // eslint-disable-next-line prefer-const
   quoteWithMaxSlippage = {
     token: tokenInfo,
     amount: amountWithSlippageImpact,
@@ -52,7 +57,7 @@ export function constructQuoteWithSlippage(
 export function getAmountWithSlippageImpact(
   tradeType: TradeType,
   amount: ethers.BigNumberish,
-  slippagePercent: Percent
+  slippagePercent: Percent,
 ): ethers.BigNumberish {
   if (slippagePercent.numerator.toString() === '0') {
     return amount;
