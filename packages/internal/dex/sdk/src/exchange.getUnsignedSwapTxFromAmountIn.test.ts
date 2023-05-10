@@ -1,4 +1,3 @@
-import { describe, it } from '@jest/globals';
 import { Exchange } from './exchange';
 import { Percent, TradeType } from '@uniswap/sdk-core';
 import {
@@ -9,6 +8,7 @@ import {
   TestDexConfiguration,
 } from './utils/testUtils';
 import * as utils from './lib/utils';
+import { Router } from "./lib/router";
 import { ExchangeConfiguration } from 'config';
 
 jest.mock('./lib/router');
@@ -25,6 +25,36 @@ const exactInputSingleSignature = '0x04e45aaf';
 const DEFAULT_SLIPPAGE: Percent = new Percent(1, 1000); // 1/1000 = 0.001 = 0.1%
 
 describe('getUnsignedSwapTxFromAmountIn', () => {
+  describe('When no route found', () => {
+    it('Returns NO_ROUTE_FOUND', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+
+      (Router as unknown as jest.Mock).mockImplementationOnce(() => {
+        return {
+          findOptimalRoute: () => {
+            return {
+              success: false,
+              trade: undefined,
+            };
+          },
+        };
+      });
+
+      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const exchange = new Exchange(configuration);
+      const tx = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountIn
+      );
+
+      expect(tx.info).toBe(undefined);
+      expect(tx.transaction).toBe(undefined);
+      expect(tx.success).toBe(false);
+    });
+  });
+
   describe('Swap with single pool and defaults', () => {
     it('Generates valid calldata', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);

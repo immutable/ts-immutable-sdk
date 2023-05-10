@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
-import { Exchange, TradeInfo } from '@imtbl/dex-sdk';
+import { Exchange, TradeInfo, TransactionResponse } from '@imtbl/dex-sdk';
 import { configuration } from '../config';
 import { getERC20ApproveCalldata } from '@/utils/approve';
 import { ConnectAccount } from './ConnectAccount';
@@ -26,7 +26,7 @@ export function Example() {
   const [inputAmount, setInputAmount] = useState<string>('0')
   const [swapStatus, setSwapStatus] = useState<boolean>(false);
   const [approved, setApproved] = useState<boolean>(false);
-  const [result, setResult] = useState<TradeInfo | null>();
+  const [result, setResult] = useState<TransactionResponse | null>();
   const [routes, setRoutes] = useState<RouteType[]>([]);
   const [error, setError] = useState<string | null>(null)
   const [addressToSymbolMapping, setAddressToSymbolMapping] = useState<mapping>(
@@ -89,16 +89,17 @@ export function Example() {
     setRoutes([]);
     setIsFetching(true);
 
-    const result = await exchange.getQuoteFromAmountIn(
+    const txn = await exchange.getUnsignedSwapTxFromAmountIn(
+      ethereumAccount,
       inputToken,
       outputToken,
       ethers.utils.parseEther(`${inputAmount}`)
     );
 
-    if (result.success) {
-      setResult(result.trade);
+    if (txn.success) {
+      setResult(txn);
 
-      const mapping = await getTokenPaths(result.trade);
+      const mapping = await getTokenPaths(txn.info);
       setRoutes(mapping);
     } else {
       setError('Error fetching quote')
@@ -109,18 +110,10 @@ export function Example() {
     setIsFetching(false);
   };
 
-  const performSwap = async (result: any) => {
+  const performSwap = async (result: TransactionResponse) => {
     setIsFetching(true);
     const provider = new ethers.providers.JsonRpcProvider(
       process.env.NEXT_PUBLIC_RPC_URL
-    );
-
-    // Get the unsigned swap transaction
-    const swapInfo = await exchange.getUnsignedSwapTxFromAmountIn(
-      ethereumAccount,
-      inputToken,
-      outputToken,
-      ethers.utils.parseEther(`${inputAmount}`)
     );
 
     // Approve the ERC20 spend
@@ -151,9 +144,10 @@ export function Example() {
 
     try {
       // Send the Swap transaction
+      console.log({result})
       const receipt = await (window as any).ethereum.send(
         'eth_sendTransaction',
-        [swapInfo.transactionRequest]
+        [result.transaction]
       );
 
       // Wait for the Swap transaction to complete
@@ -193,19 +187,20 @@ export function Example() {
       </button>
 
       <hr className="my-4" />
-      {result && (
+      {result && result.info && (
         <>
-          <h3>Amount out: {ethers.utils.formatEther(result.amountOut)}</h3>
+          <h3>Expected amount: {ethers.utils.formatEther(result.info.quote.amount)} {`${addressToSymbolMapping[result.info.quote.token.address]}`}</h3>
+          <h3>Minimum amount: {ethers.utils.formatEther(result.info.quoteWithMaxSlippage.amount)} {`${addressToSymbolMapping[result.info.quoteWithMaxSlippage.token.address]}`}</h3>
           {routes.length > 0 && (
             <>
               <h3>
                 Token Path:&nbsp;
-                {result.route.tokenPath.map((token: any, index: number) => {
+                {result.info.route.tokenPath.map((token: any, index: number) => {
                   const key = token.address;
                   return (
                     <span key={key}>
                       {addressToSymbolMapping[token.address]}{' '}
-                      {index !== result.route.tokenPath.length - 1
+                      {index !== result.info.route.tokenPath.length - 1
                         ? `--->`
                         : ''}{' '}
                     </span>
