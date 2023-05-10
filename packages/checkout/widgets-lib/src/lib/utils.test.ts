@@ -1,6 +1,7 @@
 import { ChainId, GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { sortTokensByAmount } from './utils';
+import { Environment } from '@imtbl/config';
 
 describe('utils', () => {
   describe('sortTokensByAmount', () => {
@@ -32,7 +33,7 @@ describe('utils', () => {
         },
       ];
 
-      expect(sortTokensByAmount(tokens, ChainId.ETHEREUM)).toEqual([
+      expect(sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM)).toEqual([
         {
           balance: BigNumber.from('100000000000000000000'),
           formattedBalance: '100.0',
@@ -104,7 +105,7 @@ describe('utils', () => {
         },
       ];
 
-      expect(sortTokensByAmount(tokens, ChainId.POLYGON)).toEqual([
+      expect(sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.POLYGON)).toEqual([
         {
           balance: BigNumber.from('0'),
           formattedBalance: '0.0',
@@ -184,7 +185,7 @@ describe('utils', () => {
         },
       ];
 
-      expect(sortTokensByAmount(tokens, ChainId.ETHEREUM)).toEqual([
+      expect(sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM)).toEqual([
         {
           balance: BigNumber.from('100000000000000000000'),
           formattedBalance: '100.0',

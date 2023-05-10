@@ -115,18 +115,18 @@ describe('ConnectLoader', () => {
             getAddress: async () => Promise.resolve(''),
           }),
           getNetwork: async () => ({
-            chainId: ChainId.POLYGON,
-            name: 'POLYGON',
+            chainId: ChainId.POLYGON_ZKEVM_TESTNET,
+            name: 'POLYGON_ZKEVM_TESTNET',
           }),
         },
-        network: { name: 'POLYGON' },
+        network: { name: 'POLYGON_ZKEVM_TESTNET' },
       });
 
     cy.stub(Checkout.prototype, 'getNetworkInfo')
       .as('getNetworkInfoStub')
       .resolves({
         isSupported: true,
-        chainId: ChainId.POLYGON,
+        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
       });
 
     mount(
@@ -163,11 +163,11 @@ describe('ConnectLoader', () => {
             getAddress: async () => Promise.resolve(''),
           }),
           getNetwork: async () => ({
-            chainId: 1,
-            name: 'ETHEREUM',
+            chainId: 5,
+            name: 'GOERLI',
           }),
         },
-        network: { name: 'ETHEREUM' },
+        network: { name: 'GOERLI' },
       });
 
     mount(

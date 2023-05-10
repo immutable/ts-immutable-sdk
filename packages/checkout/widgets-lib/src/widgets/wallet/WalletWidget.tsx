@@ -2,7 +2,6 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import {
-  ChainId,
   Checkout,
   ConnectionProviders,
   GetNetworkParams,
@@ -28,6 +27,7 @@ import { ErrorView } from '../../components/Error/ErrorView';
 import { LoadingView } from '../../components/Loading/LoadingView';
 import { getTokenBalances } from './functions/tokenBalances';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
+import { zkEVMNetwork } from '../../lib/networkUtils';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
@@ -92,7 +92,7 @@ export function WalletWidget(props: WalletWidgetProps) {
       if (!isSupportedNetwork) {
         const result = await checkout.switchNetwork({
           provider,
-          chainId: ChainId.POLYGON,
+          chainId: zkEVMNetwork(checkout.config.environment),
         });
         provider = result.provider;
         network = result.network;

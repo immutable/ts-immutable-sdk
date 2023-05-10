@@ -49,8 +49,8 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON,
-        name: 'Polygon',
+        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
+        name: 'POLYGON_ZKEVM_TESTNET',
         nativeCurrency: {
           name: 'MATIC',
           symbol: 'MATIC',
@@ -79,12 +79,12 @@ describe('BalanceItem', () => {
     cySmartGet('token-menu').should('exist');
   });
 
-  it('should show ONLY the add and swap options on Polygon when all topUps are enabled', () => {
+  it('should show ONLY the add and swap options on POLYGON_ZKEVM when all topUps are enabled', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON,
-        name: 'Polygon',
+        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
+        name: 'POLYGON_ZKEVM_TESTNET',
         nativeCurrency: {
           name: 'MATIC',
           symbol: 'MATIC',
@@ -118,12 +118,12 @@ describe('BalanceItem', () => {
     cySmartGet('balance-item-move-option').should('not.be.visible');
   });
 
-  it('should ONLY show swap option on Polygon if onramp is disabled', () => {
+  it('should ONLY show swap option on POLYGON_ZKEVM if onramp is disabled', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON,
-        name: 'Polygon',
+        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
+        name: 'POLYGON_ZKEVM_TESTNET',
         nativeCurrency: {
           name: 'MATIC',
           symbol: 'MATIC',
@@ -160,10 +160,10 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.ETHEREUM,
-        name: 'Ethereum',
+        chainId: ChainId.GOERLI,
+        name: 'GOERLI',
         nativeCurrency: {
-          name: 'Ethereum',
+          name: 'GOERLI',
           symbol: 'ETH',
           decimals: 18,
         },

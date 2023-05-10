@@ -16,12 +16,12 @@ import {
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';
 import { useContext, useEffect, useState } from 'react';
-import { ChainId } from '@imtbl/checkout-sdk';
 import {
   sendBridgeCoinsEvent,
   sendOnRampCoinsEvent,
   sendSwapCoinsEvent,
 } from '../../CoinTopUpEvents';
+import { L1Network, zkEVMNetwork } from '../../../../lib/networkUtils';
 
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
@@ -30,29 +30,29 @@ export const BalanceItem = (props: BalanceItemProps) => {
   const { balanceInfo } = props;
   const fiatAmount = `≈ USD $${balanceInfo.fiatAmount ?? '-.--'}`;
   const { walletState } = useContext(WalletContext);
-  const { supportedTopUps, network } = walletState;
+  const { supportedTopUps, network, checkout } = walletState;
   const [isOnRampEnabled, setIsOnRampEnabled] = useState<boolean>();
   const [isBridgeEnabled, setIsBridgeEnabled] = useState<boolean>();
   const [isSwapEnabled, setIsSwapEnabled] = useState<boolean>();
 
   useEffect(() => {
-    if (!network || !supportedTopUps) return;
+    if (!network || !supportedTopUps || !checkout) return;
 
     const enableAddCoin =
-      network.chainId === ChainId.POLYGON &&
+      network.chainId === zkEVMNetwork(checkout.config.environment) &&
       (supportedTopUps?.isOnRampEnabled ?? true);
     setIsOnRampEnabled(enableAddCoin);
 
     const enableMoveCoin =
-      network.chainId === ChainId.ETHEREUM &&
+      network.chainId === L1Network(checkout.config.environment) &&
       (supportedTopUps?.isBridgeEnabled ?? true);
     setIsBridgeEnabled(enableMoveCoin);
 
     const enableSwapCoin =
-      network.chainId === ChainId.POLYGON &&
+      network.chainId === zkEVMNetwork(checkout.config.environment) &&
       (supportedTopUps?.isSwapEnabled ?? true);
     setIsSwapEnabled(enableSwapCoin);
-  }, [network, supportedTopUps]);
+  }, [network, supportedTopUps, checkout]);
 
   return (
     <Box

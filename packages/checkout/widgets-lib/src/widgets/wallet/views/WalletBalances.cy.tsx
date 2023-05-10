@@ -17,8 +17,8 @@ describe('WalletBalances', () => {
   const baseWalletState: WalletState = {
     checkout: checkout,
     network: {
-      chainId: 137,
-      name: 'Polygon',
+      chainId: 1442,
+      name: 'POLYGON_ZKEVM_TESTNET',
       nativeCurrency: {} as unknown as TokenInfo,
       isSupported: true,
     },
@@ -28,7 +28,7 @@ describe('WalletBalances', () => {
     supportedTopUps: null,
   };
 
-  it('should show add coins button on Polygon when topUps are supported', () => {
+  it('should show add coins button on POLYGON_ZKEVM when topUps are supported', () => {
     const topUpFeatureTestCases = [
       {
         isOnRampEnabled: true,
@@ -93,8 +93,8 @@ describe('WalletBalances', () => {
     const walletState: WalletState = {
       checkout: checkout,
       network: {
-        chainId: 1,
-        name: 'Ethereum',
+        chainId: 5,
+        name: 'Goerli',
         nativeCurrency: {} as unknown as TokenInfo,
         isSupported: true,
       },
@@ -116,7 +116,7 @@ describe('WalletBalances', () => {
         </WalletContext.Provider>
       </BiomeCombinedProviders>
     );
-    cySmartGet('Ethereum-network-button').click();
+    cySmartGet('Goerli-network-button').click();
     cySmartGet('add-coins').should('not.exist');
   });
 });
