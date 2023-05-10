@@ -71,7 +71,6 @@ export const ReadyToConnect = () => {
         <HeaderNavigation
           showBack
           title=""
-          transparent
           onCloseButtonClick={sendCloseEvent}
         />
       }

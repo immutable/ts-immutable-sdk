@@ -131,7 +131,7 @@ describe('HeaderNavigation', () => {
             header={
               <HeaderNavigation
                 showBack
-                transparent
+                transparent={false}
                 onCloseButtonClick={() => console.log('close clicked')}
               />
             }

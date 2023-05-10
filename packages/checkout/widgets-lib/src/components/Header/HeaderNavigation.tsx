@@ -1,7 +1,7 @@
 import { AppHeaderBar, ButtCon } from '@biom3/react';
 import { useContext } from 'react';
 import { ViewActions, ViewContext } from '../../context/ViewContext';
-import { HeaderNavigationStyles, ButtonNavigationStyles } from './HeaderStyles';
+import { HeaderNavigationStyles } from './HeaderStyles';
 
 export interface HeaderNavigationProps {
   title?: string;
@@ -17,7 +17,7 @@ export const HeaderNavigation = ({
   title,
   showBack = false,
   showSettings = false,
-  transparent = false,
+  transparent = true,
   onSettingsClick,
   onBackButtonClick,
   onCloseButtonClick,
@@ -50,11 +50,7 @@ export const HeaderNavigation = ({
           testId="back-button"
         />
       )}
-      <AppHeaderBar.Title
-        testId="header-title"
-        size="small"
-        sx={{ textAlign: 'left' }}
-      >
+      <AppHeaderBar.Title testId="header-title" size="small">
         {title}
       </AppHeaderBar.Title>
       <AppHeaderBar.RightHandButtons>
@@ -69,7 +65,6 @@ export const HeaderNavigation = ({
         {onCloseButtonClick && (
           <ButtCon
             iconVariant="bold"
-            sx={ButtonNavigationStyles(transparent)}
             icon="Close"
             onClick={onCloseButtonClick}
             testId="close-button"

@@ -9,6 +9,7 @@ export const HeroImageStyles = {
   justifyContent: 'center',
   alignItems: 'center',
 };
+
 export const HeroBackGroundStyles = {
   position: 'relative',
   height: '100%',

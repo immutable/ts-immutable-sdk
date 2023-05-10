@@ -1,9 +1,10 @@
-import { Box, useTheme } from '@biom3/react';
+import { Box, Logo, useTheme } from '@biom3/react';
 import { FooterLogoStyles } from './FooterStyles';
-import { ReactComponent as PoweredByImmutableLogo } from '../../assets/PoweredByImmutableLogo.svg';
+
 export interface FooterLogoProps {
   hideLogo?: boolean;
 }
+
 export const FooterLogo = ({ hideLogo }: FooterLogoProps) => {
   const showLogo = !hideLogo;
   const {
@@ -12,10 +13,7 @@ export const FooterLogo = ({ hideLogo }: FooterLogoProps) => {
   return (
     <Box testId="footer-logo-container" sx={FooterLogoStyles}>
       {showLogo && (
-        <PoweredByImmutableLogo
-          data-testid="footer-logo-image"
-          fill={color.brand[1]}
-        />
+        <Logo sx={{ width: '100px' }} logo="ImmutableHorizontalLockup" />
       )}
     </Box>
   );

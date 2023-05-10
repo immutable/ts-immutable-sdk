@@ -44,12 +44,7 @@ export const SwitchNetwork = () => {
   return (
     <SimpleLayout
       testId="switch-network-view"
-      header={
-        <HeaderNavigation
-          transparent={true}
-          onCloseButtonClick={sendCloseEvent}
-        />
-      }
+      header={<HeaderNavigation onCloseButtonClick={sendCloseEvent} />}
       footer={
         <FooterButton
           actionText={buttonText}

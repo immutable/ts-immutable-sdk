@@ -29,13 +29,7 @@ export const ErrorView = ({
 
   return (
     <SimpleLayout
-      header={
-        <HeaderNavigation
-          showBack={true}
-          transparent={true}
-          onCloseButtonClick={onCloseClick}
-        />
-      }
+      header={<HeaderNavigation showBack />}
       footer={
         <FooterButton
           actionText={actionText}
@@ -43,7 +37,7 @@ export const ErrorView = ({
         />
       }
       heroContent={<SatelliteHero />}
-      floatHeader={true}
+      floatHeader
     >
       <SimpleTextBody heading={errorText.heading}>
         {errorText.body[0]}{' '}

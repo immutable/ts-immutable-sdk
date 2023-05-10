@@ -1,11 +1,8 @@
-export const HeaderNavigationStyles = (transparent: boolean) => {
-  return {
-    backgroundColor: transparent ? 'transparent' : '',
-  };
-};
+import { SxProps } from '@biom3/react';
 
-export const ButtonNavigationStyles = (transparent: boolean) => {
+export const HeaderNavigationStyles = (transparent: boolean): SxProps => {
   return {
-    backgroundColor: transparent ? 'base.color.neutral.800' : '',
+    padding: '0',
+    backgroundColor: transparent ? 'transparent' : '',
   };
 };
