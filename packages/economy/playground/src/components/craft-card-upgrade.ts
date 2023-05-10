@@ -190,14 +190,15 @@ export class CraftingCardUpgrade extends LitElement {
   constructor() {
     super();
     this.economy = new Economy();
-    this.inventoryItems = mockInventoryItems;
+    this.loadInventory();
   }
 
   @state()
   private state: CraftInput = {
     requiresWeb3: false,
     input: {
-      userId: '123',
+      userId: 'jimmy-test',
+      gameId: 'shardbound',
       recipeId: HardcodedCardUpgradeRecipe.id,
       ingredients: [],
     },
@@ -209,6 +210,8 @@ export class CraftingCardUpgrade extends LitElement {
   private craftLoading: boolean = false;
   private showOutput: boolean = false;
   private inventoryItems: any[] = [];
+  private dustExpected: any;
+  private dustPowerTotal = 0;
 
   connectedCallback() {
     console.log('CraftingCardUpgrade :: connectedCallback');
@@ -241,6 +244,21 @@ export class CraftingCardUpgrade extends LitElement {
     console.log('craft button clicked');
     this.submitCrafting();
     this.requestUpdate();
+  }
+
+  loadInventory() {
+    console.log('loadInventory');
+    this.economy.inventory.getItems('jimmy-test');
+
+    this.economy.subscribe((event: any) => {
+      console.log('@@@@@@@@ craft card upgrade loadInvenotry COMPLETED', event);
+      if (event.action === 'INVENTORY') {
+        if (event.status === 'COMPLETED') {
+          this.inventoryItems = event.data.rows;
+          this.requestUpdate();
+        }
+      }
+    });
   }
 
   selectItem(item: any) {
@@ -278,9 +296,10 @@ export class CraftingCardUpgrade extends LitElement {
       <div class="list-item-content">
         <div class="list-item-title">${item.metadata.name}</div>
         <div class="list-item-description is-flex is-flex-direction-row">
+          <div class="mr-2">Level ${item.metadata.Level}</div>
           <div class="mr-2">Attack ${item.metadata.Attack}</div>
-          <div class="mr-2">Mana: ${item.metadata.Mana}</div>
-          <div class="mr-2">Health: ${item.metadata.Health}</div>
+          <div class="mr-2">Mana ${item.metadata.Mana}</div>
+          <div class="mr-2">Health ${item.metadata.Health}</div>
           <div class="mr-2">
             ${item.metadata.dust_cost | item.metadata.dust_power} Dust
           </div>
@@ -350,9 +369,24 @@ export class CraftingCardUpgrade extends LitElement {
           <button @click=${this.resetCraftItems}>🗑️ Reset</button>
         </div>
         <div class="">
-          <p>EXP REQUIRED:</p>
-          <p>Upgrade Level from 1 to 2</p>
-          <p>Upgrade Attack from 1 to 2</p>
+          <p>
+            DUST REQUIRED: ${this.dustPowerTotal} / ${this.dustExpected | 0}
+          </p>
+          <p>
+            Upgrade Level from
+            ${this.cardToUpgrade ? this.cardToUpgrade.metadata.Level : '?'} to
+            ${this.cardToUpgrade ? mockOutputItem.properties.Level : '?'}
+          </p>
+          <p>
+            Upgrade Attack from
+            ${this.cardToUpgrade ? this.cardToUpgrade.metadata.Attack : '?'} to
+            ${this.cardToUpgrade ? mockOutputItem.properties.Attack : '?'}
+          </p>
+          <p>
+            Upgrade Health from
+            ${this.cardToUpgrade ? this.cardToUpgrade.metadata.Health : '?'} to
+            ${this.cardToUpgrade ? mockOutputItem.properties.Health : '?'}
+          </p>
         </div>
         ${cache(this.renderCraftButton())}
       </div>
@@ -383,15 +417,15 @@ export class CraftingCardUpgrade extends LitElement {
   }
 
   validateCraftButton() {
-    const dustExpected =
+    this.dustExpected =
       HardcodedCardUpgradeRecipe.inputs[1].conditions[0].expected;
 
     const dustPowerArray = this.selectedDustItems.map(
       (item) => item.metadata.dust_power
     );
-    const dustPowerTotal = dustPowerArray.reduce((a, b) => a + b, 0);
+    this.dustPowerTotal = dustPowerArray.reduce((a, b) => a + b, 0);
 
-    if (dustPowerTotal >= dustExpected) {
+    if (this.dustPowerTotal >= this.dustExpected) {
       this.craftingDisabled = false;
     } else {
       this.craftingDisabled = true;

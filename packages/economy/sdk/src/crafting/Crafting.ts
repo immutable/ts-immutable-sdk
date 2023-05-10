@@ -12,6 +12,7 @@ export type CraftInput = {
   web3Assets?: any;
   input: {
     userId: string;
+    gameId: string;
     recipeId: string;
     ingredients: Array<{
       conditionId: string;

@@ -1,9 +1,18 @@
 {
-  "craft_id": "86a316da-9e16-4996-a09d-bb1366f33eb4",
-  "results": [
+  "craft_id": "25cb2d13-4f15-4832-8fc5-fdfb0a1c809e",
+  "Results": [
     {
-      "properties": {},
-      "result_item_id": "75e3c3d3-27f1-4709-89e8-6aa35dcd658f"
+      "result_item_id": "2PXJ3tal1srQrBeLWmB0iMYDAd2",
+      "properties": {
+        "Attack": 8,
+        "Health": 6,
+        "Level": 2,
+        "Mana": 7,
+        "description": "Deal 3 damage to a random sleeping enemy creature",
+        "dust_power": 100,
+        "image": "https://images.godsunchained.com/art2/500/94.webp",
+        "name": "Demogorgon+"
+      }
     }
   ]
 }
