@@ -1,4 +1,3 @@
-import { ExchangeModuleConfiguration } from '../types';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   POLYGON_TESTNET_CHAIN_ID,
@@ -6,10 +5,12 @@ import {
 } from 'constants/tokens';
 import { POLYGON_ZKEVM_TESTNET_RPC_URL } from 'constants/rpc';
 import { tokenInfoToUniswapToken } from 'lib';
+import { ExchangeModuleConfiguration } from '../types';
 import { Chain } from '../constants/chains';
 
 export class ExchangeConfiguration {
   public baseConfig: ImmutableConfiguration;
+
   public chain: Chain;
 
   constructor({ chainId, baseConfig, overrides }: ExchangeModuleConfiguration) {
@@ -17,22 +18,23 @@ export class ExchangeConfiguration {
 
     if (overrides) {
       this.chain = {
-        chainId: chainId,
+        chainId,
         rpcUrl: overrides.rpcURL,
         contracts: overrides.exchangeContracts,
         commonRoutingTokens: tokenInfoToUniswapToken(
-          overrides.commonRoutingTokens
+          overrides.commonRoutingTokens,
         ),
       };
 
       return;
     }
 
-    const chain =
-      SupportedChainIdsForEnvironment[baseConfig.environment][chainId];
+    // TODO fix use before define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    const chain = SupportedChainIdsForEnvironment[baseConfig.environment][chainId];
     if (!chain) {
       throw new Error(
-        `Chain ${chainId} is not supported in environment ${baseConfig.environment}`
+        `Chain ${chainId} is not supported in environment ${baseConfig.environment}`,
       );
     }
 
@@ -50,6 +52,8 @@ export type ExchangeContracts = {
   tickLens: string;
 };
 
+// TODO: Should this be refactored to be camelCase or UPPER_CASE?
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ContractsForChainId: { [chainId: number]: ExchangeContracts } = {
   [POLYGON_TESTNET_CHAIN_ID]: {
     multicall: '0x66d0aB680ACEe44308edA2062b910405CC51A190',
@@ -62,6 +66,8 @@ export const ContractsForChainId: { [chainId: number]: ExchangeContracts } = {
   },
 };
 
+// TODO: Should this be refactored to be camelCase or UPPER_CASE?
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const SupportedSandboxChains: { [chainId: number]: Chain } = {
   [POLYGON_TESTNET_CHAIN_ID]: {
     chainId: POLYGON_TESTNET_CHAIN_ID,
@@ -71,8 +77,12 @@ export const SupportedSandboxChains: { [chainId: number]: Chain } = {
   },
 };
 
+// TODO: Should this be refactored to be camelCase or UPPER_CASE?
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const SupportedProductionChains: { [chainId: number]: Chain } = {};
 
+// TODO: Should this be refactored to be camelCase or UPPER_CASE?
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const SupportedChainIdsForEnvironment: {
   [key in Environment]: { [chainId: number]: Chain };
 } = {
