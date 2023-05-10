@@ -35,17 +35,17 @@ export const NetworkMenu = () => {
     []
   );
   const LogoColor = {
-    [ChainId.POLYGON]: 'base.color.text.link.primary',
-    [ChainId.POLYGON_ZKEVM_TESTNET]: 'base.color.text.link.primary',
+    [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
+    [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
     [ChainId.ETHEREUM]: 'base.color.accent.5',
     [ChainId.GOERLI]: 'base.color.accent.5',
   };
 
   //todo: add corresponding network symbols
   const NetworkIcon = {
-    [ChainId.POLYGON]: 'Immutable',
+    [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
     [ChainId.ETHEREUM]: 'EthToken',
-    [ChainId.POLYGON_ZKEVM_TESTNET]: 'Immutable',
+    [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
     [ChainId.GOERLI]: 'EthToken',
   };
 

@@ -33,7 +33,9 @@ describe('utils', () => {
         },
       ];
 
-      expect(sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM)).toEqual([
+      expect(
+        sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM)
+      ).toEqual([
         {
           balance: BigNumber.from('100000000000000000000'),
           formattedBalance: '100.0',
@@ -105,7 +107,13 @@ describe('utils', () => {
         },
       ];
 
-      expect(sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.POLYGON)).toEqual([
+      expect(
+        sortTokensByAmount(
+          Environment.PRODUCTION,
+          tokens,
+          ChainId.IMTBL_ZKEVM_TESTNET
+        )
+      ).toEqual([
         {
           balance: BigNumber.from('0'),
           formattedBalance: '0.0',
@@ -185,7 +193,9 @@ describe('utils', () => {
         },
       ];
 
-      expect(sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM)).toEqual([
+      expect(
+        sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM)
+      ).toEqual([
         {
           balance: BigNumber.from('100000000000000000000'),
           formattedBalance: '100.0',

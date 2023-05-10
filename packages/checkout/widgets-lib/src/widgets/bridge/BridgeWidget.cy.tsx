@@ -226,11 +226,11 @@ describe('Bridge Widget tests', () => {
 
       switchNetworkStub.resolves({
         network: {
-          chainId: 137,
-          name: 'Polygon',
+          chainId: 13372,
+          name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
-            name: 'Matic',
-            symbol: 'MATIC',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },
@@ -238,7 +238,7 @@ describe('Bridge Widget tests', () => {
 
       const params = {
         providerPreference: 'metamask',
-        fromNetwork: Network.POLYGON.toString(),
+        fromNetwork: Network.IMTBL_ZKEVM_TESTNET.toString(),
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
@@ -364,11 +364,11 @@ describe('Bridge Widget tests', () => {
 
       switchNetworkStub.resolves({
         network: {
-          chainId: 137,
-          name: 'Polygon',
+          chainId: 13372,
+          name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
-            name: 'Matic',
-            symbol: 'MATIC',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },
@@ -376,7 +376,7 @@ describe('Bridge Widget tests', () => {
 
       const params = {
         providerPreference: 'metamask',
-        fromNetwork: Network.POLYGON.toString(),
+        fromNetwork: Network.IMTBL_ZKEVM_TESTNET.toString(),
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
