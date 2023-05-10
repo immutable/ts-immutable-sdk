@@ -12,7 +12,6 @@ import {
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider } from '@ethersproject/providers';
 import { useEffect } from 'react';
-import { Environment } from '@imtbl/config';
 
 export function AsyncLoader() {
   CheckoutWidgets({
