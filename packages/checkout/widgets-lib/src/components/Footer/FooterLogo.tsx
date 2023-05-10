@@ -9,6 +9,7 @@ export const FooterLogo = ({ hideLogo }: FooterLogoProps) => {
     <Box testId="footer-logo-container" sx={FooterLogoStyles}>
       {showLogo && (
         <Logo
+          testId="footer-logo-image"
           logo="ImmutableHorizontalLockup"
           sx={{ width: 'base.spacing.x25' }}
         />
