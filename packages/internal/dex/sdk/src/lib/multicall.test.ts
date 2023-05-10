@@ -32,24 +32,25 @@ describe('callMultipleContractSingleData', () => {
     mockedContract = (Contract as unknown as jest.Mock).mockImplementation(
       () => ({
         callStatic: {
-          // TODO: fix
-          // eslint-disable-next-line no-promise-executor-return, @typescript-eslint/no-unused-vars
-          multicall: () => new Promise((resolve, reject) => resolve({
-            returnData: [
-              {
-                returnData: ethers.utils.defaultAbiCoder.encode(
-                  ['address'],
-                  [WETH_TEST_CHAIN.address],
-                ),
-              },
-              {
-                returnData: ethers.utils.defaultAbiCoder.encode(
-                  ['address'],
-                  [WETH_TEST_CHAIN.address],
-                ),
-              },
-            ],
-          })),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          multicall: () => new Promise((resolve, reject) => {
+            resolve({
+              returnData: [
+                {
+                  returnData: ethers.utils.defaultAbiCoder.encode(
+                    ['address'],
+                    [WETH_TEST_CHAIN.address],
+                  ),
+                },
+                {
+                  returnData: ethers.utils.defaultAbiCoder.encode(
+                    ['address'],
+                    [WETH_TEST_CHAIN.address],
+                  ),
+                },
+              ],
+            });
+          }),
         },
       }),
     );
