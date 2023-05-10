@@ -54,6 +54,7 @@
     "packages/passport",
     "packages/provider",
     "packages/internal/toolkit",
+    "packages/internal/cryptofiat",
     "packages/internal/dex/sdk",
     "packages/internal/dex/sdk-sample-app",
     "packages/internal/bridge/sdk",
