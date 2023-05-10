@@ -1,6 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout, ChainId } from '@imtbl/checkout-sdk';
+import { Checkout, ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { sortTokensByAmount } from '../../../lib/utils';
+import { CryptoFiat, CryptoFiatConfiguration, CryptoFiatConvertReturn } from '@imtbl/cryptofiat';
 
 export interface BalanceInfo {
   id: string;
@@ -15,7 +16,8 @@ export const getTokenBalances = async (
   checkout: Checkout,
   provider: Web3Provider,
   networkName: string,
-  chainId: ChainId
+  chainId: ChainId,
+  cryptoFiat: CryptoFiat,
 ): Promise<BalanceInfo[]> => {
   if (!checkout || !provider || !chainId) return [];
 
@@ -33,12 +35,14 @@ export const getTokenBalances = async (
       chainId
     );
 
+    const cryptoToFiatResult = await cryptoFiat.convert(buildCryptoToFiatRequest(getAllBalancesResult.balances));
+
     const tokenBalances: BalanceInfo[] = [];
     sortedTokens.forEach((balance) => {
       tokenBalances.push({
         id: networkName + '-' + balance.token.symbol,
         balance: balance.formattedBalance,
-        fiatAmount: '23.50', // todo: fetch fiat price from coinGecko apis
+        fiatAmount: calculateCryptoToFiatValue(balance.formattedBalance, balance.token.symbol, cryptoToFiatResult),
         symbol: balance.token.symbol,
         description: balance.token.name,
       });
@@ -46,6 +50,51 @@ export const getTokenBalances = async (
 
     return tokenBalances;
   } catch (err: any) {
+    console.log(err)
     return []; // todo: what are the error scenarios?
   }
 };
+
+export interface RequestStructure {
+  tokenSymbols: string[];
+  fiatSymbols: string[];
+}
+
+const buildCryptoToFiatRequest = (balances: GetBalanceResult[]): RequestStructure => {
+  // Extract token symbols from balances
+  const tokenSymbols = balances.map(balance => balance.token.symbol);
+
+  // Define fiat symbols as always 'usd' and 'aud'
+  const fiatSymbols = ['usd', 'aud'];
+
+  // Build and return the request structure
+  const request: RequestStructure = {
+      tokenSymbols,
+      fiatSymbols
+  };
+  return request;
+};
+
+export const calculateCryptoToFiatValue = (
+  balance: string, 
+  symbol: string,
+  conversions: CryptoFiatConvertReturn
+): string => {
+  const zeroBalanceString = '-.--';
+  if (!balance) return zeroBalanceString; 
+
+  const conversion = conversions[symbol.toLowerCase()];
+  if (!conversion) return zeroBalanceString;
+
+  const parsedBalance = parseFloat(balance);
+  if (parseFloat(balance) === 0 || isNaN(parsedBalance)) return zeroBalanceString;
+
+  if (!conversion['usd']) return zeroBalanceString;
+
+  return formatFiatString(parsedBalance * conversion['usd']);
+};
+
+export const formatFiatString = (amount: number): string => {
+  const factor = Math.pow(10, 2);
+  return ((Math.round(amount * factor) / factor).toFixed(2)).toString();
+}
