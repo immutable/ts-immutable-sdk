@@ -9,6 +9,7 @@ const DEFAULT_FIAT_SYMBOL = 'usd';
 
 // Given that we could have multiple coins with the same symbol and CoinGecko
 // does not support chain id then we are forcing the conversion.
+// Coin conversion list: https://api.coingecko.com/api/v3/coins/list
 const symbolsOverrides: { [symbol: string]: string } = {
   eth: 'ethereum',
   usdc: 'usd-coin',
