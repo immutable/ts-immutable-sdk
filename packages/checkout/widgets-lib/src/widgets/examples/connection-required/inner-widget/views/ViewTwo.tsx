@@ -5,7 +5,8 @@ import { HeaderNavigation } from '../../../../../components/Header/HeaderNavigat
 import { SimpleLayout } from '../../../../../components/SimpleLayout/SimpleLayout';
 import { ViewContext, ViewActions } from '../../../../../context/ViewContext';
 import { InnerExampleWidgetViews } from '../../../../../context/InnerExampleViewContextTypes';
-import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { zkEVMNetwork } from '../../../../../lib/networkUtils';
 
 export interface ViewTwoProps {
   callBack?: () => void;
@@ -23,7 +24,10 @@ export const ViewTwo = ({ callBack }: ViewTwoProps) => {
       });
 
       if (checkout) {
-        await checkout.switchNetwork({ provider, chainId: ChainId.POLYGON });
+        await checkout.switchNetwork({
+          provider,
+          chainId: zkEVMNetwork(checkout.config.environment),
+        });
         dispatchSuccess();
       }
     } catch (err: any) {

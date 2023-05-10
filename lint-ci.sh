@@ -1,5 +1,17 @@
 #!/bin/bash
 
-files=$(git diff --name-only --diff-filter=ACMRTUXB $(git rev-parse HEAD^1) | grep  -E '(.js$|.ts$|.tsx$)')
+# if GITHUB_BASE_REF is set, use it. Otherwise, use origin/main
+# https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+base=${GITHUB_BASE_REF:-main}
 
-[[ -z $files ]] || eslint $files --ext .ts,.jsx,.tsx --max-warnings=0 --no-error-on-unmatched-pattern
+files=$(git diff --name-only --diff-filter=ACMRTUXB origin/$base)
+
+tolint=()
+for f in $files; do
+  #   match js,.js,.jsx,.ts,.tsx
+  if [[ $f =~ \.[tj]sx?$ ]]; then
+    tolint+=($f)
+  fi
+done
+
+[[ -z $tolint ]] || eslint $tolint --no-error-on-unmatched-pattern

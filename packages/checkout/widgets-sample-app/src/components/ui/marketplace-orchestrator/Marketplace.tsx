@@ -1,11 +1,7 @@
 import {
   CheckoutWidgets,
-  ConnectEventType,
   ConnectReact,
-  ConnectionFailed,
   WidgetConnectionProviders,
-  ConnectionSuccess,
-  IMTBLWidgetEvents,
   WalletReact,
   WidgetTheme,
 } from '@imtbl/checkout-widgets';
@@ -17,12 +13,8 @@ export const Marketplace = () => {
   CheckoutWidgets({
     theme: WidgetTheme.DARK,
   });
-  const {
-    showConnectWidget,
-    providerPreference,
-    setShowConnectWidget,
-    setProviderPreference,
-  } = useConnectWidget();
+  const { showConnectWidget, providerPreference, setShowConnectWidget } =
+    useConnectWidget();
 
   const { showWalletWidget, setShowWalletWidget } = useWalletWidget();
 

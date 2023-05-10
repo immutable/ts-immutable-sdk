@@ -25,12 +25,12 @@ export const fetchValidPools = async (
   multicallContract: Multicall,
   erc20Pair: ERC20Pair,
   commonRoutingERC20s: Token[],
-  factoryAddress: string
+  factoryAddress: string,
 ): Promise<Pool[]> => {
   const poolIDs = generatePossiblePoolsFromERC20Pair(
     erc20Pair,
     commonRoutingERC20s,
-    factoryAddress
+    factoryAddress,
   );
   const poolAddresses = poolIDs.map((pool) => pool.poolAddress);
 
@@ -40,27 +40,24 @@ export const fetchValidPools = async (
     multicallSingleCallDataMultipleContracts(
       multicallContract,
       slot0FuncString,
-      poolAddresses
+      poolAddresses,
     ),
     multicallSingleCallDataMultipleContracts(
       multicallContract,
       liquidityFuncString,
-      poolAddresses
+      poolAddresses,
     ),
   ]);
 
   const slot0s = slot0Results.returnData;
   const liquidities = liquidityResults.returnData;
 
-  const uniswapV3Pool: UniswapV3PoolInterface =
-    UniswapV3Pool__factory.createInterface();
+  const uniswapV3Pool: UniswapV3PoolInterface = UniswapV3Pool__factory.createInterface();
 
   const validPools: Pool[] = [];
   poolIDs.forEach((poolID, index) => {
-    const noPriceResult =
-      slot0Results.returnData[index].returnData === noDataResult;
-    const noLiquidityResult =
-      liquidityResults.returnData[index].returnData === noDataResult;
+    const noPriceResult = slot0Results.returnData[index].returnData === noDataResult;
+    const noLiquidityResult = liquidityResults.returnData[index].returnData === noDataResult;
 
     // This indicates that the pool doesn't exist
     if (noPriceResult || noLiquidityResult) {
@@ -69,11 +66,11 @@ export const fetchValidPools = async (
 
     const poolSlot0 = uniswapV3Pool.decodeFunctionResult(
       slot0FuncString,
-      slot0s[index].returnData
+      slot0s[index].returnData,
     ) as unknown as Slot0;
     const poolLiquidity = uniswapV3Pool.decodeFunctionResult(
       liquidityFuncString,
-      liquidities[index].returnData
+      liquidities[index].returnData,
     ) as [BigNumber];
 
     const zeroPrice = poolSlot0.sqrtPriceX96.isZero();
@@ -91,7 +88,7 @@ export const fetchValidPools = async (
       poolID.fee,
       poolSlot0.sqrtPriceX96.toString(),
       poolLiquidity.toString(),
-      poolSlot0.tick
+      poolSlot0.tick,
     );
     validPools.push(validPool);
   });

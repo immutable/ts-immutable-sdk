@@ -1,7 +1,7 @@
 import { ChainId, Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import { Box } from '@biom3/react';
 
@@ -47,6 +47,12 @@ export default function GetAllBalances(props: BalanceProps) {
       console.log(err.stack);
     }
   }
+
+  useEffect(() => {
+    setResult(undefined);
+    setError(null);
+    setLoading(false);
+  }, [checkout]);
 
   return (
     <div>

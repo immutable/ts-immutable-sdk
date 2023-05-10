@@ -6,7 +6,7 @@ import {
   WalletFilterTypes,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import LoadingButton from './LoadingButton';
 import { Box } from '@biom3/react';
@@ -115,6 +115,18 @@ export default function GetAllowList(props: AllowListProps) {
       console.log(error.stack);
     }
   }
+
+  useEffect(() => {
+    setResultToken(undefined);
+    setErrorToken(null);
+    setLoadingToken(false);
+    setResultWallet(undefined);
+    setErrorWallet(null);
+    setLoadingWallet(false);
+    setResultNetwork(undefined);
+    setErrorNetwork(null);
+    setLoadingNetwork(false);
+  }, [checkout]);
 
   return (
     <div>

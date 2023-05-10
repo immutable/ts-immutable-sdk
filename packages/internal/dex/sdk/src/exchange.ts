@@ -1,6 +1,9 @@
+/* eslint-disable max-len */
 import { ethers } from 'ethers';
 import { MethodParameters } from '@uniswap/v3-sdk';
-import { CurrencyAmount, Percent, Token, TradeType } from '@uniswap/sdk-core';
+import {
+  CurrencyAmount, Percent, Token, TradeType,
+} from '@uniswap/sdk-core';
 import assert from 'assert';
 import JSBI from 'jsbi';
 
@@ -17,20 +20,22 @@ import {
   validateAddress,
   validateDifferentAddresses,
 } from './lib/utils';
-import { QuoteResponse, TransactionResponse } from './types';
+import { TransactionResponse } from './types';
 import { createSwapParameters } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 import { constructQuoteWithSlippage } from './lib/transactionUtils/constructQuoteWithSlippage';
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;
+
   private router: Router;
+
   private chainId: number;
 
   constructor(configuration: ExchangeConfiguration) {
     this.chainId = configuration.chain.chainId;
     this.provider = new ethers.providers.JsonRpcProvider(
-      configuration.chain.rpcUrl
+      configuration.chain.rpcUrl,
     );
     this.router = new Router(
       this.provider,
@@ -40,7 +45,7 @@ export class Exchange {
         factoryAddress: configuration.chain.contracts.coreFactory,
         quoterAddress: configuration.chain.contracts.quoterV2,
         peripheryRouterAddress: configuration.chain.contracts.peripheryRouter,
-      }
+      },
     );
   }
 
@@ -48,7 +53,7 @@ export class Exchange {
     tokenInAddress: string,
     tokenOutAddress: string,
     maxHops: number,
-    fromAddress?: string
+    fromAddress?: string,
   ) {
     if (fromAddress) validateAddress(fromAddress);
     validateAddress(tokenInAddress);
@@ -65,7 +70,7 @@ export class Exchange {
     slippagePercent: Percent,
     maxHops: number,
     deadline: number,
-    tradeType: TradeType
+    tradeType: TradeType,
   ): Promise<TransactionResponse> {
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, fromAddress);
 
@@ -77,18 +82,18 @@ export class Exchange {
     const tokenIn: Token = new Token(
       this.chainId,
       tokenInAddress,
-      tokenInDecimals
+      tokenInDecimals,
     );
     const tokenOut: Token = new Token(
       this.chainId,
       tokenOutAddress,
-      tokenOutDecimals
+      tokenOutDecimals,
     );
 
     let amountSpecified: CurrencyAmount<Token>;
     let otherToken: Token;
     const amountJsbi = JSBI.BigInt(amount.toString());
-    if (tradeType == TradeType.EXACT_INPUT) {
+    if (tradeType === TradeType.EXACT_INPUT) {
       amountSpecified = CurrencyAmount.fromRawAmount(tokenIn, amountJsbi);
       otherToken = tokenOut;
     } else {
@@ -100,7 +105,7 @@ export class Exchange {
       amountSpecified,
       otherToken,
       tradeType,
-      maxHops
+      maxHops,
     );
     if (!routeAndQuote.success) {
       return {
@@ -114,14 +119,14 @@ export class Exchange {
       routeAndQuote.trade,
       fromAddress,
       slippagePercent,
-      deadline
+      deadline,
     );
 
     const quoteInfo = constructQuoteWithSlippage(
       otherToken,
       tradeType,
       routeAndQuote.trade,
-      slippagePercent
+      slippagePercent,
     );
 
     return {
@@ -142,16 +147,16 @@ export class Exchange {
   }
 
   /**
-   * Make a swap given the amount to sell.
-   * If `minAmountOut` is unspecified, there will be a default slippage percentage of 0.1%.
+   * Get the unsigned swap transaction given the amount to sell.
+   * Includes quote details for the swap.
    *
    * @param {string} fromAddress The EOA that will sign and submit the transaction.
    * @param {string} tokenInAddress Token address to sell.
    * @param {string} tokenOutAddress Token address to buy.
    * @param {ethers.BigNumberish} amountIn Amount to sell.
-   * @param {Percent} slippagePercent (optional) The Percentage of slippage tolerance.
-   * @param {number} maxHops (optional) Maximum hops allowed in optimal route.
-   * @param {number} deadline (optional) Latest time swap can execute.
+   * @param {Percent} slippagePercent (optional) The Percentage of slippage tolerance. Default is 0.1%
+   * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2
+   * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes
    */
   public async getUnsignedSwapTxFromAmountIn(
     fromAddress: string,
@@ -160,7 +165,7 @@ export class Exchange {
     amountIn: ethers.BigNumberish,
     slippagePercent: Percent = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
-    deadline: number = DEFAULT_DEADLINE
+    deadline: number = DEFAULT_DEADLINE,
   ): Promise<TransactionResponse> {
     return await this.getUnsignedSwapTx(
       fromAddress,
@@ -170,21 +175,21 @@ export class Exchange {
       slippagePercent,
       maxHops,
       deadline,
-      TradeType.EXACT_INPUT
+      TradeType.EXACT_INPUT,
     );
   }
 
   /**
-   * Make a swap given the amount to buy.
-   * If `maxAmountIn` is unspecified, there will be a default slippage percentage of 0.1%.
+   * Get the unsigned swap transaction given the amount to buy.
+   * Includes quote details for the swap.
    *
    * @param {string} fromAddress The EOA that will sign and submit the transaction.
    * @param {string} tokenInAddress Token address to sell.
    * @param {string} tokenOutAddress Token address to buy.
    * @param {ethers.BigNumberish} amountOut Amount to buy.
-   * @param {Percent} slippagePercent (optional) The Percentage of slippage tolerance.
-   * @param {number} maxHops (optional) Maximum hops allowed in optimal route.
-   * @param {number} deadline (optional) Latest time swap can execute.
+   * @param {Percent} slippagePercent (optional) The Percentage of slippage tolerance. Default is 0.1%
+   * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2
+   * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes
    * @return {TransactionResponse} The result containing the unsigned transaction to sign and execute.
    */
   public async getUnsignedSwapTxFromAmountOut(
@@ -194,9 +199,9 @@ export class Exchange {
     amountOut: ethers.BigNumberish,
     slippagePercent: Percent = DEFAULT_SLIPPAGE,
     maxHops: number = DEFAULT_MAX_HOPS,
-    deadline: number = DEFAULT_DEADLINE
+    deadline: number = DEFAULT_DEADLINE,
   ): Promise<TransactionResponse> {
-    return await this.getUnsignedSwapTx(
+    return this.getUnsignedSwapTx(
       fromAddress,
       tokenInAddress,
       tokenOutAddress,
@@ -204,97 +209,7 @@ export class Exchange {
       slippagePercent,
       maxHops,
       deadline,
-      TradeType.EXACT_OUTPUT
-    );
-  }
-
-  /**
-   * Get a quote for a swap given the amount to sell.
-   *
-   * @param {string} tokenInAddress Token address to sell.
-   * @param {string} tokenOutAddress Token address to buy.
-   * @param {ethers.BigNumberish} amountIn Amount to sell.
-   * @param {number} maxHops (optional) Maximum hops in optimal route.
-   * @return {QuoteResponse} The resultant route information.
-   */
-  public async getQuoteFromAmountIn(
-    tokenInAddress: string,
-    tokenOutAddress: string,
-    amountIn: ethers.BigNumberish,
-    maxHops = DEFAULT_MAX_HOPS
-  ): Promise<QuoteResponse> {
-    Exchange.validate(tokenInAddress, tokenOutAddress, maxHops);
-    // get decimals of token
-    const [tokenInDecimals, tokenOutDecimals] = await Promise.all([
-      getERC20Decimals(tokenInAddress, this.provider),
-      getERC20Decimals(tokenOutAddress, this.provider),
-    ]);
-    const tokenIn: Token = new Token(
-      this.chainId,
-      tokenInAddress,
-      tokenInDecimals
-    );
-    const tokenOut: Token = new Token(
-      this.chainId,
-      tokenOutAddress,
-      tokenOutDecimals
-    );
-    const amountInJsbi = JSBI.BigInt(amountIn.toString());
-    const amountSpecified: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
-      tokenIn,
-      amountInJsbi
-    );
-
-    return await this.router.findOptimalRoute(
-      amountSpecified,
-      tokenOut,
-      TradeType.EXACT_INPUT,
-      maxHops
-    );
-  }
-
-  /**
-   * Get a quote for a swap given the amount to buy.
-   *
-   * @param {string} tokenInAddress Token address to sell.
-   * @param {string} tokenOutAddress Token address to buy.
-   * @param {ethers.BigNumberish} amountOut Amount to buy.
-   * @param {number} maxHops (optional) Maximum hops in optimal route.
-   * @return {QuoteResponse} The resultant route information.
-   */
-  public async getQuoteFromAmountOut(
-    tokenInAddress: string,
-    tokenOutAddress: string,
-    amountOut: ethers.BigNumberish,
-    maxHops = DEFAULT_MAX_HOPS
-  ): Promise<QuoteResponse> {
-    Exchange.validate(tokenInAddress, tokenOutAddress, maxHops);
-    // get decimals of token
-    const [tokenInDecimals, tokenOutDecimals] = await Promise.all([
-      getERC20Decimals(tokenInAddress, this.provider),
-      getERC20Decimals(tokenOutAddress, this.provider),
-    ]);
-    const tokenIn: Token = new Token(
-      this.chainId,
-      tokenInAddress,
-      tokenInDecimals
-    );
-    const tokenOut: Token = new Token(
-      this.chainId,
-      tokenOutAddress,
-      tokenOutDecimals
-    );
-    const amountOutJsbi = JSBI.BigInt(amountOut.toString());
-    const amountSpecified: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
-      tokenOut,
-      amountOutJsbi
-    );
-
-    return await this.router.findOptimalRoute(
-      amountSpecified,
-      tokenIn,
       TradeType.EXACT_OUTPUT,
-      maxHops
     );
   }
 }

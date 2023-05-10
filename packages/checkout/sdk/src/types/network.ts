@@ -8,6 +8,7 @@ export enum ChainId {
   ETHEREUM = 1,
   GOERLI = 5,
   POLYGON = 137,
+  POLYGON_ZKEVM_TESTNET = 1442
   // zkEVM = 'zkEVM'
 }
 
@@ -42,10 +43,15 @@ export type NetworkDetails = {
 };
 
 /**
- * Object mapping the list of supported networks with the corresponding network details.
+ * Type representing the mapping between ChainId and NetworkDetails
  */
-export const ChainIdNetworkMap = {
-  [ChainId.ETHEREUM]: {
+export type NetworkMap = Map<ChainId, NetworkDetails>;
+
+/**
+ * Object mapping the list of supported production networks with the corresponding network details.
+ */
+export const ProductionChainIdNetworkMap: NetworkMap = new Map<ChainId, NetworkDetails>([
+  [ChainId.ETHEREUM, {
     chainIdHex: '0x1', // 1
     chainName: 'Ethereum',
     rpcUrls: ['https://mainnet.infura.io/v3/'],
@@ -55,19 +61,8 @@ export const ChainIdNetworkMap = {
       decimals: 18,
     },
     blockExplorerUrls: ['https://etherscan.io/'],
-  } as NetworkDetails,
-  [ChainId.GOERLI]: {
-    chainIdHex: '0x5', // 5
-    chainName: 'Goerli',
-    rpcUrls: ['https://goerli.infura.io/v3/'],
-    nativeCurrency: {
-      name: 'Goerli Eth',
-      symbol: 'ETH',
-      decimals: 18,
-    },
-    blockExplorerUrls: ['https://goerli.etherscan.io/'],
-  },
-  [ChainId.POLYGON]: {
+  }],
+  [ChainId.POLYGON, {
     chainIdHex: '0x89', // 137
     chainName: 'Polygon',
     rpcUrls: ['https://polygon-rpc.com'],
@@ -77,8 +72,36 @@ export const ChainIdNetworkMap = {
       decimals: 18,
     },
     blockExplorerUrls: ['https://polygonscan.com/'],
-  },
-};
+  }]
+])
+
+/**
+ * Object mapping the list of supported sandbox networks with the corresponding network details.
+ */
+export const SandboxChainIdNetworkMap: NetworkMap = new Map<ChainId, NetworkDetails>([
+  [ChainId.GOERLI, {
+    chainIdHex: '0x5', // 5
+    chainName: 'Goerli',
+    rpcUrls: ['https://goerli.infura.io/v3/'],
+    nativeCurrency: {
+      name: 'Goerli Eth',
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    blockExplorerUrls: ['https://goerli.etherscan.io/'],
+  }],
+  [ChainId.POLYGON_ZKEVM_TESTNET, {
+    chainIdHex: '0x5A2',
+    chainName: 'Polygon zkEVM Testnet',
+    rpcUrls: ['https://rpc.public.zkevm-test.net'],
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    blockExplorerUrls: ['https://testnet-zkevm.polygonscan.com']
+  }]
+])
 
 /**
  * Interface representing the parameters for {@link Checkout.switchNetwork}.
