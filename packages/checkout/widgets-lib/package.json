@@ -47,6 +47,11 @@
       "react-app/jest"
     ]
   },
+  "jest": {
+    "moduleNameMapper": {
+      "axios": "axios/dist/node/axios.cjs"
+    }
+  },
   "private": true,
   "scripts": {
     "build": "cp src/build.tsx src/index.tsx && GENERATE_SOURCEMAP=false react-scripts build",
