@@ -120,7 +120,7 @@ describe('HeaderNavigation', () => {
       cySmartGet('header-navigation-container').should(
         'have.css',
         'background-color',
-        'rgb(236, 236, 236)'
+        'rgba(0, 0, 0, 0)'
       );
     });
 
@@ -143,8 +143,30 @@ describe('HeaderNavigation', () => {
       cySmartGet('header-navigation-container').should(
         'have.css',
         'background-color',
-        'rgba(0, 0, 0, 0)'
+        'rgb(236, 236, 236)'
       );
+    });
+
+    it('should set with the default title alignment', () => {
+      mount(
+        <BiomeThemeProvider>
+          <SimpleLayout header={<HeaderNavigation />} />
+        </BiomeThemeProvider>
+      );
+
+      cySmartGet('header-title').should('exist');
+      cySmartGet('header-title').should('not.have.css', 'text-align', 'center');
+    });
+
+    it('should set the title center aligned', () => {
+      mount(
+        <BiomeThemeProvider>
+          <SimpleLayout header={<HeaderNavigation titleAlign="center" />} />
+        </BiomeThemeProvider>
+      );
+
+      cySmartGet('header-title').should('exist');
+      cySmartGet('header-title').should('have.css', 'text-align', 'center');
     });
   });
 });

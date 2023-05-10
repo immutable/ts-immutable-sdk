@@ -5,6 +5,7 @@ import { HeaderNavigationStyles } from './HeaderStyles';
 
 export interface HeaderNavigationProps {
   title?: string;
+  titleAlign?: 'left' | 'center';
   showBack?: boolean;
   showSettings?: boolean;
   transparent?: boolean;
@@ -15,6 +16,7 @@ export interface HeaderNavigationProps {
 
 export const HeaderNavigation = ({
   title,
+  titleAlign = 'left',
   showBack = false,
   showSettings = false,
   transparent = true,
@@ -40,7 +42,7 @@ export const HeaderNavigation = ({
     <AppHeaderBar
       testId="header-navigation-container"
       sx={HeaderNavigationStyles(transparent)}
-      contentAlign="left"
+      contentAlign={titleAlign}
     >
       {showBack && (
         <AppHeaderBar.LeftButtCon
