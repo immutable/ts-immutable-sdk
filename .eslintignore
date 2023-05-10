@@ -4,6 +4,6 @@ node_modules/
 dist/
 
 # sample apps
-**/sample-app/**
+**sample-app**/
 
 # put module specific ignore paths here

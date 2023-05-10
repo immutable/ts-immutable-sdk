@@ -7,7 +7,7 @@ export const IMX_POLYGON_TESTNET = new Token(
   '0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851',
   18,
   'IMX',
-  'Immutable X'
+  'Immutable X',
 );
 
 export const WETH_POLYGON_TESTNET = new Token(
@@ -15,7 +15,7 @@ export const WETH_POLYGON_TESTNET = new Token(
   '0x4F062A3EAeC3730560aB89b5CE5aC0ab2C5517aE',
   18,
   'WETH',
-  'Wrapped Ether'
+  'Wrapped Ether',
 );
 
 export const USDC_POLYGON_TESTNET = new Token(
@@ -23,5 +23,5 @@ export const USDC_POLYGON_TESTNET = new Token(
   '0x93733225CCc07Ba02b1449aA3379418Ddc37F6EC',
   18,
   'USDC',
-  'USD Coin'
+  'USD Coin',
 );
