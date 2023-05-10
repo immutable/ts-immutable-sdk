@@ -171,11 +171,11 @@ describe('Bridge Widget tests', () => {
     it('it should call switch network when dropdown clicked and other network selected', async () => {
       switchNetworkStub.resolves({
         network: {
-          chainId: 137,
-          name: 'Polygon',
+          chainId: 13372,
+          name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
-            name: 'Matic',
-            symbol: 'MATIC',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },
