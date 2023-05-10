@@ -7,6 +7,13 @@ const COINGECKO_API_PRO_BASE_URL = 'https://pro-api.coingecko.com/api/v3';
 
 const DEFAULT_FIAT_SYMBOL = 'usd';
 
+// Given that we could have multiple coins with the same symbol and CoinGecko
+// does not support chain id then we are forcing the conversion.
+const symbolsOverrides: { [symbol: string]: string } = {
+  eth: 'ethereum',
+  usdc: 'usd-coin',
+};
+
 /**
  * CryptoFiat module class
  */
@@ -46,7 +53,11 @@ export class CryptoFiat {
 
     this.cache = new Map<string, string>();
     for (const coin of data) {
-      this.cache.set(coin.symbol.toLowerCase(), coin.id.toLowerCase());
+      const override = symbolsOverrides[coin.id.toLowerCase()];
+      this.cache.set(
+        coin.symbol.toLowerCase(),
+        override ?? coin.id.toLowerCase(),
+      );
     }
   }
 

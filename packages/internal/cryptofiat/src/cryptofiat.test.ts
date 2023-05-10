@@ -86,6 +86,44 @@ describe('CryptoFiat', () => {
     expect(result.eth).toEqual({ usd: 4000 });
   });
 
+  it('should fetch and convert token symbols to fiat using the symbolsOverrides map', async () => {
+    const mockedSymbolsResponse = {
+      status: 200,
+      data: [
+        { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin' },
+        { id: 'ethereum', symbol: 'eth', name: 'Ethereum' },
+        { id: 'usd-coin', symbol: 'usdc', name: 'USDC' },
+      ],
+    };
+    mockedAxios.get.mockResolvedValueOnce(mockedSymbolsResponse);
+
+    const mockedConversionResponse = {
+      status: 200,
+      data: {
+        bitcoin: { usd: 50000 },
+        ethereum: { usd: 4000 },
+        'usd-coin': { usd: 10000 },
+      },
+    };
+    mockedAxios.get.mockResolvedValueOnce(mockedConversionResponse);
+
+    const config = new CryptoFiatConfiguration({});
+    const cryptoFiat = new CryptoFiat(config);
+    const result = await cryptoFiat.convert({ tokenSymbols: ['eth', 'usdc'] });
+
+    expect(mockedAxios.get).toHaveBeenCalledTimes(2);
+    expect(mockedAxios.get).toHaveBeenNthCalledWith(
+      1,
+      'https://api.coingecko.com/api/v3/coins/list',
+    );
+    expect(mockedAxios.get).toHaveBeenNthCalledWith(
+      2,
+      'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin&vs_currencies=usd',
+    );
+    expect(result.usdc).toEqual({ usd: 10000 });
+    expect(result.eth).toEqual({ usd: 4000 });
+  });
+
   it('should fetch and convert token symbols to fiat symbols', async () => {
     const mockedSymbolsResponse = {
       status: 200,
