@@ -20,13 +20,13 @@ export type QuoteTradeInfo = {
 
 export type QuoteResponse =
   | {
-      success: true;
-      trade: QuoteTradeInfo;
-    }
+    success: true;
+    trade: QuoteTradeInfo;
+  }
   | {
-      success: false;
-      trade: undefined;
-    };
+    success: false;
+    trade: undefined;
+  };
 
 export type TradeInfo = {
   route: Route<Currency, Currency>;
@@ -38,15 +38,15 @@ export type TradeInfo = {
 
 export type TransactionResponse =
   | {
-      transaction: ethers.providers.TransactionRequest;
-      info: TradeInfo;
-      success: true;
-    }
+    transaction: ethers.providers.TransactionRequest;
+    info: TradeInfo;
+    success: true;
+  }
   | {
-      info: undefined;
-      success: false;
-      transaction: undefined;
-    };
+    info: undefined;
+    success: false;
+    transaction: undefined;
+  };
 
 export type TokenInfo = {
   chainId: number;

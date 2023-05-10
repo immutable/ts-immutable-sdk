@@ -1,24 +1,23 @@
 import { describe, it } from '@jest/globals';
-import { Exchange } from './exchange';
 import { Percent, TradeType } from '@uniswap/sdk-core';
+import { ExchangeConfiguration } from 'config';
+import { Exchange } from './exchange';
 import {
   decodeMulticallData,
   mockRouterImplementation,
   setupSwapTxTest,
   TEST_PERIPHERY_ROUTER_ADDRESS,
-  TestDexConfiguration,
+  TEST_DEX_CONFIGURATION,
 } from './utils/testUtils';
 import * as utils from './lib/utils';
-import { ExchangeConfiguration } from 'config';
 
 jest.mock('./lib/router');
-jest.mock('./lib/utils', () => {
-  return {
-    __esmodule: true,
-    ...jest.requireActual('./lib/utils'),
-    getERC20Decimals: async () => 18,
-  };
-});
+jest.mock('./lib/utils', () => ({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  __esmodule: true,
+  ...jest.requireActual('./lib/utils'),
+  getERC20Decimals: async () => 18,
+}));
 
 const exactInputSingleSignature = '0x04e45aaf';
 
@@ -31,17 +30,17 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountIn
+        params.amountIn,
       );
 
-      let data = tx.transaction?.data?.toString() || '';
+      const data = tx.transaction?.data?.toString() || '';
 
       const { functionCallParams, topLevelParams } = decodeMulticallData(data);
 
@@ -55,10 +54,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(tx.transaction?.from).toBe(params.fromAddress); // from address
       expect(tx.transaction?.value).toBe('0x00'); // refers to 0ETH
       expect(functionCallParams.firstAmount.toString()).toBe(
-        params.amountIn.toString()
+        params.amountIn.toString(),
       ); // amountin
       expect(functionCallParams.secondAmount.toString()).toBe(
-        params.minAmountOut.toString()
+        params.minAmountOut.toString(),
       ); // minAmountOut
       expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
@@ -68,14 +67,14 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const { info, success } = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountIn
+        params.amountIn,
       );
 
       expect(success).toBe(true);
@@ -84,10 +83,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(info?.slippage).toBe('0.1%');
       expect(info?.quote?.amount.toString()).toEqual('10000000000000000000000');
       expect(info?.quoteWithMaxSlippage?.token.address).toEqual(
-        params.outputToken
+        params.outputToken,
       );
       expect(info?.quoteWithMaxSlippage?.amount.toString()).toEqual(
-        '9990000000000000000000'
+        '9990000000000000000000',
       );
     });
   });
@@ -99,7 +98,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -107,10 +106,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.inputToken,
         params.outputToken,
         params.amountIn,
-        higherSlippage
+        higherSlippage,
       );
 
-      let data = tx.transaction?.data?.toString() || '';
+      const data = tx.transaction?.data?.toString() || '';
 
       const { functionCallParams, topLevelParams } = decodeMulticallData(data);
 
@@ -124,10 +123,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(tx.transaction?.from).toBe(params.fromAddress); // from address
       expect(tx.transaction?.value).toBe('0x00'); // refers to 0ETH
       expect(functionCallParams.firstAmount.toString()).toBe(
-        params.amountIn.toString()
+        params.amountIn.toString(),
       ); // amountin
       expect(functionCallParams.secondAmount.toString()).toBe(
-        params.minAmountOut.toString()
+        params.minAmountOut.toString(),
       ); // minAmountOut
       expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
@@ -136,7 +135,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const { info, success } = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -144,7 +143,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.inputToken,
         params.outputToken,
         params.amountIn,
-        higherSlippage
+        higherSlippage,
       );
 
       expect(success).toBe(true);
@@ -153,10 +152,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(info?.slippage).toBe('0.2%');
       expect(info?.quote?.amount.toString()).toEqual('10000000000000000000000');
       expect(info?.quoteWithMaxSlippage?.token.address).toEqual(
-        params.outputToken
+        params.outputToken,
       );
       expect(info?.quoteWithMaxSlippage?.amount.toString()).toEqual(
-        '9980000000000000000000'
+        '9980000000000000000000',
       );
     });
   });
@@ -166,7 +165,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const higherSlippage = new Percent(2, 1000); // 0.2%
       const params = setupSwapTxTest(higherSlippage);
 
-      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       const invalidAddress = '0x0123abcdef';
@@ -177,10 +176,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.inputToken,
           params.outputToken,
           params.amountIn,
-          higherSlippage
-        )
+          higherSlippage,
+        ),
       ).rejects.toThrow(
-        new utils.InvalidAddress('Address is not valid: 0x0123abcdef')
+        new utils.InvalidAddress('Address is not valid: 0x0123abcdef'),
       );
 
       await expect(
@@ -189,8 +188,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           invalidAddress,
           params.outputToken,
           params.amountIn,
-          higherSlippage
-        )
+          higherSlippage,
+        ),
       ).rejects.toThrow(utils.InvalidAddress);
 
       await expect(
@@ -199,8 +198,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.inputToken,
           invalidAddress,
           params.amountIn,
-          higherSlippage
-        )
+          higherSlippage,
+        ),
       ).rejects.toThrow(utils.InvalidAddress);
     });
   });
@@ -211,7 +210,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(higherSlippage);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
       await expect(
@@ -221,8 +220,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           params.outputToken,
           params.amountIn,
           higherSlippage,
-          11
-        )
+          11,
+        ),
       ).rejects.toThrow();
     });
   });
