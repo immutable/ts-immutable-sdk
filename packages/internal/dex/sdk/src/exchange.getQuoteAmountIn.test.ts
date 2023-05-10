@@ -1,25 +1,25 @@
 import { describe, expect, it } from '@jest/globals';
 import { ethers } from 'ethers';
+import { Currency, Token, TradeType } from '@uniswap/sdk-core';
+import {
+  FeeAmount, Pool, Route, TickMath,
+} from '@uniswap/v3-sdk';
 import { Exchange } from './exchange';
 import { Router } from './lib/router';
-import { Currency, Token, TradeType } from '@uniswap/sdk-core';
-import { FeeAmount, Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import {
   IMX_TEST_CHAIN,
-  TEST_CHAIN_ID,
-  TestDexConfiguration,
+  TEST_DEX_CONFIGURATION,
   WETH_TEST_CHAIN,
 } from './utils/testUtils';
 import { ExchangeConfiguration } from './config';
 
 jest.mock('./lib/router');
-jest.mock('./lib/utils', () => {
-  return {
-    __esmodule: true,
-    ...jest.requireActual('./lib/utils'),
-    getERC20Decimals: async () => 18,
-  };
-});
+jest.mock('./lib/utils', () => ({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  __esmodule: true,
+  ...jest.requireActual('./lib/utils'),
+  getERC20Decimals: async () => 18,
+}));
 
 const wethToken: Token = WETH_TEST_CHAIN;
 const imxToken: Token = IMX_TEST_CHAIN;
@@ -40,7 +40,7 @@ describe('getQuoteFromAmountIn', () => {
           FeeAmount.HIGH,
           sqrtPriceAtTick,
           arbitraryLiquidity,
-          arbitraryTick
+          arbitraryTick,
         ),
         new Pool(
           wethToken,
@@ -48,41 +48,37 @@ describe('getQuoteFromAmountIn', () => {
           FeeAmount.LOW,
           sqrtPriceAtTick,
           arbitraryLiquidity,
-          arbitraryTick
+          arbitraryTick,
         ),
       ];
       const route: Route<Currency, Currency> = new Route(
         pools,
         wethToken,
-        imxToken
+        imxToken,
       );
       const tradeType: TradeType = TradeType.EXACT_INPUT;
 
-      (Router as unknown as jest.Mock).mockImplementationOnce(() => {
-        return {
-          findOptimalRoute: () => {
-            return {
-              success: true,
-              trade: {
-                route: route,
-                amountIn: amountIn,
-                tokenIn: wethToken,
-                amountOut: amountOut,
-                tokenOut: imxToken,
-                tradeType: tradeType,
-              },
-            };
+      (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
+        findOptimalRoute: () => ({
+          success: true,
+          trade: {
+            route,
+            amountIn,
+            tokenIn: wethToken,
+            amountOut,
+            tokenOut: imxToken,
+            tradeType,
           },
-        };
-      });
+        }),
+      }));
 
-      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
       const result = await exchange.getQuoteFromAmountIn(
         wethToken.address,
         imxToken.address,
         amountIn,
-        maxHops
+        maxHops,
       );
       expect(result.trade?.route).toBe(route);
       expect(result.trade?.amountIn).toBe(amountIn);
@@ -99,24 +95,20 @@ describe('getQuoteFromAmountIn', () => {
       const maxHops = 2;
       const amountIn = ethers.utils.parseEther('1000').toString();
 
-      (Router as unknown as jest.Mock).mockImplementationOnce(() => {
-        return {
-          findOptimalRoute: () => {
-            return {
-              success: false,
-              trade: undefined,
-            };
-          },
-        };
-      });
+      (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
+        findOptimalRoute: () => ({
+          success: false,
+          trade: undefined,
+        }),
+      }));
 
-      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
       const result = await exchange.getQuoteFromAmountIn(
         wethToken.address,
         imxToken.address,
         amountIn,
-        maxHops
+        maxHops,
       );
       expect(result.trade).toBe(undefined);
       expect(result.success).toBe(false);
@@ -128,24 +120,20 @@ describe('getQuoteFromAmountIn', () => {
       const maxHops = 2;
       const amountIn = ethers.utils.parseEther('1000').toString();
 
-      (Router as unknown as jest.Mock).mockImplementationOnce(() => {
-        return {
-          findOptimalRoute: () => {
-            return {
-              success: false,
-              trade: undefined,
-            };
-          },
-        };
-      });
+      (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
+        findOptimalRoute: () => ({
+          success: false,
+          trade: undefined,
+        }),
+      }));
 
-      const configuration = new ExchangeConfiguration(TestDexConfiguration);
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
       const result = await exchange.getQuoteFromAmountIn(
         wethToken.address,
         imxToken.address,
         amountIn,
-        maxHops
+        maxHops,
       );
       expect(result.trade).toBe(undefined);
       expect(result.success).toBe(false);

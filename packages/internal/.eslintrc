@@ -1,6 +1,5 @@
 {
   "extends": ["airbnb", "airbnb-typescript"],
-  "ignorePatterns": ["jest.config.*", "rollup.config.*"],
   "rules": {
     "@typescript-eslint/naming-convention": [
       "error",

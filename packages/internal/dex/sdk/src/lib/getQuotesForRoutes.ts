@@ -19,25 +19,27 @@ export async function getQuotesForRoutes(
   quoterContractAddress: string,
   routes: Route<Currency, Currency>[],
   amountSpecified: CurrencyAmount<Currency>,
-  tradeType: TradeType
+  tradeType: TradeType,
 ): Promise<QuoteResult[]> {
   // With all valid routes, get the best quotes
   const callData = routes.map(
-    (route) =>
-      SwapQuoter.quoteCallParameters(route, amountSpecified, tradeType, {
-        useQuoterV2: true,
-      }).calldata
+    (route) => SwapQuoter.quoteCallParameters(route, amountSpecified, tradeType, {
+      useQuoterV2: true,
+    }).calldata,
   );
 
   const quoteResults = await multicallMultipleCallDataSingContract(
     multicallContract,
     callData,
     quoterContractAddress,
-    { gasRequired: DEFAULT_GAS_QUOTE }
+    { gasRequired: DEFAULT_GAS_QUOTE },
   );
 
-  let decodedQuoteResults: QuoteResult[] = [];
-  for (let i in quoteResults.returnData) {
+  const decodedQuoteResults: QuoteResult[] = [];
+  // TODO: for..in loops iterate over the entire prototype chain,
+  // Use Object.{keys,values,entries}, and iterate over the resulting array.
+  // eslint-disable-next-line no-restricted-syntax, guard-for-in
+  for (const i in quoteResults.returnData) {
     const functionSig = callData[i].substring(0, 10);
     const returnTypes = quoteReturnMapping[functionSig];
     if (!returnTypes) {
@@ -47,21 +49,25 @@ export async function getQuotesForRoutes(
     try {
       if (quoteResults.returnData[i].returnData === '0x') {
         // There is no quote result for the swap using this route, so don't include it in results
+        // eslint-disable-next-line no-continue
         continue;
       }
 
       const decodedQuoteResult = ethers.utils.defaultAbiCoder.decode(
         returnTypes,
-        quoteResults.returnData[i].returnData
+        quoteResults.returnData[i].returnData,
       );
       const quoteResult = {
         route: routes[i],
-        quoteAmount: decodedQuoteResult[amountIndex], // The 0th element in each decoded data is going to be the amountOut or amountIn.
+        // The 0th element in each decoded data is going to be the amountOut or amountIn.
+        quoteAmount: decodedQuoteResult[amountIndex],
       };
       decodedQuoteResults.push(quoteResult);
     } catch {
+      // TODO: Should there be a log statement here?
+      // eslint-disable-next-line no-console
       console.warn(
-        `Quote failed with reason ${quoteResults.returnData[i].returnData}`
+        `Quote failed with reason ${quoteResults.returnData[i].returnData}`,
       );
     }
   }

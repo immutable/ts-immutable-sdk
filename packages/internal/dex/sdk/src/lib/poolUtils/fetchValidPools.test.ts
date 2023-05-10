@@ -1,8 +1,10 @@
 import { describe, it } from '@jest/globals';
-import { BigNumber, Contract, providers, utils } from 'ethers';
-import { fetchValidPools } from './fetchValidPools';
+import {
+  BigNumber, Contract, providers, utils,
+} from 'ethers';
 import { TickMath } from '@uniswap/v3-sdk';
-import { Multicall__factory, factories } from '../../contracts/types';
+import { fetchValidPools } from './fetchValidPools';
+import { Multicall__factory } from '../../contracts/types';
 import {
   IMX_TEST_CHAIN,
   TEST_CHAIN_ID,
@@ -15,6 +17,7 @@ import {
 jest.mock('@ethersproject/contracts');
 
 describe('fetchPools', () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let mockedMulticallContract: jest.Mock;
 
   describe('when a pool has no liquidity or price result', () => {
@@ -56,31 +59,29 @@ describe('fetchPools', () => {
       // There will be 4 pool addresses when given a pair of tokens with no common routing tokens
       mockedMulticallContract = (
         Contract as unknown as jest.Mock
-      ).mockImplementationOnce(() => {
-        return {
-          callStatic: {
-            multicall: jest
-              .fn()
-              .mockResolvedValueOnce(slot0MockResults)
-              .mockResolvedValueOnce(liquiditiesMockResult),
-          },
-        };
-      });
+      ).mockImplementationOnce(() => ({
+        callStatic: {
+          multicall: jest
+            .fn()
+            .mockResolvedValueOnce(slot0MockResults)
+            .mockResolvedValueOnce(liquiditiesMockResult),
+        },
+      }));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
-        TEST_CHAIN_ID
+        TEST_CHAIN_ID,
       );
       const multicallContract = Multicall__factory.connect(
         TEST_MULTICALL_ADDRESS,
-        provider
+        provider,
       );
 
       const pools = await fetchValidPools(
         multicallContract,
         [WETH_TEST_CHAIN, IMX_TEST_CHAIN],
         [],
-        TEST_V3_CORE_FACTORY_ADDRESS
+        TEST_V3_CORE_FACTORY_ADDRESS,
       );
 
       expect(pools).toHaveLength(0);
@@ -102,7 +103,7 @@ describe('fetchPools', () => {
                 'uint8',
                 'bool',
               ],
-              [BigNumber.from(0), BigNumber.from(0), 0, 1, 1, 0, true]
+              [BigNumber.from(0), BigNumber.from(0), 0, 1, 1, 0, true],
             ),
           },
           {
@@ -116,7 +117,7 @@ describe('fetchPools', () => {
                 'uint8',
                 'bool',
               ],
-              [BigNumber.from(0), BigNumber.from(0), 0, 1, 1, 0, true]
+              [BigNumber.from(0), BigNumber.from(0), 0, 1, 1, 0, true],
             ),
           },
           {
@@ -130,7 +131,7 @@ describe('fetchPools', () => {
                 'uint8',
                 'bool',
               ],
-              [BigNumber.from(0), BigNumber.from(0), 0, 1, 1, 0, true]
+              [BigNumber.from(0), BigNumber.from(0), 0, 1, 1, 0, true],
             ),
           },
           {
@@ -144,7 +145,7 @@ describe('fetchPools', () => {
                 'uint8',
                 'bool',
               ],
-              [BigNumber.from(0), BigNumber.from(0), 0, 1, 1, 0, true]
+              [BigNumber.from(0), BigNumber.from(0), 0, 1, 1, 0, true],
             ),
           },
         ],
@@ -155,25 +156,25 @@ describe('fetchPools', () => {
           {
             returnData: utils.defaultAbiCoder.encode(
               ['uint128'],
-              [BigNumber.from(0)]
+              [BigNumber.from(0)],
             ),
           },
           {
             returnData: utils.defaultAbiCoder.encode(
               ['uint128'],
-              [BigNumber.from(0)]
+              [BigNumber.from(0)],
             ),
           },
           {
             returnData: utils.defaultAbiCoder.encode(
               ['uint128'],
-              [BigNumber.from(0)]
+              [BigNumber.from(0)],
             ),
           },
           {
             returnData: utils.defaultAbiCoder.encode(
               ['uint128'],
-              [BigNumber.from(0)]
+              [BigNumber.from(0)],
             ),
           },
         ],
@@ -182,31 +183,29 @@ describe('fetchPools', () => {
       // There will be 4 pool addresses when given a pair of tokens with no common routing tokens
       mockedMulticallContract = (
         Contract as unknown as jest.Mock
-      ).mockImplementationOnce(() => {
-        return {
-          callStatic: {
-            multicall: jest
-              .fn()
-              .mockResolvedValueOnce(slot0MockResults)
-              .mockResolvedValueOnce(liquiditiesMockResult),
-          },
-        };
-      });
+      ).mockImplementationOnce(() => ({
+        callStatic: {
+          multicall: jest
+            .fn()
+            .mockResolvedValueOnce(slot0MockResults)
+            .mockResolvedValueOnce(liquiditiesMockResult),
+        },
+      }));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
-        TEST_CHAIN_ID
+        TEST_CHAIN_ID,
       );
       const multicallContract = Multicall__factory.connect(
         TEST_MULTICALL_ADDRESS,
-        provider
+        provider,
       );
 
       const pools = await fetchValidPools(
         multicallContract,
         [WETH_TEST_CHAIN, IMX_TEST_CHAIN],
         [],
-        TEST_V3_CORE_FACTORY_ADDRESS
+        TEST_V3_CORE_FACTORY_ADDRESS,
       );
 
       expect(pools).toHaveLength(0);
@@ -231,7 +230,7 @@ describe('fetchPools', () => {
                 'uint8',
                 'bool',
               ],
-              [sqrtPriceAtTick.toString(), arbitraryTick, 0, 1, 1, 0, true]
+              [sqrtPriceAtTick.toString(), arbitraryTick, 0, 1, 1, 0, true],
             ),
           },
           {
@@ -245,7 +244,7 @@ describe('fetchPools', () => {
                 'uint8',
                 'bool',
               ],
-              [sqrtPriceAtTick.toString(), arbitraryTick, 0, 1, 1, 0, true]
+              [sqrtPriceAtTick.toString(), arbitraryTick, 0, 1, 1, 0, true],
             ),
           },
           {
@@ -259,7 +258,7 @@ describe('fetchPools', () => {
                 'uint8',
                 'bool',
               ],
-              [sqrtPriceAtTick.toString(), arbitraryTick, 0, 1, 1, 0, true]
+              [sqrtPriceAtTick.toString(), arbitraryTick, 0, 1, 1, 0, true],
             ),
           },
           {
@@ -273,7 +272,7 @@ describe('fetchPools', () => {
                 'uint8',
                 'bool',
               ],
-              [sqrtPriceAtTick.toString(), arbitraryTick, 0, 1, 1, 0, true]
+              [sqrtPriceAtTick.toString(), arbitraryTick, 0, 1, 1, 0, true],
             ),
           },
         ],
@@ -284,25 +283,25 @@ describe('fetchPools', () => {
           {
             returnData: utils.defaultAbiCoder.encode(
               ['uint128'],
-              [BigNumber.from(1000000)]
+              [BigNumber.from(1000000)],
             ),
           },
           {
             returnData: utils.defaultAbiCoder.encode(
               ['uint128'],
-              [BigNumber.from(1000000)]
+              [BigNumber.from(1000000)],
             ),
           },
           {
             returnData: utils.defaultAbiCoder.encode(
               ['uint128'],
-              [BigNumber.from(1000000)]
+              [BigNumber.from(1000000)],
             ),
           },
           {
             returnData: utils.defaultAbiCoder.encode(
               ['uint128'],
-              [BigNumber.from(1000000)]
+              [BigNumber.from(1000000)],
             ),
           },
         ],
@@ -311,31 +310,29 @@ describe('fetchPools', () => {
       // There will be 4 pool addresses when given a pair of tokens with no common routing tokens
       mockedMulticallContract = (
         Contract as unknown as jest.Mock
-      ).mockImplementationOnce(() => {
-        return {
-          callStatic: {
-            multicall: jest
-              .fn()
-              .mockResolvedValueOnce(slot0MockResults)
-              .mockResolvedValueOnce(liquiditiesMockResult),
-          },
-        };
-      });
+      ).mockImplementationOnce(() => ({
+        callStatic: {
+          multicall: jest
+            .fn()
+            .mockResolvedValueOnce(slot0MockResults)
+            .mockResolvedValueOnce(liquiditiesMockResult),
+        },
+      }));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
-        TEST_CHAIN_ID
+        TEST_CHAIN_ID,
       );
       const multicallContract = Multicall__factory.connect(
         TEST_MULTICALL_ADDRESS,
-        provider
+        provider,
       );
 
       const pools = await fetchValidPools(
         multicallContract,
         [WETH_TEST_CHAIN, IMX_TEST_CHAIN],
         [],
-        TEST_V3_CORE_FACTORY_ADDRESS
+        TEST_V3_CORE_FACTORY_ADDRESS,
       );
 
       expect(pools).toHaveLength(4);
