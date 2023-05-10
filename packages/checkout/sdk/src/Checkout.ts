@@ -28,14 +28,17 @@ import {
   SwitchNetworkResult,
 } from './types';
 import { CheckoutError, CheckoutErrorType } from './errors';
-import { CheckoutModuleConfiguration, CheckoutConfiguration, SandboxConfiguration } from './config';
+import {
+  CheckoutModuleConfiguration,
+  CheckoutConfiguration,
+  SandboxConfiguration,
+} from './config';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
   private providerPreference: ConnectionProviders | undefined;
 
   constructor(config: CheckoutModuleConfiguration = SandboxConfiguration) {
-    console.log("constructor: config is, ", config);
     this.config = new CheckoutConfiguration(config);
   }
 
@@ -100,7 +103,11 @@ export class Checkout {
    */
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
     if (!params.contractAddress || params.contractAddress === '') {
-      return await balances.getBalance(this.config, params.provider, params.walletAddress);
+      return await balances.getBalance(
+        this.config,
+        params.provider,
+        params.walletAddress
+      );
     }
     return await balances.getERC20Balance(
       params.provider,
