@@ -19,6 +19,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/config": "0.0.0",
+    "@imtbl/cryptofiat": "0.0.0",
     "ethers": "^5.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
