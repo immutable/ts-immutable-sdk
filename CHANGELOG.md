@@ -16,3 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Deprecated
+
+
+## [Unreleased] - 2023-05-1
+
+### Fixed
+
+- Fixed a bug where Passport Provider would return Stark Key instead of Ether Key.
