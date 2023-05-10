@@ -23,12 +23,12 @@ export function Example() {
 
   const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
-  const [inputAmount, setInputAmount] = useState<string>('0')
+  const [inputAmount, setInputAmount] = useState<string>('0');
   const [swapStatus, setSwapStatus] = useState<boolean>(false);
   const [approved, setApproved] = useState<boolean>(false);
   const [result, setResult] = useState<TransactionResponse | null>();
   const [routes, setRoutes] = useState<RouteType[]>([]);
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null);
   const [addressToSymbolMapping, setAddressToSymbolMapping] = useState<mapping>(
     {}
   );
@@ -49,7 +49,7 @@ export function Example() {
   }, [inputToken, outputToken]);
 
   if (ethereumAccount === null) {
-    return <ConnectAccount setAccount={setEthereumAccount}/>
+    return <ConnectAccount setAccount={setEthereumAccount} />;
   }
 
   type mapping = {
@@ -102,7 +102,7 @@ export function Example() {
       const mapping = await getTokenPaths(txn.info);
       setRoutes(mapping);
     } else {
-      setError('Error fetching quote')
+      setError('Error fetching quote');
       setResult(null);
       setRoutes([]);
     }
@@ -111,6 +111,7 @@ export function Example() {
   };
 
   const performSwap = async (result: TransactionResponse) => {
+    setSwapStatus(false);
     setIsFetching(true);
     const provider = new ethers.providers.JsonRpcProvider(
       process.env.NEXT_PUBLIC_RPC_URL
@@ -118,10 +119,14 @@ export function Example() {
 
     // Approve the ERC20 spend
     if (!approved) {
-      const approveCalldata = getERC20ApproveCalldata(inputAmount);
+      const inputBigNumber = ethers.utils.parseUnits(
+        inputAmount,
+        result.info?.quote.token.decimals
+      );
+      const approveCalldata = getERC20ApproveCalldata(inputBigNumber);
       const transactionRequest = {
         data: approveCalldata,
-        to: FUN_TOKEN,
+        to: inputToken,
         value: '0',
         from: ethereumAccount,
       };
@@ -133,7 +138,7 @@ export function Example() {
         );
 
         // Wait for the Approve transaction to complete
-        await provider.waitForTransaction(approveReceipt.result, 1, 250000);
+        await provider.waitForTransaction(approveReceipt.result, 1, 500000);
         setApproved(true);
       } catch (e: any) {
         alert(e.message);
@@ -144,22 +149,21 @@ export function Example() {
 
     try {
       // Send the Swap transaction
-      console.log({result})
       const receipt = await (window as any).ethereum.send(
         'eth_sendTransaction',
         [result.transaction]
       );
 
       // Wait for the Swap transaction to complete
-      await provider.waitForTransaction(receipt.result, 1, 250000);
+      await provider.waitForTransaction(receipt.result, 1, 500000);
+      setIsFetching(false);
+      setSwapStatus(true);
     } catch (e: any) {
       alert(e.message);
       setIsFetching(false);
+      setSwapStatus(false);
       return;
     }
-
-    setIsFetching(false);
-    setSwapStatus(true);
   };
 
   return (
@@ -176,7 +180,10 @@ export function Example() {
         Output Token: {outputToken} ({addressToSymbolMapping[outputToken]})
       </h3>
 
-      <AmountInput  inputTokenSymbol={addressToSymbolMapping[inputToken]} setInputAmount={setInputAmount} />
+      <AmountInput
+        inputTokenSymbol={addressToSymbolMapping[inputToken]}
+        setInputAmount={setInputAmount}
+      />
 
       <button
         className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
@@ -189,23 +196,38 @@ export function Example() {
       <hr className="my-4" />
       {result && result.info && (
         <>
-          <h3>Expected amount: {ethers.utils.formatEther(result.info.quote.amount)} {`${addressToSymbolMapping[result.info.quote.token.address]}`}</h3>
-          <h3>Minimum amount: {ethers.utils.formatEther(result.info.quoteWithMaxSlippage.amount)} {`${addressToSymbolMapping[result.info.quoteWithMaxSlippage.token.address]}`}</h3>
+          <h3>
+            Expected amount:{' '}
+            {ethers.utils.formatEther(result.info.quote.amount)}{' '}
+            {`${addressToSymbolMapping[result.info.quote.token.address]}`}
+          </h3>
+          <h3>
+            Minimum amount:{' '}
+            {ethers.utils.formatEther(result.info.quoteWithMaxSlippage.amount)}{' '}
+            {`${
+              addressToSymbolMapping[
+                result.info.quoteWithMaxSlippage.token.address
+              ]
+            }`}
+          </h3>
+          <h3>Slippage: {result.info.slippage}</h3>
           {routes.length > 0 && (
             <>
               <h3>
                 Token Path:&nbsp;
-                {result.info.route.tokenPath.map((token: any, index: number) => {
-                  const key = token.address;
-                  return (
-                    <span key={key}>
-                      {addressToSymbolMapping[token.address]}{' '}
-                      {index !== result.info.route.tokenPath.length - 1
-                        ? `--->`
-                        : ''}{' '}
-                    </span>
-                  );
-                })}
+                {result.info.route.tokenPath.map(
+                  (token: any, index: number) => {
+                    const key = token.address;
+                    return (
+                      <span key={key}>
+                        {addressToSymbolMapping[token.address]}{' '}
+                        {index !== result.info.route.tokenPath.length - 1
+                          ? `--->`
+                          : ''}{' '}
+                      </span>
+                    );
+                  }
+                )}
               </h3>
               <h3>
                 Pools used:&nbsp;
@@ -230,10 +252,11 @@ export function Example() {
               {isFetching && <h3>loading...</h3>}
               {swapStatus && (
                 <h3 style={{ marginTop: '12px' }}>
-                  Swap successful! Check your metamask to see updated token balances
+                  Swap successful! Check your metamask to see updated token
+                  balances
                 </h3>
               )}
-              {error && <Error message={error}/>}
+              {error && <Error message={error} />}
             </>
           )}
         </>
@@ -242,10 +265,10 @@ export function Example() {
   );
 }
 
-const Error = ({message}: {message: string}) => {
+const Error = ({ message }: { message: string }) => {
   return (
     <div>
       <p>{message}</p>
     </div>
-  )
-}
+  );
+};
