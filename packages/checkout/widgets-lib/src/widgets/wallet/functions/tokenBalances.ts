@@ -3,6 +3,10 @@ import { Checkout, ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { sortTokensByAmount } from '../../../lib/utils';
 import { CryptoFiat, CryptoFiatConvertReturn } from '@imtbl/cryptofiat';
 
+enum FiatSymbols {
+  USD = 'usd'
+}
+
 export interface BalanceInfo {
   id: string;
   symbol: string;
@@ -69,7 +73,7 @@ const buildCryptoToFiatRequest = (
   balances: GetBalanceResult[]
 ): RequestStructure => {
   const tokenSymbols = balances.map((balance) => balance.token.symbol);
-  const fiatSymbols = ['usd', 'aud'];
+  const fiatSymbols = [FiatSymbols.USD];
 
   const request: RequestStructure = {
     tokenSymbols,
@@ -93,9 +97,9 @@ export const calculateCryptoToFiatValue = (
   if (parseFloat(balance) === 0 || isNaN(parsedBalance))
     return zeroBalanceString;
 
-  if (!conversion['usd']) return zeroBalanceString;
+  if (!conversion[FiatSymbols.USD]) return zeroBalanceString;
 
-  return formatFiatString(parsedBalance * conversion['usd']);
+  return formatFiatString(parsedBalance * conversion[FiatSymbols.USD]);
 };
 
 export const formatFiatString = (amount: number): string => {
