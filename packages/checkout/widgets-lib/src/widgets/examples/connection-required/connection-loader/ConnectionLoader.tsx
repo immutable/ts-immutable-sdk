@@ -12,6 +12,7 @@ import {
   SuccessLogoStyles,
 } from '../../../../components/Success/SuccessViewStyles';
 import { CenteredBoxContent } from '../../../../components/CenteredBoxContent/CenteredBoxContent';
+import { zkEVMNetwork } from '../../../../lib/networkUtils';
 
 export interface ConnectionLoaderProps {
   children?: React.ReactNode;
@@ -59,7 +60,9 @@ export function ConnectionLoader({
       });
 
       console.log('connectRes', connectRes);
-      if (connectRes.network.chainId !== ChainId.POLYGON) {
+      if (
+        connectRes.network.chainId !== zkEVMNetwork(checkout.config.environment)
+      ) {
         return ConnectionStatus.CONNECTED_WRONG_NETWORK;
       }
 
