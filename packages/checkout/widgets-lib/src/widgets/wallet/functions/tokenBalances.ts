@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { sortTokensByAmount } from '../../../lib/utils';
-import { CryptoFiat, CryptoFiatConvertReturn } from '@imtbl/cryptofiat';
+import { CryptoFiat, CryptoFiatConvertParams, CryptoFiatConvertReturn } from '@imtbl/cryptofiat';
 
 enum FiatSymbols {
   USD = 'usd'
@@ -64,18 +64,13 @@ export const getTokenBalances = async (
   }
 };
 
-export interface RequestStructure {
-  tokenSymbols: string[];
-  fiatSymbols: string[];
-}
-
 const buildCryptoToFiatRequest = (
   balances: GetBalanceResult[]
-): RequestStructure => {
+): CryptoFiatConvertParams => {
   const tokenSymbols = balances.map((balance) => balance.token.symbol);
   const fiatSymbols = [FiatSymbols.USD];
 
-  const request: RequestStructure = {
+  const request: CryptoFiatConvertParams = {
     tokenSymbols,
     fiatSymbols,
   };
