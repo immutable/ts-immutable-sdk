@@ -1,5 +1,3 @@
-// TODO: Fix dependency error
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, it } from '@jest/globals';
 import { ethers } from 'ethers';
 import { Percent, TradeType } from '@uniswap/sdk-core';
@@ -13,6 +11,7 @@ import {
   TEST_DEX_CONFIGURATION,
 } from './utils/testUtils';
 import * as utils from './lib/utils';
+import { Router } from './lib';
 
 jest.mock('./lib/router');
 jest.mock('./lib/utils', () => ({
@@ -27,6 +26,32 @@ const exactOutputSingleSignature = '0x5023b4df';
 const DEFAULT_SLIPPAGE: Percent = new Percent(1, 1000); // 1/1000 = 0.001 = 0.1%
 
 describe('getUnsignedSwapTxFromAmountOut', () => {
+  describe('When no route found', () => {
+    it('Returns NO_ROUTE_FOUND', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+
+      (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
+        findOptimalRoute: () => ({
+          success: false,
+          trade: undefined,
+        }),
+      }));
+
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange(configuration);
+      const tx = await exchange.getUnsignedSwapTxFromAmountOut(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountOut,
+      );
+
+      expect(tx.info).toBe(undefined);
+      expect(tx.transaction).toBe(undefined);
+      expect(tx.success).toBe(false);
+    });
+  });
+
   describe('Swap with single pool and default slippage tolerance', () => {
     it('Generates valid calldata', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
