@@ -6,7 +6,7 @@ import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { Environment } from '@imtbl/config';
 
 export class ImmutableSwap extends ImmutableWebComponent {
-  environment = Environment.PRODUCTION;
+  environment = Environment.SANDBOX;
   providerPreference = ConnectionProviders.METAMASK;
   amount = '';
   fromContractAddress = '';

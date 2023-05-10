@@ -17,7 +17,7 @@ export const SwapButton = (props: SwapButtonProps) => {
     if (!transaction || !provider) return;
     // TODO: update here to go to context and stop hardcoing
     const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
+      baseConfig: { environment: Environment.SANDBOX },
     });
     try {
       await checkout.sendTransaction({

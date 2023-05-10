@@ -39,7 +39,7 @@ export function ConnectionLoader({
   theme,
 }: ConnectionLoaderProps) {
   const checkout = new Checkout({
-    baseConfig: { environment: Environment.PRODUCTION },
+    baseConfig: { environment: Environment.SANDBOX },
   });
   const [connStatus, setConnStatus] = useState(ConnectionStatus.UNKNOWN);
 

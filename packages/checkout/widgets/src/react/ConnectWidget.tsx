@@ -26,7 +26,7 @@ export function ConnectReact(props: ConnectReactProps): JSX.Element {
 
   return (
     <imtbl-connect
-      environment={config.theme ?? Environment.PRODUCTION}
+      environment={config.environment ?? Environment.SANDBOX}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }

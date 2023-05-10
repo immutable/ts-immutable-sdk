@@ -72,7 +72,7 @@ export default function With(props: WithProps) {
   const checkout = useMemo(
     () =>
       new Checkout({
-        baseConfig: { environment: Environment.PRODUCTION },
+        baseConfig: { environment: Environment.SANDBOX },
       }),
     []
   );

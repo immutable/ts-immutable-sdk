@@ -27,6 +27,7 @@ import {
 } from './BridgeWidgetEvents';
 import { EtherscanLink } from './components/EtherscanLink';
 import { Environment } from '@imtbl/config';
+import { L1Network } from '../../lib/networkUtils';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -47,9 +48,7 @@ export enum BridgeWidgetViews {
   FAIL = 'FAIL',
 }
 
-const bridgingNetworks = Object.values(Network).filter(
-  (network) => network.toString() !== Network.GOERLI
-);
+const bridgingNetworks = Object.values(Network);
 
 export const NetworkChainMap = {
   [Network.ETHEREUM]: ChainId.ETHEREUM,
@@ -59,6 +58,10 @@ export const NetworkChainMap = {
 
 export function BridgeWidget(props: BridgeWidgetProps) {
   const { environment, params, theme } = props;
+  const checkout = useMemo(
+    () => new Checkout({ baseConfig: { environment } }),
+    [environment]
+  );
   const { providerPreference, fromContractAddress, amount, fromNetwork } =
     params;
   const biomeTheme: BaseTokens =
@@ -68,14 +71,11 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   const defaultFromChainId = useMemo(() => {
     return fromNetwork && bridgingNetworks.includes(fromNetwork)
       ? NetworkChainMap[fromNetwork]
-      : ChainId.ETHEREUM;
-  }, [fromNetwork]);
+      : L1Network(checkout.config.environment);
+  }, [fromNetwork, checkout]);
 
   const firstRender = useRef(true);
-  const checkout = useMemo(
-    () => new Checkout({ baseConfig: { environment } }),
-    [environment]
-  );
+
   const [provider, setProvider] = useState<Web3Provider>();
   const [balances, setBalances] = useState<GetBalanceResult[]>([]);
   const [connectedChainId, setConnectedChainId] = useState<ChainId>();

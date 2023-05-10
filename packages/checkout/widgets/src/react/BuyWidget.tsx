@@ -28,7 +28,7 @@ export function BuyReact(props: BuyReactProps): JSX.Element {
 
   return (
     <imtbl-buy
-      environment={Environment.PRODUCTION}
+      environment={Environment.SANDBOX}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }

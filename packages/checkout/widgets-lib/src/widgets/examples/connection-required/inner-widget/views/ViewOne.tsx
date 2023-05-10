@@ -12,7 +12,7 @@ export const ViewOne = () => {
   const { viewDispatch } = useContext(ViewContext);
 
   const checkout = new Checkout({
-    baseConfig: { environment: Environment.PRODUCTION },
+    baseConfig: { environment: Environment.SANDBOX },
   });
 
   async function metamaskClick() {

@@ -57,9 +57,9 @@ export const BridgeButton = (props: BridgeButtonProps) => {
     // get unsigned transaction from the bridge/exchange sdk
     const transaction = getUnsignedTransaction();
 
-    // TODO: Refactor this checkout object into context and stop hardcoding to production
+    // TODO: Refactor this checkout object into context and stop hardcoding to sandbox
     const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
+      baseConfig: { environment: Environment.SANDBOX },
     });
     try {
       const response = await checkout.sendTransaction({

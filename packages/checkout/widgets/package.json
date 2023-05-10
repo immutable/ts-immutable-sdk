@@ -6,6 +6,7 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/checkout-sdk": "0.0.0",
+    "@imtbl/config": "0.0.0",
     "ethers": "^5.7.2"
   },
   "devDependencies": {

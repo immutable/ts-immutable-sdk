@@ -55,7 +55,7 @@ const TokenSelect = ({
   const getTokens = useCallback(async () => {
     // TODO: update here to go to context and stop hardcoing
     const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
+      baseConfig: { environment: Environment.SANDBOX },
     });
 
     const allowList = await checkout.getTokenAllowList({

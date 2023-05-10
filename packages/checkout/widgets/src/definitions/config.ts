@@ -1,3 +1,4 @@
+import { Environment } from '@imtbl/config';
 import { WidgetTheme } from './constants';
 
 /**
@@ -6,4 +7,5 @@ import { WidgetTheme } from './constants';
  */
 export type CheckoutWidgetsConfig = {
   theme?: WidgetTheme;
+  environment: Environment;
 };

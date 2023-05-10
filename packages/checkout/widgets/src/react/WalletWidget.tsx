@@ -38,7 +38,7 @@ export function WalletReact(props: WalletReactProps) {
   // converting them to string for compatible webComponent properties
   return (
     <imtbl-wallet
-      environment={Environment.PRODUCTION}
+      environment={Environment.SANDBOX}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }

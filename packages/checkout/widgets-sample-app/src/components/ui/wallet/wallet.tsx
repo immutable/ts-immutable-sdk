@@ -1,5 +1,9 @@
 import { useEffect } from 'react';
-import { WidgetConnectionProviders } from '@imtbl/checkout-widgets';
+import {
+  CheckoutWidgetsConfig,
+  UpdateConfig,
+  WidgetConnectionProviders,
+} from '@imtbl/checkout-widgets';
 
 import {
   WalletEventType,
@@ -9,11 +13,21 @@ import {
   CheckoutWidgets,
   WalletReact,
 } from '@imtbl/checkout-widgets';
+import { Environment } from '@imtbl/config';
 
 function WalletUI() {
   CheckoutWidgets({
     theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
   });
+
+  const widgetsConfig2: CheckoutWidgetsConfig = {
+    theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
+  };
+
+  UpdateConfig(widgetsConfig2);
+
   useEffect(() => {
     const handleWalletWidgetEvents = ((event: CustomEvent) => {
       console.log(event);

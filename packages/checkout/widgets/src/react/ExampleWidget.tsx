@@ -30,7 +30,7 @@ export function ExampleReact(props: ExampleReactProps) {
 
   return (
     <imtbl-example
-      environment={config.theme ?? Environment.PRODUCTION}
+      environment={config.environment ?? Environment.SANDBOX}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }

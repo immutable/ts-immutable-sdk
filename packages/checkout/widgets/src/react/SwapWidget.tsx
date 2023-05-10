@@ -33,7 +33,7 @@ export function SwapReact(props: SwapReactProps): JSX.Element {
 
   return (
     <imtbl-swap
-      environment={Environment.PRODUCTION}
+      environment={Environment.SANDBOX}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }

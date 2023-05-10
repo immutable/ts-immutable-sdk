@@ -34,7 +34,7 @@ export function BridgeReact(props: BridgeReactProps): JSX.Element {
 
   return (
     <imtbl-bridge
-      environment={Environment.PRODUCTION}
+      environment={Environment.SANDBOX}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }
