@@ -21,6 +21,7 @@ import { QuoteResponse, TransactionResponse } from './types';
 import { createSwapParameters } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 import { constructQuoteWithSlippage } from './lib/transactionUtils/constructQuoteWithSlippage';
+import { Fee } from 'lib/estimation';
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;
