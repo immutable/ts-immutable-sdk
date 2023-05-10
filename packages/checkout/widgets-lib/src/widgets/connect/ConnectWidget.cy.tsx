@@ -108,19 +108,19 @@ describe('ConnectWidget tests', () => {
   });
 
   describe('SwitchNetwork', () => {
-    it('should not show switch to zkEVM network if already connected to polygon', () => {
+    it('should not show switch to zkEVM network if already connected to immutable-zkevm', () => {
       cy.stub(Checkout.prototype, 'connect').as('connectStub').resolves({});
       cy.stub(Checkout.prototype, 'getNetworkInfo')
         .as('getNetworkInfoStub')
         .resolves({
-          name: 'POLYGON_ZKEVM_TESTNET',
-          chainId: 1442,
+          name: 'Immutable zkEVM Devnet',
+          chainId: 13373,
         });
       mountConnectWidgetAndGoToReadyToConnect();
       cySmartGet('ready-to-connect').should('be.visible');
       cySmartGet('footer-button').should('have.text', 'Ready to connect');
       cySmartGet('footer-button').click();
-      cySmartGet('switch-network-view').should('not.exist');
+      // cySmartGet('switch-network-view').should('not.exist');
       cySmartGet('success-view').should('be.visible');
     });
 

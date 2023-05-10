@@ -1,5 +1,5 @@
-import { ChainId } from "@imtbl/checkout-sdk";
-import { Environment } from "@imtbl/config";
+import { ChainId } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 
 /**
  * Returns the preferred L1 ChainId for the given environment.
@@ -7,7 +7,9 @@ import { Environment } from "@imtbl/config";
  * @returns
  */
 export function L1Network(environment: Environment) {
-  return environment === Environment.PRODUCTION ? ChainId.ETHEREUM : ChainId.GOERLI;
+  return environment === Environment.PRODUCTION
+    ? ChainId.ETHEREUM
+    : ChainId.GOERLI;
 }
 
 /**
@@ -16,5 +18,7 @@ export function L1Network(environment: Environment) {
  * @returns
  */
 export function zkEVMNetwork(environment: Environment) {
-  return environment === Environment.PRODUCTION ? ChainId.IMTBL_ZKEVM_TESTNET : ChainId.IMTBL_ZKEVM_DEVNET;
+  return environment === Environment.PRODUCTION
+    ? ChainId.IMTBL_ZKEVM_TESTNET
+    : ChainId.IMTBL_ZKEVM_DEVNET;
 }
