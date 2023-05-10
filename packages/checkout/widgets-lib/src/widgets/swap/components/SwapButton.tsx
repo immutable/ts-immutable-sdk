@@ -5,6 +5,7 @@ import { useContext, useEffect, useState } from 'react';
 import { ViewActions, ViewContext } from '../../../context/ViewContext';
 import { SwapWidgetViews } from '../../../context/SwapViewContextTypes';
 import { sendSwapSuccessEvent } from '../SwapWidgetEvents';
+import { text } from '../../../resources/text/textConfig';
 
 export interface SwapButtonProps {
   provider?: Web3Provider;
@@ -15,6 +16,7 @@ export const SwapButton = (props: SwapButtonProps) => {
   const { viewDispatch } = useContext(ViewContext);
   const { provider, transaction } = props;
   const [loading, setLoading] = useState(true);
+  const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
 
   const sendTransaction = async () => {
     if (!transaction || !provider) return;
@@ -60,7 +62,7 @@ export const SwapButton = (props: SwapButtonProps) => {
       {loading && (
         <Button.Icon icon="Loading" sx={{ width: 'base.icon.size.200' }} />
       )}
-      {!loading && 'Swap'}
+      {!loading && buttonText}
     </Button>
   );
 };

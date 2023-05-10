@@ -4,6 +4,9 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { SwapForm } from '../components/SwapForm';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
+import { text } from '../../../resources/text/textConfig';
+import { SwapWidgetViews } from '../../../context/SwapViewContextTypes';
+
 export interface SwapCoinsProps {
   allowedTokens: TokenInfo[];
   amount: string | undefined;
@@ -11,6 +14,7 @@ export interface SwapCoinsProps {
   toContractAddress: string | undefined;
   connection: ConnectResult | undefined;
 }
+
 export const SwapCoins = ({
   allowedTokens,
   amount,
@@ -18,11 +22,12 @@ export const SwapCoins = ({
   toContractAddress,
   connection,
 }: SwapCoinsProps) => {
+  const { title } = text.views[SwapWidgetViews.SWAP].header;
   return (
     <SimpleLayout
       header={
         <HeaderNavigation
-          title="Swap coins"
+          title={title}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent()}
         />
       }

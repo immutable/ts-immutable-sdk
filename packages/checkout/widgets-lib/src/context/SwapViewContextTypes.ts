@@ -3,6 +3,7 @@ export enum SwapWidgetViews {
   SUCCESS = 'SUCCESS',
   FAIL = 'FAIL',
 }
+
 export type SwapWidgetView =
   | { type: SwapWidgetViews.SWAP }
   | { type: SwapWidgetViews.SUCCESS }
