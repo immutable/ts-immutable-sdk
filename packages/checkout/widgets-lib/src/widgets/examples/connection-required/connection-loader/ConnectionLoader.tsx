@@ -1,5 +1,5 @@
 import { BiomeThemeProvider, Body, Box, Icon } from '@biom3/react';
-import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { useState } from 'react';
 import { InnerWidget } from '../inner-widget/InnerWidget';
