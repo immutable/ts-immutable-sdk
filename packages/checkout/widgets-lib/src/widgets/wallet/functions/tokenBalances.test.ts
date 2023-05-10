@@ -7,6 +7,10 @@ import {
 import { BigNumber } from 'ethers';
 import { calculateCryptoToFiatValue, formatFiatString, getTokenBalances } from './tokenBalances';
 import { Web3Provider } from '@ethersproject/providers';
+<<<<<<< main
+=======
+import { CryptoFiat, CryptoFiatConfiguration } from '@imtbl/cryptofiat';
+>>>>>>> Use checkout config
 import { Environment } from '@imtbl/config';
 
 describe('token balance tests', () => {
@@ -29,6 +33,7 @@ describe('token balance tests', () => {
   //     },
   //   ];
 
+<<<<<<< main
   //   const mockProvider = {
   //     getSigner: jest.fn().mockReturnValue({
   //       getAddress: jest.fn().mockResolvedValue('0xaddress'),
@@ -38,6 +43,11 @@ describe('token balance tests', () => {
   //     baseConfig: { environment: Environment.PRODUCTION },
   //   });
   //   jest.spyOn(checkout, 'getAllBalances').mockResolvedValue({ balances });
+=======
+    it('should return an empty array if checkout, provider or chainId are not provided', async () => {
+      const checkout = new Checkout({baseConfig: {environment: Environment.PRODUCTION}});
+      jest.spyOn(checkout, 'getAllBalances').mockResolvedValue({ balances });
+>>>>>>> Use checkout config
 
 <<<<<<< main
     const actualResult = await getTokenBalances(

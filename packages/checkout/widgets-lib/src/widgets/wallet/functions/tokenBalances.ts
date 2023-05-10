@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { sortTokensByAmount } from '../../../lib/utils';
-import { CryptoFiat, CryptoFiatConfiguration, CryptoFiatConvertReturn } from '@imtbl/cryptofiat';
+import { CryptoFiat, CryptoFiatConvertReturn } from '@imtbl/cryptofiat';
 
 export interface BalanceInfo {
   id: string;
