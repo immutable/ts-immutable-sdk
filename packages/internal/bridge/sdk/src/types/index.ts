@@ -1,5 +1,4 @@
 import { ModuleConfiguration } from '@imtbl/config';
-import { BridgeError } from 'errors';
 import { ethers } from 'ethers';
 
 /**
