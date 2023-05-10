@@ -16,6 +16,7 @@ import {
   Checkout,
   ConnectionProviders,
   GetBalanceResult,
+  NetworkFilterTypes,
 } from '@imtbl/checkout-sdk';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
@@ -27,7 +28,7 @@ import {
 } from './BridgeWidgetEvents';
 import { EtherscanLink } from './components/EtherscanLink';
 import { Environment } from '@imtbl/config';
-import { L1Network } from '../../lib/networkUtils';
+import { L1Network, zkEVMNetwork } from '../../lib/networkUtils';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -58,6 +59,7 @@ export const NetworkChainMap = {
 
 export function BridgeWidget(props: BridgeWidgetProps) {
   const { environment, params, theme } = props;
+  console.log(environment);
   const checkout = useMemo(
     () => new Checkout({ baseConfig: { environment } }),
     [environment]
@@ -68,6 +70,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
     theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
       ? onLightBase
       : onDarkBase;
+
   const defaultFromChainId = useMemo(() => {
     return fromNetwork && bridgingNetworks.includes(fromNetwork)
       ? NetworkChainMap[fromNetwork]
@@ -104,9 +107,14 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       chainId = connectResult.network.chainId;
       theProvider = connectResult.provider;
 
-      const connectedNetworkNotWhitelisted = !bridgingNetworks.includes(
-        connectResult.network.name as Network
-      );
+      const allowedBridgingNetworks = await checkout.getNetworkAllowList({
+        type: NetworkFilterTypes.ALL,
+      });
+
+      const connectedNetworkNotWhitelisted = !allowedBridgingNetworks.networks
+        .map((network) => network.chainId)
+        .includes(connectResult.network.chainId);
+
       const requiresNetworkSwitch =
         defaultFromChainId !== connectResult.network.chainId;
 
@@ -123,11 +131,12 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       setProvider(theProvider);
       setConnectedChainId(chainId);
       setSelectedNetwork(chainId as OptionKey);
-      const toNetworkOption = bridgingNetworks.filter(
+      const toNetworkOption = allowedBridgingNetworks.networks.find(
         (network) =>
-          network.toString() !== connectResult.network.name.toString()
+          network.chainId === zkEVMNetwork(checkout.config.environment)
       );
-      setToNetwork(toNetworkOption[0]);
+
+      setToNetwork(toNetworkOption?.name ?? '');
       setNativeCurrencySymbol(connectResult.network.nativeCurrency.symbol);
     };
 

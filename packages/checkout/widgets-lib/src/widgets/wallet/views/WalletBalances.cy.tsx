@@ -20,8 +20,8 @@ describe('WalletBalances', () => {
   const baseWalletState: WalletState = {
     checkout: checkout,
     network: {
-      chainId: 1442,
-      name: 'POLYGON_ZKEVM_TESTNET',
+      chainId: 137,
+      name: 'Polygon',
       nativeCurrency: {} as unknown as TokenInfo,
       isSupported: true,
     },
@@ -98,8 +98,8 @@ describe('WalletBalances', () => {
     const walletState: WalletState = {
       checkout: checkout,
       network: {
-        chainId: 5,
-        name: 'Goerli',
+        chainId: 1,
+        name: 'Ethereum',
         nativeCurrency: {} as unknown as TokenInfo,
         isSupported: true,
       },
@@ -121,7 +121,7 @@ describe('WalletBalances', () => {
         </WalletContext.Provider>
       </BiomeCombinedProviders>
     );
-    cySmartGet('Goerli-network-button').click();
+    cySmartGet('Ethereum-network-button').click();
     cySmartGet('add-coins').should('not.exist');
   });
 });

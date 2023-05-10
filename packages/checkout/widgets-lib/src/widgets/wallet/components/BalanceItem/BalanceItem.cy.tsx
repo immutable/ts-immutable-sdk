@@ -52,8 +52,8 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
-        name: 'POLYGON_ZKEVM_TESTNET',
+        chainId: ChainId.POLYGON,
+        name: 'Polygon',
         nativeCurrency: {
           name: 'MATIC',
           symbol: 'MATIC',
@@ -86,8 +86,8 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
-        name: 'POLYGON_ZKEVM_TESTNET',
+        chainId: ChainId.POLYGON,
+        name: 'Polygon',
         nativeCurrency: {
           name: 'MATIC',
           symbol: 'MATIC',
@@ -125,8 +125,8 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
-        name: 'POLYGON_ZKEVM_TESTNET',
+        chainId: ChainId.POLYGON,
+        name: 'Polygon',
         nativeCurrency: {
           name: 'MATIC',
           symbol: 'MATIC',
@@ -163,10 +163,10 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.GOERLI,
-        name: 'GOERLI',
+        chainId: ChainId.ETHEREUM,
+        name: 'Ethereum',
         nativeCurrency: {
-          name: 'GOERLI',
+          name: 'Ethereum',
           symbol: 'ETH',
           decimals: 18,
         },
