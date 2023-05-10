@@ -1,0 +1,6 @@
+dist/
+
+# sample apps
+**sample-app**/
+
+# put module specific ignore paths here
