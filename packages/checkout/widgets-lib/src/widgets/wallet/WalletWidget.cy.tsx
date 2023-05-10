@@ -70,13 +70,13 @@ describe('WalletWidget tests', () => {
               getAddress: () => Promise.resolve('dss'),
             }),
             getNetwork: async () => ({
-              chainId: 1,
-              name: 'Ethereum',
+              chainId: 5,
+              name: 'Goerli',
             }),
           },
           network: {
             chainId: 1,
-            name: 'Ethereum',
+            name: 'Goerli',
             nativeCurrency: {
               name: 'ETH',
               symbol: 'ETH',
@@ -91,13 +91,13 @@ describe('WalletWidget tests', () => {
               getAddress: () => Promise.resolve('dss'),
             }),
             getNetwork: async () => ({
-              chainId: 137,
-              name: 'Polygon',
+              chainId: 1142,
+              name: 'Polygon zkEVM Testnet',
             }),
           },
           network: {
-            chainId: 137,
-            name: 'Polygon',
+            chainId: 1442,
+            name: 'Polygon zkEVM Testnet',
             nativeCurrency: {
               name: 'MATIC',
               symbol: 'MATIC',
@@ -146,8 +146,8 @@ describe('WalletWidget tests', () => {
         .as('switchNetworkStub')
         .resolves({
           network: {
-            chainId: 137,
-            name: 'Polygon',
+            chainId: 1442,
+            name: 'Polygon zkEVM Testnet',
             nativeCurrency: {
               name: 'MATIC',
               symbol: 'MATIC',
@@ -176,7 +176,7 @@ describe('WalletWidget tests', () => {
 
       cySmartGet('close-button').should('be.visible');
       cySmartGet('heading').should('be.visible');
-      cySmartGet('Ethereum-network-button').should('include.text', 'Ethereum');
+      cySmartGet('Goerli-network-button').should('include.text', 'Goerli');
 
       cySmartGet('total-token-balance').should('exist');
       cySmartGet('total-token-balance').should('have.text', '≈ USD $70.50');
