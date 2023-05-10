@@ -61,13 +61,9 @@ export interface RequestStructure {
 }
 
 const buildCryptoToFiatRequest = (balances: GetBalanceResult[]): RequestStructure => {
-  // Extract token symbols from balances
   const tokenSymbols = balances.map(balance => balance.token.symbol);
-
-  // Define fiat symbols as always 'usd' and 'aud'
   const fiatSymbols = ['usd', 'aud'];
 
-  // Build and return the request structure
   const request: RequestStructure = {
       tokenSymbols,
       fiatSymbols

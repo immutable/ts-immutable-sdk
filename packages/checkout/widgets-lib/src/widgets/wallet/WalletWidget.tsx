@@ -29,6 +29,7 @@ import { getTokenBalances } from './functions/tokenBalances';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { zkEVMNetwork } from '../../lib/networkUtils';
 import { Environment } from '@imtbl/config';
+import { CryptoFiat, CryptoFiatConfiguration } from '@imtbl/cryptofiat';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
@@ -54,14 +55,22 @@ export function WalletWidget(props: WalletWidgetProps) {
     initialWalletState
   );
 
-  const { checkout } = walletState;
+  const { checkout, cryptoFiat } = walletState;
 
   useEffect(() => {
     const checkout = new Checkout({ baseConfig: { environment: environment } });
     walletDispatch({
       payload: {
         type: WalletActions.SET_CHECKOUT,
-        checkout: checkout,
+        checkout,
+      },
+    });
+
+    const cryptoFiat = new CryptoFiat(new CryptoFiatConfiguration({}));
+    walletDispatch({
+      payload: {
+        type: WalletActions.SET_CRYPTO_FIAT,
+        cryptoFiat,
       },
     });
 
@@ -75,7 +84,7 @@ export function WalletWidget(props: WalletWidgetProps) {
 
   useEffect(() => {
     (async () => {
-      if (!checkout) return;
+      if (!checkout || !cryptoFiat) return;
 
       let provider;
       let network;
@@ -115,7 +124,8 @@ export function WalletWidget(props: WalletWidgetProps) {
             checkout,
             provider,
             network.name,
-            network.chainId
+            network.chainId,
+            cryptoFiat
           ),
         },
       });
@@ -127,7 +137,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         },
       });
     })();
-  }, [providerPreference, checkout]);
+  }, [providerPreference, checkout, cryptoFiat]);
 
   const errorAction = () => {
     console.log('Something went wrong');

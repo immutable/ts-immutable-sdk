@@ -30,7 +30,7 @@ export const NetworkMenu = () => {
   const { viewDispatch } = useContext(ViewContext);
 
   const { networkStatus } = text.views[WalletWidgetViews.WALLET_BALANCES];
-  const { checkout, network, provider } = walletState;
+  const { checkout, network, provider, cryptoFiat } = walletState;
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[] | undefined>(
     []
   );
@@ -51,7 +51,13 @@ export const NetworkMenu = () => {
 
   const switchNetwork = useCallback(
     async (chainId: ChainId) => {
-      if (!checkout || !provider || !network || network.chainId === chainId)
+      if (
+        !checkout ||
+        !provider ||
+        !network ||
+        network.chainId === chainId ||
+        !cryptoFiat
+      )
         return;
       try {
         const switchNetworkResult = await checkout.switchNetwork({
@@ -73,7 +79,8 @@ export const NetworkMenu = () => {
               checkout,
               switchNetworkResult?.provider,
               switchNetworkResult.network.name,
-              switchNetworkResult.network.chainId
+              switchNetworkResult.network.chainId,
+              cryptoFiat
             ),
           },
         });
@@ -92,7 +99,7 @@ export const NetworkMenu = () => {
         }
       }
     },
-    [checkout, provider, network, walletDispatch, viewDispatch]
+    [checkout, provider, network, walletDispatch, viewDispatch, cryptoFiat]
   );
 
   useEffect(() => {

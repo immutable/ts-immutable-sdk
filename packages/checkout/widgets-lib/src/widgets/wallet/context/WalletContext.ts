@@ -6,6 +6,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 import { BalanceInfo } from '../functions/tokenBalances';
+import { CryptoFiat } from '@imtbl/cryptofiat';
 
 export interface WalletState {
   checkout: Checkout | null;
@@ -44,6 +45,7 @@ type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
   | SetProviderPreferencePayload
+  | SetCryptoFiatPayload
   | SetSwitchNetworkPayload
   | SetSupportedTopUpPayload;
 
@@ -51,6 +53,7 @@ export enum WalletActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
+  SET_CRYPTO_FIAT = 'SET_CRYPTO_FIAT',
   SWITCH_NETWORK = 'SWITCH_NETWORK',
   SET_SUPPORTED_TOP_UPS = 'SUPPORTED_TOP_UPS',
 }
@@ -68,6 +71,11 @@ export interface SetProviderPayload {
 export interface SetProviderPreferencePayload {
   type: WalletActions.SET_PROVIDER_PREFERENCE;
   providerPreference: ConnectionProviders;
+}
+
+export interface SetCryptoFiatPayload {
+  type: WalletActions.SET_CRYPTO_FIAT;
+  cryptoFiat: CryptoFiat;
 }
 
 export interface SetSwitchNetworkPayload {
@@ -107,6 +115,11 @@ export const walletReducer: Reducer<WalletState, WalletAction> = (
       return {
         ...state,
         providerPreference: action.payload.providerPreference,
+      };
+    case WalletActions.SET_CRYPTO_FIAT:
+      return {
+        ...state,
+        cryptoFiat: action.payload.cryptoFiat,
       };
     case WalletActions.SWITCH_NETWORK:
       return {
