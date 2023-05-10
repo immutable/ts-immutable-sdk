@@ -4,7 +4,7 @@ node_modules/
 dist/
 
 # sample apps
-**/sdk-sample-app/**
-**/widgets-sample-app/**
+**sdk-sample-app**/
+**widgets-sample-app**/
 
 # put module specific ignore paths here
