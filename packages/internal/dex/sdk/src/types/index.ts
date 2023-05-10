@@ -29,8 +29,6 @@ export type QuoteResponse =
   };
 
 export type TradeInfo = {
-  route: Route<Currency, Currency>;
-
   quote: Amount;
   quoteWithMaxSlippage: Amount;
   slippage: string;
