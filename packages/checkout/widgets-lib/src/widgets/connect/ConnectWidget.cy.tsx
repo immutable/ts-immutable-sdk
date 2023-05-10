@@ -113,8 +113,8 @@ describe('ConnectWidget tests', () => {
       cy.stub(Checkout.prototype, 'getNetworkInfo')
         .as('getNetworkInfoStub')
         .resolves({
-          name: 'Polygon',
-          chainId: 137,
+          name: 'POLYGON_ZKEVM_TESTNET',
+          chainId: 1442,
         });
       mountConnectWidgetAndGoToReadyToConnect();
       cySmartGet('ready-to-connect').should('be.visible');

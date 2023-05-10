@@ -6,6 +6,7 @@
   "bugs": "https://github.com/immutable/imx-checkout-sdk/issues",
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
+    "@imtbl/config": "0.0.0",
     "@metamask/detect-provider": "^2.0.0",
     "ethers": "^5.7.2"
   },

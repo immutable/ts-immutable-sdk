@@ -36,13 +36,17 @@ export const NetworkMenu = () => {
   );
   const LogoColor = {
     [ChainId.POLYGON]: 'base.color.text.link.primary',
+    [ChainId.POLYGON_ZKEVM_TESTNET]: 'base.color.text.link.primary',
     [ChainId.ETHEREUM]: 'base.color.accent.5',
+    [ChainId.GOERLI]: 'base.color.accent.5',
   };
 
   //todo: add corresponding network symbols
   const NetworkIcon = {
     [ChainId.POLYGON]: 'Immutable',
     [ChainId.ETHEREUM]: 'EthToken',
+    [ChainId.POLYGON_ZKEVM_TESTNET]: 'Immutable',
+    [ChainId.GOERLI]: 'EthToken',
   };
 
   const switchNetwork = useCallback(
@@ -117,33 +121,34 @@ export const NetworkMenu = () => {
         />
       </Box>
       <HorizontalMenu>
-        {allowedNetworks
-          ?.sort((a: NetworkInfo, b: NetworkInfo) =>
-            sortNetworksCompareFn(a, b)
-          )
-          .map((networkItem) => (
-            <HorizontalMenu.Button
-              key={networkItem.chainId}
-              testId={`${networkItem.name}-network-button`}
-              sx={
-                networkItem.chainId === network?.chainId
-                  ? ActiveNetworkButtonStyle
-                  : NetworkButtonStyle
-              }
-              size="small"
-              onClick={() => switchNetwork(networkItem.chainId)}
-            >
-              <Button.Icon
-                icon={NetworkIcon[networkItem.chainId]}
-                iconVariant="bold"
-                sx={LogoStyle(
-                  LogoColor[networkItem.chainId],
+        {checkout &&
+          allowedNetworks
+            ?.sort((a: NetworkInfo, b: NetworkInfo) =>
+              sortNetworksCompareFn(a, b, checkout.config.environment)
+            )
+            .map((networkItem) => (
+              <HorizontalMenu.Button
+                key={networkItem.chainId}
+                testId={`${networkItem.name}-network-button`}
+                sx={
                   networkItem.chainId === network?.chainId
-                )}
-              />
-              {networkItem.name}
-            </HorizontalMenu.Button>
-          ))}
+                    ? ActiveNetworkButtonStyle
+                    : NetworkButtonStyle
+                }
+                size="small"
+                onClick={() => switchNetwork(networkItem.chainId)}
+              >
+                <Button.Icon
+                  icon={NetworkIcon[networkItem.chainId]}
+                  iconVariant="bold"
+                  sx={LogoStyle(
+                    LogoColor[networkItem.chainId],
+                    networkItem.chainId === network?.chainId
+                  )}
+                />
+                {networkItem.name}
+              </HorizontalMenu.Button>
+            ))}
       </HorizontalMenu>
     </Box>
   );

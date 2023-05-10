@@ -14,22 +14,24 @@ import {
   WalletBalanceContainerStyle,
   WalletBalanceItemStyle,
 } from './WalletBalancesStyles';
-import { ChainId } from '@imtbl/checkout-sdk';
 import { sendAddCoinsEvent } from '../CoinTopUpEvents';
+import { zkEVMNetwork } from '../../../lib/networkUtils';
 
 export const WalletBalances = () => {
   const { walletState } = useContext(WalletContext);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
+  const { checkout, network, supportedTopUps } = walletState;
   const showAddCoins = useMemo(() => {
+    if (!checkout || !network) return false;
     return (
-      walletState.network?.chainId === ChainId.POLYGON &&
+      network?.chainId === zkEVMNetwork(checkout.config.environment) &&
       Boolean(
-        walletState.supportedTopUps?.isBridgeEnabled ||
-          walletState.supportedTopUps?.isSwapEnabled ||
-          walletState.supportedTopUps?.isOnRampEnabled
+        supportedTopUps?.isBridgeEnabled ||
+          supportedTopUps?.isSwapEnabled ||
+          supportedTopUps?.isOnRampEnabled
       )
     );
-  }, [walletState.network?.chainId, walletState.supportedTopUps]);
+  }, [checkout, network, supportedTopUps]);
 
   useEffect(() => {
     let totalAmount = 0.0;

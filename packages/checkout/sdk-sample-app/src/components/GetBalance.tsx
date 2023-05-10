@@ -1,6 +1,6 @@
 import { Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import LoadingButton from './LoadingButton';
 import { Box } from '@biom3/react';
@@ -85,6 +85,14 @@ export default function GetBalance(props: BalanceProps) {
       console.log(err.stack);
     }
   }
+  useEffect(() => {
+    setResultBalance(undefined);
+    setErrorBalance(null);
+    setLoadingBalance(false);
+    setResultNative(undefined);
+    setErrorNative(null);
+    setLoadingNative(false);
+  }, [checkout]);
 
   return (
     <div>
