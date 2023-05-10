@@ -46,7 +46,7 @@ export class CryptoFiat {
 
     this.cache = new Map<string, string>();
     for (const coin of data) {
-      this.cache.set(coin.symbol.toUpperCase(), coin.id.toLowerCase());
+      this.cache.set(coin.symbol.toLowerCase(), coin.id.toLowerCase());
     }
   }
 
@@ -60,18 +60,23 @@ export class CryptoFiat {
    */
   async convert({
     tokenSymbols,
+    fiatSymbols = [],
   }: CryptoFiatConvertParams): Promise<CryptoFiatConvertReturn> {
     if (!tokenSymbols || tokenSymbols.length === 0) {
       throw new Error('Error missing token symbols to convert');
     }
 
+    if (fiatSymbols.length === 0) fiatSymbols.push(DEFAULT_FIAT_SYMBOL);
+
     await this.fetchSymbols();
 
     const ids = tokenSymbols
-      .map((s) => this.cache!.get(s.toUpperCase()))
+      .map((s) => this.cache!.get(s.toLowerCase()))
       .join(',');
     const url = this.withApiKey(
-      `/simple/price?ids=${ids}&vs_currencies=${DEFAULT_FIAT_SYMBOL}`,
+      `/simple/price?ids=${ids}&vs_currencies=${fiatSymbols
+        .join(',')
+        .toLowerCase()}`,
     );
 
     const response = await axios.get(url);
@@ -85,7 +90,7 @@ export class CryptoFiat {
 
     const result: CryptoFiatConvertReturn = {};
     for (const symbol of tokenSymbols) {
-      const symbolKey = symbol.toUpperCase();
+      const symbolKey = symbol.toLowerCase();
       const coinId = this.cache!.get(symbolKey);
       result[symbolKey] = {};
       if (coinId) result[symbolKey] = data[coinId] || {};

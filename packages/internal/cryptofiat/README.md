@@ -7,17 +7,45 @@ https://immutable.atlassian.net/browse/WT-1291
 This package uses CoinGecko to fetch crypto to fiat conversions. The dependency with CoinGecko will be eventually deprecated in favour to a custom Immutable solution.
 
 Free CoinGecko APIs
-```shell
-const conv = new CryptoFiat() 
-const rest = await conv.convert(["eth", "imx"])
-console.log(res) // { BTC: { usd: 50000 }, ETH: { usd: 4000 } }
+```ts
+const config = new CryptoFiatConfiguration({});
+const conv = new CryptoFiat(config);
+const rest = await conv.convert({
+  tokenSymbols: ['eth', 'imx'],
+  fiatSymbols: ['aud', 'usd'],
+});
+console.log(rest);
+```
+Result
+```json
+{
+    "eth": {
+        "usd": 1846.46,
+        "aud": 2728.21
+    },
+    "imx": {
+        "usd": 0.764824,
+        "aud": 1.13
+    }
+}
 ```
 
 PRO CoinGecko APIs
-```
+```ts
 const apiKey = "some-api-key"
 const config = new CryptoFiatConfiguration({ apiKey });
-const cryptoFiat = new CryptoFiat(config);
-const rest = await conv.convert(["eth", "imx"])
-console.log(res) // { BTC: { usd: 50000 }, ETH: { usd: 4000 } }
+const conv = new CryptoFiat(config);
+const rest = await conv.convert({ tokenSymbols: ['eth', 'imx'] });
+console.log(rest);
+```
+Result
+```json
+{
+    "eth": {
+        "usd": 1846.46
+    },
+    "imx": {
+        "usd": 0.764824
+    }
+}
 ```

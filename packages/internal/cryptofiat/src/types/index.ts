@@ -12,6 +12,7 @@ export interface CryptoFiatModuleConfiguration {
  */
 export type CryptoFiatConvertParams = {
   tokenSymbols: string[];
+  fiatSymbols?: string[];
 };
 
 /**
