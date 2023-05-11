@@ -9,7 +9,7 @@
         "config": "prod",
         "immutablex_client": "prod",
         "passport": "prod",
-        "provider": "alpha",
+        "provider": "prod",
         "checkout_sdk": "alpha",
         "checkout_widgets": "alpha"
     }
