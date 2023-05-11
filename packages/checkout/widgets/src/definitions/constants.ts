@@ -3,7 +3,7 @@
  */
 export enum Network {
   ETHEREUM = 'Ethereum',
-  GOERLI = 'Goerli',
+  SEPOLIA = 'Sepolia',
   IMTBL_ZKEVM_TESTNET = 'Immutable zkEVM Testnet',
   IMTBL_ZKEVM_DEVNET = 'Immutable zkEVM Devnet',
 }
