@@ -168,7 +168,7 @@ describe('ConnectLoader', () => {
             getAddress: async () => Promise.resolve(''),
           }),
           getNetwork: async () => ({
-            chainId: 5,
+            chainId: 11155111,
             name: 'SEPOLIA',
           }),
         },
