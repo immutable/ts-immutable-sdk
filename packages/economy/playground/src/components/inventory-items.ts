@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/lines-between-class-members */
-
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators';
 

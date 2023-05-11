@@ -5,6 +5,7 @@ export type {
   EventStatus,
   ItemDefinition,
   InventoryItem,
+  Recipe,
 } from './types';
 
 export * from './Economy';
