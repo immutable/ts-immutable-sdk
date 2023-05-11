@@ -34,12 +34,12 @@ const ethNetworkInfo = {
     decimals: 18,
   },
 };
-const polygonNetworkInfo = {
-  name: 'Polygon',
-  chainId: ChainId.POLYGON,
+const zkevmNetworkInfo = {
+  name: 'IMTBL_ZKEVM_TESTNET',
+  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
   nativeCurrency: {
-    name: 'MATIC',
-    symbol: 'MATIC',
+    name: 'IMX',
+    symbol: 'IMX',
     decimals: 18,
   },
 };
@@ -49,7 +49,9 @@ jest.mock('@ethersproject/providers', () => ({
 }));
 
 describe('network functions', () => {
-  const testCheckoutConfiguration = new CheckoutConfiguration({baseConfig: {environment: Environment.PRODUCTION}});
+  const testCheckoutConfiguration = new CheckoutConfiguration({
+    baseConfig: { environment: Environment.PRODUCTION },
+  });
   describe('switchWalletNetwork()', () => {
     beforeEach(() => {
       windowSpy = jest.spyOn(window, 'window', 'get');
@@ -87,7 +89,8 @@ describe('network functions', () => {
         method: WALLET_ACTION.SWITCH_NETWORK,
         params: [
           {
-            chainId: ProductionChainIdNetworkMap.get(ChainId.ETHEREUM)?.chainIdHex,
+            chainId: ProductionChainIdNetworkMap.get(ChainId.ETHEREUM)
+              ?.chainIdHex,
           },
         ],
       });
@@ -102,7 +105,7 @@ describe('network functions', () => {
       });
     });
 
-    it('should make request for the user to switch network Polygon', async () => {
+    it('should make request for the user to switch network zkevm', async () => {
       (Web3Provider as unknown as jest.Mock)
         .mockReturnValueOnce({
           provider: providerMock,
@@ -112,7 +115,7 @@ describe('network functions', () => {
           provider: {
             request: jest.fn(),
           },
-          getNetwork: async () => polygonNetworkInfo,
+          getNetwork: async () => zkevmNetworkInfo,
         });
 
       const provider = await connectWalletProvider({
@@ -123,23 +126,25 @@ describe('network functions', () => {
         testCheckoutConfiguration,
         ConnectionProviders.METAMASK,
         provider,
-        ChainId.POLYGON
+        ChainId.IMTBL_ZKEVM_TESTNET
       );
 
       expect(provider.provider.request).toBeCalledWith({
         method: WALLET_ACTION.SWITCH_NETWORK,
         params: [
           {
-            chainId: testCheckoutConfiguration.networkMap.get(ChainId.POLYGON)?.chainIdHex,
+            chainId: testCheckoutConfiguration.networkMap.get(
+              ChainId.IMTBL_ZKEVM_TESTNET
+            )?.chainIdHex,
           },
         ],
       });
       expect(switchNetworkResult.network).toEqual({
-        name: 'Polygon',
-        chainId: 137,
+        name: 'Immutable zkEVM Testnet',
+        chainId: 13372,
         nativeCurrency: {
-          name: 'MATIC',
-          symbol: 'MATIC',
+          name: 'IMX',
+          symbol: 'IMX',
           decimals: 18,
         },
       });
@@ -195,7 +200,7 @@ describe('network functions', () => {
           testCheckoutConfiguration,
           ConnectionProviders.METAMASK,
           provider,
-          ChainId.POLYGON
+          ChainId.IMTBL_ZKEVM_TESTNET
         )
       ).rejects.toThrow(
         new CheckoutError(
@@ -225,7 +230,7 @@ describe('network functions', () => {
           testCheckoutConfiguration,
           ConnectionProviders.METAMASK,
           provider,
-          ChainId.POLYGON
+          ChainId.IMTBL_ZKEVM_TESTNET
         )
       ).rejects.toThrow(
         new CheckoutError(
@@ -245,13 +250,13 @@ describe('network functions', () => {
               .mockRejectedValueOnce({ code: 4902 })
               .mockResolvedValueOnce({}),
           },
-          getNetwork: async () => polygonNetworkInfo,
+          getNetwork: async () => zkevmNetworkInfo,
         })
         .mockReturnValueOnce({
           provider: {
             request: jest.fn().mockResolvedValueOnce({}),
           },
-          getNetwork: async () => polygonNetworkInfo,
+          getNetwork: async () => zkevmNetworkInfo,
         });
       const provider = await connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK,
@@ -261,19 +266,28 @@ describe('network functions', () => {
         testCheckoutConfiguration,
         ConnectionProviders.METAMASK,
         provider,
-        ChainId.POLYGON
+        ChainId.IMTBL_ZKEVM_TESTNET
       );
 
       expect(provider.provider.request).toHaveBeenCalledWith({
         method: WALLET_ACTION.ADD_NETWORK,
         params: [
           {
-            chainId: testCheckoutConfiguration.networkMap.get(ChainId.POLYGON)?.chainIdHex,
-            chainName: testCheckoutConfiguration.networkMap.get(ChainId.POLYGON)?.chainName,
-            rpcUrls: testCheckoutConfiguration.networkMap.get(ChainId.POLYGON)?.rpcUrls,
-            nativeCurrency: testCheckoutConfiguration.networkMap.get(ChainId.POLYGON)?.nativeCurrency,
-            blockExplorerUrls:
-            testCheckoutConfiguration.networkMap.get(ChainId.POLYGON)?.blockExplorerUrls,
+            chainId: testCheckoutConfiguration.networkMap.get(
+              ChainId.IMTBL_ZKEVM_TESTNET
+            )?.chainIdHex,
+            chainName: testCheckoutConfiguration.networkMap.get(
+              ChainId.IMTBL_ZKEVM_TESTNET
+            )?.chainName,
+            rpcUrls: testCheckoutConfiguration.networkMap.get(
+              ChainId.IMTBL_ZKEVM_TESTNET
+            )?.rpcUrls,
+            nativeCurrency: testCheckoutConfiguration.networkMap.get(
+              ChainId.IMTBL_ZKEVM_TESTNET
+            )?.nativeCurrency,
+            blockExplorerUrls: testCheckoutConfiguration.networkMap.get(
+              ChainId.IMTBL_ZKEVM_TESTNET
+            )?.blockExplorerUrls,
           },
         ],
       });
@@ -287,8 +301,8 @@ describe('network functions', () => {
         chainName: 'homestead',
       },
       {
-        chainId: 137 as ChainId,
-        chainName: 'matic',
+        chainId: 13372 as ChainId,
+        chainName: 'IMX',
       },
     ];
 
@@ -305,9 +319,14 @@ describe('network functions', () => {
           testCheckoutConfiguration,
           mockProvider as unknown as Web3Provider
         );
-        expect(result.name).toBe(ProductionChainIdNetworkMap.get(testCase.chainId)?.chainName);
+        expect(result.name).toBe(
+          ProductionChainIdNetworkMap.get(testCase.chainId)?.chainName
+        );
         expect(result.chainId).toBe(
-          parseInt(ProductionChainIdNetworkMap.get(testCase.chainId)?.chainIdHex ?? "", 16)
+          parseInt(
+            ProductionChainIdNetworkMap.get(testCase.chainId)?.chainIdHex ?? '',
+            16
+          )
         );
         expect(result.nativeCurrency).toEqual(
           ProductionChainIdNetworkMap.get(testCase.chainId)?.nativeCurrency
@@ -338,7 +357,9 @@ describe('network functions', () => {
   describe('getNetworkAllowList()', () => {
     it('should return all the networks if no exclude filter is provided', async () => {
       await expect(
-        await getNetworkAllowList(testCheckoutConfiguration, { type: NetworkFilterTypes.ALL })
+        await getNetworkAllowList(testCheckoutConfiguration, {
+          type: NetworkFilterTypes.ALL,
+        })
       ).toEqual({
         networks: [
           {
@@ -352,12 +373,12 @@ describe('network functions', () => {
             },
           },
           {
-            name: 'Polygon',
-            chainId: 137,
+            name: 'Immutable zkEVM Testnet',
+            chainId: 13372,
             isSupported: true,
             nativeCurrency: {
-              name: 'MATIC',
-              symbol: 'MATIC',
+              name: 'IMX',
+              symbol: 'IMX',
               decimals: 18,
             },
           },
@@ -369,7 +390,7 @@ describe('network functions', () => {
       await expect(
         await getNetworkAllowList(testCheckoutConfiguration, {
           type: NetworkFilterTypes.ALL,
-          exclude: [{ chainId: 137 }],
+          exclude: [{ chainId: 13372 }],
         })
       ).toEqual({
         networks: [

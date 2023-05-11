@@ -5,7 +5,6 @@ import { Buy } from './Buy';
 import { ConnectResult, TokenInfo, Transaction } from '@imtbl/checkout-sdk';
 import { Fees } from './Fees';
 import { SwapButton } from './SwapButton';
-import { SwapWidgetViews } from '../SwapWidget';
 import { useState } from 'react';
 import With from './With';
 
@@ -51,8 +50,7 @@ export interface SwapFormProps {
   amount?: string;
   fromContractAddress?: string;
   toContractAddress?: string;
-  connection: ConnectResult;
-  updateView: (view: SwapWidgetViews, err?: any) => void;
+  connection: ConnectResult | undefined;
   allowedTokens: TokenInfo[];
 }
 
@@ -63,7 +61,6 @@ export function SwapForm(props: SwapFormProps) {
     toContractAddress,
     connection,
     allowedTokens,
-    updateView,
   } = props;
 
   const sortedAllowList: TokenInfo[] = alphaSortTokensList(allowedTokens);
@@ -123,23 +120,27 @@ export function SwapForm(props: SwapFormProps) {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      <Buy
-        onTokenChange={onBuyFieldTokenChange}
-        onAmountChange={onBuyFieldAmountChange}
-        token={buyToken}
-        amount={buyAmount}
-        connection={connection}
-      />
-      <With
-        onTokenChange={onWithFieldTokenChange}
-        onQuoteChange={onWithFieldQuoteChange}
-        token={withToken}
-        quote={withQuote}
-        buyToken={buyToken}
-        buyAmount={buyAmount}
-        connection={connection}
-        tokenAllowList={sortedAllowList}
-      />
+      {connection && (
+        <>
+          <Buy
+            onTokenChange={onBuyFieldTokenChange}
+            onAmountChange={onBuyFieldAmountChange}
+            token={buyToken}
+            amount={buyAmount}
+            connection={connection}
+          />
+          <With
+            onTokenChange={onWithFieldTokenChange}
+            onQuoteChange={onWithFieldQuoteChange}
+            token={withToken}
+            quote={withQuote}
+            buyToken={buyToken}
+            buyAmount={buyAmount}
+            connection={connection}
+            tokenAllowList={sortedAllowList}
+          />
+        </>
+      )}
       {withQuote && (
         <Fees
           fees={withQuote.trade.fees.amount.formatted}
@@ -147,11 +148,12 @@ export function SwapForm(props: SwapFormProps) {
           tokenSymbol="imx"
         />
       )}
-      <SwapButton
-        provider={connection.provider}
-        transaction={getTransaction()}
-        updateView={updateView}
-      />
+      {connection && (
+        <SwapButton
+          provider={connection.provider}
+          transaction={getTransaction()}
+        />
+      )}
     </Box>
   );
 }

@@ -52,11 +52,11 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON,
-        name: 'Polygon',
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
-          name: 'MATIC',
-          symbol: 'MATIC',
+          name: 'IMX',
+          symbol: 'IMX',
           decimals: 18,
         },
         isSupported: true,
@@ -86,11 +86,11 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON,
-        name: 'Polygon',
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
-          name: 'MATIC',
-          symbol: 'MATIC',
+          name: 'IMX',
+          symbol: 'IMX',
           decimals: 18,
         },
         isSupported: true,
@@ -125,11 +125,11 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON,
-        name: 'Polygon',
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
-          name: 'MATIC',
-          symbol: 'MATIC',
+          name: 'IMX',
+          symbol: 'IMX',
           decimals: 18,
         },
         isSupported: true,

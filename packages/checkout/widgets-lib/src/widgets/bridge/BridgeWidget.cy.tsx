@@ -106,7 +106,10 @@ describe('Bridge Widget tests', () => {
       cySmartGet('select-token__target').should('have.text', 'ETH');
       cySmartGet('amount__input').should('be.visible');
       cySmartGet('amount__input').should('have.value', '0');
-      cySmartGet('bridge-to-network').should('include.text', 'Polygon');
+      cySmartGet('bridge-to-network').should(
+        'include.text',
+        'Immutable zkEVM Testnet'
+      );
       cySmartGet('@connectStub').should('have.been.called');
       cySmartGet('@getAllBalancesStub').should('have.been.called');
     });
@@ -133,7 +136,10 @@ describe('Bridge Widget tests', () => {
       cySmartGet('select-token__target').should('have.text', 'MATIC');
       cySmartGet('amount__input').should('be.visible');
       cySmartGet('amount__input').should('have.value', '50.23');
-      cySmartGet('bridge-to-network').should('include.text', 'Polygon');
+      cySmartGet('bridge-to-network').should(
+        'include.text',
+        'Immutable zkEVM Testnet'
+      );
       cySmartGet('@connectStub').should('have.been.called');
       cySmartGet('@getAllBalancesStub').should('have.been.called');
     });
@@ -190,11 +196,11 @@ describe('Bridge Widget tests', () => {
     it('it should call switch network when dropdown clicked and other network selected', async () => {
       switchNetworkStub.resolves({
         network: {
-          chainId: 137,
-          name: 'Polygon',
+          chainId: 13372,
+          name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
-            name: 'Matic',
-            symbol: 'MATIC',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },
@@ -255,11 +261,11 @@ describe('Bridge Widget tests', () => {
 
       switchNetworkStub.resolves({
         network: {
-          chainId: 137,
-          name: 'Polygon',
+          chainId: 13372,
+          name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
-            name: 'Matic',
-            symbol: 'MATIC',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },
@@ -267,7 +273,7 @@ describe('Bridge Widget tests', () => {
 
       const params = {
         providerPreference: 'metamask',
-        fromNetwork: Network.POLYGON.toString(),
+        fromNetwork: Network.IMTBL_ZKEVM_TESTNET.toString(),
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
@@ -281,7 +287,7 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
         provider: connectStubReturnWrongNetwork.provider,
-        chainId: 137,
+        chainId: 13372,
       });
     });
 
@@ -401,11 +407,11 @@ describe('Bridge Widget tests', () => {
 
       switchNetworkStub.resolves({
         network: {
-          chainId: 137,
-          name: 'Polygon',
+          chainId: 13372,
+          name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
-            name: 'Matic',
-            symbol: 'MATIC',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },
@@ -413,7 +419,7 @@ describe('Bridge Widget tests', () => {
 
       const params = {
         providerPreference: 'metamask',
-        fromNetwork: Network.POLYGON.toString(),
+        fromNetwork: Network.IMTBL_ZKEVM_TESTNET.toString(),
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
@@ -427,7 +433,7 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
         provider: connectStubReturnWhitelistedNetwork.provider,
-        chainId: 137,
+        chainId: 13372,
       });
     });
     it('should call switch network (to default Ethereum) if provider is on the whitelisted network to start with', () => {
@@ -437,19 +443,19 @@ describe('Bridge Widget tests', () => {
             getAddress: () => Promise.resolve('0xwalletAddress'),
           }),
           getNetwork: async () => ({
-            chainId: 137,
-            name: 'Polygon',
+            chainId: 13372,
+            name: 'Immutable zkEVM Testnet',
           }),
           provider: {
             request: async () => null,
           },
         },
         network: {
-          chainId: 137,
-          name: 'Polygon',
+          chainId: 13372,
+          name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
-            name: 'MATIC',
-            symbol: 'MATIC',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },

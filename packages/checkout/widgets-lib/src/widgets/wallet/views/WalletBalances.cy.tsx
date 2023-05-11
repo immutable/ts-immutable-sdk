@@ -20,8 +20,8 @@ describe('WalletBalances', () => {
   const baseWalletState: WalletState = {
     checkout: checkout,
     network: {
-      chainId: 137,
-      name: 'Polygon',
+      chainId: 13372,
+      name: 'Immutable zkEVM Testnet',
       nativeCurrency: {} as unknown as TokenInfo,
       isSupported: true,
     },
@@ -31,7 +31,7 @@ describe('WalletBalances', () => {
     supportedTopUps: null,
   };
 
-  it('should show add coins button on POLYGON_ZKEVM when topUps are supported', () => {
+  it('should show add coins button on ZKEVM when topUps are supported', () => {
     const topUpFeatureTestCases = [
       {
         isOnRampEnabled: true,

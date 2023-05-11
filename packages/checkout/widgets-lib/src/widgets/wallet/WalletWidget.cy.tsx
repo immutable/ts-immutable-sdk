@@ -98,16 +98,16 @@ describe('WalletWidget tests', () => {
               getAddress: () => Promise.resolve('dss'),
             }),
             getNetwork: async () => ({
-              chainId: 137,
-              name: 'Polygon',
+              chainId: 13372,
+              name: 'Immutable zkEVM Testnet',
             }),
           },
           network: {
-            chainId: 137,
-            name: 'Polygon',
+            chainId: 13372,
+            name: 'Immutable zkEVM Testnet',
             nativeCurrency: {
-              name: 'MATIC',
-              symbol: 'MATIC',
+              name: 'IMX',
+              symbol: 'IMX',
               decimals: 18,
             },
           },
@@ -153,11 +153,11 @@ describe('WalletWidget tests', () => {
         .as('switchNetworkStub')
         .resolves({
           network: {
-            chainId: 137,
-            name: 'Polygon',
+            chainId: 13372,
+            name: 'Immutable zkEVM Testnet',
             nativeCurrency: {
-              name: 'MATIC',
-              symbol: 'MATIC',
+              name: 'IMX',
+              symbol: 'IMX',
               decimals: 18,
             },
           },

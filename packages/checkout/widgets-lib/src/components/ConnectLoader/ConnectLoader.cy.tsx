@@ -119,18 +119,18 @@ describe('ConnectLoader', () => {
             getAddress: async () => Promise.resolve(''),
           }),
           getNetwork: async () => ({
-            chainId: ChainId.POLYGON_ZKEVM_TESTNET,
-            name: 'POLYGON_ZKEVM_TESTNET',
+            chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+            name: 'Immutable zkEVM Devnet',
           }),
         },
-        network: { name: 'POLYGON_ZKEVM_TESTNET' },
+        network: { name: 'Immutable zkEVM Devnet' },
       });
 
     cy.stub(Checkout.prototype, 'getNetworkInfo')
       .as('getNetworkInfoStub')
       .resolves({
         isSupported: true,
-        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
+        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
       });
 
     mount(
