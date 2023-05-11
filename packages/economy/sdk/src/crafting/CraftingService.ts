@@ -51,6 +51,11 @@ export class CraftingService {
     };
     return this.httpClient.post<CraftOutput>(url, data, config);
   }
+
+  public async validate(_input: CraftInput): Promise<Boolean> {
+    // TODO: Validate from API
+    return true;
+  }
 }
 
 export default CraftingService;
