@@ -1,7 +1,10 @@
 /**
  * Types of SDK Errors
  */
-export type ErrorType = 'CRAFTING_ERROR' | 'UNKNOWN_ERROR';
+export type ErrorType =
+  | 'CRAFTING_ERROR'
+  | 'GET_INVENTORY_ERROR'
+  | 'UNKNOWN_ERROR';
 
 /** SDK Error Payload */
 export type SDKErrorType = {
