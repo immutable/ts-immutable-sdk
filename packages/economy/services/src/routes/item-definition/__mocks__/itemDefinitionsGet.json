@@ -1,0 +1,220 @@
+[
+  {
+    "id": "783fd1a4-e711-4696-8b3a-c752bca12352",
+    "game_id": "pokemon",
+    "item_template_id": "e617aa3d-555d-49e6-8e54-16de3a8aeb3a",
+    "type": "Pokemon",
+    "name": "Charizard L1 - v4",
+    "description": "A Charizard Level 1 Pokemon",
+    "properties": {
+      "attack": 50,
+      "dust_power": 50,
+      "hp": 50,
+      "level": "1"
+    },
+    "image": "https://i.ebayimg.com/images/g/9XkAAOSw5ohkH6EY/s-l1600.jpg",
+    "property_schema": {
+      "type": "object",
+      "required": ["level", "attack", "hp"],
+      "properties": {
+        "hp": {
+          "type": "number",
+          "default": 1,
+          "location": "off-chain",
+          "exclusiveMaximum": 100,
+          "exclusiveMinimum": 0
+        },
+        "level": {
+          "type": "string",
+          "default": "1",
+          "location": "off-chain"
+        },
+        "attack": {
+          "type": "number",
+          "default": 1,
+          "location": "off-chain",
+          "exclusiveMaximum": 100,
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "status": "draft",
+    "published_at": null,
+    "created_at": "2023-05-10T03:29:36.304604Z",
+    "updated_at": "2023-05-10T03:29:36.304604Z"
+  },
+  {
+    "id": "bfa39069-40eb-43c4-a9c9-1bc95e9b3512",
+    "game_id": "pokemon",
+    "item_template_id": "e617aa3d-555d-49e6-8e54-16de3a8aeb3a",
+    "type": "Pokemon",
+    "name": "Charizard Vmax - v4",
+    "description": "A Charizard Vmax Pokemon",
+    "properties": {
+      "attack": 99,
+      "dust_power": 99,
+      "hp": 99,
+      "level": "5"
+    },
+    "image": "https://m.media-amazon.com/images/I/71x6QsZ1TwL._AC_SL1500_.jpg",
+    "property_schema": {
+      "type": "object",
+      "required": ["level", "attack", "hp"],
+      "properties": {
+        "hp": {
+          "type": "number",
+          "default": 1,
+          "location": "off-chain",
+          "exclusiveMaximum": 100,
+          "exclusiveMinimum": 0
+        },
+        "level": {
+          "type": "string",
+          "default": "1",
+          "location": "off-chain"
+        },
+        "attack": {
+          "type": "number",
+          "default": 1,
+          "location": "off-chain",
+          "exclusiveMaximum": 100,
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "status": "draft",
+    "published_at": null,
+    "created_at": "2023-05-10T03:20:33.799325Z",
+    "updated_at": "2023-05-10T03:20:33.799325Z"
+  },
+  {
+    "id": "1f331f1a-834b-4f15-8aeb-93c7fe3b6c68",
+    "game_id": "pokemon",
+    "item_template_id": "e617aa3d-555d-49e6-8e54-16de3a8aeb3a",
+    "type": "Pokemon",
+    "name": "Pikachu L1 - v4",
+    "description": "A Pikachu Level 1 Pokemon",
+    "properties": {
+      "attack": 30,
+      "dust_power": 50,
+      "hp": 30,
+      "level": "1"
+    },
+    "image": "https://i.ebayimg.com/images/g/2IMAAOSwSRpjeg-G/s-l1600.jpg",
+    "property_schema": {
+      "type": "object",
+      "required": ["level", "attack", "hp"],
+      "properties": {
+        "hp": {
+          "type": "number",
+          "default": 1,
+          "location": "off-chain",
+          "exclusiveMaximum": 100,
+          "exclusiveMinimum": 0
+        },
+        "level": {
+          "type": "string",
+          "default": "1",
+          "location": "off-chain"
+        },
+        "attack": {
+          "type": "number",
+          "default": 1,
+          "location": "off-chain",
+          "exclusiveMaximum": 100,
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "status": "draft",
+    "published_at": null,
+    "created_at": "2023-05-10T03:21:28.174337Z",
+    "updated_at": "2023-05-10T03:21:28.174337Z"
+  },
+  {
+    "id": "fd43d372-a2d3-4ba3-b22f-a381c849f024",
+    "game_id": "pokemon",
+    "item_template_id": "e617aa3d-555d-49e6-8e54-16de3a8aeb3a",
+    "type": "Pokemon",
+    "name": "Venusaur L1 - v4",
+    "description": "A Venusaur Level 1 Pokemon",
+    "properties": {
+      "attack": 60,
+      "dust_power": 50,
+      "hp": 60,
+      "level": "1"
+    },
+    "image": "https://m.media-amazon.com/images/I/71mJjFYc3mL._AC_SY741_.jpg",
+    "property_schema": {
+      "type": "object",
+      "required": ["level", "attack", "hp"],
+      "properties": {
+        "hp": {
+          "type": "number",
+          "default": 1,
+          "location": "off-chain",
+          "exclusiveMaximum": 100,
+          "exclusiveMinimum": 0
+        },
+        "level": {
+          "type": "string",
+          "default": "1",
+          "location": "off-chain"
+        },
+        "attack": {
+          "type": "number",
+          "default": 1,
+          "location": "off-chain",
+          "exclusiveMaximum": 100,
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "status": "draft",
+    "published_at": null,
+    "created_at": "2023-05-10T03:21:56.156025Z",
+    "updated_at": "2023-05-10T03:21:56.156025Z"
+  },
+  {
+    "id": "76688eb0-e2c7-4afd-a405-0130204f85e3",
+    "game_id": "shardbound",
+    "item_template_id": "b7a41354-d8ec-11ed-afa1-0242ac120002",
+    "type": "Card",
+    "name": "Charizard L5 Vmax",
+    "description": "Charizard Vmax",
+    "properties": {
+      "Attack": 12,
+      "Health": 10,
+      "Level": 5,
+      "Mana": 9,
+      "dust_power": 100
+    },
+    "image": "https://m.media-amazon.com/images/I/71x6QsZ1TwL._AC_SL1500_.jpg",
+    "property_schema": {},
+    "status": "draft",
+    "published_at": null,
+    "created_at": "2023-04-12T04:48:01.764483Z",
+    "updated_at": "2023-04-12T04:48:01.764483Z"
+  },
+  {
+    "id": "0f89554b-2c92-4220-b43e-8317a0b117c5",
+    "game_id": "shardbound",
+    "item_template_id": "b7a41354-d8ec-11ed-afa1-0242ac120002",
+    "type": "Card",
+    "name": "Demogorgon+",
+    "description": "Deal 3 damage to a random sleeping enemy creature",
+    "properties": {
+      "Attack": 8,
+      "Health": 6,
+      "Level": 2,
+      "Mana": 7,
+      "dust_power": 100
+    },
+    "image": "https://images.godsunchained.com/art2/500/94.webp",
+    "property_schema": {},
+    "status": "draft",
+    "published_at": null,
+    "created_at": "2023-04-12T04:48:01.764483Z",
+    "updated_at": "2023-04-12T04:48:01.764483Z"
+  }
+]
