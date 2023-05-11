@@ -9,7 +9,7 @@ import { Environment } from '@imtbl/config';
 export function L1Network(environment: Environment) {
   return environment === Environment.PRODUCTION
     ? ChainId.ETHEREUM
-    : ChainId.GOERLI;
+    : ChainId.SEPOLIA;
 }
 
 /**

@@ -22,6 +22,7 @@ import { SwapCoins } from './views/SwapCoins';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { LoadingView } from '../../components/Loading/LoadingView';
 import { Environment } from '@imtbl/config';
+import { L1Network } from '../../lib/networkUtils';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -48,8 +49,10 @@ export function SwapWidget(props: SwapWidgetProps) {
     theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
       ? onLightBase
       : onDarkBase;
-  const checkout = useMemo(() => new Checkout({ baseConfig: { environment: environment } }),
-    [environment]);
+  const checkout = useMemo(
+    () => new Checkout({ baseConfig: { environment: environment } }),
+    [environment]
+  );
 
   const connectToCheckout = useCallback(async () => {
     if (!providerPreference) return;
@@ -58,7 +61,10 @@ export function SwapWidget(props: SwapWidgetProps) {
     });
     setConnection(result);
     const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
-      { chainId: 1, type: TokenFilterTypes.SWAP } // TODO: THIS NEEDS TO BE CHANGED BACK TO THE NETWORK CHAIN ID
+      {
+        chainId: L1Network(checkout.config.environment),
+        type: TokenFilterTypes.SWAP,
+      } // TODO: THIS NEEDS TO BE CHANGED BACK TO THE NETWORK CHAIN ID
     );
     setAllowedTokens(allowList.tokens);
     viewDispatch({
