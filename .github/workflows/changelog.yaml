@@ -39,3 +39,10 @@ jobs:
       - if: contains(github.event.pull_request.title, 'NO-CHANGELOG') == false && steps.changelog.outputs.CHANGELOG_UPDATED != 'CHANGELOG.md'
         run: |
           exit 1
+          
+      - if: contains(github.event.pull_request.title, 'NO-CHANGELOG') == false && steps.changelog.outputs.CHANGELOG_UPDATED == 'CHANGELOG.md'
+        name: Update the status message.
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            Changelog update detected!
