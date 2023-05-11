@@ -1,13 +1,19 @@
+/* eslint-disable no-console */
 import { LitElement, css, html } from 'lit';
 import {
   customElement,
   eventOptions,
   property,
   state,
-} from 'lit/decorators.js';
-import { Config, Passport } from '@imtbl/passport';
+} from 'lit/decorators';
+import {
+  Passport,
+  ImmutableConfiguration,
+  PassportConfiguration,
+} from '@imtbl/passport';
 import { IMXProvider } from '@imtbl/provider';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const devEnvConfig = {
   network: 'goerli',
   authenticationDomain: 'https://auth.dev.immutable.com',
@@ -22,27 +28,30 @@ export class CraftPassport extends LitElement {
   static styles = css``;
 
   private passport!: Passport;
+
   private provider!: IMXProvider;
+
   private button!: HTMLButtonElement;
 
   @property()
-  env: keyof typeof Config | 'dev' = 'SANDBOX';
+    // env: keyof typeof Config | 'dev' = 'SANDBOX';
+    env: string = 'SANDBOX';
 
   @property()
-  clientId: string = '';
+    clientId: string = '';
 
   @property()
-  redirectUri: string = '';
+    redirectUri: string = '';
 
   @property()
-  logoutRedirectUri: string = '';
+    logoutRedirectUri: string = '';
 
   @state()
   private state = {
-    accessToken: '',
-    userInfo: {},
-    user: {},
-  };
+      accessToken: '',
+      userInfo: {},
+      user: {},
+    };
 
   @eventOptions({ capture: true })
   async handleLoginClick(event: MouseEvent) {
@@ -61,7 +70,7 @@ export class CraftPassport extends LitElement {
     this.setup();
   }
 
-  get _slottedChildren() {
+  get slottedChildren() {
     const slot = this.shadowRoot?.querySelector('slot');
     return slot?.assignedElements({ flatten: true });
   }
@@ -73,15 +82,23 @@ export class CraftPassport extends LitElement {
   }
 
   create() {
-    const config = this.env === 'dev' ? devEnvConfig : Config[this.env];
-
-    this.passport = new Passport(config as any, {
+    const oidcConfiguration = {
       clientId: this.clientId,
       redirectUri: this.redirectUri,
       logoutRedirectUri: this.logoutRedirectUri,
       scope: 'openid offline_access transact',
       audience: 'platform_api',
+    };
+    const immutableConfig = new ImmutableConfiguration({
+      environment: this.env,
     });
+    const config = new PassportConfiguration({
+      baseConfig: immutableConfig,
+      ...oidcConfiguration,
+    });
+    // const config = this.env === 'dev' ? devEnvConfig : Config[this.env];
+
+    this.passport = new Passport(config);
   }
 
   connect() {
@@ -92,10 +109,13 @@ export class CraftPassport extends LitElement {
     window.addEventListener('load', async () => {
       try {
         await this.passport.loginCallback();
-      } catch {}
+      } catch (err) {
+        console.error(err);
+      }
     });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   async onLoginPopupCloseEvent(error: any) {
     console.log('CraftPassport ~ onLoginPopupCloseEvent ~ error:', error);
   }
@@ -106,7 +126,12 @@ export class CraftPassport extends LitElement {
       this.passport.getUserInfo(),
     ]);
     const user = (this.provider as any)?.user || {};
-    this.state = { ...this.state, accessToken, userInfo, user };
+    this.state = {
+      ...this.state,
+      accessToken,
+      userInfo,
+      user,
+    };
     this.requestUpdate();
     console.log({ state: this.state });
   }
@@ -115,7 +140,7 @@ export class CraftPassport extends LitElement {
     console.log('Component mounted!', {
       passport: this.passport,
     });
-    this.button = this._slottedChildren?.[0] as HTMLButtonElement;
+    this.button = this.slottedChildren?.[0] as HTMLButtonElement;
   }
 
   renderConnected() {

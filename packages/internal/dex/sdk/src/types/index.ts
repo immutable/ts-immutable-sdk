@@ -31,7 +31,7 @@ export type QuoteResponse =
 export type TradeInfo = {
   quote: Amount;
   quoteWithMaxSlippage: Amount;
-  slippage: string;
+  slippage: number;
 };
 
 export type TransactionResponse =

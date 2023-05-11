@@ -7,9 +7,9 @@ export type EventType<A = EventAction, D = EventData> = { action: A } & D;
 /**
  * @public Namespaces for Custom Events emitted by the Economy SDK
  */
-export const EconomyCustomEventTypes = {
-  DEFAULT: 'imtbl-economy-event',
-} as const;
+export enum EconomyCustomEventTypes {
+  DEFAULT = 'imtbl-economy-event',
+}
 export type EconomyCustomEventType =
   (typeof EconomyCustomEventTypes)[keyof typeof EconomyCustomEventTypes];
 

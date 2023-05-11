@@ -22,37 +22,29 @@ export type CraftInput = {
 };
 
 // TODO: Use Checkout SDK
-const Checkout = {
+const checkout = {
   connect: asyncFn('connect'),
   transfer: asyncFn('transfer', [1, 2, 3]),
   sign: asyncFn('sign'),
-};
-
-// TODO: Replace for CraftService class
-const CraftServiceMock = {
-  validateCraft: asyncFn('validateCraft'),
-  submitCraft: asyncFn('submitCraft'),
 };
 
 /**
  * @internal Craft events
  */
 export type CraftEvent = EventType<
-  'CRAFT',
-  | EventData<'STARTED' | 'IN_PROGRESS'>
-  | EventData<'COMPLETED', { data: {} }>
-  | EventData<'FAILED', { error: { code: string; reason: string } }>
-  | EventData<
-      'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
-    >
+'CRAFT',
+| EventData<'STARTED' | 'IN_PROGRESS'>
+| EventData<'COMPLETED', { data: {} }>
+| EventData<'FAILED', { error: { code: string; reason: string } }>
+| EventData<'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'>
 >;
 
 /** List of specific craft statuses */
 export type CraftStatus = CraftEvent['status'];
 
 export class Crafting {
-  public x: string = 'test';
   private emitEvent: (event: CraftEvent) => void;
+
   private craftingService: CraftingService;
 
   // FIXME: make injectable
@@ -69,8 +61,6 @@ export class Crafting {
    */
   @withSDKError({ type: 'CRAFTING_ERROR' })
   public async craft(input: CraftInput): Promise<CraftStatus> {
-    console.log('@@@@@@@@@ economy/sdk/src/crafting/Crafting.ts craft', input);
-    // return 'FAILED';
     // 1. validate inputs
     this.emitEvent({ status: 'STARTED', action: 'CRAFT' });
     await this.validate(input);
@@ -80,9 +70,10 @@ export class Crafting {
     let signature;
     if (input.requiresWeb3) {
       this.emitEvent({ status: 'AWAITING_WEB3_INTERACTION', action: 'CRAFT' });
-      txIds = await Checkout.transfer(input.input);
-      signature = await Checkout.sign();
+      txIds = await checkout.transfer(input.input);
+      signature = await checkout.sign();
     }
+    console.info('txIds, signature', { txIds, signature });
 
     // 3. submit craft to BE
     this.emitEvent({ status: 'SUBMITTED', action: 'CRAFT' });
