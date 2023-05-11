@@ -26,8 +26,8 @@ NEXT_PUBLIC_COMMON_ROUTING_WETH=
 Then also add the RPC URL and the chain ID:
 
 ```bash
-NEXT_PUBLIC_RPC_URL_DEV=
-NEXT_PUBLIC_CHAIN_ID_DEV=
+NEXT_PUBLIC_RPC_URL=
+NEXT_PUBLIC_CHAIN_ID=
 ```
 
 Finally, run the development server:

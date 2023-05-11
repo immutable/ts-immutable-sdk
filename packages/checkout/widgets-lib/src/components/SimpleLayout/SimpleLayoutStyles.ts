@@ -31,6 +31,7 @@ export const FooterStyle = {
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
+  backgroundColor: 'base.color.translucent.container.200'
 };
 
 export const ContentStyle = {
