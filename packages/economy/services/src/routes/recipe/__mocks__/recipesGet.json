@@ -1,79 +1,49 @@
 [
   {
-    "id": "9b25e21e-1741-4a3e-a983-a9b69a420f51",
-    "game_id": "shardbound",
-    "name": "Prestige",
-    "description": "Shardbound Prestige",
+    "id": "c1da5d0e-f506-4ae4-9d9d-00958be06d58",
+    "game_id": "pokemon",
+    "name": "charizard-vmax-upgrade",
+    "description": "Get a charizard vmax card",
     "status": "draft",
     "inputs": [
       {
-        "id": "22a01f44-c5d9-46ce-b9b1-b2731f12834f",
+        "id": "d2da797d-a4d3-4e56-95a9-60dd49af4063",
         "type": "single_item",
-        "name": "Card to upgrade",
+        "name": "card to be upgraded",
         "conditions": [
-          {
-            "type": "",
-            "ref": "item_type",
-            "comparison": "eq",
-            "expected": "Card"
-          },
           {
             "type": "",
             "ref": "properties.level",
             "comparison": "eq",
-            "expected": "5"
-          },
-          {
-            "type": "",
-            "ref": "properties.tier",
-            "comparison": "eq",
-            "expected": "Common"
-          },
-          {
-            "type": "",
-            "ref": "properties.location",
-            "comparison": "eq",
-            "expected": "off-chain"
+            "expected": "1"
           }
         ]
       },
       {
-        "id": "0be743b7-f38b-4e22-8612-7538cf9c3c96",
-        "type": "single_item",
-        "name": "Convertible Item",
+        "id": "18a159b0-e78c-48b6-845f-5a08be8a8356",
+        "type": "multiple_item",
+        "name": "dust power cost",
         "conditions": [
           {
-            "type": "",
-            "ref": "item_type",
-            "comparison": "eq",
-            "expected": "Convertible"
+            "type": "property_sum",
+            "ref": "properties.dust_power",
+            "comparison": "gte",
+            "expected": "300"
           }
         ]
       }
     ],
     "outputs": [
       {
-        "id": "1fc425fc-8cde-44b9-a1eb-416110c62a78",
+        "id": "ca32421c-eb55-41e3-8d63-56761915d634",
         "type": "item_definition",
-        "name": "",
-        "ref": "something",
-        "data": {
-          "properties.level": "2"
-        }
+        "name": "A Charizard vMax Pokemon",
+        "ref": "bfa39069-40eb-43c4-a9c9-1bc95e9b3512",
+        "location": "offchain",
+        "data": null
       }
     ],
-    "created_at": "2023-04-11T07:50:45.763723Z",
-    "updated_at": "2023-04-11T07:50:45.763723Z"
-  },
-  {
-    "id": "3b081349-e5a5-4b0e-a7cf-557d525682ff",
-    "game_id": "shardbound",
-    "name": "test 1",
-    "description": "dsdfsdf",
-    "status": "draft",
-    "inputs": [],
-    "outputs": [],
-    "created_at": "2023-04-13T00:51:24.205505Z",
-    "updated_at": "2023-04-13T00:51:39.058877Z"
+    "created_at": "2023-05-09T08:06:50.91838Z",
+    "updated_at": "2023-05-10T03:32:28.905668Z"
   }
 ]
