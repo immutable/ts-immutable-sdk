@@ -17,6 +17,7 @@ import {
   sendBuyWidgetCloseEvent,
   sendBuyWidgetNotConnectedEvent,
 } from './BuyWidgetEvents';
+import { Environment } from '@imtbl/config';
 
 export enum BuyWidgetViews {
   BUY = 'BUY',
@@ -79,6 +80,7 @@ export type GetOrderResponse = {
 export interface BuyWidgetProps {
   params: BuyWidgetParams;
   theme: WidgetTheme;
+  environment: Environment;
 }
 
 export interface BuyWidgetParams {
@@ -182,10 +184,14 @@ export class Orderbook {
 }
 
 export function BuyWidget({
+  environment,
   params: { providerPreference, orderId },
   theme,
 }: BuyWidgetProps) {
-  const checkout = useMemo(() => new Checkout(), []);
+  const checkout = useMemo(
+    () => new Checkout({ baseConfig: { environment: environment } }),
+    [environment]
+  );
   const [provider, setProvider] = useState<Web3Provider>();
   const [orderbook, setOrderbook] = useState<Orderbook>();
   const [connectedChainId, setConnectedChainId] = useState<ChainId>();

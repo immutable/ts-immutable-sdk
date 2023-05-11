@@ -18,12 +18,14 @@ import { LoadingView } from '../Loading/LoadingView';
 import { ConnectWidget } from '../../widgets/connect/ConnectWidget';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 import { ErrorView } from '../Error/ErrorView';
+import { Environment } from '@imtbl/config';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
   params: ConnectLoaderParams;
   theme: WidgetTheme;
   closeEvent: () => void;
+  environment: Environment;
 }
 
 export interface ConnectLoaderParams {
@@ -31,6 +33,7 @@ export interface ConnectLoaderParams {
 }
 
 export const ConnectLoader = ({
+  environment,
   children,
   params,
   theme,
@@ -109,9 +112,9 @@ export const ConnectLoader = ({
       }
     };
 
-    const checkout = new Checkout();
+    const checkout = new Checkout({ baseConfig: { environment: environment } });
     checkConnection(checkout);
-  }, [providerPreference]);
+  }, [providerPreference, environment]);
 
   return (
     <>
@@ -126,6 +129,7 @@ export const ConnectLoader = ({
           value={{ connectLoaderState, connectLoaderDispatch }}
         >
           <ConnectWidget
+            environment={environment}
             params={params}
             theme={theme}
             deepLink={ConnectWidgetViews.CONNECT_WALLET}

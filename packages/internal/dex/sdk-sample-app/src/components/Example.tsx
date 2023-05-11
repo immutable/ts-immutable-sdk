@@ -1,17 +1,11 @@
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
-import { Exchange, TradeInfo, TransactionResponse } from '@imtbl/dex-sdk';
+import { Exchange, TransactionResponse } from '@imtbl/dex-sdk';
 import { configuration } from '../config';
 import { getERC20ApproveCalldata } from '@/utils/approve';
 import { ConnectAccount } from './ConnectAccount';
 import { getTokenSymbol } from '../utils/getTokenSymbol';
 import { AmountInput } from './AmountInput';
-
-type RouteType = {
-  fee: any;
-  token0: string;
-  token1: string;
-};
 
 export function Example() {
   // Create the Exchange class
@@ -27,7 +21,6 @@ export function Example() {
   const [swapStatus, setSwapStatus] = useState<boolean>(false);
   const [approved, setApproved] = useState<boolean>(false);
   const [result, setResult] = useState<TransactionResponse | null>();
-  const [routes, setRoutes] = useState<RouteType[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [addressToSymbolMapping, setAddressToSymbolMapping] = useState<mapping>(
     {}
@@ -56,37 +49,7 @@ export function Example() {
     [address: string]: string;
   };
 
-  async function getTokenPaths(trade: TradeInfo): Promise<RouteType[]> {
-    const promises = trade.route.pools.map(async ({ fee, token0, token1 }) => {
-      const token0Symbol = await getTokenSymbol(token0.address);
-      const token1Symbol = await getTokenSymbol(token1.address);
-
-      if (!addressToSymbolMapping[token0.address]) {
-        setAddressToSymbolMapping({
-          ...addressToSymbolMapping,
-          [token0.address]: token0Symbol,
-        });
-      }
-
-      if (!addressToSymbolMapping[token1.address]) {
-        setAddressToSymbolMapping({
-          ...addressToSymbolMapping,
-          [token1.address]: token1Symbol,
-        });
-      }
-
-      return {
-        fee,
-        token0: token0Symbol,
-        token1: token1Symbol,
-      };
-    });
-
-    return Promise.all(promises);
-  }
-
   const getQuote = async () => {
-    setRoutes([]);
     setIsFetching(true);
 
     const txn = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -98,13 +61,9 @@ export function Example() {
 
     if (txn.success) {
       setResult(txn);
-
-      const mapping = await getTokenPaths(txn.info);
-      setRoutes(mapping);
     } else {
       setError('Error fetching quote');
       setResult(null);
-      setRoutes([]);
     }
 
     setIsFetching(false);
@@ -211,37 +170,7 @@ export function Example() {
             }`}
           </h3>
           <h3>Slippage: {result.info.slippage}</h3>
-          {routes.length > 0 && (
             <>
-              <h3>
-                Token Path:&nbsp;
-                {result.info.route.tokenPath.map(
-                  (token: any, index: number) => {
-                    const key = token.address;
-                    return (
-                      <span key={key}>
-                        {addressToSymbolMapping[token.address]}{' '}
-                        {index !== result.info.route.tokenPath.length - 1
-                          ? `--->`
-                          : ''}{' '}
-                      </span>
-                    );
-                  }
-                )}
-              </h3>
-              <h3>
-                Pools used:&nbsp;
-                {routes.map((route: any, index: number) => {
-                  const key = `${route.token0}-${route.token1}-${route.fee}`;
-                  return (
-                    <span key={key}>
-                      ({route.token0}/{route.token1} - {route.fee / 10000}%){' '}
-                      {index !== routes.length - 1 ? `--->` : ''}{' '}
-                    </span>
-                  );
-                })}
-              </h3>
-
               <button
                 className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
                 onClick={() => performSwap(result)}
@@ -258,7 +187,6 @@ export function Example() {
               )}
               {error && <Error message={error} />}
             </>
-          )}
         </>
       )}
     </div>

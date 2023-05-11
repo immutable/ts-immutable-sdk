@@ -4,6 +4,7 @@ import {
   WidgetConnectionProviders,
   WidgetTheme,
 } from '../definitions/constants';
+import { Environment } from '@imtbl/config';
 
 /**
  * Interface representing the props for the Swap Widget component.
@@ -32,6 +33,7 @@ export function SwapReact(props: SwapReactProps): JSX.Element {
 
   return (
     <imtbl-swap
+      environment={Environment.SANDBOX}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }

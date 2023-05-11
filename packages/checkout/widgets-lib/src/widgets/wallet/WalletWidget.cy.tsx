@@ -7,6 +7,7 @@ import { cySmartGet } from '../../lib/testUtils';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
+import { Environment } from '@imtbl/config';
 
 describe('WalletWidget tests', () => {
   beforeEach(() => {
@@ -52,7 +53,13 @@ describe('WalletWidget tests', () => {
         },
       });
 
-    mount(<WalletWidget params={params} theme={WidgetTheme.DARK} />);
+    mount(
+      <WalletWidget
+        environment={Environment.PRODUCTION}
+        params={params}
+        theme={WidgetTheme.DARK}
+      />
+    );
 
     cySmartGet('loading-view').should('be.visible');
     cySmartGet('wallet-balances').should('be.visible');
@@ -167,7 +174,13 @@ describe('WalletWidget tests', () => {
         providerPreference: ConnectionProviders.METAMASK,
       } as WalletWidgetParams;
 
-      mount(<WalletWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <WalletWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
 
       // cySmartGet('@balanceStub').should('have.been.called');
       cySmartGet('@connectStub').should('have.been.calledWith', {
@@ -190,7 +203,13 @@ describe('WalletWidget tests', () => {
       const params = {
         providerPreference: ConnectionProviders.METAMASK,
       } as WalletWidgetParams;
-      mount(<WalletWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <WalletWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
 
       cySmartGet('@balanceStub').should('have.been.called');
       cySmartGet('@connectStub').should('have.been.calledWith', {

@@ -9,6 +9,7 @@ import { cy, it } from 'local-cypress';
 import { Checkout, ConnectionProviders, TokenInfo } from '@imtbl/checkout-sdk';
 import { WalletContext, WalletState } from '../../context/WalletContext';
 import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 
 describe('Network Menu', () => {
   beforeEach(() => {
@@ -50,7 +51,9 @@ describe('Network Menu', () => {
   });
   it('should have network buttons', () => {
     const walletState: WalletState = {
-      checkout: new Checkout(),
+      checkout: new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      }),
       network: null,
       provider: null,
       providerPreference: ConnectionProviders.METAMASK,
@@ -87,7 +90,9 @@ describe('Network Menu', () => {
       });
 
     const walletState: WalletState = {
-      checkout: new Checkout(),
+      checkout: new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      }),
       network: {
         chainId: 1,
         name: 'Ethereum',

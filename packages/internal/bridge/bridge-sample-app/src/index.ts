@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { ethers } from 'ethers';
 import {
@@ -14,7 +15,6 @@ import {
   WaitForResponse,
   CompletionStatus,
 } from '@imtbl/bridge-sdk';
-
 
 /**
  * Deposit function to handle the deposit process from L1 to L2.
@@ -49,21 +49,21 @@ async function deposit() {
   // Parse deposit amount from environment variable
   const depositAmountBeforeFee = ethers.utils.parseUnits(
     process.env.DEPOSIT_AMOUNT,
-    18
+    18,
   );
 
   // Create providers for root and child chains
   const rootChainProvider = new ethers.providers.JsonRpcProvider(
-    process.env.ROOT_PROVIDER
+    process.env.ROOT_PROVIDER,
   );
   const childChainProvider = new ethers.providers.JsonRpcProvider(
-    process.env.CHILD_PROVIDER
+    process.env.CHILD_PROVIDER,
   );
 
   // Create a wallet instance to simulate the user's wallet
   const checkout = new ethers.Wallet(
     process.env.PRIVATE_KEY,
-    rootChainProvider
+    rootChainProvider,
   );
 
   // Create a bridge configuration instance
@@ -82,7 +82,7 @@ async function deposit() {
   // Get the bridge fee and calculate the total deposit amount
   const bridgeFeeReq: BridgeFeeRequest = { token: process.env.TOKEN_ADDRESS };
   const bridgeFeeResponse: BridgeFeeResponse = await tokenBridge.getFee(
-    bridgeFeeReq
+    bridgeFeeReq,
   );
 
   // Calculate the total deposit amount required to ensure the user gets the amount they expect on L2
@@ -92,12 +92,11 @@ async function deposit() {
   const approveReq: ApproveBridgeRequest = {
     depositorAddress: process.env.DEPOSITOR_ADDRESS,
     token: process.env.TOKEN_ADDRESS,
-    depositAmount: depositAmount,
+    depositAmount,
   };
 
   // Get the unsigned approval transaction for the deposit
-  const approveResp: ApproveBridgeResponse =
-    await tokenBridge.getUnsignedApproveBridgeTx(approveReq);
+  const approveResp: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(approveReq);
 
   // If approval is required, sign and send the approval transaction
   if (approveResp.required) {
@@ -106,14 +105,14 @@ async function deposit() {
     }
     console.log('Sending Approve Tx');
     const txResponseApprove = await checkout.sendTransaction(
-      approveResp.unsignedTx
+      approveResp.unsignedTx,
     );
     const txApprovalReceipt = await txResponseApprove.wait();
     console.log(
-      `Approval Tx Completed with hash: ${txApprovalReceipt.transactionHash}`
+      `Approval Tx Completed with hash: ${txApprovalReceipt.transactionHash}`,
     );
   } else {
-    console.log(`Approval not required`);
+    console.log('Approval not required');
   }
 
   // Get the unsigned deposit transaction and send it on L1
@@ -121,15 +120,14 @@ async function deposit() {
     depositorAddress: process.env.DEPOSITOR_ADDRESS,
     recipientAddress: process.env.RECIPIENT_ADDRESS,
     token: process.env.TOKEN_ADDRESS,
-    depositAmount: depositAmount,
+    depositAmount,
   };
 
-  const unsignedDepositResult: BridgeDepositResponse =
-    await tokenBridge.getUnsignedDepositTx(depositArgs);
+  const unsignedDepositResult: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(depositArgs);
   console.log('Sending Deposit Tx');
   // Sign and Send the signed transaction
   const txResponse = await checkout.sendTransaction(
-    unsignedDepositResult.unsignedTx
+    unsignedDepositResult.unsignedTx,
   );
   console.log('Sent Deposit Transaction...waiting for L1 completion');
 
@@ -137,23 +135,23 @@ async function deposit() {
   const txReceipt = await txResponse.wait();
   console.log(
     'Transaction successful on L1 with hash:',
-    txReceipt.transactionHash
+    txReceipt.transactionHash,
   );
-  console.log(`MUST BE CONNECTED TO VPN to connect to zkEVM`);
+  console.log('MUST BE CONNECTED TO VPN to connect to zkEVM');
   console.log('Waiting for Deposit to complete on L2...');
   // Wait for the deposit to complete on L2
   const waitReq: WaitForRequest = {
     transactionHash: txReceipt.transactionHash,
   };
   const bridgeResult: WaitForResponse = await tokenBridge.waitForDeposit(
-    waitReq
+    waitReq,
   );
   if (bridgeResult.status === CompletionStatus.SUCCESS) {
     console.log('Deposit Successful');
   } else {
     // Alert condition. Shouldn't happen
     console.log(
-      `Deposit Failed on L2 with status ${bridgeResult.status}`
+      `Deposit Failed on L2 with status ${bridgeResult.status}`,
     );
   }
 }

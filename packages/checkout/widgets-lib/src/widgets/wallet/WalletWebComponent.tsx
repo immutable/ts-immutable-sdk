@@ -8,15 +8,10 @@ import {
   ConnectLoaderParams,
 } from '../../components/ConnectLoader/ConnectLoader';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
+import { Environment } from '@imtbl/config';
+import { ImmutableWebComponent } from '../ImmutableWebComponent';
 
-export class ImmutableWallet extends HTMLElement {
-  reactRoot?: ReactDOM.Root;
-
-  static get observedAttributes() {
-    return ['theme'];
-  }
-
-  theme = WidgetTheme.DARK;
+export class ImmutableWallet extends ImmutableWebComponent {
   providerPreference = ConnectionProviders.METAMASK;
   useConnectWidget?: boolean;
   isOnRampEnabled?: boolean;
@@ -76,6 +71,7 @@ export class ImmutableWallet extends HTMLElement {
       <React.StrictMode>
         {this.useConnectWidget ? (
           <ConnectLoader
+            environment={this.environment}
             theme={this.theme}
             params={connectLoaderParams}
             closeEvent={sendWalletWidgetCloseEvent}
@@ -83,10 +79,15 @@ export class ImmutableWallet extends HTMLElement {
             <WalletWidget
               params={walletParams}
               theme={this.theme}
+              environment={this.environment}
             ></WalletWidget>
           </ConnectLoader>
         ) : (
-          <WalletWidget params={walletParams} theme={this.theme}></WalletWidget>
+          <WalletWidget
+            params={walletParams}
+            theme={this.theme}
+            environment={this.environment}
+          ></WalletWidget>
         )}
       </React.StrictMode>
     );

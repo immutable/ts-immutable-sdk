@@ -6,16 +6,27 @@ import {
   CheckoutWidgets,
   CheckoutWidgetTagNames,
   ExampleReact,
+  CheckoutWidgetsConfig,
+  UpdateConfig,
 } from '@imtbl/checkout-widgets';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider } from '@ethersproject/providers';
 import { useState } from 'react';
+import { Environment } from '@imtbl/config';
 
 function ExampleUI() {
   CheckoutWidgets({
     theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
   });
   const [theme, setTheme] = useState(WidgetTheme.DARK);
+
+  const widgetsConfig2: CheckoutWidgetsConfig = {
+    theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
+  };
+
+  UpdateConfig(widgetsConfig2);
 
   async function setProvider() {
     const provider: Web3Provider | null = await detectEthereumProvider();

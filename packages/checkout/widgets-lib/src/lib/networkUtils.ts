@@ -3,8 +3,8 @@ import { Environment } from '@imtbl/config';
 
 /**
  * Returns the preferred L1 ChainId for the given environment.
- * @param environment
- * @returns
+ * @param {Environment} environment
+ * @returns {ChainId}
  */
 export function L1Network(environment: Environment) {
   return environment === Environment.PRODUCTION
@@ -14,8 +14,8 @@ export function L1Network(environment: Environment) {
 
 /**
  * Returns the preferred zkEVM ChainId for the given environment.
- * @param environment
- * @returns
+ * @param {Environment} environment
+ * @returns {ChainId}
  */
 export function zkEVMNetwork(environment: Environment) {
   return environment === Environment.PRODUCTION

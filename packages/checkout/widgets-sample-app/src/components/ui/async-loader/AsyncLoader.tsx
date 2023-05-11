@@ -12,14 +12,17 @@ import {
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider } from '@ethersproject/providers';
 import { useEffect } from 'react';
+import { Environment } from '@imtbl/config';
 
 export function AsyncLoader() {
   CheckoutWidgets({
     theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
   });
 
   const widgetsConfig2: CheckoutWidgetsConfig = {
     theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
   };
 
   UpdateConfig(widgetsConfig2);

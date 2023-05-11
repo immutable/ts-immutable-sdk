@@ -24,10 +24,10 @@
   },
   "license": "Apache-2.0",
   "scripts": {
-    "lint": "npx eslint ./src --ext .ts --max-warnings=0",
     "build": "npm run setup && npm run build:app",
     "build:app": "parcel build src/*.html --public-url ./",
     "clean": "rimraf ./dist ./.cache",
+    "lint": "npx eslint ./src --ext .ts --max-warnings=0",
     "prestart": "[ -f public/js/imtbl-checkout-widgets.js ] || { echo 'Error: checkout-widgets deps not found. Please run `npm run setup` first.' ; exit 1; }",
     "setup": "npm run clean && yarn workspace @imtbl/checkout-widgets-lib build && yarn workspace @imtbl/checkout-widgets-lib dist:sdk && cp ../../../sdk/dist/browser/checkout.js public/js/imtbl-checkout-widgets.js",
     "start": "npm run prestart && parcel src/*.html -p 4200"
