@@ -1,26 +1,19 @@
 import { TextInput, Box, Body } from '@biom3/react';
 import { BigNumber, utils, BigNumberish } from 'ethers';
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import {
-  ConnectResult,
-  TokenInfo,
-  Checkout,
-  GetBalanceResult,
-} from '@imtbl/checkout-sdk';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
+import { TokenInfo, GetBalanceResult } from '@imtbl/checkout-sdk';
 import TokenSelect from './TokenSelect';
 import { QuoteResponse } from './SwapForm';
 import { findTokenByAddress } from '../helpers';
-import { Environment } from '@imtbl/config';
+import { SwapActions, SwapContext } from '../context/SwapContext';
 
 type WithProps = {
   onTokenChange: (token: TokenInfo) => void;
   onQuoteChange: (token: QuoteResponse) => void;
-  tokenAllowList: TokenInfo[];
   token?: TokenInfo;
   quote?: QuoteResponse;
   buyToken: TokenInfo;
   buyAmount: BigNumber;
-  connection: ConnectResult;
 };
 
 async function getQuoteFromAmountOut(
@@ -55,44 +48,28 @@ async function getQuoteFromAmountOut(
 }
 
 export default function With(props: WithProps) {
-  const {
-    onTokenChange,
-    onQuoteChange,
-    token,
-    quote,
-    buyToken,
-    buyAmount,
-    connection,
-    tokenAllowList,
-  } = props;
-  const [balances, setBalances] = useState<GetBalanceResult[]>();
+  const { onTokenChange, onQuoteChange, token, quote, buyToken, buyAmount } =
+    props;
   const [loading, setLoading] = useState<boolean>(false);
   const [debounceId, setDebounceId] = useState<string | null>();
-  // TODO: update here to go to context and stop hardcoing
-  const checkout = useMemo(
-    () =>
-      new Checkout({
-        baseConfig: { environment: Environment.SANDBOX },
-      }),
-    []
-  );
+
+  const { swapState, swapDispatch } = useContext(SwapContext);
+  const { checkout, provider, network, tokenBalances, allowedTokens } =
+    swapState;
+
   const quoteAmount = (
     (quote &&
       utils.formatUnits(quote.trade.amountIn.toString(), token?.decimals)) ||
     0
   )?.toString();
 
-  const allowedTokens = (): string[] => {
-    return (balances || []).map(
-      (balance: GetBalanceResult) => balance.token?.address || ''
-    );
-  };
-
   const fetchBalances = useCallback(async () => {
-    const walletAddress = await connection.provider.getSigner().getAddress();
+    if (!checkout || !provider || !network) return;
+
+    const walletAddress = await provider.getSigner().getAddress();
     const result = await checkout.getAllBalances({
-      provider: connection.provider,
-      chainId: 1, //TODO: THIS NEEDS TO BE CHANGED BACK TO THE CURRENT NETWORK CHAIN ID
+      provider: provider,
+      chainId: network.chainId,
       walletAddress,
     });
 
@@ -100,15 +77,20 @@ export default function With(props: WithProps) {
       .filter((balance: GetBalanceResult) => balance.balance.gt(0))
       .map((balance: GetBalanceResult) => ({
         ...balance,
-        token: findTokenByAddress(tokenAllowList, balance.token.address || '')!,
+        token: findTokenByAddress(allowedTokens, balance.token.address || '')!,
       }));
 
-    setBalances(resolvedBalances);
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_TOKEN_BALANCES,
+        tokenBalances: resolvedBalances,
+      },
+    });
 
     if (resolvedBalances.length > 0) {
       onTokenChange(resolvedBalances[0].token);
     }
-  }, [connection, checkout, tokenAllowList, onTokenChange]);
+  }, [checkout, provider, network, allowedTokens, swapDispatch, onTokenChange]);
 
   const generateQuote = async () => {
     const newQuote = await getQuoteFromAmountOut(
@@ -143,10 +125,10 @@ export default function With(props: WithProps) {
   }, [buyAmount, buyToken, token]);
 
   useEffect(() => {
-    if (!balances) {
+    if (!tokenBalances) {
       fetchBalances();
     }
-  }, [balances, fetchBalances]);
+  }, [tokenBalances, fetchBalances]);
 
   return (
     <Box sx={{ mt: '20px' }}>
@@ -160,10 +142,10 @@ export default function With(props: WithProps) {
         />
         <TokenSelect
           testId="withField"
+          allowedTokens={allowedTokens}
           token={token}
           onChange={onTokenChange}
-          connection={connection}
-          filter={allowedTokens()}
+          filter={allowedTokens.map((token) => token?.address ?? '')}
         />
       </Box>
       {loading && <Body>Loading</Body>}
