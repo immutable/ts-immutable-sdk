@@ -54,10 +54,10 @@ export class CryptoFiat {
 
     this.cache = new Map<string, string>();
     for (const coin of data) {
-      const override = symbolsOverrides[coin.id.toLowerCase()];
+      const override = symbolsOverrides[coin.symbol.toLowerCase()];
       this.cache.set(
         coin.symbol.toLowerCase(),
-        override ?? coin.id.toLowerCase(),
+        override || coin.id.toLowerCase(),
       );
     }
   }
