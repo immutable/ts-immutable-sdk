@@ -91,6 +91,11 @@ export class Crafting {
     return 'COMPLETED';
   }
 
+  /**
+   * Validate a craft input
+   * @param input
+   * @returns
+   */
   public async validate(input: CraftInput) {
     return this.service.validateCraft(input);
   }
