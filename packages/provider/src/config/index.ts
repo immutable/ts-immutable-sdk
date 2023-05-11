@@ -17,6 +17,7 @@ interface ProviderModuleConfiguration
 
 export class ProviderConfiguration {
   readonly immutableXConfig: ImmutableXConfiguration;
+
   readonly baseConfig: ImmutableConfiguration;
 
   constructor({ baseConfig, overrides }: ProviderModuleConfiguration) {

@@ -1,9 +1,8 @@
-import { generateSigners, privateKey1, testConfig } from '../test/helpers';
-import { UnsignedOrderRequest, OrdersApi } from '@imtbl/core-sdk';
+import { UnsignedOrderRequest, OrdersApi, GetSignableCancelOrderRequest } from '@imtbl/core-sdk';
 import { parseEther } from '@ethersproject/units';
-import { cancelOrder, createOrder } from './orders';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
-import { GetSignableCancelOrderRequest } from '@imtbl/core-sdk';
+import { cancelOrder, createOrder } from './orders';
+import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
@@ -93,7 +92,7 @@ describe('Orders', () => {
           nonce: getSignableOrderResponse.nonce,
           stark_key: getSignableOrderResponse.stark_key,
           stark_signature:
-            getSignableOrderResponse.payload_hash + 'STX' + privateKey1,
+            `${getSignableOrderResponse.payload_hash}STX${privateKey1}`,
           vault_id_buy: getSignableOrderResponse.vault_id_buy,
           vault_id_sell: getSignableOrderResponse.vault_id_sell,
         },
@@ -138,8 +137,7 @@ describe('Orders', () => {
 
     test('should make the correct api requests with the correct params, and return the correct receipt', async () => {
       const signers = await generateSigners(privateKey1);
-      const starkSignature =
-        getSignableCancelResponse.payload_hash + 'STX' + privateKey1;
+      const starkSignature = `${getSignableCancelResponse.payload_hash}STX${privateKey1}`;
 
       const response = await cancelOrder({
         signers,

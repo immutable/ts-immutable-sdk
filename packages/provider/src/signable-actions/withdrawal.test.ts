@@ -1,8 +1,8 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { AnyToken } from '@imtbl/core-sdk';
 import { completeWithdrawal } from './withdrawal';
 import { Signers } from './types';
 import * as WithdrawalActions from './withdrawal-actions';
-import { AnyToken } from '@imtbl/core-sdk';
 import { ProviderConfiguration } from '../config';
 
 jest.mock('@imtbl/core-sdk');
@@ -69,13 +69,13 @@ describe('withdrawal', () => {
         });
 
         expect(completeERC20WithdrawalMock).toBeCalledTimes(
-          testCase.callsToWithdrawalERC20
+          testCase.callsToWithdrawalERC20,
         );
         expect(completeERC721WithdrawalMock).toBeCalledTimes(
-          testCase.callsToWithdrawalERC721
+          testCase.callsToWithdrawalERC721,
         );
         expect(completeEthWithdrawalMock).toBeCalledTimes(
-          testCase.callsToWithdrawalEth
+          testCase.callsToWithdrawalEth,
         );
       });
     });

@@ -1,9 +1,9 @@
-import { deposit } from './deposit';
-import * as depositActions from './deposit-actions';
-import { Signers } from './types';
 import { TokenAmount } from '@imtbl/core-sdk';
 import { ProviderConfiguration } from 'config';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { deposit } from './deposit';
+import * as depositActions from './deposit-actions';
+import { Signers } from './types';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('./deposit-actions');
@@ -28,13 +28,13 @@ describe('deposit', () => {
       depositEthMock = jest.fn();
 
       (depositActions.depositERC20 as jest.Mock).mockImplementation(
-        depositERC20Mock
+        depositERC20Mock,
       );
       (depositActions.depositERC721 as jest.Mock).mockImplementation(
-        depositERC721Mock
+        depositERC721Mock,
       );
       (depositActions.depositEth as jest.Mock).mockImplementation(
-        depositEthMock
+        depositEthMock,
       );
     });
 
@@ -69,7 +69,7 @@ describe('deposit', () => {
 
         expect(depositERC20Mock).toBeCalledTimes(testCase.callsToDepositERC20);
         expect(depositERC721Mock).toBeCalledTimes(
-          testCase.callsToDepositERC721
+          testCase.callsToDepositERC721,
         );
         expect(depositEthMock).toBeCalledTimes(testCase.callsToDepositEth);
       });

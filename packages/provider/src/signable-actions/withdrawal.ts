@@ -1,6 +1,6 @@
 import { TokenAmount, AnyToken } from '@imtbl/core-sdk';
-import { Signers } from './types';
 import { ProviderConfiguration } from 'config';
+import { Signers } from './types';
 import {
   prepareWithdrawalAction,
   completeEthWithdrawalAction,

@@ -1,9 +1,10 @@
+import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
+import { ProviderConfiguration } from 'config';
 import { connect } from './metaMask';
 import {
   connect as buildImxSigner,
   disconnect as disconnectImxSigner,
 } from '../imx-wallet/imxWallet';
-import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { GenericIMXProvider } from '../genericImxProvider';
 import { ImxSigner } from '../imx-wallet/ImxSigner';
 import {
@@ -11,7 +12,6 @@ import {
   ProviderErrorType,
   withProviderError,
 } from '../errors/providerError';
-import { ProviderConfiguration } from 'config';
 
 export class MetaMaskIMXProvider extends GenericIMXProvider {
   private static imxSigner: ImxSigner;
@@ -19,13 +19,13 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
   constructor(
     config: ProviderConfiguration,
     ethSigner: EthSigner,
-    starkSigner: StarkSigner
+    starkSigner: StarkSigner,
   ) {
     super(config, ethSigner, starkSigner);
   }
 
   public static async connect(
-    config: ProviderConfiguration
+    config: ProviderConfiguration,
   ): Promise<MetaMaskIMXProvider> {
     return await withProviderError<MetaMaskIMXProvider>(
       async () => {
@@ -34,15 +34,15 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
         });
         this.imxSigner = await buildImxSigner(
           metaMaskProvider,
-          config.baseConfig.environment
+          config.baseConfig.environment,
         );
         return new MetaMaskIMXProvider(
           config,
           metaMaskProvider.getSigner(),
-          this.imxSigner
+          this.imxSigner,
         );
       },
-      { type: ProviderErrorType.WALLET_CONNECTION_ERROR }
+      { type: ProviderErrorType.WALLET_CONNECTION_ERROR },
     );
   }
 
@@ -50,7 +50,7 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
     if (!this.imxSigner) {
       throw new ProviderError(
         'Attempted to disconnect from the MetaMask IMX provider without an established connection',
-        ProviderErrorType.PROVIDER_CONNECTION_ERROR
+        ProviderErrorType.PROVIDER_CONNECTION_ERROR,
       );
     }
 
@@ -58,7 +58,7 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
       async () => {
         await disconnectImxSigner(this.imxSigner);
       },
-      { type: ProviderErrorType.PROVIDER_CONNECTION_ERROR }
+      { type: ProviderErrorType.PROVIDER_CONNECTION_ERROR },
     );
   }
 
@@ -66,15 +66,13 @@ export class MetaMaskIMXProvider extends GenericIMXProvider {
     if (!this.imxSigner) {
       throw new ProviderError(
         'Attempted to sign a message with the MetaMask IMX provider without an established connection',
-        ProviderErrorType.PROVIDER_CONNECTION_ERROR
+        ProviderErrorType.PROVIDER_CONNECTION_ERROR,
       );
     }
 
     return withProviderError<string>(
-      async () => {
-        return await this.imxSigner.signMessage(message);
-      },
-      { type: ProviderErrorType.PROVIDER_CONNECTION_ERROR }
+      async () => await this.imxSigner.signMessage(message),
+      { type: ProviderErrorType.PROVIDER_CONNECTION_ERROR },
     );
   }
 }

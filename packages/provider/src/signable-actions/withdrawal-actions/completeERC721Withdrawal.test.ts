@@ -1,9 +1,11 @@
+import { Contracts, MintableTokenDetails, MintsApi } from '@imtbl/core-sdk';
+import * as encUtils from 'enc-utils';
+import { TransactionResponse } from '@ethersproject/providers';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
 } from '../registration';
-import { Contracts, MintableTokenDetails, MintsApi } from '@imtbl/core-sdk';
 import {
   generateSigners,
   privateKey1,
@@ -11,8 +13,6 @@ import {
   transactionResponse,
 } from '../../test/helpers';
 import { completeERC721WithdrawalAction } from './completeERC721Withdrawal';
-import * as encUtils from 'enc-utils';
-import { TransactionResponse } from '@ethersproject/providers';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
@@ -146,7 +146,7 @@ describe('completeERC721Withdrawal action', () => {
             tokenId: '23',
             tokenAddress: '0x23cv1',
           },
-        })
+        }),
       ).rejects.toThrowError();
     });
   });

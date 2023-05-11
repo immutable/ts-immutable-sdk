@@ -5,8 +5,8 @@ import {
   ERC20Amount,
   TokensApi,
   UsersApi,
+  EthSigner, EthConfiguration,
 } from '@imtbl/core-sdk';
-import { EthSigner } from '@imtbl/core-sdk';
 import { TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -15,7 +15,6 @@ import {
   isRegisteredOnChain,
 } from '../registration';
 import { validateChain } from '../helpers';
-import { EthConfiguration } from '@imtbl/core-sdk';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
 
@@ -58,11 +57,11 @@ export async function depositERC20({
   // Approve whether an amount of token from an account can be spent by a third-party account
   const tokenContract = Contracts.IERC20.connect(
     deposit.tokenAddress,
-    ethSigner
+    ethSigner,
   );
   const approveTransaction = await tokenContract.populateTransaction.approve(
     ethConfiguration.coreContractAddress,
-    amount
+    amount,
   );
   await ethSigner.sendTransaction(approveTransaction);
 
@@ -100,7 +99,7 @@ export async function depositERC20({
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    config
+    config,
   );
 
   if (!isRegistered) {
@@ -111,18 +110,17 @@ export async function depositERC20({
       starkPublicKey,
       vaultId,
       ethConfiguration,
-      usersApi
-    );
-  } else {
-    return executeDepositERC20(
-      ethSigner,
-      quantizedAmount,
-      assetType,
-      starkPublicKey,
-      vaultId,
-      ethConfiguration
+      usersApi,
     );
   }
+  return executeDepositERC20(
+    ethSigner,
+    quantizedAmount,
+    assetType,
+    starkPublicKey,
+    vaultId,
+    ethConfiguration,
+  );
 }
 
 async function executeDepositERC20(
@@ -131,20 +129,19 @@ async function executeDepositERC20(
   assetType: string,
   starkPublicKey: string,
   vaultId: number,
-  config: EthConfiguration
+  config: EthConfiguration,
 ): Promise<TransactionResponse> {
   const coreContract = Contracts.Core.connect(
     config.coreContractAddress,
-    ethSigner
+    ethSigner,
   );
 
-  const populatedTransaction =
-    await coreContract.populateTransaction.depositERC20(
-      starkPublicKey,
-      assetType,
-      vaultId,
-      quantizedAmount
-    );
+  const populatedTransaction = await coreContract.populateTransaction.depositERC20(
+    starkPublicKey,
+    assetType,
+    vaultId,
+    quantizedAmount,
+  );
 
   return ethSigner.sendTransaction(populatedTransaction);
 }
@@ -156,28 +153,27 @@ async function executeRegisterAndDepositERC20(
   starkPublicKey: string,
   vaultId: number,
   config: EthConfiguration,
-  usersApi: UsersApi
+  usersApi: UsersApi,
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
   const coreContract = Contracts.Core.connect(
     config.coreContractAddress,
-    ethSigner
+    ethSigner,
   );
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
-    usersApi
+    usersApi,
   );
 
-  const populatedTransaction =
-    await coreContract.populateTransaction.registerAndDepositERC20(
-      etherKey,
-      starkPublicKey,
-      signableResult.operator_signature,
-      assetType,
-      vaultId,
-      quantizedAmount
-    );
+  const populatedTransaction = await coreContract.populateTransaction.registerAndDepositERC20(
+    etherKey,
+    starkPublicKey,
+    signableResult.operator_signature,
+    assetType,
+    vaultId,
+    quantizedAmount,
+  );
 
   return ethSigner.sendTransaction(populatedTransaction);
 }

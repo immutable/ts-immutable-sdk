@@ -81,13 +81,13 @@ export async function depositERC721({
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    config
+    config,
   );
 
   // Approve whether an amount of token from an account can be spent by a third-party account
   const tokenContract = Contracts.IERC721.connect(
     deposit.tokenAddress,
-    ethSigner
+    ethSigner,
   );
   const operator = immutableXConfig.ethConfiguration.coreContractAddress;
   const isApprovedForAll = await tokenContract.isApprovedForAll(user, operator);
@@ -99,18 +99,18 @@ export async function depositERC721({
     const signableResult = await getSignableRegistrationOnchain(
       user,
       starkPublicKey,
-      usersApi
+      usersApi,
     );
 
     const coreContract = Contracts.Core.connect(
       immutableXConfig.ethConfiguration.coreContractAddress,
-      ethSigner
+      ethSigner,
     );
     // Note: proxy registration contract registerAndDepositNft method is not used as it currently fails erc721 transfer ownership check
     await coreContract.registerUser(
       user,
       starkPublicKey,
-      signableResult.operator_signature
+      signableResult.operator_signature,
     );
   }
 
@@ -120,7 +120,7 @@ export async function depositERC721({
     assetType,
     starkPublicKey,
     vaultId,
-    immutableXConfig
+    immutableXConfig,
   );
 }
 
@@ -130,19 +130,18 @@ async function executeDepositERC721(
   assetType: string,
   starkPublicKey: string,
   vaultId: number,
-  config: ImmutableXConfiguration
+  config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const coreContract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    ethSigner
+    ethSigner,
   );
-  const populatedTransaction =
-    await coreContract.populateTransaction.depositNft(
-      starkPublicKey,
-      assetType,
-      vaultId,
-      tokenId
-    );
+  const populatedTransaction = await coreContract.populateTransaction.depositNft(
+    starkPublicKey,
+    assetType,
+    vaultId,
+    tokenId,
+  );
 
   return ethSigner.sendTransaction(populatedTransaction);
 }
