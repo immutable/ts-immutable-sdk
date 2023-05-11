@@ -55,7 +55,7 @@ export const NetworkChainMap = {
   [Network.ETHEREUM]: ChainId.ETHEREUM,
   [Network.IMTBL_ZKEVM_TESTNET]: ChainId.IMTBL_ZKEVM_TESTNET,
   [Network.IMTBL_ZKEVM_DEVNET]: ChainId.IMTBL_ZKEVM_DEVNET,
-  [Network.GOERLI]: ChainId.GOERLI,
+  [Network.SEPOLIA]: ChainId.SEPOLIA,
 };
 
 export function BridgeWidget(props: BridgeWidgetProps) {

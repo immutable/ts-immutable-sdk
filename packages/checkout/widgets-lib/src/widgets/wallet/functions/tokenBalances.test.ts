@@ -38,7 +38,7 @@ describe('token balance tests', () => {
       checkout,
       mockProvider as unknown as Web3Provider,
       '',
-      ChainId.GOERLI
+      ChainId.SEPOLIA
     );
 
     expect(actualResult.length).toBe(2);
@@ -59,7 +59,7 @@ describe('token balance tests', () => {
       checkout,
       {} as unknown as Web3Provider,
       '',
-      ChainId.GOERLI
+      ChainId.SEPOLIA
     );
 
     expect(actualResult.length).toBe(0);
@@ -82,7 +82,7 @@ describe('token balance tests', () => {
       checkout,
       mockProvider as unknown as Web3Provider,
       '',
-      ChainId.GOERLI
+      ChainId.SEPOLIA
     );
 
     expect(actualResult.length).toBe(0);

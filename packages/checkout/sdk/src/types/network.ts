@@ -6,7 +6,7 @@ import { TokenInfo } from './token';
  */
 export enum ChainId {
   ETHEREUM = 1,
-  GOERLI = 5,
+  SEPOLIA = 11155111,
   IMTBL_ZKEVM_DEVNET = 13373,
   IMTBL_ZKEVM_TESTNET = 13372, //to be used in prod config for testnet launch
 }
@@ -91,17 +91,17 @@ export const SandboxChainIdNetworkMap: NetworkMap = new Map<
   NetworkDetails
 >([
   [
-    ChainId.GOERLI,
+    ChainId.SEPOLIA,
     {
-      chainIdHex: '0x5', // 5
-      chainName: 'Goerli',
-      rpcUrls: ['https://goerli.infura.io/v3/'],
+      chainIdHex: '0xaa36a7', // 11155111
+      chainName: 'Sepolia',
+      rpcUrls: ['https://sepolia.infura.io/v3/'],
       nativeCurrency: {
-        name: 'Goerli Eth',
+        name: 'Sep Eth',
         symbol: 'ETH',
         decimals: 18,
       },
-      blockExplorerUrls: ['https://goerli.etherscan.io/'],
+      blockExplorerUrls: ['https://sepolia.etherscan.io/'],
     },
   ],
   [

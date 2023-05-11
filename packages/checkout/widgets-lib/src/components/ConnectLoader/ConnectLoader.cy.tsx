@@ -169,10 +169,10 @@ describe('ConnectLoader', () => {
           }),
           getNetwork: async () => ({
             chainId: 5,
-            name: 'GOERLI',
+            name: 'SEPOLIA',
           }),
         },
-        network: { name: 'GOERLI' },
+        network: { name: 'Sepolia' },
       });
 
     mount(

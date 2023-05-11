@@ -38,7 +38,7 @@ export const NetworkMenu = () => {
     [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
     [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
     [ChainId.ETHEREUM]: 'base.color.accent.5',
-    [ChainId.GOERLI]: 'base.color.accent.5',
+    [ChainId.SEPOLIA]: 'base.color.accent.5',
   };
 
   //todo: add corresponding network symbols
@@ -46,7 +46,7 @@ export const NetworkMenu = () => {
     [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
     [ChainId.ETHEREUM]: 'EthToken',
     [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
-    [ChainId.GOERLI]: 'EthToken',
+    [ChainId.SEPOLIA]: 'EthToken',
   };
 
   const switchNetwork = useCallback(
