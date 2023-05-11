@@ -24,13 +24,15 @@ import {
 } from '../../../../context/ViewContext';
 import { getTokenBalances } from '../../functions/tokenBalances';
 import { sortNetworksCompareFn } from '../../../../lib/utils';
+import { CryptoFiatContext } from '../../../../context/crypto-fiat-context/CryptoFiatContext';
 
 export const NetworkMenu = () => {
-  const { walletState, walletDispatch } = useContext(WalletContext);
   const { viewDispatch } = useContext(ViewContext);
-
+  const { cryptoFiatState } = useContext(CryptoFiatContext);
+  const { cryptoFiat } = cryptoFiatState;
+  const { walletState, walletDispatch } = useContext(WalletContext);
   const { networkStatus } = text.views[WalletWidgetViews.WALLET_BALANCES];
-  const { checkout, network, provider, cryptoFiat } = walletState;
+  const { checkout, network, provider } = walletState;
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[] | undefined>(
     []
   );
@@ -62,7 +64,6 @@ export const NetworkMenu = () => {
       try {
         const switchNetworkResult = await checkout.switchNetwork({
           provider,
-          chainId,
         } as SwitchNetworkParams);
         walletDispatch({
           payload: {
@@ -73,15 +74,8 @@ export const NetworkMenu = () => {
 
         walletDispatch({
           payload: {
-            type: WalletActions.SWITCH_NETWORK,
+            type: WalletActions.SET_NETWORK,
             network: switchNetworkResult.network,
-            tokenBalances: await getTokenBalances(
-              checkout,
-              switchNetworkResult?.provider,
-              switchNetworkResult.network.name,
-              switchNetworkResult.network.chainId,
-              cryptoFiat
-            ),
           },
         });
 

@@ -6,7 +6,6 @@ import {
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 import { BalanceInfo } from '../functions/tokenBalances';
-import { CryptoFiat } from '@imtbl/cryptofiat';
 
 export interface WalletState {
   checkout: Checkout | null;
@@ -45,16 +44,16 @@ type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
   | SetProviderPreferencePayload
-  | SetCryptoFiatPayload
   | SetSwitchNetworkPayload
+  | SetTokenBalancesPayload
   | SetSupportedTopUpPayload;
 
 export enum WalletActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
-  SET_CRYPTO_FIAT = 'SET_CRYPTO_FIAT',
-  SWITCH_NETWORK = 'SWITCH_NETWORK',
+  SET_NETWORK = 'SET_NETWORK',
+  SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_SUPPORTED_TOP_UPS = 'SUPPORTED_TOP_UPS',
 }
 
@@ -73,14 +72,13 @@ export interface SetProviderPreferencePayload {
   providerPreference: ConnectionProviders;
 }
 
-export interface SetCryptoFiatPayload {
-  type: WalletActions.SET_CRYPTO_FIAT;
-  cryptoFiat: CryptoFiat;
+export interface SetSwitchNetworkPayload {
+  type: WalletActions.SET_NETWORK;
+  network: NetworkInfo;
 }
 
-export interface SetSwitchNetworkPayload {
-  type: WalletActions.SWITCH_NETWORK;
-  network: NetworkInfo;
+export interface SetTokenBalancesPayload {
+  type: WalletActions.SET_TOKEN_BALANCES;
   tokenBalances: BalanceInfo[];
 }
 
@@ -116,15 +114,14 @@ export const walletReducer: Reducer<WalletState, WalletAction> = (
         ...state,
         providerPreference: action.payload.providerPreference,
       };
-    case WalletActions.SET_CRYPTO_FIAT:
-      return {
-        ...state,
-        cryptoFiat: action.payload.cryptoFiat,
-      };
-    case WalletActions.SWITCH_NETWORK:
+    case WalletActions.SET_NETWORK:
       return {
         ...state,
         network: action.payload.network,
+      };
+    case WalletActions.SET_TOKEN_BALANCES:
+      return {
+        ...state,
         tokenBalances: action.payload.tokenBalances,
       };
     case WalletActions.SET_SUPPORTED_TOP_UPS:

@@ -25,11 +25,10 @@ import { WalletWidgetViews } from '../../context/WalletViewContextTypes';
 import { WalletBalances } from './views/WalletBalances';
 import { ErrorView } from '../../components/Error/ErrorView';
 import { LoadingView } from '../../components/Loading/LoadingView';
-import { getTokenBalances } from './functions/tokenBalances';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { zkEVMNetwork } from '../../lib/networkUtils';
 import { Environment } from '@imtbl/config';
-import { CryptoFiat, CryptoFiatConfiguration } from '@imtbl/cryptofiat';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
@@ -50,12 +49,13 @@ export function WalletWidget(props: WalletWidgetProps) {
       ? onLightBase
       : onDarkBase;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+
   const [walletState, walletDispatch] = useReducer(
     walletReducer,
     initialWalletState
   );
 
-  const { checkout, cryptoFiat } = walletState;
+  const { checkout } = walletState;
 
   useEffect(() => {
     const checkout = new Checkout({ baseConfig: { environment: environment } });
@@ -63,14 +63,6 @@ export function WalletWidget(props: WalletWidgetProps) {
       payload: {
         type: WalletActions.SET_CHECKOUT,
         checkout,
-      },
-    });
-
-    const cryptoFiat = new CryptoFiat(new CryptoFiatConfiguration({}));
-    walletDispatch({
-      payload: {
-        type: WalletActions.SET_CRYPTO_FIAT,
-        cryptoFiat,
       },
     });
 
@@ -84,7 +76,7 @@ export function WalletWidget(props: WalletWidgetProps) {
 
   useEffect(() => {
     (async () => {
-      if (!checkout || !cryptoFiat) return;
+      if (!checkout) return;
 
       let provider;
       let network;
@@ -118,15 +110,8 @@ export function WalletWidget(props: WalletWidgetProps) {
 
       walletDispatch({
         payload: {
-          type: WalletActions.SWITCH_NETWORK,
+          type: WalletActions.SET_NETWORK,
           network,
-          tokenBalances: await getTokenBalances(
-            checkout,
-            provider,
-            network.name,
-            network.chainId,
-            cryptoFiat
-          ),
         },
       });
 
@@ -137,7 +122,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         },
       });
     })();
-  }, [providerPreference, checkout, cryptoFiat]);
+  }, [providerPreference, checkout]);
 
   const errorAction = () => {
     console.log('Something went wrong');
@@ -146,21 +131,23 @@ export function WalletWidget(props: WalletWidgetProps) {
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
-        <WalletContext.Provider value={{ walletState, walletDispatch }}>
-          {viewState.view.type === BaseViews.LOADING_VIEW && (
-            <LoadingView loadingText="Loading" />
-          )}
-          {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
-            <WalletBalances />
-          )}
-          {viewState.view.type === BaseViews.ERROR && (
-            <ErrorView
-              actionText="Try again"
-              onActionClick={errorAction}
-              onCloseClick={sendWalletWidgetCloseEvent}
-            />
-          )}
-        </WalletContext.Provider>
+        <CryptoFiatProvider>
+          <WalletContext.Provider value={{ walletState, walletDispatch }}>
+            {viewState.view.type === BaseViews.LOADING_VIEW && (
+              <LoadingView loadingText="Loading" />
+            )}
+            {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
+              <WalletBalances />
+            )}
+            {viewState.view.type === BaseViews.ERROR && (
+              <ErrorView
+                actionText="Try again"
+                onActionClick={errorAction}
+                onCloseClick={sendWalletWidgetCloseEvent}
+              />
+            )}
+          </WalletContext.Provider>
+        </CryptoFiatProvider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
   );

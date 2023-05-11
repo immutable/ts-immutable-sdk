@@ -5,19 +5,12 @@ import {
   TokenInfo,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
-import {
-  calculateCryptoToFiatValue,
-  formatFiatString,
-  getTokenBalances,
-} from './tokenBalances';
+import { getTokenBalances } from './tokenBalances';
 import { Web3Provider } from '@ethersproject/providers';
-<<<<<<< main
-=======
-import { CryptoFiat, CryptoFiatConfiguration } from '@imtbl/cryptofiat';
->>>>>>> Use checkout config
 import { Environment } from '@imtbl/config';
 
 describe('token balance tests', () => {
+<<<<<<< main
   // describe('getTokenBalances', () => {
   //   const balances: GetBalanceResult[] = [
   //     {
@@ -193,81 +186,113 @@ describe('token balance tests', () => {
           symbol: 'MATIC',
         },
       ]);
+=======
+  it('should return balances for all tokens', async () => {
+    const balances: GetBalanceResult[] = [
+      {
+        balance: BigNumber.from(1),
+        token: { symbol: 'QQQ', name: 'QQQ' } as TokenInfo,
+        formattedBalance: '12.34',
+      },
+      {
+        balance: BigNumber.from(2),
+        token: { symbol: 'AAA', name: 'AAA' } as TokenInfo,
+        formattedBalance: '26.34',
+      },
+    ];
+
+    const conversions = new Map<string, number>([
+      ['aaa', 10.1234],
+      ['qqq', 5.125],
+    ]);
+
+    const mockProvider = {
+      getSigner: jest.fn().mockReturnValue({
+        getAddress: jest.fn().mockResolvedValue('0xaddress'),
+      }),
+    };
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+>>>>>>> CryptoFiat context
     });
-  });
+    jest.spyOn(checkout, 'getAllBalances').mockResolvedValue({ balances });
 
-  describe('calculateCryptoToFiatValue', () => {
-    it('should return zero balance string if balance is not provided', () => {
-      const result = calculateCryptoToFiatValue('', 'eth', {});
-      expect(result).toBe('-.--');
-    });
-
-    it('should return zero balance string if no conversion is found', () => {
-      const result = calculateCryptoToFiatValue('10', 'eth', {});
-      expect(result).toBe('-.--');
-    });
-
-    it('should return zero balance string if balance is zero', () => {
-      const result = calculateCryptoToFiatValue('0', 'eth', {
-        eth: { usd: 1800 },
-      });
-      expect(result).toBe('-.--');
-    });
-
-    it('should return zero balance string if balance is NaN', () => {
-      const result = calculateCryptoToFiatValue('abc', 'eth', {
-        eth: { usd: 1800 },
-      });
-      expect(result).toBe('-.--');
-    });
-
-    it('should return zero balance string if no USD conversion is found', () => {
-      const result = calculateCryptoToFiatValue('10', 'eth', {
-        eth: { aud: 1800 },
-      });
-      expect(result).toBe('-.--');
-    });
-
-    it('should return calculated fiat value if valid balance and conversion are provided', () => {
-      const result = calculateCryptoToFiatValue('10', 'eth', {
-        eth: { usd: 1800 },
-      });
-      expect(result).toBe(formatFiatString(10 * 1800));
-    });
-
-    it('should handle lowercase and uppercase symbols', () => {
-      const result = calculateCryptoToFiatValue('10', 'eth', {
-        eth: { usd: 1800 },
-      });
-      expect(result).toBe(formatFiatString(10 * 1800));
-    });
-  });
->>>>>>> Prettier
->>>>>>> Prettier
-
-  // it('should return empty array when checkout.getAllBalances throws error', async () => {
-  //   const mockProvider = {
-  //     getSigner: jest.fn().mockReturnValue({
-  //       getAddress: jest.fn().mockResolvedValue('0xaddress'),
-  //     }),
-  //   };
-  //   const checkout = new Checkout({
-  //     baseConfig: { environment: Environment.PRODUCTION },
-  //   });
-  //   jest
-  //     .spyOn(checkout, 'getAllBalances')
-  //     .mockRejectedValue(new Error('some-err'));
-
-  //   it('should format number and round down', () => {
-  //     const result = formatFiatString(123.124);
-  //     expect(result).toBe('123.12');
-  //   });
-
-<<<<<<< main
     const actualResult = await getTokenBalances(
       checkout,
       mockProvider as unknown as Web3Provider,
       '',
+      ChainId.GOERLI,
+      conversions
+    );
+
+    expect(actualResult.length).toBe(2);
+    expect(actualResult).toEqual([
+      {
+        id: "-AAA",
+        description: "AAA",
+        balance: '26.34',
+        symbol: 'AAA',
+        fiatAmount: '266.65',
+      },
+      {
+        id: "-QQQ",
+        description: "QQQ",
+        balance: '12.34',
+        symbol: 'QQQ',
+        fiatAmount: '63.24',
+      },
+    ])
+  });
+  
+  it('should return empty array when any argument is missing', async () => {
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    const conversions = new Map<string, number>([]);
+
+    const actualResult = await getTokenBalances(
+      checkout,
+      {} as unknown as Web3Provider,
+      '',
+      ChainId.GOERLI,
+      conversions
+    );
+
+    expect(actualResult.length).toBe(0);
+  });
+
+  it('should return empty array when checkout.getAllBalances throws error', async () => {
+    const mockProvider = {
+      getSigner: jest.fn().mockReturnValue({
+        getAddress: jest.fn().mockResolvedValue('0xaddress'),
+      }),
+    };
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+<<<<<<< main
+  });
+>>>>>>> Prettier
+>>>>>>> Prettier
+=======
+>>>>>>> CryptoFiat context
+
+    const conversions = new Map<string, number>([]);
+
+    jest
+      .spyOn(checkout, 'getAllBalances')
+      .mockRejectedValue(new Error('some-err'));
+
+<<<<<<< main
+<<<<<<< main
+=======
+>>>>>>> CryptoFiat context
+    const actualResult = await getTokenBalances(
+      checkout,
+      mockProvider as unknown as Web3Provider,
+      '',
+<<<<<<< main
       ChainId.SEPOLIA
     );
 =======
@@ -276,10 +301,12 @@ describe('token balance tests', () => {
   //     expect(result).toBe('123.40');
   //   });
 >>>>>>> Get token balance from internal cryptofiat package
+=======
+      ChainId.GOERLI,
+      conversions
+    );
+>>>>>>> CryptoFiat context
 
-  //   it('should format number with no decimal places', () => {
-  //     const result = formatFiatString(123);
-  //     expect(result).toBe('123.00');
-  //   });
-  // });
+    expect(actualResult.length).toBe(0);
+  });
 });
