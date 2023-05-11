@@ -182,7 +182,7 @@ describe('WalletWidget tests', () => {
         />
       );
 
-      // cySmartGet('@balanceStub').should('have.been.called');
+      cySmartGet('@balanceStub').should('have.been.called');
       cySmartGet('@connectStub').should('have.been.calledWith', {
         providerPreference: 'metamask',
       });
