@@ -13,6 +13,7 @@ import { SwapForm } from './components/SwapForm';
 import { SwapWidgetStyle } from './SwapStyles';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { sendSwapSuccessEvent, sendSwapFailedEvent } from './SwapWidgetEvents';
+import { Environment } from '@imtbl/config';
 
 export enum SwapWidgetViews {
   SWAP = 'SWAP',
@@ -23,6 +24,7 @@ export enum SwapWidgetViews {
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
   theme: WidgetTheme;
+  environment: Environment;
 }
 
 export interface SwapWidgetParams {
@@ -36,14 +38,17 @@ export function SwapWidget(props: SwapWidgetProps) {
   const [connection, setConnection] = useState<ConnectResult>();
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [view, setView] = useState(SwapWidgetViews.SWAP);
-  const { params, theme } = props;
+  const { params, theme, environment } = props;
   const { amount, fromContractAddress, toContractAddress, providerPreference } =
     params;
   const biomeTheme: BaseTokens =
     theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
       ? onLightBase
       : onDarkBase;
-  const checkout = useMemo(() => new Checkout(), []);
+  const checkout = useMemo(
+    () => new Checkout({ baseConfig: { environment: environment } }),
+    [environment]
+  );
   const connectToCheckout = useCallback(async () => {
     const result =
       providerPreference &&

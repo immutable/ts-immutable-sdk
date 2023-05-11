@@ -9,12 +9,22 @@ import {
   WidgetConnectionProviders,
   ConnectReact,
   CheckoutWidgets,
+  UpdateConfig,
+  CheckoutWidgetsConfig,
 } from '@imtbl/checkout-widgets';
+import { Environment } from '@imtbl/config';
 
 function ConnectUI() {
   CheckoutWidgets({
     theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
   });
+  const widgetsConfig2: CheckoutWidgetsConfig = {
+    theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
+  };
+
+  UpdateConfig(widgetsConfig2);
   useEffect(() => {
     // Add event listeners for the IMXConnectWidget and handle event types appropriately
     const handleConnectEvent = ((event: CustomEvent) => {

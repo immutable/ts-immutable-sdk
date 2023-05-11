@@ -7,6 +7,7 @@ import * as transaction from './transaction';
 import {
   CheckConnectionParams,
   CheckConnectionResult,
+  CheckoutModuleConfiguration,
   ConnectionProviders,
   ConnectParams,
   ConnectResult,
@@ -22,6 +23,7 @@ import {
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   NetworkInfo,
+  SandboxConfiguration,
   SendTransactionParams,
   SendTransactionResult,
   SwitchNetworkParams,
@@ -29,9 +31,7 @@ import {
 } from './types';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import {
-  CheckoutModuleConfiguration,
   CheckoutConfiguration,
-  SandboxConfiguration,
 } from './config';
 
 export class Checkout {

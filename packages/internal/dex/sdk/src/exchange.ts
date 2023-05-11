@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { ethers } from 'ethers';
 import { MethodParameters } from '@uniswap/v3-sdk';
 import {
@@ -138,7 +137,6 @@ export class Exchange {
         from: fromAddress,
       },
       info: {
-        route: routeAndQuote.trade.route,
         quote: quoteInfo.quote,
         quoteWithMaxSlippage: quoteInfo.quoteWithMaxSlippage,
         slippage: `${slippagePercent.toSignificant()}%`,

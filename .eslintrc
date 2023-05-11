@@ -5,11 +5,12 @@
   "plugins": ["@typescript-eslint"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-      "project": "./tsconfig.json",
-      "tsconfigRootDir": ".",
-      "sourceType": "module"
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": ".",
+    "sourceType": "module"
   },
   "rules": {
+    "max-len": "off", // turned off due to type annotations
     "@typescript-eslint/naming-convention": [
       "error",
       {

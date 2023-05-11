@@ -4,6 +4,7 @@ import { mount } from 'cypress/react18';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { cySmartGet } from '../../lib/testUtils';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
 
 describe('BuyWidget tests', () => {
   beforeEach(() => {
@@ -44,7 +45,13 @@ describe('BuyWidget tests', () => {
       orderId: '123',
     } as BuyWidgetParams;
 
-    mount(<BuyWidget params={params} theme={WidgetTheme.DARK} />);
+    mount(
+      <BuyWidget
+        environment={Environment.PRODUCTION}
+        params={params}
+        theme={WidgetTheme.DARK}
+      />
+    );
 
     cySmartGet('collection_name').should('have.text', 'Gods Unchained Cards');
     cySmartGet('asset_name').should('have.text', 'Furious Felid');

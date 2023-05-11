@@ -5,6 +5,7 @@ import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { cySmartGet } from '../../lib/testUtils';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
+import { Environment } from '@imtbl/config';
 
 describe('SwapWidget tests', () => {
   beforeEach(() => {
@@ -57,7 +58,13 @@ describe('SwapWidget tests', () => {
     const params = {
       providerPreference: 'metamask',
     } as SwapWidgetParams;
-    mount(<SwapWidget params={params} theme={WidgetTheme.DARK} />);
+    mount(
+      <SwapWidget
+        environment={Environment.PRODUCTION}
+        params={params}
+        theme={WidgetTheme.DARK}
+      />
+    );
     cySmartGet('buyField__selected-option').should('be.visible');
     cySmartGet('buyField__selected-option-text').should('have.text', 'ETH');
   });
@@ -70,7 +77,13 @@ describe('SwapWidget tests', () => {
         providerPreference: 'metamask',
       } as SwapWidgetParams;
 
-      mount(<SwapWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <SwapWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
 
       cySmartGet('buyField__option-ETH').should('not.exist');
       cySmartGet('buyField__option-IMX').should('not.exist');
@@ -102,7 +115,13 @@ describe('SwapWidget tests', () => {
         providerPreference: 'metamask',
       } as SwapWidgetParams;
 
-      mount(<SwapWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <SwapWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
 
       cySmartGet('withField__option-ETH').should('not.exist');
       cySmartGet('withField__option-IMX').should('not.exist');

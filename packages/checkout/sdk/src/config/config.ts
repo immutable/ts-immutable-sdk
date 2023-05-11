@@ -1,16 +1,5 @@
-import { Environment, ModuleConfiguration } from '@imtbl/config';
-import { NetworkDetails, NetworkMap, ProductionChainIdNetworkMap, SandboxChainIdNetworkMap } from '../types';
-
-
-export const SandboxConfiguration = {
-  baseConfig: { 
-    environment: Environment.SANDBOX
-  }
-}
-
-export interface CheckoutOverrides{}
-export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {
-}
+import { Environment } from '@imtbl/config';
+import { CheckoutModuleConfiguration, NetworkMap, ProductionChainIdNetworkMap, SandboxChainIdNetworkMap } from '../types';
 
 export class CheckoutConfiguration {
   readonly environment: Environment;
