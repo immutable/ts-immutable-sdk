@@ -22,7 +22,6 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../../context/ViewContext';
-import { getTokenBalances } from '../../functions/tokenBalances';
 import { sortNetworksCompareFn } from '../../../../lib/utils';
 import { CryptoFiatContext } from '../../../../context/crypto-fiat-context/CryptoFiatContext';
 
