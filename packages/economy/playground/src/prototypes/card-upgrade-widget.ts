@@ -145,21 +145,11 @@ export class CraftingWidget extends LitElement {
   }
 
   async getInventory() {
-    const urlParams = new URLSearchParams(window.location.search);
-    this.items = await this.economy.inventory.items(
-      {
-        userId: this.craftInput.input.userId,
-        gameId: this.craftInput.input.gameId,
-      },
-      Boolean(urlParams.get('updated'))
-    );
-    // this.addSelection(this.items[0]);
-    // this.addSelection(this.items[1]);
-    // this.addSelection(this.items[2]);
-    // this.addSelection(this.items[3]);
-    // this.addSelection(this.items[4]);
-    // this.addSelection(this.items[5]);
-    // this.addSelection(this.items[6]);
+    this.items = await this.economy.inventory.getItems({
+      userId: this.craftInput.input.userId,
+      gameId: this.craftInput.input.gameId,
+    });
+
     this.requestUpdate();
   }
 
@@ -281,33 +271,33 @@ export class CraftingWidget extends LitElement {
       <hr />
       <div>
         <div class="grid grid-cols-2 gap-6 p-6">
-          <imtbl-crafting-inventory
+          <imtbl-economy-inventory-items
             .items="${this.items}"
             .activeItemId="${inputItem?.id}"
             .selectedItemIds="${selectedItemsIds}"
-          ></imtbl-crafting-inventory>
+          ></imtbl-economy-inventory-items>
           <div class="flex w-full">
             <div
               class="flex-grow p-4 bg-base-300 place-items-center h-screen overflow-y-scroll"
               style="flex: 1;"
             >
-              <imtbl-crafting-selection
+              <imtbl-economy-items-selection
                 .items="${selectedItems}"
-              ></imtbl-crafting-selection>
+              ></imtbl-economy-items-selection>
             </div>
             <div class="divider divider-horizontal">=</div>
             <div
               class="grid flex-grow card bg-base-300 rounded-box"
               style="flex: 2;"
             >
-              <imtbl-crafting-output
+              <imtbl-economy-crafting-output
                 .input="${inputItem}"
                 .output="${this.outputItemDef}"
                 .dustPower="${this.dustPower}"
                 .maxDustPower="${this.getMaxDustPower()}"
                 .loading="${this.loading}"
                 .completed="${this.craftingCompleted}"
-              ></imtbl-crafting-output>
+              ></imtbl-economy-crafting-output>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
-import HttpClient from '../HttpClient';
+import { HttpClient } from '../HttpClient';
 
 // TODO: Use generated types
 type CraftOutput = {};
@@ -36,7 +36,7 @@ export class CraftingService {
   }
 
   public async craft(input: CraftInput): Promise<AxiosResponse<CraftOutput>> {
-    const url = `/craft`;
+    const url = '/craft';
     const data = {
       recipe_id: input.recipeId,
       user_id: input.userId,
@@ -52,7 +52,7 @@ export class CraftingService {
     return this.httpClient.post<CraftOutput>(url, data, config);
   }
 
-  public async validate(_input: CraftInput): Promise<Boolean> {
+  public async validate(): Promise<Boolean> {
     // TODO: Validate from API
     return true;
   }
