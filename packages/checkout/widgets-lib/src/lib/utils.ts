@@ -26,16 +26,20 @@ export const sortTokensByAmount = (
   });
 };
 
-export const sortNetworksCompareFn = (a: NetworkInfo, b: NetworkInfo, environment: Environment) => {
+export const sortNetworksCompareFn = (
+  a: NetworkInfo,
+  b: NetworkInfo,
+  environment: Environment
+) => {
   // make sure zkEVM at start of the list then L1
-  if(a.chainId === zkEVMNetwork(environment)){
+  if (a.chainId === zkEVMNetwork(environment)) {
     return -1;
   }
-  if(a.chainId === L1Network(environment)) {
+  if (a.chainId === L1Network(environment)) {
     return 0;
   }
   return 1;
-}
+};
 
 export const calculateCryptoToFiat = (
   amount: string,
@@ -50,8 +54,7 @@ export const calculateCryptoToFiat = (
   if (!conversion) return zeroBalanceString;
 
   const parsedAmount = parseFloat(amount);
-  if (parseFloat(amount) === 0 || isNaN(parsedAmount))
-    return zeroBalanceString;
+  if (parseFloat(amount) === 0 || isNaN(parsedAmount)) return zeroBalanceString;
 
   return formatFiatString(parsedAmount * conversion);
 };

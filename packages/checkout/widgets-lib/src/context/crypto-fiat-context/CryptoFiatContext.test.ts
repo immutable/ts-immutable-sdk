@@ -16,7 +16,7 @@ describe('CryptoFiatContext', () => {
       type: CryptoFiatActions.SET_CRYPTO_FIAT,
       cryptoFiat: new CryptoFiat(new CryptoFiatConfiguration({})),
     };
-    
+
     expect(initialCryptoFiatState.cryptoFiat).toBeNull();
     const { cryptoFiat } = cryptoFiatReducer(initialCryptoFiatState, {
       payload: setCryptoFiatPayload,
@@ -35,7 +35,7 @@ describe('CryptoFiatContext', () => {
       payload: setFiatSymbolPayload,
     });
 
-    expect(fiatSymbol).toEqual(FiatSymbols.USD)
+    expect(fiatSymbol).toEqual(FiatSymbols.USD);
   });
 
   it('should update state token symbols when reducer called with SET_TOKEN_SYMBOLS action', () => {
@@ -48,11 +48,15 @@ describe('CryptoFiatContext', () => {
       payload: setTokenSymbolsPayload,
     });
 
-    expect(tokenSymbols).toEqual(['eth', 'imx', 'matic'])
+    expect(tokenSymbols).toEqual(['eth', 'imx', 'matic']);
   });
 
   it('should update conversions when reducer called with SET_CONVERSIONS action', () => {
-    const conversionsMap = new Map<string, number>([[ 'eth', 12.10 ], ['imx', 100], ['matic', 5]]);
+    const conversionsMap = new Map<string, number>([
+      ['eth', 12.1],
+      ['imx', 100],
+      ['matic', 5],
+    ]);
 
     const setConversionsPayload: SetConversionsPayload = {
       type: CryptoFiatActions.SET_CONVERSIONS,
@@ -63,6 +67,6 @@ describe('CryptoFiatContext', () => {
       payload: setConversionsPayload,
     });
 
-    expect(conversions).toEqual(conversionsMap)
+    expect(conversions).toEqual(conversionsMap);
   });
 });

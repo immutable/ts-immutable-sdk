@@ -1,6 +1,10 @@
 import { ChainId, GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
-import { calculateCryptoToFiat, formatFiatString, sortTokensByAmount } from './utils';
+import {
+  calculateCryptoToFiat,
+  formatFiatString,
+  sortTokensByAmount,
+} from './utils';
 import { Environment } from '@imtbl/config';
 
 describe('utils', () => {
@@ -234,32 +238,56 @@ describe('utils', () => {
 
   describe('calculateCryptoToFiat', () => {
     it('should return zero balance string if balance is not provided', () => {
-      const result = calculateCryptoToFiat('', 'eth', new Map<string, number>());
+      const result = calculateCryptoToFiat(
+        '',
+        'eth',
+        new Map<string, number>()
+      );
       expect(result).toBe('-.--');
     });
 
     it('should return zero balance string if no conversion is found', () => {
-      const result = calculateCryptoToFiat('10', 'eth', new Map<string, number>());
+      const result = calculateCryptoToFiat(
+        '10',
+        'eth',
+        new Map<string, number>()
+      );
       expect(result).toBe('-.--');
     });
 
     it('should return zero balance string if balance is zero', () => {
-      const result = calculateCryptoToFiat('0', 'eth', new Map<string, number>([['eth', 1800]]));
+      const result = calculateCryptoToFiat(
+        '0',
+        'eth',
+        new Map<string, number>([['eth', 1800]])
+      );
       expect(result).toBe('-.--');
     });
 
     it('should return zero balance string if balance is NaN', () => {
-      const result = calculateCryptoToFiat('abc', 'eth', new Map<string, number>([['eth', 1800]]));
+      const result = calculateCryptoToFiat(
+        'abc',
+        'eth',
+        new Map<string, number>([['eth', 1800]])
+      );
       expect(result).toBe('-.--');
     });
 
     it('should return calculated fiat value if valid balance and conversion are provided', () => {
-      const result = calculateCryptoToFiat('10', 'eth', new Map<string, number>([['eth', 1800]]));
+      const result = calculateCryptoToFiat(
+        '10',
+        'eth',
+        new Map<string, number>([['eth', 1800]])
+      );
       expect(result).toBe('18000.00');
     });
 
     it('should handle lowercase and uppercase symbols', () => {
-      const result = calculateCryptoToFiat('10', 'eth', new Map<string, number>([['eth', 1800]]));
+      const result = calculateCryptoToFiat(
+        '10',
+        'eth',
+        new Map<string, number>([['eth', 1800]])
+      );
       expect(result).toBe('18000.00');
     });
   });
@@ -289,5 +317,5 @@ describe('utils', () => {
       const result = formatFiatString(123);
       expect(result).toBe('123.00');
     });
-  })
+  });
 });

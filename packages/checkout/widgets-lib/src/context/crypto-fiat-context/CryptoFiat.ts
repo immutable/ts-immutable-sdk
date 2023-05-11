@@ -1,10 +1,10 @@
-import { CryptoFiat, CryptoFiatConvertReturn } from "@imtbl/cryptofiat";
-import { FiatSymbols } from "./CryptoFiatContext";
+import { CryptoFiat, CryptoFiatConvertReturn } from '@imtbl/cryptofiat';
+import { FiatSymbols } from './CryptoFiatContext';
 
 export const getCryptoToFiatConversion = async (
   cryptoFiat: CryptoFiat,
   fiatSymbol: FiatSymbols,
-  tokenSymbols: string[],
+  tokenSymbols: string[]
 ): Promise<Map<string, number>> => {
   try {
     if (tokenSymbols.length === 0) return new Map<string, number>();
@@ -18,11 +18,11 @@ export const getCryptoToFiatConversion = async (
   } catch (err: any) {
     return new Map<string, number>();
   }
-}
+};
 
 export const updateConversions = (
   cryptoToFiatResult: CryptoFiatConvertReturn,
-  fiatSymbol: FiatSymbols,
+  fiatSymbol: FiatSymbols
 ): Map<string, number> => {
   const conversionMap = new Map<string, number>();
 
@@ -35,7 +35,7 @@ export const updateConversions = (
     }
   }
   return conversionMap;
-}
+};
 
 export const calculateCryptoToFiatValue = (
   balance: string,

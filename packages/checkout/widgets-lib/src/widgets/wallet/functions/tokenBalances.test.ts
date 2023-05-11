@@ -228,22 +228,22 @@ describe('token balance tests', () => {
     expect(actualResult.length).toBe(2);
     expect(actualResult).toEqual([
       {
-        id: "-AAA",
-        description: "AAA",
+        id: '-AAA',
+        description: 'AAA',
         balance: '26.34',
         symbol: 'AAA',
         fiatAmount: '266.65',
       },
       {
-        id: "-QQQ",
-        description: "QQQ",
+        id: '-QQQ',
+        description: 'QQQ',
         balance: '12.34',
         symbol: 'QQQ',
         fiatAmount: '63.24',
       },
-    ])
+    ]);
   });
-  
+
   it('should return empty array when any argument is missing', async () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },

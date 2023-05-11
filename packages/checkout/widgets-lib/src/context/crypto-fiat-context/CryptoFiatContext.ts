@@ -2,7 +2,7 @@ import { CryptoFiat } from '@imtbl/cryptofiat';
 import { createContext } from 'react';
 
 export enum FiatSymbols {
-  USD = 'usd'
+  USD = 'usd',
 }
 
 export interface CryptoFiatState {
@@ -28,13 +28,17 @@ export interface CryptoFiatAction {
   payload: CryptoFiatActionPayload;
 }
 
-type CryptoFiatActionPayload = SetCryptoFiatPayload | SetFiatSymbolPayload | SetTokenSymbolsPayload | SetConversionsPayload;
+type CryptoFiatActionPayload =
+  | SetCryptoFiatPayload
+  | SetFiatSymbolPayload
+  | SetTokenSymbolsPayload
+  | SetConversionsPayload;
 
 export enum CryptoFiatActions {
   SET_CRYPTO_FIAT = 'SET_CRYPTO_FIAT',
   SET_FIAT_SYMBOL = 'SET_FIAT_SYMBOL',
   SET_TOKEN_SYMBOLS = 'SET_TOKEN_SYMBOLS',
-  SET_CONVERSIONS = 'SET_CONVERSIONS'
+  SET_CONVERSIONS = 'SET_CONVERSIONS',
 }
 
 export interface SetCryptoFiatPayload {
@@ -64,10 +68,10 @@ export const CryptoFiatContext = createContext<CryptoFiatContextState>({
 
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
-export const cryptoFiatReducer: Reducer<
-  CryptoFiatState,
-  CryptoFiatAction
-> = (state: CryptoFiatState, action: CryptoFiatAction) => {
+export const cryptoFiatReducer: Reducer<CryptoFiatState, CryptoFiatAction> = (
+  state: CryptoFiatState,
+  action: CryptoFiatAction
+) => {
   switch (action.payload.type) {
     case CryptoFiatActions.SET_CRYPTO_FIAT:
       return {
@@ -88,7 +92,7 @@ export const cryptoFiatReducer: Reducer<
       return {
         ...state,
         conversions: action.payload.conversions,
-      }
+      };
     default:
       return state;
   }
