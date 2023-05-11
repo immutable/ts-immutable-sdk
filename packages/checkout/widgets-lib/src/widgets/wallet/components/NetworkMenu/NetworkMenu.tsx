@@ -54,6 +54,7 @@ export const NetworkMenu = () => {
       try {
         const switchNetworkResult = await checkout.switchNetwork({
           provider,
+          chainId,
         } as SwitchNetworkParams);
         walletDispatch({
           payload: {
