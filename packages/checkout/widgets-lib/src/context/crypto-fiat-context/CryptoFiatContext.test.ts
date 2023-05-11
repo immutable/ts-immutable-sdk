@@ -1,4 +1,4 @@
-import { CryptoFiat, CryptoFiatConfiguration } from '@imtbl/cryptoFiat';
+import { CryptoFiat, CryptoFiatConfiguration } from '@imtbl/cryptofiat';
 import {
   CryptoFiatActions,
   FiatSymbols,
