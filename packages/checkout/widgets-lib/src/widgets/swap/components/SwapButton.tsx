@@ -2,6 +2,7 @@ import { Button } from '@biom3/react';
 import { Checkout, Transaction } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { SwapWidgetViews } from '../SwapWidget';
+import { Environment } from '@imtbl/config';
 
 export interface SwapButtonProps {
   provider?: Web3Provider;
@@ -14,7 +15,10 @@ export const SwapButton = (props: SwapButtonProps) => {
 
   const sendTransaction = async () => {
     if (!transaction || !provider) return;
-    const checkout = new Checkout();
+    // TODO: update here to go to context and stop hardcoing
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    });
     try {
       await checkout.sendTransaction({
         provider,

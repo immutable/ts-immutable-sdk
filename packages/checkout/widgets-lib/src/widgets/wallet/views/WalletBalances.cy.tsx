@@ -6,19 +6,22 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import { WalletContext, WalletState } from '../context/WalletContext';
 import { Web3Provider } from '@ethersproject/providers';
 import { cySmartGet } from '../../../lib/testUtils';
+import { Environment } from '@imtbl/config';
 
 describe('WalletBalances', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
 
-  const checkout = new Checkout();
+  const checkout = new Checkout({
+    baseConfig: { environment: Environment.PRODUCTION },
+  });
   const provider = {} as unknown as Web3Provider;
   const baseWalletState: WalletState = {
     checkout: checkout,
     network: {
-      chainId: 1442,
-      name: 'POLYGON_ZKEVM_TESTNET',
+      chainId: 137,
+      name: 'Polygon',
       nativeCurrency: {} as unknown as TokenInfo,
       isSupported: true,
     },
@@ -88,13 +91,15 @@ describe('WalletBalances', () => {
   });
 
   it('should NOT show add coins button on Ethereum', () => {
-    const checkout = new Checkout();
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
     const provider = {} as unknown as Web3Provider;
     const walletState: WalletState = {
       checkout: checkout,
       network: {
-        chainId: 5,
-        name: 'Goerli',
+        chainId: 1,
+        name: 'Ethereum',
         nativeCurrency: {} as unknown as TokenInfo,
         isSupported: true,
       },
@@ -116,7 +121,7 @@ describe('WalletBalances', () => {
         </WalletContext.Provider>
       </BiomeCombinedProviders>
     );
-    cySmartGet('Goerli-network-button').click();
+    cySmartGet('Ethereum-network-button').click();
     cySmartGet('add-coins').should('not.exist');
   });
 });
