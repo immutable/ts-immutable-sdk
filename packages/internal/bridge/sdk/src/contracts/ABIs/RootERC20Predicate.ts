@@ -1,4 +1,4 @@
-export const RootERC20Predicate = [
+export const ROOT_ERC20_PREDICATE = [
   {
     anonymous: false,
     inputs: [
