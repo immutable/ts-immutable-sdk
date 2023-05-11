@@ -7,9 +7,8 @@ import { TokenInfo } from './token';
 export enum ChainId {
   ETHEREUM = 1,
   GOERLI = 5,
-  POLYGON = 137,
-  POLYGON_ZKEVM_TESTNET = 1442
-  // zkEVM = 'zkEVM'
+  IMTBL_ZKEVM_DEVNET = 13373,
+  IMTBL_ZKEVM_TESTNET = 13372, //to be used in prod config for testnet launch
 }
 
 /**
@@ -50,58 +49,76 @@ export type NetworkMap = Map<ChainId, NetworkDetails>;
 /**
  * Object mapping the list of supported production networks with the corresponding network details.
  */
-export const ProductionChainIdNetworkMap: NetworkMap = new Map<ChainId, NetworkDetails>([
-  [ChainId.ETHEREUM, {
-    chainIdHex: '0x1', // 1
-    chainName: 'Ethereum',
-    rpcUrls: ['https://mainnet.infura.io/v3/'],
-    nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
-      decimals: 18,
+export const ProductionChainIdNetworkMap: NetworkMap = new Map<
+  ChainId,
+  NetworkDetails
+>([
+  [
+    ChainId.ETHEREUM,
+    {
+      chainIdHex: '0x1', // 1
+      chainName: 'Ethereum',
+      rpcUrls: ['https://mainnet.infura.io/v3/'],
+      nativeCurrency: {
+        name: 'Ethereum',
+        symbol: 'ETH',
+        decimals: 18,
+      },
+      blockExplorerUrls: ['https://etherscan.io/'],
     },
-    blockExplorerUrls: ['https://etherscan.io/'],
-  }],
-  [ChainId.POLYGON, {
-    chainIdHex: '0x89', // 137
-    chainName: 'Polygon',
-    rpcUrls: ['https://polygon-rpc.com'],
-    nativeCurrency: {
-      name: 'MATIC',
-      symbol: 'MATIC',
-      decimals: 18,
+  ],
+  [
+    ChainId.IMTBL_ZKEVM_TESTNET,
+    {
+      chainIdHex: '0x343C', // 13372
+      chainName: 'Immutable zkEVM Testnet',
+      rpcUrls: ['https://zkevm-rpc.dev.x.immutable.com'],
+      nativeCurrency: {
+        name: 'IMX',
+        symbol: 'IMX',
+        decimals: 18,
+      },
+      blockExplorerUrls: [''],
     },
-    blockExplorerUrls: ['https://polygonscan.com/'],
-  }]
-])
+  ],
+]);
 
 /**
  * Object mapping the list of supported sandbox networks with the corresponding network details.
  */
-export const SandboxChainIdNetworkMap: NetworkMap = new Map<ChainId, NetworkDetails>([
-  [ChainId.GOERLI, {
-    chainIdHex: '0x5', // 5
-    chainName: 'Goerli',
-    rpcUrls: ['https://goerli.infura.io/v3/'],
-    nativeCurrency: {
-      name: 'Goerli Eth',
-      symbol: 'ETH',
-      decimals: 18,
+export const SandboxChainIdNetworkMap: NetworkMap = new Map<
+  ChainId,
+  NetworkDetails
+>([
+  [
+    ChainId.GOERLI,
+    {
+      chainIdHex: '0x5', // 5
+      chainName: 'Goerli',
+      rpcUrls: ['https://goerli.infura.io/v3/'],
+      nativeCurrency: {
+        name: 'Goerli Eth',
+        symbol: 'ETH',
+        decimals: 18,
+      },
+      blockExplorerUrls: ['https://goerli.etherscan.io/'],
     },
-    blockExplorerUrls: ['https://goerli.etherscan.io/'],
-  }],
-  [ChainId.POLYGON_ZKEVM_TESTNET, {
-    chainIdHex: '0x5A2',
-    chainName: 'Polygon zkEVM Testnet',
-    rpcUrls: ['https://rpc.public.zkevm-test.net'],
-    nativeCurrency: {
-      name: 'ETH',
-      symbol: 'ETH',
-      decimals: 18
+  ],
+  [
+    ChainId.IMTBL_ZKEVM_DEVNET,
+    {
+      chainIdHex: '0x343D', //13373
+      chainName: 'Immutable zkEVM Devnet',
+      rpcUrls: ['https://zkevm-rpc.dev.x.immutable.com/'],
+      nativeCurrency: {
+        name: 'IMX',
+        symbol: 'IMX',
+        decimals: 18,
+      },
+      blockExplorerUrls: [''],
     },
-    blockExplorerUrls: ['https://testnet-zkevm.polygonscan.com']
-  }]
-])
+  ],
+]);
 
 /**
  * Interface representing the parameters for {@link Checkout.switchNetwork}.

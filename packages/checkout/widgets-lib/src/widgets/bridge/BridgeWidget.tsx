@@ -53,7 +53,8 @@ const bridgingNetworks = Object.values(Network);
 
 export const NetworkChainMap = {
   [Network.ETHEREUM]: ChainId.ETHEREUM,
-  [Network.POLYGON]: ChainId.POLYGON,
+  [Network.IMTBL_ZKEVM_TESTNET]: ChainId.IMTBL_ZKEVM_TESTNET,
+  [Network.IMTBL_ZKEVM_DEVNET]: ChainId.IMTBL_ZKEVM_DEVNET,
   [Network.GOERLI]: ChainId.GOERLI,
 };
 
