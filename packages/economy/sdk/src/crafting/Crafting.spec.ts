@@ -25,8 +25,10 @@ describe('Crafting', () => {
 
       try {
         await expect(craftingWithError.craft(input)).rejects.toThrow(
-          new SDKError('CRAFTING_ERROR', errorMessage)
+          new SDKError('CRAFTING_ERROR', errorMessage),
         );
+      // TODO: remove once fixed
+      // eslint-disable-next-line no-empty
       } catch {}
     });
   });

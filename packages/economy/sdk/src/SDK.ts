@@ -47,6 +47,8 @@ export abstract class SDK<SDKEvent> {
 
   /** Utility: Use to print logs in console */
   log(...args: unknown[]): void {
+    // TODO: Remove once fixed
+    // eslint-disable-next-line no-console
     console.log(`${this.constructor.name}:`, ...args);
   }
 

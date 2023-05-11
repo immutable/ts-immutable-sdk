@@ -11,10 +11,9 @@ export class Economy extends SDK<EconomyEvents> {
 
   constructor(crafting?: Crafting) {
     super();
-    this.crafting =
-      crafting instanceof Crafting
-        ? crafting
-        : new Crafting(this.getEmitEventHandler());
+    this.crafting = crafting instanceof Crafting
+      ? crafting
+      : new Crafting(this.getEmitEventHandler());
   }
 
   /** Lifecycle method: Self invoked after class instanciation */
