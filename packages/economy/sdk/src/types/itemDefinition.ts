@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 export type ItemDefinition = {
   id: string;
   game_id: string;

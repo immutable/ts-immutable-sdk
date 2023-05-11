@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 export class HttpClient {
@@ -38,13 +39,13 @@ export class HttpClient {
           message: error.message,
         });
         return Promise.reject(error);
-      }
+      },
     );
   }
 
   public async get<T>(
     url: string,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> {
     return this.axiosInstance.get<T>(url, config);
   }
@@ -52,7 +53,7 @@ export class HttpClient {
   public async post<T>(
     url: string,
     data?: any,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> {
     return this.axiosInstance.post<T>(url, data, config);
   }
@@ -60,14 +61,14 @@ export class HttpClient {
   public async put<T>(
     url: string,
     data?: any,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> {
     return this.axiosInstance.put<T>(url, data, config);
   }
 
   public async delete<T>(
     url: string,
-    config?: AxiosRequestConfig
+    config?: AxiosRequestConfig,
   ): Promise<AxiosResponse<T>> {
     return this.axiosInstance.delete<T>(url, config);
   }
