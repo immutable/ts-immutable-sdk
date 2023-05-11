@@ -92,6 +92,7 @@ describe('CryptoFiat', () => {
       data: [
         { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin' },
         { id: 'ethereum', symbol: 'eth', name: 'Ethereum' },
+        { id: 'ethereum-wormhole', symbol: 'eth', name: 'Ethereum' },
         { id: 'usd-coin', symbol: 'usdc', name: 'USDC' },
       ],
     };
