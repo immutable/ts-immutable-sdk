@@ -28,10 +28,12 @@ import { LoadingView } from '../../components/Loading/LoadingView';
 import { getTokenBalances } from './functions/tokenBalances';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { zkEVMNetwork } from '../../lib/networkUtils';
+import { Environment } from '@imtbl/config';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
   theme: WidgetTheme;
+  environment: Environment;
 }
 
 export interface WalletWidgetParams {
@@ -40,7 +42,7 @@ export interface WalletWidgetParams {
 }
 
 export function WalletWidget(props: WalletWidgetProps) {
-  const { params, theme } = props;
+  const { environment, params, theme } = props;
   const { providerPreference, topUpFeatures } = params;
   const biomeTheme: BaseTokens =
     theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
@@ -55,7 +57,7 @@ export function WalletWidget(props: WalletWidgetProps) {
   const { checkout } = walletState;
 
   useEffect(() => {
-    const checkout = new Checkout();
+    const checkout = new Checkout({ baseConfig: { environment: environment } });
     walletDispatch({
       payload: {
         type: WalletActions.SET_CHECKOUT,
@@ -69,7 +71,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         supportedTopUps: { ...topUpFeatures },
       },
     });
-  }, [topUpFeatures]);
+  }, [topUpFeatures, environment]);
 
   useEffect(() => {
     (async () => {

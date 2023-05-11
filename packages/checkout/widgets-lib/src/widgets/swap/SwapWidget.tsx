@@ -21,10 +21,12 @@ import { SwapWidgetViews } from '../../context/SwapViewContextTypes';
 import { SwapCoins } from './views/SwapCoins';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { LoadingView } from '../../components/Loading/LoadingView';
+import { Environment } from '@imtbl/config';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
   theme: WidgetTheme;
+  environment: Environment;
 }
 
 export interface SwapWidgetParams {
@@ -39,14 +41,15 @@ export function SwapWidget(props: SwapWidgetProps) {
   const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
-  const { params, theme } = props;
+  const { params, theme, environment } = props;
   const { amount, fromContractAddress, toContractAddress, providerPreference } =
     params;
   const biomeTheme: BaseTokens =
     theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
       ? onLightBase
       : onDarkBase;
-  const checkout = useMemo(() => new Checkout(), []);
+  const checkout = useMemo(() => new Checkout({ baseConfig: { environment: environment } }),
+    [environment]);
 
   const connectToCheckout = useCallback(async () => {
     if (!providerPreference) return;

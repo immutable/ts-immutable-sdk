@@ -36,7 +36,11 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <BridgeWidget params={params} theme={this.theme}></BridgeWidget>
+        <BridgeWidget
+          params={params}
+          theme={this.theme}
+          environment={this.environment}
+        ></BridgeWidget>
       </React.StrictMode>
     );
   }

@@ -7,6 +7,7 @@ import { cySmartGet } from '../../lib/testUtils';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
+import { Environment } from '@imtbl/config';
 
 describe('WalletWidget tests', () => {
   beforeEach(() => {
@@ -52,7 +53,13 @@ describe('WalletWidget tests', () => {
         },
       });
 
-    mount(<WalletWidget params={params} theme={WidgetTheme.DARK} />);
+    mount(
+      <WalletWidget
+        environment={Environment.PRODUCTION}
+        params={params}
+        theme={WidgetTheme.DARK}
+      />
+    );
 
     cySmartGet('loading-view').should('be.visible');
     cySmartGet('wallet-balances').should('be.visible');
@@ -70,13 +77,13 @@ describe('WalletWidget tests', () => {
               getAddress: () => Promise.resolve('dss'),
             }),
             getNetwork: async () => ({
-              chainId: 5,
-              name: 'Goerli',
+              chainId: 1,
+              name: 'Ethereum',
             }),
           },
           network: {
             chainId: 1,
-            name: 'Goerli',
+            name: 'Ethereum',
             nativeCurrency: {
               name: 'ETH',
               symbol: 'ETH',
@@ -91,16 +98,16 @@ describe('WalletWidget tests', () => {
               getAddress: () => Promise.resolve('dss'),
             }),
             getNetwork: async () => ({
-              chainId: 1142,
-              name: 'Polygon zkEVM Testnet',
+              chainId: 13372,
+              name: 'Immutable zkEVM Testnet',
             }),
           },
           network: {
-            chainId: 1442,
-            name: 'Polygon zkEVM Testnet',
+            chainId: 13372,
+            name: 'Immutable zkEVM Testnet',
             nativeCurrency: {
-              name: 'MATIC',
-              symbol: 'MATIC',
+              name: 'IMX',
+              symbol: 'IMX',
               decimals: 18,
             },
           },
@@ -146,11 +153,11 @@ describe('WalletWidget tests', () => {
         .as('switchNetworkStub')
         .resolves({
           network: {
-            chainId: 1442,
-            name: 'Polygon zkEVM Testnet',
+            chainId: 13372,
+            name: 'Immutable zkEVM Testnet',
             nativeCurrency: {
-              name: 'MATIC',
-              symbol: 'MATIC',
+              name: 'IMX',
+              symbol: 'IMX',
               decimals: 18,
             },
           },
@@ -167,7 +174,13 @@ describe('WalletWidget tests', () => {
         providerPreference: ConnectionProviders.METAMASK,
       } as WalletWidgetParams;
 
-      mount(<WalletWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <WalletWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
 
       cySmartGet('@balanceStub').should('have.been.called');
       cySmartGet('@connectStub').should('have.been.calledWith', {
@@ -176,7 +189,7 @@ describe('WalletWidget tests', () => {
 
       cySmartGet('close-button').should('be.visible');
       cySmartGet('heading').should('be.visible');
-      cySmartGet('Goerli-network-button').should('include.text', 'Goerli');
+      cySmartGet('Ethereum-network-button').should('include.text', 'Ethereum');
 
       cySmartGet('total-token-balance').should('exist');
       cySmartGet('total-token-balance').should('have.text', '≈ USD $70.50');
@@ -190,7 +203,13 @@ describe('WalletWidget tests', () => {
       const params = {
         providerPreference: ConnectionProviders.METAMASK,
       } as WalletWidgetParams;
-      mount(<WalletWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <WalletWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
 
       cySmartGet('@balanceStub').should('have.been.called');
       cySmartGet('@connectStub').should('have.been.calledWith', {

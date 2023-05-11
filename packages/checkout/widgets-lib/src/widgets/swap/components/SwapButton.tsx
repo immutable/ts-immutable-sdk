@@ -6,6 +6,7 @@ import { ViewActions, ViewContext } from '../../../context/ViewContext';
 import { SwapWidgetViews } from '../../../context/SwapViewContextTypes';
 import { sendSwapSuccessEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
+import { Environment } from '@imtbl/config';
 
 export interface SwapButtonProps {
   provider?: Web3Provider;
@@ -20,7 +21,10 @@ export const SwapButton = (props: SwapButtonProps) => {
 
   const sendTransaction = async () => {
     if (!transaction || !provider) return;
-    const checkout = new Checkout();
+    // TODO: update here to go to context and stop hardcoing
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    });
     try {
       await checkout.sendTransaction({
         provider,

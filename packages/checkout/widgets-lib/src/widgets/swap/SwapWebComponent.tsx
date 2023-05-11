@@ -3,8 +3,10 @@ import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
+import { Environment } from '@imtbl/config';
 
 export class ImmutableSwap extends ImmutableWebComponent {
+  environment = Environment.SANDBOX;
   providerPreference = ConnectionProviders.METAMASK;
   amount = '';
   fromContractAddress = '';
@@ -22,6 +24,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
     this.toContractAddress = this.getAttribute('toContractAddress') as string;
     this.renderWidget();
   }
+
   renderWidget() {
     const swapParams: SwapWidgetParams = {
       providerPreference: this.providerPreference,
@@ -36,7 +39,11 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <SwapWidget params={swapParams} theme={this.theme} />
+        <SwapWidget
+          params={swapParams}
+          theme={this.theme}
+          environment={this.environment}
+        />
       </React.StrictMode>
     );
   }

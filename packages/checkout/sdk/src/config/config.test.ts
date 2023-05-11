@@ -1,7 +1,7 @@
 import { Environment } from "@imtbl/config";
-import { CheckoutModuleConfiguration, CheckoutConfigurtionError } from "./config"
+import { CheckoutConfigurtionError } from "./config"
 import { Checkout } from "../Checkout";
-import { ProductionChainIdNetworkMap, SandboxChainIdNetworkMap } from "../types";
+import { CheckoutModuleConfiguration, ProductionChainIdNetworkMap, SandboxChainIdNetworkMap } from "../types";
 
 describe('CheckoutConfiguration class', () => {
 
