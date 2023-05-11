@@ -287,7 +287,7 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
         provider: connectStubReturnWrongNetwork.provider,
-        chainId: 137,
+        chainId: 13372,
       });
     });
 

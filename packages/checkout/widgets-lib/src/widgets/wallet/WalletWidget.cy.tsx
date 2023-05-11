@@ -189,10 +189,10 @@ describe('WalletWidget tests', () => {
 
       cySmartGet('close-button').should('be.visible');
       cySmartGet('heading').should('be.visible');
-      cySmartGet('Goerli-network-button').should('include.text', 'Goerli');
+      cySmartGet('Ethereum-network-button').should('include.text', 'Ethereum');
 
       cySmartGet('total-token-balance').should('exist');
-      cySmartGet('total-token-balance').should('have.text', '≈ USD $0.00');
+      cySmartGet('total-token-balance').should('have.text', '≈ USD $70.50');
 
       cySmartGet('balance-item-ETH').should('exist');
       cySmartGet('balance-item-GODS').should('exist');

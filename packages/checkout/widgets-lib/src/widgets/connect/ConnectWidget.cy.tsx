@@ -120,8 +120,8 @@ describe('ConnectWidget tests', () => {
       cy.stub(Checkout.prototype, 'getNetworkInfo')
         .as('getNetworkInfoStub')
         .resolves({
-          name: 'Immutable zkEVM Devnet',
-          chainId: 13373,
+          name: 'Immutable zkEVM Testnet',
+          chainId: 13372,
         });
       mountConnectWidgetAndGoToReadyToConnect();
       cySmartGet('ready-to-connect').should('be.visible');

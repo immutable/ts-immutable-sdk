@@ -22,8 +22,8 @@ describe('Network Menu', () => {
             chainId: 1,
           },
           {
-            name: 'Polygon',
-            chainId: 137,
+            name: 'ImmutablezkEVMTestnet',
+            chainId: 13372,
           },
         ],
       });
@@ -71,7 +71,7 @@ describe('Network Menu', () => {
     );
     cySmartGet('@getNetworkAllowListStub').should('have.been.called');
     cySmartGet('Ethereum-network-button').should('exist');
-    cySmartGet('Polygon-network-button').should('exist');
+    cySmartGet('ImmutablezkEVMTestnet-network-button').should('exist');
   });
 
   it('should switch network', () => {
@@ -79,11 +79,11 @@ describe('Network Menu', () => {
       .as('switchNetworkStub')
       .resolves({
         network: {
-          chainId: 137,
-          name: 'Polygon',
+          chainId: 13372,
+          name: 'ImmutablezkEVMTestnet',
           nativeCurrency: {
-            name: 'MATIC',
-            symbol: 'MATIC',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },
@@ -114,12 +114,12 @@ describe('Network Menu', () => {
       </BiomeThemeProvider>
     );
 
-    cySmartGet('Polygon-network-button').click();
+    cySmartGet('ImmutablezkEVMTestnet-network-button').click();
 
     cySmartGet('@switchNetworkStub').should('have.been.called');
     cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
       provider: {},
-      chainId: 137,
+      chainId: 13372,
     });
   });
 });
