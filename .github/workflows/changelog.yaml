@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - if: ${{ contains(github.event.pull_request.title, 'NO-CHANGELOG') }}
         name: Add comment about skipping check
@@ -27,7 +27,7 @@ jobs:
         name: Check Changelog Updated
         id: changelog
         run: |
-          echo "CHANGELOG_UPDATED=$(git diff --name-only -r origin/main origin/${GITHUB_HEAD_REF} CHANGELOG.md)" >> $GITHUB_OUTPUT
+          echo "CHANGELOG_UPDATED=$(git diff --name-only --diff-filter=ACMRTUXB origin/main origin/${GITHUB_HEAD_REF} CHANGELOG.md)" >> $GITHUB_OUTPUT
 
       - if: contains(github.event.pull_request.title, 'NO-CHANGELOG') == false && steps.changelog.outputs.CHANGELOG_UPDATED != 'CHANGELOG.md'
         name: Run step only when any of the above files changed.
