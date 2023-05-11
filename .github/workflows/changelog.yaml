@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - if: ${{ contains(github.event.pull_request.title, 'NO-CHANGELOG') }}
         name: Add comment about skipping check
