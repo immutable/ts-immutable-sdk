@@ -27,7 +27,8 @@ jobs:
         name: Check Changelog Updated
         id: changelog
         run: |
-          echo "CHANGELOG_UPDATED=$(git diff --name-only -r origin/main origin/${GITHUB_HEAD_REF} CHANGELOG.md)" >> $GITHUB_OUTPUT
+          echo "CHANGELOG_UPDATED=$(git diff --name-only --diff-filter=ACMRTUXB origin/main CHANGELOG.md)" >> $GITHUB_OUTPUT
+          echo $CHANGELOG_UPDATED
 
       - if: contains(github.event.pull_request.title, 'NO-CHANGELOG') == false && steps.changelog.outputs.CHANGELOG_UPDATED != 'CHANGELOG.md'
         name: Run step only when any of the above files changed.
