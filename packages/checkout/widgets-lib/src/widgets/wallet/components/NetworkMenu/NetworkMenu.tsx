@@ -23,12 +23,9 @@ import {
   ViewContext,
 } from '../../../../context/ViewContext';
 import { sortNetworksCompareFn } from '../../../../lib/utils';
-import { CryptoFiatContext } from '../../../../context/crypto-fiat-context/CryptoFiatContext';
 
 export const NetworkMenu = () => {
   const { viewDispatch } = useContext(ViewContext);
-  const { cryptoFiatState } = useContext(CryptoFiatContext);
-  const { cryptoFiat } = cryptoFiatState;
   const { walletState, walletDispatch } = useContext(WalletContext);
   const { networkStatus } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const { checkout, network, provider } = walletState;
@@ -52,13 +49,7 @@ export const NetworkMenu = () => {
 
   const switchNetwork = useCallback(
     async (chainId: ChainId) => {
-      if (
-        !checkout ||
-        !provider ||
-        !network ||
-        network.chainId === chainId ||
-        !cryptoFiat
-      )
+      if (!checkout || !provider || !network || network.chainId === chainId)
         return;
       try {
         const switchNetworkResult = await checkout.switchNetwork({
@@ -92,7 +83,7 @@ export const NetworkMenu = () => {
         }
       }
     },
-    [checkout, provider, network, walletDispatch, viewDispatch, cryptoFiat]
+    [checkout, provider, network, walletDispatch, viewDispatch]
   );
 
   useEffect(() => {
