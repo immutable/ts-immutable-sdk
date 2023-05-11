@@ -47,7 +47,6 @@ export abstract class SDK<SDKEvent> {
 
   /** Utility: Use to print logs in console */
   log(...args: unknown[]): void {
-    // eslint-disable-next-line no-console
     console.log(`${this.constructor.name}:`, ...args);
   }
 
@@ -77,7 +76,7 @@ export abstract class SDK<SDKEvent> {
    * @param detail event payload
    */
   private emitNativeEvent(detail: SDKEvent): void {
-    if (!SDK.isClientSide) {
+    if (!this.isClientSide) {
       this.log(
         'Cannot dispatch native event: not running in a browser environment',
       );
@@ -95,7 +94,9 @@ export abstract class SDK<SDKEvent> {
   /**
    * Utility: Checks if the class was mounted in a browser environment
    */
-  protected static get isClientSide(): boolean {
+  // TODO: remove when fixed
+  // eslint-disable-next-line class-methods-use-this
+  protected get isClientSide(): boolean {
     return typeof window !== 'undefined' && typeof document !== 'undefined';
   }
 
