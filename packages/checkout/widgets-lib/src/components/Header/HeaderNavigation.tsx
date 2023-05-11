@@ -40,7 +40,7 @@ export const HeaderNavigation = ({
     <AppHeaderBar
       testId="header-navigation-container"
       sx={HeaderNavigationStyles(transparent)}
-      contentAlign="left"
+      contentAlign="center"
     >
       {showBack && (
         <AppHeaderBar.LeftButtCon
@@ -50,11 +50,7 @@ export const HeaderNavigation = ({
           testId="back-button"
         />
       )}
-      <AppHeaderBar.Title
-        testId="header-title"
-        size="small"
-        sx={{ textAlign: 'left' }}
-      >
+      <AppHeaderBar.Title testId="header-title" size="small">
         {title}
       </AppHeaderBar.Title>
       <AppHeaderBar.RightHandButtons>
