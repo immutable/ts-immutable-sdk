@@ -2701,6 +2701,7 @@ __metadata:
     "@parcel/transformer-sass": 2.8.3
     "@parcel/transformer-typescript-tsc": ^2.8.3
     assert: ^2.0.0
+    buffer: ^5.5.0
     lit: ^2.7.2
     parcel: ^2.8.3
     parcel-bundler: ^1.12.3
