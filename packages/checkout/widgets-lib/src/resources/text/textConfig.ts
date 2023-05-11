@@ -2,6 +2,7 @@ import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
 import { BaseViews } from '../../context/ViewContext';
 import { WalletWidgetViews } from '../../context/WalletViewContextTypes';
+import { SwapWidgetViews } from '../../context/SwapViewContextTypes';
 
 export const text = {
   views: {
@@ -46,6 +47,14 @@ export const text = {
         noTokensFound: 'No tokens found',
       },
     },
+    [SwapWidgetViews.SWAP]: {
+      header: {
+        title: "Swap coins"
+      },
+      swapForm: {
+        buttonText: 'Swap'
+      }
+    }
   },
   wallets: {
     [ConnectionProviders.METAMASK]: {

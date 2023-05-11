@@ -6,7 +6,7 @@ import { cySmartGet } from '../../lib/testUtils';
 import { FooterLogo } from './FooterLogo';
 
 describe('Footer Logo', () => {
-  it('should show the power by immutable logo', () => {
+  it('should show the immutable logo', () => {
     mount(
       <BiomeThemeProvider theme={{ base: onDarkBase }}>
         <SimpleLayout footer={<FooterLogo />}></SimpleLayout>
