@@ -7,6 +7,7 @@ import {
 import { BigNumber } from 'ethers';
 import { getTokenBalances } from './tokenBalances';
 import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 
 describe('token balance tests', () => {
   it('should return balances for all tokens', async () => {
@@ -28,7 +29,9 @@ describe('token balance tests', () => {
         getAddress: jest.fn().mockResolvedValue('0xaddress'),
       }),
     };
-    const checkout = new Checkout();
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
     jest.spyOn(checkout, 'getAllBalances').mockResolvedValue({ balances });
 
     const actualResult = await getTokenBalances(
@@ -48,7 +51,9 @@ describe('token balance tests', () => {
     });
   });
   it('should return empty array when any argument is missing', async () => {
-    const checkout = new Checkout();
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
 
     const actualResult = await getTokenBalances(
       checkout,
@@ -66,7 +71,9 @@ describe('token balance tests', () => {
         getAddress: jest.fn().mockResolvedValue('0xaddress'),
       }),
     };
-    const checkout = new Checkout();
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
     jest
       .spyOn(checkout, 'getAllBalances')
       .mockRejectedValue(new Error('some-err'));

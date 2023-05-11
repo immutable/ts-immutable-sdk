@@ -8,6 +8,7 @@ export {
   SupportedFiatCurrencies,
 } from './types';
 export type {
+  CheckoutModuleConfiguration,
   GetNetworkParams,
   CheckConnectionParams,
   CheckConnectionResult,

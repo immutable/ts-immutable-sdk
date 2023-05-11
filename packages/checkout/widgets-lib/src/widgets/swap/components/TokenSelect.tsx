@@ -13,6 +13,7 @@ import {
   SelectStyle,
 } from '../SwapStyles';
 import { alphaSortTokensList } from '../helpers';
+import { Environment } from '@imtbl/config';
 
 export interface TokenSelectProps {
   onChange: (token: TokenInfo) => void;
@@ -52,7 +53,10 @@ const TokenSelect = ({
   }, [token, selectOption]);
 
   const getTokens = useCallback(async () => {
-    const checkout = new Checkout();
+    // TODO: update here to go to context and stop hardcoing
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    });
 
     const allowList = await checkout.getTokenAllowList({
       chainId: 1,

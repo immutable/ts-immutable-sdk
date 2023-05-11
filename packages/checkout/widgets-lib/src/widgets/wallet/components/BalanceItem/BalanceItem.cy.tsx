@@ -6,10 +6,13 @@ import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { BalanceItem } from './BalanceItem';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { cySmartGet } from '../../../../lib/testUtils';
+import { Environment } from '@imtbl/config';
 
 describe('BalanceItem', () => {
   let baseWalletState: WalletState = {
-    checkout: new Checkout(),
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    }),
     network: null,
     provider: null,
     providerPreference: ConnectionProviders.METAMASK,
@@ -49,8 +52,8 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
-        name: 'POLYGON_ZKEVM_TESTNET',
+        chainId: ChainId.POLYGON,
+        name: 'Polygon',
         nativeCurrency: {
           name: 'MATIC',
           symbol: 'MATIC',
@@ -83,8 +86,8 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
-        name: 'POLYGON_ZKEVM_TESTNET',
+        chainId: ChainId.POLYGON,
+        name: 'Polygon',
         nativeCurrency: {
           name: 'MATIC',
           symbol: 'MATIC',
@@ -122,8 +125,8 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
-        name: 'POLYGON_ZKEVM_TESTNET',
+        chainId: ChainId.POLYGON,
+        name: 'Polygon',
         nativeCurrency: {
           name: 'MATIC',
           symbol: 'MATIC',
@@ -160,10 +163,10 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.GOERLI,
-        name: 'GOERLI',
+        chainId: ChainId.ETHEREUM,
+        name: 'Ethereum',
         nativeCurrency: {
-          name: 'GOERLI',
+          name: 'Ethereum',
           symbol: 'ETH',
           decimals: 18,
         },

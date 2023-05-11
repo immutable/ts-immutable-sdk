@@ -5,6 +5,7 @@ import {
   Network,
   WidgetTheme,
 } from '../definitions/constants';
+import { Environment } from '@imtbl/config';
 
 /**
  * Interface representing the props for the Example Widget component.
@@ -29,6 +30,7 @@ export function ExampleReact(props: ExampleReactProps) {
 
   return (
     <imtbl-example
+      environment={config.environment ?? Environment.SANDBOX}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }
