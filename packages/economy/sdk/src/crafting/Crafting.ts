@@ -10,7 +10,7 @@ export type CraftInput = {
 };
 
 // TODO: Use Checkout SDK
-const Checkout = {
+const CHECKOUT = {
   connect: asyncFn('connect'),
   transfer: asyncFn('transfer', [1, 2, 3]),
   sign: asyncFn('sign'),
@@ -23,7 +23,7 @@ type CraftService = {
 };
 
 // TODO: Replace for CraftService class
-const CraftServiceMock = {
+const CRAFT_SERVICE_MOCK = {
   validateCraft: asyncFn('validateCraft'),
   submitCraft: asyncFn('submitCraft'),
 };
@@ -32,13 +32,13 @@ const CraftServiceMock = {
  * @internal Craft events
  */
 export type CraftEvent = EventType<
-  'CRAFT',
-  | EventData<'STARTED' | 'IN_PROGRESS'>
-  | EventData<'COMPLETED', { data: { output: { id: string } } }>
-  | EventData<'FAILED', { error: { code: string; reason: string } }>
-  | EventData<
-      'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
-    >
+'CRAFT',
+| EventData<'STARTED' | 'IN_PROGRESS'>
+| EventData<'COMPLETED', { data: { output: { id: string } } }>
+| EventData<'FAILED', { error: { code: string; reason: string } }>
+| EventData<
+'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
+>
 >;
 
 /** List of specific craft statuses */
@@ -46,10 +46,11 @@ export type CraftStatus = CraftEvent['status'];
 
 export class Crafting {
   private emitEvent: (event: CraftEvent) => void;
+
   private service: CraftService;
 
   constructor(emitEvent: (event: CraftEvent) => void, service?: CraftService) {
-    this.service = service || CraftServiceMock;
+    this.service = service || CRAFT_SERVICE_MOCK;
     this.emitEvent = emitEvent;
   }
 
@@ -70,8 +71,8 @@ export class Crafting {
     let signature;
     if (input.requiresWeb3) {
       this.emitEvent({ status: 'AWAITING_WEB3_INTERACTION', action: 'CRAFT' });
-      txIds = await Checkout.transfer(input.web3Assets);
-      signature = await Checkout.sign();
+      txIds = await CHECKOUT.transfer(input.web3Assets);
+      signature = await CHECKOUT.sign();
     }
 
     // 3. submit craft to BE
