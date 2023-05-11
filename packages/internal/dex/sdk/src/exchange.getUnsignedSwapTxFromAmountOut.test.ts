@@ -1,7 +1,8 @@
 import { describe, it } from '@jest/globals';
 import { ethers } from 'ethers';
-import { Percent, TradeType } from '@uniswap/sdk-core';
+import { TradeType } from '@uniswap/sdk-core';
 import { ExchangeConfiguration } from 'config';
+import { ExchangeErrorTypes } from 'errors';
 import { Exchange } from './exchange';
 import {
   decodeMulticallData,
@@ -23,7 +24,8 @@ jest.mock('./lib/utils', () => ({
 
 const exactOutputSingleSignature = '0x5023b4df';
 
-const DEFAULT_SLIPPAGE: Percent = new Percent(1, 1000); // 1/1000 = 0.001 = 0.1%
+const DEFAULT_SLIPPAGE = 0.1; // 1/1000 = 0.001 = 0.1%
+const HIGHER_SLIPPAGE = 0.2; // 2/1000 = 0.002 = 0.2%
 
 describe('getUnsignedSwapTxFromAmountOut', () => {
   describe('When no route found', () => {
@@ -117,7 +119,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(success).toBe(true);
       expect(info).not.toBe(undefined);
       expect(info?.quote?.token.address).toEqual(params.inputToken);
-      expect(info?.slippage).toBe('0.1%');
+      expect(info?.slippage).toBe(0.1);
       expect(info?.quote?.amount.toString()).toEqual('12300000000000');
       expect(info?.quoteWithMaxSlippage?.token.address).toEqual(
         params.inputToken,
@@ -129,9 +131,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
   });
 
   describe('Swap with single pool and higher slippage tolerance', () => {
-    const higherSlippage = new Percent(2, 1000); // 0.2%
     it('Generates valid calldata', async () => {
-      const params = setupSwapTxTest(higherSlippage);
+      const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
@@ -142,7 +143,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.inputToken,
         params.outputToken,
         params.amountOut,
-        higherSlippage,
+        HIGHER_SLIPPAGE,
       );
 
       const data = tx.transaction?.data?.toString() || '';
@@ -174,7 +175,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
     });
 
     it('returns valid quote', async () => {
-      const params = setupSwapTxTest(higherSlippage);
+      const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
@@ -185,13 +186,13 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.inputToken,
         params.outputToken,
         params.amountIn,
-        higherSlippage,
+        HIGHER_SLIPPAGE,
       );
 
       expect(success).toBe(true);
       expect(info).not.toBe(undefined);
       expect(info?.quote?.token.address).toEqual(params.inputToken);
-      expect(info?.slippage).toBe('0.2%');
+      expect(info?.slippage).toBe(0.2);
       expect(info?.quote?.amount.toString()).toEqual('12300000000000');
       expect(info?.quoteWithMaxSlippage?.token.address).toEqual(
         params.inputToken,
@@ -204,8 +205,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
   describe('pass in invalid fromAddress', () => {
     it('reverts', async () => {
-      const higherSlippage = new Percent(2, 1000); // 0.2%
-      const params = setupSwapTxTest(higherSlippage);
+      const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
@@ -216,7 +216,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.inputToken,
         params.outputToken,
         params.amountOut,
-        higherSlippage,
+        HIGHER_SLIPPAGE,
       );
 
       const data = tx.transaction?.data?.toString() || '';
@@ -243,8 +243,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
   describe('Pass in invalid addresses', () => {
     it('throws InvalidAddress', async () => {
-      const higherSlippage = new Percent(2, 1000); // 0.2%
-      const params = setupSwapTxTest(higherSlippage);
+      const params = setupSwapTxTest(HIGHER_SLIPPAGE);
 
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
@@ -257,7 +256,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           params.inputToken,
           params.outputToken,
           params.amountOut,
-          higherSlippage,
+          HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(
         new utils.InvalidAddress('Address is not valid: 0x0123abcdef'),
@@ -269,7 +268,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           invalidAddress,
           params.outputToken,
           params.amountOut,
-          higherSlippage,
+          HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(utils.InvalidAddress);
 
@@ -279,7 +278,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           params.inputToken,
           invalidAddress,
           params.amountOut,
-          higherSlippage,
+          HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(utils.InvalidAddress);
     });
@@ -287,8 +286,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
   describe('Pass in maxHops > 10', () => {
     it('throws', async () => {
-      const higherSlippage = new Percent(2, 1000); // 0.2%
-      const params = setupSwapTxTest(higherSlippage);
+      const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
@@ -300,10 +298,52 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           params.inputToken,
           params.outputToken,
           params.amountOut,
-          higherSlippage,
+          HIGHER_SLIPPAGE,
           11,
         ),
       ).rejects.toThrow();
+    });
+  });
+
+  describe('With slippage greater than 50', () => {
+    it('throws', async () => {
+      const params = setupSwapTxTest(HIGHER_SLIPPAGE);
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange(configuration);
+
+      await expect(
+        exchange.getUnsignedSwapTxFromAmountOut(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          params.amountIn,
+          100,
+          2,
+        ),
+      ).rejects.toThrow(ExchangeErrorTypes.INVALID_SLIPPAGE);
+    });
+  });
+
+  describe('With slippage less than 0', () => {
+    it('throws', async () => {
+      const params = setupSwapTxTest(HIGHER_SLIPPAGE);
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange(configuration);
+
+      await expect(
+        exchange.getUnsignedSwapTxFromAmountOut(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          params.amountIn,
+          -5,
+          2,
+        ),
+      ).rejects.toThrow(ExchangeErrorTypes.INVALID_SLIPPAGE);
     });
   });
 });
