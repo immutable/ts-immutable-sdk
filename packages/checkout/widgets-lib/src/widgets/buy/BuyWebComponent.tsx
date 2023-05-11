@@ -15,7 +15,6 @@ export class ImmutableBuy extends ImmutableWebComponent {
       'providerPreference'
     ) as ConnectionProviders;
     this.orderId = this.getAttribute('orderId') as string;
-    this.environment = this.getAttribute('environment') as Environment;
 
     this.renderWidget();
   }

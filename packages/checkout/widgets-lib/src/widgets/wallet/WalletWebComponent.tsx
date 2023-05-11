@@ -9,16 +9,9 @@ import {
 } from '../../components/ConnectLoader/ConnectLoader';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { Environment } from '@imtbl/config';
+import { ImmutableWebComponent } from '../ImmutableWebComponent';
 
-export class ImmutableWallet extends HTMLElement {
-  reactRoot?: ReactDOM.Root;
-
-  static get observedAttributes() {
-    return ['theme'];
-  }
-
-  environment = Environment.SANDBOX;
-  theme = WidgetTheme.DARK;
+export class ImmutableWallet extends ImmutableWebComponent {
   providerPreference = ConnectionProviders.METAMASK;
   useConnectWidget?: boolean;
   isOnRampEnabled?: boolean;

@@ -25,8 +25,10 @@ export abstract class ImmutableWebComponent extends HTMLElement {
   }
 
   connectedCallback() {
-    this.theme = this.getAttribute('theme') as WidgetTheme;
-    this.environment = this.getAttribute('environment') as Environment;
+    this.theme =
+      (this.getAttribute('theme') as WidgetTheme) ?? WidgetTheme.DARK;
+    this.environment =
+      (this.getAttribute('environment') as Environment) ?? Environment.SANDBOX;
   }
 
   abstract renderWidget(): void;
