@@ -9,6 +9,7 @@ import { cy, it } from 'local-cypress';
 import { Checkout, ConnectionProviders, TokenInfo } from '@imtbl/checkout-sdk';
 import { WalletContext, WalletState } from '../../context/WalletContext';
 import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 
 describe('Network Menu', () => {
   beforeEach(() => {
@@ -21,8 +22,8 @@ describe('Network Menu', () => {
             chainId: 1,
           },
           {
-            name: 'Polygon',
-            chainId: 137,
+            name: 'ImmutablezkEVMTestnet',
+            chainId: 13372,
           },
         ],
       });
@@ -50,7 +51,9 @@ describe('Network Menu', () => {
   });
   it('should have network buttons', () => {
     const walletState: WalletState = {
-      checkout: new Checkout(),
+      checkout: new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      }),
       network: null,
       provider: null,
       providerPreference: ConnectionProviders.METAMASK,
@@ -68,7 +71,7 @@ describe('Network Menu', () => {
     );
     cySmartGet('@getNetworkAllowListStub').should('have.been.called');
     cySmartGet('Ethereum-network-button').should('exist');
-    cySmartGet('Polygon-network-button').should('exist');
+    cySmartGet('ImmutablezkEVMTestnet-network-button').should('exist');
   });
 
   it('should switch network', () => {
@@ -76,18 +79,20 @@ describe('Network Menu', () => {
       .as('switchNetworkStub')
       .resolves({
         network: {
-          chainId: 137,
-          name: 'Polygon',
+          chainId: 13372,
+          name: 'ImmutablezkEVMTestnet',
           nativeCurrency: {
-            name: 'MATIC',
-            symbol: 'MATIC',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },
       });
 
     const walletState: WalletState = {
-      checkout: new Checkout(),
+      checkout: new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      }),
       network: {
         chainId: 1,
         name: 'Ethereum',
@@ -109,12 +114,12 @@ describe('Network Menu', () => {
       </BiomeThemeProvider>
     );
 
-    cySmartGet('Polygon-network-button').click();
+    cySmartGet('ImmutablezkEVMTestnet-network-button').click();
 
     cySmartGet('@switchNetworkStub').should('have.been.called');
     cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
       provider: {},
-      chainId: 137,
+      chainId: 13372,
     });
   });
 });

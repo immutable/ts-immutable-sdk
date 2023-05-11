@@ -3,12 +3,24 @@ import {
   WidgetConnectionProviders,
   SwapReact,
   CheckoutWidgets,
+  CheckoutWidgetsConfig,
+  UpdateConfig,
 } from '@imtbl/checkout-widgets';
+import { Environment } from '@imtbl/config';
 
 function SwapUI() {
   CheckoutWidgets({
     theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
   });
+
+  const widgetsConfig2: CheckoutWidgetsConfig = {
+    theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
+  };
+
+  UpdateConfig(widgetsConfig2);
+
   return (
     <div className="Swap">
       <h1 className="sample-heading">Checkout Swap (Web Component)</h1>

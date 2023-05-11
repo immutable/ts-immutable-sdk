@@ -91,11 +91,11 @@ export const BridgeForm = (props: BridgeFormProps) => {
             <Option.Label>{Network.ETHEREUM}</Option.Label>
           </Option>
           <Option
-            testId={`select-network-${Network.POLYGON}`}
-            key={Network.POLYGON}
-            optionKey={ChainId.POLYGON}
+            testId={`select-network-${Network.IMTBL_ZKEVM_TESTNET}`}
+            key={Network.IMTBL_ZKEVM_TESTNET}
+            optionKey={ChainId.IMTBL_ZKEVM_TESTNET}
           >
-            <Option.Label>{Network.POLYGON}</Option.Label>
+            <Option.Label>{Network.IMTBL_ZKEVM_TESTNET}</Option.Label>
           </Option>
         </Select>
       </Box>
