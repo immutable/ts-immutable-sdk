@@ -22,6 +22,7 @@ const imxConfig: ImmutableXConfiguration = {
     apiKey: undefined,
     baseOptions: {
       headers: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         'x-sdk-version': 'imx-core-sdk-ts-1.0.1',
       },
     },
@@ -60,7 +61,7 @@ export const getTokenAddress = (symbol: string): string => {
       tokenAddress: '0x1facdd0165489f373255a90304650e15481b2c85', // IMX address in goerli
     },
   ];
-  const token = tokenAddresses.find((token) => token.symbol === symbol);
+  const token = tokenAddresses.find((tkn) => tkn.symbol === symbol);
   return token?.tokenAddress || '';
 };
 

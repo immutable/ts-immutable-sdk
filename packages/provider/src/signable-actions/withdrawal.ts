@@ -33,12 +33,16 @@ export async function prepareWithdrawal({
   });
 }
 
+// TODO: remove once fixed
+// eslint-disable-next-line consistent-return
 export async function completeWithdrawal({
   signers: { ethSigner },
   starkPublicKey,
   token,
   config,
 }: CompleteWithdrawalParams) {
+  // TODO: please add a reasonable default here
+  // eslint-disable-next-line default-case
   switch (token.type) {
     case 'ETH':
       return completeEthWithdrawalAction({ ethSigner, starkPublicKey, config });

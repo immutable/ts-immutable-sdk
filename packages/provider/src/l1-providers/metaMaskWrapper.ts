@@ -1,4 +1,3 @@
-import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { ProviderConfiguration } from 'config';
 import { connect } from './metaMask';
 import {
@@ -15,14 +14,6 @@ import {
 
 export class MetaMaskIMXProvider extends GenericIMXProvider {
   private static imxSigner: ImxSigner;
-
-  constructor(
-    config: ProviderConfiguration,
-    ethSigner: EthSigner,
-    starkSigner: StarkSigner,
-  ) {
-    super(config, ethSigner, starkSigner);
-  }
 
   public static async connect(
     config: ProviderConfiguration,

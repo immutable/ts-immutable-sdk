@@ -9,7 +9,11 @@ type DepositParams = {
   config: ProviderConfiguration;
 };
 
+// TODO: remove once fixed deposit variable shadowing
+// eslint-disable-next-line consistent-return, @typescript-eslint/no-shadow
 export async function deposit({ signers, deposit, config }: DepositParams) {
+  // TODO: please add a reasonable default here
+  // eslint-disable-next-line default-case
   switch (deposit.type) {
     case 'ETH':
       return depositEth({ signers, deposit, config });

@@ -116,6 +116,8 @@ export async function batchTransfer({
 
   const requests = [];
   for (const resp of signableResult.data.signable_responses) {
+    // TODO: remove once fixed
+    // eslint-disable-next-line no-await-in-loop
     const starkSignature = await starkSigner.signMessage(resp.payload_hash);
     const req = {
       sender_vault_id: resp.sender_vault_id,

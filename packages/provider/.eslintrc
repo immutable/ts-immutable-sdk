@@ -15,7 +15,7 @@
       },
       {
         "selector": "objectLiteralProperty",
-        "format": ["camelCase"]
+        "format": ["camelCase","snake_case"]
       },
       {
         "selector": "variable",

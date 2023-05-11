@@ -60,24 +60,27 @@ describe('withdrawal', () => {
     ];
 
     testCases.forEach((testCase) => {
-      test(`should call withdrawal${testCase.withdrawalType}() when the type in the paylod is ${testCase.withdrawalType}`, async () => {
-        await completeWithdrawal({
-          signers: {} as Signers,
-          starkPublicKey: '',
-          token: { type: testCase.withdrawalType } as unknown as AnyToken,
-          config,
-        });
+      test(
+        `should call withdrawal${testCase.withdrawalType}() when the type in the paylod is ${testCase.withdrawalType}`,
+        async () => {
+          await completeWithdrawal({
+            signers: {} as Signers,
+            starkPublicKey: '',
+            token: { type: testCase.withdrawalType } as unknown as AnyToken,
+            config,
+          });
 
-        expect(completeERC20WithdrawalMock).toBeCalledTimes(
-          testCase.callsToWithdrawalERC20,
-        );
-        expect(completeERC721WithdrawalMock).toBeCalledTimes(
-          testCase.callsToWithdrawalERC721,
-        );
-        expect(completeEthWithdrawalMock).toBeCalledTimes(
-          testCase.callsToWithdrawalEth,
-        );
-      });
+          expect(completeERC20WithdrawalMock).toBeCalledTimes(
+            testCase.callsToWithdrawalERC20,
+          );
+          expect(completeERC721WithdrawalMock).toBeCalledTimes(
+            testCase.callsToWithdrawalERC721,
+          );
+          expect(completeEthWithdrawalMock).toBeCalledTimes(
+            testCase.callsToWithdrawalEth,
+          );
+        },
+      );
     });
 
     test('should not call withdrawal when withdrawal type is invalid', async () => {

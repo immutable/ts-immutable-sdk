@@ -20,6 +20,20 @@ jest.mock('enc-utils');
 jest.mock('../registration');
 jest.mock('./getEncodeAssetInfo');
 
+async function act(): Promise<TransactionResponse> {
+  const signers = await generateSigners(privateKey1);
+  return await completeERC721WithdrawalAction({
+    ethSigner: signers.ethSigner,
+    config: testConfig,
+    starkPublicKey: '789912305',
+    token: {
+      type: 'ERC721',
+      tokenId: '23',
+      tokenAddress: '0x23cv1',
+    },
+  });
+}
+
 describe('completeERC721Withdrawal action', () => {
   describe('when ERC721 is mintable', () => {
     const mintableErc721Token: MintableTokenDetails = {
@@ -129,6 +143,8 @@ describe('completeERC721Withdrawal action', () => {
         getMintableTokenDetailsByClientTokenId: jest
           .fn()
           .mockRejectedValue(() => {
+            // TODO: should be an object of type error (eg. new Error())
+            // eslint-disable-next-line @typescript-eslint/no-throw-literal
             throw error;
           }),
       });
@@ -151,17 +167,3 @@ describe('completeERC721Withdrawal action', () => {
     });
   });
 });
-
-async function act(): Promise<TransactionResponse> {
-  const signers = await generateSigners(privateKey1);
-  return await completeERC721WithdrawalAction({
-    ethSigner: signers.ethSigner,
-    config: testConfig,
-    starkPublicKey: '789912305',
-    token: {
-      type: 'ERC721',
-      tokenId: '23',
-      tokenAddress: '0x23cv1',
-    },
-  });
-}

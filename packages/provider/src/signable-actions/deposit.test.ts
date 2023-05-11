@@ -60,19 +60,22 @@ describe('deposit', () => {
     ];
 
     testCases.forEach((testCase) => {
-      test(`should call deposit${testCase.depositType}() when the type in the paylod is ${testCase.depositType}`, async () => {
-        await deposit({
-          signers: {} as Signers,
-          deposit: { type: testCase.depositType } as unknown as TokenAmount,
-          config,
-        });
+      test(
+        `should call deposit${testCase.depositType}() when the type in the paylod is ${testCase.depositType}`,
+        async () => {
+          await deposit({
+            signers: {} as Signers,
+            deposit: { type: testCase.depositType } as unknown as TokenAmount,
+            config,
+          });
 
-        expect(depositERC20Mock).toBeCalledTimes(testCase.callsToDepositERC20);
-        expect(depositERC721Mock).toBeCalledTimes(
-          testCase.callsToDepositERC721,
-        );
-        expect(depositEthMock).toBeCalledTimes(testCase.callsToDepositEth);
-      });
+          expect(depositERC20Mock).toBeCalledTimes(testCase.callsToDepositERC20);
+          expect(depositERC721Mock).toBeCalledTimes(
+            testCase.callsToDepositERC721,
+          );
+          expect(depositEthMock).toBeCalledTimes(testCase.callsToDepositEth);
+        },
+      );
     });
 
     test('should not call deposit when deposit type is invalid', async () => {

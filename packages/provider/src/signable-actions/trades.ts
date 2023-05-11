@@ -4,7 +4,7 @@ import { Signers } from './types';
 import { validateChain } from './helpers';
 import { ProviderConfiguration } from '../config';
 
-type createTradeWorkflowParams = {
+type CreateTradeWorkflowParams = {
   signers: Signers;
   request: GetSignableTradeRequest;
   config: ProviderConfiguration;
@@ -14,7 +14,7 @@ export async function createTrade({
   signers: { ethSigner, starkSigner },
   request,
   config,
-}: createTradeWorkflowParams): Promise<CreateTradeResponse> {
+}: CreateTradeWorkflowParams): Promise<CreateTradeResponse> {
   await validateChain(ethSigner, config.immutableXConfig);
   const ethAddress = await ethSigner.getAddress();
   const tradesApi = new TradesApi(config.immutableXConfig.apiConfiguration);

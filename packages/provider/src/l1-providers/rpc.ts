@@ -1,7 +1,10 @@
 import { ethers } from 'ethers';
 
 export const WALLET_ACTION = {
+  // TODO: remove once fixed - consider using an enum
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   SWITCH_CHAIN: 'wallet_switchEthereumChain',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   CONNECT: 'eth_requestAccounts',
 };
 

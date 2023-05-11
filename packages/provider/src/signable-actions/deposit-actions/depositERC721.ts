@@ -17,7 +17,9 @@ import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
 
 interface ERC721TokenData {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   token_id: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   token_address: string;
 }
 
@@ -26,6 +28,28 @@ type DepositERC721Params = {
   deposit: ERC721Token;
   config: ProviderConfiguration;
 };
+
+async function executeDepositERC721(
+  ethSigner: EthSigner,
+  tokenId: string,
+  assetType: string,
+  starkPublicKey: string,
+  vaultId: number,
+  config: ImmutableXConfiguration,
+): Promise<TransactionResponse> {
+  const coreContract = Contracts.Core.connect(
+    config.ethConfiguration.coreContractAddress,
+    ethSigner,
+  );
+  const populatedTransaction = await coreContract.populateTransaction.depositNft(
+    starkPublicKey,
+    assetType,
+    vaultId,
+    tokenId,
+  );
+
+  return ethSigner.sendTransaction(populatedTransaction);
+}
 
 export async function depositERC721({
   signers: { ethSigner },
@@ -106,7 +130,8 @@ export async function depositERC721({
       immutableXConfig.ethConfiguration.coreContractAddress,
       ethSigner,
     );
-    // Note: proxy registration contract registerAndDepositNft method is not used as it currently fails erc721 transfer ownership check
+    // Note: proxy registration contract registerAndDepositNft method is not used as
+    // it currently fails erc721 transfer ownership check
     await coreContract.registerUser(
       user,
       starkPublicKey,
@@ -122,26 +147,4 @@ export async function depositERC721({
     vaultId,
     immutableXConfig,
   );
-}
-
-async function executeDepositERC721(
-  ethSigner: EthSigner,
-  tokenId: string,
-  assetType: string,
-  starkPublicKey: string,
-  vaultId: number,
-  config: ImmutableXConfiguration,
-): Promise<TransactionResponse> {
-  const coreContract = Contracts.Core.connect(
-    config.ethConfiguration.coreContractAddress,
-    ethSigner,
-  );
-  const populatedTransaction = await coreContract.populateTransaction.depositNft(
-    starkPublicKey,
-    assetType,
-    vaultId,
-    tokenId,
-  );
-
-  return ethSigner.sendTransaction(populatedTransaction);
 }
