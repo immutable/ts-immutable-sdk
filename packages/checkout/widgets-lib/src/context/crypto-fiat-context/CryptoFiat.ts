@@ -36,28 +36,3 @@ export const updateConversions = (
   }
   return conversionMap;
 };
-
-export const calculateCryptoToFiatValue = (
-  balance: string,
-  symbol: string,
-  conversions: CryptoFiatConvertReturn
-): string => {
-  const zeroBalanceString = '-.--';
-  if (!balance) return zeroBalanceString;
-
-  const conversion = conversions[symbol.toLowerCase()];
-  if (!conversion) return zeroBalanceString;
-
-  const parsedBalance = parseFloat(balance);
-  if (parseFloat(balance) === 0 || isNaN(parsedBalance))
-    return zeroBalanceString;
-
-  if (!conversion[FiatSymbols.USD]) return zeroBalanceString;
-
-  return formatFiatString(parsedBalance * conversion[FiatSymbols.USD]);
-};
-
-export const formatFiatString = (amount: number): string => {
-  const factor = Math.pow(10, 2);
-  return (Math.round(amount * factor) / factor).toFixed(2).toString();
-};
