@@ -1,5 +1,10 @@
 {
-  "extends": ["airbnb", "airbnb-typescript"],
+  "extends": ["airbnb", "airbnb-typescript","../../.eslintrc"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "."
+  },
   "rules": {
     "@typescript-eslint/naming-convention": [
       "error",
