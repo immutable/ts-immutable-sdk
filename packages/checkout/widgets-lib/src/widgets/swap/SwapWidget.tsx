@@ -57,7 +57,6 @@ export function SwapWidget(props: SwapWidgetProps) {
     if (!providerPreference) return;
 
     const checkout = new Checkout({ baseConfig: { environment: environment } });
-    console.log(checkout);
 
     swapDispatch({
       payload: {
@@ -76,7 +75,6 @@ export function SwapWidget(props: SwapWidgetProps) {
         provider: connectResult.provider,
       },
     });
-    console.log(connectResult.provider);
 
     const address = await connectResult.provider.getSigner().getAddress();
     const tokenBalances = await checkout.getAllBalances({
@@ -93,17 +91,12 @@ export function SwapWidget(props: SwapWidgetProps) {
       },
     });
 
-    console.log(connectResult.network);
-    console.log(tokenBalances.balances);
-
     const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
       {
         chainId: connectResult.network.chainId,
         type: TokenFilterTypes.SWAP,
       }
     );
-
-    console.log(allowList);
 
     swapDispatch({
       payload: {

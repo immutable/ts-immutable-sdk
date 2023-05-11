@@ -3,7 +3,7 @@ import { BigNumber, utils, BigNumberish } from 'ethers';
 import React, { useEffect, useState, useCallback, useContext } from 'react';
 import { TokenInfo, GetBalanceResult } from '@imtbl/checkout-sdk';
 import TokenSelect from './TokenSelect';
-import { QuoteResponse } from './SwapForm';
+import { QuoteResponse } from '../views/SwapCoins';
 import { findTokenByAddress } from '../helpers';
 import { SwapActions, SwapContext } from '../context/SwapContext';
 
