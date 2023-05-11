@@ -24,7 +24,7 @@ export class Inventory {
     this.inventoryService = new InventoryService();
   }
 
-  @withSDKError({ type: 'GET_INVENTORY_ERROR' })
+  @withSDKError({ type: 'INVENTORY_ERROR' })
   public async getItems(input: GetInventoryInput) {
     const { data, status } = await this.inventoryService.getItems(input);
 

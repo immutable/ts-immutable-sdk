@@ -1,16 +1,4 @@
-/**
- * Types of SDK Errors
- */
-export type ErrorType =
-  | 'CRAFTING_ERROR'
-  | 'GET_INVENTORY_ERROR'
-  | 'UNKNOWN_ERROR';
-
-/** SDK Error Payload */
-export type SDKErrorType = {
-  type: ErrorType;
-  message?: string;
-};
+import { ErrorType, SDKErrorType } from './types';
 
 /**
  * SDK Error Class
