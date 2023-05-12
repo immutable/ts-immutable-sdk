@@ -1,5 +1,5 @@
-import { ChainId } from './network';
 import { BigNumber } from 'ethers';
+import { ChainId } from './network';
 
 /**
  * Interface representing token information.

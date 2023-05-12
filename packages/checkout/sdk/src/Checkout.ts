@@ -36,6 +36,7 @@ import {
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
+
   private providerPreference: ConnectionProviders | undefined;
 
   constructor(config: CheckoutModuleConfiguration = SandboxConfiguration) {
@@ -49,7 +50,7 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async checkIsWalletConnected(
-    params: CheckConnectionParams
+    params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
     return connect.checkIsWalletConnected(params.providerPreference);
   }
@@ -78,12 +79,12 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async switchNetwork(
-    params: SwitchNetworkParams
+    params: SwitchNetworkParams,
   ): Promise<SwitchNetworkResult> {
     if (!this.providerPreference) {
       throw new CheckoutError(
-        `connect should be called before switchNetwork to set the provider preference`,
-        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR
+        'connect should be called before switchNetwork to set the provider preference',
+        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR,
       );
     }
 
@@ -91,7 +92,7 @@ export class Checkout {
       this.config,
       this.providerPreference,
       params.provider,
-      params.chainId
+      params.chainId,
     );
   }
 
@@ -106,13 +107,13 @@ export class Checkout {
       return await balances.getBalance(
         this.config,
         params.provider,
-        params.walletAddress
+        params.walletAddress,
       );
     }
     return await balances.getERC20Balance(
       params.provider,
       params.walletAddress,
-      params.contractAddress
+      params.contractAddress,
     );
   }
 
@@ -123,13 +124,13 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getAllBalances(
-    params: GetAllBalancesParams
+    params: GetAllBalancesParams,
   ): Promise<GetAllBalancesResult> {
     return balances.getAllBalances(
       this.config,
       params.provider,
       params.walletAddress,
-      params.chainId
+      params.chainId,
     );
   }
 
@@ -140,7 +141,7 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getNetworkAllowList(
-    params: GetNetworkAllowListParams
+    params: GetNetworkAllowListParams,
   ): Promise<GetNetworkAllowListResult> {
     return await network.getNetworkAllowList(this.config, params);
   }
@@ -152,7 +153,7 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getTokenAllowList(
-    params: GetTokenAllowListParams
+    params: GetTokenAllowListParams,
   ): Promise<GetTokenAllowListResult> {
     return await tokens.getTokenAllowList(params);
   }
@@ -164,7 +165,7 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getWalletAllowList(
-    params: GetWalletAllowListParams
+    params: GetWalletAllowListParams,
   ): Promise<GetWalletAllowListResult> {
     return await wallet.getWalletAllowList(params);
   }
@@ -178,7 +179,7 @@ export class Checkout {
    * Further documenation can be found at [MetaMask | Sending Transactions](https://docs.metamask.io/guide/sending-transactions.html).
    */
   public async sendTransaction(
-    params: SendTransactionParams
+    params: SendTransactionParams,
   ): Promise<SendTransactionResult> {
     return await transaction.sendTransaction(params);
   }

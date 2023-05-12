@@ -23,12 +23,12 @@ const filterTokenList = function ({
       const tokenAllowedForType = token.tokenFeatures.includes(type);
 
       return (
-        (skipChainIdCheck || chainIdMatches) &&
-        tokenNotExcluded &&
-        (allowAllTokens || tokenAllowedForType)
+        (skipChainIdCheck || chainIdMatches)
+        && tokenNotExcluded
+        && (allowAllTokens || tokenAllowedForType)
       );
-    }) as TokenMasterInfo[]
-}
+    }) as TokenMasterInfo[];
+};
 
 export const getTokenAllowList = async function ({
   type = TokenFilterTypes.ALL,
@@ -41,7 +41,8 @@ export const getTokenAllowList = async function ({
     (token) => {
       const { chainId, tokenFeatures, ...tokenInfo } = token;
       return tokenInfo as TokenInfo;
-    });
+    },
+  );
 
   return {
     tokens: filteredTokenList,

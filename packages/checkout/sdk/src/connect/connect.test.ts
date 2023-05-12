@@ -5,8 +5,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
 import { checkIsWalletConnected, connectWalletProvider } from './connect';
-import { ConnectionProviders } from '../types';
-import { WALLET_ACTION } from '../types';
+import { ConnectionProviders, WALLET_ACTION } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 
 let windowSpy: any;
@@ -42,7 +41,7 @@ describe('connect', () => {
       // mock return array with active wallet address so we are connected
       providerRequestMock.mockResolvedValue(['0xmyWallet']);
       const checkConnection = await checkIsWalletConnected(
-        ConnectionProviders.METAMASK
+        ConnectionProviders.METAMASK,
       );
       expect(checkConnection.isConnected).toBe(true);
       expect(checkConnection.walletAddress).toBe('0xmyWallet');
@@ -52,7 +51,7 @@ describe('connect', () => {
       // mock return empty array of accounts so not connected
       providerRequestMock.mockResolvedValue([]);
       const checkConnection = await checkIsWalletConnected(
-        ConnectionProviders.METAMASK
+        ConnectionProviders.METAMASK,
       );
       expect(checkConnection.isConnected).toBe(false);
       expect(checkConnection.walletAddress).toBe('');
@@ -77,12 +76,12 @@ describe('connect', () => {
       await expect(
         connectWalletProvider({
           providerPreference: 'trust-wallet' as ConnectionProviders,
-        })
+        }),
       ).rejects.toThrow(
         new CheckoutError(
           'Provider preference is not supported',
-          CheckoutErrorType.CONNECT_PROVIDER_ERROR
-        )
+          CheckoutErrorType.CONNECT_PROVIDER_ERROR,
+        ),
       );
     });
 
@@ -94,12 +93,12 @@ describe('connect', () => {
       await expect(
         connectWalletProvider({
           providerPreference: ConnectionProviders.METAMASK,
-        })
+        }),
       ).rejects.toThrow(
         new CheckoutError(
           '[METAMASK_PROVIDER_ERROR] Cause:window.addEventListener is not a function',
-          CheckoutErrorType.METAMASK_PROVIDER_ERROR
-        )
+          CheckoutErrorType.METAMASK_PROVIDER_ERROR,
+        ),
       );
     });
 
@@ -112,12 +111,12 @@ describe('connect', () => {
       await expect(
         connectWalletProvider({
           providerPreference: ConnectionProviders.METAMASK,
-        })
+        }),
       ).rejects.toThrow(
         new CheckoutError(
           'No MetaMask provider installed.',
-          CheckoutErrorType.METAMASK_PROVIDER_ERROR
-        )
+          CheckoutErrorType.METAMASK_PROVIDER_ERROR,
+        ),
       );
     });
 
@@ -134,12 +133,12 @@ describe('connect', () => {
       await expect(
         connectWalletProvider({
           providerPreference: ConnectionProviders.METAMASK,
-        })
+        }),
       ).rejects.toThrow(
         new CheckoutError(
           '[USER_REJECTED_REQUEST_ERROR] Cause:User rejected request',
-          CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
-        )
+          CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
+        ),
       );
     });
   });

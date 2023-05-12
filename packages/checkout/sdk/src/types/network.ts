@@ -8,7 +8,7 @@ export enum ChainId {
   ETHEREUM = 1,
   SEPOLIA = 11155111,
   IMTBL_ZKEVM_DEVNET = 13373,
-  IMTBL_ZKEVM_TESTNET = 13372, //to be used in prod config for testnet launch
+  IMTBL_ZKEVM_TESTNET = 13372, // to be used in prod config for testnet launch
 }
 
 /**
@@ -50,8 +50,8 @@ export type NetworkMap = Map<ChainId, NetworkDetails>;
  * Object mapping the list of supported production networks with the corresponding network details.
  */
 export const ProductionChainIdNetworkMap: NetworkMap = new Map<
-  ChainId,
-  NetworkDetails
+ChainId,
+NetworkDetails
 >([
   [
     ChainId.ETHEREUM,
@@ -86,8 +86,8 @@ export const ProductionChainIdNetworkMap: NetworkMap = new Map<
  * Object mapping the list of supported sandbox networks with the corresponding network details.
  */
 export const SandboxChainIdNetworkMap: NetworkMap = new Map<
-  ChainId,
-  NetworkDetails
+ChainId,
+NetworkDetails
 >([
   [
     ChainId.SEPOLIA,
@@ -106,7 +106,7 @@ export const SandboxChainIdNetworkMap: NetworkMap = new Map<
   [
     ChainId.IMTBL_ZKEVM_DEVNET,
     {
-      chainIdHex: '0x343D', //13373
+      chainIdHex: '0x343D', // 13373
       chainName: 'Immutable zkEVM Devnet',
       rpcUrls: ['https://zkevm-rpc.dev.x.immutable.com/'],
       nativeCurrency: {

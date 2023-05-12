@@ -3,6 +3,8 @@
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 import {
   getNetworkAllowList,
   getNetworkInfo,
@@ -17,9 +19,7 @@ import {
 } from '../types';
 import { connectWalletProvider } from '../connect';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutConfiguration } from '../config';
-import { Environment } from '@imtbl/config';
 
 let windowSpy: any;
 const providerMock = {
@@ -82,7 +82,7 @@ describe('network functions', () => {
         testCheckoutConfiguration,
         ConnectionProviders.METAMASK,
         provider,
-        ChainId.ETHEREUM
+        ChainId.ETHEREUM,
       );
 
       expect(provider.provider.request).toBeCalledWith({
@@ -126,7 +126,7 @@ describe('network functions', () => {
         testCheckoutConfiguration,
         ConnectionProviders.METAMASK,
         provider,
-        ChainId.IMTBL_ZKEVM_TESTNET
+        ChainId.IMTBL_ZKEVM_TESTNET,
       );
 
       expect(provider.provider.request).toBeCalledWith({
@@ -134,7 +134,7 @@ describe('network functions', () => {
         params: [
           {
             chainId: testCheckoutConfiguration.networkMap.get(
-              ChainId.IMTBL_ZKEVM_TESTNET
+              ChainId.IMTBL_ZKEVM_TESTNET,
             )?.chainIdHex,
           },
         ],
@@ -165,13 +165,13 @@ describe('network functions', () => {
           testCheckoutConfiguration,
           ConnectionProviders.METAMASK,
           provider,
-          56 as ChainId
-        )
+          56 as ChainId,
+        ),
       ).rejects.toThrow(
         new CheckoutError(
           'Chain:56 is not a supported chain',
-          CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR
-        )
+          CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
+        ),
       );
     });
 
@@ -200,13 +200,13 @@ describe('network functions', () => {
           testCheckoutConfiguration,
           ConnectionProviders.METAMASK,
           provider,
-          ChainId.IMTBL_ZKEVM_TESTNET
-        )
+          ChainId.IMTBL_ZKEVM_TESTNET,
+        ),
       ).rejects.toThrow(
         new CheckoutError(
           'User cancelled switch network request',
-          CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
-        )
+          CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
+        ),
       );
     });
 
@@ -230,13 +230,13 @@ describe('network functions', () => {
           testCheckoutConfiguration,
           ConnectionProviders.METAMASK,
           provider,
-          ChainId.IMTBL_ZKEVM_TESTNET
-        )
+          ChainId.IMTBL_ZKEVM_TESTNET,
+        ),
       ).rejects.toThrow(
         new CheckoutError(
           'Incompatible provider',
-          CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
-        )
+          CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
+        ),
       );
     });
 
@@ -266,7 +266,7 @@ describe('network functions', () => {
         testCheckoutConfiguration,
         ConnectionProviders.METAMASK,
         provider,
-        ChainId.IMTBL_ZKEVM_TESTNET
+        ChainId.IMTBL_ZKEVM_TESTNET,
       );
 
       expect(provider.provider.request).toHaveBeenCalledWith({
@@ -274,19 +274,19 @@ describe('network functions', () => {
         params: [
           {
             chainId: testCheckoutConfiguration.networkMap.get(
-              ChainId.IMTBL_ZKEVM_TESTNET
+              ChainId.IMTBL_ZKEVM_TESTNET,
             )?.chainIdHex,
             chainName: testCheckoutConfiguration.networkMap.get(
-              ChainId.IMTBL_ZKEVM_TESTNET
+              ChainId.IMTBL_ZKEVM_TESTNET,
             )?.chainName,
             rpcUrls: testCheckoutConfiguration.networkMap.get(
-              ChainId.IMTBL_ZKEVM_TESTNET
+              ChainId.IMTBL_ZKEVM_TESTNET,
             )?.rpcUrls,
             nativeCurrency: testCheckoutConfiguration.networkMap.get(
-              ChainId.IMTBL_ZKEVM_TESTNET
+              ChainId.IMTBL_ZKEVM_TESTNET,
             )?.nativeCurrency,
             blockExplorerUrls: testCheckoutConfiguration.networkMap.get(
-              ChainId.IMTBL_ZKEVM_TESTNET
+              ChainId.IMTBL_ZKEVM_TESTNET,
             )?.blockExplorerUrls,
           },
         ],
@@ -317,19 +317,19 @@ describe('network functions', () => {
         };
         const result = await getNetworkInfo(
           testCheckoutConfiguration,
-          mockProvider as unknown as Web3Provider
+          mockProvider as unknown as Web3Provider,
         );
         expect(result.name).toBe(
-          ProductionChainIdNetworkMap.get(testCase.chainId)?.chainName
+          ProductionChainIdNetworkMap.get(testCase.chainId)?.chainName,
         );
         expect(result.chainId).toBe(
           parseInt(
             ProductionChainIdNetworkMap.get(testCase.chainId)?.chainIdHex ?? '',
-            16
-          )
+            16,
+          ),
         );
         expect(result.nativeCurrency).toEqual(
-          ProductionChainIdNetworkMap.get(testCase.chainId)?.nativeCurrency
+          ProductionChainIdNetworkMap.get(testCase.chainId)?.nativeCurrency,
         );
       });
     });
@@ -344,7 +344,7 @@ describe('network functions', () => {
       };
       const result = await getNetworkInfo(
         testCheckoutConfiguration,
-        mockProvider as unknown as Web3Provider
+        mockProvider as unknown as Web3Provider,
       );
       expect(result).toEqual({
         chainId: 3,
@@ -359,7 +359,7 @@ describe('network functions', () => {
       await expect(
         await getNetworkAllowList(testCheckoutConfiguration, {
           type: NetworkFilterTypes.ALL,
-        })
+        }),
       ).toEqual({
         networks: [
           {
@@ -391,7 +391,7 @@ describe('network functions', () => {
         await getNetworkAllowList(testCheckoutConfiguration, {
           type: NetworkFilterTypes.ALL,
           exclude: [{ chainId: 13372 }],
-        })
+        }),
       ).toEqual({
         networks: [
           {

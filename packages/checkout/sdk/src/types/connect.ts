@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { NetworkInfo } from '../types';
+import { NetworkInfo } from '.';
 
 /**
  * Enum representing the list of default supported providers.

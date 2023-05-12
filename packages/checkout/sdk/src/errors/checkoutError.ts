@@ -35,12 +35,15 @@ export type ErrorType = {
  */
 export class CheckoutError extends Error {
   public message: string;
+
   public type: CheckoutErrorType;
+
   public data?: { [key: string]: string };
+
   constructor(
     message: string,
     type: CheckoutErrorType,
-    data?: { [key: string]: string }
+    data?: { [key: string]: string },
   ) {
     super(message);
     this.message = message;
@@ -63,6 +66,7 @@ export enum CheckoutInternalErrorType {
  */
 export class CheckoutInternalError extends Error {
   public type: CheckoutInternalErrorType;
+
   constructor(type: CheckoutInternalErrorType) {
     super('Checkout internal error');
     this.type = type;
@@ -78,7 +82,7 @@ export class CheckoutInternalError extends Error {
  */
 export const withCheckoutError = async <T>(
   fn: () => Promise<T>,
-  customError: ErrorType
+  customError: ErrorType,
 ): Promise<T> => {
   try {
     return await fn();
