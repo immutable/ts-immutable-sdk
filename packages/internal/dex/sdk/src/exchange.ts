@@ -21,7 +21,7 @@ import { QuoteResponse, TransactionResponse } from './types';
 import { createSwapParameters } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 import { constructQuoteWithSlippage } from './lib/transactionUtils/constructQuoteWithSlippage';
-import { Fee } from 'lib/estimation';
+import { Fee, estimateIntermediateSwapFees } from 'lib/estimation';
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;
@@ -111,6 +111,8 @@ export class Exchange {
       };
     }
 
+    const estimatedProtocolFee = estimateIntermediateSwapFees(routeAndQuote);
+
     const params: MethodParameters = await createSwapParameters(
       routeAndQuote.trade,
       fromAddress,
@@ -138,6 +140,7 @@ export class Exchange {
         quote: quoteInfo.quote,
         quoteWithMaxSlippage: quoteInfo.quoteWithMaxSlippage,
         slippage: `${slippagePercent.toSignificant()}%`,
+        estimatedProtocolFee: estimatedProtocolFee,
       },
     };
   }

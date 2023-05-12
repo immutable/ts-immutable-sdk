@@ -97,3 +97,22 @@ export const tokenInfoToUniswapToken = (tokenInfos: TokenInfo[]): Token[] => {
 
   return tokens;
 };
+
+export function convertTokenDecimalsToWei(
+  amount: ethers.BigNumber,
+  decimals: number
+): ethers.BigNumber {
+  // const amountWei = ethers.utils.parseUnits(amount.toString(), decimals);
+  const factor = ethers.BigNumber.from(10).pow(18 - decimals);
+  const amountWei = amount.mul(factor);
+  return amountWei;
+}
+
+export function convertWeiToTokenDecimals(
+  amount: ethers.BigNumber,
+  decimals: number
+): ethers.BigNumber {
+  const factor = ethers.BigNumber.from(10).pow(18 - decimals);
+  const amountToken = amount.div(factor);
+  return amountToken;
+}

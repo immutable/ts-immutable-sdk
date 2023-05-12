@@ -8,13 +8,8 @@ import {
 import { ethers } from 'ethers';
 import { hexDataSlice } from 'ethers/lib/utils';
 import JSBI from 'jsbi';
-import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
-import {
-  ExchangeModuleConfiguration,
-  QuoteTradeInfo,
-  Router,
-  TradeInfo,
-} from '../lib';
+import { FeeAmount, Pool, Route, TickMath } from '@uniswap/v3-sdk';
+import { ExchangeModuleConfiguration, QuoteTradeInfo, Router } from '../lib';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 
 export const testChainId: number = 1;
@@ -282,3 +277,30 @@ export function mockRouterImplementation(
     };
   });
 }
+
+export const randomAddress = () => {
+  return (
+    '0x' +
+    [...Array(40)]
+      .map(() => Math.floor(Math.random() * 16).toString(16))
+      .join('')
+  );
+};
+
+export const generatePool = (
+  token0?: Token,
+  token1?: Token,
+  fee?: FeeAmount
+): Pool => {
+  const arbitraryTick = 100;
+  const arbitraryLiquidity = 10;
+  const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
+  return new Pool(
+    token0 || USDC_TEST_CHAIN,
+    token1 || WETH_TEST_CHAIN,
+    fee || FeeAmount.HIGH,
+    sqrtPriceAtTick,
+    arbitraryLiquidity,
+    arbitraryTick
+  );
+};

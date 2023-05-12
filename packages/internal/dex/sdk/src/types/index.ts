@@ -34,6 +34,7 @@ export type TradeInfo = {
   quote: Amount;
   quoteWithMaxSlippage: Amount;
   slippage: string;
+  estimatedProtocolFee: ethers.BigNumber;
 };
 
 export type TransactionResponse =

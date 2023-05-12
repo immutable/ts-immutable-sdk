@@ -1,6 +1,7 @@
 import { Pool } from '@uniswap/v3-sdk';
 import { ethers } from 'ethers';
 import { getTokenAmounts } from './estimation';
+import { convertTokenDecimalsToWei } from './utils';
 
 export function getXAndY(pool: Pool): [ethers.BigNumber, ethers.BigNumber] {
   let sqrtRatioX96 = pool.sqrtRatioX96;
@@ -16,7 +17,13 @@ export function getXAndY(pool: Pool): [ethers.BigNumber, ethers.BigNumber] {
     pool.token0.decimals,
     pool.token1.decimals
   );
-  const x: ethers.BigNumber = amount0;
-  const y: ethers.BigNumber = amount1;
+  const x: ethers.BigNumber = convertTokenDecimalsToWei(
+    amount0,
+    pool.token0.decimals
+  );
+  const y: ethers.BigNumber = convertTokenDecimalsToWei(
+    amount1,
+    pool.token1.decimals
+  );
   return [x, y];
 }

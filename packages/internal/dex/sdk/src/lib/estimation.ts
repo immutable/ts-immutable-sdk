@@ -1,9 +1,18 @@
 import { ethers } from 'ethers';
 import JSBI from 'jsbi';
-import { QuoteResponse } from 'lib';
+import {
+  QuoteResponse,
+  convertTokenDecimalsToWei,
+  convertWeiToTokenDecimals,
+} from 'lib';
 import { Pool, TickMath } from '@uniswap/v3-sdk';
 import { Currency, Percent } from '@uniswap/sdk-core';
 import { getXAndY } from './temp';
+
+export type Fee = {
+  token: Currency;
+  amount: ethers.BigNumber;
+};
 
 export function getTokenAmounts(
   liquidity: JSBI,
@@ -65,16 +74,11 @@ function getSwapFee(amount: ethers.BigNumber, fee: number): ethers.BigNumber {
   return feeAmount;
 }
 
-export type Fee = {
-  token: Currency;
-  amount: ethers.BigNumber;
-};
-
 export const estimateIntermediateSwapFees = (
   routeAndQuote: QuoteResponse
-): Fee[] => {
+): ethers.BigNumber => {
   if (!routeAndQuote.trade) {
-    return [];
+    return ethers.BigNumber.from(0);
   }
 
   const pools: Pool[] = routeAndQuote.trade.route.pools;
@@ -85,21 +89,22 @@ export const estimateIntermediateSwapFees = (
     ethers.BigNumber.from(routeAndQuote.trade.amountIn),
     pools[0].fee
   );
-  let previousAmountOut: ethers.BigNumber = ethers.BigNumber.from(
-    routeAndQuote.trade.amountIn
-  ).sub(feeAmount);
+  let previousAmountOut: ethers.BigNumber = convertTokenDecimalsToWei(
+    ethers.BigNumber.from(routeAndQuote.trade.amountIn).sub(feeAmount),
+    routeAndQuote.trade.tokenIn.decimals
+  );
 
   // First fee paid is the overal input token
   fees.push({
     token: routeAndQuote.trade.tokenIn,
-    amount: feeAmount,
+    amount: convertTokenDecimalsToWei(
+      feeAmount,
+      routeAndQuote.trade.tokenIn.decimals
+    ),
   });
 
-  const [x, y] = getXAndY(pools[0]);
-  console.log(x.toString(), y.toString());
-
   if (pools.length == 1) {
-    return fees;
+    return convertWeiToTokenDecimals(fees[0].amount, fees[0].token.decimals);
   }
 
   // nextTokenIn is the Token that is to be swapped in to the next intermediate swap.
@@ -140,7 +145,6 @@ export const estimateIntermediateSwapFees = (
       amount: feeAmount,
     });
   }
-  // TODO currently just returning all fees, not aggregated. Should roll up into the first input token and return both.
 
   // FUN -> USDC -> WETH -> IMX
   // 1. sum = USDC value of WETH fees
@@ -164,10 +168,11 @@ export const estimateIntermediateSwapFees = (
       poolBefore.token1.address.toLowerCase()
     ) {
       // Token that fees were paid in is token1, find out how much that is worth in token0
+      // But first, convert token into wei.
       sum = x.mul(fees[i].amount.add(sum)).div(y);
     }
   }
   sum = sum.add(fees[0].amount);
-
-  return fees;
+  sum = convertWeiToTokenDecimals(sum, fees[0].token.decimals);
+  return sum;
 };
