@@ -1,17 +1,17 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutWidgetsConfig } from './definitions/config';
 import { CheckoutWidgetTagNames } from './definitions/constants';
-import { Web3Provider } from '@ethersproject/providers';
 
 /**
  * CheckoutWidgets allows to inject the Checkout Widgets into your application.
  * @param {CheckoutWidgetsConfig|undefined} config - Checkout Widget global configurations.
  */
 export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
-  var checkoutWidgetJS = document.createElement('script');
+  const checkoutWidgetJS = document.createElement('script');
 
   checkoutWidgetJS.setAttribute(
     'src',
-    'http://localhost:3000/lib/js/imtbl-checkout.js'
+    'http://localhost:3000/lib/js/imtbl-checkout.js',
   );
 
   document.head.appendChild(checkoutWidgetJS);
@@ -33,7 +33,7 @@ export function UpdateConfig(config: CheckoutWidgetsConfig) {
  */
 export function SetProvider(
   tagName: CheckoutWidgetTagNames,
-  provider: Web3Provider | null
+  provider: Web3Provider | null,
 ) {
   if (!provider) {
     console.error('no provider parsed');

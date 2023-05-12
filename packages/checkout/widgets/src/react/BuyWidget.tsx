@@ -1,10 +1,10 @@
 import React from 'react';
 
+import { Environment } from '@imtbl/config';
 import {
   WidgetConnectionProviders,
   WidgetTheme,
 } from '../definitions/constants';
-import { Environment } from '@imtbl/config';
 
 /**
  * Interface representing the props for the Buy Widget component.
@@ -34,6 +34,6 @@ export function BuyReact(props: BuyReactProps): JSX.Element {
       }
       theme={config.theme ?? WidgetTheme.DARK}
       orderId={orderId}
-    ></imtbl-buy>
+    />
   );
 }

@@ -1,10 +1,10 @@
 import React from 'react';
 
+import { Environment } from '@imtbl/config';
 import {
   WidgetConnectionProviders,
   WidgetTheme,
 } from '../definitions/constants';
-import { Environment } from '@imtbl/config';
 
 /**
  * Interface representing the props for the Connect Widget component.
@@ -31,6 +31,6 @@ export function ConnectReact(props: ConnectReactProps): JSX.Element {
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }
       theme={config.theme ?? WidgetTheme.DARK}
-    ></imtbl-connect>
+    />
   );
 }
