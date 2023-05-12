@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
-import HttpClient from '../HttpClient';
+import { HttpClient } from '../HttpClient';
 import { InventoryItem } from '../types';
 
 // TODO: Use generated types
@@ -21,14 +22,14 @@ type GetItemsInput = {
 // TODO: Read from .env
 // FIXME: target https://api.dev.games.immutable.com/inventory/swagger/index.html#/root/post_craft
 // const defaultBaseURL = 'https://api.sandbox.games.immutable.com/inventory';
-const defaultBaseURL = 'http://127.0.0.1:3031/crafting';
+const defaultBaseURL = 'http://127.0.0.1:3031/inventory';
 
 export class InventoryService {
   private httpClient: HttpClient;
 
   constructor(
     httpClientOrBaseUrl: HttpClient | string = defaultBaseURL,
-    defaultHeaders: Record<string, string> = {}
+    defaultHeaders: Record<string, string> = {},
   ) {
     if (httpClientOrBaseUrl instanceof HttpClient) {
       this.httpClient = httpClientOrBaseUrl;
@@ -38,7 +39,7 @@ export class InventoryService {
   }
 
   public async getItems(
-    input: GetItemsInput
+    input: GetItemsInput,
   ): Promise<AxiosResponse<GetItemsOutput>> {
     const url = `/v1/${input.gameId}/items`;
     const config: AxiosRequestConfig = {
@@ -46,7 +47,7 @@ export class InventoryService {
     };
     return this.httpClient.get<GetItemsOutput>(
       `${url}?owner=${input.userId}`,
-      config
+      config,
     );
   }
 }

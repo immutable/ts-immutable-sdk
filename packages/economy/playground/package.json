@@ -8,6 +8,7 @@
     "@imtbl/economy": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/provider": "0.0.0",
+    "buffer": "^5.5.0",
     "lit": "^2.7.2"
   },
   "devDependencies": {

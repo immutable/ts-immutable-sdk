@@ -1,5 +1,4 @@
-import type { EventData, EventType } from '../types';
-import { asyncFn } from '../utils';
+import type { EventType } from '../types';
 import { withSDKError } from '../Errors';
 
 import { InventoryService } from './InventoryService';
@@ -15,12 +14,10 @@ export type InventoryEvent = EventType<'INVENTORY'>;
 export type InventoryStatus = InventoryEvent['status'];
 
 export class Inventory {
-  private emitEvent: (event: InventoryEvent) => void;
   private inventoryService: InventoryService;
 
-  constructor(emitEvent: (event: InventoryEvent) => void) {
-    this.emitEvent = emitEvent;
-    // FIXME: make injectable
+  // FIXME: make injectable
+  constructor() {
     this.inventoryService = new InventoryService();
   }
 
