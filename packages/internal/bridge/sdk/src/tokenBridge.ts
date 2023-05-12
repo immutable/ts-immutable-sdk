@@ -306,7 +306,7 @@ export class TokenBridge {
   public async waitForDeposit(
     req: WaitForRequest,
   ): Promise<WaitForResponse> {
-    const rootTxReceipt: ethers.providers.TransactionReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(async () => this.config.rootProvider.waitForTransaction(req.transactionHash, 3), BridgeErrorType.PROVIDER_ERROR);
+    const rootTxReceipt: ethers.providers.TransactionReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(async () => this.config.rootProvider.waitForTransaction(req.transactionHash, this.config.rootChainFinalityBlocks), BridgeErrorType.PROVIDER_ERROR);
 
     // Throw an error if the transaction was reverted
     if (rootTxReceipt.status !== 1) {

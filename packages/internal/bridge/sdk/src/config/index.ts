@@ -61,6 +61,7 @@ export class BridgeConfiguration {
    * @property {number} pollInterval - The time to wait between polls to the blockchain
    * @property {number} maxDepositBlockDelay - The maximum number of blocks it should take on child chain for deposit to be observed
    * @property {number} clockInaccuracy - The maximum number of seconds of inaccuracy of blockchain timestamps
+   * @property {number} rootChainFinalityBlocks - The number of blocks to wait for on the rootchain before accepting finality
   */
   public baseConfig: ImmutableConfiguration;
 
@@ -79,6 +80,8 @@ export class BridgeConfiguration {
   public maxDepositBlockDelay: number;
 
   public clockInaccuracy: number;
+
+  public rootChainFinalityBlocks: number;
 
   /**
    * Constructs a BridgeConfiguration instance.
@@ -105,6 +108,8 @@ export class BridgeConfiguration {
     this.maxDepositBlockDelay = 250;
     // Assume that the clock timestamp is at most 900 seconds inaccurate, see for more -> https://github.com/ethereum/wiki/blob/c02254611f218f43cbb07517ca8e5d00fd6d6d75/Block-Protocol-2.0.md
     this.clockInaccuracy = 900;
+    // How many blocks to wait for on the root chain before accepting rootchain finality
+    this.rootChainFinalityBlocks = 3;
 
     if (overrides) {
       this.bridgeContracts = overrides.bridgeContracts;
