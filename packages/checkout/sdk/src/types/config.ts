@@ -1,6 +1,6 @@
 import { Environment, ModuleConfiguration } from '@imtbl/config';
 
-export const SandboxConfiguration = {
+export const SANDBOX_CONFIGURATION = {
   baseConfig: {
     environment: Environment.SANDBOX,
   },

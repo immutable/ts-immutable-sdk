@@ -1,7 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { CheckoutConfigurtionError } from './config';
 import { Checkout } from '../Checkout';
-import { CheckoutModuleConfiguration, ProductionChainIdNetworkMap, SandboxChainIdNetworkMap } from '../types';
+import { CheckoutModuleConfiguration, PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP } from '../types';
 
 describe('CheckoutConfiguration class', () => {
   it('should set the environment in the constructor to SANDBOX or PRODUCTION', () => {
@@ -24,7 +24,7 @@ describe('CheckoutConfiguration class', () => {
 
     const checkoutProd = new Checkout(productionConfig);
     expect(checkoutProd).toBeInstanceOf(Checkout);
-    expect(checkoutProd.config.networkMap).toBe(ProductionChainIdNetworkMap);
+    expect(checkoutProd.config.networkMap).toBe(PRODUCTION_CHAIN_ID_NETWORK_MAP);
 
     const sandboxConfig = {
       baseConfig: { environment: Environment.SANDBOX },
@@ -32,7 +32,7 @@ describe('CheckoutConfiguration class', () => {
 
     const checkoutSandbox = new Checkout(sandboxConfig);
     expect(checkoutSandbox).toBeInstanceOf(Checkout);
-    expect(checkoutSandbox.config.networkMap).toBe(SandboxChainIdNetworkMap);
+    expect(checkoutSandbox.config.networkMap).toBe(SANDBOX_CHAIN_ID_NETWORK_MAP);
   });
 
   it('should throw an error when environment is misconfigured', () => {

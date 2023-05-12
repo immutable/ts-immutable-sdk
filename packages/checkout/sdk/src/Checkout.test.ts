@@ -8,7 +8,7 @@ import { getNetworkInfo, switchWalletNetwork } from './network';
 
 import { Checkout } from './Checkout';
 import {
-  ChainId, ConnectionProviders, GetBalanceParams, ProductionChainIdNetworkMap,
+  ChainId, ConnectionProviders, GetBalanceParams,
 } from './types';
 import { getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';

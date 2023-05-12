@@ -76,7 +76,8 @@ export class CheckoutInternalError extends Error {
 /**
  * Higher order function that takes in a function and an error object.
  * Returns the result of the function or throws a custom {@link CheckoutError}.
- * If the error thrown by the function is an instance of {@link CheckoutError}, it throws a new {@link CheckoutError} based on the custom error object.
+ * If the error thrown by the function is an instance of {@link CheckoutError},
+ * it throws a new {@link CheckoutError} based on the custom error object.
  * Otherwise, it throws a new {@link CheckoutError} based on the custom error object with the cause of the error appended to the message.
  * @throws {@link CheckoutError}
  */

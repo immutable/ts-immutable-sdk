@@ -1,7 +1,16 @@
 import { Environment } from '@imtbl/config';
 import {
-  CheckoutModuleConfiguration, NetworkMap, ProductionChainIdNetworkMap, SandboxChainIdNetworkMap,
+  CheckoutModuleConfiguration, NetworkMap, PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP,
 } from '../types';
+
+export class CheckoutConfigurtionError extends Error {
+  public message: string;
+
+  constructor(message: string) {
+    super(message);
+    this.message = message;
+  }
+}
 
 export class CheckoutConfiguration {
   readonly environment: Environment;
@@ -15,16 +24,7 @@ export class CheckoutConfiguration {
     }
     this.environment = config.baseConfig.environment;
     this.networkMap = config.baseConfig.environment === Environment.PRODUCTION
-      ? ProductionChainIdNetworkMap
-      : SandboxChainIdNetworkMap;
-  }
-}
-
-export class CheckoutConfigurtionError extends Error {
-  public message: string;
-
-  constructor(message: string) {
-    super(message);
-    this.message = message;
+      ? PRODUCTION_CHAIN_ID_NETWORK_MAP
+      : SANDBOX_CHAIN_ID_NETWORK_MAP;
   }
 }

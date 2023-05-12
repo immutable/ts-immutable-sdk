@@ -5,7 +5,6 @@ import {
   ERC20ABI,
   GetAllBalancesResult,
   GetBalanceResult,
-  NetworkMap,
   TokenFilterTypes,
   TokenInfo,
 } from '../types';

@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
 import { checkIsWalletConnected, connectWalletProvider } from './connect';
-import { ConnectionProviders, WALLET_ACTION } from '../types';
+import { ConnectionProviders, WalletAction } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 
 let windowSpy: any;
@@ -32,7 +32,7 @@ describe('connect', () => {
       providerRequestMock.mockResolvedValue([]);
       await checkIsWalletConnected(ConnectionProviders.METAMASK);
       expect(providerRequestMock).toBeCalledWith({
-        method: WALLET_ACTION.CHECK_CONNECTION,
+        method: WalletAction.CHECK_CONNECTION,
         params: [],
       });
     });
@@ -67,7 +67,7 @@ describe('connect', () => {
       expect(connRes).toBeInstanceOf(Web3Provider);
       expect(connRes?.provider).not.toBe(null);
       expect(connRes?.provider.request).toBeCalledWith({
-        method: WALLET_ACTION.CONNECT,
+        method: WalletAction.CONNECT,
         params: [],
       });
     });

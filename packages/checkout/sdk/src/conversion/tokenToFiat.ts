@@ -13,9 +13,7 @@ import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 export const fetchTokenIds = async (tokens: TokenInfo[]) => {
   const coinListApi = 'https://api.coingecko.com/api/v3/coins/list';
   const tokenSymbols = tokens.map((token) => token.symbol.toLowerCase());
-  let res;
-
-  res = await withCheckoutError(async () => await (await fetch(coinListApi)).json(), {
+  const res = await withCheckoutError(async () => await (await fetch(coinListApi)).json(), {
     type: CheckoutErrorType.FIAT_CONVERSION_ERROR,
   });
 
@@ -42,6 +40,7 @@ export const fetchQuotesFromCoinGecko = async (
 ): Promise<FetchQuotesResult> => {
   const tokenIds: { [key: string]: string } = await fetchTokenIds(tokens);
   const idsString = Object.keys(tokenIds).join(',');
+  // eslint-disable-next-line max-len
   const quoteApi = `https://api.coingecko.com/api/v3/simple/price?ids=${idsString}&precision=full&vs_currencies=${fiatSymbol}&include_last_updated_at=true`;
   const { data } = await withCheckoutError(
     async () => await (await fetch(quoteApi)).json(),

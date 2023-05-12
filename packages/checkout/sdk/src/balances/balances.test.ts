@@ -8,7 +8,6 @@ import {
   GetAllBalancesResult,
   GetTokenAllowListResult,
   NetworkInfo,
-  ProductionChainIdNetworkMap,
   TokenInfo,
 } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -18,6 +17,7 @@ import { CheckoutConfiguration } from '../config';
 jest.mock('../tokens');
 jest.mock('ethers', () => ({
   ...jest.requireActual('ethers'),
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Contract: jest.fn(),
 }));
 
@@ -60,6 +60,8 @@ describe('balances', () => {
     });
 
     it('should catch an error from getBalance() and throw a CheckoutError of type BalanceError', async () => {
+      // TODO: fix variable shadowing
+      // eslint-disable-next-line @typescript-eslint/no-shadow
       const mockProvider = jest.fn().mockImplementation(() => ({
         getBalance: jest
           .fn()
@@ -75,24 +77,29 @@ describe('balances', () => {
       );
     });
 
-    it('should throw a CheckoutError of type BalanceError with the right message if the current network is unsupported', async () => {
-      const mockProvider = jest.fn().mockImplementation(() => ({
-        getBalance: jest
-          .fn()
-          .mockRejectedValue(new Error('Error getting balance')),
-        getNetwork: jest.fn().mockResolvedValue({
-          chainId: 0,
-          name: 'homestead',
-        }),
-      }));
+    it(
+      'should throw a CheckoutError of type BalanceError with the right message if the current network is unsupported',
+      async () => {
+      // TODO: fix variable shadowing
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+        const mockProvider = jest.fn().mockImplementation(() => ({
+          getBalance: jest
+            .fn()
+            .mockRejectedValue(new Error('Error getting balance')),
+          getNetwork: jest.fn().mockResolvedValue({
+            chainId: 0,
+            name: 'homestead',
+          }),
+        }));
 
-      await expect(getBalance(testCheckoutConfig, mockProvider(), '0xAddress')).rejects.toThrow(
-        new CheckoutError(
-          '[GET_BALANCE_ERROR] Cause:Chain:0 is not a supported chain',
-          CheckoutErrorType.GET_BALANCE_ERROR,
-        ),
-      );
-    });
+        await expect(getBalance(testCheckoutConfig, mockProvider(), '0xAddress')).rejects.toThrow(
+          new CheckoutError(
+            '[GET_BALANCE_ERROR] Cause:Chain:0 is not a supported chain',
+            CheckoutErrorType.GET_BALANCE_ERROR,
+          ),
+        );
+      },
+    );
   });
 
   describe('getERC20Balance()', () => {
@@ -163,6 +170,8 @@ describe('balances', () => {
     it('should throw an error if the contract address is invalid', async () => {
       (Contract as unknown as jest.Mock).mockImplementation(() => {
         const contract = jest.requireActual('ethers').Contract;
+        // TODO: fix constructor naming
+        // eslint-disable-next-line new-cap
         return new contract(mockProvider(), JSON.stringify(ERC20ABI), null);
       });
 
@@ -170,6 +179,7 @@ describe('balances', () => {
         getERC20Balance(mockProvider(), 'abc123', '0x10c'),
       ).rejects.toThrow(
         new CheckoutError(
+          // eslint-disable-next-line max-len
           '[GET_ERC20_BALANCE_ERROR] Cause:invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)',
           CheckoutErrorType.GET_ERC20_BALANCE_ERROR,
         ),
@@ -184,7 +194,10 @@ describe('balances', () => {
     let nameMock: jest.Mock;
     let symbolMock: jest.Mock;
 
+    // TODO fix variable shadowing
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     let mockGetBalance: jest.Mock;
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     let mockGetNetwork: jest.Mock;
 
     let getTokenAllowListMock: jest.Mock;

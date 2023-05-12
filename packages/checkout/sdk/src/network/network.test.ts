@@ -12,10 +12,10 @@ import {
 } from './network';
 import {
   ChainId,
-  ProductionChainIdNetworkMap,
+  PRODUCTION_CHAIN_ID_NETWORK_MAP,
   ConnectionProviders,
   NetworkFilterTypes,
-  WALLET_ACTION,
+  WalletAction,
 } from '../types';
 import { connectWalletProvider } from '../connect';
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -45,6 +45,7 @@ const zkevmNetworkInfo = {
 };
 
 jest.mock('@ethersproject/providers', () => ({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Web3Provider: jest.fn(),
 }));
 
@@ -86,10 +87,10 @@ describe('network functions', () => {
       );
 
       expect(provider.provider.request).toBeCalledWith({
-        method: WALLET_ACTION.SWITCH_NETWORK,
+        method: WalletAction.SWITCH_NETWORK,
         params: [
           {
-            chainId: ProductionChainIdNetworkMap.get(ChainId.ETHEREUM)
+            chainId: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM)
               ?.chainIdHex,
           },
         ],
@@ -130,7 +131,7 @@ describe('network functions', () => {
       );
 
       expect(provider.provider.request).toBeCalledWith({
-        method: WALLET_ACTION.SWITCH_NETWORK,
+        method: WalletAction.SWITCH_NETWORK,
         params: [
           {
             chainId: testCheckoutConfiguration.networkMap.get(
@@ -270,7 +271,7 @@ describe('network functions', () => {
       );
 
       expect(provider.provider.request).toHaveBeenCalledWith({
-        method: WALLET_ACTION.ADD_NETWORK,
+        method: WalletAction.ADD_NETWORK,
         params: [
           {
             chainId: testCheckoutConfiguration.networkMap.get(
@@ -320,16 +321,16 @@ describe('network functions', () => {
           mockProvider as unknown as Web3Provider,
         );
         expect(result.name).toBe(
-          ProductionChainIdNetworkMap.get(testCase.chainId)?.chainName,
+          PRODUCTION_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainName,
         );
         expect(result.chainId).toBe(
           parseInt(
-            ProductionChainIdNetworkMap.get(testCase.chainId)?.chainIdHex ?? '',
+            PRODUCTION_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainIdHex ?? '',
             16,
           ),
         );
         expect(result.nativeCurrency).toEqual(
-          ProductionChainIdNetworkMap.get(testCase.chainId)?.nativeCurrency,
+          PRODUCTION_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.nativeCurrency,
         );
       });
     });

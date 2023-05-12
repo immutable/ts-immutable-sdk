@@ -23,7 +23,7 @@ import {
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   NetworkInfo,
-  SandboxConfiguration,
+  SANDBOX_CONFIGURATION,
   SendTransactionParams,
   SendTransactionResult,
   SwitchNetworkParams,
@@ -39,16 +39,18 @@ export class Checkout {
 
   private providerPreference: ConnectionProviders | undefined;
 
-  constructor(config: CheckoutModuleConfiguration = SandboxConfiguration) {
+  constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
   }
 
   /**
-   * Check if a wallet is connected to the current application without requesting permission from the wallet and hence triggering a connect popup.
+   * Check if a wallet is connected to the current application
+   * without requesting permission from the wallet and hence triggering a connect popup.
    * @param {CheckConnectionParams} params - The necessary data required to verify a wallet connection status.
    * @returns Wallet connection status details.
    * @throws {@link ErrorType}
    */
+  // eslint-disable-next-line class-methods-use-this
   public async checkIsWalletConnected(
     params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
@@ -97,7 +99,9 @@ export class Checkout {
   }
 
   /**
-   * Fetch the balance of the native token of the current connected network or, if a contract address is provided, it will return the balance of that ERC20 token. For example, if the wallet is connected to the Ethereum Mainnet then the function gets the wallet ETH L1 balance.
+   * Fetch the balance of the native token of the current connected network or,
+   * if a contract address is provided, it will return the balance of that ERC20 token. For example,
+   * if the wallet is connected to the Ethereum Mainnet then the function gets the wallet ETH L1 balance.
    * @param {GetBalanceParams} params - The necessary data required to fetch the wallet balance.
    * @returns Native token balance for the given wallet.
    * @throws {@link ErrorType}
@@ -118,7 +122,8 @@ export class Checkout {
   }
 
   /**
-   * Fetch all available balances (ERC20 & Native) of the current connected network of the given wallet. It will loop through the list of allowed tokens and check for balance on each one.
+   * Fetch all available balances (ERC20 & Native) of the current connected network of the given wallet.
+   * It will loop through the list of allowed tokens and check for balance on each one.
    * @param {GetAllBalancesParams} params - The necessary data required to fetch all the wallet balances.
    * @returns List of tokens balance for the given wallet.
    * @throws {@link ErrorType}
@@ -152,6 +157,7 @@ export class Checkout {
    * @returns List of allowed tokens.
    * @throws {@link ErrorType}
    */
+  // eslint-disable-next-line class-methods-use-this
   public async getTokenAllowList(
     params: GetTokenAllowListParams,
   ): Promise<GetTokenAllowListResult> {
@@ -164,6 +170,7 @@ export class Checkout {
    * @returns List of allowed wallets.
    * @throws {@link ErrorType}
    */
+  // eslint-disable-next-line class-methods-use-this
   public async getWalletAllowList(
     params: GetWalletAllowListParams,
   ): Promise<GetWalletAllowListResult> {
@@ -178,6 +185,7 @@ export class Checkout {
    * @remarks
    * Further documenation can be found at [MetaMask | Sending Transactions](https://docs.metamask.io/guide/sending-transactions.html).
    */
+  // eslint-disable-next-line class-methods-use-this
   public async sendTransaction(
     params: SendTransactionParams,
   ): Promise<SendTransactionResult> {

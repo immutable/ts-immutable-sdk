@@ -1,4 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
+// TODO: fix circular dependency
+// eslint-disable-next-line import/no-cycle
 import { TokenInfo } from './token';
 
 /**
@@ -49,7 +51,7 @@ export type NetworkMap = Map<ChainId, NetworkDetails>;
 /**
  * Object mapping the list of supported production networks with the corresponding network details.
  */
-export const ProductionChainIdNetworkMap: NetworkMap = new Map<
+export const PRODUCTION_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
 ChainId,
 NetworkDetails
 >([
@@ -85,7 +87,7 @@ NetworkDetails
 /**
  * Object mapping the list of supported sandbox networks with the corresponding network details.
  */
-export const SandboxChainIdNetworkMap: NetworkMap = new Map<
+export const SANDBOX_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
 ChainId,
 NetworkDetails
 >([

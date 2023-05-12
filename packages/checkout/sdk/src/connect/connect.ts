@@ -4,10 +4,44 @@ import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
 import {
   ConnectionProviders,
   ConnectParams,
-  WALLET_ACTION,
+  WalletAction,
   CheckConnectionResult,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
+
+async function getMetaMaskProvider(): Promise<Web3Provider> {
+  const provider = await withCheckoutError<ExternalProvider | null>(
+    async () => await detectEthereumProvider(),
+    { type: CheckoutErrorType.METAMASK_PROVIDER_ERROR },
+  );
+
+  if (!provider || !provider.request) {
+    throw new CheckoutError(
+      'No MetaMask provider installed.',
+      CheckoutErrorType.METAMASK_PROVIDER_ERROR,
+    );
+  }
+
+  return new Web3Provider(provider);
+}
+
+async function getWalletProviderForPreference(
+  providerPreference: ConnectionProviders,
+): Promise<Web3Provider> {
+  let web3Provider: Web3Provider | null = null;
+  switch (providerPreference) {
+    case ConnectionProviders.METAMASK: {
+      web3Provider = await getMetaMaskProvider();
+      break;
+    }
+    default:
+      throw new CheckoutError(
+        'Provider preference is not supported',
+        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR,
+      );
+  }
+  return web3Provider;
+}
 
 export async function checkIsWalletConnected(
   providerPreference: ConnectionProviders,
@@ -25,7 +59,7 @@ export async function checkIsWalletConnected(
   let accounts = [];
   try {
     accounts = await provider.provider.request({
-      method: WALLET_ACTION.CHECK_CONNECTION,
+      method: WalletAction.CHECK_CONNECTION,
       params: [],
     });
   } catch (err: any) {
@@ -33,7 +67,7 @@ export async function checkIsWalletConnected(
       'Check wallet connection request failed',
       CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR,
       {
-        rpcMethod: WALLET_ACTION.CHECK_CONNECTION,
+        rpcMethod: WalletAction.CHECK_CONNECTION,
       },
     );
   }
@@ -63,7 +97,7 @@ export async function connectWalletProvider(
       }
       // this makes the request to the wallet to connect i.e request eth accounts ('eth_requestAccounts')
       await web3Provider.provider.request({
-        method: WALLET_ACTION.CONNECT,
+        method: WalletAction.CONNECT,
         params: [],
       });
     },
@@ -71,38 +105,4 @@ export async function connectWalletProvider(
   );
 
   return web3Provider;
-}
-
-async function getWalletProviderForPreference(
-  providerPreference: ConnectionProviders,
-): Promise<Web3Provider> {
-  let web3Provider: Web3Provider | null = null;
-  switch (providerPreference) {
-    case ConnectionProviders.METAMASK: {
-      web3Provider = await getMetaMaskProvider();
-      break;
-    }
-    default:
-      throw new CheckoutError(
-        'Provider preference is not supported',
-        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR,
-      );
-  }
-  return web3Provider;
-}
-
-async function getMetaMaskProvider(): Promise<Web3Provider> {
-  const provider = await withCheckoutError<ExternalProvider | null>(
-    async () => await detectEthereumProvider(),
-    { type: CheckoutErrorType.METAMASK_PROVIDER_ERROR },
-  );
-
-  if (!provider || !provider.request) {
-    throw new CheckoutError(
-      'No MetaMask provider installed.',
-      CheckoutErrorType.METAMASK_PROVIDER_ERROR,
-    );
-  }
-
-  return new Web3Provider(provider);
 }
