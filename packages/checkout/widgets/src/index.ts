@@ -1,3 +1,7 @@
+// NOTE you might not need to import the global types
+// https://www.typescriptlang.org/docs/handbook/declaration-files/templates/global-d-ts.html
+// TODO: circular dependency
+// eslint-disable-next-line import/no-cycle, @typescript-eslint/no-unused-vars
 import * as _ from '../global';
 
 // Definitions | Events

@@ -24,11 +24,11 @@
       {
         "selector": "variable",
         "types": ["function"],
-        "format": ["camelCase"]
+        "format": ["camelCase", "PascalCase"]
       },
       {
         "selector": "function",
-        "format": ["camelCase"]
+        "format": ["camelCase", "PascalCase"]
       },
       {
         "selector": "parameter",
@@ -72,6 +72,7 @@
       "WithStatement"
     ],
     "import/no-extraneous-dependencies": ["off"],
-    "@typescript-eslint/return-await": ["off"]
+    "@typescript-eslint/return-await": ["off"],
+    "react/require-default-props": ["off"]
   }
 }

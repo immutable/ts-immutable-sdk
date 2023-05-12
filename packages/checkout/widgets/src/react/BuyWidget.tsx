@@ -8,7 +8,8 @@ import {
 
 /**
  * Interface representing the props for the Buy Widget component.
- * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Buy Widget (default: {@link WidgetConnectionProviders.METAMASK}).
+ * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Buy Widget
+ * (default: {@link WidgetConnectionProviders.METAMASK}).
  * @property {string} orderId - The ID that identifies the open buy order associated to the assets to buy.
  */
 export interface BuyReactProps {

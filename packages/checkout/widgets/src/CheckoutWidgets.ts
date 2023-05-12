@@ -36,6 +36,7 @@ export function SetProvider(
   provider: Web3Provider | null,
 ) {
   if (!provider) {
+    // eslint-disable-next-line no-console
     console.error('no provider parsed');
     return;
   }
@@ -55,6 +56,7 @@ export function SetProvider(
       attempts++;
       if (attempts >= maxAttempts) {
         window.clearInterval(timer);
+        // eslint-disable-next-line no-console
         console.error('failed to set the provider');
       }
     }

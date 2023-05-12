@@ -8,7 +8,8 @@ import {
 
 /**
  * Interface representing the props for the Wallet Widget component.
- * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Wallet Widget (default: {@link WidgetConnectionProviders.METAMASK}).
+ * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Wallet Widget
+ * (default: {@link WidgetConnectionProviders.METAMASK}).
  */
 export interface WalletReactProps {
   providerPreference?: WidgetConnectionProviders;

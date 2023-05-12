@@ -8,7 +8,8 @@ import {
 
 /**
  * Interface representing the props for the Connect Widget component.
- * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Connect Widget (default: {@link WidgetConnectionProviders.METAMASK}).
+ * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Connect Widget
+ * (default: {@link WidgetConnectionProviders.METAMASK}).
  */
 export interface ConnectReactProps {
   providerPreference?: WidgetConnectionProviders;

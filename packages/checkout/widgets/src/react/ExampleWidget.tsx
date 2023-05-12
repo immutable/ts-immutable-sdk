@@ -24,6 +24,7 @@ export interface ExampleReactProps {
  */
 export function ExampleReact(props: ExampleReactProps) {
   const {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     providerPreference, fromContractAddress, amount, fromNetwork,
   } = props;
 
