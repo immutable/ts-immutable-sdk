@@ -316,10 +316,16 @@ export class TokenBridge {
     // Get the state sync ID from the transaction receipt
     const stateSyncID = await withBridgeError<number>(async () => this.getRootStateSyncID(rootTxReceipt), BridgeErrorType.PROVIDER_ERROR);
 
-    // Get the block timestamp
+    // Get the block for the timestamp
     const rootBlock: ethers.providers.Block = await this.config.rootProvider.getBlock(rootTxReceipt.blockNumber);
+
+    // Get the minimum block on childchain which corresponds with the timestamp on rootchain
     const minBlockRange: number = await withBridgeError<number>(async () => getBlockNumberClosestToTimestamp(this.config.childProvider, rootBlock.timestamp, this.config.blockTime, this.config.clockInaccuracy), BridgeErrorType.PROVIDER_ERROR);
+
+    // Get the upper bound for which we expect the StateSync event to occur
     const maxBlockRange: number = minBlockRange + this.config.maxDepositBlockDelay;
+
+    // Poll till event observed
     const result: CompletionStatus = await withBridgeError<CompletionStatus>(async () => this.waitForChildStateSync(stateSyncID, this.config.pollInterval, minBlockRange, maxBlockRange), BridgeErrorType.PROVIDER_ERROR);
 
     return {
