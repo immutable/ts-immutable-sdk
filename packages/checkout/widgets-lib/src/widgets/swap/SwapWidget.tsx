@@ -8,14 +8,6 @@ import {
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { useEffect, useCallback, useReducer } from 'react';
-import {
-  BaseViews,
-  ViewActions,
-  ViewContext,
-  initialViewState,
-  viewReducer,
-} from '../../context/ViewContext';
-import { SwapWidgetViews } from '../../context/SwapViewContextTypes';
 import { SwapCoins } from './views/SwapCoins';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { LoadingView } from '../../components/Loading/LoadingView';
@@ -26,6 +18,14 @@ import {
   initialSwapState,
   swapReducer,
 } from './context/SwapContext';
+import {
+  BaseViews,
+  ViewActions,
+  ViewContext,
+  initialViewState,
+  viewReducer,
+} from '../../context/view-context/ViewContext';
+import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -91,6 +91,8 @@ export function SwapWidget(props: SwapWidgetProps) {
         type: TokenFilterTypes.SWAP,
       }
     );
+
+    console.log(allowList.tokens);
 
     // Do we filter token balances by allow list here??
     const allowedTokenBalances = tokenBalances.balances.filter((balance) =>

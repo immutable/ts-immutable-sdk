@@ -14,14 +14,7 @@ import {
   connectReducer,
   initialConnectState,
 } from './context/ConnectContext';
-import {
-  BaseViews,
-  initialViewState,
-  ViewActions,
-  ViewContext,
-  viewReducer,
-} from '../../context/ViewContext';
-import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
+import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { ConnectWallet } from './views/ConnectWallet';
 import { ConnectResult } from './views/ConnectResult';
 import { SuccessView } from '../../components/Success/SuccessView';
@@ -30,6 +23,13 @@ import { SwitchNetwork } from './views/SwitchNetwork';
 import { LoadingView } from '../../components/Loading/LoadingView';
 import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
 import { Environment } from '@imtbl/config';
+import {
+  viewReducer,
+  initialViewState,
+  ViewActions,
+  ViewContext,
+  BaseViews,
+} from '../../context/view-context/ViewContext';
 
 export interface ConnectWidgetProps {
   environment: Environment;

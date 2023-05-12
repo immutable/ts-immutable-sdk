@@ -3,7 +3,6 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
-import { SwapWidgetViews } from '../../../context/SwapViewContextTypes';
 import { Box } from '@biom3/react';
 import { Buy } from '../components/Buy';
 import With from '../components/With';
@@ -14,6 +13,7 @@ import { TokenInfo, Transaction } from '@imtbl/checkout-sdk';
 import { useContext, useState } from 'react';
 import { SwapContext } from '../context/SwapContext';
 import { alphaSortTokensList, findTokenByAddress } from '../helpers';
+import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 
 type AmountAndPercentage = {
   amount: {
@@ -58,7 +58,6 @@ export interface SwapFormProps {
   fromContractAddress?: string;
   toContractAddress?: string;
 }
-
 export interface SwapCoinsProps {
   amount: string | undefined;
   fromContractAddress: string | undefined;

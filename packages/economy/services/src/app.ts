@@ -1,10 +1,13 @@
 import express, { Request, Response } from 'express';
 
 import pino from 'pino';
+import cors from 'cors';
 import routes from './routes';
 
 const logger = pino();
 const app = express();
+app.use(cors());
+
 const paths: { path: string; methods: string }[] = routes.reduce(
   (a, r) => [
     ...a,
@@ -15,7 +18,7 @@ const paths: { path: string; methods: string }[] = routes.reduce(
         .toString(),
     })),
   ],
-  [] as any,
+  [] as any
 );
 
 logger.info(paths);
@@ -23,15 +26,18 @@ logger.info(paths);
 /**
  * Root must only be used the resources directory
  */
-app.get('/', (req: Request, res: Response) => res.send(/* html */ `
+app.get('/', (req: Request, res: Response) =>
+  res.send(/* html */ `
     <h1>Economy SDK Services</h1>
     <ul>
     ${paths
-    .map(
-      ({ path, methods }) => `<li><b>[${methods}]</b> <a href="${path}" target="_blank">${path}</a></li>`,
-    )
-    .join('')}
+      .map(
+        ({ path, methods }) =>
+          `<li><b>[${methods}]</b> <a href="${path}" target="_blank">${path}</a></li>`
+      )
+      .join('')}
     </ul>
-  `));
+  `)
+);
 
 export default app;

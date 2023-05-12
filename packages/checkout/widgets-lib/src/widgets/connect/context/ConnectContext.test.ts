@@ -15,7 +15,9 @@ describe('connect-context', () => {
   it('should update state with checkout when reducer called with SET_CHECKOUT action', () => {
     const setCheckoutPayload: SetCheckoutPayload = {
       type: ConnectActions.SET_CHECKOUT,
-      checkout: new Checkout({baseConfig: {environment: Environment.PRODUCTION}}),
+      checkout: new Checkout({
+        baseConfig: { environment: Environment.PRODUCTION },
+      }),
     };
     expect(initialConnectState.checkout).toBeNull();
     const { checkout } = connectReducer(initialConnectState, {

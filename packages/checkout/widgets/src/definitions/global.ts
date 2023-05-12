@@ -8,8 +8,8 @@ import React from 'react';
  */
 export interface ImtblConnectProps
   extends React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLElement>,
-    HTMLElement
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
   > {
   providerPreference: string;
   theme: string;
@@ -24,8 +24,8 @@ export interface ImtblConnectProps
  */
 export interface ImtblWalletProps
   extends React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLElement>,
-    HTMLElement
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
   > {
   providerPreference: string;
   useConnectWidget?: string;
@@ -47,8 +47,8 @@ export interface ImtblWalletProps
  */
 export interface ImtblSwapProps
   extends React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLElement>,
-    HTMLElement
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
   > {
   providerPreference: string;
   theme: string;
@@ -70,8 +70,8 @@ export interface ImtblSwapProps
  */
 export interface ImtblBridgeProps
   extends React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLElement>,
-    HTMLElement
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
   > {
   providerPreference: string;
   theme: string;
@@ -90,8 +90,8 @@ export interface ImtblBridgeProps
  */
 export interface ImtblExampleProps
   extends React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLElement>,
-    HTMLElement
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
   > {
   providerPreference: string;
   theme: string;
@@ -107,8 +107,8 @@ export interface ImtblExampleProps
  */
 export interface ImtblBuyProps
   extends React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLElement>,
-    HTMLElement
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
   > {
   providerPreference: string;
   theme: string;
@@ -124,8 +124,8 @@ export interface ImtblBuyProps
  */
 export interface ImtblTransitionExampleProps
   extends React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLElement>,
-    HTMLElement
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
   > {
   providerPreference: string;
   theme: string;
@@ -140,8 +140,8 @@ export interface ImtblTransitionExampleProps
  */
 export interface ImtblInnerWidgetExampleProps
   extends React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLElement>,
-    HTMLElement
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
   > {
   providerPreference: string;
   theme: string;
@@ -156,8 +156,8 @@ export interface ImtblInnerWidgetExampleProps
  */
 export interface ImtblOuterWidgetExampleProps
   extends React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLElement>,
-    HTMLElement
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
   > {
   providerPreference: string;
   theme: string;

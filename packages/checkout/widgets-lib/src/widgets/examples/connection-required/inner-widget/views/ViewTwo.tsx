@@ -3,11 +3,14 @@ import { useContext } from 'react';
 import { FooterLogo } from '../../../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../../../components/SimpleLayout/SimpleLayout';
-import { ViewContext, ViewActions } from '../../../../../context/ViewContext';
-import { InnerExampleWidgetViews } from '../../../../../context/InnerExampleViewContextTypes';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { zkEVMNetwork } from '../../../../../lib/networkUtils';
 import { Environment } from '@imtbl/config';
+import { InnerExampleWidgetViews } from '../../../../../context/view-context/InnerExampleViewContextTypes';
+import {
+  ViewContext,
+  ViewActions,
+} from '../../../../../context/view-context/ViewContext';
 
 export interface ViewTwoProps {
   callBack?: () => void;

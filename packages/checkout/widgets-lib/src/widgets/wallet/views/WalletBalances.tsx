@@ -2,13 +2,12 @@ import { Box, MenuItem } from '@biom3/react';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { WalletWidgetViews } from '../../../context/WalletViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { TotalTokenBalance } from '../components/TotalTokenBalance/TotalTokenBalance';
 import { TokenBalanceList } from '../components/TokenBalanceList/TokenBalanceList';
 import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { WalletContext } from '../context/WalletContext';
+import { WalletActions, WalletContext } from '../context/WalletContext';
 import { sendWalletWidgetCloseEvent } from '../WalletWidgetEvents';
 import {
   WalletBalanceContainerStyle,
@@ -16,11 +15,19 @@ import {
 } from './WalletBalancesStyles';
 import { sendAddCoinsEvent } from '../CoinTopUpEvents';
 import { zkEVMNetwork } from '../../../lib/networkUtils';
+import {
+  CryptoFiatActions,
+  CryptoFiatContext,
+} from '../../../context/crypto-fiat-context/CryptoFiatContext';
+import { getTokenBalances } from '../functions/tokenBalances';
+import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 
 export const WalletBalances = () => {
-  const { walletState } = useContext(WalletContext);
+  const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  const { walletState, walletDispatch } = useContext(WalletContext);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
-  const { checkout, network, supportedTopUps } = walletState;
+  const { provider, checkout, network, supportedTopUps } = walletState;
+  const { conversions } = cryptoFiatState;
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
     return (
@@ -42,6 +49,51 @@ export const WalletBalances = () => {
     });
     setTotalFiatAmount(totalAmount);
   }, [walletState.tokenBalances]);
+
+  useEffect(() => {
+    if (!checkout || !provider || !network) return;
+
+    (async () => {
+      const walletAddress = await provider.getSigner().getAddress();
+      const getAllBalancesResult = await checkout.getAllBalances({
+        provider,
+        walletAddress,
+        chainId: network.chainId,
+      });
+
+      const tokenSymbols: string[] = [];
+      getAllBalancesResult.balances.forEach((balance) => {
+        tokenSymbols.push(balance.token.symbol);
+      });
+
+      cryptoFiatDispatch({
+        payload: {
+          type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+          tokenSymbols,
+        },
+      });
+    })();
+  }, [provider, checkout, network, cryptoFiatDispatch]);
+
+  useEffect(() => {
+    if (!checkout || !provider || !network) return;
+    (async () => {
+      const tokenBalances = await getTokenBalances(
+        checkout,
+        provider,
+        network.name,
+        network.chainId,
+        conversions
+      );
+
+      walletDispatch({
+        payload: {
+          type: WalletActions.SET_TOKEN_BALANCES,
+          tokenBalances,
+        },
+      });
+    })();
+  }, [checkout, network, provider, conversions, walletDispatch]);
 
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
 

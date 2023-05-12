@@ -3,7 +3,7 @@ import { Body, Box } from '@biom3/react';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
+import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { WalletList } from '../components/WalletList';
 import { ConnectContext } from '../context/ConnectContext';

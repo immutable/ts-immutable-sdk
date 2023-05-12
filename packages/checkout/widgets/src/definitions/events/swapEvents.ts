@@ -14,7 +14,7 @@ export type SwapEvent<T> = {
 export enum SwapEventType {
   SUCCESS = 'success',
   FAILURE = 'failure',
-  CLOSE_WIDGET = 'close-widget'
+  CLOSE_WIDGET = 'close-widget',
 }
 
 /**

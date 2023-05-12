@@ -1,5 +1,5 @@
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
-import HttpClient from '../HttpClient';
+import { HttpClient } from '../HttpClient';
 import { ItemDefinition } from '../types';
 
 // TODO: Read from .env
@@ -13,7 +13,7 @@ export class ItemDefinitionService {
 
   constructor(
     httpClientOrBaseUrl: HttpClient | string = defaultBaseURL,
-    defaultHeaders: Record<string, string> = {}
+    defaultHeaders: Record<string, string> = {},
   ) {
     if (httpClientOrBaseUrl instanceof HttpClient) {
       this.httpClient = httpClientOrBaseUrl;

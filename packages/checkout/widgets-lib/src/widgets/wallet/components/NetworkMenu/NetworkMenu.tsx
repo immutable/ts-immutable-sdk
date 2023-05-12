@@ -8,7 +8,6 @@ import {
   SwitchNetworkParams,
 } from '@imtbl/checkout-sdk';
 import { text } from '../../../../resources/text/textConfig';
-import { WalletWidgetViews } from '../../../../context/WalletViewContextTypes';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
 import {
   ActiveNetworkButtonStyle,
@@ -17,18 +16,17 @@ import {
   NetworkHeadingStyle,
   NetworkMenuStyles,
 } from './NetworkMenuStyles';
-import {
-  BaseViews,
-  ViewActions,
-  ViewContext,
-} from '../../../../context/ViewContext';
-import { getTokenBalances } from '../../functions/tokenBalances';
 import { sortNetworksCompareFn } from '../../../../lib/utils';
+import {
+  ViewContext,
+  ViewActions,
+  BaseViews,
+} from '../../../../context/view-context/ViewContext';
+import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 
 export const NetworkMenu = () => {
-  const { walletState, walletDispatch } = useContext(WalletContext);
   const { viewDispatch } = useContext(ViewContext);
-
+  const { walletState, walletDispatch } = useContext(WalletContext);
   const { networkStatus } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const { checkout, network, provider } = walletState;
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[] | undefined>(
@@ -67,14 +65,8 @@ export const NetworkMenu = () => {
 
         walletDispatch({
           payload: {
-            type: WalletActions.SWITCH_NETWORK,
+            type: WalletActions.SET_NETWORK,
             network: switchNetworkResult.network,
-            tokenBalances: await getTokenBalances(
-              checkout,
-              switchNetworkResult?.provider,
-              switchNetworkResult.network.name,
-              switchNetworkResult.network.chainId
-            ),
           },
         });
 
