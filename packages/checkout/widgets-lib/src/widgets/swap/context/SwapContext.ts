@@ -102,6 +102,8 @@ export const SwapContext = createContext<SwapContextState>({
   swapDispatch: () => {},
 });
 
+SwapContext.displayName = 'SwapContext'; // help with debugging Context in browser
+
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export const swapReducer: Reducer<SwapState, SwapAction> = (

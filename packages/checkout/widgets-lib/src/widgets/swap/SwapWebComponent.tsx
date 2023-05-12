@@ -4,10 +4,16 @@ import ReactDOM from 'react-dom/client';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { Environment } from '@imtbl/config';
+import {
+  ConnectLoader,
+  ConnectLoaderParams,
+} from '../../components/ConnectLoader/ConnectLoader';
+import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 
 export class ImmutableSwap extends ImmutableWebComponent {
   environment = Environment.SANDBOX;
   providerPreference = ConnectionProviders.METAMASK;
+  useConnectWidget?: boolean;
   amount = '';
   fromContractAddress = '';
   toContractAddress = '';
@@ -17,6 +23,9 @@ export class ImmutableSwap extends ImmutableWebComponent {
     this.providerPreference = this.getAttribute(
       'providerPreference'
     ) as ConnectionProviders;
+    const useConnectWidgetProp = this.getAttribute('useConnectWidget');
+    this.useConnectWidget =
+      useConnectWidgetProp?.toLowerCase() === 'false' ? false : true;
     this.amount = this.getAttribute('amount') as string;
     this.fromContractAddress = this.getAttribute(
       'fromContractAddress'
@@ -26,6 +35,10 @@ export class ImmutableSwap extends ImmutableWebComponent {
   }
 
   renderWidget() {
+    const connectLoaderParams: ConnectLoaderParams = {
+      providerPreference: this.providerPreference,
+    };
+
     const swapParams: SwapWidgetParams = {
       providerPreference: this.providerPreference,
       amount: this.amount,
@@ -39,11 +52,26 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <SwapWidget
-          params={swapParams}
-          theme={this.theme}
-          environment={this.environment}
-        />
+        {this.useConnectWidget ? (
+          <ConnectLoader
+            environment={this.environment}
+            theme={this.theme}
+            params={connectLoaderParams}
+            closeEvent={sendSwapWidgetCloseEvent}
+          >
+            <SwapWidget
+              params={swapParams}
+              theme={this.theme}
+              environment={this.environment}
+            />
+          </ConnectLoader>
+        ) : (
+          <SwapWidget
+            params={swapParams}
+            theme={this.theme}
+            environment={this.environment}
+          />
+        )}
       </React.StrictMode>
     );
   }

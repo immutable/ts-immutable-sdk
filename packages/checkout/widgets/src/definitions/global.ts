@@ -53,6 +53,7 @@ export interface ImtblSwapProps
   providerPreference: string;
   theme: string;
   environment: string;
+  useConnectWidget?: string;
   amount: string;
   fromContractAddress: string;
   toContractAddress: string;

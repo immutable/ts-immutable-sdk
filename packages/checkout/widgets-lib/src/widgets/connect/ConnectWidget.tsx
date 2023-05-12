@@ -85,7 +85,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
         },
       });
     }, 200);
-  }, [deepLink, sendCloseEventOverride]);
+  }, [deepLink, sendCloseEventOverride, environment]);
 
   useEffect(() => {
     switch (viewState.view.type) {
