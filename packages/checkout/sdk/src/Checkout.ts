@@ -30,9 +30,7 @@ import {
   SwitchNetworkResult,
 } from './types';
 import { CheckoutError, CheckoutErrorType } from './errors';
-import {
-  CheckoutConfiguration,
-} from './config';
+import { CheckoutConfiguration } from './config';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
@@ -80,16 +78,16 @@ export class Checkout {
   public async switchNetwork(
     params: SwitchNetworkParams
   ): Promise<SwitchNetworkResult> {
-    if (!this.providerPreference) {
-      throw new CheckoutError(
-        `connect should be called before switchNetwork to set the provider preference`,
-        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR
-      );
-    }
+    // if (!this.providerPreference) {
+    //   throw new CheckoutError(
+    //     `connect should be called before switchNetwork to set the provider preference`,
+    //     CheckoutErrorType.PROVIDER_PREFERENCE_ERROR
+    //   );
+    // }
 
     return await network.switchWalletNetwork(
       this.config,
-      this.providerPreference,
+      ConnectionProviders.METAMASK,
       params.provider,
       params.chainId
     );

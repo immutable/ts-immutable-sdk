@@ -5,6 +5,7 @@ import {
   ConnectParams,
   WALLET_ACTION,
   CheckConnectionResult,
+  ChainId,
 } from '../types';
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';

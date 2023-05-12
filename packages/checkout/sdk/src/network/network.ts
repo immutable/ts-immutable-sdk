@@ -22,7 +22,7 @@ export async function getNetworkInfo(
   config: CheckoutConfiguration,
   provider: Web3Provider
 ): Promise<NetworkInfo> {
-  const {networkMap} = config;
+  const { networkMap } = config;
   return withCheckoutError(
     async () => {
       const network = await provider.getNetwork();
@@ -34,7 +34,7 @@ export async function getNetworkInfo(
           name: network.name,
           isSupported: false,
         } as NetworkInfo;
-      } else{
+      } else {
         const chainIdNetworkInfo = networkMap.get(network.chainId as ChainId);
         return {
           name: chainIdNetworkInfo!.chainName,
@@ -43,7 +43,6 @@ export async function getNetworkInfo(
           isSupported: true,
         };
       }
-      
     },
     {
       type: CheckoutErrorType.GET_NETWORK_INFO_ERROR,
@@ -58,7 +57,7 @@ export async function switchWalletNetwork(
   chainId: ChainId
 ): Promise<SwitchNetworkResult> {
   let currentProvider = provider;
-  const {networkMap} = config;
+  const { networkMap } = config;
 
   if (!Object.values(ChainId).includes(chainId)) {
     throw new CheckoutError(
@@ -95,15 +94,15 @@ export async function switchWalletNetwork(
       );
     }
   }
-  currentProvider = await connectWalletProvider({ providerPreference });
+  // currentProvider = await connectWalletProvider({ providerPreference });
 
-  if ((await currentProvider.getNetwork()).chainId !== chainId) {
-    // user didn't actually switch
-    throw new CheckoutError(
-      'User cancelled switch network request',
-      CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
-    );
-  }
+  // if ((await currentProvider.getNetwork()).chainId !== chainId) {
+  //   // user didn't actually switch
+  //   throw new CheckoutError(
+  //     'User cancelled switch network request',
+  //     CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
+  //   );
+  // }
 
   // we can assume that if the above succeeds then user has successfully
   // switched to the network specified
@@ -111,7 +110,7 @@ export async function switchWalletNetwork(
   return {
     network: {
       name: newNetwork?.chainName,
-      chainId: parseInt(newNetwork?.chainIdHex ?? "", 16),
+      chainId: parseInt(newNetwork?.chainIdHex ?? '', 16),
       nativeCurrency: newNetwork?.nativeCurrency,
     },
     provider: currentProvider,
@@ -120,12 +119,10 @@ export async function switchWalletNetwork(
 
 export async function getNetworkAllowList(
   config: CheckoutConfiguration,
-  {
-  type = NetworkFilterTypes.ALL,
-  exclude,
-}: GetNetworkAllowListParams): Promise<GetNetworkAllowListResult> {
-  const {networkMap} = config;
-  
+  { type = NetworkFilterTypes.ALL, exclude }: GetNetworkAllowListParams
+): Promise<GetNetworkAllowListResult> {
+  const { networkMap } = config;
+
   const list = networkMasterList.filter((network) => {
     const allowAllTokens = type === NetworkFilterTypes.ALL;
     const networkNotExcluded = !(exclude || [])
@@ -137,7 +134,7 @@ export async function getNetworkAllowList(
   const allowedNetworks: NetworkInfo[] = [];
   list.forEach((element) => {
     const newNetwork = networkMap.get(element.chainId as ChainId);
-    if(newNetwork) {
+    if (newNetwork) {
       allowedNetworks.push({
         name: newNetwork.chainName,
         chainId: parseInt(newNetwork.chainIdHex, 16),
@@ -154,7 +151,11 @@ export async function getNetworkAllowList(
 
 // these functions should not be exported. These functions should be used as part of an exported function e.g switchWalletNetwork() above.
 // make sure to check if(provider.provider?.request) in the exported function and throw an error
-async function switchNetworkInWallet(networkMap: NetworkMap, provider: Web3Provider, chainId: ChainId) {
+async function switchNetworkInWallet(
+  networkMap: NetworkMap,
+  provider: Web3Provider,
+  chainId: ChainId
+) {
   if (provider.provider?.request) {
     return await provider.provider.request({
       method: WALLET_ACTION.SWITCH_NETWORK,
@@ -167,7 +168,11 @@ async function switchNetworkInWallet(networkMap: NetworkMap, provider: Web3Provi
   }
 }
 
-async function addNetworkToWallet(networkMap: NetworkMap, provider: Web3Provider, chainId: ChainId) {
+async function addNetworkToWallet(
+  networkMap: NetworkMap,
+  provider: Web3Provider,
+  chainId: ChainId
+) {
   if (provider.provider?.request) {
     const networkDetails = networkMap.get(chainId);
     const addNetwork = {

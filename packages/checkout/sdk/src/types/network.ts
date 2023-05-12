@@ -78,7 +78,6 @@ export const ProductionChainIdNetworkMap: NetworkMap = new Map<
         symbol: 'IMX',
         decimals: 18,
       },
-      blockExplorerUrls: [''],
     },
   ],
 ]);
@@ -115,7 +114,6 @@ export const SandboxChainIdNetworkMap: NetworkMap = new Map<
         symbol: 'IMX',
         decimals: 18,
       },
-      blockExplorerUrls: [''],
     },
   ],
 ]);
