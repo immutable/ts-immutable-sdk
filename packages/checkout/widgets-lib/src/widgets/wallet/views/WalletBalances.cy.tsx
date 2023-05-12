@@ -16,9 +16,18 @@ describe('WalletBalances', () => {
   const checkout = new Checkout({
     baseConfig: { environment: Environment.PRODUCTION },
   });
-  const provider = {} as unknown as Web3Provider;
+
+  const provider = {
+    getSigner: () => ({
+      getAddress: async () => Promise.resolve(''),
+    }),
+    provider: {
+      request: async () => null,
+    },
+  } as unknown as Web3Provider;
+
   const baseWalletState: WalletState = {
-    checkout: checkout,
+    checkout,
     network: {
       chainId: 13372,
       name: 'Immutable zkEVM Testnet',
@@ -94,9 +103,8 @@ describe('WalletBalances', () => {
     const checkout = new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     });
-    const provider = {} as unknown as Web3Provider;
     const walletState: WalletState = {
-      checkout: checkout,
+      checkout,
       network: {
         chainId: 1,
         name: 'Ethereum',
