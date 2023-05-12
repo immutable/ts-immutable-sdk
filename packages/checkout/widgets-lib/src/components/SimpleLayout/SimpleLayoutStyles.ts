@@ -22,7 +22,7 @@ export const HeaderStyle = (floatHeader: boolean) => {
     alignItems: 'center',
     width: '100%',
     position: floatHeader ? 'absolute' : 'relative',
-    zIndex: 10
+    zIndex: 10,
   };
 };
 
@@ -31,7 +31,7 @@ export const FooterStyle = {
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: 'base.color.translucent.container.200'
+  backgroundColor: 'base.color.translucent.container.200',
 };
 
 export const ContentStyle = {

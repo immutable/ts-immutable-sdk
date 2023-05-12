@@ -5,7 +5,7 @@ import { SwapForm } from '../components/SwapForm';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
-import { SwapWidgetViews } from '../../../context/SwapViewContextTypes';
+import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 
 export interface SwapCoinsProps {
   allowedTokens: TokenInfo[];
