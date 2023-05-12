@@ -11,11 +11,12 @@ export type Amount = {
 
 export type QuoteTradeInfo = {
   route: Route<Currency, Currency>;
-  amountIn: ethers.BigNumberish;
+  amountIn: ethers.BigNumber;
   tokenIn: Currency;
-  amountOut: ethers.BigNumberish;
+  amountOut: ethers.BigNumber;
   tokenOut: Currency;
   tradeType: TradeType;
+  gasEstimate: ethers.BigNumber
 };
 
 export type QuoteResponse =
@@ -32,6 +33,7 @@ export type TradeInfo = {
   quote: Amount;
   quoteWithMaxSlippage: Amount;
   slippage: number;
+  gasFeeEstimate: string | null
 };
 
 export type TransactionResponse =

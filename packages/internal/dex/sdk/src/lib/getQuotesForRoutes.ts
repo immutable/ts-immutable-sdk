@@ -8,10 +8,12 @@ import { Multicall } from '../contracts/types';
 
 export const DEFAULT_GAS_QUOTE = 2_000_000;
 const amountIndex = 0;
+const gasEstimateIndex = 3;
 
 export type QuoteResult = {
   route: Route<Currency, Currency>;
   quoteAmount: JSBI;
+  gasEstimate: ethers.BigNumber
 };
 
 export async function getQuotesForRoutes(
@@ -61,6 +63,7 @@ export async function getQuotesForRoutes(
         route: routes[i],
         // The 0th element in each decoded data is going to be the amountOut or amountIn.
         quoteAmount: decodedQuoteResult[amountIndex],
+        gasEstimate: ethers.BigNumber.from(decodedQuoteResult[gasEstimateIndex]),
       };
       decodedQuoteResults.push(quoteResult);
     } catch {

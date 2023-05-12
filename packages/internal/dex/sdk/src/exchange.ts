@@ -4,10 +4,10 @@ import {
   CurrencyAmount, Token, TradeType,
 } from '@uniswap/sdk-core';
 import assert from 'assert';
-import JSBI from 'jsbi';
 
 import { slippageToFraction } from 'lib/transactionUtils/slippage';
 import { ExchangeError, ExchangeErrorTypes } from 'errors';
+import { calculateGasFee, fetchGasPrice } from 'lib/transactionUtils/gas';
 import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
@@ -55,9 +55,9 @@ export class Exchange {
     tokenOutAddress: string,
     maxHops: number,
     slippagePercent: number,
-    fromAddress?: string,
+    fromAddress: string,
   ) {
-    if (fromAddress) validateAddress(fromAddress);
+    validateAddress(fromAddress);
     validateAddress(tokenInAddress);
     validateAddress(tokenOutAddress);
     validateDifferentAddresses(tokenInAddress, tokenOutAddress);
@@ -96,12 +96,11 @@ export class Exchange {
 
     let amountSpecified: CurrencyAmount<Token>;
     let otherToken: Token;
-    const amountJsbi = JSBI.BigInt(amount.toString());
     if (tradeType === TradeType.EXACT_INPUT) {
-      amountSpecified = CurrencyAmount.fromRawAmount(tokenIn, amountJsbi);
+      amountSpecified = CurrencyAmount.fromRawAmount(tokenIn, amount.toString());
       otherToken = tokenOut;
     } else {
-      amountSpecified = CurrencyAmount.fromRawAmount(tokenOut, amountJsbi);
+      amountSpecified = CurrencyAmount.fromRawAmount(tokenOut, amount.toString());
       otherToken = tokenIn;
     }
 
@@ -134,6 +133,9 @@ export class Exchange {
       slippage,
     );
 
+    const gasPrice = await fetchGasPrice(this.provider);
+    const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, routeAndQuote.trade.gasEstimate) : null;
+
     return {
       success: true,
       transaction: {
@@ -146,6 +148,7 @@ export class Exchange {
         quote: quoteInfo.quote,
         quoteWithMaxSlippage: quoteInfo.quoteWithMaxSlippage,
         slippage: slippagePercent,
+        gasFeeEstimate,
       },
     };
   }
@@ -161,7 +164,7 @@ export class Exchange {
    * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0.
    * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2.
    * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes.
-   * @return {TransactionResponse} The result containing the unsigned transaction to sign and execute and swap details.
+   * @return {TransactionResponse} The result containing the unsigned transaction and details of the swap.
    */
   public async getUnsignedSwapTxFromAmountIn(
     fromAddress: string,
@@ -195,7 +198,7 @@ export class Exchange {
    * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0.
    * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2.
    * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes.
-   * @return {TransactionResponse} The result containing the unsigned transaction to sign and execute and swap details.
+   * @return {TransactionResponse} The result containing the unsigned transaction and details of the swap.
    */
   public async getUnsignedSwapTxFromAmountOut(
     fromAddress: string,
