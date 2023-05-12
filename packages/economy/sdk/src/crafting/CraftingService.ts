@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable class-methods-use-this */
+
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { HttpClient } from '../HttpClient';
 
@@ -26,7 +29,7 @@ export class CraftingService {
 
   constructor(
     httpClientOrBaseUrl: HttpClient | string = defaultBaseURL,
-    defaultHeaders: Record<string, string> = {}
+    defaultHeaders: Record<string, string> = {},
   ) {
     if (httpClientOrBaseUrl instanceof HttpClient) {
       this.httpClient = httpClientOrBaseUrl;

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { EventData, EventType } from '../types';
 import { asyncFn } from '../utils';
 import { withSDKError } from '../Errors';
@@ -63,7 +64,7 @@ export class Crafting {
   public async craft(input: CraftInput): Promise<CraftStatus> {
     // 1. validate inputs
     this.emitEvent({ status: 'STARTED', action: 'CRAFT' });
-    await this.validate(input);
+    await this.validate();
 
     // 2. perform any web3 actions
     let txIds: number[] = [];
@@ -101,8 +102,8 @@ export class Crafting {
    * @param input
    * @returns
    */
-  public async validate(input: CraftInput) {
+  public async validate() {
     // TODO
-    return this.craftingService.validate(input.input);
+    return this.craftingService.validate();
   }
 }

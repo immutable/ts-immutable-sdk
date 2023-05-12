@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { HttpClient } from '../HttpClient';
 import { InventoryItem } from '../types';
@@ -28,7 +29,7 @@ export class InventoryService {
 
   constructor(
     httpClientOrBaseUrl: HttpClient | string = defaultBaseURL,
-    defaultHeaders: Record<string, string> = {}
+    defaultHeaders: Record<string, string> = {},
   ) {
     if (httpClientOrBaseUrl instanceof HttpClient) {
       this.httpClient = httpClientOrBaseUrl;
@@ -38,15 +39,15 @@ export class InventoryService {
   }
 
   public async getItems(
-    input: GetItemsInput
+    input: GetItemsInput,
   ): Promise<AxiosResponse<GetItemsOutput>> {
-    const url = `/${input.gameId}/items`;
+    const url = `/v1/${input.gameId}/items`;
     const config: AxiosRequestConfig = {
       headers: {},
     };
     return this.httpClient.get<GetItemsOutput>(
       `${url}?owner=${input.userId}`,
-      config
+      config,
     );
   }
 }

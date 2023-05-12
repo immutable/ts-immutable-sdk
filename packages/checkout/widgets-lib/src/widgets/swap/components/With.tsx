@@ -84,7 +84,7 @@ export default function With(props: WithProps) {
 
   const allowedTokens = (): string[] => {
     return (balances || []).map(
-      (balance: GetBalanceResult) => balance.token.address || ''
+      (balance: GetBalanceResult) => balance.token?.address || ''
     );
   };
 

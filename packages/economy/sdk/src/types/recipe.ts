@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+
 export type Recipe = {
   id: string;
   game_id: string;

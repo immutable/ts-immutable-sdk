@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 export type InventoryItem = {
   id: string;
   game_id: string;
