@@ -2,7 +2,6 @@ import { Box, MenuItem } from '@biom3/react';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { WalletWidgetViews } from '../../../context/WalletViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { TotalTokenBalance } from '../components/TotalTokenBalance/TotalTokenBalance';
 import { TokenBalanceList } from '../components/TokenBalanceList/TokenBalanceList';
@@ -21,6 +20,7 @@ import {
   CryptoFiatContext,
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { getTokenBalances } from '../functions/tokenBalances';
+import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 
 export const WalletBalances = () => {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);

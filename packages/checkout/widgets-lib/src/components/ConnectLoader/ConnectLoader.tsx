@@ -16,7 +16,7 @@ import {
 } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { LoadingView } from '../Loading/LoadingView';
 import { ConnectWidget } from '../../widgets/connect/ConnectWidget';
-import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
+import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { ErrorView } from '../Error/ErrorView';
 import { Environment } from '@imtbl/config';
 

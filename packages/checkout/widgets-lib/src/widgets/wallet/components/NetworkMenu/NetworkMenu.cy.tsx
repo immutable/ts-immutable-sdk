@@ -3,13 +3,13 @@ import React from 'react';
 import { NetworkMenu } from './NetworkMenu';
 import { cySmartGet } from '../../../../lib/testUtils';
 import { text } from '../../../../resources/text/textConfig';
-import { WalletWidgetViews } from '../../../../context/WalletViewContextTypes';
 import { BiomeThemeProvider } from '@biom3/react';
 import { cy, it } from 'local-cypress';
 import { Checkout, ConnectionProviders, TokenInfo } from '@imtbl/checkout-sdk';
 import { WalletContext, WalletState } from '../../context/WalletContext';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
+import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 
 describe('Network Menu', () => {
   beforeEach(() => {

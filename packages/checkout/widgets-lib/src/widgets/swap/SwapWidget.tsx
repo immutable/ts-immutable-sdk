@@ -10,19 +10,19 @@ import {
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { useEffect, useState, useMemo, useCallback, useReducer } from 'react';
-import {
-  BaseViews,
-  ViewActions,
-  ViewContext,
-  initialViewState,
-  viewReducer,
-} from '../../context/ViewContext';
-import { SwapWidgetViews } from '../../context/SwapViewContextTypes';
 import { SwapCoins } from './views/SwapCoins';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { LoadingView } from '../../components/Loading/LoadingView';
 import { Environment } from '@imtbl/config';
 import { L1Network } from '../../lib/networkUtils';
+import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
+import {
+  viewReducer,
+  initialViewState,
+  ViewActions,
+  ViewContext,
+  BaseViews,
+} from '../../context/view-context/ViewContext';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;

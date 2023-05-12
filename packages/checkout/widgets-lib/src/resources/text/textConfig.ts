@@ -1,8 +1,8 @@
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
-import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
-import { BaseViews } from '../../context/ViewContext';
-import { WalletWidgetViews } from '../../context/WalletViewContextTypes';
-import { SwapWidgetViews } from '../../context/SwapViewContextTypes';
+import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
+import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
+import { BaseViews } from '../../context/view-context/ViewContext';
+import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 
 export const text = {
   views: {
@@ -49,12 +49,12 @@ export const text = {
     },
     [SwapWidgetViews.SWAP]: {
       header: {
-        title: "Swap coins"
+        title: 'Swap coins',
       },
       swapForm: {
-        buttonText: 'Swap'
-      }
-    }
+        buttonText: 'Swap',
+      },
+    },
   },
   wallets: {
     [ConnectionProviders.METAMASK]: {

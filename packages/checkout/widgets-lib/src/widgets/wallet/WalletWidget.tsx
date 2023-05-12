@@ -14,14 +14,6 @@ import {
   WalletContext,
   walletReducer,
 } from './context/WalletContext';
-import {
-  BaseViews,
-  initialViewState,
-  ViewActions,
-  ViewContext,
-  viewReducer,
-} from '../../context/ViewContext';
-import { WalletWidgetViews } from '../../context/WalletViewContextTypes';
 import { WalletBalances } from './views/WalletBalances';
 import { ErrorView } from '../../components/Error/ErrorView';
 import { LoadingView } from '../../components/Loading/LoadingView';
@@ -29,6 +21,14 @@ import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { zkEVMNetwork } from '../../lib/networkUtils';
 import { Environment } from '@imtbl/config';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import {
+  viewReducer,
+  initialViewState,
+  ViewActions,
+  ViewContext,
+  BaseViews,
+} from '../../context/view-context/ViewContext';
+import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
