@@ -1,17 +1,17 @@
 import {
+  DepositsApi,
+  EncodingApi,
+  UsersApi,
+  ERC721Token,
+  Contracts,
+} from '@imtbl/core-sdk';
+import {
   generateSigners,
   privateKey1,
   testConfig,
   transactionResponse,
 } from '../../test/helpers';
-import {
-  DepositsApi,
-  EncodingApi,
-  UsersApi,
-  ERC721Token,
-} from '@imtbl/core-sdk';
-import { depositERC721 } from './';
-import { Contracts } from '@imtbl/core-sdk';
+import { depositERC721 } from '.';
 
 jest.mock('@imtbl/core-sdk');
 

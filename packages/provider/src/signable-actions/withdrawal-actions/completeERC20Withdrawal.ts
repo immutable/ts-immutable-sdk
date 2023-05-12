@@ -40,21 +40,20 @@ async function executeRegisterAndWithdrawERC20({
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
-    usersApi
+    usersApi,
   );
 
   const contract = Contracts.Registration.connect(
     config.immutableXConfig.ethConfiguration.registrationContractAddress,
-    ethSigner
+    ethSigner,
   );
 
-  const populatedTransaction =
-    await contract.populateTransaction.registerAndWithdraw(
-      etherKey,
-      starkPublicKey,
-      signableResult.operator_signature,
-      assetType
-    );
+  const populatedTransaction = await contract.populateTransaction.registerAndWithdraw(
+    etherKey,
+    starkPublicKey,
+    signableResult.operator_signature,
+    assetType,
+  );
 
   return ethSigner.sendTransaction(populatedTransaction);
 }
@@ -63,16 +62,16 @@ async function executeWithdrawERC20(
   ethSigner: Signer,
   assetType: string,
   starkPublicKey: string,
-  config: ImmutableXConfiguration
+  config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const contract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    ethSigner
+    ethSigner,
   );
 
   const populatedTransaction = await contract.populateTransaction.withdraw(
     starkPublicKey,
-    assetType
+    assetType,
   );
 
   return ethSigner.sendTransaction(populatedTransaction);
@@ -93,7 +92,7 @@ export async function completeERC20WithdrawalAction({
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    config
+    config,
   );
 
   if (!isRegistered) {
@@ -103,12 +102,11 @@ export async function completeERC20WithdrawalAction({
       starkPublicKey,
       config,
     });
-  } else {
-    return executeWithdrawERC20(
-      ethSigner,
-      assetType.asset_type,
-      starkPublicKey,
-      imxConfig
-    );
   }
+  return executeWithdrawERC20(
+    ethSigner,
+    assetType.asset_type,
+    starkPublicKey,
+    imxConfig,
+  );
 }

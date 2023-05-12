@@ -1,11 +1,11 @@
-import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 import {
   UnsignedTransferRequest,
   TransfersApi,
   NftTransferDetails,
 } from '@imtbl/core-sdk';
-import { transfer, batchTransfer } from './transfer';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
+import { generateSigners, privateKey1, testConfig } from '../test/helpers';
+import { transfer, batchTransfer } from './transfer';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
@@ -81,7 +81,7 @@ describe('Transfer', () => {
             type: 'ERC721',
           },
           amount: '1',
-          receiver: receiver,
+          receiver,
         },
       });
       expect(createTransferMock).toHaveBeenCalledWith({
@@ -182,7 +182,7 @@ describe('Transfer', () => {
                 type: 'ERC721',
               },
               amount: '1',
-              receiver: receiver,
+              receiver,
             },
           ],
         },
