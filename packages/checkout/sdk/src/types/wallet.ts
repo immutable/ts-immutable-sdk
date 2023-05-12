@@ -1,14 +1,16 @@
+// TODO: fix circular dependency
+// eslint-disable-next-line import/no-cycle
 import { ConnectionProviders } from './connect';
 
 /**
  * Enum representing different wallet actions.
  */
-export const WALLET_ACTION = {
-  CHECK_CONNECTION: 'eth_accounts',
-  CONNECT: 'eth_requestAccounts',
-  ADD_NETWORK: 'wallet_addEthereumChain',
-  SWITCH_NETWORK: 'wallet_switchEthereumChain',
-};
+export enum WalletAction {
+  CHECK_CONNECTION = 'eth_accounts',
+  CONNECT = 'eth_requestAccounts',
+  ADD_NETWORK = 'wallet_addEthereumChain',
+  SWITCH_NETWORK = 'wallet_switchEthereumChain',
+}
 
 /**
  * Interface representing a wallet filter to be used in {@link GetWalletAllowListParams}.

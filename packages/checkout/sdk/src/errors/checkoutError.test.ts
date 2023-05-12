@@ -15,7 +15,7 @@ describe('checkoutError', () => {
     expect(
       await withCheckoutError(anyFn, {
         type: CheckoutErrorType.GET_BALANCE_ERROR,
-      })
+      }),
     ).toEqual(returnValue);
   });
 
@@ -26,12 +26,12 @@ describe('checkoutError', () => {
     await expect(
       withCheckoutError(errorFunction, {
         type: CheckoutErrorType.GET_BALANCE_ERROR,
-      })
+      }),
     ).rejects.toThrow(
       new CheckoutError(
         '[GET_BALANCE_ERROR] Cause:Error message',
-        CheckoutErrorType.GET_BALANCE_ERROR
-      )
+        CheckoutErrorType.GET_BALANCE_ERROR,
+      ),
     );
   });
 
@@ -43,12 +43,12 @@ describe('checkoutError', () => {
       withCheckoutError(errorFunction, {
         type: CheckoutErrorType.GET_BALANCE_ERROR,
         message: 'Custom message',
-      })
+      }),
     ).rejects.toThrow(
       new CheckoutError(
         '[GET_BALANCE_ERROR]:Custom message. Cause:Error message',
-        CheckoutErrorType.GET_BALANCE_ERROR
-      )
+        CheckoutErrorType.GET_BALANCE_ERROR,
+      ),
     );
   });
 
@@ -67,7 +67,7 @@ describe('checkoutError', () => {
       // https://github.com/facebook/jest/issues/11693
       expect(errorObject.type).toEqual(CheckoutErrorType.GET_BALANCE_ERROR);
       expect(errorObject.message).toEqual(
-        '[GET_BALANCE_ERROR]:Custom message. Cause:Error message'
+        '[GET_BALANCE_ERROR]:Custom message. Cause:Error message',
       );
       expect(errorObject.data).toEqual({
         details: 'some error details',
@@ -81,8 +81,8 @@ describe('checkoutError', () => {
       new CheckoutError(
         'Error message',
         CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
-        { innerDetails: 'inner details of main error' }
-      )
+        { innerDetails: 'inner details of main error' },
+      ),
     );
     try {
       await withCheckoutError(errorFunction, {
@@ -95,7 +95,7 @@ describe('checkoutError', () => {
       // https://github.com/facebook/jest/issues/11693
       expect(errorObject.type).toEqual(CheckoutErrorType.GET_BALANCE_ERROR);
       expect(errorObject.message).toEqual(
-        '[GET_BALANCE_ERROR]:Custom message. Cause:Error message'
+        '[GET_BALANCE_ERROR]:Custom message. Cause:Error message',
       );
       expect(errorObject.data).toEqual({
         details: 'some error details',
