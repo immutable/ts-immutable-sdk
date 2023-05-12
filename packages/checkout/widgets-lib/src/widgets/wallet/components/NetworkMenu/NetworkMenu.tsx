@@ -8,7 +8,6 @@ import {
   SwitchNetworkParams,
 } from '@imtbl/checkout-sdk';
 import { text } from '../../../../resources/text/textConfig';
-import { WalletWidgetViews } from '../../../../context/WalletViewContextTypes';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
 import {
   ActiveNetworkButtonStyle,
@@ -17,18 +16,17 @@ import {
   NetworkHeadingStyle,
   NetworkMenuStyles,
 } from './NetworkMenuStyles';
-import {
-  BaseViews,
-  ViewActions,
-  ViewContext,
-} from '../../../../context/ViewContext';
-import { getTokenBalances } from '../../functions/tokenBalances';
 import { sortNetworksCompareFn } from '../../../../lib/utils';
+import {
+  ViewContext,
+  ViewActions,
+  BaseViews,
+} from '../../../../context/view-context/ViewContext';
+import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 
 export const NetworkMenu = () => {
-  const { walletState, walletDispatch } = useContext(WalletContext);
   const { viewDispatch } = useContext(ViewContext);
-
+  const { walletState, walletDispatch } = useContext(WalletContext);
   const { networkStatus } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const { checkout, network, provider } = walletState;
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[] | undefined>(
@@ -38,7 +36,7 @@ export const NetworkMenu = () => {
     [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
     [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
     [ChainId.ETHEREUM]: 'base.color.accent.5',
-    [ChainId.GOERLI]: 'base.color.accent.5',
+    [ChainId.SEPOLIA]: 'base.color.accent.5',
   };
 
   //todo: add corresponding network symbols
@@ -46,7 +44,7 @@ export const NetworkMenu = () => {
     [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
     [ChainId.ETHEREUM]: 'EthToken',
     [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
-    [ChainId.GOERLI]: 'EthToken',
+    [ChainId.SEPOLIA]: 'EthToken',
   };
 
   const switchNetwork = useCallback(
@@ -67,14 +65,8 @@ export const NetworkMenu = () => {
 
         walletDispatch({
           payload: {
-            type: WalletActions.SWITCH_NETWORK,
+            type: WalletActions.SET_NETWORK,
             network: switchNetworkResult.network,
-            tokenBalances: await getTokenBalances(
-              checkout,
-              switchNetworkResult?.provider,
-              switchNetworkResult.network.name,
-              switchNetworkResult.network.chainId
-            ),
           },
         });
 

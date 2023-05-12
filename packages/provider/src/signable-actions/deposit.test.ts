@@ -1,9 +1,9 @@
-import { deposit } from './deposit';
-import * as depositActions from './deposit-actions';
-import { Signers } from './types';
 import { TokenAmount } from '@imtbl/core-sdk';
 import { ProviderConfiguration } from 'config';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { deposit } from './deposit';
+import * as depositActions from './deposit-actions';
+import { Signers } from './types';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('./deposit-actions');
@@ -28,13 +28,13 @@ describe('deposit', () => {
       depositEthMock = jest.fn();
 
       (depositActions.depositERC20 as jest.Mock).mockImplementation(
-        depositERC20Mock
+        depositERC20Mock,
       );
       (depositActions.depositERC721 as jest.Mock).mockImplementation(
-        depositERC721Mock
+        depositERC721Mock,
       );
       (depositActions.depositEth as jest.Mock).mockImplementation(
-        depositEthMock
+        depositEthMock,
       );
     });
 
@@ -60,19 +60,22 @@ describe('deposit', () => {
     ];
 
     testCases.forEach((testCase) => {
-      test(`should call deposit${testCase.depositType}() when the type in the paylod is ${testCase.depositType}`, async () => {
-        await deposit({
-          signers: {} as Signers,
-          deposit: { type: testCase.depositType } as unknown as TokenAmount,
-          config,
-        });
+      test(
+        `should call deposit${testCase.depositType}() when the type in the paylod is ${testCase.depositType}`,
+        async () => {
+          await deposit({
+            signers: {} as Signers,
+            deposit: { type: testCase.depositType } as unknown as TokenAmount,
+            config,
+          });
 
-        expect(depositERC20Mock).toBeCalledTimes(testCase.callsToDepositERC20);
-        expect(depositERC721Mock).toBeCalledTimes(
-          testCase.callsToDepositERC721
-        );
-        expect(depositEthMock).toBeCalledTimes(testCase.callsToDepositEth);
-      });
+          expect(depositERC20Mock).toBeCalledTimes(testCase.callsToDepositERC20);
+          expect(depositERC721Mock).toBeCalledTimes(
+            testCase.callsToDepositERC721,
+          );
+          expect(depositEthMock).toBeCalledTimes(testCase.callsToDepositEth);
+        },
+      );
     });
 
     test('should not call deposit when deposit type is invalid', async () => {

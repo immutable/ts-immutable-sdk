@@ -15,7 +15,7 @@ describe('providerError', () => {
     expect(
       await withProviderError(anyFn, {
         type: ProviderErrorType.PROVIDER_CONNECTION_ERROR,
-      })
+      }),
     ).toEqual(returnValue);
   });
 
@@ -26,12 +26,12 @@ describe('providerError', () => {
     await expect(
       withProviderError(errorFunction, {
         type: ProviderErrorType.PROVIDER_CONNECTION_ERROR,
-      })
+      }),
     ).rejects.toThrow(
       new ProviderError(
         'Error message',
-        ProviderErrorType.PROVIDER_CONNECTION_ERROR
-      )
+        ProviderErrorType.PROVIDER_CONNECTION_ERROR,
+      ),
     );
   });
 
@@ -43,12 +43,12 @@ describe('providerError', () => {
       withProviderError(errorFunction, {
         type: ProviderErrorType.PROVIDER_CONNECTION_ERROR,
         message: 'Custom message',
-      })
+      }),
     ).rejects.toThrow(
       new ProviderError(
         'Custom message',
-        ProviderErrorType.PROVIDER_CONNECTION_ERROR
-      )
+        ProviderErrorType.PROVIDER_CONNECTION_ERROR,
+      ),
     );
   });
 });

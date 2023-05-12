@@ -1,6 +1,10 @@
 import { ChainId, GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
-import { sortTokensByAmount } from './utils';
+import {
+  calculateCryptoToFiat,
+  formatFiatString,
+  sortTokensByAmount,
+} from './utils';
 import { Environment } from '@imtbl/config';
 
 describe('utils', () => {
@@ -229,6 +233,89 @@ describe('utils', () => {
           } as unknown as TokenInfo,
         },
       ]);
+    });
+  });
+
+  describe('calculateCryptoToFiat', () => {
+    it('should return zero balance string if balance is not provided', () => {
+      const result = calculateCryptoToFiat(
+        '',
+        'eth',
+        new Map<string, number>()
+      );
+      expect(result).toBe('-.--');
+    });
+
+    it('should return zero balance string if no conversion is found', () => {
+      const result = calculateCryptoToFiat(
+        '10',
+        'eth',
+        new Map<string, number>()
+      );
+      expect(result).toBe('-.--');
+    });
+
+    it('should return zero balance string if balance is zero', () => {
+      const result = calculateCryptoToFiat(
+        '0',
+        'eth',
+        new Map<string, number>([['eth', 1800]])
+      );
+      expect(result).toBe('-.--');
+    });
+
+    it('should return zero balance string if balance is NaN', () => {
+      const result = calculateCryptoToFiat(
+        'abc',
+        'eth',
+        new Map<string, number>([['eth', 1800]])
+      );
+      expect(result).toBe('-.--');
+    });
+
+    it('should return calculated fiat value if valid balance and conversion are provided', () => {
+      const result = calculateCryptoToFiat(
+        '10',
+        'eth',
+        new Map<string, number>([['eth', 1800]])
+      );
+      expect(result).toBe('18000.00');
+    });
+
+    it('should handle lowercase and uppercase symbols', () => {
+      const result = calculateCryptoToFiat(
+        '10',
+        'eth',
+        new Map<string, number>([['eth', 1800]])
+      );
+      expect(result).toBe('18000.00');
+    });
+  });
+
+  describe('formatFiatString', () => {
+    it('should format number', () => {
+      const result = formatFiatString(123.12);
+      expect(result).toBe('123.12');
+    });
+
+    it('should format number and round down', () => {
+      const result = formatFiatString(123.124);
+      expect(result).toBe('123.12');
+    });
+
+    it('should format number and round up', () => {
+      const result = formatFiatString(123.125);
+      expect(result).toBe('123.13');
+    });
+
+    it('should format number with less than two decimal places', () => {
+      const result = formatFiatString(123.4);
+      expect(result).toBe('123.40');
+    });
+
+    it('should format number with no decimal places', () => {
+      const result = formatFiatString(123);
+      expect(result).toBe('123.00');
     });
   });
 });

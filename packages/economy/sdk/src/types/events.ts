@@ -7,9 +7,9 @@ export type EventType<A = EventAction, D = EventData> = { action: A } & D;
 /**
  * @public Namespaces for Custom Events emitted by the Economy SDK
  */
-export const EconomyCustomEventTypes = {
-  DEFAULT: 'imtbl-economy-event',
-} as const;
+export enum EconomyCustomEventTypes {
+  DEFAULT = 'imtbl-economy-event',
+}
 export type EconomyCustomEventType =
   (typeof EconomyCustomEventTypes)[keyof typeof EconomyCustomEventTypes];
 
@@ -31,3 +31,19 @@ export enum EventActions {
   'CRAFT' = 'CRAFT',
 }
 export type EventAction = keyof typeof EventActions;
+
+/**
+ * Types of SDK Errors
+ */
+export type ErrorType =
+  | 'CRAFTING_ERROR'
+  | 'INVENTORY_ERROR'
+  | 'RECIPE_ERROR'
+  | 'ITEM_DEFINITION_ERROR'
+  | 'UNKNOWN_ERROR';
+
+/** SDK Error Payload */
+export type SDKErrorType = {
+  type: ErrorType;
+  message?: string;
+};

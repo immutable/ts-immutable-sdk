@@ -50,8 +50,7 @@ export async function createOrder({
     getSignableOrderRequestV3: getSignableOrderRequest,
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    getSignableOrderResponse.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = getSignableOrderResponse.data;
 
   const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 
@@ -97,11 +96,10 @@ export async function cancelOrder({
       getSignableCancelOrderRequest: {
         order_id: request.order_id,
       },
-    }
+    },
   );
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    getSignableCancelOrderResponse.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
 
   const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 

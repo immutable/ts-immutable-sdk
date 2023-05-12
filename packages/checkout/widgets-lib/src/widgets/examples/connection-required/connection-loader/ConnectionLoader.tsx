@@ -3,7 +3,6 @@ import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { useState } from 'react';
 import { InnerWidget } from '../inner-widget/InnerWidget';
-import { InnerExampleWidgetViews } from '../../../../context/InnerExampleViewContextTypes';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
@@ -14,6 +13,7 @@ import {
 import { CenteredBoxContent } from '../../../../components/CenteredBoxContent/CenteredBoxContent';
 import { zkEVMNetwork } from '../../../../lib/networkUtils';
 import { Environment } from '@imtbl/config';
+import { InnerExampleWidgetViews } from '../../../../context/view-context/InnerExampleViewContextTypes';
 
 export interface ConnectionLoaderProps {
   children?: React.ReactNode;

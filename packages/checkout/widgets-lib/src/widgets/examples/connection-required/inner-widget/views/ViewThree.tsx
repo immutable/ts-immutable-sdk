@@ -3,8 +3,11 @@ import { useContext } from 'react';
 import { FooterLogo } from '../../../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../../../components/SimpleLayout/SimpleLayout';
-import { ViewContext, ViewActions } from '../../../../../context/ViewContext';
-import { InnerExampleWidgetViews } from '../../../../../context/InnerExampleViewContextTypes';
+import { InnerExampleWidgetViews } from '../../../../../context/view-context/InnerExampleViewContextTypes';
+import {
+  ViewContext,
+  ViewActions,
+} from '../../../../../context/view-context/ViewContext';
 
 export const ViewThree = () => {
   const { viewDispatch } = useContext(ViewContext);

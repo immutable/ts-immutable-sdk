@@ -1,14 +1,15 @@
 import React from 'react';
 
+import { Environment } from '@imtbl/config';
 import {
   WidgetConnectionProviders,
   WidgetTheme,
 } from '../definitions/constants';
-import { Environment } from '@imtbl/config';
 
 /**
  * Interface representing the props for the Wallet Widget component.
- * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Wallet Widget (default: {@link WidgetConnectionProviders.METAMASK}).
+ * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Wallet Widget
+ * (default: {@link WidgetConnectionProviders.METAMASK}).
  */
 export interface WalletReactProps {
   providerPreference?: WidgetConnectionProviders;
@@ -47,6 +48,6 @@ export function WalletReact(props: WalletReactProps) {
       isBridgeEnabled={isBridgeEnabled?.toString()}
       isSwapEnabled={isSwapEnabled?.toString()}
       isOnRampEnabled={isOnRampEnabled?.toString()}
-    ></imtbl-wallet>
+    />
   );
 }

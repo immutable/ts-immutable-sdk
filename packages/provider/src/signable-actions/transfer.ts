@@ -5,8 +5,8 @@ import {
   TransfersApi,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import { Signers } from './types';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
+import { Signers } from './types';
 import { validateChain } from './helpers';
 import { ProviderConfiguration } from '../config';
 
@@ -31,7 +31,7 @@ export async function transfer({
 
   const ethAddress = await ethSigner.getAddress();
   const transfersApi = new TransfersApi(
-    config.immutableXConfig.apiConfiguration
+    config.immutableXConfig.apiConfiguration,
   );
 
   const transferAmount = request.type === 'ERC721' ? '1' : request.amount;
@@ -44,8 +44,7 @@ export async function transfer({
     },
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    signableResult.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
 
   const ethSignature = await signRaw(signableMessage, ethSigner);
 
@@ -87,20 +86,18 @@ export async function batchTransfer({
 
   const ethAddress = await ethSigner.getAddress();
   const transfersApi = new TransfersApi(
-    config.immutableXConfig.apiConfiguration
+    config.immutableXConfig.apiConfiguration,
   );
 
-  const signableRequests = request.map((nftTransfer) => {
-    return {
-      amount: '1',
-      token: convertToSignableToken({
-        type: 'ERC721',
-        tokenId: nftTransfer.tokenId,
-        tokenAddress: nftTransfer.tokenAddress,
-      }),
-      receiver: nftTransfer.receiver,
-    };
-  });
+  const signableRequests = request.map((nftTransfer) => ({
+    amount: '1',
+    token: convertToSignableToken({
+      type: 'ERC721',
+      tokenId: nftTransfer.tokenId,
+      tokenAddress: nftTransfer.tokenAddress,
+    }),
+    receiver: nftTransfer.receiver,
+  }));
 
   const signableResult = await transfersApi.getSignableTransfer({
     getSignableTransferRequestV2: {
@@ -119,6 +116,8 @@ export async function batchTransfer({
 
   const requests = [];
   for (const resp of signableResult.data.signable_responses) {
+    // TODO: remove once fixed
+    // eslint-disable-next-line no-await-in-loop
     const starkSignature = await starkSigner.signMessage(resp.payload_hash);
     const req = {
       sender_vault_id: resp.sender_vault_id,

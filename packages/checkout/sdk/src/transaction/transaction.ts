@@ -5,7 +5,7 @@ import {
 } from '../types/transaction';
 
 export const sendTransaction = async (
-  params: SendTransactionParams
+  params: SendTransactionParams,
 ): Promise<SendTransactionResult> => {
   const { provider, transaction } = params;
   return await withCheckoutError<SendTransactionResult>(
@@ -17,6 +17,6 @@ export const sendTransaction = async (
         transactionResponse,
       };
     },
-    { type: CheckoutErrorType.TRANSACTION_ERROR }
+    { type: CheckoutErrorType.TRANSACTION_ERROR },
   );
 };

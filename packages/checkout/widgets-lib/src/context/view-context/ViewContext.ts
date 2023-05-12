@@ -4,6 +4,7 @@ import { TransitionExampleWidgetView } from './TransitionExampleViewContextTypes
 import { InnerExampleWidgetView } from './InnerExampleViewContextTypes';
 import { OuterExampleWidgetView } from './OuterExampleViewContextTypes';
 import { WalletWidgetView } from './WalletViewContextTypes';
+import { SwapWidgetView } from './SwapViewContextTypes';
 
 export enum BaseViews {
   LOADING_VIEW = 'LOADING_VIEW',
@@ -21,6 +22,7 @@ export type View =
   | BaseView
   | ConnectWidgetView
   | WalletWidgetView
+  | SwapWidgetView
   | TransitionExampleWidgetView
   | InnerExampleWidgetView
   | OuterExampleWidgetView;

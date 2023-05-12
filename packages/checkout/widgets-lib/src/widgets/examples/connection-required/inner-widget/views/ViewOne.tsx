@@ -3,10 +3,13 @@ import { useContext } from 'react';
 import { FooterLogo } from '../../../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../../../components/SimpleLayout/SimpleLayout';
-import { ViewContext, ViewActions } from '../../../../../context/ViewContext';
-import { InnerExampleWidgetViews } from '../../../../../context/InnerExampleViewContextTypes';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import { InnerExampleWidgetViews } from '../../../../../context/view-context/InnerExampleViewContextTypes';
+import {
+  ViewContext,
+  ViewActions,
+} from '../../../../../context/view-context/ViewContext';
 
 export const ViewOne = () => {
   const { viewDispatch } = useContext(ViewContext);

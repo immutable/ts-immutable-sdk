@@ -12,7 +12,7 @@ export function getIFrame(): HTMLIFrameElement | null {
 }
 
 export async function setupIFrame(
-  env: Environment
+  env: Environment,
 ): Promise<HTMLIFrameElement> {
   return new Promise((resolve) => {
     const iframe = document.createElement('iframe');
@@ -28,7 +28,7 @@ export async function setupIFrame(
 }
 
 export async function getOrSetupIFrame(
-  env: Environment
+  env: Environment,
 ): Promise<HTMLIFrameElement> {
   const iframe = getIFrame();
   if (iframe) return iframe;

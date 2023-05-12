@@ -2,8 +2,8 @@ import { Body, Box } from '@biom3/react';
 import { BalanceItem } from '../BalanceItem/BalanceItem';
 import { TokenBalanceListStyle } from './TokenBalanceListStyles';
 import { text } from '../../../../resources/text/textConfig';
-import { WalletWidgetViews } from '../../../../context/WalletViewContextTypes';
 import { BalanceInfo } from '../../functions/tokenBalances';
+import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 
 interface TokenBalanceListProps {
   balanceInfoItems: BalanceInfo[];
