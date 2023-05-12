@@ -7,7 +7,7 @@ export type RequestMessage<T> = {
 
 export function postRequestMessage<T>(
   iframe: HTMLIFrameElement,
-  payload: RequestMessage<T>
+  payload: RequestMessage<T>,
 ) {
   if (iframe && iframe.contentWindow) {
     iframe.contentWindow.postMessage(payload, new URL(iframe.src).origin);

@@ -1,3 +1,4 @@
+import { StarkSigner } from '@imtbl/core-sdk';
 import {
   COMMUNICATION_TYPE,
   ResponseEventType,
@@ -6,10 +7,10 @@ import {
 import { messageResponseListener } from './messageResponseListener';
 import { postRequestMessage } from './postRequestMessage';
 import { SignMessageRequest, SignMessageResponse } from './types';
-import { StarkSigner } from '@imtbl/core-sdk';
 
 export class ImxSigner implements StarkSigner {
   private publicAddress;
+
   private iframe;
 
   constructor(publicAddress: string, iframe: HTMLIFrameElement) {
@@ -36,7 +37,7 @@ export class ImxSigner implements StarkSigner {
             }
 
             resolve(messageDetails.data.signedMessage);
-          }
+          },
         );
       };
       window.addEventListener(COMMUNICATION_TYPE, listener);

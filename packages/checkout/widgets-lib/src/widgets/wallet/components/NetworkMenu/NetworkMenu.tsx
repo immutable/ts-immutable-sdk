@@ -22,13 +22,11 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../../context/ViewContext';
-import { getTokenBalances } from '../../functions/tokenBalances';
 import { sortNetworksCompareFn } from '../../../../lib/utils';
 
 export const NetworkMenu = () => {
-  const { walletState, walletDispatch } = useContext(WalletContext);
   const { viewDispatch } = useContext(ViewContext);
-
+  const { walletState, walletDispatch } = useContext(WalletContext);
   const { networkStatus } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const { checkout, network, provider } = walletState;
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[] | undefined>(
@@ -67,14 +65,8 @@ export const NetworkMenu = () => {
 
         walletDispatch({
           payload: {
-            type: WalletActions.SWITCH_NETWORK,
+            type: WalletActions.SET_NETWORK,
             network: switchNetworkResult.network,
-            tokenBalances: await getTokenBalances(
-              checkout,
-              switchNetworkResult?.provider,
-              switchNetworkResult.network.name,
-              switchNetworkResult.network.chainId
-            ),
           },
         });
 

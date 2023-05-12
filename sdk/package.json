@@ -22,6 +22,7 @@
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/config": "0.0.0",
+    "@imtbl/cryptofiat": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/provider": "0.0.0",

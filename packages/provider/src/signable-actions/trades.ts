@@ -1,11 +1,10 @@
-import { CreateTradeResponse, GetSignableTradeRequest } from '@imtbl/core-sdk';
+import { CreateTradeResponse, GetSignableTradeRequest, TradesApi } from '@imtbl/core-sdk';
+import { signRaw } from '@imtbl/toolkit';
 import { Signers } from './types';
 import { validateChain } from './helpers';
-import { signRaw } from '@imtbl/toolkit';
-import { TradesApi } from '@imtbl/core-sdk';
 import { ProviderConfiguration } from '../config';
 
-type createTradeWorkflowParams = {
+type CreateTradeWorkflowParams = {
   signers: Signers;
   request: GetSignableTradeRequest;
   config: ProviderConfiguration;
@@ -15,7 +14,7 @@ export async function createTrade({
   signers: { ethSigner, starkSigner },
   request,
   config,
-}: createTradeWorkflowParams): Promise<CreateTradeResponse> {
+}: CreateTradeWorkflowParams): Promise<CreateTradeResponse> {
   await validateChain(ethSigner, config.immutableXConfig);
   const ethAddress = await ethSigner.getAddress();
   const tradesApi = new TradesApi(config.immutableXConfig.apiConfiguration);
@@ -28,8 +27,7 @@ export async function createTrade({
     },
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    signableResult.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
 
   const ethSignature = await signRaw(signableMessage, ethSigner);
 

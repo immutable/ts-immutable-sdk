@@ -8,6 +8,7 @@ import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
+import { CryptoFiat } from '@imtbl/cryptofiat';
 
 describe('WalletWidget tests', () => {
   beforeEach(() => {
@@ -130,7 +131,7 @@ describe('WalletWidget tests', () => {
           },
           {
             balance: BigNumber.from(2),
-            formattedBalance: '88888999',
+            formattedBalance: '899',
             token: {
               name: 'Immutable X',
               symbol: 'IMX',
@@ -139,7 +140,7 @@ describe('WalletWidget tests', () => {
           },
           {
             balance: BigNumber.from(3),
-            formattedBalance: '100000000.2',
+            formattedBalance: '100.2',
             token: {
               name: 'Gods Unchained',
               symbol: 'GODS',
@@ -167,6 +168,20 @@ describe('WalletWidget tests', () => {
         getAddress: cy.stub().resolves('0x123'),
       };
       cy.stub(Web3Provider.prototype, 'getSigner').returns(signerStub);
+
+      cy.stub(CryptoFiat.prototype, 'convert')
+        .as('cryptoFiatStub')
+        .resolves({
+          eth: {
+            usd: 1800,
+          },
+          imx: {
+            usd: 0.7,
+          },
+          gods: {
+            usd: 0.8,
+          },
+        });
     });
 
     it('should show the network and user balances on that network', () => {
@@ -192,7 +207,7 @@ describe('WalletWidget tests', () => {
       cySmartGet('Ethereum-network-button').should('include.text', 'Ethereum');
 
       cySmartGet('total-token-balance').should('exist');
-      cySmartGet('total-token-balance').should('have.text', '≈ USD $70.50');
+      cySmartGet('total-token-balance').should('have.text', '≈ USD $22525.46');
 
       cySmartGet('balance-item-ETH').should('exist');
       cySmartGet('balance-item-GODS').should('exist');
@@ -224,15 +239,12 @@ describe('WalletWidget tests', () => {
       cySmartGet('balance-item-IMX').should('exist');
       cySmartGet('balance-item-IMX').should('include.text', 'IMX');
       cySmartGet('balance-item-IMX').should('include.text', 'Immutable X');
-      cySmartGet('balance-item-IMX__price').should('have.text', '88,888,999');
+      cySmartGet('balance-item-IMX__price').should('have.text', '899');
 
       cySmartGet('balance-item-GODS').should('exist');
       cySmartGet('balance-item-GODS').should('include.text', 'GODS');
       cySmartGet('balance-item-GODS').should('include.text', 'Gods Unchained');
-      cySmartGet('balance-item-GODS__price').should(
-        'have.text',
-        '100,000,000.2'
-      );
+      cySmartGet('balance-item-GODS__price').should('have.text', '100.2');
     });
   });
 });

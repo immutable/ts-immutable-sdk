@@ -4,10 +4,10 @@
 
 import { ethers } from 'ethers';
 
+import { Environment } from '@imtbl/config';
 import { RequestEventType, ResponseEventType } from './events';
 import { connect, disconnect } from './imxWallet';
 import { postRequestMessage } from './postRequestMessage';
-import { Environment } from '@imtbl/config';
 import { asyncTriggerIFrameOnLoad } from './testUtils';
 import { getOrSetupIFrame } from './imxWalletIFrame';
 import { ImxSigner } from './ImxSigner';
@@ -88,7 +88,7 @@ describe('imxWallet', () => {
         });
 
       expect(connect(l1Provider, env)).rejects.toThrow(
-        'The L2 IMX Wallet connection has failed.'
+        'The L2 IMX Wallet connection has failed.',
       );
     });
   });
