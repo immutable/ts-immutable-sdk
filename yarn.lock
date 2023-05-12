@@ -2518,6 +2518,7 @@ __metadata:
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/config": 0.0.0
+    "@imtbl/cryptofiat": 0.0.0
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
     "@testing-library/user-event": ^13.5.0
@@ -2639,7 +2640,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@imtbl/cryptofiat@workspace:packages/internal/cryptofiat":
+"@imtbl/cryptofiat@0.0.0, @imtbl/cryptofiat@workspace:packages/internal/cryptofiat":
   version: 0.0.0-use.local
   resolution: "@imtbl/cryptofiat@workspace:packages/internal/cryptofiat"
   dependencies:
@@ -2860,6 +2861,7 @@ __metadata:
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^1.1.1-alpha.1
+    "@imtbl/cryptofiat": 0.0.0
     "@imtbl/immutablex-client": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/provider": 0.0.0

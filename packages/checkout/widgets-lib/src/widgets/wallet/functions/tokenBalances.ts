@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, ChainId } from '@imtbl/checkout-sdk';
-import { sortTokensByAmount } from '../../../lib/utils';
+import { calculateCryptoToFiat, sortTokensByAmount } from '../../../lib/utils';
 
 export interface BalanceInfo {
   id: string;
@@ -15,7 +15,8 @@ export const getTokenBalances = async (
   checkout: Checkout,
   provider: Web3Provider,
   networkName: string,
-  chainId: ChainId
+  chainId: ChainId,
+  conversions: Map<string, number>
 ): Promise<BalanceInfo[]> => {
   if (!checkout || !provider || !chainId) return [];
 
@@ -38,7 +39,11 @@ export const getTokenBalances = async (
       tokenBalances.push({
         id: networkName + '-' + balance.token.symbol,
         balance: balance.formattedBalance,
-        fiatAmount: '23.50', // todo: fetch fiat price from coinGecko apis
+        fiatAmount: calculateCryptoToFiat(
+          balance.formattedBalance,
+          balance.token.symbol,
+          conversions
+        ),
         symbol: balance.token.symbol,
         description: balance.token.name,
       });

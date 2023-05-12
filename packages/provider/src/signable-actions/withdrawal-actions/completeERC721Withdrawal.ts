@@ -4,17 +4,17 @@ import {
   Contracts,
   ImmutableXConfiguration,
   UsersApi,
+  ERC721Token,
 } from '@imtbl/core-sdk';
 import * as encUtils from 'enc-utils';
-import { ERC721Token } from '@imtbl/core-sdk';
+import { TransactionResponse } from '@ethersproject/providers';
+import { ProviderConfiguration } from 'config';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
 } from '../registration';
-import { TransactionResponse } from '@ethersproject/providers';
 import { validateChain } from '../helpers';
-import { ProviderConfiguration } from 'config';
 
 interface MintableERC721Withdrawal {
   type: 'ERC721';
@@ -37,19 +37,18 @@ async function executeWithdrawMintableERC721(
   assetType: string,
   starkPublicKey: string,
   mintingBlob: string,
-  config: ImmutableXConfiguration
+  config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const contract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    ethSigner
+    ethSigner,
   );
 
-  const populatedTransaction =
-    await contract.populateTransaction.withdrawAndMint(
-      starkPublicKey,
-      assetType,
-      mintingBlob
-    );
+  const populatedTransaction = await contract.populateTransaction.withdrawAndMint(
+    starkPublicKey,
+    assetType,
+    mintingBlob,
+  );
   return ethSigner.sendTransaction(populatedTransaction);
 }
 
@@ -58,35 +57,34 @@ async function executeRegisterAndWithdrawMintableERC721(
   assetType: string,
   starkPublicKey: string,
   mintingBlob: string,
-  config: ImmutableXConfiguration
+  config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
   const usersApi = new UsersApi(config.apiConfiguration);
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
-    usersApi
+    usersApi,
   );
 
   const contract = Contracts.Registration.connect(
     config.ethConfiguration.registrationContractAddress,
-    ethSigner
+    ethSigner,
   );
 
-  const populatedTransaction =
-    await contract.populateTransaction.regsiterAndWithdrawAndMint(
-      etherKey,
-      starkPublicKey,
-      signableResult.operator_signature,
-      assetType,
-      mintingBlob
-    );
+  const populatedTransaction = await contract.populateTransaction.regsiterAndWithdrawAndMint(
+    etherKey,
+    starkPublicKey,
+    signableResult.operator_signature,
+    assetType,
+    mintingBlob,
+  );
 
   return ethSigner.sendTransaction(populatedTransaction);
 }
 
 function getMintingBlob(token: MintableERC721Withdrawal): string {
-  const id = token.data.id;
+  const { id } = token.data;
   const blueprint = token.data.blueprint || '';
   return encUtils.sanitizeHex(encUtils.utf8ToHex(`{${id}}:{${blueprint}}`));
 }
@@ -95,7 +93,7 @@ async function completeMintableERC721Withdrawal(
   ethSigner: Signer,
   starkPublicKey: string,
   token: MintableERC721Withdrawal,
-  config: ProviderConfiguration
+  config: ProviderConfiguration,
 ) {
   const imxConfig = config.immutableXConfig;
   const assetType = await getEncodeAssetInfo(
@@ -106,7 +104,7 @@ async function completeMintableERC721Withdrawal(
       id: token.data.id,
       token_address: token.data.tokenAddress,
       ...(token.data.blueprint && { blueprint: token.data.blueprint }),
-    }
+    },
   );
 
   const mintingBlob = getMintingBlob(token);
@@ -114,7 +112,7 @@ async function completeMintableERC721Withdrawal(
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    config
+    config,
   );
 
   if (!isRegistered) {
@@ -123,17 +121,16 @@ async function completeMintableERC721Withdrawal(
       assetType.asset_type,
       starkPublicKey,
       mintingBlob,
-      imxConfig
-    );
-  } else {
-    return executeWithdrawMintableERC721(
-      ethSigner,
-      assetType.asset_type,
-      starkPublicKey,
-      mintingBlob,
-      imxConfig
+      imxConfig,
     );
   }
+  return executeWithdrawMintableERC721(
+    ethSigner,
+    assetType.asset_type,
+    starkPublicKey,
+    mintingBlob,
+    imxConfig,
+  );
 }
 
 async function executeRegisterAndWithdrawERC721(
@@ -141,29 +138,28 @@ async function executeRegisterAndWithdrawERC721(
   assetType: string,
   starkPublicKey: string,
   tokenId: string,
-  config: ImmutableXConfiguration
+  config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const etherKey = await ethSigner.getAddress();
   const usersApi = new UsersApi(config.apiConfiguration);
   const signableResult = await getSignableRegistrationOnchain(
     etherKey,
     starkPublicKey,
-    usersApi
+    usersApi,
   );
 
   const contract = Contracts.Registration.connect(
     config.ethConfiguration.registrationContractAddress,
-    ethSigner
+    ethSigner,
   );
 
-  const populatedTransaction =
-    await contract.populateTransaction.registerAndWithdrawNft(
-      etherKey,
-      starkPublicKey,
-      signableResult.operator_signature,
-      assetType,
-      tokenId
-    );
+  const populatedTransaction = await contract.populateTransaction.registerAndWithdrawNft(
+    etherKey,
+    starkPublicKey,
+    signableResult.operator_signature,
+    assetType,
+    tokenId,
+  );
 
   return ethSigner.sendTransaction(populatedTransaction);
 }
@@ -173,17 +169,17 @@ async function executeWithdrawERC721(
   assetType: string,
   starkPublicKey: string,
   tokenId: string,
-  config: ImmutableXConfiguration
+  config: ImmutableXConfiguration,
 ): Promise<TransactionResponse> {
   const contract = Contracts.Core.connect(
     config.ethConfiguration.coreContractAddress,
-    ethSigner
+    ethSigner,
   );
 
   const populatedTransaction = await contract.populateTransaction.withdrawNft(
     starkPublicKey,
     assetType,
-    tokenId
+    tokenId,
   );
   return ethSigner.sendTransaction(populatedTransaction);
 }
@@ -192,7 +188,7 @@ async function completeERC721Withdrawal(
   ethSigner: Signer,
   starkPublicKey: string,
   token: ERC721Token,
-  config: ProviderConfiguration
+  config: ProviderConfiguration,
 ) {
   const imxConfig = config.immutableXConfig;
   const assetType = await getEncodeAssetInfo('asset', 'ERC721', imxConfig, {
@@ -203,7 +199,7 @@ async function completeERC721Withdrawal(
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    config
+    config,
   );
 
   if (!isRegistered) {
@@ -212,17 +208,16 @@ async function completeERC721Withdrawal(
       assetType.asset_type,
       starkPublicKey,
       token.tokenId,
-      imxConfig
-    );
-  } else {
-    return executeWithdrawERC721(
-      ethSigner,
-      assetType.asset_type,
-      starkPublicKey,
-      token.tokenId,
-      imxConfig
+      imxConfig,
     );
   }
+  return executeWithdrawERC721(
+    ethSigner,
+    assetType.asset_type,
+    starkPublicKey,
+    token.tokenId,
+    imxConfig,
+  );
 }
 
 export async function completeERC721WithdrawalAction({
@@ -233,8 +228,8 @@ export async function completeERC721WithdrawalAction({
 }: CompleteERC721WithdrawalActionParams) {
   await validateChain(ethSigner, config.immutableXConfig);
 
-  const tokenAddress = token.tokenAddress;
-  const tokenId = token.tokenId;
+  const { tokenAddress } = token;
+  const { tokenId } = token;
   const imxConfig = config.immutableXConfig;
   const mintsApi = new MintsApi(imxConfig.apiConfiguration);
 
@@ -243,21 +238,19 @@ export async function completeERC721WithdrawalAction({
       tokenAddress,
       tokenId,
     })
-    .then((mintableToken) =>
-      completeMintableERC721Withdrawal(
-        ethSigner,
-        starkPublicKey,
-        {
-          type: 'ERC721',
-          data: {
-            id: tokenId,
-            tokenAddress: tokenAddress,
-            blueprint: mintableToken.data.blueprint,
-          },
+    .then((mintableToken) => completeMintableERC721Withdrawal(
+      ethSigner,
+      starkPublicKey,
+      {
+        type: 'ERC721',
+        data: {
+          id: tokenId,
+          tokenAddress,
+          blueprint: mintableToken.data.blueprint,
         },
-        config
-      )
-    )
+      },
+      config,
+    ))
     .catch((error) => {
       if (error.response?.status === 404) {
         // token is already minted on L1
@@ -265,7 +258,7 @@ export async function completeERC721WithdrawalAction({
           ethSigner,
           starkPublicKey,
           token,
-          config
+          config,
         );
       }
       throw error; // unable to recover from any other kind of error

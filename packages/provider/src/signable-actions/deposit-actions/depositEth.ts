@@ -8,12 +8,12 @@ import {
   UsersApi,
 } from '@imtbl/core-sdk';
 import { parseUnits } from '@ethersproject/units';
+import { BigNumber } from '@ethersproject/bignumber';
+import { TransactionResponse } from '@ethersproject/providers';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
 } from '../registration';
-import { BigNumber } from '@ethersproject/bignumber';
-import { TransactionResponse } from '@ethersproject/providers';
 import { validateChain } from '../helpers';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
@@ -27,6 +27,58 @@ type DepositEthParams = {
   deposit: ETHAmount;
   config: ProviderConfiguration;
 };
+
+async function executeRegisterAndDepositEth(
+  ethSigner: EthSigner,
+  amount: BigNumber,
+  assetType: string,
+  starkPublicKey: string,
+  vaultId: number,
+  config: ImmutableXConfiguration,
+  usersApi: UsersApi,
+): Promise<TransactionResponse> {
+  const etherKey = await ethSigner.getAddress();
+  const coreContract = Contracts.Core.connect(
+    config.ethConfiguration.coreContractAddress,
+    ethSigner,
+  );
+
+  const signableResult = await getSignableRegistrationOnchain(
+    etherKey,
+    starkPublicKey,
+    usersApi,
+  );
+
+  const populatedTransaction = await coreContract.populateTransaction.registerAndDepositEth(
+    etherKey,
+    starkPublicKey,
+    signableResult.operator_signature,
+    assetType,
+    vaultId,
+  );
+
+  return ethSigner.sendTransaction({ ...populatedTransaction, value: amount });
+}
+
+async function executeDepositEth(
+  ethSigner: EthSigner,
+  amount: BigNumber,
+  assetType: string,
+  starkPublicKey: string,
+  vaultId: number,
+  config: ImmutableXConfiguration,
+): Promise<TransactionResponse> {
+  const coreContract = Contracts.Core.connect(
+    config.ethConfiguration.coreContractAddress,
+    ethSigner,
+  );
+
+  const populatedTransaction = await coreContract.populateTransaction[
+    'deposit(uint256,uint256,uint256)'
+  ](starkPublicKey, assetType, vaultId);
+
+  return ethSigner.sendTransaction({ ...populatedTransaction, value: amount });
+}
 
 export async function depositEth({
   signers: { ethSigner },
@@ -74,7 +126,7 @@ export async function depositEth({
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    config
+    config,
   );
 
   if (!isRegistered) {
@@ -85,69 +137,15 @@ export async function depositEth({
       starkPublicKey,
       vaultId,
       imxConfig,
-      usersApi
-    );
-  } else {
-    return executeDepositEth(
-      ethSigner,
-      amount,
-      assetType,
-      starkPublicKey,
-      vaultId,
-      imxConfig
+      usersApi,
     );
   }
-}
-
-async function executeRegisterAndDepositEth(
-  ethSigner: EthSigner,
-  amount: BigNumber,
-  assetType: string,
-  starkPublicKey: string,
-  vaultId: number,
-  config: ImmutableXConfiguration,
-  usersApi: UsersApi
-): Promise<TransactionResponse> {
-  const etherKey = await ethSigner.getAddress();
-  const coreContract = Contracts.Core.connect(
-    config.ethConfiguration.coreContractAddress,
-    ethSigner
-  );
-
-  const signableResult = await getSignableRegistrationOnchain(
-    etherKey,
+  return executeDepositEth(
+    ethSigner,
+    amount,
+    assetType,
     starkPublicKey,
-    usersApi
+    vaultId,
+    imxConfig,
   );
-
-  const populatedTransaction =
-    await coreContract.populateTransaction.registerAndDepositEth(
-      etherKey,
-      starkPublicKey,
-      signableResult.operator_signature,
-      assetType,
-      vaultId
-    );
-
-  return ethSigner.sendTransaction({ ...populatedTransaction, value: amount });
-}
-
-async function executeDepositEth(
-  ethSigner: EthSigner,
-  amount: BigNumber,
-  assetType: string,
-  starkPublicKey: string,
-  vaultId: number,
-  config: ImmutableXConfiguration
-): Promise<TransactionResponse> {
-  const coreContract = Contracts.Core.connect(
-    config.ethConfiguration.coreContractAddress,
-    ethSigner
-  );
-
-  const populatedTransaction = await coreContract.populateTransaction[
-    'deposit(uint256,uint256,uint256)'
-  ](starkPublicKey, assetType, vaultId);
-
-  return ethSigner.sendTransaction({ ...populatedTransaction, value: amount });
 }
