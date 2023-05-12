@@ -3,7 +3,7 @@ import {
   Checkout,
   ConnectionProviders,
 } from '@imtbl/checkout-sdk';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import LoadingButton from './LoadingButton';
 import { Web3Provider } from '@ethersproject/providers';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
@@ -44,6 +44,13 @@ export default function CheckConnection(props: CheckConnectionProps) {
       console.log(err.stack);
     }
   }
+
+  useEffect(() => {
+    // reset state wehn checkout changes from environment switch
+    setResult(undefined);
+    setError(null);
+    setLoading(false);
+  }, [checkout]);
 
   return (
     <div>

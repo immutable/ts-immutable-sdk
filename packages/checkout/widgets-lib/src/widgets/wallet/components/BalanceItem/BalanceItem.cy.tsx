@@ -6,10 +6,13 @@ import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { BalanceItem } from './BalanceItem';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { cySmartGet } from '../../../../lib/testUtils';
+import { Environment } from '@imtbl/config';
 
 describe('BalanceItem', () => {
   let baseWalletState: WalletState = {
-    checkout: new Checkout(),
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    }),
     network: null,
     provider: null,
     providerPreference: ConnectionProviders.METAMASK,
@@ -49,11 +52,11 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON,
-        name: 'Polygon',
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
-          name: 'MATIC',
-          symbol: 'MATIC',
+          name: 'IMX',
+          symbol: 'IMX',
           decimals: 18,
         },
         isSupported: true,
@@ -79,15 +82,15 @@ describe('BalanceItem', () => {
     cySmartGet('token-menu').should('exist');
   });
 
-  it('should show ONLY the add and swap options on Polygon when all topUps are enabled', () => {
+  it('should show ONLY the add and swap options on POLYGON_ZKEVM when all topUps are enabled', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON,
-        name: 'Polygon',
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
-          name: 'MATIC',
-          symbol: 'MATIC',
+          name: 'IMX',
+          symbol: 'IMX',
           decimals: 18,
         },
         isSupported: true,
@@ -118,15 +121,15 @@ describe('BalanceItem', () => {
     cySmartGet('balance-item-move-option').should('not.be.visible');
   });
 
-  it('should ONLY show swap option on Polygon if onramp is disabled', () => {
+  it('should ONLY show swap option on POLYGON_ZKEVM if onramp is disabled', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON,
-        name: 'Polygon',
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
-          name: 'MATIC',
-          symbol: 'MATIC',
+          name: 'IMX',
+          symbol: 'IMX',
           decimals: 18,
         },
         isSupported: true,

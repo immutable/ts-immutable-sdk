@@ -5,7 +5,9 @@ import { HeaderNavigation } from '../../../../../components/Header/HeaderNavigat
 import { SimpleLayout } from '../../../../../components/SimpleLayout/SimpleLayout';
 import { ViewContext, ViewActions } from '../../../../../context/ViewContext';
 import { InnerExampleWidgetViews } from '../../../../../context/InnerExampleViewContextTypes';
-import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { zkEVMNetwork } from '../../../../../lib/networkUtils';
+import { Environment } from '@imtbl/config';
 
 export interface ViewTwoProps {
   callBack?: () => void;
@@ -14,7 +16,9 @@ export interface ViewTwoProps {
 export const ViewTwo = ({ callBack }: ViewTwoProps) => {
   const { viewDispatch } = useContext(ViewContext);
 
-  const checkout = new Checkout();
+  const checkout = new Checkout({
+    baseConfig: { environment: Environment.SANDBOX },
+  });
 
   async function connectPolygonClick() {
     try {
@@ -23,7 +27,10 @@ export const ViewTwo = ({ callBack }: ViewTwoProps) => {
       });
 
       if (checkout) {
-        await checkout.switchNetwork({ provider, chainId: ChainId.POLYGON });
+        await checkout.switchNetwork({
+          provider,
+          chainId: zkEVMNetwork(checkout.config.environment),
+        });
         dispatchSuccess();
       }
     } catch (err: any) {

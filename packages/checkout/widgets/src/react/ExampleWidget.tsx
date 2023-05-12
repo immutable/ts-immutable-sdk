@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Environment } from '@imtbl/config';
 import {
   WidgetConnectionProviders,
   Network,
@@ -22,17 +23,20 @@ export interface ExampleReactProps {
  * @experimental
  */
 export function ExampleReact(props: ExampleReactProps) {
-  const { providerPreference, fromContractAddress, amount, fromNetwork } =
-    props;
+  const {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    providerPreference, fromContractAddress, amount, fromNetwork,
+  } = props;
 
   const config = window.ImtblCheckoutWidgetConfig;
 
   return (
     <imtbl-example
+      environment={config.environment ?? Environment.SANDBOX}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }
       theme={config.theme ?? WidgetTheme.DARK}
-    ></imtbl-example>
+    />
   );
 }

@@ -10,6 +10,7 @@ import {
 import TokenSelect from './TokenSelect';
 import { QuoteResponse } from './SwapForm';
 import { findTokenByAddress } from '../helpers';
+import { Environment } from '@imtbl/config';
 
 type WithProps = {
   onTokenChange: (token: TokenInfo) => void;
@@ -67,7 +68,14 @@ export default function With(props: WithProps) {
   const [balances, setBalances] = useState<GetBalanceResult[]>();
   const [loading, setLoading] = useState<boolean>(false);
   const [debounceId, setDebounceId] = useState<string | null>();
-  const checkout = useMemo(() => new Checkout(), []);
+  // TODO: update here to go to context and stop hardcoing
+  const checkout = useMemo(
+    () =>
+      new Checkout({
+        baseConfig: { environment: Environment.SANDBOX },
+      }),
+    []
+  );
   const quoteAmount = (
     (quote &&
       utils.formatUnits(quote.trade.amountIn.toString(), token?.decimals)) ||
@@ -76,7 +84,7 @@ export default function With(props: WithProps) {
 
   const allowedTokens = (): string[] => {
     return (balances || []).map(
-      (balance: GetBalanceResult) => balance.token.address || ''
+      (balance: GetBalanceResult) => balance.token?.address || ''
     );
   };
 

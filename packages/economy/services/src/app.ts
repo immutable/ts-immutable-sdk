@@ -1,17 +1,20 @@
 import express, { Request, Response } from 'express';
 
-import routes from './routes';
 import pino from 'pino';
+import cors from 'cors';
+import routes from './routes';
 
 const logger = pino();
 const app = express();
+app.use(cors());
+
 const paths: { path: string; methods: string }[] = routes.reduce(
   (a, r) => [
     ...a,
     ...r.stack.map((s) => ({
       path: s.route.path,
       methods: Object.keys(s.route.methods)
-        .map((s) => s.toUpperCase())
+        .map((str) => str.toUpperCase())
         .toString(),
     })),
   ],
@@ -24,7 +27,7 @@ logger.info(paths);
  * Root must only be used the resources directory
  */
 app.get('/', (req: Request, res: Response) =>
-  res.send(/*html*/ `
+  res.send(/* html */ `
     <h1>Economy SDK Services</h1>
     <ul>
     ${paths

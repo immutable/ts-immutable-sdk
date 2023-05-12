@@ -4,6 +4,7 @@ import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
+import { Environment } from '@imtbl/config';
 
 describe('ConnectLoader', () => {
   beforeEach(() => {
@@ -14,6 +15,7 @@ describe('ConnectLoader', () => {
     const params = {} as ConnectLoaderParams;
     mount(
       <ConnectLoader
+        environment={Environment.SANDBOX}
         params={params}
         theme={WidgetTheme.DARK}
         closeEvent={() => {}}
@@ -38,6 +40,7 @@ describe('ConnectLoader', () => {
 
     mount(
       <ConnectLoader
+        environment={Environment.SANDBOX}
         params={params}
         theme={WidgetTheme.DARK}
         closeEvent={() => {}}
@@ -84,6 +87,7 @@ describe('ConnectLoader', () => {
 
     mount(
       <ConnectLoader
+        environment={Environment.SANDBOX}
         params={params}
         theme={WidgetTheme.DARK}
         closeEvent={() => {}}
@@ -115,22 +119,23 @@ describe('ConnectLoader', () => {
             getAddress: async () => Promise.resolve(''),
           }),
           getNetwork: async () => ({
-            chainId: ChainId.POLYGON,
-            name: 'POLYGON',
+            chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+            name: 'Immutable zkEVM Devnet',
           }),
         },
-        network: { name: 'POLYGON' },
+        network: { name: 'Immutable zkEVM Devnet' },
       });
 
     cy.stub(Checkout.prototype, 'getNetworkInfo')
       .as('getNetworkInfoStub')
       .resolves({
         isSupported: true,
-        chainId: ChainId.POLYGON,
+        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
       });
 
     mount(
       <ConnectLoader
+        environment={Environment.SANDBOX}
         params={params}
         theme={WidgetTheme.DARK}
         closeEvent={() => {}}
@@ -163,15 +168,16 @@ describe('ConnectLoader', () => {
             getAddress: async () => Promise.resolve(''),
           }),
           getNetwork: async () => ({
-            chainId: 1,
-            name: 'ETHEREUM',
+            chainId: 11155111,
+            name: 'SEPOLIA',
           }),
         },
-        network: { name: 'ETHEREUM' },
+        network: { name: 'Sepolia' },
       });
 
     mount(
       <ConnectLoader
+        environment={Environment.SANDBOX}
         params={params}
         theme={WidgetTheme.DARK}
         closeEvent={() => {}}

@@ -3,6 +3,8 @@
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 import {
   getNetworkAllowList,
   getNetworkInfo,
@@ -10,14 +12,14 @@ import {
 } from './network';
 import {
   ChainId,
-  ChainIdNetworkMap,
+  PRODUCTION_CHAIN_ID_NETWORK_MAP,
   ConnectionProviders,
   NetworkFilterTypes,
-  WALLET_ACTION,
+  WalletAction,
 } from '../types';
 import { connectWalletProvider } from '../connect';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { Web3Provider } from '@ethersproject/providers';
+import { CheckoutConfiguration } from '../config';
 
 let windowSpy: any;
 const providerMock = {
@@ -32,21 +34,25 @@ const ethNetworkInfo = {
     decimals: 18,
   },
 };
-const polygonNetworkInfo = {
-  name: 'Polygon',
-  chainId: ChainId.POLYGON,
+const zkevmNetworkInfo = {
+  name: 'IMTBL_ZKEVM_TESTNET',
+  chainId: ChainId.IMTBL_ZKEVM_TESTNET,
   nativeCurrency: {
-    name: 'MATIC',
-    symbol: 'MATIC',
+    name: 'IMX',
+    symbol: 'IMX',
     decimals: 18,
   },
 };
 
 jest.mock('@ethersproject/providers', () => ({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Web3Provider: jest.fn(),
 }));
 
 describe('network functions', () => {
+  const testCheckoutConfiguration = new CheckoutConfiguration({
+    baseConfig: { environment: Environment.PRODUCTION },
+  });
   describe('switchWalletNetwork()', () => {
     beforeEach(() => {
       windowSpy = jest.spyOn(window, 'window', 'get');
@@ -74,16 +80,18 @@ describe('network functions', () => {
       });
 
       const switchNetworkResult = await switchWalletNetwork(
+        testCheckoutConfiguration,
         ConnectionProviders.METAMASK,
         provider,
-        ChainId.ETHEREUM
+        ChainId.ETHEREUM,
       );
 
       expect(provider.provider.request).toBeCalledWith({
-        method: WALLET_ACTION.SWITCH_NETWORK,
+        method: WalletAction.SWITCH_NETWORK,
         params: [
           {
-            chainId: ChainIdNetworkMap[ChainId.ETHEREUM].chainIdHex,
+            chainId: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM)
+              ?.chainIdHex,
           },
         ],
       });
@@ -98,7 +106,7 @@ describe('network functions', () => {
       });
     });
 
-    it('should make request for the user to switch network Polygon', async () => {
+    it('should make request for the user to switch network zkevm', async () => {
       (Web3Provider as unknown as jest.Mock)
         .mockReturnValueOnce({
           provider: providerMock,
@@ -108,7 +116,7 @@ describe('network functions', () => {
           provider: {
             request: jest.fn(),
           },
-          getNetwork: async () => polygonNetworkInfo,
+          getNetwork: async () => zkevmNetworkInfo,
         });
 
       const provider = await connectWalletProvider({
@@ -116,25 +124,28 @@ describe('network functions', () => {
       });
 
       const switchNetworkResult = await switchWalletNetwork(
+        testCheckoutConfiguration,
         ConnectionProviders.METAMASK,
         provider,
-        ChainId.POLYGON
+        ChainId.IMTBL_ZKEVM_TESTNET,
       );
 
       expect(provider.provider.request).toBeCalledWith({
-        method: WALLET_ACTION.SWITCH_NETWORK,
+        method: WalletAction.SWITCH_NETWORK,
         params: [
           {
-            chainId: ChainIdNetworkMap[ChainId.POLYGON].chainIdHex,
+            chainId: testCheckoutConfiguration.networkMap.get(
+              ChainId.IMTBL_ZKEVM_TESTNET,
+            )?.chainIdHex,
           },
         ],
       });
       expect(switchNetworkResult.network).toEqual({
-        name: 'Polygon',
-        chainId: 137,
+        name: 'Immutable zkEVM Testnet',
+        chainId: 13372,
         nativeCurrency: {
-          name: 'MATIC',
-          symbol: 'MATIC',
+          name: 'IMX',
+          symbol: 'IMX',
           decimals: 18,
         },
       });
@@ -152,15 +163,16 @@ describe('network functions', () => {
 
       await expect(
         switchWalletNetwork(
+          testCheckoutConfiguration,
           ConnectionProviders.METAMASK,
           provider,
-          56 as ChainId
-        )
+          56 as ChainId,
+        ),
       ).rejects.toThrow(
         new CheckoutError(
           'Chain:56 is not a supported chain',
-          CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR
-        )
+          CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
+        ),
       );
     });
 
@@ -186,15 +198,16 @@ describe('network functions', () => {
 
       await expect(
         switchWalletNetwork(
+          testCheckoutConfiguration,
           ConnectionProviders.METAMASK,
           provider,
-          ChainId.POLYGON
-        )
+          ChainId.IMTBL_ZKEVM_TESTNET,
+        ),
       ).rejects.toThrow(
         new CheckoutError(
           'User cancelled switch network request',
-          CheckoutErrorType.USER_REJECTED_REQUEST_ERROR
-        )
+          CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
+        ),
       );
     });
 
@@ -215,15 +228,16 @@ describe('network functions', () => {
 
       await expect(
         switchWalletNetwork(
+          testCheckoutConfiguration,
           ConnectionProviders.METAMASK,
           provider,
-          ChainId.POLYGON
-        )
+          ChainId.IMTBL_ZKEVM_TESTNET,
+        ),
       ).rejects.toThrow(
         new CheckoutError(
           'Incompatible provider',
-          CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR
-        )
+          CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
+        ),
       );
     });
 
@@ -237,34 +251,44 @@ describe('network functions', () => {
               .mockRejectedValueOnce({ code: 4902 })
               .mockResolvedValueOnce({}),
           },
-          getNetwork: async () => polygonNetworkInfo,
+          getNetwork: async () => zkevmNetworkInfo,
         })
         .mockReturnValueOnce({
           provider: {
             request: jest.fn().mockResolvedValueOnce({}),
           },
-          getNetwork: async () => polygonNetworkInfo,
+          getNetwork: async () => zkevmNetworkInfo,
         });
       const provider = await connectWalletProvider({
         providerPreference: ConnectionProviders.METAMASK,
       });
 
       await switchWalletNetwork(
+        testCheckoutConfiguration,
         ConnectionProviders.METAMASK,
         provider,
-        ChainId.POLYGON
+        ChainId.IMTBL_ZKEVM_TESTNET,
       );
 
       expect(provider.provider.request).toHaveBeenCalledWith({
-        method: WALLET_ACTION.ADD_NETWORK,
+        method: WalletAction.ADD_NETWORK,
         params: [
           {
-            chainId: ChainIdNetworkMap[ChainId.POLYGON].chainIdHex,
-            chainName: ChainIdNetworkMap[ChainId.POLYGON].chainName,
-            rpcUrls: ChainIdNetworkMap[ChainId.POLYGON].rpcUrls,
-            nativeCurrency: ChainIdNetworkMap[ChainId.POLYGON].nativeCurrency,
-            blockExplorerUrls:
-              ChainIdNetworkMap[ChainId.POLYGON].blockExplorerUrls,
+            chainId: testCheckoutConfiguration.networkMap.get(
+              ChainId.IMTBL_ZKEVM_TESTNET,
+            )?.chainIdHex,
+            chainName: testCheckoutConfiguration.networkMap.get(
+              ChainId.IMTBL_ZKEVM_TESTNET,
+            )?.chainName,
+            rpcUrls: testCheckoutConfiguration.networkMap.get(
+              ChainId.IMTBL_ZKEVM_TESTNET,
+            )?.rpcUrls,
+            nativeCurrency: testCheckoutConfiguration.networkMap.get(
+              ChainId.IMTBL_ZKEVM_TESTNET,
+            )?.nativeCurrency,
+            blockExplorerUrls: testCheckoutConfiguration.networkMap.get(
+              ChainId.IMTBL_ZKEVM_TESTNET,
+            )?.blockExplorerUrls,
           },
         ],
       });
@@ -278,12 +302,8 @@ describe('network functions', () => {
         chainName: 'homestead',
       },
       {
-        chainId: 5 as ChainId,
-        chainName: 'goerli',
-      },
-      {
-        chainId: 137 as ChainId,
-        chainName: 'matic',
+        chainId: 13372 as ChainId,
+        chainName: 'IMX',
       },
     ];
 
@@ -297,14 +317,20 @@ describe('network functions', () => {
           getNetwork: getNetworkMock,
         };
         const result = await getNetworkInfo(
-          mockProvider as unknown as Web3Provider
+          testCheckoutConfiguration,
+          mockProvider as unknown as Web3Provider,
         );
-        expect(result.name).toBe(ChainIdNetworkMap[testCase.chainId].chainName);
+        expect(result.name).toBe(
+          PRODUCTION_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainName,
+        );
         expect(result.chainId).toBe(
-          parseInt(ChainIdNetworkMap[testCase.chainId].chainIdHex, 16)
+          parseInt(
+            PRODUCTION_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainIdHex ?? '',
+            16,
+          ),
         );
         expect(result.nativeCurrency).toEqual(
-          ChainIdNetworkMap[testCase.chainId].nativeCurrency
+          PRODUCTION_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.nativeCurrency,
         );
       });
     });
@@ -318,7 +344,8 @@ describe('network functions', () => {
         getNetwork: getNetworkMock,
       };
       const result = await getNetworkInfo(
-        mockProvider as unknown as Web3Provider
+        testCheckoutConfiguration,
+        mockProvider as unknown as Web3Provider,
       );
       expect(result).toEqual({
         chainId: 3,
@@ -331,7 +358,9 @@ describe('network functions', () => {
   describe('getNetworkAllowList()', () => {
     it('should return all the networks if no exclude filter is provided', async () => {
       await expect(
-        await getNetworkAllowList({ type: NetworkFilterTypes.ALL })
+        await getNetworkAllowList(testCheckoutConfiguration, {
+          type: NetworkFilterTypes.ALL,
+        }),
       ).toEqual({
         networks: [
           {
@@ -345,12 +374,12 @@ describe('network functions', () => {
             },
           },
           {
-            name: 'Polygon',
-            chainId: 137,
+            name: 'Immutable zkEVM Testnet',
+            chainId: 13372,
             isSupported: true,
             nativeCurrency: {
-              name: 'MATIC',
-              symbol: 'MATIC',
+              name: 'IMX',
+              symbol: 'IMX',
               decimals: 18,
             },
           },
@@ -360,10 +389,10 @@ describe('network functions', () => {
 
     it('should exclude the right networks if an exclude filter is provided', async () => {
       await expect(
-        await getNetworkAllowList({
+        await getNetworkAllowList(testCheckoutConfiguration, {
           type: NetworkFilterTypes.ALL,
-          exclude: [{ chainId: 5 }, { chainId: 137 }],
-        })
+          exclude: [{ chainId: 13372 }],
+        }),
       ).toEqual({
         networks: [
           {

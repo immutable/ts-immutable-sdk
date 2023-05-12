@@ -16,7 +16,7 @@ export function messageResponseListener<T>(
   iframe: HTMLIFrameElement,
   event: MessageEvent,
   eventType: ResponseEventType,
-  callback: (response: ResponseMessageDetails<T>) => void
+  callback: (response: ResponseMessageDetails<T>) => void,
 ) {
   if (iframe && event.source !== iframe.contentWindow) {
     return;

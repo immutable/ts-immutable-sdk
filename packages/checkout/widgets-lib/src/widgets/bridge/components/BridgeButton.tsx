@@ -3,6 +3,7 @@ import { Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { Web3Provider, TransactionResponse } from '@ethersproject/providers';
 import { utils } from 'ethers';
 import { BridgeWidgetViews } from '../BridgeWidget';
+import { Environment } from '@imtbl/config';
 
 interface BridgeButtonProps {
   provider?: Web3Provider;
@@ -56,7 +57,10 @@ export const BridgeButton = (props: BridgeButtonProps) => {
     // get unsigned transaction from the bridge/exchange sdk
     const transaction = getUnsignedTransaction();
 
-    const checkout = new Checkout();
+    // TODO: Refactor this checkout object into context and stop hardcoding to sandbox
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    });
     try {
       const response = await checkout.sendTransaction({
         provider,

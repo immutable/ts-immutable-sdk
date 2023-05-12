@@ -6,19 +6,31 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import { WalletContext, WalletState } from '../context/WalletContext';
 import { Web3Provider } from '@ethersproject/providers';
 import { cySmartGet } from '../../../lib/testUtils';
+import { Environment } from '@imtbl/config';
 
 describe('WalletBalances', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
 
-  const checkout = new Checkout();
-  const provider = {} as unknown as Web3Provider;
+  const checkout = new Checkout({
+    baseConfig: { environment: Environment.PRODUCTION },
+  });
+
+  const provider = {
+    getSigner: () => ({
+      getAddress: async () => Promise.resolve(''),
+    }),
+    provider: {
+      request: async () => null,
+    },
+  } as unknown as Web3Provider;
+
   const baseWalletState: WalletState = {
-    checkout: checkout,
+    checkout,
     network: {
-      chainId: 137,
-      name: 'Polygon',
+      chainId: 13372,
+      name: 'Immutable zkEVM Testnet',
       nativeCurrency: {} as unknown as TokenInfo,
       isSupported: true,
     },
@@ -28,7 +40,7 @@ describe('WalletBalances', () => {
     supportedTopUps: null,
   };
 
-  it('should show add coins button on Polygon when topUps are supported', () => {
+  it('should show add coins button on ZKEVM when topUps are supported', () => {
     const topUpFeatureTestCases = [
       {
         isOnRampEnabled: true,
@@ -88,10 +100,11 @@ describe('WalletBalances', () => {
   });
 
   it('should NOT show add coins button on Ethereum', () => {
-    const checkout = new Checkout();
-    const provider = {} as unknown as Web3Provider;
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
     const walletState: WalletState = {
-      checkout: checkout,
+      checkout,
       network: {
         chainId: 1,
         name: 'Ethereum',

@@ -3,8 +3,10 @@ import { ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { useEffect, useState } from 'react';
 import { Network } from '@imtbl/checkout-widgets';
 import { BridgeButton } from './BridgeButton';
-import { Web3Provider, TransactionResponse } from '@ethersproject/providers';
+import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import { BridgeWidgetViews } from '../BridgeWidget';
+import { L1Network } from '../../../lib/networkUtils';
+import { Environment } from '@imtbl/config';
 
 interface BridgeFormProps {
   provider: Web3Provider;
@@ -84,18 +86,20 @@ export const BridgeForm = (props: BridgeFormProps) => {
           onSelectChange={onSelectedNetworkChange}
         >
           <Option
-            testId={`select-network-${Network.ETHEREUM}`}
-            key={Network.ETHEREUM}
-            optionKey={ChainId.ETHEREUM}
+            testId={`select-network-${L1Network(Environment.PRODUCTION)}`}
+            key={L1Network(Environment.PRODUCTION)}
+            optionKey={L1Network(Environment.PRODUCTION)}
           >
-            <Option.Label>{Network.ETHEREUM}</Option.Label>
+            <Option.Label>
+              {ChainId[L1Network(Environment.PRODUCTION)]}
+            </Option.Label>
           </Option>
           <Option
-            testId={`select-network-${Network.POLYGON}`}
-            key={Network.POLYGON}
-            optionKey={ChainId.POLYGON}
+            testId={`select-network-${Network.IMTBL_ZKEVM_TESTNET}`}
+            key={Network.IMTBL_ZKEVM_TESTNET}
+            optionKey={ChainId.IMTBL_ZKEVM_TESTNET}
           >
-            <Option.Label>{Network.POLYGON}</Option.Label>
+            <Option.Label>{Network.IMTBL_ZKEVM_TESTNET}</Option.Label>
           </Option>
         </Select>
       </Box>

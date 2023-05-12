@@ -1,9 +1,17 @@
 {
-  "craft_id": "86a316da-9e16-4996-a09d-bb1366f33eb4",
+  "craft_id": "a51ab010-3bf1-4228-834d-876c124c6a60",
   "results": [
     {
-      "properties": {},
-      "result_item_id": "75e3c3d3-27f1-4709-89e8-6aa35dcd658f"
+      "result_item_id": "1PY6vbTH85ctujEyuHvcRCM8kfY",
+      "properties": {
+        "attack": 99,
+        "dust_power": 99,
+        "hp": 99,
+        "level": 5,
+        "description": "A Charizard vmax card",
+        "image": "https://m.media-amazon.com/images/I/71x6QsZ1TwL._AC_SL1500_.jpg",
+        "name": "Charizard Vmax"
+      }
     }
   ]
 }

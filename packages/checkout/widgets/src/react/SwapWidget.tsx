@@ -1,5 +1,7 @@
+/* eslint-disable max-len */
 import React from 'react';
 
+import { Environment } from '@imtbl/config';
 import {
   WidgetConnectionProviders,
   WidgetTheme,
@@ -25,13 +27,15 @@ export interface SwapReactProps {
  * @returns {JSX.Element} - The rendered Swap Widget component.
  */
 export function SwapReact(props: SwapReactProps): JSX.Element {
-  const { providerPreference, fromContractAddress, amount, toContractAddress } =
-    props;
+  const {
+    providerPreference, fromContractAddress, amount, toContractAddress,
+  } = props;
 
   const config = window.ImtblCheckoutWidgetConfig;
 
   return (
     <imtbl-swap
+      environment={Environment.SANDBOX}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }
@@ -39,6 +43,6 @@ export function SwapReact(props: SwapReactProps): JSX.Element {
       fromContractAddress={fromContractAddress ?? ''}
       toContractAddress={toContractAddress ?? ''}
       amount={amount ?? ''}
-    ></imtbl-swap>
+    />
   );
 }

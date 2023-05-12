@@ -20,34 +20,32 @@ export type QuoteTradeInfo = {
 
 export type QuoteResponse =
   | {
-      success: true;
-      trade: QuoteTradeInfo;
-    }
+    success: true;
+    trade: QuoteTradeInfo;
+  }
   | {
-      success: false;
-      trade: undefined;
-    };
+    success: false;
+    trade: undefined;
+  };
 
 export type TradeInfo = {
-  route: Route<Currency, Currency>;
-
   quote: Amount;
   quoteWithMaxSlippage: Amount;
-  slippage: string;
+  slippage: number;
   estimatedProtocolFee: ethers.BigNumber;
 };
 
 export type TransactionResponse =
   | {
-      transaction: ethers.providers.TransactionRequest;
-      info: TradeInfo;
-      success: true;
-    }
+    transaction: ethers.providers.TransactionRequest;
+    info: TradeInfo;
+    success: true;
+  }
   | {
-      info: undefined;
-      success: false;
-      transaction: undefined;
-    };
+    info: undefined;
+    success: false;
+    transaction: undefined;
+  };
 
 export type TokenInfo = {
   chainId: number;

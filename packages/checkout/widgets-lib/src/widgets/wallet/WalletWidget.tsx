@@ -2,7 +2,6 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import {
-  ChainId,
   Checkout,
   ConnectionProviders,
   GetNetworkParams,
@@ -26,12 +25,15 @@ import { WalletWidgetViews } from '../../context/WalletViewContextTypes';
 import { WalletBalances } from './views/WalletBalances';
 import { ErrorView } from '../../components/Error/ErrorView';
 import { LoadingView } from '../../components/Loading/LoadingView';
-import { getTokenBalances } from './functions/tokenBalances';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
+import { zkEVMNetwork } from '../../lib/networkUtils';
+import { Environment } from '@imtbl/config';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
   theme: WidgetTheme;
+  environment: Environment;
 }
 
 export interface WalletWidgetParams {
@@ -40,13 +42,14 @@ export interface WalletWidgetParams {
 }
 
 export function WalletWidget(props: WalletWidgetProps) {
-  const { params, theme } = props;
+  const { environment, params, theme } = props;
   const { providerPreference, topUpFeatures } = params;
   const biomeTheme: BaseTokens =
     theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
       ? onLightBase
       : onDarkBase;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+
   const [walletState, walletDispatch] = useReducer(
     walletReducer,
     initialWalletState
@@ -55,11 +58,11 @@ export function WalletWidget(props: WalletWidgetProps) {
   const { checkout } = walletState;
 
   useEffect(() => {
-    const checkout = new Checkout();
+    const checkout = new Checkout({ baseConfig: { environment: environment } });
     walletDispatch({
       payload: {
         type: WalletActions.SET_CHECKOUT,
-        checkout: checkout,
+        checkout,
       },
     });
 
@@ -69,7 +72,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         supportedTopUps: { ...topUpFeatures },
       },
     });
-  }, [topUpFeatures]);
+  }, [topUpFeatures, environment]);
 
   useEffect(() => {
     (async () => {
@@ -92,7 +95,7 @@ export function WalletWidget(props: WalletWidgetProps) {
       if (!isSupportedNetwork) {
         const result = await checkout.switchNetwork({
           provider,
-          chainId: ChainId.POLYGON,
+          chainId: zkEVMNetwork(checkout.config.environment),
         });
         provider = result.provider;
         network = result.network;
@@ -107,14 +110,8 @@ export function WalletWidget(props: WalletWidgetProps) {
 
       walletDispatch({
         payload: {
-          type: WalletActions.SWITCH_NETWORK,
+          type: WalletActions.SET_NETWORK,
           network,
-          tokenBalances: await getTokenBalances(
-            checkout,
-            provider,
-            network.name,
-            network.chainId
-          ),
         },
       });
 
@@ -134,21 +131,23 @@ export function WalletWidget(props: WalletWidgetProps) {
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
-        <WalletContext.Provider value={{ walletState, walletDispatch }}>
-          {viewState.view.type === BaseViews.LOADING_VIEW && (
-            <LoadingView loadingText="Loading" />
-          )}
-          {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
-            <WalletBalances />
-          )}
-          {viewState.view.type === BaseViews.ERROR && (
-            <ErrorView
-              actionText="Try again"
-              onActionClick={errorAction}
-              onCloseClick={sendWalletWidgetCloseEvent}
-            />
-          )}
-        </WalletContext.Provider>
+        <CryptoFiatProvider>
+          <WalletContext.Provider value={{ walletState, walletDispatch }}>
+            {viewState.view.type === BaseViews.LOADING_VIEW && (
+              <LoadingView loadingText="Loading" />
+            )}
+            {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
+              <WalletBalances />
+            )}
+            {viewState.view.type === BaseViews.ERROR && (
+              <ErrorView
+                actionText="Try again"
+                onActionClick={errorAction}
+                onCloseClick={sendWalletWidgetCloseEvent}
+              />
+            )}
+          </WalletContext.Provider>
+        </CryptoFiatProvider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
   );

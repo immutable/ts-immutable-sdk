@@ -36,7 +36,7 @@ describe('getEncodeAssetInfo', () => {
       assetType,
       tokenType,
       testConfig.immutableXConfig,
-      tokenData
+      tokenData,
     );
 
     expect(response).toEqual(encodeAssetResponse);

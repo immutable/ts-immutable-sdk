@@ -1,6 +1,6 @@
-import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 import { TradesApi, GetSignableTradeRequest } from '@imtbl/core-sdk';
 import { signRaw } from '@imtbl/toolkit';
+import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 import { createTrade } from './trades';
 
 jest.mock('@imtbl/core-sdk');
@@ -80,7 +80,7 @@ describe('Trades', () => {
           nonce: getSignableTradeResponse.nonce,
           stark_key: getSignableTradeResponse.stark_key,
           stark_signature:
-            getSignableTradeResponse.payload_hash + 'STX' + privateKey1,
+            `${getSignableTradeResponse.payload_hash}STX${privateKey1}`,
           vault_id_buy: getSignableTradeResponse.vault_id_buy,
           vault_id_sell: getSignableTradeResponse.vault_id_sell,
         },

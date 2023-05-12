@@ -7,6 +7,7 @@ import {
 import { BigNumber } from 'ethers';
 import { getTokenBalances } from './tokenBalances';
 import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 
 describe('token balance tests', () => {
   it('should return balances for all tokens', async () => {
@@ -23,38 +24,61 @@ describe('token balance tests', () => {
       },
     ];
 
+    const conversions = new Map<string, number>([
+      ['aaa', 10.1234],
+      ['qqq', 5.125],
+    ]);
+
     const mockProvider = {
       getSigner: jest.fn().mockReturnValue({
         getAddress: jest.fn().mockResolvedValue('0xaddress'),
       }),
     };
-    const checkout = new Checkout();
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
     jest.spyOn(checkout, 'getAllBalances').mockResolvedValue({ balances });
 
     const actualResult = await getTokenBalances(
       checkout,
       mockProvider as unknown as Web3Provider,
       '',
-      ChainId.GOERLI
+      ChainId.SEPOLIA,
+      conversions
     );
 
     expect(actualResult.length).toBe(2);
-
-    actualResult.forEach((tokenBalance, index) => {
-      expect(tokenBalance.balance).toBe(balances[index].formattedBalance);
-      expect(tokenBalance.symbol).toBe(balances[index].token.symbol);
-      expect(tokenBalance.description).toBe(balances[index].token.name);
-      expect(tokenBalance.fiatAmount).toBe('23.50');
-    });
+    expect(actualResult).toEqual([
+      {
+        id: '-AAA',
+        description: 'AAA',
+        balance: '26.34',
+        symbol: 'AAA',
+        fiatAmount: '266.65',
+      },
+      {
+        id: '-QQQ',
+        description: 'QQQ',
+        balance: '12.34',
+        symbol: 'QQQ',
+        fiatAmount: '63.24',
+      },
+    ]);
   });
+
   it('should return empty array when any argument is missing', async () => {
-    const checkout = new Checkout();
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    const conversions = new Map<string, number>([]);
 
     const actualResult = await getTokenBalances(
       checkout,
       {} as unknown as Web3Provider,
       '',
-      ChainId.GOERLI
+      ChainId.SEPOLIA,
+      conversions
     );
 
     expect(actualResult.length).toBe(0);
@@ -66,7 +90,12 @@ describe('token balance tests', () => {
         getAddress: jest.fn().mockResolvedValue('0xaddress'),
       }),
     };
-    const checkout = new Checkout();
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    const conversions = new Map<string, number>([]);
+
     jest
       .spyOn(checkout, 'getAllBalances')
       .mockRejectedValue(new Error('some-err'));
@@ -75,7 +104,8 @@ describe('token balance tests', () => {
       checkout,
       mockProvider as unknown as Web3Provider,
       '',
-      ChainId.GOERLI
+      ChainId.SEPOLIA,
+      conversions
     );
 
     expect(actualResult.length).toBe(0);

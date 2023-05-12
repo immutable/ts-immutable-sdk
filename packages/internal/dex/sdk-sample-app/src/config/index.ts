@@ -28,21 +28,21 @@ const contractOverrides: ExchangeContracts = {
 // These tokens will be used to find available pools for a swap
 const commonRoutingTokens: TokenInfo[] = [
   {
-    chainId: chainId,
+    chainId,
     address: process.env.NEXT_PUBLIC_COMMON_ROUTING_FUN,
     decimals: 18,
     symbol: 'FUN',
     name: 'The Fungibles Token',
   },
   {
-    chainId: chainId,
+    chainId,
     address: process.env.NEXT_PUBLIC_COMMON_ROUTING_USDC,
     decimals: 18,
     symbol: 'USDC',
     name: 'US Dollar Coin',
   },
   {
-    chainId: chainId,
+    chainId,
     address: process.env.NEXT_PUBLIC_COMMON_ROUTING_WETH,
     decimals: 18,
     symbol: 'WETH',
@@ -53,10 +53,10 @@ const commonRoutingTokens: TokenInfo[] = [
 const overrides: ExchangeOverrides = {
   rpcURL: process.env.NEXT_PUBLIC_RPC_URL,
   exchangeContracts: contractOverrides,
-  commonRoutingTokens: commonRoutingTokens,
+  commonRoutingTokens,
 };
 export const configuration = new ExchangeConfiguration({
-  chainId: chainId,
+  chainId,
   baseConfig: immutableConfig,
-  overrides: overrides,
+  overrides,
 });

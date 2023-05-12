@@ -14,6 +14,7 @@ import { onDarkBase } from '@biom3/design-tokens';
 import Sinon from 'cypress/types/sinon';
 import { BridgeButton } from './components/BridgeButton';
 import { TransactionResponse } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 
 type CypressStub = Cypress.Agent<Sinon.SinonStub<any[], any>>;
 describe('Bridge Widget tests', () => {
@@ -90,16 +91,25 @@ describe('Bridge Widget tests', () => {
       const params = {
         providerPreference: 'metamask',
       } as BridgeWidgetParams;
-      mount(<BridgeWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <BridgeWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
       cySmartGet('heading').should('be.visible');
       cySmartGet('close-button').should('be.visible');
       cySmartGet('select-network__target').should('be.visible');
-      cySmartGet('select-network__target').should('have.text', 'Ethereum');
+      cySmartGet('select-network__target').should('have.text', 'ETHEREUM');
       cySmartGet('select-token__target').should('be.visible');
       cySmartGet('select-token__target').should('have.text', 'ETH');
       cySmartGet('amount__input').should('be.visible');
       cySmartGet('amount__input').should('have.value', '0');
-      cySmartGet('bridge-to-network').should('include.text', 'Polygon');
+      cySmartGet('bridge-to-network').should(
+        'include.text',
+        'Immutable zkEVM Testnet'
+      );
       cySmartGet('@connectStub').should('have.been.called');
       cySmartGet('@getAllBalancesStub').should('have.been.called');
     });
@@ -111,16 +121,25 @@ describe('Bridge Widget tests', () => {
         fromNetwork: Network.ETHEREUM.toString(),
         fromContractAddress: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
       } as BridgeWidgetParams;
-      mount(<BridgeWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <BridgeWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
       cySmartGet('heading').should('be.visible');
       cySmartGet('close-button').should('be.visible');
       cySmartGet('select-network__target').should('be.visible');
-      cySmartGet('select-network__target').should('have.text', 'Ethereum');
+      cySmartGet('select-network__target').should('have.text', 'ETHEREUM');
       cySmartGet('select-token__target').should('be.visible');
       cySmartGet('select-token__target').should('have.text', 'MATIC');
       cySmartGet('amount__input').should('be.visible');
       cySmartGet('amount__input').should('have.value', '50.23');
-      cySmartGet('bridge-to-network').should('include.text', 'Polygon');
+      cySmartGet('bridge-to-network').should(
+        'include.text',
+        'Immutable zkEVM Testnet'
+      );
       cySmartGet('@connectStub').should('have.been.called');
       cySmartGet('@getAllBalancesStub').should('have.been.called');
     });
@@ -132,7 +151,13 @@ describe('Bridge Widget tests', () => {
         fromNetwork: Network.ETHEREUM.toString(),
         fromContractAddress: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
       } as BridgeWidgetParams;
-      mount(<BridgeWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <BridgeWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
       cy.wait(50);
       cySmartGet('select-token__target').should('have.text', 'MATIC');
       cySmartGet('select-token__target').click();
@@ -148,7 +173,13 @@ describe('Bridge Widget tests', () => {
         fromNetwork: Network.ETHEREUM.toString(),
         fromContractAddress: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
       } as BridgeWidgetParams;
-      mount(<BridgeWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <BridgeWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
       cy.wait(50);
       cySmartGet('select-token__target').should('have.text', 'MATIC');
       cySmartGet('select-token__target').click();
@@ -165,11 +196,11 @@ describe('Bridge Widget tests', () => {
     it('it should call switch network when dropdown clicked and other network selected', async () => {
       switchNetworkStub.resolves({
         network: {
-          chainId: 137,
-          name: 'Polygon',
+          chainId: 13372,
+          name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
-            name: 'Matic',
-            symbol: 'MATIC',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },
@@ -180,7 +211,11 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget params={params} theme={WidgetTheme.DARK} />
+          <BridgeWidget
+            environment={Environment.PRODUCTION}
+            params={params}
+            theme={WidgetTheme.DARK}
+          />
         </BiomeCombinedProviders>
       );
 
@@ -226,11 +261,11 @@ describe('Bridge Widget tests', () => {
 
       switchNetworkStub.resolves({
         network: {
-          chainId: 137,
-          name: 'Polygon',
+          chainId: 13372,
+          name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
-            name: 'Matic',
-            symbol: 'MATIC',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },
@@ -238,17 +273,21 @@ describe('Bridge Widget tests', () => {
 
       const params = {
         providerPreference: 'metamask',
-        fromNetwork: Network.POLYGON.toString(),
+        fromNetwork: Network.IMTBL_ZKEVM_TESTNET.toString(),
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget params={params} theme={WidgetTheme.DARK} />
+          <BridgeWidget
+            environment={Environment.PRODUCTION}
+            params={params}
+            theme={WidgetTheme.DARK}
+          />
         </BiomeCombinedProviders>
       );
 
       cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
         provider: connectStubReturnWrongNetwork.provider,
-        chainId: 137,
+        chainId: 13372,
       });
     });
 
@@ -324,7 +363,11 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget params={params} theme={WidgetTheme.DARK} />
+          <BridgeWidget
+            environment={Environment.PRODUCTION}
+            params={params}
+            theme={WidgetTheme.DARK}
+          />
         </BiomeCombinedProviders>
       );
 
@@ -364,11 +407,11 @@ describe('Bridge Widget tests', () => {
 
       switchNetworkStub.resolves({
         network: {
-          chainId: 137,
-          name: 'Polygon',
+          chainId: 13372,
+          name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
-            name: 'Matic',
-            symbol: 'MATIC',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },
@@ -376,17 +419,21 @@ describe('Bridge Widget tests', () => {
 
       const params = {
         providerPreference: 'metamask',
-        fromNetwork: Network.POLYGON.toString(),
+        fromNetwork: Network.IMTBL_ZKEVM_TESTNET.toString(),
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget params={params} theme={WidgetTheme.DARK} />
+          <BridgeWidget
+            environment={Environment.PRODUCTION}
+            params={params}
+            theme={WidgetTheme.DARK}
+          />
         </BiomeCombinedProviders>
       );
 
       cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
         provider: connectStubReturnWhitelistedNetwork.provider,
-        chainId: 137,
+        chainId: 13372,
       });
     });
     it('should call switch network (to default Ethereum) if provider is on the whitelisted network to start with', () => {
@@ -396,19 +443,19 @@ describe('Bridge Widget tests', () => {
             getAddress: () => Promise.resolve('0xwalletAddress'),
           }),
           getNetwork: async () => ({
-            chainId: 137,
-            name: 'Polygon',
+            chainId: 13372,
+            name: 'Immutable zkEVM Testnet',
           }),
           provider: {
             request: async () => null,
           },
         },
         network: {
-          chainId: 137,
-          name: 'Polygon',
+          chainId: 13372,
+          name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
-            name: 'MATIC',
-            symbol: 'MATIC',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },
@@ -461,7 +508,11 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget params={params} theme={WidgetTheme.DARK} />
+          <BridgeWidget
+            environment={Environment.PRODUCTION}
+            params={params}
+            theme={WidgetTheme.DARK}
+          />
         </BiomeCombinedProviders>
       );
 
@@ -489,7 +540,13 @@ describe('Bridge Widget tests', () => {
         amount: '0.1',
         fromNetwork: Network.ETHEREUM.toString(),
       } as BridgeWidgetParams;
-      mount(<BridgeWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <BridgeWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
 
       cySmartGet('bridge-button').should('be.visible');
       cySmartGet('bridge-button').should('be.enabled');
@@ -511,7 +568,13 @@ describe('Bridge Widget tests', () => {
         amount: '0.1',
         fromNetwork: Network.ETHEREUM.toString(),
       } as BridgeWidgetParams;
-      mount(<BridgeWidget params={params} theme={WidgetTheme.DARK} />);
+      mount(
+        <BridgeWidget
+          environment={Environment.PRODUCTION}
+          params={params}
+          theme={WidgetTheme.DARK}
+        />
+      );
 
       cySmartGet('bridge-button').should('be.visible');
       cySmartGet('bridge-button').should('be.enabled');

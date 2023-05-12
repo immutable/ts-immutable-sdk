@@ -2,8 +2,8 @@ import {
   WithdrawalsApi,
   CreateWithdrawalResponse,
   ImmutableXConfiguration,
+  TokenAmount,
 } from '@imtbl/core-sdk';
-import { TokenAmount } from '@imtbl/core-sdk';
 import { signMessage, convertToSignableToken } from '@imtbl/toolkit';
 import { Signers } from '../types';
 import { validateChain } from '../helpers';
@@ -19,7 +19,7 @@ export type PrepareWithdrawalWorkflowParams = TokenAmount & {
 };
 
 export async function prepareWithdrawalAction(
-  params: PrepareWithdrawalWorkflowParams
+  params: PrepareWithdrawalWorkflowParams,
 ): Promise<CreateWithdrawalResponse> {
   const {
     signers: { ethSigner, starkSigner },
@@ -37,14 +37,13 @@ export async function prepareWithdrawalAction(
     },
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    signableWithdrawalResult.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = signableWithdrawalResult.data;
 
   const starkSignature = await starkSigner.signMessage(payloadHash);
 
   const { ethAddress, ethSignature } = await signMessage(
     signableMessage,
-    ethSigner
+    ethSigner,
   );
 
   const prepareWithdrawalResponse = await withdrawalsApi.createWithdrawal({

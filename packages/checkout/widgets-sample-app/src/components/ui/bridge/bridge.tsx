@@ -4,12 +4,23 @@ import {
   Network,
   BridgeReact,
   CheckoutWidgets,
+  CheckoutWidgetsConfig,
+  UpdateConfig,
 } from '@imtbl/checkout-widgets';
+import { Environment } from '@imtbl/config';
 
 function BridgeUI() {
   CheckoutWidgets({
     theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
   });
+
+  const widgetsConfig2: CheckoutWidgetsConfig = {
+    theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
+  };
+
+  UpdateConfig(widgetsConfig2);
 
   return (
     <div className="Swap">

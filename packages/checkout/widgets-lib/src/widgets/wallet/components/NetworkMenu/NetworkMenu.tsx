@@ -22,27 +22,29 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../../context/ViewContext';
-import { getTokenBalances } from '../../functions/tokenBalances';
 import { sortNetworksCompareFn } from '../../../../lib/utils';
 
 export const NetworkMenu = () => {
-  const { walletState, walletDispatch } = useContext(WalletContext);
   const { viewDispatch } = useContext(ViewContext);
-
+  const { walletState, walletDispatch } = useContext(WalletContext);
   const { networkStatus } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const { checkout, network, provider } = walletState;
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[] | undefined>(
     []
   );
   const LogoColor = {
-    [ChainId.POLYGON]: 'base.color.text.link.primary',
+    [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
+    [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
     [ChainId.ETHEREUM]: 'base.color.accent.5',
+    [ChainId.SEPOLIA]: 'base.color.accent.5',
   };
 
   //todo: add corresponding network symbols
   const NetworkIcon = {
-    [ChainId.POLYGON]: 'Immutable',
+    [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
     [ChainId.ETHEREUM]: 'EthToken',
+    [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
+    [ChainId.SEPOLIA]: 'EthToken',
   };
 
   const switchNetwork = useCallback(
@@ -63,14 +65,8 @@ export const NetworkMenu = () => {
 
         walletDispatch({
           payload: {
-            type: WalletActions.SWITCH_NETWORK,
+            type: WalletActions.SET_NETWORK,
             network: switchNetworkResult.network,
-            tokenBalances: await getTokenBalances(
-              checkout,
-              switchNetworkResult?.provider,
-              switchNetworkResult.network.name,
-              switchNetworkResult.network.chainId
-            ),
           },
         });
 
@@ -117,33 +113,34 @@ export const NetworkMenu = () => {
         />
       </Box>
       <HorizontalMenu>
-        {allowedNetworks
-          ?.sort((a: NetworkInfo, b: NetworkInfo) =>
-            sortNetworksCompareFn(a, b)
-          )
-          .map((networkItem) => (
-            <HorizontalMenu.Button
-              key={networkItem.chainId}
-              testId={`${networkItem.name}-network-button`}
-              sx={
-                networkItem.chainId === network?.chainId
-                  ? ActiveNetworkButtonStyle
-                  : NetworkButtonStyle
-              }
-              size="small"
-              onClick={() => switchNetwork(networkItem.chainId)}
-            >
-              <Button.Icon
-                icon={NetworkIcon[networkItem.chainId]}
-                iconVariant="bold"
-                sx={LogoStyle(
-                  LogoColor[networkItem.chainId],
+        {checkout &&
+          allowedNetworks
+            ?.sort((a: NetworkInfo, b: NetworkInfo) =>
+              sortNetworksCompareFn(a, b, checkout.config.environment)
+            )
+            .map((networkItem) => (
+              <HorizontalMenu.Button
+                key={networkItem.chainId}
+                testId={`${networkItem.name}-network-button`}
+                sx={
                   networkItem.chainId === network?.chainId
-                )}
-              />
-              {networkItem.name}
-            </HorizontalMenu.Button>
-          ))}
+                    ? ActiveNetworkButtonStyle
+                    : NetworkButtonStyle
+                }
+                size="small"
+                onClick={() => switchNetwork(networkItem.chainId)}
+              >
+                <Button.Icon
+                  icon={NetworkIcon[networkItem.chainId]}
+                  iconVariant="bold"
+                  sx={LogoStyle(
+                    LogoColor[networkItem.chainId],
+                    networkItem.chainId === network?.chainId
+                  )}
+                />
+                {networkItem.name}
+              </HorizontalMenu.Button>
+            ))}
       </HorizontalMenu>
     </Box>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Environment } from '@imtbl/config';
 import {
   WidgetConnectionProviders,
   WidgetTheme,
@@ -7,7 +8,8 @@ import {
 
 /**
  * Interface representing the props for the Buy Widget component.
- * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Buy Widget (default: {@link WidgetConnectionProviders.METAMASK}).
+ * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Buy Widget
+ * (default: {@link WidgetConnectionProviders.METAMASK}).
  * @property {string} orderId - The ID that identifies the open buy order associated to the assets to buy.
  */
 export interface BuyReactProps {
@@ -27,11 +29,12 @@ export function BuyReact(props: BuyReactProps): JSX.Element {
 
   return (
     <imtbl-buy
+      environment={Environment.SANDBOX}
       providerPreference={
         providerPreference ?? WidgetConnectionProviders.METAMASK
       }
       theme={config.theme ?? WidgetTheme.DARK}
       orderId={orderId}
-    ></imtbl-buy>
+    />
   );
 }

@@ -1,5 +1,5 @@
 import { BiomeThemeProvider, Body, Box, Icon } from '@biom3/react';
-import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { useState } from 'react';
 import { InnerWidget } from '../inner-widget/InnerWidget';
@@ -12,6 +12,8 @@ import {
   SuccessLogoStyles,
 } from '../../../../components/Success/SuccessViewStyles';
 import { CenteredBoxContent } from '../../../../components/CenteredBoxContent/CenteredBoxContent';
+import { zkEVMNetwork } from '../../../../lib/networkUtils';
+import { Environment } from '@imtbl/config';
 
 export interface ConnectionLoaderProps {
   children?: React.ReactNode;
@@ -36,7 +38,9 @@ export function ConnectionLoader({
   params,
   theme,
 }: ConnectionLoaderProps) {
-  const checkout = new Checkout();
+  const checkout = new Checkout({
+    baseConfig: { environment: Environment.SANDBOX },
+  });
   const [connStatus, setConnStatus] = useState(ConnectionStatus.UNKNOWN);
 
   const biomeTheme: BaseTokens =
@@ -59,7 +63,9 @@ export function ConnectionLoader({
       });
 
       console.log('connectRes', connectRes);
-      if (connectRes.network.chainId !== ChainId.POLYGON) {
+      if (
+        connectRes.network.chainId !== zkEVMNetwork(checkout.config.environment)
+      ) {
         return ConnectionStatus.CONNECTED_WRONG_NETWORK;
       }
 

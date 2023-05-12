@@ -1,4 +1,3 @@
-import { ChainId } from '@imtbl/checkout-sdk';
 import { useContext, useState } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
@@ -9,6 +8,7 @@ import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
 import { ViewContext, ViewActions } from '../../../context/ViewContext';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectContext } from '../context/ConnectContext';
+import { zkEVMNetwork } from '../../../lib/networkUtils';
 
 export const SwitchNetwork = () => {
   const { viewDispatch } = useContext(ViewContext);
@@ -19,12 +19,12 @@ export const SwitchNetwork = () => {
   const [buttonText, setButtonText] = useState('Ready to Switch');
 
   const switchNetwork = async () => {
-    if (!provider) return;
+    if (!provider || !checkout) return;
 
     try {
-      await checkout!.switchNetwork({
+      await checkout.switchNetwork({
         provider,
-        chainId: ChainId.POLYGON,
+        chainId: zkEVMNetwork(checkout.config.environment),
       });
 
       viewDispatch({
