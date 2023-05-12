@@ -1,11 +1,11 @@
 import { TextInput, Box, Body } from '@biom3/react';
 import { BigNumber, utils, BigNumberish } from 'ethers';
-import React, { useEffect, useState, useCallback, useContext } from 'react';
+import React, { useEffect, useState, useContext, useMemo } from 'react';
 import { TokenInfo, GetBalanceResult } from '@imtbl/checkout-sdk';
 import TokenSelect from './TokenSelect';
 import { QuoteResponse } from '../views/SwapCoins';
 import { findTokenByAddress } from '../helpers';
-import { SwapActions, SwapContext } from '../context/SwapContext';
+import { SwapContext } from '../context/SwapContext';
 
 type WithProps = {
   onTokenChange: (token: TokenInfo) => void;
@@ -53,9 +53,8 @@ export default function With(props: WithProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [debounceId, setDebounceId] = useState<string | null>();
 
-  const { swapState, swapDispatch } = useContext(SwapContext);
-  const { checkout, provider, network, tokenBalances, allowedTokens } =
-    swapState;
+  const { swapState } = useContext(SwapContext);
+  const { tokenBalances, allowedTokens } = swapState;
 
   const quoteAmount = (
     (quote &&
@@ -63,34 +62,14 @@ export default function With(props: WithProps) {
     0
   )?.toString();
 
-  const fetchBalances = useCallback(async () => {
-    if (!checkout || !provider || !network) return;
-
-    const walletAddress = await provider.getSigner().getAddress();
-    const result = await checkout.getAllBalances({
-      provider: provider,
-      chainId: network.chainId,
-      walletAddress,
-    });
-
-    const resolvedBalances = result.balances
+  const nonZeroBalances = useMemo(() => {
+    return tokenBalances
       .filter((balance: GetBalanceResult) => balance.balance.gt(0))
       .map((balance: GetBalanceResult) => ({
         ...balance,
         token: findTokenByAddress(allowedTokens, balance.token.address || '')!,
       }));
-
-    swapDispatch({
-      payload: {
-        type: SwapActions.SET_TOKEN_BALANCES,
-        tokenBalances: resolvedBalances,
-      },
-    });
-
-    if (resolvedBalances.length > 0) {
-      onTokenChange(resolvedBalances[0].token);
-    }
-  }, [checkout, provider, network, allowedTokens, swapDispatch, onTokenChange]);
+  }, [tokenBalances, allowedTokens]);
 
   const generateQuote = async () => {
     const newQuote = await getQuoteFromAmountOut(
@@ -125,10 +104,10 @@ export default function With(props: WithProps) {
   }, [buyAmount, buyToken, token]);
 
   useEffect(() => {
-    if (!tokenBalances) {
-      fetchBalances();
+    if (nonZeroBalances.length > 0) {
+      onTokenChange(nonZeroBalances[0].token);
     }
-  }, [tokenBalances, fetchBalances]);
+  }, [nonZeroBalances, onTokenChange]);
 
   return (
     <Box sx={{ mt: '20px' }}>

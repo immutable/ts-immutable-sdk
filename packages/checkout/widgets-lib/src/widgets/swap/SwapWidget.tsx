@@ -56,7 +56,9 @@ export function SwapWidget(props: SwapWidgetProps) {
   const swapWidgetSetup = useCallback(async () => {
     if (!providerPreference) return;
 
-    const checkout = new Checkout({ baseConfig: { environment: environment } });
+    const checkout = new Checkout({
+      baseConfig: { environment: environment },
+    });
 
     swapDispatch({
       payload: {
@@ -83,14 +85,6 @@ export function SwapWidget(props: SwapWidgetProps) {
       chainId: connectResult.network.chainId,
     });
 
-    swapDispatch({
-      payload: {
-        type: SwapActions.SET_NETWORK,
-        network: connectResult.network,
-        tokenBalances: tokenBalances.balances,
-      },
-    });
-
     const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
       {
         chainId: connectResult.network.chainId,
@@ -98,10 +92,25 @@ export function SwapWidget(props: SwapWidgetProps) {
       }
     );
 
+    // Do we filter token balances by allow list here??
+    const allowedTokenBalances = tokenBalances.balances.filter((balance) =>
+      allowList.tokens
+        .map((token) => token.address)
+        .includes(balance.token.address)
+    );
+
     swapDispatch({
       payload: {
         type: SwapActions.SET_ALLOWED_TOKENS,
         allowedTokens: allowList.tokens,
+      },
+    });
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_NETWORK,
+        network: connectResult.network,
+        tokenBalances: allowedTokenBalances,
       },
     });
 
