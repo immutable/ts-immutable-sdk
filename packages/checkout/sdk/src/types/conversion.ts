@@ -1,5 +1,5 @@
-import { TokenInfo } from './token';
 import { BigNumber } from 'ethers';
+import { TokenInfo } from './token';
 
 /**
  * Enum representing the types of token filters available.

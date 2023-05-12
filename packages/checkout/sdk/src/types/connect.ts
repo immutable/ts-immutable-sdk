@@ -1,5 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { NetworkInfo } from '../types';
+// TODO: fix circular dependency
+// eslint-disable-next-line import/no-cycle
+import { NetworkInfo } from '.';
 
 /**
  * Enum representing the list of default supported providers.

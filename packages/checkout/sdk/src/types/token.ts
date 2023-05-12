@@ -1,5 +1,6 @@
+// TODO: fix circular dependency
+// eslint-disable-next-line import/no-cycle
 import { ChainId } from './network';
-import { BigNumber } from 'ethers';
 
 /**
  * Interface representing token information.
