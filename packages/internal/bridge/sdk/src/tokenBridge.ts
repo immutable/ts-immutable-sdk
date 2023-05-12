@@ -17,6 +17,7 @@ import { ERC20 } from 'contracts/ABIs/ERC20';
 import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
 import { ROOT_STATE_SENDER } from 'contracts/ABIs/RootStateSender';
 import { CHILD_STATE_RECEIVER } from 'contracts/ABIs/ChildStateReceiver';
+import { getBlockNumberClosestToTimestamp } from 'lib/getBlockCloseToTimestamp';
 
 /**
  * Represents a token bridge, which manages asset transfers between two chains.
@@ -313,53 +314,35 @@ export class TokenBridge {
     }
 
     // Get the state sync ID from the transaction receipt
-    const stateSyncID = await withBridgeError<string>(async () => this.getRootStateSyncID(rootTxReceipt), BridgeErrorType.PROVIDER_ERROR);
-
+    const stateSyncID = await withBridgeError<number>(async () => this.getRootStateSyncID(rootTxReceipt), BridgeErrorType.PROVIDER_ERROR);
+    // eslint-disable-next-line no-console
+    console.log(`StateSyncID is ${stateSyncID}`);
     // Get the block timestamp
     const rootBlock: ethers.providers.Block = await this.config.rootProvider.getBlock(rootTxReceipt.blockNumber);
-    const SIX_HOURS_IN_SECONDS = 6 * 60 * 60;
-    const minStartingBlock: number = await withBridgeError<number>(async () => this.getBlockNumberClosestToTimestamp(rootBlock.timestamp, SIX_HOURS_IN_SECONDS), BridgeErrorType.PROVIDER_ERROR);
+    const minBlockRange: number = await withBridgeError<number>(async () => getBlockNumberClosestToTimestamp(this.config.childProvider, rootBlock.timestamp, this.config.blockTime, this.config.clockInaccuracy), BridgeErrorType.PROVIDER_ERROR);
+    const maxBlockRange: number = minBlockRange + this.config.maxDepositBlockDelay;
     // eslint-disable-next-line no-console
-    console.log(`Min Starting Block is ${minStartingBlock}`);
-    const result: CompletionStatus = await withBridgeError<CompletionStatus>(async () => this.waitForChildStateSync(stateSyncID, 10000, minStartingBlock), BridgeErrorType.PROVIDER_ERROR);
+    console.log(`Polling between blocks ${minBlockRange} and ${maxBlockRange}`);
+    const result: CompletionStatus = await withBridgeError<CompletionStatus>(async () => this.waitForChildStateSync(stateSyncID, this.config.pollInterval, minBlockRange, maxBlockRange), BridgeErrorType.PROVIDER_ERROR);
 
     return {
       status: result,
     };
   }
 
-  private async getBlockNumberClosestToTimestamp(targetTimestamp: number, maxTimeDiff: number): Promise<number> {
-    let lowerBlockNumber = 0;
-    let upperBlockNumber = await this.config.childProvider.getBlockNumber();
-
-    while (upperBlockNumber !== lowerBlockNumber + 1) {
-      const midBlockNumber = Math.floor((lowerBlockNumber + upperBlockNumber) / 2);
-      // eslint-disable-next-line no-await-in-loop
-      const midBlock = await this.config.childProvider.getBlock(midBlockNumber);
-
-      if (Math.abs(midBlock.timestamp - targetTimestamp) <= maxTimeDiff) {
-        return midBlockNumber;
-      } if (midBlock.timestamp < targetTimestamp) {
-        lowerBlockNumber = midBlockNumber;
-      } else {
-        upperBlockNumber = midBlockNumber;
-      }
-    }
-    throw new Error(`no block within ${maxTimeDiff} of timestamp found`);
-  }
-
   private async waitForChildStateSync(
-    stateSyncID: string,
+    stateSyncID: number,
     interval: number,
-    minBlock: number,
+    minBlockRange: number,
+    maxBlockRange: number,
   ) : Promise<CompletionStatus> {
     const childStateReceiver = new ethers.Contract(this.config.bridgeContracts.childChainStateReceiver, CHILD_STATE_RECEIVER, this.config.childProvider);
 
     // Set up an event filter for the StateSyncResult event
-    const eventFilter = childStateReceiver.filters.StateSyncResult(parseInt(stateSyncID, 10), null, null);
+    const eventFilter = childStateReceiver.filters.StateSyncResult(stateSyncID, null, null);
 
     // Helper function to query for events with the state sync id
-    const getEventsWithStateSyncID = async (): Promise<ethers.Event[]> => childStateReceiver.queryFilter(eventFilter, minBlock, 'latest');
+    const getEventsWithStateSyncID = async (): Promise<ethers.Event[]> => childStateReceiver.queryFilter(eventFilter, minBlockRange, maxBlockRange);
 
     // Helper function to pause execution for a specified interval
     const pause = (): Promise<void> => new Promise((resolve) => {
@@ -391,7 +374,7 @@ export class TokenBridge {
     return CompletionStatus.FAILED;
   }
 
-  private async getRootStateSyncID(txReceipt: ethers.providers.TransactionReceipt): Promise<string> {
+  private async getRootStateSyncID(txReceipt: ethers.providers.TransactionReceipt): Promise<number> {
     const stateSenderInterface = new ethers.utils.Interface(ROOT_STATE_SENDER);
 
     // Get the StateSynced event log from the transaction receipt
@@ -406,8 +389,8 @@ export class TokenBridge {
       throw new Error(`expected state sync event in tx ${txReceipt.transactionHash}`);
     }
 
-    // Return the state sync ID as a string
-    const stateSyncID = stateSyncEvent.args.id.toString();
+    // Return the state sync ID as a number
+    const stateSyncID = parseInt(stateSyncEvent.args.id, 10);
     return stateSyncID;
   }
 
