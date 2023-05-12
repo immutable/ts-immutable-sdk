@@ -1,12 +1,14 @@
 import {
+  DepositsApi, EncodingApi, UsersApi, ETHAmount,
+  Contracts,
+} from '@imtbl/core-sdk';
+import {
   generateSigners,
   privateKey1,
   testConfig,
   transactionResponse,
 } from '../../test/helpers';
-import { DepositsApi, EncodingApi, UsersApi, ETHAmount } from '@imtbl/core-sdk';
-import { depositEth } from './';
-import { Contracts } from '@imtbl/core-sdk';
+import { depositEth } from '.';
 
 jest.mock('@imtbl/core-sdk');
 
@@ -64,6 +66,7 @@ describe('Deposit ETH', () => {
       (Contracts.Core.connect as jest.Mock).mockReturnValue({
         populateTransaction: {
           registerAndDepositEth: async () => 'test',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           'deposit(uint256,uint256,uint256)': async () => 'test',
         },
       });

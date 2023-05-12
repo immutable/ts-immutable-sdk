@@ -17,6 +17,7 @@ interface ProviderModuleConfiguration
 
 export class ProviderConfiguration {
   readonly immutableXConfig: ImmutableXConfiguration;
+
   readonly baseConfig: ImmutableConfiguration;
 
   constructor({ baseConfig, overrides }: ProviderModuleConfiguration) {
@@ -24,6 +25,8 @@ export class ProviderConfiguration {
     if (overrides) {
       this.immutableXConfig = overrides.immutableXConfig;
     } else {
+      // TODO: remove once a sensible default is chosen
+      // eslint-disable-next-line default-case
       switch (baseConfig.environment) {
         case Environment.SANDBOX: {
           this.immutableXConfig = CoreSDKConfigOptions.SANDBOX;

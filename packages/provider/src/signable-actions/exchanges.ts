@@ -22,7 +22,7 @@ export async function exchangeTransfer({
   await validateChain(signers.ethSigner, config.immutableXConfig);
 
   const exchangeApi = new ExchangesApi(
-    config.immutableXConfig.apiConfiguration
+    config.immutableXConfig.apiConfiguration,
   );
   const ethAddress = await signers.ethSigner.getAddress();
 
@@ -37,8 +37,7 @@ export async function exchangeTransfer({
     },
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    signableResult.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
 
   const ethSignature = await signRaw(signableMessage, signers.ethSigner);
 
