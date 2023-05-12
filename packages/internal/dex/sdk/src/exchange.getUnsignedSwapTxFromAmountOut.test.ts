@@ -1,3 +1,4 @@
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { describe, it } from '@jest/globals';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
@@ -10,10 +11,12 @@ import {
   setupSwapTxTest,
   TEST_PERIPHERY_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
+  TEST_GAS_PRICE,
 } from './utils/testUtils';
 import * as utils from './lib/utils';
 import { Router } from './lib';
 
+jest.mock('@ethersproject/providers');
 jest.mock('./lib/router');
 jest.mock('./lib/utils', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -28,8 +31,19 @@ const DEFAULT_SLIPPAGE = 0.1; // 1/1000 = 0.001 = 0.1%
 const HIGHER_SLIPPAGE = 0.2; // 2/1000 = 0.002 = 0.2%
 
 describe('getUnsignedSwapTxFromAmountOut', () => {
+  beforeAll(() => {
+    (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
+      () => ({
+        getFeeData: async () => ({
+          maxFeePerGas: null,
+          gasPrice: TEST_GAS_PRICE,
+        }),
+      }),
+    ) as unknown as JsonRpcProvider;
+  });
+
   describe('When no route found', () => {
-    it('Returns NO_ROUTE_FOUND', async () => {
+    it('should return with success = false', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
       (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
@@ -203,46 +217,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
     });
   });
 
-  describe('pass in invalid fromAddress', () => {
-    it('reverts', async () => {
-      const params = setupSwapTxTest(HIGHER_SLIPPAGE);
-      mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
-
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
-
-      const tx = await exchange.getUnsignedSwapTxFromAmountOut(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        params.amountOut,
-        HIGHER_SLIPPAGE,
-      );
-
-      const data = tx.transaction?.data?.toString() || '';
-
-      const { functionCallParams, topLevelParams } = decodeMulticallData(data);
-
-      expect(topLevelParams[1][0].slice(0, 10)).toBe(
-        exactOutputSingleSignature,
-      );
-
-      expect(functionCallParams.tokenIn).toBe(params.inputToken); // input token
-      expect(functionCallParams.tokenOut).toBe(params.outputToken); // output token
-      expect(functionCallParams.fee).toBe(10000); // fee
-      expect(functionCallParams.recipient).toBe(params.fromAddress); // Recipient
-      expect(functionCallParams.firstAmount.toString()).toBe(
-        params.amountOut.toString(),
-      ); // amountOut
-      expect(functionCallParams.secondAmount.toString()).toBe(
-        params.maxAmountIn.toString(),
-      ); // amountIn
-      expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
-    });
-  });
-
   describe('Pass in invalid addresses', () => {
-    it('throws InvalidAddress', async () => {
+    it('throws InvalidAddress error', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
 
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
@@ -285,7 +261,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
   });
 
   describe('Pass in maxHops > 10', () => {
-    it('throws', async () => {
+    it('throws INVALID_MAX_HOPS error', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
@@ -301,12 +277,12 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           HIGHER_SLIPPAGE,
           11,
         ),
-      ).rejects.toThrow();
+      ).rejects.toThrow(ExchangeErrorTypes.INVALID_MAX_HOPS);
     });
   });
 
   describe('With slippage greater than 50', () => {
-    it('throws', async () => {
+    it('throws INVALID_SLIPPAGE error', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
@@ -327,7 +303,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
   });
 
   describe('With slippage less than 0', () => {
-    it('throws', async () => {
+    it('throws INVALID_SLIPPAGE error', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 

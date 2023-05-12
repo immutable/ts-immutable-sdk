@@ -17,7 +17,8 @@ import {
   Router,
 } from '../lib';
 
-export const testChainId: number = 1;
+export const TEST_GAS_PRICE = ethers.BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
+export const TEST_TRANSACTION_GAS_USAGE = ethers.BigNumber.from('200000'); // 200,000 gas units
 
 export const TEST_CHAIN_ID = 999;
 export const TEST_RPC_URL = 'https://0.net';
@@ -267,6 +268,7 @@ export function mockRouterImplementation(
         amountOut: ethers.BigNumber.from(params.amountOut),
         tokenOut,
         tradeType,
+        gasEstimate: TEST_TRANSACTION_GAS_USAGE,
       };
       return {
         success: true,

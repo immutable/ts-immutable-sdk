@@ -1,3 +1,4 @@
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { describe, it } from '@jest/globals';
 import { TradeType } from '@uniswap/sdk-core';
 import { ExchangeConfiguration } from 'config';
@@ -9,10 +10,12 @@ import {
   setupSwapTxTest,
   TEST_PERIPHERY_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
+  TEST_GAS_PRICE,
 } from './utils/testUtils';
 import * as utils from './lib/utils';
 import { Router } from './lib';
 
+jest.mock('@ethersproject/providers');
 jest.mock('./lib/router');
 jest.mock('./lib/utils', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -27,8 +30,19 @@ const DEFAULT_SLIPPAGE = 0.1;
 const HIGHER_SLIPPAGE = 0.2;
 
 describe('getUnsignedSwapTxFromAmountIn', () => {
+  beforeAll(() => {
+    (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
+      () => ({
+        getFeeData: async () => ({
+          maxFeePerGas: null,
+          gasPrice: TEST_GAS_PRICE,
+        }),
+      }),
+    ) as unknown as JsonRpcProvider;
+  });
+
   describe('When no route found', () => {
-    it('Returns NO_ROUTE_FOUND', async () => {
+    it('should return with success = false', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
       (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
@@ -188,7 +202,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('Pass in invalid addresses', () => {
-    it('throws InvalidAddress', async () => {
+    it('throws InvalidAddress error', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
 
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
@@ -231,7 +245,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('Pass in maxHops > 10', () => {
-    it('throws', async () => {
+    it('throws INVALID_MAX_HOPS error', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
@@ -247,12 +261,12 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
           HIGHER_SLIPPAGE,
           11,
         ),
-      ).rejects.toThrow();
+      ).rejects.toThrow(ExchangeErrorTypes.INVALID_MAX_HOPS);
     });
   });
 
   describe('With slippage greater than 50', () => {
-    it('throws', async () => {
+    it('throws INVALID_SLIPPAGE error', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
@@ -273,7 +287,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('With slippage less than 0', () => {
-    it('throws', async () => {
+    it('throws INVALID_SLIPPAGE error', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 

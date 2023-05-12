@@ -1,5 +1,5 @@
-import { ethers } from 'ethers';
 import { JsonRpcProvider } from '@ethersproject/providers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { TEST_CHAIN_ID, TEST_RPC_URL } from 'utils/testUtils';
 import { calculateGasFee, fetchGasPrice } from './gas';
 
@@ -8,9 +8,9 @@ jest.mock('@ethersproject/providers');
 describe('calculateGasFee', () => {
   describe('when given a price and gas used', () => {
     it('calculates gas fee from and returns face value', async () => {
-      const gasPrice = ethers.BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
+      const gasPrice = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
 
-      const gasUsedInTransaction = ethers.BigNumber.from('200000');
+      const gasUsedInTransaction = BigNumber.from('200000');
       const gasFeeEstimate = calculateGasFee(gasPrice, gasUsedInTransaction);
 
       expect(gasFeeEstimate).not.toBeNull();
@@ -29,7 +29,7 @@ describe('fetchGasPrice', () => {
             gasPrice: null,
           }),
         }),
-      ) as unknown as ethers.providers.JsonRpcProvider;
+      ) as unknown as JsonRpcProvider;
 
       const provider = new JsonRpcProvider(
         TEST_RPC_URL,
@@ -44,7 +44,7 @@ describe('fetchGasPrice', () => {
 
   describe('when EIP-1559 is not supported', () => {
     it('should return the gasPrice', async () => {
-      const gasPrice = ethers.BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
+      const gasPrice = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
 
       (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
         () => ({
@@ -53,7 +53,7 @@ describe('fetchGasPrice', () => {
             gasPrice,
           }),
         }),
-      ) as unknown as ethers.providers.JsonRpcProvider;
+      ) as unknown as JsonRpcProvider;
 
       const provider = new JsonRpcProvider(
         TEST_RPC_URL,
@@ -69,8 +69,8 @@ describe('fetchGasPrice', () => {
 
   describe('when EIP-1559 is supported', () => {
     it('should return the maxFeePerGas', async () => {
-      const maxFeePerGas = ethers.BigNumber.from('2500000000'); // 2.5 gwei or 2500000000 wei
-      const maxPriorityFeePerGas = ethers.BigNumber.from('500000000'); // 0.5 gwei or 500000000 wei
+      const maxFeePerGas = BigNumber.from('2500000000'); // 2.5 gwei or 2500000000 wei
+      const maxPriorityFeePerGas = BigNumber.from('500000000'); // 0.5 gwei or 500000000 wei
 
       (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
         () => ({
@@ -80,7 +80,7 @@ describe('fetchGasPrice', () => {
             gasPrice: null,
           }),
         }),
-      ) as unknown as ethers.providers.JsonRpcProvider;
+      ) as unknown as JsonRpcProvider;
 
       const provider = new JsonRpcProvider(
         TEST_RPC_URL,
