@@ -14,7 +14,7 @@ import {
   generatePool,
   randomAddress,
 } from 'utils/testUtils';
-import { estimateIntermediateSwapFees } from './estimation';
+import { getEstimatedSwapFee } from './estimation';
 import { getXAndY } from './temp';
 
 jest.mock('./temp', () => ({
@@ -30,7 +30,7 @@ function calculateFeeAmount(
   return amount.mul(pool.fee).div(1000000);
 }
 
-describe('estimateIntermediateSwapFees', () => {
+describe('getEstimatedSwapFee', () => {
   describe('with one hop', () => {
     it('returns the amountIn', async () => {
       const amountIn = ethers.utils.parseUnits('10', '6');
@@ -59,7 +59,7 @@ describe('estimateIntermediateSwapFees', () => {
       };
 
       // Don't need to mock getXAndY since it doesn't call it when pools.length == 1
-      const fees = estimateIntermediateSwapFees(routeAndQuote);
+      const fees = getEstimatedSwapFee(routeAndQuote);
       const expectedFeeAmount = calculateFeeAmount(pools[0], amountIn);
       expect(fees.toString()).toBe(expectedFeeAmount.toString());
     });
@@ -107,7 +107,7 @@ describe('estimateIntermediateSwapFees', () => {
             tradeType: TradeType.EXACT_INPUT,
           },
         };
-        const total = estimateIntermediateSwapFees(routeAndQuote);
+        const total = getEstimatedSwapFee(routeAndQuote);
         const expectedFeeAmount0 = calculateFeeAmount(pools[0], amountIn);
         // If the first fee is 1%, amount in is actually `in = amountIn - (amountIn * 0.01)`
         // if first x, y is 500, 100, x * y = k = 50000.
@@ -171,7 +171,7 @@ describe('estimateIntermediateSwapFees', () => {
             tradeType: TradeType.EXACT_INPUT,
           },
         };
-        const total = estimateIntermediateSwapFees(routeAndQuote);
+        const total = getEstimatedSwapFee(routeAndQuote);
 
         const expectedFeeAmount0 = calculateFeeAmount(
           pools[0],

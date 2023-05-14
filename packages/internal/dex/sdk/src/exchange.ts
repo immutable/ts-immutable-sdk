@@ -8,7 +8,7 @@ import JSBI from 'jsbi';
 
 import { slippageToFraction } from 'lib/transactionUtils/slippage';
 import { ExchangeError, ExchangeErrorTypes } from 'errors';
-import { estimateIntermediateSwapFees } from 'lib/estimation';
+import { getEstimatedSwapFee } from 'lib/estimation';
 import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
@@ -120,7 +120,7 @@ export class Exchange {
       };
     }
 
-    const estimatedProtocolFee = estimateIntermediateSwapFees(routeAndQuote);
+    const estimatedProtocolFee = getEstimatedSwapFee(routeAndQuote);
 
     const slippage = slippageToFraction(slippagePercent);
     const params: MethodParameters = await createSwapParameters(

@@ -74,7 +74,7 @@ function getSwapFee(amount: ethers.BigNumber, fee: number): ethers.BigNumber {
   return feeAmount;
 }
 
-export const estimateIntermediateSwapFees = (
+export const getEstimatedSwapFee = (
   routeAndQuote: QuoteResponse
 ): ethers.BigNumber => {
   if (!routeAndQuote.trade) {
@@ -82,8 +82,17 @@ export const estimateIntermediateSwapFees = (
   }
 
   const pools: Pool[] = routeAndQuote.trade.route.pools;
-  const fees: Fee[] = [];
+  const fees: Fee[] = estimateAllIntermediateSwapFees(pools, routeAndQuote);
 
+  return rollUpFees(fees, pools);
+};
+
+// Estimate all intermediate swaps in a route, and calculate the protocol fees paid for each swap.
+function estimateAllIntermediateSwapFees(pools: Pool[], routeAndQuote: QuoteResponse): Fee[] {
+  if (!routeAndQuote.trade) {
+    return []
+  }
+  const fees: Fee[] = [];
   // Do the first pool's fees
   let feeAmount = getSwapFee(
     ethers.BigNumber.from(routeAndQuote.trade.amountIn),
@@ -104,7 +113,8 @@ export const estimateIntermediateSwapFees = (
   });
 
   if (pools.length == 1) {
-    return convertWeiToTokenDecimals(fees[0].amount, fees[0].token.decimals);
+    // return convertWeiToTokenDecimals(fees[0].amount, fees[0].token.decimals);
+    return fees
   }
 
   // nextTokenIn is the Token that is to be swapped in to the next intermediate swap.
@@ -145,10 +155,11 @@ export const estimateIntermediateSwapFees = (
       amount: feeAmount,
     });
   }
+  return fees
+}
 
-  // FUN -> USDC -> WETH -> IMX
-  // 1. sum = USDC value of WETH fees
-  // 2. sum = FUN value of (all USDC fees)
+// Rolls up the fees from the intermediate swaps into a single fee amount, in the swap's original input token.
+function rollUpFees(fees: Fee[], pools: Pool[]): ethers.BigNumber {
   let sum: ethers.BigNumber = ethers.BigNumber.from(0);
   for (let i = fees.length - 1; i >= 1; i--) {
     const poolBefore = pools[i - 1];
@@ -174,5 +185,5 @@ export const estimateIntermediateSwapFees = (
   }
   sum = sum.add(fees[0].amount);
   sum = convertWeiToTokenDecimals(sum, fees[0].token.decimals);
-  return sum;
-};
+  return sum
+}
