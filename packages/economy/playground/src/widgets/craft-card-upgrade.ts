@@ -1,6 +1,6 @@
 import { EconomyCustomEventTypes } from '@imtbl/economy';
 import { LitElement, css, html } from 'lit';
-import { customElement, eventOptions, state } from 'lit/decorators';
+import { customElement, eventOptions, state } from 'lit/decorators.js';
 import { cache } from 'lit/directives/cache';
 
 // FIXME: Use auto generated types from ts codegen
@@ -25,12 +25,12 @@ export class CraftingCardUpgrade extends LitElement {
 
   @state()
   private state: State = {
-      craftInput: {
-        userId: '',
-        recipeId: '',
-        ingredients: [],
-      },
-    };
+    craftInput: {
+      userId: '',
+      recipeId: '',
+      ingredients: [],
+    },
+  };
 
   connectedCallback() {
     // TODO: Remove once fixed
@@ -39,7 +39,7 @@ export class CraftingCardUpgrade extends LitElement {
     super.connectedCallback();
     window.addEventListener(
       EconomyCustomEventTypes.DEFAULT,
-      this.handleCustomEvent(this.handleConnectEvent),
+      this.handleCustomEvent(this.handleConnectEvent)
     );
   }
 

@@ -5,7 +5,7 @@ import {
   eventOptions,
   property,
   state,
-} from 'lit/decorators';
+} from 'lit/decorators.js';
 import {
   Passport,
   ImmutableConfiguration,
@@ -23,7 +23,7 @@ const devEnvConfig = {
   passportDomain: 'https://passport.dev.immutable.com',
 };
 
-@customElement('imtbl-craft-passport')
+@customElement('imtbl-craft-passport-connect')
 export class CraftPassport extends LitElement {
   static styles = css``;
 
@@ -34,24 +34,24 @@ export class CraftPassport extends LitElement {
   private button!: HTMLButtonElement;
 
   @property()
-    // env: keyof typeof Config | 'dev' = 'SANDBOX';
-    env: string = 'SANDBOX';
+  // env: keyof typeof Config | 'dev' = 'SANDBOX';
+  env: string = 'SANDBOX';
 
   @property()
-    clientId: string = '';
+  clientId: string = '';
 
   @property()
-    redirectUri: string = '';
+  redirectUri: string = '';
 
   @property()
-    logoutRedirectUri: string = '';
+  logoutRedirectUri: string = '';
 
   @state()
   private state = {
-      accessToken: '',
-      userInfo: {},
-      user: {},
-    };
+    accessToken: '',
+    userInfo: {},
+    user: {},
+  };
 
   @eventOptions({ capture: true })
   async handleLoginClick(event: MouseEvent) {
