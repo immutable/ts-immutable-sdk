@@ -1,5 +1,5 @@
 import { LitElement, css, html } from 'lit';
-import { customElement, state } from 'lit/decorators';
+import { customElement, state } from 'lit/decorators.js';
 
 import { Economy, EconomyEvents } from '@imtbl/economy';
 import type {
@@ -9,7 +9,7 @@ import type {
   Recipe,
 } from '@imtbl/economy';
 
-@customElement('imtbl-card-upgrade-widget')
+@customElement('imtbl-crafting-widget')
 export class CraftingWidget extends LitElement {
   static styles = css``;
 
