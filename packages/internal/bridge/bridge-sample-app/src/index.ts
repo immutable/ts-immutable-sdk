@@ -158,5 +158,5 @@ async function deposit() {
 
 // Run the deposit function and exit the process when completed
 (async () => {
-  await deposit().finally(() => process.exit(0));
+  await deposit().then(() => {console.log(`Exiting Successfully`); process.exit(0)}).catch(e => {console.log(`Exiting with error: ${e.toString()}`); process.exit(1)});
 })();
