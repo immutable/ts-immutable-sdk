@@ -7,15 +7,15 @@ import { Recipe } from './recipe/Recipe';
 import { Crafting } from './crafting/Crafting';
 import type { CraftEvent } from './crafting/Crafting';
 import { ItemDefinition } from './item-definition/ItemDefinition';
-import { Events } from './Events';
-import { Configuration, Config } from './Config';
+import { EventClient } from './EventClient';
+import { Config, Configuration } from './Config';
 
 /** @internal Economy SDK actions */
 export type EconomyEvents = CraftEvent;
 
 @Service()
 export class Economy {
-  static build(config?: Configuration): Economy {
+  static build(config?: Partial<Configuration>): Economy {
     if (config) {
       Container.get(Config).set(config);
     }
@@ -24,7 +24,7 @@ export class Economy {
   }
 
   constructor(
-    private events: Events<EconomyEvents>,
+    private events: EventClient<EconomyEvents>,
     public config: Config,
     public crafting: Crafting,
     public recipe: Recipe,
@@ -34,7 +34,7 @@ export class Economy {
 
   public connect(): void {
     // TODO: Initialize all services
-    this.log('connected', this.config.get());
+    this.log('connected', { config: this.config.get() });
   }
 
   public subscribe(handler: (event: EconomyEvents) => void): Subscription {
