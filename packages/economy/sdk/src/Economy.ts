@@ -8,24 +8,21 @@ import { Crafting } from './crafting/Crafting';
 import type { CraftEvent } from './crafting/Crafting';
 import { ItemDefinition } from './item-definition/ItemDefinition';
 import { EventClient } from './EventClient';
-import { Config, Configuration } from './Config';
+import { Config, defaultConfig } from './Config';
 
 /** @internal Economy SDK actions */
 export type EconomyEvents = CraftEvent;
 
 @Service()
 export class Economy {
-  static build(config?: Partial<Configuration>): Economy {
-    if (config) {
-      Container.get(Config).set(config);
-    }
-
+  static build(config = defaultConfig): Economy {
+    Container.set(Config, new Config(config));
     return Container.get(Economy);
   }
 
   constructor(
-    private events: EventClient<EconomyEvents>,
     public config: Config,
+    private events: EventClient<EconomyEvents>,
     public crafting: Crafting,
     public recipe: Recipe,
     public inventory: Inventory,

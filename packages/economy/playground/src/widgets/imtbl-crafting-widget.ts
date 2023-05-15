@@ -8,6 +8,7 @@ import type {
   ItemDefinition,
   Recipe,
 } from '@imtbl/economy';
+import { Environment } from '@imtbl/config';
 
 @customElement('imtbl-crafting-widget')
 export class CraftingWidget extends LitElement {
@@ -19,6 +20,12 @@ export class CraftingWidget extends LitElement {
     super();
     this.economy = Economy.build({
       gameId: 'pokemon',
+      userId: 'pokemon_master',
+      walletAddress: '0x',
+      imxProvider: undefined,
+      baseConfig: {
+        environment: Environment.SANDBOX,
+      },
     });
     this.getRecipe();
     this.getInventory();

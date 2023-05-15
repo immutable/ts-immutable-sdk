@@ -1,25 +1,29 @@
 import { Service } from 'typedi';
 
-import {
-  Environment,
-  ModuleConfiguration as ImmutableModuleConfiguration,
-} from '@imtbl/config';
+import { Environment, ModuleConfiguration } from '@imtbl/config';
 import { IMXProvider } from '@imtbl/provider';
 
-export interface Configuration {
+export interface Overrides {
+  environment?: Environment;
+  servicesBaseURL?: string;
+}
+
+export interface EconomyModuleConfiguration
+  extends ModuleConfiguration<Overrides> {
   gameId: string;
   userId: string;
   walletAddress: string;
   imxProvider?: IMXProvider;
 }
 
-export interface ModuleConfiguration
-  extends ImmutableModuleConfiguration<Configuration> {}
-
-export const defaultConfig: ModuleConfiguration = {
+export const defaultConfig: EconomyModuleConfiguration = {
   baseConfig: {
     environment: Environment.SANDBOX,
   },
+  gameId: '',
+  userId: '',
+  walletAddress: '',
+  imxProvider: undefined,
 };
 
 export class ConfigurtionError extends Error {
@@ -30,19 +34,18 @@ export class ConfigurtionError extends Error {
     this.message = message;
   }
 }
+
+const PROD_BASE_URL = 'https://api.games.immutable.com';
+
+const SANDBOX_BASE_URL = 'https://api.sandbox.games.immutable.com';
+
 @Service()
 export class Config {
   readonly environment: Environment;
 
-  readonly gameId: string;
+  readonly servicesBaseURL!: string;
 
-  readonly userId: string;
-
-  readonly walletAddress: string;
-
-  readonly imxProvider?: IMXProvider;
-
-  constructor(config: ModuleConfiguration = defaultConfig) {
+  constructor(readonly config: EconomyModuleConfiguration) {
     const envKeys = Object.values(Environment);
     if (!envKeys.includes(config.baseConfig.environment)) {
       throw new ConfigurtionError(
@@ -50,28 +53,37 @@ export class Config {
       );
     }
 
-    this.environment = config.baseConfig.environment;
-    this.gameId = config.overrides?.gameId || '';
-    this.userId = config.overrides?.userId || '';
-    this.walletAddress = config.overrides?.walletAddress || '';
-    this.imxProvider = config.overrides?.imxProvider;
+    this.environment = config?.overrides?.environment || config.baseConfig.environment;
+
+    if (this.environment === Environment.PRODUCTION) {
+      this.servicesBaseURL = PROD_BASE_URL;
+    }
+
+    if (this.environment === Environment.SANDBOX) {
+      this.servicesBaseURL = SANDBOX_BASE_URL;
+    }
+
+    if (config.overrides?.servicesBaseURL) {
+      this.servicesBaseURL = config.overrides.servicesBaseURL;
+    }
   }
 
-  public set(configuration: Partial<Configuration>): void {
-    Object.entries(configuration as Configuration).forEach(([key, value]) => {
-      if (key in this && key !== 'config') {
-        this[key as keyof this] = value;
-      }
-    });
+  public set(config: Partial<EconomyModuleConfiguration>): void {
+    Object.entries(config as EconomyModuleConfiguration).forEach(
+      ([key, value]) => {
+        if (key in this.config && key !== 'overrides') {
+          this.config[key as keyof EconomyModuleConfiguration] = value;
+        }
+      },
+    );
   }
 
   public get() {
+    const { overrides, ...rest } = this.config;
+
     return {
       environment: this.environment,
-      gameId: this.gameId,
-      userId: this.userId,
-      walletAddress: this.walletAddress,
-      imxProvider: this.imxProvider,
+      ...rest,
     };
   }
 }
