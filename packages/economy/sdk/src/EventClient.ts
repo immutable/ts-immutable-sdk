@@ -4,9 +4,9 @@ import { Service } from 'typedi';
 import { EconomyCustomEventTypes } from './types';
 
 @Service()
-export class Events<SDKEvent> {
+export class EventClient<EventType> {
   /** Produces events so consumer can hook into the SDK workflow */
-  private events$$ = new Subject<SDKEvent>();
+  private events$$ = new Subject<EventType>();
 
   /** events subscription for later disconnect */
   private eventsSubscription!: Subscription;
@@ -22,7 +22,7 @@ export class Events<SDKEvent> {
   }
 
   /** Utility: Subscribe to events */
-  public subscribe(handler: (event: SDKEvent) => void): Subscription {
+  public subscribe(handler: (event: EventType) => void): Subscription {
     this.eventsSubscription = this.events$.subscribe(handler);
     return this.eventsSubscription;
   }
@@ -32,7 +32,7 @@ export class Events<SDKEvent> {
    * @param type action event type
    * @param status action event status
    */
-  public emitEvent(event: SDKEvent): void {
+  public emitEvent(event: EventType): void {
     this.emitNativeEvent(event);
     this.events$$.next(event);
   }
@@ -41,8 +41,8 @@ export class Events<SDKEvent> {
    * Notify DOM listeners of a event
    * @param detail event payload
    */
-  private emitNativeEvent(detail: SDKEvent): void {
-    if (!Events.isClientSide()) {
+  private emitNativeEvent(detail: EventType): void {
+    if (!EventClient.isClientSide()) {
       this.log(
         'Cannot dispatch native event: not running in a browser environment',
       );
@@ -70,4 +70,4 @@ export class Events<SDKEvent> {
   }
 }
 
-export default Events;
+export default EventClient;

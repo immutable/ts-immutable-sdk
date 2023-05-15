@@ -3,6 +3,7 @@ import { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { Service } from 'typedi';
 import { HttpClient } from '../HttpClient';
 import { InventoryItem } from '../types';
+import { Config } from '../Config';
 
 // TODO: Use generated types
 type GetItemsOutput = {
@@ -20,15 +21,10 @@ type GetItemsInput = {
   userId: string;
 };
 
-// TODO: Read from .env
-// FIXME: target https://api.dev.games.immutable.com/inventory/swagger/index.html#/root/post_craft
-// const defaultBaseURL = 'https://api.sandbox.games.immutable.com/inventory/v1';
-const defaultBaseURL = 'http://127.0.0.1:3031/inventory';
-
 @Service()
 export class InventoryService {
-  constructor(private httpClient: HttpClient) {
-    this.httpClient.setBaseURL(defaultBaseURL);
+  constructor(private httpClient: HttpClient, private config: Config) {
+    this.httpClient.setBaseURL(`${this.config.servicesBaseURL}/inventory`);
   }
 
   public async getItems(

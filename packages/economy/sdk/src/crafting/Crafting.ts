@@ -3,7 +3,7 @@ import { Service } from 'typedi';
 
 import type { EventData, EventType } from '../types';
 import { asyncFn } from '../utils';
-import { Events } from '../Events';
+import { EventClient } from '../EventClient';
 import { withSDKError } from '../Errors';
 
 import { CraftingService } from './CraftingService';
@@ -50,7 +50,7 @@ export type CraftStatus = CraftEvent['status'];
 
 @Service()
 export class Crafting {
-  constructor(private craftingService: CraftingService, private events: Events<CraftEvent>) {
+  constructor(private craftingService: CraftingService, private events: EventClient<CraftEvent>) {
   }
 
   /**

@@ -4,6 +4,7 @@
 import { Service } from 'typedi';
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { HttpClient } from '../HttpClient';
+import { Config } from '../Config';
 
 // TODO: Use generated types
 type CraftOutput = {};
@@ -20,15 +21,10 @@ type CraftIngredient = {
   itemId: string;
 };
 
-// TODO: Read from .env or inject config
-// FIXME: target https://api.dev.games.immutable.com/crafting/swagger/index.html#/root/post_craft
-// const defaultBaseURL = 'https://api.sandbox.games.immutable.com/crafting/v1';
-const defaultBaseURL = 'http://127.0.0.1:3031/crafting';
-
 @Service()
 export class CraftingService {
-  constructor(private httpClient: HttpClient) {
-    this.httpClient.setBaseURL(defaultBaseURL);
+  constructor(private httpClient: HttpClient, private config: Config) {
+    this.httpClient.setBaseURL(`${this.config.servicesBaseURL}/crafting`);
   }
 
   public async craft(input: CraftInput): Promise<AxiosResponse<CraftOutput>> {
