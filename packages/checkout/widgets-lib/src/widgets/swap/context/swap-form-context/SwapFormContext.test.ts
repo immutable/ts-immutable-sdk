@@ -1,5 +1,4 @@
-import { SetSwapFromAmountPayload, SetSwapFromPayload, SetSwapToAmountPayload, SetSwapToPayload, SwapFormAction, SwapFormActions, initialSwapFormState, swapFormReducer } from "./SwapFormContext";
-
+import { SetSwapFromAmountPayload, SetSwapFromPayload, SetSwapToAmountPayload, SetSwapToPayload,  SwapFormActions, initialSwapFormState, swapFormReducer } from "./SwapFormContext";
 
 describe('swap form context', () => {
   it ('should set swapTo when reducer called with SET_SWAP_TO action', () => {
