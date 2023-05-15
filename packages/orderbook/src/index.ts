@@ -1,2 +1,2 @@
 export const module = 'orderbook';
-export { Orderbook as OrderbookFactory } from './orderbook'
+export { Orderbook } from './orderbook';
