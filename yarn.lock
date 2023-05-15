@@ -2724,6 +2724,7 @@ __metadata:
     "@biom3/react": ^0.3.0-beta
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
+    "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/cryptofiat": 0.0.0
     "@testing-library/jest-dom": ^5.16.5
