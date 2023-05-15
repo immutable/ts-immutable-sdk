@@ -4,8 +4,7 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@imtbl/config": "0.0.0",
-    "@opensea/seaport-js": "^1.2.0"
+    "@imtbl/config": "0.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
