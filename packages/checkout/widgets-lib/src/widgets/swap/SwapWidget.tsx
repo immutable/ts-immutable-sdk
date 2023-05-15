@@ -26,6 +26,11 @@ import {
   viewReducer,
 } from '../../context/view-context/ViewContext';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
+import {
+  SwapFormContext,
+  initialSwapFormState,
+  swapFormReducer,
+} from './context/swap-form-context/SwapFormContext';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -43,6 +48,10 @@ export interface SwapWidgetParams {
 export function SwapWidget(props: SwapWidgetProps) {
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const [swapState, swapDispatch] = useReducer(swapReducer, initialSwapState);
+  const [swapFormState, swapFormDispatch] = useReducer(
+    swapFormReducer,
+    initialSwapFormState
+  );
 
   const { params, theme, environment } = props;
   const {
@@ -138,25 +147,27 @@ export function SwapWidget(props: SwapWidgetProps) {
             To fix this consider wrapping it in a useMemo hook. */}
         {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
         <SwapContext.Provider value={{ swapState, swapDispatch }}>
-          {viewState.view.type === BaseViews.LOADING_VIEW && (
-            <LoadingView loadingText="Loading" />
-          )}
-          {viewState.view.type === SwapWidgetViews.SWAP && (
-            <SwapCoins
-              amount={amount}
-              fromContractAddress={fromContractAddress}
-              toContractAddress={toContractAddress}
-            />
-          )}
-          {viewState.view.type === SwapWidgetViews.SUCCESS && (
-            <SuccessView
-              successText="Success"
-              actionText="Contine"
-              // eslint-disable-next-line no-console
-              onActionClick={() => console.log('success')}
-            />
-          )}
-          {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
+          <SwapFormContext.Provider value={{ swapFormState, swapFormDispatch }}>
+            {viewState.view.type === BaseViews.LOADING_VIEW && (
+              <LoadingView loadingText="Loading" />
+            )}
+            {viewState.view.type === SwapWidgetViews.SWAP && (
+              <SwapCoins
+                amount={amount}
+                fromContractAddress={fromContractAddress}
+                toContractAddress={toContractAddress}
+              />
+            )}
+            {viewState.view.type === SwapWidgetViews.SUCCESS && (
+              <SuccessView
+                successText='Success'
+                actionText='Contine'
+                // eslint-disable-next-line no-console
+                onActionClick={() => console.log('success')}
+              />
+            )}
+            {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
+          </SwapFormContext.Provider>
         </SwapContext.Provider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>

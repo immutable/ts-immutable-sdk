@@ -10,13 +10,16 @@ interface SelectFormProps {
     icon?: IconList;
     boldVariant?: boolean;
   }[];
-  validator: (value: string) => boolean;
+  textAlign?: 'left' | 'right';
+  subtext?: string;
+  isErrored?: boolean;
+  errorMessage?: string;
 }
 
-export const SelectForm = ({ options, validator }: SelectFormProps) => {
+export const SelectForm = ({ options }: SelectFormProps) => {
   return (
     // todo: biome does not currently support Select for FormControl
-    // <FormControlWrapper>
+    // <FormControlWrapper textAlign={textAlign ?? 'left'}>
     <Select size="large">
       {options.map((option) => {
         return (

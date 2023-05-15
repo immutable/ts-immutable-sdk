@@ -17,22 +17,54 @@ interface SelectInputProps {
     icon?: IconList;
     boldVariant?: boolean;
   }[];
-  selectValidator: (value: string) => boolean;
+  selectTextAlign?: 'left' | 'right';
+  textInputTextAlign?: 'left' | 'right';
+  textInputSubtext?: string;
+  textInputErrored?: boolean;
+  textInputErrorMessage?: string;
+  selectSubtext?: string;
+  selectErrored?: boolean;
+  selectErrorMessage?: string;
   textInputValidator: (value: string) => boolean;
+  onTextInputBlur: (value: string) => void;
+  textInputMaxButtonClick?: () => void;
 }
 
 export const SelectInput = ({
   options,
-  selectValidator,
   textInputValidator,
+  onTextInputBlur,
+  textInputTextAlign,
+  selectTextAlign,
+  textInputSubtext,
+  textInputErrored,
+  textInputErrorMessage,
+  selectSubtext,
+  selectErrored,
+  selectErrorMessage,
+  textInputMaxButtonClick,
 }: SelectInputProps) => {
   return (
     <Box sx={selectInputBoxStyle}>
       <Box sx={selectStyle}>
-        <SelectForm options={options} validator={selectValidator} />
+        <SelectForm
+          options={options}
+          subtext={selectSubtext}
+          textAlign={selectTextAlign}
+          isErrored={selectErrored}
+          errorMessage={selectErrorMessage}
+        />
       </Box>
       <Box sx={inputStyle}>
-        <TextInputForm validator={textInputValidator} />
+        <TextInputForm
+          subtext={textInputSubtext}
+          textAlign={textInputTextAlign}
+          isErrored={textInputErrored}
+          errorMessage={textInputErrorMessage}
+          validator={textInputValidator}
+          onTextInputBlur={onTextInputBlur}
+          maxButtonClick={textInputMaxButtonClick}
+        />
       </Box>
     </Box>
   );

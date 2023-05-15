@@ -1,6 +1,7 @@
 export const selectInputBoxStyle = {
   display: 'flex',
   flexDirection: 'row',
+  justifyContent: 'space-between',
 }
 
 export const selectStyle = {

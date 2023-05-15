@@ -25,6 +25,9 @@ export interface SwapFormAction {
 
 type ActionPayload =
   | SetSwapToPayload
+  | SetSwapToAmountPayload
+  | SetSwapFromPayload
+  | SetSwapFromAmountPayload;
 
 export enum SwapFormActions {
   SET_SWAP_TO = 'SET_SWAP_TO',
@@ -38,9 +41,19 @@ export interface SetSwapToPayload {
   swapTo: string;
 }
 
+export interface SetSwapToAmountPayload {
+  type: SwapFormActions.SET_SWAP_TO_AMOUNT;
+  swapToAmount: string;
+}
+
 export interface SetSwapFromPayload {
   type: SwapFormActions.SET_SWAP_FROM;
   swapFrom: string;
+}
+
+export interface SetSwapFromAmountPayload {
+  type: SwapFormActions.SET_SWAP_FROM_AMOUNT;
+  swapFromAmount: string;
 }
 
 export const SwapFormContext = createContext<SwapFormContextState>({
@@ -59,6 +72,21 @@ export const swapFormReducer: Reducer<SwapFormState, SwapFormAction> = (
       return {
         ...state,
         swapTo: action.payload.swapTo,
+      };
+    case SwapFormActions.SET_SWAP_TO_AMOUNT:
+      return {
+        ...state,
+        swapToAmount: action.payload.swapToAmount,
+      };
+    case SwapFormActions.SET_SWAP_FROM:
+      return {
+        ...state,
+        swapFrom: action.payload.swapFrom,
+      };
+    case SwapFormActions.SET_SWAP_FROM_AMOUNT:
+      return {
+        ...state,
+        swapFromAmount: action.payload.swapFromAmount,
       };
     default:
       return state;
