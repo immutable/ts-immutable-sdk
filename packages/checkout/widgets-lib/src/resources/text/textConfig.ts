@@ -48,6 +48,14 @@ export const text = {
         noTokensFound: 'No tokens found',
       },
     },
+    [WalletWidgetViews.SETTINGS]: {
+      header: {
+        title: 'Settings',
+      },
+      disconnectButton: {
+        label: 'Disconnect'
+      }
+    },
     [SwapWidgetViews.SWAP]: {
       header: {
         title: 'Swap coins',
