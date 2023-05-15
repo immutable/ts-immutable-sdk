@@ -36,7 +36,10 @@
     "build": "parcel build",
     "build:dist": "npm i && npm run build && npm run dist",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
-    "start": "parcel watch"
+    "start": "parcel watch",
+    "test": "jest test",
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
+    "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix"
   },
   "source": "src/index.ts",
   "types": "dist/index.d.ts"

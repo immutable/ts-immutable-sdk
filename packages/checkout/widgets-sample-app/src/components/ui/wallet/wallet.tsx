@@ -64,6 +64,7 @@ function WalletUI() {
         providerPreference={WidgetConnectionProviders.METAMASK}
         useConnectWidget={true}
         isOnRampEnabled={false}
+        environment={Environment.PRODUCTION}
       />
     </div>
   );

@@ -1,10 +1,10 @@
 import React from 'react';
-
-import { Environment } from '@imtbl/config';
 import {
+  DEFAULT_PROVIDER,
   WidgetConnectionProviders,
-  WidgetTheme,
 } from '../definitions/constants';
+import { CheckoutWidgetsConfig } from '../definitions/config';
+import { withDefaults } from '../lib/withDefaults';
 
 /**
  * Interface representing the props for the Buy Widget component.
@@ -12,7 +12,7 @@ import {
  * (default: {@link WidgetConnectionProviders.METAMASK}).
  * @property {string} orderId - The ID that identifies the open buy order associated to the assets to buy.
  */
-export interface BuyReactProps {
+export interface BuyReactProps extends CheckoutWidgetsConfig {
   providerPreference: WidgetConnectionProviders;
   orderId: string;
 }
@@ -23,17 +23,17 @@ export interface BuyReactProps {
  * @returns {JSX.Element} - The rendered Buy Widget component.
  */
 export function BuyReact(props: BuyReactProps): JSX.Element {
-  const { providerPreference, orderId } = props;
+  const {
+    providerPreference, orderId, environment, theme,
+  } = props;
 
-  const config = window.ImtblCheckoutWidgetConfig;
+  const config = withDefaults(window.ImtblCheckoutWidgetConfig);
 
   return (
     <imtbl-buy
-      environment={Environment.SANDBOX}
-      providerPreference={
-        providerPreference ?? WidgetConnectionProviders.METAMASK
-      }
-      theme={config.theme ?? WidgetTheme.DARK}
+      environment={environment ?? config.environment}
+      theme={theme ?? config.theme}
+      providerPreference={providerPreference ?? DEFAULT_PROVIDER}
       orderId={orderId}
     />
   );
