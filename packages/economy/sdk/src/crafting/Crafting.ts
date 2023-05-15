@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
-import Container, { Service } from 'typedi';
+import { Service } from 'typedi';
+
 import type { EventData, EventType } from '../types';
 import { asyncFn } from '../utils';
+import { Events } from '../Events';
 import { withSDKError } from '../Errors';
 
 import { CraftingService } from './CraftingService';
@@ -34,23 +36,22 @@ const checkout = {
  * @internal Craft events
  */
 export type CraftEvent = EventType<
-  'CRAFT',
-  | EventData<'STARTED' | 'IN_PROGRESS'>
-  | EventData<'COMPLETED', { data: {} }>
-  | EventData<'FAILED', { error: { code: string; reason: string } }>
-  | EventData<
-      'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
-    >
+'CRAFT',
+| EventData<'STARTED' | 'IN_PROGRESS'>
+| EventData<'COMPLETED', { data: {} }>
+| EventData<'FAILED', { error: { code: string; reason: string } }>
+| EventData<
+'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
+>
 >;
-
-type EmitEventFn = (event: CraftEvent) => void;
 
 /** List of specific craft statuses */
 export type CraftStatus = CraftEvent['status'];
 
 @Service()
 export class Crafting {
-  constructor(private craftingService: CraftingService) {}
+  constructor(private craftingService: CraftingService, private events: Events<CraftEvent>) {
+  }
 
   /**
    * Given inputs for a recipe crafting
@@ -60,35 +61,33 @@ export class Crafting {
    */
   @withSDKError({ type: 'CRAFTING_ERROR' })
   public async craft(input: CraftInput): Promise<CraftStatus> {
-    const emitEvent = Container.get<EmitEventFn>('EmitEventHandler');
-
     // 1. validate inputs
-    emitEvent({ status: 'STARTED', action: 'CRAFT' });
+    this.events.emitEvent({ status: 'STARTED', action: 'CRAFT' });
     await this.validate();
 
     // 2. perform any web3 actions
     let txIds: number[] = [];
     let signature;
     if (input.requiresWeb3) {
-      emitEvent({ status: 'AWAITING_WEB3_INTERACTION', action: 'CRAFT' });
+      this.events.emitEvent({ status: 'AWAITING_WEB3_INTERACTION', action: 'CRAFT' });
       txIds = await checkout.transfer(input.input);
       signature = await checkout.sign();
     }
     console.info('txIds, signature', { txIds, signature });
 
     // 3. submit craft to BE
-    emitEvent({ status: 'SUBMITTED', action: 'CRAFT' });
+    this.events.emitEvent({ status: 'SUBMITTED', action: 'CRAFT' });
     const { data, status } = await this.craftingService.craft(input.input);
 
     if (status !== 200) {
-      emitEvent({
+      this.events.emitEvent({
         status: 'FAILED',
         action: 'CRAFT',
         error: { code: `${status}`, reason: 'unknown' },
       });
     }
 
-    emitEvent({
+    this.events.emitEvent({
       status: 'COMPLETED',
       action: 'CRAFT',
       data,

@@ -11,4 +11,5 @@ export type {
 } from './types';
 
 export * from './Economy';
+export type { Configuration } from './Config';
 export type { CraftInput, CraftStatus, CraftEvent } from './crafting/Crafting';
