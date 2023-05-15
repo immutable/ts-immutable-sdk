@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable class-methods-use-this */
 
+import { Service } from 'typedi';
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { HttpClient } from '../HttpClient';
 
@@ -24,18 +25,10 @@ type CraftIngredient = {
 // const defaultBaseURL = 'https://api.sandbox.games.immutable.com/crafting/v1';
 const defaultBaseURL = 'http://127.0.0.1:3031/crafting';
 
+@Service()
 export class CraftingService {
-  private httpClient: HttpClient;
-
-  constructor(
-    httpClientOrBaseUrl: HttpClient | string = defaultBaseURL,
-    defaultHeaders: Record<string, string> = {},
-  ) {
-    if (httpClientOrBaseUrl instanceof HttpClient) {
-      this.httpClient = httpClientOrBaseUrl;
-    } else {
-      this.httpClient = new HttpClient(httpClientOrBaseUrl, defaultHeaders);
-    }
+  constructor(private httpClient: HttpClient) {
+    this.httpClient.setBaseURL(defaultBaseURL);
   }
 
   public async craft(input: CraftInput): Promise<AxiosResponse<CraftOutput>> {
