@@ -1,4 +1,4 @@
-export const SuccessBoxStyles = {
+export const successBoxStyles = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -11,7 +11,7 @@ export const SuccessBoxStyles = {
   rowGap: 'base.spacing.x4',
 };
 
-export const SuccessLogoStyles = {
+export const successLogoStyles = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',

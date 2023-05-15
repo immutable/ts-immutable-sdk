@@ -1,6 +1,7 @@
 import React from 'react';
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
+import { Environment } from '@imtbl/config';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { Environment } from '@imtbl/config';
@@ -12,23 +13,26 @@ import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 
 export class ImmutableSwap extends ImmutableWebComponent {
   environment = Environment.SANDBOX;
+
   providerPreference = ConnectionProviders.METAMASK;
   useConnectWidget?: boolean;
   amount = '';
+
   fromContractAddress = '';
+
   toContractAddress = '';
 
   connectedCallback() {
     super.connectedCallback();
     this.providerPreference = this.getAttribute(
-      'providerPreference'
+      'providerPreference',
     ) as ConnectionProviders;
     const useConnectWidgetProp = this.getAttribute('useConnectWidget');
     this.useConnectWidget =
       useConnectWidgetProp?.toLowerCase() === 'false' ? false : true;
     this.amount = this.getAttribute('amount') as string;
     this.fromContractAddress = this.getAttribute(
-      'fromContractAddress'
+      'fromContractAddress',
     ) as string;
     this.toContractAddress = this.getAttribute('toContractAddress') as string;
     this.renderWidget();

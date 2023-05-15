@@ -24,8 +24,8 @@ export class ImmutableTransitionExample extends ImmutableWebComponent {
         <TransitionExampleWidget
           params={params}
           theme={this.theme}
-        ></TransitionExampleWidget>
-      </React.StrictMode>
+        />
+      </React.StrictMode>,
     );
   }
 }

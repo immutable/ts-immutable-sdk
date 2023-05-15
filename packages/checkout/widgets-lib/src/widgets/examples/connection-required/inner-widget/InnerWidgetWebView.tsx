@@ -23,7 +23,7 @@ function InnerWidgetWebView() {
       providerPreference={WidgetConnectionProviders.METAMASK}
       theme={theme}
       environment={environment}
-    ></imtbl-inner-widget-example>
+    />
   );
 }
 

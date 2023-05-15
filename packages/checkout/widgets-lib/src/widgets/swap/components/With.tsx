@@ -19,7 +19,7 @@ type WithProps = {
 async function getQuoteFromAmountOut(
   tokenInAddress: string,
   tokenOutAddress: string,
-  amountOut: BigNumberish
+  amountOut: BigNumberish,
 ): Promise<QuoteResponse> {
   return {
     status: 'ok',
@@ -57,9 +57,9 @@ export default function With(props: WithProps) {
   const { tokenBalances, allowedTokens } = swapState;
 
   const quoteAmount = (
-    (quote &&
-      utils.formatUnits(quote.trade.amountIn.toString(), token?.decimals)) ||
-    0
+    (quote
+      && utils.formatUnits(quote.trade.amountIn.toString(), token?.decimals))
+    || 0
   )?.toString();
 
   const nonZeroBalances = useMemo(() => {
@@ -75,7 +75,7 @@ export default function With(props: WithProps) {
     const newQuote = await getQuoteFromAmountOut(
       token?.address || '',
       buyToken?.address || '',
-      buyAmount!
+      buyAmount!,
     );
 
     onQuoteChange(newQuote);
@@ -91,7 +91,7 @@ export default function With(props: WithProps) {
       setTimeout(() => {
         setDebounceId(null);
         func();
-      }, threshold).toString()
+      }, threshold).toString(),
     );
   };
 
@@ -100,7 +100,6 @@ export default function With(props: WithProps) {
       debounce(generateQuote, 1000);
       setLoading(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [buyAmount, buyToken, token]);
 
   useEffect(() => {

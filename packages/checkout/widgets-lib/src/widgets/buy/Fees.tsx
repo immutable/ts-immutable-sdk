@@ -1,5 +1,7 @@
 import React from 'react';
 import { Body, Box } from '@biom3/react';
+// TODO: fix circular dependency
+// eslint-disable-next-line import/no-cycle
 import { BuyFees } from './BuyWidget';
 
 interface FeesProps {
@@ -20,7 +22,9 @@ export default function Fees({ fees }: FeesProps) {
             testId={`fee_description_${idx}`}
             size="xSmall"
             sx={{ mr: 'base.spacing.x2' }}
-          >{`Royalty to ${fee.recipient}:`}</Body>
+          >
+            {`Royalty to ${fee.recipient}:`}
+          </Body>
           <img src={fee.token.icon} alt="icon" height="8px" />
           <Body
             testId={`fee_amount_${idx}`}

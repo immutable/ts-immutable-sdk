@@ -23,7 +23,7 @@ function TransitionExampleWebView() {
       providerPreference={WidgetConnectionProviders.METAMASK}
       theme={theme}
       environment={environment}
-    ></imtbl-transition-example>
+    />
   );
 }
 

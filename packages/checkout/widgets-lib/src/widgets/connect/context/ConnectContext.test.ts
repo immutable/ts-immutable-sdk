@@ -1,6 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { describe, expect } from '@jest/globals';
+import { Environment } from '@imtbl/config';
 import {
   ConnectActions,
   connectReducer,
@@ -9,7 +10,6 @@ import {
   SetProviderPayload,
   SetSendCloseEventPayload,
 } from './ConnectContext';
-import { Environment } from '@imtbl/config';
 
 describe('connect-context', () => {
   it('should update state with checkout when reducer called with SET_CHECKOUT action', () => {
@@ -40,14 +40,16 @@ describe('connect-context', () => {
 
   it('should update state with send close function when reducer called with SET_SEND_CLOSE_EVENT action', () => {
     const newSendCloseEvent = () => {
+      // TODO: Should this this be removed?
+      // eslint-disable-next-line no-console
       console.log('Send close event');
     };
-    const SetSendCloseEventPayload: SetSendCloseEventPayload = {
+    const setSendCloseEventPayload: SetSendCloseEventPayload = {
       type: ConnectActions.SET_SEND_CLOSE_EVENT,
       sendCloseEvent: newSendCloseEvent,
     };
     const { sendCloseEvent } = connectReducer(initialConnectState, {
-      payload: SetSendCloseEventPayload,
+      payload: setSendCloseEventPayload,
     });
     expect(sendCloseEvent).toEqual(newSendCloseEvent);
   });

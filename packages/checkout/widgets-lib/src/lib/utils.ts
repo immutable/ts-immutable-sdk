@@ -1,6 +1,6 @@
 import { ChainId, GetBalanceResult, NetworkInfo } from '@imtbl/checkout-sdk';
-import { L1Network, zkEVMNetwork } from './networkUtils';
 import { Environment } from '@imtbl/config';
+import { L1Network, zkEVMNetwork } from './networkUtils';
 
 export const sortTokensByAmount = (
   environment: Environment,
@@ -24,20 +24,19 @@ export const sortTokensByAmount = (
       return 1;
     }
 
-    if (a.balance.lt(b.balance)) {
-      return 1;
-    }
-    if (a.balance.gt(b.balance)) {
-      return -1;
-    }
-    return 0;
-  });
-};
+  if (a.balance.lt(b.balance)) {
+    return 1;
+  }
+  if (a.balance.gt(b.balance)) {
+    return -1;
+  }
+  return 0;
+});
 
 export const sortNetworksCompareFn = (
   a: NetworkInfo,
   b: NetworkInfo,
-  environment: Environment
+  environment: Environment,
 ) => {
   // make sure zkEVM at start of the list then L1
   if (a.chainId === zkEVMNetwork(environment)) {
@@ -49,10 +48,15 @@ export const sortNetworksCompareFn = (
   return 1;
 };
 
+export const formatFiatString = (amount: number): string => {
+  const factor = 10 ** 2;
+  return (Math.round(amount * factor) / factor).toFixed(2).toString();
+};
+
 export const calculateCryptoToFiat = (
   amount: string,
   symbol: string,
-  conversions: Map<string, number>
+  conversions: Map<string, number>,
 ): string => {
   const zeroBalanceString = '-.--';
 
@@ -62,12 +66,7 @@ export const calculateCryptoToFiat = (
   if (!conversion) return zeroBalanceString;
 
   const parsedAmount = parseFloat(amount);
-  if (parseFloat(amount) === 0 || isNaN(parsedAmount)) return zeroBalanceString;
+  if (parseFloat(amount) === 0 || Number.isNaN(parsedAmount)) return zeroBalanceString;
 
   return formatFiatString(parsedAmount * conversion);
-};
-
-export const formatFiatString = (amount: number): string => {
-  const factor = Math.pow(10, 2);
-  return (Math.round(amount * factor) / factor).toFixed(2).toString();
 };

@@ -1,11 +1,7 @@
-export const HeaderNavigationStyles = (transparent: boolean) => {
-  return {
-    backgroundColor: transparent ? 'transparent' : '',
-  };
-};
+export const HeaderNavigationStyles = (transparent: boolean) => ({
+  backgroundColor: transparent ? 'transparent' : '',
+});
 
-export const ButtonNavigationStyles = (transparent: boolean) => {
-  return {
-    backgroundColor: transparent ? 'base.color.neutral.800' : '',
-  };
-};
+export const ButtonNavigationStyles = (transparent: boolean) => ({
+  backgroundColor: transparent ? 'base.color.neutral.800' : '',
+});

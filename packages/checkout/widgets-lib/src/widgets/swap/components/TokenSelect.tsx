@@ -2,10 +2,10 @@ import { Body, Box } from '@biom3/react';
 import { useCallback, useEffect, useState } from 'react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import {
-  OptionsContainerStyle,
-  OptionStyle,
-  SelectedOptionStyle,
-  SelectStyle,
+  optionsContainerStyle,
+  optionStyle,
+  selectedOptionStyle,
+  selectStyle,
 } from '../SwapStyles';
 import { alphaSortTokensList } from '../helpers';
 
@@ -17,7 +17,7 @@ export interface TokenSelectProps {
   filter?: string[];
 }
 
-const TokenSelect = ({
+function TokenSelect({
   testId,
   onChange,
   token,
@@ -33,15 +33,17 @@ const TokenSelect = ({
   };
 
   const selectOption = useCallback(
-    (token: TokenInfo) => {
-      setOption(token?.symbol);
-      setIcon(token?.icon);
-      onChange(token);
+    (tkn: TokenInfo) => {
+      setOption(tkn?.symbol);
+      setIcon(tkn?.icon);
+      onChange(tkn);
     },
-    [setOption, setIcon, onChange]
+    [setOption, setIcon, onChange],
   );
 
   useEffect(() => {
+    // TODO: please fix
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     token && selectOption(token);
   }, [token, selectOption]);
 
@@ -56,8 +58,8 @@ const TokenSelect = ({
   }, [getTokens]);
 
   return (
-    <Box sx={SelectStyle} onClick={() => toggleOpen()}>
-      <Box testId={`${testId}__selected-option`} sx={SelectedOptionStyle}>
+    <Box sx={selectStyle} onClick={() => toggleOpen()}>
+      <Box testId={`${testId}__selected-option`} sx={selectedOptionStyle}>
         <img
           style={{ width: '16px', height: '16px' }}
           alt={option}
@@ -90,6 +92,6 @@ const TokenSelect = ({
       )}
     </Box>
   );
-};
+}
 
 export default TokenSelect;

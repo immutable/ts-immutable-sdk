@@ -1,8 +1,10 @@
 import React from 'react';
-import { GetOrderResponse, Orderbook, BuyWidgetViews } from './BuyWidget';
 import { Button } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, ChainId } from '@imtbl/checkout-sdk';
+// TODO: fix circular dependency
+// eslint-disable-next-line import/no-cycle
+import { GetOrderResponse, Orderbook, BuyWidgetViews } from './BuyWidget';
 import { sendBuySuccessEvent, sendBuyFailedEvent } from './BuyWidgetEvents';
 
 export interface BuyButtonProps {
@@ -47,7 +49,7 @@ export default function BuyButton({
     <Button
       testId="buy_asset_button"
       variant="primary"
-      onClick={async function () {
+      onClick={async () => {
         await buyAsset();
       }}
       sx={{ width: '100%', mt: 'base.spacing.x2' }}

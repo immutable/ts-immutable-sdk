@@ -3,12 +3,12 @@ import {
   ConnectParams,
   ConnectionProviders,
 } from '@imtbl/checkout-sdk';
-import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { cySmartGet } from '../../lib/testUtils';
 import { Environment } from '@imtbl/config';
+import { cySmartGet } from '../../lib/testUtils';
+import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
 
 describe('ConnectWidget tests', () => {
   /** mounting the connect widget should be done to start all tests */
@@ -22,7 +22,7 @@ describe('ConnectWidget tests', () => {
         environment={Environment.PRODUCTION}
         params={params}
         theme={WidgetTheme.DARK}
-      />
+      />,
     );
   };
 

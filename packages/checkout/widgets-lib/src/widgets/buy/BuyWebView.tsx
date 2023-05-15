@@ -23,8 +23,8 @@ function BuyWebView() {
       providerPreference={WidgetConnectionProviders.METAMASK}
       theme={theme}
       environment={environment}
-      orderId={'2345'}
-    ></imtbl-buy>
+      orderId="2345"
+    />
   );
 }
 

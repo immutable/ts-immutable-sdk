@@ -1,11 +1,11 @@
-export const ResponsiveStyles = {
-  width: `clamp(320px, 100vw, 430px)`,
+export const responsiveStyles = {
+  width: 'clamp(320px, 100vw, 430px)',
   minHeight: '500px',
   height: '100vh',
   maxHeight: '650px',
 };
 
-export const SimpleLayoutStyle = {
+export const simpleLayoutStyle = {
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
@@ -14,19 +14,17 @@ export const SimpleLayoutStyle = {
   width: '100%',
 };
 
-export const HeaderStyle = (floatHeader: boolean) => {
-  return {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    position: floatHeader ? 'absolute' : 'relative',
-    zIndex: 10,
-  };
-};
+export const headerStyle = (floatHeader: boolean) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  width: '100%',
+  position: floatHeader ? 'absolute' : 'relative',
+  zIndex: 10,
+});
 
-export const FooterStyle = {
+export const footerStyle = {
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
@@ -34,19 +32,19 @@ export const FooterStyle = {
   backgroundColor: 'base.color.translucent.container.200',
 };
 
-export const ContentStyle = {
+export const contentStyle = {
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-start',
 };
 
-export const HeroContent = {
+export const heroContentStyle = {
   flex: '1 0 0', // needed to set flex-basis to 0 for even distribution with BodyStyle
   width: '100%',
 };
 
-export const BodyStyle = {
+export const bodyStyle = {
   flex: '1 0 0', // needed to set flex-basis to 0 for even distribution with HeroContent
   width: '100%',
   paddingX: 'base.spacing.x2',

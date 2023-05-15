@@ -3,12 +3,12 @@ import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { cySmartGet } from '../../lib/testUtils';
-import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
+import { WalletWidget, WalletWidgetParams } from './WalletWidget';
+import { cySmartGet } from '../../lib/testUtils';
 
 describe('WalletWidget tests', () => {
   beforeEach(() => {
@@ -59,7 +59,7 @@ describe('WalletWidget tests', () => {
         environment={Environment.PRODUCTION}
         params={params}
         theme={WidgetTheme.DARK}
-      />
+      />,
     );
 
     cySmartGet('loading-view').should('be.visible');
@@ -194,7 +194,7 @@ describe('WalletWidget tests', () => {
           environment={Environment.PRODUCTION}
           params={params}
           theme={WidgetTheme.DARK}
-        />
+        />,
       );
 
       cySmartGet('@balanceStub').should('have.been.called');
@@ -223,7 +223,7 @@ describe('WalletWidget tests', () => {
           environment={Environment.PRODUCTION}
           params={params}
           theme={WidgetTheme.DARK}
-        />
+        />,
       );
 
       cySmartGet('@balanceStub').should('have.been.called');

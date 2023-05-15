@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';

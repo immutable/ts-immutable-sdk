@@ -132,12 +132,12 @@ export const SwapCoins = ({
 
   return (
     <SimpleLayout
-      header={
+      header={(
         <HeaderNavigation
           title={title}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent()}
         />
-      }
+      )}
       footer={<FooterLogo />}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -168,4 +168,4 @@ export const SwapCoins = ({
       </Box>
     </SimpleLayout>
   );
-};
+}

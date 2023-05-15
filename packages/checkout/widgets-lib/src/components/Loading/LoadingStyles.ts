@@ -1,4 +1,4 @@
-export const LoadingBoxStyles = {
+export const loadingBoxStyles = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',

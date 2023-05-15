@@ -1,4 +1,5 @@
 import { useReducer, ReactNode, useEffect } from 'react';
+import { CryptoFiat, CryptoFiatConfiguration } from '@imtbl/cryptofiat';
 import {
   CryptoFiatActions,
   CryptoFiatContext,
@@ -6,16 +7,15 @@ import {
   initialCryptoFiatState,
 } from './CryptoFiatContext';
 import { getCryptoToFiatConversion } from './CryptoFiat';
-import { CryptoFiat, CryptoFiatConfiguration } from '@imtbl/cryptofiat';
 
 interface CryptoFiatProviderProps {
   children: ReactNode;
 }
 
-export const CryptoFiatProvider = ({ children }: CryptoFiatProviderProps) => {
+export function CryptoFiatProvider({ children }: CryptoFiatProviderProps) {
   const [cryptoFiatState, cryptoFiatDispatch] = useReducer(
     cryptoFiatReducer,
-    initialCryptoFiatState
+    initialCryptoFiatState,
   );
 
   const { cryptoFiat, fiatSymbol, tokenSymbols } = cryptoFiatState;
@@ -36,7 +36,7 @@ export const CryptoFiatProvider = ({ children }: CryptoFiatProviderProps) => {
       const conversions = await getCryptoToFiatConversion(
         cryptoFiat,
         fiatSymbol,
-        tokenSymbols
+        tokenSymbols,
       );
 
       cryptoFiatDispatch({
@@ -49,8 +49,11 @@ export const CryptoFiatProvider = ({ children }: CryptoFiatProviderProps) => {
   }, [cryptoFiat, tokenSymbols, fiatSymbol]);
 
   return (
+    // TODO: The object passed as the value prop to the Context provider changes every render.
+    // To fix this consider wrapping it in a useMemo hook.
+    // eslint-disable-next-line react/jsx-no-constructed-context-values
     <CryptoFiatContext.Provider value={{ cryptoFiatState, cryptoFiatDispatch }}>
       {children}
     </CryptoFiatContext.Provider>
   );
-};
+}

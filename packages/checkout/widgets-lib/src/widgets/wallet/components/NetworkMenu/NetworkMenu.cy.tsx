@@ -1,14 +1,14 @@
 import { mount } from 'cypress/react18';
 import React from 'react';
-import { NetworkMenu } from './NetworkMenu';
-import { cySmartGet } from '../../../../lib/testUtils';
-import { text } from '../../../../resources/text/textConfig';
 import { BiomeThemeProvider } from '@biom3/react';
 import { cy, it } from 'local-cypress';
 import { Checkout, ConnectionProviders, TokenInfo } from '@imtbl/checkout-sdk';
-import { WalletContext, WalletState } from '../../context/WalletContext';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
+import { WalletContext, WalletState } from '../../context/WalletContext';
+import { text } from '../../../../resources/text/textConfig';
+import { cySmartGet } from '../../../../lib/testUtils';
+import { NetworkMenu } from './NetworkMenu';
 import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 
 describe('Network Menu', () => {
@@ -32,19 +32,19 @@ describe('Network Menu', () => {
     mount(
       <BiomeThemeProvider>
         <NetworkMenu />
-      </BiomeThemeProvider>
+      </BiomeThemeProvider>,
     );
 
     cySmartGet('network-heading').should(
       'include.text',
-      text.views[WalletWidgetViews.WALLET_BALANCES].networkStatus.heading
+      text.views[WalletWidgetViews.WALLET_BALANCES].networkStatus.heading,
     );
   });
   it('should have info icon', () => {
     mount(
       <BiomeThemeProvider>
         <NetworkMenu />
-      </BiomeThemeProvider>
+      </BiomeThemeProvider>,
     );
 
     cySmartGet('network-icon').should('exist');
@@ -67,7 +67,7 @@ describe('Network Menu', () => {
         >
           <NetworkMenu />
         </WalletContext.Provider>
-      </BiomeThemeProvider>
+      </BiomeThemeProvider>,
     );
     cySmartGet('@getNetworkAllowListStub').should('have.been.called');
     cySmartGet('Ethereum-network-button').should('exist');
@@ -111,7 +111,7 @@ describe('Network Menu', () => {
         >
           <NetworkMenu />
         </WalletContext.Provider>
-      </BiomeThemeProvider>
+      </BiomeThemeProvider>,
     );
 
     cySmartGet('ImmutablezkEVMTestnet-network-button').click();
