@@ -63,6 +63,27 @@ describe('SwapWidget tests', () => {
           },
         ],
       });
+
+    cy.stub(Checkout.prototype, 'getTokenAllowList')
+      .as('getTokenAllowListStub')
+      .resolves({
+        tokens: [
+          {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+            address: '',
+            icon: '123',
+          },
+          {
+            name: 'Immutable X',
+            symbol: 'IMX',
+            decimals: 18,
+            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            icon: '123',
+          },
+        ],
+      });
   });
 
   it('should show swap widget on mount', () => {
