@@ -1596,6 +1596,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@biom3/react@npm:^0.4.2-beta":
+  version: 0.4.2-beta
+  resolution: "@biom3/react@npm:0.4.2-beta"
+  dependencies:
+    "@biom3/design-tokens": "*"
+    "@emotion/css": ^11.10.8
+    "@emotion/react": ^11.10.8
+    framer-motion: ^9.1.7
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.throttle: ^4.1.1
+    next: ~13.1.1
+    querystring: ^0.2.1
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    react-is: ^18.2.0
+    ts-deepmerge: ^5.0.0
+  checksum: 8ab0050cf86a6c9ee7b4ffea8ff9714071b0ae675bdb4f5e4b8a84024cbab9673593b3ce12bd7e939141b00e6b3792c707ee0c7a6ad57b1e8bb489dd254c8fda
+  languageName: node
+  linkType: hard
+
 "@chevrotain/types@npm:^9.1.0":
   version: 9.1.0
   resolution: "@chevrotain/types@npm:9.1.0"
@@ -1874,7 +1895,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/css@npm:^11.10.5":
+"@emotion/css@npm:^11.10.5, @emotion/css@npm:^11.10.8":
   version: 11.11.0
   resolution: "@emotion/css@npm:11.11.0"
   dependencies:
@@ -1917,7 +1938,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/react@npm:^11.10.5":
+"@emotion/react@npm:^11.10.5, @emotion/react@npm:^11.10.8":
   version: 11.11.0
   resolution: "@emotion/react@npm:11.11.0"
   dependencies:
@@ -2721,7 +2742,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-lib@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.1.4-beta
-    "@biom3/react": ^0.3.0-beta
+    "@biom3/react": ^0.4.2-beta
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0

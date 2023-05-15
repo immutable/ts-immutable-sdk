@@ -21,8 +21,9 @@ interface SelectInputProps {
 export const SelectInput = ({ options }: SelectInputProps) => {
   const [textInputValue, setTextInputValue] = useState<string>('');
 
-  const handleOnChange = () => {
-    console.log('handleOnChange');
+  const handleOnChange = (event) => {
+    console.log(event.target.value);
+    setTextInputValue(event.target.value);
   };
 
   return (
@@ -45,9 +46,9 @@ export const SelectInput = ({ options }: SelectInputProps) => {
 
       <Box sx={inputStyle}>
         <TextInput
-          onChange={() => handleOnChange()}
+          onChange={handleOnChange}
           sizeVariant="large"
-          // value={textInputValue}
+          value={textInputValue}
           validationStatus="error"
           placeholder="1.123456"
         >
