@@ -16,6 +16,7 @@ import { SwapButton } from '../components/SwapButton';
 import { SwapContext } from '../context/SwapContext';
 import { alphaSortTokensList, findTokenByAddress } from '../helpers';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
+import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 
 type AmountAndPercentage = {
   amount: {
@@ -140,6 +141,25 @@ export function SwapCoins({
       footer={<FooterLogo />}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        <SelectInput
+          // todo: is this the right structure?
+          options={[
+            {
+              id: 'ETH',
+              label: 'Ethereum',
+              icon: 'EthToken',
+              boldVariant: true,
+            },
+            {
+              id: 'IMX',
+              label: 'Immutable X',
+              icon: 'ImxTokenDex',
+              boldVariant: true,
+            },
+          ]}
+        />
+        <br />
+
         <Buy
           onTokenChange={onBuyFieldTokenChange}
           onAmountChange={onBuyFieldAmountChange}

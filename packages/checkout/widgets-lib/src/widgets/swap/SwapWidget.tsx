@@ -1,4 +1,4 @@
-import { BiomeThemeProvider, Body } from '@biom3/react';
+import { BiomeCombinedProviders, Body } from '@biom3/react';
 import {
   Checkout,
   GetTokenAllowListResult,
@@ -132,10 +132,7 @@ export function SwapWidget(props: SwapWidgetProps) {
   const renderFailure = () => <Body>Failure</Body>;
 
   return (
-    <BiomeThemeProvider theme={{ base: biomeTheme }}>
-      {/* TODO: The object passed as the value prop to the Context provider changes every render.
-          To fix this consider wrapping it in a useMemo hook. */}
-      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
+    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         {/* TODO: The object passed as the value prop to the Context provider changes every render.
             To fix this consider wrapping it in a useMemo hook. */}
@@ -162,6 +159,6 @@ export function SwapWidget(props: SwapWidgetProps) {
           {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
         </SwapContext.Provider>
       </ViewContext.Provider>
-    </BiomeThemeProvider>
+    </BiomeCombinedProviders>
   );
 }
