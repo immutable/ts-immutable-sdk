@@ -1,10 +1,9 @@
-import { Select, Option, TextInput, Box } from '@biom3/react';
+import { Box } from '@biom3/react';
 import {
   inputStyle,
   selectInputBoxStyle,
   selectStyle,
 } from './SelectInputStyles';
-import { useState } from 'react';
 import { SelectForm } from '../SelectForm/SelectForm';
 import { TextInputForm } from '../TextInputForm/TextInputForm';
 

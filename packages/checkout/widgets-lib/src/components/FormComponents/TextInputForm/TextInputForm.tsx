@@ -3,10 +3,16 @@ import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 import { useState } from 'react';
 
 interface TextInputFormProps {
+  errorMessage?: string;
+  isErrored?: boolean;
   validator: (value: string) => boolean;
 }
 
-export const TextInputForm = ({ validator }: TextInputFormProps) => {
+export const TextInputForm = ({
+  errorMessage,
+  isErrored,
+  validator,
+}: TextInputFormProps) => {
   const [textInputValue, setTextInputValue] = useState<string>('');
 
   const handleOnChange = (event) => {
@@ -16,12 +22,12 @@ export const TextInputForm = ({ validator }: TextInputFormProps) => {
   };
 
   return (
-    <FormControlWrapper>
+    <FormControlWrapper isErrored={isErrored} errorMessage={errorMessage}>
       <TextInput
         onChange={handleOnChange}
         sizeVariant="large"
         value={textInputValue}
-        validationStatus="error"
+        validationStatus={isErrored ? 'error' : 'success'}
         placeholder="1.123456"
       >
         <TextInput.Button
@@ -29,7 +35,6 @@ export const TextInputForm = ({ validator }: TextInputFormProps) => {
         >
           max
         </TextInput.Button>
-        <TextInput.Icon icon="Calendar" />
       </TextInput>
     </FormControlWrapper>
   );

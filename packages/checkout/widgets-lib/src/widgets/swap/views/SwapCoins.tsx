@@ -17,6 +17,7 @@ import { SwapContext } from '../context/SwapContext';
 import { alphaSortTokensList, findTokenByAddress } from '../helpers';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
+import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 
 type AmountAndPercentage = {
   amount: {
@@ -161,10 +162,7 @@ export function SwapCoins({
             console.log('selectValidator');
             return true;
           }}
-          textInputValidator={() => {
-            console.log('selectValidator');
-            return true;
-          }}
+          textInputValidator={amountInputValidation}
         />
         <br />
 
