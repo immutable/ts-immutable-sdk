@@ -157,6 +157,14 @@ export function SwapCoins({
               boldVariant: true,
             },
           ]}
+          selectValidator={() => {
+            console.log('selectValidator');
+            return true;
+          }}
+          textInputValidator={() => {
+            console.log('selectValidator');
+            return true;
+          }}
         />
         <br />
 

@@ -5,6 +5,8 @@ import {
   selectStyle,
 } from './SelectInputStyles';
 import { useState } from 'react';
+import { SelectForm } from '../SelectForm/SelectForm';
+import { TextInputForm } from '../TextInputForm/TextInputForm';
 
 // todo: sort out this list
 type IconList = 'EthToken' | 'ImxTokenDex';
@@ -16,49 +18,22 @@ interface SelectInputProps {
     icon?: IconList;
     boldVariant?: boolean;
   }[];
+  selectValidator: (value: string) => boolean;
+  textInputValidator: (value: string) => boolean;
 }
 
-export const SelectInput = ({ options }: SelectInputProps) => {
-  const [textInputValue, setTextInputValue] = useState<string>('');
-
-  const handleOnChange = (event) => {
-    console.log(event.target.value);
-    setTextInputValue(event.target.value);
-  };
-
+export const SelectInput = ({
+  options,
+  selectValidator,
+  textInputValidator,
+}: SelectInputProps) => {
   return (
     <Box sx={selectInputBoxStyle}>
       <Box sx={selectStyle}>
-        <Select size="large">
-          {options.map((option) => {
-            return (
-              <Option key={option.id} optionKey={option.id}>
-                <Option.Icon
-                  icon={option.icon ?? 'Coins'}
-                  variant={option.boldVariant ? 'bold' : 'regular'}
-                />
-                <Option.Label>{option.label}</Option.Label>
-              </Option>
-            );
-          })}
-        </Select>
+        <SelectForm options={options} validator={selectValidator} />
       </Box>
-
       <Box sx={inputStyle}>
-        <TextInput
-          onChange={handleOnChange}
-          sizeVariant="large"
-          value={textInputValue}
-          validationStatus="error"
-          placeholder="1.123456"
-        >
-          <TextInput.Button
-            onClick={() => console.log('max btn clicked, do stuff!')}
-          >
-            max
-          </TextInput.Button>
-          <TextInput.Icon icon="Calendar" />
-        </TextInput>
+        <TextInputForm validator={textInputValidator} />
       </Box>
     </Box>
   );
