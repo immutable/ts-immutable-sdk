@@ -1,11 +1,6 @@
 import { Body, Box } from '@biom3/react';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  Checkout,
-  ConnectResult,
-  TokenFilterTypes,
-  TokenInfo,
-} from '@imtbl/checkout-sdk';
+import { TokenInfo } from '@imtbl/checkout-sdk';
 import {
   OptionsContainerStyle,
   OptionStyle,
@@ -13,13 +8,12 @@ import {
   SelectStyle,
 } from '../SwapStyles';
 import { alphaSortTokensList } from '../helpers';
-import { Environment } from '@imtbl/config';
 
 export interface TokenSelectProps {
+  allowedTokens: TokenInfo[];
   onChange: (token: TokenInfo) => void;
   token?: TokenInfo;
   testId: string;
-  connection: ConnectResult;
   filter?: string[];
 }
 
@@ -27,13 +21,12 @@ const TokenSelect = ({
   testId,
   onChange,
   token,
-  connection,
   filter,
+  allowedTokens,
 }: TokenSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [option, setOption] = useState(token?.symbol);
   const [icon, setIcon] = useState(token?.icon);
-  const [allowedList, setAllowedList] = useState<TokenInfo[]>([]);
 
   const toggleOpen = () => {
     setIsOpen(!isOpen);
@@ -53,20 +46,11 @@ const TokenSelect = ({
   }, [token, selectOption]);
 
   const getTokens = useCallback(async () => {
-    // TODO: update here to go to context and stop hardcoing
-    const checkout = new Checkout({
-      baseConfig: { environment: Environment.SANDBOX },
-    });
-
-    const allowList = await checkout.getTokenAllowList({
-      chainId: 1,
-      type: TokenFilterTypes.SWAP,
-    }); // TODO: THIS NEEDS TO BE SET BACK TO THE NETWORK CHAIN ID
-    const sortedAllowList = alphaSortTokensList(allowList.tokens);
-    setAllowedList(sortedAllowList);
+    const sortedAllowList = alphaSortTokensList(allowedTokens);
     setOption(sortedAllowList[0]?.symbol);
     setIcon(sortedAllowList[0]?.icon);
-  }, []);
+  }, [allowedTokens]);
+
   useEffect(() => {
     getTokens();
   }, [getTokens]);
@@ -85,7 +69,7 @@ const TokenSelect = ({
       </Box>
       {isOpen && (
         <Box sx={OptionsContainerStyle}>
-          {allowedList.map((token) => {
+          {allowedTokens.map((token) => {
             return !filter || filter.includes(token.address || '') ? (
               <Box
                 testId={`${testId}__option-${token.symbol}`}
