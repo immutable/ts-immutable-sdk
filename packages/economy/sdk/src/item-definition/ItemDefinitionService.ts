@@ -1,25 +1,13 @@
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
+import { Service } from 'typedi';
 import { HttpClient } from '../HttpClient';
 import { ItemDefinition } from '../types';
+import { Config } from '../Config';
 
-// TODO: Read from .env
-// FIXME: target https://api.dev.games.immutable.com/inventory/swagger/index.html#/root/post_craft
-const defaultBaseURL = 'http://127.0.0.1:3031/item-definition';
-// const defaultBaseURL =
-//   'https://api.sandbox.games.immutable.com/item-definition/v1';
-
+@Service()
 export class ItemDefinitionService {
-  private httpClient: HttpClient;
-
-  constructor(
-    httpClientOrBaseUrl: HttpClient | string = defaultBaseURL,
-    defaultHeaders: Record<string, string> = {},
-  ) {
-    if (httpClientOrBaseUrl instanceof HttpClient) {
-      this.httpClient = httpClientOrBaseUrl;
-    } else {
-      this.httpClient = new HttpClient(httpClientOrBaseUrl, defaultHeaders);
-    }
+  constructor(private httpClient: HttpClient, private config: Config) {
+    this.httpClient.setBaseURL(`${this.config.servicesBaseURL}/item-definition`);
   }
 
   public async getById(id: string): Promise<AxiosResponse<ItemDefinition>> {

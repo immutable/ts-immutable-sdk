@@ -1,14 +1,19 @@
 /* eslint-disable no-console */
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { Service } from 'typedi';
+import axios, {
+  HeadersDefaults,
+  AxiosHeaderValue,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
 
+@Service({ transient: true })
 export class HttpClient {
   private readonly axiosInstance: AxiosInstance;
 
-  constructor(baseURL: string, defaultHeaders: Record<string, string> = {}) {
-    this.axiosInstance = axios.create({
-      baseURL,
-      headers: defaultHeaders,
-    });
+  constructor() {
+    this.axiosInstance = axios.create();
 
     // Setup request
     this.axiosInstance.interceptors.request.use((config) => {
@@ -75,6 +80,12 @@ export class HttpClient {
 
   public setBaseURL(baseURL: string) {
     this.axiosInstance.defaults.baseURL = baseURL;
+  }
+
+  public setBaseHeaders(
+    headers: HeadersDefaults & { [key: string]: AxiosHeaderValue },
+  ) {
+    this.axiosInstance.defaults.headers = headers;
   }
 }
 

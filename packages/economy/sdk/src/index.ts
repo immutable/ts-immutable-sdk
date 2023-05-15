@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 export { EconomyCustomEventTypes, EventActions, EventStatuses } from './types';
 export type {
   EconomyCustomEventType,
@@ -9,4 +11,5 @@ export type {
 } from './types';
 
 export * from './Economy';
+export type { EconomyModuleConfiguration } from './Config';
 export type { CraftInput, CraftStatus, CraftEvent } from './crafting/Crafting';

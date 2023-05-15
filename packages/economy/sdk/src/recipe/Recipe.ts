@@ -1,18 +1,16 @@
+import { Service } from 'typedi';
 import { withSDKError } from '../Errors';
 
 import { RecipeService } from './RecipeService';
 
+@Service()
 export class Recipe {
-  private service: RecipeService;
-
-  // FIXME: make injectable
-  constructor() {
-    this.service = new RecipeService();
+  constructor(private recipeService: RecipeService) {
   }
 
   @withSDKError({ type: 'RECIPE_ERROR' })
   public async getRecipes(input: { gameId: string; filters: string[] }) {
-    const { data, status } = await this.service.getRecipes(
+    const { data, status } = await this.recipeService.getRecipes(
       input.gameId,
       input.filters,
     );
@@ -25,7 +23,7 @@ export class Recipe {
 
   @withSDKError({ type: 'RECIPE_ERROR' })
   public async getRecipeById(id: string) {
-    const { data, status } = await this.service.getRecipeById(id);
+    const { data, status } = await this.recipeService.getRecipeById(id);
 
     if (status !== 200) {
       throw new Error('GET_RECIPE_BY_ID_ERROR');
