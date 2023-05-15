@@ -92,7 +92,6 @@ export function SwapWidget(props: SwapWidgetProps) {
       }
     );
 
-    // Do we filter token balances by allow list here??
     const allowedTokenBalances = tokenBalances.balances.filter((balance) =>
       allowList.tokens
         .map((token) => token.address)
