@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 export { EconomyCustomEventTypes, EventActions, EventStatuses } from './types';
 export type {
   EconomyCustomEventType,
