@@ -1,6 +1,7 @@
 import { AxiosResponse } from 'axios';
 import querystring from 'querystring';
 
+import { Service } from 'typedi';
 import { HttpClient } from '../HttpClient';
 import { Recipe } from '../types';
 
@@ -10,23 +11,15 @@ const defaultBaseURL = 'http://127.0.0.1:3031/recipe';
 // const defaultBaseURL =
 //   'https://api.sandbox.games.immutable.com/recipe'
 
+@Service()
 export class RecipeService {
-  private httpClient: HttpClient;
-
-  constructor(
-    httpClientOrBaseUrl: HttpClient | string = defaultBaseURL,
-    defaultHeaders: Record<string, string> = {},
-  ) {
-    if (httpClientOrBaseUrl instanceof HttpClient) {
-      this.httpClient = httpClientOrBaseUrl;
-    } else {
-      this.httpClient = new HttpClient(httpClientOrBaseUrl, defaultHeaders);
-    }
+  constructor(private httpClient: HttpClient) {
+    this.httpClient.setBaseURL(defaultBaseURL);
   }
 
   public async getRecipes(
     gameId: string,
-    filters?: string[],
+    filters?: string[]
   ): Promise<AxiosResponse<Array<Recipe>>> {
     const query = querystring.stringify({ filters });
     const url = `/recipes?game_id=${gameId}${query ? `&${query}` : ''}`;
