@@ -74,7 +74,7 @@ NetworkDetails
     {
       chainIdHex: '0x343C', // 13372
       chainName: 'Immutable zkEVM Testnet',
-      rpcUrls: ['https://zkevm-rpc.dev.x.immutable.com'],
+      rpcUrls: ['https://zkevm-rpc.sandbox.x.immutable.com'],
       nativeCurrency: {
         name: 'IMX',
         symbol: 'IMX',
