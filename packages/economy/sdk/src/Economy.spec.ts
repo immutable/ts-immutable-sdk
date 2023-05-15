@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Economy } from './Economy';
 
 describe('Economy Class', () => {
