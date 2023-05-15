@@ -21,7 +21,6 @@ const defaultConfig: Configuration = {
 export abstract class SDK<SDKEvent> {
   constructor(protected config = defaultConfig) {
     this.config = config;
-    this.connect();
   }
 
   /** Produces lifecycle events so consumer can hook into the SDK workflow */
