@@ -24,8 +24,11 @@ export class CraftingWidget extends LitElement {
       walletAddress: '0x',
       imxProvider: undefined,
       baseConfig: {
-        environment: Environment.SANDBOX,
+        environment: Environment.PRODUCTION,
       },
+      overrides: {
+        servicesBaseURL: 'http://127.0.0.1:3031'
+      }
     });
     this.getRecipe();
     this.getInventory();
