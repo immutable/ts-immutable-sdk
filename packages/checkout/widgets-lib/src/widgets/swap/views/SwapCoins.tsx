@@ -183,11 +183,11 @@ export function SwapCoins({
           buyAmount={buyAmount}
         />
         {withQuote && (
-        <Fees
-          fees={withQuote.trade.fees.amount.formatted}
-          slippage={withQuote.trade.slippage.amount.formatted}
-          tokenSymbol="imx"
-        />
+          <Fees
+            fees={withQuote.trade.fees.amount.formatted}
+            fiatPrice={withQuote.trade.slippage.amount.formatted}
+            tokenSymbol="imx"
+          />
         )}
         {provider && (
         <SwapButton provider={provider} transaction={getTransaction()} />

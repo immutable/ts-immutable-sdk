@@ -1,24 +1,33 @@
-import { Body, Box, Heading } from '@biom3/react';
+import { Body, Box } from '@biom3/react';
+import { FeeBoxStyles, FeeContainerStyles } from './FeeStyles';
 
 export interface FeeProps {
   fees: string;
-  slippage: string;
   tokenSymbol: string;
+  fiatPrice: string;
 }
 
 export function Fees(feeProps: FeeProps) {
-  const { fees, slippage, tokenSymbol } = feeProps;
+  const { fees, fiatPrice, tokenSymbol } = feeProps;
 
   return (
-    <Box>
-      <Heading size="xSmall">Fees:</Heading>
-      <Body>
-        {fees}
-        {' '}
-        {tokenSymbol}
+    <Box sx={FeeContainerStyles}>
+      <Body size="medium" weight="regular">
+        Fees total
       </Body>
-      <Heading size="xSmall">Slippage:</Heading>
-      <Body>{slippage}</Body>
+      <Box sx={FeeBoxStyles}>
+        <Body size="medium" weight="regular" sx={{ textAlign: 'right' }}>
+          ≈
+          {' '}
+          {tokenSymbol.toUpperCase()}
+          {' '}
+          {fees}
+        </Body>
+        <Body size="xSmall" weight="regular" sx={{ textAlign: 'left' }}>
+          Approx USD $
+          {fiatPrice}
+        </Body>
+      </Box>
     </Box>
   );
 }
