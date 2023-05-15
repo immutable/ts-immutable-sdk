@@ -1,3 +1,4 @@
+import Container, { Service } from 'typedi';
 import { Inventory } from './inventory/Inventory';
 import { Recipe } from './recipe/Recipe';
 
@@ -10,25 +11,37 @@ import { ItemDefinition } from './item-definition/ItemDefinition';
 /** @internal Economy SDK actions */
 export type EconomyEvents = CraftEvent;
 
+@Service()
 export class Economy extends SDK<EconomyEvents> {
-  public crafting!: Crafting;
-
-  public recipe!: Recipe;
-
-  public inventory!: Inventory;
-
-  public item!: ItemDefinition;
-
-  constructor() {
+  constructor(
+    public crafting: Crafting,
+    public recipe: Recipe,
+    public inventory: Inventory,
+    public item: ItemDefinition,
+  ) {
     super();
-    this.crafting = new Crafting(this.getEmitEventHandler());
-    this.recipe = new Recipe();
-    this.inventory = new Inventory();
-    this.item = new ItemDefinition();
+
+    this.setInjectedDeps();
   }
 
-  /** Lifecycle method: Self invoked after class instanciation */
+  /** Lifecycle method: Initialises class resources */
   connect(): void {
-    this.log('mounted');
+    this.log('connect');
+  }
+
+  static build(): Economy {
+    return Container.get(Economy);
+  }
+
+  /**
+   * Sets injected dependencies required by the SDK services
+   */
+  private setInjectedDeps(): void {
+    const handler = this.getEmitEventHandler();
+    Container.set('EmitEventHandler', handler);
+
+    Container.set('SDKConfig', {
+      env: 'dev',
+    });
   }
 }

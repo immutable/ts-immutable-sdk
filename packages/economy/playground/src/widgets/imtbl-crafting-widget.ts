@@ -17,7 +17,7 @@ export class CraftingWidget extends LitElement {
 
   constructor() {
     super();
-    this.economy = new Economy();
+    this.economy = Economy.build();
     this.getRecipe();
     this.getInventory();
   }
