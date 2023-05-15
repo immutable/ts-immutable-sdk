@@ -1,4 +1,3 @@
-// write describe for above function and test cases
 import { amountInputValidation } from './amountInputValidations';
 
 describe('amountInPutValidation', () => {
