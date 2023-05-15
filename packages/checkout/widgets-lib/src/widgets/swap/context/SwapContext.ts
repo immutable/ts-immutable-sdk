@@ -2,6 +2,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
   ConnectionProviders,
+  GetBalanceResult,
   NetworkInfo,
   TokenInfo,
 } from '@imtbl/checkout-sdk';
@@ -12,7 +13,7 @@ export interface SwapState {
   provider: Web3Provider | null;
   providerPreference: ConnectionProviders | null;
   network: NetworkInfo | null;
-  tokenBalances: any[];
+  tokenBalances: GetBalanceResult[];
   supportedTopUps: TopUpFeature | null;
   allowedTokens: TokenInfo[]
 }
@@ -46,7 +47,7 @@ type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
   | SetProviderPreferencePayload
-  | SetSwitchNetworkPayload
+  | SetNetworkPayload
   | SetSupportedTopUpPayload
   | SetTokenBalancesPayload
   | SetAllowedTokensPayload;
@@ -76,15 +77,14 @@ export interface SetProviderPreferencePayload {
   providerPreference: ConnectionProviders;
 }
 
-export interface SetSwitchNetworkPayload {
+export interface SetNetworkPayload {
   type: SwapActions.SET_NETWORK;
   network: NetworkInfo;
-  tokenBalances: any[];
 }
 
 export interface SetTokenBalancesPayload {
   type: SwapActions.SET_TOKEN_BALANCES;
-  tokenBalances: any[];
+  tokenBalances: GetBalanceResult[];
 }
 
 export interface SetSupportedTopUpPayload {
@@ -130,7 +130,6 @@ export const swapReducer: Reducer<SwapState, SwapAction> = (
       return {
         ...state,
         network: action.payload.network,
-        tokenBalances: action.payload.tokenBalances,
       };
     case SwapActions.SET_SUPPORTED_TOP_UPS:
       return {

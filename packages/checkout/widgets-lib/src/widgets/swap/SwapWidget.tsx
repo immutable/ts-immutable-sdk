@@ -92,8 +92,6 @@ export function SwapWidget(props: SwapWidgetProps) {
       }
     );
 
-    console.log(allowList.tokens);
-
     // Do we filter token balances by allow list here??
     const allowedTokenBalances = tokenBalances.balances.filter((balance) =>
       allowList.tokens
@@ -110,9 +108,15 @@ export function SwapWidget(props: SwapWidgetProps) {
 
     swapDispatch({
       payload: {
+        type: SwapActions.SET_TOKEN_BALANCES,
+        tokenBalances: allowedTokenBalances,
+      },
+    });
+
+    swapDispatch({
+      payload: {
         type: SwapActions.SET_NETWORK,
         network: connectResult.network,
-        tokenBalances: allowedTokenBalances,
       },
     });
 

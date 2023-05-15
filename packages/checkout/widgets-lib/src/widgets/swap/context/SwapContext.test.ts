@@ -2,12 +2,13 @@ import { Checkout } from '@imtbl/checkout-sdk';
 import {
   SetCheckoutPayload,
   SetProviderPayload,
-  SetSwitchNetworkPayload,
+  SetNetworkPayload,
   SwapActions,
   initialSwapState,
   swapReducer,
   SetSupportedTopUpPayload,
   TopUpFeature,
+  SetTokenBalancesPayload,
 } from './SwapContext';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
@@ -39,8 +40,8 @@ describe('WalletContext', () => {
     expect(provider).not.toBeNull();
   });
 
-  it('should update state with network info and token balances when reducer called with SWITCH_NETWORK action', () => {
-    const setSwitchNetworkPayload: SetSwitchNetworkPayload = {
+  it('should update state with network info when reducer called with SET_NETWORK action', () => {
+    const setNetworkPayload: SetNetworkPayload = {
       type: SwapActions.SET_NETWORK,
       network: {
         name: 'Ethereum',
@@ -51,7 +52,28 @@ describe('WalletContext', () => {
           name: 'Ethereum',
         },
         isSupported: true,
+      }
+    };
+    expect(initialSwapState.network).toBeNull();
+    expect(initialSwapState.tokenBalances).toEqual([]);
+    const { network } = swapReducer(initialSwapState, {
+      payload: setNetworkPayload,
+    });
+    expect(network).toEqual({
+      name: 'Ethereum',
+      chainId: 1,
+      nativeCurrency: {
+        symbol: 'ETH',
+        decimals: 18,
+        name: 'Ethereum',
       },
+      isSupported: true,
+    });
+  });
+
+  it('should update state with token balances when reducer called with SWITCH_NETWORK action', () => {
+    const setTokenBalancesPayload: SetTokenBalancesPayload = {
+      type: SwapActions.SET_TOKEN_BALANCES,
       tokenBalances: [
         {
           id: 'Ethereum-ETH',
@@ -64,18 +86,8 @@ describe('WalletContext', () => {
     };
     expect(initialSwapState.network).toBeNull();
     expect(initialSwapState.tokenBalances).toEqual([]);
-    const { network, tokenBalances } = swapReducer(initialSwapState, {
-      payload: setSwitchNetworkPayload,
-    });
-    expect(network).toEqual({
-      name: 'Ethereum',
-      chainId: 1,
-      nativeCurrency: {
-        symbol: 'ETH',
-        decimals: 18,
-        name: 'Ethereum',
-      },
-      isSupported: true,
+    const { tokenBalances } = swapReducer(initialSwapState, {
+      payload: setTokenBalancesPayload,
     });
     expect(tokenBalances).toEqual([
       {
