@@ -3,9 +3,12 @@
     "chainId": 1
   },
   {
-    "chainId": 5
+    "chainId": 11155111
   },
   {
-    "chainId": 137
+    "chainId": 13372
+  },
+  {
+    "chainId": 13373
   }
 ]

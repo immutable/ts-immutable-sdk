@@ -1,0 +1,53 @@
+import React from 'react';
+
+import { Environment } from '@imtbl/config';
+import {
+  WidgetConnectionProviders,
+  WidgetTheme,
+} from '../definitions/constants';
+
+/**
+ * Interface representing the props for the Wallet Widget component.
+ * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Wallet Widget
+ * (default: {@link WidgetConnectionProviders.METAMASK}).
+ */
+export interface WalletReactProps {
+  providerPreference?: WidgetConnectionProviders;
+  useConnectWidget?: boolean;
+  isOnRampEnabled?: boolean;
+  isSwapEnabled?: boolean;
+  isBridgeEnabled?: boolean;
+}
+
+/**
+ * A React functional component that renders the Checkout Wallet Widget.
+ * @param {WalletReactProps} props - The props for the Wallet Widget component.
+ * @returns {JSX.Element} - The rendered Wallet Widget component.
+ */
+export function WalletReact(props: WalletReactProps) {
+  const {
+    providerPreference,
+    useConnectWidget,
+    isBridgeEnabled,
+    isOnRampEnabled,
+    isSwapEnabled,
+  } = props;
+
+  const config = window.ImtblCheckoutWidgetConfig;
+
+  // isOnRampEnabled, isBridgeEnabled, isSwapEnabled is a boolean type for better devExp
+  // converting them to string for compatible webComponent properties
+  return (
+    <imtbl-wallet
+      environment={Environment.SANDBOX}
+      providerPreference={
+        providerPreference ?? WidgetConnectionProviders.METAMASK
+      }
+      theme={config.theme ?? WidgetTheme.DARK}
+      useConnectWidget={useConnectWidget?.toString()}
+      isBridgeEnabled={isBridgeEnabled?.toString()}
+      isSwapEnabled={isSwapEnabled?.toString()}
+      isOnRampEnabled={isOnRampEnabled?.toString()}
+    />
+  );
+}

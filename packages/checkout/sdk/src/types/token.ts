@@ -1,3 +1,5 @@
+// TODO: fix circular dependency
+// eslint-disable-next-line import/no-cycle
 import { ChainId } from './network';
 
 /**
@@ -35,7 +37,7 @@ export interface TokenMasterInfo extends TokenInfo {
  */
 export interface GetTokenAllowListParams {
   type: TokenFilterTypes;
-  chainId: ChainId;
+  chainId?: ChainId;
   exclude?: TokenFilter[];
 }
 

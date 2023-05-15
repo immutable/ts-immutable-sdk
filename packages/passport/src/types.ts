@@ -1,4 +1,7 @@
 import { ModuleConfiguration } from '@imtbl/config';
+// TODO: Remove this ignore once the dependency is added
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { ImmutableXClient } from '@imtbl/immutablex-client';
 
 export type UserProfile = {
   email?: string;
@@ -40,12 +43,12 @@ export interface PassportOverrides {
   magicPublishableApiKey: string;
   magicProviderId: string;
   passportDomain: string;
-  imxApiBasePath: string;
+  immutableXClient: ImmutableXClient;
 }
 
 export interface PassportModuleConfiguration
   extends ModuleConfiguration<PassportOverrides>,
-    OidcConfiguration {}
+  OidcConfiguration {}
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 

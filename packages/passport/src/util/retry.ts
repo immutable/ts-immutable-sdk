@@ -6,14 +6,13 @@ export type RetryOption = {
   interval?: number;
   finalErr?: Error;
 };
-const wait = (ms: number) =>
-  new Promise<void>((resolve) => {
-    setTimeout(() => resolve(), ms);
-  });
+const wait = (ms: number) => new Promise<void>((resolve) => {
+  setTimeout(() => resolve(), ms);
+});
 
 export const retryWithDelay = async <T>(
   fn: () => Promise<T>,
-  options?: RetryOption
+  options?: RetryOption,
 ): Promise<T> => {
   const {
     retries = MAX_RETRIES,

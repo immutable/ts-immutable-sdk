@@ -1,6 +1,6 @@
-import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 import { Contracts, UsersApi } from '@imtbl/core-sdk';
 import { signRaw } from '@imtbl/toolkit';
+import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 import { isRegisteredOnChain, registerOffchain } from './registration';
 
 jest.mock('@imtbl/core-sdk');
@@ -20,7 +20,7 @@ describe('Registration', () => {
       });
 
       await expect(
-        isRegisteredOnChain('stark-key', signers.ethSigner, testConfig)
+        isRegisteredOnChain('stark-key', signers.ethSigner, testConfig),
       ).resolves.not.toThrowError(new Error('some err'));
     });
 
@@ -34,7 +34,7 @@ describe('Registration', () => {
         }),
       });
       await expect(
-        isRegisteredOnChain('stark-key', signers.ethSigner, testConfig)
+        isRegisteredOnChain('stark-key', signers.ethSigner, testConfig),
       ).rejects.toThrowError(err);
     });
   });
@@ -80,7 +80,7 @@ describe('Registration', () => {
 
       const response = await registerOffchain(signers, testConfig);
       expect(getSignableRegistrationOffchainMock).toHaveBeenCalledWith({
-        getSignableRegistrationRequest: getSignableRegistrationRequest,
+        getSignableRegistrationRequest,
       });
       expect(registerUserMock).toHaveBeenCalledWith({
         registerUserRequest: {

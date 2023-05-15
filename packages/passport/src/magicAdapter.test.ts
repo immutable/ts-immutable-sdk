@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { LoginWithOpenIdParams, OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
 import { Magic } from 'magic-sdk';
@@ -7,7 +8,7 @@ import { PassportError, PassportErrorType } from './errors/passportError';
 import { Networks } from './types';
 
 const loginWithOIDCMock: jest.MockedFunction<
-  (args: LoginWithOpenIdParams) => Promise<void>
+(args: LoginWithOpenIdParams) => Promise<void>
 > = jest.fn();
 const web3ProviderInstance = { getSigner: jest.fn() };
 const web3ProviderMock = ethers.providers.Web3Provider as jest.MockedClass<
@@ -82,8 +83,8 @@ describe('MagicWallet', () => {
       }).rejects.toThrow(
         new PassportError(
           'WALLET_CONNECTION_ERROR: oops',
-          PassportErrorType.WALLET_CONNECTION_ERROR
-        )
+          PassportErrorType.WALLET_CONNECTION_ERROR,
+        ),
       );
     });
   });

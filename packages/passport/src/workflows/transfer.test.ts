@@ -93,6 +93,7 @@ describe('transfer', () => {
       };
       const mockHeader = {
         headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           Authorization: `Bearer ${mockUser.accessToken}`,
         },
       };
@@ -107,7 +108,7 @@ describe('transfer', () => {
         confirmed: true,
       });
       getSignableTransferV1Mock.mockResolvedValue(
-        mockSignableTransferV1Response
+        mockSignableTransferV1Response,
       );
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferV1Mock.mockResolvedValue({
@@ -123,12 +124,12 @@ describe('transfer', () => {
       });
 
       expect(getSignableTransferV1Mock).toBeCalledWith(
-        mockSignableTransferRequest
+        mockSignableTransferRequest,
       );
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(createTransferV1Mock).toBeCalledWith(
         mockCreateTransferRequest,
-        mockHeader
+        mockHeader,
       );
       expect(result).toEqual(mockReturnValue);
     });
@@ -136,19 +137,17 @@ describe('transfer', () => {
     it('should return error if failed to call public api', async () => {
       getSignableTransferV1Mock.mockRejectedValue(new Error(mockErrorMessage));
 
-      await expect(() =>
-        transfer({
-          transfersApi: transferApiMock,
-          starkSigner: mockStarkSigner,
-          user: mockUser,
-          request: mockTransferRequest as UnsignedTransferRequest,
-          passportConfig,
-        })
-      ).rejects.toThrow(
+      await expect(() => transfer({
+        transfersApi: transferApiMock,
+        starkSigner: mockStarkSigner,
+        user: mockUser,
+        request: mockTransferRequest as UnsignedTransferRequest,
+        passportConfig,
+      })).rejects.toThrow(
         new PassportError(
           `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
-          PassportErrorType.TRANSFER_ERROR
-        )
+          PassportErrorType.TRANSFER_ERROR,
+        ),
       );
     });
 
@@ -168,21 +167,19 @@ describe('transfer', () => {
       };
 
       getSignableTransferV1Mock.mockResolvedValue(
-        mockSignableTransferV1Response
+        mockSignableTransferV1Response,
       );
       mockStartTransaction.mockRejectedValue({
         confirmed: false,
       });
 
-      await expect(() =>
-        transfer({
-          transfersApi: transferApiMock,
-          starkSigner: mockStarkSigner,
-          user: mockUser,
-          request: mockTransferRequest as UnsignedTransferRequest,
-          passportConfig,
-        })
-      ).rejects.toThrowError('TRANSFER_ERROR');
+      await expect(() => transfer({
+        transfersApi: transferApiMock,
+        starkSigner: mockStarkSigner,
+        user: mockUser,
+        request: mockTransferRequest as UnsignedTransferRequest,
+        passportConfig,
+      })).rejects.toThrowError('TRANSFER_ERROR');
     });
   });
 
@@ -251,7 +248,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
-        passportConfig: passportConfig,
+        passportConfig,
       });
 
       expect(result).toEqual({
@@ -296,28 +293,27 @@ describe('transfer', () => {
         },
         {
           headers: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             Authorization: `Bearer ${mockUser.accessToken}`,
           },
-        }
+        },
       );
     });
 
     it('should return error if failed to call public api', async () => {
       getSignableTransferMock.mockRejectedValue(new Error(mockErrorMessage));
 
-      await expect(() =>
-        batchNftTransfer({
-          user: mockUser,
-          starkSigner: mockStarkSigner,
-          request: transferRequest,
-          transfersApi: transferApiMock,
-          passportConfig: passportConfig,
-        })
-      ).rejects.toThrow(
+      await expect(() => batchNftTransfer({
+        user: mockUser,
+        starkSigner: mockStarkSigner,
+        request: transferRequest,
+        transfersApi: transferApiMock,
+        passportConfig,
+      })).rejects.toThrow(
         new PassportError(
           `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
-          PassportErrorType.TRANSFER_ERROR
-        )
+          PassportErrorType.TRANSFER_ERROR,
+        ),
       );
     });
 
@@ -352,15 +348,13 @@ describe('transfer', () => {
         confirmed: false,
       });
 
-      await expect(() =>
-        batchNftTransfer({
-          user: mockUser,
-          starkSigner: mockStarkSigner,
-          request: transferRequest,
-          transfersApi: transferApiMock,
-          passportConfig: passportConfig,
-        })
-      ).rejects.toThrowError('TRANSFER_ERROR');
+      await expect(() => batchNftTransfer({
+        user: mockUser,
+        starkSigner: mockStarkSigner,
+        request: transferRequest,
+        transfersApi: transferApiMock,
+        passportConfig,
+      })).rejects.toThrowError('TRANSFER_ERROR');
     });
   });
 });

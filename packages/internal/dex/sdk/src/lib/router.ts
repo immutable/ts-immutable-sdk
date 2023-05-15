@@ -1,9 +1,11 @@
 import { ethers } from 'ethers';
-import { Currency, TradeType, CurrencyAmount, Token } from '@uniswap/sdk-core';
+import {
+  Currency, CurrencyAmount, Token, TradeType,
+} from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import JSBI from 'jsbi';
 import { poolEquals } from './utils';
-import { QuoteResult, getQuotesForRoutes } from './getQuotesForRoutes';
+import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
 import { QuoteResponse } from '../types';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
@@ -18,13 +20,15 @@ export type RoutingContracts = {
 
 export class Router {
   public provider: ethers.providers.JsonRpcProvider;
+
   public routingTokens: Token[];
+
   public routingContracts: RoutingContracts;
 
   constructor(
     provider: ethers.providers.JsonRpcProvider,
     routingTokens: Token[],
-    routingContracts: RoutingContracts
+    routingContracts: RoutingContracts,
   ) {
     this.provider = provider;
     this.routingTokens = routingTokens;
@@ -35,17 +39,17 @@ export class Router {
     amountSpecified: CurrencyAmount<Currency>,
     otherCurrency: Currency,
     tradeType: TradeType,
-    maxHops: number = 2
+    maxHops: number = 2,
   ): Promise<QuoteResponse> {
     const [currencyIn, currencyOut] = this.determineERC20InAndERC20Out(
       tradeType,
       amountSpecified,
-      otherCurrency
+      otherCurrency,
     );
 
     const multicallContract = Multicall__factory.connect(
       this.routingContracts.multicallAddress,
-      this.provider
+      this.provider,
     );
     const erc20Pair: ERC20Pair = [currencyIn.wrapped, currencyOut.wrapped];
 
@@ -54,7 +58,7 @@ export class Router {
       multicallContract,
       erc20Pair,
       this.routingTokens,
-      this.routingContracts.factoryAddress
+      this.routingContracts.factoryAddress,
     );
     const noValidPools = pools.length === 0;
     if (noValidPools) {
@@ -65,6 +69,8 @@ export class Router {
     }
 
     // Get all the possible routes from the given pools
+    // TODO: Fix used before defined error
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const routes = generateAllAcyclicPaths(
       currencyIn,
       currencyOut,
@@ -72,7 +78,7 @@ export class Router {
       [],
       [],
       currencyIn,
-      maxHops
+      maxHops,
     );
     const noValidRoute = routes.length === 0;
     if (noValidRoute) {
@@ -88,7 +94,7 @@ export class Router {
       routes,
       amountSpecified,
       otherCurrency,
-      tradeType
+      tradeType,
     );
     const noQuoteAvailable = bestQuoteForRoute === undefined;
     if (noQuoteAvailable) {
@@ -98,13 +104,13 @@ export class Router {
       };
     }
 
-    const amountIn = bestQuoteForRoute.amountIn;
-    const amountOut = bestQuoteForRoute.amountOut;
+    const { amountIn } = bestQuoteForRoute;
+    const { amountOut } = bestQuoteForRoute;
     const amountInWei = ethers.BigNumber.from(
-      amountIn.multiply(amountIn.decimalScale).toExact()
+      amountIn.multiply(amountIn.decimalScale).toExact(),
     );
     const amountOutWei = ethers.BigNumber.from(
-      amountOut.multiply(amountOut.decimalScale).toExact()
+      amountOut.multiply(amountOut.decimalScale).toExact(),
     );
 
     return {
@@ -115,30 +121,33 @@ export class Router {
         tokenIn: currencyIn,
         amountOut: amountOutWei,
         tokenOut: currencyOut,
-        tradeType: tradeType,
+        tradeType,
       },
     };
   }
 
+  // TODO: Fix consistent return
+  // eslint-disable-next-line consistent-return
   public async getBestQuoteFromRoutes(
     multicallContract: Multicall,
     routes: Route<Currency, Currency>[],
     amountSpecified: CurrencyAmount<Currency>,
     otherCurrency: Currency,
-    tradeType: TradeType
+    tradeType: TradeType,
   ): Promise<
     | {
-        route: Route<Currency, Currency>;
-        amountIn: CurrencyAmount<Currency>;
-        amountOut: CurrencyAmount<Currency>;
-      }
+      route: Route<Currency, Currency>;
+      amountIn: CurrencyAmount<Currency>;
+      amountOut: CurrencyAmount<Currency>;
+    }
     | undefined
-  > {
+    > {
     const quotes = await getQuotesForRoutes(
       multicallContract,
+      this.routingContracts.quoterAddress,
       routes,
       amountSpecified,
-      tradeType
+      tradeType,
     );
     if (quotes.length === 0) {
       return undefined;
@@ -149,12 +158,12 @@ export class Router {
       const bestQuote = this.bestQuoteForAmountIn(quotes);
       const amountOut = CurrencyAmount.fromRawAmount(
         otherCurrency,
-        bestQuote.quoteAmount
+        bestQuote.quoteAmount,
       );
       return {
         route: bestQuote.route,
         amountIn: amountSpecified,
-        amountOut: amountOut,
+        amountOut,
       };
     }
 
@@ -163,42 +172,43 @@ export class Router {
       const bestQuote = this.bestQuoteForAmountOut(quotes);
       const amountIn = CurrencyAmount.fromRawAmount(
         otherCurrency,
-        bestQuote.quoteAmount
+        bestQuote.quoteAmount,
       );
       return {
         route: bestQuote.route,
-        amountIn: amountIn,
+        amountIn,
         amountOut: amountSpecified,
       };
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private bestQuoteForAmountIn(quotes: QuoteResult[]): QuoteResult {
     let bestQuote = quotes[0];
 
     for (let i = 1; i < quotes.length; i++) {
-      if (JSBI.greaterThan(quotes[i].quoteAmount, bestQuote.quoteAmount))
-        bestQuote = quotes[i];
+      if (JSBI.greaterThan(quotes[i].quoteAmount, bestQuote.quoteAmount)) bestQuote = quotes[i];
     }
 
     return bestQuote;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private bestQuoteForAmountOut(quotes: QuoteResult[]): QuoteResult {
     let bestQuote = quotes[0];
 
     for (let i = 1; i < quotes.length; i++) {
-      if (JSBI.lessThan(quotes[i].quoteAmount, bestQuote.quoteAmount))
-        bestQuote = quotes[i];
+      if (JSBI.lessThan(quotes[i].quoteAmount, bestQuote.quoteAmount)) bestQuote = quotes[i];
     }
 
     return bestQuote;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private determineERC20InAndERC20Out(
     tradeType: TradeType,
     amountSpecified: CurrencyAmount<Currency>,
-    otherCurrency: Currency
+    otherCurrency: Currency,
   ): [Currency, Currency] {
     // If the trade type is EXACT INPUT then we have specified the amount for the tokenIn
     return tradeType === TradeType.EXACT_INPUT
@@ -211,21 +221,25 @@ export const generateAllAcyclicPaths = (
   currencyIn: Currency, // the currency we start with
   currencyOut: Currency, // the currency we want to end up with
   pools: Pool[], // list of all available pools
+  // TODO: Fix default param should be last
+  // eslint-disable-next-line @typescript-eslint/default-param-last
   currentRoute: Pool[] = [], // list of pools already traversed
+  // eslint-disable-next-line @typescript-eslint/default-param-last
   routes: Route<Currency, Currency>[] = [], // list of all routes found so far
+  // eslint-disable-next-line @typescript-eslint/default-param-last
   startCurrencyIn: Currency = currencyIn, // the currency we started with
-  maxHops: number // the maximum number of pools that can be traversed
+  maxHops: number, // the maximum number of pools that can be traversed
 ): Route<Currency, Currency>[] => {
   const tokenIn = currencyIn.wrapped;
 
   const tokenOut = currencyOut.wrapped;
 
   for (const pool of pools) {
-    // if the pool doesn't have the tokenIn or if it has already been traversed, skip to the next pool
+    // if the pool doesn't have the tokenIn or if it has already been traversed,
+    // skip to the next pool
     const poolHasTokenIn = pool.involvesToken(tokenIn);
-    const poolHasCycle = currentRoute.find((pathPool) =>
-      poolEquals(pool, pathPool)
-    );
+    const poolHasCycle = currentRoute.find((pathPool) => poolEquals(pool, pathPool));
+    // eslint-disable-next-line no-continue
     if (!poolHasTokenIn || poolHasCycle) continue;
 
     // get the output token of the pool
@@ -235,10 +249,11 @@ export const generateAllAcyclicPaths = (
     const routeFound = outputToken.equals(tokenOut);
     if (routeFound) {
       routes.push(
-        new Route([...currentRoute, pool], startCurrencyIn, currencyOut)
+        new Route([...currentRoute, pool], startCurrencyIn, currencyOut),
       );
     } else if (maxHops > 1) {
-      // otherwise, if we haven't exceeded the maximum number of pools that can be traversed, recursively call this function with the output token as the new starting currency
+      // otherwise, if we haven't exceeded the maximum number of pools that can be traversed,
+      // recursively call this function with the output token as the new starting currency
       generateAllAcyclicPaths(
         outputToken,
         currencyOut,
@@ -246,7 +261,7 @@ export const generateAllAcyclicPaths = (
         [...currentRoute, pool],
         routes,
         startCurrencyIn,
-        maxHops - 1
+        maxHops - 1,
       );
     }
   }

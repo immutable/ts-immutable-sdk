@@ -1,14 +1,33 @@
 import { useEffect } from 'react';
-import { ConnectionProviders } from '@imtbl/checkout-sdk-web';
+import {
+  CheckoutWidgetsConfig,
+  UpdateConfig,
+  WidgetConnectionProviders,
+} from '@imtbl/checkout-widgets';
 
 import {
   WalletEventType,
   IMTBLWidgetEvents,
   WidgetTheme,
   WalletNetworkSwitchEvent,
-} from '@imtbl/checkout-ui-types';
+  CheckoutWidgets,
+  WalletReact,
+} from '@imtbl/checkout-widgets';
+import { Environment } from '@imtbl/config';
 
 function WalletUI() {
+  CheckoutWidgets({
+    theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
+  });
+
+  const widgetsConfig2: CheckoutWidgetsConfig = {
+    theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
+  };
+
+  UpdateConfig(widgetsConfig2);
+
   useEffect(() => {
     const handleWalletWidgetEvents = ((event: CustomEvent) => {
       console.log(event);
@@ -41,10 +60,11 @@ function WalletUI() {
   return (
     <div className="Connect">
       <h1 className="sample-heading">Checkout Wallet (Web Component)</h1>
-      <imtbl-wallet
-        providerPreference={ConnectionProviders.METAMASK}
-        theme={WidgetTheme.DARK}
-      ></imtbl-wallet>
+      <WalletReact
+        providerPreference={WidgetConnectionProviders.METAMASK}
+        useConnectWidget={true}
+        isOnRampEnabled={false}
+      />
     </div>
   );
 }

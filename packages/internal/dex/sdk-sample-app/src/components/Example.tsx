@@ -1,131 +1,202 @@
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
-import { Exchange, TradeInfo } from '@imtbl/dex-sdk';
-import { configuration } from '@/config/devnet';
-
-type RouteType = {
-  fee: any;
-  token0: string;
-  token1: string;
-};
+import { Exchange, TransactionResponse } from '@imtbl/dex-sdk';
+import { configuration } from '../config';
+import { getERC20ApproveCalldata } from '@/utils/approve';
+import { ConnectAccount } from './ConnectAccount';
+import { getTokenSymbol } from '../utils/getTokenSymbol';
+import { AmountInput } from './AmountInput';
 
 export function Example() {
-  // Create and use the exchange as per normal
+  // Create the Exchange class
   const exchange = new Exchange(configuration);
-  const DEVNET_USDC = '0xBB587517EC25e545F8Fe7c450161319c35677C86';
-  const DEVNET_FUN = '0x1a4B77b638d55f320e0a453394EC18Ab69F762F2';
 
-  const [result, setResult] = useState<TradeInfo>();
+  // Instead of hard-coding these tokens, you can optionally retrieve available tokens from the user's wallet
+  const FUN_TOKEN = process.env.NEXT_PUBLIC_COMMON_ROUTING_FUN || '';
+  const WETH_TOKEN = process.env.NEXT_PUBLIC_COMMON_ROUTING_WETH || '';
+
+  const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
-  const [routes, setRoutes] = useState<RouteType[]>([]);
-  const [inputTokenSymbol, setInputTokenSymbol] = useState('');
-  const [outputTokenSymbol, setOutputTokenSymbol] = useState('');
+  const [inputAmount, setInputAmount] = useState<string>('0');
+  const [swapStatus, setSwapStatus] = useState<boolean>(false);
+  const [approved, setApproved] = useState<boolean>(false);
+  const [result, setResult] = useState<TransactionResponse | null>();
+  const [error, setError] = useState<string | null>(null);
+  const [addressToSymbolMapping, setAddressToSymbolMapping] = useState<mapping>(
+    {}
+  );
 
-  const inputToken = DEVNET_USDC;
-  const outputToken = DEVNET_FUN;
+  const inputToken = FUN_TOKEN;
+  const outputToken = WETH_TOKEN;
 
-  const amountIn = ethers.utils.parseEther('1000');
+  useEffect(() => {
+    // Get the symbols for the tokens that we want to swap so we can display this to the user
+    Promise.all([getTokenSymbol(inputToken), getTokenSymbol(outputToken)]).then(
+      ([inputTokenSymbol, outputTokenSymbol]) => {
+        setAddressToSymbolMapping({
+          [inputToken]: inputTokenSymbol,
+          [outputToken]: outputTokenSymbol,
+        });
+      }
+    );
+  }, [inputToken, outputToken]);
 
-  // useEffect(() => {
-  //   getTokenSymbol(inputToken).then((symbol: string) => {
-  //     setInputTokenSymbol(symbol);
-  //   });
-  //
-  //   getTokenSymbol(outputToken).then((symbol: string) => {
-  //     setOutputTokenSymbol(symbol);
-  //   });
-  // });
-  //
-  // async function getTokenSymbol(tokenAddress: string): Promise<string> {
-  //   const provider = new ethers.providers.JsonRpcProvider(
-  //     RPC_URLS[SupportedChainId.POLYGON_ZKEVM_TESTNET][0]
-  //   );
-  //   const symbolFunctionSig = ethers.utils.id('symbol()').substring(0, 10);
-  //   const returnValue = await provider.call({
-  //     to: tokenAddress,
-  //     data: symbolFunctionSig,
-  //   });
-  //   return ethers.utils.defaultAbiCoder.decode(['string'], returnValue)[0];
-  // }
-
-  async function getPaths(trade: TradeInfo): Promise<RouteType[]> {
-    const promises = trade.route.pools.map(async ({ fee, token0, token1 }) => {
-      // const token0Symbol = await getTokenSymbol(token0.address);
-      // const token1Symbol = await getTokenSymbol(token1.address);
-
-      const token0Symbol = 'IMZ';
-      const token1Symbol = 'ETH';
-
-      console.log({ token0Symbol, token1Symbol });
-      return {
-        fee,
-        token0: token0Symbol,
-        token1: token1Symbol,
-      };
-    });
-
-    return Promise.all(promises);
+  if (ethereumAccount === null) {
+    return <ConnectAccount setAccount={setEthereumAccount} />;
   }
 
+  type mapping = {
+    [address: string]: string;
+  };
+
   const getQuote = async () => {
-    setRoutes([]);
-    setResult(undefined);
     setIsFetching(true);
 
-    const result = await exchange.getQuoteFromAmountIn(
+    const txn = await exchange.getUnsignedSwapTxFromAmountIn(
+      ethereumAccount,
       inputToken,
       outputToken,
-      amountIn
+      ethers.utils.parseEther(`${inputAmount}`)
     );
-    console.log({ result });
 
-    // if (result?.state == TradeState.VALID) {
-    //   setResult(result.trade);
-    //
-    //   const mapping = await getPaths(result.trade);
-    //   setRoutes(mapping);
-    // }
+    if (txn.success) {
+      setResult(txn);
+    } else {
+      setError('Error fetching quote');
+      setResult(null);
+    }
 
     setIsFetching(false);
   };
 
-  // if (!inputTokenSymbol || !outputTokenSymbol) {
-  //   return null;
-  // }
+  const performSwap = async (result: TransactionResponse) => {
+    setSwapStatus(false);
+    setIsFetching(true);
+    const provider = new ethers.providers.JsonRpcProvider(
+      process.env.NEXT_PUBLIC_RPC_URL
+    );
+
+    // Approve the ERC20 spend
+    if (!approved) {
+      const inputBigNumber = ethers.utils.parseUnits(
+        inputAmount,
+        result.info?.quote.token.decimals
+      );
+      const approveCalldata = getERC20ApproveCalldata(inputBigNumber);
+      const transactionRequest = {
+        data: approveCalldata,
+        to: inputToken,
+        value: '0',
+        from: ethereumAccount,
+      };
+      try {
+        // Send the Approve transaction
+        const approveReceipt = await (window as any).ethereum.send(
+          'eth_sendTransaction',
+          [transactionRequest]
+        );
+
+        // Wait for the Approve transaction to complete
+        await provider.waitForTransaction(approveReceipt.result, 1, 500000);
+        setApproved(true);
+      } catch (e: any) {
+        alert(e.message);
+        setIsFetching(false);
+        return;
+      }
+    }
+
+    try {
+      // Send the Swap transaction
+      const receipt = await (window as any).ethereum.send(
+        'eth_sendTransaction',
+        [result.transaction]
+      );
+
+      // Wait for the Swap transaction to complete
+      await provider.waitForTransaction(receipt.result, 1, 500000);
+      setIsFetching(false);
+      setSwapStatus(true);
+    } catch (e: any) {
+      alert(e.message);
+      setIsFetching(false);
+      setSwapStatus(false);
+      return;
+    }
+  };
 
   return (
     <div>
-      <h3>
-        Input Token: {inputTokenSymbol} - {inputToken}
+      <h3 style={{ marginBottom: '12px' }}>
+        Your wallet address: {ethereumAccount}
       </h3>
+
       <h3>
-        Output Token: {outputTokenSymbol} - {outputToken}
+        Input Token: {inputToken} ({addressToSymbolMapping[inputToken]})
       </h3>
-      <h3>Amount In: {ethers.utils.formatEther(amountIn)}</h3>
+
+      <h3>
+        Output Token: {outputToken} ({addressToSymbolMapping[outputToken]})
+      </h3>
+
+      <AmountInput
+        inputTokenSymbol={addressToSymbolMapping[inputToken]}
+        setInputAmount={setInputAmount}
+      />
+
       <button
         className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
         onClick={async () => await getQuote()}
         disabled={isFetching}
       >
-        GET QUOTE
+        Get Quote
       </button>
+
       <hr className="my-4" />
-      {result && (
-        <h3>Amount out: {ethers.utils.formatEther(result.amountOut)}</h3>
-      )}
-      {routes.length > 0 && (
-        <h3>
-          {routes.map((route: any, index: number) => {
-            const key = `${route.token0}-${route.token1}-${route.fee}`;
-            return (
-              <span key={key}>
-                {route.token0}/{route.token1} - {route.fee / 10000}%{' '}
-                {index !== routes.length - 1 ? `--->` : ''}{' '}
-              </span>
-            );
-          })}
-        </h3>
+      {result && result.info && (
+        <>
+          <h3>
+            Expected amount:{' '}
+            {ethers.utils.formatEther(result.info.quote.amount)}{' '}
+            {`${addressToSymbolMapping[result.info.quote.token.address]}`}
+          </h3>
+          <h3>
+            Minimum amount:{' '}
+            {ethers.utils.formatEther(result.info.quoteWithMaxSlippage.amount)}{' '}
+            {`${
+              addressToSymbolMapping[
+                result.info.quoteWithMaxSlippage.token.address
+              ]
+            }`}
+          </h3>
+          <h3>Slippage: {result.info.slippage}</h3>
+            <>
+              <button
+                className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                onClick={() => performSwap(result)}
+                disabled={isFetching}
+              >
+                {approved ? 'Swap' : 'Approve'}
+              </button>
+              {isFetching && <h3>loading...</h3>}
+              {swapStatus && (
+                <h3 style={{ marginTop: '12px' }}>
+                  Swap successful! Check your metamask to see updated token
+                  balances
+                </h3>
+              )}
+              {error && <Error message={error} />}
+            </>
+        </>
       )}
     </div>
   );
 }
+
+const Error = ({ message }: { message: string }) => {
+  return (
+    <div>
+      <p>{message}</p>
+    </div>
+  );
+};

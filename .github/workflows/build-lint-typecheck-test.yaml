@@ -42,7 +42,7 @@ jobs:
         run: yarn syncpack:check
 
       - name: Lint
-        run: yarn lint
+        run: yarn lint:ci
 
       - name: Build
         run: yarn build

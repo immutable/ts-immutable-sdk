@@ -1,36 +1,34 @@
-import { SDK } from './SDK';
-import { craft } from './crafting';
-import { withSDKError } from './Errors';
+import { Inventory } from './inventory/Inventory';
+import { Recipe } from './recipe/Recipe';
 
-import type { CraftInput, CraftStatus, CraftEvent } from './crafting';
+import { SDK } from './SDK';
+
+import { Crafting } from './crafting/Crafting';
+import type { CraftEvent } from './crafting/Crafting';
+import { ItemDefinition } from './item-definition/ItemDefinition';
 
 /** @internal Economy SDK actions */
 export type EconomyEvents = CraftEvent;
 
 export class Economy extends SDK<EconomyEvents> {
+  public crafting!: Crafting;
+
+  public recipe!: Recipe;
+
+  public inventory!: Inventory;
+
+  public item!: ItemDefinition;
+
+  constructor() {
+    super();
+    this.crafting = new Crafting(this.getEmitEventHandler());
+    this.recipe = new Recipe();
+    this.inventory = new Inventory();
+    this.item = new ItemDefinition();
+  }
+
   /** Lifecycle method: Self invoked after class instanciation */
   connect(): void {
     this.log('mounted');
-
-    this.subscribe((event) => {
-      if (event.action === 'CRAFT' && event.status === 'COMPLETED') {
-        event.data;
-      }
-    });
-  }
-
-  /**
-   * Given inputs for a recipe crafting
-   * process the recipe by sending it to the backend service
-   * @param input crafting recipe inputs
-   * @returns crafting status
-   */
-  @withSDKError({ type: 'CRAFTING_ERROR' })
-  async craft(input: CraftInput): Promise<CraftStatus> {
-    this.emitEvent({ action: 'CRAFT', status: 'STARTED' });
-
-    const status = await craft(input, this.getEmitEventHandler());
-
-    return status;
   }
 }

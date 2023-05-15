@@ -10,7 +10,12 @@
   <body>
     <h1>Checkout Wallet (Static)</h1>
     <br />
-    <imtbl-wallet providerPreference="metamask" theme="dark"></imtbl-wallet>
+    <imtbl-wallet
+      providerPreference="metamask"
+      theme="dark"
+      environment="sandbox"
+      useConnectWidget="true"
+    ></imtbl-wallet>
   </body>
   <script defer src="../js/imtbl-checkout.js"></script>
 </html>

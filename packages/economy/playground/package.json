@@ -3,34 +3,41 @@
   "description": "Playground application for Immutable Economy SDK",
   "version": "0.0.0",
   "dependencies": {
-    "@imtbl/checkout-sdk-web": "0.0.0",
-    "@imtbl/checkout-ui-types": "0.0.0",
+    "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/economy": "0.0.0",
-    "@imtbl/passport": "0.0.0"
+    "@imtbl/passport": "0.0.0",
+    "@imtbl/provider": "0.0.0",
+    "lit": "^2.7.2"
   },
   "devDependencies": {
-    "@parcel/transformer-sass": "2.8.3",
-    "@parcel/transformer-typescript-tsc": "^2.8.3",
-    "assert": "^2.0.0",
-    "lit": "^2.7.2",
-    "parcel": "^2.8.3",
-    "parcel-bundler": "^1.12.3",
-    "rimraf": "^5.0.0",
-    "stream-browserify": "^3.0.0",
-    "typescript": "^4.9.5"
+    "@storybook/addon-essentials": "^7.0.10",
+    "@storybook/addon-links": "^7.0.10",
+    "@storybook/blocks": "^7.0.10",
+    "@storybook/web-components": "^7.0.10",
+    "@storybook/web-components-vite": "^7.0.10",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^7.0.10",
+    "typescript": "^4.9.5",
+    "vite": "^4.3.5"
   },
   "engines": {
     "node": ">=16"
   },
   "license": "Apache-2.0",
-  "scripts": {
-    "build": "npm run setup && npm run build:app",
-    "build:app": "parcel build src/index.html --public-url ./",
-    "clean": "rimraf ./dist ./.cache",
-    "prestart": "[ -f public/js/imtbl-checkout-widgets.js ] || { echo 'Error: checkout-widgets deps not found. Please run `npm run setup` first.' ; exit 1; }",
-    "setup": "npm run clean && yarn workspace @imtbl/checkout-widgets build && cp ../../../sdk/dist/browser/checkout.js public/js/imtbl-checkout-widgets.js",
-    "start": "npm run prestart && parcel src/index.html -p 4200"
+  "resolutions": {
+    "string-width": "4.2.2"
   },
-  "source": "index.html"
+  "scripts": {
+    "build": "storybook build",
+    "build:app": "tsc && vite build",
+    "clean": "rimraf ./dist ./.cache",
+    "dev": "vite",
+    "prestart": "[ -f public/js/imtbl-checkout-widgets.js ] || { echo 'Error: checkout-widgets deps not found. Please run `npm run setup` first.' ; exit 1; }",
+    "preview": "vite preview",
+    "setup": "npm run clean && yarn workspace @imtbl/checkout-widgets-lib build && yarn workspace @imtbl/checkout-widgets-lib dist:sdk && cp ../../../sdk/dist/browser/checkout.js public/js/imtbl-checkout-widgets.js",
+    "start": "storybook dev -p 6006"
+  },
+  "type": "module"
 }

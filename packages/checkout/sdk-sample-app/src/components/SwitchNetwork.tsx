@@ -1,9 +1,10 @@
-import { Checkout, ChainId, NetworkInfo } from '@imtbl/checkout-sdk-web';
+import { Checkout, ChainId, NetworkInfo } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import LoadingButton from './LoadingButton';
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box } from '@biom3/react';
+import { NetworkFilterTypes } from '@imtbl/checkout-sdk';
 
 export interface SwitchNetworkProps {
   checkout: Checkout | undefined;
@@ -21,6 +22,31 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
   const [resultNetInfo, setResultNetInfo] = useState<NetworkInfo>();
   const [errorNetInfo, setErrorNetInfo] = useState<any>(null);
   const [loadingNetInfo, setLoadingNetInfo] = useState<boolean>(false);
+
+  const [availableNetworks, setAvailableNetworks] = useState<NetworkInfo[]>([]);
+
+  useEffect(() => {
+    async function getNetworks() {
+      if (!checkout) return [];
+
+      const result = await checkout.getNetworkAllowList({
+        type: NetworkFilterTypes.ALL,
+        exclude: [],
+      });
+
+      setAvailableNetworks(result.networks);
+
+      // reset state wehn checkout changes from environment switch
+      setResult(undefined);
+      setError(null);
+      setLoading(false);
+      setResultNetInfo(undefined);
+      setErrorNetInfo(null);
+      setLoadingNetInfo(false);
+    }
+
+    getNetworks();
+  }, [checkout]);
 
   async function switchNetwork(chainId: ChainId) {
     if (!checkout) {
@@ -88,26 +114,21 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
             gap: 'base.spacing.x4',
           }}
         >
-          <LoadingButton
-            onClick={() => switchNetwork(ChainId.ETHEREUM)}
-            loading={loading}
-          >
-            Switch to Ethereum
-          </LoadingButton>
-          <LoadingButton
-            onClick={() => switchNetwork(ChainId.GOERLI)}
-            loading={loading}
-          >
-            Switch to Goerli
-          </LoadingButton>
-          <LoadingButton
-            onClick={() => switchNetwork(ChainId.POLYGON)}
-            loading={loading}
-          >
-            Switch to Polygon
-          </LoadingButton>
+          {availableNetworks.map((networkInfo) => {
+            return (
+              <LoadingButton
+                key={networkInfo.name}
+                onClick={() => switchNetwork(networkInfo.chainId as ChainId)}
+                loading={loading}
+              >
+                Switch to {networkInfo.name}
+              </LoadingButton>
+            );
+          })}
         </Box>
-        {result && !error && <SuccessMessage>Connected.</SuccessMessage>}
+        {result && !error && (
+          <SuccessMessage>Connected to {result?.name}.</SuccessMessage>
+        )}
         {error && (
           <ErrorMessage>
             {error.message}. Check console logs for more details.

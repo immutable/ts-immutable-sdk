@@ -29,7 +29,7 @@ describe('the postRequestMessage function', () => {
 
     expect(postMessageMock).toHaveBeenCalledWith(
       postMessage,
-      IMX_WALLET_IFRAME_HOSTS.sandbox
+      IMX_WALLET_IFRAME_HOSTS.sandbox,
     );
   });
 });

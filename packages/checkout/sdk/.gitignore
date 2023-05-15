@@ -1,5 +1,5 @@
 node_modules
 .parcel-cache
 dist
-imtbl-checkout-sdk-web-*.*.*.tgz
+imtbl-checkout-sdk-*.*.*.tgz
 docs

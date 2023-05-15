@@ -14,13 +14,16 @@
     ]
   },
   "dependencies": {
-    "@imtbl/checkout-sdk-web": "0.0.0",
-    "@imtbl/checkout-ui-types": "0.0.0",
+    "@imtbl/checkout-sdk": "0.0.0",
+    "@imtbl/checkout-widgets": "0.0.0",
+    "@imtbl/config": "0.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.11.0"
   },
   "devDependencies": {
+    "@imtbl/checkout-sdk": "0.0.0",
+    "@imtbl/checkout-widgets": "0.0.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -36,9 +39,6 @@
   "scripts": {
     "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "eject": "react-scripts eject",
-    "reload:deps": "rm -rf package-lock.json && npm run reload:sdk && npm run reload:types && npm i",
-    "reload:sdk": "npm uninstall @imtbl/checkout-sdk-web --no-save",
-    "reload:types": "npm uninstall @imtbl/checkout-ui-types --no-save",
     "start": "GENERATE_SOURCEMAP=false react-scripts start",
     "test": "react-scripts test --passWithNoTests"
   }

@@ -92,7 +92,7 @@ describe('getWalletAllowList', () => {
         await getWalletAllowList({
           type: testcase.type,
           exclude: testcase.exclude,
-        })
+        }),
       ).toEqual({
         wallets: testcase.result,
       });

@@ -5,8 +5,8 @@ import {
   ERC20Amount,
   TokensApi,
   UsersApi,
+  EthSigner, EthConfiguration,
 } from '@imtbl/core-sdk';
-import { EthSigner } from '@imtbl/core-sdk';
 import { TransactionResponse } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -15,12 +15,12 @@ import {
   isRegisteredOnChain,
 } from '../registration';
 import { validateChain } from '../helpers';
-import { EthConfiguration } from '@imtbl/core-sdk';
 import { Signers } from '../types';
 import { ProviderConfiguration } from '../../config';
 
 interface ERC20TokenData {
   decimals: number;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   token_address: string;
 }
 
@@ -29,6 +29,61 @@ type DepositERC20Params = {
   deposit: ERC20Amount;
   config: ProviderConfiguration;
 };
+
+async function executeRegisterAndDepositERC20(
+  ethSigner: EthSigner,
+  quantizedAmount: BigNumber,
+  assetType: string,
+  starkPublicKey: string,
+  vaultId: number,
+  config: EthConfiguration,
+  usersApi: UsersApi,
+): Promise<TransactionResponse> {
+  const etherKey = await ethSigner.getAddress();
+  const coreContract = Contracts.Core.connect(
+    config.coreContractAddress,
+    ethSigner,
+  );
+  const signableResult = await getSignableRegistrationOnchain(
+    etherKey,
+    starkPublicKey,
+    usersApi,
+  );
+
+  const populatedTransaction = await coreContract.populateTransaction.registerAndDepositERC20(
+    etherKey,
+    starkPublicKey,
+    signableResult.operator_signature,
+    assetType,
+    vaultId,
+    quantizedAmount,
+  );
+
+  return ethSigner.sendTransaction(populatedTransaction);
+}
+
+async function executeDepositERC20(
+  ethSigner: EthSigner,
+  quantizedAmount: BigNumber,
+  assetType: string,
+  starkPublicKey: string,
+  vaultId: number,
+  config: EthConfiguration,
+): Promise<TransactionResponse> {
+  const coreContract = Contracts.Core.connect(
+    config.coreContractAddress,
+    ethSigner,
+  );
+
+  const populatedTransaction = await coreContract.populateTransaction.depositERC20(
+    starkPublicKey,
+    assetType,
+    vaultId,
+    quantizedAmount,
+  );
+
+  return ethSigner.sendTransaction(populatedTransaction);
+}
 
 export async function depositERC20({
   signers: { ethSigner },
@@ -46,6 +101,8 @@ export async function depositERC20({
 
   // Get decimals for this specific ERC20
   const token = await tokensApi.getToken({ address: deposit.tokenAddress });
+  // TODO: remove once fixed
+  // eslint-disable-next-line radix
   const decimals = parseInt(token.data.decimals);
 
   const data: ERC20TokenData = {
@@ -58,11 +115,11 @@ export async function depositERC20({
   // Approve whether an amount of token from an account can be spent by a third-party account
   const tokenContract = Contracts.IERC20.connect(
     deposit.tokenAddress,
-    ethSigner
+    ethSigner,
   );
   const approveTransaction = await tokenContract.populateTransaction.approve(
     ethConfiguration.coreContractAddress,
-    amount
+    amount,
   );
   await ethSigner.sendTransaction(approveTransaction);
 
@@ -100,7 +157,7 @@ export async function depositERC20({
   const isRegistered = await isRegisteredOnChain(
     starkPublicKey,
     ethSigner,
-    config
+    config,
   );
 
   if (!isRegistered) {
@@ -111,73 +168,15 @@ export async function depositERC20({
       starkPublicKey,
       vaultId,
       ethConfiguration,
-      usersApi
-    );
-  } else {
-    return executeDepositERC20(
-      ethSigner,
-      quantizedAmount,
-      assetType,
-      starkPublicKey,
-      vaultId,
-      ethConfiguration
+      usersApi,
     );
   }
-}
-
-async function executeDepositERC20(
-  ethSigner: EthSigner,
-  quantizedAmount: BigNumber,
-  assetType: string,
-  starkPublicKey: string,
-  vaultId: number,
-  config: EthConfiguration
-): Promise<TransactionResponse> {
-  const coreContract = Contracts.Core.connect(
-    config.coreContractAddress,
-    ethSigner
-  );
-
-  const populatedTransaction =
-    await coreContract.populateTransaction.depositERC20(
-      starkPublicKey,
-      assetType,
-      vaultId,
-      quantizedAmount
-    );
-
-  return ethSigner.sendTransaction(populatedTransaction);
-}
-
-async function executeRegisterAndDepositERC20(
-  ethSigner: EthSigner,
-  quantizedAmount: BigNumber,
-  assetType: string,
-  starkPublicKey: string,
-  vaultId: number,
-  config: EthConfiguration,
-  usersApi: UsersApi
-): Promise<TransactionResponse> {
-  const etherKey = await ethSigner.getAddress();
-  const coreContract = Contracts.Core.connect(
-    config.coreContractAddress,
-    ethSigner
-  );
-  const signableResult = await getSignableRegistrationOnchain(
-    etherKey,
+  return executeDepositERC20(
+    ethSigner,
+    quantizedAmount,
+    assetType,
     starkPublicKey,
-    usersApi
+    vaultId,
+    ethConfiguration,
   );
-
-  const populatedTransaction =
-    await coreContract.populateTransaction.registerAndDepositERC20(
-      etherKey,
-      starkPublicKey,
-      signableResult.operator_signature,
-      assetType,
-      vaultId,
-      quantizedAmount
-    );
-
-  return ethSigner.sendTransaction(populatedTransaction);
 }

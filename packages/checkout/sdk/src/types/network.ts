@@ -1,4 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
+// TODO: fix circular dependency
+// eslint-disable-next-line import/no-cycle
 import { TokenInfo } from './token';
 
 /**
@@ -6,9 +8,9 @@ import { TokenInfo } from './token';
  */
 export enum ChainId {
   ETHEREUM = 1,
-  GOERLI = 5,
-  POLYGON = 137,
-  // zkEVM = 'zkEVM'
+  SEPOLIA = 11155111,
+  IMTBL_ZKEVM_DEVNET = 13373,
+  IMTBL_ZKEVM_TESTNET = 13372, // to be used in prod config for testnet launch
 }
 
 /**
@@ -42,43 +44,81 @@ export type NetworkDetails = {
 };
 
 /**
- * Object mapping the list of supported networks with the corresponding network details.
+ * Type representing the mapping between ChainId and NetworkDetails
  */
-export const ChainIdNetworkMap = {
-  [ChainId.ETHEREUM]: {
-    chainIdHex: '0x1', // 1
-    chainName: 'Ethereum',
-    rpcUrls: ['https://mainnet.infura.io/v3/'],
-    nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
-      decimals: 18,
+export type NetworkMap = Map<ChainId, NetworkDetails>;
+
+/**
+ * Object mapping the list of supported production networks with the corresponding network details.
+ */
+export const PRODUCTION_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
+ChainId,
+NetworkDetails
+>([
+  [
+    ChainId.ETHEREUM,
+    {
+      chainIdHex: '0x1', // 1
+      chainName: 'Ethereum',
+      rpcUrls: ['https://mainnet.infura.io/v3/'],
+      nativeCurrency: {
+        name: 'Ethereum',
+        symbol: 'ETH',
+        decimals: 18,
+      },
+      blockExplorerUrls: ['https://etherscan.io/'],
     },
-    blockExplorerUrls: ['https://etherscan.io/'],
-  } as NetworkDetails,
-  [ChainId.GOERLI]: {
-    chainIdHex: '0x5', // 5
-    chainName: 'Goerli',
-    rpcUrls: ['https://goerli.infura.io/v3/'],
-    nativeCurrency: {
-      name: 'Goerli Eth',
-      symbol: 'ETH',
-      decimals: 18,
+  ],
+  [
+    ChainId.IMTBL_ZKEVM_TESTNET,
+    {
+      chainIdHex: '0x343C', // 13372
+      chainName: 'Immutable zkEVM Testnet',
+      rpcUrls: ['https://zkevm-rpc.dev.x.immutable.com'],
+      nativeCurrency: {
+        name: 'IMX',
+        symbol: 'IMX',
+        decimals: 18,
+      },
     },
-    blockExplorerUrls: ['https://goerli.etherscan.io/'],
-  },
-  [ChainId.POLYGON]: {
-    chainIdHex: '0x89', // 137
-    chainName: 'Polygon',
-    rpcUrls: ['https://polygon-rpc.com'],
-    nativeCurrency: {
-      name: 'MATIC',
-      symbol: 'MATIC',
-      decimals: 18,
+  ],
+]);
+
+/**
+ * Object mapping the list of supported sandbox networks with the corresponding network details.
+ */
+export const SANDBOX_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
+ChainId,
+NetworkDetails
+>([
+  [
+    ChainId.SEPOLIA,
+    {
+      chainIdHex: '0xaa36a7', // 11155111
+      chainName: 'Sepolia',
+      rpcUrls: ['https://sepolia.infura.io/v3/'],
+      nativeCurrency: {
+        name: 'Sep Eth',
+        symbol: 'ETH',
+        decimals: 18,
+      },
+      blockExplorerUrls: ['https://sepolia.etherscan.io/'],
     },
-    blockExplorerUrls: ['https://polygonscan.com/'],
-  },
-};
+  ],
+  [
+    ChainId.IMTBL_ZKEVM_DEVNET,
+    {
+      chainIdHex: '0x343D', // 13373
+      chainName: 'Immutable zkEVM Devnet',
+      rpcUrls: ['https://zkevm-rpc.dev.x.immutable.com/'],
+      nativeCurrency: {
+        name: 'IMX',
+        symbol: 'IMX',
+        decimals: 18,
+      },
+    },
+  ],
+]);
 
 /**
  * Interface representing the parameters for {@link Checkout.switchNetwork}.

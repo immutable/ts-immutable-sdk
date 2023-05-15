@@ -1,3 +1,2 @@
-import './components/craft-button';
-import './components/craft-connect';
-import './components/craft-passport';
+export * from './widgets';
+export * from './components';
