@@ -1,4 +1,5 @@
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
+import { Service } from 'typedi';
 import { HttpClient } from '../HttpClient';
 import { ItemDefinition } from '../types';
 
@@ -8,18 +9,10 @@ const defaultBaseURL = 'http://127.0.0.1:3031/item-definition';
 // const defaultBaseURL =
 //   'https://api.sandbox.games.immutable.com/item-definition/v1';
 
+@Service()
 export class ItemDefinitionService {
-  private httpClient: HttpClient;
-
-  constructor(
-    httpClientOrBaseUrl: HttpClient | string = defaultBaseURL,
-    defaultHeaders: Record<string, string> = {},
-  ) {
-    if (httpClientOrBaseUrl instanceof HttpClient) {
-      this.httpClient = httpClientOrBaseUrl;
-    } else {
-      this.httpClient = new HttpClient(httpClientOrBaseUrl, defaultHeaders);
-    }
+  constructor(private httpClient: HttpClient) {
+    this.httpClient.setBaseURL(defaultBaseURL);
   }
 
   public async getById(id: string): Promise<AxiosResponse<ItemDefinition>> {
