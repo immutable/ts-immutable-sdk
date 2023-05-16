@@ -21,7 +21,7 @@ import {
 import { Router } from './lib/router';
 import {
   getERC20Decimals,
-  validateAddress,
+  isValidAddress,
 } from './lib/utils';
 import { TransactionResponse } from './types';
 import { createSwapParameters } from './lib/transactionUtils/swap';
@@ -59,9 +59,9 @@ export class Exchange {
     slippagePercent: number,
     fromAddress: string,
   ) {
-    assert(validateAddress(fromAddress), new InvalidAddressError(ExchangeErrorMessage.INVALID_FROM));
-    assert(validateAddress(tokenInAddress), new InvalidAddressError(ExchangeErrorMessage.INVALID_TOKEN_IN));
-    assert(validateAddress(tokenOutAddress), new InvalidAddressError(ExchangeErrorMessage.INVALID_TOKEN_OUT));
+    assert(isValidAddress(fromAddress), new InvalidAddressError(ExchangeErrorMessage.INVALID_FROM));
+    assert(isValidAddress(tokenInAddress), new InvalidAddressError(ExchangeErrorMessage.INVALID_TOKEN_IN));
+    assert(isValidAddress(tokenOutAddress), new InvalidAddressError(ExchangeErrorMessage.INVALID_TOKEN_OUT));
     assert(tokenInAddress.toLocaleLowerCase() !== tokenOutAddress.toLocaleLowerCase(), new DuplicateAddressesError());
     assert(maxHops <= MAX_MAX_HOPS, new InvalidMaxHopsError(ExchangeErrorMessage.MAX_HOPS_TOO_HIGH));
     assert(maxHops >= MIN_MAX_HOPS, new InvalidMaxHopsError(ExchangeErrorMessage.MAX_HOPS_TOO_LOW));
