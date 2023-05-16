@@ -28,14 +28,8 @@ export const doesChainSupportEIP1559 = (fee: FeeData): fee is EIP1559FeeData => 
  * or null if no gas price is available
  */
 export const fetchGasPrice = async (provider: JsonRpcProvider): Promise<BigNumber | null> => {
-  let feeData: FeeData;
-  try {
-    feeData = await provider.getFeeData();
-    if (!feeData) {
-      return null;
-    }
-  } catch (e) {
-    // unable to retrieve gas fee data
+  const feeData = await provider.getFeeData().catch(() => null);
+  if (!feeData) {
     return null;
   }
 
