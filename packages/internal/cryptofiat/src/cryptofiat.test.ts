@@ -195,6 +195,7 @@ describe('CryptoFiat', () => {
     );
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       2,
+      // eslint-disable-next-line max-len
       'https://pro-api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&x_cg_pro_api_key=fake-api',
     );
     expect(result.btc).toEqual({ usd: 50000 });

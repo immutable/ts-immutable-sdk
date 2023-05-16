@@ -83,7 +83,7 @@ jobs:
         run: yarn install --immutable
 
       - name: Lint
-        run: yarn lint:ci
+        run: yarn lint
 
       - name: Check Single Package Version Policy
         run: yarn syncpack:check
