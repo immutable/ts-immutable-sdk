@@ -5,5 +5,8 @@
   "parserOptions": {
     "project": "./tsconfig.json",
     "tsconfigRootDir": "."
+  },
+  "rules": {
+    "max-len": ["error", { "comments": 140, "code": 120 }]
   }
 }
