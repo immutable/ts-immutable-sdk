@@ -1,6 +1,6 @@
 # Immutable DEX sample application
 
-This sample app demonstrates retrieving a swap, displaying swap details to the user and executing the swap transaction using the Metamask browser extension.
+This sample app demonstrates retrieving a swap transaction, displaying swap details to the user and executing the swap transaction using the Metamask browser extension.
 
 ## Getting Started
 
