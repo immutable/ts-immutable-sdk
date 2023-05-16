@@ -20,36 +20,33 @@ import {
 import { Multicall__factory } from '../contracts/types';
 import { DEFAULT_GAS_QUOTE } from './getQuotesForRoutes';
 
-const slot0 = 'slot0';
 const token0 = 'token0';
 const POOL_INIT_CODE_HASH = '0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54';
 
 jest.mock('@ethersproject/contracts');
 
-describe('callMultipleContractSingleData', () => {
+describe('multicallSingleCallDataMultipleContracts', () => {
   let mockedContract: jest.Mock;
   beforeEach(() => {
-    mockedContract = (Contract as unknown as jest.Mock).mockImplementation(
+    mockedContract = (Contract as unknown as jest.Mock).mockImplementationOnce(
       () => ({
         callStatic: {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          multicall: () => new Promise((resolve, reject) => {
-            resolve({
-              returnData: [
-                {
-                  returnData: ethers.utils.defaultAbiCoder.encode(
-                    ['address'],
-                    [WETH_TEST_CHAIN.address],
-                  ),
-                },
-                {
-                  returnData: ethers.utils.defaultAbiCoder.encode(
-                    ['address'],
-                    [WETH_TEST_CHAIN.address],
-                  ),
-                },
-              ],
-            });
+          multicall: async () => ({
+            returnData: [
+              {
+                returnData: ethers.utils.defaultAbiCoder.encode(
+                  ['address'],
+                  [WETH_TEST_CHAIN.address],
+                ),
+              },
+              {
+                returnData: ethers.utils.defaultAbiCoder.encode(
+                  ['address'],
+                  [WETH_TEST_CHAIN.address],
+                ),
+              },
+            ],
           }),
         },
       }),
@@ -118,59 +115,9 @@ describe('callMultipleContractSingleData', () => {
       expect(mockedContract).toBeCalledTimes(1);
     });
   });
-
-  describe('Spot price calculation PoC', () => {
-    it.skip('calculates', async () => {
-      const coreFactoryV3 = TEST_V3_CORE_FACTORY_ADDRESS;
-      const addr: string = getCreate2Address(
-        coreFactoryV3,
-        keccak256(
-          ['bytes'],
-          [
-            defaultAbiCoder.encode(
-              ['address', 'address', 'uint24'],
-              [WETH_TEST_CHAIN.address, IMX_TEST_CHAIN.address, '10000'],
-            ),
-          ],
-        ),
-        POOL_INIT_CODE_HASH,
-      );
-      const addresses = [addr];
-      const provider = new providers.JsonRpcProvider(
-        TEST_RPC_URL,
-        TEST_CHAIN_ID,
-      );
-      const multicallContract = Multicall__factory.connect(
-        TEST_MULTICALL_ADDRESS,
-        provider,
-      );
-
-      const result = await multicallSingleCallDataMultipleContracts(
-        multicallContract,
-        slot0,
-        addresses,
-      );
-
-      const encodedSlot0 = result.returnData[0].returnData;
-      const decodedSlot0 = ethers.utils.defaultAbiCoder.decode(
-        ['uint160', 'int24', 'uint16', 'uint16', 'uint16', 'uint8', 'bool'],
-        encodedSlot0,
-      );
-
-      // 1<<96
-      const sqrtPriceX96 = ethers.BigNumber.from(decodedSlot0[0]);
-      const two = ethers.BigNumber.from('2');
-      const oneNineTwo = ethers.BigNumber.from('192');
-      const priceX96 = sqrtPriceX96.mul(sqrtPriceX96);
-      const price = priceX96.div(two.pow(oneNineTwo));
-      // TODO: Should this log be removed?
-      // eslint-disable-next-line no-console
-      console.log(price.toString());
-    });
-  });
 });
 
-describe('callSingleContractWithCallData', () => {
+describe('multicallMultipleCallDataSingContract', () => {
   let mockedContract: jest.Mock;
   beforeEach(() => {
     mockedContract = (Contract as unknown as jest.Mock).mockImplementation(
@@ -178,7 +125,7 @@ describe('callSingleContractWithCallData', () => {
         callStatic: {
           // TODO fix
           // eslint-disable-next-line no-promise-executor-return, @typescript-eslint/no-unused-vars
-          multicall: () => new Promise((resolve, reject) => resolve({
+          multicall: async () => ({
             returnData: [
               {
                 returnData: ethers.utils.defaultAbiCoder.encode(
@@ -186,16 +133,24 @@ describe('callSingleContractWithCallData', () => {
                   [WETH_TEST_CHAIN.address],
                 ),
               },
+              {
+                returnData: ethers.utils.defaultAbiCoder.encode(
+                  ['address'],
+                  [WETH_TEST_CHAIN.address],
+                ),
+              },
             ],
-          })),
+          }),
         },
       }),
     );
   });
 
-  describe('when something happens', () => {
-    it('has this result', async () => {
+  describe('when multiple call data', () => {
+    it('returns the result of each function call', async () => {
       const testCallData = [
+        // eslint-disable-next-line max-len
+        '0xc6a5026a0000000000000000000000004f062a3eaec3730560ab89b5ce5ac0ab2c5517ae00000000000000000000000093733225ccc07ba02b1449aa3379418ddc37f6ec000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000000000000000000000027100000000000000000000000000000000000000000000000000000000000000000',
         // eslint-disable-next-line max-len
         '0xc6a5026a0000000000000000000000004f062a3eaec3730560ab89b5ce5ac0ab2c5517ae00000000000000000000000093733225ccc07ba02b1449aa3379418ddc37f6ec000000000000000000000000000000000000000000000000002386f26fc1000000000000000000000000000000000000000000000000000000000000000027100000000000000000000000000000000000000000000000000000000000000000',
       ];
@@ -229,7 +184,8 @@ describe('callSingleContractWithCallData', () => {
         addrToken0,
         { gasRequired: DEFAULT_GAS_QUOTE },
       );
-      expect(result.returnData.length).toBe(1);
+
+      expect(result.returnData.length).toBe(2);
       expect(mockedContract).toBeCalledTimes(1);
     });
   });
