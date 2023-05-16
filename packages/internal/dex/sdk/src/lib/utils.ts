@@ -45,8 +45,9 @@ export async function getERC20Decimals(
       decimalsResult,
       16,
     );
-  } catch (e: any) {
-    throw new ProviderCallError(`${ExchangeErrorMessage.FAILED_TO_GET_ERC20_DECIMALS}: ${e.message}`);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Unknown Error';
+    throw new ProviderCallError(`${ExchangeErrorMessage.FAILED_TO_GET_ERC20_DECIMALS}: ${message}`);
   }
 }
 

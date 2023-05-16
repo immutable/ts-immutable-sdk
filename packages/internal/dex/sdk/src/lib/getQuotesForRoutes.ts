@@ -37,8 +37,9 @@ export async function getQuotesForRoutes(
       quoterContractAddress,
       { gasRequired: DEFAULT_GAS_QUOTE },
     );
-  } catch (e: any) {
-    throw new ProviderCallError(`${ExchangeErrorMessage.FAILED_MULTICALL}: ${e.message}`);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Unknown Error';
+    throw new ProviderCallError(`${ExchangeErrorMessage.FAILED_MULTICALL}: ${message}`);
   }
 
   const decodedQuoteResults: QuoteResult[] = [];
@@ -58,21 +59,24 @@ export async function getQuotesForRoutes(
       continue;
     }
 
+    let decodedQuoteResult: ethers.utils.Result | undefined;
     try {
-      const decodedQuoteResult = ethers.utils.defaultAbiCoder.decode(
+      decodedQuoteResult = ethers.utils.defaultAbiCoder.decode(
         returnTypes,
         quoteResults.returnData[i].returnData,
       );
+    } catch {
+      // Failed to get the quote for this particular route
+      // Other quotes for routes may still succeed, so do nothing
+      // and continue processing
+    }
 
+    if (decodedQuoteResult) {
       decodedQuoteResults.push({
         route: routes[i],
         // The 0th element in each decoded data is going to be the amountOut or amountIn.
         quoteAmount: decodedQuoteResult[amountIndex],
       });
-    } catch {
-      // Failed to get the quote for this particular route
-      // Other quotes for routes may still succeed, so do nothing
-      // and continue processing
     }
   }
 

@@ -54,8 +54,9 @@ export const fetchValidPools = async (
         poolAddresses,
       ),
     ]);
-  } catch (e: any) {
-    throw new ProviderCallError(`${ExchangeErrorMessage.FAILED_MULTICALL}: ${e.message}`);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Unknown Error';
+    throw new ProviderCallError(`${ExchangeErrorMessage.FAILED_MULTICALL}: ${message}`);
   }
 
   const slot0s = slot0Results.returnData;
