@@ -24,6 +24,7 @@
     "@imtbl/config": "0.0.0",
     "@imtbl/cryptofiat": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
+    "@imtbl/orderbook": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/provider": "0.0.0",
     "@rollup/plugin-commonjs": "^24.0.1",
@@ -61,6 +62,10 @@
     "./passport": {
       "types": "./dist/passport.d.ts",
       "import": "./dist/passport.js"
+    },
+    "./orderbook": {
+      "types": "./dist/orderbook.d.ts",
+      "import": "./dist/orderbook.js"
     },
     "./provider": {
       "types": "./dist/provider.d.ts",
