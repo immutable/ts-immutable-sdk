@@ -103,7 +103,7 @@ export function SwapCoins({
           justifyContent: 'space-between',
         }}
       >
-        <Box sx={{ paddingX: 'base.spacing.x1' }}>
+        <Box sx={{ paddingX: 'base.spacing.x4' }}>
           <Heading
             size="small"
             weight="regular"

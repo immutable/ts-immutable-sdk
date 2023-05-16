@@ -122,6 +122,7 @@ export function WalletBalances() {
           display: 'flex',
           flexDirection: 'column',
           rowGap: 'base.spacing.x2',
+          paddingX: 'base.spacing.x2',
         }}
       >
         <Box sx={WALLET_BALANCE_CONTAINER_STYLE}>
