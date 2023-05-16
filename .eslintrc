@@ -72,7 +72,10 @@
     "import/prefer-default-export": ["off"],
     "no-plusplus": ["off"],
     "max-classes-per-file": ["off"],
-    "max-len": ["error", { "comments": 120, "code": 120 }],
+    "max-len": [
+      "error",
+      { "code": 120, "ignoreComments": true, "ignoreTrailingComments": true }
+    ],
     "no-restricted-syntax": [
       "error",
       "ForInStatement",
