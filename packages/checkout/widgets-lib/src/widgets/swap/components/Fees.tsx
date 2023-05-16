@@ -1,5 +1,7 @@
 import { Body, Box, ButtCon } from '@biom3/react';
 import { feeBoxStyles, feeContainerStyles } from './FeeStyles';
+import { text } from '../../../resources/text/textConfig';
+import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 
 export interface FeeProps {
   fees: string;
@@ -9,6 +11,10 @@ export interface FeeProps {
 
 export function Fees(feeProps: FeeProps) {
   const { fees, fiatPrice, tokenSymbol } = feeProps;
+  const {
+    fees: { title },
+    content,
+  } = text.views[SwapWidgetViews.SWAP];
 
   return (
     <Box sx={feeContainerStyles}>
@@ -27,24 +33,19 @@ export function Fees(feeProps: FeeProps) {
           iconVariant="bold"
         />
         <Body size="medium" weight="regular">
-          Fees total
+          {title}
         </Body>
       </Box>
       <Box sx={feeBoxStyles}>
         <Body size="medium" weight="regular" sx={{ textAlign: 'right' }}>
-          ≈
-          {' '}
-          {tokenSymbol.toUpperCase()}
-          {' '}
-          {fees}
+          {`≈ ${tokenSymbol.toUpperCase()} ${fees}`}
         </Body>
         <Body
           size="xSmall"
           weight="regular"
           sx={{ color: 'base.color.text.secondary' }}
         >
-          Approx USD $
-          {fiatPrice}
+          {`${content.fiatPricePrefix} ${fiatPrice}`}
         </Body>
       </Box>
     </Box>

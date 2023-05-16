@@ -54,15 +54,22 @@ export const text = {
       },
       content: {
         title: 'What would you like to swap?',
+        fiatPricePrefix: 'Approx USD',
+        availableBalancePrefix: 'Available',
       },
       swapForm: {
         from: {
           label: 'From',
+          inputPlaceholder: '0',
         },
         to: {
           label: 'To',
+          inputPlaceholder: '0',
         },
         buttonText: 'Swap',
+      },
+      fees: {
+        title: 'Fees total',
       },
     },
   },

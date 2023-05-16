@@ -13,7 +13,7 @@ export interface SelectOption {
 }
 
 interface SelectFormProps {
-  selectId: string;
+  testId: string;
   options: SelectOption[];
   textAlign?: 'left' | 'right';
   subtext?: string;
@@ -23,7 +23,7 @@ interface SelectFormProps {
 }
 
 export function SelectForm({
-  selectId,
+  testId,
   options,
   subtext,
   onSelectChange,
@@ -33,7 +33,7 @@ export function SelectForm({
     // <FormControlWrapper textAlign={textAlign ?? 'left'}>
     <Box>
       <Select
-        testId={selectId}
+        testId={testId}
         size="large"
         defaultLabel="Select coin"
         onSelectChange={onSelectChange}
@@ -43,13 +43,13 @@ export function SelectForm({
           <Option
             key={option.id}
             optionKey={option.id}
-            testId={`${selectId}-${option.id}`}
+            testId={`${testId}-${option.id}`}
           >
             {!option.icon && (
-            <Option.Icon icon={option.icon ?? 'Coins'} variant="bold" />
+              <Option.Icon icon={option.icon ?? 'Coins'} variant="bold" />
             )}
             {option.icon && (
-            <Option.FramedImage imageUrl={option.icon} circularFrame />
+              <Option.FramedImage imageUrl={option.icon} circularFrame />
             )}
             <Option.Label>{option.label}</Option.Label>
           </Option>

@@ -100,10 +100,10 @@ describe('SwapWidget tests', () => {
       />,
     );
 
-    cySmartGet('select-from__target').should('be.visible');
-    cySmartGet('text-input-from').should('be.visible');
-    cySmartGet('select-to__target').should('be.visible');
-    cySmartGet('text-input-to').should('be.visible');
+    cySmartGet('fromTokenInputs-select__target').should('be.visible');
+    cySmartGet('fromTokenInputs-text').should('be.visible');
+    cySmartGet('toTokenInputs-select__target').should('be.visible');
+    cySmartGet('toTokenInputs-text').should('be.visible');
   });
 
   it('should show select options', () => {
@@ -118,10 +118,10 @@ describe('SwapWidget tests', () => {
       />,
     );
 
-    cySmartGet('select-from__target').should('be.visible');
-    cySmartGet('text-input-from').should('be.visible');
-    cySmartGet('select-to__target').should('be.visible');
-    cySmartGet('text-input-to').should('be.visible');
+    cySmartGet('fromTokenInputs-select__target').should('be.visible');
+    cySmartGet('fromTokenInputs-text').should('be.visible');
+    cySmartGet('toTokenInputs-select__target').should('be.visible');
+    cySmartGet('toTokenInputs-text').should('be.visible');
   });
 
   // todo: implement below cypress tests in the slice tickets

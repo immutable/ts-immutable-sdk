@@ -91,43 +91,47 @@ describe('SwapCoins tests', () => {
   });
 
   it('should only allow valid number up to 6 decimal places in from field', () => {
-    cySmartGet('text-input-from__input').focus().type('1234567');
-    cySmartGet('text-input-from__input').should('have.value', '1234567');
-    cySmartGet('text-input-from__input').clear();
-    cySmartGet('text-input-from__input').focus().type('12.123e4');
-    cySmartGet('text-input-from__input').should('have.value', '12.1234');
-    cySmartGet('text-input-from__input').clear();
-    cySmartGet('text-input-from__input').focus().type('12.1234567');
-    cySmartGet('text-input-from__input').should('have.value', '12.123456');
+    cySmartGet('fromTokenInputs-text__input').focus().type('1234567');
+    cySmartGet('fromTokenInputs-text__input').should('have.value', '1234567');
+    cySmartGet('fromTokenInputs-text__input').clear();
+    cySmartGet('fromTokenInputs-text__input').focus().type('12.123e4');
+    cySmartGet('fromTokenInputs-text__input').should('have.value', '12.1234');
+    cySmartGet('fromTokenInputs-text__input').clear();
+    cySmartGet('fromTokenInputs-text__input').focus().type('12.1234567');
+    cySmartGet('fromTokenInputs-text__input').should('have.value', '12.123456');
   });
 
   it('should only allow valid number up to 6 decimal places in to field', () => {
-    cySmartGet('text-input-to__input').focus().type('1234567');
-    cySmartGet('text-input-to__input').should('have.value', '1234567');
-    cySmartGet('text-input-to__input').clear();
+    cySmartGet('toTokenInputs-text__input').focus().type('1234567');
+    cySmartGet('toTokenInputs-text__input').should('have.value', '1234567');
+    cySmartGet('toTokenInputs-text__input').clear();
 
-    cySmartGet('text-input-to__input').focus().type('12.123e4');
-    cySmartGet('text-input-to__input').should('have.value', '12.1234');
-    cySmartGet('text-input-to__input').clear();
+    cySmartGet('toTokenInputs-text__input').focus().type('12.123e4');
+    cySmartGet('toTokenInputs-text__input').should('have.value', '12.1234');
+    cySmartGet('toTokenInputs-text__input').clear();
 
-    cySmartGet('text-input-to__input').focus().type('12.1234567');
-    cySmartGet('text-input-to__input').should('have.value', '12.123456');
+    cySmartGet('toTokenInputs-text__input').focus().type('12.1234567');
+    cySmartGet('toTokenInputs-text__input').should('have.value', '12.123456');
   });
 
   it('should show token balances list in from select', () => {
-    cySmartGet('select-from__target').click();
-    cySmartGet('select-from-IMX-IMX').should('be.visible');
-    cySmartGet('select-from-ETH-Ethereum').should('not.exist');
-    cySmartGet('select-from-IMX-IMX').click();
-    cySmartGet('select-from__target').find('span').should('have.text', 'IMX');
+    cySmartGet('fromTokenInputs-select__target').click();
+    cySmartGet('fromTokenInputs-select-IMX-IMX').should('be.visible');
+    cySmartGet('fromTokenInputs-select-ETH-Ethereum').should('not.exist');
+    cySmartGet('fromTokenInputs-select-IMX-IMX').click();
+    cySmartGet('fromTokenInputs-select__target')
+      .find('span')
+      .should('have.text', 'IMX');
   });
 
   it('should show allowed tokens list in to select', () => {
-    cySmartGet('select-to__target').click();
-    cySmartGet('select-to-ETH-Ethereum').should('be.visible');
-    cySmartGet('select-to-IMX-IMX').should('be.visible');
-    cySmartGet('select-to-ETH-Ethereum').click();
-    cySmartGet('select-to__target').find('span').should('have.text', 'ETH');
-    cySmartGet('select-to-IMX-IMX').should('not.exist');
+    cySmartGet('toTokenInputs-select__target').click();
+    cySmartGet('toTokenInputs-select-ETH-Ethereum').should('be.visible');
+    cySmartGet('toTokenInputs-select-IMX-IMX').should('be.visible');
+    cySmartGet('toTokenInputs-select-ETH-Ethereum').click();
+    cySmartGet('toTokenInputs-select__target')
+      .find('span')
+      .should('have.text', 'ETH');
+    cySmartGet('toTokenInputs-select-IMX-IMX').should('not.exist');
   });
 });

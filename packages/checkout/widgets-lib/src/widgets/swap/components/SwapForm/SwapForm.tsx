@@ -18,12 +18,10 @@ import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContex
 import { SwapContext } from '../../context/swap-context/SwapContext';
 import { SelectOption } from '../../../../components/FormComponents/SelectForm/SelectForm';
 
-const SWAP_TEXT_INPUT_PLACEHOLDER = '0';
-
 export function SwapForm() {
   const { swapState } = useContext(SwapContext);
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
-  const { swapForm } = text.views[SwapWidgetViews.SWAP];
+  const { content, swapForm } = text.views[SwapWidgetViews.SWAP];
   const { swapFromAmount, swapToAmount } = swapFormState;
   const { tokenBalances, allowedTokens } = swapState;
 
@@ -51,8 +49,8 @@ export function SwapForm() {
 
   // extract these to context or calculate on render
   const fromToConversionText = '1 WETH ≈ 12.6 GOG'; // TODO: to calculate when dex integrated
-  const fromFiatPriceText = 'Approx USD $20.40';
-  const availableFromBalanceSubtext = 'Available 0.123';
+  const fromFiatPriceText = `${content.fiatPricePrefix} $20.40`; // todo: update with actual value
+  const availableFromBalanceSubtext = `${content.availableBalancePrefix} 0.123`; // todo: update with actual values
 
   const handleFromTokenChange = useCallback(
     (value: OptionKey) => {
@@ -97,13 +95,12 @@ export function SwapForm() {
           {swapForm.from.label}
         </Heading>
         <SelectInput
-          selectId="select-from"
-          textInputId="text-input-from"
+          testId="fromTokenInputs"
           options={fromTokensOptions}
           selectSubtext={availableFromBalanceSubtext}
           selectTextAlign="left"
           textInputValue={swapFromAmount}
-          textInputPlaceholder={SWAP_TEXT_INPUT_PLACEHOLDER}
+          textInputPlaceholder={swapForm.from.inputPlaceholder}
           textInputSubtext={fromFiatPriceText}
           textInputTextAlign="right"
           textInputValidator={amountInputValidation}
@@ -139,11 +136,10 @@ export function SwapForm() {
           </Body>
         </Box>
         <SelectInput
-          selectId="select-to"
-          textInputId="text-input-to"
+          testId="toTokenInputs"
           options={toTokenOptions}
           textInputValue={swapToAmount}
-          textInputPlaceholder={SWAP_TEXT_INPUT_PLACEHOLDER}
+          textInputPlaceholder={swapForm.to.inputPlaceholder}
           textInputTextAlign="right"
           textInputValidator={amountInputValidation}
           // eslint-disable-next-line no-console
