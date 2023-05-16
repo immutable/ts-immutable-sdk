@@ -7,15 +7,15 @@ import {
   OverflowPopoverMenu,
   PriceDisplay,
 } from '@biom3/react';
+import { useContext, useEffect, useState } from 'react';
 import {
-  BalanceItemContainerStyle,
-  BalanceItemCoinBoxStyle,
-  BalanceItemPriceBoxStyle,
+  balanceItemContainerStyle,
+  balanceItemCoinBoxStyle,
+  balanceItemPriceBoxStyle,
   ShowMenuItem,
 } from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';
-import { useContext, useEffect, useState } from 'react';
 import {
   sendBridgeCoinsEvent,
   sendOnRampCoinsEvent,
@@ -26,7 +26,7 @@ import { L1Network, zkEVMNetwork } from '../../../../lib/networkUtils';
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
 }
-export const BalanceItem = (props: BalanceItemProps) => {
+export function BalanceItem(props: BalanceItemProps) {
   const { balanceInfo } = props;
   const fiatAmount = `≈ USD $${balanceInfo.fiatAmount ?? '-.--'}`;
   const { walletState } = useContext(WalletContext);
@@ -38,35 +38,32 @@ export const BalanceItem = (props: BalanceItemProps) => {
   useEffect(() => {
     if (!network || !supportedTopUps || !checkout) return;
 
-    const enableAddCoin =
-      network.chainId === zkEVMNetwork(checkout.config.environment) &&
-      (supportedTopUps?.isOnRampEnabled ?? true);
+    const enableAddCoin = network.chainId === zkEVMNetwork(checkout.config.environment)
+      && (supportedTopUps?.isOnRampEnabled ?? true);
     setIsOnRampEnabled(enableAddCoin);
 
-    const enableMoveCoin =
-      network.chainId === L1Network(checkout.config.environment) &&
-      (supportedTopUps?.isBridgeEnabled ?? true);
+    const enableMoveCoin = network.chainId === L1Network(checkout.config.environment)
+      && (supportedTopUps?.isBridgeEnabled ?? true);
     setIsBridgeEnabled(enableMoveCoin);
 
-    const enableSwapCoin =
-      network.chainId === zkEVMNetwork(checkout.config.environment) &&
-      (supportedTopUps?.isSwapEnabled ?? true);
+    const enableSwapCoin = network.chainId === zkEVMNetwork(checkout.config.environment)
+      && (supportedTopUps?.isSwapEnabled ?? true);
     setIsSwapEnabled(enableSwapCoin);
   }, [network, supportedTopUps, checkout]);
 
   return (
     <Box
       testId={`balance-item-${balanceInfo.symbol}`}
-      sx={BalanceItemContainerStyle}
+      sx={balanceItemContainerStyle}
     >
-      <Box sx={BalanceItemCoinBoxStyle}>
+      <Box sx={balanceItemCoinBoxStyle}>
         <Icon icon="Coins" sx={{ width: 'base.icon.size.300' }} />
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Body>{balanceInfo.symbol}</Body>
           <Body size="small">{balanceInfo.description}</Body>
         </Box>
       </Box>
-      <Box sx={BalanceItemPriceBoxStyle}>
+      <Box sx={balanceItemPriceBoxStyle}>
         <PriceDisplay
           testId={`balance-item-${balanceInfo.symbol}`}
           use={Heading}
@@ -86,7 +83,7 @@ export const BalanceItem = (props: BalanceItemProps) => {
                 });
               }}
             >
-              <MenuItem.Icon icon="Add"></MenuItem.Icon>
+              <MenuItem.Icon icon="Add" />
               <MenuItem.Label>{`Add ${balanceInfo.symbol}`}</MenuItem.Label>
             </MenuItem>
             <MenuItem
@@ -100,7 +97,7 @@ export const BalanceItem = (props: BalanceItemProps) => {
                 });
               }}
             >
-              <MenuItem.Icon icon="Exchange"></MenuItem.Icon>
+              <MenuItem.Icon icon="Exchange" />
               <MenuItem.Label>{`Swap ${balanceInfo.symbol}`}</MenuItem.Label>
             </MenuItem>
             <MenuItem
@@ -114,7 +111,7 @@ export const BalanceItem = (props: BalanceItemProps) => {
                 });
               }}
             >
-              <MenuItem.Icon icon="Minting"></MenuItem.Icon>
+              <MenuItem.Icon icon="Minting" />
               <MenuItem.Label>{`Move ${balanceInfo.symbol}`}</MenuItem.Label>
             </MenuItem>
           </OverflowPopoverMenu>
@@ -122,4 +119,4 @@ export const BalanceItem = (props: BalanceItemProps) => {
       </Box>
     </Box>
   );
-};
+}

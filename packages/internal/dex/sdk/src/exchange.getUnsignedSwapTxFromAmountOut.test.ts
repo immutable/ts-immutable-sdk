@@ -2,7 +2,9 @@ import { describe, it } from '@jest/globals';
 import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { ExchangeConfiguration } from 'config';
-import { ExchangeErrorTypes } from 'errors';
+import {
+  InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError,
+} from 'errors';
 import { Exchange } from './exchange';
 import {
   decodeMulticallData,
@@ -11,7 +13,6 @@ import {
   TEST_PERIPHERY_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
 } from './utils/testUtils';
-import * as utils from './lib/utils';
 import { Router } from './lib';
 
 jest.mock('./lib/router');
@@ -29,28 +30,21 @@ const HIGHER_SLIPPAGE = 0.2; // 2/1000 = 0.002 = 0.2%
 
 describe('getUnsignedSwapTxFromAmountOut', () => {
   describe('When no route found', () => {
-    it('Returns NO_ROUTE_FOUND', async () => {
+    it('throws NoRoutesAvailableError', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
       (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
-        findOptimalRoute: () => ({
-          success: false,
-          trade: undefined,
-        }),
+        findOptimalRoute: jest.fn().mockRejectedValue(new NoRoutesAvailableError()),
       }));
 
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
-      const tx = await exchange.getUnsignedSwapTxFromAmountOut(
+      await expect(exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountOut,
-      );
-
-      expect(tx.info).toBe(undefined);
-      expect(tx.transaction).toBe(undefined);
-      expect(tx.success).toBe(false);
+        params.amountIn,
+      )).rejects.toThrow(new NoRoutesAvailableError());
     });
   });
 
@@ -109,14 +103,13 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
-      const { info, success } = await exchange.getUnsignedSwapTxFromAmountOut(
+      const { info } = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
         params.inputToken,
         params.outputToken,
         params.amountIn,
       );
 
-      expect(success).toBe(true);
       expect(info).not.toBe(undefined);
       expect(info?.quote?.token.address).toEqual(params.inputToken);
       expect(info?.slippage).toBe(0.1);
@@ -181,7 +174,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
-      const { info, success } = await exchange.getUnsignedSwapTxFromAmountOut(
+      const { info } = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
         params.inputToken,
         params.outputToken,
@@ -189,7 +182,6 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         HIGHER_SLIPPAGE,
       );
 
-      expect(success).toBe(true);
       expect(info).not.toBe(undefined);
       expect(info?.quote?.token.address).toEqual(params.inputToken);
       expect(info?.slippage).toBe(0.2);
@@ -259,7 +251,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(
-        new utils.InvalidAddress('Address is not valid: 0x0123abcdef'),
+        new InvalidAddressError('Error: invalid from address'),
       );
 
       await expect(
@@ -270,7 +262,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           params.amountOut,
           HIGHER_SLIPPAGE,
         ),
-      ).rejects.toThrow(utils.InvalidAddress);
+      ).rejects.toThrow(new InvalidAddressError('Error: invalid token in address'));
 
       await expect(
         exchange.getUnsignedSwapTxFromAmountOut(
@@ -280,7 +272,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           params.amountOut,
           HIGHER_SLIPPAGE,
         ),
-      ).rejects.toThrow(utils.InvalidAddress);
+      ).rejects.toThrow(new InvalidAddressError('Error: invalid token out address'));
     });
   });
 
@@ -301,7 +293,28 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           HIGHER_SLIPPAGE,
           11,
         ),
-      ).rejects.toThrow();
+      ).rejects.toThrow(new InvalidMaxHopsError('Error: max hops must be less than or equal to 10'));
+    });
+  });
+
+  describe('Pass in maxHops < 1', () => {
+    it('throws', async () => {
+      const params = setupSwapTxTest(HIGHER_SLIPPAGE);
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange(configuration);
+
+      await expect(
+        exchange.getUnsignedSwapTxFromAmountOut(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          params.amountOut,
+          HIGHER_SLIPPAGE,
+          0,
+        ),
+      ).rejects.toThrow(new InvalidMaxHopsError('Error: max hops must be greater than or equal to 1'));
     });
   });
 
@@ -322,7 +335,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           100,
           2,
         ),
-      ).rejects.toThrow(ExchangeErrorTypes.INVALID_SLIPPAGE);
+      ).rejects.toThrow(new InvalidSlippageError('Error: slippage percent must be less than or equal to 50'));
     });
   });
 
@@ -343,7 +356,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           -5,
           2,
         ),
-      ).rejects.toThrow(ExchangeErrorTypes.INVALID_SLIPPAGE);
+      ).rejects.toThrow(new InvalidSlippageError('Error: slippage percent must be greater than or equal to 0'));
     });
   });
 });

@@ -6,17 +6,23 @@ export interface WalletProps {
   onWalletClick: (providerPreference: ConnectionProviders) => void;
   wallet: WalletInfo;
 }
-export const WalletItem = (props: WalletProps) => {
+export function WalletItem(props: WalletProps) {
   const { wallet, onWalletClick } = props;
   const { wallets } = text;
+  // TODO: Should this this be removed?
+  // eslint-disable-next-line no-console
   console.log(wallets[wallet.connectionProvider]);
 
   const walletText = wallets[wallet.connectionProvider];
-  const Logo = {
+  const logo = {
     [ConnectionProviders.METAMASK]: 'MetaMaskSymbol',
   };
 
   return (
+    // TODO: Fragments should contain more than one child - otherwise, there’s no need for a Fragment at all.
+    // Consider checking !walletText and rendering a callback component instead, then it would make sense
+    // to use a Fragment.
+    // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       {walletText && (
         <MenuItem
@@ -26,7 +32,7 @@ export const WalletItem = (props: WalletProps) => {
           onClick={() => onWalletClick(wallet.connectionProvider)}
         >
           <MenuItem.FramedLogo
-            logo={Logo[wallet.connectionProvider] as any}
+            logo={logo[wallet.connectionProvider] as any}
             sx={{
               width: 'base.icon.size.500',
               backgroundColor: 'base.color.translucent.container.200',
@@ -36,7 +42,7 @@ export const WalletItem = (props: WalletProps) => {
           <MenuItem.Label size="medium">
             {wallets[wallet.connectionProvider].heading}
           </MenuItem.Label>
-          <MenuItem.IntentIcon></MenuItem.IntentIcon>
+          <MenuItem.IntentIcon />
           <MenuItem.Caption>
             {wallets[wallet.connectionProvider].description}
           </MenuItem.Caption>
@@ -44,4 +50,4 @@ export const WalletItem = (props: WalletProps) => {
       )}
     </>
   );
-};
+}

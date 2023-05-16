@@ -1,12 +1,13 @@
 import { Box, Logo } from '@biom3/react';
-import { FooterLogoStyles } from './FooterStyles';
+import { footerLogoStyles } from './FooterStyles';
+
 export interface FooterLogoProps {
   hideLogo?: boolean;
 }
-export const FooterLogo = ({ hideLogo }: FooterLogoProps) => {
+export function FooterLogo({ hideLogo }: FooterLogoProps) {
   const showLogo = !hideLogo;
   return (
-    <Box testId="footer-logo-container" sx={FooterLogoStyles}>
+    <Box testId="footer-logo-container" sx={footerLogoStyles}>
       {showLogo && (
         <Logo
           testId="footer-logo-image"
@@ -16,4 +17,4 @@ export const FooterLogo = ({ hideLogo }: FooterLogoProps) => {
       )}
     </Box>
   );
-};
+}

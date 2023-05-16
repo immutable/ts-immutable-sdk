@@ -16,7 +16,7 @@ export const getTokenBalances = async (
   provider: Web3Provider,
   networkName: string,
   chainId: ChainId,
-  conversions: Map<string, number>
+  conversions: Map<string, number>,
 ): Promise<BalanceInfo[]> => {
   if (!checkout || !provider || !chainId) return [];
 
@@ -31,18 +31,18 @@ export const getTokenBalances = async (
     const sortedTokens = sortTokensByAmount(
       checkout.config.environment,
       getAllBalancesResult.balances,
-      chainId
+      chainId,
     );
 
     const tokenBalances: BalanceInfo[] = [];
     sortedTokens.forEach((balance) => {
       tokenBalances.push({
-        id: networkName + '-' + balance.token.symbol,
+        id: `${networkName}-${balance.token.symbol}`,
         balance: balance.formattedBalance,
         fiatAmount: calculateCryptoToFiat(
           balance.formattedBalance,
           balance.token.symbol,
-          conversions
+          conversions,
         ),
         symbol: balance.token.symbol,
         description: balance.token.name,

@@ -10,13 +10,33 @@ enum ViewThreeContents {
   CONTENT_TWO = 'CONTENT_TWO',
 }
 
-export const ViewThree = () => {
+function ViewThreeContentOne() {
+  return (
+    <>
+      <Heading>View Three</Heading>
+      <Body>Some content here</Body>
+    </>
+  );
+}
+
+function ViewThreeContentTwo() {
+  return (
+    <>
+      <Heading>View Three More</Heading>
+      <Body>More content</Body>
+    </>
+  );
+}
+
+export function ViewThree() {
   const [currentContent, setCurrentContent] = useState(
-    ViewThreeContents.CONTENT_ONE
+    ViewThreeContents.CONTENT_ONE,
   );
 
   /*
-    This is an example of how we can change the content using an enum with a function that's provided to the header & footer. This is using useCallback to ensure the switchContent is only created once instead of each re-render.
+    This is an example of how we can change the content using an enum
+    with a function that's provided to the header & footer.
+    This is using useCallback to ensure the switchContent is only created once instead of each re-render.
   */
   const switchContent = useCallback((content: ViewThreeContents) => {
     switch (content) {
@@ -32,7 +52,7 @@ export const ViewThree = () => {
 
   return (
     <SimpleLayout
-      header={
+      header={(
         <HeaderNavigation
           showBack
           onBackButtonClick={
@@ -41,7 +61,7 @@ export const ViewThree = () => {
               : undefined
           }
         />
-      }
+      )}
       footer={
         currentContent === ViewThreeContents.CONTENT_ONE ? (
           <FooterButton
@@ -61,22 +81,4 @@ export const ViewThree = () => {
       )}
     </SimpleLayout>
   );
-};
-
-const ViewThreeContentOne = () => {
-  return (
-    <>
-      <Heading>View Three</Heading>
-      <Body>Some content here</Body>
-    </>
-  );
-};
-
-const ViewThreeContentTwo = () => {
-  return (
-    <>
-      <Heading>View Three More</Heading>
-      <Body>More content</Body>
-    </>
-  );
-};
+}

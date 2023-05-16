@@ -9,6 +9,7 @@ export class ImmutableOuterExample extends ImmutableWebComponent {
     super.connectedCallback();
     this.renderWidget();
   }
+
   renderWidget() {
     const params: OuterWidgetParams = {};
 
@@ -19,9 +20,9 @@ export class ImmutableOuterExample extends ImmutableWebComponent {
     this.reactRoot.render(
       <React.StrictMode>
         <ConnectionLoader params={params} theme={this.theme}>
-          <OuterWidget params={params} theme={this.theme}></OuterWidget>
+          <OuterWidget params={params} theme={this.theme} />
         </ConnectionLoader>
-      </React.StrictMode>
+      </React.StrictMode>,
     );
   }
 }

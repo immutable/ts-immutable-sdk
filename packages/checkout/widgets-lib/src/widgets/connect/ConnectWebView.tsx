@@ -23,7 +23,7 @@ function ConnectWebView() {
       providerPreference={WidgetConnectionProviders.METAMASK}
       theme={theme}
       environment={environment}
-    ></imtbl-connect>
+    />
   );
 }
 

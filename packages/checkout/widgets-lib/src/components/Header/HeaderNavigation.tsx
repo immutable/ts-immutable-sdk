@@ -16,7 +16,7 @@ export interface HeaderNavigationProps {
   onCloseButtonClick?: () => void;
 }
 
-export const HeaderNavigation = ({
+export function HeaderNavigation({
   title,
   showBack = false,
   showSettings = false,
@@ -24,7 +24,7 @@ export const HeaderNavigation = ({
   onSettingsClick,
   onBackButtonClick,
   onCloseButtonClick,
-}: HeaderNavigationProps) => {
+}: HeaderNavigationProps) {
   const { viewDispatch } = useContext(ViewContext);
 
   const goBack = async () => {
@@ -36,7 +36,11 @@ export const HeaderNavigation = ({
   };
 
   const handleBackButtonClick = () => {
-    onBackButtonClick ? onBackButtonClick() : goBack();
+    if (onBackButtonClick) {
+      onBackButtonClick();
+    } else {
+      goBack();
+    }
   };
 
   return (
@@ -77,4 +81,4 @@ export const HeaderNavigation = ({
       </AppHeaderBar.RightHandButtons>
     </AppHeaderBar>
   );
-};
+}

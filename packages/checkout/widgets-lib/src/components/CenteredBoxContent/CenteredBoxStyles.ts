@@ -1,4 +1,4 @@
-export const CenteredBoxContentStyles = {
+export const centeredBoxContentStyles = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
