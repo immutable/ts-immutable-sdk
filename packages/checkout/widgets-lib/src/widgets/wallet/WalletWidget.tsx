@@ -57,10 +57,11 @@ export function WalletWidget(props: WalletWidgetProps) {
   const { checkout } = walletState;
 
   useEffect(() => {
+    const checkout2 = new Checkout({ baseConfig: { environment } });
     walletDispatch({
       payload: {
         type: WalletActions.SET_CHECKOUT,
-        checkout: checkout as Checkout,
+        checkout: checkout2 as Checkout,
       },
     });
 

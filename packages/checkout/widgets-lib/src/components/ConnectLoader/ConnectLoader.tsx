@@ -141,9 +141,9 @@ export function ConnectLoader({
           />
         </ConnectLoaderContext.Provider>
       )}
-      {connectionStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && {
-        children,
-      }}
+      {connectionStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (
+        children
+      )}
       {connectionStatus === ConnectionStatus.ERROR && (
         <BiomeThemeProvider theme={{ base: biomeTheme }}>
           <ErrorView
