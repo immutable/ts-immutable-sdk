@@ -1,15 +1,17 @@
 import { useCallback, useContext, useMemo } from 'react';
+import {
+  Body, Box, Heading, OptionKey,
+} from '@biom3/react';
 import { SelectInput } from '../../../../components/FormComponents/SelectInput/SelectInput';
 import { amountInputValidation } from '../../../../lib/validations/amountInputValidations';
 import {
   SwapFormActions,
   SwapFormContext,
 } from '../../context/swap-form-context/SwapFormContext';
-import { Body, Box, Heading, OptionKey } from '@biom3/react';
 import {
-  SwapFormContainerStyle,
-  ToHeadingBodyStyle,
-  HeadingStyle,
+  swapFormContainerStyle,
+  toHeadingBodyStyle,
+  headingStyle,
 } from './SwapFormStyles';
 import { text } from '../../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
@@ -18,34 +20,34 @@ import { SelectOption } from '../../../../components/FormComponents/SelectForm/S
 
 const SWAP_TEXT_INPUT_PLACEHOLDER = '0';
 
-export const SwapForm = () => {
+export function SwapForm() {
   const { swapState } = useContext(SwapContext);
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
   const { swapForm } = text.views[SwapWidgetViews.SWAP];
   const { swapFromAmount, swapToAmount } = swapFormState;
   const { tokenBalances, allowedTokens } = swapState;
 
-  const fromTokensOptions = useMemo(() => {
-    return tokenBalances.map(
-      (tokenBalance) =>
-        ({
-          id: `${tokenBalance.token.symbol}-${tokenBalance.token.name}`,
-          label: tokenBalance.token.symbol,
-          icon: tokenBalance.token.icon, // todo: add correct image once available on token info
-        } as SelectOption)
-    );
-  }, [tokenBalances]);
+  const fromTokensOptions = useMemo(
+    () => tokenBalances.map(
+      (tokenBalance) => ({
+        id: `${tokenBalance.token.symbol}-${tokenBalance.token.name}`,
+        label: tokenBalance.token.symbol,
+        icon: tokenBalance.token.icon, // todo: add correct image once available on token info
+      } as SelectOption),
+    ),
+    [tokenBalances],
+  );
 
-  const toTokenOptions = useMemo(() => {
-    return allowedTokens.map(
-      (token) =>
-        ({
-          id: `${token.symbol}-${token.name}`,
-          label: token.symbol,
-          icon: undefined, // todo: add correct image once available on token info
-        } as SelectOption)
-    );
-  }, [allowedTokens]);
+  const toTokenOptions = useMemo(
+    () => allowedTokens.map(
+      (token) => ({
+        id: `${token.symbol}-${token.name}`,
+        label: token.symbol,
+        icon: undefined, // todo: add correct image once available on token info
+      } as SelectOption),
+    ),
+    [allowedTokens],
+  );
 
   // extract these to context or calculate on render
   const fromToConversionText = '1 WETH ≈ 12.6 GOG'; // TODO: to calculate when dex integrated
@@ -55,8 +57,7 @@ export const SwapForm = () => {
   const handleFromTokenChange = useCallback(
     (value: OptionKey) => {
       const selectedTokenOption = tokenBalances.find(
-        (tokenBalance) =>
-          value === `${tokenBalance.token.symbol}-${tokenBalance.token.name}`
+        (tokenBalance) => value === `${tokenBalance.token.symbol}-${tokenBalance.token.name}`,
       );
 
       if (selectedTokenOption && selectedTokenOption.token) {
@@ -68,13 +69,13 @@ export const SwapForm = () => {
         });
       }
     },
-    [tokenBalances, swapFormDispatch]
+    [tokenBalances, swapFormDispatch],
   );
 
   const handleToTokenChange = useCallback(
     (value: OptionKey) => {
       const selectedTokenOption = allowedTokens.find(
-        (token) => value === `${token.symbol}-${token.name}`
+        (token) => value === `${token.symbol}-${token.name}`,
       );
 
       if (selectedTokenOption) {
@@ -86,13 +87,13 @@ export const SwapForm = () => {
         });
       }
     },
-    [allowedTokens, swapFormDispatch]
+    [allowedTokens, swapFormDispatch],
   );
 
   return (
-    <Box sx={SwapFormContainerStyle}>
+    <Box sx={swapFormContainerStyle}>
       <Box>
-        <Heading size="xSmall" sx={HeadingStyle}>
+        <Heading size="xSmall" sx={headingStyle}>
           {swapForm.from.label}
         </Heading>
         <SelectInput
@@ -106,21 +107,24 @@ export const SwapForm = () => {
           textInputSubtext={fromFiatPriceText}
           textInputTextAlign="right"
           textInputValidator={amountInputValidation}
+          // eslint-disable-next-line no-console
           onTextInputFocus={() => console.log('Swap From Text Input Focused')}
-          onTextInputChange={(swapFromAmount) => {
-            console.log('Swap From Amount onChange');
-            console.log(swapFromAmount);
+          onTextInputChange={(value) => {
+            // eslint-disable-next-line no-console
+            console.log(`Swap From Amount onChange ${value}`);
             swapFormDispatch({
               payload: {
                 type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
-                swapFromAmount,
+                swapFromAmount: value,
               },
             });
           }}
-          onTextInputBlur={(swapFromAmount: string) => {
-            console.log('Swap From Amount onBlur');
+          onTextInputBlur={(value: string) => {
+            // eslint-disable-next-line no-console
+            console.log(`Swap From Amount onBlur ${value}`);
           }}
           textInputMaxButtonClick={() => {
+            // eslint-disable-next-line no-console
             console.log('todo: implement max button function');
           }}
           onSelectChange={handleFromTokenChange}
@@ -128,9 +132,9 @@ export const SwapForm = () => {
       </Box>
       <Box>
         {/* todo, add the converstion label thats right aligned */}
-        <Box sx={HeadingStyle}>
+        <Box sx={headingStyle}>
           <Heading size="xSmall">{swapForm.to.label}</Heading>
-          <Body sx={ToHeadingBodyStyle} size="small">
+          <Body sx={toHeadingBodyStyle} size="small">
             {fromToConversionText}
           </Body>
         </Box>
@@ -142,19 +146,22 @@ export const SwapForm = () => {
           textInputPlaceholder={SWAP_TEXT_INPUT_PLACEHOLDER}
           textInputTextAlign="right"
           textInputValidator={amountInputValidation}
+          // eslint-disable-next-line no-console
           onTextInputFocus={() => console.log('Swap To Text Input Focused')}
-          onTextInputChange={(swapToAmount) => {
+          onTextInputChange={(value) => {
             swapFormDispatch({
               payload: {
                 type: SwapFormActions.SET_SWAP_TO_AMOUNT,
-                swapToAmount,
+                swapToAmount: value,
               },
             });
           }}
-          onTextInputBlur={(swapToAmount: string) => {
-            console.log('Swap To Amount onBlur');
+          onTextInputBlur={(value: string) => {
+            // eslint-disable-next-line no-console
+            console.log(`Swap To Amount onBlur ${value}`);
           }}
           textInputMaxButtonClick={() => {
+            // eslint-disable-next-line no-console
             console.log('todo: implement max button function');
           }}
           onSelectChange={handleToTokenChange}
@@ -162,4 +169,4 @@ export const SwapForm = () => {
       </Box>
     </Box>
   );
-};
+}

@@ -61,8 +61,11 @@ export interface SwapCoinsProps {
 }
 
 export function SwapCoins({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   amount,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fromContractAddress,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   toContractAddress,
 }: SwapCoinsProps) {
   const { header, content } = text.views[SwapWidgetViews.SWAP];

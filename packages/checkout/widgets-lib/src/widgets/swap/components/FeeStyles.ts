@@ -1,4 +1,4 @@
-export const FeeContainerStyles = {
+export const feeContainerStyles = {
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
@@ -6,7 +6,7 @@ export const FeeContainerStyles = {
   paddingTop: 'base.spacing.x3',
 };
 
-export const FeeBoxStyles = {
+export const feeBoxStyles = {
   display: 'flex',
   flexDirection: 'column',
 };

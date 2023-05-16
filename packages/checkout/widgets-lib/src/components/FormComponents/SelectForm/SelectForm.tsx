@@ -1,4 +1,7 @@
-import { Select, Option, Box, Body, OptionKey } from '@biom3/react';
+/* eslint-disable react/no-unused-prop-types */
+import {
+  Select, Option, Box, Body, OptionKey,
+} from '@biom3/react';
 // import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 
 type IconList = 'EthToken' | 'ImxTokenDex';
@@ -19,12 +22,12 @@ interface SelectFormProps {
   onSelectChange?: (value: OptionKey) => void;
 }
 
-export const SelectForm = ({
+export function SelectForm({
   selectId,
   options,
   subtext,
   onSelectChange,
-}: SelectFormProps) => {
+}: SelectFormProps) {
   return (
     // todo: biome does not currently support Select for FormControl
     // <FormControlWrapper textAlign={textAlign ?? 'left'}>
@@ -36,23 +39,21 @@ export const SelectForm = ({
         onSelectChange={onSelectChange}
         sx={{ backgroundColor: 'base.color.translucent.container.200' }}
       >
-        {options.map((option) => {
-          return (
-            <Option
-              key={option.id}
-              optionKey={option.id}
-              testId={`${selectId}-${option.id}`}
-            >
-              {!option.icon && (
-                <Option.Icon icon={option.icon ?? 'Coins'} variant={'bold'} />
-              )}
-              {option.icon && (
-                <Option.FramedImage imageUrl={option.icon} circularFrame />
-              )}
-              <Option.Label>{option.label}</Option.Label>
-            </Option>
-          );
-        })}
+        {options.map((option) => (
+          <Option
+            key={option.id}
+            optionKey={option.id}
+            testId={`${selectId}-${option.id}`}
+          >
+            {!option.icon && (
+            <Option.Icon icon={option.icon ?? 'Coins'} variant="bold" />
+            )}
+            {option.icon && (
+            <Option.FramedImage imageUrl={option.icon} circularFrame />
+            )}
+            <Option.Label>{option.label}</Option.Label>
+          </Option>
+        ))}
       </Select>
       <Body
         size="xSmall"
@@ -66,4 +67,4 @@ export const SelectForm = ({
     </Box>
     // </FormControlWrapper>
   );
-};
+}

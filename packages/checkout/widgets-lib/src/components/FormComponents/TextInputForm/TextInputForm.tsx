@@ -16,7 +16,7 @@ interface TextInputFormProps {
   maxButtonClick?: () => void;
 }
 
-export const TextInputForm = ({
+export function TextInputForm({
   textInputId,
   value,
   placeholder,
@@ -29,7 +29,7 @@ export const TextInputForm = ({
   textAlign,
   subtext,
   maxButtonClick,
-}: TextInputFormProps) => {
+}: TextInputFormProps) {
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
     if (!validator(inputValue)) return;
@@ -67,4 +67,4 @@ export const TextInputForm = ({
       </TextInput>
     </FormControlWrapper>
   );
-};
+}

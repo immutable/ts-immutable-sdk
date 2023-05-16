@@ -1,25 +1,18 @@
 import { Box, Button } from '@biom3/react';
 import { Checkout, Transaction } from '@imtbl/checkout-sdk';
 import { useContext, useEffect, useState } from 'react';
-<<<<<<< main:packages/checkout/widgets-lib/src/widgets/swap/components/SwapButton.tsx
 import { Environment } from '@imtbl/config';
-import { sendSwapSuccessEvent } from '../SwapWidgetEvents';
-import { text } from '../../../resources/text/textConfig';
-import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
-=======
 import { sendSwapSuccessEvent } from '../../SwapWidgetEvents';
 import { text } from '../../../../resources/text/textConfig';
-import { Environment } from '@imtbl/config';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
->>>>>>> Move inline styles to file:packages/checkout/widgets-lib/src/widgets/swap/components/SwapButton/SwapButton.tsx
 import {
   ViewContext,
   ViewActions,
 } from '../../../../context/view-context/ViewContext';
 import { SwapContext } from '../../context/swap-context/SwapContext';
 import {
-  SwapButtonBoxStyle,
-  SwapButtonIconLoadingStyle,
+  swapButtonBoxStyle,
+  swapButtonIconLoadingStyle,
 } from './SwapButtonStyles';
 
 export interface SwapButtonProps {
@@ -73,7 +66,7 @@ export function SwapButton(props: SwapButtonProps) {
   }, [setLoading]);
 
   return (
-    <Box sx={SwapButtonBoxStyle}>
+    <Box sx={swapButtonBoxStyle}>
       <Button
         disabled={!provider || !transaction || loading}
         variant={!provider || !transaction ? 'tertiary' : 'primary'}
@@ -81,7 +74,7 @@ export function SwapButton(props: SwapButtonProps) {
         size="large"
       >
         {loading && (
-          <Button.Icon icon="Loading" sx={SwapButtonIconLoadingStyle} />
+          <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
         )}
         {!loading && buttonText}
       </Button>

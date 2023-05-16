@@ -1,11 +1,13 @@
-import { describe, it, cy, beforeEach } from 'local-cypress';
-import { cySmartGet } from '../../../lib/testUtils';
+import {
+  describe, it, cy, beforeEach,
+} from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
-import { SwapWidgetParams, SwapWidget } from '../SwapWidget';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
+import { SwapWidgetParams, SwapWidget } from '../SwapWidget';
+import { cySmartGet } from '../../../lib/testUtils';
 
 describe('SwapCoins tests', () => {
   beforeEach(() => {
@@ -84,7 +86,7 @@ describe('SwapCoins tests', () => {
         environment={Environment.PRODUCTION}
         params={params}
         theme={WidgetTheme.DARK}
-      />
+      />,
     );
   });
 
@@ -92,11 +94,9 @@ describe('SwapCoins tests', () => {
     cySmartGet('text-input-from__input').focus().type('1234567');
     cySmartGet('text-input-from__input').should('have.value', '1234567');
     cySmartGet('text-input-from__input').clear();
-
     cySmartGet('text-input-from__input').focus().type('12.123e4');
     cySmartGet('text-input-from__input').should('have.value', '12.1234');
     cySmartGet('text-input-from__input').clear();
-
     cySmartGet('text-input-from__input').focus().type('12.1234567');
     cySmartGet('text-input-from__input').should('have.value', '12.123456');
   });

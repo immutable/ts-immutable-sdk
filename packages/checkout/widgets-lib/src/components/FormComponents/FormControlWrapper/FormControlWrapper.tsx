@@ -8,13 +8,13 @@ interface FormControlWrapperProps {
   errorMessage?: string;
 }
 
-export const FormControlWrapper = ({
+export function FormControlWrapper({
   children,
   subtext,
   textAlign,
   isErrored,
   errorMessage,
-}: FormControlWrapperProps) => {
+}: FormControlWrapperProps) {
   return (
     <FormControl
       textAlign={textAlign ?? 'left'}
@@ -27,4 +27,4 @@ export const FormControlWrapper = ({
       )}
     </FormControl>
   );
-};
+}

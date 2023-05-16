@@ -57,6 +57,7 @@ export interface SetSwapFromAmountPayload {
   swapFromAmount: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const SwapFormContext = createContext<SwapFormContextState>({
   swapFormState: initialSwapFormState,
   swapFormDispatch: () => {},
@@ -66,7 +67,7 @@ export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export const swapFormReducer: Reducer<SwapFormState, SwapFormAction> = (
   state: SwapFormState,
-  action: SwapFormAction
+  action: SwapFormAction,
 ) => {
   switch (action.payload.type) {
     case SwapFormActions.SET_SWAP_TO_TOKEN:

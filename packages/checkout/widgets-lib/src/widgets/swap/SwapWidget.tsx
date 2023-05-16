@@ -50,7 +50,7 @@ export function SwapWidget(props: SwapWidgetProps) {
   const [swapState, swapDispatch] = useReducer(swapReducer, initialSwapState);
   const [swapFormState, swapFormDispatch] = useReducer(
     swapFormReducer,
-    initialSwapFormState
+    initialSwapFormState,
   );
 
   const { params, theme, environment } = props;
@@ -142,11 +142,13 @@ export function SwapWidget(props: SwapWidgetProps) {
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
+      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         {/* TODO: The object passed as the value prop to the Context provider changes every render.
             To fix this consider wrapping it in a useMemo hook. */}
         {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
         <SwapContext.Provider value={{ swapState, swapDispatch }}>
+          {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
           <SwapFormContext.Provider value={{ swapFormState, swapFormDispatch }}>
             {viewState.view.type === BaseViews.LOADING_VIEW && (
               <LoadingView loadingText="Loading" />
@@ -160,8 +162,8 @@ export function SwapWidget(props: SwapWidgetProps) {
             )}
             {viewState.view.type === SwapWidgetViews.SUCCESS && (
               <SuccessView
-                successText='Success'
-                actionText='Contine'
+                successText="Success"
+                actionText="Contine"
                 // eslint-disable-next-line no-console
                 onActionClick={() => console.log('success')}
               />

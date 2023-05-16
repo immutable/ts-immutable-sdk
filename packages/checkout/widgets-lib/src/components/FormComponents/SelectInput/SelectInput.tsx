@@ -29,7 +29,7 @@ interface SelectInputProps {
   onSelectChange: (value: OptionKey) => void;
 }
 
-export const SelectInput = ({
+export function SelectInput({
   selectId,
   textInputId,
   options,
@@ -49,7 +49,7 @@ export const SelectInput = ({
   selectErrorMessage,
   textInputMaxButtonClick,
   onSelectChange,
-}: SelectInputProps) => {
+}: SelectInputProps) {
   return (
     <Box sx={selectInputBoxStyle}>
       <Box sx={selectStyle}>
@@ -81,4 +81,4 @@ export const SelectInput = ({
       </Box>
     </Box>
   );
-};
+}
