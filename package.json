@@ -35,7 +35,7 @@
     "@biom3/design-tokens": "0.1.4-beta"
   },
   "scripts": {
-    "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets -e -r --stages build && yarn syncpack:format",
+    "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --stages build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:all": "wsrun --stages build",
     "lint": "wsrun --exclude-missing -e lint",
     "lint:ci": "./lint-ci.sh",

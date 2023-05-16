@@ -35,8 +35,8 @@ export const SUPPORTED_BRIDGES_FOR_ENVIRONMENT: {
  */
 const CONTRACTS_FOR_BRIDGE = new Map<BridgeInstance, BridgeContracts>()
   .set(ETH_SEPOLIA_TO_ZKEVM_DEVNET, {
-    rootChainERC20Predicate: '0xA401eA44cDAc48569322b1166A0696b9412977D9',
-    rootChainStateSender: '0xA002CfC25D1DDdE53FBD5d8bCF8E26c821B87ceD',
+    rootChainERC20Predicate: '0x61BA9C39FfA6Cb84797973888375030F7Bd89E5e',
+    rootChainStateSender: '0x156a129e8f48E25BBfCb0c2Ff4EbB2e1CACdeb08',
     childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
     childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
@@ -57,7 +57,12 @@ export class BridgeConfiguration {
    * @property {BridgeContracts} bridgeContracts - The configuration of the contracts associated with the bridge.
    * @property {ethers.providers.Provider} rootProvider - The Ethereum provider for the root chain.
    * @property {ethers.providers.Provider} childProvider - The Ethereum provider for the child chain.
-   */
+   * @property {number} blockTime - The approximate block time
+   * @property {number} pollInterval - The time to wait between polls to the blockchain
+   * @property {number} maxDepositBlockDelay - The maximum number of blocks it should take on child chain for deposit to be observed
+   * @property {number} clockInaccuracy - The maximum number of seconds of inaccuracy of blockchain timestamps
+   * @property {number} rootChainFinalityBlocks - The number of blocks to wait for on the rootchain before accepting finality
+  */
   public baseConfig: ImmutableConfiguration;
 
   public bridgeInstance: BridgeInstance;
@@ -67,6 +72,16 @@ export class BridgeConfiguration {
   public rootProvider: ethers.providers.Provider;
 
   public childProvider: ethers.providers.Provider;
+
+  public blockTime: number;
+
+  public pollInterval: number;
+
+  public maxDepositBlockDelay: number;
+
+  public clockInaccuracy: number;
+
+  public rootChainFinalityBlocks: number;
 
   /**
    * Constructs a BridgeConfiguration instance.
@@ -84,6 +99,17 @@ export class BridgeConfiguration {
     this.bridgeInstance = bridgeInstance;
     this.rootProvider = rootProvider;
     this.childProvider = childProvider;
+
+    // Does not need to be exact, just approximate
+    this.blockTime = 12;
+    // How frequently we poll the childchain for StateSync events
+    this.pollInterval = 5 * 1000; // 5 seconds
+    // The upper bound of the block range we poll for StateSync events
+    this.maxDepositBlockDelay = 250;
+    // Assume that the clock timestamp is at most 900 seconds inaccurate, see for more -> https://github.com/ethereum/wiki/blob/c02254611f218f43cbb07517ca8e5d00fd6d6d75/Block-Protocol-2.0.md
+    this.clockInaccuracy = 900;
+    // How many blocks to wait for on the root chain before accepting rootchain finality
+    this.rootChainFinalityBlocks = 3;
 
     if (overrides) {
       this.bridgeContracts = overrides.bridgeContracts;

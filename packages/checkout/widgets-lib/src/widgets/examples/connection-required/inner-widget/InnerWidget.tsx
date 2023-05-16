@@ -3,15 +3,15 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { ViewOne } from './views/ViewOne';
 import { useEffect, useReducer } from 'react';
+import { ViewTwo } from './views/ViewTwo';
+import { ViewThree } from './views/ViewThree';
+import { InnerExampleWidgetViews } from '../../../../context/view-context/InnerExampleViewContextTypes';
 import {
+  viewReducer,
   initialViewState,
   ViewActions,
   ViewContext,
-  viewReducer,
-} from '../../../../context/ViewContext';
-import { ViewTwo } from './views/ViewTwo';
-import { ViewThree } from './views/ViewThree';
-import { InnerExampleWidgetViews } from '../../../../context/InnerExampleViewContextTypes';
+} from '../../../../context/view-context/ViewContext';
 
 export interface InnerWidgetProps {
   params: InnerWidgetParams;

@@ -1,7 +1,10 @@
 import { AppHeaderBar, ButtCon } from '@biom3/react';
 import { useContext } from 'react';
-import { ViewActions, ViewContext } from '../../context/ViewContext';
 import { HeaderNavigationStyles, ButtonNavigationStyles } from './HeaderStyles';
+import {
+  ViewActions,
+  ViewContext,
+} from '../../context/view-context/ViewContext';
 
 export interface HeaderNavigationProps {
   title?: string;

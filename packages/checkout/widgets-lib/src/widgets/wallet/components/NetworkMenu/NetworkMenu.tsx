@@ -8,7 +8,6 @@ import {
   SwitchNetworkParams,
 } from '@imtbl/checkout-sdk';
 import { text } from '../../../../resources/text/textConfig';
-import { WalletWidgetViews } from '../../../../context/WalletViewContextTypes';
 import { sendNetworkSwitchEvent } from '../../WalletWidgetEvents';
 import {
   ActiveNetworkButtonStyle,
@@ -17,12 +16,13 @@ import {
   NetworkHeadingStyle,
   NetworkMenuStyles,
 } from './NetworkMenuStyles';
-import {
-  BaseViews,
-  ViewActions,
-  ViewContext,
-} from '../../../../context/ViewContext';
 import { sortNetworksCompareFn } from '../../../../lib/utils';
+import {
+  ViewContext,
+  ViewActions,
+  BaseViews,
+} from '../../../../context/view-context/ViewContext';
+import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 
 export const NetworkMenu = () => {
   const { viewDispatch } = useContext(ViewContext);

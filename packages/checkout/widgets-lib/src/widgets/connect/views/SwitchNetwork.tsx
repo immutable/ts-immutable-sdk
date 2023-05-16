@@ -4,11 +4,14 @@ import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
-import { ViewContext, ViewActions } from '../../../context/ViewContext';
+import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectContext } from '../context/ConnectContext';
 import { zkEVMNetwork } from '../../../lib/networkUtils';
+import {
+  ViewContext,
+  ViewActions,
+} from '../../../context/view-context/ViewContext';
 
 export const SwitchNetwork = () => {
   const { viewDispatch } = useContext(ViewContext);

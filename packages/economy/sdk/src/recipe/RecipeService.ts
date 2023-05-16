@@ -1,27 +1,15 @@
+import { Service } from 'typedi';
 import { AxiosResponse } from 'axios';
 import querystring from 'querystring';
 
-import { HttpClient } from '../HttpClient';
 import { Recipe } from '../types';
+import { HttpClient } from '../HttpClient';
+import { Config } from '../Config';
 
-// TODO: Read from .env
-// FIXME: target https://api.dev.games.immutable.com/inventory/swagger/index.html#/root/post_craft
-const defaultBaseURL = 'http://127.0.0.1:3031/recipe';
-// const defaultBaseURL =
-//   'https://api.sandbox.games.immutable.com/recipe'
-
+@Service()
 export class RecipeService {
-  private httpClient: HttpClient;
-
-  constructor(
-    httpClientOrBaseUrl: HttpClient | string = defaultBaseURL,
-    defaultHeaders: Record<string, string> = {},
-  ) {
-    if (httpClientOrBaseUrl instanceof HttpClient) {
-      this.httpClient = httpClientOrBaseUrl;
-    } else {
-      this.httpClient = new HttpClient(httpClientOrBaseUrl, defaultHeaders);
-    }
+  constructor(private httpClient: HttpClient, private config: Config) {
+    this.httpClient.setBaseURL(`${this.config.servicesBaseURL}/recipe`);
   }
 
   public async getRecipes(

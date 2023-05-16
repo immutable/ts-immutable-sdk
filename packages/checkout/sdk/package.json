@@ -38,6 +38,7 @@
     "build:prod": "NODE_ENV=production parcel build --no-source-maps",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
+    "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "start": "parcel watch",
     "test": "jest test",
     "test:coverage": "jest --coverage",

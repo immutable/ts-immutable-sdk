@@ -2,11 +2,14 @@ import { Button } from '@biom3/react';
 import { Checkout, Transaction } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useContext, useEffect, useState } from 'react';
-import { ViewActions, ViewContext } from '../../../context/ViewContext';
-import { SwapWidgetViews } from '../../../context/SwapViewContextTypes';
 import { sendSwapSuccessEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
 import { Environment } from '@imtbl/config';
+import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
+import {
+  ViewContext,
+  ViewActions,
+} from '../../../context/view-context/ViewContext';
 
 export interface SwapButtonProps {
   provider?: Web3Provider;

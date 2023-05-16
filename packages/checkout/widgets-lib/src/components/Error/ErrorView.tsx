@@ -4,8 +4,8 @@ import { HeaderNavigation } from '../Header/HeaderNavigation';
 import { SatelliteHero } from '../Hero/SatelliteHero';
 import { SimpleTextBody } from '../Body/SimpleTextBody';
 import { Link } from '@biom3/react';
-import { BaseViews } from '../../context/ViewContext';
 import { text } from '../../resources/text/textConfig';
+import { BaseViews } from '../../context/view-context/ViewContext';
 
 export interface ErrorViewProps {
   actionText: string;

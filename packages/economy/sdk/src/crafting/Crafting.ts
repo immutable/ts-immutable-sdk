@@ -1,6 +1,9 @@
 /* eslint-disable no-console */
+import { Service } from 'typedi';
+
 import type { EventData, EventType } from '../types';
 import { asyncFn } from '../utils';
+import { EventClient } from '../EventClient';
 import { withSDKError } from '../Errors';
 
 import { CraftingService } from './CraftingService';
@@ -37,21 +40,17 @@ export type CraftEvent = EventType<
 | EventData<'STARTED' | 'IN_PROGRESS'>
 | EventData<'COMPLETED', { data: {} }>
 | EventData<'FAILED', { error: { code: string; reason: string } }>
-| EventData<'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'>
+| EventData<
+'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
+>
 >;
 
 /** List of specific craft statuses */
 export type CraftStatus = CraftEvent['status'];
 
+@Service()
 export class Crafting {
-  private emitEvent: (event: CraftEvent) => void;
-
-  private craftingService: CraftingService;
-
-  // FIXME: make injectable
-  constructor(emitEvent: (event: CraftEvent) => void) {
-    this.emitEvent = emitEvent;
-    this.craftingService = new CraftingService();
+  constructor(private craftingService: CraftingService, private events: EventClient<CraftEvent>) {
   }
 
   /**
@@ -63,32 +62,32 @@ export class Crafting {
   @withSDKError({ type: 'CRAFTING_ERROR' })
   public async craft(input: CraftInput): Promise<CraftStatus> {
     // 1. validate inputs
-    this.emitEvent({ status: 'STARTED', action: 'CRAFT' });
+    this.events.emitEvent({ status: 'STARTED', action: 'CRAFT' });
     await this.validate();
 
     // 2. perform any web3 actions
     let txIds: number[] = [];
     let signature;
     if (input.requiresWeb3) {
-      this.emitEvent({ status: 'AWAITING_WEB3_INTERACTION', action: 'CRAFT' });
+      this.events.emitEvent({ status: 'AWAITING_WEB3_INTERACTION', action: 'CRAFT' });
       txIds = await checkout.transfer(input.input);
       signature = await checkout.sign();
     }
     console.info('txIds, signature', { txIds, signature });
 
     // 3. submit craft to BE
-    this.emitEvent({ status: 'SUBMITTED', action: 'CRAFT' });
+    this.events.emitEvent({ status: 'SUBMITTED', action: 'CRAFT' });
     const { data, status } = await this.craftingService.craft(input.input);
 
     if (status !== 200) {
-      this.emitEvent({
+      this.events.emitEvent({
         status: 'FAILED',
         action: 'CRAFT',
         error: { code: `${status}`, reason: 'unknown' },
       });
     }
 
-    this.emitEvent({
+    this.events.emitEvent({
       status: 'COMPLETED',
       action: 'CRAFT',
       data,
