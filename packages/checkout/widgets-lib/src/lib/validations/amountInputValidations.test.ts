@@ -5,13 +5,13 @@ describe('amountInPutValidation', () => {
   const invalidTestCases = ['123.1234567', '1.1234567', 'blah'];
 
   validTestCases.forEach((testCase) => {
-    it(`should validate the input:${testCase} as a float number with 6 decimal places`, function () {
+    it(`should validate the input:${testCase} as a float number with 6 decimal places`, () => {
       expect(amountInputValidation(testCase)).toBeTruthy(); // true
     });
   });
 
   invalidTestCases.forEach((testCase) => {
-    it(`should invalidate the input:${testCase}`, function () {
+    it(`should invalidate the input:${testCase}`, () => {
       expect(amountInputValidation(testCase)).toBeFalsy(); // false
     });
   });
