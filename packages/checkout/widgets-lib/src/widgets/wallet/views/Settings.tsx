@@ -35,7 +35,7 @@ export const Settings = () => {
         }}
       >
         <WalletAddress provider={provider}/>
-        <Button variant="secondary" sx={{marginTop: "32px"}} onClick={sendDisconnectWalletEvent}>{disconnectButton.label}</Button>
+        <Button testId="disconnect-button" variant="secondary" sx={{marginTop: "32px"}} onClick={sendDisconnectWalletEvent}>{disconnectButton.label}</Button>
       </Box>
     </SimpleLayout>
   );

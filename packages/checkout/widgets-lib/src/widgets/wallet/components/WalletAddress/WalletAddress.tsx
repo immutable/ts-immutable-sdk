@@ -22,7 +22,7 @@ export const WalletAddress = ({ provider }: { provider: Web3Provider | null }) =
       <Box sx={WalletAddressLayoutStyle}>
         <Box sx={WalletAddressTextLayoutStyle}>
           <Body size="xSmall" sx={{color: 'base.color.brand.4'}}>Wallet address</Body>
-          <Body size="medium" sx={TruncatedTextStyle}>{walletAddress}</Body>
+          <Body testId="wallet-address" size="medium" sx={TruncatedTextStyle}>{walletAddress}</Body>
         </Box>
         <CopyButton textToCopy={walletAddress} />
       </Box>
