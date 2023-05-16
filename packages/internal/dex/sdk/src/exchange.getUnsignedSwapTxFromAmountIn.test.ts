@@ -237,7 +237,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('Pass in maxHops > 10', () => {
-    it('throws INVALID_MAX_HOPS error', async () => {
+    it('throws InvalidMaxHopsError', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
@@ -258,7 +258,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('Pass in maxHops < 1', () => {
-    it('throws', async () => {
+    it('throws InvalidMaxHopsError', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
@@ -279,7 +279,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('With slippage greater than 50', () => {
-    it('throws INVALID_SLIPPAGE error', async () => {
+    it('throws InvalidSlippageError', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
@@ -300,7 +300,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('With slippage less than 0', () => {
-    it('throws INVALID_SLIPPAGE error', async () => {
+    it('throws InvalidSlippageError', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
