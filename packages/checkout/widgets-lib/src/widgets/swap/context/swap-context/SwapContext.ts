@@ -15,7 +15,7 @@ export interface SwapState {
   network: NetworkInfo | null;
   tokenBalances: GetBalanceResult[];
   supportedTopUps: TopUpFeature | null;
-  allowedTokens: TokenInfo[]
+  allowedTokens: TokenInfo[];
 }
 
 export interface TopUpFeature {

@@ -25,7 +25,7 @@ export interface SwapFormAction {
 }
 
 type ActionPayload =
-  SetSwapFromTokenPayload
+  | SetSwapFromTokenPayload
   | SetSwapFromAmountPayload
   | SetSwapToTokenPayload
   | SetSwapToAmountPayload;
