@@ -8,10 +8,10 @@ import {
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { useEffect, useCallback, useReducer } from 'react';
+import { Environment } from '@imtbl/config';
 import { SwapCoins } from './views/SwapCoins';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { LoadingView } from '../../components/Loading/LoadingView';
-import { Environment } from '@imtbl/config';
 import {
   SwapActions,
   SwapContext,
@@ -45,19 +45,19 @@ export function SwapWidget(props: SwapWidgetProps) {
   const [swapState, swapDispatch] = useReducer(swapReducer, initialSwapState);
 
   const { params, theme, environment } = props;
-  const { amount, fromContractAddress, toContractAddress, providerPreference } =
-    params;
+  const {
+    amount, fromContractAddress, toContractAddress, providerPreference,
+  } = params;
 
-  const biomeTheme: BaseTokens =
-    theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-      ? onLightBase
-      : onDarkBase;
+  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+    ? onLightBase
+    : onDarkBase;
 
   const swapWidgetSetup = useCallback(async () => {
     if (!providerPreference) return;
 
     const checkout = new Checkout({
-      baseConfig: { environment: environment },
+      baseConfig: { environment },
     });
 
     swapDispatch({
@@ -89,14 +89,12 @@ export function SwapWidget(props: SwapWidgetProps) {
       {
         chainId: connectResult.network.chainId,
         type: TokenFilterTypes.SWAP,
-      }
+      },
     );
 
-    const allowedTokenBalances = tokenBalances.balances.filter((balance) =>
-      allowList.tokens
-        .map((token) => token.address)
-        .includes(balance.token.address)
-    );
+    const allowedTokenBalances = tokenBalances.balances.filter((balance) => allowList.tokens
+      .map((token) => token.address)
+      .includes(balance.token.address));
 
     swapDispatch({
       payload: {
@@ -131,13 +129,17 @@ export function SwapWidget(props: SwapWidgetProps) {
     swapWidgetSetup();
   }, [swapWidgetSetup]);
 
-  const renderFailure = () => {
-    return <Body>Failure</Body>;
-  };
+  const renderFailure = () => <Body>Failure</Body>;
 
   return (
     <BiomeThemeProvider theme={{ base: biomeTheme }}>
+      {/* TODO: The object passed as the value prop to the Context provider changes every render.
+          To fix this consider wrapping it in a useMemo hook. */}
+      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
+        {/* TODO: The object passed as the value prop to the Context provider changes every render.
+            To fix this consider wrapping it in a useMemo hook. */}
+        {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
         <SwapContext.Provider value={{ swapState, swapDispatch }}>
           {viewState.view.type === BaseViews.LOADING_VIEW && (
             <LoadingView loadingText="Loading" />
@@ -151,8 +153,9 @@ export function SwapWidget(props: SwapWidgetProps) {
           )}
           {viewState.view.type === SwapWidgetViews.SUCCESS && (
             <SuccessView
-              successText={'Success'}
-              actionText={'Contine'}
+              successText="Success"
+              actionText="Contine"
+              // eslint-disable-next-line no-console
               onActionClick={() => console.log('success')}
             />
           )}

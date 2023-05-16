@@ -61,6 +61,7 @@ export interface SetConversionsPayload {
   conversions: Map<string, number>;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const CryptoFiatContext = createContext<CryptoFiatContextState>({
   cryptoFiatState: initialCryptoFiatState,
   cryptoFiatDispatch: () => {},
@@ -70,7 +71,7 @@ export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export const cryptoFiatReducer: Reducer<CryptoFiatState, CryptoFiatAction> = (
   state: CryptoFiatState,
-  action: CryptoFiatAction
+  action: CryptoFiatAction,
 ) => {
   switch (action.payload.type) {
     case CryptoFiatActions.SET_CRYPTO_FIAT:

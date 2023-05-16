@@ -2,9 +2,9 @@ import { Button } from '@biom3/react';
 import { Checkout, Transaction } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { useContext, useEffect, useState } from 'react';
+import { Environment } from '@imtbl/config';
 import { sendSwapSuccessEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
-import { Environment } from '@imtbl/config';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import {
   ViewContext,
@@ -16,7 +16,7 @@ export interface SwapButtonProps {
   transaction?: Transaction;
 }
 
-export const SwapButton = (props: SwapButtonProps) => {
+export function SwapButton(props: SwapButtonProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { provider, transaction } = props;
   const [loading, setLoading] = useState(true);
@@ -72,4 +72,4 @@ export const SwapButton = (props: SwapButtonProps) => {
       {!loading && buttonText}
     </Button>
   );
-};
+}

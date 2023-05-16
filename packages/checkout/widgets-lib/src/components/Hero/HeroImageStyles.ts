@@ -1,4 +1,4 @@
-export const HeroImageStyles = {
+export const heroImageStyles = {
   position: 'absolute',
   top: '0',
   left: '0',
@@ -9,7 +9,7 @@ export const HeroImageStyles = {
   justifyContent: 'center',
   alignItems: 'center',
 };
-export const HeroBackGroundStyles = {
+export const heroBackGroundStyles = {
   position: 'relative',
   height: '100%',
   width: '100%',

@@ -12,9 +12,13 @@ import { ImmutableWebComponent } from '../ImmutableWebComponent';
 
 export class ImmutableWallet extends ImmutableWebComponent {
   providerPreference = ConnectionProviders.METAMASK;
+
   useConnectWidget?: boolean;
+
   isOnRampEnabled?: boolean;
+
   isSwapEnabled?: boolean;
+
   isBridgeEnabled?: boolean;
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -25,12 +29,11 @@ export class ImmutableWallet extends ImmutableWebComponent {
   connectedCallback() {
     this.theme = this.getAttribute('theme') as WidgetTheme;
     this.providerPreference = this.getAttribute(
-      'providerPreference'
+      'providerPreference',
     ) as ConnectionProviders;
 
     const useConnectWidgetProp = this.getAttribute('useConnectWidget');
-    this.useConnectWidget =
-      useConnectWidgetProp?.toLowerCase() === 'false' ? false : true;
+    this.useConnectWidget = useConnectWidgetProp?.toLowerCase() !== 'false';
 
     const isOnRampEnabledProp = this.getAttribute('isOnRampEnabled');
     const isSwapEnabledProp = this.getAttribute('isSwapEnabled');
@@ -79,16 +82,16 @@ export class ImmutableWallet extends ImmutableWebComponent {
               params={walletParams}
               theme={this.theme}
               environment={this.environment}
-            ></WalletWidget>
+            />
           </ConnectLoader>
         ) : (
           <WalletWidget
             params={walletParams}
             theme={this.theme}
             environment={this.environment}
-          ></WalletWidget>
+          />
         )}
-      </React.StrictMode>
+      </React.StrictMode>,
     );
   }
 }

@@ -1,12 +1,12 @@
 import { Box } from '@biom3/react';
 import {
-  SimpleLayoutStyle,
-  HeaderStyle,
-  FooterStyle,
-  BodyStyle,
-  ContentStyle,
-  HeroContent,
-  ResponsiveStyles,
+  simpleLayoutStyle,
+  headerStyle,
+  footerStyle,
+  bodyStyle,
+  contentStyle,
+  heroContentStyle,
+  responsiveStyles,
 } from './SimpleLayoutStyles';
 
 export interface SimpleLayoutProps {
@@ -18,40 +18,40 @@ export interface SimpleLayoutProps {
   floatHeader?: boolean;
 }
 
-export const SimpleLayout = ({
+export function SimpleLayout({
   header,
   footer,
   children,
   heroContent,
   testId,
   floatHeader = false,
-}: SimpleLayoutProps) => {
+}: SimpleLayoutProps) {
   return (
-    <Box sx={ResponsiveStyles}>
-      <Box testId={testId} sx={SimpleLayoutStyle}>
+    <Box sx={responsiveStyles}>
+      <Box testId={testId} sx={simpleLayoutStyle}>
         {header && (
-          <Box id="header" sx={HeaderStyle(floatHeader)}>
+          <Box id="header" sx={headerStyle(floatHeader)}>
             {header}
           </Box>
         )}
-        <Box id="content" sx={ContentStyle}>
+        <Box id="content" sx={contentStyle}>
           {heroContent && (
-            <Box id="hero-content" sx={HeroContent}>
+            <Box id="hero-content" sx={heroContentStyle}>
               {heroContent}
             </Box>
           )}
           {children && (
-            <Box id="body" sx={BodyStyle}>
+            <Box id="body" sx={bodyStyle}>
               {children}
             </Box>
           )}
         </Box>
         {footer && (
-          <Box id="footer" sx={FooterStyle}>
+          <Box id="footer" sx={footerStyle}>
             {footer}
           </Box>
         )}
       </Box>
     </Box>
   );
-};
+}

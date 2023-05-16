@@ -1,17 +1,17 @@
 import { Box } from '@biom3/react';
-import { CenteredBoxContentStyles } from './CenteredBoxStyles';
+import { centeredBoxContentStyles } from './CenteredBoxStyles';
 
 export interface CenteredBoxContentProps {
   testId?: string;
   children?: React.ReactNode;
 }
-export const CenteredBoxContent = ({
+export function CenteredBoxContent({
   children,
   testId,
-}: CenteredBoxContentProps) => {
+}: CenteredBoxContentProps) {
   return (
-    <Box testId={testId} sx={CenteredBoxContentStyles}>
+    <Box testId={testId} sx={centeredBoxContentStyles}>
       {children}
     </Box>
   );
-};
+}

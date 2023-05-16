@@ -14,8 +14,10 @@ export function sendSwapWidgetCloseEvent() {
         type: SwapEventType.CLOSE_WIDGET,
         data: {},
       },
-    }
+    },
   );
+  // TODO: remove once fixed
+  // eslint-disable-next-line no-console
   console.log('close widget event:', closeWidgetEvent);
   if (window !== undefined) window.dispatchEvent(closeWidgetEvent);
 }
@@ -30,7 +32,7 @@ export const sendSwapSuccessEvent = () => {
           timestamp: new Date().getTime(),
         },
       },
-    }
+    },
   );
   if (window !== undefined) window.dispatchEvent(successEvent);
 };
@@ -46,7 +48,7 @@ export const sendSwapFailedEvent = (reason: string) => {
           timestamp: new Date().getTime(),
         },
       },
-    }
+    },
   );
   if (window !== undefined) window.dispatchEvent(failedEvent);
 };

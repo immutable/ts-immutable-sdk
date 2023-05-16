@@ -10,15 +10,15 @@ export interface SuccessViewProps {
   successEventAction?: () => void;
 }
 
-export const SuccessView = ({
+export function SuccessView({
   successText,
   actionText,
   onActionClick,
   successEventAction,
-}: SuccessViewProps) => {
+}: SuccessViewProps) {
   if (
-    successEventAction !== undefined &&
-    typeof successEventAction === 'function'
+    successEventAction !== undefined
+    && typeof successEventAction === 'function'
   ) {
     successEventAction();
   }
@@ -31,16 +31,16 @@ export const SuccessView = ({
 
   return (
     <SimpleLayout
-      footer={
+      footer={(
         <FooterButton
           actionText={actionText}
           onActionClick={onSuccessActionClick}
         />
-      }
+      )}
     >
       <CenteredBoxContent testId="success-view">
         <SuccessBox successText={successText} />
       </CenteredBoxContent>
     </SimpleLayout>
   );
-};
+}

@@ -18,15 +18,9 @@ export type QuoteTradeInfo = {
   tradeType: TradeType;
 };
 
-export type QuoteResponse =
-  | {
-    success: true;
-    trade: QuoteTradeInfo;
-  }
-  | {
-    success: false;
-    trade: undefined;
-  };
+export type QuoteResponse = {
+  trade: QuoteTradeInfo;
+};
 
 export type TradeInfo = {
   quote: Amount;
@@ -34,17 +28,10 @@ export type TradeInfo = {
   slippage: number;
 };
 
-export type TransactionResponse =
-  | {
-    transaction: ethers.providers.TransactionRequest;
-    info: TradeInfo;
-    success: true;
-  }
-  | {
-    info: undefined;
-    success: false;
-    transaction: undefined;
-  };
+export type TransactionResponse = {
+  transaction: ethers.providers.TransactionRequest;
+  info: TradeInfo;
+};
 
 export type TokenInfo = {
   chainId: number;

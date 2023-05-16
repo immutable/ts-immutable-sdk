@@ -6,12 +6,10 @@ import {
 } from '../../context/connect-loader-context/ConnectLoaderContext';
 
 type ConnectLoaderSuccessProps = {
-  children: React.ReactNode;
+  children: JSX.Element;
 };
 
-export const ConnectLoaderSuccess = ({
-  children,
-}: ConnectLoaderSuccessProps) => {
+export function ConnectLoaderSuccess({ children }: ConnectLoaderSuccessProps) {
   const { connectLoaderDispatch } = useContext(ConnectLoaderContext);
 
   useEffect(() => {
@@ -23,5 +21,5 @@ export const ConnectLoaderSuccess = ({
     });
   }, [connectLoaderDispatch]);
 
-  return <>{children}</>;
-};
+  return children;
+}

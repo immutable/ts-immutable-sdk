@@ -1,15 +1,15 @@
 import { BiomeCombinedProviders } from '@biom3/react';
-import { WalletContext, WalletState } from '../../context/WalletContext';
 import React from 'react';
 import { mount } from 'cypress/react18';
 import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
+import { WalletContext, WalletState } from '../../context/WalletContext';
 import { BalanceItem } from './BalanceItem';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { cySmartGet } from '../../../../lib/testUtils';
-import { Environment } from '@imtbl/config';
 
 describe('BalanceItem', () => {
-  let baseWalletState: WalletState = {
+  const baseWalletState: WalletState = {
     checkout: new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     }),
@@ -34,9 +34,9 @@ describe('BalanceItem', () => {
         <WalletContext.Provider
           value={{ walletState: baseWalletState, walletDispatch: () => {} }}
         >
-          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
+          <BalanceItem balanceInfo={testBalanceInfo} />
         </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      </BiomeCombinedProviders>,
     );
 
     cySmartGet('balance-item-IMX').should('include.text', 'IMX');
@@ -44,7 +44,7 @@ describe('BalanceItem', () => {
     cySmartGet('balance-item-IMX__price').should('have.text', '21.32');
     cySmartGet('balance-item-IMX__fiatAmount').should(
       'include.text',
-      '≈ USD $3,412.08'
+      '≈ USD $3,412.08',
     );
   });
 
@@ -74,9 +74,9 @@ describe('BalanceItem', () => {
         <WalletContext.Provider
           value={{ walletState: testWalletState, walletDispatch: () => {} }}
         >
-          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
+          <BalanceItem balanceInfo={testBalanceInfo} />
         </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      </BiomeCombinedProviders>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -108,9 +108,9 @@ describe('BalanceItem', () => {
         <WalletContext.Provider
           value={{ walletState: testWalletState, walletDispatch: () => {} }}
         >
-          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
+          <BalanceItem balanceInfo={testBalanceInfo} />
         </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      </BiomeCombinedProviders>,
     );
     cySmartGet('token-menu').should('exist');
     cySmartGet('token-menu').click();
@@ -147,9 +147,9 @@ describe('BalanceItem', () => {
         <WalletContext.Provider
           value={{ walletState: testWalletState, walletDispatch: () => {} }}
         >
-          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
+          <BalanceItem balanceInfo={testBalanceInfo} />
         </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      </BiomeCombinedProviders>,
     );
     cySmartGet('token-menu').should('exist');
     cySmartGet('token-menu').click();
@@ -185,9 +185,9 @@ describe('BalanceItem', () => {
         <WalletContext.Provider
           value={{ walletState: testWalletState, walletDispatch: () => {} }}
         >
-          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
+          <BalanceItem balanceInfo={testBalanceInfo} />
         </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      </BiomeCombinedProviders>,
     );
     cySmartGet('token-menu').should('exist');
     cySmartGet('token-menu').click();
@@ -211,9 +211,9 @@ describe('BalanceItem', () => {
         <WalletContext.Provider
           value={{ walletState: testWalletState, walletDispatch: () => {} }}
         >
-          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
+          <BalanceItem balanceInfo={testBalanceInfo} />
         </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      </BiomeCombinedProviders>,
     );
     cySmartGet('token-menu').should('not.exist');
   });

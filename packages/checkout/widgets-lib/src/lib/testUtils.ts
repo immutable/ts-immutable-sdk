@@ -12,12 +12,10 @@ export const cyGetByTestId = (
   testId: string,
   options?: {
     domElement?: string;
-  }
-) => {
-  return cy.get(
-    `${options?.domElement ? options.domElement : ''}[data-testid="${testId}"]`
-  );
-};
+  },
+) => cy.get(
+  `${options?.domElement ? options.domElement : ''}[data-testid="${testId}"]`,
+);
 
 /**
  * Allows the simple selection of both cypress aliases and testids
@@ -27,7 +25,6 @@ export const cyGetByTestId = (
  *
  * @alpha maturity
  */
-export const cySmartGet = (selector: string) =>
-  selector.includes('@') || selector.includes(' ')
-    ? cy.get(selector)
-    : cyGetByTestId(selector);
+export const cySmartGet = (selector: string) => (selector.includes('@') || selector.includes(' ')
+  ? cy.get(selector)
+  : cyGetByTestId(selector));

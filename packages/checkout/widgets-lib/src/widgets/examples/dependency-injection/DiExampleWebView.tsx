@@ -23,7 +23,7 @@ function DiExampleWebView() {
       providerPreference={WidgetConnectionProviders.METAMASK}
       theme={theme}
       environment={environment}
-    ></imtbl-example>
+    />
   );
 }
 

@@ -1,12 +1,16 @@
-import { Body, Box, Option, OptionKey, Select, TextInput } from '@biom3/react';
+import {
+  Body, Box, Option, OptionKey, Select, TextInput,
+} from '@biom3/react';
 import { ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { useEffect, useState } from 'react';
 import { Network } from '@imtbl/checkout-widgets';
-import { BridgeButton } from './BridgeButton';
 import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
+// TODO: Fix circular dependency
+// eslint-disable-next-line import/no-cycle
+import { BridgeButton } from './BridgeButton';
 import { BridgeWidgetViews } from '../BridgeWidget';
 import { L1Network } from '../../../lib/networkUtils';
-import { Environment } from '@imtbl/config';
 
 interface BridgeFormProps {
   provider: Web3Provider;
@@ -22,7 +26,7 @@ interface BridgeFormProps {
   updateView: (view: BridgeWidgetViews, err?: any) => void;
 }
 
-export const BridgeForm = (props: BridgeFormProps) => {
+export function BridgeForm(props: BridgeFormProps) {
   const {
     provider,
     balances,
@@ -39,7 +43,7 @@ export const BridgeForm = (props: BridgeFormProps) => {
   const [selectedTokenOption, setSelectedTokenOption] = useState<OptionKey>();
 
   function handleBridgeAmountChange(event: any) {
-    const value = event.target.value;
+    const { value } = event.target;
     setBridgeAmount(value);
   }
 
@@ -57,12 +61,12 @@ export const BridgeForm = (props: BridgeFormProps) => {
     let defaultToken: GetBalanceResult | undefined;
     if (defaultTokenAddress) {
       defaultToken = balances.find(
-        (balance) => balance.token.address === defaultTokenAddress
+        (balance) => balance.token.address === defaultTokenAddress,
       );
     }
     if (!defaultToken) {
       defaultToken = balances.find(
-        (balance) => balance.token.symbol === nativeCurrencySymbol
+        (balance) => balance.token.symbol === nativeCurrencySymbol,
       );
     }
 
@@ -79,7 +83,7 @@ export const BridgeForm = (props: BridgeFormProps) => {
           columnGap: 'base.spacing.x4',
         }}
       >
-        <Body size={'small'}>From:</Body>
+        <Body size="small">From:</Body>
         <Select
           testId="select-network"
           selectedOption={selectedNetwork}
@@ -116,9 +120,9 @@ export const BridgeForm = (props: BridgeFormProps) => {
           testId="amount"
           sx={{ minWidth: 'base.spacing.x20', width: 'base.spacing.x40' }}
           value={bridgeAmount}
-          onChange={handleBridgeAmountChange}
+          onChange={(e) => handleBridgeAmountChange(e)}
           type="number"
-        ></TextInput>
+        />
         <Select
           testId="select-token"
           sx={{
@@ -126,19 +130,17 @@ export const BridgeForm = (props: BridgeFormProps) => {
             width: 'base.spacing.x40',
           }}
           selectedOption={selectedTokenOption}
-          onSelectChange={handleSelectToken}
+          onSelectChange={(o) => handleSelectToken(o)}
         >
-          {balances.map((balance) => {
-            return (
-              <Option
-                testId={`select-token-${balance.token.symbol}`}
-                key={`${chainId}-${balance.token.symbol}`}
-                optionKey={balance.token.symbol}
-              >
-                <Option.Label>{balance.token.symbol}</Option.Label>
-              </Option>
-            );
-          })}
+          {balances.map((balance) => (
+            <Option
+              testId={`select-token-${balance.token.symbol}`}
+              key={`${chainId}-${balance.token.symbol}`}
+              optionKey={balance.token.symbol}
+            >
+              <Option.Label>{balance.token.symbol}</Option.Label>
+            </Option>
+          ))}
         </Select>
       </Box>
       <Box
@@ -149,7 +151,7 @@ export const BridgeForm = (props: BridgeFormProps) => {
         }}
       >
         {!selectedTokenOption && (
-          <Body size={'xSmall'}>You have no balances on this network</Body>
+          <Body size="xSmall">You have no balances on this network</Body>
         )}
       </Box>
       <Box
@@ -159,9 +161,13 @@ export const BridgeForm = (props: BridgeFormProps) => {
           flexDirection: 'column',
         }}
       >
-        <Body testId="bridge-to-network">To: {toNetwork}</Body>
+        <Body testId="bridge-to-network">
+          To:
+          {toNetwork}
+        </Body>
         <Body testId="receive-text">
-          You will receive:{' '}
+          You will receive:
+          {' '}
           {bridgeAmount && selectedTokenOption
             ? `${bridgeAmount} ${selectedTokenOption.toString()}`
             : ''}
@@ -171,7 +177,7 @@ export const BridgeForm = (props: BridgeFormProps) => {
         provider={provider}
         amount={bridgeAmount}
         balance={balances.find(
-          (balance) => balance.token.symbol === selectedTokenOption
+          (balance) => balance.token.symbol === selectedTokenOption,
         )}
         fromNetwork={selectedNetwork}
         updateTransactionResponse={updateTransactionResponse}
@@ -179,4 +185,4 @@ export const BridgeForm = (props: BridgeFormProps) => {
       />
     </Box>
   );
-};
+}
