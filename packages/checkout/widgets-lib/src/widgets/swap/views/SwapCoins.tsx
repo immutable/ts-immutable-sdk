@@ -1,4 +1,4 @@
-import { Box } from '@biom3/react';
+import { Box, Heading } from '@biom3/react';
 import { BigNumber, utils } from 'ethers';
 import { TokenInfo, Transaction } from '@imtbl/checkout-sdk';
 import { useContext, useState } from 'react';
@@ -7,16 +7,12 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
-import { Buy } from '../components/Buy';
-// TODO: Fix circular dependency
-// eslint-disable-next-line import/no-cycle
-import With from '../components/With';
-import { Fees } from '../components/Fees';
-import { SwapButton } from '../components/SwapButton';
 import { SwapContext } from '../context/SwapContext';
 import { alphaSortTokensList, findTokenByAddress } from '../helpers';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapForm } from '../components/SwapForm/SwapForm';
+import { Fees } from '../components/Fees';
+import { SwapButton } from '../components/SwapButton';
 
 type AmountAndPercentage = {
   amount: {
@@ -72,10 +68,10 @@ export function SwapCoins({
   fromContractAddress,
   toContractAddress,
 }: SwapCoinsProps) {
-  const { title } = text.views[SwapWidgetViews.SWAP].header;
+  const { header, content } = text.views[SwapWidgetViews.SWAP];
 
   const { swapState } = useContext(SwapContext);
-  const { provider, allowedTokens } = swapState;
+  const { allowedTokens } = swapState;
 
   const sortedAllowList: TokenInfo[] = alphaSortTokensList(allowedTokens);
   const validatedAmount = Number.isNaN(Number(amount))
@@ -134,17 +130,35 @@ export function SwapCoins({
     <SimpleLayout
       header={(
         <HeaderNavigation
-          title={title}
+          showBack
+          title={header.title}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent()}
         />
       )}
       footer={<FooterLogo />}
     >
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        <SwapForm />
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Box sx={{ paddingX: 'base.spacing.x1' }}>
+          <Heading
+            size="small"
+            weight="regular"
+            sx={{ paddingBottom: 'base.spacing.x4' }}
+          >
+            {content.title}
+          </Heading>
+          <SwapForm />
+          <Fees fees="0.5" fiatPrice="0.123" tokenSymbol="imx" />
+        </Box>
 
         {/* todo: remove buy/with components */}
-        <Buy
+        {/* <Buy
           onTokenChange={onBuyFieldTokenChange}
           onAmountChange={onBuyFieldAmountChange}
           token={buyToken}
@@ -157,17 +171,9 @@ export function SwapCoins({
           quote={withQuote}
           buyToken={buyToken}
           buyAmount={buyAmount}
-        />
-        {withQuote && (
-          <Fees
-            fees={withQuote.trade.fees.amount.formatted}
-            fiatPrice={withQuote.trade.slippage.amount.formatted}
-            tokenSymbol="imx"
-          />
-        )}
-        {provider && (
-        <SwapButton provider={provider} transaction={getTransaction()} />
-        )}
+        /> */}
+
+        <SwapButton transaction={getTransaction()} />
       </Box>
     </SimpleLayout>
   );

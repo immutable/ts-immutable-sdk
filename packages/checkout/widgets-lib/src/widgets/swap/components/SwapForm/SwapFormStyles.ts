@@ -1,11 +1,13 @@
-export const ToStyle = {
-  // todo: is this the right padding between from/to?
-  paddingTop: 'base.spacing.x4'
+export const SwapFormContainerStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  rowGap: 'base.spacing.x6'
 }
 
-export const ToHeadingStyle = {
+export const HeadingStyle = {
   display: 'flex',
   justifyContent: 'space-between',
+  paddingBottom: 'base.spacing.x1'
 }
 
 export const ToHeadingBodyStyle = {

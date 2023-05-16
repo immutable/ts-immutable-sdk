@@ -1,38 +1,42 @@
 import { TextInput } from '@biom3/react';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
-import { useState } from 'react';
-
 interface TextInputFormProps {
+  value: string;
+  placeholder?: string;
   subtext?: string;
   textAlign?: 'left' | 'right';
   isErrored?: boolean;
   errorMessage?: string;
   validator: (value: string) => boolean;
+  onTextInputFocus: () => void;
+  onTextInputChange: (value: string) => void;
   onTextInputBlur: (value: string) => void;
   maxButtonClick?: () => void;
 }
 
 export const TextInputForm = ({
+  value,
+  placeholder,
   errorMessage,
   isErrored,
   validator,
+  onTextInputFocus,
+  onTextInputChange,
   onTextInputBlur,
   textAlign,
   subtext,
   maxButtonClick,
 }: TextInputFormProps) => {
-  const [textInputValue, setTextInputValue] = useState<string>('');
-
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    if (!validator(value)) return;
-    setTextInputValue(value);
+    const inputValue = event.target.value;
+    if (!validator(inputValue)) return;
+    onTextInputChange(inputValue);
   };
 
   const handleOnBlur = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    if (!validator(value)) return;
-    onTextInputBlur(value);
+    const inputValue = event.target.value;
+    if (!validator(inputValue)) return;
+    onTextInputBlur(inputValue);
   };
 
   return (
@@ -45,10 +49,12 @@ export const TextInputForm = ({
       <TextInput
         onChange={handleOnChange}
         sizeVariant="large"
-        value={textInputValue}
+        value={value}
         validationStatus={isErrored ? 'error' : 'success'}
-        placeholder="1.123456"
+        placeholder={placeholder}
         onBlur={handleOnBlur}
+        hideClearValueButton
+        onFocus={onTextInputFocus}
       >
         {maxButtonClick && (
           <TextInput.Button onClick={maxButtonClick}>max</TextInput.Button>

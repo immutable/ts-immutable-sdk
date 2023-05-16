@@ -1,17 +1,18 @@
+import { TokenInfo } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 
 export interface SwapFormState {
-  swapTo: string;
-  swapToAmount: string;
-  swapFrom: string;
+  swapFromToken: TokenInfo | null;
   swapFromAmount: string;
+  swapToToken: TokenInfo | null;
+  swapToAmount: string;
 }
 
 export const initialSwapFormState: SwapFormState = {
-  swapTo: '',
-  swapToAmount: '',
-  swapFrom: '',
+  swapFromToken: null,
   swapFromAmount: '',
+  swapToToken: null,
+  swapToAmount: '',
 };
 
 export interface SwapFormContextState {
@@ -24,21 +25,21 @@ export interface SwapFormAction {
 }
 
 type ActionPayload =
-  | SetSwapToPayload
-  | SetSwapToAmountPayload
-  | SetSwapFromPayload
-  | SetSwapFromAmountPayload;
+  SetSwapFromTokenPayload
+  | SetSwapFromAmountPayload
+  | SetSwapToTokenPayload
+  | SetSwapToAmountPayload;
 
 export enum SwapFormActions {
-  SET_SWAP_TO = 'SET_SWAP_TO',
-  SET_SWAP_TO_AMOUNT = 'SET_SWAP_TO_AMOUNT',
-  SET_SWAP_FROM = 'SET_SWAP_FROM',
+  SET_SWAP_FROM_TOKEN = 'SET_SWAP_FROM_TOKEN',
   SET_SWAP_FROM_AMOUNT = 'SET_SWAP_FROM_AMOUNT',
+  SET_SWAP_TO_TOKEN = 'SET_SWAP_TO_TOKEN',
+  SET_SWAP_TO_AMOUNT = 'SET_SWAP_TO_AMOUNT',
 }
 
-export interface SetSwapToPayload {
-  type: SwapFormActions.SET_SWAP_TO;
-  swapTo: string;
+export interface SetSwapToTokenPayload {
+  type: SwapFormActions.SET_SWAP_TO_TOKEN;
+  swapToToken: TokenInfo;
 }
 
 export interface SetSwapToAmountPayload {
@@ -46,9 +47,9 @@ export interface SetSwapToAmountPayload {
   swapToAmount: string;
 }
 
-export interface SetSwapFromPayload {
-  type: SwapFormActions.SET_SWAP_FROM;
-  swapFrom: string;
+export interface SetSwapFromTokenPayload {
+  type: SwapFormActions.SET_SWAP_FROM_TOKEN;
+  swapFromToken: TokenInfo;
 }
 
 export interface SetSwapFromAmountPayload {
@@ -68,20 +69,20 @@ export const swapFormReducer: Reducer<SwapFormState, SwapFormAction> = (
   action: SwapFormAction
 ) => {
   switch (action.payload.type) {
-    case SwapFormActions.SET_SWAP_TO:
+    case SwapFormActions.SET_SWAP_TO_TOKEN:
       return {
         ...state,
-        swapTo: action.payload.swapTo,
+        swapToToken: action.payload.swapToToken,
       };
     case SwapFormActions.SET_SWAP_TO_AMOUNT:
       return {
         ...state,
         swapToAmount: action.payload.swapToAmount,
       };
-    case SwapFormActions.SET_SWAP_FROM:
+    case SwapFormActions.SET_SWAP_FROM_TOKEN:
       return {
         ...state,
-        swapFrom: action.payload.swapFrom,
+        swapFromToken: action.payload.swapFromToken,
       };
     case SwapFormActions.SET_SWAP_FROM_AMOUNT:
       return {

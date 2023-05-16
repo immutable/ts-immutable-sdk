@@ -4,21 +4,18 @@ import {
   selectInputBoxStyle,
   selectStyle,
 } from './SelectInputStyles';
-import { SelectForm } from '../SelectForm/SelectForm';
+import { SelectForm, SelectOption } from '../SelectForm/SelectForm';
 import { TextInputForm } from '../TextInputForm/TextInputForm';
 
 // todo: sort out this list
 type IconList = 'EthToken' | 'ImxTokenDex';
 
 interface SelectInputProps {
-  options: {
-    id: string;
-    label: string;
-    icon?: IconList;
-    boldVariant?: boolean;
-  }[];
+  options: SelectOption[];
   selectTextAlign?: 'left' | 'right';
   textInputTextAlign?: 'left' | 'right';
+  textInputValue: string;
+  textInputPlaceholder?: string;
   textInputSubtext?: string;
   textInputErrored?: boolean;
   textInputErrorMessage?: string;
@@ -26,19 +23,25 @@ interface SelectInputProps {
   selectErrored?: boolean;
   selectErrorMessage?: string;
   textInputValidator: (value: string) => boolean;
+  onTextInputFocus: () => void;
+  onTextInputChange: (value: string) => void;
   onTextInputBlur: (value: string) => void;
   textInputMaxButtonClick?: () => void;
 }
 
 export const SelectInput = ({
   options,
+  textInputValue,
+  textInputPlaceholder,
   textInputValidator,
+  onTextInputFocus,
+  onTextInputChange,
   onTextInputBlur,
   textInputTextAlign,
-  selectTextAlign,
   textInputSubtext,
   textInputErrored,
   textInputErrorMessage,
+  selectTextAlign,
   selectSubtext,
   selectErrored,
   selectErrorMessage,
@@ -57,11 +60,15 @@ export const SelectInput = ({
       </Box>
       <Box sx={inputStyle}>
         <TextInputForm
+          value={textInputValue}
+          placeholder={textInputPlaceholder}
           subtext={textInputSubtext}
           textAlign={textInputTextAlign}
           isErrored={textInputErrored}
           errorMessage={textInputErrorMessage}
           validator={textInputValidator}
+          onTextInputFocus={onTextInputFocus}
+          onTextInputChange={onTextInputChange}
           onTextInputBlur={onTextInputBlur}
           maxButtonClick={textInputMaxButtonClick}
         />

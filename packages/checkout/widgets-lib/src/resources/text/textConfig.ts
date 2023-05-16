@@ -52,7 +52,16 @@ export const text = {
       header: {
         title: 'Swap coins',
       },
+      content: {
+        title: 'What would you like to swap?'
+      },
       swapForm: {
+        from: {
+          label: 'From'
+        },
+        to: {
+          label: 'To'
+        },
         buttonText: 'Swap',
       },
     },

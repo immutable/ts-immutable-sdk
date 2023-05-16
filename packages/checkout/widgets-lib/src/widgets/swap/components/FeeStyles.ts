@@ -1,10 +1,9 @@
 export const FeeContainerStyles = {
   display: 'flex',
   flexDirection: 'row',
-  rowGap: '58px',
-  width: '100%',
   justifyContent: 'space-between',
-  padding: '24px 16px 24px 16px',
+  alignItems: 'center',
+  paddingTop: 'base.spacing.x3',
 };
 
 export const FeeBoxStyles = {

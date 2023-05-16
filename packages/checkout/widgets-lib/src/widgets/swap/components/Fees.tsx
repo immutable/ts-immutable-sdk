@@ -1,4 +1,4 @@
-import { Body, Box } from '@biom3/react';
+import { Body, Box, ButtCon } from '@biom3/react';
 import { FeeBoxStyles, FeeContainerStyles } from './FeeStyles';
 
 export interface FeeProps {
@@ -12,9 +12,24 @@ export function Fees(feeProps: FeeProps) {
 
   return (
     <Box sx={FeeContainerStyles}>
-      <Body size="medium" weight="regular">
-        Fees total
-      </Body>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 'base.spacing.x2',
+        }}
+      >
+        <ButtCon
+          size="small"
+          variant="tertiary"
+          icon="ChevronExpand"
+          iconVariant="bold"
+        />
+        <Body size="medium" weight="regular">
+          Fees total
+        </Body>
+      </Box>
       <Box sx={FeeBoxStyles}>
         <Body size="medium" weight="regular" sx={{ textAlign: 'right' }}>
           ≈
@@ -23,7 +38,11 @@ export function Fees(feeProps: FeeProps) {
           {' '}
           {fees}
         </Body>
-        <Body size="xSmall" weight="regular" sx={{ textAlign: 'left' }}>
+        <Body
+          size="xSmall"
+          weight="regular"
+          sx={{ color: 'base.color.text.secondary' }}
+        >
           Approx USD $
           {fiatPrice}
         </Body>

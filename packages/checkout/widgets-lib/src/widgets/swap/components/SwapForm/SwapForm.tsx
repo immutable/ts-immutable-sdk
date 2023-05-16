@@ -6,15 +6,32 @@ import {
   SwapFormContext,
 } from '../../context/swap-form-context/SwapFormContext';
 import { Body, Box, Heading } from '@biom3/react';
-import { ToHeadingBodyStyle, ToHeadingStyle, ToStyle } from './SwapFormStyles';
+import {
+  SwapFormContainerStyle,
+  ToHeadingBodyStyle,
+  HeadingStyle,
+} from './SwapFormStyles';
+import { text } from '../../../../resources/text/textConfig';
+import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 
 export const SwapForm = () => {
-  const { swapFormDispatch } = useContext(SwapFormContext);
+  const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
+  const { swapForm } = text.views[SwapWidgetViews.SWAP];
+  const { swapFromAmount, swapToAmount } = swapFormState;
+
+  // extract these to context or calculate on render
+  const fromToConversionText = '1 WETH ≈ 12.6 GOG'; // TODO: to calculate when dex integrated
+  const fromFiatPriceText = 'Approx USD $20.40';
+  const availableFromBalanceSubtext = 'Available 0.123';
+
+  const toFiatPriceText = 'Approx USD $20.40';
 
   return (
-    <>
+    <Box sx={SwapFormContainerStyle}>
       <Box>
-        <Heading size="xSmall">From</Heading>
+        <Heading size="xSmall" sx={HeadingStyle}>
+          {swapForm.from.label}
+        </Heading>
         <SelectInput
           options={[
             // todo: get values from token balances
@@ -31,17 +48,31 @@ export const SwapForm = () => {
               boldVariant: true,
             },
           ]}
-          textInputSubtext="Approx USD $20.40" // todo: fix hardcoding
-          textInputTextAlign="right"
-          selectSubtext="0.123 Available" // todo: fix hardcoding
+          selectSubtext={availableFromBalanceSubtext} // todo: fix hardcoding
           selectTextAlign="left"
+          textInputValue={swapFromAmount}
+          textInputPlaceholder="0"
+          textInputSubtext={fromFiatPriceText} // todo: fix hardcoding
+          textInputTextAlign="right"
           textInputValidator={amountInputValidation}
-          onTextInputBlur={(swapTo: string) => {
-            console.log(swapTo);
+          onTextInputFocus={() => console.log('Swap From Text Input Focused')}
+          onTextInputChange={(swapFromAmount) => {
+            console.log('Swap From Amount onChange');
+            console.log(swapFromAmount);
             swapFormDispatch({
               payload: {
-                type: SwapFormActions.SET_SWAP_TO,
-                swapTo,
+                type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
+                swapFromAmount,
+              },
+            });
+          }}
+          onTextInputBlur={(swapFromAmount: string) => {
+            console.log('Swap From Amount onBlur');
+            console.log(swapFromAmount);
+            swapFormDispatch({
+              payload: {
+                type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
+                swapFromAmount,
               },
             });
           }}
@@ -50,12 +81,12 @@ export const SwapForm = () => {
           }}
         />
       </Box>
-      <Box sx={ToStyle}>
+      <Box>
         {/* todo, add the converstion label thats right aligned */}
-        <Box sx={ToHeadingStyle}>
-          <Heading size="xSmall">To</Heading>
+        <Box sx={HeadingStyle}>
+          <Heading size="xSmall">{swapForm.to.label}</Heading>
           <Body sx={ToHeadingBodyStyle} size="small">
-            {/* todo: fix hardcoding */}1 WETH ≈ 12.6 GOG
+            {fromToConversionText}
           </Body>
         </Box>
         <SelectInput
@@ -74,10 +105,25 @@ export const SwapForm = () => {
               boldVariant: true,
             },
           ]}
-          textInputSubtext="Approx USD $20.40" // todo: fix hardcoding
+          textInputValue={swapToAmount}
+          textInputPlaceholder="0"
+          textInputSubtext={toFiatPriceText}
           textInputTextAlign="right"
           textInputValidator={amountInputValidation}
+          onTextInputFocus={() => console.log('Swap To Text Input Focused')}
+          onTextInputChange={(swapToAmount) => {
+            console.log('Swap To Amount onChange');
+            console.log(swapToAmount);
+            swapFormDispatch({
+              payload: {
+                type: SwapFormActions.SET_SWAP_TO_AMOUNT,
+                swapToAmount,
+              },
+            });
+          }}
           onTextInputBlur={(swapToAmount: string) => {
+            console.log('Swap To Amount onBlur');
+            console.log(swapToAmount);
             swapFormDispatch({
               payload: {
                 type: SwapFormActions.SET_SWAP_TO_AMOUNT,
@@ -90,6 +136,6 @@ export const SwapForm = () => {
           }}
         />
       </Box>
-    </>
+    </Box>
   );
 };

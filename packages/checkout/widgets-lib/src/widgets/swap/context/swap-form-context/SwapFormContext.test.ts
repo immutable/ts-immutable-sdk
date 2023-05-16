@@ -1,14 +1,15 @@
-import { SetSwapFromAmountPayload, SetSwapFromPayload, SetSwapToAmountPayload, SetSwapToPayload,  SwapFormActions, initialSwapFormState, swapFormReducer } from "./SwapFormContext";
+import { TokenInfo } from "@imtbl/checkout-sdk";
+import { SetSwapFromAmountPayload, SetSwapFromTokenPayload, SetSwapToAmountPayload, SetSwapToTokenPayload,  SwapFormActions, initialSwapFormState, swapFormReducer } from "./SwapFormContext";
 
 describe('swap form context', () => {
   it ('should set swapTo when reducer called with SET_SWAP_TO action', () => {
-    const setSwapToPayload: SetSwapToPayload = {
-      type: SwapFormActions.SET_SWAP_TO,
-      swapTo: 'ethereum',
+    const setSwapToPayload: SetSwapToTokenPayload = {
+      type: SwapFormActions.SET_SWAP_TO_TOKEN,
+      swapToToken: {name: 'ethereum'} as TokenInfo,
     };
 
-    const { swapTo } = swapFormReducer(initialSwapFormState, { payload: setSwapToPayload });
-    expect(swapTo).toEqual('ethereum');
+    const { swapToToken } = swapFormReducer(initialSwapFormState, { payload: setSwapToPayload });
+    expect(swapToToken).toEqual({name: 'ethereum'});
   });
 
   it ('should set swapToAmount when reducer called with SET_SWAP_TO_AMOUNT action', () => {
@@ -22,13 +23,13 @@ describe('swap form context', () => {
   });
 
     it ('should set swapFrom when reducer called with SET_SWAP_FROM action', () => {
-    const setSwapFromPayload: SetSwapFromPayload = {
-      type: SwapFormActions.SET_SWAP_FROM,
-      swapFrom: 'ethereum',
+    const setSwapFromPayload: SetSwapFromTokenPayload = {
+      type: SwapFormActions.SET_SWAP_FROM_TOKEN,
+      swapFromToken: {name: 'ethereum'} as TokenInfo,
     };
 
-    const { swapFrom } = swapFormReducer(initialSwapFormState, { payload: setSwapFromPayload });
-    expect(swapFrom).toEqual('ethereum');
+    const { swapFromToken } = swapFormReducer(initialSwapFormState, { payload: setSwapFromPayload });
+    expect(swapFromToken).toEqual({name: 'ethereum'});
   });
 
   it ('should set swapFromAmount when reducer called with SET_SWAP_FROM_AMOUNT action', () => {
