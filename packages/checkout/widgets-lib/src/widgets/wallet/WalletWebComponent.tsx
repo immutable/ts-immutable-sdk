@@ -8,7 +8,6 @@ import {
   ConnectLoaderParams,
 } from '../../components/ConnectLoader/ConnectLoader';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
-import { Environment } from '@imtbl/config';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 
 export class ImmutableWallet extends ImmutableWebComponent {

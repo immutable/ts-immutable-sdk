@@ -52,17 +52,18 @@ export function Example() {
   const getQuote = async () => {
     setIsFetching(true);
 
-    const txn = await exchange.getUnsignedSwapTxFromAmountIn(
-      ethereumAccount,
-      inputToken,
-      outputToken,
-      ethers.utils.parseEther(`${inputAmount}`)
-    );
+    try {
+      const txn = await exchange.getUnsignedSwapTxFromAmountIn(
+        ethereumAccount,
+        inputToken,
+        outputToken,
+        ethers.utils.parseEther(`${inputAmount}`)
+      );
 
-    if (txn.success) {
       setResult(txn);
-    } else {
-      setError('Error fetching quote');
+    } catch(e) {
+      const message =  e instanceof Error ? e.message : 'Unknown Error';
+      setError(`Error fetching quote: ${message}`);
       setResult(null);
     }
 
@@ -99,8 +100,9 @@ export function Example() {
         // Wait for the Approve transaction to complete
         await provider.waitForTransaction(approveReceipt.result, 1, 500000);
         setApproved(true);
-      } catch (e: any) {
-        alert(e.message);
+      } catch (e) {
+        const message =  e instanceof Error ? e.message : 'Unknown Error';
+        alert(message);
         setIsFetching(false);
         return;
       }
@@ -117,8 +119,9 @@ export function Example() {
       await provider.waitForTransaction(receipt.result, 1, 500000);
       setIsFetching(false);
       setSwapStatus(true);
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e) {
+      const message =  e instanceof Error ? e.message : 'Unknown Error';
+      alert(message);
       setIsFetching(false);
       setSwapStatus(false);
       return;
@@ -171,28 +174,30 @@ export function Example() {
           </h3>
           <h3>Slippage: {result.info.slippage}%</h3>
           <h3>Gas estimate: {result.info.gasFeeEstimate} IMX</h3>
-          <button
-            className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
-            onClick={() => performSwap(result)}
-            disabled={isFetching}
-          >
-            {approved ? 'Swap' : 'Approve'}
-          </button>
-          {isFetching && <h3>loading...</h3>}
-          {swapStatus && (
-            <h3 style={{ marginTop: '12px' }}>
-              Swap successful! Check your metamask to see updated token
-              balances
-            </h3>
-          )}
-          {error && <Error message={error} />}
+            <>
+              <button
+                className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                onClick={() => performSwap(result)}
+                disabled={isFetching}
+              >
+                {approved ? 'Swap' : 'Approve'}
+              </button>
+              {isFetching && <h3>loading...</h3>}
+              {swapStatus && (
+                <h3 style={{ marginTop: '12px' }}>
+                  Swap successful! Check your metamask to see updated token
+                  balances
+                </h3>
+              )}
+              {error && <ErrorMessage message={error} />}
+            </>
         </>
       )}
     </div>
   );
 }
 
-const Error = ({ message }: { message: string }) => {
+const ErrorMessage = ({ message }: { message: string }) => {
   return (
     <div>
       <p>{message}</p>

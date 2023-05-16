@@ -1,56 +1,56 @@
-import { withSDKError } from 'Errors';
+/* eslint-disable no-console */
+import { Service } from 'typedi';
+
 import type { EventData, EventType } from '../types';
 import { asyncFn } from '../utils';
+import { EventClient } from '../EventClient';
+import { withSDKError } from '../Errors';
 
+import { CraftingService } from './CraftingService';
+
+// FIXME: Use generated types
+// FIXME: Update to include recipe payload from spec
+// https://api.dev.games.immutable.com/crafting/swagger/index.html#/
 export type CraftInput = {
   requiresWeb3: boolean;
-  web3Assets: Record<string, unknown>;
-  // TODO: Update to include recipe payload from spec
-  // https://api.dev.games.immutable.com/crafting/swagger/index.html#/
+  web3Assets?: any;
+  input: {
+    userId: string;
+    gameId: string;
+    recipeId: string;
+    ingredients: Array<{
+      conditionId: string;
+      itemId: string;
+    }>;
+  };
 };
 
 // TODO: Use Checkout SDK
-const Checkout = {
+const checkout = {
   connect: asyncFn('connect'),
   transfer: asyncFn('transfer', [1, 2, 3]),
   sign: asyncFn('sign'),
-};
-
-// TODO: Create CraftService class
-type CraftService = {
-  validateCraft: ReturnType<typeof asyncFn>;
-  submitCraft: ReturnType<typeof asyncFn>;
-};
-
-// TODO: Replace for CraftService class
-const CraftServiceMock = {
-  validateCraft: asyncFn('validateCraft'),
-  submitCraft: asyncFn('submitCraft'),
 };
 
 /**
  * @internal Craft events
  */
 export type CraftEvent = EventType<
-  'CRAFT',
-  | EventData<'STARTED' | 'IN_PROGRESS'>
-  | EventData<'COMPLETED', { data: { output: { id: string } } }>
-  | EventData<'FAILED', { error: { code: string; reason: string } }>
-  | EventData<
-      'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
-    >
+'CRAFT',
+| EventData<'STARTED' | 'IN_PROGRESS'>
+| EventData<'COMPLETED', { data: {} }>
+| EventData<'FAILED', { error: { code: string; reason: string } }>
+| EventData<
+'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
+>
 >;
 
 /** List of specific craft statuses */
 export type CraftStatus = CraftEvent['status'];
 
+@Service()
 export class Crafting {
-  private emitEvent: (event: CraftEvent) => void;
-  private service: CraftService;
-
-  constructor(emitEvent: (event: CraftEvent) => void, service?: CraftService) {
-    this.service = service || CraftServiceMock;
-    this.emitEvent = emitEvent;
+  constructor(private craftingService: CraftingService, private events: EventClient<CraftEvent>) {
   }
 
   /**
@@ -62,36 +62,47 @@ export class Crafting {
   @withSDKError({ type: 'CRAFTING_ERROR' })
   public async craft(input: CraftInput): Promise<CraftStatus> {
     // 1. validate inputs
-    this.emitEvent({ status: 'STARTED', action: 'CRAFT' });
-    await this.validate(input);
+    this.events.emitEvent({ status: 'STARTED', action: 'CRAFT' });
+    await this.validate();
 
     // 2. perform any web3 actions
     let txIds: number[] = [];
     let signature;
     if (input.requiresWeb3) {
-      this.emitEvent({ status: 'AWAITING_WEB3_INTERACTION', action: 'CRAFT' });
-      txIds = await Checkout.transfer(input.web3Assets);
-      signature = await Checkout.sign();
+      this.events.emitEvent({ status: 'AWAITING_WEB3_INTERACTION', action: 'CRAFT' });
+      txIds = await checkout.transfer(input.input);
+      signature = await checkout.sign();
     }
+    console.info('txIds, signature', { txIds, signature });
 
     // 3. submit craft to BE
-    this.emitEvent({ status: 'SUBMITTED', action: 'CRAFT' });
-    await this.service.submitCraft(input, txIds, signature);
+    this.events.emitEvent({ status: 'SUBMITTED', action: 'CRAFT' });
+    const { data, status } = await this.craftingService.craft(input.input);
 
-    // ? notify the caller of `craft` in real time the status/results
+    if (status !== 200) {
+      this.events.emitEvent({
+        status: 'FAILED',
+        action: 'CRAFT',
+        error: { code: `${status}`, reason: 'unknown' },
+      });
+    }
 
-    this.emitEvent({
+    this.events.emitEvent({
       status: 'COMPLETED',
       action: 'CRAFT',
-      data: {
-        output: { id: 'stirng' },
-      },
+      data,
     });
 
     return 'COMPLETED';
   }
 
-  public async validate(input: CraftInput) {
-    return this.service.validateCraft(input);
+  /**
+   * Validate a craft input
+   * @param input
+   * @returns
+   */
+  public async validate() {
+    // TODO
+    return this.craftingService.validate();
   }
 }

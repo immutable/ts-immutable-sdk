@@ -1,27 +1,31 @@
 import { BiomeThemeProvider, Body } from '@biom3/react';
 import {
   Checkout,
-  ConnectResult,
   GetTokenAllowListResult,
   TokenFilterTypes,
-  TokenInfo,
   ConnectionProviders,
 } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { useEffect, useState, useMemo, useCallback, useReducer } from 'react';
+import { useEffect, useCallback, useReducer } from 'react';
+import { SwapCoins } from './views/SwapCoins';
+import { SuccessView } from '../../components/Success/SuccessView';
+import { LoadingView } from '../../components/Loading/LoadingView';
+import { Environment } from '@imtbl/config';
+import {
+  SwapActions,
+  SwapContext,
+  initialSwapState,
+  swapReducer,
+} from './context/SwapContext';
 import {
   BaseViews,
   ViewActions,
   ViewContext,
   initialViewState,
   viewReducer,
-} from '../../context/ViewContext';
-import { SwapWidgetViews } from '../../context/SwapViewContextTypes';
-import { SwapCoins } from './views/SwapCoins';
-import { SuccessView } from '../../components/Success/SuccessView';
-import { LoadingView } from '../../components/Loading/LoadingView';
-import { Environment } from '@imtbl/config';
+} from '../../context/view-context/ViewContext';
+import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -37,41 +41,95 @@ export interface SwapWidgetParams {
 }
 
 export function SwapWidget(props: SwapWidgetProps) {
-  const [connection, setConnection] = useState<ConnectResult>();
-  const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+  const [swapState, swapDispatch] = useReducer(swapReducer, initialSwapState);
 
   const { params, theme, environment } = props;
   const { amount, fromContractAddress, toContractAddress, providerPreference } =
     params;
+
   const biomeTheme: BaseTokens =
     theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
       ? onLightBase
       : onDarkBase;
-  const checkout = useMemo(() => new Checkout({ baseConfig: { environment: environment } }),
-    [environment]);
 
-  const connectToCheckout = useCallback(async () => {
+  const swapWidgetSetup = useCallback(async () => {
     if (!providerPreference) return;
-    const result = await checkout.connect({
-      providerPreference,
+
+    const checkout = new Checkout({
+      baseConfig: { environment: environment },
     });
-    setConnection(result);
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_CHECKOUT,
+        checkout,
+      },
+    });
+
+    const connectResult = await checkout.connect({
+      providerPreference: providerPreference ?? ConnectionProviders.METAMASK,
+    });
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_PROVIDER,
+        provider: connectResult.provider,
+      },
+    });
+
+    const address = await connectResult.provider.getSigner().getAddress();
+    const tokenBalances = await checkout.getAllBalances({
+      provider: connectResult.provider,
+      walletAddress: address,
+      chainId: connectResult.network.chainId,
+    });
+
     const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
-      { chainId: 1, type: TokenFilterTypes.SWAP } // TODO: THIS NEEDS TO BE CHANGED BACK TO THE NETWORK CHAIN ID
+      {
+        chainId: connectResult.network.chainId,
+        type: TokenFilterTypes.SWAP,
+      }
     );
-    setAllowedTokens(allowList.tokens);
+
+    const allowedTokenBalances = tokenBalances.balances.filter((balance) =>
+      allowList.tokens
+        .map((token) => token.address)
+        .includes(balance.token.address)
+    );
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_ALLOWED_TOKENS,
+        allowedTokens: allowList.tokens,
+      },
+    });
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_TOKEN_BALANCES,
+        tokenBalances: allowedTokenBalances,
+      },
+    });
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_NETWORK,
+        network: connectResult.network,
+      },
+    });
+
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: { type: SwapWidgetViews.SWAP },
       },
     });
-  }, [checkout, providerPreference]);
+  }, [providerPreference, environment]);
 
   useEffect(() => {
-    connectToCheckout();
-  }, [connectToCheckout]);
+    swapWidgetSetup();
+  }, [swapWidgetSetup]);
 
   const renderFailure = () => {
     return <Body>Failure</Body>;
@@ -80,26 +138,26 @@ export function SwapWidget(props: SwapWidgetProps) {
   return (
     <BiomeThemeProvider theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
-        {viewState.view.type === BaseViews.LOADING_VIEW && (
-          <LoadingView loadingText="Loading" />
-        )}
-        {viewState.view.type === SwapWidgetViews.SWAP && (
-          <SwapCoins
-            allowedTokens={allowedTokens}
-            amount={amount}
-            fromContractAddress={fromContractAddress}
-            toContractAddress={toContractAddress}
-            connection={connection}
-          />
-        )}
-        {viewState.view.type === SwapWidgetViews.SUCCESS && (
-          <SuccessView
-            successText={'Success'}
-            actionText={'Contine'}
-            onActionClick={() => console.log('success')}
-          />
-        )}
-        {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
+        <SwapContext.Provider value={{ swapState, swapDispatch }}>
+          {viewState.view.type === BaseViews.LOADING_VIEW && (
+            <LoadingView loadingText="Loading" />
+          )}
+          {viewState.view.type === SwapWidgetViews.SWAP && (
+            <SwapCoins
+              amount={amount}
+              fromContractAddress={fromContractAddress}
+              toContractAddress={toContractAddress}
+            />
+          )}
+          {viewState.view.type === SwapWidgetViews.SUCCESS && (
+            <SuccessView
+              successText={'Success'}
+              actionText={'Contine'}
+              onActionClick={() => console.log('success')}
+            />
+          )}
+          {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
+        </SwapContext.Provider>
       </ViewContext.Provider>
     </BiomeThemeProvider>
   );

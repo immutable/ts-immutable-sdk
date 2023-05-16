@@ -239,10 +239,9 @@ describe('PassportImxProvider', () => {
   });
 
   describe('getAddress', () => {
-    it('should return stark signer address', async () => {
-      mockStarkSigner.getAddress.mockResolvedValue('0x1234...');
+    it('should return user ether key address', async () => {
       const response = await passportImxProvider.getAddress();
-      expect(response).toEqual('0x1234...');
+      expect(response).toEqual('123');
     });
   });
 });

@@ -101,7 +101,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('heading').should('be.visible');
       cySmartGet('close-button').should('be.visible');
       cySmartGet('select-network__target').should('be.visible');
-      cySmartGet('select-network__target').should('have.text', 'Ethereum');
+      cySmartGet('select-network__target').should('have.text', 'ETHEREUM');
       cySmartGet('select-token__target').should('be.visible');
       cySmartGet('select-token__target').should('have.text', 'ETH');
       cySmartGet('amount__input').should('be.visible');
@@ -131,7 +131,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('heading').should('be.visible');
       cySmartGet('close-button').should('be.visible');
       cySmartGet('select-network__target').should('be.visible');
-      cySmartGet('select-network__target').should('have.text', 'Ethereum');
+      cySmartGet('select-network__target').should('have.text', 'ETHEREUM');
       cySmartGet('select-token__target').should('be.visible');
       cySmartGet('select-token__target').should('have.text', 'MATIC');
       cySmartGet('amount__input').should('be.visible');

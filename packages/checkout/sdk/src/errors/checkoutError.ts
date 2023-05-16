@@ -13,9 +13,6 @@ export enum CheckoutErrorType {
   PROVIDER_REQUEST_FAILED_ERROR = 'PROVIDER_REQUEST_FAILED_ERROR',
   USER_REJECTED_REQUEST_ERROR = 'USER_REJECTED_REQUEST_ERROR',
   TRANSACTION_ERROR = 'TRANSACTION_ERROR',
-  FIAT_CONVERSION_ERROR = 'FIAT_CONVERSION_ERROR',
-  TOKEN_NOT_SUPPORTED_ERROR = 'TOKEN_NOT_SUPPORTED_ERROR',
-  FIAT_CURRENCY_NOT_SUPPORTED_ERROR = 'FIAT_CURRENCY_NOT_SUPPORTED_ERROR',
 }
 
 /**
@@ -35,12 +32,15 @@ export type ErrorType = {
  */
 export class CheckoutError extends Error {
   public message: string;
+
   public type: CheckoutErrorType;
+
   public data?: { [key: string]: string };
+
   constructor(
     message: string,
     type: CheckoutErrorType,
-    data?: { [key: string]: string }
+    data?: { [key: string]: string },
   ) {
     super(message);
     this.message = message;
@@ -63,6 +63,7 @@ export enum CheckoutInternalErrorType {
  */
 export class CheckoutInternalError extends Error {
   public type: CheckoutInternalErrorType;
+
   constructor(type: CheckoutInternalErrorType) {
     super('Checkout internal error');
     this.type = type;
@@ -72,13 +73,14 @@ export class CheckoutInternalError extends Error {
 /**
  * Higher order function that takes in a function and an error object.
  * Returns the result of the function or throws a custom {@link CheckoutError}.
- * If the error thrown by the function is an instance of {@link CheckoutError}, it throws a new {@link CheckoutError} based on the custom error object.
+ * If the error thrown by the function is an instance of {@link CheckoutError},
+ * it throws a new {@link CheckoutError} based on the custom error object.
  * Otherwise, it throws a new {@link CheckoutError} based on the custom error object with the cause of the error appended to the message.
  * @throws {@link CheckoutError}
  */
 export const withCheckoutError = async <T>(
   fn: () => Promise<T>,
-  customError: ErrorType
+  customError: ErrorType,
 ): Promise<T> => {
   try {
     return await fn();

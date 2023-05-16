@@ -17,6 +17,7 @@ import { ERC20 } from 'contracts/ABIs/ERC20';
 import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
 import { ROOT_STATE_SENDER } from 'contracts/ABIs/RootStateSender';
 import { CHILD_STATE_RECEIVER } from 'contracts/ABIs/ChildStateReceiver';
+import { getBlockNumberClosestToTimestamp } from 'lib/getBlockCloseToTimestamp';
 
 /**
  * Represents a token bridge, which manages asset transfers between two chains.
@@ -42,6 +43,9 @@ export class TokenBridge {
    * @param {BridgeFeeRequest} req - The fee request object containing the token address for which the fee is required.
    * @returns {Promise<BridgeFeeResponse>} - A promise that resolves to an object containing the bridge fee for the specified token and a flag indicating if the token is bridgeable.
    * @throws {BridgeError} - If an error occurs during the fee retrieval, a BridgeError will be thrown with a specific error type.
+   *
+   * Possible BridgeError types include:
+   * - INVALID_ADDRESS: The token address provided in the request is invalid.
    *
    * @example
    * const feeRequest = {
@@ -76,6 +80,12 @@ export class TokenBridge {
    * @param {BridgeDepositRequest} req - The deposit request object containing the required data for depositing tokens.
    * @returns {Promise<BridgeDepositResponse>} - A promise that resolves to an object containing the unsigned transaction data.
    * @throws {BridgeError} - If an error occurs during the generation of the unsigned transaction, a BridgeError will be thrown with a specific error type.
+   *
+   * Possible BridgeError types include:
+   * - UNSUPPORTED_ERROR: The operation is not supported. Currently thrown when attempting to deposit native tokens.
+   * - INVALID_ADDRESS: An Ethereum address provided in the request is invalid. This could be the depositor's, recipient's or the token's address.
+   * - INVALID_AMOUNT: The deposit amount provided in the request is invalid (less than or equal to 0).
+   * - INTERNAL_ERROR: An unexpected error occurred during the execution, likely due to the bridge SDK implementation.
    *
    * @example
    * const depositRequest = {
@@ -170,6 +180,13 @@ export class TokenBridge {
    * @param {ApproveBridgeRequest} req - The approve bridge request object containing the depositor address, token address, and deposit amount.
    * @returns {Promise<ApproveBridgeResponse>} - A promise that resolves to an object containing the unsigned approval transaction and a flag indicating if the approval is required.
    * @throws {BridgeError} - If an error occurs during the transaction creation, a BridgeError will be thrown with a specific error type.
+   *
+   * Possible BridgeError types include:
+   * - UNSUPPORTED_ERROR: The operation is not supported. Currently thrown when attempting to deposit native tokens.
+   * - INVALID_ADDRESS: An Ethereum address provided in the request is invalid.
+   * - INVALID_AMOUNT: The deposit amount provided in the request is invalid (less than or equal to 0).
+   * - INTERNAL_ERROR: An unexpected error occurred during the execution, likely due to the bridge SDK implementation.
+   * - PROVIDER_ERROR: An error occurred while interacting with the Ethereum provider. This includes issues calling the ERC20 smart contract
    *
    * @example
    * const approveRequest = {
@@ -269,6 +286,10 @@ export class TokenBridge {
    * @returns {Promise<WaitForResponse>} - A promise that resolves to an object containing the status of the deposit transaction.
    * @throws {BridgeError} - If an error occurs during the transaction confirmation or state sync, a BridgeError will be thrown with a specific error type.
    *
+   * Possible BridgeError types include:
+   * - PROVIDER_ERROR: An error occurred with the Ethereum provider during transaction confirmation or state synchronization.
+   * - TRANSACTION_REVERTED: The transaction on the root chain was reverted.
+   *
    * @example
    * const waitForRequest = {
    *   transactionHash: '0x123456...', // Deposit transaction hash on the root chain
@@ -285,9 +306,7 @@ export class TokenBridge {
   public async waitForDeposit(
     req: WaitForRequest,
   ): Promise<WaitForResponse> {
-    // TODO: remove once fixed
-    // eslint-disable-next-line @typescript-eslint/return-await
-    const rootTxReceipt: ethers.providers.TransactionReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(async () => await this.config.rootProvider.waitForTransaction(req.transactionHash, 3), BridgeErrorType.PROVIDER_ERROR);
+    const rootTxReceipt: ethers.providers.TransactionReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(async () => this.config.rootProvider.waitForTransaction(req.transactionHash, this.config.rootChainFinalityBlocks), BridgeErrorType.PROVIDER_ERROR);
 
     // Throw an error if the transaction was reverted
     if (rootTxReceipt.status !== 1) {
@@ -295,9 +314,19 @@ export class TokenBridge {
     }
 
     // Get the state sync ID from the transaction receipt
-    const stateSyncID = await withBridgeError<string>(async () => this.getRootStateSyncID(rootTxReceipt), BridgeErrorType.PROVIDER_ERROR);
+    const stateSyncID = await withBridgeError<number>(async () => this.getRootStateSyncID(rootTxReceipt), BridgeErrorType.PROVIDER_ERROR);
 
-    const result: CompletionStatus = await withBridgeError<CompletionStatus>(async () => this.waitForChildStateSync(stateSyncID, 10000), BridgeErrorType.PROVIDER_ERROR);
+    // Get the block for the timestamp
+    const rootBlock: ethers.providers.Block = await this.config.rootProvider.getBlock(rootTxReceipt.blockNumber);
+
+    // Get the minimum block on childchain which corresponds with the timestamp on rootchain
+    const minBlockRange: number = await withBridgeError<number>(async () => getBlockNumberClosestToTimestamp(this.config.childProvider, rootBlock.timestamp, this.config.blockTime, this.config.clockInaccuracy), BridgeErrorType.PROVIDER_ERROR);
+
+    // Get the upper bound for which we expect the StateSync event to occur
+    const maxBlockRange: number = minBlockRange + this.config.maxDepositBlockDelay;
+
+    // Poll till event observed
+    const result: CompletionStatus = await withBridgeError<CompletionStatus>(async () => this.waitForChildStateSync(stateSyncID, this.config.pollInterval, minBlockRange, maxBlockRange), BridgeErrorType.PROVIDER_ERROR);
 
     return {
       status: result,
@@ -305,35 +334,40 @@ export class TokenBridge {
   }
 
   private async waitForChildStateSync(
-    stateSyncID: string,
+    stateSyncID: number,
     interval: number,
+    minBlockRange: number,
+    maxBlockRange: number,
   ) : Promise<CompletionStatus> {
     const childStateReceiver = new ethers.Contract(this.config.bridgeContracts.childChainStateReceiver, CHILD_STATE_RECEIVER, this.config.childProvider);
 
     // Set up an event filter for the StateSyncResult event
-    const eventFilter = childStateReceiver.filters.StateSyncResult();
+    const eventFilter = childStateReceiver.filters.StateSyncResult(stateSyncID, null, null);
 
-    let childDepositEvent;
-    // TODO: please fix
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      // Query for past events that match the event filter
+    // Helper function to query for events with the state sync id
+    const getEventsWithStateSyncID = async (): Promise<ethers.Event[]> => childStateReceiver.queryFilter(eventFilter, minBlockRange, maxBlockRange);
 
-      // TODO: please fix
-      // eslint-disable-next-line no-await-in-loop
-      const pastEvents = await childStateReceiver.queryFilter(eventFilter);
-      childDepositEvent = pastEvents.find((ev) => {
-        if (!ev.args) return false;
-        if (!ev.args.counter) return false;
-        return (ev.args.counter.toString() === stateSyncID);
-      });
-      if (childDepositEvent) {
-        break;
+    // Helper function to pause execution for a specified interval
+    const pause = (): Promise<void> => new Promise((resolve) => {
+      setTimeout(resolve, interval);
+    });
+
+    // Recursive function to keep checking for the child deposit event
+    const checkForChildDepositEvent = async (): Promise<ethers.Event> => {
+      const events = await getEventsWithStateSyncID();
+      if (events.length > 1) {
+        throw new Error(`expected maximum of 1 events with statesync id ${stateSyncID} but found ${events.length}`);
       }
-      // TODO: please fix
-      // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
-      await new Promise((resolve) => setTimeout(resolve, interval));
-    }
+      if (events.length === 1) {
+        return events[0];
+      }
+
+      await pause();
+      return checkForChildDepositEvent();
+    };
+
+    const childDepositEvent = await checkForChildDepositEvent();
+
     if (!childDepositEvent) throw new Error('failed to find child deposit event');
     if (!childDepositEvent.args) throw new Error('child deposit event has no args');
     if (!childDepositEvent.args.status) throw new Error('child deposit event has no status');
@@ -343,7 +377,7 @@ export class TokenBridge {
     return CompletionStatus.FAILED;
   }
 
-  private async getRootStateSyncID(txReceipt: ethers.providers.TransactionReceipt): Promise<string> {
+  private async getRootStateSyncID(txReceipt: ethers.providers.TransactionReceipt): Promise<number> {
     const stateSenderInterface = new ethers.utils.Interface(ROOT_STATE_SENDER);
 
     // Get the StateSynced event log from the transaction receipt
@@ -358,8 +392,8 @@ export class TokenBridge {
       throw new Error(`expected state sync event in tx ${txReceipt.transactionHash}`);
     }
 
-    // Return the state sync ID as a string
-    const stateSyncID = stateSyncEvent.args.id.toString();
+    // Return the state sync ID as a number
+    const stateSyncID = parseInt(stateSyncEvent.args.id, 10);
     return stateSyncID;
   }
 

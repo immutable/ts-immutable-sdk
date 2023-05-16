@@ -177,6 +177,6 @@ export default class PassportImxProvider implements IMXProvider {
   }
 
   getAddress(): Promise<string> {
-    return Promise.resolve(this.starkSigner.getAddress());
+    return Promise.resolve(this.user.etherKey);
   }
 }

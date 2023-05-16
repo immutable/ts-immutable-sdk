@@ -6,10 +6,13 @@ import {
   ConnectionProviders,
 } from '@imtbl/checkout-sdk';
 import { useContext, useState, useEffect } from 'react';
-import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
-import { ViewContext, ViewActions } from '../../../context/ViewContext';
+import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
+import {
+  ViewContext,
+  ViewActions,
+} from '../../../context/view-context/ViewContext';
 
 export interface WalletListProps {
   walletFilterTypes?: WalletFilterTypes;

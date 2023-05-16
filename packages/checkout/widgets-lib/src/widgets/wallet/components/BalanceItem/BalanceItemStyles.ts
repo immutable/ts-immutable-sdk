@@ -24,6 +24,6 @@ export const BalanceItemPriceBoxStyle = {
 
 export const ShowMenuItem = (show: boolean | undefined) => {
   return {
-    display: show ? '' : 'none'
-  }
-}
+    display: show ? '' : 'none',
+  };
+};

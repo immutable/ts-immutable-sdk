@@ -168,11 +168,11 @@ describe('ConnectLoader', () => {
             getAddress: async () => Promise.resolve(''),
           }),
           getNetwork: async () => ({
-            chainId: 5,
-            name: 'GOERLI',
+            chainId: 11155111,
+            name: 'SEPOLIA',
           }),
         },
-        network: { name: 'GOERLI' },
+        network: { name: 'Sepolia' },
       });
 
     mount(

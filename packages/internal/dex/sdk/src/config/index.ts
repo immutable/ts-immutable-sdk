@@ -5,6 +5,7 @@ import {
 } from 'constants/tokens';
 import { POLYGON_ZKEVM_TESTNET_RPC_URL } from 'constants/rpc';
 import { tokenInfoToUniswapToken } from 'lib';
+import { ChainNotSupportedError } from 'errors';
 import { ExchangeModuleConfiguration } from '../types';
 import { Chain } from '../constants/chains';
 
@@ -33,9 +34,7 @@ export class ExchangeConfiguration {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const chain = SupportedChainIdsForEnvironment[baseConfig.environment][chainId];
     if (!chain) {
-      throw new Error(
-        `Chain ${chainId} is not supported in environment ${baseConfig.environment}`,
-      );
+      throw new ChainNotSupportedError(chainId, baseConfig.environment);
     }
 
     this.chain = chain;

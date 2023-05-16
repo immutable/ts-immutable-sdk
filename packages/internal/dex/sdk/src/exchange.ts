@@ -6,20 +6,22 @@ import {
 import assert from 'assert';
 
 import { slippageToFraction } from 'lib/transactionUtils/slippage';
-import { ExchangeError, ExchangeErrorTypes } from 'errors';
+import {
+  DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
+} from 'errors';
 import { calculateGasFee, fetchGasPrice } from 'lib/transactionUtils/gas';
 import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
   DEFAULT_SLIPPAGE,
   MAX_MAX_HOPS,
+  MIN_MAX_HOPS,
 } from './constants';
 
 import { Router } from './lib/router';
 import {
   getERC20Decimals,
-  validateAddress,
-  validateDifferentAddresses,
+  isValidAddress,
 } from './lib/utils';
 import { TransactionResponse } from './types';
 import { createSwapParameters } from './lib/transactionUtils/swap';
@@ -57,13 +59,14 @@ export class Exchange {
     slippagePercent: number,
     fromAddress: string,
   ) {
-    validateAddress(fromAddress);
-    validateAddress(tokenInAddress);
-    validateAddress(tokenOutAddress);
-    validateDifferentAddresses(tokenInAddress, tokenOutAddress);
-    assert(maxHops <= MAX_MAX_HOPS, new ExchangeError(ExchangeErrorTypes.INVALID_MAX_HOPS));
-    assert(slippagePercent <= 50, new ExchangeError(ExchangeErrorTypes.INVALID_SLIPPAGE));
-    assert(slippagePercent >= 0, new ExchangeError(ExchangeErrorTypes.INVALID_SLIPPAGE));
+    assert(isValidAddress(fromAddress), new InvalidAddressError('invalid from address'));
+    assert(isValidAddress(tokenInAddress), new InvalidAddressError('invalid token in address'));
+    assert(isValidAddress(tokenOutAddress), new InvalidAddressError('invalid token out address'));
+    assert(tokenInAddress.toLocaleLowerCase() !== tokenOutAddress.toLocaleLowerCase(), new DuplicateAddressesError());
+    assert(maxHops <= MAX_MAX_HOPS, new InvalidMaxHopsError('max hops must be less than or equal to 10'));
+    assert(maxHops >= MIN_MAX_HOPS, new InvalidMaxHopsError('max hops must be greater than or equal to 1'));
+    assert(slippagePercent <= 50, new InvalidSlippageError('slippage percent must be less than or equal to 50'));
+    assert(slippagePercent >= 0, new InvalidSlippageError('slippage percent must be greater than or equal to 0'));
   }
 
   private async getUnsignedSwapTx(
@@ -78,11 +81,12 @@ export class Exchange {
   ): Promise<TransactionResponse> {
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, slippagePercent, fromAddress);
 
-    // get decimals of token
+    // get the decimals of the tokens that will be swapped
     const [tokenInDecimals, tokenOutDecimals] = await Promise.all([
       getERC20Decimals(tokenInAddress, this.provider),
       getERC20Decimals(tokenOutAddress, this.provider),
     ]);
+
     const tokenIn: Token = new Token(
       this.chainId,
       tokenInAddress,
@@ -94,6 +98,7 @@ export class Exchange {
       tokenOutDecimals,
     );
 
+    // determine which amount was specified for the swap from the TradeType
     let amountSpecified: CurrencyAmount<Token>;
     let otherToken: Token;
     if (tradeType === TradeType.EXACT_INPUT) {
@@ -110,16 +115,9 @@ export class Exchange {
       tradeType,
       maxHops,
     );
-    if (!routeAndQuote.success) {
-      return {
-        success: false,
-        transaction: undefined,
-        info: undefined,
-      };
-    }
 
     const slippage = slippageToFraction(slippagePercent);
-    const params: MethodParameters = await createSwapParameters(
+    const params: MethodParameters = createSwapParameters(
       routeAndQuote.trade,
       fromAddress,
       slippage,
@@ -137,7 +135,6 @@ export class Exchange {
     const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, routeAndQuote.trade.gasEstimate) : null;
 
     return {
-      success: true,
       transaction: {
         data: params.calldata,
         to: this.router.routingContracts.peripheryRouterAddress,
@@ -209,7 +206,7 @@ export class Exchange {
     maxHops: number = DEFAULT_MAX_HOPS,
     deadline: number = DEFAULT_DEADLINE,
   ): Promise<TransactionResponse> {
-    return this.getUnsignedSwapTx(
+    return await this.getUnsignedSwapTx(
       fromAddress,
       tokenInAddress,
       tokenOutAddress,
