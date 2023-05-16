@@ -92,6 +92,8 @@ export const WalletContext = createContext<WalletContextState>({
   walletDispatch: () => {},
 });
 
+WalletContext.displayName = 'WalletContext'; // help with debugging Context in browser
+
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export const walletReducer: Reducer<WalletState, WalletAction> = (

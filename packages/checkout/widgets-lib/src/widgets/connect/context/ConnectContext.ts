@@ -63,6 +63,8 @@ export const ConnectContext = createContext<ConnectContextState>({
   connectDispatch: () => {},
 });
 
+ConnectContext.displayName = 'ConnectContext'; // help with debugging Context in browser
+
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export const connectReducer: Reducer<ConnectState, ConnectAction> = (

@@ -54,4 +54,3 @@ export type WalletEvent<T> = {
   type: WalletEventType;
   data: T;
 };
-

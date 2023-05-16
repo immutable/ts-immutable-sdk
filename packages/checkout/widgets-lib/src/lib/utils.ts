@@ -8,12 +8,20 @@ export const sortTokensByAmount = (
   chainId: ChainId
 ) => {
   return tokens.sort((a, b) => {
+    // make sure IMX is at the top of the list
     if (
       chainId === zkEVMNetwork(environment) &&
       a.token.symbol.toLowerCase() === 'imx' &&
       b.token.symbol.toLowerCase() !== 'imx'
     ) {
       return -1;
+    }
+    if (
+      chainId === zkEVMNetwork(environment) &&
+      b.token.symbol.toLowerCase() === 'imx' &&
+      a.token.symbol.toLowerCase() !== 'imx'
+    ) {
+      return 1;
     }
 
     if (a.balance.lt(b.balance)) {

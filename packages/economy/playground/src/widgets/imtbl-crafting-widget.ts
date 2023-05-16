@@ -1,5 +1,5 @@
 import { LitElement, css, html } from 'lit';
-import { customElement, state } from 'lit/decorators';
+import { customElement, state } from 'lit/decorators.js';
 
 import { Economy, EconomyEvents } from '@imtbl/economy';
 import type {
@@ -8,8 +8,9 @@ import type {
   ItemDefinition,
   Recipe,
 } from '@imtbl/economy';
+import { Environment } from '@imtbl/config';
 
-@customElement('imtbl-card-upgrade-widget')
+@customElement('imtbl-crafting-widget')
 export class CraftingWidget extends LitElement {
   static styles = css``;
 
@@ -17,7 +18,18 @@ export class CraftingWidget extends LitElement {
 
   constructor() {
     super();
-    this.economy = new Economy();
+    this.economy = Economy.build({
+      gameId: 'pokemon',
+      userId: 'pokemon_master',
+      walletAddress: '0x',
+      imxProvider: undefined,
+      baseConfig: {
+        environment: Environment.PRODUCTION,
+      },
+      overrides: {
+        servicesBaseURL: 'http://127.0.0.1:3031'
+      }
+    });
     this.getRecipe();
     this.getInventory();
   }

@@ -51,15 +51,14 @@ export function sendSwapCoinsEvent(eventData: WalletRequestSwapEvent) {
 }
 
 export function sendBridgeCoinsEvent(eventData: WalletRequestBridgeEvent) {
-  const bridgeCoinsEvent = new CustomEvent<WalletEvent<WalletRequestBridgeEvent>>(
-    IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
-    {
-      detail: {
-        type: WalletEventType.REQUEST_BRIDGE,
-        data: eventData,
-      },
-    }
-  );
+  const bridgeCoinsEvent = new CustomEvent<
+    WalletEvent<WalletRequestBridgeEvent>
+  >(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
+    detail: {
+      type: WalletEventType.REQUEST_BRIDGE,
+      data: eventData,
+    },
+  });
   console.log('bridge coins event:', bridgeCoinsEvent);
   if (window !== undefined) window.dispatchEvent(bridgeCoinsEvent);
 }

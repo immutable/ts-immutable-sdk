@@ -5,7 +5,7 @@ import {
   eventOptions,
   property,
   state,
-} from 'lit/decorators';
+} from 'lit/decorators.js';
 
 import { Economy, EconomyCustomEventTypes } from '@imtbl/economy';
 import type { CraftInput } from '@imtbl/economy';
@@ -22,13 +22,13 @@ export class CraftButton extends LitElement {
   }
 
   @property()
-    label?: string = '%craft-button%';
+  label?: string = '%craft-button%';
 
   @state()
   private craftInput: CraftInput = {
-      requiresWeb3: true,
-      web3Assets: {},
-    };
+    requiresWeb3: true,
+    web3Assets: {},
+  };
 
   handleCustomEvent<T extends Event>(listener: (event: T) => void) {
     return (event: Event) => {
@@ -40,7 +40,7 @@ export class CraftButton extends LitElement {
     super.connectedCallback();
     window.addEventListener(
       EconomyCustomEventTypes.DEFAULT,
-      this.handleCustomEvent(this.handleConnectEvent),
+      this.handleCustomEvent(this.handleConnectEvent)
     );
   }
 
