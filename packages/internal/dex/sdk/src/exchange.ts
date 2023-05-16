@@ -7,19 +7,21 @@ import assert from 'assert';
 import JSBI from 'jsbi';
 
 import { slippageToFraction } from 'lib/transactionUtils/slippage';
-import { ExchangeError, ExchangeErrorTypes } from 'errors';
+import {
+  DuplicateAddressesError, ExchangeErrorMessage, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
+} from 'errors';
 import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
   DEFAULT_SLIPPAGE,
   MAX_MAX_HOPS,
+  MIN_MAX_HOPS,
 } from './constants';
 
 import { Router } from './lib/router';
 import {
   getERC20Decimals,
   validateAddress,
-  validateDifferentAddresses,
 } from './lib/utils';
 import { TransactionResponse } from './types';
 import { createSwapParameters } from './lib/transactionUtils/swap';
@@ -55,15 +57,16 @@ export class Exchange {
     tokenOutAddress: string,
     maxHops: number,
     slippagePercent: number,
-    fromAddress?: string,
+    fromAddress: string,
   ) {
-    if (fromAddress) validateAddress(fromAddress);
-    validateAddress(tokenInAddress);
-    validateAddress(tokenOutAddress);
-    validateDifferentAddresses(tokenInAddress, tokenOutAddress);
-    assert(maxHops <= MAX_MAX_HOPS, new ExchangeError(ExchangeErrorTypes.INVALID_MAX_HOPS));
-    assert(slippagePercent <= 50, new ExchangeError(ExchangeErrorTypes.INVALID_SLIPPAGE));
-    assert(slippagePercent >= 0, new ExchangeError(ExchangeErrorTypes.INVALID_SLIPPAGE));
+    assert(validateAddress(fromAddress), new InvalidAddressError(ExchangeErrorMessage.INVALID_FROM));
+    assert(validateAddress(tokenInAddress), new InvalidAddressError(ExchangeErrorMessage.INVALID_TOKEN_IN));
+    assert(validateAddress(tokenOutAddress), new InvalidAddressError(ExchangeErrorMessage.INVALID_TOKEN_OUT));
+    assert(tokenInAddress.toLocaleLowerCase() !== tokenOutAddress.toLocaleLowerCase(), new DuplicateAddressesError());
+    assert(maxHops <= MAX_MAX_HOPS, new InvalidMaxHopsError(ExchangeErrorMessage.MAX_HOPS_TOO_HIGH));
+    assert(maxHops >= MIN_MAX_HOPS, new InvalidMaxHopsError(ExchangeErrorMessage.MAX_HOPS_TOO_LOW));
+    assert(slippagePercent <= 50, new InvalidSlippageError(ExchangeErrorMessage.SLIPPAGE_TOO_HIGH));
+    assert(slippagePercent >= 0, new InvalidSlippageError(ExchangeErrorMessage.SLIPPAGE_TOO_LOW));
   }
 
   private async getUnsignedSwapTx(
@@ -78,11 +81,12 @@ export class Exchange {
   ): Promise<TransactionResponse> {
     Exchange.validate(tokenInAddress, tokenOutAddress, maxHops, slippagePercent, fromAddress);
 
-    // get decimals of token
+    // get the decimals of the tokens that will be swapped
     const [tokenInDecimals, tokenOutDecimals] = await Promise.all([
       getERC20Decimals(tokenInAddress, this.provider),
       getERC20Decimals(tokenOutAddress, this.provider),
     ]);
+
     const tokenIn: Token = new Token(
       this.chainId,
       tokenInAddress,
@@ -94,6 +98,7 @@ export class Exchange {
       tokenOutDecimals,
     );
 
+    // determine which amount was specified for the swap from the TradeType
     let amountSpecified: CurrencyAmount<Token>;
     let otherToken: Token;
     const amountJsbi = JSBI.BigInt(amount.toString());
@@ -111,16 +116,9 @@ export class Exchange {
       tradeType,
       maxHops,
     );
-    if (!routeAndQuote.success) {
-      return {
-        success: false,
-        transaction: undefined,
-        info: undefined,
-      };
-    }
 
     const slippage = slippageToFraction(slippagePercent);
-    const params: MethodParameters = await createSwapParameters(
+    const params: MethodParameters = createSwapParameters(
       routeAndQuote.trade,
       fromAddress,
       slippage,
@@ -135,7 +133,6 @@ export class Exchange {
     );
 
     return {
-      success: true,
       transaction: {
         data: params.calldata,
         to: this.router.routingContracts.peripheryRouterAddress,
@@ -206,7 +203,7 @@ export class Exchange {
     maxHops: number = DEFAULT_MAX_HOPS,
     deadline: number = DEFAULT_DEADLINE,
   ): Promise<TransactionResponse> {
-    return this.getUnsignedSwapTx(
+    return await this.getUnsignedSwapTx(
       fromAddress,
       tokenInAddress,
       tokenOutAddress,

@@ -1,7 +1,8 @@
 import { Pool } from '@uniswap/v3-sdk';
 import { Token } from '@uniswap/sdk-core';
 import { BigNumber } from 'ethers';
-import { multicallSingleCallDataMultipleContracts } from '../multicall';
+import { ExchangeErrorMessage, ProviderCallError } from 'errors';
+import { MulticallResponse, multicallSingleCallDataMultipleContracts } from '../multicall';
 import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromERC20Pairs';
 import { ERC20Pair } from './generateERC20Pairs';
 import { Multicall, UniswapV3Pool__factory } from '../../contracts/types';
@@ -21,6 +22,8 @@ const liquidityFuncString = 'liquidity';
 const slot0FuncString = 'slot0';
 const noDataResult = '0x';
 
+// TODO: Split into fetchPools and filterPools methods
+// in order to allow for better error handling/separation of concerns
 export const fetchValidPools = async (
   multicallContract: Multicall,
   erc20Pair: ERC20Pair,
@@ -36,18 +39,24 @@ export const fetchValidPools = async (
 
   // The multicall contract returns data in the same order as the given pool addresses
   // Indexes of pool addresses will map to the indexes of the results
-  const [slot0Results, liquidityResults] = await Promise.all([
-    multicallSingleCallDataMultipleContracts(
-      multicallContract,
-      slot0FuncString,
-      poolAddresses,
-    ),
-    multicallSingleCallDataMultipleContracts(
-      multicallContract,
-      liquidityFuncString,
-      poolAddresses,
-    ),
-  ]);
+  let slot0Results: MulticallResponse;
+  let liquidityResults: MulticallResponse;
+  try {
+    [slot0Results, liquidityResults] = await Promise.all([
+      multicallSingleCallDataMultipleContracts(
+        multicallContract,
+        slot0FuncString,
+        poolAddresses,
+      ),
+      multicallSingleCallDataMultipleContracts(
+        multicallContract,
+        liquidityFuncString,
+        poolAddresses,
+      ),
+    ]);
+  } catch (e: any) {
+    throw new ProviderCallError(`${ExchangeErrorMessage.FAILED_MULTICALL}: ${e.message}`);
+  }
 
   const slot0s = slot0Results.returnData;
   const liquidities = liquidityResults.returnData;

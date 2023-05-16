@@ -9,12 +9,12 @@ import {
 import JSBI from 'jsbi';
 import { QuoteTradeInfo } from '../../types';
 
-export async function createSwapParameters(
+export function createSwapParameters(
   trade: QuoteTradeInfo,
   fromAddress: string,
   slippage: Percent,
   deadline: number,
-): Promise<MethodParameters> {
+): MethodParameters {
   // Create an unchecked trade to be used in generating swap parameters.
   const uncheckedTrade: Trade<Currency, Currency, TradeType> = Trade.createUncheckedTrade({
     route: trade.route,
