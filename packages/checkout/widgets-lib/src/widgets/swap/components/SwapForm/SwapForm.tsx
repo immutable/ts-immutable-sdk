@@ -1,11 +1,11 @@
-import { useContext } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import { SelectInput } from '../../../../components/FormComponents/SelectInput/SelectInput';
 import { amountInputValidation } from '../../../../lib/validations/amountInputValidations';
 import {
   SwapFormActions,
   SwapFormContext,
 } from '../../context/swap-form-context/SwapFormContext';
-import { Body, Box, Heading } from '@biom3/react';
+import { Body, Box, Heading, OptionKey } from '@biom3/react';
 import {
   SwapFormContainerStyle,
   ToHeadingBodyStyle,
@@ -13,18 +13,81 @@ import {
 } from './SwapFormStyles';
 import { text } from '../../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
+import { SwapContext } from '../../context/SwapContext';
+import { SelectOption } from '../../../../components/FormComponents/SelectForm/SelectForm';
+
+const SWAP_TEXT_INPUT_PLACEHOLDER = '0';
 
 export const SwapForm = () => {
+  const { swapState } = useContext(SwapContext);
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
   const { swapForm } = text.views[SwapWidgetViews.SWAP];
   const { swapFromAmount, swapToAmount } = swapFormState;
+  const { tokenBalances, allowedTokens } = swapState;
+
+  const fromTokensOptions = useMemo(() => {
+    return tokenBalances.map(
+      (tokenBalance) =>
+        ({
+          id: `${tokenBalance.token.symbol}-${tokenBalance.token.name}`,
+          label: tokenBalance.token.symbol,
+          icon: tokenBalance.token.icon, // todo: add correct image once available on token info
+        } as SelectOption)
+    );
+  }, [tokenBalances]);
+
+  const toTokenOptions = useMemo(() => {
+    return allowedTokens.map(
+      (token) =>
+        ({
+          id: `${token.symbol}-${token.name}`,
+          label: token.symbol,
+          icon: undefined, // todo: add correct image once available on token info
+        } as SelectOption)
+    );
+  }, [allowedTokens]);
 
   // extract these to context or calculate on render
   const fromToConversionText = '1 WETH ≈ 12.6 GOG'; // TODO: to calculate when dex integrated
   const fromFiatPriceText = 'Approx USD $20.40';
   const availableFromBalanceSubtext = 'Available 0.123';
 
-  const toFiatPriceText = 'Approx USD $20.40';
+  const handleFromTokenChange = useCallback(
+    (value: OptionKey) => {
+      const selectedTokenOption = tokenBalances.find(
+        (tokenBalance) =>
+          value === `${tokenBalance.token.symbol}-${tokenBalance.token.name}`
+      );
+
+      if (selectedTokenOption && selectedTokenOption.token) {
+        swapFormDispatch({
+          payload: {
+            type: SwapFormActions.SET_SWAP_FROM_TOKEN,
+            swapFromToken: selectedTokenOption.token,
+          },
+        });
+      }
+    },
+    [tokenBalances, swapFormDispatch]
+  );
+
+  const handleToTokenChange = useCallback(
+    (value: OptionKey) => {
+      const selectedTokenOption = allowedTokens.find(
+        (token) => value === `${token.symbol}-${token.name}`
+      );
+
+      if (selectedTokenOption) {
+        swapFormDispatch({
+          payload: {
+            type: SwapFormActions.SET_SWAP_TO_TOKEN,
+            swapToToken: selectedTokenOption,
+          },
+        });
+      }
+    },
+    [allowedTokens, swapFormDispatch]
+  );
 
   return (
     <Box sx={SwapFormContainerStyle}>
@@ -33,26 +96,12 @@ export const SwapForm = () => {
           {swapForm.from.label}
         </Heading>
         <SelectInput
-          options={[
-            // todo: get values from token balances
-            {
-              id: 'ETH',
-              label: 'Ethereum',
-              icon: 'EthToken',
-              boldVariant: true,
-            },
-            {
-              id: 'IMX',
-              label: 'Immutable X',
-              icon: 'ImxTokenDex',
-              boldVariant: true,
-            },
-          ]}
-          selectSubtext={availableFromBalanceSubtext} // todo: fix hardcoding
+          options={fromTokensOptions}
+          selectSubtext={availableFromBalanceSubtext}
           selectTextAlign="left"
           textInputValue={swapFromAmount}
-          textInputPlaceholder="0"
-          textInputSubtext={fromFiatPriceText} // todo: fix hardcoding
+          textInputPlaceholder={SWAP_TEXT_INPUT_PLACEHOLDER}
+          textInputSubtext={fromFiatPriceText}
           textInputTextAlign="right"
           textInputValidator={amountInputValidation}
           onTextInputFocus={() => console.log('Swap From Text Input Focused')}
@@ -68,17 +117,11 @@ export const SwapForm = () => {
           }}
           onTextInputBlur={(swapFromAmount: string) => {
             console.log('Swap From Amount onBlur');
-            console.log(swapFromAmount);
-            swapFormDispatch({
-              payload: {
-                type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
-                swapFromAmount,
-              },
-            });
           }}
           textInputMaxButtonClick={() => {
             console.log('todo: implement max button function');
           }}
+          onSelectChange={handleFromTokenChange}
         />
       </Box>
       <Box>
@@ -90,30 +133,13 @@ export const SwapForm = () => {
           </Body>
         </Box>
         <SelectInput
-          options={[
-            // todo: get from allowed tokens
-            {
-              id: 'ETH',
-              label: 'Ethereum',
-              icon: 'EthToken',
-              boldVariant: true,
-            },
-            {
-              id: 'IMX',
-              label: 'Immutable X',
-              icon: 'ImxTokenDex',
-              boldVariant: true,
-            },
-          ]}
+          options={toTokenOptions}
           textInputValue={swapToAmount}
-          textInputPlaceholder="0"
-          textInputSubtext={toFiatPriceText}
+          textInputPlaceholder={SWAP_TEXT_INPUT_PLACEHOLDER}
           textInputTextAlign="right"
           textInputValidator={amountInputValidation}
           onTextInputFocus={() => console.log('Swap To Text Input Focused')}
           onTextInputChange={(swapToAmount) => {
-            console.log('Swap To Amount onChange');
-            console.log(swapToAmount);
             swapFormDispatch({
               payload: {
                 type: SwapFormActions.SET_SWAP_TO_AMOUNT,
@@ -123,17 +149,11 @@ export const SwapForm = () => {
           }}
           onTextInputBlur={(swapToAmount: string) => {
             console.log('Swap To Amount onBlur');
-            console.log(swapToAmount);
-            swapFormDispatch({
-              payload: {
-                type: SwapFormActions.SET_SWAP_TO_AMOUNT,
-                swapToAmount,
-              },
-            });
           }}
           textInputMaxButtonClick={() => {
             console.log('todo: implement max button function');
           }}
+          onSelectChange={handleToTokenChange}
         />
       </Box>
     </Box>

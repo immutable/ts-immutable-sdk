@@ -1,4 +1,4 @@
-import { Box } from '@biom3/react';
+import { Box, OptionKey } from '@biom3/react';
 import {
   inputStyle,
   selectInputBoxStyle,
@@ -6,9 +6,6 @@ import {
 } from './SelectInputStyles';
 import { SelectForm, SelectOption } from '../SelectForm/SelectForm';
 import { TextInputForm } from '../TextInputForm/TextInputForm';
-
-// todo: sort out this list
-type IconList = 'EthToken' | 'ImxTokenDex';
 
 interface SelectInputProps {
   options: SelectOption[];
@@ -27,6 +24,7 @@ interface SelectInputProps {
   onTextInputChange: (value: string) => void;
   onTextInputBlur: (value: string) => void;
   textInputMaxButtonClick?: () => void;
+  onSelectChange: (value: OptionKey) => void;
 }
 
 export const SelectInput = ({
@@ -46,6 +44,7 @@ export const SelectInput = ({
   selectErrored,
   selectErrorMessage,
   textInputMaxButtonClick,
+  onSelectChange,
 }: SelectInputProps) => {
   return (
     <Box sx={selectInputBoxStyle}>
@@ -56,6 +55,7 @@ export const SelectInput = ({
           textAlign={selectTextAlign}
           isErrored={selectErrored}
           errorMessage={selectErrorMessage}
+          onSelectChange={onSelectChange}
         />
       </Box>
       <Box sx={inputStyle}>

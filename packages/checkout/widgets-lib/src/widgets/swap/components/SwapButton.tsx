@@ -68,7 +68,7 @@ export function SwapButton(props: SwapButtonProps) {
         flexDirection: 'column',
         paddingY: 'base.spacing.x6',
         paddingX: 'base.spacing.x4',
-        marginX: '-12px',
+        marginX: '-8px',
         backgroundColor: 'base.color.translucent.container.200',
       }}
     >
@@ -76,6 +76,7 @@ export function SwapButton(props: SwapButtonProps) {
         disabled={!provider || !transaction || loading}
         variant={!provider || !transaction ? 'tertiary' : 'primary'}
         onClick={sendTransaction}
+        size="large"
       >
         {loading && (
           <Button.Icon icon="Loading" sx={{ width: 'base.icon.size.200' }} />

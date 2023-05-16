@@ -1,4 +1,4 @@
-import { Select, Option, Box, Body } from '@biom3/react';
+import { Select, Option, Box, Body, OptionKey } from '@biom3/react';
 // import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 
 type IconList = 'EthToken' | 'ImxTokenDex';
@@ -7,7 +7,6 @@ export interface SelectOption {
   id: string;
   label: string;
   icon?: IconList;
-  boldVariant?: boolean;
 }
 
 interface SelectFormProps {
@@ -16,21 +15,32 @@ interface SelectFormProps {
   subtext?: string;
   isErrored?: boolean;
   errorMessage?: string;
+  onSelectChange?: (value: OptionKey) => void;
 }
 
-export const SelectForm = ({ options, subtext }: SelectFormProps) => {
+export const SelectForm = ({
+  options,
+  subtext,
+  onSelectChange,
+}: SelectFormProps) => {
   return (
     // todo: biome does not currently support Select for FormControl
     // <FormControlWrapper textAlign={textAlign ?? 'left'}>
     <Box>
-      <Select size="large" defaultLabel="Select coin">
+      <Select
+        size="large"
+        defaultLabel="Select coin"
+        onSelectChange={onSelectChange}
+      >
         {options.map((option) => {
           return (
             <Option key={option.id} optionKey={option.id}>
-              <Option.Icon
-                icon={option.icon ?? 'Coins'}
-                variant={option.boldVariant ? 'bold' : 'regular'}
-              />
+              {!option.icon && (
+                <Option.Icon icon={option.icon ?? 'Coins'} variant={'bold'} />
+              )}
+              {option.icon && (
+                <Option.FramedImage imageUrl={option.icon} circularFrame />
+              )}
               <Option.Label>{option.label}</Option.Label>
             </Option>
           );
