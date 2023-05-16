@@ -3,6 +3,7 @@ import {
   BigNumber, Contract, providers, utils,
 } from 'ethers';
 import { TickMath } from '@uniswap/v3-sdk';
+import { ExchangeErrorMessage, ProviderCallError } from 'errors';
 import { fetchValidPools } from './fetchValidPools';
 import { Multicall__factory } from '../../contracts/types';
 import {
@@ -19,6 +20,35 @@ jest.mock('@ethersproject/contracts');
 describe('fetchPools', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let mockedMulticallContract: jest.Mock;
+
+  describe('when provider call fails', () => {
+    it('should throw ProviderCallError', async () => {
+      (Contract as unknown as jest.Mock).mockImplementationOnce(
+        () => ({
+          callStatic: {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            multicall: jest.fn().mockRejectedValue(new ProviderCallError('an rpc error message')),
+          },
+        }),
+      );
+
+      const provider = new providers.JsonRpcProvider(
+        TEST_RPC_URL,
+        TEST_CHAIN_ID,
+      );
+      const multicallContract = Multicall__factory.connect(
+        TEST_MULTICALL_ADDRESS,
+        provider,
+      );
+
+      await expect(fetchValidPools(
+        multicallContract,
+        [WETH_TEST_CHAIN, IMX_TEST_CHAIN],
+        [],
+        TEST_V3_CORE_FACTORY_ADDRESS,
+      )).rejects.toThrow(new ProviderCallError(`${ExchangeErrorMessage.FAILED_MULTICALL}: an rpc error message`));
+    });
+  });
 
   describe('when a pool has no liquidity or price result', () => {
     it('should not include the pool in results', async () => {

@@ -4,6 +4,7 @@ import {
 } from '@uniswap/v3-sdk';
 import { Token, CurrencyAmount, TradeType } from '@uniswap/sdk-core';
 import { Contract, ethers, providers } from 'ethers';
+import { ExchangeErrorMessage, ProviderCallError } from 'errors';
 import { getQuotesForRoutes } from './getQuotesForRoutes';
 import {
   IMX_TEST_CHAIN,
@@ -20,6 +21,56 @@ jest.mock('@ethersproject/contracts');
 describe('getQuotesForRoutes', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let mockedMulticallContract: jest.Mock;
+
+  describe('when multicall fails', () => {
+    it('should throw ProviderCallError', async () => {
+      mockedMulticallContract = (
+        Contract as unknown as jest.Mock
+      ).mockImplementationOnce(() => ({
+        callStatic: {
+          multicall: jest.fn().mockRejectedValue(new ProviderCallError('an rpc error message')),
+        },
+      }));
+
+      const provider = new providers.JsonRpcProvider(
+        TEST_RPC_URL,
+        TEST_CHAIN_ID,
+      );
+      const multicallContract = Multicall__factory.connect(
+        TEST_MULTICALL_ADDRESS,
+        provider,
+      );
+
+      const dummyRoutes: Route<Token, Token>[] = [];
+      const arbitraryTick = 100;
+      const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
+      // Since we will be mocking the multicall, routes doesn't matter,
+      // as long as the length is correct.
+      const pool0 = new Pool(
+        WETH_TEST_CHAIN,
+        IMX_TEST_CHAIN,
+        FeeAmount.HIGH,
+        sqrtPriceAtTick,
+        1000,
+        arbitraryTick,
+      );
+      dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
+      dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
+
+      const amount: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
+        WETH_TEST_CHAIN,
+        '123123',
+      );
+
+      await expect(getQuotesForRoutes(
+        multicallContract,
+        TEST_QUOTER_ADDRESS,
+        dummyRoutes,
+        amount,
+        TradeType.EXACT_INPUT,
+      )).rejects.toThrow(new ProviderCallError(`${ExchangeErrorMessage.FAILED_MULTICALL}: an rpc error message`));
+    });
+  });
 
   describe('with one quote', () => {
     it('returns the only quote', async () => {

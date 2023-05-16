@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { ChainNotSupportedError } from 'errors';
 import { ExchangeModuleConfiguration } from '../types';
 import { ExchangeConfiguration } from './index';
 import { POLYGON_TESTNET_CHAIN_ID } from '../constants/tokens/polygon';
@@ -20,7 +21,7 @@ describe('config', () => {
     expect(config.baseConfig.environment).toBe(Environment.SANDBOX);
   });
 
-  it('throw error if incorrect chainId provided', () => {
+  it('throw ChainNotSupportedError', () => {
     const baseConfig = new ImmutableConfiguration({
       // eslint-disable-next-line @typescript-eslint/naming-convention
       environment: Environment.SANDBOX,
@@ -31,7 +32,7 @@ describe('config', () => {
     };
 
     expect(() => new ExchangeConfiguration(exchangeConfiguration)).toThrow(
-      new Error('Chain 1 is not supported in environment sandbox'),
+      new ChainNotSupportedError(1, Environment.SANDBOX),
     );
   });
 });

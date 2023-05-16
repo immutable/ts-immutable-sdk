@@ -1,3 +1,5 @@
+import { Environment } from '@imtbl/config';
+
 /**
  * @enum {string} Errors that can be returned by the Exchange.
  */
@@ -7,8 +9,6 @@ export enum ExchangeErrorCode {
   INVALID_ADDRESS = 'INVALID_ADDRESS',
   DUPLICATE_ADDRESSES = 'DUPLICATE_ADDRESSES',
   CHAIN_NOT_SUPPORTED = 'CHAIN_NOT_SUPPORTED',
-  INTERNAL_ERROR = 'INTERNAL_ERROR',
-  UNABLE_TO_RETRIEVE_ROUTE = 'UNABLE_TO_RETRIEVE_ROUTE',
   NO_ROUTES_AVAILABLE = 'NO_ROUTES_AVAILABLE',
   PROVIDER_CALL_ERROR = 'PROVIDER_CALL_ERROR',
 }
@@ -25,10 +25,7 @@ export enum ExchangeErrorMessage {
   MAX_HOPS_TOO_LOW = 'max hops must be greater than or equal to 1',
   SLIPPAGE_TOO_HIGH = 'slippage percent must be less than or equal to 50',
   SLIPPAGE_TOO_LOW = 'slippage percent must be greater than or equal to 0',
-  INTERNAL_ERROR = 'internal error',
-  UNABLE_TO_RETRIEVE_ROUTE = 'unable to retrieve route for tokens',
   NO_ROUTES_AVAILABLE = 'no routes available',
-  PROVIDER_REQUEST_FAILED = 'failed to make request',
   FAILED_TO_GET_ERC20_DECIMALS = 'failed to get ERC20 decimals',
   FAILED_MULTICALL = 'failed multicall',
 }
@@ -60,8 +57,8 @@ export class ExchangeError extends Error {
 }
 
 export class ChainNotSupportedError extends ExchangeError {
-  constructor(chain: number) {
-    const message = `Chain with ID ${chain} is not a supported chain`;
+  constructor(chain: number, environment: Environment) {
+    const message = `Chain with ID ${chain} is not a supported chain in environment ${environment}`;
 
     super(message, ExchangeErrorCode.CHAIN_NOT_SUPPORTED);
   }
