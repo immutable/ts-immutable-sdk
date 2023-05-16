@@ -1,7 +1,7 @@
 import { Pool } from '@uniswap/v3-sdk';
 import { Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
-import { ExchangeErrorMessage, ProviderCallError } from 'errors';
+import { ProviderCallError } from 'errors';
 import { TokenInfo } from '../types';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
@@ -47,7 +47,7 @@ export async function getERC20Decimals(
     );
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown Error';
-    throw new ProviderCallError(`${ExchangeErrorMessage.FAILED_TO_GET_ERC20_DECIMALS}: ${message}`);
+    throw new ProviderCallError(`failed to get ERC20 decimals: ${message}`);
   }
 }
 

@@ -14,23 +14,6 @@ export enum ExchangeErrorCode {
 }
 
 /**
- * @enum {string} Error messages that can exist in ExchangeError
- */
-export enum ExchangeErrorMessage {
-  INVALID_TOKEN_IN = 'invalid token in address',
-  INVALID_TOKEN_OUT = 'invalid token out address',
-  INVALID_FROM = 'invalid from address',
-  DUPLICATE_ADDRESSES = 'token in and token out addresses must be different',
-  MAX_HOPS_TOO_HIGH = 'max hops must be less than or equal to 10',
-  MAX_HOPS_TOO_LOW = 'max hops must be greater than or equal to 1',
-  SLIPPAGE_TOO_HIGH = 'slippage percent must be less than or equal to 50',
-  SLIPPAGE_TOO_LOW = 'slippage percent must be greater than or equal to 0',
-  NO_ROUTES_AVAILABLE = 'no routes available',
-  FAILED_TO_GET_ERC20_DECIMALS = 'failed to get ERC20 decimals',
-  FAILED_MULTICALL = 'failed multicall',
-}
-
-/**
  * The type signature for an error.
  * Contains a type that corresponds to a {@link ExchangeError} and an optional message string.
  */
@@ -84,13 +67,13 @@ export class InvalidAddressError extends ExchangeError {
 
 export class DuplicateAddressesError extends ExchangeError {
   constructor() {
-    super(ExchangeErrorMessage.DUPLICATE_ADDRESSES, ExchangeErrorCode.DUPLICATE_ADDRESSES);
+    super('token in and token out addresses must be different', ExchangeErrorCode.DUPLICATE_ADDRESSES);
   }
 }
 
 export class NoRoutesAvailableError extends ExchangeError {
   constructor() {
-    super(ExchangeErrorMessage.NO_ROUTES_AVAILABLE, ExchangeErrorCode.NO_ROUTES_AVAILABLE);
+    super('no routes available', ExchangeErrorCode.NO_ROUTES_AVAILABLE);
   }
 }
 

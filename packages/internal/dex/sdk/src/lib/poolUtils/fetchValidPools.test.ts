@@ -3,7 +3,7 @@ import {
   BigNumber, Contract, providers, utils,
 } from 'ethers';
 import { TickMath } from '@uniswap/v3-sdk';
-import { ExchangeErrorMessage, ProviderCallError } from 'errors';
+import { ProviderCallError } from 'errors';
 import { fetchValidPools } from './fetchValidPools';
 import { Multicall__factory } from '../../contracts/types';
 import {
@@ -46,7 +46,7 @@ describe('fetchPools', () => {
         [WETH_TEST_CHAIN, IMX_TEST_CHAIN],
         [],
         TEST_V3_CORE_FACTORY_ADDRESS,
-      )).rejects.toThrow(new ProviderCallError(`${ExchangeErrorMessage.FAILED_MULTICALL}: an rpc error message`));
+      )).rejects.toThrow(new ProviderCallError('failed multicall: an rpc error message'));
     });
   });
 

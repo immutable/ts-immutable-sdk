@@ -1,7 +1,7 @@
 import { Pool } from '@uniswap/v3-sdk';
 import { Token } from '@uniswap/sdk-core';
 import { BigNumber } from 'ethers';
-import { ExchangeErrorMessage, ProviderCallError } from 'errors';
+import { ProviderCallError } from 'errors';
 import { MulticallResponse, multicallSingleCallDataMultipleContracts } from '../multicall';
 import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromERC20Pairs';
 import { ERC20Pair } from './generateERC20Pairs';
@@ -56,7 +56,7 @@ export const fetchValidPools = async (
     ]);
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown Error';
-    throw new ProviderCallError(`${ExchangeErrorMessage.FAILED_MULTICALL}: ${message}`);
+    throw new ProviderCallError(`failed multicall: ${message}`);
   }
 
   const slot0s = slot0Results.returnData;

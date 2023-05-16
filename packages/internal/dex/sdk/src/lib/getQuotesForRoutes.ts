@@ -2,7 +2,7 @@ import { Route, SwapQuoter } from '@uniswap/v3-sdk';
 import { Currency, TradeType, CurrencyAmount } from '@uniswap/sdk-core';
 import JSBI from 'jsbi';
 import { ethers } from 'ethers';
-import { ExchangeErrorMessage, ProviderCallError } from 'errors';
+import { ProviderCallError } from 'errors';
 import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
 import { quoteReturnMapping } from './utils';
 import { Multicall } from '../contracts/types';
@@ -39,7 +39,7 @@ export async function getQuotesForRoutes(
     );
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown Error';
-    throw new ProviderCallError(`${ExchangeErrorMessage.FAILED_MULTICALL}: ${message}`);
+    throw new ProviderCallError(`failed multicall: ${message}`);
   }
 
   const decodedQuoteResults: QuoteResult[] = [];

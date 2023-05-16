@@ -4,7 +4,7 @@ import {
 } from '@uniswap/v3-sdk';
 import { Token, CurrencyAmount, TradeType } from '@uniswap/sdk-core';
 import { Contract, ethers, providers } from 'ethers';
-import { ExchangeErrorMessage, ProviderCallError } from 'errors';
+import { ProviderCallError } from 'errors';
 import { getQuotesForRoutes } from './getQuotesForRoutes';
 import {
   IMX_TEST_CHAIN,
@@ -68,7 +68,7 @@ describe('getQuotesForRoutes', () => {
         dummyRoutes,
         amount,
         TradeType.EXACT_INPUT,
-      )).rejects.toThrow(new ProviderCallError(`${ExchangeErrorMessage.FAILED_MULTICALL}: an rpc error message`));
+      )).rejects.toThrow(new ProviderCallError('failed multicall: an rpc error message'));
     });
   });
 

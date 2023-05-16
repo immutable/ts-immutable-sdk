@@ -8,7 +8,7 @@ import JSBI from 'jsbi';
 
 import { slippageToFraction } from 'lib/transactionUtils/slippage';
 import {
-  DuplicateAddressesError, ExchangeErrorMessage, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
+  DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
 } from 'errors';
 import {
   DEFAULT_DEADLINE,
@@ -59,14 +59,14 @@ export class Exchange {
     slippagePercent: number,
     fromAddress: string,
   ) {
-    assert(isValidAddress(fromAddress), new InvalidAddressError(ExchangeErrorMessage.INVALID_FROM));
-    assert(isValidAddress(tokenInAddress), new InvalidAddressError(ExchangeErrorMessage.INVALID_TOKEN_IN));
-    assert(isValidAddress(tokenOutAddress), new InvalidAddressError(ExchangeErrorMessage.INVALID_TOKEN_OUT));
+    assert(isValidAddress(fromAddress), new InvalidAddressError('invalid from address'));
+    assert(isValidAddress(tokenInAddress), new InvalidAddressError('invalid token in address'));
+    assert(isValidAddress(tokenOutAddress), new InvalidAddressError('invalid token out address'));
     assert(tokenInAddress.toLocaleLowerCase() !== tokenOutAddress.toLocaleLowerCase(), new DuplicateAddressesError());
-    assert(maxHops <= MAX_MAX_HOPS, new InvalidMaxHopsError(ExchangeErrorMessage.MAX_HOPS_TOO_HIGH));
-    assert(maxHops >= MIN_MAX_HOPS, new InvalidMaxHopsError(ExchangeErrorMessage.MAX_HOPS_TOO_LOW));
-    assert(slippagePercent <= 50, new InvalidSlippageError(ExchangeErrorMessage.SLIPPAGE_TOO_HIGH));
-    assert(slippagePercent >= 0, new InvalidSlippageError(ExchangeErrorMessage.SLIPPAGE_TOO_LOW));
+    assert(maxHops <= MAX_MAX_HOPS, new InvalidMaxHopsError('max hops must be less than or equal to 10'));
+    assert(maxHops >= MIN_MAX_HOPS, new InvalidMaxHopsError('max hops must be greater than or equal to 1'));
+    assert(slippagePercent <= 50, new InvalidSlippageError('slippage percent must be less than or equal to 50'));
+    assert(slippagePercent >= 0, new InvalidSlippageError('slippage percent must be greater than or equal to 0'));
   }
 
   private async getUnsignedSwapTx(

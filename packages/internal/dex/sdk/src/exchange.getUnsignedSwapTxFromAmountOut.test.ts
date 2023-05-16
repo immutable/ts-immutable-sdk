@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { TradeType } from '@uniswap/sdk-core';
 import { ExchangeConfiguration } from 'config';
 import {
-  ExchangeErrorMessage, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError,
+  InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError,
 } from 'errors';
 import { Exchange } from './exchange';
 import {
@@ -251,7 +251,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(
-        new InvalidAddressError(`Error: ${ExchangeErrorMessage.INVALID_FROM}`),
+        new InvalidAddressError('Error: invalid from address'),
       );
 
       await expect(
@@ -262,7 +262,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           params.amountOut,
           HIGHER_SLIPPAGE,
         ),
-      ).rejects.toThrow(new InvalidAddressError(`Error: ${ExchangeErrorMessage.INVALID_TOKEN_IN}`));
+      ).rejects.toThrow(new InvalidAddressError('Error: invalid token in address'));
 
       await expect(
         exchange.getUnsignedSwapTxFromAmountOut(
@@ -272,7 +272,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           params.amountOut,
           HIGHER_SLIPPAGE,
         ),
-      ).rejects.toThrow(new InvalidAddressError(`Error: ${ExchangeErrorMessage.INVALID_TOKEN_OUT}`));
+      ).rejects.toThrow(new InvalidAddressError('Error: invalid token out address'));
     });
   });
 
@@ -293,7 +293,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           HIGHER_SLIPPAGE,
           11,
         ),
-      ).rejects.toThrow(new InvalidMaxHopsError(`Error: ${ExchangeErrorMessage.MAX_HOPS_TOO_HIGH}`));
+      ).rejects.toThrow(new InvalidMaxHopsError('Error: max hops must be less than or equal to 10'));
     });
   });
 
@@ -314,7 +314,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           HIGHER_SLIPPAGE,
           0,
         ),
-      ).rejects.toThrow(new InvalidMaxHopsError(`Error: ${ExchangeErrorMessage.MAX_HOPS_TOO_LOW}`));
+      ).rejects.toThrow(new InvalidMaxHopsError('Error: max hops must be greater than or equal to 1'));
     });
   });
 
@@ -335,7 +335,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           100,
           2,
         ),
-      ).rejects.toThrow(new InvalidSlippageError(`Error: ${ExchangeErrorMessage.SLIPPAGE_TOO_HIGH}`));
+      ).rejects.toThrow(new InvalidSlippageError('Error: slippage percent must be less than or equal to 50'));
     });
   });
 
@@ -356,7 +356,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           -5,
           2,
         ),
-      ).rejects.toThrow(new InvalidSlippageError(`Error: ${ExchangeErrorMessage.SLIPPAGE_TOO_LOW}`));
+      ).rejects.toThrow(new InvalidSlippageError('Error: slippage percent must be greater than or equal to 0'));
     });
   });
 });
