@@ -64,6 +64,7 @@ export interface GoBackPayload {
   type: ViewActions.GO_BACK;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ViewContext = createContext<ViewContextState>({
   viewState: initialViewState,
   viewDispatch: () => {},
@@ -75,15 +76,18 @@ export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export const viewReducer: Reducer<ViewState, ViewAction> = (
   state: ViewState,
-  action: ViewAction
+  action: ViewAction,
 ) => {
+  // TODO consider using if statements instead of switch
   switch (action.payload.type) {
     case ViewActions.UPDATE_VIEW:
+      // eslint-disable-next-line no-case-declarations, prefer-destructuring
       const view = action.payload.view;
+      // eslint-disable-next-line no-case-declarations, prefer-destructuring
       const history = state.history;
       if (
-        history.length === 0 ||
-        history[history.length - 1].type !== view.type
+        history.length === 0
+        || history[history.length - 1].type !== view.type
       ) {
         history.push(view);
       }
@@ -94,6 +98,7 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
       };
     case ViewActions.GO_BACK:
       if (state.history.length <= 1) return { ...state };
+      // eslint-disable-next-line no-case-declarations
       const updatedHistory = state.history.slice(0, -1);
       return {
         ...state,

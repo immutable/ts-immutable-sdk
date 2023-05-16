@@ -52,17 +52,18 @@ export function Example() {
   const getQuote = async () => {
     setIsFetching(true);
 
-    const txn = await exchange.getUnsignedSwapTxFromAmountIn(
-      ethereumAccount,
-      inputToken,
-      outputToken,
-      ethers.utils.parseEther(`${inputAmount}`)
-    );
+    try {
+      const txn = await exchange.getUnsignedSwapTxFromAmountIn(
+        ethereumAccount,
+        inputToken,
+        outputToken,
+        ethers.utils.parseEther(`${inputAmount}`)
+      );
 
-    if (txn.success) {
       setResult(txn);
-    } else {
-      setError('Error fetching quote');
+    } catch(e) {
+      const message =  e instanceof Error ? e.message : 'Unknown Error';
+      setError(`Error fetching quote: ${message}`);
       setResult(null);
     }
 
@@ -99,8 +100,9 @@ export function Example() {
         // Wait for the Approve transaction to complete
         await provider.waitForTransaction(approveReceipt.result, 1, 500000);
         setApproved(true);
-      } catch (e: any) {
-        alert(e.message);
+      } catch (e) {
+        const message =  e instanceof Error ? e.message : 'Unknown Error';
+        alert(message);
         setIsFetching(false);
         return;
       }
@@ -117,8 +119,9 @@ export function Example() {
       await provider.waitForTransaction(receipt.result, 1, 500000);
       setIsFetching(false);
       setSwapStatus(true);
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e) {
+      const message =  e instanceof Error ? e.message : 'Unknown Error';
+      alert(message);
       setIsFetching(false);
       setSwapStatus(false);
       return;
@@ -185,7 +188,7 @@ export function Example() {
                   balances
                 </h3>
               )}
-              {error && <Error message={error} />}
+              {error && <ErrorMessage message={error} />}
             </>
         </>
       )}
@@ -193,7 +196,7 @@ export function Example() {
   );
 }
 
-const Error = ({ message }: { message: string }) => {
+const ErrorMessage = ({ message }: { message: string }) => {
   return (
     <div>
       <p>{message}</p>

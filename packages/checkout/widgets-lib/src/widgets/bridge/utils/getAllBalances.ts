@@ -3,7 +3,7 @@ import { Web3Provider } from '@ethersproject/providers';
 
 export async function getAllBalances(
   checkout: Checkout,
-  provider: Web3Provider
+  provider: Web3Provider,
 ): Promise<GetAllBalancesResult> {
   const walletAddress = await provider.getSigner().getAddress();
   const connectedChain = await provider.getNetwork();

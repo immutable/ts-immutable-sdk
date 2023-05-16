@@ -8,7 +8,7 @@ import { text } from '../../../resources/text/textConfig';
 import { WalletList } from '../components/WalletList';
 import { ConnectContext } from '../context/ConnectContext';
 
-export const ConnectWallet = () => {
+export function ConnectWallet() {
   const { header, body } = text.views[ConnectWidgetViews.CONNECT_WALLET];
   const {
     connectState: { sendCloseEvent },
@@ -16,12 +16,12 @@ export const ConnectWallet = () => {
   return (
     <SimpleLayout
       testId="connect-wallet"
-      header={
+      header={(
         <HeaderNavigation
           title={header.title}
           onCloseButtonClick={sendCloseEvent}
         />
-      }
+      )}
       footer={<FooterLogo />}
     >
       <Box
@@ -46,4 +46,4 @@ export const ConnectWallet = () => {
       </Box>
     </SimpleLayout>
   );
-};
+}

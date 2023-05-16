@@ -1,8 +1,12 @@
 import { TextInput, Box, Body } from '@biom3/react';
 import { BigNumber, utils, BigNumberish } from 'ethers';
-import React, { useEffect, useState, useContext, useMemo } from 'react';
+import React, {
+  useEffect, useState, useContext, useMemo,
+} from 'react';
 import { TokenInfo, GetBalanceResult } from '@imtbl/checkout-sdk';
 import TokenSelect from './TokenSelect';
+// TODO: fix circular dependency
+// eslint-disable-next-line import/no-cycle
 import { QuoteResponse } from '../views/SwapCoins';
 import { findTokenByAddress } from '../helpers';
 import { SwapContext } from '../context/SwapContext';
@@ -19,7 +23,7 @@ type WithProps = {
 async function getQuoteFromAmountOut(
   tokenInAddress: string,
   tokenOutAddress: string,
-  amountOut: BigNumberish
+  amountOut: BigNumberish,
 ): Promise<QuoteResponse> {
   return {
     status: 'ok',
@@ -48,8 +52,9 @@ async function getQuoteFromAmountOut(
 }
 
 export default function With(props: WithProps) {
-  const { onTokenChange, onQuoteChange, token, quote, buyToken, buyAmount } =
-    props;
+  const {
+    onTokenChange, onQuoteChange, token, quote, buyToken, buyAmount,
+  } = props;
   const [loading, setLoading] = useState<boolean>(false);
   const [debounceId, setDebounceId] = useState<string | null>();
 
@@ -57,25 +62,23 @@ export default function With(props: WithProps) {
   const { tokenBalances, allowedTokens } = swapState;
 
   const quoteAmount = (
-    (quote &&
-      utils.formatUnits(quote.trade.amountIn.toString(), token?.decimals)) ||
-    0
+    (quote
+      && utils.formatUnits(quote.trade.amountIn.toString(), token?.decimals))
+    || 0
   )?.toString();
 
-  const nonZeroBalances = useMemo(() => {
-    return tokenBalances
-      .filter((balance: GetBalanceResult) => balance.balance.gt(0))
-      .map((balance: GetBalanceResult) => ({
-        ...balance,
-        token: findTokenByAddress(allowedTokens, balance.token.address || '')!,
-      }));
-  }, [tokenBalances, allowedTokens]);
+  const nonZeroBalances = useMemo(() => tokenBalances
+    .filter((balance: GetBalanceResult) => balance.balance.gt(0))
+    .map((balance: GetBalanceResult) => ({
+      ...balance,
+      token: findTokenByAddress(allowedTokens, balance.token.address || '')!,
+    })), [tokenBalances, allowedTokens]);
 
   const generateQuote = async () => {
     const newQuote = await getQuoteFromAmountOut(
       token?.address || '',
       buyToken?.address || '',
-      buyAmount!
+      buyAmount!,
     );
 
     onQuoteChange(newQuote);
@@ -91,7 +94,7 @@ export default function With(props: WithProps) {
       setTimeout(() => {
         setDebounceId(null);
         func();
-      }, threshold).toString()
+      }, threshold).toString(),
     );
   };
 
@@ -100,7 +103,6 @@ export default function With(props: WithProps) {
       debounce(generateQuote, 1000);
       setLoading(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [buyAmount, buyToken, token]);
 
   useEffect(() => {
@@ -124,6 +126,8 @@ export default function With(props: WithProps) {
           allowedTokens={allowedTokens}
           token={token}
           onChange={onTokenChange}
+          // TODO: token is declared in the upper scope
+          // eslint-disable-next-line @typescript-eslint/no-shadow
           filter={allowedTokens.map((token) => token?.address ?? '')}
         />
       </Box>

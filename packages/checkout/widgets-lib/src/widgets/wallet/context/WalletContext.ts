@@ -87,6 +87,7 @@ export interface SetSupportedTopUpPayload {
   supportedTopUps: TopUpFeature;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const WalletContext = createContext<WalletContextState>({
   walletState: initialWalletState,
   walletDispatch: () => {},
@@ -98,7 +99,7 @@ export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export const walletReducer: Reducer<WalletState, WalletAction> = (
   state: WalletState,
-  action: WalletAction
+  action: WalletAction,
 ) => {
   switch (action.payload.type) {
     case WalletActions.SET_CHECKOUT:

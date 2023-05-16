@@ -1,4 +1,6 @@
 import { Checkout } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 import {
   SetCheckoutPayload,
   SetProviderPayload,
@@ -10,8 +12,6 @@ import {
   TopUpFeature,
   SetTokenBalancesPayload,
 } from './SwapContext';
-import { Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
 
 describe('WalletContext', () => {
   it('should update state with checkout when reducer called with SET_CHECKOUT action', () => {
@@ -52,7 +52,7 @@ describe('WalletContext', () => {
           name: 'Ethereum',
         },
         isSupported: true,
-      }
+      },
     };
     expect(initialSwapState.network).toBeNull();
     expect(initialSwapState.tokenBalances).toEqual([]);

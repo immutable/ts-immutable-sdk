@@ -13,7 +13,7 @@ import {
   ViewActions,
 } from '../../../context/view-context/ViewContext';
 
-export const SwitchNetwork = () => {
+export function SwitchNetwork() {
   const { viewDispatch } = useContext(ViewContext);
   const { connectState } = useContext(ConnectContext);
   const { checkout, provider, sendCloseEvent } = connectState;
@@ -39,6 +39,7 @@ export const SwitchNetwork = () => {
         },
       });
     } catch (err: any) {
+      // eslint-disable-next-line no-console
       console.log(err.code, err.message);
       setButtonText('Try Again');
     }
@@ -47,22 +48,22 @@ export const SwitchNetwork = () => {
   return (
     <SimpleLayout
       testId="switch-network-view"
-      header={
+      header={(
         <HeaderNavigation
-          transparent={true}
+          transparent
           onCloseButtonClick={sendCloseEvent}
         />
-      }
-      footer={
+      )}
+      footer={(
         <FooterButton
           actionText={buttonText}
           onActionClick={() => switchNetwork()}
         />
-      }
+      )}
       heroContent={<ImmutableNetworkHero />}
-      floatHeader={true}
+      floatHeader
     >
       <SimpleTextBody heading={heading}>{body}</SimpleTextBody>
     </SimpleLayout>
   );
-};
+}

@@ -16,7 +16,7 @@ export const sendBridgeSuccessEvent = () => {
           timestamp: new Date().getTime(),
         },
       },
-    }
+    },
   );
   if (window !== undefined) window.dispatchEvent(successEvent);
 };
@@ -32,12 +32,13 @@ export const sendBridgeFailedEvent = (reason: string) => {
           timestamp: new Date().getTime(),
         },
       },
-    }
+    },
   );
   if (window !== undefined) window.dispatchEvent(failedEvent);
 };
 
 export function sendBridgeWidgetCloseEvent() {
+  // eslint-disable-next-line no-console
   console.log(BridgeEventType.CLOSE_WIDGET);
   const closeWidgetEvent = new CustomEvent<BridgeEvent<any>>(
     IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
@@ -46,7 +47,7 @@ export function sendBridgeWidgetCloseEvent() {
         type: BridgeEventType.CLOSE_WIDGET,
         data: {},
       },
-    }
+    },
   );
   if (window !== undefined) window.dispatchEvent(closeWidgetEvent);
 }

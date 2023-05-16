@@ -1,11 +1,12 @@
 import { Box, Logo } from '@biom3/react';
-import { HeroBackGroundStyles, HeroImageStyles } from './HeroImageStyles';
+import { heroBackGroundStyles, heroImageStyles } from './HeroImageStyles';
 import { ReactComponent as PurpleDownGradient } from '../../assets/PurpleDownGradient.svg';
-export const MetamaskConnectHero = () => {
+
+export function MetamaskConnectHero() {
   return (
-    <Box testId="metamask-connect-hero" sx={HeroBackGroundStyles}>
+    <Box testId="metamask-connect-hero" sx={heroBackGroundStyles}>
       <PurpleDownGradient />
-      <Box sx={HeroImageStyles}>
+      <Box sx={heroImageStyles}>
         <Logo
           testId="metamask-connect-hero-logo"
           logo="MetaMaskSymbol"
@@ -14,4 +15,4 @@ export const MetamaskConnectHero = () => {
       </Box>
     </Box>
   );
-};
+}

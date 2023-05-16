@@ -6,17 +6,19 @@ export interface FeeProps {
   tokenSymbol: string;
 }
 
-export const Fees = (feeProps: FeeProps) => {
+export function Fees(feeProps: FeeProps) {
   const { fees, slippage, tokenSymbol } = feeProps;
 
   return (
     <Box>
       <Heading size="xSmall">Fees:</Heading>
       <Body>
-        {fees} {tokenSymbol}
+        {fees}
+        {' '}
+        {tokenSymbol}
       </Body>
       <Heading size="xSmall">Slippage:</Heading>
       <Body>{slippage}</Body>
     </Box>
   );
-};
+}
