@@ -6,10 +6,10 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
+import { SwapButton } from '../components/SwapButton/SwapButton';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapForm } from '../components/SwapForm/SwapForm';
 import { Fees } from '../components/Fees';
-import { SwapButton } from '../components/SwapButton';
 
 type AmountAndPercentage = {
   amount: {
