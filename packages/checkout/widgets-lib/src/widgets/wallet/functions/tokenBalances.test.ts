@@ -5,9 +5,9 @@ import {
   TokenInfo,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
-import { getTokenBalances } from './tokenBalances';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
+import { getTokenBalances } from './tokenBalances';
 
 describe('token balance tests', () => {
   it('should return balances for all tokens', async () => {
@@ -44,7 +44,7 @@ describe('token balance tests', () => {
       mockProvider as unknown as Web3Provider,
       '',
       ChainId.SEPOLIA,
-      conversions
+      conversions,
     );
 
     expect(actualResult.length).toBe(2);
@@ -78,7 +78,7 @@ describe('token balance tests', () => {
       {} as unknown as Web3Provider,
       '',
       ChainId.SEPOLIA,
-      conversions
+      conversions,
     );
 
     expect(actualResult.length).toBe(0);
@@ -105,7 +105,7 @@ describe('token balance tests', () => {
       mockProvider as unknown as Web3Provider,
       '',
       ChainId.SEPOLIA,
-      conversions
+      conversions,
     );
 
     expect(actualResult.length).toBe(0);

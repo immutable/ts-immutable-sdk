@@ -7,6 +7,7 @@ import {
   GetNetworkParams,
 } from '@imtbl/checkout-sdk';
 import { useEffect, useReducer } from 'react';
+import { Environment } from '@imtbl/config';
 import {
   initialWalletState,
   TopUpFeature,
@@ -19,7 +20,6 @@ import { ErrorView } from '../../components/Error/ErrorView';
 import { LoadingView } from '../../components/Loading/LoadingView';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { zkEVMNetwork } from '../../lib/networkUtils';
-import { Environment } from '@imtbl/config';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import {
   viewReducer,
@@ -44,25 +44,23 @@ export interface WalletWidgetParams {
 export function WalletWidget(props: WalletWidgetProps) {
   const { environment, params, theme } = props;
   const { providerPreference, topUpFeatures } = params;
-  const biomeTheme: BaseTokens =
-    theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-      ? onLightBase
-      : onDarkBase;
+  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+    ? onLightBase
+    : onDarkBase;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
   const [walletState, walletDispatch] = useReducer(
     walletReducer,
-    initialWalletState
+    initialWalletState,
   );
 
   const { checkout } = walletState;
 
   useEffect(() => {
-    const checkout = new Checkout({ baseConfig: { environment: environment } });
     walletDispatch({
       payload: {
         type: WalletActions.SET_CHECKOUT,
-        checkout,
+        checkout: new Checkout({ baseConfig: { environment } }),
       },
     });
 
@@ -125,13 +123,19 @@ export function WalletWidget(props: WalletWidgetProps) {
   }, [providerPreference, checkout]);
 
   const errorAction = () => {
+    // TODO: please remove or if necessary keep the eslint ignore
+    // eslint-disable-next-line no-console
     console.log('Something went wrong');
   };
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
+      {/* TODO: please fix */}
+      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         <CryptoFiatProvider>
+          {/* TODO: please fix */}
+          {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
           <WalletContext.Provider value={{ walletState, walletDispatch }}>
             {viewState.view.type === BaseViews.LOADING_VIEW && (
               <LoadingView loadingText="Loading" />

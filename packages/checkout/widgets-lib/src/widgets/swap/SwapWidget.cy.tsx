@@ -1,11 +1,13 @@
-import { SwapWidget, SwapWidgetParams } from './SwapWidget';
-import { describe, it, cy, beforeEach } from 'local-cypress';
+import {
+  describe, it, cy, beforeEach,
+} from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
-import { cySmartGet } from '../../lib/testUtils';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
+import { cySmartGet } from '../../lib/testUtils';
+import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 
 describe('SwapWidget tests', () => {
   beforeEach(() => {
@@ -95,7 +97,7 @@ describe('SwapWidget tests', () => {
         environment={Environment.PRODUCTION}
         params={params}
         theme={WidgetTheme.DARK}
-      />
+      />,
     );
     cySmartGet('buyField__selected-option').should('be.visible');
     cySmartGet('buyField__selected-option-text').should('have.text', 'ETH');
@@ -114,7 +116,7 @@ describe('SwapWidget tests', () => {
           environment={Environment.PRODUCTION}
           params={params}
           theme={WidgetTheme.DARK}
-        />
+        />,
       );
 
       cySmartGet('buyField__option-ETH').should('not.exist');
@@ -149,7 +151,7 @@ describe('SwapWidget tests', () => {
           environment={Environment.PRODUCTION}
           params={params}
           theme={WidgetTheme.DARK}
-        />
+        />,
       );
 
       cySmartGet('withField__option-ETH').should('not.exist');
@@ -160,7 +162,7 @@ describe('SwapWidget tests', () => {
       cySmartGet('buyField__option-IMX').should('be.visible');
 
       cySmartGet('buyField__option-IMX').click();
-      cy.wait(1000); //wait for the debounce delay
+      cy.wait(1000); // wait for the debounce delay
       cySmartGet('withField__amount__input').should('have.value', '500.0');
       cySmartGet('withField__selected-option-text').should('have.text', 'ETH');
     });

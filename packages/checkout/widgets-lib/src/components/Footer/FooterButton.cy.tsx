@@ -1,8 +1,8 @@
 import { onDarkBase } from '@biom3/design-tokens';
 import { BiomeThemeProvider } from '@biom3/react';
+import { mount } from 'cypress/react18';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { FooterButton } from './FooterButton';
-import { mount } from 'cypress/react18';
 import { cySmartGet } from '../../lib/testUtils';
 
 describe('Footer Button', () => {
@@ -10,14 +10,15 @@ describe('Footer Button', () => {
     mount(
       <BiomeThemeProvider theme={{ base: onDarkBase }}>
         <SimpleLayout
-          footer={
+          footer={(
             <FooterButton
               actionText="Let's go"
+              // eslint-disable-next-line no-console
               onActionClick={() => console.log('test click')}
             />
-          }
-        ></SimpleLayout>
-      </BiomeThemeProvider>
+          )}
+        />
+      </BiomeThemeProvider>,
     );
 
     cySmartGet('footer-button-container').should('exist');
@@ -25,12 +26,12 @@ describe('Footer Button', () => {
     cySmartGet('footer-button-container').should(
       'have.css',
       'flex-direction',
-      'row'
+      'row',
     );
     cySmartGet('footer-button-container').should(
       'have.css',
       'justify-content',
-      'flex-end'
+      'flex-end',
     );
     cySmartGet('footer-button').should('have.text', "Let's go");
   });
@@ -39,15 +40,16 @@ describe('Footer Button', () => {
     mount(
       <BiomeThemeProvider theme={{ base: onDarkBase }}>
         <SimpleLayout
-          footer={
+          footer={(
             <FooterButton
               hideActionButton
               actionText="Let's go"
+              // eslint-disable-next-line no-console
               onActionClick={() => console.log('test click')}
             />
-          }
-        ></SimpleLayout>
-      </BiomeThemeProvider>
+          )}
+        />
+      </BiomeThemeProvider>,
     );
 
     cySmartGet('footer-button-container').should('exist');

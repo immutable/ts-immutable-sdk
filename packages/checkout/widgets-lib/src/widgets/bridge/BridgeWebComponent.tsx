@@ -7,8 +7,11 @@ import { ImmutableWebComponent } from '../ImmutableWebComponent';
 
 export class ImmutableBridge extends ImmutableWebComponent {
   fromNetwork = Network.ETHEREUM;
+
   fromContract = '';
+
   amount = '';
+
   providerPreference: ConnectionProviders = ConnectionProviders.METAMASK;
 
   connectedCallback() {
@@ -17,7 +20,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
     this.fromNetwork = this.getAttribute('fromNetwork') as Network;
     this.amount = this.getAttribute('amount') as string;
     this.providerPreference = this.getAttribute(
-      'providerPreference'
+      'providerPreference',
     ) as ConnectionProviders;
     this.renderWidget();
   }
@@ -40,8 +43,8 @@ export class ImmutableBridge extends ImmutableWebComponent {
           params={params}
           theme={this.theme}
           environment={this.environment}
-        ></BridgeWidget>
-      </React.StrictMode>
+        />
+      </React.StrictMode>,
     );
   }
 }

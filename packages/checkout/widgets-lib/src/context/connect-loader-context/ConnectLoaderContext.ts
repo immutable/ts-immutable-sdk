@@ -36,6 +36,7 @@ export interface UpdateConnectionStatusPayload {
   connectionStatus: ConnectionStatus;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ConnectLoaderContext = createContext<ConnectLoaderContextState>({
   connectLoaderState: initialConnectLoaderState,
   connectLoaderDispatch: () => {},
@@ -44,8 +45,8 @@ export const ConnectLoaderContext = createContext<ConnectLoaderContextState>({
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export const connectLoaderReducer: Reducer<
-  ConnectLoaderState,
-  ConnectLoaderAction
+ConnectLoaderState,
+ConnectLoaderAction
 > = (state: ConnectLoaderState, action: ConnectLoaderAction) => {
   switch (action.payload.type) {
     case ConnectLoaderActions.UPDATE_CONNECTION_STATUS:

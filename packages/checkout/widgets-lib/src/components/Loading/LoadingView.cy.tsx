@@ -10,7 +10,7 @@ describe('LoadingView', () => {
     mount(
       <BiomeThemeProvider theme={{ base: onDarkBase }}>
         <LoadingView loadingText={testLoadingText} />
-      </BiomeThemeProvider>
+      </BiomeThemeProvider>,
     );
 
     cySmartGet('loading-box').should('exist');

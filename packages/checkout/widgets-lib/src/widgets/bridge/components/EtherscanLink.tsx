@@ -4,7 +4,7 @@ interface EtherscanLinkProps {
   hash: string;
 }
 
-export const EtherscanLink = (props: EtherscanLinkProps) => {
+export function EtherscanLink(props: EtherscanLinkProps) {
   const { hash } = props;
 
   return (
@@ -16,4 +16,4 @@ export const EtherscanLink = (props: EtherscanLinkProps) => {
       View your transaction on Etherscan
     </Link>
   );
-};
+}

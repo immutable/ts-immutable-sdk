@@ -1,13 +1,16 @@
+/* eslint-disable react/jsx-no-constructed-context-values */
+
 import { BiomeThemeProvider } from '@biom3/react';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
+import { useEffect, useReducer } from 'react';
+import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
+import { Environment } from '@imtbl/config';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
   sendConnectSuccessEvent,
 } from './ConnectWidgetEvents';
-import { useEffect, useReducer } from 'react';
-import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   ConnectActions,
   ConnectContext,
@@ -22,7 +25,6 @@ import { ReadyToConnect } from './views/ReadyToConnect';
 import { SwitchNetwork } from './views/SwitchNetwork';
 import { LoadingView } from '../../components/Loading/LoadingView';
 import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
-import { Environment } from '@imtbl/config';
 import {
   viewReducer,
   initialViewState,
@@ -33,6 +35,8 @@ import {
 
 export interface ConnectWidgetProps {
   environment: Environment;
+  // TODO: 'params' PropType is defined but prop is never used
+  // eslint-disable-next-line react/no-unused-prop-types
   params: ConnectWidgetParams;
   theme: WidgetTheme;
   deepLink?: ConnectWidgetViews.CONNECT_WALLET;
@@ -44,19 +48,20 @@ export interface ConnectWidgetParams {
 }
 
 export function ConnectWidget(props: ConnectWidgetProps) {
-  const { environment, theme, deepLink, sendCloseEventOverride } = props;
+  const {
+    environment, theme, deepLink, sendCloseEventOverride,
+  } = props;
   const [connectState, connectDispatch] = useReducer(
     connectReducer,
-    initialConnectState
+    initialConnectState,
   );
   const { sendCloseEvent } = connectState;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const { view } = viewState;
 
-  const biomeTheme: BaseTokens =
-    theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-      ? onLightBase
-      : onDarkBase;
+  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+    ? onLightBase
+    : onDarkBase;
 
   useEffect(() => {
     setTimeout(() => {
@@ -64,7 +69,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
         payload: {
           type: ConnectActions.SET_CHECKOUT,
           checkout: new Checkout({
-            baseConfig: { environment: environment },
+            baseConfig: { environment },
           }),
         },
       });
@@ -88,20 +93,20 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   }, [deepLink, sendCloseEventOverride, environment]);
 
   useEffect(() => {
-    switch (viewState.view.type) {
-      case ConnectWidgetViews.FAIL:
-        sendConnectFailedEvent(viewState.view.reason);
-        break;
+    if (viewState.view.type === ConnectWidgetViews.FAIL) {
+      sendConnectFailedEvent(viewState.view.reason);
     }
   }, [viewState]);
 
   return (
     <BiomeThemeProvider theme={{ base: biomeTheme }}>
+      {/* TODO: The object passed as the value prop to the Context provider changes every render.
+          To fix this consider wrapping it in a useMemo hook. */}
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         <ConnectContext.Provider value={{ connectState, connectDispatch }}>
           <>
             {view.type === BaseViews.LOADING_VIEW && (
-              <LoadingView loadingText={'Connecting'} />
+              <LoadingView loadingText="Connecting" />
             )}
             {view.type === ConnectWidgetViews.CONNECT_WALLET && (
               <ConnectWallet />
@@ -114,9 +119,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
                 <SuccessView
                   successText="Connection secure"
                   actionText="Continue"
-                  successEventAction={() =>
-                    sendConnectSuccessEvent(ConnectionProviders.METAMASK)
-                  }
+                  successEventAction={() => sendConnectSuccessEvent(ConnectionProviders.METAMASK)}
                   onActionClick={() => sendCloseEvent()}
                 />
               </ConnectLoaderSuccess>

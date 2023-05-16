@@ -1,4 +1,4 @@
-export const BalanceItemContainerStyle = {
+export const balanceItemContainerStyle = {
   width: '100%',
   display: 'flex',
   flexDirection: 'row',
@@ -8,22 +8,20 @@ export const BalanceItemContainerStyle = {
   borderRadius: 'base.borderRadius.x6',
 };
 
-export const BalanceItemCoinBoxStyle = {
+export const balanceItemCoinBoxStyle = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   columnGap: 'base.spacing.x5',
 };
 
-export const BalanceItemPriceBoxStyle = {
+export const balanceItemPriceBoxStyle = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   columnGap: 'base.spacing.x4',
 };
 
-export const ShowMenuItem = (show: boolean | undefined) => {
-  return {
-    display: show ? '' : 'none',
-  };
-};
+export const ShowMenuItem = (show: boolean | undefined) => ({
+  display: show ? '' : 'none',
+});

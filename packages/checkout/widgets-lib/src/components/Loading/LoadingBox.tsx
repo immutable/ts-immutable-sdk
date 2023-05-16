@@ -1,13 +1,13 @@
 import { Body, Box, Icon } from '@biom3/react';
-import { LoadingBoxStyles } from './LoadingStyles';
+import { loadingBoxStyles } from './LoadingStyles';
 
 export interface LoadingProps {
   loadingText: string;
 }
 
-export const LoadingBox = ({ loadingText }: LoadingProps) => {
+export function LoadingBox({ loadingText }: LoadingProps) {
   return (
-    <Box testId="loading-box" sx={LoadingBoxStyles}>
+    <Box testId="loading-box" sx={loadingBoxStyles}>
       <Icon
         testId="loading-icon"
         icon="Loading"
@@ -16,4 +16,4 @@ export const LoadingBox = ({ loadingText }: LoadingProps) => {
       <Body testId="loading-text">{loadingText}</Body>
     </Box>
   );
-};
+}
