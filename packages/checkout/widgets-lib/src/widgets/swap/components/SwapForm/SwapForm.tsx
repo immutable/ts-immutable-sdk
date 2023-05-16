@@ -13,7 +13,7 @@ import {
 } from './SwapFormStyles';
 import { text } from '../../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
-import { SwapContext } from '../../context/SwapContext';
+import { SwapContext } from '../../context/swap-context/SwapContext';
 import { SelectOption } from '../../../../components/FormComponents/SelectForm/SelectForm';
 
 const SWAP_TEXT_INPUT_PLACEHOLDER = '0';
@@ -96,6 +96,8 @@ export const SwapForm = () => {
           {swapForm.from.label}
         </Heading>
         <SelectInput
+          selectId="select-from"
+          textInputId="text-input-from"
           options={fromTokensOptions}
           selectSubtext={availableFromBalanceSubtext}
           selectTextAlign="left"
@@ -133,6 +135,8 @@ export const SwapForm = () => {
           </Body>
         </Box>
         <SelectInput
+          selectId="select-to"
+          textInputId="text-input-to"
           options={toTokenOptions}
           textInputValue={swapToAmount}
           textInputPlaceholder={SWAP_TEXT_INPUT_PLACEHOLDER}

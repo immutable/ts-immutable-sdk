@@ -10,6 +10,7 @@ export interface SelectOption {
 }
 
 interface SelectFormProps {
+  selectId: string;
   options: SelectOption[];
   textAlign?: 'left' | 'right';
   subtext?: string;
@@ -19,6 +20,7 @@ interface SelectFormProps {
 }
 
 export const SelectForm = ({
+  selectId,
   options,
   subtext,
   onSelectChange,
@@ -28,6 +30,7 @@ export const SelectForm = ({
     // <FormControlWrapper textAlign={textAlign ?? 'left'}>
     <Box>
       <Select
+        testId={selectId}
         size="large"
         defaultLabel="Select coin"
         onSelectChange={onSelectChange}
@@ -35,7 +38,11 @@ export const SelectForm = ({
       >
         {options.map((option) => {
           return (
-            <Option key={option.id} optionKey={option.id}>
+            <Option
+              key={option.id}
+              optionKey={option.id}
+              testId={`${selectId}-${option.id}`}
+            >
               {!option.icon && (
                 <Option.Icon icon={option.icon ?? 'Coins'} variant={'bold'} />
               )}

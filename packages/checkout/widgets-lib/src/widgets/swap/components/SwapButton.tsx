@@ -9,7 +9,7 @@ import {
   ViewContext,
   ViewActions,
 } from '../../../context/view-context/ViewContext';
-import { SwapContext } from '../context/SwapContext';
+import { SwapContext } from '../context/swap-context/SwapContext';
 
 export interface SwapButtonProps {
   transaction?: Transaction;

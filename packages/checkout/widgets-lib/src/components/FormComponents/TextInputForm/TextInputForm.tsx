@@ -1,6 +1,8 @@
 import { TextInput } from '@biom3/react';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
+
 interface TextInputFormProps {
+  textInputId: string;
   value: string;
   placeholder?: string;
   subtext?: string;
@@ -15,6 +17,7 @@ interface TextInputFormProps {
 }
 
 export const TextInputForm = ({
+  textInputId,
   value,
   placeholder,
   errorMessage,
@@ -47,6 +50,7 @@ export const TextInputForm = ({
       errorMessage={errorMessage}
     >
       <TextInput
+        testId={textInputId}
         onChange={handleOnChange}
         sizeVariant="large"
         value={value}
