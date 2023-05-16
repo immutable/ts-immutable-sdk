@@ -1,12 +1,11 @@
 {
-  "extends": ["../.eslintrc"],
-  "ignorePatterns": ["jest.config.*", "rollup.config.*"],
+  "extends": ["../../../../.eslintrc"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.json",
     "tsconfigRootDir": "."
   },
   "rules": {
-    "max-len": ["error", { "comments": 140, "code": 120 }]
+    "max-len": ["off"]
   }
 }
