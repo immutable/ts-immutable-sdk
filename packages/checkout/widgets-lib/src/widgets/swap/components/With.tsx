@@ -9,7 +9,7 @@ import TokenSelect from './TokenSelect';
 // eslint-disable-next-line import/no-cycle
 import { QuoteResponse } from '../views/SwapCoins';
 import { findTokenByAddress } from '../helpers';
-import { SwapContext } from '../context/SwapContext';
+import { SwapContext } from '../context/swap-context/SwapContext';
 
 type WithProps = {
   onTokenChange: (token: TokenInfo) => void;

@@ -2,7 +2,7 @@ import { Box, Body, TextInput } from '@biom3/react';
 import { BigNumber, utils } from 'ethers';
 import { useContext } from 'react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
-import { SwapContext } from '../context/SwapContext';
+import { SwapContext } from '../context/swap-context/SwapContext';
 import TokenSelect from './TokenSelect';
 
 export interface BuyProps {

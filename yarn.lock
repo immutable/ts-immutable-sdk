@@ -1575,13 +1575,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.3.0-beta":
-  version: 0.3.0-beta
-  resolution: "@biom3/react@npm:0.3.0-beta"
+"@biom3/react@npm:^0.4.2-beta":
+  version: 0.4.2-beta
+  resolution: "@biom3/react@npm:0.4.2-beta"
   dependencies:
     "@biom3/design-tokens": "*"
-    "@emotion/css": ^11.10.5
-    "@emotion/react": ^11.10.5
+    "@emotion/css": ^11.10.8
+    "@emotion/react": ^11.10.8
     framer-motion: ^9.1.7
     lodash.debounce: ^4.0.8
     lodash.get: ^4.4.2
@@ -1592,7 +1592,7 @@ __metadata:
     react-dom: ^18.2.0
     react-is: ^18.2.0
     ts-deepmerge: ^5.0.0
-  checksum: a0ee69dc63e149b2547571a3c0cafb8681dd6c5f8e95b9aba88d2116437922dcb10ed670acea5e947cdabd73e71bcf8e5884a7ee7fbfd4697fe28907a3acdf52
+  checksum: 8ab0050cf86a6c9ee7b4ffea8ff9714071b0ae675bdb4f5e4b8a84024cbab9673593b3ce12bd7e939141b00e6b3792c707ee0c7a6ad57b1e8bb489dd254c8fda
   languageName: node
   linkType: hard
 
@@ -1874,7 +1874,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/css@npm:^11.10.5":
+"@emotion/css@npm:^11.10.8":
   version: 11.11.0
   resolution: "@emotion/css@npm:11.11.0"
   dependencies:
@@ -1917,7 +1917,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/react@npm:^11.10.5":
+"@emotion/react@npm:^11.10.8":
   version: 11.11.0
   resolution: "@emotion/react@npm:11.11.0"
   dependencies:
@@ -2671,7 +2671,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.3.0-beta
+    "@biom3/react": ^0.4.2-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@testing-library/jest-dom": ^5.16.5
@@ -2721,7 +2721,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-lib@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.1.4-beta
-    "@biom3/react": ^0.3.0-beta
+    "@biom3/react": ^0.4.2-beta
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0

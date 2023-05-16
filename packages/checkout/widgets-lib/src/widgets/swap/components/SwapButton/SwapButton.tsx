@@ -1,24 +1,29 @@
-import { Button } from '@biom3/react';
+import { Box, Button } from '@biom3/react';
 import { Checkout, Transaction } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import { useContext, useEffect, useState } from 'react';
 import { Environment } from '@imtbl/config';
-import { sendSwapSuccessEvent } from '../SwapWidgetEvents';
-import { text } from '../../../resources/text/textConfig';
-import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
+import { sendSwapSuccessEvent } from '../../SwapWidgetEvents';
+import { text } from '../../../../resources/text/textConfig';
+import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 import {
   ViewContext,
   ViewActions,
-} from '../../../context/view-context/ViewContext';
+} from '../../../../context/view-context/ViewContext';
+import { SwapContext } from '../../context/swap-context/SwapContext';
+import {
+  swapButtonBoxStyle,
+  swapButtonIconLoadingStyle,
+} from './SwapButtonStyles';
 
 export interface SwapButtonProps {
-  provider?: Web3Provider;
   transaction?: Transaction;
 }
 
 export function SwapButton(props: SwapButtonProps) {
   const { viewDispatch } = useContext(ViewContext);
-  const { provider, transaction } = props;
+  const { swapState } = useContext(SwapContext);
+  const { provider } = swapState;
+  const { transaction } = props;
   const [loading, setLoading] = useState(true);
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
 
@@ -61,15 +66,18 @@ export function SwapButton(props: SwapButtonProps) {
   }, [setLoading]);
 
   return (
-    <Button
-      disabled={!provider || !transaction || loading}
-      variant={!provider || !transaction ? 'tertiary' : 'primary'}
-      onClick={sendTransaction}
-    >
-      {loading && (
-        <Button.Icon icon="Loading" sx={{ width: 'base.icon.size.200' }} />
-      )}
-      {!loading && buttonText}
-    </Button>
+    <Box sx={swapButtonBoxStyle}>
+      <Button
+        disabled={!provider || !transaction || loading}
+        variant={!provider || !transaction ? 'tertiary' : 'primary'}
+        onClick={sendTransaction}
+        size="large"
+      >
+        {loading && (
+          <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
+        )}
+        {!loading && buttonText}
+      </Button>
+    </Box>
   );
 }
