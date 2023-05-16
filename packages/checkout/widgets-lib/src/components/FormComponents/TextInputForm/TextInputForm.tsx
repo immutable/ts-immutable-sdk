@@ -55,6 +55,7 @@ export const TextInputForm = ({
         onBlur={handleOnBlur}
         hideClearValueButton
         onFocus={onTextInputFocus}
+        sx={{ backgroundColor: 'base.color.translucent.container.200' }}
       >
         {maxButtonClick && (
           <TextInput.Button onClick={maxButtonClick}>max</TextInput.Button>
