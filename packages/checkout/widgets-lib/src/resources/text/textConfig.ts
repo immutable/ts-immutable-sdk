@@ -41,8 +41,6 @@ export const text = {
       },
       networkStatus: {
         heading: 'Network',
-        network1Name: 'Polygon',
-        network2Name: 'Ethereum',
       },
       tokenBalancesList: {
         noTokensFound: 'No tokens found',

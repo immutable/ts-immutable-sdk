@@ -93,6 +93,7 @@ export function SwapCoins({
         />
       )}
       footer={<FooterLogo />}
+      footerBackgroundColor="base.color.translucent.container.200"
     >
       <Box
         sx={{

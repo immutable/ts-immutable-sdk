@@ -24,13 +24,13 @@ export const headerStyle = (floatHeader: boolean) => ({
   zIndex: 10,
 });
 
-export const footerStyle = {
+export const footerStyle = (footerBackgroundColor?: string) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: 'base.color.translucent.container.200',
-};
+  backgroundColor: footerBackgroundColor ?? '',
+});
 
 export const contentStyle = {
   flex: 1,
