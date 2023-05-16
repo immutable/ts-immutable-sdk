@@ -52,17 +52,17 @@ export function Example() {
   const getQuote = async () => {
     setIsFetching(true);
 
-    const txn = await exchange.getUnsignedSwapTxFromAmountIn(
-      ethereumAccount,
-      inputToken,
-      outputToken,
-      ethers.utils.parseEther(`${inputAmount}`)
-    );
+    try {
+      const txn = await exchange.getUnsignedSwapTxFromAmountIn(
+        ethereumAccount,
+        inputToken,
+        outputToken,
+        ethers.utils.parseEther(`${inputAmount}`)
+      );
 
-    if (txn.success) {
       setResult(txn);
-    } else {
-      setError('Error fetching quote');
+    } catch(e: any) {
+      setError(`Error fetching quote: ${e.message}`);
       setResult(null);
     }
 
