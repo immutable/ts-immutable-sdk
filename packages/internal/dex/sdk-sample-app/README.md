@@ -1,3 +1,7 @@
+# Immutable DEX sample application
+
+This sample app demonstrates retrieving a swap transaction, displaying swap details to the user and executing the swap transaction using the Metamask browser extension.
+
 ## Getting Started
 
 First, run the setup:
@@ -8,7 +12,9 @@ First, run the setup:
 yarn setup
 ```
 
-Second, create a file called `.env.local` in the `sdk-sample-app` directory. Put the following variables in, set as their respective contract addresses:
+Second, create a file called `.env.local` in the `sdk-sample-app` directory. Add the following environment variables:
+
+- Contracts:
 
 ```bash
 NEXT_PUBLIC_MULTICALL_CONTRACT_DEV=
@@ -23,14 +29,14 @@ NEXT_PUBLIC_COMMON_ROUTING_USDC=
 NEXT_PUBLIC_COMMON_ROUTING_WETH=
 ```
 
-Then also add the RPC URL and the chain ID:
+- RPC URL and Chain ID:
 
 ```bash
 NEXT_PUBLIC_RPC_URL=
 NEXT_PUBLIC_CHAIN_ID=
 ```
 
-Finally, run the development server:
+Run the development server:
 
 ```bash
 yarn dev
