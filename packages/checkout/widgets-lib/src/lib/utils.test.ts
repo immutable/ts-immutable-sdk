@@ -165,8 +165,8 @@ describe('utils', () => {
           sortTokensByAmount(
             Environment.PRODUCTION,
             testcase.tokens,
-            ChainId.IMTBL_ZKEVM_TESTNET
-          )
+            ChainId.IMTBL_ZKEVM_TESTNET,
+          ),
         ).toEqual([
           {
             balance: BigNumber.from('0'),

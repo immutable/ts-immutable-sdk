@@ -23,7 +23,7 @@ function TokenSelect({
   token,
   filter,
   allowedTokens,
-}: TokenSelectProps) => {
+}: TokenSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [option, setOption] = useState(token?.symbol);
   const [icon, setIcon] = useState(token?.icon);
@@ -33,16 +33,19 @@ function TokenSelect({
   };
 
   const selectOption = useCallback(
-    (tkn: TokenInfo) => {
-      setOption(tkn?.symbol);
-      setIcon(tkn?.icon);
-      onChange(tkn);
+    // TODO: token is declared in the upper scope
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    (token: TokenInfo) => {
+      setOption(token?.symbol);
+      setIcon(token?.icon);
+      onChange(token);
     },
     [setOption, setIcon, onChange],
   );
 
   useEffect(() => {
-    // TODO: please fix
+    // TODO: Expected an assignment or function call and instead saw an expression
+    // if statement? should this be short curcuited?
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     token && selectOption(token);
   }, [token, selectOption]);
@@ -70,24 +73,24 @@ function TokenSelect({
         </Body>
       </Box>
       {isOpen && (
-        <Box sx={OptionsContainerStyle}>
-          {allowedTokens.map((token) => {
-            return !filter || filter.includes(token.address || '') ? (
-              <Box
-                testId={`${testId}__option-${token.symbol}`}
-                sx={OptionStyle}
-                key={token.symbol}
-                onClick={() => selectOption(token)}
-              >
-                <img
-                  style={{ width: '16px', height: '16px' }}
-                  src={token.icon}
-                  alt={token.symbol}
-                />
-                <Body size="small">{token.symbol}</Body>
-              </Box>
-            ) : null;
-          })}
+        <Box sx={optionsContainerStyle}>
+          {/* TODO: 'token' is already declared in the upper scope */}
+          {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
+          {allowedTokens.map((token) => (!filter || filter.includes(token.address || '') ? (
+            <Box
+              testId={`${testId}__option-${token.symbol}`}
+              sx={optionStyle}
+              key={token.symbol}
+              onClick={() => selectOption(token)}
+            >
+              <img
+                style={{ width: '16px', height: '16px' }}
+                src={token.icon}
+                alt={token.symbol}
+              />
+              <Body size="small">{token.symbol}</Body>
+            </Box>
+          ) : null))}
         </Box>
       )}
     </Box>

@@ -1,8 +1,8 @@
 import { Box, Body, TextInput } from '@biom3/react';
 import { BigNumber, utils } from 'ethers';
 import { useContext } from 'react';
+import { TokenInfo } from '@imtbl/checkout-sdk';
 import { SwapContext } from '../context/SwapContext';
-import { TokenInfo, ConnectResult } from '@imtbl/checkout-sdk';
 import TokenSelect from './TokenSelect';
 
 export interface BuyProps {
@@ -13,7 +13,9 @@ export interface BuyProps {
 }
 
 export function Buy(props: BuyProps) {
-  const { onTokenChange, onAmountChange, token, amount } = props;
+  const {
+    onTokenChange, onAmountChange, token, amount,
+  } = props;
   const defaultValue = utils
     .formatUnits((amount || 0).toString(), token?.decimals || 18)
     ?.toString();
