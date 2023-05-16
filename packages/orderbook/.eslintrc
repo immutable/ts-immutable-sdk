@@ -1,6 +1,6 @@
 {
-  "extends": ["../../../.eslintrc"],
-  "ignorePatterns": ["jest.config.*", "rollup.config.*"],
+  "extends": ["airbnb", "airbnb-typescript"],
+  "ignorePatterns": ["jest.config.*"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.json",
@@ -15,20 +15,20 @@
       },
       {
         "selector": "objectLiteralProperty",
-        "format": ["camelCase"]
+        "format": ["camelCase","snake_case"]
       },
       {
         "selector": "variable",
-        "format": ["camelCase", "UPPER_CASE"]
+        "format": ["camelCase", "UPPER_CASE", "snake_case"]
       },
       {
         "selector": "variable",
         "types": ["function"],
-        "format": ["camelCase", "PascalCase"]
+        "format": ["camelCase"]
       },
       {
         "selector": "function",
-        "format": ["camelCase", "PascalCase"]
+        "format": ["camelCase"]
       },
       {
         "selector": "parameter",
@@ -58,11 +58,9 @@
       },
       {
         "selector": "typeProperty",
-        "format": ["camelCase"]
+        "format": ["camelCase","snake_case"]
       }
     ],
-    "class-methods-use-this": ["off"],
-    "react/require-default-props": ["off"],
-    "react/react-in-jsx-scope": ["off"]
+    "import/prefer-default-export": ["off"]
   }
 }
