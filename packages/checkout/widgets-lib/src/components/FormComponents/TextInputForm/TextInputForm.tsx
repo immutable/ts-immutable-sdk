@@ -30,9 +30,13 @@ export function TextInputForm({
   subtext,
   maxButtonClick,
 }: TextInputFormProps) {
-  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>, previousValue: string) => {
     const inputValue = event.target.value;
-    if (!validator(inputValue)) return;
+    if (!validator(inputValue)) {
+      // TODO: is there a better solution to this, cypress tests having issues with typing 'abc' and it still being set
+      onTextInputChange(previousValue ?? '');
+      return;
+    }
     onTextInputChange(inputValue);
   };
 
@@ -51,7 +55,7 @@ export function TextInputForm({
     >
       <TextInput
         testId={testId}
-        onChange={handleOnChange}
+        onChange={(event) => handleOnChange(event, value)}
         sizeVariant="large"
         value={value}
         validationStatus={isErrored ? 'error' : 'success'}
