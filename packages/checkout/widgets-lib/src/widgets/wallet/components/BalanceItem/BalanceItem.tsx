@@ -15,7 +15,7 @@ import {
   ShowMenuItem,
 } from './BalanceItemStyles';
 import { BalanceInfo } from '../../functions/tokenBalances';
-import { WalletContext } from '../../context/WalletContext';
+import { WalletActions, WalletContext } from '../../context/WalletContext';
 import {
   sendBridgeCoinsEvent,
   sendOnRampCoinsEvent,
@@ -29,11 +29,20 @@ export interface BalanceItemProps {
 export function BalanceItem(props: BalanceItemProps) {
   const { balanceInfo } = props;
   const fiatAmount = `≈ USD $${balanceInfo.fiatAmount ?? '-.--'}`;
-  const { walletState } = useContext(WalletContext);
+  const { walletState, walletDispatch } = useContext(WalletContext);
   const { supportedTopUps, network, checkout } = walletState;
   const [isOnRampEnabled, setIsOnRampEnabled] = useState<boolean>();
   const [isBridgeEnabled, setIsBridgeEnabled] = useState<boolean>();
   const [isSwapEnabled, setIsSwapEnabled] = useState<boolean>();
+
+  useEffect(() => {
+    walletDispatch({
+      payload: {
+        type: WalletActions.SET_SUPPORTED_TOP_UPS,
+        supportedTopUps: { ...supportedTopUps, isBridgeEnabled: true },
+      },
+    });
+  }, []);
 
   useEffect(() => {
     if (!network || !supportedTopUps || !checkout) return;
