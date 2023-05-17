@@ -33,6 +33,7 @@ import {
   initialSwapFormState,
   swapFormReducer,
 } from './context/swap-form-context/SwapFormContext';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -166,11 +167,13 @@ export function SwapWidget(props: SwapWidgetProps) {
               <LoadingView loadingText="Loading" />
             )}
             {viewState.view.type === SwapWidgetViews.SWAP && (
-              <SwapCoins
-                amount={amount}
-                fromContractAddress={fromContractAddress}
-                toContractAddress={toContractAddress}
-              />
+              <CryptoFiatProvider>
+                <SwapCoins
+                  amount={amount}
+                  fromContractAddress={fromContractAddress}
+                  toContractAddress={toContractAddress}
+                />
+              </CryptoFiatProvider>
             )}
             {viewState.view.type === SwapWidgetViews.SUCCESS && (
               <SuccessView

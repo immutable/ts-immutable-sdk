@@ -1,4 +1,6 @@
-import { useCallback, useContext, useMemo } from 'react';
+import {
+  useCallback, useContext, useEffect, useMemo,
+} from 'react';
 import {
   Body, Box, Heading, OptionKey,
 } from '@biom3/react';
@@ -17,6 +19,8 @@ import { text } from '../../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 import { SwapContext } from '../../context/swap-context/SwapContext';
 import { SelectOption } from '../../../../components/FormComponents/SelectForm/SelectForm';
+import { CryptoFiatActions, CryptoFiatContext } from '../../../../context/crypto-fiat-context/CryptoFiatContext';
+import { calculateCryptoToFiat } from '../../../../lib/utils';
 
 export function SwapForm() {
   const { swapState } = useContext(SwapContext);
@@ -26,6 +30,7 @@ export function SwapForm() {
     swapFromAmount, swapFromToken, swapToAmount, swapToToken,
   } = swapFormState;
   const { tokenBalances, allowedTokens } = swapState;
+  const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
 
   const fromTokensOptions = useMemo(
     () => tokenBalances.filter((balance) => balance.balance.gt(0)).map(
@@ -49,9 +54,49 @@ export function SwapForm() {
     [allowedTokens, swapFromToken],
   );
 
+  useEffect(() => {
+    const tokenSymbols: string[] = [];
+    allowedTokens.forEach((token) => {
+      tokenSymbols.push(token.symbol);
+    });
+
+    cryptoFiatDispatch({
+      payload: {
+        type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+        tokenSymbols,
+      },
+    });
+  }, [cryptoFiatDispatch, fromTokensOptions]);
+
+  useEffect(() => {
+    if (!swapFormState.swapFromAmount) {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_FROM_FIAT_VALUE,
+          swapFromFiatValue: '0.00',
+        },
+      });
+    }
+
+    if (swapFormState.swapFromAmount && swapFormState.swapFromToken) {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_FROM_FIAT_VALUE,
+          swapFromFiatValue: calculateCryptoToFiat(
+            swapFormState.swapFromAmount,
+            swapFormState.swapFromToken.symbol,
+            cryptoFiatState.conversions,
+          ),
+        },
+      });
+    }
+    // {'imx' => 0.751084, 'fun' => 0.00492518, 'usdc' => 1, 'weth' => 1819.43}
+    console.log('Conversions: ', cryptoFiatState.conversions);
+  }, [cryptoFiatState.conversions, swapFormState.swapFromAmount, swapFormState.swapFromToken]);
+
   // extract these to context or calculate on render
   const fromToConversionText = '1 WETH ≈ 12.6 GOG'; // TODO: to calculate when dex integrated
-  const fromFiatPriceText = `${content.fiatPricePrefix} $20.40`; // todo: calculate fiat price here and pass down as string
+  const fromFiatPriceText = `${content.fiatPricePrefix} $${swapFormState.swapFromFiatValue}`;
   const availableFromBalanceSubtext = `${content.availableBalancePrefix} 0.123`; // todo: update with actual values
 
   const handleFromTokenChange = useCallback(
@@ -130,7 +175,6 @@ export function SwapForm() {
         />
       </Box>
       <Box>
-        {/* todo, add the converstion label thats right aligned */}
         <Box sx={headingStyle}>
           <Heading size="xSmall">{swapForm.to.label}</Heading>
           <Body sx={toHeadingBodyStyle} size="small">

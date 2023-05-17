@@ -6,6 +6,7 @@ export interface SwapFormState {
   swapFromAmount: string;
   swapToToken: TokenInfo | null;
   swapToAmount: string;
+  swapFromFiatValue: string;
 }
 
 export const initialSwapFormState: SwapFormState = {
@@ -13,6 +14,7 @@ export const initialSwapFormState: SwapFormState = {
   swapFromAmount: '',
   swapToToken: null,
   swapToAmount: '',
+  swapFromFiatValue: '',
 };
 
 export interface SwapFormContextState {
@@ -28,13 +30,15 @@ type ActionPayload =
   | SetSwapFromTokenPayload
   | SetSwapFromAmountPayload
   | SetSwapToTokenPayload
-  | SetSwapToAmountPayload;
+  | SetSwapToAmountPayload
+  | SetSwapFromFiatValue;
 
 export enum SwapFormActions {
   SET_SWAP_FROM_TOKEN = 'SET_SWAP_FROM_TOKEN',
   SET_SWAP_FROM_AMOUNT = 'SET_SWAP_FROM_AMOUNT',
   SET_SWAP_TO_TOKEN = 'SET_SWAP_TO_TOKEN',
   SET_SWAP_TO_AMOUNT = 'SET_SWAP_TO_AMOUNT',
+  SET_SWAP_FROM_FIAT_VALUE = 'SET_SWAP_FROM_FIAT_VALUE',
 }
 
 export interface SetSwapToTokenPayload {
@@ -55,6 +59,11 @@ export interface SetSwapFromTokenPayload {
 export interface SetSwapFromAmountPayload {
   type: SwapFormActions.SET_SWAP_FROM_AMOUNT;
   swapFromAmount: string;
+}
+
+export interface SetSwapFromFiatValue {
+  type: SwapFormActions.SET_SWAP_FROM_FIAT_VALUE;
+  swapFromFiatValue: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -90,6 +99,11 @@ export const swapFormReducer: Reducer<SwapFormState, SwapFormAction> = (
       return {
         ...state,
         swapFromAmount: action.payload.swapFromAmount,
+      };
+    case SwapFormActions.SET_SWAP_FROM_FIAT_VALUE:
+      return {
+        ...state,
+        swapFromFiatValue: action.payload.swapFromFiatValue,
       };
     default:
       return state;
