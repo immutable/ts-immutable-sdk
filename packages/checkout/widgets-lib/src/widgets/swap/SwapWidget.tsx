@@ -7,7 +7,9 @@ import {
 } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { useEffect, useCallback, useReducer } from 'react';
+import {
+  useEffect, useCallback, useReducer, useMemo,
+} from 'react';
 import { Environment } from '@imtbl/config';
 import { SwapCoins } from './views/SwapCoins';
 import { SuccessView } from '../../components/Success/SuccessView';
@@ -47,10 +49,22 @@ export interface SwapWidgetParams {
 
 export function SwapWidget(props: SwapWidgetProps) {
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+  const viewReducerValues = useMemo(
+    () => ({ viewState, viewDispatch }),
+    [viewState, viewDispatch],
+  );
   const [swapState, swapDispatch] = useReducer(swapReducer, initialSwapState);
+  const swapReducerValues = useMemo(
+    () => ({ swapState, swapDispatch }),
+    [swapState, swapDispatch],
+  );
   const [swapFormState, swapFormDispatch] = useReducer(
     swapFormReducer,
     initialSwapFormState,
+  );
+  const swapFormReducerValues = useMemo(
+    () => ({ swapFormState, swapFormDispatch }),
+    [swapFormState, swapFormDispatch],
   );
 
   const { params, theme, environment } = props;
@@ -145,14 +159,9 @@ export function SwapWidget(props: SwapWidgetProps) {
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-      <ViewContext.Provider value={{ viewState, viewDispatch }}>
-        {/* TODO: The object passed as the value prop to the Context provider changes every render.
-            To fix this consider wrapping it in a useMemo hook. */}
-        {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-        <SwapContext.Provider value={{ swapState, swapDispatch }}>
-          {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-          <SwapFormContext.Provider value={{ swapFormState, swapFormDispatch }}>
+      <ViewContext.Provider value={viewReducerValues}>
+        <SwapContext.Provider value={swapReducerValues}>
+          <SwapFormContext.Provider value={swapFormReducerValues}>
             {viewState.view.type === BaseViews.LOADING_VIEW && (
               <LoadingView loadingText="Loading" />
             )}
