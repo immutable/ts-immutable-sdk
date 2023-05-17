@@ -103,6 +103,11 @@ export function NetworkMenu() {
     })();
   }, [checkout]);
 
+  // TODO: this can be removed if needed
+  function formatNetworkName(networkName: string) {
+    return networkName.replace('Devnet', 'dev').replace('Testnet', 'test');
+  }
+
   return (
     <Box sx={networkMenuStyles}>
       <Box sx={networkHeadingStyle}>
@@ -139,7 +144,7 @@ export function NetworkMenu() {
                     networkItem.chainId === network?.chainId,
                   )}
                 />
-                {networkItem.name}
+                {formatNetworkName(networkItem.name)}
               </HorizontalMenu.Button>
             ))}
       </HorizontalMenu>

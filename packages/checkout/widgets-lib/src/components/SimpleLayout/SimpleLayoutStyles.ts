@@ -24,13 +24,13 @@ export const headerStyle = (floatHeader: boolean) => ({
   zIndex: 10,
 });
 
-export const footerStyle = {
+export const footerStyle = (footerBackgroundColor?: string) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: 'base.color.translucent.container.200',
-};
+  backgroundColor: footerBackgroundColor ?? '',
+});
 
 export const contentStyle = {
   flex: 1,
@@ -47,5 +47,4 @@ export const heroContentStyle = {
 export const bodyStyle = {
   flex: '1 0 0', // needed to set flex-basis to 0 for even distribution with HeroContent
   width: '100%',
-  paddingX: 'base.spacing.x2',
 };
