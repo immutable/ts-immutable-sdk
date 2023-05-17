@@ -26,8 +26,8 @@ export type QuoteResponse = {
 export type TradeInfo = {
   quote: Amount;
   quoteWithMaxSlippage: Amount;
+  gasFeeEstimate: Amount | null
   slippage: number;
-  gasFeeEstimate: string | null
 };
 
 export type TransactionResponse = {
@@ -47,6 +47,7 @@ export interface ExchangeOverrides {
   rpcURL: string;
   exchangeContracts: ExchangeContracts;
   commonRoutingTokens: TokenInfo[];
+  nativeToken: TokenInfo;
 }
 
 export interface ExchangeModuleConfiguration

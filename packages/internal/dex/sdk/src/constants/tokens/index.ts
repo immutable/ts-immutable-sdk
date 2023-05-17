@@ -1,15 +1,1 @@
-import { Token } from '@uniswap/sdk-core';
-import {
-  POLYGON_TESTNET_CHAIN_ID,
-  IMX_POLYGON_TESTNET,
-  USDC_POLYGON_TESTNET,
-  WETH_POLYGON_TESTNET,
-} from './polygon';
-
-export { POLYGON_TESTNET_CHAIN_ID };
-
-export const POLYGON_ZKEVM_COMMON_ROUTING_TOKENS: Token[] = [
-  IMX_POLYGON_TESTNET,
-  WETH_POLYGON_TESTNET,
-  USDC_POLYGON_TESTNET,
-];
+export * from './polygon';

@@ -23,7 +23,7 @@ import {
   getERC20Decimals,
   isValidAddress,
 } from './lib/utils';
-import { TransactionResponse } from './types';
+import { TokenInfo, TransactionResponse } from './types';
 import { createSwapParameters } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 import { constructQuoteWithSlippage } from './lib/transactionUtils/constructQuoteWithSlippage';
@@ -35,11 +35,16 @@ export class Exchange {
 
   private chainId: number;
 
+  private nativeToken: TokenInfo;
+
   constructor(configuration: ExchangeConfiguration) {
     this.chainId = configuration.chain.chainId;
+    this.nativeToken = configuration.chain.nativeToken;
+
     this.provider = new ethers.providers.JsonRpcProvider(
       configuration.chain.rpcUrl,
     );
+
     this.router = new Router(
       this.provider,
       configuration.chain.commonRoutingTokens,
@@ -132,7 +137,10 @@ export class Exchange {
     );
 
     const gasPrice = await fetchGasPrice(this.provider);
-    const gasFeeEstimate = gasPrice ? calculateGasFee(gasPrice, routeAndQuote.trade.gasEstimate) : null;
+    const gasFeeEstimate = gasPrice ? {
+      token: this.nativeToken,
+      amount: calculateGasFee(gasPrice, routeAndQuote.trade.gasEstimate).toString(),
+    } : null;
 
     return {
       transaction: {

@@ -1,7 +1,5 @@
-import { BigNumber, utils } from 'ethers';
+import { BigNumber } from 'ethers';
 import { JsonRpcProvider, FeeData } from '@ethersproject/providers';
-
-const imxDecimals = 18; // TODO: Use an Amount so that we have the decimals available for calcs
 
 type EIP1559FeeData = {
   maxFeePerGas: BigNumber;
@@ -41,9 +39,6 @@ export const fetchGasPrice = async (provider: JsonRpcProvider): Promise<BigNumbe
  *
  * @param {BigNumber} gasPriceInWei - The price of gas in wei
  * @param {BigNumber} gasUsed - The total gas units that will be used for the transaction
- * @returns - The face value of the token as a string. e.g. wei / 10^18
+ * @returns - The cost of the transaction in the gas token's smallest denomination (e.g. WEI)
  */
-export const calculateGasFee = (gasPriceInWei: BigNumber, gasUsed: BigNumber): string => {
-  const totalGasFee = gasUsed.mul(gasPriceInWei);
-  return utils.formatUnits(totalGasFee, imxDecimals);
-};
+export const calculateGasFee = (gasPriceInWei: BigNumber, gasUsed: BigNumber): BigNumber => gasUsed.mul(gasPriceInWei);

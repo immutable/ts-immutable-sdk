@@ -194,7 +194,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('Pass in invalid addresses', () => {
-    it('throws InvalidAddress error', async () => {
+    it('throws InvalidAddressError', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
 
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
