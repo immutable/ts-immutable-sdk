@@ -34,17 +34,17 @@ generate-item-definition: get-item-definition-openapi
 # Get OpenAPI specs
 .PHONY: get-crafting-openapi get-inventory-openapi get-recipe-openapi get-item-definition-openapi
 get-crafting-openapi:
-	rm -rf ./openapi/crafting-openapi.json && mkdir -p ./openapi && touch ./openapi/crafting-openapi.json
+	rm -rf ./openapi/crafting-openapi.json && mkdir -p ./openapi && touch ./openapi/crafting-openapi.json && \
 	curl -H "Accept: application/json+v3" $(BASE_URL)/crafting/swagger/doc.json  -o ./openapi/crafting-openapi.json
 
 get-inventory-openapi:
-	rm -rf ./openapi/inventory-openapi.json && mkdir -p ./openapi && touch ./openapi/inventory-openapi.json
+	rm -rf ./openapi/inventory-openapi.json && mkdir -p ./openapi && touch ./openapi/inventory-openapi.json && \
 	curl -H "Accept: application/json+v3" $(BASE_URL)/inventory/swagger/doc.json -o ./openapi/inventory-openapi.json
 
 get-recipe-openapi:
-	rm -rf ./openapi/recipe-openapi.json && mkdir -p ./openapi && touch ./openapi/recipe-openapi.json
+	rm -rf ./openapi/recipe-openapi.json && mkdir -p ./openapi && touch ./openapi/recipe-openapi.json && \
 	curl -H "Accept: application/json+v3" $(BASE_URL)/recipe/swagger/doc.json -o ./openapi/recipe-openapi.json
 
 get-item-definition-openapi:
-	rm -rf ./openapi/item-definition-openapi.json && mkdir -p ./openapi && touch ./openapi/item-definition-openapi.json
+	rm -rf ./openapi/item-definition-openapi.json && mkdir -p ./openapi && touch ./openapi/item-definition-openapi.json && \
 	curl -H "Accept: application/json+v3" $(BASE_URL)/item-definition/swagger/doc.json -o ./openapi/item-definition-openapi.json 
