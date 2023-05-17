@@ -22,11 +22,13 @@ export function SwapForm() {
   const { swapState } = useContext(SwapContext);
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
   const { content, swapForm } = text.views[SwapWidgetViews.SWAP];
-  const { swapFromAmount, swapToAmount } = swapFormState;
+  const {
+    swapFromAmount, swapFromToken, swapToAmount, swapToToken,
+  } = swapFormState;
   const { tokenBalances, allowedTokens } = swapState;
 
   const fromTokensOptions = useMemo(
-    () => tokenBalances.map(
+    () => tokenBalances.filter((balance) => balance.balance.gt(0)).map(
       (tokenBalance) => ({
         id: `${tokenBalance.token.symbol}-${tokenBalance.token.name}`,
         label: tokenBalance.token.symbol,
@@ -37,14 +39,14 @@ export function SwapForm() {
   );
 
   const toTokenOptions = useMemo(
-    () => allowedTokens.map(
+    () => allowedTokens.filter((token) => token.address !== swapFromToken?.address).map(
       (token) => ({
         id: `${token.symbol}-${token.name}`,
         label: token.symbol,
         icon: undefined, // todo: add correct image once available on token info
       } as SelectOption),
     ),
-    [allowedTokens],
+    [allowedTokens, swapFromToken],
   );
 
   // extract these to context or calculate on render
@@ -65,9 +67,23 @@ export function SwapForm() {
             swapFromToken: selectedTokenOption.token,
           },
         });
+
+        console.log(selectedTokenOption.token);
+        console.log(swapToToken);
+
+        // Can't swap to the same token so clear the to token if from token is the same
+        if (swapToToken && swapToToken.address === selectedTokenOption.token.address) {
+          console.log('they match');
+          swapFormDispatch({
+            payload: {
+              type: SwapFormActions.SET_SWAP_TO_TOKEN,
+              swapToToken: null,
+            },
+          });
+        }
       }
     },
-    [tokenBalances, swapFormDispatch],
+    [tokenBalances, swapFormDispatch, swapToToken],
   );
 
   const handleToTokenChange = useCallback(

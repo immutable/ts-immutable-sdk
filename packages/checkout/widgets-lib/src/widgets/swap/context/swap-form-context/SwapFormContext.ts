@@ -39,7 +39,7 @@ export enum SwapFormActions {
 
 export interface SetSwapToTokenPayload {
   type: SwapFormActions.SET_SWAP_TO_TOKEN;
-  swapToToken: TokenInfo;
+  swapToToken: TokenInfo | null;
 }
 
 export interface SetSwapToAmountPayload {
@@ -49,7 +49,7 @@ export interface SetSwapToAmountPayload {
 
 export interface SetSwapFromTokenPayload {
   type: SwapFormActions.SET_SWAP_FROM_TOKEN;
-  swapFromToken: TokenInfo;
+  swapFromToken: TokenInfo | null;
 }
 
 export interface SetSwapFromAmountPayload {

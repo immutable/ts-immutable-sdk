@@ -126,6 +126,9 @@ export function SwapWidget(props: SwapWidgetProps) {
       },
     });
 
+    // check default values for amount, toTokenAddress and fromTokenAddress
+    // set in form state
+
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
