@@ -1,4 +1,4 @@
-import { Box, Body } from '@biom3/react';
+import { Box, Body, Heading } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import { useEffect, useState } from 'react';
 import { WalletAddressContainerStyle, WalletAddressLayoutStyle, WalletAddressTextLayoutStyle, TruncatedTextStyle } from './WalletAddressStyles';
@@ -21,8 +21,8 @@ export const WalletAddress = ({ provider }: { provider: Web3Provider | null }) =
     <Box sx={WalletAddressContainerStyle}>
       <Box sx={WalletAddressLayoutStyle}>
         <Box sx={WalletAddressTextLayoutStyle}>
-          <Body size="xSmall" sx={{color: 'base.color.brand.4'}}>Wallet address</Body>
-          <Body testId="wallet-address" size="medium" sx={TruncatedTextStyle}>{walletAddress}</Body>
+          <Heading size="xSmall">Wallet address</Heading>
+          <Body testId="wallet-address" size="xSmall" sx={TruncatedTextStyle}>{walletAddress}</Body>
         </Box>
         <CopyButton textToCopy={walletAddress} />
       </Box>

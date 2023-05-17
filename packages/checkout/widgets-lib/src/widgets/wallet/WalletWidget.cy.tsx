@@ -303,7 +303,7 @@ describe('WalletWidget tests', () => {
           />,
         );
         cySmartGet('settings-button').click();
-        cySmartGet('disconnect-button').should('have.text', 'Disconnect');
+        cySmartGet('disconnect-button').should('have.text', 'Disconnect Wallet');
         cySmartGet('disconnect-button').click();
         cySmartGet('@disconnectEvent').should('have.been.calledOnce');
       });

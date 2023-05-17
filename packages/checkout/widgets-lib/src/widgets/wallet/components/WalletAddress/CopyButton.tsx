@@ -1,5 +1,6 @@
 import { Box, ButtCon } from '@biom3/react';
 import { useState } from 'react';
+import { isCopiedStyle } from './CopyButtonStyles';
 
 export const CopyButton = ({
   textToCopy,
@@ -18,7 +19,7 @@ export const CopyButton = ({
   }
 
   return (
-    <Box sx={{ my: 'base.spacing.x4' }}>
+    <Box>
           {textToCopy && (
             <Box
               sx={{
@@ -28,13 +29,8 @@ export const CopyButton = ({
               <ButtCon
                 sx={
                   isCopied
-                    ? {
-                        background: 'base.color.status.success.bright',
-                        fill: 'base.color.status.success.bright',
-                      }
-                    : {
-                      background: 'none', color: 'white', border:'none'
-                    }
+                    ? isCopiedStyle
+                    : {}
                 }
                 onClick={handleCopy}
                 size="small"

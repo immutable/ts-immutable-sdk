@@ -53,7 +53,7 @@ export const text = {
         title: 'Settings',
       },
       disconnectButton: {
-        label: 'Disconnect'
+        label: 'Disconnect Wallet'
       }
     },
     [SwapWidgetViews.SWAP]: {
