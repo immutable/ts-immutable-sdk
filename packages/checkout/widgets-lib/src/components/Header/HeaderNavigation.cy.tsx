@@ -1,10 +1,11 @@
+/* eslint-disable no-console */
 import { describe, it } from 'local-cypress';
 import { mount } from 'cypress/react18';
+import { BiomeThemeProvider } from '@biom3/react';
+import { onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { cySmartGet } from '../../lib/testUtils';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from './HeaderNavigation';
-import { BiomeThemeProvider } from '@biom3/react';
-import { onDarkBase, onLightBase } from '@biom3/design-tokens';
 
 describe('HeaderNavigation', () => {
   describe('configurable buttons and title', () => {
@@ -12,7 +13,7 @@ describe('HeaderNavigation', () => {
       mount(
         <BiomeThemeProvider theme={{ base: onDarkBase }}>
           <SimpleLayout header={<HeaderNavigation showBack />} />
-        </BiomeThemeProvider>
+        </BiomeThemeProvider>,
       );
 
       cySmartGet('back-button').should('exist');
@@ -25,13 +26,13 @@ describe('HeaderNavigation', () => {
       mount(
         <BiomeThemeProvider theme={{ base: onDarkBase }}>
           <SimpleLayout
-            header={
+            header={(
               <HeaderNavigation
                 onCloseButtonClick={() => console.log('close clicked')}
               />
-            }
+            )}
           />
-        </BiomeThemeProvider>
+        </BiomeThemeProvider>,
       );
 
       cySmartGet('back-button').should('not.exist');
@@ -44,14 +45,14 @@ describe('HeaderNavigation', () => {
       mount(
         <BiomeThemeProvider theme={{ base: onDarkBase }}>
           <SimpleLayout
-            header={
+            header={(
               <HeaderNavigation
                 showSettings
                 onSettingsClick={() => console.log('test settings')}
               />
-            }
+            )}
           />
-        </BiomeThemeProvider>
+        </BiomeThemeProvider>,
       );
 
       cySmartGet('back-button').should('not.exist');
@@ -64,14 +65,14 @@ describe('HeaderNavigation', () => {
       mount(
         <BiomeThemeProvider theme={{ base: onDarkBase }}>
           <SimpleLayout
-            header={
+            header={(
               <HeaderNavigation
                 title="Test title"
                 onCloseButtonClick={() => console.log('close clicked')}
               />
-            }
+            )}
           />
-        </BiomeThemeProvider>
+        </BiomeThemeProvider>,
       );
 
       cySmartGet('back-button').should('not.exist');
@@ -84,14 +85,14 @@ describe('HeaderNavigation', () => {
       mount(
         <BiomeThemeProvider theme={{ base: onDarkBase }}>
           <SimpleLayout
-            header={
+            header={(
               <HeaderNavigation
                 showBack
                 onCloseButtonClick={() => console.log('close clicked')}
               />
-            }
+            )}
           />
-        </BiomeThemeProvider>
+        </BiomeThemeProvider>,
       );
 
       cySmartGet('back-button').should('exist');
@@ -106,21 +107,21 @@ describe('HeaderNavigation', () => {
       mount(
         <BiomeThemeProvider theme={{ base: onLightBase }}>
           <SimpleLayout
-            header={
+            header={(
               <HeaderNavigation
                 showBack
                 onCloseButtonClick={() => console.log('close clicked')}
               />
-            }
+            )}
           />
-        </BiomeThemeProvider>
+        </BiomeThemeProvider>,
       );
 
       cySmartGet('header-navigation-container').should('exist');
       cySmartGet('header-navigation-container').should(
         'have.css',
         'background-color',
-        'rgb(236, 236, 236)'
+        'rgb(236, 236, 236)',
       );
     });
 
@@ -128,22 +129,22 @@ describe('HeaderNavigation', () => {
       mount(
         <BiomeThemeProvider theme={{ base: onLightBase }}>
           <SimpleLayout
-            header={
+            header={(
               <HeaderNavigation
                 showBack
                 transparent
                 onCloseButtonClick={() => console.log('close clicked')}
               />
-            }
+            )}
           />
-        </BiomeThemeProvider>
+        </BiomeThemeProvider>,
       );
 
       cySmartGet('header-navigation-container').should('exist');
       cySmartGet('header-navigation-container').should(
         'have.css',
         'background-color',
-        'rgba(0, 0, 0, 0)'
+        'rgba(0, 0, 0, 0)',
       );
     });
   });

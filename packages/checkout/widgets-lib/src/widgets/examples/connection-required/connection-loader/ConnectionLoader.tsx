@@ -1,18 +1,20 @@
-import { BiomeThemeProvider, Body, Box, Icon } from '@biom3/react';
+import {
+  BiomeThemeProvider, Body, Box, Icon,
+} from '@biom3/react';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { useState } from 'react';
+import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
+import { Environment } from '@imtbl/config';
 import { InnerWidget } from '../inner-widget/InnerWidget';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
-import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
-  SuccessBoxStyles,
-  SuccessLogoStyles,
+  successBoxStyles,
+  successLogoStyles,
 } from '../../../../components/Success/SuccessViewStyles';
 import { CenteredBoxContent } from '../../../../components/CenteredBoxContent/CenteredBoxContent';
 import { zkEVMNetwork } from '../../../../lib/networkUtils';
-import { Environment } from '@imtbl/config';
 import { InnerExampleWidgetViews } from '../../../../context/view-context/InnerExampleViewContextTypes';
 
 export interface ConnectionLoaderProps {
@@ -43,10 +45,9 @@ export function ConnectionLoader({
   });
   const [connStatus, setConnStatus] = useState(ConnectionStatus.UNKNOWN);
 
-  const biomeTheme: BaseTokens =
-    theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-      ? onLightBase
-      : onDarkBase;
+  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+    ? onLightBase
+    : onDarkBase;
 
   async function checkConnection() {
     try {
@@ -62,6 +63,7 @@ export function ConnectionLoader({
         providerPreference: ConnectionProviders.METAMASK,
       });
 
+      // eslint-disable-next-line no-console
       console.log('connectRes', connectRes);
       if (
         connectRes.network.chainId !== zkEVMNetwork(checkout.config.environment)
@@ -91,8 +93,8 @@ export function ConnectionLoader({
         <BiomeThemeProvider theme={{ base: biomeTheme }}>
           <SimpleLayout footer={<FooterLogo />}>
             <CenteredBoxContent>
-              <Box sx={SuccessBoxStyles}>
-                <Box sx={SuccessLogoStyles}>
+              <Box sx={successBoxStyles}>
+                <Box sx={successLogoStyles}>
                   <Icon
                     icon="Loading"
                     variant="bold"
@@ -114,20 +116,20 @@ export function ConnectionLoader({
         <InnerWidget
           params={params}
           theme={theme}
-          callBack={callBack}
+          callBack={() => callBack()}
           deepLink={InnerExampleWidgetViews.VIEW_ONE}
-        ></InnerWidget>
+        />
       )}
       {connStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK && (
         <InnerWidget
           params={params}
           theme={theme}
-          callBack={callBack}
+          callBack={() => callBack()}
           deepLink={InnerExampleWidgetViews.VIEW_TWO}
-        ></InnerWidget>
+        />
       )}
       {connStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (
-        <>{children && <>{children}</>}</>
+        { children }
       )}
     </>
   );

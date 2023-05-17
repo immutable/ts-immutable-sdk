@@ -2,9 +2,9 @@ import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
+import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
-import { Environment } from '@imtbl/config';
 
 describe('ConnectLoader', () => {
   beforeEach(() => {
@@ -21,7 +21,7 @@ describe('ConnectLoader', () => {
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
+      </ConnectLoader>,
     );
     cySmartGet('wallet-list-metamask').should('be.visible');
     cy.get('#inner-widget').should('not.exist');
@@ -46,7 +46,7 @@ describe('ConnectLoader', () => {
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
+      </ConnectLoader>,
     );
 
     cySmartGet('wallet-list-metamask').should('be.visible');
@@ -93,7 +93,7 @@ describe('ConnectLoader', () => {
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
+      </ConnectLoader>,
     );
 
     cySmartGet('wallet-list-metamask').should('be.visible');
@@ -141,7 +141,7 @@ describe('ConnectLoader', () => {
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
+      </ConnectLoader>,
     );
 
     cySmartGet('wallet-list-metamask').click();
@@ -183,7 +183,7 @@ describe('ConnectLoader', () => {
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
+      </ConnectLoader>,
     );
 
     cy.get('#inner-widget').should('be.visible');

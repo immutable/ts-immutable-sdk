@@ -7,7 +7,9 @@ export abstract class ImmutableWebComponent extends HTMLElement {
   reactRoot?: ReactDOM.Root;
 
   environment = Environment.SANDBOX;
+
   theme = WidgetTheme.DARK;
+
   provider: Web3Provider | undefined = undefined;
 
   static get observedAttributes() {
@@ -25,10 +27,8 @@ export abstract class ImmutableWebComponent extends HTMLElement {
   }
 
   connectedCallback() {
-    this.theme =
-      (this.getAttribute('theme') as WidgetTheme) ?? WidgetTheme.DARK;
-    this.environment =
-      (this.getAttribute('environment') as Environment) ?? Environment.SANDBOX;
+    this.theme = (this.getAttribute('theme') as WidgetTheme) ?? WidgetTheme.DARK;
+    this.environment = (this.getAttribute('environment') as Environment) ?? Environment.SANDBOX;
   }
 
   abstract renderWidget(): void;

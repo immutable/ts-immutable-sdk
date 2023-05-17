@@ -1,7 +1,9 @@
-import React from 'react';
 import { Body, Box, Heading } from '@biom3/react';
+// TODO: Fix circular dependency
+// eslint-disable-next-line import/no-cycle
 import { GetAssetResponse, GetOrderResponse } from './BuyWidget';
 import Fees from './Fees';
+
 interface AssetDetailsProps {
   order: GetOrderResponse;
   asset: GetAssetResponse;

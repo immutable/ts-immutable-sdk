@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
@@ -40,8 +41,6 @@ export const text = {
       },
       networkStatus: {
         heading: 'Network',
-        network1Name: 'Polygon',
-        network2Name: 'Ethereum',
       },
       tokenBalancesList: {
         noTokensFound: 'No tokens found',
@@ -51,8 +50,24 @@ export const text = {
       header: {
         title: 'Swap coins',
       },
+      content: {
+        title: 'What would you like to swap?',
+        fiatPricePrefix: 'Approx USD',
+        availableBalancePrefix: 'Available',
+      },
       swapForm: {
+        from: {
+          label: 'From',
+          inputPlaceholder: '0',
+        },
+        to: {
+          label: 'To',
+          inputPlaceholder: '0',
+        },
         buttonText: 'Swap',
+      },
+      fees: {
+        title: 'Fees total',
       },
     },
   },

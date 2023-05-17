@@ -1,6 +1,7 @@
 import { Pool } from '@uniswap/v3-sdk';
 import { Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
+import { ProviderCallError } from 'errors';
 import { TokenInfo } from '../types';
 
 export const quoteReturnMapping: { [signature: string]: string[] } = {
@@ -28,59 +29,37 @@ export function poolEquals(poolA: Pool, poolB: Pool): boolean {
   );
 }
 
-export class InvalidAddress extends Error {
-  constructor(msg: string) {
-    super(msg);
-
-    // Set the prototype explicitly.
-    Object.setPrototypeOf(this, InvalidAddress.prototype);
-  }
-}
-
-export class DuplicateAddress extends Error {
-  constructor(msg: string) {
-    super(msg);
-
-    // Set the prototype explicitly.
-    Object.setPrototypeOf(this, InvalidAddress.prototype);
-  }
-}
-
 export async function getERC20Decimals(
   tokenAddress: string,
   provider: ethers.providers.JsonRpcProvider,
 ): Promise<number> {
   const decimalsFunctionSig = ethers.utils.id('decimals()').substring(0, 10);
-  return parseInt(
-    await provider.call({
+
+  try {
+    const decimalsResult = await provider.call({
       to: tokenAddress,
       data: decimalsFunctionSig,
-    }),
-    16,
-  );
+    });
+
+    return parseInt(
+      decimalsResult,
+      16,
+    );
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Unknown Error';
+    throw new ProviderCallError(`failed to get ERC20 decimals: ${message}`);
+  }
 }
 
 /**
  * Based on https://github.com/ethers-io/ethers.js/blob/main/src.ts/address/checks.ts#L51
  */
-export function validateAddress(address: string) {
+export function isValidAddress(address: string): boolean {
   try {
     ethers.utils.getAddress(address);
+    return true;
   } catch (error) {
-    throw new InvalidAddress(`Address is not valid: ${address}`);
-  }
-}
-
-export function validateDifferentAddresses(
-  tokenInAddress: string,
-  tokenOutAddress: string,
-) {
-  if (
-    tokenInAddress.toLocaleLowerCase() === tokenOutAddress.toLocaleLowerCase()
-  ) {
-    throw new DuplicateAddress(
-      `tokenInAddress and tokenOutAddress should be different but got: ${tokenInAddress}, ${tokenOutAddress}`,
-    );
+    return false;
   }
 }
 

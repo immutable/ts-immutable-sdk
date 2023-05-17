@@ -1,4 +1,7 @@
 import { Box, MenuItem } from '@biom3/react';
+import {
+  useContext, useEffect, useMemo, useState,
+} from 'react';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -6,11 +9,10 @@ import { text } from '../../../resources/text/textConfig';
 import { TotalTokenBalance } from '../components/TotalTokenBalance/TotalTokenBalance';
 import { TokenBalanceList } from '../components/TokenBalanceList/TokenBalanceList';
 import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
-import { useContext, useEffect, useMemo, useState } from 'react';
 import { WalletActions, WalletContext } from '../context/WalletContext';
 import { sendWalletWidgetCloseEvent } from '../WalletWidgetEvents';
 import {
-  WalletBalanceContainerStyle,
+  WALLET_BALANCE_CONTAINER_STYLE,
   WalletBalanceItemStyle,
 } from './WalletBalancesStyles';
 import { sendAddCoinsEvent } from '../CoinTopUpEvents';
@@ -22,20 +24,25 @@ import {
 import { getTokenBalances } from '../functions/tokenBalances';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 
-export const WalletBalances = () => {
+export function WalletBalances() {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { walletState, walletDispatch } = useContext(WalletContext);
+  const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
-  const { provider, checkout, network, supportedTopUps } = walletState;
+  const {
+    provider, checkout, network, supportedTopUps,
+  } = walletState;
   const { conversions } = cryptoFiatState;
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
     return (
-      network?.chainId === zkEVMNetwork(checkout.config.environment) &&
-      Boolean(
-        supportedTopUps?.isBridgeEnabled ||
-          supportedTopUps?.isSwapEnabled ||
-          supportedTopUps?.isOnRampEnabled
+      // @ts-ignore
+      // TODO: please fix. `config` doesn't exist on `Checkout` type.
+      network?.chainId === zkEVMNetwork(checkout.config.environment)
+      && Boolean(
+        supportedTopUps?.isBridgeEnabled
+          || supportedTopUps?.isSwapEnabled
+          || supportedTopUps?.isOnRampEnabled,
       )
     );
   }, [checkout, network, supportedTopUps]);
@@ -45,7 +52,7 @@ export const WalletBalances = () => {
 
     walletState.tokenBalances.forEach((balance) => {
       const fiatAmount = parseFloat(balance.fiatAmount);
-      if (!isNaN(fiatAmount)) totalAmount += fiatAmount;
+      if (!Number.isNaN(fiatAmount)) totalAmount += fiatAmount;
     });
     setTotalFiatAmount(totalAmount);
   }, [walletState.tokenBalances]);
@@ -83,7 +90,7 @@ export const WalletBalances = () => {
         provider,
         network.name,
         network.chainId,
-        conversions
+        conversions,
       );
 
       walletDispatch({
@@ -95,19 +102,19 @@ export const WalletBalances = () => {
     })();
   }, [checkout, network, provider, conversions, walletDispatch]);
 
-  const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
-
   return (
     <SimpleLayout
       testId="wallet-balances"
-      header={
+      header={(
         <HeaderNavigation
           title={header.title}
           showSettings
+          // TODO: please remove or if necessary keep the eslint ignore
+          // eslint-disable-next-line no-console
           onSettingsClick={() => console.log('settings click')}
           onCloseButtonClick={sendWalletWidgetCloseEvent}
         />
-      }
+      )}
       footer={<FooterLogo />}
     >
       <Box
@@ -115,15 +122,16 @@ export const WalletBalances = () => {
           display: 'flex',
           flexDirection: 'column',
           rowGap: 'base.spacing.x2',
+          paddingX: 'base.spacing.x2',
         }}
       >
-        <Box sx={WalletBalanceContainerStyle}>
+        <Box sx={WALLET_BALANCE_CONTAINER_STYLE}>
           <NetworkMenu />
           <TotalTokenBalance totalBalance={totalFiatAmount} />
           <Box
             sx={WalletBalanceItemStyle(
               showAddCoins,
-              walletState.tokenBalances.length > 2
+              walletState.tokenBalances.length > 2,
             )}
           >
             <TokenBalanceList balanceInfoItems={walletState.tokenBalances} />
@@ -139,11 +147,11 @@ export const WalletBalances = () => {
               });
             }}
           >
-            <MenuItem.FramedIcon icon="Add"></MenuItem.FramedIcon>
+            <MenuItem.FramedIcon icon="Add" />
             <MenuItem.Label>Add coins</MenuItem.Label>
           </MenuItem>
         )}
       </Box>
     </SimpleLayout>
   );
-};
+}

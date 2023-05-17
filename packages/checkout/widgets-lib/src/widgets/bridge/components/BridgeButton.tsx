@@ -2,8 +2,10 @@ import { Button, OptionKey } from '@biom3/react';
 import { Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { Web3Provider, TransactionResponse } from '@ethersproject/providers';
 import { utils } from 'ethers';
-import { BridgeWidgetViews } from '../BridgeWidget';
 import { Environment } from '@imtbl/config';
+// TODO: fix circular dependency
+// eslint-disable-next-line import/no-cycle
+import { BridgeWidgetViews } from '../BridgeWidget';
 
 interface BridgeButtonProps {
   provider?: Web3Provider;
@@ -14,7 +16,7 @@ interface BridgeButtonProps {
   updateView: (view: BridgeWidgetViews, err?: any) => void;
 }
 
-export const BridgeButton = (props: BridgeButtonProps) => {
+export function BridgeButton(props: BridgeButtonProps) {
   const {
     provider,
     amount,
@@ -25,8 +27,7 @@ export const BridgeButton = (props: BridgeButtonProps) => {
   } = props;
 
   const isDisabled = (): boolean => {
-    if (!amount || !balance || !fromNetwork || isNaN(Number(amount)))
-      return true;
+    if (!amount || !balance || !fromNetwork || Number.isNaN(Number(amount))) return true;
 
     const bnAmount = utils.parseUnits(amount, balance?.token.decimals);
     if (bnAmount.lte(0)) return true;
@@ -35,21 +36,18 @@ export const BridgeButton = (props: BridgeButtonProps) => {
     return false;
   };
 
-  const getUnsignedTransaction = () => {
+  const getUnsignedTransaction = () => ({
     // get the bridge transaction
     // Bridge.getBridgeTx(...)
-
-    return {
-      nonce: '0x00', // ignored by MetaMask
-      gasPrice: '0x000', // customizable by user during MetaMask confirmation.
-      gas: '0x000', // customizable by user during MetaMask confirmation.
-      to: '', // To address.
-      from: '', // User's active address.
-      value: '0x00', // Only required to send ether to the recipient from the initiating external account.
-      data: '0x000', // Optional, but used for defining smart contract creation and interaction.
-      chainId: 5, // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
-    };
-  };
+    nonce: '0x00', // ignored by MetaMask
+    gasPrice: '0x000', // customizable by user during MetaMask confirmation.
+    gas: '0x000', // customizable by user during MetaMask confirmation.
+    to: '', // To address.
+    from: '', // User's active address.
+    value: '0x00', // Only required to send ether to the recipient from the initiating external account.
+    data: '0x000', // Optional, but used for defining smart contract creation and interaction.
+    chainId: 5, // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
+  });
 
   const submitBridge = async () => {
     if (!provider) return;
@@ -83,4 +81,4 @@ export const BridgeButton = (props: BridgeButtonProps) => {
       Bridge
     </Button>
   );
-};
+}

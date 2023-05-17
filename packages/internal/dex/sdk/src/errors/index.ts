@@ -1,1 +1,1 @@
-export * from './exchangeErrors';
+export * from './exchangeError';

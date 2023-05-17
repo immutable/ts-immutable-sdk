@@ -6,12 +6,13 @@ import { ImmutableWebComponent } from '../ImmutableWebComponent';
 
 export class ImmutableBuy extends ImmutableWebComponent {
   orderId = '';
+
   providerPreference: ConnectionProviders = ConnectionProviders.METAMASK;
 
   connectedCallback() {
     super.connectedCallback();
     this.providerPreference = this.getAttribute(
-      'providerPreference'
+      'providerPreference',
     ) as ConnectionProviders;
     this.orderId = this.getAttribute('orderId') as string;
 
@@ -34,8 +35,8 @@ export class ImmutableBuy extends ImmutableWebComponent {
           params={params}
           theme={this.theme}
           environment={this.environment}
-        ></BuyWidget>
-      </React.StrictMode>
+        />
+      </React.StrictMode>,
     );
   }
 }

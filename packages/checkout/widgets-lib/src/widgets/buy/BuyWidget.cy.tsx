@@ -1,10 +1,12 @@
-import { BuyWidget, BuyWidgetParams } from './BuyWidget';
-import { describe, it, cy, beforeEach } from 'local-cypress';
+import {
+  describe, it, cy, beforeEach,
+} from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
-import { cySmartGet } from '../../lib/testUtils';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import { cySmartGet } from '../../lib/testUtils';
+import { BuyWidget, BuyWidgetParams } from './BuyWidget';
 
 describe('BuyWidget tests', () => {
   beforeEach(() => {
@@ -50,7 +52,7 @@ describe('BuyWidget tests', () => {
         environment={Environment.PRODUCTION}
         params={params}
         theme={WidgetTheme.DARK}
-      />
+      />,
     );
 
     cySmartGet('collection_name').should('have.text', 'Gods Unchained Cards');

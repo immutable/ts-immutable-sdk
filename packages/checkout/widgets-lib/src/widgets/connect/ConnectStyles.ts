@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+// TODO: Remove eslint disable when naming convention is fixed
 export const ButtonWrapperStyle = {
   marginBottom: '10px',
 };

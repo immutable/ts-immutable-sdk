@@ -23,7 +23,7 @@ function OuterWidgetWebView() {
       providerPreference={WidgetConnectionProviders.METAMASK}
       theme={theme}
       environment={environment}
-    ></imtbl-outer-widget-example>
+    />
   );
 }
 

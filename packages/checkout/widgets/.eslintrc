@@ -1,5 +1,5 @@
 {
-  "extends": ["airbnb", "airbnb-typescript"],
+  "extends": ["../.eslintrc"],
   "ignorePatterns": ["jest.config.*", "rollup.config.*"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -61,18 +61,6 @@
         "format": ["camelCase"]
       }
     ],
-    "import/prefer-default-export": ["off"],
-    "no-plusplus": ["off"],
-    "max-classes-per-file": ["off"],
-    "max-len": ["error", { "comments": 120, "code": 120 }],
-    "no-restricted-syntax": [
-      "error",
-      "ForInStatement",
-      "LabeledStatement",
-      "WithStatement"
-    ],
-    "import/no-extraneous-dependencies": ["off"],
-    "@typescript-eslint/return-await": ["off"],
     "react/require-default-props": ["off"]
   }
 }

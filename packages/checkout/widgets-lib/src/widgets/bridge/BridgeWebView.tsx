@@ -26,7 +26,7 @@ function BridgeWebView() {
       amount="50"
       fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
       fromNetwork="Sepolia"
-    ></imtbl-bridge>
+    />
   );
 }
 

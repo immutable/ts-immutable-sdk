@@ -1,21 +1,17 @@
 import React from 'react';
-
-import { Environment } from '@imtbl/config';
 import {
   WidgetConnectionProviders,
-  Network,
-  WidgetTheme,
+  DEFAULT_PROVIDER,
 } from '../definitions/constants';
+import { CheckoutWidgetsConfig } from '../definitions/config';
+import { withDefaults } from '../lib/withDefaults';
 
 /**
  * Interface representing the props for the Example Widget component.
  * @experimental
  */
-export interface ExampleReactProps {
+export interface ExampleReactProps extends CheckoutWidgetsConfig {
   providerPreference: WidgetConnectionProviders;
-  fromContractAddress?: string;
-  amount?: string;
-  fromNetwork?: Network;
 }
 
 /**
@@ -25,18 +21,18 @@ export interface ExampleReactProps {
 export function ExampleReact(props: ExampleReactProps) {
   const {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    providerPreference, fromContractAddress, amount, fromNetwork,
+    providerPreference,
+    environment,
+    theme,
   } = props;
 
-  const config = window.ImtblCheckoutWidgetConfig;
+  const config = withDefaults(window.ImtblCheckoutWidgetConfig);
 
   return (
     <imtbl-example
-      environment={config.environment ?? Environment.SANDBOX}
-      providerPreference={
-        providerPreference ?? WidgetConnectionProviders.METAMASK
-      }
-      theme={config.theme ?? WidgetTheme.DARK}
+      environment={environment ?? config.environment}
+      theme={theme ?? config.theme}
+      providerPreference={providerPreference ?? DEFAULT_PROVIDER}
     />
   );
 }

@@ -1,8 +1,8 @@
 import { Box, Heading, Body } from '@biom3/react';
 import {
-  BodyBoxStyle,
-  BodyStyle,
-  SimpleTextBodyStyle,
+  bodyBoxStyle,
+  bodyStyle,
+  simpleTextBodyStyle,
 } from './SimpleTextBodyStyles';
 
 export interface SimpleTextBodyProps {
@@ -10,17 +10,17 @@ export interface SimpleTextBodyProps {
   children?: React.ReactNode;
 }
 
-export const SimpleTextBody = (props: SimpleTextBodyProps) => {
+export function SimpleTextBody(props: SimpleTextBodyProps) {
   const { heading, children } = props;
 
   return (
-    <Box sx={SimpleTextBodyStyle}>
+    <Box sx={simpleTextBodyStyle}>
       <Heading size="small">{heading}</Heading>
-      <Box sx={BodyBoxStyle}>
-        <Body size="small" sx={BodyStyle}>
+      <Box sx={bodyBoxStyle}>
+        <Body size="small" sx={bodyStyle}>
           {children}
         </Body>
       </Box>
     </Box>
   );
-};
+}

@@ -42,7 +42,6 @@ export async function multicallSingleCallDataMultipleContracts(
     });
   }
 
-  // static call to multicall contract with encoded args
   return multicallContract.callStatic.multicall(calls);
 }
 

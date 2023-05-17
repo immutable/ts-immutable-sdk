@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import reportWebVitals from './reportWebVitals';
 import BuyWebView from './widgets/buy/BuyWebView';
 import ConnectWebView from './widgets/connect/ConnectWebView';
 import SwapWebView from './widgets/swap/SwapWebView';
@@ -11,7 +11,7 @@ import TransitionExampleWebView from './widgets/examples/transition/TransitionEx
 import DiExampleWebView from './widgets/examples/dependency-injection/DiExampleWebView';
 import OuterWidgetWebView from './widgets/examples/connection-required/outer-widget/OuterWidgetWebView';
 
-require('./build.tsx');
+import './build';
 
 function App() {
   return (
@@ -98,13 +98,13 @@ const router = createBrowserRouter([
 ]);
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById('root') as HTMLElement,
 );
 
 root.render(
   <React.StrictMode>
     <RouterProvider router={router} />
-  </React.StrictMode>
+  </React.StrictMode>,
 );
 
 // If you want to start measuring performance in your app, pass a function

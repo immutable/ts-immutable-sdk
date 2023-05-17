@@ -1,9 +1,9 @@
 import { describe, it } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { cySmartGet } from '../../lib/testUtils';
-import { SuccessView } from './SuccessView';
 import { onDarkBase } from '@biom3/design-tokens';
 import { BiomeThemeProvider } from '@biom3/react';
+import { cySmartGet } from '../../lib/testUtils';
+import { SuccessView } from './SuccessView';
 
 describe('success view', () => {
   it('shows success text and button', () => {
@@ -13,10 +13,11 @@ describe('success view', () => {
           successText="Test success"
           actionText="Close"
           onActionClick={() => {
+            // eslint-disable-next-line no-console
             console.log('clicked!');
           }}
         />
-      </BiomeThemeProvider>
+      </BiomeThemeProvider>,
     );
 
     cySmartGet('success-box').should('be.visible');
