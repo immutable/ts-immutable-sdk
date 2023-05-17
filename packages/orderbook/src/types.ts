@@ -1,4 +1,5 @@
-import { PopulatedTransaction } from 'ethers';
+import { OrderComponents } from '@opensea/seaport-js/lib/types';
+import { PopulatedTransaction, TypedDataDomain, TypedDataField } from 'ethers';
 
 export interface ERC721Item {
   type: 'ERC721'
@@ -31,9 +32,18 @@ export interface PrepareListingParams {
 
 export interface PrepareListingResponse {
   unsignedApprovalTransaction?: PopulatedTransaction
-  typedOrderMessageForSigning: {}
-  orderComponents: {}
+  typedOrderMessageForSigning: {
+    domain: TypedDataDomain,
+    types: Record<string, TypedDataField[]>
+    value: Record<string, any>
+  }
+  orderComponents: OrderComponents
+  orderHash: string
 }
 
-export interface CreateOrderParams {}
-export interface CreateOrderResponse {}
+export interface CreateOrderParams {
+  offerer: string
+  orderComponents: OrderComponents
+  orderHash: string
+  orderSignature: string
+}

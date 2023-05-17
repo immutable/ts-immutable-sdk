@@ -1,6 +1,8 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
 import { ItemType } from '@opensea/seaport-js/lib/constants';
-import { Signer } from '@opensea/seaport-js/lib/types';
+import {
+  ApprovalAction, CreateOrderAction, OrderComponents, Signer,
+} from '@opensea/seaport-js/lib/types';
 import { PopulatedTransaction, providers } from 'ethers';
 import {
   ERC20Item, ERC721Item, NativeItem, RoyaltyInfo,
@@ -29,7 +31,10 @@ export class Seaport {
     considerationItem: ERC20Item | NativeItem,
     royaltyInfo: RoyaltyInfo,
     orderExpiry: Date,
-  ): Promise<{ approvalTransaction: PopulatedTransaction | undefined, orderMessageToSign: string }> {
+  ): Promise<{
+      approvalTransaction: PopulatedTransaction | undefined,
+      orderMessageToSign: string
+    }> {
     const { actions } = await this.seaport.createOrder({
       allowPartialFills: false,
       offer: [
@@ -58,22 +63,30 @@ export class Seaport {
     }, offerer);
 
     let approvalTransaction: PopulatedTransaction | undefined;
-    let orderMessageToSign = '';
 
-    for (const action of actions) {
-      if (action.type === 'approval') {
-        approvalTransaction = await action.transactionMethods.buildTransaction();
-        approvalTransaction.gasLimit = await action.transactionMethods.estimateGas();
-        // Add 20% more gas than estimate to prevent out of gas errors
-        // This can always be overwritten by the user signing the transaction
-        approvalTransaction.gasLimit = approvalTransaction.gasLimit.add(approvalTransaction.gasLimit.div(5));
-      }
+    const approvalAction = actions
+      .find((action) => action.type === 'approval') as ApprovalAction | undefined;
+    const createAction: CreateOrderAction | undefined = actions
+      .find((action) => action.type === 'create') as CreateOrderAction | undefined;
 
-      if (action.type === 'create') {
-        orderMessageToSign = await action.getMessageToSign();
-      }
+    if (approvalAction) {
+      approvalTransaction = await approvalAction.transactionMethods.buildTransaction();
+      approvalTransaction.gasLimit = await approvalAction.transactionMethods.estimateGas();
+      // Add 20% more gas than estimate to prevent out of gas errors
+      // This can always be overwritten by the user signing the transaction
+      approvalTransaction.gasLimit = approvalTransaction.gasLimit
+        .add(approvalTransaction.gasLimit.div(5));
     }
 
+    if (!createAction) {
+      throw new Error('No create order action found');
+    }
+
+    const orderMessageToSign = await createAction.getMessageToSign();
     return { approvalTransaction, orderMessageToSign };
+  }
+
+  async getOrderHash(orderComponents: OrderComponents): Promise<string> {
+    return this.seaport.getOrderHash(orderComponents);
   }
 }
