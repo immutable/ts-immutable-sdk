@@ -8,6 +8,7 @@ import { WalletContext } from '../context/WalletContext';
 import { sendDisconnectWalletEvent, sendWalletWidgetCloseEvent } from '../WalletWidgetEvents';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 import { WalletAddress } from '../components/WalletAddress/WalletAddress';
+import { settingsBoxStyle, settingsDisconnectButtonStyle } from './SettingsStyles';
 
 export function Settings() {
   const { walletState } = useContext(WalletContext);
@@ -27,18 +28,13 @@ export function Settings() {
       footer={<FooterLogo />}
     >
       <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          rowGap: 'base.spacing.x2',
-          marginX: 'base.spacing.x2',
-        }}
+        sx={settingsBoxStyle}
       >
         <WalletAddress provider={provider} />
         <Button
           testId="disconnect-button"
           variant="secondary"
-          sx={{ marginTop: '32px' }}
+          sx={settingsDisconnectButtonStyle}
           onClick={sendDisconnectWalletEvent}
         >
           {disconnectButton.label}
