@@ -16,6 +16,7 @@ export interface SimpleLayoutProps {
   heroContent?: React.ReactNode;
   testId?: string;
   floatHeader?: boolean;
+  footerBackgroundColor?: string;
 }
 
 export function SimpleLayout({
@@ -25,6 +26,7 @@ export function SimpleLayout({
   heroContent,
   testId,
   floatHeader = false,
+  footerBackgroundColor,
 }: SimpleLayoutProps) {
   return (
     <Box sx={responsiveStyles}>
@@ -47,7 +49,7 @@ export function SimpleLayout({
           )}
         </Box>
         {footer && (
-          <Box id="footer" sx={footerStyle}>
+          <Box id="footer" sx={footerStyle(footerBackgroundColor)}>
             {footer}
           </Box>
         )}

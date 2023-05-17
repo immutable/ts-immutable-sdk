@@ -3,7 +3,6 @@ export const swapButtonBoxStyle = {
   flexDirection: 'column',
   paddingY: 'base.spacing.x6',
   paddingX: 'base.spacing.x4',
-  marginX: '-8px',
   backgroundColor: 'base.color.translucent.container.200',
 };
 
