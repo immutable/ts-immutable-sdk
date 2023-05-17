@@ -20,16 +20,16 @@ all: generate-crafting generate-inventory generate-recipe generate-item-definiti
 # Generate individual schemas
 .PHONY: generate-crafting generate-inventory generate-recipe generate-item-definition
 generate-crafting: get-crafting-openapi
-	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate -i ./app/openapi/crafting-openapi.json -g typescript-axios --additional-properties=supportsES6=true,npmVersion=6.9.0,typescriptThreePlus=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=domain,useSingleRequestParameter=true -o /app/src/__codegen__/api/crafting
+	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate -i ./app/openapi/crafting-openapi.json -g typescript-axios --additional-properties=supportsES6=true,npmVersion=6.9.0,typescriptThreePlus=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=domain,useSingleRequestParameter=true -o /app/src/__codegen__/crafting
 
 generate-inventory: get-inventory-openapi
-	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate -i ./app/openapi/inventory-openapi.json -g typescript-axios --additional-properties=supportsES6=true,npmVersion=6.9.0,typescriptThreePlus=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=domain,useSingleRequestParameter=true -o /app/src/__codegen__/api/inventory
+	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate -i ./app/openapi/inventory-openapi.json -g typescript-axios --additional-properties=supportsES6=true,npmVersion=6.9.0,typescriptThreePlus=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=domain,useSingleRequestParameter=true -o /app/src/__codegen__/inventory
 
 generate-recipe: get-recipe-openapi
-	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate -i ./app/openapi/recipe-openapi.json -g typescript-axios --additional-properties=supportsES6=true,npmVersion=6.9.0,typescriptThreePlus=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=domain,useSingleRequestParameter=true -o /app/src/__codegen__/api/recipe
+	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate -i ./app/openapi/recipe-openapi.json -g typescript-axios --additional-properties=supportsES6=true,npmVersion=6.9.0,typescriptThreePlus=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=domain,useSingleRequestParameter=true -o /app/src/__codegen__/recipe
 
 generate-item-definition: get-item-definition-openapi
-	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate -i ./app/openapi/item-definition-openapi.json -g typescript-axios --additional-properties=supportsES6=true,npmVersion=6.9.0,typescriptThreePlus=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=domain,useSingleRequestParameter=true -o /app/src/__codegen__/api/item-definition 
+	docker run --rm -v $(shell pwd):/app openapitools/openapi-generator-cli:v6.2.1 generate -i ./app/openapi/item-definition-openapi.json -g typescript-axios --additional-properties=supportsES6=true,npmVersion=6.9.0,typescriptThreePlus=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=domain,useSingleRequestParameter=true -o /app/src/__codegen__/item-definition 
 
 # Get OpenAPI specs
 .PHONY: get-crafting-openapi get-inventory-openapi get-recipe-openapi get-item-definition-openapi
