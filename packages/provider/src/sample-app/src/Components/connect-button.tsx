@@ -1,8 +1,8 @@
 import { Box, Button } from '@biom3/react';
-import { MetaMaskIMXProvider, ProviderConfiguration } from '@imtbl/provider';
+import { MetaMaskIMXProvider, ProviderConfiguration } from '@imtbl/sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { useContext } from 'react';
-import { Actions, AppCtx } from '../context/app-context';
+import { Actions, AppCtx } from '../Context/app-context';
 
 export const ConnectButton = () => {
   const { state, dispatch } = useContext(AppCtx);
@@ -19,7 +19,7 @@ export const ConnectButton = () => {
     dispatch({
       payload: {
         type: Actions.MetaMaskIMXProviderConnected,
-        metaMaskIMXProvider,
+        metaMaskIMXProvider: metaMaskIMXProvider,
         address: await metaMaskIMXProvider.getAddress(),
       },
     });
