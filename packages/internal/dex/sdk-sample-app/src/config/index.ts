@@ -54,6 +54,13 @@ const overrides: ExchangeOverrides = {
   rpcURL: process.env.NEXT_PUBLIC_RPC_URL,
   exchangeContracts: contractOverrides,
   commonRoutingTokens,
+  nativeToken: {
+    chainId,
+    address: '0xd1da7e9b2Ce1a4024DaD52b3D37F4c5c91a525C1',
+    decimals: 18,
+    symbol: 'IMX',
+    name: 'Immutable X Token'
+  }
 };
 export const configuration = new ExchangeConfiguration({
   chainId,

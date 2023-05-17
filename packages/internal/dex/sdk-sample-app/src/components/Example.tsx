@@ -173,7 +173,7 @@ export function Example() {
             }`}
           </h3>
           <h3>Slippage: {result.info.slippage}%</h3>
-          <h3>Gas estimate: {result.info.gasFeeEstimate} IMX</h3>
+          <h3>Gas estimate: {result.info.gasFeeEstimate ? `${ethers.utils.formatEther(result.info.gasFeeEstimate?.amount)} IMX` : 'No gas estimate available'}</h3>
             <>
               <button
                 className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
