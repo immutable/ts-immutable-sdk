@@ -47,8 +47,9 @@ export function sendDisconnectWalletEvent() {
         type: WalletEventType.DISCONNECT_WALLET,
         data: {},
       },
-    }
+    },
   );
+  // eslint-disable-next-line no-console
   console.log('disconnect wallet event:', disconnectWalletEvent);
   if (window !== undefined) window.dispatchEvent(disconnectWalletEvent);
 }

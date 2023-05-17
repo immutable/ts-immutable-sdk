@@ -1,4 +1,4 @@
-export const WalletAddressContainerStyle = {
+export const walletAddressContainerStyle = {
   width: '100%',
   height: '88px',
   display: 'flex',
@@ -9,19 +9,19 @@ export const WalletAddressContainerStyle = {
   borderRadius: 'base.borderRadius.x6',
 };
 
-export const WalletAddressLayoutStyle = {
+export const walletAddressLayoutStyle = {
   width: '100%',
-  display: 'flex'
+  display: 'flex',
 };
 
-export const WalletAddressTextLayoutStyle = {
+export const walletAddressTextLayoutStyle = {
   width: '318px',
   display: 'flex',
   flexDirection: 'column',
 };
 
-export const TruncatedTextStyle = {
+export const truncatedTextStyle = {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-}
+};
