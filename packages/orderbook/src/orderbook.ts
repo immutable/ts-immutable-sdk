@@ -1,12 +1,15 @@
 import { OrderbookModuleConfiguration } from 'config/config';
-import { OrderBookClient } from 'openapi/sdk';
+import { ERC721 } from 'erc721';
+import { OrderBookClient, Order } from 'openapi/sdk';
+import { Seaport } from 'seaport';
+import { CreateOrderParams, PrepareListingParams, PrepareListingResponse } from 'types';
 
 export class Orderbook {
   private orderbookClient: OrderBookClient;
 
   private chainId: string;
 
-  constructor(config: OrderbookModuleConfiguration) {
+  constructor(private config: OrderbookModuleConfiguration) {
     // TODO: Move endpoint lookup to a map based on env. Just using override to get dev started
     const apiEndpoint = config.overrides?.apiEndpoint;
     if (!apiEndpoint) {
@@ -26,7 +29,30 @@ export class Orderbook {
     });
   }
 
-  getOrder(orderId: string) {
+  getOrder(orderId: string): Promise<Order> {
     return this.orderbookClient.orderBook.orderBookGetOrder({ chainId: this.chainId, orderId });
+  }
+
+  async prepareListing({
+    offerer, listingItem, considerationItem, orderExpiry,
+  }: PrepareListingParams): Promise<PrepareListingResponse> {
+    const royaltyInfo = await new ERC721(listingItem.contractAddress, this.config.provider)
+      .royaltyInfo(listingItem.tokenId, considerationItem.amount);
+
+    const { approvalTransaction, orderMessageToSign } = await new Seaport(
+      this.config.seaportContractAddress,
+      this.config.zoneContractAddress,
+      this.config.provider,
+    ).constructSeaportOrder(
+      offerer,
+      listingItem,
+      considerationItem,
+      royaltyInfo,
+      // Default order expiry to 2 years from now
+      orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
+    );
+  }
+
+  createOrder(createOrderParams: CreateOrderParams): Promise<Order> {
   }
 }

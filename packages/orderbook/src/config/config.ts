@@ -1,4 +1,5 @@
 import { ModuleConfiguration } from '@imtbl/config';
+import { providers } from 'ethers';
 import { OrderBookClient } from 'openapi/sdk';
 
 export interface OrderbookOverrides {
@@ -7,4 +8,8 @@ export interface OrderbookOverrides {
   orderbookClient?: OrderBookClient;
 }
 
-export interface OrderbookModuleConfiguration extends ModuleConfiguration<OrderbookOverrides> {}
+export interface OrderbookModuleConfiguration extends ModuleConfiguration<OrderbookOverrides> {
+  seaportContractAddress: string
+  zoneContractAddress: string
+  provider: providers.JsonRpcProvider | providers.Web3Provider
+}
