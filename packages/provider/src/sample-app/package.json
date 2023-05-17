@@ -1,7 +1,18 @@
 {
   "name": "sample-app",
   "version": "0.1.0",
-  "private": true,
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "dependencies": {
     "@biom3/react": "^0.4.2-beta",
     "@imtbl/core-sdk": "^1.1.1-alpha.1",
@@ -19,23 +30,6 @@
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
-  "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
     "@svgr/webpack": "^8.0.1",
     "assert-browserify": "^2.0.0",
@@ -43,5 +37,11 @@
     "crypto-browserify": "^3.12.0",
     "react-app-rewired": "^2.2.1",
     "stream-browserify": "^3.0.0"
+  },
+  "private": true,
+  "scripts": {
+    "build": "react-app-rewired build",
+    "start": "react-app-rewired start",
+    "test": "react-app-rewired test"
   }
 }
