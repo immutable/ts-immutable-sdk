@@ -39,7 +39,7 @@ export function SwapForm() {
   );
 
   const toTokenOptions = useMemo(
-    () => allowedTokens.filter((token) => token.address !== swapFromToken?.address).map(
+    () => allowedTokens.map(
       (token) => ({
         id: `${token.symbol}-${token.name}`,
         label: token.symbol,
@@ -51,7 +51,7 @@ export function SwapForm() {
 
   // extract these to context or calculate on render
   const fromToConversionText = '1 WETH ≈ 12.6 GOG'; // TODO: to calculate when dex integrated
-  const fromFiatPriceText = `${content.fiatPricePrefix} $20.40`; // todo: update with actual value
+  const fromFiatPriceText = `${content.fiatPricePrefix} $20.40`; // todo: calculate fiat price here and pass down as string
   const availableFromBalanceSubtext = `${content.availableBalancePrefix} 0.123`; // todo: update with actual values
 
   const handleFromTokenChange = useCallback(
@@ -67,20 +67,6 @@ export function SwapForm() {
             swapFromToken: selectedTokenOption.token,
           },
         });
-
-        console.log(selectedTokenOption.token);
-        console.log(swapToToken);
-
-        // Can't swap to the same token so clear the to token if from token is the same
-        if (swapToToken && swapToToken.address === selectedTokenOption.token.address) {
-          console.log('they match');
-          swapFormDispatch({
-            payload: {
-              type: SwapFormActions.SET_SWAP_TO_TOKEN,
-              swapToToken: null,
-            },
-          });
-        }
       }
     },
     [tokenBalances, swapFormDispatch, swapToToken],
