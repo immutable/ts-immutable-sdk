@@ -1,17 +1,17 @@
 import React from 'react';
-
-import { Environment } from '@imtbl/config';
 import {
+  DEFAULT_PROVIDER,
   WidgetConnectionProviders,
-  WidgetTheme,
 } from '../definitions/constants';
+import { CheckoutWidgetsConfig } from '../definitions/config';
+import { withDefaults } from '../lib/withDefaults';
 
 /**
  * Interface representing the props for the Wallet Widget component.
  * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Wallet Widget
  * (default: {@link WidgetConnectionProviders.METAMASK}).
  */
-export interface WalletReactProps {
+export interface WalletReactProps extends CheckoutWidgetsConfig {
   providerPreference?: WidgetConnectionProviders;
   useConnectWidget?: boolean;
   isOnRampEnabled?: boolean;
@@ -31,19 +31,19 @@ export function WalletReact(props: WalletReactProps) {
     isBridgeEnabled,
     isOnRampEnabled,
     isSwapEnabled,
+    environment,
+    theme,
   } = props;
 
-  const config = window.ImtblCheckoutWidgetConfig;
+  const config = withDefaults(window.ImtblCheckoutWidgetConfig);
 
   // isOnRampEnabled, isBridgeEnabled, isSwapEnabled is a boolean type for better devExp
   // converting them to string for compatible webComponent properties
   return (
     <imtbl-wallet
-      environment={Environment.SANDBOX}
-      providerPreference={
-        providerPreference ?? WidgetConnectionProviders.METAMASK
-      }
-      theme={config.theme ?? WidgetTheme.DARK}
+      environment={environment ?? config.environment}
+      theme={theme ?? config.theme}
+      providerPreference={providerPreference ?? DEFAULT_PROVIDER}
       useConnectWidget={useConnectWidget?.toString()}
       isBridgeEnabled={isBridgeEnabled?.toString()}
       isSwapEnabled={isSwapEnabled?.toString()}
