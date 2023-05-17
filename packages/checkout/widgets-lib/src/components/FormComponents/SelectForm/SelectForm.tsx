@@ -37,7 +37,6 @@ export function SelectForm({
         size="large"
         defaultLabel="Select coin"
         onSelectChange={onSelectChange}
-        sx={{ backgroundColor: 'base.color.translucent.container.200', minWidth: 'base.spacing.x44' }}
       >
         {options.map((option) => (
           <Option
