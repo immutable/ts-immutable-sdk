@@ -1,41 +1,77 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
-import { ItemType } from '@opensea/seaport-js/lib/constants';
 import {
-  ApprovalAction, CreateOrderAction, OrderComponents, Signer,
+  EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME, SEAPORT_CONTRACT_VERSION_V1_4,
+} from '@opensea/seaport-js/lib/constants';
+import {
+  ApprovalAction, CreateOrderAction, OrderComponents, OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
-import { PopulatedTransaction, providers } from 'ethers';
 import {
-  ERC20Item, ERC721Item, NativeItem, RoyaltyInfo,
+  PopulatedTransaction, providers,
+} from 'ethers';
+import {
+  ERC20Item, ERC721Item, NativeItem, PrepareListingResponse, RoyaltyInfo,
 } from 'types';
+import { getOrderComponentsFromMessage } from './components';
+import { prepareApprovalTransaction } from './approval';
 
 export class Seaport {
-  private seaport: SeaportLib;
-
   constructor(
-    seaportContractAddress: string,
-    private readonly zoneContractAddress: string,
-    provider: providers.JsonRpcProvider | Signer,
-  ) {
-    this.seaport = new SeaportLib(provider, {
-      seaportVersion: '1.4',
-      balanceAndApprovalChecksOnOrderCreation: true,
-      overrides: {
-        contractAddress: seaportContractAddress,
-      },
-    });
-  }
+    private seaport: SeaportLib,
+    private provider: providers.JsonRpcProvider,
+    private seaportContractAddress: string,
+    private zoneContractAddress: string,
+  ) {}
 
-  async constructSeaportOrder(
+  async prepareSeaportOrder(
     offerer: string,
     listingItem: ERC721Item,
     considerationItem: ERC20Item | NativeItem,
     royaltyInfo: RoyaltyInfo,
     orderExpiry: Date,
-  ): Promise<{
-      approvalTransaction: PopulatedTransaction | undefined,
-      orderMessageToSign: string
-    }> {
-    const { actions } = await this.seaport.createOrder({
+  ): Promise<PrepareListingResponse> {
+    const { actions } = await this.createSeaportOrder(
+      offerer,
+      listingItem,
+      considerationItem,
+      royaltyInfo,
+      orderExpiry,
+    );
+
+    let approvalTransaction: PopulatedTransaction | undefined;
+
+    const approvalAction = actions
+      .find((action) => action.type === 'approval') as ApprovalAction | undefined;
+
+    if (approvalAction) {
+      approvalTransaction = await prepareApprovalTransaction(approvalAction);
+    }
+
+    const createAction: CreateOrderAction | undefined = actions
+      .find((action) => action.type === 'create') as CreateOrderAction | undefined;
+
+    if (!createAction) {
+      throw new Error('No create order action found');
+    }
+
+    const orderMessageToSign = await createAction.getMessageToSign();
+    const orderComponents = getOrderComponentsFromMessage(orderMessageToSign);
+
+    return {
+      unsignedApprovalTransaction: approvalTransaction,
+      typedOrderMessageForSigning: await this.getTypedDataFromOrderComponents(orderComponents),
+      orderComponents,
+      orderHash: await this.seaport.getOrderHash(orderComponents),
+    };
+  }
+
+  private createSeaportOrder(
+    offerer: string,
+    listingItem: ERC721Item,
+    considerationItem: ERC20Item | NativeItem,
+    royaltyInfo: RoyaltyInfo,
+    orderExpiry: Date,
+  ): Promise<OrderUseCase<CreateOrderAction>> {
+    return this.seaport.createOrder({
       allowPartialFills: false,
       offer: [
         {
@@ -61,32 +97,24 @@ export class Seaport {
       zone: this.zoneContractAddress,
       restrictedByZone: true,
     }, offerer);
-
-    let approvalTransaction: PopulatedTransaction | undefined;
-
-    const approvalAction = actions
-      .find((action) => action.type === 'approval') as ApprovalAction | undefined;
-    const createAction: CreateOrderAction | undefined = actions
-      .find((action) => action.type === 'create') as CreateOrderAction | undefined;
-
-    if (approvalAction) {
-      approvalTransaction = await approvalAction.transactionMethods.buildTransaction();
-      approvalTransaction.gasLimit = await approvalAction.transactionMethods.estimateGas();
-      // Add 20% more gas than estimate to prevent out of gas errors
-      // This can always be overwritten by the user signing the transaction
-      approvalTransaction.gasLimit = approvalTransaction.gasLimit
-        .add(approvalTransaction.gasLimit.div(5));
-    }
-
-    if (!createAction) {
-      throw new Error('No create order action found');
-    }
-
-    const orderMessageToSign = await createAction.getMessageToSign();
-    return { approvalTransaction, orderMessageToSign };
   }
 
-  async getOrderHash(orderComponents: OrderComponents): Promise<string> {
-    return this.seaport.getOrderHash(orderComponents);
+  private async getTypedDataFromOrderComponents(
+    orderComponents: OrderComponents,
+  ): Promise<PrepareListingResponse['typedOrderMessageForSigning']> {
+    const { chainId } = await this.provider.getNetwork();
+
+    const domainData = {
+      name: SEAPORT_CONTRACT_NAME,
+      version: SEAPORT_CONTRACT_VERSION_V1_4,
+      chainId,
+      verifyingContract: this.seaportContractAddress,
+    };
+
+    return {
+      domain: domainData,
+      types: EIP_712_ORDER_TYPE,
+      value: orderComponents,
+    };
   }
 }
