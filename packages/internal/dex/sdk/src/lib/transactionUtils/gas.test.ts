@@ -7,14 +7,14 @@ jest.mock('@ethersproject/providers');
 
 describe('calculateGasFee', () => {
   describe('when given a price and gas used', () => {
-    it('calculates gas fee from and returns face value', async () => {
+    it('calculates gas fee from gas used and gas price', async () => {
       const gasPrice = BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
 
       const gasUsedInTransaction = BigNumber.from('200000');
       const gasFeeEstimate = calculateGasFee(gasPrice, gasUsedInTransaction);
 
       expect(gasFeeEstimate).not.toBeNull();
-      expect(gasFeeEstimate?.toString()).toEqual('0.0003');
+      expect(gasFeeEstimate?.toString()).toEqual('300000000000000');
     });
   });
 });

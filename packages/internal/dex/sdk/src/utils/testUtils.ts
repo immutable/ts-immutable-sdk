@@ -25,28 +25,6 @@ export const TEST_RPC_URL = 'https://0.net';
 
 export const TEST_FROM_ADDRESS = '0x94fC2BcA2E71e26D874d7E937d89ce2c9113af6e';
 
-export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new ImmutableConfiguration({
-  environment: Environment.SANDBOX,
-});
-
-export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
-  baseConfig: TEST_IMMUTABLE_CONFIGURATION,
-  chainId: TEST_CHAIN_ID,
-  overrides: {
-    rpcURL: TEST_RPC_URL,
-    exchangeContracts: {
-      multicall: '',
-      coreFactory: '',
-      quoterV2: '',
-      peripheryRouter: '',
-      migrator: '',
-      nonfungiblePositionManager: '',
-      tickLens: '',
-    },
-    commonRoutingTokens: [],
-  },
-};
-
 export const TEST_MULTICALL_ADDRESS = '0x66d0aB680ACEe44308edA2062b910405CC51A190';
 export const TEST_V3_CORE_FACTORY_ADDRESS = '0x23490b262829ACDAD3EF40e555F23d77D1B69e4e';
 export const TEST_QUOTER_ADDRESS = '0x9B323E56215aAdcD4f45a6Be660f287DE154AFC5';
@@ -96,6 +74,35 @@ const exactInputOutputSingleParamTypes = [
   'uint256',
   'uint160',
 ];
+
+export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new ImmutableConfiguration({
+  environment: Environment.SANDBOX,
+});
+
+export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
+  baseConfig: TEST_IMMUTABLE_CONFIGURATION,
+  chainId: TEST_CHAIN_ID,
+  overrides: {
+    rpcURL: TEST_RPC_URL,
+    exchangeContracts: {
+      multicall: '',
+      coreFactory: '',
+      quoterV2: '',
+      peripheryRouter: '',
+      migrator: '',
+      nonfungiblePositionManager: '',
+      tickLens: '',
+    },
+    commonRoutingTokens: [],
+    nativeToken: {
+      chainId: IMX_TEST_CHAIN.chainId,
+      address: IMX_TEST_CHAIN.address,
+      decimals: IMX_TEST_CHAIN.decimals,
+      symbol: IMX_TEST_CHAIN.symbol,
+      name: IMX_TEST_CHAIN.name,
+    },
+  },
+};
 
 type ExactInputOutputSingleParams = {
   tokenIn: string;

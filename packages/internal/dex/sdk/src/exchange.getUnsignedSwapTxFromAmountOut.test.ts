@@ -14,6 +14,7 @@ import {
   TEST_PERIPHERY_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
   TEST_GAS_PRICE,
+  IMX_TEST_CHAIN,
 } from './utils/testUtils';
 import { Router } from './lib';
 
@@ -206,6 +207,12 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(info?.quoteWithMaxSlippage?.amount.toString()).toEqual(
         '12324600000000',
       );
+      expect(info?.gasFeeEstimate?.amount).toEqual('300000000000000');
+      expect(info?.gasFeeEstimate?.token.chainId).toEqual(IMX_TEST_CHAIN.chainId);
+      expect(info?.gasFeeEstimate?.token.address).toEqual(IMX_TEST_CHAIN.address);
+      expect(info?.gasFeeEstimate?.token.decimals).toEqual(IMX_TEST_CHAIN.decimals);
+      expect(info?.gasFeeEstimate?.token.symbol).toEqual(IMX_TEST_CHAIN.symbol);
+      expect(info?.gasFeeEstimate?.token.name).toEqual(IMX_TEST_CHAIN.name);
     });
   });
 
