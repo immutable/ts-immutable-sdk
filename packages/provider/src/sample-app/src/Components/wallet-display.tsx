@@ -1,4 +1,4 @@
-import { AppCtx } from '../context/app-context';
+import { AppCtx } from '../Context/app-context';
 import { Box, Heading } from '@biom3/react';
 import { useContext } from 'react';
 
