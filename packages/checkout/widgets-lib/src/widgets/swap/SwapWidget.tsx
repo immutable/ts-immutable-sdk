@@ -11,6 +11,7 @@ import {
   useEffect, useCallback, useReducer, useMemo,
 } from 'react';
 import { Environment } from '@imtbl/config';
+import { BigNumber } from 'ethers';
 import { SwapCoins } from './views/SwapCoins';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { LoadingView } from '../../components/Loading/LoadingView';
@@ -120,6 +121,8 @@ export function SwapWidget(props: SwapWidgetProps) {
       .map((token) => token.address)
       .includes(balance.token.address));
 
+    allowedTokenBalances.entries();
+
     swapDispatch({
       payload: {
         type: SwapActions.SET_ALLOWED_TOKENS,
@@ -127,10 +130,19 @@ export function SwapWidget(props: SwapWidgetProps) {
       },
     });
 
+    // FIXME: stop hardcoing this, only doing becuase dev net is reset
     swapDispatch({
       payload: {
         type: SwapActions.SET_TOKEN_BALANCES,
-        tokenBalances: allowedTokenBalances,
+        tokenBalances: [{
+          balance: BigNumber.from('1560000000000000000'),
+          formattedBalance: '1.56',
+          token: {
+            name: 'ImmutableX',
+            symbol: 'IMX',
+            decimals: 18,
+          },
+        }],
       },
     });
 

@@ -1,12 +1,13 @@
-import { TokenInfo } from '@imtbl/checkout-sdk';
+import { GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 
 export interface SwapFormState {
-  swapFromToken: TokenInfo | null;
+  swapFromToken: GetBalanceResult | null;
   swapFromAmount: string;
   swapToToken: TokenInfo | null;
   swapToAmount: string;
   swapFromFiatValue: string;
+  blockFetchQuote: boolean;
 }
 
 export const initialSwapFormState: SwapFormState = {
@@ -15,6 +16,7 @@ export const initialSwapFormState: SwapFormState = {
   swapToToken: null,
   swapToAmount: '',
   swapFromFiatValue: '',
+  blockFetchQuote: true,
 };
 
 export interface SwapFormContextState {
@@ -31,7 +33,8 @@ type ActionPayload =
   | SetSwapFromAmountPayload
   | SetSwapToTokenPayload
   | SetSwapToAmountPayload
-  | SetSwapFromFiatValue;
+  | SetSwapFromFiatValue
+  | SetBlockFetchQuote;
 
 export enum SwapFormActions {
   SET_SWAP_FROM_TOKEN = 'SET_SWAP_FROM_TOKEN',
@@ -39,6 +42,7 @@ export enum SwapFormActions {
   SET_SWAP_TO_TOKEN = 'SET_SWAP_TO_TOKEN',
   SET_SWAP_TO_AMOUNT = 'SET_SWAP_TO_AMOUNT',
   SET_SWAP_FROM_FIAT_VALUE = 'SET_SWAP_FROM_FIAT_VALUE',
+  SET_BLOCK_FETCH_QUOTE = 'SET_BLOCK_FETCH_QUOTE',
 }
 
 export interface SetSwapToTokenPayload {
@@ -53,7 +57,7 @@ export interface SetSwapToAmountPayload {
 
 export interface SetSwapFromTokenPayload {
   type: SwapFormActions.SET_SWAP_FROM_TOKEN;
-  swapFromToken: TokenInfo | null;
+  swapFromToken: GetBalanceResult | null;
 }
 
 export interface SetSwapFromAmountPayload {
@@ -64,6 +68,11 @@ export interface SetSwapFromAmountPayload {
 export interface SetSwapFromFiatValue {
   type: SwapFormActions.SET_SWAP_FROM_FIAT_VALUE;
   swapFromFiatValue: string;
+}
+
+export interface SetBlockFetchQuote {
+  type: SwapFormActions.SET_BLOCK_FETCH_QUOTE;
+  blockFetchQuote: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -104,6 +113,11 @@ export const swapFormReducer: Reducer<SwapFormState, SwapFormAction> = (
       return {
         ...state,
         swapFromFiatValue: action.payload.swapFromFiatValue,
+      };
+    case SwapFormActions.SET_BLOCK_FETCH_QUOTE:
+      return {
+        ...state,
+        blockFetchQuote: action.payload.blockFetchQuote,
       };
     default:
       return state;

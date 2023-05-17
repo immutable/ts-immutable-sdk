@@ -1,5 +1,6 @@
 import {
   useCallback, useContext, useEffect, useMemo,
+  useState,
 } from 'react';
 import {
   Body, Box, Heading, OptionKey,
@@ -28,9 +29,31 @@ export function SwapForm() {
   const { content, swapForm } = text.views[SwapWidgetViews.SWAP];
   const {
     swapFromAmount, swapFromToken, swapToAmount, swapToToken,
+    blockFetchQuote,
   } = swapFormState;
   const { tokenBalances, allowedTokens } = swapState;
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  const [debounceId, setDebounceId] = useState<string | null>();
+
+  const debounce = (func: () => {}, threshold: number) => {
+    if (debounceId) {
+      clearTimeout(debounceId);
+    }
+
+    setDebounceId(
+      setTimeout(() => {
+        setDebounceId(null);
+        func();
+      }, threshold).toString(),
+    );
+  };
+
+  // extract these to context or calculate on render
+  const fromToConversionText = '1 WETH ≈ 12.6 GOG'; // TODO: to calculate when dex integrated
+  const fromFiatPriceText = `${content.fiatPricePrefix} $${swapFormState.swapFromFiatValue}`;
+  const availableFromBalanceSubtext = swapFromToken
+    ? `${content.availableBalancePrefix} ${swapFromToken?.formattedBalance}`
+    : ''; // todo: update with actual values
 
   const fromTokensOptions = useMemo(
     () => tokenBalances.filter((balance) => balance.balance.gt(0)).map(
@@ -84,20 +107,13 @@ export function SwapForm() {
           type: SwapFormActions.SET_SWAP_FROM_FIAT_VALUE,
           swapFromFiatValue: calculateCryptoToFiat(
             swapFormState.swapFromAmount,
-            swapFormState.swapFromToken.symbol,
+            swapFormState.swapFromToken.token.symbol,
             cryptoFiatState.conversions,
           ),
         },
       });
     }
-    // {'imx' => 0.751084, 'fun' => 0.00492518, 'usdc' => 1, 'weth' => 1819.43}
-    console.log('Conversions: ', cryptoFiatState.conversions);
   }, [cryptoFiatState.conversions, swapFormState.swapFromAmount, swapFormState.swapFromToken]);
-
-  // extract these to context or calculate on render
-  const fromToConversionText = '1 WETH ≈ 12.6 GOG'; // TODO: to calculate when dex integrated
-  const fromFiatPriceText = `${content.fiatPricePrefix} $${swapFormState.swapFromFiatValue}`;
-  const availableFromBalanceSubtext = `${content.availableBalancePrefix} 0.123`; // todo: update with actual values
 
   const handleFromTokenChange = useCallback(
     (value: OptionKey) => {
@@ -105,14 +121,25 @@ export function SwapForm() {
         (tokenBalance) => value === `${tokenBalance.token.symbol}-${tokenBalance.token.name}`,
       );
 
-      if (selectedTokenOption && selectedTokenOption.token) {
+      if (selectedTokenOption) {
         swapFormDispatch({
           payload: {
             type: SwapFormActions.SET_SWAP_FROM_TOKEN,
-            swapFromToken: selectedTokenOption.token,
+            swapFromToken: selectedTokenOption,
           },
         });
       }
+
+      debounce(() => {
+        // console.log('unblocking fetch quote after debounce');
+        swapFormDispatch({
+          payload: {
+            type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
+            blockFetchQuote: false,
+          },
+        });
+        return {};
+      }, 2000);
     },
     [tokenBalances, swapFormDispatch, swapToToken],
   );
@@ -131,9 +158,66 @@ export function SwapForm() {
           },
         });
       }
+
+      debounce(() => {
+        // console.log('unblocking fetch quote after debounce');
+        swapFormDispatch({
+          payload: {
+            type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
+            blockFetchQuote: false,
+          },
+        });
+        return {};
+      }, 2000);
     },
     [allowedTokens, swapFormDispatch],
   );
+
+  // downside I see to this method is that we will have to pass in one of the values
+  // const fetchQuoteIfAvailable = useCallback(() => {
+  //   // fetch quote on certain conditions
+  //   if (!Number.isNaN(parseFloat(swapFromAmount))
+  //     && parseFloat(swapFromAmount) > 0
+  //     && swapFromToken
+  //     && swapToToken
+  //   ) {
+  //     console.log('### FETCHING QUOTE ###');
+  //   }
+  // }, [swapFromAmount, swapFromToken, swapToToken]);
+
+  // listening to state changes in a useEffect is handy as it will receive the most updated
+  // values of the form context state, then we can conditionally fetch a quote
+  useEffect(() => {
+    // fetch quote on certain conditions
+    if (!Number.isNaN(parseFloat(swapFromAmount))
+      && parseFloat(swapFromAmount) > 0
+      && swapFromToken
+      && swapToToken
+      && !blockFetchQuote
+    ) {
+      console.log('### FETCHING QUOTE ###');
+    }
+
+    // console.log('blocking fetch quote');
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
+        blockFetchQuote: true,
+      },
+    });
+  }, [swapFromAmount, swapFromToken, swapToToken,
+    blockFetchQuote,
+  ]);
+
+  const handleSwapFromMaxButtonClick = useCallback(() => {
+    if (!swapFromToken) return;
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
+        swapFromAmount: swapFromToken.formattedBalance,
+      },
+    });
+  }, [swapFromToken]);
 
   return (
     <Box sx={swapFormContainerStyle}>
@@ -152,25 +236,53 @@ export function SwapForm() {
           textInputTextAlign="right"
           textInputValidator={amountInputValidation}
           // eslint-disable-next-line no-console
-          onTextInputFocus={() => console.log('Swap From Text Input Focused')}
+          onTextInputFocus={() => {
+            // block fetching of quote when a user focuses the input
+            // conversely stop blocking on blur or after debounce time
+
+            // console.log('blocking fetch quote');
+            swapFormDispatch({
+              payload: {
+                type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
+                blockFetchQuote: true,
+              },
+            });
+          }}
           onTextInputChange={(value) => {
-            // eslint-disable-next-line no-console
-            console.log(`Swap From Amount onChange ${value}`);
             swapFormDispatch({
               payload: {
                 type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
                 swapFromAmount: value,
               },
             });
+            debounce(() => {
+              // console.log('unblocking fetch quote after debounce');
+              swapFormDispatch({
+                payload: {
+                  type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
+                  blockFetchQuote: false,
+                },
+              });
+              return {};
+            }, 2000);
           }}
           onTextInputBlur={(value: string) => {
             // eslint-disable-next-line no-console
-            console.log(`Swap From Amount onBlur ${value}`);
+            swapFormDispatch({
+              payload: {
+                type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
+                swapFromAmount: value,
+              },
+            });
+            // console.log('unblocking fetch quote');
+            swapFormDispatch({
+              payload: {
+                type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
+                blockFetchQuote: false,
+              },
+            });
           }}
-          textInputMaxButtonClick={() => {
-            // eslint-disable-next-line no-console
-            console.log('todo: implement max button function');
-          }}
+          textInputMaxButtonClick={handleSwapFromMaxButtonClick}
           onSelectChange={handleFromTokenChange}
         />
       </Box>

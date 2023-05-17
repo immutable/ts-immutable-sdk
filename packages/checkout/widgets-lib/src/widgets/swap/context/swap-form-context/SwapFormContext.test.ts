@@ -1,4 +1,4 @@
-import { TokenInfo } from '@imtbl/checkout-sdk';
+import { GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
 import {
   SetSwapFromAmountPayload,
   SetSwapFromTokenPayload,
@@ -37,13 +37,13 @@ describe('swap form context', () => {
   it('should set swapFrom when reducer called with SET_SWAP_FROM action', () => {
     const setSwapFromPayload: SetSwapFromTokenPayload = {
       type: SwapFormActions.SET_SWAP_FROM_TOKEN,
-      swapFromToken: { name: 'ethereum' } as TokenInfo,
+      swapFromToken: { token: { name: 'ethereum' } } as GetBalanceResult,
     };
 
     const { swapFromToken } = swapFormReducer(initialSwapFormState, {
       payload: setSwapFromPayload,
     });
-    expect(swapFromToken).toEqual({ name: 'ethereum' });
+    expect(swapFromToken).toEqual({ token: { name: 'ethereum' } });
   });
 
   it('should set swapFromAmount when reducer called with SET_SWAP_FROM_AMOUNT action', () => {
