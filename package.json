@@ -53,6 +53,7 @@
     "packages/immutablex_client",
     "packages/passport",
     "packages/provider",
+    "packages/provider/src/sample-app",
     "packages/orderbook",
     "packages/internal/toolkit",
     "packages/internal/cryptofiat",
