@@ -165,7 +165,7 @@ describe('utils', () => {
           sortTokensByAmount(
             Environment.PRODUCTION,
             testcase.tokens,
-            ChainId.IMTBL_ZKEVM_TESTNET,
+            ChainId.POLYGON_ZKEVM,
           ),
         ).toEqual([
           {
