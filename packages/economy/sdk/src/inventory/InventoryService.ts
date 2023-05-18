@@ -16,9 +16,9 @@ type GetItemsOutput = {
   rows: Array<InventoryItem>;
 };
 
-type GetItemsInput = {
+export type GetItemsInput = {
   gameId: string;
-  userId: string;
+  owner: string;
 };
 
 @Service()
@@ -35,7 +35,7 @@ export class InventoryService {
       headers: {},
     };
     return this.httpClient.get<GetItemsOutput>(
-      `${url}?owner=${input.userId}`,
+      `${url}?owner=${input.owner}`,
       config,
     );
   }

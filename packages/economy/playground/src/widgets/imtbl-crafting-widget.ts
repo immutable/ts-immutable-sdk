@@ -158,7 +158,7 @@ export class CraftingWidget extends LitElement {
 
   async getInventory() {
     this.items = await this.economy.inventory.getItems({
-      userId: this.craftInput.input.userId,
+      owner: this.craftInput.input.userId,
       gameId: this.craftInput.input.gameId,
     });
 

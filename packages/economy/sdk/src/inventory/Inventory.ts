@@ -2,9 +2,7 @@ import { Service } from 'typedi';
 import type { EventType } from '../types';
 import { withSDKError } from '../Errors';
 
-import { InventoryService } from './InventoryService';
-
-type GetInventoryInput = { userId: string; gameId: string };
+import { GetItemsInput, InventoryService } from './InventoryService';
 
 /**
  * @internal Assets events
@@ -20,7 +18,7 @@ export class Inventory {
   }
 
   @withSDKError({ type: 'INVENTORY_ERROR' })
-  public async getItems(input: GetInventoryInput) {
+  public async getItems(input: GetItemsInput) {
     const { data, status } = await this.inventoryService.getItems(input);
 
     if (status !== 200) {

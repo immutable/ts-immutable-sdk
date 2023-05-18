@@ -153,7 +153,7 @@ export class CraftingWidget2 extends LitElement {
     console.log('loadInventory');
 
     this.inventoryItems = await this.economy.inventory.getItems({
-      userId: this.state.input.userId,
+      owner: this.state.input.userId,
       gameId: this.state.input.gameId,
     });
     this.requestUpdate();
