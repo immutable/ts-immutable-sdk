@@ -55,9 +55,9 @@ export interface SwapFormProps {
   toContractAddress?: string;
 }
 export interface SwapCoinsProps {
-  amount: string | undefined;
-  fromContractAddress: string | undefined;
-  toContractAddress: string | undefined;
+  amount?: string;
+  fromContractAddress?: string;
+  toContractAddress?: string;
 }
 
 export function SwapCoins({
