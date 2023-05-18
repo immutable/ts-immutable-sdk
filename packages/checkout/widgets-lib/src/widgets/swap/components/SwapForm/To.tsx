@@ -10,7 +10,7 @@ import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContex
 import { text } from '../../../../resources/text/textConfig';
 import { SelectOption } from '../../../../components/FormComponents/SelectForm/SelectForm';
 import { SwapContext } from '../../context/swap-context/SwapContext';
-import { ValidateAmount } from '../../functions/SwapValidator';
+import { ValidateToAmount } from '../../functions/SwapValidator';
 
 interface ToProps {
   debounceTime: number;
@@ -99,7 +99,7 @@ export function To({ debounceTime, debounce }: ToProps) {
           });
         }}
         onTextInputBlur={() => {
-          const validateToAmountError = ValidateAmount(swapToAmount);
+          const validateToAmountError = ValidateToAmount(swapToAmount);
           if (validateToAmountError) {
             swapFormDispatch({
               payload: {

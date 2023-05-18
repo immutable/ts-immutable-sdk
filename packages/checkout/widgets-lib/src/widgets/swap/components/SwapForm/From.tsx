@@ -8,7 +8,7 @@ import { SelectOption } from '../../../../components/FormComponents/SelectForm/S
 import { SwapContext } from '../../context/swap-context/SwapContext';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 import { text } from '../../../../resources/text/textConfig';
-import { ValidateAmount } from '../../functions/SwapValidator';
+import { ValidateFromAmount } from '../../functions/SwapValidator';
 
 interface FromProps {
   debounceTime: number;
@@ -142,7 +142,7 @@ export function From({ debounceTime, debounce }: FromProps) {
           }, debounceTime);
         }}
         onTextInputBlur={() => {
-          const validateFromAmountError = ValidateAmount(swapFromAmount);
+          const validateFromAmountError = ValidateFromAmount(swapFromAmount, swapFromToken?.formattedBalance);
           if (validateFromAmountError) {
             swapFormDispatch({
               payload: {

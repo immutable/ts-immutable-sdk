@@ -11,7 +11,9 @@ import { SwapButton } from '../components/SwapButton/SwapButton';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapForm } from '../components/SwapForm/SwapForm';
 import { Fees } from '../components/Fees';
-import { ValidateAmount, ValidateToken } from '../functions/SwapValidator';
+import {
+  ValidateToAmount, ValidateFromAmount, ValidateFromToken, ValidateToToken,
+} from '../functions/SwapValidator';
 import { SwapFormActions, SwapFormContext } from '../context/swap-form-context/SwapFormContext';
 
 type AmountAndPercentage = {
@@ -93,10 +95,10 @@ export function SwapCoins({
     });
 
   const SwapFormValidator = (): boolean => {
-    const validateFromTokenError = ValidateToken(swapFromToken);
-    const validateFromAmountError = ValidateAmount(swapFromAmount);
-    const validateToTokenError = ValidateToken(swapToToken);
-    const validateToAmountError = ValidateAmount(swapToAmount);
+    const validateFromTokenError = ValidateFromToken(swapFromToken);
+    const validateFromAmountError = ValidateFromAmount(swapFromAmount, swapFromToken?.formattedBalance);
+    const validateToTokenError = ValidateToToken(swapToToken);
+    const validateToAmountError = ValidateToAmount(swapToAmount);
 
     if (validateFromTokenError) {
       swapFormDispatch({
