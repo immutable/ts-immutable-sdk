@@ -86,6 +86,7 @@ export const swapFormReducer: Reducer<SwapFormState, SwapFormAction> = (
         swapFromToken: action.payload.swapFromToken,
       };
     case SwapFormActions.SET_SWAP_FROM_AMOUNT:
+      if (state.swapFromAmount === action.payload.swapFromAmount) return state;
       return {
         ...state,
         swapFromAmount: action.payload.swapFromAmount,
