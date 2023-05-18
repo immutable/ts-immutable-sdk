@@ -8,7 +8,7 @@ import { SelectForm, SelectOption } from '../SelectForm/SelectForm';
 import { TextInputForm } from '../TextInputForm/TextInputForm';
 
 interface SelectInputProps {
-  testId: string;
+  id: string;
   options: SelectOption[];
   selectTextAlign?: 'left' | 'right';
   textInputTextAlign?: 'left' | 'right';
@@ -29,7 +29,7 @@ interface SelectInputProps {
 }
 
 export function SelectInput({
-  testId,
+  id,
   options,
   textInputValue,
   textInputPlaceholder,
@@ -52,7 +52,7 @@ export function SelectInput({
     <Box sx={selectInputBoxStyle}>
       <Box sx={selectStyle}>
         <SelectForm
-          testId={`${testId}-select`}
+          id={`${id}-select-form`}
           options={options}
           subtext={selectSubtext}
           textAlign={selectTextAlign}
@@ -63,7 +63,7 @@ export function SelectInput({
       </Box>
       <Box sx={inputStyle}>
         <TextInputForm
-          testId={`${testId}-text`}
+          id={`${id}-text-form`}
           value={textInputValue}
           placeholder={textInputPlaceholder}
           subtext={textInputSubtext}
