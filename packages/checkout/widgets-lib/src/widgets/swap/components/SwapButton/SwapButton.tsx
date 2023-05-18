@@ -1,7 +1,6 @@
 import { Box, Button } from '@biom3/react';
-import { Checkout, Transaction } from '@imtbl/checkout-sdk';
+import { Transaction } from '@imtbl/checkout-sdk';
 import { useContext, useEffect, useState } from 'react';
-import { Environment } from '@imtbl/config';
 import { sendSwapSuccessEvent } from '../../SwapWidgetEvents';
 import { text } from '../../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
@@ -17,22 +16,21 @@ import {
 
 export interface SwapButtonProps {
   transaction?: Transaction;
+  validator: () => boolean;
 }
 
 export function SwapButton(props: SwapButtonProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { swapState } = useContext(SwapContext);
-  const { provider } = swapState;
-  const { transaction } = props;
+  const { checkout, provider } = swapState;
+  const { transaction, validator } = props;
   const [loading, setLoading] = useState(true);
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
 
   const sendTransaction = async () => {
-    if (!transaction || !provider) return;
-    // TODO: update here to go to context and stop hardcoing
-    const checkout = new Checkout({
-      baseConfig: { environment: Environment.SANDBOX },
-    });
+    if (!checkout || !transaction || !provider) return;
+    if (!validator()) return;
+
     try {
       await checkout.sendTransaction({
         provider,

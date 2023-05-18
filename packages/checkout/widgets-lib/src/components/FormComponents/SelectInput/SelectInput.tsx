@@ -15,10 +15,8 @@ interface SelectInputProps {
   textInputValue: string;
   textInputPlaceholder?: string;
   textInputSubtext?: string;
-  textInputErrored?: boolean;
   textInputErrorMessage?: string;
   selectSubtext?: string;
-  selectErrored?: boolean;
   selectErrorMessage?: string;
   textInputValidator: (value: string) => boolean;
   onTextInputFocus: () => void;
@@ -39,11 +37,9 @@ export function SelectInput({
   onTextInputBlur,
   textInputTextAlign,
   textInputSubtext,
-  textInputErrored,
   textInputErrorMessage,
   selectTextAlign,
   selectSubtext,
-  selectErrored,
   selectErrorMessage,
   textInputMaxButtonClick,
   onSelectChange,
@@ -56,7 +52,6 @@ export function SelectInput({
           options={options}
           subtext={selectSubtext}
           textAlign={selectTextAlign}
-          isErrored={selectErrored}
           errorMessage={selectErrorMessage}
           onSelectChange={onSelectChange}
         />
@@ -68,7 +63,6 @@ export function SelectInput({
           placeholder={textInputPlaceholder}
           subtext={textInputSubtext}
           textAlign={textInputTextAlign}
-          isErrored={textInputErrored}
           errorMessage={textInputErrorMessage}
           validator={textInputValidator}
           onTextInputFocus={onTextInputFocus}

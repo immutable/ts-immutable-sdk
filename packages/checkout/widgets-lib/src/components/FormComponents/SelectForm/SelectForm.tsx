@@ -1,7 +1,8 @@
 /* eslint-disable react/no-unused-prop-types */
 import {
-  Select, Option, Box, Body, OptionKey,
+  Select, Option, OptionKey,
 } from '@biom3/react';
+import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 // import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 
 type IconList = 'EthToken' | 'ImxTokenDex';
@@ -17,7 +18,6 @@ interface SelectFormProps {
   options: SelectOption[];
   textAlign?: 'left' | 'right';
   subtext?: string;
-  isErrored?: boolean;
   errorMessage?: string;
   onSelectChange?: (value: OptionKey) => void;
 }
@@ -27,11 +27,16 @@ export function SelectForm({
   options,
   subtext,
   onSelectChange,
+  textAlign,
+  errorMessage,
 }: SelectFormProps) {
   return (
-    // todo: biome does not currently support Select for FormControl
-    // <FormControlWrapper textAlign={textAlign ?? 'left'}>
-    <Box>
+    <FormControlWrapper
+      textAlign={textAlign ?? 'left'}
+      subtext={errorMessage ? undefined : subtext}
+      isErrored={!!errorMessage}
+      errorMessage={errorMessage}
+    >
       <Select
         id={`${id}-select`}
         testId={`${id}-select`}
@@ -55,16 +60,6 @@ export function SelectForm({
           </Option>
         ))}
       </Select>
-      <Body
-        size="xSmall"
-        sx={{
-          display: subtext ? '' : 'none',
-          color: 'base.color.text.secondary',
-        }}
-      >
-        {subtext}
-      </Body>
-    </Box>
-    // </FormControlWrapper>
+    </FormControlWrapper>
   );
 }

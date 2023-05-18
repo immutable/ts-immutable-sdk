@@ -20,7 +20,9 @@ export function From({ debounceTime, debounce }: FromProps) {
   const { tokenBalances } = swapState;
   const { content, swapForm } = text.views[SwapWidgetViews.SWAP];
 
-  const { swapFromAmount, swapFromToken, swapToToken } = swapFormState;
+  const {
+    swapFromAmount, swapFromToken, swapToToken, swapFromTokenError, swapFromAmountError,
+  } = swapFormState;
 
   const availableFromBalanceSubtext = swapFromToken
     ? `${content.availableBalancePrefix} ${swapFromToken?.formattedBalance}`
@@ -53,10 +55,10 @@ export function From({ debounceTime, debounce }: FromProps) {
         });
       }
 
-      // focus from text input
+      // Focuses on the From input field when the From token is updated
       document.getElementById('fromTokenInputs-text-form-text')?.focus();
 
-      // clear the to text input
+      // Clears the To input field when the From token is updated
       swapFormDispatch({
         payload: {
           type: SwapFormActions.SET_SWAP_TO_AMOUNT,
@@ -67,7 +69,6 @@ export function From({ debounceTime, debounce }: FromProps) {
       // TODO: clear the quote value here
 
       debounce(() => {
-        // console.log('unblocking fetch quote after debounce');
         swapFormDispatch({
           payload: {
             type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
@@ -132,9 +133,14 @@ export function From({ debounceTime, debounce }: FromProps) {
             return {};
           }, debounceTime);
         }}
-        onTextInputBlur={() => {}}
+        onTextInputBlur={() => {
+          // eslint-disable-next-line no-console
+          console.log('todo: validate the FROM field');
+        }}
         textInputMaxButtonClick={handleSwapFromMaxButtonClick}
         onSelectChange={handleFromTokenChange}
+        textInputErrorMessage={swapFromAmountError}
+        selectErrorMessage={swapFromTokenError}
       />
     </Box>
   );

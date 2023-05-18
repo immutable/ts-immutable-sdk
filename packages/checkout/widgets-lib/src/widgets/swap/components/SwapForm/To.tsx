@@ -19,10 +19,11 @@ interface ToProps {
 export function To({ debounceTime, debounce }: ToProps) {
   const { swapState } = useContext(SwapContext);
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
-  const { swapFromToken, swapToAmount } = swapFormState;
+  const {
+    swapFromToken, swapToAmount, swapToTokenError, swapToAmountError,
+  } = swapFormState;
   const { allowedTokens } = swapState;
   const { swapForm } = text.views[SwapWidgetViews.SWAP];
-  // extract these to context or calculate on render
   const fromToConversionText = '1 WETH ≈ 12.6 GOG'; // TODO: to calculate when dex integrated
 
   const toTokenOptions = useMemo(
@@ -52,7 +53,6 @@ export function To({ debounceTime, debounce }: ToProps) {
       }
 
       debounce(() => {
-        console.log('unblocking fetch quote after debounce');
         swapFormDispatch({
           payload: {
             type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
@@ -91,14 +91,16 @@ export function To({ debounceTime, debounce }: ToProps) {
           });
         }}
         onTextInputBlur={(value: string) => {
-        // eslint-disable-next-line no-console
+          // eslint-disable-next-line no-console
           console.log(`Swap To Amount onBlur ${value}`);
         }}
         textInputMaxButtonClick={() => {
-        // eslint-disable-next-line no-console
+          // eslint-disable-next-line no-console
           console.log('todo: implement max button function');
         }}
         onSelectChange={handleToTokenChange}
+        textInputErrorMessage={swapToAmountError}
+        selectErrorMessage={swapToTokenError}
       />
     </Box>
   );

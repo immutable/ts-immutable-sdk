@@ -7,7 +7,6 @@ interface TextInputFormProps {
   placeholder?: string;
   subtext?: string;
   textAlign?: 'left' | 'right';
-  isErrored?: boolean;
   errorMessage?: string;
   validator: (value: string) => boolean;
   onTextInputFocus: () => void;
@@ -21,7 +20,6 @@ export function TextInputForm({
   value,
   placeholder,
   errorMessage,
-  isErrored,
   validator,
   onTextInputFocus,
   onTextInputChange,
@@ -49,8 +47,8 @@ export function TextInputForm({
   return (
     <FormControlWrapper
       textAlign={textAlign ?? 'left'}
-      subtext={subtext}
-      isErrored={isErrored}
+      subtext={errorMessage ? undefined : subtext}
+      isErrored={!!errorMessage}
       errorMessage={errorMessage}
     >
       <TextInput
@@ -59,7 +57,7 @@ export function TextInputForm({
         onChange={(event) => handleOnChange(event, value)}
         sizeVariant="large"
         value={value}
-        validationStatus={isErrored ? 'error' : 'success'}
+        validationStatus={errorMessage ? 'error' : 'success'}
         placeholder={placeholder}
         onBlur={handleOnBlur}
         hideClearValueButton

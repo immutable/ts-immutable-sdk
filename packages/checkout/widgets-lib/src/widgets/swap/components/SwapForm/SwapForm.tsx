@@ -77,8 +77,8 @@ export function SwapForm() {
     }
   }, [cryptoFiatState.conversions, swapFormState.swapFromAmount, swapFormState.swapFromToken]);
 
-  // listening to state changes in a useEffect is handy as it will receive the most updated
-  // values of the form context state, then we can conditionally fetch a quote
+  // Listening to state changes in the useEffect will ensure the most updated values
+  // are received from the SwapForm context state, then we can conditionally fetch a quote
   useEffect(() => {
     // Fetch the quote from the DEX when the following conditions are met
     if (!Number.isNaN(parseFloat(swapFromAmount))

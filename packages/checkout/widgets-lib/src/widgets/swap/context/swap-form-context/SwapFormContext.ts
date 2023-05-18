@@ -8,6 +8,10 @@ export interface SwapFormState {
   swapToAmount: string;
   swapFromFiatValue: string;
   blockFetchQuote: boolean;
+  swapFromTokenError: string;
+  swapFromAmountError: string;
+  swapToTokenError: string;
+  swapToAmountError: string;
 }
 
 export const initialSwapFormState: SwapFormState = {
@@ -17,6 +21,10 @@ export const initialSwapFormState: SwapFormState = {
   swapToAmount: '',
   swapFromFiatValue: '',
   blockFetchQuote: true,
+  swapFromTokenError: '',
+  swapFromAmountError: '',
+  swapToTokenError: '',
+  swapToAmountError: '',
 };
 
 export interface SwapFormContextState {
@@ -33,8 +41,12 @@ type ActionPayload =
   | SetSwapFromAmountPayload
   | SetSwapToTokenPayload
   | SetSwapToAmountPayload
-  | SetSwapFromFiatValue
-  | SetBlockFetchQuote;
+  | SetSwapFromFiatValuePayload
+  | SetBlockFetchQuote
+  | SetSwapFromTokenErrorPayload
+  | SetSwapFromAmountErrorPayload
+  | SetSwapToTokenErrorPayload
+  | SetSwapToAmountErrorPayload;
 
 export enum SwapFormActions {
   SET_SWAP_FROM_TOKEN = 'SET_SWAP_FROM_TOKEN',
@@ -43,6 +55,10 @@ export enum SwapFormActions {
   SET_SWAP_TO_AMOUNT = 'SET_SWAP_TO_AMOUNT',
   SET_SWAP_FROM_FIAT_VALUE = 'SET_SWAP_FROM_FIAT_VALUE',
   SET_BLOCK_FETCH_QUOTE = 'SET_BLOCK_FETCH_QUOTE',
+  SET_SWAP_FROM_TOKEN_ERROR = 'SET_SWAP_FROM_TOKEN_ERROR',
+  SET_SWAP_FROM_AMOUNT_ERROR = 'SET_SWAP_FROM_AMOUNT_ERROR',
+  SET_SWAP_TO_TOKEN_ERROR = 'SET_SWAP_TO_TOKEN_ERROR',
+  SET_SWAP_TO_AMOUNT_ERROR = 'SET_SWAP_TO_AMOUNT_ERROR',
 }
 
 export interface SetSwapToTokenPayload {
@@ -65,7 +81,7 @@ export interface SetSwapFromAmountPayload {
   swapFromAmount: string;
 }
 
-export interface SetSwapFromFiatValue {
+export interface SetSwapFromFiatValuePayload {
   type: SwapFormActions.SET_SWAP_FROM_FIAT_VALUE;
   swapFromFiatValue: string;
 }
@@ -73,6 +89,26 @@ export interface SetSwapFromFiatValue {
 export interface SetBlockFetchQuote {
   type: SwapFormActions.SET_BLOCK_FETCH_QUOTE;
   blockFetchQuote: boolean;
+}
+
+export interface SetSwapFromTokenErrorPayload {
+  type: SwapFormActions.SET_SWAP_FROM_TOKEN_ERROR;
+  swapFromTokenError: string;
+}
+
+export interface SetSwapFromAmountErrorPayload {
+  type: SwapFormActions.SET_SWAP_FROM_AMOUNT_ERROR;
+  swapFromAmountError: string;
+}
+
+export interface SetSwapToTokenErrorPayload {
+  type: SwapFormActions.SET_SWAP_TO_TOKEN_ERROR;
+  swapToTokenError: string;
+}
+
+export interface SetSwapToAmountErrorPayload {
+  type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR;
+  swapToAmountError: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -118,6 +154,26 @@ export const swapFormReducer: Reducer<SwapFormState, SwapFormAction> = (
       return {
         ...state,
         blockFetchQuote: action.payload.blockFetchQuote,
+      };
+    case SwapFormActions.SET_SWAP_FROM_TOKEN_ERROR:
+      return {
+        ...state,
+        swapFromTokenError: action.payload.swapFromTokenError,
+      };
+    case SwapFormActions.SET_SWAP_FROM_AMOUNT_ERROR:
+      return {
+        ...state,
+        swapFromAmountError: action.payload.swapFromAmountError,
+      };
+    case SwapFormActions.SET_SWAP_TO_TOKEN_ERROR:
+      return {
+        ...state,
+        swapToTokenError: action.payload.swapToTokenError,
+      };
+    case SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR:
+      return {
+        ...state,
+        swapToAmountError: action.payload.swapToAmountError,
       };
     default:
       return state;
