@@ -11,6 +11,8 @@ export enum ChainId {
   SEPOLIA = 11155111,
   IMTBL_ZKEVM_DEVNET = 13373,
   IMTBL_ZKEVM_TESTNET = 13372, // to be used in prod config for testnet launch
+  POLYGON_ZKEVM_TESTNET = 1442,
+  POLYGON_ZKEVM = 137,
 }
 
 /**
@@ -82,6 +84,20 @@ NetworkDetails
       },
     },
   ],
+  [
+    ChainId.POLYGON_ZKEVM,
+    {
+      chainIdHex: '0x89', // 137
+      chainName: 'Polygon zkEVM',
+      rpcUrls: ['https://polygon-rpc.com'],
+      nativeCurrency: {
+        name: 'MATIC',
+        symbol: 'MATIC',
+        decimals: 18,
+      },
+      blockExplorerUrls: ['https://polygonscan.com/'],
+    },
+  ],
 ]);
 
 /**
@@ -116,6 +132,20 @@ NetworkDetails
         symbol: 'IMX',
         decimals: 18,
       },
+    },
+  ],
+  [
+    ChainId.POLYGON_ZKEVM_TESTNET,
+    {
+      chainIdHex: '0x5A2', // 1442
+      chainName: 'Polygon zkEVM Testnet',
+      rpcUrls: ['https://rpc.public.zkevm-test.net'],
+      nativeCurrency: {
+        name: 'MATIC',
+        symbol: 'MATIC',
+        decimals: 18,
+      },
+      blockExplorerUrls: ['https://testnet-zkevm.polygonscan.com'],
     },
   ],
 ]);
