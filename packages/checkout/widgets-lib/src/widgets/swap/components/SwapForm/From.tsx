@@ -8,6 +8,7 @@ import { SelectOption } from '../../../../components/FormComponents/SelectForm/S
 import { SwapContext } from '../../context/swap-context/SwapContext';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 import { text } from '../../../../resources/text/textConfig';
+import { ValidateAmount } from '../../functions/SwapValidator';
 
 interface FromProps {
   debounceTime: number;
@@ -51,6 +52,13 @@ export function From({ debounceTime, debounce }: FromProps) {
           payload: {
             type: SwapFormActions.SET_SWAP_FROM_TOKEN,
             swapFromToken: selectedTokenOption,
+          },
+        });
+
+        swapFormDispatch({
+          payload: {
+            type: SwapFormActions.SET_SWAP_FROM_TOKEN_ERROR,
+            swapFromTokenError: '',
           },
         });
       }
@@ -134,8 +142,23 @@ export function From({ debounceTime, debounce }: FromProps) {
           }, debounceTime);
         }}
         onTextInputBlur={() => {
-          // eslint-disable-next-line no-console
-          console.log('todo: validate the FROM field');
+          const validateFromAmountError = ValidateAmount(swapFromAmount);
+          if (validateFromAmountError) {
+            swapFormDispatch({
+              payload: {
+                type: SwapFormActions.SET_SWAP_FROM_AMOUNT_ERROR,
+                swapFromAmountError: validateFromAmountError,
+              },
+            });
+            return;
+          }
+
+          swapFormDispatch({
+            payload: {
+              type: SwapFormActions.SET_SWAP_FROM_AMOUNT_ERROR,
+              swapFromAmountError: '',
+            },
+          });
         }}
         textInputMaxButtonClick={handleSwapFromMaxButtonClick}
         onSelectChange={handleFromTokenChange}

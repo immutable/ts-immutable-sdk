@@ -10,6 +10,7 @@ import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContex
 import { text } from '../../../../resources/text/textConfig';
 import { SelectOption } from '../../../../components/FormComponents/SelectForm/SelectForm';
 import { SwapContext } from '../../context/swap-context/SwapContext';
+import { ValidateAmount } from '../../functions/SwapValidator';
 
 interface ToProps {
   debounceTime: number;
@@ -50,6 +51,13 @@ export function To({ debounceTime, debounce }: ToProps) {
             swapToToken: selectedTokenOption,
           },
         });
+
+        swapFormDispatch({
+          payload: {
+            type: SwapFormActions.SET_SWAP_TO_TOKEN_ERROR,
+            swapToTokenError: '',
+          },
+        });
       }
 
       debounce(() => {
@@ -80,7 +88,7 @@ export function To({ debounceTime, debounce }: ToProps) {
         textInputPlaceholder={swapForm.to.inputPlaceholder}
         textInputTextAlign="right"
         textInputValidator={amountInputValidation}
-      // eslint-disable-next-line no-console
+        // eslint-disable-next-line no-console
         onTextInputFocus={() => console.log('Swap To Text Input Focused')}
         onTextInputChange={(value) => {
           swapFormDispatch({
@@ -90,9 +98,24 @@ export function To({ debounceTime, debounce }: ToProps) {
             },
           });
         }}
-        onTextInputBlur={(value: string) => {
-          // eslint-disable-next-line no-console
-          console.log(`Swap To Amount onBlur ${value}`);
+        onTextInputBlur={() => {
+          const validateToAmountError = ValidateAmount(swapToAmount);
+          if (validateToAmountError) {
+            swapFormDispatch({
+              payload: {
+                type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR,
+                swapToAmountError: validateToAmountError,
+              },
+            });
+            return;
+          }
+
+          swapFormDispatch({
+            payload: {
+              type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR,
+              swapToAmountError: '',
+            },
+          });
         }}
         textInputMaxButtonClick={() => {
           // eslint-disable-next-line no-console
