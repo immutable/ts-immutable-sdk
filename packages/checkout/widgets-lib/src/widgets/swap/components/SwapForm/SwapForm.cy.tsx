@@ -2,8 +2,6 @@ import { mount } from 'cypress/react18';
 import { cySmartGet } from '../../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../../test-components/SwapWidgetTestComponent';
 import { SwapForm } from './SwapForm';
-import { SwapState, initialSwapState } from '../../context/swap-context/SwapContext';
-import { SwapFormState } from '../../context/swap-form-context/SwapFormContext';
 import { text } from '../../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 
@@ -11,24 +9,12 @@ describe('SwapForm', () => {
   const { from: fromText, to: toText } = text.views[SwapWidgetViews.SWAP].swapForm;
 
   describe('initial form state', () => {
-    let testSwapState:SwapState;
-    let testFormState: SwapFormState;
-    beforeEach(() => {
-      testSwapState = {
-        ...initialSwapState,
-      };
-      testFormState = {
-        ...testFormState,
-      };
-    });
-
     it('should show all swap inputs with initial state', () => {
       mount(
-        <SwapWidgetTestComponent initialStateOverride={testSwapState} initialFormStateOverride={testFormState}>
+        <SwapWidgetTestComponent>
           <SwapForm />
         </SwapWidgetTestComponent>,
       );
-
       cySmartGet('fromTokenInputs-select__target').should('be.visible');
       cySmartGet('fromTokenInputs-select__target').should('have.text', 'Select coin');
       cySmartGet('fromTokenInputs-text')
@@ -43,17 +29,6 @@ describe('SwapForm', () => {
   });
 
   describe('swapFromAmount input validation', () => {
-    let testSwapState:SwapState;
-    let testFormState: SwapFormState;
-    beforeEach(() => {
-      testSwapState = {
-        ...initialSwapState,
-      };
-      testFormState = {
-        ...testFormState,
-      };
-    });
-
     const swapFromAmountTestCases = [
       {
         name: 'should allow for numbers and decimal place',
@@ -119,7 +94,7 @@ describe('SwapForm', () => {
     swapFromAmountTestCases.forEach((testCase) => {
       it(`should only allow numbers with 6 decimal places in the swapFromAmount input - ${testCase.name}`, () => {
         mount(
-          <SwapWidgetTestComponent initialStateOverride={testSwapState} initialFormStateOverride={testFormState}>
+          <SwapWidgetTestComponent>
             <SwapForm />
           </SwapWidgetTestComponent>,
         );
