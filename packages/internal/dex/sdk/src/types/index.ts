@@ -11,11 +11,12 @@ export type Amount = {
 
 export type QuoteTradeInfo = {
   route: Route<Currency, Currency>;
-  amountIn: ethers.BigNumberish;
+  amountIn: ethers.BigNumber;
   tokenIn: Currency;
-  amountOut: ethers.BigNumberish;
+  amountOut: ethers.BigNumber;
   tokenOut: Currency;
   tradeType: TradeType;
+  gasEstimate: ethers.BigNumber
 };
 
 export type QuoteResponse = {
@@ -25,6 +26,7 @@ export type QuoteResponse = {
 export type TradeInfo = {
   quote: Amount;
   quoteWithMaxSlippage: Amount;
+  gasFeeEstimate: Amount | null
   slippage: number;
 };
 
@@ -45,6 +47,7 @@ export interface ExchangeOverrides {
   rpcURL: string;
   exchangeContracts: ExchangeContracts;
   commonRoutingTokens: TokenInfo[];
+  nativeToken: TokenInfo;
 }
 
 export interface ExchangeModuleConfiguration

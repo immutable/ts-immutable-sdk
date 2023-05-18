@@ -4,12 +4,12 @@ import {
   CurrencyAmount, Token, TradeType,
 } from '@uniswap/sdk-core';
 import assert from 'assert';
-import JSBI from 'jsbi';
 
 import { slippageToFraction } from 'lib/transactionUtils/slippage';
 import {
   DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
 } from 'errors';
+import { calculateGasFee, fetchGasPrice } from 'lib/transactionUtils/gas';
 import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
@@ -23,7 +23,7 @@ import {
   getERC20Decimals,
   isValidAddress,
 } from './lib/utils';
-import { TransactionResponse } from './types';
+import { TokenInfo, TransactionResponse } from './types';
 import { createSwapParameters } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 import { constructQuoteWithSlippage } from './lib/transactionUtils/constructQuoteWithSlippage';
@@ -35,11 +35,16 @@ export class Exchange {
 
   private chainId: number;
 
+  private nativeToken: TokenInfo;
+
   constructor(configuration: ExchangeConfiguration) {
     this.chainId = configuration.chain.chainId;
+    this.nativeToken = configuration.chain.nativeToken;
+
     this.provider = new ethers.providers.JsonRpcProvider(
       configuration.chain.rpcUrl,
     );
+
     this.router = new Router(
       this.provider,
       configuration.chain.commonRoutingTokens,
@@ -101,12 +106,11 @@ export class Exchange {
     // determine which amount was specified for the swap from the TradeType
     let amountSpecified: CurrencyAmount<Token>;
     let otherToken: Token;
-    const amountJsbi = JSBI.BigInt(amount.toString());
     if (tradeType === TradeType.EXACT_INPUT) {
-      amountSpecified = CurrencyAmount.fromRawAmount(tokenIn, amountJsbi);
+      amountSpecified = CurrencyAmount.fromRawAmount(tokenIn, amount.toString());
       otherToken = tokenOut;
     } else {
-      amountSpecified = CurrencyAmount.fromRawAmount(tokenOut, amountJsbi);
+      amountSpecified = CurrencyAmount.fromRawAmount(tokenOut, amount.toString());
       otherToken = tokenIn;
     }
 
@@ -132,6 +136,12 @@ export class Exchange {
       slippage,
     );
 
+    const gasPrice = await fetchGasPrice(this.provider);
+    const gasFeeEstimate = gasPrice ? {
+      token: this.nativeToken,
+      amount: calculateGasFee(gasPrice, routeAndQuote.trade.gasEstimate).toString(),
+    } : null;
+
     return {
       transaction: {
         data: params.calldata,
@@ -143,6 +153,7 @@ export class Exchange {
         quote: quoteInfo.quote,
         quoteWithMaxSlippage: quoteInfo.quoteWithMaxSlippage,
         slippage: slippagePercent,
+        gasFeeEstimate,
       },
     };
   }
@@ -158,7 +169,7 @@ export class Exchange {
    * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0.
    * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2.
    * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes.
-   * @return {TransactionResponse} The result containing the unsigned transaction to sign and execute and swap details.
+   * @return {TransactionResponse} The result containing the unsigned transaction and details of the swap.
    */
   public async getUnsignedSwapTxFromAmountIn(
     fromAddress: string,
@@ -192,7 +203,7 @@ export class Exchange {
    * @param {number} slippagePercent (optional) The percentage of slippage tolerance. Default = 0.1. Max = 50. Min = 0.
    * @param {number} maxHops (optional) Maximum hops allowed in optimal route. Default is 2.
    * @param {number} deadline (optional) Latest time swap can execute. Default is 15 minutes.
-   * @return {TransactionResponse} The result containing the unsigned transaction to sign and execute and swap details.
+   * @return {TransactionResponse} The result containing the unsigned transaction and details of the swap.
    */
   public async getUnsignedSwapTxFromAmountOut(
     fromAddress: string,
