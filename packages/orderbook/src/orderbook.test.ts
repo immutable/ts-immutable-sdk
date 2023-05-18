@@ -9,6 +9,9 @@ describe('Orderbook', () => {
           baseConfig: {
             environment: Environment.SANDBOX,
           },
+          provider: {} as any,
+          seaportContractAddress: '0x123',
+          zoneContractAddress: '0x456',
           overrides: {
             chainId: '1',
           },
@@ -21,6 +24,9 @@ describe('Orderbook', () => {
           baseConfig: {
             environment: Environment.SANDBOX,
           },
+          provider: {} as any,
+          seaportContractAddress: '0x123',
+          zoneContractAddress: '0x456',
           overrides: {
             apiEndpoint: 'http://foobar',
           },
@@ -33,6 +39,9 @@ describe('Orderbook', () => {
           baseConfig: {
             environment: Environment.SANDBOX,
           },
+          provider: {} as any,
+          seaportContractAddress: '0x123',
+          zoneContractAddress: '0x456',
           overrides: {
             apiEndpoint: 'http://foobar',
             chainId: '1',

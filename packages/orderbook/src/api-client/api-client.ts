@@ -1,17 +1,17 @@
 import { ItemType } from '@opensea/seaport-js/lib/constants';
 import {
-  BuyItem, Fee, Order, OrderBookClient, ProtocolData, SellItem,
+  BuyItem, Fee, Order, OrderBookService, ProtocolData, SellItem,
 } from 'openapi/sdk';
 import { CreateOrderParams } from 'types';
 
 export class ImmutableApiClient {
   constructor(
-    private readonly orderbookClient: OrderBookClient,
+    private readonly orderbookService: OrderBookService,
     private readonly chainId: string,
   ) {}
 
   async getOrder(orderId: string): Promise<Order> {
-    return this.orderbookClient.orderBook.orderBookGetOrder({ chainId: this.chainId, orderId });
+    return this.orderbookService.orderBookGetOrder({ chainId: this.chainId, orderId });
   }
 
   async createOrder(
@@ -19,8 +19,22 @@ export class ImmutableApiClient {
       orderHash, orderComponents, offerer, orderSignature,
     }: CreateOrderParams,
   ): Promise<Order> {
-    // TODO: Add validation
-    return this.orderbookClient.orderBook.orderBookCreateOrder({
+    if (orderComponents.offer.length !== 1) {
+      throw new Error('Only one item can be listed at a time');
+    }
+
+    if (orderComponents.offer[0].itemType !== ItemType.ERC721) {
+      throw new Error('Only ERC721 tokens can be listed');
+    }
+
+    const considerationItemTypeTheSame = new Set(
+      [...orderComponents.consideration.map((c) => c.itemType)],
+    ).size === 1;
+    if (!considerationItemTypeTheSame) {
+      throw new Error('All consideration items must be of the same type');
+    }
+
+    return this.orderbookService.orderBookCreateOrder({
       chainId: this.chainId,
       requestBody: {
         order_hash: orderHash,
