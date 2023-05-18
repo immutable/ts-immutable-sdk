@@ -1,5 +1,7 @@
 import { Box, Heading, OptionKey } from '@biom3/react';
-import { useCallback, useContext, useMemo } from 'react';
+import {
+  useCallback, useContext, useMemo,
+} from 'react';
 import { SelectInput } from '../../../../components/FormComponents/SelectInput/SelectInput';
 import { amountInputValidation } from '../../../../lib/validations/amountInputValidations';
 import { SwapFormActions, SwapFormContext } from '../../context/swap-form-context/SwapFormContext';
@@ -12,7 +14,7 @@ import { ValidateFromAmount } from '../../functions/SwapValidator';
 
 interface FromProps {
   debounceTime: number;
-  debounce: (func: () => {}, threshold: number) => void;
+  debounce: (func: () => void, threshold: number) => void;
 }
 
 export function From({ debounceTime, debounce }: FromProps) {
@@ -64,7 +66,8 @@ export function From({ debounceTime, debounce }: FromProps) {
       }
 
       // Focuses on the From input field when the From token is updated
-      document.getElementById('fromTokenInputs-text-form-text')?.focus();
+      // This raises issues with validation on blur of this field if we are auto-focusing it
+      // document.getElementById('fromTokenInputs-text-form-text')?.focus();
 
       // Clears the To input field when the From token is updated
       swapFormDispatch({
@@ -83,13 +86,32 @@ export function From({ debounceTime, debounce }: FromProps) {
             blockFetchQuote: false,
           },
         });
-        return {};
       }, debounceTime);
     },
     [tokenBalances, swapFormDispatch, swapToToken],
   );
 
-  const handleSwapFromMaxButtonClick = useCallback(() => {
+  const handleFromAmountValidation = useCallback((value: string) => {
+    const validateFromAmountError = ValidateFromAmount(value, swapFromToken?.formattedBalance);
+    if (validateFromAmountError) {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_FROM_AMOUNT_ERROR,
+          swapFromAmountError: validateFromAmountError,
+        },
+      });
+      return;
+    }
+
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_SWAP_FROM_AMOUNT_ERROR,
+        swapFromAmountError: '',
+      },
+    });
+  }, [swapFromToken?.formattedBalance]);
+
+  const handleFromMaxAmountButtonClick = useCallback(() => {
     if (!swapFromToken) return;
     swapFormDispatch({
       payload: {
@@ -97,7 +119,44 @@ export function From({ debounceTime, debounce }: FromProps) {
         swapFromAmount: swapFromToken.formattedBalance,
       },
     });
+    debounce(() => {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
+          blockFetchQuote: false,
+        },
+      });
+    }, debounceTime);
+    handleFromAmountValidation(swapFromToken.formattedBalance);
   }, [swapFromToken]);
+
+  const handleAmountInputFoucs = useCallback(() => {
+    // block fetching of quote when a user focuses the input
+    // conversely stop blocking on blur or after debounce time
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
+        blockFetchQuote: true,
+      },
+    });
+  }, []);
+
+  const handleFromAmountChange = useCallback((value) => {
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
+        swapFromAmount: value,
+      },
+    });
+    debounce(() => {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
+          blockFetchQuote: false,
+        },
+      });
+    }, debounceTime);
+  }, []);
 
   return (
     <Box>
@@ -114,53 +173,10 @@ export function From({ debounceTime, debounce }: FromProps) {
         textInputSubtext={fromFiatPriceText}
         textInputTextAlign="right"
         textInputValidator={amountInputValidation}
-        onTextInputFocus={() => {
-          // block fetching of quote when a user focuses the input
-          // conversely stop blocking on blur or after debounce time
-          swapFormDispatch({
-            payload: {
-              type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
-              blockFetchQuote: true,
-            },
-          });
-        }}
-        onTextInputChange={(value) => {
-          swapFormDispatch({
-            payload: {
-              type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
-              swapFromAmount: value,
-            },
-          });
-          debounce(() => {
-            swapFormDispatch({
-              payload: {
-                type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
-                blockFetchQuote: false,
-              },
-            });
-            return {};
-          }, debounceTime);
-        }}
-        onTextInputBlur={() => {
-          const validateFromAmountError = ValidateFromAmount(swapFromAmount, swapFromToken?.formattedBalance);
-          if (validateFromAmountError) {
-            swapFormDispatch({
-              payload: {
-                type: SwapFormActions.SET_SWAP_FROM_AMOUNT_ERROR,
-                swapFromAmountError: validateFromAmountError,
-              },
-            });
-            return;
-          }
-
-          swapFormDispatch({
-            payload: {
-              type: SwapFormActions.SET_SWAP_FROM_AMOUNT_ERROR,
-              swapFromAmountError: '',
-            },
-          });
-        }}
-        textInputMaxButtonClick={handleSwapFromMaxButtonClick}
+        onTextInputFocus={handleAmountInputFoucs}
+        onTextInputChange={(value) => handleFromAmountChange(value)}
+        onTextInputBlur={(value) => handleFromAmountValidation(value)}
+        textInputMaxButtonClick={handleFromMaxAmountButtonClick}
         onSelectChange={handleFromTokenChange}
         textInputErrorMessage={swapFromAmountError}
         selectErrorMessage={swapFromTokenError}

@@ -38,6 +38,11 @@ export function SwapButton(props: SwapButtonProps) {
     const validateFromTokenError = ValidateFromToken(swapFromToken);
     const validateFromAmountError = ValidateFromAmount(swapFromAmount, swapFromToken?.formattedBalance);
     const validateToTokenError = ValidateToToken(swapToToken);
+
+    // we are expecting this to have an amount input from the quote
+    // conversely if the user updates this then swapFromAmount should have a quote value
+    // before we allow the swap to occur.
+    // This will be handled in swap slice 2.
     const validateToAmountError = ValidateToAmount(swapToAmount);
 
     if (validateFromTokenError) {

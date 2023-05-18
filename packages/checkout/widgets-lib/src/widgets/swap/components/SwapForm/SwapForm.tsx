@@ -26,7 +26,7 @@ export function SwapForm() {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const [debounceId, setDebounceId] = useState<string | null>();
 
-  const debounce = (func: () => {}, threshold: number) => {
+  const debounce = (func: () => void, threshold: number) => {
     if (debounceId) {
       clearTimeout(debounceId);
     }

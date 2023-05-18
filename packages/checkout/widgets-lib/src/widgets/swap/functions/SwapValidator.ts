@@ -4,7 +4,7 @@ import { text } from '../../../resources/text/textConfig';
 
 export function ValidateFromToken(swapFromToken: GetBalanceResult | null): string {
   const { validation } = text.views[SwapWidgetViews.SWAP];
-  if (!swapFromToken) return validation.noToTokenSelected;
+  if (!swapFromToken) return validation.noFromTokenSelected;
   return '';
 }
 

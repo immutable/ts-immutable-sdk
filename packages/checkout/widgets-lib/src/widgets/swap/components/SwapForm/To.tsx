@@ -14,7 +14,7 @@ import { ValidateToAmount } from '../../functions/SwapValidator';
 
 interface ToProps {
   debounceTime: number;
-  debounce: (func: () => {}, threshold: number) => void;
+  debounce: (func: () => void, threshold: number) => void;
 }
 
 export function To({ debounceTime, debounce }: ToProps) {
