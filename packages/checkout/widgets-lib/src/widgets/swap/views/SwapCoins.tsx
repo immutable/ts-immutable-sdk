@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import { Box, Heading } from '@biom3/react';
 import { BigNumber } from 'ethers';
 import { TokenInfo, Transaction } from '@imtbl/checkout-sdk';
@@ -11,10 +10,6 @@ import { SwapButton } from '../components/SwapButton/SwapButton';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapForm } from '../components/SwapForm/SwapForm';
 import { Fees } from '../components/Fees';
-import {
-  ValidateToAmount, ValidateFromAmount, ValidateFromToken, ValidateToToken,
-} from '../functions/SwapValidator';
-import { SwapFormActions, SwapFormContext } from '../context/swap-form-context/SwapFormContext';
 
 type AmountAndPercentage = {
   amount: {
@@ -75,11 +70,6 @@ export function SwapCoins({
 }: SwapCoinsProps) {
   const { header, content } = text.views[SwapWidgetViews.SWAP];
 
-  const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
-  const {
-    swapFromToken, swapFromAmount, swapToToken, swapToAmount,
-  } = swapFormState;
-
   const getTransaction = (): Transaction =>
     // Stubbed exchange.getTransaction
     // eslint-disable-next-line implicit-arrow-linebreak
@@ -93,56 +83,6 @@ export function SwapCoins({
       data: '0x000', // Optional, but used for defining smart contract creation and interaction.
       chainId: 5, // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
     });
-
-  const SwapFormValidator = (): boolean => {
-    const validateFromTokenError = ValidateFromToken(swapFromToken);
-    const validateFromAmountError = ValidateFromAmount(swapFromAmount, swapFromToken?.formattedBalance);
-    const validateToTokenError = ValidateToToken(swapToToken);
-    const validateToAmountError = ValidateToAmount(swapToAmount);
-
-    if (validateFromTokenError) {
-      swapFormDispatch({
-        payload: {
-          type: SwapFormActions.SET_SWAP_FROM_TOKEN_ERROR,
-          swapFromTokenError: validateFromTokenError,
-        },
-      });
-    }
-
-    if (validateFromAmountError) {
-      swapFormDispatch({
-        payload: {
-          type: SwapFormActions.SET_SWAP_FROM_AMOUNT_ERROR,
-          swapFromAmountError: validateFromAmountError,
-        },
-      });
-    }
-
-    if (validateToTokenError) {
-      swapFormDispatch({
-        payload: {
-          type: SwapFormActions.SET_SWAP_TO_TOKEN_ERROR,
-          swapToTokenError: validateToTokenError,
-        },
-      });
-    }
-
-    if (validateToAmountError) {
-      swapFormDispatch({
-        payload: {
-          type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR,
-          swapToAmountError: validateToAmountError,
-        },
-      });
-    }
-
-    if (
-      validateFromTokenError
-      || validateFromAmountError
-      || validateToTokenError
-      || validateToAmountError) return false;
-    return true;
-  };
 
   return (
     <SimpleLayout
@@ -175,7 +115,7 @@ export function SwapCoins({
           <SwapForm />
           <Fees fees="0.5" fiatPrice="0.123" tokenSymbol="imx" />
         </Box>
-        <SwapButton transaction={getTransaction()} validator={SwapFormValidator} />
+        <SwapButton transaction={getTransaction()} />
       </Box>
     </SimpleLayout>
   );

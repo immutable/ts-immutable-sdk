@@ -13,23 +13,80 @@ import {
   swapButtonBoxStyle,
   swapButtonIconLoadingStyle,
 } from './SwapButtonStyles';
+import { SwapFormActions, SwapFormContext } from '../../context/swap-form-context/SwapFormContext';
+import {
+  ValidateFromToken, ValidateFromAmount, ValidateToToken, ValidateToAmount,
+} from '../../functions/SwapValidator';
 
 export interface SwapButtonProps {
   transaction?: Transaction;
-  validator: () => boolean;
 }
 
 export function SwapButton(props: SwapButtonProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { swapState } = useContext(SwapContext);
   const { checkout, provider } = swapState;
-  const { transaction, validator } = props;
+  const { transaction } = props;
   const [loading, setLoading] = useState(true);
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
+  const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
+  const {
+    swapFromToken, swapFromAmount, swapToToken, swapToAmount,
+  } = swapFormState;
+
+  const SwapFormValidator = (): boolean => {
+    const validateFromTokenError = ValidateFromToken(swapFromToken);
+    const validateFromAmountError = ValidateFromAmount(swapFromAmount, swapFromToken?.formattedBalance);
+    const validateToTokenError = ValidateToToken(swapToToken);
+    const validateToAmountError = ValidateToAmount(swapToAmount);
+
+    if (validateFromTokenError) {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_FROM_TOKEN_ERROR,
+          swapFromTokenError: validateFromTokenError,
+        },
+      });
+    }
+
+    if (validateFromAmountError) {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_FROM_AMOUNT_ERROR,
+          swapFromAmountError: validateFromAmountError,
+        },
+      });
+    }
+
+    if (validateToTokenError) {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_TO_TOKEN_ERROR,
+          swapToTokenError: validateToTokenError,
+        },
+      });
+    }
+
+    if (validateToAmountError) {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR,
+          swapToAmountError: validateToAmountError,
+        },
+      });
+    }
+
+    if (
+      validateFromTokenError
+      || validateFromAmountError
+      || validateToTokenError
+      || validateToAmountError) return false;
+    return true;
+  };
 
   const sendTransaction = async () => {
     if (!checkout || !transaction || !provider) return;
-    if (!validator()) return;
+    if (!SwapFormValidator()) return;
 
     try {
       await checkout.sendTransaction({
