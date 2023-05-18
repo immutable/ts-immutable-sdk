@@ -9,7 +9,7 @@ describe('SwapValidator', () => {
     it('should return error message if swapFromToken is null', () => {
       const swapFromToken = null;
       const result = ValidateFromToken(swapFromToken);
-      expect(result).toEqual('Select a coin to receive');
+      expect(result).toEqual('Select a coin to swap');
     });
 
     it('should return empty string if swapFromToken is not null', () => {
