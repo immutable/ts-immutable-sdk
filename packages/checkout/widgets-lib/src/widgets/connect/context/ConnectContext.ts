@@ -58,6 +58,7 @@ export interface SetSendCloseEventPayload {
   sendCloseEvent: () => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const ConnectContext = createContext<ConnectContextState>({
   connectState: initialConnectState,
   connectDispatch: () => {},
@@ -69,7 +70,7 @@ export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export const connectReducer: Reducer<ConnectState, ConnectAction> = (
   state: ConnectState,
-  action: ConnectAction
+  action: ConnectAction,
 ) => {
   switch (action.payload.type) {
     case ConnectActions.SET_CHECKOUT:

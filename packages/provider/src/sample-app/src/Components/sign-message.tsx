@@ -1,4 +1,4 @@
-import { Actions, AppCtx } from '../context/app-context';
+import { Actions, AppCtx } from '../Context/app-context';
 import {
   Box,
   Body,
@@ -8,7 +8,7 @@ import {
   Heading,
 } from '@biom3/react';
 import { ChangeEvent, useContext, useState } from 'react';
-import { MetaMaskIMXProvider } from 'ts-immutable-sdk';
+import { MetaMaskIMXProvider } from '@imtbl/sdk';
 
 export const SignMessage = () => {
   const { state, dispatch } = useContext(AppCtx);

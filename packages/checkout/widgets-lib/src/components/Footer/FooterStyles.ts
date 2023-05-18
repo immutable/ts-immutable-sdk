@@ -1,4 +1,4 @@
-export const FooterButtonStyles = {
+export const footerButtonStyles = {
   width: '100%',
   display: 'flex',
   flexDirection: 'row',
@@ -7,7 +7,7 @@ export const FooterButtonStyles = {
   padding: 'base.spacing.x3',
 };
 
-export const FooterLogoStyles = {
+export const footerLogoStyles = {
   maxHeight: 'base.spacing.x20',
   display: 'flex',
   flexDirection: 'row',

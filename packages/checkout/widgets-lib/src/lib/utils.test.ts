@@ -1,11 +1,11 @@
 import { ChainId, GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
+import { Environment } from '@imtbl/config';
 import {
   calculateCryptoToFiat,
   formatFiatString,
   sortTokensByAmount,
 } from './utils';
-import { Environment } from '@imtbl/config';
 
 describe('utils', () => {
   describe('sortTokensByAmount', () => {
@@ -38,7 +38,7 @@ describe('utils', () => {
       ];
 
       expect(
-        sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM)
+        sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM),
       ).toEqual([
         {
           balance: BigNumber.from('100000000000000000000'),
@@ -165,8 +165,8 @@ describe('utils', () => {
           sortTokensByAmount(
             Environment.PRODUCTION,
             testcase.tokens,
-            ChainId.IMTBL_ZKEVM_TESTNET
-          )
+            ChainId.IMTBL_ZKEVM_TESTNET,
+          ),
         ).toEqual([
           {
             balance: BigNumber.from('0'),
@@ -249,7 +249,7 @@ describe('utils', () => {
       ];
 
       expect(
-        sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM)
+        sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM),
       ).toEqual([
         {
           balance: BigNumber.from('100000000000000000000'),
@@ -292,7 +292,7 @@ describe('utils', () => {
       const result = calculateCryptoToFiat(
         '',
         'eth',
-        new Map<string, number>()
+        new Map<string, number>(),
       );
       expect(result).toBe('-.--');
     });
@@ -301,7 +301,7 @@ describe('utils', () => {
       const result = calculateCryptoToFiat(
         '10',
         'eth',
-        new Map<string, number>()
+        new Map<string, number>(),
       );
       expect(result).toBe('-.--');
     });
@@ -310,7 +310,7 @@ describe('utils', () => {
       const result = calculateCryptoToFiat(
         '0',
         'eth',
-        new Map<string, number>([['eth', 1800]])
+        new Map<string, number>([['eth', 1800]]),
       );
       expect(result).toBe('-.--');
     });
@@ -319,7 +319,7 @@ describe('utils', () => {
       const result = calculateCryptoToFiat(
         'abc',
         'eth',
-        new Map<string, number>([['eth', 1800]])
+        new Map<string, number>([['eth', 1800]]),
       );
       expect(result).toBe('-.--');
     });
@@ -328,7 +328,7 @@ describe('utils', () => {
       const result = calculateCryptoToFiat(
         '10',
         'eth',
-        new Map<string, number>([['eth', 1800]])
+        new Map<string, number>([['eth', 1800]]),
       );
       expect(result).toBe('18000.00');
     });
@@ -337,7 +337,7 @@ describe('utils', () => {
       const result = calculateCryptoToFiat(
         '10',
         'eth',
-        new Map<string, number>([['eth', 1800]])
+        new Map<string, number>([['eth', 1800]]),
       );
       expect(result).toBe('18000.00');
     });

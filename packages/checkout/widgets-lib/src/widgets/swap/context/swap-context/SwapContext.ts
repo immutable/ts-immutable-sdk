@@ -15,7 +15,7 @@ export interface SwapState {
   network: NetworkInfo | null;
   tokenBalances: GetBalanceResult[];
   supportedTopUps: TopUpFeature | null;
-  allowedTokens: TokenInfo[]
+  allowedTokens: TokenInfo[];
 }
 
 export interface TopUpFeature {
@@ -31,7 +31,7 @@ export const initialSwapState: SwapState = {
   network: null,
   tokenBalances: [],
   supportedTopUps: null,
-  allowedTokens: []
+  allowedTokens: [],
 };
 
 export interface SwapContextState {
@@ -59,7 +59,7 @@ export enum SwapActions {
   SET_NETWORK = 'SET_NETWORK',
   SET_SUPPORTED_TOP_UPS = 'SET_SUPPORTED_TOP_UPS',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
-  SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS'
+  SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
 }
 
 export interface SetCheckoutPayload {
@@ -97,6 +97,7 @@ export interface SetAllowedTokensPayload {
   allowedTokens: TokenInfo[];
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const SwapContext = createContext<SwapContextState>({
   swapState: initialSwapState,
   swapDispatch: () => {},
@@ -108,7 +109,7 @@ export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export const swapReducer: Reducer<SwapState, SwapAction> = (
   state: SwapState,
-  action: SwapAction
+  action: SwapAction,
 ) => {
   switch (action.payload.type) {
     case SwapActions.SET_CHECKOUT:
@@ -145,13 +146,13 @@ export const swapReducer: Reducer<SwapState, SwapAction> = (
     case SwapActions.SET_TOKEN_BALANCES:
       return {
         ...state,
-        tokenBalances: action.payload.tokenBalances
-      }
+        tokenBalances: action.payload.tokenBalances,
+      };
     case SwapActions.SET_ALLOWED_TOKENS:
       return {
         ...state,
-        allowedTokens: action.payload.allowedTokens
-      }
+        allowedTokens: action.payload.allowedTokens,
+      };
     default:
       return state;
   }

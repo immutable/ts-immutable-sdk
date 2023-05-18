@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { MetaMaskIMXProvider, Environment } from 'ts-immutable-sdk';
+import { MetaMaskIMXProvider, Environment } from '@imtbl/sdk';
 
 export interface AppState {
   metaMaskIMXProvider: MetaMaskIMXProvider | null;

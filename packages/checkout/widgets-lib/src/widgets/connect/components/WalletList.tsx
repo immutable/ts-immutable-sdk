@@ -19,7 +19,7 @@ export interface WalletListProps {
   excludeWallets?: WalletFilter[];
 }
 
-export const WalletList = (props: WalletListProps) => {
+export function WalletList(props: WalletListProps) {
   const { walletFilterTypes, excludeWallets } = props;
   const {
     connectDispatch,
@@ -74,4 +74,4 @@ export const WalletList = (props: WalletListProps) => {
       ))}
     </Box>
   );
-};
+}

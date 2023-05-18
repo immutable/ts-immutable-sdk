@@ -1,15 +1,15 @@
 import { Box } from '@biom3/react';
 import { ReactComponent as ImmutableNetwork } from '../../assets/ImmutableNetwork.svg';
 import { ReactComponent as PurpleDownGradient } from '../../assets/PurpleDownGradient.svg';
-import { HeroBackGroundStyles, HeroImageStyles } from './HeroImageStyles';
+import { heroBackGroundStyles, heroImageStyles } from './HeroImageStyles';
 
-export const ImmutableNetworkHero = () => {
+export function ImmutableNetworkHero() {
   return (
-    <Box sx={HeroBackGroundStyles}>
+    <Box sx={heroBackGroundStyles}>
       <PurpleDownGradient />
-      <Box sx={HeroImageStyles}>
+      <Box sx={heroImageStyles}>
         <ImmutableNetwork />
       </Box>
     </Box>
   );
-};
+}

@@ -15,7 +15,7 @@ import {
   ViewActions,
 } from '../../../context/view-context/ViewContext';
 
-export const ReadyToConnect = () => {
+export function ReadyToConnect() {
   const {
     connectState: { checkout, sendCloseEvent },
     connectDispatch,
@@ -26,8 +26,10 @@ export const ReadyToConnect = () => {
 
   const onConnectClick = useCallback(async () => {
     const handleConnectViewUpdate = async (
+      // TODO: variable is already declared above
+      // eslint-disable-next-line
       checkout: Checkout,
-      provider: Web3Provider
+      provider: Web3Provider,
     ) => {
       const networkInfo = await checkout.getNetworkInfo({ provider });
 
@@ -70,24 +72,24 @@ export const ReadyToConnect = () => {
   return (
     <SimpleLayout
       testId="ready-to-connect"
-      header={
+      header={(
         <HeaderNavigation
           showBack
           title=""
           transparent
           onCloseButtonClick={sendCloseEvent}
         />
-      }
+      )}
       floatHeader
       heroContent={<MetamaskConnectHero />}
-      footer={
+      footer={(
         <FooterButton
           actionText={footerButtonText}
           onActionClick={onConnectClick}
         />
-      }
+      )}
     >
       <SimpleTextBody heading={body.heading}>{body.content}</SimpleTextBody>
     </SimpleLayout>
   );
-};
+}
