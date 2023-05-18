@@ -11,6 +11,7 @@ export enum ExchangeErrorCode {
   CHAIN_NOT_SUPPORTED = 'CHAIN_NOT_SUPPORTED',
   NO_ROUTES_AVAILABLE = 'NO_ROUTES_AVAILABLE',
   PROVIDER_CALL_ERROR = 'PROVIDER_CALL_ERROR',
+  APPROVAL_ERROR = 'APPROVAL_ERROR',
 }
 
 /**
@@ -80,5 +81,11 @@ export class NoRoutesAvailableError extends ExchangeError {
 export class ProviderCallError extends ExchangeError {
   constructor(message: string) {
     super(message, ExchangeErrorCode.PROVIDER_CALL_ERROR);
+  }
+}
+
+export class ApprovalError extends ExchangeError {
+  constructor(message: string) {
+    super(message, ExchangeErrorCode.APPROVAL_ERROR);
   }
 }
