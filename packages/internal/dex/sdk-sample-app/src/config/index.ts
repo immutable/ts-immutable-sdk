@@ -59,8 +59,8 @@ const overrides: ExchangeOverrides = {
     address: '0xd1da7e9b2Ce1a4024DaD52b3D37F4c5c91a525C1',
     decimals: 18,
     symbol: 'IMX',
-    name: 'Immutable X Token'
-  }
+    name: 'Immutable X Token',
+  },
 };
 export const configuration = new ExchangeConfiguration({
   chainId,

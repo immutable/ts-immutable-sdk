@@ -13,7 +13,7 @@ export function Example() {
 
   // Instead of hard-coding these tokens, you can optionally retrieve available tokens from the user's wallet
   const FUN_TOKEN = process.env.NEXT_PUBLIC_COMMON_ROUTING_FUN || '';
-  const WETH_TOKEN = process.env.NEXT_PUBLIC_COMMON_ROUTING_WETH || '';
+  const USDC_TOKEN = process.env.NEXT_PUBLIC_COMMON_ROUTING_USDC || '';
 
   const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -27,7 +27,7 @@ export function Example() {
   );
 
   const inputToken = FUN_TOKEN;
-  const outputToken = WETH_TOKEN;
+  const outputToken = USDC_TOKEN;
 
   useEffect(() => {
     // Get the symbols for the tokens that we want to swap so we can display this to the user
@@ -51,6 +51,7 @@ export function Example() {
 
   const getQuote = async () => {
     setIsFetching(true);
+    setError(null)
 
     try {
       const txn = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -156,6 +157,7 @@ export function Example() {
       </button>
 
       <hr className="my-4" />
+      {error && <ErrorMessage message={error} />}
       {result && result.info && (
         <>
           <h3>
@@ -189,7 +191,6 @@ export function Example() {
                   balances
                 </h3>
               )}
-              {error && <ErrorMessage message={error} />}
             </>
         </>
       )}
