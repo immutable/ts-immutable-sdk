@@ -1,39 +1,25 @@
 import { Service } from 'typedi';
-import type { EventData, EventType } from '../types';
 import { withSDKError } from '../Errors';
 
 import { GetItemsInput, InventoryService } from './InventoryService';
-import { EventClient } from '../EventClient';
-
-/**
- * @internal Assets events
- */
-export type InventoryEvent = EventType<
-'INVENTORY_GET_ITEMS',
-| EventData<'STARTED' | 'IN_PROGRESS'>
-| EventData<'COMPLETED', { data: {} }>
-| EventData<'FAILED', { error: { code: string; reason: string } }>
->
-| EventType<'INVENTORY_FILTER_ITEMS_BY'>;
-
-/** List of specific Assets statuses */
-export type InventoryStatus = InventoryEvent['status'];
 
 @Service()
 export class Inventory {
-  constructor(private inventoryService: InventoryService, private events: EventClient<InventoryEvent>) {
+  constructor(private inventoryService: InventoryService) {
   }
 
   @withSDKError({ type: 'INVENTORY_GET_ITEMS_ERROR' })
   public async getItems(input: GetItemsInput) {
-    this.events.emitEvent({ status: 'STARTED', action: 'INVENTORY_GET_ITEMS' });
-
+    // TODO Add query params for pagination etc.
     const { data, status } = await this.inventoryService.getItems(input);
 
     if (status !== 200) {
-      throw new Error('GET_INVENTORY_ERROR');
+      // TODO Expose more useful error information.
+      throw new Error('INVENTORY_GET_ITEMS_ERROR', { cause: { code: `${status}`, reason: 'unknown' } });
     }
 
-    return data.rows;
+    const items = data.rows;
+
+    return items;
   }
 }
