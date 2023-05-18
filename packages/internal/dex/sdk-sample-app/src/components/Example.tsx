@@ -2,7 +2,6 @@ import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import { Exchange, TransactionResponse } from '@imtbl/dex-sdk';
 import { configuration } from '../config';
-import { getERC20ApproveCalldata } from '@/utils/approve';
 import { ConnectAccount } from './ConnectAccount';
 import { getTokenSymbol } from '../utils/getTokenSymbol';
 import { AmountInput } from './AmountInput';
@@ -62,6 +61,10 @@ export function Example() {
       );
 
       setResult(txn);
+
+      if (!txn.approval) {
+        setApproved(true)
+      }
     } catch(e) {
       const message =  e instanceof Error ? e.message : 'Unknown Error';
       setError(`Error fetching quote: ${message}`);
@@ -80,26 +83,15 @@ export function Example() {
 
     // Approve the ERC20 spend
     if (!approved) {
-      const inputBigNumber = ethers.utils.parseUnits(
-        inputAmount,
-        result.info?.quote.token.decimals
-      );
-      const approveCalldata = getERC20ApproveCalldata(inputBigNumber);
-      const transactionRequest = {
-        data: approveCalldata,
-        to: inputToken,
-        value: '0',
-        from: ethereumAccount,
-      };
       try {
         // Send the Approve transaction
         const approveReceipt = await (window as any).ethereum.send(
           'eth_sendTransaction',
-          [transactionRequest]
+          [result.approval]
         );
 
         // Wait for the Approve transaction to complete
-        await provider.waitForTransaction(approveReceipt.result, 1, 500000);
+        await provider.waitForTransaction(approveReceipt.result, 2);
         setApproved(true);
       } catch (e) {
         const message =  e instanceof Error ? e.message : 'Unknown Error';
@@ -117,7 +109,7 @@ export function Example() {
       );
 
       // Wait for the Swap transaction to complete
-      await provider.waitForTransaction(receipt.result, 1, 500000);
+      await provider.waitForTransaction(receipt.result, 2);
       setIsFetching(false);
       setSwapStatus(true);
     } catch (e) {
