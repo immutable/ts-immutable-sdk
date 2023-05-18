@@ -15,16 +15,16 @@ describe('SwapForm', () => {
           <SwapForm />
         </SwapWidgetTestComponent>,
       );
-      cySmartGet('fromTokenInputs-select__target').should('be.visible');
-      cySmartGet('fromTokenInputs-select__target').should('have.text', 'Select coin');
-      cySmartGet('fromTokenInputs-text')
+      cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+      cySmartGet('fromTokenInputs-text-form-text')
         .should('be.visible');
-      cySmartGet('fromTokenInputs-text__input')
+      cySmartGet('fromTokenInputs-text-form-text__input')
         .should('have.attr', 'placeholder', fromText.inputPlaceholder);
-      cySmartGet('toTokenInputs-select__target').should('be.visible');
-      cySmartGet('toTokenInputs-select__target').should('have.text', 'Select coin');
-      cySmartGet('toTokenInputs-text').should('be.visible');
-      cySmartGet('toTokenInputs-text__input').should('have.attr', 'placeholder', toText.inputPlaceholder);
+      cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+      cySmartGet('toTokenInputs-text-form-text').should('be.visible');
+      cySmartGet('toTokenInputs-text-form-text__input').should('have.attr', 'placeholder', toText.inputPlaceholder);
     });
   });
 
@@ -100,8 +100,8 @@ describe('SwapForm', () => {
         );
 
         // Have had to modify the onChange method to reset to previous state if input is not valid
-        cySmartGet('fromTokenInputs-text__input').type(testCase.input).trigger('change');
-        cySmartGet('fromTokenInputs-text__input').should('have.attr', 'value', testCase.expected);
+        cySmartGet('fromTokenInputs-text-form-text__input').type(testCase.input).trigger('change');
+        cySmartGet('fromTokenInputs-text-form-text__input').should('have.attr', 'value', testCase.expected);
       });
     });
   });
