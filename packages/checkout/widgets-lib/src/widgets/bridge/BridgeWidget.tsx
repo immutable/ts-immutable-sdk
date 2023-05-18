@@ -62,6 +62,7 @@ export const NetworkChainMap = {
   [Network.ETHEREUM]: ChainId.ETHEREUM,
   [Network.IMTBL_ZKEVM_TESTNET]: ChainId.IMTBL_ZKEVM_TESTNET,
   [Network.IMTBL_ZKEVM_DEVNET]: ChainId.IMTBL_ZKEVM_DEVNET,
+  [Network.POLYGON_ZKEVM_TESTNET]: ChainId.POLYGON_ZKEVM_TESTNET,
   [Network.SEPOLIA]: ChainId.SEPOLIA,
 };
 

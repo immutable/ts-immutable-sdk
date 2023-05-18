@@ -14,8 +14,8 @@ import {
   ChainId,
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
   ConnectionProviders,
-  NetworkFilterTypes,
   WalletAction,
+  NetworkFilterTypes,
 } from '../types';
 import { connectWalletProvider } from '../connect';
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -48,6 +48,25 @@ jest.mock('@ethersproject/providers', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
   Web3Provider: jest.fn(),
 }));
+
+jest.mock(
+  './network_master_list.json',
+  () => [
+    {
+      chainId: 1,
+    },
+    {
+      chainId: 11155111,
+    },
+    {
+      chainId: 13372,
+    },
+    {
+      chainId: 13373,
+    },
+  ],
+  { virtual: true },
+);
 
 describe('network functions', () => {
   const testCheckoutConfiguration = new CheckoutConfiguration({
@@ -325,7 +344,8 @@ describe('network functions', () => {
         );
         expect(result.chainId).toBe(
           parseInt(
-            PRODUCTION_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainIdHex ?? '',
+            PRODUCTION_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainIdHex
+              ?? '',
             16,
           ),
         );

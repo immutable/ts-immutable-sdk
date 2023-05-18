@@ -8,7 +8,7 @@ import { Environment } from '@imtbl/config';
  */
 export function L1Network(environment: Environment) {
   return environment === Environment.PRODUCTION
-    ? ChainId.ETHEREUM
+    ? ChainId.SEPOLIA
     : ChainId.SEPOLIA;
 }
 
@@ -19,6 +19,6 @@ export function L1Network(environment: Environment) {
  */
 export function zkEVMNetwork(environment: Environment) {
   return environment === Environment.PRODUCTION
-    ? ChainId.IMTBL_ZKEVM_TESTNET
-    : ChainId.IMTBL_ZKEVM_DEVNET;
+    ? ChainId.POLYGON_ZKEVM // IMTBL_ZKEVM_TESTNET
+    : ChainId.POLYGON_ZKEVM_TESTNET; // IMTBL_ZKEVM_DEVNET
 }

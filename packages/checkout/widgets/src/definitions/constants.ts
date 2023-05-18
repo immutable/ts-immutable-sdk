@@ -9,6 +9,7 @@ export enum Network {
   SEPOLIA = 'Sepolia',
   IMTBL_ZKEVM_TESTNET = 'Immutable zkEVM Testnet',
   IMTBL_ZKEVM_DEVNET = 'Immutable zkEVM Devnet',
+  POLYGON_ZKEVM_TESTNET = 'Polygon zkEVM Testnet',
 }
 
 /**
