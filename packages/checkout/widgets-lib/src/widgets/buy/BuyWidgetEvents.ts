@@ -18,7 +18,7 @@ export const sendBuySuccessEvent = () => {
           timestamp: new Date().getTime(),
         },
       },
-    }
+    },
   );
   if (window !== undefined) window.dispatchEvent(successEvent);
 };
@@ -34,7 +34,7 @@ export const sendBuyFailedEvent = (reason: string) => {
           timestamp: new Date().getTime(),
         },
       },
-    }
+    },
   );
   if (window !== undefined) window.dispatchEvent(failedEvent);
 };
@@ -47,7 +47,7 @@ export const sendBuyWidgetCloseEvent = () => {
         type: BuyEventType.CLOSE,
         data: {},
       },
-    }
+    },
   );
   if (window !== undefined) window.dispatchEvent(closeEvent);
 };
@@ -60,7 +60,7 @@ export const sendBuyWidgetNotConnectedEvent = (providerPreference: string) => {
         type: BuyEventType.NOT_CONNECTED,
         data: { providerPreference },
       },
-    }
+    },
   );
   if (window !== undefined) window.dispatchEvent(notConnectedEvent);
 };

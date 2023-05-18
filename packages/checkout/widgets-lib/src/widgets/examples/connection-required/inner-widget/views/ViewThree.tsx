@@ -9,7 +9,7 @@ import {
   ViewActions,
 } from '../../../../../context/view-context/ViewContext';
 
-export const ViewThree = () => {
+export function ViewThree() {
   const { viewDispatch } = useContext(ViewContext);
 
   return (
@@ -34,4 +34,4 @@ export const ViewThree = () => {
       </Button>
     </SimpleLayout>
   );
-};
+}

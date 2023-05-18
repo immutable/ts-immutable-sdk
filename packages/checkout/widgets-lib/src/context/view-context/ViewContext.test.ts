@@ -48,7 +48,7 @@ describe('view-context', () => {
             type: ConnectWidgetViews.CONNECT_WALLET,
           },
         },
-      }
+      },
     );
 
     expect(state).toEqual({
@@ -78,7 +78,7 @@ describe('view-context', () => {
             type: ConnectWidgetViews.READY_TO_CONNECT,
           },
         },
-      }
+      },
     );
 
     expect(state).toEqual({
@@ -108,7 +108,7 @@ describe('view-context', () => {
         payload: {
           type: ViewActions.GO_BACK,
         },
-      }
+      },
     );
 
     expect(state).toEqual({
@@ -130,7 +130,7 @@ describe('view-context', () => {
         },
         history: [{ type: ConnectWidgetViews.READY_TO_CONNECT }],
       },
-      { payload: { type: ViewActions.GO_BACK } }
+      { payload: { type: ViewActions.GO_BACK } },
     );
 
     expect(state).toEqual({

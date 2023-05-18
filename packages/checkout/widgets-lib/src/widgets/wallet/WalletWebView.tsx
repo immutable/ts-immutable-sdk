@@ -32,7 +32,7 @@ function WalletWebView() {
       isOnRampEnabled={isOnRampEnabled}
       isSwapEnabled={isSwapEnabled}
       isBridgeEnabled={isBridgeEnabled}
-    ></imtbl-wallet>
+    />
   );
 }
 

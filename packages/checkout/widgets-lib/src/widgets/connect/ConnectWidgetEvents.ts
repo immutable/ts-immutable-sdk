@@ -11,7 +11,7 @@ import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { addToLocalStorage } from '../../lib';
 
 export function sendConnectSuccessEvent(
-  providerPreference: ConnectionProviders
+  providerPreference: ConnectionProviders,
 ) {
   addToLocalStorage('providerPreference', providerPreference);
   const successEvent = new CustomEvent<ConnectEvent<ConnectionSuccess>>(
@@ -20,10 +20,10 @@ export function sendConnectSuccessEvent(
       detail: {
         type: ConnectEventType.SUCCESS,
         data: {
-          providerPreference: providerPreference,
+          providerPreference,
         },
       },
-    }
+    },
   );
   if (window !== undefined) window.dispatchEvent(successEvent);
 }
@@ -36,7 +36,7 @@ export function sendCloseWidgetEvent() {
         type: ConnectEventType.CLOSE_WIDGET,
         data: {},
       },
-    }
+    },
   );
   if (window !== undefined) window.dispatchEvent(closeWidgetEvent);
 }
@@ -51,7 +51,7 @@ export function sendConnectFailedEvent(reason: string) {
           reason,
         },
       },
-    }
+    },
   );
   if (window !== undefined) window.dispatchEvent(failedEvent);
 }

@@ -10,6 +10,7 @@ export enum WalletEventType {
   REQUEST_SWAP = 'request-swap',
   REQUEST_BRIDGE = 'request-bridge',
   REQUEST_ONRAMP = 'request-onramp',
+  DISCONNECT_WALLET = 'disconnect-wallet',
 }
 
 /**
@@ -44,6 +45,8 @@ export type WalletRequestOnrampEvent = {
   tokenAddress: string;
   amount: string;
 };
+
+export type WalletDisconnectWalletEvent = {};
 
 /**
  * Represents an event object emitted by the Wallet Widget.

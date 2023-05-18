@@ -1,20 +1,22 @@
 import {
-  BridgeWidget,
-  BridgeWidgetParams,
-  BridgeWidgetViews,
-} from './BridgeWidget';
-import { describe, it, cy, beforeEach } from 'local-cypress';
+  describe, it, cy, beforeEach,
+} from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Network, WidgetTheme } from '@imtbl/checkout-widgets';
-import { cySmartGet } from '../../lib/testUtils';
 import { Checkout, SwitchNetworkResult } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { BiomeCombinedProviders, BiomeThemeProvider } from '@biom3/react';
 import { onDarkBase } from '@biom3/design-tokens';
 import Sinon from 'cypress/types/sinon';
-import { BridgeButton } from './components/BridgeButton';
 import { TransactionResponse } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
+import { BridgeButton } from './components/BridgeButton';
+import { cySmartGet } from '../../lib/testUtils';
+import {
+  BridgeWidget,
+  BridgeWidgetParams,
+  BridgeWidgetViews,
+} from './BridgeWidget';
 
 type CypressStub = Cypress.Agent<Sinon.SinonStub<any[], any>>;
 describe('Bridge Widget tests', () => {
@@ -96,7 +98,7 @@ describe('Bridge Widget tests', () => {
           environment={Environment.PRODUCTION}
           params={params}
           theme={WidgetTheme.DARK}
-        />
+        />,
       );
       cySmartGet('heading').should('be.visible');
       cySmartGet('close-button').should('be.visible');
@@ -108,7 +110,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('amount__input').should('have.value', '0');
       cySmartGet('bridge-to-network').should(
         'include.text',
-        'Immutable zkEVM Testnet'
+        'Immutable zkEVM Testnet',
       );
       cySmartGet('@connectStub').should('have.been.called');
       cySmartGet('@getAllBalancesStub').should('have.been.called');
@@ -126,7 +128,7 @@ describe('Bridge Widget tests', () => {
           environment={Environment.PRODUCTION}
           params={params}
           theme={WidgetTheme.DARK}
-        />
+        />,
       );
       cySmartGet('heading').should('be.visible');
       cySmartGet('close-button').should('be.visible');
@@ -138,7 +140,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('amount__input').should('have.value', '50.23');
       cySmartGet('bridge-to-network').should(
         'include.text',
-        'Immutable zkEVM Testnet'
+        'Immutable zkEVM Testnet',
       );
       cySmartGet('@connectStub').should('have.been.called');
       cySmartGet('@getAllBalancesStub').should('have.been.called');
@@ -156,7 +158,7 @@ describe('Bridge Widget tests', () => {
           environment={Environment.PRODUCTION}
           params={params}
           theme={WidgetTheme.DARK}
-        />
+        />,
       );
       cy.wait(50);
       cySmartGet('select-token__target').should('have.text', 'MATIC');
@@ -178,7 +180,7 @@ describe('Bridge Widget tests', () => {
           environment={Environment.PRODUCTION}
           params={params}
           theme={WidgetTheme.DARK}
-        />
+        />,
       );
       cy.wait(50);
       cySmartGet('select-token__target').should('have.text', 'MATIC');
@@ -216,7 +218,7 @@ describe('Bridge Widget tests', () => {
             params={params}
             theme={WidgetTheme.DARK}
           />
-        </BiomeCombinedProviders>
+        </BiomeCombinedProviders>,
       );
 
       cySmartGet('select-network__target').should('have.text', 'Ethereum');
@@ -282,7 +284,7 @@ describe('Bridge Widget tests', () => {
             params={params}
             theme={WidgetTheme.DARK}
           />
-        </BiomeCombinedProviders>
+        </BiomeCombinedProviders>,
       );
 
       cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
@@ -368,7 +370,7 @@ describe('Bridge Widget tests', () => {
             params={params}
             theme={WidgetTheme.DARK}
           />
-        </BiomeCombinedProviders>
+        </BiomeCombinedProviders>,
       );
 
       cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
@@ -379,6 +381,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('@getAllBalancesStub').should('have.been.called');
     });
 
+    // eslint-disable-next-line max-len
     it('should call switch network (to specified network) if provider is on the whitelisted network to start with', () => {
       const connectStubReturnWhitelistedNetwork = {
         provider: {
@@ -428,7 +431,7 @@ describe('Bridge Widget tests', () => {
             params={params}
             theme={WidgetTheme.DARK}
           />
-        </BiomeCombinedProviders>
+        </BiomeCombinedProviders>,
       );
 
       cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
@@ -436,6 +439,7 @@ describe('Bridge Widget tests', () => {
         chainId: 13372,
       });
     });
+    // eslint-disable-next-line max-len
     it('should call switch network (to default Ethereum) if provider is on the whitelisted network to start with', () => {
       const connectStubReturnWhitelistedNetwork = {
         provider: {
@@ -513,7 +517,7 @@ describe('Bridge Widget tests', () => {
             params={params}
             theme={WidgetTheme.DARK}
           />
-        </BiomeCombinedProviders>
+        </BiomeCombinedProviders>,
       );
 
       cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
@@ -545,7 +549,7 @@ describe('Bridge Widget tests', () => {
           environment={Environment.PRODUCTION}
           params={params}
           theme={WidgetTheme.DARK}
-        />
+        />,
       );
 
       cySmartGet('bridge-button').should('be.visible');
@@ -573,7 +577,7 @@ describe('Bridge Widget tests', () => {
           environment={Environment.PRODUCTION}
           params={params}
           theme={WidgetTheme.DARK}
-        />
+        />,
       );
 
       cySmartGet('bridge-button').should('be.visible');
@@ -588,11 +592,15 @@ describe('Bridge Widget tests', () => {
         <BiomeThemeProvider>
           <BridgeButton
             updateTransactionResponse={(
-              transactionResponse: TransactionResponse
+              // TODO: is this for mocking purposes?
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              transactionResponse: TransactionResponse,
             ) => {}}
+            // TODO: is this for mocking purposes?
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             updateView={(view: BridgeWidgetViews, err?: any) => {}}
           />
-        </BiomeThemeProvider>
+        </BiomeThemeProvider>,
       );
 
       cySmartGet('bridge-button').should('be.visible');

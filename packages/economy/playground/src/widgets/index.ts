@@ -4,3 +4,4 @@ import './craft-checkout-connect';
 //
 // import './craft-card-upgrade';
 import './imtbl-crafting-widget';
+import './imtbl-crafting-widget-2';

@@ -16,8 +16,10 @@ export function sendAddCoinsEvent(eventData: WalletAddCoinsEvent) {
         type: WalletEventType.ADD_COINS,
         data: eventData,
       },
-    }
+    },
   );
+  // TODO: please remove or if necessary keep the eslint ignore
+  // eslint-disable-next-line no-console
   console.log('add coins event:', addCoinsEvent);
   if (window !== undefined) window.dispatchEvent(addCoinsEvent);
 }
@@ -30,8 +32,10 @@ export function sendOnRampCoinsEvent(eventData: WalletRequestOnrampEvent) {
         type: WalletEventType.REQUEST_ONRAMP,
         data: eventData,
       },
-    }
+    },
   );
+  // TODO: please remove or if necessary keep the eslint ignore
+  // eslint-disable-next-line no-console
   console.log('on-ramp coins event:', addCoinsEvent);
   if (window !== undefined) window.dispatchEvent(addCoinsEvent);
 }
@@ -44,21 +48,25 @@ export function sendSwapCoinsEvent(eventData: WalletRequestSwapEvent) {
         type: WalletEventType.REQUEST_SWAP,
         data: eventData,
       },
-    }
+    },
   );
+  // TODO: please remove or if necessary keep the eslint ignore
+  // eslint-disable-next-line no-console
   console.log('swap coins event:', swapCoinsEvent);
   if (window !== undefined) window.dispatchEvent(swapCoinsEvent);
 }
 
 export function sendBridgeCoinsEvent(eventData: WalletRequestBridgeEvent) {
   const bridgeCoinsEvent = new CustomEvent<
-    WalletEvent<WalletRequestBridgeEvent>
+  WalletEvent<WalletRequestBridgeEvent>
   >(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
     detail: {
       type: WalletEventType.REQUEST_BRIDGE,
       data: eventData,
     },
   });
+  // TODO: please remove or if necessary keep the eslint ignore
+  // eslint-disable-next-line no-console
   console.log('bridge coins event:', bridgeCoinsEvent);
   if (window !== undefined) window.dispatchEvent(bridgeCoinsEvent);
 }

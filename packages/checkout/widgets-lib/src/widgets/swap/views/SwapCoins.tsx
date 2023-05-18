@@ -1,19 +1,15 @@
+import { Box, Heading } from '@biom3/react';
+import { BigNumber } from 'ethers';
+import { TokenInfo, Transaction } from '@imtbl/checkout-sdk';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
-import { Box } from '@biom3/react';
-import { Buy } from '../components/Buy';
-import With from '../components/With';
-import { Fees } from '../components/Fees';
-import { SwapButton } from '../components/SwapButton';
-import { BigNumber, utils } from 'ethers';
-import { TokenInfo, Transaction } from '@imtbl/checkout-sdk';
-import { useContext, useState } from 'react';
-import { SwapContext } from '../context/SwapContext';
-import { alphaSortTokensList, findTokenByAddress } from '../helpers';
+import { SwapButton } from '../components/SwapButton/SwapButton';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
+import { SwapForm } from '../components/SwapForm/SwapForm';
+import { Fees } from '../components/Fees';
 
 type AmountAndPercentage = {
   amount: {
@@ -64,61 +60,20 @@ export interface SwapCoinsProps {
   toContractAddress: string | undefined;
 }
 
-export const SwapCoins = ({
+export function SwapCoins({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   amount,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fromContractAddress,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   toContractAddress,
-}: SwapCoinsProps) => {
-  const { title } = text.views[SwapWidgetViews.SWAP].header;
+}: SwapCoinsProps) {
+  const { header, content } = text.views[SwapWidgetViews.SWAP];
 
-  const { swapState } = useContext(SwapContext);
-  const { provider, allowedTokens } = swapState;
-
-  const sortedAllowList: TokenInfo[] = alphaSortTokensList(allowedTokens);
-  const validatedAmount = isNaN(Number(amount))
-    ? BigNumber.from(0)
-    : BigNumber.from(amount);
-
-  const [buyAmount, setBuyAmount] = useState<BigNumber>(validatedAmount || 0);
-  const [buyToken, setBuyToken] = useState<TokenInfo>(
-    findTokenByAddress(sortedAllowList, toContractAddress) || sortedAllowList[0]
-  );
-  const [withQuote, setWithQuote] = useState<QuoteResponse>();
-  const [withToken, setWithToken] = useState<TokenInfo | undefined>(
-    findTokenByAddress(sortedAllowList, fromContractAddress)
-  );
-
-  const onBuyFieldAmountChange = (event: any) => {
-    const newAmount = event.target.value;
-    let resolvedValue: BigNumber;
-
-    if (!newAmount || isNaN(newAmount)) {
-      resolvedValue = BigNumber.from(0);
-    } else {
-      resolvedValue = utils.parseUnits(
-        newAmount.toString(),
-        buyToken?.decimals
-      );
-    }
-
-    setBuyAmount(resolvedValue);
-  };
-
-  const onBuyFieldTokenChange = (token: TokenInfo) => {
-    setBuyToken(token);
-  };
-
-  const onWithFieldTokenChange = (token: TokenInfo) => {
-    setWithToken(token);
-  };
-
-  const onWithFieldQuoteChange = (newQuote: QuoteResponse) => {
-    setWithQuote(newQuote);
-  };
-
-  const getTransaction = (): Transaction => {
+  const getTransaction = (): Transaction =>
     // Stubbed exchange.getTransaction
-    return {
+    // eslint-disable-next-line implicit-arrow-linebreak
+    ({
       nonce: '0x00', // ignored by MetaMask
       gasPrice: '0x000', // customizable by user during MetaMask confirmation.
       gas: '0x000', // customizable by user during MetaMask confirmation.
@@ -127,45 +82,40 @@ export const SwapCoins = ({
       value: '0x00', // Only required to send ether to the recipient from the initiating external account.
       data: '0x000', // Optional, but used for defining smart contract creation and interaction.
       chainId: 5, // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
-    };
-  };
-
+    });
   return (
     <SimpleLayout
-      header={
+      header={(
         <HeaderNavigation
-          title={title}
+          showBack
+          title={header.title}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent()}
         />
-      }
+      )}
       footer={<FooterLogo />}
+      footerBackgroundColor="base.color.translucent.container.200"
     >
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        <Buy
-          onTokenChange={onBuyFieldTokenChange}
-          onAmountChange={onBuyFieldAmountChange}
-          token={buyToken}
-          amount={buyAmount}
-        />
-        <With
-          onTokenChange={onWithFieldTokenChange}
-          onQuoteChange={onWithFieldQuoteChange}
-          token={withToken}
-          quote={withQuote}
-          buyToken={buyToken}
-          buyAmount={buyAmount}
-        />
-        {withQuote && (
-          <Fees
-            fees={withQuote.trade.fees.amount.formatted}
-            slippage={withQuote.trade.slippage.amount.formatted}
-            tokenSymbol="imx"
-          />
-        )}
-        {provider && (
-          <SwapButton provider={provider} transaction={getTransaction()} />
-        )}
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Box sx={{ paddingX: 'base.spacing.x4' }}>
+          <Heading
+            size="small"
+            weight="regular"
+            sx={{ paddingBottom: 'base.spacing.x4' }}
+          >
+            {content.title}
+          </Heading>
+          <SwapForm />
+          <Fees fees="0.5" fiatPrice="0.123" tokenSymbol="imx" />
+        </Box>
+        <SwapButton transaction={getTransaction()} />
       </Box>
     </SimpleLayout>
   );
-};
+}

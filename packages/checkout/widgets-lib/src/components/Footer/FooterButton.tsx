@@ -1,5 +1,5 @@
 import { Box, Button } from '@biom3/react';
-import { FooterButtonStyles } from './FooterStyles';
+import { footerButtonStyles } from './FooterStyles';
 
 export interface FooterButtonProps {
   hideActionButton?: boolean;
@@ -7,14 +7,14 @@ export interface FooterButtonProps {
   onActionClick: () => void;
 }
 
-export const FooterButton = ({
+export function FooterButton({
   actionText,
   onActionClick,
   hideActionButton = false,
-}: FooterButtonProps) => {
+}: FooterButtonProps) {
   const showButton = !hideActionButton;
   return (
-    <Box testId="footer-button-container" sx={FooterButtonStyles}>
+    <Box testId="footer-button-container" sx={footerButtonStyles}>
       {showButton && (
         <Button
           testId="footer-button"
@@ -27,4 +27,4 @@ export const FooterButton = ({
       )}
     </Box>
   );
-};
+}
