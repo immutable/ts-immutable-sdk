@@ -2,6 +2,7 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   POLYGON_TESTNET_CHAIN_ID,
   POLYGON_ZKEVM_COMMON_ROUTING_TOKENS,
+  WETH_POLYGON_TESTNET,
 } from 'constants/tokens';
 import { POLYGON_ZKEVM_TESTNET_RPC_URL } from 'constants/rpc';
 import { tokenInfoToUniswapToken } from 'lib';
@@ -25,6 +26,7 @@ export class ExchangeConfiguration {
         commonRoutingTokens: tokenInfoToUniswapToken(
           overrides.commonRoutingTokens,
         ),
+        nativeToken: overrides.nativeToken,
       };
 
       return;
@@ -73,6 +75,13 @@ export const SupportedSandboxChains: { [chainId: number]: Chain } = {
     rpcUrl: POLYGON_ZKEVM_TESTNET_RPC_URL,
     contracts: ContractsForChainId[POLYGON_TESTNET_CHAIN_ID],
     commonRoutingTokens: POLYGON_ZKEVM_COMMON_ROUTING_TOKENS,
+    nativeToken: {
+      chainId: POLYGON_TESTNET_CHAIN_ID,
+      address: WETH_POLYGON_TESTNET.address,
+      decimals: WETH_POLYGON_TESTNET.decimals,
+      symbol: WETH_POLYGON_TESTNET.symbol,
+      name: WETH_POLYGON_TESTNET.name,
+    },
   },
 };
 
