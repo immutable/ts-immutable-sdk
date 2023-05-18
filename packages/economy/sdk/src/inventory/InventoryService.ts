@@ -24,7 +24,7 @@ type GetItemsInput = {
 @Service()
 export class InventoryService {
   constructor(private httpClient: HttpClient, private config: Config) {
-    this.httpClient.setBaseURL(`${this.config.servicesBaseURL}/inventory`);
+    this.httpClient.setBaseURL(`${this.config.servicesBaseURL}/inventory/v1`);
   }
 
   public async getItems(
