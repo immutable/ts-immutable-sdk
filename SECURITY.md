@@ -14,16 +14,13 @@ Additionally, we recommend installing the library through npm and setting up vul
 
 ### Supported Versions
 
-Security patches will be released for the latest minor of a given major release. For example, if an issue is found in versions >=4.6.0 and the latest is 4.8.0, the patch will be released only in version 4.8.1.
+Security patches will be released for the latest minor of a given major release. For example, if an issue is found in versions >=1.1.0 and the latest is 1.8.0, the patch will be released only in version 1.8.1.
 
 Only critical severity bug fixes will be backported to past major releases.
 
 | Version | Critical security fixes | Other security fixes |
 | ------- | ----------------------- | -------------------- |
-| 4.x     | :white_check_mark:      | :white_check_mark:   |
-| 3.4     | :white_check_mark:      | :x:                  |
-| 2.5     | :white_check_mark:      | :x:                  |
-| < 2.0   | :x:                     | :x:                  |
+| 0.x     | :white_check_mark:      | :white_check_mark:   |
 
 Note as well that the Solidity language itself only guarantees security updates for the latest release.
 
