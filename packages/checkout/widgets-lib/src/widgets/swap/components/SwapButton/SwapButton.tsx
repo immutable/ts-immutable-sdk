@@ -1,6 +1,6 @@
 import { Box, Button } from '@biom3/react';
 import { Transaction } from '@imtbl/checkout-sdk';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { sendSwapSuccessEvent } from '../../SwapWidgetEvents';
 import { text } from '../../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
@@ -27,11 +27,10 @@ export function SwapButton(props: SwapButtonProps) {
   const { swapState } = useContext(SwapContext);
   const { checkout, provider } = swapState;
   const { transaction } = props;
-  const [loading, setLoading] = useState(true);
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
   const {
-    swapFromToken, swapFromAmount, swapToToken, swapToAmount,
+    swapFromToken, swapFromAmount, swapToToken, swapToAmount, loading,
   } = swapFormState;
 
   const SwapFormValidator = (): boolean => {
@@ -117,18 +116,11 @@ export function SwapButton(props: SwapButtonProps) {
     }
   };
 
-  // TODO: remove this and move the loading state used for the button into a SwapContext
-  // or SwapFormContext etc...
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, [setLoading]);
-
   return (
     <Box sx={swapButtonBoxStyle}>
       <Button
-        disabled={!provider || !transaction || loading}
+        testId="swap-button"
+        disabled={loading}
         variant={!provider || !transaction ? 'tertiary' : 'primary'}
         onClick={sendTransaction}
         size="large"

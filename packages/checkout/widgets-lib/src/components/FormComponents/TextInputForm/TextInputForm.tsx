@@ -46,6 +46,7 @@ export function TextInputForm({
 
   return (
     <FormControlWrapper
+      testId={`${id}-text-control`}
       textAlign={textAlign ?? 'left'}
       subtext={errorMessage ? undefined : subtext}
       isErrored={!!errorMessage}
@@ -64,7 +65,7 @@ export function TextInputForm({
         onFocus={onTextInputFocus}
       >
         {maxButtonClick && (
-          <TextInput.Button onClick={maxButtonClick}>max</TextInput.Button>
+          <TextInput.Button testId={`${id}-max-button`} onClick={maxButtonClick}>max</TextInput.Button>
         )}
       </TextInput>
     </FormControlWrapper>

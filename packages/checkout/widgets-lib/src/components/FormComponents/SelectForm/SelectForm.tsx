@@ -32,6 +32,7 @@ export function SelectForm({
 }: SelectFormProps) {
   return (
     <FormControlWrapper
+      testId={`${id}-select-control`}
       textAlign={textAlign ?? 'left'}
       subtext={errorMessage ? undefined : subtext}
       isErrored={!!errorMessage}

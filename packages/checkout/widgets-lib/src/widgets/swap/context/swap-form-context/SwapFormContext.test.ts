@@ -11,7 +11,7 @@ import {
   SetSwapToTokenErrorPayload,
   SetSwapFromAmountErrorPayload,
   SetSwapToAmountErrorPayload,
-  SetBlockFetchQuote,
+  SetBlockFetchQuotePayload,
   SetSwapFromFiatValuePayload,
 } from './SwapFormContext';
 
@@ -77,7 +77,7 @@ describe('swap form context', () => {
   });
 
   it('should set setBlockFetchQuote when reducer called with SET_BLOCK_FETCH_QUOTE action', () => {
-    const setBlockFetchQuote: SetBlockFetchQuote = {
+    const setBlockFetchQuote: SetBlockFetchQuotePayload = {
       type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
       blockFetchQuote: true,
     };

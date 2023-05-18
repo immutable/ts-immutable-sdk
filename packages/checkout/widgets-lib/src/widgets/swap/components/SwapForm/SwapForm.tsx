@@ -12,6 +12,7 @@ import { CryptoFiatActions, CryptoFiatContext } from '../../../../context/crypto
 import { calculateCryptoToFiat } from '../../../../lib/utils';
 import { From } from './From';
 import { To } from './To';
+import { quotes } from '../../functions/FetchQuote';
 
 const DEBOUNCE_TIME = 2000;
 
@@ -87,8 +88,28 @@ export function SwapForm() {
       && swapToToken
       && !blockFetchQuote
     ) {
-      // eslint-disable-next-line no-console
-      console.log('todo: Fetch the quote');
+      // TODO: this section will need to be updated with WT-1331
+      swapFormDispatch({
+        payload:
+        {
+          type: SwapFormActions.SET_LOADING,
+          loading: true,
+        },
+      });
+      // TODO: replace this function with function from WT-1331
+      // also rename the stub in SwapForm tests
+
+      quotes.fetchMeAQuote();
+
+      setTimeout(() => {
+        swapFormDispatch({
+          payload:
+          {
+            type: SwapFormActions.SET_LOADING,
+            loading: false,
+          },
+        });
+      }, 1000);
     }
 
     swapFormDispatch({
