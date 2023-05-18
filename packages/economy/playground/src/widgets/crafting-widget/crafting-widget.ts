@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement('crafting-widget')
 export class CraftingWidget extends LitElement {
@@ -12,12 +12,63 @@ export class CraftingWidget extends LitElement {
   @property({ type: String, attribute: 'wallet-address' })
   walletAddress!: string;
 
+  @state()
+  inventory: Array<number> = [1, 2, 3];
+
+  @state()
+  recipes: Array<unknown> = ['A', 'B', 'C'];
+
+  onConnectClick() {
+    this.inventory = [...this.inventory, 1, 2, 3, 5, 6, 7, 8, 9, 10];
+    this.requestUpdate();
+  }
+
   render() {
     const properties = {
       gameId: this.gameId,
       userId: this.userId,
       walletAddress: this.walletAddress,
     };
+
+    const selectedItems = [
+      {
+        id: 1,
+        name: 'item 1',
+        image: 'https://via.placeholder.com/50',
+        type: 'weapon',
+      },
+      {
+        id: 2,
+        name: 'item 2',
+        image: 'https://via.placeholder.com/50',
+        type: 'weapon',
+      },
+      {
+        id: 3,
+        name: 'item 3',
+        image: 'https://via.placeholder.com/50',
+        type: 'weapon',
+      },
+      {
+        id: 4,
+        name: 'item 4',
+        image: 'https://via.placeholder.com/50',
+        type: 'material',
+      },
+      {
+        id: 5,
+        name: 'item 5',
+        image: 'https://via.placeholder.com/50',
+        type: 'material',
+      },
+      {
+        id: 6,
+        name: 'item 6',
+        image: 'https://via.placeholder.com/50',
+        type: 'material',
+      },
+    ];
+
     return html`
       <div class="h-screen flex flex-col">
         <div class="drawer">
@@ -59,15 +110,15 @@ export class CraftingWidget extends LitElement {
                   placeholder="Wallet Address"
                   class="input w-full max-w-xs ml-2"
                 />
-                <select class="select select-primary w-full max-w-xs ml-2">
-                  <option disabled selected>Select a recipe</option>
-                  <option>A1</option>
-                  <option>A2</option>
-                  <option>B1</option>
-                  <option>B2</option>
-                </select>
+                <div class="w-full max-w-xs ml-2">
+                  <recipe-selection
+                    .recipes="${this.recipes}"
+                  ></recipe-selection>
+                </div>
                 <!-- CONNECT -->
-                <button class="btn ml-2">Connect</button>
+                <div class="ml-2">
+                  <connect-button></connect-button>
+                </div>
                 <!-- CONNECT -->
               </div>
             </div>
@@ -76,97 +127,16 @@ export class CraftingWidget extends LitElement {
               <div
                 class="bg-gray-100 overflow-hidden overflow-y-scroll max-h-96 lg:max-h-none"
               >
-                Inventory
-                <!-- ITEMS -->
-                <div
-                  class="grid gap-x-4 gap-y-8 grid-cols-3 md:grid-cols-4 px-8 justify-items-start"
-                >
-                  <div class="stack">
-                    <div
-                      class="grid w-32 h-32 bg-base-300 place-items-center my-4"
-                    >
-                      stacked
-                    </div>
-                    <div
-                      class="grid w-32 h-32 bg-base-300 place-items-center my-4"
-                    >
-                      stacked
-                    </div>
-                    <div
-                      class="grid w-32 h-32 bg-base-300 place-items-center my-4"
-                    >
-                      stacked
-                    </div>
-                    <div
-                      class="grid w-32 h-32 bg-base-300 place-items-center my-4"
-                    >
-                      stacked
-                    </div>
-                  </div>
-                  ${Array.from({ length: 100 }).map(
-                    () => html` <div class="indicator">
-                        <!-- ITEM -->
-                        <span class="indicator-item badge badge-secondary"
-                          >new</span
-                        >
-                        <div
-                          class="grid w-32 h-32 bg-base-300 place-items-center"
-                        >
-                          item
-                        </div>
-                      </div>
-                      <!-- ITEM -->`
-                  )}
-                </div>
-                <!-- ITEMS -->
+                <inventory-collection
+                  .inventory="${this.inventory}"
+                ></inventory-collection>
               </div>
               <!-- INVENTORY -->
               <div class="flex flex-1 flex-col lg:flex-row">
                 <!-- SELECTION -->
                 <div class=" flex-grow bg-gray-200">
                   Selection
-                  <div class="prose">
-                    <ul class="tree">
-                      <li>
-                        <details>
-                          <summary group="1">First Item</summary>
-                          <ul class="tree">
-                            <li>First item</li>
-                            <li>
-                              <details>
-                                <summary group="1">Third Item</summary>
-                                <ul class="tree">
-                                  <li>First item</li>
-                                  <li>Second item</li>
-                                  <li>Another Here</li>
-                                </ul>
-                              </details>
-                            </li>
-                            <li>Another Here</li>
-                          </ul>
-                        </details>
-                      </li>
-                      <li>
-                        <details>
-                          <summary group="1">Second Item</summary>
-                          <ul class="tree">
-                            <li>First item</li>
-                            <li>
-                              <details>
-                                <summary group="1">Third Item</summary>
-                                <ul class="tree">
-                                  <li>First item</li>
-                                  <li>Second item</li>
-                                  <li>Another Here</li>
-                                </ul>
-                              </details>
-                            </li>
-                            <li>Another Here</li>
-                          </ul>
-                        </details>
-                      </li>
-                    </ul>
-                  </div>
+                  <items-selection .items="${selectedItems}"></items-selection>
                 </div>
                 <!-- SELECTION -->
                 <div class="divider lg:divider-horizontal">🟰</div>
@@ -184,19 +154,8 @@ export class CraftingWidget extends LitElement {
           <div class="drawer-side">
             <!-- DRAWER -->
             <label for="my-drawer-3" class="drawer-overlay"></label>
-            <div
-              class="menu p-4 w-2/4 bg-base-100 prose overflow-hidden overflow-y-scroll"
-            >
-              <h2 class="">History</h2>
-              <div class="p-2 mb-8 outline outline-1 outline-slate-800">
-                <code>576890-fgdd7980-=fd7980-=fds7890-=</code>
-                <ul class="steps w-full">
-                  <li class="step step-info" data-content="✓">Created</li>
-                  <li class="step step-info" data-content="✓">Received</li>
-                  <li class="step step-info" data-content="✓">Minted</li>
-                  <li data-content="●" class="step step-neutral">Completed</li>
-                </ul>
-              </div>
+            <div class="menu w-2/4 bg-base-100 p-4">
+              <crafting-history></crafting-history>
             </div>
             <!-- DRAWER -->
           </div>

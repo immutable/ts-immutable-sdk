@@ -4,4 +4,4 @@ import './craft-checkout-connect';
 //
 import './imtbl-crafting-widget';
 import './imtbl-crafting-widget-2';
-import './crafting-widget/crafting-widget';
+import './crafting-widget';
