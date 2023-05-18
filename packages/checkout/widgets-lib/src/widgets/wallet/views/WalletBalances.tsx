@@ -23,10 +23,12 @@ import {
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { getTokenBalances } from '../functions/tokenBalances';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 
 export function WalletBalances() {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { walletState, walletDispatch } = useContext(WalletContext);
+  const { viewDispatch } = useContext(ViewContext);
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const {
@@ -109,9 +111,14 @@ export function WalletBalances() {
         <HeaderNavigation
           title={header.title}
           showSettings
-          // TODO: please remove or if necessary keep the eslint ignore
-          // eslint-disable-next-line no-console
-          onSettingsClick={() => console.log('settings click')}
+          onSettingsClick={() => {
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: { type: WalletWidgetViews.SETTINGS },
+              },
+            });
+          }}
           onCloseButtonClick={sendWalletWidgetCloseEvent}
         />
       )}
