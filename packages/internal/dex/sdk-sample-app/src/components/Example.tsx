@@ -91,7 +91,7 @@ export function Example() {
         );
 
         // Wait for the Approve transaction to complete
-        await provider.waitForTransaction(approveReceipt.result, 2);
+        await provider.waitForTransaction(approveReceipt.result, 1);
         setApproved(true);
       } catch (e) {
         const message =  e instanceof Error ? e.message : 'Unknown Error';
@@ -109,7 +109,7 @@ export function Example() {
       );
 
       // Wait for the Swap transaction to complete
-      await provider.waitForTransaction(receipt.result, 2);
+      await provider.waitForTransaction(receipt.result, 1);
       setIsFetching(false);
       setSwapStatus(true);
     } catch (e) {
