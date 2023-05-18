@@ -40,15 +40,15 @@
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "build:all": "wsrun -p @imtbl/economy --stages build",
     "dev": "npm run build -- --watch",
-    "generate:all": "make",
-    "generate:crafting": "make generate-crafting",
-    "generate:inventory": "make generate-inventory",
-    "generate:item-definition": "make generate-item-definition",
-    "generate:recipe": "make generate-recipe",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",
-    "typecheck": "tsc --noEmit --jsx preserve"
+    "typecheck": "tsc --noEmit --jsx preserve",
+    "generate:crafting": "make generate-crafting",
+    "generate:inventory": "make generate-inventory",
+    "generate:recipe": "make generate-recipe",
+    "generate:item-definition": "make generate-item-definition",
+    "generate:all": "make"
   },
   "type": "module",
   "types": "dist/index.d.ts"
