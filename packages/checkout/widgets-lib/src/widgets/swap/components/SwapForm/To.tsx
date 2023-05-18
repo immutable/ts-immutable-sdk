@@ -73,6 +73,45 @@ export function To({ debounceTime, debounce }: ToProps) {
     [allowedTokens, swapFormDispatch],
   );
 
+  const handleToAmountValidation = useCallback((value: string) => {
+    const validateToAmountError = ValidateToAmount(value);
+    if (validateToAmountError) {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR,
+          swapToAmountError: validateToAmountError,
+        },
+      });
+      return;
+    }
+
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR,
+        swapToAmountError: '',
+      },
+    });
+  }, []);
+
+  const handleToAmountFocus = useCallback(() => {
+    // eslint-disable-next-line no-console
+    console.log('Swap To Text Input Focused');
+  }, []);
+
+  const handleToAmountChange = useCallback((value: string) => {
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_SWAP_TO_AMOUNT,
+        swapToAmount: value,
+      },
+    });
+  }, []);
+
+  const handleToAmountMaxButtonClick = useCallback(() => {
+    // eslint-disable-next-line no-console
+    console.log('todo: implement max button function');
+  }, []);
+
   return (
     <Box>
       <Box sx={headingStyle}>
@@ -88,39 +127,10 @@ export function To({ debounceTime, debounce }: ToProps) {
         textInputPlaceholder={swapForm.to.inputPlaceholder}
         textInputTextAlign="right"
         textInputValidator={amountInputValidation}
-        // eslint-disable-next-line no-console
-        onTextInputFocus={() => console.log('Swap To Text Input Focused')}
-        onTextInputChange={(value) => {
-          swapFormDispatch({
-            payload: {
-              type: SwapFormActions.SET_SWAP_TO_AMOUNT,
-              swapToAmount: value,
-            },
-          });
-        }}
-        onTextInputBlur={() => {
-          const validateToAmountError = ValidateToAmount(swapToAmount);
-          if (validateToAmountError) {
-            swapFormDispatch({
-              payload: {
-                type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR,
-                swapToAmountError: validateToAmountError,
-              },
-            });
-            return;
-          }
-
-          swapFormDispatch({
-            payload: {
-              type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR,
-              swapToAmountError: '',
-            },
-          });
-        }}
-        textInputMaxButtonClick={() => {
-          // eslint-disable-next-line no-console
-          console.log('todo: implement max button function');
-        }}
+        onTextInputFocus={handleToAmountFocus}
+        onTextInputChange={(value) => handleToAmountChange(value)}
+        onTextInputBlur={(value) => handleToAmountValidation(value)}
+        textInputMaxButtonClick={handleToAmountMaxButtonClick}
         onSelectChange={handleToTokenChange}
         textInputErrorMessage={swapToAmountError}
         selectErrorMessage={swapToTokenError}
