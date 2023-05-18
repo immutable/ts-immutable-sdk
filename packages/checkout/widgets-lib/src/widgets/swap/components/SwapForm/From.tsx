@@ -2,6 +2,7 @@ import { Box, Heading, OptionKey } from '@biom3/react';
 import {
   useCallback, useContext, useMemo,
 } from 'react';
+import debounce from 'lodash.debounce';
 import { SelectInput } from '../../../../components/FormComponents/SelectInput/SelectInput';
 import { amountInputValidation } from '../../../../lib/validations/amountInputValidations';
 import { SwapFormActions, SwapFormContext } from '../../context/swap-form-context/SwapFormContext';
@@ -11,13 +12,13 @@ import { SwapContext } from '../../context/swap-context/SwapContext';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 import { text } from '../../../../resources/text/textConfig';
 import { ValidateFromAmount } from '../../functions/SwapValidator';
+import { SELECT_DEBOUNCE_TIME, TEXT_DEBOUNCE_TIME } from '../../constants';
 
-interface FromProps {
-  debounceTime: number;
-  debounce: (func: () => void, threshold: number) => void;
+export interface FromProps {
+  unblockQuote: () => void;
 }
 
-export function From({ debounceTime, debounce }: FromProps) {
+export function From({ unblockQuote }: FromProps) {
   const { swapState } = useContext(SwapContext);
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
   const { tokenBalances } = swapState;
@@ -42,6 +43,14 @@ export function From({ debounceTime, debounce }: FromProps) {
     ),
     [tokenBalances],
   );
+
+  const unblockQuoteOnTextDebounce = useCallback(debounce(() => {
+    unblockQuote();
+  }, TEXT_DEBOUNCE_TIME), []);
+
+  const unblockQuoteOnSelectDebounce = useCallback(debounce(() => {
+    unblockQuote();
+  }, SELECT_DEBOUNCE_TIME), []);
 
   const handleFromTokenChange = useCallback(
     (value: OptionKey) => {
@@ -79,14 +88,7 @@ export function From({ debounceTime, debounce }: FromProps) {
 
       // TODO: clear the quote value here
 
-      debounce(() => {
-        swapFormDispatch({
-          payload: {
-            type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
-            blockFetchQuote: false,
-          },
-        });
-      }, debounceTime);
+      unblockQuoteOnSelectDebounce();
     },
     [tokenBalances, swapFormDispatch, swapToToken],
   );
@@ -119,14 +121,7 @@ export function From({ debounceTime, debounce }: FromProps) {
         swapFromAmount: swapFromToken.formattedBalance,
       },
     });
-    debounce(() => {
-      swapFormDispatch({
-        payload: {
-          type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
-          blockFetchQuote: false,
-        },
-      });
-    }, debounceTime);
+    unblockQuoteOnTextDebounce();
     handleFromAmountValidation(swapFromToken.formattedBalance);
   }, [swapFromToken]);
 
@@ -148,14 +143,7 @@ export function From({ debounceTime, debounce }: FromProps) {
         swapFromAmount: value,
       },
     });
-    debounce(() => {
-      swapFormDispatch({
-        payload: {
-          type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
-          blockFetchQuote: false,
-        },
-      });
-    }, debounceTime);
+    unblockQuoteOnTextDebounce();
   }, []);
 
   return (

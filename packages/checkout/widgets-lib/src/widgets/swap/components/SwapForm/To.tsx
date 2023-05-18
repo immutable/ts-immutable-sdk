@@ -2,6 +2,7 @@ import {
   Box, Heading, Body, OptionKey,
 } from '@biom3/react';
 import { useCallback, useContext, useMemo } from 'react';
+import debounce from 'lodash.debounce';
 import { SelectInput } from '../../../../components/FormComponents/SelectInput/SelectInput';
 import { amountInputValidation } from '../../../../lib/validations/amountInputValidations';
 import { SwapFormActions, SwapFormContext } from '../../context/swap-form-context/SwapFormContext';
@@ -11,13 +12,13 @@ import { text } from '../../../../resources/text/textConfig';
 import { SelectOption } from '../../../../components/FormComponents/SelectForm/SelectForm';
 import { SwapContext } from '../../context/swap-context/SwapContext';
 import { ValidateToAmount } from '../../functions/SwapValidator';
+import { SELECT_DEBOUNCE_TIME } from '../../constants';
 
-interface ToProps {
-  debounceTime: number;
-  debounce: (func: () => void, threshold: number) => void;
+export interface ToProps {
+  unblockQuote: () => void;
 }
 
-export function To({ debounceTime, debounce }: ToProps) {
+export function To({ unblockQuote }: ToProps) {
   const { swapState } = useContext(SwapContext);
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
   const {
@@ -26,6 +27,10 @@ export function To({ debounceTime, debounce }: ToProps) {
   const { allowedTokens } = swapState;
   const { swapForm } = text.views[SwapWidgetViews.SWAP];
   const fromToConversionText = '1 WETH ≈ 12.6 GOG'; // TODO: to calculate when dex integrated
+
+  const unblockQuoteOnSelectDebounce = useCallback(debounce(() => {
+    unblockQuote();
+  }, SELECT_DEBOUNCE_TIME), []);
 
   const toTokenOptions = useMemo(
     () => allowedTokens.map(
@@ -60,17 +65,9 @@ export function To({ debounceTime, debounce }: ToProps) {
         });
       }
 
-      debounce(() => {
-        swapFormDispatch({
-          payload: {
-            type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
-            blockFetchQuote: false,
-          },
-        });
-        return {};
-      }, debounceTime);
+      unblockQuoteOnSelectDebounce();
     },
-    [allowedTokens, swapFormDispatch],
+    [allowedTokens, swapFormDispatch, unblockQuoteOnSelectDebounce],
   );
 
   const handleToAmountValidation = useCallback((value: string) => {

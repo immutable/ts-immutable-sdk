@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { Box } from '@biom3/react';
 import {
   SwapFormActions,
@@ -14,8 +14,6 @@ import { From } from './From';
 import { To } from './To';
 import { quotes } from '../../functions/FetchQuote';
 
-const DEBOUNCE_TIME = 2000;
-
 export function SwapForm() {
   const { swapState } = useContext(SwapContext);
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
@@ -25,20 +23,24 @@ export function SwapForm() {
   } = swapFormState;
   const { allowedTokens } = swapState;
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
-  const [debounceId, setDebounceId] = useState<string | null>();
 
-  const debounce = (func: () => void, threshold: number) => {
-    if (debounceId) {
-      clearTimeout(debounceId);
-    }
+  const unblockQuote = useCallback(() => {
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
+        blockFetchQuote: false,
+      },
+    });
+  }, []);
 
-    setDebounceId(
-      setTimeout(() => {
-        setDebounceId(null);
-        func();
-      }, threshold).toString(),
-    );
-  };
+  const blockQuote = useCallback(() => {
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
+        blockFetchQuote: true,
+      },
+    });
+  }, []);
 
   useEffect(() => {
     const tokenSymbols: string[] = [];
@@ -112,18 +114,13 @@ export function SwapForm() {
       }, 1000);
     }
 
-    swapFormDispatch({
-      payload: {
-        type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
-        blockFetchQuote: true,
-      },
-    });
-  }, [swapFromAmount, swapFromToken, swapToToken, blockFetchQuote]);
+    blockQuote();
+  }, [swapFromAmount, swapFromToken, swapToToken, blockFetchQuote, blockQuote]);
 
   return (
     <Box sx={swapFormContainerStyle}>
-      <From debounceTime={DEBOUNCE_TIME} debounce={debounce} />
-      <To debounceTime={DEBOUNCE_TIME} debounce={debounce} />
+      <From unblockQuote={unblockQuote} />
+      <To unblockQuote={unblockQuote} />
     </Box>
   );
 }
