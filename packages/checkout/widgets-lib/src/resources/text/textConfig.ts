@@ -54,6 +54,10 @@ export const text = {
         label: 'Disconnect Wallet',
       },
     },
+    [WalletWidgetViews.COIN_INFO]: {
+      heading: 'Coins and collectibles are native to networks',
+      body: 'You can switch networks to add coins or move them from one network to another',
+    },
     [SwapWidgetViews.SWAP]: {
       header: {
         title: 'Swap coins',

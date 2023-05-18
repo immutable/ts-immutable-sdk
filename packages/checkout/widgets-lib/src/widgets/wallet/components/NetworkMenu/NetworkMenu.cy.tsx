@@ -47,7 +47,7 @@ describe('Network Menu', () => {
       </BiomeThemeProvider>,
     );
 
-    cySmartGet('network-icon').should('exist');
+    cySmartGet('coin-info-icon').should('exist');
   });
   it('should have network buttons', () => {
     const walletState: WalletState = {

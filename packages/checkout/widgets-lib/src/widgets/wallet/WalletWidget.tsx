@@ -30,6 +30,7 @@ import {
 } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { Settings } from './views/Settings';
+import { CoinInfo } from './views/CoinInfo';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
@@ -144,8 +145,9 @@ export function WalletWidget(props: WalletWidgetProps) {
             {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
               <WalletBalances />
             )}
-            {viewState.view.type === WalletWidgetViews.SETTINGS && (
-              <Settings />
+            {viewState.view.type === WalletWidgetViews.SETTINGS && <Settings />}
+            {viewState.view.type === WalletWidgetViews.COIN_INFO && (
+              <CoinInfo />
             )}
             {viewState.view.type === BaseViews.ERROR && (
               <ErrorView

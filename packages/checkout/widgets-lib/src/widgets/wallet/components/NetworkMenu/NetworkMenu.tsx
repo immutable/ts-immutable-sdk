@@ -117,9 +117,15 @@ export function NetworkMenu() {
           {networkStatus.heading}
         </Body>
         <Icon
-          testId="network-icon"
+          testId="coin-info-icon"
           icon="InformationCircle"
           sx={{ width: 'base.icon.size.100' }}
+          onClick={() => viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: { type: WalletWidgetViews.COIN_INFO },
+            },
+          })}
         />
       </Box>
       <HorizontalMenu>
