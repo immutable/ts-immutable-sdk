@@ -10,6 +10,7 @@ import {
   DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
 } from 'errors';
 import { calculateGasFee, fetchGasPrice } from 'lib/transactionUtils/gas';
+import { getERC20AmountToApprove, getUnsignedERC20ApproveTransaction } from 'lib/transactionUtils/approval';
 import {
   DEFAULT_DEADLINE,
   DEFAULT_MAX_HOPS,
@@ -136,13 +137,33 @@ export class Exchange {
       slippage,
     );
 
+    // Get gas details
     const gasPrice = await fetchGasPrice(this.provider);
     const gasFeeEstimate = gasPrice ? {
       token: this.nativeToken,
       amount: calculateGasFee(gasPrice, routeAndQuote.trade.gasEstimate).toString(),
     } : null;
 
+    // Get approval transaction if needed
+    // we always check the tokenIn address because we are always selling the tokenIn
+    const amountToApprove = await getERC20AmountToApprove(
+      this.provider,
+      fromAddress,
+      tokenInAddress,
+      ethers.BigNumber.from(amount),
+      this.router.routingContracts.peripheryRouterAddress,
+    );
+    const approvalTransaction = amountToApprove.isZero()
+      ? null
+      : getUnsignedERC20ApproveTransaction(
+        fromAddress,
+        tokenInAddress,
+        amountToApprove,
+        this.router.routingContracts.peripheryRouterAddress,
+      );
+
     return {
+      approval: approvalTransaction,
       transaction: {
         data: params.calldata,
         to: this.router.routingContracts.peripheryRouterAddress,

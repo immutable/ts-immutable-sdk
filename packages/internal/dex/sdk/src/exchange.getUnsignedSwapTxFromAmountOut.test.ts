@@ -1,11 +1,14 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
+import { Contract } from '@ethersproject/contracts';
 import { describe, it } from '@jest/globals';
 import { ethers } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { TradeType } from '@uniswap/sdk-core';
 import { ExchangeConfiguration } from 'config';
 import {
   InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError,
 } from 'errors';
+import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { Exchange } from './exchange';
 import {
   decodeMulticallData,
@@ -19,6 +22,7 @@ import {
 import { Router } from './lib';
 
 jest.mock('@ethersproject/providers');
+jest.mock('@ethersproject/contracts');
 jest.mock('./lib/router');
 jest.mock('./lib/utils', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -31,9 +35,16 @@ const exactOutputSingleSignature = '0x5023b4df';
 
 const DEFAULT_SLIPPAGE = 0.1; // 1/1000 = 0.001 = 0.1%
 const HIGHER_SLIPPAGE = 0.2; // 2/1000 = 0.002 = 0.2%
+const APPROVED_AMOUNT = BigNumber.from('1000000000000000000');
 
 describe('getUnsignedSwapTxFromAmountOut', () => {
   beforeAll(() => {
+    (Contract as unknown as jest.Mock).mockImplementation(
+      () => ({
+        allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+      }),
+    );
+
     (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
       () => ({
         getFeeData: async () => ({
@@ -42,6 +53,55 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         }),
       }),
     ) as unknown as JsonRpcProvider;
+  });
+
+  describe('When the swap transaction requires approval', () => {
+    it('should include the unsigned approval transaction', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      const erc20ContractInterface = ERC20__factory.createInterface();
+
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange(configuration);
+
+      const amountOut = APPROVED_AMOUNT.add(BigNumber.from('1000000000000000000'));
+      const tx = await exchange.getUnsignedSwapTxFromAmountOut(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        amountOut,
+      );
+
+      expect(tx.approval).not.toBe(null);
+      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', tx.approval?.data as string);
+      expect(decodedResults[0]).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
+      // we have already approved 1000000000000000000, so we expect to approve 1000000000000000000 more
+      expect(decodedResults[1].toString()).toEqual(APPROVED_AMOUNT.toString());
+      expect(tx.approval?.to).toEqual(params.inputToken);
+      expect(tx.approval?.from).toEqual(params.fromAddress);
+      expect(tx.approval?.value).toEqual(0); // we do not want to send any ETH
+    });
+  });
+
+  describe('When the swap transaction does not require approval', () => {
+    it('should not include the unsigned approval transaction', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange(configuration);
+
+      // Set the amountIn to be the same as the APPROVED_AMOUNT
+      const tx = await exchange.getUnsignedSwapTxFromAmountOut(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        APPROVED_AMOUNT,
+      );
+
+      // we have already approved 1000000000000000000, so we don't expect to approve anything
+      expect(tx.approval).toBe(null);
+    });
   });
 
   describe('When no route found', () => {

@@ -1,7 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
-import { Amount } from 'types';
 import { ApprovalError } from 'errors';
 
 /**
@@ -16,11 +15,12 @@ import { ApprovalError } from 'errors';
 export const getERC20AmountToApprove = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
-  tokenAmount: Amount,
+  tokenAddress: string,
+  tokenAmount: BigNumber,
   spenderAddress: string,
 ) => {
   // create an instance of the ERC20 token contract
-  const erc20Contract = ERC20__factory.connect(tokenAmount.token.address, provider);
+  const erc20Contract = ERC20__factory.connect(tokenAddress, provider);
 
   // get the allowance for the token spender
   // minimum is 0 - no allowance
@@ -33,7 +33,12 @@ export const getERC20AmountToApprove = async (
   }
 
   // get the amount that needs to be approved
-  return BigNumber.from(tokenAmount.amount).sub(allowance);
+  const requiredAmount = BigNumber.from(tokenAmount).sub(allowance);
+  if (requiredAmount.isNegative()) {
+    return BigNumber.from('0');
+  }
+
+  return BigNumber.from(tokenAmount).sub(allowance);
 };
 
 /**
@@ -46,7 +51,8 @@ export const getERC20AmountToApprove = async (
  */
 export const getUnsignedERC20ApproveTransaction = (
   ownerAddress: string,
-  tokenAmount: Amount,
+  tokenAddress: string,
+  tokenAmount: BigNumber,
   spenderAddress: string,
 ) => {
   if (ownerAddress === spenderAddress) {
@@ -54,11 +60,11 @@ export const getUnsignedERC20ApproveTransaction = (
   }
 
   const erc20Contract = ERC20__factory.createInterface();
-  const callData = erc20Contract.encodeFunctionData('approve', [spenderAddress, tokenAmount.amount]);
+  const callData = erc20Contract.encodeFunctionData('approve', [spenderAddress, tokenAmount]);
 
   return {
     data: callData,
-    to: tokenAmount.token.address,
+    to: tokenAddress,
     value: 0,
     from: ownerAddress,
   };
