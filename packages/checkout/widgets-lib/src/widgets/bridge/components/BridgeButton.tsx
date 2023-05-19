@@ -1,40 +1,37 @@
-import { Button, OptionKey } from '@biom3/react';
-import { Checkout, GetBalanceResult } from '@imtbl/checkout-sdk';
-import { Web3Provider, TransactionResponse } from '@ethersproject/providers';
-import { utils } from 'ethers';
+import { Button } from '@biom3/react';
+import { Checkout } from '@imtbl/checkout-sdk';
+import { TransactionResponse } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
-// TODO: fix circular dependency
-// eslint-disable-next-line import/no-cycle
-import { BridgeWidgetViews } from '../BridgeWidget';
+import { useContext } from 'react';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { BridgeContext } from '../context/BridgeContext';
+import { BridgeFormContext } from '../context/BridgeFormContext';
 
 interface BridgeButtonProps {
-  provider?: Web3Provider;
-  amount?: string;
-  balance?: GetBalanceResult;
-  fromNetwork?: OptionKey;
   updateTransactionResponse: (transactionResponse: TransactionResponse) => void;
-  updateView: (view: BridgeWidgetViews, err?: any) => void;
 }
 
 export function BridgeButton(props: BridgeButtonProps) {
   const {
-    provider,
-    amount,
-    balance,
-    fromNetwork,
     updateTransactionResponse,
-    updateView,
   } = props;
 
-  const isDisabled = (): boolean => {
-    if (!amount || !balance || !fromNetwork || Number.isNaN(Number(amount))) return true;
+  // const { bridgeState } = useContext(BridgeContext);
+  const { bridgeFormState: { bridgeFromAmount } } = useContext(BridgeFormContext);
+  console.log(bridgeFromAmount);
+  const { viewDispatch } = useContext(ViewContext);
+  const { bridgeState: { provider } } = useContext(BridgeContext);
 
-    const bnAmount = utils.parseUnits(amount, balance?.token.decimals);
-    if (bnAmount.lte(0)) return true;
-    if (bnAmount.gt(balance.balance)) return true;
+  // const isDisabled = (): boolean => {
+  //   if (!bridgeFromAmount || !balance || Number.isNaN(Number(bridgeFromAmount))) return true;
 
-    return false;
-  };
+  //   const bnAmount = utils.parseUnits(bridgeFromAmount, balance?.token.decimals);
+  //   if (bnAmount.lte(0)) return true;
+  //   if (bnAmount.gt(balance.balance)) return true;
+
+  //   return false;
+  // };
 
   const getUnsignedTransaction = () => ({
     // get the bridge transaction
@@ -65,17 +62,27 @@ export function BridgeButton(props: BridgeButtonProps) {
         transaction,
       });
       updateTransactionResponse(response.transactionResponse);
-      updateView(BridgeWidgetViews.SUCCESS);
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: BridgeWidgetViews.SUCCESS },
+        },
+      });
     } catch (err: any) {
-      updateView(BridgeWidgetViews.FAIL, err);
+      // TODO: fix this with fail view... always succeeed for now
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: BridgeWidgetViews.SUCCESS },
+        },
+      });
     }
   };
 
   return (
     <Button
       testId="bridge-button"
-      disabled={isDisabled()}
-      variant={isDisabled() ? 'tertiary' : 'primary'}
+      variant="primary"
       onClick={submitBridge}
     >
       Bridge

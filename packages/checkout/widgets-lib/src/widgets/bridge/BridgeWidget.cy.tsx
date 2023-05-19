@@ -15,7 +15,6 @@ import { cySmartGet } from '../../lib/testUtils';
 import {
   BridgeWidget,
   BridgeWidgetParams,
-  BridgeWidgetViews,
 } from './BridgeWidget';
 
 type CypressStub = Cypress.Agent<Sinon.SinonStub<any[], any>>;
@@ -596,9 +595,6 @@ describe('Bridge Widget tests', () => {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               transactionResponse: TransactionResponse,
             ) => {}}
-            // TODO: is this for mocking purposes?
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            updateView={(view: BridgeWidgetViews, err?: any) => {}}
           />
         </BiomeThemeProvider>,
       );
