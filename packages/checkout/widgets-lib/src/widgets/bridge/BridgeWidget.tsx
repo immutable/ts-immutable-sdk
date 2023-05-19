@@ -14,9 +14,10 @@ import {
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
-  useEffect, useMemo, useReducer,
+  useEffect, useMemo, useReducer, useState,
 } from 'react';
 import { Environment } from '@imtbl/config';
+import { TransactionResponse } from '@ethersproject/providers';
 import { L1Network, zkEVMNetwork } from '../../lib/networkUtils';
 import {
   BaseViews,
@@ -81,6 +82,10 @@ export function BridgeWidget(props: BridgeWidgetProps) {
 
   const defaultFromChainId = L1Network(environment);
   const toChainId = zkEVMNetwork(environment);
+
+  const [transactionResponse, setTransactionResponse] = useState<
+  TransactionResponse | undefined
+  >();
 
   /**
    * This effect is used to set up the BridgeWidget state for the first time.
@@ -242,11 +247,15 @@ export function BridgeWidget(props: BridgeWidgetProps) {
           <LoadingView loadingText="Loading" />
           )}
           {viewReducerValues.viewState.view.type === BridgeWidgetViews.BRIDGE && (
-          <Bridge amount={amount} fromContractAddress={fromContractAddress} />
+          <Bridge
+            amount={amount}
+            fromContractAddress={fromContractAddress}
+            setTransactionResponse={setTransactionResponse}
+          />
           )}
           {viewReducerValues.viewState.view.type === BridgeWidgetViews.SUCCESS && (
           <SuccessView
-            successText="Success"
+            successText={`Success, transaction hash: ${transactionResponse?.hash}`}
             actionText="Continue"
             onActionClick={sendBridgeWidgetCloseEvent}
           />

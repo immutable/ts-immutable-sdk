@@ -18,20 +18,23 @@ export function BridgeButton(props: BridgeButtonProps) {
   } = props;
 
   // const { bridgeState } = useContext(BridgeContext);
-  const { bridgeFormState: { bridgeFromAmount } } = useContext(BridgeFormContext);
-  console.log(bridgeFromAmount);
+  const { bridgeFormState: { bridgeFromAmount, bridgeFromToken } } = useContext(BridgeFormContext);
+
   const { viewDispatch } = useContext(ViewContext);
   const { bridgeState: { provider } } = useContext(BridgeContext);
 
-  // const isDisabled = (): boolean => {
-  //   if (!bridgeFromAmount || !balance || Number.isNaN(Number(bridgeFromAmount))) return true;
+  const isDisabled = (): boolean => {
+    if (!bridgeFromAmount || !bridgeFromToken) return true;
 
-  //   const bnAmount = utils.parseUnits(bridgeFromAmount, balance?.token.decimals);
-  //   if (bnAmount.lte(0)) return true;
-  //   if (bnAmount.gt(balance.balance)) return true;
+    return false;
+    // if (!bridgeFromAmount || !balance || Number.isNaN(Number(bridgeFromAmount))) return true;
 
-  //   return false;
-  // };
+    // const bnAmount = utils.parseUnits(bridgeFromAmount, balance?.token.decimals);
+    // if (bnAmount.lte(0)) return true;
+    // if (bnAmount.gt(balance.balance)) return true;
+
+    // return false;
+  };
 
   const getUnsignedTransaction = () => ({
     // get the bridge transaction
@@ -82,7 +85,8 @@ export function BridgeButton(props: BridgeButtonProps) {
   return (
     <Button
       testId="bridge-button"
-      variant="primary"
+      disabled={isDisabled()}
+      variant={isDisabled() ? 'tertiary' : 'primary'}
       onClick={submitBridge}
     >
       Bridge

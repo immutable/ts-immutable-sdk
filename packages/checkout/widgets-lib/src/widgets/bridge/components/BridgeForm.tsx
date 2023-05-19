@@ -41,13 +41,9 @@ export function BridgeForm(props: BridgeFormProps) {
       );
     }
     if (!defaultToken) {
-      console.log('calculate default token');
-      console.log(tokenBalances);
-      console.log(network);
       defaultToken = tokenBalances.find(
         (balance) => balance.token.symbol === network?.nativeCurrency.symbol,
       );
-      console.log(defaultToken);
     }
 
     setSelectedTokenOption(defaultToken?.token.symbol as OptionKey);
