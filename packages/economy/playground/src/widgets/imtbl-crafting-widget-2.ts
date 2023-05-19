@@ -84,16 +84,16 @@ export class CraftingWidget2 extends LitElement {
   constructor() {
     super();
     this.economy = Economy.build({
-      gameId: 'shardbound',
+      gameId: 'sb',
       userId: 'jimmy-test',
       walletAddress: '0x',
       imxProvider: undefined,
       baseConfig: {
-        environment: Environment.PRODUCTION,
+        environment: Environment.SANDBOX,
       },
-      overrides: {
-        servicesBaseURL: 'http://127.0.0.1:3031',
-      },
+      // overrides: {
+      //   servicesBaseURL: 'http://127.0.0.1:3031',
+      // },
     });
     this.loadInventory();
   }
@@ -103,7 +103,7 @@ export class CraftingWidget2 extends LitElement {
     requiresWeb3: false,
     input: {
       userId: 'jimmy-test',
-      gameId: 'shardbound',
+      gameId: 'sb',
       recipeId: HardcodedCardUpgradeRecipe.id,
       ingredients: [],
     },
@@ -153,7 +153,7 @@ export class CraftingWidget2 extends LitElement {
     console.log('loadInventory');
 
     this.inventoryItems = await this.economy.inventory.getItems({
-      userId: this.state.input.userId,
+      owner: this.state.input.userId,
       gameId: this.state.input.gameId,
     });
     this.requestUpdate();
