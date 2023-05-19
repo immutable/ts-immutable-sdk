@@ -29,11 +29,7 @@ export interface ImtblWalletProps
   > {
   providerPreference: string;
   useConnectWidget?: string;
-  isOnRampEnabled?: string;
-  isSwapEnabled?: string;
-  isBridgeEnabled?: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
 }
 
 /**

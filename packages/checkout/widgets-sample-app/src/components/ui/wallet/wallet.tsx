@@ -63,7 +63,6 @@ function WalletUI() {
       <WalletReact
         providerPreference={WidgetConnectionProviders.METAMASK}
         useConnectWidget={true}
-        isOnRampEnabled={false}
       />
     </div>
   );

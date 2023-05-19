@@ -7,7 +7,6 @@ import {
   GetNetworkParams,
 } from '@imtbl/checkout-sdk';
 import { useEffect, useReducer } from 'react';
-import { Environment } from '@imtbl/config';
 import {
   initialWalletState,
   TopUpFeature,
@@ -30,22 +29,27 @@ import {
 } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { Settings } from './views/Settings';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
-  theme: WidgetTheme;
-  environment: Environment;
+  widgetConfig: StrongCheckoutWidgetsConfig
 }
 
 export interface WalletWidgetParams {
   providerPreference?: ConnectionProviders;
-  topUpFeatures?: TopUpFeature;
 }
 
 export function WalletWidget(props: WalletWidgetProps) {
-  const { environment, params, theme } = props;
-  const { providerPreference, topUpFeatures } = params;
-  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const { params, widgetConfig } = props;
+  const { providerPreference } = params;
+  const topUpFeatures: TopUpFeature = {
+    isBridgeEnabled: widgetConfig.isBridgeEnabled,
+    isSwapEnabled: widgetConfig.isSwapEnabled,
+    isOnRampEnabled: widgetConfig.isOnRampEnabled,
+  };
+
+  const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
@@ -61,7 +65,7 @@ export function WalletWidget(props: WalletWidgetProps) {
     walletDispatch({
       payload: {
         type: WalletActions.SET_CHECKOUT,
-        checkout: new Checkout({ baseConfig: { environment } }),
+        checkout: new Checkout({ baseConfig: { environment: widgetConfig.environment } }),
       },
     });
 
@@ -71,7 +75,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         supportedTopUps: { ...topUpFeatures },
       },
     });
-  }, [topUpFeatures, environment]);
+  }, [topUpFeatures, widgetConfig.environment]);
 
   useEffect(() => {
     (async () => {
