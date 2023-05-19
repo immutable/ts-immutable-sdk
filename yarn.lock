@@ -2729,6 +2729,7 @@ __metadata:
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
     "@imtbl/cryptofiat": 0.0.0
+    "@imtbl/dex-sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0

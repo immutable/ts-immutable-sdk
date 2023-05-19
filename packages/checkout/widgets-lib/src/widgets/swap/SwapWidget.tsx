@@ -141,6 +141,7 @@ export function SwapWidget(props: SwapWidgetProps) {
             name: 'ImmutableX',
             symbol: 'IMX',
             decimals: 18,
+            address: '0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851',
           },
         }],
       },
