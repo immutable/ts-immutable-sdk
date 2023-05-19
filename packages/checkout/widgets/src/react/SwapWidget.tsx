@@ -4,7 +4,6 @@ import {
   DEFAULT_PROVIDER,
   WidgetConnectionProviders,
 } from '../definitions/constants';
-import { CheckoutWidgetsConfig } from '../definitions/config';
 
 /**
  * Interface representing the props for the Swap Widget component.
@@ -13,7 +12,7 @@ import { CheckoutWidgetsConfig } from '../definitions/config';
  * @property {string} amount - The amount of tokens to send.
  * @property {Network} toContractAddress - The contract address to swap tokens to.
  */
-export interface SwapReactProps extends CheckoutWidgetsConfig {
+export interface SwapReactProps {
   providerPreference: WidgetConnectionProviders;
   fromContractAddress?: string;
   amount?: string;

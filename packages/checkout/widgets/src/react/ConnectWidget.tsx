@@ -3,14 +3,13 @@ import {
   DEFAULT_PROVIDER,
   WidgetConnectionProviders,
 } from '../definitions/constants';
-import { CheckoutWidgetsConfig } from '../definitions/config';
 
 /**
  * Interface representing the props for the Connect Widget component.
  * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Connect Widget
  * (default: {@link WidgetConnectionProviders.METAMASK}).
  */
-export interface ConnectReactProps extends CheckoutWidgetsConfig {
+export interface ConnectReactProps {
   providerPreference?: WidgetConnectionProviders;
 }
 
