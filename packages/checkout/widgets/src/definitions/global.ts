@@ -12,8 +12,7 @@ export interface ImtblConnectProps
   HTMLElement
   > {
   providerPreference: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
 }
 
 /**
@@ -47,8 +46,7 @@ export interface ImtblSwapProps
   HTMLElement
   > {
   providerPreference: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
   useConnectWidget?: string;
   amount: string;
   fromContractAddress: string;
@@ -70,8 +68,7 @@ export interface ImtblBridgeProps
   HTMLElement
   > {
   providerPreference: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
   fromContractAddress: string;
   fromNetwork: string;
   amount: string;
@@ -90,8 +87,7 @@ export interface ImtblExampleProps
   HTMLElement
   > {
   providerPreference: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
 }
 
 /**
@@ -107,8 +103,7 @@ export interface ImtblBuyProps
   HTMLElement
   > {
   providerPreference: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
   orderId: string;
 }
 
@@ -124,8 +119,7 @@ export interface ImtblTransitionExampleProps
   HTMLElement
   > {
   providerPreference: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
 }
 
 /**
@@ -140,8 +134,7 @@ export interface ImtblInnerWidgetExampleProps
   HTMLElement
   > {
   providerPreference: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
 }
 
 /**
@@ -156,6 +149,5 @@ export interface ImtblOuterWidgetExampleProps
   HTMLElement
   > {
   providerPreference: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
 }

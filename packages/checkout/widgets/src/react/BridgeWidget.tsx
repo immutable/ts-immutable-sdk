@@ -4,8 +4,6 @@ import {
   Network,
   DEFAULT_PROVIDER,
 } from '../definitions/constants';
-import { CheckoutWidgetsConfig } from '../definitions/config';
-import { withDefaults } from '../lib/withDefaults';
 
 /**
  * Interface representing the props for the Bridge Widget component.
@@ -15,7 +13,7 @@ import { withDefaults } from '../lib/withDefaults';
  * @property {string} amount - The amount of tokens to send.
  * @property {Network} fromNetwork - The network to send tokens from.
  */
-export interface BridgeReactProps extends CheckoutWidgetsConfig {
+export interface BridgeReactProps {
   providerPreference: WidgetConnectionProviders;
   fromContractAddress?: string;
   amount?: string;
@@ -33,16 +31,13 @@ export function BridgeReact(props: BridgeReactProps): JSX.Element {
     fromContractAddress,
     amount,
     fromNetwork,
-    environment,
-    theme,
   } = props;
 
-  const config = withDefaults(window.ImtblCheckoutWidgetConfig);
+  const config = window.ImtblCheckoutWidgetConfig;
 
   return (
     <imtbl-bridge
-      environment={environment ?? config.environment}
-      theme={theme ?? config.theme}
+      widgetConfig={config}
       providerPreference={providerPreference ?? DEFAULT_PROVIDER}
       fromContractAddress={fromContractAddress ?? ''}
       fromNetwork={fromNetwork ?? ''}

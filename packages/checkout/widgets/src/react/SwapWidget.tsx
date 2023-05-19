@@ -5,7 +5,6 @@ import {
   WidgetConnectionProviders,
 } from '../definitions/constants';
 import { CheckoutWidgetsConfig } from '../definitions/config';
-import { withDefaults } from '../lib/withDefaults';
 
 /**
  * Interface representing the props for the Swap Widget component.
@@ -32,16 +31,13 @@ export function SwapReact(props: SwapReactProps): JSX.Element {
     fromContractAddress,
     amount,
     toContractAddress,
-    environment,
-    theme,
   } = props;
 
-  const config = withDefaults(window.ImtblCheckoutWidgetConfig);
+  const config = window.ImtblCheckoutWidgetConfig;
 
   return (
     <imtbl-swap
-      environment={environment ?? config.environment}
-      theme={theme ?? config.theme}
+      widgetConfig={config}
       providerPreference={providerPreference ?? DEFAULT_PROVIDER}
       fromContractAddress={fromContractAddress ?? ''}
       toContractAddress={toContractAddress ?? ''}

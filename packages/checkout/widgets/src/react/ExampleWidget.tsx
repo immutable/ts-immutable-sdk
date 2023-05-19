@@ -4,7 +4,6 @@ import {
   DEFAULT_PROVIDER,
 } from '../definitions/constants';
 import { CheckoutWidgetsConfig } from '../definitions/config';
-import { withDefaults } from '../lib/withDefaults';
 
 /**
  * Interface representing the props for the Example Widget component.
@@ -20,18 +19,14 @@ export interface ExampleReactProps extends CheckoutWidgetsConfig {
  */
 export function ExampleReact(props: ExampleReactProps) {
   const {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     providerPreference,
-    environment,
-    theme,
   } = props;
 
-  const config = withDefaults(window.ImtblCheckoutWidgetConfig);
+  const config = window.ImtblCheckoutWidgetConfig;
 
   return (
     <imtbl-example
-      environment={environment ?? config.environment}
-      theme={theme ?? config.theme}
+      widgetConfig={config}
       providerPreference={providerPreference ?? DEFAULT_PROVIDER}
     />
   );

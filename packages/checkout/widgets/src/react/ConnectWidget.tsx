@@ -4,7 +4,6 @@ import {
   WidgetConnectionProviders,
 } from '../definitions/constants';
 import { CheckoutWidgetsConfig } from '../definitions/config';
-import { withDefaults } from '../lib/withDefaults';
 
 /**
  * Interface representing the props for the Connect Widget component.
@@ -21,14 +20,13 @@ export interface ConnectReactProps extends CheckoutWidgetsConfig {
  * @returns {JSX.Element} - The rendered Connect Widget component.
  */
 export function ConnectReact(props: ConnectReactProps): JSX.Element {
-  const { providerPreference, environment, theme } = props;
+  const { providerPreference } = props;
 
-  const config = withDefaults(window.ImtblCheckoutWidgetConfig);
+  const config = window.ImtblCheckoutWidgetConfig;
 
   return (
     <imtbl-connect
-      environment={environment ?? config.environment}
-      theme={theme ?? config.theme}
+      widgetConfig={config}
       providerPreference={providerPreference ?? DEFAULT_PROVIDER}
     />
   );
