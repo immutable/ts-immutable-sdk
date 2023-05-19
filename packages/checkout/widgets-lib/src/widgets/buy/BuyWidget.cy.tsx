@@ -7,8 +7,16 @@ import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../lib/testUtils';
 import { BuyWidget, BuyWidgetParams } from './BuyWidget';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 
 describe('BuyWidget tests', () => {
+  const config: StrongCheckoutWidgetsConfig = {
+    environment: Environment.PRODUCTION,
+    theme: WidgetTheme.DARK,
+    isBridgeEnabled: true,
+    isSwapEnabled: true,
+    isOnRampEnabled: true,
+  };
   beforeEach(() => {
     cy.stub(Checkout.prototype, 'checkIsWalletConnected')
       .as('isConnectedStub')
@@ -49,9 +57,8 @@ describe('BuyWidget tests', () => {
 
     mount(
       <BuyWidget
-        environment={Environment.PRODUCTION}
+        widgetConfig={config}
         params={params}
-        theme={WidgetTheme.DARK}
       />,
     );
 

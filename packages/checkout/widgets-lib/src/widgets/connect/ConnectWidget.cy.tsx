@@ -9,8 +9,17 @@ import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../lib/testUtils';
 import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 
 describe('ConnectWidget tests', () => {
+  const config: StrongCheckoutWidgetsConfig = {
+    environment: Environment.PRODUCTION,
+    theme: WidgetTheme.DARK,
+    isBridgeEnabled: true,
+    isSwapEnabled: true,
+    isOnRampEnabled: true,
+  };
+
   /** mounting the connect widget should be done to start all tests */
   const mountConnectWidget = () => {
     const params = {
@@ -19,9 +28,8 @@ describe('ConnectWidget tests', () => {
 
     mount(
       <ConnectWidget
-        environment={Environment.PRODUCTION}
         params={params}
-        theme={WidgetTheme.DARK}
+        widgetConfig={config}
       />,
     );
   };

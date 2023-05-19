@@ -47,7 +47,7 @@ export class ImmutableDiExample extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <ExampleWidget params={params} theme={this.theme} />
+        <ExampleWidget params={params} theme={this.widgetConfig?.theme!} />
       </React.StrictMode>,
     );
   }

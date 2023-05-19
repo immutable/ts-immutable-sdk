@@ -1,7 +1,8 @@
 import React from 'react';
+import { Environment } from '@imtbl/config';
 import {
   WidgetConnectionProviders,
-  DEFAULT_PROVIDER,
+  DEFAULT_PROVIDER, WidgetTheme,
 } from '../definitions/constants';
 import { CheckoutWidgetsConfig } from '../definitions/config';
 
@@ -19,14 +20,16 @@ export interface ExampleReactProps extends CheckoutWidgetsConfig {
  */
 export function ExampleReact(props: ExampleReactProps) {
   const {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     providerPreference,
+    environment,
+    theme,
   } = props;
-
-  const config = window.ImtblCheckoutWidgetConfig;
 
   return (
     <imtbl-example
-      widgetConfig={config}
+      environment={environment ?? Environment.SANDBOX}
+      theme={theme ?? WidgetTheme.DARK}
       providerPreference={providerPreference ?? DEFAULT_PROVIDER}
     />
   );

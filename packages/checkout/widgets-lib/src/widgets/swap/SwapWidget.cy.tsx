@@ -8,6 +8,7 @@ import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../lib/testUtils';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 
 describe('SwapWidget tests', () => {
   beforeEach(() => {
@@ -102,11 +103,17 @@ describe('SwapWidget tests', () => {
     const params = {
       providerPreference: 'metamask',
     } as SwapWidgetParams;
+    const config: StrongCheckoutWidgetsConfig = {
+      environment: Environment.PRODUCTION,
+      theme: WidgetTheme.DARK,
+      isBridgeEnabled: true,
+      isSwapEnabled: true,
+      isOnRampEnabled: true,
+    };
     mount(
       <SwapWidget
-        environment={Environment.PRODUCTION}
         params={params}
-        theme={WidgetTheme.DARK}
+        widgetConfig={config}
       />,
     );
 
@@ -120,11 +127,17 @@ describe('SwapWidget tests', () => {
     const params = {
       providerPreference: 'metamask',
     } as SwapWidgetParams;
+    const config: StrongCheckoutWidgetsConfig = {
+      environment: Environment.PRODUCTION,
+      theme: WidgetTheme.DARK,
+      isBridgeEnabled: true,
+      isSwapEnabled: true,
+      isOnRampEnabled: true,
+    };
     mount(
       <SwapWidget
-        environment={Environment.PRODUCTION}
+        widgetConfig={config}
         params={params}
-        theme={WidgetTheme.DARK}
       />,
     );
 
