@@ -5,3 +5,4 @@ export * from './inventory-item';
 export * from './items-selection';
 export * from './recipe-selection';
 export * from './crafting-history';
+export * from './crafting-summary';
