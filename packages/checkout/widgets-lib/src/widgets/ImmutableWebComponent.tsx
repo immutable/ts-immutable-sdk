@@ -1,17 +1,9 @@
 import ReactDOM from 'react-dom/client';
 import { Web3Provider } from '@ethersproject/providers';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
-import { Environment } from '@imtbl/config';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
 
 export abstract class ImmutableWebComponent extends HTMLElement {
   reactRoot?: ReactDOM.Root;
-
-  // todo: remove after fixing all web components
-  theme = WidgetTheme.DARK;
-
-  // todo: remove after fixing all web components
-  environment = Environment.SANDBOX;
 
   widgetConfig?: StrongCheckoutWidgetsConfig;
 
@@ -37,7 +29,6 @@ export abstract class ImmutableWebComponent extends HTMLElement {
 
   connectedCallback() {
     const widgetConfig = this.getAttribute('widgetConfig') || undefined;
-    console.log('super connectedCallback, widgetsConfig str:', widgetConfig);
 
     this.widgetConfig = this.parseWidgetConfig(widgetConfig);
   }

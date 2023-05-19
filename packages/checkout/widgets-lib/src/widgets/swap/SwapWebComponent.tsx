@@ -1,7 +1,6 @@
 import React from 'react';
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { Environment } from '@imtbl/config';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import {
@@ -11,8 +10,6 @@ import {
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 
 export class ImmutableSwap extends ImmutableWebComponent {
-  environment = Environment.SANDBOX;
-
   providerPreference = ConnectionProviders.METAMASK;
 
   useConnectWidget?: boolean;
@@ -58,22 +55,19 @@ export class ImmutableSwap extends ImmutableWebComponent {
       <React.StrictMode>
         {this.useConnectWidget ? (
           <ConnectLoader
-            environment={this.environment}
-            theme={this.theme}
+            widgetConfig={this.widgetConfig!}
             params={connectLoaderParams}
             closeEvent={sendSwapWidgetCloseEvent}
           >
             <SwapWidget
               params={swapParams}
-              theme={this.theme}
-              environment={this.environment}
+              widgetConfig={this.widgetConfig!}
             />
           </ConnectLoader>
         ) : (
           <SwapWidget
             params={swapParams}
-            theme={this.theme}
-            environment={this.environment}
+            widgetConfig={this.widgetConfig!}
           />
         )}
       </React.StrictMode>,

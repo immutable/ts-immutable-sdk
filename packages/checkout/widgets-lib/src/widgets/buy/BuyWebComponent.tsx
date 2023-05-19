@@ -33,8 +33,7 @@ export class ImmutableBuy extends ImmutableWebComponent {
       <React.StrictMode>
         <BuyWidget
           params={params}
-          theme={this.theme}
-          environment={this.environment}
+          widgetConfig={this.widgetConfig!}
         />
       </React.StrictMode>,
     );

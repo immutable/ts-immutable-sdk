@@ -14,19 +14,8 @@ export class ImmutableWallet extends ImmutableWebComponent {
 
   useConnectWidget?: boolean;
 
-  // todo: test the change, then remove
-  // attributeChangedCallback(name, oldValue, newValue) {
-  //   if ((name !== 'providerPreference') && (name !== 'useConnectWidget')) {
-  //     super.attributeChangedCallback(name, oldValue, newValue);
-  //   } else {
-  //     this[name] = newValue;
-  //   }
-  //   this.renderWidget();
-  // }
-
   connectedCallback() {
     super.connectedCallback();
-    console.log('ImmutableWallet connectedCallback, widgetsConfig:', this.widgetConfig);
     this.providerPreference = this.getAttribute(
       'providerPreference',
     ) as ConnectionProviders;
