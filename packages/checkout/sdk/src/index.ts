@@ -5,6 +5,7 @@ export {
   TokenFilterTypes,
   WalletFilterTypes,
   NetworkFilterTypes,
+  DefaultProviders,
 } from './types';
 export type {
   CheckoutModuleConfiguration,

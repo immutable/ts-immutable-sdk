@@ -1,6 +1,8 @@
+import { Web3Provider } from '@ethersproject/providers';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
+import * as provider from './provider';
 import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
@@ -11,6 +13,8 @@ import {
   ConnectionProviders,
   ConnectParams,
   ConnectResult,
+  CreateProviderParams,
+  CreateProviderResult,
   GetAllBalancesParams,
   GetAllBalancesResult,
   GetBalanceParams,
@@ -23,16 +27,17 @@ import {
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   NetworkInfo,
+  Providers,
   SANDBOX_CONFIGURATION,
   SendTransactionParams,
   SendTransactionResult,
+  SetProviderParams,
+  SetProviderResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
 } from './types';
 import { CheckoutError, CheckoutErrorType } from './errors';
-import {
-  CheckoutConfiguration,
-} from './config';
+import { CheckoutConfiguration } from './config';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
@@ -41,6 +46,31 @@ export class Checkout {
 
   constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
+  }
+
+  public async createProvider(
+    params: CreateProviderParams,
+  ): Promise<CreateProviderResult> {
+    const web3Provider: Web3Provider = await provider.createProvider(
+      this.config,
+      params.providerName,
+    );
+    return {
+      web3Provider,
+      name: params.providerName,
+    };
+  }
+
+  public async setProvider(
+    params: SetProviderParams,
+  ): Promise<SetProviderResult> {
+    const providers: Providers = await provider.setProvider(
+      this.config,
+      params,
+    );
+    return {
+      providers,
+    };
   }
 
   /**
@@ -65,11 +95,11 @@ export class Checkout {
    */
   public async connect(params: ConnectParams): Promise<ConnectResult> {
     this.providerPreference = params.providerPreference;
-    const provider = await connect.connectWalletProvider(params);
-    const networkInfo = await network.getNetworkInfo(this.config, provider);
+    const web3Provider = await connect.connectWalletProvider(params);
+    const networkInfo = await network.getNetworkInfo(this.config, web3Provider);
 
     return {
-      provider,
+      provider: web3Provider,
       network: networkInfo,
     };
   }

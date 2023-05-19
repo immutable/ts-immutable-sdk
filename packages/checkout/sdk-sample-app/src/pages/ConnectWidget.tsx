@@ -9,6 +9,7 @@ import { Body, Divider, Heading, Toggle } from '@biom3/react';
 import GetBalance from '../components/GetBalance';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import Provider from '../components/Provider';
 
 export default function ConnectWidget() {
   const [environment, setEnvironment] = useState(Environment.PRODUCTION);
@@ -47,6 +48,20 @@ export default function ConnectWidget() {
       <Toggle
         checked={environment === Environment.PRODUCTION}
         onChange={toggleEnvironment}
+      />
+
+      <Divider
+        sx={{
+          marginTop: 'base.spacing.x6',
+          marginBottom: 'base.spacing.x2',
+        }}
+      >
+        Provider
+      </Divider>
+      <Provider
+        checkout={checkout}
+        setProvider={setProvider}
+        provider={provider}
       />
 
       <Divider
