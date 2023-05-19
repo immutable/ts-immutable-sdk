@@ -45,8 +45,7 @@ export class ImmutableWallet extends ImmutableWebComponent {
       <React.StrictMode>
         {this.useConnectWidget ? (
           <ConnectLoader
-            environment={this.widgetConfig!.environment}
-            theme={this.widgetConfig!.theme}
+            widgetConfig={this.widgetConfig!}
             params={connectLoaderParams}
             closeEvent={sendWalletWidgetCloseEvent}
           >

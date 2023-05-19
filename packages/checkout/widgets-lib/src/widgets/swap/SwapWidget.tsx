@@ -10,7 +10,6 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   useEffect, useCallback, useReducer, useMemo,
 } from 'react';
-import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { SwapCoins } from './views/SwapCoins';
 import { SuccessView } from '../../components/Success/SuccessView';
@@ -35,11 +34,11 @@ import {
   swapFormReducer,
 } from './context/swap-form-context/SwapFormContext';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
-  theme: WidgetTheme;
-  environment: Environment;
+  widgetConfig: StrongCheckoutWidgetsConfig
 }
 
 export interface SwapWidgetParams {
@@ -69,12 +68,12 @@ export function SwapWidget(props: SwapWidgetProps) {
     [swapFormState, swapFormDispatch],
   );
 
-  const { params, theme, environment } = props;
+  const { params, widgetConfig } = props;
   const {
     amount, fromContractAddress, toContractAddress, providerPreference,
   } = params;
 
-  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 
@@ -82,7 +81,7 @@ export function SwapWidget(props: SwapWidgetProps) {
     if (!providerPreference) return;
 
     const checkout = new Checkout({
-      baseConfig: { environment },
+      baseConfig: { environment: widgetConfig.environment },
     });
 
     swapDispatch({
@@ -162,7 +161,7 @@ export function SwapWidget(props: SwapWidgetProps) {
         view: { type: SwapWidgetViews.SWAP },
       },
     });
-  }, [providerPreference, environment]);
+  }, [providerPreference, widgetConfig.environment]);
 
   useEffect(() => {
     swapWidgetSetup();

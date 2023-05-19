@@ -24,6 +24,7 @@ import {
   sendBuyWidgetCloseEvent,
   sendBuyWidgetNotConnectedEvent,
 } from './BuyWidgetEvents';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 
 export enum BuyWidgetViews {
   BUY = 'BUY',
@@ -85,8 +86,7 @@ export type GetOrderResponse = {
 };
 export interface BuyWidgetProps {
   params: BuyWidgetParams;
-  theme: WidgetTheme;
-  environment: Environment;
+  widgetConfig: StrongCheckoutWidgetsConfig
 }
 
 export interface BuyWidgetParams {
@@ -197,13 +197,12 @@ export class Orderbook {
 }
 
 export function BuyWidget({
-  environment,
   params: { providerPreference, orderId },
-  theme,
+  widgetConfig,
 }: BuyWidgetProps) {
   const checkout = useMemo(
-    () => new Checkout({ baseConfig: { environment } }),
-    [environment],
+    () => new Checkout({ baseConfig: { environment: widgetConfig.environment } }),
+    [widgetConfig.environment],
   );
   const [provider, setProvider] = useState<Web3Provider>();
   const [orderbook, setOrderbook] = useState<Orderbook>();
@@ -211,7 +210,7 @@ export function BuyWidget({
   const [order, setOrder] = useState<GetOrderResponse>();
   const [asset, setAsset] = useState<GetAssetResponse>();
   const [view, setView] = useState(BuyWidgetViews.BUY);
-  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 

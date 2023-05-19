@@ -7,7 +7,6 @@ import {
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { useEffect, useReducer } from 'react';
-import { Environment } from '@imtbl/config';
 import {
   ConnectLoaderActions,
   ConnectLoaderContext,
@@ -19,13 +18,13 @@ import { LoadingView } from '../Loading/LoadingView';
 import { ConnectWidget } from '../../widgets/connect/ConnectWidget';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { ErrorView } from '../Error/ErrorView';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
   params: ConnectLoaderParams;
-  theme: WidgetTheme;
   closeEvent: () => void;
-  environment: Environment;
+  widgetConfig: StrongCheckoutWidgetsConfig;
 }
 
 export interface ConnectLoaderParams {
@@ -33,10 +32,9 @@ export interface ConnectLoaderParams {
 }
 
 export function ConnectLoader({
-  environment,
   children,
   params,
-  theme,
+  widgetConfig,
   closeEvent,
 }: ConnectLoaderProps) {
   const [connectLoaderState, connectLoaderDispatch] = useReducer(
@@ -46,7 +44,7 @@ export function ConnectLoader({
   const { connectionStatus } = connectLoaderState;
   const { providerPreference } = params;
 
-  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 
@@ -115,7 +113,7 @@ export function ConnectLoader({
     // TODO: Checkout interface expects 0 arguments but got 1
     const checkout = new Checkout({ baseConfig: { environment } });
     checkConnection(checkout);
-  }, [providerPreference, environment]);
+  }, [providerPreference, widgetConfig.environment]);
 
   return (
     <>
@@ -133,9 +131,8 @@ export function ConnectLoader({
           value={{ connectLoaderState, connectLoaderDispatch }}
         >
           <ConnectWidget
-            environment={environment}
+            widgetConfig={widgetConfig}
             params={params}
-            theme={theme}
             deepLink={ConnectWidgetViews.CONNECT_WALLET}
             sendCloseEventOverride={closeEvent}
           />

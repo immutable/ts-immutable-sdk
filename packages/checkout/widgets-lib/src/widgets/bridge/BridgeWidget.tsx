@@ -21,7 +21,6 @@ import {
   useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
 import { bridgeWidgetStyle } from './BridgeStyles';
 
 // TODO: Fix this import cycle
@@ -34,11 +33,11 @@ import {
 } from './BridgeWidgetEvents';
 import { EtherscanLink } from './components/EtherscanLink';
 import { L1Network, zkEVMNetwork } from '../../lib/networkUtils';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
-  theme: WidgetTheme;
-  environment: Environment;
+  widgetConfig: StrongCheckoutWidgetsConfig
 }
 
 export interface BridgeWidgetParams {
@@ -68,16 +67,15 @@ export const NetworkChainMap = {
 };
 
 export function BridgeWidget(props: BridgeWidgetProps) {
-  const { environment, params, theme } = props;
-  console.log(environment);
+  const { params, widgetConfig } = props;
   const checkout = useMemo(
-    () => new Checkout({ baseConfig: { environment } }),
-    [environment],
+    () => new Checkout({ baseConfig: { environment: widgetConfig.environment } }),
+    [widgetConfig.environment],
   );
   const {
     providerPreference, fromContractAddress, amount, fromNetwork,
   } = params;
-  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 
