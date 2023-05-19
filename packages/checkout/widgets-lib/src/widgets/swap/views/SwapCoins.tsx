@@ -55,9 +55,9 @@ export interface SwapFormProps {
   toContractAddress?: string;
 }
 export interface SwapCoinsProps {
-  amount: string | undefined;
-  fromContractAddress: string | undefined;
-  toContractAddress: string | undefined;
+  amount?: string;
+  fromContractAddress?: string;
+  toContractAddress?: string;
 }
 
 export function SwapCoins({
@@ -83,6 +83,7 @@ export function SwapCoins({
       data: '0x000', // Optional, but used for defining smart contract creation and interaction.
       chainId: 5, // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
     });
+
   return (
     <SimpleLayout
       header={(
@@ -93,6 +94,7 @@ export function SwapCoins({
         />
       )}
       footer={<FooterLogo />}
+      footerBackgroundColor="base.color.translucent.container.200"
     >
       <Box
         sx={{
@@ -102,7 +104,7 @@ export function SwapCoins({
           justifyContent: 'space-between',
         }}
       >
-        <Box sx={{ paddingX: 'base.spacing.x1' }}>
+        <Box sx={{ paddingX: 'base.spacing.x4' }}>
           <Heading
             size="small"
             weight="regular"

@@ -38,3 +38,18 @@ export function sendNetworkSwitchEvent(network: NetworkInfo) {
   console.log('switch network event:', walletWidgetSwitchNetworkEvent);
   if (window !== undefined) window.dispatchEvent(walletWidgetSwitchNetworkEvent);
 }
+
+export function sendDisconnectWalletEvent() {
+  const disconnectWalletEvent = new CustomEvent<WalletEvent<any>>(
+    IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+    {
+      detail: {
+        type: WalletEventType.DISCONNECT_WALLET,
+        data: {},
+      },
+    },
+  );
+  // eslint-disable-next-line no-console
+  console.log('disconnect wallet event:', disconnectWalletEvent);
+  if (window !== undefined) window.dispatchEvent(disconnectWalletEvent);
+}
