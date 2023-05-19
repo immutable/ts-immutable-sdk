@@ -19,16 +19,16 @@ export class CraftingWidget extends LitElement {
   constructor() {
     super();
     this.economy = Economy.build({
-      gameId: 'pokemon',
-      userId: 'pokemon_master',
+      gameId: 'sb',
+      userId: 'jimmy-test',
       walletAddress: '0x',
       imxProvider: undefined,
       baseConfig: {
-        environment: Environment.PRODUCTION,
+        environment: Environment.SANDBOX,
       },
-      overrides: {
-        servicesBaseURL: 'http://127.0.0.1:3031'
-      }
+      // overrides: {
+      //   servicesBaseURL: 'http://127.0.0.1:3031'
+      // }
     });
     this.getRecipe();
     this.getInventory();
@@ -38,8 +38,8 @@ export class CraftingWidget extends LitElement {
   private craftInput: CraftInput = {
     requiresWeb3: false,
     input: {
-      gameId: 'pokemon',
-      userId: 'pokemon_master',
+      gameId: 'sb',
+      userId: 'jimmy-test',
       recipeId: 'c1da5d0e-f506-4ae4-9d9d-00958be06d58',
       ingredients: [],
     },
@@ -158,7 +158,7 @@ export class CraftingWidget extends LitElement {
 
   async getInventory() {
     this.items = await this.economy.inventory.getItems({
-      userId: this.craftInput.input.userId,
+      owner: this.craftInput.input.userId,
       gameId: this.craftInput.input.gameId,
     });
 
@@ -194,12 +194,14 @@ export class CraftingWidget extends LitElement {
   }
 
   handleGameInput(event: InputEvent) {
-    this.gameId = (event.target as HTMLInputElement).value;
+    this.craftInput.input.gameId = (event.target as HTMLInputElement).value;
+    this.getInventory();
     this.requestUpdate();
   }
 
   handleUserInput(event: InputEvent) {
     this.craftInput.input.userId = (event.target as HTMLInputElement).value;
+    this.getInventory();
     this.requestUpdate();
   }
 
