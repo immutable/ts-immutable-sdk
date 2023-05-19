@@ -14,7 +14,7 @@ import {
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
-  useEffect, useMemo, useReducer, useState,
+  useEffect, useMemo, useReducer, useRef, useState,
 } from 'react';
 import { Environment } from '@imtbl/config';
 import { TransactionResponse } from '@ethersproject/providers';
@@ -23,13 +23,14 @@ import {
   BaseViews,
   ViewActions, ViewContext, initialViewState, viewReducer,
 } from '../../context/view-context/ViewContext';
-import { Bridge } from './views/Bridge';
 import {
   BridgeActions, BridgeContext, bridgeReducer, initialBridgeState,
 } from './context/BridgeContext';
 import { LoadingView } from '../../components/Loading/LoadingView';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
+import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { Bridge } from './views/Bridge';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -42,12 +43,6 @@ export interface BridgeWidgetParams {
   fromContractAddress?: string;
   amount?: string;
   fromNetwork?: Network;
-}
-
-export enum BridgeWidgetViews {
-  BRIDGE = 'BRIDGE',
-  SUCCESS = 'SUCCESS',
-  FAIL = 'FAIL',
 }
 
 // const bridgingNetworks = Object.values(Network);
@@ -66,6 +61,8 @@ export const NetworkChainMap = {
 export function BridgeWidget(props: BridgeWidgetProps) {
   const { environment, params, theme } = props;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+
+  const firstRender = useRef(true);
 
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
 
@@ -91,7 +88,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
    * This effect is used to set up the BridgeWidget state for the first time.
    * It includes connecting with a provider preference
    * Checking that the provider is connected to an available network and switching
-   * to the default specified network if not (if no default provided then Ethereum)
+   * to the default specified network
    * It then calculates the toNetwork for the bridge and it's associated native currency.
    *
    * NOTE: This effect should only run on the first render of the component to avoid switchNetwork errors
@@ -203,8 +200,10 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       });
     };
 
-    bridgetWidgetSetup();
-  }, [providerPreference, defaultFromChainId, toChainId]);
+    if (firstRender.current) {
+      bridgetWidgetSetup();
+    }
+  }, [providerPreference, defaultFromChainId, toChainId, firstRender.current]);
 
   /**
    * This effect is used to refresh all user balances when the network changes.
@@ -229,15 +228,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   //   };
   //   refreshBalances();
   // }, [checkout, provider]);
-
-  // const renderSuccess = () => (
-  //   <>
-  //     <Body testId="bridge-success">Success</Body>
-  //     <EtherscanLink hash={transactionResponse?.hash || ''} />
-  //   </>
-  // );
-
-  // const renderFailure = () => <Body testId="bridge-failure">Failure</Body>;
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>

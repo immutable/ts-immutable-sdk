@@ -8,6 +8,8 @@ import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeForm } from '../components/BridgeForm';
 import { BridgeButton } from '../components/BridgeButton';
+import { text } from '../../../resources/text/textConfig';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 
 export interface BridgeProps {
   amount: string | undefined;
@@ -18,6 +20,7 @@ export interface BridgeProps {
 export function Bridge({ amount, fromContractAddress, setTransactionResponse }: BridgeProps) {
   const { bridgeState } = useContext(BridgeContext);
   const { provider } = bridgeState;
+  const { header } = text.views[BridgeWidgetViews.BRIDGE];
 
   const updateTransactionResponse = (
     response: TransactionResponse,
@@ -29,7 +32,7 @@ export function Bridge({ amount, fromContractAddress, setTransactionResponse }: 
       header={(
         <HeaderNavigation
           showBack
-          title="Move coins"
+          title={header.title}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent()}
         />
       )}
