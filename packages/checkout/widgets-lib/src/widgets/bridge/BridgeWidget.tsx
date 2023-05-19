@@ -108,29 +108,37 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         },
       });
 
-      let connectResult = await checkout.connect({
+      const connectResult = await checkout.connect({
         providerPreference: providerPreference ?? ConnectionProviders.METAMASK,
       });
 
+      // The correct network check should be done by the ConnectionLoader
+
       // check that the user is on the correct network
-      let theProvider;
-      theProvider = connectResult.provider;
+      // let theProvider;
+      // theProvider = connectResult.provider;
 
-      const requireNetworkSwitch = defaultFromChainId !== connectResult.network.chainId;
+      // const requireNetworkSwitch = defaultFromChainId !== connectResult.network.chainId;
 
-      if (requireNetworkSwitch) {
-        const switchNetworkResponse = await checkout.switchNetwork({
-          provider: connectResult.provider,
-          chainId: defaultFromChainId,
-        });
-        connectResult = await checkout.connect({ providerPreference });
-        theProvider = switchNetworkResponse.provider;
-      }
+      // if (requireNetworkSwitch) {
+      //   let switchNetworkResponse: SwitchNetworkResult;
+      //   try {
+      //     switchNetworkResponse = await checkout.switchNetwork({
+      //       provider: connectResult.provider,
+      //       chainId: defaultFromChainId,
+      //     });
+      //     theProvider = switchNetworkResponse ? switchNetworkResponse.provider : null;
+      //   } catch {
+      //     console.log('cooked');
+      //   }
+
+      //   // connectResult = await checkout.connect({ providerPreference });
+      // }
 
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_PROVIDER,
-          provider: theProvider,
+          provider: connectResult.provider,
         },
       });
 

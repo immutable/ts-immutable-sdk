@@ -3,10 +3,8 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Network, WidgetTheme } from '@imtbl/checkout-widgets';
-import { Checkout, SwitchNetworkResult } from '@imtbl/checkout-sdk';
+import { Checkout } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
-import { BiomeCombinedProviders } from '@biom3/react';
-import { onDarkBase } from '@biom3/design-tokens';
 import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../lib/testUtils';
 import {
@@ -19,9 +17,6 @@ describe('Bridge Widget tests', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
-
-  let connectStub: any;
-  let switchNetworkStub: any;
 
   let connectStubReturnValue;
 
@@ -51,7 +46,7 @@ describe('Bridge Widget tests', () => {
       },
     };
 
-    connectStub = cy
+    cy
       .stub(Checkout.prototype, 'connect')
       .as('connectStub')
       .resolves(connectStubReturnValue);
@@ -85,7 +80,7 @@ describe('Bridge Widget tests', () => {
         ],
       });
 
-    switchNetworkStub = cy
+    cy
       .stub(Checkout.prototype, 'switchNetwork')
       .as('switchNetworkStub')
       .resolves(connectStubReturnValue);
@@ -236,241 +231,241 @@ describe('Bridge Widget tests', () => {
     });
   });
 
-  describe('switch network', () => {
-    it('should call switch network (to specified network) if provider is on the wrong network to start with', () => {
-      const connectStubReturnWrongNetwork = {
-        provider: {
-          getSigner: () => ({
-            getAddress: () => Promise.resolve('0xwalletAddress'),
-          }),
-          getNetwork: async () => ({
-            chainId: 250,
-            name: 'Fantom',
-          }),
-          provider: {
-            request: async () => null,
-          },
-        },
-        network: {
-          chainId: 250,
-          name: 'Fantom',
-          nativeCurrency: {
-            name: 'FTM',
-            symbol: 'FTM',
-            decimals: 18,
-          },
-        },
-      };
-      connectStub.resolves(connectStubReturnWrongNetwork);
+  // describe('switch network', () => {
+  //   it('should call switch network (to specified network) if provider is on the wrong network to start with', () => {
+  //     const connectStubReturnWrongNetwork = {
+  //       provider: {
+  //         getSigner: () => ({
+  //           getAddress: () => Promise.resolve('0xwalletAddress'),
+  //         }),
+  //         getNetwork: async () => ({
+  //           chainId: 250,
+  //           name: 'Fantom',
+  //         }),
+  //         provider: {
+  //           request: async () => null,
+  //         },
+  //       },
+  //       network: {
+  //         chainId: 250,
+  //         name: 'Fantom',
+  //         nativeCurrency: {
+  //           name: 'FTM',
+  //           symbol: 'FTM',
+  //           decimals: 18,
+  //         },
+  //       },
+  //     };
+  //     connectStub.resolves(connectStubReturnWrongNetwork);
 
-      switchNetworkStub.resolves({
-        network: {
-          chainId: 11155111,
-          name: 'Sepolia',
-          nativeCurrency: {
-            name: 'Sepolia',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-      } as SwitchNetworkResult);
+  //     switchNetworkStub.resolves({
+  //       network: {
+  //         chainId: 11155111,
+  //         name: 'Sepolia',
+  //         nativeCurrency: {
+  //           name: 'Sepolia',
+  //           symbol: 'ETH',
+  //           decimals: 18,
+  //         },
+  //       },
+  //     } as SwitchNetworkResult);
 
-      const params = {
-        providerPreference: 'metamask',
-      } as BridgeWidgetParams;
-      mount(
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget
-            environment={Environment.PRODUCTION}
-            params={params}
-            theme={WidgetTheme.DARK}
-          />
-        </BiomeCombinedProviders>,
-      );
+  //     const params = {
+  //       providerPreference: 'metamask',
+  //     } as BridgeWidgetParams;
+  //     mount(
+  //       <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+  //         <BridgeWidget
+  //           environment={Environment.PRODUCTION}
+  //           params={params}
+  //           theme={WidgetTheme.DARK}
+  //         />
+  //       </BiomeCombinedProviders>,
+  //     );
 
-      cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
-        provider: connectStubReturnWrongNetwork.provider,
-        chainId: 11155111,
-      });
-    });
+  //     cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
+  //       provider: connectStubReturnWrongNetwork.provider,
+  //       chainId: 11155111,
+  //     });
+  //   });
 
-    it('should call switch network (to default Ethereum) if provider is on the wrong network to start with', () => {
-      const connectStubReturnWrongNetwork = {
-        provider: {
-          getSigner: () => ({
-            getAddress: () => Promise.resolve('0xwalletAddress'),
-          }),
-          getNetwork: async () => ({
-            chainId: 250,
-            name: 'Fantom',
-          }),
-          provider: {
-            request: async () => null,
-          },
-        },
-        network: {
-          chainId: 250,
-          name: 'Fantom',
-          nativeCurrency: {
-            name: 'FTM',
-            symbol: 'FTM',
-            decimals: 18,
-          },
-        },
-      };
+  //   it('should call switch network (to default Ethereum) if provider is on the wrong network to start with', () => {
+  //     const connectStubReturnWrongNetwork = {
+  //       provider: {
+  //         getSigner: () => ({
+  //           getAddress: () => Promise.resolve('0xwalletAddress'),
+  //         }),
+  //         getNetwork: async () => ({
+  //           chainId: 250,
+  //           name: 'Fantom',
+  //         }),
+  //         provider: {
+  //           request: async () => null,
+  //         },
+  //       },
+  //       network: {
+  //         chainId: 250,
+  //         name: 'Fantom',
+  //         nativeCurrency: {
+  //           name: 'FTM',
+  //           symbol: 'FTM',
+  //           decimals: 18,
+  //         },
+  //       },
+  //     };
 
-      const connectStubCorrectNetwork = {
-        provider: {
-          getSigner: () => ({
-            getAddress: () => Promise.resolve('0xwalletAddress'),
-          }),
-          getNetwork: async () => ({
-            chainId: 1,
-            name: 'Ethereum',
-          }),
-          provider: {
-            request: async () => null,
-          },
-        },
-        network: {
-          chainId: 1,
-          name: 'Ethereum',
-          nativeCurrency: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-      };
+  //     const connectStubCorrectNetwork = {
+  //       provider: {
+  //         getSigner: () => ({
+  //           getAddress: () => Promise.resolve('0xwalletAddress'),
+  //         }),
+  //         getNetwork: async () => ({
+  //           chainId: 1,
+  //           name: 'Ethereum',
+  //         }),
+  //         provider: {
+  //           request: async () => null,
+  //         },
+  //       },
+  //       network: {
+  //         chainId: 1,
+  //         name: 'Ethereum',
+  //         nativeCurrency: {
+  //           name: 'Ethereum',
+  //           symbol: 'ETH',
+  //           decimals: 18,
+  //         },
+  //       },
+  //     };
 
-      connectStub
-        .onFirstCall()
-        .resolves(connectStubReturnWrongNetwork)
-        .onSecondCall()
-        .resolves(connectStubCorrectNetwork);
+  //     connectStub
+  //       .onFirstCall()
+  //       .resolves(connectStubReturnWrongNetwork)
+  //       .onSecondCall()
+  //       .resolves(connectStubCorrectNetwork);
 
-      switchNetworkStub.resolves({
-        network: {
-          chainId: 1,
-          name: 'Ethereum',
-          nativeCurrency: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-      } as SwitchNetworkResult);
+  //     switchNetworkStub.resolves({
+  //       network: {
+  //         chainId: 1,
+  //         name: 'Ethereum',
+  //         nativeCurrency: {
+  //           name: 'Ethereum',
+  //           symbol: 'ETH',
+  //           decimals: 18,
+  //         },
+  //       },
+  //     } as SwitchNetworkResult);
 
-      const params = {
-        providerPreference: 'metamask',
-      } as BridgeWidgetParams;
-      mount(
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget
-            environment={Environment.PRODUCTION}
-            params={params}
-            theme={WidgetTheme.DARK}
-          />
-        </BiomeCombinedProviders>,
-      );
+  //     const params = {
+  //       providerPreference: 'metamask',
+  //     } as BridgeWidgetParams;
+  //     mount(
+  //       <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+  //         <BridgeWidget
+  //           environment={Environment.PRODUCTION}
+  //           params={params}
+  //           theme={WidgetTheme.DARK}
+  //         />
+  //       </BiomeCombinedProviders>,
+  //     );
 
-      cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
-        provider: connectStubReturnWrongNetwork.provider,
-        chainId: 11155111,
-      });
+  //     cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
+  //       provider: connectStubReturnWrongNetwork.provider,
+  //       chainId: 11155111,
+  //     });
 
-      cySmartGet('@getAllBalancesStub').should('have.been.called');
-    });
+  //     cySmartGet('@getAllBalancesStub').should('have.been.called');
+  //   });
 
-    // eslint-disable-next-line max-len
-    it('should call switch network (to default Ethereum) if provider is on the whitelisted network to start with', () => {
-      const connectStubReturnWhitelistedNetwork = {
-        provider: {
-          getSigner: () => ({
-            getAddress: () => Promise.resolve('0xwalletAddress'),
-          }),
-          getNetwork: async () => ({
-            chainId: 13372,
-            name: 'Immutable zkEVM Testnet',
-          }),
-          provider: {
-            request: async () => null,
-          },
-        },
-        network: {
-          chainId: 13372,
-          name: 'Immutable zkEVM Testnet',
-          nativeCurrency: {
-            name: 'IMX',
-            symbol: 'IMX',
-            decimals: 18,
-          },
-        },
-      };
+  //   // eslint-disable-next-line max-len
+  //   it('should call switch network (to default Ethereum) if provider is on the whitelisted network to start with', () => {
+  //     const connectStubReturnWhitelistedNetwork = {
+  //       provider: {
+  //         getSigner: () => ({
+  //           getAddress: () => Promise.resolve('0xwalletAddress'),
+  //         }),
+  //         getNetwork: async () => ({
+  //           chainId: 13372,
+  //           name: 'Immutable zkEVM Testnet',
+  //         }),
+  //         provider: {
+  //           request: async () => null,
+  //         },
+  //       },
+  //       network: {
+  //         chainId: 13372,
+  //         name: 'Immutable zkEVM Testnet',
+  //         nativeCurrency: {
+  //           name: 'IMX',
+  //           symbol: 'IMX',
+  //           decimals: 18,
+  //         },
+  //       },
+  //     };
 
-      const connectStubCorrectNetwork = {
-        provider: {
-          getSigner: () => ({
-            getAddress: () => Promise.resolve('0xwalletAddress'),
-          }),
-          getNetwork: async () => ({
-            chainId: 1,
-            name: 'Ethereum',
-          }),
-          provider: {
-            request: async () => null,
-          },
-        },
-        network: {
-          chainId: 1,
-          name: 'Ethereum',
-          nativeCurrency: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-      };
+  //     const connectStubCorrectNetwork = {
+  //       provider: {
+  //         getSigner: () => ({
+  //           getAddress: () => Promise.resolve('0xwalletAddress'),
+  //         }),
+  //         getNetwork: async () => ({
+  //           chainId: 1,
+  //           name: 'Ethereum',
+  //         }),
+  //         provider: {
+  //           request: async () => null,
+  //         },
+  //       },
+  //       network: {
+  //         chainId: 1,
+  //         name: 'Ethereum',
+  //         nativeCurrency: {
+  //           name: 'Ethereum',
+  //           symbol: 'ETH',
+  //           decimals: 18,
+  //         },
+  //       },
+  //     };
 
-      connectStub
-        .onFirstCall()
-        .resolves(connectStubReturnWhitelistedNetwork)
-        .onSecondCall()
-        .resolves(connectStubCorrectNetwork);
+  //     connectStub
+  //       .onFirstCall()
+  //       .resolves(connectStubReturnWhitelistedNetwork)
+  //       .onSecondCall()
+  //       .resolves(connectStubCorrectNetwork);
 
-      switchNetworkStub.resolves({
-        network: {
-          chainId: 1,
-          name: 'Ethereum',
-          nativeCurrency: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-      } as SwitchNetworkResult);
+  //     switchNetworkStub.resolves({
+  //       network: {
+  //         chainId: 1,
+  //         name: 'Ethereum',
+  //         nativeCurrency: {
+  //           name: 'Ethereum',
+  //           symbol: 'ETH',
+  //           decimals: 18,
+  //         },
+  //       },
+  //     } as SwitchNetworkResult);
 
-      const params = {
-        providerPreference: 'metamask',
-      } as BridgeWidgetParams;
-      mount(
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget
-            environment={Environment.PRODUCTION}
-            params={params}
-            theme={WidgetTheme.DARK}
-          />
-        </BiomeCombinedProviders>,
-      );
+  //     const params = {
+  //       providerPreference: 'metamask',
+  //     } as BridgeWidgetParams;
+  //     mount(
+  //       <BiomeCombinedProviders theme={{ base: onDarkBase }}>
+  //         <BridgeWidget
+  //           environment={Environment.PRODUCTION}
+  //           params={params}
+  //           theme={WidgetTheme.DARK}
+  //         />
+  //       </BiomeCombinedProviders>,
+  //     );
 
-      cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
-        provider: connectStubReturnWhitelistedNetwork.provider,
-        chainId: 11155111,
-      });
+  //     cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
+  //       provider: connectStubReturnWhitelistedNetwork.provider,
+  //       chainId: 11155111,
+  //     });
 
-      cySmartGet('@getAllBalancesStub').should('have.been.called');
-    });
-  });
+  //     cySmartGet('@getAllBalancesStub').should('have.been.called');
+  //   });
+  // });
 
   describe('Bridge Widget button tests', () => {
 
