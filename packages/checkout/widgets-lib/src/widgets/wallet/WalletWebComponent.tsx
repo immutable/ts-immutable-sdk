@@ -27,8 +27,6 @@ export class ImmutableWallet extends ImmutableWebComponent {
   }
 
   renderWidget() {
-    console.log('ImmutableWallet renderWidget');
-
     const connectLoaderParams: ConnectLoaderParams = {
       providerPreference: this.providerPreference,
     };

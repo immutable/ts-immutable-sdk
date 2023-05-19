@@ -5,7 +5,6 @@ import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { Environment } from '@imtbl/config';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,

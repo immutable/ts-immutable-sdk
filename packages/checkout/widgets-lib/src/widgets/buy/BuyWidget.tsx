@@ -12,7 +12,6 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
-import { Environment } from '@imtbl/config';
 import { buyWidgetStyle } from './BuyStyles';
 // TODO: fix circular dependency
 // eslint-disable-next-line import/no-cycle
