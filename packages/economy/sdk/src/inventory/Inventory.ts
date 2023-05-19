@@ -10,11 +10,9 @@ export class Inventory {
 
   @withSDKError({ type: 'INVENTORY_GET_ITEMS_ERROR' })
   public async getItems(input: GetItemsInput) {
-    // TODO Add query params for pagination etc.
     const { data, status } = await this.inventoryService.getItems(input);
 
     if (status !== 200) {
-      // TODO Expose more useful error information.
       throw new Error('INVENTORY_GET_ITEMS_ERROR', { cause: { code: `${status}`, reason: 'unknown' } });
     }
 
