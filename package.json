@@ -32,7 +32,7 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
-    "@biom3/design-tokens": "0.1.4-beta"
+    "@biom3/design-tokens": "0.1.5-beta"
   },
   "scripts": {
     "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --stages build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
