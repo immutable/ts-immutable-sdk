@@ -37,7 +37,7 @@ export type EventAction = keyof typeof EventActions;
  */
 export type ErrorType =
   | 'CRAFTING_ERROR'
-  | 'INVENTORY_ERROR'
+  | 'INVENTORY_GET_ITEMS_ERROR'
   | 'RECIPE_ERROR'
   | 'ITEM_DEFINITION_ERROR'
   | 'UNKNOWN_ERROR';
