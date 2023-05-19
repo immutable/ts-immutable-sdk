@@ -194,12 +194,14 @@ export class CraftingWidget extends LitElement {
   }
 
   handleGameInput(event: InputEvent) {
-    this.gameId = (event.target as HTMLInputElement).value;
+    this.craftInput.input.gameId = (event.target as HTMLInputElement).value;
+    this.getInventory();
     this.requestUpdate();
   }
 
   handleUserInput(event: InputEvent) {
     this.craftInput.input.userId = (event.target as HTMLInputElement).value;
+    this.getInventory();
     this.requestUpdate();
   }
 
