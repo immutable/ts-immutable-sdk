@@ -219,7 +219,7 @@ describe('WalletWidget tests', () => {
         });
 
         cySmartGet('close-button').should('be.visible');
-        cySmartGet('heading').should('be.visible');
+        cySmartGet('network-heading').should('be.visible');
         cySmartGet('Ethereum-network-button').should(
           'include.text',
           'Ethereum',

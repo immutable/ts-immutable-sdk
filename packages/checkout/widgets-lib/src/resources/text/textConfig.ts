@@ -42,6 +42,10 @@ export const text = {
       networkStatus: {
         heading: 'Network',
       },
+      totalTokenBalance: {
+        heading: 'Coins',
+        totalHeading: 'Value',
+      },
       tokenBalancesList: {
         noTokensFound: 'No tokens found',
       },

@@ -1,5 +1,5 @@
 import {
-  Body, Box, Button, HorizontalMenu, Icon,
+  Body, Box, Button, HorizontalMenu,
 } from '@biom3/react';
 import {
   useCallback, useContext, useEffect, useState,
@@ -112,22 +112,9 @@ export function NetworkMenu() {
 
   return (
     <Box sx={networkMenuStyles}>
-      <Box sx={networkHeadingStyle}>
-        <Body testId="network-heading" size="medium">
-          {networkStatus.heading}
-        </Body>
-        <Icon
-          testId="coin-info-icon"
-          icon="InformationCircle"
-          sx={{ width: 'base.icon.size.100' }}
-          onClick={() => viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: { type: WalletWidgetViews.COIN_INFO },
-            },
-          })}
-        />
-      </Box>
+      <Body testId="network-heading" size="medium" sx={networkHeadingStyle}>
+        {networkStatus.heading}
+      </Body>
       <HorizontalMenu>
         {checkout
           && allowedNetworks
