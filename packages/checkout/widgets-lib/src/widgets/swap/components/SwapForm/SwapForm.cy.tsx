@@ -11,7 +11,6 @@ import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContex
 import { SwapState, initialSwapState } from '../../context/swap-context/SwapContext';
 import { SwapCoins } from '../../views/SwapCoins';
 import { SwapFormState, initialSwapFormState } from '../../context/swap-form-context/SwapFormContext';
-import { quotes } from '../../functions/FetchQuote';
 
 describe('SwapForm', () => {
   let testSwapState: SwapState;
@@ -292,7 +291,7 @@ describe('SwapForm', () => {
 
   describe('when to fetch a quote', () => {
     beforeEach(() => {
-      cy.stub(quotes, 'fetchMeAQuote').as('fetchQuoteStub');
+      // cy.stub(quotes, 'fetchMeAQuote').as('fetchQuoteStub');
     });
     it('should only fetch a quote when from token and to token are selected and swap amount has value', () => {
       mount(

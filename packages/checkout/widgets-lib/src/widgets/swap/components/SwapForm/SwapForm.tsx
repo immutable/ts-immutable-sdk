@@ -1,6 +1,11 @@
 import { useCallback, useContext, useEffect } from 'react';
 import { Box } from '@biom3/react';
 import {
+  Exchange, ExchangeConfiguration,
+} from '@imtbl/dex-sdk';
+import { ImmutableConfiguration, Environment } from '@imtbl/config';
+import { BigNumber, utils } from 'ethers';
+import {
   SwapFormActions,
   SwapFormContext,
 } from '../../context/swap-form-context/SwapFormContext';
@@ -12,7 +17,6 @@ import { CryptoFiatActions, CryptoFiatContext } from '../../../../context/crypto
 import { calculateCryptoToFiat } from '../../../../lib/utils';
 import { From } from './From';
 import { To } from './To';
-import { quotes } from '../../functions/FetchQuote';
 
 export function SwapForm() {
   const { swapState } = useContext(SwapContext);
@@ -21,8 +25,12 @@ export function SwapForm() {
     swapFromAmount, swapFromToken, swapToToken,
     blockFetchQuote,
   } = swapFormState;
-  const { allowedTokens } = swapState;
+  const { allowedTokens, provider } = swapState;
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  const exchange = new Exchange(new ExchangeConfiguration({
+    chainId: 1442,
+    baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
+  }));
 
   const unblockQuote = useCallback(() => {
     swapFormDispatch({
@@ -98,12 +106,28 @@ export function SwapForm() {
           loading: true,
         },
       });
-      // TODO: replace this function with function from WT-1331
-      // also rename the stub in SwapForm tests
 
-      quotes.fetchMeAQuote();
+      const func = async () => {
+        const address = await provider?.getSigner().getAddress();
+        console.log(swapFromToken);
+        const result = await exchange.getUnsignedSwapTxFromAmountIn(
+          address!,
+          swapFromToken.token.address || '',
+          swapToToken.address || '',
+          BigNumber.from(utils.parseUnits(swapFromAmount, swapFromToken.token.decimals)),
+        );
 
-      setTimeout(() => {
+        swapFormDispatch({
+          payload: {
+            type: SwapFormActions.SET_SWAP_TO_AMOUNT,
+            swapToAmount: utils.formatUnits(
+              result.info.quote.amount,
+              result.info.quote.token.decimals,
+            ),
+          },
+        });
+
+        console.log(result);
         swapFormDispatch({
           payload:
           {
@@ -111,7 +135,9 @@ export function SwapForm() {
             loading: false,
           },
         });
-      }, 1000);
+      };
+
+      func();
     }
 
     blockQuote();

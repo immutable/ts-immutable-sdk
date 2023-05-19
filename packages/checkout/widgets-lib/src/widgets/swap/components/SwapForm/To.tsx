@@ -22,11 +22,12 @@ export function To({ unblockQuote }: ToProps) {
   const { swapState } = useContext(SwapContext);
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
   const {
-    swapFromToken, swapToAmount, swapToTokenError, swapToAmountError,
+    loading, swapFromToken, swapToToken, swapFromAmount, swapToAmount, swapToTokenError, swapToAmountError,
   } = swapFormState;
   const { allowedTokens } = swapState;
   const { swapForm } = text.views[SwapWidgetViews.SWAP];
-  const fromToConversionText = '1 WETH ≈ 12.6 GOG'; // TODO: to calculate when dex integrated
+  const fromToConversionText = swapToAmount && swapFromAmount && swapFromToken && swapToToken
+  && `1 ${swapFromToken.token.symbol} ≈ ${Number(swapToAmount) / Number(swapFromAmount)} ${swapToToken.symbol}`; // TODO: to calculate when dex integrated
 
   const unblockQuoteOnSelectDebounce = useCallback(debounce(() => {
     unblockQuote();
@@ -114,7 +115,7 @@ export function To({ unblockQuote }: ToProps) {
       <Box sx={headingStyle}>
         <Heading size="xSmall">{swapForm.to.label}</Heading>
         <Body sx={toHeadingBodyStyle} size="small">
-          {fromToConversionText}
+          {!loading && fromToConversionText}
         </Body>
       </Box>
       <SelectInput
