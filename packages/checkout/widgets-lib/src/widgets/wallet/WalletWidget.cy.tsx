@@ -11,6 +11,8 @@ import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 import { cySmartGet } from '../../lib/testUtils';
+import { text } from '../../resources/text/textConfig';
+import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 
 describe('WalletWidget tests', () => {
   beforeEach(() => {
@@ -114,6 +116,17 @@ describe('WalletWidget tests', () => {
               decimals: 18,
             },
           },
+        });
+
+      cy.stub(Checkout.prototype, 'getNetworkAllowList')
+        .as('getNetworkAllowListStub')
+        .resolves({
+          networks: [
+            {
+              name: 'Ethereum',
+              chainId: 1,
+            },
+          ],
         });
 
       getAllBalancesStub = cy
@@ -335,8 +348,10 @@ describe('WalletWidget tests', () => {
           />,
         );
 
+        const { heading, body } = text.views[WalletWidgetViews.COIN_INFO];
         cySmartGet('coin-info-icon').click();
-        cySmartGet('coin-info').should('exists');
+        cy.get('body').contains(body);
+        cy.get('body').contains(heading);
         cySmartGet('back-button').should('be.visible');
       });
     });
