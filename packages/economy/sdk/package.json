@@ -43,7 +43,12 @@
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",
-    "typecheck": "tsc --noEmit --jsx preserve"
+    "typecheck": "tsc --noEmit --jsx preserve",
+    "generate:crafting": "make generate-crafting",
+    "generate:inventory": "make generate-inventory",
+    "generate:recipe": "make generate-recipe",
+    "generate:item-definition": "make generate-item-definition",
+    "generate:all": "make"
   },
   "type": "module",
   "types": "dist/index.d.ts"
