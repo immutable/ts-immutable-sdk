@@ -87,7 +87,8 @@ export interface ImtblExampleProps
   HTMLElement
   > {
   providerPreference: string;
-  widgetConfig?: string;
+  theme: string;
+  environment: string;
 }
 
 /**
@@ -119,7 +120,8 @@ export interface ImtblTransitionExampleProps
   HTMLElement
   > {
   providerPreference: string;
-  widgetConfig?: string;
+  theme: string;
+  environment: string;
 }
 
 /**
@@ -134,7 +136,8 @@ export interface ImtblInnerWidgetExampleProps
   HTMLElement
   > {
   providerPreference: string;
-  widgetConfig?: string;
+  theme: string;
+  environment: string;
 }
 
 /**
@@ -149,5 +152,6 @@ export interface ImtblOuterWidgetExampleProps
   HTMLElement
   > {
   providerPreference: string;
-  widgetConfig?: string;
+  theme: string;
+  environment: string;
 }

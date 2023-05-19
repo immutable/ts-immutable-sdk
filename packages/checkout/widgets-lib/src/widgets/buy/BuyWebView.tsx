@@ -5,11 +5,15 @@ import {
 import { Environment } from '@imtbl/config';
 
 function BuyWebView() {
+  const config = {
+    theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
+  };
+
   return (
     <imtbl-buy
       providerPreference={WidgetConnectionProviders.METAMASK}
-      theme={WidgetTheme.DARK}
-      environment={Environment.SANDBOX}
+      widgetConfig={JSON.stringify(config)}
       orderId="2345"
     />
   );

@@ -5,11 +5,15 @@ import {
 import { Environment } from '@imtbl/config';
 
 function WalletWebView() {
+  const config = {
+    theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
+  };
+
   return (
     <imtbl-wallet
       providerPreference={WidgetConnectionProviders.METAMASK}
-      theme={WidgetTheme.DARK}
-      environment={Environment.SANDBOX}
+      widgetConfig={JSON.stringify(config)}
     />
   );
 }
