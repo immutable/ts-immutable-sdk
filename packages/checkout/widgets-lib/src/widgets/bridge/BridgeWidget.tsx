@@ -17,8 +17,6 @@ import {
   useEffect, useMemo, useReducer,
 } from 'react';
 import { Environment } from '@imtbl/config';
-import { BigNumber } from 'ethers';
-
 import { L1Network, zkEVMNetwork } from '../../lib/networkUtils';
 import {
   BaseViews,
@@ -134,6 +132,13 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         },
       });
 
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_NETWORK,
+          network: connectResult.network,
+        },
+      });
+
       const allowedBridgingNetworks = await checkout.getNetworkAllowList({
         type: NetworkFilterTypes.ALL, // TODO: change to Bridge
       });
@@ -171,8 +176,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         .map((token) => token.address)
         .includes(balance.token.address));
 
-      allowedTokenBalances.entries();
-
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_ALLOWED_TOKENS,
@@ -180,26 +183,10 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         },
       });
 
-      // FIXME: stop hardcoing this, only doing becuase dev net is reset
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_TOKEN_BALANCES,
-          tokenBalances: [{
-            balance: BigNumber.from('1560000000000000000'),
-            formattedBalance: '1.56',
-            token: {
-              name: 'ImmutableX',
-              symbol: 'IMX',
-              decimals: 18,
-            },
-          }],
-        },
-      });
-
-      bridgeDispatch({
-        payload: {
-          type: BridgeActions.SET_NETWORK,
-          network: connectResult.network,
+          tokenBalances: allowedTokenBalances,
         },
       });
 
