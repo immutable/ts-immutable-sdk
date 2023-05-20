@@ -1,6 +1,9 @@
 import {
   CheckoutWidgetsConfig,
+  DEFAULT_BRIDGE_ENABLED,
   DEFAULT_ENV,
+  DEFAULT_ON_RAMP_ENABLED,
+  DEFAULT_SWAP_ENABLED,
   DEFAULT_THEME,
   WidgetTheme,
 } from '@imtbl/checkout-widgets/src';
@@ -19,7 +22,7 @@ export const withDefaultWidgetConfigs = (
 ): StrongCheckoutWidgetsConfig => ({
   theme: configs?.theme ?? DEFAULT_THEME,
   environment: configs?.environment ?? DEFAULT_ENV,
-  isOnRampEnabled: configs?.isOnRampEnabled ?? true,
-  isSwapEnabled: configs?.isSwapEnabled ?? true,
-  isBridgeEnabled: configs?.isBridgeEnabled ?? true,
+  isOnRampEnabled: configs?.isOnRampEnabled ?? DEFAULT_ON_RAMP_ENABLED,
+  isSwapEnabled: configs?.isSwapEnabled ?? DEFAULT_SWAP_ENABLED,
+  isBridgeEnabled: configs?.isBridgeEnabled ?? DEFAULT_BRIDGE_ENABLED,
 });

@@ -45,6 +45,21 @@ export const DEFAULT_THEME = WidgetTheme.DARK;
 export const DEFAULT_PROVIDER = ConnectionProviders.METAMASK;
 
 /**
+ * Checkout Widget default onramp enabled flag
+ */
+export const DEFAULT_ON_RAMP_ENABLED = true;
+
+/**
+ * Checkout Widget default swap enabled flag
+ */
+export const DEFAULT_SWAP_ENABLED = true;
+
+/**
+ * Checkout Widget default bridge enabled flag
+ */
+export const DEFAULT_BRIDGE_ENABLED = true;
+
+/**
  * Enum representing list of Checkout Widgets DOM tags.
  */
 export enum CheckoutWidgetTagNames {

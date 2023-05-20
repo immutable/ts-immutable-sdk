@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-// TODO: Fix circular dependency
-// eslint-disable-next-line import/no-cycle
 import {
   ImtblConnectProps,
   ImtblWalletProps,
@@ -37,3 +35,6 @@ declare global {
     setAttribute: Function;
   }
 }
+
+// Add an empty export statement to make this file a module
+export {};

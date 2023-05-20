@@ -16,5 +16,9 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "babel.config.js", "global.d.ts"]
+  "include": [
+    "src/**/*",
+    "babel.config.js",
+    "global.d.ts"
+  ]
 }
