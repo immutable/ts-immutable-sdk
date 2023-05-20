@@ -6,7 +6,7 @@ import {
   DEFAULT_SWAP_ENABLED,
   DEFAULT_THEME,
   WidgetTheme,
-} from '@imtbl/checkout-widgets/src';
+} from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
 
 export type StrongCheckoutWidgetsConfig = {
