@@ -19,6 +19,5 @@
   "include": [
     "src/**/*",
     "babel.config.js",
-    "global.d.ts"
   ]
 }
