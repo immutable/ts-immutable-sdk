@@ -1,9 +1,12 @@
+import { Environment } from '@imtbl/config';
 import {
+  DEFAULT_BRIDGE_ENABLED,
   DEFAULT_ENV,
+  DEFAULT_ON_RAMP_ENABLED,
+  DEFAULT_SWAP_ENABLED,
   DEFAULT_THEME,
   WidgetTheme,
 } from '@imtbl/checkout-widgets';
-import { Environment } from '@imtbl/config';
 import { withDefaultWidgetConfigs } from './withDefaultWidgetConfig';
 
 describe('withDefaultWidgetConfig', () => {
@@ -11,16 +14,16 @@ describe('withDefaultWidgetConfig', () => {
     expect(withDefaultWidgetConfigs({})).toEqual({
       theme: DEFAULT_THEME,
       environment: DEFAULT_ENV,
-      isOnRampEnabled: true,
-      isSwapEnabled: true,
-      isBridgeEnabled: true,
+      isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
+      isSwapEnabled: DEFAULT_SWAP_ENABLED,
+      isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
     });
     expect(withDefaultWidgetConfigs(undefined)).toEqual({
       theme: DEFAULT_THEME,
       environment: DEFAULT_ENV,
-      isOnRampEnabled: true,
-      isSwapEnabled: true,
-      isBridgeEnabled: true,
+      isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
+      isSwapEnabled: DEFAULT_SWAP_ENABLED,
+      isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
     });
   });
 
@@ -32,9 +35,9 @@ describe('withDefaultWidgetConfig', () => {
     ).toEqual({
       theme: DEFAULT_THEME,
       environment: Environment.PRODUCTION,
-      isOnRampEnabled: true,
-      isSwapEnabled: true,
-      isBridgeEnabled: true,
+      isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
+      isSwapEnabled: DEFAULT_SWAP_ENABLED,
+      isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
     });
     expect(
       withDefaultWidgetConfigs({
@@ -43,9 +46,9 @@ describe('withDefaultWidgetConfig', () => {
     ).toEqual({
       theme: WidgetTheme.CUSTOM,
       environment: DEFAULT_ENV,
-      isOnRampEnabled: true,
-      isSwapEnabled: true,
-      isBridgeEnabled: true,
+      isOnRampEnabled: DEFAULT_ON_RAMP_ENABLED,
+      isSwapEnabled: DEFAULT_SWAP_ENABLED,
+      isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
     });
     expect(
       withDefaultWidgetConfigs({
@@ -55,8 +58,8 @@ describe('withDefaultWidgetConfig', () => {
       theme: DEFAULT_THEME,
       environment: DEFAULT_ENV,
       isOnRampEnabled: false,
-      isSwapEnabled: true,
-      isBridgeEnabled: true,
+      isSwapEnabled: DEFAULT_SWAP_ENABLED,
+      isBridgeEnabled: DEFAULT_BRIDGE_ENABLED,
     });
   });
 });

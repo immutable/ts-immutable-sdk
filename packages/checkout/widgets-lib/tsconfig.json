@@ -18,5 +18,5 @@
     "noImplicitAny": false,
     "experimentalDecorators": true
   },
-  "include": ["src"]
+  "include": ["src", "babel.config.js"]
 }
