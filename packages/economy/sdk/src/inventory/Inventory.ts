@@ -1,8 +1,9 @@
+import { List } from 'linqts';
 import { Service } from 'typedi';
-import { RootApiGameIDItemsGetRequest } from '__codegen__/inventory';
-import { withSDKError } from '../Errors';
 
 import { StudioBE } from '../StudioBE';
+import { withSDKError } from '../Errors';
+import { InventoryItem, RootApiGameIDItemsGetRequest } from '../__codegen__/inventory';
 
 @Service()
 export class Inventory {
@@ -23,5 +24,12 @@ export class Inventory {
     const items = data.rows;
 
     return items;
+  }
+
+  public static filterItemsBy(
+    items: InventoryItem[],
+    predicate: (value?: InventoryItem, index?: number, list?: InventoryItem[]) => boolean,
+  ) {
+    return new List<InventoryItem>(items).Where(predicate).ToArray();
   }
 }
