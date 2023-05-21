@@ -11,7 +11,7 @@ export class Inventory {
   @withSDKError({ type: 'INVENTORY_GET_ITEMS_ERROR' })
   public async getItems(input: RootApiGameIDItemsGetRequest) {
     const { data, status } = await this.studioBE.inventoryApi.gameIDItemsGet(
-      input
+      input,
     );
 
     if (status !== 200) {

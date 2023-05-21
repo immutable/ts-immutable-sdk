@@ -25,13 +25,13 @@ const checkout = {
  * @internal Craft events
  */
 export type CraftEvent = EventType<
-  'CRAFT',
-  | EventData<'STARTED' | 'IN_PROGRESS'>
-  | EventData<'COMPLETED', { data: {} }>
-  | EventData<'FAILED', { error: { code: string; reason: string } }>
-  | EventData<
-      'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
-    >
+'CRAFT',
+| EventData<'STARTED' | 'IN_PROGRESS'>
+| EventData<'COMPLETED', { data: {} }>
+| EventData<'FAILED', { error: { code: string; reason: string } }>
+| EventData<
+'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
+>
 >;
 
 /** List of specific craft statuses */
@@ -41,7 +41,7 @@ export type CraftStatus = CraftEvent['status'];
 export class Crafting {
   constructor(
     private events: EventClient<CraftEvent>,
-    private studioBE: StudioBE
+    private studioBE: StudioBE,
   ) {}
 
   /**
@@ -72,7 +72,7 @@ export class Crafting {
     // 3. submit craft to BE
     this.events.emitEvent({ status: 'SUBMITTED', action: 'CRAFT' });
     const { data, status } = await this.studioBE.craftingApi.craftPost(
-      input.input
+      input.input,
     );
 
     if (status !== 200) {

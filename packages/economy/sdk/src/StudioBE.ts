@@ -21,7 +21,7 @@ export class StudioBE {
     this.inventoryApi = new InventoryApi(this.getConfig('/inventory/v1'));
     this.craftingApi = new CraftingApi(this.getConfig('/crafting/v1'));
     this.itemDefinitionApi = new ItemDefinitionApi(
-      this.getConfig('/item-definition/v1')
+      this.getConfig('/item-definition/v1'),
     );
   }
 
