@@ -77,79 +77,76 @@ export function SwapForm() {
     });
   }, [cryptoFiatState.conversions, swapFromAmount, swapFromToken]);
 
-  const fetchQuote = async (withLoading: boolean = true) => {
+  const fetchQuote = async () => {
+    if (blockFetchQuote) return;
     if (!provider) return;
     if (!exchange) return;
-    if (blockFetchQuote) return;
     if (Number.isNaN(parseFloat(swapFromAmount))) return;
     if (parseFloat(swapFromAmount) <= 0) return;
     if (!swapFromToken) return;
     if (!swapToToken) return;
 
+    loadingToggle(true);
+
+    try {
+      const result = await quotesProcessor.fromAmountIn(
+        exchange,
+        provider,
+        swapFromToken.token,
+        swapFromAmount,
+        swapToToken,
+      );
+
+      const gasFee = utils.formatUnits(
+        result.info.gasFeeEstimate?.amount || 0,
+        DEFAULT_IMX_DECIMALS,
+      );
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_QUOTE,
+          quote: result,
+          gasFeeValue: gasFee,
+          gasFeeFiatValue: calculateCryptoToFiat(
+            gasFee,
+            DEFAULT_IMX_DECIMALS.toString(),
+            cryptoFiatState.conversions,
+          ),
+        },
+      });
+
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_TO_AMOUNT,
+          swapToAmount: utils.formatUnits(
+            result.info.quote.amount,
+            result.info.quote.token.decimals,
+          ),
+        },
+      });
+    } catch (error: any) {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_QUOTE_ERROR,
+          quoteError: error.message,
+        },
+      });
+    }
+
     blockQuoteToggle(true);
-
-    if (withLoading) loadingToggle(true);
-
-    (async () => {
-      try {
-        const result = await quotesProcessor.fromAmountIn(
-          exchange,
-          provider,
-          swapFromToken.token,
-          swapFromAmount,
-          swapToToken,
-        );
-
-        const gasFee = utils.formatUnits(
-          result.info.gasFeeEstimate?.amount || 0,
-          DEFAULT_IMX_DECIMALS,
-        );
-        swapFormDispatch({
-          payload: {
-            type: SwapFormActions.SET_SWAP_QUOTE,
-            quote: result,
-            gasFeeValue: gasFee,
-            gasFeeFiatValue: calculateCryptoToFiat(
-              gasFee,
-              DEFAULT_IMX_DECIMALS.toString(),
-              cryptoFiatState.conversions,
-            ),
-          },
-        });
-
-        swapFormDispatch({
-          payload: {
-            type: SwapFormActions.SET_SWAP_TO_AMOUNT,
-            swapToAmount: utils.formatUnits(
-              result.info.quote.amount,
-              result.info.quote.token.decimals,
-            ),
-          },
-        });
-      } catch (error: any) {
-        swapFormDispatch({
-          payload: {
-            type: SwapFormActions.SET_SWAP_QUOTE_ERROR,
-            quoteError: error.message,
-          },
-        });
-      }
-
-      if (withLoading) loadingToggle(false);
-
-      blockQuoteToggle(false);
-    })();
+    loadingToggle(false);
   };
 
   // Listening to state changes in the useEffect will ensure the most updated values
   // are received from the SwapForm context state, then we can conditionally fetch a quote
-  useEffect(() => { fetchQuote(); }, [
+  useEffect(() => {
+    blockQuoteToggle(false);
+    fetchQuote();
+  }, [
     provider,
     exchange,
     swapFromAmount,
     swapFromToken,
     swapToToken,
-    blockFetchQuote,
   ]);
 
   return (

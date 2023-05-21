@@ -70,8 +70,10 @@ export const calculateCryptoToFiat = (
   return formatFiatString(parsedAmount * conversion);
 };
 
-export const formatZeroAmount = (amount: string) => {
-  if (!amount || amount === '0.00') return '-.--';
+export const formatZeroAmount = (amount: string, allowZeros: boolean = false) => {
+  const fallback = '-.--';
+  if (!amount) return fallback;
+  if (amount === '0.00' && !allowZeros) return fallback;
   return amount;
 };
 

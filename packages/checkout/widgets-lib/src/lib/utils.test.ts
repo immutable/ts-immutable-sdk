@@ -383,6 +383,13 @@ describe('utils', () => {
       expect(result).toBe('-.--');
     });
 
+    it('should return 0.00 if allow zero is true', () => {
+      let result = formatZeroAmount('0.00', true);
+      expect(result).toBe('0.00');
+      result = formatZeroAmount('', true);
+      expect(result).toBe('-.--');
+    });
+
     it('should return -.-- if amount 0.00', () => {
       const result = formatZeroAmount('0.00');
       expect(result).toBe('-.--');

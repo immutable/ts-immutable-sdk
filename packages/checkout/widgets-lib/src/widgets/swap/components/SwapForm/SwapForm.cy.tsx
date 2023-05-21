@@ -345,8 +345,6 @@ describe('SwapForm', () => {
       cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
 
-      cySmartGet('@fromAmountInStub').should('have.been.called');
-
       const params = [
         // exchange
         {},
@@ -415,7 +413,7 @@ describe('SwapForm', () => {
 
       const staticText = text.views[SwapWidgetViews.SWAP];
       cySmartGet('fee_description_gas').should('have.text', `${staticText.content.gasFeePrefix} 0.112300`);
-      cySmartGet('fee_description_gas_fiat').should('have.text', `${staticText.content.fiatPricePrefix} 0.00`);
+      cySmartGet('fee_description_gas_fiat').should('have.text', `${staticText.content.fiatPricePrefix} $0.00`);
     });
 
     it('should fetch a quote after from amount max button is clicked', () => {

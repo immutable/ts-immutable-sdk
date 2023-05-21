@@ -4,7 +4,7 @@ import { feeBoxStyles, feeContainerStyles } from './FeeStyles';
 import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapFormContext } from '../context/swap-form-context/SwapFormContext';
-import { tokenValueFormat } from '../../../lib/utils';
+import { formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
 
 export function Fees() {
   const staticText = text.views[SwapWidgetViews.SWAP];
@@ -35,7 +35,7 @@ export function Fees() {
         <Body testId="fee_description_gas" size="medium" weight="regular" sx={{ textAlign: 'right' }}>
           {staticText.content.gasFeePrefix}
           {' '}
-          {tokenValueFormat(gasFeeValue)}
+          {formatZeroAmount(tokenValueFormat(gasFeeValue))}
         </Body>
         <Body
           testId="fee_description_gas_fiat"
@@ -45,7 +45,8 @@ export function Fees() {
         >
           {staticText.content.fiatPricePrefix}
           {' '}
-          {gasFeeFiatValue}
+          $
+          {formatZeroAmount(gasFeeFiatValue, true)}
         </Body>
       </Box>
     </Box>

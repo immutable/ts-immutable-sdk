@@ -125,7 +125,7 @@ export function From({ unblockQuote }: FromProps) {
     handleFromAmountValidation(swapFromToken.formattedBalance);
   }, [swapFromToken]);
 
-  const handleAmountInputFoucs = useCallback(() => {
+  const handleAmountInputFocus = () => {
     // block fetching of quote when a user focuses the input
     // conversely stop blocking on blur or after debounce time
     swapFormDispatch({
@@ -134,9 +134,9 @@ export function From({ unblockQuote }: FromProps) {
         blockFetchQuote: true,
       },
     });
-  }, []);
+  };
 
-  const handleFromAmountChange = useCallback((value) => {
+  const handleFromAmountChange = (value) => {
     swapFormDispatch({
       payload: {
         type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
@@ -144,7 +144,7 @@ export function From({ unblockQuote }: FromProps) {
       },
     });
     unblockQuoteOnTextDebounce();
-  }, []);
+  };
 
   return (
     <Box>
@@ -161,7 +161,7 @@ export function From({ unblockQuote }: FromProps) {
         textInputSubtext={fromFiatPriceText}
         textInputTextAlign="right"
         textInputValidator={amountInputValidation}
-        onTextInputFocus={handleAmountInputFoucs}
+        onTextInputFocus={handleAmountInputFocus}
         onTextInputChange={(value) => handleFromAmountChange(value)}
         onTextInputBlur={(value) => handleFromAmountValidation(value)}
         textInputMaxButtonClick={handleFromMaxAmountButtonClick}

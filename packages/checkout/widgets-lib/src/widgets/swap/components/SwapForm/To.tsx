@@ -13,7 +13,7 @@ import { SelectOption } from '../../../../components/FormComponents/SelectForm/S
 import { SwapContext } from '../../context/swap-context/SwapContext';
 import { ValidateToAmount } from '../../functions/SwapValidator';
 import { SELECT_DEBOUNCE_TIME } from '../../constants';
-import { tokenValueFormat } from '../../../../lib/utils';
+import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
 
 export interface ToProps {
   unblockQuote: () => void;
@@ -38,7 +38,9 @@ const swapValuesToText = ({
 
   if (swapFromAmount && swapFromToken && swapToToken) {
     const conversionRatio = tokenValueFormat(Number(swapToAmount) / Number(swapFromAmount));
-    resp.fromToConversion = `1 ${swapFromToken.token.symbol} ≈ ${conversionRatio} ${swapToToken.symbol}`;
+    resp.fromToConversion = `1 ${swapFromToken.token.symbol} ≈ ${
+      formatZeroAmount(conversionRatio, true)
+    } ${swapToToken.symbol}`;
   }
 
   return resp;
@@ -50,7 +52,6 @@ export function To({ unblockQuote }: ToProps) {
 
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
   const {
-    loading,
     swapFromToken,
     swapToTokenError,
     swapToAmountError,
@@ -97,7 +98,7 @@ export function To({ unblockQuote }: ToProps) {
     [allowedTokens, swapFormDispatch, unblockQuoteOnSelectDebounce],
   );
 
-  const handleToAmountValidation = useCallback((value: string) => {
+  const handleToAmountValidation = (value: string) => {
     const validateToAmountError = ValidateToAmount(value);
     if (!validateToAmountError) return;
 
@@ -107,28 +108,28 @@ export function To({ unblockQuote }: ToProps) {
         swapToAmountError: validateToAmountError,
       },
     });
-  }, []);
+  };
 
-  const handleToAmountFocus = useCallback(() => {
+  const handleToAmountFocus = () => {
     // eslint-disable-next-line no-console
     console.log('Swap To Text Input Focused');
-  }, []);
+  };
 
-  const handleToAmountChange = useCallback((value: string) => {
+  const handleToAmountChange = (value: string) => {
     swapFormDispatch({
       payload: {
         type: SwapFormActions.SET_SWAP_TO_AMOUNT,
         swapToAmount: value,
       },
     });
-  }, []);
+  };
 
   return (
     <Box>
       <Box sx={headingStyle}>
         <Heading size="xSmall">{staticText.to.label}</Heading>
         <Body sx={toHeadingBodyStyle} size="small">
-          {!loading && swapValuesText.fromToConversion}
+          {swapValuesText.fromToConversion}
         </Body>
       </Box>
       <SelectInput
