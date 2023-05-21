@@ -116,6 +116,7 @@ export class Router {
         amountOut: amountOutWei,
         tokenOut: currencyOut,
         tradeType,
+        gasEstimate: bestQuoteForRoute.gasEstimate,
       },
     };
   }
@@ -133,6 +134,7 @@ export class Router {
       route: Route<Currency, Currency>;
       amountIn: CurrencyAmount<Currency>;
       amountOut: CurrencyAmount<Currency>;
+      gasEstimate: ethers.BigNumber
     }
     | undefined
     > {
@@ -158,6 +160,7 @@ export class Router {
         route: bestQuote.route,
         amountIn: amountSpecified,
         amountOut,
+        gasEstimate: bestQuote.gasEstimate,
       };
     }
 
@@ -172,6 +175,7 @@ export class Router {
         route: bestQuote.route,
         amountIn,
         amountOut: amountSpecified,
+        gasEstimate: bestQuote.gasEstimate,
       };
     }
   }

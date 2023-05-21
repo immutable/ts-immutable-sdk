@@ -3,14 +3,14 @@ import {
   AppCtx,
   appReducer,
   initialState,
-} from './context/app-context';
+} from './Context/app-context';
 import { BiomeThemeProvider, Heading } from '@biom3/react';
-import { ConnectButton } from './components/connect-button';
-import { DisconnectButton } from './components/disconnect-button';
-import { Environment } from 'ts-immutable-sdk';
-import { SignMessage } from './components/sign-message';
+import { ConnectButton } from './Components/connect-button';
+import { DisconnectButton } from './Components/disconnect-button';
+import { Environment } from '@imtbl/sdk';
+import { SignMessage } from './Components/sign-message';
 import { useEffect, useReducer } from 'react';
-import { WalletDisplay } from './components/wallet-display';
+import { WalletDisplay } from './Components/wallet-display';
 
 export const App = () => {
   const [state, dispatch] = useReducer(appReducer, initialState);

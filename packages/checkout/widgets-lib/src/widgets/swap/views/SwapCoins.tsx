@@ -55,9 +55,9 @@ export interface SwapFormProps {
   toContractAddress?: string;
 }
 export interface SwapCoinsProps {
-  amount: string | undefined;
-  fromContractAddress: string | undefined;
-  toContractAddress: string | undefined;
+  amount?: string;
+  fromContractAddress?: string;
+  toContractAddress?: string;
 }
 
 export function SwapCoins({
@@ -83,6 +83,7 @@ export function SwapCoins({
       data: '0x000', // Optional, but used for defining smart contract creation and interaction.
       chainId: 5, // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
     });
+
   return (
     <SimpleLayout
       header={(

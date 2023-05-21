@@ -46,6 +46,14 @@ export const text = {
         noTokensFound: 'No tokens found',
       },
     },
+    [WalletWidgetViews.SETTINGS]: {
+      header: {
+        title: 'Settings',
+      },
+      disconnectButton: {
+        label: 'Disconnect Wallet',
+      },
+    },
     [SwapWidgetViews.SWAP]: {
       header: {
         title: 'Swap coins',
@@ -68,6 +76,12 @@ export const text = {
       },
       fees: {
         title: 'Fees total',
+      },
+      validation: {
+        noAmountInputted: 'Please input amount',
+        insufficientBalance: 'Insufficient balance',
+        noFromTokenSelected: 'Select a coin to swap',
+        noToTokenSelected: 'Select a coin to receive',
       },
     },
   },

@@ -1,0 +1,272 @@
+{
+    "schemes": [],
+    "swagger": "2.0",
+    "info": {
+        "description": "Crafting API",
+        "title": "Crafting API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "",
+    "basePath": "/crafting/v1",
+    "paths": {
+        "/craft": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "root"
+                ],
+                "summary": "Execuate recipe from user inputs and create a craft",
+                "parameters": [
+                    {
+                        "description": "Recipe execution payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/craft.CreateCraftInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/craft.CreateCraftOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/craft.ValidationErrors"
+                        }
+                    }
+                }
+            }
+        },
+        "/crafts": {
+            "get": {
+                "description": "Get all crafts",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "root"
+                ],
+                "summary": "Get all crafts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Craft"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/crafts/:id": {
+            "get": {
+                "description": "Get the craft with the given ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "root"
+                ],
+                "summary": "Get the craft with the given ID",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Craft"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "craft.CreateCraftInput": {
+            "type": "object",
+            "required": [
+                "game_id",
+                "ingredients",
+                "recipe_id",
+                "user_id"
+            ],
+            "properties": {
+                "game_id": {
+                    "type": "string"
+                },
+                "ingredients": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/craft.Ingredient"
+                    }
+                },
+                "recipe_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "craft.CreateCraftOutput": {
+            "type": "object",
+            "properties": {
+                "game_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "recipe_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "craft.FieldError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "craft.Ingredient": {
+            "type": "object",
+            "required": [
+                "condition_id",
+                "item_id"
+            ],
+            "properties": {
+                "condition_id": {
+                    "type": "string"
+                },
+                "item_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "craft.ValidationErrors": {
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/craft.FieldError"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Craft": {
+            "type": "object",
+            "properties": {
+                "game_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "input_item_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "output_item_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "outputs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.CraftOutput"
+                    }
+                },
+                "recipe_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/domain.CraftStatus"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.CraftOutput": {
+            "type": "object",
+            "properties": {
+                "item_definition_id": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "owner": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.CraftStatus": {
+            "type": "string",
+            "enum": [
+                "created",
+                "assets_locking",
+                "assets_locked",
+                "delivering",
+                "delivered",
+                "completing",
+                "completed",
+                "cancelled"
+            ],
+            "x-enum-varnames": [
+                "CraftStatusCreated",
+                "CraftStatusAssetsLocking",
+                "CraftStatusAssetsLocked",
+                "CraftStatusDelivering",
+                "CraftStatusDelivered",
+                "CraftStatusCompleting",
+                "CraftStatusCompleted",
+                "CraftStatusCancelled"
+            ]
+        }
+    }
+}
