@@ -155,7 +155,7 @@ export class CraftingWidget2 extends LitElement {
     this.inventoryItems = await this.economy.inventory.getItems({
       owner: this.state.input.userId,
       gameId: this.state.input.gameId,
-    });
+    }) || [];
     this.requestUpdate();
   }
 

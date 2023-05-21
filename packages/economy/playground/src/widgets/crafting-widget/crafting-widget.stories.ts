@@ -6,11 +6,7 @@ const meta = {
 export default meta;
 
 const Template = () => html`
-  <crafting-widget
-    game-id="1"
-    user-id="1"
-    wallet-address="0x1234567890"
-  ></crafting-widget>
+  <crafting-widget game-id="" user-id="" wallet-address=""></crafting-widget>
 `;
 
 export const Widget: any = Template.bind({});

@@ -1,6 +1,11 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
+type ComponentEvent = {
+  type: 'userInfo';
+  userInfo: { userId: string; email: string; address: string };
+};
+
 @customElement('crafting-widget')
 export class CraftingWidget extends LitElement {
   @property({ type: String, attribute: 'game-id' })
@@ -18,9 +23,20 @@ export class CraftingWidget extends LitElement {
   @state()
   recipes: Array<unknown> = ['A', 'B', 'C'];
 
-  onConnectClick() {
-    this.inventory = [...this.inventory, 1, 2, 3, 5, 6, 7, 8, 9, 10];
+  onComponentEvent(event: CustomEvent) {
+    const detail = event.detail as ComponentEvent;
+    console.log('onComponentEvent', { detail });
+
+    if (detail.type === 'userInfo') {
+      this.setUserInfoOnConnect(event.detail.userInfo);
+    }
+  }
+
+  setUserInfoOnConnect(userInfo: ComponentEvent['userInfo']) {
+    this.walletAddress = userInfo.address;
+    this.userId = userInfo.userId;
     this.requestUpdate();
+    console.log('setUserInfoOnConnect', { userInfo });
   }
 
   render() {
@@ -97,18 +113,21 @@ export class CraftingWidget extends LitElement {
               <div class="flex-1 px-2 ml-2">
                 <input
                   type="text"
-                  placeholder="User Id"
+                  placeholder="Game Id"
                   class="input w-full max-w-xs ml-2"
+                  .value="${this.gameId}"
                 />
                 <input
                   type="text"
-                  placeholder="Game Id"
+                  placeholder="User Id"
                   class="input w-full max-w-xs ml-2"
+                  .value="${this.userId}"
                 />
                 <input
                   type="text"
                   placeholder="Wallet Address"
                   class="input w-full max-w-xs ml-2"
+                  .value="${this.walletAddress}"
                 />
                 <div class="w-full max-w-xs ml-2">
                   <recipe-selection
@@ -145,7 +164,9 @@ export class CraftingWidget extends LitElement {
                   <div class="flex justify-center bg-gray-400 w-full p-2">
                     <button class="btn btn-wide">Craft</button>
                   </div>
-                  <div class="flex flex-col w-full items-center">Summary</div>
+                  <div class="flex flex-col w-full items-center">
+                    <crafting-summary></crafting-summary>
+                  </div>
                 </div>
                 <!-- SUMMARY -->
               </div>
@@ -171,7 +192,22 @@ export class CraftingWidget extends LitElement {
       </div>
     `;
   }
+
   protected createRenderRoot(): Element | ShadowRoot {
     return this;
+  }
+
+  getCustomEventHandler<T extends Event>(listener: (event: T) => void) {
+    return (event: Event) => {
+      listener.call(this, event as T);
+    };
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    window.addEventListener(
+      'crafting-widget-event',
+      this.getCustomEventHandler(this.onComponentEvent)
+    );
   }
 }

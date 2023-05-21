@@ -1,19 +1,17 @@
 import { Service } from 'typedi';
 import { withSDKError } from '../Errors';
-
-import { RecipeService } from './RecipeService';
+import { StudioBE } from '../StudioBE';
 
 @Service()
 export class Recipe {
-  constructor(private recipeService: RecipeService) {
-  }
+  constructor(private studioBE: StudioBE) {}
 
   @withSDKError({ type: 'RECIPE_ERROR' })
-  public async getRecipes(input: { gameId: string; filters: string[] }) {
-    const { data, status } = await this.recipeService.getRecipes(
-      input.gameId,
-      input.filters,
-    );
+  public async getAll(input: { gameId: string; filters: string[] }) {
+    const { data, status } = await this.studioBE.recipeApi.recipesGet({
+      gameId: input.gameId,
+      filters: input.filters,
+    });
 
     if (status !== 200) {
       throw new Error('GET_RECIPES_ERROR');
@@ -22,8 +20,10 @@ export class Recipe {
   }
 
   @withSDKError({ type: 'RECIPE_ERROR' })
-  public async getRecipeById(id: string) {
-    const { data, status } = await this.recipeService.getRecipeById(id);
+  public async getById(id: string) {
+    const { data, status } = await this.studioBE.recipeApi.recipesIdGet({
+      id,
+    });
 
     if (status !== 200) {
       throw new Error('GET_RECIPE_BY_ID_ERROR');
