@@ -1,28 +1,17 @@
 /* eslint-disable no-console */
 import { Service } from 'typedi';
 
+import { RootApiCraftPostRequest as CraftApiInput } from '__codegen__/crafting';
 import type { EventData, EventType } from '../types';
 import { asyncFn } from '../utils';
 import { EventClient } from '../EventClient';
 import { withSDKError } from '../Errors';
+import { StudioBE } from '../StudioBE';
 
-import { CraftingService } from './CraftingService';
-
-// FIXME: Use generated types
-// FIXME: Update to include recipe payload from spec
-// https://api.dev.games.immutable.com/crafting/swagger/index.html#/
 export type CraftInput = {
   requiresWeb3: boolean;
   web3Assets?: any;
-  input: {
-    userId: string;
-    gameId: string;
-    recipeId: string;
-    ingredients: Array<{
-      conditionId: string;
-      itemId: string;
-    }>;
-  };
+  input: CraftApiInput;
 };
 
 // TODO: Use Checkout SDK
@@ -50,8 +39,10 @@ export type CraftStatus = CraftEvent['status'];
 
 @Service()
 export class Crafting {
-  constructor(private craftingService: CraftingService, private events: EventClient<CraftEvent>) {
-  }
+  constructor(
+    private events: EventClient<CraftEvent>,
+    private studioBE: StudioBE,
+  ) {}
 
   /**
    * Given inputs for a recipe crafting
@@ -63,13 +54,16 @@ export class Crafting {
   public async craft(input: CraftInput): Promise<CraftStatus> {
     // 1. validate inputs
     this.events.emitEvent({ status: 'STARTED', action: 'CRAFT' });
-    await this.validate();
+    // await this.validate();
 
     // 2. perform any web3 actions
     let txIds: number[] = [];
     let signature;
     if (input.requiresWeb3) {
-      this.events.emitEvent({ status: 'AWAITING_WEB3_INTERACTION', action: 'CRAFT' });
+      this.events.emitEvent({
+        status: 'AWAITING_WEB3_INTERACTION',
+        action: 'CRAFT',
+      });
       txIds = await checkout.transfer(input.input);
       signature = await checkout.sign();
     }
@@ -77,7 +71,9 @@ export class Crafting {
 
     // 3. submit craft to BE
     this.events.emitEvent({ status: 'SUBMITTED', action: 'CRAFT' });
-    const { data, status } = await this.craftingService.craft(input.input);
+    const { data, status } = await this.studioBE.craftingApi.craftPost(
+      input.input,
+    );
 
     if (status !== 200) {
       this.events.emitEvent({
@@ -97,12 +93,12 @@ export class Crafting {
   }
 
   /**
+   * TODO:
    * Validate a craft input
    * @param input
    * @returns
    */
-  public async validate() {
-    // TODO
-    return this.craftingService.validate();
-  }
+  // public async validate() {
+  //   return true;
+  // }
 }
