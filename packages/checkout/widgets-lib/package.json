@@ -62,7 +62,7 @@
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "start": "cp src/app.tsx src/index.tsx && PORT=3001 GENERATE_SOURCEMAP=false react-scripts start",
-    "test": "react-scripts test --passWithNoTests",
+    "test": "jest test --passWithNoTests",
     "test:cypress": "NODE_ENV=test cypress run --component --headless",
     "test:cypress:open": "NODE_ENV=test cypress open --component --browser electron"
   }
