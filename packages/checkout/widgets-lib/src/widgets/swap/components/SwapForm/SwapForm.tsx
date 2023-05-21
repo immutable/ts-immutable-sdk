@@ -17,6 +17,7 @@ import { CryptoFiatActions, CryptoFiatContext } from '../../../../context/crypto
 import { calculateCryptoToFiat } from '../../../../lib/utils';
 import { From } from './From';
 import { To } from './To';
+import { DEFAULT_IMX_DECIMALS } from '../../../../lib/constant';
 
 export function SwapForm() {
   const { swapState } = useContext(SwapContext);
@@ -109,25 +110,53 @@ export function SwapForm() {
 
       const func = async () => {
         const address = await provider?.getSigner().getAddress();
-        console.log(swapFromToken);
-        const result = await exchange.getUnsignedSwapTxFromAmountIn(
-          address!,
-          swapFromToken.token.address || '',
-          swapToToken.address || '',
-          BigNumber.from(utils.parseUnits(swapFromAmount, swapFromToken.token.decimals)),
-        );
+        if (!address) {
+          throw new Error('Wallet not connected');
+        }
 
-        swapFormDispatch({
-          payload: {
-            type: SwapFormActions.SET_SWAP_TO_AMOUNT,
-            swapToAmount: utils.formatUnits(
-              result.info.quote.amount,
-              result.info.quote.token.decimals,
-            ),
-          },
-        });
+        try {
+          const result = await exchange.getUnsignedSwapTxFromAmountIn(
+            address,
+            swapFromToken.token.address || '',
+            swapToToken.address || '',
+            BigNumber.from(utils.parseUnits(swapFromAmount, swapFromToken.token.decimals)),
+          );
 
-        console.log(result);
+          const gasFee = utils.formatUnits(
+            result.info.gasFeeEstimate?.amount || 0,
+            DEFAULT_IMX_DECIMALS,
+          );
+          swapFormDispatch({
+            payload: {
+              type: SwapFormActions.SET_SWAP_QUOTE,
+              quote: result,
+              gasFeeValue: gasFee,
+              gasFeeFiatValue: calculateCryptoToFiat(
+                gasFee,
+                DEFAULT_IMX_DECIMALS.toString(),
+                cryptoFiatState.conversions,
+              ),
+            },
+          });
+
+          swapFormDispatch({
+            payload: {
+              type: SwapFormActions.SET_SWAP_TO_AMOUNT,
+              swapToAmount: utils.formatUnits(
+                result.info.quote.amount,
+                result.info.quote.token.decimals,
+              ),
+            },
+          });
+        } catch (error: any) {
+          swapFormDispatch({
+            payload: {
+              type: SwapFormActions.SET_SWAP_QUOTE_ERROR,
+              quoteError: error.message,
+            },
+          });
+        }
+
         swapFormDispatch({
           payload:
           {

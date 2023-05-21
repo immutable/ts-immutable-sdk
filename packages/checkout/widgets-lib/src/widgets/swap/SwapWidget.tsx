@@ -130,7 +130,7 @@ export function SwapWidget(props: SwapWidgetProps) {
       },
     });
 
-    // FIXME: stop hardcoing this, only doing becuase dev net is reset
+    // FIXME: stop hardcoding this, only doing because dev net is reset
     swapDispatch({
       payload: {
         type: SwapActions.SET_TOKEN_BALANCES,
@@ -191,7 +191,7 @@ export function SwapWidget(props: SwapWidgetProps) {
             {viewState.view.type === SwapWidgetViews.SUCCESS && (
               <SuccessView
                 successText="Success"
-                actionText="Contine"
+                actionText="Continue"
                 // eslint-disable-next-line no-console
                 onActionClick={() => console.log('success')}
               />

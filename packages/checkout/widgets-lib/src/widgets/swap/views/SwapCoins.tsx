@@ -113,7 +113,7 @@ export function SwapCoins({
             {content.title}
           </Heading>
           <SwapForm />
-          <Fees fees="0.5" fiatPrice="0.123" tokenSymbol="imx" />
+          <Fees />
         </Box>
         <SwapButton transaction={getTransaction()} />
       </Box>

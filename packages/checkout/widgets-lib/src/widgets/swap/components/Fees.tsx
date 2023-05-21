@@ -1,20 +1,15 @@
 import { Body, Box, ButtCon } from '@biom3/react';
+import { useContext } from 'react';
 import { feeBoxStyles, feeContainerStyles } from './FeeStyles';
 import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
+import { SwapFormContext } from '../context/swap-form-context/SwapFormContext';
+import { tokenValueFormat } from '../../../lib/utils';
 
-export interface FeeProps {
-  fees: string;
-  tokenSymbol: string;
-  fiatPrice: string;
-}
+export function Fees() {
+  const staticText = text.views[SwapWidgetViews.SWAP];
 
-export function Fees(feeProps: FeeProps) {
-  const { fees, fiatPrice, tokenSymbol } = feeProps;
-  const {
-    fees: { title },
-    content,
-  } = text.views[SwapWidgetViews.SWAP];
+  const { swapFormState: { gasFeeValue, gasFeeFiatValue } } = useContext(SwapFormContext);
 
   return (
     <Box sx={feeContainerStyles}>
@@ -33,19 +28,23 @@ export function Fees(feeProps: FeeProps) {
           iconVariant="bold"
         />
         <Body size="medium" weight="regular">
-          {title}
+          {staticText.fees.title}
         </Body>
       </Box>
       <Box sx={feeBoxStyles}>
         <Body size="medium" weight="regular" sx={{ textAlign: 'right' }}>
-          {`≈ ${tokenSymbol.toUpperCase()} ${fees}`}
+          {staticText.content.gasFeePrefix}
+          {' '}
+          {tokenValueFormat(gasFeeValue)}
         </Body>
         <Body
-          size="xSmall"
+          size="small"
           weight="regular"
-          sx={{ color: 'base.color.text.secondary' }}
+          sx={{ color: 'base.color.text.secondary', textAlign: 'right' }}
         >
-          {`${content.fiatPricePrefix} ${fiatPrice}`}
+          {staticText.content.fiatPricePrefix}
+          {' '}
+          {gasFeeFiatValue}
         </Body>
       </Box>
     </Box>

@@ -6,6 +6,7 @@ import {
   formatFiatString,
   formatZeroAmount,
   sortTokensByAmount,
+  tokenValueFormat,
 } from './utils';
 
 describe('utils', () => {
@@ -386,5 +387,9 @@ describe('utils', () => {
       const result = formatZeroAmount('0.00');
       expect(result).toBe('-.--');
     });
+  });
+
+  describe('tokenValueFormat', () => {
+    expect(tokenValueFormat('11.2233445566')).toEqual('11.223344');
   });
 });

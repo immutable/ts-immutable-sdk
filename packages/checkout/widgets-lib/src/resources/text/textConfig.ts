@@ -61,6 +61,7 @@ export const text = {
       content: {
         title: 'What would you like to swap?',
         fiatPricePrefix: 'Approx USD',
+        gasFeePrefix: '≈ IMX',
         availableBalancePrefix: 'Available',
       },
       swapForm: {
