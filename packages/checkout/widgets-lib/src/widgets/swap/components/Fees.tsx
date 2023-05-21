@@ -32,12 +32,13 @@ export function Fees() {
         </Body>
       </Box>
       <Box sx={feeBoxStyles}>
-        <Body size="medium" weight="regular" sx={{ textAlign: 'right' }}>
+        <Body testId="fee_description_gas" size="medium" weight="regular" sx={{ textAlign: 'right' }}>
           {staticText.content.gasFeePrefix}
           {' '}
           {tokenValueFormat(gasFeeValue)}
         </Body>
         <Body
+          testId="fee_description_gas_fiat"
           size="small"
           weight="regular"
           sx={{ color: 'base.color.text.secondary', textAlign: 'right' }}

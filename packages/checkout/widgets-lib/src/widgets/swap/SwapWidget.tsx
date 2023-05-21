@@ -10,8 +10,9 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   useEffect, useCallback, useReducer, useMemo,
 } from 'react';
-import { Environment } from '@imtbl/config';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { BigNumber } from 'ethers';
+import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { SwapCoins } from './views/SwapCoins';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { LoadingView } from '../../components/Loading/LoadingView';
@@ -161,6 +162,18 @@ export function SwapWidget(props: SwapWidgetProps) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: { type: SwapWidgetViews.SWAP },
+      },
+    });
+
+    const exchange = new Exchange(new ExchangeConfiguration({
+      chainId: connectResult.network.chainId,
+      baseConfig: new ImmutableConfiguration({ environment }),
+    }));
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_EXCHANGE,
+        exchange,
       },
     });
   }, [providerPreference, environment]);

@@ -1,10 +1,6 @@
 import { useCallback, useContext, useEffect } from 'react';
 import { Box } from '@biom3/react';
-import {
-  Exchange, ExchangeConfiguration,
-} from '@imtbl/dex-sdk';
-import { ImmutableConfiguration, Environment } from '@imtbl/config';
-import { BigNumber, utils } from 'ethers';
+import { utils } from 'ethers';
 import {
   SwapFormActions,
   SwapFormContext,
@@ -18,164 +14,148 @@ import { calculateCryptoToFiat } from '../../../../lib/utils';
 import { From } from './From';
 import { To } from './To';
 import { DEFAULT_IMX_DECIMALS } from '../../../../lib/constant';
+import { quotesProcessor } from '../../functions/FetchQuote';
 
 export function SwapForm() {
-  const { swapState } = useContext(SwapContext);
-  const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
   const {
-    swapFromAmount, swapFromToken, swapToToken,
-    blockFetchQuote,
-  } = swapFormState;
-  const { allowedTokens, provider } = swapState;
-  const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
-  const exchange = new Exchange(new ExchangeConfiguration({
-    chainId: 1442,
-    baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
-  }));
+    swapState: {
+      allowedTokens,
+      provider,
+      exchange,
+    },
+  } = useContext(SwapContext);
 
-  const unblockQuote = useCallback(() => {
+  const {
+    swapFormState: {
+      swapFromAmount,
+      swapFromToken,
+      swapToToken,
+      blockFetchQuote,
+    }, swapFormDispatch,
+  } = useContext(SwapFormContext);
+
+  const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
+
+  const blockQuoteToggle = useCallback((value: boolean) => {
     swapFormDispatch({
       payload: {
         type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
-        blockFetchQuote: false,
+        blockFetchQuote: value,
       },
     });
   }, []);
 
-  const blockQuote = useCallback(() => {
+  const loadingToggle = useCallback((value: boolean) => {
     swapFormDispatch({
       payload: {
-        type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
-        blockFetchQuote: true,
+        type: SwapFormActions.SET_LOADING,
+        loading: value,
       },
     });
   }, []);
 
   useEffect(() => {
-    const tokenSymbols: string[] = [];
-    allowedTokens.forEach((token) => {
-      tokenSymbols.push(token.symbol);
-    });
-
     cryptoFiatDispatch({
       payload: {
         type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
-        tokenSymbols,
+        tokenSymbols: allowedTokens.map((token) => token.symbol),
       },
     });
   }, [cryptoFiatDispatch, allowedTokens]);
 
   useEffect(() => {
-    if (!swapFormState.swapFromAmount) {
-      swapFormDispatch({
-        payload: {
-          type: SwapFormActions.SET_SWAP_FROM_FIAT_VALUE,
-          swapFromFiatValue: '0.00',
-        },
-      });
-    }
+    if (!swapFromAmount || !swapFromToken) return;
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_SWAP_FROM_FIAT_VALUE,
+        swapFromFiatValue: calculateCryptoToFiat(
+          swapFromAmount,
+          swapFromToken.token.symbol,
+          cryptoFiatState.conversions,
+        ),
+      },
+    });
+  }, [cryptoFiatState.conversions, swapFromAmount, swapFromToken]);
 
-    if (swapFormState.swapFromAmount && swapFormState.swapFromToken) {
-      swapFormDispatch({
-        payload: {
-          type: SwapFormActions.SET_SWAP_FROM_FIAT_VALUE,
-          swapFromFiatValue: calculateCryptoToFiat(
-            swapFormState.swapFromAmount,
-            swapFormState.swapFromToken.token.symbol,
-            cryptoFiatState.conversions,
-          ),
-        },
-      });
-    }
-  }, [cryptoFiatState.conversions, swapFormState.swapFromAmount, swapFormState.swapFromToken]);
+  const fetchQuote = async (withLoading: boolean = true) => {
+    if (!provider) return;
+    if (!exchange) return;
+    if (blockFetchQuote) return;
+    if (Number.isNaN(parseFloat(swapFromAmount))) return;
+    if (parseFloat(swapFromAmount) <= 0) return;
+    if (!swapFromToken) return;
+    if (!swapToToken) return;
+
+    blockQuoteToggle(true);
+
+    if (withLoading) loadingToggle(true);
+
+    (async () => {
+      try {
+        const result = await quotesProcessor.fromAmountIn(
+          exchange,
+          provider,
+          swapFromToken.token,
+          swapFromAmount,
+          swapToToken,
+        );
+
+        const gasFee = utils.formatUnits(
+          result.info.gasFeeEstimate?.amount || 0,
+          DEFAULT_IMX_DECIMALS,
+        );
+        swapFormDispatch({
+          payload: {
+            type: SwapFormActions.SET_SWAP_QUOTE,
+            quote: result,
+            gasFeeValue: gasFee,
+            gasFeeFiatValue: calculateCryptoToFiat(
+              gasFee,
+              DEFAULT_IMX_DECIMALS.toString(),
+              cryptoFiatState.conversions,
+            ),
+          },
+        });
+
+        swapFormDispatch({
+          payload: {
+            type: SwapFormActions.SET_SWAP_TO_AMOUNT,
+            swapToAmount: utils.formatUnits(
+              result.info.quote.amount,
+              result.info.quote.token.decimals,
+            ),
+          },
+        });
+      } catch (error: any) {
+        swapFormDispatch({
+          payload: {
+            type: SwapFormActions.SET_SWAP_QUOTE_ERROR,
+            quoteError: error.message,
+          },
+        });
+      }
+
+      if (withLoading) loadingToggle(false);
+
+      blockQuoteToggle(false);
+    })();
+  };
 
   // Listening to state changes in the useEffect will ensure the most updated values
   // are received from the SwapForm context state, then we can conditionally fetch a quote
-  useEffect(() => {
-    // Fetch the quote from the DEX when the following conditions are met
-    if (!Number.isNaN(parseFloat(swapFromAmount))
-      && parseFloat(swapFromAmount) > 0
-      && swapFromToken
-      && swapToToken
-      && !blockFetchQuote
-    ) {
-      // TODO: this section will need to be updated with WT-1331
-      swapFormDispatch({
-        payload:
-        {
-          type: SwapFormActions.SET_LOADING,
-          loading: true,
-        },
-      });
-
-      const func = async () => {
-        const address = await provider?.getSigner().getAddress();
-        if (!address) {
-          throw new Error('Wallet not connected');
-        }
-
-        try {
-          const result = await exchange.getUnsignedSwapTxFromAmountIn(
-            address,
-            swapFromToken.token.address || '',
-            swapToToken.address || '',
-            BigNumber.from(utils.parseUnits(swapFromAmount, swapFromToken.token.decimals)),
-          );
-
-          const gasFee = utils.formatUnits(
-            result.info.gasFeeEstimate?.amount || 0,
-            DEFAULT_IMX_DECIMALS,
-          );
-          swapFormDispatch({
-            payload: {
-              type: SwapFormActions.SET_SWAP_QUOTE,
-              quote: result,
-              gasFeeValue: gasFee,
-              gasFeeFiatValue: calculateCryptoToFiat(
-                gasFee,
-                DEFAULT_IMX_DECIMALS.toString(),
-                cryptoFiatState.conversions,
-              ),
-            },
-          });
-
-          swapFormDispatch({
-            payload: {
-              type: SwapFormActions.SET_SWAP_TO_AMOUNT,
-              swapToAmount: utils.formatUnits(
-                result.info.quote.amount,
-                result.info.quote.token.decimals,
-              ),
-            },
-          });
-        } catch (error: any) {
-          swapFormDispatch({
-            payload: {
-              type: SwapFormActions.SET_SWAP_QUOTE_ERROR,
-              quoteError: error.message,
-            },
-          });
-        }
-
-        swapFormDispatch({
-          payload:
-          {
-            type: SwapFormActions.SET_LOADING,
-            loading: false,
-          },
-        });
-      };
-
-      func();
-    }
-
-    blockQuote();
-  }, [swapFromAmount, swapFromToken, swapToToken, blockFetchQuote, blockQuote]);
+  useEffect(() => { fetchQuote(); }, [
+    provider,
+    exchange,
+    swapFromAmount,
+    swapFromToken,
+    swapToToken,
+    blockFetchQuote,
+  ]);
 
   return (
     <Box sx={swapFormContainerStyle}>
-      <From unblockQuote={unblockQuote} />
-      <To unblockQuote={unblockQuote} />
+      <From unblockQuote={() => blockQuoteToggle(false)} />
+      <To unblockQuote={() => blockQuoteToggle(false)} />
     </Box>
   );
 }

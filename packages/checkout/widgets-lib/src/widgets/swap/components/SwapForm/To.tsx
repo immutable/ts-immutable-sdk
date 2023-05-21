@@ -28,17 +28,20 @@ const swapValuesToText = ({
   fromToConversion: string,
   swapToAmount: string,
 } => {
-  if (!(swapToAmount && swapFromAmount && swapFromToken && swapToToken)) {
-    return {
-      fromToConversion: '',
-      swapToAmount: '',
-    };
-  }
-  const conversionRatio = tokenValueFormat(Number(swapToAmount) / Number(swapFromAmount));
-  return {
-    fromToConversion: `1 ${swapFromToken.token.symbol} ≈ ${conversionRatio} ${swapToToken.symbol}`,
-    swapToAmount: tokenValueFormat(swapToAmount),
+  const resp = {
+    fromToConversion: '',
+    swapToAmount: '',
   };
+
+  if (!swapToAmount) return resp;
+  resp.swapToAmount = tokenValueFormat(swapToAmount);
+
+  if (swapFromAmount && swapFromToken && swapToToken) {
+    const conversionRatio = tokenValueFormat(Number(swapToAmount) / Number(swapFromAmount));
+    resp.fromToConversion = `1 ${swapFromToken.token.symbol} ≈ ${conversionRatio} ${swapToToken.symbol}`;
+  }
+
+  return resp;
 };
 
 export function To({ unblockQuote }: ToProps) {
@@ -68,7 +71,7 @@ export function To({ unblockQuote }: ToProps) {
       (token) => ({
         id: `${token.symbol}-${token.name}`,
         label: token.symbol,
-        icon: token.icon,
+        icon: undefined, // todo: add correct image once available on token info
       } as SelectOption),
     ),
     [allowedTokens, swapFromToken],
@@ -136,8 +139,8 @@ export function To({ unblockQuote }: ToProps) {
         textInputTextAlign="right"
         textInputValidator={amountInputValidation}
         onTextInputFocus={handleToAmountFocus}
-        onTextInputChange={handleToAmountChange}
-        onTextInputBlur={handleToAmountValidation}
+        onTextInputChange={(value) => handleToAmountChange(value)}
+        onTextInputBlur={(value) => handleToAmountValidation(value)}
         onSelectChange={handleToTokenChange}
         textInputErrorMessage={swapToAmountError}
         selectErrorMessage={swapToTokenError}

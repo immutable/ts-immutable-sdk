@@ -3,7 +3,7 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { WidgetTheme } from '@imtbl/checkout-widgets';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../lib/testUtils';
@@ -23,7 +23,7 @@ describe('SwapWidget tests', () => {
             getAddress: () => Promise.resolve('dss'),
           }),
           getNetwork: async () => ({
-            chainId: 1,
+            chainId: ChainId.POLYGON_ZKEVM_TESTNET,
             name: 'Ethereum',
           }),
           provider: {
@@ -31,7 +31,7 @@ describe('SwapWidget tests', () => {
           },
         },
         network: {
-          chainId: 1,
+          chainId: ChainId.POLYGON_ZKEVM_TESTNET,
           name: 'Ethereum',
           nativeCurrency: {
             name: 'ETH',
@@ -104,7 +104,7 @@ describe('SwapWidget tests', () => {
     } as SwapWidgetParams;
     mount(
       <SwapWidget
-        environment={Environment.PRODUCTION}
+        environment={Environment.SANDBOX}
         params={params}
         theme={WidgetTheme.DARK}
       />,
@@ -122,7 +122,7 @@ describe('SwapWidget tests', () => {
     } as SwapWidgetParams;
     mount(
       <SwapWidget
-        environment={Environment.PRODUCTION}
+        environment={Environment.SANDBOX}
         params={params}
         theme={WidgetTheme.DARK}
       />,

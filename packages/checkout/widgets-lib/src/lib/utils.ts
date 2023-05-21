@@ -77,5 +77,9 @@ export const formatZeroAmount = (amount: string) => {
 
 export const tokenValueFormat = (s: Number | string): string => {
   const asString = s.toString();
-  return asString.substring(0, asString.indexOf('.') + DEFAULT_TOKEN_DECIMALS + 1);
+
+  const pointIndex = asString.indexOf('.');
+  if (pointIndex === -1) return asString;
+
+  return asString.substring(0, pointIndex + DEFAULT_TOKEN_DECIMALS + 1);
 };
