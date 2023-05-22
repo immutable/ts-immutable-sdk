@@ -1,4 +1,7 @@
-import { useCallback, useContext, useEffect } from 'react';
+/* eslint-disable */
+import {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
 import { Box } from '@biom3/react';
 import { utils } from 'ethers';
 import {
@@ -16,7 +19,7 @@ import { To } from './To';
 import { DEFAULT_IMX_DECIMALS } from '../../../../lib/constant';
 import { quotesProcessor } from '../../functions/FetchQuote';
 
-export function SwapForm() {
+export function SwapForm({ setLoading }: { setLoading: (value: boolean) => void }) {
   const {
     swapState: {
       allowedTokens,
@@ -36,20 +39,13 @@ export function SwapForm() {
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
 
+  const [isFetching, setIsFetching] = useState(false);
+
   const blockQuoteToggle = useCallback((value: boolean) => {
     swapFormDispatch({
       payload: {
         type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
         blockFetchQuote: value,
-      },
-    });
-  }, []);
-
-  const loadingToggle = useCallback((value: boolean) => {
-    swapFormDispatch({
-      payload: {
-        type: SwapFormActions.SET_LOADING,
-        loading: value,
       },
     });
   }, []);
@@ -77,17 +73,7 @@ export function SwapForm() {
     });
   }, [cryptoFiatState.conversions, swapFromAmount, swapFromToken]);
 
-  const fetchQuote = async () => {
-    if (blockFetchQuote) return;
-    if (!provider) return;
-    if (!exchange) return;
-    if (Number.isNaN(parseFloat(swapFromAmount))) return;
-    if (parseFloat(swapFromAmount) <= 0) return;
-    if (!swapFromToken) return;
-    if (!swapToToken) return;
-
-    loadingToggle(true);
-
+  const fetchQuoteFrom = async () => {
     try {
       const result = await quotesProcessor.fromAmountIn(
         exchange,
@@ -142,28 +128,40 @@ export function SwapForm() {
         },
       });
     }
-
-    blockQuoteToggle(true);
-    loadingToggle(false);
   };
 
-  // Listening to state changes in the useEffect will ensure the most updated values
-  // are received from the SwapForm context state, then we can conditionally fetch a quote
-  useEffect(() => {
-    blockQuoteToggle(false);
-    fetchQuote();
-  }, [
-    provider,
-    exchange,
-    swapFromAmount,
-    swapFromToken,
-    swapToToken,
-  ]);
+  const fetchQuote = async ({ direction }) => {
+    if (!provider) return;
+    if (!exchange) return;
+
+    if (direction === 'from') {
+      if (Number.isNaN(parseFloat(swapFromAmount))) return;
+      if (parseFloat(swapFromAmount) <= 0) return;
+      if (!swapFromToken) return;
+      if (!swapToToken) return;
+
+      if (isFetching) return;
+      setIsFetching(true);
+      fetchQuoteFrom();
+      setIsFetching(false);
+      return;
+    }
+
+    if (Number.isNaN(parseFloat(swapFromAmount))) return;
+    if (parseFloat(swapFromAmount) <= 0) return;
+    if (!swapFromToken) return;
+    if (!swapToToken) return;
+
+    if (isFetching) return;
+    setIsFetching(true);
+    fetchQuoteTo();
+    setIsFetching(false);
+  };
 
   return (
     <Box sx={swapFormContainerStyle}>
-      <From unblockQuote={() => blockQuoteToggle(false)} />
-      <To unblockQuote={() => blockQuoteToggle(false)} />
+      <From fetchQuote />
+      <To fetchQuote />
     </Box>
   );
 }

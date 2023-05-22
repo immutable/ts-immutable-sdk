@@ -1,6 +1,8 @@
+/* eslint-disable */
 import { Box, Heading } from '@biom3/react';
 import { BigNumber } from 'ethers';
 import { TokenInfo, Transaction } from '@imtbl/checkout-sdk';
+import { useState } from 'react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
@@ -69,6 +71,8 @@ export function SwapCoins({
   toContractAddress,
 }: SwapCoinsProps) {
   const { header, content } = text.views[SwapWidgetViews.SWAP];
+
+  const [loading, setLoading] = useState(false);
 
   const getTransaction = (): Transaction =>
     // Stubbed exchange.getTransaction

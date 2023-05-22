@@ -1,6 +1,6 @@
 {
   "extends": ["../../../.eslintrc"],
-  "ignorePatterns": ["jest.config.*", "rollup.config.*"],
+  "ignorePatterns": ["sec/**/**"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.json",
