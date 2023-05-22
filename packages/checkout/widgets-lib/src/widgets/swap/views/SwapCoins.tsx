@@ -1,6 +1,4 @@
 import { Box, Heading } from '@biom3/react';
-import { BigNumber } from 'ethers';
-import { TokenInfo } from '@imtbl/checkout-sdk';
 import { useState } from 'react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -12,49 +10,6 @@ import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTy
 import { SwapForm } from '../components/SwapForm/SwapForm';
 import { Fees } from '../components/Fees';
 
-type AmountAndPercentage = {
-  amount: {
-    bn: BigNumber;
-    formatted: string;
-  };
-  percent: number;
-};
-
-type QuoteSlippage = AmountAndPercentage;
-
-type QuoteFees = AmountAndPercentage & {
-  token: TokenInfo;
-};
-
-type TradeInfo = {
-  amountIn: BigNumber;
-  amountOut: BigNumber;
-  tokenIn: TokenInfo;
-  tokenOut: TokenInfo;
-  fees: QuoteFees;
-  slippage: QuoteSlippage;
-};
-
-export type QuoteResponse = {
-  status: string;
-  trade: TradeInfo;
-};
-
-export type BuyField = {
-  amount?: BigNumber;
-  token?: TokenInfo;
-};
-
-export type WithField = {
-  quote?: QuoteResponse;
-  token?: TokenInfo;
-};
-
-export interface SwapFormProps {
-  amount?: string;
-  fromContractAddress?: string;
-  toContractAddress?: string;
-}
 export interface SwapCoinsProps {
   amount?: string;
   fromContractAddress?: string;
