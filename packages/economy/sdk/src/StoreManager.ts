@@ -8,7 +8,7 @@ export class StoreManager {
       const serializedData = JSON.stringify(data);
       localStorage.setItem(key, serializedData);
     } catch (e) {
-      console.error('Error saving data to local storage', e);
+      this.handleError(e);
     }
   }
 
@@ -21,7 +21,7 @@ export class StoreManager {
       }
       return JSON.parse(serializedData) as T;
     } catch (e) {
-      console.error('Error getting data from local storage', e);
+      this.handleError(e);
       return null;
     }
   }
@@ -31,7 +31,7 @@ export class StoreManager {
     try {
       localStorage.removeItem(key);
     } catch (e) {
-      console.error('Error deleting data from local storage', e);
+      this.handleError(e);
     }
   }
 
@@ -40,7 +40,21 @@ export class StoreManager {
     try {
       localStorage.clear();
     } catch (e) {
-      console.error('Error clearing local storage', e);
+      this.handleError(e);
+    }
+  }
+
+  private handleError(e: unknown) {
+    if (e instanceof DOMException) {
+      if (e.name === 'QuotaExceededError') {
+        console.error(
+          'Failed to save data to local storage because it is full.'
+        );
+      } else if (e.name === 'SecurityError') {
+        console.error('Local storage is disabled, unable to save data.');
+      }
+    } else {
+      console.error('Error using local storage methods', e);
     }
   }
 }
