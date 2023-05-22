@@ -128,9 +128,7 @@ export function ConnectionLoader({
           deepLink={InnerExampleWidgetViews.VIEW_TWO}
         />
       )}
-      {connStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (
-        { children }
-      )}
+      {connStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && { children }}
     </>
   );
 }

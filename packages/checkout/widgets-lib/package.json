@@ -65,6 +65,7 @@
     "dist:sdk": "mkdir -p ../../../sdk/dist/browser && cp build/static/js/main.*.js ../../../sdk/dist/browser/checkout.js",
     "eject": "react-scripts eject",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
+    "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "start": "cp src/app.tsx src/index.tsx && PORT=3001 GENERATE_SOURCEMAP=false react-scripts start",
     "test": "react-scripts test --passWithNoTests",
     "test:cypress": "NODE_ENV=test cypress run --component --headless",
