@@ -17,7 +17,6 @@ export function BridgeButton(props: BridgeButtonProps) {
     updateTransactionResponse,
   } = props;
 
-  // const { bridgeState } = useContext(BridgeContext);
   const { bridgeFormState: { bridgeFromAmount, bridgeFromToken } } = useContext(BridgeFormContext);
 
   const { viewDispatch } = useContext(ViewContext);
@@ -27,13 +26,6 @@ export function BridgeButton(props: BridgeButtonProps) {
     if (!bridgeFromAmount || !bridgeFromToken) return true;
 
     return false;
-    // if (!bridgeFromAmount || !balance || Number.isNaN(Number(bridgeFromAmount))) return true;
-
-    // const bnAmount = utils.parseUnits(bridgeFromAmount, balance?.token.decimals);
-    // if (bnAmount.lte(0)) return true;
-    // if (bnAmount.gt(balance.balance)) return true;
-
-    // return false;
   };
 
   const getUnsignedTransaction = () => ({

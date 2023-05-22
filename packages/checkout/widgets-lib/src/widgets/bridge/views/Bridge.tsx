@@ -31,7 +31,6 @@ export function Bridge({ amount, fromContractAddress, setTransactionResponse }: 
     <SimpleLayout
       header={(
         <HeaderNavigation
-          showBack
           title={header.title}
           onCloseButtonClick={() => sendBridgeWidgetCloseEvent()}
         />
@@ -39,7 +38,7 @@ export function Bridge({ amount, fromContractAddress, setTransactionResponse }: 
       footer={<FooterLogo />}
       footerBackgroundColor="base.color.translucent.container.200"
     >
-      <Box sx={{ paddingX: 'base.spacing.x2' }}>
+      <Box sx={{ paddingX: 'base.spacing.x4' }}>
         {provider && (
         <BridgeForm
           defaultAmount={amount}
