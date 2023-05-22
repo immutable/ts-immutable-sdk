@@ -1,7 +1,5 @@
-import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
-import { FooterButton } from '../Footer/FooterButton';
 import { SuccessBox } from './SuccessBox';
-import { CenteredBoxContent } from '../CenteredBoxContent/CenteredBoxContent';
+import { StatusView } from '../StatusView/StatusView';
 
 export interface SuccessViewProps {
   successText: string;
@@ -30,17 +28,12 @@ export function SuccessView({
   };
 
   return (
-    <SimpleLayout
-      footer={(
-        <FooterButton
-          actionText={actionText}
-          onActionClick={onSuccessActionClick}
-        />
-      )}
+    <StatusView
+      testId="success-view"
+      actionText={actionText}
+      onActionClick={onSuccessActionClick}
     >
-      <CenteredBoxContent testId="success-view">
-        <SuccessBox successText={successText} />
-      </CenteredBoxContent>
-    </SimpleLayout>
+      <SuccessBox successText={successText} />
+    </StatusView>
   );
 }

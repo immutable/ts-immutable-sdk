@@ -3,28 +3,28 @@ import { mount } from 'cypress/react18';
 import { onDarkBase } from '@biom3/design-tokens';
 import { BiomeThemeProvider } from '@biom3/react';
 import { cySmartGet } from '../../lib/testUtils';
-import { SuccessView } from './SuccessView';
+import { FailureView } from './FailureView';
 
-describe('success view', () => {
-  it('shows success text and button', () => {
+describe('failure view', () => {
+  it('shows failure text and button', () => {
     mount(
       <BiomeThemeProvider theme={{ base: onDarkBase }}>
-        <SuccessView
-          successText="Test success"
+        <FailureView
+          failureText="Failed"
           actionText="Close"
           onActionClick={() => {
             // eslint-disable-next-line no-console
             console.log('clicked!');
           }}
         />
-
       </BiomeThemeProvider>,
     );
 
-    cySmartGet('success-box').should('be.visible');
-    cySmartGet('success-icon').should('be.visible');
-    cySmartGet('success-text').should('be.visible');
-    cySmartGet('success-text').should('have.text', 'Test success');
+    cySmartGet('failure-view').should('be.visible');
+    cySmartGet('failure-box').should('be.visible');
+    cySmartGet('fail-icon').should('be.visible');
+    cySmartGet('fail-text').should('be.visible');
+    cySmartGet('fail-text').should('have.text', 'Failed');
     cySmartGet('footer-button-container').should('be.visible');
   });
 });
