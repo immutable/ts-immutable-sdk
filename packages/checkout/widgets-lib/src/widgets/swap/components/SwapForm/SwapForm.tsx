@@ -13,8 +13,8 @@ import { CryptoFiatActions, CryptoFiatContext } from '../../../../context/crypto
 import { calculateCryptoToFiat } from '../../../../lib/utils';
 import { From } from './From';
 import { To } from './To';
-import { DEFAULT_IMX_DECIMALS } from '../../../../lib/constant';
 import { quotesProcessor } from '../../functions/FetchQuote';
+import { DEFAULT_IMX_DECIMALS } from '../../../../lib';
 
 export function SwapForm() {
   const {

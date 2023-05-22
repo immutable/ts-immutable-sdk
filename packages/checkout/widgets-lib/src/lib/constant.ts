@@ -1,2 +1,0 @@
-export const DEFAULT_TOKEN_DECIMALS = 6;
-export const DEFAULT_IMX_DECIMALS = 18;

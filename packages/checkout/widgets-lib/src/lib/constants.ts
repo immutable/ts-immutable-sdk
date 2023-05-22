@@ -2,6 +2,9 @@ import { Environment } from '@imtbl/config';
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from './types';
 
+export const DEFAULT_IMX_DECIMALS = 18;
+export const DEFAULT_TOKEN_DECIMALS = 6;
+
 /**
  * Checkout Widget default env
  */
