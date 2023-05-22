@@ -37,7 +37,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "private": true,
   "scripts": {
     "build": "parcel build",
     "build:dist": "npm i && npm run build && npm run dist",
