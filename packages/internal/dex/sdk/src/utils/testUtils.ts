@@ -6,7 +6,6 @@ import {
   TradeType,
 } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
-import { hexDataSlice } from 'ethers/lib/utils';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
@@ -135,14 +134,14 @@ export function decodeMulticallData(data: ethers.utils.BytesLike): {
   functionCallParams: ExactInputOutputSingleParams;
 } {
   // eslint-disable-next-line no-param-reassign
-  data = hexDataSlice(data, 4);
+  data = ethers.utils.hexDataSlice(data, 4);
 
   const decodedTopLevelParams = ethers.utils.defaultAbiCoder.decode(
     ['uint256', 'bytes[]'],
     data,
   );
   const calldata = decodedTopLevelParams[1][0];
-  const calldataParams = hexDataSlice(calldata, 4);
+  const calldataParams = ethers.utils.hexDataSlice(calldata, 4);
   const decodedFunctionCallParams = ethers.utils.defaultAbiCoder.decode(
     exactInputOutputSingleParamTypes,
     calldataParams,

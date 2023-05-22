@@ -1,15 +1,36 @@
 import { LitElement, css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
 import type { ItemDefinition } from '@imtbl/economy';
 
 @customElement('imtbl-economy-inventory-items')
 export class InventoryItems extends LitElement {
-  static styles = css``;
+  static styles = css`
+    .locked {
+      filter: sepia(1);
+      opacity: 0.5;
+      background: orangered;
+      pointer-events: none;
+
+      &::before {
+        content: 'LOCKED';
+        font-size: 2.4em;
+        font-weight: bold;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+        color: black;
+      }
+    }
+  `;
+
+  @property({ type: Array })
+  items: ItemDefinition[];
 
   static get properties() {
     return {
-      items: { type: Array<ItemDefinition> },
       activeItemId: { type: String },
       selectedItemIds: { type: Array<String> },
     };
@@ -64,11 +85,14 @@ export class InventoryItems extends LitElement {
           this.activeItemId === item.id
             ? 'outline outline-8 cursor-not-allowed'
             : 'hover:text-primary-content hover:bg-base-content hover:cursor-pointer';
+
+        const status = item.status === 'locked' ? 'sepia pointer-events-none' : '';
         return html`
           <div
             @click=${this.getOnClick(item)}
-            class="card bg-base-100 shadow-xl ${selectedCx} ${activeCx}"
+            class="relative card bg-base-100 shadow-xl h-max ${selectedCx} ${activeCx} ${status}"
           >
+          ${item.status === "locked" ? html`<span class="absolute bottom-0 text-center m-auto text-lg font-bold bg-black text-white w-full" >LOCKED</span>` : ''}
             <figure>
               <img src="${item.metadata.image}" alt=${item.metadata.name} />
             </figure>
@@ -99,6 +123,7 @@ export class InventoryItems extends LitElement {
           </div>
         `;
       })}
+      
     </div>`;
   }
 

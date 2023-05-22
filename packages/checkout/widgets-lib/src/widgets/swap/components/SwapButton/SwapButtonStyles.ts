@@ -6,4 +6,6 @@ export const swapButtonBoxStyle = {
   backgroundColor: 'base.color.translucent.container.200',
 };
 
-export const swapButtonIconLoadingStyle = { width: 'base.icon.size.200' };
+export const swapButtonIconLoadingStyle = {
+  width: 'base.icon.size.400',
+};
