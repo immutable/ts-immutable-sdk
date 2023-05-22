@@ -53,10 +53,6 @@ export class CraftingWidget extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
-    console.log({
-      owner: this.owner,
-    });
-
     this.economy = Economy.build({
       gameId: this.gameId,
       userId: this.owner,
@@ -70,9 +66,16 @@ export class CraftingWidget extends LitElement {
     });
 
     this.getRecipe();
+
     this.getInventory();
+    const intervalId = setInterval(() => {
+      this.getInventory();
+    }, 1000);
 
     this.economy.subscribe(this.handleCraftingComplete.bind(this));
+    window.addEventListener('unload', () => {
+      clearInterval(intervalId);
+    });
     window.addEventListener(
       'imtbl-crafting-event',
       this.handleCustomEvent(this.handleComponentEvent)
@@ -148,6 +151,8 @@ export class CraftingWidget extends LitElement {
   }
 
   async getInventory() {
+    console.log("🚀 ~ file: imtbl-crafting-widget.ts:159 ~ CraftingWidget ~ getInventory ~ this.gameId:", this.gameId)
+
     this.items =
       (await this.economy.inventory.getItems({
         gameID: this.gameId,
@@ -184,16 +189,14 @@ export class CraftingWidget extends LitElement {
     this.recipeId = (event.target as HTMLInputElement).value;
     this.requestUpdate();
   }
-
+  
   handleGameInput(event: InputEvent) {
     this.gameId = (event.target as HTMLInputElement).value;
-    this.getInventory();
     this.requestUpdate();
   }
-
+  
   handleOwnerInput(event: InputEvent) {
     this.owner = (event.target as HTMLInputElement).value;
-    this.getInventory();
     this.requestUpdate();
   }
 
