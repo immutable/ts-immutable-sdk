@@ -2983,6 +2983,7 @@ __metadata:
     eslint: ^8.40.0
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
+    linqts: ^1.15.0
     prettier: ^2.8.7
     reflect-metadata: ^0.1.13
     rollup: ^3.17.2
@@ -17824,6 +17825,13 @@ __metadata:
   version: 1.2.4
   resolution: "lines-and-columns@npm:1.2.4"
   checksum: 0c37f9f7fa212b38912b7145e1cd16a5f3cd34d782441c3e6ca653485d326f58b3caccda66efce1c5812bde4961bbde3374fae4b0d11bf1226152337f3894aa5
+  languageName: node
+  linkType: hard
+
+"linqts@npm:^1.15.0":
+  version: 1.15.0
+  resolution: "linqts@npm:1.15.0"
+  checksum: 2be0daf81ce2743a6c6e41b5d7a4b70d52c30db7e9f9a95a370acbce5626936debf2e8724b2589c5afac4efce876f6551f49584d850a5a4f2625b3ae5e709c6b
   languageName: node
   linkType: hard
 
