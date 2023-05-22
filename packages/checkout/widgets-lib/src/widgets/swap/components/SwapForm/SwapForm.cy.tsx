@@ -11,7 +11,7 @@ import { text } from '../../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 import { SwapState, initialSwapState } from '../../context/swap-context/SwapContext';
 import { SwapCoins } from '../../views/SwapCoins';
-import { SwapFormState, initialSwapFormState } from '../../context/swap-form-context/SwapFormContext';
+import { SwapFormState } from '../../context/swap-form-context/SwapFormContext';
 import { quotesProcessor } from '../../functions/FetchQuote';
 
 describe('SwapForm', () => {
@@ -68,7 +68,8 @@ describe('SwapForm', () => {
     it('should show all swap inputs with initial state', () => {
       mount(
         <SwapWidgetTestComponent>
-          <SwapForm />
+          {/* todo-mik: check cypress tests */}
+          <SwapForm setLoading={() => {}} />
         </SwapWidgetTestComponent>,
       );
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
@@ -151,7 +152,8 @@ describe('SwapForm', () => {
       it(`should only allow numbers with 6 decimal places in the swapFromAmount input - ${testCase.name}`, () => {
         mount(
           <SwapWidgetTestComponent>
-            <SwapForm />
+            {/* todo-mik: check cypress tests */}
+            <SwapForm setLoading={() => {}} />
           </SwapWidgetTestComponent>,
         );
 
@@ -164,13 +166,6 @@ describe('SwapForm', () => {
 
   describe('swap form behaviour', () => {
     let testSwapFormState: SwapFormState;
-
-    beforeEach(() => {
-      testSwapFormState = {
-        ...initialSwapFormState,
-        blockFetchQuote: true,
-      };
-    });
 
     it('should validate all inputs when Swap Button is clicked', () => {
       mount(

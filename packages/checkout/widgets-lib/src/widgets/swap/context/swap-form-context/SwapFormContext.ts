@@ -13,8 +13,6 @@ export interface SwapFormState {
   swapToToken: TokenInfo | null;
   swapToAmount: string;
   swapFromFiatValue: string;
-  blockFetchQuote: boolean;
-  loading: boolean;
   swapFromTokenError: string;
   swapFromAmountError: string;
   swapToTokenError: string;
@@ -32,8 +30,6 @@ export const initialSwapFormState: SwapFormState = {
   swapToToken: null,
   swapToAmount: '',
   swapFromFiatValue: '',
-  blockFetchQuote: true,
-  loading: false,
   swapFromTokenError: '',
   swapFromAmountError: '',
   swapToTokenError: '',
@@ -57,8 +53,6 @@ type ActionPayload =
   | SetSwapToTokenPayload
   | SetSwapToAmountPayload
   | SetSwapFromFiatValuePayload
-  | SetBlockFetchQuotePayload
-  | SetLoadingPayload
   | SetSwapFromTokenErrorPayload
   | SetSwapFromAmountErrorPayload
   | SetSwapToTokenErrorPayload
@@ -72,8 +66,6 @@ export enum SwapFormActions {
   SET_SWAP_TO_TOKEN = 'SET_SWAP_TO_TOKEN',
   SET_SWAP_TO_AMOUNT = 'SET_SWAP_TO_AMOUNT',
   SET_SWAP_FROM_FIAT_VALUE = 'SET_SWAP_FROM_FIAT_VALUE',
-  SET_BLOCK_FETCH_QUOTE = 'SET_BLOCK_FETCH_QUOTE',
-  SET_LOADING = 'SET_LOADING',
   SET_SWAP_FROM_TOKEN_ERROR = 'SET_SWAP_FROM_TOKEN_ERROR',
   SET_SWAP_FROM_AMOUNT_ERROR = 'SET_SWAP_FROM_AMOUNT_ERROR',
   SET_SWAP_TO_TOKEN_ERROR = 'SET_SWAP_TO_TOKEN_ERROR',
@@ -103,16 +95,6 @@ export interface SetSwapFromAmountPayload {
 export interface SetSwapFromFiatValuePayload {
   type: SwapFormActions.SET_SWAP_FROM_FIAT_VALUE;
   swapFromFiatValue: string;
-}
-
-export interface SetBlockFetchQuotePayload {
-  type: SwapFormActions.SET_BLOCK_FETCH_QUOTE;
-  blockFetchQuote: boolean;
-}
-
-export interface SetLoadingPayload {
-  type: SwapFormActions.SET_LOADING;
-  loading: boolean;
 }
 
 export interface SetSwapFromTokenErrorPayload {
@@ -199,16 +181,6 @@ export const swapFormReducer: Reducer<SwapFormState, SwapFormAction> = (
       return {
         ...state,
         swapFromFiatValue: action.payload.swapFromFiatValue,
-      };
-    case SwapFormActions.SET_BLOCK_FETCH_QUOTE:
-      return {
-        ...state,
-        blockFetchQuote: action.payload.blockFetchQuote,
-      };
-    case SwapFormActions.SET_LOADING:
-      return {
-        ...state,
-        loading: action.payload.loading,
       };
     case SwapFormActions.SET_SWAP_FROM_TOKEN_ERROR:
       return {

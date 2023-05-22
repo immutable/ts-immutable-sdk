@@ -2,7 +2,6 @@ import { Box, Heading, OptionKey } from '@biom3/react';
 import {
   useCallback, useContext, useMemo,
 } from 'react';
-import debounce from 'lodash.debounce';
 import { SelectInput } from '../../../../components/FormComponents/SelectInput/SelectInput';
 import { amountInputValidation } from '../../../../lib/validations/amountInputValidations';
 import { SwapFormActions, SwapFormContext } from '../../context/swap-form-context/SwapFormContext';
@@ -12,14 +11,13 @@ import { SwapContext } from '../../context/swap-context/SwapContext';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 import { text } from '../../../../resources/text/textConfig';
 import { ValidateFromAmount } from '../../functions/SwapValidator';
-import { SELECT_DEBOUNCE_TIME, TEXT_DEBOUNCE_TIME } from '../../constants';
 import { formatZeroAmount } from '../../../../lib/utils';
 
 export interface FromProps {
-  unblockQuote: () => void;
+  fetchQuote: () => void;
 }
 
-export function From({ unblockQuote }: FromProps) {
+export function From({ fetchQuote }: FromProps) {
   const { swapState } = useContext(SwapContext);
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
   const { tokenBalances } = swapState;
@@ -45,14 +43,6 @@ export function From({ unblockQuote }: FromProps) {
     [tokenBalances],
   );
 
-  const unblockQuoteOnTextDebounce = useCallback(debounce(() => {
-    unblockQuote();
-  }, TEXT_DEBOUNCE_TIME), []);
-
-  const unblockQuoteOnSelectDebounce = useCallback(debounce(() => {
-    unblockQuote();
-  }, SELECT_DEBOUNCE_TIME), []);
-
   const handleFromTokenChange = useCallback(
     (value: OptionKey) => {
       const selectedTokenOption = tokenBalances.find(
@@ -73,6 +63,8 @@ export function From({ unblockQuote }: FromProps) {
             swapFromTokenError: '',
           },
         });
+
+        fetchQuote();
       }
 
       // Focuses on the From input field when the From token is updated
@@ -86,10 +78,6 @@ export function From({ unblockQuote }: FromProps) {
           swapToAmount: '',
         },
       });
-
-      // TODO: clear the quote value here
-
-      unblockQuoteOnSelectDebounce();
     },
     [tokenBalances, swapFormDispatch, swapToToken],
   );
@@ -122,20 +110,9 @@ export function From({ unblockQuote }: FromProps) {
         swapFromAmount: swapFromToken.formattedBalance,
       },
     });
-    unblockQuoteOnTextDebounce();
     handleFromAmountValidation(swapFromToken.formattedBalance);
+    fetchQuote();
   }, [swapFromToken]);
-
-  const handleAmountInputFocus = () => {
-    // block fetching of quote when a user focuses the input
-    // conversely stop blocking on blur or after debounce time
-    swapFormDispatch({
-      payload: {
-        type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
-        blockFetchQuote: true,
-      },
-    });
-  };
 
   const handleFromAmountChange = (value) => {
     swapFormDispatch({
@@ -144,7 +121,18 @@ export function From({ unblockQuote }: FromProps) {
         swapFromAmount: value,
       },
     });
-    unblockQuoteOnTextDebounce();
+  };
+
+  const handleFromAmountOnBlur = (value) => {
+    handleFromAmountValidation(value);
+    // todo-mik: do we still need handleFromAmountChange now if we are doing fetch on blur?
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
+        swapFromAmount: value,
+      },
+    });
+    fetchQuote();
   };
 
   return (
@@ -162,9 +150,8 @@ export function From({ unblockQuote }: FromProps) {
         textInputSubtext={fromFiatPriceText}
         textInputTextAlign="right"
         textInputValidator={amountInputValidation}
-        onTextInputFocus={handleAmountInputFocus}
         onTextInputChange={(value) => handleFromAmountChange(value)}
-        onTextInputBlur={(value) => handleFromAmountValidation(value)}
+        onTextInputBlur={(value) => handleFromAmountOnBlur(value)}
         textInputMaxButtonClick={handleFromMaxAmountButtonClick}
         onSelectChange={handleFromTokenChange}
         textInputErrorMessage={swapFromAmountError}

@@ -2,7 +2,6 @@ import {
   Box, Heading, Body, OptionKey,
 } from '@biom3/react';
 import { useCallback, useContext, useMemo } from 'react';
-import debounce from 'lodash.debounce';
 import { SelectInput } from '../../../../components/FormComponents/SelectInput/SelectInput';
 import { amountInputValidation } from '../../../../lib/validations/amountInputValidations';
 import { SwapFormActions, SwapFormContext, SwapFormState } from '../../context/swap-form-context/SwapFormContext';
@@ -12,11 +11,10 @@ import { text } from '../../../../resources/text/textConfig';
 import { SelectOption } from '../../../../components/FormComponents/SelectForm/SelectForm';
 import { SwapContext } from '../../context/swap-context/SwapContext';
 import { ValidateToAmount } from '../../functions/SwapValidator';
-import { SELECT_DEBOUNCE_TIME } from '../../constants';
 import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
 
 export interface ToProps {
-  unblockQuote: () => void;
+  fetchQuote: () => void;
 }
 
 const swapValuesToText = ({
@@ -46,7 +44,7 @@ const swapValuesToText = ({
   return resp;
 };
 
-export function To({ unblockQuote }: ToProps) {
+export function To({ fetchQuote }: ToProps) {
   const { swapState } = useContext(SwapContext);
   const { allowedTokens } = swapState;
 
@@ -59,10 +57,6 @@ export function To({ unblockQuote }: ToProps) {
 
   const staticText = text.views[SwapWidgetViews.SWAP].swapForm;
   const swapValuesText = swapValuesToText(swapFormState);
-
-  const unblockQuoteOnSelectDebounce = useCallback(debounce(() => {
-    unblockQuote();
-  }, SELECT_DEBOUNCE_TIME), []);
 
   const toTokenOptions = useMemo(
     () => allowedTokens.filter(
@@ -91,11 +85,11 @@ export function To({ unblockQuote }: ToProps) {
             swapToToken: selectedTokenOption,
           },
         });
-      }
 
-      unblockQuoteOnSelectDebounce();
+        fetchQuote();
+      }
     },
-    [allowedTokens, swapFormDispatch, unblockQuoteOnSelectDebounce],
+    [allowedTokens, swapFormDispatch],
   );
 
   const handleToAmountValidation = (value: string) => {
@@ -110,11 +104,6 @@ export function To({ unblockQuote }: ToProps) {
     });
   };
 
-  const handleToAmountFocus = () => {
-    // eslint-disable-next-line no-console
-    console.log('Swap To Text Input Focused');
-  };
-
   const handleToAmountChange = (value: string) => {
     swapFormDispatch({
       payload: {
@@ -122,6 +111,18 @@ export function To({ unblockQuote }: ToProps) {
         swapToAmount: value,
       },
     });
+  };
+
+  const handleToAmountOnBlur = (value: string) => {
+    handleToAmountValidation(value);
+    // todo-mik: do we still need handleFromAmountChange now if we are doing fetch on blur?
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_SWAP_TO_AMOUNT,
+        swapToAmount: value,
+      },
+    });
+    fetchQuote();
   };
 
   return (
@@ -139,9 +140,8 @@ export function To({ unblockQuote }: ToProps) {
         textInputPlaceholder={staticText.to.inputPlaceholder}
         textInputTextAlign="right"
         textInputValidator={amountInputValidation}
-        onTextInputFocus={handleToAmountFocus}
         onTextInputChange={(value) => handleToAmountChange(value)}
-        onTextInputBlur={(value) => handleToAmountValidation(value)}
+        onTextInputBlur={(value) => handleToAmountOnBlur(value)}
         onSelectChange={handleToTokenChange}
         textInputErrorMessage={swapToAmountError}
         selectErrorMessage={swapToTokenError}

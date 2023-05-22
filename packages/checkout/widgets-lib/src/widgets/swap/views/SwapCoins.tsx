@@ -1,6 +1,7 @@
 import { Box, Heading } from '@biom3/react';
 import { BigNumber } from 'ethers';
-import { TokenInfo, Transaction } from '@imtbl/checkout-sdk';
+import { TokenInfo } from '@imtbl/checkout-sdk';
+import { useState } from 'react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
@@ -70,19 +71,11 @@ export function SwapCoins({
 }: SwapCoinsProps) {
   const { header, content } = text.views[SwapWidgetViews.SWAP];
 
-  const getTransaction = (): Transaction =>
-    // Stubbed exchange.getTransaction
-    // eslint-disable-next-line implicit-arrow-linebreak
-    ({
-      nonce: '0x00', // ignored by MetaMask
-      gasPrice: '0x000', // customizable by user during MetaMask confirmation.
-      gas: '0x000', // customizable by user during MetaMask confirmation.
-      to: '', // To address.
-      from: '', // User's active address.
-      value: '0x00', // Only required to send ether to the recipient from the initiating external account.
-      data: '0x000', // Optional, but used for defining smart contract creation and interaction.
-      chainId: 5, // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
-    });
+  const [loading, setLoading] = useState(false);
+
+  const updateSetLoading = (value: boolean) => {
+    setLoading(value);
+  };
 
   return (
     <SimpleLayout
@@ -112,10 +105,10 @@ export function SwapCoins({
           >
             {content.title}
           </Heading>
-          <SwapForm />
+          <SwapForm setLoading={updateSetLoading} />
           <Fees />
         </Box>
-        <SwapButton transaction={getTransaction()} />
+        <SwapButton loading={loading} />
       </Box>
     </SimpleLayout>
   );

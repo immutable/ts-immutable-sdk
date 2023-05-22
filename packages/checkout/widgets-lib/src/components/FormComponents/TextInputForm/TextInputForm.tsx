@@ -9,7 +9,6 @@ interface TextInputFormProps {
   textAlign?: 'left' | 'right';
   errorMessage?: string;
   validator: (value: string) => boolean;
-  onTextInputFocus: () => void;
   onTextInputChange: (value: string) => void;
   onTextInputBlur: (value: string) => void;
   maxButtonClick?: () => void;
@@ -21,7 +20,6 @@ export function TextInputForm({
   placeholder,
   errorMessage,
   validator,
-  onTextInputFocus,
   onTextInputChange,
   onTextInputBlur,
   textAlign,
@@ -62,7 +60,6 @@ export function TextInputForm({
         placeholder={placeholder}
         onBlur={handleOnBlur}
         hideClearValueButton
-        onFocus={onTextInputFocus}
       >
         {maxButtonClick && (
           <TextInput.Button testId={`${id}-max-button`} onClick={maxButtonClick}>max</TextInput.Button>
