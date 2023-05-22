@@ -131,13 +131,6 @@ export function From({ fetchQuote }: FromProps) {
 
   const handleFromAmountOnBlur = (value) => {
     handleFromAmountValidation(value);
-    // todo-mik: do we still need handleFromAmountChange now if we are doing fetch on blur?
-    swapFormDispatch({
-      payload: {
-        type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
-        swapFromAmount: value,
-      },
-    });
     fetchQuote();
   };
 

@@ -65,7 +65,13 @@ export function TextInputForm({
         hideClearValueButton
       >
         {maxButtonClick && (
-          <TextInput.Button testId={`${id}-max-button`} onClick={maxButtonClick}>max</TextInput.Button>
+          <TextInput.Button
+            testId={`${id}-max-button`}
+            onClick={maxButtonClick}
+            disabled={disabled}
+          >
+            max
+          </TextInput.Button>
         )}
       </TextInput>
     </FormControlWrapper>
