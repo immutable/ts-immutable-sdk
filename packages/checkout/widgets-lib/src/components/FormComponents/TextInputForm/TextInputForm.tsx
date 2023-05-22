@@ -8,6 +8,7 @@ interface TextInputFormProps {
   subtext?: string;
   textAlign?: 'left' | 'right';
   errorMessage?: string;
+  disabled?: boolean;
   validator: (value: string) => boolean;
   onTextInputChange: (value: string) => void;
   onTextInputBlur: (value: string) => void;
@@ -25,6 +26,7 @@ export function TextInputForm({
   textAlign,
   subtext,
   maxButtonClick,
+  disabled,
 }: TextInputFormProps) {
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>, previousValue: string) => {
     const inputValue = event.target.value;
@@ -59,6 +61,7 @@ export function TextInputForm({
         validationStatus={errorMessage ? 'error' : 'success'}
         placeholder={placeholder}
         onBlur={handleOnBlur}
+        disabled={disabled}
         hideClearValueButton
       >
         {maxButtonClick && (

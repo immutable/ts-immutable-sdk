@@ -17,6 +17,10 @@ export interface SwapFormState {
   swapFromAmountError: string;
   swapToTokenError: string;
   swapToAmountError: string;
+  disableFromSelect: boolean;
+  disableFromInput: boolean;
+  disableToSelect: boolean;
+  disableToInput: boolean;
 }
 
 export const initialSwapFormState: SwapFormState = {
@@ -34,6 +38,10 @@ export const initialSwapFormState: SwapFormState = {
   swapFromAmountError: '',
   swapToTokenError: '',
   swapToAmountError: '',
+  disableFromSelect: false,
+  disableFromInput: false,
+  disableToSelect: false,
+  disableToInput: false,
 };
 
 export interface SwapFormContextState {
@@ -56,7 +64,9 @@ type ActionPayload =
   | SetSwapFromTokenErrorPayload
   | SetSwapFromAmountErrorPayload
   | SetSwapToTokenErrorPayload
-  | SetSwapToAmountErrorPayload;
+  | SetSwapToAmountErrorPayload
+  | SetDisableFieldsPayload
+  | SetEnableFieldsPayload;
 
 export enum SwapFormActions {
   SET_SWAP_QUOTE = 'SET_SWAP_QUOTE',
@@ -70,6 +80,8 @@ export enum SwapFormActions {
   SET_SWAP_FROM_AMOUNT_ERROR = 'SET_SWAP_FROM_AMOUNT_ERROR',
   SET_SWAP_TO_TOKEN_ERROR = 'SET_SWAP_TO_TOKEN_ERROR',
   SET_SWAP_TO_AMOUNT_ERROR = 'SET_SWAP_TO_AMOUNT_ERROR',
+  SET_DISABLE_FIELDS = 'SET_DISABLE_FIELDS',
+  SET_ENABLE_FIELDS = 'SET_ENABLE_FIELDS',
 }
 
 export interface SetSwapToTokenPayload {
@@ -128,6 +140,14 @@ export interface SetSwapQuotePayload {
 export interface SetSwapQuoteErrorPayload {
   type: SwapFormActions.SET_SWAP_QUOTE_ERROR;
   quoteError: string;
+}
+
+export interface SetDisableFieldsPayload {
+  type: SwapFormActions.SET_DISABLE_FIELDS;
+}
+
+export interface SetEnableFieldsPayload {
+  type: SwapFormActions.SET_ENABLE_FIELDS;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -201,6 +221,22 @@ export const swapFormReducer: Reducer<SwapFormState, SwapFormAction> = (
       return {
         ...state,
         swapToAmountError: action.payload.swapToAmountError,
+      };
+    case SwapFormActions.SET_DISABLE_FIELDS:
+      return {
+        ...state,
+        disableFromSelect: true,
+        disableFromInput: true,
+        disableToSelect: true,
+        disableToInput: true,
+      };
+    case SwapFormActions.SET_ENABLE_FIELDS:
+      return {
+        ...state,
+        disableFromSelect: false,
+        disableFromInput: false,
+        disableToSelect: false,
+        disableToInput: false,
       };
     default:
       return state;

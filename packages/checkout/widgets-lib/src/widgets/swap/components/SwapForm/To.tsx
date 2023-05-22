@@ -53,6 +53,8 @@ export function To({ fetchQuote }: ToProps) {
     swapFromToken,
     swapToTokenError,
     swapToAmountError,
+    disableToSelect,
+    disableToInput,
   } = swapFormState;
 
   const staticText = text.views[SwapWidgetViews.SWAP].swapForm;
@@ -145,6 +147,8 @@ export function To({ fetchQuote }: ToProps) {
         onSelectChange={handleToTokenChange}
         textInputErrorMessage={swapToAmountError}
         selectErrorMessage={swapToTokenError}
+        selectInputDisabled={disableToSelect}
+        textInputDisabled={disableToInput}
       />
     </Box>
   );

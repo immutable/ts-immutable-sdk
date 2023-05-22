@@ -24,7 +24,13 @@ export function From({ fetchQuote }: FromProps) {
   const { content, swapForm } = text.views[SwapWidgetViews.SWAP];
 
   const {
-    swapFromAmount, swapFromToken, swapToToken, swapFromTokenError, swapFromAmountError,
+    swapFromAmount,
+    swapFromToken,
+    swapToToken,
+    swapFromTokenError,
+    swapFromAmountError,
+    disableFromSelect,
+    disableFromInput,
   } = swapFormState;
 
   const availableFromBalanceSubtext = swapFromToken
@@ -156,6 +162,8 @@ export function From({ fetchQuote }: FromProps) {
         onSelectChange={handleFromTokenChange}
         textInputErrorMessage={swapFromAmountError}
         selectErrorMessage={swapFromTokenError}
+        selectInputDisabled={disableFromSelect}
+        textInputDisabled={disableFromInput}
       />
     </Box>
   );

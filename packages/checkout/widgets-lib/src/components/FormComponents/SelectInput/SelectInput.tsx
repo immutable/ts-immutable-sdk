@@ -18,6 +18,8 @@ interface SelectInputProps {
   textInputErrorMessage?: string;
   selectSubtext?: string;
   selectErrorMessage?: string;
+  textInputDisabled?: boolean;
+  selectInputDisabled?: boolean;
   textInputValidator: (value: string) => boolean;
   onTextInputChange: (value: string) => void;
   onTextInputBlur: (value: string) => void;
@@ -41,6 +43,8 @@ export function SelectInput({
   selectErrorMessage,
   textInputMaxButtonClick,
   onSelectChange,
+  textInputDisabled,
+  selectInputDisabled,
 }: SelectInputProps) {
   return (
     <Box sx={selectInputBoxStyle}>
@@ -52,6 +56,7 @@ export function SelectInput({
           textAlign={selectTextAlign}
           errorMessage={selectErrorMessage}
           onSelectChange={onSelectChange}
+          disabled={selectInputDisabled}
         />
       </Box>
       <Box sx={inputStyle}>
@@ -66,6 +71,7 @@ export function SelectInput({
           onTextInputChange={onTextInputChange}
           onTextInputBlur={onTextInputBlur}
           maxButtonClick={textInputMaxButtonClick}
+          disabled={textInputDisabled}
         />
       </Box>
     </Box>

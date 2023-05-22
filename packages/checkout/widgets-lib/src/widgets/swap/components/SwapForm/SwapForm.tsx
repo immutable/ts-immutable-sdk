@@ -142,6 +142,22 @@ export function SwapForm({ setLoading }: SwapFormProps) {
     console.log('todo: implement fetch quote to: ', swapToAmount);
   };
 
+  const disableFields = async () => {
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_DISABLE_FIELDS,
+      },
+    });
+  };
+
+  const enableFields = async () => {
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_ENABLE_FIELDS,
+      },
+    });
+  };
+
   const fetchQuote = async (direction: SwapDirection) => {
     if (direction === SwapDirection.FROM) {
       if (Number.isNaN(parseFloat(swapFromAmount))) return;
@@ -152,9 +168,11 @@ export function SwapForm({ setLoading }: SwapFormProps) {
       if (isFetching) return;
       setLoading(true);
       setIsFetching(true);
+      disableFields();
       await fetchQuoteFrom();
       setLoading(false);
       setIsFetching(false);
+      enableFields();
       return;
     }
 
@@ -166,9 +184,11 @@ export function SwapForm({ setLoading }: SwapFormProps) {
     if (isFetching) return;
     setLoading(true);
     setIsFetching(true);
+    disableFields();
     await fetchQuoteTo();
     setLoading(false);
     setIsFetching(false);
+    enableFields();
   };
 
   return (
