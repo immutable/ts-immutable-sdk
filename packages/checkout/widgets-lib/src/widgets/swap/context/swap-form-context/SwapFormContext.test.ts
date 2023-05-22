@@ -122,34 +122,4 @@ describe('swap form context', () => {
     });
     expect(swapToAmountError).toEqual('Please input amount');
   });
-
-  it('should set disable fields to true when reducer called with SET_DISABLE_FIELDS action', () => {
-    const {
-      disableFromSelect,
-      disableFromInput,
-      disableToSelect,
-      disableToInput,
-    } = swapFormReducer(initialSwapFormState, {
-      payload: { type: SwapFormActions.SET_DISABLE_FIELDS },
-    });
-    expect(disableFromSelect).toEqual(true);
-    expect(disableFromInput).toEqual(true);
-    expect(disableToSelect).toEqual(true);
-    expect(disableToInput).toEqual(true);
-  });
-
-  it('should set disable fields to false when reducer called with SET_ENABLE_FIELDS action', () => {
-    const {
-      disableFromSelect,
-      disableFromInput,
-      disableToSelect,
-      disableToInput,
-    } = swapFormReducer(initialSwapFormState, {
-      payload: { type: SwapFormActions.SET_ENABLE_FIELDS },
-    });
-    expect(disableFromSelect).toEqual(false);
-    expect(disableFromInput).toEqual(false);
-    expect(disableToSelect).toEqual(false);
-    expect(disableToInput).toEqual(false);
-  });
 });

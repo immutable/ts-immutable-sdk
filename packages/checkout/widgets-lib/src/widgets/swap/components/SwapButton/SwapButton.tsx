@@ -132,7 +132,7 @@ export function SwapButton({ loading }: SwapButtonProps) {
       <Button
         testId="swap-button"
         disabled={loading}
-        variant={loading ? 'tertiary' : 'primary'}
+        variant="primary"
         onClick={sendTransaction}
         size="large"
       >

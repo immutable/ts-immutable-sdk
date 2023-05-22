@@ -17,10 +17,6 @@ export interface SwapFormState {
   swapFromAmountError: string;
   swapToTokenError: string;
   swapToAmountError: string;
-  disableFromSelect: boolean;
-  disableFromInput: boolean;
-  disableToSelect: boolean;
-  disableToInput: boolean;
 }
 
 export const initialSwapFormState: SwapFormState = {
@@ -38,10 +34,6 @@ export const initialSwapFormState: SwapFormState = {
   swapFromAmountError: '',
   swapToTokenError: '',
   swapToAmountError: '',
-  disableFromSelect: false,
-  disableFromInput: false,
-  disableToSelect: false,
-  disableToInput: false,
 };
 
 export interface SwapFormContextState {
@@ -64,9 +56,7 @@ type ActionPayload =
   | SetSwapFromTokenErrorPayload
   | SetSwapFromAmountErrorPayload
   | SetSwapToTokenErrorPayload
-  | SetSwapToAmountErrorPayload
-  | SetDisableFieldsPayload
-  | SetEnableFieldsPayload;
+  | SetSwapToAmountErrorPayload;
 
 export enum SwapFormActions {
   SET_SWAP_QUOTE = 'SET_SWAP_QUOTE',
@@ -80,8 +70,6 @@ export enum SwapFormActions {
   SET_SWAP_FROM_AMOUNT_ERROR = 'SET_SWAP_FROM_AMOUNT_ERROR',
   SET_SWAP_TO_TOKEN_ERROR = 'SET_SWAP_TO_TOKEN_ERROR',
   SET_SWAP_TO_AMOUNT_ERROR = 'SET_SWAP_TO_AMOUNT_ERROR',
-  SET_DISABLE_FIELDS = 'SET_DISABLE_FIELDS',
-  SET_ENABLE_FIELDS = 'SET_ENABLE_FIELDS',
 }
 
 export interface SetSwapToTokenPayload {
@@ -142,14 +130,6 @@ export interface SetSwapQuoteErrorPayload {
   quoteError: string;
 }
 
-export interface SetDisableFieldsPayload {
-  type: SwapFormActions.SET_DISABLE_FIELDS;
-}
-
-export interface SetEnableFieldsPayload {
-  type: SwapFormActions.SET_ENABLE_FIELDS;
-}
-
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const SwapFormContext = createContext<SwapFormContextState>({
   swapFormState: initialSwapFormState,
@@ -162,6 +142,7 @@ export const swapFormReducer: Reducer<SwapFormState, SwapFormAction> = (
   state: SwapFormState,
   action: SwapFormAction,
 ) => {
+  // console.log(action.payload);
   switch (action.payload.type) {
     case SwapFormActions.SET_SWAP_QUOTE:
       return {
@@ -221,22 +202,6 @@ export const swapFormReducer: Reducer<SwapFormState, SwapFormAction> = (
       return {
         ...state,
         swapToAmountError: action.payload.swapToAmountError,
-      };
-    case SwapFormActions.SET_DISABLE_FIELDS:
-      return {
-        ...state,
-        disableFromSelect: true,
-        disableFromInput: true,
-        disableToSelect: true,
-        disableToInput: true,
-      };
-    case SwapFormActions.SET_ENABLE_FIELDS:
-      return {
-        ...state,
-        disableFromSelect: false,
-        disableFromInput: false,
-        disableToSelect: false,
-        disableToInput: false,
       };
     default:
       return state;

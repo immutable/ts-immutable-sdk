@@ -23,6 +23,7 @@ interface SelectInputProps {
   textInputValidator: (value: string) => boolean;
   onTextInputChange: (value: string) => void;
   onTextInputBlur: (value: string) => void;
+  onTextInputFocus?: (value: string) => void;
   textInputMaxButtonClick?: () => void;
   onSelectChange: (value: OptionKey) => void;
 }
@@ -35,6 +36,7 @@ export function SelectInput({
   textInputValidator,
   onTextInputChange,
   onTextInputBlur,
+  onTextInputFocus,
   textInputTextAlign,
   textInputSubtext,
   textInputErrorMessage,
@@ -70,6 +72,7 @@ export function SelectInput({
           validator={textInputValidator}
           onTextInputChange={onTextInputChange}
           onTextInputBlur={onTextInputBlur}
+          onTextInputFocus={onTextInputFocus}
           maxButtonClick={textInputMaxButtonClick}
           disabled={textInputDisabled}
         />

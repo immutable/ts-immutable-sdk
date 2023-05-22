@@ -12,6 +12,7 @@ interface TextInputFormProps {
   validator: (value: string) => boolean;
   onTextInputChange: (value: string) => void;
   onTextInputBlur: (value: string) => void;
+  onTextInputFocus?: (value: string) => void;
   maxButtonClick?: () => void;
 }
 
@@ -23,6 +24,7 @@ export function TextInputForm({
   validator,
   onTextInputChange,
   onTextInputBlur,
+  onTextInputFocus,
   textAlign,
   subtext,
   maxButtonClick,
@@ -44,6 +46,13 @@ export function TextInputForm({
     onTextInputBlur(inputValue);
   };
 
+  const handleOnFocus = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!onTextInputFocus) return;
+    const inputValue = event.target.value;
+    if (!validator(inputValue)) return;
+    onTextInputFocus(inputValue);
+  };
+
   return (
     <FormControlWrapper
       testId={`${id}-text-control`}
@@ -61,6 +70,7 @@ export function TextInputForm({
         validationStatus={errorMessage ? 'error' : 'success'}
         placeholder={placeholder}
         onBlur={handleOnBlur}
+        onFocus={handleOnFocus}
         disabled={disabled}
         hideClearValueButton
       >

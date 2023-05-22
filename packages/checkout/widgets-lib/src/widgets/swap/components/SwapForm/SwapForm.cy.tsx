@@ -191,8 +191,7 @@ describe('SwapForm', () => {
         .should('have.text', validation.noToTokenSelected);
 
       cySmartGet('toTokenInputs-text-form-text-control-error')
-        .should('exist')
-        .should('have.text', validation.noAmountInputted);
+        .should('not.exist');
     });
 
     it('should show insufficient balance error when swap from amount is larger than token balance', () => {
