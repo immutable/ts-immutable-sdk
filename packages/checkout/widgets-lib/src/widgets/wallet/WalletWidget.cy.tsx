@@ -1,6 +1,6 @@
 import React from 'react';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
-import { IMTBLWidgetEvents, WidgetTheme } from '@imtbl/checkout-widgets';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
   describe, it, cy, context,
 } from 'local-cypress';
@@ -12,6 +12,7 @@ import { CryptoFiat } from '@imtbl/cryptofiat';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 import { cySmartGet } from '../../lib/testUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 describe('WalletWidget tests', () => {
   beforeEach(() => {

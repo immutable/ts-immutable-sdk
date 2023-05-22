@@ -1,13 +1,11 @@
 import {
   CheckoutWidgets,
   ConnectReact,
-  WidgetConnectionProviders,
   WalletReact,
   WidgetTheme,
   UpdateConfig,
   CheckoutWidgetsConfig,
 } from '@imtbl/checkout-widgets';
-import { useEffect, useMemo, useState } from 'react';
 import { useConnectWidget } from './useConnectWidget.hook';
 import { useWalletWidget } from './useWalletWidget.hook';
 import { Environment } from '@imtbl/config';
@@ -50,7 +48,7 @@ export const Marketplace = () => {
       )}
       {showWalletWidget && (
         <WalletReact
-          providerPreference={providerPreference as WidgetConnectionProviders}
+          providerPreference={providerPreference}
         />
       )}
     </div>

@@ -3,13 +3,13 @@ import {
   ConnectParams,
   ConnectionProviders,
 } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../lib/testUtils';
 import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 describe('ConnectWidget tests', () => {
   const config: StrongCheckoutWidgetsConfig = {

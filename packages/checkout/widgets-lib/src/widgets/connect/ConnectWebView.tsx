@@ -1,8 +1,6 @@
-import {
-  WidgetTheme,
-  WidgetConnectionProviders,
-} from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WidgetTheme } from '../../lib';
 
 function ConnectWebView() {
   const config = {
@@ -12,7 +10,7 @@ function ConnectWebView() {
 
   return (
     <imtbl-connect
-      providerPreference={WidgetConnectionProviders.METAMASK}
+      providerPreference={ConnectionProviders.METAMASK}
       widgetConfig={JSON.stringify(config)}
     />
   );

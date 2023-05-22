@@ -2,7 +2,6 @@ import {
   describe, it, cy, beforeEach,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { Network, WidgetTheme } from '@imtbl/checkout-widgets';
 import { Checkout, SwitchNetworkResult } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { BiomeCombinedProviders, BiomeThemeProvider } from '@biom3/react';
@@ -18,6 +17,7 @@ import {
   BridgeWidgetViews,
 } from './BridgeWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { Network, WidgetTheme } from '../../lib';
 
 type CypressStub = Cypress.Agent<Sinon.SinonStub<any[], any>>;
 describe('Bridge Widget tests', () => {

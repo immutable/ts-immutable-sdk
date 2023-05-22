@@ -2,12 +2,12 @@ import {
   describe, it, cy, beforeEach,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../lib/testUtils';
 import { BuyWidget, BuyWidgetParams } from './BuyWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 describe('BuyWidget tests', () => {
   const config: StrongCheckoutWidgetsConfig = {

@@ -1,6 +1,6 @@
 import { Environment } from '@imtbl/config';
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
+import { WidgetTheme } from './types';
 
 /**
  * Checkout Widget default env

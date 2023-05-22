@@ -2,13 +2,13 @@ import {
   describe, it, cy, beforeEach,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../lib/testUtils';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 describe('SwapWidget tests', () => {
   beforeEach(() => {

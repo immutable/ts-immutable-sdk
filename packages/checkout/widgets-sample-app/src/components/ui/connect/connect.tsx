@@ -6,7 +6,6 @@ import {
   ConnectionFailed,
   IMTBLWidgetEvents,
   WidgetTheme,
-  WidgetConnectionProviders,
   ConnectReact,
   CheckoutWidgets,
   UpdateConfig,
@@ -61,7 +60,7 @@ function ConnectUI() {
   return (
     <div className="Connect">
       <h1 className="sample-heading">Checkout Connect (Web Component)</h1>
-      <ConnectReact providerPreference={WidgetConnectionProviders.METAMASK} />
+      <ConnectReact providerPreference='metamask' />
     </div>
   );
 }

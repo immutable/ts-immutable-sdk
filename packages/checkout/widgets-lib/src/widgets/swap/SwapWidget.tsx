@@ -5,7 +5,6 @@ import {
   TokenFilterTypes,
   ConnectionProviders,
 } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   useEffect, useCallback, useReducer, useMemo,
@@ -35,6 +34,7 @@ import {
 } from './context/swap-form-context/SwapFormContext';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;

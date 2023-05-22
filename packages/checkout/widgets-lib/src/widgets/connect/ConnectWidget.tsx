@@ -2,7 +2,6 @@
 
 import { BiomeThemeProvider } from '@biom3/react';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
@@ -32,6 +31,7 @@ import {
   BaseViews,
 } from '../../context/view-context/ViewContext';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 export interface ConnectWidgetProps {
   // TODO: 'params' PropType is defined but prop is never used

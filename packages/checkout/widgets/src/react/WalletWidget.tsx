@@ -1,16 +1,12 @@
 import React from 'react';
-import { DEFAULT_PROVIDER } from '@imtbl/sdk';
-import {
-  WidgetConnectionProviders,
-} from '../definitions/constants';
 
 /**
  * Interface representing the props for the Wallet Widget component.
- * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Wallet Widget
- * (default: {@link WidgetConnectionProviders.METAMASK}).
+ * @property {string} providerPreference - The preferred provider for the Wallet Widget
+ * (default: "metamask").
  */
 export interface WalletReactProps {
-  providerPreference?: WidgetConnectionProviders;
+  providerPreference?: string;
   useConnectWidget?: boolean;
 }
 
@@ -31,7 +27,7 @@ export function WalletReact(props: WalletReactProps) {
     <imtbl-wallet
       widgetConfig={config}
       useConnectWidget={useConnectWidget?.toString()}
-      providerPreference={providerPreference || DEFAULT_PROVIDER}
+      providerPreference={providerPreference ?? 'metamask'}
     />
   );
 }

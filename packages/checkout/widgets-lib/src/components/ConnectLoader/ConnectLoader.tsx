@@ -4,7 +4,6 @@ import {
   ConnectionProviders,
   GetNetworkParams,
 } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { useEffect, useReducer } from 'react';
 import {
@@ -19,6 +18,7 @@ import { ConnectWidget } from '../../widgets/connect/ConnectWidget';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { ErrorView } from '../Error/ErrorView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;

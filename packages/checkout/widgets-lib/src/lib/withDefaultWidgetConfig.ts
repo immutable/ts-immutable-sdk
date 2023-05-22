@@ -1,4 +1,3 @@
-import { CheckoutWidgetsConfig, WidgetTheme } from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
 import {
   DEFAULT_BRIDGE_ENABLED,
@@ -7,6 +6,7 @@ import {
   DEFAULT_SWAP_ENABLED,
   DEFAULT_THEME,
 } from './constants';
+import { WidgetTheme } from './types';
 
 export type StrongCheckoutWidgetsConfig = {
   theme: WidgetTheme;
@@ -52,7 +52,7 @@ function getValidBoolean(defaultValue: boolean, value?: string): boolean {
 }
 
 export const withDefaultWidgetConfigs = (
-  configs?: CheckoutWidgetsConfig,
+  configs?: any,
 ): StrongCheckoutWidgetsConfig => ({
   theme: getValidTheme(configs?.theme),
   environment: getValidEnvironment(configs?.environment),

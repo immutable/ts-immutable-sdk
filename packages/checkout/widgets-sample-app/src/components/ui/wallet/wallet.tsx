@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import {
   CheckoutWidgetsConfig,
   UpdateConfig,
-  WidgetConnectionProviders,
 } from '@imtbl/checkout-widgets';
 
 import {
@@ -61,7 +60,6 @@ function WalletUI() {
     <div className="Connect">
       <h1 className="sample-heading">Checkout Wallet (Web Component)</h1>
       <WalletReact
-        providerPreference={WidgetConnectionProviders.METAMASK}
         useConnectWidget={true}
       />
     </div>

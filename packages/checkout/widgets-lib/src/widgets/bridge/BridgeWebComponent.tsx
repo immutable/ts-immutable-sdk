@@ -1,9 +1,9 @@
 import React from 'react';
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { Network } from '@imtbl/checkout-widgets';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
+import { Network } from '../../lib';
 
 export class ImmutableBridge extends ImmutableWebComponent {
   fromNetwork = Network.ETHEREUM;

@@ -8,8 +8,6 @@ import {
   OptionKey,
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-
-import { Network, WidgetTheme } from '@imtbl/checkout-widgets';
 import {
   ChainId,
   Checkout,
@@ -34,6 +32,7 @@ import {
 import { EtherscanLink } from './components/EtherscanLink';
 import { L1Network, zkEVMNetwork } from '../../lib/networkUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { Network, WidgetTheme } from '../../lib';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;

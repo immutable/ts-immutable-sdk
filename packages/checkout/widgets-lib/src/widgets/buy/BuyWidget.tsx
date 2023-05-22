@@ -3,7 +3,6 @@ import {
   BiomeThemeProvider, Box, Heading, Button, Body,
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import {
   ChainId,
   Checkout,
@@ -24,6 +23,7 @@ import {
   sendBuyWidgetNotConnectedEvent,
 } from './BuyWidgetEvents';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 export enum BuyWidgetViews {
   BUY = 'BUY',

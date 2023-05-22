@@ -1,6 +1,5 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import {
   Checkout,
   ConnectionProviders,
@@ -30,6 +29,7 @@ import {
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { Settings } from './views/Settings';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;

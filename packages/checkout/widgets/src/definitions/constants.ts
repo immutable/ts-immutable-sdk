@@ -20,13 +20,6 @@ export enum WidgetTheme {
 }
 
 /**
- * Enum representing the default Web3 providers supported by the Checkout widgets.
- */
-export enum WidgetConnectionProviders {
-  METAMASK = 'metamask',
-}
-
-/**
  * Enum representing list of Checkout Widgets DOM tags.
  */
 export enum CheckoutWidgetTagNames {
