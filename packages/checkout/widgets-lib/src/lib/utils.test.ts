@@ -4,6 +4,7 @@ import { Environment } from '@imtbl/config';
 import {
   calculateCryptoToFiat,
   formatFiatString,
+  formatZeroAmount,
   sortTokensByAmount,
 } from './utils';
 
@@ -294,7 +295,7 @@ describe('utils', () => {
         'eth',
         new Map<string, number>(),
       );
-      expect(result).toBe('-.--');
+      expect(result).toBe('0.00');
     });
 
     it('should return zero balance string if no conversion is found', () => {
@@ -303,7 +304,7 @@ describe('utils', () => {
         'eth',
         new Map<string, number>(),
       );
-      expect(result).toBe('-.--');
+      expect(result).toBe('0.00');
     });
 
     it('should return zero balance string if balance is zero', () => {
@@ -312,7 +313,7 @@ describe('utils', () => {
         'eth',
         new Map<string, number>([['eth', 1800]]),
       );
-      expect(result).toBe('-.--');
+      expect(result).toBe('0.00');
     });
 
     it('should return zero balance string if balance is NaN', () => {
@@ -321,7 +322,7 @@ describe('utils', () => {
         'eth',
         new Map<string, number>([['eth', 1800]]),
       );
-      expect(result).toBe('-.--');
+      expect(result).toBe('0.00');
     });
 
     it('should return calculated fiat value if valid balance and conversion are provided', () => {
@@ -367,6 +368,23 @@ describe('utils', () => {
     it('should format number with no decimal places', () => {
       const result = formatFiatString(123);
       expect(result).toBe('123.00');
+    });
+  });
+
+  describe('formatZeroAmount', () => {
+    it('should return same amount', () => {
+      const result = formatZeroAmount('123.12');
+      expect(result).toBe('123.12');
+    });
+
+    it('should return -.-- if amount empty', () => {
+      const result = formatZeroAmount('');
+      expect(result).toBe('-.--');
+    });
+
+    it('should return -.-- if amount 0.00', () => {
+      const result = formatZeroAmount('0.00');
+      expect(result).toBe('-.--');
     });
   });
 });

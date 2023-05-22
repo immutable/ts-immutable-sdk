@@ -9,9 +9,6 @@ export interface WalletProps {
 export function WalletItem(props: WalletProps) {
   const { wallet, onWalletClick } = props;
   const { wallets } = text;
-  // TODO: Should this this be removed?
-  // eslint-disable-next-line no-console
-  console.log(wallets[wallet.connectionProvider]);
 
   const walletText = wallets[wallet.connectionProvider];
   const logo = {

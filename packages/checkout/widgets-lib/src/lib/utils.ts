@@ -47,9 +47,9 @@ export const sortNetworksCompareFn = (
   return 1;
 };
 
-export const formatFiatString = (amount: number): string => {
+export const formatFiatString = (amount: number) => {
   const factor = 10 ** 2;
-  return (Math.round(amount * factor) / factor).toFixed(2).toString();
+  return (Math.round(amount * factor) / factor).toFixed(2);
 };
 
 export const calculateCryptoToFiat = (
@@ -57,15 +57,19 @@ export const calculateCryptoToFiat = (
   symbol: string,
   conversions: Map<string, number>,
 ): string => {
-  const zeroBalanceString = '-.--';
+  const zeroString = '0.00';
 
-  if (!amount) return zeroBalanceString;
+  if (!amount) return zeroString;
 
   const conversion = conversions.get(symbol.toLowerCase());
-  if (!conversion) return zeroBalanceString;
+  if (!conversion) return zeroString;
 
   const parsedAmount = parseFloat(amount);
-  if (parseFloat(amount) === 0 || Number.isNaN(parsedAmount)) return zeroBalanceString;
-
+  if (parseFloat(amount) === 0 || Number.isNaN(parsedAmount)) return zeroString;
   return formatFiatString(parsedAmount * conversion);
+};
+
+export const formatZeroAmount = (amount: string) => {
+  if (!amount || amount === '0.00') return '-.--';
+  return amount;
 };

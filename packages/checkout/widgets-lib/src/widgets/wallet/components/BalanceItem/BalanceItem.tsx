@@ -22,13 +22,15 @@ import {
   sendSwapCoinsEvent,
 } from '../../CoinTopUpEvents';
 import { L1Network, zkEVMNetwork } from '../../../../lib/networkUtils';
+import { formatZeroAmount } from '../../../../lib/utils';
 
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
 }
+
 export function BalanceItem(props: BalanceItemProps) {
   const { balanceInfo } = props;
-  const fiatAmount = `≈ USD $${balanceInfo.fiatAmount ?? '-.--'}`;
+  const fiatAmount = `≈ USD $${formatZeroAmount(balanceInfo.fiatAmount)}`;
   const { walletState } = useContext(WalletContext);
   const { supportedTopUps, network, checkout } = walletState;
   const [isOnRampEnabled, setIsOnRampEnabled] = useState<boolean>();
