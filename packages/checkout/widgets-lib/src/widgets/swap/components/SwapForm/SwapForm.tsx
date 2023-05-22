@@ -124,6 +124,12 @@ export function SwapForm({ setLoading }: SwapFormProps) {
           ),
         },
       });
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR,
+          swapToAmountError: '',
+        },
+      });
     } catch (error: any) {
       swapFormDispatch({
         payload: {
