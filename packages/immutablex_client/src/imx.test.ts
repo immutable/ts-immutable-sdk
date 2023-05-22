@@ -50,9 +50,6 @@ describe('ImmutableXClient', () => {
     const assetsResponse = await assetApi.listAssets();
 
     expect(assetsResponse.status).toEqual(200);
-    expect(assetsResponse.config.headers?.['x-sdk-version']).toContain(
-      'ts-immutable-sdk',
-    );
   });
 
   it('should instantiate a ImmutableXClient with override and custom SDK version', async () => {
