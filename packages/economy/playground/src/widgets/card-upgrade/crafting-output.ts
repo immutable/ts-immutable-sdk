@@ -59,7 +59,7 @@ export class CraftingOutput extends LitElement {
       this.requestUpdate();
       if (this.timeRemaining <= 0) {
         this.stopTimer();
-        // window.location.reload();
+        window.location.reload();
       }
     }, 1000);
   }
