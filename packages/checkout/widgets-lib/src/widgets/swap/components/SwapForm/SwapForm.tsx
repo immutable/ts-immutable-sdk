@@ -94,7 +94,6 @@ export function SwapForm({ setLoading }: SwapFormProps) {
 
   const [fromAmount, setFromAmount] = useState<string>('');
   const [fromToken, setFromToken] = useState<GetBalanceResult | null>(null);
-
   const [toAmount, setToAmount] = useState<string>('');
   const [toToken, setToToken] = useState<TokenInfo | null>(null);
 
@@ -124,6 +123,7 @@ export function SwapForm({ setLoading }: SwapFormProps) {
     [allowedTokens, fromToken],
   );
 
+  // Helpers to update the form context
   useEffect(() => {
     cryptoFiatDispatch({
       payload: {
@@ -169,6 +169,7 @@ export function SwapForm({ setLoading }: SwapFormProps) {
     });
   }, [toToken]);
 
+  // Helpers functions for handling error messaging
   const setFromAmountError = (value: string) => {
     swapFormDispatch({
       payload: {
@@ -331,7 +332,7 @@ export function SwapForm({ setLoading }: SwapFormProps) {
     if (direction === SwapDirection.TO) return;
     if (editing) return;
     (async () => await fetchQuote())();
-  }, [fromAmount, toToken, fromToken, editing]);
+  }, [fromAmount, fromToken, toToken, editing]);
 
   useEffect(() => {
     if (direction === SwapDirection.FROM) return;
