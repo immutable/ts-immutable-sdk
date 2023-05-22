@@ -6,9 +6,13 @@ import { ErrorType, SDKErrorType } from './types';
 export class SDKError extends Error {
   public type: ErrorType;
 
-  constructor(type: ErrorType, message: string) {
+  public cause: unknown;
+
+  constructor(type: ErrorType, message: string, cause: unknown) {
+    console.log({ cause });
     super(message);
     this.type = type;
+    this.cause = cause;
   }
 }
 
@@ -18,7 +22,6 @@ export class SDKError extends Error {
  * @returns
  */
 export function withSDKError(options: SDKErrorType) {
-  // TODO: fix this eslint error
   // eslint-disable-next-line func-names
   return function (
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -28,20 +31,19 @@ export function withSDKError(options: SDKErrorType) {
   ) {
     const method = descriptor.value;
 
-    // TODO: fix this eslint error
     // eslint-disable-next-line func-names, no-param-reassign
     descriptor.value = async function (...args: unknown[]) {
       try {
-        // TODO: fix this eslint error
         // eslint-disable-next-line @typescript-eslint/return-await
         return await method.apply(this, args);
       } catch (error) {
         const params = `${args ? JSON.stringify(args, undefined, 2) : ''}`;
-        const errorMessage = options.message
-          || `Error in method ${target.constructor.name}.${propertyKey}: "${
-            (error as Error).message
-          }"\n called with: ${params}`;
-        throw new SDKError(options.type, errorMessage);
+        const defaultErrorMessage = `
+          Error in method ${target.constructor.name}.${propertyKey}: "${(error as Error).message}"\n 
+          called with: ${params}`;
+
+        const errorMessage = options.message || defaultErrorMessage;
+        throw new SDKError(options.type, errorMessage, (error as Error).cause);
       }
     };
 
