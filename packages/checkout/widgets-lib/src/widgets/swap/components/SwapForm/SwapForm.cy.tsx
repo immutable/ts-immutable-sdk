@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers';
 import { cy } from 'local-cypress';
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout } from '@imtbl/checkout-sdk';
+import { Exchange } from '@imtbl/dex-sdk';
 import { cySmartGet } from '../../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../../test-components/SwapWidgetTestComponent';
 import { SwapForm } from './SwapForm';
@@ -11,7 +12,7 @@ import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContex
 import { SwapState, initialSwapState } from '../../context/swap-context/SwapContext';
 import { SwapCoins } from '../../views/SwapCoins';
 import { SwapFormState, initialSwapFormState } from '../../context/swap-form-context/SwapFormContext';
-import { quotes } from '../../functions/FetchQuote';
+import { quotesProcessor } from '../../functions/FetchQuote';
 
 describe('SwapForm', () => {
   let testSwapState: SwapState;
@@ -22,6 +23,7 @@ describe('SwapForm', () => {
       ...initialSwapState,
       provider: {} as Web3Provider,
       checkout: {} as Checkout,
+      exchange: {} as Exchange,
       tokenBalances: [
         {
           balance: BigNumber.from('10000000000000'),
@@ -292,8 +294,42 @@ describe('SwapForm', () => {
 
   describe('when to fetch a quote', () => {
     beforeEach(() => {
-      cy.stub(quotes, 'fetchMeAQuote').as('fetchQuoteStub');
+      cy.stub(quotesProcessor, 'fromAmountIn')
+        .as('fromAmountInStub')
+        .resolves({
+          info: {
+            quote: {
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+                address: '',
+              },
+              amount: BigNumber.from('112300000000000012'),
+            },
+            quoteWithMaxSlippage: {
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              },
+              amount: BigNumber.from('112300000000000032'),
+            },
+            gasFeeEstimate: {
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              },
+              amount: BigNumber.from('112300000000000045'),
+            },
+            slippage: 10,
+          },
+        });
     });
+
     it('should only fetch a quote when from token and to token are selected and swap amount has value', () => {
       mount(
         <SwapWidgetTestComponent
@@ -309,7 +345,75 @@ describe('SwapForm', () => {
       cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
 
-      cySmartGet('@fetchQuoteStub').should('have.been.called');
+      const params = [
+        // exchange
+        {},
+        // provider
+        {},
+        // fromToken
+        {
+          name: 'ImmutableX',
+          symbol: 'IMX',
+          decimals: 18,
+          address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+        },
+        // fromAmount
+        '0.01',
+        // toToken
+        {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
+          address: '',
+        },
+      ];
+      cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
+    });
+
+    it('should set to amount and fees after quote is fetched', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+        >
+          <SwapCoins />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('fromTokenInputs-select-form-select__target').click();
+      cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
+      cySmartGet('toTokenInputs-select-form-select__target').click();
+      cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
+      cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
+
+      cySmartGet('@fromAmountInStub').should('have.been.called');
+
+      const params = [
+        // exchange
+        {},
+        // provider
+        {},
+        // fromToken
+        {
+          name: 'ImmutableX',
+          symbol: 'IMX',
+          decimals: 18,
+          address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+        },
+        // fromAmount
+        '0.01',
+        // toToken
+        {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
+          address: '',
+        },
+      ];
+      cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
+
+      const staticText = text.views[SwapWidgetViews.SWAP];
+      cySmartGet('fee_description_gas').should('have.text', '≈ IMX 0.112300');
+      cySmartGet('fee_description_gas_fiat').should('have.text', `${staticText.content.fiatPricePrefix} $0.00`);
     });
 
     it('should fetch a quote after from amount max button is clicked', () => {
@@ -327,7 +431,29 @@ describe('SwapForm', () => {
       cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
       cySmartGet('fromTokenInputs-text-form-max-button').click();
 
-      cySmartGet('@fetchQuoteStub').should('have.been.called');
+      const params = [
+        // exchange
+        {},
+        // provider
+        {},
+        // fromToken
+        {
+          name: 'ImmutableX',
+          symbol: 'IMX',
+          decimals: 18,
+          address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+        },
+        // fromAmount
+        '0.1', // From balance
+        // toToken
+        {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
+          address: '',
+        },
+      ];
+      cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
     });
 
     it('should not fetch a quote when to token is not selected', () => {
@@ -343,8 +469,11 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
+      cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
-      cySmartGet('@fetchQuoteStub').should('not.have.been.called');
+      cySmartGet('toTokenInputs-select-form-select__target').click();
+      cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
+      cySmartGet('@fromAmountInStub').should('have.been.called');
     });
 
     it('should not fetch a quote when from token is not selected', () => {
@@ -360,8 +489,11 @@ describe('SwapForm', () => {
       cySmartGet('toTokenInputs-select-form-select__target').click();
       cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
+      cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
-      cySmartGet('@fetchQuoteStub').should('not.have.been.called');
+      cySmartGet('fromTokenInputs-select-form-select__target').click();
+      cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
+      cySmartGet('@fromAmountInStub').should('have.been.called');
     });
 
     it('should not fetch a quote when from amount is 0', () => {
@@ -378,8 +510,10 @@ describe('SwapForm', () => {
       cySmartGet('toTokenInputs-select-form-select__target').click();
       cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0').trigger('change');
+      cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
-      cySmartGet('@fetchQuoteStub').should('not.have.been.called');
+      cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
+      cySmartGet('@fromAmountInStub').should('have.been.called');
     });
   });
 });

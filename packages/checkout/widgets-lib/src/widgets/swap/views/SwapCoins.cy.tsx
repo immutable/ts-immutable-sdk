@@ -16,6 +16,7 @@ describe('SwapCoins tests', () => {
   beforeEach(() => {
     const initialSwapState: SwapState = {
       checkout: null,
+      exchange: null,
       provider: null,
       providerPreference: null,
       network: null,
