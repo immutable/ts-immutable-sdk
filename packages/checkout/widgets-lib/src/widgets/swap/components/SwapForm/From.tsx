@@ -13,6 +13,7 @@ import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContex
 import { text } from '../../../../resources/text/textConfig';
 import { ValidateFromAmount } from '../../functions/SwapValidator';
 import { SELECT_DEBOUNCE_TIME, TEXT_DEBOUNCE_TIME } from '../../constants';
+import { formatZeroAmount } from '../../../../lib/utils';
 
 export interface FromProps {
   unblockQuote: () => void;
@@ -31,7 +32,7 @@ export function From({ unblockQuote }: FromProps) {
   const availableFromBalanceSubtext = swapFromToken
     ? `${content.availableBalancePrefix} ${swapFromToken?.formattedBalance}`
     : '';
-  const fromFiatPriceText = `${content.fiatPricePrefix} $${swapFormState.swapFromFiatValue}`;
+  const fromFiatPriceText = `${content.fiatPricePrefix} $${formatZeroAmount(swapFormState.swapFromFiatValue, true)}`;
 
   const fromTokensOptions = useMemo(
     () => tokenBalances.filter((balance) => balance.balance.gt(0)).map(
@@ -125,7 +126,7 @@ export function From({ unblockQuote }: FromProps) {
     handleFromAmountValidation(swapFromToken.formattedBalance);
   }, [swapFromToken]);
 
-  const handleAmountInputFoucs = useCallback(() => {
+  const handleAmountInputFocus = () => {
     // block fetching of quote when a user focuses the input
     // conversely stop blocking on blur or after debounce time
     swapFormDispatch({
@@ -134,9 +135,9 @@ export function From({ unblockQuote }: FromProps) {
         blockFetchQuote: true,
       },
     });
-  }, []);
+  };
 
-  const handleFromAmountChange = useCallback((value) => {
+  const handleFromAmountChange = (value) => {
     swapFormDispatch({
       payload: {
         type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
@@ -144,7 +145,7 @@ export function From({ unblockQuote }: FromProps) {
       },
     });
     unblockQuoteOnTextDebounce();
-  }, []);
+  };
 
   return (
     <Box>
@@ -161,7 +162,7 @@ export function From({ unblockQuote }: FromProps) {
         textInputSubtext={fromFiatPriceText}
         textInputTextAlign="right"
         textInputValidator={amountInputValidation}
-        onTextInputFocus={handleAmountInputFoucs}
+        onTextInputFocus={handleAmountInputFocus}
         onTextInputChange={(value) => handleFromAmountChange(value)}
         onTextInputBlur={(value) => handleFromAmountValidation(value)}
         textInputMaxButtonClick={handleFromMaxAmountButtonClick}

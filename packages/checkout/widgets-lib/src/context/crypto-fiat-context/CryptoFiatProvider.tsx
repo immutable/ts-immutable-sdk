@@ -24,7 +24,9 @@ export function CryptoFiatProvider({ children }: CryptoFiatProviderProps) {
     cryptoFiatDispatch({
       payload: {
         type: CryptoFiatActions.SET_CRYPTO_FIAT,
-        cryptoFiat: new CryptoFiat(new CryptoFiatConfiguration({})),
+        cryptoFiat: new CryptoFiat(new CryptoFiatConfiguration({
+          apiKey: process.env.REACT_APP_CRYPTO_FIAT_API_KEY,
+        })),
       },
     });
   }, []);
