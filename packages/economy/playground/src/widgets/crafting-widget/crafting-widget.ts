@@ -5,10 +5,15 @@ import { Environment } from '@imtbl/config';
 import { Economy } from '@imtbl/economy';
 // FIXME: export this type
 import { DomainRecipe } from '@imtbl/economy/dist/__codegen__/recipe';
+import { InventoryItem } from '@imtbl/economy/dist/__codegen__/inventory';
+import { DomainCraft } from '@imtbl/economy/dist/__codegen__/crafting';
 
 type ComponentEvent = {
   type: 'userInfo';
-  userInfo: { userId: string; email: string; address: string };
+  data: { userId: string; email: string; address: string };
+} | {
+  type: 'item-selected',
+  data: InventoryItem
 };
 
 @customElement('crafting-widget')
@@ -23,11 +28,18 @@ export class CraftingWidget extends LitElement {
   walletAddress!: string;
 
   @state()
-  inventory: Array<number> = [1, 2, 3];
+  inventory: Array<Required<InventoryItem>> = [];
 
   @state()
   recipes: Array<DomainRecipe> = [];
- 
+
+  @state()
+  crafts: Array<DomainCraft> = [];
+
+
+  @state()
+  selectedItems: Map<string, Required<InventoryItem>> = new Map();
+
   private economy!: Economy;
 
   onComponentEvent(event: CustomEvent) {
@@ -35,69 +47,68 @@ export class CraftingWidget extends LitElement {
     console.log('onComponentEvent', { detail });
 
     if (detail.type === 'userInfo') {
-      this.setUserInfoOnConnect(event.detail.userInfo);
+      this.setUserInfoOnConnect(detail.data);
+    }
+
+    if (detail.type === 'item-selected') {
+      this.selectItem(detail.data);
     }
   }
 
-  setUserInfoOnConnect(userInfo: ComponentEvent['userInfo']) {
-    this.walletAddress = userInfo.address;
-    this.userId = userInfo.userId;
+  setUserInfoOnConnect(data: { userId: string; address: string }) {
+    this.walletAddress = data.address;
+    this.userId = data.userId;
     this.requestUpdate();
-    console.log('setUserInfoOnConnect', { userInfo });
   }
 
-  async loadRecipes() {
+  selectItem(item: InventoryItem) {
+    if (this.selectedItems.has(item.id)) {
+      this.selectedItems.delete(item.id);
+    }
+
+    if (!this.selectedItems.has(item.id)) {
+      this.selectedItems.set(item.id, item);
+    }
+
+    this.requestUpdate(); 
+  }
+
+  async getRecipes() {
     this.recipes = await this.economy.recipe.getAll({
       gameId: this.gameId,
     });
     this.requestUpdate();
   }
 
-  render() {
-    const properties = {
+  async getInventory() {
+    this.inventory = (await this.economy.inventory.getItems({
+      gameID: this.gameId,
+      owner: [this.userId],
+    })) as Required<InventoryItem>[];
+    this.requestUpdate();
+  }
+
+  async getCrafts() {
+    this.crafts = await this.economy.crafting.getCraftsByGameId(this.gameId);
+    this.requestUpdate();
+  }
+
+  setEconomy() {
+    this.economy = Economy.build({
       gameId: this.gameId,
       userId: this.userId,
       walletAddress: this.walletAddress,
-    };
+      baseConfig: {
+        environment: Environment.SANDBOX,
+      },
+      // overrides: {
+      //   servicesBaseURL: 'http://127.0.0.1:3031',
+      // },
+    });
+  }
 
-    const selectedItems = [
-      {
-        id: 1,
-        name: 'item 1',
-        image: 'https://via.placeholder.com/50',
-        type: 'weapon',
-      },
-      {
-        id: 2,
-        name: 'item 2',
-        image: 'https://via.placeholder.com/50',
-        type: 'weapon',
-      },
-      {
-        id: 3,
-        name: 'item 3',
-        image: 'https://via.placeholder.com/50',
-        type: 'weapon',
-      },
-      {
-        id: 4,
-        name: 'item 4',
-        image: 'https://via.placeholder.com/50',
-        type: 'material',
-      },
-      {
-        id: 5,
-        name: 'item 5',
-        image: 'https://via.placeholder.com/50',
-        type: 'material',
-      },
-      {
-        id: 6,
-        name: 'item 6',
-        image: 'https://via.placeholder.com/50',
-        type: 'material',
-      },
-    ];
+  render() {
+    const selectedItems = Array.from(this.selectedItems.values());
 
     return html`
       <div class="h-screen flex flex-col">
@@ -190,19 +201,11 @@ export class CraftingWidget extends LitElement {
             <!-- DRAWER -->
             <label for="my-drawer-3" class="drawer-overlay"></label>
             <div class="menu w-2/4 bg-base-100 p-4">
-              <crafting-history></crafting-history>
+              <crafting-history .crafts=${this.crafts}></crafting-history>
             </div>
             <!-- DRAWER -->
           </div>
         </div>
-      </div>
-
-      <div>
-        <h1>Crafting Widget</h1>
-        <p>Game ID: ${this.gameId}</p>
-        <p>User ID: ${this.userId}</p>
-        <p>Wallet Address: ${this.walletAddress}</p>
-        <pre>${JSON.stringify(properties, null, 2)}</pre>
       </div>
     `;
   }
@@ -217,27 +220,23 @@ export class CraftingWidget extends LitElement {
     };
   }
 
-  setEconomy() {
-    this.economy = Economy.build({
-      gameId: this.gameId,
-      userId: this.userId,
-      walletAddress: this.walletAddress,
-      baseConfig: {
-        environment: Environment.SANDBOX,
-      },
-      // overrides: {
-      //   servicesBaseURL: 'http://127.0.0.1:3031',
-      // },
-    });
-    this.loadRecipes();
-  }
-
   connectedCallback(): void {
     super.connectedCallback();
+    this.setEconomy();
+    this.getRecipes();
+    this.getCrafts();
+    this.getInventory();
+    const refreshInterval = setInterval(() => {
+      this.getInventory();
+      this.getCrafts();
+    }, 3000);
+    window.addEventListener('beforeunload', () =>
+      clearInterval(refreshInterval)
+    );
+
     window.addEventListener(
       'crafting-widget-event',
       this.getCustomEventHandler(this.onComponentEvent)
     );
-    this.setEconomy();
   }
 }
