@@ -32,7 +32,10 @@ export function SwapButton({ loading }: SwapButtonProps) {
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
   const {
-    swapFromToken, swapFromAmount, swapToToken, swapToAmount,
+    swapFromToken,
+    swapFromAmount,
+    swapToToken,
+    swapToAmount,
   } = swapFormState;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -92,7 +95,36 @@ export function SwapButton({ loading }: SwapButtonProps) {
   };
 
   const sendTransaction = async () => {
-    // todo-mik: implement
+    if (!checkout || !provider) return;
+    if (!SwapFormValidator()) return;
+    try {
+      await checkout.sendTransaction({
+        provider,
+        transaction: {
+          nonce: '0x00',
+          gasPrice: '0x00',
+          gas: '0x00',
+          to: '',
+          from: '',
+          value: '0x00',
+          data: '',
+          chainId: 5,
+        },
+      });
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: SwapWidgetViews.SUCCESS },
+        },
+      });
+    } catch (err: any) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: SwapWidgetViews.SUCCESS },
+        },
+      });
+    }
   };
 
   return (

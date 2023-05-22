@@ -1,6 +1,8 @@
 import { Box, Heading, OptionKey } from '@biom3/react';
 import {
-  useCallback, useContext, useMemo,
+  useCallback,
+  useContext,
+  useMemo,
 } from 'react';
 import { SelectInput } from '../../../../components/FormComponents/SelectInput/SelectInput';
 import { amountInputValidation } from '../../../../lib/validations/amountInputValidations';
@@ -62,14 +64,18 @@ export function From({ fetchQuote }: FromProps) {
             swapFromToken: selectedTokenOption,
           },
         });
-
         swapFormDispatch({
           payload: {
             type: SwapFormActions.SET_SWAP_FROM_TOKEN_ERROR,
             swapFromTokenError: '',
           },
         });
-
+        swapFormDispatch({
+          payload: {
+            type: SwapFormActions.SET_SWAP_TO_AMOUNT,
+            swapToAmount: '',
+          },
+        });
         fetchQuote();
       }
 
@@ -116,6 +122,12 @@ export function From({ fetchQuote }: FromProps) {
         swapFromAmount: swapFromToken.formattedBalance,
       },
     });
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_SWAP_TO_AMOUNT,
+        swapToAmount: '',
+      },
+    });
     handleFromAmountValidation(swapFromToken.formattedBalance);
     fetchQuote();
   }, [swapFromToken]);
@@ -125,6 +137,12 @@ export function From({ fetchQuote }: FromProps) {
       payload: {
         type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
         swapFromAmount: value,
+      },
+    });
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_SWAP_TO_AMOUNT,
+        swapToAmount: '',
       },
     });
   };

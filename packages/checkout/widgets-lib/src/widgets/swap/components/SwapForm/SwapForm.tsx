@@ -170,7 +170,6 @@ export function SwapForm({ setLoading }: SwapFormProps) {
       if (parseFloat(swapFromAmount) <= 0) return;
       if (!swapFromToken) return;
       if (!swapToToken) return;
-
       if (isFetching) return;
       setLoading(true);
       setIsFetching(true);

@@ -87,6 +87,12 @@ export function To({ fetchQuote }: ToProps) {
             swapToToken: selectedTokenOption,
           },
         });
+        swapFormDispatch({
+          payload: {
+            type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
+            swapFromAmount: '',
+          },
+        });
 
         fetchQuote();
       }
@@ -111,6 +117,12 @@ export function To({ fetchQuote }: ToProps) {
       payload: {
         type: SwapFormActions.SET_SWAP_TO_AMOUNT,
         swapToAmount: value,
+      },
+    });
+    swapFormDispatch({
+      payload: {
+        type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
+        swapFromAmount: '',
       },
     });
   };
