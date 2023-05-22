@@ -1,49 +1,24 @@
 import { LitElement, css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, state, property } from 'lit/decorators.js';
 
 import { Economy, EconomyEvents } from '@imtbl/economy';
-import type {
-  CraftInput,
-  InventoryItem,
-  ItemDefinition,
-  Recipe,
-} from '@imtbl/economy';
+import type { InventoryItem, ItemDefinition, Recipe } from '@imtbl/economy';
 import { Environment } from '@imtbl/config';
 
 @customElement('imtbl-crafting-widget')
 export class CraftingWidget extends LitElement {
   static styles = css``;
 
-  private economy: Economy;
+  @property({ type: String })
+  owner!: string;
 
-  constructor() {
-    super();
-    this.economy = Economy.build({
-      gameId: 'sb',
-      userId: 'jimmy-test',
-      walletAddress: '0x',
-      imxProvider: undefined,
-      baseConfig: {
-        environment: Environment.SANDBOX,
-      },
-      // overrides: {
-      //   servicesBaseURL: 'http://127.0.0.1:3031'
-      // }
-    });
-    this.getRecipe();
-    this.getInventory();
-  }
+  @property({ type: String, attribute: 'game-id' })
+  gameId!: string;
 
-  @state()
-  private craftInput: CraftInput = {
-    requiresWeb3: false,
-    input: {
-      gameId: 'sb',
-      userId: 'jimmy-test',
-      recipeId: 'c1da5d0e-f506-4ae4-9d9d-00958be06d58',
-      ingredients: [],
-    },
-  };
+  @property({ type: String, attribute: 'recipe-id' })
+  recipeId!: string;
+
+  private economy!: Economy;
 
   @state()
   recipe!: Recipe;
@@ -78,7 +53,29 @@ export class CraftingWidget extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
+    this.economy = Economy.build({
+      gameId: this.gameId,
+      userId: this.owner,
+      walletAddress: '0x',
+      baseConfig: {
+        environment: Environment.SANDBOX,
+      },
+      // overrides: {
+      //   servicesBaseURL: 'http://127.0.0.1:3031'
+      // }
+    });
+
+    this.getRecipe();
+
+    this.getInventory();
+    const intervalId = setInterval(() => {
+      this.getInventory();
+    }, 1000);
+
     this.economy.subscribe(this.handleCraftingComplete.bind(this));
+    window.addEventListener('unload', () => {
+      clearInterval(intervalId);
+    });
     window.addEventListener(
       'imtbl-crafting-event',
       this.handleCustomEvent(this.handleComponentEvent)
@@ -89,22 +86,21 @@ export class CraftingWidget extends LitElement {
     this.loading = true;
     this.requestUpdate();
     this.economy.crafting.craft({
-      requiresWeb3: this.craftInput.requiresWeb3,
-      input: {
-        ...this.craftInput.input,
-        ingredients: this.getCraftIngredients(),
-      },
+      game_id: this.gameId,
+      user_id: this.owner,
+      recipe_id: this.recipeId,
+      ingredients: this.getCraftIngredients() as any,
     });
   }
 
-  getCraftIngredients(): CraftInput['input']['ingredients'] {
+  getCraftIngredients(): Array<any> {
     const [firstItem, ...dustItems] = Array.from(this.selectedItems.values());
 
     return [
-      { conditionId: this.recipe.inputs[0]?.id, itemId: firstItem.id },
+      { condition_id: this.recipe.inputs[0]?.id, item_id: firstItem.id },
       ...dustItems.map((item) => ({
-        conditionId: this.recipe.inputs[1]?.id,
-        itemId: item.id,
+        condition_id: this.recipe.inputs[1]?.id,
+        item_id: item.id,
       })),
     ];
   }
@@ -149,18 +145,19 @@ export class CraftingWidget extends LitElement {
   }
 
   async getRecipe() {
-    this.recipe = await this.economy.recipe.getRecipeById(
-      this.craftInput.input.recipeId
-    );
+    this.recipe = await this.economy.recipe.getById(this.recipeId);
     await this.getRecipeOutput();
     this.requestUpdate();
   }
 
   async getInventory() {
-    this.items = await this.economy.inventory.getItems({
-      owner: this.craftInput.input.userId,
-      gameId: this.craftInput.input.gameId,
-    }) || [];
+    console.log("🚀 ~ file: imtbl-crafting-widget.ts:159 ~ CraftingWidget ~ getInventory ~ this.gameId:", this.gameId)
+
+    this.items =
+      (await this.economy.inventory.getItems({
+        gameID: this.gameId,
+        owner: [this.owner],
+      })) || [];
 
     this.requestUpdate();
   }
@@ -189,24 +186,24 @@ export class CraftingWidget extends LitElement {
   }
 
   handleRecipeInput(event: InputEvent) {
-    this.craftInput.input.recipeId = (event.target as HTMLInputElement).value;
+    this.recipeId = (event.target as HTMLInputElement).value;
     this.requestUpdate();
   }
-
+  
   handleGameInput(event: InputEvent) {
-    this.craftInput.input.gameId = (event.target as HTMLInputElement).value;
-    this.getInventory();
+    this.gameId = (event.target as HTMLInputElement).value;
     this.requestUpdate();
   }
-
-  handleUserInput(event: InputEvent) {
-    this.craftInput.input.userId = (event.target as HTMLInputElement).value;
-    this.getInventory();
+  
+  handleOwnerInput(event: InputEvent) {
+    this.owner = (event.target as HTMLInputElement).value;
     this.requestUpdate();
   }
 
   getDustCondition(input: Recipe['inputs'][0]) {
-    return input.conditions.find((cond) => cond.ref.includes('dust_power'));
+    return input.conditions.find((cond: any) =>
+      cond.ref.includes('dust_power')
+    );
   }
 
   getMaxDustPower(): Number {
@@ -247,14 +244,14 @@ export class CraftingWidget extends LitElement {
     return html` <div class="p-4 flex flex-row">
         <div class="form-control w-full max-w-xs">
           <label class="label">
-            <span class="label-text">User Id</span>
+            <span class="label-text">Owner (user-id / wallet address)</span>
           </label>
           <input
-            placeholder="User ID"
+            placeholder="Owner"
             class="input input-bordered w-full max-w-xs"
             type="text"
-            .value="${this.craftInput.input.userId}"
-            @blur="${this.handleUserInput}"
+            .value="${this.owner}"
+            @blur="${this.handleOwnerInput}"
           />
         </div>
         <div class="form-control w-full max-w-xs">
@@ -265,7 +262,7 @@ export class CraftingWidget extends LitElement {
             placeholder="Game ID"
             class="input input-bordered w-full max-w-xs"
             type="text"
-            .value="${this.craftInput.input.gameId}"
+            .value="${this.gameId}"
             @blur="${this.handleGameInput}"
           />
         </div>
@@ -277,7 +274,7 @@ export class CraftingWidget extends LitElement {
             placeholder="Recipe ID"
             class="input input-bordered w-full max-w-xs"
             type="text"
-            .value="${this.craftInput.input.recipeId}"
+            .value="${this.recipeId}"
             @blur="${this.handleRecipeInput}"
           />
         </div>
