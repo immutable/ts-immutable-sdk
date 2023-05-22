@@ -39,7 +39,7 @@ describe(Recipe.name, () => {
     });
 
     describe('when status is not 200', () => {
-      it.only('should throw error', async () => {
+      it('should throw error', async () => {
         const recipesGetFn = jest.fn().mockImplementation((input: { gameId: string, filter?: string[] }) => {
           throw new Error();
         });

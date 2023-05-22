@@ -9,7 +9,6 @@ export class SDKError extends Error {
   public cause: unknown;
 
   constructor(type: ErrorType, message: string, cause: unknown) {
-    console.log({ cause });
     super(message);
     this.type = type;
     this.cause = cause;
