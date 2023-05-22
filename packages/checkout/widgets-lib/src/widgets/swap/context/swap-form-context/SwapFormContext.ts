@@ -5,6 +5,7 @@ import { createContext } from 'react';
 export interface SwapFormState {
   quote: TransactionResponse | null;
   gasFeeValue: string;
+  gasFeeToken: TokenInfo | null;
   gasFeeFiatValue: string;
   quoteError: string;
   swapFromToken: GetBalanceResult | null;
@@ -23,6 +24,7 @@ export interface SwapFormState {
 export const initialSwapFormState: SwapFormState = {
   quote: null,
   gasFeeValue: '',
+  gasFeeToken: null,
   gasFeeFiatValue: '',
   quoteError: '',
   swapFromToken: null,
@@ -137,6 +139,7 @@ export interface SetSwapQuotePayload {
   type: SwapFormActions.SET_SWAP_QUOTE;
   quote: TransactionResponse;
   gasFeeValue: string;
+  gasFeeToken: TokenInfo;
   gasFeeFiatValue: string;
 }
 
@@ -163,6 +166,7 @@ export const swapFormReducer: Reducer<SwapFormState, SwapFormAction> = (
         ...state,
         quote: action.payload.quote,
         gasFeeValue: action.payload.gasFeeValue,
+        gasFeeToken: action.payload.gasFeeToken,
         gasFeeFiatValue: action.payload.gasFeeFiatValue,
       };
     case SwapFormActions.SET_SWAP_QUOTE_ERROR:

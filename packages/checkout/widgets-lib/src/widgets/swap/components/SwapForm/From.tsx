@@ -13,6 +13,7 @@ import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContex
 import { text } from '../../../../resources/text/textConfig';
 import { ValidateFromAmount } from '../../functions/SwapValidator';
 import { SELECT_DEBOUNCE_TIME, TEXT_DEBOUNCE_TIME } from '../../constants';
+import { formatZeroAmount } from '../../../../lib/utils';
 
 export interface FromProps {
   unblockQuote: () => void;
@@ -31,7 +32,7 @@ export function From({ unblockQuote }: FromProps) {
   const availableFromBalanceSubtext = swapFromToken
     ? `${content.availableBalancePrefix} ${swapFromToken?.formattedBalance}`
     : '';
-  const fromFiatPriceText = `${content.fiatPricePrefix} $${swapFormState.swapFromFiatValue}`;
+  const fromFiatPriceText = `${content.fiatPricePrefix} $${formatZeroAmount(swapFormState.swapFromFiatValue, true)}`;
 
   const fromTokensOptions = useMemo(
     () => tokenBalances.filter((balance) => balance.balance.gt(0)).map(

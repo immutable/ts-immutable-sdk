@@ -23,6 +23,7 @@ describe('SwapWidget tests', () => {
             getAddress: () => Promise.resolve('dss'),
           }),
           getNetwork: async () => ({
+            // FIXME: stop hardcoding this, only doing because dev net is reset
             chainId: ChainId.POLYGON_ZKEVM_TESTNET,
             name: 'Ethereum',
           }),
@@ -31,6 +32,7 @@ describe('SwapWidget tests', () => {
           },
         },
         network: {
+          // FIXME: stop hardcoding this, only doing because dev net is reset
           chainId: ChainId.POLYGON_ZKEVM_TESTNET,
           name: 'Ethereum',
           nativeCurrency: {

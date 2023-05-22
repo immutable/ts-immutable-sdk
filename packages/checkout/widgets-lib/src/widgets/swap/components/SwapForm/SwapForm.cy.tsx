@@ -412,7 +412,7 @@ describe('SwapForm', () => {
       cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
 
       const staticText = text.views[SwapWidgetViews.SWAP];
-      cySmartGet('fee_description_gas').should('have.text', `${staticText.content.gasFeePrefix} 0.112300`);
+      cySmartGet('fee_description_gas').should('have.text', '≈ 0.112300');
       cySmartGet('fee_description_gas_fiat').should('have.text', `${staticText.content.fiatPricePrefix} $0.00`);
     });
 

@@ -8,6 +8,7 @@ import {
   sortTokensByAmount,
   tokenValueFormat,
 } from './utils';
+import { DEFAULT_TOKEN_DECIMALS } from './constant';
 
 describe('utils', () => {
   describe('sortTokensByAmount', () => {
@@ -397,6 +398,14 @@ describe('utils', () => {
   });
 
   describe('tokenValueFormat', () => {
-    expect(tokenValueFormat('11.2233445566')).toEqual('11.223344');
+    it(`a number with more than ${DEFAULT_TOKEN_DECIMALS} decimals`, () => {
+      expect(tokenValueFormat('11.2233445566')).toEqual('11.223344');
+    });
+    it(`a number without ${DEFAULT_TOKEN_DECIMALS} decimals`, () => {
+      expect(tokenValueFormat('112233445566')).toEqual('112233445566');
+    });
+    it(`a number with less than ${DEFAULT_TOKEN_DECIMALS} decimals`, () => {
+      expect(tokenValueFormat('11.22')).toEqual('11.22');
+    });
   });
 });

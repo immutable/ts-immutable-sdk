@@ -9,8 +9,9 @@ import { formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
 export function Fees() {
   const staticText = text.views[SwapWidgetViews.SWAP];
 
-  const { swapFormState: { gasFeeValue, gasFeeFiatValue } } = useContext(SwapFormContext);
+  const { swapFormState: { gasFeeValue, gasFeeFiatValue, gasFeeToken } } = useContext(SwapFormContext);
 
+  if (!gasFeeValue) return <Box />;
   return (
     <Box sx={feeContainerStyles}>
       <Box
@@ -33,7 +34,9 @@ export function Fees() {
       </Box>
       <Box sx={feeBoxStyles}>
         <Body testId="fee_description_gas" size="medium" weight="regular" sx={{ textAlign: 'right' }}>
-          {staticText.content.gasFeePrefix}
+          ≈
+          {' '}
+          {gasFeeToken?.symbol}
           {' '}
           {formatZeroAmount(tokenValueFormat(gasFeeValue))}
         </Body>

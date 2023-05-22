@@ -97,15 +97,26 @@ export function SwapForm() {
         swapToToken,
       );
 
+      const estimate = result.info.gasFeeEstimate;
       const gasFee = utils.formatUnits(
-        result.info.gasFeeEstimate?.amount || 0,
+        estimate?.amount || 0,
         DEFAULT_IMX_DECIMALS,
       );
+      const estimateToken = estimate?.token;
+
+      const gasToken = allowedTokens.find((token) => token.symbol === estimateToken?.symbol);
       swapFormDispatch({
         payload: {
           type: SwapFormActions.SET_SWAP_QUOTE,
           quote: result,
           gasFeeValue: gasFee,
+          gasFeeToken: {
+            name: gasToken?.name || '',
+            symbol: gasToken?.symbol || '',
+            decimals: gasToken?.decimals || 0,
+            address: gasToken?.address,
+            icon: gasToken?.icon,
+          },
           gasFeeFiatValue: calculateCryptoToFiat(
             gasFee,
             DEFAULT_IMX_DECIMALS.toString(),
