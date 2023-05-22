@@ -59,6 +59,7 @@ export class InventoryItems extends LitElement {
       class="grid grid-cols-3 gap-4 h-screen overflow-y-scroll p-4 bg-base-300"
     >
       ${this?.items?.map((item: ItemDefinition) => {
+        console.log("🚀 ~ file: inventory-items.ts:104 ~ InventoryItems ~ ${this?.items?.map ~ item:", item)
         const selectedCx = this.getIsSelected(item.id)
           ? 'opacity-50 outline outline-primary pointer-events-none'
           : '';
@@ -101,6 +102,7 @@ export class InventoryItems extends LitElement {
           </div>
         `;
       })}
+      
     </div>`;
   }
 
