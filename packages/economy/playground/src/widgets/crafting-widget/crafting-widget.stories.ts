@@ -3,9 +3,9 @@ import { html } from 'lit-html';
 const meta = {
   title: 'Crafting/widget',
   args: {
-    gameId: '',
-    userId: '',
-    walletAddress: '',
+    gameId: 'pokemon',
+    userId: 'pokemon_master',
+    walletAddress: '0x',
   },
 };
 export default meta;

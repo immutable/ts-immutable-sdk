@@ -1,6 +1,11 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
+import { Environment } from '@imtbl/config';
+import { Economy } from '@imtbl/economy';
+// FIXME: export this type
+import { DomainRecipe } from '@imtbl/economy/dist/__codegen__/recipe';
+
 type ComponentEvent = {
   type: 'userInfo';
   userInfo: { userId: string; email: string; address: string };
@@ -21,7 +26,9 @@ export class CraftingWidget extends LitElement {
   inventory: Array<number> = [1, 2, 3];
 
   @state()
-  recipes: Array<unknown> = ['A', 'B', 'C'];
+  recipes: Array<DomainRecipe> = [];
+ 
+  private economy!: Economy;
 
   onComponentEvent(event: CustomEvent) {
     const detail = event.detail as ComponentEvent;
@@ -37,6 +44,13 @@ export class CraftingWidget extends LitElement {
     this.userId = userInfo.userId;
     this.requestUpdate();
     console.log('setUserInfoOnConnect', { userInfo });
+  }
+
+  async loadRecipes() {
+    this.recipes = await this.economy.recipe.getAll({
+      gameId: this.gameId,
+    });
+    this.requestUpdate();
   }
 
   render() {
@@ -203,11 +217,27 @@ export class CraftingWidget extends LitElement {
     };
   }
 
+  setEconomy() {
+    this.economy = Economy.build({
+      gameId: this.gameId,
+      userId: this.userId,
+      walletAddress: this.walletAddress,
+      baseConfig: {
+        environment: Environment.SANDBOX,
+      },
+      // overrides: {
+      //   servicesBaseURL: 'http://127.0.0.1:3031',
+      // },
+    });
+    this.loadRecipes();
+  }
+
   connectedCallback(): void {
     super.connectedCallback();
     window.addEventListener(
       'crafting-widget-event',
       this.getCustomEventHandler(this.onComponentEvent)
     );
+    this.setEconomy();
   }
 }

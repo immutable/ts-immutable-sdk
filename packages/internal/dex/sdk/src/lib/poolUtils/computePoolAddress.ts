@@ -1,6 +1,6 @@
-import { defaultAbiCoder, getCreate2Address } from 'ethers/lib/utils';
 import { keccak256 } from '@ethersproject/solidity';
 import { FeeAmount } from '@uniswap/v3-sdk';
+import { ethers } from 'ethers';
 import { ERC20Pair } from './generateERC20Pairs';
 
 // Hard-coded into factory contract
@@ -20,12 +20,12 @@ export function computePoolAddress({
   // erc20 addresses need to be in alphabetical order to correctly identify a pool
   // eslint-disable-next-line @typescript-eslint/no-use-before-define, no-param-reassign
   erc20Pair = ensureCorrectERC20AddressOrder(erc20Pair);
-  return getCreate2Address(
+  return ethers.utils.getCreate2Address(
     factoryAddress,
     keccak256(
       ['bytes'],
       [
-        defaultAbiCoder.encode(
+        ethers.utils.defaultAbiCoder.encode(
           ['address', 'address', 'uint24'],
           [erc20Pair[0].address, erc20Pair[1].address, fee],
         ),
