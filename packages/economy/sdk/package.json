@@ -11,6 +11,7 @@
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "axios": "^1.3.5",
+    "linqts": "^1.15.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
     "typedi": "^0.10.0"
@@ -40,15 +41,15 @@
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "build:all": "wsrun -p @imtbl/economy --stages build",
     "dev": "npm run build -- --watch",
+    "generate:all": "make",
+    "generate:crafting": "make generate-crafting",
+    "generate:inventory": "make generate-inventory",
+    "generate:item-definition": "make generate-item-definition",
+    "generate:recipe": "make generate-recipe",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:watch": "jest --watch",
-    "typecheck": "tsc --noEmit --jsx preserve",
-    "generate:crafting": "make generate-crafting",
-    "generate:inventory": "make generate-inventory",
-    "generate:recipe": "make generate-recipe",
-    "generate:item-definition": "make generate-item-definition",
-    "generate:all": "make"
+    "typecheck": "tsc --noEmit --jsx preserve"
   },
   "type": "module",
   "types": "dist/index.d.ts"
