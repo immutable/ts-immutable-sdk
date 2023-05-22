@@ -41,6 +41,11 @@ export interface PrepareListingResponse {
   orderHash: string
 }
 
+export interface FulfilOrderResponse {
+  unsignedApprovalTransaction?: PopulatedTransaction
+  unsignedFulfillmentTransaction: PopulatedTransaction
+}
+
 export interface CreateOrderParams {
   offerer: string
   orderComponents: OrderComponents

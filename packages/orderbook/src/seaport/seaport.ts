@@ -3,17 +3,17 @@ import {
   EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME, SEAPORT_CONTRACT_VERSION_V1_4,
 } from '@opensea/seaport-js/lib/constants';
 import {
-  ApprovalAction, CreateOrderAction, OrderComponents, OrderUseCase,
+  ApprovalAction, CreateOrderAction, ExchangeAction, OrderComponents, OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
 import {
   PopulatedTransaction, providers,
 } from 'ethers';
 import {
-  ERC20Item, ERC721Item, NativeItem, PrepareListingResponse, RoyaltyInfo,
+  ERC20Item, ERC721Item, FulfilOrderResponse, NativeItem, PrepareListingResponse, RoyaltyInfo,
 } from 'types';
 import { Order } from 'openapi/sdk';
 import { getOrderComponentsFromMessage } from './components';
-import { prepareApprovalTransaction } from './approval';
+import { prepareTransaction } from './transaction';
 import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';
 
 export class Seaport {
@@ -45,7 +45,7 @@ export class Seaport {
       .find((action) => action.type === 'approval') as ApprovalAction | undefined;
 
     if (approvalAction) {
-      approvalTransaction = await prepareApprovalTransaction(approvalAction);
+      approvalTransaction = await prepareTransaction(approvalAction.transactionMethods);
     }
 
     const createAction: CreateOrderAction | undefined = actions
@@ -66,22 +66,47 @@ export class Seaport {
     };
   }
 
-  // async fulfilOrder() {
-  // }
+  async fulfilOrder(order: Order, account: string): Promise<FulfilOrderResponse> {
+    const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
+    const { actions } = await this.seaport.fulfillOrders({
+      accountAddress: account,
+      fulfillOrderDetails: [{
+        order: {
+          parameters: orderComponents,
+          signature: order.signature,
+        },
+      }],
+    });
+
+    let approvalTransaction: PopulatedTransaction | undefined;
+
+    const approvalAction = actions
+      .find((action) => action.type === 'approval') as ApprovalAction | undefined;
+
+    if (approvalAction) {
+      approvalTransaction = await prepareTransaction(approvalAction.transactionMethods);
+    }
+
+    const fulfillmentAction: ExchangeAction | undefined = actions
+      .find((action) => action.type === 'exchange') as ExchangeAction | undefined;
+
+    if (!fulfillmentAction) {
+      throw new Error('No exchange action found');
+    }
+
+    const fulfillmentTransaction = await prepareTransaction(fulfillmentAction.transactionMethods);
+
+    return {
+      unsignedApprovalTransaction: approvalTransaction,
+      unsignedFulfillmentTransaction: fulfillmentTransaction,
+    };
+  }
 
   async cancelOrder(order: Order, account: string): Promise<PopulatedTransaction> {
     const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
     const cancellationTransaction = await this.seaport.cancelOrders([orderComponents], account);
 
-    const transaction = await cancellationTransaction.buildTransaction();
-    transaction.gasLimit = await cancellationTransaction.estimateGas();
-
-    // Add 20% more gas than estimate to prevent out of gas errors
-    // This can always be overwritten by the user signing the transaction
-    transaction.gasLimit = transaction.gasLimit
-      .add(transaction.gasLimit.div(5));
-
-    return transaction;
+    return prepareTransaction(cancellationTransaction);
   }
 
   private async mapImmutableOrderToSeaportOrderComponents(order: Order): Promise<OrderComponents> {

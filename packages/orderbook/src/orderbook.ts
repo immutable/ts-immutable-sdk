@@ -4,7 +4,11 @@ import { ERC721Factory } from 'erc721';
 import { Order } from 'openapi/sdk';
 import { Seaport, SeaportFactory } from 'seaport';
 import {
-  CancelOrderResponse, CreateOrderParams, PrepareListingParams, PrepareListingResponse,
+  CancelOrderResponse,
+  CreateOrderParams,
+  FulfilOrderResponse,
+  PrepareListingParams,
+  PrepareListingResponse,
 } from 'types';
 
 export class Orderbook {
@@ -58,8 +62,15 @@ export class Orderbook {
     return this.apiClient.createOrder(createOrderParams);
   }
 
-  // fulfillOrder(createOrderParams: CreateOrderParams): Promise<Order> {
-  // }
+  async fulfillOrder(orderId: string, fulfillerAddress: string): Promise<FulfilOrderResponse> {
+    const order = await this.apiClient.getOrder(orderId);
+
+    if (order.status !== Order.status.ACTIVE) {
+      throw new Error(`Cannot fulfil order that is not active. Current status: ${order.status}`);
+    }
+
+    return this.seaport.fulfilOrder(order, fulfillerAddress);
+  }
 
   async cancelOrder(orderId: string, accountAddress: string): Promise<CancelOrderResponse> {
     const order = await this.apiClient.getOrder(orderId);
