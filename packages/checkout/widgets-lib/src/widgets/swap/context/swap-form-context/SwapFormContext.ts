@@ -1,7 +1,13 @@
 import { GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
+import { TransactionResponse } from '@imtbl/dex-sdk';
 import { createContext } from 'react';
 
 export interface SwapFormState {
+  quote: TransactionResponse | null;
+  gasFeeValue: string;
+  gasFeeToken: TokenInfo | null;
+  gasFeeFiatValue: string;
+  quoteError: string;
   swapFromToken: GetBalanceResult | null;
   swapFromAmount: string;
   swapToToken: TokenInfo | null;
@@ -16,6 +22,11 @@ export interface SwapFormState {
 }
 
 export const initialSwapFormState: SwapFormState = {
+  quote: null,
+  gasFeeValue: '',
+  gasFeeToken: null,
+  gasFeeFiatValue: '',
+  quoteError: '',
   swapFromToken: null,
   swapFromAmount: '',
   swapToToken: null,
@@ -39,6 +50,8 @@ export interface SwapFormAction {
 }
 
 type ActionPayload =
+  | SetSwapQuotePayload
+  | SetSwapQuoteErrorPayload
   | SetSwapFromTokenPayload
   | SetSwapFromAmountPayload
   | SetSwapToTokenPayload
@@ -52,6 +65,8 @@ type ActionPayload =
   | SetSwapToAmountErrorPayload;
 
 export enum SwapFormActions {
+  SET_SWAP_QUOTE = 'SET_SWAP_QUOTE',
+  SET_SWAP_QUOTE_ERROR = 'SET_SWAP_QUOTE_ERROR',
   SET_SWAP_FROM_TOKEN = 'SET_SWAP_FROM_TOKEN',
   SET_SWAP_FROM_AMOUNT = 'SET_SWAP_FROM_AMOUNT',
   SET_SWAP_TO_TOKEN = 'SET_SWAP_TO_TOKEN',
@@ -120,6 +135,19 @@ export interface SetSwapToAmountErrorPayload {
   swapToAmountError: string;
 }
 
+export interface SetSwapQuotePayload {
+  type: SwapFormActions.SET_SWAP_QUOTE;
+  quote: TransactionResponse;
+  gasFeeValue: string;
+  gasFeeToken: TokenInfo;
+  gasFeeFiatValue: string;
+}
+
+export interface SetSwapQuoteErrorPayload {
+  type: SwapFormActions.SET_SWAP_QUOTE_ERROR;
+  quoteError: string;
+}
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const SwapFormContext = createContext<SwapFormContextState>({
   swapFormState: initialSwapFormState,
@@ -133,6 +161,19 @@ export const swapFormReducer: Reducer<SwapFormState, SwapFormAction> = (
   action: SwapFormAction,
 ) => {
   switch (action.payload.type) {
+    case SwapFormActions.SET_SWAP_QUOTE:
+      return {
+        ...state,
+        quote: action.payload.quote,
+        gasFeeValue: action.payload.gasFeeValue,
+        gasFeeToken: action.payload.gasFeeToken,
+        gasFeeFiatValue: action.payload.gasFeeFiatValue,
+      };
+    case SwapFormActions.SET_SWAP_QUOTE_ERROR:
+      return {
+        ...state,
+        quoteError: action.payload.quoteError,
+      };
     case SwapFormActions.SET_SWAP_TO_TOKEN:
       return {
         ...state,

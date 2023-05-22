@@ -9,7 +9,9 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   useEffect, useCallback, useReducer, useMemo,
 } from 'react';
+import { ImmutableConfiguration } from '@imtbl/config';
 import { BigNumber } from 'ethers';
+import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { SwapCoins } from './views/SwapCoins';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { LoadingView } from '../../components/Loading/LoadingView';
@@ -129,7 +131,7 @@ export function SwapWidget(props: SwapWidgetProps) {
       },
     });
 
-    // FIXME: stop hardcoing this, only doing becuase dev net is reset
+    // FIXME: stop hardcoding this, only doing because dev net is reset
     swapDispatch({
       payload: {
         type: SwapActions.SET_TOKEN_BALANCES,
@@ -140,6 +142,7 @@ export function SwapWidget(props: SwapWidgetProps) {
             name: 'ImmutableX',
             symbol: 'IMX',
             decimals: 18,
+            address: '0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851',
           },
         }],
       },
@@ -159,6 +162,18 @@ export function SwapWidget(props: SwapWidgetProps) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: { type: SwapWidgetViews.SWAP },
+      },
+    });
+
+    const exchange = new Exchange(new ExchangeConfiguration({
+      chainId: connectResult.network.chainId,
+      baseConfig: new ImmutableConfiguration({ environment: widgetConfig.environment }),
+    }));
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_EXCHANGE,
+        exchange,
       },
     });
   }, [providerPreference, widgetConfig.environment]);
@@ -189,7 +204,7 @@ export function SwapWidget(props: SwapWidgetProps) {
             {viewState.view.type === SwapWidgetViews.SUCCESS && (
               <SuccessView
                 successText="Success"
-                actionText="Contine"
+                actionText="Continue"
                 // eslint-disable-next-line no-console
                 onActionClick={() => console.log('success')}
               />

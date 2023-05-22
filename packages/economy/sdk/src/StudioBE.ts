@@ -27,7 +27,7 @@ export class StudioBE {
 
   private getConfig(path: string): Configuration {
     return new Configuration({
-      basePath: `${this.config.servicesBaseURL}/${path}`,
+      basePath: `${this.config.servicesBaseURL}${path}`,
     });
   }
 }

@@ -1,6 +1,7 @@
 import { ChainId, GetBalanceResult, NetworkInfo } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { L1Network, zkEVMNetwork } from './networkUtils';
+import { DEFAULT_TOKEN_DECIMALS } from './constant';
 
 export const sortTokensByAmount = (
   environment: Environment,
@@ -69,7 +70,18 @@ export const calculateCryptoToFiat = (
   return formatFiatString(parsedAmount * conversion);
 };
 
-export const formatZeroAmount = (amount: string) => {
-  if (!amount || amount === '0.00') return '-.--';
+export const formatZeroAmount = (amount: string, allowZeros: boolean = false) => {
+  const fallback = '-.--';
+  if (!amount) return fallback;
+  if (amount === '0.00' && !allowZeros) return fallback;
   return amount;
+};
+
+export const tokenValueFormat = (s: Number | string): string => {
+  const asString = s.toString();
+
+  const pointIndex = asString.indexOf('.');
+  if (pointIndex === -1) return asString;
+
+  return asString.substring(0, pointIndex + DEFAULT_TOKEN_DECIMALS + 1);
 };

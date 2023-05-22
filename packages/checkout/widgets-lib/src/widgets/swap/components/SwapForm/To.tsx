@@ -5,7 +5,7 @@ import { useCallback, useContext, useMemo } from 'react';
 import debounce from 'lodash.debounce';
 import { SelectInput } from '../../../../components/FormComponents/SelectInput/SelectInput';
 import { amountInputValidation } from '../../../../lib/validations/amountInputValidations';
-import { SwapFormActions, SwapFormContext } from '../../context/swap-form-context/SwapFormContext';
+import { SwapFormActions, SwapFormContext, SwapFormState } from '../../context/swap-form-context/SwapFormContext';
 import { headingStyle, toHeadingBodyStyle } from './SwapFormStyles';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 import { text } from '../../../../resources/text/textConfig';
@@ -13,27 +13,62 @@ import { SelectOption } from '../../../../components/FormComponents/SelectForm/S
 import { SwapContext } from '../../context/swap-context/SwapContext';
 import { ValidateToAmount } from '../../functions/SwapValidator';
 import { SELECT_DEBOUNCE_TIME } from '../../constants';
+import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
 
 export interface ToProps {
   unblockQuote: () => void;
 }
 
+const swapValuesToText = ({
+  swapFromToken,
+  swapToToken,
+  swapFromAmount,
+  swapToAmount,
+}: SwapFormState): {
+  fromToConversion: string,
+  swapToAmount: string,
+} => {
+  const resp = {
+    fromToConversion: '',
+    swapToAmount: '',
+  };
+
+  if (!swapToAmount) return resp;
+  resp.swapToAmount = tokenValueFormat(swapToAmount);
+
+  if (swapFromAmount && swapFromToken && swapToToken) {
+    const conversionRatio = tokenValueFormat(Number(swapToAmount) / Number(swapFromAmount));
+    resp.fromToConversion = `1 ${swapFromToken.token.symbol} ≈ ${
+      formatZeroAmount(conversionRatio, true)
+    } ${swapToToken.symbol}`;
+  }
+
+  return resp;
+};
+
 export function To({ unblockQuote }: ToProps) {
   const { swapState } = useContext(SwapContext);
+  const { allowedTokens } = swapState;
+
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
   const {
-    swapFromToken, swapToAmount, swapToTokenError, swapToAmountError,
+    swapFromToken,
+    swapToTokenError,
+    swapToAmountError,
   } = swapFormState;
-  const { allowedTokens } = swapState;
-  const { swapForm } = text.views[SwapWidgetViews.SWAP];
-  const fromToConversionText = '1 WETH ≈ 12.6 GOG'; // TODO: to calculate when dex integrated
+
+  const staticText = text.views[SwapWidgetViews.SWAP].swapForm;
+  const swapValuesText = swapValuesToText(swapFormState);
 
   const unblockQuoteOnSelectDebounce = useCallback(debounce(() => {
     unblockQuote();
   }, SELECT_DEBOUNCE_TIME), []);
 
   const toTokenOptions = useMemo(
-    () => allowedTokens.map(
+    () => allowedTokens.filter(
+      // Cannot get a quote for the same token
+      (token) => token.address !== swapFromToken?.token.address,
+    ).map(
       (token) => ({
         id: `${token.symbol}-${token.name}`,
         label: token.symbol,
@@ -56,13 +91,6 @@ export function To({ unblockQuote }: ToProps) {
             swapToToken: selectedTokenOption,
           },
         });
-
-        swapFormDispatch({
-          payload: {
-            type: SwapFormActions.SET_SWAP_TO_TOKEN_ERROR,
-            swapToTokenError: '',
-          },
-        });
       }
 
       unblockQuoteOnSelectDebounce();
@@ -70,64 +98,50 @@ export function To({ unblockQuote }: ToProps) {
     [allowedTokens, swapFormDispatch, unblockQuoteOnSelectDebounce],
   );
 
-  const handleToAmountValidation = useCallback((value: string) => {
+  const handleToAmountValidation = (value: string) => {
     const validateToAmountError = ValidateToAmount(value);
-    if (validateToAmountError) {
-      swapFormDispatch({
-        payload: {
-          type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR,
-          swapToAmountError: validateToAmountError,
-        },
-      });
-      return;
-    }
+    if (!validateToAmountError) return;
 
     swapFormDispatch({
       payload: {
         type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR,
-        swapToAmountError: '',
+        swapToAmountError: validateToAmountError,
       },
     });
-  }, []);
+  };
 
-  const handleToAmountFocus = useCallback(() => {
+  const handleToAmountFocus = () => {
     // eslint-disable-next-line no-console
     console.log('Swap To Text Input Focused');
-  }, []);
+  };
 
-  const handleToAmountChange = useCallback((value: string) => {
+  const handleToAmountChange = (value: string) => {
     swapFormDispatch({
       payload: {
         type: SwapFormActions.SET_SWAP_TO_AMOUNT,
         swapToAmount: value,
       },
     });
-  }, []);
-
-  const handleToAmountMaxButtonClick = useCallback(() => {
-    // eslint-disable-next-line no-console
-    console.log('todo: implement max button function');
-  }, []);
+  };
 
   return (
     <Box>
       <Box sx={headingStyle}>
-        <Heading size="xSmall">{swapForm.to.label}</Heading>
+        <Heading size="xSmall">{staticText.to.label}</Heading>
         <Body sx={toHeadingBodyStyle} size="small">
-          {fromToConversionText}
+          {swapValuesText.fromToConversion}
         </Body>
       </Box>
       <SelectInput
         id="toTokenInputs"
         options={toTokenOptions}
-        textInputValue={swapToAmount}
-        textInputPlaceholder={swapForm.to.inputPlaceholder}
+        textInputValue={swapValuesText.swapToAmount}
+        textInputPlaceholder={staticText.to.inputPlaceholder}
         textInputTextAlign="right"
         textInputValidator={amountInputValidation}
         onTextInputFocus={handleToAmountFocus}
         onTextInputChange={(value) => handleToAmountChange(value)}
         onTextInputBlur={(value) => handleToAmountValidation(value)}
-        textInputMaxButtonClick={handleToAmountMaxButtonClick}
         onSelectChange={handleToTokenChange}
         textInputErrorMessage={swapToAmountError}
         selectErrorMessage={swapToTokenError}
