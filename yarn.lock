@@ -2966,6 +2966,7 @@ __metadata:
     crypto-browserify: ^3.12.0
     https-browserify: ^1.0.0
     lit: ^2.7.2
+    moment: ^2.29.4
     os-browserify: ^0.3.0
     process: ^0.11.10
     react: ^18.2.0
@@ -2975,6 +2976,7 @@ __metadata:
     stream-http: ^3.2.0
     typescript: ^4.9.5
     url: ^0.11.0
+    variant-classnames: ^1.3.0
     vite: ^4.3.5
     vite-plugin-node-polyfills: ^0.8.2
   languageName: unknown
@@ -18883,6 +18885,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"moment@npm:^2.29.4":
+  version: 2.29.4
+  resolution: "moment@npm:2.29.4"
+  checksum: 0ec3f9c2bcba38dc2451b1daed5daded747f17610b92427bebe1d08d48d8b7bdd8d9197500b072d14e326dd0ccf3e326b9e3d07c5895d3d49e39b6803b76e80e
+  languageName: node
+  linkType: hard
+
 "mri@npm:^1.2.0":
   version: 1.2.0
   resolution: "mri@npm:1.2.0"
@@ -25766,6 +25775,13 @@ __metadata:
     resolve-package-path: ^3.1.0
     semver: ^7.3.2
   checksum: a48f4841ff87edf1c0b3dd6e49d197169d654d6206495714ba687112fc30136674c1f0d44d89b935cf15aeb7692024a268af78c6c9ca0a1dad08e72cc7118566
+  languageName: node
+  linkType: hard
+
+"variant-classnames@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "variant-classnames@npm:1.3.0"
+  checksum: 6167a804439bb6388b8f6391dc6a6ad69864cfe0c0c1a975ca9c1e6f2692e9803768edf6df8cb8b06b0715a49e8d5df3c916bd3ab1534eb850f34b6972fc4a9c
   languageName: node
   linkType: hard
 
