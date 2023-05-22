@@ -47,3 +47,7 @@ export interface CreateOrderParams {
   orderHash: string
   orderSignature: string
 }
+
+export interface CancelOrderResponse {
+  unsignedCancelOrderTransaction: PopulatedTransaction
+}

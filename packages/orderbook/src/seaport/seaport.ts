@@ -11,8 +11,10 @@ import {
 import {
   ERC20Item, ERC721Item, NativeItem, PrepareListingResponse, RoyaltyInfo,
 } from 'types';
+import { Order } from 'openapi/sdk';
 import { getOrderComponentsFromMessage } from './components';
 import { prepareApprovalTransaction } from './approval';
+import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';
 
 export class Seaport {
   constructor(
@@ -62,6 +64,33 @@ export class Seaport {
       orderComponents,
       orderHash: await this.seaport.getOrderHash(orderComponents),
     };
+  }
+
+  // async fulfilOrder() {
+  // }
+
+  async cancelOrder(order: Order, account: string): Promise<PopulatedTransaction> {
+    const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
+    const cancellationTransaction = await this.seaport.cancelOrders([orderComponents], account);
+
+    const transaction = await cancellationTransaction.buildTransaction();
+    transaction.gasLimit = await cancellationTransaction.estimateGas();
+
+    // Add 20% more gas than estimate to prevent out of gas errors
+    // This can always be overwritten by the user signing the transaction
+    transaction.gasLimit = transaction.gasLimit
+      .add(transaction.gasLimit.div(5));
+
+    return transaction;
+  }
+
+  private async mapImmutableOrderToSeaportOrderComponents(order: Order): Promise<OrderComponents> {
+    const counterForOfferer = await this.seaport.getCounter(order.account_address);
+    return mapImmutableOrderToSeaportOrderComponents(
+      order,
+      counterForOfferer.toString(),
+      this.zoneContractAddress,
+    );
   }
 
   private createSeaportOrder(
