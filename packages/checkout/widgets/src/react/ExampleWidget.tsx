@@ -1,8 +1,9 @@
 import React from 'react';
+import { DEFAULT_PROVIDER } from '@imtbl/sdk';
 import { Environment } from '@imtbl/config';
 import {
   WidgetConnectionProviders,
-  DEFAULT_PROVIDER, WidgetTheme,
+  WidgetTheme,
 } from '../definitions/constants';
 import { CheckoutWidgetsConfig } from '../definitions/config';
 

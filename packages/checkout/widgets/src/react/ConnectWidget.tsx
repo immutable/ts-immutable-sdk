@@ -1,6 +1,6 @@
 import React from 'react';
+import { DEFAULT_PROVIDER } from '@imtbl/sdk';
 import {
-  DEFAULT_PROVIDER,
   WidgetConnectionProviders,
 } from '../definitions/constants';
 
