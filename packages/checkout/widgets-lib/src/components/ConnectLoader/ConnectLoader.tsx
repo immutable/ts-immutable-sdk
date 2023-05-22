@@ -111,7 +111,7 @@ export function ConnectLoader({
 
     // @ts-ignore
     // TODO: Checkout interface expects 0 arguments but got 1
-    const checkout = new Checkout({ baseConfig: { environment } });
+    const checkout = new Checkout({ baseConfig: { environment: widgetConfig.environment } });
     checkConnection(checkout);
   }, [providerPreference, widgetConfig.environment]);
 

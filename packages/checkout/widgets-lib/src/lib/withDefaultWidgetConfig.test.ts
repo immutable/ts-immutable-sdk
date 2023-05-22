@@ -1,13 +1,13 @@
 import { Environment } from '@imtbl/config';
+import { WidgetTheme } from '@imtbl/checkout-widgets';
+import { withDefaultWidgetConfigs } from './withDefaultWidgetConfig';
 import {
   DEFAULT_BRIDGE_ENABLED,
   DEFAULT_ENV,
   DEFAULT_ON_RAMP_ENABLED,
   DEFAULT_SWAP_ENABLED,
   DEFAULT_THEME,
-  WidgetTheme,
-} from '@imtbl/checkout-widgets';
-import { withDefaultWidgetConfigs } from './withDefaultWidgetConfig';
+} from './constants';
 
 describe('withDefaultWidgetConfig', () => {
   it('empty config returns defaults', () => {
