@@ -6,7 +6,9 @@ import {
   formatFiatString,
   formatZeroAmount,
   sortTokensByAmount,
+  tokenValueFormat,
 } from './utils';
+import { DEFAULT_TOKEN_DECIMALS } from './constant';
 
 describe('utils', () => {
   describe('sortTokensByAmount', () => {
@@ -382,9 +384,28 @@ describe('utils', () => {
       expect(result).toBe('-.--');
     });
 
+    it('should return 0.00 if allow zero is true', () => {
+      let result = formatZeroAmount('0.00', true);
+      expect(result).toBe('0.00');
+      result = formatZeroAmount('', true);
+      expect(result).toBe('-.--');
+    });
+
     it('should return -.-- if amount 0.00', () => {
       const result = formatZeroAmount('0.00');
       expect(result).toBe('-.--');
+    });
+  });
+
+  describe('tokenValueFormat', () => {
+    it(`a number with more than ${DEFAULT_TOKEN_DECIMALS} decimals`, () => {
+      expect(tokenValueFormat('11.2233445566')).toEqual('11.223344');
+    });
+    it(`a number without ${DEFAULT_TOKEN_DECIMALS} decimals`, () => {
+      expect(tokenValueFormat('112233445566')).toEqual('112233445566');
+    });
+    it(`a number with less than ${DEFAULT_TOKEN_DECIMALS} decimals`, () => {
+      expect(tokenValueFormat('11.22')).toEqual('11.22');
     });
   });
 });

@@ -1,9 +1,15 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import Container from 'typedi';
 import 'reflect-metadata';
+
 import { Inventory } from './Inventory';
 import { InventoryItem } from '../__codegen__/inventory';
 
 describe(Inventory.name, () => {
+  beforeAll(() => {
+    Container.reset();
+  });
+
   describe('filterItemsBy', () => {
     const items: InventoryItem[] = [
       {
