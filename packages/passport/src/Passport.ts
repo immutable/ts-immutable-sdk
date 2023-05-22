@@ -3,6 +3,7 @@ import { IMXProvider } from '@imtbl/provider';
 // TODO: Remove this once the dependency has been added
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
+import { ethers } from 'ethers';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
@@ -16,6 +17,8 @@ import {
   User,
 } from './types';
 import registerPassport from './workflows/registration';
+import { ZkEvmProvider } from './ZkEvmProvider';
+import ConfirmationScreen from './confirmation/confirmation';
 
 export class Passport {
   private readonly authManager: AuthManager;
@@ -36,6 +39,23 @@ export class Passport {
       });
   }
 
+  private async getZkEvmProvider(user: User) {
+    if (!user || !user.idToken) {
+      throw new PassportError(
+        'Failed to initialise',
+        PassportErrorType.WALLET_CONNECTION_ERROR,
+      );
+    }
+    const magicRpcProvider = await this.magicAdapter.login(user.idToken);
+    return new ZkEvmProvider(
+      // @ts-ignore
+      this.config.relayerUrl,
+      magicRpcProvider,
+      new ConfirmationScreen(this.config),
+      user,
+    );
+  }
+
   private async getImxProvider(user: User | null) {
     if (!user || !user.idToken) {
       throw new PassportError(
@@ -43,8 +63,11 @@ export class Passport {
         PassportErrorType.WALLET_CONNECTION_ERROR,
       );
     }
-    const provider = await this.magicAdapter.login(user.idToken);
-    const ethSigner = provider.getSigner();
+    const magicRpcProvider = await this.magicAdapter.login(user.idToken);
+    const web3Provider = new ethers.providers.Web3Provider(
+      magicRpcProvider,
+    );
+    const ethSigner = web3Provider.getSigner();
     const starkSigner = await getStarkSigner(ethSigner);
 
     if (!user.etherKey) {

@@ -5,6 +5,8 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
+    "@0xsequence/relayer": "^0.43.29",
+    "@0xsequence/wallet": "^0.43.29",
     "@imtbl/config": "0.0.0",
     "@imtbl/core-sdk": "^1.1.1-alpha.1",
     "@imtbl/provider": "0.0.0",
