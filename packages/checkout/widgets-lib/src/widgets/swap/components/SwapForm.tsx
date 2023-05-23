@@ -185,6 +185,9 @@ export function SwapForm() {
       setToAmountError('');
       setToTokenError('');
     } catch (error: any) {
+      // eslint-disable-next-line no-console
+      console.log('Quote error: ', error.message);
+      // todo: handle the display on form when exchange errors
       setQuoteError(error.message);
     }
     setIsFetching(false);
@@ -517,7 +520,7 @@ export function SwapForm() {
                 }}
                 size="small"
               >
-                {swapValuesText.fromToConversion}
+                {!loading && swapValuesText.fromToConversion}
               </Body>
             </Box>
             <SelectInput
@@ -547,6 +550,5 @@ export function SwapForm() {
         quote={quote}
       />
     </>
-
   );
 }
