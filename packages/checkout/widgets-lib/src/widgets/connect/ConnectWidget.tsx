@@ -31,8 +31,8 @@ import {
   ViewContext,
   BaseViews,
 } from '../../context/view-context/ViewContext';
-import { StatusType } from '../../components/StatusView/StatusType';
-import { StatusView } from '../../components/StatusView/StatusView';
+import { StatusType } from '../../components/Status/StatusType';
+import { StatusView } from '../../components/Status/StatusView';
 
 export interface ConnectWidgetProps {
   environment: Environment;

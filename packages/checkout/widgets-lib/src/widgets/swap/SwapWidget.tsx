@@ -35,8 +35,8 @@ import {
   swapFormReducer,
 } from './context/swap-form-context/SwapFormContext';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
-import { StatusView } from '../../components/StatusView/StatusView';
-import { StatusType } from '../../components/StatusView/StatusType';
+import { StatusView } from '../../components/Status/StatusView';
+import { StatusType } from '../../components/Status/StatusType';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;

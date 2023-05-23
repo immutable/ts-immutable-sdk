@@ -3,6 +3,7 @@ import { FooterButton } from '../Footer/FooterButton';
 import { CenteredBoxContent } from '../CenteredBoxContent/CenteredBoxContent';
 import { StatusBox } from './StatusBox';
 import { StatusType } from './StatusType';
+import { FooterLogo } from '../Footer/FooterLogo';
 
 export interface StatusViewProps {
   actionText: string;
@@ -36,10 +37,13 @@ export function StatusView({
   return (
     <SimpleLayout
       footer={(
-        <FooterButton
-          actionText={actionText}
-          onActionClick={onStatusActionClick}
-        />
+        <>
+          <FooterButton
+            actionText={actionText}
+            onActionClick={onStatusActionClick}
+          />
+          <FooterLogo />
+        </>
       )}
     >
       <CenteredBoxContent testId={testId}>

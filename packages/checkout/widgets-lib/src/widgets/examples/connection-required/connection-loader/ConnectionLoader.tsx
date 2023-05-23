@@ -12,7 +12,7 @@ import { FooterLogo } from '../../../../components/Footer/FooterLogo';
 import { CenteredBoxContent } from '../../../../components/CenteredBoxContent/CenteredBoxContent';
 import { zkEVMNetwork } from '../../../../lib/networkUtils';
 import { InnerExampleWidgetViews } from '../../../../context/view-context/InnerExampleViewContextTypes';
-import { statusBoxStyles } from '../../../../components/StatusView/StatusViewStyles';
+import { statusBoxStyles } from '../../../../components/Status/StatusViewStyles';
 
 export interface ConnectionLoaderProps {
   children?: React.ReactNode;
