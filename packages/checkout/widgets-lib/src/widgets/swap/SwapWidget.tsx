@@ -71,11 +71,12 @@ export function SwapWidget(props: SwapWidgetProps) {
   );
 
   const { params, config } = props;
+  const { environment, theme } = config;
   const {
     amount, fromContractAddress, toContractAddress, providerPreference,
   } = params;
 
-  const biomeTheme: BaseTokens = config.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 
@@ -83,7 +84,7 @@ export function SwapWidget(props: SwapWidgetProps) {
     if (!providerPreference) return;
 
     const checkout = new Checkout({
-      baseConfig: { environment: config.environment },
+      baseConfig: { environment },
     });
 
     swapDispatch({
@@ -167,7 +168,7 @@ export function SwapWidget(props: SwapWidgetProps) {
 
     const exchange = new Exchange(new ExchangeConfiguration({
       chainId: connectResult.network.chainId,
-      baseConfig: new ImmutableConfiguration({ environment: config.environment }),
+      baseConfig: new ImmutableConfiguration({ environment }),
     }));
 
     swapDispatch({
@@ -176,7 +177,7 @@ export function SwapWidget(props: SwapWidgetProps) {
         exchange,
       },
     });
-  }, [providerPreference, config.environment]);
+  }, [providerPreference, environment]);
 
   useEffect(() => {
     swapWidgetSetup();

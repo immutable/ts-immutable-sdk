@@ -199,9 +199,10 @@ export function BuyWidget({
   params: { providerPreference, orderId },
   config,
 }: BuyWidgetProps) {
+  const { environment, theme } = config;
   const checkout = useMemo(
-    () => new Checkout({ baseConfig: { environment: config.environment } }),
-    [config.environment],
+    () => new Checkout({ baseConfig: { environment } }),
+    [environment],
   );
   const [provider, setProvider] = useState<Web3Provider>();
   const [orderbook, setOrderbook] = useState<Orderbook>();
@@ -209,7 +210,7 @@ export function BuyWidget({
   const [order, setOrder] = useState<GetOrderResponse>();
   const [asset, setAsset] = useState<GetAssetResponse>();
   const [view, setView] = useState(BuyWidgetViews.BUY);
-  const biomeTheme: BaseTokens = config.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 

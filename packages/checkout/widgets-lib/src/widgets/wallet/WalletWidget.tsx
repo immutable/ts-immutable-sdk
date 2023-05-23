@@ -44,13 +44,16 @@ export interface WalletWidgetParams {
 export function WalletWidget(props: WalletWidgetProps) {
   const { params, config } = props;
   const { providerPreference } = params;
+  const {
+    environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
+  } = config;
   const topUpFeatures: TopUpFeature = {
-    isBridgeEnabled: config.isBridgeEnabled,
-    isSwapEnabled: config.isSwapEnabled,
-    isOnRampEnabled: config.isOnRampEnabled,
+    isBridgeEnabled,
+    isSwapEnabled,
+    isOnRampEnabled,
   };
 
-  const biomeTheme: BaseTokens = config.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
@@ -66,7 +69,7 @@ export function WalletWidget(props: WalletWidgetProps) {
     walletDispatch({
       payload: {
         type: WalletActions.SET_CHECKOUT,
-        checkout: new Checkout({ baseConfig: { environment: config.environment } }),
+        checkout: new Checkout({ baseConfig: { environment } }),
       },
     });
 
@@ -76,7 +79,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         supportedTopUps: { ...topUpFeatures },
       },
     });
-  }, [topUpFeatures, config.environment]);
+  }, [topUpFeatures, environment]);
 
   useEffect(() => {
     (async () => {

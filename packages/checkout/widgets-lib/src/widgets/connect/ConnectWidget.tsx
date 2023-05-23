@@ -50,6 +50,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const {
     config, deepLink, sendCloseEventOverride,
   } = props;
+  const { environment, theme } = config;
   const [connectState, connectDispatch] = useReducer(
     connectReducer,
     initialConnectState,
@@ -58,7 +59,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const { view } = viewState;
 
-  const biomeTheme: BaseTokens = config.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 
@@ -68,7 +69,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
         payload: {
           type: ConnectActions.SET_CHECKOUT,
           checkout: new Checkout({
-            baseConfig: { environment: config.environment },
+            baseConfig: { environment },
           }),
         },
       });
@@ -89,7 +90,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
         },
       });
     }, 200);
-  }, [deepLink, sendCloseEventOverride, config.environment]);
+  }, [deepLink, sendCloseEventOverride, environment]);
 
   useEffect(() => {
     if (viewState.view.type === ConnectWidgetViews.FAIL) {
