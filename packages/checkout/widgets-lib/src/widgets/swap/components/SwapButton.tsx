@@ -1,7 +1,6 @@
 import { Box, Button } from '@biom3/react';
 import { useContext } from 'react';
 import { TransactionResponse } from '@imtbl/dex-sdk';
-import { Transaction } from '@imtbl/checkout-sdk';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { sendSwapSuccessEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
@@ -9,6 +8,7 @@ import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTy
 import {
   ViewContext,
   ViewActions,
+  BaseViews,
 } from '../../../context/view-context/ViewContext';
 import { SwapContext } from '../context/SwapContext';
 import {
@@ -32,10 +32,10 @@ export function SwapButton({ loading, validator, quote }: SwapButtonProps) {
     if (!checkout || !provider || !quote) return;
     if (!validator()) return;
     try {
-      await checkout.sendTransaction({
-        provider,
-        transaction: quote.transaction as Transaction, // todo: our checkout Transaction requires fields that are not required on a ethers transaction request
-      });
+      // await checkout.sendTransaction({
+      //   provider,
+      //   transaction: // todo: send the transaction
+      // });
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -46,7 +46,10 @@ export function SwapButton({ loading, validator, quote }: SwapButtonProps) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: SwapWidgetViews.SUCCESS },
+          view: {
+            type: BaseViews.ERROR,
+            error: err,
+          },
         },
       });
     }
