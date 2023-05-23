@@ -7,7 +7,6 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeForm } from '../components/BridgeForm';
-import { BridgeButton } from '../components/BridgeButton';
 import { text } from '../../../resources/text/textConfig';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 
@@ -43,15 +42,10 @@ export function Bridge({ amount, fromContractAddress, setTransactionResponse }: 
         <BridgeForm
           defaultAmount={amount}
           defaultTokenAddress={fromContractAddress}
+          updateTransactionResponse={updateTransactionResponse}
         />
         )}
       </Box>
-
-      {provider && (
-      <BridgeButton
-        updateTransactionResponse={updateTransactionResponse}
-      />
-      )}
     </SimpleLayout>
   );
 }

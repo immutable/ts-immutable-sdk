@@ -1,19 +1,33 @@
 import {
-  Body, Box, Option, OptionKey, Select, TextInput,
+  Body, Box, Button, Option, OptionKey, Select, TextInput,
 } from '@biom3/react';
 import { GetBalanceResult } from '@imtbl/checkout-sdk';
-import { useContext, useEffect, useState } from 'react';
+import {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
+import { TransactionResponse } from '@ethersproject/providers';
 import { BridgeContext } from '../context/BridgeContext';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
+import { BridgeFormContext } from '../context/BridgeFormContext';
 
 interface BridgeFormProps {
   defaultAmount?: string;
   defaultTokenAddress?: string;
+  updateTransactionResponse: (transactionResponse: TransactionResponse) => void;
 }
 
 export function BridgeForm(props: BridgeFormProps) {
   const { bridgeState } = useContext(BridgeContext);
-  const { network, tokenBalances, toNetwork } = bridgeState;
-  const { defaultAmount, defaultTokenAddress } = props;
+  const {
+    checkout, network, tokenBalances, toNetwork,
+  } = bridgeState;
+  const { defaultAmount, defaultTokenAddress, updateTransactionResponse } = props;
+
+  const { bridgeFormState: { bridgeFromAmount, bridgeFromToken } } = useContext(BridgeFormContext);
+
+  const { viewDispatch } = useContext(ViewContext);
+  const { bridgeState: { provider } } = useContext(BridgeContext);
 
   const [bridgeAmount, setBridgeAmount] = useState(defaultAmount || '0');
   const [selectedTokenOption, setSelectedTokenOption] = useState<OptionKey>();
@@ -48,6 +62,53 @@ export function BridgeForm(props: BridgeFormProps) {
 
     setSelectedTokenOption(defaultToken?.token.symbol as OptionKey);
   }, [tokenBalances, network, defaultTokenAddress]);
+
+  const isButtonDisabled = (): boolean => {
+    if (!bridgeFromAmount || !bridgeFromToken) return true;
+
+    return false;
+  };
+
+  const getUnsignedTransaction = () => ({
+    // get the bridge transaction
+    // Bridge.getBridgeTx(...)
+    nonce: '0x00', // ignored by MetaMask
+    gasPrice: '0x000', // customizable by user during MetaMask confirmation.
+    gas: '0x000', // customizable by user during MetaMask confirmation.
+    to: '', // To address.
+    from: '', // User's active address.
+    value: '0x00', // Only required to send ether to the recipient from the initiating external account.
+    data: '0x000', // Optional, but used for defining smart contract creation and interaction.
+    chainId: 5, // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
+  });
+
+  const submitBridge = useCallback(async () => {
+    if (!checkout || !provider) return;
+
+    // get unsigned transaction from the bridge/exchange sdk
+    const transaction = getUnsignedTransaction();
+    try {
+      const response = await checkout.sendTransaction({
+        provider,
+        transaction,
+      });
+      updateTransactionResponse(response.transactionResponse);
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: BridgeWidgetViews.SUCCESS },
+        },
+      });
+    } catch (err: any) {
+      // TODO: fix this with fail view... always succeeed for now
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: BridgeWidgetViews.SUCCESS },
+        },
+      });
+    }
+  }, [checkout]);
 
   return (
     <Box sx={{ paddingTop: 'base.spacing.x4' }}>
@@ -128,6 +189,14 @@ export function BridgeForm(props: BridgeFormProps) {
             : ''}
         </Body>
       </Box>
+      <Button
+        testId="bridge-button"
+        disabled={isButtonDisabled()}
+        variant={isButtonDisabled() ? 'tertiary' : 'primary'}
+        onClick={submitBridge}
+      >
+        Bridge
+      </Button>
     </Box>
   );
 }
