@@ -131,7 +131,7 @@ export function ConnectLoader({
           value={{ connectLoaderState, connectLoaderDispatch }}
         >
           <ConnectWidget
-            widgetConfig={widgetConfig}
+            config={widgetConfig}
             params={params}
             deepLink={ConnectWidgetViews.CONNECT_WALLET}
             sendCloseEventOverride={closeEvent}

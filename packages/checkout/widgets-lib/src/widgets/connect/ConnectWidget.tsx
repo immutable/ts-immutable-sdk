@@ -37,7 +37,7 @@ export interface ConnectWidgetProps {
   // TODO: 'params' PropType is defined but prop is never used
   // eslint-disable-next-line react/no-unused-prop-types
   params: ConnectWidgetParams;
-  widgetConfig: StrongCheckoutWidgetsConfig
+  config: StrongCheckoutWidgetsConfig
   deepLink?: ConnectWidgetViews.CONNECT_WALLET;
   sendCloseEventOverride?: () => void;
 }
@@ -48,7 +48,7 @@ export interface ConnectWidgetParams {
 
 export function ConnectWidget(props: ConnectWidgetProps) {
   const {
-    widgetConfig, deepLink, sendCloseEventOverride,
+    config, deepLink, sendCloseEventOverride,
   } = props;
   const [connectState, connectDispatch] = useReducer(
     connectReducer,
@@ -58,7 +58,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const { view } = viewState;
 
-  const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const biomeTheme: BaseTokens = config.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 
@@ -68,7 +68,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
         payload: {
           type: ConnectActions.SET_CHECKOUT,
           checkout: new Checkout({
-            baseConfig: { environment: widgetConfig.environment },
+            baseConfig: { environment: config.environment },
           }),
         },
       });
@@ -89,7 +89,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
         },
       });
     }, 200);
-  }, [deepLink, sendCloseEventOverride, widgetConfig.environment]);
+  }, [deepLink, sendCloseEventOverride, config.environment]);
 
   useEffect(() => {
     if (viewState.view.type === ConnectWidgetViews.FAIL) {

@@ -40,7 +40,7 @@ import { WidgetTheme } from '../../lib';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
-  widgetConfig: StrongCheckoutWidgetsConfig
+  config: StrongCheckoutWidgetsConfig
 }
 
 export interface SwapWidgetParams {
@@ -70,12 +70,12 @@ export function SwapWidget(props: SwapWidgetProps) {
     [swapFormState, swapFormDispatch],
   );
 
-  const { params, widgetConfig } = props;
+  const { params, config } = props;
   const {
     amount, fromContractAddress, toContractAddress, providerPreference,
   } = params;
 
-  const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const biomeTheme: BaseTokens = config.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 
@@ -83,7 +83,7 @@ export function SwapWidget(props: SwapWidgetProps) {
     if (!providerPreference) return;
 
     const checkout = new Checkout({
-      baseConfig: { environment: widgetConfig.environment },
+      baseConfig: { environment: config.environment },
     });
 
     swapDispatch({
@@ -167,7 +167,7 @@ export function SwapWidget(props: SwapWidgetProps) {
 
     const exchange = new Exchange(new ExchangeConfiguration({
       chainId: connectResult.network.chainId,
-      baseConfig: new ImmutableConfiguration({ environment: widgetConfig.environment }),
+      baseConfig: new ImmutableConfiguration({ environment: config.environment }),
     }));
 
     swapDispatch({
@@ -176,7 +176,7 @@ export function SwapWidget(props: SwapWidgetProps) {
         exchange,
       },
     });
-  }, [providerPreference, widgetConfig.environment]);
+  }, [providerPreference, config.environment]);
 
   useEffect(() => {
     swapWidgetSetup();

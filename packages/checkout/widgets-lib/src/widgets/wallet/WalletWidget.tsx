@@ -34,7 +34,7 @@ import { CoinInfo } from './views/CoinInfo';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
-  widgetConfig: StrongCheckoutWidgetsConfig
+  config: StrongCheckoutWidgetsConfig
 }
 
 export interface WalletWidgetParams {
@@ -42,15 +42,15 @@ export interface WalletWidgetParams {
 }
 
 export function WalletWidget(props: WalletWidgetProps) {
-  const { params, widgetConfig } = props;
+  const { params, config } = props;
   const { providerPreference } = params;
   const topUpFeatures: TopUpFeature = {
-    isBridgeEnabled: widgetConfig.isBridgeEnabled,
-    isSwapEnabled: widgetConfig.isSwapEnabled,
-    isOnRampEnabled: widgetConfig.isOnRampEnabled,
+    isBridgeEnabled: config.isBridgeEnabled,
+    isSwapEnabled: config.isSwapEnabled,
+    isOnRampEnabled: config.isOnRampEnabled,
   };
 
-  const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const biomeTheme: BaseTokens = config.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
@@ -66,7 +66,7 @@ export function WalletWidget(props: WalletWidgetProps) {
     walletDispatch({
       payload: {
         type: WalletActions.SET_CHECKOUT,
-        checkout: new Checkout({ baseConfig: { environment: widgetConfig.environment } }),
+        checkout: new Checkout({ baseConfig: { environment: config.environment } }),
       },
     });
 
@@ -76,7 +76,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         supportedTopUps: { ...topUpFeatures },
       },
     });
-  }, [topUpFeatures, widgetConfig.environment]);
+  }, [topUpFeatures, config.environment]);
 
   useEffect(() => {
     (async () => {

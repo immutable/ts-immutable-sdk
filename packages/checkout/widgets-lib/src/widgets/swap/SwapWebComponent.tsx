@@ -61,13 +61,13 @@ export class ImmutableSwap extends ImmutableWebComponent {
           >
             <SwapWidget
               params={swapParams}
-              widgetConfig={this.widgetConfig!}
+              config={this.widgetConfig!}
             />
           </ConnectLoader>
         ) : (
           <SwapWidget
             params={swapParams}
-            widgetConfig={this.widgetConfig!}
+            config={this.widgetConfig!}
           />
         )}
       </React.StrictMode>,

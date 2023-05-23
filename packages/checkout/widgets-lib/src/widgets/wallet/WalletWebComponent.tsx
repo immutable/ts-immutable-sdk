@@ -49,13 +49,13 @@ export class ImmutableWallet extends ImmutableWebComponent {
           >
             <WalletWidget
               params={walletParams}
-              widgetConfig={this.widgetConfig!}
+              config={this.widgetConfig!}
             />
           </ConnectLoader>
         ) : (
           <WalletWidget
             params={walletParams}
-            widgetConfig={this.widgetConfig!}
+            config={this.widgetConfig!}
           />
         )}
       </React.StrictMode>,

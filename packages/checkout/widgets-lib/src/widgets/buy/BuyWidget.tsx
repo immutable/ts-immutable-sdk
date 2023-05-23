@@ -85,7 +85,7 @@ export type GetOrderResponse = {
 };
 export interface BuyWidgetProps {
   params: BuyWidgetParams;
-  widgetConfig: StrongCheckoutWidgetsConfig
+  config: StrongCheckoutWidgetsConfig
 }
 
 export interface BuyWidgetParams {
@@ -197,11 +197,11 @@ export class Orderbook {
 
 export function BuyWidget({
   params: { providerPreference, orderId },
-  widgetConfig,
+  config,
 }: BuyWidgetProps) {
   const checkout = useMemo(
-    () => new Checkout({ baseConfig: { environment: widgetConfig.environment } }),
-    [widgetConfig.environment],
+    () => new Checkout({ baseConfig: { environment: config.environment } }),
+    [config.environment],
   );
   const [provider, setProvider] = useState<Web3Provider>();
   const [orderbook, setOrderbook] = useState<Orderbook>();
@@ -209,7 +209,7 @@ export function BuyWidget({
   const [order, setOrder] = useState<GetOrderResponse>();
   const [asset, setAsset] = useState<GetAssetResponse>();
   const [view, setView] = useState(BuyWidgetViews.BUY);
-  const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const biomeTheme: BaseTokens = config.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 

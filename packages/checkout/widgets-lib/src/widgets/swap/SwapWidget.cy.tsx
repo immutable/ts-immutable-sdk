@@ -115,7 +115,7 @@ describe('SwapWidget tests', () => {
     mount(
       <SwapWidget
         params={params}
-        widgetConfig={config}
+        config={config}
       />,
     );
 
@@ -138,7 +138,7 @@ describe('SwapWidget tests', () => {
     };
     mount(
       <SwapWidget
-        widgetConfig={config}
+        config={config}
         params={params}
       />,
     );

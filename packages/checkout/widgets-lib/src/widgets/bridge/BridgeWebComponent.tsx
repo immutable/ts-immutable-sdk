@@ -41,7 +41,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
       <React.StrictMode>
         <BridgeWidget
           params={params}
-          widgetConfig={this.widgetConfig!}
+          config={this.widgetConfig!}
         />
       </React.StrictMode>,
     );

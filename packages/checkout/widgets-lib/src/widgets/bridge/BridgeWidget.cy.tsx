@@ -102,7 +102,7 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BridgeWidget
-          widgetConfig={config}
+          config={config}
           params={params}
         />,
       );
@@ -131,7 +131,7 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BridgeWidget
-          widgetConfig={config}
+          config={config}
           params={params}
         />,
       );
@@ -160,7 +160,7 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BridgeWidget
-          widgetConfig={config}
+          config={config}
           params={params}
         />,
       );
@@ -181,7 +181,7 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BridgeWidget
-          widgetConfig={config}
+          config={config}
           params={params}
 
         />,
@@ -218,7 +218,7 @@ describe('Bridge Widget tests', () => {
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <BridgeWidget
-            widgetConfig={config}
+            config={config}
             params={params}
 
           />
@@ -284,7 +284,7 @@ describe('Bridge Widget tests', () => {
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <BridgeWidget
-            widgetConfig={config}
+            config={config}
             params={params}
 
           />
@@ -370,7 +370,7 @@ describe('Bridge Widget tests', () => {
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <BridgeWidget
-            widgetConfig={config}
+            config={config}
             params={params}
 
           />
@@ -431,7 +431,7 @@ describe('Bridge Widget tests', () => {
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <BridgeWidget
-            widgetConfig={config}
+            config={config}
             params={params}
 
           />
@@ -517,7 +517,7 @@ describe('Bridge Widget tests', () => {
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <BridgeWidget
-            widgetConfig={config}
+            config={config}
             params={params}
 
           />
@@ -550,7 +550,7 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BridgeWidget
-          widgetConfig={config}
+          config={config}
           params={params}
 
         />,
@@ -578,7 +578,7 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BridgeWidget
-          widgetConfig={config}
+          config={config}
           params={params}
         />,
       );

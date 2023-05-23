@@ -57,7 +57,7 @@ describe('BuyWidget tests', () => {
 
     mount(
       <BuyWidget
-        widgetConfig={config}
+        config={config}
         params={params}
       />,
     );

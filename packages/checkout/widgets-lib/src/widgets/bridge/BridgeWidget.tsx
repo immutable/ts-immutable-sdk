@@ -36,7 +36,7 @@ import { Network, WidgetTheme } from '../../lib';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
-  widgetConfig: StrongCheckoutWidgetsConfig
+  config: StrongCheckoutWidgetsConfig
 }
 
 export interface BridgeWidgetParams {
@@ -66,15 +66,15 @@ export const NetworkChainMap = {
 };
 
 export function BridgeWidget(props: BridgeWidgetProps) {
-  const { params, widgetConfig } = props;
+  const { params, config } = props;
   const checkout = useMemo(
-    () => new Checkout({ baseConfig: { environment: widgetConfig.environment } }),
-    [widgetConfig.environment],
+    () => new Checkout({ baseConfig: { environment: config.environment } }),
+    [config.environment],
   );
   const {
     providerPreference, fromContractAddress, amount, fromNetwork,
   } = params;
-  const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+  const biomeTheme: BaseTokens = config.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 

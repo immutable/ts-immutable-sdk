@@ -29,7 +29,7 @@ describe('ConnectWidget tests', () => {
     mount(
       <ConnectWidget
         params={params}
-        widgetConfig={config}
+        config={config}
       />,
     );
   };

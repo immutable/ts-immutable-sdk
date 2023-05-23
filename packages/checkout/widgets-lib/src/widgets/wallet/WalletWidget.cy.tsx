@@ -69,7 +69,7 @@ describe('WalletWidget tests', () => {
 
     mount(
       <WalletWidget
-        widgetConfig={widgetConfig}
+        config={widgetConfig}
         params={params}
       />,
     );
@@ -223,7 +223,7 @@ describe('WalletWidget tests', () => {
 
         mount(
           <WalletWidget
-            widgetConfig={widgetConfig}
+            config={widgetConfig}
             params={params}
           />,
         );
@@ -266,7 +266,7 @@ describe('WalletWidget tests', () => {
 
         mount(
           <WalletWidget
-            widgetConfig={widgetConfig}
+            config={widgetConfig}
             params={params}
           />,
         );
@@ -312,7 +312,7 @@ describe('WalletWidget tests', () => {
 
         mount(
           <WalletWidget
-            widgetConfig={widgetConfig}
+            config={widgetConfig}
             params={params}
           />,
         );
@@ -338,7 +338,7 @@ describe('WalletWidget tests', () => {
 
         mount(
           <WalletWidget
-            widgetConfig={widgetConfig}
+            config={widgetConfig}
             params={params}
           />,
         );
@@ -367,7 +367,7 @@ describe('WalletWidget tests', () => {
 
         mount(
           <WalletWidget
-            widgetConfig={widgetConfig}
+            config={widgetConfig}
             params={params}
           />,
         );
@@ -396,7 +396,7 @@ describe('WalletWidget tests', () => {
 
         mount(
           <WalletWidget
-            widgetConfig={widgetConfig}
+            config={widgetConfig}
             params={params}
           />,
         );
