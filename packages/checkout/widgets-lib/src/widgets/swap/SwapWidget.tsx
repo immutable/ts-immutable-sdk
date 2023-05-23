@@ -28,11 +28,6 @@ import {
   viewReducer,
 } from '../../context/view-context/ViewContext';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
-import {
-  SwapFormContext,
-  initialSwapFormState,
-  swapFormReducer,
-} from './context/swap-form-context/SwapFormContext';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
@@ -61,14 +56,6 @@ export function SwapWidget(props: SwapWidgetProps) {
   const swapReducerValues = useMemo(
     () => ({ swapState, swapDispatch }),
     [swapState, swapDispatch],
-  );
-  const [swapFormState, swapFormDispatch] = useReducer(
-    swapFormReducer,
-    initialSwapFormState,
-  );
-  const swapFormReducerValues = useMemo(
-    () => ({ swapFormState, swapFormDispatch }),
-    [swapFormState, swapFormDispatch],
   );
 
   const { params, config } = props;
@@ -190,31 +177,27 @@ export function SwapWidget(props: SwapWidgetProps) {
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
         <SwapContext.Provider value={swapReducerValues}>
-          <SwapFormContext.Provider value={swapFormReducerValues}>
-            {viewState.view.type === BaseViews.LOADING_VIEW && (
-              <LoadingView loadingText="Loading" />
-            )}
-            {viewState.view.type === SwapWidgetViews.SWAP && (
-              <CryptoFiatProvider>
-                <SwapCoins
-                  amount={amount}
-                  fromContractAddress={fromContractAddress}
-                  toContractAddress={toContractAddress}
-                />
-              </CryptoFiatProvider>
-            )}
-            {viewState.view.type === SwapWidgetViews.SUCCESS && (
-              <StatusView
-                statusText="Success"
-                actionText="Continue"
+          {viewState.view.type === BaseViews.LOADING_VIEW && (
+          <LoadingView loadingText="Loading" />
+          )}
+          {viewState.view.type === SwapWidgetViews.SWAP && (
+          <CryptoFiatProvider>
+            <SwapCoins
+              amount={amount}
+              fromContractAddress={fromContractAddress}
+              toContractAddress={toContractAddress}
+            />
+          </CryptoFiatProvider>
+          )}
+          {viewState.view.type === SwapWidgetViews.SUCCESS && (
+          <SuccessView
+            successText="Success"
+            actionText="Continue"
                 // eslint-disable-next-line no-console
-                onActionClick={() => console.log('success')}
-                statusType={StatusType.SUCCESS}
-                testId="success-view"
-              />
-            )}
-            {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
-          </SwapFormContext.Provider>
+            onActionClick={() => console.log('success')}
+          />
+          )}
+          {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
         </SwapContext.Provider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
