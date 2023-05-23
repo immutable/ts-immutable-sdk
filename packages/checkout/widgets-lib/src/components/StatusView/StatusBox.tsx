@@ -1,5 +1,5 @@
 import { Body, Box, Icon } from '@biom3/react';
-import { statusBoxStyles, statusLogoStyles } from './StatusViewStyles';
+import { statusBoxStyles, statusLogoFill } from './StatusViewStyles';
 import { StatusType } from './StatusType';
 
 export interface StatusViewProps {
@@ -12,17 +12,17 @@ export function StatusBox({ statusText, statusType }: StatusViewProps) {
 
   switch (statusType) {
     case StatusType.SUCCESS:
-      icon = 'Tick';
+      icon = 'Security';
       statusTestId = 'success';
       break;
-    case StatusType.FAILURE: icon = 'Close';
+    case StatusType.FAILURE: icon = 'CloseWithCircle';
       statusTestId = 'failure';
       break;
-    case StatusType.REJECTED: icon = 'Surge';
+    case StatusType.REJECTED: icon = 'Shield';
       statusTestId = 'rejected';
       break;
     default:
-      icon = 'Tick';
+      icon = 'Security';
       statusTestId = 'success';
   }
 
@@ -30,14 +30,12 @@ export function StatusBox({ statusText, statusType }: StatusViewProps) {
 
   return (
     <Box sx={statusBoxStyles} testId={`${statusTestId}-box`}>
-      <Box sx={statusLogoStyles(isSuccess)}>
-        <Icon
-          icon={icon as any}
-          testId={`${statusTestId}-icon`}
-          variant="bold"
-          sx={{ width: 'base.icon.size.400', fill: 'base.color.brand.2' }}
-        />
-      </Box>
+      <Icon
+        icon={icon as any}
+        testId={`${statusTestId}-icon`}
+        variant="bold"
+        sx={statusLogoFill(isSuccess)}
+      />
       <Body size="medium" weight="bold" testId={`${statusTestId}-text`}>
         {statusText}
       </Body>

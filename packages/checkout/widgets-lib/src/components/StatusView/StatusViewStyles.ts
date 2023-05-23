@@ -11,15 +11,9 @@ export const statusBoxStyles = {
   rowGap: 'base.spacing.x4',
 };
 
-export const statusLogoStyles = (isSuccess: boolean) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: 'base.spacing.x12',
-  width: 'base.spacing.x12',
-  borderRadius: '50%',
-  backgroundColor: isSuccess
+export const statusLogoFill = (isSuccess: boolean) => ({
+  width: 'base.icon.size.500',
+  fill: isSuccess
     ? 'base.color.status.success.bright'
     : 'base.color.status.fatal.bright',
 });

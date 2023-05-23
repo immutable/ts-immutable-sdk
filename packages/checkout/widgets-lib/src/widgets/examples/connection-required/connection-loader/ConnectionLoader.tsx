@@ -12,7 +12,7 @@ import { FooterLogo } from '../../../../components/Footer/FooterLogo';
 import { CenteredBoxContent } from '../../../../components/CenteredBoxContent/CenteredBoxContent';
 import { zkEVMNetwork } from '../../../../lib/networkUtils';
 import { InnerExampleWidgetViews } from '../../../../context/view-context/InnerExampleViewContextTypes';
-import { statusBoxStyles, statusLogoStyles } from '../../../../components/StatusView/StatusViewStyles';
+import { statusBoxStyles } from '../../../../components/StatusView/StatusViewStyles';
 
 export interface ConnectionLoaderProps {
   children?: React.ReactNode;
@@ -91,7 +91,17 @@ export function ConnectionLoader({
           <SimpleLayout footer={<FooterLogo />}>
             <CenteredBoxContent>
               <Box sx={statusBoxStyles}>
-                <Box sx={statusLogoStyles(true)}>
+                <Box sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 'base.spacing.x12',
+                  width: 'base.spacing.x12',
+                  borderRadius: '50%',
+                  backgroundColor: 'base.color.status.success.bright',
+                }}
+                >
                   <Icon
                     icon="Loading"
                     variant="bold"
