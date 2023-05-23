@@ -1,11 +1,12 @@
 import { Box, Button } from '@biom3/react';
-import { Transaction } from '@imtbl/checkout-sdk';
 import { useContext } from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { sendSwapSuccessEvent } from '../../SwapWidgetEvents';
 import { text } from '../../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 import {
   ViewContext,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ViewActions,
 } from '../../../../context/view-context/ViewContext';
 import { SwapContext } from '../../context/swap-context/SwapContext';
@@ -19,20 +20,25 @@ import {
 } from '../../functions/SwapValidator';
 
 export interface SwapButtonProps {
-  transaction?: Transaction;
+  loading: boolean
 }
 
-export function SwapButton(props: SwapButtonProps) {
+export function SwapButton({ loading }: SwapButtonProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { viewDispatch } = useContext(ViewContext);
   const { swapState } = useContext(SwapContext);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { checkout, provider } = swapState;
-  const { transaction } = props;
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
   const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
   const {
-    swapFromToken, swapFromAmount, swapToToken, swapToAmount, loading,
+    swapFromToken,
+    swapFromAmount,
+    swapToToken,
+    swapToAmount,
   } = swapFormState;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const SwapFormValidator = (): boolean => {
     const validateFromTokenError = ValidateFromToken(swapFromToken);
     const validateFromAmountError = ValidateFromAmount(swapFromAmount, swapFromToken?.formattedBalance);
@@ -89,13 +95,21 @@ export function SwapButton(props: SwapButtonProps) {
   };
 
   const sendTransaction = async () => {
-    if (!checkout || !transaction || !provider) return;
+    if (!checkout || !provider) return;
     if (!SwapFormValidator()) return;
-
     try {
       await checkout.sendTransaction({
         provider,
-        transaction,
+        transaction: {
+          nonce: '0x00',
+          gasPrice: '0x00',
+          gas: '0x00',
+          to: '',
+          from: '',
+          value: '0x00',
+          data: '',
+          chainId: 5,
+        },
       });
       viewDispatch({
         payload: {
@@ -103,10 +117,7 @@ export function SwapButton(props: SwapButtonProps) {
           view: { type: SwapWidgetViews.SUCCESS },
         },
       });
-      sendSwapSuccessEvent();
     } catch (err: any) {
-      // Intentionally making this succeed at the moment since the
-      // transaction will always error out currently
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -121,14 +132,13 @@ export function SwapButton(props: SwapButtonProps) {
       <Button
         testId="swap-button"
         disabled={loading}
-        variant={!provider || !transaction ? 'tertiary' : 'primary'}
+        variant="primary"
         onClick={sendTransaction}
         size="large"
       >
-        {loading && (
+        {loading ? (
           <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
-        )}
-        {!loading && buttonText}
+        ) : buttonText}
       </Button>
     </Box>
   );

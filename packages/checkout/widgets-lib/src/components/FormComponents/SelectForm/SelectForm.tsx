@@ -3,7 +3,6 @@ import {
   Select, Option, OptionKey,
 } from '@biom3/react';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
-// import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 
 type IconList = 'EthToken' | 'ImxTokenDex';
 
@@ -19,6 +18,7 @@ interface SelectFormProps {
   textAlign?: 'left' | 'right';
   subtext?: string;
   errorMessage?: string;
+  disabled?: boolean;
   onSelectChange?: (value: OptionKey) => void;
 }
 
@@ -29,6 +29,7 @@ export function SelectForm({
   onSelectChange,
   textAlign,
   errorMessage,
+  disabled,
 }: SelectFormProps) {
   return (
     <FormControlWrapper
@@ -50,6 +51,8 @@ export function SelectForm({
             key={option.id}
             optionKey={option.id}
             testId={`${id}-${option.id}`}
+            // select cannot currently be disabled so disabling at the option level for now
+            disabled={disabled}
           >
             {!option.icon && (
               <Option.Icon icon={option.icon ?? 'Coins'} variant="bold" />
