@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -36,14 +37,17 @@ import { SelectOption } from '../../../components/FormComponents/SelectForm/Sele
 import {
   ValidateFromAmount, ValidateFromToken, ValidateToAmount, ValidateToToken,
 } from '../functions/SwapValidator';
+import { Fees } from './Fees';
+import { SwapButton } from './SwapButton';
 
 enum SwapDirection {
   FROM = 'FROM',
   TO = 'TO',
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface SwapFormProps {
-  setLoading: (value: boolean) => void;
+  // setLoading: (value: boolean) => void;
 }
 
 const swapValuesToText = ({
@@ -78,7 +82,7 @@ const swapValuesToText = ({
   return resp;
 };
 
-export function SwapForm({ setLoading }: SwapFormProps) {
+export function SwapForm() {
   const {
     swapState: {
       allowedTokens,
@@ -89,13 +93,7 @@ export function SwapForm({ setLoading }: SwapFormProps) {
   } = useContext(SwapContext);
 
   const {
-    swapFormState: {
-      swapFromFiatValue,
-      swapToTokenError,
-      swapToAmountError,
-      swapFromAmountError,
-      swapFromTokenError,
-    },
+    swapFormState: { swapFromFiatValue },
     swapFormDispatch,
   } = useContext(SwapFormContext);
 
@@ -104,11 +102,16 @@ export function SwapForm({ setLoading }: SwapFormProps) {
   const [editing, setEditing] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [direction, setDirection] = useState<SwapDirection>(SwapDirection.FROM);
+  const [loading, setLoading] = useState(false);
 
   const [fromAmount, setFromAmount] = useState<string>('');
+  const [fromAmountError, setFromAmountError] = useState<string>('');
   const [fromToken, setFromToken] = useState<GetBalanceResult | null>(null);
+  const [fromTokenError, setFromTokenError] = useState<string>('');
   const [toAmount, setToAmount] = useState<string>('');
+  const [toAmountError, setToAmountError] = useState<string>('');
   const [toToken, setToToken] = useState<TokenInfo | null>(null);
+  const [toTokenError, setToTokenError] = useState<string>('');
 
   const tokensOptionsFrom = useMemo(
     () => tokenBalances
@@ -145,79 +148,6 @@ export function SwapForm({ setLoading }: SwapFormProps) {
       },
     });
   }, [cryptoFiatDispatch, allowedTokens]);
-
-  useEffect(() => {
-    swapFormDispatch({
-      payload: {
-        type: SwapFormActions.SET_SWAP_FROM_AMOUNT,
-        swapFromAmount: fromAmount,
-      },
-    });
-  }, [fromAmount]);
-
-  useEffect(() => {
-    swapFormDispatch({
-      payload: {
-        type: SwapFormActions.SET_SWAP_FROM_TOKEN,
-        swapFromToken: fromToken,
-      },
-    });
-  }, [fromToken]);
-
-  useEffect(() => {
-    swapFormDispatch({
-      payload: {
-        type: SwapFormActions.SET_SWAP_TO_AMOUNT,
-        swapToAmount: toAmount,
-      },
-    });
-  }, [toAmount]);
-
-  useEffect(() => {
-    swapFormDispatch({
-      payload: {
-        type: SwapFormActions.SET_SWAP_TO_TOKEN,
-        swapToToken: toToken,
-      },
-    });
-  }, [toToken]);
-
-  // Helpers functions for handling error messaging
-  const setFromAmountError = (value: string) => {
-    swapFormDispatch({
-      payload: {
-        type: SwapFormActions.SET_SWAP_FROM_AMOUNT_ERROR,
-        swapFromAmountError: value,
-      },
-    });
-  };
-
-  const setFromTokenError = (value: string) => {
-    swapFormDispatch({
-      payload: {
-        type: SwapFormActions.SET_SWAP_FROM_TOKEN_ERROR,
-        swapFromTokenError: value,
-      },
-    });
-  };
-
-  const setToAmountError = (value: string) => {
-    swapFormDispatch({
-      payload: {
-        type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR,
-        swapToAmountError: value,
-      },
-    });
-  };
-
-  const setToTokenError = (value: string) => {
-    swapFormDispatch({
-      payload: {
-        type: SwapFormActions.SET_SWAP_TO_TOKEN_ERROR,
-        swapToTokenError: value,
-      },
-    });
-  };
 
   // ------------------//
   //    FETCH QUOTES   //
@@ -472,6 +402,25 @@ export function SwapForm({ setLoading }: SwapFormProps) {
     swapToAmount: toAmount,
   });
 
+  const SwapFormValidator = (): boolean => {
+    const validateFromTokenError = ValidateFromToken(fromToken);
+    const validateFromAmountError = ValidateFromAmount(fromAmount, fromToken?.formattedBalance);
+    const validateToTokenError = ValidateToToken(toToken);
+    const validateToAmountError = ValidateToAmount(toAmount);
+
+    if (validateFromTokenError) setFromTokenError(validateFromTokenError);
+    if (validateFromAmountError) setFromAmountError(validateFromAmountError);
+    if (validateToTokenError) setToTokenError(validateToTokenError);
+    if (validateToAmountError) setToAmountError(validateToAmountError);
+
+    if (
+      validateFromTokenError
+      || validateFromAmountError
+      || validateToTokenError
+      || validateToAmountError) return false;
+    return true;
+  };
+
   // useEffect(() => {
   //   const id = setInterval(() => fetchQuote(), 2000);
   //   return () => {
@@ -480,87 +429,104 @@ export function SwapForm({ setLoading }: SwapFormProps) {
   // }, []);
 
   return (
-    <Box sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      rowGap: 'base.spacing.x6',
-    }}
-    >
-
-      {/* FROM */}
-      <Box>
+    <>
+      <Box sx={{ paddingX: 'base.spacing.x4' }}>
         <Heading
-          size="xSmall"
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            paddingBottom: 'base.spacing.x1',
-          }}
+          size="small"
+          weight="regular"
+          sx={{ paddingBottom: 'base.spacing.x4' }}
         >
-          {swapForm.from.label}
+          {content.title}
         </Heading>
-        <SelectInput
-          id="fromTokenInputs"
-          options={tokensOptionsFrom}
-          selectSubtext={
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          rowGap: 'base.spacing.x6',
+        }}
+        >
+
+          {/* FROM */}
+          <Box>
+            <Heading
+              size="xSmall"
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                paddingBottom: 'base.spacing.x1',
+              }}
+            >
+              {swapForm.from.label}
+            </Heading>
+            <SelectInput
+              id="fromTokenInputs"
+              options={tokensOptionsFrom}
+              selectSubtext={
             fromToken
               ? `${content.availableBalancePrefix} ${fromToken?.formattedBalance}`
               : ''
           }
-          selectTextAlign="left"
-          textInputValue={fromAmount}
-          textInputPlaceholder={swapForm.from.inputPlaceholder}
-          textInputSubtext={`${content.fiatPricePrefix} $${formatZeroAmount(swapFromFiatValue, true)}`}
-          textInputTextAlign="right"
-          textInputValidator={textInputValidator}
-          onTextInputChange={(v) => onFromTextInputChange(v)}
-          onTextInputBlur={(v) => onFromTextInputBlur(v)}
-          onTextInputFocus={onFromTextInputFocus}
-          textInputMaxButtonClick={textInputMaxButtonClick}
-          onSelectChange={onFromSelectChange}
-          textInputErrorMessage={direction === SwapDirection.FROM ? swapFromAmountError : ''}
-          selectErrorMessage={swapFromTokenError}
-          selectInputDisabled={isFetching}
-          textInputDisabled={isFetching}
-        />
-      </Box>
+              selectTextAlign="left"
+              textInputValue={fromAmount}
+              textInputPlaceholder={swapForm.from.inputPlaceholder}
+              textInputSubtext={`${content.fiatPricePrefix} $${formatZeroAmount(swapFromFiatValue, true)}`}
+              textInputTextAlign="right"
+              textInputValidator={textInputValidator}
+              onTextInputChange={(v) => onFromTextInputChange(v)}
+              onTextInputBlur={(v) => onFromTextInputBlur(v)}
+              onTextInputFocus={onFromTextInputFocus}
+              textInputMaxButtonClick={textInputMaxButtonClick}
+              onSelectChange={onFromSelectChange}
+              textInputErrorMessage={direction === SwapDirection.FROM ? fromAmountError : ''}
+              selectErrorMessage={fromTokenError}
+              selectInputDisabled={isFetching}
+              textInputDisabled={isFetching}
+            />
+          </Box>
 
-      {/* TO */}
-      <Box>
-        <Box sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          paddingBottom: 'base.spacing.x1',
-        }}
-        >
-          <Heading size="xSmall">{swapForm.to.label}</Heading>
-          <Body
-            sx={{
-              color: 'base.color.brand.4',
+          {/* TO */}
+          <Box>
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              paddingBottom: 'base.spacing.x1',
             }}
-            size="small"
-          >
-            {swapValuesText.fromToConversion}
-          </Body>
+            >
+              <Heading size="xSmall">{swapForm.to.label}</Heading>
+              <Body
+                sx={{
+                  color: 'base.color.brand.4',
+                }}
+                size="small"
+              >
+                {swapValuesText.fromToConversion}
+              </Body>
+            </Box>
+            <SelectInput
+              id="toTokenInputs"
+              options={tokensOptionsTo}
+              selectTextAlign="left"
+              textInputValue={toAmount}
+              textInputPlaceholder={swapForm.to.inputPlaceholder}
+              textInputTextAlign="right"
+              textInputValidator={textInputValidator}
+              onTextInputChange={(v) => onToTextInputChange(v)}
+              onTextInputBlur={(v) => onToTextInputBlur(v)}
+              onTextInputFocus={onToTextInputFocus}
+              onSelectChange={onToSelectChange}
+              textInputErrorMessage={direction === SwapDirection.TO ? toAmountError : ''}
+              selectErrorMessage={toTokenError}
+              selectInputDisabled={isFetching}
+              textInputDisabled={isFetching}
+            />
+          </Box>
         </Box>
-        <SelectInput
-          id="toTokenInputs"
-          options={tokensOptionsTo}
-          selectTextAlign="left"
-          textInputValue={toAmount}
-          textInputPlaceholder={swapForm.to.inputPlaceholder}
-          textInputTextAlign="right"
-          textInputValidator={textInputValidator}
-          onTextInputChange={(v) => onToTextInputChange(v)}
-          onTextInputBlur={(v) => onToTextInputBlur(v)}
-          onTextInputFocus={onToTextInputFocus}
-          onSelectChange={onToSelectChange}
-          textInputErrorMessage={direction === SwapDirection.TO ? swapToAmountError : ''}
-          selectErrorMessage={swapToTokenError}
-          selectInputDisabled={isFetching}
-          textInputDisabled={isFetching}
-        />
+        <Fees />
       </Box>
-    </Box>
+      <SwapButton
+        validator={SwapFormValidator}
+        loading={loading}
+      />
+    </>
+
   );
 }

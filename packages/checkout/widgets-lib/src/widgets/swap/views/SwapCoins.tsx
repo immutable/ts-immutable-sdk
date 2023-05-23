@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react/jsx-indent */
 import { Box, Heading } from '@biom3/react';
 import { useState } from 'react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -52,18 +54,7 @@ export function SwapCoins({
           justifyContent: 'space-between',
         }}
       >
-        <Box sx={{ paddingX: 'base.spacing.x4' }}>
-          <Heading
-            size="small"
-            weight="regular"
-            sx={{ paddingBottom: 'base.spacing.x4' }}
-          >
-            {content.title}
-          </Heading>
-          <SwapForm setLoading={updateSetLoading} />
-          <Fees />
-        </Box>
-        <SwapButton loading={loading} />
+        <SwapForm />
       </Box>
     </SimpleLayout>
   );

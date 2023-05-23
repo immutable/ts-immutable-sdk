@@ -69,7 +69,7 @@ describe('SwapForm', () => {
     it('should show all swap inputs with initial state', () => {
       mount(
         <SwapWidgetTestComponent>
-          <SwapForm setLoading={() => {}} />
+          <SwapForm />
         </SwapWidgetTestComponent>,
       );
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
@@ -152,7 +152,7 @@ describe('SwapForm', () => {
       it(`should only allow numbers with 6 decimal places in the swapFromAmount input - ${testCase.name}`, () => {
         mount(
           <SwapWidgetTestComponent>
-            <SwapForm setLoading={() => {}} />
+            <SwapForm />
           </SwapWidgetTestComponent>,
         );
 
