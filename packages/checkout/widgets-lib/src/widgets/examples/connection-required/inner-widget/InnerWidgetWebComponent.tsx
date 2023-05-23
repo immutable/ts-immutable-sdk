@@ -18,7 +18,7 @@ export class ImmutableInnerExample extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <InnerWidget params={params} theme={this.theme} />
+        <InnerWidget params={params} theme={this.widgetConfig?.theme!} />
       </React.StrictMode>,
     );
   }

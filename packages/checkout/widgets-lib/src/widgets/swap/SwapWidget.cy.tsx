@@ -2,12 +2,13 @@ import {
   describe, it, cy, beforeEach,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { ChainId, Checkout } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../lib/testUtils';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 describe('SwapWidget tests', () => {
   beforeEach(() => {
@@ -104,11 +105,17 @@ describe('SwapWidget tests', () => {
     const params = {
       providerPreference: 'metamask',
     } as SwapWidgetParams;
+    const config: StrongCheckoutWidgetsConfig = {
+      environment: Environment.SANDBOX,
+      theme: WidgetTheme.DARK,
+      isBridgeEnabled: true,
+      isSwapEnabled: true,
+      isOnRampEnabled: true,
+    };
     mount(
       <SwapWidget
-        environment={Environment.SANDBOX}
         params={params}
-        theme={WidgetTheme.DARK}
+        config={config}
       />,
     );
 
@@ -122,11 +129,17 @@ describe('SwapWidget tests', () => {
     const params = {
       providerPreference: 'metamask',
     } as SwapWidgetParams;
+    const config: StrongCheckoutWidgetsConfig = {
+      environment: Environment.SANDBOX,
+      theme: WidgetTheme.DARK,
+      isBridgeEnabled: true,
+      isSwapEnabled: true,
+      isOnRampEnabled: true,
+    };
     mount(
       <SwapWidget
-        environment={Environment.SANDBOX}
+        config={config}
         params={params}
-        theme={WidgetTheme.DARK}
       />,
     );
 

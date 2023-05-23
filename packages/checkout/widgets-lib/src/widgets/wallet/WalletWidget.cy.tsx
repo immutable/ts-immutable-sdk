@@ -1,6 +1,6 @@
 import React from 'react';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
-import { IMTBLWidgetEvents, WidgetTheme } from '@imtbl/checkout-widgets';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
   describe, it, cy, context,
 } from 'local-cypress';
@@ -11,6 +11,8 @@ import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 import { cySmartGet } from '../../lib/testUtils';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 import { text } from '../../resources/text/textConfig';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 
@@ -23,6 +25,13 @@ describe('WalletWidget tests', () => {
     const params = {
       providerPreference: ConnectionProviders.METAMASK,
     } as WalletWidgetParams;
+    const widgetConfig = {
+      theme: WidgetTheme.DARK,
+      environment: Environment.PRODUCTION,
+      isBridgeEnabled: false,
+      isSwapEnabled: false,
+      isOnRampEnabled: false,
+    } as StrongCheckoutWidgetsConfig;
 
     const balanceStub = cy
       .stub(Checkout.prototype, 'getBalance')
@@ -60,9 +69,8 @@ describe('WalletWidget tests', () => {
 
     mount(
       <WalletWidget
-        environment={Environment.PRODUCTION}
+        config={widgetConfig}
         params={params}
-        theme={WidgetTheme.DARK}
       />,
     );
 
@@ -205,11 +213,18 @@ describe('WalletWidget tests', () => {
           providerPreference: ConnectionProviders.METAMASK,
         } as WalletWidgetParams;
 
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.PRODUCTION,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
         mount(
           <WalletWidget
-            environment={Environment.PRODUCTION}
+            config={widgetConfig}
             params={params}
-            theme={WidgetTheme.DARK}
           />,
         );
 
@@ -240,11 +255,19 @@ describe('WalletWidget tests', () => {
         const params = {
           providerPreference: ConnectionProviders.METAMASK,
         } as WalletWidgetParams;
+
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.PRODUCTION,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
         mount(
           <WalletWidget
-            environment={Environment.PRODUCTION}
+            config={widgetConfig}
             params={params}
-            theme={WidgetTheme.DARK}
           />,
         );
 
@@ -278,11 +301,19 @@ describe('WalletWidget tests', () => {
         const params = {
           providerPreference: ConnectionProviders.METAMASK,
         } as WalletWidgetParams;
+
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.PRODUCTION,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
         mount(
           <WalletWidget
-            environment={Environment.PRODUCTION}
+            config={widgetConfig}
             params={params}
-            theme={WidgetTheme.DARK}
           />,
         );
 
@@ -296,11 +327,19 @@ describe('WalletWidget tests', () => {
         const params = {
           providerPreference: ConnectionProviders.METAMASK,
         } as WalletWidgetParams;
+
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.PRODUCTION,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
         mount(
           <WalletWidget
-            environment={Environment.PRODUCTION}
+            config={widgetConfig}
             params={params}
-            theme={WidgetTheme.DARK}
           />,
         );
         cySmartGet('settings-button').click();
@@ -318,11 +357,18 @@ describe('WalletWidget tests', () => {
           );
         });
 
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.PRODUCTION,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
         mount(
           <WalletWidget
-            environment={Environment.PRODUCTION}
+            config={widgetConfig}
             params={params}
-            theme={WidgetTheme.DARK}
           />,
         );
         cySmartGet('settings-button').click();
@@ -340,11 +386,18 @@ describe('WalletWidget tests', () => {
         const params = {
           providerPreference: ConnectionProviders.METAMASK,
         } as WalletWidgetParams;
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.PRODUCTION,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
         mount(
           <WalletWidget
-            environment={Environment.PRODUCTION}
+            config={widgetConfig}
             params={params}
-            theme={WidgetTheme.DARK}
           />,
         );
 
