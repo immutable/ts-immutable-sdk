@@ -48,6 +48,7 @@ export function HeaderNavigation({
       testId="header-navigation-container"
       sx={HeaderNavigationStyles(transparent)}
       contentAlign={showBack ? 'center' : 'left'}
+      size="small"
     >
       {showBack && (
         <AppHeaderBar.LeftButtCon

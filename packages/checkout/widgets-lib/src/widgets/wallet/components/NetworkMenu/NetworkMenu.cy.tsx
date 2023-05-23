@@ -40,15 +40,6 @@ describe('Network Menu', () => {
       text.views[WalletWidgetViews.WALLET_BALANCES].networkStatus.heading,
     );
   });
-  it('should have info icon', () => {
-    mount(
-      <BiomeThemeProvider>
-        <NetworkMenu />
-      </BiomeThemeProvider>,
-    );
-
-    cySmartGet('network-icon').should('exist');
-  });
   it('should have network buttons', () => {
     const walletState: WalletState = {
       checkout: new Checkout({

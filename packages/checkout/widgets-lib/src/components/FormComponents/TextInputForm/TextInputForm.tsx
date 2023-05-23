@@ -8,10 +8,11 @@ interface TextInputFormProps {
   subtext?: string;
   textAlign?: 'left' | 'right';
   errorMessage?: string;
+  disabled?: boolean;
   validator: (value: string) => boolean;
-  onTextInputFocus: () => void;
   onTextInputChange: (value: string) => void;
   onTextInputBlur: (value: string) => void;
+  onTextInputFocus?: (value: string) => void;
   maxButtonClick?: () => void;
 }
 
@@ -21,12 +22,13 @@ export function TextInputForm({
   placeholder,
   errorMessage,
   validator,
-  onTextInputFocus,
   onTextInputChange,
   onTextInputBlur,
+  onTextInputFocus,
   textAlign,
   subtext,
   maxButtonClick,
+  disabled,
 }: TextInputFormProps) {
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>, previousValue: string) => {
     const inputValue = event.target.value;
@@ -42,6 +44,13 @@ export function TextInputForm({
     const inputValue = event.target.value;
     if (!validator(inputValue)) return;
     onTextInputBlur(inputValue);
+  };
+
+  const handleOnFocus = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!onTextInputFocus) return;
+    const inputValue = event.target.value;
+    if (!validator(inputValue)) return;
+    onTextInputFocus(inputValue);
   };
 
   return (
@@ -61,11 +70,18 @@ export function TextInputForm({
         validationStatus={errorMessage ? 'error' : 'success'}
         placeholder={placeholder}
         onBlur={handleOnBlur}
+        onFocus={handleOnFocus}
+        disabled={disabled}
         hideClearValueButton
-        onFocus={onTextInputFocus}
       >
         {maxButtonClick && (
-          <TextInput.Button testId={`${id}-max-button`} onClick={maxButtonClick}>max</TextInput.Button>
+          <TextInput.Button
+            testId={`${id}-max-button`}
+            onClick={maxButtonClick}
+            disabled={disabled}
+          >
+            max
+          </TextInput.Button>
         )}
       </TextInput>
     </FormControlWrapper>

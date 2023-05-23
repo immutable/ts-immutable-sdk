@@ -36,13 +36,13 @@
     "@biom3/design-tokens": "0.1.5-beta"
   },
   "scripts": {
-    "scan:secrets": "gitleaks protect --staged -v",
     "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --stages build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:all": "wsrun --stages build",
     "lint": "wsrun --exclude-missing -e lint --no-error-on-unmatched-pattern",
     "lint:ci": "./lint-ci.sh",
     "postinstall": "husky install; ./.husky/install_gitleaks.sh",
     "release": "release-it",
+    "scan:secrets": "gitleaks protect --staged -v",
     "syncpack:check": "yarn syncpack list-mismatches",
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",

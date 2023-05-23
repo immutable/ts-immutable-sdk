@@ -1,5 +1,5 @@
 import {
-  Body, Box, Button, HorizontalMenu, Icon,
+  Body, Box, Button, HorizontalMenu,
 } from '@biom3/react';
 import {
   useCallback, useContext, useEffect, useState,
@@ -112,16 +112,9 @@ export function NetworkMenu() {
 
   return (
     <Box sx={networkMenuStyles}>
-      <Box sx={networkHeadingStyle}>
-        <Body testId="network-heading" size="medium">
-          {networkStatus.heading}
-        </Body>
-        <Icon
-          testId="network-icon"
-          icon="InformationCircle"
-          sx={{ width: 'base.icon.size.100' }}
-        />
-      </Box>
+      <Body testId="network-heading" size="medium" sx={networkHeadingStyle}>
+        {networkStatus.heading}
+      </Body>
       <HorizontalMenu>
         {checkout
           && allowedNetworks

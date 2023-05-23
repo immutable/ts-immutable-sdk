@@ -11,6 +11,8 @@ import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 import { cySmartGet } from '../../lib/testUtils';
+import { text } from '../../resources/text/textConfig';
+import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 
 describe('WalletWidget tests', () => {
   beforeEach(() => {
@@ -116,6 +118,17 @@ describe('WalletWidget tests', () => {
           },
         });
 
+      cy.stub(Checkout.prototype, 'getNetworkAllowList')
+        .as('getNetworkAllowListStub')
+        .resolves({
+          networks: [
+            {
+              name: 'Ethereum',
+              chainId: 1,
+            },
+          ],
+        });
+
       getAllBalancesStub = cy
         .stub(Checkout.prototype, 'getAllBalances')
         .as('balanceStub');
@@ -206,11 +219,17 @@ describe('WalletWidget tests', () => {
         });
 
         cySmartGet('close-button').should('be.visible');
-        cySmartGet('heading').should('be.visible');
-        cySmartGet('Ethereum-network-button').should('include.text', 'Ethereum');
+        cySmartGet('network-heading').should('be.visible');
+        cySmartGet('Ethereum-network-button').should(
+          'include.text',
+          'Ethereum',
+        );
 
         cySmartGet('total-token-balance').should('exist');
-        cySmartGet('total-token-balance').should('have.text', '≈ USD $22525.46');
+        cySmartGet('total-token-balance').should(
+          'have.text',
+          '≈ USD $22525.46',
+        );
 
         cySmartGet('balance-item-ETH').should('exist');
         cySmartGet('balance-item-GODS').should('exist');
@@ -246,7 +265,10 @@ describe('WalletWidget tests', () => {
 
         cySmartGet('balance-item-GODS').should('exist');
         cySmartGet('balance-item-GODS').should('include.text', 'GODS');
-        cySmartGet('balance-item-GODS').should('include.text', 'Gods Unchained');
+        cySmartGet('balance-item-GODS').should(
+          'include.text',
+          'Gods Unchained',
+        );
         cySmartGet('balance-item-GODS__price').should('have.text', '100.2');
       });
     });
@@ -289,11 +311,12 @@ describe('WalletWidget tests', () => {
         const params = {
           providerPreference: ConnectionProviders.METAMASK,
         } as WalletWidgetParams;
-        cy.window().then(
-          (window) => {
-            window.addEventListener(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, cy.stub().as('disconnectEvent'));
-          },
-        );
+        cy.window().then((window) => {
+          window.addEventListener(
+            IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+            cy.stub().as('disconnectEvent'),
+          );
+        });
 
         mount(
           <WalletWidget
@@ -303,9 +326,33 @@ describe('WalletWidget tests', () => {
           />,
         );
         cySmartGet('settings-button').click();
-        cySmartGet('disconnect-button').should('have.text', 'Disconnect Wallet');
+        cySmartGet('disconnect-button').should(
+          'have.text',
+          'Disconnect Wallet',
+        );
         cySmartGet('disconnect-button').click();
         cySmartGet('@disconnectEvent').should('have.been.calledOnce');
+      });
+    });
+
+    describe('WalletWidget coin info', () => {
+      it('should show the coin info view if the coin info icon is clicked', () => {
+        const params = {
+          providerPreference: ConnectionProviders.METAMASK,
+        } as WalletWidgetParams;
+        mount(
+          <WalletWidget
+            environment={Environment.PRODUCTION}
+            params={params}
+            theme={WidgetTheme.DARK}
+          />,
+        );
+
+        const { heading, body } = text.views[WalletWidgetViews.COIN_INFO];
+        cySmartGet('coin-info-icon').click();
+        cy.get('body').contains(body);
+        cy.get('body').contains(heading);
+        cySmartGet('back-button').should('be.visible');
       });
     });
   });

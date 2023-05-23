@@ -1,8 +1,10 @@
-import { LitElement, html, render } from 'lit';
+import { InventoryItem } from '@imtbl/economy/dist/__codegen__/inventory';
+import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-type Item = { id: string; name: string; image: string; type: string };
-
+type Item = Required<Omit<InventoryItem, 'metadata'> & {
+  metadata?: { [k: string]: unknown };
+}>;
 @customElement('items-selection')
 export class ItemsSelection extends LitElement {
   @property({ type: Array, attribute: 'items' })
@@ -13,18 +15,22 @@ export class ItemsSelection extends LitElement {
 
   renderItem(item: Item) {
     return html`
-      <div class="indicator w-full m-1">
+      <div class="indicator w-full m-1 bg-gray-300">
         <div class="indicator-item indicator-bottom">
           <button class="btn btn-error btn-xs">remove</button>
         </div>
         <div
-          class="border border-primary w-full flex flex-row justify-between items-center p-2"
+          class="flex flex-row justify-between items-center"
         >
           <picture>
-            <img class="m-0" src="${item.image}" alt="${item.name}" />
+            <img
+              class="m-0 w-12"
+              src="${item.metadata?.image}"
+              alt="${item.metadata?.name}"
+            />
           </picture>
-          <b>Job Title</b>
-          <p class="m-1">Rerum reiciendis beatae tenetur excepturi</p>
+          <b>${item?.metadata?.name}</b>
+          <p class="m-1">${item.metadata?.description}</p>
         </div>
       </div>
     `;
@@ -33,7 +39,7 @@ export class ItemsSelection extends LitElement {
   render() {
     const items = Object.entries(
       this.items.reduce((acc, item) => {
-        acc[item.type] = acc[item.type]?.concat(item) || [item];
+        acc[item?.item_definition_id] = acc[item?.item_definition_id]?.concat(item) || [item];
         return acc;
       }, {} as Record<string, Item[]>)
     );

@@ -10,4 +10,5 @@ export const totalTokenBalanceValueStyle = {
   display: 'flex',
   direction: 'row',
   columnGap: 'base.spacing.x1',
+  alignItems: 'center',
 };

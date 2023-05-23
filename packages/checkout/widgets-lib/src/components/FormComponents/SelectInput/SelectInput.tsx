@@ -18,10 +18,12 @@ interface SelectInputProps {
   textInputErrorMessage?: string;
   selectSubtext?: string;
   selectErrorMessage?: string;
+  textInputDisabled?: boolean;
+  selectInputDisabled?: boolean;
   textInputValidator: (value: string) => boolean;
-  onTextInputFocus: () => void;
   onTextInputChange: (value: string) => void;
   onTextInputBlur: (value: string) => void;
+  onTextInputFocus?: (value: string) => void;
   textInputMaxButtonClick?: () => void;
   onSelectChange: (value: OptionKey) => void;
 }
@@ -32,9 +34,9 @@ export function SelectInput({
   textInputValue,
   textInputPlaceholder,
   textInputValidator,
-  onTextInputFocus,
   onTextInputChange,
   onTextInputBlur,
+  onTextInputFocus,
   textInputTextAlign,
   textInputSubtext,
   textInputErrorMessage,
@@ -43,6 +45,8 @@ export function SelectInput({
   selectErrorMessage,
   textInputMaxButtonClick,
   onSelectChange,
+  textInputDisabled,
+  selectInputDisabled,
 }: SelectInputProps) {
   return (
     <Box sx={selectInputBoxStyle}>
@@ -54,6 +58,7 @@ export function SelectInput({
           textAlign={selectTextAlign}
           errorMessage={selectErrorMessage}
           onSelectChange={onSelectChange}
+          disabled={selectInputDisabled}
         />
       </Box>
       <Box sx={inputStyle}>
@@ -65,10 +70,11 @@ export function SelectInput({
           textAlign={textInputTextAlign}
           errorMessage={textInputErrorMessage}
           validator={textInputValidator}
-          onTextInputFocus={onTextInputFocus}
           onTextInputChange={onTextInputChange}
           onTextInputBlur={onTextInputBlur}
+          onTextInputFocus={onTextInputFocus}
           maxButtonClick={textInputMaxButtonClick}
+          disabled={textInputDisabled}
         />
       </Box>
     </Box>
