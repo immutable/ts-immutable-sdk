@@ -1,18 +1,17 @@
 /* eslint-disable no-console */
 import { Service } from 'typedi';
 
-import { RootApiCraftPostRequest as CraftApiInput } from '__codegen__/crafting';
+import {
+  CraftCreateCraftInput,
+  CraftCreateCraftOutput,
+  DomainCraft,
+} from '../__codegen__/crafting';
 import type { EventData, EventType } from '../types';
 import { asyncFn } from '../utils';
 import { EventClient } from '../EventClient';
 import { withSDKError } from '../Errors';
 import { StudioBE } from '../StudioBE';
-
-export type CraftInput = {
-  requiresWeb3: boolean;
-  web3Assets?: any;
-  input: CraftApiInput;
-};
+import { Config } from '../Config';
 
 // TODO: Use Checkout SDK
 const checkout = {
@@ -42,6 +41,7 @@ export class Crafting {
   constructor(
     private events: EventClient<CraftEvent>,
     private studioBE: StudioBE,
+    private config: Config,
   ) {}
 
   /**
@@ -51,29 +51,18 @@ export class Crafting {
    * @returns crafting status
    */
   @withSDKError({ type: 'CRAFTING_ERROR' })
-  public async craft(input: CraftInput): Promise<CraftStatus> {
+  public async craft(
+    input: CraftCreateCraftInput,
+  ): Promise<CraftCreateCraftOutput> {
     // 1. validate inputs
     this.events.emitEvent({ status: 'STARTED', action: 'CRAFT' });
-    // await this.validate();
+    await this.validate();
 
-    // 2. perform any web3 actions
-    let txIds: number[] = [];
-    let signature;
-    if (input.requiresWeb3) {
-      this.events.emitEvent({
-        status: 'AWAITING_WEB3_INTERACTION',
-        action: 'CRAFT',
-      });
-      txIds = await checkout.transfer(input.input);
-      signature = await checkout.sign();
-    }
-    console.info('txIds, signature', { txIds, signature });
-
-    // 3. submit craft to BE
+    // 2. submit craft to BE
     this.events.emitEvent({ status: 'SUBMITTED', action: 'CRAFT' });
-    const { data, status } = await this.studioBE.craftingApi.craftPost(
-      input.input,
-    );
+    const { data, status } = await this.studioBE.craftingApi.craftPost({
+      request: input,
+    });
 
     if (status !== 200) {
       this.events.emitEvent({
@@ -83,13 +72,38 @@ export class Crafting {
       });
     }
 
+    // 3. transfer assets to escrow wallet if needed
+    // TODO: true if inputs contain tokens
+    const requiresWeb3 = false;
+    if (requiresWeb3) {
+      await this.transferAssetsToEscrowWallet(data);
+    }
+
     this.events.emitEvent({
       status: 'COMPLETED',
       action: 'CRAFT',
       data,
     });
 
-    return 'COMPLETED';
+    return data;
+  }
+
+  private async transferAssetsToEscrowWallet(output: CraftCreateCraftOutput) {
+    const provider = this.config.get().imxProvider;
+    if (!provider) {
+      throw new Error('No provider found');
+    }
+
+    this.events.emitEvent({
+      status: 'AWAITING_WEB3_INTERACTION',
+      action: 'CRAFT',
+    });
+
+    checkout.transfer();
+
+    // TODO: user provider to sign transfer to escrow wallet address
+
+    return output;
   }
 
   /**
@@ -98,7 +112,25 @@ export class Crafting {
    * @param input
    * @returns
    */
-  // public async validate() {
-  //   return true;
-  // }
+  // eslint-disable-next-line class-methods-use-this
+  @withSDKError({ type: 'CRAFTING_ERROR' })
+  public async validate() {
+    // TODO: submit craft to BE for validation
+    return true;
+  }
+
+  @withSDKError({ type: 'CRAFTING_ERROR' })
+  public async getCraftsByGameId(gameId: string): Promise<Array<DomainCraft>> {
+    try {
+      const { status, data } = await this.studioBE.craftingApi.craftsGet();
+
+      if (!(status >= 200 && status < 300)) {
+        throw new Error('error fetching crafts');
+      }
+
+      return data.filter((craft) => craft.game_id === gameId);
+    } catch (error) {
+      throw new Error('error fetching crafts', { cause: { error } });
+    }
+  }
 }
