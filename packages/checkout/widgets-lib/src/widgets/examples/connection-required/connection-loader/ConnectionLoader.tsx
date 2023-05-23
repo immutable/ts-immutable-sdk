@@ -2,7 +2,6 @@ import {
   BiomeThemeProvider, Body, Box, Icon,
 } from '@biom3/react';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { useState } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { Environment } from '@imtbl/config';
@@ -13,6 +12,7 @@ import { CenteredBoxContent } from '../../../../components/CenteredBoxContent/Ce
 import { zkEVMNetwork } from '../../../../lib/networkUtils';
 import { InnerExampleWidgetViews } from '../../../../context/view-context/InnerExampleViewContextTypes';
 import { statusBoxStyles } from '../../../../components/Status/StatusViewStyles';
+import { WidgetTheme } from '../../../../lib';
 
 export interface ConnectionLoaderProps {
   children?: React.ReactNode;

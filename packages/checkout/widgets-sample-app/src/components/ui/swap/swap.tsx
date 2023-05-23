@@ -1,6 +1,5 @@
 import {
   WidgetTheme,
-  WidgetConnectionProviders,
   SwapReact,
   CheckoutWidgets,
   CheckoutWidgetsConfig,
@@ -25,7 +24,7 @@ function SwapUI() {
     <div className="Swap">
       <h1 className="sample-heading">Checkout Swap (Web Component)</h1>
       <SwapReact
-        providerPreference={WidgetConnectionProviders.METAMASK}
+        providerPreference='metamask'
         amount="50000000000000000000"
         fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
         toContractAddress=""

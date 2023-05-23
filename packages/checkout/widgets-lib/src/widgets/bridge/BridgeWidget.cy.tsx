@@ -2,7 +2,6 @@ import {
   describe, it, cy, beforeEach,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { Network, WidgetTheme } from '@imtbl/checkout-widgets';
 import { Checkout, SwitchNetworkResult } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { BiomeCombinedProviders, BiomeThemeProvider } from '@biom3/react';
@@ -17,13 +16,21 @@ import {
   BridgeWidgetParams,
   BridgeWidgetViews,
 } from './BridgeWidget';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { Network, WidgetTheme } from '../../lib';
 
 type CypressStub = Cypress.Agent<Sinon.SinonStub<any[], any>>;
 describe('Bridge Widget tests', () => {
   let connectStub: any;
   let switchNetworkStub: CypressStub;
-
   let connectStubReturnValue;
+  const config: StrongCheckoutWidgetsConfig = {
+    environment: Environment.PRODUCTION,
+    theme: WidgetTheme.DARK,
+    isBridgeEnabled: true,
+    isSwapEnabled: true,
+    isOnRampEnabled: true,
+  };
 
   beforeEach(() => {
     connectStubReturnValue = {
@@ -95,9 +102,8 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BridgeWidget
-          environment={Environment.PRODUCTION}
+          config={config}
           params={params}
-          theme={WidgetTheme.DARK}
         />,
       );
       cySmartGet('heading').should('be.visible');
@@ -125,9 +131,8 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BridgeWidget
-          environment={Environment.PRODUCTION}
+          config={config}
           params={params}
-          theme={WidgetTheme.DARK}
         />,
       );
       cySmartGet('heading').should('be.visible');
@@ -155,9 +160,8 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BridgeWidget
-          environment={Environment.PRODUCTION}
+          config={config}
           params={params}
-          theme={WidgetTheme.DARK}
         />,
       );
       cy.wait(50);
@@ -177,9 +181,9 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BridgeWidget
-          environment={Environment.PRODUCTION}
+          config={config}
           params={params}
-          theme={WidgetTheme.DARK}
+
         />,
       );
       cy.wait(50);
@@ -214,9 +218,9 @@ describe('Bridge Widget tests', () => {
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <BridgeWidget
-            environment={Environment.PRODUCTION}
+            config={config}
             params={params}
-            theme={WidgetTheme.DARK}
+
           />
         </BiomeCombinedProviders>,
       );
@@ -280,9 +284,9 @@ describe('Bridge Widget tests', () => {
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <BridgeWidget
-            environment={Environment.PRODUCTION}
+            config={config}
             params={params}
-            theme={WidgetTheme.DARK}
+
           />
         </BiomeCombinedProviders>,
       );
@@ -366,9 +370,9 @@ describe('Bridge Widget tests', () => {
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <BridgeWidget
-            environment={Environment.PRODUCTION}
+            config={config}
             params={params}
-            theme={WidgetTheme.DARK}
+
           />
         </BiomeCombinedProviders>,
       );
@@ -427,9 +431,9 @@ describe('Bridge Widget tests', () => {
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <BridgeWidget
-            environment={Environment.PRODUCTION}
+            config={config}
             params={params}
-            theme={WidgetTheme.DARK}
+
           />
         </BiomeCombinedProviders>,
       );
@@ -513,9 +517,9 @@ describe('Bridge Widget tests', () => {
       mount(
         <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <BridgeWidget
-            environment={Environment.PRODUCTION}
+            config={config}
             params={params}
-            theme={WidgetTheme.DARK}
+
           />
         </BiomeCombinedProviders>,
       );
@@ -546,9 +550,9 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BridgeWidget
-          environment={Environment.PRODUCTION}
+          config={config}
           params={params}
-          theme={WidgetTheme.DARK}
+
         />,
       );
 
@@ -574,9 +578,8 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BridgeWidget
-          environment={Environment.PRODUCTION}
+          config={config}
           params={params}
-          theme={WidgetTheme.DARK}
         />,
       );
 

@@ -3,7 +3,6 @@ import {
 } from '@biom3/react';
 import { ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { useEffect, useState } from 'react';
-import { Network } from '@imtbl/checkout-widgets';
 import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 // TODO: Fix circular dependency
@@ -11,6 +10,7 @@ import { Environment } from '@imtbl/config';
 import { BridgeButton } from './BridgeButton';
 import { BridgeWidgetViews } from '../BridgeWidget';
 import { L1Network } from '../../../lib/networkUtils';
+import { Network } from '../../../lib';
 
 interface BridgeFormProps {
   provider: Web3Provider;

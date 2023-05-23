@@ -1,17 +1,13 @@
 import React from 'react';
-import {
-  WidgetConnectionProviders,
-  DEFAULT_PROVIDER,
-} from '../definitions/constants';
+import { Environment } from '@imtbl/config';
 import { CheckoutWidgetsConfig } from '../definitions/config';
-import { withDefaults } from '../lib/withDefaults';
 
 /**
  * Interface representing the props for the Example Widget component.
  * @experimental
  */
 export interface ExampleReactProps extends CheckoutWidgetsConfig {
-  providerPreference: WidgetConnectionProviders;
+  providerPreference: string;
 }
 
 /**
@@ -26,13 +22,11 @@ export function ExampleReact(props: ExampleReactProps) {
     theme,
   } = props;
 
-  const config = withDefaults(window.ImtblCheckoutWidgetConfig);
-
   return (
     <imtbl-example
-      environment={environment ?? config.environment}
-      theme={theme ?? config.theme}
-      providerPreference={providerPreference ?? DEFAULT_PROVIDER}
+      environment={environment ?? Environment.SANDBOX}
+      theme={theme ?? 'dark'}
+      providerPreference={providerPreference}
     />
   );
 }

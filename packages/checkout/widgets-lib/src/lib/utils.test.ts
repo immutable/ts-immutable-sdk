@@ -8,7 +8,7 @@ import {
   sortTokensByAmount,
   tokenValueFormat,
 } from './utils';
-import { DEFAULT_TOKEN_DECIMALS } from './constant';
+import { DEFAULT_TOKEN_DECIMALS } from './constants';
 
 describe('utils', () => {
   describe('sortTokensByAmount', () => {

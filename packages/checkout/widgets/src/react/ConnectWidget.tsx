@@ -1,18 +1,12 @@
 import React from 'react';
-import {
-  DEFAULT_PROVIDER,
-  WidgetConnectionProviders,
-} from '../definitions/constants';
-import { CheckoutWidgetsConfig } from '../definitions/config';
-import { withDefaults } from '../lib/withDefaults';
 
 /**
  * Interface representing the props for the Connect Widget component.
- * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Connect Widget
- * (default: {@link WidgetConnectionProviders.METAMASK}).
+ * @property {string} providerPreference - The preferred provider for the Connect Widget
+ * (default: "metamask").
  */
-export interface ConnectReactProps extends CheckoutWidgetsConfig {
-  providerPreference?: WidgetConnectionProviders;
+export interface ConnectReactProps {
+  providerPreference?: string;
 }
 
 /**
@@ -21,15 +15,14 @@ export interface ConnectReactProps extends CheckoutWidgetsConfig {
  * @returns {JSX.Element} - The rendered Connect Widget component.
  */
 export function ConnectReact(props: ConnectReactProps): JSX.Element {
-  const { providerPreference, environment, theme } = props;
+  const { providerPreference } = props;
 
-  const config = withDefaults(window.ImtblCheckoutWidgetConfig);
+  const config = window.ImtblCheckoutWidgetConfig;
 
   return (
     <imtbl-connect
-      environment={environment ?? config.environment}
-      theme={theme ?? config.theme}
-      providerPreference={providerPreference ?? DEFAULT_PROVIDER}
+      widgetConfig={config}
+      providerPreference={providerPreference ?? 'metamask'}
     />
   );
 }

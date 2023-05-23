@@ -2,10 +2,8 @@
 
 import { BiomeThemeProvider } from '@biom3/react';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { Environment } from '@imtbl/config';
 import {
   sendCloseWidgetEvent,
   sendConnectFailedEvent,
@@ -33,13 +31,14 @@ import {
 } from '../../context/view-context/ViewContext';
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 export interface ConnectWidgetProps {
-  environment: Environment;
   // TODO: 'params' PropType is defined but prop is never used
   // eslint-disable-next-line react/no-unused-prop-types
   params: ConnectWidgetParams;
-  theme: WidgetTheme;
+  config: StrongCheckoutWidgetsConfig
   deepLink?: ConnectWidgetViews.CONNECT_WALLET;
   sendCloseEventOverride?: () => void;
 }
@@ -50,8 +49,9 @@ export interface ConnectWidgetParams {
 
 export function ConnectWidget(props: ConnectWidgetProps) {
   const {
-    environment, theme, deepLink, sendCloseEventOverride,
+    config, deepLink, sendCloseEventOverride,
   } = props;
+  const { environment, theme } = config;
   const [connectState, connectDispatch] = useReducer(
     connectReducer,
     initialConnectState,

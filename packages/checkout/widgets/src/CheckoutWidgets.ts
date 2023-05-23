@@ -15,7 +15,7 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
   );
 
   document.head.appendChild(checkoutWidgetJS);
-  window.ImtblCheckoutWidgetConfig = config;
+  window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
 }
 
 /**
@@ -23,7 +23,7 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
  * @param {CheckoutWidgetsConfig} config - new Checkout Widget global configurations.
  */
 export function UpdateConfig(config: CheckoutWidgetsConfig) {
-  window.ImtblCheckoutWidgetConfig = config;
+  window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
 }
 
 /**
