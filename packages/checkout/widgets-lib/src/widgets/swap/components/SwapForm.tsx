@@ -498,7 +498,7 @@ export function SwapForm() {
               onTextInputFocus={onFromTextInputFocus}
               textInputMaxButtonClick={textInputMaxButtonClick}
               onSelectChange={onFromSelectChange}
-              textInputErrorMessage={direction === SwapDirection.FROM ? fromAmountError : ''}
+              textInputErrorMessage={fromAmountError}
               selectErrorMessage={fromTokenError}
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
@@ -535,7 +535,7 @@ export function SwapForm() {
               onTextInputBlur={(v) => onToTextInputBlur(v)}
               onTextInputFocus={onToTextInputFocus}
               onSelectChange={onToSelectChange}
-              textInputErrorMessage={direction === SwapDirection.TO ? toAmountError : ''}
+              textInputErrorMessage={toAmountError}
               selectErrorMessage={toTokenError}
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
