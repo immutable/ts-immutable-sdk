@@ -5,15 +5,15 @@ import { cy } from 'local-cypress';
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Exchange } from '@imtbl/dex-sdk';
-import { cySmartGet } from '../../../../lib/testUtils';
-import { SwapWidgetTestComponent } from '../../test-components/SwapWidgetTestComponent';
+import { cySmartGet } from '../../../lib/testUtils';
+import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapForm } from './SwapForm';
-import { text } from '../../../../resources/text/textConfig';
-import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
-import { SwapState, initialSwapState } from '../../context/swap-context/SwapContext';
-import { SwapCoins } from '../../views/SwapCoins';
-import { SwapFormState } from '../../context/swap-form-context/SwapFormContext';
-import { quotesProcessor } from '../../functions/FetchQuote';
+import { text } from '../../../resources/text/textConfig';
+import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
+import { SwapState, initialSwapState } from '../context/swap-context/SwapContext';
+import { SwapCoins } from '../views/SwapCoins';
+import { SwapFormState } from '../context/swap-form-context/SwapFormContext';
+import { quotesProcessor } from '../functions/FetchQuote';
 
 describe('SwapForm', () => {
   let testSwapState: SwapState;

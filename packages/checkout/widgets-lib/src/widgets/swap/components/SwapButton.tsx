@@ -1,23 +1,23 @@
 import { Box, Button } from '@biom3/react';
 import { useContext } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { sendSwapSuccessEvent } from '../../SwapWidgetEvents';
-import { text } from '../../../../resources/text/textConfig';
-import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
+import { sendSwapSuccessEvent } from '../SwapWidgetEvents';
+import { text } from '../../../resources/text/textConfig';
+import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import {
   ViewContext,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ViewActions,
-} from '../../../../context/view-context/ViewContext';
-import { SwapContext } from '../../context/swap-context/SwapContext';
+} from '../../../context/view-context/ViewContext';
+import { SwapContext } from '../context/swap-context/SwapContext';
 import {
   swapButtonBoxStyle,
   swapButtonIconLoadingStyle,
 } from './SwapButtonStyles';
-import { SwapFormActions, SwapFormContext } from '../../context/swap-form-context/SwapFormContext';
+import { SwapFormActions, SwapFormContext } from '../context/swap-form-context/SwapFormContext';
 import {
   ValidateFromToken, ValidateFromAmount, ValidateToToken, ValidateToAmount,
-} from '../../functions/SwapValidator';
+} from '../functions/SwapValidator';
 
 export interface SwapButtonProps {
   loading: boolean
