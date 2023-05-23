@@ -8,35 +8,15 @@ import { utils } from 'ethers';
 import { GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { text } from '../../../resources/text/textConfig';
-<<<<<<< refs/remotes/origin/main
-import {
-  SwapFormActions,
-  SwapFormContext,
-<<<<<<< refs/remotes/origin/main:packages/checkout/widgets-lib/src/widgets/swap/components/SwapForm/SwapForm.tsx
-} from '../../context/swap-form-context/SwapFormContext';
-import { amountInputValidation as textInputValidator } from '../../../../lib/validations/amountInputValidations';
-import { SwapContext } from '../../context/swap-context/SwapContext';
-import { CryptoFiatActions, CryptoFiatContext } from '../../../../context/crypto-fiat-context/CryptoFiatContext';
-import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
-import { quotesProcessor } from '../../functions/FetchQuote';
-import { DEFAULT_IMX_DECIMALS } from '../../../../lib';
-import { SelectInput } from '../../../../components/FormComponents/SelectInput/SelectInput';
-import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
-import { SelectOption } from '../../../../components/FormComponents/SelectForm/SelectForm';
-=======
-} from '../context/swap-form-context/SwapFormContext';
-=======
->>>>>>> Refactor out swap form context
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/swap-context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
-import { DEFAULT_IMX_DECIMALS } from '../../../lib/constant';
+import { DEFAULT_IMX_DECIMALS } from '../../../lib/constants';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SelectOption } from '../../../components/FormComponents/SelectForm/SelectForm';
->>>>>>> Move swap components to flat file structure:packages/checkout/widgets-lib/src/widgets/swap/components/SwapForm.tsx
 import {
   ValidateFromAmount, ValidateFromToken, ValidateToAmount, ValidateToToken,
 } from '../functions/SwapValidator';
@@ -97,6 +77,7 @@ export function SwapForm() {
   const [direction, setDirection] = useState<SwapDirection>(SwapDirection.FROM);
   const [loading, setLoading] = useState(false);
 
+  // Form State
   const [fromAmount, setFromAmount] = useState<string>('');
   const [fromAmountError, setFromAmountError] = useState<string>('');
   const [fromToken, setFromToken] = useState<GetBalanceResult | null>(null);
@@ -105,14 +86,15 @@ export function SwapForm() {
   const [toAmountError, setToAmountError] = useState<string>('');
   const [toToken, setToToken] = useState<TokenInfo | null>(null);
   const [toTokenError, setToTokenError] = useState<string>('');
+  const [fromFiatValue, setFromFiatValue] = useState('');
+
+  // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [quoteError, setQuoteError] = useState<string>('');
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
   const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | null>(null);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
-  const [fromFiatValue, setFromFiatValue] = useState('');
-
   const tokensOptionsFrom = useMemo(
     () => tokenBalances
       .filter((b) => b.balance.gt(0))
@@ -209,8 +191,61 @@ export function SwapForm() {
   };
 
   const processFetchQuoteTo = async () => {
-    // eslint-disable-next-line no-console
-    console.log('todo: implement fetch quote to: ', toAmount);
+    if (!provider) return;
+    if (!exchange) return;
+    if (!fromToken) return;
+    if (!toToken) return;
+
+    try {
+      const result = await quotesProcessor.fromAmountOut(
+        exchange,
+        provider,
+        toToken,
+        toAmount,
+        fromToken.token,
+      );
+
+      const estimate = result.info.gasFeeEstimate;
+      const gasFee = utils.formatUnits(
+        estimate?.amount || 0,
+        DEFAULT_IMX_DECIMALS,
+      );
+      const estimateToken = estimate?.token;
+
+      const gasToken = allowedTokens.find((token) => token.symbol === estimateToken?.symbol);
+      setQuote(result);
+      setGasFeeValue(gasFee);
+      setGasFeeToken({
+        name: gasToken?.name || '',
+        symbol: gasToken?.symbol || '',
+        decimals: gasToken?.decimals || 0,
+        address: gasToken?.address,
+        icon: gasToken?.icon,
+      });
+      setGasFeeFiatValue(calculateCryptoToFiat(
+        gasFee,
+        DEFAULT_IMX_DECIMALS.toString(),
+        cryptoFiatState.conversions,
+      ));
+
+      setFromAmount(
+        formatZeroAmount(
+          tokenValueFormat(utils.formatUnits(
+            result.info.quote.amount,
+            result.info.quote.token.decimals,
+          )),
+        ),
+      );
+
+      setFromAmountError('');
+      setFromTokenError('');
+      setToAmountError('');
+      setToTokenError('');
+    } catch (error: any) {
+      setQuoteError(error.message);
+    }
+
+    setIsFetching(false);
   };
 
   const canRunFromQuote = (): boolean => {
