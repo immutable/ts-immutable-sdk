@@ -31,7 +31,7 @@ export type TradeInfo = {
 };
 
 export type TransactionResponse = {
-  approval: ethers.providers.TransactionRequest | null;
+  approveTransaction: ethers.providers.TransactionRequest | null;
   transaction: ethers.providers.TransactionRequest;
   info: TradeInfo;
 };

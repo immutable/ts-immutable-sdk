@@ -11,7 +11,8 @@ export enum ExchangeErrorCode {
   CHAIN_NOT_SUPPORTED = 'CHAIN_NOT_SUPPORTED',
   NO_ROUTES_AVAILABLE = 'NO_ROUTES_AVAILABLE',
   PROVIDER_CALL_ERROR = 'PROVIDER_CALL_ERROR',
-  APPROVAL_ERROR = 'APPROVAL_ERROR',
+  APPROVE_ERROR = 'APPROVE_ERROR',
+  ALREADY_APPROVED_ERROR = 'ALREADY_APPROVED_ERROR',
 }
 
 /**
@@ -84,8 +85,20 @@ export class ProviderCallError extends ExchangeError {
   }
 }
 
-export class ApprovalError extends ExchangeError {
+export class ApproveError extends ExchangeError {
   constructor(message: string) {
-    super(message, ExchangeErrorCode.APPROVAL_ERROR);
+    super(message, ExchangeErrorCode.APPROVE_ERROR);
+  }
+}
+
+export class AlreadyApprovedError extends ExchangeError {
+  public tokenAddress: string;
+
+  public spenderAddress: string;
+
+  constructor(amountApproved: string, tokenAddress: string, spenderAddress: string) {
+    super(`already approved ${amountApproved} tokens`, ExchangeErrorCode.ALREADY_APPROVED_ERROR);
+    this.tokenAddress = tokenAddress;
+    this.spenderAddress = spenderAddress;
   }
 }

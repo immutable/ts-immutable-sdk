@@ -1,10 +1,11 @@
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
-import { ApprovalError } from 'errors';
+import { ApproveError, AlreadyApprovedError } from 'errors';
 
 /**
- * Get the amount of an ERC20 token that needs to be approved
+ * Get the amount of an ERC20 token that needs to be approved by
+ * checking the existing allowance for the spender
  *
  * @param provider - The provider to use for the call
  * @param ownerAddress - The address of the owner of the token
@@ -12,7 +13,7 @@ import { ApprovalError } from 'errors';
  * @param spenderAddress - The address of the spender
  * @returns - The amount of the token that needs to be approved
  */
-export const getERC20AmountToApprove = async (
+const getERC20AmountToApprove = async (
   provider: JsonRpcProvider,
   ownerAddress: string,
   tokenAddress: string,
@@ -29,16 +30,16 @@ export const getERC20AmountToApprove = async (
     allowance = await erc20Contract.allowance(ownerAddress, spenderAddress);
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown Error';
-    throw new ApprovalError(`failed to get allowance: ${message}`);
+    throw new ApproveError(`failed to get allowance: ${message}`);
   }
 
   // get the amount that needs to be approved
   const requiredAmount = BigNumber.from(tokenAmount).sub(allowance);
-  if (requiredAmount.isNegative()) {
-    return BigNumber.from('0');
+  if (requiredAmount.isNegative() || requiredAmount.isZero()) {
+    throw new AlreadyApprovedError(tokenAmount.toString(), tokenAddress, spenderAddress);
   }
 
-  return BigNumber.from(tokenAmount).sub(allowance);
+  return requiredAmount;
 };
 
 /**
@@ -47,16 +48,16 @@ export const getERC20AmountToApprove = async (
  * @param ownerAddress - The address of the owner of the token
  * @param tokenAmount - The amount of the token to approve
  * @param spenderAddress - The address of the spender
- * @returns
+ * @returns - The unsigned ERC20 approve transaction
  */
-export const getUnsignedERC20ApproveTransaction = (
+const getUnsignedERC20ApproveTransaction = (
   ownerAddress: string,
   tokenAddress: string,
   tokenAmount: BigNumber,
   spenderAddress: string,
-) => {
+): TransactionRequest => {
   if (ownerAddress === spenderAddress) {
-    throw new ApprovalError('owner and spender addresses are the same');
+    throw new ApproveError('owner and spender addresses are the same');
   }
 
   const erc20Contract = ERC20__factory.createInterface();
@@ -68,4 +69,47 @@ export const getUnsignedERC20ApproveTransaction = (
     value: 0,
     from: ownerAddress,
   };
+};
+
+/**
+ * Get an unsigned approval transaction if needed
+ *
+ * @param provider The provider to use for the call
+ * @param ownerAddress The address of the owner of the token
+ * @param tokenAddress The address of the token to approve
+ * @param tokenAmount The amount of the token to approve
+ * @param spenderAddress The address of the spender
+ * @returns The unsigned ERC20 approve transaction, or null if no approval is needed
+ */
+export const getApproveTransaction = async (
+  provider: JsonRpcProvider,
+  ownerAddress: string,
+  tokenAddress: string,
+  tokenAmount: BigNumber,
+  spenderAddress: string,
+): Promise<TransactionRequest | null> => {
+  let amountToApprove: BigNumber;
+  try {
+    amountToApprove = await getERC20AmountToApprove(
+      provider,
+      ownerAddress,
+      tokenAddress,
+      BigNumber.from(tokenAmount),
+      spenderAddress,
+    );
+  } catch (e) {
+    if (e instanceof AlreadyApprovedError) {
+      // already approved for the required amount, nothing to do
+      return null;
+    }
+
+    throw e;
+  }
+
+  return getUnsignedERC20ApproveTransaction(
+    ownerAddress,
+    tokenAddress,
+    amountToApprove,
+    spenderAddress,
+  );
 };

@@ -72,14 +72,16 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         amountOut,
       );
 
-      expect(tx.approval).not.toBe(null);
-      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', tx.approval?.data as string);
+      expect(tx.approveTransaction).not.toBe(null);
+
+      const decodedResults = erc20ContractInterface
+        .decodeFunctionData('approve', tx.approveTransaction?.data as string);
       expect(decodedResults[0]).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
       // we have already approved 1000000000000000000, so we expect to approve 1000000000000000000 more
       expect(decodedResults[1].toString()).toEqual(APPROVED_AMOUNT.toString());
-      expect(tx.approval?.to).toEqual(params.inputToken);
-      expect(tx.approval?.from).toEqual(params.fromAddress);
-      expect(tx.approval?.value).toEqual(0); // we do not want to send any ETH
+      expect(tx.approveTransaction?.to).toEqual(params.inputToken);
+      expect(tx.approveTransaction?.from).toEqual(params.fromAddress);
+      expect(tx.approveTransaction?.value).toEqual(0); // we do not want to send any ETH
     });
   });
 
@@ -100,7 +102,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       );
 
       // we have already approved 1000000000000000000, so we don't expect to approve anything
-      expect(tx.approval).toBe(null);
+      expect(tx.approveTransaction).toBe(null);
     });
   });
 
