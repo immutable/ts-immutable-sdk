@@ -2,33 +2,33 @@ import { TextInput } from '@biom3/react';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 
 interface TextInputFormProps {
-  testId: string;
+  id: string;
   value: string;
   placeholder?: string;
   subtext?: string;
   textAlign?: 'left' | 'right';
-  isErrored?: boolean;
   errorMessage?: string;
+  disabled?: boolean;
   validator: (value: string) => boolean;
-  onTextInputFocus: () => void;
   onTextInputChange: (value: string) => void;
   onTextInputBlur: (value: string) => void;
+  onTextInputFocus?: (value: string) => void;
   maxButtonClick?: () => void;
 }
 
 export function TextInputForm({
-  testId,
+  id,
   value,
   placeholder,
   errorMessage,
-  isErrored,
   validator,
-  onTextInputFocus,
   onTextInputChange,
   onTextInputBlur,
+  onTextInputFocus,
   textAlign,
   subtext,
   maxButtonClick,
+  disabled,
 }: TextInputFormProps) {
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>, previousValue: string) => {
     const inputValue = event.target.value;
@@ -46,26 +46,42 @@ export function TextInputForm({
     onTextInputBlur(inputValue);
   };
 
+  const handleOnFocus = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!onTextInputFocus) return;
+    const inputValue = event.target.value;
+    if (!validator(inputValue)) return;
+    onTextInputFocus(inputValue);
+  };
+
   return (
     <FormControlWrapper
+      testId={`${id}-text-control`}
       textAlign={textAlign ?? 'left'}
-      subtext={subtext}
-      isErrored={isErrored}
+      subtext={errorMessage ? undefined : subtext}
+      isErrored={!!errorMessage}
       errorMessage={errorMessage}
     >
       <TextInput
-        testId={testId}
+        id={`${id}-text`}
+        testId={`${id}-text`}
         onChange={(event) => handleOnChange(event, value)}
         sizeVariant="large"
         value={value}
-        validationStatus={isErrored ? 'error' : 'success'}
+        validationStatus={errorMessage ? 'error' : 'success'}
         placeholder={placeholder}
         onBlur={handleOnBlur}
+        onFocus={handleOnFocus}
+        disabled={disabled}
         hideClearValueButton
-        onFocus={onTextInputFocus}
       >
         {maxButtonClick && (
-          <TextInput.Button onClick={maxButtonClick}>max</TextInput.Button>
+          <TextInput.Button
+            testId={`${id}-max-button`}
+            onClick={maxButtonClick}
+            disabled={disabled}
+          >
+            max
+          </TextInput.Button>
         )}
       </TextInput>
     </FormControlWrapper>

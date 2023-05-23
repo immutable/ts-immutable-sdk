@@ -4,6 +4,7 @@ import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContex
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { BaseViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
+import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 
 export const text = {
   views: {
@@ -42,6 +43,10 @@ export const text = {
       networkStatus: {
         heading: 'Network',
       },
+      totalTokenBalance: {
+        heading: 'Coins',
+        totalHeading: 'Value',
+      },
       tokenBalancesList: {
         noTokensFound: 'No tokens found',
       },
@@ -53,6 +58,10 @@ export const text = {
       disconnectButton: {
         label: 'Disconnect Wallet',
       },
+    },
+    [WalletWidgetViews.COIN_INFO]: {
+      heading: 'Coins and collectibles are native to networks',
+      body: 'You can switch networks to add coins or move them from one network to another',
     },
     [SwapWidgetViews.SWAP]: {
       header: {
@@ -76,6 +85,17 @@ export const text = {
       },
       fees: {
         title: 'Fees total',
+      },
+      validation: {
+        noAmountInputted: 'Please input amount',
+        insufficientBalance: 'Insufficient balance',
+        noFromTokenSelected: 'Select a coin to swap',
+        noToTokenSelected: 'Select a coin to receive',
+      },
+    },
+    [BridgeWidgetViews.BRIDGE]: {
+      header: {
+        title: 'Move coins',
       },
     },
   },

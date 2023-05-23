@@ -1,12 +1,21 @@
 import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 describe('ConnectLoader', () => {
+  const config: StrongCheckoutWidgetsConfig = {
+    environment: Environment.SANDBOX,
+    theme: WidgetTheme.DARK,
+    isBridgeEnabled: true,
+    isSwapEnabled: true,
+    isOnRampEnabled: true,
+  };
+
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
@@ -15,9 +24,8 @@ describe('ConnectLoader', () => {
     const params = {} as ConnectLoaderParams;
     mount(
       <ConnectLoader
-        environment={Environment.SANDBOX}
+        widgetConfig={config}
         params={params}
-        theme={WidgetTheme.DARK}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
@@ -40,9 +48,8 @@ describe('ConnectLoader', () => {
 
     mount(
       <ConnectLoader
-        environment={Environment.SANDBOX}
+        widgetConfig={config}
         params={params}
-        theme={WidgetTheme.DARK}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
@@ -87,9 +94,8 @@ describe('ConnectLoader', () => {
 
     mount(
       <ConnectLoader
-        environment={Environment.SANDBOX}
+        widgetConfig={config}
         params={params}
-        theme={WidgetTheme.DARK}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
@@ -135,9 +141,8 @@ describe('ConnectLoader', () => {
 
     mount(
       <ConnectLoader
-        environment={Environment.SANDBOX}
+        widgetConfig={config}
         params={params}
-        theme={WidgetTheme.DARK}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
@@ -177,9 +182,8 @@ describe('ConnectLoader', () => {
 
     mount(
       <ConnectLoader
-        environment={Environment.SANDBOX}
+        widgetConfig={config}
         params={params}
-        theme={WidgetTheme.DARK}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>

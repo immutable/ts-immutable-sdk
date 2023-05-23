@@ -33,3 +33,5 @@ declare global {
     setAttribute: Function;
   }
 }
+
+export {};

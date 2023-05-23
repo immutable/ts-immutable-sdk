@@ -19,8 +19,8 @@ export class ImmutableOuterExample extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <ConnectionLoader params={params} theme={this.theme}>
-          <OuterWidget params={params} theme={this.theme} />
+        <ConnectionLoader params={params} theme={this.widgetConfig?.theme!}>
+          <OuterWidget params={params} theme={this.widgetConfig?.theme!} />
         </ConnectionLoader>
       </React.StrictMode>,
     );

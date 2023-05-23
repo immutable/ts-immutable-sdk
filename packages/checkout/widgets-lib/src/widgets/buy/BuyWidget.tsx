@@ -3,7 +3,6 @@ import {
   BiomeThemeProvider, Box, Heading, Button, Body,
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import {
   ChainId,
   Checkout,
@@ -12,7 +11,6 @@ import {
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
-import { Environment } from '@imtbl/config';
 import { buyWidgetStyle } from './BuyStyles';
 // TODO: fix circular dependency
 // eslint-disable-next-line import/no-cycle
@@ -24,6 +22,8 @@ import {
   sendBuyWidgetCloseEvent,
   sendBuyWidgetNotConnectedEvent,
 } from './BuyWidgetEvents';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 export enum BuyWidgetViews {
   BUY = 'BUY',
@@ -85,8 +85,7 @@ export type GetOrderResponse = {
 };
 export interface BuyWidgetProps {
   params: BuyWidgetParams;
-  theme: WidgetTheme;
-  environment: Environment;
+  config: StrongCheckoutWidgetsConfig
 }
 
 export interface BuyWidgetParams {
@@ -197,10 +196,10 @@ export class Orderbook {
 }
 
 export function BuyWidget({
-  environment,
   params: { providerPreference, orderId },
-  theme,
+  config,
 }: BuyWidgetProps) {
+  const { environment, theme } = config;
   const checkout = useMemo(
     () => new Checkout({ baseConfig: { environment } }),
     [environment],

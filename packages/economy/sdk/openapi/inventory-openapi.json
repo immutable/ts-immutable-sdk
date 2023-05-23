@@ -1,0 +1,518 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Inventory API",
+    "title": "Inventory API",
+    "contact": {},
+    "version": "1.0"
+  },
+  "basePath": "/inventory/v1",
+  "paths": {
+    "/items/{id}": {
+      "get": {
+        "description": "Get item by ID",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["root"],
+        "summary": "Get item by ID",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Item ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/inventory.Item"
+            }
+          }
+        }
+      }
+    },
+    "/items/{itemID}": {
+      "put": {
+        "security": [
+          {
+            "securitydefinitions.apikey": []
+          }
+        ],
+        "description": "Update an item's metadata",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["root"],
+        "summary": "Update an item",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Item ID - The identifier of the item you're updating",
+            "name": "itemID",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Item Data",
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/inventory.UpdateItemRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/inventory.Item"
+            }
+          }
+        }
+      }
+    },
+    "/{gameID}/batch": {
+      "post": {
+        "security": [
+          {
+            "securitydefinitions.apikey": []
+          }
+        ],
+        "description": "An atomic operation that allow to create and delete multiple items",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["root"],
+        "summary": "Create/Delete items in batch",
+        "parameters": [
+          {
+            "type": "string",
+            "default": "shardbound",
+            "description": "Game ID - The game you're creating the item for, must match API Key",
+            "name": "gameID",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Batch request with an array of items to delete and create",
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/inventory.BatchRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/inventory.Item"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{gameID}/items": {
+      "get": {
+        "description": "Get items based on filters",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["root"],
+        "summary": "Get items",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Game ID to filter items",
+            "name": "gameID",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Item IDs to filter items",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "description": "Owners to filter items",
+            "name": "owner",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Number of records per page",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Page number",
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "field to order the results",
+            "name": "order_by",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "results ordered ascending or descending",
+            "name": "direction",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/inventory.PaginatedItems"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "securitydefinitions.apikey": []
+          }
+        ],
+        "description": "Create an item for the given game, owner, location and item definition",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["root"],
+        "summary": "Create an item",
+        "parameters": [
+          {
+            "type": "string",
+            "default": "shardbound",
+            "description": "Game ID - The game you're creating the item for, must match API Key",
+            "name": "gameID",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "Item Data",
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/inventory.CreateItemRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/inventory.Item"
+            }
+          }
+        }
+      }
+    },
+    "/{gameID}/items/{id}": {
+      "delete": {
+        "security": [
+          {
+            "securitydefinitions.apikey": []
+          }
+        ],
+        "description": "Delete an item for the given game",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["root"],
+        "summary": "Delete an item",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Game ID of the item you are trying to delete",
+            "name": "gameID",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Item ID to be deleted",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/{gameID}/mint": {
+      "post": {
+        "security": [
+          {
+            "securitydefinitions.apikey": []
+          }
+        ],
+        "description": "Used to mint items that aren't minted yet (pending status)",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "tags": ["root"],
+        "summary": "Mint on-chain items in the zkEVM",
+        "parameters": [
+          {
+            "type": "string",
+            "default": "shardbound",
+            "description": "Game ID - The game you're creating the item for, must match API Key",
+            "name": "gameID",
+            "in": "path",
+            "required": true
+          },
+          {
+            "description": "List of item ids to be minted",
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/inventory.MintItemRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "inventory.BatchRequest": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "$ref": "#/definitions/inventory.BatchRequestItems"
+        }
+      }
+    },
+    "inventory.BatchRequestItems": {
+      "type": "object",
+      "properties": {
+        "create": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/inventory.CreateItemRequest"
+          }
+        },
+        "delete": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/inventory.DeleteItemRequest"
+          }
+        },
+        "lock": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/inventory.LockItemRequest"
+          }
+        },
+        "on_chain_lock": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/inventory.LockItemRequest"
+          }
+        }
+      }
+    },
+    "inventory.CreateItemRequest": {
+      "type": "object",
+      "required": ["item_definition_id", "location", "owner"],
+      "properties": {
+        "item_definition_id": {
+          "type": "string",
+          "format": "uuid",
+          "example": "00000000-0000-0000-0000-000000000000"
+        },
+        "location": {
+          "description": "Location of the item. Can be one of the following values:\n* offchain - Off chain, only in the inventory system.\n* starkex - On the StarkEx Network.\n* zkevm - On the ZK EVM Network.",
+          "type": "string",
+          "enum": ["offchain", "zkevm", "starkex"]
+        },
+        "metadata": {
+          "description": "JSON Object of item properties e.g. {\"Level\": 2, \"Rarity\": \"Common\"}",
+          "type": "object"
+        },
+        "owner": {
+          "type": "string",
+          "format": "user_id,eth_address",
+          "example": "00000000-0000-0000-0000-000000000000,0x000000000000"
+        }
+      }
+    },
+    "inventory.DeleteItemRequest": {
+      "type": "object",
+      "required": ["item_id"],
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "example": "shardbound::item::00000000-0000-0000-0000-000000000000::2OJwAJu2EpNckUgT0cY09cfZfCk"
+        }
+      }
+    },
+    "inventory.Item": {
+      "type": "object",
+      "properties": {
+        "contract_id": {
+          "type": "string",
+          "format": "eth_address",
+          "example": "0x0000000000000000000000000000000000000000"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-04-05T00:00:00+00:00"
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-04-05T00:00:00+00:00"
+        },
+        "game_id": {
+          "type": "string",
+          "example": "shardbound"
+        },
+        "id": {
+          "type": "string",
+          "format": "resource_id",
+          "example": "shardbound::item::item_definition_1::0ujsszwN8NRY24YaXiTIE2VWDTS"
+        },
+        "item_definition_id": {
+          "type": "string",
+          "format": "uuid",
+          "example": "00000000-0000-0000-0000-000000000000"
+        },
+        "last_traded": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-04-05T00:00:00+00:00"
+        },
+        "location": {
+          "description": "Location of the item. Can be one of the following values:\n* offchain - Off chain, only in the inventory system.\n* starkex - On the StarkEx Network.\n* zkevm - On the ZK EVM Network.",
+          "type": "string",
+          "example": "offchain"
+        },
+        "lock_owner": {
+          "type": "string",
+          "example": "craft_1"
+        },
+        "metadata": {
+          "description": "JSON Object of item properties e.g. {\"Level\": 2, \"Rarity\": \"Common\"}",
+          "type": "object"
+        },
+        "owner": {
+          "type": "string",
+          "format": "user_id,eth_address",
+          "example": "00000000-0000-0000-0000-000000000000,0x0000000000000000000000000000000000000000"
+        },
+        "status": {
+          "description": "Status of the item. Can be one of the following values:\n* pending - The item is pending to be minted.\n* minting - The item has been requested to be minted\n* created - The item has been created/minted and is in the inventory system.\n* failed - The item failed to be minted.\n* locked - The item locked. Certain operations are not allowed.\n* on_chain_locked - The item locked in our onchain contracts. Certain operations are not allowed.\nFSM: pending -\u003e minting --------\u003e created \u003c-\u003e locked -\u003e on_chain_locked\n\t\t\t\t\t\t\t\t\t |--\u003e failed",
+          "type": "string",
+          "example": "minted"
+        },
+        "token_id": {
+          "type": "string",
+          "format": "eth_address",
+          "example": "0x0000000000000000000000000000000000000000"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-04-05T00:00:00+00:00"
+        }
+      }
+    },
+    "inventory.LockItemRequest": {
+      "type": "object",
+      "required": ["item_id", "lock_owner"],
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "example": "shardbound::item::00000000-0000-0000-0000-000000000000::2OJwAJu2EpNckUgT0cY09cfZfCk"
+        },
+        "lock_owner": {
+          "type": "string",
+          "example": "craft_1"
+        }
+      }
+    },
+    "inventory.MintItemRequest": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "inventory.PaginatedItems": {
+      "type": "object",
+      "properties": {
+        "direction": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer"
+        },
+        "page": {
+          "type": "integer"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/inventory.Item"
+          }
+        },
+        "sort": {
+          "type": "string"
+        },
+        "total_pages": {
+          "type": "integer"
+        },
+        "total_rows": {
+          "type": "integer"
+        }
+      }
+    },
+    "inventory.UpdateItemRequest": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "description": "JSON Object of item properties e.g. {\"Level\": 2, \"Rarity\": \"Common\"}",
+          "type": "object"
+        },
+        "overwrite": {
+          "description": "Overwrite means the metadata will overwrite the existing metadata entirely.",
+          "type": "boolean",
+          "example": false
+        }
+      }
+    }
+  }
+}

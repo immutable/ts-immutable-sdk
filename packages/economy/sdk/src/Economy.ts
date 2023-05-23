@@ -35,7 +35,7 @@ export class Economy {
   }
 
   public subscribe(handler: (event: EconomyEvents) => void): Subscription {
-    return this.events.subscribe((handler));
+    return this.events.subscribe(handler);
   }
 
   public disconnect(): void {

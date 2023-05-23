@@ -1,21 +1,17 @@
 import { Body, Box, ButtCon } from '@biom3/react';
+import { useContext } from 'react';
 import { feeBoxStyles, feeContainerStyles } from './FeeStyles';
 import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
+import { SwapFormContext } from '../context/swap-form-context/SwapFormContext';
+import { formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
 
-export interface FeeProps {
-  fees: string;
-  tokenSymbol: string;
-  fiatPrice: string;
-}
+export function Fees() {
+  const staticText = text.views[SwapWidgetViews.SWAP];
 
-export function Fees(feeProps: FeeProps) {
-  const { fees, fiatPrice, tokenSymbol } = feeProps;
-  const {
-    fees: { title },
-    content,
-  } = text.views[SwapWidgetViews.SWAP];
+  const { swapFormState: { gasFeeValue, gasFeeFiatValue, gasFeeToken } } = useContext(SwapFormContext);
 
+  if (!gasFeeValue) return <Box />;
   return (
     <Box sx={feeContainerStyles}>
       <Box
@@ -33,19 +29,27 @@ export function Fees(feeProps: FeeProps) {
           iconVariant="bold"
         />
         <Body size="medium" weight="regular">
-          {title}
+          {staticText.fees.title}
         </Body>
       </Box>
       <Box sx={feeBoxStyles}>
-        <Body size="medium" weight="regular" sx={{ textAlign: 'right' }}>
-          {`≈ ${tokenSymbol.toUpperCase()} ${fees}`}
+        <Body testId="fee_description_gas" size="medium" weight="regular" sx={{ textAlign: 'right' }}>
+          ≈
+          {' '}
+          {gasFeeToken?.symbol}
+          {' '}
+          {formatZeroAmount(tokenValueFormat(gasFeeValue))}
         </Body>
         <Body
-          size="xSmall"
+          testId="fee_description_gas_fiat"
+          size="small"
           weight="regular"
-          sx={{ color: 'base.color.text.secondary' }}
+          sx={{ color: 'base.color.text.secondary', textAlign: 'right' }}
         >
-          {`${content.fiatPricePrefix} ${fiatPrice}`}
+          {staticText.content.fiatPricePrefix}
+          {' '}
+          $
+          {formatZeroAmount(gasFeeFiatValue, true)}
         </Body>
       </Box>
     </Box>

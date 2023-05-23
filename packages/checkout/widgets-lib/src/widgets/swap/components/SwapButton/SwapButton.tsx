@@ -1,12 +1,12 @@
 import { Box, Button } from '@biom3/react';
-import { Checkout, Transaction } from '@imtbl/checkout-sdk';
-import { useContext, useEffect, useState } from 'react';
-import { Environment } from '@imtbl/config';
+import { useContext } from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { sendSwapSuccessEvent } from '../../SwapWidgetEvents';
 import { text } from '../../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 import {
   ViewContext,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ViewActions,
 } from '../../../../context/view-context/ViewContext';
 import { SwapContext } from '../../context/swap-context/SwapContext';
@@ -14,29 +14,102 @@ import {
   swapButtonBoxStyle,
   swapButtonIconLoadingStyle,
 } from './SwapButtonStyles';
+import { SwapFormActions, SwapFormContext } from '../../context/swap-form-context/SwapFormContext';
+import {
+  ValidateFromToken, ValidateFromAmount, ValidateToToken, ValidateToAmount,
+} from '../../functions/SwapValidator';
 
 export interface SwapButtonProps {
-  transaction?: Transaction;
+  loading: boolean
 }
 
-export function SwapButton(props: SwapButtonProps) {
+export function SwapButton({ loading }: SwapButtonProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { viewDispatch } = useContext(ViewContext);
   const { swapState } = useContext(SwapContext);
-  const { provider } = swapState;
-  const { transaction } = props;
-  const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { checkout, provider } = swapState;
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
+  const { swapFormState, swapFormDispatch } = useContext(SwapFormContext);
+  const {
+    swapFromToken,
+    swapFromAmount,
+    swapToToken,
+    swapToAmount,
+  } = swapFormState;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const SwapFormValidator = (): boolean => {
+    const validateFromTokenError = ValidateFromToken(swapFromToken);
+    const validateFromAmountError = ValidateFromAmount(swapFromAmount, swapFromToken?.formattedBalance);
+    const validateToTokenError = ValidateToToken(swapToToken);
+
+    // we are expecting this to have an amount input from the quote
+    // conversely if the user updates this then swapFromAmount should have a quote value
+    // before we allow the swap to occur.
+    // This will be handled in swap slice 2.
+    const validateToAmountError = ValidateToAmount(swapToAmount);
+
+    if (validateFromTokenError) {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_FROM_TOKEN_ERROR,
+          swapFromTokenError: validateFromTokenError,
+        },
+      });
+    }
+
+    if (validateFromAmountError) {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_FROM_AMOUNT_ERROR,
+          swapFromAmountError: validateFromAmountError,
+        },
+      });
+    }
+
+    if (validateToTokenError) {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_TO_TOKEN_ERROR,
+          swapToTokenError: validateToTokenError,
+        },
+      });
+    }
+
+    if (validateToAmountError) {
+      swapFormDispatch({
+        payload: {
+          type: SwapFormActions.SET_SWAP_TO_AMOUNT_ERROR,
+          swapToAmountError: validateToAmountError,
+        },
+      });
+    }
+
+    if (
+      validateFromTokenError
+      || validateFromAmountError
+      || validateToTokenError
+      || validateToAmountError) return false;
+    return true;
+  };
 
   const sendTransaction = async () => {
-    if (!transaction || !provider) return;
-    // TODO: update here to go to context and stop hardcoing
-    const checkout = new Checkout({
-      baseConfig: { environment: Environment.SANDBOX },
-    });
+    if (!checkout || !provider) return;
+    if (!SwapFormValidator()) return;
     try {
       await checkout.sendTransaction({
         provider,
-        transaction,
+        transaction: {
+          nonce: '0x00',
+          gasPrice: '0x00',
+          gas: '0x00',
+          to: '',
+          from: '',
+          value: '0x00',
+          data: '',
+          chainId: 5,
+        },
       });
       viewDispatch({
         payload: {
@@ -44,10 +117,7 @@ export function SwapButton(props: SwapButtonProps) {
           view: { type: SwapWidgetViews.SUCCESS },
         },
       });
-      sendSwapSuccessEvent();
     } catch (err: any) {
-      // Intentionally making this succeed at the moment since the
-      // transaction will always error out currently
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -57,26 +127,18 @@ export function SwapButton(props: SwapButtonProps) {
     }
   };
 
-  // TODO: remove this and move the loading state used for the button into a SwapContext
-  // or SwapFormContext etc...
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, [setLoading]);
-
   return (
     <Box sx={swapButtonBoxStyle}>
       <Button
-        disabled={!provider || !transaction || loading}
-        variant={!provider || !transaction ? 'tertiary' : 'primary'}
+        testId="swap-button"
+        disabled={loading}
+        variant="primary"
         onClick={sendTransaction}
         size="large"
       >
-        {loading && (
+        {loading ? (
           <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
-        )}
-        {!loading && buttonText}
+        ) : buttonText}
       </Button>
     </Box>
   );

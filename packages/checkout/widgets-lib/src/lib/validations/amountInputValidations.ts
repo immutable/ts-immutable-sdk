@@ -1,4 +1,8 @@
+import { DEFAULT_TOKEN_DECIMALS } from '../constants';
+
 export function amountInputValidation(value: string): boolean {
-  const regex = /^([0-9]+([.][0-9]{0,6})?)?$/;
+  const regex = new RegExp(
+    `^([0-9]+([.][0-9]{0,${DEFAULT_TOKEN_DECIMALS}})?)?$`,
+  );
   return regex.test(value);
 }

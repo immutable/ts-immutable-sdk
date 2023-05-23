@@ -1,6 +1,5 @@
 import { Box, Heading } from '@biom3/react';
-import { BigNumber } from 'ethers';
-import { TokenInfo, Transaction } from '@imtbl/checkout-sdk';
+import { useState } from 'react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
@@ -11,49 +10,6 @@ import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTy
 import { SwapForm } from '../components/SwapForm/SwapForm';
 import { Fees } from '../components/Fees';
 
-type AmountAndPercentage = {
-  amount: {
-    bn: BigNumber;
-    formatted: string;
-  };
-  percent: number;
-};
-
-type QuoteSlippage = AmountAndPercentage;
-
-type QuoteFees = AmountAndPercentage & {
-  token: TokenInfo;
-};
-
-type TradeInfo = {
-  amountIn: BigNumber;
-  amountOut: BigNumber;
-  tokenIn: TokenInfo;
-  tokenOut: TokenInfo;
-  fees: QuoteFees;
-  slippage: QuoteSlippage;
-};
-
-export type QuoteResponse = {
-  status: string;
-  trade: TradeInfo;
-};
-
-export type BuyField = {
-  amount?: BigNumber;
-  token?: TokenInfo;
-};
-
-export type WithField = {
-  quote?: QuoteResponse;
-  token?: TokenInfo;
-};
-
-export interface SwapFormProps {
-  amount?: string;
-  fromContractAddress?: string;
-  toContractAddress?: string;
-}
 export interface SwapCoinsProps {
   amount?: string;
   fromContractAddress?: string;
@@ -70,19 +26,12 @@ export function SwapCoins({
 }: SwapCoinsProps) {
   const { header, content } = text.views[SwapWidgetViews.SWAP];
 
-  const getTransaction = (): Transaction =>
-    // Stubbed exchange.getTransaction
-    // eslint-disable-next-line implicit-arrow-linebreak
-    ({
-      nonce: '0x00', // ignored by MetaMask
-      gasPrice: '0x000', // customizable by user during MetaMask confirmation.
-      gas: '0x000', // customizable by user during MetaMask confirmation.
-      to: '', // To address.
-      from: '', // User's active address.
-      value: '0x00', // Only required to send ether to the recipient from the initiating external account.
-      data: '0x000', // Optional, but used for defining smart contract creation and interaction.
-      chainId: 5, // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
-    });
+  const [loading, setLoading] = useState(false);
+
+  const updateSetLoading = (value: boolean) => {
+    setLoading(value);
+  };
+
   return (
     <SimpleLayout
       header={(
@@ -111,10 +60,10 @@ export function SwapCoins({
           >
             {content.title}
           </Heading>
-          <SwapForm />
-          <Fees fees="0.5" fiatPrice="0.123" tokenSymbol="imx" />
+          <SwapForm setLoading={updateSetLoading} />
+          <Fees />
         </Box>
-        <SwapButton transaction={getTransaction()} />
+        <SwapButton loading={loading} />
       </Box>
     </SimpleLayout>
   );
