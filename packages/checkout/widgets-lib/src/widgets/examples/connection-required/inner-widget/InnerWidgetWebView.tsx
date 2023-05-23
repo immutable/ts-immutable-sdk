@@ -1,9 +1,7 @@
-import {
-  WidgetTheme,
-  WidgetConnectionProviders,
-} from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
 import { useState, useEffect } from 'react';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WidgetTheme } from '../../../../lib';
 
 function InnerWidgetWebView() {
   const [theme, setTheme] = useState(WidgetTheme.DARK);
@@ -20,7 +18,7 @@ function InnerWidgetWebView() {
 
   return (
     <imtbl-inner-widget-example
-      providerPreference={WidgetConnectionProviders.METAMASK}
+      providerPreference={ConnectionProviders.METAMASK}
       theme={theme}
       environment={environment}
     />

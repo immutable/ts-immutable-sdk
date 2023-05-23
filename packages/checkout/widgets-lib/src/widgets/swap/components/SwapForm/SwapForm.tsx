@@ -15,8 +15,8 @@ import { amountInputValidation as textInputValidator } from '../../../../lib/val
 import { SwapContext } from '../../context/swap-context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
-import { DEFAULT_IMX_DECIMALS } from '../../../../lib/constant';
 import { quotesProcessor } from '../../functions/FetchQuote';
+import { DEFAULT_IMX_DECIMALS } from '../../../../lib';
 import { SelectInput } from '../../../../components/FormComponents/SelectInput/SelectInput';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 import { SelectOption } from '../../../../components/FormComponents/SelectForm/SelectForm';

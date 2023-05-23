@@ -1,13 +1,11 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import {
   Checkout,
   ConnectionProviders,
   GetNetworkParams,
 } from '@imtbl/checkout-sdk';
 import { useEffect, useReducer } from 'react';
-import { Environment } from '@imtbl/config';
 import {
   initialWalletState,
   TopUpFeature,
@@ -30,22 +28,31 @@ import {
 } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { Settings } from './views/Settings';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 import { CoinInfo } from './views/CoinInfo';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
-  theme: WidgetTheme;
-  environment: Environment;
+  config: StrongCheckoutWidgetsConfig
 }
 
 export interface WalletWidgetParams {
   providerPreference?: ConnectionProviders;
-  topUpFeatures?: TopUpFeature;
 }
 
 export function WalletWidget(props: WalletWidgetProps) {
-  const { environment, params, theme } = props;
-  const { providerPreference, topUpFeatures } = params;
+  const { params, config } = props;
+  const { providerPreference } = params;
+  const {
+    environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
+  } = config;
+  const topUpFeatures: TopUpFeature = {
+    isBridgeEnabled,
+    isSwapEnabled,
+    isOnRampEnabled,
+  };
+
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;

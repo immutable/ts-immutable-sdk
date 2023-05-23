@@ -1,6 +1,5 @@
 import {
   WidgetTheme,
-  WidgetConnectionProviders,
   CheckoutWidgets,
   BuyReact,
   CheckoutWidgetsConfig,
@@ -25,7 +24,7 @@ function BuyUI() {
     <div className="Buy">
       <h1 className="sample-heading">Checkout Buy Order (Web Component)</h1>
       <BuyReact
-        providerPreference={WidgetConnectionProviders.METAMASK}
+        providerPreference='metamask'
         orderId={`1234`}
       />
     </div>

@@ -5,12 +5,11 @@ import {
   TokenFilterTypes,
   ConnectionProviders,
 } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   useEffect, useCallback, useReducer, useMemo,
 } from 'react';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { ImmutableConfiguration } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { SwapCoins } from './views/SwapCoins';
@@ -36,11 +35,12 @@ import {
   swapFormReducer,
 } from './context/swap-form-context/SwapFormContext';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
-  theme: WidgetTheme;
-  environment: Environment;
+  config: StrongCheckoutWidgetsConfig
 }
 
 export interface SwapWidgetParams {
@@ -70,7 +70,8 @@ export function SwapWidget(props: SwapWidgetProps) {
     [swapFormState, swapFormDispatch],
   );
 
-  const { params, theme, environment } = props;
+  const { params, config } = props;
+  const { environment, theme } = config;
   const {
     amount, fromContractAddress, toContractAddress, providerPreference,
   } = params;

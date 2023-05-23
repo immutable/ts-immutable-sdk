@@ -1,9 +1,9 @@
 import React from 'react';
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { Network } from '@imtbl/checkout-widgets';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
+import { Network } from '../../lib';
 import { ConnectLoader } from '../../components/ConnectLoader/ConnectLoader';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 
@@ -48,21 +48,18 @@ export class ImmutableBridge extends ImmutableWebComponent {
         {this.useConnectWidget ? (
           <ConnectLoader
             params={params}
-            theme={this.theme}
             closeEvent={sendBridgeWidgetCloseEvent}
-            environment={this.environment}
+            widgetConfig={this.widgetConfig!}
           >
             <BridgeWidget
               params={params}
-              theme={this.theme}
-              environment={this.environment}
+              config={this.widgetConfig!}
             />
           </ConnectLoader>
         ) : (
           <BridgeWidget
             params={params}
-            theme={this.theme}
-            environment={this.environment}
+            config={this.widgetConfig!}
           />
         )}
       </React.StrictMode>,

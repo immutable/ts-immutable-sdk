@@ -3,8 +3,6 @@ import {
   BiomeCombinedProviders,
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-
-import { Network, WidgetTheme } from '@imtbl/checkout-widgets';
 import {
   ChainId,
   Checkout,
@@ -16,9 +14,10 @@ import {
 import {
   useEffect, useMemo, useReducer, useRef, useState,
 } from 'react';
-import { Environment } from '@imtbl/config';
 import { TransactionResponse } from '@ethersproject/providers';
 import { L1Network, zkEVMNetwork } from '../../lib/networkUtils';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { Network, WidgetTheme } from '../../lib';
 import {
   BaseViews,
   ViewActions, ViewContext, initialViewState, viewReducer,
@@ -34,8 +33,7 @@ import { Bridge } from './views/Bridge';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
-  theme: WidgetTheme;
-  environment: Environment;
+  config: StrongCheckoutWidgetsConfig
 }
 
 export interface BridgeWidgetParams {
@@ -59,7 +57,9 @@ export const NetworkChainMap = {
 };
 
 export function BridgeWidget(props: BridgeWidgetProps) {
-  const { environment, params, theme } = props;
+  const { params, config } = props;
+  const { environment, theme } = config;
+
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
   const firstRender = useRef(true);
