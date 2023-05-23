@@ -1,5 +1,5 @@
+import { Box, Button } from '@biom3/react';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
-import { FooterButton } from '../Footer/FooterButton';
 import { CenteredBoxContent } from '../CenteredBoxContent/CenteredBoxContent';
 import { StatusBox } from './StatusBox';
 import { StatusType } from './StatusType';
@@ -37,18 +37,34 @@ export function StatusView({
   return (
     <SimpleLayout
       footer={(
-        <>
-          <FooterButton
-            actionText={actionText}
-            onActionClick={onStatusActionClick}
-          />
-          <FooterLogo />
-        </>
+        <FooterLogo />
       )}
     >
-      <CenteredBoxContent testId={testId}>
-        <StatusBox statusText={statusText} statusType={statusType} />
-      </CenteredBoxContent>
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
+        <CenteredBoxContent testId={testId}>
+          <StatusBox statusText={statusText} statusType={statusType} />
+        </CenteredBoxContent>
+
+        <Box sx={{ paddingX: 'base.spacing.x4' }}>
+          <Button
+            sx={{ width: '100%' }}
+            testId="swap-button"
+            variant="primary"
+            size="large"
+            onClick={onStatusActionClick}
+          >
+            {actionText}
+          </Button>
+        </Box>
+
+      </Box>
     </SimpleLayout>
   );
 }
