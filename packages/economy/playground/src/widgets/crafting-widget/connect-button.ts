@@ -22,6 +22,7 @@ export class ConnectButton extends LitElement {
 
   constructor() {
     super();
+
     this.passport = new Passport({
       baseConfig: this.baseConfig,
       overrides: {
@@ -33,10 +34,8 @@ export class ConnectButton extends LitElement {
         immutableXClient: new ImmutableXClient({ baseConfig: this.baseConfig }),
       },
       clientId: '3Xt3vBGjrsuLnBKK3mtJsIU5j5WikfQC',
-      redirectUri:
-        'http://localhost:6006/iframe.html?args=&id=crafting-crafting-widget--widget&viewMode=story',
-      logoutRedirectUri:
-        'http://localhost:6006/iframe.html?args=&id=crafting-crafting-widget--widget&viewMode=story',
+      redirectUri: window.location.href,
+      logoutRedirectUri: window.location.href,
       scope: 'openid offline_access email transact',
       audience: 'platform_api',
     });

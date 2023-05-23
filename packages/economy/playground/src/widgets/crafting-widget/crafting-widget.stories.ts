@@ -1,7 +1,7 @@
 import { html } from 'lit-html';
 
 const meta = {
-  title: 'Crafting/widget',
+  title: 'Crafting/generic-crafting-widget',
   args: {
     gameId: 'pokemon',
     userId: 'pokemon_master',

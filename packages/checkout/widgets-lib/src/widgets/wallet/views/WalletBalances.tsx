@@ -23,7 +23,10 @@ import {
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { getTokenBalances } from '../functions/tokenBalances';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
-import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import {
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 
 export function WalletBalances() {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -38,8 +41,6 @@ export function WalletBalances() {
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
     return (
-      // @ts-ignore
-      // TODO: please fix. `config` doesn't exist on `Checkout` type.
       network?.chainId === zkEVMNetwork(checkout.config.environment)
       && Boolean(
         supportedTopUps?.isBridgeEnabled

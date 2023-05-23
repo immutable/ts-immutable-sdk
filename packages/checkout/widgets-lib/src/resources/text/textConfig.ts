@@ -43,6 +43,10 @@ export const text = {
       networkStatus: {
         heading: 'Network',
       },
+      totalTokenBalance: {
+        heading: 'Coins',
+        totalHeading: 'Value',
+      },
       tokenBalancesList: {
         noTokensFound: 'No tokens found',
       },
@@ -54,6 +58,10 @@ export const text = {
       disconnectButton: {
         label: 'Disconnect Wallet',
       },
+    },
+    [WalletWidgetViews.COIN_INFO]: {
+      heading: 'Coins and collectibles are native to networks',
+      body: 'You can switch networks to add coins or move them from one network to another',
     },
     [SwapWidgetViews.SWAP]: {
       header: {

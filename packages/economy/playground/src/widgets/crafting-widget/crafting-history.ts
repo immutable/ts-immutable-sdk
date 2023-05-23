@@ -1,34 +1,50 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
+import { DomainCraft } from '@imtbl/economy/dist/__codegen__/crafting';
+
+const statuses = {
+  created: ['created', 'assets_locking'],
+  received: ['assets_locked', 'delivering'],
+  minting: ['delivered'],
+  completed: ['completing', 'completed'],
+};
+
+const statusToStep = (status = 'created'): number => {
+  return Object.values(statuses).findIndex((steps) => steps.includes(status));
+};
+
 @customElement('crafting-history')
 export class CraftingHistory extends LitElement {
-  @property({ type: Object, attribute: 'item' })
-  item: Object = {};
+  @property({ type: Array, attribute: 'crafts' })
+  crafts: Array<DomainCraft> = [];
 
-  renderEntry(_: unknown) {
+  renderCraft(craft: DomainCraft) {
+    const steps = Object.keys(statuses);
+
     return html`<div class="p-2 mb-8 outline outline-1 outline-slate-800">
-      <span class="prose"><code>576890-fgdd7980-=fd7980-=fds7890-=</code></span>
+      <span class="prose"><code>${craft.id}</code></span>
       <ul class="steps w-full">
-        <li class="step step-info" data-content="✓">Created</li>
-        <li class="step step-info" data-content="✓">Received</li>
-        <li class="step step-info" data-content="✓">Minted</li>
-        <li data-content="●" class="step step-neutral">Completed</li>
+        ${steps.map((status, idx) => {
+          const lastIdx = statusToStep(craft.status);
+          const stepDone = lastIdx >= idx;
+          const completed =
+            lastIdx >= steps.length - 1 ? 'step-success' : 'step-neutral';
+          return html`<li
+            class="step capitalize ${stepDone ? completed : ''}"
+            data-content="${stepDone ? '✓' : '●'}"
+          >
+            ${status}
+          </li>`;
+        })}
       </ul>
     </div>`;
   }
 
   render() {
-    const properties = {
-      item: this.item,
-    };
-    console.log(
-      '🚀 ~ file: inventory-item.ts:13 ~ InventoryItem ~ render ~ properties:',
-      properties
-    );
     return html`
       <h2>History</h2>
-      ${Array.from({ length: 10 }).map((_, i) => this.renderEntry(i))}
+      ${this.crafts.map((craft) => this.renderCraft(craft))}
     `;
   }
   protected createRenderRoot(): Element | ShadowRoot {
