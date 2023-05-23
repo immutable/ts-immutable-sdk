@@ -41,12 +41,26 @@ export const text = {
       },
       networkStatus: {
         heading: 'Network',
-        network1Name: 'Polygon',
-        network2Name: 'Ethereum',
+      },
+      totalTokenBalance: {
+        heading: 'Coins',
+        totalHeading: 'Value',
       },
       tokenBalancesList: {
         noTokensFound: 'No tokens found',
       },
+    },
+    [WalletWidgetViews.SETTINGS]: {
+      header: {
+        title: 'Settings',
+      },
+      disconnectButton: {
+        label: 'Disconnect Wallet',
+      },
+    },
+    [WalletWidgetViews.COIN_INFO]: {
+      heading: 'Coins and collectibles are native to networks',
+      body: 'You can switch networks to add coins or move them from one network to another',
     },
     [SwapWidgetViews.SWAP]: {
       header: {
@@ -70,6 +84,12 @@ export const text = {
       },
       fees: {
         title: 'Fees total',
+      },
+      validation: {
+        noAmountInputted: 'Please input amount',
+        insufficientBalance: 'Insufficient balance',
+        noFromTokenSelected: 'Select a coin to swap',
+        noToTokenSelected: 'Select a coin to receive',
       },
     },
   },

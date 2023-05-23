@@ -4,8 +4,11 @@ import { Environment } from '@imtbl/config';
 import {
   calculateCryptoToFiat,
   formatFiatString,
+  formatZeroAmount,
   sortTokensByAmount,
+  tokenValueFormat,
 } from './utils';
+import { DEFAULT_TOKEN_DECIMALS } from './constants';
 
 describe('utils', () => {
   describe('sortTokensByAmount', () => {
@@ -165,7 +168,7 @@ describe('utils', () => {
           sortTokensByAmount(
             Environment.PRODUCTION,
             testcase.tokens,
-            ChainId.IMTBL_ZKEVM_TESTNET,
+            ChainId.POLYGON_ZKEVM,
           ),
         ).toEqual([
           {
@@ -294,7 +297,7 @@ describe('utils', () => {
         'eth',
         new Map<string, number>(),
       );
-      expect(result).toBe('-.--');
+      expect(result).toBe('0.00');
     });
 
     it('should return zero balance string if no conversion is found', () => {
@@ -303,7 +306,7 @@ describe('utils', () => {
         'eth',
         new Map<string, number>(),
       );
-      expect(result).toBe('-.--');
+      expect(result).toBe('0.00');
     });
 
     it('should return zero balance string if balance is zero', () => {
@@ -312,7 +315,7 @@ describe('utils', () => {
         'eth',
         new Map<string, number>([['eth', 1800]]),
       );
-      expect(result).toBe('-.--');
+      expect(result).toBe('0.00');
     });
 
     it('should return zero balance string if balance is NaN', () => {
@@ -321,7 +324,7 @@ describe('utils', () => {
         'eth',
         new Map<string, number>([['eth', 1800]]),
       );
-      expect(result).toBe('-.--');
+      expect(result).toBe('0.00');
     });
 
     it('should return calculated fiat value if valid balance and conversion are provided', () => {
@@ -367,6 +370,42 @@ describe('utils', () => {
     it('should format number with no decimal places', () => {
       const result = formatFiatString(123);
       expect(result).toBe('123.00');
+    });
+  });
+
+  describe('formatZeroAmount', () => {
+    it('should return same amount', () => {
+      const result = formatZeroAmount('123.12');
+      expect(result).toBe('123.12');
+    });
+
+    it('should return -.-- if amount empty', () => {
+      const result = formatZeroAmount('');
+      expect(result).toBe('-.--');
+    });
+
+    it('should return 0.00 if allow zero is true', () => {
+      let result = formatZeroAmount('0.00', true);
+      expect(result).toBe('0.00');
+      result = formatZeroAmount('', true);
+      expect(result).toBe('-.--');
+    });
+
+    it('should return -.-- if amount 0.00', () => {
+      const result = formatZeroAmount('0.00');
+      expect(result).toBe('-.--');
+    });
+  });
+
+  describe('tokenValueFormat', () => {
+    it(`a number with more than ${DEFAULT_TOKEN_DECIMALS} decimals`, () => {
+      expect(tokenValueFormat('11.2233445566')).toEqual('11.223344');
+    });
+    it(`a number without ${DEFAULT_TOKEN_DECIMALS} decimals`, () => {
+      expect(tokenValueFormat('112233445566')).toEqual('112233445566');
+    });
+    it(`a number with less than ${DEFAULT_TOKEN_DECIMALS} decimals`, () => {
+      expect(tokenValueFormat('11.22')).toEqual('11.22');
     });
   });
 });

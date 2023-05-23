@@ -23,10 +23,15 @@ import {
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { getTokenBalances } from '../functions/tokenBalances';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
+import {
+  ViewActions,
+  ViewContext,
+} from '../../../context/view-context/ViewContext';
 
 export function WalletBalances() {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { walletState, walletDispatch } = useContext(WalletContext);
+  const { viewDispatch } = useContext(ViewContext);
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const {
@@ -36,8 +41,6 @@ export function WalletBalances() {
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
     return (
-      // @ts-ignore
-      // TODO: please fix. `config` doesn't exist on `Checkout` type.
       network?.chainId === zkEVMNetwork(checkout.config.environment)
       && Boolean(
         supportedTopUps?.isBridgeEnabled
@@ -109,9 +112,14 @@ export function WalletBalances() {
         <HeaderNavigation
           title={header.title}
           showSettings
-          // TODO: please remove or if necessary keep the eslint ignore
-          // eslint-disable-next-line no-console
-          onSettingsClick={() => console.log('settings click')}
+          onSettingsClick={() => {
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: { type: WalletWidgetViews.SETTINGS },
+              },
+            });
+          }}
           onCloseButtonClick={sendWalletWidgetCloseEvent}
         />
       )}
@@ -122,6 +130,7 @@ export function WalletBalances() {
           display: 'flex',
           flexDirection: 'column',
           rowGap: 'base.spacing.x2',
+          paddingX: 'base.spacing.x2',
         }}
       >
         <Box sx={WALLET_BALANCE_CONTAINER_STYLE}>

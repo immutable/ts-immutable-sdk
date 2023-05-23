@@ -1,4 +1,30 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import React from 'react';
+
+declare global {
+  interface Window {
+    ImtblCheckoutWidgetConfig: any;
+  }
+
+  namespace JSX {
+    interface IntrinsicElements {
+      'imtbl-connect': ImtblConnectProps;
+      'imtbl-wallet': ImtblWalletProps;
+      'imtbl-swap': ImtblSwapProps;
+      'imtbl-bridge': ImtblBridgeProps;
+      'imtbl-buy': ImtblBuyProps;
+      'imtbl-example': ImtblExampleProps;
+      'imtbl-transition-example': ImtblTransitionExampleProps;
+      'imtbl-inner-widget-example': ImtblInnerWidgetExampleProps;
+      'imtbl-outer-widget-example': ImtblOuterWidgetExampleProps;
+    }
+  }
+
+  interface ImmutableWebComponent {
+    setProvider: Function;
+    setAttribute: Function;
+  }
+}
 
 /**
  * Props for the Connect Widget component
@@ -12,8 +38,7 @@ export interface ImtblConnectProps
   HTMLElement
   > {
   providerPreference: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
 }
 
 /**
@@ -29,11 +54,7 @@ export interface ImtblWalletProps
   > {
   providerPreference: string;
   useConnectWidget?: string;
-  isOnRampEnabled?: string;
-  isSwapEnabled?: string;
-  isBridgeEnabled?: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
 }
 
 /**
@@ -51,8 +72,7 @@ export interface ImtblSwapProps
   HTMLElement
   > {
   providerPreference: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
   useConnectWidget?: string;
   amount: string;
   fromContractAddress: string;
@@ -74,8 +94,7 @@ export interface ImtblBridgeProps
   HTMLElement
   > {
   providerPreference: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
   fromContractAddress: string;
   fromNetwork: string;
   amount: string;
@@ -111,8 +130,7 @@ export interface ImtblBuyProps
   HTMLElement
   > {
   providerPreference: string;
-  theme: string;
-  environment: string;
+  widgetConfig?: string;
   orderId: string;
 }
 

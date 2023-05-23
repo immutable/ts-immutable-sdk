@@ -6,7 +6,7 @@ The provider sample app tests the MetaMask provider functionality.
 
 ## Yalc Setup
 
-The `ts-immutable-sdk` is imported via yalc. 
+The `@imtbl/sdk` is imported via yalc. 
 
 To install yalc run
 
@@ -14,7 +14,7 @@ To install yalc run
 npm i -g yalc
 ```
 
-From the root directory of the `ts-immutable-sdk` run
+From the root directory of the `@imtbl/sdk` run
 
 ```
 yalc publish
@@ -23,11 +23,11 @@ yalc publish
 From within the sample-app root directory run
 
 ```
-yalc add ts-immutable-sdk
+yalc add @imtbl/sdk
 npm install
 ```
 
-If changes are made to `ts-immutable-sdk` in the root directory of the sdk after already publishing run
+If changes are made to `@imtbl/sdk` in the root directory of the sdk after already publishing run
 
 ```
 yalc push

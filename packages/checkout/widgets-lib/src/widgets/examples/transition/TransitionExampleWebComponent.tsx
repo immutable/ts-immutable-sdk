@@ -25,7 +25,7 @@ export class ImmutableTransitionExample extends ImmutableWebComponent {
           // TODO: Property 'params' does not exist on type 'IntrinsicAttributes & TransitionExampleWidgetProps'
           // @ts-ignore
           params={params}
-          theme={this.theme}
+          theme={this.widgetConfig?.theme!}
         />
       </React.StrictMode>,
     );

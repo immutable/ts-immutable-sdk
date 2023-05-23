@@ -5,10 +5,13 @@ import {
   TokenFilterTypes,
   ConnectionProviders,
 } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { useEffect, useCallback, useReducer } from 'react';
-import { Environment } from '@imtbl/config';
+import {
+  useEffect, useCallback, useReducer, useMemo,
+} from 'react';
+import { ImmutableConfiguration } from '@imtbl/config';
+import { BigNumber } from 'ethers';
+import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { SwapCoins } from './views/SwapCoins';
 import { SuccessView } from '../../components/Success/SuccessView';
 import { LoadingView } from '../../components/Loading/LoadingView';
@@ -31,11 +34,13 @@ import {
   initialSwapFormState,
   swapFormReducer,
 } from './context/swap-form-context/SwapFormContext';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
-  theme: WidgetTheme;
-  environment: Environment;
+  config: StrongCheckoutWidgetsConfig
 }
 
 export interface SwapWidgetParams {
@@ -47,13 +52,26 @@ export interface SwapWidgetParams {
 
 export function SwapWidget(props: SwapWidgetProps) {
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+  const viewReducerValues = useMemo(
+    () => ({ viewState, viewDispatch }),
+    [viewState, viewDispatch],
+  );
   const [swapState, swapDispatch] = useReducer(swapReducer, initialSwapState);
+  const swapReducerValues = useMemo(
+    () => ({ swapState, swapDispatch }),
+    [swapState, swapDispatch],
+  );
   const [swapFormState, swapFormDispatch] = useReducer(
     swapFormReducer,
     initialSwapFormState,
   );
+  const swapFormReducerValues = useMemo(
+    () => ({ swapFormState, swapFormDispatch }),
+    [swapFormState, swapFormDispatch],
+  );
 
-  const { params, theme, environment } = props;
+  const { params, config } = props;
+  const { environment, theme } = config;
   const {
     amount, fromContractAddress, toContractAddress, providerPreference,
   } = params;
@@ -105,6 +123,8 @@ export function SwapWidget(props: SwapWidgetProps) {
       .map((token) => token.address)
       .includes(balance.token.address));
 
+    allowedTokenBalances.entries();
+
     swapDispatch({
       payload: {
         type: SwapActions.SET_ALLOWED_TOKENS,
@@ -112,10 +132,20 @@ export function SwapWidget(props: SwapWidgetProps) {
       },
     });
 
+    // FIXME: stop hardcoding this, only doing because dev net is reset
     swapDispatch({
       payload: {
         type: SwapActions.SET_TOKEN_BALANCES,
-        tokenBalances: allowedTokenBalances,
+        tokenBalances: [{
+          balance: BigNumber.from('1560000000000000000'),
+          formattedBalance: '1.56',
+          token: {
+            name: 'ImmutableX',
+            symbol: 'IMX',
+            decimals: 18,
+            address: '0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851',
+          },
+        }],
       },
     });
 
@@ -126,10 +156,25 @@ export function SwapWidget(props: SwapWidgetProps) {
       },
     });
 
+    // check default values for amount, toTokenAddress and fromTokenAddress
+    // set in form state
+
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: { type: SwapWidgetViews.SWAP },
+      },
+    });
+
+    const exchange = new Exchange(new ExchangeConfiguration({
+      chainId: connectResult.network.chainId,
+      baseConfig: new ImmutableConfiguration({ environment }),
+    }));
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_EXCHANGE,
+        exchange,
       },
     });
   }, [providerPreference, environment]);
@@ -142,28 +187,25 @@ export function SwapWidget(props: SwapWidgetProps) {
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-      <ViewContext.Provider value={{ viewState, viewDispatch }}>
-        {/* TODO: The object passed as the value prop to the Context provider changes every render.
-            To fix this consider wrapping it in a useMemo hook. */}
-        {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-        <SwapContext.Provider value={{ swapState, swapDispatch }}>
-          {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-          <SwapFormContext.Provider value={{ swapFormState, swapFormDispatch }}>
+      <ViewContext.Provider value={viewReducerValues}>
+        <SwapContext.Provider value={swapReducerValues}>
+          <SwapFormContext.Provider value={swapFormReducerValues}>
             {viewState.view.type === BaseViews.LOADING_VIEW && (
               <LoadingView loadingText="Loading" />
             )}
             {viewState.view.type === SwapWidgetViews.SWAP && (
-              <SwapCoins
-                amount={amount}
-                fromContractAddress={fromContractAddress}
-                toContractAddress={toContractAddress}
-              />
+              <CryptoFiatProvider>
+                <SwapCoins
+                  amount={amount}
+                  fromContractAddress={fromContractAddress}
+                  toContractAddress={toContractAddress}
+                />
+              </CryptoFiatProvider>
             )}
             {viewState.view.type === SwapWidgetViews.SUCCESS && (
               <SuccessView
                 successText="Success"
-                actionText="Contine"
+                actionText="Continue"
                 // eslint-disable-next-line no-console
                 onActionClick={() => console.log('success')}
               />

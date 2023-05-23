@@ -1,6 +1,5 @@
 import { BiomeThemeProvider } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { useEffect, useReducer } from 'react';
 import { ViewOne } from './views/ViewOne';
 import { ViewTwo } from './views/ViewTwo';
@@ -12,6 +11,7 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../../context/view-context/ViewContext';
+import { WidgetTheme } from '../../../../lib';
 
 export interface OuterWidgetProps {
   // eslint-disable-next-line

@@ -6,10 +6,12 @@ import {
   NetworkInfo,
   TokenInfo,
 } from '@imtbl/checkout-sdk';
+import { Exchange } from '@imtbl/dex-sdk';
 import { createContext } from 'react';
 
 export interface SwapState {
   checkout: Checkout | null;
+  exchange: Exchange | null;
   provider: Web3Provider | null;
   providerPreference: ConnectionProviders | null;
   network: NetworkInfo | null;
@@ -26,6 +28,7 @@ export interface TopUpFeature {
 
 export const initialSwapState: SwapState = {
   checkout: null,
+  exchange: null,
   provider: null,
   providerPreference: null,
   network: null,
@@ -45,6 +48,7 @@ export interface SwapAction {
 
 type ActionPayload =
   | SetCheckoutPayload
+  | SetExchangePayload
   | SetProviderPayload
   | SetProviderPreferencePayload
   | SetNetworkPayload
@@ -54,6 +58,7 @@ type ActionPayload =
 
 export enum SwapActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
+  SET_EXCHANGE = 'SET_EXCHANGE',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
   SET_NETWORK = 'SET_NETWORK',
@@ -65,6 +70,11 @@ export enum SwapActions {
 export interface SetCheckoutPayload {
   type: SwapActions.SET_CHECKOUT;
   checkout: Checkout;
+}
+
+export interface SetExchangePayload {
+  type: SwapActions.SET_EXCHANGE;
+  exchange: Exchange;
 }
 
 export interface SetProviderPayload {
@@ -116,6 +126,11 @@ export const swapReducer: Reducer<SwapState, SwapAction> = (
       return {
         ...state,
         checkout: action.payload.checkout,
+      };
+    case SwapActions.SET_EXCHANGE:
+      return {
+        ...state,
+        exchange: action.payload.exchange,
       };
     case SwapActions.SET_PROVIDER:
       return {

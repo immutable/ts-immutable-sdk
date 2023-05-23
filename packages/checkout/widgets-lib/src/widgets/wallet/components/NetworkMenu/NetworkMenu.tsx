@@ -1,5 +1,5 @@
 import {
-  Body, Box, Button, HorizontalMenu, Icon,
+  Body, Box, Button, HorizontalMenu,
 } from '@biom3/react';
 import {
   useCallback, useContext, useEffect, useState,
@@ -39,6 +39,7 @@ export function NetworkMenu() {
   const logoColour = {
     [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
     [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
+    [ChainId.POLYGON_ZKEVM_TESTNET]: 'base.color.text.link.primary',
     [ChainId.ETHEREUM]: 'base.color.accent.5',
     [ChainId.SEPOLIA]: 'base.color.accent.5',
   };
@@ -48,6 +49,7 @@ export function NetworkMenu() {
     [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
     [ChainId.ETHEREUM]: 'EthToken',
     [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
+    [ChainId.POLYGON_ZKEVM_TESTNET]: 'Immutable',
     [ChainId.SEPOLIA]: 'EthToken',
   };
 
@@ -103,18 +105,16 @@ export function NetworkMenu() {
     })();
   }, [checkout]);
 
+  // TODO: this can be removed if needed
+  function formatNetworkName(networkName: string) {
+    return networkName.replace('Devnet', 'dev').replace('Testnet', 'test');
+  }
+
   return (
     <Box sx={networkMenuStyles}>
-      <Box sx={networkHeadingStyle}>
-        <Body testId="network-heading" size="medium">
-          {networkStatus.heading}
-        </Body>
-        <Icon
-          testId="network-icon"
-          icon="InformationCircle"
-          sx={{ width: 'base.icon.size.100' }}
-        />
-      </Box>
+      <Body testId="network-heading" size="medium" sx={networkHeadingStyle}>
+        {networkStatus.heading}
+      </Body>
       <HorizontalMenu>
         {checkout
           && allowedNetworks
@@ -139,7 +139,7 @@ export function NetworkMenu() {
                     networkItem.chainId === network?.chainId,
                   )}
                 />
-                {networkItem.name}
+                {formatNetworkName(networkItem.name)}
               </HorizontalMenu.Button>
             ))}
       </HorizontalMenu>

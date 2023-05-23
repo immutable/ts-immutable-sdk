@@ -1,32 +1,35 @@
 import { Service } from 'typedi';
+import { RootApiRecipesGetRequest } from '../__codegen__/recipe';
 import { withSDKError } from '../Errors';
-
-import { RecipeService } from './RecipeService';
+import { StudioBE } from '../StudioBE';
 
 @Service()
 export class Recipe {
-  constructor(private recipeService: RecipeService) {
-  }
+  constructor(private studioBE: StudioBE) { }
 
-  @withSDKError({ type: 'RECIPE_ERROR' })
-  public async getRecipes(input: { gameId: string; filters: string[] }) {
-    const { data, status } = await this.recipeService.getRecipes(
-      input.gameId,
-      input.filters,
-    );
+  @withSDKError({
+    type: 'RECIPE_GET_RECIPES_ERROR',
+  })
+  public async getAll(input: RootApiRecipesGetRequest) {
+    const { status, data } = await this.studioBE.recipeApi.recipesGet(input);
 
-    if (status !== 200) {
-      throw new Error('GET_RECIPES_ERROR');
+    if (!(status >= 200 && status < 300)) {
+      // FIXME: align with backend error response types
+      throw new Error('status is not successful response', { cause: { code: `${status}`, reason: 'unknown' } });
     }
+
     return data;
   }
 
-  @withSDKError({ type: 'RECIPE_ERROR' })
-  public async getRecipeById(id: string) {
-    const { data, status } = await this.recipeService.getRecipeById(id);
+  @withSDKError({
+    type: 'RECIPE_GET_RECIPE_BY_ID_ERROR',
+  })
+  public async getById(id: string) {
+    const { data, status } = await this.studioBE.recipeApi.recipesIdGet({ id });
 
-    if (status !== 200) {
-      throw new Error('GET_RECIPE_BY_ID_ERROR');
+    if (!(status >= 200 && status < 300)) {
+      // FIXME: align with backend error response types
+      throw new Error('status is not successful response', { cause: { code: `${status}`, reason: 'unknown' } });
     }
 
     return data;

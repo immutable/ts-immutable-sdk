@@ -2,13 +2,21 @@ import {
   describe, it, cy, beforeEach,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../lib/testUtils';
 import { BuyWidget, BuyWidgetParams } from './BuyWidget';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 describe('BuyWidget tests', () => {
+  const config: StrongCheckoutWidgetsConfig = {
+    environment: Environment.PRODUCTION,
+    theme: WidgetTheme.DARK,
+    isBridgeEnabled: true,
+    isSwapEnabled: true,
+    isOnRampEnabled: true,
+  };
   beforeEach(() => {
     cy.stub(Checkout.prototype, 'checkIsWalletConnected')
       .as('isConnectedStub')
@@ -49,9 +57,8 @@ describe('BuyWidget tests', () => {
 
     mount(
       <BuyWidget
-        environment={Environment.PRODUCTION}
+        config={config}
         params={params}
-        theme={WidgetTheme.DARK}
       />,
     );
 

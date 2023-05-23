@@ -1,6 +1,7 @@
 import { ChainId, GetBalanceResult, NetworkInfo } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { L1Network, zkEVMNetwork } from './networkUtils';
+import { DEFAULT_TOKEN_DECIMALS } from './constants';
 
 export const sortTokensByAmount = (
   environment: Environment,
@@ -47,9 +48,9 @@ export const sortNetworksCompareFn = (
   return 1;
 };
 
-export const formatFiatString = (amount: number): string => {
+export const formatFiatString = (amount: number) => {
   const factor = 10 ** 2;
-  return (Math.round(amount * factor) / factor).toFixed(2).toString();
+  return (Math.round(amount * factor) / factor).toFixed(2);
 };
 
 export const calculateCryptoToFiat = (
@@ -57,15 +58,33 @@ export const calculateCryptoToFiat = (
   symbol: string,
   conversions: Map<string, number>,
 ): string => {
-  const zeroBalanceString = '-.--';
+  const zeroString = '0.00';
 
-  if (!amount) return zeroBalanceString;
+  if (!amount) return zeroString;
 
   const conversion = conversions.get(symbol.toLowerCase());
-  if (!conversion) return zeroBalanceString;
+  if (!conversion) return zeroString;
 
   const parsedAmount = parseFloat(amount);
-  if (parseFloat(amount) === 0 || Number.isNaN(parsedAmount)) return zeroBalanceString;
-
+  if (parseFloat(amount) === 0 || Number.isNaN(parsedAmount)) return zeroString;
   return formatFiatString(parsedAmount * conversion);
+};
+
+export const formatZeroAmount = (
+  amount: string,
+  allowZeros: boolean = false,
+) => {
+  const fallback = '-.--';
+  if (!amount) return fallback;
+  if (amount === '0.00' && !allowZeros) return fallback;
+  return amount;
+};
+
+export const tokenValueFormat = (s: Number | string): string => {
+  const asString = s.toString();
+
+  const pointIndex = asString.indexOf('.');
+  if (pointIndex === -1) return asString;
+
+  return asString.substring(0, pointIndex + DEFAULT_TOKEN_DECIMALS + 1);
 };

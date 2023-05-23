@@ -26,8 +26,13 @@
     "typedoc-plugin-markdown": "^3.15.2",
     "typescript": "^4.9.5"
   },
+  "homepage": "https://github.com/immutable/ts-immutable-sdk",
+  "keywords": [
+    "immutable"
+  ],
   "license": "ISC",
-  "module": "dist/index.js",
+  "main": "dist/main.js",
+  "module": "dist/module.js",
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -36,10 +41,10 @@
     "build": "parcel build",
     "build:dist": "npm i && npm run build && npm run dist",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
-    "start": "parcel watch",
-    "test": "jest test",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
-    "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix"
+    "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
+    "start": "parcel watch",
+    "test": "jest test --passWithNoTests"
   },
   "source": "src/index.ts",
   "types": "dist/index.d.ts"

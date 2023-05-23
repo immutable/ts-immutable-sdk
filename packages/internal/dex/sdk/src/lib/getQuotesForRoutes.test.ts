@@ -74,7 +74,8 @@ describe('getQuotesForRoutes', () => {
 
   describe('with one quote', () => {
     it('returns the only quote', async () => {
-      const amountOut = ethers.utils.parseEther('1000');
+      const expectedAmountOut = ethers.utils.parseEther('1000');
+      const expectedGasEstimate = '100000';
       const types = [
         'uint256', // amountOut/amountIn
         'uint160', // sqrtPrice after
@@ -83,10 +84,10 @@ describe('getQuotesForRoutes', () => {
       ];
 
       const encoded = ethers.utils.defaultAbiCoder.encode(types, [
-        amountOut,
+        expectedAmountOut,
         '100',
         '1',
-        '100000',
+        expectedGasEstimate,
       ]);
 
       const mockReturnData = {
@@ -140,17 +141,19 @@ describe('getQuotesForRoutes', () => {
         amount,
         TradeType.EXACT_INPUT,
       );
-      expect(amountOutReceived.length).toBe(1);
-      expect(amountOutReceived[0].quoteAmount.toString()).toBe(
-        amountOut.toString(),
-      );
+      expect(amountOutReceived.length).toEqual(1);
+      expect(amountOutReceived[0].quoteAmount.toString()).toEqual(expectedAmountOut.toString());
+      expect(amountOutReceived[0].gasEstimate.toString()).toEqual(expectedGasEstimate);
     });
   });
 
   describe('with multiple quotes', () => {
     it('returns all quotes', async () => {
-      const amountOut1 = ethers.utils.parseEther('1000');
-      const amountOut2 = ethers.utils.parseEther('2000');
+      const expectedAmountOut1 = ethers.utils.parseEther('1000');
+      const expectedAmountOut2 = ethers.utils.parseEther('2000');
+      const expectedGasEstimate1 = '100000';
+      const expectedGasEstimate2 = '200000';
+
       const types = [
         'uint256', // amountOut/amountIn
         'uint160', // sqrtPrice after
@@ -159,16 +162,16 @@ describe('getQuotesForRoutes', () => {
       ];
 
       const encoded1 = ethers.utils.defaultAbiCoder.encode(types, [
-        amountOut1,
+        expectedAmountOut1,
         '100',
         '1',
-        '100000',
+        expectedGasEstimate1,
       ]);
       const encoded2 = ethers.utils.defaultAbiCoder.encode(types, [
-        amountOut2,
+        expectedAmountOut2,
         '100',
         '1',
-        '100000',
+        expectedGasEstimate2,
       ]);
 
       const mockReturnData = {
@@ -228,11 +231,13 @@ describe('getQuotesForRoutes', () => {
       );
       expect(amountOutReceived.length).toBe(2);
       expect(amountOutReceived[0].quoteAmount.toString()).toBe(
-        amountOut1.toString(),
+        expectedAmountOut1.toString(),
       );
+      expect(amountOutReceived[0].gasEstimate.toString()).toEqual(expectedGasEstimate1);
       expect(amountOutReceived[1].quoteAmount.toString()).toBe(
-        amountOut2.toString(),
+        expectedAmountOut2.toString(),
       );
+      expect(amountOutReceived[1].gasEstimate.toString()).toEqual(expectedGasEstimate2);
     });
   });
 });

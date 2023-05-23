@@ -8,8 +8,6 @@ import {
   OptionKey,
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-
-import { Network, WidgetTheme } from '@imtbl/checkout-widgets';
 import {
   ChainId,
   Checkout,
@@ -21,7 +19,6 @@ import {
   useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
 import { bridgeWidgetStyle } from './BridgeStyles';
 
 // TODO: Fix this import cycle
@@ -34,11 +31,12 @@ import {
 } from './BridgeWidgetEvents';
 import { EtherscanLink } from './components/EtherscanLink';
 import { L1Network, zkEVMNetwork } from '../../lib/networkUtils';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { Network, WidgetTheme } from '../../lib';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
-  theme: WidgetTheme;
-  environment: Environment;
+  config: StrongCheckoutWidgetsConfig
 }
 
 export interface BridgeWidgetParams {
@@ -62,12 +60,14 @@ export const NetworkChainMap = {
   [Network.ETHEREUM]: ChainId.ETHEREUM,
   [Network.IMTBL_ZKEVM_TESTNET]: ChainId.IMTBL_ZKEVM_TESTNET,
   [Network.IMTBL_ZKEVM_DEVNET]: ChainId.IMTBL_ZKEVM_DEVNET,
+  [Network.POLYGON_ZKEVM_TESTNET]: ChainId.POLYGON_ZKEVM_TESTNET,
+  [Network.POLYGON_ZKEVM]: ChainId.POLYGON_ZKEVM,
   [Network.SEPOLIA]: ChainId.SEPOLIA,
 };
 
 export function BridgeWidget(props: BridgeWidgetProps) {
-  const { environment, params, theme } = props;
-  console.log(environment);
+  const { params, config } = props;
+  const { environment, theme } = config;
   const checkout = useMemo(
     () => new Checkout({ baseConfig: { environment } }),
     [environment],

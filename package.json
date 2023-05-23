@@ -26,21 +26,23 @@
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
   "lint-staged": {
+    "*": "yarn scan:secrets",
     "*.{js,jsx,ts,tsx}": "eslint"
   },
   "packageManager": "yarn@3.5.0",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
-    "@biom3/design-tokens": "0.1.4-beta"
+    "@biom3/design-tokens": "0.1.5-beta"
   },
   "scripts": {
     "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --stages build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:all": "wsrun --stages build",
     "lint": "wsrun --exclude-missing -e lint --no-error-on-unmatched-pattern",
     "lint:ci": "./lint-ci.sh",
-    "postinstall": "husky install",
+    "postinstall": "husky install; ./.husky/install_gitleaks.sh",
     "release": "release-it",
+    "scan:secrets": "gitleaks protect --staged -v",
     "syncpack:check": "yarn syncpack list-mismatches",
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
@@ -53,6 +55,7 @@
     "packages/immutablex_client",
     "packages/passport",
     "packages/provider",
+    "packages/provider/src/sample-app",
     "packages/orderbook",
     "packages/internal/toolkit",
     "packages/internal/cryptofiat",

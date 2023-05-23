@@ -28,8 +28,7 @@ export class ImmutableConnect extends ImmutableWebComponent {
       <React.StrictMode>
         <ConnectWidget
           params={connectParams}
-          theme={this.theme}
-          environment={this.environment}
+          config={this.widgetConfig!}
         />
       </React.StrictMode>,
     );

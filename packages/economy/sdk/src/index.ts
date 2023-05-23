@@ -12,4 +12,4 @@ export type {
 
 export * from './Economy';
 export type { EconomyModuleConfiguration } from './Config';
-export type { CraftInput, CraftStatus, CraftEvent } from './crafting/Crafting';
+export type { CraftStatus, CraftEvent } from './crafting/Crafting';
