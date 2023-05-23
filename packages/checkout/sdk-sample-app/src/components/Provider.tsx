@@ -2,6 +2,7 @@ import {
   Checkout,
   ConnectionProviders,
   DefaultProviders,
+  Providers,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
@@ -19,22 +20,24 @@ interface ProviderProps {
 export default function Provider(props: ProviderProps) {
   const { setProvider, checkout, provider } = props;
 
-  const [result, setResult] = useState<Web3Provider>();
-  const [error, setError] = useState<any>(null);
+  const [result1, setResult1] = useState<Web3Provider>();
+  const [result2, setResult2] = useState<Providers>();
+  const [error1, setError1] = useState<any>(null);
+  const [error2, setError2] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   async function createMetamaskClick() {
-    setError(null);
+    setError1(null);
     setLoading(true);
     try {
-      const resp = await checkout.createProvider({
+      const resp = await checkout.createDefaultProvider({
         providerName: DefaultProviders.METAMASK,
       });
       setProvider(resp.web3Provider);
-      setResult(resp.web3Provider);
+      setResult1(resp.web3Provider);
       setLoading(false);
     } catch (err: any) {
-      setError(err);
+      setError1(err);
       setLoading(false);
       console.log(err.message);
       console.log(err.type);
@@ -44,21 +47,19 @@ export default function Provider(props: ProviderProps) {
   }
 
   async function setProviderClick() {
-    setError(null);
+    setError2(null);
     setLoading(true);
     try {
-      const resp = await checkout.setProvider([
-        {
-          name: 'metamask',
-          web3Provider: provider,
-        },
-      ]);
+      const resp = await checkout.setProvider({
+        name: 'metamask',
+        web3Provider: provider,
+      });
       // setProvider(resp.web3Provider);
       console.log(resp);
-      //setResult(resp);
+      setResult2(resp.providers);
       setLoading(false);
     } catch (err: any) {
-      setError(err);
+      setError2(err);
       setLoading(false);
       console.log(err.message);
       console.log(err.type);
@@ -69,8 +70,10 @@ export default function Provider(props: ProviderProps) {
 
   useEffect(() => {
     // reset state wehn checkout changes from environment switch
-    setResult(undefined);
-    setError(null);
+    setResult1(undefined);
+    setResult2(undefined);
+    setError1(null);
+    setError2(null);
     setLoading(false);
   }, [checkout]);
 
@@ -84,10 +87,12 @@ export default function Provider(props: ProviderProps) {
         <LoadingButton onClick={createMetamaskClick} loading={loading}>
           Create Metamask Provider
         </LoadingButton>
-        {result && !error && <SuccessMessage>Provider Created.</SuccessMessage>}
-        {error && (
+        {result1 && !error1 && (
+          <SuccessMessage>Provider Created.</SuccessMessage>
+        )}
+        {error1 && (
           <ErrorMessage>
-            {error.message}. Check console logs for more details.
+            {error1.message}. Check console logs for more details.
           </ErrorMessage>
         )}
       </Box>
@@ -99,15 +104,14 @@ export default function Provider(props: ProviderProps) {
         <LoadingButton onClick={setProviderClick} loading={loading}>
           Set Provider
         </LoadingButton>
-        {result && !error && (
+        {result2 && !error2 && (
           <SuccessMessage>
-            <Box>Provider Set for Available Networks.</Box>
-            <pre>{JSON.stringify(result)}</pre>
+            <Box>Providers Set for Available Networks.</Box>
           </SuccessMessage>
         )}
-        {error && (
+        {error2 && (
           <ErrorMessage>
-            {error.message}. Check console logs for more details.
+            {error2.message}. Check console logs for more details.
           </ErrorMessage>
         )}
       </Box>

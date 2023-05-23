@@ -14,10 +14,12 @@ export interface CreateProviderResult {
   web3Provider: Web3Provider;
 }
 
-export type SetProviderParams = Array<GenericProvider>;
+export type SetProviderParams = GenericProvider;
 
 export interface SetProviderResult {
   providers: Providers;
+  currentProvider: string;
+  currentChainId: ChainId;
 }
 
 export interface Providers {
@@ -25,7 +27,7 @@ export interface Providers {
 }
 
 export type ProviderForChain = {
-  [key in ChainId]: Web3Provider;
+  [key in ChainId]?: Web3Provider;
 };
 
 export interface GenericProvider {

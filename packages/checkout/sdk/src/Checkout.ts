@@ -7,6 +7,7 @@ import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
 import {
+  ChainId,
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
@@ -44,11 +45,17 @@ export class Checkout {
 
   private providerPreference: ConnectionProviders | undefined;
 
+  private providers: Providers = {};
+
+  private currentProvider: string | undefined;
+
+  private currentChainId: ChainId | undefined;
+
   constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
   }
 
-  public async createProvider(
+  public async createDefaultProvider(
     params: CreateProviderParams,
   ): Promise<CreateProviderResult> {
     const web3Provider: Web3Provider = await provider.createProvider(
@@ -61,15 +68,26 @@ export class Checkout {
     };
   }
 
+  public async getProviders() {
+    return {
+      providers: this.providers,
+    };
+  }
+
   public async setProvider(
     params: SetProviderParams,
   ): Promise<SetProviderResult> {
-    const providers: Providers = await provider.setProvider(
+    const { providers, currentChainId } = await provider.setProvider(
       this.config,
       params,
     );
+    this.currentProvider = params.name;
+    this.currentChainId = currentChainId as ChainId;
+    this.providers = providers;
     return {
-      providers,
+      providers: this.providers,
+      currentProvider: this.currentProvider,
+      currentChainId: this.currentChainId,
     };
   }
 
