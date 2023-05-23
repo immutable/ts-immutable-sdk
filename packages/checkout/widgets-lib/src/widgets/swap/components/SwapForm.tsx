@@ -76,6 +76,7 @@ export function SwapForm() {
   const [isFetching, setIsFetching] = useState(false);
   const [direction, setDirection] = useState<SwapDirection>(SwapDirection.FROM);
   const [loading, setLoading] = useState(false);
+  const [swapFromToConversionText, setSwapFromToConversionText] = useState('');
 
   // Form State
   const [fromAmount, setFromAmount] = useState<string>('');
@@ -417,13 +418,6 @@ export function SwapForm() {
   };
 
   const { content, swapForm } = text.views[SwapWidgetViews.SWAP];
-  const swapValuesText = swapValuesToText({
-    swapFromToken: fromToken,
-    swapFromAmount: fromAmount,
-    swapToToken: toToken,
-    swapToAmount: toAmount,
-  });
-
   const SwapFormValidator = (): boolean => {
     const validateFromTokenError = ValidateFromToken(fromToken);
     const validateFromAmountError = ValidateFromAmount(fromAmount, fromToken?.formattedBalance);
@@ -442,6 +436,15 @@ export function SwapForm() {
       || validateToAmountError) return false;
     return true;
   };
+
+  useEffect(() => {
+    setSwapFromToConversionText(swapValuesToText({
+      swapFromToken: fromToken,
+      swapFromAmount: fromAmount,
+      swapToToken: toToken,
+      swapToAmount: toAmount,
+    }).fromToConversion);
+  }, [quote]);
 
   // useEffect(() => {
   //   const id = setInterval(() => fetchQuote(), 2000);
@@ -520,7 +523,7 @@ export function SwapForm() {
                 }}
                 size="small"
               >
-                {!loading && swapValuesText.fromToConversion}
+                {!loading && swapFromToConversionText}
               </Body>
             </Box>
             <SelectInput
