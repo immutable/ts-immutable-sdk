@@ -20,7 +20,6 @@ import {
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { ConnectWallet } from './views/ConnectWallet';
 import { ConnectResult } from './views/ConnectResult';
-import { SuccessView } from '../../components/Success/SuccessView';
 import { ReadyToConnect } from './views/ReadyToConnect';
 import { SwitchNetwork } from './views/SwitchNetwork';
 import { LoadingView } from '../../components/Loading/LoadingView';
@@ -32,6 +31,8 @@ import {
   ViewContext,
   BaseViews,
 } from '../../context/view-context/ViewContext';
+import { StatusType } from '../../components/StatusView/StatusType';
+import { StatusView } from '../../components/StatusView/StatusView';
 
 export interface ConnectWidgetProps {
   environment: Environment;
@@ -116,11 +117,13 @@ export function ConnectWidget(props: ConnectWidgetProps) {
             )}
             {view.type === ConnectWidgetViews.SUCCESS && (
               <ConnectLoaderSuccess>
-                <SuccessView
-                  successText="Connection secure"
+                <StatusView
+                  statusText="Connection secure"
                   actionText="Continue"
-                  successEventAction={() => sendConnectSuccessEvent(ConnectionProviders.METAMASK)}
                   onActionClick={() => sendCloseEvent()}
+                  statusEventAction={() => sendConnectSuccessEvent(ConnectionProviders.METAMASK)}
+                  statusType={StatusType.SUCCESS}
+                  testId="success-view"
                 />
               </ConnectLoaderSuccess>
             )}

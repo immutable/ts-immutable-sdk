@@ -1,4 +1,4 @@
-export const successBoxStyles = {
+export const statusBoxStyles = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -11,7 +11,7 @@ export const successBoxStyles = {
   rowGap: 'base.spacing.x4',
 };
 
-export const successLogoStyles = {
+export const statusLogoStyles = (isSuccess: boolean) => ({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -19,5 +19,7 @@ export const successLogoStyles = {
   height: 'base.spacing.x12',
   width: 'base.spacing.x12',
   borderRadius: '50%',
-  backgroundColor: 'base.color.status.success.bright',
-};
+  backgroundColor: isSuccess
+    ? 'base.color.status.success.bright'
+    : 'base.color.status.fatal.bright',
+});

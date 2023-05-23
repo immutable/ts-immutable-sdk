@@ -14,7 +14,6 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { SwapCoins } from './views/SwapCoins';
-import { SuccessView } from '../../components/Success/SuccessView';
 import { LoadingView } from '../../components/Loading/LoadingView';
 import {
   SwapActions,
@@ -36,6 +35,8 @@ import {
   swapFormReducer,
 } from './context/swap-form-context/SwapFormContext';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import { StatusView } from '../../components/StatusView/StatusView';
+import { StatusType } from '../../components/StatusView/StatusType';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -202,11 +203,13 @@ export function SwapWidget(props: SwapWidgetProps) {
               </CryptoFiatProvider>
             )}
             {viewState.view.type === SwapWidgetViews.SUCCESS && (
-              <SuccessView
-                successText="Success"
+              <StatusView
+                statusText="Success"
                 actionText="Continue"
                 // eslint-disable-next-line no-console
                 onActionClick={() => console.log('success')}
+                statusType={StatusType.SUCCESS}
+                testId="success-view"
               />
             )}
             {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
