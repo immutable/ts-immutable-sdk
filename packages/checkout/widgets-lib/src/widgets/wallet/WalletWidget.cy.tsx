@@ -1,6 +1,6 @@
 import React from 'react';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
-import { IMTBLWidgetEvents, WidgetTheme } from '@imtbl/checkout-widgets';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
   describe, it, cy, context,
 } from 'local-cypress';
@@ -11,6 +11,10 @@ import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 import { cySmartGet } from '../../lib/testUtils';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
+import { text } from '../../resources/text/textConfig';
+import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 
 describe('WalletWidget tests', () => {
   beforeEach(() => {
@@ -21,6 +25,13 @@ describe('WalletWidget tests', () => {
     const params = {
       providerPreference: ConnectionProviders.METAMASK,
     } as WalletWidgetParams;
+    const widgetConfig = {
+      theme: WidgetTheme.DARK,
+      environment: Environment.PRODUCTION,
+      isBridgeEnabled: false,
+      isSwapEnabled: false,
+      isOnRampEnabled: false,
+    } as StrongCheckoutWidgetsConfig;
 
     const balanceStub = cy
       .stub(Checkout.prototype, 'getBalance')
@@ -58,9 +69,8 @@ describe('WalletWidget tests', () => {
 
     mount(
       <WalletWidget
-        environment={Environment.PRODUCTION}
+        config={widgetConfig}
         params={params}
-        theme={WidgetTheme.DARK}
       />,
     );
 
@@ -114,6 +124,17 @@ describe('WalletWidget tests', () => {
               decimals: 18,
             },
           },
+        });
+
+      cy.stub(Checkout.prototype, 'getNetworkAllowList')
+        .as('getNetworkAllowListStub')
+        .resolves({
+          networks: [
+            {
+              name: 'Ethereum',
+              chainId: 1,
+            },
+          ],
         });
 
       getAllBalancesStub = cy
@@ -192,11 +213,18 @@ describe('WalletWidget tests', () => {
           providerPreference: ConnectionProviders.METAMASK,
         } as WalletWidgetParams;
 
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.PRODUCTION,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
         mount(
           <WalletWidget
-            environment={Environment.PRODUCTION}
+            config={widgetConfig}
             params={params}
-            theme={WidgetTheme.DARK}
           />,
         );
 
@@ -206,11 +234,17 @@ describe('WalletWidget tests', () => {
         });
 
         cySmartGet('close-button').should('be.visible');
-        cySmartGet('heading').should('be.visible');
-        cySmartGet('Ethereum-network-button').should('include.text', 'Ethereum');
+        cySmartGet('network-heading').should('be.visible');
+        cySmartGet('Ethereum-network-button').should(
+          'include.text',
+          'Ethereum',
+        );
 
         cySmartGet('total-token-balance').should('exist');
-        cySmartGet('total-token-balance').should('have.text', '≈ USD $22525.46');
+        cySmartGet('total-token-balance').should(
+          'have.text',
+          '≈ USD $22525.46',
+        );
 
         cySmartGet('balance-item-ETH').should('exist');
         cySmartGet('balance-item-GODS').should('exist');
@@ -221,11 +255,19 @@ describe('WalletWidget tests', () => {
         const params = {
           providerPreference: ConnectionProviders.METAMASK,
         } as WalletWidgetParams;
+
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.PRODUCTION,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
         mount(
           <WalletWidget
-            environment={Environment.PRODUCTION}
+            config={widgetConfig}
             params={params}
-            theme={WidgetTheme.DARK}
           />,
         );
 
@@ -246,7 +288,10 @@ describe('WalletWidget tests', () => {
 
         cySmartGet('balance-item-GODS').should('exist');
         cySmartGet('balance-item-GODS').should('include.text', 'GODS');
-        cySmartGet('balance-item-GODS').should('include.text', 'Gods Unchained');
+        cySmartGet('balance-item-GODS').should(
+          'include.text',
+          'Gods Unchained',
+        );
         cySmartGet('balance-item-GODS__price').should('have.text', '100.2');
       });
     });
@@ -256,11 +301,19 @@ describe('WalletWidget tests', () => {
         const params = {
           providerPreference: ConnectionProviders.METAMASK,
         } as WalletWidgetParams;
+
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.PRODUCTION,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
         mount(
           <WalletWidget
-            environment={Environment.PRODUCTION}
+            config={widgetConfig}
             params={params}
-            theme={WidgetTheme.DARK}
           />,
         );
 
@@ -274,11 +327,19 @@ describe('WalletWidget tests', () => {
         const params = {
           providerPreference: ConnectionProviders.METAMASK,
         } as WalletWidgetParams;
+
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.PRODUCTION,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
         mount(
           <WalletWidget
-            environment={Environment.PRODUCTION}
+            config={widgetConfig}
             params={params}
-            theme={WidgetTheme.DARK}
           />,
         );
         cySmartGet('settings-button').click();
@@ -289,23 +350,62 @@ describe('WalletWidget tests', () => {
         const params = {
           providerPreference: ConnectionProviders.METAMASK,
         } as WalletWidgetParams;
-        cy.window().then(
-          (window) => {
-            window.addEventListener(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, cy.stub().as('disconnectEvent'));
-          },
-        );
+        cy.window().then((window) => {
+          window.addEventListener(
+            IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+            cy.stub().as('disconnectEvent'),
+          );
+        });
+
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.PRODUCTION,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
 
         mount(
           <WalletWidget
-            environment={Environment.PRODUCTION}
+            config={widgetConfig}
             params={params}
-            theme={WidgetTheme.DARK}
           />,
         );
         cySmartGet('settings-button').click();
-        cySmartGet('disconnect-button').should('have.text', 'Disconnect Wallet');
+        cySmartGet('disconnect-button').should(
+          'have.text',
+          'Disconnect Wallet',
+        );
         cySmartGet('disconnect-button').click();
         cySmartGet('@disconnectEvent').should('have.been.calledOnce');
+      });
+    });
+
+    describe('WalletWidget coin info', () => {
+      it('should show the coin info view if the coin info icon is clicked', () => {
+        const params = {
+          providerPreference: ConnectionProviders.METAMASK,
+        } as WalletWidgetParams;
+        const widgetConfig = {
+          theme: WidgetTheme.DARK,
+          environment: Environment.PRODUCTION,
+          isBridgeEnabled: false,
+          isSwapEnabled: false,
+          isOnRampEnabled: false,
+        } as StrongCheckoutWidgetsConfig;
+
+        mount(
+          <WalletWidget
+            config={widgetConfig}
+            params={params}
+          />,
+        );
+
+        const { heading, body } = text.views[WalletWidgetViews.COIN_INFO];
+        cySmartGet('coin-info-icon').click();
+        cy.get('body').contains(body);
+        cy.get('body').contains(heading);
+        cySmartGet('back-button').should('be.visible');
       });
     });
   });

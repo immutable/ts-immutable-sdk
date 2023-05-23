@@ -11,7 +11,6 @@ import {
   SetSwapToTokenErrorPayload,
   SetSwapFromAmountErrorPayload,
   SetSwapToAmountErrorPayload,
-  SetBlockFetchQuotePayload,
   SetSwapFromFiatValuePayload,
 } from './SwapFormContext';
 
@@ -74,18 +73,6 @@ describe('swap form context', () => {
       payload: setSwapFromFiatValuePayload,
     });
     expect(swapFromFiatValue).toEqual('12.34');
-  });
-
-  it('should set setBlockFetchQuote when reducer called with SET_BLOCK_FETCH_QUOTE action', () => {
-    const setBlockFetchQuote: SetBlockFetchQuotePayload = {
-      type: SwapFormActions.SET_BLOCK_FETCH_QUOTE,
-      blockFetchQuote: true,
-    };
-
-    const { blockFetchQuote } = swapFormReducer(initialSwapFormState, {
-      payload: setBlockFetchQuote,
-    });
-    expect(blockFetchQuote).toBeTruthy();
   });
 
   it('should set swapFromTokenError when reducer called with SET_SWAP_FROM_TOKEN_ERROR action', () => {

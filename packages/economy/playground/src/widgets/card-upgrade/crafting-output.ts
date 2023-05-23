@@ -59,7 +59,7 @@ export class CraftingOutput extends LitElement {
       this.requestUpdate();
       if (this.timeRemaining <= 0) {
         this.stopTimer();
-        window.location.href = `${window.location.pathname}?updated=true`;
+        window.location.reload();
       }
     }, 1000);
   }
@@ -84,35 +84,16 @@ export class CraftingOutput extends LitElement {
       </div>
       <div class="p-4">
         <div class="card bg-base-100 shadow-xl max-w-sm  mx-auto">
-          <figure>
-            <img
-              src="${this.input.metadata.image}"
-              alt=${this.input.metadata.name}
-            />
-          </figure>
-          <div class="card-body">
-            <h2 class="card-title">${this.input.metadata.name}</h2>
-            <div class="card-actions flex-col">
-              <div
-                class="flex w-full justify-end flex-wrap absolute top-4 right-4"
-              >
-                <div class="badge">📍 ${this.input.location}</div>
-              </div>
-              <div class="flex w-full justify-between flex-wrap">
-                <div class="badge badge-success">
-                  💚 ${this.input.metadata.hp}
-                </div>
-                <div class="badge badge-error">
-                  🔥 ${this.input.metadata.attack}
-                </div>
-                <div class="badge badge-primary">
-                  ⬆️ ${this.input.metadata.level}
-                </div>
-                <div class="badge badge-neutral badge-outline badge-lg">
-                  Dust Power 🎟${this.input.metadata.dust_power}
-                </div>
-              </div>
-            </div>
+          <div class="flex">
+            <figure class="flex-1">
+              <img
+                src="${this.input.metadata.image}"
+                alt=${this.input.metadata.name}
+              />
+            </figure>
+            <figure class="flex-1">
+              <img src="${this.output.image}" alt=${this.output.name} />
+            </figure>
           </div>
         </div>
         <div class="divider"><b>🎟 Dust Power</b></div>

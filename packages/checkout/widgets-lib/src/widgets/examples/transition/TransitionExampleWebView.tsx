@@ -1,13 +1,11 @@
-import {
-  WidgetTheme,
-  WidgetConnectionProviders,
-} from '@imtbl/checkout-widgets';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import { WidgetTheme } from '../../../lib';
 
 function TransitionExampleWebView() {
   return (
     <imtbl-transition-example
-      providerPreference={WidgetConnectionProviders.METAMASK}
+      providerPreference={ConnectionProviders.METAMASK}
       theme={WidgetTheme.DARK}
       environment={Environment.SANDBOX}
     />
