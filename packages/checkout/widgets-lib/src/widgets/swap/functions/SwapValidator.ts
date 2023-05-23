@@ -10,7 +10,7 @@ export function ValidateFromToken(swapFromToken: GetBalanceResult | null): strin
 
 export function ValidateFromAmount(amount: string, balance?: string): string {
   const { validation } = text.views[SwapWidgetViews.SWAP];
-  if (!amount) return validation.noAmountInputted;
+  if (!amount || parseFloat(amount) === 0) return validation.noAmountInputted;
   if (balance && Number(amount) > Number(balance)) return validation.insufficientBalance;
   return '';
 }
@@ -23,6 +23,6 @@ export function ValidateToToken(swapToToken: TokenInfo | null): string {
 
 export function ValidateToAmount(amount: string): string {
   const { validation } = text.views[SwapWidgetViews.SWAP];
-  if (!amount) return validation.noAmountInputted;
+  if (!amount || parseFloat(amount) === 0) return validation.noAmountInputted;
   return '';
 }

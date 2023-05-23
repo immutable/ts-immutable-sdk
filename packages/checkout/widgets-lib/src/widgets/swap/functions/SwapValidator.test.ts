@@ -34,6 +34,18 @@ describe('SwapValidator', () => {
       expect(result).toEqual('Please input amount');
     });
 
+    it('should return error message if amount is 0', () => {
+      const amount = '0';
+      const result = ValidateFromAmount(amount);
+      expect(result).toEqual('Please input amount');
+    });
+
+    it('should return error message if amount is 0.00', () => {
+      const amount = '0';
+      const result = ValidateFromAmount(amount);
+      expect(result).toEqual('Please input amount');
+    });
+
     it('should return error message if amount is greater than balance', () => {
       const amount = '2';
       const balance = '1';
@@ -83,6 +95,18 @@ describe('SwapValidator', () => {
   describe('ValidateToAmount', () => {
     it('should return error message if amount is empty', () => {
       const amount = '';
+      const result = ValidateToAmount(amount);
+      expect(result).toEqual('Please input amount');
+    });
+
+    it('should return error message if amount is 0', () => {
+      const amount = '0';
+      const result = ValidateToAmount(amount);
+      expect(result).toEqual('Please input amount');
+    });
+
+    it('should return error message if amount is 0.00', () => {
+      const amount = '0';
       const result = ValidateToAmount(amount);
       expect(result).toEqual('Please input amount');
     });
