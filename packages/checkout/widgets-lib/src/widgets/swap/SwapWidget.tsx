@@ -10,7 +10,6 @@ import {
   useEffect, useCallback, useReducer, useMemo,
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
-import { BigNumber } from 'ethers';
 import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../components/Loading/LoadingView';
@@ -33,6 +32,7 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
+import { getDexConfigOverrides } from './DexConfigOverrides';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -124,16 +124,7 @@ export function SwapWidget(props: SwapWidgetProps) {
     swapDispatch({
       payload: {
         type: SwapActions.SET_TOKEN_BALANCES,
-        tokenBalances: [{
-          balance: BigNumber.from('1560000000000000000'),
-          formattedBalance: '1.56',
-          token: {
-            name: 'ImmutableX',
-            symbol: 'IMX',
-            decimals: 18,
-            address: '0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851',
-          },
-        }],
+        tokenBalances: tokenBalances.balances,
       },
     });
 
@@ -157,6 +148,7 @@ export function SwapWidget(props: SwapWidgetProps) {
     const exchange = new Exchange(new ExchangeConfiguration({
       chainId: connectResult.network.chainId,
       baseConfig: new ImmutableConfiguration({ environment }),
+      overrides: getDexConfigOverrides(),
     }));
 
     swapDispatch({
