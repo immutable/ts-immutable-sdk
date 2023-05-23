@@ -62,7 +62,7 @@ export function Example() {
 
       setResult(txn);
 
-      if (!txn.approval) {
+      if (!txn.approveTransaction) {
         setApproved(true)
       }
     } catch(e) {
@@ -87,7 +87,7 @@ export function Example() {
         // Send the Approve transaction
         const approveReceipt = await (window as any).ethereum.send(
           'eth_sendTransaction',
-          [result.approval]
+          [result.approveTransaction]
         );
 
         // Wait for the Approve transaction to complete
