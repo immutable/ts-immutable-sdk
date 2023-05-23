@@ -1,17 +1,17 @@
 import { ItemType } from '@opensea/seaport-js/lib/constants';
 import {
-  BuyItem, Fee, Order, OrderBookService, ProtocolData, SellItem,
+  BuyItem, Fee, Order, OrdersService, CreateOrderProtocolData, SellItem,
 } from 'openapi/sdk';
 import { CreateOrderParams } from 'types';
 
 export class ImmutableApiClient {
   constructor(
-    private readonly orderbookService: OrderBookService,
+    private readonly orderbookService: OrdersService,
     private readonly chainId: string,
   ) {}
 
   async getOrder(orderId: string): Promise<Order> {
-    return this.orderbookService.orderBookGetOrder({ chainId: this.chainId, orderId });
+    return this.orderbookService.getOrder({ chainId: this.chainId, orderId });
   }
 
   async createOrder(
@@ -34,7 +34,7 @@ export class ImmutableApiClient {
       throw new Error('All consideration items must be of the same type');
     }
 
-    return this.orderbookService.orderBookCreateOrder({
+    return this.orderbookService.createOrder({
       chainId: this.chainId,
       requestBody: {
         order_hash: orderHash,
@@ -57,7 +57,8 @@ export class ImmutableApiClient {
           : [],
         end_time: new Date(parseInt(`${orderComponents.endTime.toString()}000`, 10)).toISOString(),
         protocol_data: {
-          order_type: ProtocolData.order_type.FULL_OPEN,
+          order_type: CreateOrderProtocolData.order_type.FULL_OPEN,
+          zone_address: orderComponents.zone,
         },
         salt: orderComponents.salt,
         sell: [{

@@ -10,12 +10,14 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export { BuyItem } from './models/BuyItem';
+export { CreateOrderProtocolData } from './models/CreateOrderProtocolData';
 export type { CreateOrderRequestBody } from './models/CreateOrderRequestBody';
 export type { Error } from './models/Error';
 export { Fee } from './models/Fee';
 export { Order } from './models/Order';
 export type { Orders } from './models/Orders';
-export { ProtocolData } from './models/ProtocolData';
+export type { Page } from './models/Page';
+export type { ProtocolData } from './models/ProtocolData';
 export { SellItem } from './models/SellItem';
 
-export { OrderBookService } from './services/OrderBookService';
+export { OrdersService } from './services/OrdersService';
