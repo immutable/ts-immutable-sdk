@@ -9,13 +9,10 @@ import { Environment } from '@imtbl/config';
 import { InnerWidget } from '../inner-widget/InnerWidget';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
-import {
-  successBoxStyles,
-  successLogoStyles,
-} from '../../../../components/Success/SuccessViewStyles';
 import { CenteredBoxContent } from '../../../../components/CenteredBoxContent/CenteredBoxContent';
 import { zkEVMNetwork } from '../../../../lib/networkUtils';
 import { InnerExampleWidgetViews } from '../../../../context/view-context/InnerExampleViewContextTypes';
+import { statusBoxStyles, statusLogoStyles } from '../../../../components/StatusView/StatusViewStyles';
 
 export interface ConnectionLoaderProps {
   children?: React.ReactNode;
@@ -93,8 +90,8 @@ export function ConnectionLoader({
         <BiomeThemeProvider theme={{ base: biomeTheme }}>
           <SimpleLayout footer={<FooterLogo />}>
             <CenteredBoxContent>
-              <Box sx={successBoxStyles}>
-                <Box sx={successLogoStyles}>
+              <Box sx={statusBoxStyles}>
+                <Box sx={statusLogoStyles(true)}>
                   <Icon
                     icon="Loading"
                     variant="bold"
