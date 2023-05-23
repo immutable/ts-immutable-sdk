@@ -29,6 +29,7 @@ export class Seaport {
     listingItem: ERC721Item,
     considerationItem: ERC20Item | NativeItem,
     royaltyInfo: RoyaltyInfo,
+    orderStart: Date,
     orderExpiry: Date,
   ): Promise<PrepareListingResponse> {
     const { actions } = await this.createSeaportOrder(
@@ -36,6 +37,7 @@ export class Seaport {
       listingItem,
       considerationItem,
       royaltyInfo,
+      orderStart,
       orderExpiry,
     );
 
@@ -123,6 +125,7 @@ export class Seaport {
     listingItem: ERC721Item,
     considerationItem: ERC20Item | NativeItem,
     royaltyInfo: RoyaltyInfo,
+    orderStart: Date,
     orderExpiry: Date,
   ): Promise<OrderUseCase<CreateOrderAction>> {
     return this.seaport.createOrder({
@@ -146,7 +149,7 @@ export class Seaport {
           recipient: royaltyInfo.recipient,
         },
       ],
-      startTime: (new Date().getTime() / 1000).toFixed(0),
+      startTime: (orderStart.getTime() / 1000).toFixed(0),
       endTime: (orderExpiry.getTime() / 1000).toFixed(0),
       zone: this.zoneContractAddress,
       restrictedByZone: true,

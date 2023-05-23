@@ -53,6 +53,8 @@ export class Orderbook {
       listingItem,
       considerationItem,
       royaltyInfo,
+      // Default order start to now
+      new Date(),
       // Default order expiry to 2 years from now
       orderExpiry || new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2),
     );
