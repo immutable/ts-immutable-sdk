@@ -10,7 +10,7 @@ import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestCompon
 import { SwapForm } from './SwapForm';
 import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
-import { SwapState, initialSwapState } from '../context/swap-context/SwapContext';
+import { SwapState, initialSwapState } from '../context/SwapContext';
 import { SwapCoins } from '../views/SwapCoins';
 import { quotesProcessor } from '../functions/FetchQuote';
 

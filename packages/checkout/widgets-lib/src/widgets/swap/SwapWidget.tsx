@@ -19,7 +19,7 @@ import {
   SwapContext,
   initialSwapState,
   swapReducer,
-} from './context/swap-context/SwapContext';
+} from './context/SwapContext';
 import {
   BaseViews,
   ViewActions,
