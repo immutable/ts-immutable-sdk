@@ -12,7 +12,6 @@ import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapState, initialSwapState } from '../context/swap-context/SwapContext';
 import { SwapCoins } from '../views/SwapCoins';
-import { SwapFormState } from '../context/swap-form-context/SwapFormContext';
 import { quotesProcessor } from '../functions/FetchQuote';
 
 describe('SwapForm', () => {
@@ -164,13 +163,10 @@ describe('SwapForm', () => {
   });
 
   describe('swap form behaviour', () => {
-    let testSwapFormState: SwapFormState;
-
     it('should validate all inputs when Swap Button is clicked', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
-          initialFormStateOverride={testSwapFormState}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -198,7 +194,6 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
-          initialFormStateOverride={testSwapFormState}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -219,7 +214,6 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
-          initialFormStateOverride={testSwapFormState}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -239,7 +233,6 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
-          initialFormStateOverride={testSwapFormState}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -263,7 +256,6 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
-          initialFormStateOverride={testSwapFormState}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,

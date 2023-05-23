@@ -1,5 +1,7 @@
 import { Box, Button } from '@biom3/react';
 import { useContext } from 'react';
+import { TransactionResponse } from '@imtbl/dex-sdk';
+import { Transaction } from '@imtbl/checkout-sdk';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { sendSwapSuccessEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
@@ -17,30 +19,22 @@ import {
 export interface SwapButtonProps {
   loading: boolean
   validator: () => boolean
+  quote: TransactionResponse | null
 }
 
-export function SwapButton({ loading, validator }: SwapButtonProps) {
+export function SwapButton({ loading, validator, quote }: SwapButtonProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { swapState } = useContext(SwapContext);
   const { checkout, provider } = swapState;
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
 
   const sendTransaction = async () => {
-    if (!checkout || !provider) return;
+    if (!checkout || !provider || !quote) return;
     if (!validator()) return;
     try {
       await checkout.sendTransaction({
         provider,
-        transaction: {
-          nonce: '0x00',
-          gasPrice: '0x00',
-          gas: '0x00',
-          to: '',
-          from: '',
-          value: '0x00',
-          data: '',
-          chainId: 5,
-        },
+        transaction: quote.transaction as Transaction, // todo: our checkout Transaction requires fields that are not required on a ethers transaction request
       });
       viewDispatch({
         payload: {

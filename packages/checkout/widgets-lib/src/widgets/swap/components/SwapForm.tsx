@@ -6,7 +6,9 @@ import {
 } from '@biom3/react';
 import { utils } from 'ethers';
 import { GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
+import { TransactionResponse } from '@imtbl/dex-sdk';
 import { text } from '../../../resources/text/textConfig';
+<<<<<<< refs/remotes/origin/main
 import {
   SwapFormActions,
   SwapFormContext,
@@ -23,6 +25,8 @@ import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContex
 import { SelectOption } from '../../../../components/FormComponents/SelectForm/SelectForm';
 =======
 } from '../context/swap-form-context/SwapFormContext';
+=======
+>>>>>>> Refactor out swap form context
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/swap-context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
@@ -86,11 +90,6 @@ export function SwapForm() {
     },
   } = useContext(SwapContext);
 
-  const {
-    swapFormState: { swapFromFiatValue },
-    swapFormDispatch,
-  } = useContext(SwapFormContext);
-
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
 
   const [editing, setEditing] = useState(false);
@@ -106,6 +105,13 @@ export function SwapForm() {
   const [toAmountError, setToAmountError] = useState<string>('');
   const [toToken, setToToken] = useState<TokenInfo | null>(null);
   const [toTokenError, setToTokenError] = useState<string>('');
+  const [quote, setQuote] = useState<TransactionResponse | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [quoteError, setQuoteError] = useState<string>('');
+  const [gasFeeValue, setGasFeeValue] = useState<string>('');
+  const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | null>(null);
+  const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
+  const [fromFiatValue, setFromFiatValue] = useState('');
 
   const tokensOptionsFrom = useMemo(
     () => tokenBalances
@@ -133,7 +139,6 @@ export function SwapForm() {
     [allowedTokens, fromToken],
   );
 
-  // Helpers to update the form context
   useEffect(() => {
     cryptoFiatDispatch({
       payload: {
@@ -169,25 +174,20 @@ export function SwapForm() {
       const estimateToken = estimate?.token;
 
       const gasToken = allowedTokens.find((token) => token.symbol === estimateToken?.symbol);
-      swapFormDispatch({
-        payload: {
-          type: SwapFormActions.SET_SWAP_QUOTE,
-          quote: result,
-          gasFeeValue: gasFee,
-          gasFeeToken: {
-            name: gasToken?.name || '',
-            symbol: gasToken?.symbol || '',
-            decimals: gasToken?.decimals || 0,
-            address: gasToken?.address,
-            icon: gasToken?.icon,
-          },
-          gasFeeFiatValue: calculateCryptoToFiat(
-            gasFee,
-            DEFAULT_IMX_DECIMALS.toString(),
-            cryptoFiatState.conversions,
-          ),
-        },
+      setQuote(result);
+      setGasFeeValue(gasFee);
+      setGasFeeToken({
+        name: gasToken?.name || '',
+        symbol: gasToken?.symbol || '',
+        decimals: gasToken?.decimals || 0,
+        address: gasToken?.address,
+        icon: gasToken?.icon,
       });
+      setGasFeeFiatValue(calculateCryptoToFiat(
+        gasFee,
+        DEFAULT_IMX_DECIMALS.toString(),
+        cryptoFiatState.conversions,
+      ));
 
       setToAmount(
         formatZeroAmount(
@@ -203,12 +203,7 @@ export function SwapForm() {
       setToAmountError('');
       setToTokenError('');
     } catch (error: any) {
-      swapFormDispatch({
-        payload: {
-          type: SwapFormActions.SET_SWAP_QUOTE_ERROR,
-          quoteError: error.message,
-        },
-      });
+      setQuoteError(error.message);
     }
     setIsFetching(false);
   };
@@ -302,16 +297,11 @@ export function SwapForm() {
     err = validateFromToken(fromToken);
     if (err) return;
 
-    swapFormDispatch({
-      payload: {
-        type: SwapFormActions.SET_SWAP_FROM_FIAT_VALUE,
-        swapFromFiatValue: calculateCryptoToFiat(
-          fromAmount,
-          fromToken.token.symbol,
-          cryptoFiatState.conversions,
-        ),
-      },
-    });
+    setFromFiatValue(calculateCryptoToFiat(
+      fromAmount,
+      fromToken.token.symbol,
+      cryptoFiatState.conversions,
+    ));
   }, [fromAmount, fromAmount]);
 
   const onFromSelectChange = (value: OptionKey) => {
@@ -462,7 +452,7 @@ export function SwapForm() {
               selectTextAlign="left"
               textInputValue={fromAmount}
               textInputPlaceholder={swapForm.from.inputPlaceholder}
-              textInputSubtext={`${content.fiatPricePrefix} $${formatZeroAmount(swapFromFiatValue, true)}`}
+              textInputSubtext={`${content.fiatPricePrefix} $${formatZeroAmount(fromFiatValue, true)}`}
               textInputTextAlign="right"
               textInputValidator={textInputValidator}
               onTextInputChange={(v) => onFromTextInputChange(v)}
@@ -514,11 +504,12 @@ export function SwapForm() {
             />
           </Box>
         </Box>
-        <Fees />
+        <Fees gasFeeFiatValue={gasFeeFiatValue} gasFeeToken={gasFeeToken} gasFeeValue={gasFeeValue} />
       </Box>
       <SwapButton
         validator={SwapFormValidator}
         loading={loading}
+        quote={quote}
       />
     </>
 
