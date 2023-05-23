@@ -4,6 +4,7 @@ import { Service } from 'typedi';
 import {
   CraftCreateCraftInput,
   CraftCreateCraftOutput,
+  DomainCraft,
 } from '../__codegen__/crafting';
 import type { EventData, EventType } from '../types';
 import { asyncFn } from '../utils';
@@ -112,8 +113,24 @@ export class Crafting {
    * @returns
    */
   // eslint-disable-next-line class-methods-use-this
+  @withSDKError({ type: 'CRAFTING_ERROR' })
   public async validate() {
     // TODO: submit craft to BE for validation
     return true;
+  }
+
+  @withSDKError({ type: 'CRAFTING_ERROR' })
+  public async getCraftsByGameId(gameId: string): Promise<Array<DomainCraft>> {
+    try {
+      const { status, data } = await this.studioBE.craftingApi.craftsGet();
+
+      if (!(status >= 200 && status < 300)) {
+        throw new Error('error fetching crafts');
+      }
+
+      return data.filter((craft) => craft.game_id === gameId);
+    } catch (error) {
+      throw new Error('error fetching crafts', { cause: { error } });
+    }
   }
 }

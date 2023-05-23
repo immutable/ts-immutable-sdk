@@ -30,6 +30,7 @@ import { WalletWidgetViews } from '../../context/view-context/WalletViewContextT
 import { Settings } from './views/Settings';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
+import { CoinInfo } from './views/CoinInfo';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
@@ -148,8 +149,9 @@ export function WalletWidget(props: WalletWidgetProps) {
             {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
               <WalletBalances />
             )}
-            {viewState.view.type === WalletWidgetViews.SETTINGS && (
-              <Settings />
+            {viewState.view.type === WalletWidgetViews.SETTINGS && <Settings />}
+            {viewState.view.type === WalletWidgetViews.COIN_INFO && (
+              <CoinInfo />
             )}
             {viewState.view.type === BaseViews.ERROR && (
               <ErrorView
