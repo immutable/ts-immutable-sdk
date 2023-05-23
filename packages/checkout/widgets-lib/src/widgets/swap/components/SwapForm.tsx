@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -43,11 +42,6 @@ import { SwapButton } from './SwapButton';
 enum SwapDirection {
   FROM = 'FROM',
   TO = 'TO',
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface SwapFormProps {
-  // setLoading: (value: boolean) => void;
 }
 
 const swapValuesToText = ({
