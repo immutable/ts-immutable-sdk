@@ -1,43 +1,33 @@
 import {
-  Body, Box, Option, OptionKey, Select, TextInput,
+  Body, Box, Button, Option, OptionKey, Select, TextInput,
 } from '@biom3/react';
-import { ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
-import { useEffect, useState } from 'react';
-import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
-// TODO: Fix circular dependency
-// eslint-disable-next-line import/no-cycle
-import { BridgeButton } from './BridgeButton';
-import { BridgeWidgetViews } from '../BridgeWidget';
-import { L1Network } from '../../../lib/networkUtils';
-import { Network } from '../../../lib';
+import { GetBalanceResult } from '@imtbl/checkout-sdk';
+import {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
+import { TransactionResponse } from '@ethersproject/providers';
+import { BridgeContext } from '../context/BridgeContext';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
+import { BridgeFormContext } from '../context/BridgeFormContext';
 
 interface BridgeFormProps {
-  provider: Web3Provider;
-  balances: GetBalanceResult[];
-  chainId?: ChainId;
-  selectedNetwork: OptionKey | undefined;
-  onSelectedNetworkChange: (selectedOption: OptionKey) => void;
-  toNetwork: string;
-  nativeCurrencySymbol: string;
   defaultAmount?: string;
   defaultTokenAddress?: string;
   updateTransactionResponse: (transactionResponse: TransactionResponse) => void;
-  updateView: (view: BridgeWidgetViews, err?: any) => void;
 }
 
 export function BridgeForm(props: BridgeFormProps) {
+  const { bridgeState } = useContext(BridgeContext);
   const {
-    provider,
-    balances,
-    chainId,
-    selectedNetwork,
-    onSelectedNetworkChange,
-    toNetwork,
-    updateTransactionResponse,
-    updateView,
-  } = props;
-  const { nativeCurrencySymbol, defaultAmount, defaultTokenAddress } = props;
+    checkout, network, tokenBalances, toNetwork,
+  } = bridgeState;
+  const { defaultAmount, defaultTokenAddress, updateTransactionResponse } = props;
+
+  const { bridgeFormState: { bridgeFromAmount, bridgeFromToken } } = useContext(BridgeFormContext);
+
+  const { viewDispatch } = useContext(ViewContext);
+  const { bridgeState: { provider } } = useContext(BridgeContext);
 
   const [bridgeAmount, setBridgeAmount] = useState(defaultAmount || '0');
   const [selectedTokenOption, setSelectedTokenOption] = useState<OptionKey>();
@@ -60,18 +50,65 @@ export function BridgeForm(props: BridgeFormProps) {
   useEffect(() => {
     let defaultToken: GetBalanceResult | undefined;
     if (defaultTokenAddress) {
-      defaultToken = balances.find(
+      defaultToken = tokenBalances.find(
         (balance) => balance.token.address === defaultTokenAddress,
       );
     }
     if (!defaultToken) {
-      defaultToken = balances.find(
-        (balance) => balance.token.symbol === nativeCurrencySymbol,
+      defaultToken = tokenBalances.find(
+        (balance) => balance.token.symbol === network?.nativeCurrency.symbol,
       );
     }
 
     setSelectedTokenOption(defaultToken?.token.symbol as OptionKey);
-  }, [balances, selectedNetwork, defaultTokenAddress, nativeCurrencySymbol]);
+  }, [tokenBalances, network, defaultTokenAddress]);
+
+  const isButtonDisabled = (): boolean => {
+    if (!bridgeFromAmount || !bridgeFromToken) return true;
+
+    return false;
+  };
+
+  const getUnsignedTransaction = () => ({
+    // get the bridge transaction
+    // Bridge.getBridgeTx(...)
+    nonce: '0x00', // ignored by MetaMask
+    gasPrice: '0x000', // customizable by user during MetaMask confirmation.
+    gas: '0x000', // customizable by user during MetaMask confirmation.
+    to: '', // To address.
+    from: '', // User's active address.
+    value: '0x00', // Only required to send ether to the recipient from the initiating external account.
+    data: '0x000', // Optional, but used for defining smart contract creation and interaction.
+    chainId: 5, // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
+  });
+
+  const submitBridge = useCallback(async () => {
+    if (!checkout || !provider) return;
+
+    // get unsigned transaction from the bridge/exchange sdk
+    const transaction = getUnsignedTransaction();
+    try {
+      const response = await checkout.sendTransaction({
+        provider,
+        transaction,
+      });
+      updateTransactionResponse(response.transactionResponse);
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: BridgeWidgetViews.SUCCESS },
+        },
+      });
+    } catch (err: any) {
+      // TODO: fix this with fail view... always succeeed for now
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: BridgeWidgetViews.SUCCESS },
+        },
+      });
+    }
+  }, [checkout]);
 
   return (
     <Box sx={{ paddingTop: 'base.spacing.x4' }}>
@@ -83,29 +120,9 @@ export function BridgeForm(props: BridgeFormProps) {
           columnGap: 'base.spacing.x4',
         }}
       >
-        <Body size="small">From:</Body>
-        <Select
-          testId="select-network"
-          selectedOption={selectedNetwork}
-          onSelectChange={onSelectedNetworkChange}
-        >
-          <Option
-            testId={`select-network-${L1Network(Environment.PRODUCTION)}`}
-            key={L1Network(Environment.PRODUCTION)}
-            optionKey={L1Network(Environment.PRODUCTION)}
-          >
-            <Option.Label>
-              {ChainId[L1Network(Environment.PRODUCTION)]}
-            </Option.Label>
-          </Option>
-          <Option
-            testId={`select-network-${Network.IMTBL_ZKEVM_TESTNET}`}
-            key={Network.IMTBL_ZKEVM_TESTNET}
-            optionKey={ChainId.IMTBL_ZKEVM_TESTNET}
-          >
-            <Option.Label>{Network.IMTBL_ZKEVM_TESTNET}</Option.Label>
-          </Option>
-        </Select>
+        <Body size="small">
+          {`From: ${network?.name}`}
+        </Body>
       </Box>
       <Box
         sx={{
@@ -132,10 +149,10 @@ export function BridgeForm(props: BridgeFormProps) {
           selectedOption={selectedTokenOption}
           onSelectChange={(o) => handleSelectToken(o)}
         >
-          {balances.map((balance) => (
+          {tokenBalances.map((balance) => (
             <Option
               testId={`select-token-${balance.token.symbol}`}
-              key={`${chainId}-${balance.token.symbol}`}
+              key={`${network?.chainId}-${balance.token.symbol}`}
               optionKey={balance.token.symbol}
             >
               <Option.Label>{balance.token.symbol}</Option.Label>
@@ -150,7 +167,7 @@ export function BridgeForm(props: BridgeFormProps) {
           justifyContent: 'flex-start',
         }}
       >
-        {!selectedTokenOption && (
+        {tokenBalances.length === 0 && (
           <Body size="xSmall">You have no balances on this network</Body>
         )}
       </Box>
@@ -162,8 +179,7 @@ export function BridgeForm(props: BridgeFormProps) {
         }}
       >
         <Body testId="bridge-to-network">
-          To:
-          {toNetwork}
+          {`To: ${toNetwork?.name}`}
         </Body>
         <Body testId="receive-text">
           You will receive:
@@ -173,16 +189,14 @@ export function BridgeForm(props: BridgeFormProps) {
             : ''}
         </Body>
       </Box>
-      <BridgeButton
-        provider={provider}
-        amount={bridgeAmount}
-        balance={balances.find(
-          (balance) => balance.token.symbol === selectedTokenOption,
-        )}
-        fromNetwork={selectedNetwork}
-        updateTransactionResponse={updateTransactionResponse}
-        updateView={updateView}
-      />
+      <Button
+        testId="bridge-button"
+        disabled={isButtonDisabled()}
+        variant={isButtonDisabled() ? 'tertiary' : 'primary'}
+        onClick={submitBridge}
+      >
+        Bridge
+      </Button>
     </Box>
   );
 }
