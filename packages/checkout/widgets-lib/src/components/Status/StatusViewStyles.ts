@@ -1,3 +1,10 @@
+export const statusContainerStyles = {
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+};
+
 export const statusBoxStyles = {
   display: 'flex',
   flexDirection: 'column',
