@@ -6,10 +6,11 @@ import {
 } from '@biom3/react';
 import { utils } from 'ethers';
 import { GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
-import { text } from '../../../../resources/text/textConfig';
+import { text } from '../../../resources/text/textConfig';
 import {
   SwapFormActions,
   SwapFormContext,
+<<<<<<< refs/remotes/origin/main:packages/checkout/widgets-lib/src/widgets/swap/components/SwapForm/SwapForm.tsx
 } from '../../context/swap-form-context/SwapFormContext';
 import { amountInputValidation as textInputValidator } from '../../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../../context/swap-context/SwapContext';
@@ -20,9 +21,21 @@ import { DEFAULT_IMX_DECIMALS } from '../../../../lib';
 import { SelectInput } from '../../../../components/FormComponents/SelectInput/SelectInput';
 import { SwapWidgetViews } from '../../../../context/view-context/SwapViewContextTypes';
 import { SelectOption } from '../../../../components/FormComponents/SelectForm/SelectForm';
+=======
+} from '../context/swap-form-context/SwapFormContext';
+import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
+import { SwapContext } from '../context/swap-context/SwapContext';
+import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
+import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
+import { DEFAULT_IMX_DECIMALS } from '../../../lib/constant';
+import { quotesProcessor } from '../functions/FetchQuote';
+import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
+import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
+import { SelectOption } from '../../../components/FormComponents/SelectForm/SelectForm';
+>>>>>>> Move swap components to flat file structure:packages/checkout/widgets-lib/src/widgets/swap/components/SwapForm.tsx
 import {
   ValidateFromAmount, ValidateFromToken, ValidateToAmount, ValidateToToken,
-} from '../../functions/SwapValidator';
+} from '../functions/SwapValidator';
 
 enum SwapDirection {
   FROM = 'FROM',
