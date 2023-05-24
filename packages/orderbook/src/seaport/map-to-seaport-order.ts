@@ -13,8 +13,8 @@ export function mapImmutableOrderToSeaportOrderComponents(
     endAmount: buyItem.start_amount,
     itemType: buyItem.item_type === 'ERC20' ? ItemType.ERC20 : ItemType.NATIVE,
     recipient: order.account_address,
-    token: buyItem.contract_address!,
-    identifierOrCriteria: '',
+    token: buyItem.contract_address! || constants.AddressZero,
+    identifierOrCriteria: '0',
   }));
 
   const fees: ConsiderationItem[] = order.buy_fees.map((fee) => ({
@@ -22,12 +22,12 @@ export function mapImmutableOrderToSeaportOrderComponents(
     endAmount: fee.amount,
     itemType: order.buy[0].item_type === 'ERC20' ? ItemType.ERC20 : ItemType.NATIVE,
     recipient: fee.recipient,
-    token: order.buy[0].contract_address!,
-    identifierOrCriteria: '',
+    token: order.buy[0].contract_address! || constants.AddressZero,
+    identifierOrCriteria: '0',
   }));
 
   return {
-    conduitKey: constants.AddressZero,
+    conduitKey: constants.HashZero,
     consideration: [...considerationItems, ...fees],
     offer: order.sell.map((sellItem) => ({
       startAmount: '1',
@@ -37,8 +37,8 @@ export function mapImmutableOrderToSeaportOrderComponents(
       identifierOrCriteria: sellItem.token_id,
     })),
     counter,
-    endTime: order.end_time,
-    startTime: order.start_time,
+    endTime: Math.round(new Date(order.end_time).getTime() / 1000).toString(),
+    startTime: Math.round(new Date(order.start_time).getTime() / 1000).toString(),
     salt: order.salt,
     offerer: order.account_address,
     zone: zoneAddress,

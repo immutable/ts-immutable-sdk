@@ -8,13 +8,10 @@ import { Environment } from '@imtbl/config';
 import { InnerWidget } from '../inner-widget/InnerWidget';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
-import {
-  successBoxStyles,
-  successLogoStyles,
-} from '../../../../components/Success/SuccessViewStyles';
 import { CenteredBoxContent } from '../../../../components/CenteredBoxContent/CenteredBoxContent';
 import { zkEVMNetwork } from '../../../../lib/networkUtils';
 import { InnerExampleWidgetViews } from '../../../../context/view-context/InnerExampleViewContextTypes';
+import { statusBoxStyles } from '../../../../components/Status/StatusViewStyles';
 import { WidgetTheme } from '../../../../lib';
 
 export interface ConnectionLoaderProps {
@@ -93,8 +90,18 @@ export function ConnectionLoader({
         <BiomeThemeProvider theme={{ base: biomeTheme }}>
           <SimpleLayout footer={<FooterLogo />}>
             <CenteredBoxContent>
-              <Box sx={successBoxStyles}>
-                <Box sx={successLogoStyles}>
+              <Box sx={statusBoxStyles}>
+                <Box sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 'base.spacing.x12',
+                  width: 'base.spacing.x12',
+                  borderRadius: '50%',
+                  backgroundColor: 'base.color.status.success.bright',
+                }}
+                >
                   <Icon
                     icon="Loading"
                     variant="bold"

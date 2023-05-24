@@ -13,5 +13,6 @@ export const footerLogoStyles = {
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: 'base.spacing.x3',
+  paddingTop: 'base.spacing.x4',
+  paddingBottom: 'base.spacing.x5',
 };
