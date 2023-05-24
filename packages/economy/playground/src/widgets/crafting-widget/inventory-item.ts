@@ -20,12 +20,22 @@ const badgeVx = {
   },
 };
 
+const locationVx = {
+  $all: 'font-bold text-white font-mono text-center',
+  location: {
+    offchain: 'bg-black',
+    zkevm: 'bg-primary',
+  },
+};
+
 @customElement('inventory-item')
 export class Item extends LitElement {
   @property({ type: Object, attribute: 'item' })
-  item!: Required<Omit<InventoryItem, 'metadata'> & {
-    metadata?: { name: string; image: string; [k: string]: unknown };
-  }>;
+  item!: Required<
+    Omit<InventoryItem, 'metadata'> & {
+      metadata?: { name: string; image: string; [k: string]: unknown };
+    }
+  >;
 
   handleClick(event: Event) {
     event.preventDefault();
@@ -44,6 +54,12 @@ export class Item extends LitElement {
     document.dispatchEvent(event);
   }
 
+  copyToClipboard(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    navigator.clipboard.writeText(this.item.id);
+  }
+
   render() {
     const props = {
       ...this.item,
@@ -54,17 +70,28 @@ export class Item extends LitElement {
 
     return html`
       <div
-        class="indicator h-full outline-offset-1 hover:outline hover:cursor-pointer"
+        class="indicator h-full outline-offset-1 hover:outline hover:cursor-pointer flex flex-col"
         @click="${this.handleClick}"
       >
         <span class="${vx(badgeVx, props)}"> ${this.item.status}</span>
-        <div class="grid w-32 h-full bg-base-300 place-items-center ">
+        <div
+          class="grid w-32 h-full bg-base-300 place-items-center overflow-hidden"
+        >
           <img
+            class="w-16"
             alt="${this.item.metadata.name}"
             src="${this.item.metadata.image}"
           />
           ${this.item.metadata.name}
+          <span
+            class="bg-accent font-bold text-white font-mono text-center truncate w-32 hover:bg-accent-focus cursor-copy"
+            title="${this.item.id}"
+            @click="${this.copyToClipboard}"
+          >
+            ...${this.item.id.slice(-10)}
+          </span>
         </div>
+        <span class="${vx(locationVx, props)}">${this.item.location}</span>
       </div>
     `;
   }

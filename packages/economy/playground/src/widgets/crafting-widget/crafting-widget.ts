@@ -8,13 +8,15 @@ import { DomainRecipe } from '@imtbl/economy/dist/__codegen__/recipe';
 import { InventoryItem } from '@imtbl/economy/dist/__codegen__/inventory';
 import { DomainCraft } from '@imtbl/economy/dist/__codegen__/crafting';
 
-type ComponentEvent = {
-  type: 'userInfo';
-  data: { userId: string; email: string; address: string };
-} | {
-  type: 'item-selected',
-  data: InventoryItem
-};
+type ComponentEvent =
+  | {
+      type: 'userInfo';
+      data: { userId: string; email: string; address: string };
+    }
+  | {
+      type: 'item-selected';
+      data: InventoryItem;
+    };
 
 @customElement('crafting-widget')
 export class CraftingWidget extends LitElement {
@@ -35,7 +37,6 @@ export class CraftingWidget extends LitElement {
 
   @state()
   crafts: Array<DomainCraft> = [];
-
 
   @state()
   selectedItems: Map<string, Required<InventoryItem>> = new Map();
@@ -70,7 +71,7 @@ export class CraftingWidget extends LitElement {
       this.selectedItems.set(item.id, item);
     }
 
-    this.requestUpdate(); 
+    this.requestUpdate();
   }
 
   async getRecipes() {
@@ -107,6 +108,13 @@ export class CraftingWidget extends LitElement {
     });
   }
 
+  handleInputChanges(key: 'userId' | 'walletAddress' | 'gameId') {
+    return (event: InputEvent) => {
+      this[key] = (event.target as HTMLInputElement).value;
+      this.requestUpdate();
+    };
+  }
+
   render() {
     const selectedItems = Array.from(this.selectedItems.values());
 
@@ -141,18 +149,21 @@ export class CraftingWidget extends LitElement {
                   placeholder="Game Id"
                   class="input w-full max-w-xs ml-2"
                   .value="${this.gameId}"
+                  @blur="${this.handleInputChanges('gameId')}"
                 />
                 <input
                   type="text"
                   placeholder="User Id"
                   class="input w-full max-w-xs ml-2"
                   .value="${this.userId}"
-                />
-                <input
+                  @blur="${this.handleInputChanges('userId')}"
+                  />
+                  <input
                   type="text"
                   placeholder="Wallet Address"
                   class="input w-full max-w-xs ml-2"
                   .value="${this.walletAddress}"
+                  @blur="${this.handleInputChanges('walletAddress')}"
                 />
                 <div class="w-full max-w-xs ml-2">
                   <recipe-selection
