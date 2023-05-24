@@ -23,7 +23,7 @@ export class ImmutableApiClient {
       throw new Error('Only one item can be listed at a time');
     }
 
-    if (orderComponents.offer[0].itemType !== ItemType.ERC721) {
+    if (Number(orderComponents.offer[0].itemType) !== ItemType.ERC721) {
       throw new Error('Only ERC721 tokens can be listed');
     }
 
