@@ -1618,28 +1618,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.5.0-beta":
-  version: 0.5.0-beta
-  resolution: "@biom3/react@npm:0.5.0-beta"
-  dependencies:
-    "@biom3/design-tokens": "*"
-    "@emotion/css": ^11.10.8
-    "@emotion/react": ^11.10.8
-    buffer: ^6.0.3
-    framer-motion: ^9.1.7
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.throttle: ^4.1.1
-    next: ~13.1.1
-    querystring: ^0.2.1
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    react-is: ^18.2.0
-    ts-deepmerge: ^5.0.0
-  checksum: 781a7cfd395b830d1d7d290cc9f05371f2d25e4330d8a608b6ae1d95585e685859ae242f0919700ea232a22b0ce2aad191f5e0f3bf97af1b3110b6143014a56a
-  languageName: node
-  linkType: hard
-
 "@biom3/react@npm:^0.5.6-beta":
   version: 0.5.6-beta
   resolution: "@biom3/react@npm:0.5.6-beta"
@@ -2737,7 +2715,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.5.0-beta
+    "@biom3/react": ^0.5.6-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@svgr/webpack": ^8.0.1
@@ -14326,22 +14304,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:^9.1.7":
-  version: 9.1.7
-  resolution: "framer-motion@npm:9.1.7"
-  dependencies:
-    "@emotion/is-prop-valid": ^0.8.2
-    tslib: ^2.4.0
-  peerDependencies:
-    react: ^18.0.0
-    react-dom: ^18.0.0
-  dependenciesMeta:
-    "@emotion/is-prop-valid":
-      optional: true
-  checksum: 8ab21a2c15eb2494644b09c91c91aec3c01575e2148ff17621df4fca44bc64a8c03bc1cf6a5261ec0cebb7504fea8d75480e93b1799e8842337f8b1863af8c14
-  languageName: node
-  linkType: hard
-
 "fresh@npm:0.5.2":
   version: 0.5.2
   resolution: "fresh@npm:0.5.2"
@@ -23293,7 +23255,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sample-app@workspace:packages/provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.5.0-beta
+    "@biom3/react": ^0.5.6-beta
     "@imtbl/core-sdk": ^1.1.1-alpha.1
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
