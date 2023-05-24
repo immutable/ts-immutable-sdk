@@ -1,4 +1,5 @@
 import { Box, Button } from '@biom3/react';
+import { useEffect } from 'react';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { CenteredBoxContent } from '../CenteredBoxContent/CenteredBoxContent';
 import { StatusBox } from './StatusBox';
@@ -9,7 +10,7 @@ import { statusContainerStyles } from './StatusViewStyles';
 export interface StatusViewProps {
   actionText: string;
   onActionClick: () => void;
-  statusEventAction?: () => void;
+  onRenderEvent?: () => void;
   testId: string;
   statusText: string;
   statusType: StatusType;
@@ -18,19 +19,19 @@ export interface StatusViewProps {
 export function StatusView({
   actionText,
   onActionClick,
-  statusEventAction,
+  onRenderEvent,
   testId,
   statusText,
   statusType,
 }: StatusViewProps) {
-  if (
-    statusEventAction !== undefined
-    && typeof statusEventAction === 'function'
-  ) {
-    statusEventAction();
-  }
+  useEffect(() => {
+    if (onRenderEvent) {
+      onRenderEvent();
+    }
+  }, []);
+
   const onStatusActionClick = () => {
-    if (onActionClick !== undefined && typeof onActionClick === 'function') {
+    if (onActionClick) {
       onActionClick();
     }
   };

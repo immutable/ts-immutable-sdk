@@ -121,7 +121,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
                   statusText="Connection secure"
                   actionText="Continue"
                   onActionClick={() => sendCloseEvent()}
-                  statusEventAction={() => sendConnectSuccessEvent(ConnectionProviders.METAMASK)}
+                  onRenderEvent={() => sendConnectSuccessEvent(ConnectionProviders.METAMASK)}
                   statusType={StatusType.SUCCESS}
                   testId="success-view"
                 />

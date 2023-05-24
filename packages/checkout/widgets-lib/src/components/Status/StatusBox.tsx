@@ -12,18 +12,17 @@ export function StatusBox({ statusText, statusType }: StatusViewProps) {
 
   switch (statusType) {
     case StatusType.SUCCESS:
-      icon = 'Security';
+      icon = 'TickWithCircle';
       statusTestId = 'success';
       break;
-    case StatusType.FAILURE: icon = 'CloseWithCircle';
-      statusTestId = 'failure';
-      break;
-    case StatusType.REJECTED: icon = 'Shield';
+    case StatusType.REJECTED:
+      icon = 'Shield';
       statusTestId = 'rejected';
       break;
+    case StatusType.FAILURE:
     default:
-      icon = 'Security';
-      statusTestId = 'success';
+      icon = 'CloseWithCircle';
+      statusTestId = 'failure';
   }
 
   const isSuccess = statusType === StatusType.SUCCESS;
