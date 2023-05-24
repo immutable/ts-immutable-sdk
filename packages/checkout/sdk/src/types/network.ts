@@ -156,7 +156,11 @@ NetworkDetails
  * @property {ChainId} chainId - The ID of the network to switch to.
  */
 export interface SwitchNetworkParams {
-  provider: Web3Provider;
+  web3Provider?: Web3Provider;
+  cachedProvider?: {
+    name: string;
+    chainId: ChainId;
+  };
   chainId: ChainId;
 }
 

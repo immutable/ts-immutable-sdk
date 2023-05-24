@@ -3,7 +3,6 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
 import {
   ConnectionProviders,
-  ConnectParams,
   WalletAction,
   CheckConnectionResult,
 } from '../types';
@@ -79,12 +78,12 @@ export async function checkIsWalletConnected(
   };
 }
 
-export async function connectWalletProvider(
-  params: ConnectParams,
-): Promise<Web3Provider> {
-  const web3Provider = await getWalletProviderForPreference(
-    params.providerPreference,
-  );
+// @WT-1345 - rename to connectSite()
+
+export async function connectWalletProvider(params: {
+  web3Provider: Web3Provider;
+}): Promise<Web3Provider> {
+  const { web3Provider } = params;
 
   await withCheckoutError<void>(
     async () => {
@@ -92,7 +91,7 @@ export async function connectWalletProvider(
         throw new CheckoutError(
           'Incompatible provider',
           CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
-          { details: `Unsupported provider for ${params.providerPreference}` },
+          { details: 'Attempting to connect with an incompatible provider' },
         );
       }
       // this makes the request to the wallet to connect i.e request eth accounts ('eth_requestAccounts')

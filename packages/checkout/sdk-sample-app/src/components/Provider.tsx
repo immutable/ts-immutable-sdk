@@ -10,8 +10,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
 import { Environment } from '@imtbl/config';
 import { Box } from '@biom3/react';
-import Web3 from 'web3';
-import HttpProvider from 'web3';
 
 interface ProviderProps {
   checkout: Checkout;
@@ -24,11 +22,9 @@ export default function Provider(props: ProviderProps) {
 
   const [result1, setResult1] = useState<Web3Provider>();
   const [result2, setResult2] = useState<Providers>();
-  const [result3, setResult3] = useState<Providers>();
 
   const [error1, setError1] = useState<any>(null);
   const [error2, setError2] = useState<any>(null);
-  const [error3, setError3] = useState<any>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -52,15 +48,20 @@ export default function Provider(props: ProviderProps) {
     }
   }
 
-  async function setEIPProviderClick() {
+  async function setWeb3ProviderClick() {
     setError2(null);
     setLoading(true);
-    try {
-      const eipProvider = new Web3.providers.HttpProvider('https://eth.llamarpc.com')
 
+    if (!provider) {
+      setError2(new Error('No Provider'));
+      setLoading(false);
+      return;
+    }
+
+    try {
       const resp = await checkout.setProvider({
         name: 'metamask',
-        provider: eipProvider,
+        web3Provider: provider,
       });
       // setProvider(resp.web3Provider);
       console.log(resp);
@@ -76,36 +77,12 @@ export default function Provider(props: ProviderProps) {
     }
   }
 
-  async function setWeb3ProviderClick() {
-    setError3(null);
-    setLoading(true);
-    try {
-      const resp = await checkout.setProvider({
-        name: 'metamask',
-        web3Provider: provider,
-      });
-      // setProvider(resp.web3Provider);
-      console.log(resp);
-      setResult3(resp.providers);
-      setLoading(false);
-    } catch (err: any) {
-      setError3(err);
-      setLoading(false);
-      console.log(err.message);
-      console.log(err.type);
-      console.log(err.data);
-      console.log(err.stack);
-    }
-  }
-
   useEffect(() => {
     // reset state wehn checkout changes from environment switch
     setResult1(undefined);
     setResult2(undefined);
-    setResult3(undefined);
     setError1(null);
     setError2(null);
-    setError3(null);
     setLoading(false);
   }, [checkout]);
 
@@ -133,8 +110,8 @@ export default function Provider(props: ProviderProps) {
           marginTop: 'base.spacing.x4',
         }}
       >
-        <LoadingButton onClick={setEIPProviderClick} loading={loading}>
-          Set provider using EIP-1193 Provider
+        <LoadingButton onClick={setWeb3ProviderClick} loading={loading}>
+          Set All Providers using Web3Provider
         </LoadingButton>
         {result2 && !error2 && (
           <SuccessMessage>
@@ -142,25 +119,6 @@ export default function Provider(props: ProviderProps) {
           </SuccessMessage>
         )}
         {error2 && (
-          <ErrorMessage>
-            {error2.message}. Check console logs for more details.
-          </ErrorMessage>
-        )}
-      </Box>
-      <Box
-        sx={{
-          marginTop: 'base.spacing.x4',
-        }}
-      >
-        <LoadingButton onClick={setWeb3ProviderClick} loading={loading}>
-          Set Provider using Web3Provider
-        </LoadingButton>
-        {result3 && !error3 && (
-          <SuccessMessage>
-            <Box>Providers Set for Available Networks.</Box>
-          </SuccessMessage>
-        )}
-        {error3 && (
           <ErrorMessage>
             {error2.message}. Check console logs for more details.
           </ErrorMessage>

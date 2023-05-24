@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { ChainId } from './network';
+import { ChainId, NetworkInfo } from './network';
 
 export enum DefaultProviders {
   METAMASK = 'metamask',
@@ -9,17 +9,14 @@ export interface CreateProviderParams {
   providerName: DefaultProviders;
 }
 
-export interface CreateProviderResult {
-  name: DefaultProviders;
-  web3Provider: Web3Provider;
-}
+export type CreateProviderResult = GenericProvider;
 
 export type SetProviderParams = GenericProvider;
 
 export interface SetProviderResult {
   providers: Providers;
   currentProvider: string;
-  currentChainId: ChainId;
+  currentNetwork: NetworkInfo;
 }
 
 export interface Providers {
@@ -27,10 +24,16 @@ export interface Providers {
 }
 
 export type ProviderForChain = {
-  [key in ChainId]?: Web3Provider;
+  [key in ChainId | number]: Web3Provider;
 };
 
 export interface GenericProvider {
-  name: string;
-  web3Provider: Web3Provider | undefined;
+  name: string | DefaultProviders;
+  web3Provider: Web3Provider;
+}
+
+export interface ProviderInfo {
+  currentProvider?: string | DefaultProviders;
+  currentNetwork?: NetworkInfo;
+  providers?: Providers;
 }

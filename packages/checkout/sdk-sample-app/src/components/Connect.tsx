@@ -21,9 +21,7 @@ export default function Connect(props: ConnectProps) {
     setError(null);
     setLoading(true);
     try {
-      const resp = await checkout.connect({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
+      const resp = await checkout.connect();
       setProvider(resp.provider);
       setResult(resp.provider);
       setLoading(false);

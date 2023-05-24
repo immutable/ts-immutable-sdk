@@ -7,11 +7,9 @@ import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
 import {
-  ChainId,
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
-  ConnectionProviders,
   ConnectParams,
   ConnectResult,
   CreateProviderParams,
@@ -28,7 +26,7 @@ import {
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   NetworkInfo,
-  Providers,
+  ProviderInfo,
   SANDBOX_CONFIGURATION,
   SendTransactionParams,
   SendTransactionResult,
@@ -37,22 +35,16 @@ import {
   SwitchNetworkParams,
   SwitchNetworkResult,
 } from './types';
-import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
 
-  private providerPreference: ConnectionProviders | undefined;
-
-  private providers: Providers = {};
-
-  private currentProvider: string | undefined;
-
-  private currentChainId: ChainId | undefined;
+  private providerInfo: ProviderInfo;
 
   constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
+    this.providerInfo = {};
   }
 
   public async createDefaultProvider(
@@ -70,24 +62,24 @@ export class Checkout {
 
   public async getProviders() {
     return {
-      providers: this.providers,
+      providers: this.providerInfo.providers,
     };
   }
 
   public async setProvider(
     params: SetProviderParams,
   ): Promise<SetProviderResult> {
-    const { providers, currentChainId } = await provider.setProvider(
+    const { providers, networkInfo } = await provider.cloneProviders(
       this.config,
       params,
     );
-    this.currentProvider = params.name;
-    this.currentChainId = currentChainId as ChainId;
-    this.providers = providers;
+    this.providerInfo.currentProvider = params.name;
+    this.providerInfo.currentNetwork = networkInfo;
+    this.providerInfo.providers = providers;
     return {
-      providers: this.providers,
-      currentProvider: this.currentProvider,
-      currentChainId: this.currentChainId,
+      providers: this.providerInfo.providers,
+      currentProvider: this.providerInfo.currentProvider,
+      currentNetwork: this.providerInfo.currentNetwork,
     };
   }
 
@@ -111,9 +103,12 @@ export class Checkout {
    * @returns Wallet provider and current network information.
    * @throws {@link ErrorType}
    */
-  public async connect(params: ConnectParams): Promise<ConnectResult> {
-    this.providerPreference = params.providerPreference;
-    const web3Provider = await connect.connectWalletProvider(params);
+  public async connect(params: ConnectParams = {}): Promise<ConnectResult> {
+    const web3Provider = await provider.getWeb3Provider(
+      params,
+      this.providerInfo,
+    );
+    await connect.connectWalletProvider({ web3Provider });
     const networkInfo = await network.getNetworkInfo(this.config, web3Provider);
 
     return {
@@ -131,17 +126,21 @@ export class Checkout {
   public async switchNetwork(
     params: SwitchNetworkParams,
   ): Promise<SwitchNetworkResult> {
-    if (!this.providerPreference) {
-      throw new CheckoutError(
-        'connect should be called before switchNetwork to set the provider preference',
-        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR,
-      );
-    }
+    // if (!this.providerPreference) {
+    //   throw new CheckoutError(
+    //     'connect should be called before switchNetwork to set the provider preference',
+    //     CheckoutErrorType.PROVIDER_PREFERENCE_ERROR
+    //   );
+    // }
+
+    const web3Provider = await provider.getWeb3Provider(
+      params,
+      this.providerInfo,
+    );
 
     return await network.switchWalletNetwork(
       this.config,
-      this.providerPreference,
-      params.provider,
+      web3Provider,
       params.chainId,
     );
   }

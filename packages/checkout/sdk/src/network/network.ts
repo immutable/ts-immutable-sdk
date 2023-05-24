@@ -9,7 +9,6 @@ import {
   NetworkInfo,
   SwitchNetworkResult,
   WalletAction,
-  ConnectionProviders,
   NetworkMap,
 } from '../types';
 import { connectWalletProvider } from '../connect/connect';
@@ -21,7 +20,11 @@ const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 // these functions should not be exported. These functions should be used as part of an exported function e.g switchWalletNetwork() above.
 // make sure to check if(provider.provider?.request) in the exported function and throw an error
 // eslint-disable-next-line consistent-return
-async function switchNetworkInWallet(networkMap: NetworkMap, provider: Web3Provider, chainId: ChainId) {
+async function switchNetworkInWallet(
+  networkMap: NetworkMap,
+  provider: Web3Provider,
+  chainId: ChainId,
+) {
   if (provider.provider?.request) {
     return await provider.provider.request({
       method: WalletAction.SWITCH_NETWORK,
@@ -36,7 +39,11 @@ async function switchNetworkInWallet(networkMap: NetworkMap, provider: Web3Provi
 
 // TODO: Should these functions always return something?
 // eslint-disable-next-line consistent-return
-async function addNetworkToWallet(networkMap: NetworkMap, provider: Web3Provider, chainId: ChainId) {
+async function addNetworkToWallet(
+  networkMap: NetworkMap,
+  provider: Web3Provider,
+  chainId: ChainId,
+) {
   if (provider.provider?.request) {
     const networkDetails = networkMap.get(chainId);
     const addNetwork = {
@@ -62,6 +69,8 @@ export async function getNetworkInfo(
     async () => {
       const network = await provider.getNetwork();
 
+      // console.log('network', network);
+
       if (!Array.from(networkMap.keys()).includes(network.chainId as ChainId)) {
         // return empty details
         return {
@@ -86,11 +95,13 @@ export async function getNetworkInfo(
 
 export async function switchWalletNetwork(
   config: CheckoutConfiguration,
-  providerPreference: ConnectionProviders,
-  provider: Web3Provider,
+  web3Provider: Web3Provider,
   chainId: ChainId,
 ): Promise<SwitchNetworkResult> {
-  let currentProvider = provider;
+  // @WT-1345 - refactor this to return the new network and network info from the providers array
+  // then update the Checkout.providerInfo object with the new current info
+
+  const currentProvider = web3Provider;
   const { networkMap } = config;
 
   if (!Object.values(ChainId).includes(chainId)) {
@@ -115,7 +126,7 @@ export async function switchWalletNetwork(
     if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE) {
       try {
         await addNetworkToWallet(networkMap, currentProvider, chainId);
-      // eslint-disable-next-line @typescript-eslint/no-shadow
+        // eslint-disable-next-line @typescript-eslint/no-shadow
       } catch (err: any) {
         throw new CheckoutError(
           'User cancelled add network request',
@@ -129,7 +140,8 @@ export async function switchWalletNetwork(
       );
     }
   }
-  currentProvider = await connectWalletProvider({ providerPreference });
+
+  await connectWalletProvider({ web3Provider });
 
   if ((await currentProvider.getNetwork()).chainId !== chainId) {
     // user didn't actually switch
@@ -154,10 +166,7 @@ export async function switchWalletNetwork(
 
 export async function getNetworkAllowList(
   config: CheckoutConfiguration,
-  {
-    type = NetworkFilterTypes.ALL,
-    exclude,
-  }: GetNetworkAllowListParams,
+  { type = NetworkFilterTypes.ALL, exclude }: GetNetworkAllowListParams,
 ): Promise<GetNetworkAllowListResult> {
   const { networkMap } = config;
 
