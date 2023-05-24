@@ -1,6 +1,5 @@
 import { Box, Button } from '@biom3/react';
 import { useContext } from 'react';
-import { TransactionResponse } from '@imtbl/dex-sdk';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { sendSwapSuccessEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
@@ -19,10 +18,9 @@ import {
 export interface SwapButtonProps {
   loading: boolean
   validator: () => boolean
-  quote: TransactionResponse | null
 }
 
-export function SwapButton({ loading, validator, quote }: SwapButtonProps) {
+export function SwapButton({ loading, validator }: SwapButtonProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { swapState } = useContext(SwapContext);
   const { checkout, provider } = swapState;
@@ -30,7 +28,7 @@ export function SwapButton({ loading, validator, quote }: SwapButtonProps) {
 
   const sendTransaction = async () => {
     if (!validator()) return;
-    if (!checkout || !provider || !quote) return;
+    if (!checkout || !provider) return;
     try {
       // await checkout.sendTransaction({
       //   provider,
