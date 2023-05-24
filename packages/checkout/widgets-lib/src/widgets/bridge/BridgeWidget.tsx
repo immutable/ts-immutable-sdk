@@ -26,10 +26,11 @@ import {
   BridgeActions, BridgeContext, bridgeReducer, initialBridgeState,
 } from './context/BridgeContext';
 import { LoadingView } from '../../components/Loading/LoadingView';
-import { SuccessView } from '../../components/Success/SuccessView';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { Bridge } from './views/Bridge';
+import { StatusType } from '../../components/Status/StatusType';
+import { StatusView } from '../../components/Status/StatusView';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -252,11 +253,13 @@ export function BridgeWidget(props: BridgeWidgetProps) {
           />
           )}
           {viewReducerValues.viewState.view.type === BridgeWidgetViews.SUCCESS && (
-          <SuccessView
-            successText={`Success, transaction hash: ${transactionResponse?.hash}`}
-            actionText="Continue"
-            onActionClick={sendBridgeWidgetCloseEvent}
-          />
+            <StatusView
+              statusText={`Success, transaction hash: ${transactionResponse?.hash}`}
+              actionText="Continue"
+              onActionClick={sendBridgeWidgetCloseEvent}
+              statusType={StatusType.SUCCESS}
+              testId="success-view"
+            />
           )}
         </BridgeContext.Provider>
       </ViewContext.Provider>
