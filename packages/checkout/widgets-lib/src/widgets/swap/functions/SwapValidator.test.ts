@@ -1,19 +1,19 @@
 import { GetBalanceResult } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import {
-  ValidateFromAmount, ValidateFromToken, ValidateToToken, ValidateToAmount,
+  ValidateFromAmount, ValidateFromToken, ValidateToToken, ValidateToAmount, ValidateTokens,
 } from './SwapValidator';
 
 describe('SwapValidator', () => {
   describe('ValidateFromToken', () => {
-    it('should return error message if swapFromToken is null', () => {
-      const swapFromToken = null;
-      const result = ValidateFromToken(swapFromToken);
+    it('should return error message if fromToken is null', () => {
+      const fromToken = null;
+      const result = ValidateFromToken(fromToken);
       expect(result).toEqual('Select a coin to swap');
     });
 
-    it('should return empty string if swapFromToken is not null', () => {
-      const swapFromToken: GetBalanceResult = {
+    it('should return empty string if fromToken is not null', () => {
+      const fromToken: GetBalanceResult = {
         balance: BigNumber.from(1),
         formattedBalance: '1',
         token: {
@@ -22,7 +22,7 @@ describe('SwapValidator', () => {
           decimals: 18,
         },
       };
-      const result = ValidateFromToken(swapFromToken);
+      const result = ValidateFromToken(fromToken);
       expect(result).toEqual('');
     });
   });
@@ -75,19 +75,19 @@ describe('SwapValidator', () => {
   });
 
   describe('ValidateToToken', () => {
-    it('should return error message if swapToToken is null', () => {
-      const swapToToken = null;
-      const result = ValidateToToken(swapToToken);
+    it('should return error message if toToken is null', () => {
+      const toToken = null;
+      const result = ValidateToToken(toToken);
       expect(result).toEqual('Select a coin to receive');
     });
 
-    it('should return empty string if swapToToken is not null', () => {
-      const swapToToken = {
+    it('should return empty string if toToken is not null', () => {
+      const toToken = {
         name: 'Ethereum',
         symbol: 'ETH',
         decimals: 18,
       };
-      const result = ValidateToToken(swapToToken);
+      const result = ValidateToToken(toToken);
       expect(result).toEqual('');
     });
   });
@@ -114,6 +114,46 @@ describe('SwapValidator', () => {
     it('should return empty string if amount is not empty', () => {
       const amount = '1';
       const result = ValidateToAmount(amount);
+      expect(result).toEqual('');
+    });
+  });
+
+  describe('ValidateTokens', () => {
+    it('should return error message if fromToken and toToken are the same', () => {
+      const fromToken = {
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+        token: {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
+        },
+      };
+      const toToken = {
+        name: 'Ethereum',
+        symbol: 'ETH',
+        decimals: 18,
+      };
+      const result = ValidateTokens(fromToken, toToken);
+      expect(result).toEqual('From and to tokens must be different');
+    });
+
+    it('should return empty string if fromToken and toToken are not the same', () => {
+      const fromToken = {
+        balance: BigNumber.from(1),
+        formattedBalance: '1',
+        token: {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18,
+        },
+      };
+      const toToken = {
+        name: 'IMX',
+        symbol: 'IMX',
+        decimals: 18,
+      };
+      const result = ValidateTokens(fromToken, toToken);
       expect(result).toEqual('');
     });
   });

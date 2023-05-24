@@ -18,7 +18,7 @@ import { SelectInput } from '../../../components/FormComponents/SelectInput/Sele
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SelectOption } from '../../../components/FormComponents/SelectForm/SelectForm';
 import {
-  ValidateFromAmount, ValidateFromToken, ValidateToAmount, ValidateToToken,
+  ValidateFromAmount, ValidateFromToken, ValidateToAmount, ValidateToToken, ValidateTokens,
 } from '../functions/SwapValidator';
 import { Fees } from './Fees';
 import { SwapButton } from './SwapButton';
@@ -423,17 +423,23 @@ export function SwapForm() {
     const validateFromAmountError = ValidateFromAmount(fromAmount, fromToken?.formattedBalance);
     const validateToTokenError = ValidateToToken(toToken);
     const validateToAmountError = ValidateToAmount(toAmount);
+    const validateTokensError = ValidateTokens(fromToken, toToken);
 
     if (validateFromTokenError) setFromTokenError(validateFromTokenError);
     if (validateFromAmountError) setFromAmountError(validateFromAmountError);
     if (validateToTokenError) setToTokenError(validateToTokenError);
     if (validateToAmountError) setToAmountError(validateToAmountError);
+    if (validateTokensError) {
+      setFromTokenError(validateTokensError);
+      setToTokenError(validateTokensError);
+    }
 
     if (
       validateFromTokenError
       || validateFromAmountError
       || validateToTokenError
-      || validateToAmountError) return false;
+      || validateToAmountError
+      || validateTokensError) return false;
     return true;
   };
 
