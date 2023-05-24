@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 /* eslint-disable no-console */
 import { Service } from 'typedi';
 
@@ -112,7 +113,6 @@ export class Crafting {
    * @param input
    * @returns
    */
-  // eslint-disable-next-line class-methods-use-this
   @withSDKError({ type: 'CRAFTING_ERROR' })
   public async validate() {
     // TODO: submit craft to BE for validation
@@ -120,7 +120,10 @@ export class Crafting {
   }
 
   @withSDKError({ type: 'CRAFTING_ERROR' })
-  public async getCraftsByGameId(gameId: string): Promise<Array<DomainCraft>> {
+  public async getTransactions(
+    gameId: string,
+    userId: string,
+  ): Promise<Array<DomainCraft>> {
     try {
       const { status, data } = await this.studioBE.craftingApi.craftsGet();
 
@@ -128,7 +131,10 @@ export class Crafting {
         throw new Error('error fetching crafts');
       }
 
-      return data.filter((craft) => craft.game_id === gameId);
+      // TODO: Sort by latest
+      return data.filter(
+        (craft) => craft.game_id === gameId && craft.user_id === userId,
+      );
     } catch (error) {
       throw new Error('error fetching crafts', { cause: { error } });
     }

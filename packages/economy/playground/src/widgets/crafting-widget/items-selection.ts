@@ -1,27 +1,59 @@
-import { InventoryItem } from '@imtbl/economy/dist/__codegen__/inventory';
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-type Item = Required<Omit<InventoryItem, 'metadata'> & {
-  metadata?: { [k: string]: unknown };
-}>;
+import type { InventoryItem } from '@imtbl/economy/dist/__codegen__/inventory';
+import type { DomainRecipe } from '@imtbl/economy/dist/__codegen__/recipe';
+
+type Item = Required<
+  Omit<InventoryItem, 'metadata'> & {
+    metadata?: { [k: string]: unknown };
+  }
+>;
 @customElement('items-selection')
 export class ItemsSelection extends LitElement {
-  @property({ type: Array, attribute: 'items' })
+  @property()
   items: Array<Item> = [];
+
+  @property()
+  recipe: DomainRecipe = {} as DomainRecipe;
+
+  @state()
+  used: string[] = [];
 
   @state()
   groupedItems: Array<unknown> = [];
+
+  handleClick(item: Item) {
+    return (event: Event) => {
+      event.preventDefault();
+      this.emitEvent('crafting-widget-event', {
+        type: 'item-selected',
+        data: item,
+      });
+    };
+  }
+
+  emitEvent<T>(type: string, detail: T) {
+    const event = new CustomEvent('crafting-widget-event', {
+      detail: { type, ...detail },
+      bubbles: true,
+      cancelable: true,
+    });
+    document.dispatchEvent(event);
+  }
 
   renderItem(item: Item) {
     return html`
       <div class="indicator w-full m-1 bg-gray-300">
         <div class="indicator-item indicator-bottom">
-          <button class="btn btn-error btn-xs">remove</button>
+          <button
+            class="btn btn-error btn-xs"
+            @click="${this.handleClick(item)}"
+          >
+            remove
+          </button>
         </div>
-        <div
-          class="flex flex-row justify-between items-center"
-        >
+        <div class="flex flex-row justify-between items-center">
           <picture>
             <img
               class="m-0 w-12"
@@ -39,7 +71,9 @@ export class ItemsSelection extends LitElement {
   render() {
     const items = Object.entries(
       this.items.reduce((acc, item) => {
-        acc[item?.item_definition_id] = acc[item?.item_definition_id]?.concat(item) || [item];
+        acc[item?.item_definition_id] = acc[item?.item_definition_id]?.concat(
+          item
+        ) || [item];
         return acc;
       }, {} as Record<string, Item[]>)
     );
@@ -65,7 +99,6 @@ export class ItemsSelection extends LitElement {
       </div>
     `;
   }
-
   protected createRenderRoot(): Element | ShadowRoot {
     return this;
   }

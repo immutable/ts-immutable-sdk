@@ -5,13 +5,21 @@ import { customElement, property } from 'lit/decorators.js';
 
 import type { InventoryItem } from '@imtbl/economy/dist/__codegen__/inventory';
 
+const itemVx = {
+  $all: 'indicator h-full outline-offset-1 hover:outline hover:cursor-pointer flex flex-col',
+  selected: {
+    true: 'border border-4 border-accent hover:border-none',
+  },
+};
+
 const badgeVx = {
   $all: 'indicator-item badge',
   status: {
     locked: 'badge-error',
     created: 'badge-success',
   },
-  isNew: {
+
+  new: {
     false: {
       status: {
         created: 'hidden',
@@ -36,6 +44,9 @@ export class Item extends LitElement {
       metadata?: { name: string; image: string; [k: string]: unknown };
     }
   >;
+
+  @property({ type: Boolean, attribute: 'selected' })
+  selected = false;
 
   handleClick(event: Event) {
     event.preventDefault();
@@ -63,19 +74,15 @@ export class Item extends LitElement {
   render() {
     const props = {
       ...this.item,
-      isNew: moment(this.item.created_at).isAfter(
-        moment().subtract(1, 'minute')
-      ),
+      selected: this.selected,
+      new: moment(this.item.created_at).isAfter(moment().subtract(1, 'minute')),
     };
 
     return html`
-      <div
-        class="indicator h-full outline-offset-1 hover:outline hover:cursor-pointer flex flex-col"
-        @click="${this.handleClick}"
-      >
+      <div class="${vx(itemVx, props)}" @click="${this.handleClick}">
         <span class="${vx(badgeVx, props)}"> ${this.item.status}</span>
         <div
-          class="grid w-32 h-full bg-base-300 place-items-center overflow-hidden"
+          class="grid w-32 h-full bg-base-300 place-items-center overflow-hidden text-center"
         >
           <img
             class="w-16"

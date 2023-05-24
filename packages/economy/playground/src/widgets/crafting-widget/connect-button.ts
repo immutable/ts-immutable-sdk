@@ -127,10 +127,6 @@ export class ConnectButton extends LitElement {
   }
 
   update(changedProperties: Map<string, unknown>) {
-    console.log(
-      '🚀 ~ file: connect-button.ts:119 ~ ConnectButton ~ update ~ changedProperties:',
-      Array.from(changedProperties.keys())
-    );
     if (changedProperties.has('provider')) {
       this.setUserInfoOnProvider();
     }
