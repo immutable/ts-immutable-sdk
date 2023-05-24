@@ -5,13 +5,13 @@ import type { BaseHttpRequest } from './core/BaseHttpRequest';
 import type { OpenAPIConfig } from './core/OpenAPI';
 import { NodeHttpRequest } from './core/NodeHttpRequest';
 
-import { OrderBookService } from './services/OrderBookService';
+import { OrdersService } from './services/OrdersService';
 
 type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
 
 export class OrderBookClient {
 
-  public readonly orderBook: OrderBookService;
+  public readonly orders: OrdersService;
 
   public readonly request: BaseHttpRequest;
 
@@ -28,7 +28,7 @@ export class OrderBookClient {
       ENCODE_PATH: config?.ENCODE_PATH,
     });
 
-    this.orderBook = new OrderBookService(this.request);
+    this.orders = new OrdersService(this.request);
   }
 }
 

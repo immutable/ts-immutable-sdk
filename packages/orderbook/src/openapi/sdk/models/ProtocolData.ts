@@ -2,22 +2,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type ProtocolData = {
+import type { CreateOrderProtocolData } from './CreateOrderProtocolData';
+
+export type ProtocolData = (CreateOrderProtocolData & {
   /**
-   * The Order type
+   * Operator signature signed by orderbook
    */
-  order_type: ProtocolData.order_type;
-};
-
-export namespace ProtocolData {
-
-  /**
-   * The Order type
-   */
-  export enum order_type {
-    FULL_OPEN = 'FULL_OPEN',
-  }
-
-
-}
+  operator_signature: string;
+});
 

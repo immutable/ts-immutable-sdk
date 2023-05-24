@@ -3,16 +3,10 @@
 /* eslint-disable */
 
 import type { Order } from './Order';
+import type { Page } from './Page';
 
 export type Orders = {
-  /**
-   * Cursor to retrieve next page
-   */
-  next?: string;
-  /**
-   * Cursor to retrieve previous page
-   */
-  previous?: string;
+  page?: Page;
   result: Array<Order>;
 };
 

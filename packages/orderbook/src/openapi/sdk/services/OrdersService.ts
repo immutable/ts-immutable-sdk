@@ -8,19 +8,19 @@ import type { Orders } from '../models/Orders';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-export class OrderBookService {
+export class OrdersService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
   /**
-   * listorder order_book
-   * Retrieve a list of orders from a given chain
+   * List all orders
+   * List all orders
    * @returns Orders OK response.
    * @throws ApiError
    */
-  public orderBookListOrder({
+  public listOrders({
     chainId,
-    pageSize = '100',
+    pageSize = 100,
     sortBy,
     sortDirection,
     pageCursor,
@@ -30,19 +30,19 @@ export class OrderBookService {
      */
     chainId: string,
     /**
-     * Number of orders to return per page
+     * Maximum number of orders to return per page
      */
-    pageSize?: string,
+    pageSize?: number,
     /**
      * Order field to sort by
      */
-    sortBy?: string,
+    sortBy?: 'status' | 'sell_item_contract_address' | 'sell_item_token_id',
     /**
      * Ascending or descending direction for sort
      */
     sortDirection?: 'asc' | 'desc',
     /**
-     * Cursor for specific page
+     * Page cursor to retrieve previous or next page. Use the value returned in the response.
      */
     pageCursor?: string,
   }): CancelablePromise<Orders> {
@@ -66,12 +66,12 @@ export class OrderBookService {
   }
 
   /**
-   * create_order order_book
-   * Create a listing on a specific chain
+   * Create an order
+   * Create an order
    * @returns Order Created response.
    * @throws ApiError
    */
-  public orderBookCreateOrder({
+  public createOrder({
     chainId,
     requestBody,
   }: {
@@ -98,12 +98,12 @@ export class OrderBookService {
   }
 
   /**
-   * getorder order_book
-   * Retrieve a single order from a given chain
+   * Get a single order by ID
+   * Get a single order by ID
    * @returns Order OK response.
    * @throws ApiError
    */
-  public orderBookGetOrder({
+  public getOrder({
     chainId,
     orderId,
   }: {
