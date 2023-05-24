@@ -163,7 +163,7 @@ describe('SwapForm', () => {
   });
 
   describe('swap form behaviour', () => {
-    it('should validate all inputs when Swap Button is clicked', () => {
+    it.only('should validate all inputs when Swap Button is clicked', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
@@ -481,8 +481,7 @@ describe('SwapForm', () => {
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
       cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
-      // todo: updating from token currently broken
-      // cySmartGet('@fromAmountInStub').should('have.been.called');
+      cySmartGet('@fromAmountInStub').should('have.been.called');
     });
 
     it('should not fetch a quote when from amount is 0', () => {
