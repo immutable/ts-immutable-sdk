@@ -54,7 +54,7 @@ export function StatusView({
           <Button
             sx={{ width: '100%' }}
             testId="status-action-button"
-            variant="primary"
+            variant="secondary"
             size="large"
             onClick={onStatusActionClick}
           >
