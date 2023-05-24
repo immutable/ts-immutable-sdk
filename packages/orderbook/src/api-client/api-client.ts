@@ -41,7 +41,7 @@ export class ImmutableApiClient {
         account_address: offerer,
         buy: [
           {
-            item_type: orderComponents.consideration[0].itemType === ItemType.NATIVE
+            item_type: Number(orderComponents.consideration[0].itemType) === ItemType.NATIVE
               ? BuyItem.item_type.IMX
               : BuyItem.item_type.ERC20,
             start_amount: orderComponents.consideration[0].startAmount,

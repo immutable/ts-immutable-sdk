@@ -1,9 +1,10 @@
 import { Order } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 
-export async function waitForOrderToBeActive(
+export async function waitForOrderToBeOfStatus(
   sdk: Orderbook,
   orderId: string,
+  status: Order.status,
   attemps = 0,
 ): Promise<Order> {
   if (attemps > 20) {
@@ -11,11 +12,11 @@ export async function waitForOrderToBeActive(
   }
 
   const order = await sdk.getOrder(orderId);
-  if (order.status === 'ACTIVE') {
+  if (order.status === status) {
     return order;
   }
 
   // eslint-disable-next-line
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  return waitForOrderToBeActive(sdk, orderId, attemps + 1);
+  return waitForOrderToBeOfStatus(sdk, orderId, status, attemps + 1);
 }

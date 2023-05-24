@@ -8,8 +8,8 @@ import { deployTestToken } from './helpers/erc721';
 import { signAndSubmitTx, signMessage } from './helpers/sign-and-submit';
 import { waitForOrderToBeOfStatus } from './helpers/order';
 
-describe('prepareListing and createOrder e2e', () => {
-  it('should create the order', async () => {
+describe('cancel order', () => {
+  it('should cancel the order', async () => {
     const config = getConfig();
     const provider = getLocalhostProvider();
     const offerer = getOffererWallet(provider);
@@ -59,5 +59,10 @@ describe('prepareListing and createOrder e2e', () => {
     });
 
     await waitForOrderToBeOfStatus(sdk, order.id, Order.status.ACTIVE);
+
+    const { unsignedCancelOrderTransaction } = await sdk.cancelOrder(order.id, offerer.address);
+    await signAndSubmitTx(unsignedCancelOrderTransaction, offerer, provider);
+
+    await waitForOrderToBeOfStatus(sdk, order.id, Order.status.CANCELLED);
   }, 30_000);
 });
