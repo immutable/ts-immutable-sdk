@@ -1,6 +1,6 @@
-# Orderbook
+# Order Book
 
-The SDK for the zkEVM orderbook
+The SDK for the zkEVM Order Book
 
 ## OpenAPI SDK
 
