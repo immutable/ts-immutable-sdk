@@ -91,6 +91,8 @@ export const text = {
         insufficientBalance: 'Insufficient balance',
         noFromTokenSelected: 'Select a coin to swap',
         noToTokenSelected: 'Select a coin to receive',
+        // todo: get the correct copy for same token selected error
+        sameTokenSelected: 'From and to tokens must be different',
       },
     },
     [BridgeWidgetViews.BRIDGE]: {
