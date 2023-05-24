@@ -3,8 +3,8 @@
 /* eslint-disable */
 
 import type { BuyItem } from './BuyItem';
+import type { CreateOrderProtocolData } from './CreateOrderProtocolData';
 import type { Fee } from './Fee';
-import type { ProtocolData } from './ProtocolData';
 import type { SellItem } from './SellItem';
 
 export type CreateOrderRequestBody = {
@@ -16,7 +16,7 @@ export type CreateOrderRequestBody = {
    * Time after which the Order is considered expired
    */
   end_time: string;
-  protocol_data: ProtocolData;
+  protocol_data: CreateOrderProtocolData;
   /**
    * A random value added to the create Order request
    */
