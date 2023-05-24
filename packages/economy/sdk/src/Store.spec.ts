@@ -51,14 +51,14 @@ describe('Store', () => {
 
   it('should perform a nested partial update on the data object', () => {
     store.set((data) => {
-      data.user = { name: 'alice', age: 10 };
-      data.items?.concat([1, 2, 3]);
+      data.user = { name: 'alice', age: 20 };
+      data.items?.push(...[1, 2, 3]);
     });
 
     expect(store.get()).toEqual({
       id: '1',
-      user: { name: 'alice', age: 10 },
       items: [1, 2, 3],
+      user: { name: 'alice', age: 20 },
     });
   });
 
