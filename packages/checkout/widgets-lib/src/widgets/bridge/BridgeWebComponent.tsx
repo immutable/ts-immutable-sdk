@@ -3,7 +3,7 @@ import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { Network } from '../../lib';
+import { ConnectTargetNetwork, Network } from '../../lib';
 import { ConnectLoader } from '../../components/ConnectLoader/ConnectLoader';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 
@@ -32,6 +32,10 @@ export class ImmutableBridge extends ImmutableWebComponent {
   }
 
   renderWidget() {
+    const bridgeConnectLoaderParams = {
+      targetNetwork: ConnectTargetNetwork.ETHEREUM,
+      providerPreference: this.providerPreference,
+    };
     const params: BridgeWidgetParams = {
       providerPreference: this.providerPreference,
       fromContractAddress: this.fromContract,
@@ -47,7 +51,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
       <React.StrictMode>
         {this.useConnectWidget ? (
           <ConnectLoader
-            params={params}
+            params={bridgeConnectLoaderParams}
             closeEvent={sendBridgeWidgetCloseEvent}
             widgetConfig={this.widgetConfig!}
           >

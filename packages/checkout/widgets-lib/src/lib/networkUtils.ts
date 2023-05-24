@@ -1,6 +1,11 @@
 import { ChainId } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
+export enum ConnectTargetNetwork {
+  ETHEREUM = 'ETHEREUM',
+  ZK_EVM = 'ZK_EVM',
+}
+
 /**
  * Returns the preferred L1 ChainId for the given environment.
  * @param {Environment} environment

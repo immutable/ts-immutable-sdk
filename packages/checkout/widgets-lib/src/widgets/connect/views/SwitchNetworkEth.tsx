@@ -7,17 +7,17 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectContext } from '../context/ConnectContext';
-import { zkEVMNetwork } from '../../../lib/networkUtils';
+import { L1Network } from '../../../lib/networkUtils';
 import {
   ViewContext,
   ViewActions,
 } from '../../../context/view-context/ViewContext';
 
-export function SwitchNetwork() {
+export function SwitchNetworkEth() {
   const { viewDispatch } = useContext(ViewContext);
   const { connectState } = useContext(ConnectContext);
   const { checkout, provider, sendCloseEvent } = connectState;
-  const { heading, body } = text.views.SWITCH_NETWORK;
+  const { heading, body } = text.views[ConnectWidgetViews.SWITCH_NETWORK].eth;
 
   const [buttonText, setButtonText] = useState('Ready to Switch');
 
@@ -27,7 +27,7 @@ export function SwitchNetwork() {
     try {
       await checkout.switchNetwork({
         provider,
-        chainId: zkEVMNetwork(checkout.config.environment),
+        chainId: L1Network(checkout.config.environment),
       });
 
       viewDispatch({
