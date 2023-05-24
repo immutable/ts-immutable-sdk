@@ -1,7 +1,8 @@
 import { Wallet } from 'ethers';
 
 // MEGA JANKY HACK
-// Path directly to imx-engine. imx-engine and ts-immutable-sdk must be at the same level
+// Path directly to imx-engine. imx-engine and ts-immutable-sdk must be at the same level.
+// Not CI friendly, but this suite (and associated compilation) is not run in CI
 // eslint-disable-next-line
 import { TestToken, TestToken__factory } from "../../../../../../imx-engine/services/order-book-mr/e2e/typechain-types";
 
