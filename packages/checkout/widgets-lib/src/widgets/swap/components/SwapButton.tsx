@@ -1,7 +1,7 @@
 import { Box, Button } from '@biom3/react';
 import { useContext } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { sendSwapSuccessEvent } from '../SwapWidgetEvents';
+import { sendSwapSuccessEvent } from '../helpers/events';
 import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import {

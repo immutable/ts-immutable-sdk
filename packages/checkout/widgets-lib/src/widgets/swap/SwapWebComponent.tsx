@@ -7,7 +7,7 @@ import {
   ConnectLoader,
   ConnectLoaderParams,
 } from '../../components/ConnectLoader/ConnectLoader';
-import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
+import { sendSwapWidgetCloseEvent } from './helpers/events';
 
 export class ImmutableSwap extends ImmutableWebComponent {
   providerPreference = ConnectionProviders.METAMASK;

@@ -2,7 +2,7 @@ import { Box } from '@biom3/react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
-import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
+import { sendSwapWidgetCloseEvent } from '../helpers/events';
 import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapForm } from '../components/SwapForm';

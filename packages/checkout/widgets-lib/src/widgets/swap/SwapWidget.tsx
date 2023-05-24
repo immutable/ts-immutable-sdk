@@ -31,7 +31,7 @@ import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
-import { getDexConfigOverrides } from './DexConfigOverrides';
+import { getDexConfigOverrides } from './configs/overrides';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;

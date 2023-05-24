@@ -6,8 +6,8 @@ import {
   optionStyle,
   selectedOptionStyle,
   selectStyle,
-} from '../SwapStyles';
-import { alphaSortTokensList } from '../helpers';
+} from './TokenSelectStyles';
+import { alphaSortTokensList } from '../helpers/tokens';
 
 export interface TokenSelectProps {
   allowedTokens: TokenInfo[];
