@@ -556,6 +556,7 @@ export function SwapForm() {
       <SwapButton
         validator={SwapFormValidator}
         loading={loading}
+        transaction={quote}
       />
     </>
   );

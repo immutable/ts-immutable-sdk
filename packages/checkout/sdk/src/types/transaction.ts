@@ -1,4 +1,8 @@
-import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
+import {
+  TransactionRequest,
+  TransactionResponse,
+  Web3Provider,
+} from '@ethersproject/providers';
 
 /**
  * Interface representing the parameters for {@link Checkout.sendTransaction}.
@@ -7,7 +11,7 @@ import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
  */
 export interface SendTransactionParams {
   provider: Web3Provider;
-  transaction: Transaction;
+  transaction: TransactionRequest;
 }
 
 /**
@@ -22,7 +26,7 @@ export interface SendTransactionResult {
  * Interface representing a blockchain transaction.
  * @property {string} nonce - The transaction nonce.
  * @property {string} gasPrice - The gas price of the transaction.
- * @property {string} gas - The gas limit for the transaction.
+ * @property {string} gasLimit - The gas limit for the transaction.
  * @property {string} to - The address of the recipient.
  * @property {string} from - The address of the sender.
  * @property {string} value - The value to transfer in wei.
@@ -30,12 +34,12 @@ export interface SendTransactionResult {
  * @property {number} chainId - The ID of the chain the transaction is for.
  */
 export interface Transaction {
-  nonce: string;
-  gasPrice: string;
-  gas: string;
-  to: string;
-  from: string;
-  value: string;
-  data: string;
-  chainId: number;
+  nonce?: string;
+  gasPrice?: string;
+  gasLimit?: string;
+  to?: string;
+  from?: string;
+  value?: string;
+  data?: string;
+  chainId?: number;
 }

@@ -30,9 +30,7 @@ import {
   SwitchNetworkResult,
 } from './types';
 import { CheckoutError, CheckoutErrorType } from './errors';
-import {
-  CheckoutConfiguration,
-} from './config';
+import { CheckoutConfiguration } from './config';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
