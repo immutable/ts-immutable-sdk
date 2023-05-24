@@ -493,7 +493,7 @@ export function SwapForm() {
               options={tokensOptionsFrom}
               selectSubtext={
             fromToken
-              ? `${content.availableBalancePrefix} ${fromToken?.formattedBalance}`
+              ? `${content.availableBalancePrefix} ${tokenValueFormat(fromToken?.formattedBalance)}`
               : ''
           }
               selectTextAlign="left"
