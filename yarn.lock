@@ -3041,7 +3041,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/guardian@workspace:packages/internal/guardian":
+"@imtbl/guardian@0.0.0, @imtbl/guardian@workspace:packages/internal/guardian":
   version: 0.0.0-use.local
   resolution: "@imtbl/guardian@workspace:packages/internal/guardian"
   dependencies:
@@ -3106,6 +3106,7 @@ __metadata:
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^1.1.1-alpha.1
+    "@imtbl/guardian": 0.0.0
     "@imtbl/provider": 0.0.0
     "@imtbl/toolkit": 0.0.0
     "@magic-ext/oidc": ^1.0.1
