@@ -187,7 +187,8 @@ describe('SwapForm', () => {
         .should('have.text', validation.noToTokenSelected);
 
       cySmartGet('toTokenInputs-text-form-text-control-error')
-        .should('not.exist');
+        .should('exist')
+        .should('have.text', validation.noAmountInputted);
     });
 
     it('should show insufficient balance error when swap from amount is larger than token balance', () => {
@@ -439,30 +440,29 @@ describe('SwapForm', () => {
           address: '',
         },
       ];
-      // todo: max is broken
-      // cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
+
+      cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
     });
 
-    // todo: this test is broken until the fetchQuoteTo is properly implemented
-    // it('should not fetch a quote when to token is not selected', () => {
-    //   mount(
-    //     <SwapWidgetTestComponent
-    //       initialStateOverride={testSwapState}
-    //     >
-    //       <SwapCoins />
-    //     </SwapWidgetTestComponent>,
-    //   );
+    it('should not fetch a quote when to token is not selected', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+        >
+          <SwapCoins />
+        </SwapWidgetTestComponent>,
+      );
 
-    //   cySmartGet('fromTokenInputs-select-form-select__target').click();
-    //   cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
-    //   cySmartGet('toTokenInputs-select-form-select__target').click();
-    //   cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
-    //   cySmartGet('@fromAmountInStub').should('not.have.been.called');
+      cySmartGet('fromTokenInputs-select-form-select__target').click();
+      cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
+      cySmartGet('toTokenInputs-select-form-select__target').click();
+      cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
+      cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
-    //   cySmartGet('toTokenInputs-select-form-select__target').click();
-    //   cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
-    //   // cySmartGet('@fromAmountInStub').should('have.been.called');
-    // });
+      cySmartGet('toTokenInputs-select-form-select__target').click();
+      cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
+      cySmartGet('@fromAmountInStub').should('have.been.called');
+    });
 
     it('should not fetch a quote when from token is not selected', () => {
       mount(

@@ -29,8 +29,8 @@ export function SwapButton({ loading, validator, quote }: SwapButtonProps) {
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
 
   const sendTransaction = async () => {
-    if (!checkout || !provider || !quote) return;
     if (!validator()) return;
+    if (!checkout || !provider || !quote) return;
     try {
       // await checkout.sendTransaction({
       //   provider,
