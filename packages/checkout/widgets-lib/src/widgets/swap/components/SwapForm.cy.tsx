@@ -6,13 +6,13 @@ import { Web3Provider } from '@ethersproject/providers';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Exchange } from '@imtbl/dex-sdk';
 import { cySmartGet } from '../../../lib/testUtils';
-import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapForm } from './SwapForm';
 import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapState, initialSwapState } from '../context/swap';
 import { SwapCoins } from '../views/SwapCoins';
 import { quotesProcessor } from '../services/dex';
+import { SwapWidgetTestComponent } from '../tests/SwapWidgetComponentTest';
 
 describe('SwapForm', () => {
   let testSwapState: SwapState;

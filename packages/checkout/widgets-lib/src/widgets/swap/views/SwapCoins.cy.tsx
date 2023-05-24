@@ -4,7 +4,7 @@ import {
 import { mount } from 'cypress/react18';
 import { BigNumber } from 'ethers';
 import { cySmartGet } from '../../../lib/testUtils';
-import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
+import { SwapWidgetTestComponent } from '../tests/SwapWidgetComponentTest';
 import { SwapCoins } from './SwapCoins';
 import { SwapState } from '../context/swap';
 
