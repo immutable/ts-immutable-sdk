@@ -22,7 +22,6 @@ export async function signMessage(
   value: Record<string, any>,
   signer: Wallet,
 ): Promise<string> {
-  // Need this? ethers.utils.splitSignature(signedMessage).compact
-// eslint-disable-next-line
+  // eslint-disable-next-line
   return signer._signTypedData(domainData, types, value);
 }
