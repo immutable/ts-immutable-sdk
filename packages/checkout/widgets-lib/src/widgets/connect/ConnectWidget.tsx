@@ -74,8 +74,6 @@ export function ConnectWidget(props: ConnectWidgetProps) {
     ? zkEVMNetwork(config.environment)
     : L1Network(config.environment);
 
-  console.log(`network to switch to: ${networkToSwitchTo}`);
-
   useEffect(() => {
     setTimeout(() => {
       connectDispatch({
