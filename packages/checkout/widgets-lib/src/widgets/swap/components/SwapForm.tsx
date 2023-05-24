@@ -419,6 +419,7 @@ export function SwapForm() {
 
   const { content, swapForm } = text.views[SwapWidgetViews.SWAP];
   const SwapFormValidator = (): boolean => {
+    console.log('validate');
     const validateFromTokenError = ValidateFromToken(fromToken);
     const validateFromAmountError = ValidateFromAmount(fromAmount, fromToken?.formattedBalance);
     const validateToTokenError = ValidateToToken(toToken);
@@ -428,6 +429,11 @@ export function SwapForm() {
     if (validateFromAmountError) setFromAmountError(validateFromAmountError);
     if (validateToTokenError) setToTokenError(validateToTokenError);
     if (validateToAmountError) setToAmountError(validateToAmountError);
+
+    console.log(validateFromTokenError
+      || validateFromAmountError
+      || validateToTokenError
+      || validateToAmountError);
 
     if (
       validateFromTokenError
