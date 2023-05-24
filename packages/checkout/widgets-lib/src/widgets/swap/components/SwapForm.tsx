@@ -9,7 +9,7 @@ import { GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { text } from '../../../resources/text/textConfig';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
-import { SwapContext } from '../context/SwapContext';
+import { SwapContext } from '../context/swapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
 import { DEFAULT_IMX_DECIMALS } from '../../../lib/constants';

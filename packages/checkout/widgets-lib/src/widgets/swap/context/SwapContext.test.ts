@@ -11,7 +11,7 @@ import {
   SetSupportedTopUpPayload,
   TopUpFeature,
   SetTokenBalancesPayload,
-} from './SwapContext';
+} from './swapContext';
 
 describe('WalletContext', () => {
   it('should update state with checkout when reducer called with SET_CHECKOUT action', () => {

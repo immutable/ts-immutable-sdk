@@ -9,7 +9,7 @@ import {
   ViewActions,
   BaseViews,
 } from '../../../context/view-context/ViewContext';
-import { SwapContext } from '../context/SwapContext';
+import { SwapContext } from '../context/swapContext';
 import {
   swapButtonBoxStyle,
   swapButtonIconLoadingStyle,
