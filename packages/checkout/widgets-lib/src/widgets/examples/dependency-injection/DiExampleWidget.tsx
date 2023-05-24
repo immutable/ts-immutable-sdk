@@ -1,5 +1,5 @@
 import {
-  BiomeThemeProvider, Body, Box, Button, Heading,
+  BiomeCombinedProviders, Body, Box, Button, Heading,
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
@@ -37,7 +37,7 @@ export function ExampleWidget(props: ExampleWidgetProps) {
   }
 
   return (
-    <BiomeThemeProvider theme={{ base: biomeTheme }}>
+    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <Box sx={diExampleWidgetStyle}>
         <Heading>Example Widget</Heading>
         <br />
@@ -48,6 +48,6 @@ export function ExampleWidget(props: ExampleWidgetProps) {
           {numLogs}
         </Body>
       </Box>
-    </BiomeThemeProvider>
+    </BiomeCombinedProviders>
   );
 }

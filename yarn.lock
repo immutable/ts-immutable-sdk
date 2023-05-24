@@ -1640,6 +1640,7 @@ __metadata:
   languageName: node
   linkType: hard
 
+
 "@chevrotain/types@npm:^9.1.0":
   version: 9.1.0
   resolution: "@chevrotain/types@npm:9.1.0"
