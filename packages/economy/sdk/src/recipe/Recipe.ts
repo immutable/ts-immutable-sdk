@@ -36,7 +36,7 @@ export class Recipe {
     return data;
   }
 
-  public static getRecipeInputsBy(
+  public static getInputsBy(
     recipe: DomainRecipe,
     predicateFn: (input?: DomainInput, index?: number, list?: DomainInput[]) => boolean,
   ) {

@@ -65,7 +65,7 @@ describe(Recipe.name, () => {
     });
   });
 
-  describe('getRecipeInputsBy', () => {
+  describe('getInputsBy', () => {
     it('should return recipe input and index when given a recipe and predicateFn condition', () => {
       const recipe = {
         id: 'a9e66897-08e1-482f-887a-1611f9d824bf',
@@ -116,7 +116,7 @@ describe(Recipe.name, () => {
         updated_at: '2023-04-11T23:35:33.411305Z',
       };
       const predicateFn = (input: any) => input.name === 'card_to_upgrade';
-      const response = Recipe.getRecipeInputsBy(recipe, predicateFn);
+      const response = Recipe.getInputsBy(recipe, predicateFn);
       expect(response).toEqual([[recipe.inputs[0], 0]]);
     });
   });
