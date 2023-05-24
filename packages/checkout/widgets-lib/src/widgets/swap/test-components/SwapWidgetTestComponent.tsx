@@ -2,7 +2,7 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import React, { useMemo, useReducer } from 'react';
 import {
   initialSwapState, SwapContext, swapReducer, SwapState,
-} from '../context/swapContext';
+} from '../context/swap';
 
 export interface TestProps {
   children: React.ReactNode;
