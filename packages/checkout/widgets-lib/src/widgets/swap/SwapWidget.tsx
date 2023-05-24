@@ -120,11 +120,10 @@ export function SwapWidget(props: SwapWidgetProps) {
       },
     });
 
-    // FIXME: stop hardcoding this, only doing because dev net is reset
     swapDispatch({
       payload: {
         type: SwapActions.SET_TOKEN_BALANCES,
-        tokenBalances: tokenBalances.balances,
+        tokenBalances: allowedTokenBalances,
       },
     });
 
