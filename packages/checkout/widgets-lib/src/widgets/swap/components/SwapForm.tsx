@@ -425,14 +425,14 @@ export function SwapForm() {
     const validateToAmountError = ValidateToAmount(toAmount);
     const validateTokensError = ValidateTokens(fromToken, toToken);
 
-    if (validateFromTokenError) setFromTokenError(validateFromTokenError);
-    if (validateFromAmountError) setFromAmountError(validateFromAmountError);
-    if (validateToTokenError) setToTokenError(validateToTokenError);
-    if (validateToAmountError) setToAmountError(validateToAmountError);
     if (validateTokensError) {
       setFromTokenError(validateTokensError);
       setToTokenError(validateTokensError);
     }
+    if (validateFromTokenError) setFromTokenError(validateFromTokenError);
+    if (validateFromAmountError) setFromAmountError(validateFromAmountError);
+    if (validateToTokenError) setToTokenError(validateToTokenError);
+    if (validateToAmountError) setToAmountError(validateToAmountError);
 
     if (
       validateFromTokenError
