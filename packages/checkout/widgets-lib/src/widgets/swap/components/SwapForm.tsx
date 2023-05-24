@@ -13,15 +13,15 @@ import { SwapContext } from '../context/swap';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
 import { DEFAULT_IMX_DECIMALS } from '../../../lib/constants';
-import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SelectOption } from '../../../components/FormComponents/SelectForm/SelectForm';
 import {
   ValidateFromAmount, ValidateFromToken, ValidateToAmount, ValidateToToken, ValidateTokens,
-} from '../functions/SwapValidator';
+} from '../validators/swaps';
 import { Fees } from './Fees';
 import { SwapButton } from './SwapButton';
+import { quotesProcessor } from '../services/dex';
 
 enum SwapDirection {
   FROM = 'FROM',

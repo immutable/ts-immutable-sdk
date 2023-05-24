@@ -12,7 +12,7 @@ import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapState, initialSwapState } from '../context/swap';
 import { SwapCoins } from '../views/SwapCoins';
-import { quotesProcessor } from '../functions/FetchQuote';
+import { quotesProcessor } from '../services/dex';
 
 describe('SwapForm', () => {
   let testSwapState: SwapState;
