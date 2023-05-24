@@ -1,5 +1,7 @@
+/* eslint-disable class-methods-use-this */
+import { List } from 'linqts';
 import { Service } from 'typedi';
-import { RootApiRecipesGetRequest } from '../__codegen__/recipe';
+import { DomainInput, DomainRecipe, RootApiRecipesGetRequest } from '../__codegen__/recipe';
 import { withSDKError } from '../Errors';
 import { StudioBE } from '../StudioBE';
 
@@ -33,5 +35,15 @@ export class Recipe {
     }
 
     return data;
+  }
+
+  public getInputsBy(
+    recipe: DomainRecipe,
+    predicateFn: (input?: DomainInput, index?: number, list?: DomainInput[]) => boolean,
+  ) {
+    return new List<DomainInput>(recipe.inputs)
+      .Where(predicateFn)
+      .Select((input, index) => [input, index] as [DomainInput, number])
+      .ToArray();
   }
 }
