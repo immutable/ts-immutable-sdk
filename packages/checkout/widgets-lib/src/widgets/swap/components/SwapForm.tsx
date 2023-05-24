@@ -168,7 +168,7 @@ export function SwapForm() {
       });
       setGasFeeFiatValue(calculateCryptoToFiat(
         gasFee,
-        DEFAULT_IMX_DECIMALS.toString(),
+        gasToken?.symbol || '',
         cryptoFiatState.conversions,
       ));
 
@@ -228,7 +228,7 @@ export function SwapForm() {
       });
       setGasFeeFiatValue(calculateCryptoToFiat(
         gasFee,
-        DEFAULT_IMX_DECIMALS.toString(),
+        gasToken?.symbol || '',
         cryptoFiatState.conversions,
       ));
 
