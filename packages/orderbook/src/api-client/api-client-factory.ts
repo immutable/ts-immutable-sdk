@@ -12,6 +12,6 @@ export class ImmutableApiClientFactory {
   }
 
   create(): ImmutableApiClient {
-    return new ImmutableApiClient(this.orderbookClient.orderBook, this.chainId);
+    return new ImmutableApiClient(this.orderbookClient.orders, this.chainId);
   }
 }

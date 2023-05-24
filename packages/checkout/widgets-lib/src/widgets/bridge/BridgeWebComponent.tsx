@@ -4,6 +4,8 @@ import ReactDOM from 'react-dom/client';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { Network } from '../../lib';
+import { ConnectLoader } from '../../components/ConnectLoader/ConnectLoader';
+import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 
 export class ImmutableBridge extends ImmutableWebComponent {
   fromNetwork = Network.ETHEREUM;
@@ -14,6 +16,8 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
   providerPreference: ConnectionProviders = ConnectionProviders.METAMASK;
 
+  useConnectWidget?: boolean;
+
   connectedCallback() {
     super.connectedCallback();
     this.fromContract = this.getAttribute('fromContractAddress') as string;
@@ -22,6 +26,8 @@ export class ImmutableBridge extends ImmutableWebComponent {
     this.providerPreference = this.getAttribute(
       'providerPreference',
     ) as ConnectionProviders;
+    const useConnectWidgetProp = this.getAttribute('useConnectWidget');
+    this.useConnectWidget = useConnectWidgetProp?.toLowerCase() !== 'false';
     this.renderWidget();
   }
 
@@ -39,10 +45,23 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <BridgeWidget
-          params={params}
-          config={this.widgetConfig!}
-        />
+        {this.useConnectWidget ? (
+          <ConnectLoader
+            params={params}
+            closeEvent={sendBridgeWidgetCloseEvent}
+            widgetConfig={this.widgetConfig!}
+          >
+            <BridgeWidget
+              params={params}
+              config={this.widgetConfig!}
+            />
+          </ConnectLoader>
+        ) : (
+          <BridgeWidget
+            params={params}
+            config={this.widgetConfig!}
+          />
+        )}
       </React.StrictMode>,
     );
   }
