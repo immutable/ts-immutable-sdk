@@ -111,8 +111,6 @@ export function SwapWidget(props: SwapWidgetProps) {
       .map((token) => token.address)
       .includes(balance.token.address));
 
-    allowedTokenBalances.entries();
-
     swapDispatch({
       payload: {
         type: SwapActions.SET_ALLOWED_TOKENS,
