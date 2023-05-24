@@ -65,5 +65,5 @@ describe('fulfil order', () => {
     await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
 
     await waitForOrderToBeOfStatus(sdk, order.id, Order.status.FILLED);
-  }, 30_000);
+  }, 60_000);
 });

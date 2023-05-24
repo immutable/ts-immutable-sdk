@@ -64,5 +64,5 @@ describe('cancel order', () => {
     await signAndSubmitTx(unsignedCancelOrderTransaction, offerer, provider);
 
     await waitForOrderToBeOfStatus(sdk, order.id, Order.status.CANCELLED);
-  }, 30_000);
+  }, 60_000);
 });
