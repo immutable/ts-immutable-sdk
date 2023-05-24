@@ -1618,15 +1618,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.5.0-beta":
-  version: 0.5.0-beta
-  resolution: "@biom3/react@npm:0.5.0-beta"
+"@biom3/react@npm:^0.5.6-beta":
+  version: 0.5.6-beta
+  resolution: "@biom3/react@npm:0.5.6-beta"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.10.8
     "@emotion/react": ^11.10.8
     buffer: ^6.0.3
-    framer-motion: ^9.1.7
+    framer-motion: ^10.12.12
     lodash.debounce: ^4.0.8
     lodash.get: ^4.4.2
     lodash.throttle: ^4.1.1
@@ -1636,7 +1636,7 @@ __metadata:
     react-dom: ^18.2.0
     react-is: ^18.2.0
     ts-deepmerge: ^5.0.0
-  checksum: 781a7cfd395b830d1d7d290cc9f05371f2d25e4330d8a608b6ae1d95585e685859ae242f0919700ea232a22b0ce2aad191f5e0f3bf97af1b3110b6143014a56a
+  checksum: ea30d6515387b03d6c96aaf7921fd914a0bb95b82a5bc6861a81d09400c6f94d11d3c2ab204334a80d7278bc99d333d148f3867f4632951920337a89114520de
   languageName: node
   linkType: hard
 
@@ -2715,7 +2715,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.5.0-beta
+    "@biom3/react": ^0.5.6-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@svgr/webpack": ^8.0.1
@@ -2766,7 +2766,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-lib@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.1.5-beta
-    "@biom3/react": ^0.5.0-beta
+    "@biom3/react": ^0.5.6-beta
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
@@ -14284,9 +14284,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:^9.1.7":
-  version: 9.1.7
-  resolution: "framer-motion@npm:9.1.7"
+"framer-motion@npm:^10.12.12":
+  version: 10.12.14
+  resolution: "framer-motion@npm:10.12.14"
   dependencies:
     "@emotion/is-prop-valid": ^0.8.2
     tslib: ^2.4.0
@@ -14296,7 +14296,12 @@ __metadata:
   dependenciesMeta:
     "@emotion/is-prop-valid":
       optional: true
-  checksum: 8ab21a2c15eb2494644b09c91c91aec3c01575e2148ff17621df4fca44bc64a8c03bc1cf6a5261ec0cebb7504fea8d75480e93b1799e8842337f8b1863af8c14
+  peerDependenciesMeta:
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: f59ad15cd1de257f1ae6c431b801716774397331a8b5b0105cba8abfb06f1b4e6fb96e4706c0b43c434e939ce91607d99ecdbd20f7c658dda9a901ca6bdc75ef
   languageName: node
   linkType: hard
 
@@ -23251,7 +23256,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sample-app@workspace:packages/provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.5.0-beta
+    "@biom3/react": ^0.5.6-beta
     "@imtbl/core-sdk": ^1.1.1-alpha.1
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
