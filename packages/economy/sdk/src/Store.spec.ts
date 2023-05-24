@@ -25,7 +25,7 @@ describe('Store', () => {
     store = new Store<Data>(defaultValue);
   });
 
-  it.only('should handle errors when loading from local storage', () => {
+  it('should handle errors when loading from local storage', () => {
     jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw new Error('Local storage error');
     });
