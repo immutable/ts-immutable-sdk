@@ -341,7 +341,7 @@ export function SwapForm() {
       fromToken.token.symbol,
       cryptoFiatState.conversions,
     ));
-  }, [fromAmount, fromAmount]);
+  }, [fromAmount]);
 
   const onFromSelectChange = (value: OptionKey) => {
     const selected = tokenBalances.find((t) => value === `${t.token.symbol}-${t.token.name}`);
