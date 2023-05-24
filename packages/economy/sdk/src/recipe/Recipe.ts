@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { List } from 'linqts';
 import { Service } from 'typedi';
 import { DomainInput, DomainRecipe, RootApiRecipesGetRequest } from '../__codegen__/recipe';
@@ -36,7 +37,7 @@ export class Recipe {
     return data;
   }
 
-  public static getInputsBy(
+  public getInputsBy(
     recipe: DomainRecipe,
     predicateFn: (input?: DomainInput, index?: number, list?: DomainInput[]) => boolean,
   ) {

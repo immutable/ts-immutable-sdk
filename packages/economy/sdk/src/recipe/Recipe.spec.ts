@@ -12,7 +12,6 @@ import { Config, defaultConfig } from '../Config';
 import { SDKError } from '../Errors';
 import { StudioBE } from '../StudioBE';
 import { Recipe } from './Recipe';
-import { DomainInput, DomainRecipe } from '../__codegen__/recipe';
 
 describe(Recipe.name, () => {
   beforeAll(() => {
@@ -67,7 +66,7 @@ describe(Recipe.name, () => {
 
   describe('getInputsBy', () => {
     it('should return recipe input and index when given a recipe and predicateFn condition', () => {
-      const recipe = {
+      const mockRecipe = {
         id: 'a9e66897-08e1-482f-887a-1611f9d824bf',
         game_id: 'shardbound',
         name: 'Test Recipe',
@@ -116,8 +115,9 @@ describe(Recipe.name, () => {
         updated_at: '2023-04-11T23:35:33.411305Z',
       };
       const predicateFn = (input: any) => input.name === 'card_to_upgrade';
-      const response = Recipe.getInputsBy(recipe, predicateFn);
-      expect(response).toEqual([[recipe.inputs[0], 0]]);
+      const recipeClass = Container.get(Recipe);
+      const response = recipeClass.getInputsBy(mockRecipe, predicateFn);
+      expect(response).toEqual([[mockRecipe.inputs[0], 0]]);
     });
   });
 });
