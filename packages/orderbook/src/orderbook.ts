@@ -123,7 +123,7 @@ export class Orderbook {
       throw new Error(`Cannot cancel order with status ${order.status}`);
     }
 
-    if (order.account_address !== accountAddress) {
+    if (order.account_address !== accountAddress.toLowerCase()) {
       throw new Error(`Only account ${order.account_address} can cancel order ${orderId}`);
     }
 
