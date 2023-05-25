@@ -182,12 +182,14 @@ export function SwapWidget(props: SwapWidgetProps) {
           </CryptoFiatProvider>
           )}
           {viewState.view.type === SwapWidgetViews.SUCCESS && (
-          <SuccessView
-            successText={success.text}
-            actionText={success.actionText}
-                // eslint-disable-next-line no-console
-            onActionClick={() => console.log('success')}
-          />
+            <StatusView
+              statusText={success.text}
+              actionText={success.actionText}
+              // eslint-disable-next-line no-console
+              onActionClick={() => console.log('success')}
+              statusType={StatusType.SUCCESS}
+              testId="success-view"
+            />
           )}
           {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
         </SwapContext.Provider>
