@@ -5,7 +5,12 @@
 import { Service } from 'typedi';
 import { produce } from 'immer';
 
-type State = { selectedRecipeId: string | undefined };
+import type { CraftIngredient } from './__codegen__/crafting';
+
+type State = {
+  craftingInputs: CraftIngredient[]
+  selectedRecipeId: string | undefined
+};
 
 @Service()
 export class Store<T = State> {
