@@ -1,6 +1,6 @@
 import { mount } from 'cypress/react18';
 import React from 'react';
-import { BiomeThemeProvider } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { cy, it } from 'local-cypress';
 import { Checkout, ConnectionProviders, TokenInfo } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
@@ -30,9 +30,9 @@ describe('Network Menu', () => {
   });
   it('should have heading', () => {
     mount(
-      <BiomeThemeProvider>
+      <BiomeCombinedProviders>
         <NetworkMenu />
-      </BiomeThemeProvider>,
+      </BiomeCombinedProviders>,
     );
 
     cySmartGet('network-heading').should(
@@ -52,13 +52,13 @@ describe('Network Menu', () => {
       supportedTopUps: null,
     };
     mount(
-      <BiomeThemeProvider>
+      <BiomeCombinedProviders>
         <WalletContext.Provider
           value={{ walletState, walletDispatch: () => {} }}
         >
           <NetworkMenu />
         </WalletContext.Provider>
-      </BiomeThemeProvider>,
+      </BiomeCombinedProviders>,
     );
     cySmartGet('@getNetworkAllowListStub').should('have.been.called');
     cySmartGet('Ethereum-network-button').should('exist');
@@ -96,13 +96,13 @@ describe('Network Menu', () => {
       supportedTopUps: null,
     };
     mount(
-      <BiomeThemeProvider>
+      <BiomeCombinedProviders>
         <WalletContext.Provider
           value={{ walletState, walletDispatch: () => {} }}
         >
           <NetworkMenu />
         </WalletContext.Provider>
-      </BiomeThemeProvider>,
+      </BiomeCombinedProviders>,
     );
 
     cySmartGet('ImmutablezkEVMTestnet-network-button').click();

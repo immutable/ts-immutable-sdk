@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  BiomeThemeProvider, Box, Heading, Button, Body,
+  BiomeCombinedProviders, Box, Heading, Button, Body,
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
@@ -270,7 +270,7 @@ export function BuyWidget({
   const renderFailure = () => <Body>Failure</Body>;
 
   return (
-    <BiomeThemeProvider theme={{ base: biomeTheme }}>
+    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <Box sx={buyWidgetStyle}>
         <Box
           sx={{
@@ -293,6 +293,6 @@ export function BuyWidget({
         {view === BuyWidgetViews.SUCCESS && renderSuccess()}
         {view === BuyWidgetViews.FAIL && renderFailure()}
       </Box>
-    </BiomeThemeProvider>
+    </BiomeCombinedProviders>
   );
 }
