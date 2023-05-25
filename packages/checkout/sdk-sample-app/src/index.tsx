@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ConnectWidget from './pages/ConnectWidget';
 import { onLightBase } from '@biom3/design-tokens';
-import { BiomeThemeProvider, Box } from '@biom3/react';
+import { BiomeCombinedProviders, Box } from '@biom3/react';
 
 const router = createBrowserRouter([
   {
@@ -24,7 +24,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <BiomeThemeProvider theme={{ base: onLightBase }}>
+    <BiomeCombinedProviders theme={{ base: onLightBase }}>
       <Box
         sx={{
           m: 'auto',
@@ -33,7 +33,7 @@ root.render(
       >
         <RouterProvider router={router} />
       </Box>
-    </BiomeThemeProvider>
+    </BiomeCombinedProviders>
   </React.StrictMode>
 );
 

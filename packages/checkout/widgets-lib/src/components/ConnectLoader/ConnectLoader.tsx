@@ -1,4 +1,4 @@
-import { BiomeThemeProvider } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import {
   Checkout,
   ConnectionProviders,
@@ -118,9 +118,9 @@ export function ConnectLoader({
   return (
     <>
       {connectionStatus === ConnectionStatus.LOADING && (
-        <BiomeThemeProvider theme={{ base: biomeTheme }}>
+        <BiomeCombinedProviders theme={{ base: biomeTheme }}>
           <LoadingView loadingText="Connecting" />
-        </BiomeThemeProvider>
+        </BiomeCombinedProviders>
       )}
       {(connectionStatus === ConnectionStatus.NOT_CONNECTED
         || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
@@ -142,7 +142,7 @@ export function ConnectLoader({
         children
       )}
       {connectionStatus === ConnectionStatus.ERROR && (
-        <BiomeThemeProvider theme={{ base: biomeTheme }}>
+        <BiomeCombinedProviders theme={{ base: biomeTheme }}>
           <ErrorView
             onCloseClick={closeEvent}
             onActionClick={() => {
@@ -155,7 +155,7 @@ export function ConnectLoader({
             }}
             actionText="Try Again"
           />
-        </BiomeThemeProvider>
+        </BiomeCombinedProviders>
       )}
     </>
   );

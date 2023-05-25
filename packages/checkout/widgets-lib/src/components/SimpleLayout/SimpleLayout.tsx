@@ -1,4 +1,4 @@
-import { Box } from '@biom3/react';
+import { Box, MountedBottomSheetOverlayAndProvider } from '@biom3/react';
 import {
   simpleLayoutStyle,
   headerStyle,
@@ -29,31 +29,33 @@ export function SimpleLayout({
   footerBackgroundColor,
 }: SimpleLayoutProps) {
   return (
-    <Box sx={responsiveStyles}>
-      <Box testId={testId} sx={simpleLayoutStyle}>
-        {header && (
-          <Box id="header" sx={headerStyle(floatHeader)}>
-            {header}
-          </Box>
-        )}
-        <Box id="content" sx={contentStyle}>
-          {heroContent && (
-            <Box id="hero-content" sx={heroContentStyle}>
-              {heroContent}
+    <MountedBottomSheetOverlayAndProvider containerId="layout-container">
+      <Box sx={responsiveStyles} id="layout-container">
+        <Box testId={testId} sx={simpleLayoutStyle}>
+          {header && (
+            <Box id="header" sx={headerStyle(floatHeader)}>
+              {header}
             </Box>
           )}
-          {children && (
-            <Box id="body" sx={bodyStyle}>
-              {children}
+          <Box id="content" sx={contentStyle}>
+            {heroContent && (
+              <Box id="hero-content" sx={heroContentStyle}>
+                {heroContent}
+              </Box>
+            )}
+            {children && (
+              <Box id="body" sx={bodyStyle}>
+                {children}
+              </Box>
+            )}
+          </Box>
+          {footer && (
+            <Box id="footer" sx={footerStyle(footerBackgroundColor)}>
+              {footer}
             </Box>
           )}
         </Box>
-        {footer && (
-          <Box id="footer" sx={footerStyle(footerBackgroundColor)}>
-            {footer}
-          </Box>
-        )}
       </Box>
-    </Box>
+    </MountedBottomSheetOverlayAndProvider>
   );
 }
