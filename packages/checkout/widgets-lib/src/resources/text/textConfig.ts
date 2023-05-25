@@ -119,6 +119,23 @@ export const text = {
       header: {
         title: 'Move coins',
       },
+      content: {
+        title: 'What would you like to move from Ethereum mainnet to Immutable zkEVM?',
+        fiatPricePrefix: 'Approx USD',
+        availableBalancePrefix: 'Available',
+      },
+      bridgeForm: {
+        inputPlaceholder: '0',
+        buttonText: 'Move',
+      },
+      fees: {
+        title: 'Fees total',
+      },
+      validation: {
+        noAmountInputted: 'Please input amount',
+        insufficientBalance: 'Insufficient balance',
+        noTokenSelected: 'Select a coin to move',
+      },
     },
   },
   wallets: {

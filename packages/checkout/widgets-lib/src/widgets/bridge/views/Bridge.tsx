@@ -1,8 +1,5 @@
-import { TransactionResponse } from '@ethersproject/providers';
-import { useContext } from 'react';
 import { Box } from '@biom3/react';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
-import { BridgeContext } from '../context/BridgeContext';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
@@ -13,19 +10,11 @@ import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewConte
 export interface BridgeProps {
   amount: string | undefined;
   fromContractAddress: string | undefined;
-  setTransactionResponse: (response: TransactionResponse) => void;
 }
 
-export function Bridge({ amount, fromContractAddress, setTransactionResponse }: BridgeProps) {
-  const { bridgeState } = useContext(BridgeContext);
-  const { provider } = bridgeState;
+export function Bridge({ amount, fromContractAddress }: BridgeProps) {
   const { header } = text.views[BridgeWidgetViews.BRIDGE];
 
-  const updateTransactionResponse = (
-    response: TransactionResponse,
-  ) => {
-    setTransactionResponse(response);
-  };
   return (
     <SimpleLayout
       header={(
@@ -37,14 +26,17 @@ export function Bridge({ amount, fromContractAddress, setTransactionResponse }: 
       footer={<FooterLogo />}
       footerBackgroundColor="base.color.translucent.container.200"
     >
-      <Box sx={{ paddingX: 'base.spacing.x4' }}>
-        {provider && (
+      <Box sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+      }}
+      >
         <BridgeForm
           defaultAmount={amount}
           defaultTokenAddress={fromContractAddress}
-          updateTransactionResponse={updateTransactionResponse}
         />
-        )}
       </Box>
     </SimpleLayout>
   );

@@ -12,9 +12,8 @@ import {
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
-  useEffect, useMemo, useReducer, useRef, useState,
+  useEffect, useMemo, useReducer, useRef,
 } from 'react';
-import { TransactionResponse } from '@ethersproject/providers';
 import { l1Network, zkEVMNetwork } from '../../lib/networkUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { Network, WidgetTheme } from '../../lib';
@@ -31,6 +30,7 @@ import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextT
 import { Bridge } from './views/Bridge';
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -43,8 +43,6 @@ export interface BridgeWidgetParams {
   amount?: string;
   fromNetwork?: Network;
 }
-
-// const bridgingNetworks = Object.values(Network);
 
 // TODO: consider changing this to an enum for better discoverability
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -80,10 +78,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
 
   const defaultFromChainId = l1Network(environment);
   const toChainId = zkEVMNetwork(environment);
-
-  const [transactionResponse, setTransactionResponse] = useState<
-  TransactionResponse | undefined
-  >();
 
   /**
    * This effect is used to set up the BridgeWidget state for the first time.
@@ -183,9 +177,10 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         },
       );
 
-      const allowedTokenBalances = tokenBalances.balances.filter((balance) => allowList.tokens
-        .map((token) => token.address)
-        .includes(balance.token.address));
+      const allowedTokenBalances = tokenBalances.balances.filter((balance) => balance.balance.gt(0)
+        && allowList.tokens
+          .map((token) => token.address)
+          .includes(balance.token.address));
 
       bridgeDispatch({
         payload: {
@@ -242,25 +237,26 @@ export function BridgeWidget(props: BridgeWidgetProps) {
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
         <BridgeContext.Provider value={bridgeReducerValues}>
-          {viewReducerValues.viewState.view.type === BaseViews.LOADING_VIEW && (
-          <LoadingView loadingText="Loading" />
-          )}
-          {viewReducerValues.viewState.view.type === BridgeWidgetViews.BRIDGE && (
-          <Bridge
-            amount={amount}
-            fromContractAddress={fromContractAddress}
-            setTransactionResponse={setTransactionResponse}
-          />
-          )}
-          {viewReducerValues.viewState.view.type === BridgeWidgetViews.SUCCESS && (
+          <CryptoFiatProvider>
+            {viewReducerValues.viewState.view.type === BaseViews.LOADING_VIEW && (
+            <LoadingView loadingText="Loading" />
+            )}
+            {viewReducerValues.viewState.view.type === BridgeWidgetViews.BRIDGE && (
+            <Bridge
+              amount={amount}
+              fromContractAddress={fromContractAddress}
+            />
+            )}
+            {viewReducerValues.viewState.view.type === BridgeWidgetViews.SUCCESS && (
             <StatusView
-              statusText={`Success, transaction hash: ${transactionResponse?.hash}`}
+              statusText="Success"
               actionText="Continue"
               onActionClick={sendBridgeWidgetCloseEvent}
               statusType={StatusType.SUCCESS}
               testId="success-view"
             />
-          )}
+            )}
+          </CryptoFiatProvider>
         </BridgeContext.Provider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
