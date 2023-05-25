@@ -7,7 +7,7 @@ import { quotesProcessor } from './FetchQuote';
 
 describe('QuotesProcessor', () => {
   describe('processQuotes', () => {
-    it('getUnsignedSwapTxFromAmountIn', async () => {
+    it('should call the unsigned swap transaction from amount in and get the quote', async () => {
       const getUnsignedSwapTxFromAmountIn = jest.fn();
 
       const exchange = new Exchange(new ExchangeConfiguration({
@@ -51,7 +51,7 @@ describe('QuotesProcessor', () => {
       );
     });
 
-    it('getUnsignedSwapTxFromAmountOut', async () => {
+    it('should call the unsigned swap transaction from amount out and get the quote', async () => {
       const getUnsignedSwapTxFromAmountOut = jest.fn();
 
       const exchange = new Exchange(new ExchangeConfiguration({

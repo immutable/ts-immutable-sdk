@@ -18,7 +18,10 @@ import { SelectInput } from '../../../components/FormComponents/SelectInput/Sele
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SelectOption } from '../../../components/FormComponents/SelectForm/SelectForm';
 import {
-  ValidateFromAmount, ValidateFromToken, ValidateToAmount, ValidateToToken, ValidateTokens,
+  validateFromAmount,
+  validateFromToken,
+  validateToAmount,
+  validateToToken,
 } from '../functions/SwapValidator';
 import { Fees } from './Fees';
 import { SwapButton } from './SwapButton';
@@ -300,48 +303,32 @@ export function SwapForm() {
   };
 
   useEffect(() => {
-    if (direction === SwapDirection.TO) return;
-    if (editing) return;
-    (async () => await fetchQuote())();
+    if (direction === SwapDirection.FROM) {
+      if (editing) return;
+      (async () => await fetchQuote())();
+    }
   }, [fromAmount, fromToken, toToken, editing]);
 
   useEffect(() => {
-    if (direction === SwapDirection.FROM) return;
-    if (editing) return;
-    (async () => await fetchQuote())();
+    if (direction === SwapDirection.TO) {
+      if (editing) return;
+      (async () => await fetchQuote())();
+    }
   }, [toAmount, toToken, fromToken, editing]);
 
   // -------------//
   //     FROM     //
   // -------------//
-  const validateFromAmount = (value: string): string | null => {
-    if (!fromToken) return null;
-    const err = ValidateFromAmount(value, fromToken.formattedBalance);
-    setFromAmountError(err);
-    return err;
-  };
-
-  const validateFromToken = (value: GetBalanceResult): string | null => {
-    const err = ValidateFromToken(value);
-    setFromTokenError(err);
-    return err;
-  };
-
   useEffect(() => {
     if (!fromAmount) return;
-    let err = validateFromAmount(fromAmount);
-    if (err) return;
-
     if (!fromToken) return;
-    err = validateFromToken(fromToken);
-    if (err) return;
 
     setFromFiatValue(calculateCryptoToFiat(
       fromAmount,
       fromToken.token.symbol,
       cryptoFiatState.conversions,
     ));
-  }, [fromAmount]);
+  }, [fromAmount, fromToken]);
 
   const onFromSelectChange = (value: OptionKey) => {
     const selected = tokenBalances.find((t) => value === `${t.token.symbol}-${t.token.name}`);
@@ -377,24 +364,6 @@ export function SwapForm() {
   // ------------//
   //      TO     //
   // ------------//
-  const validateAmount = (value: string) => {
-    if (!toToken) return;
-    const err = ValidateToAmount(value);
-    setToAmountError(err);
-  };
-
-  const validateToken = (value: TokenInfo) => {
-    const err = ValidateToToken(value);
-    setToTokenError(err);
-  };
-
-  useEffect(() => {
-    if (!toAmount) return;
-    validateAmount(toAmount);
-    if (!toToken) return;
-    validateToken(toToken);
-  }, [toAmount, toToken]);
-
   const onToSelectChange = (value: OptionKey) => {
     const selected = allowedTokens.find((t) => value === `${t.symbol}-${t.name}`);
     if (!selected) return;
@@ -419,16 +388,11 @@ export function SwapForm() {
 
   const { content, swapForm } = text.views[SwapWidgetViews.SWAP];
   const SwapFormValidator = (): boolean => {
-    const validateFromTokenError = ValidateFromToken(fromToken);
-    const validateFromAmountError = ValidateFromAmount(fromAmount, fromToken?.formattedBalance);
-    const validateToTokenError = ValidateToToken(toToken);
-    const validateToAmountError = ValidateToAmount(toAmount);
-    const validateTokensError = ValidateTokens(fromToken, toToken);
+    const validateFromTokenError = validateFromToken(fromToken);
+    const validateFromAmountError = validateFromAmount(fromAmount, fromToken?.formattedBalance);
+    const validateToTokenError = validateToToken(toToken);
+    const validateToAmountError = validateToAmount(toAmount);
 
-    if (validateTokensError) {
-      setFromTokenError(validateTokensError);
-      setToTokenError(validateTokensError);
-    }
     if (validateFromTokenError) setFromTokenError(validateFromTokenError);
     if (validateFromAmountError) setFromAmountError(validateFromAmountError);
     if (validateToTokenError) setToTokenError(validateToTokenError);
@@ -438,8 +402,7 @@ export function SwapForm() {
       validateFromTokenError
       || validateFromAmountError
       || validateToTokenError
-      || validateToAmountError
-      || validateTokensError) return false;
+      || validateToAmountError) return false;
     return true;
   };
 

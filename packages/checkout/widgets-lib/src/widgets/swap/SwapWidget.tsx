@@ -33,6 +33,7 @@ import { WidgetTheme } from '../../lib';
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
 import { getDexConfigOverrides } from './DexConfigOverrides';
+import { text } from '../../resources/text/textConfig';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -47,6 +48,8 @@ export interface SwapWidgetParams {
 }
 
 export function SwapWidget(props: SwapWidgetProps) {
+  const { success } = text.views[SwapWidgetViews.SWAP];
+  const loadingText = text.views[BaseViews.LOADING_VIEW].text;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const viewReducerValues = useMemo(
     () => ({ viewState, viewDispatch }),
@@ -167,7 +170,7 @@ export function SwapWidget(props: SwapWidgetProps) {
       <ViewContext.Provider value={viewReducerValues}>
         <SwapContext.Provider value={swapReducerValues}>
           {viewState.view.type === BaseViews.LOADING_VIEW && (
-          <LoadingView loadingText="Loading" />
+          <LoadingView loadingText={loadingText} />
           )}
           {viewState.view.type === SwapWidgetViews.SWAP && (
           <CryptoFiatProvider>
@@ -180,8 +183,8 @@ export function SwapWidget(props: SwapWidgetProps) {
           )}
           {viewState.view.type === SwapWidgetViews.SUCCESS && (
           <SuccessView
-            successText="Success"
-            actionText="Continue"
+            successText={success.text}
+            actionText={success.actionText}
                 // eslint-disable-next-line no-console
             onActionClick={() => console.log('success')}
           />
