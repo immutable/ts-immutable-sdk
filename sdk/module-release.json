@@ -10,6 +10,7 @@
         "config": "prod",
         "immutablex_client": "prod",
         "passport": "prod",
+        "guardian": "alpha",
         "orderbook": "alpha",
         "provider": "prod",
         "checkout_sdk": "alpha",

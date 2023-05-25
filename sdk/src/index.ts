@@ -1,6 +1,7 @@
 export * from './config';
 export * from './immutablex_client';
 export * from './passport';
+export * from './guardian';
 export * from './orderbook';
 export * from './provider';
 export * from './checkout_sdk';

@@ -65,6 +65,10 @@
       "types": "./dist/passport.d.ts",
       "import": "./dist/passport.js"
     },
+    "./guardian": {
+      "types": "./dist/guardian.d.ts",
+      "import": "./dist/guardian.js"
+    },
     "./orderbook": {
       "types": "./dist/orderbook.d.ts",
       "import": "./dist/orderbook.js"
