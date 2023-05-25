@@ -5,7 +5,7 @@
 import { Service } from 'typedi';
 import { produce } from 'immer';
 
-type State = {};
+type State = { selectedRecipeId: string | undefined };
 
 @Service()
 export class Store<T = State> {
