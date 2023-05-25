@@ -1,1 +1,3 @@
-export * from '@imtbl/guardian';
+import * as guardian from '@imtbl/guardian';
+
+export { guardian };
