@@ -7,9 +7,8 @@ import {
   ChainId,
   Checkout,
   ConnectionProviders,
-  Transaction,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { buyWidgetStyle } from './BuyStyles';
 // TODO: fix circular dependency
@@ -123,7 +122,7 @@ export class Orderbook {
     chainId: ChainId,
     // eslint-disable-next-line
     orderId: string,
-  ): Promise<Transaction> {
+  ): Promise<TransactionRequest> {
     // Stubbed exchange.getTransaction
     return {
       nonce: '0x00', // ignored by MetaMask
