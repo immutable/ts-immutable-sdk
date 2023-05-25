@@ -1,17 +1,7 @@
-# .PHONY: generate-openapi-prod
-# generate-openapi-prod: get-openapi-prod generate-api
-
 .PHONY: generate-openapi
 generate-openapi: get-openapi-sandbox generate-api
 
-# .PHONY: get-openapi-prod
-# get-openapi-prod:
-# 	rm openapi.json && touch openapi.json && \
-# 	curl -H "Accept: application/json+v3" \
-#     https://api.x.immutable.com/openapi \
-#     -o openapi.json
-
-.PHONY: get-openapi-sandbox
+.PHONY: get-openapi
 get-openapi-sandbox:
 	rm openapi.json && touch openapi.json && \
 	curl -H "Accept: application/json+v3" \
