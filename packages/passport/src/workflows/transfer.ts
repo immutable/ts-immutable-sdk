@@ -10,6 +10,8 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { convertToSignableToken } from '@imtbl/toolkit';
+import { retryWithDelay } from 'util/retry';
+import * as guardian from '@imtbl/guardian';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { TransactionTypes } from '../confirmation/types';
 import ConfirmationScreen from '../confirmation/confirmation';
@@ -40,9 +42,9 @@ export const transfer = ({
   starkSigner,
   user,
   passportConfig,
-// TODO: remove this eslint disable once we have a better solution
+}: // TODO: remove this eslint disable once we have a better solution
 // eslint-disable-next-line max-len
-}: TransferRequest): Promise<CreateTransferResponseV1> => withPassportError<CreateTransferResponseV1>(async () => {
+TransferRequest): Promise<CreateTransferResponseV1> => withPassportError<CreateTransferResponseV1>(async () => {
   const transferAmount = request.type === ERC721 ? '1' : request.amount;
   const getSignableTransferRequest: GetSignableTransferRequestV1 = {
     sender: user.etherKey,
@@ -50,21 +52,51 @@ export const transfer = ({
     amount: transferAmount,
     receiver: request.receiver,
   };
+
+  const headers = {
+    Authorization: `Bearer ${user.accessToken}`,
+  };
+
   const signableResult = await transfersApi.getSignableTransferV1({
     getSignableTransferRequest,
+  }, { headers });
+
+  const transactionAPI = new guardian.TransactionsApi(new guardian.Configuration({
+    accessToken: user.accessToken,
+    basePath: passportConfig.guardianDomain,
+  }));
+  const transactionExists = await retryWithDelay(async () => transactionAPI.getTransactionByID({
+    transactionID: signableResult.data.payload_hash,
+    chainType: 'starkex',
+  }));
+
+  if (!transactionExists) {
+    throw new Error("Transaction doesn't exists");
+  }
+
+  const starkExTransactionApi = new guardian.StarkexTransactionsApi(new guardian.Configuration({
+    accessToken: user.accessToken,
+    basePath: passportConfig.guardianDomain,
+  }));
+
+  const evaluateStarkexRes = await starkExTransactionApi.evaluateStarkexTransaction({
+    payloadHash: signableResult.data.payload_hash,
   });
 
-  const confirmationScreen = new ConfirmationScreen(passportConfig);
-  const confirmationResult = await confirmationScreen.startTransaction(
-    user.accessToken,
-    {
-      transactionType: TransactionTypes.CreateTransfer,
-      transactionData: getSignableTransferRequest,
-    },
-  );
+  const { confirmationRequired } = evaluateStarkexRes.data;
+  if (confirmationRequired) {
+    const confirmationScreen = new ConfirmationScreen(passportConfig);
+    const confirmationResult = await confirmationScreen.startTransaction(
+      user.accessToken,
+      {
+        transactionType: TransactionTypes.CreateTransfer,
+        transactionData: getSignableTransferRequest,
+      },
+    );
 
-  if (!confirmationResult.confirmed) {
-    throw new Error('Transaction rejected by user');
+    if (!confirmationResult.confirmed) {
+      throw new Error('Transaction rejected by user');
+    }
   }
 
   const signableResultData = signableResult.data;
@@ -86,11 +118,6 @@ export const transfer = ({
 
   const createTransferRequest = {
     createTransferRequest: transferSigningParams,
-  };
-
-  const headers = {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    Authorization: `Bearer ${user.accessToken}`,
   };
 
   const { data: responseData } = await transfersApi.createTransferV1(

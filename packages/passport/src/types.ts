@@ -43,6 +43,7 @@ export interface PassportOverrides {
   magicPublishableApiKey: string;
   magicProviderId: string;
   passportDomain: string;
+  guardianDomain: string;
   immutableXClient: ImmutableXClient;
 }
 
