@@ -20,12 +20,12 @@ type CoinSelectorOption = {
     formattedFiatAmount: string;
     formattedAmount: string;
   }
-}
+};
 
-type CoinSelectorOptionProps = CoinSelectorOption
+type CoinSelectorOptionProps = CoinSelectorOption;
 
 export function CoinSelector({
-  heading, options, children, onCloseBottomSheet, visible
+  heading, options, children, onCloseBottomSheet, visible,
 }: CoinSelectorProps) {
   return (
     <BottomSheet headerBarTitle={heading} size="full" onCloseBottomSheet={onCloseBottomSheet} visible={visible}>
@@ -34,7 +34,7 @@ export function CoinSelector({
       </BottomSheet.Target>
       <BottomSheet.Content>
         <Box sx={selectOptionsContainerStyles}>
-          {options.map(({onClick, icon, name, symbol, balance}) => (
+          {options.map(({ onClick, icon, name, symbol, balance }) => (
             <CoinSelectorOption
               key={symbol}
               onClick={onClick}
