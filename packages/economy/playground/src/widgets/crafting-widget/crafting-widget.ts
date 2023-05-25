@@ -13,17 +13,17 @@ import type { DomainCraft } from '@imtbl/economy/dist/__codegen__/crafting';
 
 type ComponentEvent =
   | {
-      type: 'userInfo';
-      data: { userId: string; email: string; address: string };
-    }
+    type: 'userInfo';
+    data: { userId: string; email: string; address: string };
+  }
   | {
-      type: 'item-selected';
-      data: Required<InventoryItem>;
-    }
+    type: 'item-selected';
+    data: Required<InventoryItem>;
+  }
   | {
-      type: 'recipe-selected';
-      data: string;
-    };
+    type: 'recipe-selected';
+    data: string;
+  };
 
 @customElement('crafting-widget')
 export class CraftingWidget extends LitElement {
@@ -103,6 +103,7 @@ export class CraftingWidget extends LitElement {
     });
     if (!recipe) return;
 
+    this.economy.recipe.setActive(recipe.id);
     this.selectedRecipe = recipe;
     this.selectedItems.clear();
     this.requestUpdate();
@@ -243,23 +244,24 @@ export class CraftingWidget extends LitElement {
         recipe_id: this.selectedRecipe?.id as string,
       });
 
+      this.economy.recipe.setActive(undefined);
       this.selectedRecipe = undefined as any;
       this.disabledSelection = false;
       this.selectedItems.clear();
       this.requestUpdate();
 
       console.log({ craft });
-    } catch {}
+    } catch { }
   }
 
   render() {
     const selectedItems = Array.from(this.selectedItems.values());
     const filteredInventory = this.selectedRecipe
       ? this.inventory.filter((item: Required<InventoryItem>) => {
-          return this.selectedRecipe?.inputs?.find((input) =>
-            this.matchesCondition(item, input?.conditions as DomainCondition[])
-          );
-        })
+        return this.selectedRecipe?.inputs?.find((input) =>
+          this.matchesCondition(item, input?.conditions as DomainCondition[])
+        );
+      })
       : this.inventory;
 
     return html`
@@ -325,9 +327,9 @@ export class CraftingWidget extends LitElement {
               <!-- INVENTORY -->
               <div
                 class="bg-gray-100 overflow-hidden overflow-y-scroll max-h-96 lg:max-h-none ${this
-                  .disabledSelection
-                  ? 'grayscale contrast-200 opacity-50 pointer-events-none'
-                  : ''}"
+        .disabledSelection
+        ? 'grayscale contrast-200 opacity-50 pointer-events-none'
+        : ''}"
               >
                 <inventory-collection
                   .inventory="${filteredInventory}"
@@ -404,6 +406,15 @@ export class CraftingWidget extends LitElement {
       this.getCustomEventHandler(this.onComponentEvent)
     );
 
+    console.log({ state: this.economy.state });
     this.requestUpdate();
+  }
+
+  update(changedProperties: Map<string, unknown>) {
+    if (changedProperties.has('selectedRecipe')) {
+      console.log({ selectedRecipeId: this.economy.state.selectedRecipeId })
+    }
+
+    super.update(changedProperties);
   }
 }
