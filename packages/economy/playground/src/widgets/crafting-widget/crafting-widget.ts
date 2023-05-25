@@ -247,7 +247,7 @@ export class CraftingWidget extends LitElement {
         recipe_id: this.selectedRecipe?.id as string,
       });
 
-      this.economy.recipe.setActive(undefined);
+      this.economy.resetState();
       this.selectedRecipe = undefined as any;
       this.disabledSelection = false;
       this.selectedItems.clear();
