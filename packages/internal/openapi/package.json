@@ -24,5 +24,8 @@
     "typecheck": "tsc --noEmit --jsx preserve"
   },
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "dist/index.d.ts",
+  "devDependencies": {
+    "rollup": "^3.23.0"
+  }
 }
