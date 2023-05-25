@@ -14,8 +14,8 @@ type CoinSelectorProps = {
 type CoinSelectorOption = {
   onClick: () => void;
   icon: AllIconKeys;
-  label: string;
-  caption: string;
+  name: string;
+  symbol: string;
   balance?: {
     formattedFiatAmount: string;
     formattedAmount: string;
@@ -34,12 +34,13 @@ export function CoinSelector({
       </BottomSheet.Target>
       <BottomSheet.Content>
         <Box sx={selectOptionsContainerStyles}>
-          {options.map(({onClick, icon, label, caption, balance}) => (
+          {options.map(({onClick, icon, name, symbol, balance}) => (
             <CoinSelectorOption
+              key={symbol}
               onClick={onClick}
               icon={icon}
-              label={label}
-              caption={caption}
+              name={name}
+              symbol={symbol}
               balance={balance} />
           ))}
         </Box>
@@ -49,13 +50,13 @@ export function CoinSelector({
 }
 
 export function CoinSelectorOption({
-  onClick, icon, label, caption, balance,
+  onClick, icon, name, symbol, balance,
 }: CoinSelectorOptionProps) {
   return (
     <MenuItem emphasized size="small" onClick={onClick}>
       <MenuItem.Icon icon={icon} />
-      <MenuItem.Label>{label}</MenuItem.Label>
-      <MenuItem.Caption>{caption}</MenuItem.Caption>
+      <MenuItem.Label>{name}</MenuItem.Label>
+      <MenuItem.Caption>{symbol}</MenuItem.Caption>
       {
         balance && (
           <MenuItem.PriceDisplay
