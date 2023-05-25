@@ -6,36 +6,25 @@ export interface StatusViewProps {
   statusText: string;
   statusType: StatusType;
 }
+
+const status = {
+  [StatusType.SUCCESS]: 'TickWithCircle',
+  [StatusType.REJECTED]: 'Shield',
+  [StatusType.FAILURE]: 'CloseWithCircle',
+};
+
 export function StatusBox({ statusText, statusType }: StatusViewProps) {
-  let icon: string;
-  let statusTestId: string;
-
-  switch (statusType) {
-    case StatusType.SUCCESS:
-      icon = 'TickWithCircle';
-      statusTestId = 'success';
-      break;
-    case StatusType.REJECTED:
-      icon = 'Shield';
-      statusTestId = 'rejected';
-      break;
-    case StatusType.FAILURE:
-    default:
-      icon = 'CloseWithCircle';
-      statusTestId = 'failure';
-  }
-
   const isSuccess = statusType === StatusType.SUCCESS;
 
   return (
-    <Box sx={statusBoxStyles} testId={`${statusTestId}-box`}>
+    <Box sx={statusBoxStyles} testId={`${statusType.toString()}-box`}>
       <Icon
-        icon={icon as any}
-        testId={`${statusTestId}-icon`}
+        icon={status[statusType] as any}
+        testId={`${statusType.toString()}-icon`}
         variant="bold"
         sx={statusLogoFill(isSuccess)}
       />
-      <Body size="medium" weight="bold" testId={`${statusTestId}-text`}>
+      <Body size="medium" weight="bold" testId={`${statusType.toString()}-text`}>
         {statusText}
       </Body>
     </Box>
