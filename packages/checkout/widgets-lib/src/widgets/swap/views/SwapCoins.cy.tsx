@@ -6,7 +6,7 @@ import { BigNumber } from 'ethers';
 import { cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapCoins } from './SwapCoins';
-import { SwapState } from '../context/swap-context/SwapContext';
+import { SwapState } from '../context/SwapContext';
 
 describe('SwapCoins tests', () => {
   beforeEach(() => {
