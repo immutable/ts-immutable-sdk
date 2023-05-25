@@ -1,33 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
-// TODO: fix circular dependency
-// eslint-disable-next-line import/no-cycle
-import { TokenInfo } from './token';
-
-/**
- * Enum representing the supported chains with their corresponding IDs.
- */
-export enum ChainId {
-  ETHEREUM = 1,
-  SEPOLIA = 11155111,
-  IMTBL_ZKEVM_DEVNET = 13373,
-  IMTBL_ZKEVM_TESTNET = 13372, // to be used in prod config for testnet launch
-  POLYGON_ZKEVM_TESTNET = 1442,
-  POLYGON_ZKEVM = 137,
-}
-
-/**
- * Interface representing the information of a network.
- * @property {string} name - The name of the network.
- * @property {number} chainId - The ID of the network.
- * @property {TokenInfo} nativeCurrency - The info of the network's native currency.
- * @property {boolean} isSupported - Flag indicating if the network is supported by the application.
- */
-export interface NetworkInfo {
-  name: string;
-  chainId: number;
-  nativeCurrency: TokenInfo;
-  isSupported: boolean;
-}
+import { TokenInfo } from './tokenInfo';
+import { ChainId } from './chainId.enum';
+import { NetworkInfo } from './networkInfo';
 
 /**
  * Type representing the details of a network.

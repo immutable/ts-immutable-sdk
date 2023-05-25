@@ -1,9 +1,10 @@
 export * from './balances';
+export * from './chainId.enum';
 export * from './config';
-// TODO: fix circular dependency
-// eslint-disable-next-line import/no-cycle
 export * from './connect';
 export * from './network';
+export * from './networkInfo';
 export * from './token';
+export * from './tokenInfo';
 export * from './transaction';
 export * from './wallet';

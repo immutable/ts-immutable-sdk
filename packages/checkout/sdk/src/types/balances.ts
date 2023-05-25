@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
-import { ChainId } from './network';
-import { TokenInfo } from './token';
+import { ChainId } from './chainId.enum';
+import { TokenInfo } from './tokenInfo';
 
 /**
  * Interface representing the parameters for {@link Checkout.getBalance}.
