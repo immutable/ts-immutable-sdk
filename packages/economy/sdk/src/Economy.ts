@@ -9,6 +9,7 @@ import type { CraftEvent } from './crafting/Crafting';
 import { ItemDefinition } from './item-definition/ItemDefinition';
 import { EventClient } from './EventClient';
 import { Config, defaultConfig } from './Config';
+import { Store } from './Store';
 
 /** @internal Economy SDK actions */
 export type EconomyEvents = CraftEvent;
@@ -27,6 +28,7 @@ export class Economy {
     public recipe: Recipe,
     public inventory: Inventory,
     public item: ItemDefinition,
+    private store: Store,
   ) {}
 
   public connect(): void {
@@ -40,6 +42,10 @@ export class Economy {
 
   public disconnect(): void {
     this.events.disconnect();
+  }
+
+  public get state() {
+    return this.store.get();
   }
 
   /** Utility: Use to print logs in console */
