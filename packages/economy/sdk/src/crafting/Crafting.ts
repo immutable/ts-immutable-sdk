@@ -118,9 +118,9 @@ export class Crafting {
     });
   }
 
-  public removeInput(input: CraftIngredient) {
+  public removeInput(itemId: string) {
     this.store.set((state) => {
-      state.craftingInputs = state.craftingInputs.filter((i) => i !== input);
+      state.craftingInputs = state.craftingInputs.filter((input) => input.item_id !== itemId);
     });
   }
 
