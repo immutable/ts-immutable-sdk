@@ -6,12 +6,12 @@ import { selectOptionsContainerStyles } from './styles';
 type CoinSelectorProps = {
   onCloseBottomSheet?: () => void;
   heading: string;
-  options: CoinSelectorOption[];
+  options: Option[];
   children: any;
   visible?: boolean;
 };
 
-type CoinSelectorOption = {
+type Option = {
   onClick: () => void;
   icon: AllIconKeys;
   name: string;
@@ -22,32 +22,7 @@ type CoinSelectorOption = {
   }
 };
 
-type CoinSelectorOptionProps = CoinSelectorOption;
-
-export function CoinSelector({
-  heading, options, children, onCloseBottomSheet, visible,
-}: CoinSelectorProps) {
-  return (
-    <BottomSheet headerBarTitle={heading} size="full" onCloseBottomSheet={onCloseBottomSheet} visible={visible}>
-      <BottomSheet.Target>
-        {children}
-      </BottomSheet.Target>
-      <BottomSheet.Content>
-        <Box sx={selectOptionsContainerStyles}>
-          {options.map(({ onClick, icon, name, symbol, balance }) => (
-            <CoinSelectorOption
-              key={symbol}
-              onClick={onClick}
-              icon={icon}
-              name={name}
-              symbol={symbol}
-              balance={balance} />
-          ))}
-        </Box>
-      </BottomSheet.Content>
-    </BottomSheet>
-  );
-}
+type CoinSelectorOptionProps = Option;
 
 export function CoinSelectorOption({
   onClick, icon, name, symbol, balance,
@@ -66,5 +41,33 @@ export function CoinSelectorOption({
         )
       }
     </MenuItem>
+  );
+}
+
+export function CoinSelector({
+  heading, options, children, onCloseBottomSheet, visible,
+}: CoinSelectorProps) {
+  return (
+    <BottomSheet headerBarTitle={heading} size="full" onCloseBottomSheet={onCloseBottomSheet} visible={visible}>
+      <BottomSheet.Target>
+        {children}
+      </BottomSheet.Target>
+      <BottomSheet.Content>
+        <Box sx={selectOptionsContainerStyles}>
+          {options.map(({
+            onClick, icon, name, symbol, balance,
+          }) => (
+            <CoinSelectorOption
+              key={symbol}
+              onClick={onClick}
+              icon={icon}
+              name={name}
+              symbol={symbol}
+              balance={balance}
+            />
+          ))}
+        </Box>
+      </BottomSheet.Content>
+    </BottomSheet>
   );
 }
