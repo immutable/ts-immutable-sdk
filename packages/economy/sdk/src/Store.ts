@@ -8,8 +8,13 @@ import { produce } from 'immer';
 import type { CraftIngredient } from './__codegen__/crafting';
 
 type State = {
-  craftingInputs: CraftIngredient[]
-  selectedRecipeId: string | undefined
+  craftingInputs: CraftIngredient[];
+  selectedRecipeId: string | undefined;
+};
+
+export const defaultState: State = {
+  selectedRecipeId: undefined,
+  craftingInputs: [],
 };
 
 @Service()
@@ -17,7 +22,7 @@ export class Store<T = State> {
   private data: T;
 
   constructor(defaultValue: T) {
-    this.data = this.loadFromLocalStorage() || { ...defaultValue };
+    this.data = { ...defaultValue, ...this.loadFromLocalStorage() };
   }
 
   set(fn: (data: T) => void) {

@@ -33,7 +33,9 @@ describe('Store', () => {
     store = new Store<Data>(defaultValue);
     expect(store.get()).toEqual(defaultValue);
 
-    store.set(() => ({ id: '2' }));
+    store.set((data) => {
+      data.id = '2';
+    });
     expect(store.get().id).toEqual('2');
   });
 
@@ -72,7 +74,10 @@ describe('Store', () => {
 
     store = new Store<Data>(defaultValue);
 
-    expect(store.get()).toEqual(storedData);
+    expect(store.get()).toEqual({
+      items: [],
+      ...storedData,
+    });
   });
 
   it('should save data to local storage', () => {
