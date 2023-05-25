@@ -3,6 +3,8 @@ export const responsiveStyles = {
   minHeight: '500px',
   height: '100vh',
   maxHeight: '650px',
+  position: 'relative',
+  overflow: 'hidden',
 };
 
 export const simpleLayoutStyle = {
@@ -21,7 +23,7 @@ export const headerStyle = (floatHeader: boolean) => ({
   alignItems: 'center',
   width: '100%',
   position: floatHeader ? 'absolute' : 'relative',
-  zIndex: 10,
+  zIndex: 8,
 });
 
 export const footerStyle = (footerBackgroundColor?: string) => ({

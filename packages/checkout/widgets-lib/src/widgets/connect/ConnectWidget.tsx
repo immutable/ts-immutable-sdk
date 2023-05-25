@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-constructed-context-values */
 
-import { BiomeThemeProvider } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
@@ -100,7 +100,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   }, [viewState]);
 
   return (
-    <BiomeThemeProvider theme={{ base: biomeTheme }}>
+    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       {/* TODO: The object passed as the value prop to the Context provider changes every render.
           To fix this consider wrapping it in a useMemo hook. */}
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
@@ -134,6 +134,6 @@ export function ConnectWidget(props: ConnectWidgetProps) {
           </>
         </ConnectContext.Provider>
       </ViewContext.Provider>
-    </BiomeThemeProvider>
+    </BiomeCombinedProviders>
   );
 }

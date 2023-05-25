@@ -166,7 +166,7 @@ export function SwapWidget(props: SwapWidgetProps) {
   const renderFailure = () => <Body>Failure</Body>;
 
   return (
-    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
+    <BiomeCombinedProviders theme={{ base: biomeTheme }} bottomSheetContainerId="bottom-sheet-container">
       <ViewContext.Provider value={viewReducerValues}>
         <SwapContext.Provider value={swapReducerValues}>
           {viewState.view.type === BaseViews.LOADING_VIEW && (

@@ -1,5 +1,5 @@
 import {
-  BiomeThemeProvider, Body, Box, Icon,
+  BiomeCombinedProviders, Body, Box, Icon,
 } from '@biom3/react';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { useState } from 'react';
@@ -87,7 +87,7 @@ export function ConnectionLoader({
   return (
     <>
       {connStatus === ConnectionStatus.UNKNOWN && (
-        <BiomeThemeProvider theme={{ base: biomeTheme }}>
+        <BiomeCombinedProviders theme={{ base: biomeTheme }}>
           <SimpleLayout footer={<FooterLogo />}>
             <CenteredBoxContent>
               <Box sx={statusBoxStyles}>
@@ -117,7 +117,7 @@ export function ConnectionLoader({
               </Box>
             </CenteredBoxContent>
           </SimpleLayout>
-        </BiomeThemeProvider>
+        </BiomeCombinedProviders>
       )}
       {connStatus === ConnectionStatus.NOT_CONNECTED && (
         <InnerWidget
