@@ -79,7 +79,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         supportedTopUps: { ...topUpFeatures },
       },
     });
-  }, []);
+  }, [isBridgeEnabled, isSwapEnabled, isOnRampEnabled, environment]);
 
   useEffect(() => {
     (async () => {
