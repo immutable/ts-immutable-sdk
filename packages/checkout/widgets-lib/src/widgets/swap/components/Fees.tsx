@@ -1,15 +1,18 @@
 import { Body, Box, ButtCon } from '@biom3/react';
-import { useContext } from 'react';
+import { TokenInfo } from '@imtbl/checkout-sdk';
 import { feeBoxStyles, feeContainerStyles } from './FeeStyles';
 import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
-import { SwapFormContext } from '../context/swap-form-context/SwapFormContext';
 import { formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
 
-export function Fees() {
-  const staticText = text.views[SwapWidgetViews.SWAP];
+interface FeesProps {
+  gasFeeValue: string;
+  gasFeeToken: TokenInfo | null;
+  gasFeeFiatValue: string;
+}
 
-  const { swapFormState: { gasFeeValue, gasFeeFiatValue, gasFeeToken } } = useContext(SwapFormContext);
+export function Fees({ gasFeeValue, gasFeeToken, gasFeeFiatValue }: FeesProps) {
+  const staticText = text.views[SwapWidgetViews.SWAP];
 
   if (!gasFeeValue) return <Box />;
   return (
