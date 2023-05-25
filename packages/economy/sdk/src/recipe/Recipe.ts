@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable class-methods-use-this */
 import { List } from 'linqts';
 import { Service } from 'typedi';
@@ -49,6 +50,8 @@ export class Recipe {
   }
 
   public setActive(recipeId: string | undefined) {
-    this.store.set(() => ({ selectedRecipeId: recipeId }));
+    this.store.set((state) => {
+      state.selectedRecipeId = recipeId;
+    });
   }
 }
