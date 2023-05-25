@@ -55,7 +55,6 @@ export function SimpleLayout({
             </Box>
           )}
         </Box>
-        {/* <Box id="bottom-sheet-container" sx={{ position: 'absolute', height: "100%", width: "100%", bottom: '0', left: '0', pointerEvents: 'none' }}></Box> */}
       </Box>
     </MountedBottomSheetOverlayAndProvider>
   );
