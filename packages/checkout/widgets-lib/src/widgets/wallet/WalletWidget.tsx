@@ -47,11 +47,6 @@ export function WalletWidget(props: WalletWidgetProps) {
   const {
     environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
-  const topUpFeatures: TopUpFeature = {
-    isBridgeEnabled,
-    isSwapEnabled,
-    isOnRampEnabled,
-  };
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
@@ -76,7 +71,11 @@ export function WalletWidget(props: WalletWidgetProps) {
     walletDispatch({
       payload: {
         type: WalletActions.SET_SUPPORTED_TOP_UPS,
-        supportedTopUps: { ...topUpFeatures },
+        supportedTopUps: {
+          isBridgeEnabled,
+          isSwapEnabled,
+          isOnRampEnabled,
+        },
       },
     });
   }, [isBridgeEnabled, isSwapEnabled, isOnRampEnabled, environment]);
