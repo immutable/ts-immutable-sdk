@@ -17,8 +17,8 @@ export type EconomyEvents = CraftEvent;
 @Service()
 export class Economy {
   static build(config = defaultConfig): Economy {
-    Container.set(Store, new Store(defaultState));
     Container.set(Config, new Config(config));
+    Container.set(Store, new Store(defaultState));
     return Container.get(Economy);
   }
 
@@ -47,6 +47,10 @@ export class Economy {
 
   public get state() {
     return this.store.get();
+  }
+
+  public resetState() {
+    this.store.reset();
   }
 
   /** Utility: Use to print logs in console */
