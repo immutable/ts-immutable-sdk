@@ -13,7 +13,6 @@ import { ImmutableConfiguration } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { SwapCoins } from './views/SwapCoins';
-import { SuccessView } from '../../components/Success/SuccessView';
 import { LoadingView } from '../../components/Loading/LoadingView';
 import {
   SwapActions,
@@ -37,6 +36,8 @@ import {
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
+import { StatusView } from '../../components/Status/StatusView';
+import { StatusType } from '../../components/Status/StatusType';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -203,11 +204,13 @@ export function SwapWidget(props: SwapWidgetProps) {
               </CryptoFiatProvider>
             )}
             {viewState.view.type === SwapWidgetViews.SUCCESS && (
-              <SuccessView
-                successText="Success"
+              <StatusView
+                statusText="Success"
                 actionText="Continue"
                 // eslint-disable-next-line no-console
                 onActionClick={() => console.log('success')}
+                statusType={StatusType.SUCCESS}
+                testId="success-view"
               />
             )}
             {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
