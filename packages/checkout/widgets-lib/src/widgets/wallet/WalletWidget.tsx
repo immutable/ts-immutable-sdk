@@ -8,7 +8,6 @@ import {
 import { useEffect, useReducer } from 'react';
 import {
   initialWalletState,
-  TopUpFeature,
   WalletActions,
   WalletContext,
   walletReducer,
