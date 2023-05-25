@@ -63,6 +63,7 @@
     "packages/internal/dex/sdk-sample-app",
     "packages/internal/bridge/sdk",
     "packages/internal/bridge/bridge-sample-app",
+    "packages/internal/openapi",
     "packages/checkout/sdk",
     "packages/checkout/sdk-sample-app",
     "packages/checkout/widgets",

@@ -1,0 +1,2818 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Immutable X API",
+    "version": "1.0.0",
+    "description": "Immutable Multi Rollup API",
+    "contact": {
+      "name": "Immutable API Support",
+      "email": "support@immutable.com",
+      "url": "https://support.immutable.com"
+    }
+  },
+  "tags": [
+    {
+      "name": "activities",
+      "description": "Activities Endpoints",
+      "x-displayName": "activities"
+    },
+    {
+      "name": "chains",
+      "description": "Chains Endpoints",
+      "x-displayName": "chains"
+    },
+    {
+      "name": "collections",
+      "description": "Collections Endpoints",
+      "x-displayName": "collections"
+    },
+    {
+      "name": "nfts",
+      "description": "NFTs Endpoints",
+      "x-displayName": "nfts"
+    },
+    {
+      "name": "nft owners",
+      "description": "NFT Owner Endpoints",
+      "x-displayName": "nft owners"
+    },
+    {
+      "name": "demopage",
+      "description": "Temporary HTML endpoint for demo purposes",
+      "x-displayName": "demopage"
+    },
+    {
+      "name": "order_book",
+      "description": "The orderbook service provides trading primitives for the global Order book",
+      "x-displayName": "order_book"
+    }
+  ],
+  "x-tagGroups": [
+    {
+      "name": "oas",
+      "tags": [
+        "activities",
+        "chains",
+        "collections",
+        "nfts",
+        "nft owners",
+        "demopage",
+        "order_book"
+      ],
+      "description": "Service for handing the Immutable global Order book"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://indexer-mr.dev.imtbl.com"
+    },
+    {
+      "url": "https://order-book-mr.dev.imtbl.com"
+    }
+  ],
+  "paths": {
+    "/demopage": {
+      "get": {
+        "description": "Demopage",
+        "x-internal": true,
+        "tags": [
+          "demopage"
+        ],
+        "operationId": "DemoPage",
+        "responses": {
+          "200": {
+            "description": "success and returns some html text",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/activities": {
+      "get": {
+        "tags": [
+          "activities"
+        ],
+        "operationId": "ListActivities",
+        "summary": "List all activities",
+        "description": "List all activities",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "in": "path",
+            "required": true,
+            "examples": {
+              "devnet": {
+                "value": "imtbl-zkevm-devnet",
+                "summary": "Immutable zkEVM Private Testnet"
+              },
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              },
+              "mainnet": {
+                "value": "imtbl-zkevm-mainnet",
+                "summary": "Immutable zkEVM Public Mainnet"
+              },
+              "sepolia-devnet": {
+                "value": "sepolia-devnet",
+                "summary": "Sepolia Dev Testnet"
+              }
+            }
+          },
+          {
+            "name": "contract_address",
+            "in": "query",
+            "description": "The contract address of NFT or ERC20 Token",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "token_id",
+            "in": "query",
+            "description": "An `uint256` token id as string",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          },
+          {
+            "name": "account_address",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3",
+            "description": "The account address activity contains"
+          },
+          {
+            "name": "activity_type",
+            "in": "query",
+            "description": "The activity type",
+            "required": false,
+            "example": "burn",
+            "schema": {
+              "$ref": "#/components/schemas/ActivityType"
+            }
+          },
+          {
+            "name": "from_indexed_at",
+            "in": "query",
+            "description": "From indexed at including given date",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "2022-08-16T17:43:26.991388Z",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to_indexed_at",
+            "in": "query",
+            "required": false,
+            "description": "To indexed at including given date",
+            "schema": {
+              "type": "string",
+              "example": "2022-08-16T17:43:26.991388Z",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "transaction_hash",
+            "in": "query",
+            "description": "The transaction hash of activity",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x68d9eac5e3b3c3580404989a4030c948a78e1b07b2b5ea5688d8c38a6c61c93e"
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListActivitiesResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequests"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/activities/{activity_id}": {
+      "get": {
+        "tags": [
+          "activities"
+        ],
+        "operationId": "GetActivity",
+        "summary": "Get a single activity by ID",
+        "description": "Get a single activity by ID",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "in": "path",
+            "required": true,
+            "examples": {
+              "devnet": {
+                "value": "imtbl-zkevm-devnet",
+                "summary": "Immutable zkEVM Private Testnet"
+              },
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              },
+              "mainnet": {
+                "value": "imtbl-zkevm-mainnet",
+                "summary": "Immutable zkEVM Public Mainnet"
+              },
+              "sepolia-devnet": {
+                "value": "sepolia-devnet",
+                "summary": "Sepolia Dev Testnet"
+              }
+            }
+          },
+          {
+            "name": "activity_id",
+            "description": "The id of activity",
+            "schema": {
+              "$ref": "#/components/schemas/ActivityID"
+            },
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetActivityResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequests"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/collections": {
+      "get": {
+        "description": "List all collections",
+        "tags": [
+          "collections"
+        ],
+        "operationId": "ListCollections",
+        "summary": "List all collections",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "description": "The name of chain",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "devnet": {
+                "value": "imtbl-zkevm-devnet",
+                "summary": "Immutable zkEVM Private Testnet"
+              },
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              },
+              "mainnet": {
+                "value": "imtbl-zkevm-mainnet",
+                "summary": "Immutable zkEVM Public Mainnet"
+              },
+              "sepolia-devnet": {
+                "value": "sepolia-devnet",
+                "summary": "Sepolia Dev Testnet"
+              }
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCollectionsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequests"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/collections/{contract_address}": {
+      "get": {
+        "description": "Get collection by contract address",
+        "tags": [
+          "collections"
+        ],
+        "operationId": "GetCollection",
+        "summary": "Get collection by contract address",
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "devnet": {
+                "value": "imtbl-zkevm-devnet",
+                "summary": "Immutable zkEVM Private Testnet"
+              },
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              },
+              "mainnet": {
+                "value": "imtbl-zkevm-mainnet",
+                "summary": "Immutable zkEVM Public Mainnet"
+              },
+              "sepolia-devnet": {
+                "value": "sepolia-devnet",
+                "summary": "Sepolia Dev Testnet"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCollectionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequests"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/collections/{contract_address}/nfts/{token_id}": {
+      "get": {
+        "description": "Get NFT by token ID",
+        "tags": [
+          "nfts"
+        ],
+        "summary": "Get NFT by token ID",
+        "operationId": "GetNFT",
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The address of NFT contract",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          {
+            "name": "token_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "An `uint256` token id as string",
+            "example": "1"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "devnet": {
+                "value": "imtbl-zkevm-devnet",
+                "summary": "Immutable zkEVM Private Testnet"
+              },
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              },
+              "mainnet": {
+                "value": "imtbl-zkevm-mainnet",
+                "summary": "Immutable zkEVM Public Mainnet"
+              },
+              "sepolia-devnet": {
+                "value": "sepolia-devnet",
+                "summary": "Sepolia Dev Testnet"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetNFTResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequests"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/collections/{contract_address}/nfts": {
+      "get": {
+        "description": "List NFTs by contract address",
+        "tags": [
+          "nfts"
+        ],
+        "summary": "List NFTs by contract address",
+        "operationId": "ListNFTs",
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "required": true,
+            "description": "Contract address",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "devnet": {
+                "value": "imtbl-zkevm-devnet",
+                "summary": "Immutable zkEVM Private Testnet"
+              },
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              },
+              "mainnet": {
+                "value": "imtbl-zkevm-mainnet",
+                "summary": "Immutable zkEVM Public Mainnet"
+              },
+              "sepolia-devnet": {
+                "value": "sepolia-devnet",
+                "summary": "Sepolia Dev Testnet"
+              }
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListNFTsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequests"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/accounts/{account_address}/nfts": {
+      "get": {
+        "description": "List NFTs by account address",
+        "tags": [
+          "nfts"
+        ],
+        "operationId": "ListNFTsByAccountAddress",
+        "summary": "List NFTs by account address",
+        "parameters": [
+          {
+            "name": "account_address",
+            "in": "path",
+            "description": "Account address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "devnet": {
+                "value": "imtbl-zkevm-devnet",
+                "summary": "Immutable zkEVM Private Testnet"
+              },
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              },
+              "mainnet": {
+                "value": "imtbl-zkevm-mainnet",
+                "summary": "Immutable zkEVM Public Mainnet"
+              },
+              "sepolia-devnet": {
+                "value": "sepolia-devnet",
+                "summary": "Sepolia Dev Testnet"
+              }
+            }
+          },
+          {
+            "name": "contract_address",
+            "in": "query",
+            "description": "The address of contract",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListNFTsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequests"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/collections/{contract_address}/nfts/{token_id}/owners": {
+      "get": {
+        "description": "List NFT owners by token ID",
+        "tags": [
+          "nft owners"
+        ],
+        "operationId": "ListNFTOwners",
+        "summary": "List NFT owners by token ID",
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address of contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "token_id",
+            "in": "path",
+            "description": "An `uint256` token id as string",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            },
+            "examples": {
+              "devnet": {
+                "value": "imtbl-zkevm-devnet",
+                "summary": "Immutable zkEVM Private Testnet"
+              },
+              "testnet": {
+                "value": "imtbl-zkevm-testnet",
+                "summary": "Immutable zkEVM Public Testnet"
+              },
+              "mainnet": {
+                "value": "imtbl-zkevm-mainnet",
+                "summary": "Immutable zkEVM Public Mainnet"
+              },
+              "sepolia-devnet": {
+                "value": "sepolia-devnet",
+                "summary": "Sepolia Dev Testnet"
+              }
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListNFTOwnersResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequests"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains": {
+      "get": {
+        "description": "List supported chains",
+        "summary": "List supported chains",
+        "tags": [
+          "chains"
+        ],
+        "operationId": "ListChains",
+        "parameters": [
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListChainsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequests"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_id}/orders": {
+      "get": {
+        "tags": [
+          "order_book"
+        ],
+        "summary": "listorder order_book",
+        "description": "Retrieve a list of orders from a given chain",
+        "operationId": "order_book_list_order",
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Number of orders to return per page",
+            "allowEmptyValue": true,
+            "schema": {
+              "type": "string",
+              "description": "Number of orders to return per page",
+              "default": "100",
+              "example": "200"
+            },
+            "example": "200"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Order field to sort by",
+            "allowEmptyValue": true,
+            "schema": {
+              "type": "string",
+              "description": "Order field to sort by",
+              "example": "start_time"
+            },
+            "example": "start_time"
+          },
+          {
+            "name": "sort_direction",
+            "in": "query",
+            "description": "Ascending or descending direction for sort",
+            "allowEmptyValue": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "description": "Ascending or descending direction for sort",
+              "example": "asc"
+            },
+            "example": "asc"
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Cursor for specific page",
+            "allowEmptyValue": true,
+            "schema": {
+              "type": "string",
+              "description": "Cursor for specific page",
+              "example": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzI"
+            },
+            "example": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzI"
+          },
+          {
+            "name": "chain_id",
+            "in": "path",
+            "description": "Chain identifier using the CAIP-2 blockchain id spec",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Chain identifier using the CAIP-2 blockchain id spec",
+              "example": "eip155:11155111"
+            },
+            "example": "eip155:11155111"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Orders"
+                },
+                "example": {
+                  "next": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzB",
+                  "previous": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA",
+                  "result": [
+                    {
+                      "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                      "buy": [
+                        {
+                          "item_type": "ERC20",
+                          "start_amount": "9750000000000000000",
+                          "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                        }
+                      ],
+                      "buy_fees": [],
+                      "chain_id": "eip155:11155111",
+                      "create_time": "2022-03-07T07:20:50.52Z",
+                      "end_time": "2022-03-10T05:00:50.52Z",
+                      "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+                      "protocol_data": {
+                        "order_type": "FULL_OPEN"
+                      },
+                      "salt": "12686911856931635052326433555881236148",
+                      "sell": [
+                        {
+                          "item_type": "ERC721",
+                          "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                          "token_id": "1"
+                        }
+                      ],
+                      "signature": "0x",
+                      "start_time": "2022-03-09T05:00:50.52Z",
+                      "status": "EXPIRED",
+                      "update_time": "2022-03-07T07:20:50.52Z"
+                    },
+                    {
+                      "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                      "buy": [
+                        {
+                          "item_type": "ERC20",
+                          "start_amount": "9750000000000000000",
+                          "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                        }
+                      ],
+                      "buy_fees": [],
+                      "chain_id": "eip155:11155111",
+                      "create_time": "2022-03-07T07:20:50.52Z",
+                      "end_time": "2022-03-10T05:00:50.52Z",
+                      "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+                      "protocol_data": {
+                        "order_type": "FULL_OPEN"
+                      },
+                      "salt": "12686911856931635052326433555881236148",
+                      "sell": [
+                        {
+                          "item_type": "ERC721",
+                          "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                          "token_id": "1"
+                        }
+                      ],
+                      "signature": "0x",
+                      "start_time": "2022-03-09T05:00:50.52Z",
+                      "status": "EXPIRED",
+                      "update_time": "2022-03-07T07:20:50.52Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found: Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error: Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "order_book"
+        ],
+        "summary": "create_order order_book",
+        "description": "Create a listing on a specific chain",
+        "operationId": "order_book_create_order",
+        "parameters": [
+          {
+            "name": "chain_id",
+            "in": "path",
+            "description": "Chain identifier using the CAIP-2 blockchain id spec",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Chain identifier using the CAIP-2 blockchain id spec",
+              "example": "eip155:11155111"
+            },
+            "example": "eip155:11155111"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequestBody"
+              },
+              "example": {
+                "order_hash": "0x0821933d9391bc9bf11a6010fe84776c84b203abff0c1ad781fb4881409c8770",
+                "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                "buy": [
+                  {
+                    "item_type": "IMX",
+                    "start_amount": "9750000000000000000",
+                    "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                  }
+                ],
+                "buy_fees": [],
+                "end_time": "2022-03-10T05:00:50.52Z",
+                "protocol_data": {
+                  "order_type": "FULL_OPEN"
+                },
+                "salt": "12686911856931635052326433555881236148",
+                "sell": [
+                  {
+                    "item_type": "ERC721",
+                    "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                    "token_id": "1"
+                  }
+                ],
+                "signature": "0x",
+                "start_time": "2022-03-09T05:00:50.52Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                },
+                "example": {
+                  "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                  "buy": [
+                    {
+                      "item_type": "IMX",
+                      "start_amount": "9750000000000000000",
+                      "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                    }
+                  ],
+                  "buy_fees": [],
+                  "chain_id": "eip155:11155111",
+                  "create_time": "2022-03-07T07:20:50.52Z",
+                  "end_time": "2022-03-10T05:00:50.52Z",
+                  "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+                  "protocol_data": {
+                    "order_type": "FULL_OPEN"
+                  },
+                  "salt": "12686911856931635052326433555881236148",
+                  "sell": [
+                    {
+                      "item_type": "ERC721",
+                      "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                      "token_id": "1"
+                    }
+                  ],
+                  "signature": "0x",
+                  "start_time": "2022-03-09T05:00:50.52Z",
+                  "status": "FILLED",
+                  "update_time": "2022-03-07T07:20:50.52Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad_request: Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found: Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error: Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_id}/orders/{order_id}": {
+      "get": {
+        "tags": [
+          "order_book"
+        ],
+        "summary": "getorder order_book",
+        "description": "Retrieve a single order from a given chain",
+        "operationId": "order_book_get_order",
+        "parameters": [
+          {
+            "name": "chain_id",
+            "in": "path",
+            "description": "Chain identifier using the CAIP-2 blockchain id spec",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Chain identifier using the CAIP-2 blockchain id spec",
+              "example": "eip155:11155111"
+            },
+            "example": "eip155:11155111"
+          },
+          {
+            "name": "order_id",
+            "in": "path",
+            "description": "Global Order identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Global Order identifier",
+              "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
+            },
+            "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                },
+                "example": {
+                  "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                  "buy": [
+                    {
+                      "item_type": "IMX",
+                      "start_amount": "9750000000000000000",
+                      "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                    }
+                  ],
+                  "buy_fees": [],
+                  "chain_id": "eip155:11155111",
+                  "create_time": "2022-03-07T07:20:50.52Z",
+                  "end_time": "2022-03-10T05:00:50.52Z",
+                  "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+                  "protocol_data": {
+                    "order_type": "FULL_OPEN"
+                  },
+                  "salt": "12686911856931635052326433555881236148",
+                  "sell": [
+                    {
+                      "item_type": "ERC721",
+                      "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                      "token_id": "1"
+                    }
+                  ],
+                  "signature": "0x",
+                  "start_time": "2022-03-09T05:00:50.52Z",
+                  "status": "PENDING",
+                  "update_time": "2022-03-07T07:20:50.52Z"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found: Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error: Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "NotFound": {
+        "description": "The specified resource was not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIError404"
+            }
+          }
+        }
+      },
+      "BadRequests": {
+        "description": "400 response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIError400"
+            }
+          }
+        }
+      },
+      "ServerError": {
+        "description": "500 response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIError500"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "ActivityType": {
+        "description": "The activity type",
+        "example": "mint",
+        "type": "string",
+        "enum": [
+          "mint",
+          "burn",
+          "transfer",
+          "sale"
+        ]
+      },
+      "ERC721Token": {
+        "type": "object",
+        "properties": {
+          "contract_type": {
+            "$ref": "#/components/schemas/ContractType"
+          },
+          "contract_address": {
+            "description": "The token contract address",
+            "type": "string",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "token_id": {
+            "description": "An `uint256` token id as string",
+            "type": "string",
+            "example": "1"
+          }
+        },
+        "required": [
+          "contract_type",
+          "contract_address",
+          "token_id"
+        ]
+      },
+      "ERC20": {
+        "type": "object",
+        "properties": {
+          "contract_type": {
+            "$ref": "#/components/schemas/ContractType"
+          },
+          "contract_address": {
+            "description": "The token contract address",
+            "type": "string",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "symbol": {
+            "description": "The symbol of the token",
+            "type": "string",
+            "nullable": true,
+            "example": "GOG"
+          },
+          "decimals": {
+            "description": "The decimal places of a token",
+            "type": "integer",
+            "nullable": true,
+            "example": 18
+          }
+        },
+        "required": [
+          "contract_type",
+          "contract_address",
+          "symbol",
+          "decimals"
+        ]
+      },
+      "Token": {
+        "description": "The token details",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ERC721Token"
+          },
+          {
+            "$ref": "#/components/schemas/ERC20"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "contract_type"
+        }
+      },
+      "Mint": {
+        "type": "object",
+        "description": "The mint activity details",
+        "properties": {
+          "activity_type": {
+            "$ref": "#/components/schemas/ActivityType"
+          },
+          "to": {
+            "description": "The account address token minted to",
+            "type": "string",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "amount": {
+            "description": "The minted token amount",
+            "type": "string",
+            "example": "1"
+          },
+          "token": {
+            "$ref": "#/components/schemas/Token"
+          }
+        },
+        "required": [
+          "activity_type",
+          "to",
+          "amount",
+          "token"
+        ]
+      },
+      "Burn": {
+        "description": "The burn activity details",
+        "type": "object",
+        "properties": {
+          "activity_type": {
+            "$ref": "#/components/schemas/ActivityType"
+          },
+          "from": {
+            "description": "The account address the token was transferred from",
+            "type": "string",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "amount": {
+            "description": "The amount of tokens burnt",
+            "type": "string",
+            "example": "1"
+          },
+          "token": {
+            "$ref": "#/components/schemas/Token"
+          }
+        },
+        "required": [
+          "activity_type",
+          "from",
+          "amount",
+          "token"
+        ]
+      },
+      "Transfer": {
+        "type": "object",
+        "description": "The transfer activity details",
+        "properties": {
+          "activity_type": {
+            "$ref": "#/components/schemas/ActivityType"
+          },
+          "from": {
+            "description": "The account address the token was transferred from",
+            "type": "string",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "to": {
+            "description": "The account address the token was transferred to",
+            "type": "string",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "amount": {
+            "description": "The amount of tokens transferred",
+            "type": "string",
+            "example": "1"
+          },
+          "token": {
+            "$ref": "#/components/schemas/Token"
+          }
+        },
+        "required": [
+          "activity_type",
+          "from",
+          "to",
+          "amount",
+          "token"
+        ]
+      },
+      "NativeToken": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "description": "The token symbol",
+            "type": "string",
+            "example": "ETH"
+          }
+        },
+        "required": [
+          "symbol"
+        ]
+      },
+      "NFTSale": {
+        "description": "The NFT Sale activity details",
+        "type": "object",
+        "properties": {
+          "activity_type": {
+            "$ref": "#/components/schemas/ActivityType"
+          },
+          "order_id": {
+            "description": "The id of order",
+            "type": "string",
+            "example": "ARZ3NDEKTSV4RRFFQ69G5FAV"
+          },
+          "buyer_address": {
+            "description": "The account address of buyer",
+            "type": "string",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "seller_address": {
+            "description": "The account address of seller",
+            "type": "string",
+            "example": "0xbD6cFcf93474De653d7B42b346c7c25d1F9c559C"
+          },
+          "quantity": {
+            "description": "The quantity of tokens sold",
+            "type": "integer",
+            "format": "int32",
+            "example": 1
+          },
+          "token": {
+            "$ref": "#/components/schemas/ERC721Token"
+          },
+          "payment_amount": {
+            "description": "The amount of payment",
+            "type": "string",
+            "example": "123"
+          },
+          "payment_token": {
+            "description": "The type of payment token",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ERC20"
+              },
+              {
+                "$ref": "#/components/schemas/NativeToken"
+              }
+            ]
+          }
+        },
+        "required": [
+          "activity_type",
+          "order_id",
+          "buyer_address",
+          "seller_address",
+          "quantity",
+          "token",
+          "payment_amount",
+          "payment_amount_usd",
+          "payment_token"
+        ]
+      },
+      "ActivityDetails": {
+        "description": "The activity details",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Mint"
+          },
+          {
+            "$ref": "#/components/schemas/Burn"
+          },
+          {
+            "$ref": "#/components/schemas/Transfer"
+          },
+          {
+            "$ref": "#/components/schemas/NFTSale"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "activity_type"
+        }
+      },
+      "BlockchainMetadata": {
+        "description": "The metadata related to blockchain transaction",
+        "nullable": true,
+        "type": "object",
+        "properties": {
+          "transaction_hash": {
+            "type": "string",
+            "description": "The transaction hash of the activity",
+            "example": "0x68d9eac5e3b3c3580404989a4030c948a78e1b07b2b5ea5688d8c38a6c61c93e"
+          },
+          "block_number": {
+            "description": "EVM block number (uint64 as string)",
+            "type": "string",
+            "example": "1"
+          },
+          "transaction_index": {
+            "description": "Transaction index in a block (uint32 as string)",
+            "type": "string",
+            "example": "1"
+          },
+          "log_index": {
+            "description": "The log index of activity in a block (uint32 as string)",
+            "type": "string",
+            "nullable": true,
+            "example": "1"
+          }
+        },
+        "required": [
+          "transaction_hash",
+          "block_number",
+          "transaction_index",
+          "log_index"
+        ]
+      },
+      "Activity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ActivityID"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ActivityType"
+          },
+          "details": {
+            "$ref": "#/components/schemas/ActivityDetails"
+          },
+          "indexed_at": {
+            "type": "string",
+            "description": "The time activity was indexed",
+            "format": "date-time",
+            "example": "2022-08-16T17:43:26.991388Z"
+          },
+          "blockchain_metadata": {
+            "$ref": "#/components/schemas/BlockchainMetadata"
+          }
+        },
+        "required": [
+          "id",
+          "chain",
+          "type",
+          "details",
+          "indexed_at",
+          "blockchain_metadata"
+        ]
+      },
+      "ListActivitiesResult": {
+        "type": "object",
+        "description": "List activities response",
+        "properties": {
+          "result": {
+            "type": "array",
+            "description": "List of activities",
+            "items": {
+              "$ref": "#/components/schemas/Activity"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "GetActivityResult": {
+        "type": "object",
+        "description": "Single activity",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/Activity"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "Collection": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The name of the collection",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "symbol": {
+            "type": "string",
+            "nullable": true,
+            "description": "The symbol of contract",
+            "example": "BASP"
+          },
+          "contract_type": {
+            "$ref": "#/components/schemas/CollectionContractType"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "The address of the contract",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "The description of collection",
+            "example": "Some description"
+          },
+          "image": {
+            "type": "string",
+            "description": "The url of the collection image",
+            "example": "https://some-url",
+            "nullable": true
+          },
+          "external_link": {
+            "type": "string",
+            "description": "The url of external link",
+            "example": "https://some-url",
+            "nullable": true
+          },
+          "contract_uri": {
+            "type": "string",
+            "description": "The uri for the metadata of the collection",
+            "example": "https://some-url",
+            "nullable": true
+          },
+          "base_uri": {
+            "type": "string",
+            "nullable": true,
+            "description": "The metadata uri for nft",
+            "example": "https://some-url"
+          },
+          "indexed_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "When the collection was first indexed"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "When the collection was last updated"
+          },
+          "last_metadata_synced_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "When the collection metadata was last synced"
+          }
+        },
+        "required": [
+          "chain",
+          "name",
+          "symbol",
+          "contract_type",
+          "contract_address",
+          "description",
+          "image",
+          "external_link",
+          "base_uri",
+          "metadata_uri",
+          "indexed_at",
+          "updated_at",
+          "last_metadata_synced_at"
+        ]
+      },
+      "ListCollectionsResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "description": "List of collections",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Collection"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "GetCollectionResult": {
+        "type": "object",
+        "description": "Single Collection",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/Collection"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "NFT": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "token_id": {
+            "type": "string",
+            "example": "1",
+            "description": "An `uint256` token id as string"
+          },
+          "contract_address": {
+            "type": "string",
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e",
+            "description": "The contract address of the NFT"
+          },
+          "indexed_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "When the NFT was first indexed"
+          },
+          "metadata_synced_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When NFT metadata was last synced",
+            "example": "2022-08-16T17:43:26.991388Z"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "example": "Sword",
+            "description": "The name of the NFT"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "2022-08-16T17:43:26.991388Z",
+            "description": "The description of the NFT"
+          },
+          "image": {
+            "type": "string",
+            "nullable": true,
+            "description": "The image url of the NFT",
+            "example": "https://some-url"
+          },
+          "external_link": {
+            "type": "string",
+            "nullable": true,
+            "description": "The external website link of NFT",
+            "example": "https://some-url"
+          },
+          "animation_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The animation url of the NFT",
+            "example": "https://some-url"
+          },
+          "youtube_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "The youtube URL of NFT",
+            "example": "https://some-url"
+          },
+          "mint_activity_id": {
+            "type": "string",
+            "nullable": true,
+            "example": "8d644608-a26f-4e41-bdc8-205cae20c7c5",
+            "description": "The id of mint activity of this NFT"
+          }
+        },
+        "required": [
+          "chain",
+          "token_id",
+          "contract_address",
+          "indexed_at",
+          "metadata_synced_at",
+          "name",
+          "description",
+          "image",
+          "external_link",
+          "animation_url",
+          "youtube_url",
+          "mint_activity_id"
+        ]
+      },
+      "NFTMetadataAttribute": {
+        "type": "object",
+        "properties": {
+          "trait_type": {
+            "description": "The metadata trait type",
+            "type": "string",
+            "example": "Aqua Power"
+          },
+          "value": {
+            "type": "string",
+            "description": "The metadata trait value",
+            "example": "40"
+          },
+          "display_type": {
+            "type": "string",
+            "description": "The metadata trait display type",
+            "example": "boost_number"
+          }
+        },
+        "required": [
+          "trait_type",
+          "value",
+          "display_type"
+        ]
+      },
+      "NFTMetadataAttributes": {
+        "type": "object",
+        "description": "List of normalized NFT metadata attributes",
+        "properties": {
+          "attributes": {
+            "type": "array",
+            "description": "List of NFT Metadata attributes",
+            "items": {
+              "$ref": "#/components/schemas/NFTMetadataAttribute"
+            }
+          }
+        },
+        "required": [
+          "attributes"
+        ]
+      },
+      "ChainName": {
+        "type": "string",
+        "description": "The name of chain",
+        "example": "imtbl-zkevm-testnet"
+      },
+      "PageSize": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Maximum number of items to return",
+        "minimum": 1,
+        "default": 100,
+        "maximum": 200,
+        "example": 10
+      },
+      "PageCursor": {
+        "type": "string",
+        "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+        "example": "ewogICJ0eXBlIjogInByZXYiLAogICJpdGVtIjogewogICAgImlkIjogNjI3NTEzMCwKICAgICJjcmVhdGVkX2F0IjogIjIwMjItMDktMTNUMTc6MDQ6MTIuMDI0MTI2WiIKICB9Cn0="
+      },
+      "Page": {
+        "type": "object",
+        "description": "Pagination properties",
+        "properties": {
+          "previous_cursor": {
+            "type": "string",
+            "description": "First item as base64 encoded string",
+            "example": "ewogICJ0eXBlIjogInByZXYiLAogICJpdGVtIjogewogICAgImlkIjogNjI3NTEzMCwKICAgICJjcmVhdGVkX2F0IjogIjIwMjItMDktMTNUMTc6MDQ6MTIuMDI0MTI2WiIKICB9Cn0="
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Last item as base64 encoded string",
+            "example": "ewogICJ0eXBlIjogInByZXYiLAogICJpdGVtIjogewogICAgImlkIjogNjI3NTEzMCwKICAgICJjcmVhdGVkX2F0IjogIjIwMjItMDktMTNUMTc6MDQ6MTIuMDI0MTI2WiIKICB9Cn0="
+          }
+        },
+        "required": [
+          "previous_cursor",
+          "next_cursor"
+        ]
+      },
+      "ContractType": {
+        "description": "The contract type",
+        "type": "string",
+        "enum": [
+          "ERC721",
+          "ERC20"
+        ]
+      },
+      "ActivityID": {
+        "description": "Activity ID in UUIDv4 format",
+        "type": "string",
+        "format": "uuid",
+        "example": "4e28df8d-f65c-4c11-ba04-6a9dd47b179b"
+      },
+      "CollectionContractType": {
+        "description": "The collection contract type",
+        "type": "string",
+        "enum": [
+          "ERC721"
+        ]
+      },
+      "NFTWithMetadataAttributes": {
+        "description": "A single NFT with metadata attributes",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NFT"
+          },
+          {
+            "$ref": "#/components/schemas/NFTMetadataAttributes"
+          }
+        ]
+      },
+      "GetNFTResult": {
+        "type": "object",
+        "description": "Single NFT",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/NFTWithMetadataAttributes"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "ListNFTsResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "description": "List of nfts",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NFT"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "NFTOwner": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "The address of NFT contract",
+            "example": "0x5a019874f4fae314b0eaa4606be746366e661306"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "An `uint256` token id as string",
+            "example": "1"
+          },
+          "account_address": {
+            "type": "string",
+            "description": "The account address of the owner of the NFT",
+            "example": "0x5a019874f4fae314b0eaa4606be746366e661306"
+          },
+          "quantity": {
+            "type": "string",
+            "description": "The quantity of owned tokens (uint256 as string)",
+            "example": "1"
+          }
+        },
+        "required": [
+          "chain",
+          "contract_address",
+          "token_id",
+          "account_address",
+          "quantity"
+        ]
+      },
+      "ListNFTOwnersResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "description": "List of nft owners",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NFTOwner"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "Chain": {
+        "type": "object",
+        "description": "The chain details",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The id of chain",
+            "example": "eip155:13372"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of chain",
+            "example": "imtbl-zkevm-testnet"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "ListChainsResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "description": "List of chains",
+            "items": {
+              "$ref": "#/components/schemas/Chain"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "DemoPage": {
+        "type": "string",
+        "example": "<html>HTML text</html>"
+      },
+      "BasicAPIError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error Message",
+            "example": "all fields must be provided"
+          },
+          "link": {
+            "type": "string",
+            "description": "Link to IMX documentation that can help resolve this error",
+            "example": "https://docs.x.immutable.com/reference/#/"
+          },
+          "trace_id": {
+            "type": "string",
+            "description": "Trace ID of the initial request",
+            "example": "e47634b79a5cd6894ddc9639ec4aad26"
+          }
+        },
+        "required": [
+          "message",
+          "link",
+          "trace_id"
+        ]
+      },
+      "APIError400": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAPIError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error Code",
+                "enum": [
+                  "VALIDATION_ERROR"
+                ],
+                "example": "VALIDATION_ERROR"
+              },
+              "details": {
+                "type": "object",
+                "nullable": true,
+                "description": "Additional details to help resolve the error",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "code",
+              "details"
+            ]
+          }
+        ]
+      },
+      "APIError404": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAPIError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error Code",
+                "enum": [
+                  "RESOURCE_NOT_FOUND"
+                ],
+                "example": "RESOURCE_NOT_FOUND"
+              },
+              "details": {
+                "type": "object",
+                "nullable": true,
+                "description": "Additional details to help resolve the error",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "code",
+              "details"
+            ]
+          }
+        ]
+      },
+      "APIError500": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAPIError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error Code",
+                "enum": [
+                  "INTERNAL_SERVER_ERROR"
+                ],
+                "example": "INTERNAL_SERVER_ERROR"
+              },
+              "details": {
+                "type": "object",
+                "nullable": true,
+                "description": "Additional details to help resolve the error",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "code",
+              "details"
+            ]
+          }
+        ]
+      },
+      "BuyItem": {
+        "type": "object",
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "description": "Token type user is willing to accept upon settlement",
+            "example": "ERC20",
+            "enum": [
+              "ERC20",
+              "IMX"
+            ]
+          },
+          "start_amount": {
+            "type": "string",
+            "description": "Starting price of what the user will consider to sell token",
+            "example": "9750000000000000000",
+            "pattern": "\\d+"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC20 token",
+            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          }
+        },
+        "example": {
+          "item_type": "IMX",
+          "start_amount": "9750000000000000000",
+          "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+        },
+        "required": [
+          "item_type",
+          "start_amount"
+        ]
+      },
+      "CreateOrderRequestBody": {
+        "type": "object",
+        "properties": {
+          "account_address": {
+            "type": "string",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "order_hash": {
+            "type": "string",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+          },
+          "buy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuyItem"
+            },
+            "example": [
+              {
+                "item_type": "IMX",
+                "start_amount": "9750000000000000000",
+                "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "buy_fees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Fee"
+            },
+            "example": [],
+            "minItems": 0,
+            "maxItems": 1
+          },
+          "end_time": {
+            "type": "string",
+            "description": "Time after which the Order is considered expired",
+            "format": "date-time",
+            "example": "2022-03-09T05:00:50.52Z"
+          },
+          "protocol_data": {
+            "$ref": "#/components/schemas/ProtocolData"
+          },
+          "salt": {
+            "type": "string",
+            "description": "A random value added to the create Order request",
+            "example": "12686911856931635052326433555881236148"
+          },
+          "sell": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SellItem"
+            },
+            "example": [
+              {
+                "item_type": "ERC721",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "token_id": "1"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "signature": {
+            "type": "string",
+            "description": "Digital signature generated by the user for the specific Order",
+            "example": "0x"
+          },
+          "start_time": {
+            "type": "string",
+            "description": "Time after which Order is considered active",
+            "format": "date-time",
+            "example": "2022-03-09T05:00:50.52Z"
+          }
+        },
+        "example": {
+          "order_hash": "0x0821933d9391bc9bf11a6010fe84776c84b203abff0c1ad781fb4881409c8770",
+          "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          "buy": [
+            {
+              "item_type": "IMX",
+              "start_amount": "9750000000000000000",
+              "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+            }
+          ],
+          "buy_fees": [],
+          "end_time": "2022-03-10T05:00:50.52Z",
+          "protocol_data": {
+            "order_type": "FULL_OPEN"
+          },
+          "salt": "12686911856931635052326433555881236148",
+          "sell": [
+            {
+              "item_type": "ERC721",
+              "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+              "token_id": "1"
+            }
+          ],
+          "signature": "0x",
+          "start_time": "2022-03-09T05:00:50.52Z"
+        },
+        "required": [
+          "account_address",
+          "order_hash",
+          "buy",
+          "sell",
+          "buy_fees",
+          "end_time",
+          "start_time",
+          "protocol_data",
+          "salt",
+          "signature"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Error trace id",
+            "example": "1234567890"
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message",
+            "example": "Order creation failed"
+          }
+        },
+        "description": "Resource not found",
+        "example": {
+          "id": "1234567890",
+          "message": "Order creation failed"
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "Fee": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Fee payable to recipient upon settlement",
+            "example": "2250000000000000000",
+            "pattern": "\\d+"
+          },
+          "fee_type": {
+            "type": "string",
+            "description": "Fee type",
+            "example": "ROYALTY",
+            "enum": [
+              "ROYALTY"
+            ]
+          },
+          "recipient": {
+            "type": "string",
+            "description": "Wallet address of fee recipient",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          }
+        },
+        "example": {
+          "amount": "2250000000000000000",
+          "fee_type": "ROYALTY",
+          "recipient": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
+        },
+        "required": [
+          "fee_type",
+          "amount",
+          "recipient"
+        ]
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "account_address": {
+            "type": "string",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+          },
+          "buy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuyItem"
+            },
+            "example": [
+              {
+                "item_type": "IMX",
+                "start_amount": "9750000000000000000",
+                "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "buy_fees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Fee"
+            },
+            "example": [],
+            "minItems": 0,
+            "maxItems": 1
+          },
+          "chain_id": {
+            "type": "string",
+            "description": "Chain identifier using the CAIP-2 blockchain id spec",
+            "example": "eip155:11155111"
+          },
+          "create_time": {
+            "type": "string",
+            "description": "Time the Order is created",
+            "format": "date-time",
+            "example": "2022-03-07T07:20:50.52Z"
+          },
+          "end_time": {
+            "type": "string",
+            "description": "Time after which the Order is considered expired",
+            "format": "date-time",
+            "example": "2022-03-10T05:00:50.52Z"
+          },
+          "id": {
+            "type": "string",
+            "description": "Global Order identifier",
+            "example": "018792C9-4AD7-8EC4-4038-9E05C598534A"
+          },
+          "protocol_data": {
+            "$ref": "#/components/schemas/ProtocolData"
+          },
+          "salt": {
+            "type": "string",
+            "description": "A random value added to the create Order request",
+            "example": "12686911856931635052326433555881236148"
+          },
+          "sell": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SellItem"
+            },
+            "example": [
+              {
+                "item_type": "ERC721",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "token_id": "1"
+              }
+            ],
+            "minItems": 1,
+            "maxItems": 1
+          },
+          "signature": {
+            "type": "string",
+            "description": "Digital signature generated by the user for the specific Order",
+            "example": "0x"
+          },
+          "start_time": {
+            "type": "string",
+            "description": "Time after which Order is considered active",
+            "format": "date-time",
+            "example": "2022-03-09T05:00:50.52Z"
+          },
+          "status": {
+            "type": "string",
+            "description": "Order status",
+            "example": "INACTIVE",
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "CANCELLED",
+              "INACTIVE",
+              "REJECTED",
+              "FILLED",
+              "EXPIRED"
+            ]
+          },
+          "update_time": {
+            "type": "string",
+            "description": "Time the Order is last updated",
+            "format": "date-time",
+            "example": "2022-03-07T07:20:50.52Z"
+          }
+        },
+        "example": {
+          "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          "buy": [
+            {
+              "item_type": "IMX",
+              "start_amount": "9750000000000000000",
+              "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+            }
+          ],
+          "buy_fees": [],
+          "chain_id": "eip155:11155111",
+          "create_time": "2022-03-07T07:20:50.52Z",
+          "end_time": "2022-03-10T05:00:50.52Z",
+          "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+          "protocol_data": {
+            "order_type": "FULL_OPEN"
+          },
+          "salt": "12686911856931635052326433555881236148",
+          "sell": [
+            {
+              "item_type": "ERC721",
+              "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+              "token_id": "1"
+            }
+          ],
+          "signature": "0x",
+          "start_time": "2022-03-09T05:00:50.52Z",
+          "status": "ACTIVE",
+          "update_time": "2022-03-07T07:20:50.52Z"
+        },
+        "required": [
+          "id",
+          "account_address",
+          "buy",
+          "sell",
+          "buy_fees",
+          "chain_id",
+          "create_time",
+          "end_time",
+          "start_time",
+          "update_time",
+          "protocol_data",
+          "salt",
+          "signature",
+          "status"
+        ]
+      },
+      "Orders": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string",
+            "description": "Cursor to retrieve next page",
+            "example": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzB"
+          },
+          "previous": {
+            "type": "string",
+            "description": "Cursor to retrieve previous page",
+            "example": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA"
+          },
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Order"
+            },
+            "example": [
+              {
+                "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                "buy": [
+                  {
+                    "item_type": "ERC20",
+                    "start_amount": "9750000000000000000",
+                    "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                  }
+                ],
+                "buy_fees": [],
+                "chain_id": "eip155:11155111",
+                "create_time": "2022-03-07T07:20:50.52Z",
+                "end_time": "2022-03-10T05:00:50.52Z",
+                "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+                "protocol_data": {
+                  "order_type": "FULL_OPEN"
+                },
+                "salt": "12686911856931635052326433555881236148",
+                "sell": [
+                  {
+                    "item_type": "ERC721",
+                    "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                    "token_id": "1"
+                  }
+                ],
+                "signature": "0x",
+                "start_time": "2022-03-09T05:00:50.52Z",
+                "status": "EXPIRED",
+                "update_time": "2022-03-07T07:20:50.52Z"
+              },
+              {
+                "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+                "buy": [
+                  {
+                    "item_type": "ERC20",
+                    "start_amount": "9750000000000000000",
+                    "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                  }
+                ],
+                "buy_fees": [],
+                "chain_id": "eip155:11155111",
+                "create_time": "2022-03-07T07:20:50.52Z",
+                "end_time": "2022-03-10T05:00:50.52Z",
+                "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+                "protocol_data": {
+                  "order_type": "FULL_OPEN"
+                },
+                "salt": "12686911856931635052326433555881236148",
+                "sell": [
+                  {
+                    "item_type": "ERC721",
+                    "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                    "token_id": "1"
+                  }
+                ],
+                "signature": "0x",
+                "start_time": "2022-03-09T05:00:50.52Z",
+                "status": "EXPIRED",
+                "update_time": "2022-03-07T07:20:50.52Z"
+              }
+            ],
+            "minItems": 0,
+            "maxItems": 200
+          }
+        },
+        "example": {
+          "next": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzB",
+          "previous": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA",
+          "result": [
+            {
+              "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "buy": [
+                {
+                  "item_type": "ERC20",
+                  "start_amount": "9750000000000000000",
+                  "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                }
+              ],
+              "buy_fees": [],
+              "chain_id": "eip155:11155111",
+              "create_time": "2022-03-07T07:20:50.52Z",
+              "end_time": "2022-03-10T05:00:50.52Z",
+              "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+              "protocol_data": {
+                "order_type": "FULL_OPEN"
+              },
+              "salt": "12686911856931635052326433555881236148",
+              "sell": [
+                {
+                  "item_type": "ERC721",
+                  "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                  "token_id": "1"
+                }
+              ],
+              "signature": "0x",
+              "start_time": "2022-03-09T05:00:50.52Z",
+              "status": "EXPIRED",
+              "update_time": "2022-03-07T07:20:50.52Z"
+            },
+            {
+              "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "buy": [
+                {
+                  "item_type": "ERC20",
+                  "start_amount": "9750000000000000000",
+                  "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+                }
+              ],
+              "buy_fees": [],
+              "chain_id": "eip155:11155111",
+              "create_time": "2022-03-07T07:20:50.52Z",
+              "end_time": "2022-03-10T05:00:50.52Z",
+              "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+              "protocol_data": {
+                "order_type": "FULL_OPEN"
+              },
+              "salt": "12686911856931635052326433555881236148",
+              "sell": [
+                {
+                  "item_type": "ERC721",
+                  "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                  "token_id": "1"
+                }
+              ],
+              "signature": "0x",
+              "start_time": "2022-03-09T05:00:50.52Z",
+              "status": "EXPIRED",
+              "update_time": "2022-03-07T07:20:50.52Z"
+            }
+          ]
+        },
+        "required": [
+          "result"
+        ]
+      },
+      "ProtocolData": {
+        "type": "object",
+        "properties": {
+          "order_type": {
+            "type": "string",
+            "description": "The Order type",
+            "example": "FULL_OPEN",
+            "enum": [
+              "FULL_OPEN"
+            ]
+          }
+        },
+        "example": {
+          "order_type": "FULL_OPEN"
+        },
+        "required": [
+          "order_type"
+        ]
+      },
+      "SellItem": {
+        "type": "object",
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "description": "Token type user is offering which in this case is a ERC721",
+            "example": "ERC721",
+            "enum": [
+              "ERC721"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC721 token",
+            "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "ID of ERC721 token",
+            "example": "1",
+            "pattern": "\\d+"
+          }
+        },
+        "example": {
+          "item_type": "ERC721",
+          "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+          "token_id": "1"
+        },
+        "required": [
+          "item_type",
+          "contract_address",
+          "token_id"
+        ]
+      }
+    }
+  }
+}

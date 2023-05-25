@@ -3057,6 +3057,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@imtbl/openapi@workspace:packages/internal/openapi":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/openapi@workspace:packages/internal/openapi"
+  languageName: unknown
+  linkType: soft
+
 "@imtbl/orderbook@0.0.0, @imtbl/orderbook@workspace:packages/orderbook":
   version: 0.0.0-use.local
   resolution: "@imtbl/orderbook@workspace:packages/orderbook"
