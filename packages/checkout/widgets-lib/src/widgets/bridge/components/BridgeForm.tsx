@@ -14,7 +14,7 @@ import { text } from '../../../resources/text/textConfig';
 import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
 import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
 import { SelectForm, SelectOption } from '../../../components/FormComponents/SelectForm/SelectForm';
-import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
+import { validateAmount, validateAmountWithBalance, validateToken } from '../functions/BridgeFormValidator';
 
 interface BridgeFormProps {
   defaultAmount?: string;
@@ -59,7 +59,12 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const handleBridgeAmountChange = (value: string) => {
     setAmount(value);
-    setAmountError('');
+    const validateBalanceError = validateAmountWithBalance(value, token?.formattedBalance);
+    if (validateBalanceError) {
+      setAmountError(validateBalanceError);
+    } else {
+      setAmountError('');
+    }
 
     if (!token) return;
     setAmountFiatValue(calculateCryptoToFiat(
@@ -71,7 +76,12 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const handleAmountInputBlur = (value: string) => {
     setAmount(value);
-    setAmountError('');
+    const validateBalanceError = validateAmountWithBalance(value, token?.formattedBalance);
+    if (validateBalanceError) {
+      setAmountError(validateBalanceError);
+    } else {
+      setAmountError('');
+    }
 
     if (!token) return;
     setAmountFiatValue(calculateCryptoToFiat(
