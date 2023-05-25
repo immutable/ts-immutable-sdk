@@ -74,7 +74,7 @@ export function BridgeForm(props: BridgeFormProps) {
     // Bridge.getBridgeTx(...)
     nonce: '0x00', // ignored by MetaMask
     gasPrice: '0x000', // customizable by user during MetaMask confirmation.
-    gas: '0x000', // customizable by user during MetaMask confirmation.
+    gasLimit: '0x000', // customizable by user during MetaMask confirmation.
     to: '', // To address.
     from: '', // User's active address.
     value: '0x00', // Only required to send ether to the recipient from the initiating external account.
