@@ -2,6 +2,7 @@ import { Box, Button } from '@biom3/react';
 import { useContext } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { TransactionResponse } from '@imtbl/dex-sdk';
+import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import {
@@ -43,6 +44,7 @@ export function SwapButton({ loading, validator, transaction }: SwapButtonProps)
         transaction: transaction.transaction,
       });
       const receipt = await txn.transactionResponse.wait();
+      console.log('receipt:', receipt, receipt.status);
 
       if (receipt.status === 0 || receipt.status === undefined) {
         viewDispatch({
@@ -62,6 +64,24 @@ export function SwapButton({ loading, validator, transaction }: SwapButtonProps)
         },
       });
     } catch (err: any) {
+      console.log('err:', err);
+      if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+        console.log('user rejected request');
+        return;
+      }
+      if (err.type === CheckoutErrorType.TRANSACTION_FAILED) {
+        console.log('transaction failed');
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SwapWidgetViews.FAIL,
+              reason: 'Transaction failed',
+            },
+          },
+        });
+        return;
+      }
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,

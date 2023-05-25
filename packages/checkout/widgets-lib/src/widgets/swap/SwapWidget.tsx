@@ -1,4 +1,4 @@
-import { BiomeCombinedProviders, Body } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import {
   Checkout,
   GetTokenAllowListResult,
@@ -163,23 +163,21 @@ export function SwapWidget(props: SwapWidgetProps) {
     swapWidgetSetup();
   }, [swapWidgetSetup]);
 
-  const renderFailure = () => <Body>Failure</Body>;
-
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }} bottomSheetContainerId="bottom-sheet-container">
       <ViewContext.Provider value={viewReducerValues}>
         <SwapContext.Provider value={swapReducerValues}>
           {viewState.view.type === BaseViews.LOADING_VIEW && (
-          <LoadingView loadingText={loadingText} />
+            <LoadingView loadingText={loadingText} />
           )}
           {viewState.view.type === SwapWidgetViews.SWAP && (
-          <CryptoFiatProvider>
-            <SwapCoins
-              amount={amount}
-              fromContractAddress={fromContractAddress}
-              toContractAddress={toContractAddress}
-            />
-          </CryptoFiatProvider>
+            <CryptoFiatProvider>
+              <SwapCoins
+                amount={amount}
+                fromContractAddress={fromContractAddress}
+                toContractAddress={toContractAddress}
+              />
+            </CryptoFiatProvider>
           )}
           {viewState.view.type === SwapWidgetViews.SUCCESS && (
             <StatusView
@@ -191,7 +189,16 @@ export function SwapWidget(props: SwapWidgetProps) {
               testId="success-view"
             />
           )}
-          {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
+          {viewState.view.type === SwapWidgetViews.FAIL && (
+          <StatusView
+            statusText="Transaction failed"
+            actionText="Review & try again"
+                // eslint-disable-next-line no-console
+            onActionClick={() => console.log('review and try again')}
+            statusType={StatusType.FAILURE}
+            testId="fail-view"
+          />
+          )}
         </SwapContext.Provider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
