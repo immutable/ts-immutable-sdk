@@ -72,14 +72,14 @@ export function WalletWidget(props: WalletWidgetProps) {
         checkout: new Checkout({ baseConfig: { environment } }),
       },
     });
-
+    
     walletDispatch({
       payload: {
         type: WalletActions.SET_SUPPORTED_TOP_UPS,
         supportedTopUps: { ...topUpFeatures },
       },
     });
-  }, [topUpFeatures, environment]);
+  }, []);
 
   useEffect(() => {
     (async () => {
