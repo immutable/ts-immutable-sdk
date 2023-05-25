@@ -1,19 +1,31 @@
 import { GetBalanceResult } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import {
-  ValidateFromAmount, ValidateFromToken, ValidateToToken, ValidateToAmount,
+  validateFromAmount,
+  validateFromToken,
+  validateToToken,
+  validateToAmount,
 } from './SwapValidator';
+import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
+import { text } from '../../../resources/text/textConfig';
 
 describe('SwapValidator', () => {
-  describe('ValidateFromToken', () => {
-    it('should return error message if swapFromToken is null', () => {
-      const swapFromToken = null;
-      const result = ValidateFromToken(swapFromToken);
-      expect(result).toEqual('Select a coin to swap');
+  const {
+    noAmountInputted,
+    noFromTokenSelected,
+    noToTokenSelected,
+    insufficientBalance,
+  } = text.views[SwapWidgetViews.SWAP].validation;
+
+  describe('validateFromToken', () => {
+    it('should return error message if fromToken is null', () => {
+      const fromToken = null;
+      const result = validateFromToken(fromToken);
+      expect(result).toEqual(noFromTokenSelected);
     });
 
-    it('should return empty string if swapFromToken is not null', () => {
-      const swapFromToken: GetBalanceResult = {
+    it('should return empty string if fromToken is not null', () => {
+      const fromToken: GetBalanceResult = {
         balance: BigNumber.from(1),
         formattedBalance: '1',
         token: {
@@ -22,74 +34,98 @@ describe('SwapValidator', () => {
           decimals: 18,
         },
       };
-      const result = ValidateFromToken(swapFromToken);
+      const result = validateFromToken(fromToken);
       expect(result).toEqual('');
     });
   });
 
-  describe('ValidateFromAmount', () => {
+  describe('validateFromAmount', () => {
     it('should return error message if amount is empty', () => {
       const amount = '';
-      const result = ValidateFromAmount(amount);
-      expect(result).toEqual('Please input amount');
+      const result = validateFromAmount(amount);
+      expect(result).toEqual(noAmountInputted);
+    });
+
+    it('should return error message if amount is 0', () => {
+      const amount = '0';
+      const result = validateFromAmount(amount);
+      expect(result).toEqual(noAmountInputted);
+    });
+
+    it('should return error message if amount is 0.00', () => {
+      const amount = '0';
+      const result = validateFromAmount(amount);
+      expect(result).toEqual(noAmountInputted);
     });
 
     it('should return error message if amount is greater than balance', () => {
       const amount = '2';
       const balance = '1';
-      const result = ValidateFromAmount(amount, balance);
-      expect(result).toEqual('Insufficient balance');
+      const result = validateFromAmount(amount, balance);
+      expect(result).toEqual(insufficientBalance);
     });
 
     it('should return empty string if amount is less than balance', () => {
       const amount = '1';
       const balance = '2';
-      const result = ValidateFromAmount(amount, balance);
+      const result = validateFromAmount(amount, balance);
       expect(result).toEqual('');
     });
 
     it('should return empty string if amount is equal to balance', () => {
       const amount = '1';
       const balance = '1';
-      const result = ValidateFromAmount(amount, balance);
+      const result = validateFromAmount(amount, balance);
       expect(result).toEqual('');
     });
 
     it('should return empty string if balance is undefined', () => {
       const amount = '1';
-      const result = ValidateFromAmount(amount);
+      const result = validateFromAmount(amount);
       expect(result).toEqual('');
     });
   });
 
-  describe('ValidateToToken', () => {
-    it('should return error message if swapToToken is null', () => {
-      const swapToToken = null;
-      const result = ValidateToToken(swapToToken);
-      expect(result).toEqual('Select a coin to receive');
+  describe('validateToToken', () => {
+    it('should return error message if toToken is null', () => {
+      const toToken = null;
+      const result = validateToToken(toToken);
+      expect(result).toEqual(noToTokenSelected);
     });
 
-    it('should return empty string if swapToToken is not null', () => {
-      const swapToToken = {
+    it('should return empty string if toToken is not null', () => {
+      const toToken = {
         name: 'Ethereum',
         symbol: 'ETH',
         decimals: 18,
       };
-      const result = ValidateToToken(swapToToken);
+      const result = validateToToken(toToken);
       expect(result).toEqual('');
     });
   });
 
-  describe('ValidateToAmount', () => {
+  describe('validateToAmount', () => {
     it('should return error message if amount is empty', () => {
       const amount = '';
-      const result = ValidateToAmount(amount);
+      const result = validateToAmount(amount);
+      expect(result).toEqual('Please input amount');
+    });
+
+    it('should return error message if amount is 0', () => {
+      const amount = '0';
+      const result = validateToAmount(amount);
+      expect(result).toEqual('Please input amount');
+    });
+
+    it('should return error message if amount is 0.00', () => {
+      const amount = '0';
+      const result = validateToAmount(amount);
       expect(result).toEqual('Please input amount');
     });
 
     it('should return empty string if amount is not empty', () => {
       const amount = '1';
-      const result = ValidateToAmount(amount);
+      const result = validateToAmount(amount);
       expect(result).toEqual('');
     });
   });

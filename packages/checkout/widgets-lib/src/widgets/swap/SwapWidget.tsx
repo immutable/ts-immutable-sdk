@@ -10,7 +10,6 @@ import {
   useEffect, useCallback, useReducer, useMemo,
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
-import { BigNumber } from 'ethers';
 import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../components/Loading/LoadingView';
@@ -19,7 +18,7 @@ import {
   SwapContext,
   initialSwapState,
   swapReducer,
-} from './context/swap-context/SwapContext';
+} from './context/SwapContext';
 import {
   BaseViews,
   ViewActions,
@@ -28,16 +27,13 @@ import {
   viewReducer,
 } from '../../context/view-context/ViewContext';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
-import {
-  SwapFormContext,
-  initialSwapFormState,
-  swapFormReducer,
-} from './context/swap-form-context/SwapFormContext';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
+import { getDexConfigOverrides } from './DexConfigOverrides';
+import { text } from '../../resources/text/textConfig';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -52,6 +48,8 @@ export interface SwapWidgetParams {
 }
 
 export function SwapWidget(props: SwapWidgetProps) {
+  const { success } = text.views[SwapWidgetViews.SWAP];
+  const loadingText = text.views[BaseViews.LOADING_VIEW].text;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const viewReducerValues = useMemo(
     () => ({ viewState, viewDispatch }),
@@ -61,14 +59,6 @@ export function SwapWidget(props: SwapWidgetProps) {
   const swapReducerValues = useMemo(
     () => ({ swapState, swapDispatch }),
     [swapState, swapDispatch],
-  );
-  const [swapFormState, swapFormDispatch] = useReducer(
-    swapFormReducer,
-    initialSwapFormState,
-  );
-  const swapFormReducerValues = useMemo(
-    () => ({ swapFormState, swapFormDispatch }),
-    [swapFormState, swapFormDispatch],
   );
 
   const { params, config } = props;
@@ -124,8 +114,6 @@ export function SwapWidget(props: SwapWidgetProps) {
       .map((token) => token.address)
       .includes(balance.token.address));
 
-    allowedTokenBalances.entries();
-
     swapDispatch({
       payload: {
         type: SwapActions.SET_ALLOWED_TOKENS,
@@ -133,20 +121,10 @@ export function SwapWidget(props: SwapWidgetProps) {
       },
     });
 
-    // FIXME: stop hardcoding this, only doing because dev net is reset
     swapDispatch({
       payload: {
         type: SwapActions.SET_TOKEN_BALANCES,
-        tokenBalances: [{
-          balance: BigNumber.from('1560000000000000000'),
-          formattedBalance: '1.56',
-          token: {
-            name: 'ImmutableX',
-            symbol: 'IMX',
-            decimals: 18,
-            address: '0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851',
-          },
-        }],
+        tokenBalances: allowedTokenBalances,
       },
     });
 
@@ -170,6 +148,7 @@ export function SwapWidget(props: SwapWidgetProps) {
     const exchange = new Exchange(new ExchangeConfiguration({
       chainId: connectResult.network.chainId,
       baseConfig: new ImmutableConfiguration({ environment }),
+      overrides: getDexConfigOverrides(),
     }));
 
     swapDispatch({
@@ -190,31 +169,29 @@ export function SwapWidget(props: SwapWidgetProps) {
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
         <SwapContext.Provider value={swapReducerValues}>
-          <SwapFormContext.Provider value={swapFormReducerValues}>
-            {viewState.view.type === BaseViews.LOADING_VIEW && (
-              <LoadingView loadingText="Loading" />
-            )}
-            {viewState.view.type === SwapWidgetViews.SWAP && (
-              <CryptoFiatProvider>
-                <SwapCoins
-                  amount={amount}
-                  fromContractAddress={fromContractAddress}
-                  toContractAddress={toContractAddress}
-                />
-              </CryptoFiatProvider>
-            )}
-            {viewState.view.type === SwapWidgetViews.SUCCESS && (
-              <StatusView
-                statusText="Success"
-                actionText="Continue"
-                // eslint-disable-next-line no-console
-                onActionClick={() => console.log('success')}
-                statusType={StatusType.SUCCESS}
-                testId="success-view"
-              />
-            )}
-            {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
-          </SwapFormContext.Provider>
+          {viewState.view.type === BaseViews.LOADING_VIEW && (
+          <LoadingView loadingText={loadingText} />
+          )}
+          {viewState.view.type === SwapWidgetViews.SWAP && (
+          <CryptoFiatProvider>
+            <SwapCoins
+              amount={amount}
+              fromContractAddress={fromContractAddress}
+              toContractAddress={toContractAddress}
+            />
+          </CryptoFiatProvider>
+          )}
+          {viewState.view.type === SwapWidgetViews.SUCCESS && (
+            <StatusView
+              statusText={success.text}
+              actionText={success.actionText}
+              // eslint-disable-next-line no-console
+              onActionClick={() => console.log('success')}
+              statusType={StatusType.SUCCESS}
+              testId="success-view"
+            />
+          )}
+          {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
         </SwapContext.Provider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
