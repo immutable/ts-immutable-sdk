@@ -1,8 +1,8 @@
-import { GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
+import { TokenInfo } from '@imtbl/checkout-sdk';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 
-export function validateFromToken(fromToken: GetBalanceResult | null): string {
+export function validateFromToken(fromToken?: TokenInfo): string {
   const { validation } = text.views[SwapWidgetViews.SWAP];
   if (!fromToken) return validation.noFromTokenSelected;
   return '';
@@ -15,7 +15,7 @@ export function validateFromAmount(amount: string, balance?: string): string {
   return '';
 }
 
-export function validateToToken(toToken: TokenInfo | null): string {
+export function validateToToken(toToken?: TokenInfo): string {
   const { validation } = text.views[SwapWidgetViews.SWAP];
   if (!toToken) return validation.noToTokenSelected;
   return '';

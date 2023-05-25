@@ -173,7 +173,7 @@ export function SwapWidget(props: SwapWidgetProps) {
           {viewState.view.type === SwapWidgetViews.SWAP && (
             <CryptoFiatProvider>
               <SwapCoins
-                amount={amount}
+                fromAmount={amount}
                 fromContractAddress={fromContractAddress}
                 toContractAddress={toContractAddress}
               />
@@ -194,7 +194,14 @@ export function SwapWidget(props: SwapWidgetProps) {
             statusText="Transaction failed"
             actionText="Review & try again"
                 // eslint-disable-next-line no-console
-            onActionClick={() => console.log('review and try again')}
+            onActionClick={() => {
+              viewDispatch({
+                payload: {
+                  type: ViewActions.UPDATE_VIEW,
+                  view: { type: SwapWidgetViews.SWAP },
+                },
+              });
+            }}
             statusType={StatusType.FAILURE}
             testId="fail-view"
           />
