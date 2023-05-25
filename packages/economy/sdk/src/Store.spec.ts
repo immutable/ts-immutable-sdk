@@ -22,7 +22,7 @@ describe('Store', () => {
   beforeEach(() => {
     jest.restoreAllMocks();
     localStorage.clear();
-    store = new Store<Data>(defaultValue);
+    store = new Store<Data>(defaultValue, true);
   });
 
   it('should handle errors when loading from local storage', () => {
@@ -72,7 +72,7 @@ describe('Store', () => {
     const serializedData = JSON.stringify(storedData);
     localStorage.setItem('storeData', serializedData);
 
-    store = new Store<Data>(defaultValue);
+    store = new Store<Data>(defaultValue, true);
 
     expect(store.get()).toEqual({
       items: [],
