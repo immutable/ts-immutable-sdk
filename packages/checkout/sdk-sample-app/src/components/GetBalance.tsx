@@ -11,7 +11,7 @@ interface BalanceProps {
 }
 
 export default function GetBalance(props: BalanceProps) {
-  const contractAddress = '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF';
+  const contractAddress = '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE';
 
   const { provider, checkout } = props;
 
@@ -39,7 +39,7 @@ export default function GetBalance(props: BalanceProps) {
     const walletAddress = await provider.getSigner().getAddress();
     try {
       const resp = await checkout.getBalance({
-        provider,
+        web3Provider: provider,
         walletAddress,
       });
       setResultNative(resp);
@@ -70,7 +70,7 @@ export default function GetBalance(props: BalanceProps) {
     const walletAddress = await provider.getSigner().getAddress();
     try {
       const resp = await checkout.getBalance({
-        provider,
+        web3Provider: provider,
         walletAddress,
         contractAddress,
       });

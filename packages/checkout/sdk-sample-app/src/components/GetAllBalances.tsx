@@ -32,9 +32,9 @@ export default function GetAllBalances(props: BalanceProps) {
     const walletAddress = await provider.getSigner().getAddress();
     try {
       const resp = await checkout.getAllBalances({
-        provider,
+        web3Provider: provider,
         walletAddress: walletAddress,
-        chainId: ChainId.ETHEREUM,
+        chainId: ChainId.SEPOLIA,
       });
       setResult(resp.balances);
       setLoading(false);
@@ -63,7 +63,7 @@ export default function GetAllBalances(props: BalanceProps) {
         }}
       >
         <LoadingButton onClick={getAllBalances} loading={loading}>
-          Get all balances (Ethereum)
+          Get all balances (Sepolia)
         </LoadingButton>
       </Box>
       {result && !error && (

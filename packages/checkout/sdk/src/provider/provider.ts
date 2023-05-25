@@ -4,14 +4,11 @@ import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import {
   ChainId,
-  ConnectParams,
   DefaultProviders,
   GenericProvider,
-  GetNetworkAllowListParams,
   NetworkFilterTypes,
   NetworkInfo,
   ProviderForChain,
-  ProviderInfo,
   Providers,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
@@ -62,11 +59,9 @@ export async function cloneProviders(
   const { web3Provider } = genericProvider;
   const providerName: string = genericProvider.name;
 
-  const getNetParams: GetNetworkAllowListParams = {
+  const allowedNetworks = await getNetworkAllowList(config, {
     type: NetworkFilterTypes.ALL,
-  };
-
-  const allowedNetworks = await getNetworkAllowList(config, getNetParams);
+  });
 
   for (const network of allowedNetworks.networks) {
     const chainId: ChainId = network.chainId as ChainId;
@@ -112,39 +107,4 @@ export async function cloneProviders(
     providers: clonedProviders,
     networkInfo: defaultNetworkInfo,
   };
-}
-
-export async function getWeb3Provider(
-  params: ConnectParams,
-  providerInfo: ProviderInfo,
-): Promise<Web3Provider> {
-  const { providers, currentProvider, currentNetwork } = providerInfo;
-  const { web3Provider, cachedProvider } = params;
-
-  // console.log('providers', providers);
-  // console.log('currentProvider', currentProvider);
-  // console.log('currentNetwork', currentNetwork);
-  // console.log('web3Provider', web3Provider);
-  // console.log('cachedProvider', cachedProvider);
-
-  if (web3Provider) return web3Provider;
-
-  if (cachedProvider && providers) {
-    const { chainId, name } = cachedProvider;
-    if (providers[name] && providers[name][chainId]) {
-      return providers[name][chainId];
-    }
-  }
-
-  if (providers && currentProvider && currentNetwork) {
-    const { chainId } = currentNetwork;
-    if (providers[currentProvider] && providers[currentProvider][chainId]) {
-      return providers[currentProvider][chainId];
-    }
-  }
-
-  throw new CheckoutError(
-    'unable to retrieve a valid web3Provider',
-    CheckoutErrorType.WEB3_PROVIDER_ERROR,
-  );
 }

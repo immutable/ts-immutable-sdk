@@ -14,6 +14,7 @@ import {
   ConnectResult,
   CreateProviderParams,
   CreateProviderResult,
+  CurrentProviderInfo,
   GetAllBalancesParams,
   GetAllBalancesResult,
   GetBalanceParams,
@@ -26,7 +27,7 @@ import {
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   NetworkInfo,
-  ProviderInfo,
+  Providers,
   SANDBOX_CONFIGURATION,
   SendTransactionParams,
   SendTransactionResult,
@@ -36,15 +37,19 @@ import {
   SwitchNetworkResult,
 } from './types';
 import { CheckoutConfiguration } from './config';
+import { CheckoutError, CheckoutErrorType } from './errors';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
 
-  private providerInfo: ProviderInfo;
+  private allProviders: Providers;
+
+  private currentProviderInfo: CurrentProviderInfo;
 
   constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
-    this.providerInfo = {};
+    this.currentProviderInfo = {};
+    this.allProviders = {};
   }
 
   public async createDefaultProvider(
@@ -62,7 +67,13 @@ export class Checkout {
 
   public async getProviders() {
     return {
-      providers: this.providerInfo.providers,
+      providers: this.allProviders,
+    };
+  }
+
+  public async getCurrentProvider() {
+    return {
+      currentProviderInfo: this.currentProviderInfo,
     };
   }
 
@@ -73,13 +84,12 @@ export class Checkout {
       this.config,
       params,
     );
-    this.providerInfo.currentProvider = params.name;
-    this.providerInfo.currentNetwork = networkInfo;
-    this.providerInfo.providers = providers;
+    this.currentProviderInfo.name = params.name;
+    this.currentProviderInfo.network = networkInfo;
+    this.allProviders = providers;
     return {
-      providers: this.providerInfo.providers,
-      currentProvider: this.providerInfo.currentProvider,
-      currentNetwork: this.providerInfo.currentNetwork,
+      providers: this.allProviders,
+      currentProviderInfo: this.currentProviderInfo,
     };
   }
 
@@ -106,7 +116,8 @@ export class Checkout {
   public async connect(params: ConnectParams = {}): Promise<ConnectResult> {
     const web3Provider = await provider.getWeb3Provider(
       params,
-      this.providerInfo,
+      this.currentProviderInfo,
+      this.allProviders,
     );
     await connect.connectWalletProvider({ web3Provider });
     const networkInfo = await network.getNetworkInfo(this.config, web3Provider);
@@ -126,23 +137,30 @@ export class Checkout {
   public async switchNetwork(
     params: SwitchNetworkParams,
   ): Promise<SwitchNetworkResult> {
-    // if (!this.providerPreference) {
-    //   throw new CheckoutError(
-    //     'connect should be called before switchNetwork to set the provider preference',
-    //     CheckoutErrorType.PROVIDER_PREFERENCE_ERROR
-    //   );
-    // }
+    if (!this.allProviders) {
+      throw new CheckoutError(
+        'checkout.setProvider should be called before switchNetwork to create the providers for each available network',
+        CheckoutErrorType.PROVIDER_ERROR,
+      );
+    }
 
     const web3Provider = await provider.getWeb3Provider(
       params,
-      this.providerInfo,
+      this.currentProviderInfo,
+      this.allProviders,
     );
 
-    return await network.switchWalletNetwork(
+    const switchNetworkRes = await network.switchWalletNetwork(
       this.config,
       web3Provider,
       params.chainId,
+      this.currentProviderInfo,
+      this.allProviders,
     );
+
+    this.currentProviderInfo.network = switchNetworkRes.network;
+
+    return switchNetworkRes;
   }
 
   /**
@@ -154,15 +172,21 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
+    const web3Provider = await provider.getWeb3Provider(
+      params,
+      this.currentProviderInfo,
+      this.allProviders,
+    );
+
     if (!params.contractAddress || params.contractAddress === '') {
       return await balances.getBalance(
         this.config,
-        params.provider,
+        web3Provider,
         params.walletAddress,
       );
     }
     return await balances.getERC20Balance(
-      params.provider,
+      web3Provider,
       params.walletAddress,
       params.contractAddress,
     );
@@ -178,9 +202,15 @@ export class Checkout {
   public async getAllBalances(
     params: GetAllBalancesParams,
   ): Promise<GetAllBalancesResult> {
+    const web3Provider = await provider.getWeb3Provider(
+      params,
+      this.currentProviderInfo,
+      this.allProviders,
+    );
+
     return balances.getAllBalances(
       this.config,
-      params.provider,
+      web3Provider,
       params.walletAddress,
       params.chainId,
     );
@@ -236,7 +266,15 @@ export class Checkout {
   public async sendTransaction(
     params: SendTransactionParams,
   ): Promise<SendTransactionResult> {
-    return await transaction.sendTransaction(params);
+    const web3Provider = await provider.getWeb3Provider(
+      params,
+      this.currentProviderInfo,
+      this.allProviders,
+    );
+    return await transaction.sendTransaction({
+      web3Provider,
+      transaction: params.transaction,
+    });
   }
 
   /**
@@ -246,6 +284,11 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
-    return await network.getNetworkInfo(this.config, params.provider);
+    const web3Provider = await provider.getWeb3Provider(
+      params,
+      this.currentProviderInfo,
+      this.allProviders,
+    );
+    return await network.getNetworkInfo(this.config, web3Provider);
   }
 }

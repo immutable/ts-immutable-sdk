@@ -2,6 +2,9 @@ import { Web3Provider } from '@ethersproject/providers';
 // TODO: fix circular dependency
 // eslint-disable-next-line import/no-cycle
 import { TokenInfo } from './token';
+// TODO: fix circular dependency
+// eslint-disable-next-line import/no-cycle
+import { ProviderParams } from './provider';
 
 /**
  * Enum representing the supported chains with their corresponding IDs.
@@ -155,12 +158,7 @@ NetworkDetails
  * @property {Web3Provider} provider - The provider to connect to the network.
  * @property {ChainId} chainId - The ID of the network to switch to.
  */
-export interface SwitchNetworkParams {
-  web3Provider?: Web3Provider;
-  cachedProvider?: {
-    name: string;
-    chainId: ChainId;
-  };
+export interface SwitchNetworkParams extends ProviderParams {
   chainId: ChainId;
 }
 
@@ -177,9 +175,7 @@ export interface SwitchNetworkResult {
  * * Interface representing the parameters for {@link Checkout.getNetworkInfo}.
  * @property {Web3Provider} provider - The provider to connect to the network.
  */
-export interface GetNetworkParams {
-  provider: Web3Provider;
-}
+export interface GetNetworkParams extends ProviderParams {}
 
 /**
  * Enum representing the types of filters that can be applied to get the allow list of networks.

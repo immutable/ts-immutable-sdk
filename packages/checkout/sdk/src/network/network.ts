@@ -10,10 +10,12 @@ import {
   SwitchNetworkResult,
   WalletAction,
   NetworkMap,
+  CurrentProviderInfo,
+  Providers,
 } from '../types';
-import { connectWalletProvider } from '../connect/connect';
 import networkMasterList from './network_master_list.json';
 import { CheckoutConfiguration } from '../config';
+import { getWeb3Provider } from '../provider/web3provider';
 
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 
@@ -60,6 +62,38 @@ async function addNetworkToWallet(
   }
 }
 
+export async function getNetworkAllowList(
+  config: CheckoutConfiguration,
+  { type = NetworkFilterTypes.ALL, exclude }: GetNetworkAllowListParams,
+): Promise<GetNetworkAllowListResult> {
+  const { networkMap } = config;
+
+  const list = networkMasterList.filter((network) => {
+    const allowAllTokens = type === NetworkFilterTypes.ALL;
+    const networkNotExcluded = !(exclude || [])
+      .map((exc) => exc.chainId)
+      .includes(network.chainId);
+    return allowAllTokens && networkNotExcluded;
+  });
+
+  const allowedNetworks: NetworkInfo[] = [];
+  list.forEach((element) => {
+    const newNetwork = networkMap.get(element.chainId as ChainId);
+    if (newNetwork) {
+      allowedNetworks.push({
+        name: newNetwork.chainName,
+        chainId: parseInt(newNetwork.chainIdHex, 16),
+        nativeCurrency: newNetwork.nativeCurrency,
+        isSupported: true,
+      });
+    }
+  });
+
+  return {
+    networks: allowedNetworks,
+  };
+}
+
 export async function getNetworkInfo(
   config: CheckoutConfiguration,
   provider: Web3Provider,
@@ -97,6 +131,8 @@ export async function switchWalletNetwork(
   config: CheckoutConfiguration,
   web3Provider: Web3Provider,
   chainId: ChainId,
+  currentProviderInfo: CurrentProviderInfo,
+  allProviders: Providers,
 ): Promise<SwitchNetworkResult> {
   // @WT-1345 - refactor this to return the new network and network info from the providers array
   // then update the Checkout.providerInfo object with the new current info
@@ -104,7 +140,13 @@ export async function switchWalletNetwork(
   const currentProvider = web3Provider;
   const { networkMap } = config;
 
-  if (!Object.values(ChainId).includes(chainId)) {
+  const allowedNetworks = await getNetworkAllowList(config, {
+    type: NetworkFilterTypes.ALL,
+  });
+
+  if (
+    !allowedNetworks.networks.some((network) => network.chainId === chainId)
+  ) {
     throw new CheckoutError(
       `Chain:${chainId} is not a supported chain`,
       CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
@@ -141,57 +183,31 @@ export async function switchWalletNetwork(
     }
   }
 
-  await connectWalletProvider({ web3Provider });
+  const getW3Params = {
+    cachedProvider: {
+      name: currentProviderInfo.name!,
+      chainId,
+    },
+  };
 
-  if ((await currentProvider.getNetwork()).chainId !== chainId) {
-    // user didn't actually switch
+  const newProvider = await getWeb3Provider(
+    getW3Params,
+    currentProviderInfo,
+    allProviders,
+  );
+
+  let networkInfo: NetworkInfo;
+  try {
+    networkInfo = await getNetworkInfo(config, newProvider);
+  } catch (err) {
     throw new CheckoutError(
       'User cancelled switch network request',
       CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
     );
   }
 
-  // we can assume that if the above succeeds then user has successfully
-  // switched to the network specified
-  const newNetwork = networkMap.get(chainId as ChainId);
   return {
-    network: {
-      name: newNetwork?.chainName,
-      chainId: parseInt(newNetwork?.chainIdHex ?? '', 16),
-      nativeCurrency: newNetwork?.nativeCurrency,
-    },
-    provider: currentProvider,
+    network: networkInfo,
+    provider: newProvider,
   } as SwitchNetworkResult;
-}
-
-export async function getNetworkAllowList(
-  config: CheckoutConfiguration,
-  { type = NetworkFilterTypes.ALL, exclude }: GetNetworkAllowListParams,
-): Promise<GetNetworkAllowListResult> {
-  const { networkMap } = config;
-
-  const list = networkMasterList.filter((network) => {
-    const allowAllTokens = type === NetworkFilterTypes.ALL;
-    const networkNotExcluded = !(exclude || [])
-      .map((exc) => exc.chainId)
-      .includes(network.chainId);
-    return allowAllTokens && networkNotExcluded;
-  });
-
-  const allowedNetworks: NetworkInfo[] = [];
-  list.forEach((element) => {
-    const newNetwork = networkMap.get(element.chainId as ChainId);
-    if (newNetwork) {
-      allowedNetworks.push({
-        name: newNetwork.chainName,
-        chainId: parseInt(newNetwork.chainIdHex, 16),
-        nativeCurrency: newNetwork.nativeCurrency,
-        isSupported: true,
-      });
-    }
-  });
-
-  return {
-    networks: allowedNetworks,
-  };
 }

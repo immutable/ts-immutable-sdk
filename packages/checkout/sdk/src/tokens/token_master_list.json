@@ -69,6 +69,24 @@
     "tokenFeatures": ["swap", "bridge"]
   },
   {
+    "chainId": 11155111,
+    "name": "FUN token",
+    "address": "0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE",
+    "symbol": "FUN",
+    "decimals": 18,
+    "icon": "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg xmlns='http://www.w3.org/2000/svg' xml:space='preserve' width='100%25' height='100%25' version='1.1' shape-rendering='geometricPrecision' text-rendering='geometricPrecision' image-rendering='optimizeQuality' fill-rule='evenodd' clip-rule='evenodd'%0AviewBox='0 0 784.37 1277.39' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:xodm='http://www.corel.com/coreldraw/odm/2003'%3E%3Cg id='Layer_x0020_1'%3E%3Cmetadata id='CorelCorpID_0Corel-Layer'/%3E%3Cg id='_1421394342400'%3E%3Cg%3E%3Cpolygon fill='%23343434' fill-rule='nonzero' points='392.07,0 383.5,29.11 383.5,873.74 392.07,882.29 784.13,650.54 '/%3E%3Cpolygon fill='%238C8C8C' fill-rule='nonzero' points='392.07,0 -0,650.54 392.07,882.29 392.07,472.33 '/%3E%3Cpolygon fill='%233C3C3B' fill-rule='nonzero' points='392.07,956.52 387.24,962.41 387.24,1263.28 392.07,1277.38 784.37,724.89 '/%3E%3Cpolygon fill='%238C8C8C' fill-rule='nonzero' points='392.07,1277.38 392.07,956.52 -0,724.89 '/%3E%3Cpolygon fill='%23141414' fill-rule='nonzero' points='392.07,882.29 784.13,650.54 392.07,472.33 '/%3E%3Cpolygon fill='%23393939' fill-rule='nonzero' points='0,650.54 392.07,882.29 392.07,472.33 '/%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E%0A",
+    "tokenFeatures": ["swap", "bridge"]
+  },
+  {
+    "chainId": 11155111,
+    "name": "DEX token",
+    "address": "0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2",
+    "symbol": "DEX",
+    "decimals": 18,
+    "icon": "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg xmlns='http://www.w3.org/2000/svg' xml:space='preserve' width='100%25' height='100%25' version='1.1' shape-rendering='geometricPrecision' text-rendering='geometricPrecision' image-rendering='optimizeQuality' fill-rule='evenodd' clip-rule='evenodd'%0AviewBox='0 0 784.37 1277.39' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:xodm='http://www.corel.com/coreldraw/odm/2003'%3E%3Cg id='Layer_x0020_1'%3E%3Cmetadata id='CorelCorpID_0Corel-Layer'/%3E%3Cg id='_1421394342400'%3E%3Cg%3E%3Cpolygon fill='%23343434' fill-rule='nonzero' points='392.07,0 383.5,29.11 383.5,873.74 392.07,882.29 784.13,650.54 '/%3E%3Cpolygon fill='%238C8C8C' fill-rule='nonzero' points='392.07,0 -0,650.54 392.07,882.29 392.07,472.33 '/%3E%3Cpolygon fill='%233C3C3B' fill-rule='nonzero' points='392.07,956.52 387.24,962.41 387.24,1263.28 392.07,1277.38 784.37,724.89 '/%3E%3Cpolygon fill='%238C8C8C' fill-rule='nonzero' points='392.07,1277.38 392.07,956.52 -0,724.89 '/%3E%3Cpolygon fill='%23141414' fill-rule='nonzero' points='392.07,882.29 784.13,650.54 392.07,472.33 '/%3E%3Cpolygon fill='%23393939' fill-rule='nonzero' points='0,650.54 392.07,882.29 392.07,472.33 '/%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E%0A",
+    "tokenFeatures": ["swap", "bridge"]
+  },
+  {
     "chainId": 1442,
     "name": "WETH",
     "address": "0x4F062A3EAeC3730560aB89b5CE5aC0ab2C5517aE",

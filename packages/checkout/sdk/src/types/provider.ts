@@ -1,4 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
+// TODO: fix circular dependency
+// eslint-disable-next-line import/no-cycle
 import { ChainId, NetworkInfo } from './network';
 
 export enum DefaultProviders {
@@ -15,8 +17,7 @@ export type SetProviderParams = GenericProvider;
 
 export interface SetProviderResult {
   providers: Providers;
-  currentProvider: string;
-  currentNetwork: NetworkInfo;
+  currentProviderInfo: CurrentProviderInfo;
 }
 
 export interface Providers {
@@ -32,8 +33,15 @@ export interface GenericProvider {
   web3Provider: Web3Provider;
 }
 
-export interface ProviderInfo {
-  currentProvider?: string | DefaultProviders;
-  currentNetwork?: NetworkInfo;
-  providers?: Providers;
+export interface CurrentProviderInfo {
+  name?: string | DefaultProviders;
+  network?: NetworkInfo;
+}
+
+export interface ProviderParams {
+  web3Provider?: Web3Provider;
+  cachedProvider?: {
+    name: string | DefaultProviders;
+    chainId: ChainId;
+  };
 }

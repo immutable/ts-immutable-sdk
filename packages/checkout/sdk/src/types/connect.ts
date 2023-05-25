@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 // TODO: fix circular dependency
 // eslint-disable-next-line import/no-cycle
-import { ChainId, DefaultProviders, NetworkInfo } from '.';
+import { NetworkInfo, ProviderParams } from '.';
 
 /**
  * Enum representing the list of default supported providers.
@@ -14,14 +14,9 @@ export enum ConnectionProviders {
  * Interface representing the parameters for {@link Checkout.connect}.
  * @property {ConnectionProviders} providerPreference - The preferred provider to connect to the network.
  */
-export type ConnectParams = {
-  web3Provider?: Web3Provider;
-  cachedProvider?: {
-    name: string | DefaultProviders;
-    chainId: ChainId;
-  };
+export interface ConnectParams extends ProviderParams {
   providerPreference?: ConnectionProviders;
-};
+}
 
 /**
  * Interface representing the result of {@link Checkout.connect}.

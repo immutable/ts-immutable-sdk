@@ -7,10 +7,10 @@ import {
 export const sendTransaction = async (
   params: SendTransactionParams,
 ): Promise<SendTransactionResult> => {
-  const { provider, transaction } = params;
+  const { web3Provider, transaction } = params;
   return await withCheckoutError<SendTransactionResult>(
     async () => {
-      const transactionResponse = await provider
+      const transactionResponse = await web3Provider!
         .getSigner()
         .sendTransaction(transaction);
       return {
