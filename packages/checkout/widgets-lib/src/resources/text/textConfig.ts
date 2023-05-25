@@ -32,11 +32,19 @@ export const text = {
         heading:
         'To move your coins, you\'ll need to switch to the Ethereum network',
         body: 'You\'ll be prompted to switch networks in Passport. You\'ll be able to switch back when needed.',
+        button: {
+          text: 'Ready to Switch',
+          retryText: 'Try Again',
+        },
       },
       zkEVM: {
         heading:
         'To trade here, MetaMask will ask you to switch to the Immutable zkEVM network',
         body: 'Check for the pop-up from MetaMask and \'Approve\' to switch. If this is the first time, MetaMask will also ask you to add the network.',
+        button: {
+          text: 'Ready to Switch',
+          retryText: 'Try Again',
+        },
       },
     },
     [BaseViews.ERROR]: {

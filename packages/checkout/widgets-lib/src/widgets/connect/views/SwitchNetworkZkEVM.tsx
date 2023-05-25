@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -17,11 +17,11 @@ export function SwitchNetworkZkEVM() {
   const { viewDispatch } = useContext(ViewContext);
   const { connectState } = useContext(ConnectContext);
   const { checkout, provider, sendCloseEvent } = connectState;
-  const { heading, body } = text.views[ConnectWidgetViews.SWITCH_NETWORK].zkEVM;
+  const { heading, body, button } = text.views[ConnectWidgetViews.SWITCH_NETWORK].zkEVM;
 
-  const [buttonText, setButtonText] = useState('Ready to Switch');
+  const [buttonText, setButtonText] = useState(button.text);
 
-  const switchNetwork = async () => {
+  const switchNetwork = useCallback(async () => {
     if (!provider || !checkout) return;
 
     try {
@@ -39,11 +39,9 @@ export function SwitchNetworkZkEVM() {
         },
       });
     } catch (err: any) {
-      // eslint-disable-next-line no-console
-      console.log(err.code, err.message);
-      setButtonText('Try Again');
+      setButtonText(button.retryText);
     }
-  };
+  }, [provider, checkout]);
 
   return (
     <SimpleLayout
@@ -57,7 +55,7 @@ export function SwitchNetworkZkEVM() {
       footer={(
         <FooterButton
           actionText={buttonText}
-          onActionClick={() => switchNetwork()}
+          onActionClick={switchNetwork}
         />
       )}
       heroContent={<ImmutableNetworkHero />}

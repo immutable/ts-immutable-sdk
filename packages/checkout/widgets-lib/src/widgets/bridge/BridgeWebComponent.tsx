@@ -32,7 +32,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
   }
 
   renderWidget() {
-    const bridgeConnectLoaderParams = {
+    const connectLoaderParams = {
       targetNetwork: ConnectTargetNetwork.ETHEREUM,
       providerPreference: this.providerPreference,
     };
@@ -51,7 +51,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
       <React.StrictMode>
         {this.useConnectWidget ? (
           <ConnectLoader
-            params={bridgeConnectLoaderParams}
+            params={connectLoaderParams}
             closeEvent={sendBridgeWidgetCloseEvent}
             widgetConfig={this.widgetConfig!}
           >

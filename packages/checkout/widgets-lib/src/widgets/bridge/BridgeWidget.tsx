@@ -15,7 +15,7 @@ import {
   useEffect, useMemo, useReducer, useRef, useState,
 } from 'react';
 import { TransactionResponse } from '@ethersproject/providers';
-import { L1Network, zkEVMNetwork } from '../../lib/networkUtils';
+import { l1Network, zkEVMNetwork } from '../../lib/networkUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { Network, WidgetTheme } from '../../lib';
 import {
@@ -78,7 +78,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
     ? onLightBase
     : onDarkBase;
 
-  const defaultFromChainId = L1Network(environment);
+  const defaultFromChainId = l1Network(environment);
   const toChainId = zkEVMNetwork(environment);
 
   const [transactionResponse, setTransactionResponse] = useState<

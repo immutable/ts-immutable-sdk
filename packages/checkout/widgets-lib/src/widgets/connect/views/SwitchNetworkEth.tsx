@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -7,7 +7,7 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectContext } from '../context/ConnectContext';
-import { L1Network } from '../../../lib/networkUtils';
+import { l1Network } from '../../../lib/networkUtils';
 import {
   ViewContext,
   ViewActions,
@@ -17,17 +17,17 @@ export function SwitchNetworkEth() {
   const { viewDispatch } = useContext(ViewContext);
   const { connectState } = useContext(ConnectContext);
   const { checkout, provider, sendCloseEvent } = connectState;
-  const { heading, body } = text.views[ConnectWidgetViews.SWITCH_NETWORK].eth;
+  const { heading, body, button } = text.views[ConnectWidgetViews.SWITCH_NETWORK].eth;
 
-  const [buttonText, setButtonText] = useState('Ready to Switch');
+  const [buttonText, setButtonText] = useState(button.text);
 
-  const switchNetwork = async () => {
+  const switchNetwork = useCallback(async () => {
     if (!provider || !checkout) return;
 
     try {
       await checkout.switchNetwork({
         provider,
-        chainId: L1Network(checkout.config.environment),
+        chainId: l1Network(checkout.config.environment),
       });
 
       viewDispatch({
@@ -39,11 +39,9 @@ export function SwitchNetworkEth() {
         },
       });
     } catch (err: any) {
-      // eslint-disable-next-line no-console
-      console.log(err.code, err.message);
-      setButtonText('Try Again');
+      setButtonText(button.retryText);
     }
-  };
+  }, [provider, checkout]);
 
   return (
     <SimpleLayout
@@ -57,7 +55,7 @@ export function SwitchNetworkEth() {
       footer={(
         <FooterButton
           actionText={buttonText}
-          onActionClick={() => switchNetwork()}
+          onActionClick={switchNetwork}
         />
       )}
       heroContent={<EthereumNetworkHero />}

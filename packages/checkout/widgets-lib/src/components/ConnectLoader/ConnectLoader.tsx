@@ -19,7 +19,7 @@ import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContex
 import { ErrorView } from '../Error/ErrorView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
-  WidgetTheme, ConnectTargetNetwork, L1Network, zkEVMNetwork,
+  WidgetTheme, ConnectTargetNetwork, getTargetNetworkChainId,
 } from '../../lib';
 
 export interface ConnectLoaderProps {
@@ -49,9 +49,7 @@ export function ConnectLoader({
 
   const networkToSwitchTo = targetNetwork ?? ConnectTargetNetwork.ZK_EVM;
 
-  const targetChainId = networkToSwitchTo === ConnectTargetNetwork.ZK_EVM
-    ? zkEVMNetwork(widgetConfig.environment)
-    : L1Network(widgetConfig.environment);
+  const targetChainId = getTargetNetworkChainId(targetNetwork ?? ConnectTargetNetwork.ZK_EVM, widgetConfig.environment);
 
   const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase

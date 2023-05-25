@@ -33,7 +33,7 @@ import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
-  ConnectTargetNetwork, L1Network, WidgetTheme, zkEVMNetwork,
+  ConnectTargetNetwork, l1Network, WidgetTheme, zkEVMNetwork,
 } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 
@@ -72,7 +72,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
 
   const targetChainId = targetNetwork === ConnectTargetNetwork.ZK_EVM
     ? zkEVMNetwork(config.environment)
-    : L1Network(config.environment);
+    : l1Network(config.environment);
 
   useEffect(() => {
     setTimeout(() => {
