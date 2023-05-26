@@ -57,7 +57,7 @@ export class ImmutableApiClient {
           : [],
         end_time: new Date(parseInt(`${orderComponents.endTime.toString()}000`, 10)).toISOString(),
         protocol_data: {
-          order_type: CreateOrderProtocolData.order_type.FULL_OPEN,
+          order_type: CreateOrderProtocolData.order_type.FULL_RESTRICTED,
           zone_address: orderComponents.zone,
         },
         salt: orderComponents.salt,

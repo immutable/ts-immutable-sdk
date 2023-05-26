@@ -15,7 +15,7 @@ import {
   BigNumber, PopulatedTransaction, providers,
 } from 'ethers';
 import {
-  BuyItem, Order, CreateOrderProtocolData, SellItem,
+  BuyItem, Order, CreateOrderProtocolData, SellItem, OrderStatus,
 } from 'openapi/sdk';
 import { Seaport } from './seaport';
 
@@ -373,7 +373,7 @@ describe('Seaport', () => {
         end_time: new Date().toISOString(),
         id: '1',
         protocol_data: {
-          order_type: CreateOrderProtocolData.order_type.FULL_OPEN,
+          order_type: CreateOrderProtocolData.order_type.FULL_RESTRICTED,
           zone_address: randomAddress(),
           operator_signature: randomAddress(),
         },
@@ -382,7 +382,7 @@ describe('Seaport', () => {
           { item_type: SellItem.item_type.ERC721, contract_address: randomAddress(), token_id: '1' },
         ],
         signature: randomAddress(),
-        status: Order.status.ACTIVE,
+        status: OrderStatus.ACTIVE,
         start_time: new Date().toISOString(),
         update_time: new Date().toISOString(),
       };

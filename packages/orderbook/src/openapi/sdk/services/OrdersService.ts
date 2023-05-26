@@ -4,6 +4,7 @@
 import type { CreateOrderRequestBody } from '../models/CreateOrderRequestBody';
 import type { Order } from '../models/Order';
 import type { Orders } from '../models/Orders';
+import type { OrderStatus } from '../models/OrderStatus';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -20,6 +21,9 @@ export class OrdersService {
    */
   public listOrders({
     chainId,
+    status,
+    sellItemContractAddress,
+    sellItemTokenId,
     pageSize = 100,
     sortBy,
     sortDirection,
@@ -30,13 +34,25 @@ export class OrdersService {
      */
     chainId: string,
     /**
+     * Order status to filter by
+     */
+    status?: OrderStatus,
+    /**
+     * Sell item contract address to filter by
+     */
+    sellItemContractAddress?: string,
+    /**
+     * Sell item token identifier to filter by
+     */
+    sellItemTokenId?: string,
+    /**
      * Maximum number of orders to return per page
      */
     pageSize?: number,
     /**
      * Order field to sort by
      */
-    sortBy?: 'status' | 'sell_item_contract_address' | 'sell_item_token_id',
+    sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount',
     /**
      * Ascending or descending direction for sort
      */
@@ -53,6 +69,9 @@ export class OrdersService {
         'chain_id': chainId,
       },
       query: {
+        'status': status,
+        'sell_item_contract_address': sellItemContractAddress,
+        'sell_item_token_id': sellItemTokenId,
         'page_size': pageSize,
         'sort_by': sortBy,
         'sort_direction': sortDirection,
