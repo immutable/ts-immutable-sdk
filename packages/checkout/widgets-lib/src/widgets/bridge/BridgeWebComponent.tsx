@@ -3,7 +3,7 @@ import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { ConnectTargetNetwork, Network } from '../../lib';
+import { ConnectTargetLayer, Network } from '../../lib';
 import { ConnectLoader } from '../../components/ConnectLoader/ConnectLoader';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 
@@ -33,7 +33,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
   renderWidget() {
     const connectLoaderParams = {
-      targetNetwork: ConnectTargetNetwork.ETHEREUM,
+      targetLayer: ConnectTargetLayer.LAYER1,
       providerPreference: this.providerPreference,
     };
     const params: BridgeWidgetParams = {

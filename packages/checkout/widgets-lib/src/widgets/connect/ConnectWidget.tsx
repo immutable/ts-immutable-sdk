@@ -33,7 +33,7 @@ import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
-  ConnectTargetNetwork, l1Network, WidgetTheme, zkEVMNetwork,
+  ConnectTargetLayer, getTargetLayerChainId, WidgetTheme,
 } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 
@@ -47,13 +47,13 @@ export interface ConnectWidgetProps {
 }
 
 export interface ConnectWidgetParams {
-  targetNetwork?: ConnectTargetNetwork
+  targetLayer?: ConnectTargetLayer
   providerPreference?: ConnectionProviders;
 }
 
 export function ConnectWidget(props: ConnectWidgetProps) {
   const {
-    config, deepLink, sendCloseEventOverride, params: { targetNetwork },
+    config, deepLink, sendCloseEventOverride, params: { targetLayer },
   } = props;
   const { environment, theme } = config;
   const [connectState, connectDispatch] = useReducer(
@@ -68,11 +68,9 @@ export function ConnectWidget(props: ConnectWidgetProps) {
     ? onLightBase
     : onDarkBase;
 
-  const networkToSwitchTo = targetNetwork ?? ConnectTargetNetwork.ZK_EVM;
+  const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
-  const targetChainId = targetNetwork === ConnectTargetNetwork.ZK_EVM
-    ? zkEVMNetwork(config.environment)
-    : l1Network(config.environment);
+  const targetChainId = getTargetLayerChainId(targetLayer ?? ConnectTargetLayer.LAYER2, environment);
 
   useEffect(() => {
     setTimeout(() => {
@@ -125,10 +123,10 @@ export function ConnectWidget(props: ConnectWidgetProps) {
             {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
               <ReadyToConnect targetChainId={targetChainId} />
             )}
-            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetNetwork.ZK_EVM && (
+            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER2 && (
               <SwitchNetworkZkEVM />
             )}
-            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetNetwork.ETHEREUM && (
+            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
               <SwitchNetworkEth />
             )}
             {view.type === ConnectWidgetViews.SUCCESS && (

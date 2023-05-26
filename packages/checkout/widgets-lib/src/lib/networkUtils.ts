@@ -1,9 +1,9 @@
 import { ChainId } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
-export enum ConnectTargetNetwork {
-  ETHEREUM = 'ETHEREUM',
-  ZK_EVM = 'ZK_EVM',
+export enum ConnectTargetLayer {
+  LAYER1 = 'LAYER1',
+  LAYER2 = 'LAYER2',
 }
 
 /**
@@ -29,13 +29,13 @@ export function zkEVMNetwork(environment: Environment) {
 }
 
 /**
- * Returns the target network ChainId based on ConnectTargetNetwork and environment
- * @param {ConnectTargetNetwork} targetNetwork
+ * Returns the target network ChainId based on ConnectTargetLayer and environment
+ * @param {ConnectTargetLayer} targetLayer
  * @param {Environment} environment
  * @returns {ChainId}
  */
-export function getTargetNetworkChainId(targetNetwork: ConnectTargetNetwork, environment: Environment) {
-  return targetNetwork === ConnectTargetNetwork.ZK_EVM
+export function getTargetLayerChainId(targetLayer: ConnectTargetLayer, environment: Environment) {
+  return targetLayer === ConnectTargetLayer.LAYER2
     ? zkEVMNetwork(environment)
     : l1Network(environment);
 }

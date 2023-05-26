@@ -19,7 +19,7 @@ import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContex
 import { ErrorView } from '../Error/ErrorView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
-  WidgetTheme, ConnectTargetNetwork, getTargetNetworkChainId,
+  WidgetTheme, ConnectTargetLayer, getTargetLayerChainId,
 } from '../../lib';
 
 export interface ConnectLoaderProps {
@@ -30,7 +30,7 @@ export interface ConnectLoaderProps {
 }
 
 export interface ConnectLoaderParams {
-  targetNetwork?: ConnectTargetNetwork;
+  targetLayer?: ConnectTargetLayer;
   providerPreference?: ConnectionProviders;
 }
 
@@ -45,11 +45,11 @@ export function ConnectLoader({
     initialConnectLoaderState,
   );
   const { connectionStatus } = connectLoaderState;
-  const { targetNetwork, providerPreference } = params;
+  const { targetLayer, providerPreference } = params;
 
-  const networkToSwitchTo = targetNetwork ?? ConnectTargetNetwork.ZK_EVM;
+  const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
-  const targetChainId = getTargetNetworkChainId(targetNetwork ?? ConnectTargetNetwork.ZK_EVM, widgetConfig.environment);
+  const targetChainId = getTargetLayerChainId(targetLayer ?? ConnectTargetLayer.LAYER2, widgetConfig.environment);
 
   const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
@@ -136,7 +136,7 @@ export function ConnectLoader({
         >
           <ConnectWidget
             config={widgetConfig}
-            params={{ ...params, targetNetwork: networkToSwitchTo }}
+            params={{ ...params, targetLayer: networkToSwitchTo }}
             deepLink={ConnectWidgetViews.CONNECT_WALLET}
             sendCloseEventOverride={closeEvent}
           />
