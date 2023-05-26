@@ -92,6 +92,7 @@ describe('Passport', () => {
           baseConfig,
           overrides: {
             authenticationDomain: 'authenticationDomain123',
+            guardianDomain: 'guardianDomain123',
             magicProviderId: 'providerId123',
             magicPublishableApiKey: 'publishableKey123',
             network: Networks.SANDBOX,

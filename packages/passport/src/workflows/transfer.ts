@@ -53,21 +53,21 @@ const transferWithGuardian = async ({
       basePath: passportConfig.guardianDomain,
     }),
   );
-  const transactionExists = await retryWithDelay(async () => transactionAPI.getTransactionByID({
-    transactionID: payloadHash,
-    chainType: 'starkex',
-  }));
-
-  if (!transactionExists) {
-    throw new Error("Transaction doesn't exists");
-  }
-
   const starkExTransactionApi = new guardian.StarkexTransactionsApi(
     new guardian.Configuration({
       accessToken,
       basePath: passportConfig.guardianDomain,
     }),
   );
+
+  const transactionRes = await retryWithDelay(async () => transactionAPI.getTransactionByID({
+    transactionID: payloadHash,
+    chainType: 'starkex',
+  }));
+
+  if (!transactionRes.data.id) {
+    throw new Error("Transaction doesn't exists");
+  }
 
   const evaluateStarkexRes = await starkExTransactionApi.evaluateStarkexTransaction({
     payloadHash,
