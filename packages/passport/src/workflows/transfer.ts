@@ -36,6 +36,60 @@ type BatchTransfersParams = {
   passportConfig: PassportConfiguration;
 };
 
+type TransferWithGuardianParams = {
+  accessToken: string;
+  passportConfig: PassportConfiguration;
+  payloadHash: string;
+};
+
+const transferWithGuardian = async ({
+  accessToken,
+  passportConfig,
+  payloadHash,
+}: TransferWithGuardianParams) => {
+  const transactionAPI = new guardian.TransactionsApi(
+    new guardian.Configuration({
+      accessToken,
+      basePath: passportConfig.guardianDomain,
+    }),
+  );
+  const transactionExists = await retryWithDelay(async () => transactionAPI.getTransactionByID({
+    transactionID: payloadHash,
+    chainType: 'starkex',
+  }));
+
+  if (!transactionExists) {
+    throw new Error("Transaction doesn't exists");
+  }
+
+  const starkExTransactionApi = new guardian.StarkexTransactionsApi(
+    new guardian.Configuration({
+      accessToken,
+      basePath: passportConfig.guardianDomain,
+    }),
+  );
+
+  const evaluateStarkexRes = await starkExTransactionApi.evaluateStarkexTransaction({
+    payloadHash,
+  });
+
+  const { confirmationRequired } = evaluateStarkexRes.data;
+  if (confirmationRequired) {
+    const confirmationScreen = new ConfirmationScreen(passportConfig);
+    const confirmationResult = await confirmationScreen.startTransaction(
+      accessToken,
+      {
+        transactionType: TransactionTypes.CreateTransfer,
+        transactionData: payloadHash,
+      },
+    );
+
+    if (!confirmationResult.confirmed) {
+      throw new Error('Transaction rejected by user');
+    }
+  }
+};
+
 export const transfer = ({
   request,
   transfersApi,
@@ -57,47 +111,18 @@ TransferRequest): Promise<CreateTransferResponseV1> => withPassportError<CreateT
     Authorization: `Bearer ${user.accessToken}`,
   };
 
-  const signableResult = await transfersApi.getSignableTransferV1({
-    getSignableTransferRequest,
-  }, { headers });
+  const signableResult = await transfersApi.getSignableTransferV1(
+    {
+      getSignableTransferRequest,
+    },
+    { headers },
+  );
 
-  const transactionAPI = new guardian.TransactionsApi(new guardian.Configuration({
+  await transferWithGuardian({
+    passportConfig,
     accessToken: user.accessToken,
-    basePath: passportConfig.guardianDomain,
-  }));
-  const transactionExists = await retryWithDelay(async () => transactionAPI.getTransactionByID({
-    transactionID: signableResult.data.payload_hash,
-    chainType: 'starkex',
-  }));
-
-  if (!transactionExists) {
-    throw new Error("Transaction doesn't exists");
-  }
-
-  const starkExTransactionApi = new guardian.StarkexTransactionsApi(new guardian.Configuration({
-    accessToken: user.accessToken,
-    basePath: passportConfig.guardianDomain,
-  }));
-
-  const evaluateStarkexRes = await starkExTransactionApi.evaluateStarkexTransaction({
     payloadHash: signableResult.data.payload_hash,
   });
-
-  const { confirmationRequired } = evaluateStarkexRes.data;
-  if (confirmationRequired) {
-    const confirmationScreen = new ConfirmationScreen(passportConfig);
-    const confirmationResult = await confirmationScreen.startTransaction(
-      user.accessToken,
-      {
-        transactionType: TransactionTypes.CreateTransfer,
-        transactionData: getSignableTransferRequest,
-      },
-    );
-
-    if (!confirmationResult.confirmed) {
-      throw new Error('Transaction rejected by user');
-    }
-  }
 
   const signableResultData = signableResult.data;
   const { payload_hash: payloadHash } = signableResultData;

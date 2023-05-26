@@ -51,7 +51,7 @@ export type CreateTrade = {
 
 export type CreateTransfer = {
   transactionType: TransactionTypes.CreateTransfer;
-  transactionData: GetSignableTransferRequestV1;
+  transactionData: GetSignableTransferRequestV1 | string;
 };
 
 export type CreateBatchTransfer = {
