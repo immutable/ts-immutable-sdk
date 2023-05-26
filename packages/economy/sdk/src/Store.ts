@@ -5,26 +5,44 @@
 import { Service } from 'typedi';
 import { produce } from 'immer';
 
-type State = { selectedRecipeId: string | undefined };
+import type { CraftIngredient } from './__codegen__/crafting';
+
+type State = {
+  craftingInputs: CraftIngredient[];
+  selectedRecipeId: string | undefined;
+};
+
+export const defaultState: State = {
+  selectedRecipeId: undefined,
+  craftingInputs: [],
+};
 
 @Service()
 export class Store<T = State> {
-  private data: T;
+  private data!: T;
 
-  constructor(defaultValue: T) {
-    this.data = this.loadFromLocalStorage() || { ...defaultValue };
+  constructor(private defaultValue: T, private persist = false) {
+    this.reset();
   }
 
-  set(fn: (data: T) => void) {
+  public set(fn: (data: T) => void) {
     this.data = produce(this.data, fn);
-    this.saveToLocalStorage(this.data);
+    if (this.persist) {
+      this.saveToLocalStorage(this.data);
+    }
   }
 
-  get(): T {
+  public get(): T {
     return this.data;
   }
 
+  public reset() {
+    this.data = { ...this.defaultValue, ...this.loadFromLocalStorage() };
+  }
+
   private saveToLocalStorage(data: T): void {
+    if (!this.persist) return;
+
     try {
       const serializedData = JSON.stringify(data);
       localStorage.setItem('storeData', serializedData);
@@ -34,6 +52,8 @@ export class Store<T = State> {
   }
 
   private loadFromLocalStorage(): T | null {
+    if (!this.persist) return null;
+
     try {
       const serializedData = localStorage.getItem('storeData');
       if (serializedData) {
