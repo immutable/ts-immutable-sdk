@@ -69,8 +69,18 @@ export function SwapButton({ loading, validator, transaction }: SwapButtonProps)
         console.log('user rejected request');
         return;
       }
+      if (err.type === CheckoutErrorType.INSUFFICIENT_FUNDS) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SwapWidgetViews.PRICE_SURGE,
+            },
+          },
+        });
+        return;
+      }
       if (err.type === CheckoutErrorType.TRANSACTION_FAILED) {
-        console.log('transaction failed');
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,

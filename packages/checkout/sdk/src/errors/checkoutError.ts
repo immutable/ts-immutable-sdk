@@ -13,6 +13,7 @@ export enum CheckoutErrorType {
   PROVIDER_REQUEST_FAILED_ERROR = 'PROVIDER_REQUEST_FAILED_ERROR',
   USER_REJECTED_REQUEST_ERROR = 'USER_REJECTED_REQUEST_ERROR',
   TRANSACTION_FAILED = 'TRANSACTION_FAILED',
+  INSUFFICIENT_FUNDS = 'INSUFFICIENT_FUNDS',
 }
 
 /**
@@ -91,7 +92,6 @@ export const withCheckoutError = async <T>(
       ? `[${customError.type}]:${customError.message}. Cause:${cause}`
       : `[${customError.type}] Cause:${cause}`;
 
-    console.log('sdk error');
     if (error instanceof CheckoutError) {
       throw new CheckoutError(errorMessage, customError.type, {
         ...customError.data,

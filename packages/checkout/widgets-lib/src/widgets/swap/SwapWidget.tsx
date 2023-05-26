@@ -191,8 +191,8 @@ export function SwapWidget(props: SwapWidgetProps) {
           )}
           {viewState.view.type === SwapWidgetViews.FAIL && (
           <StatusView
-            statusText="Transaction failed"
-            actionText="Review & try again"
+            statusText="Transaction rejected"
+            actionText="Try again"
                 // eslint-disable-next-line no-console
             onActionClick={() => {
               viewDispatch({
@@ -205,6 +205,23 @@ export function SwapWidget(props: SwapWidgetProps) {
             statusType={StatusType.FAILURE}
             testId="fail-view"
           />
+          )}
+          {viewState.view.type === SwapWidgetViews.PRICE_SURGE && (
+            <StatusView
+              statusText="Price surge"
+              actionText="Review & try again"
+              // eslint-disable-next-line no-console
+              onActionClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: { type: SwapWidgetViews.SWAP },
+                  },
+                });
+              }}
+              statusType={StatusType.WARNING}
+              testId="price-surge-view"
+            />
           )}
         </SwapContext.Provider>
       </ViewContext.Provider>

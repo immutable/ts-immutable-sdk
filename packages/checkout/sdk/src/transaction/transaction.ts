@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { SendTransactionParams, SendTransactionResult } from '../types';
 
@@ -14,7 +15,14 @@ export const sendTransaction = async (
       transactionResponse,
     };
   } catch (err: any) {
-    if (err.message.includes('user rejected')) {
+    if (err.code === ethers.errors.INSUFFICIENT_FUNDS) {
+      throw new CheckoutError(
+        err.message,
+        CheckoutErrorType.INSUFFICIENT_FUNDS,
+        err,
+      );
+    }
+    if (err.code === ethers.errors.ACTION_REJECTED) {
       throw new CheckoutError(
         err.message,
         CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
