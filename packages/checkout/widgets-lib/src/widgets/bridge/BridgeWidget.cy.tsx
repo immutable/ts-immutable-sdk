@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   describe, it, cy, beforeEach,
 } from 'local-cypress';
@@ -136,6 +137,19 @@ describe('Bridge Widget tests', () => {
           },
         ],
       });
+    const fiatPricingValue = {
+      ethereum: { usd: 2000.0 },
+      'usd-coin': { usd: 1.0 },
+      'immutable-x': { usd: 1.5 },
+    };
+
+    cy.intercept(
+      {
+        method: 'GET',
+        path: '/api/v3/coins*',
+      },
+      fiatPricingValue,
+    ).as('fiatPricingStub');
   });
 
   describe('Bridge Widget render', () => {

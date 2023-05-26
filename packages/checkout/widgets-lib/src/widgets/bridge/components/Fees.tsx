@@ -2,8 +2,8 @@ import { Body, Box, ButtCon } from '@biom3/react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { feeBoxStyles, feeContainerStyles } from './FeeStyles';
 import { text } from '../../../resources/text/textConfig';
+import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
-import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 
 interface FeesProps {
   gasFeeValue: string;
@@ -12,7 +12,7 @@ interface FeesProps {
 }
 
 export function Fees({ gasFeeValue, gasFeeToken, gasFeeFiatValue }: FeesProps) {
-  const staticText = text.views[BridgeWidgetViews.BRIDGE];
+  const staticText = text.views[SwapWidgetViews.SWAP];
 
   if (!gasFeeValue) return <Box />;
   return (

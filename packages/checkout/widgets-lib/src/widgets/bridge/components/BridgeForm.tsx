@@ -15,6 +15,7 @@ import { TextInputForm } from '../../../components/FormComponents/TextInputForm/
 import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
 import { SelectForm, SelectOption } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
+import { Fees } from './Fees';
 
 interface BridgeFormProps {
   defaultAmount?: string;
@@ -222,6 +223,7 @@ export function BridgeForm(props: BridgeFormProps) {
             disabled={false}
           />
         </Box>
+        <Fees gasFeeValue="" gasFeeToken={null} gasFeeFiatValue="" />
       </Box>
       <Box sx={{
         display: 'flex',

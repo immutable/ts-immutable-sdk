@@ -120,7 +120,7 @@ export const text = {
         title: 'Move coins',
       },
       content: {
-        title: 'What would you like to move from Ethereum mainnet to Immutable zkEVM?',
+        title: 'What would you like to move?',
         fiatPricePrefix: 'Approx USD',
         availableBalancePrefix: 'Available',
       },
