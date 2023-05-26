@@ -20,9 +20,9 @@ export interface SetProviderResult {
   currentProviderInfo: CurrentProviderInfo;
 }
 
-export interface Providers {
-  [key: string]: ProviderForChain;
-}
+export type Providers = {
+  [key in DefaultProviders | string]: ProviderForChain;
+};
 
 export type ProviderForChain = {
   [key in ChainId | number]: Web3Provider;
