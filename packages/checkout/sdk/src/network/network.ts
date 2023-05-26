@@ -184,7 +184,7 @@ export async function switchWalletNetwork(
   }
 
   const getW3Params = {
-    cachedProvider: {
+    provider: {
       name: currentProviderInfo.name!,
       chainId,
     },

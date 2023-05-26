@@ -39,9 +39,10 @@ export interface CurrentProviderInfo {
 }
 
 export interface ProviderParams {
-  web3Provider?: Web3Provider;
-  cachedProvider?: {
-    name: string | DefaultProviders;
-    chainId: ChainId;
-  };
+  provider?: Web3Provider | CachedProvider;
+}
+
+export interface CachedProvider {
+  name: string | DefaultProviders;
+  chainId: ChainId;
 }

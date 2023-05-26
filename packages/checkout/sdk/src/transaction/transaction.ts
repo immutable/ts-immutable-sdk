@@ -1,12 +1,11 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutErrorType, withCheckoutError } from '../errors';
-import {
-  SendTransactionParams,
-  SendTransactionResult,
-} from '../types/transaction';
+import { SendTransactionResult } from '../types/transaction';
 
-export const sendTransaction = async (
-  params: SendTransactionParams,
-): Promise<SendTransactionResult> => {
+export const sendTransaction = async (params: {
+  web3Provider: Web3Provider;
+  transaction: any;
+}): Promise<SendTransactionResult> => {
   const { web3Provider, transaction } = params;
   return await withCheckoutError<SendTransactionResult>(
     async () => {

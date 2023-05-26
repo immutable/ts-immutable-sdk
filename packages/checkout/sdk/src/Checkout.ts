@@ -104,7 +104,7 @@ export class Checkout {
   public async checkIsWalletConnected(
     params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
-    return connect.checkIsWalletConnected(params.providerPreference);
+    return connect.checkIsWalletConnected(params.providerPreference); // @WT-1345 remove provider preference
   }
 
   /**
