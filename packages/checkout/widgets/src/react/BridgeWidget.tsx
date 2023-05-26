@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Network,
-} from '../definitions/constants';
+} from '../definitions/types';
 
 /**
  * Interface representing the props for the Bridge Widget component.

@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { WidgetTheme } from './constants';
+import { WidgetTheme } from './types';
 
 /**
  * Represents the configuration options for the Checkout Widgets.

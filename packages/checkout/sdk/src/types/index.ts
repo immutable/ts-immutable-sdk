@@ -1,5 +1,5 @@
 export * from './balances';
-export * from './chainId.enum';
+export * from './chainId';
 export * from './config';
 export * from './connect';
 export * from './network';

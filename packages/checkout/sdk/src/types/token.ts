@@ -1,4 +1,4 @@
-import { ChainId } from './chainId.enum';
+import { ChainId } from './chainId';
 import { TokenInfo } from './tokenInfo';
 
 /**

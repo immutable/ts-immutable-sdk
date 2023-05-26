@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { TokenInfo } from './tokenInfo';
-import { ChainId } from './chainId.enum';
+import { ChainId } from './chainId';
 import { NetworkInfo } from './networkInfo';
 
 /**
