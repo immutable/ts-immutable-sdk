@@ -18,6 +18,7 @@ import { validateAmount, validateToken } from '../functions/BridgeFormValidator'
 import { Fees } from './Fees';
 
 interface BridgeFormProps {
+  testId?: string;
   defaultAmount?: string;
   defaultTokenAddress?: string;
 }
@@ -30,7 +31,7 @@ export function BridgeForm(props: BridgeFormProps) {
   } = useContext(BridgeContext);
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
-  const { defaultAmount, defaultTokenAddress } = props;
+  const { testId, defaultAmount, defaultTokenAddress } = props;
   const { content, bridgeForm } = text.views[BridgeWidgetViews.BRIDGE];
 
   // Form state
@@ -181,9 +182,18 @@ export function BridgeForm(props: BridgeFormProps) {
   }, [checkout, provider, bridgeFormValidator]);
 
   return (
-    <>
+    <Box
+      testId={testId}
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+      }}
+    >
       <Box sx={{ paddingX: 'base.spacing.x4' }}>
         <Heading
+          testId={`${testId}-content-heading`}
           size="small"
           weight="regular"
           sx={{ paddingBottom: 'base.spacing.x4' }}
@@ -234,13 +244,13 @@ export function BridgeForm(props: BridgeFormProps) {
       }}
       >
         <Button
-          testId="bridge-button"
+          testId={`${testId}-button`}
           variant="primary"
           onClick={submitBridge}
         >
           {bridgeForm.buttonText}
         </Button>
       </Box>
-    </>
+    </Box>
   );
 }

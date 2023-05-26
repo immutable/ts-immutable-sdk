@@ -1,4 +1,3 @@
-import { Box } from '@biom3/react';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -17,6 +16,7 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
 
   return (
     <SimpleLayout
+      testId="bridge-view"
       header={(
         <HeaderNavigation
           title={header.title}
@@ -26,18 +26,11 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
       footer={<FooterLogo />}
       footerBackgroundColor="base.color.translucent.container.200"
     >
-      <Box sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-      }}
-      >
-        <BridgeForm
-          defaultAmount={amount}
-          defaultTokenAddress={fromContractAddress}
-        />
-      </Box>
+      <BridgeForm
+        testId="bridge-form"
+        defaultAmount={amount}
+        defaultTokenAddress={fromContractAddress}
+      />
     </SimpleLayout>
   );
 }
