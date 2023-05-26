@@ -19,7 +19,7 @@ import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContex
 import { ConnectWallet } from './views/ConnectWallet';
 import { ConnectResult } from './views/ConnectResult';
 import { ReadyToConnect } from './views/ReadyToConnect';
-import { SwitchNetwork } from './views/SwitchNetwork';
+import { SwitchNetworkZkEVM } from './views/SwitchNetworkZkEVM';
 import { LoadingView } from '../../components/Loading/LoadingView';
 import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
 import {
@@ -32,7 +32,10 @@ import {
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '../../lib';
+import {
+  ConnectTargetLayer, getTargetLayerChainId, WidgetTheme,
+} from '../../lib';
+import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 
 export interface ConnectWidgetProps {
   // TODO: 'params' PropType is defined but prop is never used
@@ -44,12 +47,13 @@ export interface ConnectWidgetProps {
 }
 
 export interface ConnectWidgetParams {
+  targetLayer?: ConnectTargetLayer
   providerPreference?: ConnectionProviders;
 }
 
 export function ConnectWidget(props: ConnectWidgetProps) {
   const {
-    config, deepLink, sendCloseEventOverride,
+    config, deepLink, sendCloseEventOverride, params: { targetLayer },
   } = props;
   const { environment, theme } = config;
   const [connectState, connectDispatch] = useReducer(
@@ -63,6 +67,10 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
+
+  const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
+
+  const targetChainId = getTargetLayerChainId(targetLayer ?? ConnectTargetLayer.LAYER2, environment);
 
   useEffect(() => {
     setTimeout(() => {
@@ -113,7 +121,13 @@ export function ConnectWidget(props: ConnectWidgetProps) {
               <ConnectWallet />
             )}
             {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
-              <ReadyToConnect />
+              <ReadyToConnect targetChainId={targetChainId} />
+            )}
+            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER2 && (
+              <SwitchNetworkZkEVM />
+            )}
+            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
+              <SwitchNetworkEth />
             )}
             {view.type === ConnectWidgetViews.SUCCESS && (
               <ConnectLoaderSuccess>
@@ -128,9 +142,6 @@ export function ConnectWidget(props: ConnectWidgetProps) {
               </ConnectLoaderSuccess>
             )}
             {view.type === ConnectWidgetViews.FAIL && <ConnectResult />}
-            {view.type === ConnectWidgetViews.SWITCH_NETWORK && (
-              <SwitchNetwork />
-            )}
           </>
         </ConnectContext.Provider>
       </ViewContext.Provider>

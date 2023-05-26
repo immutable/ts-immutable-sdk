@@ -8,6 +8,7 @@ import {
 } from '../../components/ConnectLoader/ConnectLoader';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
+import { ConnectTargetLayer } from '../../lib';
 
 export class ImmutableWallet extends ImmutableWebComponent {
   providerPreference = ConnectionProviders.METAMASK;
@@ -28,6 +29,7 @@ export class ImmutableWallet extends ImmutableWebComponent {
 
   renderWidget() {
     const connectLoaderParams: ConnectLoaderParams = {
+      targetLayer: ConnectTargetLayer.LAYER2,
       providerPreference: this.providerPreference,
     };
 

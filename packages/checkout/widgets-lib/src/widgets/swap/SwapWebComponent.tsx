@@ -8,6 +8,7 @@ import {
   ConnectLoaderParams,
 } from '../../components/ConnectLoader/ConnectLoader';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
+import { ConnectTargetLayer } from '../../lib';
 
 export class ImmutableSwap extends ImmutableWebComponent {
   providerPreference = ConnectionProviders.METAMASK;
@@ -37,6 +38,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
   renderWidget() {
     const connectLoaderParams: ConnectLoaderParams = {
+      targetLayer: ConnectTargetLayer.LAYER2,
       providerPreference: this.providerPreference,
     };
 

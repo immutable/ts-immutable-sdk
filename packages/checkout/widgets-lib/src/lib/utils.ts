@@ -1,6 +1,6 @@
 import { ChainId, GetBalanceResult, NetworkInfo } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { L1Network, zkEVMNetwork } from './networkUtils';
+import { l1Network, zkEVMNetwork } from './networkUtils';
 import { DEFAULT_TOKEN_DECIMALS } from './constants';
 
 export const sortTokensByAmount = (
@@ -42,7 +42,7 @@ export const sortNetworksCompareFn = (
   if (a.chainId === zkEVMNetwork(environment)) {
     return -1;
   }
-  if (a.chainId === L1Network(environment)) {
+  if (a.chainId === l1Network(environment)) {
     return 0;
   }
   return 1;
