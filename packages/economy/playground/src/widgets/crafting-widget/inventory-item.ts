@@ -13,10 +13,10 @@ const itemVx = {
 };
 
 const badgeVx = {
-  $all: 'indicator-item badge',
+  $all: 'text-white text-center',
   status: {
-    locked: 'badge-error',
-    created: 'badge-success',
+    created: 'bg-success',
+    $none: 'bg-black',
   },
 
   new: {

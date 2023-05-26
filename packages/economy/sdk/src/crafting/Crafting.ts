@@ -1,8 +1,11 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-console */
+/* eslint-disable no-param-reassign */
+
 import { Service } from 'typedi';
 
 import {
+  CraftIngredient,
   CraftCreateCraftInput,
   CraftCreateCraftOutput,
   DomainCraft,
@@ -13,6 +16,7 @@ import { EventClient } from '../EventClient';
 import { withSDKError } from '../Errors';
 import { StudioBE } from '../StudioBE';
 import { Config } from '../Config';
+import { Store } from '../Store';
 
 // TODO: Use Checkout SDK
 const checkout = {
@@ -43,6 +47,7 @@ export class Crafting {
     private events: EventClient<CraftEvent>,
     private studioBE: StudioBE,
     private config: Config,
+    private store: Store,
   ) {}
 
   /**
@@ -105,6 +110,18 @@ export class Crafting {
     // TODO: user provider to sign transfer to escrow wallet address
 
     return output;
+  }
+
+  public addInput(input: CraftIngredient) {
+    this.store.set((state) => {
+      state.craftingInputs.push(input);
+    });
+  }
+
+  public removeInput(itemId: string) {
+    this.store.set((state) => {
+      state.craftingInputs = state.craftingInputs.filter((input) => input.item_id !== itemId);
+    });
   }
 
   /**
