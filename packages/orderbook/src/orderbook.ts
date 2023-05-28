@@ -1,12 +1,13 @@
 import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
 import { OrderbookModuleConfiguration } from 'config/config';
 import { ERC721Factory } from 'erc721';
-import { Order, OrderStatus } from 'openapi/sdk';
+import { Order, OrderStatus, Orders } from 'openapi/sdk';
 import { Seaport, SeaportFactory } from 'seaport';
 import {
   CancelOrderResponse,
   CreateOrderParams,
   FulfilOrderResponse,
+  ListOrderParams,
   PrepareListingParams,
   PrepareListingResponse,
 } from 'types';
@@ -50,6 +51,16 @@ export class Orderbook {
    */
   getOrder(orderId: string): Promise<Order> {
     return this.apiClient.getOrder(orderId);
+  }
+
+  /**
+   * List orders. This method is used to get a list of orders filtered by conditions specified
+   * in the params object.
+   * @param {ListOrderParams} listOrderParams - Filtering, ordering and page parameters.
+   * @return {Orders} The paged orders.
+   */
+  listOrders(listOrderParams: ListOrderParams): Promise<Orders> {
+    return this.apiClient.listOrders(listOrderParams);
   }
 
   /**
