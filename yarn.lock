@@ -3057,9 +3057,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/openapi@workspace:packages/internal/openapi":
+"@imtbl/multi-rollup-api-client@workspace:packages/internal/multi-rollup-api-client":
   version: 0.0.0-use.local
-  resolution: "@imtbl/openapi@workspace:packages/internal/openapi"
+  resolution: "@imtbl/multi-rollup-api-client@workspace:packages/internal/multi-rollup-api-client"
   dependencies:
     rollup: ^3.17.2
   languageName: unknown

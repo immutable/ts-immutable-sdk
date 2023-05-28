@@ -1,6 +1,6 @@
 {
-  "name": "@imtbl/openapi",
-  "description": "OpenAPI package for Immutable SDK",
+  "name": "@imtbl/multi-rollup-api-client",
+  "description": "Generated client for Immutable multi rollup API",
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
