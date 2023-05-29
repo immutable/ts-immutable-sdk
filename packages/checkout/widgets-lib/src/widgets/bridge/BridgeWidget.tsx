@@ -85,8 +85,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
    * Checking that the provider is connected to an available network and switching
    * to the default specified network
    * It then calculates the toNetwork for the bridge and it's associated native currency.
-   *
-   * NOTE: This effect should only run on the first render of the component to avoid switchNetwork errors
    */
   useEffect(() => {
     const bridgetWidgetSetup = async () => {
@@ -106,29 +104,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       const connectResult = await checkout.connect({
         providerPreference: providerPreference ?? ConnectionProviders.METAMASK,
       });
-
-      // The correct network check should be done by the ConnectionLoader
-
-      // check that the user is on the correct network
-      // let theProvider;
-      // theProvider = connectResult.provider;
-
-      // const requireNetworkSwitch = defaultFromChainId !== connectResult.network.chainId;
-
-      // if (requireNetworkSwitch) {
-      //   let switchNetworkResponse: SwitchNetworkResult;
-      //   try {
-      //     switchNetworkResponse = await checkout.switchNetwork({
-      //       provider: connectResult.provider,
-      //       chainId: defaultFromChainId,
-      //     });
-      //     theProvider = switchNetworkResponse ? switchNetworkResponse.provider : null;
-      //   } catch {
-      //     console.log('cooked');
-      //   }
-
-      //   // connectResult = await checkout.connect({ providerPreference });
-      // }
 
       bridgeDispatch({
         payload: {
@@ -158,10 +133,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
           },
         });
       }
-
-      /**
-       * Below setup assumes that we are on the correct network
-       */
 
       const address = await connectResult.provider.getSigner().getAddress();
       const tokenBalances = await checkout.getAllBalances({
@@ -208,30 +179,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       bridgetWidgetSetup();
     }
   }, [providerPreference, defaultFromChainId, toChainId, firstRender.current]);
-
-  /**
-   * This effect is used to refresh all user balances when the network changes.
-   * It also filters out any 0 balances as the user will have nothing to bridge.
-   */
-  // useEffect(() => {
-  //   const refreshBalances = async () => {
-  //     if (checkout && provider) {
-  //       const getAllBalancesResult = await getAllBalances(checkout, provider);
-
-  //       const nonZeroBalances = getAllBalancesResult.balances
-  //         .filter((balance) => balance.balance.gt(0))
-  //         .sort((a, b) => b.token.symbol.localeCompare(a.token.symbol));
-
-  //       bridgeDispatch({
-  //         payload: {
-  //           type: BridgeActions.SET_TOKEN_BALANCES,
-  //           tokenBalances: nonZeroBalances,
-  //         },
-  //       });
-  //     }
-  //   };
-  //   refreshBalances();
-  // }, [checkout, provider]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
