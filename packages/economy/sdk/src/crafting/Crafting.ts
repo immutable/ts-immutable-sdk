@@ -34,8 +34,8 @@ export type CraftEvent = EventType<
   | EventData<'COMPLETED', { data: {} }>
   | EventData<'FAILED', { error: { code: string; reason: string } }>
   | EventData<
-    'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
-  >
+      'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
+    >
 >;
 
 /** List of specific craft statuses */
@@ -43,13 +43,13 @@ export type CraftStatus = CraftEvent['status'];
 
 @Service()
 export class Crafting {
-  constructor (
+  constructor(
     private events: EventClient<CraftEvent>,
     private studioBE: StudioBE,
     private config: Config,
     private store: Store,
-    private recipe: Recipe
-  ) { }
+    private recipe: Recipe,
+  ) {}
 
   /**
    * Given inputs for a recipe crafting
@@ -127,7 +127,6 @@ export class Crafting {
     });
   }
 
-  @withSDKError({ type: 'CRAFTING_ERROR' })
   public addInputByItem(item: InventoryItem) {
     const { selectedRecipeId } = this.store.get();
 
@@ -188,7 +187,13 @@ export class Crafting {
           return false;
         }
 
-        return this.store.get().craftingInputs.findIndex((usedInput) => usedInput.condition_id === input.id) === -1
+        return (
+          this.store
+            .get()
+            .craftingInputs.findIndex(
+              (usedInput) => usedInput.condition_id === input.id
+            ) === -1
+        );
       }) || [];
 
     if (!availableInput?.id) {

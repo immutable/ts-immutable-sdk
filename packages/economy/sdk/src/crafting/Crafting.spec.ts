@@ -178,59 +178,67 @@ const recipe2 = {
   ],
 };
 
-const items2 = [{
-  id: 'stick_1_id',
-  item_definition_id: 'stick_item_definition_id',
-  metadata: {
-    description: 'Stick Regular',
-    image: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/7a/Stick_JE1_BE1.png',
-    name: 'Stick Regular',
+const items2 = [
+  {
+    id: 'stick_1_id',
+    item_definition_id: 'stick_item_definition_id',
+    metadata: {
+      description: 'Stick Regular',
+      image:
+        'https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/7a/Stick_JE1_BE1.png',
+      name: 'Stick Regular',
+    },
   },
-},
-{
-  id: 'stick_2_id',
-  item_definition_id: 'stick_item_definition_id',
-  metadata: {
-    description: 'Stick Regular',
-    image: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/7a/Stick_JE1_BE1.png',
-    name: 'Stick Regular',
+  {
+    id: 'stick_2_id',
+    item_definition_id: 'stick_item_definition_id',
+    metadata: {
+      description: 'Stick Regular',
+      image:
+        'https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/7a/Stick_JE1_BE1.png',
+      name: 'Stick Regular',
+    },
   },
-}, {
-  id: 'stick_3_id',
-  item_definition_id: 'stick_item_definition_id',
-  metadata: {
-    description: 'Stick Regular',
-    image: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/7a/Stick_JE1_BE1.png',
-    name: 'Stick Regular',
+  {
+    id: 'stick_3_id',
+    item_definition_id: 'stick_item_definition_id',
+    metadata: {
+      description: 'Stick Regular',
+      image:
+        'https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/7a/Stick_JE1_BE1.png',
+      name: 'Stick Regular',
+    },
   },
-},
-{
-  id: 'woodplank_1_id',
-  item_definition_id: 'woodplank_item_definition_id',
-  metadata: {
-    description: 'Wood Plank Regular',
-    image: 'https://j-img.game8.co/1652109/a087c7c4677cd9fa3c030c798faafe4c.png/show?1527556487',
-    name: 'Wood Plank Regular',
+  {
+    id: 'woodplank_1_id',
+    item_definition_id: 'woodplank_item_definition_id',
+    metadata: {
+      description: 'Wood Plank Regular',
+      image:
+        'https://j-img.game8.co/1652109/a087c7c4677cd9fa3c030c798faafe4c.png/show?1527556487',
+      name: 'Wood Plank Regular',
+    },
   },
-},
-{
-  id: 'woodplank_2_id',
-  item_definition_id: 'woodplank_item_definition_id',
-  metadata: {
-    description: 'Wood Plank Regular',
-    image: 'https://j-img.game8.co/1652109/a087c7c4677cd9fa3c030c798faafe4c.png/show?1527556487',
-    name: 'Wood Plank Regular',
+  {
+    id: 'woodplank_2_id',
+    item_definition_id: 'woodplank_item_definition_id',
+    metadata: {
+      description: 'Wood Plank Regular',
+      image:
+        'https://j-img.game8.co/1652109/a087c7c4677cd9fa3c030c798faafe4c.png/show?1527556487',
+      name: 'Wood Plank Regular',
+    },
   },
-},
-{
-  id: 'woodplank_3_id',
-  item_definition_id: 'woodplank_item_definition_id',
-  metadata: {
-    description: 'Wood Plank Regular',
-    image: 'https://j-img.game8.co/1652109/a087c7c4677cd9fa3c030c798faafe4c.png/show?1527556487',
-    name: 'Wood Plank Regular',
+  {
+    id: 'woodplank_3_id',
+    item_definition_id: 'woodplank_item_definition_id',
+    metadata: {
+      description: 'Wood Plank Regular',
+      image:
+        'https://j-img.game8.co/1652109/a087c7c4677cd9fa3c030c798faafe4c.png/show?1527556487',
+      name: 'Wood Plank Regular',
+    },
   },
-},
 ] as unknown as Array<InventoryItem>;
 
 describe(Crafting.name, () => {
@@ -253,18 +261,19 @@ describe(Crafting.name, () => {
     const crafting = Container.get(Crafting);
     const store = Container.get(Store);
 
-    try {
-      crafting.addInputByItem(store.get().inventory[0]);
-      crafting.addInputByItem(store.get().inventory[1]);
-      crafting.addInputByItem(store.get().inventory[2]);
-      crafting.addInputByItem(store.get().inventory[3]);
-      crafting.addInputByItem(store.get().inventory[4]);
+    crafting.addInputByItem(store.get().inventory[0]);
+    crafting.addInputByItem(store.get().inventory[1]);
+    crafting.addInputByItem(store.get().inventory[2]);
+    crafting.addInputByItem(store.get().inventory[3]);
+    crafting.addInputByItem(store.get().inventory[4]);
 
-      console.log('#########', store.get().craftingInputs);
-    } catch (error) {
-      console.log('######### ERROR', error);
-    }
-    expect(crafting).toBeDefined();
+    expect(store.get().craftingInputs).toEqual([
+      { condition_id: 'input_1', item_id: 'item_1' },
+      { condition_id: 'input_1', item_id: 'item_2' },
+      { condition_id: 'input_2', item_id: 'item_3' },
+      { condition_id: 'input_3', item_id: 'item_4' },
+      { condition_id: 'input_2', item_id: 'item_5' },
+    ]);
   });
 
   it('should add item in the correct available slot', () => {
@@ -282,14 +291,17 @@ describe(Crafting.name, () => {
     const store = Container.get(Store);
 
     try {
-      crafting.addInputByItem(store.get().inventory.find((item: any) => item.id === 'stick_1_id'));
-      crafting.addInputByItem(store.get().inventory.find((item: any) => item.id === 'stick_2_id'));
-      crafting.addInputByItem(store.get().inventory.find((item: any) => item.id === 'stick_3_id'));
+      crafting.addInputByItem(store.get().inventory[0]);
+      crafting.addInputByItem(store.get().inventory[1]);
 
-      console.log('#########', store.get().craftingInputs);
+      expect(store.get().craftingInputs).toEqual([
+        { condition_id: 'stick_input_1', item_id: 'stick_1_id' },
+        { condition_id: 'stick_input_2', item_id: 'stick_2_id' },
+      ]);
+
+      expect(crafting.addInputByItem(store.get().inventory[2])).toThrowError();
     } catch (error) {
-      console.log('######### ERROR', error);
+      expect(error).toBeInstanceOf(Error);
     }
-    expect(crafting).toBeDefined();
   });
 });
