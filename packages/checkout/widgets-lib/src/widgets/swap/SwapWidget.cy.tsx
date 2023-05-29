@@ -144,8 +144,8 @@ describe('SwapWidget tests', () => {
     );
 
     cySmartGet('fromTokenInputs-select-form-select__target').click();
-    cySmartGet('fromTokenInputs-select-form-ETH-Ethereum').should('exist');
-    cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').should('exist');
+    cySmartGet('fromTokenInputs-select-form-eth-ethereum').should('exist');
+    cySmartGet('fromTokenInputs-select-form-imx-immutablex').should('exist');
     cySmartGet('fromTokenInputs-select-form-USDC-USDCoin').should('not.exist');
   });
 });
