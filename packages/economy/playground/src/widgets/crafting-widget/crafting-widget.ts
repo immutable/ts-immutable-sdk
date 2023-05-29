@@ -4,26 +4,23 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { Environment } from '@imtbl/config';
 import { Economy } from '@imtbl/economy';
 // FIXME: export this types
-import type {
-  DomainCondition,
-  DomainRecipe,
-} from '@imtbl/economy/dist/__codegen__/recipe';
+import type { DomainRecipe } from '@imtbl/economy/dist/__codegen__/recipe';
 import type { InventoryItem } from '@imtbl/economy/dist/__codegen__/inventory';
-import type { DomainCraft } from '@imtbl/economy/dist/__codegen__/crafting';
+import type { CraftCreateCraftInput, DomainCraft } from '@imtbl/economy/dist/__codegen__/crafting';
 
 type ComponentEvent =
   | {
-      type: 'userInfo';
-      data: { userId: string; email: string; address: string };
-    }
+    type: 'userInfo';
+    data: { userId: string; email: string; address: string };
+  }
   | {
-      type: 'item-selected';
-      data: Required<InventoryItem>;
-    }
+    type: 'item-selected';
+    data: Required<InventoryItem>;
+  }
   | {
-      type: 'recipe-selected';
-      data: string;
-    };
+    type: 'recipe-selected';
+    data: string;
+  };
 
 @customElement('crafting-widget')
 export class CraftingWidget extends LitElement {
@@ -88,11 +85,11 @@ export class CraftingWidget extends LitElement {
   selectItem(item: Required<InventoryItem>) {
     if (this.selectedItems.has(item.id)) {
       this.selectedItems.delete(item.id);
+      this.economy.crafting.removeInput(item.id)
     } else {
       this.selectedItems.set(item.id, item);
+      this.economy.crafting.addInputByItem(item);
     }
-
-    this.setCraftingInput(item);
     this.requestUpdate();
   }
 
@@ -140,6 +137,8 @@ export class CraftingWidget extends LitElement {
       //   servicesBaseURL: 'http://127.0.0.1:3031',
       // },
     });
+
+    this.economy.connect();
   }
 
   handleInputChanges(key: 'userId' | 'walletAddress' | 'gameId') {
@@ -149,122 +148,28 @@ export class CraftingWidget extends LitElement {
     };
   }
 
-  setCraftingInput(item: InventoryItem) {
-    const index = this.craftingInputs.findIndex(
-      (input) => input.item_id === item.id
-    );
-    if (index > -1) {
-      this.craftingInputs = this.craftingInputs.filter(
-        (input) => input.item_id !== item.id
-      );
-      this.economy.crafting.removeInput(item.id as string);
-      this.requestUpdate();
-      return;
-    }
-
-    const availableInputs = this.selectedRecipe?.inputs?.filter(
-      (input) =>
-        !this.craftingInputs.find(
-          (craftInput) => craftInput.condition_id === input.id
-        )
-    );
-
-    const recipeInput = availableInputs?.find((input) => {
-      const matches = this.matchesCondition(
-        item as Required<InventoryItem>,
-        input.conditions as DomainCondition[]
-      );
-
-      return matches;
-    });
-
-    if (recipeInput) {
-      const input = {
-        item_id: item.id as string,
-        condition_id: recipeInput.id as string,
-      };
-      this.craftingInputs = [input, ...this.craftingInputs];
-      this.economy.crafting.addInput(input);
-      this.requestUpdate();
-    }
-
-    if ((availableInputs?.length as number) <= 1) {
-      this.disabledSelection = true;
-      this.requestUpdate();
-      return;
-    }
-  }
-
-  // TODO: Move to economy, craft.addInput
-  // consider if backend can outsource validation for inputs
-  matchesCondition(
-    item: Required<InventoryItem>,
-    conditions: DomainCondition[]
-  ) {
-    return conditions?.every((condition) => {
-      let matches = false;
-
-      const key = condition?.ref as string;
-      const metadata = (item.metadata = {
-        item_definition_id: item?.item_definition_id,
-        ...(item?.metadata || {}),
-      } as any);
-
-      if (Object.hasOwnProperty.call(metadata, key)) {
-        if (condition?.comparison === 'eq') {
-          matches = metadata?.[key] === condition?.expected;
-        }
-
-        if (condition?.comparison === 'gte') {
-          matches = Number(metadata?.[key]) >= Number(condition?.expected);
-        }
-
-        if (condition?.comparison === 'lte') {
-          matches = Number(metadata?.[key]) <= Number(condition?.expected);
-        }
-
-        if (condition?.comparison === 'gt') {
-          matches = Number(metadata?.[key]) > Number(condition?.expected);
-        }
-
-        if (condition?.comparison === 'lt') {
-          matches = Number(metadata?.[key]) < Number(condition?.expected);
-        }
-      }
-
-      return matches;
-    });
-  }
-
   async sendCraft(event: Event) {
     event.preventDefault();
 
-    try {
-      const craft = await this.economy.crafting.craft({
-        user_id: this.userId,
-        game_id: this.gameId,
-        ingredients: [...this.craftingInputs],
-        recipe_id: this.selectedRecipe?.id as string,
-      });
+    if (!this.economy.state.selectedRecipeId) {
+      return;
+    }
+    const input: CraftCreateCraftInput = {
+      game_id: this.economy.config.get().gameId,
+      user_id: this.economy.config.get().userId,
+      recipe_id: this.economy.state.selectedRecipeId,
+      ingredients: this.economy.state.craftingInputs,
+    }
+    this.economy.crafting.craft(input)
 
-      this.economy.resetState();
-      this.selectedRecipe = undefined as any;
-      this.disabledSelection = false;
-      this.selectedItems.clear();
-      this.requestUpdate();
-
-      console.log({ craft });
-    } catch {}
   }
 
   render() {
     const selectedItems = Array.from(this.selectedItems.values());
     const filteredInventory = this.selectedRecipe
       ? this.inventory.filter((item: Required<InventoryItem>) => {
-          return this.selectedRecipe?.inputs?.find((input) =>
-            this.matchesCondition(item, input?.conditions as DomainCondition[])
-          );
-        })
+        return this.economy.recipe.getInputsByItem(this.selectedRecipe, item).length > 0;
+      })
       : this.inventory;
 
     return html`
@@ -330,9 +235,9 @@ export class CraftingWidget extends LitElement {
               <!-- INVENTORY -->
               <div
                 class="bg-gray-100 overflow-hidden overflow-y-scroll max-h-96 lg:max-h-none ${this
-                  .disabledSelection
-                  ? 'grayscale contrast-200 opacity-50 pointer-events-none'
-                  : ''}"
+        .disabledSelection
+        ? 'grayscale contrast-200 opacity-50 pointer-events-none'
+        : ''}"
               >
                 <inventory-collection
                   .inventory="${filteredInventory}"
