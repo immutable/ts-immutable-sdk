@@ -64,6 +64,7 @@
     "packages/internal/bridge/sdk",
     "packages/internal/guardian",
     "packages/internal/bridge/bridge-sample-app",
+    "packages/internal/multi-rollup-api-client",
     "packages/checkout/sdk",
     "packages/checkout/sdk-sample-app",
     "packages/checkout/widgets",
