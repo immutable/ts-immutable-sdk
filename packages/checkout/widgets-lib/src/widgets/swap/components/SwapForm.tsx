@@ -202,6 +202,7 @@ export function SwapForm({ data }: SwapFromProps) {
       setToAmountError('');
       setToTokenError('');
     } catch (error: any) {
+      setQuote(null);
       // eslint-disable-next-line no-console
       console.log('Quote error: ', error.message);
       // todo: handle the display on form when exchange errors
@@ -262,6 +263,10 @@ export function SwapForm({ data }: SwapFromProps) {
       setToAmountError('');
       setToTokenError('');
     } catch (error: any) {
+      setQuote(null);
+      // eslint-disable-next-line no-console
+      console.log('Quote error: ', error.message);
+      // todo: handle the display on form when exchange errors
       setQuoteError(error.message);
     }
 
