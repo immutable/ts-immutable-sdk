@@ -1,8 +1,8 @@
 import { ItemType } from '@opensea/seaport-js/lib/constants';
 import {
-  BuyItem, Fee, Order, OrdersService, CreateOrderProtocolData, SellItem,
+  BuyItem, Fee, Order, OrdersService, CreateOrderProtocolData, SellItem, ListOrdersResult,
 } from 'openapi/sdk';
-import { CreateOrderParams } from 'types';
+import { CreateOrderParams, ListOrderParams } from 'types';
 
 export class ImmutableApiClient {
   constructor(
@@ -12,6 +12,13 @@ export class ImmutableApiClient {
 
   async getOrder(orderId: string): Promise<Order> {
     return this.orderbookService.getOrder({ chainId: this.chainId, orderId });
+  }
+
+  async listOrders(listOrderParams: ListOrderParams): Promise<ListOrdersResult> {
+    return this.orderbookService.listOrders({
+      chainId: this.chainId,
+      ...listOrderParams,
+    });
   }
 
   async createOrder(
@@ -57,7 +64,7 @@ export class ImmutableApiClient {
           : [],
         end_time: new Date(parseInt(`${orderComponents.endTime.toString()}000`, 10)).toISOString(),
         protocol_data: {
-          order_type: CreateOrderProtocolData.order_type.FULL_OPEN,
+          order_type: CreateOrderProtocolData.order_type.FULL_RESTRICTED,
           zone_address: orderComponents.zone,
         },
         salt: orderComponents.salt,
