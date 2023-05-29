@@ -15,7 +15,6 @@ import { StudioBE } from '../StudioBE';
 import { Config } from '../Config';
 import { Store } from '../Store';
 import { Recipe } from '../recipe/Recipe';
-import { DomainInput } from '__codegen__/recipe';
 
 // TODO: Use Checkout SDK
 const checkout = {
@@ -47,7 +46,7 @@ export class Crafting {
     private studioBE: StudioBE,
     private config: Config,
     private store: Store,
-    private recipe: Recipe,
+    private recipe: Recipe
   ) {}
 
   /**
