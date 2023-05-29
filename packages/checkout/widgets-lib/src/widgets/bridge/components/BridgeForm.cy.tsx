@@ -7,7 +7,7 @@ import { cySmartGet } from '../../../lib/testUtils';
 import { text } from '../../../resources/text/textConfig';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 
-describe('Bridge View', () => {
+describe('Bridge Form', () => {
   const { validation } = text.views[BridgeWidgetViews.BRIDGE];
   let initialBridgeState;
   let cryptoConversions;
@@ -121,8 +121,7 @@ describe('Bridge View', () => {
         </BridgeWidgetTestComponent>,
       );
 
-      cySmartGet('bridge-token-select__target').should('have.text', 'Select coin');
-      cySmartGet('bridge-amount-text__input').should('have.value', '0.1');
+      cySmartGet('bridge-token-select__target__controlledLabel').should('have.text', 'IMX');
     });
 
     it('should render token balances greater than zero as token options', () => {

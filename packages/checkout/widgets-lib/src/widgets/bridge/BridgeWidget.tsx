@@ -82,8 +82,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   /**
    * This effect is used to set up the BridgeWidget state for the first time.
    * It includes connecting with a provider preference
-   * Checking that the provider is connected to an available network and switching
-   * to the default specified network
+   * Checking that the provider is connected
    * It then calculates the toNetwork for the bridge and it's associated native currency.
    */
   useEffect(() => {

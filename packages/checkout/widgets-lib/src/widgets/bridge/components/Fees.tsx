@@ -37,11 +37,7 @@ export function Fees({ gasFeeValue, gasFeeToken, gasFeeFiatValue }: FeesProps) {
       </Box>
       <Box sx={feeBoxStyles}>
         <Body testId="fee_description_gas" size="medium" weight="regular" sx={{ textAlign: 'right' }}>
-          ≈
-          {' '}
-          {gasFeeToken?.symbol}
-          {' '}
-          {formatZeroAmount(tokenValueFormat(gasFeeValue))}
+          {`≈ ${gasFeeToken?.symbol} ${formatZeroAmount(tokenValueFormat(gasFeeValue))}`}
         </Body>
         <Body
           testId="fee_description_gas_fiat"
@@ -49,10 +45,7 @@ export function Fees({ gasFeeValue, gasFeeToken, gasFeeFiatValue }: FeesProps) {
           weight="regular"
           sx={{ color: 'base.color.text.secondary', textAlign: 'right' }}
         >
-          {staticText.content.fiatPricePrefix}
-          {' '}
-          $
-          {formatZeroAmount(gasFeeFiatValue, true)}
+          {`${staticText.content.fiatPricePrefix} $${formatZeroAmount(gasFeeFiatValue, true)}`}
         </Body>
       </Box>
     </Box>

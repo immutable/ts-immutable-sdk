@@ -31,14 +31,14 @@ export function BridgeWidgetTestComponent({ children, initialStateOverride, cryp
 
   const cryptoFiatDispatch = useCallback(() => {}, []);
 
-  const cryptoFiaterReducerValues = useMemo(() => (
+  const cryptoFiatReducerValues = useMemo(() => (
     { cryptoFiatState, cryptoFiatDispatch }
   ), [cryptoFiatState, cryptoFiatDispatch]);
 
   return (
     <BiomeCombinedProviders theme={{ base: onDarkBase }}>
       <BridgeContext.Provider value={bridgeReducerValues}>
-        <CryptoFiatContext.Provider value={cryptoFiaterReducerValues as CryptoFiatContextState}>
+        <CryptoFiatContext.Provider value={cryptoFiatReducerValues as CryptoFiatContextState}>
           {children}
         </CryptoFiatContext.Provider>
       </BridgeContext.Provider>
