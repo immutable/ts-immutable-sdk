@@ -2686,7 +2686,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@imtbl/blockchain-data@workspace:packages/blockchain-data":
+"@imtbl/blockchain-data@0.0.0, @imtbl/blockchain-data@workspace:packages/blockchain-data":
   version: 0.0.0-use.local
   resolution: "@imtbl/blockchain-data@workspace:packages/blockchain-data"
   dependencies:
@@ -3206,6 +3206,7 @@ __metadata:
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
     "@ethersproject/wallet": ^5.7.0
+    "@imtbl/blockchain-data": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
