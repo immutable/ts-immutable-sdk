@@ -4,7 +4,6 @@ import {
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
-  ChainId,
   Checkout,
   ConnectionProviders,
   GetTokenAllowListResult,
@@ -44,17 +43,6 @@ export interface BridgeWidgetParams {
   fromNetwork?: Network;
 }
 
-// TODO: consider changing this to an enum for better discoverability
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const NetworkChainMap = {
-  [Network.ETHEREUM]: ChainId.ETHEREUM,
-  [Network.IMTBL_ZKEVM_TESTNET]: ChainId.IMTBL_ZKEVM_TESTNET,
-  [Network.IMTBL_ZKEVM_DEVNET]: ChainId.IMTBL_ZKEVM_DEVNET,
-  [Network.POLYGON_ZKEVM_TESTNET]: ChainId.POLYGON_ZKEVM_TESTNET,
-  [Network.POLYGON_ZKEVM]: ChainId.POLYGON_ZKEVM,
-  [Network.SEPOLIA]: ChainId.SEPOLIA,
-};
-
 export function BridgeWidget(props: BridgeWidgetProps) {
   const { params, config } = props;
   const { environment, theme } = config;
@@ -79,12 +67,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   const defaultFromChainId = l1Network(environment);
   const toChainId = zkEVMNetwork(environment);
 
-  /**
-   * This effect is used to set up the BridgeWidget state for the first time.
-   * It includes connecting with a provider preference
-   * Checking that the provider is connected
-   * It then calculates the toNetwork for the bridge and it's associated native currency.
-   */
   useEffect(() => {
     const bridgetWidgetSetup = async () => {
       if (!providerPreference) return;
@@ -119,8 +101,10 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       });
 
       const allowedBridgingNetworks = await checkout.getNetworkAllowList({
-        type: NetworkFilterTypes.ALL, // TODO: change to Bridge
+        type: NetworkFilterTypes.ALL,
       });
+
+      console.log(allowedBridgingNetworks);
 
       const toNetwork = allowedBridgingNetworks.networks.find((network) => network.chainId === toChainId);
 
