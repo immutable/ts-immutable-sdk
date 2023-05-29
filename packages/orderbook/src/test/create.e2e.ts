@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { Order } from 'openapi/sdk';
+import { OrderStatus } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getConfig } from './helpers/config';
@@ -58,6 +58,6 @@ describe('prepareListing and createOrder e2e', () => {
       orderSignature: signature,
     });
 
-    await waitForOrderToBeOfStatus(sdk, order.id, Order.status.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, order.id, OrderStatus.ACTIVE);
   }, 30_000);
 });

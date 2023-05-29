@@ -1,10 +1,10 @@
-import { Order } from 'openapi/sdk';
+import { Order, OrderStatus } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 
 export async function waitForOrderToBeOfStatus(
   sdk: Orderbook,
   orderId: string,
-  status: Order.status,
+  status: OrderStatus,
   attemps = 0,
 ): Promise<Order> {
   if (attemps > 20) {

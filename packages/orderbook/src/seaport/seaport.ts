@@ -77,6 +77,7 @@ export class Seaport {
           parameters: orderComponents,
           signature: order.signature,
         },
+        extraData: order.protocol_data.operator_signature,
       }],
     });
 
