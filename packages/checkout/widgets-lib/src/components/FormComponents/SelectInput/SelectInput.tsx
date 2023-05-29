@@ -26,7 +26,7 @@ interface SelectInputProps {
   onTextInputFocus?: (value: string) => void;
   textInputMaxButtonClick?: () => void;
   onSelectChange: (value: OptionKey) => void;
-  defaultOption?: OptionKey;
+  selectedOption?: OptionKey;
 }
 
 export function SelectInput({
@@ -48,7 +48,7 @@ export function SelectInput({
   onSelectChange,
   textInputDisabled,
   selectInputDisabled,
-  defaultOption,
+  selectedOption,
 }: SelectInputProps) {
   return (
     <Box sx={selectInputBoxStyle}>
@@ -61,7 +61,7 @@ export function SelectInput({
           errorMessage={selectErrorMessage}
           onSelectChange={onSelectChange}
           disabled={selectInputDisabled}
-          defaultOption={defaultOption}
+          selectedOption={selectedOption}
         />
       </Box>
       <Box sx={inputStyle}>

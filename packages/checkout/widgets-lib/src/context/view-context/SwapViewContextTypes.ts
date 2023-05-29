@@ -6,12 +6,29 @@ export enum SwapWidgetViews {
 }
 
 export type SwapWidgetView =
-  | { type: SwapWidgetViews.SWAP }
+  | SwapView
   | { type: SwapWidgetViews.SUCCESS }
-  | { type: SwapWidgetViews.PRICE_SURGE }
+  | PriceSurgeView
   | SwapFailView;
 
 interface SwapFailView {
   type: SwapWidgetViews.FAIL;
-  reason: string;
+  data: PrefilledSwapForm;
+  reason?: string;
+}
+
+interface PriceSurgeView {
+  type: SwapWidgetViews.PRICE_SURGE;
+  data: PrefilledSwapForm;
+}
+
+interface SwapView {
+  type: SwapWidgetViews.SWAP;
+  data?: PrefilledSwapForm;
+}
+
+export interface PrefilledSwapForm {
+  fromAmount: string;
+  fromContractAddress: string;
+  toContractAddress: string;
 }

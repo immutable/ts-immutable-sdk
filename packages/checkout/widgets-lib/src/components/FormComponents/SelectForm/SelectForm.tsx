@@ -20,7 +20,7 @@ interface SelectFormProps {
   errorMessage?: string;
   disabled?: boolean;
   onSelectChange?: (value: OptionKey) => void;
-  defaultOption?: OptionKey;
+  selectedOption?: OptionKey;
 }
 
 export function SelectForm({
@@ -30,7 +30,7 @@ export function SelectForm({
   onSelectChange,
   textAlign,
   errorMessage,
-  defaultOption,
+  selectedOption,
   disabled,
 }: SelectFormProps) {
   return (
@@ -47,7 +47,7 @@ export function SelectForm({
         size="large"
         defaultLabel="Select coin"
         onSelectChange={onSelectChange}
-        selectedOption={defaultOption}
+        selectedOption={selectedOption}
       >
         {options.map((option) => (
           <Option

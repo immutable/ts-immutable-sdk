@@ -25,6 +25,7 @@ import {
 } from '../functions/SwapValidator';
 import { Fees } from './Fees';
 import { SwapButton } from './SwapButton';
+import { SwapFormData } from './swapFormTypes';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -64,12 +65,7 @@ const swapValuesToText = ({
 };
 
 export interface SwapFromProps {
-  data?: {
-    fromAmount?: string;
-    toAmount?: string;
-    fromContractAddress?: string;
-    toContractAddress?: string;
-  };
+  data?: SwapFormData;
 }
 
 export function SwapForm({ data }: SwapFromProps) {
@@ -85,6 +81,9 @@ export function SwapForm({ data }: SwapFromProps) {
   // TODO: native token handling for no-address tokens
   const initialToken = (address) => allowedTokens.find((t) => t.address === address);
   const initialBalance = (address) => tokenBalances.find((t) => t.token.address === address)?.formattedBalance;
+
+  console.log('fun:', initialToken('0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE'));
+  console.log('dex:', initialToken('0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2'));
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
 
@@ -500,7 +499,7 @@ export function SwapForm({ data }: SwapFromProps) {
               selectErrorMessage={fromTokenError}
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
-              defaultOption={fromToken
+              selectedOption={fromToken
                 ? `${fromToken.symbol.toLowerCase()}-${fromToken.name.toLowerCase()}`
                 : undefined}
             />
@@ -541,6 +540,9 @@ export function SwapForm({ data }: SwapFromProps) {
               selectErrorMessage={toTokenError}
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
+              selectedOption={toToken
+                ? `${toToken.symbol.toLowerCase()}-${toToken.name.toLowerCase()}`
+                : undefined}
             />
           </Box>
         </Box>
@@ -554,6 +556,11 @@ export function SwapForm({ data }: SwapFromProps) {
         validator={SwapFormValidator}
         loading={loading}
         transaction={quote}
+        data={{
+          fromAmount,
+          fromContractAddress: fromToken?.address,
+          toContractAddress: toToken?.address,
+        }}
       />
     </>
   );

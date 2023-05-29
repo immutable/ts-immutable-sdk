@@ -6,6 +6,10 @@ export const sendTransaction = async (
   params: SendTransactionParams,
 ): Promise<SendTransactionResult> => {
   const { provider, transaction } = params;
+  throw new CheckoutError(
+    'insufficient funds',
+    CheckoutErrorType.INSUFFICIENT_FUNDS,
+  );
   try {
     const transactionResponse = await provider
       .getSigner()
@@ -19,20 +23,17 @@ export const sendTransaction = async (
       throw new CheckoutError(
         err.message,
         CheckoutErrorType.INSUFFICIENT_FUNDS,
-        err,
       );
     }
     if (err.code === ethers.errors.ACTION_REJECTED) {
       throw new CheckoutError(
         err.message,
         CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
-        err,
       );
     }
     throw new CheckoutError(
       err.message,
       CheckoutErrorType.TRANSACTION_FAILED,
-      err,
     );
   }
 };

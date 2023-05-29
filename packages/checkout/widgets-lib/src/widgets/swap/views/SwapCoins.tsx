@@ -22,6 +22,14 @@ export function SwapCoins({
 }: SwapCoinsProps) {
   const { header } = text.views[SwapWidgetViews.SWAP];
 
+  console.log(
+    'SwapCoinsData: ',
+    fromAmount,
+    toAmount,
+    fromContractAddress,
+    toContractAddress,
+  );
+
   return (
     <SimpleLayout
       header={(

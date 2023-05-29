@@ -179,9 +179,9 @@ export function SwapWidget(props: SwapWidgetProps) {
           {viewState.view.type === SwapWidgetViews.SWAP && (
             <CryptoFiatProvider>
               <SwapCoins
-                fromAmount={amount}
-                fromContractAddress={fromContractAddress}
-                toContractAddress={toContractAddress}
+                fromAmount={viewState.view.data?.fromAmount ?? amount}
+                fromContractAddress={viewState.view.data?.fromContractAddress ?? fromContractAddress}
+                toContractAddress={viewState.view.data?.toContractAddress ?? toContractAddress}
               />
             </CryptoFiatProvider>
           )}
@@ -202,12 +202,17 @@ export function SwapWidget(props: SwapWidgetProps) {
             actionText={failed.actionText}
             onRenderEvent={() => sendSwapFailedEvent('Transaction failed')}
             onActionClick={() => {
-              viewDispatch({
-                payload: {
-                  type: ViewActions.UPDATE_VIEW,
-                  view: { type: SwapWidgetViews.SWAP },
-                },
-              });
+              if (viewState.view.type === SwapWidgetViews.FAIL) {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: {
+                      type: SwapWidgetViews.SWAP,
+                      data: viewState.view.data,
+                    },
+                  },
+                });
+              }
             }}
             statusType={StatusType.FAILURE}
             testId="fail-view"
@@ -218,14 +223,18 @@ export function SwapWidget(props: SwapWidgetProps) {
               statusText={rejected.text}
               actionText={rejected.actionText}
               onRenderEvent={() => sendSwapRejectedEvent('Price surge')}
-              // eslint-disable-next-line no-console
               onActionClick={() => {
-                viewDispatch({
-                  payload: {
-                    type: ViewActions.UPDATE_VIEW,
-                    view: { type: SwapWidgetViews.SWAP },
-                  },
-                });
+                if (viewState.view.type === SwapWidgetViews.PRICE_SURGE) {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.UPDATE_VIEW,
+                      view: {
+                        type: SwapWidgetViews.SWAP,
+                        data: viewState.view.data,
+                      },
+                    },
+                  });
+                }
               }}
               statusType={StatusType.WARNING}
               testId="price-surge-view"

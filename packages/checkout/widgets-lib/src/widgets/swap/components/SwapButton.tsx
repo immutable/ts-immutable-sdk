@@ -4,7 +4,7 @@ import { useContext } from 'react';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { text } from '../../../resources/text/textConfig';
-import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
+import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import {
   ViewContext,
   ViewActions,
@@ -15,14 +15,18 @@ import {
   swapButtonBoxStyle,
   swapButtonIconLoadingStyle,
 } from './SwapButtonStyles';
+import { SwapFormData } from './swapFormTypes';
 
 export interface SwapButtonProps {
   loading: boolean
   validator: () => boolean
   transaction: TransactionResponse | null;
+  data?: SwapFormData;
 }
 
-export function SwapButton({ loading, validator, transaction }: SwapButtonProps) {
+export function SwapButton({
+  loading, validator, transaction, data,
+}: SwapButtonProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { swapState } = useContext(SwapContext);
   const { checkout, provider } = swapState;
@@ -52,6 +56,7 @@ export function SwapButton({ loading, validator, transaction }: SwapButtonProps)
             type: ViewActions.UPDATE_VIEW,
             view: {
               type: SwapWidgetViews.FAIL,
+              data: data as PrefilledSwapForm,
               reason: 'Transaction failed',
             },
           },
@@ -70,11 +75,13 @@ export function SwapButton({ loading, validator, transaction }: SwapButtonProps)
         return;
       }
       if (err.type === CheckoutErrorType.INSUFFICIENT_FUNDS) {
+        console.log('Insufficient funds, data is: ', data as PrefilledSwapForm);
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
             view: {
               type: SwapWidgetViews.PRICE_SURGE,
+              data: data as PrefilledSwapForm,
             },
           },
         });
@@ -87,6 +94,7 @@ export function SwapButton({ loading, validator, transaction }: SwapButtonProps)
             view: {
               type: SwapWidgetViews.FAIL,
               reason: 'Transaction failed',
+              data: data as PrefilledSwapForm,
             },
           },
         });
