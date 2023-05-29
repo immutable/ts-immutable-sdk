@@ -26,11 +26,11 @@ interface SelectFormProps {
 export function SelectForm({
   id,
   options,
+  selectedOption,
   subtext,
   onSelectChange,
   textAlign,
   errorMessage,
-  selectedOption,
   disabled,
 }: SelectFormProps) {
   return (
