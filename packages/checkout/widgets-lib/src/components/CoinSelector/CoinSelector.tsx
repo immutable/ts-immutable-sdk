@@ -7,7 +7,7 @@ type CoinSelectorProps = {
   onCloseBottomSheet?: () => void;
   heading: string;
   options: Option[];
-  children: any;
+  children?: any;
   visible?: boolean;
 };
 
@@ -26,7 +26,7 @@ type Option = {
 type CoinSelectorOptionProps = Option;
 
 export function CoinSelectorOption({
-  onClick, icon, name, symbol, balance, framedImageUrl
+  onClick, icon, name, symbol, balance, framedImageUrl,
 }: CoinSelectorOptionProps) {
   return (
     <MenuItem emphasized size="small" onClick={onClick}>

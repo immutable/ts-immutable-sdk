@@ -99,9 +99,7 @@ export function SwapForm() {
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
   const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | null>(null);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
-  const generateTokenId = (token?: TokenInfo | null): string => {
-    return token ? `${token.symbol}-${token.name}` : ''
-  }
+  const generateTokenId = (token?: TokenInfo | null): string => (token ? `${token.symbol}-${token.name}` : '');
   const tokensOptionsFrom = useMemo(
     () => tokenBalances
       .filter((b) => b.balance.gt(0))

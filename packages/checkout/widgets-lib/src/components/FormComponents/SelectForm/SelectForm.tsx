@@ -2,7 +2,7 @@
 import {
   Select, Option, Box,
 } from '@biom3/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 import { CoinSelector } from '../../CoinSelector/CoinSelector';
 
@@ -18,7 +18,6 @@ export interface SelectOption {
 interface SelectFormProps {
   id: string;
   options: SelectOption[];
-  selectedOption?: OptionKey;
   textAlign?: 'left' | 'right';
   subtext?: string;
   errorMessage?: string;
