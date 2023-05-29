@@ -51,7 +51,6 @@ export function SwapButton({
         transaction: transaction.transaction,
       });
       const receipt = await txn.transactionResponse.wait();
-      console.log('receipt:', receipt, receipt.status);
 
       updateLoading(false);
 
@@ -75,13 +74,10 @@ export function SwapButton({
       });
     } catch (err: any) {
       updateLoading(false);
-      console.log('err:', err);
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-        console.log('user rejected request');
         return;
       }
       if (err.type === CheckoutErrorType.INSUFFICIENT_FUNDS) {
-        console.log('Insufficient funds, data is: ', data as PrefilledSwapForm);
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
