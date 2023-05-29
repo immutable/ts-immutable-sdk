@@ -85,12 +85,6 @@ export class Crafting {
       .filter(Boolean)
       .map(Number);
 
-    console.log('🚀 ~ file: Crafting.ts:87 ~ Crafting ~ tokenIds:', {
-      input,
-      output,
-      tokenIds,
-    });
-
     // no ntfs found then skip transfer
     if (tokenIds.length === 0 || !output.id) {
       return;

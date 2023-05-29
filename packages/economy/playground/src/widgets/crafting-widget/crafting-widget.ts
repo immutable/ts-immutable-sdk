@@ -157,6 +157,7 @@ export class CraftingWidget extends LitElement {
     if (!this.economy.state.selectedRecipeId) {
       return;
     }
+
     const input: CraftCreateCraftInput = {
       game_id: this.economy.config.get().gameId,
       user_id: this.economy.config.get().userId,
