@@ -188,7 +188,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-form-content-heading').should('have.text', content.title);
       cySmartGet('close-button').should('be.visible');
 
-      cySmartGet('bridge-token-select__target').should('have.text', 'Select coin');
+      cySmartGet('bridge-token-select__target').should('have.text', 'ETH');
       cySmartGet('bridge-amount-text__input').should('have.value', '');
     });
 
