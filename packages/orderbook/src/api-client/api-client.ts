@@ -1,17 +1,17 @@
 import { ItemType } from '@opensea/seaport-js/lib/constants';
 import {
-  BuyItem, Fee, Order, OrderBookService, ProtocolData, SellItem,
+  BuyItem, Fee, Order, OrdersService, CreateOrderProtocolData, SellItem,
 } from 'openapi/sdk';
 import { CreateOrderParams } from 'types';
 
 export class ImmutableApiClient {
   constructor(
-    private readonly orderbookService: OrderBookService,
+    private readonly orderbookService: OrdersService,
     private readonly chainId: string,
   ) {}
 
   async getOrder(orderId: string): Promise<Order> {
-    return this.orderbookService.orderBookGetOrder({ chainId: this.chainId, orderId });
+    return this.orderbookService.getOrder({ chainId: this.chainId, orderId });
   }
 
   async createOrder(
@@ -23,7 +23,7 @@ export class ImmutableApiClient {
       throw new Error('Only one item can be listed at a time');
     }
 
-    if (orderComponents.offer[0].itemType !== ItemType.ERC721) {
+    if (Number(orderComponents.offer[0].itemType) !== ItemType.ERC721) {
       throw new Error('Only ERC721 tokens can be listed');
     }
 
@@ -34,14 +34,14 @@ export class ImmutableApiClient {
       throw new Error('All consideration items must be of the same type');
     }
 
-    return this.orderbookService.orderBookCreateOrder({
+    return this.orderbookService.createOrder({
       chainId: this.chainId,
       requestBody: {
         order_hash: orderHash,
         account_address: offerer,
         buy: [
           {
-            item_type: orderComponents.consideration[0].itemType === ItemType.NATIVE
+            item_type: Number(orderComponents.consideration[0].itemType) === ItemType.NATIVE
               ? BuyItem.item_type.IMX
               : BuyItem.item_type.ERC20,
             start_amount: orderComponents.consideration[0].startAmount,
@@ -57,7 +57,8 @@ export class ImmutableApiClient {
           : [],
         end_time: new Date(parseInt(`${orderComponents.endTime.toString()}000`, 10)).toISOString(),
         protocol_data: {
-          order_type: ProtocolData.order_type.FULL_OPEN,
+          order_type: CreateOrderProtocolData.order_type.FULL_OPEN,
+          zone_address: orderComponents.zone,
         },
         salt: orderComponents.salt,
         sell: [{

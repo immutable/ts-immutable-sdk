@@ -1,7 +1,11 @@
+/* eslint-disable class-methods-use-this */
 /* eslint-disable no-console */
+/* eslint-disable no-param-reassign */
+
 import { Service } from 'typedi';
 
 import {
+  CraftIngredient,
   CraftCreateCraftInput,
   CraftCreateCraftOutput,
   DomainCraft,
@@ -12,6 +16,7 @@ import { EventClient } from '../EventClient';
 import { withSDKError } from '../Errors';
 import { StudioBE } from '../StudioBE';
 import { Config } from '../Config';
+import { Store } from '../Store';
 
 // TODO: Use Checkout SDK
 const checkout = {
@@ -42,6 +47,7 @@ export class Crafting {
     private events: EventClient<CraftEvent>,
     private studioBE: StudioBE,
     private config: Config,
+    private store: Store,
   ) {}
 
   /**
@@ -106,13 +112,24 @@ export class Crafting {
     return output;
   }
 
+  public addInput(input: CraftIngredient) {
+    this.store.set((state) => {
+      state.craftingInputs.push(input);
+    });
+  }
+
+  public removeInput(itemId: string) {
+    this.store.set((state) => {
+      state.craftingInputs = state.craftingInputs.filter((input) => input.item_id !== itemId);
+    });
+  }
+
   /**
    * TODO:
    * Validate a craft input
    * @param input
    * @returns
    */
-  // eslint-disable-next-line class-methods-use-this
   @withSDKError({ type: 'CRAFTING_ERROR' })
   public async validate() {
     // TODO: submit craft to BE for validation
@@ -120,7 +137,10 @@ export class Crafting {
   }
 
   @withSDKError({ type: 'CRAFTING_ERROR' })
-  public async getCraftsByGameId(gameId: string): Promise<Array<DomainCraft>> {
+  public async getTransactions(
+    gameId: string,
+    userId: string,
+  ): Promise<Array<DomainCraft>> {
     try {
       const { status, data } = await this.studioBE.craftingApi.craftsGet();
 
@@ -128,7 +148,10 @@ export class Crafting {
         throw new Error('error fetching crafts');
       }
 
-      return data.filter((craft) => craft.game_id === gameId);
+      // TODO: Sort by latest
+      return data.filter(
+        (craft) => craft.game_id === gameId && craft.user_id === userId,
+      );
     } catch (error) {
       throw new Error('error fetching crafts', { cause: { error } });
     }

@@ -21,6 +21,23 @@ const fromAmountIn = async (
   );
 };
 
+const fromAmountOut = async (
+  exchange: Exchange,
+  provider: Web3Provider,
+  toToken: TokenInfo,
+  toAmount: string,
+  fromToken: TokenInfo,
+): Promise<TransactionResponse> => {
+  const address = await provider.getSigner().getAddress();
+  return exchange.getUnsignedSwapTxFromAmountOut(
+    address,
+    fromToken.address || '',
+    toToken.address || '',
+    BigNumber.from(utils.parseUnits(toAmount, toToken.decimals)),
+  );
+};
+
 export const quotesProcessor = {
   fromAmountIn,
+  fromAmountOut,
 };

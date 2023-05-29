@@ -9,7 +9,7 @@ export * from './definitions/events/onRampEvents';
 
 // Definitions
 export * from './definitions/global';
-export * from './definitions/constants';
+export * from './definitions/types';
 export * from './definitions/config';
 
 // React components

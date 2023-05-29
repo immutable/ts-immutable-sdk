@@ -4,7 +4,7 @@ import {
   appReducer,
   initialState,
 } from './Context/app-context';
-import { BiomeThemeProvider, Heading } from '@biom3/react';
+import { BiomeCombinedProviders, Heading } from '@biom3/react';
 import { ConnectButton } from './Components/connect-button';
 import { DisconnectButton } from './Components/disconnect-button';
 import { Environment } from '@imtbl/sdk';
@@ -25,7 +25,7 @@ export const App = () => {
   }, []);
 
   return (
-    <BiomeThemeProvider>
+    <BiomeCombinedProviders>
       <AppCtx.Provider value={{ state: state, dispatch: dispatch }}>
         <Heading size="large">Sample App</Heading>
         <WalletDisplay />
@@ -33,7 +33,7 @@ export const App = () => {
         <SignMessage />
         <DisconnectButton />
       </AppCtx.Provider>
-    </BiomeThemeProvider>
+    </BiomeCombinedProviders>
   );
 };
 

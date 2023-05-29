@@ -28,6 +28,23 @@ import {
 } from '../../../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 
+const logoColour = {
+  [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
+  [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
+  [ChainId.POLYGON_ZKEVM_TESTNET]: 'base.color.text.link.primary',
+  [ChainId.ETHEREUM]: 'base.color.accent.5',
+  [ChainId.SEPOLIA]: 'base.color.accent.5',
+};
+
+// todo: add corresponding network symbols
+const networkIcon = {
+  [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
+  [ChainId.ETHEREUM]: 'EthToken',
+  [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
+  [ChainId.POLYGON_ZKEVM_TESTNET]: 'Immutable',
+  [ChainId.SEPOLIA]: 'EthToken',
+};
+
 export function NetworkMenu() {
   const { viewDispatch } = useContext(ViewContext);
   const { walletState, walletDispatch } = useContext(WalletContext);
@@ -36,22 +53,6 @@ export function NetworkMenu() {
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[] | undefined>(
     [],
   );
-  const logoColour = {
-    [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
-    [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
-    [ChainId.POLYGON_ZKEVM_TESTNET]: 'base.color.text.link.primary',
-    [ChainId.ETHEREUM]: 'base.color.accent.5',
-    [ChainId.SEPOLIA]: 'base.color.accent.5',
-  };
-
-  // todo: add corresponding network symbols
-  const networkIcon = {
-    [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
-    [ChainId.ETHEREUM]: 'EthToken',
-    [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
-    [ChainId.POLYGON_ZKEVM_TESTNET]: 'Immutable',
-    [ChainId.SEPOLIA]: 'EthToken',
-  };
 
   const switchNetwork = useCallback(
     async (chainId: ChainId) => {

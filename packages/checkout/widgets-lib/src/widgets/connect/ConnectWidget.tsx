@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-constructed-context-values */
 
-import { BiomeThemeProvider } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
@@ -18,9 +18,8 @@ import {
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { ConnectWallet } from './views/ConnectWallet';
 import { ConnectResult } from './views/ConnectResult';
-import { SuccessView } from '../../components/Success/SuccessView';
 import { ReadyToConnect } from './views/ReadyToConnect';
-import { SwitchNetwork } from './views/SwitchNetwork';
+import { SwitchNetworkZkEVM } from './views/SwitchNetworkZkEVM';
 import { LoadingView } from '../../components/Loading/LoadingView';
 import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
 import {
@@ -30,8 +29,13 @@ import {
   ViewContext,
   BaseViews,
 } from '../../context/view-context/ViewContext';
+import { StatusType } from '../../components/Status/StatusType';
+import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '../../lib';
+import {
+  ConnectTargetLayer, getTargetLayerChainId, WidgetTheme,
+} from '../../lib';
+import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 
 export interface ConnectWidgetProps {
   // TODO: 'params' PropType is defined but prop is never used
@@ -43,12 +47,13 @@ export interface ConnectWidgetProps {
 }
 
 export interface ConnectWidgetParams {
+  targetLayer?: ConnectTargetLayer
   providerPreference?: ConnectionProviders;
 }
 
 export function ConnectWidget(props: ConnectWidgetProps) {
   const {
-    config, deepLink, sendCloseEventOverride,
+    config, deepLink, sendCloseEventOverride, params: { targetLayer },
   } = props;
   const { environment, theme } = config;
   const [connectState, connectDispatch] = useReducer(
@@ -62,6 +67,10 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
+
+  const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
+
+  const targetChainId = getTargetLayerChainId(targetLayer ?? ConnectTargetLayer.LAYER2, environment);
 
   useEffect(() => {
     setTimeout(() => {
@@ -99,7 +108,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   }, [viewState]);
 
   return (
-    <BiomeThemeProvider theme={{ base: biomeTheme }}>
+    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       {/* TODO: The object passed as the value prop to the Context provider changes every render.
           To fix this consider wrapping it in a useMemo hook. */}
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
@@ -112,25 +121,30 @@ export function ConnectWidget(props: ConnectWidgetProps) {
               <ConnectWallet />
             )}
             {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
-              <ReadyToConnect />
+              <ReadyToConnect targetChainId={targetChainId} />
+            )}
+            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER2 && (
+              <SwitchNetworkZkEVM />
+            )}
+            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
+              <SwitchNetworkEth />
             )}
             {view.type === ConnectWidgetViews.SUCCESS && (
               <ConnectLoaderSuccess>
-                <SuccessView
-                  successText="Connection secure"
+                <StatusView
+                  statusText="Connection secure"
                   actionText="Continue"
-                  successEventAction={() => sendConnectSuccessEvent(ConnectionProviders.METAMASK)}
                   onActionClick={() => sendCloseEvent()}
+                  onRenderEvent={() => sendConnectSuccessEvent(ConnectionProviders.METAMASK)}
+                  statusType={StatusType.SUCCESS}
+                  testId="success-view"
                 />
               </ConnectLoaderSuccess>
             )}
             {view.type === ConnectWidgetViews.FAIL && <ConnectResult />}
-            {view.type === ConnectWidgetViews.SWITCH_NETWORK && (
-              <SwitchNetwork />
-            )}
           </>
         </ConnectContext.Provider>
       </ViewContext.Provider>
-    </BiomeThemeProvider>
+    </BiomeCombinedProviders>
   );
 }

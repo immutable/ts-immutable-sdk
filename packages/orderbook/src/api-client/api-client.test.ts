@@ -1,7 +1,7 @@
 import {
   mock, when, instance, deepEqual, anything,
 } from 'ts-mockito';
-import { Order, OrderBookService } from 'openapi/sdk';
+import { Order, OrdersService } from 'openapi/sdk';
 import { OrderComponents } from '@opensea/seaport-js/lib/types';
 import { ItemType } from '@opensea/seaport-js/lib/constants';
 import { ImmutableApiClient } from './api-client';
@@ -9,11 +9,11 @@ import { ImmutableApiClient } from './api-client';
 describe('ImmutableApiClient', () => {
   describe('getOrder', () => {
     it('calls the OpenAPI client with the correct parameters', async () => {
-      const mockedOpenAPIClient = mock(OrderBookService);
+      const mockedOpenAPIClient = mock(OrdersService);
       const chainId = '123';
       const orderId = '456';
 
-      when(mockedOpenAPIClient.orderBookGetOrder(deepEqual({ chainId, orderId })))
+      when(mockedOpenAPIClient.getOrder(deepEqual({ chainId, orderId })))
         .thenReturn(Promise.resolve({ id: orderId, chain_id: chainId } as Order));
 
       const order = await new ImmutableApiClient(instance(mockedOpenAPIClient), chainId)
@@ -26,7 +26,7 @@ describe('ImmutableApiClient', () => {
   describe('createOrder', () => {
     describe('when there are multiple offer items', () => {
       it('throws', async () => {
-        const mockedOpenAPIClient = mock(OrderBookService);
+        const mockedOpenAPIClient = mock(OrdersService);
 
         const mockedOrderComponents = mock<OrderComponents>();
         const orderComponents = instance(mockedOrderComponents);
@@ -60,7 +60,7 @@ describe('ImmutableApiClient', () => {
 
     describe('when an offer item is not an ERC721', () => {
       it('throws', async () => {
-        const mockedOpenAPIClient = mock(OrderBookService);
+        const mockedOpenAPIClient = mock(OrdersService);
 
         const mockedOrderComponents = mock<OrderComponents>();
         const orderComponents = instance(mockedOrderComponents);
@@ -85,7 +85,7 @@ describe('ImmutableApiClient', () => {
 
     describe('when consideration items are of different types', () => {
       it('throws', async () => {
-        const mockedOpenAPIClient = mock(OrderBookService);
+        const mockedOpenAPIClient = mock(OrdersService);
 
         const mockedOrderComponents = mock<OrderComponents>();
         const orderComponents = instance(mockedOrderComponents);
@@ -128,7 +128,7 @@ describe('ImmutableApiClient', () => {
 
     describe('when the order components are valid', () => {
       it('calls the OpenAPI client with the correct parameters', async () => {
-        const mockedOpenAPIClient = mock(OrderBookService);
+        const mockedOpenAPIClient = mock(OrdersService);
 
         const mockedOrderComponents = mock<OrderComponents>();
         const orderComponents = instance(mockedOrderComponents);
@@ -163,7 +163,7 @@ describe('ImmutableApiClient', () => {
         const chainId = '123';
         const orderId = '456';
 
-        when(mockedOpenAPIClient.orderBookCreateOrder(anything()))
+        when(mockedOpenAPIClient.createOrder(anything()))
           .thenReturn(Promise.resolve({ id: orderId, chain_id: chainId } as Order));
 
         const order = await new ImmutableApiClient(instance(mockedOpenAPIClient), '123').createOrder({

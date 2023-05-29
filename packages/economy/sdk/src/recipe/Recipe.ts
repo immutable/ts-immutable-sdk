@@ -1,11 +1,15 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable class-methods-use-this */
+import { List } from 'linqts';
 import { Service } from 'typedi';
-import { RootApiRecipesGetRequest } from '../__codegen__/recipe';
+import { DomainInput, DomainRecipe, RootApiRecipesGetRequest } from '../__codegen__/recipe';
 import { withSDKError } from '../Errors';
 import { StudioBE } from '../StudioBE';
+import { Store } from '../Store';
 
 @Service()
 export class Recipe {
-  constructor(private studioBE: StudioBE) { }
+  constructor(private studioBE: StudioBE, private store: Store) { }
 
   @withSDKError({
     type: 'RECIPE_GET_RECIPES_ERROR',
@@ -33,5 +37,21 @@ export class Recipe {
     }
 
     return data;
+  }
+
+  public getInputsBy(
+    recipe: DomainRecipe,
+    predicateFn: (input?: DomainInput, index?: number, list?: DomainInput[]) => boolean,
+  ) {
+    return new List<DomainInput>(recipe.inputs)
+      .Where(predicateFn)
+      .Select((input, index) => [input, index] as [DomainInput, number])
+      .ToArray();
+  }
+
+  public setActive(recipeId: string | undefined) {
+    this.store.set((state) => {
+      state.selectedRecipeId = recipeId;
+    });
   }
 }

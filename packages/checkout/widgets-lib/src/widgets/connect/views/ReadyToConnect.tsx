@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { useContext, useState, useCallback } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
@@ -9,13 +9,15 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
-import { zkEVMNetwork } from '../../../lib/networkUtils';
 import {
   ViewContext,
   ViewActions,
 } from '../../../context/view-context/ViewContext';
 
-export function ReadyToConnect() {
+export interface ReadyToConnectProps {
+  targetChainId: ChainId;
+}
+export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   const {
     connectState: { checkout, sendCloseEvent },
     connectDispatch,
@@ -33,7 +35,7 @@ export function ReadyToConnect() {
     ) => {
       const networkInfo = await checkout.getNetworkInfo({ provider });
 
-      if (networkInfo.chainId !== zkEVMNetwork(checkout.config.environment)) {
+      if (networkInfo.chainId !== targetChainId) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,

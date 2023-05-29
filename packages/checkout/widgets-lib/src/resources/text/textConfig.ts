@@ -4,6 +4,7 @@ import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContex
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { BaseViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
+import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 
 export const text = {
   views: {
@@ -27,13 +28,31 @@ export const text = {
       },
     },
     [ConnectWidgetViews.SWITCH_NETWORK]: {
-      heading:
+      eth: {
+        heading:
+        'To move your coins, you\'ll need to switch to the Sepolia network',
+        body: 'You\'ll be prompted to switch networks in Metamask. You\'ll be able to switch back when needed.',
+        button: {
+          text: 'Ready to Switch',
+          retryText: 'Try Again',
+        },
+      },
+      zkEVM: {
+        heading:
         'To trade here, MetaMask will ask you to switch to the Immutable zkEVM network',
-      body: "Check for the pop-up from MetaMask and 'Approve' to switch. If this is the first time, MetaMask will also ask you to add the network.",
+        body: 'Check for the pop-up from MetaMask and \'Approve\' to switch. If this is the first time, MetaMask will also ask you to add the network.',
+        button: {
+          text: 'Ready to Switch',
+          retryText: 'Try Again',
+        },
+      },
     },
     [BaseViews.ERROR]: {
       heading: "Something's gone wrong",
       body: ['You can try again or contact', 'support', 'for help.'],
+    },
+    [BaseViews.LOADING_VIEW]: {
+      text: 'Loading',
     },
     [WalletWidgetViews.WALLET_BALANCES]: {
       header: {
@@ -90,6 +109,15 @@ export const text = {
         insufficientBalance: 'Insufficient balance',
         noFromTokenSelected: 'Select a coin to swap',
         noToTokenSelected: 'Select a coin to receive',
+      },
+      success: {
+        text: 'Success',
+        actionText: 'Continue',
+      },
+    },
+    [BridgeWidgetViews.BRIDGE]: {
+      header: {
+        title: 'Move coins',
       },
     },
   },

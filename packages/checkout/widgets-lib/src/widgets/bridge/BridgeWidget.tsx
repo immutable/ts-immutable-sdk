@@ -1,38 +1,36 @@
 /* eslint-disable no-console */
 import {
   BiomeCombinedProviders,
-  Body,
-  Box,
-  Button,
-  Heading,
-  OptionKey,
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   ChainId,
   Checkout,
   ConnectionProviders,
-  GetBalanceResult,
+  GetTokenAllowListResult,
   NetworkFilterTypes,
+  TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
-  useCallback, useEffect, useMemo, useRef, useState,
+  useEffect, useMemo, useReducer, useRef, useState,
 } from 'react';
-import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
-import { bridgeWidgetStyle } from './BridgeStyles';
-
-// TODO: Fix this import cycle
-// eslint-disable-next-line import/no-cycle
-import { BridgeForm } from './components/BridgeForm';
-import { getAllBalances } from './utils';
-import {
-  sendBridgeFailedEvent,
-  sendBridgeSuccessEvent,
-} from './BridgeWidgetEvents';
-import { EtherscanLink } from './components/EtherscanLink';
-import { L1Network, zkEVMNetwork } from '../../lib/networkUtils';
+import { TransactionResponse } from '@ethersproject/providers';
+import { l1Network, zkEVMNetwork } from '../../lib/networkUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { Network, WidgetTheme } from '../../lib';
+import {
+  BaseViews,
+  ViewActions, ViewContext, initialViewState, viewReducer,
+} from '../../context/view-context/ViewContext';
+import {
+  BridgeActions, BridgeContext, bridgeReducer, initialBridgeState,
+} from './context/BridgeContext';
+import { LoadingView } from '../../components/Loading/LoadingView';
+import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
+import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { Bridge } from './views/Bridge';
+import { StatusType } from '../../components/Status/StatusType';
+import { StatusView } from '../../components/Status/StatusView';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -46,13 +44,7 @@ export interface BridgeWidgetParams {
   fromNetwork?: Network;
 }
 
-export enum BridgeWidgetViews {
-  BRIDGE = 'BRIDGE',
-  SUCCESS = 'SUCCESS',
-  FAIL = 'FAIL',
-}
-
-const bridgingNetworks = Object.values(Network);
+// const bridgingNetworks = Object.values(Network);
 
 // TODO: consider changing this to an enum for better discoverability
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -68,30 +60,27 @@ export const NetworkChainMap = {
 export function BridgeWidget(props: BridgeWidgetProps) {
   const { params, config } = props;
   const { environment, theme } = config;
-  const checkout = useMemo(
-    () => new Checkout({ baseConfig: { environment } }),
-    [environment],
-  );
+
+  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+
+  const firstRender = useRef(true);
+
+  const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
+
+  const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridgeState);
+  const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
+
   const {
-    providerPreference, fromContractAddress, amount, fromNetwork,
+    providerPreference, amount, fromContractAddress,
   } = params;
+
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 
-  const defaultFromChainId = useMemo(() => (fromNetwork && bridgingNetworks.includes(fromNetwork)
-    ? NetworkChainMap[fromNetwork]
-    : L1Network(checkout.config.environment)), [fromNetwork, checkout]);
+  const defaultFromChainId = l1Network(environment);
+  const toChainId = zkEVMNetwork(environment);
 
-  const firstRender = useRef(true);
-
-  const [provider, setProvider] = useState<Web3Provider>();
-  const [balances, setBalances] = useState<GetBalanceResult[]>([]);
-  const [connectedChainId, setConnectedChainId] = useState<ChainId>();
-  const [selectedNetwork, setSelectedNetwork] = useState<OptionKey>();
-  const [nativeCurrencySymbol, setNativeCurrencySymbol] = useState('');
-  const [toNetwork, setToNetwork] = useState('');
-  const [view, setView] = useState(BridgeWidgetViews.BRIDGE);
   const [transactionResponse, setTransactionResponse] = useState<
   TransactionResponse | undefined
   >();
@@ -100,187 +89,180 @@ export function BridgeWidget(props: BridgeWidgetProps) {
    * This effect is used to set up the BridgeWidget state for the first time.
    * It includes connecting with a provider preference
    * Checking that the provider is connected to an available network and switching
-   * to the default specified network if not (if no default provided then Ethereum)
+   * to the default specified network
    * It then calculates the toNetwork for the bridge and it's associated native currency.
    *
    * NOTE: This effect should only run on the first render of the component to avoid switchNetwork errors
    */
   useEffect(() => {
     const bridgetWidgetSetup = async () => {
-      let connectResult = await checkout.connect({ providerPreference });
-      let theProvider;
-      let chainId;
-      chainId = connectResult.network.chainId;
-      theProvider = connectResult.provider;
+      if (!providerPreference) return;
 
-      const allowedBridgingNetworks = await checkout.getNetworkAllowList({
-        type: NetworkFilterTypes.ALL,
+      const checkout = new Checkout({
+        baseConfig: { environment },
       });
 
-      const connectedNetworkNotWhitelisted = !allowedBridgingNetworks.networks
-        .map((network) => network.chainId)
-        .includes(connectResult.network.chainId);
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_CHECKOUT,
+          checkout,
+        },
+      });
 
-      const requiresNetworkSwitch = defaultFromChainId !== connectResult.network.chainId;
+      const connectResult = await checkout.connect({
+        providerPreference: providerPreference ?? ConnectionProviders.METAMASK,
+      });
 
-      if (connectedNetworkNotWhitelisted || requiresNetworkSwitch) {
-        const switchNetworkResponse = await checkout.switchNetwork({
+      // The correct network check should be done by the ConnectionLoader
+
+      // check that the user is on the correct network
+      // let theProvider;
+      // theProvider = connectResult.provider;
+
+      // const requireNetworkSwitch = defaultFromChainId !== connectResult.network.chainId;
+
+      // if (requireNetworkSwitch) {
+      //   let switchNetworkResponse: SwitchNetworkResult;
+      //   try {
+      //     switchNetworkResponse = await checkout.switchNetwork({
+      //       provider: connectResult.provider,
+      //       chainId: defaultFromChainId,
+      //     });
+      //     theProvider = switchNetworkResponse ? switchNetworkResponse.provider : null;
+      //   } catch {
+      //     console.log('cooked');
+      //   }
+
+      //   // connectResult = await checkout.connect({ providerPreference });
+      // }
+
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_PROVIDER,
           provider: connectResult.provider,
-          chainId: defaultFromChainId,
+        },
+      });
+
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_NETWORK,
+          network: connectResult.network,
+        },
+      });
+
+      const allowedBridgingNetworks = await checkout.getNetworkAllowList({
+        type: NetworkFilterTypes.ALL, // TODO: change to Bridge
+      });
+
+      const toNetwork = allowedBridgingNetworks.networks.find((network) => network.chainId === toChainId);
+
+      if (toNetwork) {
+        bridgeDispatch({
+          payload: {
+            type: BridgeActions.SET_TO_NETWORK,
+            toNetwork,
+          },
         });
-        chainId = switchNetworkResponse.network.chainId;
-        connectResult = await checkout.connect({ providerPreference });
-        theProvider = connectResult.provider;
       }
 
-      setProvider(theProvider);
-      setConnectedChainId(chainId);
-      setSelectedNetwork(chainId as OptionKey);
-      const toNetworkOption = allowedBridgingNetworks.networks.find(
-        (network) => network.chainId === zkEVMNetwork(checkout.config.environment),
+      /**
+       * Below setup assumes that we are on the correct network
+       */
+
+      const address = await connectResult.provider.getSigner().getAddress();
+      const tokenBalances = await checkout.getAllBalances({
+        provider: connectResult.provider,
+        walletAddress: address,
+        chainId: connectResult.network.chainId,
+      });
+
+      const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
+        {
+          chainId: connectResult.network.chainId,
+          type: TokenFilterTypes.BRIDGE,
+        },
       );
 
-      setToNetwork(toNetworkOption?.name ?? '');
-      setNativeCurrencySymbol(connectResult.network.nativeCurrency.symbol);
+      const allowedTokenBalances = tokenBalances.balances.filter((balance) => allowList.tokens
+        .map((token) => token.address)
+        .includes(balance.token.address));
+
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_ALLOWED_TOKENS,
+          allowedTokens: allowList.tokens,
+        },
+      });
+
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_TOKEN_BALANCES,
+          tokenBalances: allowedTokenBalances,
+        },
+      });
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: BridgeWidgetViews.BRIDGE },
+        },
+      });
     };
 
     if (firstRender.current) {
-      firstRender.current = false;
       bridgetWidgetSetup();
     }
-  }, [checkout, providerPreference, defaultFromChainId, firstRender]);
+  }, [providerPreference, defaultFromChainId, toChainId, firstRender.current]);
 
   /**
    * This effect is used to refresh all user balances when the network changes.
-   * It also filters out any 0 balances as the user will have nothing to swap.
+   * It also filters out any 0 balances as the user will have nothing to bridge.
    */
-  useEffect(() => {
-    const refreshBalances = async () => {
-      if (checkout && provider) {
-        const getAllBalancesResult = await getAllBalances(checkout, provider);
+  // useEffect(() => {
+  //   const refreshBalances = async () => {
+  //     if (checkout && provider) {
+  //       const getAllBalancesResult = await getAllBalances(checkout, provider);
 
-        const nonZeroBalances = getAllBalancesResult.balances
-          .filter((balance) => balance.balance.gt(0))
-          .sort((a, b) => b.token.symbol.localeCompare(a.token.symbol));
+  //       const nonZeroBalances = getAllBalancesResult.balances
+  //         .filter((balance) => balance.balance.gt(0))
+  //         .sort((a, b) => b.token.symbol.localeCompare(a.token.symbol));
 
-        setBalances(nonZeroBalances);
-      }
-    };
-    refreshBalances();
-  }, [checkout, provider, selectedNetwork]);
-
-  /**
-   * When we switch network, we need to refresh the provider object to avoid errors
-   * After a switch network, update the new toNetwork and associated native currency
-   */
-  const handleSelectNetwork = useCallback(
-    async (selectedOption: OptionKey) => {
-      if (!provider) return;
-      const switchNetworkResponse = await checkout.switchNetwork({
-        provider,
-        chainId: selectedOption as ChainId,
-      });
-      const connectResult = await checkout.connect({ providerPreference });
-      setProvider(connectResult.provider);
-      setSelectedNetwork(switchNetworkResponse.network.chainId as OptionKey);
-      const toNetworkOption = bridgingNetworks.filter(
-        (network) => network.toString() !== switchNetworkResponse.network.name.toString(),
-      );
-      setToNetwork(toNetworkOption[0]);
-      setNativeCurrencySymbol(connectResult.network.nativeCurrency.symbol);
-    },
-    [checkout, provider, providerPreference],
-  );
-
-  function sendBridgeWidgetCloseEvent() {
-    console.log('add close event to fire here');
-  }
-
-  // TODO: @typescript-eslint/no-shadow 'view' is already declared in the upper scope
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-shadow
-  const updateView = async (view: BridgeWidgetViews, err?: any) => {
-    setView(view);
-    if (view === BridgeWidgetViews.SUCCESS) {
-      sendBridgeSuccessEvent();
-      return;
-    }
-    if (view === BridgeWidgetViews.FAIL) {
-      sendBridgeFailedEvent(err.message);
-    }
-  };
-
-  const updateTransactionResponse = (
-    response: TransactionResponse,
-  ) => {
-    setTransactionResponse(response);
-  };
-
-  const renderBridgeForm = () => (
-    checkout && provider && (
-      <BridgeForm
-        provider={provider}
-        balances={balances}
-        nativeCurrencySymbol={nativeCurrencySymbol}
-        defaultAmount={amount}
-        defaultTokenAddress={fromContractAddress}
-        chainId={connectedChainId}
-        selectedNetwork={selectedNetwork}
-        toNetwork={toNetwork}
-        onSelectedNetworkChange={handleSelectNetwork}
-        updateTransactionResponse={updateTransactionResponse}
-        updateView={updateView}
-      />
-    )
-  );
-
-  const renderSuccess = () => (
-    <>
-      <Body testId="bridge-success">Success</Body>
-      <EtherscanLink hash={transactionResponse?.hash || ''} />
-    </>
-  );
-
-  const renderFailure = () => <Body testId="bridge-failure">Failure</Body>;
-
-  // eslint-disable-next-line consistent-return
-  const renderView = () => {
-    // TODO: add a default case please :)
-    // eslint-disable-next-line default-case
-    switch (view) {
-      case BridgeWidgetViews.BRIDGE:
-        return renderBridgeForm();
-      case BridgeWidgetViews.SUCCESS:
-        return renderSuccess();
-      case BridgeWidgetViews.FAIL:
-        return renderFailure();
-    }
-  };
+  //       bridgeDispatch({
+  //         payload: {
+  //           type: BridgeActions.SET_TOKEN_BALANCES,
+  //           tokenBalances: nonZeroBalances,
+  //         },
+  //       });
+  //     }
+  //   };
+  //   refreshBalances();
+  // }, [checkout, provider]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-      <Box sx={bridgeWidgetStyle}>
-        <>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <Heading testId="heading">Bridge Widget</Heading>
-            <Button
-              size="small"
-              sx={{ alignSelf: 'flex-end' }}
-              testId="close-button"
-              onClick={() => sendBridgeWidgetCloseEvent()}
-            >
-              x
-            </Button>
-          </Box>
-          {provider && checkout && renderView()}
-          {(!provider || !checkout) && <Body size="small">Loading...</Body>}
-        </>
-      </Box>
+      <ViewContext.Provider value={viewReducerValues}>
+        <BridgeContext.Provider value={bridgeReducerValues}>
+          {viewReducerValues.viewState.view.type === BaseViews.LOADING_VIEW && (
+          <LoadingView loadingText="Loading" />
+          )}
+          {viewReducerValues.viewState.view.type === BridgeWidgetViews.BRIDGE && (
+          <Bridge
+            amount={amount}
+            fromContractAddress={fromContractAddress}
+            setTransactionResponse={setTransactionResponse}
+          />
+          )}
+          {viewReducerValues.viewState.view.type === BridgeWidgetViews.SUCCESS && (
+            <StatusView
+              statusText={`Success, transaction hash: ${transactionResponse?.hash}`}
+              actionText="Continue"
+              onActionClick={sendBridgeWidgetCloseEvent}
+              statusType={StatusType.SUCCESS}
+              testId="success-view"
+            />
+          )}
+        </BridgeContext.Provider>
+      </ViewContext.Provider>
     </BiomeCombinedProviders>
   );
 }
