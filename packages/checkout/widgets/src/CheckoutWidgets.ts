@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutWidgetsConfig } from './definitions/config';
-import { CheckoutWidgetTagNames } from './definitions/constants';
+import { CheckoutWidgetTagNames } from './definitions/types';
 
 /**
  * CheckoutWidgets allows to inject the Checkout Widgets into your application.

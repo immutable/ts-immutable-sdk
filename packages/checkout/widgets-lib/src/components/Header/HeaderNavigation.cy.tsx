@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { describe, it } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { BiomeThemeProvider } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { cySmartGet } from '../../lib/testUtils';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
@@ -11,9 +11,9 @@ describe('HeaderNavigation', () => {
   describe('configurable buttons and title', () => {
     it('should show back button when configured', () => {
       mount(
-        <BiomeThemeProvider theme={{ base: onDarkBase }}>
+        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <SimpleLayout header={<HeaderNavigation showBack />} />
-        </BiomeThemeProvider>,
+        </BiomeCombinedProviders>,
       );
 
       cySmartGet('back-button').should('exist');
@@ -24,7 +24,7 @@ describe('HeaderNavigation', () => {
 
     it('should show close button when configured', () => {
       mount(
-        <BiomeThemeProvider theme={{ base: onDarkBase }}>
+        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <SimpleLayout
             header={(
               <HeaderNavigation
@@ -32,7 +32,7 @@ describe('HeaderNavigation', () => {
               />
             )}
           />
-        </BiomeThemeProvider>,
+        </BiomeCombinedProviders>,
       );
 
       cySmartGet('back-button').should('not.exist');
@@ -43,7 +43,7 @@ describe('HeaderNavigation', () => {
 
     it('should show settings button when configured with on click', () => {
       mount(
-        <BiomeThemeProvider theme={{ base: onDarkBase }}>
+        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <SimpleLayout
             header={(
               <HeaderNavigation
@@ -52,7 +52,7 @@ describe('HeaderNavigation', () => {
               />
             )}
           />
-        </BiomeThemeProvider>,
+        </BiomeCombinedProviders>,
       );
 
       cySmartGet('back-button').should('not.exist');
@@ -63,7 +63,7 @@ describe('HeaderNavigation', () => {
 
     it('should show title and close when configured', () => {
       mount(
-        <BiomeThemeProvider theme={{ base: onDarkBase }}>
+        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <SimpleLayout
             header={(
               <HeaderNavigation
@@ -72,7 +72,7 @@ describe('HeaderNavigation', () => {
               />
             )}
           />
-        </BiomeThemeProvider>,
+        </BiomeCombinedProviders>,
       );
 
       cySmartGet('back-button').should('not.exist');
@@ -83,7 +83,7 @@ describe('HeaderNavigation', () => {
 
     it('should show back and close when configured', () => {
       mount(
-        <BiomeThemeProvider theme={{ base: onDarkBase }}>
+        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
           <SimpleLayout
             header={(
               <HeaderNavigation
@@ -92,7 +92,7 @@ describe('HeaderNavigation', () => {
               />
             )}
           />
-        </BiomeThemeProvider>,
+        </BiomeCombinedProviders>,
       );
 
       cySmartGet('back-button').should('exist');
@@ -105,7 +105,7 @@ describe('HeaderNavigation', () => {
   describe('HeaderNavigation styling', () => {
     it('should set solid background when configured', () => {
       mount(
-        <BiomeThemeProvider theme={{ base: onLightBase }}>
+        <BiomeCombinedProviders theme={{ base: onLightBase }}>
           <SimpleLayout
             header={(
               <HeaderNavigation
@@ -114,7 +114,7 @@ describe('HeaderNavigation', () => {
               />
             )}
           />
-        </BiomeThemeProvider>,
+        </BiomeCombinedProviders>,
       );
 
       cySmartGet('header-navigation-container').should('exist');
@@ -127,7 +127,7 @@ describe('HeaderNavigation', () => {
 
     it('should set transparent background when configured', () => {
       mount(
-        <BiomeThemeProvider theme={{ base: onLightBase }}>
+        <BiomeCombinedProviders theme={{ base: onLightBase }}>
           <SimpleLayout
             header={(
               <HeaderNavigation
@@ -137,7 +137,7 @@ describe('HeaderNavigation', () => {
               />
             )}
           />
-        </BiomeThemeProvider>,
+        </BiomeCombinedProviders>,
       );
 
       cySmartGet('header-navigation-container').should('exist');

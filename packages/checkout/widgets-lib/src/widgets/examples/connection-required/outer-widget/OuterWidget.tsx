@@ -1,4 +1,4 @@
-import { BiomeThemeProvider } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { useEffect, useReducer } from 'react';
 import { ViewOne } from './views/ViewOne';
@@ -40,7 +40,7 @@ export function OuterWidget(props: OuterWidgetProps) {
   }, []);
 
   return (
-    <BiomeThemeProvider theme={{ base: biomeTheme }}>
+    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       {/* TODO: The object passed as the value prop to the Context provider changes every render.
         To fix this consider wrapping it in a useMemo hook. */}
       {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
@@ -55,6 +55,6 @@ export function OuterWidget(props: OuterWidgetProps) {
           <ViewThree />
         )}
       </ViewContext.Provider>
-    </BiomeThemeProvider>
+    </BiomeCombinedProviders>
   );
 }

@@ -1,5 +1,5 @@
 import { onDarkBase } from '@biom3/design-tokens';
-import { BiomeThemeProvider } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { mount } from 'cypress/react18';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { FooterButton } from './FooterButton';
@@ -8,7 +8,7 @@ import { cySmartGet } from '../../lib/testUtils';
 describe('Footer Button', () => {
   it('should have right aligned large button', () => {
     mount(
-      <BiomeThemeProvider theme={{ base: onDarkBase }}>
+      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
         <SimpleLayout
           footer={(
             <FooterButton
@@ -18,7 +18,7 @@ describe('Footer Button', () => {
             />
           )}
         />
-      </BiomeThemeProvider>,
+      </BiomeCombinedProviders>,
     );
 
     cySmartGet('footer-button-container').should('exist');
@@ -38,7 +38,7 @@ describe('Footer Button', () => {
 
   it('should hide button when configured', () => {
     mount(
-      <BiomeThemeProvider theme={{ base: onDarkBase }}>
+      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
         <SimpleLayout
           footer={(
             <FooterButton
@@ -49,7 +49,7 @@ describe('Footer Button', () => {
             />
           )}
         />
-      </BiomeThemeProvider>,
+      </BiomeCombinedProviders>,
     );
 
     cySmartGet('footer-button-container').should('exist');

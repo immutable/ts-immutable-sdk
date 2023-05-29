@@ -1,4 +1,4 @@
-import { BiomeThemeProvider } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import {
   Checkout,
   ConnectionProviders,
@@ -18,7 +18,9 @@ import { ConnectWidget } from '../../widgets/connect/ConnectWidget';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { ErrorView } from '../Error/ErrorView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '../../lib';
+import {
+  WidgetTheme, ConnectTargetLayer, getTargetLayerChainId,
+} from '../../lib';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -28,6 +30,7 @@ export interface ConnectLoaderProps {
 }
 
 export interface ConnectLoaderParams {
+  targetLayer?: ConnectTargetLayer;
   providerPreference?: ConnectionProviders;
 }
 
@@ -42,7 +45,11 @@ export function ConnectLoader({
     initialConnectLoaderState,
   );
   const { connectionStatus } = connectLoaderState;
-  const { providerPreference } = params;
+  const { targetLayer, providerPreference } = params;
+
+  const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
+
+  const targetChainId = getTargetLayerChainId(targetLayer ?? ConnectTargetLayer.LAYER2, widgetConfig.environment);
 
   const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
@@ -79,11 +86,10 @@ export function ConnectLoader({
           providerPreference,
         });
 
-        const isSupportedNetwork = (
-          await checkout.getNetworkInfo({ provider } as GetNetworkParams)
-        ).isSupported;
+        const currentNetworkInfo = await checkout.getNetworkInfo({ provider } as GetNetworkParams);
 
-        if (!isSupportedNetwork) {
+        // if unsupported network or current network is not the target network
+        if (!currentNetworkInfo.isSupported || currentNetworkInfo.chainId !== targetChainId) {
           connectLoaderDispatch({
             payload: {
               type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -109,8 +115,6 @@ export function ConnectLoader({
       }
     };
 
-    // @ts-ignore
-    // TODO: Checkout interface expects 0 arguments but got 1
     const checkout = new Checkout({ baseConfig: { environment: widgetConfig.environment } });
     checkConnection(checkout);
   }, [providerPreference, widgetConfig.environment]);
@@ -118,9 +122,9 @@ export function ConnectLoader({
   return (
     <>
       {connectionStatus === ConnectionStatus.LOADING && (
-        <BiomeThemeProvider theme={{ base: biomeTheme }}>
+        <BiomeCombinedProviders theme={{ base: biomeTheme }}>
           <LoadingView loadingText="Connecting" />
-        </BiomeThemeProvider>
+        </BiomeCombinedProviders>
       )}
       {(connectionStatus === ConnectionStatus.NOT_CONNECTED
         || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
@@ -132,7 +136,7 @@ export function ConnectLoader({
         >
           <ConnectWidget
             config={widgetConfig}
-            params={params}
+            params={{ ...params, targetLayer: networkToSwitchTo }}
             deepLink={ConnectWidgetViews.CONNECT_WALLET}
             sendCloseEventOverride={closeEvent}
           />
@@ -142,7 +146,7 @@ export function ConnectLoader({
         children
       )}
       {connectionStatus === ConnectionStatus.ERROR && (
-        <BiomeThemeProvider theme={{ base: biomeTheme }}>
+        <BiomeCombinedProviders theme={{ base: biomeTheme }}>
           <ErrorView
             onCloseClick={closeEvent}
             onActionClick={() => {
@@ -155,7 +159,7 @@ export function ConnectLoader({
             }}
             actionText="Try Again"
           />
-        </BiomeThemeProvider>
+        </BiomeCombinedProviders>
       )}
     </>
   );

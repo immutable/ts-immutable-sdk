@@ -1,7 +1,8 @@
 import { Web3Provider } from '@ethersproject/providers';
 // TODO: fix circular dependency
 // eslint-disable-next-line import/no-cycle
-import { ChainId, NetworkInfo } from './network';
+import { NetworkInfo } from './networkInfo';
+import { ChainId } from './chainId';
 
 export enum DefaultProviders {
   METAMASK = 'metamask',

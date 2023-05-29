@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
-import { ChainId } from './network';
-import { TokenInfo } from './token';
 import { ProviderParams } from './provider';
+import { ChainId } from './chainId';
+import { TokenInfo } from './tokenInfo';
 
 /**
  * Interface representing the parameters for {@link Checkout.getBalance}.

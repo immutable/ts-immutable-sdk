@@ -21,7 +21,7 @@ import {
   sendOnRampCoinsEvent,
   sendSwapCoinsEvent,
 } from '../../CoinTopUpEvents';
-import { L1Network, zkEVMNetwork } from '../../../../lib/networkUtils';
+import { l1Network, zkEVMNetwork } from '../../../../lib/networkUtils';
 import { formatZeroAmount } from '../../../../lib/utils';
 
 export interface BalanceItemProps {
@@ -44,7 +44,7 @@ export function BalanceItem(props: BalanceItemProps) {
       && (supportedTopUps?.isOnRampEnabled ?? true);
     setIsOnRampEnabled(enableAddCoin);
 
-    const enableMoveCoin = network.chainId === L1Network(checkout.config.environment)
+    const enableMoveCoin = network.chainId === l1Network(checkout.config.environment)
       && (supportedTopUps?.isBridgeEnabled ?? true);
     setIsBridgeEnabled(enableMoveCoin);
 
