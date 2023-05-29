@@ -37,11 +37,6 @@
       "x-displayName": "nft owners"
     },
     {
-      "name": "demopage",
-      "description": "Temporary HTML endpoint for demo purposes",
-      "x-displayName": "demopage"
-    },
-    {
       "name": "order_book",
       "description": "The orderbook service provides trading primitives for the global Order book",
       "x-displayName": "order_book"
@@ -56,7 +51,6 @@
         "collections",
         "nfts",
         "nft owners",
-        "demopage",
         "order_book"
       ],
       "description": "Service for handing the Immutable global Order book"
@@ -71,33 +65,9 @@
     }
   ],
   "paths": {
-    "/demopage": {
-      "get": {
-        "description": "Demopage",
-        "x-internal": true,
-        "tags": [
-          "demopage"
-        ],
-        "operationId": "DemoPage",
-        "responses": {
-          "200": {
-            "description": "success and returns some html text",
-            "content": {
-              "text/html": {
-                "schema": {
-                  "$ref": "#/components/schemas/DemoPage"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v1/chains/{chain_name}/activities": {
       "get": {
-        "tags": [
-          "activities"
-        ],
+        "tags": ["activities"],
         "operationId": "ListActivities",
         "summary": "List all activities",
         "description": "List all activities",
@@ -245,9 +215,7 @@
     },
     "/v1/chains/{chain_name}/activities/{activity_id}": {
       "get": {
-        "tags": [
-          "activities"
-        ],
+        "tags": ["activities"],
         "operationId": "GetActivity",
         "summary": "Get a single activity by ID",
         "description": "Get a single activity by ID",
@@ -315,9 +283,7 @@
     "/v1/chains/{chain_name}/collections": {
       "get": {
         "description": "List all collections",
-        "tags": [
-          "collections"
-        ],
+        "tags": ["collections"],
         "operationId": "ListCollections",
         "summary": "List all collections",
         "parameters": [
@@ -393,9 +359,7 @@
     "/v1/chains/{chain_name}/collections/{contract_address}": {
       "get": {
         "description": "Get collection by contract address",
-        "tags": [
-          "collections"
-        ],
+        "tags": ["collections"],
         "operationId": "GetCollection",
         "summary": "Get collection by contract address",
         "parameters": [
@@ -463,9 +427,7 @@
     "/v1/chains/{chain_name}/collections/{contract_address}/nfts/{token_id}": {
       "get": {
         "description": "Get NFT by token ID",
-        "tags": [
-          "nfts"
-        ],
+        "tags": ["nfts"],
         "summary": "Get NFT by token ID",
         "operationId": "GetNFT",
         "parameters": [
@@ -543,9 +505,7 @@
     "/v1/chains/{chain_name}/collections/{contract_address}/nfts": {
       "get": {
         "description": "List NFTs by contract address",
-        "tags": [
-          "nfts"
-        ],
+        "tags": ["nfts"],
         "summary": "List NFTs by contract address",
         "operationId": "ListNFTs",
         "parameters": [
@@ -631,9 +591,7 @@
     "/v1/chains/{chain_name}/accounts/{account_address}/nfts": {
       "get": {
         "description": "List NFTs by account address",
-        "tags": [
-          "nfts"
-        ],
+        "tags": ["nfts"],
         "operationId": "ListNFTsByAccountAddress",
         "summary": "List NFTs by account address",
         "parameters": [
@@ -729,9 +687,7 @@
     "/v1/chains/{chain_name}/collections/{contract_address}/nfts/{token_id}/owners": {
       "get": {
         "description": "List NFT owners by token ID",
-        "tags": [
-          "nft owners"
-        ],
+        "tags": ["nft owners"],
         "operationId": "ListNFTOwners",
         "summary": "List NFT owners by token ID",
         "parameters": [
@@ -828,9 +784,7 @@
       "get": {
         "description": "List supported chains",
         "summary": "List supported chains",
-        "tags": [
-          "chains"
-        ],
+        "tags": ["chains"],
         "operationId": "ListChains",
         "parameters": [
           {
@@ -877,9 +831,7 @@
     },
     "/v1/chains/{chain_id}/orders": {
       "get": {
-        "tags": [
-          "order_book"
-        ],
+        "tags": ["order_book"],
         "summary": "listorder order_book",
         "description": "Retrieve a list of orders from a given chain",
         "operationId": "order_book_list_order",
@@ -916,10 +868,7 @@
             "allowEmptyValue": true,
             "schema": {
               "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ],
+              "enum": ["asc", "desc"],
               "description": "Ascending or descending direction for sort",
               "example": "asc"
             },
@@ -1050,9 +999,7 @@
         }
       },
       "post": {
-        "tags": [
-          "order_book"
-        ],
+        "tags": ["order_book"],
         "summary": "create_order order_book",
         "description": "Create a listing on a specific chain",
         "operationId": "order_book_create_order",
@@ -1182,9 +1129,7 @@
     },
     "/v1/chains/{chain_id}/orders/{order_id}": {
       "get": {
-        "tags": [
-          "order_book"
-        ],
+        "tags": ["order_book"],
         "summary": "getorder order_book",
         "description": "Retrieve a single order from a given chain",
         "operationId": "order_book_get_order",
@@ -1317,12 +1262,7 @@
         "description": "The activity type",
         "example": "mint",
         "type": "string",
-        "enum": [
-          "mint",
-          "burn",
-          "transfer",
-          "sale"
-        ]
+        "enum": ["mint", "burn", "transfer", "sale"]
       },
       "ERC721Token": {
         "type": "object",
@@ -1341,11 +1281,7 @@
             "example": "1"
           }
         },
-        "required": [
-          "contract_type",
-          "contract_address",
-          "token_id"
-        ]
+        "required": ["contract_type", "contract_address", "token_id"]
       },
       "ERC20": {
         "type": "object",
@@ -1371,12 +1307,7 @@
             "example": 18
           }
         },
-        "required": [
-          "contract_type",
-          "contract_address",
-          "symbol",
-          "decimals"
-        ]
+        "required": ["contract_type", "contract_address", "symbol", "decimals"]
       },
       "Token": {
         "description": "The token details",
@@ -1413,12 +1344,7 @@
             "$ref": "#/components/schemas/Token"
           }
         },
-        "required": [
-          "activity_type",
-          "to",
-          "amount",
-          "token"
-        ]
+        "required": ["activity_type", "to", "amount", "token"]
       },
       "Burn": {
         "description": "The burn activity details",
@@ -1441,12 +1367,7 @@
             "$ref": "#/components/schemas/Token"
           }
         },
-        "required": [
-          "activity_type",
-          "from",
-          "amount",
-          "token"
-        ]
+        "required": ["activity_type", "from", "amount", "token"]
       },
       "Transfer": {
         "type": "object",
@@ -1474,13 +1395,7 @@
             "$ref": "#/components/schemas/Token"
           }
         },
-        "required": [
-          "activity_type",
-          "from",
-          "to",
-          "amount",
-          "token"
-        ]
+        "required": ["activity_type", "from", "to", "amount", "token"]
       },
       "NativeToken": {
         "type": "object",
@@ -1491,9 +1406,7 @@
             "example": "ETH"
           }
         },
-        "required": [
-          "symbol"
-        ]
+        "required": ["symbol"]
       },
       "NFTSale": {
         "description": "The NFT Sale activity details",
@@ -1658,10 +1571,7 @@
             "$ref": "#/components/schemas/Page"
           }
         },
-        "required": [
-          "result",
-          "page"
-        ]
+        "required": ["result", "page"]
       },
       "GetActivityResult": {
         "type": "object",
@@ -1671,9 +1581,7 @@
             "$ref": "#/components/schemas/Activity"
           }
         },
-        "required": [
-          "result"
-        ]
+        "required": ["result"]
       },
       "Collection": {
         "type": "object",
@@ -1781,10 +1689,7 @@
             "$ref": "#/components/schemas/Page"
           }
         },
-        "required": [
-          "result",
-          "page"
-        ]
+        "required": ["result", "page"]
       },
       "GetCollectionResult": {
         "type": "object",
@@ -1794,9 +1699,7 @@
             "$ref": "#/components/schemas/Collection"
           }
         },
-        "required": [
-          "result"
-        ]
+        "required": ["result"]
       },
       "NFT": {
         "type": "object",
@@ -1904,11 +1807,7 @@
             "example": "boost_number"
           }
         },
-        "required": [
-          "trait_type",
-          "value",
-          "display_type"
-        ]
+        "required": ["trait_type", "value", "display_type"]
       },
       "NFTMetadataAttributes": {
         "type": "object",
@@ -1922,9 +1821,7 @@
             }
           }
         },
-        "required": [
-          "attributes"
-        ]
+        "required": ["attributes"]
       },
       "ChainName": {
         "type": "string",
@@ -1960,18 +1857,12 @@
             "example": "ewogICJ0eXBlIjogInByZXYiLAogICJpdGVtIjogewogICAgImlkIjogNjI3NTEzMCwKICAgICJjcmVhdGVkX2F0IjogIjIwMjItMDktMTNUMTc6MDQ6MTIuMDI0MTI2WiIKICB9Cn0="
           }
         },
-        "required": [
-          "previous_cursor",
-          "next_cursor"
-        ]
+        "required": ["previous_cursor", "next_cursor"]
       },
       "ContractType": {
         "description": "The contract type",
         "type": "string",
-        "enum": [
-          "ERC721",
-          "ERC20"
-        ]
+        "enum": ["ERC721", "ERC20"]
       },
       "ActivityID": {
         "description": "Activity ID in UUIDv4 format",
@@ -1982,9 +1873,7 @@
       "CollectionContractType": {
         "description": "The collection contract type",
         "type": "string",
-        "enum": [
-          "ERC721"
-        ]
+        "enum": ["ERC721"]
       },
       "NFTWithMetadataAttributes": {
         "description": "A single NFT with metadata attributes",
@@ -2006,9 +1895,7 @@
             "$ref": "#/components/schemas/NFTWithMetadataAttributes"
           }
         },
-        "required": [
-          "result"
-        ]
+        "required": ["result"]
       },
       "ListNFTsResult": {
         "type": "object",
@@ -2024,10 +1911,7 @@
             "$ref": "#/components/schemas/Page"
           }
         },
-        "required": [
-          "result",
-          "page"
-        ]
+        "required": ["result", "page"]
       },
       "NFTOwner": {
         "type": "object",
@@ -2078,10 +1962,7 @@
             "$ref": "#/components/schemas/Page"
           }
         },
-        "required": [
-          "result",
-          "page"
-        ]
+        "required": ["result", "page"]
       },
       "Chain": {
         "type": "object",
@@ -2098,10 +1979,7 @@
             "example": "imtbl-zkevm-testnet"
           }
         },
-        "required": [
-          "id",
-          "name"
-        ]
+        "required": ["id", "name"]
       },
       "ListChainsResult": {
         "type": "object",
@@ -2117,14 +1995,7 @@
             "$ref": "#/components/schemas/Page"
           }
         },
-        "required": [
-          "result",
-          "page"
-        ]
-      },
-      "DemoPage": {
-        "type": "string",
-        "example": "<html>HTML text</html>"
+        "required": ["result", "page"]
       },
       "BasicAPIError": {
         "type": "object",
@@ -2145,11 +2016,7 @@
             "example": "e47634b79a5cd6894ddc9639ec4aad26"
           }
         },
-        "required": [
-          "message",
-          "link",
-          "trace_id"
-        ]
+        "required": ["message", "link", "trace_id"]
       },
       "APIError400": {
         "allOf": [
@@ -2162,9 +2029,7 @@
               "code": {
                 "type": "string",
                 "description": "Error Code",
-                "enum": [
-                  "VALIDATION_ERROR"
-                ],
+                "enum": ["VALIDATION_ERROR"],
                 "example": "VALIDATION_ERROR"
               },
               "details": {
@@ -2174,10 +2039,7 @@
                 "additionalProperties": true
               }
             },
-            "required": [
-              "code",
-              "details"
-            ]
+            "required": ["code", "details"]
           }
         ]
       },
@@ -2192,9 +2054,7 @@
               "code": {
                 "type": "string",
                 "description": "Error Code",
-                "enum": [
-                  "RESOURCE_NOT_FOUND"
-                ],
+                "enum": ["RESOURCE_NOT_FOUND"],
                 "example": "RESOURCE_NOT_FOUND"
               },
               "details": {
@@ -2204,10 +2064,7 @@
                 "additionalProperties": true
               }
             },
-            "required": [
-              "code",
-              "details"
-            ]
+            "required": ["code", "details"]
           }
         ]
       },
@@ -2222,9 +2079,7 @@
               "code": {
                 "type": "string",
                 "description": "Error Code",
-                "enum": [
-                  "INTERNAL_SERVER_ERROR"
-                ],
+                "enum": ["INTERNAL_SERVER_ERROR"],
                 "example": "INTERNAL_SERVER_ERROR"
               },
               "details": {
@@ -2234,10 +2089,7 @@
                 "additionalProperties": true
               }
             },
-            "required": [
-              "code",
-              "details"
-            ]
+            "required": ["code", "details"]
           }
         ]
       },
@@ -2248,10 +2100,7 @@
             "type": "string",
             "description": "Token type user is willing to accept upon settlement",
             "example": "ERC20",
-            "enum": [
-              "ERC20",
-              "IMX"
-            ]
+            "enum": ["ERC20", "IMX"]
           },
           "start_amount": {
             "type": "string",
@@ -2271,10 +2120,7 @@
           "start_amount": "9750000000000000000",
           "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
         },
-        "required": [
-          "item_type",
-          "start_amount"
-        ]
+        "required": ["item_type", "start_amount"]
       },
       "CreateOrderRequestBody": {
         "type": "object",
@@ -2411,9 +2257,7 @@
           "id": "1234567890",
           "message": "Order creation failed"
         },
-        "required": [
-          "message"
-        ]
+        "required": ["message"]
       },
       "Fee": {
         "type": "object",
@@ -2428,9 +2272,7 @@
             "type": "string",
             "description": "Fee type",
             "example": "ROYALTY",
-            "enum": [
-              "ROYALTY"
-            ]
+            "enum": ["ROYALTY"]
           },
           "recipient": {
             "type": "string",
@@ -2444,11 +2286,7 @@
           "fee_type": "ROYALTY",
           "recipient": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
         },
-        "required": [
-          "fee_type",
-          "amount",
-          "recipient"
-        ]
+        "required": ["fee_type", "amount", "recipient"]
       },
       "Order": {
         "type": "object",
@@ -2755,9 +2593,7 @@
             }
           ]
         },
-        "required": [
-          "result"
-        ]
+        "required": ["result"]
       },
       "ProtocolData": {
         "type": "object",
@@ -2766,17 +2602,13 @@
             "type": "string",
             "description": "The Order type",
             "example": "FULL_OPEN",
-            "enum": [
-              "FULL_OPEN"
-            ]
+            "enum": ["FULL_OPEN"]
           }
         },
         "example": {
           "order_type": "FULL_OPEN"
         },
-        "required": [
-          "order_type"
-        ]
+        "required": ["order_type"]
       },
       "SellItem": {
         "type": "object",
@@ -2785,9 +2617,7 @@
             "type": "string",
             "description": "Token type user is offering which in this case is a ERC721",
             "example": "ERC721",
-            "enum": [
-              "ERC721"
-            ]
+            "enum": ["ERC721"]
           },
           "contract_address": {
             "type": "string",
@@ -2807,11 +2637,7 @@
           "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
           "token_id": "1"
         },
-        "required": [
-          "item_type",
-          "contract_address",
-          "token_id"
-        ]
+        "required": ["item_type", "contract_address", "token_id"]
       }
     }
   }

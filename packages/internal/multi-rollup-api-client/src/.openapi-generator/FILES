@@ -8,7 +8,6 @@ configuration.ts
 domain/activities-api.ts
 domain/chains-api.ts
 domain/collections-api.ts
-domain/demopage-api.ts
 domain/nft-owners-api.ts
 domain/nfts-api.ts
 domain/order-book-api.ts
