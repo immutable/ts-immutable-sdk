@@ -24,7 +24,7 @@ export function FormControlWrapper({
       validationStatus={isErrored ? 'error' : 'success'}
     >
       {children}
-      {subtext && <FormControl.Caption>{subtext}</FormControl.Caption>}
+      {subtext && <FormControl.Caption testId={`${testId}-subtext`}>{subtext}</FormControl.Caption>}
       {isErrored && (
         <FormControl.Validation testId={`${testId}-error`}>{errorMessage}</FormControl.Validation>
       )}
