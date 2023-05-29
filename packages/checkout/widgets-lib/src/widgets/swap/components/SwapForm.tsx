@@ -556,6 +556,9 @@ export function SwapForm({ data }: SwapFromProps) {
       </Box>
       <SwapButton
         validator={SwapFormValidator}
+        updateLoading={(value: boolean) => {
+          setLoading(value);
+        }}
         loading={loading}
         transaction={quote}
         data={{

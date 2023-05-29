@@ -19,13 +19,14 @@ import { SwapFormData } from './swapFormTypes';
 
 export interface SwapButtonProps {
   loading: boolean
+  updateLoading: (value: boolean) => void
   validator: () => boolean
   transaction: TransactionResponse | null;
   data?: SwapFormData;
 }
 
 export function SwapButton({
-  loading, validator, transaction, data,
+  loading, updateLoading, validator, transaction, data,
 }: SwapButtonProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { swapState } = useContext(SwapContext);
@@ -36,6 +37,8 @@ export function SwapButton({
     if (!validator()) return;
     if (!checkout || !provider || !transaction) return;
     try {
+      updateLoading(true);
+
       if (transaction.approveTransaction) {
         const txn = await checkout.sendTransaction({
           provider,
@@ -49,6 +52,8 @@ export function SwapButton({
       });
       const receipt = await txn.transactionResponse.wait();
       console.log('receipt:', receipt, receipt.status);
+
+      updateLoading(false);
 
       if (receipt.status === 0 || receipt.status === undefined) {
         viewDispatch({
@@ -69,6 +74,7 @@ export function SwapButton({
         },
       });
     } catch (err: any) {
+      updateLoading(false);
       console.log('err:', err);
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         console.log('user rejected request');
