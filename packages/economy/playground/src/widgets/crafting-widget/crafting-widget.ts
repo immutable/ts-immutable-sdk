@@ -327,9 +327,9 @@ export class CraftingWidget extends LitElement {
     this.getCrafts();
     this.getInventory();
     const refreshInterval = setInterval(() => {
-      // this.getInventory();
-      // this.getCrafts();
-      // this.requestUpdate();
+      this.getInventory();
+      this.getCrafts();
+      this.requestUpdate();
     }, 1000);
     window.addEventListener('beforeunload', () =>
       clearInterval(refreshInterval)
