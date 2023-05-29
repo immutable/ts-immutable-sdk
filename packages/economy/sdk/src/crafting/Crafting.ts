@@ -1,13 +1,7 @@
 /* eslint-disable  */
 import { Service } from 'typedi';
 
-import {
-  CraftIngredient,
-  CraftCreateCraftInput,
-  CraftCreateCraftOutput,
-  DomainCraft,
-} from '../__codegen__/crafting';
-import type { EventData, EventType, InventoryItem } from '../types';
+import type { EventData, EventType } from '../types';
 import { asyncFn, comparison } from '../utils';
 import { EventClient } from '../EventClient';
 import { withSDKError } from '../Errors';
@@ -15,6 +9,14 @@ import { StudioBE } from '../StudioBE';
 import { Config } from '../Config';
 import { Store } from '../Store';
 import { Recipe } from '../recipe/Recipe';
+
+import { InventoryItem } from '../__codegen__/inventory';
+import {
+  CraftIngredient,
+  CraftCreateCraftInput,
+  CraftCreateCraftOutput,
+  DomainCraft,
+} from '../__codegen__/crafting';
 
 // TODO: Use Checkout SDK
 const checkout = {
@@ -32,8 +34,8 @@ export type CraftEvent = EventType<
   | EventData<'COMPLETED', { data: {} }>
   | EventData<'FAILED', { error: { code: string; reason: string } }>
   | EventData<
-      'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
-    >
+    'AWAITING_WEB3_INTERACTION' | 'VALIDATING' | 'SUBMITTED' | 'PENDING'
+  >
 >;
 
 /** List of specific craft statuses */
@@ -41,13 +43,13 @@ export type CraftStatus = CraftEvent['status'];
 
 @Service()
 export class Crafting {
-  constructor(
+  constructor (
     private events: EventClient<CraftEvent>,
     private studioBE: StudioBE,
     private config: Config,
     private store: Store,
     private recipe: Recipe
-  ) {}
+  ) { }
 
   /**
    * Given inputs for a recipe crafting
@@ -186,7 +188,7 @@ export class Crafting {
           return false;
         }
 
-        return true;
+        return this.store.get().craftingInputs.findIndex((usedInput) => usedInput.condition_id === input.id) === -1
       }) || [];
 
     if (!availableInput?.id) {
@@ -195,7 +197,7 @@ export class Crafting {
 
     this.addInput({
       condition_id: availableInput.id,
-      item_id: item.id,
+      item_id: item.id as string,
     });
   }
 

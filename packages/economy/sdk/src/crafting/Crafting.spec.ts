@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 import Container from 'typedi';
 
-import { InventoryItem } from 'types';
+import { InventoryItem } from '../__codegen__/inventory';
 import { Config, defaultConfig } from '../Config';
 import { Store } from '../Store';
 import { Crafting } from './Crafting';
 
-const recipe = {
+const recipe1 = {
   id: 'recipe_1',
   inputs: [
     {
@@ -60,7 +60,7 @@ const recipe = {
   ],
 };
 
-const items = [
+const items1 = [
   {
     id: 'item_1',
     item_definition_id: 'item_def_1',
@@ -98,22 +98,158 @@ const items = [
   },
 ] as unknown as Array<InventoryItem>;
 
+const recipe2 = {
+  id: 'wood-pickaxe-recipe-id',
+  inputs: [
+    {
+      id: 'woodplank_input_1',
+      type: 'single_item',
+      name: 'Wood Plank',
+      conditions: [
+        {
+          type: '',
+          ref: 'item_definition_id',
+          comparison: 'eq',
+          expected: 'woodplank_item_definition_id',
+        },
+      ],
+    },
+    {
+      id: 'woodplank_input_2',
+      type: 'single_item',
+      name: 'Wood Plank',
+      conditions: [
+        {
+          type: '',
+          ref: 'item_definition_id',
+          comparison: 'eq',
+          expected: 'woodplank_item_definition_id',
+        },
+      ],
+    },
+    {
+      id: 'woodplank_input_3',
+      type: 'single_item',
+      name: 'Wood Plank',
+      conditions: [
+        {
+          type: '',
+          ref: 'item_definition_id',
+          comparison: 'eq',
+          expected: 'woodplank_item_definition_id',
+        },
+      ],
+    },
+    {
+      id: 'stick_input_1',
+      type: 'single_item',
+      name: 'Stick',
+      conditions: [
+        {
+          type: '',
+          ref: 'item_definition_id',
+          comparison: 'eq',
+          expected: 'stick_item_definition_id',
+        },
+      ],
+    },
+    {
+      id: 'stick_input_2',
+      type: 'single_item',
+      name: 'Stick',
+      conditions: [
+        {
+          type: '',
+          ref: 'item_definition_id',
+          comparison: 'eq',
+          expected: 'stick_item_definition_id',
+        },
+      ],
+    },
+  ],
+  outputs: [
+    {
+      type: 'item_definition',
+      name: 'Wood Pickaxe',
+      ref: '7ee3130f-cbf8-4b21-8aed-011eea9188f9',
+      location: 'offchain',
+      data: null,
+    },
+  ],
+};
+
+const items2 = [{
+  id: 'stick_1_id',
+  item_definition_id: 'stick_item_definition_id',
+  metadata: {
+    description: 'Stick Regular',
+    image: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/7a/Stick_JE1_BE1.png',
+    name: 'Stick Regular',
+  },
+},
+{
+  id: 'stick_2_id',
+  item_definition_id: 'stick_item_definition_id',
+  metadata: {
+    description: 'Stick Regular',
+    image: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/7a/Stick_JE1_BE1.png',
+    name: 'Stick Regular',
+  },
+}, {
+  id: 'stick_3_id',
+  item_definition_id: 'stick_item_definition_id',
+  metadata: {
+    description: 'Stick Regular',
+    image: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/7a/Stick_JE1_BE1.png',
+    name: 'Stick Regular',
+  },
+},
+{
+  id: 'woodplank_1_id',
+  item_definition_id: 'woodplank_item_definition_id',
+  metadata: {
+    description: 'Wood Plank Regular',
+    image: 'https://j-img.game8.co/1652109/a087c7c4677cd9fa3c030c798faafe4c.png/show?1527556487',
+    name: 'Wood Plank Regular',
+  },
+},
+{
+  id: 'woodplank_2_id',
+  item_definition_id: 'woodplank_item_definition_id',
+  metadata: {
+    description: 'Wood Plank Regular',
+    image: 'https://j-img.game8.co/1652109/a087c7c4677cd9fa3c030c798faafe4c.png/show?1527556487',
+    name: 'Wood Plank Regular',
+  },
+},
+{
+  id: 'woodplank_3_id',
+  item_definition_id: 'woodplank_item_definition_id',
+  metadata: {
+    description: 'Wood Plank Regular',
+    image: 'https://j-img.game8.co/1652109/a087c7c4677cd9fa3c030c798faafe4c.png/show?1527556487',
+    name: 'Wood Plank Regular',
+  },
+},
+] as unknown as Array<InventoryItem>;
+
 describe(Crafting.name, () => {
   beforeAll(() => {
     Container.reset();
     Container.set(Config, new Config(defaultConfig));
+  });
+
+  it('should be defined', () => {
     Container.set(
       Store,
       new Store({
-        recipes: [recipe],
-        inventory: items,
+        recipes: [recipe1],
+        inventory: items1,
         craftingInputs: [],
         selectedRecipeId: 'recipe_1',
       }),
     );
-  });
 
-  it('should be defined', () => {
     const crafting = Container.get(Crafting);
     const store = Container.get(Store);
 
@@ -123,6 +259,32 @@ describe(Crafting.name, () => {
       crafting.addInputByItem(store.get().inventory[2]);
       crafting.addInputByItem(store.get().inventory[3]);
       crafting.addInputByItem(store.get().inventory[4]);
+
+      console.log('#########', store.get().craftingInputs);
+    } catch (error) {
+      console.log('######### ERROR', error);
+    }
+    expect(crafting).toBeDefined();
+  });
+
+  it('should add item in the correct available slot', () => {
+    Container.set(
+      Store,
+      new Store({
+        recipes: [recipe2],
+        inventory: items2,
+        craftingInputs: [],
+        selectedRecipeId: 'wood-pickaxe-recipe-id',
+      }),
+    );
+
+    const crafting = Container.get(Crafting);
+    const store = Container.get(Store);
+
+    try {
+      crafting.addInputByItem(store.get().inventory.find((item: any) => item.id === 'stick_1_id'));
+      crafting.addInputByItem(store.get().inventory.find((item: any) => item.id === 'stick_2_id'));
+      crafting.addInputByItem(store.get().inventory.find((item: any) => item.id === 'stick_3_id'));
 
       console.log('#########', store.get().craftingInputs);
     } catch (error) {
