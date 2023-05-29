@@ -478,6 +478,7 @@ export function SwapForm() {
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
               selectedOption={generateTokenId(fromToken?.token)}
+              coinSelectorHeading="What would you like to swap from?"
             />
           </Box>
 
@@ -516,6 +517,7 @@ export function SwapForm() {
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
               selectedOption={generateTokenId(toToken)}
+              coinSelectorHeading="What would you like to swap to?"
             />
           </Box>
         </Box>

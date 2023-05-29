@@ -24,24 +24,26 @@ interface SelectFormProps {
   selectedOption?: string | null;
   disabled?: boolean;
   onSelectChange: (value: string) => void;
+  coinSelectorHeading: string;
 }
 
 export function SelectForm({
   id,
   options,
-  selectedOption,
   subtext,
   onSelectChange,
   textAlign,
   errorMessage,
   disabled,
+  selectedOption,
+  coinSelectorHeading,
 }: SelectFormProps) {
   const [coinSelectorOpen, setCoinSelectorOpen] = useState<boolean>(false);
 
   return (
     <Box>
       <CoinSelector
-        heading="What would you like to swap to?"
+        heading={coinSelectorHeading}
         options={
           options.map((option) => ({
             ...option,
