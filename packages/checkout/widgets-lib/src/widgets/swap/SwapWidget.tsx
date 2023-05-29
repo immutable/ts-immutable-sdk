@@ -34,6 +34,8 @@ import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
 import { getDexConfigOverrides } from './DexConfigOverrides';
 import { text } from '../../resources/text/textConfig';
+import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
+import { ErrorView } from '../../components/Error/ErrorView';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -50,6 +52,7 @@ export interface SwapWidgetParams {
 export function SwapWidget(props: SwapWidgetProps) {
   const { success } = text.views[SwapWidgetViews.SWAP];
   const loadingText = text.views[BaseViews.LOADING_VIEW].text;
+  const { actionText } = text.views[BaseViews.ERROR];
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const viewReducerValues = useMemo(
     () => ({ viewState, viewDispatch }),
@@ -221,6 +224,14 @@ export function SwapWidget(props: SwapWidgetProps) {
               }}
               statusType={StatusType.WARNING}
               testId="price-surge-view"
+            />
+          )}
+          {viewState.view.type === BaseViews.ERROR && (
+            <ErrorView
+              actionText={actionText}
+              // todo: go back to swap prefilled form
+              onActionClick={() => {}}
+              onCloseClick={sendSwapWidgetCloseEvent}
             />
           )}
         </SwapContext.Provider>
