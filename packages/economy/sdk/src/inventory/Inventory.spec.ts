@@ -2,12 +2,14 @@
 import Container from 'typedi';
 import 'reflect-metadata';
 
+import { Config, defaultConfig } from '../Config';
 import { Inventory } from './Inventory';
 import { InventoryItem } from '../__codegen__/inventory';
 
 describe(Inventory.name, () => {
   beforeAll(() => {
     Container.reset();
+    Container.set(Config, new Config(defaultConfig));
   });
 
   describe('filterItemsBy', () => {
