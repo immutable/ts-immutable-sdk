@@ -3078,6 +3078,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@imtbl/multi-rollup-api-client@workspace:packages/internal/multi-rollup-api-client":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/multi-rollup-api-client@workspace:packages/internal/multi-rollup-api-client"
+  dependencies:
+    rollup: ^3.17.2
+  languageName: unknown
+  linkType: soft
+
 "@imtbl/orderbook@0.0.0, @imtbl/orderbook@workspace:packages/orderbook":
   version: 0.0.0-use.local
   resolution: "@imtbl/orderbook@workspace:packages/orderbook"
