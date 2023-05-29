@@ -92,7 +92,8 @@ describe(Inventory.name, () => {
       },
     ];
     it('should filter items', () => {
-      const filteredItems = Inventory.filterItemsBy(
+      const inventory = Container.get(Inventory);
+      const filteredItems = inventory.filterItemsBy(
         items,
         (x) => x?.item_definition_id === 'd14f72cb-02f2-48e7-826b-b3f1f76509ee',
       );
