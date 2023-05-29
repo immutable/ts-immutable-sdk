@@ -1,6 +1,6 @@
 import { ItemType } from '@opensea/seaport-js/lib/constants';
 import {
-  BuyItem, Fee, Order, OrdersService, CreateOrderProtocolData, SellItem, Orders,
+  BuyItem, Fee, Order, OrdersService, CreateOrderProtocolData, SellItem, ListOrdersResult,
 } from 'openapi/sdk';
 import { CreateOrderParams, ListOrderParams } from 'types';
 
@@ -14,7 +14,7 @@ export class ImmutableApiClient {
     return this.orderbookService.getOrder({ chainId: this.chainId, orderId });
   }
 
-  async listOrders(listOrderParams: ListOrderParams): Promise<Orders> {
+  async listOrders(listOrderParams: ListOrderParams): Promise<ListOrdersResult> {
     return this.orderbookService.listOrders({
       chainId: this.chainId,
       ...listOrderParams,

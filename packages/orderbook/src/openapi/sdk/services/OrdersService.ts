@@ -2,9 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateOrderRequestBody } from '../models/CreateOrderRequestBody';
+import type { ListOrdersResult } from '../models/ListOrdersResult';
 import type { Order } from '../models/Order';
-import type { Orders } from '../models/Orders';
 import type { OrderStatus } from '../models/OrderStatus';
+import type { PageCursor } from '../models/PageCursor';
+import type { PageSize } from '../models/PageSize';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -16,7 +18,7 @@ export class OrdersService {
   /**
    * List all orders
    * List all orders
-   * @returns Orders OK response.
+   * @returns ListOrdersResult OK response.
    * @throws ApiError
    */
   public listOrders({
@@ -24,7 +26,7 @@ export class OrdersService {
     status,
     sellItemContractAddress,
     sellItemTokenId,
-    pageSize = 100,
+    pageSize,
     sortBy,
     sortDirection,
     pageCursor,
@@ -48,7 +50,7 @@ export class OrdersService {
     /**
      * Maximum number of orders to return per page
      */
-    pageSize?: number,
+    pageSize?: PageSize,
     /**
      * Order field to sort by
      */
@@ -60,8 +62,8 @@ export class OrdersService {
     /**
      * Page cursor to retrieve previous or next page. Use the value returned in the response.
      */
-    pageCursor?: string,
-  }): CancelablePromise<Orders> {
+    pageCursor?: PageCursor,
+  }): CancelablePromise<ListOrdersResult> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/v1/chains/{chain_id}/orders',
@@ -78,8 +80,9 @@ export class OrdersService {
         'page_cursor': pageCursor,
       },
       errors: {
-        404: `not_found: Resource not found`,
-        500: `internal_error: Internal server error`,
+        400: `Client error`,
+        404: `The specified resource was not found`,
+        500: `Internal server error`,
       },
     });
   }

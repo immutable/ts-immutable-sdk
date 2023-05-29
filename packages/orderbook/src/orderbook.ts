@@ -1,7 +1,7 @@
 import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
 import { OrderbookModuleConfiguration } from 'config/config';
 import { ERC721Factory } from 'erc721';
-import { Order, OrderStatus, Orders } from 'openapi/sdk';
+import { Order, OrderStatus, ListOrdersResult } from 'openapi/sdk';
 import { Seaport, SeaportFactory } from 'seaport';
 import {
   CancelOrderResponse,
@@ -59,7 +59,7 @@ export class Orderbook {
    * @param {ListOrderParams} listOrderParams - Filtering, ordering and page parameters.
    * @return {Orders} The paged orders.
    */
-  listOrders(listOrderParams: ListOrderParams): Promise<Orders> {
+  listOrders(listOrderParams: ListOrderParams): Promise<ListOrdersResult> {
     return this.apiClient.listOrders(listOrderParams);
   }
 
