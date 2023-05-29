@@ -16,6 +16,11 @@ import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../..
 import { SelectForm, SelectOption } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
 import { Fees } from './Fees';
+import {
+  bridgeFormButtonContainerStyles,
+  bridgeFormWrapperStyles,
+  formInputsContainerStyles,
+} from './BridgeFormStyles';
 
 interface BridgeFormProps {
   testId?: string;
@@ -181,12 +186,7 @@ export function BridgeForm(props: BridgeFormProps) {
   return (
     <Box
       testId={testId}
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-      }}
+      sx={bridgeFormWrapperStyles}
     >
       <Box sx={{ paddingX: 'base.spacing.x4' }}>
         <Heading
@@ -197,14 +197,7 @@ export function BridgeForm(props: BridgeFormProps) {
         >
           {content.title}
         </Heading>
-        <Box
-          sx={{
-            paddingTop: 'base.spacing.x4',
-            display: 'flex',
-            justifyContent: 'space-between',
-            columnGap: 'base.spacing.x1',
-          }}
-        >
+        <Box sx={formInputsContainerStyles}>
           <SelectForm
             id="bridge-token"
             options={tokensOptions}
@@ -232,14 +225,7 @@ export function BridgeForm(props: BridgeFormProps) {
         </Box>
         <Fees gasFeeValue="" gasFeeToken={null} gasFeeFiatValue="" />
       </Box>
-      <Box sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        paddingY: 'base.spacing.x6',
-        paddingX: 'base.spacing.x4',
-        backgroundColor: 'base.color.translucent.container.200',
-      }}
-      >
+      <Box sx={bridgeFormButtonContainerStyles}>
         <Button
           testId={`${testId}-button`}
           variant="primary"

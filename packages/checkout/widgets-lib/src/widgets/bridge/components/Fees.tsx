@@ -1,6 +1,6 @@
 import { Body, Box, ButtCon } from '@biom3/react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
-import { feeBoxStyles, feeContainerStyles } from './FeeStyles';
+import { feeBoxStyles, feeContainerStyles, feeHeadingContainerStyles } from './FeeStyles';
 import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
@@ -18,12 +18,7 @@ export function Fees({ gasFeeValue, gasFeeToken, gasFeeFiatValue }: FeesProps) {
   return (
     <Box sx={feeContainerStyles}>
       <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 'base.spacing.x2',
-        }}
+        sx={feeHeadingContainerStyles}
       >
         <ButtCon
           size="small"
