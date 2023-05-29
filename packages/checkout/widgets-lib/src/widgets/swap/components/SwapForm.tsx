@@ -82,8 +82,10 @@ export function SwapForm({ data }: SwapFromProps) {
   const initialToken = (address) => allowedTokens.find((t) => t.address === address);
   const initialBalance = (address) => tokenBalances.find((t) => t.token.address === address)?.formattedBalance;
 
-  console.log('fun:', initialToken('0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE'));
-  console.log('dex:', initialToken('0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2'));
+  const formatTokenOptionsId = (symbol: string, address?: string) => {
+    if (!address) return symbol.toLowerCase();
+    return `${symbol.toLowerCase()}-${address.toLowerCase()}`;
+  };
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
 
@@ -117,7 +119,7 @@ export function SwapForm({ data }: SwapFromProps) {
       .filter((b) => b.balance.gt(0))
       .map(
         (t) => ({
-          id: `${t.token.symbol.toLowerCase()}-${t.token.name.toLowerCase()}`,
+          id: formatTokenOptionsId(t.token.symbol, t.token.address),
           label: t.token.symbol,
           icon: t.token.icon,
         } as SelectOption),
@@ -129,7 +131,7 @@ export function SwapForm({ data }: SwapFromProps) {
       .filter((t) => t.address !== fromToken?.address)
       .map(
         (t) => ({
-          id: `${t.symbol.toLowerCase()}-${t.name.toLowerCase()}`,
+          id: formatTokenOptionsId(t.symbol, t.address),
           label: t.symbol,
           icon: undefined, // todo: add correct image once available on token info
         } as SelectOption),
@@ -349,7 +351,7 @@ export function SwapForm({ data }: SwapFromProps) {
 
   const onFromSelectChange = (value: OptionKey) => {
     const selected = tokenBalances
-      .find((t) => value === `${t.token.symbol.toLowerCase()}-${t.token.name.toLowerCase()}`);
+      .find((t) => value === formatTokenOptionsId(t.token.symbol, t.token.address));
     if (!selected) return;
 
     setFromToken(selected.token);
@@ -383,7 +385,7 @@ export function SwapForm({ data }: SwapFromProps) {
   //      TO     //
   // ------------//
   const onToSelectChange = (value: OptionKey) => {
-    const selected = allowedTokens.find((t) => value === `${t.symbol.toLowerCase()}-${t.name.toLowerCase()}`);
+    const selected = allowedTokens.find((t) => value === formatTokenOptionsId(t.symbol, t.address));
     if (!selected) return;
     setToToken(selected);
     setToTokenError('');
@@ -500,7 +502,7 @@ export function SwapForm({ data }: SwapFromProps) {
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
               selectedOption={fromToken
-                ? `${fromToken.symbol.toLowerCase()}-${fromToken.name.toLowerCase()}`
+                ? formatTokenOptionsId(fromToken.symbol, fromToken.address)
                 : undefined}
             />
           </Box>
@@ -541,7 +543,7 @@ export function SwapForm({ data }: SwapFromProps) {
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
               selectedOption={toToken
-                ? `${toToken.symbol.toLowerCase()}-${toToken.name.toLowerCase()}`
+                ? formatTokenOptionsId(toToken.symbol, toToken.address)
                 : undefined}
             />
           </Box>

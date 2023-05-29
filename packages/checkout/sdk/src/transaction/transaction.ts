@@ -6,10 +6,6 @@ export const sendTransaction = async (
   params: SendTransactionParams,
 ): Promise<SendTransactionResult> => {
   const { provider, transaction } = params;
-  throw new CheckoutError(
-    'insufficient funds',
-    CheckoutErrorType.INSUFFICIENT_FUNDS,
-  );
   try {
     const transactionResponse = await provider
       .getSigner()
