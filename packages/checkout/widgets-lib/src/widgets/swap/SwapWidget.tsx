@@ -34,8 +34,11 @@ import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
 import { getDexConfigOverrides } from './DexConfigOverrides';
 import { text } from '../../resources/text/textConfig';
-import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import { ErrorView } from '../../components/Error/ErrorView';
+import {
+  sendSwapFailedEvent, sendSwapRejectedEvent,
+  sendSwapSuccessEvent, sendSwapWidgetCloseEvent,
+} from './SwapWidgetEvents';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -186,6 +189,7 @@ export function SwapWidget(props: SwapWidgetProps) {
             <StatusView
               statusText={success.text}
               actionText={success.actionText}
+              onRenderEvent={sendSwapSuccessEvent}
               // eslint-disable-next-line no-console
               onActionClick={() => console.log('success')}
               statusType={StatusType.SUCCESS}
@@ -196,7 +200,7 @@ export function SwapWidget(props: SwapWidgetProps) {
           <StatusView
             statusText="Transaction rejected"
             actionText="Try again"
-                // eslint-disable-next-line no-console
+            onRenderEvent={() => sendSwapFailedEvent('Transaction failed')}
             onActionClick={() => {
               viewDispatch({
                 payload: {
@@ -213,6 +217,7 @@ export function SwapWidget(props: SwapWidgetProps) {
             <StatusView
               statusText="Price surge"
               actionText="Review & try again"
+              onRenderEvent={() => sendSwapRejectedEvent('Price surge')}
               // eslint-disable-next-line no-console
               onActionClick={() => {
                 viewDispatch({
