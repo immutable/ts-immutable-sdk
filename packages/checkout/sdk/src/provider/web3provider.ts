@@ -10,13 +10,16 @@ import { CheckoutError, CheckoutErrorType } from '../errors';
 
 export function isWeb3Provider(
   provider: Web3Provider | CachedProvider | undefined,
-) {
-  return provider && provider instanceof Web3Provider;
+): boolean {
+  if (provider && provider instanceof Web3Provider) {
+    return true;
+  }
+  return false;
 }
 
 export function isCachedProvider(
   provider: Web3Provider | CachedProvider | undefined,
-) {
+): boolean {
   if (provider && !(provider instanceof Web3Provider)) {
     const { chainId, name } = provider;
     if (chainId && name) {
@@ -37,6 +40,13 @@ export async function getWeb3Provider(
 
   // if they've supplied a web3provider, use it
   if (isWeb3Provider(provider)) return provider as Web3Provider;
+
+  if (!allProviders) {
+    throw new CheckoutError(
+      'Checkout.setProvider({Web3Provider, Name}) needs to be called to set the providers for all available networks.',
+      CheckoutErrorType.PROVIDER_ERROR,
+    );
+  }
 
   // if we've already cloned the providers use the cached one they're requesting
   if (isCachedProvider(provider) && allProviders) {

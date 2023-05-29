@@ -1,63 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import detectEthereumProvider from '@metamask/detect-provider';
-import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
-import {
-  ConnectionProviders,
-  WalletAction,
-  CheckConnectionResult,
-} from '../types';
+import { Web3Provider } from '@ethersproject/providers';
+import { WalletAction, CheckConnectionResult } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 
-async function getMetaMaskProvider(): Promise<Web3Provider> {
-  const provider = await withCheckoutError<ExternalProvider | null>(
-    async () => await detectEthereumProvider(),
-    { type: CheckoutErrorType.METAMASK_PROVIDER_ERROR },
-  );
-
-  if (!provider || !provider.request) {
-    throw new CheckoutError(
-      'No MetaMask provider installed.',
-      CheckoutErrorType.METAMASK_PROVIDER_ERROR,
-    );
-  }
-
-  return new Web3Provider(provider);
-}
-
-async function getWalletProviderForPreference(
-  providerPreference: ConnectionProviders,
-): Promise<Web3Provider> {
-  let web3Provider: Web3Provider | null = null;
-  switch (providerPreference) {
-    case ConnectionProviders.METAMASK: {
-      web3Provider = await getMetaMaskProvider();
-      break;
-    }
-    default:
-      throw new CheckoutError(
-        'Provider preference is not supported',
-        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR,
-      );
-  }
-  return web3Provider;
-}
-
 export async function checkIsWalletConnected(
-  providerPreference: ConnectionProviders,
+  web3Provider: Web3Provider,
 ): Promise<CheckConnectionResult> {
-  const provider = await getWalletProviderForPreference(providerPreference);
-
-  if (!provider.provider?.request) {
+  if (!web3Provider?.provider?.request) {
     throw new CheckoutError(
-      'Incompatible provider',
-      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
-      { details: `Unsupported provider for ${providerPreference}` },
+      'Check wallet connection request failed',
+      CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR,
+      {
+        rpcMethod: WalletAction.CHECK_CONNECTION,
+      },
     );
   }
-
   let accounts = [];
   try {
-    accounts = await provider.provider.request({
+    accounts = await web3Provider.provider.request({
       method: WalletAction.CHECK_CONNECTION,
       params: [],
     });
@@ -78,9 +38,7 @@ export async function checkIsWalletConnected(
   };
 }
 
-// @WT-1345 - rename to connectSite()
-
-export async function connectWalletProvider(params: {
+export async function connectSite(params: {
   web3Provider: Web3Provider;
 }): Promise<Web3Provider> {
   const { web3Provider } = params;

@@ -37,7 +37,6 @@ import {
   SwitchNetworkResult,
 } from './types';
 import { CheckoutConfiguration } from './config';
-import { CheckoutError, CheckoutErrorType } from './errors';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
@@ -104,7 +103,12 @@ export class Checkout {
   public async checkIsWalletConnected(
     params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
-    return connect.checkIsWalletConnected(params.providerPreference); // @WT-1345 remove provider preference
+    const web3Provider = await provider.getWeb3Provider(
+      params,
+      this.currentProviderInfo,
+      this.allProviders,
+    );
+    return connect.checkIsWalletConnected(web3Provider);
   }
 
   /**
@@ -119,7 +123,7 @@ export class Checkout {
       this.currentProviderInfo,
       this.allProviders,
     );
-    await connect.connectWalletProvider({ web3Provider });
+    await connect.connectSite({ web3Provider });
     const networkInfo = await network.getNetworkInfo(this.config, web3Provider);
 
     return {
@@ -137,13 +141,6 @@ export class Checkout {
   public async switchNetwork(
     params: SwitchNetworkParams,
   ): Promise<SwitchNetworkResult> {
-    if (!this.allProviders) {
-      throw new CheckoutError(
-        'checkout.setProvider should be called before switchNetwork to create the providers for each available network',
-        CheckoutErrorType.PROVIDER_ERROR,
-      );
-    }
-
     const web3Provider = await provider.getWeb3Provider(
       params,
       this.currentProviderInfo,

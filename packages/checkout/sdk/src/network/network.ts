@@ -134,9 +134,6 @@ export async function switchWalletNetwork(
   currentProviderInfo: CurrentProviderInfo,
   allProviders: Providers,
 ): Promise<SwitchNetworkResult> {
-  // @WT-1345 - refactor this to return the new network and network info from the providers array
-  // then update the Checkout.providerInfo object with the new current info
-
   const currentProvider = web3Provider;
   const { networkMap } = config;
 

@@ -14,6 +14,7 @@ import {
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { CheckoutConfiguration } from '../config';
 import { getNetworkAllowList, getNetworkInfo } from '../network';
+import { isWeb3Provider } from './web3provider';
 
 async function getMetaMaskProvider(): Promise<Web3Provider> {
   const provider = await withCheckoutError<ExternalProvider | null>(
@@ -33,10 +34,10 @@ async function getMetaMaskProvider(): Promise<Web3Provider> {
 
 export async function createProvider(
   config: CheckoutConfiguration,
-  providerUID: DefaultProviders,
+  defaultProvider: DefaultProviders,
 ): Promise<Web3Provider> {
   let web3Provider: Web3Provider | null = null;
-  switch (providerUID) {
+  switch (defaultProvider) {
     case DefaultProviders.METAMASK: {
       web3Provider = await getMetaMaskProvider();
       break;
@@ -44,7 +45,7 @@ export async function createProvider(
     default:
       throw new CheckoutError(
         'Provider not supported',
-        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR,
+        CheckoutErrorType.DEFAULT_PROVIDER_ERROR,
       );
   }
   return web3Provider;
@@ -57,6 +58,21 @@ export async function cloneProviders(
   const clonedProviders: Providers = {};
 
   const { web3Provider } = genericProvider;
+
+  if (!isWeb3Provider(web3Provider)) {
+    throw new CheckoutError(
+      'The parsed provider is not a Web3Provider',
+      CheckoutErrorType.PROVIDER_ERROR,
+    );
+  }
+
+  if (!genericProvider?.name) {
+    throw new CheckoutError(
+      'The provider name is not defined',
+      CheckoutErrorType.PROVIDER_ERROR,
+    );
+  }
+
   const providerName: string = genericProvider.name;
 
   const allowedNetworks = await getNetworkAllowList(config, {

@@ -39,7 +39,7 @@ export default function GetBalance(props: BalanceProps) {
     const walletAddress = await provider.getSigner().getAddress();
     try {
       const resp = await checkout.getBalance({
-        web3Provider: provider,
+        provider,
         walletAddress,
       });
       setResultNative(resp);
@@ -70,7 +70,7 @@ export default function GetBalance(props: BalanceProps) {
     const walletAddress = await provider.getSigner().getAddress();
     try {
       const resp = await checkout.getBalance({
-        web3Provider: provider,
+        provider,
         walletAddress,
         contractAddress,
       });

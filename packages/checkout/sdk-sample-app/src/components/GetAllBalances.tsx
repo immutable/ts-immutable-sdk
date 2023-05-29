@@ -32,8 +32,8 @@ export default function GetAllBalances(props: BalanceProps) {
     const walletAddress = await provider.getSigner().getAddress();
     try {
       const resp = await checkout.getAllBalances({
-        web3Provider: provider,
-        walletAddress: walletAddress,
+        provider,
+        walletAddress,
         chainId: ChainId.SEPOLIA,
       });
       setResult(resp.balances);

@@ -10,13 +10,7 @@ export enum ConnectionProviders {
   METAMASK = 'metamask',
 }
 
-/**
- * Interface representing the parameters for {@link Checkout.connect}.
- * @property {ConnectionProviders} providerPreference - The preferred provider to connect to the network.
- */
-export interface ConnectParams extends ProviderParams {
-  providerPreference?: ConnectionProviders;
-}
+export interface ConnectParams extends ProviderParams {}
 
 /**
  * Interface representing the result of {@link Checkout.connect}.
@@ -28,13 +22,7 @@ export interface ConnectResult {
   network: NetworkInfo;
 }
 
-/**
- * Interface representing the parameters for {@link Checkout.checkIsWalletConnected}.
- * @property {ConnectionProviders} providerPreference - The preferred provider to use to check the connection status to th Web3 network.
- */
-export interface CheckConnectionParams {
-  providerPreference: ConnectionProviders;
-}
+export interface CheckConnectionParams extends ProviderParams {}
 
 /**
  * Interface representing the result of {@link Checkout.checkIsWalletConnected}.

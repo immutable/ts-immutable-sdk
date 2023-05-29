@@ -63,7 +63,7 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
 
     try {
       const resp = await checkout.switchNetwork({
-        web3Provider: provider,
+        provider,
         chainId,
       });
       setProvider(resp.provider);
@@ -93,7 +93,7 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
     setLoadingNetInfo(true);
 
     try {
-      const resp = await checkout.getNetworkInfo({ web3Provider: provider });
+      const resp = await checkout.getNetworkInfo({ provider });
       setResultNetInfo(resp);
       setLoadingNetInfo(false);
     } catch (err: any) {
