@@ -1,12 +1,13 @@
 import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
 import { OrderbookModuleConfiguration } from 'config/config';
 import { ERC721Factory } from 'erc721';
-import { Order } from 'openapi/sdk';
+import { Order, OrderStatus, ListOrdersResult } from 'openapi/sdk';
 import { Seaport, SeaportFactory } from 'seaport';
 import {
   CancelOrderResponse,
   CreateOrderParams,
   FulfilOrderResponse,
+  ListOrderParams,
   PrepareListingParams,
   PrepareListingResponse,
 } from 'types';
@@ -50,6 +51,16 @@ export class Orderbook {
    */
   getOrder(orderId: string): Promise<Order> {
     return this.apiClient.getOrder(orderId);
+  }
+
+  /**
+   * List orders. This method is used to get a list of orders filtered by conditions specified
+   * in the params object.
+   * @param {ListOrderParams} listOrderParams - Filtering, ordering and page parameters.
+   * @return {Orders} The paged orders.
+   */
+  listOrders(listOrderParams: ListOrderParams): Promise<ListOrdersResult> {
+    return this.apiClient.listOrders(listOrderParams);
   }
 
   /**
@@ -98,7 +109,7 @@ export class Orderbook {
   async fulfillOrder(orderId: string, fulfillerAddress: string): Promise<FulfilOrderResponse> {
     const order = await this.apiClient.getOrder(orderId);
 
-    if (order.status !== Order.status.ACTIVE) {
+    if (order.status !== OrderStatus.ACTIVE) {
       throw new Error(`Cannot fulfil order that is not active. Current status: ${order.status}`);
     }
 
@@ -116,9 +127,9 @@ export class Orderbook {
     const order = await this.apiClient.getOrder(orderId);
 
     if (
-      order.status !== Order.status.ACTIVE
-      && order.status !== Order.status.INACTIVE
-      && order.status !== Order.status.PENDING
+      order.status !== OrderStatus.ACTIVE
+      && order.status !== OrderStatus.INACTIVE
+      && order.status !== OrderStatus.PENDING
     ) {
       throw new Error(`Cannot cancel order with status ${order.status}`);
     }
