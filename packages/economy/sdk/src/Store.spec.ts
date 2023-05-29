@@ -70,7 +70,7 @@ describe('Store', () => {
       user: { name: 'charlie', age: 20 },
     };
     const serializedData = JSON.stringify(storedData);
-    localStorage.setItem('storeData', serializedData);
+    localStorage.setItem(Store.key, serializedData);
 
     store = new Store<Data>(defaultValue, true);
 
@@ -86,7 +86,7 @@ describe('Store', () => {
       data.user = { name: 'alice', age: 30 };
     });
 
-    const storedData = localStorage.getItem('storeData');
+    const storedData = localStorage.getItem(Store.key);
     const parsedData = storedData ? JSON.parse(storedData) : null;
 
     expect(parsedData).toEqual(store.get());
