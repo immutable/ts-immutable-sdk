@@ -1,6 +1,6 @@
-# openapi
+# Multi Rollup API Client
 
-Internal package containing OpenAPI bindings for the Immutable X API.
+Internal package containing generated client for Immutable Multi Rollup API.
 
 This package only contains generated code, and is intended to provide the building blocks for the public interfaces that live within other external packages in this monorepo.
 
