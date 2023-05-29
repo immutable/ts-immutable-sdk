@@ -99,7 +99,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
   /**
    * This effect is used to set the default token option
-   * Set as the token that is passed in as a prop if it has an available balance
+   * Set as the token that is passed in as a prop if it (is allowed and) has an available balance
    * Otherwise will default to the native currency of the chain
    * If the user does not have any non-zero balances, this will not be set
    */
@@ -110,19 +110,16 @@ export function BridgeForm(props: BridgeFormProps) {
         (balance) => balance.token.address === defaultTokenAddress,
       );
     }
-    // TODO: do we need to default the coin to the native curreny of the network??
 
-    // if (!defaultToken) {
-    //   defaultToken = tokenBalances.find(
-    //     (balance) => balance.token.symbol === network?.nativeCurrency.symbol,
-    //   );
-    // }
+    if (!defaultToken) {
+      defaultToken = tokenBalances.find(
+        (balance) => balance.token.symbol === network?.nativeCurrency.symbol,
+      );
+    }
 
     setToken(defaultToken || null);
   }, [tokenBalances, network, defaultTokenAddress]);
 
-  // Does this effect need to be here?
-  // can it be in the BridgeWidget?
   useEffect(() => {
     cryptoFiatDispatch({
       payload: {
