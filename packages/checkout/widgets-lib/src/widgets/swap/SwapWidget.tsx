@@ -191,7 +191,7 @@ export function SwapWidget(props: SwapWidgetProps) {
               actionText={success.actionText}
               onRenderEvent={sendSwapSuccessEvent}
               // eslint-disable-next-line no-console
-              onActionClick={() => console.log('success')}
+              onActionClick={sendSwapWidgetCloseEvent}
               statusType={StatusType.SUCCESS}
               testId="success-view"
             />
