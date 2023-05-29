@@ -53,7 +53,7 @@ export interface SwapWidgetParams {
 }
 
 export function SwapWidget(props: SwapWidgetProps) {
-  const { success } = text.views[SwapWidgetViews.SWAP];
+  const { success, failed, rejected } = text.views[SwapWidgetViews.SWAP];
   const loadingText = text.views[BaseViews.LOADING_VIEW].text;
   const { actionText } = text.views[BaseViews.ERROR];
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
@@ -198,8 +198,8 @@ export function SwapWidget(props: SwapWidgetProps) {
           )}
           {viewState.view.type === SwapWidgetViews.FAIL && (
           <StatusView
-            statusText="Transaction rejected"
-            actionText="Try again"
+            statusText={failed.text}
+            actionText={failed.actionText}
             onRenderEvent={() => sendSwapFailedEvent('Transaction failed')}
             onActionClick={() => {
               viewDispatch({
@@ -215,8 +215,8 @@ export function SwapWidget(props: SwapWidgetProps) {
           )}
           {viewState.view.type === SwapWidgetViews.PRICE_SURGE && (
             <StatusView
-              statusText="Price surge"
-              actionText="Review & try again"
+              statusText={rejected.text}
+              actionText={rejected.actionText}
               onRenderEvent={() => sendSwapRejectedEvent('Price surge')}
               // eslint-disable-next-line no-console
               onActionClick={() => {
