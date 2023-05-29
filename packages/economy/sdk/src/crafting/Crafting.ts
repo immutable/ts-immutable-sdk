@@ -2,13 +2,13 @@
 import { Service } from 'typedi';
 
 import type { EventData, EventType } from '../types';
-import { asyncFn, comparison } from '../utils';
+import { comparison } from '../utils';
 import { EventClient } from '../EventClient';
-import { withSDKError } from '../Errors';
 import { StudioBE } from '../StudioBE';
 import { Config } from '../Config';
 import { Store } from '../Store';
 import { Recipe } from '../recipe/Recipe';
+import { Provider } from '../provider/Provider';
 
 import { InventoryItem } from '../__codegen__/inventory';
 import {
@@ -17,13 +17,6 @@ import {
   CraftCreateCraftOutput,
   DomainCraft,
 } from '../__codegen__/crafting';
-
-// TODO: Use Checkout SDK
-const checkout = {
-  connect: asyncFn('connect'),
-  transfer: asyncFn('transfer', [1, 2, 3]),
-  sign: asyncFn('sign'),
-};
 
 /**
  * @internal Craft events
@@ -49,6 +42,7 @@ export class Crafting {
     private config: Config,
     private store: Store,
     private recipe: Recipe,
+    private provider: Provider
   ) {}
 
   /**
@@ -57,60 +51,52 @@ export class Crafting {
    * @param input crafting recipe inputs
    * @returns crafting status
    */
-  @withSDKError({ type: 'CRAFTING_ERROR' })
   public async craft(
     input: CraftCreateCraftInput
   ): Promise<CraftCreateCraftOutput> {
     // 1. validate inputs
-    this.events.emitEvent({ status: 'STARTED', action: 'CRAFT' });
     await this.validate();
 
     // 2. submit craft to BE
-    this.events.emitEvent({ status: 'SUBMITTED', action: 'CRAFT' });
-    const { data, status } = await this.studioBE.craftingApi.craftPost({
+    const { data: output, status } = await this.studioBE.craftingApi.craftPost({
       request: input,
     });
 
-    if (status !== 200) {
-      this.events.emitEvent({
-        status: 'FAILED',
-        action: 'CRAFT',
-        error: { code: `${status}`, reason: 'unknown' },
-      });
+    if (!(status >= 200 && status < 300)) {
+      throw new Error('Crafting failed');
     }
 
     // 3. transfer assets to escrow wallet if needed
-    // TODO: true if inputs contain tokens
-    const requiresWeb3 = false;
-    if (requiresWeb3) {
-      await this.transferAssetsToEscrowWallet(data);
-    }
-
-    this.events.emitEvent({
-      status: 'COMPLETED',
-      action: 'CRAFT',
-      data,
-    });
-
-    return data;
-  }
-
-  private async transferAssetsToEscrowWallet(output: CraftCreateCraftOutput) {
-    const provider = this.config.get().imxProvider;
-    if (!provider) {
-      throw new Error('No provider found');
-    }
-
-    this.events.emitEvent({
-      status: 'AWAITING_WEB3_INTERACTION',
-      action: 'CRAFT',
-    });
-
-    checkout.transfer();
-
-    // TODO: user provider to sign transfer to escrow wallet address
+    await this.transferAssetsToEscrowWallet(input, output);
 
     return output;
+  }
+
+  private async transferAssetsToEscrowWallet(
+    input: CraftCreateCraftInput,
+    output: CraftCreateCraftOutput
+  ) {
+    const tokenIds = input.ingredients
+      .map(
+        ({ item_id }) =>
+          this.store.get().inventory.find((item) => item.id === item_id)
+            ?.token_id
+      )
+      .filter(Boolean)
+      .map(Number);
+
+    console.log('🚀 ~ file: Crafting.ts:87 ~ Crafting ~ tokenIds:', {
+      input,
+      output,
+      tokenIds,
+    });
+
+    // no ntfs found then skip transfer
+    if (tokenIds.length === 0 || !output.id) {
+      return;
+    }
+
+    this.provider.transfer(output.id, tokenIds);
   }
 
   public addInput(input: CraftIngredient) {
@@ -212,13 +198,11 @@ export class Crafting {
    * @param input
    * @returns
    */
-  @withSDKError({ type: 'CRAFTING_ERROR' })
   public async validate() {
     // TODO: submit craft to BE for validation
     return true;
   }
 
-  @withSDKError({ type: 'CRAFTING_ERROR' })
   public async getTransactions(
     gameId: string,
     userId: string
