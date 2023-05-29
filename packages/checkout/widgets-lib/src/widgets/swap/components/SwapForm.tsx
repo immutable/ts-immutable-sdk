@@ -2,7 +2,7 @@ import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
 import {
-  Body, Box, Heading, OptionKey,
+  Body, Box, Heading,
 } from '@biom3/react';
 import { utils } from 'ethers';
 import { GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
@@ -99,13 +99,17 @@ export function SwapForm() {
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
   const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | null>(null);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
+  const generateTokenId = (token?: TokenInfo | null): string => {
+    return token ? `${token.symbol}-${token.name}` : ''
+  }
   const tokensOptionsFrom = useMemo(
     () => tokenBalances
       .filter((b) => b.balance.gt(0))
       .map(
         (t) => ({
-          id: `${t.token.symbol}-${t.token.name}`,
-          label: t.token.symbol,
+          id: generateTokenId(t.token),
+          name: t.token.name,
+          symbol: t.token.symbol,
           icon: t.token.icon,
         } as SelectOption),
       ),
@@ -117,8 +121,9 @@ export function SwapForm() {
       .filter((t) => t.address !== fromToken?.token.address)
       .map(
         (t) => ({
-          id: `${t.symbol}-${t.name}`,
-          label: t.symbol,
+          id: generateTokenId(t),
+          name: t.name,
+          symbol: t.symbol,
           icon: undefined, // todo: add correct image once available on token info
         } as SelectOption),
       ),
@@ -330,7 +335,7 @@ export function SwapForm() {
     ));
   }, [fromAmount, fromToken]);
 
-  const onFromSelectChange = (value: OptionKey) => {
+  const onFromSelectChange = (value: string) => {
     const selected = tokenBalances.find((t) => value === `${t.token.symbol}-${t.token.name}`);
     if (!selected) return;
 
@@ -364,7 +369,7 @@ export function SwapForm() {
   // ------------//
   //      TO     //
   // ------------//
-  const onToSelectChange = (value: OptionKey) => {
+  const onToSelectChange = (value: string) => {
     const selected = allowedTokens.find((t) => value === `${t.symbol}-${t.name}`);
     if (!selected) return;
     setToToken(selected);
@@ -474,6 +479,7 @@ export function SwapForm() {
               selectErrorMessage={fromTokenError}
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
+              selectedOption={generateTokenId(fromToken?.token)}
             />
           </Box>
 
@@ -511,6 +517,7 @@ export function SwapForm() {
               selectErrorMessage={toTokenError}
               selectInputDisabled={isFetching}
               textInputDisabled={isFetching}
+              selectedOption={generateTokenId(toToken)}
             />
           </Box>
         </Box>

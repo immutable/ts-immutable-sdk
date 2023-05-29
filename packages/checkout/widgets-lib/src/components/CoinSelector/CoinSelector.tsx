@@ -13,7 +13,8 @@ type CoinSelectorProps = {
 
 type Option = {
   onClick: () => void;
-  icon: AllIconKeys;
+  icon?: AllIconKeys;
+  framedImageUrl?: string;
   name: string;
   symbol: string;
   balance?: {
@@ -25,11 +26,12 @@ type Option = {
 type CoinSelectorOptionProps = Option;
 
 export function CoinSelectorOption({
-  onClick, icon, name, symbol, balance,
+  onClick, icon, name, symbol, balance, framedImageUrl
 }: CoinSelectorOptionProps) {
   return (
     <MenuItem emphasized size="small" onClick={onClick}>
-      <MenuItem.Icon icon={icon} />
+      {icon && <MenuItem.Icon icon={icon} />}
+      {framedImageUrl && <MenuItem.FramedImage imageUrl={framedImageUrl} />}
       <MenuItem.Label>{name}</MenuItem.Label>
       <MenuItem.Caption>{symbol}</MenuItem.Caption>
       {

@@ -1,4 +1,4 @@
-import { Box, OptionKey } from '@biom3/react';
+import { Box } from '@biom3/react';
 import {
   inputStyle,
   selectInputBoxStyle,
@@ -18,6 +18,7 @@ interface SelectInputProps {
   textInputErrorMessage?: string;
   selectSubtext?: string;
   selectErrorMessage?: string;
+  selectedOption?: string | null;
   textInputDisabled?: boolean;
   selectInputDisabled?: boolean;
   textInputValidator: (value: string) => boolean;
@@ -25,7 +26,7 @@ interface SelectInputProps {
   onTextInputBlur: (value: string) => void;
   onTextInputFocus?: (value: string) => void;
   textInputMaxButtonClick?: () => void;
-  onSelectChange: (value: OptionKey) => void;
+  onSelectChange: (value: string) => void;
 }
 
 export function SelectInput({
@@ -47,6 +48,7 @@ export function SelectInput({
   onSelectChange,
   textInputDisabled,
   selectInputDisabled,
+  selectedOption,
 }: SelectInputProps) {
   return (
     <Box sx={selectInputBoxStyle}>
@@ -59,6 +61,7 @@ export function SelectInput({
           errorMessage={selectErrorMessage}
           onSelectChange={onSelectChange}
           disabled={selectInputDisabled}
+          selectedOption={selectedOption}
         />
       </Box>
       <Box sx={inputStyle}>
