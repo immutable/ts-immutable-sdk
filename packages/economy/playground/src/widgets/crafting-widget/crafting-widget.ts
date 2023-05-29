@@ -115,8 +115,6 @@ export class CraftingWidget extends LitElement {
     this.recipes = await this.economy.recipe.getAll({
       gameId: this.gameId,
     });
-
-    this.selectRecipe(this.recipes[2].id as string);
   }
 
   async getInventory() {
