@@ -2,6 +2,7 @@
 generate-openapi: get-openapi-sandbox generate-api
 
 .PHONY: get-openapi
+# TODO udpate URL once we release to testnet
 get-openapi-sandbox:
 	rm openapi.json && touch openapi.json && \
 	curl -H "Accept: application/json+v3" \
