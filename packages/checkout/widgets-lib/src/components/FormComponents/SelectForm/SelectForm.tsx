@@ -2,22 +2,14 @@
 import {
   Select, Option, Box, OptionKey,
 } from '@biom3/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FormControlWrapper } from '../FormControlWrapper/FormControlWrapper';
 import { CoinSelector } from '../../CoinSelector/CoinSelector';
-
-type IconList = 'EthToken' | 'ImxTokenDex';
-
-export interface SelectOption {
-  id: string;
-  name: string;
-  icon?: IconList;
-  symbol: string;
-}
+import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 
 interface SelectFormProps {
   id: string;
-  options: SelectOption[];
+  options: CoinSelectorOptionProps[];
   textAlign?: 'left' | 'right';
   subtext?: string;
   errorMessage?: string;
@@ -40,22 +32,20 @@ export function SelectForm({
 }: SelectFormProps) {
   const [coinSelectorOpen, setCoinSelectorOpen] = useState<boolean>(false);
 
+  const coinSelectorOptions = useMemo(() => options.map((option) => ({
+    ...option,
+    onClick: () => {
+      onSelectChange(option.id);
+      setCoinSelectorOpen(false);
+    },
+  })), [options]);
+
   return (
     <Box>
       <CoinSelector
         testId={id}
         heading={coinSelectorHeading}
-        options={
-          options.map((option) => ({
-            ...option,
-            icon: option.icon || 'Coins',
-            framedImageUrl: option.icon,
-            onClick: () => {
-              onSelectChange(option.id);
-              setCoinSelectorOpen(false);
-            },
-          }))
-        }
+        options={coinSelectorOptions}
         visible={coinSelectorOpen}
         onCloseBottomSheet={() => setCoinSelectorOpen(false)}
       />

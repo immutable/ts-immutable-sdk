@@ -16,7 +16,6 @@ import { DEFAULT_IMX_DECIMALS } from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
-import { SelectOption } from '../../../components/FormComponents/SelectForm/SelectForm';
 import {
   validateFromAmount,
   validateFromToken,
@@ -26,6 +25,7 @@ import {
 import { Fees } from './Fees';
 import { SwapButton } from './SwapButton';
 import { SwapFormData } from './swapFormTypes';
+import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -123,7 +123,15 @@ export function SwapForm({ data }: SwapFromProps) {
           name: t.token.name,
           symbol: t.token.symbol,
           icon: t.token.icon,
-        } as SelectOption),
+          balance: {
+            formattedAmount: t.formattedBalance,
+            formattedFiatAmount: calculateCryptoToFiat(
+              t.formattedBalance,
+              t.token.symbol || '',
+              cryptoFiatState.conversions,
+            ),
+          },
+        } as CoinSelectorOptionProps),
       ),
     [tokenBalances],
   );
@@ -136,7 +144,7 @@ export function SwapForm({ data }: SwapFromProps) {
           name: t.name,
           symbol: t.symbol,
           icon: undefined, // todo: add correct image once available on token info
-        } as SelectOption),
+        } as CoinSelectorOptionProps),
       ),
     [allowedTokens, fromToken],
   );

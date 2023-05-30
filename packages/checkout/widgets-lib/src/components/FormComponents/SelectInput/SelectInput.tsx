@@ -4,12 +4,13 @@ import {
   selectInputBoxStyle,
   selectStyle,
 } from './SelectInputStyles';
-import { SelectForm, SelectOption } from '../SelectForm/SelectForm';
+import { SelectForm } from '../SelectForm/SelectForm';
 import { TextInputForm } from '../TextInputForm/TextInputForm';
+import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 
 interface SelectInputProps {
   id: string;
-  options: SelectOption[];
+  options: CoinSelectorOptionProps[];
   selectTextAlign?: 'left' | 'right';
   textInputTextAlign?: 'left' | 'right';
   textInputValue: string;

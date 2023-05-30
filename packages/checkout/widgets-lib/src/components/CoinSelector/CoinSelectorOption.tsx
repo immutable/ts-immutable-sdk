@@ -1,29 +1,26 @@
 import { MenuItem, AllIconKeys } from '@biom3/react';
 
-export type CoinSelectorOptionProps = {
-  onClick: () => void;
-  id: string;
-  icon?: AllIconKeys;
-  framedImageUrl?: string;
-  name: string;
-  symbol: string;
+export interface CoinSelectorOptionProps {
   testId?: string;
+  id: string;
+  name: string;
+  icon?: AllIconKeys;
+  symbol: string;
+  onClick?: () => void
   balance?: {
     formattedFiatAmount: string;
     formattedAmount: string;
   }
-};
+}
 
 export function CoinSelectorOption({
-  onClick, icon, name, symbol, balance, framedImageUrl, id, testId,
+  onClick, icon, name, symbol, balance, testId, id,
 }: CoinSelectorOptionProps) {
   return (
     <MenuItem testId={`${testId}-coin-selector__option-${id}`} emphasized size="small" onClick={onClick}>
-      {
-        framedImageUrl || icon
-          ? (framedImageUrl && <MenuItem.FramedImage imageUrl={framedImageUrl} />)
-          : (icon && <MenuItem.Icon icon={icon} />)
-      }
+      {!icon && <MenuItem.Icon icon="Coins" variant="bold" />}
+      {icon && <MenuItem.FramedImage imageUrl={icon} circularFrame />}
+
       <MenuItem.Label>{name}</MenuItem.Label>
       <MenuItem.Caption>{symbol}</MenuItem.Caption>
       {

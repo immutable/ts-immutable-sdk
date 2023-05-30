@@ -13,7 +13,7 @@ import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fi
 import { text } from '../../../resources/text/textConfig';
 import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
 import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
-import { SelectForm, SelectOption } from '../../../components/FormComponents/SelectForm/SelectForm';
+import { SelectForm } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
 import { Fees } from './Fees';
 import {
@@ -21,6 +21,7 @@ import {
   bridgeFormWrapperStyles,
   formInputsContainerStyles,
 } from './BridgeFormStyles';
+import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 
 interface BridgeFormProps {
   testId?: string;
@@ -55,7 +56,7 @@ export function BridgeForm(props: BridgeFormProps) {
           name: t.token.name,
           symbol: t.token.symbol,
           icon: t.token.icon,
-        } as SelectOption),
+        } as CoinSelectorOptionProps),
       ),
     [tokenBalances],
   );
