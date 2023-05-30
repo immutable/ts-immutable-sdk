@@ -5,8 +5,8 @@
 import type { Order } from './Order';
 import type { Page } from './Page';
 
-export type Orders = {
-  page?: Page;
+export type ListOrdersResult = {
+  page: Page;
   result: Array<Order>;
 };
 

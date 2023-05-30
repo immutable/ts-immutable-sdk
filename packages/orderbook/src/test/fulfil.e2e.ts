@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { Order } from 'openapi/sdk';
+import { OrderStatus } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getConfig } from './helpers/config';
@@ -59,11 +59,11 @@ describe('fulfil order', () => {
       orderSignature: signature,
     });
 
-    await waitForOrderToBeOfStatus(sdk, order.id, Order.status.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, order.id, OrderStatus.ACTIVE);
 
     const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(order.id, fulfiller.address);
     await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
 
-    await waitForOrderToBeOfStatus(sdk, order.id, Order.status.FILLED);
+    await waitForOrderToBeOfStatus(sdk, order.id, OrderStatus.FILLED);
   }, 60_000);
 });

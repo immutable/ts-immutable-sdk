@@ -19,7 +19,7 @@ export namespace CreateOrderProtocolData {
    * The Order type
    */
   export enum order_type {
-    FULL_OPEN = 'FULL_OPEN',
+    FULL_RESTRICTED = 'FULL_RESTRICTED',
   }
 
 
