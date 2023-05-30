@@ -279,17 +279,19 @@ export class CraftingWidget extends LitElement {
                 <div class="divider lg:divider-horizontal">🟰</div>
                 <!-- SUMMARY -->
                 <div class="flex-grow bg-gray-300">
-                  <div class="flex justify-center bg-gray-400 w-full p-2">
-                    <button class="btn btn-wide" @click=${this.sendCraft}>
-                      Craft
-                    </button>
-                  </div>
                   <div class="flex flex-col w-full items-center">
                     <crafting-summary
                       class="w-full"
                       .recipe="${this.selectedRecipe}"
-                      .items="${this.outputItems}"
+                      .outputItems="${this.outputItems}"
+                      .selectedItems="${selectedItems}"
+                      .inputs="${this.economy.state.craftingInputs}"
                     ></crafting-summary>
+                  </div>
+                  <div class="flex justify-center bg-gray-400 w-full p-2">
+                    <button class="btn btn-wide" @click=${this.sendCraft}>
+                      Craft
+                    </button>
                   </div>
                 </div>
                 <!-- SUMMARY -->
