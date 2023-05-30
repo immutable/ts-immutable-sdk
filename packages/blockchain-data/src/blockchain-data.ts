@@ -26,6 +26,7 @@ import {
   BlockchainDataConfiguration,
   BlockchainDataModuleConfiguration,
 } from 'config';
+import { formatError } from 'utils/formatErrors';
 
 export class BlockchainData {
   private readonly activities: ActivitiesApi;
@@ -52,7 +53,7 @@ export class BlockchainData {
    * List all activities
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a list of activities
-   * @throws {@link index.IMXError} // TODO FIXME
+   * @throws {@link index.APIError}
    */
   public async listActivities(
     request: ActivitiesApiListActivitiesRequest
@@ -61,8 +62,7 @@ export class BlockchainData {
       .listActivities(request)
       .then((res) => res.data)
       .catch((err) => {
-        // throw formatError(err); TODO format error correctly according to our error shape
-        throw new Error(err);
+        throw formatError(err);
       });
   }
 
@@ -70,7 +70,7 @@ export class BlockchainData {
    * Get a single activity by ID
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a single activity
-   * @throws {@link index.IMXError} // TODO FIXME
+   * @throws {@link index.APIError}
    */
   public async getActivity(
     request: ActivitiesApiGetActivityRequest
@@ -79,8 +79,7 @@ export class BlockchainData {
       .getActivity(request)
       .then((res) => res.data)
       .catch((err) => {
-        // throw formatError(err); TODO format error correctly according to our error shape
-        throw new Error(err);
+        throw formatError(err);
       });
   }
 
@@ -88,7 +87,7 @@ export class BlockchainData {
    * List supported chains
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a list of supported chains
-   * @throws {@link index.IMXError} // TODO FIXME
+   * @throws {@link index.APIError}
    */
   public async listChains(
     request: ChainsApiListChainsRequest
@@ -97,8 +96,7 @@ export class BlockchainData {
       .listChains(request)
       .then((res) => res.data)
       .catch((err) => {
-        // throw formatError(err); TODO format error correctly according to our error shape
-        throw new Error(err);
+        throw formatError(err);
       });
   }
 
@@ -106,7 +104,7 @@ export class BlockchainData {
    * List all collections
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a list of collections
-   * @throws {@link index.IMXError} // TODO FIXME
+   * @throws {@link index.APIError}
    */
   public async listCollections(
     request: CollectionsApiListCollectionsRequest
@@ -115,8 +113,7 @@ export class BlockchainData {
       .listCollections(request)
       .then((res) => res.data)
       .catch((err) => {
-        // throw formatError(err); TODO format error correctly according to our error shape
-        throw new Error(err);
+        throw formatError(err);
       });
   }
 
@@ -124,7 +121,7 @@ export class BlockchainData {
    * Get collection by contract address
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a single collection
-   * @throws {@link index.IMXError} // TODO FIXME
+   * @throws {@link index.APIError}
    */
   public async getCollection(
     request: CollectionsApiGetCollectionRequest
@@ -133,8 +130,7 @@ export class BlockchainData {
       .getCollection(request)
       .then((res) => res.data)
       .catch((err) => {
-        // throw formatError(err); TODO format error correctly according to our error shape
-        throw new Error(err);
+        throw formatError(err);
       });
   }
 
@@ -142,15 +138,14 @@ export class BlockchainData {
    * Get NFT by token ID
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a single NFT
-   * @throws {@link index.IMXError} // TODO FIXME
+   * @throws {@link index.APIError}
    */
   public async getNFT(request: NftsApiGetNFTRequest): Promise<GetNFTResult> {
     return await this.nfts
       .getNFT(request)
       .then((res) => res.data)
       .catch((err) => {
-        // throw formatError(err); TODO format error correctly according to our error shape
-        throw new Error(err);
+        throw formatError(err);
       });
   }
 
@@ -158,7 +153,7 @@ export class BlockchainData {
    * List NFTs by contract address
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a list of NFTs
-   * @throws {@link index.IMXError} // TODO FIXME
+   * @throws {@link index.APIError}
    */
   public async listNFTs(
     request: NftsApiListNFTsRequest
@@ -167,8 +162,7 @@ export class BlockchainData {
       .listNFTs(request)
       .then((res) => res.data)
       .catch((err) => {
-        // throw formatError(err); TODO format error correctly according to our error shape
-        throw new Error(err);
+        throw formatError(err);
       });
   }
 
@@ -176,7 +170,7 @@ export class BlockchainData {
    * List NFTs by account address
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a list of NFTs
-   * @throws {@link index.IMXError} // TODO FIXME
+   * @throws {@link index.APIError}
    */
   public async listNFTsByAccountAddress(
     request: NftsApiListNFTsByAccountAddressRequest
@@ -185,8 +179,7 @@ export class BlockchainData {
       .listNFTsByAccountAddress(request)
       .then((res) => res.data)
       .catch((err) => {
-        // throw formatError(err); TODO format error correctly according to our error shape
-        throw new Error(err);
+        throw formatError(err);
       });
   }
 
@@ -194,7 +187,7 @@ export class BlockchainData {
    * List NFT owners by token ID
    * @param request - the request object containing the parameters to be provided in the API request
    * @returns a promise that resolves with a list of NFT owners
-   * @throws {@link index.IMXError} // TODO FIXME
+   * @throws {@link index.APIError}
    */
   public async listNFTOwners(
     request: NftOwnersApiListNFTOwnersRequest
@@ -203,8 +196,7 @@ export class BlockchainData {
       .listNFTOwners(request)
       .then((res) => res.data)
       .catch((err) => {
-        // throw formatError(err); TODO format error correctly according to our error shape
-        throw new Error(err);
+        throw formatError(err);
       });
   }
 }
