@@ -1,56 +1,17 @@
 import {
-  BottomSheet, Box, MenuItem, AllIconKeys,
+  BottomSheet, Box,
 } from '@biom3/react';
 import { selectOptionsContainerStyles } from './styles';
+import { CoinSelectorOption, CoinSelectorOptionProps } from './CoinSelectorOption';
 
 type CoinSelectorProps = {
   onCloseBottomSheet?: () => void;
   heading: string;
-  options: Option[];
+  options: CoinSelectorOptionProps[];
   children?: any;
   visible?: boolean;
   testId?: string;
 };
-
-type Option = {
-  onClick: () => void;
-  id: string;
-  icon?: AllIconKeys;
-  framedImageUrl?: string;
-  name: string;
-  symbol: string;
-  testId?: string;
-  balance?: {
-    formattedFiatAmount: string;
-    formattedAmount: string;
-  }
-};
-
-type CoinSelectorOptionProps = Option;
-
-export function CoinSelectorOption({
-  onClick, icon, name, symbol, balance, framedImageUrl, id, testId,
-}: CoinSelectorOptionProps) {
-  return (
-    <MenuItem testId={`${testId}-coin-selector__option-${id}`} emphasized size="small" onClick={onClick}>
-      {
-        framedImageUrl || icon
-          ? (framedImageUrl && <MenuItem.FramedImage imageUrl={framedImageUrl} />)
-          : (icon && <MenuItem.Icon icon={icon} />)
-      }
-      <MenuItem.Label>{name}</MenuItem.Label>
-      <MenuItem.Caption>{symbol}</MenuItem.Caption>
-      {
-        balance && (
-          <MenuItem.PriceDisplay
-            fiatAmount={balance.formattedFiatAmount}
-            price={balance.formattedAmount}
-          />
-        )
-      }
-    </MenuItem>
-  );
-}
 
 export function CoinSelector({
   heading, options, children, onCloseBottomSheet, visible, testId,
