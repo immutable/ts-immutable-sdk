@@ -33,8 +33,11 @@ export function CoinSelectorOption({
 }: CoinSelectorOptionProps) {
   return (
     <MenuItem testId={`${testId}-coin-selector__option-${id}`} emphasized size="small" onClick={onClick}>
-      {icon && <MenuItem.Icon icon={icon} />}
-      {framedImageUrl && <MenuItem.FramedImage imageUrl={framedImageUrl} />}
+      {
+        framedImageUrl || icon
+          ? (framedImageUrl && <MenuItem.FramedImage imageUrl={framedImageUrl} />)
+          : (icon && <MenuItem.Icon icon={icon} />)
+      }
       <MenuItem.Label>{name}</MenuItem.Label>
       <MenuItem.Caption>{symbol}</MenuItem.Caption>
       {
