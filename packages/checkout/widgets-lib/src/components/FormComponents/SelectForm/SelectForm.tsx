@@ -71,7 +71,7 @@ export function SelectForm({
           testId={`${id}-select`}
           size="large"
           defaultLabel="Select coin"
-          targetClickOveride={() => { setCoinSelectorOpen(true); }}
+          targetClickOveride={() => setCoinSelectorOpen(true)}
           selectedOption={selectedOption || undefined}
         >
           {options.map((option) => (
