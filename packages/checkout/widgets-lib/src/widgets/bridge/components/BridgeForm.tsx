@@ -52,7 +52,8 @@ export function BridgeForm(props: BridgeFormProps) {
       .map(
         (t) => ({
           id: `${t.token.symbol}-${t.token.name}`,
-          label: t.token.symbol,
+          name: t.token.name,
+          symbol: t.token.symbol,
           icon: t.token.icon,
         } as SelectOption),
       ),
