@@ -4,12 +4,13 @@ import {
   selectInputBoxStyle,
   selectStyle,
 } from './SelectInputStyles';
-import { SelectForm, SelectOption } from '../SelectForm/SelectForm';
+import { SelectForm } from '../SelectForm/SelectForm';
 import { TextInputForm } from '../TextInputForm/TextInputForm';
+import { CoinSelectorOptionProps } from '../../CoinSelector/CoinSelectorOption';
 
 interface SelectInputProps {
   id: string;
-  options: SelectOption[];
+  options: CoinSelectorOptionProps[];
   selectTextAlign?: 'left' | 'right';
   textInputTextAlign?: 'left' | 'right';
   textInputValue: string;
@@ -18,6 +19,7 @@ interface SelectInputProps {
   textInputErrorMessage?: string;
   selectSubtext?: string;
   selectErrorMessage?: string;
+  coinSelectorHeading: string;
   textInputDisabled?: boolean;
   selectInputDisabled?: boolean;
   textInputValidator: (value: string) => boolean;
@@ -49,6 +51,7 @@ export function SelectInput({
   textInputDisabled,
   selectInputDisabled,
   selectedOption,
+  coinSelectorHeading,
 }: SelectInputProps) {
   return (
     <Box sx={selectInputBoxStyle}>
@@ -62,6 +65,7 @@ export function SelectInput({
           onSelectChange={onSelectChange}
           disabled={selectInputDisabled}
           selectedOption={selectedOption}
+          coinSelectorHeading={coinSelectorHeading}
         />
       </Box>
       <Box sx={inputStyle}>

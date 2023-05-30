@@ -13,7 +13,7 @@ import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fi
 import { text } from '../../../resources/text/textConfig';
 import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
 import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
-import { SelectForm, SelectOption } from '../../../components/FormComponents/SelectForm/SelectForm';
+import { SelectForm } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
 import { Fees } from './Fees';
 import {
@@ -21,6 +21,7 @@ import {
   bridgeFormWrapperStyles,
   formInputsContainerStyles,
 } from './BridgeFormStyles';
+import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 
 interface BridgeFormProps {
   testId?: string;
@@ -52,9 +53,10 @@ export function BridgeForm(props: BridgeFormProps) {
       .map(
         (t) => ({
           id: `${t.token.symbol}-${t.token.name}`,
-          label: t.token.symbol,
+          name: t.token.name,
+          symbol: t.token.symbol,
           icon: t.token.icon,
-        } as SelectOption),
+        } as CoinSelectorOptionProps),
       ),
     [tokenBalances],
   );
@@ -201,6 +203,7 @@ export function BridgeForm(props: BridgeFormProps) {
           <SelectForm
             id="bridge-token"
             options={tokensOptions}
+            coinSelectorHeading={bridgeForm.from.selectorTitle}
             selectedOption={selectedOption}
             subtext={token
               ? `${content.availableBalancePrefix} ${tokenValueFormat(token?.formattedBalance)}`
@@ -213,7 +216,7 @@ export function BridgeForm(props: BridgeFormProps) {
           <TextInputForm
             id="bridge-amount"
             value={amount}
-            placeholder={bridgeForm.inputPlaceholder}
+            placeholder={bridgeForm.from.inputPlaceholder}
             subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}
             validator={amountInputValidation}
             onTextInputChange={(value) => handleBridgeAmountChange(value)}

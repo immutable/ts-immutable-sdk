@@ -95,10 +95,12 @@ export const text = {
         from: {
           label: 'From',
           inputPlaceholder: '0',
+          selectorTitle: 'What would you like to swap from?',
         },
         to: {
           label: 'To',
           inputPlaceholder: '0',
+          selectorTitle: 'What would you like to swap to?',
         },
         buttonText: 'Swap',
       },
@@ -134,7 +136,10 @@ export const text = {
         availableBalancePrefix: 'Available',
       },
       bridgeForm: {
-        inputPlaceholder: '0',
+        from: {
+          inputPlaceholder: '0',
+          selectorTitle: 'What would you like to bridge?',
+        },
         buttonText: 'Move',
       },
       fees: {
