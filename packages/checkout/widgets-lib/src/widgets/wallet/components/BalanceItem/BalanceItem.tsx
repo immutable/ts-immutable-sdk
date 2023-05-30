@@ -18,9 +18,7 @@ import {
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';
 import {
-  sendRequestBridgeEvent,
-  sendRequestOnRampEvent,
-  sendRequestSwapEvent,
+  orchestrationEvents,
 } from '../../../../lib/orchestrationEvents';
 import { l1Network, zkEVMNetwork } from '../../../../lib/networkUtils';
 import { formatZeroAmount } from '../../../../lib/utils';
@@ -80,8 +78,8 @@ export function BalanceItem(props: BalanceItemProps) {
               testId="balance-item-add-option"
               sx={ShowMenuItem(isOnRampEnabled)}
               onClick={() => {
-                sendRequestOnRampEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
-                  tokenAddress: '',
+                orchestrationEvents.sendRequestOnRampEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
+                  tokenAddress: balanceInfo.address ?? '',
                   amount: '',
                 });
               }}
@@ -93,8 +91,8 @@ export function BalanceItem(props: BalanceItemProps) {
               testId="balance-item-swap-option"
               sx={ShowMenuItem(isSwapEnabled)}
               onClick={() => {
-                sendRequestSwapEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
-                  fromTokenAddress: '',
+                orchestrationEvents.sendRequestSwapEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
+                  fromTokenAddress: balanceInfo.address ?? '',
                   toTokenAddress: '',
                   amount: '',
                 });
@@ -107,8 +105,8 @@ export function BalanceItem(props: BalanceItemProps) {
               testId="balance-item-move-option"
               sx={ShowMenuItem(isBridgeEnabled)}
               onClick={() => {
-                sendRequestBridgeEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
-                  tokenAddress: '',
+                orchestrationEvents.sendRequestBridgeEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
+                  tokenAddress: balanceInfo.address ?? '',
                   amount: '',
                 });
               }}

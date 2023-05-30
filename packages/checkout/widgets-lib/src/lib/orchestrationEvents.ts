@@ -7,7 +7,7 @@ import {
   WidgetEvent,
 } from '@imtbl/checkout-widgets';
 
-export function sendRequestOnRampEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: RequestOnrampEvent) {
+function sendRequestOnRampEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: RequestOnrampEvent) {
   const requestOnrampEvent = new CustomEvent<WidgetEvent<RequestOnrampEvent>>(
     imtblWidgetEvent,
     {
@@ -23,7 +23,7 @@ export function sendRequestOnRampEvent(imtblWidgetEvent: IMTBLWidgetEvents, even
   if (window !== undefined) window.dispatchEvent(requestOnrampEvent);
 }
 
-export function sendRequestSwapEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: RequestSwapEvent) {
+function sendRequestSwapEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: RequestSwapEvent) {
   const requestSwapEvent = new CustomEvent<WidgetEvent<RequestSwapEvent>>(
     imtblWidgetEvent,
     {
@@ -39,7 +39,7 @@ export function sendRequestSwapEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventD
   if (window !== undefined) window.dispatchEvent(requestSwapEvent);
 }
 
-export function sendRequestBridgeEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: RequestBridgeEvent) {
+function sendRequestBridgeEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: RequestBridgeEvent) {
   const requestBridgeEvent = new CustomEvent<WidgetEvent<RequestBridgeEvent>>(imtblWidgetEvent, {
     detail: {
       type: OrchestrationEventType.REQUEST_BRIDGE,
@@ -51,3 +51,9 @@ export function sendRequestBridgeEvent(imtblWidgetEvent: IMTBLWidgetEvents, even
   console.log('bridge coins event:', requestBridgeEvent);
   if (window !== undefined) window.dispatchEvent(requestBridgeEvent);
 }
+
+export const orchestrationEvents = {
+  sendRequestBridgeEvent,
+  sendRequestSwapEvent,
+  sendRequestOnRampEvent,
+};
