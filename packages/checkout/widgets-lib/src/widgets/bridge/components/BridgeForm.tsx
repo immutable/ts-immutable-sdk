@@ -202,6 +202,7 @@ export function BridgeForm(props: BridgeFormProps) {
           <SelectForm
             id="bridge-token"
             options={tokensOptions}
+            coinSelectorHeading="What would you like to bridge?"
             selectedOption={selectedOption}
             subtext={token
               ? `${content.availableBalancePrefix} ${tokenValueFormat(token?.formattedBalance)}`
