@@ -1,9 +1,4 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable class-methods-use-this */
-/**
- * @jest-environment node
- */
+/** @jest-environment jsdom */
 
 import 'reflect-metadata';
 import Container from 'typedi';
@@ -22,15 +17,22 @@ describe(Recipe.name, () => {
   describe('getRecipes', () => {
     describe('when status is 200', () => {
       it('should return an array of recipes ', async () => {
-        const recipesGetFn = jest.fn().mockImplementation((input: { gameId: string, filter?: string[] }) => ({
-          status: 200,
-          data: [],
-        }));
-        Container.set(StudioBE, new (class {
-          recipeApi = {
-            recipesGet: recipesGetFn,
-          };
-        })());
+        const recipesGetFn = jest
+          .fn()
+          .mockImplementation(
+            (input: { gameId: string; filter?: string[] }) => ({
+              status: 200,
+              data: [],
+            }),
+          );
+        Container.set(
+          StudioBE,
+          new (class {
+            recipeApi = {
+              recipesGet: recipesGetFn,
+            };
+          })(),
+        );
 
         const recipe = Container.get(Recipe);
         const response = await recipe.getAll({ gameId: '111' });
@@ -41,19 +43,28 @@ describe(Recipe.name, () => {
 
     describe('when status is not 200', () => {
       it('should throw error', async () => {
-        const recipesGetFn = jest.fn().mockImplementation((input: { gameId: string, filter?: string[] }) => {
-          throw new Error();
-        });
-        Container.set(StudioBE, new (class {
-          recipeApi = {
-            recipesGet: recipesGetFn,
-          };
-        })());
+        const recipesGetFn = jest
+          .fn()
+          .mockImplementation(
+            (input: { gameId: string; filter?: string[] }) => {
+              throw new Error();
+            },
+          );
+        Container.set(
+          StudioBE,
+          new (class {
+            recipeApi = {
+              recipesGet: recipesGetFn,
+            };
+          })(),
+        );
         const recipe = Container.get(Recipe);
 
         try {
           expect(recipe.getAll({ gameId: '' })).toThrowError();
-        } catch (error) { /* empty */ }
+        } catch (error) {
+          /* empty */
+        }
 
         try {
           const response = await recipe.getAll({ gameId: '' });

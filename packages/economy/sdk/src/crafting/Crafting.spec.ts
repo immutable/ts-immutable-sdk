@@ -1,3 +1,5 @@
+/** @jest-environment jsdom */
+
 import 'reflect-metadata';
 import Container from 'typedi';
 
