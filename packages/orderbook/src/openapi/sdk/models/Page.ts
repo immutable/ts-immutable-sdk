@@ -2,6 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
+/**
+ * Pagination properties
+ */
 export type Page = {
   /**
    * First item as base64 encoded string

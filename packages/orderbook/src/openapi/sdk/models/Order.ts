@@ -4,6 +4,7 @@
 
 import type { BuyItem } from './BuyItem';
 import type { Fee } from './Fee';
+import type { OrderStatus } from './OrderStatus';
 import type { ProtocolData } from './ProtocolData';
 import type { SellItem } from './SellItem';
 
@@ -41,31 +42,10 @@ export type Order = {
    * Time after which Order is considered active
    */
   start_time: string;
-  /**
-   * Order status
-   */
-  status: Order.status;
+  status: OrderStatus;
   /**
    * Time the Order is last updated
    */
   update_time: string;
 };
-
-export namespace Order {
-
-  /**
-   * Order status
-   */
-  export enum status {
-    PENDING = 'PENDING',
-    ACTIVE = 'ACTIVE',
-    CANCELLED = 'CANCELLED',
-    INACTIVE = 'INACTIVE',
-    REJECTED = 'REJECTED',
-    FILLED = 'FILLED',
-    EXPIRED = 'EXPIRED',
-  }
-
-
-}
 

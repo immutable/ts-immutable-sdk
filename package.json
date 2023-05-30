@@ -15,7 +15,6 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
     "node-gyp": "^9.3.1",
-    "prettier": "^2.8.7",
     "release-it": "^15.10.1",
     "syncpack": "^9.8.4",
     "wsrun": "^5.2.4"
@@ -65,6 +64,7 @@
     "packages/internal/bridge/sdk",
     "packages/internal/guardian",
     "packages/internal/bridge/bridge-sample-app",
+    "packages/internal/multi-rollup-api-client",
     "packages/checkout/sdk",
     "packages/checkout/sdk-sample-app",
     "packages/checkout/widgets",

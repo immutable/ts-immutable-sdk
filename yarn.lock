@@ -3030,7 +3030,6 @@ __metadata:
     immer: ^10.0.2
     jest: ^29.4.3
     jest-environment-jsdom: ^29.4.3
-    linqts: ^1.15.0
     prettier: ^2.8.7
     reflect-metadata: ^0.1.13
     rollup: ^3.17.2
@@ -3076,6 +3075,14 @@ __metadata:
     jest-environment-jsdom: ^29.4.3
     rollup: ^3.17.2
     typescript: ^4.9.5
+  languageName: unknown
+  linkType: soft
+
+"@imtbl/multi-rollup-api-client@workspace:packages/internal/multi-rollup-api-client":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/multi-rollup-api-client@workspace:packages/internal/multi-rollup-api-client"
+  dependencies:
+    rollup: ^3.17.2
   languageName: unknown
   linkType: soft
 
@@ -18125,13 +18132,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"linqts@npm:^1.15.0":
-  version: 1.15.0
-  resolution: "linqts@npm:1.15.0"
-  checksum: 2be0daf81ce2743a6c6e41b5d7a4b70d52c30db7e9f9a95a370acbce5626936debf2e8724b2589c5afac4efce876f6551f49584d850a5a4f2625b3ae5e709c6b
-  languageName: node
-  linkType: hard
-
 "lint-staged@npm:^13.2.0":
   version: 13.2.2
   resolution: "lint-staged@npm:13.2.2"
@@ -25331,7 +25331,6 @@ __metadata:
     husky: ^8.0.3
     lint-staged: ^13.2.0
     node-gyp: ^9.3.1
-    prettier: ^2.8.7
     release-it: ^15.10.1
     syncpack: ^9.8.4
     wsrun: ^5.2.4

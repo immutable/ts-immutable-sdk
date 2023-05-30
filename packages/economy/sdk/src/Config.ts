@@ -26,7 +26,7 @@ export const defaultConfig: EconomyModuleConfiguration = {
   imxProvider: undefined,
 };
 
-export class ConfigurtionError extends Error {
+export class ConfigurationError extends Error {
   public message: string;
 
   constructor(message: string) {
@@ -48,7 +48,7 @@ export class Config {
   constructor(readonly config: EconomyModuleConfiguration) {
     const envKeys = Object.values(Environment);
     if (!envKeys.includes(config.baseConfig.environment)) {
-      throw new ConfigurtionError(
+      throw new ConfigurationError(
         `Invalid environment key, must be one of ${envKeys}`,
       );
     }
