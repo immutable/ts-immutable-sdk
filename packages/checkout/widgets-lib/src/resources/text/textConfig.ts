@@ -30,8 +30,8 @@ export const text = {
     [ConnectWidgetViews.SWITCH_NETWORK]: {
       eth: {
         heading:
-        'To move your coins, you\'ll need to switch to the Sepolia network',
-        body: 'You\'ll be prompted to switch networks in Metamask. You\'ll be able to switch back when needed.',
+          "To move your coins, you'll need to switch to the Sepolia network",
+        body: "You'll be prompted to switch networks in Metamask. You'll be able to switch back when needed.",
         button: {
           text: 'Ready to Switch',
           retryText: 'Try Again',
@@ -39,8 +39,8 @@ export const text = {
       },
       zkEVM: {
         heading:
-        'To trade here, MetaMask will ask you to switch to the Immutable zkEVM network',
-        body: 'Check for the pop-up from MetaMask and \'Approve\' to switch. If this is the first time, MetaMask will also ask you to add the network.',
+          'To trade here, MetaMask will ask you to switch to the Immutable zkEVM network',
+        body: "Check for the pop-up from MetaMask and 'Approve' to switch. If this is the first time, MetaMask will also ask you to add the network.",
         button: {
           text: 'Ready to Switch',
           retryText: 'Try Again',
@@ -50,6 +50,7 @@ export const text = {
     [BaseViews.ERROR]: {
       heading: "Something's gone wrong",
       body: ['You can try again or contact', 'support', 'for help.'],
+      actionText: 'Try again',
     },
     [BaseViews.LOADING_VIEW]: {
       text: 'Loading',
@@ -113,6 +114,14 @@ export const text = {
       success: {
         text: 'Success',
         actionText: 'Continue',
+      },
+      failed: {
+        text: 'Transaction rejected',
+        actionText: 'Try again',
+      },
+      rejected: {
+        text: 'Price surge',
+        actionText: 'Review & try again',
       },
     },
     [BridgeWidgetViews.BRIDGE]: {

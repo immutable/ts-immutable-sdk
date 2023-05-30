@@ -82,9 +82,9 @@ describe('SwapCoins tests', () => {
 
   it('should show token balances list in from select', () => {
     cySmartGet('fromTokenInputs-select-form-select__target').click();
-    cySmartGet('fromTokenInputs-select-form-IMX-IMX').should('be.visible');
-    cySmartGet('fromTokenInputs-select-form-ETH-Ethereum').should('not.exist');
-    cySmartGet('fromTokenInputs-select-form-IMX-IMX').click();
+    cySmartGet('fromTokenInputs-select-form-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').should('be.visible');
+    cySmartGet('fromTokenInputs-select-form-eth').should('not.exist');
+    cySmartGet('fromTokenInputs-select-form-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
     cySmartGet('fromTokenInputs-select-form-select__target')
       .find('span')
       .should('have.text', 'IMX');
@@ -92,9 +92,9 @@ describe('SwapCoins tests', () => {
 
   it('should show allowed tokens list in to select', () => {
     cySmartGet('toTokenInputs-select-form-select__target').click();
-    cySmartGet('toTokenInputs-select-form-ETH-Ethereum').should('be.visible');
-    cySmartGet('toTokenInputs-select-form-IMX-IMX').should('be.visible');
-    cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
+    cySmartGet('toTokenInputs-select-form-eth').should('be.visible');
+    cySmartGet('toTokenInputs-select-form-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').should('be.visible');
+    cySmartGet('toTokenInputs-select-form-eth').click();
     cySmartGet('toTokenInputs-select-form-select__target')
       .find('span')
       .should('have.text', 'ETH');

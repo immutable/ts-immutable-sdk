@@ -15,12 +15,12 @@ export interface SelectOption {
 interface SelectFormProps {
   id: string;
   options: SelectOption[];
-  selectedOption?: OptionKey;
   textAlign?: 'left' | 'right';
   subtext?: string;
   errorMessage?: string;
   disabled?: boolean;
   onSelectChange?: (value: OptionKey) => void;
+  selectedOption?: OptionKey;
 }
 
 export function SelectForm({
@@ -44,10 +44,10 @@ export function SelectForm({
       <Select
         id={`${id}-select`}
         testId={`${id}-select`}
-        selectedOption={selectedOption}
         size="large"
         defaultLabel="Select coin"
         onSelectChange={onSelectChange}
+        selectedOption={selectedOption}
       >
         {options.map((option) => (
           <Option
