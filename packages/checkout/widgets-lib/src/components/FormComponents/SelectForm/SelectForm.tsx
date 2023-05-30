@@ -43,6 +43,7 @@ export function SelectForm({
   return (
     <Box>
       <CoinSelector
+        testId={id}
         heading={coinSelectorHeading}
         options={
           options.map((option) => ({
