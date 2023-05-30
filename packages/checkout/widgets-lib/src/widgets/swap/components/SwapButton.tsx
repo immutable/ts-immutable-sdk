@@ -77,7 +77,7 @@ export function SwapButton({
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         return;
       }
-      if (err.type === CheckoutErrorType.INSUFFICIENT_FUNDS) {
+      if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
@@ -89,7 +89,7 @@ export function SwapButton({
         });
         return;
       }
-      if (err.type === CheckoutErrorType.TRANSACTION_FAILED) {
+      if (err.type === CheckoutErrorType.TRANSACTION_FAILED || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
