@@ -3,6 +3,7 @@ export enum OrchestrationEventType {
   REQUEST_WALLET = 'request-wallet',
   REQUEST_SWAP = 'request-swap',
   REQUEST_BRIDGE = 'request-bridge',
+  REQUEST_ONRAMP = 'request-onramp',
 }
 
 export type RequestConnectEvent = {
@@ -20,6 +21,11 @@ export type RequestSwapEvent = {
 };
 
 export type RequestBridgeEvent = {
-  fromTokenAddress: string;
+  tokenAddress: string;
+  amount: string;
+};
+
+export type RequestOnrampEvent = {
+  tokenAddress: string;
   amount: string;
 };

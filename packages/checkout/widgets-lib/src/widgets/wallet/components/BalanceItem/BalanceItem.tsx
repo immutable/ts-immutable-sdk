@@ -8,6 +8,7 @@ import {
   PriceDisplay,
 } from '@biom3/react';
 import { useContext, useEffect, useState } from 'react';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
   balanceItemContainerStyle,
   balanceItemCoinBoxStyle,
@@ -17,10 +18,10 @@ import {
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { WalletContext } from '../../context/WalletContext';
 import {
-  sendBridgeCoinsEvent,
-  sendOnRampCoinsEvent,
-  sendSwapCoinsEvent,
-} from '../../CoinTopUpEvents';
+  sendRequestBridgeEvent,
+  sendRequestOnRampEvent,
+  sendRequestSwapEvent,
+} from '../../../../lib/orchestrationEvents';
 import { l1Network, zkEVMNetwork } from '../../../../lib/networkUtils';
 import { formatZeroAmount } from '../../../../lib/utils';
 
@@ -79,7 +80,7 @@ export function BalanceItem(props: BalanceItemProps) {
               testId="balance-item-add-option"
               sx={ShowMenuItem(isOnRampEnabled)}
               onClick={() => {
-                sendOnRampCoinsEvent({
+                sendRequestOnRampEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
                   tokenAddress: '',
                   amount: '',
                 });
@@ -92,7 +93,7 @@ export function BalanceItem(props: BalanceItemProps) {
               testId="balance-item-swap-option"
               sx={ShowMenuItem(isSwapEnabled)}
               onClick={() => {
-                sendSwapCoinsEvent({
+                sendRequestSwapEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
                   fromTokenAddress: '',
                   toTokenAddress: '',
                   amount: '',
@@ -106,8 +107,7 @@ export function BalanceItem(props: BalanceItemProps) {
               testId="balance-item-move-option"
               sx={ShowMenuItem(isBridgeEnabled)}
               onClick={() => {
-                sendBridgeCoinsEvent({
-                  fromNetwork: '',
+                sendRequestBridgeEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
                   tokenAddress: '',
                   amount: '',
                 });

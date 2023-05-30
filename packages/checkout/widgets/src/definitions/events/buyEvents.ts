@@ -1,5 +1,3 @@
-import { OrchestrationEventType } from './orchestrationEvents';
-
 /**
  * Enum representing possible Buy Widget event types.
  */
@@ -9,16 +7,6 @@ export enum BuyEventType {
   FAILURE = 'failure',
   NOT_CONNECTED = 'not_connected',
 }
-
-/**
- * Represents an event object emitted by the Buy Widget.
- * @property {BuyEventType} type - The type of the event.
- * @property {T} data - The data contained in the event.
- */
-export type BuyEvent<T> = {
-  type: BuyEventType | OrchestrationEventType;
-  data: T;
-};
 
 /**
  * Type representing a Buy Widget event with type CLOSE.

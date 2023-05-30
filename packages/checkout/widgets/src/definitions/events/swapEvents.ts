@@ -1,24 +1,12 @@
-import { OrchestrationEventType } from './orchestrationEvents';
-
 /**
  * Enum representing possible Swap Widget event types.
  */
 export enum SwapEventType {
+  CLOSE_WIDGET = 'close-widget',
   SUCCESS = 'success',
   FAILURE = 'failure',
-  CLOSE_WIDGET = 'close-widget',
   REJECTED = 'rejected',
 }
-
-/**
- * Represents an event object emitted by the Swap Widget.
- * @property {SwapEventType} type - The type of the event.
- * @property {T} data - The data contained in the event.
- */
-export type SwapEvent<T> = {
-  type: SwapEventType | OrchestrationEventType;
-  data: T;
-};
 
 /**
  * Type representing a Swap Widget with type SUCCESS.
