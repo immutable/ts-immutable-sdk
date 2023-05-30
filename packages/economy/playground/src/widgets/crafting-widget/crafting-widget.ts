@@ -55,6 +55,9 @@ export class CraftingWidget extends LitElement {
   selectedRecipe!: DomainRecipe;
 
   @state()
+  outputItems: Array<InventoryItem> = [];
+
+  @state()
   craftingInputs: Array<{
     item_id: string;
     condition_id: string;
@@ -128,6 +131,18 @@ export class CraftingWidget extends LitElement {
     );
   }
 
+  async getRecipeOutputItems() {
+    if (!this.selectedRecipe?.outputs) {
+      return;
+    }
+
+    const items$ = this.selectedRecipe.outputs.map(async (output) => {
+      return this.economy.item.getById(output?.ref as string);
+    });
+
+    this.outputItems = await Promise.all(items$);
+  }
+
   setEconomy() {
     this.economy = Economy.build({
       gameId: this.gameId,
@@ -164,7 +179,6 @@ export class CraftingWidget extends LitElement {
       recipe_id: this.economy.state.selectedRecipeId,
       ingredients: this.economy.state.craftingInputs,
     };
-
     this.economy.crafting.craft(input);
   }
 
@@ -271,7 +285,11 @@ export class CraftingWidget extends LitElement {
                     </button>
                   </div>
                   <div class="flex flex-col w-full items-center">
-                    <crafting-summary></crafting-summary>
+                    <crafting-summary
+                      class="w-full"
+                      .recipe="${this.selectedRecipe}"
+                      .items="${this.outputItems}"
+                    ></crafting-summary>
                   </div>
                 </div>
                 <!-- SUMMARY -->
@@ -331,6 +349,13 @@ export class CraftingWidget extends LitElement {
     }
 
     if (changedProperties.has('selectedRecipe')) {
+      if (!this.selectedRecipe) {
+        this.outputItems = [];
+        return;
+      }
+
+      this.getRecipeOutputItems();
+
       console.log({ selectedRecipeId: this.economy.state.selectedRecipeId });
     }
 
