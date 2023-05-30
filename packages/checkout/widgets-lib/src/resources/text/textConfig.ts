@@ -136,7 +136,10 @@ export const text = {
         availableBalancePrefix: 'Available',
       },
       bridgeForm: {
-        inputPlaceholder: '0',
+        from: {
+          inputPlaceholder: '0',
+          selectorTitle: 'What would you like to bridge?',
+        },
         buttonText: 'Move',
       },
       fees: {

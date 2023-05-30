@@ -202,7 +202,7 @@ export function BridgeForm(props: BridgeFormProps) {
           <SelectForm
             id="bridge-token"
             options={tokensOptions}
-            coinSelectorHeading="What would you like to bridge?"
+            coinSelectorHeading={bridgeForm.from.selectorTitle}
             selectedOption={selectedOption}
             subtext={token
               ? `${content.availableBalancePrefix} ${tokenValueFormat(token?.formattedBalance)}`
@@ -215,7 +215,7 @@ export function BridgeForm(props: BridgeFormProps) {
           <TextInputForm
             id="bridge-amount"
             value={amount}
-            placeholder={bridgeForm.inputPlaceholder}
+            placeholder={bridgeForm.from.inputPlaceholder}
             subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}
             validator={amountInputValidation}
             onTextInputChange={(value) => handleBridgeAmountChange(value)}
