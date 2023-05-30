@@ -34,6 +34,7 @@ export function SelectForm({
 
   const coinSelectorOptions = useMemo(() => options.map((option) => ({
     ...option,
+    testId: id,
     onClick: () => {
       onSelectChange(option.id);
       setCoinSelectorOpen(false);
@@ -43,7 +44,6 @@ export function SelectForm({
   return (
     <Box>
       <CoinSelector
-        testId={id}
         heading={coinSelectorHeading}
         options={coinSelectorOptions}
         visible={coinSelectorOpen}
@@ -77,7 +77,7 @@ export function SelectForm({
             <Option
               key={option.id}
               optionKey={option.id}
-              testId={`${id}-${option.id}`}
+              testId={option.testId}
               // select cannot currently be disabled so disabling at the option level for now
               disabled={disabled}
             >

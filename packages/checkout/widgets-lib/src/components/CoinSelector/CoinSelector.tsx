@@ -10,11 +10,10 @@ type CoinSelectorProps = {
   options: CoinSelectorOptionProps[];
   children?: any;
   visible?: boolean;
-  testId?: string;
 };
 
 export function CoinSelector({
-  heading, options, children, onCloseBottomSheet, visible, testId,
+  heading, options, children, onCloseBottomSheet, visible,
 }: CoinSelectorProps) {
   return (
     <BottomSheet headerBarTitle={heading} size="full" onCloseBottomSheet={onCloseBottomSheet} visible={visible}>
@@ -24,7 +23,7 @@ export function CoinSelector({
       <BottomSheet.Content>
         <Box sx={selectOptionsContainerStyles}>
           {options.map(({
-            onClick, icon, name, symbol, balance, id,
+            onClick, icon, name, symbol, balance, id, testId,
           }) => (
             <CoinSelectorOption
               id={id}

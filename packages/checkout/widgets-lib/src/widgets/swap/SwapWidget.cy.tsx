@@ -144,8 +144,9 @@ describe('SwapWidget tests', () => {
     );
 
     cySmartGet('fromTokenInputs-select-form-select__target').click();
-    cySmartGet('fromTokenInputs-select-form-eth').should('exist');
-    cySmartGet('fromTokenInputs-select-form-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').should('exist');
+    cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').should('exist');
+    cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      .should('exist');
     cySmartGet('fromTokenInputs-select-form-USDC-USDCoin').should('not.exist');
   });
 });
