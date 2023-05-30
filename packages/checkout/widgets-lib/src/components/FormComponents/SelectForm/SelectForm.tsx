@@ -21,7 +21,7 @@ interface SelectFormProps {
   textAlign?: 'left' | 'right';
   subtext?: string;
   errorMessage?: string;
-  selectedOption?: string | null;
+  selectedOption?: string;
   disabled?: boolean;
   onSelectChange: (value: string) => void;
   coinSelectorHeading: string;
@@ -83,7 +83,7 @@ export function SelectForm({
               disabled={disabled}
             >
               {!option.icon && (
-                <Option.Icon icon={option.icon ?? 'Coins'} variant="bold" />
+                <Option.Icon icon="Coins" variant="bold" />
               )}
               {option.icon && (
                 <Option.FramedImage imageUrl={option.icon} circularFrame />

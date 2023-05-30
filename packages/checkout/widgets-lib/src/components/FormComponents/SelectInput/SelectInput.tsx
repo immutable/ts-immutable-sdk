@@ -18,7 +18,7 @@ interface SelectInputProps {
   textInputErrorMessage?: string;
   selectSubtext?: string;
   selectErrorMessage?: string;
-  selectedOption?: string | null;
+  selectedOption?: string;
   coinSelectorHeading: string;
   textInputDisabled?: boolean;
   selectInputDisabled?: boolean;
