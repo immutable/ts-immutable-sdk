@@ -69,6 +69,9 @@ export function SelectForm({
             and so we are here rendering only the selected option.
             If we will move away from the CoinSelector we will need to simply remove
             `.filter((o) => o.id === selectedOption)?`
+            -----
+            The reason why we have the options here is only for a visual representation of the selected
+            option.
           */}
           {options.filter((o) => o.id === selectedOption)?.map((option) => (
             <Option
