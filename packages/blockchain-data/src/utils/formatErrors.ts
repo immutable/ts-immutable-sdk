@@ -1,4 +1,4 @@
-import { BasicAPIError } from '@imtbl/multi-rollup-api-client';
+/* eslint-disable @typescript-eslint/naming-convention */
 import axios from 'axios';
 import { APIError } from '../types/errors';
 
@@ -9,12 +9,14 @@ import { APIError } from '../types/errors';
  */
 export function formatError(error: unknown): APIError {
   if (axios.isAxiosError(error) && error.response) {
-    const apiError: BasicAPIError = error.response.data;
+    const apiError = error.response.data;
     if (apiError.code && apiError.message) {
       return new APIError({
         code: apiError.code,
         details: apiError.details,
         message: apiError.message,
+        link: apiError.link,
+        trace_id: apiError.trace_id,
       });
     }
 
@@ -22,11 +24,17 @@ export function formatError(error: unknown): APIError {
       code:
         error.code ?? error.response?.status.toString() ?? 'unknown_error_code',
       message: String(error),
+      details: null,
+      link: '',
+      trace_id: '',
     });
   }
 
   return new APIError({
     code: 'unknown_error_code',
     message: String(error),
+    details: null,
+    link: '',
+    trace_id: '',
   });
 }
