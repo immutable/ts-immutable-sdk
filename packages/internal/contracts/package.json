@@ -1,0 +1,19 @@
+{
+  "name": "@imtbl/contracts",
+  "version": "0.0.0",
+  "author": "Immutable",
+  "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
+  "scripts": {},
+  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "private": true,
+  "repository": "immutable/ts-immutable-sdk.git",
+  "devDependencies": {},
+  "dependencies": {
+    "@imtbl/zkevm-contracts": "^1.0.3",
+    "@openzeppelin/contracts": "^4.8.2"
+  },
+  "type": "module",
+  "types": "dist/index.d.ts"
+}
