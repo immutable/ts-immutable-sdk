@@ -1,12 +1,4 @@
-/**
- * Represents an event object emitted by the Bridge Widget.
- * @property {BridgeEventType} type - The type of the event.
- * @property {T} data - The data associated with the event.
- */
-export type BridgeEvent<T> = {
-  type: BridgeEventType;
-  data: T;
-};
+import { OrchestrationEventType } from './orchestrationEvents';
 
 /**
  * Enum of possible Bridge Widget event types.
@@ -16,6 +8,16 @@ export enum BridgeEventType {
   SUCCESS = 'success',
   FAILURE = 'failure',
 }
+
+/**
+ * Represents an event object emitted by the Bridge Widget.
+ * @property {BridgeEventType} type - The type of the event.
+ * @property {T} data - The data associated with the event.
+ */
+export type BridgeEvent<T> = {
+  type: BridgeEventType | OrchestrationEventType;
+  data: T;
+};
 
 /**
  * Type representing a Bridge Widget event with type SUCCESS

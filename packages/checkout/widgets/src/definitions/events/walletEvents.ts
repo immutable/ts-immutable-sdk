@@ -1,4 +1,5 @@
 import { NetworkInfo, TokenInfo } from '@imtbl/checkout-sdk';
+import { OrchestrationEventType } from './orchestrationEvents';
 
 /**
  * Enum representing possible Wallet Widget event types.
@@ -12,6 +13,16 @@ export enum WalletEventType {
   REQUEST_ONRAMP = 'request-onramp',
   DISCONNECT_WALLET = 'disconnect-wallet',
 }
+
+/**
+ * Represents an event object emitted by the Wallet Widget.
+ * @property {WalletEventType} type - The type of the event.
+ * @property {T} data - The data contained in the event.
+ */
+export type WalletEvent<T> = {
+  type: WalletEventType | OrchestrationEventType;
+  data: T;
+};
 
 /**
  * Type representing the data emitted by the network switch event.
@@ -47,13 +58,3 @@ export type WalletRequestOnrampEvent = {
 };
 
 export type WalletDisconnectWalletEvent = {};
-
-/**
- * Represents an event object emitted by the Wallet Widget.
- * @property {WalletEventType} type - The type of the event.
- * @property {T} data - The data contained in the event.
- */
-export type WalletEvent<T> = {
-  type: WalletEventType;
-  data: T;
-};

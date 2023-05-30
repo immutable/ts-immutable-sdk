@@ -1,4 +1,5 @@
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { OrchestrationEventType } from './orchestrationEvents';
 
 /**
  * Enum representing possible Connect Widget event types.
@@ -15,7 +16,7 @@ export enum ConnectEventType {
  * @property {T} data - The data contained in the event.
  */
 export type ConnectEvent<T> = {
-  type: ConnectEventType;
+  type: ConnectEventType | OrchestrationEventType;
   data: T;
 };
 
