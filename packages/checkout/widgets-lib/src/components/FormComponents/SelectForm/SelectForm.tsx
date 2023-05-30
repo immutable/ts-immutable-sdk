@@ -64,7 +64,13 @@ export function SelectForm({
           targetClickOveride={() => setCoinSelectorOpen(true)}
           selectedOption={selectedOption || undefined}
         >
-          {options.map((option) => (
+          {/*
+            because we are using the CoinSelector, the options are shown on the bottom sheet component
+            and so we are here rendering only the selected option.
+            If we will move away from the CoinSelector we will need to simply remove
+            `.filter((o) => o.id === selectedOption)?`
+          */}
+          {options.filter((o) => o.id === selectedOption)?.map((option) => (
             <Option
               key={option.id}
               optionKey={option.id}
