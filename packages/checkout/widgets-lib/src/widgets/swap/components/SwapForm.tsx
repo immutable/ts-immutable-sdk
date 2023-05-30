@@ -120,7 +120,8 @@ export function SwapForm({ data }: SwapFromProps) {
       .map(
         (t) => ({
           id: formatTokenOptionsId(t.token.symbol, t.token.address),
-          label: t.token.symbol,
+          name: t.token.name,
+          symbol: t.token.symbol,
           icon: t.token.icon,
         } as SelectOption),
       ),
@@ -132,7 +133,8 @@ export function SwapForm({ data }: SwapFromProps) {
       .map(
         (t) => ({
           id: formatTokenOptionsId(t.symbol, t.address),
-          label: t.symbol,
+          name: t.name,
+          symbol: t.symbol,
           icon: undefined, // todo: add correct image once available on token info
         } as SelectOption),
       ),
@@ -504,6 +506,7 @@ export function SwapForm({ data }: SwapFromProps) {
               selectedOption={fromToken
                 ? formatTokenOptionsId(fromToken.symbol, fromToken.address)
                 : undefined}
+              coinSelectorHeading={swapForm.from.selectorTitle}
             />
           </Box>
 
@@ -545,6 +548,7 @@ export function SwapForm({ data }: SwapFromProps) {
               selectedOption={toToken
                 ? formatTokenOptionsId(toToken.symbol, toToken.address)
                 : undefined}
+              coinSelectorHeading={swapForm.to.selectorTitle}
             />
           </Box>
         </Box>

@@ -95,10 +95,12 @@ export const text = {
         from: {
           label: 'From',
           inputPlaceholder: '0',
+          selectorTitle: 'What would you like to swap from?',
         },
         to: {
           label: 'To',
           inputPlaceholder: '0',
+          selectorTitle: 'What would you like to swap to?',
         },
         buttonText: 'Swap',
       },

@@ -163,7 +163,7 @@ describe('SwapForm', () => {
   });
 
   describe('swap form behaviour', () => {
-    it.only('should validate all inputs when Swap Button is clicked', () => {
+    it('should validate all inputs when Swap Button is clicked', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
@@ -201,7 +201,7 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-IMX-ImmutableX').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('20').trigger('change');
 
       cySmartGet('swap-button').click();
@@ -221,7 +221,7 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-IMX-ImmutableX').click();
 
       cySmartGet('swap-button').click();
 
@@ -240,7 +240,7 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-IMX-ImmutableX').click();
 
       cySmartGet('swap-button').click();
       cySmartGet('fromTokenInputs-text-form-text-control-error')
@@ -263,7 +263,7 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-ETH-Ethereum').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').blur();
       cySmartGet('swap-button').click();
       cySmartGet('fromTokenInputs-select-form-select-control-error')
@@ -271,7 +271,7 @@ describe('SwapForm', () => {
         .should('have.text', validation.noFromTokenSelected);
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-IMX-ImmutableX').click();
 
       cySmartGet('fromTokenInputs-text-form-text-control-error')
         .should('not.exist');
@@ -326,9 +326,9 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-IMX-ImmutableX').click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-ETH-Ethereum').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('fromTokenInputs-text-form-text__input').blur();
 
@@ -367,9 +367,9 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-IMX-ImmutableX').click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-ETH-Ethereum').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('fromTokenInputs-text-form-text__input').blur();
       cySmartGet('@fromAmountInStub').should('have.been.called');
@@ -413,9 +413,9 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-IMX-ImmutableX').click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-ETH-Ethereum').click();
       cySmartGet('fromTokenInputs-text-form-max-button').click();
 
       const params = [
@@ -454,13 +454,13 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-IMX-ImmutableX').click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-ETH-Ethereum').click();
       cySmartGet('@fromAmountInStub').should('have.been.called');
     });
 
@@ -475,12 +475,12 @@ describe('SwapForm', () => {
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-ETH-Ethereum').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-IMX-ImmutableX').click();
       cySmartGet('@fromAmountInStub').should('have.been.called');
     });
 
@@ -494,9 +494,9 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-IMX-ImmutableX').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-IMX-ImmutableX').click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-ETH-Ethereum').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-ETH-Ethereum').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0').trigger('change');
       cySmartGet('@fromAmountInStub').should('not.have.been.called');
 

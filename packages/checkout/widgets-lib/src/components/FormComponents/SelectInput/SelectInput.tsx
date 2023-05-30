@@ -18,6 +18,7 @@ interface SelectInputProps {
   textInputErrorMessage?: string;
   selectSubtext?: string;
   selectErrorMessage?: string;
+  coinSelectorHeading: string;
   textInputDisabled?: boolean;
   selectInputDisabled?: boolean;
   textInputValidator: (value: string) => boolean;
@@ -49,6 +50,7 @@ export function SelectInput({
   textInputDisabled,
   selectInputDisabled,
   selectedOption,
+  coinSelectorHeading,
 }: SelectInputProps) {
   return (
     <Box sx={selectInputBoxStyle}>
@@ -62,6 +64,7 @@ export function SelectInput({
           onSelectChange={onSelectChange}
           disabled={selectInputDisabled}
           selectedOption={selectedOption}
+          coinSelectorHeading={coinSelectorHeading}
         />
       </Box>
       <Box sx={inputStyle}>
