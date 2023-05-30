@@ -1,3 +1,1 @@
-const TEST = 'test';
-
-export { TEST };
+export { BlockchainData } from './blockchain-data';

@@ -10,7 +10,7 @@ import {
 
 const defaultHeaders = { sdkVersion: 'ts-immutable-sdk-__SDK_VERSION__' };
 
-interface APIConfigurationParams {
+export interface APIConfigurationParams {
   basePath: string;
   headers?: Record<string, string>;
 }
