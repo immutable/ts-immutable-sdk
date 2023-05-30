@@ -68,7 +68,7 @@ export function CoinSelector({
             <CoinSelectorOption
               testId={testId}
               id={id}
-              key={symbol}
+              key={`${symbol}-${name}`}
               onClick={onClick}
               icon={icon}
               name={name}
