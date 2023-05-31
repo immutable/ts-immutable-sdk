@@ -17,7 +17,7 @@
     "@biom3/react": "^0.5.6-beta",
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/config": "0.0.0",
-    "ethers": "^6.4.0",
+    "ethers": "^5.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.11.0"

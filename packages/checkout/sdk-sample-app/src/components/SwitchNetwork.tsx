@@ -94,6 +94,8 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
 
     try {
       const resp = await checkout.getNetworkInfo({ provider });
+
+      console.log('resp', resp)
       setResultNetInfo(resp);
       setLoadingNetInfo(false);
     } catch (err: any) {
@@ -150,7 +152,10 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
           <SuccessMessage>
             <Box>ChainId: {resultNetInfo.chainId}</Box>
             <Box>Name: {resultNetInfo.name}</Box>
-            <Box>Symbol: {resultNetInfo.nativeCurrency.symbol}</Box>
+            { resultNetInfo.isSupported && (
+              <Box>Symbol: {resultNetInfo.nativeCurrency.symbol}</Box>
+            )}
+            <Box>Supported: {resultNetInfo.isSupported ? 'true' : 'false'}</Box>
           </SuccessMessage>
         )}
         {errorNetInfo && (

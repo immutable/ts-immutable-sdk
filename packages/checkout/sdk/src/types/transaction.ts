@@ -29,12 +29,12 @@ export interface SendTransactionResult {
  * @property {number} chainId - The ID of the chain the transaction is for.
  */
 export interface Transaction {
-  nonce: string;
-  gasPrice: string;
-  gas: string;
-  to: string;
-  from: string;
-  value: string;
-  data: string;
-  chainId: number;
+  nonce?: string;
+  gasPrice?: string;
+  gas?: string;
+  to?: string;
+  from?: string;
+  value?: string;
+  data?: string;
+  chainId?: number;
 }

@@ -10,6 +10,7 @@ import GetBalance from '../components/GetBalance';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import Provider from '../components/Provider';
+import SendTransaction from '../components/SendTransaction';
 
 export default function ConnectWidget() {
   const [environment, setEnvironment] = useState(Environment.PRODUCTION);
@@ -72,7 +73,10 @@ export default function ConnectWidget() {
       >
         Connect
       </Divider>
-      <Connect checkout={checkout} setProvider={setProvider} />
+      <Connect 
+        checkout={checkout} 
+        provider={provider}
+        setProvider={setProvider} />
 
       <Divider
         sx={{
@@ -117,6 +121,21 @@ export default function ConnectWidget() {
         Get wallet balances
       </Divider>
       <GetAllBalances checkout={checkout} provider={provider} />
+
+      <Divider
+        sx={{
+          marginTop: 'base.spacing.x6',
+          marginBottom: 'base.spacing.x2',
+        }}
+      >
+        Send Transaction
+      </Divider>
+      <SendTransaction
+        checkout={checkout}
+        provider={provider}
+        setProvider={setProvider}
+      />
+
 
       <Divider
         sx={{

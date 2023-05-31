@@ -104,6 +104,7 @@ export class Checkout {
     params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
     const web3Provider = await provider.getWeb3Provider(
+      this.config,
       params,
       this.currentProviderInfo,
       this.allProviders,
@@ -119,6 +120,7 @@ export class Checkout {
    */
   public async connect(params: ConnectParams = {}): Promise<ConnectResult> {
     const web3Provider = await provider.getWeb3Provider(
+      this.config,
       params,
       this.currentProviderInfo,
       this.allProviders,
@@ -142,6 +144,7 @@ export class Checkout {
     params: SwitchNetworkParams,
   ): Promise<SwitchNetworkResult> {
     const web3Provider = await provider.getWeb3Provider(
+      this.config,
       params,
       this.currentProviderInfo,
       this.allProviders,
@@ -170,6 +173,7 @@ export class Checkout {
    */
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
     const web3Provider = await provider.getWeb3Provider(
+      this.config,
       params,
       this.currentProviderInfo,
       this.allProviders,
@@ -200,6 +204,7 @@ export class Checkout {
     params: GetAllBalancesParams,
   ): Promise<GetAllBalancesResult> {
     const web3Provider = await provider.getWeb3Provider(
+      this.config,
       params,
       this.currentProviderInfo,
       this.allProviders,
@@ -264,9 +269,11 @@ export class Checkout {
     params: SendTransactionParams,
   ): Promise<SendTransactionResult> {
     const web3Provider = await provider.getWeb3Provider(
+      this.config,
       params,
       this.currentProviderInfo,
       this.allProviders,
+      false,
     );
     return await transaction.sendTransaction({
       web3Provider,
@@ -282,6 +289,7 @@ export class Checkout {
    */
   public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
     const web3Provider = await provider.getWeb3Provider(
+      this.config,
       params,
       this.currentProviderInfo,
       this.allProviders,

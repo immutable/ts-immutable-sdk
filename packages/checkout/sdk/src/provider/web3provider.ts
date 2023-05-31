@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  ConnectParams,
   Providers,
   CurrentProviderInfo,
   CachedProvider,
+  ProviderParams,
 } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
+import { CheckoutConfiguration } from '../config';
 
 export function isWeb3Provider(
   provider: Web3Provider | CachedProvider | undefined,
@@ -32,14 +33,24 @@ export function isCachedProvider(
 // @NOTE - This is split out from the main provider file to avoid circular dependencies
 
 export async function getWeb3Provider(
-  params: ConnectParams,
+  config: CheckoutConfiguration,
+  params: ProviderParams,
   currentProviderInfo: CurrentProviderInfo,
   allProviders: Providers,
+  allowUnsupportedNetworks: boolean = true,
 ): Promise<Web3Provider> {
   const { provider } = params;
 
   // if they've supplied a web3provider, use it
-  if (isWeb3Provider(provider)) return provider as Web3Provider;
+  if (isWeb3Provider(provider)) {
+    if (allowUnsupportedNetworks === false && currentProviderInfo.network && !currentProviderInfo.network.isSupported) {
+      throw new CheckoutError(
+        'Your current network is not supported, please switch network',
+        CheckoutErrorType.WEB3_PROVIDER_ERROR,
+      );
+    }
+    return provider as Web3Provider;
+  }
 
   if (!allProviders) {
     throw new CheckoutError(
@@ -54,6 +65,13 @@ export async function getWeb3Provider(
     if (allProviders[name] && allProviders[name][chainId]) {
       return allProviders[name][chainId];
     }
+  }
+
+  if (allowUnsupportedNetworks === false && currentProviderInfo.network && !currentProviderInfo.network.isSupported) {
+    throw new CheckoutError(
+      'Your current network is not supported, please switch network',
+      CheckoutErrorType.WEB3_PROVIDER_ERROR,
+    );
   }
 
   // otherwise use the current provider as set in the Checkout class

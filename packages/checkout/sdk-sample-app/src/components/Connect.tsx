@@ -8,10 +8,11 @@ import { Environment } from '@imtbl/config';
 interface ConnectProps {
   checkout: Checkout;
   setProvider: (provider: Web3Provider) => void;
+  provider: Web3Provider | undefined;
 }
 
 export default function Connect(props: ConnectProps) {
-  const { setProvider, checkout } = props;
+  const { setProvider, checkout, provider } = props;
 
   const [result, setResult] = useState<Web3Provider>();
   const [error, setError] = useState<any>(null);
@@ -21,7 +22,9 @@ export default function Connect(props: ConnectProps) {
     setError(null);
     setLoading(true);
     try {
-      const resp = await checkout.connect();
+      const resp = await checkout.connect({
+        provider 
+      });
       setProvider(resp.provider);
       setResult(resp.provider);
       setLoading(false);

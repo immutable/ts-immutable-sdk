@@ -102,9 +102,6 @@ export async function getNetworkInfo(
   return withCheckoutError(
     async () => {
       const network = await provider.getNetwork();
-
-      // console.log('network', network);
-
       if (!Array.from(networkMap.keys()).includes(network.chainId as ChainId)) {
         // return empty details
         return {
@@ -188,6 +185,7 @@ export async function switchWalletNetwork(
   };
 
   const newProvider = await getWeb3Provider(
+    config,
     getW3Params,
     currentProviderInfo,
     allProviders,

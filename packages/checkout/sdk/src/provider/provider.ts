@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
 import {
   ChainId,
   DefaultProviders,
@@ -97,30 +96,8 @@ export async function cloneProviders(
 
   const networkInfo: NetworkInfo = await getNetworkInfo(config, web3Provider);
 
-  if (networkInfo.isSupported) {
-    return {
-      providers: clonedProviders,
-      networkInfo,
-    };
-  }
-
-  // @WT-1345 - this is throwing an error if you are not on a supported network
-
-  let defaultNetworkInfo: NetworkInfo;
-  if (config.environment === Environment.PRODUCTION) {
-    defaultNetworkInfo = await getNetworkInfo(
-      config,
-      clonedProviders[providerName][ChainId.ETHEREUM],
-    );
-  } else {
-    defaultNetworkInfo = await getNetworkInfo(
-      config,
-      clonedProviders[providerName][ChainId.SEPOLIA],
-    );
-  }
-
   return {
     providers: clonedProviders,
-    networkInfo: defaultNetworkInfo,
+    networkInfo,
   };
 }
