@@ -23,8 +23,8 @@ export namespace BuyItem {
    * Token type user is willing to accept upon settlement
    */
   export enum item_type {
+    NATIVE = 'NATIVE',
     ERC20 = 'ERC20',
-    IMX = 'IMX',
   }
 
 
