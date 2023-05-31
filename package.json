@@ -56,6 +56,7 @@
     "packages/provider",
     "packages/provider/src/sample-app",
     "packages/orderbook",
+    "packages/internal/contracts",
     "packages/internal/toolkit",
     "packages/internal/cryptofiat",
     "packages/internal/dex/sdk",
@@ -71,6 +72,7 @@
     "packages/checkout/widgets-lib",
     "packages/economy/sdk",
     "packages/economy/playground",
-    "packages/economy/services"
+    "packages/economy/services",
+    "packages/blockchain-data"
   ]
 }

@@ -15,6 +15,7 @@ export enum SwapEventType {
   SUCCESS = 'success',
   FAILURE = 'failure',
   CLOSE_WIDGET = 'close-widget',
+  REJECTED = 'rejected',
 }
 
 /**
@@ -31,6 +32,16 @@ export type SwapSuccess = {
  * @property {number} timestamp - The timestamp of the failed swap.
  */
 export type SwapFailed = {
-  reason: string;
+  reason?: string;
+  timestamp: number;
+};
+
+/**
+ * Type representing a Swap Widget with type FAILURE.
+ * @property {string} reason - The reason why the swap failed.
+ * @property {number} timestamp - The timestamp of the failed swap.
+ */
+export type SwapRejected = {
+  reason?: string;
   timestamp: number;
 };
