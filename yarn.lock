@@ -3047,9 +3047,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/erc721-permissioned-mintable@0.0.0, @imtbl/erc721-permissioned-mintable@workspace:packages/erc721_permissioned_mintable":
+"@imtbl/erc20@0.0.0, @imtbl/erc20@workspace:packages/erc20":
   version: 0.0.0-use.local
-  resolution: "@imtbl/erc721-permissioned-mintable@workspace:packages/erc721_permissioned_mintable"
+  resolution: "@imtbl/erc20@workspace:packages/erc20"
+  dependencies:
+    "@rollup/plugin-typescript": ^11.0.0
+    "@swc/jest": ^0.2.24
+    "@typechain/ethers-v5": ^10.2.0
+    rollup: ^3.17.2
+  languageName: unknown
+  linkType: soft
+
+"@imtbl/erc721-permissioned-mintable@0.0.0, @imtbl/erc721-permissioned-mintable@workspace:packages/erc721-permissioned-mintable":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/erc721-permissioned-mintable@workspace:packages/erc721-permissioned-mintable"
   dependencies:
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
@@ -3205,6 +3216,7 @@ __metadata:
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^1.1.1-alpha.1
     "@imtbl/cryptofiat": 0.0.0
+    "@imtbl/erc20": 0.0.0
     "@imtbl/erc721-permissioned-mintable": 0.0.0
     "@imtbl/guardian": 0.0.0
     "@imtbl/immutablex-client": 0.0.0
