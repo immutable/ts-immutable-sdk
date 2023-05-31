@@ -3161,9 +3161,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/passport@workspace:packages/passport"
   dependencies:
+    "@ethersproject/providers": ^5.7.2
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^1.1.1-alpha.1
     "@imtbl/guardian": 0.0.0
+    "@imtbl/immutablex-client": 0.0.0
     "@imtbl/provider": 0.0.0
     "@imtbl/toolkit": 0.0.0
     "@magic-ext/oidc": ^1.0.1
