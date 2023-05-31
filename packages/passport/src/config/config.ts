@@ -41,6 +41,12 @@ export class PassportConfiguration {
 
   readonly baseConfig: ImmutableConfiguration;
 
+  readonly zkEvmChainId: number;
+
+  readonly zkEvmRpcUrl: string;
+
+  readonly relayerUrl: string;
+
   constructor({
     baseConfig,
     overrides,
@@ -59,9 +65,12 @@ export class PassportConfiguration {
         [
           'network',
           'authenticationDomain',
+          'passportDomain',
           'magicPublishableApiKey',
           'magicProviderId',
-          'passportDomain',
+          'zkEvmRpcUrl',
+          'zkEvmChainId',
+          'relayerUrl',
         ],
         'overrides',
       );
@@ -70,6 +79,9 @@ export class PassportConfiguration {
       this.passportDomain = overrides.passportDomain;
       this.magicPublishableApiKey = overrides.magicPublishableApiKey;
       this.magicProviderId = overrides.magicProviderId;
+      this.zkEvmRpcUrl = overrides.zkEvmRpcUrl;
+      this.zkEvmChainId = overrides.zkEvmChainId;
+      this.relayerUrl = overrides.relayerUrl;
     } else {
       switch (baseConfig.environment) {
         case Environment.PRODUCTION: {
@@ -78,6 +90,9 @@ export class PassportConfiguration {
           this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
           this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
           this.passportDomain = 'https://passport.immutable.com';
+          this.zkEvmRpcUrl = ''; // TODO
+          this.zkEvmChainId = 0; // TODO
+          this.relayerUrl = ''; //TODO
           break;
         }
         case Environment.SANDBOX:
@@ -87,6 +102,9 @@ export class PassportConfiguration {
           this.magicPublishableApiKey = 'pk_live_10F423798A540ED7';
           this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
           this.passportDomain = 'https://passport.sandbox.immutable.com';
+          this.zkEvmRpcUrl = ''; // TODO
+          this.zkEvmChainId = 0; // TODO
+          this.relayerUrl = ''; //TODO
           break;
         }
       }

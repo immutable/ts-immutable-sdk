@@ -3,34 +3,36 @@ import { RpcRelayer } from '@0xsequence/relayer';
 import { Transaction } from '@0xsequence/transactions';
 import { Wallet } from '@0xsequence/wallet';
 import ConfirmationScreen from '../confirmation/confirmation';
+import { PassportConfiguration } from '../config';
 
 export const ethSendTransaction = async (
   request: ethers.providers.TransactionRequest,
-  // TODO: Do we need both providers?
-  // Or can we just rely on magicProvider pointing to our eth node?
-  jsonRpcProvider: ethers.providers.JsonRpcProvider,
-  magicProvider: ethers.providers.Web3Provider,
+  magicProvider: ethers.providers.ExternalProvider,
+  config: PassportConfiguration,
   confirmationScreen: ConfirmationScreen,
 ): Promise<string> => {
   if (!request.to) {
     throw new Error('eth_sendTransaction requires a "to" field');
   }
 
+  const magicWeb3Provider = new ethers.providers.Web3Provider(magicProvider);
+
   // If smart contract deployed, get nonce from storage, otherwise default to 0
   let nonce = 0;
-  const storageValue = await jsonRpcProvider.getStorageAt('0x0', 0, 0); // TODO
+  // TODO: Pass counterfactual address to determine if SCW has been deployed.
+  const storageValue = await magicWeb3Provider.getStorageAt('0x0', 0, 0);
   if (storageValue) {
     nonce = parseInt(storageValue, 10);
   }
 
   const relayer = new RpcRelayer({
-    url: this.sequenceRelayerUrl,
-    provider: jsonRpcProvider,
+    url: config.relayerUrl,
+    provider: magicWeb3Provider,
   });
 
   const wallet = (
-    await Wallet.singleOwner(magicProvider.getSigner())
-  ).connect(magicProvider, relayer);
+    await Wallet.singleOwner(magicWeb3Provider.getSigner())
+  ).connect(magicWeb3Provider, relayer);
 
   const transaction: Transaction = {
     to: request.to,
@@ -39,12 +41,12 @@ export const ethSendTransaction = async (
     value: request.value,
   };
 
-  const [config, context] = await Promise.all([
+  const [walletConfig, context] = await Promise.all([
     wallet.getWalletConfig(),
     wallet.getWalletContext(),
   ]);
   const { options, quote } = await relayer.getFeeOptions(
-    config[0],
+    walletConfig[0],
     context,
     transaction,
   );
@@ -72,7 +74,7 @@ export const ethSendTransaction = async (
 
   const transactionResponse = await wallet.sendTransaction(
     [transaction, feeTransaction],
-    undefined,
+    config.zkEvmChainId,
     undefined,
     quote,
   );

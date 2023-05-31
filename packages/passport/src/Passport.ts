@@ -4,6 +4,7 @@ import { IMXProvider } from '@imtbl/provider';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { ethers } from 'ethers';
+import { EthNetworkConfiguration } from 'magic-sdk';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
@@ -46,14 +47,17 @@ export class Passport {
         PassportErrorType.WALLET_CONNECTION_ERROR,
       );
     }
-    const magicRpcProvider = await this.magicAdapter.login(user.idToken);
-    return new ZkEvmProvider(
-      // @ts-ignore
-      this.config.relayerUrl,
-      magicRpcProvider,
-      new ConfirmationScreen(this.config),
+    const magicNetwork: EthNetworkConfiguration = {
+      rpcUrl: this.config.zkEvmRpcUrl,
+      chainId: this.config.zkEvmChainId,
+    };
+    const magicProvider = await this.magicAdapter.login(user.idToken, magicNetwork);
+    return new ZkEvmProvider({
+      magicProvider,
+      config: this.config,
+      confirmationScreen: new ConfirmationScreen(this.config),
       user,
-    );
+    });
   }
 
   private async getImxProvider(user: User | null) {
@@ -63,7 +67,7 @@ export class Passport {
         PassportErrorType.WALLET_CONNECTION_ERROR,
       );
     }
-    const magicRpcProvider = await this.magicAdapter.login(user.idToken);
+    const magicRpcProvider = await this.magicAdapter.login(user.idToken, this.config.network);
     const web3Provider = new ethers.providers.Web3Provider(
       magicRpcProvider,
     );

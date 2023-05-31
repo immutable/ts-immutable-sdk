@@ -44,6 +44,9 @@ export interface PassportOverrides {
   magicProviderId: string;
   passportDomain: string;
   immutableXClient: ImmutableXClient;
+  zkEvmRpcUrl: string;
+  zkEvmChainId: number;
+  relayerUrl: string;
 }
 
 export interface PassportModuleConfiguration

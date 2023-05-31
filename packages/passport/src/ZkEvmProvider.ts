@@ -6,27 +6,35 @@ import { RPCErrorCode } from '@magic-sdk/types/dist/types/core/exception-types';
 import ConfirmationScreen from './confirmation/confirmation';
 import { User } from './types';
 import { ethSendTransaction } from './rpcMethods';
+import { PassportConfiguration } from './config';
+
+export type ZkEvmProviderInput = {
+  magicProvider: ethers.providers.ExternalProvider,
+  config: PassportConfiguration,
+  confirmationScreen: ConfirmationScreen,
+  user: User,
+};
 
 export class ZkEvmProvider {
-  private readonly provider: ethers.providers.JsonRpcProvider;
+  private readonly magicProvider: ethers.providers.ExternalProvider;
 
-  private readonly relayerProvider: ethers.providers.JsonRpcProvider;
+  private readonly config: PassportConfiguration;
 
   private readonly confirmationScreen: ConfirmationScreen;
 
-  private readonly user: User;
-
-  constructor(
-    ethereumNodeUrl: string, // TODO: What should this be?
-    sequenceRelayerUrl: string,
-    confirmationScreen: ConfirmationScreen,
-    user: User,
-  ) {
-    this.provider = new ethers.providers.JsonRpcProvider(ethereumNodeUrl);
-    this.relayerProvider = new ethers.providers.JsonRpcProvider(sequenceRelayerUrl);
+  constructor({
+    magicProvider,
+    config,
+    confirmationScreen,
+    user,
+  }: ZkEvmProviderInput) {
+    this.magicProvider = magicProvider;
+    this.config = config;
     this.confirmationScreen = confirmationScreen;
     this.user = user;
   }
+
+  private readonly user: User;
 
   public async sendAsync(
     request: JsonRpcRequestPayload,
@@ -43,7 +51,8 @@ export class ZkEvmProvider {
         case 'eth_sendTransaction': {
           response.result = await ethSendTransaction(
             request.params[0],
-            this.provider,
+            this.magicProvider,
+            this.config,
             this.confirmationScreen,
           );
           break;
