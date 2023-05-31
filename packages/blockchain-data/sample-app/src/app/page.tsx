@@ -1,5 +1,13 @@
 import Image from "next/image";
 
+import { Environment, ImmutableConfiguration } from "@imtbl/config";
+import {
+  BlockchainData,
+  BlockchainDataModuleConfiguration,
+} from "@imtbl/blockchain-data";
+
+import { useEffect, useMemo, useState } from "react";
+
 const chainName = "sepolia";
 const apiURL = "https://indexer-mr.dev.imtbl.com/v1";
 
@@ -406,6 +414,30 @@ const endpointDomains = {
 };
 
 export default function Home() {
+  const [response, setResponse] = useState("");
+
+  useEffect(() => {
+    async function getData() {
+      const environment = Environment.SANDBOX;
+
+      const config: BlockchainDataModuleConfiguration = {
+        baseConfig: new ImmutableConfiguration({
+          environment,
+        }),
+      };
+
+      const client = new BlockchainData(config);
+
+      const request = {
+        chainName: "imtbl-zkevm-testnet",
+      };
+
+      const response = await client.listActivities(request);
+    }
+
+    getData();
+  }, []);
+
   return (
     <main className="flex min-h-screen flex-col p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
