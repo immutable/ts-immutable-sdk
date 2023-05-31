@@ -1,5 +1,6 @@
 {
   "name": "@imtbl/blockchain-data",
+  "description": "Wrapper functions for interacting with Immutable blockchain data APIs",
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
