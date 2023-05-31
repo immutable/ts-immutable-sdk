@@ -7,16 +7,14 @@ import {
 } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { UserWithEtherKey } from '../types';
-import { TransactionTypes } from '../confirmation/types';
-import { PassportConfiguration } from '../config';
-import ConfirmationScreen from '../confirmation/confirmation';
+import { ConfirmationScreen, TransactionTypes } from '../confirmation';
 
 type CreateTradeParams = {
   request: GetSignableTradeRequest;
   tradesApi: TradesApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  passportConfig: PassportConfiguration;
+  confirmationScreen: ConfirmationScreen;
 };
 
 export async function createTrade({
@@ -24,7 +22,7 @@ export async function createTrade({
   tradesApi,
   user,
   starkSigner,
-  passportConfig,
+  confirmationScreen,
 }: CreateTradeParams): Promise<CreateTradeResponse> {
   return withPassportError<CreateTradeResponse>(async () => {
     const ethAddress = user.etherKey;
@@ -39,11 +37,10 @@ export async function createTrade({
       getSignableTradeRequest,
     });
 
-    const confirmationScreen = new ConfirmationScreen(passportConfig);
     const confirmationResult = await confirmationScreen.startTransaction(
       user.accessToken,
       {
-        transactionType: TransactionTypes.CreateTrade,
+        transactionType: TransactionTypes.createTrade,
         transactionData: getSignableTradeRequest,
       },
     );
