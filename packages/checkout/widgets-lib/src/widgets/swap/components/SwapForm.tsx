@@ -12,7 +12,7 @@ import { amountInputValidation as textInputValidator } from '../../../lib/valida
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
-import { DEFAULT_IMX_DECIMALS } from '../../../lib';
+import { DEFAULT_IMX_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
@@ -357,7 +357,7 @@ export function SwapForm({ data }: SwapFromProps) {
   };
 
   // Silently refresh the quote
-  useInterval(() => fetchQuote(true), 3000);
+  useInterval(() => fetchQuote(true), DEFAULT_QUOTE_REFRESH_INTERVAL);
 
   useEffect(() => {
     if (direction === SwapDirection.FROM) {
