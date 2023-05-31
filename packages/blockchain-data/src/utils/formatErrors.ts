@@ -13,10 +13,10 @@ export function formatError(error: unknown): APIError {
     if (apiError.code && apiError.message) {
       return new APIError({
         code: apiError.code,
-        details: apiError.details,
         message: apiError.message,
-        link: apiError.link,
-        trace_id: apiError.trace_id,
+        details: apiError.details || null,
+        link: apiError.link || '',
+        trace_id: apiError.trace_id || '',
       });
     }
 

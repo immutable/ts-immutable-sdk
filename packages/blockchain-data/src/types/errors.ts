@@ -1,10 +1,12 @@
-import {
-  APIError400,
-  APIError404,
-  APIError500,
-} from '@imtbl/multi-rollup-api-client';
+import { BasicAPIError } from '@imtbl/multi-rollup-api-client';
 
-type OpenAPIError = APIError400 | APIError404 | APIError500;
+interface OpenAPIError extends BasicAPIError {
+  code: string;
+
+  details: {
+    [key: string]: any;
+  } | null;
+}
 
 /**
  * Custom Error class that is returned from the API when a request fails
