@@ -103,7 +103,10 @@ export class CraftingWidget extends LitElement {
     const recipe = this.recipes.find((recipe) => {
       return recipe.id === recipeId;
     });
-    if (!recipe) return;
+
+    if (!recipe) {
+      throw new Error(`Recipe ${recipeId} not found`);
+    };
 
     this.economy.recipe.setActive(recipe.id);
     this.selectedRecipe = recipe;
@@ -179,12 +182,21 @@ export class CraftingWidget extends LitElement {
       recipe_id: this.economy.state.selectedRecipeId,
       ingredients: this.economy.state.craftingInputs,
     };
-    this.economy.crafting.craft(input);
+    
+    try {
+      await this.economy.crafting.craft(input);
+
+      this.selectedRecipe = {};
+      this.selectedItems.clear();
+      this.economy.crafting.resetCraftingInputs();
+      this.requestUpdate();
+    } catch (error) {
+    }
   }
 
   render() {
     const selectedItems = Array.from(this.selectedItems.values());
-    const filteredInventory = this.selectedRecipe
+    const filteredInventory = this.selectedRecipe?.id
       ? this.inventory.filter((item: Required<InventoryItem>) => {
           return (
             this.economy.recipe.getInputsByItem(this.selectedRecipe, item)
@@ -193,7 +205,7 @@ export class CraftingWidget extends LitElement {
         })
       : this.inventory;
 
-    return html`
+      return html`
       <div class="h-screen flex flex-col">
         <div class="drawer">
           <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
@@ -331,7 +343,7 @@ export class CraftingWidget extends LitElement {
       this.getInventory();
       this.getCrafts();
       this.requestUpdate();
-    }, 1000);
+    }, 500);
     window.addEventListener('beforeunload', () =>
       clearInterval(refreshInterval)
     );
@@ -351,14 +363,7 @@ export class CraftingWidget extends LitElement {
     }
 
     if (changedProperties.has('selectedRecipe')) {
-      if (!this.selectedRecipe) {
-        this.outputItems = [];
-        return;
-      }
-
       this.getRecipeOutputItems();
-
-      console.log({ selectedRecipeId: this.economy.state.selectedRecipeId });
     }
 
     super.update(changedProperties);
