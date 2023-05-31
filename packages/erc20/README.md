@@ -1,2 +1,2 @@
-# ERC721 Permissioned Mintable
-The ERC721PermissionedMintable contract
+# ERC20
+The ERC20 contract
