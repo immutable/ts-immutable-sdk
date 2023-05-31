@@ -412,27 +412,30 @@ export default function Home() {
         <Image
           src="https://assets-global.website-files.com/646557ee455c3e16e4a9bcb3/646557ee455c3e16e4a9bcbe_immutable-logo.svg"
           alt="Vercel Logo"
-          className="dark:invert mx-3"
+          className="dark:invert"
           width={190}
           height={48}
           priority
         />
       </div>
 
-      <div className="mb-32 lg:mb-0 flex flex-col my-3">
+      <div className="mb-32 lg:mb-0 flex flex-col my-6">
         {Object.keys(endpointDomains).map((key) => {
           const endpoints = endpointDomains[key];
           return (
             <>
-              <h2 className={`text-xl font-semibold`}>
+              <h2
+                className={`text-sm uppercase tracking-wider font-mono`}
+                style={{ opacity: 0.6 }}
+              >
                 {capitalizeFirstLetter(key)}
               </h2>
-              <ul>
+              <ul className="my-1">
                 {endpoints.map((endpoint) => (
-                  <li>
+                  <li className="my-2">
                     <a
                       href="#"
-                      className="group rounded-lg border border-transparent p-3 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+                      className="group rounded-lg border border-transparent p-2 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
                     >
                       {endpoint.name}
                     </a>

@@ -10051,6 +10051,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "blockchain-data-sample-app@workspace:packages/blockchain-data/sample-app"
   dependencies:
+    "@imtbl/blockchain-data": 0.0.0
+    "@imtbl/config": 0.0.0
     "@types/node": 20.2.5
     "@types/react": 18.2.7
     "@types/react-dom": 18.2.4
