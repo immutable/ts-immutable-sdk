@@ -162,7 +162,7 @@ export function SwapForm({ data }: SwapFromProps) {
   // ------------------//
   //    FETCH QUOTES   //
   // ------------------//
-  const processFetchQuoteFrom = async () => {
+  const processFetchQuoteFrom = async (silently: boolean = false) => {
     if (!provider) return;
     if (!exchange) return;
     if (!fromToken) return;
@@ -176,6 +176,11 @@ export function SwapForm({ data }: SwapFromProps) {
         fromAmount,
         toToken,
       );
+
+      // Prevent to use the silently fetch quote
+      // if the user has updated the values and
+      // it is fetching a new quote.
+      if (silently && loading) return;
 
       const estimate = result.info.gasFeeEstimate;
       const gasFee = utils.formatUnits(
@@ -223,7 +228,7 @@ export function SwapForm({ data }: SwapFromProps) {
     setIsFetching(false);
   };
 
-  const processFetchQuoteTo = async () => {
+  const processFetchQuoteTo = async (silently: boolean = false) => {
     if (!provider) return;
     if (!exchange) return;
     if (!fromToken) return;
@@ -237,6 +242,11 @@ export function SwapForm({ data }: SwapFromProps) {
         toAmount,
         fromToken,
       );
+
+      // Prevent to use the silently fetch quote
+      // if the user has updated the values and
+      // it is fetching a new quote.
+      if (silently && loading) return;
 
       const estimate = result.info.gasFeeEstimate;
       const gasFee = utils.formatUnits(
@@ -291,20 +301,26 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!fromToken) return false;
     if (!toToken) return false;
     if (isFetching) return false;
-    if (editing) return false;
     return true;
   };
 
-  const fetchQuoteFrom = async (withLoading: boolean = true) => {
+  const fetchQuoteFrom = async (silently: boolean = false) => {
     if (!canRunFromQuote()) return;
 
-    if (withLoading) setLoading(true);
-    setIsFetching(true);
+    // setIsFetching within this if statement
+    // to allow the user to edit the form
+    // even if a new quote is fetch silently
+    if (!silently) {
+      setLoading(true);
+      setIsFetching(true);
+    }
 
-    await processFetchQuoteFrom();
+    await processFetchQuoteFrom(silently);
 
-    if (withLoading) setLoading(false);
-    setIsFetching(false);
+    if (!silently) {
+      setLoading(false);
+      setIsFetching(false);
+    }
   };
 
   const canRunToQuote = (): boolean => {
@@ -313,29 +329,35 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!fromToken) return false;
     if (!toToken) return false;
     if (isFetching) return false;
-    if (editing) return false;
     return true;
   };
 
-  const fetchQuoteTo = async (withLoading: boolean = true) => {
+  const fetchQuoteTo = async (silently: boolean = false) => {
     if (!canRunToQuote()) return;
 
-    if (withLoading) setLoading(true);
-    setIsFetching(true);
+    // setIsFetching within this if statement
+    // to allow the user to edit the form
+    // even if a new quote is fetch silently
+    if (!silently) {
+      setLoading(true);
+      setIsFetching(true);
+    }
 
-    await processFetchQuoteTo();
+    await processFetchQuoteTo(silently);
 
-    if (withLoading) setLoading(false);
-    setIsFetching(false);
+    if (!silently) {
+      setLoading(false);
+      setIsFetching(false);
+    }
   };
 
-  const fetchQuote = async (withLoading: boolean = true) => {
-    if (direction === SwapDirection.FROM) await fetchQuoteFrom(withLoading);
-    else await fetchQuoteTo(withLoading);
+  const fetchQuote = async (silently: boolean = false) => {
+    if (direction === SwapDirection.FROM) await fetchQuoteFrom(silently);
+    else await fetchQuoteTo(silently);
   };
 
   // Silently refresh the quote
-  useInterval(() => fetchQuote(false), 3000);
+  useInterval(() => fetchQuote(true), 3000);
 
   useEffect(() => {
     if (direction === SwapDirection.FROM) {
@@ -508,8 +530,8 @@ export function SwapForm({ data }: SwapFromProps) {
               onSelectChange={onFromSelectChange}
               textInputErrorMessage={fromAmountError}
               selectErrorMessage={fromTokenError}
-              selectInputDisabled={loading}
-              textInputDisabled={loading}
+              selectInputDisabled={isFetching}
+              textInputDisabled={isFetching}
               selectedOption={fromToken
                 ? formatTokenOptionsId(fromToken.symbol, fromToken.address)
                 : undefined}
@@ -533,7 +555,7 @@ export function SwapForm({ data }: SwapFromProps) {
                 }}
                 size="small"
               >
-                {!loading && swapFromToConversionText}
+                {swapFromToConversionText}
               </Body>
             </Box>
             <SelectInput
@@ -550,8 +572,8 @@ export function SwapForm({ data }: SwapFromProps) {
               onSelectChange={onToSelectChange}
               textInputErrorMessage={toAmountError}
               selectErrorMessage={toTokenError}
-              selectInputDisabled={loading}
-              textInputDisabled={loading}
+              selectInputDisabled={isFetching}
+              textInputDisabled={isFetching}
               selectedOption={toToken
                 ? formatTokenOptionsId(toToken.symbol, toToken.address)
                 : undefined}
