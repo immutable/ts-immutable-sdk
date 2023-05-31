@@ -51,13 +51,13 @@ describe('prepareListing and createOrder e2e', () => {
       offerer,
     );
 
-    const order = await sdk.createOrder({
+    const { result: { id: orderId } } = await sdk.createOrder({
       offerer: offerer.address,
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
       orderSignature: signature,
     });
 
-    await waitForOrderToBeOfStatus(sdk, order.id, OrderStatus.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
   }, 30_000);
 });
