@@ -1,6 +1,6 @@
 {
-  "name": "@imtbl/smartcontracts",
-  "description": "The SDK for the smart contracts",
+  "name": "@imtbl/erc721-permissioned-mintable",
+  "description": "The ERC721PermissionedMintable contract",
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",

@@ -24,6 +24,7 @@
     "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/cryptofiat": "0.0.0",
+    "@imtbl/erc721-permissioned-mintable": "0.0.0",
     "@imtbl/guardian": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
     "@imtbl/orderbook": "0.0.0",
@@ -81,9 +82,9 @@
       "types": "./dist/checkout_widgets.d.ts",
       "import": "./dist/checkout_widgets.js"
     },
-    "./smartcontracts": {
-      "types": "./dist/smartcontracts.d.ts",
-      "import": "./dist/smartcontracts.js"
+    "./erc721_permissioned_mintable": {
+      "types": "./dist/erc721_permissioned_mintable.d.ts",
+      "import": "./dist/erc721_permissioned_mintable.js"
     }
   },
   "files": [

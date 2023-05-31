@@ -51,7 +51,7 @@
   "workspaces": [
     "sdk",
     "packages/config",
-    "packages/contracts",
+    "packages/erc721_permissioned_mintable",
     "packages/immutablex_client",
     "packages/passport",
     "packages/provider",

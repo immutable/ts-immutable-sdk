@@ -5,4 +5,4 @@ export * from './orderbook';
 export * from './provider';
 export * from './checkout_sdk';
 export * from './checkout_widgets';
-export * from './contracts';
+export * from './erc721_permissioned_mintable';
