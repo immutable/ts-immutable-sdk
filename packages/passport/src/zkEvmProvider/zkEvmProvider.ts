@@ -1,5 +1,5 @@
 import { ExternalProvider } from '@ethersproject/providers';
-import { ethSendTransaction } from './rpcMethods';
+import { ethRequestAccounts, ethSendTransaction } from './rpcMethods';
 import {
   JsonRpcRequestCallback, JsonRpcRequestPayload, JsonRpcResponsePayload, RpcErrorCode,
 } from './types';
@@ -70,22 +70,15 @@ export class ZkEvmProvider {
       try {
         switch (request.method) {
           case 'eth_requestAccounts': {
-            this.user = await this.authManager.getUser() ?? await this.authManager.login();
-            if (this.user && this.user.idToken) {
-              this.magicProvider = await this.magicAdapter.login(
-                this.user.idToken,
-                {
-                  rpcUrl: this.config.zkEvmRpcUrl,
-                  chainId: this.config.zkEvmChainId,
-                },
-              );
-            }
+            const { result, magicProvider, user } = await ethRequestAccounts({
+              authManager: this.authManager,
+              config: this.config,
+              magicAdapter: this.magicAdapter,
+            });
 
-            if (this.magicProvider && this.magicProvider.request) {
-              return this.magicProvider.request(request);
-            }
-
-            response.result = [];
+            this.user = user;
+            this.magicProvider = magicProvider;
+            response.result = result;
             break;
           }
           case 'eth_sendTransaction': {
@@ -111,7 +104,9 @@ export class ZkEvmProvider {
           response.result = null;
           response.error = {
             ...error,
-            code: RpcErrorCode.INTERNAL_ERROR,
+            code: 'code' in error
+              ? error.code as RpcErrorCode
+              : RpcErrorCode.INTERNAL_ERROR,
           };
         }
       }
