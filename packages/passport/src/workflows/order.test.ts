@@ -1,36 +1,20 @@
 import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { cancelOrder, createOrder } from './order';
-import { PassportConfiguration } from '../config';
-import ConfirmationScreen from '../confirmation/confirmation';
+import { ConfirmationScreen, TransactionTypes } from '../confirmation';
 
 jest.mock('../confirmation/confirmation');
 
 describe('order', () => {
-  const mockStartTransaction = jest.fn();
+  afterEach(jest.resetAllMocks);
+
+  const mockConfirmationScreen = new ConfirmationScreen({} as any);
 
   const mockStarkSigner = {
     signMessage: jest.fn(),
     getAddress: jest.fn(),
   };
-
-  const passportConfig = new PassportConfiguration({
-    baseConfig: new ImmutableConfiguration({
-      environment: Environment.PRODUCTION,
-    }),
-    clientId: 'clientId123',
-    logoutRedirectUri: 'http://localhost:3000',
-    redirectUri: 'http://localhost:3000',
-  });
-
-  beforeEach(() => {
-    jest.resetAllMocks();
-    (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
-      startTransaction: mockStartTransaction,
-    }));
-  });
 
   describe('createOrder', () => {
     let getSignableCreateOrderMock: jest.Mock;
@@ -121,7 +105,7 @@ describe('order', () => {
 
       getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
-      mockStartTransaction.mockResolvedValue({
+      (mockConfirmationScreen.startTransaction as jest.Mock).mockResolvedValue({
         confirmed: true,
       });
       createOrderMock.mockResolvedValue({
@@ -133,13 +117,20 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: orderRequest as UnsignedOrderRequest,
-        passportConfig: passportConfig as PassportConfiguration,
+        confirmationScreen: mockConfirmationScreen,
       });
 
       expect(getSignableCreateOrderMock).toBeCalledWith(
         mockSignableOrderRequest,
       );
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
+      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
+        mockUser.accessToken,
+        {
+          transactionType: TransactionTypes.createOrder,
+          transactionData: expect.any(Object),
+        },
+      );
       expect(createOrderMock).toBeCalledWith(
         mockCreateOrderRequest,
         mockHeader,
@@ -155,7 +146,7 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: orderRequest as UnsignedOrderRequest,
-        passportConfig: passportConfig as PassportConfiguration,
+        confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
         new PassportError(
           `${PassportErrorType.CREATE_ORDER_ERROR}: ${mockErrorMessage}`,
@@ -184,7 +175,7 @@ describe('order', () => {
 
       getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
-      mockStartTransaction.mockResolvedValue({
+      (mockConfirmationScreen.startTransaction as jest.Mock).mockResolvedValue({
         confirmed: true,
       });
 
@@ -193,8 +184,16 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: orderRequest as UnsignedOrderRequest,
-        passportConfig: passportConfig as PassportConfiguration,
+        confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('CREATE_ORDER_ERROR');
+
+      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
+        mockUser.accessToken,
+        {
+          transactionType: TransactionTypes.createOrder,
+          transactionData: expect.any(Object),
+        },
+      );
     });
   });
 
@@ -257,7 +256,7 @@ describe('order', () => {
       cancelOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
-      mockStartTransaction.mockResolvedValue({
+      (mockConfirmationScreen.startTransaction as jest.Mock).mockResolvedValue({
         confirmed: true,
       });
 
@@ -266,13 +265,20 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
-        passportConfig: passportConfig as PassportConfiguration,
+        confirmationScreen: mockConfirmationScreen,
       });
 
       expect(getSignableCancelOrderMock).toBeCalledWith(
         mockSignableCancelOrderRequest,
       );
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
+      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
+        mockUser.accessToken,
+        {
+          transactionType: TransactionTypes.cancelOrder,
+          transactionData: expect.any(Object),
+        },
+      );
       expect(cancelOrderMock).toBeCalledWith(
         mockCancelOrderRequest,
         mockHeader,
@@ -305,8 +311,16 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
-        passportConfig: passportConfig as PassportConfiguration,
+        confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('CANCEL_ORDER_ERROR');
+
+      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
+        mockUser.accessToken,
+        {
+          transactionType: TransactionTypes.cancelOrder,
+          transactionData: expect.any(Object),
+        },
+      );
     });
 
     it('should return error if failed to call public api', async () => {
@@ -317,7 +331,7 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
-        passportConfig: passportConfig as PassportConfiguration,
+        confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
         new PassportError(
           `${PassportErrorType.CANCEL_ORDER_ERROR}: ${mockErrorMessage}`,

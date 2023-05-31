@@ -1,7 +1,5 @@
 import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { IMXProvider } from '@imtbl/provider';
-// TODO: Remove this once the dependency has been added
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
@@ -16,6 +14,7 @@ import {
   User,
 } from './types';
 import registerPassport from './workflows/registration';
+import { ConfirmationScreen } from './confirmation';
 
 export class Passport {
   private readonly authManager: AuthManager;
@@ -26,10 +25,13 @@ export class Passport {
 
   private readonly immutableXClient: ImmutableXClient;
 
+  private readonly confirmationScreen: ConfirmationScreen;
+
   constructor(passportModuleConfiguration: PassportModuleConfiguration) {
     this.config = new PassportConfiguration(passportModuleConfiguration);
     this.authManager = new AuthManager(this.config);
     this.magicAdapter = new MagicAdapter(this.config);
+    this.confirmationScreen = new ConfirmationScreen(this.config);
     this.immutableXClient = passportModuleConfiguration.overrides?.immutableXClient
       || new ImmutableXClient({
         baseConfig: passportModuleConfiguration.baseConfig,
@@ -56,16 +58,16 @@ export class Passport {
       return new PassportImxProvider({
         user: updatedUser,
         starkSigner,
-        passportConfig: this.config,
         immutableXClient: this.immutableXClient,
+        confirmationScreen: this.confirmationScreen,
       });
     }
     const userWithEtherKey = user as UserWithEtherKey;
     return new PassportImxProvider({
       user: userWithEtherKey,
       starkSigner,
-      passportConfig: this.config,
       immutableXClient: this.immutableXClient,
+      confirmationScreen: this.confirmationScreen,
     });
   }
 

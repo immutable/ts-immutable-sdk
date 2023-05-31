@@ -1,5 +1,5 @@
 import {
-  BuyEvent,
+  WidgetEvent,
   BuyEventType,
   BuySuccess,
   IMTBLWidgetEvents,
@@ -9,7 +9,7 @@ import {
 } from '@imtbl/checkout-widgets';
 
 export const sendBuySuccessEvent = () => {
-  const successEvent = new CustomEvent<BuyEvent<BuySuccess>>(
+  const successEvent = new CustomEvent<WidgetEvent<BuySuccess>>(
     IMTBLWidgetEvents.IMTBL_BUY_WIDGET_EVENT,
     {
       detail: {
@@ -24,7 +24,7 @@ export const sendBuySuccessEvent = () => {
 };
 
 export const sendBuyFailedEvent = (reason: string) => {
-  const failedEvent = new CustomEvent<BuyEvent<BuyFailed>>(
+  const failedEvent = new CustomEvent<WidgetEvent<BuyFailed>>(
     IMTBLWidgetEvents.IMTBL_BUY_WIDGET_EVENT,
     {
       detail: {
@@ -40,11 +40,11 @@ export const sendBuyFailedEvent = (reason: string) => {
 };
 
 export const sendBuyWidgetCloseEvent = () => {
-  const closeEvent = new CustomEvent<BuyEvent<BuyClose>>(
+  const closeEvent = new CustomEvent<WidgetEvent<BuyClose>>(
     IMTBLWidgetEvents.IMTBL_BUY_WIDGET_EVENT,
     {
       detail: {
-        type: BuyEventType.CLOSE,
+        type: BuyEventType.CLOSE_WIDGET,
         data: {},
       },
     },
@@ -53,7 +53,7 @@ export const sendBuyWidgetCloseEvent = () => {
 };
 
 export const sendBuyWidgetNotConnectedEvent = (providerPreference: string) => {
-  const notConnectedEvent = new CustomEvent<BuyEvent<BuyNotConnected>>(
+  const notConnectedEvent = new CustomEvent<WidgetEvent<BuyNotConnected>>(
     IMTBLWidgetEvents.IMTBL_BUY_WIDGET_EVENT,
     {
       detail: {

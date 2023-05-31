@@ -231,7 +231,7 @@ export class CraftingWidget extends LitElement {
 
       setTimeout(() => {
         this.loading = false;
-      }, 3000);
+      }, 1000);
 
       this.selectedRecipe = {};
       this.selectedItems.clear();
