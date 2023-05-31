@@ -2686,9 +2686,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@imtbl/blockchain-data@0.0.0, @imtbl/blockchain-data@workspace:packages/blockchain-data":
+"@imtbl/blockchain-data@0.0.0, @imtbl/blockchain-data@workspace:packages/blockchain-data/sdk":
   version: 0.0.0-use.local
-  resolution: "@imtbl/blockchain-data@workspace:packages/blockchain-data"
+  resolution: "@imtbl/blockchain-data@workspace:packages/blockchain-data/sdk"
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/multi-rollup-api-client": 0.0.0
