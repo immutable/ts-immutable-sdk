@@ -2,7 +2,6 @@ import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { IMXProvider } from '@imtbl/provider';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { ethers } from 'ethers';
-import { EthNetworkConfiguration } from 'magic-sdk';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
@@ -17,7 +16,7 @@ import {
 } from './types';
 import registerPassport from './workflows/registration';
 import { ConfirmationScreen } from './confirmation';
-import { ZkEvmProvider } from './ZkEvmProvider';
+import { ZkEvmProvider } from './zkEvmProvider';
 
 export class Passport {
   private readonly authManager: AuthManager;
@@ -41,27 +40,16 @@ export class Passport {
       });
   }
 
-  private async getZkEvmProvider(user: User) {
-    if (!user || !user.idToken) {
-      throw new PassportError(
-        'Failed to initialise',
-        PassportErrorType.WALLET_CONNECTION_ERROR,
-      );
-    }
-    const magicNetwork: EthNetworkConfiguration = {
-      rpcUrl: this.config.zkEvmRpcUrl,
-      chainId: this.config.zkEvmChainId,
-    };
-    const magicProvider = await this.magicAdapter.login(user.idToken, magicNetwork);
+  private async connectEvm() {
     return new ZkEvmProvider({
-      magicProvider,
+      authManager: this.authManager,
+      magicAdapter: this.magicAdapter,
       config: this.config,
-      confirmationScreen: new ConfirmationScreen(this.config),
-      user,
+      confirmationScreen: this.confirmationScreen,
     });
   }
 
-  private async getImxProvider(user: User | null) {
+  private async getImxProvider(user: User) {
     if (!user || !user.idToken) {
       throw new PassportError(
         'Failed to initialise',

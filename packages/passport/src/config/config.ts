@@ -92,7 +92,7 @@ export class PassportConfiguration {
           this.passportDomain = 'https://passport.immutable.com';
           this.zkEvmRpcUrl = ''; // TODO
           this.zkEvmChainId = 0; // TODO
-          this.relayerUrl = ''; //TODO
+          this.relayerUrl = ''; // TODO
           break;
         }
         case Environment.SANDBOX:
@@ -104,7 +104,7 @@ export class PassportConfiguration {
           this.passportDomain = 'https://passport.sandbox.immutable.com';
           this.zkEvmRpcUrl = ''; // TODO
           this.zkEvmChainId = 0; // TODO
-          this.relayerUrl = ''; //TODO
+          this.relayerUrl = ''; // TODO
           break;
         }
       }

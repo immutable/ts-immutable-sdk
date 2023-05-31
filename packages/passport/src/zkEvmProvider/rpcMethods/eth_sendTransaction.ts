@@ -2,16 +2,23 @@ import ethers from 'ethers';
 import { RpcRelayer } from '@0xsequence/relayer';
 import { Transaction } from '@0xsequence/transactions';
 import { Wallet } from '@0xsequence/wallet';
-import ConfirmationScreen from '../confirmation/confirmation';
-import { PassportConfiguration } from '../config';
+import { ConfirmationScreen } from '../../confirmation';
+import { PassportConfiguration } from '../../config';
 
-export const ethSendTransaction = async (
-  request: ethers.providers.TransactionRequest,
+type EthSendTransactionInput = {
+  transactionRequest: ethers.providers.TransactionRequest,
   magicProvider: ethers.providers.ExternalProvider,
   config: PassportConfiguration,
   confirmationScreen: ConfirmationScreen,
-): Promise<string> => {
-  if (!request.to) {
+};
+
+export const ethSendTransaction = async ({
+  transactionRequest,
+  magicProvider,
+  config,
+  confirmationScreen,
+}: EthSendTransactionInput): Promise<string> => {
+  if (!transactionRequest.to) {
     throw new Error('eth_sendTransaction requires a "to" field');
   }
 
@@ -35,10 +42,10 @@ export const ethSendTransaction = async (
   ).connect(magicWeb3Provider, relayer);
 
   const transaction: Transaction = {
-    to: request.to,
-    data: request.data,
+    to: transactionRequest.to,
+    data: transactionRequest.data,
     nonce, // request.nonce,
-    value: request.value,
+    value: transactionRequest.value,
   };
 
   const [walletConfig, context] = await Promise.all([
@@ -51,8 +58,9 @@ export const ethSendTransaction = async (
     transaction,
   );
 
+  // TODO: Add support for non-native gas payments (e.g ERC20, feeTransaction initialisation must change)
   const feeTransaction: Transaction = {
-    // TODO: How do we choose a fee option?
+    // TODO: How do we choose a fee option? Always select IMX? wETH? USDC?
     //  Pass all to transaction-confirmation & let user select?
     to: options[0].to,
     value: options[0].value,
@@ -60,17 +68,20 @@ export const ethSendTransaction = async (
     revertOnError: true,
   };
 
+  // TODO: Evaluate transactions through Guardian
+  // @ts-ignore
+  const transactionId = await submitTransactionToGuardian([transaction, feeTransaction]);
+
   // @ts-ignore
   const confirmationResult = await confirmationScreen.startzkEvmTransaction(
-    // TODO: What should the format of this be?
-    //  Likely need to pass transaction & feeTransaction
-    transaction,
-    feeTransaction,
+    transactionId,
   );
 
   if (!confirmationResult.confirmed) {
     return Promise.reject(new Error('User rejected transaction'));
   }
+
+  // TODO: Sign transactions with Magic
 
   const transactionResponse = await wallet.sendTransaction(
     [transaction, feeTransaction],
@@ -78,7 +89,13 @@ export const ethSendTransaction = async (
     undefined,
     quote,
   );
+  // const transactionResponse = relayer.sendTransaction();
+  // const id = transactionResponse.internalId;
+  //
+  // let txnHash;
+  // await setInterval(
+  //   // wait for transaction to be submitted
+  // );
 
-  const transactionReceipt = await transactionResponse.wait();
-  return transactionReceipt.transactionHash;
+  return transactionResponse.hash;
 };
