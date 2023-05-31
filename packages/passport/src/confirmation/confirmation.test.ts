@@ -30,8 +30,30 @@ describe('confirmation', () => {
     windowSpy.mockRestore();
   });
 
+  describe('startGuardianTransaction', () => {
+    it('should handle popup window opened', async () => {
+      const transactionId = 'transactionId123';
+      const config = new PassportConfiguration({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        clientId: 'clientId123',
+        logoutRedirectUri: 'http://localhost:3000',
+        redirectUri: 'http://localhost:3000',
+      });
+
+      const confirmationScreen = new ConfirmationScreen(config);
+      const res = await confirmationScreen.startGuardianTransaction(
+        transactionId,
+      );
+
+      expect(res.confirmed).toEqual(false);
+      expect(mockedOpen).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('startTransaction', () => {
-    it('should handle popup window closed', async () => {
+    it('should handle popup window opened', async () => {
       const transaction: Transaction = {
         transactionType: TransactionTypes.CreateTransfer,
         transactionData: {

@@ -76,12 +76,8 @@ const transferWithGuardian = async ({
   const { confirmationRequired } = evaluateStarkexRes.data;
   if (confirmationRequired) {
     const confirmationScreen = new ConfirmationScreen(passportConfig);
-    const confirmationResult = await confirmationScreen.startTransaction(
-      accessToken,
-      {
-        transactionType: TransactionTypes.CreateTransfer,
-        transactionData: payloadHash,
-      },
+    const confirmationResult = await confirmationScreen.startGuardianTransaction(
+      payloadHash,
     );
 
     if (!confirmationResult.confirmed) {
