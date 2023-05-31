@@ -1,2 +1,2 @@
 # ERC20
-The ERC20 contract
+Wrapper functions for interacting with a deployed ERC20 contract.

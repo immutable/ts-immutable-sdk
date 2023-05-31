@@ -1,2 +1,2 @@
 # ERC721 Permissioned Mintable
-The ERC721PermissionedMintable contract
+Wrapper functions for interacting with a deployed ERC721PermissionedMintable contract.
