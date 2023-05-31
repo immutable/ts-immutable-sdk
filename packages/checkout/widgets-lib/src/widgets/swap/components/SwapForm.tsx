@@ -22,7 +22,7 @@ import {
   validateToAmount,
   validateToToken,
 } from '../functions/SwapValidator';
-import { Fees } from './Fees';
+import { Fees } from '../../../components/Fees/Fees';
 import { SwapButton } from './SwapButton';
 import { SwapFormData } from './swapFormTypes';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
@@ -416,7 +416,7 @@ export function SwapForm({ data }: SwapFromProps) {
     setToAmount(value);
   };
 
-  const { content, swapForm } = text.views[SwapWidgetViews.SWAP];
+  const { content, swapForm, fees } = text.views[SwapWidgetViews.SWAP];
   const SwapFormValidator = (): boolean => {
     const validateFromTokenError = validateFromToken(fromToken);
     const validateFromAmountError = validateFromAmount(fromAmount, fromBalance);
@@ -561,6 +561,8 @@ export function SwapForm({ data }: SwapFromProps) {
           </Box>
         </Box>
         <Fees
+          title={fees.title}
+          fiatPricePrefix={content.fiatPricePrefix}
           gasFeeFiatValue={gasFeeFiatValue}
           gasFeeToken={gasFeeToken}
           gasFeeValue={gasFeeValue}

@@ -4,7 +4,7 @@ export interface CoinSelectorOptionProps {
   testId?: string;
   id: string;
   name: string;
-  icon?: AllIconKeys;
+  icon?: AllIconKeys | string;
   symbol: string;
   onClick?: () => void
   balance?: {
@@ -19,7 +19,12 @@ export function CoinSelectorOption({
   return (
     <MenuItem testId={`${testId}-coin-selector__option-${id}`} emphasized size="small" onClick={onClick}>
       {!icon && <MenuItem.Icon icon="Coins" variant="bold" />}
-      {icon && <MenuItem.FramedImage imageUrl={icon} circularFrame />}
+      {icon && (
+        <MenuItem.FramedImage
+          imageUrl={icon}
+          circularFrame
+        />
+      )}
 
       <MenuItem.Label>{name}</MenuItem.Label>
       <MenuItem.Caption>{symbol}</MenuItem.Caption>
