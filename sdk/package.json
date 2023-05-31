@@ -80,6 +80,10 @@
     "./checkout_widgets": {
       "types": "./dist/checkout_widgets.d.ts",
       "import": "./dist/checkout_widgets.js"
+    },
+    "./smartcontracts": {
+      "types": "./dist/smartcontracts.d.ts",
+      "import": "./dist/smartcontracts.js"
     }
   },
   "files": [

@@ -51,6 +51,7 @@
   "workspaces": [
     "sdk",
     "packages/config",
+    "packages/contracts",
     "packages/immutablex_client",
     "packages/passport",
     "packages/provider",

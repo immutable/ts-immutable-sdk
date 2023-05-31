@@ -3227,6 +3227,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@imtbl/smartcontracts@workspace:packages/contracts":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/smartcontracts@workspace:packages/contracts"
+  languageName: unknown
+  linkType: soft
+
 "@imtbl/toolkit@0.0.0, @imtbl/toolkit@workspace:packages/internal/toolkit":
   version: 0.0.0-use.local
   resolution: "@imtbl/toolkit@workspace:packages/internal/toolkit"

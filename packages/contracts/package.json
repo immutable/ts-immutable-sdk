@@ -1,0 +1,26 @@
+{
+  "name": "@imtbl/smartcontracts",
+  "description": "The SDK for the smart contracts",
+  "version": "0.0.0",
+  "author": "Immutable",
+  "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
+  "engines": {
+    "node": ">=16.11.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "private": true,
+  "repository": "immutable/ts-immutable-sdk.git",
+  "scripts": {
+    "build": "NODE_ENV=production rollup --config rollup.config.js",
+    "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
+    "prepare": "wsrun -r build",
+    "typecheck": "tsc --noEmit --jsx preserve"
+  },
+  "type": "module",
+  "types": "dist/index.d.ts"
+}
