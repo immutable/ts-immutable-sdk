@@ -64,8 +64,8 @@ describe('transaction', () => {
 
     await expect(sendTransaction(params)).rejects.toThrow(
       new CheckoutError(
-        '[TRANSACTION_ERROR] Cause:Transaction errored',
-        CheckoutErrorType.TRANSACTION_ERROR,
+        'Transaction errored',
+        CheckoutErrorType.TRANSACTION_FAILED,
       ),
     );
   });

@@ -7,9 +7,8 @@ import {
   ChainId,
   Checkout,
   ConnectionProviders,
-  Transaction,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
+import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { buyWidgetStyle } from './BuyStyles';
 // TODO: fix circular dependency
@@ -123,12 +122,12 @@ export class Orderbook {
     chainId: ChainId,
     // eslint-disable-next-line
     orderId: string,
-  ): Promise<Transaction> {
+  ): Promise<TransactionRequest> {
     // Stubbed exchange.getTransaction
     return {
       nonce: '0x00', // ignored by MetaMask
       gasPrice: '0x000', // customizable by user during MetaMask confirmation.
-      gas: '0x000', // customizable by user during MetaMask confirmation.
+      gasLimit: '0x000', // customizable by user during MetaMask confirmation.
       to: '', // To address.
       from: '', // User's active address.
       value: '0x00', // Only required to send ether to the recipient from the initiating external account.
