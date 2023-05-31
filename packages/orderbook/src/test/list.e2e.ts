@@ -42,14 +42,14 @@ async function createOrder(
     offerer,
   );
 
-  const order = await sdk.createOrder({
+  const { result: { id: orderId } } = await sdk.createOrder({
     offerer: offerer.address,
     orderComponents: listing.orderComponents,
     orderHash: listing.orderHash,
     orderSignature: signature,
   });
 
-  return waitForOrderToBeOfStatus(sdk, order.id, OrderStatus.ACTIVE);
+  return waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
 }
 
 describe('listOrders e2e', () => {
