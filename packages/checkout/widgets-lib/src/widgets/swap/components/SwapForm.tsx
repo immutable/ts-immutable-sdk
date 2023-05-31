@@ -177,9 +177,9 @@ export function SwapForm({ data }: SwapFromProps) {
         toToken,
       );
 
-      // Prevent to use the silently fetch quote
-      // if the user has updated the values and
-      // it is fetching a new quote.
+      // Prevent to silently fetch and set a new quote
+      // if the user has updated and the widget is already
+      // fetching or the user is updating the inputs.
       if (silently && (loading || editing)) return;
 
       const estimate = result.info.gasFeeEstimate;
@@ -243,9 +243,9 @@ export function SwapForm({ data }: SwapFromProps) {
         fromToken,
       );
 
-      // Prevent to use the silently fetch quote
-      // if the user has updated the values and
-      // it is fetching a new quote.
+      // Prevent to silently fetch and set a new quote
+      // if the user has updated and the widget is already
+      // fetching or the user is updating the inputs.
       if (silently && (loading || editing)) return;
 
       const estimate = result.info.gasFeeEstimate;
