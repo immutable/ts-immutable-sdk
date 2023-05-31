@@ -20,6 +20,7 @@
     "oidc-client-ts": "^2.2.1"
   },
   "devDependencies": {
+    "@imtbl/blockchain-data": "0.0.0",
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/config": "0.0.0",
@@ -58,6 +59,10 @@
     "./config": {
       "types": "./dist/config.d.ts",
       "import": "./dist/config.js"
+    },
+    "./blockchain-data": {
+      "types": "./dist/blockchain-data.d.ts",
+      "import": "./dist/blockchain-data.js"
     },
     "./immutablex_client": {
       "types": "./dist/immutablex_client.d.ts",
