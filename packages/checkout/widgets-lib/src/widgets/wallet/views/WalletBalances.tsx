@@ -23,6 +23,7 @@ import {
 import { getTokenBalances } from '../functions/tokenBalances';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 import {
+  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -83,11 +84,6 @@ export function WalletBalances() {
       });
     })();
   }, [provider, checkout, network, cryptoFiatDispatch]);
-
-  const handleAddCoinsClick = () => {
-    // eslint-disable-next-line no-console
-    console.log('Add coins click to implement top up view');
-  };
 
   useEffect(() => {
     if (!checkout || !provider || !network) return;
@@ -153,7 +149,14 @@ export function WalletBalances() {
           <MenuItem
             testId="add-coins"
             emphasized
-            onClick={() => handleAddCoinsClick()}
+            onClick={() => {
+              viewDispatch({
+                payload: {
+                  type: ViewActions.UPDATE_VIEW,
+                  view: { type: SharedViews.TOP_UP_VIEW },
+                },
+              });
+            }}
           >
             <MenuItem.FramedIcon icon="Add" />
             <MenuItem.Label>Add coins</MenuItem.Label>

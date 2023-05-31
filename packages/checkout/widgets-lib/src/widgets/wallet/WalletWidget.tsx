@@ -13,8 +13,8 @@ import {
   walletReducer,
 } from './context/WalletContext';
 import { WalletBalances } from './views/WalletBalances';
-import { ErrorView } from '../../components/Error/ErrorView';
-import { LoadingView } from '../../components/Loading/LoadingView';
+import { ErrorView } from '../../views/error/ErrorView';
+import { LoadingView } from '../../views/loading/LoadingView';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { zkEVMNetwork } from '../../lib/networkUtils';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
@@ -23,13 +23,14 @@ import {
   initialViewState,
   ViewActions,
   ViewContext,
-  BaseViews,
+  SharedViews,
 } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { Settings } from './views/Settings';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { CoinInfo } from './views/CoinInfo';
+import { TopUpView } from '../../views/top-up/TopUpView';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
@@ -144,7 +145,7 @@ export function WalletWidget(props: WalletWidgetProps) {
           {/* TODO: please fix */}
           {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
           <WalletContext.Provider value={{ walletState, walletDispatch }}>
-            {viewState.view.type === BaseViews.LOADING_VIEW && (
+            {viewState.view.type === SharedViews.LOADING_VIEW && (
               <LoadingView loadingText="Loading" />
             )}
             {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
@@ -154,11 +155,19 @@ export function WalletWidget(props: WalletWidgetProps) {
             {viewState.view.type === WalletWidgetViews.COIN_INFO && (
               <CoinInfo />
             )}
-            {viewState.view.type === BaseViews.ERROR && (
+            {viewState.view.type === SharedViews.ERROR_VIEW && (
               <ErrorView
                 actionText="Try again"
                 onActionClick={errorAction}
                 onCloseClick={sendWalletWidgetCloseEvent}
+              />
+            )}
+            {viewState.view.type === SharedViews.TOP_UP_VIEW && (
+              <TopUpView
+                showOnrampOption={isOnRampEnabled}
+                showSwapOption={isSwapEnabled}
+                showBridgeOption={isBridgeEnabled}
+                onCloseButtonClick={sendWalletWidgetCloseEvent}
               />
             )}
           </WalletContext.Provider>

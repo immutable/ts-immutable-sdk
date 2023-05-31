@@ -12,7 +12,7 @@ import {
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { SwapCoins } from './views/SwapCoins';
-import { LoadingView } from '../../components/Loading/LoadingView';
+import { LoadingView } from '../../views/loading/LoadingView';
 import {
   SwapActions,
   SwapContext,
@@ -20,7 +20,7 @@ import {
   swapReducer,
 } from './context/SwapContext';
 import {
-  BaseViews,
+  SharedViews,
   ViewActions,
   ViewContext,
   initialViewState,
@@ -34,7 +34,7 @@ import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
 import { getDexConfigOverrides } from './DexConfigOverrides';
 import { text } from '../../resources/text/textConfig';
-import { ErrorView } from '../../components/Error/ErrorView';
+import { ErrorView } from '../../views/error/ErrorView';
 import {
   sendSwapFailedEvent, sendSwapRejectedEvent,
   sendSwapSuccessEvent, sendSwapWidgetCloseEvent,
@@ -54,8 +54,8 @@ export interface SwapWidgetParams {
 
 export function SwapWidget(props: SwapWidgetProps) {
   const { success, failed, rejected } = text.views[SwapWidgetViews.SWAP];
-  const loadingText = text.views[BaseViews.LOADING_VIEW].text;
-  const { actionText } = text.views[BaseViews.ERROR];
+  const loadingText = text.views[SharedViews.LOADING_VIEW].text;
+  const { actionText } = text.views[SharedViews.ERROR_VIEW];
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const viewReducerValues = useMemo(
     () => ({ viewState, viewDispatch }),
@@ -172,7 +172,7 @@ export function SwapWidget(props: SwapWidgetProps) {
     <BiomeCombinedProviders theme={{ base: biomeTheme }} bottomSheetContainerId="bottom-sheet-container">
       <ViewContext.Provider value={viewReducerValues}>
         <SwapContext.Provider value={swapReducerValues}>
-          {viewState.view.type === BaseViews.LOADING_VIEW && (
+          {viewState.view.type === SharedViews.LOADING_VIEW && (
             <LoadingView loadingText={loadingText} />
           )}
           {viewState.view.type === SwapWidgetViews.SWAP && (
@@ -239,7 +239,7 @@ export function SwapWidget(props: SwapWidgetProps) {
               testId="price-surge-view"
             />
           )}
-          {viewState.view.type === BaseViews.ERROR && (
+          {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
               actionText={actionText}
               onActionClick={() => {

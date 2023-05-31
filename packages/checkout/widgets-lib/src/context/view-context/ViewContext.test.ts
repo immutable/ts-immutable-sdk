@@ -5,7 +5,7 @@ import {
   viewReducer,
   initialViewState,
   UpdateViewPayload,
-  BaseViews,
+  SharedViews,
 } from './ViewContext';
 
 describe('view-context', () => {
@@ -19,7 +19,7 @@ describe('view-context', () => {
 
     expect(initialViewState).toEqual({
       view: {
-        type: BaseViews.LOADING_VIEW,
+        type: SharedViews.LOADING_VIEW,
       },
       history: [],
     });
