@@ -3,7 +3,7 @@
 /* eslint-disable */
 import type { CreateOrderRequestBody } from '../models/CreateOrderRequestBody';
 import type { ListOrdersResult } from '../models/ListOrdersResult';
-import type { Order } from '../models/Order';
+import type { OrderResult } from '../models/OrderResult';
 import type { OrderStatus } from '../models/OrderStatus';
 import type { PageCursor } from '../models/PageCursor';
 import type { PageSize } from '../models/PageSize';
@@ -90,7 +90,7 @@ export class OrdersService {
   /**
    * Create an order
    * Create an order
-   * @returns Order Created response.
+   * @returns OrderResult Created response.
    * @throws ApiError
    */
   public createOrder({
@@ -102,7 +102,7 @@ export class OrdersService {
      */
     chainId: string,
     requestBody: CreateOrderRequestBody,
-  }): CancelablePromise<Order> {
+  }): CancelablePromise<OrderResult> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/v1/chains/{chain_id}/orders',
@@ -112,9 +112,9 @@ export class OrdersService {
       body: requestBody,
       mediaType: 'application/json',
       errors: {
-        400: `bad_request: Bad Request`,
-        404: `not_found: Resource not found`,
-        500: `internal_error: Internal server error`,
+        400: `Client error`,
+        404: `The specified resource was not found`,
+        500: `Internal server error`,
       },
     });
   }
@@ -122,7 +122,7 @@ export class OrdersService {
   /**
    * Get a single order by ID
    * Get a single order by ID
-   * @returns Order OK response.
+   * @returns OrderResult OK response.
    * @throws ApiError
    */
   public getOrder({
@@ -137,7 +137,7 @@ export class OrdersService {
      * Global Order identifier
      */
     orderId: string,
-  }): CancelablePromise<Order> {
+  }): CancelablePromise<OrderResult> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/v1/chains/{chain_id}/orders/{order_id}',
@@ -146,8 +146,9 @@ export class OrdersService {
         'order_id': orderId,
       },
       errors: {
-        404: `not_found: Resource not found`,
-        500: `internal_error: Internal server error`,
+        400: `Client error`,
+        404: `The specified resource was not found`,
+        500: `Internal server error`,
       },
     });
   }

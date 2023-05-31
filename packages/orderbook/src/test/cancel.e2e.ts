@@ -51,18 +51,18 @@ describe('cancel order', () => {
       offerer,
     );
 
-    const order = await sdk.createOrder({
+    const { result: { id: orderId } } = await sdk.createOrder({
       offerer: offerer.address,
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
       orderSignature: signature,
     });
 
-    await waitForOrderToBeOfStatus(sdk, order.id, OrderStatus.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
 
-    const { unsignedCancelOrderTransaction } = await sdk.cancelOrder(order.id, offerer.address);
+    const { unsignedCancelOrderTransaction } = await sdk.cancelOrder(orderId, offerer.address);
     await signAndSubmitTx(unsignedCancelOrderTransaction, offerer, provider);
 
-    await waitForOrderToBeOfStatus(sdk, order.id, OrderStatus.CANCELLED);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.CANCELLED);
   }, 60_000);
 });
