@@ -24,7 +24,6 @@
     "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/cryptofiat": "0.0.0",
-    "@imtbl/guardian": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
     "@imtbl/orderbook": "0.0.0",
     "@imtbl/passport": "0.0.0",
