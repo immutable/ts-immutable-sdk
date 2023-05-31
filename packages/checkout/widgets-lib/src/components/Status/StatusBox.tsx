@@ -9,7 +9,7 @@ export interface StatusViewProps {
 
 const status = {
   [StatusType.SUCCESS]: 'TickWithCircle',
-  [StatusType.REJECTED]: 'Shield',
+  [StatusType.WARNING]: 'Shield',
   [StatusType.FAILURE]: 'CloseWithCircle',
 };
 

@@ -7,9 +7,7 @@ import { connectWalletProvider } from './connect';
 import { getNetworkInfo, switchWalletNetwork } from './network';
 
 import { Checkout } from './Checkout';
-import {
-  ChainId, ConnectionProviders, GetBalanceParams,
-} from './types';
+import { ChainId, ConnectionProviders, GetBalanceParams } from './types';
 import { getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
 import { CheckoutError, CheckoutErrorType } from './errors';
@@ -21,12 +19,16 @@ jest.mock('./balances');
 jest.mock('./transaction');
 
 describe(' Connect', () => {
-  const testCheckoutConfig = new CheckoutConfiguration({ baseConfig: { environment: Environment.PRODUCTION } });
+  const testCheckoutConfig = new CheckoutConfiguration({
+    baseConfig: { environment: Environment.PRODUCTION },
+  });
   beforeEach(() => {
     jest.resetAllMocks();
   });
   it('should call the connectWalletProvider function', async () => {
-    const checkout = new Checkout({ baseConfig: { environment: Environment.PRODUCTION } });
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
 
     await checkout.connect({
       providerPreference: ConnectionProviders.METAMASK,
@@ -37,18 +39,26 @@ describe(' Connect', () => {
   });
 
   it('should call getBalance when no contract address provided', async () => {
-    const checkout = new Checkout({ baseConfig: { environment: Environment.PRODUCTION } });
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
     await checkout.getBalance({
       provider: {} as unknown as Web3Provider,
       walletAddress: '0x123',
     } as GetBalanceParams);
     expect(getERC20Balance).toBeCalledTimes(0);
     expect(getBalance).toBeCalledTimes(1);
-    expect(getBalance).toBeCalledWith(testCheckoutConfig, {} as unknown as Web3Provider, '0x123');
+    expect(getBalance).toBeCalledWith(
+      testCheckoutConfig,
+      {} as unknown as Web3Provider,
+      '0x123',
+    );
   });
 
   it('should call getERC20Balance when a contract address is provided', async () => {
-    const checkout = new Checkout({ baseConfig: { environment: Environment.PRODUCTION } });
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
     await checkout.getBalance({
       provider: {} as unknown as Web3Provider,
       walletAddress: '0x123',
@@ -64,14 +74,20 @@ describe(' Connect', () => {
   });
 
   it('should call the switchWalletNetwork function', async () => {
-    const checkout = new Checkout({ baseConfig: { environment: Environment.PRODUCTION } });
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
 
     await checkout.connect({
       providerPreference: ConnectionProviders.METAMASK,
     });
 
     await checkout.switchNetwork({
-      provider: { provider: { request: () => {} } } as any as Web3Provider,
+      provider: {
+        provider: {
+          request: () => {},
+        },
+      } as any as Web3Provider,
       chainId: ChainId.ETHEREUM,
     });
 
@@ -79,11 +95,17 @@ describe(' Connect', () => {
   });
 
   it('should throw error when calling the switchWalletNetwork function', async () => {
-    const checkout = new Checkout({ baseConfig: { environment: Environment.PRODUCTION } });
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
 
     await expect(
       checkout.switchNetwork({
-        provider: { provider: { request: () => {} } } as any as Web3Provider,
+        provider: {
+          provider: {
+            request: () => {},
+          },
+        } as any as Web3Provider,
         chainId: ChainId.ETHEREUM,
       }),
     ).rejects.toThrow(
@@ -95,14 +117,16 @@ describe(' Connect', () => {
   });
 
   it('should call sendTransaction function', async () => {
-    const checkout = new Checkout({ baseConfig: { environment: Environment.PRODUCTION } });
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
 
     await checkout.sendTransaction({
       provider: {} as Web3Provider,
       transaction: {
         nonce: '',
         gasPrice: '',
-        gas: '',
+        gasLimit: '',
         to: '',
         from: '',
         value: '',

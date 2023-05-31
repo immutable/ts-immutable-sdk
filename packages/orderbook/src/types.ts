@@ -1,5 +1,6 @@
 import { OrderComponents } from '@opensea/seaport-js/lib/types';
 import { PopulatedTransaction, TypedDataDomain, TypedDataField } from 'ethers';
+import { OrdersService } from 'openapi/sdk';
 
 export interface ERC721Item {
   type: 'ERC721'
@@ -56,3 +57,7 @@ export interface CreateOrderParams {
 export interface CancelOrderResponse {
   unsignedCancelOrderTransaction: PopulatedTransaction
 }
+
+// Expose the list order filtering and ordering directly from the openAPI SDK, except
+// chainID is omitted as its configured as a part of the client
+export type ListOrderParams = Omit<Parameters<typeof OrdersService.prototype.listOrders>[0], 'chainId'>;

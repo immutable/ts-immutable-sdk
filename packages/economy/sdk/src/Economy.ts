@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import Container, { Service } from 'typedi';
 import { Subscription } from 'rxjs';
 import { Inventory } from './inventory/Inventory';
@@ -32,9 +31,19 @@ export class Economy {
     private store: Store,
   ) {}
 
-  public connect(): void {
-    // TODO: Initialize all services
-    this.log('connected', { config: this.config.get() });
+  public async connect() {
+    const config = this.config.get();
+
+    const inventory$ = this.inventory.getItems({
+      gameID: config.gameId,
+      owner: [config.walletAddress || config.userId],
+    });
+
+    const recipes$ = this.recipe.getAll({
+      gameId: config.gameId,
+    });
+
+    await Promise.all([inventory$, recipes$]);
   }
 
   public subscribe(handler: (event: EconomyEvents) => void): Subscription {
@@ -55,7 +64,6 @@ export class Economy {
 
   /** Utility: Use to print logs in console */
   private log(...args: unknown[]): void {
-    // eslint-disable-next-line no-console
     console.log(`${this.constructor.name}:`, ...args);
   }
 }
