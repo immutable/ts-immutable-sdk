@@ -5,6 +5,7 @@ import { calculateCryptoToFiat, sortTokensByAmount } from '../../../lib/utils';
 export interface BalanceInfo {
   id: string;
   symbol: string;
+  address?: string;
   description?: string;
   balance: string;
   fiatAmount: string;
@@ -45,6 +46,7 @@ export const getTokenBalances = async (
           conversions,
         ),
         symbol: balance.token.symbol,
+        address: balance.token.address,
         description: balance.token.name,
       });
     });

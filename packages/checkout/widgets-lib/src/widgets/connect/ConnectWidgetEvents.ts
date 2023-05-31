@@ -1,6 +1,6 @@
 import {
   IMTBLWidgetEvents,
-  ConnectEvent,
+  WidgetEvent,
   ConnectionSuccess,
   ConnectionFailed,
   ConnectEventType,
@@ -14,7 +14,7 @@ export function sendConnectSuccessEvent(
   providerPreference: ConnectionProviders,
 ) {
   addToLocalStorage('providerPreference', providerPreference);
-  const successEvent = new CustomEvent<ConnectEvent<ConnectionSuccess>>(
+  const successEvent = new CustomEvent<WidgetEvent<ConnectionSuccess>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
       detail: {
@@ -25,11 +25,13 @@ export function sendConnectSuccessEvent(
       },
     },
   );
+  // eslint-disable-next-line no-console
+  console.log('success event:', successEvent);
   if (window !== undefined) window.dispatchEvent(successEvent);
 }
 
 export function sendCloseWidgetEvent() {
-  const closeWidgetEvent = new CustomEvent<ConnectEvent<any>>(
+  const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
       detail: {
@@ -38,11 +40,13 @@ export function sendCloseWidgetEvent() {
       },
     },
   );
+  // eslint-disable-next-line no-console
+  console.log('close event:', closeWidgetEvent);
   if (window !== undefined) window.dispatchEvent(closeWidgetEvent);
 }
 
 export function sendConnectFailedEvent(reason: string) {
-  const failedEvent = new CustomEvent<ConnectEvent<ConnectionFailed>>(
+  const failedEvent = new CustomEvent<WidgetEvent<ConnectionFailed>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
       detail: {
