@@ -180,7 +180,7 @@ export function SwapForm({ data }: SwapFromProps) {
       // Prevent to use the silently fetch quote
       // if the user has updated the values and
       // it is fetching a new quote.
-      if (silently && loading) return;
+      if (silently && (loading || editing)) return;
 
       const estimate = result.info.gasFeeEstimate;
       const gasFee = utils.formatUnits(
@@ -246,7 +246,7 @@ export function SwapForm({ data }: SwapFromProps) {
       // Prevent to use the silently fetch quote
       // if the user has updated the values and
       // it is fetching a new quote.
-      if (silently && loading) return;
+      if (silently && (loading || editing)) return;
 
       const estimate = result.info.gasFeeEstimate;
       const gasFee = utils.formatUnits(
