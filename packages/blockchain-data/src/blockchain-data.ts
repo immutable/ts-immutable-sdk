@@ -29,6 +29,8 @@ import {
 import { formatError } from 'utils/formatErrors';
 
 export class BlockchainData {
+  public readonly config: BlockchainDataConfiguration;
+
   private readonly activities: ActivitiesApi;
 
   private readonly chains: ChainsApi;
@@ -40,13 +42,13 @@ export class BlockchainData {
   private readonly nftOwners: NftOwnersApi;
 
   constructor(moduleConfig: BlockchainDataModuleConfiguration) {
-    const config = new BlockchainDataConfiguration(moduleConfig);
+    this.config = new BlockchainDataConfiguration(moduleConfig);
 
-    this.activities = new ActivitiesApi(config.apiConfig);
-    this.chains = new ChainsApi(config.apiConfig);
-    this.collections = new CollectionsApi(config.apiConfig);
-    this.nfts = new NftsApi(config.apiConfig);
-    this.nftOwners = new NftOwnersApi(config.apiConfig);
+    this.activities = new ActivitiesApi(this.config.apiConfig);
+    this.chains = new ChainsApi(this.config.apiConfig);
+    this.collections = new CollectionsApi(this.config.apiConfig);
+    this.nfts = new NftsApi(this.config.apiConfig);
+    this.nftOwners = new NftOwnersApi(this.config.apiConfig);
   }
 
   /**

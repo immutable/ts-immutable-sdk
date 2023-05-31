@@ -1,3 +1,4 @@
+/* eslint-disable implicit-arrow-linebreak */
 import {
   Environment,
   ImmutableConfiguration,
@@ -8,7 +9,9 @@ import {
   ConfigurationParameters,
 } from '@imtbl/multi-rollup-api-client';
 
-const defaultHeaders = { sdkVersion: 'ts-immutable-sdk-__SDK_VERSION__' };
+const defaultHeaders = {
+  sdkVersion: 'ts-immutable-sdk-multi-rollup-api-client-__SDK_VERSION__',
+};
 
 export interface APIConfigurationParams {
   basePath: string;
@@ -37,13 +40,11 @@ export const createAPIConfiguration = ({
 };
 
 const production = (): APIConfiguration =>
-  // eslint-disable-next-line implicit-arrow-linebreak
   createAPIConfiguration({
     basePath: 'https://indexer-mr.dev.imtbl.com/v1', // TODO update before mainnet release
   });
 
 const sandbox = (): APIConfiguration =>
-  // eslint-disable-next-line implicit-arrow-linebreak
   createAPIConfiguration({
     basePath: 'https://indexer-mr.dev.imtbl.com/v1', // TODO update before testnet release
   });
