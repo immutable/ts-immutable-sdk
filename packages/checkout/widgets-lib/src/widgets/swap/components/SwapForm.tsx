@@ -26,6 +26,7 @@ import { Fees } from './Fees';
 import { SwapButton } from './SwapButton';
 import { SwapFormData } from './swapFormTypes';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
+import { useInterval } from '../../../lib/hooks/useInterval';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -290,18 +291,19 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!fromToken) return false;
     if (!toToken) return false;
     if (isFetching) return false;
+    if (editing) return false;
     return true;
   };
 
-  const fetchQuoteFrom = async () => {
+  const fetchQuoteFrom = async (withLoading: boolean = true) => {
     if (!canRunFromQuote()) return;
 
-    setLoading(true);
+    if (withLoading) setLoading(true);
     setIsFetching(true);
 
     await processFetchQuoteFrom();
 
-    setLoading(false);
+    if (withLoading) setLoading(false);
     setIsFetching(false);
   };
 
@@ -311,25 +313,29 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!fromToken) return false;
     if (!toToken) return false;
     if (isFetching) return false;
+    if (editing) return false;
     return true;
   };
 
-  const fetchQuoteTo = async () => {
+  const fetchQuoteTo = async (withLoading: boolean = true) => {
     if (!canRunToQuote()) return;
 
-    setLoading(true);
+    if (withLoading) setLoading(true);
     setIsFetching(true);
 
     await processFetchQuoteTo();
 
-    setLoading(false);
+    if (withLoading) setLoading(false);
     setIsFetching(false);
   };
 
-  const fetchQuote = async () => {
-    if (direction === SwapDirection.FROM) await fetchQuoteFrom();
-    else await fetchQuoteTo();
+  const fetchQuote = async (withLoading: boolean = true) => {
+    if (direction === SwapDirection.FROM) await fetchQuoteFrom(withLoading);
+    else await fetchQuoteTo(withLoading);
   };
+
+  // Silently refresh the quote
+  useInterval(() => fetchQuote(false), 3000);
 
   useEffect(() => {
     if (direction === SwapDirection.FROM) {
@@ -445,13 +451,6 @@ export function SwapForm({ data }: SwapFromProps) {
     }).fromToConversion);
   }, [quote]);
 
-  // useEffect(() => {
-  //   const id = setInterval(() => fetchQuote(), 2000);
-  //   return () => {
-  //     clearInterval(id);
-  //   };
-  // }, []);
-
   return (
     <>
       <Box sx={{ paddingX: 'base.spacing.x4' }}>
@@ -509,8 +508,8 @@ export function SwapForm({ data }: SwapFromProps) {
               onSelectChange={onFromSelectChange}
               textInputErrorMessage={fromAmountError}
               selectErrorMessage={fromTokenError}
-              selectInputDisabled={isFetching}
-              textInputDisabled={isFetching}
+              selectInputDisabled={loading}
+              textInputDisabled={loading}
               selectedOption={fromToken
                 ? formatTokenOptionsId(fromToken.symbol, fromToken.address)
                 : undefined}
@@ -551,8 +550,8 @@ export function SwapForm({ data }: SwapFromProps) {
               onSelectChange={onToSelectChange}
               textInputErrorMessage={toAmountError}
               selectErrorMessage={toTokenError}
-              selectInputDisabled={isFetching}
-              textInputDisabled={isFetching}
+              selectInputDisabled={loading}
+              textInputDisabled={loading}
               selectedOption={toToken
                 ? formatTokenOptionsId(toToken.symbol, toToken.address)
                 : undefined}
