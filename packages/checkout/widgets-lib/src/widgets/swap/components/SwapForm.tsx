@@ -1,5 +1,5 @@
 import {
-  useContext, useEffect, useMemo, useState,
+  useContext, useEffect, useMemo, useState, useRef
 } from 'react';
 import {
   Body, Box, Heading, OptionKey,
@@ -92,6 +92,18 @@ export function SwapForm() {
   const [toTokenError, setToTokenError] = useState<string>('');
   const [fromFiatValue, setFromFiatValue] = useState('');
 
+  const stateRef = useRef({
+    fromAmount,
+    fromToken,
+    toToken,
+    toAmount,
+    isFetching,
+    loading,
+    direction,
+    provider,
+    exchange,
+  })
+
   // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -138,10 +150,20 @@ export function SwapForm() {
   //    FETCH QUOTES   //
   // ------------------//
   const processFetchQuoteFrom = async () => {
+    const {
+      fromAmount,
+      fromToken,
+      toToken,
+      provider,
+      exchange,
+    } = stateRef.current
+
     if (!provider) return;
     if (!exchange) return;
     if (!fromToken) return;
     if (!toToken) return;
+
+    console.log('fetchingFrom')
 
     try {
       const result = await quotesProcessor.fromAmountIn(
@@ -198,10 +220,19 @@ export function SwapForm() {
   };
 
   const processFetchQuoteTo = async () => {
+    const {
+      fromToken,
+      toToken,
+      provider,
+      exchange,
+    } = stateRef.current
+    console.log(provider, exchange, fromToken, toToken)
     if (!provider) return;
     if (!exchange) return;
     if (!fromToken) return;
     if (!toToken) return;
+
+    console.log('fetchingTo')
 
     try {
       const result = await quotesProcessor.fromAmountOut(
@@ -256,6 +287,13 @@ export function SwapForm() {
   };
 
   const canRunFromQuote = (): boolean => {
+    const {
+      isFetching,
+      fromToken,
+      toToken,
+      fromAmount,
+    } = stateRef.current
+    console.log(Number.isNaN(parseFloat(fromAmount)), parseFloat(fromAmount), fromToken, toToken, isFetching)
     if (Number.isNaN(parseFloat(fromAmount))) return false;
     if (parseFloat(fromAmount) <= 0) return false;
     if (!fromToken) return false;
@@ -264,10 +302,10 @@ export function SwapForm() {
     return true;
   };
 
-  const fetchQuoteFrom = async () => {
+  const fetchQuoteFrom = async (blocking: boolean) => {
     if (!canRunFromQuote()) return;
 
-    setLoading(true);
+    setLoading(blocking);
     setIsFetching(true);
 
     await processFetchQuoteFrom();
@@ -277,6 +315,12 @@ export function SwapForm() {
   };
 
   const canRunToQuote = (): boolean => {
+    const {
+      isFetching,
+      fromToken,
+      toToken,
+      toAmount,
+    } = stateRef.current
     if (Number.isNaN(parseFloat(toAmount))) return false;
     if (parseFloat(toAmount) <= 0) return false;
     if (!fromToken) return false;
@@ -285,10 +329,10 @@ export function SwapForm() {
     return true;
   };
 
-  const fetchQuoteTo = async () => {
+  const fetchQuoteTo = async (blocking: boolean) => {
     if (!canRunToQuote()) return;
 
-    setLoading(true);
+    setLoading(blocking);
     setIsFetching(true);
 
     await processFetchQuoteTo();
@@ -297,9 +341,13 @@ export function SwapForm() {
     setIsFetching(false);
   };
 
-  const fetchQuote = async () => {
-    if (direction === SwapDirection.FROM) await fetchQuoteFrom();
-    else await fetchQuoteTo();
+  const fetchQuote = async (blocking: boolean = true) => {
+    const {
+      direction
+    } = stateRef.current
+    console.log(direction)
+    if (direction === SwapDirection.FROM) await fetchQuoteFrom(blocking);
+    else await fetchQuoteTo(blocking);
   };
 
   useEffect(() => {
@@ -315,6 +363,30 @@ export function SwapForm() {
       (async () => await fetchQuote())();
     }
   }, [toAmount, toToken, fromToken, editing]);
+  
+  useEffect(() => {
+    stateRef.current = {
+      fromAmount,
+      fromToken,
+      toToken,
+      isFetching,
+      loading,
+      direction,
+      provider,
+      exchange,
+      toAmount,
+    }
+  }, [
+    fromAmount,
+    fromToken,
+    toToken,
+    toAmount,
+    isFetching,
+    loading,
+    direction,
+    provider,
+    exchange,
+  ]);
 
   // -------------//
   //     FROM     //
@@ -415,12 +487,15 @@ export function SwapForm() {
     }).fromToConversion);
   }, [quote]);
 
-  // useEffect(() => {
-  //   const id = setInterval(() => fetchQuote(), 2000);
-  //   return () => {
-  //     clearInterval(id);
-  //   };
-  // }, []);
+  useEffect(() => {
+    const id = setInterval(async () => {
+      console.log('quietfetch')
+      await fetchQuote(false)
+    }, 10000);
+    return () => {
+      clearInterval(id);
+    };
+  }, []);
 
   return (
     <>
