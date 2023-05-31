@@ -1,6 +1,6 @@
 {
   "name": "@imtbl/erc20",
-  "description": "The ERC20 contract",
+  "description": "Wrapper functions for interacting with a deployed ERC20 contract.\n",
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
