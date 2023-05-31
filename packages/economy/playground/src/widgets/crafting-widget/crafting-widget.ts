@@ -1,39 +1,39 @@
-import { LitElement, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { LitElement, html } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 
-import { Environment } from '@imtbl/config';
-import { Economy } from '@imtbl/economy';
+import { Environment } from "@imtbl/config";
+import { Economy } from "@imtbl/economy";
 // FIXME: export this types
-import type { DomainRecipe } from '@imtbl/economy/dist/__codegen__/recipe';
-import type { InventoryItem } from '@imtbl/economy/dist/__codegen__/inventory';
+import type { DomainRecipe } from "@imtbl/economy/dist/__codegen__/recipe";
+import type { InventoryItem } from "@imtbl/economy/dist/__codegen__/inventory";
 import type {
   CraftCreateCraftInput,
   DomainCraft,
-} from '@imtbl/economy/dist/__codegen__/crafting';
+} from "@imtbl/economy/dist/__codegen__/crafting";
 
 type ComponentEvent =
   | {
-      type: 'userInfo';
+      type: "userInfo";
       data: { userId: string; email: string; address: string };
     }
   | {
-      type: 'item-selected';
+      type: "item-selected";
       data: Required<InventoryItem>;
     }
   | {
-      type: 'recipe-selected';
+      type: "recipe-selected";
       data: string;
     };
 
-@customElement('crafting-widget')
+@customElement("crafting-widget")
 export class CraftingWidget extends LitElement {
-  @property({ type: String, attribute: 'game-id' })
+  @property({ type: String, attribute: "game-id" })
   gameId!: string;
 
-  @property({ type: String, attribute: 'user-id' })
+  @property({ type: String, attribute: "user-id" })
   userId!: string;
 
-  @property({ type: String, attribute: 'wallet-address' })
+  @property({ type: String, attribute: "wallet-address" })
   walletAddress!: string;
 
   @state()
@@ -43,6 +43,9 @@ export class CraftingWidget extends LitElement {
   recipes: Array<DomainRecipe> = [];
 
   @state()
+  filteredRecipes: Array<DomainRecipe> = [];
+
+  @state()
   crafts: Array<DomainCraft> = [];
 
   @state()
@@ -50,6 +53,9 @@ export class CraftingWidget extends LitElement {
 
   @state()
   disabledSelection = false;
+
+  @state()
+  loading = false;
 
   @state()
   selectedRecipe!: DomainRecipe;
@@ -67,17 +73,17 @@ export class CraftingWidget extends LitElement {
 
   onComponentEvent(event: CustomEvent) {
     const detail = event.detail as ComponentEvent;
-    console.log('onComponentEvent', { detail });
+    console.log("onComponentEvent", { detail });
 
-    if (detail.type === 'userInfo') {
+    if (detail.type === "userInfo") {
       this.setUserInfoOnConnect(detail.data);
     }
 
-    if (detail.type === 'item-selected') {
+    if (detail.type === "item-selected") {
       this.selectItem(detail.data);
     }
 
-    if (detail.type === 'recipe-selected') {
+    if (detail.type === "recipe-selected") {
       this.selectRecipe(detail.data);
     }
   }
@@ -89,28 +95,64 @@ export class CraftingWidget extends LitElement {
   }
 
   selectItem(item: Required<InventoryItem>) {
-    if (this.selectedItems.has(item.id)) {
-      this.selectedItems.delete(item.id);
-      this.economy.crafting.removeInput(item.id);
-    } else {
-      this.selectedItems.set(item.id, item);
-      this.economy.crafting.addInputByItem(item);
+    if (!this.selectedRecipe?.id && !this.selectedItems.has(item.id)) {
+      this.showRecipeSelection(item);
+      return;
     }
+
+    if (this.selectedItems.has(item.id)) {
+      this.economy.crafting.removeInput(item.id);
+      this.selectedItems.delete(item.id);
+    } else {
+      this.economy.crafting.addInputByItem(item);
+      this.selectedItems.set(item.id, item);
+    }
+
+    this.setDisableSection();
     this.requestUpdate();
   }
 
-  selectRecipe(recipeId: string) {
+  showRecipeSelection(item: Required<InventoryItem>) {
+    this.filteredRecipes = this.recipes.filter((recipe) => {
+      return this.economy.recipe.getInputsByItem(recipe, item).length > 0;
+    });
+    
+    if (this.filteredRecipes.length > 0) {
+      this.selectedItems.set(item.id, item);
+    }
+    
+    this.requestUpdate();
+    (this.querySelector("#btnRecipeModal") as HTMLLabelElement)?.click();
+  }
+
+  selectRecipe(recipeId: string, resetItems = true) {
     const recipe = this.recipes.find((recipe) => {
       return recipe.id === recipeId;
     });
 
     if (!recipe) {
       throw new Error(`Recipe ${recipeId} not found`);
-    };
+    }
+
+    this.economy.crafting.resetCraftingInputs();
+    if (resetItems) {
+      this.selectedItems.clear();
+    }
 
     this.economy.recipe.setActive(recipe.id);
     this.selectedRecipe = recipe;
-    this.selectedItems.clear();
+    this.setDisableSection();
+    this.requestUpdate();
+  }
+
+  setDisableSection() {
+    this.disabledSelection =
+      this.economy.state.craftingInputs.length ===
+      this.selectedRecipe?.inputs?.length;
+  }
+
+  setLoading(loading = false) {
+    this.loading = loading;
     this.requestUpdate();
   }
 
@@ -162,7 +204,7 @@ export class CraftingWidget extends LitElement {
     this.economy.connect();
   }
 
-  handleInputChanges(key: 'userId' | 'walletAddress' | 'gameId') {
+  handleInputChanges(key: "userId" | "walletAddress" | "gameId") {
     return (event: InputEvent) => {
       this[key] = (event.target as HTMLInputElement).value;
       this.requestUpdate();
@@ -171,6 +213,9 @@ export class CraftingWidget extends LitElement {
 
   async sendCraft(event: Event) {
     event.preventDefault();
+
+    this.loading = true;
+    this.requestUpdate();
 
     if (!this.economy.state.selectedRecipeId) {
       return;
@@ -182,16 +227,62 @@ export class CraftingWidget extends LitElement {
       recipe_id: this.economy.state.selectedRecipeId,
       ingredients: this.economy.state.craftingInputs,
     };
-    
+
     try {
-      await this.economy.crafting.craft(input);
+      // await this.economy.crafting.craft(input);
+
+      setTimeout(() => {
+        this.loading = false;
+      }, 3000);
 
       this.selectedRecipe = {};
       this.selectedItems.clear();
       this.economy.crafting.resetCraftingInputs();
+      this.disabledSelection = false;
       this.requestUpdate();
-    } catch (error) {
-    }
+    } catch (error) {}
+  }
+
+  cancelRecipeSelection() {
+    this.selectedItems.clear();
+  }
+
+  renderRecipeSelection() {
+    return html`
+      <!-- The button to open modal -->
+      <label id="btnRecipeModal" for="my-modal" class="btn hidden"
+        >open modal</label
+      >
+
+      <!-- Put this part before </body> tag -->
+      <input type="checkbox" id="my-modal" class="modal-toggle" />
+      <div class="modal">
+        <div class="modal-box">
+          <h3 class="font-bold text-lg">
+            Compatible recipes
+          </h3>
+          <div class="ul w-full">
+            ${this.filteredRecipes.map((recipe) => {
+              return html`
+                <li
+                  class="w-full font-bold hover:bg-primary hover:text-white cursor-pointer p-2"
+                  @click="${() => {
+                    this.selectRecipe(recipe.id as string, false);
+                    this.economy.crafting.addInputByItem(
+                      Array.from(this.selectedItems.values())[0]
+                    );
+                    (this.querySelector("#btnRecipeModal") as HTMLLabelElement)?.click(); 
+                  }}"
+                >${recipe.name}</li>
+              `
+            })}
+          </div>
+          <div class="modal-action">
+            <label for="my-modal" class="btn btn-warning" @click="${this.cancelRecipeSelection}">cancel</label>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   render() {
@@ -205,7 +296,8 @@ export class CraftingWidget extends LitElement {
         })
       : this.inventory;
 
-      return html`
+    return html`
+      ${this.renderRecipeSelection()}
       <div class="h-screen flex flex-col">
         <div class="drawer">
           <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
@@ -236,21 +328,21 @@ export class CraftingWidget extends LitElement {
                   placeholder="Game Id"
                   class="input w-full max-w-xs ml-2"
                   .value="${this.gameId}"
-                  @blur="${this.handleInputChanges('gameId')}"
+                  @blur="${this.handleInputChanges("gameId")}"
                 />
                 <input
                   type="text"
                   placeholder="User Id"
                   class="input w-full max-w-xs ml-2"
                   .value="${this.userId}"
-                  @blur="${this.handleInputChanges('userId')}"
+                  @blur="${this.handleInputChanges("userId")}"
                 />
                 <input
                   type="text"
                   placeholder="Wallet Address"
                   class="input w-full max-w-xs ml-2"
                   .value="${this.walletAddress}"
-                  @blur="${this.handleInputChanges('walletAddress')}"
+                  @blur="${this.handleInputChanges("walletAddress")}"
                 />
                 <div class="w-full max-w-xs ml-2">
                   <recipe-selection
@@ -269,8 +361,8 @@ export class CraftingWidget extends LitElement {
               <div
                 class="bg-gray-100 overflow-hidden overflow-y-scroll max-h-96 lg:max-h-none ${this
                   .disabledSelection
-                  ? 'grayscale contrast-200 opacity-50 pointer-events-none'
-                  : ''}"
+                  ? "grayscale contrast-200 opacity-50 pointer-events-none"
+                  : ""}"
               >
                 <inventory-collection
                   .inventory="${filteredInventory}"
@@ -281,7 +373,6 @@ export class CraftingWidget extends LitElement {
               <div class="flex flex-1 flex-col lg:flex-row">
                 <!-- SELECTION -->
                 <div class=" flex-grow bg-gray-200">
-                  Selection
                   <items-selection
                     .items="${selectedItems}"
                     .recipe="${this.selectedRecipe}"
@@ -291,6 +382,16 @@ export class CraftingWidget extends LitElement {
                 <div class="divider lg:divider-horizontal">🟰</div>
                 <!-- SUMMARY -->
                 <div class="flex-grow bg-gray-300">
+                  <div class="flex justify-center bg-gray-400 w-full p-2">
+                    <button
+                      class="btn btn-wide btn-secondary ${this.loading
+                        ? "loading"
+                        : ""} ${!this.disabledSelection ? "btn-disabled" : ""}"
+                      @click="${this.sendCraft}"
+                    >
+                      Craft
+                    </button>
+                  </div>
                   <div class="flex flex-col w-full items-center">
                     <crafting-summary
                       class="w-full"
@@ -299,11 +400,6 @@ export class CraftingWidget extends LitElement {
                       .selectedItems="${selectedItems}"
                       .inputs="${this.economy.state.craftingInputs}"
                     ></crafting-summary>
-                  </div>
-                  <div class="flex justify-center bg-gray-400 w-full p-2">
-                    <button class="btn btn-wide" @click=${this.sendCraft}>
-                      Craft
-                    </button>
                   </div>
                 </div>
                 <!-- SUMMARY -->
@@ -344,12 +440,12 @@ export class CraftingWidget extends LitElement {
       this.getCrafts();
       this.requestUpdate();
     }, 500);
-    window.addEventListener('beforeunload', () =>
+    window.addEventListener("beforeunload", () =>
       clearInterval(refreshInterval)
     );
 
     window.addEventListener(
-      'crafting-widget-event',
+      "crafting-widget-event",
       this.getCustomEventHandler(this.onComponentEvent)
     );
 
@@ -358,11 +454,7 @@ export class CraftingWidget extends LitElement {
   }
 
   update(changedProperties: Map<string, unknown>) {
-    if (changedProperties.has('craftingInputs')) {
-      console.log({ craftingInputs: this.economy.state.craftingInputs });
-    }
-
-    if (changedProperties.has('selectedRecipe')) {
+    if (changedProperties.has("selectedRecipe")) {
       this.getRecipeOutputItems();
     }
 
