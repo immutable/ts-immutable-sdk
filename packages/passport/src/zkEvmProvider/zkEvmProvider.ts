@@ -79,6 +79,7 @@ export class ZkEvmProvider {
             this.user = user;
             this.magicProvider = magicProvider;
             response.result = result;
+
             break;
           }
           case 'eth_sendTransaction': {
