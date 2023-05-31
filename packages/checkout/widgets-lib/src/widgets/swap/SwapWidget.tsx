@@ -1,33 +1,48 @@
-import { BiomeThemeProvider, Body } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import {
   Checkout,
-  ConnectResult,
   GetTokenAllowListResult,
   TokenFilterTypes,
-  TokenInfo,
   ConnectionProviders,
 } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { useEffect, useState, useMemo, useCallback, useReducer } from 'react';
+import {
+  useEffect, useCallback, useReducer, useMemo,
+} from 'react';
+import { ImmutableConfiguration } from '@imtbl/config';
+import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
+import { SwapCoins } from './views/SwapCoins';
+import { LoadingView } from '../../components/Loading/LoadingView';
+import {
+  SwapActions,
+  SwapContext,
+  initialSwapState,
+  swapReducer,
+} from './context/SwapContext';
 import {
   BaseViews,
   ViewActions,
   ViewContext,
   initialViewState,
   viewReducer,
-} from '../../context/ViewContext';
-import { SwapWidgetViews } from '../../context/SwapViewContextTypes';
-import { SwapCoins } from './views/SwapCoins';
-import { SuccessView } from '../../components/Success/SuccessView';
-import { LoadingView } from '../../components/Loading/LoadingView';
-import { Environment } from '@imtbl/config';
-import { L1Network } from '../../lib/networkUtils';
+} from '../../context/view-context/ViewContext';
+import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
+import { StatusView } from '../../components/Status/StatusView';
+import { StatusType } from '../../components/Status/StatusType';
+import { getDexConfigOverrides } from './DexConfigOverrides';
+import { text } from '../../resources/text/textConfig';
+import { ErrorView } from '../../components/Error/ErrorView';
+import {
+  sendSwapFailedEvent, sendSwapRejectedEvent,
+  sendSwapSuccessEvent, sendSwapWidgetCloseEvent,
+} from './SwapWidgetEvents';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
-  theme: WidgetTheme;
-  environment: Environment;
+  config: StrongCheckoutWidgetsConfig
 }
 
 export interface SwapWidgetParams {
@@ -38,75 +53,208 @@ export interface SwapWidgetParams {
 }
 
 export function SwapWidget(props: SwapWidgetProps) {
-  const [connection, setConnection] = useState<ConnectResult>();
-  const [allowedTokens, setAllowedTokens] = useState<TokenInfo[]>([]);
+  const { success, failed, rejected } = text.views[SwapWidgetViews.SWAP];
+  const loadingText = text.views[BaseViews.LOADING_VIEW].text;
+  const { actionText } = text.views[BaseViews.ERROR];
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-
-  const { params, theme, environment } = props;
-  const { amount, fromContractAddress, toContractAddress, providerPreference } =
-    params;
-  const biomeTheme: BaseTokens =
-    theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-      ? onLightBase
-      : onDarkBase;
-  const checkout = useMemo(
-    () => new Checkout({ baseConfig: { environment: environment } }),
-    [environment]
+  const viewReducerValues = useMemo(
+    () => ({ viewState, viewDispatch }),
+    [viewState, viewDispatch],
+  );
+  const [swapState, swapDispatch] = useReducer(swapReducer, initialSwapState);
+  const swapReducerValues = useMemo(
+    () => ({ swapState, swapDispatch }),
+    [swapState, swapDispatch],
   );
 
-  const connectToCheckout = useCallback(async () => {
+  const { params, config } = props;
+  const { environment, theme } = config;
+  const {
+    amount, fromContractAddress, toContractAddress, providerPreference,
+  } = params;
+
+  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+    ? onLightBase
+    : onDarkBase;
+
+  const swapWidgetSetup = useCallback(async () => {
     if (!providerPreference) return;
-    const result = await checkout.connect({
-      providerPreference,
+
+    const checkout = new Checkout({
+      baseConfig: { environment },
     });
-    setConnection(result);
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_CHECKOUT,
+        checkout,
+      },
+    });
+
+    const connectResult = await checkout.connect({
+      providerPreference: providerPreference ?? ConnectionProviders.METAMASK,
+    });
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_PROVIDER,
+        provider: connectResult.provider,
+      },
+    });
+
+    const address = await connectResult.provider.getSigner().getAddress();
+    const tokenBalances = await checkout.getAllBalances({
+      provider: connectResult.provider,
+      walletAddress: address,
+      chainId: connectResult.network.chainId,
+    });
+
     const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
       {
-        chainId: L1Network(checkout.config.environment),
+        chainId: connectResult.network.chainId,
         type: TokenFilterTypes.SWAP,
-      } // TODO: THIS NEEDS TO BE CHANGED BACK TO THE NETWORK CHAIN ID
+      },
     );
-    setAllowedTokens(allowList.tokens);
+
+    const allowedTokenBalances = tokenBalances.balances.filter((balance) => allowList.tokens
+      .map((token) => token.address)
+      .includes(balance.token.address));
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_ALLOWED_TOKENS,
+        allowedTokens: allowList.tokens,
+      },
+    });
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_TOKEN_BALANCES,
+        tokenBalances: allowedTokenBalances,
+      },
+    });
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_NETWORK,
+        network: connectResult.network,
+      },
+    });
+
+    // check default values for amount, toTokenAddress and fromTokenAddress
+    // set in form state
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: { type: SwapWidgetViews.SWAP },
       },
     });
-  }, [checkout, providerPreference]);
+
+    const exchange = new Exchange(new ExchangeConfiguration({
+      chainId: connectResult.network.chainId,
+      baseConfig: new ImmutableConfiguration({ environment }),
+      overrides: getDexConfigOverrides(),
+    }));
+
+    swapDispatch({
+      payload: {
+        type: SwapActions.SET_EXCHANGE,
+        exchange,
+      },
+    });
+  }, [providerPreference, environment]);
 
   useEffect(() => {
-    connectToCheckout();
-  }, [connectToCheckout]);
-
-  const renderFailure = () => {
-    return <Body>Failure</Body>;
-  };
+    swapWidgetSetup();
+  }, [swapWidgetSetup]);
 
   return (
-    <BiomeThemeProvider theme={{ base: biomeTheme }}>
-      <ViewContext.Provider value={{ viewState, viewDispatch }}>
-        {viewState.view.type === BaseViews.LOADING_VIEW && (
-          <LoadingView loadingText="Loading" />
-        )}
-        {viewState.view.type === SwapWidgetViews.SWAP && (
-          <SwapCoins
-            allowedTokens={allowedTokens}
-            amount={amount}
-            fromContractAddress={fromContractAddress}
-            toContractAddress={toContractAddress}
-            connection={connection}
+    <BiomeCombinedProviders theme={{ base: biomeTheme }} bottomSheetContainerId="bottom-sheet-container">
+      <ViewContext.Provider value={viewReducerValues}>
+        <SwapContext.Provider value={swapReducerValues}>
+          {viewState.view.type === BaseViews.LOADING_VIEW && (
+            <LoadingView loadingText={loadingText} />
+          )}
+          {viewState.view.type === SwapWidgetViews.SWAP && (
+            <CryptoFiatProvider>
+              <SwapCoins
+                fromAmount={viewState.view.data?.fromAmount ?? amount}
+                fromContractAddress={viewState.view.data?.fromContractAddress ?? fromContractAddress}
+                toContractAddress={viewState.view.data?.toContractAddress ?? toContractAddress}
+              />
+            </CryptoFiatProvider>
+          )}
+          {viewState.view.type === SwapWidgetViews.SUCCESS && (
+            <StatusView
+              statusText={success.text}
+              actionText={success.actionText}
+              onRenderEvent={sendSwapSuccessEvent}
+              // eslint-disable-next-line no-console
+              onActionClick={sendSwapWidgetCloseEvent}
+              statusType={StatusType.SUCCESS}
+              testId="success-view"
+            />
+          )}
+          {viewState.view.type === SwapWidgetViews.FAIL && (
+          <StatusView
+            statusText={failed.text}
+            actionText={failed.actionText}
+            onRenderEvent={() => sendSwapFailedEvent('Transaction failed')}
+            onActionClick={() => {
+              if (viewState.view.type === SwapWidgetViews.FAIL) {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: {
+                      type: SwapWidgetViews.SWAP,
+                      data: viewState.view.data,
+                    },
+                  },
+                });
+              }
+            }}
+            statusType={StatusType.FAILURE}
+            testId="fail-view"
           />
-        )}
-        {viewState.view.type === SwapWidgetViews.SUCCESS && (
-          <SuccessView
-            successText={'Success'}
-            actionText={'Contine'}
-            onActionClick={() => console.log('success')}
-          />
-        )}
-        {viewState.view.type === SwapWidgetViews.FAIL && renderFailure()}
+          )}
+          {viewState.view.type === SwapWidgetViews.PRICE_SURGE && (
+            <StatusView
+              statusText={rejected.text}
+              actionText={rejected.actionText}
+              onRenderEvent={() => sendSwapRejectedEvent('Price surge')}
+              onActionClick={() => {
+                if (viewState.view.type === SwapWidgetViews.PRICE_SURGE) {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.UPDATE_VIEW,
+                      view: {
+                        type: SwapWidgetViews.SWAP,
+                        data: viewState.view.data,
+                      },
+                    },
+                  });
+                }
+              }}
+              statusType={StatusType.WARNING}
+              testId="price-surge-view"
+            />
+          )}
+          {viewState.view.type === BaseViews.ERROR && (
+            <ErrorView
+              actionText={actionText}
+              onActionClick={() => {
+                viewDispatch({
+                  payload: {
+                    type: ViewActions.UPDATE_VIEW,
+                    view: { type: SwapWidgetViews.SWAP },
+                  },
+                });
+              }}
+              onCloseClick={sendSwapWidgetCloseEvent}
+            />
+          )}
+        </SwapContext.Provider>
       </ViewContext.Provider>
-    </BiomeThemeProvider>
+    </BiomeCombinedProviders>
   );
 }

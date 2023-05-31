@@ -1,8 +1,10 @@
+/* eslint-disable max-len */
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
-import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
-import { BaseViews } from '../../context/ViewContext';
-import { WalletWidgetViews } from '../../context/WalletViewContextTypes';
-import { SwapWidgetViews } from '../../context/SwapViewContextTypes';
+import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
+import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
+import { BaseViews } from '../../context/view-context/ViewContext';
+import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
+import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 
 export const text = {
   views: {
@@ -26,13 +28,32 @@ export const text = {
       },
     },
     [ConnectWidgetViews.SWITCH_NETWORK]: {
-      heading:
-        'To trade here, MetaMask will ask you to switch to the Immutable zkEVM network',
-      body: "Check for the pop-up from MetaMask and 'Approve' to switch. If this is the first time, MetaMask will also ask you to add the network.",
+      eth: {
+        heading:
+          "To move your coins, you'll need to switch to the Sepolia network",
+        body: "You'll be prompted to switch networks in Metamask. You'll be able to switch back when needed.",
+        button: {
+          text: 'Ready to Switch',
+          retryText: 'Try Again',
+        },
+      },
+      zkEVM: {
+        heading:
+          'To trade here, MetaMask will ask you to switch to the Immutable zkEVM network',
+        body: "Check for the pop-up from MetaMask and 'Approve' to switch. If this is the first time, MetaMask will also ask you to add the network.",
+        button: {
+          text: 'Ready to Switch',
+          retryText: 'Try Again',
+        },
+      },
     },
     [BaseViews.ERROR]: {
       heading: "Something's gone wrong",
       body: ['You can try again or contact', 'support', 'for help.'],
+      actionText: 'Try again',
+    },
+    [BaseViews.LOADING_VIEW]: {
+      text: 'Loading',
     },
     [WalletWidgetViews.WALLET_BALANCES]: {
       header: {
@@ -40,21 +61,96 @@ export const text = {
       },
       networkStatus: {
         heading: 'Network',
-        network1Name: 'Polygon',
-        network2Name: 'Ethereum',
+      },
+      totalTokenBalance: {
+        heading: 'Coins',
+        totalHeading: 'Value',
       },
       tokenBalancesList: {
         noTokensFound: 'No tokens found',
       },
     },
+    [WalletWidgetViews.SETTINGS]: {
+      header: {
+        title: 'Settings',
+      },
+      disconnectButton: {
+        label: 'Disconnect Wallet',
+      },
+    },
+    [WalletWidgetViews.COIN_INFO]: {
+      heading: 'Coins and collectibles are native to networks',
+      body: 'You can switch networks to add coins or move them from one network to another',
+    },
     [SwapWidgetViews.SWAP]: {
       header: {
-        title: "Swap coins"
+        title: 'Swap coins',
+      },
+      content: {
+        title: 'What would you like to swap?',
+        fiatPricePrefix: 'Approx USD',
+        availableBalancePrefix: 'Available',
       },
       swapForm: {
-        buttonText: 'Swap'
-      }
-    }
+        from: {
+          label: 'From',
+          inputPlaceholder: '0',
+          selectorTitle: 'What would you like to swap from?',
+        },
+        to: {
+          label: 'To',
+          inputPlaceholder: '0',
+          selectorTitle: 'What would you like to swap to?',
+        },
+        buttonText: 'Swap',
+      },
+      fees: {
+        title: 'Fees total',
+      },
+      validation: {
+        noAmountInputted: 'Please input amount',
+        insufficientBalance: 'Insufficient balance',
+        noFromTokenSelected: 'Select a coin to swap',
+        noToTokenSelected: 'Select a coin to receive',
+      },
+      success: {
+        text: 'Success',
+        actionText: 'Continue',
+      },
+      failed: {
+        text: 'Transaction rejected',
+        actionText: 'Try again',
+      },
+      rejected: {
+        text: 'Price surge',
+        actionText: 'Review & try again',
+      },
+    },
+    [BridgeWidgetViews.BRIDGE]: {
+      header: {
+        title: 'Move coins',
+      },
+      content: {
+        title: 'What would you like to move from Ethereum to Immutable zkEVM?',
+        fiatPricePrefix: 'Approx USD',
+        availableBalancePrefix: 'Available',
+      },
+      bridgeForm: {
+        from: {
+          inputPlaceholder: '0',
+          selectorTitle: 'What would you like to bridge?',
+        },
+        buttonText: 'Move',
+      },
+      fees: {
+        title: 'Fees total',
+      },
+      validation: {
+        noAmountInputted: 'Please input amount',
+        insufficientBalance: 'Insufficient balance',
+        noTokenSelected: 'Select a coin to move',
+      },
+    },
   },
   wallets: {
     [ConnectionProviders.METAMASK]: {

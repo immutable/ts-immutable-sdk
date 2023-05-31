@@ -3,12 +3,12 @@ import { Body, Box } from '@biom3/react';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
+import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { WalletList } from '../components/WalletList';
 import { ConnectContext } from '../context/ConnectContext';
 
-export const ConnectWallet = () => {
+export function ConnectWallet() {
   const { header, body } = text.views[ConnectWidgetViews.CONNECT_WALLET];
   const {
     connectState: { sendCloseEvent },
@@ -16,12 +16,12 @@ export const ConnectWallet = () => {
   return (
     <SimpleLayout
       testId="connect-wallet"
-      header={
+      header={(
         <HeaderNavigation
           title={header.title}
           onCloseButtonClick={sendCloseEvent}
         />
-      }
+      )}
       footer={<FooterLogo />}
     >
       <Box
@@ -46,4 +46,4 @@ export const ConnectWallet = () => {
       </Box>
     </SimpleLayout>
   );
-};
+}

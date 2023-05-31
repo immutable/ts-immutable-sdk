@@ -1,6 +1,5 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import {
   Checkout,
   ConnectionProviders,
@@ -9,69 +8,76 @@ import {
 import { useEffect, useReducer } from 'react';
 import {
   initialWalletState,
-  TopUpFeature,
   WalletActions,
   WalletContext,
   walletReducer,
 } from './context/WalletContext';
-import {
-  BaseViews,
-  initialViewState,
-  ViewActions,
-  ViewContext,
-  viewReducer,
-} from '../../context/ViewContext';
-import { WalletWidgetViews } from '../../context/WalletViewContextTypes';
 import { WalletBalances } from './views/WalletBalances';
 import { ErrorView } from '../../components/Error/ErrorView';
 import { LoadingView } from '../../components/Loading/LoadingView';
-import { getTokenBalances } from './functions/tokenBalances';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { zkEVMNetwork } from '../../lib/networkUtils';
-import { Environment } from '@imtbl/config';
+import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import {
+  viewReducer,
+  initialViewState,
+  ViewActions,
+  ViewContext,
+  BaseViews,
+} from '../../context/view-context/ViewContext';
+import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
+import { Settings } from './views/Settings';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
+import { CoinInfo } from './views/CoinInfo';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
-  theme: WidgetTheme;
-  environment: Environment;
+  config: StrongCheckoutWidgetsConfig
 }
 
 export interface WalletWidgetParams {
   providerPreference?: ConnectionProviders;
-  topUpFeatures?: TopUpFeature;
 }
 
 export function WalletWidget(props: WalletWidgetProps) {
-  const { environment, params, theme } = props;
-  const { providerPreference, topUpFeatures } = params;
-  const biomeTheme: BaseTokens =
-    theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-      ? onLightBase
-      : onDarkBase;
+  const { params, config } = props;
+  const { providerPreference } = params;
+  const {
+    environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
+  } = config;
+
+  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+    ? onLightBase
+    : onDarkBase;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+
   const [walletState, walletDispatch] = useReducer(
     walletReducer,
-    initialWalletState
+    initialWalletState,
   );
 
   const { checkout } = walletState;
 
   useEffect(() => {
-    const checkout = new Checkout({ baseConfig: { environment: environment } });
     walletDispatch({
       payload: {
         type: WalletActions.SET_CHECKOUT,
-        checkout: checkout,
+        checkout: new Checkout({ baseConfig: { environment } }),
       },
     });
 
     walletDispatch({
       payload: {
         type: WalletActions.SET_SUPPORTED_TOP_UPS,
-        supportedTopUps: { ...topUpFeatures },
+        supportedTopUps: {
+          isBridgeEnabled,
+          isSwapEnabled,
+          isOnRampEnabled,
+        },
       },
     });
-  }, [topUpFeatures, environment]);
+  }, [isBridgeEnabled, isSwapEnabled, isOnRampEnabled, environment]);
 
   useEffect(() => {
     (async () => {
@@ -109,14 +115,8 @@ export function WalletWidget(props: WalletWidgetProps) {
 
       walletDispatch({
         payload: {
-          type: WalletActions.SWITCH_NETWORK,
+          type: WalletActions.SET_NETWORK,
           network,
-          tokenBalances: await getTokenBalances(
-            checkout,
-            provider,
-            network.name,
-            network.chainId
-          ),
         },
       });
 
@@ -130,27 +130,39 @@ export function WalletWidget(props: WalletWidgetProps) {
   }, [providerPreference, checkout]);
 
   const errorAction = () => {
+    // TODO: please remove or if necessary keep the eslint ignore
+    // eslint-disable-next-line no-console
     console.log('Something went wrong');
   };
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
+      {/* TODO: please fix */}
+      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
-        <WalletContext.Provider value={{ walletState, walletDispatch }}>
-          {viewState.view.type === BaseViews.LOADING_VIEW && (
-            <LoadingView loadingText="Loading" />
-          )}
-          {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
-            <WalletBalances />
-          )}
-          {viewState.view.type === BaseViews.ERROR && (
-            <ErrorView
-              actionText="Try again"
-              onActionClick={errorAction}
-              onCloseClick={sendWalletWidgetCloseEvent}
-            />
-          )}
-        </WalletContext.Provider>
+        <CryptoFiatProvider>
+          {/* TODO: please fix */}
+          {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
+          <WalletContext.Provider value={{ walletState, walletDispatch }}>
+            {viewState.view.type === BaseViews.LOADING_VIEW && (
+              <LoadingView loadingText="Loading" />
+            )}
+            {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
+              <WalletBalances />
+            )}
+            {viewState.view.type === WalletWidgetViews.SETTINGS && <Settings />}
+            {viewState.view.type === WalletWidgetViews.COIN_INFO && (
+              <CoinInfo />
+            )}
+            {viewState.view.type === BaseViews.ERROR && (
+              <ErrorView
+                actionText="Try again"
+                onActionClick={errorAction}
+                onCloseClick={sendWalletWidgetCloseEvent}
+              />
+            )}
+          </WalletContext.Provider>
+        </CryptoFiatProvider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>
   );

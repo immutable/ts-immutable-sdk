@@ -1,7 +1,7 @@
-import { generateSigners, privateKey1, testConfig } from '../test/helpers';
 import { UnsignedExchangeTransferRequest, ExchangesApi } from '@imtbl/core-sdk';
-import { exchangeTransfer } from './exchanges';
 import { signRaw, convertToSignableToken } from '@imtbl/toolkit';
+import { generateSigners, privateKey1, testConfig } from '../test/helpers';
+import { exchangeTransfer } from './exchanges';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
@@ -76,7 +76,7 @@ describe('ExchangeTransfer', () => {
             type: 'ETH',
           },
           amount: '1000000000000000000',
-          receiver: receiver,
+          receiver,
         },
       });
       expect(createExchangeTransferMock).toHaveBeenCalledWith({

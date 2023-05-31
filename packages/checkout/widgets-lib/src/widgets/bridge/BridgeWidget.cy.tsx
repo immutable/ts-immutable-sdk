@@ -1,27 +1,35 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+import {
+  describe, it, cy, beforeEach,
+} from 'local-cypress';
+import { mount } from 'cypress/react18';
+import { Checkout } from '@imtbl/checkout-sdk';
+import { BigNumber } from 'ethers';
+import { Environment } from '@imtbl/config';
+import { cySmartGet } from '../../lib/testUtils';
 import {
   BridgeWidget,
   BridgeWidgetParams,
-  BridgeWidgetViews,
 } from './BridgeWidget';
-import { describe, it, cy, beforeEach } from 'local-cypress';
-import { mount } from 'cypress/react18';
-import { Network, WidgetTheme } from '@imtbl/checkout-widgets';
-import { cySmartGet } from '../../lib/testUtils';
-import { Checkout, SwitchNetworkResult } from '@imtbl/checkout-sdk';
-import { BigNumber } from 'ethers';
-import { BiomeCombinedProviders, BiomeThemeProvider } from '@biom3/react';
-import { onDarkBase } from '@biom3/design-tokens';
-import Sinon from 'cypress/types/sinon';
-import { BridgeButton } from './components/BridgeButton';
-import { TransactionResponse } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
+import { text } from '../../resources/text/textConfig';
+import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 
-type CypressStub = Cypress.Agent<Sinon.SinonStub<any[], any>>;
 describe('Bridge Widget tests', () => {
-  let connectStub: any;
-  let switchNetworkStub: CypressStub;
+  const { header, content } = text.views[BridgeWidgetViews.BRIDGE];
+  beforeEach(() => {
+    cy.viewport('ipad-2');
+  });
 
   let connectStubReturnValue;
+  const config: StrongCheckoutWidgetsConfig = {
+    environment: Environment.PRODUCTION,
+    theme: WidgetTheme.DARK,
+    isBridgeEnabled: true,
+    isSwapEnabled: true,
+    isOnRampEnabled: true,
+  };
 
   beforeEach(() => {
     connectStubReturnValue = {
@@ -44,11 +52,12 @@ describe('Bridge Widget tests', () => {
           name: 'ETH',
           symbol: 'ETH',
           decimals: 18,
+          address: '',
         },
       },
     };
 
-    connectStub = cy
+    cy
       .stub(Checkout.prototype, 'connect')
       .as('connectStub')
       .resolves(connectStubReturnValue);
@@ -64,6 +73,7 @@ describe('Bridge Widget tests', () => {
               name: 'ETH',
               symbol: 'ETH',
               decimals: 18,
+              address: '',
               icon: '123',
             },
           },
@@ -71,19 +81,94 @@ describe('Bridge Widget tests', () => {
             balance: BigNumber.from('10000000000000'),
             formattedBalance: '0.1',
             token: {
-              name: 'Matic',
-              symbol: 'MATIC',
+              name: 'ImmutableX',
+              symbol: 'IMX',
               decimals: 18,
-              address: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
+              address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
               icon: '123',
             },
           },
         ],
       });
 
-    switchNetworkStub = cy
+    cy
       .stub(Checkout.prototype, 'switchNetwork')
-      .as('switchNetworkStub');
+      .as('switchNetworkStub')
+      .resolves(connectStubReturnValue);
+
+    cy.stub(Checkout.prototype, 'getTokenAllowList')
+      .as('getTokenAllowListStub')
+      .resolves({
+        tokens: [
+          {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+            address: '',
+          },
+          {
+            name: 'ImmutableX',
+            symbol: 'IMX',
+            decimals: 18,
+            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          },
+        ],
+      });
+
+    cy.stub(Checkout.prototype, 'getNetworkAllowList')
+      .as('getNetworkAllowListStub')
+      .resolves({
+        networks: [
+          {
+            chainId: 1,
+            name: 'Ethereum',
+            nativeCurrency: {
+              name: 'ETH',
+              symbol: 'ETH',
+              decimals: 18,
+            },
+          },
+          {
+            chainId: 137,
+            name: 'Immutable zkEVM Testnet',
+            nativeCurrency: {
+              name: 'ImmutableX',
+              symbol: 'IMX',
+              decimals: 18,
+            },
+          },
+        ],
+      });
+
+    const fiatPricingValue = {
+      ethereum: { usd: 2000.0 },
+      'usd-coin': { usd: 1.0 },
+      'immutable-x': { usd: 1.5 },
+    };
+
+    const coinList = [
+      {
+        id: 'ethereum',
+        symbol: 'eth',
+        name: 'Etherum',
+      },
+    ];
+
+    cy.intercept(
+      {
+        method: 'GET',
+        path: '/api/v3/coins/list*',
+      },
+      coinList,
+    ).as('coinListStub');
+
+    cy.intercept(
+      {
+        method: 'GET',
+        path: '/api/v3/simple/price*',
+      },
+      fiatPricingValue,
+    ).as('cryptoFiatStub');
   });
 
   describe('Bridge Widget render', () => {
@@ -93,510 +178,33 @@ describe('Bridge Widget tests', () => {
       } as BridgeWidgetParams;
       mount(
         <BridgeWidget
-          environment={Environment.PRODUCTION}
+          config={config}
           params={params}
-          theme={WidgetTheme.DARK}
-        />
+        />,
       );
-      cySmartGet('heading').should('be.visible');
+      cySmartGet('bridge-view').should('exist');
+      cySmartGet('bridge-form').should('be.visible');
+      cySmartGet('header-title').should('have.text', header.title);
+      cySmartGet('bridge-form-content-heading').should('have.text', content.title);
       cySmartGet('close-button').should('be.visible');
-      cySmartGet('select-network__target').should('be.visible');
-      cySmartGet('select-network__target').should('have.text', 'ETHEREUM');
-      cySmartGet('select-token__target').should('be.visible');
-      cySmartGet('select-token__target').should('have.text', 'ETH');
-      cySmartGet('amount__input').should('be.visible');
-      cySmartGet('amount__input').should('have.value', '0');
-      cySmartGet('bridge-to-network').should(
-        'include.text',
-        'Immutable zkEVM Testnet'
+
+      cySmartGet('bridge-token-select__target').should('have.text', 'ETH');
+      cySmartGet('bridge-amount-text__input').should('have.value', '');
+    });
+
+    it('should set up bridge widget on mount', () => {
+      const params = {
+        providerPreference: 'metamask',
+      } as BridgeWidgetParams;
+      mount(
+        <BridgeWidget
+          config={config}
+          params={params}
+        />,
       );
       cySmartGet('@connectStub').should('have.been.called');
       cySmartGet('@getAllBalancesStub').should('have.been.called');
-    });
-
-    it('should show bridge widget with default set values on mount', () => {
-      const params = {
-        providerPreference: 'metamask',
-        amount: '50.23',
-        fromNetwork: Network.ETHEREUM.toString(),
-        fromContractAddress: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
-      } as BridgeWidgetParams;
-      mount(
-        <BridgeWidget
-          environment={Environment.PRODUCTION}
-          params={params}
-          theme={WidgetTheme.DARK}
-        />
-      );
-      cySmartGet('heading').should('be.visible');
-      cySmartGet('close-button').should('be.visible');
-      cySmartGet('select-network__target').should('be.visible');
-      cySmartGet('select-network__target').should('have.text', 'ETHEREUM');
-      cySmartGet('select-token__target').should('be.visible');
-      cySmartGet('select-token__target').should('have.text', 'MATIC');
-      cySmartGet('amount__input').should('be.visible');
-      cySmartGet('amount__input').should('have.value', '50.23');
-      cySmartGet('bridge-to-network').should(
-        'include.text',
-        'Immutable zkEVM Testnet'
-      );
-      cySmartGet('@connectStub').should('have.been.called');
-      cySmartGet('@getAllBalancesStub').should('have.been.called');
-    });
-
-    it('should switch the selected token when changed', () => {
-      const params = {
-        providerPreference: 'metamask',
-        amount: '50.23',
-        fromNetwork: Network.ETHEREUM.toString(),
-        fromContractAddress: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
-      } as BridgeWidgetParams;
-      mount(
-        <BridgeWidget
-          environment={Environment.PRODUCTION}
-          params={params}
-          theme={WidgetTheme.DARK}
-        />
-      );
-      cy.wait(50);
-      cySmartGet('select-token__target').should('have.text', 'MATIC');
-      cySmartGet('select-token__target').click();
-      cySmartGet('select-token-ETH').click();
-      cySmartGet('select-token__target').should('have.text', 'ETH');
-      cySmartGet('receive-text').should('include.text', '50.23 ETH');
-    });
-
-    it('should update the bridge amount when typed', () => {
-      const params = {
-        providerPreference: 'metamask',
-        amount: '0',
-        fromNetwork: Network.ETHEREUM.toString(),
-        fromContractAddress: '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
-      } as BridgeWidgetParams;
-      mount(
-        <BridgeWidget
-          environment={Environment.PRODUCTION}
-          params={params}
-          theme={WidgetTheme.DARK}
-        />
-      );
-      cy.wait(50);
-      cySmartGet('select-token__target').should('have.text', 'MATIC');
-      cySmartGet('select-token__target').click();
-      cySmartGet('select-token-ETH').click();
-      cySmartGet('select-token__target').should('have.text', 'ETH');
-      cySmartGet('amount__input').clear();
-      cySmartGet('amount__input').type('50.456');
-      cySmartGet('amount__input').should('have.value', '50.456');
-      cySmartGet('receive-text').should('include.text', '50.456 ETH');
-    });
-  });
-
-  describe('switch network', () => {
-    it('it should call switch network when dropdown clicked and other network selected', async () => {
-      switchNetworkStub.resolves({
-        network: {
-          chainId: 13372,
-          name: 'Immutable zkEVM Testnet',
-          nativeCurrency: {
-            name: 'IMX',
-            symbol: 'IMX',
-            decimals: 18,
-          },
-        },
-      } as SwitchNetworkResult);
-      const params = {
-        providerPreference: 'metamask',
-        fromNetwork: Network.ETHEREUM.toString(),
-      } as BridgeWidgetParams;
-      mount(
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget
-            environment={Environment.PRODUCTION}
-            params={params}
-            theme={WidgetTheme.DARK}
-          />
-        </BiomeCombinedProviders>
-      );
-
-      cySmartGet('select-network__target').should('have.text', 'Ethereum');
-      cy.wait(50);
-      cySmartGet('select-network__target').click();
-      cySmartGet('select-network-Polygon').click();
-
-      cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
-        provider: connectStubReturnValue.provider,
-        chainId: 137,
-      });
-      cySmartGet('select-network__target').should('have.text', 'Polygon');
-
-      cySmartGet('bridge-to-network').should('include.text', 'Ethereum');
-    });
-
-    it('should call switch network (to specified network) if provider is on the wrong network to start with', () => {
-      const connectStubReturnWrongNetwork = {
-        provider: {
-          getSigner: () => ({
-            getAddress: () => Promise.resolve('0xwalletAddress'),
-          }),
-          getNetwork: async () => ({
-            chainId: 250,
-            name: 'Fantom',
-          }),
-          provider: {
-            request: async () => null,
-          },
-        },
-        network: {
-          chainId: 250,
-          name: 'Fantom',
-          nativeCurrency: {
-            name: 'FTM',
-            symbol: 'FTM',
-            decimals: 18,
-          },
-        },
-      };
-      connectStub.resolves(connectStubReturnWrongNetwork);
-
-      switchNetworkStub.resolves({
-        network: {
-          chainId: 13372,
-          name: 'Immutable zkEVM Testnet',
-          nativeCurrency: {
-            name: 'IMX',
-            symbol: 'IMX',
-            decimals: 18,
-          },
-        },
-      } as SwitchNetworkResult);
-
-      const params = {
-        providerPreference: 'metamask',
-        fromNetwork: Network.IMTBL_ZKEVM_TESTNET.toString(),
-      } as BridgeWidgetParams;
-      mount(
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget
-            environment={Environment.PRODUCTION}
-            params={params}
-            theme={WidgetTheme.DARK}
-          />
-        </BiomeCombinedProviders>
-      );
-
-      cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
-        provider: connectStubReturnWrongNetwork.provider,
-        chainId: 13372,
-      });
-    });
-
-    it('should call switch network (to default Ethereum) if provider is on the wrong network to start with', () => {
-      const connectStubReturnWrongNetwork = {
-        provider: {
-          getSigner: () => ({
-            getAddress: () => Promise.resolve('0xwalletAddress'),
-          }),
-          getNetwork: async () => ({
-            chainId: 250,
-            name: 'Fantom',
-          }),
-          provider: {
-            request: async () => null,
-          },
-        },
-        network: {
-          chainId: 250,
-          name: 'Fantom',
-          nativeCurrency: {
-            name: 'FTM',
-            symbol: 'FTM',
-            decimals: 18,
-          },
-        },
-      };
-
-      const connectStubCorrectNetwork = {
-        provider: {
-          getSigner: () => ({
-            getAddress: () => Promise.resolve('0xwalletAddress'),
-          }),
-          getNetwork: async () => ({
-            chainId: 1,
-            name: 'Ethereum',
-          }),
-          provider: {
-            request: async () => null,
-          },
-        },
-        network: {
-          chainId: 1,
-          name: 'Ethereum',
-          nativeCurrency: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-      };
-
-      connectStub
-        .onFirstCall()
-        .resolves(connectStubReturnWrongNetwork)
-        .onSecondCall()
-        .resolves(connectStubCorrectNetwork);
-
-      switchNetworkStub.resolves({
-        network: {
-          chainId: 1,
-          name: 'Ethereum',
-          nativeCurrency: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-      } as SwitchNetworkResult);
-
-      const params = {
-        providerPreference: 'metamask',
-      } as BridgeWidgetParams;
-      mount(
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget
-            environment={Environment.PRODUCTION}
-            params={params}
-            theme={WidgetTheme.DARK}
-          />
-        </BiomeCombinedProviders>
-      );
-
-      cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
-        provider: connectStubReturnWrongNetwork.provider,
-        chainId: 1,
-      });
-
-      cySmartGet('@getAllBalancesStub').should('have.been.called');
-    });
-
-    it('should call switch network (to specified network) if provider is on the whitelisted network to start with', () => {
-      const connectStubReturnWhitelistedNetwork = {
-        provider: {
-          getSigner: () => ({
-            getAddress: () => Promise.resolve('0xwalletAddress'),
-          }),
-          getNetwork: async () => ({
-            chainId: 1,
-            name: 'Ethereum',
-          }),
-          provider: {
-            request: async () => null,
-          },
-        },
-        network: {
-          chainId: 1,
-          name: 'Ethereum',
-          nativeCurrency: {
-            name: 'ETH',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-      };
-      connectStub.resolves(connectStubReturnWhitelistedNetwork);
-
-      switchNetworkStub.resolves({
-        network: {
-          chainId: 13372,
-          name: 'Immutable zkEVM Testnet',
-          nativeCurrency: {
-            name: 'IMX',
-            symbol: 'IMX',
-            decimals: 18,
-          },
-        },
-      } as SwitchNetworkResult);
-
-      const params = {
-        providerPreference: 'metamask',
-        fromNetwork: Network.IMTBL_ZKEVM_TESTNET.toString(),
-      } as BridgeWidgetParams;
-      mount(
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget
-            environment={Environment.PRODUCTION}
-            params={params}
-            theme={WidgetTheme.DARK}
-          />
-        </BiomeCombinedProviders>
-      );
-
-      cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
-        provider: connectStubReturnWhitelistedNetwork.provider,
-        chainId: 13372,
-      });
-    });
-    it('should call switch network (to default Ethereum) if provider is on the whitelisted network to start with', () => {
-      const connectStubReturnWhitelistedNetwork = {
-        provider: {
-          getSigner: () => ({
-            getAddress: () => Promise.resolve('0xwalletAddress'),
-          }),
-          getNetwork: async () => ({
-            chainId: 13372,
-            name: 'Immutable zkEVM Testnet',
-          }),
-          provider: {
-            request: async () => null,
-          },
-        },
-        network: {
-          chainId: 13372,
-          name: 'Immutable zkEVM Testnet',
-          nativeCurrency: {
-            name: 'IMX',
-            symbol: 'IMX',
-            decimals: 18,
-          },
-        },
-      };
-
-      const connectStubCorrectNetwork = {
-        provider: {
-          getSigner: () => ({
-            getAddress: () => Promise.resolve('0xwalletAddress'),
-          }),
-          getNetwork: async () => ({
-            chainId: 1,
-            name: 'Ethereum',
-          }),
-          provider: {
-            request: async () => null,
-          },
-        },
-        network: {
-          chainId: 1,
-          name: 'Ethereum',
-          nativeCurrency: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-      };
-
-      connectStub
-        .onFirstCall()
-        .resolves(connectStubReturnWhitelistedNetwork)
-        .onSecondCall()
-        .resolves(connectStubCorrectNetwork);
-
-      switchNetworkStub.resolves({
-        network: {
-          chainId: 1,
-          name: 'Ethereum',
-          nativeCurrency: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-        },
-      } as SwitchNetworkResult);
-
-      const params = {
-        providerPreference: 'metamask',
-      } as BridgeWidgetParams;
-      mount(
-        <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-          <BridgeWidget
-            environment={Environment.PRODUCTION}
-            params={params}
-            theme={WidgetTheme.DARK}
-          />
-        </BiomeCombinedProviders>
-      );
-
-      cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
-        provider: connectStubReturnWhitelistedNetwork.provider,
-        chainId: 1,
-      });
-
-      cySmartGet('@getAllBalancesStub').should('have.been.called');
-    });
-  });
-
-  describe('Bridge Widget button tests', () => {
-    it('should show success and etherscan transaction when bridge succeeds', () => {
-      cy.stub(Checkout.prototype, 'sendTransaction')
-        .as('sendTransactionStub')
-        .resolves({
-          transactionResponse: {
-            hash: '0x123',
-          },
-        });
-
-      const params = {
-        providerPreference: 'metamask',
-        amount: '0.1',
-        fromNetwork: Network.ETHEREUM.toString(),
-      } as BridgeWidgetParams;
-      mount(
-        <BridgeWidget
-          environment={Environment.PRODUCTION}
-          params={params}
-          theme={WidgetTheme.DARK}
-        />
-      );
-
-      cySmartGet('bridge-button').should('be.visible');
-      cySmartGet('bridge-button').should('be.enabled');
-      cySmartGet('bridge-button').click();
-      cySmartGet('bridge-success').should('be.visible');
-      cySmartGet('etherscan-link')
-        .invoke('attr', 'href')
-        .should('eq', 'https://etherscan.io/tx/0x123');
-      cySmartGet('bridge-button').should('not.exist');
-    });
-
-    it('should show failure when bridge fails', () => {
-      cy.stub(Checkout.prototype, 'sendTransaction')
-        .as('sendTransactionStub')
-        .rejects({});
-
-      const params = {
-        providerPreference: 'metamask',
-        amount: '0.1',
-        fromNetwork: Network.ETHEREUM.toString(),
-      } as BridgeWidgetParams;
-      mount(
-        <BridgeWidget
-          environment={Environment.PRODUCTION}
-          params={params}
-          theme={WidgetTheme.DARK}
-        />
-      );
-
-      cySmartGet('bridge-button').should('be.visible');
-      cySmartGet('bridge-button').should('be.enabled');
-      cySmartGet('bridge-button').click();
-      cySmartGet('bridge-failure').should('be.visible');
-      cySmartGet('bridge-button').should('not.exist');
-    });
-
-    it('should have disabled button when validation fails', () => {
-      mount(
-        <BiomeThemeProvider>
-          <BridgeButton
-            updateTransactionResponse={(
-              transactionResponse: TransactionResponse
-            ) => {}}
-            updateView={(view: BridgeWidgetViews, err?: any) => {}}
-          />
-        </BiomeThemeProvider>
-      );
-
-      cySmartGet('bridge-button').should('be.visible');
-      cySmartGet('bridge-button').should('be.disabled');
+      cySmartGet('@getTokenAllowListStub').should('have.been.called');
     });
   });
 });

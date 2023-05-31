@@ -1,12 +1,12 @@
 import { useContext } from 'react';
+import { Body } from '@biom3/react';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { ViewContext } from '../../../context/ViewContext';
-import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
-import { Body } from '@biom3/react';
+import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
+import { ViewContext } from '../../../context/view-context/ViewContext';
 
-export const ConnectResult = () => {
+export function ConnectResult() {
   const { viewState } = useContext(ViewContext);
   return (
     <SimpleLayout
@@ -21,4 +21,4 @@ export const ConnectResult = () => {
       )}
     </SimpleLayout>
   );
-};
+}

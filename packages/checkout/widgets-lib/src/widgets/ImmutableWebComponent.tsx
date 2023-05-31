@@ -1,17 +1,16 @@
 import ReactDOM from 'react-dom/client';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
+import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
 
 export abstract class ImmutableWebComponent extends HTMLElement {
   reactRoot?: ReactDOM.Root;
 
-  environment = Environment.SANDBOX;
-  theme = WidgetTheme.DARK;
+  widgetConfig?: StrongCheckoutWidgetsConfig;
+
   provider: Web3Provider | undefined = undefined;
 
   static get observedAttributes() {
-    return ['theme', 'environment'];
+    return ['widgetConfig'];
   }
 
   setProvider(provider: Web3Provider): void {
@@ -20,15 +19,28 @@ export abstract class ImmutableWebComponent extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    this[name] = newValue;
+    if (name === 'widgetConfig') {
+      this.widgetConfig = this.parseWidgetConfig(newValue);
+    } else {
+      this[name] = newValue;
+    }
     this.renderWidget();
   }
 
   connectedCallback() {
-    this.theme =
-      (this.getAttribute('theme') as WidgetTheme) ?? WidgetTheme.DARK;
-    this.environment =
-      (this.getAttribute('environment') as Environment) ?? Environment.SANDBOX;
+    const widgetConfig = this.getAttribute('widgetConfig') || undefined;
+
+    this.widgetConfig = this.parseWidgetConfig(widgetConfig);
+  }
+
+  private parseWidgetConfig(widgetsConfig?: string):StrongCheckoutWidgetsConfig {
+    try {
+      return withDefaultWidgetConfigs(
+        JSON.parse(widgetsConfig || '{}'),
+      );
+    } catch (e) {
+      return withDefaultWidgetConfigs();
+    }
   }
 
   abstract renderWidget(): void;

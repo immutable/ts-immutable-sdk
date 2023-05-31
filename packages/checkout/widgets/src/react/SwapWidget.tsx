@@ -1,20 +1,15 @@
+/* eslint-disable max-len */
 import React from 'react';
-
-import {
-  WidgetConnectionProviders,
-  WidgetTheme,
-} from '../definitions/constants';
-import { Environment } from '@imtbl/config';
 
 /**
  * Interface representing the props for the Swap Widget component.
- * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Swap Widget (default: {@link WidgetConnectionProviders.METAMASK}).
+ * @property {string} providerPreference - The preferred provider for the Swap Widget (default: "metamask"}).
  * @property {string} fromContractAddress - The contract address to swap tokens from.
  * @property {string} amount - The amount of tokens to send.
  * @property {Network} toContractAddress - The contract address to swap tokens to.
  */
 export interface SwapReactProps {
-  providerPreference: WidgetConnectionProviders;
+  providerPreference: string;
   fromContractAddress?: string;
   amount?: string;
   toContractAddress?: string;
@@ -26,21 +21,22 @@ export interface SwapReactProps {
  * @returns {JSX.Element} - The rendered Swap Widget component.
  */
 export function SwapReact(props: SwapReactProps): JSX.Element {
-  const { providerPreference, fromContractAddress, amount, toContractAddress } =
-    props;
+  const {
+    providerPreference,
+    fromContractAddress,
+    amount,
+    toContractAddress,
+  } = props;
 
   const config = window.ImtblCheckoutWidgetConfig;
 
   return (
     <imtbl-swap
-      environment={Environment.SANDBOX}
-      providerPreference={
-        providerPreference ?? WidgetConnectionProviders.METAMASK
-      }
-      theme={config.theme ?? WidgetTheme.DARK}
+      widgetConfig={config}
+      providerPreference={providerPreference}
       fromContractAddress={fromContractAddress ?? ''}
       toContractAddress={toContractAddress ?? ''}
       amount={amount ?? ''}
-    ></imtbl-swap>
+    />
   );
 }

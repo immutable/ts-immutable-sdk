@@ -1,21 +1,21 @@
-import { CheckoutWidgetsConfig } from './definitions/config';
-import { CheckoutWidgetTagNames } from './definitions/constants';
 import { Web3Provider } from '@ethersproject/providers';
+import { CheckoutWidgetsConfig } from './definitions/config';
+import { CheckoutWidgetTagNames } from './definitions/types';
 
 /**
  * CheckoutWidgets allows to inject the Checkout Widgets into your application.
  * @param {CheckoutWidgetsConfig|undefined} config - Checkout Widget global configurations.
  */
 export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
-  var checkoutWidgetJS = document.createElement('script');
+  const checkoutWidgetJS = document.createElement('script');
 
   checkoutWidgetJS.setAttribute(
     'src',
-    'http://localhost:3000/lib/js/imtbl-checkout.js'
+    'http://localhost:3000/lib/js/imtbl-checkout.js',
   );
 
   document.head.appendChild(checkoutWidgetJS);
-  window.ImtblCheckoutWidgetConfig = config;
+  window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
 }
 
 /**
@@ -23,7 +23,7 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
  * @param {CheckoutWidgetsConfig} config - new Checkout Widget global configurations.
  */
 export function UpdateConfig(config: CheckoutWidgetsConfig) {
-  window.ImtblCheckoutWidgetConfig = config;
+  window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
 }
 
 /**
@@ -33,9 +33,10 @@ export function UpdateConfig(config: CheckoutWidgetsConfig) {
  */
 export function SetProvider(
   tagName: CheckoutWidgetTagNames,
-  provider: Web3Provider | null
+  provider: Web3Provider | null,
 ) {
   if (!provider) {
+    // eslint-disable-next-line no-console
     console.error('no provider parsed');
     return;
   }
@@ -55,6 +56,7 @@ export function SetProvider(
       attempts++;
       if (attempts >= maxAttempts) {
         window.clearInterval(timer);
+        // eslint-disable-next-line no-console
         console.error('failed to set the provider');
       }
     }

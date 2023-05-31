@@ -2,15 +2,24 @@
     "__readme__": [
         "This file is responsible for which modules",
         "get bundled and released as part of alpha and prod",
-        "releases of the sdk.",
-        "Each key is a file in `src`, and each value is either alpha or prod"
+        "releases of the SDK.",
+        "Under `modules`, each key is a file in `src`, and each value is either alpha or prod",
+        "Under `fileCopy`, each object has `src` and `dest` keys, as wel, which are paths relative to this file"
     ],
     "modules": {
         "config": "prod",
         "immutablex_client": "prod",
         "passport": "prod",
+        "orderbook": "alpha",
         "provider": "prod",
         "checkout_sdk": "alpha",
         "checkout_widgets": "alpha"
-    }
+    },
+    "fileCopy": [
+        {
+            "src": "../packages/checkout/widgets-lib/build/static/js/main.*.js",
+            "dest": "./dist/browser/checkout.js",
+            "stage": "alpha"
+        }
+    ]
 }

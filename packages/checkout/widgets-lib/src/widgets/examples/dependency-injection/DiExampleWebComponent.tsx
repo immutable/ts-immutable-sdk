@@ -1,28 +1,32 @@
 import React from 'react';
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { Network } from '@imtbl/checkout-widgets';
-import { ExampleWidget, ExampleWidgetParams } from './DiExampleWidget';
 import { Web3Provider } from '@ethersproject/providers';
+import { ExampleWidget, ExampleWidgetParams } from './DiExampleWidget';
 import { ImmutableWebComponent } from '../../ImmutableWebComponent';
 
 export class ImmutableDiExample extends ImmutableWebComponent {
   static get observedAttributes() {
     return [...ImmutableWebComponent.observedAttributes, 'test'];
   }
-  fromNetwork = Network.ETHEREUM;
+
+  fromNetwork = 'ethereum';
+
   fromContract = '';
+
   amount = '';
+
   providerPreference: ConnectionProviders = ConnectionProviders.METAMASK;
+
   provider: Web3Provider | undefined = undefined;
 
   connectedCallback() {
     super.connectedCallback();
     this.fromContract = this.getAttribute('fromContractAddress') as string;
-    this.fromNetwork = this.getAttribute('fromNetwork') as Network;
+    this.fromNetwork = this.getAttribute('fromNetwork') || 'ethereum';
     this.amount = this.getAttribute('amount') as string;
     this.providerPreference = this.getAttribute(
-      'providerPreference'
+      'providerPreference',
     ) as ConnectionProviders;
     this.renderWidget();
   }
@@ -42,8 +46,8 @@ export class ImmutableDiExample extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <ExampleWidget params={params} theme={this.theme}></ExampleWidget>
-      </React.StrictMode>
+        <ExampleWidget params={params} theme={this.widgetConfig?.theme!} />
+      </React.StrictMode>,
     );
   }
 }

@@ -6,17 +6,20 @@ import {
   ConnectionProviders,
 } from '@imtbl/checkout-sdk';
 import { useContext, useState, useEffect } from 'react';
-import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
-import { ViewContext, ViewActions } from '../../../context/ViewContext';
+import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
+import {
+  ViewContext,
+  ViewActions,
+} from '../../../context/view-context/ViewContext';
 
 export interface WalletListProps {
   walletFilterTypes?: WalletFilterTypes;
   excludeWallets?: WalletFilter[];
 }
 
-export const WalletList = (props: WalletListProps) => {
+export function WalletList(props: WalletListProps) {
   const { walletFilterTypes, excludeWallets } = props;
   const {
     connectDispatch,
@@ -71,4 +74,4 @@ export const WalletList = (props: WalletListProps) => {
       ))}
     </Box>
   );
-};
+}

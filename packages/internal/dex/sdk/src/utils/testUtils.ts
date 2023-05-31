@@ -6,7 +6,6 @@ import {
   TradeType,
 } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
-import { hexDataSlice } from 'ethers/lib/utils';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
@@ -17,34 +16,13 @@ import {
   Router,
 } from '../lib';
 
-export const testChainId: number = 1;
+export const TEST_GAS_PRICE = ethers.BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
+export const TEST_TRANSACTION_GAS_USAGE = ethers.BigNumber.from('200000'); // 200,000 gas units
 
 export const TEST_CHAIN_ID = 999;
 export const TEST_RPC_URL = 'https://0.net';
 
 export const TEST_FROM_ADDRESS = '0x94fC2BcA2E71e26D874d7E937d89ce2c9113af6e';
-
-export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new ImmutableConfiguration({
-  environment: Environment.SANDBOX,
-});
-
-export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
-  baseConfig: TEST_IMMUTABLE_CONFIGURATION,
-  chainId: TEST_CHAIN_ID,
-  overrides: {
-    rpcURL: TEST_RPC_URL,
-    exchangeContracts: {
-      multicall: '',
-      coreFactory: '',
-      quoterV2: '',
-      peripheryRouter: '',
-      migrator: '',
-      nonfungiblePositionManager: '',
-      tickLens: '',
-    },
-    commonRoutingTokens: [],
-  },
-};
 
 export const TEST_MULTICALL_ADDRESS = '0x66d0aB680ACEe44308edA2062b910405CC51A190';
 export const TEST_V3_CORE_FACTORY_ADDRESS = '0x23490b262829ACDAD3EF40e555F23d77D1B69e4e';
@@ -96,6 +74,35 @@ const exactInputOutputSingleParamTypes = [
   'uint160',
 ];
 
+export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new ImmutableConfiguration({
+  environment: Environment.SANDBOX,
+});
+
+export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
+  baseConfig: TEST_IMMUTABLE_CONFIGURATION,
+  chainId: TEST_CHAIN_ID,
+  overrides: {
+    rpcURL: TEST_RPC_URL,
+    exchangeContracts: {
+      multicall: '',
+      coreFactory: '',
+      quoterV2: '',
+      peripheryRouter: '',
+      migrator: '',
+      nonfungiblePositionManager: '',
+      tickLens: '',
+    },
+    commonRoutingTokens: [],
+    nativeToken: {
+      chainId: IMX_TEST_CHAIN.chainId,
+      address: IMX_TEST_CHAIN.address,
+      decimals: IMX_TEST_CHAIN.decimals,
+      symbol: IMX_TEST_CHAIN.symbol,
+      name: IMX_TEST_CHAIN.name,
+    },
+  },
+};
+
 type ExactInputOutputSingleParams = {
   tokenIn: string;
   tokenOut: string;
@@ -127,14 +134,14 @@ export function decodeMulticallData(data: ethers.utils.BytesLike): {
   functionCallParams: ExactInputOutputSingleParams;
 } {
   // eslint-disable-next-line no-param-reassign
-  data = hexDataSlice(data, 4);
+  data = ethers.utils.hexDataSlice(data, 4);
 
   const decodedTopLevelParams = ethers.utils.defaultAbiCoder.decode(
     ['uint256', 'bytes[]'],
     data,
   );
   const calldata = decodedTopLevelParams[1][0];
-  const calldataParams = hexDataSlice(calldata, 4);
+  const calldataParams = ethers.utils.hexDataSlice(calldata, 4);
   const decodedFunctionCallParams = ethers.utils.defaultAbiCoder.decode(
     exactInputOutputSingleParamTypes,
     calldataParams,
@@ -267,6 +274,7 @@ export function mockRouterImplementation(
         amountOut: ethers.BigNumber.from(params.amountOut),
         tokenOut,
         tradeType,
+        gasEstimate: TEST_TRANSACTION_GAS_USAGE,
       };
       return {
         success: true,

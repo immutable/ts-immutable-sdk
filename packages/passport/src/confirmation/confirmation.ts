@@ -1,7 +1,7 @@
 import {
   ConfirmationResult,
   DisplayConfirmationParams,
-  PassportEventType,
+  PASSPORT_EVENT_TYPE,
   ReceiveMessage,
   SendMessage,
   Transaction,
@@ -28,7 +28,7 @@ export default class ConfirmationScreen {
   ) {
     destinationWindow.postMessage(
       {
-        eventType: PassportEventType,
+        eventType: PASSPORT_EVENT_TYPE,
         accessToken,
         ...message,
       },
@@ -45,7 +45,7 @@ export default class ConfirmationScreen {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
           origin !== this.config.passportDomain
-          || data.eventType !== PassportEventType
+          || data.eventType !== PASSPORT_EVENT_TYPE
         ) {
           return;
         }

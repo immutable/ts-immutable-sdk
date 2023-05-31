@@ -1,6 +1,4 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-// TODO: Remove this once the dependency has been fixed
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { PassportConfiguration } from './config';
 import { PassportError, PassportErrorType } from '../errors/passportError';

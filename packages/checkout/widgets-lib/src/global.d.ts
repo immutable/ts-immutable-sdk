@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   ImtblConnectProps,
   ImtblWalletProps,
@@ -32,3 +33,5 @@ declare global {
     setAttribute: Function;
   }
 }
+
+export {};

@@ -1,12 +1,21 @@
 import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
+import { Environment } from '@imtbl/config';
 import { cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
-import { Environment } from '@imtbl/config';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import { WidgetTheme } from '../../lib';
 
 describe('ConnectLoader', () => {
+  const config: StrongCheckoutWidgetsConfig = {
+    environment: Environment.SANDBOX,
+    theme: WidgetTheme.DARK,
+    isBridgeEnabled: true,
+    isSwapEnabled: true,
+    isOnRampEnabled: true,
+  };
+
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
@@ -15,13 +24,12 @@ describe('ConnectLoader', () => {
     const params = {} as ConnectLoaderParams;
     mount(
       <ConnectLoader
-        environment={Environment.SANDBOX}
+        widgetConfig={config}
         params={params}
-        theme={WidgetTheme.DARK}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
+      </ConnectLoader>,
     );
     cySmartGet('wallet-list-metamask').should('be.visible');
     cy.get('#inner-widget').should('not.exist');
@@ -40,13 +48,12 @@ describe('ConnectLoader', () => {
 
     mount(
       <ConnectLoader
-        environment={Environment.SANDBOX}
+        widgetConfig={config}
         params={params}
-        theme={WidgetTheme.DARK}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
+      </ConnectLoader>,
     );
 
     cySmartGet('wallet-list-metamask').should('be.visible');
@@ -87,13 +94,12 @@ describe('ConnectLoader', () => {
 
     mount(
       <ConnectLoader
-        environment={Environment.SANDBOX}
+        widgetConfig={config}
         params={params}
-        theme={WidgetTheme.DARK}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
+      </ConnectLoader>,
     );
 
     cySmartGet('wallet-list-metamask').should('be.visible');
@@ -130,18 +136,17 @@ describe('ConnectLoader', () => {
       .as('getNetworkInfoStub')
       .resolves({
         isSupported: true,
-        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
       });
 
     mount(
       <ConnectLoader
-        environment={Environment.SANDBOX}
+        widgetConfig={config}
         params={params}
-        theme={WidgetTheme.DARK}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
+      </ConnectLoader>,
     );
 
     cySmartGet('wallet-list-metamask').click();
@@ -168,22 +173,21 @@ describe('ConnectLoader', () => {
             getAddress: async () => Promise.resolve(''),
           }),
           getNetwork: async () => ({
-            chainId: 11155111,
-            name: 'SEPOLIA',
+            chainId: ChainId.POLYGON_ZKEVM_TESTNET,
+            name: 'Polygon zkEVM Testnet',
           }),
         },
-        network: { name: 'Sepolia' },
+        network: { name: 'Polygon zkEVM Testnet' },
       });
 
     mount(
       <ConnectLoader
-        environment={Environment.SANDBOX}
+        widgetConfig={config}
         params={params}
-        theme={WidgetTheme.DARK}
         closeEvent={() => {}}
       >
         <div id="inner-widget">Inner Widget</div>
-      </ConnectLoader>
+      </ConnectLoader>,
     );
 
     cy.get('#inner-widget').should('be.visible');

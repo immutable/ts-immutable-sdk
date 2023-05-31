@@ -1,19 +1,20 @@
-import { BiomeThemeProvider } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
-import { ViewOne } from './views/ViewOne';
 import { useEffect, useReducer } from 'react';
+import { ViewOne } from './views/ViewOne';
+import { ViewTwo } from './views/ViewTwo';
+import { ViewThree } from './views/ViewThree';
+import { InnerExampleWidgetViews } from '../../../../context/view-context/InnerExampleViewContextTypes';
 import {
+  viewReducer,
   initialViewState,
   ViewActions,
   ViewContext,
-  viewReducer,
-} from '../../../../context/ViewContext';
-import { ViewTwo } from './views/ViewTwo';
-import { ViewThree } from './views/ViewThree';
-import { InnerExampleWidgetViews } from '../../../../context/InnerExampleViewContextTypes';
+} from '../../../../context/view-context/ViewContext';
+import { WidgetTheme } from '../../../../lib';
 
 export interface InnerWidgetProps {
+  // eslint-disable-next-line
   params: InnerWidgetParams;
   theme: WidgetTheme;
   deepLink?: InnerExampleWidgetViews;
@@ -25,10 +26,9 @@ export interface InnerWidgetParams {}
 export function InnerWidget(props: InnerWidgetProps) {
   const { theme, deepLink, callBack } = props;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
-  const biomeTheme: BaseTokens =
-    theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-      ? onLightBase
-      : onDarkBase;
+  const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+    ? onLightBase
+    : onDarkBase;
 
   useEffect(() => {
     viewDispatch({
@@ -42,7 +42,10 @@ export function InnerWidget(props: InnerWidgetProps) {
   }, [deepLink]);
 
   return (
-    <BiomeThemeProvider theme={{ base: biomeTheme }}>
+    <BiomeCombinedProviders theme={{ base: biomeTheme }}>
+      {/* TODO: The object passed as the value prop to the Context provider changes every render.
+          To fix this consider wrapping it in a useMemo hook. */}
+      { /* eslint-disable-next-line */ }
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         {viewState.view.type === InnerExampleWidgetViews.VIEW_ONE && (
           <ViewOne />
@@ -54,6 +57,6 @@ export function InnerWidget(props: InnerWidgetProps) {
           <ViewThree />
         )}
       </ViewContext.Provider>
-    </BiomeThemeProvider>
+    </BiomeCombinedProviders>
   );
 }

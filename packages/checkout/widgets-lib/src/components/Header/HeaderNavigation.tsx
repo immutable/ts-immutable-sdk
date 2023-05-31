@@ -1,7 +1,10 @@
 import { AppHeaderBar, ButtCon } from '@biom3/react';
 import { useContext } from 'react';
-import { ViewActions, ViewContext } from '../../context/ViewContext';
 import { HeaderNavigationStyles, ButtonNavigationStyles } from './HeaderStyles';
+import {
+  ViewActions,
+  ViewContext,
+} from '../../context/view-context/ViewContext';
 
 export interface HeaderNavigationProps {
   title?: string;
@@ -13,7 +16,7 @@ export interface HeaderNavigationProps {
   onCloseButtonClick?: () => void;
 }
 
-export const HeaderNavigation = ({
+export function HeaderNavigation({
   title,
   showBack = false,
   showSettings = false,
@@ -21,7 +24,7 @@ export const HeaderNavigation = ({
   onSettingsClick,
   onBackButtonClick,
   onCloseButtonClick,
-}: HeaderNavigationProps) => {
+}: HeaderNavigationProps) {
   const { viewDispatch } = useContext(ViewContext);
 
   const goBack = async () => {
@@ -33,14 +36,19 @@ export const HeaderNavigation = ({
   };
 
   const handleBackButtonClick = () => {
-    onBackButtonClick ? onBackButtonClick() : goBack();
+    if (onBackButtonClick) {
+      onBackButtonClick();
+    } else {
+      goBack();
+    }
   };
 
   return (
     <AppHeaderBar
       testId="header-navigation-container"
       sx={HeaderNavigationStyles(transparent)}
-      contentAlign="center"
+      contentAlign={showBack ? 'center' : 'left'}
+      size="small"
     >
       {showBack && (
         <AppHeaderBar.LeftButtCon
@@ -74,4 +82,4 @@ export const HeaderNavigation = ({
       </AppHeaderBar.RightHandButtons>
     </AppHeaderBar>
   );
-};
+}

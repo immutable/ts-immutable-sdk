@@ -1,72 +1,132 @@
-import { Button } from '@biom3/react';
-import { Checkout, Transaction } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
-import { useContext, useEffect, useState } from 'react';
-import { ViewActions, ViewContext } from '../../../context/ViewContext';
-import { SwapWidgetViews } from '../../../context/SwapViewContextTypes';
-import { sendSwapSuccessEvent } from '../SwapWidgetEvents';
+import { Box, Button } from '@biom3/react';
+import { useContext } from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { TransactionResponse } from '@imtbl/dex-sdk';
+import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { text } from '../../../resources/text/textConfig';
-import { Environment } from '@imtbl/config';
+import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
+import {
+  ViewContext,
+  ViewActions,
+  BaseViews,
+} from '../../../context/view-context/ViewContext';
+import { SwapContext } from '../context/SwapContext';
+import {
+  swapButtonBoxStyle,
+  swapButtonIconLoadingStyle,
+} from './SwapButtonStyles';
+import { SwapFormData } from './swapFormTypes';
 
 export interface SwapButtonProps {
-  provider?: Web3Provider;
-  transaction?: Transaction;
+  loading: boolean
+  updateLoading: (value: boolean) => void
+  validator: () => boolean
+  transaction: TransactionResponse | null;
+  data?: SwapFormData;
 }
 
-export const SwapButton = (props: SwapButtonProps) => {
+export function SwapButton({
+  loading, updateLoading, validator, transaction, data,
+}: SwapButtonProps) {
   const { viewDispatch } = useContext(ViewContext);
-  const { provider, transaction } = props;
-  const [loading, setLoading] = useState(true);
+  const { swapState } = useContext(SwapContext);
+  const { checkout, provider } = swapState;
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
 
   const sendTransaction = async () => {
-    if (!transaction || !provider) return;
-    // TODO: update here to go to context and stop hardcoing
-    const checkout = new Checkout({
-      baseConfig: { environment: Environment.SANDBOX },
-    });
+    if (!validator()) return;
+    if (!checkout || !provider || !transaction) return;
     try {
-      await checkout.sendTransaction({
+      updateLoading(true);
+
+      if (transaction.approveTransaction) {
+        const txn = await checkout.sendTransaction({
+          provider,
+          transaction: transaction.approveTransaction,
+        });
+        await txn.transactionResponse.wait();
+      }
+      const txn = await checkout.sendTransaction({
         provider,
-        transaction,
+        transaction: transaction.transaction,
       });
+      const receipt = await txn.transactionResponse.wait();
+
+      updateLoading(false);
+
+      if (receipt.status === 0 || receipt.status === undefined) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SwapWidgetViews.FAIL,
+              data: data as PrefilledSwapForm,
+              reason: 'Transaction failed',
+            },
+          },
+        });
+      }
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: { type: SwapWidgetViews.SUCCESS },
         },
       });
-      sendSwapSuccessEvent();
     } catch (err: any) {
-      // Intentionally making this succeed at the moment since the
-      // transaction will always error out currently
+      updateLoading(false);
+      if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+        return;
+      }
+      if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SwapWidgetViews.PRICE_SURGE,
+              data: data as PrefilledSwapForm,
+            },
+          },
+        });
+        return;
+      }
+      if (err.type === CheckoutErrorType.TRANSACTION_FAILED || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SwapWidgetViews.FAIL,
+              reason: 'Transaction failed',
+              data: data as PrefilledSwapForm,
+            },
+          },
+        });
+        return;
+      }
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: SwapWidgetViews.SUCCESS },
+          view: {
+            type: BaseViews.ERROR,
+            error: err,
+          },
         },
       });
     }
   };
 
-  // TODO: remove this and move the loading state used for the button into a SwapContext
-  // or SwapFormContext etc...
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, [setLoading]);
-
   return (
-    <Button
-      disabled={!provider || !transaction || loading}
-      variant={!provider || !transaction ? 'tertiary' : 'primary'}
-      onClick={sendTransaction}
-    >
-      {loading && (
-        <Button.Icon icon="Loading" sx={{ width: 'base.icon.size.200' }} />
-      )}
-      {!loading && buttonText}
-    </Button>
+    <Box sx={swapButtonBoxStyle}>
+      <Button
+        testId="swap-button"
+        disabled={loading}
+        variant="primary"
+        onClick={sendTransaction}
+        size="large"
+      >
+        {loading ? (
+          <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
+        ) : buttonText}
+      </Button>
+    </Box>
   );
-};
+}

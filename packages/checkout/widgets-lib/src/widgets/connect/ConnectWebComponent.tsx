@@ -10,7 +10,7 @@ export class ImmutableConnect extends ImmutableWebComponent {
   connectedCallback() {
     super.connectedCallback();
     this.providerPreference = this.getAttribute(
-      'providerPreference'
+      'providerPreference',
     ) as ConnectionProviders;
     this.renderWidget();
   }
@@ -28,10 +28,9 @@ export class ImmutableConnect extends ImmutableWebComponent {
       <React.StrictMode>
         <ConnectWidget
           params={connectParams}
-          theme={this.theme}
-          environment={this.environment}
-        ></ConnectWidget>
-      </React.StrictMode>
+          config={this.widgetConfig!}
+        />
+      </React.StrictMode>,
     );
   }
 }

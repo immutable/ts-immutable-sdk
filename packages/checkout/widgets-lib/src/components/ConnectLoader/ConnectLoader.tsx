@@ -1,10 +1,9 @@
-import { BiomeThemeProvider } from '@biom3/react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import {
   Checkout,
   ConnectionProviders,
   GetNetworkParams,
 } from '@imtbl/checkout-sdk';
-import { WidgetTheme } from '@imtbl/checkout-widgets';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { useEffect, useReducer } from 'react';
 import {
@@ -16,40 +15,45 @@ import {
 } from '../../context/connect-loader-context/ConnectLoaderContext';
 import { LoadingView } from '../Loading/LoadingView';
 import { ConnectWidget } from '../../widgets/connect/ConnectWidget';
-import { ConnectWidgetViews } from '../../context/ConnectViewContextTypes';
+import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { ErrorView } from '../Error/ErrorView';
-import { Environment } from '@imtbl/config';
+import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
+import {
+  WidgetTheme, ConnectTargetLayer, getTargetLayerChainId,
+} from '../../lib';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
   params: ConnectLoaderParams;
-  theme: WidgetTheme;
   closeEvent: () => void;
-  environment: Environment;
+  widgetConfig: StrongCheckoutWidgetsConfig;
 }
 
 export interface ConnectLoaderParams {
+  targetLayer?: ConnectTargetLayer;
   providerPreference?: ConnectionProviders;
 }
 
-export const ConnectLoader = ({
-  environment,
+export function ConnectLoader({
   children,
   params,
-  theme,
+  widgetConfig,
   closeEvent,
-}: ConnectLoaderProps) => {
+}: ConnectLoaderProps) {
   const [connectLoaderState, connectLoaderDispatch] = useReducer(
     connectLoaderReducer,
-    initialConnectLoaderState
+    initialConnectLoaderState,
   );
   const { connectionStatus } = connectLoaderState;
-  const { providerPreference } = params;
+  const { targetLayer, providerPreference } = params;
 
-  const biomeTheme: BaseTokens =
-    theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
-      ? onLightBase
-      : onDarkBase;
+  const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
+
+  const targetChainId = getTargetLayerChainId(targetLayer ?? ConnectTargetLayer.LAYER2, widgetConfig.environment);
+
+  const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
+    ? onLightBase
+    : onDarkBase;
 
   useEffect(() => {
     const checkConnection = async (checkout: Checkout) => {
@@ -82,11 +86,10 @@ export const ConnectLoader = ({
           providerPreference,
         });
 
-        const isSupportedNetwork = (
-          await checkout.getNetworkInfo({ provider } as GetNetworkParams)
-        ).isSupported;
+        const currentNetworkInfo = await checkout.getNetworkInfo({ provider } as GetNetworkParams);
 
-        if (!isSupportedNetwork) {
+        // if unsupported network or current network is not the target network
+        if (!currentNetworkInfo.isSupported || currentNetworkInfo.chainId !== targetChainId) {
           connectLoaderDispatch({
             payload: {
               type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -112,36 +115,38 @@ export const ConnectLoader = ({
       }
     };
 
-    const checkout = new Checkout({ baseConfig: { environment: environment } });
+    const checkout = new Checkout({ baseConfig: { environment: widgetConfig.environment } });
     checkConnection(checkout);
-  }, [providerPreference, environment]);
+  }, [providerPreference, widgetConfig.environment]);
 
   return (
     <>
       {connectionStatus === ConnectionStatus.LOADING && (
-        <BiomeThemeProvider theme={{ base: biomeTheme }}>
-          <LoadingView loadingText={'Connecting'} />
-        </BiomeThemeProvider>
+        <BiomeCombinedProviders theme={{ base: biomeTheme }}>
+          <LoadingView loadingText="Connecting" />
+        </BiomeCombinedProviders>
       )}
-      {(connectionStatus === ConnectionStatus.NOT_CONNECTED ||
-        connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
+      {(connectionStatus === ConnectionStatus.NOT_CONNECTED
+        || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
         <ConnectLoaderContext.Provider
+          // TODO: The object passed as the value prop to the Context provider (at line 131) changes every render.
+          // To fix this consider wrapping it in a useMemo hook.
+          // eslint-disable-next-line react/jsx-no-constructed-context-values
           value={{ connectLoaderState, connectLoaderDispatch }}
         >
           <ConnectWidget
-            environment={environment}
-            params={params}
-            theme={theme}
+            config={widgetConfig}
+            params={{ ...params, targetLayer: networkToSwitchTo }}
             deepLink={ConnectWidgetViews.CONNECT_WALLET}
             sendCloseEventOverride={closeEvent}
           />
         </ConnectLoaderContext.Provider>
       )}
       {connectionStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (
-        <>{children}</>
+        children
       )}
       {connectionStatus === ConnectionStatus.ERROR && (
-        <BiomeThemeProvider theme={{ base: biomeTheme }}>
+        <BiomeCombinedProviders theme={{ base: biomeTheme }}>
           <ErrorView
             onCloseClick={closeEvent}
             onActionClick={() => {
@@ -154,8 +159,8 @@ export const ConnectLoader = ({
             }}
             actionText="Try Again"
           />
-        </BiomeThemeProvider>
+        </BiomeCombinedProviders>
       )}
     </>
   );
-};
+}

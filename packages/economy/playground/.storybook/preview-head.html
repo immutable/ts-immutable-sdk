@@ -1,0 +1,90 @@
+<link
+  href="https://cdn.jsdelivr.net/npm/daisyui@2.51.6/dist/full.css"
+  rel="stylesheet"
+  type="text/css"
+/>
+<style type="text/tailwindcss">
+  .tree {
+    @apply leading-8 m-0 list-none pl-8;
+  }
+
+  .tree details {
+    @apply relative m-0;
+  }
+
+  .tree:first-child > li::after,
+  .tree:first-child > li::before {
+    display: none;
+  }
+
+  .tree li {
+    @apply relative m-0;
+
+    &::before {
+      content: '';
+      @apply absolute top-0 -left-4 w-4 h-4;
+      border-left: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+    }
+
+    &::after {
+      content: '';
+      @apply absolute bottom-0 -left-4 w-4 h-full;
+      border-left: 2px solid currentColor;
+    }
+
+    &:last-child::after {
+      display: none;
+    }
+  }
+
+  .tree summary {
+    @apply cursor-pointer pl-2 relative font-bold first-letter:uppercase text-lg;
+
+    &::before {
+      @apply block bg-black rounded-full w-8 h-8 text-white text-center leading-8 font-bold;
+      @apply absolute -left-9 top-0 z-10;
+      content: attr(group);
+    }
+  }
+
+  .tree summary::marker,
+  .tree summary::-webkit-details-marker {
+    font-size: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .lg\:divider-horizontal {
+      margin-top: 0;
+      margin-bottom: 0;
+      margin-left: 1rem;
+      margin-right: 1rem;
+      height: auto;
+      width: 1rem;
+    }
+
+    .lg\:divider-horizontal {
+      flex-direction: column;
+    }
+
+    .lg\:divider-horizontal:before {
+      height: 100%;
+      width: 0.125rem;
+    }
+
+    .lg\:divider-horizontal:after {
+      height: 100%;
+      width: 0.125rem;
+    }
+  }
+
+  .stack > * {
+    margin: 0 !important;
+  }
+</style>
+<script src="https://cdn.tailwindcss.com?plugins=typography,aspect-ratio,line-clamp"></script>
+<script>
+  window.addEventListener('load', function () {
+    document.body.setAttribute('data-theme', 'light');
+  });
+</script>

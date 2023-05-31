@@ -1,45 +1,55 @@
-import { ConnectResult, TokenInfo } from '@imtbl/checkout-sdk';
+import { Box } from '@biom3/react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { SwapForm } from '../components/SwapForm';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
-import { SwapWidgetViews } from '../../../context/SwapViewContextTypes';
+import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
+import { SwapForm } from '../components/SwapForm';
 
 export interface SwapCoinsProps {
-  allowedTokens: TokenInfo[];
-  amount: string | undefined;
-  fromContractAddress: string | undefined;
-  toContractAddress: string | undefined;
-  connection: ConnectResult | undefined;
+  fromAmount?: string;
+  toAmount?: string;
+  fromContractAddress?: string;
+  toContractAddress?: string;
 }
 
-export const SwapCoins = ({
-  allowedTokens,
-  amount,
+export function SwapCoins({
+  fromAmount,
+  toAmount,
   fromContractAddress,
   toContractAddress,
-  connection,
-}: SwapCoinsProps) => {
-  const { title } = text.views[SwapWidgetViews.SWAP].header;
+}: SwapCoinsProps) {
+  const { header } = text.views[SwapWidgetViews.SWAP];
+
   return (
     <SimpleLayout
-      header={
+      header={(
         <HeaderNavigation
-          title={title}
+          showBack
+          title={header.title}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent()}
         />
-      }
+      )}
       footer={<FooterLogo />}
+      footerBackgroundColor="base.color.translucent.container.200"
     >
-      <SwapForm
-        allowedTokens={allowedTokens}
-        amount={amount}
-        fromContractAddress={fromContractAddress}
-        toContractAddress={toContractAddress}
-        connection={connection}
-      />
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
+        <SwapForm data={{
+          fromAmount,
+          toAmount,
+          fromContractAddress,
+          toContractAddress,
+        }}
+        />
+      </Box>
     </SimpleLayout>
   );
-};
+}

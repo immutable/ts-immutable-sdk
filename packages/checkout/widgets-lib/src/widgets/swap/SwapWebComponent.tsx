@@ -3,29 +3,45 @@ import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { Environment } from '@imtbl/config';
+import {
+  ConnectLoader,
+  ConnectLoaderParams,
+} from '../../components/ConnectLoader/ConnectLoader';
+import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
+import { ConnectTargetLayer } from '../../lib';
 
 export class ImmutableSwap extends ImmutableWebComponent {
-  environment = Environment.SANDBOX;
   providerPreference = ConnectionProviders.METAMASK;
+
+  useConnectWidget?: boolean;
+
   amount = '';
+
   fromContractAddress = '';
+
   toContractAddress = '';
 
   connectedCallback() {
     super.connectedCallback();
     this.providerPreference = this.getAttribute(
-      'providerPreference'
+      'providerPreference',
     ) as ConnectionProviders;
+    const useConnectWidgetProp = this.getAttribute('useConnectWidget');
+    this.useConnectWidget = useConnectWidgetProp?.toLowerCase() !== 'false';
     this.amount = this.getAttribute('amount') as string;
     this.fromContractAddress = this.getAttribute(
-      'fromContractAddress'
+      'fromContractAddress',
     ) as string;
     this.toContractAddress = this.getAttribute('toContractAddress') as string;
     this.renderWidget();
   }
 
   renderWidget() {
+    const connectLoaderParams: ConnectLoaderParams = {
+      targetLayer: ConnectTargetLayer.LAYER1,
+      providerPreference: this.providerPreference,
+    };
+
     const swapParams: SwapWidgetParams = {
       providerPreference: this.providerPreference,
       amount: this.amount,
@@ -39,12 +55,24 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        <SwapWidget
-          params={swapParams}
-          theme={this.theme}
-          environment={this.environment}
-        />
-      </React.StrictMode>
+        {this.useConnectWidget ? (
+          <ConnectLoader
+            widgetConfig={this.widgetConfig!}
+            params={connectLoaderParams}
+            closeEvent={sendSwapWidgetCloseEvent}
+          >
+            <SwapWidget
+              params={swapParams}
+              config={this.widgetConfig!}
+            />
+          </ConnectLoader>
+        ) : (
+          <SwapWidget
+            params={swapParams}
+            config={this.widgetConfig!}
+          />
+        )}
+      </React.StrictMode>,
     );
   }
 }

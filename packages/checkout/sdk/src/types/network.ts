@@ -1,29 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { TokenInfo } from './token';
-
-/**
- * Enum representing the supported chains with their corresponding IDs.
- */
-export enum ChainId {
-  ETHEREUM = 1,
-  SEPOLIA = 11155111,
-  IMTBL_ZKEVM_DEVNET = 13373,
-  IMTBL_ZKEVM_TESTNET = 13372, //to be used in prod config for testnet launch
-}
-
-/**
- * Interface representing the information of a network.
- * @property {string} name - The name of the network.
- * @property {number} chainId - The ID of the network.
- * @property {TokenInfo} nativeCurrency - The info of the network's native currency.
- * @property {boolean} isSupported - Flag indicating if the network is supported by the application.
- */
-export interface NetworkInfo {
-  name: string;
-  chainId: number;
-  nativeCurrency: TokenInfo;
-  isSupported: boolean;
-}
+import { TokenInfo } from './tokenInfo';
+import { ChainId } from './chainId';
+import { NetworkInfo } from './networkInfo';
 
 /**
  * Type representing the details of a network.
@@ -49,9 +27,9 @@ export type NetworkMap = Map<ChainId, NetworkDetails>;
 /**
  * Object mapping the list of supported production networks with the corresponding network details.
  */
-export const ProductionChainIdNetworkMap: NetworkMap = new Map<
-  ChainId,
-  NetworkDetails
+export const PRODUCTION_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
+ChainId,
+NetworkDetails
 >([
   [
     ChainId.ETHEREUM,
@@ -72,7 +50,7 @@ export const ProductionChainIdNetworkMap: NetworkMap = new Map<
     {
       chainIdHex: '0x343C', // 13372
       chainName: 'Immutable zkEVM Testnet',
-      rpcUrls: ['https://zkevm-rpc.dev.x.immutable.com'],
+      rpcUrls: ['https://zkevm-rpc.sandbox.x.immutable.com'],
       nativeCurrency: {
         name: 'IMX',
         symbol: 'IMX',
@@ -80,14 +58,28 @@ export const ProductionChainIdNetworkMap: NetworkMap = new Map<
       },
     },
   ],
+  [
+    ChainId.POLYGON_ZKEVM,
+    {
+      chainIdHex: '0x89', // 137
+      chainName: 'Polygon zkEVM',
+      rpcUrls: ['https://polygon-rpc.com'],
+      nativeCurrency: {
+        name: 'MATIC',
+        symbol: 'MATIC',
+        decimals: 18,
+      },
+      blockExplorerUrls: ['https://polygonscan.com/'],
+    },
+  ],
 ]);
 
 /**
  * Object mapping the list of supported sandbox networks with the corresponding network details.
  */
-export const SandboxChainIdNetworkMap: NetworkMap = new Map<
-  ChainId,
-  NetworkDetails
+export const SANDBOX_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
+ChainId,
+NetworkDetails
 >([
   [
     ChainId.SEPOLIA,
@@ -106,7 +98,7 @@ export const SandboxChainIdNetworkMap: NetworkMap = new Map<
   [
     ChainId.IMTBL_ZKEVM_DEVNET,
     {
-      chainIdHex: '0x343D', //13373
+      chainIdHex: '0x343D', // 13373
       chainName: 'Immutable zkEVM Devnet',
       rpcUrls: ['https://zkevm-rpc.dev.x.immutable.com/'],
       nativeCurrency: {
@@ -114,6 +106,20 @@ export const SandboxChainIdNetworkMap: NetworkMap = new Map<
         symbol: 'IMX',
         decimals: 18,
       },
+    },
+  ],
+  [
+    ChainId.POLYGON_ZKEVM_TESTNET,
+    {
+      chainIdHex: '0x5A2', // 1442
+      chainName: 'Polygon zkEVM Testnet',
+      rpcUrls: ['https://rpc.public.zkevm-test.net'],
+      nativeCurrency: {
+        name: 'MATIC',
+        symbol: 'MATIC',
+        decimals: 18,
+      },
+      blockExplorerUrls: ['https://testnet-zkevm.polygonscan.com'],
     },
   ],
 ]);

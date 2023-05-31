@@ -1,4 +1,4 @@
-export const TotalTokenBalanceStyle = {
+export const totalTokenBalanceStyle = {
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
@@ -6,8 +6,9 @@ export const TotalTokenBalanceStyle = {
   paddingY: 'base.spacing.x2',
 };
 
-export const TotalTokenBalanceValueStyle = {
+export const totalTokenBalanceValueStyle = {
   display: 'flex',
   direction: 'row',
   columnGap: 'base.spacing.x1',
+  alignItems: 'center',
 };

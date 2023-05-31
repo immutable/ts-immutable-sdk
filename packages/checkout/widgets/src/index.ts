@@ -1,5 +1,3 @@
-import * as _ from '../global';
-
 // Definitions | Events
 export * from './definitions/events/events';
 export * from './definitions/events/connectEvents';
@@ -11,7 +9,7 @@ export * from './definitions/events/onRampEvents';
 
 // Definitions
 export * from './definitions/global';
-export * from './definitions/constants';
+export * from './definitions/types';
 export * from './definitions/config';
 
 // React components

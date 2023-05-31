@@ -5,7 +5,7 @@ import { CenteredBoxContent } from '../CenteredBoxContent/CenteredBoxContent';
 export interface LoadingViewProps {
   loadingText: string;
 }
-export const LoadingView = ({ loadingText }: LoadingViewProps) => {
+export function LoadingView({ loadingText }: LoadingViewProps) {
   return (
     <SimpleLayout>
       <CenteredBoxContent testId="loading-view">
@@ -13,4 +13,4 @@ export const LoadingView = ({ loadingText }: LoadingViewProps) => {
       </CenteredBoxContent>
     </SimpleLayout>
   );
-};
+}

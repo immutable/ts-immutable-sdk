@@ -22,10 +22,12 @@ export class ImmutableTransitionExample extends ImmutableWebComponent {
     this.reactRoot.render(
       <React.StrictMode>
         <TransitionExampleWidget
+          // TODO: Property 'params' does not exist on type 'IntrinsicAttributes & TransitionExampleWidgetProps'
+          // @ts-ignore
           params={params}
-          theme={this.theme}
-        ></TransitionExampleWidget>
-      </React.StrictMode>
+          theme={this.widgetConfig?.theme!}
+        />
+      </React.StrictMode>,
     );
   }
 }

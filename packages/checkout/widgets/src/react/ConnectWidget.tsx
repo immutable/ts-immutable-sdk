@@ -1,17 +1,12 @@
 import React from 'react';
 
-import {
-  WidgetConnectionProviders,
-  WidgetTheme,
-} from '../definitions/constants';
-import { Environment } from '@imtbl/config';
-
 /**
  * Interface representing the props for the Connect Widget component.
- * @property {WidgetConnectionProviders} providerPreference - The preferred provider for the Connect Widget (default: {@link WidgetConnectionProviders.METAMASK}).
+ * @property {string} providerPreference - The preferred provider for the Connect Widget
+ * (default: "metamask").
  */
 export interface ConnectReactProps {
-  providerPreference?: WidgetConnectionProviders;
+  providerPreference?: string;
 }
 
 /**
@@ -26,11 +21,8 @@ export function ConnectReact(props: ConnectReactProps): JSX.Element {
 
   return (
     <imtbl-connect
-      environment={config.environment ?? Environment.SANDBOX}
-      providerPreference={
-        providerPreference ?? WidgetConnectionProviders.METAMASK
-      }
-      theme={config.theme ?? WidgetTheme.DARK}
-    ></imtbl-connect>
+      widgetConfig={config}
+      providerPreference={providerPreference ?? 'metamask'}
+    />
   );
 }

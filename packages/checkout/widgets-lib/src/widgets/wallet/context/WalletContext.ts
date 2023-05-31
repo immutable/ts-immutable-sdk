@@ -45,13 +45,15 @@ type ActionPayload =
   | SetProviderPayload
   | SetProviderPreferencePayload
   | SetSwitchNetworkPayload
+  | SetTokenBalancesPayload
   | SetSupportedTopUpPayload;
 
 export enum WalletActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
-  SWITCH_NETWORK = 'SWITCH_NETWORK',
+  SET_NETWORK = 'SET_NETWORK',
+  SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_SUPPORTED_TOP_UPS = 'SUPPORTED_TOP_UPS',
 }
 
@@ -71,8 +73,12 @@ export interface SetProviderPreferencePayload {
 }
 
 export interface SetSwitchNetworkPayload {
-  type: WalletActions.SWITCH_NETWORK;
+  type: WalletActions.SET_NETWORK;
   network: NetworkInfo;
+}
+
+export interface SetTokenBalancesPayload {
+  type: WalletActions.SET_TOKEN_BALANCES;
   tokenBalances: BalanceInfo[];
 }
 
@@ -81,16 +87,19 @@ export interface SetSupportedTopUpPayload {
   supportedTopUps: TopUpFeature;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const WalletContext = createContext<WalletContextState>({
   walletState: initialWalletState,
   walletDispatch: () => {},
 });
 
+WalletContext.displayName = 'WalletContext'; // help with debugging Context in browser
+
 export type Reducer<S, A> = (prevState: S, action: A) => S;
 
 export const walletReducer: Reducer<WalletState, WalletAction> = (
   state: WalletState,
-  action: WalletAction
+  action: WalletAction,
 ) => {
   switch (action.payload.type) {
     case WalletActions.SET_CHECKOUT:
@@ -108,10 +117,14 @@ export const walletReducer: Reducer<WalletState, WalletAction> = (
         ...state,
         providerPreference: action.payload.providerPreference,
       };
-    case WalletActions.SWITCH_NETWORK:
+    case WalletActions.SET_NETWORK:
       return {
         ...state,
         network: action.payload.network,
+      };
+    case WalletActions.SET_TOKEN_BALANCES:
+      return {
+        ...state,
         tokenBalances: action.payload.tokenBalances,
       };
     case WalletActions.SET_SUPPORTED_TOP_UPS:

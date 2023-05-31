@@ -3,10 +3,13 @@ import { useContext } from 'react';
 import { FooterLogo } from '../../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../../components/SimpleLayout/SimpleLayout';
-import { TransitionExampleWidgetViews } from '../../../../context/TransitionExampleViewContextTypes';
-import { ViewContext, ViewActions } from '../../../../context/ViewContext';
+import { TransitionExampleWidgetViews } from '../../../../context/view-context/TransitionExampleViewContextTypes';
+import {
+  ViewContext,
+  ViewActions,
+} from '../../../../context/view-context/ViewContext';
 
-export const ViewOne = () => {
+export function ViewOne() {
   const { viewDispatch } = useContext(ViewContext);
 
   return (
@@ -31,4 +34,4 @@ export const ViewOne = () => {
       </Button>
     </SimpleLayout>
   );
-};
+}

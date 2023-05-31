@@ -1,12 +1,12 @@
-import { Box } from '@biom3/react';
+import { Box, MountedBottomSheetOverlayAndProvider } from '@biom3/react';
 import {
-  SimpleLayoutStyle,
-  HeaderStyle,
-  FooterStyle,
-  BodyStyle,
-  ContentStyle,
-  HeroContent,
-  ResponsiveStyles,
+  simpleLayoutStyle,
+  headerStyle,
+  footerStyle,
+  bodyStyle,
+  contentStyle,
+  heroContentStyle,
+  responsiveStyles,
 } from './SimpleLayoutStyles';
 
 export interface SimpleLayoutProps {
@@ -16,42 +16,46 @@ export interface SimpleLayoutProps {
   heroContent?: React.ReactNode;
   testId?: string;
   floatHeader?: boolean;
+  footerBackgroundColor?: string;
 }
 
-export const SimpleLayout = ({
+export function SimpleLayout({
   header,
   footer,
   children,
   heroContent,
   testId,
   floatHeader = false,
-}: SimpleLayoutProps) => {
+  footerBackgroundColor,
+}: SimpleLayoutProps) {
   return (
-    <Box sx={ResponsiveStyles}>
-      <Box testId={testId} sx={SimpleLayoutStyle}>
-        {header && (
-          <Box id="header" sx={HeaderStyle(floatHeader)}>
-            {header}
-          </Box>
-        )}
-        <Box id="content" sx={ContentStyle}>
-          {heroContent && (
-            <Box id="hero-content" sx={HeroContent}>
-              {heroContent}
+    <MountedBottomSheetOverlayAndProvider containerId="layout-container">
+      <Box sx={responsiveStyles} id="layout-container">
+        <Box testId={testId} sx={simpleLayoutStyle}>
+          {header && (
+            <Box id="header" sx={headerStyle(floatHeader)}>
+              {header}
             </Box>
           )}
-          {children && (
-            <Box id="body" sx={BodyStyle}>
-              {children}
+          <Box id="content" sx={contentStyle}>
+            {heroContent && (
+              <Box id="hero-content" sx={heroContentStyle}>
+                {heroContent}
+              </Box>
+            )}
+            {children && (
+              <Box id="body" sx={bodyStyle}>
+                {children}
+              </Box>
+            )}
+          </Box>
+          {footer && (
+            <Box id="footer" sx={footerStyle(footerBackgroundColor)}>
+              {footer}
             </Box>
           )}
         </Box>
-        {footer && (
-          <Box id="footer" sx={FooterStyle}>
-            {footer}
-          </Box>
-        )}
       </Box>
-    </Box>
+    </MountedBottomSheetOverlayAndProvider>
   );
-};
+}

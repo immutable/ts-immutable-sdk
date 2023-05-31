@@ -4,6 +4,7 @@ import {
 } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import JSBI from 'jsbi';
+import { NoRoutesAvailableError } from 'errors';
 import { poolEquals } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
@@ -54,18 +55,16 @@ export class Router {
     const erc20Pair: ERC20Pair = [currencyIn.wrapped, currencyOut.wrapped];
 
     // Get all pools and use these to get all possible routes.
-    const pools: Pool[] = await fetchValidPools(
+    const pools = await fetchValidPools(
       multicallContract,
       erc20Pair,
       this.routingTokens,
       this.routingContracts.factoryAddress,
     );
+
     const noValidPools = pools.length === 0;
     if (noValidPools) {
-      return {
-        success: false,
-        trade: undefined,
-      };
+      throw new NoRoutesAvailableError();
     }
 
     // Get all the possible routes from the given pools
@@ -80,12 +79,10 @@ export class Router {
       currencyIn,
       maxHops,
     );
+
     const noValidRoute = routes.length === 0;
     if (noValidRoute) {
-      return {
-        success: false,
-        trade: undefined,
-      };
+      throw new NoRoutesAvailableError();
     }
 
     // Get the best quote from all of the given routes
@@ -96,12 +93,10 @@ export class Router {
       otherCurrency,
       tradeType,
     );
+
     const noQuoteAvailable = bestQuoteForRoute === undefined;
     if (noQuoteAvailable) {
-      return {
-        success: false,
-        trade: undefined,
-      };
+      throw new NoRoutesAvailableError();
     }
 
     const { amountIn } = bestQuoteForRoute;
@@ -114,7 +109,6 @@ export class Router {
     );
 
     return {
-      success: true,
       trade: {
         route: bestQuoteForRoute.route,
         amountIn: amountInWei,
@@ -122,6 +116,7 @@ export class Router {
         amountOut: amountOutWei,
         tokenOut: currencyOut,
         tradeType,
+        gasEstimate: bestQuoteForRoute.gasEstimate,
       },
     };
   }
@@ -139,6 +134,7 @@ export class Router {
       route: Route<Currency, Currency>;
       amountIn: CurrencyAmount<Currency>;
       amountOut: CurrencyAmount<Currency>;
+      gasEstimate: ethers.BigNumber
     }
     | undefined
     > {
@@ -150,7 +146,7 @@ export class Router {
       tradeType,
     );
     if (quotes.length === 0) {
-      return undefined;
+      throw new NoRoutesAvailableError();
     }
 
     // We want to maximise the amountOut for the EXACT_INPUT type
@@ -164,6 +160,7 @@ export class Router {
         route: bestQuote.route,
         amountIn: amountSpecified,
         amountOut,
+        gasEstimate: bestQuote.gasEstimate,
       };
     }
 
@@ -178,6 +175,7 @@ export class Router {
         route: bestQuote.route,
         amountIn,
         amountOut: amountSpecified,
+        gasEstimate: bestQuote.gasEstimate,
       };
     }
   }

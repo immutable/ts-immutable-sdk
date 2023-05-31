@@ -1,71 +1,16 @@
 {
-  "root": true,
-  "extends": ["airbnb", "airbnb-typescript"],
-  "ignorePatterns": ["jest.config.*"],
-  "plugins": ["@typescript-eslint"],
+  "extends": ["../../.eslintrc"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.json",
-    "tsconfigRootDir": ".",
-    "sourceType": "module"
+    "tsconfigRootDir": "."
   },
   "rules": {
-    "max-len": "off", // turned off due to type annotations
-    "@typescript-eslint/naming-convention": [
-      "error",
-      {
-        "selector": "default",
-        "format": ["camelCase"]
-      },
-      {
-        "selector": "objectLiteralProperty",
-        "format": ["camelCase"]
-      },
-      {
-        "selector": "variable",
-        "format": ["camelCase", "UPPER_CASE"]
-      },
-      {
-        "selector": "variable",
-        "types": ["function"],
-        "format": ["camelCase"]
-      },
-      {
-        "selector": "function",
-        "format": ["camelCase"]
-      },
-      {
-        "selector": "parameter",
-        "format": ["camelCase"],
-        "leadingUnderscore": "allow"
-      },
-      {
-        "selector": "class",
-        "format": ["PascalCase"]
-      },
-      {
-        "selector": "enum",
-        "format": ["PascalCase"]
-      },
-      {
-        "selector": "enumMember",
-        "format": ["UPPER_CASE"]
-      },
-      {
-        "selector": "memberLike",
-        "modifiers": ["private"],
-        "format": ["camelCase", "UPPER_CASE"]
-      },
-      {
-        "selector": "typeLike",
-        "format": ["PascalCase"]
-      },
-      {
-        "selector": "typeProperty",
-        "format": ["camelCase"]
-      }
-    ],
-    "import/prefer-default-export": ["off"],
-    "max-classes-per-file": ["off"]
+    "no-console": "off",
+    "class-methods-use-this": "off",
+    "no-param-reassign": "off",
+    "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/dot-notation": "off",
+    "@typescript-eslint/no-unused-vars": "off"
   }
 }

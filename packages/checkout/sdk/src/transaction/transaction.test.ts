@@ -12,9 +12,7 @@ describe('transaction', () => {
     };
     const mockProvider = {
       getSigner: jest.fn().mockReturnValue({
-        sendTransaction: () => {
-          return transactionResponse;
-        },
+        sendTransaction: () => transactionResponse,
       }),
     } as unknown as Web3Provider;
 
@@ -66,9 +64,9 @@ describe('transaction', () => {
 
     await expect(sendTransaction(params)).rejects.toThrow(
       new CheckoutError(
-        '[TRANSACTION_ERROR] Cause:Transaction errored',
-        CheckoutErrorType.TRANSACTION_ERROR
-      )
+        'Transaction errored',
+        CheckoutErrorType.TRANSACTION_FAILED,
+      ),
     );
   });
 });

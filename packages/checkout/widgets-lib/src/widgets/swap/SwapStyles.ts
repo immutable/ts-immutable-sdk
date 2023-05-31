@@ -1,16 +1,16 @@
-export const SelectStyle = {
+export const selectStyle = {
   position: 'relative',
   width: '200px',
 };
 
-export const SelectedOptionStyle = {
+export const selectedOptionStyle = {
   backgroundColor: 'black',
   color: 'white',
   padding: '10px',
   cursor: 'pointer',
 };
 
-export const OptionsContainerStyle = {
+export const optionsContainerStyle = {
   position: 'absolute',
   width: '100%',
   backgroundColor: 'black',
@@ -18,13 +18,13 @@ export const OptionsContainerStyle = {
   zIndex: '9999999',
 };
 
-export const OptionStyle = {
+export const optionStyle = {
   padding: '10px',
   cursor: 'pointer',
   transition: 'all 0.2s',
 };
 
-export const OptionHoverStyle = {
+export const optionHoverStyle = {
   backgroundColor: 'black',
   color: 'white',
 };

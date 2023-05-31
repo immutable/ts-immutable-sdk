@@ -1,14 +1,14 @@
-import { generateSigners, privateKey1, testConfig } from '../../test/helpers';
 import {
   CreateWithdrawalResponse,
   GetSignableWithdrawalResponse,
   WithdrawalsApi,
 } from '@imtbl/core-sdk';
+import { convertToSignableToken, signMessage } from '@imtbl/toolkit';
+import { generateSigners, privateKey1, testConfig } from '../../test/helpers';
 import {
   prepareWithdrawalAction,
   PrepareWithdrawalWorkflowParams,
 } from './prepareWithdrawal';
-import { convertToSignableToken, signMessage } from '@imtbl/toolkit';
 
 jest.mock('@imtbl/core-sdk');
 jest.mock('@imtbl/toolkit');
@@ -61,7 +61,7 @@ describe('prepareWithdrawal', () => {
       const request: PrepareWithdrawalWorkflowParams = {
         type: 'ERC721',
         config: testConfig.immutableXConfig,
-        signers: signers,
+        signers,
         tokenId: '1',
         tokenAddress: 'asd',
       };
@@ -83,7 +83,7 @@ describe('prepareWithdrawal', () => {
           vault_id: getSignableWithdrawalResponse.vault_id,
           nonce: getSignableWithdrawalResponse.nonce,
           stark_signature:
-            getSignableWithdrawalResponse.payload_hash + 'STX' + privateKey1,
+            `${getSignableWithdrawalResponse.payload_hash}STX${privateKey1}`,
         },
         xImxEthAddress: ethKey,
         xImxEthSignature: 'raw-eth-signature',
@@ -103,7 +103,7 @@ describe('prepareWithdrawal', () => {
       const request: PrepareWithdrawalWorkflowParams = {
         type: 'ERC20',
         config: testConfig.immutableXConfig,
-        signers: signers,
+        signers,
         amount: '1.02',
         tokenAddress: 'asd',
       };
@@ -125,7 +125,7 @@ describe('prepareWithdrawal', () => {
           vault_id: getSignableWithdrawalResponse.vault_id,
           nonce: getSignableWithdrawalResponse.nonce,
           stark_signature:
-            getSignableWithdrawalResponse.payload_hash + 'STX' + privateKey1,
+            `${getSignableWithdrawalResponse.payload_hash}STX${privateKey1}`,
         },
         xImxEthAddress: ethKey,
         xImxEthSignature: 'raw-eth-signature',

@@ -1,32 +1,21 @@
-import {
-  WidgetTheme,
-  WidgetConnectionProviders,
-} from '@imtbl/checkout-widgets';
+import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
-import { useState, useEffect } from 'react';
+import { WidgetTheme } from '../../lib';
 
 function SwapWebView() {
-  const [theme, setTheme] = useState(WidgetTheme.DARK);
-  const [environment, setEnvironment] = useState(Environment.SANDBOX);
-
-  const queryParams = new URLSearchParams(window.location.search);
-  const themeParam = queryParams.get('theme');
-  const environmentParam = queryParams.get('environment');
-
-  useEffect(() => {
-    if (themeParam) setTheme(themeParam as WidgetTheme);
-    if (environmentParam) setEnvironment(environmentParam as Environment);
-  }, [themeParam, environmentParam]);
+  const config = {
+    theme: WidgetTheme.DARK,
+    environment: Environment.SANDBOX,
+  };
 
   return (
     <imtbl-swap
-      providerPreference={WidgetConnectionProviders.METAMASK}
-      theme={theme}
-      environment={environment}
-      amount="50000000000000000000"
-      fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
+      providerPreference={ConnectionProviders.METAMASK}
+      widgetConfig={JSON.stringify(config)}
+      amount=""
+      fromContractAddress="0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE"
       toContractAddress=""
-    ></imtbl-swap>
+    />
   );
 }
 

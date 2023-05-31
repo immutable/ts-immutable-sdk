@@ -1,15 +1,15 @@
-import { BiomeCombinedProviders } from '@biom3/react';
-import { WalletContext, WalletState } from '../../context/WalletContext';
 import React from 'react';
 import { mount } from 'cypress/react18';
 import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { Environment } from '@imtbl/config';
+import { WalletState } from '../../context/WalletContext';
 import { BalanceItem } from './BalanceItem';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { cySmartGet } from '../../../../lib/testUtils';
-import { Environment } from '@imtbl/config';
+import { WalletWidgetTestComponent } from '../../test-components/WalletWidgetTestComponent';
 
 describe('BalanceItem', () => {
-  let baseWalletState: WalletState = {
+  const baseWalletState: WalletState = {
     checkout: new Checkout({
       baseConfig: { environment: Environment.PRODUCTION },
     }),
@@ -30,13 +30,9 @@ describe('BalanceItem', () => {
 
   it('should show balance details', () => {
     mount(
-      <BiomeCombinedProviders>
-        <WalletContext.Provider
-          value={{ walletState: baseWalletState, walletDispatch: () => {} }}
-        >
-          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
-        </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      <WalletWidgetTestComponent>
+        <BalanceItem balanceInfo={testBalanceInfo} />
+      </WalletWidgetTestComponent>,
     );
 
     cySmartGet('balance-item-IMX').should('include.text', 'IMX');
@@ -44,7 +40,7 @@ describe('BalanceItem', () => {
     cySmartGet('balance-item-IMX__price').should('have.text', '21.32');
     cySmartGet('balance-item-IMX__fiatAmount').should(
       'include.text',
-      '≈ USD $3,412.08'
+      '≈ USD $3,412.08',
     );
   });
 
@@ -70,13 +66,9 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <BiomeCombinedProviders>
-        <WalletContext.Provider
-          value={{ walletState: testWalletState, walletDispatch: () => {} }}
-        >
-          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
-        </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+        <BalanceItem balanceInfo={testBalanceInfo} />
+      </WalletWidgetTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -104,14 +96,11 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <BiomeCombinedProviders>
-        <WalletContext.Provider
-          value={{ walletState: testWalletState, walletDispatch: () => {} }}
-        >
-          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
-        </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+        <BalanceItem balanceInfo={testBalanceInfo} />
+      </WalletWidgetTestComponent>,
     );
+
     cySmartGet('token-menu').should('exist');
     cySmartGet('token-menu').click();
     cySmartGet('balance-item-add-option').should('be.visible');
@@ -143,14 +132,11 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <BiomeCombinedProviders>
-        <WalletContext.Provider
-          value={{ walletState: testWalletState, walletDispatch: () => {} }}
-        >
-          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
-        </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+        <BalanceItem balanceInfo={testBalanceInfo} />
+      </WalletWidgetTestComponent>,
     );
+
     cySmartGet('token-menu').should('exist');
     cySmartGet('token-menu').click();
     cySmartGet('balance-item-add-option').should('not.be.visible');
@@ -181,13 +167,9 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <BiomeCombinedProviders>
-        <WalletContext.Provider
-          value={{ walletState: testWalletState, walletDispatch: () => {} }}
-        >
-          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
-        </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+        <BalanceItem balanceInfo={testBalanceInfo} />
+      </WalletWidgetTestComponent>,
     );
     cySmartGet('token-menu').should('exist');
     cySmartGet('token-menu').click();
@@ -207,14 +189,11 @@ describe('BalanceItem', () => {
       },
     };
     mount(
-      <BiomeCombinedProviders>
-        <WalletContext.Provider
-          value={{ walletState: testWalletState, walletDispatch: () => {} }}
-        >
-          <BalanceItem balanceInfo={testBalanceInfo}></BalanceItem>
-        </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+        <BalanceItem balanceInfo={testBalanceInfo} />
+      </WalletWidgetTestComponent>,
     );
+
     cySmartGet('token-menu').should('not.exist');
   });
 });

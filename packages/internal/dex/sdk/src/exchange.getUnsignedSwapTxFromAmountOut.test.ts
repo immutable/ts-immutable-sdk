@@ -1,8 +1,14 @@
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { Contract } from '@ethersproject/contracts';
 import { describe, it } from '@jest/globals';
 import { ethers } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { TradeType } from '@uniswap/sdk-core';
 import { ExchangeConfiguration } from 'config';
-import { ExchangeErrorTypes } from 'errors';
+import {
+  InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError,
+} from 'errors';
+import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { Exchange } from './exchange';
 import {
   decodeMulticallData,
@@ -10,10 +16,13 @@ import {
   setupSwapTxTest,
   TEST_PERIPHERY_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
+  TEST_GAS_PRICE,
+  IMX_TEST_CHAIN,
 } from './utils/testUtils';
-import * as utils from './lib/utils';
 import { Router } from './lib';
 
+jest.mock('@ethersproject/providers');
+jest.mock('@ethersproject/contracts');
 jest.mock('./lib/router');
 jest.mock('./lib/utils', () => ({
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -26,31 +35,93 @@ const exactOutputSingleSignature = '0x5023b4df';
 
 const DEFAULT_SLIPPAGE = 0.1; // 1/1000 = 0.001 = 0.1%
 const HIGHER_SLIPPAGE = 0.2; // 2/1000 = 0.002 = 0.2%
+const APPROVED_AMOUNT = BigNumber.from('1000000000000000000');
 
 describe('getUnsignedSwapTxFromAmountOut', () => {
-  describe('When no route found', () => {
-    it('Returns NO_ROUTE_FOUND', async () => {
-      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+  beforeAll(() => {
+    (Contract as unknown as jest.Mock).mockImplementation(
+      () => ({
+        allowance: jest.fn().mockResolvedValue(APPROVED_AMOUNT),
+      }),
+    );
 
-      (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
-        findOptimalRoute: () => ({
-          success: false,
-          trade: undefined,
+    (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
+      () => ({
+        getFeeData: async () => ({
+          maxFeePerGas: null,
+          gasPrice: TEST_GAS_PRICE,
         }),
-      }));
+      }),
+    ) as unknown as JsonRpcProvider;
+  });
+
+  describe('When the swap transaction requires approval', () => {
+    it('should include the unsigned approval transaction', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      const erc20ContractInterface = ERC20__factory.createInterface();
 
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
+
+      const amountOut = APPROVED_AMOUNT.add(BigNumber.from('1000000000000000000'));
       const tx = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountOut,
+        amountOut,
       );
 
-      expect(tx.info).toBe(undefined);
-      expect(tx.transaction).toBe(undefined);
-      expect(tx.success).toBe(false);
+      expect(tx.approveTransaction).not.toBe(null);
+
+      const decodedResults = erc20ContractInterface
+        .decodeFunctionData('approve', tx.approveTransaction?.data as string);
+      expect(decodedResults[0]).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
+      // we have already approved 1000000000000000000, so we expect to approve 1000000000000000000 more
+      expect(decodedResults[1].toString()).toEqual(APPROVED_AMOUNT.toString());
+      expect(tx.approveTransaction?.to).toEqual(params.inputToken);
+      expect(tx.approveTransaction?.from).toEqual(params.fromAddress);
+      expect(tx.approveTransaction?.value).toEqual(0); // we do not want to send any ETH
+    });
+  });
+
+  describe('When the swap transaction does not require approval', () => {
+    it('should not include the unsigned approval transaction', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange(configuration);
+
+      // Set the amountIn to be the same as the APPROVED_AMOUNT
+      const tx = await exchange.getUnsignedSwapTxFromAmountOut(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        APPROVED_AMOUNT,
+      );
+
+      // we have already approved 1000000000000000000, so we don't expect to approve anything
+      expect(tx.approveTransaction).toBe(null);
+    });
+  });
+
+  describe('When no route found', () => {
+    it('throws NoRoutesAvailableError', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+
+      (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
+        findOptimalRoute: jest.fn().mockRejectedValue(new NoRoutesAvailableError()),
+      }));
+
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange(configuration);
+      await expect(exchange.getUnsignedSwapTxFromAmountOut(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountIn,
+      )).rejects.toThrow(new NoRoutesAvailableError());
     });
   });
 
@@ -109,14 +180,13 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
-      const { info, success } = await exchange.getUnsignedSwapTxFromAmountOut(
+      const { info } = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
         params.inputToken,
         params.outputToken,
         params.amountIn,
       );
 
-      expect(success).toBe(true);
       expect(info).not.toBe(undefined);
       expect(info?.quote?.token.address).toEqual(params.inputToken);
       expect(info?.slippage).toBe(0.1);
@@ -181,7 +251,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
       const exchange = new Exchange(configuration);
 
-      const { info, success } = await exchange.getUnsignedSwapTxFromAmountOut(
+      const { info } = await exchange.getUnsignedSwapTxFromAmountOut(
         params.fromAddress,
         params.inputToken,
         params.outputToken,
@@ -189,7 +259,6 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         HIGHER_SLIPPAGE,
       );
 
-      expect(success).toBe(true);
       expect(info).not.toBe(undefined);
       expect(info?.quote?.token.address).toEqual(params.inputToken);
       expect(info?.slippage).toBe(0.2);
@@ -200,49 +269,17 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(info?.quoteWithMaxSlippage?.amount.toString()).toEqual(
         '12324600000000',
       );
-    });
-  });
-
-  describe('pass in invalid fromAddress', () => {
-    it('reverts', async () => {
-      const params = setupSwapTxTest(HIGHER_SLIPPAGE);
-      mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
-
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
-
-      const tx = await exchange.getUnsignedSwapTxFromAmountOut(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        params.amountOut,
-        HIGHER_SLIPPAGE,
-      );
-
-      const data = tx.transaction?.data?.toString() || '';
-
-      const { functionCallParams, topLevelParams } = decodeMulticallData(data);
-
-      expect(topLevelParams[1][0].slice(0, 10)).toBe(
-        exactOutputSingleSignature,
-      );
-
-      expect(functionCallParams.tokenIn).toBe(params.inputToken); // input token
-      expect(functionCallParams.tokenOut).toBe(params.outputToken); // output token
-      expect(functionCallParams.fee).toBe(10000); // fee
-      expect(functionCallParams.recipient).toBe(params.fromAddress); // Recipient
-      expect(functionCallParams.firstAmount.toString()).toBe(
-        params.amountOut.toString(),
-      ); // amountOut
-      expect(functionCallParams.secondAmount.toString()).toBe(
-        params.maxAmountIn.toString(),
-      ); // amountIn
-      expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+      expect(info?.gasFeeEstimate?.amount).toEqual('300000000000000');
+      expect(info?.gasFeeEstimate?.token.chainId).toEqual(IMX_TEST_CHAIN.chainId);
+      expect(info?.gasFeeEstimate?.token.address).toEqual(IMX_TEST_CHAIN.address);
+      expect(info?.gasFeeEstimate?.token.decimals).toEqual(IMX_TEST_CHAIN.decimals);
+      expect(info?.gasFeeEstimate?.token.symbol).toEqual(IMX_TEST_CHAIN.symbol);
+      expect(info?.gasFeeEstimate?.token.name).toEqual(IMX_TEST_CHAIN.name);
     });
   });
 
   describe('Pass in invalid addresses', () => {
-    it('throws InvalidAddress', async () => {
+    it('throws InvalidAddressError', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
 
       const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
@@ -259,7 +296,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           HIGHER_SLIPPAGE,
         ),
       ).rejects.toThrow(
-        new utils.InvalidAddress('Address is not valid: 0x0123abcdef'),
+        new InvalidAddressError('Error: invalid from address'),
       );
 
       await expect(
@@ -270,7 +307,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           params.amountOut,
           HIGHER_SLIPPAGE,
         ),
-      ).rejects.toThrow(utils.InvalidAddress);
+      ).rejects.toThrow(new InvalidAddressError('Error: invalid token in address'));
 
       await expect(
         exchange.getUnsignedSwapTxFromAmountOut(
@@ -280,12 +317,12 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           params.amountOut,
           HIGHER_SLIPPAGE,
         ),
-      ).rejects.toThrow(utils.InvalidAddress);
+      ).rejects.toThrow(new InvalidAddressError('Error: invalid token out address'));
     });
   });
 
   describe('Pass in maxHops > 10', () => {
-    it('throws', async () => {
+    it('throws InvalidMaxHopsError', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
@@ -301,12 +338,33 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           HIGHER_SLIPPAGE,
           11,
         ),
-      ).rejects.toThrow();
+      ).rejects.toThrow(new InvalidMaxHopsError('Error: max hops must be less than or equal to 10'));
+    });
+  });
+
+  describe('Pass in maxHops < 1', () => {
+    it('throws InvalidMaxHopsError', async () => {
+      const params = setupSwapTxTest(HIGHER_SLIPPAGE);
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+
+      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange(configuration);
+
+      await expect(
+        exchange.getUnsignedSwapTxFromAmountOut(
+          params.fromAddress,
+          params.inputToken,
+          params.outputToken,
+          params.amountOut,
+          HIGHER_SLIPPAGE,
+          0,
+        ),
+      ).rejects.toThrow(new InvalidMaxHopsError('Error: max hops must be greater than or equal to 1'));
     });
   });
 
   describe('With slippage greater than 50', () => {
-    it('throws', async () => {
+    it('throws InvalidSlippageError', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
@@ -322,12 +380,12 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           100,
           2,
         ),
-      ).rejects.toThrow(ExchangeErrorTypes.INVALID_SLIPPAGE);
+      ).rejects.toThrow(new InvalidSlippageError('Error: slippage percent must be less than or equal to 50'));
     });
   });
 
   describe('With slippage less than 0', () => {
-    it('throws', async () => {
+    it('throws InvalidSlippageError', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
@@ -343,7 +401,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
           -5,
           2,
         ),
-      ).rejects.toThrow(ExchangeErrorTypes.INVALID_SLIPPAGE);
+      ).rejects.toThrow(new InvalidSlippageError('Error: slippage percent must be greater than or equal to 0'));
     });
   });
 });

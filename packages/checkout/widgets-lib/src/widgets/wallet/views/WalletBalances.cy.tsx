@@ -1,24 +1,35 @@
 import { Checkout, ConnectionProviders, TokenInfo } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { WalletBalances } from './WalletBalances';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { WalletContext, WalletState } from '../context/WalletContext';
 import { Web3Provider } from '@ethersproject/providers';
-import { cySmartGet } from '../../../lib/testUtils';
 import { Environment } from '@imtbl/config';
+import { WalletBalances } from './WalletBalances';
+import { WalletContext, WalletState } from '../context/WalletContext';
+import { cySmartGet } from '../../../lib/testUtils';
 
 describe('WalletBalances', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
 
+  // @ts-ignore
+  // TODO: please fix the interface for this and remove above @ts-ignore
   const checkout = new Checkout({
     baseConfig: { environment: Environment.PRODUCTION },
   });
-  const provider = {} as unknown as Web3Provider;
+
+  const provider = {
+    getSigner: () => ({
+      getAddress: async () => Promise.resolve(''),
+    }),
+    provider: {
+      request: async () => null,
+    },
+  } as unknown as Web3Provider;
+
   const baseWalletState: WalletState = {
-    checkout: checkout,
+    checkout,
     network: {
       chainId: 13372,
       name: 'Immutable zkEVM Testnet',
@@ -63,7 +74,7 @@ describe('WalletBalances', () => {
           >
             <WalletBalances />
           </WalletContext.Provider>
-        </BiomeCombinedProviders>
+        </BiomeCombinedProviders>,
       );
       cySmartGet('add-coins').should('exist');
     });
@@ -85,18 +96,14 @@ describe('WalletBalances', () => {
         >
           <WalletBalances />
         </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      </BiomeCombinedProviders>,
     );
     cySmartGet('add-coins').should('not.exist');
   });
 
   it('should NOT show add coins button on Ethereum', () => {
-    const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
-    });
-    const provider = {} as unknown as Web3Provider;
     const walletState: WalletState = {
-      checkout: checkout,
+      checkout,
       network: {
         chainId: 1,
         name: 'Ethereum',
@@ -119,7 +126,7 @@ describe('WalletBalances', () => {
         >
           <WalletBalances />
         </WalletContext.Provider>
-      </BiomeCombinedProviders>
+      </BiomeCombinedProviders>,
     );
     cySmartGet('Ethereum-network-button').click();
     cySmartGet('add-coins').should('not.exist');

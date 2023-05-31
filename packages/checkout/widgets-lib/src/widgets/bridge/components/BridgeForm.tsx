@@ -1,182 +1,242 @@
-import { Body, Box, Option, OptionKey, Select, TextInput } from '@biom3/react';
-import { ChainId, GetBalanceResult } from '@imtbl/checkout-sdk';
-import { useEffect, useState } from 'react';
-import { Network } from '@imtbl/checkout-widgets';
-import { BridgeButton } from './BridgeButton';
-import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
-import { BridgeWidgetViews } from '../BridgeWidget';
-import { L1Network } from '../../../lib/networkUtils';
-import { Environment } from '@imtbl/config';
+import {
+  Box, Button, Heading, OptionKey,
+} from '@biom3/react';
+import { GetBalanceResult } from '@imtbl/checkout-sdk';
+import {
+  useCallback, useContext, useEffect, useMemo, useState,
+} from 'react';
+import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
+import { BridgeContext } from '../context/BridgeContext';
+import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
+import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
+import { text } from '../../../resources/text/textConfig';
+import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
+import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
+import { SelectForm } from '../../../components/FormComponents/SelectForm/SelectForm';
+import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
+import { Fees } from './Fees';
+import {
+  bridgeFormButtonContainerStyles,
+  bridgeFormWrapperStyles,
+  formInputsContainerStyles,
+} from './BridgeFormStyles';
+import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 
 interface BridgeFormProps {
-  provider: Web3Provider;
-  balances: GetBalanceResult[];
-  chainId?: ChainId;
-  selectedNetwork: OptionKey | undefined;
-  onSelectedNetworkChange: (selectedOption: OptionKey) => void;
-  toNetwork: string;
-  nativeCurrencySymbol: string;
+  testId?: string;
   defaultAmount?: string;
   defaultTokenAddress?: string;
-  updateTransactionResponse: (transactionResponse: TransactionResponse) => void;
-  updateView: (view: BridgeWidgetViews, err?: any) => void;
 }
 
-export const BridgeForm = (props: BridgeFormProps) => {
+export function BridgeForm(props: BridgeFormProps) {
   const {
-    provider,
-    balances,
-    chainId,
-    selectedNetwork,
-    onSelectedNetworkChange,
-    toNetwork,
-    updateTransactionResponse,
-    updateView,
-  } = props;
-  const { nativeCurrencySymbol, defaultAmount, defaultTokenAddress } = props;
+    bridgeState: {
+      provider, checkout, network, tokenBalances, allowedTokens,
+    },
+  } = useContext(BridgeContext);
+  const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  const { viewDispatch } = useContext(ViewContext);
+  const { testId, defaultAmount, defaultTokenAddress } = props;
+  const { content, bridgeForm } = text.views[BridgeWidgetViews.BRIDGE];
 
-  const [bridgeAmount, setBridgeAmount] = useState(defaultAmount || '0');
-  const [selectedTokenOption, setSelectedTokenOption] = useState<OptionKey>();
+  // Form state
+  const [amount, setAmount] = useState<string>(defaultAmount || '');
+  const [amountError, setAmountError] = useState<string>('');
+  const [token, setToken] = useState<GetBalanceResult | null>(null);
+  const [tokenError, setTokenError] = useState<string>('');
+  const [amountFiatValue, setAmountFiatValue] = useState<string>('');
 
-  function handleBridgeAmountChange(event: any) {
-    const value = event.target.value;
-    setBridgeAmount(value);
-  }
+  const tokensOptions = useMemo(
+    () => tokenBalances
+      .filter((b) => b.balance.gt(0))
+      .map(
+        (t) => ({
+          id: `${t.token.symbol}-${t.token.name}`,
+          name: t.token.name,
+          symbol: t.token.symbol,
+          icon: t.token.icon,
+        } as CoinSelectorOptionProps),
+      ),
+    [tokenBalances],
+  );
 
-  function handleSelectToken(selectedOption: OptionKey) {
-    setSelectedTokenOption(selectedOption);
-  }
+  const selectedOption = useMemo(
+    () => (token && token ? `${token.token.symbol}-${token.token.name}` : undefined),
+    [token, tokensOptions],
+  );
+
+  const handleBridgeAmountChange = (value: string) => {
+    setAmount(value);
+    if (amountError) {
+      const validateAmountError = validateAmount(value, token?.formattedBalance);
+      setAmountError(validateAmountError);
+    }
+
+    if (!token) return;
+    setAmountFiatValue(calculateCryptoToFiat(
+      value,
+      token.token.symbol,
+      cryptoFiatState.conversions,
+    ));
+  };
+
+  const handleAmountInputBlur = (value: string) => {
+    setAmount(value);
+    if (amountError) {
+      const validateAmountError = validateAmount(value, token?.formattedBalance);
+      setAmountError(validateAmountError);
+    }
+
+    if (!token) return;
+    setAmountFiatValue(calculateCryptoToFiat(
+      value,
+      token.token.symbol,
+      cryptoFiatState.conversions,
+    ));
+  };
+
+  const handleSelectTokenChange = (value: OptionKey) => {
+    const selected = tokenBalances.find((t) => value === `${t.token.symbol}-${t.token.name}`);
+    if (!selected) return;
+
+    setToken(selected);
+    setTokenError('');
+  };
 
   /**
    * This effect is used to set the default token option
-   * Set as the token that is passed in as a prop if it has an available balance
+   * Set as the token that is passed in as a prop if it (is allowed and) has an available balance
    * Otherwise will default to the native currency of the chain
    * If the user does not have any non-zero balances, this will not be set
    */
   useEffect(() => {
     let defaultToken: GetBalanceResult | undefined;
     if (defaultTokenAddress) {
-      defaultToken = balances.find(
-        (balance) => balance.token.address === defaultTokenAddress
-      );
-    }
-    if (!defaultToken) {
-      defaultToken = balances.find(
-        (balance) => balance.token.symbol === nativeCurrencySymbol
+      defaultToken = tokenBalances.find(
+        (balance) => balance.token.address === defaultTokenAddress,
       );
     }
 
-    setSelectedTokenOption(defaultToken?.token.symbol as OptionKey);
-  }, [balances, selectedNetwork, defaultTokenAddress, nativeCurrencySymbol]);
+    if (!defaultToken) {
+      defaultToken = tokenBalances.find(
+        (balance) => balance.token.symbol === network?.nativeCurrency.symbol,
+      );
+    }
+
+    setToken(defaultToken || null);
+  }, [tokenBalances, network, defaultTokenAddress]);
+
+  useEffect(() => {
+    cryptoFiatDispatch({
+      payload: {
+        type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+        tokenSymbols: allowedTokens.map((allowedToken) => allowedToken.symbol),
+      },
+    });
+  }, [cryptoFiatDispatch, allowedTokens]);
+
+  useEffect(() => {
+    if (!amount) return;
+    if (!token) return;
+
+    setAmountFiatValue(calculateCryptoToFiat(
+      amount,
+      token.token.symbol,
+      cryptoFiatState.conversions,
+    ));
+  }, [amount, token]);
+
+  const bridgeFormValidator = useCallback((): boolean => {
+    const validateTokenError = validateToken(token);
+    const validateAmountError = validateAmount(amount, token?.formattedBalance);
+
+    if (validateTokenError) setTokenError(validateTokenError);
+    if (validateAmountError) setAmountError(validateAmountError);
+
+    if (
+      validateTokenError
+      || validateAmountError) return false;
+    return true;
+  }, [token, amount, setTokenError, setAmountError]);
+
+  const submitBridge = useCallback(async () => {
+    if (!bridgeFormValidator()) return;
+    if (!checkout || !provider) return;
+
+    // Fetch bridge transaction
+
+    try {
+      // submit bridge transaction
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: BridgeWidgetViews.SUCCESS },
+        },
+      });
+    } catch (err: any) {
+      // TODO: fix this with fail view... always succeeed for now
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: BridgeWidgetViews.SUCCESS },
+        },
+      });
+    }
+  }, [checkout, provider, bridgeFormValidator]);
 
   return (
-    <Box sx={{ paddingTop: 'base.spacing.x4' }}>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          columnGap: 'base.spacing.x4',
-        }}
-      >
-        <Body size={'small'}>From:</Body>
-        <Select
-          testId="select-network"
-          selectedOption={selectedNetwork}
-          onSelectChange={onSelectedNetworkChange}
+    <Box
+      testId={testId}
+      sx={bridgeFormWrapperStyles}
+    >
+      <Box sx={{ paddingX: 'base.spacing.x4' }}>
+        <Heading
+          testId={`${testId}-content-heading`}
+          size="small"
+          weight="regular"
+          sx={{ paddingBottom: 'base.spacing.x4' }}
         >
-          <Option
-            testId={`select-network-${L1Network(Environment.PRODUCTION)}`}
-            key={L1Network(Environment.PRODUCTION)}
-            optionKey={L1Network(Environment.PRODUCTION)}
-          >
-            <Option.Label>
-              {ChainId[L1Network(Environment.PRODUCTION)]}
-            </Option.Label>
-          </Option>
-          <Option
-            testId={`select-network-${Network.IMTBL_ZKEVM_TESTNET}`}
-            key={Network.IMTBL_ZKEVM_TESTNET}
-            optionKey={ChainId.IMTBL_ZKEVM_TESTNET}
-          >
-            <Option.Label>{Network.IMTBL_ZKEVM_TESTNET}</Option.Label>
-          </Option>
-        </Select>
+          {content.title}
+        </Heading>
+        <Box sx={formInputsContainerStyles}>
+          <SelectForm
+            id="bridge-token"
+            options={tokensOptions}
+            coinSelectorHeading={bridgeForm.from.selectorTitle}
+            selectedOption={selectedOption}
+            subtext={token
+              ? `${content.availableBalancePrefix} ${tokenValueFormat(token?.formattedBalance)}`
+              : ''}
+            textAlign="left"
+            errorMessage={tokenError}
+            onSelectChange={(option) => handleSelectTokenChange(option)}
+            disabled={false}
+          />
+          <TextInputForm
+            id="bridge-amount"
+            value={amount}
+            placeholder={bridgeForm.from.inputPlaceholder}
+            subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}
+            validator={amountInputValidation}
+            onTextInputChange={(value) => handleBridgeAmountChange(value)}
+            onTextInputBlur={(value) => handleAmountInputBlur(value)}
+            textAlign="right"
+            errorMessage={amountError}
+            disabled={false}
+          />
+        </Box>
+        <Fees gasFeeValue="" gasFeeToken={null} gasFeeFiatValue="" />
       </Box>
-      <Box
-        sx={{
-          paddingTop: 'base.spacing.x4',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          columnGap: 'base.spacing.x4',
-        }}
-      >
-        <TextInput
-          testId="amount"
-          sx={{ minWidth: 'base.spacing.x20', width: 'base.spacing.x40' }}
-          value={bridgeAmount}
-          onChange={handleBridgeAmountChange}
-          type="number"
-        ></TextInput>
-        <Select
-          testId="select-token"
-          sx={{
-            minWidth: 'base.spacing.x20',
-            width: 'base.spacing.x40',
-          }}
-          selectedOption={selectedTokenOption}
-          onSelectChange={handleSelectToken}
+      <Box sx={bridgeFormButtonContainerStyles}>
+        <Button
+          testId={`${testId}-button`}
+          variant="primary"
+          onClick={submitBridge}
         >
-          {balances.map((balance) => {
-            return (
-              <Option
-                testId={`select-token-${balance.token.symbol}`}
-                key={`${chainId}-${balance.token.symbol}`}
-                optionKey={balance.token.symbol}
-              >
-                <Option.Label>{balance.token.symbol}</Option.Label>
-              </Option>
-            );
-          })}
-        </Select>
+          {bridgeForm.buttonText}
+        </Button>
       </Box>
-      <Box
-        sx={{
-          paddingTop: 'base.spacing.x1',
-          display: 'flex',
-          justifyContent: 'flex-start',
-        }}
-      >
-        {!selectedTokenOption && (
-          <Body size={'xSmall'}>You have no balances on this network</Body>
-        )}
-      </Box>
-      <Box
-        sx={{
-          paddingTop: 'base.spacing.x4',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <Body testId="bridge-to-network">To: {toNetwork}</Body>
-        <Body testId="receive-text">
-          You will receive:{' '}
-          {bridgeAmount && selectedTokenOption
-            ? `${bridgeAmount} ${selectedTokenOption.toString()}`
-            : ''}
-        </Body>
-      </Box>
-      <BridgeButton
-        provider={provider}
-        amount={bridgeAmount}
-        balance={balances.find(
-          (balance) => balance.token.symbol === selectedTokenOption
-        )}
-        fromNetwork={selectedNetwork}
-        updateTransactionResponse={updateTransactionResponse}
-        updateView={updateView}
-      />
     </Box>
   );
-};
+}

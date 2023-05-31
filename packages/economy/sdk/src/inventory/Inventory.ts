@@ -1,37 +1,41 @@
-import type { EventData, EventType } from '../types';
-import { asyncFn } from '../utils';
+import { Service } from 'typedi';
+
+import { StudioBE } from '../StudioBE';
 import { withSDKError } from '../Errors';
+import { Store } from '../Store';
 
-import { InventoryService } from './InventoryService';
+import { RootApiGameIDItemsGetRequest } from '../__codegen__/inventory';
+import type { InventoryItem } from '../__codegen__/inventory';
 
-type GetInventoryInput = { userId: string; gameId: string };
-
-/**
- * @internal Assets events
- */
-export type InventoryEvent = EventType<'INVENTORY'>;
-
-/** List of specific Assets statuses */
-export type InventoryStatus = InventoryEvent['status'];
-
+@Service()
 export class Inventory {
-  private emitEvent: (event: InventoryEvent) => void;
-  private inventoryService: InventoryService;
+  constructor(private studioBE: StudioBE, private store: Store) {}
 
-  constructor(emitEvent: (event: InventoryEvent) => void) {
-    this.emitEvent = emitEvent;
-    // FIXME: make injectable
-    this.inventoryService = new InventoryService();
-  }
+  @withSDKError({ type: 'INVENTORY_GET_ITEMS_ERROR' })
+  public async getItems(input: RootApiGameIDItemsGetRequest) {
+    const { data, status } = await this.studioBE.inventoryApi.gameIDItemsGet(
+      input,
+    );
 
-  @withSDKError({ type: 'INVENTORY_ERROR' })
-  public async getItems(input: GetInventoryInput) {
-    const { data, status } = await this.inventoryService.getItems(input);
-
-    if (status !== 200) {
-      throw new Error('GET_INVENTORY_ERROR');
+    if (!(status >= 200 && status < 300)) {
+      throw new Error('INVENTORY_GET_ITEMS_ERROR', {
+        cause: { code: `${status}`, reason: 'unknown' },
+      });
     }
 
-    return data.rows;
+    this.store.set((state) => {
+      state.inventory = data.rows || [];
+    });
+
+    const items = data.rows;
+
+    return items;
+  }
+
+  public filterItemsBy(
+    items: InventoryItem[],
+    predicate: (value?: InventoryItem, index?: number, list?: InventoryItem[]) => boolean,
+  ) {
+    return items.filter(predicate);
   }
 }

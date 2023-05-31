@@ -1,9 +1,9 @@
+import { Contracts } from '@imtbl/core-sdk';
 import { getEncodeAssetInfo } from './getEncodeAssetInfo';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChain,
 } from '../registration';
-import { Contracts } from '@imtbl/core-sdk';
 import { completeERC20WithdrawalAction } from './completeERC20Withdrawal';
 import {
   generateSigners,

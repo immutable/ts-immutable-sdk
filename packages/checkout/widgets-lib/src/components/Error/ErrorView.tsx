@@ -1,11 +1,11 @@
+import { Link } from '@biom3/react';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { FooterButton } from '../Footer/FooterButton';
 import { HeaderNavigation } from '../Header/HeaderNavigation';
 import { SatelliteHero } from '../Hero/SatelliteHero';
 import { SimpleTextBody } from '../Body/SimpleTextBody';
-import { Link } from '@biom3/react';
-import { BaseViews } from '../../context/ViewContext';
 import { text } from '../../resources/text/textConfig';
+import { BaseViews } from '../../context/view-context/ViewContext';
 
 export interface ErrorViewProps {
   actionText: string;
@@ -14,44 +14,45 @@ export interface ErrorViewProps {
   onCloseClick: () => void;
 }
 
-export const ErrorView = ({
+export function ErrorView({
   actionText,
   onActionClick,
   errorEventAction,
   onCloseClick,
-}: ErrorViewProps) => {
+}: ErrorViewProps) {
   const errorText = text.views[BaseViews.ERROR];
 
   if (typeof errorEventAction === 'function') errorEventAction();
 
-  const onErrorActionClick = () =>
-    typeof onActionClick === 'function' && onActionClick();
+  const onErrorActionClick = () => typeof onActionClick === 'function' && onActionClick();
 
   return (
     <SimpleLayout
-      header={
+      header={(
         <HeaderNavigation
-          showBack={true}
-          transparent={true}
+          showBack
+          transparent
           onCloseButtonClick={onCloseClick}
         />
-      }
-      footer={
+      )}
+      footer={(
         <FooterButton
           actionText={actionText}
           onActionClick={onErrorActionClick}
         />
-      }
+      )}
       heroContent={<SatelliteHero />}
-      floatHeader={true}
+      floatHeader
     >
       <SimpleTextBody heading={errorText.heading}>
-        {errorText.body[0]}{' '}
+        {errorText.body[0]}
+        {' '}
         <Link size="small" href="https://support.immutable.com/en/">
           {errorText.body[1]}
-        </Link>{' '}
+        </Link>
+        {' '}
         {errorText.body[2]}
       </SimpleTextBody>
     </SimpleLayout>
   );
-};
+}

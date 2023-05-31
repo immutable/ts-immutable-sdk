@@ -1,18 +1,23 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { useContext, useState, useCallback } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { MetamaskConnectHero } from '../../../components/Hero/MetamaskConnectHero';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
-import { ConnectWidgetViews } from '../../../context/ConnectViewContextTypes';
-import { ViewContext, ViewActions } from '../../../context/ViewContext';
+import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
-import { zkEVMNetwork } from '../../../lib/networkUtils';
+import {
+  ViewContext,
+  ViewActions,
+} from '../../../context/view-context/ViewContext';
 
-export const ReadyToConnect = () => {
+export interface ReadyToConnectProps {
+  targetChainId: ChainId;
+}
+export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   const {
     connectState: { checkout, sendCloseEvent },
     connectDispatch,
@@ -23,12 +28,14 @@ export const ReadyToConnect = () => {
 
   const onConnectClick = useCallback(async () => {
     const handleConnectViewUpdate = async (
+      // TODO: variable is already declared above
+      // eslint-disable-next-line
       checkout: Checkout,
-      provider: Web3Provider
+      provider: Web3Provider,
     ) => {
       const networkInfo = await checkout.getNetworkInfo({ provider });
 
-      if (networkInfo.chainId !== zkEVMNetwork(checkout.config.environment)) {
+      if (networkInfo.chainId !== targetChainId) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
@@ -67,24 +74,24 @@ export const ReadyToConnect = () => {
   return (
     <SimpleLayout
       testId="ready-to-connect"
-      header={
+      header={(
         <HeaderNavigation
           showBack
           title=""
           transparent
           onCloseButtonClick={sendCloseEvent}
         />
-      }
+      )}
       floatHeader
       heroContent={<MetamaskConnectHero />}
-      footer={
+      footer={(
         <FooterButton
           actionText={footerButtonText}
           onActionClick={onConnectClick}
         />
-      }
+      )}
     >
       <SimpleTextBody heading={body.heading}>{body.content}</SimpleTextBody>
     </SimpleLayout>
   );
-};
+}
