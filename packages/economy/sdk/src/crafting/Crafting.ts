@@ -107,6 +107,13 @@ export class Crafting {
     });
   }
 
+  public resetCraftingInputs() {
+    this.store.set((state) => {
+      state.selectedRecipeId = undefined;
+      state.craftingInputs = [];
+    });
+  }
+
   public addInputByItem(item: InventoryItem) {
     const { selectedRecipeId } = this.store.get();
 
@@ -128,15 +135,15 @@ export class Crafting {
       allInputs.find(([input]) => {
         if (input.type === 'multiple_item') {
           const condition = input.conditions?.find(
-            (cond) => cond.type === 'sum' || cond.type === 'qty'
+            (cond) => cond.type?.includes('sum') || cond.type === 'qty'
           );
 
-          const key = condition?.ref;
+          const key = `${condition?.ref}`.split('.').pop()
           const expected = condition?.expected;
           const op = condition?.comparison as string;
           let curr = 0;
 
-          if (condition?.type === 'sum') {
+          if (condition?.type?.includes('sum')) {
             curr = this.store
               .get()
               .craftingInputs.filter(
@@ -154,7 +161,7 @@ export class Crafting {
             return !comparison(curr, expected, op);
           }
 
-          if (condition?.type === 'qty') {
+          if (condition?.type?.includes('qty')) {
             curr = this.store
               .get()
               .craftingInputs.filter(

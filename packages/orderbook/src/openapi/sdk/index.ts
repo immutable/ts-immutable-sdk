@@ -16,6 +16,7 @@ export type { Error } from './models/Error';
 export { Fee } from './models/Fee';
 export type { ListOrdersResult } from './models/ListOrdersResult';
 export type { Order } from './models/Order';
+export type { OrderResult } from './models/OrderResult';
 export { OrderStatus } from './models/OrderStatus';
 export type { Page } from './models/Page';
 export type { PageCursor } from './models/PageCursor';

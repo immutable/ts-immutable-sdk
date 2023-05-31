@@ -1,5 +1,5 @@
 import {
-  BridgeEvent,
+  WidgetEvent,
   BridgeEventType,
   BridgeSuccess,
   IMTBLWidgetEvents,
@@ -7,7 +7,7 @@ import {
 } from '@imtbl/checkout-widgets';
 
 export const sendBridgeSuccessEvent = () => {
-  const successEvent = new CustomEvent<BridgeEvent<BridgeSuccess>>(
+  const successEvent = new CustomEvent<WidgetEvent<BridgeSuccess>>(
     IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
     {
       detail: {
@@ -22,7 +22,7 @@ export const sendBridgeSuccessEvent = () => {
 };
 
 export const sendBridgeFailedEvent = (reason: string) => {
-  const failedEvent = new CustomEvent<BridgeEvent<BridgeFailed>>(
+  const failedEvent = new CustomEvent<WidgetEvent<BridgeFailed>>(
     IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
     {
       detail: {
@@ -40,7 +40,7 @@ export const sendBridgeFailedEvent = (reason: string) => {
 export function sendBridgeWidgetCloseEvent() {
   // eslint-disable-next-line no-console
   console.log(BridgeEventType.CLOSE_WIDGET);
-  const closeWidgetEvent = new CustomEvent<BridgeEvent<any>>(
+  const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
     {
       detail: {

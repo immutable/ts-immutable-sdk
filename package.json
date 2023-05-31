@@ -51,11 +51,14 @@
   "workspaces": [
     "sdk",
     "packages/config",
+    "packages/erc20",
+    "packages/erc721-permissioned-mintable",
     "packages/immutablex_client",
     "packages/passport",
     "packages/provider",
     "packages/provider/src/sample-app",
     "packages/orderbook",
+    "packages/internal/contracts",
     "packages/internal/toolkit",
     "packages/internal/cryptofiat",
     "packages/internal/dex/sdk",
@@ -71,6 +74,7 @@
     "packages/checkout/widgets-lib",
     "packages/economy/sdk",
     "packages/economy/playground",
-    "packages/economy/services"
+    "packages/economy/services",
+    "packages/blockchain-data"
   ]
 }

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- @imtbl/blockchain-data: Package for exposing blockchain data information.
+
 ### Fixed
 
 - @imtbl/passport: Fixed a bug on Passport Provider getAddress.

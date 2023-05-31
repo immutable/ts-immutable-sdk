@@ -52,18 +52,18 @@ describe('fulfil order', () => {
       offerer,
     );
 
-    const order = await sdk.createOrder({
+    const { result: { id: orderId } } = await sdk.createOrder({
       offerer: offerer.address,
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
       orderSignature: signature,
     });
 
-    await waitForOrderToBeOfStatus(sdk, order.id, OrderStatus.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
 
-    const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(order.id, fulfiller.address);
+    const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(orderId, fulfiller.address);
     await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
 
-    await waitForOrderToBeOfStatus(sdk, order.id, OrderStatus.FILLED);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.FILLED);
   }, 60_000);
 });

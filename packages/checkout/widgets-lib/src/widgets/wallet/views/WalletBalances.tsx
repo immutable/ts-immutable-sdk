@@ -15,7 +15,6 @@ import {
   WALLET_BALANCE_CONTAINER_STYLE,
   WalletBalanceItemStyle,
 } from './WalletBalancesStyles';
-import { sendAddCoinsEvent } from '../CoinTopUpEvents';
 import { zkEVMNetwork } from '../../../lib/networkUtils';
 import {
   CryptoFiatActions,
@@ -85,6 +84,11 @@ export function WalletBalances() {
     })();
   }, [provider, checkout, network, cryptoFiatDispatch]);
 
+  const handleAddCoinsClick = () => {
+    // eslint-disable-next-line no-console
+    console.log('Add coins click to implement top up view');
+  };
+
   useEffect(() => {
     if (!checkout || !provider || !network) return;
     (async () => {
@@ -149,11 +153,7 @@ export function WalletBalances() {
           <MenuItem
             testId="add-coins"
             emphasized
-            onClick={() => {
-              sendAddCoinsEvent({
-                network: walletState.network ?? undefined,
-              });
-            }}
+            onClick={() => handleAddCoinsClick()}
           >
             <MenuItem.FramedIcon icon="Add" />
             <MenuItem.Label>Add coins</MenuItem.Label>

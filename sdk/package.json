@@ -20,10 +20,13 @@
     "oidc-client-ts": "^2.2.1"
   },
   "devDependencies": {
+    "@imtbl/blockchain-data": "0.0.0",
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/config": "0.0.0",
     "@imtbl/cryptofiat": "0.0.0",
+    "@imtbl/erc20": "0.0.0",
+    "@imtbl/erc721-permissioned-mintable": "0.0.0",
     "@imtbl/guardian": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
     "@imtbl/orderbook": "0.0.0",
@@ -57,6 +60,10 @@
       "types": "./dist/config.d.ts",
       "import": "./dist/config.js"
     },
+    "./blockchain-data": {
+      "types": "./dist/blockchain-data.d.ts",
+      "import": "./dist/blockchain-data.js"
+    },
     "./immutablex_client": {
       "types": "./dist/immutablex_client.d.ts",
       "import": "./dist/immutablex_client.js"
@@ -80,6 +87,14 @@
     "./checkout_widgets": {
       "types": "./dist/checkout_widgets.d.ts",
       "import": "./dist/checkout_widgets.js"
+    },
+    "./erc20": {
+      "types": "./dist/erc20.d.ts",
+      "import": "./dist/erc20.js"
+    },
+    "./erc721-permissioned-mintable": {
+      "types": "./dist/erc721-permissioned-mintable.d.ts",
+      "import": "./dist/erc721-permissioned-mintable.js"
     }
   },
   "files": [
