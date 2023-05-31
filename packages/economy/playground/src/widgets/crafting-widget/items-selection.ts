@@ -79,7 +79,7 @@ export class ItemsSelection extends LitElement {
     );
 
     return html`
-      <div class="w-5/6 mx-auto">
+      <div class="w-5/6 mx-auto my-8">
         <ul class="tree prose">
           ${items.map(
             ([type, items], idx) => html`

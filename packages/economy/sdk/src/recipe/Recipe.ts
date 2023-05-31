@@ -81,14 +81,14 @@ export class Recipe {
     conditions: Array<DomainCondition>,
   ): boolean {
     return conditions?.every((condition) => {
-      const key = condition?.ref as string;
+      const key = `${condition?.ref}`.split('.').pop() as string;
       const metadata: Record<string, any> = {
         item_definition_id: item.item_definition_id,
         ...(item.metadata || {}),
       };
 
       if (Object.hasOwnProperty.call(metadata, key)) {
-        if (condition.type === 'sum') {
+        if (condition.type?.includes('sum')) {
           return true;
         }
         return comparison(
