@@ -1,3 +1,3 @@
 # Blockchain Data
 
-Wrapper functions for interacting with our Blockchain Data APIs.
+Wrapper functions for interacting with Immutable blockchain data APIs.
