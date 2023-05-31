@@ -1,14 +1,4 @@
 /**
- * Represents an event object emitted by the Bridge Widget.
- * @property {BridgeEventType} type - The type of the event.
- * @property {T} data - The data associated with the event.
- */
-export type BridgeEvent<T> = {
-  type: BridgeEventType;
-  data: T;
-};
-
-/**
  * Enum of possible Bridge Widget event types.
  */
 export enum BridgeEventType {

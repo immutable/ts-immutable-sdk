@@ -27,7 +27,7 @@ export function TotalTokenBalance(props: TotalTokenBalanceProps) {
           <Icon
             testId="coin-info-icon"
             icon="InformationCircle"
-            sx={{ width: 'base.icon.size.100', fill: 'base.color.brand.4' }}
+            sx={{ width: 'base.icon.size.100', fill: 'base.color.brand.4', cursor: 'pointer' }}
             onClick={() => viewDispatch({
               payload: {
                 type: ViewActions.UPDATE_VIEW,

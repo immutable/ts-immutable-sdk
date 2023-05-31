@@ -365,7 +365,7 @@ describe('Seaport', () => {
       const immutableOrder: Order = {
         account_address: offerer,
         buy: [
-          { item_type: BuyItem.item_type.IMX, start_amount: '100' },
+          { item_type: BuyItem.item_type.NATIVE, start_amount: '100' },
         ],
         buy_fees: [],
         chain_id: '1',
