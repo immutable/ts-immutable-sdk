@@ -2900,9 +2900,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/contracts@workspace:packages/internal/contracts":
+"@imtbl/contracts@0.0.0, @imtbl/contracts@workspace:packages/internal/contracts":
   version: 0.0.0-use.local
   resolution: "@imtbl/contracts@workspace:packages/internal/contracts"
+  dependencies:
+    "@rollup/plugin-typescript": ^11.0.0
+    rollup: ^3.17.2
   languageName: unknown
   linkType: soft
 
@@ -3083,9 +3086,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/erc721-permissioned-mintable@workspace:packages/erc721-permissioned-mintable"
   dependencies:
+    "@imtbl/config": 0.0.0
+    "@imtbl/contracts": 0.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
+    ethers: ^5.7.2
     rollup: ^3.17.2
   languageName: unknown
   linkType: soft
