@@ -1,7 +1,5 @@
 import { TransfersApi, UnsignedTransferRequest } from '@imtbl/core-sdk';
 import * as guardian from '@imtbl/guardian';
-import { PassportConfiguration } from 'config';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
@@ -33,15 +31,6 @@ describe('transfer', () => {
     }));
   });
 
-  const passportConfig = new PassportConfiguration({
-    baseConfig: new ImmutableConfiguration({
-      environment: Environment.SANDBOX,
-    }),
-    clientId: 'clientId123',
-    logoutRedirectUri: 'http://localhost:3000',
-    redirectUri: 'http://localhost:3000',
-  });
-
   describe('single transfer', () => {
     let getSignableTransferV1Mock: jest.Mock;
     let createTransferV1Mock: jest.Mock;
@@ -57,6 +46,7 @@ describe('transfer', () => {
       tokenAddress,
       receiver: mockReceiver,
     };
+    const mockGuardianDomain = 'http://mockGuardianDomain.com';
 
     beforeEach(() => {
       getSignableTransferV1Mock = jest.fn();
@@ -143,7 +133,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-        passportConfig,
+        guardianDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       });
 
@@ -235,7 +225,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-        passportConfig,
+        guardianDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       });
 
@@ -257,7 +247,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-        passportConfig,
+        guardianDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
         new PassportError(
@@ -304,7 +294,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-        passportConfig,
+        guardianDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('TRANSFER_ERROR');
 

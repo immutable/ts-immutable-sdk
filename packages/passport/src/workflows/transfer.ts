@@ -12,7 +12,6 @@ import {
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { retryWithDelay } from 'util/retry';
 import * as guardian from '@imtbl/guardian';
-import { PassportConfiguration } from 'config';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { ConfirmationScreen, TransactionTypes } from '../confirmation';
 import { UserWithEtherKey } from '../types';
@@ -24,7 +23,7 @@ type TransferRequest = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
-  passportConfig: PassportConfiguration;
+  guardianDomain: string;
   confirmationScreen: ConfirmationScreen;
 };
 
@@ -38,27 +37,27 @@ type BatchTransfersParams = {
 
 type TransferWithGuardianParams = {
   accessToken: string;
-  passportConfig: PassportConfiguration;
+  guardianDomain: string;
   payloadHash: string;
   confirmationScreen: ConfirmationScreen;
 };
 
 const transferWithGuardian = async ({
   accessToken,
-  passportConfig,
+  guardianDomain,
   payloadHash,
   confirmationScreen,
 }: TransferWithGuardianParams) => {
   const transactionAPI = new guardian.TransactionsApi(
     new guardian.Configuration({
       accessToken,
-      basePath: passportConfig.guardianDomain,
+      basePath: guardianDomain,
     }),
   );
   const starkExTransactionApi = new guardian.StarkexTransactionsApi(
     new guardian.Configuration({
       accessToken,
-      basePath: passportConfig.guardianDomain,
+      basePath: guardianDomain,
     }),
   );
 
@@ -92,7 +91,7 @@ export async function transfer({
   transfersApi,
   starkSigner,
   user,
-  passportConfig,
+  guardianDomain,
   confirmationScreen,
 }: // TODO: remove this eslint disable once we have a better solution
 // eslint-disable-next-line max-len
@@ -118,7 +117,7 @@ TransferRequest): Promise<CreateTransferResponseV1> {
     );
 
     await transferWithGuardian({
-      passportConfig,
+      guardianDomain,
       accessToken: user.accessToken,
       payloadHash: signableResult.data.payload_hash,
       confirmationScreen,
