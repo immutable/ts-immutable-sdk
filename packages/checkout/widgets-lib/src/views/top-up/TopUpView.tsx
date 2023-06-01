@@ -16,12 +16,6 @@ import {
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 
-export enum CurrentWidget {
-  ONRAMP = 'ONRAMP',
-  SWAP = 'SWAP',
-  BRIDGE = 'BRIDGE',
-}
-
 interface TopUpViewProps {
   showOnrampOption: boolean,
   showSwapOption: boolean,
