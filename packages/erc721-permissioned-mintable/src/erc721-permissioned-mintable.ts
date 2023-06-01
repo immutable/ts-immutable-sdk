@@ -9,7 +9,7 @@ import {
   ImmutableERC721PermissionedMintable,
   ImmutableERC721PermissionedMintable__factory,
 } from '@imtbl/contracts';
-import { PromiseOrValue } from '@imtbl/contracts/dist/typechain/types/common'; // TODO export better from contracts
+import { PromiseOrValue } from '@imtbl/contracts/dist/typechain/types/common';
 
 export class ERC721PermissionedMintable {
   private readonly contract: ImmutableERC721PermissionedMintable;
