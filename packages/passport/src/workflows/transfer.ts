@@ -10,6 +10,8 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { convertToSignableToken } from '@imtbl/toolkit';
+import { retryWithDelay } from 'util/retry';
+import * as guardian from '@imtbl/guardian';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { ConfirmationScreen, TransactionTypes } from '../confirmation';
 import { UserWithEtherKey } from '../types';
@@ -21,6 +23,7 @@ type TransferRequest = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
+  imxPublicApiDomain: string;
   confirmationScreen: ConfirmationScreen;
 };
 
@@ -32,13 +35,67 @@ type BatchTransfersParams = {
   confirmationScreen: ConfirmationScreen;
 };
 
+type TransferWithGuardianParams = {
+  accessToken: string;
+  imxPublicApiDomain: string;
+  payloadHash: string;
+  confirmationScreen: ConfirmationScreen;
+};
+
+const transferWithGuardian = async ({
+  accessToken,
+  imxPublicApiDomain,
+  payloadHash,
+  confirmationScreen,
+}: TransferWithGuardianParams) => {
+  const transactionAPI = new guardian.TransactionsApi(
+    new guardian.Configuration({
+      accessToken,
+      basePath: imxPublicApiDomain,
+    }),
+  );
+  const starkExTransactionApi = new guardian.StarkexTransactionsApi(
+    new guardian.Configuration({
+      accessToken,
+      basePath: imxPublicApiDomain,
+    }),
+  );
+
+  const transactionRes = await retryWithDelay(async () => transactionAPI.getTransactionByID({
+    transactionID: payloadHash,
+    chainType: 'starkex',
+  }));
+
+  if (!transactionRes.data.id) {
+    throw new Error("Transaction doesn't exists");
+  }
+
+  const evaluateStarkexRes = await starkExTransactionApi.evaluateStarkexTransaction({
+    payloadHash,
+  });
+
+  const { confirmationRequired } = evaluateStarkexRes.data;
+  if (confirmationRequired) {
+    const confirmationResult = await confirmationScreen.startGuardianTransaction(
+      payloadHash,
+    );
+
+    if (!confirmationResult.confirmed) {
+      throw new Error('Transaction rejected by user');
+    }
+  }
+};
+
 export async function transfer({
   request,
   transfersApi,
   starkSigner,
   user,
+  imxPublicApiDomain,
   confirmationScreen,
-}: TransferRequest): Promise<CreateTransferResponseV1> {
+}: // TODO: remove this eslint disable once we have a better solution
+// eslint-disable-next-line max-len
+TransferRequest): Promise<CreateTransferResponseV1> {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
     const getSignableTransferRequest: GetSignableTransferRequestV1 = {
@@ -47,21 +104,24 @@ export async function transfer({
       amount: transferAmount,
       receiver: request.receiver,
     };
-    const signableResult = await transfersApi.getSignableTransferV1({
-      getSignableTransferRequest,
-    });
 
-    const confirmationResult = await confirmationScreen.startTransaction(
-      user.accessToken,
+    const headers = {
+      Authorization: `Bearer ${user.accessToken}`,
+    };
+
+    const signableResult = await transfersApi.getSignableTransferV1(
       {
-        transactionType: TransactionTypes.createTransfer,
-        transactionData: getSignableTransferRequest,
+        getSignableTransferRequest,
       },
+      { headers },
     );
 
-    if (!confirmationResult.confirmed) {
-      throw new Error('Transaction rejected by user');
-    }
+    await transferWithGuardian({
+      imxPublicApiDomain,
+      accessToken: user.accessToken,
+      payloadHash: signableResult.data.payload_hash,
+      confirmationScreen,
+    });
 
     const signableResultData = signableResult.data;
     const { payload_hash: payloadHash } = signableResultData;
@@ -82,11 +142,6 @@ export async function transfer({
 
     const createTransferRequest = {
       createTransferRequest: transferSigningParams,
-    };
-
-    const headers = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      Authorization: `Bearer ${user.accessToken}`,
     };
 
     const { data: responseData } = await transfersApi.createTransferV1(

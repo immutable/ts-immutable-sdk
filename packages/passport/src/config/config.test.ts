@@ -19,6 +19,7 @@ describe('Config', () => {
 
   const overrides: PassportOverrides = {
     authenticationDomain: 'authenticationDomain123',
+    imxPublicApiDomain: 'guardianDomain123',
     magicProviderId: 'providerId123',
     magicPublishableApiKey: 'publishableKey123',
     network: Networks.SANDBOX,

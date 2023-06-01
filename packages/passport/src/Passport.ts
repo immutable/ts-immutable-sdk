@@ -59,6 +59,7 @@ export class Passport {
         user: updatedUser,
         starkSigner,
         immutableXClient: this.immutableXClient,
+        imxPublicApiDomain: this.config.imxPublicApiDomain,
         confirmationScreen: this.confirmationScreen,
       });
     }
@@ -67,6 +68,7 @@ export class Passport {
       user: userWithEtherKey,
       starkSigner,
       immutableXClient: this.immutableXClient,
+      imxPublicApiDomain: this.config.imxPublicApiDomain,
       confirmationScreen: this.confirmationScreen,
     });
   }
