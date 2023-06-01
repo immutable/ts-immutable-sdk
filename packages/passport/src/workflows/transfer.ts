@@ -23,7 +23,7 @@ type TransferRequest = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
-  guardianDomain: string;
+  imxPublicApiDomain: string;
   confirmationScreen: ConfirmationScreen;
 };
 
@@ -37,27 +37,27 @@ type BatchTransfersParams = {
 
 type TransferWithGuardianParams = {
   accessToken: string;
-  guardianDomain: string;
+  imxPublicApiDomain: string;
   payloadHash: string;
   confirmationScreen: ConfirmationScreen;
 };
 
 const transferWithGuardian = async ({
   accessToken,
-  guardianDomain,
+  imxPublicApiDomain,
   payloadHash,
   confirmationScreen,
 }: TransferWithGuardianParams) => {
   const transactionAPI = new guardian.TransactionsApi(
     new guardian.Configuration({
       accessToken,
-      basePath: guardianDomain,
+      basePath: imxPublicApiDomain,
     }),
   );
   const starkExTransactionApi = new guardian.StarkexTransactionsApi(
     new guardian.Configuration({
       accessToken,
-      basePath: guardianDomain,
+      basePath: imxPublicApiDomain,
     }),
   );
 
@@ -91,7 +91,7 @@ export async function transfer({
   transfersApi,
   starkSigner,
   user,
-  guardianDomain,
+  imxPublicApiDomain,
   confirmationScreen,
 }: // TODO: remove this eslint disable once we have a better solution
 // eslint-disable-next-line max-len
@@ -117,7 +117,7 @@ TransferRequest): Promise<CreateTransferResponseV1> {
     );
 
     await transferWithGuardian({
-      guardianDomain,
+      imxPublicApiDomain,
       accessToken: user.accessToken,
       payloadHash: signableResult.data.payload_hash,
       confirmationScreen,

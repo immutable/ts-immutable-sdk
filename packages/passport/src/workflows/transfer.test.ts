@@ -133,7 +133,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-        guardianDomain: mockGuardianDomain,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       });
 
@@ -225,7 +225,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-        guardianDomain: mockGuardianDomain,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       });
 
@@ -247,7 +247,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-        guardianDomain: mockGuardianDomain,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
         new PassportError(
@@ -294,7 +294,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-        guardianDomain: mockGuardianDomain,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('TRANSFER_ERROR');
 
