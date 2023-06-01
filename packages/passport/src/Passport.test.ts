@@ -1,6 +1,4 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-// TODO: Remove this once the dependency has been fixed
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';

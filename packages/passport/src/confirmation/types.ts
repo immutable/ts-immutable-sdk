@@ -17,45 +17,35 @@ export enum SendMessage {
 }
 
 export enum TransactionTypes {
-  // TODO: remove this once the naming has been fixed
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  CancelOrder = 'delete:v1/orders',
-  // TODO: remove this once the naming has been fixed
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  CreateOrder = 'post:v1/orders',
-  // TODO: remove this once the naming has been fixed
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  CreateTrade = 'post:v1/trades',
-  // TODO: remove this once the naming has been fixed
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  CreateTransfer = 'post:v1/transfers',
-  // TODO: remove this once the naming has been fixed
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  CreateBatchTransfer = 'post:v2/transfers',
+  cancelOrder = 'delete:v1/orders',
+  createOrder = 'post:v1/orders',
+  createTrade = 'post:v1/trades',
+  createTransfer = 'post:v1/transfers',
+  createBatchTransfer = 'post:v2/transfers',
 }
 
 export type CancelOrder = {
-  transactionType: TransactionTypes.CancelOrder;
+  transactionType: TransactionTypes.cancelOrder;
   transactionData: GetSignableCancelOrderRequest;
 };
 
 export type CreateOrder = {
-  transactionType: TransactionTypes.CreateOrder;
+  transactionType: TransactionTypes.createOrder;
   transactionData: GetSignableOrderRequest;
 };
 
 export type CreateTrade = {
-  transactionType: TransactionTypes.CreateTrade;
+  transactionType: TransactionTypes.createTrade;
   transactionData: GetSignableTradeRequest;
 };
 
 export type CreateTransfer = {
-  transactionType: TransactionTypes.CreateTransfer;
-  transactionData: GetSignableTransferRequestV1 | string;
+  transactionType: TransactionTypes.createTransfer;
+  transactionData: GetSignableTransferRequestV1;
 };
 
 export type CreateBatchTransfer = {
-  transactionType: TransactionTypes.CreateBatchTransfer;
+  transactionType: TransactionTypes.createBatchTransfer;
   transactionData: GetSignableTransferRequest;
 };
 
@@ -75,6 +65,4 @@ export type ConfirmationResult = {
   confirmed: boolean;
 };
 
-// TODO: remove this once the naming has been fixed
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const PassportEventType = 'imx_passport_confirmation';
+export const PASSPORT_EVENT_TYPE = 'imx_passport_confirmation';

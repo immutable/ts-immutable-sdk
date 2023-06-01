@@ -1,7 +1,7 @@
 import {
   mock, when, instance, deepEqual, anything,
 } from 'ts-mockito';
-import { Order, OrdersService } from 'openapi/sdk';
+import { OrderResult, OrdersService } from 'openapi/sdk';
 import { OrderComponents } from '@opensea/seaport-js/lib/types';
 import { ItemType } from '@opensea/seaport-js/lib/constants';
 import { ImmutableApiClient } from './api-client';
@@ -14,12 +14,12 @@ describe('ImmutableApiClient', () => {
       const orderId = '456';
 
       when(mockedOpenAPIClient.getOrder(deepEqual({ chainId, orderId })))
-        .thenReturn(Promise.resolve({ id: orderId, chain_id: chainId } as Order));
+        .thenReturn(Promise.resolve({ result: { id: orderId, chain_id: chainId } } as OrderResult));
 
-      const order = await new ImmutableApiClient(instance(mockedOpenAPIClient), chainId)
+      const orderResult = await new ImmutableApiClient(instance(mockedOpenAPIClient), chainId)
         .getOrder(orderId);
-      expect(order.id).toEqual(orderId);
-      expect(order.chain_id).toEqual(chainId);
+      expect(orderResult.result.id).toEqual(orderId);
+      expect(orderResult.result.chain_id).toEqual(chainId);
     });
   });
 
@@ -164,17 +164,19 @@ describe('ImmutableApiClient', () => {
         const orderId = '456';
 
         when(mockedOpenAPIClient.createOrder(anything()))
-          .thenReturn(Promise.resolve({ id: orderId, chain_id: chainId } as Order));
+          .thenReturn(Promise.resolve({
+            result: { id: orderId, chain_id: chainId },
+          } as OrderResult));
 
-        const order = await new ImmutableApiClient(instance(mockedOpenAPIClient), '123').createOrder({
+        const orderResult = await new ImmutableApiClient(instance(mockedOpenAPIClient), '123').createOrder({
           offerer: '0x123',
           orderComponents,
           orderHash: '0x123',
           orderSignature: '0x123',
         });
 
-        expect(order.id).toEqual(orderId);
-        expect(order.chain_id).toEqual(chainId);
+        expect(orderResult.result.id).toEqual(orderId);
+        expect(orderResult.result.chain_id).toEqual(chainId);
       });
     });
   });

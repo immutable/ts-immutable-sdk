@@ -11,16 +11,14 @@ import {
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { UserWithEtherKey } from '../types';
-import { PassportConfiguration } from '../config';
-import { TransactionTypes } from '../confirmation/types';
-import ConfirmationScreen from '../confirmation/confirmation';
+import { ConfirmationScreen, TransactionTypes } from '../confirmation';
 
 type CancelOrderParams = {
   request: GetSignableCancelOrderRequest;
   ordersApi: OrdersApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  passportConfig: PassportConfiguration;
+  confirmationScreen: ConfirmationScreen;
 };
 
 type CreateOrderParams = {
@@ -28,7 +26,7 @@ type CreateOrderParams = {
   ordersApi: OrdersApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  passportConfig: PassportConfiguration;
+  confirmationScreen: ConfirmationScreen;
 };
 
 const ERC721 = 'ERC721';
@@ -38,7 +36,7 @@ export async function createOrder({
   user,
   request,
   ordersApi,
-  passportConfig,
+  confirmationScreen,
 }: CreateOrderParams): Promise<CreateOrderResponse> {
   return withPassportError<CreateOrderResponse>(async () => {
     const ethAddress = user.etherKey;
@@ -58,11 +56,10 @@ export async function createOrder({
       getSignableOrderRequestV3,
     });
 
-    const confirmationScreen = new ConfirmationScreen(passportConfig);
     const confirmationResult = await confirmationScreen.startTransaction(
       user.accessToken,
       {
-        transactionType: TransactionTypes.CreateOrder,
+        transactionType: TransactionTypes.createOrder,
         transactionData: getSignableOrderRequestV3,
       },
     );
@@ -112,7 +109,7 @@ export async function cancelOrder({
   starkSigner,
   request,
   ordersApi,
-  passportConfig,
+  confirmationScreen,
 }: CancelOrderParams): Promise<CancelOrderResponse> {
   return withPassportError<CancelOrderResponse>(async () => {
     const getSignableCancelOrderRequest: GetSignableCancelOrderRequest = {
@@ -122,11 +119,10 @@ export async function cancelOrder({
       getSignableCancelOrderRequest,
     });
 
-    const confirmationScreen = new ConfirmationScreen(passportConfig);
     const confirmationResult = await confirmationScreen.startTransaction(
       user.accessToken,
       {
-        transactionType: TransactionTypes.CancelOrder,
+        transactionType: TransactionTypes.cancelOrder,
         transactionData: getSignableCancelOrderRequest,
       },
     );

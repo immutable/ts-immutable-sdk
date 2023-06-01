@@ -1,20 +1,22 @@
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { TransfersApi, UnsignedTransferRequest } from '@imtbl/core-sdk';
 import * as guardian from '@imtbl/guardian';
+import { PassportConfiguration } from 'config';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
-import { PassportConfiguration } from '../config';
-import ConfirmationScreen from '../confirmation/confirmation';
+import { ConfirmationScreen, TransactionTypes } from '../confirmation';
 
 jest.mock('../confirmation/confirmation');
 jest.mock('@imtbl/guardian');
 
 describe('transfer', () => {
-  let mockStartTransaction: jest.Mock;
-  let mockStartGuardianTransaction: jest.Mock;
+  afterEach(jest.resetAllMocks);
   let mockGetTransactionByID: jest.Mock;
   let mockEvaluateStarkexTransaction: jest.Mock;
+
+  const mockConfirmationScreen = new ConfirmationScreen({} as any);
+
   const mockStarkSigner = {
     signMessage: jest.fn(),
     getAddress: jest.fn(),
@@ -22,13 +24,7 @@ describe('transfer', () => {
 
   beforeEach(() => {
     mockGetTransactionByID = jest.fn();
-    mockStartTransaction = jest.fn();
-    mockStartGuardianTransaction = jest.fn();
     mockEvaluateStarkexTransaction = jest.fn();
-    (ConfirmationScreen as jest.Mock).mockImplementation(() => ({
-      startTransaction: mockStartTransaction,
-      startGuardianTransaction: mockStartGuardianTransaction,
-    }));
     (guardian.TransactionsApi as jest.Mock).mockImplementation(() => ({
       getTransactionByID: mockGetTransactionByID,
     }));
@@ -129,7 +125,9 @@ describe('transfer', () => {
           confirmationRequired: true,
         },
       });
-      mockStartGuardianTransaction.mockResolvedValue({
+
+      (mockConfirmationScreen.startGuardianTransaction as jest.Mock).mockResolvedValue({
+
         confirmed: true,
       });
       getSignableTransferV1Mock.mockResolvedValue(
@@ -146,10 +144,14 @@ describe('transfer', () => {
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
         passportConfig,
+        confirmationScreen: mockConfirmationScreen,
       });
 
       expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
+      expect(mockConfirmationScreen.startGuardianTransaction).toHaveBeenCalledWith(
+        mockSignableTransferV1Response.data.payload_hash,
+      );
       expect(createTransferV1Mock).toBeCalledWith(
         mockCreateTransferRequest,
         mockHeader,
@@ -215,6 +217,11 @@ describe('transfer', () => {
           confirmationRequired: false,
         },
       });
+
+      (mockConfirmationScreen.startGuardianTransaction as jest.Mock).mockResolvedValue({
+
+        confirmed: true,
+      });
       getSignableTransferV1Mock.mockResolvedValue(
         mockSignableTransferV1Response,
       );
@@ -229,11 +236,12 @@ describe('transfer', () => {
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
         passportConfig,
+        confirmationScreen: mockConfirmationScreen,
       });
 
       expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(mockStartGuardianTransaction).not.toBeCalled();
+      expect(mockConfirmationScreen.startGuardianTransaction).not.toBeCalled();
       expect(createTransferV1Mock).toBeCalledWith(
         mockCreateTransferRequest,
         mockHeader,
@@ -250,6 +258,7 @@ describe('transfer', () => {
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
         passportConfig,
+        confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
         new PassportError(
           `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
@@ -276,7 +285,17 @@ describe('transfer', () => {
       getSignableTransferV1Mock.mockResolvedValue(
         mockSignableTransferV1Response,
       );
-      mockStartTransaction.mockRejectedValue({
+      mockGetTransactionByID.mockResolvedValue({
+        data: {
+          id: mockSignableTransferV1Response.data.payload_hash,
+        },
+      });
+      mockEvaluateStarkexTransaction.mockResolvedValue({
+        data: {
+          confirmationRequired: true,
+        },
+      });
+      (mockConfirmationScreen.startGuardianTransaction as jest.Mock).mockRejectedValue({
         confirmed: false,
       });
 
@@ -286,7 +305,12 @@ describe('transfer', () => {
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
         passportConfig,
+        confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('TRANSFER_ERROR');
+
+      expect(mockConfirmationScreen.startGuardianTransaction).toHaveBeenCalledWith(
+        mockSignableTransferV1Response.data.payload_hash,
+      );
     });
   });
 
@@ -302,6 +326,10 @@ describe('transfer', () => {
         receiver: 'receiver_eth_address',
       },
     ];
+    const popupOptions = {
+      height: 784,
+      width: 480,
+    };
 
     beforeEach(() => {
       getSignableTransferMock = jest.fn();
@@ -346,7 +374,7 @@ describe('transfer', () => {
       getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTransferMock.mockResolvedValue(mockTransferResponse);
-      mockStartTransaction.mockResolvedValue({
+      (mockConfirmationScreen.startTransaction as jest.Mock).mockResolvedValue({
         confirmed: true,
       });
 
@@ -355,7 +383,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
-        passportConfig,
+        confirmationScreen: mockConfirmationScreen,
       });
 
       expect(result).toEqual({
@@ -380,6 +408,14 @@ describe('transfer', () => {
         },
       });
       expect(mockStarkSigner.signMessage).toHaveBeenCalled();
+      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
+        mockUser.accessToken,
+        {
+          transactionType: TransactionTypes.createBatchTransfer,
+          transactionData: expect.any(Object),
+        },
+        popupOptions,
+      );
       expect(createTransferMock).toHaveBeenCalledWith(
         {
           createTransferRequestV2: {
@@ -415,7 +451,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
-        passportConfig,
+        confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
         new PassportError(
           `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
@@ -451,7 +487,7 @@ describe('transfer', () => {
         },
       };
       getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
-      mockStartTransaction.mockRejectedValue({
+      (mockConfirmationScreen.startTransaction as jest.Mock).mockRejectedValue({
         confirmed: false,
       });
 
@@ -460,8 +496,17 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
-        passportConfig,
+        confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('TRANSFER_ERROR');
+
+      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
+        mockUser.accessToken,
+        {
+          transactionType: TransactionTypes.createBatchTransfer,
+          transactionData: expect.any(Object),
+        },
+        popupOptions,
+      );
     });
   });
 });
