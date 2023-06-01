@@ -19,6 +19,7 @@ cd packages/internal/contracts
 yarn run generate-types
 ```
 
-### Caveats
+### Including bytecode
 
-- In order to generate the full ...
+- In order to generate all required methods to interface with the contracts, such as `attach`, the bytecode is required in the raw input files.
+- Having the bytecode is also required for contract deployment functionality.
