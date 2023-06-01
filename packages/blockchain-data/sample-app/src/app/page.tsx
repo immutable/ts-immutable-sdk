@@ -9,8 +9,8 @@ import {
   BlockchainDataModuleConfiguration,
 } from '@imtbl/blockchain-data';
 
-const chainName = 'sepolia';
-const apiURL = 'https://indexer-mr.dev.imtbl.com/v1';
+const CHAIN_NAME = 'imtbl-zkevm-devnet-2';
+const API_URL = 'https://indexer-mr.dev.imtbl.com';
 
 const separator = (url: string) => {
   return url.includes('?') ? '&' : '?';
@@ -23,7 +23,7 @@ const capitalizeFirstLetter = (string: string) => {
 const endpointDomains = {
   activities: [
     {
-      name: 'ListActivities',
+      name: 'listActivities',
       paginated: true,
       queryParams: [
         {
@@ -104,7 +104,7 @@ const endpointDomains = {
       // },
     },
     {
-      name: 'GetActivityByID',
+      name: 'getActivity',
       paginated: false,
       queryParams: [],
       pathParams: [
@@ -145,7 +145,7 @@ const endpointDomains = {
   ],
   chains: [
     {
-      name: 'ListChains',
+      name: 'listChains',
       paginated: true,
       queryParams: [],
       pathParams: [],
@@ -176,7 +176,7 @@ const endpointDomains = {
   ],
   collections: [
     {
-      name: 'ListCollections',
+      name: 'listCollections',
       paginated: true,
       queryParams: [],
       pathParams: [],
@@ -205,7 +205,7 @@ const endpointDomains = {
       // },
     },
     {
-      name: 'GetCollectionByAddress',
+      name: 'getCollection',
       paginated: false,
       queryParams: [],
       pathParams: [
@@ -237,7 +237,7 @@ const endpointDomains = {
   ],
   nfts: [
     {
-      name: 'GetNFTByTokenID',
+      name: 'getNFT',
       paginated: false,
       queryParams: [],
       pathParams: [
@@ -275,7 +275,7 @@ const endpointDomains = {
       // },
     },
     {
-      name: 'ListNFTsByContractAddress',
+      name: 'listNFTs',
       paginated: true,
       queryParams: [],
       pathParams: [
@@ -314,7 +314,7 @@ const endpointDomains = {
       // },
     },
     {
-      name: 'ListNFTsByAccountAddress',
+      name: 'listNFTsByAccountAddress',
       paginated: true,
       queryParams: [
         {
@@ -365,7 +365,7 @@ const endpointDomains = {
   ],
   'nft Owners': [
     {
-      name: 'ListOwnersByTokenID',
+      name: 'listNFTOwners',
       paginated: true,
       queryParams: [],
       pathParams: [
@@ -425,15 +425,19 @@ export default function Home() {
         baseConfig: new ImmutableConfiguration({
           environment,
         }),
+        overrides: {
+          basePath: API_URL,
+        },
       };
 
       const client = new BlockchainData(config);
 
-      const request = {
-        chainName: 'imtbl-zkevm-testnet',
-      };
-
-      const response = await client.listActivities(request);
+      try {
+        const response = await client.listChains();
+        setResponse(response.result);
+      } catch (error) {
+        console.error(error);
+      }
     }
 
     getData();
@@ -452,33 +456,39 @@ export default function Home() {
         />
       </div>
 
-      <div className="mb-32 lg:mb-0 flex flex-col my-6">
-        {Object.keys(endpointDomains).map((key) => {
-          const endpoints = endpointDomains[key];
-          return (
-            <>
-              <h2
-                className={`text-sm uppercase tracking-wider font-mono`}
-                style={{ opacity: 0.6 }}
-              >
-                {capitalizeFirstLetter(key)}
-              </h2>
-              <ul className="my-1">
-                {endpoints.map((endpoint) => (
-                  <li className="my-2">
-                    <a
-                      href="#"
-                      className="group rounded-lg border border-transparent p-2 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-                    >
-                      {endpoint.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </>
-          );
-        })}
-        <div className="flex-1 bg-gray w-full h-full"></div>
+      <div className="lg:mb-0 my-6 flex space-x-6">
+        <div className="flex flex-col">
+          {Object.keys(endpointDomains).map((key) => {
+            const endpoints = endpointDomains[key];
+            return (
+              <React.Fragment key={key}>
+                <h2
+                  className={`text-sm uppercase tracking-wider font-mono`}
+                  style={{ opacity: 0.6 }}
+                >
+                  {capitalizeFirstLetter(key)}
+                </h2>
+                <ul className="my-1">
+                  {endpoints.map((endpoint) => (
+                    <li className="my-2" key={endpoint.name}>
+                      <a
+                        href="#"
+                        className="group rounded-lg border border-transparent p-2 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+                      >
+                        {endpoint.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </React.Fragment>
+            );
+          })}
+        </div>
+        <div className="flex-1 bg-gray w-full h-full">
+          <pre className="p-4 bg-neutral-800/50 rounded-lg">
+            {JSON.stringify(response, null, 2)}
+          </pre>
+        </div>
       </div>
     </main>
   );
