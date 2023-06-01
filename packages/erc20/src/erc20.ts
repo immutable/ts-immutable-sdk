@@ -13,10 +13,16 @@ export class ERC20 {
     this.contract = factory.attach(contractAddress);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction> {
     return this.contract.populateTransaction.totalSupply(overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async balanceOf(
     account: PromiseOrValue<string>,
     overrides?: CallOverrides,
@@ -24,6 +30,9 @@ export class ERC20 {
     return this.contract.populateTransaction.balanceOf(account, overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async transfer(
     to: PromiseOrValue<string>,
     amount: PromiseOrValue<BigNumberish>,
@@ -32,6 +41,9 @@ export class ERC20 {
     return this.contract.populateTransaction.transfer(to, amount, overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async allowance(
     owner: PromiseOrValue<string>,
     spender: PromiseOrValue<string>,
@@ -40,6 +52,9 @@ export class ERC20 {
     return this.contract.populateTransaction.allowance(owner, spender, overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async approve(
     spender: PromiseOrValue<string>,
     amount: PromiseOrValue<BigNumberish>,
@@ -48,6 +63,9 @@ export class ERC20 {
     return this.contract.populateTransaction.approve(spender, amount, overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async transferFrom(
     from: PromiseOrValue<string>,
     to: PromiseOrValue<string>,
