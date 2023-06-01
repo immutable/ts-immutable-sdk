@@ -1,7 +1,6 @@
 import { BigNumberish } from '@ethersproject/bignumber';
 import { CallOverrides, PopulatedTransaction } from '@ethersproject/contracts';
 import { ERC20 as OpenZeppelinERC20, ERC20__factory as OpenZeppelinERC20Factory } from '@imtbl/contracts';
-// TODO should be exported from '@imtbl/contracts' to avoid '/src/...'
 import { PromiseOrValue } from '@imtbl/contracts/src/typechain/types/common';
 import { Overrides } from 'ethers';
 
