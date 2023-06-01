@@ -1618,9 +1618,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.5.8-beta":
-  version: 0.5.8-beta
-  resolution: "@biom3/react@npm:0.5.8-beta"
+"@biom3/react@npm:^0.5.11-beta":
+  version: 0.5.11-beta
+  resolution: "@biom3/react@npm:0.5.11-beta"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.10.8
@@ -1636,7 +1636,7 @@ __metadata:
     react-dom: ^18.2.0
     react-is: ^18.2.0
     ts-deepmerge: ^5.0.0
-  checksum: dcabbb38a90375951a4fce912bdfcf26d9fdf4b151eb026dbbeac495a4390170fe98c78a6cf0b280368f64ce1662650c95eef899e8ce9637f78bbf6c09e541d9
+  checksum: 127df41f8b5e9742402d0cb96bd26f139f69217c80b5d99ea56a4196f00bd17be3b87ad012b8f24ccb9d853e1dbb3fa12f4a573d2d4615754fc9f1c905678c3b
   languageName: node
   linkType: hard
 
@@ -2736,7 +2736,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.5.8-beta
+    "@biom3/react": ^0.5.11-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@svgr/webpack": ^8.0.1
@@ -2786,8 +2786,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets-lib@workspace:packages/checkout/widgets-lib"
   dependencies:
-    "@biom3/design-tokens": 0.1.5-beta
-    "@biom3/react": ^0.5.8-beta
+    "@biom3/design-tokens": 0.2.0-beta
+    "@biom3/react": ^0.5.11-beta
     "@ethersproject/providers": ^5.7.2
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
@@ -23340,7 +23340,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sample-app@workspace:packages/provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.5.8-beta
+    "@biom3/react": ^0.5.11-beta
     "@imtbl/core-sdk": ^1.1.1-alpha.1
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1

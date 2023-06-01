@@ -4,7 +4,7 @@ export const balanceItemContainerStyle = {
   flexDirection: 'row',
   justifyContent: 'space-between',
   padding: '24px 16px 24px 16px',
-  backgroundColor: 'base.color.translucent.container.100',
+  backgroundColor: 'base.color.translucent.emphasis.100',
   borderRadius: 'base.borderRadius.x6',
 };
 

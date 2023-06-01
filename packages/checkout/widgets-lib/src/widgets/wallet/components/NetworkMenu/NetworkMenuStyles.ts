@@ -6,7 +6,7 @@ export const networkMenuStyles = {
 
 export const activeNetworkButtonStyle = {
   fontWeight: 'base.text.caption.small.bold.fontWeight',
-  borderColor: 'base.color.translucent.container.1000',
+  borderColor: 'base.color.translucent.emphasis.1000',
   borderStyle: 'solid',
   borderWidth: 'base.border.size.200',
 };
