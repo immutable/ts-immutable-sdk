@@ -23,8 +23,8 @@ interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
   tokenAddress?: string,
   amount?: string,
-  onBackButtonClick?: () => void,
   onCloseButtonClick: () => void,
+  onBackButtonClick?: () => void,
 }
 
 export function TopUpView({
