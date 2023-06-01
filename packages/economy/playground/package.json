@@ -45,8 +45,8 @@
   "scripts": {
     "build": "storybook build",
     "build:app": "tsc && vite build",
-    "chromatic": "chromatic --exit-zero-on-changes",
     "clean": "rimraf ./dist ./.cache",
+    "chromatic": "chromatic --exit-zero-on-changes",
     "dev": "vite",
     "prestart": "[ -f public/js/imtbl-checkout-widgets.js ] || { echo 'Error: checkout-widgets deps not found. Please run `npm run setup` first.' ; exit 1; }",
     "preview": "vite preview",
