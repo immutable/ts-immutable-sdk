@@ -3088,7 +3088,6 @@ __metadata:
   dependencies:
     "@ethersproject/bignumber": ^5.7.0
     "@ethersproject/contracts": ^5.7.0
-    "@ethersproject/providers": ^5.7.2
     "@imtbl/config": 0.0.0
     "@imtbl/contracts": 0.0.0
     "@rollup/plugin-typescript": ^11.0.0
