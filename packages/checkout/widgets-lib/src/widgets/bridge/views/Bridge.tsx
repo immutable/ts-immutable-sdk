@@ -24,7 +24,7 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
         />
       )}
       footer={<FooterLogo />}
-      footerBackgroundColor="base.color.translucent.container.200"
+      footerBackgroundColor="base.color.translucent.emphasis.200"
     >
       <BridgeForm
         testId="bridge-form"

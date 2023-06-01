@@ -32,7 +32,7 @@ export function SwapCoins({
         />
       )}
       footer={<FooterLogo />}
-      footerBackgroundColor="base.color.translucent.container.200"
+      footerBackgroundColor="base.color.translucent.emphasis.200"
     >
       <Box
         sx={{

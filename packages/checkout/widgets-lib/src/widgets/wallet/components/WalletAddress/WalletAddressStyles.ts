@@ -5,7 +5,7 @@ export const walletAddressContainerStyle = {
   flexDirection: 'row',
   justifyContent: 'space-between',
   padding: '24px 11px 24px 32px',
-  backgroundColor: 'base.color.translucent.container.400',
+  backgroundColor: 'base.color.translucent.emphasis.400',
   borderRadius: 'base.borderRadius.x6',
 };
 
