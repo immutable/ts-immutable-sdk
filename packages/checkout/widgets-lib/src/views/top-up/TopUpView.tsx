@@ -28,14 +28,14 @@ interface TopUpViewProps {
 }
 
 export function TopUpView({
+  widgetEvent,
   showOnrampOption,
   showSwapOption,
   showBridgeOption,
-  widgetEvent,
   tokenAddress,
   amount,
-  onBackButtonClick,
   onCloseButtonClick,
+  onBackButtonClick,
 }: TopUpViewProps) {
   const { header, topUpOptions } = text.views[SharedViews.TOP_UP_VIEW];
   const { card, swap, bridge } = topUpOptions;
