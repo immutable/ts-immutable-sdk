@@ -9,14 +9,14 @@ import {
   ERC20Item, ERC721Item, NativeItem, RoyaltyInfo,
 } from 'types';
 import {
-  EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME, SEAPORT_CONTRACT_VERSION_V1_4,
-} from '@opensea/seaport-js/lib/constants';
-import {
   BigNumber, PopulatedTransaction, providers,
 } from 'ethers';
 import {
   BuyItem, Order, CreateOrderProtocolData, SellItem, OrderStatus,
 } from 'openapi/sdk';
+import {
+  EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME, SEAPORT_CONTRACT_VERSION_V1_4,
+} from './constants';
 import { Seaport } from './seaport';
 
 // Make an address-like string for tests
