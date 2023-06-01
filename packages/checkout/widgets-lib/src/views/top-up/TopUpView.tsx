@@ -56,7 +56,14 @@ export function TopUpView({
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: SwapWidgetViews.SWAP },
+          view: {
+            type: SwapWidgetViews.SWAP,
+            data: {
+              toContractAddress: tokenAddress ?? '',
+              fromAmount: amount ?? '',
+              fromContractAddress: '',
+            },
+          },
         },
       });
       return;
