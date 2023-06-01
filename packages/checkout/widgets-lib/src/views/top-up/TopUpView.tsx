@@ -38,7 +38,7 @@ export function TopUpView({
   onBackButtonClick,
 }: TopUpViewProps) {
   const { header, topUpOptions } = text.views[SharedViews.TOP_UP_VIEW];
-  const { card, swap, bridge } = topUpOptions;
+  const { onramp, swap, bridge } = topUpOptions;
   const { viewDispatch } = useContext(ViewContext);
 
   const onClickOnramp = () => {
@@ -134,9 +134,9 @@ export function TopUpView({
           {showOnrampOption && renderMenuItem(
             'onramp',
             'Wallet',
-            card.heading,
-            card.caption,
-            card.subcaption,
+            onramp.heading,
+            onramp.caption,
+            onramp.subcaption,
             onClickOnramp,
           )}
           {showSwapOption && renderMenuItem(
