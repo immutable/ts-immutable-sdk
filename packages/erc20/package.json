@@ -4,18 +4,18 @@
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
-  "engines": {
-    "node": ">=16.11.0"
-  },
-  "files": [
-    "dist"
-  ],
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
     "@swc/jest": "^0.2.24",
     "@typechain/ethers-v5": "^10.2.0",
     "rollup": "^3.17.2"
   },
+  "engines": {
+    "node": ">=16.11.0"
+  },
+  "files": [
+    "dist"
+  ],
   "homepage": "https://github.com/immutable/ts-immutable-sdk#readme",
   "license": "Apache-2.0",
   "main": "dist/index.js",

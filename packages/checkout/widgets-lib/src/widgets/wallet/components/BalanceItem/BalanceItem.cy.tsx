@@ -34,7 +34,7 @@ describe('BalanceItem', () => {
   beforeEach(() => {
     cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('requestSwapEventStub');
     cy.stub(orchestrationEvents, 'sendRequestBridgeEvent').as('requestBridgeEventStub');
-    cy.stub(orchestrationEvents, 'sendRequestOnRampEvent').as('requestOnrampEventStub');
+    cy.stub(orchestrationEvents, 'sendRequestOnrampEvent').as('requestOnrampEventStub');
   });
 
   it('should show balance details', () => {

@@ -78,7 +78,7 @@ export function BalanceItem(props: BalanceItemProps) {
               testId="balance-item-add-option"
               sx={ShowMenuItem(isOnRampEnabled)}
               onClick={() => {
-                orchestrationEvents.sendRequestOnRampEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
+                orchestrationEvents.sendRequestOnrampEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
                   tokenAddress: balanceInfo.address ?? '',
                   amount: '',
                 });

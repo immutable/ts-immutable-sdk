@@ -7,7 +7,7 @@ import {
   WidgetEvent,
 } from '@imtbl/checkout-widgets';
 
-function sendRequestOnRampEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: RequestOnrampEvent) {
+function sendRequestOnrampEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: RequestOnrampEvent) {
   const requestOnrampEvent = new CustomEvent<WidgetEvent<RequestOnrampEvent>>(
     imtblWidgetEvent,
     {
@@ -55,5 +55,5 @@ function sendRequestBridgeEvent(imtblWidgetEvent: IMTBLWidgetEvents, eventData: 
 export const orchestrationEvents = {
   sendRequestBridgeEvent,
   sendRequestSwapEvent,
-  sendRequestOnRampEvent,
+  sendRequestOnrampEvent,
 };

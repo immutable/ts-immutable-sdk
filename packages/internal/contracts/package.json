@@ -4,6 +4,10 @@
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.0.0",
+    "rollup": "^3.17.2"
+  },
   "engines": {
     "node": ">=16.11.0"
   },
