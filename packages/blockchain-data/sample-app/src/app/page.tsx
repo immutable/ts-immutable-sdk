@@ -1,18 +1,19 @@
-import Image from "next/image";
+'use client';
 
-import { Environment, ImmutableConfiguration } from "@imtbl/config";
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
+
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   BlockchainData,
   BlockchainDataModuleConfiguration,
-} from "@imtbl/blockchain-data";
+} from '@imtbl/blockchain-data';
 
-import { useEffect, useMemo, useState } from "react";
-
-const chainName = "sepolia";
-const apiURL = "https://indexer-mr.dev.imtbl.com/v1";
+const chainName = 'sepolia';
+const apiURL = 'https://indexer-mr.dev.imtbl.com/v1';
 
 const separator = (url: string) => {
-  return url.includes("?") ? "&" : "?";
+  return url.includes('?') ? '&' : '?';
 };
 
 const capitalizeFirstLetter = (string: string) => {
@@ -22,47 +23,47 @@ const capitalizeFirstLetter = (string: string) => {
 const endpointDomains = {
   activities: [
     {
-      name: "ListActivities",
+      name: 'ListActivities',
       paginated: true,
       queryParams: [
         {
-          id: "activity_type",
-          label: "Activity type",
-          type: "select",
+          id: 'activity_type',
+          label: 'Activity type',
+          type: 'select',
           options: [
             {
-              name: "Mint",
-              value: "mint",
+              name: 'Mint',
+              value: 'mint',
             },
             {
-              name: "Transfer",
-              value: "transfer",
+              name: 'Transfer',
+              value: 'transfer',
             },
             {
-              name: "Burn",
-              value: "burn",
+              name: 'Burn',
+              value: 'burn',
             },
           ],
         },
         {
-          id: "contract_address",
-          label: "Contract address",
-          type: "text",
+          id: 'contract_address',
+          label: 'Contract address',
+          type: 'text',
         },
         {
-          id: "account_address",
-          label: "Account address",
-          type: "text",
+          id: 'account_address',
+          label: 'Account address',
+          type: 'text',
         },
         {
-          id: "token_id",
-          label: "Token ID",
-          type: "text",
+          id: 'token_id',
+          label: 'Token ID',
+          type: 'text',
         },
         {
-          id: "transaction_hash",
-          label: "Transaction hash",
-          type: "text",
+          id: 'transaction_hash',
+          label: 'Transaction hash',
+          type: 'text',
         },
       ],
       pathParams: [],
@@ -103,14 +104,14 @@ const endpointDomains = {
       // },
     },
     {
-      name: "GetActivityByID",
+      name: 'GetActivityByID',
       paginated: false,
       queryParams: [],
       pathParams: [
         {
-          id: "activity_id",
-          label: "Activity ID",
-          type: "text",
+          id: 'activity_id',
+          label: 'Activity ID',
+          type: 'text',
         },
       ],
       // buildURL: function (pathValues, queryValues) {
@@ -144,7 +145,7 @@ const endpointDomains = {
   ],
   chains: [
     {
-      name: "ListChains",
+      name: 'ListChains',
       paginated: true,
       queryParams: [],
       pathParams: [],
@@ -175,7 +176,7 @@ const endpointDomains = {
   ],
   collections: [
     {
-      name: "ListCollections",
+      name: 'ListCollections',
       paginated: true,
       queryParams: [],
       pathParams: [],
@@ -204,14 +205,14 @@ const endpointDomains = {
       // },
     },
     {
-      name: "GetCollectionByAddress",
+      name: 'GetCollectionByAddress',
       paginated: false,
       queryParams: [],
       pathParams: [
         {
-          id: "contract_address",
-          label: "Contract address",
-          type: "text",
+          id: 'contract_address',
+          label: 'Contract address',
+          type: 'text',
         },
       ],
       // buildURL: function (pathValues, queryValues) {
@@ -236,19 +237,19 @@ const endpointDomains = {
   ],
   nfts: [
     {
-      name: "GetNFTByTokenID",
+      name: 'GetNFTByTokenID',
       paginated: false,
       queryParams: [],
       pathParams: [
         {
-          id: "contract_address",
-          label: "Contract address",
-          type: "text",
+          id: 'contract_address',
+          label: 'Contract address',
+          type: 'text',
         },
         {
-          id: "token_id",
-          label: "Token ID",
-          type: "text",
+          id: 'token_id',
+          label: 'Token ID',
+          type: 'text',
         },
       ],
       // buildURL: function (pathValues, queryValues) {
@@ -274,14 +275,14 @@ const endpointDomains = {
       // },
     },
     {
-      name: "ListNFTsByContractAddress",
+      name: 'ListNFTsByContractAddress',
       paginated: true,
       queryParams: [],
       pathParams: [
         {
-          id: "contract_address",
-          label: "Contract address",
-          type: "text",
+          id: 'contract_address',
+          label: 'Contract address',
+          type: 'text',
         },
       ],
       // buildURL: function (pathValues, queryValues) {
@@ -313,20 +314,20 @@ const endpointDomains = {
       // },
     },
     {
-      name: "ListNFTsByAccountAddress",
+      name: 'ListNFTsByAccountAddress',
       paginated: true,
       queryParams: [
         {
-          id: "contract_address",
-          label: "Contract address",
-          type: "text",
+          id: 'contract_address',
+          label: 'Contract address',
+          type: 'text',
         },
       ],
       pathParams: [
         {
-          id: "account_address",
-          label: "Account address",
-          type: "text",
+          id: 'account_address',
+          label: 'Account address',
+          type: 'text',
         },
       ],
       // buildURL: function (pathValues, queryValues) {
@@ -362,21 +363,21 @@ const endpointDomains = {
       // },
     },
   ],
-  "nft Owners": [
+  'nft Owners': [
     {
-      name: "ListOwnersByTokenID",
+      name: 'ListOwnersByTokenID',
       paginated: true,
       queryParams: [],
       pathParams: [
         {
-          id: "contract_address",
-          label: "Contract address",
-          type: "text",
+          id: 'contract_address',
+          label: 'Contract address',
+          type: 'text',
         },
         {
-          id: "token_id",
-          label: "Token ID",
-          type: "text",
+          id: 'token_id',
+          label: 'Token ID',
+          type: 'text',
         },
       ],
       // buildURL: function (pathValues, queryValues) {
@@ -414,7 +415,7 @@ const endpointDomains = {
 };
 
 export default function Home() {
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState('');
 
   useEffect(() => {
     async function getData() {
@@ -429,7 +430,7 @@ export default function Home() {
       const client = new BlockchainData(config);
 
       const request = {
-        chainName: "imtbl-zkevm-testnet",
+        chainName: 'imtbl-zkevm-testnet',
       };
 
       const response = await client.listActivities(request);
