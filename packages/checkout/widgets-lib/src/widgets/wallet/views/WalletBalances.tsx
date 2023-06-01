@@ -85,6 +85,15 @@ export function WalletBalances() {
     })();
   }, [provider, checkout, network, cryptoFiatDispatch]);
 
+  const handleAddCoinsClick = () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: SharedViews.TOP_UP_VIEW },
+      },
+    });
+  };
+
   useEffect(() => {
     if (!checkout || !provider || !network) return;
     (async () => {
@@ -149,14 +158,7 @@ export function WalletBalances() {
           <MenuItem
             testId="add-coins"
             emphasized
-            onClick={() => {
-              viewDispatch({
-                payload: {
-                  type: ViewActions.UPDATE_VIEW,
-                  view: { type: SharedViews.TOP_UP_VIEW },
-                },
-              });
-            }}
+            onClick={handleAddCoinsClick}
           >
             <MenuItem.FramedIcon icon="Add" />
             <MenuItem.Label>Add coins</MenuItem.Label>
