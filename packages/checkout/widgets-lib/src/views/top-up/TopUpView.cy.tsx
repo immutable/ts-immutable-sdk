@@ -20,6 +20,7 @@ describe('Top Up View', () => {
           showOnrampOption
           showSwapOption
           showBridgeOption
+          widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
           onCloseButtonClick={() => {}}
         />
       </BiomeCombinedProviders>,
@@ -36,6 +37,7 @@ describe('Top Up View', () => {
           showOnrampOption={false}
           showSwapOption
           showBridgeOption
+          widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
           onCloseButtonClick={() => {}}
         />
       </BiomeCombinedProviders>,
@@ -52,6 +54,7 @@ describe('Top Up View', () => {
           showOnrampOption
           showSwapOption={false}
           showBridgeOption
+          widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
           onCloseButtonClick={() => {}}
         />
       </BiomeCombinedProviders>,
@@ -68,6 +71,7 @@ describe('Top Up View', () => {
           showOnrampOption
           showSwapOption
           showBridgeOption={false}
+          widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
           onCloseButtonClick={() => {}}
         />
       </BiomeCombinedProviders>,
