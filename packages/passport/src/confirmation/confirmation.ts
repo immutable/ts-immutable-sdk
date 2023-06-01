@@ -99,7 +99,7 @@ export default class ConfirmationScreen {
       const messageHandler = ({ data, origin }: MessageEvent) => {
         if (
           origin !== this.config.passportDomain
-          || data.eventType !== PassportEventType
+          || data.eventType !== PASSPORT_EVENT_TYPE
         ) {
           return;
         }
