@@ -19,6 +19,9 @@ export class ERC721PermissionedMintable {
     this.contract = factory.attach(contractAddress);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async DEFAULT_ADMIN_ROLE(
     overrides?: CallOverrides,
   ): Promise<PopulatedTransaction> {
@@ -27,12 +30,18 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async MINTER_ROLE(
     overrides?: CallOverrides,
   ): Promise<PopulatedTransaction> {
     return await this.contract.populateTransaction.MINTER_ROLE(overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async approve(
     to: PromiseOrValue<string>,
     tokenId: PromiseOrValue<BigNumberish>,
@@ -47,6 +56,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async balanceOf(
     owner: PromiseOrValue<string>,
     overrides?: CallOverrides,
@@ -54,12 +66,18 @@ export class ERC721PermissionedMintable {
     return await this.contract.populateTransaction.balanceOf(owner, overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async baseURI(
     overrides?: CallOverrides,
   ): Promise<PopulatedTransaction> {
     return await this.contract.populateTransaction.baseURI(overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async burn(
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & {
@@ -69,18 +87,27 @@ export class ERC721PermissionedMintable {
     return await this.contract.populateTransaction.burn(tokenId, overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async contractURI(
     overrides?: CallOverrides,
   ): Promise<PopulatedTransaction> {
     return await this.contract.populateTransaction.contractURI(overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async getAdmins(
     overrides?: CallOverrides,
   ): Promise<PopulatedTransaction> {
     return await this.contract.populateTransaction.getAdmins(overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async getApproved(
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides,
@@ -91,6 +118,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async getRoleAdmin(
     role: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides,
@@ -101,6 +131,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async getRoleMember(
     role: PromiseOrValue<BytesLike>,
     index: PromiseOrValue<BigNumberish>,
@@ -113,6 +146,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async getRoleMemberCount(
     role: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides,
@@ -123,6 +159,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async grantMinterRole(
     user: PromiseOrValue<string>,
     overrides?: Overrides & {
@@ -135,6 +174,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async grantRole(
     role: PromiseOrValue<BytesLike>,
     account: PromiseOrValue<string>,
@@ -149,6 +191,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async hasRole(
     role: PromiseOrValue<BytesLike>,
     account: PromiseOrValue<string>,
@@ -161,6 +206,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async isApprovedForAll(
     owner: PromiseOrValue<string>,
     operator: PromiseOrValue<string>,
@@ -173,6 +221,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async mint(
     to: PromiseOrValue<string>,
     amount: PromiseOrValue<BigNumberish>,
@@ -183,10 +234,16 @@ export class ERC721PermissionedMintable {
     return await this.contract.populateTransaction.mint(to, amount, overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async name(overrides?: CallOverrides): Promise<PopulatedTransaction> {
     return await this.contract.populateTransaction.name(overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async ownerOf(
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides,
@@ -194,6 +251,9 @@ export class ERC721PermissionedMintable {
     return await this.contract.populateTransaction.ownerOf(tokenId, overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async renounceRole(
     role: PromiseOrValue<BytesLike>,
     account: PromiseOrValue<string>,
@@ -208,6 +268,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async revokeMinterRole(
     user: PromiseOrValue<string>,
     overrides?: Overrides & {
@@ -220,6 +283,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async revokeRole(
     role: PromiseOrValue<BytesLike>,
     account: PromiseOrValue<string>,
@@ -234,12 +300,18 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async royaltyAllowlist(
     overrides?: CallOverrides,
   ): Promise<PopulatedTransaction> {
     return await this.contract.populateTransaction.royaltyAllowlist(overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async royaltyInfo(
     _tokenId: PromiseOrValue<BigNumberish>,
     _salePrice: PromiseOrValue<BigNumberish>,
@@ -252,6 +324,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async 'safeTransferFrom(address,address,uint256)'(
     from: PromiseOrValue<string>,
     to: PromiseOrValue<string>,
@@ -265,6 +340,9 @@ export class ERC721PermissionedMintable {
     ](from, to, tokenId, overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async 'safeTransferFrom(address,address,uint256,bytes)'(
     from: PromiseOrValue<string>,
     to: PromiseOrValue<string>,
@@ -279,6 +357,9 @@ export class ERC721PermissionedMintable {
     ](from, to, tokenId, data, overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async setApprovalForAll(
     operator: PromiseOrValue<string>,
     approved: PromiseOrValue<boolean>,
@@ -293,6 +374,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async setBaseURI(
     baseURI_: PromiseOrValue<string>,
     overrides?: Overrides & {
@@ -305,6 +389,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async setContractURI(
     _contractURI: PromiseOrValue<string>,
     overrides?: Overrides & {
@@ -317,6 +404,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async setRoyaltyAllowlistRegistry(
     _royaltyAllowlist: PromiseOrValue<string>,
     overrides?: Overrides & {
@@ -329,12 +419,18 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async symbol(
     overrides?: CallOverrides,
   ): Promise<PopulatedTransaction> {
     return await this.contract.populateTransaction.symbol(overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async tokenByIndex(
     index: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides,
@@ -345,6 +441,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async tokenOfOwnerByIndex(
     owner: PromiseOrValue<string>,
     index: PromiseOrValue<BigNumberish>,
@@ -357,6 +456,9 @@ export class ERC721PermissionedMintable {
     );
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async tokenURI(
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides,
@@ -364,6 +466,9 @@ export class ERC721PermissionedMintable {
     return await this.contract.populateTransaction.tokenURI(tokenId, overrides);
   }
 
+  /**
+   * @returns a promise that resolves with a populated transaction
+   */
   public async totalSupply(
     overrides?: CallOverrides,
   ): Promise<PopulatedTransaction> {
