@@ -86,6 +86,7 @@ export class Checkout {
     this.currentProviderInfo.name = params.name;
     this.currentProviderInfo.network = networkInfo;
     this.allProviders = providers;
+
     return {
       providers: this.allProviders,
       currentProviderInfo: this.currentProviderInfo,

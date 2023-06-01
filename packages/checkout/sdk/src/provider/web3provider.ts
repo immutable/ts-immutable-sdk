@@ -43,6 +43,7 @@ export async function getWeb3Provider(
 
   // if they've supplied a web3provider, use it
   if (isWeb3Provider(provider)) {
+    // TODO: is the provider on a supported network
     if (allowUnsupportedNetworks === false && currentProviderInfo.network && !currentProviderInfo.network.isSupported) {
       throw new CheckoutError(
         'Your current network is not supported, please switch network',
@@ -67,6 +68,7 @@ export async function getWeb3Provider(
     }
   }
 
+  // TODO: is the provider on a supported network
   if (allowUnsupportedNetworks === false && currentProviderInfo.network && !currentProviderInfo.network.isSupported) {
     throw new CheckoutError(
       'Your current network is not supported, please switch network',
