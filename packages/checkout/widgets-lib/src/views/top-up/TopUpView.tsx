@@ -17,10 +17,10 @@ import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 
 interface TopUpViewProps {
+  widgetEvent: IMTBLWidgetEvents,
   showOnrampOption: boolean,
   showSwapOption: boolean,
   showBridgeOption: boolean,
-  widgetEvent: IMTBLWidgetEvents,
   tokenAddress?: string,
   amount?: string,
   onCloseButtonClick: () => void,
