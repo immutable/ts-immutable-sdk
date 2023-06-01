@@ -2344,7 +2344,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/contracts@npm:5.7.0, @ethersproject/contracts@npm:^5.7.0":
+"@ethersproject/contracts@npm:5.7.0":
   version: 5.7.0
   resolution: "@ethersproject/contracts@npm:5.7.0"
   dependencies:
@@ -3086,13 +3086,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/erc721-permissioned-mintable@workspace:packages/erc721-permissioned-mintable"
   dependencies:
-    "@ethersproject/bignumber": ^5.7.0
-    "@ethersproject/contracts": ^5.7.0
     "@imtbl/config": 0.0.0
     "@imtbl/contracts": 0.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
+    ethers: ^5.7.2
     rollup: ^3.17.2
   languageName: unknown
   linkType: soft

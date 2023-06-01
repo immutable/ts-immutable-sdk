@@ -5,10 +5,9 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@ethersproject/bignumber": "^5.7.0",
-    "@ethersproject/contracts": "^5.7.0",
     "@imtbl/config": "0.0.0",
-    "@imtbl/contracts": "0.0.0"
+    "@imtbl/contracts": "0.0.0",
+    "ethers": "^5.7.2"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
