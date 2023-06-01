@@ -7,7 +7,7 @@ import type { CancelablePromise } from './CancelablePromise';
 import type { OpenAPIConfig } from './OpenAPI';
 import { request as __request } from './request';
 
-export class NodeHttpRequest extends BaseHttpRequest {
+export class AxiosHttpRequest extends BaseHttpRequest {
 
   constructor(config: OpenAPIConfig) {
     super(config);
