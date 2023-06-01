@@ -234,14 +234,15 @@ export function BridgeForm(props: BridgeFormProps) {
             disabled={false}
           />
         </Box>
+        {/** TODO: update here when we have the correct gas values from the estimator */}
         <Fees
           title={fees.title}
           fiatPricePrefix={content.fiatPricePrefix}
-          gasFeeValue="10"
+          gasFeeValue="1"
           gasFeeToken={{
-            name: '', symbol: '', decimals: 18, address: '',
+            name: '', symbol: 'IMX', decimals: 18, address: '',
           }}
-          gasFeeFiatValue="0.1"
+          gasFeeFiatValue="0.7"
         />
       </Box>
       <Box sx={bridgeFormButtonContainerStyles}>
