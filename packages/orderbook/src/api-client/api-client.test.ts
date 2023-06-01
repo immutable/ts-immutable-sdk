@@ -3,7 +3,7 @@ import {
 } from 'ts-mockito';
 import { OrderResult, OrdersService } from 'openapi/sdk';
 import { OrderComponents } from '@opensea/seaport-js/lib/types';
-import { ItemType } from '@opensea/seaport-js/lib/constants';
+import { ItemType } from '../seaport';
 import { ImmutableApiClient } from './api-client';
 
 describe('ImmutableApiClient', () => {
