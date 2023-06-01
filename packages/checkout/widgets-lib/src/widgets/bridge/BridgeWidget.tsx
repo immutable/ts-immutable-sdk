@@ -104,8 +104,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         type: NetworkFilterTypes.ALL,
       });
 
-      console.log(allowedBridgingNetworks);
-
       const toNetwork = allowedBridgingNetworks.networks.find((network) => network.chainId === toChainId);
 
       if (toNetwork) {

@@ -138,12 +138,12 @@ export const text = {
       bridgeForm: {
         from: {
           inputPlaceholder: '0',
-          selectorTitle: 'What would you like to bridge?',
+          selectorTitle: 'What would you like to move?',
         },
         buttonText: 'Move',
       },
       fees: {
-        title: 'Fees total',
+        title: 'Fees subtotal',
       },
       validation: {
         noAmountInputted: 'Please input amount',

@@ -1,8 +1,5 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
 import {
-  EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME, SEAPORT_CONTRACT_VERSION_V1_4,
-} from '@opensea/seaport-js/lib/constants';
-import {
   ApprovalAction, CreateOrderAction, ExchangeAction, OrderComponents, OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
 import {
@@ -12,6 +9,9 @@ import {
   ERC20Item, ERC721Item, FulfilOrderResponse, NativeItem, PrepareListingResponse, RoyaltyInfo,
 } from 'types';
 import { Order } from 'openapi/sdk';
+import {
+  EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME, SEAPORT_CONTRACT_VERSION_V1_4,
+} from './constants';
 import { getOrderComponentsFromMessage } from './components';
 import { prepareTransaction } from './transaction';
 import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';

@@ -1,19 +1,19 @@
 import { Body, Box, ButtCon } from '@biom3/react';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { feeBoxStyles, feeContainerStyles } from './FeeStyles';
-import { text } from '../../../resources/text/textConfig';
-import { formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
-import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
+import { formatZeroAmount, tokenValueFormat } from '../../lib/utils';
 
 interface FeesProps {
+  title: string;
+  fiatPricePrefix: string;
   gasFeeValue: string;
   gasFeeToken: TokenInfo | null;
   gasFeeFiatValue: string;
 }
 
-export function Fees({ gasFeeValue, gasFeeToken, gasFeeFiatValue }: FeesProps) {
-  const staticText = text.views[BridgeWidgetViews.BRIDGE];
-
+export function Fees({
+  title, fiatPricePrefix, gasFeeValue, gasFeeToken, gasFeeFiatValue,
+}: FeesProps) {
   if (!gasFeeValue) return <Box />;
   return (
     <Box sx={feeContainerStyles}>
@@ -32,16 +32,12 @@ export function Fees({ gasFeeValue, gasFeeToken, gasFeeFiatValue }: FeesProps) {
           iconVariant="bold"
         />
         <Body size="medium" weight="regular">
-          {staticText.fees.title}
+          {title}
         </Body>
       </Box>
       <Box sx={feeBoxStyles}>
         <Body testId="fee_description_gas" size="medium" weight="regular" sx={{ textAlign: 'right' }}>
-          ≈
-          {' '}
-          {gasFeeToken?.symbol}
-          {' '}
-          {formatZeroAmount(tokenValueFormat(gasFeeValue))}
+          {`≈ ${gasFeeToken?.symbol} ${formatZeroAmount(tokenValueFormat(gasFeeValue))}`}
         </Body>
         <Body
           testId="fee_description_gas_fiat"
@@ -49,10 +45,7 @@ export function Fees({ gasFeeValue, gasFeeToken, gasFeeFiatValue }: FeesProps) {
           weight="regular"
           sx={{ color: 'base.color.text.secondary', textAlign: 'right' }}
         >
-          {staticText.content.fiatPricePrefix}
-          {' '}
-          $
-          {formatZeroAmount(gasFeeFiatValue, true)}
+          {`${fiatPricePrefix} $${formatZeroAmount(gasFeeFiatValue, true)}`}
         </Body>
       </Box>
     </Box>
