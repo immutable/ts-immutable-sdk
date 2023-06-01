@@ -60,7 +60,7 @@ export function TopUpView({
             type: SwapWidgetViews.SWAP,
             data: {
               toContractAddress: tokenAddress ?? '',
-              fromAmount: amount ?? '',
+              fromAmount: '',
               fromContractAddress: '',
             },
           },
