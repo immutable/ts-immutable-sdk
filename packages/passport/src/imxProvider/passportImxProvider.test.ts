@@ -46,12 +46,15 @@ describe('PassportImxProvider', () => {
     getAddress: jest.fn(),
   };
 
+  const imxPublicApiDomain = 'http://imxPublicApiDomain';
+
   beforeEach(() => {
     passportImxProvider = new PassportImxProvider({
       user: mockUser,
       starkSigner: mockStarkSigner,
       confirmationScreen,
       immutableXClient,
+      imxPublicApiDomain,
     });
   });
 
@@ -81,6 +84,7 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         transfersApi: immutableXClient.transfersApi,
+        imxPublicApiDomain,
         confirmationScreen,
       });
       expect(result).toEqual(returnValue);

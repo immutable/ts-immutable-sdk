@@ -1,13 +1,17 @@
 import { TransfersApi, UnsignedTransferRequest } from '@imtbl/core-sdk';
+import * as guardian from '@imtbl/guardian';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
 import { ConfirmationScreen, TransactionTypes } from '../confirmation';
 
 jest.mock('../confirmation/confirmation');
+jest.mock('@imtbl/guardian');
 
 describe('transfer', () => {
   afterEach(jest.resetAllMocks);
+  let mockGetTransactionByID: jest.Mock;
+  let mockEvaluateStarkexTransaction: jest.Mock;
 
   const mockConfirmationScreen = new ConfirmationScreen({} as any);
 
@@ -15,6 +19,17 @@ describe('transfer', () => {
     signMessage: jest.fn(),
     getAddress: jest.fn(),
   };
+
+  beforeEach(() => {
+    mockGetTransactionByID = jest.fn();
+    mockEvaluateStarkexTransaction = jest.fn();
+    (guardian.TransactionsApi as jest.Mock).mockImplementation(() => ({
+      getTransactionByID: mockGetTransactionByID,
+    }));
+    (guardian.StarkexTransactionsApi as jest.Mock).mockImplementation(() => ({
+      evaluateStarkexTransaction: mockEvaluateStarkexTransaction,
+    }));
+  });
 
   describe('single transfer', () => {
     let getSignableTransferV1Mock: jest.Mock;
@@ -31,6 +46,7 @@ describe('transfer', () => {
       tokenAddress,
       receiver: mockReceiver,
     };
+    const mockGuardianDomain = 'http://mockGuardianDomain.com';
 
     beforeEach(() => {
       getSignableTransferV1Mock = jest.fn();
@@ -89,7 +105,19 @@ describe('transfer', () => {
         transfer_id: 123,
       };
 
-      (mockConfirmationScreen.startTransaction as jest.Mock).mockResolvedValue({
+      mockGetTransactionByID.mockResolvedValue({
+        data: {
+          id: mockPayloadHash,
+        },
+      });
+      mockEvaluateStarkexTransaction.mockResolvedValue({
+        data: {
+          confirmationRequired: true,
+        },
+      });
+
+      (mockConfirmationScreen.startGuardianTransaction as jest.Mock).mockResolvedValue({
+
         confirmed: true,
       });
       getSignableTransferV1Mock.mockResolvedValue(
@@ -105,20 +133,105 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       });
 
-      expect(getSignableTransferV1Mock).toBeCalledWith(
-        mockSignableTransferRequest,
-      );
+      expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUser.accessToken,
-        {
-          transactionType: TransactionTypes.createTransfer,
-          transactionData: expect.any(Object),
-        },
+      expect(mockConfirmationScreen.startGuardianTransaction).toHaveBeenCalledWith(
+        mockSignableTransferV1Response.data.payload_hash,
       );
+      expect(createTransferV1Mock).toBeCalledWith(
+        mockCreateTransferRequest,
+        mockHeader,
+      );
+      expect(result).toEqual(mockReturnValue);
+    });
+
+    it('should avoid confirmation popup if evaluateStarkexTransaction returns false', async () => {
+      const mockSignableTransferRequest = {
+        getSignableTransferRequest: {
+          amount: '1',
+          receiver: mockReceiver,
+          sender: mockUser.etherKey,
+          token: {
+            data: { token_address: tokenAddress, token_id: tokenId },
+            type,
+          },
+        },
+      };
+      const mockSignableTransferV1Response = {
+        data: {
+          payload_hash: '123123',
+          sender_stark_key: 'starkKey',
+          sender_vault_id: '111',
+          receiver_stark_key: 'starkKey2',
+          receiver_vault_id: '222',
+          asset_id: tokenId,
+          amount: '1',
+          nonce: '5321',
+          expiration_timestamp: '1234',
+        },
+      };
+      const {
+        payload_hash: mockPayloadHash,
+        ...restSignableTransferV1Response
+      } = mockSignableTransferV1Response.data;
+      const mockCreateTransferRequest = {
+        createTransferRequest: {
+          ...restSignableTransferV1Response,
+          stark_signature: mockStarkSignature,
+        },
+      };
+      const mockHeader = {
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          Authorization: `Bearer ${mockUser.accessToken}`,
+        },
+      };
+      const mockReturnValue = {
+        sent_signature: '0x1c8aff950685c2ed4bc3174f3472287b56d95',
+        status: 'success',
+        time: 111,
+        transfer_id: 123,
+      };
+
+      mockGetTransactionByID.mockResolvedValue({
+        data: {
+          id: mockPayloadHash,
+        },
+      });
+      mockEvaluateStarkexTransaction.mockResolvedValue({
+        data: {
+          confirmationRequired: false,
+        },
+      });
+
+      (mockConfirmationScreen.startGuardianTransaction as jest.Mock).mockResolvedValue({
+
+        confirmed: true,
+      });
+      getSignableTransferV1Mock.mockResolvedValue(
+        mockSignableTransferV1Response,
+      );
+      mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
+      createTransferV1Mock.mockResolvedValue({
+        data: mockReturnValue,
+      });
+
+      const result = await transfer({
+        transfersApi: transferApiMock,
+        starkSigner: mockStarkSigner,
+        user: mockUser,
+        request: mockTransferRequest as UnsignedTransferRequest,
+        imxPublicApiDomain: mockGuardianDomain,
+        confirmationScreen: mockConfirmationScreen,
+      });
+
+      expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
+      expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
+      expect(mockConfirmationScreen.startGuardianTransaction).not.toBeCalled();
       expect(createTransferV1Mock).toBeCalledWith(
         mockCreateTransferRequest,
         mockHeader,
@@ -134,6 +247,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
         new PassportError(
@@ -161,7 +275,17 @@ describe('transfer', () => {
       getSignableTransferV1Mock.mockResolvedValue(
         mockSignableTransferV1Response,
       );
-      (mockConfirmationScreen.startTransaction as jest.Mock).mockRejectedValue({
+      mockGetTransactionByID.mockResolvedValue({
+        data: {
+          id: mockSignableTransferV1Response.data.payload_hash,
+        },
+      });
+      mockEvaluateStarkexTransaction.mockResolvedValue({
+        data: {
+          confirmationRequired: true,
+        },
+      });
+      (mockConfirmationScreen.startGuardianTransaction as jest.Mock).mockRejectedValue({
         confirmed: false,
       });
 
@@ -170,15 +294,12 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('TRANSFER_ERROR');
 
-      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUser.accessToken,
-        {
-          transactionType: TransactionTypes.createTransfer,
-          transactionData: expect.any(Object),
-        },
+      expect(mockConfirmationScreen.startGuardianTransaction).toHaveBeenCalledWith(
+        mockSignableTransferV1Response.data.payload_hash,
       );
     });
   });

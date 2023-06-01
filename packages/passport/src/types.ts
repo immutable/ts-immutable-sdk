@@ -41,6 +41,7 @@ export interface PassportOverrides {
   magicPublishableApiKey: string;
   magicProviderId: string;
   passportDomain: string;
+  imxPublicApiDomain: string;
   immutableXClient: ImmutableXClient;
 }
 
