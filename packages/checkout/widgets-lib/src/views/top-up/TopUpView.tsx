@@ -47,6 +47,33 @@ export function TopUpView({
   const { card, swap, bridge } = topUpOptions;
   const { viewDispatch } = useContext(ViewContext);
 
+  const onClickOnramp = () => {
+    if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
+      // dispatch onramp view
+    }
+    orchestrationEvents.sendRequestOnrampEvent(widgetEvent, {
+      tokenAddress: tokenAddress ?? '',
+      amount: amount ?? '',
+    });
+  };
+
+  const onClickSwap = () => {
+    if (widgetEvent === IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: SwapWidgetViews.SWAP },
+        },
+      });
+      return;
+    }
+    orchestrationEvents.sendRequestSwapEvent(widgetEvent, {
+      fromTokenAddress: '',
+      toTokenAddress: tokenAddress ?? '',
+      amount: '',
+    });
+  };
+
   const renderMenuItem = (
     testId: string,
     icon: 'Wallet' | 'Coins' | 'Minting',
@@ -78,6 +105,22 @@ export function TopUpView({
     </Box>
   );
 
+  const onClickBridge = () => {
+    if (widgetEvent === IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: BridgeWidgetViews.BRIDGE },
+        },
+      });
+      return;
+    }
+    orchestrationEvents.sendRequestBridgeEvent(widgetEvent, {
+      tokenAddress: '',
+      amount: '',
+    });
+  };
+
   return (
     <SimpleLayout
       header={(
@@ -100,15 +143,7 @@ export function TopUpView({
             card.heading,
             card.caption,
             card.subcaption,
-            () => {
-              if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
-                // dispatch onramp view
-              }
-              orchestrationEvents.sendRequestOnrampEvent(widgetEvent, {
-                tokenAddress: tokenAddress ?? '',
-                amount: amount ?? '',
-              });
-            },
+            onClickOnramp,
           )}
           {showSwapOption && renderMenuItem(
             'swap',
@@ -116,22 +151,7 @@ export function TopUpView({
             swap.heading,
             swap.caption,
             swap.subcaption,
-            () => {
-              if (widgetEvent === IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT) {
-                viewDispatch({
-                  payload: {
-                    type: ViewActions.UPDATE_VIEW,
-                    view: { type: SwapWidgetViews.SWAP },
-                  },
-                });
-                return;
-              }
-              orchestrationEvents.sendRequestSwapEvent(widgetEvent, {
-                fromTokenAddress: '',
-                toTokenAddress: tokenAddress ?? '',
-                amount: '',
-              });
-            },
+            onClickSwap,
           )}
           {showBridgeOption && renderMenuItem(
             'bridge',
@@ -139,21 +159,7 @@ export function TopUpView({
             bridge.heading,
             bridge.caption,
             bridge.subcaption,
-            () => {
-              if (widgetEvent === IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT) {
-                viewDispatch({
-                  payload: {
-                    type: ViewActions.UPDATE_VIEW,
-                    view: { type: BridgeWidgetViews.BRIDGE },
-                  },
-                });
-                return;
-              }
-              orchestrationEvents.sendRequestBridgeEvent(widgetEvent, {
-                tokenAddress: '',
-                amount: '',
-              });
-            },
+            onClickBridge,
           )}
         </Box>
       </Box>
