@@ -15,7 +15,7 @@ import { TextInputForm } from '../../../components/FormComponents/TextInputForm/
 import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
 import { SelectForm } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
-import { Fees } from './Fees';
+import { Fees } from '../../../components/Fees/Fees';
 import {
   bridgeFormButtonContainerStyles,
   bridgeFormWrapperStyles,
@@ -38,7 +38,7 @@ export function BridgeForm(props: BridgeFormProps) {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
   const { testId, defaultAmount, defaultTokenAddress } = props;
-  const { content, bridgeForm } = text.views[BridgeWidgetViews.BRIDGE];
+  const { content, bridgeForm, fees } = text.views[BridgeWidgetViews.BRIDGE];
 
   // Form state
   const [amount, setAmount] = useState<string>(defaultAmount || '');
@@ -56,6 +56,14 @@ export function BridgeForm(props: BridgeFormProps) {
           name: t.token.name,
           symbol: t.token.symbol,
           icon: t.token.icon,
+          balance: {
+            formattedFiatAmount: calculateCryptoToFiat(
+              t.formattedBalance,
+              t.token.symbol,
+              cryptoFiatState.conversions,
+            ),
+            formattedAmount: tokenValueFormat(t.formattedBalance),
+          },
         } as CoinSelectorOptionProps),
       ),
     [tokenBalances],
@@ -226,7 +234,16 @@ export function BridgeForm(props: BridgeFormProps) {
             disabled={false}
           />
         </Box>
-        <Fees gasFeeValue="" gasFeeToken={null} gasFeeFiatValue="" />
+        {/** TODO: update here when we have the correct gas values from the estimator */}
+        <Fees
+          title={fees.title}
+          fiatPricePrefix={content.fiatPricePrefix}
+          gasFeeValue="1"
+          gasFeeToken={{
+            name: '', symbol: 'IMX', decimals: 18, address: '',
+          }}
+          gasFeeFiatValue="0.7"
+        />
       </Box>
       <Box sx={bridgeFormButtonContainerStyles}>
         <Button

@@ -85,7 +85,10 @@ export function SelectForm({
                 <Option.Icon icon="Coins" variant="bold" />
               )}
               {option.icon && (
-                <Option.FramedImage imageUrl={option.icon} circularFrame />
+                <Option.FramedImage
+                  imageUrl={option.icon}
+                  circularFrame
+                />
               )}
               <Option.Label>{option.symbol}</Option.Label>
             </Option>
