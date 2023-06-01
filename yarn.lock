@@ -2904,8 +2904,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/contracts@workspace:packages/internal/contracts"
   dependencies:
-    "@rollup/plugin-typescript": ^11.1.1
-    rollup: ^3.23.0
+    "@rollup/plugin-typescript": ^11.0.0
+    rollup: ^3.17.2
   languageName: unknown
   linkType: soft
 
@@ -5511,7 +5511,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-typescript@npm:^11.0.0, @rollup/plugin-typescript@npm:^11.1.1":
+"@rollup/plugin-typescript@npm:^11.0.0":
   version: 11.1.1
   resolution: "@rollup/plugin-typescript@npm:11.1.1"
   dependencies:
@@ -23261,20 +23261,6 @@ __metadata:
   bin:
     rollup: dist/bin/rollup
   checksum: 6a2bf167b3587d4df709b37d149ad0300692cc5deb510f89ac7bdc77c8738c9546ae3de9322b0968e1ed2b0e984571f5f55aae28fa7de4cfcb1bc5402a4e2be6
-  languageName: node
-  linkType: hard
-
-"rollup@npm:^3.23.0":
-  version: 3.23.0
-  resolution: "rollup@npm:3.23.0"
-  dependencies:
-    fsevents: ~2.3.2
-  dependenciesMeta:
-    fsevents:
-      optional: true
-  bin:
-    rollup: dist/bin/rollup
-  checksum: 0721065cf725c5611815be61d2b01f20b4d0027e17035f6e76384d38396b56cf6ed21a3db78eb004d9db4d24c8a6a19da4563b4ff96b5dd36f0a0f7a3baf85e8
   languageName: node
   linkType: hard
 
