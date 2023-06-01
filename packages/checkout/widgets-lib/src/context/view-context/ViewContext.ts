@@ -7,20 +7,21 @@ import { WalletWidgetView } from './WalletViewContextTypes';
 import { SwapWidgetView } from './SwapViewContextTypes';
 import { BridgeWidgetView } from './BridgeViewContextTypes';
 
-export enum BaseViews {
+export enum SharedViews {
   LOADING_VIEW = 'LOADING_VIEW',
-  ERROR = 'ERROR',
+  ERROR_VIEW = 'ERROR_VIEW',
+  TOP_UP_VIEW = 'TOP_UP_VIEW',
 }
 
-export type BaseView = { type: BaseViews.LOADING_VIEW } | ErrorView;
+export type SharedView = { type: SharedViews.LOADING_VIEW } | ErrorView | { type: SharedViews.TOP_UP_VIEW };
 
 interface ErrorView {
-  type: BaseViews.ERROR;
+  type: SharedViews.ERROR_VIEW;
   error: Error;
 }
 
 export type View =
-  | BaseView
+  | SharedView
   | ConnectWidgetView
   | WalletWidgetView
   | SwapWidgetView
@@ -36,7 +37,7 @@ export interface ViewState {
 
 export const initialViewState: ViewState = {
   view: {
-    type: BaseViews.LOADING_VIEW,
+    type: SharedViews.LOADING_VIEW,
   },
   history: [],
 };

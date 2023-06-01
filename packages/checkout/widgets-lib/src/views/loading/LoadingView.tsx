@@ -1,6 +1,6 @@
-import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
+import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
 import { LoadingBox } from './LoadingBox';
-import { CenteredBoxContent } from '../CenteredBoxContent/CenteredBoxContent';
+import { CenteredBoxContent } from '../../components/CenteredBoxContent/CenteredBoxContent';
 
 export interface LoadingViewProps {
   loadingText: string;

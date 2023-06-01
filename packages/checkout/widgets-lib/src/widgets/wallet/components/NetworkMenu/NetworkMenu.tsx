@@ -24,7 +24,7 @@ import { sortNetworksCompareFn } from '../../../../lib/utils';
 import {
   ViewContext,
   ViewActions,
-  BaseViews,
+  SharedViews,
 } from '../../../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 
@@ -84,7 +84,7 @@ export function NetworkMenu() {
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
-              view: { type: BaseViews.ERROR, error: err },
+              view: { type: SharedViews.ERROR_VIEW, error: err },
             },
           });
         }

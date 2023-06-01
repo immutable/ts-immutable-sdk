@@ -17,13 +17,13 @@ import { l1Network, zkEVMNetwork } from '../../lib/networkUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { Network, WidgetTheme } from '../../lib';
 import {
-  BaseViews,
+  SharedViews,
   ViewActions, ViewContext, initialViewState, viewReducer,
 } from '../../context/view-context/ViewContext';
 import {
   BridgeActions, BridgeContext, bridgeReducer, initialBridgeState,
 } from './context/BridgeContext';
-import { LoadingView } from '../../components/Loading/LoadingView';
+import { LoadingView } from '../../views/loading/LoadingView';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { Bridge } from './views/Bridge';
@@ -166,7 +166,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       <ViewContext.Provider value={viewReducerValues}>
         <BridgeContext.Provider value={bridgeReducerValues}>
           <CryptoFiatProvider>
-            {viewReducerValues.viewState.view.type === BaseViews.LOADING_VIEW && (
+            {viewReducerValues.viewState.view.type === SharedViews.LOADING_VIEW && (
             <LoadingView loadingText="Loading" />
             )}
             {viewReducerValues.viewState.view.type === BridgeWidgetViews.BRIDGE && (
