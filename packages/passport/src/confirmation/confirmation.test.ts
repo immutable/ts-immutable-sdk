@@ -33,7 +33,7 @@ describe('confirmation', () => {
   describe('startTransaction', () => {
     it('should handle popup window closed', async () => {
       const transaction: Transaction = {
-        transactionType: TransactionTypes.CreateTransfer,
+        transactionType: TransactionTypes.createTransfer,
         transactionData: {
           amount: '1',
           token: {

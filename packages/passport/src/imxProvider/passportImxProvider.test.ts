@@ -1,6 +1,4 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-// TODO: Remove once the dependency has been added
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import {
   CancelOrderResponse,
@@ -18,11 +16,12 @@ import {
 import { mockUser } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import PassportImxProvider from './passportImxProvider';
-import { PassportConfiguration } from '../config';
 import { batchNftTransfer, transfer } from '../workflows/transfer';
 import { cancelOrder, createOrder } from '../workflows/order';
 import { exchangeTransfer } from '../workflows/exchange';
 import { createTrade } from '../workflows/trades';
+import { ConfirmationScreen } from '../confirmation';
+import { PassportConfiguration } from '../config';
 
 jest.mock('../workflows/transfer');
 jest.mock('../workflows/order');
@@ -40,7 +39,7 @@ describe('PassportImxProvider', () => {
     }),
   });
 
-  const passportConfig = {} as PassportConfiguration;
+  const confirmationScreen = new ConfirmationScreen({} as PassportConfiguration);
 
   const mockStarkSigner = {
     signMessage: jest.fn(),
@@ -51,20 +50,19 @@ describe('PassportImxProvider', () => {
     passportImxProvider = new PassportImxProvider({
       user: mockUser,
       starkSigner: mockStarkSigner,
-      passportConfig,
+      confirmationScreen,
       immutableXClient,
     });
   });
 
   describe('constructor', () => {
     it('sets the private properties', () => {
-      // TODO: Remove once fixed
       // @ts-ignore
       expect(passportImxProvider.user).toEqual(mockUser);
       // @ts-ignore
       expect(passportImxProvider.starkSigner).toEqual(mockStarkSigner);
       // @ts-ignore
-      expect(passportImxProvider.passportConfig).toEqual(passportConfig);
+      expect(passportImxProvider.confirmationScreen).toEqual(confirmationScreen);
       // @ts-ignore
       expect(passportImxProvider.immutableXClient).toEqual(immutableXClient);
     });
@@ -83,7 +81,7 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         transfersApi: immutableXClient.transfersApi,
-        passportConfig,
+        confirmationScreen,
       });
       expect(result).toEqual(returnValue);
     });
@@ -124,7 +122,7 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         ordersApi: immutableXClient.ordersApi,
-        passportConfig,
+        confirmationScreen,
       });
       expect(result).toEqual(returnValue);
     });
@@ -143,7 +141,7 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         ordersApi: immutableXClient.ordersApi,
-        passportConfig,
+        confirmationScreen,
       });
       expect(result).toEqual(returnValue);
     });
@@ -162,7 +160,7 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         tradesApi: immutableXClient.tradesApi,
-        passportConfig,
+        confirmationScreen,
       });
       expect(result).toEqual(returnValue);
     });
@@ -181,7 +179,7 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         transfersApi: immutableXClient.transfersApi,
-        passportConfig,
+        confirmationScreen,
       });
       expect(result).toEqual(returnValue);
     });
