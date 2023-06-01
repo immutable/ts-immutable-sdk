@@ -135,8 +135,8 @@ describe('Bridge Form', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-ETH-Ethereum').should('exist');
-      cySmartGet('bridge-token-IMX-IMX').should('exist');
+      cySmartGet('bridge-token-coin-selector__option-ETH-Ethereum').should('exist');
+      cySmartGet('bridge-token-coin-selector__option-IMX-IMX').should('exist');
       cySmartGet('bridge-token-RANDA-RandomAllowedToken').should('not.exist');
     });
 
@@ -151,9 +151,9 @@ describe('Bridge Form', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-ETH-Ethereum').should('exist');
-      cySmartGet('bridge-token-IMX-IMX').should('exist');
-      cySmartGet('bridge-token-SEC-SecondAllowedToken').should('not.exist');
+      cySmartGet('bridge-token-coin-selector__option-ETH-Ethereum').should('exist');
+      cySmartGet('bridge-token-coin-selector__option-IMX-IMX').should('exist');
+      cySmartGet('bridge-token-coin-selector__option-SEC-SecondAllowedToken').should('not.exist');
     });
 
     it('should update the token when changed', () => {
@@ -167,7 +167,7 @@ describe('Bridge Form', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-ETH-Ethereum').click();
+      cySmartGet('bridge-token-coin-selector__option-ETH-Ethereum').click();
       cySmartGet('bridge-token-select__target').should('have.text', 'ETH');
     });
 
@@ -182,7 +182,7 @@ describe('Bridge Form', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-ETH-Ethereum').click();
+      cySmartGet('bridge-token-coin-selector__option-ETH-Ethereum').click();
       cySmartGet('bridge-token-select__target').should('have.text', 'ETH');
       cySmartGet('bridge-token-select-control-subtext')
         .should('have.text', 'Available 0.1');
@@ -199,7 +199,7 @@ describe('Bridge Form', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-ETH-Ethereum').click();
+      cySmartGet('bridge-token-coin-selector__option-ETH-Ethereum').click();
       cySmartGet('bridge-amount-text-control-subtext')
         .should('have.text', 'Approx USD $-.--');
       cySmartGet('bridge-amount-text__input').type('0.1');
@@ -247,7 +247,7 @@ describe('Bridge Form', () => {
         .should('have.text', validation.noAmountInputted);
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-ETH-Ethereum').click();
+      cySmartGet('bridge-token-coin-selector__option-ETH-Ethereum').click();
       cySmartGet('bridge-token-select-control-error').should('not.exist');
 
       cySmartGet('bridge-amount-text__input').type('0.1');
@@ -265,7 +265,7 @@ describe('Bridge Form', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-ETH-Ethereum').click();
+      cySmartGet('bridge-token-coin-selector__option-ETH-Ethereum').click();
 
       cySmartGet('bridge-amount-text__input').type('2');
       cySmartGet('bridge-form-button').click();
