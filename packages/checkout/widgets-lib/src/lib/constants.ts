@@ -34,3 +34,8 @@ export const DEFAULT_SWAP_ENABLED = true;
  * Checkout Widget default bridge enabled flag
  */
 export const DEFAULT_BRIDGE_ENABLED = true;
+
+/**
+ * Checkout Widget default refresh quote interval
+ */
+export const DEFAULT_QUOTE_REFRESH_INTERVAL = 30000;
