@@ -1609,12 +1609,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/design-tokens@npm:0.1.5-beta":
-  version: 0.1.5-beta
-  resolution: "@biom3/design-tokens@npm:0.1.5-beta"
+"@biom3/design-tokens@npm:0.2.0-beta":
+  version: 0.2.0-beta
+  resolution: "@biom3/design-tokens@npm:0.2.0-beta"
   dependencies:
     lodash.get: ^4.4.2
-  checksum: 413df7dcde13f60fcbc0961bbbec6a8aceaba88cc669a35bae8118501bc35dc6c9ee471dfb23e089d121ca22392e5e2a81badcef0d0a01fa256f1dc7c9b5d5d4
+  checksum: 9c2f415f9c4ccd773810c3cea1fc843f1f673734c239466b7746864f5a45d2ba9681d22c9446259786bdff7befc93a2c261a08ab6138d48a35f4944f09792267
   languageName: node
   linkType: hard
 
