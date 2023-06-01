@@ -23,5 +23,9 @@
     "generate-types": "typechain --target=ethers-v5 --out-dir=src/typechain/types './src/abi/*.json'"
   },
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "dist/index.d.ts",
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.1",
+    "rollup": "^3.23.0"
+  }
 }
