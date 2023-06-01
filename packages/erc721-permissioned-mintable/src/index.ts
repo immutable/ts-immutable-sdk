@@ -1,2 +1,4 @@
-// only for infrastructure. will be removed once wrapped functions are created
-export const erc721permissionedmintable = 1;
+// TODO export config
+import { Erc721PermissionedMintable } from './erc721-permissioned-mintable';
+
+export { Erc721PermissionedMintable };

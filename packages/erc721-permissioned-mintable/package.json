@@ -28,5 +28,11 @@
     "typecheck": "tsc --noEmit --jsx preserve"
   },
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@ethersproject/providers": "^5.7.2",
+    "@imtbl/config": "0.0.0",
+    "@imtbl/contracts": "0.0.0",
+    "ethers": "^6.4.0"
+  }
 }

@@ -1,4 +1,5 @@
 # Contracts
+
 Smart Contract generated bindings as an internal package, for reference by other public packages
 
 ### Add a new contract
@@ -17,3 +18,7 @@ yarn build
 cd packages/internal/contracts
 yarn run generate-types
 ```
+
+### Caveats
+
+- In order to generate the full ...
