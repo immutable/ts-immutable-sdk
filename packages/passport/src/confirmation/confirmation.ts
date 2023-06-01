@@ -122,7 +122,8 @@ export default class ConfirmationScreen {
 
       window.addEventListener('message', messageHandler);
       const confirmationWindow = openPopupCenter({
-        url: `${this.config.passportDomain}/transaction-confirmation/${transactionId}?chainType=starkex`,
+        // eslint-disable-next-line max-len
+        url: `${this.config.passportDomain}/transaction-confirmation/transaction.html?transactionId=${transactionId}&chainType=starkex`,
         title: CONFIRMATION_WINDOW_TITLE,
         width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
         height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
