@@ -6,6 +6,7 @@ import {
   GetNetworkParams,
 } from '@imtbl/checkout-sdk';
 import { useEffect, useReducer } from 'react';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
   initialWalletState,
   WalletActions,
@@ -164,6 +165,7 @@ export function WalletWidget(props: WalletWidgetProps) {
             )}
             {viewState.view.type === SharedViews.TOP_UP_VIEW && (
               <TopUpView
+                widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
                 showOnrampOption={isOnRampEnabled}
                 showSwapOption={isSwapEnabled}
                 showBridgeOption={isBridgeEnabled}

@@ -2,7 +2,7 @@ import {
   Box, Heading, MenuItem,
 } from '@biom3/react';
 import {
-  IMTBLWidgetEvents, RequestBridgeEvent, RequestOnrampEvent, RequestSwapEvent,
+  IMTBLWidgetEvents,
 } from '@imtbl/checkout-widgets';
 import { useContext } from 'react';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
@@ -16,7 +16,7 @@ import {
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 
-enum CurrentWidget {
+export enum CurrentWidget {
   ONRAMP = 'ONRAMP',
   SWAP = 'SWAP',
   BRIDGE = 'BRIDGE',
@@ -26,10 +26,9 @@ interface TopUpViewProps {
   showOnrampOption: boolean,
   showSwapOption: boolean,
   showBridgeOption: boolean,
-  currentWidget?: CurrentWidget,
-  onrampEventData?: RequestOnrampEvent,
-  swapEventData?: RequestSwapEvent,
-  bridgeEventData?: RequestBridgeEvent,
+  widgetEvent: IMTBLWidgetEvents,
+  tokenAddress?: string,
+  amount?: string,
   onBackButtonClick?: () => void,
   onCloseButtonClick: () => void,
 }
@@ -38,10 +37,9 @@ export function TopUpView({
   showOnrampOption,
   showSwapOption,
   showBridgeOption,
-  currentWidget,
-  onrampEventData,
-  swapEventData,
-  bridgeEventData,
+  widgetEvent,
+  tokenAddress,
+  amount,
   onBackButtonClick,
   onCloseButtonClick,
 }: TopUpViewProps) {
@@ -103,12 +101,12 @@ export function TopUpView({
             card.caption,
             card.subcaption,
             () => {
-              if (currentWidget === CurrentWidget.ONRAMP) {
+              if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
                 // dispatch onramp view
               }
-              orchestrationEvents.sendRequestOnrampEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
-                tokenAddress: onrampEventData?.tokenAddress ?? '',
-                amount: onrampEventData?.amount ?? '',
+              orchestrationEvents.sendRequestOnrampEvent(widgetEvent, {
+                tokenAddress: tokenAddress ?? '',
+                amount: amount ?? '',
               });
             },
           )}
@@ -119,7 +117,7 @@ export function TopUpView({
             swap.caption,
             swap.subcaption,
             () => {
-              if (currentWidget === CurrentWidget.SWAP) {
+              if (widgetEvent === IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT) {
                 viewDispatch({
                   payload: {
                     type: ViewActions.UPDATE_VIEW,
@@ -128,10 +126,10 @@ export function TopUpView({
                 });
                 return;
               }
-              orchestrationEvents.sendRequestSwapEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
-                fromTokenAddress: swapEventData?.fromTokenAddress ?? '',
-                toTokenAddress: swapEventData?.toTokenAddress ?? '',
-                amount: swapEventData?.amount ?? '',
+              orchestrationEvents.sendRequestSwapEvent(widgetEvent, {
+                fromTokenAddress: '',
+                toTokenAddress: tokenAddress ?? '',
+                amount: '',
               });
             },
           )}
@@ -142,7 +140,7 @@ export function TopUpView({
             bridge.caption,
             bridge.subcaption,
             () => {
-              if (currentWidget === CurrentWidget.BRIDGE) {
+              if (widgetEvent === IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT) {
                 viewDispatch({
                   payload: {
                     type: ViewActions.UPDATE_VIEW,
@@ -151,9 +149,9 @@ export function TopUpView({
                 });
                 return;
               }
-              orchestrationEvents.sendRequestBridgeEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
-                tokenAddress: bridgeEventData?.tokenAddress ?? '',
-                amount: bridgeEventData?.amount ?? '',
+              orchestrationEvents.sendRequestBridgeEvent(widgetEvent, {
+                tokenAddress: '',
+                amount: '',
               });
             },
           )}

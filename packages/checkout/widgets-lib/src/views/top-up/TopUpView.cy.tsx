@@ -3,8 +3,10 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BiomeCombinedProviders } from '@biom3/react';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { TopUpView } from './TopUpView';
 import { cySmartGet } from '../../lib/testUtils';
+import { orchestrationEvents } from '../../lib/orchestrationEvents';
 
 describe('Top Up View', () => {
   beforeEach(() => {
@@ -83,6 +85,7 @@ describe('Top Up View', () => {
           showOnrampOption
           showSwapOption
           showBridgeOption
+          widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
           onCloseButtonClick={closeFunction}
         />
       </BiomeCombinedProviders>,
@@ -92,5 +95,88 @@ describe('Top Up View', () => {
     cySmartGet('menu-item-bridge').should('exist');
     cySmartGet('close-button').click();
     cy.get('@closeFunction').should('have.been.called');
+  });
+
+  it('should fire onramp event with onramp data on event when onramp clicked', () => {
+    cy.stub(orchestrationEvents, 'sendRequestOnrampEvent').as('sendRequestOnrampEventStub');
+
+    mount(
+      <BiomeCombinedProviders>
+        <TopUpView
+          showOnrampOption
+          showSwapOption
+          showBridgeOption
+          widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+          tokenAddress="0x123"
+          amount="10"
+          onCloseButtonClick={() => {}}
+        />
+      </BiomeCombinedProviders>,
+    );
+
+    cySmartGet('menu-item-onramp').click();
+    cy.get('@sendRequestOnrampEventStub').should('have.been.called');
+    cy.get('@sendRequestOnrampEventStub')
+      .should(
+        'have.been.calledWith',
+        'imtbl-wallet-widget',
+        { tokenAddress: '0x123', amount: '10' },
+      );
+  });
+
+  it('should fire swap event with swap data on event when swap clicked', () => {
+    cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('sendRequestSwapEventStub');
+
+    mount(
+      <BiomeCombinedProviders>
+        <TopUpView
+          showOnrampOption
+          showSwapOption
+          showBridgeOption
+          widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+          tokenAddress="0x123"
+          amount="10"
+          onCloseButtonClick={() => {}}
+        />
+      </BiomeCombinedProviders>,
+    );
+
+    cySmartGet('menu-item-swap').click();
+    cy.get('@sendRequestSwapEventStub').should('have.been.called');
+    cy.get('@sendRequestSwapEventStub')
+      .should(
+        'have.been.calledWith',
+        'imtbl-wallet-widget',
+        // fromToken and amount should be empty for swap in top up
+        { fromTokenAddress: '', toTokenAddress: '0x123', amount: '' },
+      );
+  });
+
+  it('should fire bridge event with bridge data on event when bridge clicked', () => {
+    cy.stub(orchestrationEvents, 'sendRequestBridgeEvent').as('sendRequestBridgeEventStub');
+
+    mount(
+      <BiomeCombinedProviders>
+        <TopUpView
+          showOnrampOption
+          showSwapOption
+          showBridgeOption
+          widgetEvent={IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT}
+          tokenAddress="0x123"
+          amount="10"
+          onCloseButtonClick={() => {}}
+        />
+      </BiomeCombinedProviders>,
+    );
+
+    cySmartGet('menu-item-bridge').click();
+    cy.get('@sendRequestBridgeEventStub').should('have.been.called');
+    cy.get('@sendRequestBridgeEventStub')
+      .should(
+        'have.been.calledWith',
+        'imtbl-wallet-widget',
+        // tokenAddress and amount should be empty for bridging in top up
+        { tokenAddress: '', amount: '' },
+      );
   });
 });
