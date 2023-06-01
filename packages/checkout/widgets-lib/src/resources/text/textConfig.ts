@@ -2,7 +2,7 @@
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
-import { BaseViews } from '../../context/view-context/ViewContext';
+import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 
@@ -47,12 +47,12 @@ export const text = {
         },
       },
     },
-    [BaseViews.ERROR]: {
+    [SharedViews.ERROR_VIEW]: {
       heading: "Something's gone wrong",
       body: ['You can try again or contact', 'support', 'for help.'],
       actionText: 'Try again',
     },
-    [BaseViews.LOADING_VIEW]: {
+    [SharedViews.LOADING_VIEW]: {
       text: 'Loading',
     },
     [WalletWidgetViews.WALLET_BALANCES]: {
@@ -138,17 +138,40 @@ export const text = {
       bridgeForm: {
         from: {
           inputPlaceholder: '0',
-          selectorTitle: 'What would you like to bridge?',
+          selectorTitle: 'What would you like to move?',
         },
         buttonText: 'Move',
       },
       fees: {
-        title: 'Fees total',
+        title: 'Fees subtotal',
       },
       validation: {
         noAmountInputted: 'Please input amount',
         insufficientBalance: 'Insufficient balance',
         noTokenSelected: 'Select a coin to move',
+      },
+    },
+    [SharedViews.TOP_UP_VIEW]: {
+      header: {
+        title: 'How would you like to add coins?',
+      },
+      topUpOptions: {
+        onramp: {
+          heading: 'Buy with card',
+          caption: 'Google pay & Apple pay available. Minimum $20.',
+          subcaption: 'Fees ~ 0.3%',
+        },
+        swap: {
+          heading: 'Swap my coins',
+          caption: 'Using the coins I have on the same network',
+          subcaption: 'Fees ~ 0.3%',
+        },
+        bridge: {
+          heading: 'Move my coins',
+          caption: 'From the coins I have on a different network',
+          // todo: get the live rate
+          subcaption: 'Fees {live rate}',
+        },
       },
     },
   },

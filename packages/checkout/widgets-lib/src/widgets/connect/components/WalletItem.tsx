@@ -32,7 +32,7 @@ export function WalletItem(props: WalletProps) {
             logo={logo[wallet.connectionProvider] as any}
             sx={{
               width: 'base.icon.size.500',
-              backgroundColor: 'base.color.translucent.container.200',
+              backgroundColor: 'base.color.translucent.emphasis.200',
               borderRadius: 'base.borderRadius.x2',
             }}
           />

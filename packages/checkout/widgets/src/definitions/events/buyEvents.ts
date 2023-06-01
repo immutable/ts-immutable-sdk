@@ -1,21 +1,11 @@
 /**
- * Represents an event object emitted by the Buy Widget.
- * @property {BuyEventType} type - The type of the event.
- * @property {T} data - The data contained in the event.
- */
-export type BuyEvent<T> = {
-  type: BuyEventType;
-  data: T;
-};
-
-/**
  * Enum representing possible Buy Widget event types.
  */
 export enum BuyEventType {
+  CLOSE_WIDGET = 'close-widget',
   SUCCESS = 'success',
   FAILURE = 'failure',
   NOT_CONNECTED = 'not_connected',
-  CLOSE = 'close',
 }
 
 /**

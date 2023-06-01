@@ -15,7 +15,6 @@ import {
   WALLET_BALANCE_CONTAINER_STYLE,
   WalletBalanceItemStyle,
 } from './WalletBalancesStyles';
-import { sendAddCoinsEvent } from '../CoinTopUpEvents';
 import { zkEVMNetwork } from '../../../lib/networkUtils';
 import {
   CryptoFiatActions,
@@ -24,6 +23,7 @@ import {
 import { getTokenBalances } from '../functions/tokenBalances';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 import {
+  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
@@ -84,6 +84,15 @@ export function WalletBalances() {
       });
     })();
   }, [provider, checkout, network, cryptoFiatDispatch]);
+
+  const handleAddCoinsClick = () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: SharedViews.TOP_UP_VIEW },
+      },
+    });
+  };
 
   useEffect(() => {
     if (!checkout || !provider || !network) return;
@@ -149,11 +158,7 @@ export function WalletBalances() {
           <MenuItem
             testId="add-coins"
             emphasized
-            onClick={() => {
-              sendAddCoinsEvent({
-                network: walletState.network ?? undefined,
-              });
-            }}
+            onClick={handleAddCoinsClick}
           >
             <MenuItem.FramedIcon icon="Add" />
             <MenuItem.Label>Add coins</MenuItem.Label>

@@ -1,5 +1,5 @@
 import {
-  SwapEvent,
+  WidgetEvent,
   SwapEventType,
   SwapSuccess,
   IMTBLWidgetEvents,
@@ -8,7 +8,7 @@ import {
 } from '@imtbl/checkout-widgets';
 
 export function sendSwapWidgetCloseEvent() {
-  const closeWidgetEvent = new CustomEvent<SwapEvent<any>>(
+  const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
     {
       detail: {
@@ -24,7 +24,7 @@ export function sendSwapWidgetCloseEvent() {
 }
 
 export const sendSwapSuccessEvent = () => {
-  const successEvent = new CustomEvent<SwapEvent<SwapSuccess>>(
+  const successEvent = new CustomEvent<WidgetEvent<SwapSuccess>>(
     IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
     {
       detail: {
@@ -39,7 +39,7 @@ export const sendSwapSuccessEvent = () => {
 };
 
 export const sendSwapFailedEvent = (reason?: string) => {
-  const failedEvent = new CustomEvent<SwapEvent<SwapFailed>>(
+  const failedEvent = new CustomEvent<WidgetEvent<SwapFailed>>(
     IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
     {
       detail: {
@@ -55,7 +55,7 @@ export const sendSwapFailedEvent = (reason?: string) => {
 };
 
 export const sendSwapRejectedEvent = (reason?: string) => {
-  const rejectedEvent = new CustomEvent<SwapEvent<SwapRejected>>(
+  const rejectedEvent = new CustomEvent<WidgetEvent<SwapRejected>>(
     IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
     {
       detail: {

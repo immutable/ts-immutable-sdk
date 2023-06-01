@@ -1,5 +1,5 @@
 import { Box, Button } from '@biom3/react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { CenteredBoxContent } from '../CenteredBoxContent/CenteredBoxContent';
 import { StatusBox } from './StatusBox';
@@ -24,11 +24,13 @@ export function StatusView({
   statusText,
   statusType,
 }: StatusViewProps) {
+  const firstRender = useRef(true);
   useEffect(() => {
-    if (onRenderEvent) {
+    if (onRenderEvent && firstRender.current) {
+      firstRender.current = false;
       onRenderEvent();
     }
-  }, []);
+  }, [firstRender.current, onRenderEvent]);
 
   const onStatusActionClick = () => {
     if (onActionClick) {

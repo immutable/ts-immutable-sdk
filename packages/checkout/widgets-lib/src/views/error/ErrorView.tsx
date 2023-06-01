@@ -1,11 +1,11 @@
 import { Link } from '@biom3/react';
-import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
-import { FooterButton } from '../Footer/FooterButton';
-import { HeaderNavigation } from '../Header/HeaderNavigation';
-import { SatelliteHero } from '../Hero/SatelliteHero';
-import { SimpleTextBody } from '../Body/SimpleTextBody';
+import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
+import { FooterButton } from '../../components/Footer/FooterButton';
+import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
+import { SatelliteHero } from '../../components/Hero/SatelliteHero';
+import { SimpleTextBody } from '../../components/Body/SimpleTextBody';
 import { text } from '../../resources/text/textConfig';
-import { BaseViews } from '../../context/view-context/ViewContext';
+import { SharedViews } from '../../context/view-context/ViewContext';
 
 export interface ErrorViewProps {
   actionText: string;
@@ -20,7 +20,7 @@ export function ErrorView({
   errorEventAction,
   onCloseClick,
 }: ErrorViewProps) {
-  const errorText = text.views[BaseViews.ERROR];
+  const errorText = text.views[SharedViews.ERROR_VIEW];
 
   if (typeof errorEventAction === 'function') errorEventAction();
 

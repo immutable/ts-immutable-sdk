@@ -1,44 +1,44 @@
-import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import vx from 'variant-classnames';
+import { LitElement, html } from "lit";
+import { customElement, property } from "lit/decorators.js";
+import vx from "variant-classnames";
 
-import type { DomainRecipe } from '@imtbl/economy/dist/__codegen__/recipe';
-import { ItemDefinition } from '@imtbl/economy/dist/__codegen__/item-definition';
-import { CraftIngredient } from '@imtbl/economy/dist/__codegen__/crafting';
-import { InventoryItem } from '@imtbl/economy/dist/__codegen__/inventory';
+import type { DomainRecipe } from "@imtbl/economy/dist/__codegen__/recipe";
+import { ItemDefinition } from "@imtbl/economy/dist/__codegen__/item-definition";
+import { CraftIngredient } from "@imtbl/economy/dist/__codegen__/crafting";
+import { InventoryItem } from "@imtbl/economy/dist/__codegen__/inventory";
 
-type Item = Omit<Required<ItemDefinition>, 'properties'> & {
+type Item = Omit<Required<ItemDefinition>, "properties"> & {
   properties: {
     [k: string]: unknown;
   };
 };
 
 const colors = [
-  '',
-  'primary',
-  'secondary',
-  'info',
-  'success',
-  'error',
-  'warning',
+  "primary",
+  "secondary",
+  "info",
+  "success",
+  "error",
+  "warning",
+  "",
 ];
 const getColor = (index = 0) => {
   const color = colors?.[index % colors.length];
-  return color ? `progress-${color}` : '';
+  return color ? `progress-${color}` : "";
 };
 
-@customElement('crafting-summary')
+@customElement("crafting-summary")
 export class CraftingSummary extends LitElement {
-  @property({ type: Object, attribute: 'recipe' })
+  @property({ type: Object, attribute: "recipe" })
   recipe!: DomainRecipe;
 
-  @property({ type: Array, attribute: 'outputItems' })
+  @property({ type: Array, attribute: "outputItems" })
   outputItems: Array<Item> = [];
 
-  @property({ type: Array, attribute: 'iteselectedItemsms' })
+  @property({ type: Array, attribute: "iteselectedItemsms" })
   selectedItems: Array<InventoryItem> = [];
 
-  @property({ type: Array, attribute: 'inputs' })
+  @property({ type: Array, attribute: "inputs" })
   inputs: Array<CraftIngredient> = [];
 
   renderOutput() {
@@ -61,19 +61,19 @@ export class CraftingSummary extends LitElement {
   renderInputs() {
     return this.recipe.inputs?.map((input, idx) => {
       const sumCond = input.conditions?.find((cond) =>
-        cond.type?.includes('sum')
+        cond.type?.includes("sum")
       );
       const sumExpected = Number(sumCond?.expected || 0);
 
       let value = 0;
-      let max = input.type === 'single_item' ? 1 : sumExpected;
+      let max = input.type === "single_item" ? 1 : sumExpected;
 
       const selectedInputs = this.inputs.filter(
         ({ condition_id }) => condition_id === input.id
       );
 
-      if (input.type === 'multiple_item' && selectedInputs.length >= 1) {
-        const sumKey = sumCond?.ref?.split('.')?.pop() || '';
+      if (input.type === "multiple_item" && selectedInputs.length >= 1) {
+        const sumKey = sumCond?.ref?.split(".")?.pop() || "";
 
         const items = selectedInputs.map(({ item_id }) =>
           this.selectedItems.find(({ id }) => id === item_id)
@@ -89,11 +89,11 @@ export class CraftingSummary extends LitElement {
         value = total;
       }
 
-      if (input.type === 'single_item' && selectedInputs.length >= 1) {
+      if (input.type === "single_item" && selectedInputs.length >= 1) {
         value = 1;
       }
 
-      return html`<div class="my-1">
+      return html`<div class="py-1 mt-2">
         <p class="font-bold">${input.name} | Type: ${input.type}</p>
         <progress
           class="progress ${getColor(idx)} w-full h-5"
@@ -126,9 +126,9 @@ export class CraftingSummary extends LitElement {
 }
 
 const locationVx = {
-  $all: 'w-full font-bold text-white font-mono text-center',
+  $all: "w-full font-bold text-white font-mono text-center",
   location: {
-    zkevm: 'bg-primary',
-    offchain: 'bg-black',
+    zkevm: "bg-primary",
+    offchain: "bg-black",
   },
 };

@@ -8,7 +8,7 @@ import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-contex
 import {
   ViewContext,
   ViewActions,
-  BaseViews,
+  SharedViews,
 } from '../../../context/view-context/ViewContext';
 import { SwapContext } from '../context/SwapContext';
 import {
@@ -106,7 +106,7 @@ export function SwapButton({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: BaseViews.ERROR,
+            type: SharedViews.ERROR_VIEW,
             error: err,
           },
         },
