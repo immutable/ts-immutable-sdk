@@ -1,4 +1,3 @@
-import { ItemType } from '@opensea/seaport-js/lib/constants';
 import {
   BuyItem,
   Fee,
@@ -9,6 +8,7 @@ import {
   OrderResult,
 } from 'openapi/sdk';
 import { CreateOrderParams, ListOrderParams } from 'types';
+import { ItemType } from '../seaport';
 
 export class ImmutableApiClient {
   constructor(
