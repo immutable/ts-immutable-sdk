@@ -1,4 +1,4 @@
 // TODO export config
-import { Erc721PermissionedMintable } from './erc721-permissioned-mintable';
+import { ERC721PermissionedMintable } from './erc721-permissioned-mintable';
 
-export { Erc721PermissionedMintable };
+export { ERC721PermissionedMintable };

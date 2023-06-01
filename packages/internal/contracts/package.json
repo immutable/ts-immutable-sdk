@@ -4,6 +4,10 @@
   "version": "0.0.0",
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.1",
+    "rollup": "^3.23.0"
+  },
   "engines": {
     "node": ">=16.11.0"
   },
@@ -17,15 +21,11 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
+    "generate-types": "typechain --target=ethers-v5 --out-dir=src/typechain/types './src/abi/*.json'",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "prepare": "wsrun -r build",
-    "typecheck": "tsc --noEmit --jsx preserve",
-    "generate-types": "typechain --target=ethers-v5 --out-dir=src/typechain/types './src/abi/*.json'"
+    "typecheck": "tsc --noEmit --jsx preserve"
   },
   "type": "module",
-  "types": "dist/index.d.ts",
-  "devDependencies": {
-    "@rollup/plugin-typescript": "^11.1.1",
-    "rollup": "^3.23.0"
-  }
+  "types": "dist/index.d.ts"
 }

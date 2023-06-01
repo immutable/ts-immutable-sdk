@@ -1,16 +1,22 @@
-// import { TransactionRequest } from '@ethersproject/providers';
+import { BigNumberish } from '@ethersproject/bignumber';
+import { CallOverrides } from '@ethersproject/contracts';
+import { TransactionRequest } from '@ethersproject/providers';
 import { ImmutableERC721PermissionedMintable, ImmutableERC721PermissionedMintable__factory } from '@imtbl/contracts';
+import { PromiseOrValue } from '@imtbl/contracts/dist/typechain/types/common';
 
 export class ERC721PermissionedMintable {
   private readonly contract: ImmutableERC721PermissionedMintable;
 
   constructor(contractAddress: string) {
-    this.contract = ImmutableERC721PermissionedMintable__factory.attach(contractAddress);
+    const factory = new ImmutableERC721PermissionedMintable__factory();
+    this.contract = factory.attach(contractAddress);
   }
 
-  // // TODO add types to params
-  // public async mint(params): Promise<TransactionRequest> {
-  //   // TODO add hasRole check
-  //   return await contract.populateTransaction.mint(...params);
-  // }
+  public async mint(
+    to: PromiseOrValue<string>,
+    amount: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides,
+  ): Promise<TransactionRequest> {
+    return await this.contract.populateTransaction.mint(to, amount, overrides);
+  }
 }
