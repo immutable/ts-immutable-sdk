@@ -116,11 +116,11 @@ export class CraftingWidget extends LitElement {
     this.filteredRecipes = this.recipes.filter((recipe) => {
       return this.economy.recipe.getInputsByItem(recipe, item).length > 0;
     });
-    
+
     if (this.filteredRecipes.length > 0) {
       this.selectedItems.set(item.id, item);
     }
-    
+
     this.requestUpdate();
     (this.querySelector("#btnRecipeModal") as HTMLLabelElement)?.click();
   }
@@ -146,9 +146,7 @@ export class CraftingWidget extends LitElement {
   }
 
   setDisableSection() {
-    this.disabledSelection =
-      this.economy.state.craftingInputs.length ===
-      this.selectedRecipe?.inputs?.length;
+    this.disabledSelection = !!this.economy.crafting.completedCraftInputs();
   }
 
   setLoading(loading = false) {
@@ -229,11 +227,11 @@ export class CraftingWidget extends LitElement {
     };
 
     try {
-      // await this.economy.crafting.craft(input);
+      await this.economy.crafting.craft(input);
 
       setTimeout(() => {
         this.loading = false;
-      }, 3000);
+      }, 1000);
 
       this.selectedRecipe = {};
       this.selectedItems.clear();
@@ -249,17 +247,16 @@ export class CraftingWidget extends LitElement {
 
   renderRecipeSelection() {
     return html`
-      <!-- The button to open modal -->
       <label id="btnRecipeModal" for="my-modal" class="btn hidden"
         >open modal</label
       >
-
-      <!-- Put this part before </body> tag -->
       <input type="checkbox" id="my-modal" class="modal-toggle" />
       <div class="modal">
         <div class="modal-box">
           <h3 class="font-bold text-lg">
-            Compatible recipes
+            ${this.filteredRecipes.length > 0
+              ? "Select a recipe"
+              : "No recipes found"}
           </h3>
           <div class="ul w-full">
             ${this.filteredRecipes.map((recipe) => {
@@ -271,14 +268,24 @@ export class CraftingWidget extends LitElement {
                     this.economy.crafting.addInputByItem(
                       Array.from(this.selectedItems.values())[0]
                     );
-                    (this.querySelector("#btnRecipeModal") as HTMLLabelElement)?.click(); 
+                    this.setDisableSection();
+                    (
+                      this.querySelector("#btnRecipeModal") as HTMLLabelElement
+                    )?.click();
                   }}"
-                >${recipe.name}</li>
-              `
+                >
+                  ${recipe.name}
+                </li>
+              `;
             })}
           </div>
           <div class="modal-action">
-            <label for="my-modal" class="btn btn-warning" @click="${this.cancelRecipeSelection}">cancel</label>
+            <label
+              for="my-modal"
+              class="btn btn-warning"
+              @click="${this.cancelRecipeSelection}"
+              >go back</label
+            >
           </div>
         </div>
       </div>
@@ -381,7 +388,7 @@ export class CraftingWidget extends LitElement {
                 <!-- SELECTION -->
                 <div class="divider lg:divider-horizontal">🟰</div>
                 <!-- SUMMARY -->
-                <div class="flex-grow bg-gray-300">
+                <div class="flex-grow bg-gray-300 relative">
                   <div class="flex justify-center bg-gray-400 w-full p-2">
                     <button
                       class="btn btn-wide btn-secondary ${this.loading
@@ -401,6 +408,12 @@ export class CraftingWidget extends LitElement {
                       .inputs="${this.economy.state.craftingInputs}"
                     ></crafting-summary>
                   </div>
+                  <div class="absolute left-0 bottom-0 overflow-hidden w-full">
+                    <crafting-history
+                      class="block bg-white px-5"
+                      .crafts=${this.crafts}
+                    ></crafting-history>
+                  </div>
                 </div>
                 <!-- SUMMARY -->
               </div>
@@ -410,7 +423,9 @@ export class CraftingWidget extends LitElement {
             <!-- DRAWER -->
             <label for="my-drawer-3" class="drawer-overlay"></label>
             <div class="menu w-2/4 bg-base-100 p-4">
-              <crafting-history .crafts=${this.crafts}></crafting-history>
+              ${
+                "" /* <crafting-history .crafts=${this.crafts}></crafting-history> */
+              }
             </div>
             <!-- DRAWER -->
           </div>
