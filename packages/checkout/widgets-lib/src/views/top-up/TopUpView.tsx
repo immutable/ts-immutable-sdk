@@ -75,6 +75,22 @@ export function TopUpView({
     });
   };
 
+  const onClickBridge = () => {
+    if (widgetEvent === IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: BridgeWidgetViews.BRIDGE },
+        },
+      });
+      return;
+    }
+    orchestrationEvents.sendRequestBridgeEvent(widgetEvent, {
+      tokenAddress: '',
+      amount: '',
+    });
+  };
+
   const renderMenuItem = (
     testId: string,
     icon: 'Wallet' | 'Coins' | 'Minting',
@@ -105,22 +121,6 @@ export function TopUpView({
       </MenuItem>
     </Box>
   );
-
-  const onClickBridge = () => {
-    if (widgetEvent === IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: BridgeWidgetViews.BRIDGE },
-        },
-      });
-      return;
-    }
-    orchestrationEvents.sendRequestBridgeEvent(widgetEvent, {
-      tokenAddress: '',
-      amount: '',
-    });
-  };
 
   return (
     <SimpleLayout
