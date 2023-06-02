@@ -3,6 +3,7 @@ import {
 } from '@biom3/react';
 import { feeItemContainerStyles } from './styles';
 import { FeeItem } from './FeeItem';
+import { text } from '../../resources/text/textConfig';
 
 type Fee = {
   label: string;
@@ -24,7 +25,7 @@ export function FeesBreakdown({
 }: FeesBreakdownProps) {
   return (
     <BottomSheet
-      headerBarTitle="Fees"
+      headerBarTitle={text.drawers.feesBreakdown.heading}
       size="threeQuarter"
       onCloseBottomSheet={onCloseBottomSheet}
       visible={visible}
@@ -34,7 +35,12 @@ export function FeesBreakdown({
       </BottomSheet.Target>
       <BottomSheet.Content>
         <Box sx={feeItemContainerStyles}>
-          <FeeItem label="Fees total" amount={totalAmount} fiatAmount={totalFiatAmount} boldLabel />
+          <FeeItem
+            label={text.drawers.feesBreakdown.total}
+            amount={totalAmount}
+            fiatAmount={totalFiatAmount}
+            boldLabel
+          />
           {
             fees.map(({ label, amount, fiatAmount }) => (
               <>

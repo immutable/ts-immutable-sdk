@@ -182,4 +182,11 @@ export const text = {
         'Digital wallet for accessing blockchain applications and web3',
     },
   },
+  drawers: {
+    feesBreakdown: {
+      heading: 'Fee breakdown',
+      total:
+        'Fees total',
+    },
+  },
 };
