@@ -1,61 +1,89 @@
-import { TransactionResponse } from '@ethersproject/abstract-provider';
 import { PassportConfiguration } from '../config';
 
 export type RelayerAdapterInput = {
   config: PassportConfiguration,
 };
 
-export type ListTransactionsRequest = {
-  filter: {
-    chainId: string;
-    wallet: string;
-  }
-};
+// JsonRpc base Types
 
-export type ListTransactionsResponse = {
-  cursor: string;
-  remaining: Number;
-  // TODO: Replace with our own transaction definition
-  transactions: TransactionResponse[];
-};
-
-export type TransactionRequest = {
+type JsonRpcRequest = {
   id: number;
-  jsonrpc: string;
-  method: string;
-  // TODO: Replace with our own transaction definition
-  params: TransactionRequest;
+  jsonrpc: '2.0';
 };
 
-export enum FeeTokenType {
-  UNKNOWN = 'UNKNOWN',
-  ERC20_TOKEN = 'ERC20_TOKEN',
-}
-
-export type FeeToken = {
-  chainId: string;
-  name: string;
-  symbol: string;
-  type: FeeTokenType;
+type JsonRpcResponse = {
+  id: number;
+  jsonrpc: '2.0';
 };
 
-export type Fee = {
-  value: string;
+// EthSendTransaction types
+
+type EthSendTransactionParams = {
   to: string;
-  token: FeeToken;
-  // gasLimit: number;
+  data: string;
 };
 
-export type Quote = {
-  options: Fee[];
+type EthSendTransactionRequest = JsonRpcRequest & {
+  method: 'eth_sendTransaction';
+  params: {
+    to: string;
+    data: string;
+    chainId: string;
+  }[];
 };
 
-export type QuoteResponse = {
-  id: number;
-  jsonrpc: string;
-  result?: Quote;
-  error?: Error;
+type EthSendTransactionResponse = JsonRpcResponse & {
+  result: string;
 };
+
+// ImGetTransactionByHash types
+
+type ImGetTransactionByHashParams = string;
+
+type ImGetTransactionByHashRequest = JsonRpcRequest & {
+  method: 'im_getTransactionByHash';
+  params: ImGetTransactionByHashParams[];
+};
+
+type Transaction = {
+  status: 'PENDING' | 'SUBMITTED' | 'CONFIRMED' | 'ERROR';
+  chainId: string;
+  relayerId: string;
+  hash: string;
+};
+
+type ImGetTransactionByHashResponse = JsonRpcResponse & {
+  result: Transaction;
+};
+
+// ImGetFeeOptions types
+
+type ImGetFeeOptionsParams = {
+  userAddress: string;
+  data: string;
+  chainId: string;
+};
+
+type ImGetFeeOptionsRequest = JsonRpcRequest & {
+  method: 'im_getFeeOptions';
+  params: ImGetFeeOptionsParams[];
+};
+
+type FeeOptions = {
+  token_price: string;
+  token_symbol: string;
+  token_decimals: number;
+  token_address: string;
+};
+
+type ImGetFeeOptionsResponse = JsonRpcResponse & {
+  result: FeeOptions[]
+};
+
+type RelayerTransactionRequest =
+  | EthSendTransactionRequest
+  | ImGetTransactionByHashRequest
+  | ImGetFeeOptionsRequest;
 
 export class RelayerAdapter {
   private readonly config: PassportConfiguration;
@@ -64,35 +92,52 @@ export class RelayerAdapter {
     this.config = config;
   }
 
-  private async postToRelayer<T>(path: string, request: object): Promise<T> {
-    return fetch(`${this.config.relayerUrl}/${path}`, {
+  private async postToRelayer<T>(request: RelayerTransactionRequest): Promise<T> {
+    return fetch(`${this.config.relayerUrl}/v1/transactions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(request),
-    }).then((response) => response.json());
+    }).then((response) => response.json())
+      .then((response) => response as T);
   }
 
-  public async listTransactions(wallet: string): Promise<ListTransactionsResponse> {
-    const listWalletRequest: ListTransactionsRequest = {
-      filter: {
+  public async ethSendTransaction(params: EthSendTransactionParams): Promise<EthSendTransactionResponse> {
+    const payload: EthSendTransactionRequest = {
+      id: 1, // TODO: How do we generate this?
+      jsonrpc: '2.0',
+      method: 'eth_sendTransaction',
+      params: [{
+        to: params.to,
+        data: params.data,
         chainId: this.config.zkEvmChainId.toString(),
-        wallet,
-      },
+      }],
     };
-
-    // TODO: Validate endpoint
-    return this.postToRelayer<ListTransactionsResponse>('listTransactions', listWalletRequest);
+    return this.postToRelayer<EthSendTransactionResponse>(payload);
   }
 
-  public async getQuote(transactionRequest: TransactionRequest): Promise<QuoteResponse> {
-    // TODO: Validate endpoint
-    return this.postToRelayer<QuoteResponse>('getQuote', transactionRequest);
+  public async imGetTransactionByHash(hash: string): Promise<ImGetTransactionByHashResponse> {
+    const payload: ImGetTransactionByHashRequest = {
+      id: 1, // TODO: How do we generate this?
+      jsonrpc: '2.0',
+      method: 'im_getTransactionByHash',
+      params: [hash],
+    };
+    return this.postToRelayer<ImGetTransactionByHashResponse>(payload);
   }
 
-  // TODO: Replace with our own transaction definition
-  public async execute(transactionRequest: TransactionRequest): Promise<TransactionResponse> {
-    return this.postToRelayer<TransactionResponse>('execute', transactionRequest);
+  public async imGetFeeOptions(userAddress: string, data: string): Promise<ImGetFeeOptionsResponse> {
+    const payload: ImGetFeeOptionsRequest = {
+      id: 1, // TODO: How do we generate this?
+      jsonrpc: '2.0',
+      method: 'im_getFeeOptions',
+      params: [{
+        userAddress,
+        data,
+        chainId: this.config.zkEvmChainId.toString(),
+      }],
+    };
+    return this.postToRelayer<ImGetFeeOptionsResponse>(payload);
   }
 }

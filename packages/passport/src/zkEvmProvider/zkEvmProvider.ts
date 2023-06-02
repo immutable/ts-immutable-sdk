@@ -8,6 +8,7 @@ import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
 import { User } from '../types';
+import { RelayerAdapter } from './relayerAdapter';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -29,6 +30,8 @@ export class ZkEvmProvider {
 
   private readonly magicAdapter: MagicAdapter;
 
+  private readonly relayerAdapter: RelayerAdapter;
+
   private magicProvider?: ExternalProvider;
 
   private user?: User;
@@ -43,6 +46,7 @@ export class ZkEvmProvider {
     this.magicAdapter = magicAdapter;
     this.config = config;
     this.confirmationScreen = confirmationScreen;
+    this.relayerAdapter = new RelayerAdapter({ config });
   }
 
   public async request(
