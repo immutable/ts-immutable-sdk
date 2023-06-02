@@ -1,8 +1,9 @@
-import { BigNumberish } from '@ethersproject/bignumber';
+import { BigNumberish, BigNumber } from '@ethersproject/bignumber';
 import { CallOverrides, PopulatedTransaction } from '@ethersproject/contracts';
 import { ERC20 as OpenZeppelinERC20, ERC20__factory as OpenZeppelinERC20Factory } from '@imtbl/contracts';
 import { PromiseOrValue } from '@imtbl/contracts/src/typechain/types/common';
 import { Overrides } from 'ethers';
+import { Provider } from '@ethersproject/providers';
 
 export class ERC20 {
   private readonly contract: OpenZeppelinERC20;
@@ -13,20 +14,33 @@ export class ERC20 {
   }
 
   /**
-   * @returns a promise that resolves with a populated transaction
+   * @returns a promise that resolves with a BigNumber that represents the amount of tokens in existence
    */
-  public async totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction> {
-    return this.contract.populateTransaction.totalSupply(overrides);
+  public async totalSupply(provider: Provider, overrides: CallOverrides = {}): Promise<BigNumber> {
+    return this.contract.connect(provider).totalSupply(overrides);
   }
 
   /**
-   * @returns a promise that resolves with a populated transaction
+   * @returns a promise that resolves with a BigNumber that represents the amount of tokens owned by account
    */
   public async balanceOf(
+    provider: Provider,
     account: PromiseOrValue<string>,
-    overrides?: CallOverrides,
-  ): Promise<PopulatedTransaction> {
-    return this.contract.populateTransaction.balanceOf(account, overrides);
+    overrides: CallOverrides = {},
+  ): Promise<BigNumber> {
+    return this.contract.connect(provider).balanceOf(account, overrides);
+  }
+
+  /**
+   * @returns a promise that resolves with a BigNumber that represents the remaining number of tokens that spender will be allowed to spend on behalf of owner through transferFrom
+   */
+  public async allowance(
+    provider: Provider,
+    owner: PromiseOrValue<string>,
+    spender: PromiseOrValue<string>,
+    overrides: CallOverrides = {},
+  ): Promise<BigNumber> {
+    return this.contract.connect(provider).allowance(owner, spender, overrides);
   }
 
   /**
@@ -43,21 +57,10 @@ export class ERC20 {
   /**
    * @returns a promise that resolves with a populated transaction
    */
-  public async allowance(
-    owner: PromiseOrValue<string>,
-    spender: PromiseOrValue<string>,
-    overrides?: CallOverrides,
-  ): Promise<PopulatedTransaction> {
-    return this.contract.populateTransaction.allowance(owner, spender, overrides);
-  }
-
-  /**
-   * @returns a promise that resolves with a populated transaction
-   */
   public async approve(
     spender: PromiseOrValue<string>,
     amount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> },
+    overrides: Overrides & { from?: PromiseOrValue<string> } = {},
   ): Promise<PopulatedTransaction> {
     return this.contract.populateTransaction.approve(spender, amount, overrides);
   }
@@ -69,7 +72,7 @@ export class ERC20 {
     from: PromiseOrValue<string>,
     to: PromiseOrValue<string>,
     amount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> },
+    overrides: Overrides & { from?: PromiseOrValue<string> } = {},
   ): Promise<PopulatedTransaction> {
     return this.contract.populateTransaction.transferFrom(from, to, amount, overrides);
   }
