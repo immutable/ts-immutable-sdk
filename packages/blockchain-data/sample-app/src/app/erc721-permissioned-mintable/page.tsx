@@ -40,6 +40,7 @@ export default function ERC721PermissionedMintablePage() {
           response: JSON.stringify(response, null, 2),
         });
       } catch (error) {
+        console.log('error', error);
         setState({
           isLoading: false,
           contract,
@@ -52,14 +53,17 @@ export default function ERC721PermissionedMintablePage() {
 
   return (
     <div>
-      {state.isLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <div>
-          <h1>ERC721PermissionedMintable</h1>
-          <code>{state.response}</code>
-        </div>
-      )}
+      <h2>{`Contract address: ${CONTRACT_ADDRESS}`}</h2>
+      <div>
+        {state.isLoading ? (
+          <p>Loading...</p>
+        ) : (
+          <div>
+            <h1>ERC721PermissionedMintable</h1>
+            <code>{state.response}</code>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
