@@ -9,3 +9,4 @@
 /packages/provider @immutable/wallets
 /packages/checkout @immutable/wallets
 /packages/economy @immutable/igs-frontend
+/packages/blockchain-data @immutable/assets
