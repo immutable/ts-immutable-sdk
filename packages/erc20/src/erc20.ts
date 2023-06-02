@@ -46,7 +46,7 @@ export class ERC20 {
   /**
    * @returns a promise that resolves with a populated transaction
    */
-  public async transfer(
+  public async populateTransfer(
     to: PromiseOrValue<string>,
     amount: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> },
@@ -57,7 +57,7 @@ export class ERC20 {
   /**
    * @returns a promise that resolves with a populated transaction
    */
-  public async approve(
+  public async populateApprove(
     spender: PromiseOrValue<string>,
     amount: PromiseOrValue<BigNumberish>,
     overrides: Overrides & { from?: PromiseOrValue<string> } = {},
@@ -68,7 +68,7 @@ export class ERC20 {
   /**
    * @returns a promise that resolves with a populated transaction
    */
-  public async transferFrom(
+  public async populateTransferFrom(
     from: PromiseOrValue<string>,
     to: PromiseOrValue<string>,
     amount: PromiseOrValue<BigNumberish>,
