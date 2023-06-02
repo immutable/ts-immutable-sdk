@@ -10,7 +10,7 @@ import {
 } from '@imtbl/blockchain-data';
 
 const CHAIN_NAME = 'imtbl-zkevm-devnet-2';
-const API_URL = 'https://indexer-mr.dev.imtbl.com';
+// const API_URL = 'https://indexer-mr.dev.imtbl.com';
 
 const separator = (url: string) => {
   return url.includes('?') ? '&' : '?';
@@ -420,6 +420,8 @@ export default function Home() {
   useEffect(() => {
     async function getData() {
       const environment = Environment.SANDBOX;
+
+      const API_URL = 'https://indexer-mr.dev.imtbl.com';
 
       const config: BlockchainDataModuleConfiguration = {
         baseConfig: new ImmutableConfiguration({
