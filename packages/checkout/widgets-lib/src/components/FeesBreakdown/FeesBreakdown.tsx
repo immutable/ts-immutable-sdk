@@ -36,6 +36,7 @@ export function FeesBreakdown({
       <BottomSheet.Content>
         <Box sx={feeItemContainerStyles}>
           <FeeItem
+            key={text.drawers.feesBreakdown.total}
             label={text.drawers.feesBreakdown.total}
             amount={totalAmount}
             fiatAmount={totalFiatAmount}
@@ -43,10 +44,10 @@ export function FeesBreakdown({
           />
           {
             fees.map(({ label, amount, fiatAmount }) => (
-              <>
-                <Divider size="xSmall" />
-                <FeeItem label={label} amount={amount} fiatAmount={fiatAmount} />
-              </>
+              [
+                <Divider size="xSmall" key={`${label}-divider`} />,
+                <FeeItem key={label} label={label} amount={amount} fiatAmount={fiatAmount} />,
+              ]
             ))
           }
         </Box>
