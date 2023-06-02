@@ -5,6 +5,12 @@ import { ERC721PermissionedMintable } from '@imtbl/erc721-permissioned-mintable'
 
 const CONTRACT_ADDRESS = '0x9A48B1B27743d807331d06eCF0bFb15c06fDb58D';
 
+// with popoulated transaction
+// { "data": "0xa217fddf", "to": "0x9A48B1B27743d807331d06eCF0bFb15c06fDb58D" }
+
+// with direct function execution
+//
+
 interface State {
   isLoading: Boolean;
   contract: ERC721PermissionedMintable | null;
@@ -20,15 +26,26 @@ export default function ERC721PermissionedMintablePage() {
 
   useEffect(() => {
     async function fn() {
+      // Contract interface instance
+
       const contract = new ERC721PermissionedMintable(CONTRACT_ADDRESS);
+      try {
+        //
+        const response = await contract.DEFAULT_ADMIN_ROLE();
+        console.log('response', response);
 
-      const response = await contract.DEFAULT_ADMIN_ROLE();
-
-      setState({
-        isLoading: false,
-        contract,
-        response: JSON.stringify(response, null, 2),
-      });
+        setState({
+          isLoading: false,
+          contract,
+          response: JSON.stringify(response, null, 2),
+        });
+      } catch (error) {
+        setState({
+          isLoading: false,
+          contract,
+          response: JSON.stringify(error, null, 2),
+        });
+      }
     }
     fn();
   }, []);
@@ -39,7 +56,7 @@ export default function ERC721PermissionedMintablePage() {
         <p>Loading...</p>
       ) : (
         <div>
-          <h1>ERC721PernmissionedMintable</h1>
+          <h1>ERC721PermissionedMintable</h1>
           <code>{state.response}</code>
         </div>
       )}
