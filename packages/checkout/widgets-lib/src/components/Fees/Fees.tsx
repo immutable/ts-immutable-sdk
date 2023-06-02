@@ -17,10 +17,11 @@ export function Fees({
 }: FeesProps) {
   if (!gasFeeValue) return <Box />;
 
+  const formattedGasValue = formatZeroAmount(tokenValueFormat(gasFeeValue));
   const gasTokenSymbol = gasFeeToken?.symbol;
   const formattedTotalValue = gasTokenSymbol
-    ? `${gasTokenSymbol} ${gasFeeValue}`
-    : gasFeeValue;
+    ? `${gasTokenSymbol} ${formattedGasValue}`
+    : formattedGasValue;
 
   return (
     <Box sx={feeContainerStyles}>
