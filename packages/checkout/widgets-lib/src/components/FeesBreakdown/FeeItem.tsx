@@ -14,12 +14,18 @@ export function FeeItem({
   amount,
   fiatAmount,
 }: FeeItemProps) {
+  const key = label.toLowerCase().replace(' ', '-');
+
   return (
-    <Box sx={feeItemStyles}>
+    <Box
+      sx={feeItemStyles}
+      testId={`fee-item-${key}`}
+    >
       <Body sx={feeItemLabelStyles(boldLabel)}>
         {label}
       </Body>
       <PriceDisplay
+        testId={key}
         sx={feeItemPriceDisplayStyles}
         price={amount}
         fiatAmount={fiatAmount}

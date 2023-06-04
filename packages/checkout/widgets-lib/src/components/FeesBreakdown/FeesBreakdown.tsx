@@ -33,7 +33,7 @@ export function FeesBreakdown({
       <BottomSheet.Target>
         {children}
       </BottomSheet.Target>
-      <BottomSheet.Content>
+      <BottomSheet.Content testId="fees-breakdown-content">
         <Box sx={feeItemContainerStyles}>
           <FeeItem
             key={text.drawers.feesBreakdown.total}
