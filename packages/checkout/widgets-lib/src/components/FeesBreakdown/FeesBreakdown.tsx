@@ -1,7 +1,7 @@
 import {
   BottomSheet, Box, Divider,
 } from '@biom3/react';
-import { feeItemContainerStyles } from './styles';
+import { feeItemContainerStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
 import { text } from '../../resources/text/textConfig';
 

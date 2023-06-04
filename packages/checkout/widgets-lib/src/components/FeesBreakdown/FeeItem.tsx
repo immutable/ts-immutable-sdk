@@ -1,5 +1,5 @@
 import { Body, Box, PriceDisplay } from '@biom3/react';
-import { feeItemStyles, feeItemLabelStyles, feeItemPriceDisplayStyles } from './styles';
+import { feeItemStyles, feeItemLabelStyles, feeItemPriceDisplayStyles } from './FeesBreakdownStyles';
 
 export interface FeeItemProps {
   boldLabel?: boolean;
