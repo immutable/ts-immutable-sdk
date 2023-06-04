@@ -42,12 +42,10 @@ export function FeesBreakdown({
             fiatAmount={totalFiatAmount}
             boldLabel
           />
+          <Divider size="xSmall" />
           {
             fees.map(({ label, amount, fiatAmount }) => (
-              [
-                <Divider size="xSmall" key={`${label}-divider`} />,
-                <FeeItem key={label} label={label} amount={amount} fiatAmount={fiatAmount} />,
-              ]
+              <FeeItem key={label} label={label} amount={amount} fiatAmount={fiatAmount} />
             ))
           }
         </Box>
