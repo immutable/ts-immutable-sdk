@@ -12,7 +12,7 @@ import { amountInputValidation as textInputValidator } from '../../../lib/valida
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
-import { DEFAULT_IMX_DECIMALS } from '../../../lib';
+import { DEFAULT_IMX_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
@@ -26,6 +26,7 @@ import { Fees } from '../../../components/Fees/Fees';
 import { SwapButton } from './SwapButton';
 import { SwapFormData } from './swapFormTypes';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
+import { useInterval } from '../../../lib/hooks/useInterval';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -161,7 +162,7 @@ export function SwapForm({ data }: SwapFromProps) {
   // ------------------//
   //    FETCH QUOTES   //
   // ------------------//
-  const processFetchQuoteFrom = async () => {
+  const processFetchQuoteFrom = async (silently: boolean = false) => {
     if (!provider) return;
     if (!exchange) return;
     if (!fromToken) return;
@@ -175,6 +176,11 @@ export function SwapForm({ data }: SwapFromProps) {
         fromAmount,
         toToken,
       );
+
+      // Prevent to silently fetch and set a new quote
+      // if the user has updated and the widget is already
+      // fetching or the user is updating the inputs.
+      if (silently && (loading || editing)) return;
 
       const estimate = result.info.gasFeeEstimate;
       const gasFee = utils.formatUnits(
@@ -222,7 +228,7 @@ export function SwapForm({ data }: SwapFromProps) {
     setIsFetching(false);
   };
 
-  const processFetchQuoteTo = async () => {
+  const processFetchQuoteTo = async (silently: boolean = false) => {
     if (!provider) return;
     if (!exchange) return;
     if (!fromToken) return;
@@ -236,6 +242,11 @@ export function SwapForm({ data }: SwapFromProps) {
         toAmount,
         fromToken,
       );
+
+      // Prevent to silently fetch and set a new quote
+      // if the user has updated and the widget is already
+      // fetching or the user is updating the inputs.
+      if (silently && (loading || editing)) return;
 
       const estimate = result.info.gasFeeEstimate;
       const gasFee = utils.formatUnits(
@@ -293,16 +304,23 @@ export function SwapForm({ data }: SwapFromProps) {
     return true;
   };
 
-  const fetchQuoteFrom = async () => {
+  const fetchQuoteFrom = async (silently: boolean = false) => {
     if (!canRunFromQuote()) return;
 
-    setLoading(true);
-    setIsFetching(true);
+    // setIsFetching within this if statement
+    // to allow the user to edit the form
+    // even if a new quote is fetch silently
+    if (!silently) {
+      setLoading(true);
+      setIsFetching(true);
+    }
 
-    await processFetchQuoteFrom();
+    await processFetchQuoteFrom(silently);
 
-    setLoading(false);
-    setIsFetching(false);
+    if (!silently) {
+      setLoading(false);
+      setIsFetching(false);
+    }
   };
 
   const canRunToQuote = (): boolean => {
@@ -314,22 +332,32 @@ export function SwapForm({ data }: SwapFromProps) {
     return true;
   };
 
-  const fetchQuoteTo = async () => {
+  const fetchQuoteTo = async (silently: boolean = false) => {
     if (!canRunToQuote()) return;
 
-    setLoading(true);
-    setIsFetching(true);
+    // setIsFetching within this if statement
+    // to allow the user to edit the form
+    // even if a new quote is fetch silently
+    if (!silently) {
+      setLoading(true);
+      setIsFetching(true);
+    }
 
-    await processFetchQuoteTo();
+    await processFetchQuoteTo(silently);
 
-    setLoading(false);
-    setIsFetching(false);
+    if (!silently) {
+      setLoading(false);
+      setIsFetching(false);
+    }
   };
 
-  const fetchQuote = async () => {
-    if (direction === SwapDirection.FROM) await fetchQuoteFrom();
-    else await fetchQuoteTo();
+  const fetchQuote = async (silently: boolean = false) => {
+    if (direction === SwapDirection.FROM) await fetchQuoteFrom(silently);
+    else await fetchQuoteTo(silently);
   };
+
+  // Silently refresh the quote
+  useInterval(() => fetchQuote(true), DEFAULT_QUOTE_REFRESH_INTERVAL);
 
   useEffect(() => {
     if (direction === SwapDirection.FROM) {
@@ -445,13 +473,6 @@ export function SwapForm({ data }: SwapFromProps) {
     }).fromToConversion);
   }, [quote]);
 
-  // useEffect(() => {
-  //   const id = setInterval(() => fetchQuote(), 2000);
-  //   return () => {
-  //     clearInterval(id);
-  //   };
-  // }, []);
-
   return (
     <>
       <Box sx={{ paddingX: 'base.spacing.x4' }}>
@@ -534,7 +555,7 @@ export function SwapForm({ data }: SwapFromProps) {
                 }}
                 size="small"
               >
-                {!loading && swapFromToConversionText}
+                {swapFromToConversionText}
               </Body>
             </Box>
             <SelectInput
