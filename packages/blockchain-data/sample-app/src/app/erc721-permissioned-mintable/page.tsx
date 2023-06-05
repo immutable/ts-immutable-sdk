@@ -8,7 +8,11 @@ import { PageLayout } from '@/components/PageLayout';
 import { Provider, TransactionResponse } from '@ethersproject/providers';
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
+
+console.log('CONTRACT_ADDRESS', CONTRACT_ADDRESS);
 const PRIVATE_KEY = process.env.NEXT_PUBLIC_PRIVATE_KEY!;
+
+console.log('PRIVATE_KEY', PRIVATE_KEY);
 
 interface State {
   isLoading: Boolean;
@@ -81,8 +85,7 @@ export default function ERC721PermissionedMintablePage() {
     const recipient = wallet.address;
 
     // Rather than be executed directly, write functions on the SDK client are returned
-    // as popoulated transactions so that users can implement their own custom workflow logic
-    // regarding transaction signing.
+    // as populated transactions so that users can implement their own transaction signing logic.
     const populatedTransaction = await state.contract.populateMint(
       recipient,
       1,

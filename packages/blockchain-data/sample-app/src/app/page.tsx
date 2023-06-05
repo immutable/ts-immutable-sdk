@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
@@ -9,17 +8,7 @@ import {
   BlockchainDataModuleConfiguration,
 } from '@imtbl/blockchain-data';
 import { PageLayout } from '@/components/PageLayout';
-
-const CHAIN_NAME = 'imtbl-zkevm-devnet-2';
-// const API_URL = 'https://indexer-mr.dev.imtbl.com';
-
-const separator = (url: string) => {
-  return url.includes('?') ? '&' : '?';
-};
-
-const capitalizeFirstLetter = (string: string) => {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-};
+import { capitalizeFirstLetter } from '@/utils';
 
 const endpointDomains = {
   activities: [
