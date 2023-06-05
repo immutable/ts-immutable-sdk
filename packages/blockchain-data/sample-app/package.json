@@ -24,7 +24,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "lint": "next lint",
+    "lint": "eslint ./src --ext .ts --max-warnings=0",
     "start": "next start"
   }
 }
