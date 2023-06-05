@@ -170,7 +170,7 @@ export class ERC721PermissionedMintable {
    */
   public async name(
     provider: Provider,
-    overrides?: CallOverrides,
+    overrides: CallOverrides = {},
   ): Promise<string> {
     return await this.contract.connect(provider).name(overrides);
   }
