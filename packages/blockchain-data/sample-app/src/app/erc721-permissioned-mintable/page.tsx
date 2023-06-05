@@ -8,11 +8,7 @@ import { PageLayout } from '@/components/PageLayout';
 import { Provider, TransactionResponse } from '@ethersproject/providers';
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
-
-console.log('CONTRACT_ADDRESS', CONTRACT_ADDRESS);
 const PRIVATE_KEY = process.env.NEXT_PUBLIC_PRIVATE_KEY!;
-
-console.log('PRIVATE_KEY', PRIVATE_KEY);
 
 interface State {
   isLoading: Boolean;
