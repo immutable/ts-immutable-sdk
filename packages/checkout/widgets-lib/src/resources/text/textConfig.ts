@@ -185,8 +185,12 @@ export const text = {
   drawers: {
     feesBreakdown: {
       heading: 'Fee breakdown',
-      total:
-        'Fees total',
+      total: 'Fees total',
+      fees: {
+        gas: {
+          label: 'Gas fee',
+        },
+      },
     },
   },
 };

@@ -3,6 +3,7 @@ import { TokenInfo } from '@imtbl/checkout-sdk';
 import { feeBoxStyles, feeContainerStyles } from './FeeStyles';
 import { formatZeroAmount, tokenValueFormat } from '../../lib/utils';
 import { FeesBreakdown } from '../FeesBreakdown/FeesBreakdown';
+import { text } from '../../resources/text/textConfig';
 
 interface FeesProps {
   title: string;
@@ -38,7 +39,7 @@ export function Fees({
           totalAmount={formattedTotalValue}
           fees={[
             {
-              label: 'Gas fee',
+              label: text.drawers.feesBreakdown.fees.gas.label,
               fiatAmount: `${fiatPricePrefix} $${gasFeeFiatValue}`,
               amount: formattedTotalValue,
             },
