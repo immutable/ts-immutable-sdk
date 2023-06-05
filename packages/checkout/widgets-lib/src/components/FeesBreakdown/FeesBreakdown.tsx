@@ -1,9 +1,10 @@
 import {
   BottomSheet, Box, Divider,
 } from '@biom3/react';
-import { feeItemContainerStyles } from './FeesBreakdownStyles';
+import { feeItemContainerStyles, feesBreakdownContentStyles } from './FeesBreakdownStyles';
 import { FeeItem } from './FeeItem';
 import { text } from '../../resources/text/textConfig';
+import { FooterLogo } from '../Footer/FooterLogo';
 
 type Fee = {
   label: string;
@@ -33,7 +34,7 @@ export function FeesBreakdown({
       <BottomSheet.Target>
         {children}
       </BottomSheet.Target>
-      <BottomSheet.Content testId="fees-breakdown-content">
+      <BottomSheet.Content testId="fees-breakdown-content" sx={feesBreakdownContentStyles}>
         <Box sx={feeItemContainerStyles}>
           <FeeItem
             key={text.drawers.feesBreakdown.total}
@@ -44,11 +45,12 @@ export function FeesBreakdown({
           />
           <Divider size="xSmall" />
           {
-            fees.map(({ label, amount, fiatAmount }) => (
-              <FeeItem key={label} label={label} amount={amount} fiatAmount={fiatAmount} />
-            ))
-          }
+              fees.map(({ label, amount, fiatAmount }) => (
+                <FeeItem key={label} label={label} amount={amount} fiatAmount={fiatAmount} />
+              ))
+            }
         </Box>
+        <FooterLogo />
       </BottomSheet.Content>
     </BottomSheet>
   );
