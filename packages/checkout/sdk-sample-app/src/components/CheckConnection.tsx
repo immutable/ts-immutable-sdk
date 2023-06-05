@@ -23,7 +23,12 @@ export default function CheckConnection(props: CheckConnectionProps) {
 
   async function checkMyConnection() {
     if (!checkout) {
-      console.error('missing checkout, please connect frist');
+      console.error('missing checkout, please connect first');
+      return;
+    }
+
+    if(!provider){
+      console.error('missing provider, please create provider first or pass one in');
       return;
     }
 
@@ -31,7 +36,7 @@ export default function CheckConnection(props: CheckConnectionProps) {
     setLoading(true);
     try {
       const resp = await checkout.checkIsWalletConnected({
-        providerPreference: ConnectionProviders.METAMASK,
+        provider: provider
       });
       setResult(resp);
       setLoading(false);
@@ -50,7 +55,7 @@ export default function CheckConnection(props: CheckConnectionProps) {
     setResult(undefined);
     setError(null);
     setLoading(false);
-  }, [checkout]);
+  }, [checkout, provider]);
 
   return (
     <div>

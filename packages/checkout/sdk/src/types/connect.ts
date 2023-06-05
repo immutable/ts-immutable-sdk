@@ -9,12 +9,20 @@ export enum ConnectionProviders {
   METAMASK = 'metamask',
 }
 
+export type CreateProviderParams = {
+  providerPreference: ConnectionProviders;
+};
+
+export interface CreateProviderResult {
+  provider: Web3Provider;
+}
+
 /**
  * Interface representing the parameters for {@link Checkout.connect}.
  * @property {ConnectionProviders} providerPreference - The preferred provider to connect to the network.
  */
 export type ConnectParams = {
-  providerPreference: ConnectionProviders;
+  provider: Web3Provider;
 };
 
 /**
@@ -23,7 +31,7 @@ export type ConnectParams = {
  * @property {NetworkInfo} network - Information about the connected network.
  */
 export interface ConnectResult {
-  provider: Web3Provider;
+  // provider: Web3Provider;
   network: NetworkInfo;
 }
 
@@ -32,7 +40,7 @@ export interface ConnectResult {
  * @property {ConnectionProviders} providerPreference - The preferred provider to use to check the connection status to th Web3 network.
  */
 export interface CheckConnectionParams {
-  providerPreference: ConnectionProviders;
+  provider: Web3Provider;
 }
 
 /**

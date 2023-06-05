@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
@@ -8,9 +9,10 @@ import {
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
-  ConnectionProviders,
   ConnectParams,
   ConnectResult,
+  CreateProviderParams,
+  CreateProviderResult,
   GetAllBalancesParams,
   GetAllBalancesResult,
   GetBalanceParams,
@@ -29,7 +31,6 @@ import {
   SwitchNetworkParams,
   SwitchNetworkResult,
 } from './types';
-import { CheckoutError, CheckoutErrorType } from './errors';
 import {
   CheckoutConfiguration,
 } from './config';
@@ -37,10 +38,14 @@ import {
 export class Checkout {
   readonly config: CheckoutConfiguration;
 
-  private providerPreference: ConnectionProviders | undefined;
-
   constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
+  }
+
+  // createProvider is just responsible for creating web3Provider object for preference
+  public async createProvider(params: CreateProviderParams): Promise<CreateProviderResult> {
+    const provider = await connect.getWalletProviderForPreference(params.providerPreference);
+    return { provider };
   }
 
   /**
@@ -54,7 +59,7 @@ export class Checkout {
   public async checkIsWalletConnected(
     params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
-    return connect.checkIsWalletConnected(params.providerPreference);
+    return connect.checkIsWalletConnected(params.provider);
   }
 
   /**
@@ -64,12 +69,12 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async connect(params: ConnectParams): Promise<ConnectResult> {
-    this.providerPreference = params.providerPreference;
-    const provider = await connect.connectWalletProvider(params);
+    const provider = await connect.connectWalletProvider(params.provider);
     const networkInfo = await network.getNetworkInfo(this.config, provider);
 
+    // no need to return provider anymore, just network info
     return {
-      provider,
+      // provider,
       network: networkInfo,
     };
   }
@@ -83,16 +88,8 @@ export class Checkout {
   public async switchNetwork(
     params: SwitchNetworkParams,
   ): Promise<SwitchNetworkResult> {
-    if (!this.providerPreference) {
-      throw new CheckoutError(
-        'connect should be called before switchNetwork to set the provider preference',
-        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR,
-      );
-    }
-
     return await network.switchWalletNetwork(
       this.config,
-      this.providerPreference,
       params.provider,
       params.chainId,
     );

@@ -5,9 +5,9 @@ import { Web3Provider } from '@ethersproject/providers';
 import GetAllBalances from '../components/GetAllBalances';
 import CheckConnection from '../components/CheckConnection';
 import GetAllowList from '../components/GetAllowList';
-import { Body, Divider, Heading, Toggle } from '@biom3/react';
+import { Body, Button, Divider, Heading, Toggle } from '@biom3/react';
 import GetBalance from '../components/GetBalance';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 
 export default function ConnectWidget() {
@@ -23,6 +23,11 @@ export default function ConnectWidget() {
     } else {
       setEnvironment(Environment.PRODUCTION);
     }
+  }
+
+  const handleCreateMetaMask = async () => {
+    const createResult = await checkout.createProvider({providerPreference: ConnectionProviders.METAMASK});
+    setProvider(createResult.provider)
   }
 
   return (
@@ -49,6 +54,16 @@ export default function ConnectWidget() {
         onChange={toggleEnvironment}
       />
 
+    <Divider
+        sx={{
+          marginTop: 'base.spacing.x6',
+          marginBottom: 'base.spacing.x2',
+        }}
+      >
+        Create Provider
+      </Divider>
+        <Button onClick={handleCreateMetaMask}>Create MetaMask Provider</Button>
+
       <Divider
         sx={{
           marginTop: 'base.spacing.x6',
@@ -57,7 +72,7 @@ export default function ConnectWidget() {
       >
         Connect
       </Divider>
-      <Connect checkout={checkout} setProvider={setProvider} />
+      <Connect checkout={checkout} provider={provider} />
 
       <Divider
         sx={{

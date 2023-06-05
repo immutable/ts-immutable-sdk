@@ -3,7 +3,6 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
 import {
   ConnectionProviders,
-  ConnectParams,
   WalletAction,
   CheckConnectionResult,
 } from '../types';
@@ -25,7 +24,7 @@ async function getMetaMaskProvider(): Promise<Web3Provider> {
   return new Web3Provider(provider);
 }
 
-async function getWalletProviderForPreference(
+export async function getWalletProviderForPreference(
   providerPreference: ConnectionProviders,
 ): Promise<Web3Provider> {
   let web3Provider: Web3Provider | null = null;
@@ -44,15 +43,13 @@ async function getWalletProviderForPreference(
 }
 
 export async function checkIsWalletConnected(
-  providerPreference: ConnectionProviders,
+  provider: Web3Provider,
 ): Promise<CheckConnectionResult> {
-  const provider = await getWalletProviderForPreference(providerPreference);
-
   if (!provider.provider?.request) {
     throw new CheckoutError(
       'Incompatible provider',
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
-      { details: `Unsupported provider for ${providerPreference}` },
+      { details: 'Unsupported provider' },
     );
   }
 
@@ -80,23 +77,19 @@ export async function checkIsWalletConnected(
 }
 
 export async function connectWalletProvider(
-  params: ConnectParams,
+  provider: Web3Provider,
 ): Promise<Web3Provider> {
-  const web3Provider = await getWalletProviderForPreference(
-    params.providerPreference,
-  );
-
   await withCheckoutError<void>(
     async () => {
-      if (!web3Provider || !web3Provider?.provider?.request) {
+      if (!provider || !provider?.provider?.request) {
         throw new CheckoutError(
           'Incompatible provider',
           CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
-          { details: `Unsupported provider for ${params.providerPreference}` },
+          { details: 'Unsupported provider' },
         );
       }
       // this makes the request to the wallet to connect i.e request eth accounts ('eth_requestAccounts')
-      await web3Provider.provider.request({
+      await provider.provider.request({
         method: WalletAction.CONNECT,
         params: [],
       });
@@ -104,5 +97,5 @@ export async function connectWalletProvider(
     { type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR },
   );
 
-  return web3Provider;
+  return provider;
 }
