@@ -9,10 +9,8 @@ import {
   NetworkInfo,
   SwitchNetworkResult,
   WalletAction,
-  ConnectionProviders,
   NetworkMap,
 } from '../types';
-import { connectWalletProvider } from '../connect/connect';
 import networkMasterList from './network_master_list.json';
 import { CheckoutConfiguration } from '../config';
 
@@ -86,7 +84,6 @@ export async function getNetworkInfo(
 
 export async function switchWalletNetwork(
   config: CheckoutConfiguration,
-  providerPreference: ConnectionProviders,
   provider: Web3Provider,
   chainId: ChainId,
 ): Promise<SwitchNetworkResult> {
@@ -129,8 +126,7 @@ export async function switchWalletNetwork(
       );
     }
   }
-  currentProvider = await connectWalletProvider({ providerPreference });
-
+  currentProvider = new Web3Provider(currentProvider.provider);
   if ((await currentProvider.getNetwork()).chainId !== chainId) {
     // user didn't actually switch
     throw new CheckoutError(

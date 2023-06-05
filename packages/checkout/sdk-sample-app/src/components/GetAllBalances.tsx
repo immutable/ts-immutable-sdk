@@ -32,7 +32,6 @@ export default function GetAllBalances(props: BalanceProps) {
     const walletAddress = await provider.getSigner().getAddress();
     try {
       const resp = await checkout.getAllBalances({
-        provider,
         walletAddress: walletAddress,
         chainId: ChainId.ETHEREUM,
       });

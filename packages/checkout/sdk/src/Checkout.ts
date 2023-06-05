@@ -1,3 +1,4 @@
+import { Web3Provider } from '@ethersproject/providers';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
@@ -5,25 +6,22 @@ import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
 import {
-  CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
-  ConnectionProviders,
-  ConnectParams,
   ConnectResult,
+  CreateProviderParams,
+  CreateProviderResult,
   GetAllBalancesParams,
   GetAllBalancesResult,
   GetBalanceParams,
   GetBalanceResult,
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
-  GetNetworkParams,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   NetworkInfo,
-  SANDBOX_CONFIGURATION,
   SendTransactionParams,
   SendTransactionResult,
   SwitchNetworkParams,
@@ -37,10 +35,35 @@ import {
 export class Checkout {
   readonly config: CheckoutConfiguration;
 
-  private providerPreference: ConnectionProviders | undefined;
+  private provider: Web3Provider;
 
-  constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
+  constructor(config: CheckoutModuleConfiguration, provider: Web3Provider) {
     this.config = new CheckoutConfiguration(config);
+
+    // check web3provider compatibility in constructor
+    // this means Checkout class 'wraps' the provider and uses it
+    if (!provider || !(provider instanceof Web3Provider)) {
+      throw new CheckoutError(
+        'incompatible provider added, please add a provider',
+        CheckoutErrorType.CHECKOUT_CONSTRUCTION_ERROR,
+      );
+    }
+
+    this.provider = provider;
+  }
+
+  /**
+   * Optional, MP can pass its own web3provider to constructor or use this method to do creation
+   * static method allows us to expose createProvider logic for use before object creation
+   * allows us to provide this experience to end users:
+   * const createResult = await Checkout.createProvider({providerPreference: "metamask"});
+   * const checkout = new Checkout(config, createResult.provider);
+   * @param params
+   * @returns
+   */
+  static async createProvider(params: CreateProviderParams): Promise<CreateProviderResult> {
+    const provider = await connect.getWalletProviderForPreference(params.providerPreference);
+    return { provider };
   }
 
   /**
@@ -51,10 +74,8 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   // eslint-disable-next-line class-methods-use-this
-  public async checkIsWalletConnected(
-    params: CheckConnectionParams,
-  ): Promise<CheckConnectionResult> {
-    return connect.checkIsWalletConnected(params.providerPreference);
+  public async checkIsWalletConnected(): Promise<CheckConnectionResult> {
+    return connect.checkIsWalletConnected(this.provider);
   }
 
   /**
@@ -63,13 +84,13 @@ export class Checkout {
    * @returns Wallet provider and current network information.
    * @throws {@link ErrorType}
    */
-  public async connect(params: ConnectParams): Promise<ConnectResult> {
-    this.providerPreference = params.providerPreference;
-    const provider = await connect.connectWalletProvider(params);
+  public async connect(): Promise<ConnectResult> {
+    const provider = await connect.connectWalletProvider(this.provider);
     const networkInfo = await network.getNetworkInfo(this.config, provider);
 
+    // we do not return provider anymore, it is already set in the constructor
     return {
-      provider,
+      // provider,
       network: networkInfo,
     };
   }
@@ -83,19 +104,18 @@ export class Checkout {
   public async switchNetwork(
     params: SwitchNetworkParams,
   ): Promise<SwitchNetworkResult> {
-    if (!this.providerPreference) {
-      throw new CheckoutError(
-        'connect should be called before switchNetwork to set the provider preference',
-        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR,
-      );
-    }
-
-    return await network.switchWalletNetwork(
+    // switch the provider on this Checkout object, re-wrap and return
+    // we do return the newly wrapped web3provider
+    const switchResult = await network.switchWalletNetwork(
       this.config,
-      this.providerPreference,
-      params.provider,
+      this.provider,
       params.chainId,
     );
+
+    // reset this Checkout objects provider with newly wrapped web3Provider (same underlying but switched network)
+    this.provider = switchResult.provider;
+
+    return switchResult;
   }
 
   /**
@@ -110,12 +130,12 @@ export class Checkout {
     if (!params.contractAddress || params.contractAddress === '') {
       return await balances.getBalance(
         this.config,
-        params.provider,
+        this.provider,
         params.walletAddress,
       );
     }
     return await balances.getERC20Balance(
-      params.provider,
+      this.provider,
       params.walletAddress,
       params.contractAddress,
     );
@@ -133,7 +153,7 @@ export class Checkout {
   ): Promise<GetAllBalancesResult> {
     return balances.getAllBalances(
       this.config,
-      params.provider,
+      this.provider,
       params.walletAddress,
       params.chainId,
     );
@@ -189,16 +209,15 @@ export class Checkout {
   public async sendTransaction(
     params: SendTransactionParams,
   ): Promise<SendTransactionResult> {
-    return await transaction.sendTransaction(params);
+    return await transaction.sendTransaction(this.provider, params.transaction);
   }
 
   /**
    * Get network information about the currently selected network.
-   * @param {GetNetworkParams} params - The necessary data required to get the current network information.
    * @returns Network details.
    * @throws {@link ErrorType}
    */
-  public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
-    return await network.getNetworkInfo(this.config, params.provider);
+  public async getNetworkInfo(): Promise<NetworkInfo> {
+    return await network.getNetworkInfo(this.config, this.provider);
   }
 }

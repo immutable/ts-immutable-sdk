@@ -130,7 +130,7 @@ NetworkDetails
  * @property {ChainId} chainId - The ID of the network to switch to.
  */
 export interface SwitchNetworkParams {
-  provider: Web3Provider;
+  // provider: Web3Provider;
   chainId: ChainId;
 }
 
@@ -148,7 +148,7 @@ export interface SwitchNetworkResult {
  * @property {Web3Provider} provider - The provider to connect to the network.
  */
 export interface GetNetworkParams {
-  provider: Web3Provider;
+  // provider: Web3Provider;
 }
 
 /**

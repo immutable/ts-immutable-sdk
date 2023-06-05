@@ -3,7 +3,7 @@ import {
   Checkout,
   ConnectionProviders,
 } from '@imtbl/checkout-sdk';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import LoadingButton from './LoadingButton';
 import { Web3Provider } from '@ethersproject/providers';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
@@ -21,7 +21,7 @@ export default function CheckConnection(props: CheckConnectionProps) {
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  async function checkMyConnection() {
+  const checkMyConnection = useCallback(async () => {
     if (!checkout) {
       console.error('missing checkout, please connect frist');
       return;
@@ -30,9 +30,7 @@ export default function CheckConnection(props: CheckConnectionProps) {
     setError(null);
     setLoading(true);
     try {
-      const resp = await checkout.checkIsWalletConnected({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
+      const resp = await checkout.checkIsWalletConnected();
       setResult(resp);
       setLoading(false);
     } catch (err: any) {
@@ -43,7 +41,7 @@ export default function CheckConnection(props: CheckConnectionProps) {
       console.log(err.data);
       console.log(err.stack);
     }
-  }
+  },[checkout, provider]);
 
   useEffect(() => {
     // reset state wehn checkout changes from environment switch

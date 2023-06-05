@@ -1,5 +1,4 @@
 import { Web3Provider } from '@ethersproject/providers';
-
 import { NetworkInfo } from './networkInfo';
 
 /**
@@ -7,6 +6,14 @@ import { NetworkInfo } from './networkInfo';
  */
 export enum ConnectionProviders {
   METAMASK = 'metamask',
+}
+
+export interface CreateProviderParams {
+  providerPreference: ConnectionProviders
+}
+
+export interface CreateProviderResult {
+  provider: Web3Provider;
 }
 
 /**
@@ -23,7 +30,6 @@ export type ConnectParams = {
  * @property {NetworkInfo} network - Information about the connected network.
  */
 export interface ConnectResult {
-  provider: Web3Provider;
   network: NetworkInfo;
 }
 
@@ -32,7 +38,7 @@ export interface ConnectResult {
  * @property {ConnectionProviders} providerPreference - The preferred provider to use to check the connection status to th Web3 network.
  */
 export interface CheckConnectionParams {
-  providerPreference: ConnectionProviders;
+  provider: Web3Provider;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
+import { TransactionResponse } from '@ethersproject/providers';
 
 /**
  * Interface representing the parameters for {@link Checkout.sendTransaction}.
@@ -6,7 +6,6 @@ import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
  * @property {Transaction} transaction - The transaction to send.
  */
 export interface SendTransactionParams {
-  provider: Web3Provider;
   transaction: Transaction;
 }
 

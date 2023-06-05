@@ -1,22 +1,21 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutErrorType, withCheckoutError } from '../errors';
 import {
-  SendTransactionParams,
   SendTransactionResult,
+  Transaction,
 } from '../types/transaction';
 
 export const sendTransaction = async (
-  params: SendTransactionParams,
-): Promise<SendTransactionResult> => {
-  const { provider, transaction } = params;
-  return await withCheckoutError<SendTransactionResult>(
-    async () => {
-      const transactionResponse = await provider
-        .getSigner()
-        .sendTransaction(transaction);
-      return {
-        transactionResponse,
-      };
-    },
-    { type: CheckoutErrorType.TRANSACTION_ERROR },
-  );
-};
+  provider: Web3Provider,
+  transaction: Transaction,
+): Promise<SendTransactionResult> => await withCheckoutError<SendTransactionResult>(
+  async () => {
+    const transactionResponse = await provider
+      .getSigner()
+      .sendTransaction(transaction);
+    return {
+      transactionResponse,
+    };
+  },
+  { type: CheckoutErrorType.TRANSACTION_ERROR },
+);

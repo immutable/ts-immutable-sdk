@@ -2,6 +2,7 @@
  * The different types of errors that can be returned by the checkout process.
  */
 export enum CheckoutErrorType {
+  CHECKOUT_CONSTRUCTION_ERROR = 'CHECKOUT_CONSTRUCTION_ERROR',
   PROVIDER_PREFERENCE_ERROR = 'PROVIDER_PREFERENCE_ERROR',
   CONNECT_PROVIDER_ERROR = 'CONNECT_PROVIDER_ERROR',
   GET_BALANCE_ERROR = 'GET_BALANCE_ERROR',
