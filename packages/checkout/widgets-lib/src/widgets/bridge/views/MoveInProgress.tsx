@@ -13,7 +13,7 @@ export function MoveInProgress({ token }: { token: TokenInfo }) {
 
   return (
     <SimpleLayout
-      testId="switch-network-view"
+      testId="move-in-progress-view"
       header={(
         <HeaderNavigation
           transparent
