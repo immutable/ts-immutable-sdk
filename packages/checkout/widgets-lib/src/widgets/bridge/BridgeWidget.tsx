@@ -177,7 +177,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
             />
             )}
             {viewReducerValues.viewState.view.type === BridgeWidgetViews.IN_PROGRESS && (
-            <MoveInProgress token={viewReducerValues.viewState.view.data?.token!} />
+            <MoveInProgress token={viewReducerValues.viewState.view.data.token} />
             )}
             {viewReducerValues.viewState.view.type === BridgeWidgetViews.SUCCESS && (
             <StatusView

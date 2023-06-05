@@ -9,14 +9,16 @@ export enum BridgeWidgetViews {
 
 export type BridgeWidgetView =
   | { type: BridgeWidgetViews.BRIDGE }
-  | {
-    type: BridgeWidgetViews.IN_PROGRESS,
-    data?: { token: TokenInfo }
-  }
+  | BridgeInProgressView
   | { type: BridgeWidgetViews.SUCCESS }
   | BridgeFailView;
 
 interface BridgeFailView {
   type: BridgeWidgetViews.FAIL;
   reason: string;
+}
+
+interface BridgeInProgressView {
+  type: BridgeWidgetViews.IN_PROGRESS;
+  data: { token: TokenInfo };
 }
