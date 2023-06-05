@@ -8,6 +8,7 @@ import {
   BlockchainData,
   BlockchainDataModuleConfiguration,
 } from '@imtbl/blockchain-data';
+import { PageLayout } from '@/components/PageLayout';
 
 const CHAIN_NAME = 'imtbl-zkevm-devnet-2';
 // const API_URL = 'https://indexer-mr.dev.imtbl.com';
@@ -446,18 +447,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="flex min-h-screen flex-col p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <Image
-          src="https://assets-global.website-files.com/646557ee455c3e16e4a9bcb3/646557ee455c3e16e4a9bcbe_immutable-logo.svg"
-          alt="Vercel Logo"
-          className="dark:invert"
-          width={190}
-          height={48}
-          priority
-        />
-      </div>
-
+    <PageLayout>
       <div className="lg:mb-0 my-6 flex space-x-6">
         <div className="flex flex-col">
           {Object.keys(endpointDomains).map((key) => {
@@ -492,6 +482,6 @@ export default function Home() {
           </pre>
         </div>
       </div>
-    </main>
+    </PageLayout>
   );
 }

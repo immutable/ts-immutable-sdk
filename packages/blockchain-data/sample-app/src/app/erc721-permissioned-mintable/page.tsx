@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ERC721PermissionedMintable } from '@imtbl/erc721-permissioned-mintable';
+import { PageLayout } from '@/components/PageLayout';
 
 const CONTRACT_ADDRESS = '0x9A48B1B27743d807331d06eCF0bFb15c06fDb58D';
 
@@ -52,18 +53,20 @@ export default function ERC721PermissionedMintablePage() {
   }, []);
 
   return (
-    <div>
-      <h2>{`Contract address: ${CONTRACT_ADDRESS}`}</h2>
+    <PageLayout>
       <div>
-        {state.isLoading ? (
-          <p>Loading...</p>
-        ) : (
-          <div>
-            <h1>ERC721PermissionedMintable</h1>
-            <code>{state.response}</code>
-          </div>
-        )}
+        <h2>{`Contract address: ${CONTRACT_ADDRESS}`}</h2>
+        <div>
+          {state.isLoading ? (
+            <p>Loading...</p>
+          ) : (
+            <div>
+              <h1>ERC721PermissionedMintable</h1>
+              <code>{state.response}</code>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }
