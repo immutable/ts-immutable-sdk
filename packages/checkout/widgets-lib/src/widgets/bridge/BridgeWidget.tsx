@@ -30,6 +30,7 @@ import { Bridge } from './views/Bridge';
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import { MoveInProgress } from './views/MoveInProgress';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -174,6 +175,9 @@ export function BridgeWidget(props: BridgeWidgetProps) {
               amount={amount}
               fromContractAddress={fromContractAddress}
             />
+            )}
+            {viewReducerValues.viewState.view.type === BridgeWidgetViews.IN_PROGRESS && (
+            <MoveInProgress token={viewReducerValues.viewState.view.data?.token!} />
             )}
             {viewReducerValues.viewState.view.type === BridgeWidgetViews.SUCCESS && (
             <StatusView

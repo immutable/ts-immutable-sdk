@@ -179,7 +179,12 @@ export function BridgeForm(props: BridgeFormProps) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: BridgeWidgetViews.SUCCESS },
+          view: {
+            type: BridgeWidgetViews.IN_PROGRESS,
+            data: {
+              token: token?.token!,
+            },
+          },
         },
       });
     } catch (err: any) {
