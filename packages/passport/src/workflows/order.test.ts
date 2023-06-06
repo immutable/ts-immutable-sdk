@@ -3,13 +3,16 @@ import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { cancelOrder, createOrder } from './order';
 import { ConfirmationScreen, TransactionTypes } from '../confirmation';
+import { validateWithGuardian } from './guardian';
 
 jest.mock('../confirmation/confirmation');
+jest.mock('./guardian');
 
 describe('order', () => {
   afterEach(jest.resetAllMocks);
 
   const mockConfirmationScreen = new ConfirmationScreen({} as any);
+  const mockGuardianDomain = 'http://mockGuardianDomain.com';
 
   const mockStarkSigner = {
     signMessage: jest.fn(),
@@ -105,9 +108,6 @@ describe('order', () => {
 
       getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
-      (mockConfirmationScreen.startTransaction as jest.Mock).mockResolvedValue({
-        confirmed: true,
-      });
       createOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
@@ -117,20 +117,16 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: orderRequest as UnsignedOrderRequest,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       });
 
       expect(getSignableCreateOrderMock).toBeCalledWith(
         mockSignableOrderRequest,
+        mockHeader,
       );
+      expect(validateWithGuardian).toBeCalledTimes(1);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUser.accessToken,
-        {
-          transactionType: TransactionTypes.createOrder,
-          transactionData: expect.any(Object),
-        },
-      );
       expect(createOrderMock).toBeCalledWith(
         mockCreateOrderRequest,
         mockHeader,
@@ -146,6 +142,7 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: orderRequest as UnsignedOrderRequest,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
         new PassportError(
@@ -175,25 +172,16 @@ describe('order', () => {
 
       getSignableCreateOrderMock.mockResolvedValue(mockSignableOrderResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
-      (mockConfirmationScreen.startTransaction as jest.Mock).mockResolvedValue({
-        confirmed: true,
-      });
 
       await expect(() => createOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: orderRequest as UnsignedOrderRequest,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('CREATE_ORDER_ERROR');
-
-      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUser.accessToken,
-        {
-          transactionType: TransactionTypes.createOrder,
-          transactionData: expect.any(Object),
-        },
-      );
+      expect(validateWithGuardian).toBeCalledTimes(1);
     });
   });
 
@@ -265,6 +253,7 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       });
 
@@ -311,6 +300,7 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('CANCEL_ORDER_ERROR');
 
@@ -331,6 +321,7 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
         new PassportError(
