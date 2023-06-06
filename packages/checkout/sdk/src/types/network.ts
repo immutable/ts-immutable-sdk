@@ -1,5 +1,4 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { ProviderParams } from './provider';
 import { TokenInfo } from './tokenInfo';
 import { ChainId } from './chainId';
 import { NetworkInfo } from './networkInfo';
@@ -130,7 +129,8 @@ NetworkDetails
  * @property {Web3Provider} provider - The provider to connect to the network.
  * @property {ChainId} chainId - The ID of the network to switch to.
  */
-export interface SwitchNetworkParams extends ProviderParams {
+export interface SwitchNetworkParams {
+  provider: Web3Provider;
   chainId: ChainId;
 }
 
@@ -147,7 +147,9 @@ export interface SwitchNetworkResult {
  * * Interface representing the parameters for {@link Checkout.getNetworkInfo}.
  * @property {Web3Provider} provider - The provider to connect to the network.
  */
-export interface GetNetworkParams extends ProviderParams {}
+export interface GetNetworkParams {
+  provider: Web3Provider;
+}
 
 /**
  * Enum representing the types of filters that can be applied to get the allow list of networks.

@@ -1,16 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
-import {
-  Providers,
-  CurrentProviderInfo,
-  CachedProvider,
-  ProviderParams,
-} from '../types';
-import { CheckoutError, CheckoutErrorType } from '../errors';
+import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { CheckoutConfiguration } from '../config';
+import { NetworkInfo, ValidateProviderOptions, validateProviderDefaults } from '../types';
+import { getNetworkInfo } from '../network';
 
 export function isWeb3Provider(
-  provider: Web3Provider | CachedProvider | undefined,
+  provider: Web3Provider,
 ): boolean {
   if (provider && provider instanceof Web3Provider) {
     return true;
@@ -19,7 +15,7 @@ export function isWeb3Provider(
 }
 
 export function isCachedProvider(
-  provider: Web3Provider | CachedProvider | undefined,
+  provider: Web3Provider,
 ): boolean {
   if (provider && !(provider instanceof Web3Provider)) {
     const { chainId, name } = provider;
@@ -30,63 +26,71 @@ export function isCachedProvider(
   return false;
 }
 
-// @NOTE - This is split out from the main provider file to avoid circular dependencies
+// this gives us access to the properties of the underlying provider object
+export function getUnderlyingChainId(provider:Web3Provider) {
+  const providerProxy = new Proxy(provider.provider, {
+    get(target:any, property:any) {
+      return target[property];
+    },
+  });
+  return parseInt(providerProxy.chainId, 16);
+}
 
-export async function getWeb3Provider(
+export async function validateProvider(
   config: CheckoutConfiguration,
-  params: ProviderParams,
-  currentProviderInfo: CurrentProviderInfo,
-  allProviders: Providers,
-  allowUnsupportedNetworks: boolean = true,
+  parsedProvider: Web3Provider,
+  parsedOptions?: ValidateProviderOptions,
 ): Promise<Web3Provider> {
-  const { provider } = params;
+  return withCheckoutError(
+    async () => {
+      if (!isWeb3Provider(parsedProvider)) {
+        throw new CheckoutError(
+          'Parsed provider is not a valid Web3Provider',
+          CheckoutErrorType.WEB3_PROVIDER_ERROR,
+        );
+      }
 
-  // if they've supplied a web3provider, use it
-  if (isWeb3Provider(provider)) {
-    // TODO: is the provider on a supported network
-    if (allowUnsupportedNetworks === false && currentProviderInfo.network && !currentProviderInfo.network.isSupported) {
-      throw new CheckoutError(
-        'Your current network is not supported, please switch network',
-        CheckoutErrorType.WEB3_PROVIDER_ERROR,
-      );
-    }
-    return provider as Web3Provider;
-  }
+      // this sets the default options and overrides them with any parsed options
+      const options = {
+        ...validateProviderDefaults,
+        ...parsedOptions,
+      };
 
-  if (!allProviders) {
-    throw new CheckoutError(
-      'Checkout.setProvider({Web3Provider, Name}) needs to be called to set the providers for all available networks.',
-      CheckoutErrorType.PROVIDER_ERROR,
-    );
-  }
+      const underlyingChainId = getUnderlyingChainId(parsedProvider);
 
-  // if we've already cloned the providers use the cached one they're requesting
-  if (isCachedProvider(provider) && allProviders) {
-    const { chainId, name } = provider as CachedProvider;
-    if (allProviders[name] && allProviders[name][chainId]) {
-      return allProviders[name][chainId];
-    }
-  }
+      // this is only used for the switch network check currently
+      // without this you can't switch to a valid network if you changed it manually
+      // since the underlying provider's chainId is mismatching the web3provider network
+      let provider:Web3Provider;
+      if (parsedProvider.network.chainId !== underlyingChainId && options.fixMixmatchedChain) {
+        provider = new Web3Provider(parsedProvider.provider, underlyingChainId);
+      } else {
+        provider = parsedProvider;
+      }
 
-  // TODO: is the provider on a supported network
-  if (allowUnsupportedNetworks === false && currentProviderInfo.network && !currentProviderInfo.network.isSupported) {
-    throw new CheckoutError(
-      'Your current network is not supported, please switch network',
-      CheckoutErrorType.WEB3_PROVIDER_ERROR,
-    );
-  }
+      let networkInfo:NetworkInfo;
+      try {
+        // this tests the underlying network hasn't been manually changed
+        networkInfo = await getNetworkInfo(config, provider);
+      } catch (err) {
+        throw new CheckoutError(
+          'Your wallet has changed network, please switch to a supported network',
+          CheckoutErrorType.WEB3_PROVIDER_ERROR,
+        );
+      }
 
-  // otherwise use the current provider as set in the Checkout class
-  if (allProviders && currentProviderInfo.name && currentProviderInfo.network) {
-    const { name, network } = currentProviderInfo;
-    const { chainId } = network;
-    if (allProviders[name] && allProviders[name][chainId]) {
-      return allProviders[name][chainId];
-    }
-  }
-
-  throw new CheckoutError(
-    'unable to retrieve a valid web3Provider',
-    CheckoutErrorType.WEB3_PROVIDER_ERROR,
+      if (!networkInfo.isSupported) {
+        if (options.allowUnsupportedProvider === false) {
+          throw new CheckoutError(
+            'Your current network is not supported, please switch network',
+            CheckoutErrorType.WEB3_PROVIDER_ERROR,
+          );
+        }
+      }
+      return provider;
+    },
+    {
+      type: CheckoutErrorType.WEB3_PROVIDER_ERROR,
+    },
   );
 }

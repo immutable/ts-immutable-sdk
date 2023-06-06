@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { ProviderParams } from './provider';
+import { Web3Provider } from '@ethersproject/providers';
 import { ChainId } from './chainId';
 import { TokenInfo } from './tokenInfo';
 
@@ -8,7 +8,8 @@ import { TokenInfo } from './tokenInfo';
  * @property {string} walletAddress - The wallet address.
  * @property {string | undefined} contractAddress - The contract address of the token.
  */
-export interface GetBalanceParams extends ProviderParams {
+export interface GetBalanceParams {
+  provider: Web3Provider;
   walletAddress: string;
   contractAddress?: string;
 }
@@ -30,7 +31,8 @@ export interface GetBalanceResult {
  * @property {string} walletAddress - The wallet address.
  * @property {ChainId} chainId - The ID of the network.
  */
-export interface GetAllBalancesParams extends ProviderParams {
+export interface GetAllBalancesParams {
+  provider: Web3Provider;
   walletAddress: string;
   chainId: ChainId;
 }

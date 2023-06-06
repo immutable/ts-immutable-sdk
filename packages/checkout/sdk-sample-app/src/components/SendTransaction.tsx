@@ -57,36 +57,33 @@ export default function SendTransaction(props: SendTransactionProps) {
     setError(null);
     setLoading(true);
 
-    const resp = await checkout.checkIsWalletConnected({
-      provider,
-    });
-
-    const transaction = {
-      from: resp.walletAddress, // The user's active address.
-      to: '0x72E45FF29bcF2C8640a025585A4fB58cC2dd1bfb', // Required except during contract publications.
-      value: utils.parseUnits('0.0001', 'ether').toHexString()
-    }
-
-
-    // try {
-    //   const tx = await defaultProvider.web3Provider.getSigner().sendTransaction(transaction)
-    //   console.log(tx)
-    // } catch(err) {
-    //   console.log('err', err)
-
-    // }
-
     try {
-      const resp = await checkout.sendTransaction({
+      const resp = await checkout.checkIsWalletConnected({
         provider,
-        transaction,
       });
-
-      console.log('resp', resp)
-      // setProvider(resp.provider);
-      // setResult(resp.network);
-      setLoading(false);
-    } catch (err: any) {
+      const transaction = {
+        from: resp.walletAddress, // The user's active address.
+        to: '0x72E45FF29bcF2C8640a025585A4fB58cC2dd1bfb', // Required except during contract publications.
+        value: utils.parseUnits('0.0001', 'ether').toHexString()
+      }
+  
+      try {
+        const resp = await checkout.sendTransaction({
+          provider,
+          transaction,
+        });
+  
+        console.log('resp', resp)
+        setLoading(false);
+      } catch (err: any) {
+        setError(err);
+        setLoading(false);
+        console.log(err.message);
+        console.log(err.type);
+        console.log(err.data);
+        console.log(err.stack);
+      }
+    } catch(err: any) {
       setError(err);
       setLoading(false);
       console.log(err.message);
@@ -94,6 +91,9 @@ export default function SendTransaction(props: SendTransactionProps) {
       console.log(err.data);
       console.log(err.stack);
     }
+  
+
+    
   }
 
   return (

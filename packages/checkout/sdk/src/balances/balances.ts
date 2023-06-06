@@ -5,12 +5,11 @@ import {
   ERC20ABI,
   GetAllBalancesResult,
   GetBalanceResult,
-  NetworkFilterTypes,
   TokenFilterTypes,
   TokenInfo,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
-import { getNetworkAllowList, getNetworkInfo } from '../network';
+import { getNetworkInfo } from '../network';
 import { getTokenAllowList } from '../tokens';
 import { CheckoutConfiguration } from '../config';
 
@@ -81,25 +80,6 @@ export const getAllBalances = async (
   walletAddress: string,
   chainId: ChainId,
 ): Promise<GetAllBalancesResult> => {
-  const allowedNetworks = await getNetworkAllowList(config, {
-    type: NetworkFilterTypes.ALL,
-  });
-
-  if (
-    !allowedNetworks.networks.some((network) => network.chainId === chainId)
-  ) {
-    throw new CheckoutError(
-      `Chain:${chainId} is not a supported chain`,
-      CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
-    );
-  }
-  if (!provider.provider?.request) {
-    throw new CheckoutError(
-      'provider object is missing request function',
-      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
-    );
-  }
-
   const tokenList = await getTokenAllowList({
     type: TokenFilterTypes.ALL,
     chainId,

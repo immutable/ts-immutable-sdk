@@ -14,7 +14,6 @@ import {
   ConnectResult,
   CreateProviderParams,
   CreateProviderResult,
-  CurrentProviderInfo,
   GetAllBalancesParams,
   GetAllBalancesResult,
   GetBalanceParams,
@@ -27,28 +26,20 @@ import {
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   NetworkInfo,
-  Providers,
   SANDBOX_CONFIGURATION,
   SendTransactionParams,
   SendTransactionResult,
-  SetProviderParams,
-  SetProviderResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
+  ValidateProviderOptions,
 } from './types';
 import { CheckoutConfiguration } from './config';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
 
-  private allProviders: Providers;
-
-  private currentProviderInfo: CurrentProviderInfo;
-
   constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
-    this.currentProviderInfo = {};
-    this.allProviders = {};
   }
 
   public async createDefaultProvider(
@@ -59,37 +50,7 @@ export class Checkout {
       params.providerName,
     );
     return {
-      web3Provider,
-      name: params.providerName,
-    };
-  }
-
-  public async getProviders() {
-    return {
-      providers: this.allProviders,
-    };
-  }
-
-  public async getCurrentProvider() {
-    return {
-      currentProviderInfo: this.currentProviderInfo,
-    };
-  }
-
-  public async setProvider(
-    params: SetProviderParams,
-  ): Promise<SetProviderResult> {
-    const { providers, networkInfo } = await provider.cloneProviders(
-      this.config,
-      params,
-    );
-    this.currentProviderInfo.name = params.name;
-    this.currentProviderInfo.network = networkInfo;
-    this.allProviders = providers;
-
-    return {
-      providers: this.allProviders,
-      currentProviderInfo: this.currentProviderInfo,
+      provider: web3Provider,
     };
   }
 
@@ -104,11 +65,10 @@ export class Checkout {
   public async checkIsWalletConnected(
     params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
-    const web3Provider = await provider.getWeb3Provider(
+    const web3Provider = await provider.validateProvider(
       this.config,
-      params,
-      this.currentProviderInfo,
-      this.allProviders,
+      params.provider,
+      { allowUnsupportedProvider: true } as ValidateProviderOptions,
     );
     return connect.checkIsWalletConnected(web3Provider);
   }
@@ -119,12 +79,11 @@ export class Checkout {
    * @returns Wallet provider and current network information.
    * @throws {@link ErrorType}
    */
-  public async connect(params: ConnectParams = {}): Promise<ConnectResult> {
-    const web3Provider = await provider.getWeb3Provider(
+  public async connect(params: ConnectParams): Promise<ConnectResult> {
+    const web3Provider = await provider.validateProvider(
       this.config,
-      params,
-      this.currentProviderInfo,
-      this.allProviders,
+      params.provider,
+      { allowUnsupportedProvider: true } as ValidateProviderOptions,
     );
     await connect.connectSite({ web3Provider });
     const networkInfo = await network.getNetworkInfo(this.config, web3Provider);
@@ -144,22 +103,17 @@ export class Checkout {
   public async switchNetwork(
     params: SwitchNetworkParams,
   ): Promise<SwitchNetworkResult> {
-    const web3Provider = await provider.getWeb3Provider(
+    const web3Provider = await provider.validateProvider(
       this.config,
-      params,
-      this.currentProviderInfo,
-      this.allProviders,
+      params.provider,
+      { allowUnsupportedProvider: true, fixMixmatchedChain: true } as ValidateProviderOptions,
     );
 
     const switchNetworkRes = await network.switchWalletNetwork(
       this.config,
       web3Provider,
       params.chainId,
-      this.currentProviderInfo,
-      this.allProviders,
     );
-
-    this.currentProviderInfo.network = switchNetworkRes.network;
 
     return switchNetworkRes;
   }
@@ -173,11 +127,9 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
-    const web3Provider = await provider.getWeb3Provider(
+    const web3Provider = await provider.validateProvider(
       this.config,
-      params,
-      this.currentProviderInfo,
-      this.allProviders,
+      params.provider,
     );
 
     if (!params.contractAddress || params.contractAddress === '') {
@@ -204,11 +156,9 @@ export class Checkout {
   public async getAllBalances(
     params: GetAllBalancesParams,
   ): Promise<GetAllBalancesResult> {
-    const web3Provider = await provider.getWeb3Provider(
+    const web3Provider = await provider.validateProvider(
       this.config,
-      params,
-      this.currentProviderInfo,
-      this.allProviders,
+      params.provider,
     );
 
     return balances.getAllBalances(
@@ -269,17 +219,15 @@ export class Checkout {
   public async sendTransaction(
     params: SendTransactionParams,
   ): Promise<SendTransactionResult> {
-    const web3Provider = await provider.getWeb3Provider(
+    const web3Provider = await provider.validateProvider(
       this.config,
-      params,
-      this.currentProviderInfo,
-      this.allProviders,
-      false,
+      params.provider,
     );
-    return await transaction.sendTransaction({
+    return await transaction.sendTransaction(
+      this.config,
       web3Provider,
-      transaction: params.transaction,
-    });
+      params.transaction,
+    );
   }
 
   /**
@@ -289,11 +237,11 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
-    const web3Provider = await provider.getWeb3Provider(
+    const web3Provider = await provider.validateProvider(
       this.config,
-      params,
-      this.currentProviderInfo,
-      this.allProviders,
+      params.provider,
+      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+
     );
     return await network.getNetworkInfo(this.config, web3Provider);
   }

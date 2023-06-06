@@ -19,6 +19,14 @@ export default function Connect(props: ConnectProps) {
   const [loading, setLoading] = useState<boolean>(false);
 
   async function connectClick() {
+    if (!checkout) {
+      console.error('missing checkout, please connect frist');
+      return;
+    }
+    if (!provider) {
+      console.error('missing provider, please connect frist');
+      return;
+    }
     setError(null);
     setLoading(true);
     try {

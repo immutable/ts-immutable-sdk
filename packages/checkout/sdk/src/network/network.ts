@@ -10,12 +10,9 @@ import {
   SwitchNetworkResult,
   WalletAction,
   NetworkMap,
-  CurrentProviderInfo,
-  Providers,
 } from '../types';
 import networkMasterList from './network_master_list.json';
 import { CheckoutConfiguration } from '../config';
-import { getWeb3Provider } from '../provider/web3provider';
 
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 
@@ -128,10 +125,7 @@ export async function switchWalletNetwork(
   config: CheckoutConfiguration,
   web3Provider: Web3Provider,
   chainId: ChainId,
-  currentProviderInfo: CurrentProviderInfo,
-  allProviders: Providers,
 ): Promise<SwitchNetworkResult> {
-  const currentProvider = web3Provider;
   const { networkMap } = config;
 
   const allowedNetworks = await getNetworkAllowList(config, {
@@ -147,7 +141,7 @@ export async function switchWalletNetwork(
     );
   }
 
-  if (!currentProvider || !currentProvider.provider?.request) {
+  if (!web3Provider || !web3Provider.provider?.request) {
     throw new CheckoutError(
       'Incompatible provider',
       CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
@@ -157,11 +151,11 @@ export async function switchWalletNetwork(
 
   // WT-1146 - Refer to the README in this folder for explantion on the switch network flow
   try {
-    await switchNetworkInWallet(networkMap, currentProvider, chainId);
+    await switchNetworkInWallet(networkMap, web3Provider, chainId);
   } catch (err: any) {
     if (err.code === UNRECOGNISED_CHAIN_ERROR_CODE) {
       try {
-        await addNetworkToWallet(networkMap, currentProvider, chainId);
+        await addNetworkToWallet(networkMap, web3Provider, chainId);
         // eslint-disable-next-line @typescript-eslint/no-shadow
       } catch (err: any) {
         throw new CheckoutError(
@@ -177,19 +171,7 @@ export async function switchWalletNetwork(
     }
   }
 
-  const getW3Params = {
-    provider: {
-      name: currentProviderInfo.name!,
-      chainId,
-    },
-  };
-
-  const newProvider = await getWeb3Provider(
-    config,
-    getW3Params,
-    currentProviderInfo,
-    allProviders,
-  );
+  const newProvider = new Web3Provider(web3Provider.provider);
 
   let networkInfo: NetworkInfo;
   try {
