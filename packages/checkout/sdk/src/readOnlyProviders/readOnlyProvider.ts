@@ -15,13 +15,9 @@ export async function createReadOnlyProviders(
     type: NetworkFilterTypes.ALL,
   });
 
-  const sepoliaUrlWithKey = 'https://eth-sepolia.g.alchemy.com/v2/3zIddNTJnsDVa7afu0WIrKk2DAY_dx3u';
-
   allowedNetworks.networks.forEach((networkInfo) => {
     const rpcUrl = config.networkMap.get(networkInfo.chainId)?.rpcUrls[0];
-    const provider = new ethers.providers.JsonRpcProvider(
-      networkInfo.chainId === ChainId.SEPOLIA ? sepoliaUrlWithKey : rpcUrl,
-    );
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
     readOnlyProviders.set(networkInfo.chainId, provider);
   });
 
