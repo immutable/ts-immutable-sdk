@@ -13,6 +13,11 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+export * from './domain/activities-api';
+export * from './domain/chains-api';
+export * from './domain/collections-api';
+export * from './domain/nft-owners-api';
+export * from './domain/nfts-api';
+export * from './domain/orders-api';
+

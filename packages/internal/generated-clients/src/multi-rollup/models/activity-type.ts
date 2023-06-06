@@ -13,6 +13,21 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * The activity type
+ * @export
+ * @enum {string}
+ */
+
+export const ActivityType = {
+    Mint: 'mint',
+    Burn: 'burn',
+    Transfer: 'transfer',
+    Sale: 'sale'
+} as const;
+
+export type ActivityType = typeof ActivityType[keyof typeof ActivityType];
+
+
+

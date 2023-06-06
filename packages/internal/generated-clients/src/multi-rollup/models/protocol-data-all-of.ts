@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface ProtocolDataAllOf
+ */
+export interface ProtocolDataAllOf {
+    /**
+     * Operator signature signed by orderbook
+     * @type {string}
+     * @memberof ProtocolDataAllOf
+     */
+    'operator_signature': string;
+}
+

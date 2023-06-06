@@ -13,6 +13,19 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * The contract type
+ * @export
+ * @enum {string}
+ */
+
+export const ContractType = {
+    Erc721: 'ERC721',
+    Erc20: 'ERC20'
+} as const;
+
+export type ContractType = typeof ContractType[keyof typeof ContractType];
+
+
+

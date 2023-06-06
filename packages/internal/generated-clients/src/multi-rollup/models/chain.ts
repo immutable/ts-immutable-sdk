@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * The chain details
+ * @export
+ * @interface Chain
+ */
+export interface Chain {
+    /**
+     * The id of chain
+     * @type {string}
+     * @memberof Chain
+     */
+    'id': string;
+    /**
+     * The name of chain
+     * @type {string}
+     * @memberof Chain
+     */
+    'name': string;
+}
+

@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * The collection contract type
+ * @export
+ * @enum {string}
+ */
+
+export const CollectionContractType = {
+    Erc721: 'ERC721'
+} as const;
+
+export type CollectionContractType = typeof CollectionContractType[keyof typeof CollectionContractType];
+
+
+

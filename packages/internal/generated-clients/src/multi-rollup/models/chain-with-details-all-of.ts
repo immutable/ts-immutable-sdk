@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface ChainWithDetailsAllOf
+ */
+export interface ChainWithDetailsAllOf {
+    /**
+     * URL for RPC node
+     * @type {string}
+     * @memberof ChainWithDetailsAllOf
+     */
+    'rpc_url': string | null;
+}
+

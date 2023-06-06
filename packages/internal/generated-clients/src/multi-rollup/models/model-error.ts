@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * Resource not found
+ * @export
+ * @interface ModelError
+ */
+export interface ModelError {
+    /**
+     * Error trace id
+     * @type {string}
+     * @memberof ModelError
+     */
+    'id'?: string;
+    /**
+     * Error message
+     * @type {string}
+     * @memberof ModelError
+     */
+    'message': string;
+}
+
