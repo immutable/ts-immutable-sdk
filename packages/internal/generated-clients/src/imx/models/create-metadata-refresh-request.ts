@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface CreateMetadataRefreshRequest
+ */
+export interface CreateMetadataRefreshRequest {
+    /**
+     * The collection contract address
+     * @type {string}
+     * @memberof CreateMetadataRefreshRequest
+     */
+    'collection_address': string;
+    /**
+     * The tokens to refresh
+     * @type {Array<string>}
+     * @memberof CreateMetadataRefreshRequest
+     */
+    'token_ids': Array<string>;
+}
+

@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface CancelOrderRequest
+ */
+export interface CancelOrderRequest {
+    /**
+     * ID of the order
+     * @type {number}
+     * @memberof CancelOrderRequest
+     */
+    'order_id': number;
+    /**
+     * Payload signature
+     * @type {string}
+     * @memberof CancelOrderRequest
+     */
+    'stark_signature': string;
+}
+

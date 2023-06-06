@@ -13,6 +13,15 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+// May contain unused imports in some cases
+// @ts-ignore
+import { SignableToken } from './signable-token';
+
+/**
+ * @type GetSignableWithdrawalRequestToken
+ * Token to withdraw
+ * @export
+ */
+export type GetSignableWithdrawalRequestToken = SignableToken;
+
+

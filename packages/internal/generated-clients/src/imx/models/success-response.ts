@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface SuccessResponse
+ */
+export interface SuccessResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof SuccessResponse
+     */
+    'result': string;
+}
+

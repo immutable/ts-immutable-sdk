@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface ContractCreateResponse
+ */
+export interface ContractCreateResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ContractCreateResponse
+     */
+    'webhook_hash'?: string;
+}
+

@@ -13,6 +13,15 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+// May contain unused imports in some cases
+// @ts-ignore
+import { TradeSide } from './trade-side';
+
+/**
+ * @type TradeB
+ * Side B of this trade (the sell order)
+ * @export
+ */
+export type TradeB = TradeSide;
+
+

@@ -13,6 +13,15 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+// May contain unused imports in some cases
+// @ts-ignore
+import { FeeInfo } from './fee-info';
+
+/**
+ * @type CreateTradeRequestV1FeeInfo
+ * Fee details
+ * @export
+ */
+export type CreateTradeRequestV1FeeInfo = FeeInfo;
+
+

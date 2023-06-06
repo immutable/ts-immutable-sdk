@@ -13,6 +13,15 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+// May contain unused imports in some cases
+// @ts-ignore
+import { FeeInfo } from './fee-info';
+
+/**
+ * @type GetSignableOrderResponseFeeInfo
+ * Fee information
+ * @export
+ */
+export type GetSignableOrderResponseFeeInfo = FeeInfo;
+
+

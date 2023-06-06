@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+// May contain unused imports in some cases
+// @ts-ignore
+import { OrderFeeInfo } from './order-fee-info';
+// May contain unused imports in some cases
+// @ts-ignore
+import { OrdersMakerTakerFee } from './orders-maker-taker-fee';
+
+/**
+ * @type OrderV3MakerFees
+ * MakerFees is the information about the fees that needs to be paid by the maker (liquidity)
+ * @export
+ */
+export type OrderV3MakerFees = OrdersMakerTakerFee;
+
+

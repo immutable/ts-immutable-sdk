@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface AggregateLimit
+ */
+export interface AggregateLimit {
+    /**
+     * Max transaction amount
+     * @type {number}
+     * @memberof AggregateLimit
+     */
+    'max_amount'?: number;
+    /**
+     * Min transaction amount
+     * @type {number}
+     * @memberof AggregateLimit
+     */
+    'min_amount'?: number;
+}
+

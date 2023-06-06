@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface NftprimarytransactionWidgetParams
+ */
+export interface NftprimarytransactionWidgetParams {
+    /**
+     * enums(light, dark)
+     * @type {string}
+     * @memberof NftprimarytransactionWidgetParams
+     */
+    'theme'?: string;
+}
+

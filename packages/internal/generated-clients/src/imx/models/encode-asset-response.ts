@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface EncodeAssetResponse
+ */
+export interface EncodeAssetResponse {
+    /**
+     * Stark encoded asset id
+     * @type {string}
+     * @memberof EncodeAssetResponse
+     */
+    'asset_id': string;
+    /**
+     * Stark encoded asset type
+     * @type {string}
+     * @memberof EncodeAssetResponse
+     */
+    'asset_type': string;
+}
+

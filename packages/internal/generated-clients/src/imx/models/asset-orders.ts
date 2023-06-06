@@ -13,6 +13,15 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+// May contain unused imports in some cases
+// @ts-ignore
+import { OrderDetails } from './order-details';
+
+/**
+ * @type AssetOrders
+ * [DEPRECATED] Open orders for this asset will always return empty. Use GET /orders
+ * @export
+ */
+export type AssetOrders = OrderDetails;
+
+

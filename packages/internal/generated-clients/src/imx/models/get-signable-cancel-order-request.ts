@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface GetSignableCancelOrderRequest
+ */
+export interface GetSignableCancelOrderRequest {
+    /**
+     * ID of the order to be cancelled
+     * @type {number}
+     * @memberof GetSignableCancelOrderRequest
+     */
+    'order_id': number;
+}
+
