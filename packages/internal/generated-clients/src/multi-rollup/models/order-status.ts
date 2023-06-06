@@ -13,6 +13,23 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * The Order status
+ * @export
+ * @enum {string}
+ */
+
+export const OrderStatus = {
+    Pending: 'PENDING',
+    Active: 'ACTIVE',
+    Inactive: 'INACTIVE',
+    Filled: 'FILLED',
+    Cancelled: 'CANCELLED',
+    Expired: 'EXPIRED'
+} as const;
+
+export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
+
+
+

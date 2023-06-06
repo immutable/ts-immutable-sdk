@@ -13,6 +13,21 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+// May contain unused imports in some cases
+// @ts-ignore
+import { Collection } from './collection';
+
+/**
+ * Single Collection
+ * @export
+ * @interface GetCollectionResult
+ */
+export interface GetCollectionResult {
+    /**
+     * 
+     * @type {Collection}
+     * @memberof GetCollectionResult
+     */
+    'result': Collection;
+}
+

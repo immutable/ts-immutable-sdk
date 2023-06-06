@@ -13,6 +13,17 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+// May contain unused imports in some cases
+// @ts-ignore
+import { APIError404AllOf } from './apierror404-all-of';
+// May contain unused imports in some cases
+// @ts-ignore
+import { BasicAPIError } from './basic-apierror';
+
+/**
+ * @type APIError404
+ * @export
+ */
+export type APIError404 = APIError404AllOf & BasicAPIError;
+
+

@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface NativeToken
+ */
+export interface NativeToken {
+    /**
+     * The token symbol
+     * @type {string}
+     * @memberof NativeToken
+     */
+    'symbol': string;
+}
+

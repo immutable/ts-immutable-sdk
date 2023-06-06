@@ -13,6 +13,17 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+// May contain unused imports in some cases
+// @ts-ignore
+import { Chain } from './chain';
+// May contain unused imports in some cases
+// @ts-ignore
+import { ChainWithDetailsAllOf } from './chain-with-details-all-of';
+
+/**
+ * @type ChainWithDetails
+ * @export
+ */
+export type ChainWithDetails = Chain & ChainWithDetailsAllOf;
+
+
