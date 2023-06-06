@@ -1,4 +1,11 @@
 import { ethers } from 'ethers';
+import {
+  BridgeConfiguration,
+  ETH_MAINNET_TO_ZKEVM_MAINNET,
+  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  TokenBridge,
+} from '@imtbl/bridge-sdk';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
@@ -34,6 +41,15 @@ import {
 } from './types';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
+import { setReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
+import {
+  getBridgeFeeEstimate,
+  getBridgeGasEstimate,
+} from './gasEstimate/gasEstimate';
+import {
+  GetBridgeGasEstimateParams,
+  GetBridgeGasEstimateResult,
+} from './types/gasEstimates';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
@@ -213,5 +229,77 @@ export class Checkout {
     return {
       providers: this.readOnlyProviders,
     };
+  }
+
+  public async getBridgeGasEstimate(
+    params: GetBridgeGasEstimateParams,
+  ): Promise<GetBridgeGasEstimateResult> {
+    const tokenBridge = await this.getBridgeInstance(
+      params.fromChainId,
+      params.toChainId,
+    );
+
+    const result: GetBridgeGasEstimateResult = {};
+
+    const bridgeFee = await getBridgeFeeEstimate(
+      tokenBridge,
+      params.tokenAddress,
+      params.toChainId,
+    );
+
+    result.bridgeFee = bridgeFee.bridgeFee;
+    result.bridgeable = bridgeFee.bridgeable;
+
+    const gasEstimate = await getBridgeGasEstimate(
+      params.transaction,
+      params.provider,
+      params.approveTxn,
+    );
+    result.gasEstimate = {
+      estimatedAmount: gasEstimate,
+      token: {
+        name: 'ETH',
+        symbol: 'ETH',
+        decimals: 18,
+      },
+    };
+    return result;
+  }
+
+  private async getBridgeInstance(
+    fromChainId: ChainId,
+    toChainId: ChainId,
+  ): Promise<TokenBridge> {
+    this.readOnlyProviders = await setReadOnlyProviders(this.config);
+
+    const rootChainProvider = this.readOnlyProviders.get(fromChainId);
+    const childChainProvider = this.readOnlyProviders.get(toChainId);
+
+    if (!rootChainProvider) {
+      throw new CheckoutError(
+        `Chain:${fromChainId} is not a supported chain`,
+        CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
+      );
+    }
+    if (!childChainProvider) {
+      throw new CheckoutError(
+        `Chain:${toChainId} is not a supported chain`,
+        CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
+      );
+    }
+
+    const bridgeConfig = new BridgeConfiguration({
+      baseConfig: new ImmutableConfiguration({
+        environment: this.config.environment,
+      }),
+      bridgeInstance:
+        this.config.environment === Environment.PRODUCTION
+          ? ETH_MAINNET_TO_ZKEVM_MAINNET
+          : ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      rootProvider: rootChainProvider,
+      childProvider: childChainProvider,
+    });
+
+    return new TokenBridge(bridgeConfig);
   }
 }

@@ -50,7 +50,7 @@ NetworkDetails
     {
       chainIdHex: '0x343C', // 13372
       chainName: 'Immutable zkEVM Testnet',
-      rpcUrls: ['https://zkevm-rpc.sandbox.x.immutable.com'],
+      rpcUrls: ['https://zkevm-rpc.sandbox.x.immutable.com/'],
       nativeCurrency: {
         name: 'IMX',
         symbol: 'IMX',
@@ -63,7 +63,7 @@ NetworkDetails
     {
       chainIdHex: '0x89', // 137
       chainName: 'Polygon zkEVM',
-      rpcUrls: ['https://polygon-rpc.com'],
+      rpcUrls: ['https://polygon-rpc.com/'],
       nativeCurrency: {
         name: 'MATIC',
         symbol: 'MATIC',

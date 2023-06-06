@@ -10,6 +10,7 @@ import { Checkout } from './Checkout';
 import { ChainId, ConnectionProviders, GetBalanceParams } from './types';
 import { getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
+import { getBridgeGasEstimate } from './gasEstimate/gasEstimate';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
 
@@ -17,6 +18,7 @@ jest.mock('./connect');
 jest.mock('./network');
 jest.mock('./balances');
 jest.mock('./transaction');
+jest.mock('./gasEstimate/gasEstimate');
 
 describe(' Connect', () => {
   const testCheckoutConfig = new CheckoutConfiguration({
@@ -136,5 +138,34 @@ describe(' Connect', () => {
     });
 
     expect(sendTransaction).toBeCalledTimes(1);
+  });
+
+  it('should fetch gas estimate for provided transaction', async () => {
+    const provider = {
+      provider: {
+        request: () => {},
+      },
+    } as any as Web3Provider;
+    const transaction = {
+      nonce: '',
+      gasPrice: '',
+      gasLimit: '',
+      to: '',
+      from: '',
+      value: '',
+      data: '',
+      chainId: 1,
+    };
+
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
+
+    await checkout.getBridgeGasEstimate({
+      provider,
+      transaction,
+    });
+
+    expect(getBridgeGasEstimate).toBeCalledTimes(1);
   });
 });
