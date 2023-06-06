@@ -2686,9 +2686,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@imtbl/blockchain-data@0.0.0, @imtbl/blockchain-data@workspace:packages/blockchain-data":
+"@imtbl/blockchain-data@0.0.0, @imtbl/blockchain-data@workspace:packages/blockchain-data/sdk":
   version: 0.0.0-use.local
-  resolution: "@imtbl/blockchain-data@workspace:packages/blockchain-data"
+  resolution: "@imtbl/blockchain-data@workspace:packages/blockchain-data/sdk"
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/multi-rollup-api-client": 0.0.0
@@ -9942,6 +9942,30 @@ __metadata:
   checksum: d543e6b92e4ca715ca33c78e89a07a2290d43e5b2bc897d7ec588c5c7bbf59df93e45225ac0c9258aa6ce4320358990f99c9288f1c48280f8ec5d7a2e088d19b
   languageName: node
   linkType: hard
+
+"blockchain-data-sample-app@workspace:packages/blockchain-data/sample-app":
+  version: 0.0.0-use.local
+  resolution: "blockchain-data-sample-app@workspace:packages/blockchain-data/sample-app"
+  dependencies:
+    "@ethersproject/providers": ^5.7.2
+    "@imtbl/blockchain-data": 0.0.0
+    "@imtbl/config": 0.0.0
+    "@imtbl/erc721-permissioned-mintable": 0.0.0
+    "@types/node": ^18.14.2
+    "@types/react": ^18.0.28
+    "@types/react-dom": ^18.0.11
+    autoprefixer: 10.4.14
+    eslint: ^8.40.0
+    eslint-config-next: 13.3.1
+    ethers: ^5.7.2
+    next: 13.3.1
+    postcss: 8.4.23
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    tailwindcss: 3.3.2
+    typescript: ^4.9.5
+  languageName: unknown
+  linkType: soft
 
 "bluebird@npm:^3.5.1, bluebird@npm:^3.5.5, bluebird@npm:^3.7.2":
   version: 3.7.2
