@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface CancelOrderResponse
+ */
+export interface CancelOrderResponse {
+    /**
+     * ID of the cancelled order
+     * @type {number}
+     * @memberof CancelOrderResponse
+     */
+    'order_id': number;
+    /**
+     * New status of the order
+     * @type {string}
+     * @memberof CancelOrderResponse
+     */
+    'status': string;
+}
+

@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface MintFee
+ */
+export interface MintFee {
+    /**
+     * Fee percentage
+     * @type {number}
+     * @memberof MintFee
+     */
+    'percentage': number;
+    /**
+     * Recipient wallet address
+     * @type {string}
+     * @memberof MintFee
+     */
+    'recipient': string;
+}
+

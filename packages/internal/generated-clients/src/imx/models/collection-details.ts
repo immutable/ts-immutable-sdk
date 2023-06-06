@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface CollectionDetails
+ */
+export interface CollectionDetails {
+    /**
+     * URL of the icon of the collection
+     * @type {string}
+     * @memberof CollectionDetails
+     */
+    'icon_url': string | null;
+    /**
+     * Name of the collection
+     * @type {string}
+     * @memberof CollectionDetails
+     */
+    'name': string;
+}
+

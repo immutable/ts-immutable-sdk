@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface CreateMetadataRefreshResponse
+ */
+export interface CreateMetadataRefreshResponse {
+    /**
+     * The metadata refresh ID
+     * @type {string}
+     * @memberof CreateMetadataRefreshResponse
+     */
+    'refresh_id': string;
+}
+

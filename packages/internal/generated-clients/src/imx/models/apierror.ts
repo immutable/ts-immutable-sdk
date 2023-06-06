@@ -13,6 +13,30 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface APIError
+ */
+export interface APIError {
+    /**
+     * The error code
+     * @type {string}
+     * @memberof APIError
+     */
+    'code': string;
+    /**
+     * The error details
+     * @type {string}
+     * @memberof APIError
+     */
+    'details'?: string;
+    /**
+     * The error message
+     * @type {string}
+     * @memberof APIError
+     */
+    'message': string;
+}
+

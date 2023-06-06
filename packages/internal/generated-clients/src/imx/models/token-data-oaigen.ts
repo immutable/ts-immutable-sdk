@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+// May contain unused imports in some cases
+// @ts-ignore
+import { TokenData } from './token-data';
+// May contain unused imports in some cases
+// @ts-ignore
+import { TokenDataProperties } from './token-data-properties';
+
+/**
+ * @type TokenDataOAIGen
+ * Token details of this asset
+ * @export
+ */
+export type TokenDataOAIGen = TokenData;
+
+

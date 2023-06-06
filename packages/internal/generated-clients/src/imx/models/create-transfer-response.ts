@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface CreateTransferResponse
+ */
+export interface CreateTransferResponse {
+    /**
+     * List of transfer IDs
+     * @type {Array<number>}
+     * @memberof CreateTransferResponse
+     */
+    'transfer_ids': Array<number>;
+}
+

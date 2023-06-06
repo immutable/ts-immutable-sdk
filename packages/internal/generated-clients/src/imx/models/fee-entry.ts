@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface FeeEntry
+ */
+export interface FeeEntry {
+    /**
+     * 
+     * @type {string}
+     * @memberof FeeEntry
+     */
+    'address'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof FeeEntry
+     */
+    'fee_percentage'?: number;
+}
+

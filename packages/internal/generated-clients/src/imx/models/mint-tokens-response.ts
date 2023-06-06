@@ -13,6 +13,21 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+// May contain unused imports in some cases
+// @ts-ignore
+import { MintResultDetails } from './mint-result-details';
+
+/**
+ * 
+ * @export
+ * @interface MintTokensResponse
+ */
+export interface MintTokensResponse {
+    /**
+     * List of mint result details
+     * @type {Array<MintResultDetails>}
+     * @memberof MintTokensResponse
+     */
+    'results': Array<MintResultDetails>;
+}
+

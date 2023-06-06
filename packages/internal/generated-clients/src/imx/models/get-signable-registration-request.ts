@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface GetSignableRegistrationRequest
+ */
+export interface GetSignableRegistrationRequest {
+    /**
+     * Ether key of user
+     * @type {string}
+     * @memberof GetSignableRegistrationRequest
+     */
+    'ether_key': string;
+    /**
+     * Public stark key of the user
+     * @type {string}
+     * @memberof GetSignableRegistrationRequest
+     */
+    'stark_key': string;
+}
+

@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface RegisterUserResponse
+ */
+export interface RegisterUserResponse {
+    /**
+     * Immutable signature authorising registration
+     * @type {string}
+     * @memberof RegisterUserResponse
+     */
+    'tx_hash': string;
+}
+

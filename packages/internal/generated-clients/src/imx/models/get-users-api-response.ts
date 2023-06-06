@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface GetUsersApiResponse
+ */
+export interface GetUsersApiResponse {
+    /**
+     * Accounts
+     * @type {Array<string>}
+     * @memberof GetUsersApiResponse
+     */
+    'accounts': Array<string>;
+}
+

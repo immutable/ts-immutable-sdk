@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface Range
+ */
+export interface Range {
+    /**
+     * Maximum value
+     * @type {number}
+     * @memberof Range
+     */
+    'max'?: number;
+    /**
+     * Minimum value
+     * @type {number}
+     * @memberof Range
+     */
+    'min'?: number;
+}
+

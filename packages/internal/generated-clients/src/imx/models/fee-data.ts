@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface FeeData
+ */
+export interface FeeData {
+    /**
+     * Address of ERC721/ERC20 contract
+     * @type {string}
+     * @memberof FeeData
+     */
+    'contract_address'?: string;
+    /**
+     * Number of decimals supported by this asset
+     * @type {number}
+     * @memberof FeeData
+     */
+    'decimals'?: number;
+}
+

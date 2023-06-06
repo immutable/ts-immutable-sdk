@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface CreateProjectResponse
+ */
+export interface CreateProjectResponse {
+    /**
+     * The project ID
+     * @type {number}
+     * @memberof CreateProjectResponse
+     */
+    'id': number;
+}
+

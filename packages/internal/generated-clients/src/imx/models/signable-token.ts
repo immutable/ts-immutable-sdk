@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface SignableToken
+ */
+export interface SignableToken {
+    /**
+     * Token data. See https://docs.x.immutable.com/docs/token-data-object
+     * @type {object}
+     * @memberof SignableToken
+     */
+    'data'?: object;
+    /**
+     * Type of token
+     * @type {string}
+     * @memberof SignableToken
+     */
+    'type'?: string;
+}
+
