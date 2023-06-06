@@ -3096,6 +3096,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@imtbl/generated-clients@0.0.0, @imtbl/generated-clients@workspace:packages/internal/generated-clients":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/generated-clients@workspace:packages/internal/generated-clients"
+  dependencies:
+    rollup: ^3.17.2
+  languageName: unknown
+  linkType: soft
+
 "@imtbl/guardian@0.0.0, @imtbl/guardian@workspace:packages/internal/guardian":
   version: 0.0.0-use.local
   resolution: "@imtbl/guardian@workspace:packages/internal/guardian"
@@ -3250,6 +3258,7 @@ __metadata:
     "@imtbl/cryptofiat": 0.0.0
     "@imtbl/erc20": 0.0.0
     "@imtbl/erc721-permissioned-mintable": 0.0.0
+    "@imtbl/generated-clients": 0.0.0
     "@imtbl/guardian": 0.0.0
     "@imtbl/immutablex-client": 0.0.0
     "@imtbl/orderbook": 0.0.0

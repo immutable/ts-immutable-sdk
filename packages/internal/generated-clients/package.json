@@ -1,5 +1,5 @@
 {
-  "name": "@imtbl/api-clients",
+  "name": "@imtbl/generated-clients",
   "description": "Generated Immutable API clients",
   "version": "0.0.0",
   "author": "Immutable",
