@@ -6,21 +6,42 @@ import {
   FungibleToken,
   TokenBridge,
 } from '@imtbl/bridge-sdk';
-import { GetBridgeGasEstimateResult } from '../types/gasEstimates';
+import {
+  GetBridgeGasEstimateResult,
+  TokenAmountEstimate,
+} from '../types/gasEstimates';
 import * as tokens from '../tokens';
-import { ChainId, TokenFilterTypes } from '../types';
+import { ChainId, TokenFilterTypes, TokenInfo } from '../types';
+
+async function getTokenInfoByAddress(
+  tokenAddress: FungibleToken,
+  chainId: ChainId,
+): Promise<TokenInfo | undefined> {
+  return (
+    await tokens.getTokenAllowList({
+      type: TokenFilterTypes.ALL,
+      chainId,
+    })
+  ).tokens.find((token) => (token.address || 'NATIVE') === tokenAddress);
+}
 
 // L1 gas estimates
 export async function getBridgeGasEstimate(
   transaction: TransactionRequest,
   provider: Web3Provider,
+  chainId: ChainId,
   approveTxn?: TransactionRequest,
-): Promise<BigNumber> {
+): Promise<TokenAmountEstimate> {
+  // fetch token details
+  const tokenInfo = await getTokenInfoByAddress('NATIVE', chainId);
+  const result: TokenAmountEstimate = { token: tokenInfo };
+
   // txn gas estimate
   const txnGasUnits = await provider.estimateGas(transaction);
   const maxFeePerGas = BigNumber.from(transaction.maxFeePerGas);
   const maxPriorityFeePerGas = BigNumber.from(transaction.maxPriorityFeePerGas);
   const gasCost = maxFeePerGas.add(maxPriorityFeePerGas).mul(txnGasUnits);
+  result.estimatedAmount = gasCost;
 
   // approveTxn gas estimate
   if (approveTxn) {
@@ -32,11 +53,10 @@ export async function getBridgeGasEstimate(
     const approveGasCost = approveMaxFeePerGas
       .add(approveMaxPriorityFeePerGas)
       .mul(approveTxnGasUnits);
-    return gasCost.add(approveGasCost);
+    result.estimatedAmount = gasCost.add(approveGasCost);
   }
 
-  // total gas estimate
-  return gasCost;
+  return result;
 }
 
 // Bridge fees
@@ -49,12 +69,10 @@ export async function getBridgeFeeEstimate(
   const bridgeFeeResponse: BridgeFeeResponse = await tokenBridge.getFee(
     bridgeFeeReq,
   );
-  const tokenInfo = (
-    await tokens.getTokenAllowList({
-      type: TokenFilterTypes.ALL,
-      chainId: destinationChainId,
-    })
-  ).tokens.find((token) => token.address === tokenAddress);
+  const tokenInfo = await getTokenInfoByAddress(
+    tokenAddress,
+    destinationChainId,
+  );
 
   return {
     bridgeFee: {

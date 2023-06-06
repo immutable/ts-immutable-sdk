@@ -14,13 +14,12 @@ export interface GetBridgeGasEstimateParams {
 }
 
 export interface GetBridgeGasEstimateResult {
-  bridgeFee?: GasEstimateInfo;
-  gasEstimate?: GasEstimateInfo;
+  bridgeFee?: TokenAmountEstimate;
+  gasEstimate?: TokenAmountEstimate;
   bridgeable?: boolean;
-  fiatEstimate?: string;
 }
 
-export interface GasEstimateInfo {
+export interface TokenAmountEstimate {
   estimatedAmount?: BigNumber;
   token?: TokenInfo;
 }

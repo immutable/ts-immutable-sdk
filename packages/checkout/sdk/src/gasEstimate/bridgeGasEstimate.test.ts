@@ -1,6 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
-import { getBridgeGasEstimate } from './gasEstimate';
+import { getBridgeGasEstimate } from './bridgeGasEstimate';
+import { ChainId } from '../types';
 
 describe('getBridgeGasEstimate', () => {
   it('should return gasEstimate for provided txn', async () => {
@@ -17,7 +18,7 @@ describe('getBridgeGasEstimate', () => {
       estimateGas: jest.fn().mockResolvedValue(1),
     } as unknown as Web3Provider;
 
-    const result = await getBridgeGasEstimate(txn, provider);
+    const result = await getBridgeGasEstimate(txn, provider, ChainId.ETHEREUM);
 
     expect(result).toEqual(BigNumber.from('0x02'));
   });
@@ -45,7 +46,12 @@ describe('getBridgeGasEstimate', () => {
       estimateGas: jest.fn().mockResolvedValue(1),
     } as unknown as Web3Provider;
 
-    const result = await getBridgeGasEstimate(txn, provider, approveTxn);
+    const result = await getBridgeGasEstimate(
+      txn,
+      provider,
+      ChainId.ETHEREUM,
+      approveTxn,
+    );
 
     expect(result).toEqual(BigNumber.from('0x04'));
   });

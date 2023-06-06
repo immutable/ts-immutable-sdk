@@ -1,11 +1,6 @@
 import { ethers } from 'ethers';
-import {
-  BridgeConfiguration,
-  ETH_MAINNET_TO_ZKEVM_MAINNET,
-  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
-  TokenBridge,
-} from '@imtbl/bridge-sdk';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { BridgeConfiguration, TokenBridge } from '@imtbl/bridge-sdk';
+import { ImmutableConfiguration } from '@imtbl/config';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
@@ -45,7 +40,7 @@ import { setReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 import {
   getBridgeFeeEstimate,
   getBridgeGasEstimate,
-} from './gasEstimate/gasEstimate';
+} from './gasEstimate/bridgeGasEstimate';
 import {
   GetBridgeGasEstimateParams,
   GetBridgeGasEstimateResult,
@@ -250,19 +245,15 @@ export class Checkout {
     result.bridgeFee = bridgeFee.bridgeFee;
     result.bridgeable = bridgeFee.bridgeable;
 
-    const gasEstimate = await getBridgeGasEstimate(
-      params.transaction,
-      params.provider,
-      params.approveTxn,
-    );
-    result.gasEstimate = {
-      estimatedAmount: gasEstimate,
-      token: {
-        name: 'ETH',
-        symbol: 'ETH',
-        decimals: 18,
-      },
-    };
+    if (result.bridgeable) {
+      result.gasEstimate = await getBridgeGasEstimate(
+        params.transaction,
+        params.provider,
+        params.fromChainId,
+        params.approveTxn,
+      );
+    }
+
     return result;
   }
 
@@ -292,10 +283,10 @@ export class Checkout {
       baseConfig: new ImmutableConfiguration({
         environment: this.config.environment,
       }),
-      bridgeInstance:
-        this.config.environment === Environment.PRODUCTION
-          ? ETH_MAINNET_TO_ZKEVM_MAINNET
-          : ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      bridgeInstance: {
+        rootChainID: fromChainId.toString(),
+        childChainID: toChainId.toString(),
+      },
       rootProvider: rootChainProvider,
       childProvider: childChainProvider,
     });
