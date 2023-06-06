@@ -33,6 +33,7 @@ export type {
   NetworkFilter,
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
+  GetReadOnlyProvidersResult,
 } from './types';
 export type { ErrorType } from './errors';
 export { CheckoutErrorType } from './errors';

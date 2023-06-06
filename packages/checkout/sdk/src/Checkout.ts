@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
@@ -5,6 +6,7 @@ import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
 import {
+  ChainId,
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
@@ -28,19 +30,24 @@ import {
   SendTransactionResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
+  GetReadOnlyProvidersResult,
 } from './types';
 import { CheckoutError, CheckoutErrorType } from './errors';
-import {
-  CheckoutConfiguration,
-} from './config';
+import { CheckoutConfiguration } from './config';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
 
   private providerPreference: ConnectionProviders | undefined;
 
+  private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
+
   constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
+    this.readOnlyProviders = new Map<
+    ChainId,
+    ethers.providers.JsonRpcProvider
+    >();
   }
 
   /**
@@ -200,5 +207,11 @@ export class Checkout {
    */
   public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
     return await network.getNetworkInfo(this.config, params.provider);
+  }
+
+  public getReadOnlyProviders(): GetReadOnlyProvidersResult {
+    return {
+      providers: this.readOnlyProviders,
+    };
   }
 }
