@@ -10,11 +10,10 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { convertToSignableToken } from '@imtbl/toolkit';
-import { retryWithDelay } from 'util/retry';
-import * as guardian from '@imtbl/guardian';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
-import { ConfirmationScreen, TransactionTypes } from '../confirmation';
+import { ConfirmationScreen } from '../confirmation';
 import { UserWithEtherKey } from '../types';
+import { batchValidateWithGuardian, validateWithGuardian } from './guardian';
 
 const ERC721 = 'ERC721';
 
@@ -32,58 +31,8 @@ type BatchTransfersParams = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
-  confirmationScreen: ConfirmationScreen;
-};
-
-type TransferWithGuardianParams = {
-  accessToken: string;
   imxPublicApiDomain: string;
-  payloadHash: string;
   confirmationScreen: ConfirmationScreen;
-};
-
-const transferWithGuardian = async ({
-  accessToken,
-  imxPublicApiDomain,
-  payloadHash,
-  confirmationScreen,
-}: TransferWithGuardianParams) => {
-  const transactionAPI = new guardian.TransactionsApi(
-    new guardian.Configuration({
-      accessToken,
-      basePath: imxPublicApiDomain,
-    }),
-  );
-  const starkExTransactionApi = new guardian.StarkexTransactionsApi(
-    new guardian.Configuration({
-      accessToken,
-      basePath: imxPublicApiDomain,
-    }),
-  );
-
-  const transactionRes = await retryWithDelay(async () => transactionAPI.getTransactionByID({
-    transactionID: payloadHash,
-    chainType: 'starkex',
-  }));
-
-  if (!transactionRes.data.id) {
-    throw new Error("Transaction doesn't exists");
-  }
-
-  const evaluateStarkexRes = await starkExTransactionApi.evaluateStarkexTransaction({
-    payloadHash,
-  });
-
-  const { confirmationRequired } = evaluateStarkexRes.data;
-  if (confirmationRequired) {
-    const confirmationResult = await confirmationScreen.startGuardianTransaction(
-      payloadHash,
-    );
-
-    if (!confirmationResult.confirmed) {
-      throw new Error('Transaction rejected by user');
-    }
-  }
 };
 
 export async function transfer({
@@ -116,7 +65,7 @@ TransferRequest): Promise<CreateTransferResponseV1> {
       { headers },
     );
 
-    await transferWithGuardian({
+    await validateWithGuardian({
       imxPublicApiDomain,
       accessToken: user.accessToken,
       payloadHash: signableResult.data.payload_hash,
@@ -163,6 +112,7 @@ export async function batchNftTransfer({
   starkSigner,
   request,
   transfersApi,
+  imxPublicApiDomain,
   confirmationScreen,
 }: BatchTransfersParams): Promise<CreateTransferResponse> {
   return withPassportError<CreateTransferResponse>(async () => {
@@ -185,23 +135,23 @@ export async function batchNftTransfer({
       signable_requests: signableRequests,
     };
 
+    const headers = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Authorization: `Bearer ${user.accessToken}`,
+    };
+
     const signableResult = await transfersApi.getSignableTransfer({
       getSignableTransferRequestV2,
+    }, { headers });
+
+    const payloadHashs = signableResult.data.signable_responses.map((responseDetails) => responseDetails.payload_hash);
+
+    await batchValidateWithGuardian({
+      imxPublicApiDomain,
+      accessToken: user.accessToken,
+      payloadHashs,
+      confirmationScreen,
     });
-
-    const popupWindowSize = { width: 480, height: 784 };
-    const confirmationResult = await confirmationScreen.startTransaction(
-      user.accessToken,
-      {
-        transactionType: TransactionTypes.createBatchTransfer,
-        transactionData: getSignableTransferRequestV2,
-      },
-      popupWindowSize,
-    );
-
-    if (!confirmationResult.confirmed) {
-      throw new Error('Transaction rejected by user');
-    }
 
     const requests = await Promise.all(
       signableResult.data.signable_responses.map(async (resp) => {
@@ -222,11 +172,6 @@ export async function batchNftTransfer({
     const transferSigningParams = {
       sender_stark_key: signableResult.data.sender_stark_key,
       requests,
-    };
-
-    const headers = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      Authorization: `Bearer ${user.accessToken}`,
     };
 
     const response = await transfersApi.createTransfer(

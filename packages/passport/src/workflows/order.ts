@@ -11,13 +11,15 @@ import {
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { UserWithEtherKey } from '../types';
-import { ConfirmationScreen, TransactionTypes } from '../confirmation';
+import { ConfirmationScreen } from '../confirmation';
+import { validateWithGuardian } from './guardian';
 
 type CancelOrderParams = {
   request: GetSignableCancelOrderRequest;
   ordersApi: OrdersApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
+  imxPublicApiDomain: string;
   confirmationScreen: ConfirmationScreen;
 };
 
@@ -26,6 +28,7 @@ type CreateOrderParams = {
   ordersApi: OrdersApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
+  imxPublicApiDomain: string;
   confirmationScreen: ConfirmationScreen;
 };
 
@@ -36,12 +39,18 @@ export async function createOrder({
   user,
   request,
   ordersApi,
+  imxPublicApiDomain,
   confirmationScreen,
 }: CreateOrderParams): Promise<CreateOrderResponse> {
   return withPassportError<CreateOrderResponse>(async () => {
     const ethAddress = user.etherKey;
     const amountSell = request.sell.type === ERC721 ? '1' : request.sell.amount;
     const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
+    const headers = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Authorization: `Bearer ${user.accessToken}`,
+    };
+
     const getSignableOrderRequestV3: GetSignableOrderRequest = {
       user: ethAddress,
       amount_buy: amountBuy,
@@ -52,20 +61,19 @@ export async function createOrder({
       expiration_timestamp: request.expiration_timestamp,
     };
 
-    const getSignableOrderResponse = await ordersApi.getSignableOrder({
-      getSignableOrderRequestV3,
-    });
-
-    const confirmationResult = await confirmationScreen.startTransaction(
-      user.accessToken,
+    const getSignableOrderResponse = await ordersApi.getSignableOrder(
       {
-        transactionType: TransactionTypes.createOrder,
-        transactionData: getSignableOrderRequestV3,
+        getSignableOrderRequestV3,
       },
+      { headers },
     );
-    if (!confirmationResult.confirmed) {
-      throw new Error('Transaction rejected by user');
-    }
+
+    await validateWithGuardian({
+      imxPublicApiDomain,
+      accessToken: user.accessToken,
+      payloadHash: getSignableOrderResponse.data.payload_hash,
+      confirmationScreen,
+    });
 
     const { payload_hash: payloadHash } = getSignableOrderResponse.data;
 
@@ -90,10 +98,7 @@ export async function createOrder({
         vault_id_sell: signableResultData.vault_id_sell,
       },
     };
-    const headers = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      Authorization: `Bearer ${user.accessToken}`,
-    };
+
     const createOrderResponse = await ordersApi.createOrder(orderParams, {
       headers,
     });
@@ -110,34 +115,31 @@ export async function cancelOrder({
   request,
   ordersApi,
   confirmationScreen,
+  imxPublicApiDomain,
 }: CancelOrderParams): Promise<CancelOrderResponse> {
   return withPassportError<CancelOrderResponse>(async () => {
     const getSignableCancelOrderRequest: GetSignableCancelOrderRequest = {
       order_id: request.order_id,
     };
-    const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrder({
-      getSignableCancelOrderRequest,
-    });
-
-    const confirmationResult = await confirmationScreen.startTransaction(
-      user.accessToken,
-      {
-        transactionType: TransactionTypes.cancelOrder,
-        transactionData: getSignableCancelOrderRequest,
-      },
-    );
-    if (!confirmationResult.confirmed) {
-      throw new Error('Transaction rejected by user');
-    }
-
-    const { payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
-
-    const starkSignature = await starkSigner.signMessage(payloadHash);
 
     const headers = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       Authorization: `Bearer ${user.accessToken}`,
     };
+    const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrder({
+      getSignableCancelOrderRequest,
+    }, { headers });
+
+    await validateWithGuardian({
+      imxPublicApiDomain,
+      accessToken: user.accessToken,
+      payloadHash: getSignableCancelOrderResponse.data.payload_hash,
+      confirmationScreen,
+    });
+
+    const { payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
+
+    const starkSignature = await starkSigner.signMessage(payloadHash);
 
     const cancelOrderResponse = await ordersApi.cancelOrder(
       {
