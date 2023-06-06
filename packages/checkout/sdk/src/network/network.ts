@@ -141,14 +141,6 @@ export async function switchWalletNetwork(
     );
   }
 
-  if (!web3Provider || !web3Provider.provider?.request) {
-    throw new CheckoutError(
-      'Incompatible provider',
-      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
-      { details: 'Unsupported provider' },
-    );
-  }
-
   // WT-1146 - Refer to the README in this folder for explantion on the switch network flow
   try {
     await switchNetworkInWallet(networkMap, web3Provider, chainId);
