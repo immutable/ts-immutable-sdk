@@ -34,6 +34,7 @@ import {
 } from './types';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
+import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
@@ -209,7 +210,10 @@ export class Checkout {
     return await network.getNetworkInfo(this.config, params.provider);
   }
 
-  public getReadOnlyProviders(): GetReadOnlyProvidersResult {
+  public async getReadOnlyProviders(): Promise<GetReadOnlyProvidersResult> {
+    if (this.readOnlyProviders.size === 0) {
+      this.readOnlyProviders = await createReadOnlyProviders(this.config);
+    }
     return {
       providers: this.readOnlyProviders,
     };

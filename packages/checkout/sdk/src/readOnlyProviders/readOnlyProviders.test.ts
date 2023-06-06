@@ -1,5 +1,5 @@
 import { GetNetworkAllowListResult, SANDBOX_CONFIGURATION } from '../types';
-import { setReadOnlyProviders } from './readOnlyProvider';
+import { createReadOnlyProviders } from './readOnlyProvider';
 import { CheckoutConfiguration } from '../config';
 import * as network from '../network';
 
@@ -30,7 +30,7 @@ describe('read only providers', () => {
     );
   });
   it('should return a map of read only providers', async () => {
-    const result = await setReadOnlyProviders(
+    const result = await createReadOnlyProviders(
       new CheckoutConfiguration(SANDBOX_CONFIGURATION),
     );
 

@@ -3,7 +3,7 @@ import * as network from '../network';
 import { ChainId, NetworkFilterTypes } from '../types';
 import { CheckoutConfiguration } from '../config';
 
-export async function setReadOnlyProviders(
+export async function createReadOnlyProviders(
   config: CheckoutConfiguration,
 ): Promise<Map<ChainId, ethers.providers.JsonRpcProvider>> {
   const readOnlyProviders = new Map<
