@@ -317,6 +317,8 @@ describe('transfer', () => {
         receiver: 'receiver_eth_address',
       },
     ];
+
+    const mockGuardianDomain = 'http://mockGuardianDomain.com';
     const popupOptions = {
       height: 784,
       width: 480,
@@ -374,6 +376,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       });
 
@@ -442,6 +445,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
         new PassportError(
@@ -487,6 +491,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('TRANSFER_ERROR');
 
