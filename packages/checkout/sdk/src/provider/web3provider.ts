@@ -8,20 +8,8 @@ import { getNetworkInfo } from '../network';
 export function isWeb3Provider(
   provider: Web3Provider,
 ): boolean {
-  if (provider && provider instanceof Web3Provider) {
+  if (provider && provider instanceof Web3Provider && provider.provider?.request) {
     return true;
-  }
-  return false;
-}
-
-export function isCachedProvider(
-  provider: Web3Provider,
-): boolean {
-  if (provider && !(provider instanceof Web3Provider)) {
-    const { chainId, name } = provider;
-    if (chainId && name) {
-      return true;
-    }
   }
   return false;
 }
