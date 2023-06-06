@@ -37,4 +37,4 @@ jobs:
         run: yarn build
 
       - name: Build and deploy Storybook to Chromatic
-        run: npx chromatic --project-token=${{ env.CHROMATIC_PROJECT_TOKEN }}
+        run: npx chromatic --project-token=${{ env.CHROMATIC_PROJECT_TOKEN }} --build-script-name=build
