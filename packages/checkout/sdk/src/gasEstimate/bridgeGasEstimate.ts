@@ -25,35 +25,44 @@ async function getTokenInfoByAddress(
   ).tokens.find((token) => (token.address || 'NATIVE') === tokenAddress);
 }
 
-// L1 gas estimates
+const doesChainSupportEIP1559 = (txn: TransactionRequest) => !!txn.maxFeePerGas && !!txn.maxPriorityFeePerGas;
+
+const getGasPriceInWei = (txn: TransactionRequest) => (doesChainSupportEIP1559(txn)
+  ? BigNumber.from(txn.maxFeePerGas).add(
+    BigNumber.from(txn.maxPriorityFeePerGas),
+  )
+  : BigNumber.from(txn.gasPrice));
+
+const getGasEstimates = async (
+  provider: Web3Provider,
+  txn: TransactionRequest,
+) => {
+  const txnGasUnits = await provider.estimateGas(txn);
+  const gasPriceInWei = getGasPriceInWei(txn);
+  return gasPriceInWei.mul(txnGasUnits);
+};
+
 export async function getBridgeGasEstimate(
   transaction: TransactionRequest,
   provider: Web3Provider,
   chainId: ChainId,
   approveTxn?: TransactionRequest,
+  tokenAddress?: FungibleToken,
 ): Promise<TokenAmountEstimate> {
   // fetch token details
-  const tokenInfo = await getTokenInfoByAddress('NATIVE', chainId);
+  const tokenInfo = await getTokenInfoByAddress(
+    tokenAddress || 'NATIVE',
+    chainId,
+  );
   const result: TokenAmountEstimate = { token: tokenInfo };
 
   // txn gas estimate
-  const txnGasUnits = await provider.estimateGas(transaction);
-  const maxFeePerGas = BigNumber.from(transaction.maxFeePerGas);
-  const maxPriorityFeePerGas = BigNumber.from(transaction.maxPriorityFeePerGas);
-  const gasCost = maxFeePerGas.add(maxPriorityFeePerGas).mul(txnGasUnits);
-  result.estimatedAmount = gasCost;
+  result.estimatedAmount = await getGasEstimates(provider, transaction);
 
   // approveTxn gas estimate
   if (approveTxn) {
-    const approveTxnGasUnits = await provider.estimateGas(approveTxn);
-    const approveMaxFeePerGas = BigNumber.from(approveTxn.maxFeePerGas);
-    const approveMaxPriorityFeePerGas = BigNumber.from(
-      approveTxn.maxPriorityFeePerGas,
-    );
-    const approveGasCost = approveMaxFeePerGas
-      .add(approveMaxPriorityFeePerGas)
-      .mul(approveTxnGasUnits);
-    result.estimatedAmount = gasCost.add(approveGasCost);
+    const approveTxnGasEstimates = await getGasEstimates(provider, transaction);
+    result.estimatedAmount = result.estimatedAmount.add(approveTxnGasEstimates);
   }
 
   return result;
