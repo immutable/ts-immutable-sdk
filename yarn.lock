@@ -3516,6 +3516,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/generated-clients@workspace:packages/internal/generated-clients"
   dependencies:
+    jest: ^29.5.0
     rollup: ^3.17.2
   languageName: unknown
   linkType: soft
@@ -18337,7 +18338,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest@npm:^29.4.3":
+"jest@npm:^29.4.3, jest@npm:^29.5.0":
   version: 29.5.0
   resolution: "jest@npm:29.5.0"
   dependencies:
