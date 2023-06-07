@@ -41,8 +41,8 @@ import {
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
 import {
-  getBridgeFeeEstimate,
   getBridgeEstimatedGas,
+  getBridgeFeeEstimate,
 } from './gasEstimate/bridgeGasEstimate';
 import {
   GetBridgeGasEstimateParams,
@@ -269,7 +269,13 @@ export class Checkout {
     fromChainId: ChainId,
     toChainId: ChainId,
   ): Promise<TokenBridge> {
-    this.readOnlyProviders = await createReadOnlyProviders(this.config);
+    if (
+      this.readOnlyProviders.size === 0
+      || (this.config.environment === Environment.PRODUCTION
+        && !this.readOnlyProviders.has(ChainId.ETHEREUM))
+    ) {
+      this.readOnlyProviders = await createReadOnlyProviders(this.config);
+    }
 
     const rootChainProvider = this.readOnlyProviders.get(fromChainId);
     const childChainProvider = this.readOnlyProviders.get(toChainId);
