@@ -13,6 +13,7 @@ import {
 } from '../types';
 import networkMasterList from './network_master_list.json';
 import { CheckoutConfiguration } from '../config';
+import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
 
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 
@@ -98,22 +99,30 @@ export async function getNetworkInfo(
   const { networkMap } = config;
   return withCheckoutError(
     async () => {
-      const network = await provider.getNetwork();
-      if (!Array.from(networkMap.keys()).includes(network.chainId as ChainId)) {
-        // return empty details
+      try {
+        const network = await provider.getNetwork();
+        if (Array.from(networkMap.keys()).includes(network.chainId as ChainId)) {
+          const chainIdNetworkInfo = networkMap.get(network.chainId as ChainId);
+          return {
+            name: chainIdNetworkInfo!.chainName,
+            chainId: parseInt(chainIdNetworkInfo!.chainIdHex, 16),
+            nativeCurrency: chainIdNetworkInfo!.nativeCurrency,
+            isSupported: true,
+          };
+        }
         return {
           chainId: network.chainId,
           name: network.name,
           isSupported: false,
         } as NetworkInfo;
+      } catch (err) {
+        const chainId = await getUnderlyingChainId(provider);
+        const isSupported = Array.from(networkMap.keys()).includes(chainId as ChainId);
+        return {
+          chainId,
+          isSupported,
+        } as NetworkInfo;
       }
-      const chainIdNetworkInfo = networkMap.get(network.chainId as ChainId);
-      return {
-        name: chainIdNetworkInfo!.chainName,
-        chainId: parseInt(chainIdNetworkInfo!.chainIdHex, 16),
-        nativeCurrency: chainIdNetworkInfo!.nativeCurrency,
-        isSupported: true,
-      };
     },
     {
       type: CheckoutErrorType.GET_NETWORK_INFO_ERROR,

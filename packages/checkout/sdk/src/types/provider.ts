@@ -13,11 +13,11 @@ export type CreateProviderResult = {
 };
 
 export type ValidateProviderOptions = {
-  fixMixmatchedChain: boolean;
+  allowMistmatchedChainId: boolean;
   allowUnsupportedProvider: boolean;
 };
 
 export const validateProviderDefaults:ValidateProviderOptions = {
-  fixMixmatchedChain: false,
+  allowMistmatchedChainId: false,
   allowUnsupportedProvider: false,
 };

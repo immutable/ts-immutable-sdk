@@ -106,7 +106,7 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowUnsupportedProvider: true, fixMixmatchedChain: true } as ValidateProviderOptions,
+      { allowUnsupportedProvider: true, allowMistmatchedChainId: true } as ValidateProviderOptions,
     );
 
     const switchNetworkRes = await network.switchWalletNetwork(
@@ -240,7 +240,7 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+      { allowUnsupportedProvider: true, allowMistmatchedChainId: true } as ValidateProviderOptions,
 
     );
     return await network.getNetworkInfo(this.config, web3Provider);
