@@ -15,22 +15,16 @@
 
 
 /**
- * Pagination properties
+ * 
  * @export
- * @interface Page
+ * @interface ChainWithDetailsAllOf
  */
-export interface Page {
+export interface ChainWithDetailsAllOf {
     /**
-     * First item as base64 encoded string
+     * URL for RPC node
      * @type {string}
-     * @memberof Page
+     * @memberof ChainWithDetailsAllOf
      */
-    'previous_cursor': string | null;
-    /**
-     * Last item as base64 encoded string
-     * @type {string}
-     * @memberof Page
-     */
-    'next_cursor': string | null;
+    'rpc_url': string | null;
 }
 

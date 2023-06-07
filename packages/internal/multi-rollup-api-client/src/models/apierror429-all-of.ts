@@ -17,27 +17,27 @@
 /**
  * 
  * @export
- * @interface APIError400AllOf
+ * @interface APIError429AllOf
  */
-export interface APIError400AllOf {
+export interface APIError429AllOf {
     /**
      * Error Code
      * @type {string}
-     * @memberof APIError400AllOf
+     * @memberof APIError429AllOf
      */
-    'code': APIError400AllOfCodeEnum;
+    'code': APIError429AllOfCodeEnum;
     /**
      * Additional details to help resolve the error
      * @type {object}
-     * @memberof APIError400AllOf
+     * @memberof APIError429AllOf
      */
     'details': object | null;
 }
 
-export const APIError400AllOfCodeEnum = {
-    ValidationError: 'VALIDATION_ERROR'
+export const APIError429AllOfCodeEnum = {
+    TooManyRequestsError: 'TOO_MANY_REQUESTS_ERROR'
 } as const;
 
-export type APIError400AllOfCodeEnum = typeof APIError400AllOfCodeEnum[keyof typeof APIError400AllOfCodeEnum];
+export type APIError429AllOfCodeEnum = typeof APIError429AllOfCodeEnum[keyof typeof APIError429AllOfCodeEnum];
 
 

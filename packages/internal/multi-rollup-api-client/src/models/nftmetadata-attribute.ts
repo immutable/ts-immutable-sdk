@@ -32,11 +32,5 @@ export interface NFTMetadataAttribute {
      * @memberof NFTMetadataAttribute
      */
     'value': string;
-    /**
-     * The metadata trait display type
-     * @type {string}
-     * @memberof NFTMetadataAttribute
-     */
-    'display_type': string;
 }
 

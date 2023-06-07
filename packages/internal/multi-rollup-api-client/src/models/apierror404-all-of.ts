@@ -28,10 +28,10 @@ export interface APIError404AllOf {
     'code': APIError404AllOfCodeEnum;
     /**
      * Additional details to help resolve the error
-     * @type {{ [key: string]: any; }}
+     * @type {object}
      * @memberof APIError404AllOf
      */
-    'details': { [key: string]: any; } | null;
+    'details': object | null;
 }
 
 export const APIError404AllOfCodeEnum = {

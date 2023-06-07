@@ -18,7 +18,13 @@
 import { BuyItem } from './buy-item';
 // May contain unused imports in some cases
 // @ts-ignore
+import { Chain } from './chain';
+// May contain unused imports in some cases
+// @ts-ignore
 import { Fee } from './fee';
+// May contain unused imports in some cases
+// @ts-ignore
+import { OrderStatus } from './order-status';
 // May contain unused imports in some cases
 // @ts-ignore
 import { ProtocolData } from './protocol-data';
@@ -51,11 +57,11 @@ export interface Order {
      */
     'buy_fees': Array<Fee>;
     /**
-     * Chain identifier using the CAIP-2 blockchain id spec
-     * @type {string}
+     * 
+     * @type {Chain}
      * @memberof Order
      */
-    'chain_id': string;
+    'chain': Chain;
     /**
      * Time the Order is created
      * @type {string}
@@ -105,11 +111,11 @@ export interface Order {
      */
     'start_time': string;
     /**
-     * Order status
-     * @type {string}
+     * 
+     * @type {OrderStatus}
      * @memberof Order
      */
-    'status': OrderStatusEnum;
+    'status': OrderStatus;
     /**
      * Time the Order is last updated
      * @type {string}
@@ -117,17 +123,4 @@ export interface Order {
      */
     'update_time': string;
 }
-
-export const OrderStatusEnum = {
-    Pending: 'PENDING',
-    Active: 'ACTIVE',
-    Cancelled: 'CANCELLED',
-    Inactive: 'INACTIVE',
-    Rejected: 'REJECTED',
-    Filled: 'FILLED',
-    Expired: 'EXPIRED'
-} as const;
-
-export type OrderStatusEnum = typeof OrderStatusEnum[keyof typeof OrderStatusEnum];
-
 

@@ -15,15 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CreateOrderProtocolData } from './create-order-protocol-data';
+import { Page } from './page';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ProtocolDataAllOf } from './protocol-data-all-of';
+import { Token } from './token';
 
 /**
- * @type ProtocolData
+ * 
  * @export
+ * @interface ListTokensResult
  */
-export type ProtocolData = CreateOrderProtocolData & ProtocolDataAllOf;
-
+export interface ListTokensResult {
+    /**
+     * List of tokens
+     * @type {Array<Token>}
+     * @memberof ListTokensResult
+     */
+    'result': Array<Token>;
+    /**
+     * 
+     * @type {Page}
+     * @memberof ListTokensResult
+     */
+    'page': Page;
+}
 

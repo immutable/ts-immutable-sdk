@@ -17,27 +17,27 @@
 /**
  * 
  * @export
- * @interface APIError400AllOf
+ * @interface APIError401AllOf
  */
-export interface APIError400AllOf {
+export interface APIError401AllOf {
     /**
      * Error Code
      * @type {string}
-     * @memberof APIError400AllOf
+     * @memberof APIError401AllOf
      */
-    'code': APIError400AllOfCodeEnum;
+    'code': APIError401AllOfCodeEnum;
     /**
      * Additional details to help resolve the error
      * @type {object}
-     * @memberof APIError400AllOf
+     * @memberof APIError401AllOf
      */
     'details': object | null;
 }
 
-export const APIError400AllOfCodeEnum = {
-    ValidationError: 'VALIDATION_ERROR'
+export const APIError401AllOfCodeEnum = {
+    UnauthorisedRequest: 'UNAUTHORISED_REQUEST'
 } as const;
 
-export type APIError400AllOfCodeEnum = typeof APIError400AllOfCodeEnum[keyof typeof APIError400AllOfCodeEnum];
+export type APIError401AllOfCodeEnum = typeof APIError401AllOfCodeEnum[keyof typeof APIError401AllOfCodeEnum];
 
 

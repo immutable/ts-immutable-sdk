@@ -15,22 +15,21 @@
 
 
 /**
- * Pagination properties
+ * The Order status
  * @export
- * @interface Page
+ * @enum {string}
  */
-export interface Page {
-    /**
-     * First item as base64 encoded string
-     * @type {string}
-     * @memberof Page
-     */
-    'previous_cursor': string | null;
-    /**
-     * Last item as base64 encoded string
-     * @type {string}
-     * @memberof Page
-     */
-    'next_cursor': string | null;
-}
+
+export const OrderStatus = {
+    Pending: 'PENDING',
+    Active: 'ACTIVE',
+    Inactive: 'INACTIVE',
+    Filled: 'FILLED',
+    Cancelled: 'CANCELLED',
+    Expired: 'EXPIRED'
+} as const;
+
+export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
+
+
 

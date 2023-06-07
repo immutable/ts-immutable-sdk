@@ -18,10 +18,10 @@
 import { BuyItem } from './buy-item';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Fee } from './fee';
+import { CreateOrderProtocolData } from './create-order-protocol-data';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ProtocolData } from './protocol-data';
+import { Fee } from './fee';
 // May contain unused imports in some cases
 // @ts-ignore
 import { SellItem } from './sell-item';
@@ -64,10 +64,10 @@ export interface CreateOrderRequestBody {
     'end_time': string;
     /**
      * 
-     * @type {ProtocolData}
+     * @type {CreateOrderProtocolData}
      * @memberof CreateOrderRequestBody
      */
-    'protocol_data': ProtocolData;
+    'protocol_data': CreateOrderProtocolData;
     /**
      * A random value added to the create Order request
      * @type {string}

@@ -13,24 +13,21 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { Order } from './order';
 
 /**
- * Pagination properties
+ * 
  * @export
- * @interface Page
+ * @interface OrderResult
  */
-export interface Page {
+export interface OrderResult {
     /**
-     * First item as base64 encoded string
-     * @type {string}
-     * @memberof Page
+     * 
+     * @type {Order}
+     * @memberof OrderResult
      */
-    'previous_cursor': string | null;
-    /**
-     * Last item as base64 encoded string
-     * @type {string}
-     * @memberof Page
-     */
-    'next_cursor': string | null;
+    'result': Order;
 }
 

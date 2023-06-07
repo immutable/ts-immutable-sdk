@@ -28,10 +28,10 @@ export interface APIError500AllOf {
     'code': APIError500AllOfCodeEnum;
     /**
      * Additional details to help resolve the error
-     * @type {{ [key: string]: any; }}
+     * @type {object}
      * @memberof APIError500AllOf
      */
-    'details': { [key: string]: any; } | null;
+    'details': object | null;
 }
 
 export const APIError500AllOfCodeEnum = {

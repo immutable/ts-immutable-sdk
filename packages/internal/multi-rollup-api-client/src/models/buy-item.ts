@@ -41,8 +41,8 @@ export interface BuyItem {
 }
 
 export const BuyItemItemTypeEnum = {
-    Erc20: 'ERC20',
-    Imx: 'IMX'
+    Native: 'NATIVE',
+    Erc20: 'ERC20'
 } as const;
 
 export type BuyItemItemTypeEnum = typeof BuyItemItemTypeEnum[keyof typeof BuyItemItemTypeEnum];

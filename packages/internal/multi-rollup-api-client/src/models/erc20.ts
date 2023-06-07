@@ -35,17 +35,5 @@ export interface ERC20 {
      * @memberof ERC20
      */
     'contract_address': string;
-    /**
-     * The symbol of the token
-     * @type {string}
-     * @memberof ERC20
-     */
-    'symbol': string | null;
-    /**
-     * The decimal places of a token
-     * @type {number}
-     * @memberof ERC20
-     */
-    'decimals': number | null;
 }
 

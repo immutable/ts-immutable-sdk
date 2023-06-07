@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Chain } from './chain';
+import { ChainWithDetails } from './chain-with-details';
 // May contain unused imports in some cases
 // @ts-ignore
 import { Page } from './page';
@@ -28,10 +28,10 @@ import { Page } from './page';
 export interface ListChainsResult {
     /**
      * List of chains
-     * @type {Array<Chain>}
+     * @type {Array<ChainWithDetails>}
      * @memberof ListChainsResult
      */
-    'result': Array<Chain>;
+    'result': Array<ChainWithDetails>;
     /**
      * 
      * @type {Page}

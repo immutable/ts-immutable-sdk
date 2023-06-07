@@ -15,22 +15,16 @@
 
 
 /**
- * Pagination properties
+ * 
  * @export
- * @interface Page
+ * @interface ProtocolDataAllOf
  */
-export interface Page {
+export interface ProtocolDataAllOf {
     /**
-     * First item as base64 encoded string
+     * Operator signature signed by orderbook
      * @type {string}
-     * @memberof Page
+     * @memberof ProtocolDataAllOf
      */
-    'previous_cursor': string | null;
-    /**
-     * Last item as base64 encoded string
-     * @type {string}
-     * @memberof Page
-     */
-    'next_cursor': string | null;
+    'operator_signature': string;
 }
 

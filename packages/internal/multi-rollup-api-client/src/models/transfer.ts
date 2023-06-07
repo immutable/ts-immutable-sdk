@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ActivityType } from './activity-type';
+import { ActivityToken } from './activity-token';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Token } from './token';
+import { ActivityType } from './activity-type';
 
 /**
  * The transfer activity details
@@ -52,9 +52,9 @@ export interface Transfer {
     'amount': string;
     /**
      * 
-     * @type {Token}
+     * @type {ActivityToken}
      * @memberof Transfer
      */
-    'token': Token;
+    'token': ActivityToken;
 }
 

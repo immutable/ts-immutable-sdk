@@ -37,9 +37,19 @@
       "x-displayName": "nft owners"
     },
     {
-      "name": "order_book",
-      "description": "The orderbook service provides trading primitives for the global Order book",
-      "x-displayName": "order_book"
+      "name": "tokens",
+      "description": "ERC20 Token Endpoints",
+      "x-displayName": "tokens"
+    },
+    {
+      "name": "demopage",
+      "description": "Temporary HTML endpoint for demo purposes",
+      "x-displayName": "demopage"
+    },
+    {
+      "name": "orders",
+      "description": "Orders Endpoints",
+      "x-displayName": "orders"
     }
   ],
   "x-tagGroups": [
@@ -51,9 +61,11 @@
         "collections",
         "nfts",
         "nft owners",
-        "order_book"
+        "tokens",
+        "demopage",
+        "orders"
       ],
-      "description": "Service for handing the Immutable global Order book"
+      "description": "Immutable Multi Rollup API"
     }
   ],
   "servers": [
@@ -67,7 +79,9 @@
   "paths": {
     "/v1/chains/{chain_name}/activities": {
       "get": {
-        "tags": ["activities"],
+        "tags": [
+          "activities"
+        ],
         "operationId": "ListActivities",
         "summary": "List all activities",
         "description": "List all activities",
@@ -81,21 +95,9 @@
             "in": "path",
             "required": true,
             "examples": {
-              "devnet": {
-                "value": "imtbl-zkevm-devnet",
-                "summary": "Immutable zkEVM Private Testnet"
-              },
               "testnet": {
                 "value": "imtbl-zkevm-testnet",
                 "summary": "Immutable zkEVM Public Testnet"
-              },
-              "mainnet": {
-                "value": "imtbl-zkevm-mainnet",
-                "summary": "Immutable zkEVM Public Mainnet"
-              },
-              "sepolia-devnet": {
-                "value": "sepolia-devnet",
-                "summary": "Sepolia Dev Testnet"
               }
             }
           },
@@ -202,20 +204,22 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequests"
+            "$ref": "#/components/responses/BadRequest"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "$ref": "#/components/responses/ServerError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
     },
     "/v1/chains/{chain_name}/activities/{activity_id}": {
       "get": {
-        "tags": ["activities"],
+        "tags": [
+          "activities"
+        ],
         "operationId": "GetActivity",
         "summary": "Get a single activity by ID",
         "description": "Get a single activity by ID",
@@ -229,21 +233,9 @@
             "in": "path",
             "required": true,
             "examples": {
-              "devnet": {
-                "value": "imtbl-zkevm-devnet",
-                "summary": "Immutable zkEVM Private Testnet"
-              },
               "testnet": {
                 "value": "imtbl-zkevm-testnet",
                 "summary": "Immutable zkEVM Public Testnet"
-              },
-              "mainnet": {
-                "value": "imtbl-zkevm-mainnet",
-                "summary": "Immutable zkEVM Public Mainnet"
-              },
-              "sepolia-devnet": {
-                "value": "sepolia-devnet",
-                "summary": "Sepolia Dev Testnet"
               }
             }
           },
@@ -269,13 +261,13 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequests"
+            "$ref": "#/components/responses/BadRequest"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "$ref": "#/components/responses/ServerError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -283,7 +275,9 @@
     "/v1/chains/{chain_name}/collections": {
       "get": {
         "description": "List all collections",
-        "tags": ["collections"],
+        "tags": [
+          "collections"
+        ],
         "operationId": "ListCollections",
         "summary": "List all collections",
         "parameters": [
@@ -296,21 +290,9 @@
               "$ref": "#/components/schemas/ChainName"
             },
             "examples": {
-              "devnet": {
-                "value": "imtbl-zkevm-devnet",
-                "summary": "Immutable zkEVM Private Testnet"
-              },
               "testnet": {
                 "value": "imtbl-zkevm-testnet",
                 "summary": "Immutable zkEVM Public Testnet"
-              },
-              "mainnet": {
-                "value": "imtbl-zkevm-mainnet",
-                "summary": "Immutable zkEVM Public Mainnet"
-              },
-              "sepolia-devnet": {
-                "value": "sepolia-devnet",
-                "summary": "Sepolia Dev Testnet"
               }
             }
           },
@@ -345,13 +327,13 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequests"
+            "$ref": "#/components/responses/BadRequest"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "$ref": "#/components/responses/ServerError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -359,7 +341,9 @@
     "/v1/chains/{chain_name}/collections/{contract_address}": {
       "get": {
         "description": "Get collection by contract address",
-        "tags": ["collections"],
+        "tags": [
+          "collections"
+        ],
         "operationId": "GetCollection",
         "summary": "Get collection by contract address",
         "parameters": [
@@ -382,21 +366,9 @@
               "$ref": "#/components/schemas/ChainName"
             },
             "examples": {
-              "devnet": {
-                "value": "imtbl-zkevm-devnet",
-                "summary": "Immutable zkEVM Private Testnet"
-              },
               "testnet": {
                 "value": "imtbl-zkevm-testnet",
                 "summary": "Immutable zkEVM Public Testnet"
-              },
-              "mainnet": {
-                "value": "imtbl-zkevm-mainnet",
-                "summary": "Immutable zkEVM Public Mainnet"
-              },
-              "sepolia-devnet": {
-                "value": "sepolia-devnet",
-                "summary": "Sepolia Dev Testnet"
               }
             }
           }
@@ -413,13 +385,13 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequests"
+            "$ref": "#/components/responses/BadRequest"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "$ref": "#/components/responses/ServerError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -427,7 +399,9 @@
     "/v1/chains/{chain_name}/collections/{contract_address}/nfts/{token_id}": {
       "get": {
         "description": "Get NFT by token ID",
-        "tags": ["nfts"],
+        "tags": [
+          "nfts"
+        ],
         "summary": "Get NFT by token ID",
         "operationId": "GetNFT",
         "parameters": [
@@ -460,21 +434,9 @@
               "$ref": "#/components/schemas/ChainName"
             },
             "examples": {
-              "devnet": {
-                "value": "imtbl-zkevm-devnet",
-                "summary": "Immutable zkEVM Private Testnet"
-              },
               "testnet": {
                 "value": "imtbl-zkevm-testnet",
                 "summary": "Immutable zkEVM Public Testnet"
-              },
-              "mainnet": {
-                "value": "imtbl-zkevm-mainnet",
-                "summary": "Immutable zkEVM Public Mainnet"
-              },
-              "sepolia-devnet": {
-                "value": "sepolia-devnet",
-                "summary": "Sepolia Dev Testnet"
               }
             }
           }
@@ -491,13 +453,13 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequests"
+            "$ref": "#/components/responses/BadRequest"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "$ref": "#/components/responses/ServerError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -505,7 +467,9 @@
     "/v1/chains/{chain_name}/collections/{contract_address}/nfts": {
       "get": {
         "description": "List NFTs by contract address",
-        "tags": ["nfts"],
+        "tags": [
+          "nfts"
+        ],
         "summary": "List NFTs by contract address",
         "operationId": "ListNFTs",
         "parameters": [
@@ -528,21 +492,9 @@
               "$ref": "#/components/schemas/ChainName"
             },
             "examples": {
-              "devnet": {
-                "value": "imtbl-zkevm-devnet",
-                "summary": "Immutable zkEVM Private Testnet"
-              },
               "testnet": {
                 "value": "imtbl-zkevm-testnet",
                 "summary": "Immutable zkEVM Public Testnet"
-              },
-              "mainnet": {
-                "value": "imtbl-zkevm-mainnet",
-                "summary": "Immutable zkEVM Public Mainnet"
-              },
-              "sepolia-devnet": {
-                "value": "sepolia-devnet",
-                "summary": "Sepolia Dev Testnet"
               }
             }
           },
@@ -577,13 +529,13 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequests"
+            "$ref": "#/components/responses/BadRequest"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "$ref": "#/components/responses/ServerError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -591,7 +543,9 @@
     "/v1/chains/{chain_name}/accounts/{account_address}/nfts": {
       "get": {
         "description": "List NFTs by account address",
-        "tags": ["nfts"],
+        "tags": [
+          "nfts"
+        ],
         "operationId": "ListNFTsByAccountAddress",
         "summary": "List NFTs by account address",
         "parameters": [
@@ -614,21 +568,9 @@
               "$ref": "#/components/schemas/ChainName"
             },
             "examples": {
-              "devnet": {
-                "value": "imtbl-zkevm-devnet",
-                "summary": "Immutable zkEVM Private Testnet"
-              },
               "testnet": {
                 "value": "imtbl-zkevm-testnet",
                 "summary": "Immutable zkEVM Public Testnet"
-              },
-              "mainnet": {
-                "value": "imtbl-zkevm-mainnet",
-                "summary": "Immutable zkEVM Public Mainnet"
-              },
-              "sepolia-devnet": {
-                "value": "sepolia-devnet",
-                "summary": "Sepolia Dev Testnet"
               }
             }
           },
@@ -673,13 +615,13 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequests"
+            "$ref": "#/components/responses/BadRequest"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "$ref": "#/components/responses/ServerError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -687,7 +629,9 @@
     "/v1/chains/{chain_name}/collections/{contract_address}/nfts/{token_id}/owners": {
       "get": {
         "description": "List NFT owners by token ID",
-        "tags": ["nft owners"],
+        "tags": [
+          "nft owners"
+        ],
         "operationId": "ListNFTOwners",
         "summary": "List NFT owners by token ID",
         "parameters": [
@@ -720,21 +664,9 @@
               "$ref": "#/components/schemas/ChainName"
             },
             "examples": {
-              "devnet": {
-                "value": "imtbl-zkevm-devnet",
-                "summary": "Immutable zkEVM Private Testnet"
-              },
               "testnet": {
                 "value": "imtbl-zkevm-testnet",
                 "summary": "Immutable zkEVM Public Testnet"
-              },
-              "mainnet": {
-                "value": "imtbl-zkevm-mainnet",
-                "summary": "Immutable zkEVM Public Mainnet"
-              },
-              "sepolia-devnet": {
-                "value": "sepolia-devnet",
-                "summary": "Sepolia Dev Testnet"
               }
             }
           },
@@ -769,13 +701,125 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequests"
+            "$ref": "#/components/responses/BadRequest"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "$ref": "#/components/responses/ServerError"
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/tokens": {
+      "get": {
+        "description": "List ERC20 tokens",
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "ListERC20Tokens",
+        "summary": "List ERC20 tokens",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListTokensResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/tokens/{contract_address}": {
+      "get": {
+        "description": "Get single ERC20 token",
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "GetERC20Token",
+        "summary": "Get single ERC20 token",
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address of contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTokenResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -784,7 +828,9 @@
       "get": {
         "description": "List supported chains",
         "summary": "List supported chains",
-        "tags": ["chains"],
+        "tags": [
+          "chains"
+        ],
         "operationId": "ListChains",
         "parameters": [
           {
@@ -818,57 +864,101 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequests"
+            "$ref": "#/components/responses/BadRequest"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "$ref": "#/components/responses/ServerError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
     },
-    "/v1/chains/{chain_id}/orders": {
+    "/v1/chains/{chain_name}/orders": {
       "get": {
-        "tags": ["order_book"],
-        "summary": "listorder order_book",
-        "description": "Retrieve a list of orders from a given chain",
-        "operationId": "order_book_list_order",
+        "tags": [
+          "orders"
+        ],
+        "summary": "List all orders",
+        "description": "List all orders",
+        "operationId": "ListOrders",
         "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Order status to filter by",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/OrderStatus"
+            }
+          },
+          {
+            "name": "sell_item_contract_address",
+            "in": "query",
+            "description": "Sell item contract address to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "sell_item_token_id",
+            "in": "query",
+            "description": "Sell item token identifier to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "1",
+              "pattern": "\\d+"
+            }
+          },
           {
             "name": "page_size",
             "in": "query",
-            "description": "Number of orders to return per page",
-            "allowEmptyValue": true,
+            "description": "Maximum number of orders to return per page",
             "schema": {
-              "type": "string",
-              "description": "Number of orders to return per page",
-              "default": "100",
-              "example": "200"
-            },
-            "example": "200"
+              "$ref": "#/components/schemas/PageSize"
+            }
           },
           {
             "name": "sort_by",
             "in": "query",
             "description": "Order field to sort by",
-            "allowEmptyValue": true,
+            "required": false,
             "schema": {
               "type": "string",
+              "enum": [
+                "created_at",
+                "updated_at",
+                "buy_item_amount"
+              ],
               "description": "Order field to sort by",
-              "example": "start_time"
+              "example": "created_at"
             },
-            "example": "start_time"
+            "example": "created_at"
           },
           {
             "name": "sort_direction",
             "in": "query",
             "description": "Ascending or descending direction for sort",
-            "allowEmptyValue": true,
+            "required": false,
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"],
+              "enum": [
+                "asc",
+                "desc"
+              ],
               "description": "Ascending or descending direction for sort",
               "example": "asc"
             },
@@ -877,26 +967,11 @@
           {
             "name": "page_cursor",
             "in": "query",
-            "description": "Cursor for specific page",
-            "allowEmptyValue": true,
+            "description": "Page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
             "schema": {
-              "type": "string",
-              "description": "Cursor for specific page",
-              "example": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzI"
-            },
-            "example": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzI"
-          },
-          {
-            "name": "chain_id",
-            "in": "path",
-            "description": "Chain identifier using the CAIP-2 blockchain id spec",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "Chain identifier using the CAIP-2 blockchain id spec",
-              "example": "eip155:11155111"
-            },
-            "example": "eip155:11155111"
+              "$ref": "#/components/schemas/PageCursor"
+            }
           }
         ],
         "responses": {
@@ -905,116 +980,37 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Orders"
-                },
-                "example": {
-                  "next": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzB",
-                  "previous": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA",
-                  "result": [
-                    {
-                      "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                      "buy": [
-                        {
-                          "item_type": "ERC20",
-                          "start_amount": "9750000000000000000",
-                          "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
-                        }
-                      ],
-                      "buy_fees": [],
-                      "chain_id": "eip155:11155111",
-                      "create_time": "2022-03-07T07:20:50.52Z",
-                      "end_time": "2022-03-10T05:00:50.52Z",
-                      "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
-                      "protocol_data": {
-                        "order_type": "FULL_OPEN"
-                      },
-                      "salt": "12686911856931635052326433555881236148",
-                      "sell": [
-                        {
-                          "item_type": "ERC721",
-                          "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
-                          "token_id": "1"
-                        }
-                      ],
-                      "signature": "0x",
-                      "start_time": "2022-03-09T05:00:50.52Z",
-                      "status": "EXPIRED",
-                      "update_time": "2022-03-07T07:20:50.52Z"
-                    },
-                    {
-                      "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                      "buy": [
-                        {
-                          "item_type": "ERC20",
-                          "start_amount": "9750000000000000000",
-                          "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
-                        }
-                      ],
-                      "buy_fees": [],
-                      "chain_id": "eip155:11155111",
-                      "create_time": "2022-03-07T07:20:50.52Z",
-                      "end_time": "2022-03-10T05:00:50.52Z",
-                      "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
-                      "protocol_data": {
-                        "order_type": "FULL_OPEN"
-                      },
-                      "salt": "12686911856931635052326433555881236148",
-                      "sell": [
-                        {
-                          "item_type": "ERC721",
-                          "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
-                          "token_id": "1"
-                        }
-                      ],
-                      "signature": "0x",
-                      "start_time": "2022-03-09T05:00:50.52Z",
-                      "status": "EXPIRED",
-                      "update_time": "2022-03-07T07:20:50.52Z"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/ListOrdersResult"
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           },
           "404": {
-            "description": "not_found: Resource not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "description": "internal_error: Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       },
       "post": {
-        "tags": ["order_book"],
-        "summary": "create_order order_book",
-        "description": "Create a listing on a specific chain",
-        "operationId": "order_book_create_order",
+        "tags": [
+          "orders"
+        ],
+        "summary": "Create an order",
+        "description": "Create an order",
+        "operationId": "CreateOrder",
         "parameters": [
           {
-            "name": "chain_id",
+            "name": "chain_name",
             "in": "path",
-            "description": "Chain identifier using the CAIP-2 blockchain id spec",
             "required": true,
             "schema": {
-              "type": "string",
-              "description": "Chain identifier using the CAIP-2 blockchain id spec",
-              "example": "eip155:11155111"
-            },
-            "example": "eip155:11155111"
+              "$ref": "#/components/schemas/ChainName"
+            }
           }
         ],
         "requestBody": {
@@ -1023,32 +1019,6 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateOrderRequestBody"
-              },
-              "example": {
-                "order_hash": "0x0821933d9391bc9bf11a6010fe84776c84b203abff0c1ad781fb4881409c8770",
-                "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                "buy": [
-                  {
-                    "item_type": "IMX",
-                    "start_amount": "9750000000000000000",
-                    "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
-                  }
-                ],
-                "buy_fees": [],
-                "end_time": "2022-03-10T05:00:50.52Z",
-                "protocol_data": {
-                  "order_type": "FULL_OPEN"
-                },
-                "salt": "12686911856931635052326433555881236148",
-                "sell": [
-                  {
-                    "item_type": "ERC721",
-                    "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
-                    "token_id": "1"
-                  }
-                ],
-                "signature": "0x",
-                "start_time": "2022-03-09T05:00:50.52Z"
               }
             }
           }
@@ -1059,92 +1029,39 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Order"
-                },
-                "example": {
-                  "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                  "buy": [
-                    {
-                      "item_type": "IMX",
-                      "start_amount": "9750000000000000000",
-                      "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
-                    }
-                  ],
-                  "buy_fees": [],
-                  "chain_id": "eip155:11155111",
-                  "create_time": "2022-03-07T07:20:50.52Z",
-                  "end_time": "2022-03-10T05:00:50.52Z",
-                  "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
-                  "protocol_data": {
-                    "order_type": "FULL_OPEN"
-                  },
-                  "salt": "12686911856931635052326433555881236148",
-                  "sell": [
-                    {
-                      "item_type": "ERC721",
-                      "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
-                      "token_id": "1"
-                    }
-                  ],
-                  "signature": "0x",
-                  "start_time": "2022-03-09T05:00:50.52Z",
-                  "status": "FILLED",
-                  "update_time": "2022-03-07T07:20:50.52Z"
+                  "$ref": "#/components/schemas/OrderResult"
                 }
               }
             }
           },
           "400": {
-            "description": "bad_request: Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "404": {
-            "description": "not_found: Resource not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "description": "internal_error: Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
     },
-    "/v1/chains/{chain_id}/orders/{order_id}": {
+    "/v1/chains/{chain_name}/orders/{order_id}": {
       "get": {
-        "tags": ["order_book"],
-        "summary": "getorder order_book",
-        "description": "Retrieve a single order from a given chain",
-        "operationId": "order_book_get_order",
+        "tags": [
+          "orders"
+        ],
+        "summary": "Get a single order by ID",
+        "description": "Get a single order by ID",
+        "operationId": "GetOrder",
         "parameters": [
           {
-            "name": "chain_id",
+            "name": "chain_name",
             "in": "path",
-            "description": "Chain identifier using the CAIP-2 blockchain id spec",
             "required": true,
             "schema": {
-              "type": "string",
-              "description": "Chain identifier using the CAIP-2 blockchain id spec",
-              "example": "eip155:11155111"
-            },
-            "example": "eip155:11155111"
+              "$ref": "#/components/schemas/ChainName"
+            }
           },
           {
             "name": "order_id",
@@ -1165,69 +1082,29 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Order"
-                },
-                "example": {
-                  "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                  "buy": [
-                    {
-                      "item_type": "IMX",
-                      "start_amount": "9750000000000000000",
-                      "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
-                    }
-                  ],
-                  "buy_fees": [],
-                  "chain_id": "eip155:11155111",
-                  "create_time": "2022-03-07T07:20:50.52Z",
-                  "end_time": "2022-03-10T05:00:50.52Z",
-                  "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
-                  "protocol_data": {
-                    "order_type": "FULL_OPEN"
-                  },
-                  "salt": "12686911856931635052326433555881236148",
-                  "sell": [
-                    {
-                      "item_type": "ERC721",
-                      "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
-                      "token_id": "1"
-                    }
-                  ],
-                  "signature": "0x",
-                  "start_time": "2022-03-09T05:00:50.52Z",
-                  "status": "PENDING",
-                  "update_time": "2022-03-07T07:20:50.52Z"
+                  "$ref": "#/components/schemas/OrderResult"
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           },
           "404": {
-            "description": "not_found: Resource not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "description": "internal_error: Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
     }
   },
   "components": {
+    "securitySchemes": {},
     "responses": {
       "NotFound": {
-        "description": "The specified resource was not found",
+        "description": "The specified resource was not found (404)",
         "content": {
           "application/json": {
             "schema": {
@@ -1236,8 +1113,8 @@
           }
         }
       },
-      "BadRequests": {
-        "description": "400 response",
+      "BadRequest": {
+        "description": "Bad Request (400)",
         "content": {
           "application/json": {
             "schema": {
@@ -1246,8 +1123,28 @@
           }
         }
       },
-      "ServerError": {
-        "description": "500 response",
+      "UnauthorisedRequest": {
+        "description": "Unauthorised Request (401)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIError401"
+            }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "Too Many Requests (429)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIError429"
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal Server Error (500)",
         "content": {
           "application/json": {
             "schema": {
@@ -1258,11 +1155,52 @@
       }
     },
     "schemas": {
+      "PageSize": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Maximum number of items to return",
+        "minimum": 1,
+        "default": 100,
+        "maximum": 200,
+        "example": 10
+      },
+      "PageCursor": {
+        "type": "string",
+        "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+        "example": "ewogICJ0eXBlIjogInByZXYiLAogICJpdGVtIjogewogICAgImlkIjogNjI3NTEzMCwKICAgICJjcmVhdGVkX2F0IjogIjIwMjItMDktMTNUMTc6MDQ6MTIuMDI0MTI2WiIKICB9Cn0="
+      },
+      "Page": {
+        "type": "object",
+        "description": "Pagination properties",
+        "properties": {
+          "previous_cursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "First item as base64 encoded string",
+            "example": "ewogICJ0eXBlIjogInByZXYiLAogICJpdGVtIjogewogICAgImlkIjogNjI3NTEzMCwKICAgICJjcmVhdGVkX2F0IjogIjIwMjItMDktMTNUMTc6MDQ6MTIuMDI0MTI2WiIKICB9Cn0="
+          },
+          "next_cursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last item as base64 encoded string",
+            "example": "ewogICJ0eXBlIjogInByZXYiLAogICJpdGVtIjogewogICAgImlkIjogNjI3NTEzMCwKICAgICJjcmVhdGVkX2F0IjogIjIwMjItMDktMTNUMTc6MDQ6MTIuMDI0MTI2WiIKICB9Cn0="
+          }
+        },
+        "required": [
+          "previous_cursor",
+          "next_cursor"
+        ]
+      },
       "ActivityType": {
         "description": "The activity type",
         "example": "mint",
         "type": "string",
-        "enum": ["mint", "burn", "transfer", "sale"]
+        "enum": [
+          "mint",
+          "burn",
+          "transfer",
+          "sale"
+        ]
       },
       "ERC721Token": {
         "type": "object",
@@ -1281,7 +1219,11 @@
             "example": "1"
           }
         },
-        "required": ["contract_type", "contract_address", "token_id"]
+        "required": [
+          "contract_type",
+          "contract_address",
+          "token_id"
+        ]
       },
       "ERC20": {
         "type": "object",
@@ -1293,24 +1235,15 @@
             "description": "The token contract address",
             "type": "string",
             "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
-          },
-          "symbol": {
-            "description": "The symbol of the token",
-            "type": "string",
-            "nullable": true,
-            "example": "GOG"
-          },
-          "decimals": {
-            "description": "The decimal places of a token",
-            "type": "integer",
-            "nullable": true,
-            "example": 18
           }
         },
-        "required": ["contract_type", "contract_address", "symbol", "decimals"]
+        "required": [
+          "contract_type",
+          "contract_address"
+        ]
       },
-      "Token": {
-        "description": "The token details",
+      "ActivityToken": {
+        "description": "The contract and token details for this activity",
         "oneOf": [
           {
             "$ref": "#/components/schemas/ERC721Token"
@@ -1341,10 +1274,15 @@
             "example": "1"
           },
           "token": {
-            "$ref": "#/components/schemas/Token"
+            "$ref": "#/components/schemas/ActivityToken"
           }
         },
-        "required": ["activity_type", "to", "amount", "token"]
+        "required": [
+          "activity_type",
+          "to",
+          "amount",
+          "token"
+        ]
       },
       "Burn": {
         "description": "The burn activity details",
@@ -1364,10 +1302,15 @@
             "example": "1"
           },
           "token": {
-            "$ref": "#/components/schemas/Token"
+            "$ref": "#/components/schemas/ActivityToken"
           }
         },
-        "required": ["activity_type", "from", "amount", "token"]
+        "required": [
+          "activity_type",
+          "from",
+          "amount",
+          "token"
+        ]
       },
       "Transfer": {
         "type": "object",
@@ -1392,10 +1335,16 @@
             "example": "1"
           },
           "token": {
-            "$ref": "#/components/schemas/Token"
+            "$ref": "#/components/schemas/ActivityToken"
           }
         },
-        "required": ["activity_type", "from", "to", "amount", "token"]
+        "required": [
+          "activity_type",
+          "from",
+          "to",
+          "amount",
+          "token"
+        ]
       },
       "NativeToken": {
         "type": "object",
@@ -1406,7 +1355,9 @@
             "example": "ETH"
           }
         },
-        "required": ["symbol"]
+        "required": [
+          "symbol"
+        ]
       },
       "NFTSale": {
         "description": "The NFT Sale activity details",
@@ -1571,7 +1522,10 @@
             "$ref": "#/components/schemas/Page"
           }
         },
-        "required": ["result", "page"]
+        "required": [
+          "result",
+          "page"
+        ]
       },
       "GetActivityResult": {
         "type": "object",
@@ -1581,7 +1535,9 @@
             "$ref": "#/components/schemas/Activity"
           }
         },
-        "required": ["result"]
+        "required": [
+          "result"
+        ]
       },
       "Collection": {
         "type": "object",
@@ -1689,7 +1645,10 @@
             "$ref": "#/components/schemas/Page"
           }
         },
-        "required": ["result", "page"]
+        "required": [
+          "result",
+          "page"
+        ]
       },
       "GetCollectionResult": {
         "type": "object",
@@ -1699,7 +1658,9 @@
             "$ref": "#/components/schemas/Collection"
           }
         },
-        "required": ["result"]
+        "required": [
+          "result"
+        ]
       },
       "NFT": {
         "type": "object",
@@ -1800,14 +1761,12 @@
             "type": "string",
             "description": "The metadata trait value",
             "example": "40"
-          },
-          "display_type": {
-            "type": "string",
-            "description": "The metadata trait display type",
-            "example": "boost_number"
           }
         },
-        "required": ["trait_type", "value", "display_type"]
+        "required": [
+          "trait_type",
+          "value"
+        ]
       },
       "NFTMetadataAttributes": {
         "type": "object",
@@ -1821,48 +1780,22 @@
             }
           }
         },
-        "required": ["attributes"]
+        "required": [
+          "attributes"
+        ]
       },
       "ChainName": {
         "type": "string",
         "description": "The name of chain",
         "example": "imtbl-zkevm-testnet"
       },
-      "PageSize": {
-        "type": "integer",
-        "format": "int32",
-        "description": "Maximum number of items to return",
-        "minimum": 1,
-        "default": 100,
-        "maximum": 200,
-        "example": 10
-      },
-      "PageCursor": {
-        "type": "string",
-        "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
-        "example": "ewogICJ0eXBlIjogInByZXYiLAogICJpdGVtIjogewogICAgImlkIjogNjI3NTEzMCwKICAgICJjcmVhdGVkX2F0IjogIjIwMjItMDktMTNUMTc6MDQ6MTIuMDI0MTI2WiIKICB9Cn0="
-      },
-      "Page": {
-        "type": "object",
-        "description": "Pagination properties",
-        "properties": {
-          "previous_cursor": {
-            "type": "string",
-            "description": "First item as base64 encoded string",
-            "example": "ewogICJ0eXBlIjogInByZXYiLAogICJpdGVtIjogewogICAgImlkIjogNjI3NTEzMCwKICAgICJjcmVhdGVkX2F0IjogIjIwMjItMDktMTNUMTc6MDQ6MTIuMDI0MTI2WiIKICB9Cn0="
-          },
-          "next_cursor": {
-            "type": "string",
-            "description": "Last item as base64 encoded string",
-            "example": "ewogICJ0eXBlIjogInByZXYiLAogICJpdGVtIjogewogICAgImlkIjogNjI3NTEzMCwKICAgICJjcmVhdGVkX2F0IjogIjIwMjItMDktMTNUMTc6MDQ6MTIuMDI0MTI2WiIKICB9Cn0="
-          }
-        },
-        "required": ["previous_cursor", "next_cursor"]
-      },
       "ContractType": {
         "description": "The contract type",
         "type": "string",
-        "enum": ["ERC721", "ERC20"]
+        "enum": [
+          "ERC721",
+          "ERC20"
+        ]
       },
       "ActivityID": {
         "description": "Activity ID in UUIDv4 format",
@@ -1873,7 +1806,9 @@
       "CollectionContractType": {
         "description": "The collection contract type",
         "type": "string",
-        "enum": ["ERC721"]
+        "enum": [
+          "ERC721"
+        ]
       },
       "NFTWithMetadataAttributes": {
         "description": "A single NFT with metadata attributes",
@@ -1895,7 +1830,9 @@
             "$ref": "#/components/schemas/NFTWithMetadataAttributes"
           }
         },
-        "required": ["result"]
+        "required": [
+          "result"
+        ]
       },
       "ListNFTsResult": {
         "type": "object",
@@ -1911,7 +1848,10 @@
             "$ref": "#/components/schemas/Page"
           }
         },
-        "required": ["result", "page"]
+        "required": [
+          "result",
+          "page"
+        ]
       },
       "NFTOwner": {
         "type": "object",
@@ -1948,6 +1888,18 @@
           "quantity"
         ]
       },
+      "GetTokenResult": {
+        "type": "object",
+        "description": "Single Token",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/Token"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
       "ListNFTOwnersResult": {
         "type": "object",
         "properties": {
@@ -1962,7 +1914,30 @@
             "$ref": "#/components/schemas/Page"
           }
         },
-        "required": ["result", "page"]
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "ChainWithDetails": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Chain"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "rpc_url": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL for RPC node"
+              }
+            },
+            "required": [
+              "rpc_url"
+            ]
+          }
+        ]
       },
       "Chain": {
         "type": "object",
@@ -1979,7 +1954,10 @@
             "example": "imtbl-zkevm-testnet"
           }
         },
-        "required": ["id", "name"]
+        "required": [
+          "id",
+          "name"
+        ]
       },
       "ListChainsResult": {
         "type": "object",
@@ -1988,14 +1966,75 @@
             "type": "array",
             "description": "List of chains",
             "items": {
-              "$ref": "#/components/schemas/Chain"
+              "$ref": "#/components/schemas/ChainWithDetails"
             }
           },
           "page": {
             "$ref": "#/components/schemas/Page"
           }
         },
-        "required": ["result", "page"]
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "ListTokensResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "description": "List of tokens",
+            "items": {
+              "$ref": "#/components/schemas/Token"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "Token": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "contract_address": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string",
+            "nullable": true
+          },
+          "decimals": {
+            "type": "integer",
+            "nullable": true
+          },
+          "image_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "chain",
+          "contract_address",
+          "symbol",
+          "decimals",
+          "image_url",
+          "name"
+        ]
+      },
+      "DemoPage": {
+        "type": "string",
+        "example": "<html>HTML text</html>"
       },
       "BasicAPIError": {
         "type": "object",
@@ -2016,7 +2055,11 @@
             "example": "e47634b79a5cd6894ddc9639ec4aad26"
           }
         },
-        "required": ["message", "link", "trace_id"]
+        "required": [
+          "message",
+          "link",
+          "trace_id"
+        ]
       },
       "APIError400": {
         "allOf": [
@@ -2029,17 +2072,21 @@
               "code": {
                 "type": "string",
                 "description": "Error Code",
-                "enum": ["VALIDATION_ERROR"],
+                "enum": [
+                  "VALIDATION_ERROR"
+                ],
                 "example": "VALIDATION_ERROR"
               },
               "details": {
                 "type": "object",
                 "nullable": true,
-                "description": "Additional details to help resolve the error",
-                "additionalProperties": true
+                "description": "Additional details to help resolve the error"
               }
             },
-            "required": ["code", "details"]
+            "required": [
+              "code",
+              "details"
+            ]
           }
         ]
       },
@@ -2054,17 +2101,21 @@
               "code": {
                 "type": "string",
                 "description": "Error Code",
-                "enum": ["RESOURCE_NOT_FOUND"],
+                "enum": [
+                  "RESOURCE_NOT_FOUND"
+                ],
                 "example": "RESOURCE_NOT_FOUND"
               },
               "details": {
                 "type": "object",
                 "nullable": true,
-                "description": "Additional details to help resolve the error",
-                "additionalProperties": true
+                "description": "Additional details to help resolve the error"
               }
             },
-            "required": ["code", "details"]
+            "required": [
+              "code",
+              "details"
+            ]
           }
         ]
       },
@@ -2079,17 +2130,79 @@
               "code": {
                 "type": "string",
                 "description": "Error Code",
-                "enum": ["INTERNAL_SERVER_ERROR"],
+                "enum": [
+                  "INTERNAL_SERVER_ERROR"
+                ],
                 "example": "INTERNAL_SERVER_ERROR"
               },
               "details": {
                 "type": "object",
                 "nullable": true,
-                "description": "Additional details to help resolve the error",
-                "additionalProperties": true
+                "description": "Additional details to help resolve the error"
               }
             },
-            "required": ["code", "details"]
+            "required": [
+              "code",
+              "details"
+            ]
+          }
+        ]
+      },
+      "APIError401": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAPIError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error Code",
+                "enum": [
+                  "UNAUTHORISED_REQUEST"
+                ],
+                "example": "UNAUTHORISED_REQUEST"
+              },
+              "details": {
+                "type": "object",
+                "nullable": true,
+                "description": "Additional details to help resolve the error"
+              }
+            },
+            "required": [
+              "code",
+              "details"
+            ]
+          }
+        ]
+      },
+      "APIError429": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAPIError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error Code",
+                "enum": [
+                  "TOO_MANY_REQUESTS_ERROR"
+                ],
+                "example": "TOO_MANY_REQUESTS_ERROR"
+              },
+              "details": {
+                "type": "object",
+                "nullable": true,
+                "description": "Additional details to help resolve the error"
+              }
+            },
+            "required": [
+              "code",
+              "details"
+            ]
           }
         ]
       },
@@ -2100,7 +2213,10 @@
             "type": "string",
             "description": "Token type user is willing to accept upon settlement",
             "example": "ERC20",
-            "enum": ["ERC20", "IMX"]
+            "enum": [
+              "NATIVE",
+              "ERC20"
+            ]
           },
           "start_amount": {
             "type": "string",
@@ -2116,11 +2232,14 @@
           }
         },
         "example": {
-          "item_type": "IMX",
+          "item_type": "NATIVE",
           "start_amount": "9750000000000000000",
           "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
         },
-        "required": ["item_type", "start_amount"]
+        "required": [
+          "item_type",
+          "start_amount"
+        ]
       },
       "CreateOrderRequestBody": {
         "type": "object",
@@ -2141,7 +2260,7 @@
             },
             "example": [
               {
-                "item_type": "IMX",
+                "item_type": "NATIVE",
                 "start_amount": "9750000000000000000",
                 "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
               }
@@ -2165,7 +2284,7 @@
             "example": "2022-03-09T05:00:50.52Z"
           },
           "protocol_data": {
-            "$ref": "#/components/schemas/ProtocolData"
+            "$ref": "#/components/schemas/CreateOrderProtocolData"
           },
           "salt": {
             "type": "string",
@@ -2204,7 +2323,7 @@
           "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
           "buy": [
             {
-              "item_type": "IMX",
+              "item_type": "NATIVE",
               "start_amount": "9750000000000000000",
               "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
             }
@@ -2212,7 +2331,10 @@
           "buy_fees": [],
           "end_time": "2022-03-10T05:00:50.52Z",
           "protocol_data": {
-            "order_type": "FULL_OPEN"
+            "order_type": "FULL_RESTRICTED",
+            "zone_address": "0x12",
+            "seaport_address": "0x12",
+            "seaport_version": "1.4"
           },
           "salt": "12686911856931635052326433555881236148",
           "sell": [
@@ -2257,7 +2379,9 @@
           "id": "1234567890",
           "message": "Order creation failed"
         },
-        "required": ["message"]
+        "required": [
+          "message"
+        ]
       },
       "Fee": {
         "type": "object",
@@ -2272,7 +2396,9 @@
             "type": "string",
             "description": "Fee type",
             "example": "ROYALTY",
-            "enum": ["ROYALTY"]
+            "enum": [
+              "ROYALTY"
+            ]
           },
           "recipient": {
             "type": "string",
@@ -2286,7 +2412,11 @@
           "fee_type": "ROYALTY",
           "recipient": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
         },
-        "required": ["fee_type", "amount", "recipient"]
+        "required": [
+          "fee_type",
+          "amount",
+          "recipient"
+        ]
       },
       "Order": {
         "type": "object",
@@ -2302,7 +2432,7 @@
             },
             "example": [
               {
-                "item_type": "IMX",
+                "item_type": "NATIVE",
                 "start_amount": "9750000000000000000",
                 "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
               }
@@ -2319,10 +2449,8 @@
             "minItems": 0,
             "maxItems": 1
           },
-          "chain_id": {
-            "type": "string",
-            "description": "Chain identifier using the CAIP-2 blockchain id spec",
-            "example": "eip155:11155111"
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
           },
           "create_time": {
             "type": "string",
@@ -2376,18 +2504,7 @@
             "example": "2022-03-09T05:00:50.52Z"
           },
           "status": {
-            "type": "string",
-            "description": "Order status",
-            "example": "INACTIVE",
-            "enum": [
-              "PENDING",
-              "ACTIVE",
-              "CANCELLED",
-              "INACTIVE",
-              "REJECTED",
-              "FILLED",
-              "EXPIRED"
-            ]
+            "$ref": "#/components/schemas/OrderStatus"
           },
           "update_time": {
             "type": "string",
@@ -2400,18 +2517,25 @@
           "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
           "buy": [
             {
-              "item_type": "IMX",
+              "item_type": "NATIVE",
               "start_amount": "9750000000000000000",
               "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
             }
           ],
           "buy_fees": [],
-          "chain_id": "eip155:11155111",
+          "chain": {
+            "id": "eip155:11155111",
+            "name": "sepolia"
+          },
           "create_time": "2022-03-07T07:20:50.52Z",
           "end_time": "2022-03-10T05:00:50.52Z",
           "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
           "protocol_data": {
-            "order_type": "FULL_OPEN"
+            "order_type": "FULL_RESTRICTED",
+            "operator_signature": "0x12",
+            "zone_address": "0x12",
+            "seaport_address": "0x12",
+            "seaport_version": "1.4"
           },
           "salt": "12686911856931635052326433555881236148",
           "sell": [
@@ -2432,7 +2556,7 @@
           "buy",
           "sell",
           "buy_fees",
-          "chain_id",
+          "chain",
           "create_time",
           "end_time",
           "start_time",
@@ -2443,93 +2567,80 @@
           "status"
         ]
       },
-      "Orders": {
+      "OrderResult": {
         "type": "object",
         "properties": {
-          "next": {
-            "type": "string",
-            "description": "Cursor to retrieve next page",
-            "example": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzB"
-          },
-          "previous": {
-            "type": "string",
-            "description": "Cursor to retrieve previous page",
-            "example": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA"
+          "result": {
+            "$ref": "#/components/schemas/Order"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "example": {
+          "result": {
+            "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "buy": [
+              {
+                "item_type": "ERC20",
+                "start_amount": "9750000000000000000",
+                "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+              }
+            ],
+            "buy_fees": [],
+            "chain": {
+              "id": "eip155:11155111",
+              "name": "sepolia"
+            },
+            "create_time": "2022-03-07T07:20:50.52Z",
+            "end_time": "2022-03-10T05:00:50.52Z",
+            "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
+            "protocol_data": {
+              "order_type": "FULL_RESTRICTED",
+              "operator_signature": "0x12",
+              "zone_address": "0x12",
+              "seaport_address": "0x12",
+              "seaport_version": "1.4"
+            },
+            "salt": "12686911856931635052326433555881236148",
+            "sell": [
+              {
+                "item_type": "ERC721",
+                "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+                "token_id": "1"
+              }
+            ],
+            "signature": "0x",
+            "start_time": "2022-03-09T05:00:50.52Z",
+            "status": "EXPIRED",
+            "update_time": "2022-03-07T07:20:50.52Z"
+          }
+        }
+      },
+      "ListOrdersResult": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "$ref": "#/components/schemas/Page"
           },
           "result": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Order"
             },
-            "example": [
-              {
-                "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                "buy": [
-                  {
-                    "item_type": "ERC20",
-                    "start_amount": "9750000000000000000",
-                    "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
-                  }
-                ],
-                "buy_fees": [],
-                "chain_id": "eip155:11155111",
-                "create_time": "2022-03-07T07:20:50.52Z",
-                "end_time": "2022-03-10T05:00:50.52Z",
-                "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
-                "protocol_data": {
-                  "order_type": "FULL_OPEN"
-                },
-                "salt": "12686911856931635052326433555881236148",
-                "sell": [
-                  {
-                    "item_type": "ERC721",
-                    "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
-                    "token_id": "1"
-                  }
-                ],
-                "signature": "0x",
-                "start_time": "2022-03-09T05:00:50.52Z",
-                "status": "EXPIRED",
-                "update_time": "2022-03-07T07:20:50.52Z"
-              },
-              {
-                "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-                "buy": [
-                  {
-                    "item_type": "ERC20",
-                    "start_amount": "9750000000000000000",
-                    "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
-                  }
-                ],
-                "buy_fees": [],
-                "chain_id": "eip155:11155111",
-                "create_time": "2022-03-07T07:20:50.52Z",
-                "end_time": "2022-03-10T05:00:50.52Z",
-                "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
-                "protocol_data": {
-                  "order_type": "FULL_OPEN"
-                },
-                "salt": "12686911856931635052326433555881236148",
-                "sell": [
-                  {
-                    "item_type": "ERC721",
-                    "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
-                    "token_id": "1"
-                  }
-                ],
-                "signature": "0x",
-                "start_time": "2022-03-09T05:00:50.52Z",
-                "status": "EXPIRED",
-                "update_time": "2022-03-07T07:20:50.52Z"
-              }
-            ],
             "minItems": 0,
             "maxItems": 200
           }
         },
+        "required": [
+          "page",
+          "result"
+        ],
         "example": {
-          "next": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzB",
-          "previous": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA",
+          "page": {
+            "previous_cursor": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA",
+            "next_cursor": "MjAyMy0wMS0yM1QwMTo1NToyNy4zNTM2MzA"
+          },
           "result": [
             {
               "account_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -2541,12 +2652,19 @@
                 }
               ],
               "buy_fees": [],
-              "chain_id": "eip155:11155111",
+              "chain": {
+                "id": "eip155:11155111",
+                "name": "sepolia"
+              },
               "create_time": "2022-03-07T07:20:50.52Z",
               "end_time": "2022-03-10T05:00:50.52Z",
               "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
               "protocol_data": {
-                "order_type": "FULL_OPEN"
+                "order_type": "FULL_RESTRICTED",
+                "operator_signature": "0x12",
+                "zone_address": "0x12",
+                "seaport_address": "0x12",
+                "seaport_version": "1.4"
               },
               "salt": "12686911856931635052326433555881236148",
               "sell": [
@@ -2571,12 +2689,19 @@
                 }
               ],
               "buy_fees": [],
-              "chain_id": "eip155:11155111",
+              "chain": {
+                "id": "eip155:11155111",
+                "name": "sepolia"
+              },
               "create_time": "2022-03-07T07:20:50.52Z",
               "end_time": "2022-03-10T05:00:50.52Z",
               "id": "018792C9-4AD7-8EC4-4038-9E05C598534A",
               "protocol_data": {
-                "order_type": "FULL_OPEN"
+                "order_type": "FULL_RESTRICTED",
+                "operator_signature": "0x12",
+                "zone_address": "0x12",
+                "seaport_address": "0x12",
+                "seaport_version": "1.4"
               },
               "salt": "12686911856931635052326433555881236148",
               "sell": [
@@ -2592,23 +2717,91 @@
               "update_time": "2022-03-07T07:20:50.52Z"
             }
           ]
-        },
-        "required": ["result"]
+        }
       },
-      "ProtocolData": {
+      "OrderStatus": {
+        "type": "string",
+        "description": "The Order status",
+        "example": "ACTIVE",
+        "enum": [
+          "PENDING",
+          "ACTIVE",
+          "INACTIVE",
+          "FILLED",
+          "CANCELLED",
+          "EXPIRED"
+        ]
+      },
+      "CreateOrderProtocolData": {
         "type": "object",
         "properties": {
           "order_type": {
             "type": "string",
             "description": "The Order type",
-            "example": "FULL_OPEN",
-            "enum": ["FULL_OPEN"]
+            "example": "FULL_RESTRICTED",
+            "enum": [
+              "FULL_RESTRICTED"
+            ]
+          },
+          "zone_address": {
+            "type": "string",
+            "description": "Immutable zone address",
+            "example": "0x12"
+          },
+          "counter": {
+            "type": "string",
+            "description": "big.Int or uint256 string for order counter",
+            "example": "92315562"
+          },
+          "seaport_address": {
+            "type": "string",
+            "description": "Immutable Seaport contract address",
+            "example": "0x12"
+          },
+          "seaport_version": {
+            "type": "string",
+            "description": "Immutable Seaport contract version",
+            "example": "1.4"
           }
         },
         "example": {
-          "order_type": "FULL_OPEN"
+          "order_type": "FULL_RESTRICTED",
+          "zone_address": "0x12",
+          "counter": "92315562",
+          "seaport_address": "0x12",
+          "seaport_version": "1.4"
         },
-        "required": ["order_type"]
+        "required": [
+          "order_type",
+          "counter",
+          "order_type",
+          "zone_address",
+          "seaport_address",
+          "seaport_version"
+        ]
+      },
+      "ProtocolData": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateOrderProtocolData"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "operator_signature": {
+                "type": "string",
+                "description": "Operator signature signed by orderbook",
+                "example": "0x12"
+              }
+            },
+            "example": {
+              "operator_signature": "0x12"
+            },
+            "required": [
+              "operator_signature"
+            ]
+          }
+        ]
       },
       "SellItem": {
         "type": "object",
@@ -2617,7 +2810,9 @@
             "type": "string",
             "description": "Token type user is offering which in this case is a ERC721",
             "example": "ERC721",
-            "enum": ["ERC721"]
+            "enum": [
+              "ERC721"
+            ]
           },
           "contract_address": {
             "type": "string",
@@ -2637,7 +2832,11 @@
           "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
           "token_id": "1"
         },
-        "required": ["item_type", "contract_address", "token_id"]
+        "required": [
+          "item_type",
+          "contract_address",
+          "token_id"
+        ]
       }
     }
   }

@@ -15,15 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CreateOrderProtocolData } from './create-order-protocol-data';
+import { ContractType } from './contract-type';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ProtocolDataAllOf } from './protocol-data-all-of';
+import { ERC20 } from './erc20';
+// May contain unused imports in some cases
+// @ts-ignore
+import { ERC721Token } from './erc721-token';
 
 /**
- * @type ProtocolData
+ * @type ActivityToken
+ * The contract and token details for this activity
  * @export
  */
-export type ProtocolData = CreateOrderProtocolData & ProtocolDataAllOf;
+export type ActivityToken = ERC20 | ERC721Token;
 
 

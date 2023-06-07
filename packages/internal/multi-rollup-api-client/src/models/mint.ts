@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ActivityType } from './activity-type';
+import { ActivityToken } from './activity-token';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Token } from './token';
+import { ActivityType } from './activity-type';
 
 /**
  * The mint activity details
@@ -46,9 +46,9 @@ export interface Mint {
     'amount': string;
     /**
      * 
-     * @type {Token}
+     * @type {ActivityToken}
      * @memberof Mint
      */
-    'token': Token;
+    'token': ActivityToken;
 }
 

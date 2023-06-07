@@ -13,24 +13,21 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { Token } from './token';
 
 /**
- * Pagination properties
+ * Single Token
  * @export
- * @interface Page
+ * @interface GetTokenResult
  */
-export interface Page {
+export interface GetTokenResult {
     /**
-     * First item as base64 encoded string
-     * @type {string}
-     * @memberof Page
+     * 
+     * @type {Token}
+     * @memberof GetTokenResult
      */
-    'previous_cursor': string | null;
-    /**
-     * Last item as base64 encoded string
-     * @type {string}
-     * @memberof Page
-     */
-    'next_cursor': string | null;
+    'result': Token;
 }
 

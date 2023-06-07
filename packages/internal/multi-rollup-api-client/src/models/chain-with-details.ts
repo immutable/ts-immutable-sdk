@@ -13,24 +13,17 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { Chain } from './chain';
+// May contain unused imports in some cases
+// @ts-ignore
+import { ChainWithDetailsAllOf } from './chain-with-details-all-of';
 
 /**
- * Pagination properties
+ * @type ChainWithDetails
  * @export
- * @interface Page
  */
-export interface Page {
-    /**
-     * First item as base64 encoded string
-     * @type {string}
-     * @memberof Page
-     */
-    'previous_cursor': string | null;
-    /**
-     * Last item as base64 encoded string
-     * @type {string}
-     * @memberof Page
-     */
-    'next_cursor': string | null;
-}
+export type ChainWithDetails = Chain & ChainWithDetailsAllOf;
+
 
