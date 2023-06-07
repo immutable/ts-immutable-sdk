@@ -23,7 +23,7 @@ describe('prepareListing and createOrder e2e', () => {
       zoneContractAddress: config.zoneContractAddress,
       overrides: {
         apiEndpoint: config.apiUrl,
-        chainId: 'eip155:31337',
+        chainName: 'imtbl-zkevm-local',
       },
     });
 
