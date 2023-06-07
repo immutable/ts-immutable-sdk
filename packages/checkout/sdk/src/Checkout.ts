@@ -219,6 +219,12 @@ export class Checkout {
     return await network.getNetworkInfo(this.config, params.provider);
   }
 
+  /**
+   * Get gas estimates for bridge transaction.
+   * @param {GetBridgeGasEstimateParams} params - The necessary data required to get the gas estimates.
+   * @returns Network details.
+   * @throws {@link ErrorType}
+   */
   public async getBridgeGasEstimate(
     params: GetBridgeGasEstimateParams,
   ): Promise<GetBridgeGasEstimateResult> {
