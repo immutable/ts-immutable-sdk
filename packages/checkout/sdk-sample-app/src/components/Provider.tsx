@@ -1,6 +1,6 @@
 import {
   Checkout,
-  DefaultProviders,
+  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
@@ -28,7 +28,7 @@ export default function Provider(props: ProviderProps) {
     setLoading(true);
     try {
       const resp = await checkout.createProvider({
-        providerName: DefaultProviders.METAMASK,
+        providerName: WalletProviderName.METAMASK,
       });
       setProvider(resp.provider);
       setResult1(resp.provider);

@@ -174,7 +174,8 @@ export async function switchWalletNetwork(
 
   const newProvider = new Web3Provider(web3Provider.provider);
 
-  if (newProvider.network.chainId !== chainId) {
+  const newProviderNetwork = await newProvider.getNetwork();
+  if (newProviderNetwork.chainId !== chainId) {
     throw new CheckoutError(
       'User cancelled switch network request',
       CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,

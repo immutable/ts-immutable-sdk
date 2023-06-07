@@ -1,4 +1,4 @@
-import { Checkout, ChainId, NetworkInfo, DefaultProviders } from '@imtbl/checkout-sdk';
+import { Checkout, ChainId, NetworkInfo, WalletProviderName } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import LoadingButton from './LoadingButton';
@@ -52,7 +52,7 @@ export default function SendTransaction(props: SendTransactionProps) {
       return;
     }
 
-    // const defaultProvider = await checkout.createDefaultProvider({providerName:DefaultProviders.METAMASK})
+    // const defaultProvider = await checkout.createDefaultProvider({providerName:WalletProviderName.METAMASK})
 
     setError(null);
     setLoading(true);
