@@ -32,11 +32,9 @@ import {
   SendTransactionResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
-  GetReadOnlyProvidersResult,
 } from './types';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
-import { setReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 import {
   getBridgeFeeEstimate,
   getBridgeGasEstimate,
@@ -45,6 +43,7 @@ import {
   GetBridgeGasEstimateParams,
   GetBridgeGasEstimateResult,
 } from './types/gasEstimates';
+import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
@@ -220,12 +219,6 @@ export class Checkout {
     return await network.getNetworkInfo(this.config, params.provider);
   }
 
-  public getReadOnlyProviders(): GetReadOnlyProvidersResult {
-    return {
-      providers: this.readOnlyProviders,
-    };
-  }
-
   public async getBridgeGasEstimate(
     params: GetBridgeGasEstimateParams,
   ): Promise<GetBridgeGasEstimateResult> {
@@ -261,7 +254,7 @@ export class Checkout {
     fromChainId: ChainId,
     toChainId: ChainId,
   ): Promise<TokenBridge> {
-    this.readOnlyProviders = await setReadOnlyProviders(this.config);
+    this.readOnlyProviders = await createReadOnlyProviders(this.config);
 
     const rootChainProvider = this.readOnlyProviders.get(fromChainId);
     const childChainProvider = this.readOnlyProviders.get(toChainId);
