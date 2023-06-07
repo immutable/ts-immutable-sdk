@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { Web3Provider } from '@ethersproject/providers';
 import * as balances from './balances';
 import * as tokens from './tokens';
@@ -42,7 +43,13 @@ export class Checkout {
     this.config = new CheckoutConfiguration(config);
   }
 
-  // eslint-disable-next-line class-methods-use-this
+  /**
+   * Create a provider object which can be used within the Checkout class mathods.
+   * Based on a walletProviderName
+   * @param {CreateProviderParams} params The data required to create a provider
+   * @returns A new provider object
+   * @throws {@link ErrorType}
+   */
   public async createProvider(
     params: CreateProviderParams,
   ): Promise<CreateProviderResult> {
@@ -61,7 +68,6 @@ export class Checkout {
    * @returns Wallet connection status details.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async checkIsWalletConnected(
     params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
@@ -187,7 +193,6 @@ export class Checkout {
    * @returns List of allowed tokens.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async getTokenAllowList(
     params: GetTokenAllowListParams,
   ): Promise<GetTokenAllowListResult> {
@@ -200,7 +205,6 @@ export class Checkout {
    * @returns List of allowed wallets.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async getWalletAllowList(
     params: GetWalletAllowListParams,
   ): Promise<GetWalletAllowListResult> {
@@ -215,7 +219,6 @@ export class Checkout {
    * @remarks
    * Further documenation can be found at [MetaMask | Sending Transactions](https://docs.metamask.io/guide/sending-transactions.html).
    */
-  // eslint-disable-next-line class-methods-use-this
   public async sendTransaction(
     params: SendTransactionParams,
   ): Promise<SendTransactionResult> {

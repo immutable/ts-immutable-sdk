@@ -1,2 +1,2 @@
 export * from './provider';
-export * from './web3provider';
+export * from './validateProvider';
