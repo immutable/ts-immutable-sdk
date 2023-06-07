@@ -1,6 +1,9 @@
+/* eslint-disable class-methods-use-this */
+import { Web3Provider } from '@ethersproject/providers';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
+import * as provider from './provider';
 import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
@@ -8,9 +11,10 @@ import {
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
-  ConnectionProviders,
   ConnectParams,
   ConnectResult,
+  CreateProviderParams,
+  CreateProviderResult,
   GetAllBalancesParams,
   GetAllBalancesResult,
   GetBalanceParams,
@@ -28,19 +32,33 @@ import {
   SendTransactionResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
+  ValidateProviderOptions,
 } from './types';
-import { CheckoutError, CheckoutErrorType } from './errors';
-import {
-  CheckoutConfiguration,
-} from './config';
+import { CheckoutConfiguration } from './config';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
 
-  private providerPreference: ConnectionProviders | undefined;
-
   constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
+  }
+
+  /**
+   * Create a provider object which can be used within the Checkout class mathods.
+   * Based on a walletProviderName
+   * @param {CreateProviderParams} params The data required to create a provider
+   * @returns A new provider object
+   * @throws {@link ErrorType}
+   */
+  public async createProvider(
+    params: CreateProviderParams,
+  ): Promise<CreateProviderResult> {
+    const web3Provider: Web3Provider = await provider.createProvider(
+      params.providerName,
+    );
+    return {
+      provider: web3Provider,
+    };
   }
 
   /**
@@ -50,11 +68,15 @@ export class Checkout {
    * @returns Wallet connection status details.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async checkIsWalletConnected(
     params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
-    return connect.checkIsWalletConnected(params.providerPreference);
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+    );
+    return connect.checkIsWalletConnected(web3Provider);
   }
 
   /**
@@ -64,12 +86,16 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async connect(params: ConnectParams): Promise<ConnectResult> {
-    this.providerPreference = params.providerPreference;
-    const provider = await connect.connectWalletProvider(params);
-    const networkInfo = await network.getNetworkInfo(this.config, provider);
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+    );
+    await connect.connectSite(web3Provider);
+    const networkInfo = await network.getNetworkInfo(this.config, web3Provider);
 
     return {
-      provider,
+      provider: web3Provider,
       network: networkInfo,
     };
   }
@@ -83,19 +109,19 @@ export class Checkout {
   public async switchNetwork(
     params: SwitchNetworkParams,
   ): Promise<SwitchNetworkResult> {
-    if (!this.providerPreference) {
-      throw new CheckoutError(
-        'connect should be called before switchNetwork to set the provider preference',
-        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR,
-      );
-    }
-
-    return await network.switchWalletNetwork(
+    const web3Provider = await provider.validateProvider(
       this.config,
-      this.providerPreference,
       params.provider,
+      { allowUnsupportedProvider: true, allowMistmatchedChainId: true } as ValidateProviderOptions,
+    );
+
+    const switchNetworkRes = await network.switchWalletNetwork(
+      this.config,
+      web3Provider,
       params.chainId,
     );
+
+    return switchNetworkRes;
   }
 
   /**
@@ -107,15 +133,20 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+    );
+
     if (!params.contractAddress || params.contractAddress === '') {
       return await balances.getBalance(
         this.config,
-        params.provider,
+        web3Provider,
         params.walletAddress,
       );
     }
     return await balances.getERC20Balance(
-      params.provider,
+      web3Provider,
       params.walletAddress,
       params.contractAddress,
     );
@@ -131,9 +162,14 @@ export class Checkout {
   public async getAllBalances(
     params: GetAllBalancesParams,
   ): Promise<GetAllBalancesResult> {
-    return balances.getAllBalances(
+    const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
+    );
+
+    return balances.getAllBalances(
+      this.config,
+      web3Provider,
       params.walletAddress,
       params.chainId,
     );
@@ -157,7 +193,6 @@ export class Checkout {
    * @returns List of allowed tokens.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async getTokenAllowList(
     params: GetTokenAllowListParams,
   ): Promise<GetTokenAllowListResult> {
@@ -170,7 +205,6 @@ export class Checkout {
    * @returns List of allowed wallets.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async getWalletAllowList(
     params: GetWalletAllowListParams,
   ): Promise<GetWalletAllowListResult> {
@@ -185,11 +219,17 @@ export class Checkout {
    * @remarks
    * Further documenation can be found at [MetaMask | Sending Transactions](https://docs.metamask.io/guide/sending-transactions.html).
    */
-  // eslint-disable-next-line class-methods-use-this
   public async sendTransaction(
     params: SendTransactionParams,
   ): Promise<SendTransactionResult> {
-    return await transaction.sendTransaction(params);
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+    );
+    return await transaction.sendTransaction(
+      web3Provider,
+      params.transaction,
+    );
   }
 
   /**
@@ -199,6 +239,12 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
-    return await network.getNetworkInfo(this.config, params.provider);
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+      { allowUnsupportedProvider: true, allowMistmatchedChainId: true } as ValidateProviderOptions,
+
+    );
+    return await network.getNetworkInfo(this.config, web3Provider);
   }
 }

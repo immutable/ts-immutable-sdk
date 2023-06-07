@@ -2,7 +2,6 @@ import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
 
 /**
  * Interface representing the parameters for {@link Checkout.sendTransaction}.
- * @property {Web3Provider} provider - The provider to connect to the network.
  * @property {Transaction} transaction - The transaction to send.
  */
 export interface SendTransactionParams {
@@ -30,12 +29,12 @@ export interface SendTransactionResult {
  * @property {number} chainId - The ID of the chain the transaction is for.
  */
 export interface Transaction {
-  nonce: string;
-  gasPrice: string;
-  gas: string;
-  to: string;
-  from: string;
-  value: string;
-  data: string;
-  chainId: number;
+  nonce?: string;
+  gasPrice?: string;
+  gas?: string;
+  to?: string;
+  from?: string;
+  value?: string;
+  data?: string;
+  chainId?: number;
 }

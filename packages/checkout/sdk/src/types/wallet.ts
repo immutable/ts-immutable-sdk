@@ -8,6 +8,7 @@ export enum WalletAction {
   CONNECT = 'eth_requestAccounts',
   ADD_NETWORK = 'wallet_addEthereumChain',
   SWITCH_NETWORK = 'wallet_switchEthereumChain',
+  GET_CHAINID = 'eth_chainId',
 }
 
 /**
