@@ -5,7 +5,6 @@ import {
   WalletProviderName,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
-import { CheckoutConfiguration } from '../config';
 
 async function getMetaMaskProvider(): Promise<Web3Provider> {
   const provider = await withCheckoutError<ExternalProvider | null>(
@@ -24,7 +23,6 @@ async function getMetaMaskProvider(): Promise<Web3Provider> {
 }
 
 export async function createProvider(
-  config: CheckoutConfiguration,
   defaultProvider: WalletProviderName,
 ): Promise<Web3Provider> {
   let web3Provider: Web3Provider | null = null;

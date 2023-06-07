@@ -1,6 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { SendTransactionParams } from '../types';
 import { sendTransaction } from './transaction';
 
 describe('transaction', () => {
@@ -27,12 +26,7 @@ describe('transaction', () => {
       chainId: 1,
     };
 
-    const params: SendTransactionParams = {
-      provider: mockProvider,
-      transaction,
-    };
-
-    await expect(sendTransaction(params)).resolves.toEqual({
+    await expect(sendTransaction(mockProvider, transaction)).resolves.toEqual({
       transactionResponse,
     });
   });
@@ -57,12 +51,7 @@ describe('transaction', () => {
       chainId: 1,
     };
 
-    const params: SendTransactionParams = {
-      provider: mockProvider,
-      transaction,
-    };
-
-    await expect(sendTransaction(params)).rejects.toThrow(
+    await expect(sendTransaction(mockProvider, transaction)).rejects.toThrow(
       new CheckoutError(
         '[TRANSACTION_ERROR] Cause:Transaction errored',
         CheckoutErrorType.TRANSACTION_ERROR,

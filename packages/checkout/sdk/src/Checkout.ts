@@ -42,11 +42,11 @@ export class Checkout {
     this.config = new CheckoutConfiguration(config);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   public async createProvider(
     params: CreateProviderParams,
   ): Promise<CreateProviderResult> {
     const web3Provider: Web3Provider = await provider.createProvider(
-      this.config,
       params.providerName,
     );
     return {
@@ -85,7 +85,7 @@ export class Checkout {
       params.provider,
       { allowUnsupportedProvider: true } as ValidateProviderOptions,
     );
-    await connect.connectSite({ web3Provider });
+    await connect.connectSite(web3Provider);
     const networkInfo = await network.getNetworkInfo(this.config, web3Provider);
 
     return {
@@ -224,7 +224,6 @@ export class Checkout {
       params.provider,
     );
     return await transaction.sendTransaction(
-      this.config,
       web3Provider,
       params.transaction,
     );
