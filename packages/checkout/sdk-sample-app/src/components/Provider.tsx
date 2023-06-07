@@ -27,7 +27,7 @@ export default function Provider(props: ProviderProps) {
     setError1(null);
     setLoading(true);
     try {
-      const resp = await checkout.createDefaultProvider({
+      const resp = await checkout.createProvider({
         providerName: DefaultProviders.METAMASK,
       });
       setProvider(resp.provider);

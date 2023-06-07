@@ -5,15 +5,15 @@ import { CheckoutError, CheckoutErrorType } from '../errors';
 import { WalletAction } from '../types';
 
 // this gives us access to the properties of the underlying provider object
-export async function getUnderlyingChainId(provider:Web3Provider) {
-  if (!provider.provider.request) {
+export async function getUnderlyingChainId(web3Provider:Web3Provider) {
+  if (!web3Provider.provider.request) {
     throw new CheckoutError(
       'Parsed provider is not a valid Web3Provider',
       CheckoutErrorType.WEB3_PROVIDER_ERROR,
     );
   }
 
-  const chainId = await provider.provider.request({
+  const chainId = await web3Provider.provider.request({
     method: WalletAction.GET_CHAINID,
     params: [],
   });

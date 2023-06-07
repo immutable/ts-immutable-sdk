@@ -42,7 +42,7 @@ export class Checkout {
     this.config = new CheckoutConfiguration(config);
   }
 
-  public async createDefaultProvider(
+  public async createProvider(
     params: CreateProviderParams,
   ): Promise<CreateProviderResult> {
     const web3Provider: Web3Provider = await provider.createProvider(

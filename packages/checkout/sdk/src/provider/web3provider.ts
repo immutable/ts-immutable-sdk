@@ -10,9 +10,9 @@ import { getNetworkAllowList } from '../network';
 import { getUnderlyingChainId } from './getUnderlyingProvider';
 
 export function isWeb3Provider(
-  provider: Web3Provider,
+  web3Provider: Web3Provider,
 ): boolean {
-  if (provider && provider instanceof Web3Provider && provider.provider?.request) {
+  if (web3Provider && web3Provider instanceof Web3Provider && web3Provider.provider?.request) {
     return true;
   }
   return false;
@@ -20,12 +20,12 @@ export function isWeb3Provider(
 
 export async function validateProvider(
   config: CheckoutConfiguration,
-  parsedProvider: Web3Provider,
-  parsedOptions?: ValidateProviderOptions,
+  web3Provider: Web3Provider,
+  validateProviderOptions?: ValidateProviderOptions,
 ): Promise<Web3Provider> {
   return withCheckoutError(
     async () => {
-      if (!isWeb3Provider(parsedProvider)) {
+      if (!isWeb3Provider(web3Provider)) {
         throw new CheckoutError(
           'Parsed provider is not a valid Web3Provider',
           CheckoutErrorType.WEB3_PROVIDER_ERROR,
@@ -35,12 +35,12 @@ export async function validateProvider(
       // this sets the default options and overrides them with any parsed options
       const options = {
         ...validateProviderDefaults,
-        ...parsedOptions,
+        ...validateProviderOptions,
       };
 
-      const underlyingChainId = await getUnderlyingChainId(parsedProvider);
+      const underlyingChainId = await getUnderlyingChainId(web3Provider);
 
-      if (parsedProvider.network.chainId !== underlyingChainId && !options.allowMistmatchedChainId) {
+      if (web3Provider.network.chainId !== underlyingChainId && !options.allowMistmatchedChainId) {
         throw new CheckoutError(
           'Your wallet has changed network, please switch to a supported network',
           CheckoutErrorType.WEB3_PROVIDER_ERROR,
@@ -59,7 +59,7 @@ export async function validateProvider(
           CheckoutErrorType.WEB3_PROVIDER_ERROR,
         );
       }
-      return parsedProvider;
+      return web3Provider;
     },
     {
       type: CheckoutErrorType.WEB3_PROVIDER_ERROR,

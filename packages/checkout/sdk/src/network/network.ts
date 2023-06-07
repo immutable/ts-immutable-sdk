@@ -22,11 +22,11 @@ const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 // eslint-disable-next-line consistent-return
 async function switchNetworkInWallet(
   networkMap: NetworkMap,
-  provider: Web3Provider,
+  web3Provider: Web3Provider,
   chainId: ChainId,
 ) {
-  if (provider.provider?.request) {
-    return await provider.provider.request({
+  if (web3Provider.provider?.request) {
+    return await web3Provider.provider.request({
       method: WalletAction.SWITCH_NETWORK,
       params: [
         {
@@ -41,10 +41,10 @@ async function switchNetworkInWallet(
 // eslint-disable-next-line consistent-return
 async function addNetworkToWallet(
   networkMap: NetworkMap,
-  provider: Web3Provider,
+  web3Provider: Web3Provider,
   chainId: ChainId,
 ) {
-  if (provider.provider?.request) {
+  if (web3Provider.provider?.request) {
     const networkDetails = networkMap.get(chainId);
     const addNetwork = {
       chainId: networkDetails?.chainIdHex,
@@ -53,7 +53,7 @@ async function addNetworkToWallet(
       nativeCurrency: networkDetails?.nativeCurrency,
       blockExplorerUrls: networkDetails?.blockExplorerUrls,
     };
-    return await provider.provider.request({
+    return await web3Provider.provider.request({
       method: WalletAction.ADD_NETWORK,
       params: [addNetwork],
     });
@@ -94,13 +94,13 @@ export async function getNetworkAllowList(
 
 export async function getNetworkInfo(
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  web3Provider: Web3Provider,
 ): Promise<NetworkInfo> {
   const { networkMap } = config;
   return withCheckoutError(
     async () => {
       try {
-        const network = await provider.getNetwork();
+        const network = await web3Provider.getNetwork();
         if (Array.from(networkMap.keys()).includes(network.chainId as ChainId)) {
           const chainIdNetworkInfo = networkMap.get(network.chainId as ChainId);
           return {
@@ -116,7 +116,7 @@ export async function getNetworkInfo(
           isSupported: false,
         } as NetworkInfo;
       } catch (err) {
-        const chainId = await getUnderlyingChainId(provider);
+        const chainId = await getUnderlyingChainId(web3Provider);
         const isSupported = Array.from(networkMap.keys()).includes(chainId as ChainId);
         return {
           chainId,
@@ -174,15 +174,14 @@ export async function switchWalletNetwork(
 
   const newProvider = new Web3Provider(web3Provider.provider);
 
-  let networkInfo: NetworkInfo;
-  try {
-    networkInfo = await getNetworkInfo(config, newProvider);
-  } catch (err) {
+  if (newProvider.network.chainId !== chainId) {
     throw new CheckoutError(
       'User cancelled switch network request',
       CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
     );
   }
+
+  const networkInfo: NetworkInfo = await getNetworkInfo(config, newProvider);
 
   return {
     network: networkInfo,

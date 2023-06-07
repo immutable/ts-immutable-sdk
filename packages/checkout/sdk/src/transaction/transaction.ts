@@ -5,11 +5,11 @@ import { CheckoutConfiguration } from '../config';
 
 export const sendTransaction = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  web3Provider: Web3Provider,
   transaction: any,
 ): Promise<SendTransactionResult> => await withCheckoutError<SendTransactionResult>(
   async () => {
-    const transactionResponse = await provider!
+    const transactionResponse = await web3Provider!
       .getSigner()
       .sendTransaction(transaction);
     return {
