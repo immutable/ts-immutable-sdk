@@ -1,5 +1,6 @@
 import { mount } from 'cypress/react18';
 import { describe } from 'local-cypress';
+import { TransactionResponse } from '@ethersproject/providers';
 import { BridgeWidgetTestComponent } from '../test-components/BridgeWidgetTestComponent';
 import { cySmartGet } from '../../../lib/testUtils';
 import { text } from '../../../resources/text/textConfig';
@@ -12,11 +13,19 @@ describe('MoveInProgress View', () => {
   it('should render the MoveInProgress view with the correct token symbol in the body text', () => {
     mount(
       <BridgeWidgetTestComponent>
-        <MoveInProgress token={{
-          name: 'Immutable X',
-          symbol: 'IMX',
-          decimals: 18,
-        }}
+        <MoveInProgress
+          token={{
+            name: 'Immutable X',
+            symbol: 'IMX',
+            decimals: 18,
+          }}
+          transactionResponse={{
+            wait: () => {},
+          } as TransactionResponse}
+          bridgeForm={{
+            tokenAddress: '',
+            amount: '',
+          }}
         />
       </BridgeWidgetTestComponent>,
     );

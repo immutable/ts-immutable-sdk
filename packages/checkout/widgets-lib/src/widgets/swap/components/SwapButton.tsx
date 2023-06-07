@@ -44,7 +44,19 @@ export function SwapButton({
           provider,
           transaction: transaction.approveTransaction,
         });
-        await txn.transactionResponse.wait();
+        const approvalReceipt = await txn.transactionResponse.wait();
+        if (approvalReceipt.status !== 1) {
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: SwapWidgetViews.FAIL,
+                data: data as PrefilledSwapForm,
+                reason: 'Transaction failed',
+              },
+            },
+          });
+        }
       }
       const txn = await checkout.sendTransaction({
         provider,
@@ -54,7 +66,7 @@ export function SwapButton({
 
       updateLoading(false);
 
-      if (receipt.status === 0 || receipt.status === undefined) {
+      if (receipt.status !== 1) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
