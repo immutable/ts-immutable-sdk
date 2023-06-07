@@ -1,6 +1,7 @@
 /sdk @immutable/developer-experience
 /packages/immutablex_client @immutable/developer-experience
 /packages/config @immutable/developer-experience
+/packages/internal/generated-clients @immutable/developer-experience
 /packages/internal/toolkit @immutable/wallets
 /packages/internal/cryptofiat @immutable/wallets
 /packages/internal/dex @immutable/tokens
