@@ -1,6 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
-import { getBridgeGasEstimate } from './bridgeGasEstimate';
+import { getBridgeEstimatedGas } from './bridgeGasEstimate';
 import { ChainId } from '../types';
 
 describe('getBridgeGasEstimate', () => {
@@ -23,7 +23,7 @@ describe('getBridgeGasEstimate', () => {
       data: '0x1',
     };
 
-    const result = await getBridgeGasEstimate(txn, provider, ChainId.ETHEREUM);
+    const result = await getBridgeEstimatedGas(txn, provider, ChainId.ETHEREUM);
 
     expect(result.estimatedAmount).toEqual(BigNumber.from('0x02'));
     expect(result.token).toBeDefined();
@@ -50,7 +50,7 @@ describe('getBridgeGasEstimate', () => {
       data: '0x1',
     };
 
-    const result = await getBridgeGasEstimate(
+    const result = await getBridgeEstimatedGas(
       txn,
       provider,
       ChainId.ETHEREUM,
@@ -71,7 +71,7 @@ describe('getBridgeGasEstimate', () => {
       data: '0x1',
     };
 
-    const result = await getBridgeGasEstimate(txn, provider, ChainId.ETHEREUM);
+    const result = await getBridgeEstimatedGas(txn, provider, ChainId.ETHEREUM);
 
     expect(result.estimatedAmount).toEqual(BigNumber.from('0x01'));
     expect(result.token).toBeDefined();

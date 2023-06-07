@@ -2,7 +2,6 @@ import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { FungibleToken } from '@imtbl/bridge-sdk';
 import { TokenInfo } from './tokenInfo';
-import { ChainId } from './chainId';
 
 /**
  * * Interface representing the parameters for {@link Checkout.getBridgeGasEstimate}.
@@ -10,16 +9,12 @@ import { ChainId } from './chainId';
  @property {TransactionRequest} transaction - Bridge transaction request.
  @property {Web3Provider} provider - Provider.
  @property {TransactionRequest} approveTxn - Approval transaction request.
- @property {ChainId} fromChainId - Chain id to bridge from.
- @property {ChainId} toChainId - Chain id to bridge to.
  * */
 export interface GetBridgeGasEstimateParams {
   tokenAddress: FungibleToken;
   transaction: TransactionRequest;
   provider: Web3Provider;
   approveTxn?: TransactionRequest;
-  fromChainId: ChainId;
-  toChainId: ChainId;
 }
 
 /**

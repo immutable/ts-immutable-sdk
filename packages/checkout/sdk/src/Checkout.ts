@@ -42,7 +42,7 @@ import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
 import {
   getBridgeFeeEstimate,
-  getBridgeGasEstimate,
+  getBridgeEstimatedGas,
 } from './gasEstimate/bridgeGasEstimate';
 import {
   GetBridgeGasEstimateParams,
@@ -233,27 +233,31 @@ export class Checkout {
   public async getBridgeGasEstimate(
     params: GetBridgeGasEstimateParams,
   ): Promise<GetBridgeGasEstimateResult> {
-    const tokenBridge = await this.getBridgeInstance(
-      params.fromChainId,
-      params.toChainId,
-    );
+    const fromChainId = this.config.environment === Environment.PRODUCTION
+      ? ChainId.ETHEREUM
+      : ChainId.SEPOLIA;
+    const toChainId = this.config.environment === Environment.PRODUCTION
+      ? ChainId.IMTBL_ZKEVM_TESTNET
+      : ChainId.IMTBL_ZKEVM_DEVNET;
+
+    const tokenBridge = await this.getBridgeInstance(fromChainId, toChainId);
 
     const result: GetBridgeGasEstimateResult = {};
 
     const bridgeFee = await getBridgeFeeEstimate(
       tokenBridge,
       params.tokenAddress,
-      params.toChainId,
+      toChainId,
     );
 
     result.bridgeFee = bridgeFee?.bridgeFee;
     result.bridgeable = bridgeFee?.bridgeable;
 
     if (result.bridgeable) {
-      result.gasEstimate = await getBridgeGasEstimate(
+      result.gasEstimate = await getBridgeEstimatedGas(
         params.transaction,
         params.provider,
-        params.fromChainId,
+        fromChainId,
         params.approveTxn,
       );
     }
@@ -291,10 +295,7 @@ export class Checkout {
         this.config.environment === Environment.PRODUCTION
           ? ETH_MAINNET_TO_ZKEVM_MAINNET
           : ETH_SEPOLIA_TO_ZKEVM_DEVNET,
-      // bridgeInstance: {
-      //   rootChainID: `eip155:${fromChainId.toString()}`,
-      //   childChainID: `eip155:${toChainId.toString()}`,
-      // },
+
       rootProvider: rootChainProvider,
       childProvider: childChainProvider,
     });

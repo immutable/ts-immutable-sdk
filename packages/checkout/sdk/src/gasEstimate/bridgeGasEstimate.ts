@@ -42,7 +42,7 @@ const getGasEstimates = async (
   return gasPriceInWei.mul(txnGasUnits);
 };
 
-export async function getBridgeGasEstimate(
+export async function getBridgeEstimatedGas(
   transaction: TransactionRequest,
   provider: Web3Provider,
   chainId: ChainId,

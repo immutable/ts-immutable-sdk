@@ -17,7 +17,7 @@ import { getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
 import {
   getBridgeFeeEstimate,
-  getBridgeGasEstimate,
+  getBridgeEstimatedGas,
 } from './gasEstimate/bridgeGasEstimate';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
@@ -202,11 +202,9 @@ describe(' Connect', () => {
         provider,
         transaction,
         tokenAddress: 'NATIVE',
-        fromChainId: ChainId.SEPOLIA,
-        toChainId: ChainId.IMTBL_ZKEVM_DEVNET,
       });
 
-      expect(getBridgeGasEstimate).toBeCalledTimes(1);
+      expect(getBridgeEstimatedGas).toBeCalledTimes(1);
       expect(getBridgeFeeEstimate).toBeCalledTimes(1);
     });
     it('should fetch gas estimate for non-bridgeable transaction', async () => {
@@ -222,11 +220,9 @@ describe(' Connect', () => {
         provider,
         transaction,
         tokenAddress: 'NATIVE',
-        fromChainId: ChainId.SEPOLIA,
-        toChainId: ChainId.IMTBL_ZKEVM_DEVNET,
       });
 
-      expect(getBridgeGasEstimate).not.toBeCalled();
+      expect(getBridgeEstimatedGas).not.toBeCalled();
       expect(getBridgeFeeEstimate).toBeCalledTimes(1);
     });
   });
