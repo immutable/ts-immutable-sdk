@@ -1,6 +1,6 @@
-import { Checkout, ChainId, NetworkInfo, WalletProviderName } from '@imtbl/checkout-sdk';
+import { Checkout, NetworkInfo } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
-import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
+import { SuccessMessage, ErrorMessage } from './messages';
 import LoadingButton from './LoadingButton';
 import { useEffect, useState } from 'react';
 import { Box } from '@biom3/react';
@@ -51,8 +51,6 @@ export default function SendTransaction(props: SendTransactionProps) {
       console.error('missing provider, please connect frist');
       return;
     }
-
-    // const defaultProvider = await checkout.createDefaultProvider({providerName:WalletProviderName.METAMASK})
 
     setError(null);
     setLoading(true);
