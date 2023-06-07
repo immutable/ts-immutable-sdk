@@ -67,7 +67,7 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
         provider,
         chainId,
       });
-      // setProvider(resp.provider);
+      setProvider(resp.provider);
       setResult(resp.network);
       setLoading(false);
     } catch (err: any) {
