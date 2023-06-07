@@ -1,10 +1,11 @@
 import { ethers } from 'ethers';
 import {
   BridgeConfiguration,
+  ETH_MAINNET_TO_ZKEVM_MAINNET,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
   TokenBridge,
 } from '@imtbl/bridge-sdk';
-import { ImmutableConfiguration } from '@imtbl/config';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
@@ -286,10 +287,13 @@ export class Checkout {
       baseConfig: new ImmutableConfiguration({
         environment: this.config.environment,
       }),
-      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      bridgeInstance:
+        this.config.environment === Environment.PRODUCTION
+          ? ETH_MAINNET_TO_ZKEVM_MAINNET
+          : ETH_SEPOLIA_TO_ZKEVM_DEVNET,
       // bridgeInstance: {
-      //   rootChainID: `eip:${fromChainId.toString()}`,
-      //   childChainID: `eip:${toChainId.toString()}`,
+      //   rootChainID: `eip155:${fromChainId.toString()}`,
+      //   childChainID: `eip155:${toChainId.toString()}`,
       // },
       rootProvider: rootChainProvider,
       childProvider: childChainProvider,
