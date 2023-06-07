@@ -1,5 +1,9 @@
 import { ethers } from 'ethers';
-import { BridgeConfiguration, TokenBridge } from '@imtbl/bridge-sdk';
+import {
+  BridgeConfiguration,
+  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  TokenBridge,
+} from '@imtbl/bridge-sdk';
 import { ImmutableConfiguration } from '@imtbl/config';
 import * as balances from './balances';
 import * as tokens from './tokens';
@@ -241,8 +245,8 @@ export class Checkout {
       params.toChainId,
     );
 
-    result.bridgeFee = bridgeFee.bridgeFee;
-    result.bridgeable = bridgeFee.bridgeable;
+    result.bridgeFee = bridgeFee?.bridgeFee;
+    result.bridgeable = bridgeFee?.bridgeable;
 
     if (result.bridgeable) {
       result.gasEstimate = await getBridgeGasEstimate(
@@ -282,10 +286,11 @@ export class Checkout {
       baseConfig: new ImmutableConfiguration({
         environment: this.config.environment,
       }),
-      bridgeInstance: {
-        rootChainID: fromChainId.toString(),
-        childChainID: toChainId.toString(),
-      },
+      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+      // bridgeInstance: {
+      //   rootChainID: `eip:${fromChainId.toString()}`,
+      //   childChainID: `eip:${toChainId.toString()}`,
+      // },
       rootProvider: rootChainProvider,
       childProvider: childChainProvider,
     });
