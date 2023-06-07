@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/dot-notation */
+/** @jest-environment jsdom */
 
 import 'reflect-metadata';
 import Container from 'typedi';

@@ -1,6 +1,4 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-// TODO: Remove this once the dependency has been fixed
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
@@ -92,6 +90,7 @@ describe('Passport', () => {
           baseConfig,
           overrides: {
             authenticationDomain: 'authenticationDomain123',
+            imxPublicApiDomain: 'guardianDomain123',
             magicProviderId: 'providerId123',
             magicPublishableApiKey: 'publishableKey123',
             network: Networks.SANDBOX,

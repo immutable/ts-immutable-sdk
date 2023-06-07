@@ -1,8 +1,14 @@
-import { ItemType } from '@opensea/seaport-js/lib/constants';
 import {
-  BuyItem, Fee, Order, OrdersService, CreateOrderProtocolData, SellItem,
+  BuyItem,
+  Fee,
+  OrdersService,
+  CreateOrderProtocolData,
+  SellItem,
+  ListOrdersResult,
+  OrderResult,
 } from 'openapi/sdk';
-import { CreateOrderParams } from 'types';
+import { CreateOrderParams, ListOrderParams } from 'types';
+import { ItemType } from '../seaport';
 
 export class ImmutableApiClient {
   constructor(
@@ -10,15 +16,22 @@ export class ImmutableApiClient {
     private readonly chainId: string,
   ) {}
 
-  async getOrder(orderId: string): Promise<Order> {
+  async getOrder(orderId: string): Promise<OrderResult> {
     return this.orderbookService.getOrder({ chainId: this.chainId, orderId });
+  }
+
+  async listOrders(listOrderParams: ListOrderParams): Promise<ListOrdersResult> {
+    return this.orderbookService.listOrders({
+      chainId: this.chainId,
+      ...listOrderParams,
+    });
   }
 
   async createOrder(
     {
       orderHash, orderComponents, offerer, orderSignature,
     }: CreateOrderParams,
-  ): Promise<Order> {
+  ): Promise<OrderResult> {
     if (orderComponents.offer.length !== 1) {
       throw new Error('Only one item can be listed at a time');
     }
@@ -42,7 +55,7 @@ export class ImmutableApiClient {
         buy: [
           {
             item_type: Number(orderComponents.consideration[0].itemType) === ItemType.NATIVE
-              ? BuyItem.item_type.IMX
+              ? BuyItem.item_type.NATIVE
               : BuyItem.item_type.ERC20,
             start_amount: orderComponents.consideration[0].startAmount,
           }],
@@ -57,7 +70,7 @@ export class ImmutableApiClient {
           : [],
         end_time: new Date(parseInt(`${orderComponents.endTime.toString()}000`, 10)).toISOString(),
         protocol_data: {
-          order_type: CreateOrderProtocolData.order_type.FULL_OPEN,
+          order_type: CreateOrderProtocolData.order_type.FULL_RESTRICTED,
           zone_address: orderComponents.zone,
         },
         salt: orderComponents.salt,

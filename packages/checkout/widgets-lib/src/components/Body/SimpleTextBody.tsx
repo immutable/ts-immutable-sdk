@@ -15,9 +15,9 @@ export function SimpleTextBody(props: SimpleTextBodyProps) {
 
   return (
     <Box sx={simpleTextBodyStyle}>
-      <Heading size="small">{heading}</Heading>
+      <Heading testId="simple-text-body__heading" size="small">{heading}</Heading>
       <Box sx={bodyBoxStyle}>
-        <Body size="small" sx={bodyStyle}>
+        <Body testId="simple-text-body__body" size="small" sx={bodyStyle}>
           {children}
         </Body>
       </Box>

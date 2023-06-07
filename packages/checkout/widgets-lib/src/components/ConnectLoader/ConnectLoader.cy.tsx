@@ -136,7 +136,7 @@ describe('ConnectLoader', () => {
       .as('getNetworkInfoStub')
       .resolves({
         isSupported: true,
-        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
       });
 
     mount(
@@ -173,11 +173,11 @@ describe('ConnectLoader', () => {
             getAddress: async () => Promise.resolve(''),
           }),
           getNetwork: async () => ({
-            chainId: 11155111,
-            name: 'SEPOLIA',
+            chainId: ChainId.POLYGON_ZKEVM_TESTNET,
+            name: 'Polygon zkEVM Testnet',
           }),
         },
-        network: { name: 'Sepolia' },
+        network: { name: 'Polygon zkEVM Testnet' },
       });
 
     mount(

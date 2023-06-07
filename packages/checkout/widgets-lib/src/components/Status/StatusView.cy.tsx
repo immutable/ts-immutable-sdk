@@ -72,7 +72,7 @@ describe('status view', () => {
             // eslint-disable-next-line no-console
             console.log('clicked!');
           }}
-          statusType={StatusType.REJECTED}
+          statusType={StatusType.WARNING}
           statusText="Test rejected"
         />
       </BiomeThemeProvider>,
@@ -80,10 +80,10 @@ describe('status view', () => {
 
     cySmartGet('status-view-container').should('be.visible');
     cySmartGet('status-view').should('be.visible');
-    cySmartGet('rejected-box').should('be.visible');
-    cySmartGet('rejected-icon').should('be.visible');
-    cySmartGet('rejected-text').should('be.visible');
-    cySmartGet('rejected-text').should('have.text', 'Test rejected');
+    cySmartGet('warning-box').should('be.visible');
+    cySmartGet('warning-icon').should('be.visible');
+    cySmartGet('warning-text').should('be.visible');
+    cySmartGet('warning-text').should('have.text', 'Test rejected');
     cySmartGet('status-action-button').should('be.visible');
     cySmartGet('status-action-button').should('have.text', 'Close');
     cySmartGet('footer-logo-container').should('be.visible');

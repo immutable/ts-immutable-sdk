@@ -14,9 +14,13 @@ export { CreateOrderProtocolData } from './models/CreateOrderProtocolData';
 export type { CreateOrderRequestBody } from './models/CreateOrderRequestBody';
 export type { Error } from './models/Error';
 export { Fee } from './models/Fee';
-export { Order } from './models/Order';
-export type { Orders } from './models/Orders';
+export type { ListOrdersResult } from './models/ListOrdersResult';
+export type { Order } from './models/Order';
+export type { OrderResult } from './models/OrderResult';
+export { OrderStatus } from './models/OrderStatus';
 export type { Page } from './models/Page';
+export type { PageCursor } from './models/PageCursor';
+export type { PageSize } from './models/PageSize';
 export type { ProtocolData } from './models/ProtocolData';
 export { SellItem } from './models/SellItem';
 

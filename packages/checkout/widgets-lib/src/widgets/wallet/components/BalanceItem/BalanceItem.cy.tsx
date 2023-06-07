@@ -2,11 +2,14 @@ import React from 'react';
 import { mount } from 'cypress/react18';
 import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import { cy } from 'local-cypress';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { WalletState } from '../../context/WalletContext';
 import { BalanceItem } from './BalanceItem';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { cySmartGet } from '../../../../lib/testUtils';
 import { WalletWidgetTestComponent } from '../../test-components/WalletWidgetTestComponent';
+import { orchestrationEvents } from '../../../../lib/orchestrationEvents';
 
 describe('BalanceItem', () => {
   const baseWalletState: WalletState = {
@@ -28,6 +31,12 @@ describe('BalanceItem', () => {
     description: 'some description',
   };
 
+  beforeEach(() => {
+    cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('requestSwapEventStub');
+    cy.stub(orchestrationEvents, 'sendRequestBridgeEvent').as('requestBridgeEventStub');
+    cy.stub(orchestrationEvents, 'sendRequestOnrampEvent').as('requestOnrampEventStub');
+  });
+
   it('should show balance details', () => {
     mount(
       <WalletWidgetTestComponent>
@@ -48,7 +57,7 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        chainId: ChainId.POLYGON_ZKEVM,
         name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
           name: 'IMX',
@@ -78,7 +87,7 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        chainId: ChainId.POLYGON_ZKEVM,
         name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
           name: 'IMX',
@@ -114,7 +123,7 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        chainId: ChainId.POLYGON_ZKEVM,
         name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
           name: 'IMX',
@@ -149,7 +158,7 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.ETHEREUM,
+        chainId: ChainId.SEPOLIA,
         name: 'Ethereum',
         nativeCurrency: {
           name: 'Ethereum',
@@ -195,5 +204,104 @@ describe('BalanceItem', () => {
     );
 
     cySmartGet('token-menu').should('not.exist');
+  });
+
+  describe('Balance Item events', () => {
+    let testWalletState;
+    beforeEach(() => {
+      testWalletState = {
+        ...baseWalletState,
+        network: {
+          chainId: ChainId.POLYGON_ZKEVM,
+          name: 'Immutable zkEVM Testnet',
+          nativeCurrency: {
+            name: 'IMX',
+            symbol: 'IMX',
+            decimals: 18,
+          },
+          isSupported: true,
+        },
+        tokenBalances: [testBalanceInfo],
+        supportedTopUps: {
+          isOnRampEnabled: true,
+          isSwapEnabled: true,
+          isBridgeEnabled: true,
+        },
+      };
+    });
+
+    it('should emit sendRequestSwapEvent when swap menu button is clicked', () => {
+      mount(
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem balanceInfo={testBalanceInfo} />
+        </WalletWidgetTestComponent>,
+      );
+
+      cySmartGet('token-menu').should('exist');
+      cySmartGet('token-menu').click();
+      cySmartGet('balance-item-swap-option').click();
+      cySmartGet('@requestSwapEventStub').should('have.been.called');
+      cySmartGet('@requestSwapEventStub').should('have.been.calledWith', IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
+        toTokenAddress: '',
+        fromTokenAddress: '',
+        amount: '',
+      });
+    });
+
+    it('should emit sendRequestOnrampEvent when add menu button is clicked', () => {
+      mount(
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem balanceInfo={testBalanceInfo} />
+        </WalletWidgetTestComponent>,
+      );
+
+      cySmartGet('token-menu').should('exist');
+      cySmartGet('token-menu').click();
+      cySmartGet('balance-item-add-option').click();
+      cySmartGet('@requestOnrampEventStub').should('have.been.called');
+      cySmartGet('@requestOnrampEventStub').should(
+        'have.been.calledWith',
+        IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+
+        {
+          tokenAddress: '',
+          amount: '',
+        },
+      );
+    });
+
+    it('should emit sendRequestBridgeEvent when move menu button is clicked', () => {
+      testWalletState = {
+        ...testWalletState,
+        network: {
+          chainId: ChainId.SEPOLIA,
+          name: 'Immutable zkEVM Testnet',
+          nativeCurrency: {
+            name: 'ETH',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+          isSupported: true,
+        },
+      };
+      mount(
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem balanceInfo={testBalanceInfo} />
+        </WalletWidgetTestComponent>,
+      );
+
+      cySmartGet('token-menu').should('exist');
+      cySmartGet('token-menu').click();
+      cySmartGet('balance-item-move-option').click();
+      cySmartGet('@requestBridgeEventStub').should('have.been.called');
+      cySmartGet('@requestBridgeEventStub').should(
+        'have.been.calledWith',
+        IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+        {
+          tokenAddress: '',
+          amount: '',
+        },
+      );
+    });
   });
 });

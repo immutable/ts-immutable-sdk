@@ -1,12 +1,13 @@
 import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
 import { OrderbookModuleConfiguration } from 'config/config';
 import { ERC721Factory } from 'erc721';
-import { Order } from 'openapi/sdk';
+import { OrderStatus, ListOrdersResult, OrderResult } from 'openapi/sdk';
 import { Seaport, SeaportFactory } from 'seaport';
 import {
   CancelOrderResponse,
   CreateOrderParams,
   FulfilOrderResponse,
+  ListOrderParams,
   PrepareListingParams,
   PrepareListingResponse,
 } from 'types';
@@ -46,10 +47,20 @@ export class Orderbook {
   /**
    * Get an order by ID
    * @param {string} orderId - The orderId to find.
-   * @return {Order} The returned order.
+   * @return {OrderResult} The returned order result.
    */
-  getOrder(orderId: string): Promise<Order> {
+  getOrder(orderId: string): Promise<OrderResult> {
     return this.apiClient.getOrder(orderId);
+  }
+
+  /**
+   * List orders. This method is used to get a list of orders filtered by conditions specified
+   * in the params object.
+   * @param {ListOrderParams} listOrderParams - Filtering, ordering and page parameters.
+   * @return {Orders} The paged orders.
+   */
+  listOrders(listOrderParams: ListOrderParams): Promise<ListOrdersResult> {
+    return this.apiClient.listOrders(listOrderParams);
   }
 
   /**
@@ -81,9 +92,9 @@ export class Orderbook {
   /**
    * Create an order
    * @param {CreateOrderParams} createOrderParams - create an order with the given params.
-   * @return {Order} The order created in the Immutable services.
+   * @return {OrderResult} The result of the order created in the Immutable services.
    */
-  createOrder(createOrderParams: CreateOrderParams): Promise<Order> {
+  createOrder(createOrderParams: CreateOrderParams): Promise<OrderResult> {
     return this.apiClient.createOrder(createOrderParams);
   }
 
@@ -96,13 +107,13 @@ export class Orderbook {
    * @return {FulfilOrderResponse} Approval and fulfilment transactions.
    */
   async fulfillOrder(orderId: string, fulfillerAddress: string): Promise<FulfilOrderResponse> {
-    const order = await this.apiClient.getOrder(orderId);
+    const orderResult = await this.apiClient.getOrder(orderId);
 
-    if (order.status !== Order.status.ACTIVE) {
-      throw new Error(`Cannot fulfil order that is not active. Current status: ${order.status}`);
+    if (orderResult.result.status !== OrderStatus.ACTIVE) {
+      throw new Error(`Cannot fulfil order that is not active. Current status: ${orderResult.result.status}`);
     }
 
-    return this.seaport.fulfilOrder(order, fulfillerAddress);
+    return this.seaport.fulfilOrder(orderResult.result, fulfillerAddress);
   }
 
   /**
@@ -113,21 +124,24 @@ export class Orderbook {
    * @return {CancelOrderResponse} The unsigned cancel order transaction
    */
   async cancelOrder(orderId: string, accountAddress: string): Promise<CancelOrderResponse> {
-    const order = await this.apiClient.getOrder(orderId);
+    const orderResult = await this.apiClient.getOrder(orderId);
 
     if (
-      order.status !== Order.status.ACTIVE
-      && order.status !== Order.status.INACTIVE
-      && order.status !== Order.status.PENDING
+      orderResult.result.status !== OrderStatus.ACTIVE
+      && orderResult.result.status !== OrderStatus.INACTIVE
+      && orderResult.result.status !== OrderStatus.PENDING
     ) {
-      throw new Error(`Cannot cancel order with status ${order.status}`);
+      throw new Error(`Cannot cancel order with status ${orderResult.result.status}`);
     }
 
-    if (order.account_address !== accountAddress.toLowerCase()) {
-      throw new Error(`Only account ${order.account_address} can cancel order ${orderId}`);
+    if (orderResult.result.account_address !== accountAddress.toLowerCase()) {
+      throw new Error(`Only account ${orderResult.result.account_address} can cancel order ${orderId}`);
     }
 
-    const cancelOrderTransaction = await this.seaport.cancelOrder(order, accountAddress);
+    const cancelOrderTransaction = await this.seaport.cancelOrder(
+      orderResult.result,
+      accountAddress,
+    );
     return { unsignedCancelOrderTransaction: cancelOrderTransaction };
   }
 }

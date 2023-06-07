@@ -2,8 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateOrderRequestBody } from '../models/CreateOrderRequestBody';
-import type { Order } from '../models/Order';
-import type { Orders } from '../models/Orders';
+import type { ListOrdersResult } from '../models/ListOrdersResult';
+import type { OrderResult } from '../models/OrderResult';
+import type { OrderStatus } from '../models/OrderStatus';
+import type { PageCursor } from '../models/PageCursor';
+import type { PageSize } from '../models/PageSize';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -15,12 +18,15 @@ export class OrdersService {
   /**
    * List all orders
    * List all orders
-   * @returns Orders OK response.
+   * @returns ListOrdersResult OK response.
    * @throws ApiError
    */
   public listOrders({
     chainId,
-    pageSize = 100,
+    status,
+    sellItemContractAddress,
+    sellItemTokenId,
+    pageSize,
     sortBy,
     sortDirection,
     pageCursor,
@@ -30,13 +36,25 @@ export class OrdersService {
      */
     chainId: string,
     /**
+     * Order status to filter by
+     */
+    status?: OrderStatus,
+    /**
+     * Sell item contract address to filter by
+     */
+    sellItemContractAddress?: string,
+    /**
+     * Sell item token identifier to filter by
+     */
+    sellItemTokenId?: string,
+    /**
      * Maximum number of orders to return per page
      */
-    pageSize?: number,
+    pageSize?: PageSize,
     /**
      * Order field to sort by
      */
-    sortBy?: 'status' | 'sell_item_contract_address' | 'sell_item_token_id',
+    sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount',
     /**
      * Ascending or descending direction for sort
      */
@@ -44,8 +62,8 @@ export class OrdersService {
     /**
      * Page cursor to retrieve previous or next page. Use the value returned in the response.
      */
-    pageCursor?: string,
-  }): CancelablePromise<Orders> {
+    pageCursor?: PageCursor,
+  }): CancelablePromise<ListOrdersResult> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/v1/chains/{chain_id}/orders',
@@ -53,14 +71,18 @@ export class OrdersService {
         'chain_id': chainId,
       },
       query: {
+        'status': status,
+        'sell_item_contract_address': sellItemContractAddress,
+        'sell_item_token_id': sellItemTokenId,
         'page_size': pageSize,
         'sort_by': sortBy,
         'sort_direction': sortDirection,
         'page_cursor': pageCursor,
       },
       errors: {
-        404: `not_found: Resource not found`,
-        500: `internal_error: Internal server error`,
+        400: `Client error`,
+        404: `The specified resource was not found`,
+        500: `Internal server error`,
       },
     });
   }
@@ -68,7 +90,7 @@ export class OrdersService {
   /**
    * Create an order
    * Create an order
-   * @returns Order Created response.
+   * @returns OrderResult Created response.
    * @throws ApiError
    */
   public createOrder({
@@ -80,7 +102,7 @@ export class OrdersService {
      */
     chainId: string,
     requestBody: CreateOrderRequestBody,
-  }): CancelablePromise<Order> {
+  }): CancelablePromise<OrderResult> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/v1/chains/{chain_id}/orders',
@@ -90,9 +112,9 @@ export class OrdersService {
       body: requestBody,
       mediaType: 'application/json',
       errors: {
-        400: `bad_request: Bad Request`,
-        404: `not_found: Resource not found`,
-        500: `internal_error: Internal server error`,
+        400: `Client error`,
+        404: `The specified resource was not found`,
+        500: `Internal server error`,
       },
     });
   }
@@ -100,7 +122,7 @@ export class OrdersService {
   /**
    * Get a single order by ID
    * Get a single order by ID
-   * @returns Order OK response.
+   * @returns OrderResult OK response.
    * @throws ApiError
    */
   public getOrder({
@@ -115,7 +137,7 @@ export class OrdersService {
      * Global Order identifier
      */
     orderId: string,
-  }): CancelablePromise<Order> {
+  }): CancelablePromise<OrderResult> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/v1/chains/{chain_id}/orders/{order_id}',
@@ -124,8 +146,9 @@ export class OrdersService {
         'order_id': orderId,
       },
       errors: {
-        404: `not_found: Resource not found`,
-        500: `internal_error: Internal server error`,
+        400: `Client error`,
+        404: `The specified resource was not found`,
+        500: `Internal server error`,
       },
     });
   }

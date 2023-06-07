@@ -17,7 +17,6 @@ export type {
   GetBalanceParams,
   GetBalanceResult,
   NetworkInfo,
-  Transaction,
   SendTransactionParams,
   SendTransactionResult,
   SwitchNetworkParams,
@@ -35,6 +34,7 @@ export type {
   NetworkFilter,
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
+  RPC_URL_MAP,
 } from './types';
 export type { ErrorType } from './errors';
 export { CheckoutErrorType } from './errors';

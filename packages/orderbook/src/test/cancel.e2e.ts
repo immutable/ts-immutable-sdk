@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { Order } from 'openapi/sdk';
+import { OrderStatus } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getConfig } from './helpers/config';
@@ -51,18 +51,18 @@ describe('cancel order', () => {
       offerer,
     );
 
-    const order = await sdk.createOrder({
+    const { result: { id: orderId } } = await sdk.createOrder({
       offerer: offerer.address,
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
       orderSignature: signature,
     });
 
-    await waitForOrderToBeOfStatus(sdk, order.id, Order.status.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
 
-    const { unsignedCancelOrderTransaction } = await sdk.cancelOrder(order.id, offerer.address);
+    const { unsignedCancelOrderTransaction } = await sdk.cancelOrder(orderId, offerer.address);
     await signAndSubmitTx(unsignedCancelOrderTransaction, offerer, provider);
 
-    await waitForOrderToBeOfStatus(sdk, order.id, Order.status.CANCELLED);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.CANCELLED);
   }, 60_000);
 });

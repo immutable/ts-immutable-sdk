@@ -29,7 +29,8 @@ export class Inventory {
 
     const items = data.rows;
 
-    return items;
+    // FIXME: remove once backend properly filters by gameId
+    return items?.filter((item) => item.game_id === input?.gameID) || [];
   }
 
   public filterItemsBy(

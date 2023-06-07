@@ -1,12 +1,17 @@
-import { TransactionResponse, Web3Provider } from '@ethersproject/providers';
+import {
+  TransactionRequest,
+  TransactionResponse,
+  Web3Provider,
+} from '@ethersproject/providers';
 
 /**
  * Interface representing the parameters for {@link Checkout.sendTransaction}.
- * @property {Transaction} transaction - The transaction to send.
+ * @property {Web3Provider} provider - The provider to connect to the network.
+ * @property {TransactionRequest} transaction - The transaction to send.
  */
 export interface SendTransactionParams {
   provider: Web3Provider;
-  transaction: Transaction;
+  transaction: TransactionRequest;
 }
 
 /**

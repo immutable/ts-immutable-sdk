@@ -1,7 +1,7 @@
-import { ItemType, OrderType } from '@opensea/seaport-js/lib/constants';
 import { ConsiderationItem, OrderComponents } from '@opensea/seaport-js/lib/types';
 import { Order } from 'openapi/sdk';
 import { constants } from 'ethers';
+import { ItemType, OrderType } from './constants';
 
 export function mapImmutableOrderToSeaportOrderComponents(
   order: Order,

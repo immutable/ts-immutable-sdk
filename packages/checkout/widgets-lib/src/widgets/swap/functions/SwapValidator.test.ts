@@ -1,5 +1,4 @@
-import { GetBalanceResult } from '@imtbl/checkout-sdk';
-import { BigNumber } from 'ethers';
+import { TokenInfo } from '@imtbl/checkout-sdk';
 import {
   validateFromAmount,
   validateFromToken,
@@ -18,21 +17,17 @@ describe('SwapValidator', () => {
   } = text.views[SwapWidgetViews.SWAP].validation;
 
   describe('validateFromToken', () => {
-    it('should return error message if fromToken is null', () => {
-      const fromToken = null;
+    it('should return error message if fromToken is undefined', () => {
+      const fromToken = undefined;
       const result = validateFromToken(fromToken);
       expect(result).toEqual(noFromTokenSelected);
     });
 
-    it('should return empty string if fromToken is not null', () => {
-      const fromToken: GetBalanceResult = {
-        balance: BigNumber.from(1),
-        formattedBalance: '1',
-        token: {
-          name: 'Ethereum',
-          symbol: 'ETH',
-          decimals: 18,
-        },
+    it('should return empty string if fromToken is available', () => {
+      const fromToken: TokenInfo = {
+        name: 'Ethereum',
+        symbol: 'ETH',
+        decimals: 18,
       };
       const result = validateFromToken(fromToken);
       expect(result).toEqual('');
@@ -87,13 +82,13 @@ describe('SwapValidator', () => {
   });
 
   describe('validateToToken', () => {
-    it('should return error message if toToken is null', () => {
-      const toToken = null;
+    it('should return error message if toToken is undefined', () => {
+      const toToken = undefined;
       const result = validateToToken(toToken);
       expect(result).toEqual(noToTokenSelected);
     });
 
-    it('should return empty string if toToken is not null', () => {
+    it('should return empty string if toToken is available', () => {
       const toToken = {
         name: 'Ethereum',
         symbol: 'ETH',

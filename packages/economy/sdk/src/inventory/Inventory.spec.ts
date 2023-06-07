@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/naming-convention */
+/** @jest-environment jsdom */
+
 import Container from 'typedi';
 import 'reflect-metadata';
 

@@ -1,13 +1,14 @@
 import {
-  SwapEvent,
+  WidgetEvent,
   SwapEventType,
   SwapSuccess,
   IMTBLWidgetEvents,
   SwapFailed,
+  SwapRejected,
 } from '@imtbl/checkout-widgets';
 
 export function sendSwapWidgetCloseEvent() {
-  const closeWidgetEvent = new CustomEvent<SwapEvent<any>>(
+  const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
     {
       detail: {
@@ -23,7 +24,7 @@ export function sendSwapWidgetCloseEvent() {
 }
 
 export const sendSwapSuccessEvent = () => {
-  const successEvent = new CustomEvent<SwapEvent<SwapSuccess>>(
+  const successEvent = new CustomEvent<WidgetEvent<SwapSuccess>>(
     IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
     {
       detail: {
@@ -37,8 +38,8 @@ export const sendSwapSuccessEvent = () => {
   if (window !== undefined) window.dispatchEvent(successEvent);
 };
 
-export const sendSwapFailedEvent = (reason: string) => {
-  const failedEvent = new CustomEvent<SwapEvent<SwapFailed>>(
+export const sendSwapFailedEvent = (reason?: string) => {
+  const failedEvent = new CustomEvent<WidgetEvent<SwapFailed>>(
     IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
     {
       detail: {
@@ -51,4 +52,20 @@ export const sendSwapFailedEvent = (reason: string) => {
     },
   );
   if (window !== undefined) window.dispatchEvent(failedEvent);
+};
+
+export const sendSwapRejectedEvent = (reason?: string) => {
+  const rejectedEvent = new CustomEvent<WidgetEvent<SwapRejected>>(
+    IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
+    {
+      detail: {
+        type: SwapEventType.REJECTED,
+        data: {
+          reason,
+          timestamp: new Date().getTime(),
+        },
+      },
+    },
+  );
+  if (window !== undefined) window.dispatchEvent(rejectedEvent);
 };

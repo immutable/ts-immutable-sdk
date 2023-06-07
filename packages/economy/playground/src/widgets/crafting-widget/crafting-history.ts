@@ -43,8 +43,10 @@ export class CraftingHistory extends LitElement {
 
   render() {
     return html`
-      <h2>History</h2>
-      ${this.crafts.map((craft) => this.renderCraft(craft))}
+      <span class="prose"><h2 class="py-4">Crafting History</h2></span>
+      <div style="max-height: 30vh; min-height: 30vh;" class="overflow-hidden overflow-y-scroll">
+        ${this.crafts.map((craft) => this.renderCraft(craft))}
+      </div>
     `;
   }
   protected createRenderRoot(): Element | ShadowRoot {
