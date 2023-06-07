@@ -1,27 +1,4 @@
-import {
-  ActivitiesApi,
-  ActivitiesApiListActivitiesRequest,
-  ActivitiesApiGetActivityRequest,
-  ListActivitiesResult,
-  GetActivityResult,
-  ChainsApi,
-  CollectionsApi,
-  NftsApi,
-  NftOwnersApi,
-  ChainsApiListChainsRequest,
-  ListChainsResult,
-  CollectionsApiListCollectionsRequest,
-  ListCollectionsResult,
-  CollectionsApiGetCollectionRequest,
-  GetCollectionResult,
-  NftsApiGetNFTRequest,
-  GetNFTResult,
-  NftsApiListNFTsRequest,
-  ListNFTsResult,
-  NftsApiListNFTsByAccountAddressRequest,
-  NftOwnersApiListNFTOwnersRequest,
-  ListNFTOwnersResult,
-} from '@imtbl/multi-rollup-api-client';
+import { mr } from '@imtbl/generated-clients';
 import {
   BlockchainDataConfiguration,
   BlockchainDataModuleConfiguration,
@@ -31,24 +8,24 @@ import { formatError } from 'utils/formatErrors';
 export class BlockchainData {
   public readonly config: BlockchainDataConfiguration;
 
-  private readonly activities: ActivitiesApi;
+  private readonly activities: mr.ActivitiesApi;
 
-  private readonly chains: ChainsApi;
+  private readonly chains: mr.ChainsApi;
 
-  private readonly collections: CollectionsApi;
+  private readonly collections: mr.CollectionsApi;
 
-  private readonly nfts: NftsApi;
+  private readonly nfts: mr.NftsApi;
 
-  private readonly nftOwners: NftOwnersApi;
+  private readonly nftOwners: mr.NftOwnersApi;
 
   constructor(moduleConfig: BlockchainDataModuleConfiguration) {
     this.config = new BlockchainDataConfiguration(moduleConfig);
 
-    this.activities = new ActivitiesApi(this.config.apiConfig);
-    this.chains = new ChainsApi(this.config.apiConfig);
-    this.collections = new CollectionsApi(this.config.apiConfig);
-    this.nfts = new NftsApi(this.config.apiConfig);
-    this.nftOwners = new NftOwnersApi(this.config.apiConfig);
+    this.activities = new mr.ActivitiesApi(this.config.apiConfig);
+    this.chains = new mr.ChainsApi(this.config.apiConfig);
+    this.collections = new mr.CollectionsApi(this.config.apiConfig);
+    this.nfts = new mr.NftsApi(this.config.apiConfig);
+    this.nftOwners = new mr.NftOwnersApi(this.config.apiConfig);
   }
 
   /**
@@ -58,8 +35,8 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listActivities(
-    request: ActivitiesApiListActivitiesRequest
-  ): Promise<ListActivitiesResult> {
+    request: mr.ActivitiesApiListActivitiesRequest
+  ): Promise<mr.ListActivitiesResult> {
     return await this.activities
       .listActivities(request)
       .then((res) => res.data)
@@ -75,8 +52,8 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async getActivity(
-    request: ActivitiesApiGetActivityRequest
-  ): Promise<GetActivityResult> {
+    request: mr.ActivitiesApiGetActivityRequest
+  ): Promise<mr.GetActivityResult> {
     return await this.activities
       .getActivity(request)
       .then((res) => res.data)
@@ -92,8 +69,8 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listChains(
-    request: ChainsApiListChainsRequest
-  ): Promise<ListChainsResult> {
+    request: mr.ChainsApiListChainsRequest
+  ): Promise<mr.ListChainsResult> {
     return await this.chains
       .listChains(request)
       .then((res) => res.data)
@@ -109,8 +86,8 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listCollections(
-    request: CollectionsApiListCollectionsRequest
-  ): Promise<ListCollectionsResult> {
+    request: mr.CollectionsApiListCollectionsRequest
+  ): Promise<mr.ListCollectionsResult> {
     return await this.collections
       .listCollections(request)
       .then((res) => res.data)
@@ -126,8 +103,8 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async getCollection(
-    request: CollectionsApiGetCollectionRequest
-  ): Promise<GetCollectionResult> {
+    request: mr.CollectionsApiGetCollectionRequest
+  ): Promise<mr.GetCollectionResult> {
     return await this.collections
       .getCollection(request)
       .then((res) => res.data)
@@ -142,7 +119,7 @@ export class BlockchainData {
    * @returns a promise that resolves with a single NFT
    * @throws {@link index.APIError}
    */
-  public async getNFT(request: NftsApiGetNFTRequest): Promise<GetNFTResult> {
+  public async getNFT(request: mr.NftsApiGetNFTRequest): Promise<mr.GetNFTResult> {
     return await this.nfts
       .getNFT(request)
       .then((res) => res.data)
@@ -158,8 +135,8 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listNFTs(
-    request: NftsApiListNFTsRequest
-  ): Promise<ListNFTsResult> {
+    request: mr.NftsApiListNFTsRequest
+  ): Promise<mr.ListNFTsResult> {
     return await this.nfts
       .listNFTs(request)
       .then((res) => res.data)
@@ -175,8 +152,8 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listNFTsByAccountAddress(
-    request: NftsApiListNFTsByAccountAddressRequest
-  ): Promise<ListNFTsResult> {
+    request: mr.NftsApiListNFTsByAccountAddressRequest
+  ): Promise<mr.ListNFTsResult> {
     return await this.nfts
       .listNFTsByAccountAddress(request)
       .then((res) => res.data)
@@ -192,8 +169,8 @@ export class BlockchainData {
    * @throws {@link index.APIError}
    */
   public async listNFTOwners(
-    request: NftOwnersApiListNFTOwnersRequest
-  ): Promise<ListNFTOwnersResult> {
+    request: mr.NftOwnersApiListNFTOwnersRequest
+  ): Promise<mr.ListNFTOwnersResult> {
     return await this.nftOwners
       .listNFTOwners(request)
       .then((res) => res.data)

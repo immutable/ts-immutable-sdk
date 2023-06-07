@@ -1,6 +1,6 @@
-import { BasicAPIError } from '@imtbl/multi-rollup-api-client';
+import { mr } from '@imtbl/generated-clients';
 
-interface OpenAPIError extends BasicAPIError {
+interface OpenAPIError extends mr.BasicAPIError {
   code: string;
 
   details: {
