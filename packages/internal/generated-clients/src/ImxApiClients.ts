@@ -17,10 +17,10 @@ import {
   NftCheckoutPrimaryApi,
   EncodingApi,
 } from './imx';
-import { ImxApiConfiguration } from './config';
+import { ImmutableAPIConfiguration } from './config';
 
 export class ImxApiClients {
-  public config: ImxApiConfiguration;
+  public config: ImmutableAPIConfiguration;
 
   public assetApi: AssetsApi;
 
@@ -56,7 +56,7 @@ export class ImxApiClients {
 
   public withdrawalsApi: WithdrawalsApi;
 
-  constructor(config: ImxApiConfiguration) {
+  constructor(config: ImmutableAPIConfiguration) {
     this.config = config;
     this.assetApi = new AssetsApi(config);
     this.balanceApi = new BalancesApi(config);
