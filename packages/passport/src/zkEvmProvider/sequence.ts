@@ -17,10 +17,10 @@ export function sequenceTxAbiEncode(txs: Transaction[]): TransactionEncoded[] {
   return txs.map((t) => ({
     delegateCall: t.delegateCall === true,
     revertOnError: t.revertOnError === true,
-    gasLimit: t.gasLimit !== undefined ? t.gasLimit : ethers.constants.Zero,
+    gasLimit: t.gasLimit ?? ethers.constants.Zero,
     target: t.to ?? ethers.constants.AddressZero,
-    value: t.value !== undefined ? t.value : ethers.constants.Zero,
-    data: t.data !== undefined ? t.data : [],
+    value: t.value ?? ethers.constants.Zero,
+    data: t.data ?? [],
   }));
 }
 
