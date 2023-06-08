@@ -107,9 +107,10 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       });
 
       const rootProvider = new ethers.providers.JsonRpcProvider(
-        config.environment
-            === Environment.PRODUCTION ? RPC_URL_MAP.get(ChainId.ETHEREUM)
-          : RPC_URL_MAP.get(ChainId.SEPOLIA),
+        // config.environment
+        //     === Environment.PRODUCTION ? RPC_URL_MAP.get(ChainId.ETHEREUM)
+        //   : RPC_URL_MAP.get(ChainId.SEPOLIA),
+        'https://eth-sepolia.g.alchemy.com/v2/3zIddNTJnsDVa7afu0WIrKk2DAY_dx3u',
       );
 
       const childProvider = new ethers.providers.JsonRpcProvider(

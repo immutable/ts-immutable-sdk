@@ -6,7 +6,7 @@ import { mount } from 'cypress/react18';
 import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { TokenBridge } from '@imtbl/bridge-sdk';
+import { CompletionStatus, TokenBridge } from '@imtbl/bridge-sdk';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { cySmartGet } from '../../lib/testUtils';
 import {
@@ -251,6 +251,11 @@ describe('Bridge Widget tests', () => {
           },
         });
 
+      cy.stub(TokenBridge.prototype, 'waitForDeposit').as('waitForDepositStub')
+        .resolves({
+          status: CompletionStatus.SUCCESS,
+        });
+
       mount(
         <BiomeCombinedProviders>
           <BridgeWidget
@@ -279,6 +284,68 @@ describe('Bridge Widget tests', () => {
       cySmartGet('move-in-progress-view').should('be.visible');
       cy.wait(1000);
       cySmartGet('success-box').should('be.visible');
+    });
+
+    it('should submit the bridge and show fail screen if wait for deposit does not return success', () => {
+      const params = {
+        providerPreference: 'metamask',
+      } as BridgeWidgetParams;
+
+      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+        .onFirstCall()
+        .resolves({
+          transactionResponse: {
+            wait: () => ({
+              status: 1,
+            }),
+          },
+        })
+        .onSecondCall()
+        .resolves({
+          transactionResponse: {
+            wait: () => new Promise((resolve) => {
+              setTimeout(() => {
+                resolve({
+                  status: 1,
+                });
+              }, 1000);
+            }),
+          },
+        });
+
+      cy.stub(TokenBridge.prototype, 'waitForDeposit').as('waitForDepositStub')
+        .resolves({
+          status: CompletionStatus.FAILED,
+        });
+
+      mount(
+        <BiomeCombinedProviders>
+          <BridgeWidget
+            config={{
+              environment: Environment.SANDBOX,
+              theme: WidgetTheme.DARK,
+              isBridgeEnabled: true,
+              isSwapEnabled: true,
+              isOnRampEnabled: true,
+            }}
+            params={params}
+          />
+        </BiomeCombinedProviders>,
+      );
+
+      cySmartGet('bridge-token-select__target').click();
+      cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
+
+      cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-form-button').click();
+
+      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
+      cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
+
+      cySmartGet('move-in-progress-view').should('be.visible');
+      cy.wait(1000);
+      cySmartGet('failure-box').should('be.visible');
     });
 
     it('should submit the bridge and show fail when status is not 1 when submitting approval transaction', () => {
