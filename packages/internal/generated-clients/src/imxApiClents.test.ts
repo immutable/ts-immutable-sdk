@@ -1,4 +1,4 @@
-import { ImxApiClients } from './ImxApiClients';
+import { ImxApiClients } from './imxApiClients';
 import { imxConfig } from './config';
 
 describe('ImxApiClients', () => {
