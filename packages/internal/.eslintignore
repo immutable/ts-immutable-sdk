@@ -3,4 +3,7 @@ dist/
 # sample apps
 **sample-app**/
 
+# auto-generated code
+generated-clients/
+
 # put module specific ignore paths here

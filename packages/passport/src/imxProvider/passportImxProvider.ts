@@ -32,6 +32,7 @@ export type PassportImxProviderInput = {
   starkSigner: StarkSigner;
   immutableXClient: ImmutableXClient;
   confirmationScreen: ConfirmationScreen;
+  imxPublicApiDomain: string;
 };
 
 export default class PassportImxProvider implements IMXProvider {
@@ -43,15 +44,19 @@ export default class PassportImxProvider implements IMXProvider {
 
   private readonly confirmationScreen: ConfirmationScreen;
 
+  private readonly imxPublicApiDomain: string;
+
   constructor({
     user,
     starkSigner,
     immutableXClient,
+    imxPublicApiDomain,
     confirmationScreen,
   }: PassportImxProviderInput) {
     this.user = user;
     this.starkSigner = starkSigner;
     this.immutableXClient = immutableXClient;
+    this.imxPublicApiDomain = imxPublicApiDomain;
     this.confirmationScreen = confirmationScreen;
   }
 
@@ -64,6 +69,7 @@ export default class PassportImxProvider implements IMXProvider {
       starkSigner: this.starkSigner,
       transfersApi: this.immutableXClient.transfersApi,
       confirmationScreen: this.confirmationScreen,
+      imxPublicApiDomain: this.imxPublicApiDomain,
     });
   }
 

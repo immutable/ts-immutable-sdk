@@ -7,16 +7,28 @@ import { connectWalletProvider } from './connect';
 import { getNetworkInfo, switchWalletNetwork } from './network';
 
 import { Checkout } from './Checkout';
-import { ChainId, ConnectionProviders, GetBalanceParams } from './types';
+import {
+  ChainId,
+  ConnectionProviders,
+  GetBalanceParams,
+  GetNetworkAllowListResult,
+} from './types';
 import { getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
+import {
+  getBridgeFeeEstimate,
+  getBridgeEstimatedGas,
+} from './gasEstimate/bridgeGasEstimate';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
+import * as network from './network';
+import { GetBridgeGasEstimateResult } from './types/gasEstimates';
 
 jest.mock('./connect');
 jest.mock('./network');
 jest.mock('./balances');
 jest.mock('./transaction');
+jest.mock('./gasEstimate/bridgeGasEstimate');
 
 describe(' Connect', () => {
   const testCheckoutConfig = new CheckoutConfiguration({
@@ -136,5 +148,82 @@ describe(' Connect', () => {
     });
 
     expect(sendTransaction).toBeCalledTimes(1);
+  });
+
+  describe('gas estimate', () => {
+    let provider: Web3Provider;
+    const transaction = {
+      nonce: '',
+      gasPrice: '',
+      gasLimit: '',
+      to: '',
+      from: '',
+      value: '',
+      data: '',
+      chainId: 1,
+    };
+    beforeEach(() => {
+      provider = {
+        provider: {
+          request: () => {},
+        },
+      } as any as Web3Provider;
+      const getNetworkAllListMock = jest.fn().mockResolvedValue({
+        networks: [
+          {
+            chainId: 13373,
+            name: 'Immutable zkEVM Testnet',
+            isSupported: true,
+            nativeCurrency: {},
+          },
+          {
+            chainId: 11155111,
+            name: 'Sepolia',
+            isSupported: true,
+            nativeCurrency: {},
+          },
+        ],
+      } as GetNetworkAllowListResult);
+
+      (network.getNetworkAllowList as jest.Mock).mockImplementation(
+        getNetworkAllListMock,
+      );
+    });
+    it('should fetch gas estimate for bridgeable transaction', async () => {
+      (getBridgeFeeEstimate as jest.Mock).mockResolvedValue({
+        bridgeable: true,
+      } as GetBridgeGasEstimateResult);
+
+      const checkout = new Checkout({
+        baseConfig: { environment: Environment.SANDBOX },
+      });
+
+      await checkout.getBridgeGasEstimate({
+        provider,
+        transaction,
+        tokenAddress: 'NATIVE',
+      });
+
+      expect(getBridgeEstimatedGas).toBeCalledTimes(1);
+      expect(getBridgeFeeEstimate).toBeCalledTimes(1);
+    });
+    it('should fetch gas estimate for non-bridgeable transaction', async () => {
+      (getBridgeFeeEstimate as jest.Mock).mockResolvedValue({
+        bridgeable: false,
+      } as GetBridgeGasEstimateResult);
+
+      const checkout = new Checkout({
+        baseConfig: { environment: Environment.SANDBOX },
+      });
+
+      await checkout.getBridgeGasEstimate({
+        provider,
+        transaction,
+        tokenAddress: 'NATIVE',
+      });
+
+      expect(getBridgeEstimatedGas).not.toBeCalled();
+      expect(getBridgeFeeEstimate).toBeCalledTimes(1);
+    });
   });
 });

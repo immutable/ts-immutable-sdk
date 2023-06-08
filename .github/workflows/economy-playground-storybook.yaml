@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Navigate to Economy Playground directory
         run: cd packages/economy/playground
@@ -37,4 +39,4 @@ jobs:
         run: yarn build
 
       - name: Build and deploy Storybook to Chromatic
-        run: npx chromatic --project-token=${{ env.CHROMATIC_PROJECT_TOKEN }}
+        run: npx chromatic --project-token=${{ env.CHROMATIC_PROJECT_TOKEN }} --build-script-name=build

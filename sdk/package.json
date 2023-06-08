@@ -27,6 +27,7 @@
     "@imtbl/cryptofiat": "0.0.0",
     "@imtbl/erc20": "0.0.0",
     "@imtbl/erc721-permissioned-mintable": "0.0.0",
+    "@imtbl/generated-clients": "0.0.0",
     "@imtbl/guardian": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
     "@imtbl/orderbook": "0.0.0",

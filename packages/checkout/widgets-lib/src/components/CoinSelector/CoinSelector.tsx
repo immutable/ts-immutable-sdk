@@ -1,8 +1,8 @@
 import {
   BottomSheet, Box,
 } from '@biom3/react';
-import { selectOptionsContainerStyles } from './styles';
 import { CoinSelectorOption, CoinSelectorOptionProps } from './CoinSelectorOption';
+import { selectOptionsContainerStyles } from './CoinSelectorStyles';
 
 type CoinSelectorProps = {
   onCloseBottomSheet?: () => void;

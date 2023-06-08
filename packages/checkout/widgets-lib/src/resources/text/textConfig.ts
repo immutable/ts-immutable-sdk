@@ -151,6 +151,11 @@ export const text = {
         noTokenSelected: 'Select a coin to move',
       },
     },
+    [BridgeWidgetViews.IN_PROGRESS]: {
+      heading: 'Move in progress',
+      body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zKEVM.`,
+      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+    },
     [SharedViews.TOP_UP_VIEW]: {
       header: {
         title: 'How would you like to add coins?',
@@ -180,6 +185,17 @@ export const text = {
       heading: 'MetaMask',
       description:
         'Digital wallet for accessing blockchain applications and web3',
+    },
+  },
+  drawers: {
+    feesBreakdown: {
+      heading: 'Fee breakdown',
+      total: 'Fees total',
+      fees: {
+        gas: {
+          label: 'Gas fee',
+        },
+      },
     },
   },
 };
