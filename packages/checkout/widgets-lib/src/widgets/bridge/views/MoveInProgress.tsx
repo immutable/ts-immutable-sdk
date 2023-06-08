@@ -1,6 +1,7 @@
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@ethersproject/providers';
 import { useContext, useEffect } from 'react';
+import { CompletionStatus, WaitForResponse } from '@imtbl/bridge-sdk';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { BridgeHero } from '../../../components/Hero/BridgeHero';
@@ -10,6 +11,7 @@ import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { BridgeWidgetViews, PrefilledBridgeForm } from '../../../context/view-context/BridgeViewContextTypes';
 import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { BridgeContext } from '../context/BridgeContext';
 
 interface MoveInProgressProps {
   token: TokenInfo,
@@ -20,19 +22,32 @@ interface MoveInProgressProps {
 export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveInProgressProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { heading, body1, body2 } = text.views[BridgeWidgetViews.IN_PROGRESS];
+  const {
+    bridgeState: {
+      tokenBridge,
+    },
+  } = useContext(BridgeContext);
 
   useEffect(() => {
+    if (!tokenBridge) return;
+
     (async () => {
       const receipt = await transactionResponse.wait();
 
       if (receipt.status === 1) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: BridgeWidgetViews.SUCCESS },
-          },
+        const bridgeResult: WaitForResponse = await tokenBridge.waitForDeposit({
+          transactionHash: receipt.transactionHash,
         });
-        return;
+
+        if (bridgeResult.status === CompletionStatus.SUCCESS) {
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: { type: BridgeWidgetViews.SUCCESS },
+            },
+          });
+          return;
+        }
       }
 
       viewDispatch({
@@ -45,7 +60,7 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
         },
       });
     })();
-  }, [transactionResponse]);
+  }, [transactionResponse, tokenBridge]);
 
   return (
     <SimpleLayout

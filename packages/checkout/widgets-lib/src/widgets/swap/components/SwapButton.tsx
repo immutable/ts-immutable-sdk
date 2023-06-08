@@ -52,10 +52,10 @@ export function SwapButton({
               view: {
                 type: SwapWidgetViews.FAIL,
                 data: data as PrefilledSwapForm,
-                reason: 'Transaction failed',
               },
             },
           });
+          return;
         }
       }
       const txn = await checkout.sendTransaction({
