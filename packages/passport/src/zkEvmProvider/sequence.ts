@@ -54,9 +54,7 @@ export const getSignedSequenceTransactions = async (
   const digest = digestOfTransactionsNonce(nonce, ...transactions);
 
   // Sign the digest
-  const hashed = false; // TODO
-  const hash = hashed ? digest : ethers.utils.keccak256(digest);
-  const hashArray = ethers.utils.arrayify(hash);
+  const hashArray = ethers.utils.arrayify(digest);
   const ethsigNoType = await signer.signMessage(hashArray);
   const signedDigest = ethsigNoType.endsWith('03') || ethsigNoType.endsWith('02') ? ethsigNoType : `${ethsigNoType}02`;
 

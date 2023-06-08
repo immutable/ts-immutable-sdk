@@ -1,7 +1,8 @@
 import { ExternalProvider } from '@ethersproject/providers';
 import { ethRequestAccounts, ethSendTransaction } from './rpcMethods';
 import {
-  JsonRpcRequestCallback, JsonRpcRequestPayload, JsonRpcResponsePayload, RpcErrorCode,
+  JsonRpcError,
+  JsonRpcRequestCallback, JsonRpcRequestPayload, RequestArguments, RpcErrorCode,
 } from './types';
 import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
@@ -50,83 +51,89 @@ export class ZkEvmProvider {
   }
 
   public async request(
-    request: JsonRpcRequestPayload,
+    request: RequestArguments,
   ) {
-    return this.sendAsync(request);
+    if (METHODS_REQUIRING_AUTHORISATION.includes(request.method) && !this.magicProvider) {
+      // eslint-disable-next-line prefer-promise-reject-errors
+      return Promise.reject({
+        message: 'Unauthorised',
+        code: RpcErrorCode.UNAUTHORISED,
+      });
+    }
+
+    try {
+      switch (request.method) {
+        case 'eth_requestAccounts': {
+          const { result, magicProvider, user } = await ethRequestAccounts({
+            authManager: this.authManager,
+            config: this.config,
+            magicAdapter: this.magicAdapter,
+          });
+
+          this.user = user;
+          this.magicProvider = magicProvider;
+
+          return result;
+        }
+        case 'eth_sendTransaction': {
+          return ethSendTransaction({
+            transactionRequest: request.params[0],
+            magicProvider: this.magicProvider!,
+            config: this.config,
+            confirmationScreen: this.confirmationScreen,
+            relayerAdapter: this.relayerAdapter,
+          });
+        }
+        default: {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          return Promise.reject({
+            message: 'Method not supported',
+            code: RpcErrorCode.METHOD_NOT_FOUND,
+          });
+        }
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        // eslint-disable-next-line prefer-promise-reject-errors
+        return Promise.reject({
+          message: error.message,
+          code: 'code' in error
+            ? error.code as RpcErrorCode
+            : RpcErrorCode.INTERNAL_ERROR,
+        });
+      }
+
+      // eslint-disable-next-line prefer-promise-reject-errors
+      return Promise.reject({
+        message: 'Internal error',
+        code: RpcErrorCode.INTERNAL_ERROR,
+      });
+    }
   }
 
-  public async sendAsync(
+  public sendAsync(
     request: JsonRpcRequestPayload,
     callback?: JsonRpcRequestCallback,
   ) {
-    const response: JsonRpcResponsePayload = {
-      jsonrpc: '2.0',
-      id: request.id!,
-      result: null,
-    };
-
-    if (METHODS_REQUIRING_AUTHORISATION.includes(request.method) && !this.magicProvider) {
-      response.error = {
-        message: 'Unauthorised',
-        code: RpcErrorCode.UNAUTHORISED,
-      };
-    } else {
-      try {
-        switch (request.method) {
-          case 'eth_requestAccounts': {
-            const { result, magicProvider, user } = await ethRequestAccounts({
-              authManager: this.authManager,
-              config: this.config,
-              magicAdapter: this.magicAdapter,
-            });
-
-            this.user = user;
-            this.magicProvider = magicProvider;
-            response.result = result;
-
-            break;
-          }
-          case 'eth_sendTransaction': {
-            response.result = await ethSendTransaction({
-              transactionRequest: request.params[0],
-              magicProvider: this.magicProvider!,
-              config: this.config,
-              confirmationScreen: this.confirmationScreen,
-              relayerAdapter: this.relayerAdapter,
-            });
-
-            break;
-          }
-          default: {
-            response.error = {
-              message: 'Method not supported',
-              code: RpcErrorCode.METHOD_NOT_FOUND,
-            };
-            break;
-          }
-        }
-      } catch (error: any) {
-        if (error instanceof Error) {
-          response.result = null;
-          response.error = {
-            ...error,
-            code: 'code' in error
-              ? error.code as RpcErrorCode
-              : RpcErrorCode.INTERNAL_ERROR,
-          };
-        }
-      }
+    if (!callback) {
+      throw new Error('No callback provided');
     }
 
-    if (typeof callback === 'function') {
-      return callback(null, response);
-    }
-    return new Promise<JsonRpcResponsePayload>((resolve, reject) => {
-      if (response.error) {
-        reject(response.error);
-      } else {
-        resolve(response.result);
-      }
+    this.request(request).then((result) => {
+      callback(null, {
+        result,
+        jsonrpc: '2.0',
+        id: request.id,
+      });
+    }).catch((error: JsonRpcError) => {
+      callback(error, null);
+    });
+  }
+
+  public send(method: string, params?: any[]) {
+    return this.request({
+      method,
+      params,
     });
   }
 }

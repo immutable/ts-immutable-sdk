@@ -50,15 +50,17 @@ export interface JsonRpcError {
   data?: any;
 }
 
-export interface JsonRpcRequestPayload<TParams = any> {
-  jsonrpc: string;
-  id: string | number | null;
+export interface RequestArguments<TParams = any> {
   method: string;
   params?: TParams;
 }
 
+export type JsonRpcRequestPayload = RequestArguments & {
+  jsonrpc: string;
+  id: string | number | null;
+};
+
 export interface JsonRpcRequestCallback {
-  /** Callback executed upon JSON RPC response. */
   (err: JsonRpcError | null, result?: JsonRpcResponsePayload | null): void;
 }
 export interface JsonRpcResponsePayload<ResultType = any> {
