@@ -5,7 +5,7 @@ import { CheckoutErrorType, GetBalanceResult } from '@imtbl/checkout-sdk';
 import {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
-import { ApproveBridgeResponse, BridgeDepositResponse, BridgeFeeResponse } from '@imtbl/bridge-sdk';
+import { ApproveBridgeResponse, BridgeDepositResponse } from '@imtbl/bridge-sdk';
 import { utils } from 'ethers';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeContext } from '../context/BridgeContext';
@@ -181,12 +181,7 @@ export function BridgeForm(props: BridgeFormProps) {
         ? 'NATIVE'
         : token.token.address;
       const depositorAddress = await provider.getSigner().getAddress();
-
-      const bridgeFeeResponse: BridgeFeeResponse = await tokenBridge.getFee({
-        token: tokenAddress,
-      });
-
-      const depositAmount = bridgeFeeResponse.feeAmount.add(utils.parseUnits(amount, token.token.decimals));
+      const depositAmount = utils.parseUnits(amount, token.token.decimals);
 
       const approveRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx({
         depositorAddress,
