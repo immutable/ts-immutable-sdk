@@ -26,6 +26,7 @@ import {
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 import { useInterval } from '../../../lib/hooks/useInterval';
 import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
+import { swapButtonIconLoadingStyle } from '../../swap/components/SwapButtonStyles';
 
 interface BridgeFormProps {
   testId?: string;
@@ -65,6 +66,7 @@ export function BridgeForm(props: BridgeFormProps) {
   const [approvalTransaction, setApprovalTransaction] = useState<ApproveBridgeResponse | undefined>(undefined);
   const [bridgeTransaction, setBridgeTransaction] = useState<BridgeDepositResponse | undefined>(undefined);
   const [tokenAddress, setTokenAddress] = useState<string>('');
+  const [loading, setLoading] = useState(false);
 
   const tokensOptions = useMemo(
     () => tokenBalances
@@ -132,6 +134,7 @@ export function BridgeForm(props: BridgeFormProps) {
     // to allow the user to edit the form
     // even if a new quote is fetch silently
     if (!silently) {
+      setLoading(true);
       setIsFetching(true);
     }
 
@@ -143,31 +146,30 @@ export function BridgeForm(props: BridgeFormProps) {
     // Prevent to silently fetch and set a new fee estimate
     // if the user has updated and the widget is already
     // fetching or the user is updating the inputs.
-    if ((silently && editing) || !transactions?.bridgeTxn) return;
+    if ((silently && (loading || editing)) || !transactions?.bridgeTxn || !checkout) return;
 
-    const gasEstimatesA = await checkout?.getBridgeGasEstimate({
+    const gasEstimateResult = await checkout.getBridgeGasEstimate({
       tokenAddress: token?.token.address || 'NATIVE',
       transaction: transactions?.bridgeTxn.unsignedTx,
       provider: provider!,
       approveTxn: transactions?.approveRes?.unsignedTx || undefined,
     });
-    console.log('gasEstimatesA', gasEstimatesA);
+    console.log('gasEstimateResult', gasEstimateResult);
 
-    const gasEstimates: GetBridgeGasEstimateResult = {};
-
-    setEstimates(gasEstimates);
+    setEstimates(gasEstimateResult);
     const estimatedAmount = utils.formatUnits(
-      gasEstimates?.gasEstimate?.estimatedAmount || 0,
+      gasEstimateResult?.gasEstimate?.estimatedAmount || 0,
       DEFAULT_TOKEN_DECIMALS,
     );
     setGasFee(estimatedAmount);
     setGasFeeFiatValue(calculateCryptoToFiat(
       gasFee,
-      gasEstimates.gasEstimate?.token?.symbol || '',
+      gasEstimateResult.gasEstimate?.token?.symbol || '',
       cryptoFiatState.conversions,
     ));
 
     if (!silently) {
+      setLoading(false);
       setIsFetching(false);
     }
   };
@@ -287,6 +289,7 @@ export function BridgeForm(props: BridgeFormProps) {
       || !approvalTransaction || !bridgeTransaction) return;
 
     try {
+      setLoading(true);
       if (approvalTransaction.required && approvalTransaction.unsignedTx) {
         const { transactionResponse } = await checkout.sendTransaction({
           provider,
@@ -294,6 +297,7 @@ export function BridgeForm(props: BridgeFormProps) {
         });
 
         const approvalReceipt = await transactionResponse.wait();
+        setLoading(false);
         if (approvalReceipt.status !== 1) {
           viewDispatch({
             payload: {
@@ -333,6 +337,8 @@ export function BridgeForm(props: BridgeFormProps) {
         },
       });
     } catch (err: any) {
+      setLoading(false);
+
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         return;
       }
@@ -418,8 +424,11 @@ export function BridgeForm(props: BridgeFormProps) {
           testId={`${testId}-button`}
           variant="primary"
           onClick={submitBridge}
+          disabled={loading}
         >
-          {bridgeForm.buttonText}
+          {loading ? (
+            <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
+          ) : bridgeForm.buttonText}
         </Button>
       </Box>
     </Box>
