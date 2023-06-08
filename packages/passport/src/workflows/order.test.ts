@@ -253,7 +253,6 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
-        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       });
 
@@ -300,7 +299,6 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
-        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('CANCEL_ORDER_ERROR');
 
@@ -321,7 +319,6 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
-        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
         new PassportError(
