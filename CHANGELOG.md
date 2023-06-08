@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Changed
+- @imtbl/passport: Changed `createOrder` function to call the confirmation screen with guardian check
 
 ### Removed
 
