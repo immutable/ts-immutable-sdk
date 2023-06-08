@@ -22,14 +22,18 @@ type EthSendTransactionInput = {
 const getNonce = async (magicWeb3Provider: Web3Provider, smartContractWalletAddress: string) => {
   const code = await magicWeb3Provider.getCode(smartContractWalletAddress);
   if (code) {
-    const contract = new ethers.Contract(smartContractWalletAddress, walletContracts.mainModule.abi, magicWeb3Provider);
+    const contract = new ethers.Contract(
+      smartContractWalletAddress,
+      walletContracts.mainModule.abi,
+      magicWeb3Provider,
+    );
     return contract.nonce();
   }
   return 0;
 };
 
 export async function ethSign(signer: JsonRpcSigner, message: string | Uint8Array, hashed = false) {
-  // TODO: Determine if message should be hashed, and remove hashed argument
+  // TODO: Determine if message should be hashed, remove hashed argument
   const hash = hashed ? message : ethers.utils.keccak256(message);
   const hashArray = ethers.utils.arrayify(hash);
   const ethsigNoType = await signer.signMessage(hashArray);
@@ -100,10 +104,7 @@ export const ethSendTransaction = async ({
 
   // TODO: ID-697 Evaluate transactions through Guardian
 
-  const transactionHash = await relayerAdapter.ethSendTransaction({
-    to: transactionRequest.to,
-    data: signedTransactions,
-  });
+  const transactionHash = await relayerAdapter.ethSendTransaction(transactionRequest.to, signedTransactions);
 
   const relayerTransaction = await relayerAdapter.imGetTransactionByHash(transactionHash);
   return relayerTransaction.hash;

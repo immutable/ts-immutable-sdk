@@ -7,22 +7,12 @@ export type RelayerAdapterInput = {
 };
 
 // JsonRpc base Types
-type JsonRpcRequest = {
-  id: number;
-  jsonrpc: '2.0';
-};
-
-type JsonRpcResponse = {
+type JsonRpc = {
   id: number;
   jsonrpc: '2.0';
 };
 
 // EthSendTransaction types
-export type EthSendTransactionParams = {
-  to: string;
-  data: BytesLike;
-};
-
 type EthSendTransactionRequest = {
   method: 'eth_sendTransaction';
   params: {
@@ -42,7 +32,7 @@ type ImGetTransactionByHashRequest = {
   params: string[];
 };
 
-type ImGetTransactionByHashResponse = JsonRpcResponse & {
+type ImGetTransactionByHashResponse = JsonRpc & {
   result: RelayerTransaction;
 };
 
@@ -55,7 +45,7 @@ type ImGetFeeOptionsRequest = {
   }[];
 };
 
-type ImGetFeeOptionsResponse = JsonRpcResponse & {
+type ImGetFeeOptionsResponse = JsonRpc & {
   result: {
     token_price: string;
     token_symbol: string;
@@ -78,7 +68,7 @@ export class RelayerAdapter {
   }
 
   private async postToRelayer<T>(request: RelayerTransactionRequest): Promise<T> {
-    const body: RelayerTransactionRequest & JsonRpcRequest = {
+    const body: RelayerTransactionRequest & JsonRpc = {
       id: 1,
       jsonrpc: '2.0',
       ...request,
@@ -100,12 +90,12 @@ export class RelayerAdapter {
     return jsonResponse;
   }
 
-  public async ethSendTransaction(params: EthSendTransactionParams): Promise<string> {
+  public async ethSendTransaction(to: string, data: BytesLike): Promise<string> {
     const payload: EthSendTransactionRequest = {
       method: 'eth_sendTransaction',
       params: [{
-        to: params.to,
-        data: params.data,
+        to,
+        data,
         chainId: this.config.zkEvmChainId.toString(),
       }],
     };
