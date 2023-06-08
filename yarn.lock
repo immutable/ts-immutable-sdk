@@ -1640,6 +1640,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@biom3/react@npm:^0.6.0-beta":
+  version: 0.6.0-beta
+  resolution: "@biom3/react@npm:0.6.0-beta"
+  dependencies:
+    "@biom3/design-tokens": "*"
+    "@emotion/css": ^11.10.8
+    "@emotion/react": ^11.10.8
+    "@rive-app/react-canvas": ^3.0.50
+    buffer: ^6.0.3
+    framer-motion: ^10.12.12
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.throttle: ^4.1.1
+    next: ~13.1.1
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    react-is: ^18.2.0
+    ts-deepmerge: ^5.0.0
+  checksum: 08a7e0d4d1ecb4ed463ec00ff16851b9e06c947e0556989de45b0f5d899fa2c87d5fdb329e90e0af4c7807a61b69435869379bcaeb808d6afcf35f6ea7917054
+  languageName: node
+  linkType: hard
+
 "@chevrotain/types@npm:^9.1.0":
   version: 9.1.0
   resolution: "@chevrotain/types@npm:9.1.0"
@@ -2821,6 +2843,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
+    "@biom3/design-tokens": ^0.2.0-beta
+    "@biom3/react": ^0.6.0-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -5381,6 +5405,24 @@ __metadata:
   version: 1.6.1
   resolution: "@remix-run/router@npm:1.6.1"
   checksum: 4ca65d9c7d6fa277227ad8fd4ef53bebab99460b714d835b609c998f9a7e7c33a964ce2b8af853b50025a60d9113968f256abc5f71f451939ff14a5187d327fe
+  languageName: node
+  linkType: hard
+
+"@rive-app/canvas@npm:1.1.9":
+  version: 1.1.9
+  resolution: "@rive-app/canvas@npm:1.1.9"
+  checksum: 28e9f5ebe61b1963a99b4a5255bc54b6703762691a17b479be80f26f5940049b0fafbebb8885ec1162526e470daea7d39f298bfe9efcc57ffaabe3c933321fc2
+  languageName: node
+  linkType: hard
+
+"@rive-app/react-canvas@npm:^3.0.50":
+  version: 3.0.51
+  resolution: "@rive-app/react-canvas@npm:3.0.51"
+  dependencies:
+    "@rive-app/canvas": 1.1.9
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 71a38ebae3b29cc13a2d2266e1eb9903191352db6816e11495bf1ad67e26ce1adb9cce893c6ccb3800e658be12e1aaa2a3508ccb4b1b7069ea71eed3d7d14c7f
   languageName: node
   linkType: hard
 
