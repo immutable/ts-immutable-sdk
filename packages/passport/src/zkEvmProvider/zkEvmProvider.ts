@@ -92,6 +92,7 @@ export class ZkEvmProvider {
               magicProvider: this.magicProvider!,
               config: this.config,
               confirmationScreen: this.confirmationScreen,
+              relayerAdapter: this.relayerAdapter,
             });
 
             break;

@@ -1,15 +1,12 @@
 import {
-  ExternalProvider, JsonRpcSigner, TransactionRequest, Web3Provider,
+  ExternalProvider, TransactionRequest, Web3Provider,
 } from '@ethersproject/providers';
-import { walletContracts } from '@0xsequence/abi';
-import { encodeSignature } from '@0xsequence/config';
 
-import { BigNumberish, ethers } from 'ethers';
 import { PassportConfiguration } from '../../config';
 import { ConfirmationScreen } from '../../confirmation';
 import { RelayerAdapter } from '../relayerAdapter';
+import { getNonce, getSignedSequenceTransactions } from '../sequence';
 import { Transaction } from '../types';
-import { digestOfTransactionsNonce, sequenceTxAbiEncode } from '../utils';
 
 type EthSendTransactionInput = {
   transactionRequest: TransactionRequest,
@@ -17,46 +14,6 @@ type EthSendTransactionInput = {
   config: PassportConfiguration,
   confirmationScreen: ConfirmationScreen,
   relayerAdapter: RelayerAdapter,
-};
-
-const getNonce = async (magicWeb3Provider: Web3Provider, smartContractWalletAddress: string) => {
-  const code = await magicWeb3Provider.getCode(smartContractWalletAddress);
-  if (code) {
-    const contract = new ethers.Contract(
-      smartContractWalletAddress,
-      walletContracts.mainModule.abi,
-      magicWeb3Provider,
-    );
-    return contract.nonce();
-  }
-  return 0;
-};
-
-export async function ethSign(signer: JsonRpcSigner, message: string | Uint8Array, hashed = false) {
-  // TODO: Determine if message should be hashed, remove hashed argument
-  const hash = hashed ? message : ethers.utils.keccak256(message);
-  const hashArray = ethers.utils.arrayify(hash);
-  const ethsigNoType = await signer.signMessage(hashArray);
-  return ethsigNoType.endsWith('03') || ethsigNoType.endsWith('02') ? ethsigNoType : `${ethsigNoType}02`;
-}
-
-const getSignedTransactions = async (transactions: Transaction[], nonce: BigNumberish, signer: JsonRpcSigner) => {
-  // Get the digest
-  const digest = digestOfTransactionsNonce(nonce, ...transactions);
-
-  // Sign the digest
-  const signature = await ethSign(signer, digest);
-
-  // Add metadata
-  const encodedSignature = encodeSignature(signature);
-
-  // Encode the transaction;
-  const walletInterface = new ethers.utils.Interface(walletContracts.mainModule.abi);
-  return walletInterface.encodeFunctionData(walletInterface.getFunction('execute'), [
-    sequenceTxAbiEncode(transactions),
-    nonce,
-    encodedSignature,
-  ]);
 };
 
 export const ethSendTransaction = async ({
@@ -84,7 +41,7 @@ export const ethSendTransaction = async ({
     revertOnError: true,
   };
 
-  const signedTransaction = await getSignedTransactions([sequenceTransaction], nonce, signer);
+  const signedTransaction = await getSignedSequenceTransactions([sequenceTransaction], nonce, signer);
 
   // TODO: Add support for non-native gas payments (e.g ERC20, feeTransaction initialisation must change)
   const feeOptions = await relayerAdapter.imGetFeeOptions(smartContractWalletAddress, signedTransaction);
@@ -100,7 +57,11 @@ export const ethSendTransaction = async ({
     revertOnError: true,
   };
 
-  const signedTransactions = await getSignedTransactions([sequenceTransaction, sequenceFeeTransaction], nonce, signer);
+  const signedTransactions = await getSignedSequenceTransactions(
+    [sequenceTransaction, sequenceFeeTransaction],
+    nonce,
+    signer,
+  );
 
   // TODO: ID-697 Evaluate transactions through Guardian
 
