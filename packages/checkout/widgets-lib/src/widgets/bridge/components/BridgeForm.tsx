@@ -1,7 +1,7 @@
 import {
   Box, Button, Heading, OptionKey,
 } from '@biom3/react';
-import { CheckoutErrorType, GetBalanceResult } from '@imtbl/checkout-sdk';
+import { CheckoutErrorType, GetBalanceResult, GetBridgeGasEstimateResult } from '@imtbl/checkout-sdk';
 import {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -24,6 +24,8 @@ import {
   formInputsContainerStyles,
 } from './BridgeFormStyles';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
+import { useInterval } from '../../../lib/hooks/useInterval';
+import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
 
 interface BridgeFormProps {
   testId?: string;
@@ -53,6 +55,16 @@ export function BridgeForm(props: BridgeFormProps) {
   const [token, setToken] = useState<GetBalanceResult | null>(null);
   const [tokenError, setTokenError] = useState<string>('');
   const [amountFiatValue, setAmountFiatValue] = useState<string>('');
+  const [editing, setEditing] = useState(false);
+
+  // estimates
+  const [isFetching, setIsFetching] = useState(false);
+  const [estimates, setEstimates] = useState<GetBridgeGasEstimateResult | undefined>(undefined);
+  const [gasFee, setGasFee] = useState<string>('');
+  const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
+  const [approvalTransaction, setApprovalTransaction] = useState<ApproveBridgeResponse | undefined>(undefined);
+  const [bridgeTransaction, setBridgeTransaction] = useState<BridgeDepositResponse | undefined>(undefined);
+  const [tokenAddress, setTokenAddress] = useState<string>('');
 
   const tokensOptions = useMemo(
     () => tokenBalances
@@ -81,6 +93,97 @@ export function BridgeForm(props: BridgeFormProps) {
     [token, tokensOptions],
   );
 
+  const canFetchEstimates = (): boolean => {
+    if (Number.isNaN(parseFloat(amount))) return false;
+    if (parseFloat(amount) <= 0) return false;
+    if (!token) return false;
+    if (isFetching) return false;
+    return true;
+  };
+
+  const getApprovalTransaction = async ()
+  : Promise<{ approveRes: ApproveBridgeResponse, bridgeTxn:BridgeDepositResponse } | undefined> => {
+    if (!checkout || !provider || !tokenBridge || !token || !tokenAddress) return;
+
+    const depositorAddress = await provider.getSigner().getAddress();
+    const depositAmount = utils.parseUnits(amount, token.token.decimals);
+
+    const approveRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx({
+      depositorAddress,
+      token: tokenAddress,
+      depositAmount,
+    });
+
+    const bridgeTxn: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx({
+      depositorAddress,
+      recipientAddress: depositorAddress,
+      token: tokenAddress,
+      depositAmount,
+    });
+
+    // eslint-disable-next-line consistent-return
+    return { approveRes, bridgeTxn };
+  };
+
+  const fetchEstimates = async (silently: boolean = false) => {
+    if (!canFetchEstimates()) return;
+
+    // setIsFetching within this if statement
+    // to allow the user to edit the form
+    // even if a new quote is fetch silently
+    if (!silently) {
+      setIsFetching(true);
+    }
+
+    // get approval txn and bridge txn
+    const transactions = await getApprovalTransaction();
+    setApprovalTransaction(transactions?.approveRes);
+    setBridgeTransaction(transactions?.bridgeTxn);
+
+    // Prevent to silently fetch and set a new fee estimate
+    // if the user has updated and the widget is already
+    // fetching or the user is updating the inputs.
+    if ((silently && editing) || !transactions?.bridgeTxn) return;
+
+    const gasEstimatesA = await checkout?.getBridgeGasEstimate({
+      tokenAddress: token?.token.address || 'NATIVE',
+      transaction: transactions?.bridgeTxn.unsignedTx,
+      provider: provider!,
+      approveTxn: transactions?.approveRes?.unsignedTx || undefined,
+    });
+    console.log('gasEstimatesA', gasEstimatesA);
+
+    const gasEstimates: GetBridgeGasEstimateResult = {};
+
+    setEstimates(gasEstimates);
+    const estimatedAmount = utils.formatUnits(
+      gasEstimates?.gasEstimate?.estimatedAmount || 0,
+      DEFAULT_TOKEN_DECIMALS,
+    );
+    setGasFee(estimatedAmount);
+    setGasFeeFiatValue(calculateCryptoToFiat(
+      gasFee,
+      gasEstimates.gasEstimate?.token?.symbol || '',
+      cryptoFiatState.conversions,
+    ));
+
+    if (!silently) {
+      setIsFetching(false);
+    }
+  };
+
+  // Silently refresh the quote
+  useInterval(() => fetchEstimates(true), DEFAULT_QUOTE_REFRESH_INTERVAL);
+
+  useEffect(() => {
+    if (editing) return;
+    (async () => await fetchEstimates())();
+  }, [amount, token, editing]);
+
+  const onTextInputFocus = () => {
+    setEditing(true);
+  };
+
   const handleBridgeAmountChange = (value: string) => {
     setAmount(value);
     if (amountError) {
@@ -97,6 +200,7 @@ export function BridgeForm(props: BridgeFormProps) {
   };
 
   const handleAmountInputBlur = (value: string) => {
+    setEditing(false);
     setAmount(value);
     if (amountError) {
       const validateAmountError = validateAmount(value, token?.formattedBalance);
@@ -115,6 +219,12 @@ export function BridgeForm(props: BridgeFormProps) {
     const selected = tokenBalances.find((t) => value === `${t.token.symbol}-${t.token.name}`);
     if (!selected) return;
 
+    const selectedTokenAddress = (selected.token.address === ''
+      || selected.token.address === undefined)
+      ? 'NATIVE'
+      : selected.token.address;
+
+    setTokenAddress(selectedTokenAddress);
     setToken(selected);
     setTokenError('');
   };
@@ -173,27 +283,14 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const submitBridge = useCallback(async () => {
     if (!bridgeFormValidator()) return;
-    if (!checkout || !provider || !tokenBridge || !token) return;
+    if (!checkout || !provider || !tokenBridge || !token
+      || !approvalTransaction || !bridgeTransaction) return;
 
     try {
-      const tokenAddress = (token.token.address === ''
-        || token.token.address === undefined)
-        ? 'NATIVE'
-        : token.token.address;
-
-      const depositorAddress = await provider.getSigner().getAddress();
-      const depositAmount = utils.parseUnits(amount, token.token.decimals);
-
-      const approveRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx({
-        depositorAddress,
-        token: tokenAddress,
-        depositAmount,
-      });
-
-      if (approveRes.required && approveRes.unsignedTx) {
+      if (approvalTransaction.required && approvalTransaction.unsignedTx) {
         const { transactionResponse } = await checkout.sendTransaction({
           provider,
-          transaction: approveRes.unsignedTx,
+          transaction: approvalTransaction.unsignedTx,
         });
 
         const approvalReceipt = await transactionResponse.wait();
@@ -214,16 +311,9 @@ export function BridgeForm(props: BridgeFormProps) {
         }
       }
 
-      const unsignedDepositResult: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx({
-        depositorAddress,
-        recipientAddress: depositorAddress,
-        token: tokenAddress,
-        depositAmount,
-      });
-
       const { transactionResponse } = await checkout.sendTransaction({
         provider,
-        transaction: unsignedDepositResult.unsignedTx,
+        transaction: bridgeTransaction.unsignedTx,
       });
 
       viewDispatch({
@@ -298,7 +388,7 @@ export function BridgeForm(props: BridgeFormProps) {
             textAlign="left"
             errorMessage={tokenError}
             onSelectChange={(option) => handleSelectTokenChange(option)}
-            disabled={false}
+            disabled={isFetching}
           />
           <TextInputForm
             id="bridge-amount"
@@ -306,22 +396,21 @@ export function BridgeForm(props: BridgeFormProps) {
             placeholder={bridgeForm.from.inputPlaceholder}
             subtext={`${content.fiatPricePrefix} $${formatZeroAmount(amountFiatValue, true)}`}
             validator={amountInputValidation}
+            onTextInputFocus={onTextInputFocus}
             onTextInputChange={(value) => handleBridgeAmountChange(value)}
             onTextInputBlur={(value) => handleAmountInputBlur(value)}
             textAlign="right"
             errorMessage={amountError}
-            disabled={false}
+            disabled={isFetching}
           />
         </Box>
         {/** TODO: update here when we have the correct gas values from the estimator */}
         <Fees
           title={fees.title}
           fiatPricePrefix={content.fiatPricePrefix}
-          gasFeeValue="1"
-          gasFeeToken={{
-            name: '', symbol: 'IMX', decimals: 18, address: '',
-          }}
-          gasFeeFiatValue="0.7"
+          gasFeeValue={gasFee}
+          gasFeeToken={estimates?.gasEstimate?.token}
+          gasFeeFiatValue={gasFeeFiatValue}
         />
       </Box>
       <Box sx={bridgeFormButtonContainerStyles}>

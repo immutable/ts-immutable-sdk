@@ -269,13 +269,10 @@ export class Checkout {
     fromChainId: ChainId,
     toChainId: ChainId,
   ): Promise<TokenBridge> {
-    if (
-      this.readOnlyProviders.size === 0
-      || (this.config.environment === Environment.PRODUCTION
-        && !this.readOnlyProviders.has(ChainId.ETHEREUM))
-    ) {
-      this.readOnlyProviders = await createReadOnlyProviders(this.config);
-    }
+    this.readOnlyProviders = await createReadOnlyProviders(
+      this.config,
+      this.readOnlyProviders,
+    );
 
     const rootChainProvider = this.readOnlyProviders.get(fromChainId);
     const childChainProvider = this.readOnlyProviders.get(toChainId);
