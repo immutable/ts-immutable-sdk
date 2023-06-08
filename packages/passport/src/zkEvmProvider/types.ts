@@ -1,3 +1,39 @@
+import { BigNumberish, BytesLike } from 'ethers';
+
+export interface RelayerTransaction {
+  status: 'PENDING' | 'SUBMITTED' | 'CONFIRMED' | 'ERROR';
+  chainId: string;
+  relayerId: string;
+  hash: string;
+}
+
+export interface FeeOption {
+  tokenPrice: string;
+  tokenSymbol: string;
+  tokenDecimals: number;
+  tokenAddress: string;
+  recipient: string;
+}
+
+export interface Transaction {
+  to: string
+  value?: BigNumberish
+  data?: BytesLike
+  nonce?: BigNumberish
+  gasLimit?: BigNumberish
+  delegateCall?: boolean
+  revertOnError?: boolean
+}
+
+export interface TransactionEncoded {
+  delegateCall: boolean
+  revertOnError: boolean
+  gasLimit: BigNumberish
+  target: string
+  value: BigNumberish
+  data: BytesLike
+}
+
 export enum RpcErrorCode {
   RPC_SERVER_ERROR = -32000,
   INVALID_REQUEST = -32600,

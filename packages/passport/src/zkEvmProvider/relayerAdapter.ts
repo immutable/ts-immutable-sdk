@@ -1,11 +1,12 @@
+import { BytesLike } from 'ethers';
 import { PassportConfiguration } from '../config';
+import { FeeOption, RelayerTransaction } from './types';
 
 export type RelayerAdapterInput = {
   config: PassportConfiguration,
 };
 
 // JsonRpc base Types
-
 type JsonRpcRequest = {
   id: number;
   jsonrpc: '2.0';
@@ -17,67 +18,51 @@ type JsonRpcResponse = {
 };
 
 // EthSendTransaction types
-
-type EthSendTransactionParams = {
+export type EthSendTransactionParams = {
   to: string;
-  data: string;
+  data: BytesLike;
 };
 
-type EthSendTransactionRequest = JsonRpcRequest & {
+type EthSendTransactionRequest = {
   method: 'eth_sendTransaction';
   params: {
     to: string;
-    data: string;
+    data: BytesLike;
     chainId: string;
   }[];
 };
 
-type EthSendTransactionResponse = JsonRpcResponse & {
+type EthSendTransactionResponse = {
   result: string;
 };
 
 // ImGetTransactionByHash types
-
-type ImGetTransactionByHashParams = string;
-
-type ImGetTransactionByHashRequest = JsonRpcRequest & {
+type ImGetTransactionByHashRequest = {
   method: 'im_getTransactionByHash';
-  params: ImGetTransactionByHashParams[];
-};
-
-type Transaction = {
-  status: 'PENDING' | 'SUBMITTED' | 'CONFIRMED' | 'ERROR';
-  chainId: string;
-  relayerId: string;
-  hash: string;
+  params: string[];
 };
 
 type ImGetTransactionByHashResponse = JsonRpcResponse & {
-  result: Transaction;
+  result: RelayerTransaction;
 };
 
-// ImGetFeeOptions types
-
-type ImGetFeeOptionsParams = {
-  userAddress: string;
-  data: string;
-  chainId: string;
-};
-
-type ImGetFeeOptionsRequest = JsonRpcRequest & {
+type ImGetFeeOptionsRequest = {
   method: 'im_getFeeOptions';
-  params: ImGetFeeOptionsParams[];
-};
-
-type FeeOptions = {
-  token_price: string;
-  token_symbol: string;
-  token_decimals: number;
-  token_address: string;
+  params: {
+    userAddress: string;
+    data: BytesLike;
+    chainId: string;
+  }[];
 };
 
 type ImGetFeeOptionsResponse = JsonRpcResponse & {
-  result: FeeOptions[]
+  result: {
+    token_price: string;
+    token_symbol: string;
+    token_decimals: number;
+    token_address: string;
+    recipient: string;
+  }[]
 };
 
 type RelayerTransactionRequest =
@@ -93,20 +78,30 @@ export class RelayerAdapter {
   }
 
   private async postToRelayer<T>(request: RelayerTransactionRequest): Promise<T> {
-    return fetch(`${this.config.relayerUrl}/v1/transactions`, {
+    const body: RelayerTransactionRequest & JsonRpcRequest = {
+      id: 1,
+      jsonrpc: '2.0',
+      ...request,
+    };
+
+    const response = await fetch(`${this.config.relayerUrl}/v1/transactions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(request),
-    }).then((response) => response.json())
-      .then((response) => response as T);
+      body: JSON.stringify(body),
+    });
+
+    const jsonResponse = await response.json();
+    if (jsonResponse.error) {
+      return Promise.reject(jsonResponse.error);
+    }
+
+    return jsonResponse;
   }
 
-  public async ethSendTransaction(params: EthSendTransactionParams): Promise<EthSendTransactionResponse> {
+  public async ethSendTransaction(params: EthSendTransactionParams): Promise<string> {
     const payload: EthSendTransactionRequest = {
-      id: 1, // TODO: How do we generate this?
-      jsonrpc: '2.0',
       method: 'eth_sendTransaction',
       params: [{
         to: params.to,
@@ -114,23 +109,21 @@ export class RelayerAdapter {
         chainId: this.config.zkEvmChainId.toString(),
       }],
     };
-    return this.postToRelayer<EthSendTransactionResponse>(payload);
+    const { result } = await this.postToRelayer<EthSendTransactionResponse>(payload);
+    return result;
   }
 
-  public async imGetTransactionByHash(hash: string): Promise<ImGetTransactionByHashResponse> {
+  public async imGetTransactionByHash(hash: string): Promise<RelayerTransaction> {
     const payload: ImGetTransactionByHashRequest = {
-      id: 1, // TODO: How do we generate this?
-      jsonrpc: '2.0',
       method: 'im_getTransactionByHash',
       params: [hash],
     };
-    return this.postToRelayer<ImGetTransactionByHashResponse>(payload);
+    const { result } = await this.postToRelayer<ImGetTransactionByHashResponse>(payload);
+    return result;
   }
 
-  public async imGetFeeOptions(userAddress: string, data: string): Promise<ImGetFeeOptionsResponse> {
+  public async imGetFeeOptions(userAddress: string, data: BytesLike): Promise<FeeOption[]> {
     const payload: ImGetFeeOptionsRequest = {
-      id: 1, // TODO: How do we generate this?
-      jsonrpc: '2.0',
       method: 'im_getFeeOptions',
       params: [{
         userAddress,
@@ -138,6 +131,13 @@ export class RelayerAdapter {
         chainId: this.config.zkEvmChainId.toString(),
       }],
     };
-    return this.postToRelayer<ImGetFeeOptionsResponse>(payload);
+    const { result } = await this.postToRelayer<ImGetFeeOptionsResponse>(payload);
+    return result.map((feeOption): FeeOption => ({
+      tokenPrice: feeOption.token_price,
+      tokenSymbol: feeOption.token_symbol,
+      tokenDecimals: feeOption.token_decimals,
+      tokenAddress: feeOption.token_address,
+      recipient: feeOption.recipient,
+    }));
   }
 }

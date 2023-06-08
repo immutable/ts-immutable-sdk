@@ -12,51 +12,51 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsequence/abi@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/abi@npm:0.43.29"
-  checksum: 3f675f16dcda93f2ff68c38442c2ff82211f053c0ce2ad0520e992c6f34317d7e93a860dbb268546a5a57ac05e2a43c0a9f550ca20a0e2302ea6685b1cd20e4b
+"@0xsequence/abi@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/abi@npm:0.43.30"
+  checksum: 82defee995540096975581d846160d87c6009e97c4146d95e3889da4082cc96a9691eb0c228e9ddd767fb468bb8a7f5eb37d8f10f8b98936fe8a56b41a3bf951
   languageName: node
   linkType: hard
 
-"@0xsequence/api@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/api@npm:0.43.29"
-  checksum: e8b82e2996c60908e7e149185c1964dc9ba33cc3aaf9fb401f4bd41a19315158a1908a782c05fe2c890fb9cc04a5d216d651012ab1697a865333d3db726fb6e1
+"@0xsequence/api@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/api@npm:0.43.30"
+  checksum: eb960aee1064e10af9f731723f50876627d4e1331b28f2a22e28a402e1f89210b90e4b503b1b86972e83bf6cbc6e8155391e9a207294275721988ca4fd235d7d
   languageName: node
   linkType: hard
 
-"@0xsequence/auth@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/auth@npm:0.43.29"
+"@0xsequence/auth@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/auth@npm:0.43.30"
   dependencies:
-    "@0xsequence/abi": ^0.43.29
-    "@0xsequence/api": ^0.43.29
-    "@0xsequence/config": ^0.43.29
+    "@0xsequence/abi": ^0.43.30
+    "@0xsequence/api": ^0.43.30
+    "@0xsequence/config": ^0.43.30
     "@0xsequence/ethauth": ^0.8.0
-    "@0xsequence/indexer": ^0.43.29
-    "@0xsequence/metadata": ^0.43.29
-    "@0xsequence/network": ^0.43.29
-    "@0xsequence/provider": ^0.43.29
-    "@0xsequence/utils": ^0.43.29
-    "@0xsequence/wallet": ^0.43.29
+    "@0xsequence/indexer": ^0.43.30
+    "@0xsequence/metadata": ^0.43.30
+    "@0xsequence/network": ^0.43.30
+    "@0xsequence/provider": ^0.43.30
+    "@0xsequence/utils": ^0.43.30
+    "@0xsequence/wallet": ^0.43.30
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: f7ff842760af96659bf74e2c8e414fc7c8258d6ec613f03dd3e51ec44fd9dd8a34e2409dc284d5210f740bd9706796d9a71c467309a21a03c177981a336920a5
+  checksum: 3c7857bb2b89afef4bd933867f48b318d6acc893ec9aa0bc639e18f98be146d6bff1b24e073773ced3e6021c966616c874e2b35e2da34b5b80f6ad19b67d3c63
   languageName: node
   linkType: hard
 
-"@0xsequence/config@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/config@npm:0.43.29"
+"@0xsequence/config@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/config@npm:0.43.30"
   dependencies:
-    "@0xsequence/abi": ^0.43.29
-    "@0xsequence/multicall": ^0.43.29
-    "@0xsequence/network": ^0.43.29
-    "@0xsequence/utils": ^0.43.29
+    "@0xsequence/abi": ^0.43.30
+    "@0xsequence/multicall": ^0.43.30
+    "@0xsequence/network": ^0.43.30
+    "@0xsequence/utils": ^0.43.30
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: 624ca9db928b8e0be494418d18c1d08072f31aca6a56c61d4d2f4c575bc109e4e5fa9c1a377474a95afcf6cd936ac7ad95977133a76c7a0a657900a59e2631b6
+  checksum: 77c5d7e14ad3dd9ff6fdd414d20e9f34273f7ac87fcca0c4d6992c128469356cc1e9b12297dc87f11315f5e1f804f0eba0f5d445b00256c4ebb62c8232a1d82e
   languageName: node
   linkType: hard
 
@@ -71,24 +71,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsequence/guard@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/guard@npm:0.43.29"
-  checksum: e91c44d6e95f91b4ccd5b29a84b8ccbfe592beea0a561b482f36ffb7ff934797c7c86b2ec80984cfb342413898f08a59cf3e2ae6fc555956c14308ab47587a7b
+"@0xsequence/guard@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/guard@npm:0.43.30"
+  checksum: 928c98a655f80a063c0a7cc71f92206795a447438e21ef4a1313046a27798933b3df8f3fa52a1d191c1b0a0243871186a305527913da4c9e78d53c278db298e2
   languageName: node
   linkType: hard
 
-"@0xsequence/indexer@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/indexer@npm:0.43.29"
-  checksum: c2003be88e5c168f3e502b57f672b6d3ed2dafea437ea73d60075443944415a25b1e9ee8df980412d79ea93ca28621f48c88b7a7fe32d1f6fec96f1d22bee3bf
+"@0xsequence/indexer@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/indexer@npm:0.43.30"
+  checksum: 3c24cb03a551ce472a2c41c88a12b8283602d083316766034912fb759f4bc51e0b41a02a83707b3a2f3593b73d2e65a894245ab02e73b3e3c39c556e6d958d55
   languageName: node
   linkType: hard
 
-"@0xsequence/metadata@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/metadata@npm:0.43.29"
-  checksum: f447556ab705a60cbc1423d9139d423c68fc56441b08e7653f319789869161259f4f04b501bbf61195d2aa49d4ca8fc808bb82b5b4be1a7678179f9ac216f447
+"@0xsequence/metadata@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/metadata@npm:0.43.30"
+  checksum: 629527ec31cbe3187ec7c95fa09cce450b7c88b9bc9a216dc75a65063dea072f93557885739c5a97237e03392c141fa9136d087a331d2ba23c4e22b851672f25
   languageName: node
   linkType: hard
 
@@ -105,16 +105,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsequence/multicall@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/multicall@npm:0.43.29"
+"@0xsequence/multicall@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/multicall@npm:0.43.30"
   dependencies:
-    "@0xsequence/abi": ^0.43.29
-    "@0xsequence/network": ^0.43.29
-    "@0xsequence/utils": ^0.43.29
+    "@0xsequence/abi": ^0.43.30
+    "@0xsequence/network": ^0.43.30
+    "@0xsequence/utils": ^0.43.30
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: 6c8724c12a673deb6f50dcba81ba3bf566b226b2ef1ec0cf814e0e8c2bc7ad87840b3f090f5abf6ff1d95fdbf8fdfa3a051051c9990b309986faf3737b09fa1b
+  checksum: f2486a7c743a0bef75ceb8fd93f0df998b9ce0128272c398b30e3ffe7f7063463e3f129fde01ca52614383aa6b460d10a140e6bc2c0a4848cf9ece8cc089bafb
   languageName: node
   linkType: hard
 
@@ -129,66 +129,66 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsequence/network@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/network@npm:0.43.29"
+"@0xsequence/network@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/network@npm:0.43.30"
   dependencies:
-    "@0xsequence/indexer": ^0.43.29
-    "@0xsequence/provider": ^0.43.29
-    "@0xsequence/relayer": ^0.43.29
-    "@0xsequence/utils": ^0.43.29
+    "@0xsequence/indexer": ^0.43.30
+    "@0xsequence/provider": ^0.43.30
+    "@0xsequence/relayer": ^0.43.30
+    "@0xsequence/utils": ^0.43.30
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: 7390ac513c99de1197be978a9d4c99fe0ce5b8c70c2130aca194619b66a7e05da357a1adc2cc3b01476964049b2f79b1b21a278d15aa71360c255b9741dc12a6
+  checksum: 988c038cb406fab1587308dea170e07013359b29f4773db1cad04fe69ef1f0bfab13024c2560d8534502dc81edcd4a276f8faeddd326a0cbbe9178abf9698522
   languageName: node
   linkType: hard
 
-"@0xsequence/provider@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/provider@npm:0.43.29"
+"@0xsequence/provider@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/provider@npm:0.43.30"
   dependencies:
-    "@0xsequence/abi": ^0.43.29
-    "@0xsequence/auth": ^0.43.29
-    "@0xsequence/config": ^0.43.29
-    "@0xsequence/network": ^0.43.29
-    "@0xsequence/relayer": ^0.43.29
-    "@0xsequence/transactions": ^0.43.29
-    "@0xsequence/utils": ^0.43.29
-    "@0xsequence/wallet": ^0.43.29
+    "@0xsequence/abi": ^0.43.30
+    "@0xsequence/auth": ^0.43.30
+    "@0xsequence/config": ^0.43.30
+    "@0xsequence/network": ^0.43.30
+    "@0xsequence/relayer": ^0.43.30
+    "@0xsequence/transactions": ^0.43.30
+    "@0xsequence/utils": ^0.43.30
+    "@0xsequence/wallet": ^0.43.30
     eventemitter2: ^6.4.5
     webextension-polyfill: ^0.10.0
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: 6936c849dbbb332ac306062f1116ed65dfd2aa76bc26cf99a33cdd19628452a37b70b1cb6d7fe3f19fc32eb1342f07337aedca3def24e05685ef10b0f8e9a2da
+  checksum: 8f8f2506ff5593036d9884724e23eef3c70186041dd1bb355fea54ec5c1c3460cd7a43068378c89e92e12bbc9f63406eb60f6fe651129424cf740007d1c8798d
   languageName: node
   linkType: hard
 
-"@0xsequence/relayer@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/relayer@npm:0.43.29"
+"@0xsequence/relayer@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/relayer@npm:0.43.30"
   dependencies:
-    "@0xsequence/abi": ^0.43.29
-    "@0xsequence/config": ^0.43.29
-    "@0xsequence/network": ^0.43.29
-    "@0xsequence/transactions": ^0.43.29
-    "@0xsequence/utils": ^0.43.29
+    "@0xsequence/abi": ^0.43.30
+    "@0xsequence/config": ^0.43.30
+    "@0xsequence/network": ^0.43.30
+    "@0xsequence/transactions": ^0.43.30
+    "@0xsequence/utils": ^0.43.30
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: d79b276133ccb83cf6dcfe659cbb17d7dc08a093a4f6c8e2b2d672a4eef05af8866715b20d3ab0f105c492b8933d8d6fe69edaa5f86f0b641692bdbb74c061ba
+  checksum: 8278e1fb6bd3b9fe1adaab398f02f3edecd39d88856b2df4e984d15a9f54dab91ba16615d3b4facc402b04556b2801a0ec9d14f191f7770b9f29a4bd6bfd7a95
   languageName: node
   linkType: hard
 
-"@0xsequence/transactions@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/transactions@npm:0.43.29"
+"@0xsequence/transactions@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/transactions@npm:0.43.30"
   dependencies:
-    "@0xsequence/abi": ^0.43.29
-    "@0xsequence/config": ^0.43.29
-    "@0xsequence/network": ^0.43.29
-    "@0xsequence/utils": ^0.43.29
+    "@0xsequence/abi": ^0.43.30
+    "@0xsequence/config": ^0.43.30
+    "@0xsequence/network": ^0.43.30
+    "@0xsequence/utils": ^0.43.30
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: f13269022cac7e59ec0050e486c5826efc7cc68e1f13279028ed44defde71dd1ceedea6538a8cbeeb10af4a39996600549ffed411ddd3c090bd6531661fe97fe
+  checksum: 8e1bd66b2561eda6b79d25270cc1d11661b1cfbbf8849fc8964590b3cae426cd6f48b56d94a2bf8371279f7c88604a0087511b0c54c0d854fb4e9894ff26e4d3
   languageName: node
   linkType: hard
 
@@ -204,31 +204,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsequence/utils@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/utils@npm:0.43.29"
+"@0xsequence/utils@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/utils@npm:0.43.30"
   dependencies:
     js-base64: ^3.7.2
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: 4006c816ffb58f3ef301911c0d903d296dca25acbf480fd07fadd91eaf194dfdd66379b45adccda7eed5940a746dd340dca34075896b72605d110c142323bff4
+  checksum: b7778d417d6ac6bbbf5bb80a2ff8f15adac9f5af2160a766fe01f14be78bce1dc429927b4cb1f96fc0c7a94c595b5fd8689441b553012ce46d24af75f1f7d600
   languageName: node
   linkType: hard
 
-"@0xsequence/wallet@npm:^0.43.29":
-  version: 0.43.29
-  resolution: "@0xsequence/wallet@npm:0.43.29"
+"@0xsequence/wallet@npm:^0.43.30":
+  version: 0.43.30
+  resolution: "@0xsequence/wallet@npm:0.43.30"
   dependencies:
-    "@0xsequence/abi": ^0.43.29
-    "@0xsequence/config": ^0.43.29
-    "@0xsequence/guard": ^0.43.29
-    "@0xsequence/network": ^0.43.29
-    "@0xsequence/relayer": ^0.43.29
-    "@0xsequence/transactions": ^0.43.29
-    "@0xsequence/utils": ^0.43.29
+    "@0xsequence/abi": ^0.43.30
+    "@0xsequence/config": ^0.43.30
+    "@0xsequence/guard": ^0.43.30
+    "@0xsequence/network": ^0.43.30
+    "@0xsequence/relayer": ^0.43.30
+    "@0xsequence/transactions": ^0.43.30
+    "@0xsequence/utils": ^0.43.30
   peerDependencies:
     ethers: ">=5.5 < 6"
-  checksum: c356a3f750ba1645a0a2725a1c855bbf649d8a8f1668b26bc0f8604be1820232bc60f11ea627f4aff1d064fca96d9b9b83a1f3c51e67bc89033c150b86c3acd6
+  checksum: 07624ae4e6a667e82a09ed52202293b07c38c7a8c71bf3eecaee3cf56bb68ffabec3ba1c057eb67dad9059ece56ddfd85aef57bc1a641e7a4d76b6388315644a
   languageName: node
   linkType: hard
 
@@ -3346,9 +3346,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/passport@workspace:packages/passport"
   dependencies:
-    "@0xsequence/relayer": ^0.43.29
-    "@0xsequence/transactions": ^0.43.29
-    "@0xsequence/wallet": ^0.43.29
+    "@0xsequence/abi": ^0.43.30
+    "@0xsequence/config": ^0.43.30
     "@ethersproject/providers": ^5.7.2
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^1.1.1-alpha.1
