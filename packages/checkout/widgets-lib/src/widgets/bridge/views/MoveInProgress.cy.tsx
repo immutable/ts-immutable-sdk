@@ -1,5 +1,5 @@
 import { mount } from 'cypress/react18';
-import { describe } from 'local-cypress';
+import { cy, describe } from 'local-cypress';
 import { TransactionResponse } from '@ethersproject/providers';
 import { CompletionStatus, TokenBridge } from '@imtbl/bridge-sdk';
 import { BridgeWidgetTestComponent } from '../test-components/BridgeWidgetTestComponent';
