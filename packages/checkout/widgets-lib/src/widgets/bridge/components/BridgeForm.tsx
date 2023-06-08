@@ -180,6 +180,7 @@ export function BridgeForm(props: BridgeFormProps) {
         || token.token.address === undefined)
         ? 'NATIVE'
         : token.token.address;
+
       const depositorAddress = await provider.getSigner().getAddress();
       const depositAmount = utils.parseUnits(amount, token.token.decimals);
 
@@ -194,6 +195,7 @@ export function BridgeForm(props: BridgeFormProps) {
           provider,
           transaction: approveRes.unsignedTx,
         });
+
         const approvalReceipt = await transactionResponse.wait();
         if (approvalReceipt.status !== 1) {
           viewDispatch({
@@ -208,13 +210,14 @@ export function BridgeForm(props: BridgeFormProps) {
               },
             },
           });
+          return;
         }
       }
 
       const unsignedDepositResult: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx({
         depositorAddress,
         recipientAddress: depositorAddress,
-        token: token.token.address,
+        token: tokenAddress,
         depositAmount,
       });
 
