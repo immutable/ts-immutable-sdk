@@ -1,4 +1,11 @@
 import { ethers } from 'ethers';
+import {
+  BridgeConfiguration,
+  ETH_MAINNET_TO_ZKEVM_MAINNET,
+  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  TokenBridge,
+} from '@imtbl/bridge-sdk';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
@@ -33,6 +40,15 @@ import {
 } from './types';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
+import {
+  getBridgeEstimatedGas,
+  getBridgeFeeEstimate,
+} from './gasEstimate/bridgeGasEstimate';
+import {
+  GetBridgeGasEstimateParams,
+  GetBridgeGasEstimateResult,
+} from './types/gasEstimates';
+import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
@@ -206,5 +222,90 @@ export class Checkout {
    */
   public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
     return await network.getNetworkInfo(this.config, params.provider);
+  }
+
+  /**
+   * Get gas estimates for bridge transaction.
+   * @param {GetBridgeGasEstimateParams} params - The necessary data required to get the gas estimates.
+   * @returns Network details.
+   * @throws {@link ErrorType}
+   */
+  public async getBridgeGasEstimate(
+    params: GetBridgeGasEstimateParams,
+  ): Promise<GetBridgeGasEstimateResult> {
+    const fromChainId = this.config.environment === Environment.PRODUCTION
+      ? ChainId.ETHEREUM
+      : ChainId.SEPOLIA;
+    const toChainId = this.config.environment === Environment.PRODUCTION
+      ? ChainId.IMTBL_ZKEVM_TESTNET
+      : ChainId.IMTBL_ZKEVM_DEVNET;
+
+    const tokenBridge = await this.getBridgeInstance(fromChainId, toChainId);
+
+    const result: GetBridgeGasEstimateResult = {};
+
+    const bridgeFee = await getBridgeFeeEstimate(
+      tokenBridge,
+      params.tokenAddress,
+      toChainId,
+    );
+
+    result.bridgeFee = bridgeFee?.bridgeFee;
+    result.bridgeable = bridgeFee?.bridgeable;
+
+    if (result.bridgeable) {
+      result.gasEstimate = await getBridgeEstimatedGas(
+        params.transaction,
+        params.provider,
+        fromChainId,
+        params.approveTxn,
+      );
+    }
+
+    return result;
+  }
+
+  private async getBridgeInstance(
+    fromChainId: ChainId,
+    toChainId: ChainId,
+  ): Promise<TokenBridge> {
+    if (
+      this.readOnlyProviders.size === 0
+      || (this.config.environment === Environment.PRODUCTION
+        && !this.readOnlyProviders.has(ChainId.ETHEREUM))
+    ) {
+      this.readOnlyProviders = await createReadOnlyProviders(this.config);
+    }
+
+    const rootChainProvider = this.readOnlyProviders.get(fromChainId);
+    const childChainProvider = this.readOnlyProviders.get(toChainId);
+
+    if (!rootChainProvider) {
+      throw new CheckoutError(
+        `Chain:${fromChainId} is not a supported chain`,
+        CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
+      );
+    }
+    if (!childChainProvider) {
+      throw new CheckoutError(
+        `Chain:${toChainId} is not a supported chain`,
+        CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
+      );
+    }
+
+    const bridgeConfig = new BridgeConfiguration({
+      baseConfig: new ImmutableConfiguration({
+        environment: this.config.environment,
+      }),
+      bridgeInstance:
+        this.config.environment === Environment.PRODUCTION
+          ? ETH_MAINNET_TO_ZKEVM_MAINNET
+          : ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+
+      rootProvider: rootChainProvider,
+      childProvider: childChainProvider,
+    });
+
+    return new TokenBridge(bridgeConfig);
   }
 }
