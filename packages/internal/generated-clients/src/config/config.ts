@@ -1,15 +1,17 @@
 import {
+  // these could be imported from '../multi-rollup' instead
+  // consider adding a multi-rollup config if the clients are vastly different
   Configuration as APIConfiguration,
-  ConfigurationParameters,
+  ConfigurationParameters as ApiConfigurationParameters,
 } from '../imx';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
 /**
- * The configuration for the ImmutableX client
+ * Configuration for generated clients
  */
-export type ImxApiConfiguration = APIConfiguration;
+export type ImmutableAPIConfiguration = APIConfiguration;
 
 interface Environment {
   basePath: string;
@@ -19,13 +21,13 @@ interface Environment {
 const createConfig = ({
   basePath,
   headers,
-}: Environment): ImxApiConfiguration => {
+}: Environment): ImmutableAPIConfiguration => {
   if (!basePath.trim()) {
     throw Error('basePath can not be empty');
   }
 
-  const composedHeaders = { ...(headers || {}), ...defaultHeaders };
-  const apiConfigOptions: ConfigurationParameters = {
+  const composedHeaders = { ...defaultHeaders, ...(headers || {}) };
+  const apiConfigOptions: ApiConfigurationParameters = {
     basePath,
     baseOptions: { headers: composedHeaders },
   };
@@ -35,7 +37,7 @@ const createConfig = ({
 
 /**
  * Creates a Configuration for the specified environment
- * @returns an ImmutableXConfiguration
+ * @returns an ImmutableAPIConfiguration
  */
 export const imxConfig = {
   getProduction() {
@@ -47,6 +49,42 @@ export const imxConfig = {
   getSandbox() {
     return createConfig({
       basePath: 'https://api.sandbox.x.immutable.com',
+    });
+  },
+
+  createConfig,
+};
+
+/**
+ * Creates a Configuration for the specified environment
+ * @returns an ImmutableAPIConfiguration
+ */
+export const mrConfig = {
+  // TODO: replace with correct production url
+  getIndexerProduction() {
+    return createConfig({
+      basePath: 'https://indexer-mr.dev.imtbl.com',
+    });
+  },
+
+  // TODO: replace with correct sandbox url
+  getIndexerSandbox() {
+    return createConfig({
+      basePath: 'https://indexer-mr.dev.imtbl.com',
+    });
+  },
+
+  // TODO: replace with correct production url
+  getOrderBookProduction() {
+    return createConfig({
+      basePath: 'https://order-book-mr.dev.imtbl.com',
+    });
+  },
+
+  // TODO: replace with correct sandbox url
+  getOrderBookSandbox() {
+    return createConfig({
+      basePath: 'https://order-book-mr.dev.imtbl.com',
     });
   },
 

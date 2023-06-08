@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { imxConfig, ImxApiConfiguration } from './config';
+import { imxConfig, ImmutableAPIConfiguration } from './config';
 import { Configuration } from '../imx';
 
 const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
@@ -21,12 +21,12 @@ describe('createConfig', () => {
     const basePath = 'https://api.sandbox.x.immutable.com';
     const customHeaders = {
       'x-custom-headers': 'x values',
-      'x-sdk-version': 'this should get overwritten',
+      'x-sdk-version': 'this should not get overwritten',
     };
-    const expected: ImxApiConfiguration = new Configuration({
+    const expected: ImmutableAPIConfiguration = new Configuration({
       basePath,
       baseOptions: {
-        headers: { 'x-custom-headers': 'x values', ...defaultHeaders },
+        headers: { ...defaultHeaders, ...customHeaders },
       },
     });
 
