@@ -56,6 +56,7 @@ export function SwapButton({
               },
             },
           });
+          return;
         }
       }
       const txn = await checkout.sendTransaction({
