@@ -157,9 +157,8 @@ export function BridgeForm(props: BridgeFormProps) {
 
     const gasEstimateResult = await checkout.getBridgeGasEstimate({
       tokenAddress: token?.token.address || 'NATIVE',
-      transaction: transactions?.bridgeTxn.unsignedTx,
       provider: provider!,
-      approveTxn: transactions?.approveRes?.unsignedTx || undefined,
+      isSpendingCapApprovalRequired: !!transactions?.approveRes?.unsignedTx,
     });
 
     setEstimates(gasEstimateResult);
@@ -299,7 +298,6 @@ export function BridgeForm(props: BridgeFormProps) {
         });
 
         const approvalReceipt = await transactionResponse.wait();
-        setLoading(false);
         if (approvalReceipt.status !== 1) {
           viewDispatch({
             payload: {

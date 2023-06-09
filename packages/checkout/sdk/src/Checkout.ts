@@ -253,14 +253,11 @@ export class Checkout {
     result.bridgeFee = bridgeFee?.bridgeFee;
     result.bridgeable = bridgeFee?.bridgeable;
 
-    if (result.bridgeable) {
-      result.gasEstimate = await getBridgeEstimatedGas(
-        params.transaction,
-        params.provider,
-        fromChainId,
-        params.approveTxn,
-      );
-    }
+    result.gasEstimate = await getBridgeEstimatedGas(
+      params.provider,
+      fromChainId,
+      params.isSpendingCapApprovalRequired,
+    );
 
     return result;
   }

@@ -1,9 +1,5 @@
 import { BigNumber } from 'ethers';
-import {
-  FeeData,
-  TransactionRequest,
-  Web3Provider,
-} from '@ethersproject/providers';
+import { FeeData, Web3Provider } from '@ethersproject/providers';
 import {
   BridgeFeeRequest,
   BridgeFeeResponse,
@@ -46,10 +42,9 @@ const getGasEstimates = async (provider: Web3Provider) => {
 };
 
 export async function getBridgeEstimatedGas(
-  transaction: TransactionRequest,
   provider: Web3Provider,
   chainId: ChainId,
-  approveTxn?: TransactionRequest,
+  isApproveTxnRequired?: boolean,
   tokenAddress?: FungibleToken,
 ): Promise<TokenAmountEstimate> {
   // fetch token details
@@ -62,7 +57,7 @@ export async function getBridgeEstimatedGas(
   const gasEstimate = await getGasEstimates(provider);
   result.estimatedAmount = gasEstimate;
 
-  if (approveTxn) {
+  if (isApproveTxnRequired) {
     result.estimatedAmount.add(gasEstimate);
   }
 
