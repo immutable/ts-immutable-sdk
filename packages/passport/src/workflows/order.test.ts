@@ -2,7 +2,7 @@ import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { cancelOrder, createOrder } from './order';
-import { ConfirmationScreen, TransactionTypes } from '../confirmation';
+import { ConfirmationScreen } from '../confirmation';
 import { validateWithGuardian } from './guardian';
 
 jest.mock('../confirmation/confirmation');
@@ -198,7 +198,7 @@ describe('order', () => {
       getSignableCancelOrderMock = jest.fn();
       cancelOrderMock = jest.fn();
       ordersApiMock = {
-        getSignableCancelOrder: getSignableCancelOrderMock,
+        getSignableCancelOrderV3: getSignableCancelOrderMock,
         cancelOrder: cancelOrderMock,
       } as unknown as OrdersApi;
     });
@@ -244,29 +244,22 @@ describe('order', () => {
       cancelOrderMock.mockResolvedValue({
         data: mockReturnValue,
       });
-      (mockConfirmationScreen.startTransaction as jest.Mock).mockResolvedValue({
-        confirmed: true,
-      });
 
       const result = await cancelOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       });
 
       expect(getSignableCancelOrderMock).toBeCalledWith(
         mockSignableCancelOrderRequest,
+        mockHeader,
       );
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUser.accessToken,
-        {
-          transactionType: TransactionTypes.cancelOrder,
-          transactionData: expect.any(Object),
-        },
-      );
+      expect(validateWithGuardian).toBeCalledTimes(1);
       expect(cancelOrderMock).toBeCalledWith(
         mockCancelOrderRequest,
         mockHeader,
@@ -281,34 +274,21 @@ describe('order', () => {
         },
       };
 
-      const mockReturnValue = {
-        order_id: orderId,
-        status: 'success',
-      };
-
       getSignableCancelOrderMock.mockResolvedValue(
         mockSignableCancelOrderResponse,
       );
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
-      cancelOrderMock.mockResolvedValue({
-        data: mockReturnValue,
-      });
 
       await expect(() => cancelOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
+        imxPublicApiDomain: mockGuardianDomain,
         user: mockUser,
         request: cancelOrderRequest,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('CANCEL_ORDER_ERROR');
 
-      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUser.accessToken,
-        {
-          transactionType: TransactionTypes.cancelOrder,
-          transactionData: expect.any(Object),
-        },
-      );
+      expect(validateWithGuardian).toBeCalledTimes(1);
     });
 
     it('should return error if failed to call public api', async () => {
@@ -319,6 +299,7 @@ describe('order', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: cancelOrderRequest,
+        imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
         new PassportError(
