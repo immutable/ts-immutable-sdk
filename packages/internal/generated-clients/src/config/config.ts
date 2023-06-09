@@ -18,7 +18,7 @@ interface Environment {
   headers?: Record<string, string>;
 }
 
-const createConfig = ({
+export const createConfig = ({
   basePath,
   headers,
 }: Environment): ImmutableAPIConfiguration => {
@@ -51,42 +51,24 @@ export const imxConfig = {
       basePath: 'https://api.sandbox.x.immutable.com',
     });
   },
+};
 
-  createConfig,
+const mrApiConfig = {
+  indexerMr: () => createConfig({
+    basePath: 'https://indexer-mr.dev.imtbl.com',
+  }),
+  orderBookMr: () => createConfig({
+    basePath: 'https://order-book-mr.dev.imtbl.com',
+  }),
 };
 
 /**
  * Creates a Configuration for the specified environment
- * @returns an ImmutableAPIConfiguration
+ * @returns an MultiRollupAPIConfiguration
  */
 export const mrConfig = {
-  // TODO: replace with correct production url
-  getIndexerProduction() {
-    return createConfig({
-      basePath: 'https://indexer-mr.dev.imtbl.com',
-    });
-  },
-
-  // TODO: replace with correct sandbox url
-  getIndexerSandbox() {
-    return createConfig({
-      basePath: 'https://indexer-mr.dev.imtbl.com',
-    });
-  },
-
-  // TODO: replace with correct production url
-  getOrderBookProduction() {
-    return createConfig({
-      basePath: 'https://order-book-mr.dev.imtbl.com',
-    });
-  },
-
-  // TODO: replace with correct sandbox url
-  getOrderBookSandbox() {
-    return createConfig({
-      basePath: 'https://order-book-mr.dev.imtbl.com',
-    });
-  },
-
-  createConfig,
+  production: mrApiConfig,
+  sandbox: mrApiConfig,
 };
+
+export type MultiRollupAPIConfiguration = typeof mrApiConfig;

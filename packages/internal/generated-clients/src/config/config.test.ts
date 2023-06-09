@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { imxConfig, ImmutableAPIConfiguration } from './config';
+import { createConfig, ImmutableAPIConfiguration } from './config';
 import { Configuration } from '../imx';
 
 const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
 describe('createConfig', () => {
   it('should throw if basePath is whitespace', () => {
-    expect(() => imxConfig.createConfig({
+    expect(() => createConfig({
       basePath: ' ',
     })).toThrowError('basePath can not be empty');
   });
 
   it('should throw if basePath is empty', () => {
-    expect(() => imxConfig.createConfig({
+    expect(() => createConfig({
       basePath: '',
     })).toThrowError('basePath can not be empty');
   });
@@ -30,7 +30,7 @@ describe('createConfig', () => {
       },
     });
 
-    const actual = imxConfig.createConfig({
+    const actual = createConfig({
       basePath,
       headers: customHeaders,
     });

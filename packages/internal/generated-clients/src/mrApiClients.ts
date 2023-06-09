@@ -6,10 +6,10 @@ import {
   NftsApi,
   OrdersApi,
 } from './multi-rollup';
-import { ImmutableAPIConfiguration } from './config';
+import { MultiRollupAPIConfiguration } from './config';
 
 export class MultiRollupApiClients {
-  public config: ImmutableAPIConfiguration;
+  public config: MultiRollupAPIConfiguration;
 
   public activitiesApi: ActivitiesApi;
 
@@ -23,13 +23,13 @@ export class MultiRollupApiClients {
 
   public ordersApi: OrdersApi;
 
-  constructor(config: ImmutableAPIConfiguration) {
+  constructor(config: MultiRollupAPIConfiguration) {
     this.config = config;
-    this.activitiesApi = new ActivitiesApi(config);
-    this.chainsApi = new ChainsApi(config);
-    this.collectionApi = new CollectionsApi(config);
-    this.nftOwnersApi = new NftOwnersApi(config);
-    this.nftsApi = new NftsApi(config);
-    this.ordersApi = new OrdersApi(config);
+    this.activitiesApi = new ActivitiesApi(config.indexerMr());
+    this.chainsApi = new ChainsApi(config.indexerMr());
+    this.collectionApi = new CollectionsApi(config.indexerMr());
+    this.nftOwnersApi = new NftOwnersApi(config.indexerMr());
+    this.nftsApi = new NftsApi(config.indexerMr());
+    this.ordersApi = new OrdersApi(config.orderBookMr());
   }
 }
