@@ -64,7 +64,8 @@ export function BridgeForm(props: BridgeFormProps) {
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [approvalTransaction, setApprovalTransaction] = useState<ApproveBridgeResponse | undefined>(undefined);
-  const [bridgeTransaction, setBridgeTransaction] = useState<BridgeDepositResponse | undefined>(undefined);
+  const [unsignedBridgeTransaction,
+    setUnsignedBridgeTransaction] = useState<BridgeDepositResponse | undefined>(undefined);
   const [tokenAddress, setTokenAddress] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
@@ -141,7 +142,7 @@ export function BridgeForm(props: BridgeFormProps) {
     // get approval txn and bridge txn
     const transactions = await getApprovalTransaction();
     setApprovalTransaction(transactions?.approveRes);
-    setBridgeTransaction(transactions?.bridgeTxn);
+    setUnsignedBridgeTransaction(transactions?.bridgeTxn);
 
     // Prevent to silently fetch and set a new fee estimate
     // if the user has updated and the widget is already
@@ -154,7 +155,6 @@ export function BridgeForm(props: BridgeFormProps) {
       provider: provider!,
       approveTxn: transactions?.approveRes?.unsignedTx || undefined,
     });
-    console.log('gasEstimateResult', gasEstimateResult);
 
     setEstimates(gasEstimateResult);
     const estimatedAmount = utils.formatUnits(
@@ -285,8 +285,8 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const submitBridge = useCallback(async () => {
     if (!bridgeFormValidator()) return;
-    if (!checkout || !provider || !tokenBridge || !token
-      || !approvalTransaction || !bridgeTransaction) return;
+    if (!checkout || !provider || !token
+      || !approvalTransaction || !unsignedBridgeTransaction) return;
 
     try {
       setLoading(true);
@@ -317,7 +317,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
       const { transactionResponse } = await checkout.sendTransaction({
         provider,
-        transaction: bridgeTransaction.unsignedTx,
+        transaction: unsignedBridgeTransaction.unsignedTx,
       });
 
       viewDispatch({
@@ -366,7 +366,7 @@ export function BridgeForm(props: BridgeFormProps) {
         },
       });
     }
-  }, [checkout, provider, bridgeFormValidator]);
+  }, [checkout, provider, bridgeFormValidator, approvalTransaction, unsignedBridgeTransaction]);
 
   return (
     <Box
