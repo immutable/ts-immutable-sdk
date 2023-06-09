@@ -20,14 +20,14 @@ export async function mintingWorkflow(
 ): Promise<MintTokensResponse> {
   // TODO: improve this object key rearrangement.
   // object keys should respect this order, but the logic can be improved
-  const users = request.users.map((user: any) => ({
+  const users = request.users.map((user) => ({
     ether_key: user.user,
-    tokens: user.tokens.map((token: any) => ({
+    tokens: user.tokens.map((token) => ({
       id: token.id,
       blueprint: token.blueprint,
       ...(token.royalties
         && token.royalties.length > 0 && {
-        royalties: token.royalties.map((royalty: any) => ({
+        royalties: token.royalties.map((royalty) => ({
           recipient: royalty.recipient,
           percentage: royalty.percentage,
         })),
@@ -40,7 +40,7 @@ export async function mintingWorkflow(
     contract_address: request.contract_address,
     ...(royalties
       && royalties.length > 0 && {
-      royalties: royalties.map((fee: any) => ({
+      royalties: royalties.map((fee) => ({
         recipient: fee.recipient,
         percentage: fee.percentage,
       })),
@@ -53,7 +53,7 @@ export async function mintingWorkflow(
   const authSignature = await signRaw(hash, signer);
 
   const apiPayload: MintRequest = {
-    users: signablePayload.users.map((user: any) => ({
+    users: signablePayload.users.map((user) => ({
       user: user.ether_key,
       tokens: user.tokens,
     })),
