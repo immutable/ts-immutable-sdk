@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ChainName } from '../models/ChainName';
 import type { CreateOrderRequestBody } from '../models/CreateOrderRequestBody';
 import type { ListOrdersResult } from '../models/ListOrdersResult';
 import type { OrderResult } from '../models/OrderResult';
@@ -22,7 +23,7 @@ export class OrdersService {
    * @throws ApiError
    */
   public listOrders({
-    chainId,
+    chainName,
     status,
     sellItemContractAddress,
     sellItemTokenId,
@@ -31,10 +32,7 @@ export class OrdersService {
     sortDirection,
     pageCursor,
   }: {
-    /**
-     * Chain identifier using the CAIP-2 blockchain id spec
-     */
-    chainId: string,
+    chainName: ChainName,
     /**
      * Order status to filter by
      */
@@ -66,9 +64,9 @@ export class OrdersService {
   }): CancelablePromise<ListOrdersResult> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/v1/chains/{chain_id}/orders',
+      url: '/v1/chains/{chain_name}/orders',
       path: {
-        'chain_id': chainId,
+        'chain_name': chainName,
       },
       query: {
         'status': status,
@@ -80,9 +78,9 @@ export class OrdersService {
         'page_cursor': pageCursor,
       },
       errors: {
-        400: `Client error`,
-        404: `The specified resource was not found`,
-        500: `Internal server error`,
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
       },
     });
   }
@@ -94,27 +92,24 @@ export class OrdersService {
    * @throws ApiError
    */
   public createOrder({
-    chainId,
+    chainName,
     requestBody,
   }: {
-    /**
-     * Chain identifier using the CAIP-2 blockchain id spec
-     */
-    chainId: string,
+    chainName: ChainName,
     requestBody: CreateOrderRequestBody,
   }): CancelablePromise<OrderResult> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/v1/chains/{chain_id}/orders',
+      url: '/v1/chains/{chain_name}/orders',
       path: {
-        'chain_id': chainId,
+        'chain_name': chainName,
       },
       body: requestBody,
       mediaType: 'application/json',
       errors: {
-        400: `Client error`,
-        404: `The specified resource was not found`,
-        500: `Internal server error`,
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
       },
     });
   }
@@ -126,13 +121,10 @@ export class OrdersService {
    * @throws ApiError
    */
   public getOrder({
-    chainId,
+    chainName,
     orderId,
   }: {
-    /**
-     * Chain identifier using the CAIP-2 blockchain id spec
-     */
-    chainId: string,
+    chainName: ChainName,
     /**
      * Global Order identifier
      */
@@ -140,15 +132,15 @@ export class OrdersService {
   }): CancelablePromise<OrderResult> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/v1/chains/{chain_id}/orders/{order_id}',
+      url: '/v1/chains/{chain_name}/orders/{order_id}',
       path: {
-        'chain_id': chainId,
+        'chain_name': chainName,
         'order_id': orderId,
       },
       errors: {
-        400: `Client error`,
-        404: `The specified resource was not found`,
-        500: `Internal server error`,
+        400: `Bad Request (400)`,
+        404: `The specified resource was not found (404)`,
+        500: `Internal Server Error (500)`,
       },
     });
   }
