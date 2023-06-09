@@ -3,7 +3,11 @@ import { TokenInfo } from './tokenInfo';
 import { ChainId } from './chainId';
 import { NetworkInfo } from './networkInfo';
 
-export const RPC_URL_MAP = new Map<ChainId, string>([
+/**
+ * Object mapping the list of supported networks with the corresponding RPC urls.
+ */
+export type RpcUrlMap = Map<ChainId, string>;
+export const RPC_URL_MAP: RpcUrlMap = new Map<ChainId, string>([
   [ChainId.ETHEREUM, 'https://mainnet.infura.io/v3/'],
   [ChainId.IMTBL_ZKEVM_TESTNET, 'https://zkevm-rpc.sandbox.x.immutable.com'],
   [ChainId.POLYGON_ZKEVM, 'https://polygon-rpc.com'],

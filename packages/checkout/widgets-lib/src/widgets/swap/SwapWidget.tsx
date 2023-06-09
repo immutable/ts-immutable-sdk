@@ -189,7 +189,6 @@ export function SwapWidget(props: SwapWidgetProps) {
               statusText={success.text}
               actionText={success.actionText}
               onRenderEvent={sendSwapSuccessEvent}
-              // eslint-disable-next-line no-console
               onActionClick={sendSwapWidgetCloseEvent}
               statusType={StatusType.SUCCESS}
               testId="success-view"
@@ -214,6 +213,7 @@ export function SwapWidget(props: SwapWidgetProps) {
               }
             }}
             statusType={StatusType.FAILURE}
+            onCloseClick={sendSwapWidgetCloseEvent}
             testId="fail-view"
           />
           )}
@@ -236,6 +236,7 @@ export function SwapWidget(props: SwapWidgetProps) {
                 }
               }}
               statusType={StatusType.WARNING}
+              onCloseClick={sendSwapWidgetCloseEvent}
               testId="price-surge-view"
             />
           )}
