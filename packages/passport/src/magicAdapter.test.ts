@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { LoginWithOpenIdParams, OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
 import { Magic } from 'magic-sdk';

@@ -40,15 +40,6 @@ export class Passport {
       });
   }
 
-  private async connectEvm() {
-    return new ZkEvmProvider({
-      authManager: this.authManager,
-      magicAdapter: this.magicAdapter,
-      config: this.config,
-      confirmationScreen: this.confirmationScreen,
-    });
-  }
-
   private async getImxProvider(user: User) {
     if (!user || !user.idToken) {
       throw new PassportError(
@@ -98,6 +89,15 @@ export class Passport {
   public async connectImx(): Promise<IMXProvider> {
     const user = await this.authManager.login();
     return this.getImxProvider(user);
+  }
+
+  public connectEvm() {
+    return new ZkEvmProvider({
+      authManager: this.authManager,
+      magicAdapter: this.magicAdapter,
+      config: this.config,
+      confirmationScreen: this.confirmationScreen,
+    });
   }
 
   public async loginCallback(): Promise<void> {
