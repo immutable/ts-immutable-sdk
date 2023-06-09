@@ -9,7 +9,7 @@
     "modules": {
         "config": "prod",
         "blockchain-data": "alpha",
-        "immutablex_client": "prod",
+        "immutablex-client": "prod",
         "passport": "prod",
         "orderbook": "alpha",
         "provider": "prod",

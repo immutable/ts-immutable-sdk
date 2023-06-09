@@ -3543,9 +3543,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/immutablex-client@0.0.0, @imtbl/immutablex-client@workspace:packages/immutablex_client":
+"@imtbl/immutablex-client@0.0.0, @imtbl/immutablex-client@workspace:packages/immutablex-client":
   version: 0.0.0-use.local
-  resolution: "@imtbl/immutablex-client@workspace:packages/immutablex_client"
+  resolution: "@imtbl/immutablex-client@workspace:packages/immutablex-client"
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^1.1.1-alpha.1

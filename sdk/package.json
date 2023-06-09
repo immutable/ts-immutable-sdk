@@ -65,9 +65,9 @@
       "types": "./dist/blockchain-data.d.ts",
       "import": "./dist/blockchain-data.js"
     },
-    "./immutablex_client": {
-      "types": "./dist/immutablex_client.d.ts",
-      "import": "./dist/immutablex_client.js"
+    "./immutablex-client": {
+      "types": "./dist/immutablex-client.d.ts",
+      "import": "./dist/immutablex-client.js"
     },
     "./passport": {
       "types": "./dist/passport.d.ts",

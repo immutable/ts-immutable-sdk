@@ -53,7 +53,7 @@
     "packages/config",
     "packages/erc20",
     "packages/erc721-permissioned-mintable",
-    "packages/immutablex_client",
+    "packages/immutablex-client",
     "packages/passport",
     "packages/provider",
     "packages/provider/src/sample-app",
