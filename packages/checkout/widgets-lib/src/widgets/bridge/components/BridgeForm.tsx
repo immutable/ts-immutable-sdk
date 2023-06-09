@@ -1,7 +1,9 @@
 import {
   Box, Button, Heading, OptionKey,
 } from '@biom3/react';
-import { CheckoutErrorType, GetBalanceResult, GetBridgeGasEstimateResult } from '@imtbl/checkout-sdk';
+import {
+  CheckoutErrorType, GetBalanceResult, GetBridgeGasEstimateResult, TokenInfo,
+} from '@imtbl/checkout-sdk';
 import {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -95,6 +97,10 @@ export function BridgeForm(props: BridgeFormProps) {
     () => (token && token ? `${token.token.symbol}-${token.token.name}` : undefined),
     [token, tokensOptions],
   );
+  const getTokenAddress = (selectedToken?: TokenInfo) => ((selectedToken?.address === ''
+    || selectedToken?.address === undefined)
+    ? 'NATIVE'
+    : selectedToken.address);
 
   const canFetchEstimates = (): boolean => {
     if (Number.isNaN(parseFloat(amount))) return false;
@@ -104,7 +110,7 @@ export function BridgeForm(props: BridgeFormProps) {
     return true;
   };
 
-  const getApprovalTransaction = async ()
+  const getUnsignedTransactions = async ()
   : Promise<{ approveRes: ApproveBridgeResponse, bridgeTxn:BridgeDepositResponse } | undefined> => {
     if (!checkout || !provider || !tokenBridge || !token || !tokenAddress) return;
 
@@ -140,7 +146,7 @@ export function BridgeForm(props: BridgeFormProps) {
     }
 
     // get approval txn and bridge txn
-    const transactions = await getApprovalTransaction();
+    const transactions = await getUnsignedTransactions();
     setApprovalTransaction(transactions?.approveRes);
     setUnsignedBridgeTransaction(transactions?.bridgeTxn);
 
@@ -221,12 +227,7 @@ export function BridgeForm(props: BridgeFormProps) {
     const selected = tokenBalances.find((t) => value === `${t.token.symbol}-${t.token.name}`);
     if (!selected) return;
 
-    const selectedTokenAddress = (selected.token.address === ''
-      || selected.token.address === undefined)
-      ? 'NATIVE'
-      : selected.token.address;
-
-    setTokenAddress(selectedTokenAddress);
+    setTokenAddress(getTokenAddress(selected.token));
     setToken(selected);
     setTokenError('');
   };
@@ -252,6 +253,7 @@ export function BridgeForm(props: BridgeFormProps) {
     }
 
     setToken(defaultToken || null);
+    setTokenAddress(getTokenAddress(defaultToken?.token));
   }, [tokenBalances, network, defaultTokenAddress]);
 
   useEffect(() => {

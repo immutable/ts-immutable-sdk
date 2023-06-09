@@ -1,5 +1,9 @@
 import { BigNumber } from 'ethers';
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import {
+  FeeData,
+  TransactionRequest,
+  Web3Provider,
+} from '@ethersproject/providers';
 import {
   BridgeFeeRequest,
   BridgeFeeResponse,
@@ -25,21 +29,20 @@ async function getTokenInfoByAddress(
   ).tokens.find((token) => (token.address || 'NATIVE') === tokenAddress);
 }
 
-const doesChainSupportEIP1559 = (txn: TransactionRequest) => !!txn.maxFeePerGas && !!txn.maxPriorityFeePerGas;
+const doesChainSupportEIP1559 = (feeData: FeeData) => !!feeData.maxFeePerGas && !!feeData.maxPriorityFeePerGas;
 
-const getGasPriceInWei = (txn: TransactionRequest) => (doesChainSupportEIP1559(txn)
-  ? BigNumber.from(txn.maxFeePerGas).add(
-    BigNumber.from(txn.maxPriorityFeePerGas),
+const getGasPriceInWei = (feeData: FeeData) => (doesChainSupportEIP1559(feeData)
+  ? BigNumber.from(feeData.maxFeePerGas).add(
+    BigNumber.from(feeData.maxPriorityFeePerGas),
   )
-  : BigNumber.from(txn.gasPrice));
+  : BigNumber.from(feeData.gasPrice));
 
-const getGasEstimates = async (
-  provider: Web3Provider,
-  txn: TransactionRequest,
-) => {
-  const txnGasUnits = await provider.estimateGas(txn);
-  const gasPriceInWei = getGasPriceInWei(txn);
-  return gasPriceInWei.mul(txnGasUnits);
+const getGasEstimates = async (provider: Web3Provider) => {
+  const txnGasLimitInWei = 140000; // todo: fetch gasLimit from bridgeSDK when they add new fn
+  const feeData: FeeData = await provider.getFeeData();
+
+  const gasPriceInWei = getGasPriceInWei(feeData);
+  return gasPriceInWei.mul(txnGasLimitInWei);
 };
 
 export async function getBridgeEstimatedGas(
@@ -56,13 +59,11 @@ export async function getBridgeEstimatedGas(
   );
   const result: TokenAmountEstimate = { token: tokenInfo };
 
-  // txn gas estimate
-  result.estimatedAmount = await getGasEstimates(provider, transaction);
+  const gasEstimate = await getGasEstimates(provider);
+  result.estimatedAmount = gasEstimate;
 
-  // approveTxn gas estimate
   if (approveTxn) {
-    const approveTxnGasEstimates = await getGasEstimates(provider, transaction);
-    result.estimatedAmount = result.estimatedAmount.add(approveTxnGasEstimates);
+    result.estimatedAmount.add(gasEstimate);
   }
 
   return result;
