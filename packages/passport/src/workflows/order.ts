@@ -11,7 +11,7 @@ import {
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { UserWithEtherKey } from '../types';
-import { ConfirmationScreen, TransactionTypes } from '../confirmation';
+import { ConfirmationScreen } from '../confirmation';
 import { validateWithGuardian } from './guardian';
 
 type CancelOrderParams = {
@@ -19,6 +19,7 @@ type CancelOrderParams = {
   ordersApi: OrdersApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
+  imxPublicApiDomain: string;
   confirmationScreen: ConfirmationScreen;
 };
 
@@ -113,6 +114,7 @@ export async function cancelOrder({
   starkSigner,
   request,
   ordersApi,
+  imxPublicApiDomain,
   confirmationScreen,
 }: CancelOrderParams): Promise<CancelOrderResponse> {
   return withPassportError<CancelOrderResponse>(async () => {
@@ -120,28 +122,25 @@ export async function cancelOrder({
       order_id: request.order_id,
     };
 
-    const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrder({
-      getSignableCancelOrderRequest,
-    });
-
-    const confirmationResult = await confirmationScreen.startTransaction(
-      user.accessToken,
-      {
-        transactionType: TransactionTypes.cancelOrder,
-        transactionData: getSignableCancelOrderRequest,
-      },
-    );
-    if (!confirmationResult.confirmed) {
-      throw new Error('Transaction rejected by user');
-    }
-
-    const { payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
-
-    const starkSignature = await starkSigner.signMessage(payloadHash);
     const headers = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       Authorization: `Bearer ${user.accessToken}`,
     };
+    const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrderV3({
+      getSignableCancelOrderRequest,
+    }, { headers });
+
+    await validateWithGuardian({
+      imxPublicApiDomain,
+      accessToken: user.accessToken,
+      payloadHash: getSignableCancelOrderResponse.data.payload_hash,
+      confirmationScreen,
+    });
+
+    const { payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
+
+    const starkSignature = await starkSigner.signMessage(payloadHash);
+
     const cancelOrderResponse = await ordersApi.cancelOrder(
       {
         id: request.order_id.toString(),

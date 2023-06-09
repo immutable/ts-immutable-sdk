@@ -126,6 +126,7 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         ordersApi: immutableXClient.ordersApi,
+        imxPublicApiDomain,
         confirmationScreen,
       });
       expect(result).toEqual(returnValue);
@@ -145,6 +146,7 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         ordersApi: immutableXClient.ordersApi,
+        imxPublicApiDomain,
         confirmationScreen,
       });
       expect(result).toEqual(returnValue);
@@ -164,6 +166,7 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         tradesApi: immutableXClient.tradesApi,
+        imxPublicApiDomain,
         confirmationScreen,
       });
       expect(result).toEqual(returnValue);

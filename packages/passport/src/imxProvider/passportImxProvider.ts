@@ -110,6 +110,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       ordersApi: this.immutableXClient.ordersApi,
+      imxPublicApiDomain: this.imxPublicApiDomain,
       confirmationScreen: this.confirmationScreen,
     });
   }
@@ -120,6 +121,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       tradesApi: this.immutableXClient.tradesApi,
+      imxPublicApiDomain: this.imxPublicApiDomain,
       confirmationScreen: this.confirmationScreen,
     });
   }
