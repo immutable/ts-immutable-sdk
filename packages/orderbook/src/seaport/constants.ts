@@ -2,7 +2,7 @@
 
 // TODO: Resolve these from seaport-js.
 // There is some bundling issue that is preventing this from working
-export const SEAPORT_CONTRACT_NAME = 'Seaport';
+export const SEAPORT_CONTRACT_NAME = 'ImmutableSeaport';
 export const SEAPORT_CONTRACT_VERSION_V1_4 = '1.4';
 export const EIP_712_ORDER_TYPE = {
   OrderComponents: [

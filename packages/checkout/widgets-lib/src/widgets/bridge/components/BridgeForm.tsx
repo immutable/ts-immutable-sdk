@@ -1,13 +1,15 @@
 import {
   Box, Button, Heading, OptionKey,
 } from '@biom3/react';
-import { GetBalanceResult } from '@imtbl/checkout-sdk';
+import { CheckoutErrorType, GetBalanceResult } from '@imtbl/checkout-sdk';
 import {
   useCallback, useContext, useEffect, useMemo, useState,
 } from 'react';
+import { ApproveBridgeResponse, BridgeDepositResponse } from '@imtbl/bridge-sdk';
+import { utils } from 'ethers';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
 import { BridgeContext } from '../context/BridgeContext';
-import { ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { text } from '../../../resources/text/textConfig';
@@ -32,7 +34,12 @@ interface BridgeFormProps {
 export function BridgeForm(props: BridgeFormProps) {
   const {
     bridgeState: {
-      provider, checkout, network, tokenBalances, allowedTokens,
+      provider,
+      checkout,
+      tokenBridge,
+      network,
+      tokenBalances,
+      allowedTokens,
     },
   } = useContext(BridgeContext);
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -158,24 +165,67 @@ export function BridgeForm(props: BridgeFormProps) {
   const bridgeFormValidator = useCallback((): boolean => {
     const validateTokenError = validateToken(token);
     const validateAmountError = validateAmount(amount, token?.formattedBalance);
-
     if (validateTokenError) setTokenError(validateTokenError);
     if (validateAmountError) setAmountError(validateAmountError);
-
-    if (
-      validateTokenError
-      || validateAmountError) return false;
+    if (validateTokenError || validateAmountError) return false;
     return true;
   }, [token, amount, setTokenError, setAmountError]);
 
   const submitBridge = useCallback(async () => {
     if (!bridgeFormValidator()) return;
-    if (!checkout || !provider) return;
-
-    // Fetch bridge transaction
+    if (!checkout || !provider || !tokenBridge || !token) return;
 
     try {
-      // submit bridge transaction
+      const tokenAddress = (token.token.address === ''
+        || token.token.address === undefined)
+        ? 'NATIVE'
+        : token.token.address;
+
+      const depositorAddress = await provider.getSigner().getAddress();
+      const depositAmount = utils.parseUnits(amount, token.token.decimals);
+
+      const approveRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx({
+        depositorAddress,
+        token: tokenAddress,
+        depositAmount,
+      });
+
+      if (approveRes.required && approveRes.unsignedTx) {
+        const { transactionResponse } = await checkout.sendTransaction({
+          provider,
+          transaction: approveRes.unsignedTx,
+        });
+
+        const approvalReceipt = await transactionResponse.wait();
+        if (approvalReceipt.status !== 1) {
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: BridgeWidgetViews.FAIL,
+                data: {
+                  tokenAddress,
+                  amount,
+                },
+              },
+            },
+          });
+          return;
+        }
+      }
+
+      const unsignedDepositResult: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx({
+        depositorAddress,
+        recipientAddress: depositorAddress,
+        token: tokenAddress,
+        depositAmount,
+      });
+
+      const { transactionResponse } = await checkout.sendTransaction({
+        provider,
+        transaction: unsignedDepositResult.unsignedTx,
+      });
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -183,16 +233,40 @@ export function BridgeForm(props: BridgeFormProps) {
             type: BridgeWidgetViews.IN_PROGRESS,
             data: {
               token: token?.token!,
+              transactionResponse,
+              bridgeForm: {
+                tokenAddress: token?.token.address ?? '',
+                amount,
+              },
             },
           },
         },
       });
     } catch (err: any) {
-      // TODO: fix this with fail view... always succeeed for now
+      if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+        return;
+      }
+      if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT
+        || err.type === CheckoutErrorType.TRANSACTION_FAILED
+        || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: BridgeWidgetViews.FAIL,
+              data: {
+                tokenAddress: token?.token.address ?? '',
+                amount,
+              },
+            },
+          },
+        });
+        return;
+      }
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: BridgeWidgetViews.SUCCESS },
+          view: { type: SharedViews.ERROR_VIEW, error: err },
         },
       });
     }

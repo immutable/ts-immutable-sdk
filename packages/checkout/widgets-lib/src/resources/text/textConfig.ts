@@ -153,8 +153,16 @@ export const text = {
     },
     [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
-      body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zKEVM.`,
+      body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
       body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+    },
+    [BridgeWidgetViews.SUCCESS]: {
+      text: 'Success',
+      actionText: 'Continue',
+    },
+    [BridgeWidgetViews.FAIL]: {
+      text: 'Transaction failed',
+      actionText: 'Review & Try again',
     },
     [SharedViews.TOP_UP_VIEW]: {
       header: {
