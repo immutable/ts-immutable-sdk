@@ -1,4 +1,5 @@
 import {
+  ChainId,
   Checkout,
   ConnectParams,
   ConnectionProviders,
@@ -128,8 +129,8 @@ describe('ConnectWidget tests', () => {
       cy.stub(Checkout.prototype, 'getNetworkInfo')
         .as('getNetworkInfoStub')
         .resolves({
-          name: 'Polygon zkEVM',
-          chainId: 137,
+          name: 'Immutable zkEVM Testnet',
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         });
       mountConnectWidgetAndGoToReadyToConnect();
       cySmartGet('ready-to-connect').should('be.visible');
