@@ -16,7 +16,9 @@ describe('ImmutableApiClient', () => {
       const orderId = '456';
 
       when(mockedOpenAPIClient.getOrder(deepEqual({ chainName, orderId })))
-        .thenReturn(Promise.resolve({ result: { id: orderId, chain: chainName } } as OrderResult));
+        .thenReturn(
+          Promise.resolve({ result: { id: orderId, chain: { name: chainName } } } as OrderResult),
+        );
 
       const orderResult = await new ImmutableApiClient(
         instance(mockedOpenAPIClient),
@@ -24,7 +26,7 @@ describe('ImmutableApiClient', () => {
         seaportAddress,
       ).getOrder(orderId);
       expect(orderResult.result.id).toEqual(orderId);
-      expect(orderResult.result.chain).toEqual(chainName);
+      expect(orderResult.result.chain.name).toEqual(chainName);
     });
   });
 
@@ -52,7 +54,7 @@ describe('ImmutableApiClient', () => {
           },
         ];
 
-        const createOrderPromise = new ImmutableApiClient(instance(mockedOpenAPIClient), '123').createOrder({
+        const createOrderPromise = new ImmutableApiClient(instance(mockedOpenAPIClient), '123', seaportAddress).createOrder({
           offerer: '0x123',
           orderComponents,
           orderHash: '0x123',
@@ -170,7 +172,7 @@ describe('ImmutableApiClient', () => {
 
         when(mockedOpenAPIClient.createOrder(anything()))
           .thenReturn(Promise.resolve({
-            result: { id: orderId, chain: chainName },
+            result: { id: orderId, chain: { name: chainName } },
           } as OrderResult));
 
         const orderResult = await new ImmutableApiClient(instance(mockedOpenAPIClient), '123', seaportAddress).createOrder({
@@ -181,7 +183,7 @@ describe('ImmutableApiClient', () => {
         });
 
         expect(orderResult.result.id).toEqual(orderId);
-        expect(orderResult.result.chain).toEqual(chainName);
+        expect(orderResult.result.chain.name).toEqual(chainName);
       });
     });
   });
