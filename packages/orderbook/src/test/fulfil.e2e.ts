@@ -24,7 +24,7 @@ describe('fulfil order', () => {
       zoneContractAddress: config.zoneContractAddress,
       overrides: {
         apiEndpoint: config.apiUrl,
-        chainId: 'eip155:31337',
+        chainName: 'imtbl-zkevm-local',
       },
     });
 

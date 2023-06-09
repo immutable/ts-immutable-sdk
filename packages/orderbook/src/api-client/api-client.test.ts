@@ -6,20 +6,27 @@ import { OrderComponents } from '@opensea/seaport-js/lib/types';
 import { ItemType } from '../seaport';
 import { ImmutableApiClient } from './api-client';
 
+const seaportAddress = '0x123';
+
 describe('ImmutableApiClient', () => {
   describe('getOrder', () => {
     it('calls the OpenAPI client with the correct parameters', async () => {
       const mockedOpenAPIClient = mock(OrdersService);
-      const chainId = '123';
+      const chainName = '123';
       const orderId = '456';
 
-      when(mockedOpenAPIClient.getOrder(deepEqual({ chainId, orderId })))
-        .thenReturn(Promise.resolve({ result: { id: orderId, chain_id: chainId } } as OrderResult));
+      when(mockedOpenAPIClient.getOrder(deepEqual({ chainName, orderId })))
+        .thenReturn(
+          Promise.resolve({ result: { id: orderId, chain: { name: chainName } } } as OrderResult),
+        );
 
-      const orderResult = await new ImmutableApiClient(instance(mockedOpenAPIClient), chainId)
-        .getOrder(orderId);
+      const orderResult = await new ImmutableApiClient(
+        instance(mockedOpenAPIClient),
+        chainName,
+        seaportAddress,
+      ).getOrder(orderId);
       expect(orderResult.result.id).toEqual(orderId);
-      expect(orderResult.result.chain_id).toEqual(chainId);
+      expect(orderResult.result.chain.name).toEqual(chainName);
     });
   });
 
@@ -47,7 +54,7 @@ describe('ImmutableApiClient', () => {
           },
         ];
 
-        const createOrderPromise = new ImmutableApiClient(instance(mockedOpenAPIClient), '123').createOrder({
+        const createOrderPromise = new ImmutableApiClient(instance(mockedOpenAPIClient), '123', seaportAddress).createOrder({
           offerer: '0x123',
           orderComponents,
           orderHash: '0x123',
@@ -72,7 +79,7 @@ describe('ImmutableApiClient', () => {
           token: '0x123',
         }];
 
-        const createOrderPromise = new ImmutableApiClient(instance(mockedOpenAPIClient), '123').createOrder({
+        const createOrderPromise = new ImmutableApiClient(instance(mockedOpenAPIClient), '123', seaportAddress).createOrder({
           offerer: '0x123',
           orderComponents,
           orderHash: '0x123',
@@ -115,7 +122,7 @@ describe('ImmutableApiClient', () => {
           },
         ];
 
-        const createOrderPromise = new ImmutableApiClient(instance(mockedOpenAPIClient), '123').createOrder({
+        const createOrderPromise = new ImmutableApiClient(instance(mockedOpenAPIClient), '123', seaportAddress).createOrder({
           offerer: '0x123',
           orderComponents,
           orderHash: '0x123',
@@ -160,15 +167,15 @@ describe('ImmutableApiClient', () => {
         orderComponents.endTime = new Date().getTime() / 1000;
         orderComponents.startTime = new Date().getTime() / 1000;
 
-        const chainId = '123';
+        const chainName = '123';
         const orderId = '456';
 
         when(mockedOpenAPIClient.createOrder(anything()))
           .thenReturn(Promise.resolve({
-            result: { id: orderId, chain_id: chainId },
+            result: { id: orderId, chain: { name: chainName } },
           } as OrderResult));
 
-        const orderResult = await new ImmutableApiClient(instance(mockedOpenAPIClient), '123').createOrder({
+        const orderResult = await new ImmutableApiClient(instance(mockedOpenAPIClient), '123', seaportAddress).createOrder({
           offerer: '0x123',
           orderComponents,
           orderHash: '0x123',
@@ -176,7 +183,7 @@ describe('ImmutableApiClient', () => {
         });
 
         expect(orderResult.result.id).toEqual(orderId);
-        expect(orderResult.result.chain_id).toEqual(chainId);
+        expect(orderResult.result.chain.name).toEqual(chainName);
       });
     });
   });

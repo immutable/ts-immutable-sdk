@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 import type { BuyItem } from './BuyItem';
+import type { Chain } from './Chain';
 import type { Fee } from './Fee';
 import type { OrderStatus } from './OrderStatus';
 import type { ProtocolData } from './ProtocolData';
@@ -12,10 +13,7 @@ export type Order = {
   account_address: string;
   buy: Array<BuyItem>;
   buy_fees: Array<Fee>;
-  /**
-   * Chain identifier using the CAIP-2 blockchain id spec
-   */
-  chain_id: string;
+  chain: Chain;
   /**
    * Time the Order is created
    */

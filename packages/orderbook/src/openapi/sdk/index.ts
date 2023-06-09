@@ -10,6 +10,8 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export { BuyItem } from './models/BuyItem';
+export type { Chain } from './models/Chain';
+export type { ChainName } from './models/ChainName';
 export { CreateOrderProtocolData } from './models/CreateOrderProtocolData';
 export type { CreateOrderRequestBody } from './models/CreateOrderRequestBody';
 export type { Error } from './models/Error';
