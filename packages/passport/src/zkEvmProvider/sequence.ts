@@ -51,6 +51,7 @@ export const getSignedSequenceTransactions = async (
   transactions: Transaction[],
   nonce: BigNumberish,
   chainId: BigNumber,
+  walletAddress: string,
   signer: JsonRpcSigner,
 ) => {
   const sequenceTransactions = getNormalisedTransactions(transactions);
@@ -59,7 +60,7 @@ export const getSignedSequenceTransactions = async (
   const digest = digestOfTransactionsAndNonce(nonce, sequenceTransactions);
   const completePayload = ethers.utils.solidityPack(
     ['string', 'uint256', 'address', 'bytes32'],
-    [ETH_SIGN_PREFIX, chainId, await signer.getAddress(), digest],
+    [ETH_SIGN_PREFIX, chainId, walletAddress, digest],
   );
   const hash = ethers.utils.keccak256(completePayload);
 

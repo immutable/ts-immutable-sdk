@@ -1,7 +1,7 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { IMXProvider } from '@imtbl/provider';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
-import { ethers } from 'ethers';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import PassportImxProvider from './imxProvider/passportImxProvider';
@@ -48,7 +48,7 @@ export class Passport {
       );
     }
     const magicRpcProvider = await this.magicAdapter.login(user.idToken, this.config.network);
-    const web3Provider = new ethers.providers.Web3Provider(
+    const web3Provider = new Web3Provider(
       magicRpcProvider,
     );
     const ethSigner = web3Provider.getSigner();

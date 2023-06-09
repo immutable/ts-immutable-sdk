@@ -1,7 +1,7 @@
 import { BigNumberish, BytesLike } from 'ethers';
 
 export interface RelayerTransaction {
-  status: 'PENDING' | 'SUBMITTED' | 'CONFIRMED' | 'ERROR';
+  status: 'PENDING' | 'SUBMITTED' | 'SUCCESSFUL' | 'ERROR';
   chainId: string;
   relayerId: string;
   hash: string;

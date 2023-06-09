@@ -1,7 +1,7 @@
 import {
   ExternalProvider, TransactionRequest, Web3Provider,
 } from '@ethersproject/providers';
-
+import { BigNumber } from 'ethers';
 import { PassportConfiguration } from '../../config';
 import { ConfirmationScreen } from '../../confirmation';
 import { RelayerAdapter } from '../relayerAdapter';
@@ -20,6 +20,7 @@ export const ethSendTransaction = async ({
   transactionRequest,
   magicProvider,
   relayerAdapter,
+  config,
 }: EthSendTransactionInput): Promise<string> => {
   if (!transactionRequest.to) {
     throw new Error('eth_sendTransaction requires a "to" field');
@@ -28,6 +29,7 @@ export const ethSendTransaction = async ({
     throw new Error('eth_sendTransaction requires a "data" field');
   }
 
+  const chainId = BigNumber.from(config.zkEvmChainId);
   const smartContractWalletAddress = '0x123'; // TODO - this should be a claim in the JWT
   const magicWeb3Provider = new Web3Provider(magicProvider);
   const signer = magicWeb3Provider.getSigner();
@@ -41,7 +43,13 @@ export const ethSendTransaction = async ({
     revertOnError: true,
   };
 
-  const signedTransaction = await getSignedSequenceTransactions([sequenceTransaction], nonce, signer);
+  const signedTransaction = await getSignedSequenceTransactions(
+    [sequenceTransaction],
+    nonce,
+    chainId,
+    smartContractWalletAddress,
+    signer,
+  );
 
   // TODO: Add support for non-native gas payments (e.g ERC20, feeTransaction initialisation must change)
   const feeOptions = await relayerAdapter.imGetFeeOptions(smartContractWalletAddress, signedTransaction);
@@ -60,6 +68,8 @@ export const ethSendTransaction = async ({
   const signedTransactions = await getSignedSequenceTransactions(
     [sequenceTransaction, sequenceFeeTransaction],
     nonce,
+    chainId,
+    smartContractWalletAddress,
     signer,
   );
 

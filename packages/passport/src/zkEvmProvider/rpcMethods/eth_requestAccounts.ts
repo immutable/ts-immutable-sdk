@@ -23,7 +23,7 @@ export const ethRequestAccounts = async ({
       user.idToken,
       {
         rpcUrl: config.zkEvmRpcUrl,
-        chainId: config.zkEvmChainId,
+        chainId: parseInt(config.zkEvmChainId, 10),
       },
     );
   }
