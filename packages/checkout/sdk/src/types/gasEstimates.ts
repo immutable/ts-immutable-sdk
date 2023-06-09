@@ -6,9 +6,8 @@ import { TokenInfo } from './tokenInfo';
 /**
  * * Interface representing the parameters for {@link Checkout.getBridgeGasEstimate}.
  @property tokenAddress - Bridge token.
- @property {TransactionRequest} transaction - Bridge transaction request.
  @property {Web3Provider} provider - Provider.
- @property {TransactionRequest} approveTxn - Approval transaction request.
+ @property {boolean} isSpendingCapApprovalRequired - Is spending cap approval required.
  * */
 export interface GetBridgeGasEstimateParams {
   tokenAddress: FungibleToken;
