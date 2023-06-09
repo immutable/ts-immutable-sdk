@@ -164,7 +164,7 @@ cd packages/passport && yarn test
 cd packages/checkout && yarn test
 cd packages/internal/toolkit && yarn test
 cd packages/provider && yarn test
-cd packages/immutablex_client && yarn test
+cd packages/immutablex-client && yarn test
 ```
 
 You can also extend these commands, by using Jest syntax such as regex or to target specific tests to run:
