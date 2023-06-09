@@ -11,10 +11,8 @@ import { handleOrchestrationEvent } from './orchestration';
 export function useWalletWidget(setProviderPreference: (val: string) => void) {
   const {showWidgets, setShowWidgets} = useContext(WidgetContext);
   const {showWallet} = showWidgets;
-  console.log('wallet widget hook')
 
   useEffect(() => {
-    console.log('wallet widget hook use effect')
     const handleWalletWidgetEvents = ((event: CustomEvent) => {
       switch (event.detail.type) {
         case WalletEventType.NETWORK_SWITCH: {
@@ -51,7 +49,6 @@ export function useWalletWidget(setProviderPreference: (val: string) => void) {
     }
 
     return () => {
-      console.log('returning wallet widget hook use effect')
       window.removeEventListener(
         IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
         handleWalletWidgetEvents

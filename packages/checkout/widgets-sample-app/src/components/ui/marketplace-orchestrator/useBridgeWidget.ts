@@ -12,10 +12,8 @@ import { handleOrchestrationEvent } from './orchestration';
 export function useBridgeWidget() {
   const {showWidgets, setShowWidgets} = useContext(WidgetContext);
   const {showBridge} = showWidgets;
-  console.log('bridge widget hook')
 
   useEffect(() => {
-    console.log('bridge widget hook use effect')
     const handleBridgeWidgetEvents = ((event: CustomEvent) => {
       switch (event.detail.type) {
         case BridgeEventType.SUCCESS: {
@@ -50,7 +48,6 @@ export function useBridgeWidget() {
     }
 
     return () => {
-      console.log('returning bridge widget hook use effect')
       window.removeEventListener(
         IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
         handleBridgeWidgetEvents

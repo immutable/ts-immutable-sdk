@@ -12,10 +12,8 @@ import { WidgetContext, hideAllWidgets } from './WidgetProvider';
 export function useConnectWidget(setProviderPreference: (val: string) => void) {
   const {showWidgets, setShowWidgets} = useContext(WidgetContext);
   const {showConnect} = showWidgets;
-  console.log('connect widget hook')
 
   useEffect(() => {
-    console.log('connect widget hook use effect')
     const handleConnectEvent = ((event: CustomEvent) => {
       switch (event.detail.type) {
         case ConnectEventType.SUCCESS: {
@@ -52,7 +50,6 @@ export function useConnectWidget(setProviderPreference: (val: string) => void) {
     }
 
     return () => {
-      console.log('returning connect widget hook use effect')
       window.removeEventListener(
         IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
         handleConnectEvent

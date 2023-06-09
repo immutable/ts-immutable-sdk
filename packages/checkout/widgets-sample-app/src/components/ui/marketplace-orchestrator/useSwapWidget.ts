@@ -13,10 +13,8 @@ import { handleOrchestrationEvent } from './orchestration';
 export function useSwapWidget(setDoneSwap: (val: boolean) => void) {
   const {showWidgets, setShowWidgets} = useContext(WidgetContext);
   const {showSwap} = showWidgets;
-  console.log('swap widget hook')
 
   useEffect(() => {
-    console.log('swap widget hook use effect')
     const handleSwapWidgetEvents = ((event: CustomEvent) => {
       switch (event.detail.type) {
         case SwapEventType.SUCCESS: {
@@ -33,7 +31,6 @@ export function useSwapWidget(setDoneSwap: (val: boolean) => void) {
           break;
         }
         case SwapEventType.CLOSE_WIDGET: {
-          console.log("########## SHOULD")
           setShowWidgets(hideAllWidgets);
           break;
         }
@@ -57,7 +54,6 @@ export function useSwapWidget(setDoneSwap: (val: boolean) => void) {
     }
 
     return () => {
-      console.log('returning swap widget hook use effect')
       window.removeEventListener(
         IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
         handleSwapWidgetEvents
