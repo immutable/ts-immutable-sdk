@@ -8,21 +8,21 @@ import {
   OrderResult,
 } from 'openapi/sdk';
 import { CreateOrderParams, ListOrderParams } from 'types';
-import { ItemType } from '../seaport';
+import { ItemType, SEAPORT_CONTRACT_VERSION_V1_4 } from '../seaport';
 
 export class ImmutableApiClient {
   constructor(
     private readonly orderbookService: OrdersService,
-    private readonly chainId: string,
-  ) {}
+    private readonly chainName: string,
+    private readonly seaportAddress: string,
+  ) { }
 
   async getOrder(orderId: string): Promise<OrderResult> {
-    return this.orderbookService.getOrder({ chainId: this.chainId, orderId });
+    return this.orderbookService.getOrder({ chainName: this.chainName, orderId });
   }
 
   async listOrders(listOrderParams: ListOrderParams): Promise<ListOrdersResult> {
     return this.orderbookService.listOrders({
-      chainId: this.chainId,
       ...listOrderParams,
     });
   }
@@ -48,7 +48,7 @@ export class ImmutableApiClient {
     }
 
     return this.orderbookService.createOrder({
-      chainId: this.chainId,
+      chainName: this.chainName,
       requestBody: {
         order_hash: orderHash,
         account_address: offerer,
@@ -72,6 +72,9 @@ export class ImmutableApiClient {
         protocol_data: {
           order_type: CreateOrderProtocolData.order_type.FULL_RESTRICTED,
           zone_address: orderComponents.zone,
+          seaport_address: this.seaportAddress,
+          seaport_version: SEAPORT_CONTRACT_VERSION_V1_4,
+          counter: orderComponents.counter.toString(),
         },
         salt: orderComponents.salt,
         sell: [{

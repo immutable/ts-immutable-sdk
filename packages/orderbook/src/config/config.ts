@@ -3,7 +3,7 @@ import { providers } from 'ethers';
 
 export interface OrderbookOverrides {
   apiEndpoint?: string;
-  chainId?: string;
+  chainName?: string;
 }
 
 export interface OrderbookModuleConfiguration extends ModuleConfiguration<OrderbookOverrides> {

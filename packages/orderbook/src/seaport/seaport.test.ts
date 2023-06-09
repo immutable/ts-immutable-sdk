@@ -368,7 +368,7 @@ describe('Seaport', () => {
           { item_type: BuyItem.item_type.NATIVE, start_amount: '100' },
         ],
         buy_fees: [],
-        chain_id: '1',
+        chain: { id: '1', name: 'imtbl-zkevm-local' },
         create_time: new Date().toISOString(),
         end_time: new Date().toISOString(),
         id: '1',
@@ -376,6 +376,9 @@ describe('Seaport', () => {
           order_type: CreateOrderProtocolData.order_type.FULL_RESTRICTED,
           zone_address: randomAddress(),
           operator_signature: randomAddress(),
+          seaport_address: randomAddress(),
+          seaport_version: SEAPORT_CONTRACT_VERSION_V1_4,
+          counter: '0',
         },
         salt: '1',
         sell: [

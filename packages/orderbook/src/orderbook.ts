@@ -30,12 +30,16 @@ export class Orderbook {
     }
 
     // TODO: Move chainId lookup to a map based on env. Just using override to get dev started
-    const chainId = config.overrides?.chainId;
-    if (!chainId) {
-      throw new Error('ChainID must be provided as an override');
+    const chainName = config.overrides?.chainName;
+    if (!chainName) {
+      throw new Error('chainName must be provided as an override');
     }
 
-    this.apiClient = new ImmutableApiClientFactory(apiEndpoint, chainId).create();
+    this.apiClient = new ImmutableApiClientFactory(
+      apiEndpoint,
+      chainName,
+      this.config.seaportContractAddress,
+    ).create();
 
     this.seaport = new SeaportFactory(
       this.config.seaportContractAddress,
