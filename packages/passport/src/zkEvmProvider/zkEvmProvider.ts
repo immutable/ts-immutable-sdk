@@ -56,7 +56,7 @@ export class ZkEvmProvider {
     if (METHODS_REQUIRING_AUTHORISATION.includes(request.method) && !this.magicProvider) {
       // eslint-disable-next-line prefer-promise-reject-errors
       return Promise.reject({
-        message: 'Unauthorised',
+        message: 'Unauthorised - call eth_requestAccounts first',
         code: RpcErrorCode.UNAUTHORISED,
       });
     }

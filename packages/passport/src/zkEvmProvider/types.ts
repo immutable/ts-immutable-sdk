@@ -25,7 +25,7 @@ export interface Transaction {
   revertOnError?: boolean
 }
 
-export interface TransactionEncoded {
+export interface TransactionNormalised {
   delegateCall: boolean
   revertOnError: boolean
   gasLimit: BigNumberish
