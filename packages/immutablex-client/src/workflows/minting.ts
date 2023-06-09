@@ -1,47 +1,50 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Signer } from '@ethersproject/abstract-signer';
+import { toUtf8Bytes } from '@ethersproject/strings';
 import {
   MintRequest,
+  MintTokensResponse,
+} from '@imtbl/generated-clients/src/imx/models';
+import {
   MintsApi,
   MintsApiMintTokensRequest,
-  MintTokensResponse,
-} from '../api';
+} from '@imtbl/generated-clients/src/imx/api';
+import { keccak256 } from '@ethersproject/keccak256';
 import { UnsignedMintRequest } from '../types';
 import { signRaw } from '../utils';
-import { keccak256 } from '@ethersproject/keccak256';
-import { toUtf8Bytes } from '@ethersproject/strings';
 
 export async function mintingWorkflow(
   signer: Signer,
   request: UnsignedMintRequest,
   mintsApi: MintsApi,
 ): Promise<MintTokensResponse> {
-  //TODO: improve this object key rearrangement.
-  //object keys should respect this order, but the logic can be improved
-  const users = request.users.map(user => ({
+  // TODO: improve this object key rearrangement.
+  // object keys should respect this order, but the logic can be improved
+  const users = request.users.map((user: any) => ({
     ether_key: user.user,
-    tokens: user.tokens.map(token => ({
+    tokens: user.tokens.map((token: any) => ({
       id: token.id,
       blueprint: token.blueprint,
-      ...(token.royalties &&
-        token.royalties.length > 0 && {
-          royalties: token.royalties.map(royalty => ({
-            recipient: royalty.recipient,
-            percentage: royalty.percentage,
-          })),
-        }),
+      ...(token.royalties
+        && token.royalties.length > 0 && {
+        royalties: token.royalties.map((royalty: any) => ({
+          recipient: royalty.recipient,
+          percentage: royalty.percentage,
+        })),
+      }),
     })),
   }));
 
-  const royalties = request.royalties;
+  const { royalties } = request;
   const signablePayload = {
     contract_address: request.contract_address,
-    ...(royalties &&
-      royalties.length > 0 && {
-        royalties: royalties.map(fee => ({
-          recipient: fee.recipient,
-          percentage: fee.percentage,
-        })),
-      }),
+    ...(royalties
+      && royalties.length > 0 && {
+      royalties: royalties.map((fee: any) => ({
+        recipient: fee.recipient,
+        percentage: fee.percentage,
+      })),
+    }),
     users,
     auth_signature: '',
   };
@@ -50,7 +53,7 @@ export async function mintingWorkflow(
   const authSignature = await signRaw(hash, signer);
 
   const apiPayload: MintRequest = {
-    users: signablePayload.users.map(user => ({
+    users: signablePayload.users.map((user: any) => ({
       user: user.ether_key,
       tokens: user.tokens,
     })),
