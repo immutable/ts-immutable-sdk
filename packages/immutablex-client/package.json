@@ -6,7 +6,8 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/config": "0.0.0",
-    "@imtbl/core-sdk": "^1.1.1-alpha.1"
+    "@imtbl/core-sdk": "^1.1.1-alpha.1",
+    "@imtbl/generated-clients": "0.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
