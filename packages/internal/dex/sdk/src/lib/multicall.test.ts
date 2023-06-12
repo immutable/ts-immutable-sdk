@@ -18,8 +18,8 @@ import {
   WETH_TEST_CHAIN,
 } from '../utils/testUtils';
 import { Multicall__factory } from '../contracts/types';
-import { DEFAULT_GAS_QUOTE } from './getQuotesForRoutes';
 
+const DEFAULT_GAS_QUOTE = 2_000_000;
 const token0 = 'token0';
 const POOL_INIT_CODE_HASH = '0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54';
 

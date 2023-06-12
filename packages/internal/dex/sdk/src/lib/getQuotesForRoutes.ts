@@ -7,7 +7,7 @@ import { multicallMultipleCallDataSingContract, MulticallResponse } from './mult
 import { quoteReturnMapping } from './utils';
 import { Multicall } from '../contracts/types';
 
-export const DEFAULT_GAS_QUOTE = 2_000_000;
+const DEFAULT_GAS_QUOTE = 2_000_000;
 const amountIndex = 0;
 const gasEstimateIndex = 3;
 
