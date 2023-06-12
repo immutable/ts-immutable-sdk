@@ -1,5 +1,5 @@
 import { Box, Button } from '@biom3/react';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
@@ -16,6 +16,7 @@ import {
   swapButtonIconLoadingStyle,
 } from './SwapButtonStyles';
 import { SwapFormData } from './swapFormTypes';
+import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 
 export interface SwapButtonProps {
   loading: boolean
@@ -28,6 +29,7 @@ export interface SwapButtonProps {
 export function SwapButton({
   loading, updateLoading, validator, transaction, data,
 }: SwapButtonProps) {
+  const [transactionCanceledDrawerOpen, setTransactionCanceledDrawerOpen] = useState(false);
   const { viewDispatch } = useContext(ViewContext);
   const { swapState } = useContext(SwapContext);
   const { checkout, provider } = swapState;
@@ -87,6 +89,7 @@ export function SwapButton({
     } catch (err: any) {
       updateLoading(false);
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+        setTransactionCanceledDrawerOpen(true);
         return;
       }
       if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT) {
@@ -139,6 +142,16 @@ export function SwapButton({
           <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
         ) : buttonText}
       </Button>
+      <TransactionRejected
+        transactionType="swap"
+        visible={transactionCanceledDrawerOpen}
+        showHeaderBar={false}
+        onCloseBottomSheet={() => setTransactionCanceledDrawerOpen(false)}
+        onRetry={() => {
+          sendTransaction();
+          setTransactionCanceledDrawerOpen(false);
+        }}
+      />
     </Box>
   );
 }
