@@ -168,7 +168,7 @@ export function BridgeForm(props: BridgeFormProps) {
     );
     setGasFee(estimatedAmount);
     setGasFeeFiatValue(calculateCryptoToFiat(
-      gasFee,
+      estimatedAmount,
       gasEstimateResult.gasEstimate?.token?.symbol || '',
       cryptoFiatState.conversions,
     ));
