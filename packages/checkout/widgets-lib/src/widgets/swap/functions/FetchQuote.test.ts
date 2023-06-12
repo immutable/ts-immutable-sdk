@@ -4,6 +4,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { ChainId, TokenInfo } from '@imtbl/checkout-sdk';
 import { BigNumber, utils } from 'ethers';
 import { quotesProcessor } from './FetchQuote';
+import { getDexConfigOverrides } from '../DexConfigOverrides';
 
 describe('QuotesProcessor', () => {
   describe('processQuotes', () => {
@@ -11,8 +12,9 @@ describe('QuotesProcessor', () => {
       const getUnsignedSwapTxFromAmountIn = jest.fn();
 
       const exchange = new Exchange(new ExchangeConfiguration({
-        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
+        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
         baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
+        overrides: getDexConfigOverrides(),
       }));
 
       exchange.getUnsignedSwapTxFromAmountIn = getUnsignedSwapTxFromAmountIn;
@@ -55,8 +57,9 @@ describe('QuotesProcessor', () => {
       const getUnsignedSwapTxFromAmountOut = jest.fn();
 
       const exchange = new Exchange(new ExchangeConfiguration({
-        chainId: ChainId.POLYGON_ZKEVM_TESTNET,
+        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
         baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
+        overrides: getDexConfigOverrides(),
       }));
 
       exchange.getUnsignedSwapTxFromAmountOut = getUnsignedSwapTxFromAmountOut;
