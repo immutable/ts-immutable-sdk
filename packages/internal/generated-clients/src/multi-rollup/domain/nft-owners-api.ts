@@ -40,7 +40,7 @@ export const NftOwnersApiAxiosParamCreator = function (configuration?: Configura
          * @param {string} contractAddress The address of contract
          * @param {string} tokenId An &#x60;uint256&#x60; token id as string
          * @param {string} chainName The name of chain
-         * @param {string} [pageCursor] Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -102,7 +102,7 @@ export const NftOwnersApiFp = function(configuration?: Configuration) {
          * @param {string} contractAddress The address of contract
          * @param {string} tokenId An &#x60;uint256&#x60; token id as string
          * @param {string} chainName The name of chain
-         * @param {string} [pageCursor] Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -127,7 +127,7 @@ export const NftOwnersApiFactory = function (configuration?: Configuration, base
          * @param {string} contractAddress The address of contract
          * @param {string} tokenId An &#x60;uint256&#x60; token id as string
          * @param {string} chainName The name of chain
-         * @param {string} [pageCursor] Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -166,7 +166,7 @@ export interface NftOwnersApiListNFTOwnersRequest {
     readonly chainName: string
 
     /**
-     * Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
      * @memberof NftOwnersApiListNFTOwners
      */

@@ -15,22 +15,22 @@
 
 
 /**
- * Pagination properties
+ * 
  * @export
- * @interface Page
+ * @interface CreateCounterfactualAddressRequest
  */
-export interface Page {
+export interface CreateCounterfactualAddressRequest {
     /**
-     * First item as an encoded string
+     * The user\'s UAK address
      * @type {string}
-     * @memberof Page
+     * @memberof CreateCounterfactualAddressRequest
      */
-    'previous_cursor': string | null;
+    'ethereumAddress': string;
     /**
-     * Last item as an encoded string
+     * The signature generated with the UAK
      * @type {string}
-     * @memberof Page
+     * @memberof CreateCounterfactualAddressRequest
      */
-    'next_cursor': string | null;
+    'ethereumSignature': string;
 }
 
