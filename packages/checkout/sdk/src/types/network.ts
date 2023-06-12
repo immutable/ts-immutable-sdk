@@ -10,10 +10,8 @@ export type RpcUrlMap = Map<ChainId, string>;
 export const RPC_URL_MAP: RpcUrlMap = new Map<ChainId, string>([
   [ChainId.ETHEREUM, 'https://mainnet.infura.io/v3/'],
   [ChainId.IMTBL_ZKEVM_TESTNET, 'https://zkevm-rpc.sandbox.x.immutable.com'],
-  [ChainId.POLYGON_ZKEVM, 'https://polygon-rpc.com'],
   [ChainId.SEPOLIA, 'https://eth-sepolia.g.alchemy.com/v2/demo'],
   [ChainId.IMTBL_ZKEVM_DEVNET, 'https://zkevm-rpc.dev.x.immutable.com'],
-  [ChainId.POLYGON_ZKEVM_TESTNET, 'https://rpc.public.zkevm-test.net'],
 ]);
 
 /**
@@ -63,26 +61,12 @@ NetworkDetails
     {
       chainIdHex: '0x343C', // 13372
       chainName: 'Immutable zkEVM Testnet',
-      rpcUrls: [RPC_URL_MAP.get(ChainId.POLYGON_ZKEVM_TESTNET) as string],
+      rpcUrls: [RPC_URL_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET) as string],
       nativeCurrency: {
         name: 'IMX',
         symbol: 'IMX',
         decimals: 18,
       },
-    },
-  ],
-  [
-    ChainId.POLYGON_ZKEVM,
-    {
-      chainIdHex: '0x89', // 137
-      chainName: 'Polygon zkEVM',
-      rpcUrls: [RPC_URL_MAP.get(ChainId.POLYGON_ZKEVM) as string],
-      nativeCurrency: {
-        name: 'MATIC',
-        symbol: 'MATIC',
-        decimals: 18,
-      },
-      blockExplorerUrls: ['https://polygonscan.com/'],
     },
   ],
 ]);
@@ -119,20 +103,6 @@ NetworkDetails
         symbol: 'IMX',
         decimals: 18,
       },
-    },
-  ],
-  [
-    ChainId.POLYGON_ZKEVM_TESTNET,
-    {
-      chainIdHex: '0x5A2', // 1442
-      chainName: 'Polygon zkEVM Testnet',
-      rpcUrls: [RPC_URL_MAP.get(ChainId.POLYGON_ZKEVM_TESTNET) as string],
-      nativeCurrency: {
-        name: 'MATIC',
-        symbol: 'MATIC',
-        decimals: 18,
-      },
-      blockExplorerUrls: ['https://testnet-zkevm.polygonscan.com'],
     },
   ],
 ]);

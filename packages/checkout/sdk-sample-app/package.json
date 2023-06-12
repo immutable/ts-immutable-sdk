@@ -14,7 +14,7 @@
     ]
   },
   "dependencies": {
-    "@biom3/react": "^0.5.11-beta",
+    "@biom3/react": "^0.6.3-beta",
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/config": "0.0.0",
     "react": "^18.2.0",
