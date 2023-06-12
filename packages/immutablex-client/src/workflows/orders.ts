@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   OrdersApi,
   OrdersApiCreateOrderRequest,
@@ -5,7 +6,7 @@ import {
   GetSignableOrderRequest,
   CancelOrderResponse,
   CreateOrderResponse,
-} from '../api';
+} from '@imtbl/generated-clients/src/imx';
 import { UnsignedOrderRequest, WalletConnection } from '../types';
 import { signRaw } from '../utils';
 import { convertToSignableToken } from '../utils/convertToSignableToken';
@@ -44,8 +45,7 @@ export async function createOrderWorkflow({
     getSignableOrderRequestV3: getSignableOrderRequest,
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    getSignableOrderResponse.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = getSignableOrderResponse.data;
 
   const ethSignature = await signRaw(signableMessage, ethSigner);
 
@@ -93,8 +93,7 @@ export async function cancelOrderWorkflow({
     },
   );
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    getSignableCancelOrderResponse.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
 
   const ethSignature = await signRaw(signableMessage, ethSigner);
 

@@ -1,8 +1,8 @@
 import { ec } from 'elliptic';
 import * as encUtils from 'enc-utils';
+import BN from 'bn.js';
 import { StarkSigner } from '../../types';
 import { starkEc } from './starkCurve';
-import BN from 'bn.js';
 import { Errors } from '../../workflows/errors';
 
 export class StandardStarkSigner implements StarkSigner {
@@ -23,8 +23,8 @@ export class StandardStarkSigner implements StarkSigner {
 
   private serialize(sig: ec.Signature): string {
     return encUtils.addHexPrefix(
-      encUtils.padLeft(sig.r.toString('hex'), 64) +
-        encUtils.padLeft(sig.s.toString('hex'), 64),
+      encUtils.padLeft(sig.r.toString('hex'), 64)
+        + encUtils.padLeft(sig.s.toString('hex'), 64),
     );
   }
 
@@ -45,7 +45,7 @@ export class StandardStarkSigner implements StarkSigner {
       return msg;
     }
     if (msg.length !== 63) {
-      throw new Error(Errors.StarkCurveInvalidMessageLength);
+      throw new Error(Errors.STARK_CURVE_INVALID_MESSAGE_LENGTH);
     }
     // In this case delta will be 4 so we perform a shift-left of 4 bits by adding a ZERO_BN.
     return `${msg}0`;

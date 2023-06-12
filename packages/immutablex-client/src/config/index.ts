@@ -1,9 +1,12 @@
-import { ImmutableXConfiguration, Config } from '@imtbl/core-sdk';
+import { Configuration as APIConfiguration, ConfigurationParameters } from '@imtbl/generated-clients/src/imx';
 import {
   Environment,
   ImmutableConfiguration,
   ModuleConfiguration,
 } from '@imtbl/config';
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
 interface ImmutableXConfigurationParams {
   basePath: string,
@@ -11,6 +14,68 @@ interface ImmutableXConfigurationParams {
   coreContractAddress: string,
   registrationContractAddress: string,
 }
+
+/**
+ * The configuration for the Ethereum network
+ */
+export interface EthConfiguration {
+  coreContractAddress: string;
+  registrationContractAddress: string;
+  chainID: number;
+}
+
+/**
+ * The configuration for the ImmutableX client
+ */
+export interface ImmutableXConfiguration {
+  /**
+   * The configuration for the API client
+   */
+  apiConfiguration: APIConfiguration;
+  /**
+   * The configuration for the Ethereum network
+   */
+  ethConfiguration: EthConfiguration;
+}
+
+interface EthEnvironment extends EthConfiguration {
+  basePath: string;
+  headers?: Record<string, string>;
+  sdkVersion?: string;
+}
+
+const createConfig = ({
+  coreContractAddress,
+  registrationContractAddress,
+  chainID,
+  basePath,
+  headers,
+  sdkVersion,
+}: EthEnvironment): ImmutableXConfiguration => {
+  if (!basePath.trim()) {
+    throw Error('basePath can not be empty');
+  }
+
+  if (sdkVersion) {
+    defaultHeaders['x-sdk-version'] = sdkVersion;
+  }
+
+  // eslint-disable-next-line no-param-reassign
+  headers = { ...(headers || {}), ...defaultHeaders };
+  const apiConfigOptions: ConfigurationParameters = {
+    basePath,
+    baseOptions: { headers },
+  };
+
+  return {
+    apiConfiguration: new APIConfiguration(apiConfigOptions),
+    ethConfiguration: {
+      coreContractAddress,
+      registrationContractAddress,
+      chainID,
+    },
+  };
+};
 
 /**
  * createImmutableXConfiguration to create a custom ImmutableXConfiguration
@@ -21,7 +86,7 @@ export const createImmutableXConfiguration = ({
   chainID,
   coreContractAddress,
   registrationContractAddress,
-}: ImmutableXConfigurationParams): ImmutableXConfiguration => Config.createConfig({
+}: ImmutableXConfigurationParams): ImmutableXConfiguration => createConfig({
   basePath,
   chainID,
   coreContractAddress,

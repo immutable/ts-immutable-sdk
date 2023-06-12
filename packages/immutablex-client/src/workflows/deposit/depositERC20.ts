@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { DepositsApi, EncodingApi, TokensApi, UsersApi } from '../../api';
+import {
+  DepositsApi, EncodingApi, TokensApi, UsersApi,
+} from '@imtbl/generated-clients/src/imx';
 import { parseUnits } from '@ethersproject/units';
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   Core,
   Core__factory,
@@ -13,7 +17,6 @@ import {
   isRegisteredOnChainWorkflow,
 } from '../registration';
 import { ERC20Amount } from '../../types';
-import { BigNumber } from '@ethersproject/bignumber';
 import { ImmutableXConfiguration } from '../../config';
 
 interface ERC20TokenData {
@@ -56,15 +59,14 @@ async function executeRegisterAndDepositERC20(
     usersApi,
   );
 
-  const populatedTransaction =
-    await contract.populateTransaction.registerAndDepositERC20(
-      etherKey,
-      starkPublicKey,
-      signableResult.operator_signature,
-      assetType,
-      vaultId,
-      quantizedAmount,
-    );
+  const populatedTransaction = await contract.populateTransaction.registerAndDepositERC20(
+    etherKey,
+    starkPublicKey,
+    signableResult.operator_signature,
+    assetType,
+    vaultId,
+    quantizedAmount,
+  );
 
   return signer.sendTransaction(populatedTransaction);
 }
@@ -82,7 +84,7 @@ export async function depositERC20Workflow(
 
   // Get decimals for this specific ERC20
   const token = await tokensApi.getToken({ address: deposit.tokenAddress });
-  const decimals = parseInt(token.data.decimals);
+  const decimals = parseInt(token.data.decimals, 10);
 
   const data: ERC20TokenData = {
     decimals,
@@ -155,14 +157,13 @@ export async function depositERC20Workflow(
       coreContract,
       usersApi,
     );
-  } else {
-    return executeDepositERC20(
-      signer,
-      quantizedAmount,
-      assetType,
-      starkPublicKey,
-      vaultId,
-      coreContract,
-    );
   }
+  return executeDepositERC20(
+    signer,
+    quantizedAmount,
+    assetType,
+    starkPublicKey,
+    vaultId,
+    coreContract,
+  );
 }

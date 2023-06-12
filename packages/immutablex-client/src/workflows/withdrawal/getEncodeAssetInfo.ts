@@ -3,7 +3,7 @@ import {
   EncodeAssetResponse,
   EncodingApi,
   EncodeAssetTokenData,
-} from '../../api';
+} from '@imtbl/generated-clients/src/imx';
 
 export async function getEncodeAssetInfo(
   assetType: string,

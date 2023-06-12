@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   UsersApi,
   GetSignableRegistrationResponse,
   RegisterUserResponse,
-} from '../api';
+} from '@imtbl/generated-clients/src/imx';
 import { WalletConnection } from '../types';
 import { signRaw } from '../utils';
 import { Registration } from '../contracts';
@@ -26,8 +27,7 @@ export async function registerOffchainWorkflow({
     },
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    signableResult.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
 
   const ethSignature = await signRaw(signableMessage, ethSigner);
 
@@ -77,5 +77,7 @@ export async function getSignableRegistrationOnchain(
   return {
     operator_signature: response.data.operator_signature,
     payload_hash: response.data.payload_hash,
+    readable_transaction: response.data.readable_transaction,
+    verification_signature: response.data.verification_signature,
   };
 }

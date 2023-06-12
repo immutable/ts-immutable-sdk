@@ -1,6 +1,7 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { EncodingApi, UsersApi } from '../../api';
+import { EncodingApi, UsersApi } from '@imtbl/generated-clients/src/imx/';
+
 import { ImmutableXConfiguration } from '../../config';
 import {
   Core,
@@ -29,13 +30,12 @@ async function executeRegisterAndWithdrawEth(
     usersApi,
   );
 
-  const populatedTransaction =
-    await contract.populateTransaction.registerAndWithdraw(
-      etherKey,
-      starkPublicKey,
-      signableResult.operator_signature,
-      assetType,
-    );
+  const populatedTransaction = await contract.populateTransaction.registerAndWithdraw(
+    etherKey,
+    starkPublicKey,
+    signableResult.operator_signature,
+    assetType,
+  );
 
   return signer.sendTransaction(populatedTransaction);
 }
@@ -86,12 +86,11 @@ export async function completeEthWithdrawalWorkflow(
       registrationContract,
       usersApi,
     );
-  } else {
-    return executeWithdrawEth(
-      signer,
-      assetType.asset_type,
-      starkPublicKey,
-      coreContract,
-    );
   }
+  return executeWithdrawEth(
+    signer,
+    assetType.asset_type,
+    starkPublicKey,
+    coreContract,
+  );
 }

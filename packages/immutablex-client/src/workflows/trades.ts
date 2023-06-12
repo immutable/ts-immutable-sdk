@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   TradesApi,
   GetSignableTradeRequest,
   CreateTradeResponse,
-} from '../api';
+} from '@imtbl/generated-clients/src/imx';
 import { WalletConnection } from '../types';
 import { signRaw } from '../utils';
 
@@ -27,8 +28,7 @@ export async function createTradeWorkflow({
     },
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    signableResult.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
 
   const ethSignature = await signRaw(signableMessage, ethSigner);
 
