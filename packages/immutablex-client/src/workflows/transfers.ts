@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import {
   TransfersApi,
-  CreateTransferResponseV1,
   CreateTransferResponse,
 } from '@imtbl/generated-clients/src/imx';
 import {
@@ -27,7 +26,7 @@ export async function transfersWorkflow({
   starkSigner,
   request,
   transfersApi,
-}: TransfersWorkflowParams): Promise<CreateTransferResponseV1> {
+}: TransfersWorkflowParams): Promise<CreateTransferResponse> {
   const ethAddress = await ethSigner.getAddress();
 
   const transferAmount = request.type === 'ERC721' ? '1' : request.amount;
@@ -40,21 +39,29 @@ export async function transfersWorkflow({
     },
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
+  const {
+    signable_message: signableMessage,
+    signable_responses: signableResponses,
+    sender_stark_key: senderStarkKey,
+  } = signableResult.data;
 
   const ethSignature = await signRaw(signableMessage, ethSigner);
 
-  const starkSignature = await starkSigner.signMessage(payloadHash);
+  if (signableResponses.length === 0) {
+    throw new Error('No transfer responses found');
+  }
+
+  const starkSignature = await starkSigner.signMessage(signableResponses[0].payload_hash);
 
   const transferSigningParams = {
-    sender_stark_key: signableResult.data.sender_stark_key!,
-    sender_vault_id: signableResult.data.sender_vault_id,
-    receiver_stark_key: signableResult.data.receiver_stark_key,
-    receiver_vault_id: signableResult.data.receiver_vault_id,
-    asset_id: signableResult.data.asset_id,
-    amount: signableResult.data.amount,
-    nonce: signableResult.data.nonce,
-    expiration_timestamp: signableResult.data.expiration_timestamp,
+    sender_stark_key: senderStarkKey!,
+    sender_vault_id: signableResponses[0].sender_vault_id,
+    receiver_stark_key: signableResponses[0].receiver_stark_key,
+    receiver_vault_id: signableResponses[0].receiver_vault_id,
+    asset_id: signableResponses[0].asset_id,
+    amount: signableResponses[0].amount,
+    nonce: signableResponses[0].nonce,
+    expiration_timestamp: signableResponses[0].expiration_timestamp,
     stark_signature: starkSignature,
   };
 
@@ -65,10 +72,7 @@ export async function transfersWorkflow({
   });
 
   return {
-    sent_signature: response?.data.sent_signature,
-    status: response?.data.status?.toString(),
-    time: response?.data.time,
-    transfer_id: response?.data.transfer_id,
+    transfer_ids: response?.data.transfer_ids,
   };
 }
 
@@ -107,6 +111,10 @@ export async function batchTransfersWorkflow({
 
   const requests = [];
   for (const resp of signableResult.data.signable_responses) {
+    if (resp.payload_hash === undefined) {
+      throw new Error('Missing `payload_hash`');
+    }
+    // eslint-disable-next-line no-await-in-loop
     const starkSignature = await starkSigner.signMessage(resp.payload_hash);
     const req = {
       sender_vault_id: resp.sender_vault_id,
@@ -121,7 +129,6 @@ export async function batchTransfersWorkflow({
     requests.push(req);
   }
 
-  // TODO: throw error on missing payload hash?
   const transferSigningParams = {
     sender_stark_key: signableResult.data.sender_stark_key,
     requests,

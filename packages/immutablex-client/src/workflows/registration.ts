@@ -4,9 +4,9 @@ import {
   GetSignableRegistrationResponse,
   RegisterUserResponse,
 } from '@imtbl/generated-clients/src/imx';
+import { Registration } from '@imtbl/contracts';
 import { WalletConnection } from '../types';
 import { signRaw } from '../utils';
-import { Registration } from '../contracts';
 
 type registerOffchainWorkflowParams = WalletConnection & {
   usersApi: UsersApi;
