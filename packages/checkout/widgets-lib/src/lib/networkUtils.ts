@@ -24,8 +24,8 @@ export function l1Network(environment: Environment) {
  */
 export function zkEVMNetwork(environment: Environment) {
   return environment === Environment.PRODUCTION
-    ? ChainId.POLYGON_ZKEVM // IMTBL_ZKEVM_TESTNET
-    : ChainId.POLYGON_ZKEVM_TESTNET; // IMTBL_ZKEVM_DEVNET
+    ? ChainId.IMTBL_ZKEVM_TESTNET
+    : ChainId.IMTBL_ZKEVM_DEVNET;
 }
 
 /**

@@ -25,8 +25,8 @@ describe('SwapWidget tests', () => {
           }),
           getNetwork: async () => ({
             // FIXME: stop hardcoding this, only doing because dev net is reset
-            chainId: ChainId.POLYGON_ZKEVM_TESTNET,
-            name: 'Ethereum',
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            name: 'Immutable zkEVM Testnet',
           }),
           provider: {
             request: async () => null,
@@ -34,11 +34,11 @@ describe('SwapWidget tests', () => {
         },
         network: {
           // FIXME: stop hardcoding this, only doing because dev net is reset
-          chainId: ChainId.POLYGON_ZKEVM_TESTNET,
-          name: 'Ethereum',
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
-            name: 'ETH',
-            symbol: 'ETH',
+            name: 'IMX',
+            symbol: 'IMX',
             decimals: 18,
           },
         },

@@ -40,7 +40,7 @@ export const MainPage = () => {
     alert("you can buy now");
   }
 
-  const cardKeys = useMemo(() => [1,2,3,4],[]);
+  const cardKeys = useMemo(() => [140142,241916,345112,205410],[]);
 
   return(
     <Box sx={{minWidth: '100vw', minHeight: '100vh', width: '100%', height: '100%', backgroundColor: 'base.color.brand.6'}}>
@@ -56,17 +56,17 @@ export const MainPage = () => {
       <Box sx={{paddingX: 'base.spacing.x4'}}>
         <GridBox minColumnWidth="40%">
           <Box sx={{display: 'flex', flexDirection: 'row', gap: 'base.spacing.x4', flexWrap: 'wrap'}}>
-            {cardKeys.map((val) => (
-              <Box key={val}>
-              <Card sx={{width: '300px'}}>
-                <Card.Title>Guild of Guardians</Card.Title>
-                <Card.Caption>Legendary Guardian</Card.Caption>
-                <Card.FramedImage imageUrl="https://miro.medium.com/v2/resize:fit:3150/1*uZJEv6HpPe_PLkAVqFIxlA.png" />
-                <Card.AssetImage imageUrl="https://gog-art-assets.s3-ap-southeast-2.amazonaws.com/Content/Thumbnails/Heroes/Umbar/Thumbnail_Hero_Umbar_Base.png" aspectRatio="4:3" relativeImageSizeInLayout="60vw" />
-              </Card>
-              <Button variant={doneSwap ? "primary" : "tertiary"} disabled={!doneSwap} onClick={handleBuyClick}>Buy</Button>
-            </Box>
-            ))}
+              {cardKeys.map((val) => (
+                <Box key={val} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+                  <Card sx={{width: '240px'}}>
+                  <Card.Title>Illuvitars</Card.Title>
+                  <Card.Caption>Illuvium</Card.Caption>
+                  <Card.FramedImage imageUrl="https://web-illuvium-static.s3.us-east-2.amazonaws.com/img/illuvitars/illuvitars_marketplace_icon.png" />
+                  <Card.AssetImage imageUrl={`https://api.illuvium-game.io/gamedata/illuvitars/portrait/${val}/render`} />
+                  </Card>
+                  <Button variant={doneSwap ? "primary" : "tertiary"} disabled={!doneSwap} onClick={handleBuyClick}>Buy</Button>
+                </Box>
+              ))}
           </Box>
           <ImtblWidgets 
             providerPreference={providerPreference} 
