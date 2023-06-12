@@ -5,8 +5,8 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
-    "@0xsequence/abi": "^0.43.30",
-    "@0xsequence/config": "^0.43.30",
+    "@0xsequence/abi": "^0.43.33",
+    "@0xsequence/config": "^0.43.33",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/wallet": "^5.7.0",

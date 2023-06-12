@@ -64,7 +64,7 @@ const getFileBuild = (inputFilename) => [
     },
     plugins: [
       dts({
-        respectExternal: true,
+        respectExternal: false,
       }),
     ],
   },
