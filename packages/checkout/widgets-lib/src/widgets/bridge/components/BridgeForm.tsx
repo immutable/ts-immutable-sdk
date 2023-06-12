@@ -150,7 +150,6 @@ export function BridgeForm(props: BridgeFormProps) {
     setApprovalTransaction(transactions?.approveRes);
     setUnsignedBridgeTransaction(transactions?.bridgeTxn);
 
-    console.log(transactions);
     // Prevent to silently fetch and set a new fee estimate
     // if the user has updated and the widget is already
     // fetching or the user is updating the inputs.
@@ -186,7 +185,6 @@ export function BridgeForm(props: BridgeFormProps) {
   useEffect(() => {
     if (editing) return;
     (async () => await fetchEstimates())();
-    console.log('fetching estimates');
   }, [amount, token, editing]);
 
   const onTextInputFocus = () => {
@@ -288,12 +286,8 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const submitBridge = useCallback(async () => {
     if (!bridgeFormValidator()) return;
-    console.log('submitting bridge 1');
-    console.log(unsignedBridgeTransaction);
-
     if (!checkout || !provider || !token || !unsignedBridgeTransaction) return;
 
-    console.log('submitting bridge');
     try {
       setLoading(true);
       if (approvalTransaction && approvalTransaction.required && approvalTransaction.unsignedTx) {

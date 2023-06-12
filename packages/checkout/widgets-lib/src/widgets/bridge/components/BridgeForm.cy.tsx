@@ -6,26 +6,34 @@ import { TokenBridge } from '@imtbl/bridge-sdk';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
 import { BridgeWidgetTestComponent } from '../test-components/BridgeWidgetTestComponent';
-import { Bridge } from '../views/Bridge';
 import { cySmartGet } from '../../../lib/testUtils';
-import { text } from '../../../resources/text/textConfig';
-import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewContextTypes';
 import { BridgeForm } from './BridgeForm';
 
 describe('Bridge Form', () => {
-  const { validation } = text.views[BridgeWidgetViews.BRIDGE];
-  let initialBridgeState;
+  let bridgeState;
   let cryptoConversions;
   beforeEach(() => {
     cy.viewport('ipad-2');
 
     cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
-    initialBridgeState = {
-      checkout: null,
-      exchange: null,
-      provider: null,
+    bridgeState = {
+      checkout: new Checkout({
+        baseConfig: { environment: Environment.SANDBOX },
+      }),
+      tokenBridge: new TokenBridge({}),
+      provider: {
+        getSigner: () => ({
+          getAddress: async () => Promise.resolve('0x123'),
+        }),
+        getFeeData: () => ({
+          maxFeePerGas: BigNumber.from(100),
+          maxPriorityFeePerGas: BigNumber.from(100),
+          gasPrice: BigNumber.from(100),
+        }),
+      } as unknown as Web3Provider,
       providerPreference: null,
       network: null,
+      exchange: null,
       tokenBalances: [
         {
           balance: BigNumber.from('100000000000000000'),
@@ -85,6 +93,12 @@ describe('Bridge Form', () => {
         },
       ],
     };
+
+    cy.stub(TokenBridge.prototype, 'getFee').as('getFeeStub')
+      .resolves({
+        bridgeable: true,
+        feeAmount: BigNumber.from(1),
+      });
   });
 
   describe('Bridge Form submit', () => {
@@ -130,18 +144,51 @@ describe('Bridge Form', () => {
           },
         });
 
-      const bridgeState = {
-        ...initialBridgeState,
-        checkout: new Checkout({
-          baseConfig: { environment: Environment.SANDBOX },
-        }),
-        tokenBridge: new TokenBridge({}),
-        provider: {
-          getSigner: () => ({
-            getAddress: async () => Promise.resolve('0x123'),
-          }),
-        } as unknown as Web3Provider,
-      };
+      mount(
+        <BridgeWidgetTestComponent
+          initialStateOverride={bridgeState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <BridgeForm
+            testId="bridge-form"
+          />
+        </BridgeWidgetTestComponent>,
+      );
+
+      cySmartGet('bridge-token-select__target').click();
+      cySmartGet('bridge-token-coin-selector__option-ETH-Ethereum').click();
+      cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
+      cySmartGet('bridge-form-button').click();
+
+      cySmartGet('@sendTransactionStub')
+        .should('have.been.calledTwice')
+        .should('have.been.calledWith', {
+          provider: bridgeState.provider,
+          transaction: {},
+        });
+    });
+
+    it('should submit bridge and skip approval if not required', () => {
+      cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+        .resolves({
+          required: false,
+        });
+
+      cy.stub(TokenBridge.prototype, 'getUnsignedDepositTx').as('getUnsignedDepositTxStub')
+        .resolves({
+          required: true,
+          unsignedTx: {},
+        });
+
+      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+        .resolves({
+          transactionResponse: {
+            wait: () => ({
+              status: 1,
+            }),
+          },
+        });
 
       mount(
         <BridgeWidgetTestComponent
@@ -156,91 +203,29 @@ describe('Bridge Form', () => {
 
       cySmartGet('bridge-token-select__target').click();
       cySmartGet('bridge-token-coin-selector__option-ETH-Ethereum').click();
-      cy.wait(2000);
-
       cySmartGet('bridge-amount-text__input').type('0.1');
-      cy.wait(2000);
-
+      cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
-      //
-      // cySmartGet('@sendTransactionStub')
-      //   .should('have.been.calledTwice')
-      //   .should('have.been.calledWith', {
-      //     provider: bridgeState.provider,
-      //     transaction: {},
-      //   });
-    });
 
-    // it('should submit bridge and skip approval if not required', () => {
-    //   cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
-    //     .resolves({
-    //       required: false,
-    //     });
-    //
-    //   cy.stub(TokenBridge.prototype, 'getUnsignedDepositTx').as('getUnsignedDepositTxStub')
-    //     .resolves({
-    //       required: true,
-    //       unsignedTx: {},
-    //     });
-    //
-    //   cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
-    //     .resolves({
-    //       transactionResponse: {
-    //         wait: () => ({
-    //           status: 1,
-    //         }),
-    //       },
-    //     });
-    //
-    //   const bridgeState = {
-    //     ...initialBridgeState,
-    //     checkout: new Checkout({
-    //       baseConfig: { environment: Environment.SANDBOX },
-    //     }),
-    //     tokenBridge: new TokenBridge({}),
-    //     provider: {
-    //       getSigner: () => ({
-    //         getAddress: async () => Promise.resolve('0x123'),
-    //       }),
-    //     } as unknown as Web3Provider,
-    //   };
-    //
-    //   mount(
-    //     <BridgeWidgetTestComponent
-    //       initialStateOverride={bridgeState}
-    //       cryptoConversionsOverride={cryptoConversions}
-    //     >
-    //       <BridgeForm
-    //         testId="bridge-form"
-    //       />
-    //     </BridgeWidgetTestComponent>,
-    //   );
-    //
-    //   cySmartGet('bridge-token-select__target').click();
-    //   cySmartGet('bridge-token-coin-selector__option-ETH-Ethereum').click();
-    //
-    //   cySmartGet('bridge-amount-text__input').type('0.1');
-    //   cySmartGet('bridge-form-button').click();
-    //
-    //   cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
-    //     depositorAddress: '0x123',
-    //     token: 'NATIVE',
-    //     depositAmount: utils.parseUnits('0.1', 18),
-    //   });
-    //
-    //   cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
-    //     depositorAddress: '0x123',
-    //     recipientAddress: '0x123',
-    //     token: 'NATIVE',
-    //     depositAmount: utils.parseUnits('0.1', 18),
-    //   });
-    //
-    //   cySmartGet('@sendTransactionStub')
-    //     .should('have.been.calledOnce')
-    //     .should('have.been.calledWith', {
-    //       provider: bridgeState.provider,
-    //       transaction: {},
-    //     });
-    // });
+      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
+        depositorAddress: '0x123',
+        token: 'NATIVE',
+        depositAmount: utils.parseUnits('0.1', 18),
+      });
+
+      cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
+        depositorAddress: '0x123',
+        recipientAddress: '0x123',
+        token: 'NATIVE',
+        depositAmount: utils.parseUnits('0.1', 18),
+      });
+
+      cySmartGet('@sendTransactionStub')
+        .should('have.been.calledOnce')
+        .should('have.been.calledWith', {
+          provider: bridgeState.provider,
+          transaction: {},
+        });
+    });
   });
 });
