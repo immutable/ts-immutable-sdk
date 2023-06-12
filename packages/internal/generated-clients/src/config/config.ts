@@ -39,25 +39,20 @@ export const createConfig = ({
  * Creates a Configuration for the specified environment
  * @returns an ImmutableAPIConfiguration
  */
-export const imxConfig = {
-  getProduction() {
-    return createConfig({
-      basePath: 'https://api.x.immutable.com',
-    });
-  },
-
-  getSandbox() {
-    return createConfig({
-      basePath: 'https://api.sandbox.x.immutable.com',
-    });
-  },
+export const imxApiConfig = {
+  getProduction: () => createConfig({
+    basePath: 'https://api.x.immutable.com',
+  }),
+  getSandbox: () => createConfig({
+    basePath: 'https://api.sandbox.x.immutable.com',
+  }),
 };
 
 const mrApiConfig = {
-  indexerMr: () => createConfig({
+  indexer: () => createConfig({
     basePath: 'https://indexer-mr.dev.imtbl.com',
   }),
-  orderBookMr: () => createConfig({
+  orderBook: () => createConfig({
     basePath: 'https://order-book-mr.dev.imtbl.com',
   }),
 };
@@ -66,7 +61,7 @@ const mrApiConfig = {
  * Creates a Configuration for the specified environment
  * @returns an MultiRollupAPIConfiguration
  */
-export const mrConfig = {
+export const multiRollupConfig = {
   production: mrApiConfig,
   sandbox: mrApiConfig,
 };

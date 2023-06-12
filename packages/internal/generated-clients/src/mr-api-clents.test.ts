@@ -1,15 +1,15 @@
-import { MultiRollupApiClients } from './mrApiClients';
-import { mrConfig } from './config';
+import { MultiRollupApiClients } from './mr-api-clients';
+import { multiRollupConfig } from './config';
 
 describe('MultiRollupApiClients', () => {
   it('should instantiate a Indexer client', async () => {
-    const { collectionApi } = new MultiRollupApiClients(mrConfig.sandbox);
+    const { collectionApi } = new MultiRollupApiClients(multiRollupConfig.sandbox);
     // TODO write better tests - can't test methods since they are behind a VPN
     expect(collectionApi).toBeTruthy();
   });
 
   it('should instantiate a Order Book client', async () => {
-    const { ordersApi } = new MultiRollupApiClients(mrConfig.sandbox);
+    const { ordersApi } = new MultiRollupApiClients(multiRollupConfig.sandbox);
     // TODO write better tests - can't test methods since they are behind a VPN
     expect(ordersApi).toBeTruthy();
   });

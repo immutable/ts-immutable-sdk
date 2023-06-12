@@ -1,9 +1,9 @@
-import { ImxApiClients } from './imxApiClients';
-import { imxConfig } from './config';
+import { ImxApiClients } from './imx-api-clients';
+import { imxApiConfig } from './config';
 
 describe('ImxApiClients', () => {
   it('should instantiate a SANDBOX ImxApiClients', async () => {
-    const config = imxConfig.getSandbox();
+    const config = imxApiConfig.getSandbox();
     const { assetApi } = new ImxApiClients(config);
     const assetsResponse = await assetApi.listAssets();
 
@@ -14,7 +14,7 @@ describe('ImxApiClients', () => {
   });
 
   it('should instantiate a PRODUCTION ImxApiClients', async () => {
-    const config = imxConfig.getProduction();
+    const config = imxApiConfig.getProduction();
     const { assetApi } = new ImxApiClients(config);
     const assetsResponse = await assetApi.listAssets();
 

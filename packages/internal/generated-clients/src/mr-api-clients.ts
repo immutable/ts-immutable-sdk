@@ -25,11 +25,11 @@ export class MultiRollupApiClients {
 
   constructor(config: MultiRollupAPIConfiguration) {
     this.config = config;
-    this.activitiesApi = new ActivitiesApi(config.indexerMr());
-    this.chainsApi = new ChainsApi(config.indexerMr());
-    this.collectionApi = new CollectionsApi(config.indexerMr());
-    this.nftOwnersApi = new NftOwnersApi(config.indexerMr());
-    this.nftsApi = new NftsApi(config.indexerMr());
-    this.ordersApi = new OrdersApi(config.orderBookMr());
+    this.activitiesApi = new ActivitiesApi(config.indexer());
+    this.chainsApi = new ChainsApi(config.indexer());
+    this.collectionApi = new CollectionsApi(config.indexer());
+    this.nftOwnersApi = new NftOwnersApi(config.indexer());
+    this.nftsApi = new NftsApi(config.indexer());
+    this.ordersApi = new OrdersApi(config.orderBook());
   }
 }
