@@ -11,7 +11,7 @@ import {
   Core__factory,
   IERC20__factory,
   Registration__factory,
-} from '../../contracts';
+} from '@imtbl/contracts';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChainWorkflow,

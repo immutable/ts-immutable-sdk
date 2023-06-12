@@ -1,3 +1,5 @@
+/* eslint-disable default-case */
+/* eslint-disable consistent-return */
 import { Signer } from '@ethersproject/abstract-signer';
 import {
   DepositsApi,
@@ -22,7 +24,8 @@ import {
   MetadataRefreshesApi,
   CreateMetadataRefreshRequest,
   ExchangesApi,
-} from '../api';
+} from '@imtbl/generated-clients/src/imx';
+import { Registration__factory } from '@imtbl/contracts';
 import {
   UnsignedMintRequest,
   UnsignedTransferRequest,
@@ -38,7 +41,6 @@ import {
   EthSigner,
   UnsignedExchangeTransferRequest,
 } from '../types';
-import { Registration__factory } from '../contracts';
 import {
   isRegisteredOnChainWorkflow,
   registerOffchainWorkflow,
@@ -64,18 +66,31 @@ import { exchangeTransfersWorkflow } from './exchangeTransfers';
 
 export class Workflows {
   private readonly depositsApi: DepositsApi;
+
   private readonly encodingApi: EncodingApi;
+
   private readonly mintsApi: MintsApi;
+
   private readonly ordersApi: OrdersApi;
+
   private readonly tokensApi: TokensApi;
+
   private readonly tradesApi: TradesApi;
+
   private readonly transfersApi: TransfersApi;
+
   private readonly usersApi: UsersApi;
+
   private readonly withdrawalsApi: WithdrawalsApi;
+
   private readonly projectsApi: ProjectsApi;
+
   private readonly collectionsApi: CollectionsApi;
+
   private readonly metadataApi: MetadataApi;
+
   private readonly metadataRefreshesApi: MetadataRefreshesApi;
+
   private readonly exchangesApi: ExchangesApi;
 
   private isChainValid(chainID: number) {
@@ -105,10 +120,11 @@ export class Workflows {
   private async validateChain(signer: Signer) {
     const chainID = await signer.getChainId();
 
-    if (!this.isChainValid(chainID))
+    if (!this.isChainValid(chainID)) {
       throw new Error(
         'The wallet used for this operation is not from the correct network.',
       );
+    }
   }
 
   public async registerOffchain(walletConnection: WalletConnection) {

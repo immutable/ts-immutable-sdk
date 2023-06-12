@@ -3,7 +3,7 @@ import { TransactionResponse } from '@ethersproject/providers';
 import { DepositsApi, EncodingApi, UsersApi } from '@imtbl/generated-clients/src/imx';
 import { parseUnits } from '@ethersproject/units';
 import { BigNumber } from '@ethersproject/bignumber';
-import { Core, Core__factory, Registration__factory } from '../../contracts';
+import { Core, Core__factory, Registration__factory } from '@imtbl/contracts';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChainWorkflow,
