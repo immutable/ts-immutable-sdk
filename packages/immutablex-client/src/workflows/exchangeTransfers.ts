@@ -1,11 +1,13 @@
-import { imx } from '@imtbl/generated-clients';
+/* eslint-disable @typescript-eslint/naming-convention */
+import { ExchangesApi } from '@imtbl/generated-clients/src/imx/api';
+import { CreateTransferResponseV1 } from '@imtbl/generated-clients/src/imx';
 import { UnsignedExchangeTransferRequest, WalletConnection } from '../types';
 import { signRaw } from '../utils';
 import { convertToSignableToken } from '../utils/convertToSignableToken';
 
 type TransfersWorkflowParams = WalletConnection & {
-  request: imx.UnsignedExchangeTransferRequest;
-  exchangesApi: imx.ExchangesApi;
+  request: UnsignedExchangeTransferRequest;
+  exchangesApi: ExchangesApi;
 };
 
 export async function exchangeTransfersWorkflow({
@@ -34,7 +36,6 @@ export async function exchangeTransfersWorkflow({
   const starkSignature = await starkSigner.signMessage(payloadHash);
 
   const transferSigningParams = {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     sender_stark_key: signableResult.data.sender_stark_key!,
     sender_vault_id: signableResult.data.sender_vault_id,
     receiver_stark_key: signableResult.data.receiver_stark_key,

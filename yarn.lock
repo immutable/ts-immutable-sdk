@@ -3561,6 +3561,7 @@ __metadata:
   dependencies:
     "@imtbl/config": 0.0.0
     "@imtbl/core-sdk": ^1.1.1-alpha.1
+    "@imtbl/generated-clients": 0.0.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
     "@types/jest": ^29.4.3

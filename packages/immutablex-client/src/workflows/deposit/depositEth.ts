@@ -1,14 +1,14 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { DepositsApi, EncodingApi, UsersApi } from '../../api';
+import { DepositsApi, EncodingApi, UsersApi } from '@imtbl/generated-clients/src/imx';
 import { parseUnits } from '@ethersproject/units';
+import { BigNumber } from '@ethersproject/bignumber';
 import { Core, Core__factory, Registration__factory } from '../../contracts';
 import {
   getSignableRegistrationOnchain,
   isRegisteredOnChainWorkflow,
 } from '../registration';
 import { ETHAmount } from '../../types';
-import { BigNumber } from '@ethersproject/bignumber';
 import { ImmutableXConfiguration } from '../../config';
 
 interface ETHTokenData {
@@ -32,14 +32,13 @@ async function executeRegisterAndDepositEth(
     usersApi,
   );
 
-  const populatedTransaction =
-    await contract.populateTransaction.registerAndDepositEth(
-      etherKey,
-      starkPublicKey,
-      signableResult.operator_signature,
-      assetType,
-      vaultId,
-    );
+  const populatedTransaction = await contract.populateTransaction.registerAndDepositEth(
+    etherKey,
+    starkPublicKey,
+    signableResult.operator_signature,
+    assetType,
+    vaultId,
+  );
 
   return signer.sendTransaction({ ...populatedTransaction, value: amount });
 }
@@ -124,14 +123,13 @@ export async function depositEthWorkflow(
       coreContract,
       usersApi,
     );
-  } else {
-    return executeDepositEth(
-      signer,
-      amount,
-      assetType,
-      starkPublicKey,
-      vaultId,
-      coreContract,
-    );
   }
+  return executeDepositEth(
+    signer,
+    amount,
+    assetType,
+    starkPublicKey,
+    vaultId,
+    coreContract,
+  );
 }

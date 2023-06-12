@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   TransfersApi,
   CreateTransferResponseV1,
   CreateTransferResponse,
-} from '../api';
+} from '@imtbl/generated-clients/src/imx';
 import {
   NftTransferDetails,
   UnsignedTransferRequest,
@@ -39,15 +40,13 @@ export async function transfersWorkflow({
     },
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    signableResult.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = signableResult.data;
 
   const ethSignature = await signRaw(signableMessage, ethSigner);
 
   const starkSignature = await starkSigner.signMessage(payloadHash);
 
   const transferSigningParams = {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     sender_stark_key: signableResult.data.sender_stark_key!,
     sender_vault_id: signableResult.data.sender_vault_id,
     receiver_stark_key: signableResult.data.receiver_stark_key,
@@ -81,17 +80,15 @@ export async function batchTransfersWorkflow({
 }: BatchTransfersWorkflowParams): Promise<CreateTransferResponse> {
   const ethAddress = await ethSigner.getAddress();
 
-  const signableRequests = request.map(nftTransfer => {
-    return {
-      amount: '1',
-      token: convertToSignableToken({
-        type: 'ERC721',
-        tokenId: nftTransfer.tokenId,
-        tokenAddress: nftTransfer.tokenAddress,
-      }),
-      receiver: nftTransfer.receiver,
-    };
-  });
+  const signableRequests = request.map((nftTransfer) => ({
+    amount: '1',
+    token: convertToSignableToken({
+      type: 'ERC721',
+      tokenId: nftTransfer.tokenId,
+      tokenAddress: nftTransfer.tokenAddress,
+    }),
+    receiver: nftTransfer.receiver,
+  }));
 
   const signableResult = await transfersApi.getSignableTransfer({
     getSignableTransferRequestV2: {

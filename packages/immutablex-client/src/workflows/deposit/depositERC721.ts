@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { DepositsApi, EncodingApi, UsersApi } from '../../api';
+import { DepositsApi, EncodingApi, UsersApi } from '@imtbl/generated-clients/src/imx/';
 import {
   Core,
   Core__factory,

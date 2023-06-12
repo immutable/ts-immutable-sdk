@@ -1,6 +1,6 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { TransactionResponse } from '@ethersproject/providers';
-import { EncodingApi, UsersApi } from '../../api';
+import { EncodingApi, UsersApi } from '@imtbl/generated-clients/src/imx';
 import { ImmutableXConfiguration } from '../../config';
 import {
   Core,
@@ -30,13 +30,12 @@ async function executeRegisterAndWithdrawERC20(
     usersApi,
   );
 
-  const populatedTransaction =
-    await contract.populateTransaction.registerAndWithdraw(
-      etherKey,
-      starkPublicKey,
-      signableResult.operator_signature,
-      assetType,
-    );
+  const populatedTransaction = await contract.populateTransaction.registerAndWithdraw(
+    etherKey,
+    starkPublicKey,
+    signableResult.operator_signature,
+    assetType,
+  );
 
   return signer.sendTransaction(populatedTransaction);
 }
@@ -64,6 +63,7 @@ export async function completeERC20WithdrawalWorkflow(
   config: ImmutableXConfiguration,
 ) {
   const assetType = await getEncodeAssetInfo('asset', 'ERC20', encodingApi, {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     token_address: token.tokenAddress,
   });
 
@@ -90,12 +90,11 @@ export async function completeERC20WithdrawalWorkflow(
       registrationContract,
       usersApi,
     );
-  } else {
-    return executeWithdrawERC20(
-      signer,
-      assetType.asset_type,
-      starkPublicKey,
-      coreContract,
-    );
   }
+  return executeWithdrawERC20(
+    signer,
+    assetType.asset_type,
+    starkPublicKey,
+    coreContract,
+  );
 }

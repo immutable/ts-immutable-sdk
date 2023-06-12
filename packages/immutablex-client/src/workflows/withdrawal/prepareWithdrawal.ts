@@ -1,4 +1,5 @@
-import { WithdrawalsApi, CreateWithdrawalResponse } from '../../api';
+import { WithdrawalsApi, CreateWithdrawalResponse } from '@imtbl/generated-clients/src/imx';
+
 import { TokenAmount, WalletConnection } from '../../types';
 import { signMessage } from '../../utils';
 import { convertToSignableToken } from '../../utils/convertToSignableToken';
@@ -9,9 +10,9 @@ const assertIsDefined = <T>(value?: T): T => {
 };
 
 type PrepareWithdrawalWorkflowParams = TokenAmount &
-  WalletConnection & {
-    withdrawalsApi: WithdrawalsApi;
-  };
+WalletConnection & {
+  withdrawalsApi: WithdrawalsApi;
+};
 
 export async function prepareWithdrawalWorkflow(
   params: PrepareWithdrawalWorkflowParams,
@@ -26,8 +27,7 @@ export async function prepareWithdrawalWorkflow(
     },
   });
 
-  const { signable_message: signableMessage, payload_hash: payloadHash } =
-    signableWithdrawalResult.data;
+  const { signable_message: signableMessage, payload_hash: payloadHash } = signableWithdrawalResult.data;
 
   const starkSignature = await starkSigner.signMessage(payloadHash);
 
@@ -38,11 +38,15 @@ export async function prepareWithdrawalWorkflow(
 
   const prepareWithdrawalResponse = await withdrawalsApi.createWithdrawal({
     createWithdrawalRequest: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       stark_key: assertIsDefined(signableWithdrawalResult.data.stark_key),
       amount: withdrawalAmount,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       asset_id: assertIsDefined(signableWithdrawalResult.data.asset_id),
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       vault_id: assertIsDefined(signableWithdrawalResult.data.vault_id),
       nonce: assertIsDefined(signableWithdrawalResult.data.nonce),
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       stark_signature: starkSignature,
     },
     xImxEthAddress: ethAddress,
