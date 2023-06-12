@@ -1,4 +1,4 @@
-import { MultiRollupApiClients } from './MrApiClients';
+import { MultiRollupApiClients } from './mrApiClients';
 import { mrConfig } from './config';
 
 describe('MultiRollupApiClients', () => {

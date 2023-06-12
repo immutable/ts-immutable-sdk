@@ -3518,6 +3518,7 @@ __metadata:
   dependencies:
     jest: ^29.4.3
     rollup: ^3.17.2
+    typescript: ^4.9.5
   languageName: unknown
   linkType: soft
 

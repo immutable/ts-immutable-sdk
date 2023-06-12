@@ -6,7 +6,8 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "devDependencies": {
     "jest": "^29.4.3",
-    "rollup": "^3.17.2"
+    "rollup": "^3.17.2",
+    "typescript": "^4.9.5"
   },
   "engines": {
     "node": ">=16.11.0"
