@@ -45,7 +45,7 @@ export class StandardStarkSigner implements StarkSigner {
       return msg;
     }
     if (msg.length !== 63) {
-      throw new Error(Errors.StarkCurveInvalidMessageLength);
+      throw new Error(Errors.STARK_CURVE_INVALID_MESSAGE_LENGTH);
     }
     // In this case delta will be 4 so we perform a shift-left of 4 bits by adding a ZERO_BN.
     return `${msg}0`;
