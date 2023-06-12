@@ -59,8 +59,9 @@ export function BridgeForm(props: BridgeFormProps) {
   const [tokenError, setTokenError] = useState<string>('');
   const [amountFiatValue, setAmountFiatValue] = useState<string>('');
   const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // estimates
+  // Fee estimates & transactions
   const [isFetching, setIsFetching] = useState(false);
   const [estimates, setEstimates] = useState<GetBridgeGasEstimateResult | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
@@ -69,7 +70,6 @@ export function BridgeForm(props: BridgeFormProps) {
   const [unsignedBridgeTransaction,
     setUnsignedBridgeTransaction] = useState<BridgeDepositResponse | undefined>(undefined);
   const [tokenAddress, setTokenAddress] = useState<string>('');
-  const [loading, setLoading] = useState(false);
 
   const tokensOptions = useMemo(
     () => tokenBalances
@@ -139,7 +139,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
     // setIsFetching within this if statement
     // to allow the user to edit the form
-    // even if a new quote is fetch silently
+    // even if a new quote is fetching silently
     if (!silently) {
       setLoading(true);
       setIsFetching(true);
@@ -150,7 +150,7 @@ export function BridgeForm(props: BridgeFormProps) {
     setApprovalTransaction(transactions?.approveRes);
     setUnsignedBridgeTransaction(transactions?.bridgeTxn);
 
-    // Prevent to silently fetch and set a new fee estimate
+    // Prevent silently fetching and set a new fee estimate
     // if the user has updated and the widget is already
     // fetching or the user is updating the inputs.
     if ((silently && (loading || editing)) || !transactions?.bridgeTxn || !checkout) return;
