@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { ec } from 'elliptic';
 import * as encUtils from 'enc-utils';
 import BN from 'bn.js';
@@ -36,19 +37,19 @@ export class StandardStarkSigner implements StarkSigner {
    _truncateToN(fixMsgHashLen(msgHash)) == msgHash.
 */
   private fixMsgHashLen(msg: string) {
-    msg = encUtils.removeHexPrefix(msg);
-    msg = new BN(msg, 'hex').toString('hex');
+    const msgHexPrefixRemoved = encUtils.removeHexPrefix(msg);
+    const msgHex = new BN(msgHexPrefixRemoved, 'hex').toString('hex');
 
-    if (msg.length <= 62) {
+    if (msgHex.length <= 62) {
       // In this case, msg should not be transformed, as the byteLength() is at most 31,
       // so delta < 0 (see _truncateToN).
-      return msg;
+      return msgHex;
     }
-    if (msg.length !== 63) {
-      throw new Error(Errors.STARK_CURVE_INVALID_MESSAGE_LENGTH);
+    if (msgHex.length !== 63) {
+      throw new Error(Errors.StarkCurveInvalidMessageLength);
     }
     // In this case delta will be 4 so we perform a shift-left of 4 bits by adding a ZERO_BN.
-    return `${msg}0`;
+    return `${msgHex}0`;
   }
 }
 
