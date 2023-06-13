@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { ethers } from 'ethers';
 import {
   BridgeConfiguration,
@@ -12,6 +13,7 @@ import * as connect from './connect';
 import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
+import * as gasEstimate from './gasEstimate';
 import {
   ChainId,
   CheckConnectionParams,
@@ -45,9 +47,11 @@ import {
   getBridgeFeeEstimate,
 } from './gasEstimate/bridgeGasEstimate';
 import {
+  GasEstimateParams,
+  GasEstimateResult,
   GetBridgeGasEstimateParams,
   GetBridgeGasEstimateResult,
-} from './types/gasEstimates';
+} from './types/gasEstimate';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 
 export class Checkout {
@@ -72,7 +76,6 @@ export class Checkout {
    * @returns Wallet connection status details.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async checkIsWalletConnected(
     params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
@@ -179,7 +182,6 @@ export class Checkout {
    * @returns List of allowed tokens.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async getTokenAllowList(
     params: GetTokenAllowListParams,
   ): Promise<GetTokenAllowListResult> {
@@ -192,7 +194,6 @@ export class Checkout {
    * @returns List of allowed wallets.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async getWalletAllowList(
     params: GetWalletAllowListParams,
   ): Promise<GetWalletAllowListResult> {
@@ -207,7 +208,6 @@ export class Checkout {
    * @remarks
    * Further documenation can be found at [MetaMask | Sending Transactions](https://docs.metamask.io/guide/sending-transactions.html).
    */
-  // eslint-disable-next-line class-methods-use-this
   public async sendTransaction(
     params: SendTransactionParams,
   ): Promise<SendTransactionResult> {
@@ -225,9 +225,17 @@ export class Checkout {
   }
 
   /**
+   * todo: fill in this
+   * @param {GasEstimateParams} - The params required to estimate gas
+   */
+  public async gasEstimate(params: GasEstimateParams): Promise<GasEstimateResult> {
+    return await gasEstimate.gasServiceEstimator(params.gasEstimate);
+  }
+
+  /**
    * Get gas estimates for bridge transaction.
    * @param {GetBridgeGasEstimateParams} params - The necessary data required to get the gas estimates.
-   * @returns Network details.
+   * @returns Bridge gas estimate.
    * @throws {@link ErrorType}
    */
   public async getBridgeGasEstimate(

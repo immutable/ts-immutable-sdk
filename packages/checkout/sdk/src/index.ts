@@ -34,6 +34,8 @@ export type {
   NetworkFilter,
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
+  GasEstimateParams,
+  GasEstimateResult,
 } from './types';
 export type { ErrorType } from './errors';
 export { CheckoutErrorType } from './errors';

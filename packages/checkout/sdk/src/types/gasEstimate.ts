@@ -1,7 +1,37 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { FungibleToken } from '@imtbl/bridge-sdk';
+import { Environment } from '@imtbl/config';
+import { Exchange } from '@imtbl/dex-sdk';
 import { TokenInfo } from './tokenInfo';
+
+export type GasEstimate = BridgeToL2GasEstimate | SwapGasEstimate;
+
+export interface BridgeToL2GasEstimate {
+  type: GasEstimateType.BRIDGE_TO_L2;
+  provider: Web3Provider,
+  environment: Environment
+}
+
+export interface SwapGasEstimate {
+  type: GasEstimateType.SWAP;
+  exchange: Exchange,
+  environment: Environment
+}
+
+export enum GasEstimateType {
+  BRIDGE_TO_L2 = 'BRIDGE_TO_L2',
+  SWAP = 'SWAP',
+}
+
+export interface GasEstimateParams {
+  gasEstimate: GasEstimate;
+}
+
+export interface GasEstimateResult {
+  estimatedAmount?: BigNumber;
+  token?: TokenInfo;
+}
 
 /**
  * * Interface representing the parameters for {@link Checkout.getBridgeGasEstimate}.

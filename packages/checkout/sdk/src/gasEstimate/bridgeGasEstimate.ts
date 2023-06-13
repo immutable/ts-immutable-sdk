@@ -9,7 +9,7 @@ import {
 import {
   GetBridgeGasEstimateResult,
   TokenAmountEstimate,
-} from '../types/gasEstimates';
+} from '../types/gasEstimate';
 import * as tokens from '../tokens';
 import { ChainId, TokenFilterTypes, TokenInfo } from '../types';
 
