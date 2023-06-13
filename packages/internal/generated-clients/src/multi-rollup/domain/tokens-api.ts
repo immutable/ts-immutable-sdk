@@ -27,29 +27,29 @@ import { APIError404 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
 // @ts-ignore
-import { GetCollectionResult } from '../models';
+import { GetTokenResult } from '../models';
 // @ts-ignore
-import { ListCollectionsResult } from '../models';
+import { ListTokensResult } from '../models';
 /**
- * CollectionsApi - axios parameter creator
+ * TokensApi - axios parameter creator
  * @export
  */
-export const CollectionsApiAxiosParamCreator = function (configuration?: Configuration) {
+export const TokensApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Get collection by contract address
-         * @summary Get collection by contract address
-         * @param {string} contractAddress The address contract
+         * Get single ERC20 token
+         * @summary Get single ERC20 token
+         * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCollection: async (contractAddress: string, chainName: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getERC20Token: async (contractAddress: string, chainName: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'contractAddress' is not null or undefined
-            assertParamExists('getCollection', 'contractAddress', contractAddress)
+            assertParamExists('getERC20Token', 'contractAddress', contractAddress)
             // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('getCollection', 'chainName', chainName)
-            const localVarPath = `/v1/chains/{chain_name}/collections/{contract_address}`
+            assertParamExists('getERC20Token', 'chainName', chainName)
+            const localVarPath = `/v1/chains/{chain_name}/tokens/{contract_address}`
                 .replace(`{${"contract_address"}}`, encodeURIComponent(String(contractAddress)))
                 .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -75,18 +75,18 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
             };
         },
         /**
-         * List all collections
-         * @summary List all collections
+         * List ERC20 tokens
+         * @summary List ERC20 tokens
          * @param {string} chainName The name of chain
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listCollections: async (chainName: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listERC20Tokens: async (chainName: string, pageCursor?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('listCollections', 'chainName', chainName)
-            const localVarPath = `/v1/chains/{chain_name}/collections`
+            assertParamExists('listERC20Tokens', 'chainName', chainName)
+            const localVarPath = `/v1/chains/{chain_name}/tokens`
                 .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -122,150 +122,150 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
 };
 
 /**
- * CollectionsApi - functional programming interface
+ * TokensApi - functional programming interface
  * @export
  */
-export const CollectionsApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = CollectionsApiAxiosParamCreator(configuration)
+export const TokensApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = TokensApiAxiosParamCreator(configuration)
     return {
         /**
-         * Get collection by contract address
-         * @summary Get collection by contract address
-         * @param {string} contractAddress The address contract
+         * Get single ERC20 token
+         * @summary Get single ERC20 token
+         * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCollection(contractAddress: string, chainName: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetCollectionResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getCollection(contractAddress, chainName, options);
+        async getERC20Token(contractAddress: string, chainName: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetTokenResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getERC20Token(contractAddress, chainName, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * List all collections
-         * @summary List all collections
+         * List ERC20 tokens
+         * @summary List ERC20 tokens
          * @param {string} chainName The name of chain
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listCollections(chainName: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListCollectionsResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listCollections(chainName, pageCursor, pageSize, options);
+        async listERC20Tokens(chainName: string, pageCursor?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListTokensResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listERC20Tokens(chainName, pageCursor, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
 };
 
 /**
- * CollectionsApi - factory interface
+ * TokensApi - factory interface
  * @export
  */
-export const CollectionsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = CollectionsApiFp(configuration)
+export const TokensApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = TokensApiFp(configuration)
     return {
         /**
-         * Get collection by contract address
-         * @summary Get collection by contract address
-         * @param {string} contractAddress The address contract
+         * Get single ERC20 token
+         * @summary Get single ERC20 token
+         * @param {string} contractAddress The address of contract
          * @param {string} chainName The name of chain
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCollection(contractAddress: string, chainName: string, options?: any): AxiosPromise<GetCollectionResult> {
-            return localVarFp.getCollection(contractAddress, chainName, options).then((request) => request(axios, basePath));
+        getERC20Token(contractAddress: string, chainName: string, options?: any): AxiosPromise<GetTokenResult> {
+            return localVarFp.getERC20Token(contractAddress, chainName, options).then((request) => request(axios, basePath));
         },
         /**
-         * List all collections
-         * @summary List all collections
+         * List ERC20 tokens
+         * @summary List ERC20 tokens
          * @param {string} chainName The name of chain
          * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listCollections(chainName: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListCollectionsResult> {
-            return localVarFp.listCollections(chainName, pageCursor, pageSize, options).then((request) => request(axios, basePath));
+        listERC20Tokens(chainName: string, pageCursor?: string, pageSize?: number, options?: any): AxiosPromise<ListTokensResult> {
+            return localVarFp.listERC20Tokens(chainName, pageCursor, pageSize, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for getCollection operation in CollectionsApi.
+ * Request parameters for getERC20Token operation in TokensApi.
  * @export
- * @interface CollectionsApiGetCollectionRequest
+ * @interface TokensApiGetERC20TokenRequest
  */
-export interface CollectionsApiGetCollectionRequest {
+export interface TokensApiGetERC20TokenRequest {
     /**
-     * The address contract
+     * The address of contract
      * @type {string}
-     * @memberof CollectionsApiGetCollection
+     * @memberof TokensApiGetERC20Token
      */
     readonly contractAddress: string
 
     /**
      * The name of chain
      * @type {string}
-     * @memberof CollectionsApiGetCollection
+     * @memberof TokensApiGetERC20Token
      */
     readonly chainName: string
 }
 
 /**
- * Request parameters for listCollections operation in CollectionsApi.
+ * Request parameters for listERC20Tokens operation in TokensApi.
  * @export
- * @interface CollectionsApiListCollectionsRequest
+ * @interface TokensApiListERC20TokensRequest
  */
-export interface CollectionsApiListCollectionsRequest {
+export interface TokensApiListERC20TokensRequest {
     /**
      * The name of chain
      * @type {string}
-     * @memberof CollectionsApiListCollections
+     * @memberof TokensApiListERC20Tokens
      */
     readonly chainName: string
 
     /**
      * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof CollectionsApiListCollections
+     * @memberof TokensApiListERC20Tokens
      */
     readonly pageCursor?: string
 
     /**
      * Maximum number of items to return
      * @type {number}
-     * @memberof CollectionsApiListCollections
+     * @memberof TokensApiListERC20Tokens
      */
     readonly pageSize?: number
 }
 
 /**
- * CollectionsApi - object-oriented interface
+ * TokensApi - object-oriented interface
  * @export
- * @class CollectionsApi
+ * @class TokensApi
  * @extends {BaseAPI}
  */
-export class CollectionsApi extends BaseAPI {
+export class TokensApi extends BaseAPI {
     /**
-     * Get collection by contract address
-     * @summary Get collection by contract address
-     * @param {CollectionsApiGetCollectionRequest} requestParameters Request parameters.
+     * Get single ERC20 token
+     * @summary Get single ERC20 token
+     * @param {TokensApiGetERC20TokenRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CollectionsApi
+     * @memberof TokensApi
      */
-    public getCollection(requestParameters: CollectionsApiGetCollectionRequest, options?: AxiosRequestConfig) {
-        return CollectionsApiFp(this.configuration).getCollection(requestParameters.contractAddress, requestParameters.chainName, options).then((request) => request(this.axios, this.basePath));
+    public getERC20Token(requestParameters: TokensApiGetERC20TokenRequest, options?: AxiosRequestConfig) {
+        return TokensApiFp(this.configuration).getERC20Token(requestParameters.contractAddress, requestParameters.chainName, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * List all collections
-     * @summary List all collections
-     * @param {CollectionsApiListCollectionsRequest} requestParameters Request parameters.
+     * List ERC20 tokens
+     * @summary List ERC20 tokens
+     * @param {TokensApiListERC20TokensRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof CollectionsApi
+     * @memberof TokensApi
      */
-    public listCollections(requestParameters: CollectionsApiListCollectionsRequest, options?: AxiosRequestConfig) {
-        return CollectionsApiFp(this.configuration).listCollections(requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+    public listERC20Tokens(requestParameters: TokensApiListERC20TokensRequest, options?: AxiosRequestConfig) {
+        return TokensApiFp(this.configuration).listERC20Tokens(requestParameters.chainName, requestParameters.pageCursor, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }

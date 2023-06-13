@@ -15,19 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ActivityNativeToken } from './activity-native-token';
+import { Page } from './page';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ActivityToken } from './activity-token';
-// May contain unused imports in some cases
-// @ts-ignore
-import { ContractType } from './contract-type';
+import { Token } from './token';
 
 /**
- * @type NFTSalePaymentToken
- * The type of payment token
+ * 
  * @export
+ * @interface ListTokensResult
  */
-export type NFTSalePaymentToken = ActivityNativeToken | ActivityToken;
-
+export interface ListTokensResult {
+    /**
+     * List of tokens
+     * @type {Array<Token>}
+     * @memberof ListTokensResult
+     */
+    'result': Array<Token>;
+    /**
+     * 
+     * @type {Page}
+     * @memberof ListTokensResult
+     */
+    'page': Page;
+}
 

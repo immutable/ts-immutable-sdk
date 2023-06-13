@@ -17,13 +17,13 @@
 /**
  * 
  * @export
- * @interface NativeToken
+ * @interface ActivityNativeToken
  */
-export interface NativeToken {
+export interface ActivityNativeToken {
     /**
      * The token symbol
      * @type {string}
-     * @memberof NativeToken
+     * @memberof ActivityNativeToken
      */
     'symbol': string;
 }

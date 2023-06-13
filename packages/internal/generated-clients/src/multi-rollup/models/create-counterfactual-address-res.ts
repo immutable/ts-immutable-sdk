@@ -14,12 +14,17 @@
 
 
 
-export * from './domain/activities-api';
-export * from './domain/chains-api';
-export * from './domain/collections-api';
-export * from './domain/nft-owners-api';
-export * from './domain/nfts-api';
-export * from './domain/orders-api';
-export * from './domain/passport-api';
-export * from './domain/tokens-api';
+/**
+ * 
+ * @export
+ * @interface CreateCounterfactualAddressRes
+ */
+export interface CreateCounterfactualAddressRes {
+    /**
+     * The user\'s counterfactual address
+     * @type {string}
+     * @memberof CreateCounterfactualAddressRes
+     */
+    'counterfactualAddress': string;
+}
 

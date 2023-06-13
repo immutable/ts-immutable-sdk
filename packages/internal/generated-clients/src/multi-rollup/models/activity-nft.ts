@@ -15,49 +15,31 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Chain } from './chain';
+import { ContractType } from './contract-type';
 
 /**
  * 
  * @export
- * @interface Token
+ * @interface ActivityNFT
  */
-export interface Token {
+export interface ActivityNFT {
     /**
      * 
-     * @type {Chain}
-     * @memberof Token
+     * @type {ContractType}
+     * @memberof ActivityNFT
      */
-    'chain': Chain;
+    'contract_type': ContractType;
     /**
-     * 
+     * The token contract address
      * @type {string}
-     * @memberof Token
+     * @memberof ActivityNFT
      */
     'contract_address': string;
     /**
-     * 
+     * An `uint256` token id as string
      * @type {string}
-     * @memberof Token
+     * @memberof ActivityNFT
      */
-    'symbol': string | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof Token
-     */
-    'decimals': number | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof Token
-     */
-    'image_url': string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof Token
-     */
-    'name': string | null;
+    'token_id': string;
 }
 
