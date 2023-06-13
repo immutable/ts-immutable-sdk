@@ -12,6 +12,8 @@ import ExampleUI from './components/ui/example/example';
 import BuyUI from './components/ui/buy/buy';
 import { Marketplace } from './components/ui/marketplace-orchestrator';
 import { AsyncLoader } from './components/ui/async-loader/AsyncLoader';
+import { BiomeCombinedProviders } from '@biom3/react';
+import { onDarkBase } from '@biom3/design-tokens';
 
 const router = createBrowserRouter([
   {
@@ -44,7 +46,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/marketplace-orchestrator',
-    element: <Marketplace />,
+    element: <BiomeCombinedProviders theme={{base: onDarkBase}}><Marketplace /></BiomeCombinedProviders>,
   },
   {
     path: '/async-loader',

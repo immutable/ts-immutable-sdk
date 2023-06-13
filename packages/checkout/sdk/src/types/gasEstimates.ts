@@ -1,4 +1,4 @@
-import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { FungibleToken } from '@imtbl/bridge-sdk';
 import { TokenInfo } from './tokenInfo';
@@ -6,15 +6,13 @@ import { TokenInfo } from './tokenInfo';
 /**
  * * Interface representing the parameters for {@link Checkout.getBridgeGasEstimate}.
  @property tokenAddress - Bridge token.
- @property {TransactionRequest} transaction - Bridge transaction request.
  @property {Web3Provider} provider - Provider.
- @property {TransactionRequest} approveTxn - Approval transaction request.
+ @property {boolean} isSpendingCapApprovalRequired - Is spending cap approval required.
  * */
 export interface GetBridgeGasEstimateParams {
   tokenAddress: FungibleToken;
-  transaction: TransactionRequest;
   provider: Web3Provider;
-  approveTxn?: TransactionRequest;
+  isSpendingCapApprovalRequired?: boolean;
 }
 
 /**

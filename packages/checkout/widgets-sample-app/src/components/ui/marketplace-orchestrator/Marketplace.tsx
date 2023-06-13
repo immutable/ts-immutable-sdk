@@ -1,56 +1,35 @@
 import {
   CheckoutWidgets,
-  ConnectReact,
-  WalletReact,
   WidgetTheme,
   UpdateConfig,
   CheckoutWidgetsConfig,
 } from '@imtbl/checkout-widgets';
-import { useConnectWidget } from './useConnectWidget.hook';
-import { useWalletWidget } from './useWalletWidget.hook';
 import { Environment } from '@imtbl/config';
+import { MainPage } from './MainPage';
+import { useEffect } from 'react';
+import { WidgetProvider } from './WidgetProvider';
 
 export const Marketplace = () => {
-  CheckoutWidgets({
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  });
+  useEffect(() => {
+    CheckoutWidgets({
+      theme: WidgetTheme.DARK,
+      environment: Environment.SANDBOX,
+    });
 
-  const widgetsConfig2: CheckoutWidgetsConfig = {
-    theme: WidgetTheme.DARK,
-    environment: Environment.SANDBOX,
-  };
-
-  UpdateConfig(widgetsConfig2);
-
-  const { showConnectWidget, providerPreference, setShowConnectWidget } =
-    useConnectWidget();
-
-  const { showWalletWidget, setShowWalletWidget } = useWalletWidget();
-
-  function openConnectWidget() {
-    setShowConnectWidget(true);
-  }
-
-  function openWalletWidget() {
-    setShowWalletWidget(true);
-  }
+    const widgetsConfig: CheckoutWidgetsConfig = {
+      theme: WidgetTheme.DARK,
+      environment: Environment.SANDBOX,
+      isOnRampEnabled: true,
+      isBridgeEnabled: true,
+      isSwapEnabled: true
+    };
+  
+    UpdateConfig(widgetsConfig);
+  },[]);
 
   return (
-    <div>
-      <h1>Sample Marketplace Orchestrator</h1>
-      {!providerPreference && (
-        <button onClick={openConnectWidget}>Connect Wallet</button>
-      )}
-      {showConnectWidget && <ConnectReact />}
-      {providerPreference && !showWalletWidget && (
-        <button onClick={openWalletWidget}>My Wallet</button>
-      )}
-      {showWalletWidget && (
-        <WalletReact
-          providerPreference={providerPreference}
-        />
-      )}
-    </div>
+    <WidgetProvider>
+      <MainPage />
+    </WidgetProvider>
   );
 };

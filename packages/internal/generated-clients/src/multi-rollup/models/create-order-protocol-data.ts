@@ -33,6 +33,12 @@ export interface CreateOrderProtocolData {
      */
     'zone_address': string;
     /**
+     * big.Int or uint256 string for order counter
+     * @type {string}
+     * @memberof CreateOrderProtocolData
+     */
+    'counter': string;
+    /**
      * Immutable Seaport contract address
      * @type {string}
      * @memberof CreateOrderProtocolData

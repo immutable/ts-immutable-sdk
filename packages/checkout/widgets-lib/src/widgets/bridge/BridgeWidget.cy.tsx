@@ -43,6 +43,11 @@ describe('Bridge Widget tests', () => {
           chainId: 1,
           name: 'Ethereum',
         }),
+        getFeeData: () => ({
+          maxFeePerGas: BigNumber.from(100),
+          maxPriorityFeePerGas: BigNumber.from(100),
+          gasPrice: BigNumber.from(100),
+        }),
         provider: {
           request: async () => null,
         },
@@ -222,6 +227,12 @@ describe('Bridge Widget tests', () => {
         .resolves({
           unsignedTx: {},
         });
+
+      cy.stub(TokenBridge.prototype, 'getFee').as('getFeeStub')
+        .resolves({
+          bridgeable: true,
+          feeAmount: BigNumber.from(1),
+        });
     });
 
     it('should submit the bridge and show success when status is 1', () => {
@@ -275,6 +286,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
@@ -337,6 +349,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
@@ -381,10 +394,11 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
-      cySmartGet('@getUnsignedDepositTxStub').should('not.have.been.called');
+      cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
       cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
 
       cySmartGet('failure-box').should('be.visible');
@@ -432,6 +446,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
@@ -479,6 +494,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
@@ -527,6 +543,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');

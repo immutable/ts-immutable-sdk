@@ -18,6 +18,8 @@ export class BlockchainData {
 
   private readonly nftOwners: mr.NftOwnersApi;
 
+  private readonly tokens: mr.TokensApi;
+
   constructor(moduleConfig: BlockchainDataModuleConfiguration) {
     this.config = new BlockchainDataConfiguration(moduleConfig);
 
@@ -26,6 +28,7 @@ export class BlockchainData {
     this.collections = new mr.CollectionsApi(this.config.apiConfig);
     this.nfts = new mr.NftsApi(this.config.apiConfig);
     this.nftOwners = new mr.NftOwnersApi(this.config.apiConfig);
+    this.tokens = new mr.TokensApi(this.config.apiConfig);
   }
 
   /**
@@ -119,7 +122,9 @@ export class BlockchainData {
    * @returns a promise that resolves with a single NFT
    * @throws {@link index.APIError}
    */
-  public async getNFT(request: mr.NftsApiGetNFTRequest): Promise<mr.GetNFTResult> {
+  public async getNFT(
+    request: mr.NftsApiGetNFTRequest
+  ): Promise<mr.GetNFTResult> {
     return await this.nfts
       .getNFT(request)
       .then((res) => res.data)
@@ -173,6 +178,40 @@ export class BlockchainData {
   ): Promise<mr.ListNFTOwnersResult> {
     return await this.nftOwners
       .listNFTOwners(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * List ERC20 Token contracts
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of ERC20 Tokens
+   * @throws {@link index.APIError}
+   */
+  public async listTokens(
+    request: mr.TokensApiListERC20TokensRequest
+  ): Promise<mr.ListTokensResult> {
+    return await this.tokens
+      .listERC20Tokens(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
+  }
+
+  /**
+   * Get details for an ERC20 Token by contract address
+   * @param request - the request object containing the parameters to be provided in the API request
+   * @returns a promise that resolves with a list of ERC20 Tokens
+   * @throws {@link index.APIError}
+   */
+  public async getToken(
+    request: mr.TokensApiGetERC20TokenRequest
+  ): Promise<mr.GetTokenResult> {
+    return await this.tokens
+      .getERC20Token(request)
       .then((res) => res.data)
       .catch((err) => {
         throw formatError(err);

@@ -57,7 +57,7 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON_ZKEVM,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
           name: 'IMX',
@@ -87,7 +87,7 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON_ZKEVM,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
           name: 'IMX',
@@ -123,7 +123,7 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON_ZKEVM,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
           name: 'IMX',
@@ -212,7 +212,7 @@ describe('BalanceItem', () => {
       testWalletState = {
         ...baseWalletState,
         network: {
-          chainId: ChainId.POLYGON_ZKEVM,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
             name: 'IMX',

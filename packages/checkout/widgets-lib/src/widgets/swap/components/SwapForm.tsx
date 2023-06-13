@@ -12,7 +12,7 @@ import { amountInputValidation as textInputValidator } from '../../../lib/valida
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
-import { DEFAULT_IMX_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
+import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
@@ -113,7 +113,7 @@ export function SwapForm({ data }: SwapFromProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [quoteError, setQuoteError] = useState<string>('');
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
-  const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | null>(null);
+  const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const tokensOptionsFrom = useMemo(
     () => tokenBalances
@@ -185,7 +185,7 @@ export function SwapForm({ data }: SwapFromProps) {
       const estimate = result.info.gasFeeEstimate;
       const gasFee = utils.formatUnits(
         estimate?.amount || 0,
-        DEFAULT_IMX_DECIMALS,
+        DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
 
@@ -251,7 +251,7 @@ export function SwapForm({ data }: SwapFromProps) {
       const estimate = result.info.gasFeeEstimate;
       const gasFee = utils.formatUnits(
         estimate?.amount || 0,
-        DEFAULT_IMX_DECIMALS,
+        DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
 

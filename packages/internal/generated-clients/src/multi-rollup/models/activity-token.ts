@@ -20,19 +20,19 @@ import { ContractType } from './contract-type';
 /**
  * 
  * @export
- * @interface ERC20
+ * @interface ActivityToken
  */
-export interface ERC20 {
+export interface ActivityToken {
     /**
      * 
      * @type {ContractType}
-     * @memberof ERC20
+     * @memberof ActivityToken
      */
     'contract_type': ContractType;
     /**
-     * The token contract address
+     * The contract address
      * @type {string}
-     * @memberof ERC20
+     * @memberof ActivityToken
      */
     'contract_address': string;
 }
