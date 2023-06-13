@@ -1,13 +1,12 @@
 import {
   Body,
-  BottomSheet, Box, Button, Heading, Icon,
+  BottomSheet, Box, Button, DuoCon, Heading,
 } from '@biom3/react';
 import {
   transactionRejectedContainerStyles,
   contentTextStyles,
   actionButtonStyles,
   actionButtonContainerStyles,
-  iconFill,
 } from './TransactionRejectedStyles';
 import { text } from '../../resources/text/textConfig';
 
@@ -33,9 +32,10 @@ export function TransactionRejected({
     >
       <BottomSheet.Content>
         <Box sx={transactionRejectedContainerStyles}>
-          <Icon
-            icon="InformationCircle"
-            sx={iconFill}
+          <DuoCon
+            icon="Information"
+            colorVariant="guidance"
+            iconVariant="bold"
           />
           <Heading
             size="small"

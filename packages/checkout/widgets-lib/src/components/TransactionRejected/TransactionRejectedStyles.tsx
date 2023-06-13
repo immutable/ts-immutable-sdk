@@ -26,8 +26,3 @@ export const actionButtonStyles = {
   width: '100%',
   height: '64px',
 };
-
-export const iconFill = {
-  width: '124px',
-  fill: 'base.color.status.guidance.bright',
-};

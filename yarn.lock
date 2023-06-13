@@ -1618,25 +1618,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.5.11-beta":
-  version: 0.5.11-beta
-  resolution: "@biom3/react@npm:0.5.11-beta"
+"@biom3/react@npm:^0.6.4-beta":
+  version: 0.6.4-beta
+  resolution: "@biom3/react@npm:0.6.4-beta"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.10.8
     "@emotion/react": ^11.10.8
+    "@rive-app/react-canvas": ^3.0.50
     buffer: ^6.0.3
     framer-motion: ^10.12.12
     lodash.debounce: ^4.0.8
     lodash.get: ^4.4.2
     lodash.throttle: ^4.1.1
     next: ~13.1.1
-    querystring: ^0.2.1
     react: ^18.2.0
     react-dom: ^18.2.0
     react-is: ^18.2.0
     ts-deepmerge: ^5.0.0
-  checksum: 127df41f8b5e9742402d0cb96bd26f139f69217c80b5d99ea56a4196f00bd17be3b87ad012b8f24ccb9d853e1dbb3fa12f4a573d2d4615754fc9f1c905678c3b
+  checksum: 3eeade398ae0c3823ce7eeb35c955e59b5f5d71c9aa767bd68832236c42d99dfb47269f9aca601e0d7314f70b39970dc21c696458ec7203bb99a78a1a781c870
   languageName: node
   linkType: hard
 
@@ -2736,7 +2736,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.5.11-beta
+    "@biom3/react": ^0.6.4-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@svgr/webpack": ^8.0.1
@@ -2788,7 +2788,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-lib@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.5.11-beta
+    "@biom3/react": ^0.6.4-beta
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3258,6 +3258,7 @@ __metadata:
     "@imtbl/orderbook": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/provider": 0.0.0
+    "@jest/globals": ^29.5.0
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
     "@opensea/seaport-js": ^1.3.0
@@ -5383,6 +5384,24 @@ __metadata:
   version: 1.6.1
   resolution: "@remix-run/router@npm:1.6.1"
   checksum: 4ca65d9c7d6fa277227ad8fd4ef53bebab99460b714d835b609c998f9a7e7c33a964ce2b8af853b50025a60d9113968f256abc5f71f451939ff14a5187d327fe
+  languageName: node
+  linkType: hard
+
+"@rive-app/canvas@npm:1.2.0":
+  version: 1.2.0
+  resolution: "@rive-app/canvas@npm:1.2.0"
+  checksum: ab2a79b550330ac5f5b0d450a089decf971260853a626d68c705fe5802096ecedd9d88aba51e6b71e95e5a347603918d978dc1ee2475cb5e2a98faf600847e81
+  languageName: node
+  linkType: hard
+
+"@rive-app/react-canvas@npm:^3.0.50":
+  version: 3.0.53
+  resolution: "@rive-app/react-canvas@npm:3.0.53"
+  dependencies:
+    "@rive-app/canvas": 1.2.0
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: d54c6dd21d1f8d2e41811d098ad72e94137aecc3d88f0dfa2d25bebc6f20cd1ae1a621fe1dcd52a9a002c83b5acfb38ad46bf0bfc15a603550a9d1081f58e093
   languageName: node
   linkType: hard
 
@@ -22239,13 +22258,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"querystring@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "querystring@npm:0.2.1"
-  checksum: 7b83b45d641e75fd39cd6625ddfd44e7618e741c61e95281b57bbae8fde0afcc12cf851924559e5cc1ef9baa3b1e06e22b164ea1397d65dd94b801f678d9c8ce
-  languageName: node
-  linkType: hard
-
 "querystringify@npm:^2.1.1":
   version: 2.2.0
   resolution: "querystringify@npm:2.2.0"
@@ -23375,7 +23387,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sample-app@workspace:packages/provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.5.11-beta
+    "@biom3/react": ^0.6.4-beta
     "@imtbl/core-sdk": ^1.1.1-alpha.1
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1
