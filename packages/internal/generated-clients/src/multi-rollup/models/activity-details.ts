@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import { ActivityNFT } from './activity-nft';
+// May contain unused imports in some cases
+// @ts-ignore
 import { ActivityType } from './activity-type';
 // May contain unused imports in some cases
 // @ts-ignore
 import { Burn } from './burn';
-// May contain unused imports in some cases
-// @ts-ignore
-import { ERC721Token } from './erc721-token';
 // May contain unused imports in some cases
 // @ts-ignore
 import { Mint } from './mint';
@@ -30,7 +30,7 @@ import { Mint } from './mint';
 import { NFTSale } from './nftsale';
 // May contain unused imports in some cases
 // @ts-ignore
-import { NFTSalePaymentToken } from './nftsale-payment-token';
+import { SalePayment } from './sale-payment';
 // May contain unused imports in some cases
 // @ts-ignore
 import { Transfer } from './transfer';

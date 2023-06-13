@@ -13,13 +13,17 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { APIError403AllOf } from './apierror403-all-of';
+// May contain unused imports in some cases
+// @ts-ignore
+import { BasicAPIError } from './basic-apierror';
 
-export * from './domain/activities-api';
-export * from './domain/chains-api';
-export * from './domain/collections-api';
-export * from './domain/nft-owners-api';
-export * from './domain/nfts-api';
-export * from './domain/orders-api';
-export * from './domain/passport-api';
-export * from './domain/tokens-api';
+/**
+ * @type APIError403
+ * @export
+ */
+export type APIError403 = APIError403AllOf & BasicAPIError;
+
 

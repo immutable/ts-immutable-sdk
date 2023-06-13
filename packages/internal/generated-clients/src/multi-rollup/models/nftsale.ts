@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import { ActivityNFT } from './activity-nft';
+// May contain unused imports in some cases
+// @ts-ignore
 import { ActivityType } from './activity-type';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ERC721Token } from './erc721-token';
-// May contain unused imports in some cases
-// @ts-ignore
-import { NFTSalePaymentToken } from './nftsale-payment-token';
+import { SalePayment } from './sale-payment';
 
 /**
  * The NFT Sale activity details
@@ -61,21 +61,15 @@ export interface NFTSale {
     'quantity': number;
     /**
      * 
-     * @type {ERC721Token}
+     * @type {ActivityNFT}
      * @memberof NFTSale
      */
-    'token': ERC721Token;
-    /**
-     * The amount of payment
-     * @type {string}
-     * @memberof NFTSale
-     */
-    'payment_amount': string;
+    'asset': ActivityNFT;
     /**
      * 
-     * @type {NFTSalePaymentToken}
+     * @type {SalePayment}
      * @memberof NFTSale
      */
-    'payment_token': NFTSalePaymentToken;
+    'payment': SalePayment;
 }
 

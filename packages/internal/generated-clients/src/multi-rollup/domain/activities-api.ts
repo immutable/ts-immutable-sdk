@@ -87,7 +87,7 @@ export const ActivitiesApiAxiosParamCreator = function (configuration?: Configur
          * @param {string} [fromIndexedAt] From indexed at including given date
          * @param {string} [toIndexedAt] To indexed at including given date
          * @param {string} [transactionHash] The transaction hash of activity
-         * @param {string} [pageCursor] Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -192,7 +192,7 @@ export const ActivitiesApiFp = function(configuration?: Configuration) {
          * @param {string} [fromIndexedAt] From indexed at including given date
          * @param {string} [toIndexedAt] To indexed at including given date
          * @param {string} [transactionHash] The transaction hash of activity
-         * @param {string} [pageCursor] Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -233,7 +233,7 @@ export const ActivitiesApiFactory = function (configuration?: Configuration, bas
          * @param {string} [fromIndexedAt] From indexed at including given date
          * @param {string} [toIndexedAt] To indexed at including given date
          * @param {string} [transactionHash] The transaction hash of activity
-         * @param {string} [pageCursor] Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -328,7 +328,7 @@ export interface ActivitiesApiListActivitiesRequest {
     readonly transactionHash?: string
 
     /**
-     * Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
      * @memberof ActivitiesApiListActivities
      */
