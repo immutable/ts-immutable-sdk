@@ -2030,9 +2030,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.6.3-beta":
-  version: 0.6.3-beta
-  resolution: "@biom3/react@npm:0.6.3-beta"
+"@biom3/react@npm:^0.6.4-beta":
+  version: 0.6.4-beta
+  resolution: "@biom3/react@npm:0.6.4-beta"
   dependencies:
     "@biom3/design-tokens": "*"
     "@emotion/css": ^11.10.8
@@ -2048,7 +2048,7 @@ __metadata:
     react-dom: ^18.2.0
     react-is: ^18.2.0
     ts-deepmerge: ^5.0.0
-  checksum: 8d0911f7281c461c699ee9bc25012dd349c6396d13eaf4e763831279e03251d5bfd1c5ba31c227f67197690bb3b8899702f2f961cf84b7396cbf0dd70106e8fc
+  checksum: 3eeade398ae0c3823ce7eeb35c955e59b5f5d71c9aa767bd68832236c42d99dfb47269f9aca601e0d7314f70b39970dc21c696458ec7203bb99a78a1a781c870
   languageName: node
   linkType: hard
 
@@ -3148,7 +3148,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/checkout-sdk-sample-app@workspace:packages/checkout/sdk-sample-app"
   dependencies:
-    "@biom3/react": ^0.6.3-beta
+    "@biom3/react": ^0.6.4-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/config": 0.0.0
     "@svgr/webpack": ^8.0.1
@@ -3200,7 +3200,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-lib@workspace:packages/checkout/widgets-lib"
   dependencies:
     "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.6.3-beta
+    "@biom3/react": ^0.6.4-beta
     "@ethersproject/providers": ^5.7.2
     "@imtbl/bridge-sdk": 0.0.0
     "@imtbl/checkout-sdk": 0.0.0
@@ -3236,7 +3236,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.6.3-beta
+    "@biom3/react": ^0.6.4-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
@@ -24170,7 +24170,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "sample-app@workspace:packages/provider/src/sample-app"
   dependencies:
-    "@biom3/react": ^0.6.3-beta
+    "@biom3/react": ^0.6.4-beta
     "@imtbl/core-sdk": ^1.1.1-alpha.1
     "@imtbl/sdk": 0.0.0
     "@svgr/webpack": ^8.0.1

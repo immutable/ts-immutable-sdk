@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@biom3/design-tokens": "0.2.0-beta",
-    "@biom3/react": "^0.6.3-beta",
+    "@biom3/react": "^0.6.4-beta",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/bridge-sdk": "0.0.0",
     "@imtbl/checkout-sdk": "0.0.0",
