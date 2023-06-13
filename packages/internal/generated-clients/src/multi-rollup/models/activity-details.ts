@@ -30,7 +30,7 @@ import { Mint } from './mint';
 import { NFTSale } from './nftsale';
 // May contain unused imports in some cases
 // @ts-ignore
-import { NFTSalePaymentToken } from './nftsale-payment-token';
+import { SalePayment } from './sale-payment';
 // May contain unused imports in some cases
 // @ts-ignore
 import { Transfer } from './transfer';

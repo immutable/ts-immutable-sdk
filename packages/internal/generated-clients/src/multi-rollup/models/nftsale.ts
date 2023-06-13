@@ -21,7 +21,7 @@ import { ActivityNFT } from './activity-nft';
 import { ActivityType } from './activity-type';
 // May contain unused imports in some cases
 // @ts-ignore
-import { NFTSalePaymentToken } from './nftsale-payment-token';
+import { SalePayment } from './sale-payment';
 
 /**
  * The NFT Sale activity details
@@ -66,16 +66,10 @@ export interface NFTSale {
      */
     'asset': ActivityNFT;
     /**
-     * The amount of payment
-     * @type {string}
-     * @memberof NFTSale
-     */
-    'payment_amount': string;
-    /**
      * 
-     * @type {NFTSalePaymentToken}
+     * @type {SalePayment}
      * @memberof NFTSale
      */
-    'payment_token': NFTSalePaymentToken;
+    'payment': SalePayment;
 }
 

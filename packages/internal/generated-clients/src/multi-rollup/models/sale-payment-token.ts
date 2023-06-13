@@ -24,10 +24,10 @@ import { ActivityToken } from './activity-token';
 import { ContractType } from './contract-type';
 
 /**
- * @type NFTSalePaymentToken
+ * @type SalePaymentToken
  * The type of payment token
  * @export
  */
-export type NFTSalePaymentToken = ActivityNativeToken | ActivityToken;
+export type SalePaymentToken = ActivityNativeToken | ActivityToken;
 
 

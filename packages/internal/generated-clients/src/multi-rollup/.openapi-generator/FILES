@@ -67,7 +67,6 @@ models/nft.ts
 models/nftmetadata-attribute.ts
 models/nftmetadata-attributes.ts
 models/nftowner.ts
-models/nftsale-payment-token.ts
 models/nftsale.ts
 models/nftwith-metadata-attributes.ts
 models/order-result.ts
@@ -76,6 +75,9 @@ models/order.ts
 models/page.ts
 models/protocol-data-all-of.ts
 models/protocol-data.ts
+models/sale-fee.ts
+models/sale-payment-token.ts
+models/sale-payment.ts
 models/sell-item.ts
 models/token.ts
 models/transfer.ts
