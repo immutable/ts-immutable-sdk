@@ -3,7 +3,7 @@ import { mount } from 'cypress/react18';
 import { BigNumber } from 'ethers';
 import { cy } from 'local-cypress';
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { Exchange } from '@imtbl/dex-sdk';
 import { cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
@@ -22,7 +22,7 @@ describe('SwapForm', () => {
     testSwapState = {
       ...initialSwapState,
       provider: {} as Web3Provider,
-      checkout: {} as Checkout,
+      checkout: new Checkout(),
       exchange: {} as Exchange,
       tokenBalances: [
         {
@@ -511,6 +511,74 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').blur();
       cySmartGet('@fromAmountInStub').should('have.been.called');
+    });
+  });
+
+  describe('submitting a swap', () => {
+    beforeEach(() => {
+      cy.stub(quotesProcessor, 'fromAmountIn')
+        .as('fromAmountInStub')
+        .resolves({
+          info: {
+            quote: {
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+                address: '',
+              },
+              amount: BigNumber.from('112300000000000012'),
+            },
+            quoteWithMaxSlippage: {
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              },
+              amount: BigNumber.from('112300000000000032'),
+            },
+            gasFeeEstimate: {
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              },
+              amount: BigNumber.from('112300000000000045'),
+            },
+            slippage: 10,
+          },
+        });
+
+      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+        .rejects({
+          type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
+        });
+    });
+
+    it('should open the transaction rejected drawer if the user rejects the transaction', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+        >
+          <SwapCoins />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('fromTokenInputs-select-form-select__target').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+        .click();
+      cySmartGet('toTokenInputs-select-form-select__target').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-eth').click();
+
+      cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
+      cySmartGet('fromTokenInputs-text-form-text__input').blur();
+
+      cySmartGet('swap-button').click();
+
+      cySmartGet('transaction-rejected-heading').should('be.visible');
+      cySmartGet('transaction-rejected-cancel-button').should('have.text', 'Cancel swap');
     });
   });
 });

@@ -31,7 +31,11 @@ export function TransactionRejected({
       <BottomSheet.Content>
         <Box sx={transactionRejectedContainerStyles}>
           <Icon icon="InformationCircle" sx={{ width: '124px' }} />
-          <Heading size="small" sx={contentTextStyles}>
+          <Heading
+            size="small"
+            sx={contentTextStyles}
+            testId="transaction-rejected-heading"
+          >
             {content.heading1}
             <br />
             {content.heading2}
@@ -45,7 +49,12 @@ export function TransactionRejected({
             <Button sx={actionButtonStyles} variant="tertiary" onClick={onRetry}>
               {buttons.retry}
             </Button>
-            <Button sx={actionButtonStyles} variant="tertiary" onClick={onCloseBottomSheet}>
+            <Button
+              sx={actionButtonStyles}
+              variant="tertiary"
+              onClick={onCloseBottomSheet}
+              testId="transaction-rejected-cancel-button"
+            >
               {buttons.cancel(transactionType)}
             </Button>
           </Box>
