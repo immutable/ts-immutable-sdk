@@ -2030,28 +2030,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biom3/react@npm:^0.6.3-beta":
-  version: 0.6.3-beta
-  resolution: "@biom3/react@npm:0.6.3-beta"
-  dependencies:
-    "@biom3/design-tokens": "*"
-    "@emotion/css": ^11.10.8
-    "@emotion/react": ^11.10.8
-    "@rive-app/react-canvas": ^3.0.50
-    buffer: ^6.0.3
-    framer-motion: ^10.12.12
-    lodash.debounce: ^4.0.8
-    lodash.get: ^4.4.2
-    lodash.throttle: ^4.1.1
-    next: ~13.1.1
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    react-is: ^18.2.0
-    ts-deepmerge: ^5.0.0
-  checksum: 8d0911f7281c461c699ee9bc25012dd349c6396d13eaf4e763831279e03251d5bfd1c5ba31c227f67197690bb3b8899702f2f961cf84b7396cbf0dd70106e8fc
-  languageName: node
-  linkType: hard
-
 "@biom3/react@npm:^0.6.4-beta":
   version: 0.6.4-beta
   resolution: "@biom3/react@npm:0.6.4-beta"
@@ -3258,7 +3236,7 @@ __metadata:
   resolution: "@imtbl/checkout-widgets-sample-app@workspace:packages/checkout/widgets-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.0-beta
-    "@biom3/react": ^0.6.3-beta
+    "@biom3/react": ^0.6.4-beta
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
