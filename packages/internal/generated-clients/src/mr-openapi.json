@@ -37,14 +37,13 @@
       "x-displayName": "nft owners"
     },
     {
-      "name": "tokens",
-      "description": "ERC20 Token Endpoints",
-      "x-displayName": "tokens"
-    },
-    {
       "name": "demopage",
       "description": "Temporary HTML endpoint for demo purposes",
       "x-displayName": "demopage"
+    },
+    {
+      "name": "tokens",
+      "x-displayName": "tokens"
     },
     {
       "name": "orders",
@@ -66,8 +65,8 @@
         "collections",
         "nfts",
         "nft owners",
-        "tokens",
         "demopage",
+        "tokens",
         "orders",
         "passport"
       ],
@@ -1473,6 +1472,76 @@
           "symbol"
         ]
       },
+      "SalePayment": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "description": "The type of payment token",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ActivityToken"
+              },
+              {
+                "$ref": "#/components/schemas/ActivityNativeToken"
+              }
+            ]
+          },
+          "price_excluding_fees": {
+            "description": "The base price of the sale not including any fees",
+            "type": "string",
+            "example": "180"
+          },
+          "price_including_fees": {
+            "description": "The total price of the sale. Includes the sum of all fees",
+            "type": "string",
+            "example": "200"
+          },
+          "fees": {
+            "description": "The fees associated with this sale",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SaleFee"
+            },
+            "example": [
+              {
+                "address": "0xB0F3749458169B7Ad51B5503CC3649DE55c2D0D2",
+                "amount": "20",
+                "type": "ROYALTY"
+              }
+            ],
+            "minItems": 0
+          }
+        },
+        "required": [
+          "token",
+          "price_excluding_fees",
+          "price_including_fees",
+          "fees"
+        ]
+      },
+      "SaleFee": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Fee payable to recipient upon settlement",
+            "example": "200"
+          },
+          "type": {
+            "type": "string",
+            "description": "Fee type",
+            "example": "ROYALTY",
+            "enum": [
+              "ROYALTY"
+            ]
+          },
+          "recipient": {
+            "type": "string",
+            "description": "Wallet address of fee recipient",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
+          }
+        }
+      },
       "NFTSale": {
         "description": "The NFT Sale activity details",
         "type": "object",
@@ -1504,21 +1573,8 @@
           "asset": {
             "$ref": "#/components/schemas/ActivityNFT"
           },
-          "payment_amount": {
-            "description": "The amount of payment",
-            "type": "string",
-            "example": "123"
-          },
-          "payment_token": {
-            "description": "The type of payment token",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ActivityToken"
-              },
-              {
-                "$ref": "#/components/schemas/ActivityNativeToken"
-              }
-            ]
+          "payment": {
+            "$ref": "#/components/schemas/SalePayment"
           }
         },
         "required": [
@@ -1528,9 +1584,7 @@
           "seller_address",
           "quantity",
           "asset",
-          "payment_amount",
-          "payment_amount_usd",
-          "payment_token"
+          "payment"
         ]
       },
       "ActivityDetails": {
