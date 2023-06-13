@@ -6,8 +6,7 @@ import { Signer } from '@ethersproject/abstract-signer';
 import { splitSignature } from '@ethersproject/bytes';
 import { hdkey } from 'ethereumjs-wallet';
 
-const DEFAULT_SIGNATURE_MESSAGE =
-  'Only sign this request if you’ve initiated an action with Immutable X.';
+const DEFAULT_SIGNATURE_MESSAGE = "Only sign this request if you've initiated an action with Immutable X.";
 const DEFAULT_ACCOUNT_APPLICATION = 'immutablex';
 const DEFAULT_ACCOUNT_LAYER = 'starkex';
 const DEFAULT_ACCOUNT_INDEX = '1';
@@ -41,6 +40,7 @@ export const starkEcOrder = new BN(
   16,
 );
 
+// eslint-disable-next-line new-cap
 export const starkEc = new ec(
   new curves.PresetCurve({
     type: 'short',
@@ -65,8 +65,8 @@ function hashKeyWithIndex(key: string, index: number): BN {
       .sha256()
       .update(
         encUtils.hexToBuffer(
-          encUtils.removeHexPrefix(key) +
-            encUtils.sanitizeBytes(encUtils.numberToHex(index), 2),
+          encUtils.removeHexPrefix(key)
+            + encUtils.sanitizeBytes(encUtils.numberToHex(index), 2),
         ),
       )
       .digest('hex'),

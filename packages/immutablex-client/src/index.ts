@@ -1,11 +1,4 @@
 import {
-  ImmutableX,
-  EthSigner,
-  generateLegacyStarkPrivateKey,
-  createStarkSigner,
-  UnsignedExchangeTransferRequest,
-  UnsignedMintRequest,
-  WalletConnection,
   DepositsApi,
   MintsApi,
   OrdersApi,
@@ -57,8 +50,20 @@ import {
   NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest,
   NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest,
   NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest,
-} from '@imtbl/core-sdk';
-import { ImxConfiguration, ImxModuleConfiguration } from './config';
+} from '@imtbl/generated-clients/src/imx';
+import { formatError } from 'utils/formatError';
+import {
+  generateLegacyStarkPrivateKey,
+  createStarkSigner,
+} from './utils';
+import {
+  EthSigner,
+  UnsignedExchangeTransferRequest,
+  UnsignedMintRequest,
+  WalletConnection,
+} from './types';
+import { ImmutableXConfiguration, ImxConfiguration, ImxModuleConfiguration } from './config';
+import { Workflows } from './workflows';
 
 export {
   ImxModuleConfiguration as ImxClientModuleConfiguration,
@@ -68,7 +73,7 @@ export {
 };
 
 export class ImmutableXClient {
-  private immutableX: ImmutableX;
+  public config: ImmutableXConfiguration;
 
   public depositsApi: DepositsApi;
 
@@ -102,25 +107,27 @@ export class ImmutableXClient {
 
   public projectsApi: ProjectsApi;
 
+  private workflows: Workflows;
+
   constructor(config: ImxModuleConfiguration) {
-    const imxConfig = new ImxConfiguration(config);
-    this.immutableX = new ImmutableX(imxConfig.immutableXConfig);
-    this.depositsApi = this.immutableX.depositsApi;
-    this.mintsApi = this.immutableX.mintsApi;
-    this.ordersApi = this.immutableX.ordersApi;
-    this.tokensApi = this.immutableX.tokensApi;
-    this.tradesApi = this.immutableX.tradesApi;
-    this.transfersApi = this.immutableX.transfersApi;
-    this.exchangeApi = this.immutableX.exchangeApi;
-    this.usersApi = this.immutableX.usersApi;
-    this.withdrawalsApi = this.immutableX.withdrawalsApi;
-    this.balanceApi = this.immutableX.balanceApi;
-    this.assetApi = this.immutableX.assetApi;
-    this.collectionApi = this.immutableX.collectionApi;
-    this.metadataApi = this.immutableX.metadataApi;
-    this.metadataRefreshesApi = this.immutableX.metadataRefreshesApi;
-    this.nftCheckoutPrimaryApi = this.immutableX.nftCheckoutPrimaryApi;
-    this.projectsApi = this.immutableX.projectsApi;
+    this.config = new ImxConfiguration(config).immutableXConfig;
+    this.workflows = new Workflows(this.config);
+    this.depositsApi = new DepositsApi(this.config.apiConfiguration);
+    this.mintsApi = new MintsApi(this.config.apiConfiguration);
+    this.ordersApi = new OrdersApi(this.config.apiConfiguration);
+    this.tokensApi = new TokensApi(this.config.apiConfiguration);
+    this.tradesApi = new TradesApi(this.config.apiConfiguration);
+    this.transfersApi = new TransfersApi(this.config.apiConfiguration);
+    this.exchangeApi = new ExchangesApi(this.config.apiConfiguration);
+    this.usersApi = new UsersApi(this.config.apiConfiguration);
+    this.withdrawalsApi = new WithdrawalsApi(this.config.apiConfiguration);
+    this.balanceApi = new BalancesApi(this.config.apiConfiguration);
+    this.assetApi = new AssetsApi(this.config.apiConfiguration);
+    this.collectionApi = new CollectionsApi(this.config.apiConfiguration);
+    this.metadataApi = new MetadataApi(this.config.apiConfiguration);
+    this.metadataRefreshesApi = new MetadataRefreshesApi(this.config.apiConfiguration);
+    this.nftCheckoutPrimaryApi = new NftCheckoutPrimaryApi(this.config.apiConfiguration);
+    this.projectsApi = new ProjectsApi(this.config.apiConfiguration);
   }
 
   /**
@@ -130,7 +137,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getDeposit(request: DepositsApiGetDepositRequest) {
-    return this.immutableX.getDeposit(request);
+    return this.depositsApi
+      .getDeposit(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -140,7 +152,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public listDeposits(request?: DepositsApiListDepositsRequest) {
-    return this.immutableX.listDeposits(request);
+    return this.depositsApi
+      .listDeposits(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -150,7 +167,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getUser(ethAddress: string) {
-    return this.immutableX.getUser(ethAddress);
+    return this.usersApi
+      .getUsers({ user: ethAddress })
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -160,7 +182,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getAsset(request: AssetsApiGetAssetRequest) {
-    return this.immutableX.getAsset(request);
+    return this.assetApi
+      .getAsset(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -170,7 +197,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public listAssets(request?: AssetsApiListAssetsRequest) {
-    return this.immutableX.listAssets(request);
+    return this.assetApi
+      .listAssets(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -184,7 +216,12 @@ export class ImmutableXClient {
     ethSigner: EthSigner,
     request: CreateCollectionRequest,
   ) {
-    return this.immutableX.createCollection(ethSigner, request);
+    return this.workflows
+      .createCollection(ethSigner, request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -194,7 +231,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getCollection(request: CollectionsApiGetCollectionRequest) {
-    return this.immutableX.getCollection(request);
+    return this.collectionApi
+      .getCollection(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -206,7 +248,12 @@ export class ImmutableXClient {
   public listCollectionFilters(
     request: CollectionsApiListCollectionFiltersRequest,
   ) {
-    return this.immutableX.listCollectionFilters(request);
+    return this.collectionApi
+      .listCollectionFilters(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -216,7 +263,9 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public listCollections(request?: CollectionsApiListCollectionsRequest) {
-    return this.collectionApi.listCollections(request).then((res) => res.data);
+    return this.collectionApi.listCollections(request).then((res) => res.data).catch((err) => {
+      throw formatError(err);
+    });
   }
 
   /**
@@ -232,11 +281,12 @@ export class ImmutableXClient {
     collectionAddress: string,
     request: UpdateCollectionRequest,
   ) {
-    return this.immutableX.updateCollection(
-      ethSigner,
-      collectionAddress,
-      request,
-    );
+    return this.workflows
+      .updateCollection(ethSigner, collectionAddress, request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -252,11 +302,12 @@ export class ImmutableXClient {
     collectionAddress: string,
     request: AddMetadataSchemaToCollectionRequest,
   ) {
-    return this.immutableX.addMetadataSchemaToCollection(
-      ethSigner,
-      collectionAddress,
-      request,
-    );
+    return this.workflows
+      .addMetadataSchemaToCollection(ethSigner, collectionAddress, request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -266,7 +317,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getMetadataSchema(request: MetadataApiGetMetadataSchemaRequest) {
-    return this.immutableX.getMetadataSchema(request);
+    return this.metadataApi
+      .getMetadataSchema(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -284,12 +340,12 @@ export class ImmutableXClient {
     name: string,
     request: MetadataSchemaRequest,
   ) {
-    return this.immutableX.updateMetadataSchemaByName(
-      ethSigner,
-      collectionAddress,
-      name,
-      request,
-    );
+    return this.workflows
+      .updateMetadataSchemaByName(ethSigner, collectionAddress, name, request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -307,12 +363,12 @@ export class ImmutableXClient {
     pageSize?: number,
     cursor?: string,
   ) {
-    return this.immutableX.listMetadataRefreshes(
-      ethSigner,
-      collectionAddress,
-      pageSize,
-      cursor,
-    );
+    return this.workflows
+      .listMetadataRefreshes(ethSigner, collectionAddress, pageSize, cursor)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -330,12 +386,12 @@ export class ImmutableXClient {
     pageSize?: number,
     cursor?: string,
   ) {
-    return this.immutableX.getMetadataRefreshErrors(
-      ethSigner,
-      refreshId,
-      pageSize,
-      cursor,
-    );
+    return this.workflows
+      .getMetadataRefreshErrors(ethSigner, refreshId, pageSize, cursor)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -346,7 +402,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getMetadataRefreshResults(ethSigner: EthSigner, refreshId: string) {
-    return this.immutableX.getMetadataRefreshResults(ethSigner, refreshId);
+    return this.workflows
+      .getMetadataRefreshResults(ethSigner, refreshId)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -360,7 +421,12 @@ export class ImmutableXClient {
     ethSigner: EthSigner,
     request: CreateMetadataRefreshRequest,
   ) {
-    return this.immutableX.createMetadataRefresh(ethSigner, request);
+    return this.workflows
+      .createMetadataRefresh(ethSigner, request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -374,7 +440,12 @@ export class ImmutableXClient {
     ethSigner: EthSigner,
     request: CreateProjectRequest,
   ) {
-    return this.immutableX.createProject(ethSigner, request);
+    return this.workflows
+      .createProject(ethSigner, request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -385,7 +456,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public async getProject(ethSigner: EthSigner, id: string) {
-    return this.immutableX.getProject(ethSigner, id);
+    return this.workflows
+      .getProject(ethSigner, id)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -405,13 +481,12 @@ export class ImmutableXClient {
     orderBy?: string,
     direction?: string,
   ) {
-    return this.immutableX.getProjects(
-      ethSigner,
-      pageSize,
-      cursor,
-      orderBy,
-      direction,
-    );
+    return this.workflows
+      .getProjects(ethSigner, pageSize, cursor, orderBy, direction)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -421,7 +496,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getBalance(request: BalancesApiGetBalanceRequest) {
-    return this.immutableX.getBalance(request);
+    return this.balanceApi
+      .getBalance(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -431,7 +511,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public listBalances(request: BalancesApiListBalancesRequest) {
-    return this.immutableX.listBalances(request);
+    return this.balanceApi
+      .listBalances(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -441,7 +526,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getMint(request: MintsApiGetMintRequest) {
-    return this.immutableX.getMint(request);
+    return this.mintsApi
+      .getMint(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -451,7 +541,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public listMints(request?: MintsApiListMintsRequest) {
-    return this.immutableX.listMints(request);
+    return this.mintsApi
+      .listMints(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -462,7 +557,9 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public mint(ethSigner: EthSigner, request: UnsignedMintRequest) {
-    return this.immutableX.mint(ethSigner, request);
+    return this.workflows.mint(ethSigner, request).catch((err) => {
+      throw formatError(err);
+    });
   }
 
   /**
@@ -472,7 +569,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public listWithdrawals(request?: WithdrawalsApiListWithdrawalsRequest) {
-    return this.immutableX.listWithdrawals(request);
+    return this.withdrawalsApi
+      .listWithdrawals(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -482,7 +584,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getWithdrawal(request: WithdrawalsApiGetWithdrawalRequest) {
-    return this.immutableX.getWithdrawal(request);
+    return this.withdrawalsApi
+      .getWithdrawal(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -492,7 +599,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getOrder(request: OrdersApiGetOrderRequest) {
-    return this.immutableX.getOrder(request);
+    return this.ordersApi
+      .getOrder(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -502,7 +614,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public listOrders(request?: OrdersApiListOrdersRequest) {
-    return this.immutableX.listOrders(request);
+    return this.ordersApi
+      .listOrders(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -512,7 +629,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getTrade(request: TradesApiGetTradeRequest) {
-    return this.immutableX.getTrade(request);
+    return this.tradesApi
+      .getTrade(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -522,7 +644,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public listTrades(request?: TradesApiListTradesRequest) {
-    return this.immutableX.listTrades(request);
+    return this.tradesApi
+      .listTrades(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -532,7 +659,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getToken(request: TokensApiGetTokenRequest) {
-    return this.immutableX.getToken(request);
+    return this.tokensApi
+      .getToken(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -542,7 +674,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public listTokens(request?: TokensApiListTokensRequest) {
-    return this.immutableX.listTokens(request);
+    return this.tokensApi
+      .listTokens(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -552,7 +689,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getTransfer(request: TransfersApiGetTransferRequest) {
-    return this.immutableX.getTransfer(request);
+    return this.transfersApi
+      .getTransfer(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -562,7 +704,12 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public listTransfers(request?: TransfersApiListTransfersRequest) {
-    return this.immutableX.listTransfers(request);
+    return this.transfersApi
+      .listTransfers(request)
+      .then((res) => res.data)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -572,7 +719,9 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public createExchange(request: ExchangesApiCreateExchangeRequest) {
-    return this.immutableX.createExchange(request).then((res) => res.data);
+    return this.exchangeApi.createExchange(request).catch((err) => {
+      throw formatError(err);
+    });
   }
 
   /**
@@ -582,7 +731,9 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getExchange(request: ExchangesApiGetExchangeRequest) {
-    return this.immutableX.getExchange(request).then((res) => res.data);
+    return this.exchangeApi.getExchange(request).catch((err) => {
+      throw formatError(err);
+    });
   }
 
   /**
@@ -592,7 +743,9 @@ export class ImmutableXClient {
    * @throws {@link index.IMXError}
    */
   public getExchanges(request: ExchangesApiGetExchangesRequest) {
-    return this.immutableX.getExchanges(request).then((res) => res.data);
+    return this.exchangeApi.getExchanges(request).catch((err) => {
+      throw formatError(err);
+    });
   }
 
   /**
@@ -606,7 +759,11 @@ export class ImmutableXClient {
     walletConnection: WalletConnection,
     request: UnsignedExchangeTransferRequest,
   ) {
-    return this.immutableX.exchangeTransfer(walletConnection, request);
+    return this.workflows
+      .exchangeTransfer(walletConnection, request)
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -618,7 +775,9 @@ export class ImmutableXClient {
   public createNftPrimary(
     request: NftCheckoutPrimaryApiCreateNftPrimaryRequest,
   ) {
-    return this.immutableX.createNftPrimary(request).then((res) => res.data);
+    return this.nftCheckoutPrimaryApi.createNftPrimary(request).catch((err) => {
+      throw formatError(err);
+    });
   }
 
   /**
@@ -630,9 +789,11 @@ export class ImmutableXClient {
   public getCurrenciesNFTCheckoutPrimary(
     request: NftCheckoutPrimaryApiGetCurrenciesNFTCheckoutPrimaryRequest,
   ) {
-    return this.immutableX
+    return this.nftCheckoutPrimaryApi
       .getCurrenciesNFTCheckoutPrimary(request)
-      .then((res) => res.data);
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -644,9 +805,11 @@ export class ImmutableXClient {
   public getNftPrimaryTransaction(
     request: NftCheckoutPrimaryApiGetNftPrimaryTransactionRequest,
   ) {
-    return this.immutableX
+    return this.nftCheckoutPrimaryApi
       .getNftPrimaryTransaction(request)
-      .then((res) => res.data);
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 
   /**
@@ -658,8 +821,10 @@ export class ImmutableXClient {
   public getNftPrimaryTransactions(
     request: NftCheckoutPrimaryApiGetNftPrimaryTransactionsRequest,
   ) {
-    return this.immutableX
+    return this.nftCheckoutPrimaryApi
       .getNftPrimaryTransactions(request)
-      .then((res) => res.data);
+      .catch((err) => {
+        throw formatError(err);
+      });
   }
 }

@@ -30,7 +30,7 @@ describe('StarkSigner', () => {
     const signer = createStarkSigner(privateKey);
 
     expect(signer.signMessage(encodedMessage)).rejects.toThrow(
-      new Error(Errors.STARK_CURVE_INVALID_MESSAGE_LENGTH),
+      new Error(Errors.StarkCurveInvalidMessageLength),
     );
   });
 });

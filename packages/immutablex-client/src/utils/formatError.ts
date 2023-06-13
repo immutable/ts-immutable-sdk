@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { APIError } from '../api';
+import { APIError } from '@imtbl/generated-clients/src/imx';
 import { IMXError } from '../types/errors';
 
 /**

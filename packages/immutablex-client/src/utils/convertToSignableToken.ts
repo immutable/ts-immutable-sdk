@@ -1,4 +1,5 @@
-import { SignableToken } from '../api';
+/* eslint-disable @typescript-eslint/naming-convention */
+import { SignableToken } from '@imtbl/generated-clients/src/imx';
 import { TokenAmount } from '../types/tokens';
 
 /**
@@ -24,6 +25,7 @@ export function convertToSignableToken(token: TokenAmount): SignableToken {
         },
       };
     case 'ETH':
+    default:
       return {
         type: 'ETH',
         data: {
