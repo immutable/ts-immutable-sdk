@@ -143,7 +143,6 @@ export function SwapButton({
         ) : buttonText}
       </Button>
       <TransactionRejected
-        transactionType="swap"
         visible={transactionCanceledDrawerOpen}
         showHeaderBar={false}
         onCloseBottomSheet={() => setTransactionCanceledDrawerOpen(false)}

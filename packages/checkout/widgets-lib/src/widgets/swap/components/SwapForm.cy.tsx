@@ -578,7 +578,6 @@ describe('SwapForm', () => {
       cySmartGet('swap-button').click();
 
       cySmartGet('transaction-rejected-heading').should('be.visible');
-      cySmartGet('transaction-rejected-cancel-button').should('have.text', 'Cancel swap');
     });
   });
 });

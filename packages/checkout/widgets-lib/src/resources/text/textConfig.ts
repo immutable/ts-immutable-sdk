@@ -214,7 +214,7 @@ export const text = {
       },
       buttons: {
         retry: 'Got it',
-        cancel: (transactionType: string) => `Cancel ${transactionType}`,
+        cancel: 'Dismiss',
       },
     },
   },

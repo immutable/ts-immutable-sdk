@@ -11,12 +11,11 @@ type TransactionRejectedProps = {
   onCloseBottomSheet?: () => void;
   visible?: boolean;
   showHeaderBar?: boolean;
-  transactionType: 'move' | 'swap',
   onRetry: () => void
 };
 
 export function TransactionRejected({
-  onCloseBottomSheet, visible, showHeaderBar, transactionType, onRetry,
+  onCloseBottomSheet, visible, showHeaderBar, onRetry,
 }: TransactionRejectedProps) {
   const { content, buttons } = text.drawers.transactionFailed;
 
@@ -55,7 +54,7 @@ export function TransactionRejected({
               onClick={onCloseBottomSheet}
               testId="transaction-rejected-cancel-button"
             >
-              {buttons.cancel(transactionType)}
+              {buttons.cancel}
             </Button>
           </Box>
         </Box>
