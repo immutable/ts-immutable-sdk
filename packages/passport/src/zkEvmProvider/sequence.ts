@@ -1,8 +1,17 @@
 import { BigNumber, BigNumberish, ethers } from 'ethers';
 import { walletContracts } from '@0xsequence/abi';
 import { encodeSignature } from '@0xsequence/config';
-import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
+import { Signer } from '@ethersproject/abstract-signer';
 import { Transaction, TransactionNormalised } from './types';
+
+// These are ignored by the Relayer but we set them to the appropriate values
+// for a 1/1 wallet to keep consistency.
+//
+// Weight of a single signature in the multisig
+const SIGNATURE_WEIGHT = 1;
+// Total required weight in the multisig
+const SIGNATURE_THRESHOLD = 1;
 
 const ETH_SIGN_FLAG = '02';
 const ETH_SIGN_PREFIX = '\x19\x01';
@@ -52,8 +61,8 @@ export const getSignedSequenceTransactions = async (
   nonce: BigNumberish,
   chainId: BigNumber,
   walletAddress: string,
-  signer: JsonRpcSigner,
-) => {
+  signer: Signer,
+): Promise<string> => {
   const sequenceTransactions = getNormalisedTransactions(transactions);
 
   // Get the hash
@@ -62,6 +71,7 @@ export const getSignedSequenceTransactions = async (
     ['string', 'uint256', 'address', 'bytes32'],
     [ETH_SIGN_PREFIX, chainId, walletAddress, digest],
   );
+
   const hash = ethers.utils.keccak256(completePayload);
 
   // Sign the digest
@@ -70,7 +80,15 @@ export const getSignedSequenceTransactions = async (
   const signedDigest = `${ethsigNoType}${ETH_SIGN_FLAG}`;
 
   // Add metadata
-  const encodedSignature = encodeSignature(signedDigest);
+  const encodedSignature = encodeSignature({
+    threshold: SIGNATURE_THRESHOLD,
+    signers: [
+      {
+        weight: SIGNATURE_WEIGHT,
+        signature: signedDigest,
+      },
+    ],
+  });
 
   // Encode the transaction;
   const walletInterface = new ethers.utils.Interface(walletContracts.mainModule.abi);
