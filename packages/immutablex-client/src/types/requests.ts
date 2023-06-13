@@ -1,5 +1,5 @@
+import { FeeEntry, MintRequest } from '@imtbl/generated-clients/src/imx';
 import { TokenAmount, ExchangeTokenAmount } from './tokens';
-import { FeeEntry, MintRequest } from '../api';
 
 // These custom request interfaces are used because API.SignableToken is not yet a union type due to OAS 2.0 spec not supporting `OneOf`
 // As well as the fact that SignableToken has an extra `data` object which we would like to flatten
@@ -20,6 +20,7 @@ export interface UnsignedOrderRequest {
   /**
    * ExpirationTimestamp in Unix time. Note: will be rounded down to the nearest hour
    */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   expiration_timestamp?: number;
   /**
    * Inclusion of either maker or taker fees
