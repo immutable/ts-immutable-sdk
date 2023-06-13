@@ -5,8 +5,8 @@ import { Web3Provider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { Transaction, TransactionNormalised } from './types';
 
-// These are ignored by the Relayer but we set them to the appropriate values
-// for a 1/1 wallet to keep consistency.
+// These are ignored by the Relayer but for consistency we set them to the
+// appropriate values for a 1/1 wallet.
 //
 // Weight of a single signature in the multisig
 const SIGNATURE_WEIGHT = 1;

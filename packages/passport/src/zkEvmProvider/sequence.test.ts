@@ -3,7 +3,7 @@ import { getSignedSequenceTransactions } from './sequence';
 
 describe('getSignedSequenceTransactions()', () => {
   // NOTE: Generated with https://github.com/immutable/wallet-contracts/blob/348add7d2fde13d8f7f83aae0882ad2d97546d72/tests/ImmutableDeployment.spec.ts#L69
-  it("should match the `data` field in a transaction generated from the 0xSequence's testing suite", async () => {
+  it("should match the `data` field in a transaction generated from 0xSequence's testing suite", async () => {
     const transactions = [
       {
         delegateCall: false,
