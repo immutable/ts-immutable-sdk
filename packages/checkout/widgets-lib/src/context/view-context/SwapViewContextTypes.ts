@@ -1,4 +1,5 @@
 import { TransactionResponse } from '@ethersproject/providers';
+import { Transaction } from 'ethers';
 
 export enum SwapWidgetViews {
   SWAP = 'SWAP',
@@ -6,6 +7,7 @@ export enum SwapWidgetViews {
   SUCCESS = 'SUCCESS',
   FAIL = 'FAIL',
   PRICE_SURGE = 'PRICE_SURGE',
+  APPROVE_ERC20 = 'APPROVE_ERC20',
 }
 
 export type SwapWidgetView =
@@ -13,7 +15,8 @@ export type SwapWidgetView =
   | SwapInProgressView
   | { type: SwapWidgetViews.SUCCESS }
   | PriceSurgeView
-  | SwapFailView;
+  | SwapFailView
+  | ApproveERC20View;
 
 interface SwapFailView {
   type: SwapWidgetViews.FAIL;
@@ -31,6 +34,11 @@ interface SwapView {
   data?: PrefilledSwapForm;
 }
 
+interface ApproveERC20View {
+  type: SwapWidgetViews.APPROVE_ERC20,
+  data: ApproveERC20
+}
+
 export interface PrefilledSwapForm {
   fromAmount: string;
   fromContractAddress: string;
@@ -42,5 +50,9 @@ interface SwapInProgressView {
   data: {
     transactionResponse: TransactionResponse;
     swapForm: PrefilledSwapForm;
-  };
+  }
+}
+export interface ApproveERC20 {
+  approveSpendingTransaction: Transaction;
+  swapTransaction: Transaction;
 }

@@ -2,6 +2,7 @@ import { Box, Button } from '@biom3/react';
 import { useContext, useState } from 'react';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
+import { Transaction } from 'ethers';
 import { text } from '../../../resources/text/textConfig';
 import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import {
@@ -35,6 +36,20 @@ export function SwapButton({
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
 
   const sendTransaction = async () => {
+    if (true) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SwapWidgetViews.APPROVE_ERC20,
+            data: {
+              approveSpendingTransaction: {} as unknown as Transaction,
+              swapTransaction: {} as unknown as Transaction,
+            },
+          },
+        },
+      });
+    }
     if (!validator()) return;
     if (!checkout || !provider || !transaction) return;
     try {

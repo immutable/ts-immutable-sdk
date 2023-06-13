@@ -131,6 +131,28 @@ export const text = {
         },
       },
     },
+    [SwapWidgetViews.APPROVE_ERC20]: {
+      approveSwap: {
+        content: {
+          heading: "Now you'll just need to approve the transaction",
+          body: 'Follow the prompts in Metamask.',
+        },
+        footer: {
+          buttonText: 'Okay',
+          retryText: 'Try again',
+        },
+      },
+      approveSpending: {
+        content: {
+          heading: "You'll be asked to set a spending cap for this transaction",
+          body: ['Input at least', 'for this transaction and future transactions, then follow the prompts.'],
+        },
+        footer: {
+          buttonText: 'Got it',
+          retryText: 'Try again',
+        },
+      },
+    },
     [BridgeWidgetViews.BRIDGE]: {
       header: {
         title: 'Move coins',

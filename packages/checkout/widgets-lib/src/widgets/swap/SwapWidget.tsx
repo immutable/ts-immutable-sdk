@@ -40,6 +40,7 @@ import {
   sendSwapSuccessEvent, sendSwapWidgetCloseEvent,
 } from './SwapWidgetEvents';
 import { SwapInProgress } from './views/SwapInProgress';
+import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -190,6 +191,9 @@ export function SwapWidget(props: SwapWidgetProps) {
               transactionResponse={viewState.view.data.transactionResponse}
               swapForm={viewState.view.data.swapForm}
             />
+          )}
+          {viewState.view.type === SwapWidgetViews.APPROVE_ERC20 && (
+            <ApproveERC20Onboarding />
           )}
           {viewState.view.type === SwapWidgetViews.SUCCESS && (
             <StatusView
