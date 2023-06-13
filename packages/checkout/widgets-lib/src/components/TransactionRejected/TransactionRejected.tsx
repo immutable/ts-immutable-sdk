@@ -3,7 +3,11 @@ import {
   BottomSheet, Box, Button, Heading, Icon,
 } from '@biom3/react';
 import {
-  transactionRejectedContainerStyles, contentTextStyles, actionButtonStyles, actionButtonContainerStyles,
+  transactionRejectedContainerStyles,
+  contentTextStyles,
+  actionButtonStyles,
+  actionButtonContainerStyles,
+  iconFill,
 } from './TransactionRejectedStyles';
 import { text } from '../../resources/text/textConfig';
 
@@ -29,7 +33,10 @@ export function TransactionRejected({
     >
       <BottomSheet.Content>
         <Box sx={transactionRejectedContainerStyles}>
-          <Icon icon="InformationCircle" sx={{ width: '124px' }} />
+          <Icon
+            icon="InformationCircle"
+            sx={iconFill}
+          />
           <Heading
             size="small"
             sx={contentTextStyles}
