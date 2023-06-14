@@ -1,4 +1,5 @@
 import { mount } from 'cypress/react18';
+import { cy } from 'local-cypress';
 import { BigNumber } from 'ethers';
 import { TradeInfo } from '@imtbl/dex-sdk';
 import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
