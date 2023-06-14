@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ActivityType } from './activity-type';
+import { ActivityAsset } from './activity-asset';
 // May contain unused imports in some cases
 // @ts-ignore
-import { Token } from './token';
+import { ActivityType } from './activity-type';
 
 /**
  * The transfer activity details
@@ -33,28 +33,28 @@ export interface Transfer {
      */
     'activity_type': ActivityType;
     /**
-     * The account address the token was transferred from
+     * The account address the asset was transferred from
      * @type {string}
      * @memberof Transfer
      */
     'from': string;
     /**
-     * The account address the token was transferred to
+     * The account address the asset was transferred to
      * @type {string}
      * @memberof Transfer
      */
     'to': string;
     /**
-     * The amount of tokens transferred
+     * The amount of assets transferred
      * @type {string}
      * @memberof Transfer
      */
     'amount': string;
     /**
      * 
-     * @type {Token}
+     * @type {ActivityAsset}
      * @memberof Transfer
      */
-    'token': Token;
+    'asset': ActivityAsset;
 }
 

@@ -1,7 +1,7 @@
 import { ChainId, GetBalanceResult, NetworkInfo } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { l1Network, zkEVMNetwork } from './networkUtils';
-import { DEFAULT_TOKEN_DECIMALS } from './constants';
+import { DEFAULT_TOKEN_FORMATTING_DECIMALS } from './constants';
 
 export const sortTokensByAmount = (
   environment: Environment,
@@ -86,5 +86,8 @@ export const tokenValueFormat = (s: Number | string): string => {
   const pointIndex = asString.indexOf('.');
   if (pointIndex === -1) return asString;
 
-  return asString.substring(0, pointIndex + DEFAULT_TOKEN_DECIMALS + 1);
+  return asString.substring(
+    0,
+    pointIndex + DEFAULT_TOKEN_FORMATTING_DECIMALS + 1,
+  );
 };

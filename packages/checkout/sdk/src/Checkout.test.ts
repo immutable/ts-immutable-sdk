@@ -152,16 +152,6 @@ describe(' Connect', () => {
 
   describe('gas estimate', () => {
     let provider: Web3Provider;
-    const transaction = {
-      nonce: '',
-      gasPrice: '',
-      gasLimit: '',
-      to: '',
-      from: '',
-      value: '',
-      data: '',
-      chainId: 1,
-    };
     beforeEach(() => {
       provider = {
         provider: {
@@ -200,29 +190,10 @@ describe(' Connect', () => {
 
       await checkout.getBridgeGasEstimate({
         provider,
-        transaction,
         tokenAddress: 'NATIVE',
       });
 
       expect(getBridgeEstimatedGas).toBeCalledTimes(1);
-      expect(getBridgeFeeEstimate).toBeCalledTimes(1);
-    });
-    it('should fetch gas estimate for non-bridgeable transaction', async () => {
-      (getBridgeFeeEstimate as jest.Mock).mockResolvedValue({
-        bridgeable: false,
-      } as GetBridgeGasEstimateResult);
-
-      const checkout = new Checkout({
-        baseConfig: { environment: Environment.SANDBOX },
-      });
-
-      await checkout.getBridgeGasEstimate({
-        provider,
-        transaction,
-        tokenAddress: 'NATIVE',
-      });
-
-      expect(getBridgeEstimatedGas).not.toBeCalled();
       expect(getBridgeFeeEstimate).toBeCalledTimes(1);
     });
   });

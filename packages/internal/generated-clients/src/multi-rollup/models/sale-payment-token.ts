@@ -15,19 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import { ActivityNativeToken } from './activity-native-token';
+// May contain unused imports in some cases
+// @ts-ignore
+import { ActivityToken } from './activity-token';
+// May contain unused imports in some cases
+// @ts-ignore
 import { ContractType } from './contract-type';
-// May contain unused imports in some cases
-// @ts-ignore
-import { ERC20 } from './erc20';
-// May contain unused imports in some cases
-// @ts-ignore
-import { NativeToken } from './native-token';
 
 /**
- * @type NFTSalePaymentToken
+ * @type SalePaymentToken
  * The type of payment token
  * @export
  */
-export type NFTSalePaymentToken = ERC20 | NativeToken;
+export type SalePaymentToken = ActivityNativeToken | ActivityToken;
 
 

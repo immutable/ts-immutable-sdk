@@ -205,5 +205,17 @@ export const text = {
         },
       },
     },
+    transactionFailed: {
+      content: {
+        heading1: 'We’ll need you to confirm in your',
+        heading2: 'wallet before proceeding',
+        body1: 'When the Metamask pop up appears, be sure to',
+        body2: 'sign the transaction',
+      },
+      buttons: {
+        retry: 'Got it',
+        cancel: 'Dismiss',
+      },
+    },
   },
 };

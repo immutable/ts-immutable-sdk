@@ -37,7 +37,7 @@ export const ChainsApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * List supported chains
          * @summary List supported chains
-         * @param {string} [pageCursor] Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -87,7 +87,7 @@ export const ChainsApiFp = function(configuration?: Configuration) {
         /**
          * List supported chains
          * @summary List supported chains
-         * @param {string} [pageCursor] Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -109,7 +109,7 @@ export const ChainsApiFactory = function (configuration?: Configuration, basePat
         /**
          * List supported chains
          * @summary List supported chains
-         * @param {string} [pageCursor] Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -127,7 +127,7 @@ export const ChainsApiFactory = function (configuration?: Configuration, basePat
  */
 export interface ChainsApiListChainsRequest {
     /**
-     * Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
      * @memberof ChainsApiListChains
      */
