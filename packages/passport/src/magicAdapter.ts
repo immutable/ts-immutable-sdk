@@ -1,8 +1,9 @@
-import { EthNetworkConfiguration, Magic } from 'magic-sdk';
+import { Magic } from 'magic-sdk';
 import { OpenIdExtension } from '@magic-ext/oidc';
 import { ethers } from 'ethers';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import { PassportConfiguration } from './config';
+import { Networks } from './types';
 
 export default class MagicAdapter {
   private readonly config: PassportConfiguration;
@@ -13,7 +14,7 @@ export default class MagicAdapter {
 
   async login(
     idToken: string,
-    network: EthNetworkConfiguration,
+    network: Networks | { rpcUrl: string; chainId?: number },
   ): Promise<ethers.providers.ExternalProvider> {
     return withPassportError<ethers.providers.ExternalProvider>(async () => {
       const magicClient = new Magic(this.config.magicPublishableApiKey, {
