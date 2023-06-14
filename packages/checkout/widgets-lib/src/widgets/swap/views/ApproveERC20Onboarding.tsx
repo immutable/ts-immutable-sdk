@@ -116,32 +116,23 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       });
       return;
     }
+
     try {
       const txn = await checkout.sendTransaction({
         provider,
         transaction: data.transaction,
       });
 
-      // TODO: We want to move to the Swap loading screen here and .wait() for the transaction
-
-      const receipt = await txn.transactionResponse.wait();
-
-      if (receipt.status !== 1) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SwapWidgetViews.FAIL,
-              data: data.swapFormInfo as PrefilledSwapForm,
-              reason: 'Transaction failed',
-            },
-          },
-        });
-      }
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: SwapWidgetViews.SUCCESS },
+          view: {
+            type: SwapWidgetViews.IN_PROGRESS,
+            data: {
+              transactionResponse: txn.transactionResponse,
+              swapForm: data.swapFormInfo as PrefilledSwapForm,
+            },
+          },
         },
       });
     } catch (err: any) {
