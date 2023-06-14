@@ -56,6 +56,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const { targetLayer, web3Provider } = params;
   const { deepLink = ConnectWidgetViews.CONNECT_WALLET } = props;
   const { environment, theme } = config;
+
   const [connectState, connectDispatch] = useReducer(
     connectReducer,
     initialConnectState,

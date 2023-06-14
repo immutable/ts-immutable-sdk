@@ -37,7 +37,7 @@ export interface ImtblConnectProps
   React.HTMLAttributes<HTMLElement>,
   HTMLElement
   > {
-  providerName: string;
+  providerName?: string;
   widgetConfig?: string;
 }
 
@@ -54,6 +54,7 @@ export interface ImtblWalletProps
   > {
   walletProvider?: string;
   widgetConfig?: string;
+  injectedProvider?:boolean;
 }
 
 /**

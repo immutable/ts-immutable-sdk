@@ -16,24 +16,28 @@ export class ImmutableWallet extends ImmutableWebComponent {
   connectedCallback() {
     super.connectedCallback();
     this.walletProvider = this.getAttribute('walletProvider') as WalletProviderName;
-
-    this.renderWidget();
+    super.connectedProviderCheck().then(() => {
+      this.renderWidget();
+    }).catch(() => {
+      // console.error(err);
+    });
   }
 
   renderWidget() {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       providerName: this.walletProvider,
+      web3Provider: this.provider,
     };
 
     const walletParams: WalletWidgetParams = {
       providerName: this.walletProvider,
+      web3Provider: this.provider,
     };
 
     if (!this.reactRoot) {
       this.reactRoot = ReactDOM.createRoot(this);
     }
-
     this.reactRoot.render(
       <React.StrictMode>
         <ConnectLoader

@@ -226,7 +226,7 @@ export function ConnectLoader({
                 },
               });
             }}
-            actionText="Try Again"
+            actionText="Try Again LOADER"
           />
         </BiomeCombinedProviders>
       )}

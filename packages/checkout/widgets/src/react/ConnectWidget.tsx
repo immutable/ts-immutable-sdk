@@ -22,7 +22,7 @@ export function ConnectReact(props: ConnectReactProps): JSX.Element {
   return (
     <imtbl-connect
       widgetConfig={config}
-      providerName={providerName ?? 'metamask'}
+      providerName={providerName}
     />
   );
 }
