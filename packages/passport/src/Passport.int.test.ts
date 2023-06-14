@@ -141,7 +141,7 @@ describe('Passport', () => {
       });
       (global.fetch as jest.Mock).mockImplementation((input: RequestInfo | URL, init?: RequestInit | undefined) => {
         const expectedCall = expectedFetchCalls.shift();
-        expect(input).toEqual('/v1/transactions'); // TODO: Update once we have added Relayer URL to config
+        expect(input).toEqual('/v1/transactions'); // TODO: ID-784 Update once we have added Relayer URL to config
         expect(init).toMatchObject({
           method: 'POST',
           headers: {

@@ -30,8 +30,8 @@ export const ethRequestAccounts = async ({
 
   if (magicProvider && magicProvider.request) {
     result = await magicProvider.request({ method: 'eth_requestAccounts' });
-    // TODO: result should return counterfactual address & not Magic key
-    // TODO: Retrieve CFA from JWT, or call backend to generate CFA & store in Auth0
+    // TODO: ID-786 Retrieve counterfactual address from JWT & return here. & not Magic key
+    // TODO: ID-786 The Magic Key should not be returned as we do not want to confuse consumers.
   }
 
   return {

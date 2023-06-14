@@ -30,7 +30,7 @@ export const ethSendTransaction = async ({
   }
 
   const chainId = BigNumber.from(config.zkEvmChainId);
-  const smartContractWalletAddress = '0x7EEC32793414aAb720a90073607733d9e7B0ecD0'; // TODO - this should be a claim in the JWT
+  const smartContractWalletAddress = '0x7EEC32793414aAb720a90073607733d9e7B0ecD0'; // TODO: ID-786 this should be a claim in the JWT
   const magicWeb3Provider = new Web3Provider(magicProvider);
   const signer = magicWeb3Provider.getSigner();
   const nonce = await getNonce(magicWeb3Provider, smartContractWalletAddress);
@@ -51,7 +51,7 @@ export const ethSendTransaction = async ({
     signer,
   );
 
-  // TODO: Add support for non-native gas payments (e.g ERC20, feeTransaction initialisation must change)
+  // TODO: ID-698 Add support for non-native gas payments (e.g ERC20, feeTransaction initialisation must change)
   const feeOptions = await relayerAdapter.imGetFeeOptions(smartContractWalletAddress, signedTransaction);
   const imxFeeOption = feeOptions.find((feeOption) => feeOption.tokenSymbol === 'IMX');
   if (!imxFeeOption) {
