@@ -68,22 +68,23 @@ export function SwapButton({
 
       updateLoading(false);
 
-      if (receipt.status !== 1) {
+      if (receipt.status === 1) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SwapWidgetViews.FAIL,
-              data: data as PrefilledSwapForm,
-              reason: 'Transaction failed',
-            },
+            view: { type: SwapWidgetViews.SUCCESS },
           },
         });
+        return;
       }
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: SwapWidgetViews.SUCCESS },
+          view: {
+            type: SwapWidgetViews.FAIL,
+            data: data as PrefilledSwapForm,
+            reason: 'Transaction failed',
+          },
         },
       });
     } catch (err: any) {
@@ -104,7 +105,9 @@ export function SwapButton({
         });
         return;
       }
-      if (err.type === CheckoutErrorType.TRANSACTION_FAILED || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS) {
+      if (err.type === CheckoutErrorType.TRANSACTION_FAILED
+        || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS
+      || (err.receipt && err.receipt.status === 0)) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
@@ -117,6 +120,7 @@ export function SwapButton({
         });
         return;
       }
+
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
