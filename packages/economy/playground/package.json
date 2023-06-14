@@ -18,26 +18,40 @@
     "process": "^0.11.10",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
+    "tslib": "latest",
     "url": "^0.11.0",
     "variant-classnames": "^1.3.0",
     "vite-plugin-node-polyfills": "^0.8.2"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^7.0.10",
-    "@storybook/addon-links": "^7.0.10",
-    "@storybook/blocks": "^7.0.10",
-    "@storybook/web-components": "^7.0.10",
-    "@storybook/web-components-vite": "^7.0.10",
-    "chromatic": "^6.17.4",
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.2",
+    "@rollup/plugin-replace": "^5.0.2",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@storybook/addon-essentials": "^7.0.18",
+    "@storybook/addon-links": "^7.0.18",
+    "@storybook/blocks": "^7.0.18",
+    "@storybook/web-components": "^7.0.18",
+    "@storybook/web-components-vite": "^7.0.18",
+    "@types/node": "^18.14.2",
+    "chromatic": "^6.18.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "storybook": "^7.0.10",
+    "replace-in-file": "^7.0.1",
+    "rollup": "^3.17.2",
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "storybook": "^7.0.18",
+    "ts-node": "^10.9.1",
     "typescript": "^4.9.5",
     "vite": "^4.3.5"
   },
   "engines": {
     "node": ">=16"
   },
+  "files": [
+    "dist"
+  ],
   "license": "Apache-2.0",
   "resolutions": {
     "string-width": "4.2.2"
@@ -45,6 +59,7 @@
   "scripts": {
     "build": "storybook build",
     "build:app": "tsc && vite build",
+    "build:package": "rollup --config rollup.config.js && cp ./dist/index.js storybook-static/js/index.js && replace-in-file '/src/index.ts' '/js/index.js' ./storybook-static/iframe.html",
     "chromatic": "chromatic --exit-zero-on-changes",
     "clean": "rimraf ./dist ./.cache",
     "dev": "vite",
@@ -53,5 +68,6 @@
     "setup": "npm run clean && yarn workspace @imtbl/checkout-widgets-lib build && yarn workspace @imtbl/checkout-widgets-lib dist:sdk && cp ../../../sdk/dist/browser/checkout.js public/js/imtbl-checkout-widgets.js",
     "start": "storybook dev -p 6006"
   },
-  "type": "module"
+  "type": "module",
+  "types": "dist/index.d.ts"
 }

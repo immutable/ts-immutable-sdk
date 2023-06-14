@@ -1,5 +1,8 @@
+import { TransactionResponse } from '@ethersproject/providers';
+
 export enum SwapWidgetViews {
   SWAP = 'SWAP',
+  IN_PROGRESS = 'IN_PROGRESS',
   SUCCESS = 'SUCCESS',
   FAIL = 'FAIL',
   PRICE_SURGE = 'PRICE_SURGE',
@@ -7,6 +10,7 @@ export enum SwapWidgetViews {
 
 export type SwapWidgetView =
   | SwapView
+  | SwapInProgressView
   | { type: SwapWidgetViews.SUCCESS }
   | PriceSurgeView
   | SwapFailView;
@@ -31,4 +35,12 @@ export interface PrefilledSwapForm {
   fromAmount: string;
   fromContractAddress: string;
   toContractAddress: string;
+}
+
+interface SwapInProgressView {
+  type: SwapWidgetViews.IN_PROGRESS;
+  data: {
+    transactionResponse: TransactionResponse;
+    swapForm: PrefilledSwapForm;
+  };
 }

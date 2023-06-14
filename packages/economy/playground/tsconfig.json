@@ -6,7 +6,6 @@
     "target": "es2022",
     "module": "esnext",
     "moduleResolution": "node",
-    "allowImportingTsExtensions": true,
     "noEmit": true,
     "allowJs": false,
     "removeComments": false,
@@ -23,7 +22,8 @@
     "useDefineForClassFields": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "importHelpers": true,
   },
   "include": ["src", "src/types.ts"],
   "exclude": ["node_modules", "dist"]

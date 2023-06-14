@@ -39,6 +39,7 @@ import {
   sendSwapFailedEvent, sendSwapRejectedEvent,
   sendSwapSuccessEvent, sendSwapWidgetCloseEvent,
 } from './SwapWidgetEvents';
+import { SwapInProgress } from './views/SwapInProgress';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -183,6 +184,12 @@ export function SwapWidget(props: SwapWidgetProps) {
                 toContractAddress={viewState.view.data?.toContractAddress ?? toContractAddress}
               />
             </CryptoFiatProvider>
+          )}
+          {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (
+            <SwapInProgress
+              transactionResponse={viewState.view.data.transactionResponse}
+              swapForm={viewState.view.data.swapForm}
+            />
           )}
           {viewState.view.type === SwapWidgetViews.SUCCESS && (
             <StatusView

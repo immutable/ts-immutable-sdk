@@ -125,6 +125,11 @@ export const text = {
         text: 'Price surge',
         actionText: 'Review & try again',
       },
+      [SwapWidgetViews.IN_PROGRESS]: {
+        loading: {
+          text: 'Swap in progress',
+        },
+      },
     },
     [BridgeWidgetViews.BRIDGE]: {
       header: {
@@ -154,7 +159,8 @@ export const text = {
     [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+      body2:
+        'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
     [BridgeWidgetViews.SUCCESS]: {
       text: 'Success',
