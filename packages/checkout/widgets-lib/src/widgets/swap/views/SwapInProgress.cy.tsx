@@ -32,5 +32,6 @@ describe('SwapInProgress View', () => {
 
     cySmartGet('loading-view').should('exist');
     cySmartGet('loading-text').should('have.text', loading.text);
+    cySmartGet('footer-logo-container').should('exist');
   });
 });
