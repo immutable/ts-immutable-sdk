@@ -1,4 +1,3 @@
-import { TokenInfo } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@ethersproject/providers';
 
 export enum SwapWidgetViews {
@@ -41,7 +40,6 @@ export interface PrefilledSwapForm {
 interface SwapInProgressView {
   type: SwapWidgetViews.IN_PROGRESS;
   data: {
-    token: TokenInfo;
     transactionResponse: TransactionResponse;
     swapForm: PrefilledSwapForm;
   };

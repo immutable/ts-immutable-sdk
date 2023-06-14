@@ -1,6 +1,5 @@
 import { Box, Button } from '@biom3/react';
 import { useContext, useState } from 'react';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { text } from '../../../resources/text/textConfig';
@@ -64,26 +63,16 @@ export function SwapButton({
         provider,
         transaction: transaction.transaction,
       });
-      const receipt = await txn.transactionResponse.wait();
 
-      updateLoading(false);
-
-      if (receipt.status === 1) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: SwapWidgetViews.SUCCESS },
-          },
-        });
-        return;
-      }
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SwapWidgetViews.FAIL,
-            data: data as PrefilledSwapForm,
-            reason: 'Transaction failed',
+            type: SwapWidgetViews.IN_PROGRESS,
+            data: {
+              transactionResponse: txn.transactionResponse,
+              swapForm: data as PrefilledSwapForm,
+            },
           },
         },
       });
