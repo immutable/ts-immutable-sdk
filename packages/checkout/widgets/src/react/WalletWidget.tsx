@@ -1,4 +1,5 @@
 import React from 'react';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 
 /**
  * Interface representing the props for the Wallet Widget component.
@@ -6,8 +7,7 @@ import React from 'react';
  * (default: "metamask").
  */
 export interface WalletReactProps {
-  providerPreference?: string;
-  useConnectWidget?: boolean;
+  walletProvider?: WalletProviderName;
 }
 
 /**
@@ -17,8 +17,7 @@ export interface WalletReactProps {
  */
 export function WalletReact(props: WalletReactProps) {
   const {
-    providerPreference,
-    useConnectWidget,
+    walletProvider,
   } = props;
 
   const config = window.ImtblCheckoutWidgetConfig;
@@ -26,8 +25,7 @@ export function WalletReact(props: WalletReactProps) {
   return (
     <imtbl-wallet
       widgetConfig={config}
-      useConnectWidget={useConnectWidget?.toString()}
-      providerPreference={providerPreference ?? 'metamask'}
+      walletProvider={walletProvider ?? WalletProviderName.METAMASK}
     />
   );
 }

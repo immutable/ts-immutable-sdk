@@ -1,4 +1,4 @@
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 
 /**
  * Enum representing possible Connect Widget event types.
@@ -24,7 +24,7 @@ export type ConnectEvent<T> = {
  * @property {ConnectionProviders} providerPreference - The user's preferred connection provider.
  */
 export type ConnectionSuccess = {
-  providerPreference: ConnectionProviders;
+  provider?: Web3Provider;
 };
 
 /**

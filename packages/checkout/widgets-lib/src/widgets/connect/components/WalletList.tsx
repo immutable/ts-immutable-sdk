@@ -3,7 +3,7 @@ import {
   WalletFilterTypes,
   WalletFilter,
   WalletInfo,
-  ConnectionProviders,
+  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { useContext, useState, useEffect } from 'react';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
@@ -39,19 +39,34 @@ export function WalletList(props: WalletListProps) {
     getAllowedWallets();
   }, [checkout, excludeWallets, walletFilterTypes]);
 
-  const onWalletClick = (providerPreference: ConnectionProviders) => {
-    connectDispatch({
-      payload: {
-        type: ConnectActions.SET_PROVIDER_PREFERENCE,
-        providerPreference,
-      },
-    });
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type: ConnectWidgetViews.READY_TO_CONNECT },
-      },
-    });
+  const onWalletClick = async (providerName: WalletProviderName) => {
+    if (checkout) {
+      try {
+        const connectResult = await checkout.createProvider({
+          providerName,
+        });
+
+        connectDispatch({
+          payload: {
+            type: ConnectActions.SET_PROVIDER,
+            provider: connectResult.provider,
+          },
+        });
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: ConnectWidgetViews.READY_TO_CONNECT },
+          },
+        });
+      } catch (err: any) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: ConnectWidgetViews.FAIL, reason: 'Unable to create provider' },
+          },
+        });
+      }
+    }
   };
 
   return (

@@ -2,10 +2,10 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   Checkout,
-  ConnectionProviders,
-  GetNetworkParams,
+  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { useEffect, useReducer } from 'react';
+import { Web3Provider } from '@ethersproject/providers';
 import {
   initialWalletState,
   WalletActions,
@@ -16,7 +16,6 @@ import { WalletBalances } from './views/WalletBalances';
 import { ErrorView } from '../../components/Error/ErrorView';
 import { LoadingView } from '../../components/Loading/LoadingView';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
-import { zkEVMNetwork } from '../../lib/networkUtils';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import {
   viewReducer,
@@ -33,16 +32,19 @@ import { CoinInfo } from './views/CoinInfo';
 
 export interface WalletWidgetProps {
   params: WalletWidgetParams;
-  config: StrongCheckoutWidgetsConfig
+  config: StrongCheckoutWidgetsConfig,
+  web3Provider?: Web3Provider
 }
 
 export interface WalletWidgetParams {
-  providerPreference?: ConnectionProviders;
+  providerName?: WalletProviderName;
+  web3Provider?: Web3Provider
 }
 
 export function WalletWidget(props: WalletWidgetProps) {
-  const { params, config } = props;
-  const { providerPreference } = params;
+  const { params, config, web3Provider } = props;
+  const { providerName } = params;
+
   const {
     environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
@@ -56,6 +58,17 @@ export function WalletWidget(props: WalletWidgetProps) {
     walletReducer,
     initialWalletState,
   );
+
+  useEffect(() => {
+    if (web3Provider) {
+      walletDispatch({
+        payload: {
+          type: WalletActions.SET_PROVIDER,
+          provider: web3Provider,
+        },
+      });
+    }
+  }, [web3Provider]);
 
   const { checkout } = walletState;
 
@@ -81,35 +94,18 @@ export function WalletWidget(props: WalletWidgetProps) {
 
   useEffect(() => {
     (async () => {
-      if (!checkout) return;
+      if (!checkout || !web3Provider) return;
 
-      let provider;
-      let network;
-
-      const connectResult = await checkout.connect({
-        providerPreference: providerPreference ?? ConnectionProviders.METAMASK,
+      const getNetworkResult = await checkout.getNetworkInfo({
+        provider: web3Provider,
       });
 
-      provider = connectResult.provider;
-      network = connectResult.network;
-
-      const isSupportedNetwork = (
-        await checkout.getNetworkInfo({ provider } as GetNetworkParams)
-      ).isSupported;
-
-      if (!isSupportedNetwork) {
-        const result = await checkout.switchNetwork({
-          provider,
-          chainId: zkEVMNetwork(checkout.config.environment),
-        });
-        provider = result.provider;
-        network = result.network;
-      }
+      const network = getNetworkResult;
 
       walletDispatch({
         payload: {
           type: WalletActions.SET_PROVIDER,
-          provider,
+          provider: web3Provider,
         },
       });
 
@@ -127,7 +123,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         },
       });
     })();
-  }, [providerPreference, checkout]);
+  }, [providerName, checkout]);
 
   const errorAction = () => {
     // TODO: please remove or if necessary keep the eslint ignore

@@ -1,23 +1,23 @@
 import React from 'react';
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 
 export class ImmutableConnect extends ImmutableWebComponent {
-  providerPreference = ConnectionProviders.METAMASK;
+  providerName = WalletProviderName.METAMASK;
 
   connectedCallback() {
     super.connectedCallback();
-    this.providerPreference = this.getAttribute(
-      'providerPreference',
-    ) as ConnectionProviders;
+    this.providerName = this.getAttribute(
+      'providerName',
+    ) as WalletProviderName;
     this.renderWidget();
   }
 
   renderWidget() {
     const connectParams: ConnectWidgetParams = {
-      providerPreference: this.providerPreference,
+      providerName: this.providerName,
     };
 
     if (!this.reactRoot) {

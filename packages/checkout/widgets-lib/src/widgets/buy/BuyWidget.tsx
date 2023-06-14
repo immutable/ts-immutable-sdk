@@ -8,6 +8,7 @@ import {
   Checkout,
   ConnectionProviders,
   Transaction,
+  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
@@ -216,12 +217,19 @@ export function BuyWidget({
 
   useEffect(() => {
     const buyWidgetSetup = async () => {
+      const connectResult = await checkout.createProvider({
+        providerName: WalletProviderName.METAMASK,
+      });
+
+      const getNetworkResult = await checkout.getNetworkInfo({
+        provider: connectResult.provider,
+      });
+
       if (
-        (await checkout.checkIsWalletConnected({ providerPreference }))
+        (await checkout.checkIsWalletConnected({ provider: connectResult.provider }))
           .isConnected
       ) {
-        const connectResult = await checkout.connect({ providerPreference });
-        const { chainId } = connectResult.network;
+        const { chainId } = getNetworkResult;
         const theProvider = connectResult.provider;
         const ordrbk = new Orderbook(theProvider);
         // TODO: Variable is declared in the upper scope

@@ -6,7 +6,7 @@ import React from 'react';
  * (default: "metamask").
  */
 export interface ConnectReactProps {
-  providerPreference?: string;
+  providerName?: string;
 }
 
 /**
@@ -15,14 +15,14 @@ export interface ConnectReactProps {
  * @returns {JSX.Element} - The rendered Connect Widget component.
  */
 export function ConnectReact(props: ConnectReactProps): JSX.Element {
-  const { providerPreference } = props;
+  const { providerName } = props;
 
   const config = window.ImtblCheckoutWidgetConfig;
 
   return (
     <imtbl-connect
       widgetConfig={config}
-      providerPreference={providerPreference ?? 'metamask'}
+      providerName={providerName ?? 'metamask'}
     />
   );
 }

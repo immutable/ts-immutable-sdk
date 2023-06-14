@@ -4,14 +4,14 @@ import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
 
 export interface ConnectState {
   checkout: Checkout | null;
-  provider: Web3Provider | null;
+  provider: Web3Provider | undefined;
   providerPreference: ConnectionProviders | null;
   sendCloseEvent: () => void;
 }
 
 export const initialConnectState: ConnectState = {
   checkout: null,
-  provider: null,
+  provider: undefined,
   providerPreference: null,
   sendCloseEvent: () => {},
 };

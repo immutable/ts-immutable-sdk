@@ -1,16 +1,16 @@
-import { ConnectionProviders, WalletInfo } from '@imtbl/checkout-sdk';
+import { ConnectionProviders, WalletInfo, WalletProviderName } from '@imtbl/checkout-sdk';
 import { MenuItem } from '@biom3/react';
 import { text } from '../../../resources/text/textConfig';
 
 export interface WalletProps {
-  onWalletClick: (providerPreference: ConnectionProviders) => void;
+  onWalletClick: (providerName: WalletProviderName) => void;
   wallet: WalletInfo;
 }
 export function WalletItem(props: WalletProps) {
   const { wallet, onWalletClick } = props;
   const { wallets } = text;
 
-  const walletText = wallets[wallet.connectionProvider];
+  const walletText = wallets[wallet.providerName];
   const logo = {
     [ConnectionProviders.METAMASK]: 'MetaMaskSymbol',
   };
@@ -23,13 +23,13 @@ export function WalletItem(props: WalletProps) {
     <>
       {walletText && (
         <MenuItem
-          testId={`wallet-list-${wallet.connectionProvider}`}
+          testId={`wallet-list-${wallet.providerName}`}
           size="medium"
           emphasized
-          onClick={() => onWalletClick(wallet.connectionProvider)}
+          onClick={() => onWalletClick(wallet.providerName)}
         >
           <MenuItem.FramedLogo
-            logo={logo[wallet.connectionProvider] as any}
+            logo={logo[wallet.providerName] as any}
             sx={{
               width: 'base.icon.size.500',
               backgroundColor: 'base.color.translucent.container.200',
@@ -37,11 +37,11 @@ export function WalletItem(props: WalletProps) {
             }}
           />
           <MenuItem.Label size="medium">
-            {wallets[wallet.connectionProvider].heading}
+            {wallets[wallet.providerName].heading}
           </MenuItem.Label>
           <MenuItem.IntentIcon />
           <MenuItem.Caption>
-            {wallets[wallet.connectionProvider].description}
+            {wallets[wallet.providerName].description}
           </MenuItem.Caption>
         </MenuItem>
       )}

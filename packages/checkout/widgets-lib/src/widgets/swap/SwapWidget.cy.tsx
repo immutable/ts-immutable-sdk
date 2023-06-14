@@ -103,7 +103,7 @@ describe('SwapWidget tests', () => {
 
   it('should show swap widget on mount', () => {
     const params = {
-      providerPreference: 'metamask',
+      providerName: 'metamask',
     } as SwapWidgetParams;
     const config: StrongCheckoutWidgetsConfig = {
       environment: Environment.SANDBOX,
@@ -127,7 +127,7 @@ describe('SwapWidget tests', () => {
 
   it('should set fromTokens to user balances filtered by the token allow list', () => {
     const params = {
-      providerPreference: 'metamask',
+      providerName: 'metamask',
     } as SwapWidgetParams;
     const config: StrongCheckoutWidgetsConfig = {
       environment: Environment.SANDBOX,

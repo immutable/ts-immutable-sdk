@@ -9,7 +9,7 @@ import {
 } from '@imtbl/checkout-widgets';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider } from '@ethersproject/providers';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Environment } from '@imtbl/config';
 
 function ExampleUI() {
@@ -17,6 +17,7 @@ function ExampleUI() {
     theme: WidgetTheme.DARK,
     environment: Environment.SANDBOX,
   });
+  
   const [theme, setTheme] = useState(WidgetTheme.DARK);
 
   const widgetsConfig2: CheckoutWidgetsConfig = {

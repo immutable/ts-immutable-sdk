@@ -1,4 +1,4 @@
-import { ConnectionProviders } from './connect';
+import { WalletProviderName } from './provider';
 
 /**
  * Enum representing different wallet actions.
@@ -16,7 +16,7 @@ export enum WalletAction {
  * @property {ConnectionProviders} connectionProvider - The connection provider to filter wallets by.
  */
 export interface WalletFilter {
-  connectionProvider: ConnectionProviders;
+  providerName: WalletProviderName;
 }
 
 /**
@@ -37,7 +37,7 @@ export interface GetWalletAllowListParams {
  * @property {string} icon - The URL/data:image of an icon for the wallet.
  */
 export interface WalletInfo {
-  connectionProvider: ConnectionProviders;
+  providerName: WalletProviderName;
   name: string;
   description: string;
   icon: string;
