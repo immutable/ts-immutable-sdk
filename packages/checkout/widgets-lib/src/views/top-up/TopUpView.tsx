@@ -48,7 +48,7 @@ export function TopUpView({
   const { walletState } = useContext(WalletContext);
   const { checkout } = walletState;
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
-  const { conversions } = cryptoFiatState;
+  const { conversions, fiatSymbol } = cryptoFiatState;
 
   useTokenSymbols(checkout, cryptoFiatDispatch);
   const [swapFeesInFiat, setSwapFeesInFiat] = useState('-.--');
@@ -154,7 +154,7 @@ export function TopUpView({
         <MenuItem.Caption>
           {caption}
           <br />
-          {`${subcaption} ${fees ? ` $${fees} USD` : ''}`}
+          {`${subcaption} ${fees ? ` $${fees} ${fiatSymbol.toLocaleUpperCase()}` : ''}`}
         </MenuItem.Caption>
       </MenuItem>
     </Box>
