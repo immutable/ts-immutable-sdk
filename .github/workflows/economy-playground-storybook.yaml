@@ -34,7 +34,7 @@ jobs:
       - name: Build Economy SDK
         run: yarn workspace @imtbl/economy build
 
-      - name: Build Economy Playground
+      - name: Build Storybook Economy Playground
         run: yarn workspace @imtbl/economy-playground build
 
       - name: Build Package Economy Playground
@@ -44,4 +44,4 @@ jobs:
         run: cd packages/economy/playground
 
       - name: Publish Economy Playground to Chromatic
-        run: npx chromatic --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} --build-script-name="build" --storybook-build-dir="/packages/economy/playground/storybook-static" --exit-zero-on-changes
+        run: npx chromatic --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} -d "../../packages/economy/playground/storybook-static" --exit-zero-on-changes
