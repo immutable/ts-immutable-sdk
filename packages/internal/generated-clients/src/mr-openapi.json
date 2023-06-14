@@ -1554,12 +1554,12 @@
             "type": "string",
             "example": "ARZ3NDEKTSV4RRFFQ69G5FAV"
           },
-          "buyer_address": {
+          "to": {
             "description": "The account address of buyer",
             "type": "string",
             "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
           },
-          "seller_address": {
+          "from": {
             "description": "The account address of seller",
             "type": "string",
             "example": "0xbD6cFcf93474De653d7B42b346c7c25d1F9c559C"
@@ -1580,8 +1580,8 @@
         "required": [
           "activity_type",
           "order_id",
-          "buyer_address",
-          "seller_address",
+          "to",
+          "from",
           "quantity",
           "asset",
           "payment"

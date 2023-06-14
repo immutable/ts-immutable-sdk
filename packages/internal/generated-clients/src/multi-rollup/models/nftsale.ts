@@ -46,13 +46,13 @@ export interface NFTSale {
      * @type {string}
      * @memberof NFTSale
      */
-    'buyer_address': string;
+    'to': string;
     /**
      * The account address of seller
      * @type {string}
      * @memberof NFTSale
      */
-    'seller_address': string;
+    'from': string;
     /**
      * The quantity of tokens sold
      * @type {number}
