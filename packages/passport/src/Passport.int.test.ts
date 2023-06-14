@@ -1,0 +1,188 @@
+import { Magic } from 'magic-sdk';
+import { UserManager } from 'oidc-client-ts';
+import { TransactionRequest } from '@ethersproject/providers';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { Passport } from './Passport';
+import { RequestArguments } from './zkEvmProvider/types';
+
+jest.mock('magic-sdk');
+jest.mock('oidc-client-ts');
+
+const mockOidcUser = {
+  profile: {
+    sub: 'sub123',
+    email: 'test@example.com',
+    nickname: 'test',
+    passport: {
+      ether_key: '0x001',
+    },
+  },
+  expired: false,
+  id_token: 'idToken123',
+  access_token: 'accessToken123',
+  refresh_token: 'refreshToken123',
+};
+
+describe('Passport', () => {
+  const mockSigninPopup = jest.fn();
+  const mockGetUser = jest.fn();
+  const mockLoginWithOidc = jest.fn();
+  const mockRequest = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (UserManager as jest.Mock).mockImplementation(() => ({
+      signinPopup: mockSigninPopup,
+      getUser: mockGetUser,
+    }));
+    (Magic as jest.Mock).mockImplementation(() => ({
+      openid: {
+        loginWithOIDC: mockLoginWithOidc,
+      },
+      rpcProvider: {
+        request: mockRequest,
+      },
+    }));
+  });
+
+  let fetch: any;
+  beforeAll(() => {
+    fetch = global.fetch;
+    global.fetch = jest.fn();
+  });
+
+  afterAll(() => {
+    global.fetch = fetch;
+  });
+
+  describe('zkEvmProvider', () => {
+    it('successfully initialises the zkEvm provider and sends a transaction', async () => {
+      const smartContractWalletAddress = '0x7EEC32793414aAb720a90073607733d9e7B0ecD0';
+      const transferToAddress = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
+      const relayerId = '0x745';
+      const transactionHash = '0x867';
+      const chainId = '13372';
+
+      const expectedRequestCalls: { method: string, returnValue: any }[] = [
+        { method: 'eth_requestAccounts', returnValue: [smartContractWalletAddress] },
+        { method: 'eth_chainId', returnValue: chainId },
+        { method: 'eth_getCode', returnValue: 0 },
+        { method: 'eth_accounts', returnValue: [smartContractWalletAddress] },
+        { method: 'personal_sign', returnValue: '0x7a9a1628000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000180000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000f42400000000000000000000000003c44cdddb6a900fa2b585dd299e03d12fa4293bc00000000000000000000000000000000000000000000000006f05b59d3b2000000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004600010001904a25850e09260d88f3fc46fab4901e7c979fc583fe9d30a12c51ba5636355a1351b8ce823f765568d8b88cddd9c8ede9f1cc17dfd7ca953e05ecbbbdf8f51e1c020000000000000000000000000000000000000000000000000000' },
+        { method: 'eth_accounts', returnValue: [smartContractWalletAddress] },
+        { method: 'personal_sign', returnValue: '0x7a9a1628000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000180000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000f42400000000000000000000000003c44cdddb6a900fa2b585dd299e03d12fa4293bc00000000000000000000000000000000000000000000000006f05b59d3b2000000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004600010001904a25850e09260d88f3fc46fab4901e7c979fc583fe9d30a12c51ba5636355a1351b8ce823f765568d8b88cddd9c8ede9f1cc17dfd7ca953e05ecbbbdf8f51e1c020000000000000000000000000000000000000000000000000000' },
+      ];
+      const expectedFetchCalls: { payload: object, returnValue: any }[] = [
+        {
+          payload: {
+            id: 1,
+            jsonrpc: '2.0',
+            method: 'im_getFeeOptions',
+            params: [{
+              userAddress: smartContractWalletAddress,
+              data: expect.any(String),
+              chainId,
+            }],
+          },
+          returnValue: {
+            id: 1,
+            jsonrpc: '2.0',
+            result: [
+              {
+                token_price: '0x1dfd14000',
+                token_symbol: 'IMX',
+                token_decimals: 18,
+                token_address: '0x123',
+              },
+            ],
+          },
+        },
+        {
+          payload: {
+            id: 1,
+            jsonrpc: '2.0',
+            method: 'eth_sendTransaction',
+            params: [{
+              to: transferToAddress,
+              data: expect.any(String),
+              chainId,
+            }],
+          },
+          returnValue: {
+            id: 1,
+            jsonrpc: '2.0',
+            result: relayerId,
+          },
+        },
+        {
+          payload: {
+            id: 1,
+            jsonrpc: '2.0',
+            method: 'im_getTransactionByHash',
+            params: [relayerId],
+          },
+          returnValue: {
+            id: 1,
+            jsonrpc: '2.0',
+            result: {
+              status: 'SUBMITTED',
+              chainId,
+              relayerId,
+              hash: transactionHash,
+            },
+          },
+        },
+      ];
+
+      mockRequest.mockImplementation(({ method }: RequestArguments) => {
+        const expectedCall = expectedRequestCalls.shift();
+        expect(method).toEqual(expectedCall?.method);
+        return Promise.resolve(expectedCall?.returnValue);
+      });
+      (global.fetch as jest.Mock).mockImplementation((input: RequestInfo | URL, init?: RequestInit | undefined) => {
+        const expectedCall = expectedFetchCalls.shift();
+        expect(input).toEqual('/v1/transactions'); // TODO: Update once we have added Relayer URL to config
+        expect(init).toMatchObject({
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        expect(JSON.parse(init?.body as string)).toMatchObject(expectedCall?.payload!);
+        return Promise.resolve({
+          json: () => Promise.resolve(expectedCall?.returnValue),
+        });
+      });
+      mockSigninPopup.mockResolvedValue(mockOidcUser);
+      mockGetUser.mockResolvedValue(mockOidcUser);
+
+      const passport = new Passport({
+        baseConfig: new ImmutableConfiguration({
+          environment: Environment.SANDBOX,
+        }),
+        audience: 'platform_api',
+        clientId: 'clientId123',
+        logoutRedirectUri: 'https://example.com/logout',
+        redirectUri: 'https://example.com/login',
+        scope: 'openid offline_access profile email transact',
+      });
+      const zkEvmProvider = passport.connectEvm();
+
+      const accounts = await zkEvmProvider.request({
+        method: 'eth_requestAccounts',
+      });
+      const transaction: TransactionRequest = {
+        to: transferToAddress,
+        value: '500000000000000000',
+        data: '0x',
+      };
+      const result = await zkEvmProvider.request({
+        method: 'eth_sendTransaction',
+        params: [transaction],
+      });
+
+      expect(accounts).toEqual([smartContractWalletAddress]);
+      expect(result).toEqual(transactionHash);
+    });
+  });
+});

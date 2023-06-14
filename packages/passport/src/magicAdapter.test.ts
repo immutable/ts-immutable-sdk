@@ -9,10 +9,10 @@ const loginWithOIDCMock:jest.MockedFunction<(args: LoginWithOpenIdParams) => Pro
 
 const rpcProvider = {};
 
+jest.mock('magic-sdk');
 jest.mock('@magic-ext/oidc', () => ({
   OpenIdExtension: jest.fn(),
 }));
-jest.mock('magic-sdk');
 
 describe('MagicWallet', () => {
   let magicWallet: MagicAdapter;

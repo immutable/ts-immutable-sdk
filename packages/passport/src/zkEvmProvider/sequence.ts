@@ -45,7 +45,7 @@ export function digestOfTransactionsAndNonce(nonce: BigNumberish, sequenceTransa
 
 export const getNonce = async (magicWeb3Provider: Web3Provider, smartContractWalletAddress: string) => {
   const code = await magicWeb3Provider.getCode(smartContractWalletAddress);
-  if (code) {
+  if (code !== '0x00') {
     const contract = new ethers.Contract(
       smartContractWalletAddress,
       walletContracts.mainModule.abi,

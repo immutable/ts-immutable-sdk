@@ -30,7 +30,7 @@ export const ethSendTransaction = async ({
   }
 
   const chainId = BigNumber.from(config.zkEvmChainId);
-  const smartContractWalletAddress = '0x123'; // TODO - this should be a claim in the JWT
+  const smartContractWalletAddress = '0x7EEC32793414aAb720a90073607733d9e7B0ecD0'; // TODO - this should be a claim in the JWT
   const magicWeb3Provider = new Web3Provider(magicProvider);
   const signer = magicWeb3Provider.getSigner();
   const nonce = await getNonce(magicWeb3Provider, smartContractWalletAddress);

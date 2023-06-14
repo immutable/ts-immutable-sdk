@@ -29,10 +29,9 @@ export const ethRequestAccounts = async ({
   }
 
   if (magicProvider && magicProvider.request) {
-    const response = await magicProvider.request({ method: 'eth_requestAccounts' });
+    result = await magicProvider.request({ method: 'eth_requestAccounts' });
     // TODO: result should return counterfactual address & not Magic key
     // TODO: Retrieve CFA from JWT, or call backend to generate CFA & store in Auth0
-    result = response.result;
   }
 
   return {

@@ -108,7 +108,7 @@ export class PassportConfiguration {
           this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
           this.passportDomain = 'https://passport.sandbox.immutable.com';
           this.imxPublicApiDomain = 'https://api.sandbox.immutable.com';
-          this.zkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com/';
+          this.zkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com';
           this.zkEvmChainId = '13372';
           this.relayerUrl = ''; // TODO
           break;
