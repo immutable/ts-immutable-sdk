@@ -20,7 +20,7 @@ export const text = {
     [ConnectWidgetViews.READY_TO_CONNECT]: {
       body: {
         heading: 'Check for the pop-up from MetaMask',
-        content: 'Follow the prompts in the Metamask popup to connect',
+        content: 'Follow the prompts in the MetaMask popup to connect',
       },
       footer: {
         buttonText1: 'Ready to connect',
@@ -31,7 +31,7 @@ export const text = {
       eth: {
         heading:
           "To move your coins, you'll need to switch to the Sepolia network",
-        body: "You'll be prompted to switch networks in Metamask. You'll be able to switch back when needed.",
+        body: "You'll be prompted to switch networks in MetaMask. You'll be able to switch back when needed.",
         button: {
           text: 'Ready to Switch',
           retryText: 'Try Again',
@@ -135,7 +135,7 @@ export const text = {
       approveSwap: {
         content: {
           heading: "Now you'll just need to approve the transaction",
-          body: 'Follow the prompts in Metamask.',
+          body: 'Follow the prompts in MetaMask.',
         },
         footer: {
           buttonText: 'Okay',
@@ -240,7 +240,7 @@ export const text = {
       content: {
         heading1: 'We’ll need you to confirm in your',
         heading2: 'wallet before proceeding',
-        body1: 'When the Metamask pop up appears, be sure to',
+        body1: 'When the MetaMask pop up appears, be sure to',
         body2: 'sign the transaction',
       },
       buttons: {
