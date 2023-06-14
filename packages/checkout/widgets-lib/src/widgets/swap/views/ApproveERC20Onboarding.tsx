@@ -52,8 +52,6 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const handleApproveSpendingClick = useCallback(async () => {
     if (!checkout || !provider) {
-      // if this happens there is something wrong
-
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -107,7 +105,15 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
   const handleApproveSwapClick = useCallback(async () => {
     if (!checkout || !provider) {
-      console.error('either no checkout or provider');
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.ERROR_VIEW,
+            error: new Error('No checkout object or no provider object found'),
+          },
+        },
+      });
       return;
     }
     try {
