@@ -4,7 +4,8 @@ import {
 import {
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-widgets';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
@@ -15,6 +16,10 @@ import {
 } from '../../lib/orchestrationEvents';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { WalletContext } from '../../widgets/wallet/context/WalletContext';
+import { getBridgeFeeEstimation, getSwapFeeEstimation } from '../../lib/feeEstimation';
+import { CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
+import { useTokenSymbols } from '../../lib/hooks/useTokenSymbols';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
@@ -40,6 +45,14 @@ export function TopUpView({
   const { header, topUpOptions } = text.views[SharedViews.TOP_UP_VIEW];
   const { onramp, swap, bridge } = topUpOptions;
   const { viewDispatch } = useContext(ViewContext);
+  const { walletState } = useContext(WalletContext);
+  const { checkout } = walletState;
+  const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  const { conversions } = cryptoFiatState;
+
+  useTokenSymbols(checkout, cryptoFiatDispatch);
+  const [swapFeesInFiat, setSwapFeesInFiat] = useState('-.--');
+  const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('-.--');
 
   const onClickOnramp = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
@@ -50,6 +63,30 @@ export function TopUpView({
       amount: amount ?? '',
     });
   };
+
+  useEffect(() => {
+    if (!checkout) return;
+
+    (async () => {
+      const swapEstimate = await checkout.gasEstimate({
+        gasEstimateType: GasEstimateType.SWAP,
+      }) as GasEstimateSwapResult;
+      const swapFeeInFiat = getSwapFeeEstimation(
+        swapEstimate,
+        conversions,
+      );
+      setSwapFeesInFiat(swapFeeInFiat.toString());
+
+      const bridgeEstimate = await checkout.gasEstimate({
+        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+      }) as GasEstimateBridgeToL2Result;
+      const bridgeFeeInFiat = getBridgeFeeEstimation(
+        bridgeEstimate,
+        conversions,
+      );
+      setBridgeFeesInFiat(bridgeFeeInFiat.toString());
+    })();
+  }, [checkout, conversions]);
 
   const onClickSwap = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT) {
@@ -98,6 +135,7 @@ export function TopUpView({
     caption: string,
     subcaption: string,
     onClick: () => void,
+    fees?: string,
   ) => (
     <Box sx={{ paddingY: '1px' }}>
       <MenuItem
@@ -116,7 +154,7 @@ export function TopUpView({
         <MenuItem.Caption>
           {caption}
           <br />
-          {subcaption}
+          {`${subcaption} ${fees ? ` $${fees} USD` : ''}`}
         </MenuItem.Caption>
       </MenuItem>
     </Box>
@@ -153,6 +191,7 @@ export function TopUpView({
             swap.caption,
             swap.subcaption,
             onClickSwap,
+            swapFeesInFiat,
           )}
           {showBridgeOption && renderMenuItem(
             'bridge',
@@ -161,6 +200,7 @@ export function TopUpView({
             bridge.caption,
             bridge.subcaption,
             onClickBridge,
+            bridgeFeesInFiat,
           )}
         </Box>
       </Box>
