@@ -1,12 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { ethers } from 'ethers';
-import {
-  BridgeConfiguration,
-  ETH_MAINNET_TO_ZKEVM_MAINNET,
-  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
-  TokenBridge,
-} from '@imtbl/bridge-sdk';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { Environment } from '@imtbl/config';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
@@ -14,6 +8,7 @@ import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
 import * as gasEstimate from './gasEstimate';
+import * as instance from './instance';
 import {
   ChainId,
   CheckConnectionParams,
@@ -48,7 +43,8 @@ import {
 } from './gasEstimate/bridgeGasEstimate';
 import {
   GasEstimateParams,
-  GasEstimateResult,
+  GasEstimateSwapResult,
+  GasEstimateBridgeToL2Result,
   GetBridgeGasEstimateParams,
   GetBridgeGasEstimateResult,
 } from './types/gasEstimate';
@@ -225,11 +221,23 @@ export class Checkout {
   }
 
   /**
-   * todo: fill in this
-   * @param {GasEstimateParams} - The params required to estimate gas
+   * Estimates the gas to perform an action.
+   * @param {GasEstimateParams} params - The params required to calculate a gas estimate
+   * @returns The gas estimate for the given action.
    */
-  public async gasEstimate(params: GasEstimateParams): Promise<GasEstimateResult> {
-    return await gasEstimate.gasServiceEstimator(params.gasEstimate);
+  public async gasEstimate(
+    params: GasEstimateParams,
+  ): Promise<GasEstimateSwapResult | GasEstimateBridgeToL2Result> {
+    this.readOnlyProviders = await createReadOnlyProviders(
+      this.config,
+      this.readOnlyProviders,
+    );
+
+    return await gasEstimate.gasServiceEstimator(
+      params.gasEstimateType,
+      this.readOnlyProviders,
+      this.config.environment,
+    );
   }
 
   /**
@@ -248,7 +256,16 @@ export class Checkout {
       ? ChainId.IMTBL_ZKEVM_TESTNET
       : ChainId.IMTBL_ZKEVM_DEVNET;
 
-    const tokenBridge = await this.getBridgeInstance(fromChainId, toChainId);
+    this.readOnlyProviders = await createReadOnlyProviders(
+      this.config,
+      this.readOnlyProviders,
+    );
+    const tokenBridge = await instance.createBridgeInstance(
+      fromChainId,
+      toChainId,
+      this.readOnlyProviders,
+      this.config.environment,
+    );
 
     const result: GetBridgeGasEstimateResult = {};
 
@@ -268,46 +285,5 @@ export class Checkout {
     );
 
     return result;
-  }
-
-  private async getBridgeInstance(
-    fromChainId: ChainId,
-    toChainId: ChainId,
-  ): Promise<TokenBridge> {
-    this.readOnlyProviders = await createReadOnlyProviders(
-      this.config,
-      this.readOnlyProviders,
-    );
-
-    const rootChainProvider = this.readOnlyProviders.get(fromChainId);
-    const childChainProvider = this.readOnlyProviders.get(toChainId);
-
-    if (!rootChainProvider) {
-      throw new CheckoutError(
-        `Chain:${fromChainId} is not a supported chain`,
-        CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
-      );
-    }
-    if (!childChainProvider) {
-      throw new CheckoutError(
-        `Chain:${toChainId} is not a supported chain`,
-        CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
-      );
-    }
-
-    const bridgeConfig = new BridgeConfiguration({
-      baseConfig: new ImmutableConfiguration({
-        environment: this.config.environment,
-      }),
-      bridgeInstance:
-        this.config.environment === Environment.PRODUCTION
-          ? ETH_MAINNET_TO_ZKEVM_MAINNET
-          : ETH_SEPOLIA_TO_ZKEVM_DEVNET,
-
-      rootProvider: rootChainProvider,
-      childProvider: childChainProvider,
-    });
-
-    return new TokenBridge(bridgeConfig);
   }
 }

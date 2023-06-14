@@ -1,82 +1,155 @@
 import { BigNumber, utils } from 'ethers/lib/ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
-import { Exchange } from '@imtbl/dex-sdk';
+import { ethers } from 'ethers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { ChainId } from '../types';
-import { getBridgeEstimatedGas } from './bridgeGasEstimate';
-import { GasEstimate, GasEstimateResult, GasEstimateType } from '../types/gasEstimate';
+import { getBridgeEstimatedGas, getBridgeFeeEstimate } from './bridgeGasEstimate';
+import { GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType } from '../types/gasEstimate';
+import * as instance from '../instance';
 
-const gasFeeEstimateAddresses = new Map<Environment, any>([
+interface GasEstimateTokenAddresses {
+  bridgeToL2Addresses: {
+    gasTokenAddress: string;
+    tokenToBridgeL2Address: string;
+  };
+  swapAddresses: {
+    tokenInAddress: string;
+    tokenOutAddress: string;
+  };
+}
+
+// Token addresses used for creating dummy requests to estimate gas fees
+const gasFeeEstimateAddresses = new Map<Environment, GasEstimateTokenAddresses>([
   [
     Environment.PRODUCTION, {
-      bridgeToL2Address: '', // todo: switch to NATIVE string
-      swap: {
-        // todo: Replace with actual production addresses
-        fromAddress: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE', // FUN
-        toAddress: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2', // DEX
+      bridgeToL2Addresses: {
+        gasTokenAddress: 'NATIVE',
+        tokenToBridgeL2Address: 'NATIVE',
+      },
+      swapAddresses: {
+        // todo: Replace with actual production addresses // todo: addresses causing gitleaks to fail
+        tokenInAddress: '', // FUN
+        tokenOutAddress: '', // DEX
       },
     },
   ],
   [
     Environment.SANDBOX, {
-      bridgeL2Address: '', // todo: switch to NATIVE string
-      swap: {
-        fromAddress: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE', // FUN
-        toAddress: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2', // DEX
+      bridgeToL2Addresses: {
+        gasTokenAddress: 'NATIVE',
+        tokenToBridgeL2Address: 'NATIVE',
+      },
+      swapAddresses: {
+        // todo: addresses causing gitleaks to fail
+        tokenInAddress: '', // FUN
+        tokenOutAddress: '', // DEX
       },
     },
   ],
 ]);
 
-async function bridgeL2GasEstimator(provider: Web3Provider, environment: Environment): Promise<GasEstimateResult> {
-  const chainId = environment === Environment.PRODUCTION ? ChainId.ETHEREUM : ChainId.SEPOLIA;
-  const gasFeeEstimateAddress = gasFeeEstimateAddresses.get(environment).bridgeL2Address;
+async function bridgeToL2GasEstimator(
+  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  environment: Environment,
+): Promise<GasEstimateBridgeToL2Result> {
+  const fromChainId = environment === Environment.PRODUCTION ? ChainId.ETHEREUM : ChainId.SEPOLIA;
+  const toChainId = environment === Environment.PRODUCTION ? ChainId.IMTBL_ZKEVM_TESTNET : ChainId.IMTBL_ZKEVM_DEVNET;
+
+  const { bridgeToL2Addresses } = gasFeeEstimateAddresses.get(environment)!;
+  const { gasTokenAddress, tokenToBridgeL2Address } = bridgeToL2Addresses;
+
+  const provider = environment === Environment.PRODUCTION
+    ? readOnlyProviders.get(ChainId.ETHEREUM)
+    : readOnlyProviders.get(ChainId.SEPOLIA);
 
   const {
     estimatedAmount,
     token,
   } = await getBridgeEstimatedGas(
-    provider,
-    chainId,
-    false, // todo: should we use true for approve txn?
-    gasFeeEstimateAddress,
+    provider as Web3Provider,
+    fromChainId,
+    true,
+    gasTokenAddress,
+  );
+
+  const tokenBridge = await instance.createBridgeInstance(
+    fromChainId,
+    toChainId,
+    readOnlyProviders,
+    environment,
+  );
+  const { bridgeFee } = await getBridgeFeeEstimate(
+    tokenBridge,
+    tokenToBridgeL2Address,
+    toChainId,
   );
 
   return {
-    estimatedAmount,
-    token,
-  };
-}
-
-async function swapGasEstimator(exchange: Exchange, environment: Environment): Promise<GasEstimateResult> {
-  const { fromAddress, toAddress } = gasFeeEstimateAddresses.get(environment).swap;
-
-  // Create a fake transaction to get the gas from the quote
-  const { info } = await exchange.getUnsignedSwapTxFromAmountIn(
-    '0x000',
-    fromAddress,
-    toAddress,
-    BigNumber.from(utils.parseUnits('1', 18)),
-  );
-
-  return {
-    estimatedAmount: BigNumber.from(info.gasFeeEstimate?.amount),
-    token: {
-      address: info.gasFeeEstimate?.token.address,
-      symbol: info.gasFeeEstimate?.token.symbol ?? '',
-      name: info.gasFeeEstimate?.token.name ?? '',
-      decimals: info.gasFeeEstimate?.token.decimals ?? 18,
+    gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+    gasFee: {
+      estimatedAmount,
+      token,
+    },
+    bridgeFee: {
+      estimatedAmount: bridgeFee?.estimatedAmount,
+      token: bridgeFee?.token,
     },
   };
 }
 
-export async function gasServiceEstimator(gasEstimate: GasEstimate): Promise<GasEstimateResult> {
-  switch (gasEstimate.type) {
+async function swapGasEstimator(environment: Environment): Promise<GasEstimateSwapResult> {
+  const { swapAddresses } = gasFeeEstimateAddresses.get(environment)!;
+  const { tokenInAddress, tokenOutAddress } = swapAddresses;
+
+  // todo: Use the environment to set chainId and also use zkevm when this is ready for swap
+  const chainId = ChainId.SEPOLIA;
+  const exchange = await instance.createExchangeInstance(chainId, environment);
+
+  // Create a fake transaction to get the gas from the quote
+  const { info } = await exchange.getUnsignedSwapTxFromAmountIn(
+    '0x000',
+    tokenInAddress,
+    tokenOutAddress,
+    BigNumber.from(utils.parseUnits('1', 18)),
+  );
+
+  if (info.gasFeeEstimate === null) {
+    return {
+      gasEstimateType: GasEstimateType.SWAP,
+      gasFee: {},
+    };
+  }
+
+  let estimatedAmount;
+  if (info.gasFeeEstimate.amount) {
+    estimatedAmount = BigNumber.from(info.gasFeeEstimate.amount);
+  }
+
+  return {
+    gasEstimateType: GasEstimateType.SWAP,
+    gasFee: {
+      estimatedAmount,
+      token: {
+        address: info.gasFeeEstimate?.token.address,
+        symbol: info.gasFeeEstimate?.token.symbol ?? '',
+        name: info.gasFeeEstimate?.token.name ?? '',
+        decimals: info.gasFeeEstimate?.token.decimals ?? 18,
+      },
+    },
+  };
+}
+
+export async function gasServiceEstimator(
+  type: GasEstimateType,
+  readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
+  environment: Environment,
+): Promise<GasEstimateSwapResult | GasEstimateBridgeToL2Result> {
+  switch (type) {
     case GasEstimateType.BRIDGE_TO_L2:
-      return await bridgeL2GasEstimator(gasEstimate.provider, gasEstimate.environment);
+      return await bridgeToL2GasEstimator(readOnlyProviders, environment);
     case GasEstimateType.SWAP:
-      return await swapGasEstimator(gasEstimate.exchange, gasEstimate.environment);
+      return await swapGasEstimator(environment);
     default:
       throw new CheckoutError(
         'Invalid type provided for gasEstimateType',

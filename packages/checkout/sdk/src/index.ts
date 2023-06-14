@@ -2,10 +2,11 @@ export { Checkout } from './Checkout';
 export {
   ChainId,
   ConnectionProviders,
-  TokenFilterTypes,
-  WalletFilterTypes,
+  GasEstimateType,
   NetworkFilterTypes,
   RPC_URL_MAP,
+  TokenFilterTypes,
+  WalletFilterTypes,
 } from './types';
 export type {
   CheckoutModuleConfiguration,
@@ -35,7 +36,8 @@ export type {
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
   GasEstimateParams,
-  GasEstimateResult,
+  GasEstimateSwapResult,
+  GasEstimateBridgeToL2Result,
 } from './types';
 export type { ErrorType } from './errors';
 export { CheckoutErrorType } from './errors';
