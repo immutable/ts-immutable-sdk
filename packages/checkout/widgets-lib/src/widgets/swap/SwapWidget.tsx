@@ -26,7 +26,7 @@ import {
   initialViewState,
   viewReducer,
 } from '../../context/view-context/ViewContext';
-import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
+import { SwapSuccessView, SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
@@ -199,7 +199,11 @@ export function SwapWidget(props: SwapWidgetProps) {
             <StatusView
               statusText={success.text}
               actionText={success.actionText}
-              onRenderEvent={sendSwapSuccessEvent}
+              onRenderEvent={
+                () => sendSwapSuccessEvent(
+                  (viewState.view as SwapSuccessView).data.transactionHash,
+                )
+              }
               onActionClick={sendSwapWidgetCloseEvent}
               statusType={StatusType.SUCCESS}
               testId="success-view"

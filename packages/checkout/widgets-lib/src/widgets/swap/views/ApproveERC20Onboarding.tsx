@@ -18,57 +18,66 @@ import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkHero';
 import { SwapContext } from '../context/SwapContext';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { LoadingView } from '../../../views/loading/LoadingView';
 
 export interface ApproveERC20Props {
   data: ApproveERC20Swap;
 }
 export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
-  // console.log(data);
   const { swapState: { checkout, provider, allowedTokens } } = useContext(SwapContext);
   const { viewDispatch } = useContext(ViewContext);
   const { approveSpending, approveSwap } = text.views[SwapWidgetViews.APPROVE_ERC20];
 
-  // can only show approve spending else show approve swap
-  const [showApproveSpendingStep, setShowApproveSpendingStep] = useState(true);
+  // Local state
+  const [actionDisabled, setActionDisabled] = useState(false);
+  const [approvalTxnLoading, setApprovalTxnLoading] = useState(false);
+  const [showSwapTxnStep, setShowSwapTxnStep] = useState(false);
 
-  // if user rejects transactions
+  // reject transaction flags
   const [rejectedSpending, setRejectedSpending] = useState(false);
   const [rejectedSwap, setRejectedSwap] = useState(false);
 
   // Get symbol from swap info for approve amount text
-  const fromToken = allowedTokens.find((token: TokenInfo) => token.address === data.swapFormInfo.fromContractAddress);
-  const approveSpendHint = `${data.swapFormInfo.fromAmount} ${fromToken?.symbol}`;
-
-  // Approve spending step
-  const approveSpendContent = (
-    <SimpleTextBody heading={approveSpending.content.heading}>
-      <Box>{`${approveSpending.content.body[0]} ${approveSpendHint} ${approveSpending.content.body[1]}`}</Box>
-    </SimpleTextBody>
+  const fromToken = useMemo(
+    () => allowedTokens.find(
+      (token: TokenInfo) => token.address === data.swapFormInfo.fromContractAddress,
+    ),
+    [allowedTokens, data.swapFormInfo.fromContractAddress],
   );
 
-  const approveSpendingFooterText = useMemo(() => (rejectedSpending
-    ? approveSpending.footer.retryText
-    : approveSpending.footer.buttonText), [rejectedSpending]);
+  // Common error view function
+  const showErrorView = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SharedViews.ERROR_VIEW,
+          error: new Error('No checkout object or no provider object found'),
+        },
+      },
+    });
+  }, [viewDispatch]);
+
+  /* --------------------- */
+  // Approve spending step //
+  /* --------------------- */
 
   const handleApproveSpendingClick = useCallback(async () => {
     if (!checkout || !provider) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.ERROR_VIEW,
-            error: new Error('No checkout object or no provider object found'),
-          },
-        },
-      });
+      showErrorView();
       return;
     }
+    if (actionDisabled) return;
+
+    setActionDisabled(true);
 
     try {
       const txnResult = await checkout.sendTransaction({
         provider,
         transaction: data.approveTransaction,
       });
+
+      setApprovalTxnLoading(true);
       const approvalReceipt = await txnResult.transactionResponse.wait();
 
       if (approvalReceipt.status !== 1) {
@@ -84,38 +93,59 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         return;
       }
 
-      setShowApproveSpendingStep(false);
+      setApprovalTxnLoading(false);
+      setActionDisabled(false);
+      setShowSwapTxnStep(true);
     } catch (err: any) {
+      setApprovalTxnLoading(false);
+      setActionDisabled(false);
+
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         setRejectedSpending(true);
       }
     }
-  }, [checkout, provider, viewDispatch, setRejectedSwap, data.approveTransaction, data.swapFormInfo]);
+  }, [
+    checkout,
+    provider,
+    showErrorView,
+    viewDispatch,
+    setRejectedSwap,
+    data.approveTransaction,
+    data.swapFormInfo,
+    actionDisabled,
+    setActionDisabled,
+    setApprovalTxnLoading,
+  ]);
 
-  // Approve swap step
-  const approveSwapContent = (
-    <SimpleTextBody heading={approveSwap.content.heading}>
-      <Box>{approveSwap.content.body}</Box>
+  const approveSpendingContent = useMemo(() => (
+    <SimpleTextBody heading={approveSpending.content.heading}>
+      {/* eslint-disable-next-line max-len */}
+      <Box>{`${approveSpending.content.body[0]} ${data.swapFormInfo.fromAmount} ${fromToken?.symbol || ''} ${approveSpending.content.body[1]}`}</Box>
     </SimpleTextBody>
-  );
+  ), [data.swapFormInfo, fromToken]);
 
-  const approveSwapFooterText = useMemo(() => (rejectedSwap
-    ? approveSwap.footer.retryText
-    : approveSwap.footer.buttonText), [rejectedSwap]);
+  const approveSpendingFooter = useMemo(() => (
+    <FooterButton
+      actionText={rejectedSpending
+        ? approveSpending.footer.retryText
+        : approveSpending.footer.buttonText}
+      onActionClick={handleApproveSpendingClick}
+    />
+  ), [rejectedSpending, handleApproveSpendingClick]);
+
+  /* ----------------- */
+  // Approve swap step //
+  /* ----------------- */
 
   const handleApproveSwapClick = useCallback(async () => {
     if (!checkout || !provider) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.ERROR_VIEW,
-            error: new Error('No checkout object or no provider object found'),
-          },
-        },
-      });
+      showErrorView();
       return;
     }
+
+    if (actionDisabled) return;
+
+    setActionDisabled(true);
 
     try {
       const txn = await checkout.sendTransaction({
@@ -123,6 +153,10 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         transaction: data.transaction,
       });
 
+      setActionDisabled(false);
+
+      // user approves swap
+      // go to the Swap In Progress View
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -136,6 +170,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         },
       });
     } catch (err: any) {
+      setActionDisabled(false);
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
         setRejectedSwap(true);
         return;
@@ -176,30 +211,46 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         },
       });
     }
-  }, [checkout, provider, viewDispatch, setRejectedSwap, data.transaction, data.swapFormInfo]);
+  }, [
+    checkout,
+    provider,
+    showErrorView,
+    viewDispatch,
+    setRejectedSwap,
+    data.transaction,
+    data.swapFormInfo,
+    actionDisabled,
+    setActionDisabled,
+  ]);
 
-  const approveSpendingFooter = useMemo(() => (
-    <FooterButton
-      actionText={approveSpendingFooterText}
-      onActionClick={handleApproveSpendingClick}
-    />
-  ), [approveSpendingFooterText, handleApproveSpendingClick]);
+  const approveSwapContent = (
+    <SimpleTextBody heading={approveSwap.content.heading}>
+      <Box>{approveSwap.content.body}</Box>
+    </SimpleTextBody>
+  );
 
   const approveSwapFooter = useMemo(() => (
     <FooterButton
-      actionText={approveSwapFooterText}
+      actionText={rejectedSwap
+        ? approveSwap.footer.retryText
+        : approveSwap.footer.buttonText}
       onActionClick={handleApproveSwapClick}
     />
-  ), [approveSwapFooterText, handleApproveSwapClick]);
+  ), [rejectedSwap, handleApproveSwapClick]);
 
   return (
-    <SimpleLayout
-      header={<HeaderNavigation transparent showBack onCloseButtonClick={sendSwapWidgetCloseEvent} />}
-      floatHeader
-      heroContent={showApproveSpendingStep ? <IMXCoinsHero /> : <ImmutableNetworkHero />}
-      footer={showApproveSpendingStep ? approveSpendingFooter : approveSwapFooter}
-    >
-      {showApproveSpendingStep ? approveSpendContent : approveSwapContent}
-    </SimpleLayout>
+    <>
+      {approvalTxnLoading && (<LoadingView loadingText={approveSpending.loading.text} showFooterLogo />)}
+      {!approvalTxnLoading && (
+        <SimpleLayout
+          header={<HeaderNavigation transparent showBack onCloseButtonClick={sendSwapWidgetCloseEvent} />}
+          floatHeader
+          heroContent={showSwapTxnStep ? <ImmutableNetworkHero /> : <IMXCoinsHero />}
+          footer={showSwapTxnStep ? approveSwapFooter : approveSpendingFooter}
+        >
+          {showSwapTxnStep ? approveSwapContent : approveSpendingContent}
+        </SimpleLayout>
+      )}
+    </>
   );
 }

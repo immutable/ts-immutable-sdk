@@ -13,11 +13,17 @@ export enum SwapWidgetViews {
 export type SwapWidgetView =
   | SwapView
   | SwapInProgressView
-  | { type: SwapWidgetViews.SUCCESS }
+  | SwapSuccessView
   | PriceSurgeView
   | SwapFailView
   | ApproveERC20View;
 
+export interface SwapSuccessView {
+  type: SwapWidgetViews.SUCCESS;
+  data: {
+    transactionHash: string;
+  }
+}
 interface SwapFailView {
   type: SwapWidgetViews.FAIL;
   data: PrefilledSwapForm;

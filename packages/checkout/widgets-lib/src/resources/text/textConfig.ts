@@ -151,6 +151,9 @@ export const text = {
           buttonText: 'Got it',
           retryText: 'Try again',
         },
+        loading: {
+          text: 'Approving spending cap',
+        },
       },
     },
     [BridgeWidgetViews.BRIDGE]: {
