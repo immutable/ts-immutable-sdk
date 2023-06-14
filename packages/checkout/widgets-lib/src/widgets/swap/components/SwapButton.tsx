@@ -2,7 +2,6 @@ import { Box, Button } from '@biom3/react';
 import { useContext, useState } from 'react';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { CheckoutErrorType } from '@imtbl/checkout-sdk';
-import { Transaction } from 'ethers';
 import { text } from '../../../resources/text/textConfig';
 import { PrefilledSwapForm, SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import {
@@ -36,43 +35,29 @@ export function SwapButton({
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
 
   const sendTransaction = async () => {
-    if (true) {
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SwapWidgetViews.APPROVE_ERC20,
-            data: {
-              approveSpendingTransaction: {} as unknown as Transaction,
-              swapTransaction: {} as unknown as Transaction,
-            },
-          },
-        },
-      });
-    }
     if (!validator()) return;
     if (!checkout || !provider || !transaction) return;
     try {
       updateLoading(true);
 
       if (transaction.approveTransaction) {
-        const txn = await checkout.sendTransaction({
-          provider,
-          transaction: transaction.approveTransaction,
-        });
-        const approvalReceipt = await txn.transactionResponse.wait();
-        if (approvalReceipt.status !== 1) {
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: SwapWidgetViews.FAIL,
-                data: data as PrefilledSwapForm,
+        // If we need to approve a spending limit first
+        // send user to Approve ERC20 Onbaording flow
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SwapWidgetViews.APPROVE_ERC20,
+              data: {
+                approveTransaction: transaction.approveTransaction,
+                transaction: transaction.transaction,
+                info: transaction.info,
+                swapFormInfo: data as PrefilledSwapForm,
               },
             },
-          });
-          return;
-        }
+          },
+        });
+        return;
       }
       const txn = await checkout.sendTransaction({
         provider,

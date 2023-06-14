@@ -193,7 +193,7 @@ export function SwapWidget(props: SwapWidgetProps) {
             />
           )}
           {viewState.view.type === SwapWidgetViews.APPROVE_ERC20 && (
-            <ApproveERC20Onboarding />
+            <ApproveERC20Onboarding data={viewState.view.data} />
           )}
           {viewState.view.type === SwapWidgetViews.SUCCESS && (
             <StatusView
