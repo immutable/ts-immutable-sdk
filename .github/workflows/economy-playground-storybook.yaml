@@ -11,32 +11,37 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-      CI: true
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-
-      - name: Navigate to Economy Playground directory
-        run: cd packages/economy/playground
 
       - name: Cache node modules
         uses: actions/cache@v2
         id: cache-node-modules
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-build-${{ env.CHROMATIC_PROJECT_TOKEN }}-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-build-${{ secrets.CHROMATIC_PROJECT_TOKEN }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install Dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: yarn install
+        
+      - name: Build Checkout SDK
+        run: yarn workspace @imtbl/checkout-sdk build && yarn workspace @imtbl/checkout-widgets build
 
-      - name: Build Storybook
-        run: yarn build
+      - name: Build Economy SDK
+        run: yarn workspace @imtbl/economy build
 
-      - name: Build and deploy Storybook to Chromatic
-        run: npx chromatic --project-token=${{ env.CHROMATIC_PROJECT_TOKEN }} --build-script-name=build
+      - name: Build Economy Playground
+        run: yarn workspace @imtbl/economy-playground build
+
+      - name: Build Package Economy Playground
+        run: yarn workspace @imtbl/economy-playground build:package
+
+      - name: Navigate to Economy Playground
+        run: cd packages/economy/playground
+
+      - name: Publish Economy Playground to Chromatic
+        run: npx chromatic --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} --build-script-name="build" --storybook-build-dir="/packages/economy/playground/storybook-static" --exit-zero-on-changes
