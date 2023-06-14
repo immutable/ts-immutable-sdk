@@ -35,7 +35,7 @@ jobs:
         run: yarn workspace @imtbl/economy build
 
       - name: Build Storybook Economy Playground
-        run: yarn workspace @imtbl/economy-playground build-storybook
+        run: yarn workspace @imtbl/economy-playground build
 
       - name: Build Package Economy Playground
         run: yarn workspace @imtbl/economy-playground build:package

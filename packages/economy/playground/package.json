@@ -57,7 +57,7 @@
     "string-width": "4.2.2"
   },
   "scripts": {
-    "build-storybook": "storybook build",
+    "build": "storybook build",
     "build:app": "tsc && vite build",
     "build:package": "rollup --config rollup.config.js && cp ./dist/index.js storybook-static/js/index.js && replace-in-file '/src/index.ts' '/js/index.js' ./storybook-static/iframe.html",
     "chromatic": "chromatic --exit-zero-on-changes",
