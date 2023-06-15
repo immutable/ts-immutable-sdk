@@ -40,15 +40,15 @@ jobs:
       - name: Build Package Economy Playground
         run: yarn workspace @imtbl/economy-playground build:package
 
-      - name: Navigate to Economy Playground
-        run: cd packages/economy/playground && pwd
+      - name: List files
+        run: ls -R packages/economy/playground/storybook-static
 
-      - name: Echo current directory
-        run: echo "${{ github.workspace }}"
+      - name: Navigate to Economy Playground
+        run: cd packages/economy/playground
 
       - name: Publish Economy Playground to Chromatic
         uses: chromaui/action@v1
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          storybookBuildDir: /home/runner/work/ts-immutable-sdk/ts-immutable-sdk/packages/economy/playground/storybook-static
+          storybookBuildDir: ${{ github.workspace }}/packages/economy/playground/storybook-static
           exitZeroOnChanges: true
