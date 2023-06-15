@@ -58,6 +58,18 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     });
   }, [viewDispatch]);
 
+  const goBackWithSwapData = useCallback(() => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SwapWidgetViews.SWAP,
+          data: data.swapFormInfo as PrefilledSwapForm,
+        },
+      },
+    });
+  }, [viewDispatch]);
+
   const handleExceptions = (err, swapFormData:PrefilledSwapForm) => {
     if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
       setRejectedSpending(true);
@@ -246,7 +258,14 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       {approvalTxnLoading && (<LoadingView loadingText={approveSpending.loading.text} showFooterLogo />)}
       {!approvalTxnLoading && (
         <SimpleLayout
-          header={<HeaderNavigation transparent showBack onCloseButtonClick={sendSwapWidgetCloseEvent} />}
+          header={(
+            <HeaderNavigation
+              transparent
+              showBack
+              onCloseButtonClick={sendSwapWidgetCloseEvent}
+              onBackButtonClick={goBackWithSwapData}
+            />
+)}
           floatHeader
           heroContent={showSwapTxnStep ? <ImmutableNetworkHero /> : <IMXCoinsHero />}
           footer={showSwapTxnStep ? approveSwapFooter : approveSpendingFooter}
