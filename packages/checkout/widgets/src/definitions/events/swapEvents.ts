@@ -13,7 +13,7 @@ export enum SwapEventType {
  * @property {number} timestamp - The timestamp of the successful swap.
  */
 export type SwapSuccess = {
-  timestamp: number;
+  transactionHash: string;
 };
 
 /**
