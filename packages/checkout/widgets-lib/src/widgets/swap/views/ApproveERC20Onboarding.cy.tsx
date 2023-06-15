@@ -116,7 +116,7 @@ describe('Approve ERC20 Onboarding', () => {
       // make transaction
       cySmartGet('footer-button').click();
 
-      // aeert approve swap copy
+      // assert approve swap copy
       cySmartGet('simple-text-body__heading').should('have.text', approveSwap.content.heading);
       cySmartGet('simple-text-body__body').should('include.text', approveSwap.content.body[0]);
       cySmartGet('footer-button').should('have.text', approveSwap.footer.buttonText);

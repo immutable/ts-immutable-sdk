@@ -58,6 +58,50 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     });
   }, [viewDispatch]);
 
+  const handleExceptions = (err, swapFormData:PrefilledSwapForm) => {
+    if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+      setRejectedSpending(true);
+    }
+
+    if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SwapWidgetViews.PRICE_SURGE,
+            data: swapFormData,
+          },
+        },
+      });
+      return;
+    }
+    if (err.type === CheckoutErrorType.TRANSACTION_FAILED
+      || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS
+      || (err.receipt && err.receipt.status === 0)) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SwapWidgetViews.FAIL,
+            reason: 'Transaction failed',
+            data: swapFormData,
+          },
+        },
+      });
+      return;
+    }
+
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: SharedViews.ERROR_VIEW,
+          error: err,
+        },
+      },
+    });
+  };
+
   /* --------------------- */
   // Approve spending step //
   /* --------------------- */
@@ -99,10 +143,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     } catch (err: any) {
       setApprovalTxnLoading(false);
       setActionDisabled(false);
-
-      if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-        setRejectedSpending(true);
-      }
+      handleExceptions(err, data.swapFormInfo as PrefilledSwapForm);
     }
   }, [
     checkout,
@@ -171,45 +212,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       });
     } catch (err: any) {
       setActionDisabled(false);
-      if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-        setRejectedSwap(true);
-        return;
-      }
-
-      if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SwapWidgetViews.PRICE_SURGE,
-              data: data.swapFormInfo as PrefilledSwapForm,
-            },
-          },
-        });
-        return;
-      }
-      if (err.type === CheckoutErrorType.TRANSACTION_FAILED || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SwapWidgetViews.FAIL,
-              reason: 'Transaction failed',
-              data: data.swapFormInfo as PrefilledSwapForm,
-            },
-          },
-        });
-        return;
-      }
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: SharedViews.ERROR_VIEW,
-            error: err,
-          },
-        },
-      });
+      handleExceptions(err, data.swapFormInfo as PrefilledSwapForm);
     }
   }, [
     checkout,
