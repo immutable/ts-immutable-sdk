@@ -1,4 +1,4 @@
-import { ConnectionProviders, WalletFilterTypes } from '../types';
+import { WalletFilterTypes, WalletProviderName } from '../types';
 import { getWalletAllowList } from './wallet';
 
 describe('getWalletAllowList', () => {
@@ -9,19 +9,19 @@ describe('getWalletAllowList', () => {
       exclude: [],
       result: [
         {
-          connectionProvider: 'metamask',
+          providerName: 'metamask',
           icon: 'some-icon-url',
           name: 'MetaMask',
           description: 'complete web3 wallet solution',
         },
         {
-          connectionProvider: 'passport',
+          providerName: 'passport',
           icon: 'pp-icon',
           name: 'Passport',
           description: 'Web3 with your email!',
         },
         {
-          connectionProvider: 'gamestop',
+          providerName: 'gamestop',
           icon: 'gme-icon',
           name: 'GameStop',
           description: 'Never stopping the game!',
@@ -31,16 +31,16 @@ describe('getWalletAllowList', () => {
     {
       text: 'exclusion of MetaMask wallet applied',
       type: WalletFilterTypes.ALL,
-      exclude: [{ connectionProvider: ConnectionProviders.METAMASK }],
+      exclude: [{ providerName: WalletProviderName.METAMASK }],
       result: [
         {
-          connectionProvider: 'passport',
+          providerName: 'passport',
           icon: 'pp-icon',
           name: 'Passport',
           description: 'Web3 with your email!',
         },
         {
-          connectionProvider: 'gamestop',
+          providerName: 'gamestop',
           icon: 'gme-icon',
           name: 'GameStop',
           description: 'Never stopping the game!',
@@ -53,13 +53,13 @@ describe('getWalletAllowList', () => {
       exclude: [],
       result: [
         {
-          connectionProvider: 'passport',
+          providerName: 'passport',
           icon: 'pp-icon',
           name: 'Passport',
           description: 'Web3 with your email!',
         },
         {
-          connectionProvider: 'gamestop',
+          providerName: 'gamestop',
           icon: 'gme-icon',
           name: 'GameStop',
           description: 'Never stopping the game!',
@@ -72,13 +72,13 @@ describe('getWalletAllowList', () => {
       exclude: [],
       result: [
         {
-          connectionProvider: 'metamask',
+          providerName: 'metamask',
           icon: 'some-icon-url',
           name: 'MetaMask',
           description: 'complete web3 wallet solution',
         },
         {
-          connectionProvider: 'passport',
+          providerName: 'passport',
           icon: 'pp-icon',
           name: 'Passport',
           description: 'Web3 with your email!',
