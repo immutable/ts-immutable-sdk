@@ -41,7 +41,7 @@ jobs:
         run: yarn workspace @imtbl/economy-playground build:package
 
       - name: Navigate to Economy Playground
-        run: cd packages/economy/playground
+        run: cd packages/economy/playground && pwd
 
       - name: Publish Economy Playground to Chromatic
-        run: npx chromatic --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} -d "./storybook-static" --exit-zero-on-changes
+        run: npx chromatic --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }} -d "/home/runner/work/ts-immutable-sdk/ts-immutable-sdk/packages/economy/playground/storybook-static" --exit-zero-on-changes
