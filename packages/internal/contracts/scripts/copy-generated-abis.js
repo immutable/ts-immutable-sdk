@@ -37,8 +37,8 @@ const getAllFilesFrom = (directory) => {
 
 /**
  *
- * @param {string} destinationDirectory
  * @param {string[]} fileList
+ * @param {string} destinationDirectory
  */
 const copyFileListTo = (fileList, destinationDirectory) => {
   if (fileList.length === 0) {
