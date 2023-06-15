@@ -52,7 +52,7 @@ export class ZkEvmProvider {
 
   public async request(
     request: RequestArguments,
-  ) {
+  ): Promise<any> {
     if (METHODS_REQUIRING_AUTHORISATION.includes(request.method) && !this.magicProvider) {
       // eslint-disable-next-line prefer-promise-reject-errors
       return Promise.reject({
