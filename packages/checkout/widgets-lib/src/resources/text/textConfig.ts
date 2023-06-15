@@ -20,7 +20,7 @@ export const text = {
     [ConnectWidgetViews.READY_TO_CONNECT]: {
       body: {
         heading: 'Check for the pop-up from MetaMask',
-        content: 'Follow the prompts in the Metamask popup to connect',
+        content: 'Follow the prompts in the MetaMask popup to connect',
       },
       footer: {
         buttonText1: 'Ready to connect',
@@ -31,7 +31,7 @@ export const text = {
       eth: {
         heading:
           "To move your coins, you'll need to switch to the Sepolia network",
-        body: "You'll be prompted to switch networks in Metamask. You'll be able to switch back when needed.",
+        body: "You'll be prompted to switch networks in MetaMask. You'll be able to switch back when needed.",
         button: {
           text: 'Ready to Switch',
           retryText: 'Try Again',
@@ -125,6 +125,36 @@ export const text = {
         text: 'Price surge',
         actionText: 'Review & try again',
       },
+      [SwapWidgetViews.IN_PROGRESS]: {
+        loading: {
+          text: 'Swap in progress',
+        },
+      },
+    },
+    [SwapWidgetViews.APPROVE_ERC20]: {
+      approveSwap: {
+        content: {
+          heading: "Now you'll just need to approve the transaction",
+          body: 'Follow the prompts in MetaMask.',
+        },
+        footer: {
+          buttonText: 'Okay',
+          retryText: 'Try again',
+        },
+      },
+      approveSpending: {
+        content: {
+          heading: "You'll be asked to set a spending cap for this transaction",
+          body: ['Input at least', 'for this transaction and future transactions, then follow the prompts.'],
+        },
+        footer: {
+          buttonText: 'Got it',
+          retryText: 'Try again',
+        },
+        loading: {
+          text: 'Approving spending cap',
+        },
+      },
     },
     [BridgeWidgetViews.BRIDGE]: {
       header: {
@@ -154,7 +184,8 @@ export const text = {
     [BridgeWidgetViews.IN_PROGRESS]: {
       heading: 'Move in progress',
       body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
-      body2: 'You can close this window, the transaction will be reflected in your wallet once complete.',
+      body2:
+        'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
     [BridgeWidgetViews.SUCCESS]: {
       text: 'Success',
@@ -209,7 +240,7 @@ export const text = {
       content: {
         heading1: 'We’ll need you to confirm in your',
         heading2: 'wallet before proceeding',
-        body1: 'When the Metamask pop up appears, be sure to',
+        body1: 'When the MetaMask pop up appears, be sure to',
         body2: 'sign the transaction',
       },
       buttons: {
