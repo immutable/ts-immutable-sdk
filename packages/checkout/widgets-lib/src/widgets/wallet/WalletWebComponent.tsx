@@ -22,7 +22,7 @@ export class ImmutableWallet extends ImmutableWebComponent {
     ) as ConnectionProviders;
 
     const useConnectWidgetProp = this.getAttribute('useConnectWidget');
-    this.useConnectWidget = useConnectWidgetProp?.toLowerCase() !== 'false';
+    this.useConnectWidget = useConnectWidgetProp ? useConnectWidgetProp.toLowerCase() !== 'false' : false;
 
     this.renderWidget();
   }
