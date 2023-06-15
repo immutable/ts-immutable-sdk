@@ -27,7 +27,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
       'providerPreference',
     ) as ConnectionProviders;
     const useConnectWidgetProp = this.getAttribute('useConnectWidget');
-    this.useConnectWidget = useConnectWidgetProp ? useConnectWidgetProp.toLowerCase() !== 'false' : false;
+    this.useConnectWidget = useConnectWidgetProp?.toLowerCase() !== 'false';
     this.amount = this.getAttribute('amount') as string;
     this.fromContractAddress = this.getAttribute(
       'fromContractAddress',
