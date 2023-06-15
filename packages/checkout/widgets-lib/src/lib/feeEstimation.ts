@@ -21,6 +21,32 @@ const convertFeeToFiat = (
   return feeAmountInFiat;
 };
 
+// Formats a value to 2 decimal places unless the value is less than 0.01, in which case it will show the first non-zero digit of the decimal places
+export function formatFiatDecimals(value: number): string {
+  if (value <= 0) {
+    return '-.--';
+  }
+
+  const str = value.toString();
+  if (str.includes('e')) {
+    // In this scenario, converting the fee to fiat has given us an exponent from
+    // parseFloat as the fee value is very low. If the value is low enough that converting
+    // the fee to fiat has returned an exponent, then it is significantly low enough to
+    // be considered essentially zero.
+    return '0.00';
+  }
+
+  if (value < 0.01) {
+    for (let i = 0; i < str.length; i++) {
+      if (str[i] !== '0' && str[i] !== '.') {
+        return value.toFixed(i - 1);
+      }
+    }
+  }
+
+  return value.toFixed(2);
+}
+
 export const getSwapFeeEstimation = (
   swapFees: GasEstimateSwapResult,
   conversions: Map<string, number>,
@@ -28,12 +54,14 @@ export const getSwapFeeEstimation = (
   const { gasFee } = swapFees;
 
   const gasFeeAmount = gasFee.estimatedAmount;
+  if (!gasFeeAmount) return '-.--';
   const gasFeeToken = gasFee.token;
+  if (!gasFeeToken) return '-.--';
 
   const gasFeeInFiat = convertFeeToFiat(gasFeeAmount, gasFeeToken, conversions);
-
   if (gasFeeInFiat === 0) return '-.--';
-  return gasFeeInFiat.toFixed(6); // todo: this fee amount is so low that toFixed(2) returns 0.00, should we make this dynamic so that it shows at least the first non-zero digit of the decimal places?
+
+  return formatFiatDecimals(gasFeeInFiat);
 };
 
 export const getBridgeFeeEstimation = (
@@ -43,12 +71,14 @@ export const getBridgeFeeEstimation = (
   const { gasFee, bridgeFee } = bridgeFees;
 
   const gasFeeAmount = gasFee.estimatedAmount;
+  if (!gasFeeAmount) return '-.--';
   const gasFeeToken = gasFee.token;
+  if (!gasFeeToken) return '-.--';
 
   const gasFeeInFiat = convertFeeToFiat(gasFeeAmount, gasFeeToken, conversions);
+  if (gasFeeInFiat === 0) return '-.--';
+
   const bridgeFeeInFiat = convertFeeToFiat(bridgeFee.estimatedAmount, bridgeFee.token, conversions);
 
-  if (gasFeeInFiat === 0) return '-.--';
-  if (bridgeFeeInFiat === 0) return gasFeeInFiat.toFixed(2);
-  return (gasFeeInFiat + bridgeFeeInFiat).toFixed(2);
+  return formatFiatDecimals(gasFeeInFiat + bridgeFeeInFiat);
 };

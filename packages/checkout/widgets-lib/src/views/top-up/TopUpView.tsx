@@ -1,10 +1,12 @@
 import {
-  Box, Heading, MenuItem,
+  Box, Heading, Icon, MenuItem,
 } from '@biom3/react';
 import {
   IMTBLWidgetEvents,
 } from '@imtbl/checkout-widgets';
-import { useContext, useEffect, useState } from 'react';
+import {
+  ReactNode, useContext, useEffect, useState,
+} from 'react';
 import { GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType } from '@imtbl/checkout-sdk';
 import { FooterLogo } from '../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
@@ -51,8 +53,10 @@ export function TopUpView({
   const { conversions, fiatSymbol } = cryptoFiatState;
 
   useTokenSymbols(checkout, cryptoFiatDispatch);
-  const [swapFeesInFiat, setSwapFeesInFiat] = useState('-.--');
-  const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('-.--');
+  const [swapFeesInFiat, setSwapFeesInFiat] = useState('');
+  const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('');
+  const [loadingSwapFees, setLoadingSwapFees] = useState(false);
+  const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
 
   const onClickOnramp = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
@@ -67,24 +71,40 @@ export function TopUpView({
   useEffect(() => {
     if (!checkout) return;
 
-    (async () => {
-      const swapEstimate = await checkout.gasEstimate({
-        gasEstimateType: GasEstimateType.SWAP,
-      }) as GasEstimateSwapResult;
-      const swapFeeInFiat = getSwapFeeEstimation(
-        swapEstimate,
-        conversions,
-      );
-      setSwapFeesInFiat(swapFeeInFiat.toString());
+    setLoadingSwapFees(true);
+    setLoadingBridgeFees(true);
 
-      const bridgeEstimate = await checkout.gasEstimate({
-        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-      }) as GasEstimateBridgeToL2Result;
-      const bridgeFeeInFiat = getBridgeFeeEstimation(
-        bridgeEstimate,
-        conversions,
-      );
-      setBridgeFeesInFiat(bridgeFeeInFiat.toString());
+    (async () => {
+      try {
+        const swapEstimate = await checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.SWAP,
+        }) as GasEstimateSwapResult;
+        const swapFeeInFiat = getSwapFeeEstimation(
+          swapEstimate,
+          conversions,
+        );
+        setSwapFeesInFiat(swapFeeInFiat);
+        setLoadingSwapFees(false);
+      } catch {
+        setSwapFeesInFiat('-.--');
+      } finally {
+        setLoadingSwapFees(false);
+      }
+
+      try {
+        const bridgeEstimate = await checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+        }) as GasEstimateBridgeToL2Result;
+        const bridgeFeeInFiat = getBridgeFeeEstimation(
+          bridgeEstimate,
+          conversions,
+        );
+        setBridgeFeesInFiat(bridgeFeeInFiat);
+      } catch {
+        setBridgeFeesInFiat('-.--');
+      } finally {
+        setLoadingBridgeFees(false);
+      }
     })();
   }, [checkout, conversions]);
 
@@ -128,6 +148,19 @@ export function TopUpView({
     });
   };
 
+  const renderFees = (fees: string, feesLoading: boolean): ReactNode => {
+    if (feesLoading) {
+      return (
+        <>
+          {' '}
+          <Icon icon="Loading" />
+          {` ${fiatSymbol.toLocaleUpperCase()}`}
+        </>
+      );
+    }
+    return (` $${fees} ${fiatSymbol.toLocaleUpperCase()}`);
+  };
+
   const renderMenuItem = (
     testId: string,
     icon: 'Wallet' | 'Coins' | 'Minting',
@@ -135,7 +168,7 @@ export function TopUpView({
     caption: string,
     subcaption: string,
     onClick: () => void,
-    fees?: string,
+    renderFeeFunction?: (fees: string, feesLoading: boolean) => ReactNode,
   ) => (
     <Box sx={{ paddingY: '1px' }}>
       <MenuItem
@@ -154,7 +187,8 @@ export function TopUpView({
         <MenuItem.Caption>
           {caption}
           <br />
-          {`${subcaption} ${fees ? ` $${fees} ${fiatSymbol.toLocaleUpperCase()}` : ''}`}
+          {`${subcaption}`}
+          {renderFeeFunction && renderFeeFunction(swapFeesInFiat, loadingSwapFees)}
         </MenuItem.Caption>
       </MenuItem>
     </Box>
@@ -191,7 +225,7 @@ export function TopUpView({
             swap.caption,
             swap.subcaption,
             onClickSwap,
-            swapFeesInFiat,
+            () => renderFees(swapFeesInFiat, loadingSwapFees),
           )}
           {showBridgeOption && renderMenuItem(
             'bridge',
@@ -200,7 +234,7 @@ export function TopUpView({
             bridge.caption,
             bridge.subcaption,
             onClickBridge,
-            bridgeFeesInFiat,
+            () => renderFees(bridgeFeesInFiat, loadingBridgeFees),
           )}
         </Box>
       </Box>
