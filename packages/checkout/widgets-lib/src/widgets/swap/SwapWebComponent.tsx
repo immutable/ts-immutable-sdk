@@ -27,7 +27,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
       'providerPreference',
     ) as ConnectionProviders;
     const useConnectWidgetProp = this.getAttribute('useConnectWidget');
-    this.useConnectWidget = useConnectWidgetProp?.toLowerCase() !== 'false';
+    this.useConnectWidget = useConnectWidgetProp ? useConnectWidgetProp.toLowerCase() !== 'false' : false;
     this.amount = this.getAttribute('amount') as string;
     this.fromContractAddress = this.getAttribute(
       'fromContractAddress',
@@ -38,7 +38,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
   renderWidget() {
     const connectLoaderParams: ConnectLoaderParams = {
-      targetLayer: ConnectTargetLayer.LAYER2,
+      targetLayer: ConnectTargetLayer.LAYER1,
       providerPreference: this.providerPreference,
     };
 
