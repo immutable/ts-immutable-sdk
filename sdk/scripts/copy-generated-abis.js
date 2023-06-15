@@ -3,6 +3,10 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+const CURRENT_DIR_PATH = path.dirname(fileURLToPath(import.meta.url));
+const SOURCE_DIRECTORY = '/../../packages/internal/contracts/artifacts/contracts';
+const DESTINATION_DIRECTORY = '/../../packages/internal/contracts/src/abi';
+
 /**
  *
  * @param {string} directory
@@ -37,6 +41,10 @@ const getAllFilesFrom = (directory) => {
  * @param {string[]} fileList
  */
 const copyFileListTo = (destinationDirectory, fileList) => {
+  if (fileList.length === 0) {
+    console.log('No abi files to copy!');
+    return;
+  }
   fileList.forEach((file) => {
     const fileName = path.basename(file);
     try {
@@ -46,17 +54,11 @@ const copyFileListTo = (destinationDirectory, fileList) => {
       process.exit(1);
     }
   });
+  console.log(`Successfully copied ${fileList.length} ${fileList.length === 1 ? 'file' : 'files'}!
+ * from: ${SOURCE_DIRECTORY.replace('/../..', '')}
+ * to:   ${destinationDirectory.replace('/../..', '')}`);
 };
 
-const currentDirPath = path.dirname(fileURLToPath(import.meta.url));
+const allAbiFiles = getAllFilesFrom(CURRENT_DIR_PATH + SOURCE_DIRECTORY);
 
-const sourceDirectory = '/../../packages/internal/contracts/artifacts/contracts';
-const destinationDirectory = '/../../packages/internal/contracts/src/abi';
-
-const allAbiFiles = getAllFilesFrom(currentDirPath + sourceDirectory);
-
-copyFileListTo(currentDirPath + destinationDirectory, allAbiFiles);
-// eslint-disable-next-line max-len
-console.log(`Successfully copied ${allAbiFiles.length} ${allAbiFiles.length === 1 ? 'file' : 'files'}!
- * from: ${sourceDirectory.replace('/../..', '')}
- * to:   ${destinationDirectory.replace('/../..', '')}`);
+copyFileListTo(CURRENT_DIR_PATH + DESTINATION_DIRECTORY, allAbiFiles);
