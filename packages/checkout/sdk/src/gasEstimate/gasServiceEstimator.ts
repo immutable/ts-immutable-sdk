@@ -14,6 +14,7 @@ interface GasEstimateTokenAddresses {
     tokenToBridgeL2Address: string;
   };
   swapAddresses: {
+    walletAddress: string;
     tokenInAddress: string;
     tokenOutAddress: string;
   };
@@ -28,6 +29,8 @@ const gasFeeEstimateAddresses = new Map<Environment, GasEstimateTokenAddresses>(
         tokenToBridgeL2Address: 'NATIVE',
       },
       swapAddresses: {
+        // Dummy swap transaction requires a valid address
+        walletAddress: '',
         // todo: Replace with actual production addresses // todo: addresses causing gitleaks to fail
         tokenInAddress: '', // FUN
         tokenOutAddress: '', // DEX
@@ -38,9 +41,12 @@ const gasFeeEstimateAddresses = new Map<Environment, GasEstimateTokenAddresses>(
     Environment.SANDBOX, {
       bridgeToL2Addresses: {
         gasTokenAddress: 'NATIVE',
-        tokenToBridgeL2Address: 'NATIVE',
+        // should be NATIVE (IMX) but bridge is not NATIVE supporting yet
+        tokenToBridgeL2Address: '',
       },
       swapAddresses: {
+        // Dummy swap transaction requires a valid address
+        walletAddress: '',
         // todo: addresses causing gitleaks to fail
         tokenInAddress: '', // FUN
         tokenOutAddress: '', // DEX
@@ -63,81 +69,102 @@ async function bridgeToL2GasEstimator(
     ? readOnlyProviders.get(ChainId.ETHEREUM)
     : readOnlyProviders.get(ChainId.SEPOLIA);
 
-  const {
-    estimatedAmount,
-    token,
-  } = await getBridgeEstimatedGas(
-    provider as Web3Provider,
-    fromChainId,
-    true,
-    gasTokenAddress,
-  );
-
-  const tokenBridge = await instance.createBridgeInstance(
-    fromChainId,
-    toChainId,
-    readOnlyProviders,
-    environment,
-  );
-  const { bridgeFee } = await getBridgeFeeEstimate(
-    tokenBridge,
-    tokenToBridgeL2Address,
-    toChainId,
-  );
-
-  return {
-    gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-    gasFee: {
+  try {
+    const {
       estimatedAmount,
       token,
-    },
-    bridgeFee: {
-      estimatedAmount: bridgeFee?.estimatedAmount,
-      token: bridgeFee?.token,
-    },
-  };
+    } = await getBridgeEstimatedGas(
+      provider as Web3Provider,
+      fromChainId,
+      true,
+      gasTokenAddress,
+    );
+
+    const tokenBridge = await instance.createBridgeInstance(
+      fromChainId,
+      toChainId,
+      readOnlyProviders,
+      environment,
+    );
+
+    const { bridgeFee } = await getBridgeFeeEstimate(
+      tokenBridge,
+      tokenToBridgeL2Address,
+      toChainId,
+    );
+
+    return {
+      gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+      gasFee: {
+        estimatedAmount,
+        token,
+      },
+      bridgeFee: {
+        estimatedAmount: bridgeFee?.estimatedAmount,
+        token: bridgeFee?.token,
+      },
+    };
+  } catch {
+    // In the case of an error, just return an empty gas & bridge fee estimate
+    return {
+      gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+      gasFee: {},
+      bridgeFee: {},
+    };
+  }
 }
 
-async function swapGasEstimator(environment: Environment): Promise<GasEstimateSwapResult> {
+async function swapGasEstimator(
+  environment: Environment,
+): Promise<GasEstimateSwapResult> {
   const { swapAddresses } = gasFeeEstimateAddresses.get(environment)!;
-  const { tokenInAddress, tokenOutAddress } = swapAddresses;
+  const { walletAddress, tokenInAddress, tokenOutAddress } = swapAddresses;
 
   // todo: Use the environment to set chainId and also use zkevm when this is ready for swap
   const chainId = ChainId.SEPOLIA;
-  const exchange = await instance.createExchangeInstance(chainId, environment);
 
-  // Create a fake transaction to get the gas from the quote
-  const { info } = await exchange.getUnsignedSwapTxFromAmountIn(
-    '0x000',
-    tokenInAddress,
-    tokenOutAddress,
-    BigNumber.from(utils.parseUnits('1', 18)),
-  );
+  try {
+    const exchange = await instance.createExchangeInstance(chainId, environment);
 
-  if (info.gasFeeEstimate === null) {
+    // Create a fake transaction to get the gas from the quote
+    const { info } = await exchange.getUnsignedSwapTxFromAmountIn(
+      walletAddress,
+      tokenInAddress,
+      tokenOutAddress,
+      BigNumber.from(utils.parseUnits('1', 18)),
+    );
+
+    if (info.gasFeeEstimate === null) {
+      return {
+        gasEstimateType: GasEstimateType.SWAP,
+        gasFee: {},
+      };
+    }
+
+    let estimatedAmount;
+    if (info.gasFeeEstimate.amount) {
+      estimatedAmount = BigNumber.from(info.gasFeeEstimate.amount);
+    }
+
+    return {
+      gasEstimateType: GasEstimateType.SWAP,
+      gasFee: {
+        estimatedAmount,
+        token: {
+          address: info.gasFeeEstimate?.token.address,
+          symbol: info.gasFeeEstimate?.token.symbol ?? '',
+          name: info.gasFeeEstimate?.token.name ?? '',
+          decimals: info.gasFeeEstimate?.token.decimals ?? 18,
+        },
+      },
+    };
+  } catch {
+    // In the case of an error, just return an empty gas fee estimate
     return {
       gasEstimateType: GasEstimateType.SWAP,
       gasFee: {},
     };
   }
-
-  let estimatedAmount;
-  if (info.gasFeeEstimate.amount) {
-    estimatedAmount = BigNumber.from(info.gasFeeEstimate.amount);
-  }
-
-  return {
-    gasEstimateType: GasEstimateType.SWAP,
-    gasFee: {
-      estimatedAmount,
-      token: {
-        address: info.gasFeeEstimate?.token.address,
-        symbol: info.gasFeeEstimate?.token.symbol ?? '',
-        name: info.gasFeeEstimate?.token.name ?? '',
-        decimals: info.gasFeeEstimate?.token.decimals ?? 18,
-      },
-    },
-  };
 }
 
 export async function gasServiceEstimator(
