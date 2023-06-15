@@ -264,7 +264,7 @@ describe('Bridge Widget tests', () => {
         });
     });
 
-    it.only('should submit the bridge and show success when status is 1', () => {
+    it('should submit the bridge and show success when status is 1', () => {
       const { approveSpending, approveBridge } = text.views[BridgeWidgetViews.APPROVE_ERC20];
       const params = {
         providerPreference: 'metamask',
@@ -406,8 +406,12 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
-      cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
 
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+      cy.wait(1000);
+
+      cySmartGet('footer-button').click();
       cySmartGet('move-in-progress-view').should('be.visible');
       cy.wait(1000);
       cySmartGet('failure-box').should('be.visible');
@@ -451,7 +455,10 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
+
+      cySmartGet('footer-button').click();
       cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+      cy.wait(1000);
 
       cySmartGet('failure-box').should('be.visible');
     });
@@ -503,12 +510,16 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
-      cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
+
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+
+      cySmartGet('footer-button').click();
 
       cySmartGet('failure-box').should('be.visible');
     });
 
-    it('should submit the bridge and show fail when recoverable error and refill form when retry', () => {
+    it.only('should submit the bridge and show fail when recoverable error and refill form when retry', () => {
       const params = {
         providerPreference: 'metamask',
       } as BridgeWidgetParams;
@@ -551,7 +562,10 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
-      cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+
+      cySmartGet('footer-button').click();
 
       cySmartGet('failure-box').should('be.visible');
       cySmartGet('status-action-button').click();
@@ -600,8 +614,10 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
-      cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
 
+      cySmartGet('footer-button').click();
       cySmartGet('simple-text-body__heading').contains("Something's gone wrong");
     });
   });
