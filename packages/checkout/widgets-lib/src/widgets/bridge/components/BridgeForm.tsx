@@ -291,27 +291,48 @@ export function BridgeForm(props: BridgeFormProps) {
     try {
       setLoading(true);
       if (approvalTransaction && approvalTransaction.required && approvalTransaction.unsignedTx) {
-        const { transactionResponse } = await checkout.sendTransaction({
-          provider,
-          transaction: approvalTransaction.unsignedTx,
-        });
+        // move to new Approve ERC20 view
+        // pass in approvalTransaction and unsignedBridgeTransaction
 
-        const approvalReceipt = await transactionResponse.wait();
-        if (approvalReceipt.status !== 1) {
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: {
-                type: BridgeWidgetViews.FAIL,
-                data: {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: BridgeWidgetViews.APPROVE_ERC20,
+              data: {
+                approveTransaction: approvalTransaction,
+                transaction: unsignedBridgeTransaction,
+                bridgeFormInfo: {
                   tokenAddress,
                   amount,
                 },
               },
             },
-          });
-          return;
-        }
+          },
+        });
+        return;
+
+        //   const { transactionResponse } = await checkout.sendTransaction({
+        //     provider,
+        //     transaction: approvalTransaction.unsignedTx,
+        //   });
+
+      //   const approvalReceipt = await transactionResponse.wait();
+      //   if (approvalReceipt.status !== 1) {
+      //     viewDispatch({
+      //       payload: {
+      //         type: ViewActions.UPDATE_VIEW,
+      //         view: {
+      //           type: BridgeWidgetViews.FAIL,
+      //           data: {
+      //             tokenAddress,
+      //             amount,
+      //           },
+      //         },
+      //       },
+      //     });
+      //     return;
+      //   }
       }
 
       const { transactionResponse } = await checkout.sendTransaction({

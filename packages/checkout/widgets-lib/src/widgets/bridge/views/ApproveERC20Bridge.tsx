@@ -5,44 +5,44 @@ import {
 import { CheckoutErrorType, TokenInfo } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
-import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
+import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { text } from '../../../resources/text/textConfig';
 import {
-  ApproveERC20Swap,
-  PrefilledSwapForm,
-  SwapWidgetViews,
-} from '../../../context/view-context/SwapViewContextTypes';
+  ApproveERC20Bridge,
+  BridgeWidgetViews,
+  PrefilledBridgeForm,
+} from '../../../context/view-context/BridgeViewContextTypes';
 import { IMXCoinsHero } from '../../../components/Hero/IMXCoinsHero';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkHero';
-import { SwapContext } from '../context/SwapContext';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
+import { BridgeContext } from '../context/BridgeContext';
 
-export interface ApproveERC20Props {
-  data: ApproveERC20Swap;
+export interface ApproveERC20BridgeProps {
+  data: ApproveERC20Bridge;
 }
-export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
-  const { swapState: { checkout, provider, allowedTokens } } = useContext(SwapContext);
+export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) {
+  const { bridgeState: { checkout, provider, allowedTokens } } = useContext(BridgeContext);
   const { viewDispatch } = useContext(ViewContext);
-  const { approveSpending, approveSwap } = text.views[SwapWidgetViews.APPROVE_ERC20];
+  const { approveSpending, approveBridge } = text.views[BridgeWidgetViews.APPROVE_ERC20];
 
   // Local state
   const [actionDisabled, setActionDisabled] = useState(false);
   const [approvalTxnLoading, setApprovalTxnLoading] = useState(false);
-  const [showSwapTxnStep, setShowSwapTxnStep] = useState(false);
+  const [showBridgeTxnStep, setShowBridgeTxnStep] = useState(false);
 
   // reject transaction flags
   const [rejectedSpending, setRejectedSpending] = useState(false);
-  const [rejectedSwap, setRejectedSwap] = useState(false);
+  const [rejectedBridge, setRejectedBridge] = useState(false);
 
   // Get symbol from swap info for approve amount text
-  const fromToken = useMemo(
+  const bridgeToken = useMemo(
     () => allowedTokens.find(
-      (token: TokenInfo) => token.address === data.swapFormInfo.fromContractAddress,
+      (token: TokenInfo) => token.address === data.bridgeFormInfo.tokenAddress || token.address === 'NATIVE',
     ),
-    [allowedTokens, data.swapFormInfo.fromContractAddress],
+    [allowedTokens, data.bridgeFormInfo.tokenAddress],
   );
 
   // Common error view function
@@ -63,21 +63,21 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: {
-          type: SwapWidgetViews.SWAP,
-          data: data.swapFormInfo as PrefilledSwapForm,
+          type: BridgeWidgetViews.BRIDGE,
+          data: data.bridgeFormInfo as PrefilledBridgeForm,
         },
       },
     });
   }, [viewDispatch]);
 
-  const handleExceptions = (err, swapFormData:PrefilledSwapForm) => {
+  const handleExceptions = (err, bridgeFormData:PrefilledBridgeForm) => {
     if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SwapWidgetViews.PRICE_SURGE,
-            data: swapFormData,
+            type: BridgeWidgetViews.FAIL,
+            data: bridgeFormData,
           },
         },
       });
@@ -90,9 +90,9 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SwapWidgetViews.FAIL,
+            type: BridgeWidgetViews.FAIL,
             reason: 'Transaction failed',
-            data: swapFormData,
+            data: bridgeFormData,
           },
         },
       });
@@ -126,7 +126,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     try {
       const txnResult = await checkout.sendTransaction({
         provider,
-        transaction: data.approveTransaction,
+        transaction: data.approveTransaction.unsignedTx!, // TODO: handle checking for null
       });
 
       setApprovalTxnLoading(true);
@@ -137,8 +137,8 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
           payload: {
             type: ViewActions.UPDATE_VIEW,
             view: {
-              type: SwapWidgetViews.FAIL,
-              data: data.swapFormInfo as unknown as PrefilledSwapForm,
+              type: BridgeWidgetViews.FAIL,
+              data: data.bridgeFormInfo as unknown as PrefilledBridgeForm,
             },
           },
         });
@@ -147,7 +147,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
 
       setApprovalTxnLoading(false);
       setActionDisabled(false);
-      setShowSwapTxnStep(true);
+      setShowBridgeTxnStep(true);
     } catch (err: any) {
       setApprovalTxnLoading(false);
       setActionDisabled(false);
@@ -155,16 +155,16 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         setRejectedSpending(true);
         return;
       }
-      handleExceptions(err, data.swapFormInfo as PrefilledSwapForm);
+      handleExceptions(err, data.bridgeFormInfo as PrefilledBridgeForm);
     }
   }, [
     checkout,
     provider,
     showErrorView,
     viewDispatch,
-    setRejectedSwap,
+    setRejectedBridge,
     data.approveTransaction,
-    data.swapFormInfo,
+    data.bridgeFormInfo,
     actionDisabled,
     setActionDisabled,
     setApprovalTxnLoading,
@@ -173,9 +173,9 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   const approveSpendingContent = useMemo(() => (
     <SimpleTextBody heading={approveSpending.content.heading}>
       {/* eslint-disable-next-line max-len */}
-      <Box>{`${approveSpending.content.body[0]} ${data.swapFormInfo.fromAmount} ${fromToken?.symbol || ''} ${approveSpending.content.body[1]}`}</Box>
+      <Box>{`${approveSpending.content.body[0]} ${data.bridgeFormInfo.amount} ${bridgeToken?.symbol || ''} ${approveSpending.content.body[1]}`}</Box>
     </SimpleTextBody>
-  ), [data.swapFormInfo, fromToken]);
+  ), [data.bridgeFormInfo, bridgeToken]);
 
   const approveSpendingFooter = useMemo(() => (
     <FooterButton
@@ -186,11 +186,11 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     />
   ), [rejectedSpending, handleApproveSpendingClick]);
 
-  /* ----------------- */
-  // Approve swap step //
-  /* ----------------- */
+  /* ------------------- */
+  // Approve bridge step //
+  /* ------------------- */
 
-  const handleApproveSwapClick = useCallback(async () => {
+  const handleApproveBridgeClick = useCallback(async () => {
     if (!checkout || !provider) {
       showErrorView();
       return;
@@ -203,7 +203,7 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     try {
       const txn = await checkout.sendTransaction({
         provider,
-        transaction: data.transaction,
+        transaction: data.transaction.unsignedTx,
       });
 
       setActionDisabled(false);
@@ -214,10 +214,11 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: SwapWidgetViews.IN_PROGRESS,
+            type: BridgeWidgetViews.IN_PROGRESS,
             data: {
+              token: bridgeToken!, // TODO: handle undefined
               transactionResponse: txn.transactionResponse,
-              swapForm: data.swapFormInfo as PrefilledSwapForm,
+              bridgeForm: data.bridgeFormInfo as PrefilledBridgeForm,
             },
           },
         },
@@ -225,37 +226,37 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
     } catch (err: any) {
       setActionDisabled(false);
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-        setRejectedSwap(true);
+        setRejectedBridge(true);
         return;
       }
-      handleExceptions(err, data.swapFormInfo as PrefilledSwapForm);
+      handleExceptions(err, data.bridgeFormInfo as PrefilledBridgeForm);
     }
   }, [
     checkout,
     provider,
     showErrorView,
     viewDispatch,
-    setRejectedSwap,
+    setRejectedBridge,
     data.transaction,
-    data.swapFormInfo,
+    data.bridgeFormInfo,
     actionDisabled,
     setActionDisabled,
   ]);
 
-  const approveSwapContent = (
-    <SimpleTextBody heading={approveSwap.content.heading}>
-      <Box>{approveSwap.content.body}</Box>
+  const approveBridgeContent = (
+    <SimpleTextBody heading={approveBridge.content.heading}>
+      <Box>{approveBridge.content.body}</Box>
     </SimpleTextBody>
   );
 
-  const approveSwapFooter = useMemo(() => (
+  const approveBridgeFooter = useMemo(() => (
     <FooterButton
-      actionText={rejectedSwap
-        ? approveSwap.footer.retryText
-        : approveSwap.footer.buttonText}
-      onActionClick={handleApproveSwapClick}
+      actionText={rejectedBridge
+        ? approveBridge.footer.retryText
+        : approveBridge.footer.buttonText}
+      onActionClick={handleApproveBridgeClick}
     />
-  ), [rejectedSwap, handleApproveSwapClick]);
+  ), [rejectedBridge, handleApproveBridgeClick]);
 
   return (
     <>
@@ -266,15 +267,15 @@ export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
             <HeaderNavigation
               transparent
               showBack
-              onCloseButtonClick={sendSwapWidgetCloseEvent}
+              onCloseButtonClick={sendBridgeWidgetCloseEvent}
               onBackButtonClick={goBackWithSwapData}
             />
-)}
+          )}
           floatHeader
-          heroContent={showSwapTxnStep ? <ImmutableNetworkHero /> : <IMXCoinsHero />}
-          footer={showSwapTxnStep ? approveSwapFooter : approveSpendingFooter}
+          heroContent={showBridgeTxnStep ? <ImmutableNetworkHero /> : <IMXCoinsHero />}
+          footer={showBridgeTxnStep ? approveBridgeFooter : approveSpendingFooter}
         >
-          {showSwapTxnStep ? approveSwapContent : approveSpendingContent}
+          {showBridgeTxnStep ? approveBridgeContent : approveSpendingContent}
         </SimpleLayout>
       )}
     </>

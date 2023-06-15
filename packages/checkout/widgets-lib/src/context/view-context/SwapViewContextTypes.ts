@@ -7,7 +7,7 @@ export enum SwapWidgetViews {
   SUCCESS = 'SUCCESS',
   FAIL = 'FAIL',
   PRICE_SURGE = 'PRICE_SURGE',
-  APPROVE_ERC20 = 'APPROVE_ERC20',
+  APPROVE_ERC20 = 'APPROVE_ERC20_SWAP',
 }
 
 export type SwapWidgetView =
