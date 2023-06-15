@@ -40,7 +40,7 @@ const getAllFilesFrom = (directory) => {
  * @param {string} destinationDirectory
  * @param {string[]} fileList
  */
-const copyFileListTo = (destinationDirectory, fileList) => {
+const copyFileListTo = (fileList, destinationDirectory) => {
   if (fileList.length === 0) {
     console.log('No abi files to copy!');
     return;

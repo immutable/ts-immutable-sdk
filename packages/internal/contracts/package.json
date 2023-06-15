@@ -35,6 +35,7 @@
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
+    "copy:generated:abi": "node ../../../sdk/scripts/copy-generated-abis.js",
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "generate-types": "typechain --target=ethers-v5 --out-dir=src/typechain/types './src/abi/*.json'",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
