@@ -43,6 +43,9 @@ export interface PassportOverrides {
   passportDomain: string;
   imxPublicApiDomain: string;
   immutableXClient: ImmutableXClient;
+  zkEvmRpcUrl: string;
+  zkEvmChainId: string;
+  relayerUrl: string;
 }
 
 export interface PassportModuleConfiguration

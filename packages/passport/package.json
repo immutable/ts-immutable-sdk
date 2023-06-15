@@ -5,6 +5,8 @@
   "author": "Immutable",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
+    "@0xsequence/abi": "^0.43.33",
+    "@0xsequence/config": "^0.43.33",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/config": "0.0.0",
     "@imtbl/core-sdk": "^1.1.1-alpha.1",

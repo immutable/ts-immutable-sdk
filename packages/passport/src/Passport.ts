@@ -1,3 +1,4 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { IMXProvider } from '@imtbl/provider';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
@@ -15,6 +16,7 @@ import {
 } from './types';
 import registerPassport from './workflows/registration';
 import { ConfirmationScreen } from './confirmation';
+import { ZkEvmProvider } from './zkEvmProvider';
 
 export class Passport {
   private readonly authManager: AuthManager;
@@ -38,15 +40,18 @@ export class Passport {
       });
   }
 
-  private async getImxProvider(user: User | null) {
+  private async getImxProvider(user: User) {
     if (!user || !user.idToken) {
       throw new PassportError(
         'Failed to initialise',
         PassportErrorType.WALLET_CONNECTION_ERROR,
       );
     }
-    const provider = await this.magicAdapter.login(user.idToken);
-    const ethSigner = provider.getSigner();
+    const magicRpcProvider = await this.magicAdapter.login(user.idToken, this.config.network);
+    const web3Provider = new Web3Provider(
+      magicRpcProvider,
+    );
+    const ethSigner = web3Provider.getSigner();
     const starkSigner = await getStarkSigner(ethSigner);
 
     if (!user.etherKey) {
@@ -84,6 +89,15 @@ export class Passport {
   public async connectImx(): Promise<IMXProvider> {
     const user = await this.authManager.login();
     return this.getImxProvider(user);
+  }
+
+  public connectEvm() {
+    return new ZkEvmProvider({
+      authManager: this.authManager,
+      magicAdapter: this.magicAdapter,
+      config: this.config,
+      confirmationScreen: this.confirmationScreen,
+    });
   }
 
   public async loginCallback(): Promise<void> {

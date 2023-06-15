@@ -43,6 +43,12 @@ export class PassportConfiguration {
 
   readonly baseConfig: ImmutableConfiguration;
 
+  readonly zkEvmChainId: string;
+
+  readonly zkEvmRpcUrl: string;
+
+  readonly relayerUrl: string;
+
   constructor({
     baseConfig,
     overrides,
@@ -61,9 +67,12 @@ export class PassportConfiguration {
         [
           'network',
           'authenticationDomain',
+          'passportDomain',
           'magicPublishableApiKey',
           'magicProviderId',
-          'passportDomain',
+          'zkEvmRpcUrl',
+          'zkEvmChainId',
+          'relayerUrl',
           'imxPublicApiDomain',
         ],
         'overrides',
@@ -74,6 +83,9 @@ export class PassportConfiguration {
       this.imxPublicApiDomain = overrides.imxPublicApiDomain;
       this.magicPublishableApiKey = overrides.magicPublishableApiKey;
       this.magicProviderId = overrides.magicProviderId;
+      this.zkEvmRpcUrl = overrides.zkEvmRpcUrl;
+      this.zkEvmChainId = overrides.zkEvmChainId;
+      this.relayerUrl = overrides.relayerUrl;
     } else {
       switch (baseConfig.environment) {
         case Environment.PRODUCTION: {
@@ -83,6 +95,9 @@ export class PassportConfiguration {
           this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
           this.passportDomain = 'https://passport.immutable.com';
           this.imxPublicApiDomain = 'https://api.immutable.com';
+          this.zkEvmRpcUrl = ''; // TODO: ID-785 Update once mainnet has been deployed
+          this.zkEvmChainId = ''; // TODO: ID-785 Update once mainnet has been deployed
+          this.relayerUrl = ''; // TODO: ID-784 Update once we have added Relayer URL to config
           break;
         }
         case Environment.SANDBOX:
@@ -93,6 +108,9 @@ export class PassportConfiguration {
           this.magicProviderId = 'fSMzaRQ4O7p4fttl7pCyGVtJS_G70P8SNsLXtPPGHo0=';
           this.passportDomain = 'https://passport.sandbox.immutable.com';
           this.imxPublicApiDomain = 'https://api.sandbox.immutable.com';
+          this.zkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com';
+          this.zkEvmChainId = '13372';
+          this.relayerUrl = ''; // TODO: ID-784 Update once we have added Relayer URL to config
           break;
         }
       }
