@@ -4,8 +4,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const CURRENT_DIR_PATH = path.dirname(fileURLToPath(import.meta.url));
-const SOURCE_DIRECTORY = '/../../packages/internal/contracts/artifacts/contracts';
-const DESTINATION_DIRECTORY = '/../../packages/internal/contracts/src/abi';
+const SOURCE_DIRECTORY = '/../artifacts/contracts';
+const DESTINATION_DIRECTORY = '/../src/abi';
 
 /**
  *
@@ -55,8 +55,8 @@ const copyFileListTo = (fileList, destinationDirectory) => {
     }
   });
   console.log(`Successfully copied ${fileList.length} ${fileList.length === 1 ? 'file' : 'files'}!
- * from: ${SOURCE_DIRECTORY.replace('/../..', '')}
- * to:   ${destinationDirectory.replace('/../..', '')}`);
+ * from: ${SOURCE_DIRECTORY.replace('/../', '')}
+ * to:   ${destinationDirectory.split('/../')[1]}`);
 };
 
 const allAbiFiles = getAllFilesFrom(CURRENT_DIR_PATH + SOURCE_DIRECTORY);
