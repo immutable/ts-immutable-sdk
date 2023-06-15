@@ -61,4 +61,4 @@ const copyFileListTo = (destinationDirectory, fileList) => {
 
 const allAbiFiles = getAllFilesFrom(CURRENT_DIR_PATH + SOURCE_DIRECTORY);
 
-copyFileListTo(CURRENT_DIR_PATH + DESTINATION_DIRECTORY, allAbiFiles);
+copyFileListTo(allAbiFiles, CURRENT_DIR_PATH + DESTINATION_DIRECTORY);
