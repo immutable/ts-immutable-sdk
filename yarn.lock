@@ -3370,7 +3370,7 @@ __metadata:
     "@rollup/plugin-typescript": ^11.0.0
     hardhat: ^2.15.0
     rollup: ^3.17.2
-    typechain: ^8.2.0
+    typechain: ^8.1.1
   languageName: unknown
   linkType: soft
 
@@ -27423,7 +27423,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typechain@npm:^8.1.1, typechain@npm:^8.2.0":
+"typechain@npm:^8.1.1":
   version: 8.2.0
   resolution: "typechain@npm:8.2.0"
   dependencies:
