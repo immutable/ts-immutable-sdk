@@ -12,7 +12,7 @@ export interface FeeOption {
   tokenSymbol: string;
   tokenDecimals: number;
   tokenAddress: string;
-  recipient: string;
+  recipientAddress: string;
 }
 
 export interface Transaction {

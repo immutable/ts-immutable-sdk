@@ -57,6 +57,7 @@ describe('Passport', () => {
 
   describe('zkEvmProvider', () => {
     it('successfully initialises the zkEvm provider and sends a transaction', async () => {
+      const magicWalletAddress = '0x3082e7c88f1c8b4e24be4a75dee018ad362d84d4';
       const smartContractWalletAddress = '0x7EEC32793414aAb720a90073607733d9e7B0ecD0';
       const transferToAddress = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
       const relayerId = '0x745';
@@ -64,12 +65,11 @@ describe('Passport', () => {
       const chainId = '13372';
 
       const expectedRequestCalls: { method: string, returnValue: any }[] = [
-        { method: 'eth_requestAccounts', returnValue: [smartContractWalletAddress] },
         { method: 'eth_chainId', returnValue: chainId },
         { method: 'eth_getCode', returnValue: '0x' },
-        { method: 'eth_accounts', returnValue: [smartContractWalletAddress] },
+        { method: 'eth_accounts', returnValue: [magicWalletAddress] },
         { method: 'personal_sign', returnValue: '0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b' },
-        { method: 'eth_accounts', returnValue: [smartContractWalletAddress] },
+        { method: 'eth_accounts', returnValue: [magicWalletAddress] },
         { method: 'personal_sign', returnValue: '0xa29c8ff87dbbf59f4f46ea3006e5b27980fa4262668ad0bc1f0b24bc01a727e92ef80db88e391707bec7bdf1e1479d2fa994b732e0cb28c9438c1d0e7e67b52d1b' },
       ];
       const expectedFetchCalls: { payload: object, returnValue: any }[] = [
@@ -89,10 +89,11 @@ describe('Passport', () => {
             jsonrpc: '2.0',
             result: [
               {
-                token_price: '0x1dfd14000',
-                token_symbol: 'IMX',
-                token_decimals: 18,
-                token_address: '0x123',
+                tokenPrice: '0x1dfd14000',
+                tokenSymbol: 'IMX',
+                tokenDecimals: 18,
+                tokenAddress: '0x123',
+                recipientAddress: '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
               },
             ],
           },

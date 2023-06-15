@@ -46,13 +46,7 @@ type ImGetFeeOptionsRequest = {
 };
 
 type ImGetFeeOptionsResponse = JsonRpc & {
-  result: {
-    token_price: string;
-    token_symbol: string;
-    token_decimals: number;
-    token_address: string;
-    recipient: string;
-  }[]
+  result: FeeOption[]
 };
 
 type RelayerTransactionRequest =
@@ -122,12 +116,6 @@ export class RelayerAdapter {
       }],
     };
     const { result } = await this.postToRelayer<ImGetFeeOptionsResponse>(payload);
-    return result.map((feeOption): FeeOption => ({
-      tokenPrice: feeOption.token_price,
-      tokenSymbol: feeOption.token_symbol,
-      tokenDecimals: feeOption.token_decimals,
-      tokenAddress: feeOption.token_address,
-      recipient: feeOption.recipient,
-    }));
+    return result;
   }
 }

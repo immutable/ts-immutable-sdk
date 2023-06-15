@@ -60,7 +60,7 @@ export const ethSendTransaction = async ({
 
   const sequenceFeeTransaction: Transaction = {
     nonce,
-    to: imxFeeOption.recipient,
+    to: imxFeeOption.recipientAddress,
     value: imxFeeOption.tokenPrice,
     revertOnError: true,
   };

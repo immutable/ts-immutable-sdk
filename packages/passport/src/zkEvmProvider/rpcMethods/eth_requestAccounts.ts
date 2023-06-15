@@ -15,7 +15,7 @@ export const ethRequestAccounts = async ({
   magicAdapter,
 }: EthRequestAccountsInput) => {
   const user = await authManager.getUser() || await authManager.login();
-  let result = [];
+  const result: string[] = [];
   let magicProvider: ExternalProvider | undefined;
 
   if (user && user.idToken) {
@@ -28,10 +28,10 @@ export const ethRequestAccounts = async ({
     );
   }
 
-  if (magicProvider && magicProvider.request) {
-    result = await magicProvider.request({ method: 'eth_requestAccounts' });
-    // TODO: ID-786 Retrieve counterfactual address from JWT & return here. & not Magic key
-    // TODO: ID-786 The Magic Key should not be returned as we do not want to confuse consumers.
+  const smartContractWalletAddress = '0x7EEC32793414aAb720a90073607733d9e7B0ecD0'; // TODO: ID-786 this should be a claim in the JWT
+
+  if (magicProvider) {
+    result.push(smartContractWalletAddress);
   }
 
   return {
