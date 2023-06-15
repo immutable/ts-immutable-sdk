@@ -22,6 +22,7 @@ import { WalletContext } from '../../widgets/wallet/context/WalletContext';
 import { getBridgeFeeEstimation, getSwapFeeEstimation } from '../../lib/feeEstimation';
 import { CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
 import { useTokenSymbols } from '../../lib/hooks/useTokenSymbols';
+import { useInterval } from '../../lib/hooks/useInterval';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
@@ -52,6 +53,7 @@ export function TopUpView({
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { conversions, fiatSymbol } = cryptoFiatState;
 
+  const DEFAULT_FEE_REFRESH_INTERVAL = 30000;
   useTokenSymbols(checkout, cryptoFiatDispatch);
   const [swapFeesInFiat, setSwapFeesInFiat] = useState('');
   const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('');
@@ -68,45 +70,51 @@ export function TopUpView({
     });
   };
 
-  useEffect(() => {
+  const refreshFees = async (silent: boolean = false) => {
     if (!checkout) return;
 
-    setLoadingSwapFees(true);
-    setLoadingBridgeFees(true);
+    if (!silent) {
+      setLoadingSwapFees(true);
+      setLoadingBridgeFees(true);
+    }
 
-    (async () => {
-      try {
-        const swapEstimate = await checkout.gasEstimate({
-          gasEstimateType: GasEstimateType.SWAP,
-        }) as GasEstimateSwapResult;
-        const swapFeeInFiat = getSwapFeeEstimation(
-          swapEstimate,
-          conversions,
-        );
-        setSwapFeesInFiat(swapFeeInFiat);
-        setLoadingSwapFees(false);
-      } catch {
-        setSwapFeesInFiat('-.--');
-      } finally {
-        setLoadingSwapFees(false);
-      }
+    try {
+      const swapEstimate = await checkout.gasEstimate({
+        gasEstimateType: GasEstimateType.SWAP,
+      }) as GasEstimateSwapResult;
+      const swapFeeInFiat = getSwapFeeEstimation(
+        swapEstimate,
+        conversions,
+      );
+      setSwapFeesInFiat(swapFeeInFiat);
+      setLoadingSwapFees(false);
+    } catch {
+      setSwapFeesInFiat('-.--');
+    } finally {
+      setLoadingSwapFees(false);
+    }
 
-      try {
-        const bridgeEstimate = await checkout.gasEstimate({
-          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        }) as GasEstimateBridgeToL2Result;
-        const bridgeFeeInFiat = getBridgeFeeEstimation(
-          bridgeEstimate,
-          conversions,
-        );
-        setBridgeFeesInFiat(bridgeFeeInFiat);
-      } catch {
-        setBridgeFeesInFiat('-.--');
-      } finally {
-        setLoadingBridgeFees(false);
-      }
-    })();
-  }, [checkout, conversions]);
+    try {
+      const bridgeEstimate = await checkout.gasEstimate({
+        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+      }) as GasEstimateBridgeToL2Result;
+      const bridgeFeeInFiat = getBridgeFeeEstimation(
+        bridgeEstimate,
+        conversions,
+      );
+      setBridgeFeesInFiat(bridgeFeeInFiat);
+    } catch {
+      setBridgeFeesInFiat('-.--');
+    } finally {
+      setLoadingBridgeFees(false);
+    }
+  };
+  useInterval(() => refreshFees(true), DEFAULT_FEE_REFRESH_INTERVAL);
+
+  useEffect(() => {
+    if (!checkout) return;
+    refreshFees();
+  }, [checkout]);
 
   const onClickSwap = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT) {
