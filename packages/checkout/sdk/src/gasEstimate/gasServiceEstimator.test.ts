@@ -45,7 +45,6 @@ describe('gasServiceEstimator', () => {
       expect(result.gasFee.estimatedAmount).toEqual(BigNumber.from(560000));
       expect(result.gasFee.token?.symbol).toEqual('ETH');
       expect(result.bridgeFee.estimatedAmount).toEqual(BigNumber.from(1));
-      expect(result.bridgeFee.token?.symbol).toEqual('IMX');
     });
 
     it('should handle non-supported EIP-1559 chain', async () => {

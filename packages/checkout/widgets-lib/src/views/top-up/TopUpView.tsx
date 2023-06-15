@@ -113,8 +113,9 @@ export function TopUpView({
 
   useEffect(() => {
     if (!checkout) return;
+    if (conversions.size === 0) return;
     refreshFees();
-  }, [checkout]);
+  }, [checkout, conversions]);
 
   const onClickSwap = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT) {
@@ -192,7 +193,7 @@ export function TopUpView({
           {heading}
         </MenuItem.Label>
         <MenuItem.IntentIcon />
-        <MenuItem.Caption>
+        <MenuItem.Caption testId={`menu-item-caption-${testId}`}>
           {caption}
           <br />
           {`${subcaption}`}
