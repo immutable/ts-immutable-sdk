@@ -519,7 +519,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('failure-box').should('be.visible');
     });
 
-    it.only('should submit the bridge and show fail when recoverable error and refill form when retry', () => {
+    it('should submit the bridge and show fail when recoverable error and refill form when retry', () => {
       const params = {
         providerPreference: 'metamask',
       } as BridgeWidgetParams;

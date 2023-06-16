@@ -44,7 +44,12 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
             viewDispatch({
               payload: {
                 type: ViewActions.UPDATE_VIEW,
-                view: { type: BridgeWidgetViews.SUCCESS },
+                view: {
+                  type: BridgeWidgetViews.SUCCESS,
+                  data: {
+                    transactionHash: receipt.transactionHash,
+                  },
+                },
               },
             });
             return;

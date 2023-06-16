@@ -14,7 +14,7 @@ export enum BridgeWidgetViews {
 export type BridgeWidgetView =
   | BridgeView
   | BridgeInProgressView
-  | { type: BridgeWidgetViews.SUCCESS }
+  | BridgeSuccessView
   | BridgeFailView
   | BridgeApproveERC20View;
 
@@ -26,6 +26,13 @@ interface BridgeView {
 export interface PrefilledBridgeForm {
   amount: string;
   tokenAddress: string;
+}
+
+export interface BridgeSuccessView {
+  type: BridgeWidgetViews.SUCCESS,
+  data: {
+    transactionHash: string;
+  }
 }
 
 interface BridgeApproveERC20View {
