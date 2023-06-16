@@ -17,6 +17,15 @@ describe('retryWithDelay', () => {
     expect(mockFunc).toHaveBeenCalledTimes(1);
   });
 
+  it('finallyFn should be called if retry reached the max time', async () => {
+    const mockFunc = jest.fn().mockRejectedValue('error');
+    const mockFinallyFn = jest.fn();
+    await expect(retryWithDelay(mockFunc, { finallyFn: mockFinallyFn })).rejects.toThrow('Retry failed');
+
+    expect(mockFunc).toHaveBeenCalledTimes(MAX_RETRIES + 1);
+    expect(mockFinallyFn).toBeCalledTimes(1);
+  });
+
   it('retryWithDelay should retry with custom option', async () => {
     const mockFunc = jest.fn().mockRejectedValue('error');
     const option: RetryOption = {
