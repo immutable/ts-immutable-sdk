@@ -48,6 +48,7 @@ const transferWithGuardian = async ({
   payloadHash,
   confirmationScreen,
 }: TransferWithGuardianParams) => {
+  confirmationScreen.loading();
   const transactionAPI = new guardian.TransactionsApi(
     new guardian.Configuration({
       accessToken,
@@ -61,10 +62,14 @@ const transferWithGuardian = async ({
     }),
   );
 
+  const finallyFn = () => {
+    confirmationScreen.closeWindow();
+  };
+
   const transactionRes = await retryWithDelay(async () => transactionAPI.getTransactionByID({
     transactionID: payloadHash,
     chainType: 'starkex',
-  }));
+  }), { finallyFn });
 
   if (!transactionRes.data.id) {
     throw new Error("Transaction doesn't exists");
@@ -83,6 +88,8 @@ const transferWithGuardian = async ({
     if (!confirmationResult.confirmed) {
       throw new Error('Transaction rejected by user');
     }
+  } else {
+    confirmationScreen.closeWindow();
   }
 };
 
