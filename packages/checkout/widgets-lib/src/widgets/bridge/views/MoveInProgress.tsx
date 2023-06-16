@@ -32,33 +32,51 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
     if (!tokenBridge) return;
 
     (async () => {
-      const receipt = await transactionResponse.wait();
+      try {
+        console.log('start waiting on txn completion');
+        const receipt = await transactionResponse.wait();
+        console.log('wait over', receipt.status);
 
-      if (receipt.status === 1) {
-        const bridgeResult: WaitForResponse = await tokenBridge.waitForDeposit({
-          transactionHash: receipt.transactionHash,
-        });
-
-        if (bridgeResult.status === CompletionStatus.SUCCESS) {
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: { type: BridgeWidgetViews.SUCCESS },
-            },
+        if (receipt.status === 1) {
+          console.log('wait for bridge completion');
+          const bridgeResult: WaitForResponse = await tokenBridge.waitForDeposit({
+            transactionHash: receipt.transactionHash,
           });
-          return;
-        }
-      }
+          console.log('bridge done', bridgeResult);
 
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: BridgeWidgetViews.FAIL,
-            data: bridgeForm,
+          if (bridgeResult.status === CompletionStatus.SUCCESS) {
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: { type: BridgeWidgetViews.SUCCESS },
+              },
+            });
+            return;
+          }
+        }
+
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: BridgeWidgetViews.FAIL,
+              data: bridgeForm,
+            },
           },
-        },
-      });
+        });
+      } catch (err) {
+        console.log('in catch', err);
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: BridgeWidgetViews.FAIL,
+              data: bridgeForm,
+              reason: 'Transaction failed',
+            },
+          },
+        });
+      }
     })();
   }, [transactionResponse, tokenBridge]);
 

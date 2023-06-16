@@ -42,9 +42,9 @@ interface BridgeFailView {
 interface BridgeInProgressView {
   type: BridgeWidgetViews.IN_PROGRESS;
   data: {
-    token: TokenInfo,
-    transactionResponse: TransactionResponse,
-    bridgeForm: PrefilledBridgeForm,
+    token: TokenInfo;
+    transactionResponse: TransactionResponse;
+    bridgeForm: PrefilledBridgeForm;
   };
 }
 
