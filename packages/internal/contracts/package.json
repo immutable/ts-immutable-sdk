@@ -8,7 +8,8 @@
     "@rollup/plugin-typescript": "^11.0.0",
     "hardhat": "^2.15.0",
     "rollup": "^3.17.2",
-    "typechain": "^8.1.1"
+    "typechain": "^8.1.1",
+    "typescript": "^4.9.5"
   },
   "engines": {
     "node": ">=16.11.0"
