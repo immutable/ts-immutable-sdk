@@ -228,18 +228,17 @@ export const text = {
         onramp: {
           heading: 'Buy with card',
           caption: 'Google pay & Apple pay available. Minimum $20.',
-          subcaption: 'Fees ~ 0.3%',
+          subcaption: 'Fees ≈ 0.3%',
         },
         swap: {
           heading: 'Swap my coins',
           caption: 'Using the coins I have on the same network',
-          subcaption: 'Fees ~ 0.3%',
+          subcaption: 'Fees ≈',
         },
         bridge: {
           heading: 'Move my coins',
           caption: 'From the coins I have on a different network',
-          // todo: get the live rate
-          subcaption: 'Fees {live rate}',
+          subcaption: 'Fees ≈',
         },
       },
     },

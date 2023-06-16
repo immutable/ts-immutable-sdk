@@ -17,7 +17,6 @@ import {
 } from './WalletBalancesStyles';
 import { zkEVMNetwork } from '../../../lib/networkUtils';
 import {
-  CryptoFiatActions,
   CryptoFiatContext,
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { getTokenBalances } from '../functions/tokenBalances';
@@ -27,6 +26,7 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
+import { useTokenSymbols } from '../../../lib/hooks/useTokenSymbols';
 
 export function WalletBalances() {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -38,6 +38,7 @@ export function WalletBalances() {
     provider, checkout, network, supportedTopUps,
   } = walletState;
   const { conversions } = cryptoFiatState;
+  useTokenSymbols(checkout, cryptoFiatDispatch);
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
     return (
@@ -59,31 +60,6 @@ export function WalletBalances() {
     });
     setTotalFiatAmount(totalAmount);
   }, [walletState.tokenBalances]);
-
-  useEffect(() => {
-    if (!checkout || !provider || !network) return;
-
-    (async () => {
-      const walletAddress = await provider.getSigner().getAddress();
-      const getAllBalancesResult = await checkout.getAllBalances({
-        provider,
-        walletAddress,
-        chainId: network.chainId,
-      });
-
-      const tokenSymbols: string[] = [];
-      getAllBalancesResult.balances.forEach((balance) => {
-        tokenSymbols.push(balance.token.symbol);
-      });
-
-      cryptoFiatDispatch({
-        payload: {
-          type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
-          tokenSymbols,
-        },
-      });
-    })();
-  }, [provider, checkout, network, cryptoFiatDispatch]);
 
   const handleAddCoinsClick = () => {
     viewDispatch({

@@ -12,7 +12,7 @@ import type { PageSize } from '../models/PageSize';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 
-export class OrdersService {
+export class ListingsService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 

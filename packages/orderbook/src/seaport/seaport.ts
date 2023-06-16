@@ -6,7 +6,7 @@ import {
   PopulatedTransaction, providers,
 } from 'ethers';
 import {
-  ERC20Item, ERC721Item, FulfilOrderResponse, NativeItem, PrepareListingResponse, RoyaltyInfo,
+  ERC20Item, ERC721Item, FulfillOrderResponse, NativeItem, PrepareListingResponse, RoyaltyInfo,
 } from 'types';
 import { Order } from 'openapi/sdk';
 import {
@@ -68,7 +68,7 @@ export class Seaport {
     };
   }
 
-  async fulfilOrder(order: Order, account: string): Promise<FulfilOrderResponse> {
+  async fulfilOrder(order: Order, account: string): Promise<FulfillOrderResponse> {
     const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
     const { actions } = await this.seaport.fulfillOrders({
       accountAddress: account,

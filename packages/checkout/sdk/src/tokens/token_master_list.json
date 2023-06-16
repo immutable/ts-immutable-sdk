@@ -1,6 +1,6 @@
 [
   {
-    "chainId": 13373,
+    "chainId": 13383,
     "name": "IMX",
     "symbol": "IMX",
     "decimals": 18,
@@ -8,7 +8,7 @@
     "tokenFeatures": ["swap", "bridge"]
   },
   {
-    "chainId": 13373,
+    "chainId": 13383,
     "name": "FUN token",
     "address": "0xd8f1D29a1572FbCeF0B0C9541E50637Ad8804F21",
     "symbol": "FUN",
@@ -17,7 +17,7 @@
     "tokenFeatures": ["swap", "bridge"]
   },
   {
-    "chainId": 13373,
+    "chainId": 13383,
     "name": "USDC",
     "address": "0x5893A5c7bc615Dfd36D7383366d00FFFca5f7178",
     "symbol": "USDC",
@@ -26,7 +26,7 @@
     "tokenFeatures": ["swap", "bridge"]
   },
   {
-    "chainId": 13373,
+    "chainId": 13383,
     "name": "WETH",
     "address": "0xD6d9321DCC42377C1fa8cFec665182c463b2392C",
     "symbol": "WETH",
