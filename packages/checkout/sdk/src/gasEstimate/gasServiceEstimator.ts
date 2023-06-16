@@ -8,13 +8,15 @@ import { getBridgeEstimatedGas, getBridgeFeeEstimate } from './bridgeGasEstimate
 import { GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType } from '../types/gasEstimate';
 import * as instance from '../instance';
 
+const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000000';
+
 interface GasEstimateTokenAddresses {
   bridgeToL2Addresses: {
     gasTokenAddress: string;
-    tokenToBridgeL2Address: string;
+    tokenToBridgeAddress: string;
   };
   swapAddresses: {
-    walletAddress: string;
+    fromAddress: string;
     tokenInAddress: string;
     tokenOutAddress: string;
   };
@@ -26,14 +28,14 @@ const gasFeeEstimateAddresses = new Map<Environment, GasEstimateTokenAddresses>(
     Environment.PRODUCTION, {
       bridgeToL2Addresses: {
         gasTokenAddress: 'NATIVE',
-        tokenToBridgeL2Address: 'NATIVE',
+        // todo: Add production address
+        tokenToBridgeAddress: '',
       },
       swapAddresses: {
-        // Dummy swap transaction requires a valid address
-        walletAddress: '',
-        // todo: Replace with actual production addresses // todo: addresses causing gitleaks to fail
-        tokenInAddress: '', // FUN
-        tokenOutAddress: '', // DEX
+        fromAddress: DUMMY_WALLET_ADDRESS,
+        // todo: Add production addresses
+        tokenInAddress: '',
+        tokenOutAddress: '',
       },
     },
   ],
@@ -41,15 +43,12 @@ const gasFeeEstimateAddresses = new Map<Environment, GasEstimateTokenAddresses>(
     Environment.SANDBOX, {
       bridgeToL2Addresses: {
         gasTokenAddress: 'NATIVE',
-        // should be NATIVE (IMX) but bridge is not NATIVE supporting yet
-        tokenToBridgeL2Address: '',
+        tokenToBridgeAddress: '0xd1da7e9b2Ce1a4024DaD52b3D37F4c5c91a525C1', // IMX
       },
       swapAddresses: {
-        // Dummy swap transaction requires a valid address
-        walletAddress: '',
-        // todo: addresses causing gitleaks to fail
-        tokenInAddress: '', // FUN
-        tokenOutAddress: '', // DEX
+        fromAddress: DUMMY_WALLET_ADDRESS,
+        tokenInAddress: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE', // FUN
+        tokenOutAddress: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2', // DEX
       },
     },
   ],
@@ -63,7 +62,7 @@ async function bridgeToL2GasEstimator(
   const toChainId = environment === Environment.PRODUCTION ? ChainId.IMTBL_ZKEVM_TESTNET : ChainId.IMTBL_ZKEVM_DEVNET;
 
   const { bridgeToL2Addresses } = gasFeeEstimateAddresses.get(environment)!;
-  const { gasTokenAddress, tokenToBridgeL2Address } = bridgeToL2Addresses;
+  const { gasTokenAddress, tokenToBridgeAddress } = bridgeToL2Addresses;
 
   const provider = environment === Environment.PRODUCTION
     ? readOnlyProviders.get(ChainId.ETHEREUM)
@@ -89,7 +88,7 @@ async function bridgeToL2GasEstimator(
 
     const { bridgeFee } = await getBridgeFeeEstimate(
       tokenBridge,
-      tokenToBridgeL2Address,
+      tokenToBridgeAddress,
       toChainId,
     );
 
@@ -118,7 +117,7 @@ async function swapGasEstimator(
   environment: Environment,
 ): Promise<GasEstimateSwapResult> {
   const { swapAddresses } = gasFeeEstimateAddresses.get(environment)!;
-  const { walletAddress, tokenInAddress, tokenOutAddress } = swapAddresses;
+  const { fromAddress, tokenInAddress, tokenOutAddress } = swapAddresses;
 
   // todo: Use the environment to set chainId and also use zkevm when this is ready for swap
   const chainId = ChainId.SEPOLIA;
@@ -128,7 +127,7 @@ async function swapGasEstimator(
 
     // Create a fake transaction to get the gas from the quote
     const { info } = await exchange.getUnsignedSwapTxFromAmountIn(
-      walletAddress,
+      fromAddress,
       tokenInAddress,
       tokenOutAddress,
       BigNumber.from(utils.parseUnits('1', 18)),

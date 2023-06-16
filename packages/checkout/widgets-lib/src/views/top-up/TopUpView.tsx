@@ -55,8 +55,8 @@ export function TopUpView({
 
   const DEFAULT_FEE_REFRESH_INTERVAL = 30000;
   useTokenSymbols(checkout, cryptoFiatDispatch);
-  const [swapFeesInFiat, setSwapFeesInFiat] = useState('');
-  const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('');
+  const [swapFeesInFiat, setSwapFeesInFiat] = useState('-.--');
+  const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('-.--');
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
 

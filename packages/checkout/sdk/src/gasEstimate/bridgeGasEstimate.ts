@@ -13,6 +13,8 @@ import {
 import * as tokens from '../tokens';
 import { ChainId, TokenFilterTypes, TokenInfo } from '../types';
 
+const GAS_LIMIT = 140000;
+
 async function getTokenInfoByAddress(
   tokenAddress: FungibleToken,
   chainId: ChainId,
@@ -34,7 +36,7 @@ const getGasPriceInWei = (feeData: FeeData): BigNumber | null => (doesChainSuppo
   : feeData.gasPrice && BigNumber.from(feeData.gasPrice));
 
 const getGasEstimates = async (provider: Web3Provider): Promise<BigNumber | undefined> => {
-  const txnGasLimitInWei = 140000; // todo: fetch gasLimit from bridgeSDK when they add new fn
+  const txnGasLimitInWei = GAS_LIMIT; // todo: fetch gasLimit from bridgeSDK when they add new fn
   const feeData: FeeData = await provider.getFeeData();
   const gasPriceInWei = getGasPriceInWei(feeData);
   if (!gasPriceInWei) return undefined;
