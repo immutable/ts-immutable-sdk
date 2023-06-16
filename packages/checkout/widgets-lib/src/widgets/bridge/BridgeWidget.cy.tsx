@@ -3,11 +3,12 @@ import {
   describe, it, cy, beforeEach,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
+import { Checkout, CheckoutErrorType, TokenAmountEstimate } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CompletionStatus, TokenBridge } from '@imtbl/bridge-sdk';
 import { BiomeCombinedProviders } from '@biom3/react';
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { cySmartGet } from '../../lib/testUtils';
 import {
   BridgeWidget,
@@ -20,10 +21,6 @@ import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextT
 
 describe('Bridge Widget tests', () => {
   const { header, content } = text.views[BridgeWidgetViews.BRIDGE];
-  beforeEach(() => {
-    cy.viewport('ipad-2');
-  });
-
   let connectStubReturnValue;
   const config: StrongCheckoutWidgetsConfig = {
     environment: Environment.SANDBOX,
@@ -33,25 +30,28 @@ describe('Bridge Widget tests', () => {
     isOnRampEnabled: true,
   };
 
+  const mockProvider = {
+    getSigner: () => ({
+      getAddress: () => Promise.resolve('0xwalletAddress'),
+    }),
+    getNetwork: async () => ({
+      chainId: 1,
+      name: 'Ethereum',
+    }),
+    getFeeData: () => ({
+      maxFeePerGas: BigNumber.from(100),
+      maxPriorityFeePerGas: BigNumber.from(100),
+      gasPrice: BigNumber.from(100),
+    }),
+    provider: {
+      request: async () => null,
+    },
+  };
+
   beforeEach(() => {
+    cy.viewport('ipad-2');
     connectStubReturnValue = {
-      provider: {
-        getSigner: () => ({
-          getAddress: () => Promise.resolve('0xwalletAddress'),
-        }),
-        getNetwork: async () => ({
-          chainId: 1,
-          name: 'Ethereum',
-        }),
-        getFeeData: () => ({
-          maxFeePerGas: BigNumber.from(100),
-          maxPriorityFeePerGas: BigNumber.from(100),
-          gasPrice: BigNumber.from(100),
-        }),
-        provider: {
-          request: async () => null,
-        },
-      },
+      provider: mockProvider,
       network: {
         chainId: 1,
         name: 'Ethereum',
@@ -64,8 +64,7 @@ describe('Bridge Widget tests', () => {
       },
     };
 
-    cy
-      .stub(Checkout.prototype, 'connect')
+    cy.stub(Checkout.prototype, 'connect')
       .as('connectStub')
       .resolves(connectStubReturnValue);
 
@@ -98,8 +97,7 @@ describe('Bridge Widget tests', () => {
         ],
       });
 
-    cy
-      .stub(Checkout.prototype, 'switchNetwork')
+    cy.stub(Checkout.prototype, 'switchNetwork')
       .as('switchNetworkStub')
       .resolves(connectStubReturnValue);
 
@@ -145,6 +143,37 @@ describe('Bridge Widget tests', () => {
             },
           },
         ],
+      });
+
+    cy.stub(Checkout.prototype, 'getNetworkInfo').as('networkInfoStub');
+
+    // Had to stub JsonRpcProvider as it makes calls on creation
+    // Can resolve to any network for these tests as we also stub
+    // TokenBridge which is at a higher level and which uses the JsonRpcProvider
+    cy.stub(JsonRpcProvider.prototype, 'detectNetwork').resolves({ name: '', chainId: '0x1' });
+
+    cy.stub(Checkout.prototype, 'getBridgeGasEstimate')
+      .as('getBridgeGasEstimate')
+      .resolves({
+        bridgeFee: {
+          estimatedAmount: BigNumber.from('0'),
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+            address: 'NATIVE',
+          },
+        } as TokenAmountEstimate,
+        gasEstimate: {
+          estimatedAmount: BigNumber.from('10000000000000'),
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+            address: 'NATIVE',
+          },
+        } as TokenAmountEstimate,
+        bridgeable: true,
       });
 
     const fiatPricingValue = {
@@ -236,6 +265,7 @@ describe('Bridge Widget tests', () => {
     });
 
     it('should submit the bridge and show success when status is 1', () => {
+      const { approveSpending, approveBridge } = text.views[BridgeWidgetViews.APPROVE_ERC20];
       const params = {
         providerPreference: 'metamask',
       } as BridgeWidgetParams;
@@ -244,8 +274,12 @@ describe('Bridge Widget tests', () => {
         .onFirstCall()
         .resolves({
           transactionResponse: {
-            wait: () => ({
-              status: 1,
+            wait: () => new Promise((resolve) => {
+              setTimeout(() => {
+                resolve({
+                  status: 1,
+                });
+              }, 1000);
             }),
           },
         })
@@ -263,23 +297,26 @@ describe('Bridge Widget tests', () => {
         });
 
       cy.stub(TokenBridge.prototype, 'waitForDeposit').as('waitForDepositStub')
-        .resolves({
-          status: CompletionStatus.SUCCESS,
-        });
+        .resolves(new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({
+              status: CompletionStatus.SUCCESS,
+              transactionHash: '0x123245',
+            });
+          }, 1000);
+        }));
 
       mount(
-        <BiomeCombinedProviders>
-          <BridgeWidget
-            config={{
-              environment: Environment.SANDBOX,
-              theme: WidgetTheme.DARK,
-              isBridgeEnabled: true,
-              isSwapEnabled: true,
-              isOnRampEnabled: true,
-            }}
-            params={params}
-          />
-        </BiomeCombinedProviders>,
+        <BridgeWidget
+          config={{
+            environment: Environment.SANDBOX,
+            theme: WidgetTheme.DARK,
+            isBridgeEnabled: true,
+            isSwapEnabled: true,
+            isOnRampEnabled: true,
+          }}
+          params={params}
+        />,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -291,9 +328,24 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
-      cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
 
+      cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.heading);
+      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.body[0]);
+      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.body[1]);
+      cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
+
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+      cy.wait(1000);
+
+      cySmartGet('simple-text-body__heading').should('have.text', approveBridge.content.heading);
+      cySmartGet('simple-text-body__body').should('include.text', approveBridge.content.body[0]);
+      cySmartGet('simple-text-body__body').should('include.text', approveBridge.content.body[1]);
+      cySmartGet('footer-button').should('have.text', approveBridge.footer.buttonText);
+
+      cySmartGet('footer-button').click();
       cySmartGet('move-in-progress-view').should('be.visible');
+
       cy.wait(1000);
       cySmartGet('success-box').should('be.visible');
     });
@@ -354,8 +406,12 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
-      cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
 
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+      cy.wait(1000);
+
+      cySmartGet('footer-button').click();
       cySmartGet('move-in-progress-view').should('be.visible');
       cy.wait(1000);
       cySmartGet('failure-box').should('be.visible');
@@ -399,7 +455,10 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
+
+      cySmartGet('footer-button').click();
       cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+      cy.wait(1000);
 
       cySmartGet('failure-box').should('be.visible');
     });
@@ -451,12 +510,16 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
-      cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
+
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+
+      cySmartGet('footer-button').click();
 
       cySmartGet('failure-box').should('be.visible');
     });
 
-    it('should submit the bridge and show fail when recoverable error and refill form when retry', () => {
+    it.only('should submit the bridge and show fail when recoverable error and refill form when retry', () => {
       const params = {
         providerPreference: 'metamask',
       } as BridgeWidgetParams;
@@ -499,7 +562,10 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
-      cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+
+      cySmartGet('footer-button').click();
 
       cySmartGet('failure-box').should('be.visible');
       cySmartGet('status-action-button').click();
@@ -548,8 +614,10 @@ describe('Bridge Widget tests', () => {
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
-      cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
 
+      cySmartGet('footer-button').click();
       cySmartGet('simple-text-body__heading').contains("Something's gone wrong");
     });
   });

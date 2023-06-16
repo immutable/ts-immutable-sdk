@@ -11,7 +11,7 @@ export async function waitForOrderToBeOfStatus(
     throw new Error('Order never became active');
   }
 
-  const { result: order } = await sdk.getOrder(orderId);
+  const { result: order } = await sdk.getListing(orderId);
   if (order.status === status) {
     return order;
   }
