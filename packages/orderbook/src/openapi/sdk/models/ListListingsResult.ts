@@ -5,7 +5,7 @@
 import type { Order } from './Order';
 import type { Page } from './Page';
 
-export type ListOrdersResult = {
+export type ListListingsResult = {
   page: Page;
   result: Array<Order>;
 };
