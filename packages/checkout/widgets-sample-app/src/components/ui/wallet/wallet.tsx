@@ -59,9 +59,7 @@ function WalletUI() {
   return (
     <div className="Connect">
       <h1 className="sample-heading">Checkout Wallet (Web Component)</h1>
-      <WalletReact
-        useConnectWidget={true}
-      />
+      <WalletReact/>
     </div>
   );
 }

@@ -26,7 +26,6 @@ export function WalletReact(props: WalletReactProps) {
     <imtbl-wallet
       widgetConfig={config}
       walletProvider={walletProvider}
-      injectedProvider
     />
   );
 }

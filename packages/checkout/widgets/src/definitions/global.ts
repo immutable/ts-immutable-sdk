@@ -54,7 +54,6 @@ export interface ImtblWalletProps
   > {
   walletProvider?: string;
   widgetConfig?: string;
-  injectedProvider?:boolean;
 }
 
 /**

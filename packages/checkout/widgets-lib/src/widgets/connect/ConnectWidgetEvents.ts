@@ -7,13 +7,12 @@ import {
 } from '@imtbl/checkout-widgets';
 
 import { Web3Provider } from '@ethersproject/providers';
-
-import { addToLocalStorage } from '../../lib';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 
 export function sendConnectSuccessEvent(
-  provider?: Web3Provider,
+  provider: Web3Provider,
+  providerName?: WalletProviderName,
 ) {
-  addToLocalStorage('provider', provider);
   const successEvent = new CustomEvent<ConnectEvent<ConnectionSuccess>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
@@ -21,6 +20,7 @@ export function sendConnectSuccessEvent(
         type: ConnectEventType.SUCCESS,
         data: {
           provider,
+          providerName,
         },
       },
     },

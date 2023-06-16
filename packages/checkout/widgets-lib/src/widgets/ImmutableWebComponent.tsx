@@ -35,33 +35,6 @@ export abstract class ImmutableWebComponent extends HTMLElement {
     this.injectedProvider = !!this.getAttribute('injectedProvider') || false;
   }
 
-  connectedProviderCheck() {
-    return new Promise((resolve):void => {
-      if (!this.injectedProvider) {
-        resolve(true);
-        return;
-      }
-      let timer: number;
-      let attempts = 0;
-      const maxAttempts = 10;
-
-      const attemptToSetProvider = () => {
-        if (this.provider) {
-          resolve(true);
-        } else {
-          attempts++;
-          if (attempts >= maxAttempts) {
-            window.clearInterval(timer);
-            resolve(false);
-          }
-        }
-      };
-
-      timer = window.setInterval(attemptToSetProvider, 10);
-      attemptToSetProvider();
-    });
-  }
-
   private parseWidgetConfig(widgetsConfig?: string):StrongCheckoutWidgetsConfig {
     try {
       return withDefaultWidgetConfigs(

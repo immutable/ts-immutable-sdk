@@ -1,17 +1,17 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { createContext } from 'react';
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { Checkout, ConnectionProviders, WalletProviderName } from '@imtbl/checkout-sdk';
 
 export interface ConnectState {
   checkout: Checkout | null;
-  provider: Web3Provider | undefined;
+  provider: Web3Provider | null;
   providerPreference: ConnectionProviders | null;
   sendCloseEvent: () => void;
 }
 
 export const initialConnectState: ConnectState = {
   checkout: null,
-  provider: undefined,
+  provider: null,
   providerPreference: null,
   sendCloseEvent: () => {},
 };
@@ -28,13 +28,13 @@ export interface ConnectAction {
 type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
-  | SetProviderPreferencePayload
+  | SetProviderNamePayload
   | SetSendCloseEventPayload;
 
 export enum ConnectActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
-  SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
+  SET_PROVIDER_NAME = 'SET_PROVIDER_NAME',
   SET_SEND_CLOSE_EVENT = 'SET_SEND_CLOSE_EVENT',
 }
 
@@ -48,9 +48,9 @@ export interface SetProviderPayload {
   provider: Web3Provider;
 }
 
-export interface SetProviderPreferencePayload {
-  type: ConnectActions.SET_PROVIDER_PREFERENCE;
-  providerPreference: ConnectionProviders;
+export interface SetProviderNamePayload {
+  type: ConnectActions.SET_PROVIDER_NAME;
+  providerName: WalletProviderName;
 }
 
 export interface SetSendCloseEventPayload {
@@ -83,10 +83,10 @@ export const connectReducer: Reducer<ConnectState, ConnectAction> = (
         ...state,
         provider: action.payload.provider,
       };
-    case ConnectActions.SET_PROVIDER_PREFERENCE:
+    case ConnectActions.SET_PROVIDER_NAME:
       return {
         ...state,
-        providerPreference: action.payload.providerPreference,
+        providerName: action.payload.providerName,
       };
     case ConnectActions.SET_SEND_CLOSE_EVENT:
       return {

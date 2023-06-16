@@ -141,7 +141,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
             {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
               <SwitchNetworkEth />
             )}
-            {view.type === ConnectWidgetViews.SUCCESS && (
+            {view.type === ConnectWidgetViews.SUCCESS && provider && (
               <ConnectLoaderSuccess>
                 <StatusView
                   statusText="Connection secure"
@@ -153,7 +153,8 @@ export function ConnectWidget(props: ConnectWidgetProps) {
                 />
               </ConnectLoaderSuccess>
             )}
-            {view.type === ConnectWidgetViews.FAIL && <ConnectResult />}
+            {((view.type === ConnectWidgetViews.SUCCESS && !provider)
+            || view.type === ConnectWidgetViews.FAIL) && <ConnectResult />}
           </>
         </ConnectContext.Provider>
       </ViewContext.Provider>

@@ -52,6 +52,12 @@ export function WalletList(props: WalletListProps) {
             provider: connectResult.provider,
           },
         });
+        connectDispatch({
+          payload: {
+            type: ConnectActions.SET_PROVIDER_NAME,
+            providerName,
+          },
+        });
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,

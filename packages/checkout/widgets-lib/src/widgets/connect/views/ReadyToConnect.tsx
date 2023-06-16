@@ -26,34 +26,34 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   const { body, footer } = text.views[ConnectWidgetViews.READY_TO_CONNECT];
   const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
 
-  const onConnectClick = useCallback(async () => {
-    const handleConnectViewUpdate = async (
-      // TODO: variable is already declared above
-      // eslint-disable-next-line
-      checkout: Checkout,
-      // eslint-disable-next-line
-      provider: Web3Provider,
-    ) => {
-      const networkInfo = await checkout.getNetworkInfo({ provider });
+  const handleConnectViewUpdate = async (
+    // TODO: variable is already declared above
+    // eslint-disable-next-line
+    checkout: Checkout,
+    // eslint-disable-next-line
+    provider: Web3Provider,
+  ) => {
+    const networkInfo = await checkout.getNetworkInfo({ provider });
 
-      if (networkInfo.chainId !== targetChainId) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: ConnectWidgetViews.SWITCH_NETWORK },
-          },
-        });
-        return;
-      }
-
+    if (networkInfo.chainId !== targetChainId) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: ConnectWidgetViews.SUCCESS },
+          view: { type: ConnectWidgetViews.SWITCH_NETWORK },
         },
       });
-    };
+      return;
+    }
 
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: ConnectWidgetViews.SUCCESS },
+      },
+    });
+  };
+
+  const onConnectClick = useCallback(async () => {
     if (checkout && provider) {
       try {
         const connectResult = await checkout.connect({

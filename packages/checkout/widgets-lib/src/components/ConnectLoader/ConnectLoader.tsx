@@ -6,7 +6,9 @@ import {
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import React, { useCallback, useEffect, useReducer } from 'react';
+import React, {
+  useCallback, useEffect, useReducer, useState,
+} from 'react';
 import {
   ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents,
 } from '@imtbl/checkout-widgets';
@@ -51,7 +53,6 @@ export function ConnectLoader({
   );
   const { connectionStatus, deepLink } = connectLoaderState;
   const { targetLayer, providerName } = params;
-  let { web3Provider } = params;
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
   const targetChainId = getTargetLayerChainId(targetLayer ?? ConnectTargetLayer.LAYER2, widgetConfig.environment);
@@ -60,7 +61,42 @@ export function ConnectLoader({
     ? onLightBase
     : onDarkBase;
 
+  const [hasWeb3Provider, setHasWeb3Provider] = useState<boolean | undefined>();
+  const [hasCheckedProvider, setHasCheckedProvider] = useState<boolean>(false);
+  const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(params.web3Provider);
+  const checkProvider = () => {
+    if (!hasCheckedProvider) setHasCheckedProvider(true);
+    let timer: number;
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    const attemptToSetProvider = () => {
+      (async () => {
+        if (web3Provider) {
+          const isWeb3Res = await Checkout.isWeb3Provider(web3Provider);
+          if (isWeb3Res) {
+            setHasWeb3Provider(true);
+            return;
+          }
+        }
+
+        attempts++;
+        if (attempts >= maxAttempts) {
+          window.clearInterval(timer);
+          setHasWeb3Provider(false);
+        }
+      })();
+    };
+
+    timer = window.setInterval(attemptToSetProvider, 10);
+    attemptToSetProvider();
+  };
+
   useEffect(() => {
+    if (hasWeb3Provider === undefined) {
+      checkProvider();
+      return;
+    }
     const checkConnection = async (checkout: Checkout) => {
       if (!providerName && !web3Provider) {
         connectLoaderDispatch({
@@ -78,13 +114,24 @@ export function ConnectLoader({
           const { provider } = await checkout.createProvider({
             providerName,
           });
-          web3Provider = provider;
+          setWeb3Provider(provider);
+        }
+
+        if (!web3Provider) {
+          connectLoaderDispatch({
+            payload: {
+              type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+              connectionStatus: ConnectionStatus.NOT_CONNECTED_NO_PROVIDER,
+              deepLink: ConnectWidgetViews.CONNECT_WALLET,
+            },
+          });
+          return;
         }
 
         // at this point web3Provider has been either created or parsed in
 
         const { isConnected } = await checkout.checkIsWalletConnected({
-          provider: web3Provider!,
+          provider: web3Provider,
         });
 
         if (!isConnected) {
@@ -111,6 +158,7 @@ export function ConnectLoader({
           });
           return;
         }
+
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -136,7 +184,7 @@ export function ConnectLoader({
         case ConnectEventType.SUCCESS: {
           const eventData = event.detail.data as ConnectionSuccess;
 
-          web3Provider = eventData.provider;
+          setWeb3Provider(eventData.provider);
 
           connectLoaderDispatch({
             payload: {
@@ -170,15 +218,14 @@ export function ConnectLoader({
       IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
       handleConnectEvent,
     );
-  }, [widgetConfig.environment, web3Provider, providerName]);
+  }, [widgetConfig.environment, web3Provider, providerName, hasWeb3Provider]);
 
   const childrenWithProvider = useCallback(
     (childrenWithoutProvider:React.ReactNode) =>
-    // eslint-disable-next-line
-     React.Children.map(childrenWithoutProvider, (child) => {
+      // eslint-disable-next-line
+      React.Children.map(childrenWithoutProvider, (child) => 
         // eslint-disable-next-line
-      return React.cloneElement(child as React.ReactElement, { web3Provider });
-      }),
+        React.cloneElement(child as React.ReactElement, { web3Provider })),
     [web3Provider],
   );
 
@@ -226,7 +273,7 @@ export function ConnectLoader({
                 },
               });
             }}
-            actionText="Try Again LOADER"
+            actionText="Try Again"
           />
         </BiomeCombinedProviders>
       )}
