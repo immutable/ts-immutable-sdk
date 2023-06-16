@@ -3,6 +3,7 @@
  */
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
+import { ethers } from 'ethers';
 import { connectWalletProvider } from './connect';
 import { getNetworkInfo, switchWalletNetwork } from './network';
 
@@ -11,24 +12,21 @@ import {
   ChainId,
   ConnectionProviders,
   GetBalanceParams,
-  GetNetworkAllowListResult,
 } from './types';
 import { getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
-import {
-  getBridgeFeeEstimate,
-  getBridgeEstimatedGas,
-} from './gasEstimate/bridgeGasEstimate';
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
-import * as network from './network';
-import { GetBridgeGasEstimateResult } from './types/gasEstimate';
+import { GasEstimateSwapResult, GasEstimateType } from './types/gasEstimate';
+import { gasEstimator } from './gasEstimate/gasEstimator';
+import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 
 jest.mock('./connect');
 jest.mock('./network');
 jest.mock('./balances');
 jest.mock('./transaction');
-jest.mock('./gasEstimate/bridgeGasEstimate');
+jest.mock('./gasEstimate/gasEstimator');
+jest.mock('./readOnlyProviders/readOnlyProvider');
 
 describe(' Connect', () => {
   const testCheckoutConfig = new CheckoutConfiguration({
@@ -150,51 +148,18 @@ describe(' Connect', () => {
     expect(sendTransaction).toBeCalledTimes(1);
   });
 
-  describe('gas estimate', () => {
-    let provider: Web3Provider;
-    beforeEach(() => {
-      provider = {
-        provider: {
-          request: () => {},
-        },
-      } as any as Web3Provider;
-      const getNetworkAllListMock = jest.fn().mockResolvedValue({
-        networks: [
-          {
-            chainId: ChainId.IMTBL_ZKEVM_DEVNET,
-            name: 'Immutable zkEVM Testnet',
-            isSupported: true,
-            nativeCurrency: {},
-          },
-          {
-            chainId: ChainId.SEPOLIA,
-            name: 'Sepolia',
-            isSupported: true,
-            nativeCurrency: {},
-          },
-        ],
-      } as GetNetworkAllowListResult);
+  it('should call gasEstimate function', async () => {
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue({} as Map<ChainId, ethers.providers.JsonRpcProvider>);
+    (gasEstimator as jest.Mock).mockResolvedValue({} as GasEstimateSwapResult);
 
-      (network.getNetworkAllowList as jest.Mock).mockImplementation(
-        getNetworkAllListMock,
-      );
+    const checkout = new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
     });
-    it('should fetch gas estimate for bridgeable transaction', async () => {
-      (getBridgeFeeEstimate as jest.Mock).mockResolvedValue({
-        bridgeable: true,
-      } as GetBridgeGasEstimateResult);
 
-      const checkout = new Checkout({
-        baseConfig: { environment: Environment.SANDBOX },
-      });
-
-      await checkout.getBridgeGasEstimate({
-        provider,
-        tokenAddress: 'NATIVE',
-      });
-
-      expect(getBridgeEstimatedGas).toBeCalledTimes(1);
-      expect(getBridgeFeeEstimate).toBeCalledTimes(1);
+    await checkout.gasEstimate({
+      gasEstimateType: GasEstimateType.SWAP,
     });
+
+    expect(gasEstimator).toBeCalledTimes(1);
   });
 });

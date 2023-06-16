@@ -46,7 +46,7 @@ const getGasEstimates = async (provider: Web3Provider): Promise<BigNumber | unde
 export async function getBridgeEstimatedGas(
   provider: Web3Provider,
   chainId: ChainId,
-  isApproveTxnRequired?: boolean,
+  isApproveTxnRequired: boolean,
   gasTokenAddress?: FungibleToken,
 ): Promise<TokenAmountEstimate> {
   const token = await getTokenInfoByAddress(
