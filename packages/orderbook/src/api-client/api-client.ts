@@ -7,7 +7,7 @@ import {
   OrdersService,
   SellItem,
 } from 'openapi/sdk';
-import { CreateOrderParams, ListOrderParams } from 'types';
+import { CreateListingParams, ListListingsParams } from 'types';
 import { ItemType, SEAPORT_CONTRACT_VERSION_V1_4 } from '../seaport';
 
 export class ImmutableApiClient {
@@ -25,7 +25,7 @@ export class ImmutableApiClient {
   }
 
   async listListings(
-    listOrderParams: ListOrderParams,
+    listOrderParams: ListListingsParams,
   ): Promise<ListListingsResult> {
     return this.orderbookService.listListings({
       ...listOrderParams,
@@ -37,7 +37,7 @@ export class ImmutableApiClient {
     orderComponents,
     offerer,
     orderSignature,
-  }: CreateOrderParams): Promise<ListingResult> {
+  }: CreateListingParams): Promise<ListingResult> {
     if (orderComponents.offer.length !== 1) {
       throw new Error('Only one item can be listed at a time');
     }
@@ -46,10 +46,10 @@ export class ImmutableApiClient {
       throw new Error('Only ERC721 tokens can be listed');
     }
 
-    const considerationItemTypeTheSame = new Set([...orderComponents.consideration.map(
+    const isSameConsiderationType = new Set([...orderComponents.consideration.map(
       (c) => c.itemType,
     )]).size === 1;
-    if (!considerationItemTypeTheSame) {
+    if (!isSameConsiderationType) {
       throw new Error('All consideration items must be of the same type');
     }
 
