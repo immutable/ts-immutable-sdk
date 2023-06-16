@@ -83,7 +83,7 @@ describe('', () => {
     const signature = await signMessage(listing.typedOrderMessageForSigning, offerer);
 
     // Submit the order creation request to the order book API
-    const { result: { id: orderId } } = await sdk.createOrder({
+    const { result: { id: orderId } } = await sdk.createListing({
       offerer: offerer.address,
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
@@ -103,7 +103,7 @@ describe('', () => {
       log(e);
     }
 
-    const listOfOrders = await sdk.listOrders({
+    const listOfOrders = await sdk.listListings({
       sellItemContractAddress: nftContract.address,
     });
 
