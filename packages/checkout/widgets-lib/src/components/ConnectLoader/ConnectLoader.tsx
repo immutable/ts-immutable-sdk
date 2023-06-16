@@ -68,7 +68,7 @@ export function ConnectLoader({
     if (!hasCheckedProvider) setHasCheckedProvider(true);
     let timer: number;
     let attempts = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 9;
 
     const attemptToSetProvider = () => {
       (async () => {
