@@ -124,9 +124,11 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
     setActionDisabled(true);
 
     try {
+      if (!data.approveTransaction.unsignedTx) return;
+
       const txnResult = await checkout.sendTransaction({
         provider,
-        transaction: data.approveTransaction.unsignedTx!, // TODO: handle checking for null
+        transaction: data.approveTransaction.unsignedTx,
       });
 
       setApprovalTxnLoading(true);
@@ -208,15 +210,13 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
 
       setActionDisabled(false);
 
-      // user approves swap
-      // go to the Swap In Progress View
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
             type: BridgeWidgetViews.IN_PROGRESS,
             data: {
-              token: bridgeToken!, // TODO: handle undefined
+              token: bridgeToken!,
               transactionResponse: txn.transactionResponse,
               bridgeForm: data.bridgeFormInfo as PrefilledBridgeForm,
             },
