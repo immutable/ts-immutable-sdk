@@ -29,7 +29,12 @@ export function SwapInProgress({ transactionResponse, swapForm }: SwapInProgress
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
-              view: { type: SwapWidgetViews.SUCCESS },
+              view: {
+                type: SwapWidgetViews.SUCCESS,
+                data: {
+                  transactionHash: receipt.transactionHash,
+                },
+              },
             },
           });
           return;
