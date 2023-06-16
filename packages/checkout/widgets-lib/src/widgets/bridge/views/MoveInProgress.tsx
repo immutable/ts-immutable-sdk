@@ -78,7 +78,7 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
       floatHeader
     >
       <SimpleTextBody heading={heading}>
-        {body1(token.symbol)}
+        {body1(token?.symbol)}
         <br />
         <br />
         {body2}

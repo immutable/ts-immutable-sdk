@@ -39,6 +39,7 @@ import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiat
 import { MoveInProgress } from './views/MoveInProgress';
 import { text } from '../../resources/text/textConfig';
 import { ErrorView } from '../../views/error/ErrorView';
+import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -217,6 +218,9 @@ export function BridgeWidget(props: BridgeWidgetProps) {
                 transactionResponse={viewReducerValues.viewState.view.data.transactionResponse}
                 bridgeForm={viewReducerValues.viewState.view.data.bridgeForm}
               />
+            )}
+            {viewReducerValues.viewState.view.type === BridgeWidgetViews.APPROVE_ERC20 && (
+              <ApproveERC20BridgeOnboarding data={viewReducerValues.viewState.view.data} />
             )}
             {viewReducerValues.viewState.view.type === BridgeWidgetViews.SUCCESS && (
               <StatusView
