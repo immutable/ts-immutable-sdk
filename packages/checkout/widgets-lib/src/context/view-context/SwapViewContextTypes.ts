@@ -7,7 +7,7 @@ export enum SwapWidgetViews {
   SUCCESS = 'SUCCESS',
   FAIL = 'FAIL',
   PRICE_SURGE = 'PRICE_SURGE',
-  APPROVE_ERC20 = 'APPROVE_ERC20',
+  APPROVE_ERC20 = 'APPROVE_ERC20_SWAP',
 }
 
 export type SwapWidgetView =
@@ -42,7 +42,7 @@ interface SwapView {
 
 interface ApproveERC20View {
   type: SwapWidgetViews.APPROVE_ERC20,
-  data: ApproveERC20Swap
+  data: ApproveERC20SwapData
 }
 
 export interface PrefilledSwapForm {
@@ -58,7 +58,7 @@ interface SwapInProgressView {
     swapForm: PrefilledSwapForm;
   }
 }
-export interface ApproveERC20Swap extends DexTransactionResponse {
+export interface ApproveERC20SwapData extends DexTransactionResponse {
   approveTransaction: TransactionRequest;
   transaction: TransactionRequest;
   info: TradeInfo;
