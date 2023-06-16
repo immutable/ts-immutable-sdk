@@ -4,7 +4,7 @@
 
 import type { Order } from './Order';
 
-export type OrderResult = {
+export type ListingResult = {
   result: Order;
 };
 
