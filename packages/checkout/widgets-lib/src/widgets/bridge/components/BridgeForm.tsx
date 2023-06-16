@@ -29,6 +29,7 @@ import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSe
 import { useInterval } from '../../../lib/hooks/useInterval';
 import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
 import { swapButtonIconLoadingStyle } from '../../swap/components/SwapButtonStyles';
+import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 
 interface BridgeFormProps {
   testId?: string;
@@ -70,6 +71,9 @@ export function BridgeForm(props: BridgeFormProps) {
   const [unsignedBridgeTransaction,
     setUnsignedBridgeTransaction] = useState<BridgeDepositResponse | undefined>(undefined);
   const [tokenAddress, setTokenAddress] = useState<string>('');
+
+  // user rejects transaction
+  const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
 
   const tokensOptions = useMemo(
     () => tokenBalances
@@ -293,7 +297,6 @@ export function BridgeForm(props: BridgeFormProps) {
       if (approvalTransaction && approvalTransaction.required && approvalTransaction.unsignedTx) {
         // move to new Approve ERC20 view
         // pass in approvalTransaction and unsignedBridgeTransaction
-
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
@@ -338,16 +341,19 @@ export function BridgeForm(props: BridgeFormProps) {
       setLoading(false);
 
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+        setShowTxnRejectedState(true);
         return;
       }
       if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT
         || err.type === CheckoutErrorType.TRANSACTION_FAILED
-        || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS) {
+        || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS
+        || (err.receipt && err.receipt.status === 0)) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
             view: {
               type: BridgeWidgetViews.FAIL,
+              reason: 'Transaction failed',
               data: {
                 tokenAddress: token?.token.address ?? '',
                 amount,
@@ -365,6 +371,11 @@ export function BridgeForm(props: BridgeFormProps) {
       });
     }
   }, [checkout, provider, bridgeFormValidator, approvalTransaction, unsignedBridgeTransaction]);
+
+  const retrySubmitBridge = async () => {
+    setShowTxnRejectedState(false);
+    await submitBridge();
+  };
 
   return (
     <Box
@@ -428,6 +439,12 @@ export function BridgeForm(props: BridgeFormProps) {
             <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
           ) : bridgeForm.buttonText}
         </Button>
+        <TransactionRejected
+          visible={showTxnRejectedState}
+          showHeaderBar={false}
+          onCloseBottomSheet={() => setShowTxnRejectedState(false)}
+          onRetry={retrySubmitBridge}
+        />
       </Box>
     </Box>
   );
