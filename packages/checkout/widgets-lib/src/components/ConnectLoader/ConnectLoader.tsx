@@ -71,9 +71,9 @@ export function ConnectLoader({
     const maxAttempts = 9;
 
     const attemptToSetProvider = () => {
-      (async () => {
+      (() => {
         if (web3Provider) {
-          const isWeb3Res = await Checkout.isWeb3Provider(web3Provider);
+          const isWeb3Res = Checkout.isWeb3Provider(web3Provider);
           if (isWeb3Res) {
             setHasWeb3Provider(true);
             return;
