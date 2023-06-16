@@ -9,7 +9,7 @@ import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { text } from '../../../resources/text/textConfig';
 import {
-  ApproveERC20Bridge,
+  ApproveERC20BridgeData,
   BridgeWidgetViews,
   PrefilledBridgeForm,
 } from '../../../context/view-context/BridgeViewContextTypes';
@@ -21,7 +21,7 @@ import { LoadingView } from '../../../views/loading/LoadingView';
 import { BridgeContext } from '../context/BridgeContext';
 
 export interface ApproveERC20BridgeProps {
-  data: ApproveERC20Bridge;
+  data: ApproveERC20BridgeData;
 }
 export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) {
   const { bridgeState: { checkout, provider, allowedTokens } } = useContext(BridgeContext);

@@ -30,7 +30,7 @@ export interface PrefilledBridgeForm {
 
 interface BridgeApproveERC20View {
   type: BridgeWidgetViews.APPROVE_ERC20,
-  data: ApproveERC20Bridge
+  data: ApproveERC20BridgeData
 }
 
 interface BridgeFailView {
@@ -48,7 +48,7 @@ interface BridgeInProgressView {
   };
 }
 
-export interface ApproveERC20Bridge {
+export interface ApproveERC20BridgeData {
   approveTransaction: ApproveBridgeResponse;
   transaction: BridgeDepositResponse;
   bridgeFormInfo: PrefilledBridgeForm;

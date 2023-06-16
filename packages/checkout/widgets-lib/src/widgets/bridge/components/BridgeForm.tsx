@@ -311,28 +311,6 @@ export function BridgeForm(props: BridgeFormProps) {
           },
         });
         return;
-
-        //   const { transactionResponse } = await checkout.sendTransaction({
-        //     provider,
-        //     transaction: approvalTransaction.unsignedTx,
-        //   });
-
-      //   const approvalReceipt = await transactionResponse.wait();
-      //   if (approvalReceipt.status !== 1) {
-      //     viewDispatch({
-      //       payload: {
-      //         type: ViewActions.UPDATE_VIEW,
-      //         view: {
-      //           type: BridgeWidgetViews.FAIL,
-      //           data: {
-      //             tokenAddress,
-      //             amount,
-      //           },
-      //         },
-      //       },
-      //     });
-      //     return;
-      //   }
       }
 
       const { transactionResponse } = await checkout.sendTransaction({

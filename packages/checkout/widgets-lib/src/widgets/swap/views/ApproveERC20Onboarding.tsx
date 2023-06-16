@@ -9,7 +9,7 @@ import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { text } from '../../../resources/text/textConfig';
 import {
-  ApproveERC20Swap,
+  ApproveERC20SwapData,
   PrefilledSwapForm,
   SwapWidgetViews,
 } from '../../../context/view-context/SwapViewContextTypes';
@@ -21,7 +21,7 @@ import { SharedViews, ViewActions, ViewContext } from '../../../context/view-con
 import { LoadingView } from '../../../views/loading/LoadingView';
 
 export interface ApproveERC20Props {
-  data: ApproveERC20Swap;
+  data: ApproveERC20SwapData;
 }
 export function ApproveERC20Onboarding({ data }: ApproveERC20Props) {
   const { swapState: { checkout, provider, allowedTokens } } = useContext(SwapContext);
