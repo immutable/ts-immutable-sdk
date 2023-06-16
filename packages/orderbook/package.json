@@ -34,6 +34,7 @@
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "test": "jest",
     "test:e2e": "jest --runInBand --testMatch \"**/?(*.)+(e2e).[jt]s?(x)\"",
+    "run:demo": "jest --runInBand --testMatch \"**/?(*.)+(demo).[jt]s?(x)\"",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
   "type": "module",

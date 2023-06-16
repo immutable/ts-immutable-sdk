@@ -23,6 +23,7 @@ export class ImmutableApiClient {
 
   async listOrders(listOrderParams: ListOrderParams): Promise<ListOrdersResult> {
     return this.orderbookService.listOrders({
+      chainName: this.chainName,
       ...listOrderParams,
     });
   }

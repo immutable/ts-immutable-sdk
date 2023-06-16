@@ -34,7 +34,7 @@ describe('prepareListing and createOrder e2e', () => {
       offerer: offerer.address,
       considerationItem: {
         amount: '1000000',
-        type: 'IMX',
+        type: 'NATIVE',
       },
       listingItem: {
         contractAddress: contract.address,
@@ -45,9 +45,7 @@ describe('prepareListing and createOrder e2e', () => {
 
     await signAndSubmitTx(listing.unsignedApprovalTransaction!, offerer, provider);
     const signature = await signMessage(
-      listing.typedOrderMessageForSigning.domain,
-      listing.typedOrderMessageForSigning.types,
-      listing.typedOrderMessageForSigning.value,
+      listing.typedOrderMessageForSigning,
       offerer,
     );
 

@@ -24,7 +24,7 @@ async function createOrder(
     offerer: offerer.address,
     considerationItem: {
       amount: considerationAmount,
-      type: 'IMX',
+      type: 'NATIVE',
     },
     listingItem: {
       contractAddress: token.address,
@@ -38,9 +38,7 @@ async function createOrder(
   }
 
   const signature = await signMessage(
-    listing.typedOrderMessageForSigning.domain,
-    listing.typedOrderMessageForSigning.types,
-    listing.typedOrderMessageForSigning.value,
+    listing.typedOrderMessageForSigning,
     offerer,
   );
 
@@ -95,7 +93,6 @@ describe('listOrders e2e', () => {
 
   it('should list orders by collection', async () => {
     const ordersPage = await sdk.listOrders({
-      chainName: LOCAL_CHAIN_NAME,
       sellItemContractAddress: token1ContractAddress,
       status: OrderStatus.ACTIVE,
     });
@@ -109,7 +106,6 @@ describe('listOrders e2e', () => {
 
   it('should list orders by tokenID', async () => {
     const ordersPage = await sdk.listOrders({
-      chainName: LOCAL_CHAIN_NAME,
       sellItemContractAddress: token2ContractAddress,
       sellItemTokenId: '0',
       status: OrderStatus.ACTIVE,
@@ -123,7 +119,6 @@ describe('listOrders e2e', () => {
 
   it('should sort orders by buy amount', async () => {
     const ordersPage = await sdk.listOrders({
-      chainName: LOCAL_CHAIN_NAME,
       sellItemContractAddress: token1ContractAddress,
       status: OrderStatus.ACTIVE,
       sortBy: 'buy_item_amount',
@@ -138,7 +133,6 @@ describe('listOrders e2e', () => {
 
   it('should page orders', async () => {
     const ordersPage1 = await sdk.listOrders({
-      chainName: LOCAL_CHAIN_NAME,
       sellItemContractAddress: token1ContractAddress,
       status: OrderStatus.ACTIVE,
       pageSize: 1,
@@ -150,7 +144,6 @@ describe('listOrders e2e', () => {
     expect(ordersPage1.page?.previous_cursor).toBeNull();
 
     const ordersPage2 = await sdk.listOrders({
-      chainName: LOCAL_CHAIN_NAME,
       sellItemContractAddress: token1ContractAddress,
       status: OrderStatus.ACTIVE,
       pageSize: 1,
@@ -163,7 +156,6 @@ describe('listOrders e2e', () => {
     expect(ordersPage2.page?.previous_cursor).toBeTruthy();
 
     const ordersPage3 = await sdk.listOrders({
-      chainName: LOCAL_CHAIN_NAME,
       sellItemContractAddress: token1ContractAddress,
       status: OrderStatus.ACTIVE,
       pageSize: 1,

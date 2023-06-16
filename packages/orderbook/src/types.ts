@@ -15,7 +15,7 @@ export interface ERC20Item {
 }
 
 export interface NativeItem {
-  type: 'IMX'
+  type: 'NATIVE'
   amount: string
 }
 
@@ -60,4 +60,4 @@ export interface CancelOrderResponse {
 
 // Expose the list order filtering and ordering directly from the openAPI SDK, except
 // chainID is omitted as its configured as a part of the client
-export type ListOrderParams = Omit<Parameters<typeof OrdersService.prototype.listOrders>[0], 'chainId'>;
+export type ListOrderParams = Omit<Parameters<typeof OrdersService.prototype.listOrders>[0], 'chainName'>;
