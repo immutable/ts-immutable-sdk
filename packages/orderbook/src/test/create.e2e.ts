@@ -43,7 +43,11 @@ describe('prepareListing and createOrder e2e', () => {
       },
     });
 
-    await signAndSubmitTx(listing.unsignedApprovalTransaction!, offerer, provider);
+    await signAndSubmitTx(
+      listing.unsignedApprovalTransaction!,
+      offerer,
+      provider,
+    );
     const signature = await signMessage(
       listing.typedOrderMessageForSigning.domain,
       listing.typedOrderMessageForSigning.types,
@@ -51,7 +55,9 @@ describe('prepareListing and createOrder e2e', () => {
       offerer,
     );
 
-    const { result: { id: orderId } } = await sdk.createOrder({
+    const {
+      result: { id: orderId },
+    } = await sdk.createListing({
       offerer: offerer.address,
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
