@@ -11,7 +11,7 @@ describe('getBridgeGasEstimate', () => {
       getFeeData: jest.fn().mockResolvedValue({
         maxFeePerGas: '0x1',
         maxPriorityFeePerGas: '0x1',
-        gasPrice: '0x1',
+        gasPrice: null,
       }),
     } as unknown as Web3Provider;
   });
@@ -19,7 +19,7 @@ describe('getBridgeGasEstimate', () => {
   it('should return gasEstimate for supported eip1159 txn', async () => {
     const result = await getBridgeEstimatedGas(provider, ChainId.ETHEREUM);
 
-    expect(result.estimatedAmount).toEqual(BigNumber.from('0x0445c0'));
+    expect(result.estimatedAmount).toEqual(BigNumber.from(280000));
     expect(result.token).toBeDefined();
     expect(result.token?.symbol).toEqual('ETH');
   });
@@ -30,8 +30,7 @@ describe('getBridgeGasEstimate', () => {
       ChainId.ETHEREUM,
       true,
     );
-
-    expect(result.estimatedAmount).toEqual(BigNumber.from('0x0445c0'));
+    expect(result.estimatedAmount).toEqual(BigNumber.from(560000));
     expect(result.token).toBeDefined();
     expect(result.token?.symbol).toEqual('ETH');
   });
@@ -45,7 +44,7 @@ describe('getBridgeGasEstimate', () => {
 
     const result = await getBridgeEstimatedGas(provider, ChainId.ETHEREUM);
 
-    expect(result.estimatedAmount).toEqual(BigNumber.from('0x0222e0'));
+    expect(result.estimatedAmount).toEqual(BigNumber.from(140000));
     expect(result.token).toBeDefined();
     expect(result.token?.symbol).toEqual('ETH');
   });
