@@ -13,13 +13,13 @@ describe('ImmutableApiClient', () => {
     it('calls the OpenAPI client with the correct parameters', async () => {
       const mockedOpenAPIClient = mock(OrdersService);
       const chainName = '123';
-      const orderId = '456';
+      const listingId = '456';
 
       when(
-        mockedOpenAPIClient.getListing(deepEqual({ chainName, orderId })),
+        mockedOpenAPIClient.getListing(deepEqual({ chainName, listingId })),
       ).thenReturn(
         Promise.resolve({
-          result: { id: orderId, chain: { name: chainName } },
+          result: { id: listingId, chain: { name: chainName } },
         } as ListingResult),
       );
 
@@ -27,8 +27,8 @@ describe('ImmutableApiClient', () => {
         instance(mockedOpenAPIClient),
         chainName,
         seaportAddress,
-      ).getListing(orderId);
-      expect(orderResult.result.id).toEqual(orderId);
+      ).getListing(listingId);
+      expect(orderResult.result.id).toEqual(listingId);
       expect(orderResult.result.chain.name).toEqual(chainName);
     });
   });
