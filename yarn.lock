@@ -3686,7 +3686,6 @@ __metadata:
     "@imtbl/orderbook": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/provider": 0.0.0
-    "@jest/globals": ^29.5.0
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
     "@opensea/seaport-js": ^1.3.0
