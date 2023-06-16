@@ -33,16 +33,12 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
 
     (async () => {
       try {
-        console.log('start waiting on txn completion');
         const receipt = await transactionResponse.wait();
-        console.log('wait over', receipt.status);
 
         if (receipt.status === 1) {
-          console.log('wait for bridge completion');
           const bridgeResult: WaitForResponse = await tokenBridge.waitForDeposit({
             transactionHash: receipt.transactionHash,
           });
-          console.log('bridge done', bridgeResult);
 
           if (bridgeResult.status === CompletionStatus.SUCCESS) {
             viewDispatch({
@@ -65,7 +61,6 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
           },
         });
       } catch (err) {
-        console.log('in catch', err);
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
