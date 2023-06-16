@@ -95,7 +95,7 @@ NetworkDetails
   [
     ChainId.IMTBL_ZKEVM_DEVNET,
     {
-      chainIdHex: '0x343D', // 13373
+      chainIdHex: '0x3447', // 13383
       chainName: 'Immutable zkEVM Devnet',
       rpcUrls: [RPC_URL_MAP.get(ChainId.IMTBL_ZKEVM_DEVNET) as string],
       nativeCurrency: {

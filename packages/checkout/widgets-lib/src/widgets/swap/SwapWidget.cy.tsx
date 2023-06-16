@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   describe, it, cy, beforeEach,
 } from 'local-cypress';
@@ -11,31 +12,32 @@ import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { quotesProcessor } from './functions/FetchQuote';
+import { text } from '../../resources/text/textConfig';
+import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 
 describe('SwapWidget tests', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
   });
 
+  const mockProvider = {
+    getSigner: () => ({
+      getAddress: () => Promise.resolve('dss'),
+    }),
+    getNetwork: async () => ({
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      name: 'Immutable zkEVM Testnet',
+    }),
+    provider: {
+      request: async () => null,
+    },
+  };
   beforeEach(() => {
     cy.stub(Checkout.prototype, 'connect')
       .as('connectStub')
       .resolves({
-        provider: {
-          getSigner: () => ({
-            getAddress: () => Promise.resolve('dss'),
-          }),
-          getNetwork: async () => ({
-            // FIXME: stop hardcoding this, only doing because dev net is reset
-            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-            name: 'Immutable zkEVM Testnet',
-          }),
-          provider: {
-            request: async () => null,
-          },
-        },
+        provider: mockProvider,
         network: {
-          // FIXME: stop hardcoding this, only doing because dev net is reset
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
@@ -101,6 +103,36 @@ describe('SwapWidget tests', () => {
           },
         ],
       });
+
+    const fiatPricingValue = {
+      ethereum: { usd: 2000.0 },
+      'usd-coin': { usd: 1.0 },
+      'immutable-x': { usd: 1.5 },
+    };
+
+    const coinList = [
+      {
+        id: 'ethereum',
+        symbol: 'eth',
+        name: 'Etherum',
+      },
+    ];
+
+    cy.intercept(
+      {
+        method: 'GET',
+        path: '/api/v3/coins/list*',
+      },
+      coinList,
+    ).as('coinListStub');
+
+    cy.intercept(
+      {
+        method: 'GET',
+        path: '/api/v3/simple/price*',
+      },
+      fiatPricingValue,
+    ).as('cryptoFiatStub');
   });
 
   const params = {
@@ -144,43 +176,51 @@ describe('SwapWidget tests', () => {
   });
 
   describe('swap submit', () => {
-    beforeEach(() => {
-      cy.stub(quotesProcessor, 'fromAmountIn')
-        .as('fromAmountInStub')
-        .resolves({
-          info: {
-            quote: {
-              token: {
-                name: 'Ethereum',
-                symbol: 'ETH',
-                decimals: 18,
-                address: '',
-              },
-              amount: BigNumber.from('112300000000000012'),
-            },
-            quoteWithMaxSlippage: {
-              token: {
-                name: 'ImmutableX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-              },
-              amount: BigNumber.from('112300000000000032'),
-            },
-            gasFeeEstimate: {
-              token: {
-                name: 'ImmutableX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-              },
-              amount: BigNumber.from('112300000000000045'),
-            },
-            slippage: 10,
+    const mockQuoteFromAmountIn = {
+      info: {
+        quote: {
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+            address: '',
           },
-          approveTransaction: {},
-          transaction: {},
-        });
+          amount: BigNumber.from('112300000000000012'),
+        },
+        quoteWithMaxSlippage: {
+          token: {
+            name: 'ImmutableX',
+            symbol: 'IMX',
+            decimals: 18,
+            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          },
+          amount: BigNumber.from('112300000000000032'),
+        },
+        gasFeeEstimate: {
+          token: {
+            name: 'ImmutableX',
+            symbol: 'IMX',
+            decimals: 18,
+            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          },
+          amount: BigNumber.from('112300000000000045'),
+        },
+        slippage: 10,
+      },
+      approveTransaction: {
+        from: 'approval',
+        to: 'approval',
+      },
+      transaction: {
+        from: 'swap',
+        to: 'swap',
+      },
+    };
+    let fromAmountInStub;
+    beforeEach(() => {
+      fromAmountInStub = cy.stub(quotesProcessor, 'fromAmountIn')
+        .as('fromAmountInStub')
+        .resolves(mockQuoteFromAmountIn);
 
       mount(
         <BiomeCombinedProviders>
@@ -189,88 +229,242 @@ describe('SwapWidget tests', () => {
       );
     });
 
-    it('should submit swap and show success', () => {
-      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
-        .onFirstCall()
-        .resolves({
-          transactionResponse: {
-            wait: () => ({
-              status: 1,
-            }),
-          },
-        })
-        .onSecondCall()
-        .resolves({
-          transactionResponse: {
-            wait: () => new Promise((resolve) => {
-              setTimeout(() => {
-                resolve({
-                  status: 1,
-                });
-              }, 1000);
-            }),
-          },
-        });
+    describe('No approval txn needed', () => {
+      it('should submit swap and show success when no approval txn needed', () => {
+        cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+          .onFirstCall()
+          .resolves({
+            transactionResponse: {
+              wait: () => new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve({
+                    status: 1,
+                  });
+                }, 1000);
+              }),
+            },
+          });
 
-      cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').click();
+        // Set up so no approval transaction is needed
+        fromAmountInStub.resolves({ ...mockQuoteFromAmountIn, approveTransaction: null });
 
-      cySmartGet('toTokenInputs-select-form-select__target').click();
-      // eslint-disable-next-line max-len
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+        cySmartGet('fromTokenInputs-select-form-select__target').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').click();
 
-      cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
-      cySmartGet('fromTokenInputs-text-form-text__input').blur();
+        cySmartGet('toTokenInputs-select-form-select__target').click();
+        // eslint-disable-next-line max-len
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
 
-      cySmartGet('swap-button').click();
+        cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
+        cySmartGet('fromTokenInputs-text-form-text__input').blur();
 
-      cySmartGet('@fromAmountInStub').should('have.been.called');
-      cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
-      cySmartGet('loading-view').should('be.visible');
-      cy.wait(1000);
-      cySmartGet('success-box').should('be.visible');
+        cySmartGet('swap-button').click();
+
+        cySmartGet('@fromAmountInStub').should('have.been.called');
+        cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+        cySmartGet('loading-view').should('be.visible');
+        cy.wait(1000);
+        cySmartGet('success-box').should('be.visible');
+      });
+
+      it('should submit swap and show fail view', () => {
+        cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+          .onFirstCall()
+          .resolves({
+            transactionResponse: {
+              wait: () => new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve({
+                    status: 0,
+                  });
+                }, 1000);
+              }),
+            },
+          });
+
+        // Set up so no approval transaction is needed
+        fromAmountInStub.resolves({ ...mockQuoteFromAmountIn, approveTransaction: null });
+
+        cySmartGet('fromTokenInputs-select-form-select__target').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').click();
+
+        cySmartGet('toTokenInputs-select-form-select__target').click();
+        // eslint-disable-next-line max-len
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+
+        cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
+        cySmartGet('fromTokenInputs-text-form-text__input').blur();
+
+        cySmartGet('swap-button').click();
+
+        cySmartGet('@fromAmountInStub').should('have.been.called');
+        cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+        cySmartGet('loading-view').should('be.visible');
+        cy.wait(1000);
+        cySmartGet('failure-box').should('be.visible');
+      });
     });
 
-    it('should submit swap and show fail view', () => {
-      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
-        .onFirstCall()
-        .resolves({
-          transactionResponse: {
-            wait: () => ({
-              status: 1,
-            }),
-          },
-        })
-        .onSecondCall()
-        .resolves({
-          transactionResponse: {
-            wait: () => new Promise((resolve) => {
-              setTimeout(() => {
-                resolve({
-                  status: 0,
-                });
-              }, 1000);
-            }),
-          },
+    describe('swap flow with approval needed', () => {
+      it('should go through Approve ERC20 flow, submit swap and succeed', () => {
+        cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+          .onFirstCall()
+          .resolves({
+            transactionResponse: {
+              wait: () => new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve({
+                    status: 1,
+                  });
+                }, 1000);
+              }),
+            },
+          })
+          .onSecondCall()
+          .resolves({
+            transactionResponse: {
+              wait: () => new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve({
+                    status: 1,
+                  });
+                }, 1000);
+              }),
+            },
+          });
+
+        const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
+
+        cySmartGet('fromTokenInputs-select-form-select__target').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').click();
+
+        cySmartGet('toTokenInputs-select-form-select__target').click();
+        // eslint-disable-next-line max-len
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+
+        cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
+        cySmartGet('fromTokenInputs-text-form-text__input').blur();
+
+        cySmartGet('swap-button').click();
+
+        cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.heading);
+        cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.body[0]);
+        cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.body[1]);
+        cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
+
+        // click button for Approval transaction
+        cySmartGet('footer-button').click();
+
+        cySmartGet('@fromAmountInStub').should('have.been.called');
+        cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+        cySmartGet('@sendTransactionStub')
+          .should(
+            'have.been.calledWith',
+            {
+              provider: mockProvider,
+              transaction: { from: 'approval', to: 'approval' },
+            },
+          );
+        cySmartGet('loading-view').should('be.visible');
+        cy.wait(1000);
+
+        cySmartGet('simple-text-body__heading').should('have.text', approveSwap.content.heading);
+        cySmartGet('simple-text-body__body').should('include.text', approveSwap.content.body[0]);
+        cySmartGet('footer-button').should('have.text', approveSwap.footer.buttonText);
+
+        // click button for Swap transaction
+        cySmartGet('footer-button').click();
+        cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
+        cySmartGet('@sendTransactionStub').should('have.been.calledWith', {
+          provider: mockProvider,
+          transaction: { from: 'swap', to: 'swap' },
         });
 
-      cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').click();
+        cySmartGet('loading-view').should('be.visible');
 
-      cySmartGet('toTokenInputs-select-form-select__target').click();
-      // eslint-disable-next-line max-len
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+        cy.wait(1000);
+        cySmartGet('success-box').should('be.visible');
+      });
 
-      cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
-      cySmartGet('fromTokenInputs-text-form-text__input').blur();
+      it('should go through Approve ERC20 flow, submit swap and fail', () => {
+        cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+          .onFirstCall()
+          .resolves({
+            transactionResponse: {
+              wait: () => new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve({
+                    status: 1,
+                  });
+                }, 1000);
+              }),
+            },
+          })
+          .onSecondCall()
+          .resolves({
+            transactionResponse: {
+              wait: () => new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve({
+                    status: 0,
+                  });
+                }, 1000);
+              }),
+            },
+          });
 
-      cySmartGet('swap-button').click();
+        const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
 
-      cySmartGet('@fromAmountInStub').should('have.been.called');
-      cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
-      cySmartGet('loading-view').should('be.visible');
-      cy.wait(1000);
-      cySmartGet('failure-box').should('be.visible');
+        cySmartGet('fromTokenInputs-select-form-select__target').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').click();
+
+        cySmartGet('toTokenInputs-select-form-select__target').click();
+        // eslint-disable-next-line max-len
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+
+        cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
+        cySmartGet('fromTokenInputs-text-form-text__input').blur();
+
+        cySmartGet('swap-button').click();
+
+        cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.heading);
+        cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.body[0]);
+        cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.body[1]);
+        cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
+
+        // click button for Approval transaction
+        cySmartGet('footer-button').click();
+
+        cySmartGet('@fromAmountInStub').should('have.been.called');
+        cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+        cySmartGet('@sendTransactionStub')
+          .should(
+            'have.been.calledWith',
+            {
+              provider: mockProvider,
+              transaction: { from: 'approval', to: 'approval' },
+            },
+          );
+        cySmartGet('loading-view').should('be.visible');
+        cy.wait(1000);
+
+        cySmartGet('simple-text-body__heading').should('have.text', approveSwap.content.heading);
+        cySmartGet('simple-text-body__body').should('include.text', approveSwap.content.body[0]);
+        cySmartGet('footer-button').should('have.text', approveSwap.footer.buttonText);
+
+        // click button for Swap transaction
+        cySmartGet('footer-button').click();
+        cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
+        cySmartGet('@sendTransactionStub').should('have.been.calledWith', {
+          provider: mockProvider,
+          transaction: { from: 'swap', to: 'swap' },
+        });
+
+        cySmartGet('loading-view').should('be.visible');
+
+        cy.wait(1000);
+        cySmartGet('failure-box').should('be.visible');
+      });
     });
   });
 });
