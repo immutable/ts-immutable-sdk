@@ -1,7 +1,11 @@
-import { ImmutableXClient } from 'index';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { Config } from '@imtbl/core-sdk';
-import { ImxConfiguration, ImxModuleConfiguration, createImmutableXConfiguration } from './config';
+import { ImmutableXClient } from './immutablex-client';
+import {
+  ImxConfiguration,
+  ImxModuleConfiguration,
+  createImmutableXConfiguration,
+  createConfig,
+} from './config';
 
 describe('ImmutableXClient', () => {
   it('should instantiate a SANDBOX ImmutableXClient', async () => {
@@ -58,7 +62,7 @@ describe('ImmutableXClient', () => {
     const config: ImxModuleConfiguration = {
       baseConfig: { environment: Environment.PRODUCTION },
       overrides: {
-        immutableXConfig: Config.createConfig({
+        immutableXConfig: createConfig({
           basePath: 'https://api.sandbox.x.immutable.com',
           chainID: 1,
           coreContractAddress: '0x5FDCCA53617f4d2b9134B29090C87D01058e27e9',

@@ -8,7 +8,7 @@ import {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const defaultHeaders = { 'x-sdk-version': 'ts-immutable-sdk-__SDK_VERSION__' };
 
-interface ImmutableXConfigurationParams {
+export interface ImmutableXConfigurationParams {
   basePath: string,
   chainID: number,
   coreContractAddress: string,
@@ -44,7 +44,9 @@ interface EthEnvironment extends EthConfiguration {
   sdkVersion?: string;
 }
 
-const createConfig = ({
+// DO NOT EXPORT THIS FUNCTION FROM INDEX
+// it should not be made available to the public
+export const createConfig = ({
   coreContractAddress,
   registrationContractAddress,
   chainID,
