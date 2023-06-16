@@ -1,3 +1,5 @@
+import { Web3Provider } from '@ethersproject/providers';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import {
   ConnectEventType,
   ConnectionFailed,
@@ -8,7 +10,8 @@ import { useEffect, useState } from 'react';
 
 export function useConnectWidget() {
   const [showConnectWidget, setShowConnectWidget] = useState(false);
-  const [providerPreference, setProviderPreference] = useState('');
+  const [provider, setProvider] = useState<Web3Provider>();
+  const [providerName, setProviderName] = useState<WalletProviderName>();
 
   useEffect(() => {
     // Add event listeners for the IMXConnectWidget and handle event types appropriately
@@ -17,8 +20,9 @@ export function useConnectWidget() {
       switch (event.detail.type) {
         case ConnectEventType.SUCCESS: {
           const eventData = event.detail.data as ConnectionSuccess;
-          console.log(eventData.providerPreference);
-          setProviderPreference(eventData.providerPreference);
+          console.log(eventData.provider);
+          setProvider(eventData.provider);
+          setProviderName(eventData.providerName);
           setShowConnectWidget(false);
           break;
         }
@@ -50,8 +54,10 @@ export function useConnectWidget() {
 
   return {
     showConnectWidget,
-    providerPreference,
     setShowConnectWidget,
-    setProviderPreference,
+    setProvider,
+    provider,
+    providerName,
+    setProviderName
   };
 }

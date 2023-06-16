@@ -5,10 +5,13 @@ import {
   WidgetTheme,
   UpdateConfig,
   CheckoutWidgetsConfig,
+  SetProvider,
+  CheckoutWidgetTagNames,
 } from '@imtbl/checkout-widgets';
 import { useConnectWidget } from './useConnectWidget.hook';
 import { useWalletWidget } from './useWalletWidget.hook';
 import { Environment } from '@imtbl/config';
+import { useEffect } from 'react';
 
 export const Marketplace = () => {
   CheckoutWidgets({
@@ -23,7 +26,7 @@ export const Marketplace = () => {
 
   UpdateConfig(widgetsConfig2);
 
-  const { showConnectWidget, providerPreference, setShowConnectWidget } =
+  const { showConnectWidget, provider,providerName, setShowConnectWidget } =
     useConnectWidget();
 
   const { showWalletWidget, setShowWalletWidget } = useWalletWidget();
@@ -36,20 +39,25 @@ export const Marketplace = () => {
     setShowWalletWidget(true);
   }
 
+  useEffect(() => {
+    if (provider && showWalletWidget) SetProvider(CheckoutWidgetTagNames.WALLET, provider)
+  }, [provider, showWalletWidget])
+
   return (
     <div>
       <h1>Sample Marketplace Orchestrator</h1>
-      {!providerPreference && (
+      {!provider && (
         <button onClick={openConnectWidget}>Connect Wallet</button>
       )}
       {showConnectWidget && <ConnectReact />}
-      {providerPreference && !showWalletWidget && (
+      {provider && !showWalletWidget && (
         <button onClick={openWalletWidget}>My Wallet</button>
       )}
-      {showWalletWidget && (
-        <WalletReact
-          providerPreference={providerPreference}
-        />
+      {showWalletWidget && provider && (
+        <WalletReact />
+      )}
+      {showWalletWidget && providerName && !provider && (
+        <WalletReact />
       )}
     </div>
   );

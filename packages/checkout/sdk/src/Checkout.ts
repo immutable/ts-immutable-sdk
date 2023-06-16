@@ -247,4 +247,8 @@ export class Checkout {
     );
     return await network.getNetworkInfo(this.config, web3Provider);
   }
+
+  static isWeb3Provider(web3Provider: Web3Provider) {
+    return provider.isWeb3Provider(web3Provider);
+  }
 }

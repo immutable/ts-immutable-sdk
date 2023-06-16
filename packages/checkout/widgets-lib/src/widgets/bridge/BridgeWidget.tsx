@@ -10,6 +10,7 @@ import {
   GetTokenAllowListResult,
   NetworkFilterTypes,
   TokenFilterTypes,
+  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import {
   useEffect, useMemo, useReducer, useRef, useState,
@@ -109,8 +110,12 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         },
       });
 
-      const connectResult = await checkout.connect({
-        providerPreference: providerPreference ?? ConnectionProviders.METAMASK,
+      const connectResult = await checkout.createProvider({
+        providerName: WalletProviderName.METAMASK,
+      });
+
+      const getNetworkResult = await checkout.getNetworkInfo({
+        provider: connectResult.provider,
       });
 
       // The correct network check should be done by the ConnectionLoader
@@ -119,7 +124,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       // let theProvider;
       // theProvider = connectResult.provider;
 
-      // const requireNetworkSwitch = defaultFromChainId !== connectResult.network.chainId;
+      // const requireNetworkSwitch = defaultFromChainId !== getNetworkResult.chainId;
 
       // if (requireNetworkSwitch) {
       //   let switchNetworkResponse: SwitchNetworkResult;
@@ -146,7 +151,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_NETWORK,
-          network: connectResult.network,
+          network: getNetworkResult,
         },
       });
 
@@ -173,12 +178,12 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       const tokenBalances = await checkout.getAllBalances({
         provider: connectResult.provider,
         walletAddress: address,
-        chainId: connectResult.network.chainId,
+        chainId: getNetworkResult.chainId,
       });
 
       const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
         {
-          chainId: connectResult.network.chainId,
+          chainId: getNetworkResult.chainId,
           type: TokenFilterTypes.BRIDGE,
         },
       );

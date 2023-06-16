@@ -1,5 +1,6 @@
 import { Environment } from '@imtbl/config';
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { CheckoutWidgets, ConnectReact } from '@imtbl/checkout-widgets';
 import { WidgetTheme } from '../../lib';
 
 function ConnectWebView() {
@@ -8,11 +9,16 @@ function ConnectWebView() {
     environment: Environment.SANDBOX,
   };
 
+  CheckoutWidgets(config);
+
   return (
-    <imtbl-connect
-      providerPreference={ConnectionProviders.METAMASK}
-      widgetConfig={JSON.stringify(config)}
-    />
+    <div>
+      {/* <imtbl-connect
+        providerName={WalletProviderName.METAMASK}
+        widgetConfig={JSON.stringify(config)}
+      /> */}
+      <ConnectReact providerName={WalletProviderName.METAMASK} />
+    </div>
   );
 }
 

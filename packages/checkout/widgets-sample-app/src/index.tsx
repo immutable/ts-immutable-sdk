@@ -8,10 +8,7 @@ import ConnectUI from './components/ui/connect/connect';
 import WalletUI from './components/ui/wallet/wallet';
 import SwapUI from './components/ui/swap/swap';
 import BridgeUI from './components/ui/bridge/bridge';
-import ExampleUI from './components/ui/example/example';
-import BuyUI from './components/ui/buy/buy';
 import { Marketplace } from './components/ui/marketplace-orchestrator';
-import { AsyncLoader } from './components/ui/async-loader/AsyncLoader';
 
 const router = createBrowserRouter([
   {
@@ -35,20 +32,8 @@ const router = createBrowserRouter([
     element: <BridgeUI />,
   },
   {
-    path: '/example',
-    element: <ExampleUI />,
-  },
-  {
-    path: '/buy',
-    element: <BuyUI />,
-  },
-  {
     path: '/marketplace-orchestrator',
     element: <Marketplace />,
-  },
-  {
-    path: '/async-loader',
-    element: <AsyncLoader />,
   },
 ]);
 

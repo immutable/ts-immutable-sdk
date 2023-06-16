@@ -6,21 +6,21 @@ import {
   ConnectEventType,
 } from '@imtbl/checkout-widgets';
 
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
-
-import { addToLocalStorage } from '../../lib';
+import { Web3Provider } from '@ethersproject/providers';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 
 export function sendConnectSuccessEvent(
-  providerPreference: ConnectionProviders,
+  provider: Web3Provider,
+  providerName?: WalletProviderName,
 ) {
-  addToLocalStorage('providerPreference', providerPreference);
   const successEvent = new CustomEvent<ConnectEvent<ConnectionSuccess>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
       detail: {
         type: ConnectEventType.SUCCESS,
         data: {
-          providerPreference,
+          provider,
+          providerName,
         },
       },
     },

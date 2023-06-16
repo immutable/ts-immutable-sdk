@@ -3,7 +3,7 @@ import {
   Checkout,
   GetTokenAllowListResult,
   TokenFilterTypes,
-  ConnectionProviders,
+  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
@@ -41,7 +41,7 @@ export interface SwapWidgetProps {
 }
 
 export interface SwapWidgetParams {
-  providerPreference: ConnectionProviders;
+  providerName: WalletProviderName;
   amount?: string;
   fromContractAddress?: string;
   toContractAddress?: string;
@@ -64,7 +64,7 @@ export function SwapWidget(props: SwapWidgetProps) {
   const { params, config } = props;
   const { environment, theme } = config;
   const {
-    amount, fromContractAddress, toContractAddress, providerPreference,
+    amount, fromContractAddress, toContractAddress, providerName,
   } = params;
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
@@ -72,7 +72,7 @@ export function SwapWidget(props: SwapWidgetProps) {
     : onDarkBase;
 
   const swapWidgetSetup = useCallback(async () => {
-    if (!providerPreference) return;
+    if (!providerName) return;
 
     const checkout = new Checkout({
       baseConfig: { environment },
@@ -85,8 +85,12 @@ export function SwapWidget(props: SwapWidgetProps) {
       },
     });
 
-    const connectResult = await checkout.connect({
-      providerPreference: providerPreference ?? ConnectionProviders.METAMASK,
+    const connectResult = await checkout.createProvider({
+      providerName: WalletProviderName.METAMASK,
+    });
+
+    const getNetworkResult = await checkout.getNetworkInfo({
+      provider: connectResult.provider,
     });
 
     swapDispatch({
@@ -100,12 +104,12 @@ export function SwapWidget(props: SwapWidgetProps) {
     const tokenBalances = await checkout.getAllBalances({
       provider: connectResult.provider,
       walletAddress: address,
-      chainId: connectResult.network.chainId,
+      chainId: getNetworkResult.chainId,
     });
 
     const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
       {
-        chainId: connectResult.network.chainId,
+        chainId: getNetworkResult.chainId,
         type: TokenFilterTypes.SWAP,
       },
     );
@@ -131,7 +135,7 @@ export function SwapWidget(props: SwapWidgetProps) {
     swapDispatch({
       payload: {
         type: SwapActions.SET_NETWORK,
-        network: connectResult.network,
+        network: getNetworkResult,
       },
     });
 
@@ -146,7 +150,7 @@ export function SwapWidget(props: SwapWidgetProps) {
     });
 
     const exchange = new Exchange(new ExchangeConfiguration({
-      chainId: connectResult.network.chainId,
+      chainId: getNetworkResult.chainId,
       baseConfig: new ImmutableConfiguration({ environment }),
       overrides: getDexConfigOverrides(),
     }));
@@ -157,7 +161,7 @@ export function SwapWidget(props: SwapWidgetProps) {
         exchange,
       },
     });
-  }, [providerPreference, environment]);
+  }, [providerName, environment]);
 
   useEffect(() => {
     swapWidgetSetup();

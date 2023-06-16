@@ -7,6 +7,8 @@ export abstract class ImmutableWebComponent extends HTMLElement {
 
   widgetConfig?: StrongCheckoutWidgetsConfig;
 
+  injectedProvider?: boolean;
+
   provider: Web3Provider | undefined = undefined;
 
   static get observedAttributes() {
@@ -29,8 +31,8 @@ export abstract class ImmutableWebComponent extends HTMLElement {
 
   connectedCallback() {
     const widgetConfig = this.getAttribute('widgetConfig') || undefined;
-
     this.widgetConfig = this.parseWidgetConfig(widgetConfig);
+    this.injectedProvider = !!this.getAttribute('injectedProvider') || false;
   }
 
   private parseWidgetConfig(widgetsConfig?: string):StrongCheckoutWidgetsConfig {

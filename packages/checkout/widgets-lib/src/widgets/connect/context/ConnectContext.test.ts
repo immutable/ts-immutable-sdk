@@ -35,6 +35,7 @@ describe('connect-context', () => {
     const { provider } = connectReducer(initialConnectState, {
       payload: setProviderPayload,
     });
+
     expect(provider).not.toBeNull();
   });
 

@@ -39,8 +39,21 @@ export async function validateProvider(
       };
 
       const underlyingChainId = await getUnderlyingChainId(web3Provider);
+      let web3ChainId:number = web3Provider.network?.chainId;
 
-      if (web3Provider.network.chainId !== underlyingChainId && !options.allowMistmatchedChainId) {
+      try {
+        web3ChainId = web3Provider.network?.chainId;
+        if (!web3ChainId) {
+          web3ChainId = (await web3Provider.getNetwork()).chainId;
+        }
+      } catch (err) {
+        throw new CheckoutError(
+          'Unable to detect the web3Provider network',
+          CheckoutErrorType.WEB3_PROVIDER_ERROR,
+        );
+      }
+
+      if (web3ChainId !== underlyingChainId && !options.allowMistmatchedChainId) {
         throw new CheckoutError(
           'Your wallet has changed network, please switch to a supported network',
           CheckoutErrorType.WEB3_PROVIDER_ERROR,

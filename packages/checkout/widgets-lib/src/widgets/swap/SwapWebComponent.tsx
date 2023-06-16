@@ -1,5 +1,5 @@
 import React from 'react';
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
@@ -11,7 +11,7 @@ import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import { ConnectTargetLayer } from '../../lib';
 
 export class ImmutableSwap extends ImmutableWebComponent {
-  providerPreference = ConnectionProviders.METAMASK;
+  providerName = WalletProviderName.METAMASK;
 
   useConnectWidget?: boolean;
 
@@ -23,9 +23,9 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
   connectedCallback() {
     super.connectedCallback();
-    this.providerPreference = this.getAttribute(
-      'providerPreference',
-    ) as ConnectionProviders;
+    this.providerName = this.getAttribute(
+      'providerName',
+    ) as WalletProviderName;
     const useConnectWidgetProp = this.getAttribute('useConnectWidget');
     this.useConnectWidget = useConnectWidgetProp?.toLowerCase() !== 'false';
     this.amount = this.getAttribute('amount') as string;
@@ -39,11 +39,11 @@ export class ImmutableSwap extends ImmutableWebComponent {
   renderWidget() {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
-      providerPreference: this.providerPreference,
+      providerName: this.providerName,
     };
 
     const swapParams: SwapWidgetParams = {
-      providerPreference: this.providerPreference,
+      providerName: this.providerName,
       amount: this.amount,
       fromContractAddress: this.fromContractAddress,
       toContractAddress: this.toContractAddress,

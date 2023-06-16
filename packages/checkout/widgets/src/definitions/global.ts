@@ -12,11 +12,6 @@ declare global {
       'imtbl-wallet': ImtblWalletProps;
       'imtbl-swap': ImtblSwapProps;
       'imtbl-bridge': ImtblBridgeProps;
-      'imtbl-buy': ImtblBuyProps;
-      'imtbl-example': ImtblExampleProps;
-      'imtbl-transition-example': ImtblTransitionExampleProps;
-      'imtbl-inner-widget-example': ImtblInnerWidgetExampleProps;
-      'imtbl-outer-widget-example': ImtblOuterWidgetExampleProps;
     }
   }
 
@@ -37,7 +32,7 @@ export interface ImtblConnectProps
   React.HTMLAttributes<HTMLElement>,
   HTMLElement
   > {
-  providerPreference: string;
+  providerName?: string;
   widgetConfig?: string;
 }
 
@@ -52,8 +47,7 @@ export interface ImtblWalletProps
   React.HTMLAttributes<HTMLElement>,
   HTMLElement
   > {
-  providerPreference: string;
-  useConnectWidget?: string;
+  walletProvider?: string;
   widgetConfig?: string;
 }
 
@@ -98,86 +92,4 @@ export interface ImtblBridgeProps
   fromContractAddress: string;
   fromNetwork: string;
   amount: string;
-}
-
-/**
- * Props for the Example Widget component
- * @property {string} providerPreference - The preferred wallet provider to connect to.
- * @property {string} theme - The theme to use.
- * @property {string} environment - The environment configuration
- * @experimental
- */
-export interface ImtblExampleProps
-  extends React.DetailedHTMLProps<
-  React.HTMLAttributes<HTMLElement>,
-  HTMLElement
-  > {
-  providerPreference: string;
-  theme: string;
-  environment: string;
-}
-
-/**
- * Props for the Buy Widget component
- * @property {string} providerPreference - The preferred wallet provider to connect to.
- * @property {string} theme - The theme to use.
- * @property {string} environment - The environment configuration
- * @property {string} orderId - The id of the order to buy.
- */
-export interface ImtblBuyProps
-  extends React.DetailedHTMLProps<
-  React.HTMLAttributes<HTMLElement>,
-  HTMLElement
-  > {
-  providerPreference: string;
-  widgetConfig?: string;
-  orderId: string;
-}
-
-/**
- * Props for the TransitionExample Widget component
- * @property {string} providerPreference - The preferred wallet provider to connect to.
- * @property {string} theme - The theme to use.
- * @property {string} environment - The environment configuration
- */
-export interface ImtblTransitionExampleProps
-  extends React.DetailedHTMLProps<
-  React.HTMLAttributes<HTMLElement>,
-  HTMLElement
-  > {
-  providerPreference: string;
-  theme: string;
-  environment: string;
-}
-
-/**
- * Props for the InnerWidgetExample Widget component
- * @property {string} providerPreference - The preferred wallet provider to connect to.
- * @property {string} theme - The theme to use.
- * @property {string} environment - The environment configuration
- */
-export interface ImtblInnerWidgetExampleProps
-  extends React.DetailedHTMLProps<
-  React.HTMLAttributes<HTMLElement>,
-  HTMLElement
-  > {
-  providerPreference: string;
-  theme: string;
-  environment: string;
-}
-
-/**
- * Props for the OuterWidgetExample Widget component
- * @property {string} providerPreference - The preferred wallet provider to connect to.
- * @property {string} theme - The theme to use.
- * @property {string} environment - The environment configuration
- */
-export interface ImtblOuterWidgetExampleProps
-  extends React.DetailedHTMLProps<
-  React.HTMLAttributes<HTMLElement>,
-  HTMLElement
-  > {
-  providerPreference: string;
-  theme: string;
-  environment: string;
 }

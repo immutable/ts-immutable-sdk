@@ -1,7 +1,8 @@
 /* eslint-disable react/jsx-no-constructed-context-values */
 
+import { Web3Provider } from '@ethersproject/providers';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import { useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
@@ -15,7 +16,7 @@ import {
   connectReducer,
   initialConnectState,
 } from './context/ConnectContext';
-import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
+import { ConnectWidgetView, ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { ConnectWallet } from './views/ConnectWallet';
 import { ConnectResult } from './views/ConnectResult';
 import { ReadyToConnect } from './views/ReadyToConnect';
@@ -38,29 +39,41 @@ import {
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 
 export interface ConnectWidgetProps {
-  // TODO: 'params' PropType is defined but prop is never used
-  // eslint-disable-next-line react/no-unused-prop-types
   params: ConnectWidgetParams;
   config: StrongCheckoutWidgetsConfig
-  deepLink?: ConnectWidgetViews.CONNECT_WALLET;
+  deepLink?: ConnectWidgetViews;
   sendCloseEventOverride?: () => void;
 }
 
 export interface ConnectWidgetParams {
   targetLayer?: ConnectTargetLayer
-  providerPreference?: ConnectionProviders;
+  providerName?: WalletProviderName;
+  web3Provider?: Web3Provider;
 }
 
 export function ConnectWidget(props: ConnectWidgetProps) {
-  const {
-    config, deepLink, sendCloseEventOverride, params: { targetLayer },
-  } = props;
+  const { config, sendCloseEventOverride, params } = props;
+  const { targetLayer, web3Provider } = params;
+  const { deepLink = ConnectWidgetViews.CONNECT_WALLET } = props;
   const { environment, theme } = config;
+
   const [connectState, connectDispatch] = useReducer(
     connectReducer,
     initialConnectState,
   );
-  const { sendCloseEvent } = connectState;
+
+  useEffect(() => {
+    if (web3Provider) {
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_PROVIDER,
+          provider: web3Provider,
+        },
+      });
+    }
+  }, [web3Provider]);
+
+  const { sendCloseEvent, provider } = connectState;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const { view } = viewState;
 
@@ -89,13 +102,12 @@ export function ConnectWidget(props: ConnectWidgetProps) {
           sendCloseEvent: sendCloseEventOverride ?? sendCloseWidgetEvent,
         },
       });
-
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
           view: {
-            type: deepLink ?? ConnectWidgetViews.CONNECT_WALLET,
-          },
+            type: deepLink,
+          } as ConnectWidgetView,
         },
       });
     }, 200);
@@ -129,19 +141,20 @@ export function ConnectWidget(props: ConnectWidgetProps) {
             {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
               <SwitchNetworkEth />
             )}
-            {view.type === ConnectWidgetViews.SUCCESS && (
+            {view.type === ConnectWidgetViews.SUCCESS && provider && (
               <ConnectLoaderSuccess>
                 <StatusView
                   statusText="Connection secure"
                   actionText="Continue"
                   onActionClick={() => sendCloseEvent()}
-                  onRenderEvent={() => sendConnectSuccessEvent(ConnectionProviders.METAMASK)}
+                  onRenderEvent={() => sendConnectSuccessEvent(provider)}
                   statusType={StatusType.SUCCESS}
                   testId="success-view"
                 />
               </ConnectLoaderSuccess>
             )}
-            {view.type === ConnectWidgetViews.FAIL && <ConnectResult />}
+            {((view.type === ConnectWidgetViews.SUCCESS && !provider)
+            || view.type === ConnectWidgetViews.FAIL) && <ConnectResult />}
           </>
         </ConnectContext.Provider>
       </ViewContext.Provider>

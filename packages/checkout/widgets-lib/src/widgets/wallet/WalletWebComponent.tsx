@@ -1,5 +1,5 @@
 import React from 'react';
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { WalletWidget, WalletWidgetParams } from './WalletWidget';
 import {
@@ -11,55 +11,41 @@ import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { ConnectTargetLayer } from '../../lib';
 
 export class ImmutableWallet extends ImmutableWebComponent {
-  providerPreference = ConnectionProviders.METAMASK;
-
-  useConnectWidget?: boolean;
+  walletProvider?:WalletProviderName;
 
   connectedCallback() {
     super.connectedCallback();
-    this.providerPreference = this.getAttribute(
-      'providerPreference',
-    ) as ConnectionProviders;
-
-    const useConnectWidgetProp = this.getAttribute('useConnectWidget');
-    this.useConnectWidget = useConnectWidgetProp?.toLowerCase() !== 'false';
-
+    this.walletProvider = this.getAttribute('walletProvider') as WalletProviderName;
     this.renderWidget();
   }
 
   renderWidget() {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
-      providerPreference: this.providerPreference,
+      providerName: this.walletProvider,
+      web3Provider: this.provider,
     };
 
     const walletParams: WalletWidgetParams = {
-      providerPreference: this.providerPreference,
+      providerName: this.walletProvider,
+      web3Provider: this.provider,
     };
 
     if (!this.reactRoot) {
       this.reactRoot = ReactDOM.createRoot(this);
     }
-
     this.reactRoot.render(
       <React.StrictMode>
-        {this.useConnectWidget ? (
-          <ConnectLoader
-            widgetConfig={this.widgetConfig!}
-            params={connectLoaderParams}
-            closeEvent={sendWalletWidgetCloseEvent}
-          >
-            <WalletWidget
-              params={walletParams}
-              config={this.widgetConfig!}
-            />
-          </ConnectLoader>
-        ) : (
+        <ConnectLoader
+          widgetConfig={this.widgetConfig!}
+          params={connectLoaderParams}
+          closeEvent={sendWalletWidgetCloseEvent}
+        >
           <WalletWidget
             params={walletParams}
             config={this.widgetConfig!}
           />
-        )}
+        </ConnectLoader>
       </React.StrictMode>,
     );
   }
