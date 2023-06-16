@@ -1,2 +1,2 @@
-export * from './gasServiceEstimator';
+export * from './gasEstimator';
 export * from './bridgeGasEstimate';

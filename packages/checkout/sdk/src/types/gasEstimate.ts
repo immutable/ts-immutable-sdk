@@ -3,6 +3,9 @@ import { BigNumber } from 'ethers';
 import { FungibleToken } from '@imtbl/bridge-sdk';
 import { TokenInfo } from './tokenInfo';
 
+/**
+ * * Enum representing the actions that gas can be estimated for using {@link Checkout.gasEstimate}.
+ * */
 export enum GasEstimateType {
   BRIDGE_TO_L2 = 'BRIDGE_TO_L2',
   SWAP = 'SWAP',

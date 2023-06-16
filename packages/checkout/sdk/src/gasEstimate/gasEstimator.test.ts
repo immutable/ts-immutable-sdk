@@ -2,7 +2,7 @@ import { BigNumber, ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { Exchange } from '@imtbl/dex-sdk';
 import { TokenBridge } from '@imtbl/bridge-sdk';
-import { gasServiceEstimator } from './gasServiceEstimator';
+import { gasServiceEstimator } from './gasEstimator';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType } from '../types/gasEstimate';
 import { ChainId } from '../types';
