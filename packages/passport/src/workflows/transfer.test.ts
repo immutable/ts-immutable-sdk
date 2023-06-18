@@ -104,7 +104,6 @@ describe('transfer', () => {
         time: 111,
         transfer_id: 123,
       };
-
       mockGetTransactionByID.mockResolvedValue({
         data: {
           id: mockPayloadHash,
@@ -139,6 +138,7 @@ describe('transfer', () => {
 
       expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
+      expect(mockConfirmationScreen.loading).toBeCalledTimes(1);
       expect(mockConfirmationScreen.startGuardianTransaction).toHaveBeenCalledWith(
         mockSignableTransferV1Response.data.payload_hash,
       );
@@ -231,6 +231,7 @@ describe('transfer', () => {
 
       expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
+      expect(mockConfirmationScreen.loading).toBeCalledTimes(1);
       expect(mockConfirmationScreen.startGuardianTransaction).not.toBeCalled();
       expect(createTransferV1Mock).toBeCalledWith(
         mockCreateTransferRequest,

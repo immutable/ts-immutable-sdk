@@ -22,7 +22,7 @@ import {
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
 import * as network from './network';
-import { GetBridgeGasEstimateResult } from './types/gasEstimates';
+import { GetBridgeGasEstimateResult } from './types/gasEstimate';
 
 jest.mock('./connect');
 jest.mock('./network');
@@ -161,13 +161,13 @@ describe(' Connect', () => {
       const getNetworkAllListMock = jest.fn().mockResolvedValue({
         networks: [
           {
-            chainId: 13373,
+            chainId: ChainId.IMTBL_ZKEVM_DEVNET,
             name: 'Immutable zkEVM Testnet',
             isSupported: true,
             nativeCurrency: {},
           },
           {
-            chainId: 11155111,
+            chainId: ChainId.SEPOLIA,
             name: 'Sepolia',
             isSupported: true,
             nativeCurrency: {},

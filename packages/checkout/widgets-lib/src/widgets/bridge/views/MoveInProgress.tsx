@@ -32,33 +32,51 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
     if (!tokenBridge) return;
 
     (async () => {
-      const receipt = await transactionResponse.wait();
+      try {
+        const receipt = await transactionResponse.wait();
 
-      if (receipt.status === 1) {
-        const bridgeResult: WaitForResponse = await tokenBridge.waitForDeposit({
-          transactionHash: receipt.transactionHash,
-        });
-
-        if (bridgeResult.status === CompletionStatus.SUCCESS) {
-          viewDispatch({
-            payload: {
-              type: ViewActions.UPDATE_VIEW,
-              view: { type: BridgeWidgetViews.SUCCESS },
-            },
+        if (receipt.status === 1) {
+          const bridgeResult: WaitForResponse = await tokenBridge.waitForDeposit({
+            transactionHash: receipt.transactionHash,
           });
-          return;
-        }
-      }
 
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: {
-            type: BridgeWidgetViews.FAIL,
-            data: bridgeForm,
+          if (bridgeResult.status === CompletionStatus.SUCCESS) {
+            viewDispatch({
+              payload: {
+                type: ViewActions.UPDATE_VIEW,
+                view: {
+                  type: BridgeWidgetViews.SUCCESS,
+                  data: {
+                    transactionHash: receipt.transactionHash,
+                  },
+                },
+              },
+            });
+            return;
+          }
+        }
+
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: BridgeWidgetViews.FAIL,
+              data: bridgeForm,
+            },
           },
-        },
-      });
+        });
+      } catch (err) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: BridgeWidgetViews.FAIL,
+              data: bridgeForm,
+              reason: 'Transaction failed',
+            },
+          },
+        });
+      }
     })();
   }, [transactionResponse, tokenBridge]);
 
@@ -78,7 +96,7 @@ export function MoveInProgress({ token, transactionResponse, bridgeForm }: MoveI
       floatHeader
     >
       <SimpleTextBody heading={heading}>
-        {body1(token.symbol)}
+        {body1(token?.symbol)}
         <br />
         <br />
         {body2}

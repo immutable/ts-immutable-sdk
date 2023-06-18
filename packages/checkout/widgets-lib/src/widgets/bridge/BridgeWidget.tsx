@@ -31,7 +31,7 @@ import {
 } from './context/BridgeContext';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { sendBridgeFailedEvent, sendBridgeSuccessEvent, sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
-import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { BridgeSuccessView, BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { Bridge } from './views/Bridge';
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
@@ -39,6 +39,7 @@ import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiat
 import { MoveInProgress } from './views/MoveInProgress';
 import { text } from '../../resources/text/textConfig';
 import { ErrorView } from '../../views/error/ErrorView';
+import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -218,12 +219,17 @@ export function BridgeWidget(props: BridgeWidgetProps) {
                 bridgeForm={viewReducerValues.viewState.view.data.bridgeForm}
               />
             )}
+            {viewReducerValues.viewState.view.type === BridgeWidgetViews.APPROVE_ERC20 && (
+              <ApproveERC20BridgeOnboarding data={viewReducerValues.viewState.view.data} />
+            )}
             {viewReducerValues.viewState.view.type === BridgeWidgetViews.SUCCESS && (
               <StatusView
                 statusText={successText.text} // todo: move to text
                 actionText={successText.actionText}
                 onActionClick={sendBridgeWidgetCloseEvent}
-                onRenderEvent={sendBridgeSuccessEvent}
+                onRenderEvent={() => sendBridgeSuccessEvent(
+                  (viewReducerValues.viewState.view as BridgeSuccessView).data.transactionHash,
+                )}
                 statusType={StatusType.SUCCESS}
                 testId="success-view"
               />

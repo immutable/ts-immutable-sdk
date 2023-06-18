@@ -8,7 +8,7 @@ import { ApproveERC20Onboarding } from './ApproveERC20Onboarding';
 import { cySmartGet } from '../../../lib/testUtils';
 import { text } from '../../../resources/text/textConfig';
 import {
-  ApproveERC20Swap,
+  ApproveERC20SwapData,
   PrefilledSwapForm,
   SwapWidgetViews,
 } from '../../../context/view-context/SwapViewContextTypes';
@@ -17,7 +17,7 @@ import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestCompon
 
 describe('Approve ERC20 Onboarding', () => {
   let initialSwapState:SwapState;
-  let mockApproveERC20Swap: ApproveERC20Swap;
+  let mockApproveERC20Swap: ApproveERC20SwapData;
   let sendTransactionStub;
   beforeEach(() => {
     cy.viewport('ipad-2');

@@ -187,6 +187,31 @@ export const text = {
       body2:
         'You can close this window, the transaction will be reflected in your wallet once complete.',
     },
+    [BridgeWidgetViews.APPROVE_ERC20]: {
+      approveBridge: {
+        content: {
+          heading: "Now you'll just need to approve the transaction",
+          body: 'Follow the prompts in MetaMask.',
+        },
+        footer: {
+          buttonText: 'Okay',
+          retryText: 'Try again',
+        },
+      },
+      approveSpending: {
+        content: {
+          heading: "You'll be asked to set a spending cap for this transaction",
+          body: ['Input at least', 'for this transaction and future transactions, then follow the prompts.'],
+        },
+        footer: {
+          buttonText: 'Got it',
+          retryText: 'Try again',
+        },
+        loading: {
+          text: 'Approving spending cap',
+        },
+      },
+    },
     [BridgeWidgetViews.SUCCESS]: {
       text: 'Success',
       actionText: 'Continue',
@@ -203,18 +228,17 @@ export const text = {
         onramp: {
           heading: 'Buy with card',
           caption: 'Google pay & Apple pay available. Minimum $20.',
-          subcaption: 'Fees ~ 0.3%',
+          subcaption: 'Fees ≈ 0.3%',
         },
         swap: {
           heading: 'Swap my coins',
           caption: 'Using the coins I have on the same network',
-          subcaption: 'Fees ~ 0.3%',
+          subcaption: 'Fees ≈',
         },
         bridge: {
           heading: 'Move my coins',
           caption: 'From the coins I have on a different network',
-          // todo: get the live rate
-          subcaption: 'Fees {live rate}',
+          subcaption: 'Fees ≈',
         },
       },
     },

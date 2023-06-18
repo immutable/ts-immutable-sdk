@@ -28,7 +28,7 @@ export interface SwapButtonProps {
 export function SwapButton({
   loading, updateLoading, validator, transaction, data,
 }: SwapButtonProps) {
-  const [transactionCanceledDrawerOpen, setTransactionCanceledDrawerOpen] = useState(false);
+  const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
   const { viewDispatch } = useContext(ViewContext);
   const { swapState } = useContext(SwapContext);
   const { checkout, provider } = swapState;
@@ -79,7 +79,7 @@ export function SwapButton({
     } catch (err: any) {
       updateLoading(false);
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
-        setTransactionCanceledDrawerOpen(true);
+        setShowTxnRejectedState(true);
         return;
       }
       if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT) {
@@ -136,12 +136,12 @@ export function SwapButton({
         ) : buttonText}
       </Button>
       <TransactionRejected
-        visible={transactionCanceledDrawerOpen}
+        visible={showTxnRejectedState}
         showHeaderBar={false}
-        onCloseBottomSheet={() => setTransactionCanceledDrawerOpen(false)}
+        onCloseBottomSheet={() => setShowTxnRejectedState(false)}
         onRetry={() => {
           sendTransaction();
-          setTransactionCanceledDrawerOpen(false);
+          setShowTxnRejectedState(false);
         }}
       />
     </Box>
