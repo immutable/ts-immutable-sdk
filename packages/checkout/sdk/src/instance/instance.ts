@@ -6,7 +6,7 @@ import { ethers } from 'ethers';
 import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { ChainId } from '../types';
-import { getDexConfigOverrides } from './dexConfigOverrides';
+import { RemoteConfig } from '../config/remoteConfig';
 
 export async function createBridgeInstance(
   fromChainId: ChainId,
@@ -50,10 +50,18 @@ export async function createExchangeInstance(
   chainId: ChainId,
   environment: Environment,
 ): Promise<Exchange> {
+  let overrides;
+
+  try {
+    overrides = (await new RemoteConfig({ environment }).load())?.dex?.overrides;
+  } catch (err) {
+    console.error(err);
+  }
+
   const exchange = new Exchange(new ExchangeConfiguration({
     chainId,
     baseConfig: new ImmutableConfiguration({ environment }),
-    overrides: getDexConfigOverrides(),
+    overrides,
   }));
 
   return exchange;
