@@ -55,6 +55,7 @@ export async function createExchangeInstance(
   try {
     overrides = (await new RemoteConfig({ environment }).load())?.dex?.overrides;
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error(err);
   }
 
