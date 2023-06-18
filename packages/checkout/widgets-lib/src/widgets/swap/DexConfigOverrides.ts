@@ -35,7 +35,7 @@ const contractOverrides = {
 };
 
 export const getDexConfigOverrides = (): any => ({
-  rpcURL: 'https://eth-sepolia.g.alchemy.com/v2/yaWHtnolBT_q8n8h03J4aSBsoGnDfWIv',
+  rpcURL: 'https://checkout-api.dev.immutable.com/v1/rpc/eth-sepolia',
   exchangeContracts: contractOverrides,
   commonRoutingTokens,
   nativeToken: {
