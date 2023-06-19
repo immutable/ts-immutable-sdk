@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ChainName } from '../models/ChainName';
-import type { CreateOrderRequestBody } from '../models/CreateOrderRequestBody';
-import type { ListOrdersResult } from '../models/ListOrdersResult';
-import type { OrderResult } from '../models/OrderResult';
+import type { CreateListingRequestBody } from '../models/CreateListingRequestBody';
+import type { ListingResult } from '../models/ListingResult';
+import type { ListListingsResult } from '../models/ListListingsResult';
 import type { OrderStatus } from '../models/OrderStatus';
 import type { PageCursor } from '../models/PageCursor';
 import type { PageSize } from '../models/PageSize';
@@ -17,12 +17,12 @@ export class OrdersService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
   /**
-   * List all orders
-   * List all orders
-   * @returns ListOrdersResult OK response.
+   * List all listings
+   * List all listings
+   * @returns ListListingsResult OK response.
    * @throws ApiError
    */
-  public listOrders({
+  public listListings({
     chainName,
     status,
     sellItemContractAddress,
@@ -61,10 +61,10 @@ export class OrdersService {
      * Page cursor to retrieve previous or next page. Use the value returned in the response.
      */
     pageCursor?: PageCursor,
-  }): CancelablePromise<ListOrdersResult> {
+  }): CancelablePromise<ListListingsResult> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/v1/chains/{chain_name}/orders',
+      url: '/v1/chains/{chain_name}/listings',
       path: {
         'chain_name': chainName,
       },
@@ -86,21 +86,21 @@ export class OrdersService {
   }
 
   /**
-   * Create an order
-   * Create an order
-   * @returns OrderResult Created response.
+   * Create a listing
+   * Create a listing
+   * @returns ListingResult Created response.
    * @throws ApiError
    */
-  public createOrder({
+  public createListing({
     chainName,
     requestBody,
   }: {
     chainName: ChainName,
-    requestBody: CreateOrderRequestBody,
-  }): CancelablePromise<OrderResult> {
+    requestBody: CreateListingRequestBody,
+  }): CancelablePromise<ListingResult> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/v1/chains/{chain_name}/orders',
+      url: '/v1/chains/{chain_name}/listings',
       path: {
         'chain_name': chainName,
       },
@@ -115,27 +115,27 @@ export class OrdersService {
   }
 
   /**
-   * Get a single order by ID
-   * Get a single order by ID
-   * @returns OrderResult OK response.
+   * Get a single listing by ID
+   * Get a single listing by ID
+   * @returns ListingResult OK response.
    * @throws ApiError
    */
-  public getOrder({
+  public getListing({
     chainName,
-    orderId,
+    listingId,
   }: {
     chainName: ChainName,
     /**
      * Global Order identifier
      */
-    orderId: string,
-  }): CancelablePromise<OrderResult> {
+    listingId: string,
+  }): CancelablePromise<ListingResult> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/v1/chains/{chain_name}/orders/{order_id}',
+      url: '/v1/chains/{chain_name}/listings/{listing_id}',
       path: {
         'chain_name': chainName,
-        'order_id': orderId,
+        'listing_id': listingId,
       },
       errors: {
         400: `Bad Request (400)`,

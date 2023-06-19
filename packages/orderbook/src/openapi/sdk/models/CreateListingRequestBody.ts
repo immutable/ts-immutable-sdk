@@ -7,7 +7,7 @@ import type { CreateOrderProtocolData } from './CreateOrderProtocolData';
 import type { Fee } from './Fee';
 import type { SellItem } from './SellItem';
 
-export type CreateOrderRequestBody = {
+export type CreateListingRequestBody = {
   account_address: string;
   order_hash: string;
   buy: Array<BuyItem>;

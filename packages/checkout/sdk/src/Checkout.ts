@@ -1,17 +1,14 @@
+/* eslint-disable class-methods-use-this */
 import { ethers } from 'ethers';
-import {
-  BridgeConfiguration,
-  ETH_MAINNET_TO_ZKEVM_MAINNET,
-  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
-  TokenBridge,
-} from '@imtbl/bridge-sdk';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { Environment } from '@imtbl/config';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
 import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
+import * as gasEstimate from './gasEstimate';
+import * as instance from './instance';
 import {
   ChainId,
   CheckConnectionParams,
@@ -45,9 +42,12 @@ import {
   getBridgeFeeEstimate,
 } from './gasEstimate/bridgeGasEstimate';
 import {
+  GasEstimateParams,
+  GasEstimateSwapResult,
+  GasEstimateBridgeToL2Result,
   GetBridgeGasEstimateParams,
   GetBridgeGasEstimateResult,
-} from './types/gasEstimates';
+} from './types/gasEstimate';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 
 export class Checkout {
@@ -72,7 +72,6 @@ export class Checkout {
    * @returns Wallet connection status details.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async checkIsWalletConnected(
     params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
@@ -179,7 +178,6 @@ export class Checkout {
    * @returns List of allowed tokens.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async getTokenAllowList(
     params: GetTokenAllowListParams,
   ): Promise<GetTokenAllowListResult> {
@@ -192,7 +190,6 @@ export class Checkout {
    * @returns List of allowed wallets.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async getWalletAllowList(
     params: GetWalletAllowListParams,
   ): Promise<GetWalletAllowListResult> {
@@ -207,7 +204,6 @@ export class Checkout {
    * @remarks
    * Further documenation can be found at [MetaMask | Sending Transactions](https://docs.metamask.io/guide/sending-transactions.html).
    */
-  // eslint-disable-next-line class-methods-use-this
   public async sendTransaction(
     params: SendTransactionParams,
   ): Promise<SendTransactionResult> {
@@ -225,9 +221,29 @@ export class Checkout {
   }
 
   /**
+   * Estimates the gas to perform an action.
+   * @param {GasEstimateParams} params - The params required to calculate a gas estimate
+   * @returns The gas estimate for the given action.
+   */
+  public async gasEstimate(
+    params: GasEstimateParams,
+  ): Promise<GasEstimateSwapResult | GasEstimateBridgeToL2Result> {
+    this.readOnlyProviders = await createReadOnlyProviders(
+      this.config,
+      this.readOnlyProviders,
+    );
+
+    return await gasEstimate.gasServiceEstimator(
+      params.gasEstimateType,
+      this.readOnlyProviders,
+      this.config.environment,
+    );
+  }
+
+  /**
    * Get gas estimates for bridge transaction.
    * @param {GetBridgeGasEstimateParams} params - The necessary data required to get the gas estimates.
-   * @returns Network details.
+   * @returns Bridge gas estimate.
    * @throws {@link ErrorType}
    */
   public async getBridgeGasEstimate(
@@ -240,7 +256,16 @@ export class Checkout {
       ? ChainId.IMTBL_ZKEVM_TESTNET
       : ChainId.IMTBL_ZKEVM_DEVNET;
 
-    const tokenBridge = await this.getBridgeInstance(fromChainId, toChainId);
+    this.readOnlyProviders = await createReadOnlyProviders(
+      this.config,
+      this.readOnlyProviders,
+    );
+    const tokenBridge = await instance.createBridgeInstance(
+      fromChainId,
+      toChainId,
+      this.readOnlyProviders,
+      this.config.environment,
+    );
 
     const result: GetBridgeGasEstimateResult = {};
 
@@ -260,46 +285,5 @@ export class Checkout {
     );
 
     return result;
-  }
-
-  private async getBridgeInstance(
-    fromChainId: ChainId,
-    toChainId: ChainId,
-  ): Promise<TokenBridge> {
-    this.readOnlyProviders = await createReadOnlyProviders(
-      this.config,
-      this.readOnlyProviders,
-    );
-
-    const rootChainProvider = this.readOnlyProviders.get(fromChainId);
-    const childChainProvider = this.readOnlyProviders.get(toChainId);
-
-    if (!rootChainProvider) {
-      throw new CheckoutError(
-        `Chain:${fromChainId} is not a supported chain`,
-        CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
-      );
-    }
-    if (!childChainProvider) {
-      throw new CheckoutError(
-        `Chain:${toChainId} is not a supported chain`,
-        CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
-      );
-    }
-
-    const bridgeConfig = new BridgeConfiguration({
-      baseConfig: new ImmutableConfiguration({
-        environment: this.config.environment,
-      }),
-      bridgeInstance:
-        this.config.environment === Environment.PRODUCTION
-          ? ETH_MAINNET_TO_ZKEVM_MAINNET
-          : ETH_SEPOLIA_TO_ZKEVM_DEVNET,
-
-      rootProvider: rootChainProvider,
-      childProvider: childChainProvider,
-    });
-
-    return new TokenBridge(bridgeConfig);
   }
 }

@@ -9,10 +9,10 @@ export enum BridgeEventType {
 
 /**
  * Type representing a Bridge Widget event with type SUCCESS
- * @property {number} timestamp - The UNIX timestamp (in milliseconds) when the event occurred.
+ * @property {string} transactionHash - The transactionHash of the bridge transaction
  */
 export type BridgeSuccess = {
-  timestamp: number;
+  transactionHash: string;
 };
 
 /**

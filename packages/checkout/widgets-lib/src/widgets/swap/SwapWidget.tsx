@@ -26,7 +26,7 @@ import {
   initialViewState,
   viewReducer,
 } from '../../context/view-context/ViewContext';
-import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
+import { SwapSuccessView, SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
@@ -39,6 +39,8 @@ import {
   sendSwapFailedEvent, sendSwapRejectedEvent,
   sendSwapSuccessEvent, sendSwapWidgetCloseEvent,
 } from './SwapWidgetEvents';
+import { SwapInProgress } from './views/SwapInProgress';
+import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -184,11 +186,24 @@ export function SwapWidget(props: SwapWidgetProps) {
               />
             </CryptoFiatProvider>
           )}
+          {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (
+            <SwapInProgress
+              transactionResponse={viewState.view.data.transactionResponse}
+              swapForm={viewState.view.data.swapForm}
+            />
+          )}
+          {viewState.view.type === SwapWidgetViews.APPROVE_ERC20 && (
+            <ApproveERC20Onboarding data={viewState.view.data} />
+          )}
           {viewState.view.type === SwapWidgetViews.SUCCESS && (
             <StatusView
               statusText={success.text}
               actionText={success.actionText}
-              onRenderEvent={sendSwapSuccessEvent}
+              onRenderEvent={
+                () => sendSwapSuccessEvent(
+                  (viewState.view as SwapSuccessView).data.transactionHash,
+                )
+              }
               onActionClick={sendSwapWidgetCloseEvent}
               statusType={StatusType.SUCCESS}
               testId="success-view"
