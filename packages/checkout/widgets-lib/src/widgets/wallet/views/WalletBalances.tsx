@@ -1,4 +1,4 @@
-import { Box, MenuItem } from '@biom3/react';
+import { Box, Icon, MenuItem } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -35,9 +35,10 @@ export function WalletBalances() {
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const {
-    provider, checkout, network, supportedTopUps,
+    provider, checkout, network, supportedTopUps, tokenBalances,
   } = walletState;
   const { conversions } = cryptoFiatState;
+  const [balancesLoading, setBalancesLoading] = useState(false);
   useTokenSymbols(checkout, cryptoFiatDispatch);
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
@@ -73,7 +74,7 @@ export function WalletBalances() {
   useEffect(() => {
     if (!checkout || !provider || !network) return;
     (async () => {
-      const tokenBalances = await getTokenBalances(
+      const balances = await getTokenBalances(
         checkout,
         provider,
         network.name,
@@ -84,11 +85,21 @@ export function WalletBalances() {
       walletDispatch({
         payload: {
           type: WalletActions.SET_TOKEN_BALANCES,
-          tokenBalances,
+          tokenBalances: balances,
         },
       });
     })();
-  }, [checkout, network, provider, conversions, walletDispatch]);
+  }, [
+    checkout,
+    network,
+    provider,
+    conversions,
+    setBalancesLoading,
+    walletDispatch]);
+
+  useEffect(() => {
+    setBalancesLoading(false);
+  }, [tokenBalances]);
 
   return (
     <SimpleLayout
@@ -119,15 +130,31 @@ export function WalletBalances() {
         }}
       >
         <Box sx={WALLET_BALANCE_CONTAINER_STYLE}>
-          <NetworkMenu />
+          <NetworkMenu setBalancesLoading={setBalancesLoading} />
           <TotalTokenBalance totalBalance={totalFiatAmount} />
           <Box
             sx={WalletBalanceItemStyle(
               showAddCoins,
-              walletState.tokenBalances.length > 2,
+              walletState.tokenBalances.length > 2 || balancesLoading,
             )}
           >
-            <TokenBalanceList balanceInfoItems={walletState.tokenBalances} />
+            {balancesLoading && (
+            <Box sx={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            >
+              <Icon
+                testId="loading-icon"
+                icon="Loading"
+                sx={{ w: 'base.icon.size.500' }}
+              />
+            </Box>
+            )}
+            {!balancesLoading && (<TokenBalanceList balanceInfoItems={walletState.tokenBalances} />)}
           </Box>
         </Box>
         {showAddCoins && (
