@@ -29,6 +29,7 @@ async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
    - Interactions exposed through the SDK (plus docs)
    - Orders expire
    - Orders can be listed and paged
+   - Order can be fulfiled
 */
 
 // Just using Jest for ease of executing the demo script, not test syntax used
@@ -39,6 +40,7 @@ describe('', () => {
     const offerer = getOffererWallet(provider);
     const fulfiller = getFulfillerWallet(provider);
 
+    log('Deploying a new NFT collection and minting a token...');
     // Deploy an NFT contract and mint a token for the offerer
     const nftContract = await deployAndMintNftContract(offerer);
 
@@ -53,14 +55,14 @@ describe('', () => {
       zoneContractAddress: config.zoneContractAddress,
       overrides: {
         apiEndpoint: config.apiUrl,
-        chainName: 'imtbl-zkevm-local',
+        chainName: 'imtbl-zkevm-devnet-5',
       },
     });
 
     log(`Preparing soon-to-expire listing for user ${offerer.address} for NFT collection ${nftContract.address}, TokenID 0`);
 
     // Prepare the listing details
-    const listing = await sdk.prepareListing({
+    const soonToExpireListing = await sdk.prepareListing({
       offerer: offerer.address,
       considerationItem: {
         amount: '1000000',
@@ -75,26 +77,26 @@ describe('', () => {
     });
 
     // Sign and submit the approval transaction for the offerer
-    await signAndSubmitTx(listing.unsignedApprovalTransaction!, offerer, provider);
+    await signAndSubmitTx(soonToExpireListing.unsignedApprovalTransaction!, offerer, provider);
 
     // Sign the EIP712 order message for the offerer. This is the signature that the order book API
     // stores and allows the fulfiller to fulfil the order, as long as they also have a valid
     // operator signature
-    const signature = await signMessage(listing.typedOrderMessageForSigning, offerer);
+    const signature = await signMessage(soonToExpireListing.typedOrderMessageForSigning, offerer);
 
     // Submit the order creation request to the order book API
     const { result: { id: orderId } } = await sdk.createListing({
       offerer: offerer.address,
-      orderComponents: listing.orderComponents,
-      orderHash: listing.orderHash,
+      orderComponents: soonToExpireListing.orderComponents,
+      orderHash: soonToExpireListing.orderHash,
       orderSignature: signature,
     });
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
-    log(`Listing ${orderId} is now active, it will soon transition to EXPIRED, waiting...`);
+    log(`Listing ${orderId} is now ACTIVE, it will soon transition to EXPIRED, waiting...`);
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.EXPIRED);
-    log(`Listing ${orderId} is now expired. Attempting to fulfill the expired listing...`);
+    log(`Listing ${orderId} is now EXPIRED. Attempting to fulfill the expired listing...`);
 
     try {
       await sdk.fulfillOrder(orderId, fulfiller.address);
@@ -103,11 +105,54 @@ describe('', () => {
       log(e);
     }
 
+    // Listing we will fulfill
+    const validListing = await sdk.prepareListing({
+      offerer: offerer.address,
+      considerationItem: {
+        amount: '1000000',
+        type: 'NATIVE',
+      },
+      listingItem: {
+        contractAddress: nftContract.address,
+        tokenId: '0',
+        type: 'ERC721',
+      },
+      // long expiry
+      orderExpiry: new Date(Date.now() + 1000000 * 30),
+    });
+
+    const signature2 = await signMessage(validListing.typedOrderMessageForSigning, offerer);
+
+    log('Cretaing new listing to be fulfilled...');
+
+    // Submit the order creation request to the order book API
+    const { result: { id: orderId2 } } = await sdk.createListing({
+      offerer: offerer.address,
+      orderComponents: validListing.orderComponents,
+      orderHash: validListing.orderHash,
+      orderSignature: signature2,
+    });
+
+    await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.ACTIVE);
+    log(`Listing ${orderId2} is now ACTIVE, fulfilling order...`);
+
+    const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(
+      orderId2,
+      fulfiller.address,
+    );
+    await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
+    log(`Fulfilment transaction sent, waiting for listing ${orderId2} to become FILLED`);
+
+    await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.FILLED);
+    log(`Listing ${orderId2} is now FILLED`);
+
+    log('Listing all orders for the NFT collection');
+
     const listOfOrders = await sdk.listListings({
       sellItemContractAddress: nftContract.address,
     });
 
     log(`List of orders for contract ${nftContract.address}:`);
     log(JSON.stringify(listOfOrders, null, 2));
-  }, 60_000);
+  }, 200_000);
 });
