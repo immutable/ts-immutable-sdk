@@ -99,7 +99,7 @@ export async function createOrder({
       },
     };
 
-    const createOrderResponse = await ordersApi.createOrder(orderParams, {
+    const createOrderResponse = await ordersApi.createOrderV3(orderParams, {
       headers,
     });
 
@@ -141,7 +141,7 @@ export async function cancelOrder({
 
     const starkSignature = await starkSigner.signMessage(payloadHash);
 
-    const cancelOrderResponse = await ordersApi.cancelOrder(
+    const cancelOrderResponse = await ordersApi.cancelOrderV3(
       {
         id: request.order_id.toString(),
         cancelOrderRequest: {

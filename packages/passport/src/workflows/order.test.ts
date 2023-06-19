@@ -38,7 +38,7 @@ describe('order', () => {
       createOrderMock = jest.fn();
       ordersApiMock = {
         getSignableOrder: getSignableCreateOrderMock,
-        createOrder: createOrderMock,
+        createOrderV3: createOrderMock,
       } as unknown as OrdersApi;
     });
 
@@ -199,7 +199,7 @@ describe('order', () => {
       cancelOrderMock = jest.fn();
       ordersApiMock = {
         getSignableCancelOrderV3: getSignableCancelOrderMock,
-        cancelOrder: cancelOrderMock,
+        cancelOrderV3: cancelOrderMock,
       } as unknown as OrdersApi;
     });
 
