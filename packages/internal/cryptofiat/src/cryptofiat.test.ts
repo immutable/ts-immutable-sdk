@@ -236,6 +236,108 @@ describe('CryptoFiat', () => {
     expect(result.eth).toEqual({ usd: 4000 });
   });
 
+  it('should handle empty strings in tokenSymbols and fiatSymbols', async () => {
+    const mockedOverridesResponse = {
+      status: 200,
+      data: {
+        eth: 'ethereum',
+        imx: 'immutable-x',
+      },
+    };
+    mockedAxios.get.mockResolvedValueOnce(mockedOverridesResponse);
+
+    const mockedSymbolsResponse = {
+      status: 200,
+      data: [
+        { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin' },
+        { id: 'ethereum', symbol: 'eth', name: 'Ethereum' },
+      ],
+    };
+    mockedAxios.get.mockResolvedValueOnce(mockedSymbolsResponse);
+
+    const mockedConversionResponse = {
+      status: 200,
+      data: {
+        bitcoin: { usd: 50000 },
+        ethereum: { usd: 4000 },
+      },
+    };
+    mockedAxios.get.mockResolvedValueOnce(mockedConversionResponse);
+
+    const cryptoFiat = new CryptoFiat(config);
+    const result = await cryptoFiat.convert({
+      tokenSymbols: ['btc', 'eth', ''],
+      fiatSymbols: ['aud', ''],
+    });
+
+    expect(mockedAxios.get).toHaveBeenCalledTimes(3);
+    expect(mockedAxios.get).toHaveBeenNthCalledWith(
+      1,
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/coins/overrides',
+    );
+    expect(mockedAxios.get).toHaveBeenNthCalledWith(
+      2,
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/coins/all',
+    );
+    expect(mockedAxios.get).toHaveBeenNthCalledWith(
+      3,
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/conversion?ids=bitcoin,ethereum&currencies=aud',
+    );
+    expect(result.btc).toEqual({ usd: 50000 });
+    expect(result.eth).toEqual({ usd: 4000 });
+  });
+
+  it('should handle have fallback fiat symbol', async () => {
+    const mockedOverridesResponse = {
+      status: 200,
+      data: {
+        eth: 'ethereum',
+        imx: 'immutable-x',
+      },
+    };
+    mockedAxios.get.mockResolvedValueOnce(mockedOverridesResponse);
+
+    const mockedSymbolsResponse = {
+      status: 200,
+      data: [
+        { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin' },
+        { id: 'ethereum', symbol: 'eth', name: 'Ethereum' },
+      ],
+    };
+    mockedAxios.get.mockResolvedValueOnce(mockedSymbolsResponse);
+
+    const mockedConversionResponse = {
+      status: 200,
+      data: {
+        bitcoin: { usd: 50000 },
+        ethereum: { usd: 4000 },
+      },
+    };
+    mockedAxios.get.mockResolvedValueOnce(mockedConversionResponse);
+
+    const cryptoFiat = new CryptoFiat(config);
+    const result = await cryptoFiat.convert({
+      tokenSymbols: ['btc', 'eth', ''],
+      fiatSymbols: [''],
+    });
+
+    expect(mockedAxios.get).toHaveBeenCalledTimes(3);
+    expect(mockedAxios.get).toHaveBeenNthCalledWith(
+      1,
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/coins/overrides',
+    );
+    expect(mockedAxios.get).toHaveBeenNthCalledWith(
+      2,
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/coins/all',
+    );
+    expect(mockedAxios.get).toHaveBeenNthCalledWith(
+      3,
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/conversion?ids=bitcoin,ethereum&currencies=usd',
+    );
+    expect(result.btc).toEqual({ usd: 50000 });
+    expect(result.eth).toEqual({ usd: 4000 });
+  });
+
   it('should throw an error when tokenSymbols is empty or not provided', async () => {
     const cryptoFiat = new CryptoFiat(config);
 

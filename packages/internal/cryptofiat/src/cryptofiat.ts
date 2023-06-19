@@ -95,19 +95,21 @@ export class CryptoFiat {
       throw new Error('Error missing token symbols to convert');
     }
 
-    if (fiatSymbols.length === 0) fiatSymbols.push(DEFAULT_FIAT_SYMBOL);
+    const currencies = fiatSymbols.filter((fiatSymbol) => fiatSymbol !== '');
+    if (currencies.length === 0) currencies.push(DEFAULT_FIAT_SYMBOL);
 
     await this.fetchCoins();
 
-    const ids = tokenSymbols
+    const idsParam = tokenSymbols
+      .filter((tokenSymbol) => tokenSymbol !== '')
       .map((tokenSymbol) => this.coinsCache!.get(tokenSymbol.toLowerCase()))
       .join(',');
 
-    const currencies = fiatSymbols
+    const currenciesParam = currencies
       .join(',')
       .toLowerCase();
 
-    const url = this.urlWithPath(`/v1/fiat/conversion?ids=${ids}&currencies=${currencies}`);
+    const url = this.urlWithPath(`/v1/fiat/conversion?ids=${idsParam}&currencies=${currenciesParam}`);
 
     const response = await axios.get(url);
     if (response.status !== 200) {
