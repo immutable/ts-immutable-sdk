@@ -1,6 +1,6 @@
-/** ************************************************ */
-/** * Copy of widgets-lib/src/lib/remoteConfig.ts ** */
-/** ************************************************ */
+/** ******************************************* */
+/** * Copy of sdk/src/config/remoteConfig.ts ** */
+/** ******************************************* */
 
 import { Environment } from '@imtbl/config';
 import { ExchangeOverrides } from '@imtbl/dex-sdk';

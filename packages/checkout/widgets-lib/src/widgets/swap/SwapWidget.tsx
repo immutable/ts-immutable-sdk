@@ -32,7 +32,6 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
-import { getDexConfigOverrides } from './DexConfigOverrides';
 import { text } from '../../resources/text/textConfig';
 import { ErrorView } from '../../views/error/ErrorView';
 import {
@@ -41,6 +40,7 @@ import {
 } from './SwapWidgetEvents';
 import { SwapInProgress } from './views/SwapInProgress';
 import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
+import { RemoteConfig } from '../../lib/remoteConfig';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -152,10 +152,18 @@ export function SwapWidget(props: SwapWidgetProps) {
       },
     });
 
+    let overrides;
+    try {
+      overrides = (await new RemoteConfig({ environment }).load())?.dex?.overrides;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(err);
+    }
+
     const exchange = new Exchange(new ExchangeConfiguration({
       chainId: connectResult.network.chainId,
       baseConfig: new ImmutableConfiguration({ environment }),
-      overrides: getDexConfigOverrides(),
+      overrides,
     }));
 
     swapDispatch({
