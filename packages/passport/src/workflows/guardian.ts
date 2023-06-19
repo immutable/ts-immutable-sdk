@@ -7,6 +7,7 @@ export type GuardianParams = {
   imxPublicApiDomain: string;
   payloadHash: string;
   confirmationScreen: ConfirmationScreen;
+  popupWindowSize?: { width: number; height: number }
 };
 
 export const validateWithGuardian = async ({
@@ -14,8 +15,9 @@ export const validateWithGuardian = async ({
   imxPublicApiDomain,
   payloadHash,
   confirmationScreen,
+  popupWindowSize,
 }: GuardianParams) => {
-  confirmationScreen.loading();
+  confirmationScreen.loading(popupWindowSize);
   const transactionAPI = new guardian.TransactionsApi(
     new guardian.Configuration({
       accessToken,

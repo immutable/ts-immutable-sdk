@@ -11,7 +11,7 @@ import {
 } from '@imtbl/core-sdk';
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
-import { ConfirmationScreen, TransactionTypes } from '../confirmation';
+import { ConfirmationScreen } from '../confirmation';
 import { UserWithEtherKey } from '../types';
 import { validateWithGuardian } from './guardian';
 
@@ -31,6 +31,7 @@ type BatchTransfersParams = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
+  imxPublicApiDomain: string;
   confirmationScreen: ConfirmationScreen;
 };
 
@@ -112,6 +113,7 @@ export async function batchNftTransfer({
   request,
   transfersApi,
   confirmationScreen,
+  imxPublicApiDomain,
 }: BatchTransfersParams): Promise<CreateTransferResponse> {
   return withPassportError<CreateTransferResponse>(async () => {
     const ethAddress = user.etherKey;
@@ -133,23 +135,23 @@ export async function batchNftTransfer({
       signable_requests: signableRequests,
     };
 
+    const headers = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Authorization: `Bearer ${user.accessToken}`,
+    };
+
     const signableResult = await transfersApi.getSignableTransfer({
       getSignableTransferRequestV2,
-    });
+    }, { headers });
 
     const popupWindowSize = { width: 480, height: 784 };
-    const confirmationResult = await confirmationScreen.startTransaction(
-      user.accessToken,
-      {
-        transactionType: TransactionTypes.createBatchTransfer,
-        transactionData: getSignableTransferRequestV2,
-      },
+    await validateWithGuardian({
+      imxPublicApiDomain,
+      accessToken: user.accessToken,
+      payloadHash: signableResult.data.signable_responses[0]?.payload_hash,
+      confirmationScreen,
       popupWindowSize,
-    );
-
-    if (!confirmationResult.confirmed) {
-      throw new Error('Transaction rejected by user');
-    }
+    });
 
     const requests = await Promise.all(
       signableResult.data.signable_responses.map(async (resp) => {
@@ -172,10 +174,6 @@ export async function batchNftTransfer({
       requests,
     };
 
-    const headers = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      Authorization: `Bearer ${user.accessToken}`,
-    };
     const response = await transfersApi.createTransfer(
       {
         createTransferRequestV2: transferSigningParams,

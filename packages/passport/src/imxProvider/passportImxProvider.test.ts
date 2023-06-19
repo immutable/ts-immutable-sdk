@@ -186,6 +186,7 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         transfersApi: immutableXClient.transfersApi,
+        imxPublicApiDomain,
         confirmationScreen,
       });
       expect(result).toEqual(returnValue);
