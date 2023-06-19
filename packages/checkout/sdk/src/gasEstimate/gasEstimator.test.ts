@@ -256,6 +256,7 @@ describe('gasServiceEstimator', () => {
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
         gasFee: {},
         bridgeFee: {},
+        bridgeable: false,
       });
     });
   });

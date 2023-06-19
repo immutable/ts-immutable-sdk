@@ -54,7 +54,7 @@ async function bridgeToL2GasEstimator(
       environment,
     );
 
-    const { bridgeFee } = await getBridgeFeeEstimate(
+    const { bridgeFee, bridgeable } = await getBridgeFeeEstimate(
       tokenBridge,
       fromAddress,
       toChainId,
@@ -70,6 +70,7 @@ async function bridgeToL2GasEstimator(
         estimatedAmount: bridgeFee?.estimatedAmount,
         token: bridgeFee?.token,
       },
+      bridgeable,
     };
   } catch {
     // In the case of an error, just return an empty gas & bridge fee estimate
@@ -77,6 +78,7 @@ async function bridgeToL2GasEstimator(
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
       gasFee: {},
       bridgeFee: {},
+      bridgeable: false,
     };
   }
 }

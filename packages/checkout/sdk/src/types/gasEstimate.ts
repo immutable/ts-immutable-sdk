@@ -49,24 +49,14 @@ export interface GasEstimateSwapResult {
  * * Interface representing the result for {@link Checkout.gasEstimate}.
  @property {gasEstimateType} - The type of action this gas estimate is for.
  @property {gasFee} - The gas fee estimate.
-  @property {bridgeFee} - The bridge fee estimate.
+ @property {bridgeFee} - The bridge fee estimate.
+  @property {bridgeable} - Indicates whether the token can be bridged or not.
  * */
 export interface GasEstimateBridgeToL2Result {
   gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
   gasFee: TokenAmountEstimate;
   bridgeFee: TokenAmountEstimate;
-}
-
-/**
- * * Interface representing .. (do we need this?) {@link Checkout.gasEstimate}.
- @property {TokenAmountEstimate} bridgeFee - Bridge fee.
- @property {TokenAmountEstimate} gasEstimate - Gas fee.
- @property {boolean} bridgeable - is bridge feasible.
- * */
-export interface GetBridgeGasEstimateResult {
-  bridgeFee?: TokenAmountEstimate;
-  gasEstimate?: TokenAmountEstimate;
-  bridgeable?: boolean;
+  bridgeable: boolean;
 }
 
 /**

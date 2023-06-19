@@ -7,7 +7,6 @@ import {
   TokenBridge,
 } from '@imtbl/bridge-sdk';
 import {
-  GetBridgeGasEstimateResult,
   TokenAmountEstimate,
 } from '../types/gasEstimate';
 import * as tokens from '../tokens';
@@ -74,11 +73,16 @@ export async function getBridgeEstimatedGas(
   return result;
 }
 
+interface BridgeFeeEstimateResult {
+  bridgeFee: TokenAmountEstimate,
+  bridgeable: boolean
+}
+
 export async function getBridgeFeeEstimate(
   tokenBridge: TokenBridge,
   tokenAddress: FungibleToken,
   destinationChainId: ChainId,
-): Promise<GetBridgeGasEstimateResult> {
+): Promise<BridgeFeeEstimateResult> {
   const bridgeFeeReq: BridgeFeeRequest = { token: tokenAddress };
   const bridgeFeeResponse: BridgeFeeResponse = await tokenBridge.getFee(
     bridgeFeeReq,
