@@ -58,7 +58,7 @@ export const MainPage = () => {
           <Box sx={{display: 'flex', flexDirection: 'row', gap: 'base.spacing.x4', flexWrap: 'wrap'}}>
               {cardKeys.map((val) => (
                 <Box key={val} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
-                  <Card sx={{width: '240px'}}>
+                  <Card sx={{width: '240px', marginBottom: 'base.spacing.x2'}}>
                   <Card.Title>Illuvitars</Card.Title>
                   <Card.Caption>Illuvium</Card.Caption>
                   <Card.FramedImage imageUrl="https://web-illuvium-static.s3.us-east-2.amazonaws.com/img/illuvitars/illuvitars_marketplace_icon.png" />
