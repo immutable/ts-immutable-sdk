@@ -84,7 +84,7 @@ describe('CryptoFiat', () => {
 
   it(
     `should fetch symbols and overrides and cache them [${Environment.PRODUCTION}]]`,
-    async () => success(config, 'https://checkout-api.immutable.com'),
+    async () => success(config, 'https://checkout-api.sandbox.immutable.com'),
   );
 
   it('should fetch and convert token symbols to fiat', async () => {
@@ -121,15 +121,15 @@ describe('CryptoFiat', () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(3);
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       1,
-      'https://checkout-api.immutable.com/v1/fiat/coins/overrides',
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/coins/overrides',
     );
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       2,
-      'https://checkout-api.immutable.com/v1/fiat/coins/all',
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/coins/all',
     );
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       3,
-      'https://checkout-api.immutable.com/v1/fiat/conversion?ids=bitcoin,ethereum&currencies=usd',
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/conversion?ids=bitcoin,ethereum&currencies=usd',
     );
     expect(result.btc).toEqual({ usd: 50000 });
     expect(result.eth).toEqual({ usd: 4000 });
@@ -171,15 +171,15 @@ describe('CryptoFiat', () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(3);
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       1,
-      'https://checkout-api.immutable.com/v1/fiat/coins/overrides',
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/coins/overrides',
     );
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       2,
-      'https://checkout-api.immutable.com/v1/fiat/coins/all',
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/coins/all',
     );
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       3,
-      'https://checkout-api.immutable.com/v1/fiat/conversion?ids=ethereum,usd-coin&currencies=usd',
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/conversion?ids=ethereum,usd-coin&currencies=usd',
     );
     expect(result.usdc).toEqual({ usd: 10000 });
     expect(result.eth).toEqual({ usd: 4000 });
@@ -222,15 +222,15 @@ describe('CryptoFiat', () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(3);
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       1,
-      'https://checkout-api.immutable.com/v1/fiat/coins/overrides',
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/coins/overrides',
     );
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       2,
-      'https://checkout-api.immutable.com/v1/fiat/coins/all',
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/coins/all',
     );
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       3,
-      'https://checkout-api.immutable.com/v1/fiat/conversion?ids=bitcoin,ethereum&currencies=aud,usd',
+      'https://checkout-api.sandbox.immutable.com/v1/fiat/conversion?ids=bitcoin,ethereum&currencies=aud,usd',
     );
     expect(result.btc).toEqual({ usd: 50000 });
     expect(result.eth).toEqual({ usd: 4000 });

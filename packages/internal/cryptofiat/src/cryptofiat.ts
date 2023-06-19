@@ -4,9 +4,9 @@ import { CryptoFiatConfiguration } from 'config';
 import { CryptoFiatConvertParams, CryptoFiatConvertReturn } from 'types';
 
 const CHECKOUT_API_BASE_URL = {
-  // TODO: @andrearampin migrate to sandbox once endpoint ready
+  // TODO: https://immutable.atlassian.net/browse/WT-1425
   [Environment.SANDBOX]: 'https://checkout-api.dev.immutable.com',
-  [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
+  [Environment.PRODUCTION]: 'https://checkout-api.sandbox.immutable.com',
 };
 
 const DEFAULT_FIAT_SYMBOL = 'usd';
@@ -100,7 +100,7 @@ export class CryptoFiat {
     await this.fetchCoins();
 
     const ids = tokenSymbols
-      .map((s) => this.coinsCache!.get(s.toLowerCase()))
+      .map((tokenSymbol) => this.coinsCache!.get(tokenSymbol.toLowerCase()))
       .join(',');
 
     const currencies = fiatSymbols
