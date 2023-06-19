@@ -196,7 +196,7 @@ describe('Seaport', () => {
 
       const considerationItem: NativeItem = {
         amount: '100',
-        type: 'IMX',
+        type: 'NATIVE',
       };
 
       const royaltyInfo: RoyaltyInfo = {
