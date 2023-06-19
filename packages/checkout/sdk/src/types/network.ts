@@ -11,7 +11,7 @@ export const RPC_URL_MAP: RpcUrlMap = new Map<ChainId, string>([
   [ChainId.ETHEREUM, 'https://checkout-api.sandbox.immutable.com/v1/rpc/eth-mainnet'],
   [ChainId.IMTBL_ZKEVM_TESTNET, 'https://zkevm-rpc.sandbox.x.immutable.com'],
   [ChainId.SEPOLIA, 'https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia'],
-  [ChainId.IMTBL_ZKEVM_DEVNET, 'https://zkevm-rpc.sandbox.x.immutable.com'],
+  [ChainId.IMTBL_ZKEVM_DEVNET, 'https://zkevm-rpc.dev.x.immutable.com'],
 ]);
 
 /**
