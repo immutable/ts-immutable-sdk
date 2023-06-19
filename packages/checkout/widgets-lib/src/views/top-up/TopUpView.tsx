@@ -61,9 +61,9 @@ export function TopUpView({
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
 
   const onClickOnramp = () => {
-    if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
-      // dispatch onramp view
-    }
+    // if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
+    //   // dispatch onramp view
+    // }
     orchestrationEvents.sendRequestOnrampEvent(widgetEvent, {
       tokenAddress: tokenAddress ?? '',
       amount: amount ?? '',
