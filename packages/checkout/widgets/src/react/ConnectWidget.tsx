@@ -6,7 +6,7 @@ import React from 'react';
  * (default: "metamask").
  */
 export interface ConnectReactProps {
-  providerName?: string;
+  walletProvider?: string;
 }
 
 /**
@@ -15,14 +15,14 @@ export interface ConnectReactProps {
  * @returns {JSX.Element} - The rendered Connect Widget component.
  */
 export function ConnectReact(props: ConnectReactProps): JSX.Element {
-  const { providerName } = props;
+  const { walletProvider } = props;
 
   const config = window.ImtblCheckoutWidgetConfig;
 
   return (
     <imtbl-connect
       widgetConfig={config}
-      providerName={providerName}
+      walletProvider={walletProvider}
     />
   );
 }

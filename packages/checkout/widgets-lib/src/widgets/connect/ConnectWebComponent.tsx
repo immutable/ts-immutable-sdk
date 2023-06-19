@@ -5,19 +5,19 @@ import { ConnectWidget, ConnectWidgetParams } from './ConnectWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 
 export class ImmutableConnect extends ImmutableWebComponent {
-  providerName = WalletProviderName.METAMASK;
+  walletProvider = WalletProviderName.METAMASK;
 
   connectedCallback() {
     super.connectedCallback();
-    this.providerName = this.getAttribute(
-      'providerName',
+    this.walletProvider = this.getAttribute(
+      'walletProvider',
     ) as WalletProviderName;
     this.renderWidget();
   }
 
   renderWidget() {
     const connectParams: ConnectWidgetParams = {
-      providerName: this.providerName,
+      providerName: this.walletProvider,
     };
 
     if (!this.reactRoot) {

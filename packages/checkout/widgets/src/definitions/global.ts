@@ -32,7 +32,7 @@ export interface ImtblConnectProps
   React.HTMLAttributes<HTMLElement>,
   HTMLElement
   > {
-  providerName?: string;
+  walletProvider?: string;
   widgetConfig?: string;
 }
 

@@ -13,11 +13,7 @@ function ConnectWebView() {
 
   return (
     <div>
-      {/* <imtbl-connect
-        providerName={WalletProviderName.METAMASK}
-        widgetConfig={JSON.stringify(config)}
-      /> */}
-      <ConnectReact providerName={WalletProviderName.METAMASK} />
+      <ConnectReact walletProvider={WalletProviderName.METAMASK} />
     </div>
   );
 }

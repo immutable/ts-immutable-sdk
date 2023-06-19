@@ -1,4 +1,5 @@
 import { Environment } from '@imtbl/config';
+import { CheckoutWidgets, WalletReact } from '@imtbl/checkout-widgets';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '../../lib';
 
@@ -8,11 +9,10 @@ function WalletWebView() {
     environment: Environment.SANDBOX,
   };
 
+  CheckoutWidgets(config);
+
   return (
-    <imtbl-wallet
-      walletProvider={WalletProviderName.METAMASK}
-      widgetConfig={JSON.stringify(config)}
-    />
+    <WalletReact walletProvider={WalletProviderName.METAMASK} />
   );
 }
 
