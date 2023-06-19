@@ -15,17 +15,16 @@
 
 
 /**
- * The contract type
+ * The contract type for a token
  * @export
  * @enum {string}
  */
 
-export const ContractType = {
-    Erc721: 'ERC721',
+export const TokenContractType = {
     Erc20: 'ERC20'
 } as const;
 
-export type ContractType = typeof ContractType[keyof typeof ContractType];
+export type TokenContractType = typeof TokenContractType[keyof typeof TokenContractType];
 
 
 
