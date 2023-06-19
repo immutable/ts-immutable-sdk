@@ -7,6 +7,8 @@ import {
   BridgeDepositResponse,
   BridgeFeeRequest,
   BridgeFeeResponse,
+  BridgeWithdrawRequest,
+  BridgeWithdrawResponse,
   CompletionStatus,
   FungibleToken,
   WaitForRequest,
@@ -18,6 +20,7 @@ import { BridgeError, BridgeErrorType, withBridgeError } from 'errors';
 import { ROOT_STATE_SENDER } from 'contracts/ABIs/RootStateSender';
 import { CHILD_STATE_RECEIVER } from 'contracts/ABIs/ChildStateReceiver';
 import { getBlockNumberClosestToTimestamp } from 'lib/getBlockCloseToTimestamp';
+import { CHILD_ERC20_PREDICATE } from 'contracts/ABIs/ChildERC20Predicate';
 
 /**
  * Represents a token bridge, which manages asset transfers between two chains.
@@ -171,6 +174,69 @@ export class TokenBridge {
         value: 0,
         from: depositor,
       },
+    };
+  }
+
+  public async getUnsignedWithdrawTx(
+    req: BridgeWithdrawRequest,
+  ): Promise<BridgeWithdrawResponse> {
+    const childERC20PredicateContract = await withBridgeError<ethers.Contract>(
+      async () => {
+        const contract = new ethers.Contract(
+          this.config.bridgeContracts.childChainERC20Predicate,
+          CHILD_ERC20_PREDICATE,
+        );
+        return contract;
+      },
+      BridgeErrorType.INTERNAL_ERROR,
+    );
+
+    // Encode the approve function call data for the ERC20 contract
+    const data: string = await withBridgeError<string>(async () => childERC20PredicateContract.interface.encodeFunctionData('withdrawTo', [
+      req.token,
+      req.recipientAddress,
+      req.withdrawAmount,
+    ]), BridgeErrorType.INTERNAL_ERROR);
+
+    return {
+      unsignedTx: {
+        data,
+        to: this.config.bridgeContracts.childChainERC20Predicate,
+        value: 0,
+      },
+    };
+  }
+
+  public async getUnsignedApproveChildBridgeTx(
+    req: ApproveBridgeRequest,
+  ): Promise<ApproveBridgeResponse> {
+    const erc20Contract = await withBridgeError<ethers.Contract>(
+      async () => {
+        const contract = new ethers.Contract(
+          req.token,
+          ERC20,
+        );
+        return contract;
+      },
+      BridgeErrorType.INTERNAL_ERROR,
+    );
+    // Encode the approve function call data for the ERC20 contract
+    const data: string = await withBridgeError<string>(async () => erc20Contract.interface.encodeFunctionData('approve', [
+      this.config.bridgeContracts.childChainERC20Predicate,
+      req.depositAmount,
+    ]), BridgeErrorType.INTERNAL_ERROR);
+
+    // Create the unsigned transaction for the approval
+    const unsignedTx: ethers.providers.TransactionRequest = {
+      data,
+      to: req.token,
+      value: 0,
+      from: req.depositorAddress,
+    };
+
+    return {
+      unsignedTx,
+      required: true,
     };
   }
 

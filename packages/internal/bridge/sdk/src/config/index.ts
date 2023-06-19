@@ -2,6 +2,7 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   ETH_MAINNET_TO_ZKEVM_MAINNET,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  ETH_SEPOLIA_TO_ZKEVM_LOCAL,
 } from 'constants/bridges';
 import { ethers } from 'ethers';
 import {
@@ -13,7 +14,7 @@ import {
 /**
  * @constant {BridgeInstance[]} SupportedSandboxBridges - An array of supported bridge instances for the sandbox environment.
  */
-const SUPPORTED_SANDBOX_BRIDGES: BridgeInstance[] = [ETH_SEPOLIA_TO_ZKEVM_DEVNET];
+const SUPPORTED_SANDBOX_BRIDGES: BridgeInstance[] = [ETH_SEPOLIA_TO_ZKEVM_DEVNET, ETH_SEPOLIA_TO_ZKEVM_LOCAL];
 
 /**
  * @constant {BridgeInstance[]} SUPPORTED_PRODUCTION_BRIDGES - An array of supported bridge instances for the production environment.
@@ -35,8 +36,8 @@ export const SUPPORTED_BRIDGES_FOR_ENVIRONMENT: {
  */
 const CONTRACTS_FOR_BRIDGE = new Map<BridgeInstance, BridgeContracts>()
   .set(ETH_SEPOLIA_TO_ZKEVM_DEVNET, {
-    rootChainERC20Predicate: '0x20e0d0C20B8DCEE68d537aD9E190A530B8567632',
-    rootChainStateSender: '0x620B6b63950a11722Ad4a0d73af0400dE7c69bfB',
+    rootChainERC20Predicate: '0x54A3B143E6F18f3B6f4416492570249a72cDAd9C',
+    rootChainStateSender: '0xa66C24ef810CBa2660B6bbF055588CE07574896F',
     childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
     childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
@@ -45,6 +46,11 @@ const CONTRACTS_FOR_BRIDGE = new Map<BridgeInstance, BridgeContracts>()
     rootChainStateSender: '0x',
     childChainERC20Predicate: '0x',
     childChainStateReceiver: '0x',
+  }).set(ETH_SEPOLIA_TO_ZKEVM_LOCAL, {
+    rootChainERC20Predicate: '0x453f079Ae4dD021B54d396a54E4D29a6894104A5',
+    rootChainStateSender: '0x6CBA18c18e1dc0867dA98201F6a0975873F4893C',
+    childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
+    childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   });
 
 /**
