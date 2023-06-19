@@ -22,7 +22,7 @@ import {
 import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
 import * as network from './network';
-import { GetBridgeGasEstimateResult } from './types/gasEstimates';
+import { GetBridgeGasEstimateResult } from './types/gasEstimate';
 
 jest.mock('./connect');
 jest.mock('./network');
