@@ -18,8 +18,8 @@ export type GasEstimateParams = GasEstimateBridgeToL2Params | GasEstimateSwapPar
 /**
  * * Interface representing the parameters to estimate gas for a bridge to L2 for {@link Checkout.gasEstimate}.
  @property {gasEstimateType} - The type of action to estimate gas for.
- @property {tokenAddress} - The address of the token to bridge.
  @property {boolean} isSpendingCapApprovalRequired - Is spending cap approval required.
+ @property {tokenAddress} - The address of the token to bridge.
  * */
 export interface GasEstimateBridgeToL2Params {
   gasEstimateType: GasEstimateType.BRIDGE_TO_L2;
