@@ -101,8 +101,8 @@ export class CryptoFiat {
     await this.fetchCoins();
 
     const idsParam = tokenSymbols
-      .filter((tokenSymbol) => tokenSymbol !== '')
       .map((tokenSymbol) => this.coinsCache!.get(tokenSymbol.toLowerCase()))
+      .filter((tokenSymbol) => tokenSymbol !== '' && tokenSymbol !== undefined)
       .join(',');
 
     const currenciesParam = currencies
