@@ -14,6 +14,8 @@
     ]
   },
   "dependencies": {
+    "@biom3/design-tokens": "0.2.0-beta",
+    "@biom3/react": "^0.6.4-beta",
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/config": "0.0.0",

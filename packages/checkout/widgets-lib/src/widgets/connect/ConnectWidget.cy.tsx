@@ -1,4 +1,5 @@
 import {
+  ChainId,
   Checkout,
   // ConnectParams,
   ConnectionProviders,
@@ -131,7 +132,7 @@ describe('ConnectWidget tests', () => {
         .as('getNetworkInfoStub')
         .resolves({
           name: 'Immutable zkEVM Testnet',
-          chainId: 13372,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         });
       mountConnectWidgetAndGoToReadyToConnect();
       cySmartGet('ready-to-connect').should('be.visible');

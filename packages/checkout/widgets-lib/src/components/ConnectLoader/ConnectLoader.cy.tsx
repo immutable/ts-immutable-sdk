@@ -173,11 +173,11 @@ describe('ConnectLoader', () => {
             getAddress: async () => Promise.resolve(''),
           }),
           getNetwork: async () => ({
-            chainId: 11155111,
-            name: 'SEPOLIA',
+            chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+            name: 'Immutable zkEVM Devnet',
           }),
         },
-        network: { name: 'Sepolia' },
+        network: { name: 'Immutable zkEVM Devnet' },
       });
 
     mount(

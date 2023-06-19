@@ -8,6 +8,10 @@ All content in src/openapi/sdk is generated from order-book-mr in engine. It can
 
 ## Getting Started
 
+### Demo Script
+
+There is a demo script that is currently run with `yarn run:demo`. It relies on the same `.env` explained in the `E2E` section below.
+
 ### Testing
 #### Unit Tests
 

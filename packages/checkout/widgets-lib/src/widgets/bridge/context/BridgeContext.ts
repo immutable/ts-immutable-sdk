@@ -1,4 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
+import { TokenBridge } from '@imtbl/bridge-sdk';
 import {
   Checkout,
   ConnectionProviders,
@@ -12,6 +13,7 @@ export interface BridgeState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
   providerPreference: ConnectionProviders | null;
+  tokenBridge: TokenBridge | null;
   network: NetworkInfo | null;
   toNetwork: NetworkInfo | null;
   tokenBalances: GetBalanceResult[];
@@ -22,6 +24,7 @@ export const initialBridgeState: BridgeState = {
   checkout: null,
   provider: null,
   providerPreference: null,
+  tokenBridge: null,
   network: null,
   toNetwork: null,
   tokenBalances: [],
@@ -41,6 +44,7 @@ type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
   | SetProviderPreferencePayload
+  | SetTokenBridgePayload
   | SetNetworkPayload
   | SetToNetworkPayload
   | SetTokenBalancesPayload
@@ -50,6 +54,7 @@ export enum BridgeActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
   SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
+  SET_TOKEN_BRIDGE = 'SET_TOKEN_BRIDGE',
   SET_NETWORK = 'SET_NETWORK',
   SET_TO_NETWORK = 'SET_TO_NETWORK',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
@@ -69,6 +74,11 @@ export interface SetProviderPayload {
 export interface SetProviderPreferencePayload {
   type: BridgeActions.SET_PROVIDER_PREFERENCE;
   providerPreference: ConnectionProviders;
+}
+
+export interface SetTokenBridgePayload {
+  type: BridgeActions.SET_TOKEN_BRIDGE;
+  tokenBridge: TokenBridge;
 }
 
 export interface SetNetworkPayload {
@@ -120,6 +130,11 @@ export const bridgeReducer: Reducer<BridgeState, BridgeAction> = (
       return {
         ...state,
         providerPreference: action.payload.providerPreference,
+      };
+    case BridgeActions.SET_TOKEN_BRIDGE:
+      return {
+        ...state,
+        tokenBridge: action.payload.tokenBridge,
       };
     case BridgeActions.SET_NETWORK:
       return {

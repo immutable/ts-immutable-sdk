@@ -1,5 +1,3 @@
-// TODO: Remove this once the dependency has been added
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import {
   AnyToken,
@@ -19,23 +17,22 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-// TODO: Remove this once the dependency has been added
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { IMXProvider } from '@imtbl/provider';
-import { PassportConfiguration } from '../config';
 import { UserWithEtherKey } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { batchNftTransfer, transfer } from '../workflows/transfer';
 import { cancelOrder, createOrder } from '../workflows/order';
 import { exchangeTransfer } from '../workflows/exchange';
 import { createTrade } from '../workflows/trades';
+import { ConfirmationScreen } from '../confirmation';
 
 export type PassportImxProviderInput = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  passportConfig: PassportConfiguration;
   immutableXClient: ImmutableXClient;
+  confirmationScreen: ConfirmationScreen;
+  imxPublicApiDomain: string;
 };
 
 export default class PassportImxProvider implements IMXProvider {
@@ -43,20 +40,24 @@ export default class PassportImxProvider implements IMXProvider {
 
   private readonly starkSigner: StarkSigner;
 
-  private readonly passportConfig: PassportConfiguration;
-
   private readonly immutableXClient: ImmutableXClient;
+
+  private readonly confirmationScreen: ConfirmationScreen;
+
+  private readonly imxPublicApiDomain: string;
 
   constructor({
     user,
     starkSigner,
-    passportConfig,
     immutableXClient,
+    imxPublicApiDomain,
+    confirmationScreen,
   }: PassportImxProviderInput) {
     this.user = user;
     this.starkSigner = starkSigner;
-    this.passportConfig = passportConfig;
     this.immutableXClient = immutableXClient;
+    this.imxPublicApiDomain = imxPublicApiDomain;
+    this.confirmationScreen = confirmationScreen;
   }
 
   async transfer(
@@ -67,7 +68,8 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       transfersApi: this.immutableXClient.transfersApi,
-      passportConfig: this.passportConfig,
+      confirmationScreen: this.confirmationScreen,
+      imxPublicApiDomain: this.imxPublicApiDomain,
     });
   }
 
@@ -95,7 +97,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       ordersApi: this.immutableXClient.ordersApi,
-      passportConfig: this.passportConfig,
+      confirmationScreen: this.confirmationScreen,
     });
   }
 
@@ -107,7 +109,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       ordersApi: this.immutableXClient.ordersApi,
-      passportConfig: this.passportConfig,
+      confirmationScreen: this.confirmationScreen,
     });
   }
 
@@ -117,7 +119,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       tradesApi: this.immutableXClient.tradesApi,
-      passportConfig: this.passportConfig,
+      confirmationScreen: this.confirmationScreen,
     });
   }
 
@@ -129,7 +131,7 @@ export default class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       transfersApi: this.immutableXClient.transfersApi,
-      passportConfig: this.passportConfig,
+      confirmationScreen: this.confirmationScreen,
     });
   }
 

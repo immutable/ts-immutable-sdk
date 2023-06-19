@@ -11,12 +11,15 @@ export class InventoryCollection extends LitElement {
   @property({ type: Array, attribute: 'selectedItems' })
   selectedItems: Array<InventoryItem> = [];
 
+
+  @property({ type: Array, attribute: 'selectedItems' })
+  selectedRecipe: Array<InventoryItem> = [];
+
   render() {
     const selectedIds = this.selectedItems.map((i) => i.id);
     return html`
-      Inventory
       <div
-        class="grid gap-x-4 gap-y-8 grid-cols-3 md:grid-cols-4 px-8 justify-items-start"
+        class="grid gap-x-4 gap-y-8 grid-cols-3 md:grid-cols-4 px-8 my-8 justify-items-start"
       >
         ${this.inventory.map(
           (item) =>

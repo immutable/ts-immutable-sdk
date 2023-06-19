@@ -1,6 +1,5 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-// TODO: Remove this once the dependency has been fixed
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
@@ -9,6 +8,7 @@ import { getStarkSigner } from './stark';
 import { Networks, OidcConfiguration, User } from './types';
 import registerPassport from './workflows/registration';
 
+jest.mock('@ethersproject/providers');
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
 jest.mock('./stark/getStarkSigner');
@@ -33,6 +33,8 @@ const mockUser: User = {
   etherKey: '123',
 };
 
+const ethSignerMock = {};
+
 describe('Passport', () => {
   afterEach(jest.resetAllMocks);
 
@@ -44,6 +46,7 @@ describe('Passport', () => {
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
   let loginSilentMock: jest.Mock;
+  let getSignerMock: jest.Mock;
 
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue({
@@ -56,9 +59,11 @@ describe('Passport', () => {
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
     loginSilentMock = jest.fn();
-    // TODO: Remove once fixed
-    // @ts-ignore
-    (AuthManager as jest.Mock).mockReturnValue({
+    getSignerMock = jest.fn().mockReturnValue(ethSignerMock);
+    (Web3Provider as unknown as jest.Mock).mockReturnValue({
+      getSigner: getSignerMock,
+    });
+    (AuthManager as unknown as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
       logout: logoutMock,
@@ -92,6 +97,7 @@ describe('Passport', () => {
           baseConfig,
           overrides: {
             authenticationDomain: 'authenticationDomain123',
+            imxPublicApiDomain: 'guardianDomain123',
             magicProviderId: 'providerId123',
             magicPublishableApiKey: 'publishableKey123',
             network: Networks.SANDBOX,

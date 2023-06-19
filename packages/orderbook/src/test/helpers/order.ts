@@ -1,17 +1,17 @@
-import { Order } from 'openapi/sdk';
+import { Order, OrderStatus } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 
 export async function waitForOrderToBeOfStatus(
   sdk: Orderbook,
   orderId: string,
-  status: Order.status,
+  status: OrderStatus,
   attemps = 0,
 ): Promise<Order> {
-  if (attemps > 20) {
+  if (attemps > 50) {
     throw new Error('Order never became active');
   }
 
-  const order = await sdk.getOrder(orderId);
+  const { result: order } = await sdk.getListing(orderId);
   if (order.status === status) {
     return order;
   }

@@ -21,14 +21,14 @@ import { ConnectWallet } from './views/ConnectWallet';
 import { ConnectResult } from './views/ConnectResult';
 import { ReadyToConnect } from './views/ReadyToConnect';
 import { SwitchNetworkZkEVM } from './views/SwitchNetworkZkEVM';
-import { LoadingView } from '../../components/Loading/LoadingView';
+import { LoadingView } from '../../views/loading/LoadingView';
 import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
 import {
   viewReducer,
   initialViewState,
   ViewActions,
   ViewContext,
-  BaseViews,
+  SharedViews,
 } from '../../context/view-context/ViewContext';
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
@@ -126,7 +126,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
       <ViewContext.Provider value={{ viewState, viewDispatch }}>
         <ConnectContext.Provider value={{ connectState, connectDispatch }}>
           <>
-            {view.type === BaseViews.LOADING_VIEW && (
+            {view.type === SharedViews.LOADING_VIEW && (
               <LoadingView loadingText="Connecting" />
             )}
             {view.type === ConnectWidgetViews.CONNECT_WALLET && (

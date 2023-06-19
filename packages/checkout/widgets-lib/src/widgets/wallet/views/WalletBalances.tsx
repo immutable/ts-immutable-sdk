@@ -15,18 +15,18 @@ import {
   WALLET_BALANCE_CONTAINER_STYLE,
   WalletBalanceItemStyle,
 } from './WalletBalancesStyles';
-import { sendAddCoinsEvent } from '../CoinTopUpEvents';
 import { zkEVMNetwork } from '../../../lib/networkUtils';
 import {
-  CryptoFiatActions,
   CryptoFiatContext,
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { getTokenBalances } from '../functions/tokenBalances';
 import { WalletWidgetViews } from '../../../context/view-context/WalletViewContextTypes';
 import {
+  SharedViews,
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
+import { useTokenSymbols } from '../../../lib/hooks/useTokenSymbols';
 
 export function WalletBalances() {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -38,6 +38,7 @@ export function WalletBalances() {
     provider, checkout, network, supportedTopUps,
   } = walletState;
   const { conversions } = cryptoFiatState;
+  useTokenSymbols(checkout, cryptoFiatDispatch);
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
     return (
@@ -60,30 +61,14 @@ export function WalletBalances() {
     setTotalFiatAmount(totalAmount);
   }, [walletState.tokenBalances]);
 
-  useEffect(() => {
-    if (!checkout || !provider || !network) return;
-
-    (async () => {
-      const walletAddress = await provider.getSigner().getAddress();
-      const getAllBalancesResult = await checkout.getAllBalances({
-        provider,
-        walletAddress,
-        chainId: network.chainId,
-      });
-
-      const tokenSymbols: string[] = [];
-      getAllBalancesResult.balances.forEach((balance) => {
-        tokenSymbols.push(balance.token.symbol);
-      });
-
-      cryptoFiatDispatch({
-        payload: {
-          type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
-          tokenSymbols,
-        },
-      });
-    })();
-  }, [provider, checkout, network, cryptoFiatDispatch]);
+  const handleAddCoinsClick = () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: SharedViews.TOP_UP_VIEW },
+      },
+    });
+  };
 
   useEffect(() => {
     if (!checkout || !provider || !network) return;
@@ -149,11 +134,7 @@ export function WalletBalances() {
           <MenuItem
             testId="add-coins"
             emphasized
-            onClick={() => {
-              sendAddCoinsEvent({
-                network: walletState.network ?? undefined,
-              });
-            }}
+            onClick={handleAddCoinsClick}
           >
             <MenuItem.FramedIcon icon="Add" />
             <MenuItem.Label>Add coins</MenuItem.Label>

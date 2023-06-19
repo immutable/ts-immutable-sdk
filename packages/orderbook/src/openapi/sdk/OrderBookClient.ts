@@ -3,19 +3,21 @@
 /* eslint-disable */
 import type { BaseHttpRequest } from './core/BaseHttpRequest';
 import type { OpenAPIConfig } from './core/OpenAPI';
-import { NodeHttpRequest } from './core/NodeHttpRequest';
+import { AxiosHttpRequest } from './core/AxiosHttpRequest';
 
+import { ListingsService } from './services/ListingsService';
 import { OrdersService } from './services/OrdersService';
 
 type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
 
 export class OrderBookClient {
 
+  public readonly listings: ListingsService;
   public readonly orders: OrdersService;
 
   public readonly request: BaseHttpRequest;
 
-  constructor(config?: Partial<OpenAPIConfig>, HttpRequest: HttpRequestConstructor = NodeHttpRequest) {
+  constructor(config?: Partial<OpenAPIConfig>, HttpRequest: HttpRequestConstructor = AxiosHttpRequest) {
     this.request = new HttpRequest({
       BASE: config?.BASE ?? 'https://order-book-mr.dev.imtbl.com',
       VERSION: config?.VERSION ?? '1.0.0',
@@ -28,6 +30,7 @@ export class OrderBookClient {
       ENCODE_PATH: config?.ENCODE_PATH,
     });
 
+    this.listings = new ListingsService(this.request);
     this.orders = new OrdersService(this.request);
   }
 }

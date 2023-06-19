@@ -1,7 +1,4 @@
 /** @jest-environment jsdom */
-
-/* eslint-disable no-param-reassign */
-
 import { Store } from './Store';
 
 describe('Store', () => {

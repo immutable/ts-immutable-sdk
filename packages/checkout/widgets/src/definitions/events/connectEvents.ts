@@ -5,20 +5,10 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
  * Enum representing possible Connect Widget event types.
  */
 export enum ConnectEventType {
+  CLOSE_WIDGET = 'close-widget',
   SUCCESS = 'success',
   FAILURE = 'failure',
-  CLOSE_WIDGET = 'close-widget',
 }
-
-/**
- * Represents an event object emitted by the Connect Widget.
- * @property {BuyEventType} type - The type of the event.
- * @property {T} data - The data contained in the event.
- */
-export type ConnectEvent<T> = {
-  type: ConnectEventType;
-  data: T;
-};
 
 /**
  * Type representing a Connect Widget event with type SUCCESS.

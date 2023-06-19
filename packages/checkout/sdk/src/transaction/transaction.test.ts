@@ -53,8 +53,8 @@ describe('transaction', () => {
 
     await expect(sendTransaction(mockProvider, transaction)).rejects.toThrow(
       new CheckoutError(
-        '[TRANSACTION_ERROR] Cause:Transaction errored',
-        CheckoutErrorType.TRANSACTION_ERROR,
+        'Transaction errored',
+        CheckoutErrorType.TRANSACTION_FAILED,
       ),
     );
   });

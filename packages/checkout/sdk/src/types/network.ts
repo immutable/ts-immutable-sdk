@@ -4,6 +4,17 @@ import { ChainId } from './chainId';
 import { NetworkInfo } from './networkInfo';
 
 /**
+ * Object mapping the list of supported networks with the corresponding RPC urls.
+ */
+export type RpcUrlMap = Map<ChainId, string>;
+export const RPC_URL_MAP: RpcUrlMap = new Map<ChainId, string>([
+  [ChainId.ETHEREUM, 'https://mainnet.infura.io/v3/'],
+  [ChainId.IMTBL_ZKEVM_TESTNET, 'https://zkevm-rpc.sandbox.x.immutable.com'],
+  [ChainId.SEPOLIA, 'https://eth-sepolia.g.alchemy.com/v2/demo'],
+  [ChainId.IMTBL_ZKEVM_DEVNET, 'https://zkevm-rpc.dev.x.immutable.com'],
+]);
+
+/**
  * Type representing the details of a network.
  * @property {string} chainIdHex - The hexadecimal ID of the network.
  * @property {string} chainName - The name of the network.
@@ -36,7 +47,7 @@ NetworkDetails
     {
       chainIdHex: '0x1', // 1
       chainName: 'Ethereum',
-      rpcUrls: ['https://mainnet.infura.io/v3/'],
+      rpcUrls: [RPC_URL_MAP.get(ChainId.ETHEREUM) as string],
       nativeCurrency: {
         name: 'Ethereum',
         symbol: 'ETH',
@@ -50,26 +61,12 @@ NetworkDetails
     {
       chainIdHex: '0x343C', // 13372
       chainName: 'Immutable zkEVM Testnet',
-      rpcUrls: ['https://zkevm-rpc.sandbox.x.immutable.com'],
+      rpcUrls: [RPC_URL_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET) as string],
       nativeCurrency: {
         name: 'IMX',
         symbol: 'IMX',
         decimals: 18,
       },
-    },
-  ],
-  [
-    ChainId.POLYGON_ZKEVM,
-    {
-      chainIdHex: '0x89', // 137
-      chainName: 'Polygon zkEVM',
-      rpcUrls: ['https://polygon-rpc.com'],
-      nativeCurrency: {
-        name: 'MATIC',
-        symbol: 'MATIC',
-        decimals: 18,
-      },
-      blockExplorerUrls: ['https://polygonscan.com/'],
     },
   ],
 ]);
@@ -86,7 +83,7 @@ NetworkDetails
     {
       chainIdHex: '0xaa36a7', // 11155111
       chainName: 'Sepolia',
-      rpcUrls: ['https://sepolia.infura.io/v3/'],
+      rpcUrls: [RPC_URL_MAP.get(ChainId.SEPOLIA) as string],
       nativeCurrency: {
         name: 'Sep Eth',
         symbol: 'ETH',
@@ -98,28 +95,14 @@ NetworkDetails
   [
     ChainId.IMTBL_ZKEVM_DEVNET,
     {
-      chainIdHex: '0x343D', // 13373
+      chainIdHex: '0x3447', // 13383
       chainName: 'Immutable zkEVM Devnet',
-      rpcUrls: ['https://zkevm-rpc.dev.x.immutable.com/'],
+      rpcUrls: [RPC_URL_MAP.get(ChainId.IMTBL_ZKEVM_DEVNET) as string],
       nativeCurrency: {
         name: 'IMX',
         symbol: 'IMX',
         decimals: 18,
       },
-    },
-  ],
-  [
-    ChainId.POLYGON_ZKEVM_TESTNET,
-    {
-      chainIdHex: '0x5A2', // 1442
-      chainName: 'Polygon zkEVM Testnet',
-      rpcUrls: ['https://rpc.public.zkevm-test.net'],
-      nativeCurrency: {
-        name: 'MATIC',
-        symbol: 'MATIC',
-        decimals: 18,
-      },
-      blockExplorerUrls: ['https://testnet-zkevm.polygonscan.com'],
     },
   ],
 ]);

@@ -8,17 +8,16 @@ import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTy
 import { SwapForm } from '../components/SwapForm';
 
 export interface SwapCoinsProps {
-  amount?: string;
+  fromAmount?: string;
+  toAmount?: string;
   fromContractAddress?: string;
   toContractAddress?: string;
 }
 
 export function SwapCoins({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  amount,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  fromAmount,
+  toAmount,
   fromContractAddress,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   toContractAddress,
 }: SwapCoinsProps) {
   const { header } = text.views[SwapWidgetViews.SWAP];
@@ -33,7 +32,7 @@ export function SwapCoins({
         />
       )}
       footer={<FooterLogo />}
-      footerBackgroundColor="base.color.translucent.container.200"
+      footerBackgroundColor="base.color.translucent.emphasis.200"
     >
       <Box
         sx={{
@@ -43,7 +42,13 @@ export function SwapCoins({
           justifyContent: 'space-between',
         }}
       >
-        <SwapForm />
+        <SwapForm data={{
+          fromAmount,
+          toAmount,
+          fromContractAddress,
+          toContractAddress,
+        }}
+        />
       </Box>
     </SimpleLayout>
   );

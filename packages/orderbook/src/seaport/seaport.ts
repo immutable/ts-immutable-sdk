@@ -1,17 +1,17 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
 import {
-  EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME, SEAPORT_CONTRACT_VERSION_V1_4,
-} from '@opensea/seaport-js/lib/constants';
-import {
   ApprovalAction, CreateOrderAction, ExchangeAction, OrderComponents, OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
 import {
   PopulatedTransaction, providers,
 } from 'ethers';
 import {
-  ERC20Item, ERC721Item, FulfilOrderResponse, NativeItem, PrepareListingResponse, RoyaltyInfo,
+  ERC20Item, ERC721Item, FulfillOrderResponse, NativeItem, PrepareListingResponse, RoyaltyInfo,
 } from 'types';
 import { Order } from 'openapi/sdk';
+import {
+  EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME, SEAPORT_CONTRACT_VERSION_V1_4,
+} from './constants';
 import { getOrderComponentsFromMessage } from './components';
 import { prepareTransaction } from './transaction';
 import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';
@@ -68,7 +68,7 @@ export class Seaport {
     };
   }
 
-  async fulfilOrder(order: Order, account: string): Promise<FulfilOrderResponse> {
+  async fulfilOrder(order: Order, account: string): Promise<FulfillOrderResponse> {
     const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
     const { actions } = await this.seaport.fulfillOrders({
       accountAddress: account,
@@ -77,6 +77,7 @@ export class Seaport {
           parameters: orderComponents,
           signature: order.signature,
         },
+        extraData: order.protocol_data.operator_signature,
       }],
     });
 

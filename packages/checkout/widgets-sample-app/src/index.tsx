@@ -9,6 +9,8 @@ import WalletUI from './components/ui/wallet/wallet';
 import SwapUI from './components/ui/swap/swap';
 import BridgeUI from './components/ui/bridge/bridge';
 import { Marketplace } from './components/ui/marketplace-orchestrator';
+import { BiomeCombinedProviders } from '@biom3/react';
+import { onDarkBase } from '@biom3/design-tokens';
 
 const router = createBrowserRouter([
   {
@@ -33,7 +35,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/marketplace-orchestrator',
-    element: <Marketplace />,
+    element: <BiomeCombinedProviders theme={{base: onDarkBase}}><Marketplace /></BiomeCombinedProviders>,
   },
 ]);
 

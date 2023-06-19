@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { Order } from 'openapi/sdk';
+import { OrderStatus } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getConfig } from './helpers/config';
@@ -24,7 +24,7 @@ describe('fulfil order', () => {
       zoneContractAddress: config.zoneContractAddress,
       overrides: {
         apiEndpoint: config.apiUrl,
-        chainId: 'eip155:31337',
+        chainName: 'imtbl-zkevm-local',
       },
     });
 
@@ -35,7 +35,7 @@ describe('fulfil order', () => {
       offerer: offerer.address,
       considerationItem: {
         amount: '1000000',
-        type: 'IMX',
+        type: 'NATIVE',
       },
       listingItem: {
         contractAddress: contract.address,
@@ -44,26 +44,33 @@ describe('fulfil order', () => {
       },
     });
 
-    await signAndSubmitTx(listing.unsignedApprovalTransaction!, offerer, provider);
+    await signAndSubmitTx(
+      listing.unsignedApprovalTransaction!,
+      offerer,
+      provider,
+    );
     const signature = await signMessage(
-      listing.typedOrderMessageForSigning.domain,
-      listing.typedOrderMessageForSigning.types,
-      listing.typedOrderMessageForSigning.value,
+      listing.typedOrderMessageForSigning,
       offerer,
     );
 
-    const order = await sdk.createOrder({
+    const {
+      result: { id: orderId },
+    } = await sdk.createListing({
       offerer: offerer.address,
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
       orderSignature: signature,
     });
 
-    await waitForOrderToBeOfStatus(sdk, order.id, Order.status.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
 
-    const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(order.id, fulfiller.address);
+    const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(
+      orderId,
+      fulfiller.address,
+    );
     await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
 
-    await waitForOrderToBeOfStatus(sdk, order.id, Order.status.FILLED);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.FILLED);
   }, 60_000);
 });

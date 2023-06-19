@@ -9,6 +9,8 @@
     "no-console": "off",
     "class-methods-use-this": "off",
     "no-param-reassign": "off",
-    "@typescript-eslint/naming-convention": "off"
+    "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/dot-notation": "off",
+    "@typescript-eslint/no-unused-vars": "off"
   }
 }

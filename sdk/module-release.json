@@ -8,12 +8,15 @@
     ],
     "modules": {
         "config": "prod",
+        "blockchain-data": "alpha",
         "immutablex_client": "prod",
         "passport": "prod",
         "orderbook": "alpha",
         "provider": "prod",
         "checkout_sdk": "alpha",
-        "checkout_widgets": "alpha"
+        "checkout_widgets": "alpha",
+        "erc20": "alpha",
+        "erc721-permissioned-mintable": "alpha"
     },
     "fileCopy": [
         {

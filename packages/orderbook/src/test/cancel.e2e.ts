@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { Order } from 'openapi/sdk';
+import { OrderStatus } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
 import { getConfig } from './helpers/config';
@@ -23,7 +23,7 @@ describe('cancel order', () => {
       zoneContractAddress: config.zoneContractAddress,
       overrides: {
         apiEndpoint: config.apiUrl,
-        chainId: 'eip155:31337',
+        chainName: 'imtbl-zkevm-local',
       },
     });
 
@@ -34,7 +34,7 @@ describe('cancel order', () => {
       offerer: offerer.address,
       considerationItem: {
         amount: '1000000',
-        type: 'IMX',
+        type: 'NATIVE',
       },
       listingItem: {
         contractAddress: contract.address,
@@ -43,26 +43,33 @@ describe('cancel order', () => {
       },
     });
 
-    await signAndSubmitTx(listing.unsignedApprovalTransaction!, offerer, provider);
+    await signAndSubmitTx(
+      listing.unsignedApprovalTransaction!,
+      offerer,
+      provider,
+    );
     const signature = await signMessage(
-      listing.typedOrderMessageForSigning.domain,
-      listing.typedOrderMessageForSigning.types,
-      listing.typedOrderMessageForSigning.value,
+      listing.typedOrderMessageForSigning,
       offerer,
     );
 
-    const order = await sdk.createOrder({
+    const {
+      result: { id: orderId },
+    } = await sdk.createListing({
       offerer: offerer.address,
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
       orderSignature: signature,
     });
 
-    await waitForOrderToBeOfStatus(sdk, order.id, Order.status.ACTIVE);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
 
-    const { unsignedCancelOrderTransaction } = await sdk.cancelOrder(order.id, offerer.address);
+    const { unsignedCancelOrderTransaction } = await sdk.cancelOrder(
+      orderId,
+      offerer.address,
+    );
     await signAndSubmitTx(unsignedCancelOrderTransaction, offerer, provider);
 
-    await waitForOrderToBeOfStatus(sdk, order.id, Order.status.CANCELLED);
+    await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.CANCELLED);
   }, 60_000);
 });

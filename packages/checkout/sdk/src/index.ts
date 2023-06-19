@@ -2,9 +2,11 @@ export { Checkout } from './Checkout';
 export {
   ChainId,
   ConnectionProviders,
+  GasEstimateType,
+  NetworkFilterTypes,
+  RPC_URL_MAP,
   TokenFilterTypes,
   WalletFilterTypes,
-  NetworkFilterTypes,
   WalletProviderName,
 } from './types';
 export type {
@@ -17,7 +19,6 @@ export type {
   GetBalanceParams,
   GetBalanceResult,
   NetworkInfo,
-  Transaction,
   SendTransactionParams,
   SendTransactionResult,
   SwitchNetworkParams,
@@ -35,6 +36,9 @@ export type {
   NetworkFilter,
   GetNetworkAllowListParams,
   GetNetworkAllowListResult,
+  GasEstimateParams,
+  GasEstimateSwapResult,
+  GasEstimateBridgeToL2Result,
 } from './types';
 export type { ErrorType } from './errors';
 export { CheckoutErrorType } from './errors';

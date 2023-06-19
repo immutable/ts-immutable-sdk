@@ -19,10 +19,10 @@ import {
   connectLoaderReducer,
   initialConnectLoaderState,
 } from '../../context/connect-loader-context/ConnectLoaderContext';
-import { LoadingView } from '../Loading/LoadingView';
+import { LoadingView } from '../../views/loading/LoadingView';
 import { ConnectWidget } from '../../widgets/connect/ConnectWidget';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
-import { ErrorView } from '../Error/ErrorView';
+import { ErrorView } from '../../views/error/ErrorView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   WidgetTheme, ConnectTargetLayer, getTargetLayerChainId,

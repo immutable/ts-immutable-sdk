@@ -2,7 +2,7 @@
 import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
-import { BaseViews } from '../../context/view-context/ViewContext';
+import { SharedViews } from '../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 
@@ -20,7 +20,7 @@ export const text = {
     [ConnectWidgetViews.READY_TO_CONNECT]: {
       body: {
         heading: 'Check for the pop-up from MetaMask',
-        content: 'Follow the prompts in the Metamask popup to connect',
+        content: 'Follow the prompts in the MetaMask popup to connect',
       },
       footer: {
         buttonText1: 'Ready to connect',
@@ -30,8 +30,8 @@ export const text = {
     [ConnectWidgetViews.SWITCH_NETWORK]: {
       eth: {
         heading:
-        'To move your coins, you\'ll need to switch to the Sepolia network',
-        body: 'You\'ll be prompted to switch networks in Metamask. You\'ll be able to switch back when needed.',
+          "To move your coins, you'll need to switch to the Sepolia network",
+        body: "You'll be prompted to switch networks in MetaMask. You'll be able to switch back when needed.",
         button: {
           text: 'Ready to Switch',
           retryText: 'Try Again',
@@ -39,19 +39,20 @@ export const text = {
       },
       zkEVM: {
         heading:
-        'To trade here, MetaMask will ask you to switch to the Immutable zkEVM network',
-        body: 'Check for the pop-up from MetaMask and \'Approve\' to switch. If this is the first time, MetaMask will also ask you to add the network.',
+          'To trade here, MetaMask will ask you to switch to the Immutable zkEVM network',
+        body: "Check for the pop-up from MetaMask and 'Approve' to switch. If this is the first time, MetaMask will also ask you to add the network.",
         button: {
           text: 'Ready to Switch',
           retryText: 'Try Again',
         },
       },
     },
-    [BaseViews.ERROR]: {
+    [SharedViews.ERROR_VIEW]: {
       heading: "Something's gone wrong",
       body: ['You can try again or contact', 'support', 'for help.'],
+      actionText: 'Try again',
     },
-    [BaseViews.LOADING_VIEW]: {
+    [SharedViews.LOADING_VIEW]: {
       text: 'Loading',
     },
     [WalletWidgetViews.WALLET_BALANCES]: {
@@ -94,10 +95,12 @@ export const text = {
         from: {
           label: 'From',
           inputPlaceholder: '0',
+          selectorTitle: 'What would you like to swap from?',
         },
         to: {
           label: 'To',
           inputPlaceholder: '0',
+          selectorTitle: 'What would you like to swap to?',
         },
         buttonText: 'Swap',
       },
@@ -114,10 +117,129 @@ export const text = {
         text: 'Success',
         actionText: 'Continue',
       },
+      failed: {
+        text: 'Transaction rejected',
+        actionText: 'Try again',
+      },
+      rejected: {
+        text: 'Price surge',
+        actionText: 'Review & try again',
+      },
+      [SwapWidgetViews.IN_PROGRESS]: {
+        loading: {
+          text: 'Swap in progress',
+        },
+      },
+    },
+    [SwapWidgetViews.APPROVE_ERC20]: {
+      approveSwap: {
+        content: {
+          heading: "Now you'll just need to approve the transaction",
+          body: 'Follow the prompts in MetaMask.',
+        },
+        footer: {
+          buttonText: 'Okay',
+          retryText: 'Try again',
+        },
+      },
+      approveSpending: {
+        content: {
+          heading: "You'll be asked to set a spending cap for this transaction",
+          body: ['Input at least', 'for this transaction and future transactions, then follow the prompts.'],
+        },
+        footer: {
+          buttonText: 'Got it',
+          retryText: 'Try again',
+        },
+        loading: {
+          text: 'Approving spending cap',
+        },
+      },
     },
     [BridgeWidgetViews.BRIDGE]: {
       header: {
         title: 'Move coins',
+      },
+      content: {
+        title: 'What would you like to move from Ethereum to Immutable zkEVM?',
+        fiatPricePrefix: 'Approx USD',
+        availableBalancePrefix: 'Available',
+      },
+      bridgeForm: {
+        from: {
+          inputPlaceholder: '0',
+          selectorTitle: 'What would you like to move?',
+        },
+        buttonText: 'Move',
+      },
+      fees: {
+        title: 'Fees subtotal',
+      },
+      validation: {
+        noAmountInputted: 'Please input amount',
+        insufficientBalance: 'Insufficient balance',
+        noTokenSelected: 'Select a coin to move',
+      },
+    },
+    [BridgeWidgetViews.IN_PROGRESS]: {
+      heading: 'Move in progress',
+      body1: (symbol: string) => `Less than 3 mins until your ${symbol} lands on zkEVM.`,
+      body2:
+        'You can close this window, the transaction will be reflected in your wallet once complete.',
+    },
+    [BridgeWidgetViews.APPROVE_ERC20]: {
+      approveBridge: {
+        content: {
+          heading: "Now you'll just need to approve the transaction",
+          body: 'Follow the prompts in MetaMask.',
+        },
+        footer: {
+          buttonText: 'Okay',
+          retryText: 'Try again',
+        },
+      },
+      approveSpending: {
+        content: {
+          heading: "You'll be asked to set a spending cap for this transaction",
+          body: ['Input at least', 'for this transaction and future transactions, then follow the prompts.'],
+        },
+        footer: {
+          buttonText: 'Got it',
+          retryText: 'Try again',
+        },
+        loading: {
+          text: 'Approving spending cap',
+        },
+      },
+    },
+    [BridgeWidgetViews.SUCCESS]: {
+      text: 'Success',
+      actionText: 'Continue',
+    },
+    [BridgeWidgetViews.FAIL]: {
+      text: 'Transaction failed',
+      actionText: 'Review & Try again',
+    },
+    [SharedViews.TOP_UP_VIEW]: {
+      header: {
+        title: 'How would you like to add coins?',
+      },
+      topUpOptions: {
+        onramp: {
+          heading: 'Buy with card',
+          caption: 'Google pay & Apple pay available. Minimum $20.',
+          subcaption: 'Fees ≈ 0.3%',
+        },
+        swap: {
+          heading: 'Swap my coins',
+          caption: 'Using the coins I have on the same network',
+          subcaption: 'Fees ≈',
+        },
+        bridge: {
+          heading: 'Move my coins',
+          caption: 'From the coins I have on a different network',
+          subcaption: 'Fees ≈',
+        },
       },
     },
   },
@@ -126,6 +248,29 @@ export const text = {
       heading: 'MetaMask',
       description:
         'Digital wallet for accessing blockchain applications and web3',
+    },
+  },
+  drawers: {
+    feesBreakdown: {
+      heading: 'Fee breakdown',
+      total: 'Fees total',
+      fees: {
+        gas: {
+          label: 'Gas fee',
+        },
+      },
+    },
+    transactionFailed: {
+      content: {
+        heading1: 'We’ll need you to confirm in your',
+        heading2: 'wallet before proceeding',
+        body1: 'When the MetaMask pop up appears, be sure to',
+        body2: 'sign the transaction',
+      },
+      buttons: {
+        retry: 'Got it',
+        cancel: 'Dismiss',
+      },
     },
   },
 };

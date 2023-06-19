@@ -1,16 +1,19 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Button } from '@biom3/react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { SimpleLayout } from '../SimpleLayout/SimpleLayout';
 import { CenteredBoxContent } from '../CenteredBoxContent/CenteredBoxContent';
 import { StatusBox } from './StatusBox';
 import { StatusType } from './StatusType';
 import { FooterLogo } from '../Footer/FooterLogo';
 import { statusContainerStyles } from './StatusViewStyles';
+import { HeaderNavigation } from '../Header/HeaderNavigation';
 
 export interface StatusViewProps {
   actionText: string;
   onActionClick: () => void;
   onRenderEvent?: () => void;
+  onCloseClick?: () => void;
   testId: string;
   statusText: string;
   statusType: StatusType;
@@ -20,15 +23,18 @@ export function StatusView({
   actionText,
   onActionClick,
   onRenderEvent,
+  onCloseClick,
   testId,
   statusText,
   statusType,
 }: StatusViewProps) {
+  const firstRender = useRef(true);
   useEffect(() => {
-    if (onRenderEvent) {
+    if (onRenderEvent && firstRender.current) {
+      firstRender.current = false;
       onRenderEvent();
     }
-  }, []);
+  }, [firstRender.current, onRenderEvent]);
 
   const onStatusActionClick = () => {
     if (onActionClick) {
@@ -41,6 +47,10 @@ export function StatusView({
       footer={(
         <FooterLogo />
       )}
+      header={
+        <HeaderNavigation onCloseButtonClick={onCloseClick} />
+      }
+      floatHeader
     >
       <Box
         testId="status-view-container"

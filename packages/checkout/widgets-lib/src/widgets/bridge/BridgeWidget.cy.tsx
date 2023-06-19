@@ -1,47 +1,57 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   describe, it, cy, beforeEach,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, CheckoutErrorType, TokenAmountEstimate } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
+import { CompletionStatus, TokenBridge } from '@imtbl/bridge-sdk';
+import { BiomeCombinedProviders } from '@biom3/react';
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { cySmartGet } from '../../lib/testUtils';
 import {
   BridgeWidget,
   BridgeWidgetParams,
 } from './BridgeWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { Network, WidgetTheme } from '../../lib';
+import { WidgetTheme } from '../../lib';
+import { text } from '../../resources/text/textConfig';
+import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 
-// type CypressStub = Cypress.Agent<Sinon.SinonStub<any[], any>>;
 describe('Bridge Widget tests', () => {
-  beforeEach(() => {
-    cy.viewport('ipad-2');
-  });
-
+  const { header, content } = text.views[BridgeWidgetViews.BRIDGE];
   let connectStubReturnValue;
   const config: StrongCheckoutWidgetsConfig = {
-    environment: Environment.PRODUCTION,
+    environment: Environment.SANDBOX,
     theme: WidgetTheme.DARK,
     isBridgeEnabled: true,
     isSwapEnabled: true,
     isOnRampEnabled: true,
   };
 
+  const mockProvider = {
+    getSigner: () => ({
+      getAddress: () => Promise.resolve('0xwalletAddress'),
+    }),
+    getNetwork: async () => ({
+      chainId: 1,
+      name: 'Ethereum',
+    }),
+    getFeeData: () => ({
+      maxFeePerGas: BigNumber.from(100),
+      maxPriorityFeePerGas: BigNumber.from(100),
+      gasPrice: BigNumber.from(100),
+    }),
+    provider: {
+      request: async () => null,
+    },
+  };
+
   beforeEach(() => {
+    cy.viewport('ipad-2');
     connectStubReturnValue = {
-      provider: {
-        getSigner: () => ({
-          getAddress: () => Promise.resolve('0xwalletAddress'),
-        }),
-        getNetwork: async () => ({
-          chainId: 1,
-          name: 'Ethereum',
-        }),
-        provider: {
-          request: async () => null,
-        },
-      },
+      provider: mockProvider,
       network: {
         chainId: 1,
         name: 'Ethereum',
@@ -54,8 +64,7 @@ describe('Bridge Widget tests', () => {
       },
     };
 
-    cy
-      .stub(Checkout.prototype, 'connect')
+    cy.stub(Checkout.prototype, 'connect')
       .as('connectStub')
       .resolves(connectStubReturnValue);
 
@@ -88,8 +97,7 @@ describe('Bridge Widget tests', () => {
         ],
       });
 
-    cy
-      .stub(Checkout.prototype, 'switchNetwork')
+    cy.stub(Checkout.prototype, 'switchNetwork')
       .as('switchNetworkStub')
       .resolves(connectStubReturnValue);
 
@@ -136,6 +144,67 @@ describe('Bridge Widget tests', () => {
           },
         ],
       });
+
+    cy.stub(Checkout.prototype, 'getNetworkInfo').as('networkInfoStub');
+
+    // Had to stub JsonRpcProvider as it makes calls on creation
+    // Can resolve to any network for these tests as we also stub
+    // TokenBridge which is at a higher level and which uses the JsonRpcProvider
+    cy.stub(JsonRpcProvider.prototype, 'detectNetwork').resolves({ name: '', chainId: '0x1' });
+
+    cy.stub(Checkout.prototype, 'getBridgeGasEstimate')
+      .as('getBridgeGasEstimate')
+      .resolves({
+        bridgeFee: {
+          estimatedAmount: BigNumber.from('0'),
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+            address: 'NATIVE',
+          },
+        } as TokenAmountEstimate,
+        gasEstimate: {
+          estimatedAmount: BigNumber.from('10000000000000'),
+          token: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+            address: 'NATIVE',
+          },
+        } as TokenAmountEstimate,
+        bridgeable: true,
+      });
+
+    const fiatPricingValue = {
+      ethereum: { usd: 2000.0 },
+      'usd-coin': { usd: 1.0 },
+      'immutable-x': { usd: 1.5 },
+    };
+
+    const coinList = [
+      {
+        id: 'ethereum',
+        symbol: 'eth',
+        name: 'Etherum',
+      },
+    ];
+
+    cy.intercept(
+      {
+        method: 'GET',
+        path: '/api/v3/coins/list*',
+      },
+      coinList,
+    ).as('coinListStub');
+
+    cy.intercept(
+      {
+        method: 'GET',
+        path: '/api/v3/simple/price*',
+      },
+      fiatPricingValue,
+    ).as('cryptoFiatStub');
   });
 
   describe('Bridge Widget render', () => {
@@ -149,402 +218,407 @@ describe('Bridge Widget tests', () => {
           params={params}
         />,
       );
-      cySmartGet('header-title').should('be.visible');
+      cySmartGet('bridge-view').should('exist');
+      cySmartGet('bridge-form').should('be.visible');
+      cySmartGet('header-title').should('have.text', header.title);
+      cySmartGet('bridge-form-content-heading').should('have.text', content.title);
       cySmartGet('close-button').should('be.visible');
-      cySmartGet('select-token__target').should('be.visible');
-      cySmartGet('select-token__target').should('have.text', 'ETH');
-      cySmartGet('amount__input').should('be.visible');
-      cySmartGet('amount__input').should('have.value', '0');
-      cySmartGet('bridge-to-network').should(
-        'include.text',
-        'Immutable zkEVM Testnet',
+
+      cySmartGet('bridge-token-select__target').should('have.text', 'ETH');
+      cySmartGet('bridge-amount-text__input').should('have.value', '');
+    });
+
+    it('should set up bridge widget on mount', () => {
+      const params = {
+        providerPreference: 'metamask',
+      } as BridgeWidgetParams;
+      mount(
+        <BridgeWidget
+          config={config}
+          params={params}
+        />,
       );
       cySmartGet('@connectStub').should('have.been.called');
       cySmartGet('@getAllBalancesStub').should('have.been.called');
-    });
-
-    it('should show bridge widget with default set values on mount', () => {
-      const params = {
-        providerPreference: 'metamask',
-        amount: '50.23',
-        fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-      } as BridgeWidgetParams;
-      mount(
-        <BridgeWidget
-          config={config}
-          params={params}
-        />,
-      );
-      cySmartGet('header-title').should('be.visible');
-      cySmartGet('close-button').should('be.visible');
-      cySmartGet('select-token__target').should('be.visible');
-      cySmartGet('select-token__target').should('have.text', 'IMX');
-      cySmartGet('amount__input').should('be.visible');
-      cySmartGet('amount__input').should('have.value', '50.23');
-      cySmartGet('bridge-to-network').should(
-        'include.text',
-        'Immutable zkEVM Testnet',
-      );
-      cySmartGet('@connectStub').should('have.been.called');
-      cySmartGet('@getAllBalancesStub').should('have.been.called');
-    });
-
-    it('should switch the selected token when changed', () => {
-      const params = {
-        providerPreference: 'metamask',
-        amount: '50.23',
-        fromNetwork: Network.ETHEREUM.toString(),
-        fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-      } as BridgeWidgetParams;
-      mount(
-        <BridgeWidget
-          config={config}
-          params={params}
-        />,
-      );
-      cy.wait(50);
-      cySmartGet('select-token__target').should('have.text', 'IMX');
-      cySmartGet('select-token__target').click();
-      cySmartGet('select-token-ETH').click();
-      cySmartGet('select-token__target').should('have.text', 'ETH');
-      cySmartGet('receive-text').should('include.text', '50.23 ETH');
-    });
-
-    it('should update the bridge amount when typed', () => {
-      const params = {
-        providerPreference: 'metamask',
-        amount: '0',
-        fromNetwork: Network.ETHEREUM.toString(),
-        fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-      } as BridgeWidgetParams;
-      mount(
-        <BridgeWidget
-          config={config}
-          params={params}
-
-        />,
-      );
-      cy.wait(50);
-      cySmartGet('select-token__target').should('have.text', 'IMX');
-      cySmartGet('select-token__target').click();
-      cySmartGet('select-token-ETH').click();
-      cySmartGet('select-token__target').should('have.text', 'ETH');
-      cySmartGet('amount__input').clear();
-      cySmartGet('amount__input').type('50.456');
-      cySmartGet('amount__input').should('have.value', '50.456');
-      cySmartGet('receive-text').should('include.text', '50.456 ETH');
+      cySmartGet('@getTokenAllowListStub').should('have.been.called');
     });
   });
 
-  // describe('switch network', () => {
-  //   it('should call switch network (to specified network) if provider is on the wrong network to start with', () => {
-  //     const connectStubReturnWrongNetwork = {
-  //       provider: {
-  //         getSigner: () => ({
-  //           getAddress: () => Promise.resolve('0xwalletAddress'),
-  //         }),
-  //         getNetwork: async () => ({
-  //           chainId: 250,
-  //           name: 'Fantom',
-  //         }),
-  //         provider: {
-  //           request: async () => null,
-  //         },
-  //       },
-  //       network: {
-  //         chainId: 250,
-  //         name: 'Fantom',
-  //         nativeCurrency: {
-  //           name: 'FTM',
-  //           symbol: 'FTM',
-  //           decimals: 18,
-  //         },
-  //       },
-  //     };
-  //     connectStub.resolves(connectStubReturnWrongNetwork);
+  describe('Bridge Submit', () => {
+    beforeEach(() => {
+      cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+        .resolves({
+          required: true,
+          unsignedTx: {},
+        });
 
-  //     switchNetworkStub.resolves({
-  //       network: {
-  //         chainId: 11155111,
-  //         name: 'Sepolia',
-  //         nativeCurrency: {
-  //           name: 'Sepolia',
-  //           symbol: 'ETH',
-  //           decimals: 18,
-  //         },
-  //       },
-  //     } as SwitchNetworkResult);
+      cy.stub(TokenBridge.prototype, 'getUnsignedDepositTx').as('getUnsignedDepositTxStub')
+        .resolves({
+          unsignedTx: {},
+        });
 
-  //     const params = {
-  //       providerPreference: 'metamask',
-  //     } as BridgeWidgetParams;
-  //     mount(
-  //       <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-  //         <BridgeWidget
-  //           config={config}
-  //           params={params}
-  //         />
-  //       </BiomeCombinedProviders>,
-  //     );
+      cy.stub(TokenBridge.prototype, 'getFee').as('getFeeStub')
+        .resolves({
+          bridgeable: true,
+          feeAmount: BigNumber.from(1),
+        });
+    });
 
-  //     cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
-  //       provider: connectStubReturnWrongNetwork.provider,
-  //       chainId: 11155111,
-  //     });
-  //   });
+    it('should submit the bridge and show success when status is 1', () => {
+      const { approveSpending, approveBridge } = text.views[BridgeWidgetViews.APPROVE_ERC20];
+      const params = {
+        providerPreference: 'metamask',
+      } as BridgeWidgetParams;
 
-  //   it('should call switch network (to default Ethereum) if provider is on the wrong network to start with', () => {
-  //     const connectStubReturnWrongNetwork = {
-  //       provider: {
-  //         getSigner: () => ({
-  //           getAddress: () => Promise.resolve('0xwalletAddress'),
-  //         }),
-  //         getNetwork: async () => ({
-  //           chainId: 250,
-  //           name: 'Fantom',
-  //         }),
-  //         provider: {
-  //           request: async () => null,
-  //         },
-  //       },
-  //       network: {
-  //         chainId: 250,
-  //         name: 'Fantom',
-  //         nativeCurrency: {
-  //           name: 'FTM',
-  //           symbol: 'FTM',
-  //           decimals: 18,
-  //         },
-  //       },
-  //     };
+      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+        .onFirstCall()
+        .resolves({
+          transactionResponse: {
+            wait: () => new Promise((resolve) => {
+              setTimeout(() => {
+                resolve({
+                  status: 1,
+                });
+              }, 1000);
+            }),
+          },
+        })
+        .onSecondCall()
+        .resolves({
+          transactionResponse: {
+            wait: () => new Promise((resolve) => {
+              setTimeout(() => {
+                resolve({
+                  status: 1,
+                });
+              }, 1000);
+            }),
+          },
+        });
 
-  //     const connectStubCorrectNetwork = {
-  //       provider: {
-  //         getSigner: () => ({
-  //           getAddress: () => Promise.resolve('0xwalletAddress'),
-  //         }),
-  //         getNetwork: async () => ({
-  //           chainId: 1,
-  //           name: 'Ethereum',
-  //         }),
-  //         provider: {
-  //           request: async () => null,
-  //         },
-  //       },
-  //       network: {
-  //         chainId: 1,
-  //         name: 'Ethereum',
-  //         nativeCurrency: {
-  //           name: 'Ethereum',
-  //           symbol: 'ETH',
-  //           decimals: 18,
-  //         },
-  //       },
-  //     };
+      cy.stub(TokenBridge.prototype, 'waitForDeposit').as('waitForDepositStub')
+        .resolves(new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({
+              status: CompletionStatus.SUCCESS,
+              transactionHash: '0x123245',
+            });
+          }, 1000);
+        }));
 
-  //     connectStub
-  //       .onFirstCall()
-  //       .resolves(connectStubReturnWrongNetwork)
-  //       .onSecondCall()
-  //       .resolves(connectStubCorrectNetwork);
+      mount(
+        <BridgeWidget
+          config={{
+            environment: Environment.SANDBOX,
+            theme: WidgetTheme.DARK,
+            isBridgeEnabled: true,
+            isSwapEnabled: true,
+            isOnRampEnabled: true,
+          }}
+          params={params}
+        />,
+      );
 
-  //     switchNetworkStub.resolves({
-  //       network: {
-  //         chainId: 1,
-  //         name: 'Ethereum',
-  //         nativeCurrency: {
-  //           name: 'Ethereum',
-  //           symbol: 'ETH',
-  //           decimals: 18,
-  //         },
-  //       },
-  //     } as SwitchNetworkResult);
+      cySmartGet('bridge-token-select__target').click();
+      cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
 
-  //     const params = {
-  //       providerPreference: 'metamask',
-  //     } as BridgeWidgetParams;
-  //     mount(
-  //       <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-  //         <BridgeWidget
-  //           config={config}
-  //           params={params}
-  //         />
-  //       </BiomeCombinedProviders>,
-  //     );
+      cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
+      cySmartGet('bridge-form-button').click();
 
-  //     cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
-  //       provider: connectStubReturnWrongNetwork.provider,
-  //       chainId: 11155111,
-  //     });
+      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
 
-  //     cySmartGet('@getAllBalancesStub').should('have.been.called');
-  //   });
+      cySmartGet('simple-text-body__heading').should('have.text', approveSpending.content.heading);
+      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.body[0]);
+      cySmartGet('simple-text-body__body').should('include.text', approveSpending.content.body[1]);
+      cySmartGet('footer-button').should('have.text', approveSpending.footer.buttonText);
 
-  //   // eslint-disable-next-line max-len
-  //   it('should call switch network (to default Ethereum) if provider is on the whitelisted network to start with', () => {
-  //     const connectStubReturnWhitelistedNetwork = {
-  //       provider: {
-  //         getSigner: () => ({
-  //           getAddress: () => Promise.resolve('0xwalletAddress'),
-  //         }),
-  //         getNetwork: async () => ({
-  //           chainId: 13372,
-  //           name: 'Immutable zkEVM Testnet',
-  //         }),
-  //         provider: {
-  //           request: async () => null,
-  //         },
-  //       },
-  //       network: {
-  //         chainId: 13372,
-  //         name: 'Immutable zkEVM Testnet',
-  //         nativeCurrency: {
-  //           name: 'IMX',
-  //           symbol: 'IMX',
-  //           decimals: 18,
-  //         },
-  //       },
-  //     };
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+      cy.wait(1000);
 
-  //     const connectStubCorrectNetwork = {
-  //       provider: {
-  //         getSigner: () => ({
-  //           getAddress: () => Promise.resolve('0xwalletAddress'),
-  //         }),
-  //         getNetwork: async () => ({
-  //           chainId: 1,
-  //           name: 'Ethereum',
-  //         }),
-  //         provider: {
-  //           request: async () => null,
-  //         },
-  //       },
-  //       network: {
-  //         chainId: 1,
-  //         name: 'Ethereum',
-  //         nativeCurrency: {
-  //           name: 'Ethereum',
-  //           symbol: 'ETH',
-  //           decimals: 18,
-  //         },
-  //       },
-  //     };
+      cySmartGet('simple-text-body__heading').should('have.text', approveBridge.content.heading);
+      cySmartGet('simple-text-body__body').should('include.text', approveBridge.content.body[0]);
+      cySmartGet('simple-text-body__body').should('include.text', approveBridge.content.body[1]);
+      cySmartGet('footer-button').should('have.text', approveBridge.footer.buttonText);
 
-  //     connectStub
-  //       .onFirstCall()
-  //       .resolves(connectStubReturnWhitelistedNetwork)
-  //       .onSecondCall()
-  //       .resolves(connectStubCorrectNetwork);
+      cySmartGet('footer-button').click();
+      cySmartGet('move-in-progress-view').should('be.visible');
 
-  //     switchNetworkStub.resolves({
-  //       network: {
-  //         chainId: 1,
-  //         name: 'Ethereum',
-  //         nativeCurrency: {
-  //           name: 'Ethereum',
-  //           symbol: 'ETH',
-  //           decimals: 18,
-  //         },
-  //       },
-  //     } as SwitchNetworkResult);
+      cy.wait(1000);
+      cySmartGet('success-box').should('be.visible');
+    });
 
-  //     const params = {
-  //       providerPreference: 'metamask',
-  //     } as BridgeWidgetParams;
-  //     mount(
-  //       <BiomeCombinedProviders theme={{ base: onDarkBase }}>
-  //         <BridgeWidget
-  //           config={config}
-  //           params={params}
-  //         />
-  //       </BiomeCombinedProviders>,
-  //     );
+    it('should submit the bridge and show fail screen if wait for deposit does not return success', () => {
+      const params = {
+        providerPreference: 'metamask',
+      } as BridgeWidgetParams;
 
-  //     cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
-  //       provider: connectStubReturnWhitelistedNetwork.provider,
-  //       chainId: 11155111,
-  //     });
+      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+        .onFirstCall()
+        .resolves({
+          transactionResponse: {
+            wait: () => ({
+              status: 1,
+            }),
+          },
+        })
+        .onSecondCall()
+        .resolves({
+          transactionResponse: {
+            wait: () => new Promise((resolve) => {
+              setTimeout(() => {
+                resolve({
+                  status: 1,
+                });
+              }, 1000);
+            }),
+          },
+        });
 
-  //     cySmartGet('@getAllBalancesStub').should('have.been.called');
-  //   });
-  // });
+      cy.stub(TokenBridge.prototype, 'waitForDeposit').as('waitForDepositStub')
+        .resolves({
+          status: CompletionStatus.FAILED,
+        });
 
-  describe('Bridge Widget button tests', () => {
+      mount(
+        <BiomeCombinedProviders>
+          <BridgeWidget
+            config={{
+              environment: Environment.SANDBOX,
+              theme: WidgetTheme.DARK,
+              isBridgeEnabled: true,
+              isSwapEnabled: true,
+              isOnRampEnabled: true,
+            }}
+            params={params}
+          />
+        </BiomeCombinedProviders>,
+      );
 
-    // TODO: uncomment and fix when bridge form is in
+      cySmartGet('bridge-token-select__target').click();
+      cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
 
-    // it('should show success and etherscan transaction when bridge succeeds', () => {
-    //   cy.stub(Checkout.prototype, 'sendTransaction')
-    //     .as('sendTransactionStub')
-    //     .resolves({
-    //       transactionResponse: {
-    //         hash: '0x123',
-    //       },
-    //     });
+      cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
+      cySmartGet('bridge-form-button').click();
 
-    //   const params = {
-    //     providerPreference: 'metamask',
-    //     amount: '0.1',
-    //     fromNetwork: Network.ETHEREUM.toString(),
-    //   } as BridgeWidgetParams;
-    //   mount(
-    //     <BridgeWidget
-    //       environment={Environment.PRODUCTION}
-    //       params={params}
-    //       theme={WidgetTheme.DARK}
-    //     />,
-    //   );
+      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
 
-    //   cySmartGet('bridge-button').should('be.visible');
-    //   cySmartGet('bridge-button').should('be.enabled');
-    //   cySmartGet('bridge-button').click();
-    //   cySmartGet('success-text').should('be.visible');
-    //   cySmartGet('bridge-button').should('not.exist');
-    // });
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+      cy.wait(1000);
 
-    // TODO: uncomment and fix when failure screen is in
+      cySmartGet('footer-button').click();
+      cySmartGet('move-in-progress-view').should('be.visible');
+      cy.wait(1000);
+      cySmartGet('failure-box').should('be.visible');
+    });
 
-    // it('should show failure when bridge fails', () => {
-    //   cy.stub(Checkout.prototype, 'sendTransaction')
-    //     .as('sendTransactionStub')
-    //     .rejects({});
+    it('should submit the bridge and show fail when status is not 1 when submitting approval transaction', () => {
+      const params = {
+        providerPreference: 'metamask',
+      } as BridgeWidgetParams;
 
-    //   const params = {
-    //     providerPreference: 'metamask',
-    //     amount: '0.1',
-    //     fromNetwork: Network.ETHEREUM.toString(),
-    //   } as BridgeWidgetParams;
-    //   mount(
-    //     <BridgeWidget
-    //       config={config}
-    //       params={params}
-    //     />,
-    //   );
+      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+        .resolves({
+          transactionResponse: {
+            wait: () => ({
+              status: 0,
+            }),
+          },
+        });
 
-    //   cySmartGet('bridge-button').should('be.visible');
-    //   cySmartGet('bridge-button').should('be.enabled');
-    //   cySmartGet('bridge-button').click();
-    //   cySmartGet('bridge-failure').should('be.visible');
-    //   cySmartGet('bridge-button').should('not.exist');
-    // });
+      mount(
+        <BiomeCombinedProviders>
+          <BridgeWidget
+            config={{
+              environment: Environment.SANDBOX,
+              theme: WidgetTheme.DARK,
+              isBridgeEnabled: true,
+              isSwapEnabled: true,
+              isOnRampEnabled: true,
+            }}
+            params={params}
+          />
+        </BiomeCombinedProviders>,
+      );
 
-    // TODO: uncomment and fix when the bridge form validation is in
+      cySmartGet('bridge-token-select__target').click();
+      cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
 
-    //   it('should have disabled button when validation fails', () => {
-    //     mount(
-    //       <BiomeThemeProvider>
-    //         <BridgeButton
-    //           updateTransactionResponse={(
-    //             // TODO: is this for mocking purposes?
-    //             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    //             transactionResponse: TransactionResponse,
-    //           ) => {}}
-    //         />
-    //       </BiomeThemeProvider>,
-    //     );
+      cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
+      cySmartGet('bridge-form-button').click();
 
-  //     cySmartGet('bridge-button').should('be.visible');
-  //     cySmartGet('bridge-button').should('be.disabled');
-  //   });
+      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
+
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+      cy.wait(1000);
+
+      cySmartGet('failure-box').should('be.visible');
+    });
+
+    it('should submit the bridge and show fail when status is not 1 when submitting the transaction', () => {
+      const params = {
+        providerPreference: 'metamask',
+      } as BridgeWidgetParams;
+
+      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+        .onFirstCall()
+        .resolves({
+          transactionResponse: {
+            wait: () => ({
+              status: 1,
+            }),
+          },
+        })
+        .onSecondCall()
+        .resolves({
+          transactionResponse: {
+            wait: () => ({
+              status: 0,
+            }),
+          },
+        });
+
+      mount(
+        <BiomeCombinedProviders>
+          <BridgeWidget
+            config={{
+              environment: Environment.SANDBOX,
+              theme: WidgetTheme.DARK,
+              isBridgeEnabled: true,
+              isSwapEnabled: true,
+              isOnRampEnabled: true,
+            }}
+            params={params}
+          />
+        </BiomeCombinedProviders>,
+      );
+
+      cySmartGet('bridge-token-select__target').click();
+      cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
+
+      cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
+      cySmartGet('bridge-form-button').click();
+
+      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
+
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+
+      cySmartGet('footer-button').click();
+
+      cySmartGet('failure-box').should('be.visible');
+    });
+
+    it('should submit the bridge and show fail when recoverable error and refill form when retry', () => {
+      const params = {
+        providerPreference: 'metamask',
+      } as BridgeWidgetParams;
+
+      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+        .onFirstCall()
+        .resolves({
+          transactionResponse: {
+            wait: () => ({
+              status: 1,
+            }),
+          },
+        })
+        .onSecondCall()
+        .rejects({
+          type: CheckoutErrorType.INSUFFICIENT_FUNDS,
+        });
+
+      mount(
+        <BiomeCombinedProviders>
+          <BridgeWidget
+            config={{
+              environment: Environment.SANDBOX,
+              theme: WidgetTheme.DARK,
+              isBridgeEnabled: true,
+              isSwapEnabled: true,
+              isOnRampEnabled: true,
+            }}
+            params={params}
+          />
+        </BiomeCombinedProviders>,
+      );
+
+      cySmartGet('bridge-token-select__target').click();
+      cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
+
+      cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
+      cySmartGet('bridge-form-button').click();
+
+      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+
+      cySmartGet('footer-button').click();
+
+      cySmartGet('failure-box').should('be.visible');
+      cySmartGet('status-action-button').click();
+
+      cySmartGet('bridge-token-select__target').should('have.text', 'ETH');
+      cySmartGet('bridge-amount-text__input').should('have.value', '0.1');
+    });
+
+    it('should submit the bridge and show shared error screen when unknown error', () => {
+      const params = {
+        providerPreference: 'metamask',
+      } as BridgeWidgetParams;
+
+      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+        .onFirstCall()
+        .resolves({
+          transactionResponse: {
+            wait: () => ({
+              status: 1,
+            }),
+          },
+        })
+        .rejects({});
+
+      mount(
+        <BiomeCombinedProviders>
+          <BridgeWidget
+            config={{
+              environment: Environment.SANDBOX,
+              theme: WidgetTheme.DARK,
+              isBridgeEnabled: true,
+              isSwapEnabled: true,
+              isOnRampEnabled: true,
+            }}
+            params={params}
+          />
+        </BiomeCombinedProviders>,
+      );
+
+      cySmartGet('bridge-token-select__target').click();
+      cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
+
+      cySmartGet('bridge-amount-text__input').type('0.1');
+      cySmartGet('bridge-amount-text__input').blur();
+      cySmartGet('bridge-form-button').click();
+
+      cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce');
+      cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce');
+      cySmartGet('footer-button').click();
+      cySmartGet('@sendTransactionStub').should('have.been.calledOnce');
+
+      cySmartGet('footer-button').click();
+      cySmartGet('simple-text-body__heading').contains("Something's gone wrong");
+    });
   });
 });

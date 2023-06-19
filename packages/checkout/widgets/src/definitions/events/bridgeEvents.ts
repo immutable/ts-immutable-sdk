@@ -1,14 +1,4 @@
 /**
- * Represents an event object emitted by the Bridge Widget.
- * @property {BridgeEventType} type - The type of the event.
- * @property {T} data - The data associated with the event.
- */
-export type BridgeEvent<T> = {
-  type: BridgeEventType;
-  data: T;
-};
-
-/**
  * Enum of possible Bridge Widget event types.
  */
 export enum BridgeEventType {
@@ -19,10 +9,10 @@ export enum BridgeEventType {
 
 /**
  * Type representing a Bridge Widget event with type SUCCESS
- * @property {number} timestamp - The UNIX timestamp (in milliseconds) when the event occurred.
+ * @property {string} transactionHash - The transactionHash of the bridge transaction
  */
 export type BridgeSuccess = {
-  timestamp: number;
+  transactionHash: string;
 };
 
 /**

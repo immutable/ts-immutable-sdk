@@ -9,14 +9,14 @@ import {
   ERC20Item, ERC721Item, NativeItem, RoyaltyInfo,
 } from 'types';
 import {
-  EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME, SEAPORT_CONTRACT_VERSION_V1_4,
-} from '@opensea/seaport-js/lib/constants';
-import {
   BigNumber, PopulatedTransaction, providers,
 } from 'ethers';
 import {
-  BuyItem, Order, CreateOrderProtocolData, SellItem,
+  BuyItem, Order, CreateOrderProtocolData, SellItem, OrderStatus,
 } from 'openapi/sdk';
+import {
+  EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME, SEAPORT_CONTRACT_VERSION_V1_4,
+} from './constants';
 import { Seaport } from './seaport';
 
 // Make an address-like string for tests
@@ -196,7 +196,7 @@ describe('Seaport', () => {
 
       const considerationItem: NativeItem = {
         amount: '100',
-        type: 'IMX',
+        type: 'NATIVE',
       };
 
       const royaltyInfo: RoyaltyInfo = {
@@ -365,24 +365,27 @@ describe('Seaport', () => {
       const immutableOrder: Order = {
         account_address: offerer,
         buy: [
-          { item_type: BuyItem.item_type.IMX, start_amount: '100' },
+          { item_type: BuyItem.item_type.NATIVE, start_amount: '100' },
         ],
         buy_fees: [],
-        chain_id: '1',
+        chain: { id: '1', name: 'imtbl-zkevm-local' },
         create_time: new Date().toISOString(),
         end_time: new Date().toISOString(),
         id: '1',
         protocol_data: {
-          order_type: CreateOrderProtocolData.order_type.FULL_OPEN,
+          order_type: CreateOrderProtocolData.order_type.FULL_RESTRICTED,
           zone_address: randomAddress(),
           operator_signature: randomAddress(),
+          seaport_address: randomAddress(),
+          seaport_version: SEAPORT_CONTRACT_VERSION_V1_4,
+          counter: '0',
         },
         salt: '1',
         sell: [
           { item_type: SellItem.item_type.ERC721, contract_address: randomAddress(), token_id: '1' },
         ],
         signature: randomAddress(),
-        status: Order.status.ACTIVE,
+        status: OrderStatus.ACTIVE,
         start_time: new Date().toISOString(),
         update_time: new Date().toISOString(),
       };
@@ -417,6 +420,7 @@ describe('Seaport', () => {
                 parameters: anything(),
                 signature: immutableOrder.signature,
               },
+              extraData: immutableOrder.protocol_data.operator_signature,
             },
           ],
         }))).thenReturn(

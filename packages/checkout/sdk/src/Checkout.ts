@@ -1,5 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import { Web3Provider } from '@ethersproject/providers';
+import { ethers } from 'ethers';
+import { Environment } from '@imtbl/config';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
@@ -7,7 +9,10 @@ import * as provider from './provider';
 import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
+import * as gasEstimate from './gasEstimate';
+import * as instance from './instance';
 import {
+  ChainId,
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
@@ -35,12 +40,30 @@ import {
   ValidateProviderOptions,
 } from './types';
 import { CheckoutConfiguration } from './config';
+import {
+  getBridgeEstimatedGas,
+  getBridgeFeeEstimate,
+} from './gasEstimate/bridgeGasEstimate';
+import {
+  GasEstimateParams,
+  GasEstimateSwapResult,
+  GasEstimateBridgeToL2Result,
+  GetBridgeGasEstimateParams,
+  GetBridgeGasEstimateResult,
+} from './types/gasEstimate';
+import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
 
+  private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
+
   constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
+    this.readOnlyProviders = new Map<
+    ChainId,
+    ethers.providers.JsonRpcProvider
+    >();
   }
 
   /**
@@ -250,5 +273,72 @@ export class Checkout {
 
   static isWeb3Provider(web3Provider: Web3Provider) {
     return provider.isWeb3Provider(web3Provider);
+  }
+
+  /**
+   * Estimates the gas to perform an action.
+   * @param {GasEstimateParams} params - The params required to calculate a gas estimate
+   * @returns The gas estimate for the given action.
+   */
+  public async gasEstimate(
+    params: GasEstimateParams,
+  ): Promise<GasEstimateSwapResult | GasEstimateBridgeToL2Result> {
+    this.readOnlyProviders = await createReadOnlyProviders(
+      this.config,
+      this.readOnlyProviders,
+    );
+
+    return await gasEstimate.gasServiceEstimator(
+      params.gasEstimateType,
+      this.readOnlyProviders,
+      this.config.environment,
+    );
+  }
+
+  /**
+   * Get gas estimates for bridge transaction.
+   * @param {GetBridgeGasEstimateParams} params - The necessary data required to get the gas estimates.
+   * @returns Bridge gas estimate.
+   * @throws {@link ErrorType}
+   */
+  public async getBridgeGasEstimate(
+    params: GetBridgeGasEstimateParams,
+  ): Promise<GetBridgeGasEstimateResult> {
+    const fromChainId = this.config.environment === Environment.PRODUCTION
+      ? ChainId.ETHEREUM
+      : ChainId.SEPOLIA;
+    const toChainId = this.config.environment === Environment.PRODUCTION
+      ? ChainId.IMTBL_ZKEVM_TESTNET
+      : ChainId.IMTBL_ZKEVM_DEVNET;
+
+    this.readOnlyProviders = await createReadOnlyProviders(
+      this.config,
+      this.readOnlyProviders,
+    );
+    const tokenBridge = await instance.createBridgeInstance(
+      fromChainId,
+      toChainId,
+      this.readOnlyProviders,
+      this.config.environment,
+    );
+
+    const result: GetBridgeGasEstimateResult = {};
+
+    const bridgeFee = await getBridgeFeeEstimate(
+      tokenBridge,
+      params.tokenAddress,
+      toChainId,
+    );
+
+    result.bridgeFee = bridgeFee?.bridgeFee;
+    result.bridgeable = bridgeFee?.bridgeable;
+
+    result.gasEstimate = await getBridgeEstimatedGas(
+      params.provider,
+      fromChainId,
+      params.isSpendingCapApprovalRequired,
+    );
+
+    return result;
   }
 }
