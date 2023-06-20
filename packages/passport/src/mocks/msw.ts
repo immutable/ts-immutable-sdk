@@ -1,0 +1,81 @@
+import { rest } from 'msw';
+import { setupServer } from 'msw/node';
+import { RelayerTransactionRequest } from '../zkEvm/relayerAdapter';
+import { JsonRpcRequestPayload } from '../zkEvm/types';
+
+export type SetupMswInput = {
+  relayerId: string;
+  chainId: string;
+};
+
+export const setupMsw = ({ relayerId, chainId }: SetupMswInput) => {
+  const handlers = [
+    rest.post('https://zkevm-rpc.sandbox.x.immutable.com', (req, res, ctx) => {
+      const body = req.body as JsonRpcRequestPayload;
+      switch (body.method) {
+        case 'eth_getCode': {
+          return res(
+            ctx.json({
+              id: body.id,
+              jsonrpc: '2.0',
+              result: '0x',
+            }),
+          );
+        }
+        default: {
+          return res(ctx.status(500));
+        }
+      }
+    }),
+    rest.post('/v1/transactions', (req, res, ctx) => { // TODO: ID-784 Update once we have added Relayer URL to config
+      const body = req.body as RelayerTransactionRequest;
+      switch (body.method) {
+        case 'eth_sendTransaction': {
+          return res(
+            ctx.json({
+              id: 1,
+              jsonrpc: '2.0',
+              result: relayerId,
+            }),
+          );
+        }
+        case 'im_getTransactionByHash': {
+          return res(
+            ctx.json({
+              id: 1,
+              jsonrpc: '2.0',
+              result: {
+                status: 'SUBMITTED',
+                chainId,
+                relayerId,
+                hash: '0x867',
+              },
+            }),
+          );
+        }
+        case 'im_getFeeOptions': {
+          return res(
+            ctx.json({
+              id: 1,
+              jsonrpc: '2.0',
+              result: [
+                {
+                  tokenPrice: '0x1dfd14000',
+                  tokenSymbol: 'IMX',
+                  tokenDecimals: 18,
+                  tokenAddress: '0x123',
+                  recipientAddress: '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
+                },
+              ],
+            }),
+          );
+        }
+        default: {
+          return res(ctx.status(500));
+        }
+      }
+    }),
+  ];
+
+  return setupServer(...handlers);
+};

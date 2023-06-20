@@ -1,7 +1,7 @@
 import { BigNumber, BigNumberish, ethers } from 'ethers';
 import { walletContracts } from '@0xsequence/abi';
 import { encodeSignature } from '@0xsequence/config';
-import { Web3Provider } from '@ethersproject/providers';
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import { Transaction, TransactionNormalised } from './types';
 
@@ -43,13 +43,13 @@ export function digestOfTransactionsAndNonce(nonce: BigNumberish, sequenceTransa
   return ethers.utils.keccak256(packMetaTransactionsNonceData);
 }
 
-export const getNonce = async (magicWeb3Provider: Web3Provider, smartContractWalletAddress: string) => {
-  const code = await magicWeb3Provider.getCode(smartContractWalletAddress);
+export const getNonce = async (jsonRpcProvider: JsonRpcProvider, smartContractWalletAddress: string) => {
+  const code = await jsonRpcProvider.send('eth_getCode', [smartContractWalletAddress]);
   if (code && code !== '0x') {
     const contract = new ethers.Contract(
       smartContractWalletAddress,
       walletContracts.mainModule.abi,
-      magicWeb3Provider,
+      jsonRpcProvider,
     );
     return contract.nonce();
   }

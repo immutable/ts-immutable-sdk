@@ -16,7 +16,7 @@ import {
 } from './types';
 import registerPassport from './workflows/registration';
 import { ConfirmationScreen } from './confirmation';
-import { ZkEvmProvider } from './zkEvmProvider';
+import { ZkEvmProvider } from './zkEvm';
 
 export class Passport {
   private readonly authManager: AuthManager;

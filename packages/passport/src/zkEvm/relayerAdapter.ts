@@ -49,7 +49,7 @@ type ImGetFeeOptionsResponse = JsonRpc & {
   result: FeeOption[]
 };
 
-type RelayerTransactionRequest =
+export type RelayerTransactionRequest =
   | EthSendTransactionRequest
   | ImGetTransactionByHashRequest
   | ImGetFeeOptionsRequest;

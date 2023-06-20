@@ -1,4 +1,4 @@
-import { ExternalProvider } from '@ethersproject/providers';
+import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { ethRequestAccounts, ethSendTransaction } from './rpcMethods';
 import {
   JsonRpcError,
@@ -33,7 +33,9 @@ export class ZkEvmProvider {
 
   private readonly relayerAdapter: RelayerAdapter;
 
-  private magicProvider?: ExternalProvider;
+  private readonly jsonRpcProvider: JsonRpcProvider; // Used for read operations
+
+  private magicProvider?: ExternalProvider; // Used for signing
 
   private user?: User;
 
@@ -48,6 +50,7 @@ export class ZkEvmProvider {
     this.config = config;
     this.confirmationScreen = confirmationScreen;
     this.relayerAdapter = new RelayerAdapter({ config });
+    this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
   }
 
   public async request(
@@ -79,6 +82,7 @@ export class ZkEvmProvider {
           return ethSendTransaction({
             transactionRequest: request.params[0],
             magicProvider: this.magicProvider!,
+            jsonRpcProvider: this.jsonRpcProvider,
             config: this.config,
             confirmationScreen: this.confirmationScreen,
             relayerAdapter: this.relayerAdapter,

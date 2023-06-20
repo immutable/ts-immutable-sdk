@@ -1,5 +1,5 @@
 import {
-  ExternalProvider, TransactionRequest, Web3Provider,
+  ExternalProvider, JsonRpcProvider, TransactionRequest, Web3Provider,
 } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { PassportConfiguration } from '../../config';
@@ -11,6 +11,7 @@ import { Transaction } from '../types';
 type EthSendTransactionInput = {
   transactionRequest: TransactionRequest,
   magicProvider: ExternalProvider,
+  jsonRpcProvider: JsonRpcProvider,
   config: PassportConfiguration,
   confirmationScreen: ConfirmationScreen,
   relayerAdapter: RelayerAdapter,
@@ -19,6 +20,7 @@ type EthSendTransactionInput = {
 export const ethSendTransaction = async ({
   transactionRequest,
   magicProvider,
+  jsonRpcProvider,
   relayerAdapter,
   config,
 }: EthSendTransactionInput): Promise<string> => {
@@ -33,8 +35,8 @@ export const ethSendTransaction = async ({
   const smartContractWalletAddress = '0x7EEC32793414aAb720a90073607733d9e7B0ecD0'; // TODO: ID-786 this should be a claim in the JWT
   const magicWeb3Provider = new Web3Provider(magicProvider);
   const signer = magicWeb3Provider.getSigner();
-  const nonce = await getNonce(magicWeb3Provider, smartContractWalletAddress);
 
+  const nonce = await getNonce(jsonRpcProvider, smartContractWalletAddress);
   const sequenceTransaction: Transaction = {
     to: transactionRequest.to,
     data: transactionRequest.data,
