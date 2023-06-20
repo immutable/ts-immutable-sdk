@@ -15,31 +15,28 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { NFTContractType } from './nftcontract-type';
+import { Order } from './order';
+// May contain unused imports in some cases
+// @ts-ignore
+import { Page } from './page';
 
 /**
  * 
  * @export
- * @interface ActivityNFT
+ * @interface ListListingsResult
  */
-export interface ActivityNFT {
+export interface ListListingsResult {
     /**
      * 
-     * @type {NFTContractType}
-     * @memberof ActivityNFT
+     * @type {Page}
+     * @memberof ListListingsResult
      */
-    'contract_type': NFTContractType;
+    'page': Page;
     /**
-     * The token contract address
-     * @type {string}
-     * @memberof ActivityNFT
+     * 
+     * @type {Array<Order>}
+     * @memberof ListListingsResult
      */
-    'contract_address': string;
-    /**
-     * An `uint256` token id as string
-     * @type {string}
-     * @memberof ActivityNFT
-     */
-    'token_id': string;
+    'result': Array<Order>;
 }
 

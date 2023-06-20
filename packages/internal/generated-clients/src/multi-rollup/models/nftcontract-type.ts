@@ -13,21 +13,18 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { Order } from './order';
 
 /**
- * 
+ * The contract type for an NFT
  * @export
- * @interface OrderResult
+ * @enum {string}
  */
-export interface OrderResult {
-    /**
-     * 
-     * @type {Order}
-     * @memberof OrderResult
-     */
-    'result': Order;
-}
+
+export const NFTContractType = {
+    Erc721: 'ERC721'
+} as const;
+
+export type NFTContractType = typeof NFTContractType[keyof typeof NFTContractType];
+
+
 
