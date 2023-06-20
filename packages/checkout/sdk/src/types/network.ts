@@ -8,9 +8,9 @@ import { NetworkInfo } from './networkInfo';
  */
 export type RpcUrlMap = Map<ChainId, string>;
 export const RPC_URL_MAP: RpcUrlMap = new Map<ChainId, string>([
-  [ChainId.ETHEREUM, 'https://mainnet.infura.io/v3/'],
+  [ChainId.ETHEREUM, 'https://checkout-api.dev.immutable.com/v1/rpc/eth-mainnet'],
   [ChainId.IMTBL_ZKEVM_TESTNET, 'https://zkevm-rpc.sandbox.x.immutable.com'],
-  [ChainId.SEPOLIA, 'https://eth-sepolia.g.alchemy.com/v2/demo'],
+  [ChainId.SEPOLIA, 'https://checkout-api.dev.immutable.com/v1/rpc/eth-sepolia'],
   [ChainId.IMTBL_ZKEVM_DEVNET, 'https://zkevm-rpc.dev.x.immutable.com'],
 ]);
 
