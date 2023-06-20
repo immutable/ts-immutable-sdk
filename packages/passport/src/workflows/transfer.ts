@@ -11,9 +11,8 @@ import {
 } from '@imtbl/core-sdk';
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
-import { ConfirmationScreen } from '../confirmation';
 import { UserWithEtherKey } from '../types';
-import { validateWithGuardian } from './guardian';
+import GuardianClient from '../imxProvider/guardian';
 
 const ERC721 = 'ERC721';
 
@@ -22,8 +21,7 @@ type TransferRequest = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
-  imxPublicApiDomain: string;
-  confirmationScreen: ConfirmationScreen;
+  guardianClient: GuardianClient;
 };
 
 type BatchTransfersParams = {
@@ -31,8 +29,7 @@ type BatchTransfersParams = {
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
-  imxPublicApiDomain: string;
-  confirmationScreen: ConfirmationScreen;
+  guardianClient: GuardianClient;
 };
 
 export async function transfer({
@@ -40,8 +37,7 @@ export async function transfer({
   transfersApi,
   starkSigner,
   user,
-  imxPublicApiDomain,
-  confirmationScreen,
+  guardianClient,
 }: // TODO: remove this eslint disable once we have a better solution
 // eslint-disable-next-line max-len
 TransferRequest): Promise<CreateTransferResponseV1> {
@@ -65,11 +61,8 @@ TransferRequest): Promise<CreateTransferResponseV1> {
       { headers },
     );
 
-    await validateWithGuardian({
-      imxPublicApiDomain,
-      accessToken: user.accessToken,
+    await guardianClient.validate({
       payloadHash: signableResult.data.payload_hash,
-      confirmationScreen,
     });
 
     const signableResultData = signableResult.data;
@@ -112,8 +105,7 @@ export async function batchNftTransfer({
   starkSigner,
   request,
   transfersApi,
-  confirmationScreen,
-  imxPublicApiDomain,
+  guardianClient,
 }: BatchTransfersParams): Promise<CreateTransferResponse> {
   return withPassportError<CreateTransferResponse>(async () => {
     const ethAddress = user.etherKey;
@@ -145,11 +137,8 @@ export async function batchNftTransfer({
     }, { headers });
 
     const popupWindowSize = { width: 480, height: 784 };
-    await validateWithGuardian({
-      imxPublicApiDomain,
-      accessToken: user.accessToken,
+    await guardianClient.validate({
       payloadHash: signableResult.data.signable_responses[0]?.payload_hash,
-      confirmationScreen,
       popupWindowSize,
     });
 

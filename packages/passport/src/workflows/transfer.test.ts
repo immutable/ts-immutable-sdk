@@ -2,17 +2,12 @@ import { TransfersApi, UnsignedTransferRequest } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
-import { ConfirmationScreen } from '../confirmation';
-import { validateWithGuardian } from './guardian';
+import GuardianClient from '../imxProvider/guardian';
 
-jest.mock('../confirmation/confirmation');
-jest.mock('./guardian');
+jest.mock('../imxProvider/guardian');
 
 describe('transfer', () => {
   afterEach(jest.resetAllMocks);
-
-  const mockConfirmationScreen = new ConfirmationScreen({} as any);
-  const mockGuardianDomain = 'http://mockGuardianDomain.com';
 
   const mockStarkSigner = {
     signMessage: jest.fn(),
@@ -34,6 +29,7 @@ describe('transfer', () => {
       tokenAddress,
       receiver: mockReceiver,
     };
+    const mockGuardianClient = new GuardianClient({} as any);
 
     beforeEach(() => {
       getSignableTransferV1Mock = jest.fn();
@@ -92,10 +88,6 @@ describe('transfer', () => {
         transfer_id: 123,
       };
 
-      (mockConfirmationScreen.startGuardianTransaction as jest.Mock).mockResolvedValue({
-
-        confirmed: true,
-      });
       getSignableTransferV1Mock.mockResolvedValue(
         mockSignableTransferV1Response,
       );
@@ -109,13 +101,12 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-        imxPublicApiDomain: mockGuardianDomain,
-        confirmationScreen: mockConfirmationScreen,
+        guardianClient: mockGuardianClient,
       });
 
       expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(validateWithGuardian).toBeCalledTimes(1);
+      expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(createTransferV1Mock).toBeCalledWith(
         mockCreateTransferRequest,
         mockHeader,
@@ -131,8 +122,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-        imxPublicApiDomain: mockGuardianDomain,
-        confirmationScreen: mockConfirmationScreen,
+        guardianClient: mockGuardianClient,
       })).rejects.toThrow(
         new PassportError(
           `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
@@ -155,21 +145,18 @@ describe('transfer', () => {
           expiration_timestamp: '1234',
         },
       };
-
       getSignableTransferV1Mock.mockResolvedValue(
         mockSignableTransferV1Response,
       );
 
+      (mockGuardianClient.validate as jest.Mock).mockRejectedValue(new Error('Transaction rejected by user'));
       await expect(() => transfer({
         transfersApi: transferApiMock,
         starkSigner: mockStarkSigner,
         user: mockUser,
         request: mockTransferRequest as UnsignedTransferRequest,
-        imxPublicApiDomain: mockGuardianDomain,
-        confirmationScreen: mockConfirmationScreen,
+        guardianClient: mockGuardianClient,
       })).rejects.toThrowError('TRANSFER_ERROR');
-
-      expect(validateWithGuardian).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -177,6 +164,7 @@ describe('transfer', () => {
     let getSignableTransferMock: jest.Mock;
     let createTransferMock: jest.Mock;
     let transferApiMock: TransfersApi;
+    const mockGuardianClient = new GuardianClient({} as any);
 
     const transferRequest = [
       {
@@ -186,7 +174,6 @@ describe('transfer', () => {
       },
     ];
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const popupOptions = {
       height: 784,
       width: 480,
@@ -215,7 +202,7 @@ describe('transfer', () => {
       const amount = 'amount';
       const nonce = 'nonce';
       const expiration_timestamp = 'expiration_timestamp';
-
+      const payload_hash = 'payload_hash';
       const mockSignableTransferResponse = {
         data: {
           sender_stark_key,
@@ -228,6 +215,7 @@ describe('transfer', () => {
               amount,
               nonce,
               expiration_timestamp,
+              payload_hash,
             },
           ],
         },
@@ -248,8 +236,7 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
-        imxPublicApiDomain: mockGuardianDomain,
-        confirmationScreen: mockConfirmationScreen,
+        guardianClient: mockGuardianClient,
       });
 
       expect(result).toEqual({
@@ -274,7 +261,10 @@ describe('transfer', () => {
         },
       }, mockHeader);
       expect(mockStarkSigner.signMessage).toHaveBeenCalled();
-      expect(validateWithGuardian).toBeCalledTimes(1);
+      expect(mockGuardianClient.validate).toBeCalledWith({
+        popupWindowSize: popupOptions,
+        payloadHash: payload_hash,
+      });
       expect(createTransferMock).toHaveBeenCalledWith(
         {
           createTransferRequestV2: {
@@ -305,11 +295,54 @@ describe('transfer', () => {
         starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
-        imxPublicApiDomain: mockGuardianDomain,
-        confirmationScreen: mockConfirmationScreen,
+        guardianClient: mockGuardianClient,
       })).rejects.toThrow(
         new PassportError(
           `${PassportErrorType.TRANSFER_ERROR}: ${mockErrorMessage}`,
+          PassportErrorType.TRANSFER_ERROR,
+        ),
+      );
+    });
+
+    it('should return error if transfer is rejected by user', async () => {
+      const sender_stark_key = 'sender_stark_key';
+      const sender_vault_id = 'sender_vault_id';
+      const receiver_stark_key = 'receiver_stark_key';
+      const receiver_vault_id = 'receiver_vault_id';
+      const asset_id = 'asset_id';
+      const amount = 'amount';
+      const nonce = 'nonce';
+      const expiration_timestamp = 'expiration_timestamp';
+      const payload_hash = 'payload_hash';
+      const mockSignableTransferResponse = {
+        data: {
+          sender_stark_key,
+          signable_responses: [
+            {
+              sender_vault_id,
+              receiver_stark_key,
+              receiver_vault_id,
+              asset_id,
+              amount,
+              nonce,
+              expiration_timestamp,
+              payload_hash,
+            },
+          ],
+        },
+      };
+      getSignableTransferMock.mockResolvedValue(mockSignableTransferResponse);
+
+      (mockGuardianClient.validate as jest.Mock).mockRejectedValue(new Error('Transaction rejected by user'));
+      await expect(() => batchNftTransfer({
+        user: mockUser,
+        starkSigner: mockStarkSigner,
+        request: transferRequest,
+        transfersApi: transferApiMock,
+        guardianClient: mockGuardianClient,
+      })).rejects.toThrow(
+        new PassportError(
+          `${PassportErrorType.TRANSFER_ERROR}: Transaction rejected by user`,
           PassportErrorType.TRANSFER_ERROR,
         ),
       );

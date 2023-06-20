@@ -84,8 +84,8 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         transfersApi: immutableXClient.transfersApi,
-        imxPublicApiDomain,
-        confirmationScreen,
+        // @ts-ignore
+        guardianClient: passportImxProvider.guardianClient,
       });
       expect(result).toEqual(returnValue);
     });
@@ -126,8 +126,8 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         ordersApi: immutableXClient.ordersApi,
-        imxPublicApiDomain,
-        confirmationScreen,
+        // @ts-ignore
+        guardianClient: passportImxProvider.guardianClient,
       });
       expect(result).toEqual(returnValue);
     });
@@ -146,8 +146,8 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         ordersApi: immutableXClient.ordersApi,
-        imxPublicApiDomain,
-        confirmationScreen,
+        // @ts-ignore
+        guardianClient: passportImxProvider.guardianClient,
       });
       expect(result).toEqual(returnValue);
     });
@@ -166,8 +166,8 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         tradesApi: immutableXClient.tradesApi,
-        imxPublicApiDomain,
-        confirmationScreen,
+        // @ts-ignore
+        guardianClient: passportImxProvider.guardianClient,
       });
       expect(result).toEqual(returnValue);
     });
@@ -186,8 +186,8 @@ describe('PassportImxProvider', () => {
         user: mockUser,
         starkSigner: mockStarkSigner,
         transfersApi: immutableXClient.transfersApi,
-        imxPublicApiDomain,
-        confirmationScreen,
+        // @ts-ignore
+        guardianClient: passportImxProvider.guardianClient,
       });
       expect(result).toEqual(returnValue);
     });
