@@ -1,5 +1,6 @@
 import { useReducer, ReactNode, useEffect } from 'react';
 import { CryptoFiat, CryptoFiatConfiguration } from '@imtbl/cryptofiat';
+import { Environment } from '@imtbl/config';
 import {
   CryptoFiatActions,
   CryptoFiatContext,
@@ -9,10 +10,11 @@ import {
 import { getCryptoToFiatConversion } from './CryptoFiat';
 
 interface CryptoFiatProviderProps {
+  environment: Environment;
   children: ReactNode;
 }
 
-export function CryptoFiatProvider({ children }: CryptoFiatProviderProps) {
+export function CryptoFiatProvider({ environment, children }: CryptoFiatProviderProps) {
   const [cryptoFiatState, cryptoFiatDispatch] = useReducer(
     cryptoFiatReducer,
     initialCryptoFiatState,
@@ -25,7 +27,9 @@ export function CryptoFiatProvider({ children }: CryptoFiatProviderProps) {
       payload: {
         type: CryptoFiatActions.SET_CRYPTO_FIAT,
         cryptoFiat: new CryptoFiat(new CryptoFiatConfiguration({
-          apiKey: process.env.REACT_APP_CRYPTO_FIAT_API_KEY,
+          baseConfig: {
+            environment,
+          },
         })),
       },
     });

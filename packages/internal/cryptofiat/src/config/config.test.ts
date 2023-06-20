@@ -1,22 +1,17 @@
 import { describe, expect, it } from '@jest/globals';
 import { CryptoFiatModuleConfiguration } from 'types';
 import { CryptoFiatConfiguration } from 'config';
+import { Environment } from '@imtbl/config';
 
 describe('config', () => {
-  it('should create successfully with API key', () => {
-    const apiKey = 'test-api-key';
+  it('should create with correct env', () => {
     const cryptoFiatConfiguration: CryptoFiatModuleConfiguration = {
-      apiKey,
+      baseConfig: {
+        environment: Environment.SANDBOX,
+      },
     };
 
     const config = new CryptoFiatConfiguration(cryptoFiatConfiguration);
-    expect(config.getApiKey()).toBe(apiKey);
-  });
-
-  it('should create successfully with empty API key', () => {
-    const cryptoFiatConfiguration: CryptoFiatModuleConfiguration = {};
-
-    const config = new CryptoFiatConfiguration(cryptoFiatConfiguration);
-    expect(config.getApiKey()).toBe(undefined);
+    expect(config.baseConfig.environment).toBe(Environment.SANDBOX);
   });
 });
