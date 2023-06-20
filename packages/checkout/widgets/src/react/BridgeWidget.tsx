@@ -14,7 +14,7 @@ import {
  * @property {Network} fromNetwork - The network to send tokens from.
  */
 export interface BridgeReactProps {
-  walletProvider: WalletProviderName;
+  walletProvider?: WalletProviderName;
   fromContractAddress?: string;
   amount?: string;
   fromNetwork?: Network;

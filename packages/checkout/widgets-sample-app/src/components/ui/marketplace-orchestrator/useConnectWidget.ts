@@ -1,3 +1,4 @@
+import { Web3Provider } from '@ethersproject/providers';
 import {
   ConnectEventType,
   ConnectionFailed,
@@ -9,7 +10,7 @@ import { useContext, useEffect, useState } from 'react';
 import { handleOrchestrationEvent } from './orchestration';
 import { WidgetContext, hideAllWidgets } from './WidgetProvider';
 
-export function useConnectWidget(setProviderPreference: (val: string) => void) {
+export function useConnectWidget(setWeb3Provider: (val: Web3Provider) => void) {
   const {showWidgets, setShowWidgets} = useContext(WidgetContext);
   const {showConnect} = showWidgets;
 
@@ -18,7 +19,7 @@ export function useConnectWidget(setProviderPreference: (val: string) => void) {
       switch (event.detail.type) {
         case ConnectEventType.SUCCESS: {
           const eventData = event.detail.data as ConnectionSuccess;
-          setProviderPreference(eventData.providerPreference);
+          setWeb3Provider(eventData.provider);
           break;
         }
         case ConnectEventType.FAILURE: {

@@ -61,7 +61,7 @@ function ConnectUI() {
   return (
     <div className="Connect">
       <h1 className="sample-heading">Checkout Connect (Web Component)</h1>
-      <ConnectReact providerName={WalletProviderName.METAMASK} />
+      <ConnectReact walletProvider={WalletProviderName.METAMASK} />
     </div>
   );
 }
