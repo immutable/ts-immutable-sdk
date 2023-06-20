@@ -4,18 +4,36 @@ import { Environment } from '@imtbl/config';
 import { ethers } from 'ethers';
 import { FungibleToken } from '@imtbl/bridge-sdk';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { ChainId } from '../types';
-import { getBridgeEstimatedGas, getBridgeFeeEstimate } from './bridgeGasEstimate';
 import {
+  ChainId,
   GasEstimateBridgeToL2Result,
   GasEstimateParams,
   GasEstimateSwapResult,
   GasEstimateType,
-} from '../types/gasEstimate';
+} from '../types';
+import {
+  getBridgeEstimatedGas,
+  getBridgeFeeEstimate,
+} from './bridgeGasEstimate';
 import * as instance from '../instance';
 import gasEstimateTokens from './gas_estimate_tokens.json';
 
 const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000000';
+const DEFAULT_TOKEN_DECIMALS = 18;
+
+const getL1ChainId = (environment: Environment): ChainId => {
+  if (environment === Environment.PRODUCTION) {
+    return ChainId.SEPOLIA;
+  }
+  return ChainId.SEPOLIA;
+};
+
+const getL2ChainId = (environment: Environment): ChainId => {
+  if (environment === Environment.PRODUCTION) {
+    return ChainId.IMTBL_ZKEVM_TESTNET;
+  }
+  return ChainId.IMTBL_ZKEVM_DEVNET;
+};
 
 async function bridgeToL2GasEstimator(
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
@@ -23,8 +41,8 @@ async function bridgeToL2GasEstimator(
   isSpendingCapApprovalRequired: boolean,
   tokenAddress?: FungibleToken,
 ): Promise<GasEstimateBridgeToL2Result> {
-  const fromChainId = environment === Environment.PRODUCTION ? ChainId.ETHEREUM : ChainId.SEPOLIA;
-  const toChainId = environment === Environment.PRODUCTION ? ChainId.IMTBL_ZKEVM_TESTNET : ChainId.IMTBL_ZKEVM_DEVNET;
+  const fromChainId = getL1ChainId(environment);
+  const toChainId = getL2ChainId(environment);
 
   const tokenAddresses = environment === Environment.PRODUCTION
     ? gasEstimateTokens[ChainId.SEPOLIA]
@@ -32,15 +50,10 @@ async function bridgeToL2GasEstimator(
 
   const { gasTokenAddress, fromAddress } = tokenAddresses.bridgeToL2Addresses;
 
-  const provider = environment === Environment.PRODUCTION
-    ? readOnlyProviders.get(ChainId.ETHEREUM)
-    : readOnlyProviders.get(ChainId.SEPOLIA);
+  const provider = readOnlyProviders.get(fromChainId);
 
   try {
-    const {
-      estimatedAmount,
-      token,
-    } = await getBridgeEstimatedGas(
+    const { estimatedAmount, token } = await getBridgeEstimatedGas(
       provider as Web3Provider,
       fromChainId,
       isSpendingCapApprovalRequired,
@@ -92,18 +105,20 @@ async function swapGasEstimator(
 
   const { inAddress, outAddress } = tokenAddresses.swapAddresses;
 
-  // todo: Use the environment to set chainId and also use zkevm when this is ready for swap
-  const chainId = ChainId.SEPOLIA;
+  const chainId = getL2ChainId(environment);
 
   try {
-    const exchange = await instance.createExchangeInstance(chainId, environment);
+    const exchange = await instance.createExchangeInstance(
+      chainId,
+      environment,
+    );
 
     // Create a fake transaction to get the gas from the quote
     const { info } = await exchange.getUnsignedSwapTxFromAmountIn(
       DUMMY_WALLET_ADDRESS,
       inAddress,
       outAddress,
-      BigNumber.from(utils.parseUnits('1', 18)),
+      BigNumber.from(utils.parseUnits('1', DEFAULT_TOKEN_DECIMALS)),
     );
 
     if (info.gasFeeEstimate === null) {
@@ -126,7 +141,8 @@ async function swapGasEstimator(
           address: info.gasFeeEstimate?.token.address,
           symbol: info.gasFeeEstimate?.token.symbol ?? '',
           name: info.gasFeeEstimate?.token.name ?? '',
-          decimals: info.gasFeeEstimate?.token.decimals ?? 18,
+          decimals:
+            info.gasFeeEstimate?.token.decimals ?? DEFAULT_TOKEN_DECIMALS,
         },
       },
     };
