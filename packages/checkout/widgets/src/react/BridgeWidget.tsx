@@ -1,4 +1,6 @@
 import React from 'react';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
+
 import {
   Network,
 } from '../definitions/types';
@@ -12,7 +14,7 @@ import {
  * @property {Network} fromNetwork - The network to send tokens from.
  */
 export interface BridgeReactProps {
-  providerPreference: string;
+  walletProvider: WalletProviderName;
   fromContractAddress?: string;
   amount?: string;
   fromNetwork?: Network;
@@ -25,7 +27,7 @@ export interface BridgeReactProps {
  */
 export function BridgeReact(props: BridgeReactProps): JSX.Element {
   const {
-    providerPreference,
+    walletProvider,
     fromContractAddress,
     amount,
     fromNetwork,
@@ -36,7 +38,7 @@ export function BridgeReact(props: BridgeReactProps): JSX.Element {
   return (
     <imtbl-bridge
       widgetConfig={config}
-      providerPreference={providerPreference}
+      walletProvider={walletProvider}
       fromContractAddress={fromContractAddress ?? ''}
       fromNetwork={fromNetwork ?? ''}
       amount={amount ?? ''}

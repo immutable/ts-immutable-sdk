@@ -1,5 +1,10 @@
 import { Environment } from '@imtbl/config';
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
+import {
+  CheckoutWidgets, SetProvider, CheckoutWidgetTagNames, BridgeReact,
+} from '@imtbl/checkout-widgets';
+import { useEffect } from 'react';
+
 import { WidgetTheme } from '../../lib';
 
 function BridgeWebView() {
@@ -8,14 +13,19 @@ function BridgeWebView() {
     environment: Environment.SANDBOX,
   };
 
+  CheckoutWidgets(config);
+
+  const checkout = new Checkout({ baseConfig: { environment: Environment.SANDBOX } });
+
+  useEffect(() => {
+    (async () => {
+      const createProviderRes = await checkout.createProvider({ providerName: WalletProviderName.METAMASK });
+      SetProvider(CheckoutWidgetTagNames.WALLET, createProviderRes.provider);
+    })();
+  });
+
   return (
-    <imtbl-bridge
-      providerPreference={ConnectionProviders.METAMASK}
-      widgetConfig={JSON.stringify(config)}
-      amount=""
-      fromContractAddress=""
-      fromNetwork="Sepolia"
-    />
+    <BridgeReact walletProvider={WalletProviderName.METAMASK} />
   );
 }
 

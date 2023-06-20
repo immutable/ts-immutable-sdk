@@ -2,7 +2,6 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   Checkout,
-  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { useEffect, useReducer } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
@@ -33,19 +32,12 @@ import { CoinInfo } from './views/CoinInfo';
 import { TopUpView } from '../../views/top-up/TopUpView';
 
 export interface WalletWidgetProps {
-  params: WalletWidgetParams;
   config: StrongCheckoutWidgetsConfig,
   web3Provider?: Web3Provider
 }
 
-export interface WalletWidgetParams {
-  providerName?: WalletProviderName;
-  web3Provider?: Web3Provider
-}
-
 export function WalletWidget(props: WalletWidgetProps) {
-  const { params, config, web3Provider } = props;
-  const { providerName } = params;
+  const { config, web3Provider } = props;
 
   const {
     environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
@@ -125,7 +117,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         },
       });
     })();
-  }, [providerName, checkout]);
+  }, [checkout]);
 
   const errorAction = () => {
     // TODO: please remove or if necessary keep the eslint ignore

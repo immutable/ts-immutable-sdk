@@ -1,7 +1,7 @@
 import React from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
-import { WalletWidget, WalletWidgetParams } from './WalletWidget';
+import { WalletWidget } from './WalletWidget';
 import {
   ConnectLoader,
   ConnectLoaderParams,
@@ -26,11 +26,6 @@ export class ImmutableWallet extends ImmutableWebComponent {
       web3Provider: this.provider,
     };
 
-    const walletParams: WalletWidgetParams = {
-      providerName: this.walletProvider,
-      web3Provider: this.provider,
-    };
-
     if (!this.reactRoot) {
       this.reactRoot = ReactDOM.createRoot(this);
     }
@@ -42,7 +37,7 @@ export class ImmutableWallet extends ImmutableWebComponent {
           closeEvent={sendWalletWidgetCloseEvent}
         >
           <WalletWidget
-            params={walletParams}
+            web3Provider={this.provider}
             config={this.widgetConfig!}
           />
         </ConnectLoader>

@@ -87,7 +87,7 @@ export interface ImtblBridgeProps
   React.HTMLAttributes<HTMLElement>,
   HTMLElement
   > {
-  providerPreference: string;
+  walletProvider: string;
   widgetConfig?: string;
   fromContractAddress: string;
   fromNetwork: string;

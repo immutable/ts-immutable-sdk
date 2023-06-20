@@ -2,14 +2,13 @@ import {
   BiomeCombinedProviders,
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
+import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
   Checkout,
-  ConnectionProviders,
   GetTokenAllowListResult,
   NetworkFilterTypes,
   TokenFilterTypes,
-  WalletProviderName,
   RPC_URL_MAP,
 } from '@imtbl/checkout-sdk';
 import {
@@ -45,17 +44,17 @@ import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
   config: StrongCheckoutWidgetsConfig
+  web3Provider?: Web3Provider;
 }
 
 export interface BridgeWidgetParams {
-  providerPreference: ConnectionProviders;
   fromContractAddress?: string;
   amount?: string;
   fromNetwork?: Network;
 }
 
 export function BridgeWidget(props: BridgeWidgetProps) {
-  const { params, config } = props;
+  const { params, config, web3Provider } = props;
   const { environment, theme } = config;
   const successText = text.views[BridgeWidgetViews.SUCCESS];
   const failText = text.views[BridgeWidgetViews.FAIL];
@@ -72,7 +71,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
 
   const {
-    providerPreference, amount, fromContractAddress,
+    amount, fromContractAddress,
   } = params;
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
@@ -84,8 +83,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
 
   useEffect(() => {
     const bridgetWidgetSetup = async () => {
-      if (!providerPreference) return;
-
+      if (!web3Provider) return;
       const checkout = new Checkout({
         baseConfig: { environment },
       });
@@ -97,18 +95,10 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         },
       });
 
-      const connectResult = await checkout.createProvider({
-        providerName: WalletProviderName.METAMASK,
-      });
-
-      const getNetworkResult = await checkout.getNetworkInfo({
-        provider: connectResult.provider,
-      });
-
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_PROVIDER,
-          provider: connectResult.provider,
+          provider: web3Provider,
         },
       });
 
@@ -135,13 +125,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         },
       });
 
-      bridgeDispatch({
-        payload: {
-          type: BridgeActions.SET_NETWORK,
-          network: getNetworkResult,
-        },
-      });
-
       const allowedBridgingNetworks = await checkout.getNetworkAllowList({
         type: NetworkFilterTypes.ALL,
       });
@@ -157,9 +140,18 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         });
       }
 
-      const address = await connectResult.provider.getSigner().getAddress();
+      const getNetworkResult = await checkout.getNetworkInfo({ provider: web3Provider });
+
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_NETWORK,
+          network: getNetworkResult,
+        },
+      });
+
+      const address = await web3Provider.getSigner().getAddress();
       const tokenBalances = await checkout.getAllBalances({
-        provider: connectResult.provider,
+        provider: web3Provider,
         walletAddress: address,
         chainId: getNetworkResult.chainId,
       });
@@ -201,7 +193,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
     if (firstRender.current) {
       bridgetWidgetSetup();
     }
-  }, [providerPreference, defaultFromChainId, toChainId, firstRender.current]);
+  }, [web3Provider, defaultFromChainId, toChainId, firstRender.current]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>

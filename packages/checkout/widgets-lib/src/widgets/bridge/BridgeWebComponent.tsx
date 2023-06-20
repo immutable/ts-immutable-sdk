@@ -1,10 +1,10 @@
 import React from 'react';
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { ConnectTargetLayer, Network } from '../../lib';
-import { ConnectLoader } from '../../components/ConnectLoader/ConnectLoader';
+import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 
 export class ImmutableBridge extends ImmutableWebComponent {
@@ -14,7 +14,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
   amount = '';
 
-  providerPreference: ConnectionProviders = ConnectionProviders.METAMASK;
+  walletProvider: WalletProviderName = WalletProviderName.METAMASK;
 
   useConnectWidget?: boolean;
 
@@ -23,21 +23,20 @@ export class ImmutableBridge extends ImmutableWebComponent {
     this.fromContract = this.getAttribute('fromContractAddress') as string;
     this.fromNetwork = this.getAttribute('fromNetwork') as Network;
     this.amount = this.getAttribute('amount') as string;
-    this.providerPreference = this.getAttribute(
-      'providerPreference',
-    ) as ConnectionProviders;
+    this.walletProvider = this.getAttribute(
+      'walletProvider',
+    ) as WalletProviderName;
     const useConnectWidgetProp = this.getAttribute('useConnectWidget');
     this.useConnectWidget = useConnectWidgetProp?.toLowerCase() !== 'false';
     this.renderWidget();
   }
 
   renderWidget() {
-    const connectLoaderParams = {
+    const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER1,
-      providerPreference: this.providerPreference,
+      providerName: this.walletProvider,
     };
     const params: BridgeWidgetParams = {
-      providerPreference: this.providerPreference,
       fromContractAddress: this.fromContract,
       fromNetwork: this.fromNetwork,
       amount: this.amount,
