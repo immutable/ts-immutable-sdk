@@ -5,8 +5,8 @@ import {
   UnsignedExchangeTransferRequest,
 } from '@imtbl/core-sdk';
 import { convertToSignableToken } from '@imtbl/toolkit';
-import { PassportErrorType, withPassportError } from '../errors/passportError';
-import { UserWithEtherKey } from '../types';
+import { PassportErrorType, withPassportError } from '../../errors/passportError';
+import { UserWithEtherKey } from '../../types';
 
 type TransfersParams = {
   user: UserWithEtherKey;

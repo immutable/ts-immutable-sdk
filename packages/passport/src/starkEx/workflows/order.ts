@@ -9,9 +9,9 @@ import {
   UnsignedOrderRequest,
 } from '@imtbl/core-sdk';
 import { convertToSignableToken } from '@imtbl/toolkit';
-import { PassportErrorType, withPassportError } from '../errors/passportError';
-import { UserWithEtherKey } from '../types';
-import { ConfirmationScreen, TransactionTypes } from '../confirmation';
+import { PassportErrorType, withPassportError } from '../../errors/passportError';
+import { UserWithEtherKey } from '../../types';
+import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
 
 type CancelOrderParams = {
   request: GetSignableCancelOrderRequest;

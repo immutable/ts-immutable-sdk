@@ -1,10 +1,10 @@
 import { TradesApi } from '@imtbl/core-sdk';
 import { createTrade } from './trades';
-import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
-import { PassportError, PassportErrorType } from '../errors/passportError';
-import { ConfirmationScreen, TransactionTypes } from '../confirmation';
+import { mockErrorMessage, mockStarkSignature, mockUser } from '../../test/mocks';
+import { PassportError, PassportErrorType } from '../../errors/passportError';
+import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
 
-jest.mock('../confirmation/confirmation');
+jest.mock('../../confirmation');
 
 const mockPayloadHash = 'test_payload_hash';
 const mockSignableTradeRequest = {

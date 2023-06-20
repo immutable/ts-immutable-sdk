@@ -21,10 +21,14 @@ import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { IMXProvider } from '@imtbl/provider';
 import { UserWithEtherKey } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
-import { batchNftTransfer, transfer } from '../workflows/transfer';
-import { cancelOrder, createOrder } from '../workflows/order';
-import { exchangeTransfer } from '../workflows/exchange';
-import { createTrade } from '../workflows/trades';
+import {
+  batchNftTransfer,
+  transfer,
+  cancelOrder,
+  createOrder,
+  exchangeTransfer,
+  createTrade,
+} from './workflows';
 import { ConfirmationScreen } from '../confirmation';
 
 export type PassportImxProviderInput = {
@@ -35,7 +39,7 @@ export type PassportImxProviderInput = {
   imxPublicApiDomain: string;
 };
 
-export default class PassportImxProvider implements IMXProvider {
+export class PassportImxProvider implements IMXProvider {
   private readonly user: UserWithEtherKey;
 
   private readonly starkSigner: StarkSigner;
