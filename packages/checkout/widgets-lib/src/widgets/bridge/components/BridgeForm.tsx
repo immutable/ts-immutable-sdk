@@ -434,6 +434,7 @@ export function BridgeForm(props: BridgeFormProps) {
           variant="primary"
           onClick={submitBridge}
           disabled={loading}
+          size="large"
         >
           {loading ? (
             <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
