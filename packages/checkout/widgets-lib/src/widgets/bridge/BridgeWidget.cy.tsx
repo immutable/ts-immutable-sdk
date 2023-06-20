@@ -3,7 +3,9 @@ import {
   describe, it, cy, beforeEach,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { Checkout, CheckoutErrorType, TokenAmountEstimate } from '@imtbl/checkout-sdk';
+import {
+  Checkout, CheckoutErrorType, GasEstimateType, TokenAmountEstimate,
+} from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CompletionStatus, TokenBridge } from '@imtbl/bridge-sdk';
@@ -152,9 +154,10 @@ describe('Bridge Widget tests', () => {
     // TokenBridge which is at a higher level and which uses the JsonRpcProvider
     cy.stub(JsonRpcProvider.prototype, 'detectNetwork').resolves({ name: '', chainId: '0x1' });
 
-    cy.stub(Checkout.prototype, 'getBridgeGasEstimate')
-      .as('getBridgeGasEstimate')
+    cy.stub(Checkout.prototype, 'gasEstimate')
+      .as('gasEstimateStub')
       .resolves({
+        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
         bridgeFee: {
           estimatedAmount: BigNumber.from('0'),
           token: {
@@ -519,7 +522,7 @@ describe('Bridge Widget tests', () => {
       cySmartGet('failure-box').should('be.visible');
     });
 
-    it.only('should submit the bridge and show fail when recoverable error and refill form when retry', () => {
+    it('should submit the bridge and show fail when recoverable error and refill form when retry', () => {
       const params = {
         providerPreference: 'metamask',
       } as BridgeWidgetParams;

@@ -31,7 +31,7 @@ import {
 } from './context/BridgeContext';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { sendBridgeFailedEvent, sendBridgeSuccessEvent, sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
-import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { BridgeSuccessView, BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { Bridge } from './views/Bridge';
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
@@ -227,7 +227,9 @@ export function BridgeWidget(props: BridgeWidgetProps) {
                 statusText={successText.text} // todo: move to text
                 actionText={successText.actionText}
                 onActionClick={sendBridgeWidgetCloseEvent}
-                onRenderEvent={sendBridgeSuccessEvent}
+                onRenderEvent={() => sendBridgeSuccessEvent(
+                  (viewReducerValues.viewState.view as BridgeSuccessView).data.transactionHash,
+                )}
                 statusType={StatusType.SUCCESS}
                 testId="success-view"
               />
