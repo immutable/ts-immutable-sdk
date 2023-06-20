@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Environment } from '@imtbl/config';
-import { RemoteConfig } from './remoteConfig';
+import { CHECKOUT_API_BASE_URL, RemoteConfig } from './remoteConfig';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -30,7 +30,7 @@ describe('RemoteConfig', () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       1,
-      'https://checkout-api.immutable.com/v1/config',
+      `${CHECKOUT_API_BASE_URL[Environment.PRODUCTION]}/v1/config`,
     );
   });
 
@@ -54,7 +54,7 @@ describe('RemoteConfig', () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       1,
-      'https://checkout-api.sandbox.immutable.com/v1/config',
+      `${CHECKOUT_API_BASE_URL[Environment.SANDBOX]}/v1/config`,
     );
   });
 });

@@ -6,9 +6,9 @@ import { Environment } from '@imtbl/config';
 import { ExchangeOverrides } from '@imtbl/dex-sdk';
 import axios from 'axios';
 
-const CHECKOUT_API_BASE_URL = {
-  [Environment.SANDBOX]: 'https://checkout-api.sandbox.immutable.com',
-  [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
+export const CHECKOUT_API_BASE_URL = {
+  [Environment.SANDBOX]: 'https://checkout-api.dev.immutable.com',
+  [Environment.PRODUCTION]: 'https://checkout-api.sandbox.immutable.com',
 };
 
 export type RemoteConfigParams = {

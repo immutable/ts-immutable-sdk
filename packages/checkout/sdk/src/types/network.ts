@@ -1,16 +1,18 @@
 import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 import { TokenInfo } from './tokenInfo';
 import { ChainId } from './chainId';
 import { NetworkInfo } from './networkInfo';
+import { CHECKOUT_API_BASE_URL } from '../config/remoteConfig';
 
 /**
  * Object mapping the list of supported networks with the corresponding RPC urls.
  */
 export type RpcUrlMap = Map<ChainId, string>;
-export const RPC_URL_MAP: RpcUrlMap = new Map<ChainId, string>([
-  [ChainId.ETHEREUM, 'https://checkout-api.sandbox.immutable.com/v1/rpc/eth-mainnet'],
+export const RPC_URL_MAP = new Map<ChainId, string>([
+  [ChainId.ETHEREUM, `${CHECKOUT_API_BASE_URL[Environment.PRODUCTION]}/v1/rpc/eth-mainnet`],
   [ChainId.IMTBL_ZKEVM_TESTNET, 'https://zkevm-rpc.sandbox.x.immutable.com'],
-  [ChainId.SEPOLIA, 'https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia'],
+  [ChainId.SEPOLIA, `${CHECKOUT_API_BASE_URL[Environment.PRODUCTION]}/v1/rpc/eth-sepolia`],
   [ChainId.IMTBL_ZKEVM_DEVNET, 'https://zkevm-rpc.dev.x.immutable.com'],
 ]);
 
