@@ -16,27 +16,18 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { Order } from './order';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Page } from './page';
 
 /**
  * 
  * @export
- * @interface ListOrdersResult
+ * @interface ListingResult
  */
-export interface ListOrdersResult {
+export interface ListingResult {
     /**
      * 
-     * @type {Page}
-     * @memberof ListOrdersResult
+     * @type {Order}
+     * @memberof ListingResult
      */
-    'page': Page;
-    /**
-     * 
-     * @type {Array<Order>}
-     * @memberof ListOrdersResult
-     */
-    'result': Array<Order>;
+    'result': Order;
 }
 

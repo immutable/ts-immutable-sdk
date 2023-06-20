@@ -46,8 +46,12 @@
       "x-displayName": "tokens"
     },
     {
+      "name": "listings",
+      "description": "Listings Endpoints",
+      "x-displayName": "listings"
+    },
+    {
       "name": "orders",
-      "description": "Orders Endpoints",
       "x-displayName": "orders"
     },
     {
@@ -67,6 +71,7 @@
         "nft owners",
         "demopage",
         "tokens",
+        "listings",
         "orders",
         "passport"
       ],
@@ -883,14 +888,15 @@
         }
       }
     },
-    "/v1/chains/{chain_name}/orders": {
+    "/v1/chains/{chain_name}/listings": {
       "get": {
         "tags": [
-          "orders"
+          "orders",
+          "listings"
         ],
-        "summary": "List all orders",
-        "description": "List all orders",
-        "operationId": "ListOrders",
+        "summary": "List all listings",
+        "description": "List all listings",
+        "operationId": "ListListings",
         "parameters": [
           {
             "name": "chain_name",
@@ -988,7 +994,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListOrdersResult"
+                  "$ref": "#/components/schemas/ListListingsResult"
                 }
               }
             }
@@ -1006,11 +1012,12 @@
       },
       "post": {
         "tags": [
+          "listings",
           "orders"
         ],
-        "summary": "Create an order",
-        "description": "Create an order",
-        "operationId": "CreateOrder",
+        "summary": "Create a listing",
+        "description": "Create a listing",
+        "operationId": "CreateListing",
         "parameters": [
           {
             "name": "chain_name",
@@ -1026,7 +1033,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateOrderRequestBody"
+                "$ref": "#/components/schemas/CreateListingRequestBody"
               }
             }
           }
@@ -1037,7 +1044,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderResult"
+                  "$ref": "#/components/schemas/ListingResult"
                 }
               }
             }
@@ -1054,14 +1061,15 @@
         }
       }
     },
-    "/v1/chains/{chain_name}/orders/{order_id}": {
+    "/v1/chains/{chain_name}/listings/{listing_id}": {
       "get": {
         "tags": [
+          "listings",
           "orders"
         ],
-        "summary": "Get a single order by ID",
-        "description": "Get a single order by ID",
-        "operationId": "GetOrder",
+        "summary": "Get a single listing by ID",
+        "description": "Get a single listing by ID",
+        "operationId": "GetListing",
         "parameters": [
           {
             "name": "chain_name",
@@ -1072,7 +1080,7 @@
             }
           },
           {
-            "name": "order_id",
+            "name": "listing_id",
             "in": "path",
             "description": "Global Order identifier",
             "required": true,
@@ -1090,7 +1098,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderResult"
+                  "$ref": "#/components/schemas/ListingResult"
                 }
               }
             }
@@ -1319,7 +1327,7 @@
         "type": "object",
         "properties": {
           "contract_type": {
-            "$ref": "#/components/schemas/ContractType"
+            "$ref": "#/components/schemas/NFTContractType"
           },
           "contract_address": {
             "description": "The token contract address",
@@ -1342,7 +1350,7 @@
         "type": "object",
         "properties": {
           "contract_type": {
-            "$ref": "#/components/schemas/ContractType"
+            "$ref": "#/components/schemas/TokenContractType"
           },
           "contract_address": {
             "description": "The contract address",
@@ -1554,24 +1562,21 @@
             "type": "string",
             "example": "ARZ3NDEKTSV4RRFFQ69G5FAV"
           },
-          "buyer_address": {
+          "to": {
             "description": "The account address of buyer",
             "type": "string",
             "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
           },
-          "seller_address": {
+          "from": {
             "description": "The account address of seller",
             "type": "string",
             "example": "0xbD6cFcf93474De653d7B42b346c7c25d1F9c559C"
           },
-          "quantity": {
-            "description": "The quantity of tokens sold",
-            "type": "integer",
-            "format": "int32",
-            "example": 1
-          },
           "asset": {
-            "$ref": "#/components/schemas/ActivityNFT"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityNFT"
+            }
           },
           "payment": {
             "$ref": "#/components/schemas/SalePayment"
@@ -1580,9 +1585,8 @@
         "required": [
           "activity_type",
           "order_id",
-          "buyer_address",
-          "seller_address",
-          "quantity",
+          "to",
+          "from",
           "asset",
           "payment"
         ]
@@ -1957,14 +1961,6 @@
         "description": "The name of chain",
         "example": "imtbl-zkevm-testnet"
       },
-      "ContractType": {
-        "description": "The contract type",
-        "type": "string",
-        "enum": [
-          "ERC721",
-          "ERC20"
-        ]
-      },
       "ActivityID": {
         "description": "Activity ID in UUIDv4 format",
         "type": "string",
@@ -1976,6 +1972,20 @@
         "type": "string",
         "enum": [
           "ERC721"
+        ]
+      },
+      "NFTContractType": {
+        "description": "The contract type for an NFT",
+        "type": "string",
+        "enum": [
+          "ERC721"
+        ]
+      },
+      "TokenContractType": {
+        "description": "The contract type for a token",
+        "type": "string",
+        "enum": [
+          "ERC20"
         ]
       },
       "NFTWithMetadataAttributes": {
@@ -2409,7 +2419,7 @@
           "start_amount"
         ]
       },
-      "CreateOrderRequestBody": {
+      "CreateListingRequestBody": {
         "type": "object",
         "properties": {
           "account_address": {
@@ -2735,7 +2745,7 @@
           "status"
         ]
       },
-      "OrderResult": {
+      "ListingResult": {
         "type": "object",
         "properties": {
           "result": {
@@ -2785,7 +2795,7 @@
           }
         }
       },
-      "ListOrdersResult": {
+      "ListListingsResult": {
         "type": "object",
         "properties": {
           "page": {
