@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ContractType } from './contract-type';
+import { TokenContractType } from './token-contract-type';
 
 /**
  * 
@@ -25,10 +25,10 @@ import { ContractType } from './contract-type';
 export interface ActivityToken {
     /**
      * 
-     * @type {ContractType}
+     * @type {TokenContractType}
      * @memberof ActivityToken
      */
-    'contract_type': ContractType;
+    'contract_type': TokenContractType;
     /**
      * The contract address
      * @type {string}

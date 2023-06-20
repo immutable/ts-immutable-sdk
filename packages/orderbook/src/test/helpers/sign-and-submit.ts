@@ -17,11 +17,13 @@ export async function signAndSubmitTx(
 }
 
 export async function signMessage(
-  domainData: TypedDataDomain,
-  types: any,
-  value: Record<string, any>,
+  {
+    domain,
+    types,
+    value,
+  }: { domain: TypedDataDomain, types: any, value: Record<string, any> },
   signer: Wallet,
 ): Promise<string> {
   // eslint-disable-next-line
-  return signer._signTypedData(domainData, types, value);
+  return signer._signTypedData(domain, types, value);
 }

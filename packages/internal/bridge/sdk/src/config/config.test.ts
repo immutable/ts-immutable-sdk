@@ -34,7 +34,7 @@ describe('config', () => {
 
     expect(() => new BridgeConfiguration(bridgeModuleConfiguration)).toThrow(
       new Error(
-        'Bridge instance with rootchain eip155:11155111 and childchain eip155:13373 is not supported in environment production',
+        'Bridge instance with rootchain eip155:11155111 and childchain eip155:13383 is not supported in environment production',
       ),
     );
   });
