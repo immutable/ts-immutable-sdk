@@ -35,10 +35,10 @@ import { ListingResult } from '../models';
 // @ts-ignore
 import { OrderStatus } from '../models';
 /**
- * OrdersApi - axios parameter creator
+ * ListingsApi - axios parameter creator
  * @export
  */
-export const OrdersApiAxiosParamCreator = function (configuration?: Configuration) {
+export const ListingsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * Create a listing
@@ -191,11 +191,11 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
 };
 
 /**
- * OrdersApi - functional programming interface
+ * ListingsApi - functional programming interface
  * @export
  */
-export const OrdersApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = OrdersApiAxiosParamCreator(configuration)
+export const ListingsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ListingsApiAxiosParamCreator(configuration)
     return {
         /**
          * Create a listing
@@ -243,11 +243,11 @@ export const OrdersApiFp = function(configuration?: Configuration) {
 };
 
 /**
- * OrdersApi - factory interface
+ * ListingsApi - factory interface
  * @export
  */
-export const OrdersApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = OrdersApiFp(configuration)
+export const ListingsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ListingsApiFp(configuration)
     return {
         /**
          * Create a listing
@@ -292,150 +292,150 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
 };
 
 /**
- * Request parameters for createListing operation in OrdersApi.
+ * Request parameters for createListing operation in ListingsApi.
  * @export
- * @interface OrdersApiCreateListingRequest
+ * @interface ListingsApiCreateListingRequest
  */
-export interface OrdersApiCreateListingRequest {
+export interface ListingsApiCreateListingRequest {
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiCreateListing
+     * @memberof ListingsApiCreateListing
      */
     readonly chainName: string
 
     /**
      * 
      * @type {CreateListingRequestBody}
-     * @memberof OrdersApiCreateListing
+     * @memberof ListingsApiCreateListing
      */
     readonly createListingRequestBody: CreateListingRequestBody
 }
 
 /**
- * Request parameters for getListing operation in OrdersApi.
+ * Request parameters for getListing operation in ListingsApi.
  * @export
- * @interface OrdersApiGetListingRequest
+ * @interface ListingsApiGetListingRequest
  */
-export interface OrdersApiGetListingRequest {
+export interface ListingsApiGetListingRequest {
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiGetListing
+     * @memberof ListingsApiGetListing
      */
     readonly chainName: string
 
     /**
      * Global Order identifier
      * @type {string}
-     * @memberof OrdersApiGetListing
+     * @memberof ListingsApiGetListing
      */
     readonly listingId: string
 }
 
 /**
- * Request parameters for listListings operation in OrdersApi.
+ * Request parameters for listListings operation in ListingsApi.
  * @export
- * @interface OrdersApiListListingsRequest
+ * @interface ListingsApiListListingsRequest
  */
-export interface OrdersApiListListingsRequest {
+export interface ListingsApiListListingsRequest {
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiListListings
+     * @memberof ListingsApiListListings
      */
     readonly chainName: string
 
     /**
      * Order status to filter by
      * @type {OrderStatus}
-     * @memberof OrdersApiListListings
+     * @memberof ListingsApiListListings
      */
     readonly status?: OrderStatus
 
     /**
      * Sell item contract address to filter by
      * @type {string}
-     * @memberof OrdersApiListListings
+     * @memberof ListingsApiListListings
      */
     readonly sellItemContractAddress?: string
 
     /**
      * Sell item token identifier to filter by
      * @type {string}
-     * @memberof OrdersApiListListings
+     * @memberof ListingsApiListListings
      */
     readonly sellItemTokenId?: string
 
     /**
      * Maximum number of orders to return per page
      * @type {number}
-     * @memberof OrdersApiListListings
+     * @memberof ListingsApiListListings
      */
     readonly pageSize?: number
 
     /**
      * Order field to sort by
      * @type {'created_at' | 'updated_at' | 'buy_item_amount'}
-     * @memberof OrdersApiListListings
+     * @memberof ListingsApiListListings
      */
     readonly sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount'
 
     /**
      * Ascending or descending direction for sort
      * @type {'asc' | 'desc'}
-     * @memberof OrdersApiListListings
+     * @memberof ListingsApiListListings
      */
     readonly sortDirection?: 'asc' | 'desc'
 
     /**
      * Page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof OrdersApiListListings
+     * @memberof ListingsApiListListings
      */
     readonly pageCursor?: string
 }
 
 /**
- * OrdersApi - object-oriented interface
+ * ListingsApi - object-oriented interface
  * @export
- * @class OrdersApi
+ * @class ListingsApi
  * @extends {BaseAPI}
  */
-export class OrdersApi extends BaseAPI {
+export class ListingsApi extends BaseAPI {
     /**
      * Create a listing
      * @summary Create a listing
-     * @param {OrdersApiCreateListingRequest} requestParameters Request parameters.
+     * @param {ListingsApiCreateListingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof OrdersApi
+     * @memberof ListingsApi
      */
-    public createListing(requestParameters: OrdersApiCreateListingRequest, options?: AxiosRequestConfig) {
-        return OrdersApiFp(this.configuration).createListing(requestParameters.chainName, requestParameters.createListingRequestBody, options).then((request) => request(this.axios, this.basePath));
+    public createListing(requestParameters: ListingsApiCreateListingRequest, options?: AxiosRequestConfig) {
+        return ListingsApiFp(this.configuration).createListing(requestParameters.chainName, requestParameters.createListingRequestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Get a single listing by ID
      * @summary Get a single listing by ID
-     * @param {OrdersApiGetListingRequest} requestParameters Request parameters.
+     * @param {ListingsApiGetListingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof OrdersApi
+     * @memberof ListingsApi
      */
-    public getListing(requestParameters: OrdersApiGetListingRequest, options?: AxiosRequestConfig) {
-        return OrdersApiFp(this.configuration).getListing(requestParameters.chainName, requestParameters.listingId, options).then((request) => request(this.axios, this.basePath));
+    public getListing(requestParameters: ListingsApiGetListingRequest, options?: AxiosRequestConfig) {
+        return ListingsApiFp(this.configuration).getListing(requestParameters.chainName, requestParameters.listingId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * List all listings
      * @summary List all listings
-     * @param {OrdersApiListListingsRequest} requestParameters Request parameters.
+     * @param {ListingsApiListListingsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof OrdersApi
+     * @memberof ListingsApi
      */
-    public listListings(requestParameters: OrdersApiListListingsRequest, options?: AxiosRequestConfig) {
-        return OrdersApiFp(this.configuration).listListings(requestParameters.chainName, requestParameters.status, requestParameters.sellItemContractAddress, requestParameters.sellItemTokenId, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
+    public listListings(requestParameters: ListingsApiListListingsRequest, options?: AxiosRequestConfig) {
+        return ListingsApiFp(this.configuration).listListings(requestParameters.chainName, requestParameters.status, requestParameters.sellItemContractAddress, requestParameters.sellItemTokenId, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
     }
 }
