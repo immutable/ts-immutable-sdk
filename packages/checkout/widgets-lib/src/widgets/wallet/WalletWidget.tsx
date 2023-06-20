@@ -90,11 +90,9 @@ export function WalletWidget(props: WalletWidgetProps) {
     (async () => {
       if (!checkout || !web3Provider) return;
 
-      const getNetworkResult = await checkout.getNetworkInfo({
+      const network = await checkout.getNetworkInfo({
         provider: web3Provider,
       });
-
-      const network = getNetworkResult;
 
       walletDispatch({
         payload: {

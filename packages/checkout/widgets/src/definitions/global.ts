@@ -65,9 +65,8 @@ export interface ImtblSwapProps
   React.HTMLAttributes<HTMLElement>,
   HTMLElement
   > {
-  providerPreference: string;
+  walletProvider?: string;
   widgetConfig?: string;
-  useConnectWidget?: string;
   amount: string;
   fromContractAddress: string;
   toContractAddress: string;
@@ -87,7 +86,7 @@ export interface ImtblBridgeProps
   React.HTMLAttributes<HTMLElement>,
   HTMLElement
   > {
-  walletProvider: string;
+  walletProvider?: string;
   widgetConfig?: string;
   fromContractAddress: string;
   fromNetwork: string;

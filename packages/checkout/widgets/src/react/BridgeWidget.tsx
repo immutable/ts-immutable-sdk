@@ -7,7 +7,7 @@ import {
 
 /**
  * Interface representing the props for the Bridge Widget component.
- * @property {string} providerPreference - The preferred provider for the Bridge Widget
+ * @property {string} walletProvider - The preferred provider for the Bridge Widget
  * (default: "metamask").
  * @property {string} fromContractAddress - The contract address to send tokens from.
  * @property {string} amount - The amount of tokens to send.

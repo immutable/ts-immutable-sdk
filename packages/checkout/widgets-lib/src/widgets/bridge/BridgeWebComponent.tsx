@@ -16,8 +16,6 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
   walletProvider: WalletProviderName = WalletProviderName.METAMASK;
 
-  useConnectWidget?: boolean;
-
   connectedCallback() {
     super.connectedCallback();
     this.fromContract = this.getAttribute('fromContractAddress') as string;
@@ -26,8 +24,6 @@ export class ImmutableBridge extends ImmutableWebComponent {
     this.walletProvider = this.getAttribute(
       'walletProvider',
     ) as WalletProviderName;
-    const useConnectWidgetProp = this.getAttribute('useConnectWidget');
-    this.useConnectWidget = useConnectWidgetProp?.toLowerCase() !== 'false';
     this.renderWidget();
   }
 
@@ -48,23 +44,16 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        {this.useConnectWidget ? (
-          <ConnectLoader
-            params={connectLoaderParams}
-            closeEvent={sendBridgeWidgetCloseEvent}
-            widgetConfig={this.widgetConfig!}
-          >
-            <BridgeWidget
-              params={params}
-              config={this.widgetConfig!}
-            />
-          </ConnectLoader>
-        ) : (
+        <ConnectLoader
+          params={connectLoaderParams}
+          closeEvent={sendBridgeWidgetCloseEvent}
+          widgetConfig={this.widgetConfig!}
+        >
           <BridgeWidget
             params={params}
             config={this.widgetConfig!}
           />
-        )}
+        </ConnectLoader>
       </React.StrictMode>,
     );
   }
