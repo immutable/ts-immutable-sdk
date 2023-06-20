@@ -6,7 +6,10 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
-    "rollup": "^3.17.2"
+    "hardhat": "^2.15.0",
+    "rollup": "^3.17.2",
+    "typechain": "^8.1.1",
+    "typescript": "^4.9.5"
   },
   "engines": {
     "node": ">=16.11.0"
@@ -21,7 +24,10 @@
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
     "build": "NODE_ENV=production rollup --config rollup.config.js",
-    "generate-types": "typechain --target=ethers-v5 --out-dir=src/typechain/types './src/abi/*.json'",
+    "copy:generated-abis": "node ./scripts/copy-generated-abis.js",
+    "generate:abis": "hardhat compile",
+    "generate:typechain-types": "typechain --target=ethers-v5 --out-dir=src/typechain/types './src/abi/*.json'",
+    "generate:types": "yarn generate:abis && yarn copy:generated-abis && yarn generate:typechain-types",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "prepare": "wsrun -r build",
     "typecheck": "tsc --noEmit --jsx preserve"
