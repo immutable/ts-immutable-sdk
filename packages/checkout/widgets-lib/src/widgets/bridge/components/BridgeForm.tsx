@@ -161,7 +161,6 @@ export function BridgeForm(props: BridgeFormProps) {
 
     const gasEstimateResult = await checkout.gasEstimate({
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-      tokenAddress: token?.token.address || 'NATIVE',
       isSpendingCapApprovalRequired: !!transactions?.approveRes?.unsignedTx,
     }) as GasEstimateBridgeToL2Result;
 
