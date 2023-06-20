@@ -38,7 +38,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
   renderWidget() {
     const connectLoaderParams: ConnectLoaderParams = {
-      targetLayer: ConnectTargetLayer.LAYER1,
+      targetLayer: ConnectTargetLayer.LAYER2,
       providerPreference: this.providerPreference,
     };
 

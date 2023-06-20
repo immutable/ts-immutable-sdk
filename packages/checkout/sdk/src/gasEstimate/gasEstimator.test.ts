@@ -2,9 +2,14 @@ import { BigNumber, ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { Exchange } from '@imtbl/dex-sdk';
 import { TokenBridge } from '@imtbl/bridge-sdk';
-import { gasServiceEstimator } from './gasEstimator';
+import { gasEstimator } from './gasEstimator';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { GasEstimateBridgeToL2Result, GasEstimateSwapResult, GasEstimateType } from '../types/gasEstimate';
+import {
+  GasEstimateBridgeToL2Result,
+  GasEstimateSwapParams,
+  GasEstimateSwapResult,
+  GasEstimateType,
+} from '../types/gasEstimate';
 import { ChainId } from '../types';
 import { createBridgeInstance, createExchangeInstance } from '../instance';
 
@@ -43,8 +48,8 @@ describe('gasServiceEstimator', () => {
         }),
       } as unknown as Exchange);
 
-      const result = await gasServiceEstimator(
-        GasEstimateType.SWAP,
+      const result = await gasEstimator(
+        { gasEstimateType: GasEstimateType.SWAP },
         readOnlyProviders,
         Environment.SANDBOX,
       ) as GasEstimateSwapResult;
@@ -66,8 +71,8 @@ describe('gasServiceEstimator', () => {
         }),
       } as unknown as Exchange);
 
-      const result = await gasServiceEstimator(
-        GasEstimateType.SWAP,
+      const result = await gasEstimator(
+        { gasEstimateType: GasEstimateType.SWAP },
         readOnlyProviders,
         Environment.SANDBOX,
       ) as GasEstimateSwapResult;
@@ -95,8 +100,8 @@ describe('gasServiceEstimator', () => {
         }),
       } as unknown as Exchange);
 
-      const result = await gasServiceEstimator(
-        GasEstimateType.SWAP,
+      const result = await gasEstimator(
+        { gasEstimateType: GasEstimateType.SWAP },
         readOnlyProviders,
         Environment.SANDBOX,
       ) as GasEstimateSwapResult;
@@ -120,8 +125,8 @@ describe('gasServiceEstimator', () => {
         getUnsignedSwapTxFromAmountIn: jest.fn().mockRejectedValue({}),
       } as unknown as Exchange);
 
-      const result = await gasServiceEstimator(
-        GasEstimateType.SWAP,
+      const result = await gasEstimator(
+        { gasEstimateType: GasEstimateType.SWAP },
         readOnlyProviders,
         Environment.SANDBOX,
       ) as GasEstimateSwapResult;
@@ -141,8 +146,33 @@ describe('gasServiceEstimator', () => {
         }),
       } as unknown as TokenBridge);
 
-      const result = await gasServiceEstimator(
-        GasEstimateType.BRIDGE_TO_L2,
+      const result = await gasEstimator(
+        {
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          isSpendingCapApprovalRequired: false,
+        },
+        readOnlyProviders,
+        Environment.SANDBOX,
+      ) as GasEstimateBridgeToL2Result;
+
+      expect(result.gasEstimateType).toEqual(GasEstimateType.BRIDGE_TO_L2);
+      expect(result.gasFee.estimatedAmount).toEqual(BigNumber.from(280000));
+      expect(result.gasFee.token?.symbol).toEqual('ETH');
+      expect(result.bridgeFee.estimatedAmount).toEqual(BigNumber.from(1));
+    });
+
+    it('should estimate gas for bridging L1 to L2 with approval transaction included in estimate', async () => {
+      (createBridgeInstance as jest.Mock).mockResolvedValue({
+        getFee: jest.fn().mockResolvedValue({
+          feeAmount: BigNumber.from(1),
+        }),
+      } as unknown as TokenBridge);
+
+      const result = await gasEstimator(
+        {
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          isSpendingCapApprovalRequired: true,
+        },
         readOnlyProviders,
         Environment.SANDBOX,
       ) as GasEstimateBridgeToL2Result;
@@ -170,13 +200,16 @@ describe('gasServiceEstimator', () => {
           }),
         } as unknown as ethers.providers.JsonRpcProvider],
       ]);
-      const result = await gasServiceEstimator(
-        GasEstimateType.BRIDGE_TO_L2,
+      const result = await gasEstimator(
+        {
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          isSpendingCapApprovalRequired: false,
+        },
         readOnlyProvidersUndefinedFees,
         Environment.SANDBOX,
       ) as GasEstimateBridgeToL2Result;
 
-      expect(result.gasFee.estimatedAmount).toEqual(BigNumber.from(280000));
+      expect(result.gasFee.estimatedAmount).toEqual(BigNumber.from(140000));
     });
 
     it('should handle gas estimates being null', async () => {
@@ -195,8 +228,11 @@ describe('gasServiceEstimator', () => {
           }),
         } as unknown as ethers.providers.JsonRpcProvider],
       ]);
-      const result = await gasServiceEstimator(
-        GasEstimateType.BRIDGE_TO_L2,
+      const result = await gasEstimator(
+        {
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          isSpendingCapApprovalRequired: false,
+        },
         readOnlyProvidersUndefinedFees,
         Environment.SANDBOX,
       ) as GasEstimateBridgeToL2Result;
@@ -207,8 +243,11 @@ describe('gasServiceEstimator', () => {
     it('should handle error when calling bridge', async () => {
       (createBridgeInstance as jest.Mock).mockRejectedValue({});
 
-      const result = await gasServiceEstimator(
-        GasEstimateType.BRIDGE_TO_L2,
+      const result = await gasEstimator(
+        {
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          isSpendingCapApprovalRequired: false,
+        },
         readOnlyProviders,
         Environment.SANDBOX,
       ) as GasEstimateBridgeToL2Result;
@@ -217,14 +256,15 @@ describe('gasServiceEstimator', () => {
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
         gasFee: {},
         bridgeFee: {},
+        bridgeable: false,
       });
     });
   });
 
   it('should throw error for invalid gasEstimateType', async () => {
     await expect(
-      gasServiceEstimator(
-        'INVALID' as GasEstimateType,
+      gasEstimator(
+        { gasEstimateType: 'INVALID' as GasEstimateType } as GasEstimateSwapParams,
         readOnlyProviders,
         Environment.SANDBOX,
       ),
