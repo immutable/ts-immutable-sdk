@@ -1,7 +1,7 @@
 import { Environment } from '@imtbl/config';
 import { Wallet } from 'ethers';
 import { log } from 'console';
-import { OrderStatus } from '../openapi/sdk/index';
+import { OrderStatus } from '@imtbl/sdk/index';
 import { Orderbook } from '../orderbook';
 import {
   getLocalhostProvider,
