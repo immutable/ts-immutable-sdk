@@ -1,61 +1,78 @@
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import axios from 'axios';
 import { CryptoFiatConfiguration } from 'config';
 import { CryptoFiatConvertParams, CryptoFiatConvertReturn } from 'types';
 
-const COINGECKO_API_BASE_URL = 'https://api.coingecko.com/api/v3';
-const COINGECKO_API_PRO_BASE_URL = 'https://pro-api.coingecko.com/api/v3';
+const CHECKOUT_API_BASE_URL = {
+  // TODO: https://immutable.atlassian.net/browse/WT-1425
+  [Environment.SANDBOX]: 'https://checkout-api.dev.immutable.com',
+  [Environment.PRODUCTION]: 'https://checkout-api.sandbox.immutable.com',
+};
 
 const DEFAULT_FIAT_SYMBOL = 'usd';
-
-// Given that we could have multiple coins with the same symbol and CoinGecko
-// does not support chain id then we are forcing the conversion.
-// Coin conversion list: https://api.coingecko.com/api/v3/coins/list
-const symbolsOverrides: { [symbol: string]: string } = {
-  eth: 'ethereum',
-  usdc: 'usd-coin',
-};
 
 /**
  * CryptoFiat module class
  */
 export class CryptoFiat {
-  private cache: Map<string, string> | null;
+  private coinsCache: Map<string, string> | null;
 
-  private apiKey?: string;
+  private overridesCache: Map<string, string> | null;
+
+  public config: ImmutableConfiguration;
 
   /**
    * Creates an instance of CryptoFiat.
-   * @param {CryptoFiatConfiguration} conf - configuration parameters for the module
+   * @param {CryptoFiatConfiguration} config - configuration parameters for the module
    */
-  constructor(conf: CryptoFiatConfiguration) {
-    this.cache = null;
-    this.apiKey = conf.getApiKey();
+  constructor(config: CryptoFiatConfiguration) {
+    this.coinsCache = null;
+    this.overridesCache = null;
+    this.config = config.baseConfig;
   }
 
-  private withApiKey(path: string): string {
-    if (!this.apiKey) return `${COINGECKO_API_BASE_URL}${path}`;
-    const glue = path.indexOf('?') === -1 ? '?' : '&';
-    return `${COINGECKO_API_PRO_BASE_URL}${path}${glue}x_cg_pro_api_key=${this.apiKey}`;
+  private urlWithPath(path: string): string {
+    return CHECKOUT_API_BASE_URL[this.config.environment] + path;
   }
 
-  private async fetchSymbols(): Promise<void> {
-    if (this.cache !== null) return;
+  // Given that we could have multiple coins with the same symbol
+  // and we do not have the contract address we are forcing the
+  // conversion because we are using coingecko under the hood.
+  private async fetchOverrides(): Promise<void> {
+    if (this.overridesCache !== null) return;
 
-    const url = this.withApiKey('/coins/list');
+    const url = this.urlWithPath('/v1/fiat/coins/overrides');
     const response = await axios.get(url);
 
     if (response.status !== 200) {
       throw new Error(
-        `Error fetching coin list: ${response.status} ${response.statusText}`,
+        `Error fetching coins overrides: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    this.overridesCache = new Map(Object.entries(response.data));
+  }
+
+  private async fetchCoins(): Promise<void> {
+    if (this.coinsCache !== null) return;
+
+    await this.fetchOverrides();
+
+    const url = this.urlWithPath('/v1/fiat/coins/all');
+    const response = await axios.get(url);
+
+    if (response.status !== 200) {
+      throw new Error(
+        `Error fetching coins list: ${response.status} ${response.statusText}`,
       );
     }
 
     const { data } = response;
 
-    this.cache = new Map<string, string>();
+    this.coinsCache = new Map<string, string>();
     for (const coin of data) {
-      const override = symbolsOverrides[coin.symbol.toLowerCase()];
-      this.cache.set(
+      const override = this.overridesCache!.get(coin.symbol.toLowerCase());
+      this.coinsCache.set(
         coin.symbol.toLowerCase(),
         override || coin.id.toLowerCase(),
       );
@@ -78,18 +95,21 @@ export class CryptoFiat {
       throw new Error('Error missing token symbols to convert');
     }
 
-    if (fiatSymbols.length === 0) fiatSymbols.push(DEFAULT_FIAT_SYMBOL);
+    const currencies = fiatSymbols.filter((fiatSymbol) => fiatSymbol !== '');
+    if (currencies.length === 0) currencies.push(DEFAULT_FIAT_SYMBOL);
 
-    await this.fetchSymbols();
+    await this.fetchCoins();
 
-    const ids = tokenSymbols
-      .map((s) => this.cache!.get(s.toLowerCase()))
+    const idsParam = tokenSymbols
+      .map((tokenSymbol) => this.coinsCache!.get(tokenSymbol.toLowerCase()))
+      .filter((tokenSymbol) => tokenSymbol !== '' && tokenSymbol !== undefined)
       .join(',');
-    const url = this.withApiKey(
-      `/simple/price?ids=${ids}&vs_currencies=${fiatSymbols
-        .join(',')
-        .toLowerCase()}`,
-    );
+
+    const currenciesParam = currencies
+      .join(',')
+      .toLowerCase();
+
+    const url = this.urlWithPath(`/v1/fiat/conversion?ids=${idsParam}&currencies=${currenciesParam}`);
 
     const response = await axios.get(url);
     if (response.status !== 200) {
@@ -103,7 +123,7 @@ export class CryptoFiat {
     const result: CryptoFiatConvertReturn = {};
     for (const symbol of tokenSymbols) {
       const symbolKey = symbol.toLowerCase();
-      const coinId = this.cache!.get(symbolKey);
+      const coinId = this.coinsCache!.get(symbolKey);
       result[symbolKey] = {};
       if (coinId) result[symbolKey] = data[coinId] || {};
     }
