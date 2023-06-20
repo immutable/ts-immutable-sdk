@@ -43,7 +43,7 @@ describe('provider validation', () => {
 
     it('should throw an error if the underlying provider is not on the same network as the Web3Provider', async () => {
       requestMock.mockResolvedValue('0x1');
-      const testWeb3Provider = new Web3Provider(underlyingProviderMock, ChainId.POLYGON_ZKEVM);
+      const testWeb3Provider = new Web3Provider(underlyingProviderMock, ChainId.IMTBL_ZKEVM_DEVNET);
       await expect(validateProvider(testCheckoutConfig, testWeb3Provider))
         .rejects.toThrowError(
           '[WEB3_PROVIDER_ERROR] Cause:Your wallet has changed network, please switch to a supported network',
@@ -52,7 +52,7 @@ describe('provider validation', () => {
 
     it('should not throw an error if allowMistmatchedChainId is true and underlying network different', async () => {
       requestMock.mockResolvedValue('0x1');
-      const testWeb3Provider = new Web3Provider(underlyingProviderMock, ChainId.POLYGON_ZKEVM);
+      const testWeb3Provider = new Web3Provider(underlyingProviderMock, ChainId.IMTBL_ZKEVM_DEVNET);
       const validationOverrides = { allowMistmatchedChainId: true, allowUnsupportedProvider: false };
       expect(await validateProvider(testCheckoutConfig, testWeb3Provider, validationOverrides)).toBe(testWeb3Provider);
     });

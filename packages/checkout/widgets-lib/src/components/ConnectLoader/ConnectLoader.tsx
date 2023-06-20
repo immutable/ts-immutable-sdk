@@ -70,7 +70,7 @@ export function ConnectLoader({
 
   // Check if Web3Provider injected, otherwise load the widget without the provider after several attempts
   let clearInterval: () => void;
-  const web3ProviderCheck = () => {
+  const checkIfWeb3ProviderSet = () => {
     const maxAttempts = 9;
 
     if (params.web3Provider) {
@@ -91,7 +91,7 @@ export function ConnectLoader({
 
     setAttempts(attempts + 1);
   };
-  clearInterval = useInterval(() => web3ProviderCheck(), 10);
+  clearInterval = useInterval(() => checkIfWeb3ProviderSet(), 10);
 
   useEffect(() => {
     if (hasWeb3Provider === undefined) {
