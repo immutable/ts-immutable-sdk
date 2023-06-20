@@ -199,7 +199,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
         <BridgeContext.Provider value={bridgeReducerValues}>
-          <CryptoFiatProvider>
+          <CryptoFiatProvider environment={environment}>
             {viewReducerValues.viewState.view.type === SharedViews.LOADING_VIEW && (
               <LoadingView loadingText={loadingText} />
             )}

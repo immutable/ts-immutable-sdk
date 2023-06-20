@@ -189,7 +189,7 @@ export function SwapWidget(props: SwapWidgetProps) {
             <LoadingView loadingText={loadingText} />
           )}
           {viewState.view.type === SwapWidgetViews.SWAP && (
-            <CryptoFiatProvider>
+            <CryptoFiatProvider environment={environment}>
               <SwapCoins
                 fromAmount={viewState.view.data?.fromAmount ?? amount}
                 fromContractAddress={viewState.view.data?.fromContractAddress ?? fromContractAddress}
