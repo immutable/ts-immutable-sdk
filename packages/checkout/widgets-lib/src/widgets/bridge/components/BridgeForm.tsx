@@ -71,12 +71,14 @@ export function BridgeForm(props: BridgeFormProps) {
   const [unsignedBridgeTransaction,
     setUnsignedBridgeTransaction] = useState<BridgeDepositResponse | undefined>(undefined);
   const [tokenAddress, setTokenAddress] = useState<string>('');
+  const [tokensOptions, setTokensOptions] = useState<CoinSelectorOptionProps[]>([]);
 
   // user rejects transaction
   const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
 
-  const tokensOptions = useMemo(
-    () => tokenBalances
+  useEffect(() => {
+    if (tokenBalances.length === 0 || cryptoFiatState.conversions.size === 0) return;
+    const options = tokenBalances
       .filter((b) => b.balance.gt(0))
       .map(
         (t) => ({
@@ -93,13 +95,13 @@ export function BridgeForm(props: BridgeFormProps) {
             formattedAmount: tokenValueFormat(t.formattedBalance),
           },
         } as CoinSelectorOptionProps),
-      ),
-    [tokenBalances],
-  );
+      );
+    setTokensOptions(options);
+  }, [tokenBalances, cryptoFiatState.conversions]);
 
   const selectedOption = useMemo(
     () => (token && token ? `${token.token.symbol}-${token.token.name}` : undefined),
-    [token, tokensOptions],
+    [token],
   );
   const getTokenAddress = (selectedToken?: TokenInfo) => ((selectedToken?.address === ''
     || selectedToken?.address === undefined)
