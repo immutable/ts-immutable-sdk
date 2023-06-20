@@ -11,16 +11,14 @@ import {
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { UserWithEtherKey } from '../types';
-import { ConfirmationScreen } from '../confirmation';
-import { validateWithGuardian } from './guardian';
+import GuardianClient from '../imxProvider/guardian';
 
 type CancelOrderParams = {
   request: GetSignableCancelOrderRequest;
   ordersApi: OrdersApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  imxPublicApiDomain: string;
-  confirmationScreen: ConfirmationScreen;
+  guardianClient: GuardianClient;
 };
 
 type CreateOrderParams = {
@@ -28,8 +26,7 @@ type CreateOrderParams = {
   ordersApi: OrdersApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  imxPublicApiDomain: string;
-  confirmationScreen: ConfirmationScreen;
+  guardianClient: GuardianClient;
 };
 
 const ERC721 = 'ERC721';
@@ -39,8 +36,7 @@ export async function createOrder({
   user,
   request,
   ordersApi,
-  imxPublicApiDomain,
-  confirmationScreen,
+  guardianClient,
 }: CreateOrderParams): Promise<CreateOrderResponse> {
   return withPassportError<CreateOrderResponse>(async () => {
     const ethAddress = user.etherKey;
@@ -68,11 +64,8 @@ export async function createOrder({
       { headers },
     );
 
-    await validateWithGuardian({
-      imxPublicApiDomain,
-      accessToken: user.accessToken,
+    await guardianClient.validate({
       payloadHash: getSignableOrderResponse.data.payload_hash,
-      confirmationScreen,
     });
 
     const { payload_hash: payloadHash } = getSignableOrderResponse.data;
@@ -99,7 +92,7 @@ export async function createOrder({
       },
     };
 
-    const createOrderResponse = await ordersApi.createOrder(orderParams, {
+    const createOrderResponse = await ordersApi.createOrderV3(orderParams, {
       headers,
     });
 
@@ -114,8 +107,7 @@ export async function cancelOrder({
   starkSigner,
   request,
   ordersApi,
-  imxPublicApiDomain,
-  confirmationScreen,
+  guardianClient,
 }: CancelOrderParams): Promise<CancelOrderResponse> {
   return withPassportError<CancelOrderResponse>(async () => {
     const getSignableCancelOrderRequest: GetSignableCancelOrderRequest = {
@@ -130,18 +122,15 @@ export async function cancelOrder({
       getSignableCancelOrderRequest,
     }, { headers });
 
-    await validateWithGuardian({
-      imxPublicApiDomain,
-      accessToken: user.accessToken,
+    await guardianClient.validate({
       payloadHash: getSignableCancelOrderResponse.data.payload_hash,
-      confirmationScreen,
     });
 
     const { payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
 
     const starkSignature = await starkSigner.signMessage(payloadHash);
 
-    const cancelOrderResponse = await ordersApi.cancelOrder(
+    const cancelOrderResponse = await ordersApi.cancelOrderV3(
       {
         id: request.order_id.toString(),
         cancelOrderRequest: {

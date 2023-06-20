@@ -7,16 +7,14 @@ import {
 } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../errors/passportError';
 import { UserWithEtherKey } from '../types';
-import { ConfirmationScreen } from '../confirmation';
-import { validateWithGuardian } from './guardian';
+import GuardianClient from '../imxProvider/guardian';
 
 type CreateTradeParams = {
   request: GetSignableTradeRequest;
   tradesApi: TradesApi;
   user: UserWithEtherKey;
   starkSigner: StarkSigner;
-  imxPublicApiDomain: string,
-  confirmationScreen: ConfirmationScreen;
+  guardianClient: GuardianClient,
 };
 
 export async function createTrade({
@@ -24,8 +22,7 @@ export async function createTrade({
   tradesApi,
   user,
   starkSigner,
-  imxPublicApiDomain,
-  confirmationScreen,
+  guardianClient,
 }: CreateTradeParams): Promise<CreateTradeResponse> {
   return withPassportError<CreateTradeResponse>(async () => {
     const ethAddress = user.etherKey;
@@ -43,11 +40,8 @@ export async function createTrade({
 
     }, { headers });
 
-    await validateWithGuardian({
-      imxPublicApiDomain,
-      accessToken: user.accessToken,
+    await guardianClient.validate({
       payloadHash: getSignableTradeResponse.data.payload_hash,
-      confirmationScreen,
     });
 
     const { payload_hash: payloadHash } = getSignableTradeResponse.data;
