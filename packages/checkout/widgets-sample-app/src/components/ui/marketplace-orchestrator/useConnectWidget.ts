@@ -12,7 +12,7 @@ import { WidgetContext, hideAllWidgets } from './WidgetProvider';
 
 export function useConnectWidget(setWeb3Provider: (val: Web3Provider) => void) {
   const {showWidgets, setShowWidgets} = useContext(WidgetContext);
-  const {showConnect} = showWidgets;
+  const {showConnect, showWallet, showBridge, showSwap} = showWidgets;
 
   useEffect(() => {
     const handleConnectEvent = ((event: CustomEvent) => {
@@ -43,7 +43,7 @@ export function useConnectWidget(setWeb3Provider: (val: Web3Provider) => void) {
       }
     }) as EventListener;
     
-    if (showConnect) {
+    if (showConnect || showWallet || showBridge || showSwap) {
       window.addEventListener(
         IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
         handleConnectEvent
@@ -56,5 +56,5 @@ export function useConnectWidget(setWeb3Provider: (val: Web3Provider) => void) {
         handleConnectEvent
       );
     };
-  }, [showConnect]);
+  }, [showConnect, showWallet, showBridge, showSwap]);
 }
