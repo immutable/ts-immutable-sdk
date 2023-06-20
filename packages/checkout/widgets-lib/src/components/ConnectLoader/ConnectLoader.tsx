@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BiomeCombinedProviders } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import {
@@ -27,6 +28,7 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
   WidgetTheme, ConnectTargetLayer, getTargetLayerChainId,
 } from '../../lib';
+import { useInterval } from '../../lib/hooks/useInterval';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -47,6 +49,7 @@ export function ConnectLoader({
   widgetConfig,
   closeEvent,
 }: ConnectLoaderProps) {
+  console.log('connect loader params', params);
   const [connectLoaderState, connectLoaderDispatch] = useReducer(
     connectLoaderReducer,
     initialConnectLoaderState,
@@ -64,40 +67,71 @@ export function ConnectLoader({
   const [hasWeb3Provider, setHasWeb3Provider] = useState<boolean | undefined>();
   const [hasCheckedProvider, setHasCheckedProvider] = useState<boolean>(false);
   const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(params.web3Provider);
-  const checkProvider = () => {
-    if (!hasCheckedProvider) setHasCheckedProvider(true);
-    let timer: number;
-    let attempts = 0;
+
+  const [attempts, setAttempts] = useState<number>(0);
+
+  // const checkProvider = () => {
+  //   if (!hasCheckedProvider) setHasCheckedProvider(true);
+  //   let timer: number;
+  //   let attempts = 0;
+  //   const maxAttempts = 100;
+
+  //   const attemptToSetProvider = () => {
+  //     console.log('attemptToSetProvider - params', params);
+  //     (() => {
+  //       if (params.web3Provider) {
+  //         const isWeb3Res = Checkout.isWeb3Provider(params.web3Provider);
+
+  //         console.log('if web3Provider attemptToSetProvider', isWeb3Res, params.web3Provider, attempts);
+
+  //         if (isWeb3Res) {
+  //           setHasWeb3Provider(true);
+  //           return;
+  //         }
+  //       }
+
+  //       console.log('attemptToSetProvider', params.web3Provider, attempts);
+
+  //       attempts++;
+  //       if (attempts >= maxAttempts) {
+  //         window.clearInterval(timer);
+  //         setHasWeb3Provider(false);
+  //       }
+  //     })();
+  //   };
+
+  //   timer = window.setInterval(attemptToSetProvider, 1000);
+  //   attemptToSetProvider();
+  // };
+
+  const web3ProviderCheck = () => {
+    console.log(attempts);
     const maxAttempts = 9;
 
-    const attemptToSetProvider = () => {
-      (() => {
-        if (web3Provider) {
-          const isWeb3Res = Checkout.isWeb3Provider(web3Provider);
-          if (isWeb3Res) {
-            setHasWeb3Provider(true);
-            return;
-          }
-        }
+    if (params.web3Provider) {
+      if (!web3Provider) {
+        setWeb3Provider(params.web3Provider);
+        setHasWeb3Provider(true);
+      }
+    }
 
-        attempts++;
-        if (attempts >= maxAttempts) {
-          window.clearInterval(timer);
-          setHasWeb3Provider(false);
-        }
-      })();
-    };
-
-    timer = window.setInterval(attemptToSetProvider, 10);
-    attemptToSetProvider();
+    if (attempts >= maxAttempts && !web3Provider) {
+      // window.clearInterval(timer);
+      // clearInterval(timer);
+      setHasWeb3Provider(false);
+    }
+    setAttempts(attempts + 1);
   };
+  useInterval(() => web3ProviderCheck(), 1000);
 
   useEffect(() => {
     if (hasWeb3Provider === undefined) {
-      checkProvider();
+      // checkProvider();
       return;
     }
+
     const checkConnection = async (checkout: Checkout) => {
+      console.log('Connect loader - checkConnection', web3Provider, walletProvider);
       if (!walletProvider && !web3Provider) {
         connectLoaderDispatch({
           payload: {

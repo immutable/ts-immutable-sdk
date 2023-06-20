@@ -26,6 +26,8 @@ export class ImmutableWallet extends ImmutableWebComponent {
       web3Provider: this.provider,
     };
 
+    console.log('connectLoaderParams', connectLoaderParams);
+
     if (!this.reactRoot) {
       this.reactRoot = ReactDOM.createRoot(this);
     }

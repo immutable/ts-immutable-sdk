@@ -22,6 +22,7 @@ export const ImtblWidgets = ({
     SetProvider(CheckoutWidgetTagNames.CONNECT, web3Provider)
   } 
   if(web3Provider && showWallet) {
+    console.log('set provider in wallet', web3Provider);
     SetProvider(CheckoutWidgetTagNames.WALLET, web3Provider)
   } 
   if(web3Provider && showSwap) {

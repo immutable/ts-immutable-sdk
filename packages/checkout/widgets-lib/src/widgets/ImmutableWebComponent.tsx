@@ -16,6 +16,7 @@ export abstract class ImmutableWebComponent extends HTMLElement {
   }
 
   setProvider(provider: Web3Provider): void {
+    console.log('immutable web component set provider', provider);
     this.provider = provider;
     this.renderWidget();
   }
