@@ -1,18 +1,18 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { createContext } from 'react';
-import { Checkout, ConnectionProviders, WalletProviderName } from '@imtbl/checkout-sdk';
+import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 
 export interface ConnectState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
-  providerPreference: ConnectionProviders | null;
+  walletProvider: WalletProviderName | null;
   sendCloseEvent: () => void;
 }
 
 export const initialConnectState: ConnectState = {
   checkout: null,
   provider: null,
-  providerPreference: null,
+  walletProvider: null,
   sendCloseEvent: () => {},
 };
 
@@ -50,7 +50,7 @@ export interface SetProviderPayload {
 
 export interface SetProviderNamePayload {
   type: ConnectActions.SET_PROVIDER_NAME;
-  providerName: WalletProviderName;
+  walletProvider: WalletProviderName;
 }
 
 export interface SetSendCloseEventPayload {
@@ -86,7 +86,7 @@ export const connectReducer: Reducer<ConnectState, ConnectAction> = (
     case ConnectActions.SET_PROVIDER_NAME:
       return {
         ...state,
-        providerName: action.payload.providerName,
+        walletProvider: action.payload.walletProvider,
       };
     case ConnectActions.SET_SEND_CLOSE_EVENT:
       return {

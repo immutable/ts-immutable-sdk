@@ -18,7 +18,7 @@ function SwapWebView() {
 
   useEffect(() => {
     (async () => {
-      const createProviderRes = await checkout.createProvider({ providerName: WalletProviderName.METAMASK });
+      const createProviderRes = await checkout.createProvider({ walletProvider: WalletProviderName.METAMASK });
       SetProvider(CheckoutWidgetTagNames.SWAP, createProviderRes.provider);
     })();
   });

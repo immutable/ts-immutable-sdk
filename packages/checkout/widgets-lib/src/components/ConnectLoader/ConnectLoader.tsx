@@ -37,7 +37,7 @@ export interface ConnectLoaderProps {
 
 export interface ConnectLoaderParams {
   targetLayer?: ConnectTargetLayer;
-  providerName?: WalletProviderName;
+  walletProvider?: WalletProviderName;
   web3Provider?: Web3Provider
 }
 
@@ -52,7 +52,7 @@ export function ConnectLoader({
     initialConnectLoaderState,
   );
   const { connectionStatus, deepLink } = connectLoaderState;
-  const { targetLayer, providerName } = params;
+  const { targetLayer, walletProvider } = params;
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
   const targetChainId = getTargetLayerChainId(targetLayer ?? ConnectTargetLayer.LAYER2, widgetConfig.environment);
@@ -98,7 +98,7 @@ export function ConnectLoader({
       return;
     }
     const checkConnection = async (checkout: Checkout) => {
-      if (!providerName && !web3Provider) {
+      if (!walletProvider && !web3Provider) {
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -110,9 +110,9 @@ export function ConnectLoader({
       }
 
       try {
-        if (!web3Provider && providerName) {
+        if (!web3Provider && walletProvider) {
           const { provider } = await checkout.createProvider({
-            providerName,
+            walletProvider,
           });
           setWeb3Provider(provider);
         }
@@ -218,7 +218,7 @@ export function ConnectLoader({
       IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
       handleConnectEvent,
     );
-  }, [widgetConfig.environment, web3Provider, providerName, hasWeb3Provider]);
+  }, [widgetConfig.environment, web3Provider, walletProvider, hasWeb3Provider]);
 
   const childrenWithProvider = useCallback(
     (childrenWithoutProvider:React.ReactNode) =>

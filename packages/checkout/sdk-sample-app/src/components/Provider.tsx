@@ -28,7 +28,7 @@ export default function Provider(props: ProviderProps) {
     setLoading(true);
     try {
       const resp = await checkout.createProvider({
-        providerName: WalletProviderName.METAMASK,
+        walletProvider: WalletProviderName.METAMASK,
       });
       setProvider(resp.provider);
       setResult1(resp.provider);

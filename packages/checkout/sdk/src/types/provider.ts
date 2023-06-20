@@ -7,7 +7,7 @@ export enum WalletProviderName {
   METAMASK = 'metamask',
 }
 export interface CreateProviderParams {
-  providerName: WalletProviderName;
+  walletProvider: WalletProviderName;
 }
 
 /**

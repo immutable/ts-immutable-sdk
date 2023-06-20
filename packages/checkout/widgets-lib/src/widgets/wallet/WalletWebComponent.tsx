@@ -22,7 +22,7 @@ export class ImmutableWallet extends ImmutableWebComponent {
   renderWidget() {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
-      providerName: this.walletProvider,
+      walletProvider: this.walletProvider,
       web3Provider: this.provider,
     };
 

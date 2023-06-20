@@ -19,7 +19,7 @@ function BridgeWebView() {
 
   useEffect(() => {
     (async () => {
-      const createProviderRes = await checkout.createProvider({ providerName: WalletProviderName.METAMASK });
+      const createProviderRes = await checkout.createProvider({ walletProvider: WalletProviderName.METAMASK });
       SetProvider(CheckoutWidgetTagNames.BRIDGE, createProviderRes.provider);
     })();
   });

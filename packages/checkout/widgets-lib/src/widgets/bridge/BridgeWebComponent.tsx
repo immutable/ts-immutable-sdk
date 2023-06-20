@@ -30,7 +30,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
   renderWidget() {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER1,
-      providerName: this.walletProvider,
+      walletProvider: this.walletProvider,
     };
     const params: BridgeWidgetParams = {
       fromContractAddress: this.fromContract,

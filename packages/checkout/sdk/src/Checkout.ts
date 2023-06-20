@@ -59,8 +59,7 @@ export class Checkout {
   }
 
   /**
-   * Create a provider object which can be used within the Checkout class mathods.
-   * Based on a walletProviderName
+   * Create a provider object which can be used within the Checkout class methods.
    * @param {CreateProviderParams} params The data required to create a provider
    * @returns A new provider object
    * @throws {@link ErrorType}
@@ -69,7 +68,7 @@ export class Checkout {
     params: CreateProviderParams,
   ): Promise<CreateProviderResult> {
     const web3Provider: Web3Provider = await provider.createProvider(
-      params.providerName,
+      params.walletProvider,
     );
     return {
       provider: web3Provider,
