@@ -97,6 +97,7 @@ export function TopUpView({
     try {
       const bridgeEstimate = await checkout.gasEstimate({
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+        isSpendingCapApprovalRequired: true,
       }) as GasEstimateBridgeToL2Result;
       const bridgeFeeInFiat = getBridgeFeeEstimation(
         bridgeEstimate,

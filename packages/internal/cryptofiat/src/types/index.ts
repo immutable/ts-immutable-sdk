@@ -1,9 +1,15 @@
+import { ModuleConfiguration } from '@imtbl/config';
+
+/**
+ * Interface representing the overrides options for the CryptoFiatModuleConfiguration.
+ */
+export interface CryptoFiatOverrides {}
+
 /**
  * Interface representing the configuration for the CryptoFiatModule.
- * @property {string} apiKey - Optional, API key for accessing the CryptoFiatModule.
  */
-export interface CryptoFiatModuleConfiguration {
-  apiKey?: string;
+export interface CryptoFiatModuleConfiguration
+  extends ModuleConfiguration<CryptoFiatOverrides> {
 }
 
 /**
