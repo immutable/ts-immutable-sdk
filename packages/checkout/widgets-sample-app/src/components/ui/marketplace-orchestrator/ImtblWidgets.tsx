@@ -20,14 +20,16 @@ export const ImtblWidgets = ({
 
   if(web3Provider && showConnect) {
     SetProvider(CheckoutWidgetTagNames.CONNECT, web3Provider)
-  } 
+  }
+
   if(web3Provider && showWallet) {
-    console.log('set provider in wallet', web3Provider);
     SetProvider(CheckoutWidgetTagNames.WALLET, web3Provider)
-  } 
+  }
+
   if(web3Provider && showSwap) {
     SetProvider(CheckoutWidgetTagNames.SWAP, web3Provider)
-  } 
+  }
+  
   if(web3Provider && showBridge) {
     SetProvider(CheckoutWidgetTagNames.BRIDGE, web3Provider)
   } 

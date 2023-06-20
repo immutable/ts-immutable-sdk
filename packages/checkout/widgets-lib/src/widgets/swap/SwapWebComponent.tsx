@@ -34,6 +34,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProvider: this.walletProvider,
+      web3Provider: this.provider,
     };
 
     const swapParams: SwapWidgetParams = {
