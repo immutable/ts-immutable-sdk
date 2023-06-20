@@ -71,7 +71,7 @@ export class PassportImxProviderFactory {
     const starkSigner = await getStarkSigner(ethSigner);
 
     if (!user.etherKey) {
-      await this.registerStarkEx(ethSigner, starkSigner, user.accessToken);
+      user = await this.registerStarkEx(ethSigner, starkSigner, user.accessToken);
     }
 
     return new PassportImxProvider({

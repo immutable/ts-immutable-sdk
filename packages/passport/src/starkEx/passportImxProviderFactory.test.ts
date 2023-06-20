@@ -14,6 +14,7 @@ import { getStarkSigner } from './getStarkSigner';
 jest.mock('@ethersproject/providers');
 jest.mock('./workflows/registration');
 jest.mock('./getStarkSigner');
+jest.mock('./passportImxProvider');
 
 describe('PassportImxProviderFactory', () => {
   const authManagerMock = {
@@ -29,6 +30,7 @@ describe('PassportImxProviderFactory', () => {
   const confirmationScreen = {} as ConfirmationScreen;
   const config = {
     network: Networks.SANDBOX,
+    imxPublicApiDomain: 'imxPublicApiDomain123',
   } as PassportConfiguration;
   const passportImxProviderFactory = new PassportImxProviderFactory({
     config,
@@ -37,6 +39,7 @@ describe('PassportImxProviderFactory', () => {
     authManager: authManagerMock as unknown as AuthManager,
     magicAdapter: magicAdapterMock as unknown as MagicAdapter,
   });
+  const passportImxProviderMock = {};
   const ethSignerMock = {};
   const starkSignerMock = {};
   const getSignerMock = jest.fn();
@@ -49,6 +52,7 @@ describe('PassportImxProviderFactory', () => {
     });
     (registerPassportStarkEx as jest.Mock).mockResolvedValue(null);
     (getStarkSigner as jest.Mock).mockResolvedValue(starkSignerMock);
+    (PassportImxProvider as jest.Mock).mockImplementation(() => passportImxProviderMock);
   });
 
   describe('getPassportImxProvider', () => {
@@ -128,7 +132,7 @@ describe('PassportImxProviderFactory', () => {
 
           const result = await passportImxProviderFactory.getPassportImxProvider();
 
-          expect(result).toBeInstanceOf(PassportImxProvider);
+          expect(result).toBe(passportImxProviderMock);
           expect(authManagerMock.login).toHaveBeenCalledTimes(1);
           expect(magicAdapterMock.login).toHaveBeenCalledWith(userWithMetadata.idToken, config.network);
           expect(getSignerMock).toHaveBeenCalledTimes(1);
@@ -138,6 +142,13 @@ describe('PassportImxProviderFactory', () => {
             usersApi: immutableXClient.usersApi,
           }, userWithMetadata.accessToken);
           expect(authManagerMock.loginSilent).toHaveBeenCalledTimes(1);
+          expect(PassportImxProvider).toHaveBeenCalledWith({
+            user: userWithMetadata,
+            starkSigner: starkSignerMock,
+            immutableXClient,
+            imxPublicApiDomain: config.imxPublicApiDomain,
+            confirmationScreen,
+          });
         });
       });
     });
@@ -159,12 +170,19 @@ describe('PassportImxProviderFactory', () => {
 
         const result = await passportImxProviderFactory.getPassportImxProvider();
 
-        expect(result).toBeInstanceOf(PassportImxProvider);
+        expect(result).toBe(passportImxProviderMock);
         expect(authManagerMock.login).toHaveBeenCalledTimes(1);
         expect(magicAdapterMock.login).toHaveBeenCalledWith(user.idToken, config.network);
         expect(getSignerMock).toHaveBeenCalledTimes(1);
         expect(registerPassportStarkEx).not.toHaveBeenCalled();
         expect(authManagerMock.loginSilent).not.toHaveBeenCalled();
+        expect(PassportImxProvider).toHaveBeenCalledWith({
+          user,
+          starkSigner: starkSignerMock,
+          immutableXClient,
+          imxPublicApiDomain: config.imxPublicApiDomain,
+          confirmationScreen,
+        });
       });
     });
   });
