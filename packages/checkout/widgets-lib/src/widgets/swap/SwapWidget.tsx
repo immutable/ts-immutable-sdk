@@ -10,7 +10,7 @@ import {
   useEffect, useCallback, useReducer, useMemo,
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
-import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
+import { Exchange, ExchangeConfiguration, ExchangeOverrides } from '@imtbl/dex-sdk';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../views/loading/LoadingView';
 import {
@@ -40,7 +40,7 @@ import {
 } from './SwapWidgetEvents';
 import { SwapInProgress } from './views/SwapInProgress';
 import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
-import { RemoteConfig } from '../../lib/remoteConfig';
+import { RemoteConfig, RemoteConfigResult } from '../../lib/remoteConfig';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -78,6 +78,12 @@ export function SwapWidget(props: SwapWidgetProps) {
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
+
+  const getDexOverrides = useCallback(async () => {
+    const remoteConfig = new RemoteConfig({ environment });
+    const remoteConfigResult: RemoteConfigResult = await remoteConfig.load();
+    return remoteConfigResult;
+  }, [environment]);
 
   const swapWidgetSetup = useCallback(async () => {
     if (!providerPreference) return;
@@ -152,9 +158,9 @@ export function SwapWidget(props: SwapWidgetProps) {
       },
     });
 
-    let overrides;
+    let overrides: ExchangeOverrides | undefined;
     try {
-      overrides = (await new RemoteConfig({ environment }).load())?.dex?.overrides;
+      overrides = (await getDexOverrides()).dex?.overrides;
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
