@@ -1,7 +1,8 @@
+import 'cross-fetch/polyfill';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
-import { RelayerTransactionRequest } from '../zkEvm/relayerAdapter';
-import { JsonRpcRequestPayload } from '../zkEvm/types';
+import { RelayerTransactionRequest } from '../../zkEvm/relayerAdapter';
+import { JsonRpcRequestPayload } from '../../zkEvm/types';
 
 export type SetupMswInput = {
   relayerId: string;
@@ -27,7 +28,7 @@ export const setupMsw = ({ relayerId, chainId }: SetupMswInput) => {
         }
       }
     }),
-    rest.post('/v1/transactions', (req, res, ctx) => { // TODO: ID-784 Update once we have added Relayer URL to config
+    rest.post('https://relayer.sandbox.immutable.com/v1/transactions', (req, res, ctx) => { // TODO: ID-784 Update once we have added Relayer URL to config
       const body = req.body as RelayerTransactionRequest;
       switch (body.method) {
         case 'eth_sendTransaction': {

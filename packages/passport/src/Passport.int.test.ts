@@ -4,7 +4,7 @@ import { TransactionRequest } from '@ethersproject/providers';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { Passport } from './Passport';
 import { RequestArguments } from './zkEvm/types';
-import { setupMsw } from './mocks/msw';
+import { setupMsw } from './mocks/zkEvm/msw';
 
 jest.mock('magic-sdk');
 jest.mock('oidc-client-ts');
@@ -73,17 +73,21 @@ describe('Passport', () => {
       const transferToAddress = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
       const transactionHash = '0x867';
 
-      const expectedMagicRequestCalls: { method: string, returnValue: any }[] = [
-        { method: 'eth_accounts', returnValue: [magicWalletAddress] },
-        { method: 'personal_sign', returnValue: '0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b' },
-        { method: 'eth_accounts', returnValue: [magicWalletAddress] },
-        { method: 'personal_sign', returnValue: '0xa29c8ff87dbbf59f4f46ea3006e5b27980fa4262668ad0bc1f0b24bc01a727e92ef80db88e391707bec7bdf1e1479d2fa994b732e0cb28c9438c1d0e7e67b52d1b' },
-      ];
-
-      mockMagicRequest.mockImplementation(({ method }: RequestArguments) => {
-        const expectedCall = expectedMagicRequestCalls.shift();
-        expect(method).toEqual(expectedCall?.method);
-        return Promise.resolve(expectedCall?.returnValue);
+      mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
+        expect(method).toEqual('eth_accounts');
+        return Promise.resolve([magicWalletAddress]);
+      });
+      mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
+        expect(method).toEqual('personal_sign');
+        return Promise.resolve('0x6b168cf5d90189eaa51d02ff3fa8ffc8956b1ea20fdd34280f521b1acca092305b9ace24e643fe64a30c528323065f5b77e1fb4045bd330aad01e7b9a07591f91b');
+      });
+      mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
+        expect(method).toEqual('eth_accounts');
+        return Promise.resolve([magicWalletAddress]);
+      });
+      mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
+        expect(method).toEqual('personal_sign');
+        return Promise.resolve('0xa29c8ff87dbbf59f4f46ea3006e5b27980fa4262668ad0bc1f0b24bc01a727e92ef80db88e391707bec7bdf1e1479d2fa994b732e0cb28c9438c1d0e7e67b52d1b');
       });
       mockSigninPopup.mockResolvedValue(mockOidcUser);
       mockGetUser.mockResolvedValue(mockOidcUser);
