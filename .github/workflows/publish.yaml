@@ -32,9 +32,6 @@ jobs:
     name: Publish Workflow
     runs-on: ubuntu-latest
     steps:
-      - name: "Increase memory limit"
-        run: export NODE_OPTIONS="--max_old_space_size=8192"
-
       - name: Check Public Release Branch
         if: contains(github.event.inputs.release_type, 'release') && (github.ref != 'refs/heads/main')
         run: failure("Public releases should be only done from main branch, current branch ${{ github.ref }}")
@@ -103,7 +100,7 @@ jobs:
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
       - name: Build
-        run: RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
 
       - name: Typecheck
         run: yarn typecheck
