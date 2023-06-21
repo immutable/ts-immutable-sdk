@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Increase memory limit"
-        run: export NODE_OPTIONS="--max_old_space_size=4096"
+        run: export NODE_OPTIONS="--max_old_space_size=8192"
 
       - name: Check Public Release Branch
         if: contains(github.event.inputs.release_type, 'release') && (github.ref != 'refs/heads/main')
