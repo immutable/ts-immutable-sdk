@@ -19,7 +19,7 @@ import {
 } from '@imtbl/core-sdk';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { IMXProvider } from '@imtbl/provider';
-import GuardianClient from 'imxProvider/guardian';
+import GuardianClient from './guardian';
 import { UserWithEtherKey } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
