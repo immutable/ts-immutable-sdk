@@ -272,5 +272,10 @@ export const text = {
         cancel: 'Dismiss',
       },
     },
+    coinSelector: {
+      option: {
+        fiatPricePrefix: 'Approx USD $',
+      },
+    },
   },
 };
