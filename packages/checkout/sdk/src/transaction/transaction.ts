@@ -1,13 +1,14 @@
 import { ethers } from 'ethers';
+import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { SendTransactionParams, SendTransactionResult } from '../types';
+import { SendTransactionResult } from '../types';
 
 export const sendTransaction = async (
-  params: SendTransactionParams,
+  web3Provider: Web3Provider,
+  transaction: TransactionRequest,
 ): Promise<SendTransactionResult> => {
-  const { provider, transaction } = params;
   try {
-    const transactionResponse = await provider
+    const transactionResponse = await web3Provider
       .getSigner()
       .sendTransaction(transaction);
 

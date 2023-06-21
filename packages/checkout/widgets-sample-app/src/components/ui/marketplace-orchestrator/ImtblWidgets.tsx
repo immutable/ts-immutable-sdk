@@ -1,8 +1,9 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { Box } from "@biom3/react";
-import { BridgeReact, ConnectReact, SwapReact, WalletReact } from "@imtbl/checkout-widgets";
+import { BridgeReact, CheckoutWidgetTagNames, ConnectReact, SetProvider, SwapReact, WalletReact } from "@imtbl/checkout-widgets";
 
 export interface ImtblWidgetsProps {
-  providerPreference: string;
+  web3Provider: Web3Provider|null;
   showConnect: boolean;
   showWallet: boolean;
   showSwap: boolean;
@@ -10,19 +11,35 @@ export interface ImtblWidgetsProps {
 }
 
 export const ImtblWidgets = ({
-  providerPreference,
+  web3Provider,
   showConnect,
   showWallet,
   showSwap,
   showBridge,
 }: ImtblWidgetsProps) => {
 
+  if(web3Provider && showConnect) {
+    SetProvider(CheckoutWidgetTagNames.CONNECT, web3Provider)
+  }
+
+  if(web3Provider && showWallet) {
+    SetProvider(CheckoutWidgetTagNames.WALLET, web3Provider)
+  }
+
+  if(web3Provider && showSwap) {
+    SetProvider(CheckoutWidgetTagNames.SWAP, web3Provider)
+  }
+  
+  if(web3Provider && showBridge) {
+    SetProvider(CheckoutWidgetTagNames.BRIDGE, web3Provider)
+  } 
+
   return(
     <Box>
       {showConnect && (<ConnectReact />)}
-      {showWallet && (<WalletReact providerPreference={providerPreference} />)}
-      {showSwap && (<SwapReact providerPreference={providerPreference} />)}
-      {showBridge && (<BridgeReact providerPreference={providerPreference} />)}
+      {showWallet && (<WalletReact />)}
+      {showSwap && (<SwapReact />)}
+      {showBridge && (<BridgeReact />)}
     </Box>
   )
 }

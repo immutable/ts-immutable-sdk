@@ -68,7 +68,7 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
         walletDispatch({
           payload: {
             type: WalletActions.SET_PROVIDER,
-            provider: switchNetworkResult?.provider,
+            provider: switchNetworkResult.provider,
           },
         });
 
@@ -79,7 +79,7 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
           },
         });
 
-        sendNetworkSwitchEvent(switchNetworkResult.network);
+        sendNetworkSwitchEvent(switchNetworkResult.provider, switchNetworkResult.network);
       } catch (err: any) {
         setBalancesLoading(false);
         if (err.type === 'USER_REJECTED_REQUEST_ERROR') {
