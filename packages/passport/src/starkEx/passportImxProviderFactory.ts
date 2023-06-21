@@ -45,17 +45,21 @@ export class PassportImxProviderFactory {
     this.magicAdapter = magicAdapter;
   }
 
-  public async getPassportImxProvider(connectSilent: boolean = false): Promise<PassportImxProvider | null> {
-    let user: User | null;
-    if (connectSilent) {
-      user = await this.authManager.loginSilent();
-      if (!user) {
-        return null;
-      }
-    } else {
-      user = await this.authManager.login();
+  public async getProvider(): Promise<PassportImxProvider> {
+    const user = await this.authManager.login();
+    return this.createProviderInstance(user);
+  }
+
+  public async getProviderSilent(): Promise<PassportImxProvider | null> {
+    const user = await this.authManager.loginSilent();
+    if (!user) {
+      return null;
     }
 
+    return this.createProviderInstance(user);
+  }
+
+  private async createProviderInstance(user: User): Promise<PassportImxProvider> {
     if (!user.idToken) {
       throw new PassportError(
         'Failed to initialise',
@@ -71,7 +75,14 @@ export class PassportImxProviderFactory {
     const starkSigner = await getStarkSigner(ethSigner);
 
     if (!user.etherKey) {
-      user = await this.registerStarkEx(ethSigner, starkSigner, user.accessToken);
+      const userWithEtherKey = await this.registerStarkEx(ethSigner, starkSigner, user.accessToken);
+      return new PassportImxProvider({
+        user: userWithEtherKey,
+        starkSigner,
+        immutableXClient: this.immutableXClient,
+        imxPublicApiDomain: this.config.imxPublicApiDomain,
+        confirmationScreen: this.confirmationScreen,
+      });
     }
 
     return new PassportImxProvider({
@@ -84,7 +95,7 @@ export class PassportImxProviderFactory {
   }
 
   private async registerStarkEx(userAdminKeySigner: EthSigner, starkSigner: StarkSigner, jwt: string) {
-    return withPassportError<UserWithEtherKey | null>(async () => {
+    return withPassportError<UserWithEtherKey>(async () => {
       await registerPassportStarkEx(
         {
           ethSigner: userAdminKeySigner,

@@ -55,25 +55,25 @@ describe('PassportImxProviderFactory', () => {
     (PassportImxProvider as jest.Mock).mockImplementation(() => passportImxProviderMock);
   });
 
-  describe('getPassportImxProvider', () => {
-    describe('when connectSilent is true', () => {
-      describe('when no user is logged in', () => {
-        it('should return null', async () => {
-          authManagerMock.loginSilent.mockResolvedValue(null);
+  describe('getProviderSilent', () => {
+    describe('when no user is logged in', () => {
+      it('should return null', async () => {
+        authManagerMock.loginSilent.mockResolvedValue(null);
 
-          const result = await passportImxProviderFactory.getPassportImxProvider(true);
+        const result = await passportImxProviderFactory.getProviderSilent();
 
-          expect(result).toBe(null);
-          expect(authManagerMock.loginSilent).toHaveBeenCalledTimes(1);
-        });
+        expect(result).toBe(null);
+        expect(authManagerMock.loginSilent).toHaveBeenCalledTimes(1);
       });
     });
+  });
 
+  describe('getProvider', () => {
     describe('when the user has no idToken', () => {
       it('should throw an error', async () => {
         authManagerMock.login.mockResolvedValue({ idToken: null });
 
-        await expect(() => passportImxProviderFactory.getPassportImxProvider()).rejects.toThrow(
+        await expect(() => passportImxProviderFactory.getProvider()).rejects.toThrow(
           new PassportError(
             'Failed to initialise',
             PassportErrorType.WALLET_CONNECTION_ERROR,
@@ -96,7 +96,7 @@ describe('PassportImxProviderFactory', () => {
           magicAdapterMock.login.mockResolvedValue(magicProviderMock);
           authManagerMock.loginSilent.mockResolvedValue(userWithoutEtherKey);
 
-          await expect(() => passportImxProviderFactory.getPassportImxProvider()).rejects.toThrow(
+          await expect(() => passportImxProviderFactory.getProvider()).rejects.toThrow(
             'REFRESH_TOKEN_ERROR',
           );
 
@@ -130,7 +130,7 @@ describe('PassportImxProviderFactory', () => {
           magicAdapterMock.login.mockResolvedValue(magicProviderMock);
           authManagerMock.loginSilent.mockResolvedValue(userWithMetadata);
 
-          const result = await passportImxProviderFactory.getPassportImxProvider();
+          const result = await passportImxProviderFactory.getProvider();
 
           expect(result).toBe(passportImxProviderMock);
           expect(authManagerMock.login).toHaveBeenCalledTimes(1);
@@ -168,7 +168,7 @@ describe('PassportImxProviderFactory', () => {
         magicAdapterMock.login.mockResolvedValue(magicProviderMock);
         authManagerMock.loginSilent.mockResolvedValue(user);
 
-        const result = await passportImxProviderFactory.getPassportImxProvider();
+        const result = await passportImxProviderFactory.getProvider();
 
         expect(result).toBe(passportImxProviderMock);
         expect(authManagerMock.login).toHaveBeenCalledTimes(1);

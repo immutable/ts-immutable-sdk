@@ -39,7 +39,8 @@ describe('Passport', () => {
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
   let loginSilentMock: jest.Mock;
-  let getPassportImxProviderMock: jest.Mock;
+  let getProviderMock: jest.Mock;
+  let getProviderSilentMock: jest.Mock;
 
   beforeEach(() => {
     authLoginMock = jest.fn().mockReturnValue({
@@ -52,7 +53,8 @@ describe('Passport', () => {
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
     loginSilentMock = jest.fn();
-    getPassportImxProviderMock = jest.fn();
+    getProviderMock = jest.fn();
+    getProviderSilentMock = jest.fn();
     (AuthManager as unknown as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
@@ -65,7 +67,8 @@ describe('Passport', () => {
       login: magicLoginMock,
     });
     (PassportImxProviderFactory as jest.Mock).mockReturnValue({
-      getPassportImxProvider: getPassportImxProviderMock,
+      getProvider: getProviderMock,
+      getProviderSilent: getProviderSilentMock,
     });
     passport = new Passport({
       baseConfig: new ImmutableConfiguration({
@@ -106,35 +109,35 @@ describe('Passport', () => {
   describe('connectImx', () => {
     it('should execute connect without error', async () => {
       const passportImxProvider = {} as PassportImxProvider;
-      getPassportImxProviderMock.mockResolvedValue(passportImxProvider);
+      getProviderMock.mockResolvedValue(passportImxProvider);
 
       const result = await passport.connectImx();
 
       expect(result).toBe(passportImxProvider);
-      expect(getPassportImxProviderMock).toHaveBeenCalledWith();
+      expect(getProviderMock).toHaveBeenCalled();
     });
   });
 
   describe('connectImxSilent', () => {
     describe('when getPassportImxProvider returns null', () => {
       it('returns null', async () => {
-        getPassportImxProviderMock.mockResolvedValue(null);
+        getProviderSilentMock.mockResolvedValue(null);
 
         const result = await passport.connectImxSilent();
 
         expect(result).toBe(null);
-        expect(getPassportImxProviderMock).toHaveBeenCalledWith(true);
+        expect(getProviderSilentMock).toHaveBeenCalled();
       });
     });
     describe('when getPassportImxProvider returns a provider', () => {
       it('should return the provider', async () => {
         const passportImxProvider = {} as PassportImxProvider;
-        getPassportImxProviderMock.mockResolvedValue(passportImxProvider);
+        getProviderSilentMock.mockResolvedValue(passportImxProvider);
 
         const result = await passport.connectImxSilent();
 
         expect(result).toBe(passportImxProvider);
-        expect(getPassportImxProviderMock).toHaveBeenCalledWith(true);
+        expect(getProviderSilentMock).toHaveBeenCalled();
       });
     });
   });

@@ -42,12 +42,11 @@ export class Passport {
   }
 
   public async connectImxSilent(): Promise<IMXProvider | null> {
-    return this.passportImxProviderFactory.getPassportImxProvider(true);
+    return this.passportImxProviderFactory.getProviderSilent();
   }
 
   public async connectImx(): Promise<IMXProvider> {
-    const imxProvider = await this.passportImxProviderFactory.getPassportImxProvider();
-    return imxProvider!;
+    return this.passportImxProviderFactory.getProvider();
   }
 
   public async loginCallback(): Promise<void> {
