@@ -13,6 +13,8 @@ export type User = {
   refreshToken?: string;
   profile: UserProfile;
   etherKey?: string;
+  starkKey?: string;
+  userAdminKey?: string;
   expired?: boolean;
 };
 

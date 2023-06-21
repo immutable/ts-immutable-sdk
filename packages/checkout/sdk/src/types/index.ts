@@ -9,3 +9,4 @@ export * from './token';
 export * from './tokenInfo';
 export * from './transaction';
 export * from './wallet';
+export * from './provider';
