@@ -24,7 +24,5 @@ export enum CheckoutWidgetTagNames {
   CONNECT = 'imtbl-connect',
   WALLET = 'imtbl-wallet',
   SWAP = 'imtbl-swap',
-  BUY = 'imtbl-buy',
   BRIDGE = 'imtbl-bridge',
-  EXAMPLE = 'imtbl-example',
 }

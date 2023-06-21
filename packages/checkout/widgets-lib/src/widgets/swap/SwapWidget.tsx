@@ -3,7 +3,6 @@ import {
   Checkout,
   GetTokenAllowListResult,
   TokenFilterTypes,
-  ConnectionProviders,
 } from '@imtbl/checkout-sdk';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
@@ -11,6 +10,7 @@ import {
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeConfiguration, ExchangeOverrides } from '@imtbl/dex-sdk';
+import { Web3Provider } from '@ethersproject/providers';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../views/loading/LoadingView';
 import {
@@ -45,10 +45,10 @@ import { RemoteConfig, RemoteConfigResult } from '../../lib/remoteConfig';
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
   config: StrongCheckoutWidgetsConfig
+  web3Provider?: Web3Provider
 }
 
 export interface SwapWidgetParams {
-  providerPreference: ConnectionProviders;
   amount?: string;
   fromContractAddress?: string;
   toContractAddress?: string;
@@ -69,11 +69,12 @@ export function SwapWidget(props: SwapWidgetProps) {
     [swapState, swapDispatch],
   );
 
-  const { params, config } = props;
+  const { params, config, web3Provider } = props;
   const { environment, theme } = config;
   const {
-    amount, fromContractAddress, toContractAddress, providerPreference,
+    amount, fromContractAddress, toContractAddress,
   } = params;
+  const { checkout } = swapState;
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
@@ -86,99 +87,109 @@ export function SwapWidget(props: SwapWidgetProps) {
   }, [environment]);
 
   const swapWidgetSetup = useCallback(async () => {
-    if (!providerPreference) return;
-
-    const checkout = new Checkout({
-      baseConfig: { environment },
-    });
-
     swapDispatch({
       payload: {
         type: SwapActions.SET_CHECKOUT,
-        checkout,
+        checkout: new Checkout({
+          baseConfig: { environment },
+        }),
       },
     });
+  }, [environment]);
 
-    const connectResult = await checkout.connect({
-      providerPreference: providerPreference ?? ConnectionProviders.METAMASK,
-    });
-
-    swapDispatch({
-      payload: {
-        type: SwapActions.SET_PROVIDER,
-        provider: connectResult.provider,
-      },
-    });
-
-    const address = await connectResult.provider.getSigner().getAddress();
-    const tokenBalances = await checkout.getAllBalances({
-      provider: connectResult.provider,
-      walletAddress: address,
-      chainId: connectResult.network.chainId,
-    });
-
-    const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
-      {
-        chainId: connectResult.network.chainId,
-        type: TokenFilterTypes.SWAP,
-      },
-    );
-
-    const allowedTokenBalances = tokenBalances.balances.filter((balance) => allowList.tokens
-      .map((token) => token.address)
-      .includes(balance.token.address));
-
-    swapDispatch({
-      payload: {
-        type: SwapActions.SET_ALLOWED_TOKENS,
-        allowedTokens: allowList.tokens,
-      },
-    });
-
-    swapDispatch({
-      payload: {
-        type: SwapActions.SET_TOKEN_BALANCES,
-        tokenBalances: allowedTokenBalances,
-      },
-    });
-
-    swapDispatch({
-      payload: {
-        type: SwapActions.SET_NETWORK,
-        network: connectResult.network,
-      },
-    });
-
-    // check default values for amount, toTokenAddress and fromTokenAddress
-    // set in form state
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type: SwapWidgetViews.SWAP },
-      },
-    });
-
-    let overrides: ExchangeOverrides | undefined;
-    try {
-      overrides = (await getDexOverrides()).dex?.overrides;
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error(err);
+  useEffect(() => {
+    if (web3Provider) {
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_PROVIDER,
+          provider: web3Provider,
+        },
+      });
     }
+  }, [web3Provider]);
 
-    const exchange = new Exchange(new ExchangeConfiguration({
-      chainId: connectResult.network.chainId,
-      baseConfig: new ImmutableConfiguration({ environment }),
-      overrides,
-    }));
+  useEffect(() => {
+    (async () => {
+      if (!checkout || !web3Provider) return;
 
-    swapDispatch({
-      payload: {
-        type: SwapActions.SET_EXCHANGE,
-        exchange,
-      },
-    });
-  }, [providerPreference, environment]);
+      const network = await checkout.getNetworkInfo({
+        provider: web3Provider,
+      });
+
+      let overrides: ExchangeOverrides | undefined;
+      try {
+        overrides = (await getDexOverrides()).dex?.overrides;
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(err);
+      }
+
+      const exchange = new Exchange(new ExchangeConfiguration({
+        chainId: network.chainId,
+        baseConfig: new ImmutableConfiguration({ environment }),
+        overrides,
+      }));
+
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_EXCHANGE,
+          exchange,
+        },
+      });
+
+      const tokenBalances = await checkout.getAllBalances({
+        provider: web3Provider,
+        walletAddress: await web3Provider.getSigner().getAddress(),
+        chainId: network.chainId,
+      });
+
+      const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
+        {
+          chainId: network.chainId,
+          type: TokenFilterTypes.SWAP,
+        },
+      );
+
+      const allowedTokenBalances = tokenBalances.balances.filter((balance) => allowList.tokens
+        .map((token) => token.address)
+        .includes(balance.token.address));
+
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_ALLOWED_TOKENS,
+          allowedTokens: allowList.tokens,
+        },
+      });
+
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_TOKEN_BALANCES,
+          tokenBalances: allowedTokenBalances,
+        },
+      });
+
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_PROVIDER,
+          provider: web3Provider,
+        },
+      });
+
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_NETWORK,
+          network,
+        },
+      });
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: SwapWidgetViews.SWAP },
+        },
+      });
+    })();
+  }, [checkout, web3Provider]);
 
   useEffect(() => {
     swapWidgetSetup();

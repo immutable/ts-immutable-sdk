@@ -156,7 +156,7 @@ describe('SwapWidget tests', () => {
   });
 
   const params = {
-    providerPreference: 'metamask',
+    providerName: 'metamask',
   } as SwapWidgetParams;
   const config: StrongCheckoutWidgetsConfig = {
     environment: Environment.SANDBOX,

@@ -4,9 +4,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Web3Provider } from '@ethersproject/providers';
-import { checkIsWalletConnected, connectWalletProvider } from './connect';
-import { ConnectionProviders, WalletAction } from '../types';
+import { checkIsWalletConnected, connectSite } from './connect';
+import { WalletAction, WalletProviderName } from '../types';
 import { CheckoutError, CheckoutErrorType } from '../errors';
+import { createProvider } from '../provider';
 
 let windowSpy: any;
 
@@ -30,7 +31,8 @@ describe('connect', () => {
   describe('checkIsWalletConnected', () => {
     it('should call request with eth_accounts method', async () => {
       providerRequestMock.mockResolvedValue([]);
-      await checkIsWalletConnected(ConnectionProviders.METAMASK);
+      const provider = await createProvider(WalletProviderName.METAMASK);
+      await checkIsWalletConnected(provider);
       expect(providerRequestMock).toBeCalledWith({
         method: WalletAction.CHECK_CONNECTION,
         params: [],
@@ -40,9 +42,8 @@ describe('connect', () => {
     it('should return isConnected as true when accounts array has an entry', async () => {
       // mock return array with active wallet address so we are connected
       providerRequestMock.mockResolvedValue(['0xmyWallet']);
-      const checkConnection = await checkIsWalletConnected(
-        ConnectionProviders.METAMASK,
-      );
+      const provider = await createProvider(WalletProviderName.METAMASK);
+      const checkConnection = await checkIsWalletConnected(provider);
       expect(checkConnection.isConnected).toBe(true);
       expect(checkConnection.walletAddress).toBe('0xmyWallet');
     });
@@ -50,9 +51,8 @@ describe('connect', () => {
     it('should return isConnected as false when no accounts returned', async () => {
       // mock return empty array of accounts so not connected
       providerRequestMock.mockResolvedValue([]);
-      const checkConnection = await checkIsWalletConnected(
-        ConnectionProviders.METAMASK,
-      );
+      const provider = await createProvider(WalletProviderName.METAMASK);
+      const checkConnection = await checkIsWalletConnected(provider);
       expect(checkConnection.isConnected).toBe(false);
       expect(checkConnection.walletAddress).toBe('');
     });
@@ -60,9 +60,8 @@ describe('connect', () => {
 
   describe('connectWalletProvider', () => {
     it('should call the connect function with metamask and return a Web3Provider', async () => {
-      const connRes = await connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
+      const provider = await createProvider(WalletProviderName.METAMASK);
+      const connRes = await connectSite(provider);
 
       expect(connRes).toBeInstanceOf(Web3Provider);
       expect(connRes?.provider).not.toBe(null);
@@ -74,12 +73,10 @@ describe('connect', () => {
 
     it('should throw an error if connect is called with a preference that is not expected', async () => {
       await expect(
-        connectWalletProvider({
-          providerPreference: 'trust-wallet' as ConnectionProviders,
-        }),
+        createProvider('trust-wallet' as WalletProviderName),
       ).rejects.toThrow(
         new CheckoutError(
-          'Provider preference is not supported',
+          'Provider not supported',
           CheckoutErrorType.CONNECT_PROVIDER_ERROR,
         ),
       );
@@ -91,9 +88,7 @@ describe('connect', () => {
       }));
 
       await expect(
-        connectWalletProvider({
-          providerPreference: ConnectionProviders.METAMASK,
-        }),
+        createProvider(WalletProviderName.METAMASK),
       ).rejects.toThrow(
         new CheckoutError(
           '[METAMASK_PROVIDER_ERROR] Cause:window.addEventListener is not a function',
@@ -109,9 +104,7 @@ describe('connect', () => {
       }));
 
       await expect(
-        connectWalletProvider({
-          providerPreference: ConnectionProviders.METAMASK,
-        }),
+        createProvider(WalletProviderName.METAMASK),
       ).rejects.toThrow(
         new CheckoutError(
           'No MetaMask provider installed.',
@@ -130,10 +123,10 @@ describe('connect', () => {
         removeEventListener: () => {},
       }));
 
+      const provider = await createProvider(WalletProviderName.METAMASK);
+
       await expect(
-        connectWalletProvider({
-          providerPreference: ConnectionProviders.METAMASK,
-        }),
+        connectSite(provider),
       ).rejects.toThrow(
         new CheckoutError(
           '[USER_REJECTED_REQUEST_ERROR] Cause:User rejected request',

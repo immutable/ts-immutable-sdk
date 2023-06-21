@@ -28,25 +28,9 @@ function App() {
         </div>
         <br />
         <div>
-          <a href={'/buy'}>Buy Order Widget (React)</a> |{' '}
-          <a href={'/lib/examples/buy.html'}>Buy Widget (Static)</a>
-        </div>
-        <br />
-        <div>
-          <a href={'/example'}>Example Widget (React)</a> |{' '}
-          <a href={'/lib/examples/example.html'}>Example Widget (Static)</a> |{' '}
-          <a href={'/lib/examples/example-webview.html'}>
-            Example Widget (Web View)
-          </a>
-        </div>
-        <br />
-        <div>
           <a href={'/marketplace-orchestrator'}>Marketplace Orchestrator</a>
         </div>
         <br />
-        <div>
-          <a href={'/async-loader'}>Async Loader</a>
-        </div>
       </main>
     </div>
   );

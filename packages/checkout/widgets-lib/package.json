@@ -55,7 +55,7 @@
   "module": "dist/module.js",
   "private": true,
   "scripts": {
-    "build": "cp src/build.tsx src/index.tsx && GENERATE_SOURCEMAP=false react-scripts build",
+    "build": "cp src/build.ts src/index.tsx && GENERATE_SOURCEMAP=false react-scripts build",
     "build:dist": "yarn build && yarn dist:sample",
     "dist:sample": "mkdir -p ../widgets-sample-app/public/lib/js && cp build/static/js/main.*.js ../widgets-sample-app/public/lib/js/imtbl-checkout.js",
     "dist:sdk": "mkdir -p ../../../sdk/dist/browser && cp build/static/js/main.*.js ../../../sdk/dist/browser/checkout.js",
