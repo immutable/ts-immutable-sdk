@@ -26,12 +26,16 @@ export default function CheckConnection(props: CheckConnectionProps) {
       console.error('missing checkout, please connect frist');
       return;
     }
+    if (!provider) {
+      console.error('missing provider, please connect frist');
+      return;
+    }
 
     setError(null);
     setLoading(true);
     try {
       const resp = await checkout.checkIsWalletConnected({
-        providerPreference: ConnectionProviders.METAMASK,
+        provider,
       });
       setResult(resp);
       setLoading(false);

@@ -1,7 +1,7 @@
 import { mount } from 'cypress/react18';
 import { cy, describe } from 'local-cypress';
 import { BigNumber, utils } from 'ethers';
-import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
+import { Checkout, CheckoutErrorType, GasEstimateType } from '@imtbl/checkout-sdk';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
@@ -14,6 +14,7 @@ describe('Bridge Form', () => {
   let cryptoConversions;
   beforeEach(() => {
     cy.viewport('ipad-2');
+    cy.intercept('https://checkout-api.dev.immutable.com/v1/rpc/eth-sepolia', []);
 
     cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
     bridgeState = {
@@ -115,15 +116,16 @@ describe('Bridge Form', () => {
           unsignedTx: {},
         });
 
-      cy.stub(Checkout.prototype, 'getBridgeGasEstimate').as('getBridgeGasEstimateStub')
+      cy.stub(Checkout.prototype, 'gasEstimate').as('gasEstimateStub')
         .resolves({
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
           bridgeFee: {
             estimatedAmount: utils.parseEther('0.0001'),
           },
           gasEstimate: {
             estimatedAmount: utils.parseEther('0.0001'),
           },
-          bridgable: true,
+          bridgeable: true,
         });
 
       cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
@@ -160,7 +162,7 @@ describe('Bridge Form', () => {
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
 
-      cySmartGet('@getBridgeGasEstimateStub').should('have.been.called');
+      cySmartGet('@gasEstimateStub').should('have.been.called');
       cy.wait(1000);
 
       cySmartGet('bridge-form-button').click();

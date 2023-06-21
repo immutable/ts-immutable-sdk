@@ -1,4 +1,5 @@
 import { MenuItem, AllIconKeys } from '@biom3/react';
+import { text } from '../../resources/text/textConfig';
 
 export interface CoinSelectorOptionProps {
   testId?: string;
@@ -16,6 +17,7 @@ export interface CoinSelectorOptionProps {
 export function CoinSelectorOption({
   onClick, icon, name, symbol, balance, testId, id,
 }: CoinSelectorOptionProps) {
+  const { drawers: { coinSelector } } = text;
   return (
     <MenuItem testId={`${testId}-coin-selector__option-${id}`} emphasized size="small" onClick={onClick}>
       {!icon && <MenuItem.Icon icon="Coins" variant="bold" />}
@@ -31,7 +33,7 @@ export function CoinSelectorOption({
       {
         balance && (
           <MenuItem.PriceDisplay
-            fiatAmount={balance.formattedFiatAmount}
+            fiatAmount={`${coinSelector.option.fiatPricePrefix}${balance.formattedFiatAmount}`}
             price={balance.formattedAmount}
           />
         )

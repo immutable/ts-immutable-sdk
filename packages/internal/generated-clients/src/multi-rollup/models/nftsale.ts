@@ -46,25 +46,19 @@ export interface NFTSale {
      * @type {string}
      * @memberof NFTSale
      */
-    'buyer_address': string;
+    'to': string;
     /**
      * The account address of seller
      * @type {string}
      * @memberof NFTSale
      */
-    'seller_address': string;
-    /**
-     * The quantity of tokens sold
-     * @type {number}
-     * @memberof NFTSale
-     */
-    'quantity': number;
+    'from': string;
     /**
      * 
-     * @type {ActivityNFT}
+     * @type {Array<ActivityNFT>}
      * @memberof NFTSale
      */
-    'asset': ActivityNFT;
+    'asset': Array<ActivityNFT>;
     /**
      * 
      * @type {SalePayment}

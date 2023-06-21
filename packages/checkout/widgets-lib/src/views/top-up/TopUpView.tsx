@@ -61,9 +61,9 @@ export function TopUpView({
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
 
   const onClickOnramp = () => {
-    if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
-      // dispatch onramp view
-    }
+    // if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
+    //   // dispatch onramp view
+    // }
     orchestrationEvents.sendRequestOnrampEvent(widgetEvent, {
       tokenAddress: tokenAddress ?? '',
       amount: amount ?? '',
@@ -97,6 +97,7 @@ export function TopUpView({
     try {
       const bridgeEstimate = await checkout.gasEstimate({
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+        isSpendingCapApprovalRequired: true,
       }) as GasEstimateBridgeToL2Result;
       const bridgeFeeInFiat = getBridgeFeeEstimation(
         bridgeEstimate,

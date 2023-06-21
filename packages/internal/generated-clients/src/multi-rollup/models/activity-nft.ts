@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ContractType } from './contract-type';
+import { NFTContractType } from './nftcontract-type';
 
 /**
  * 
@@ -25,10 +25,10 @@ import { ContractType } from './contract-type';
 export interface ActivityNFT {
     /**
      * 
-     * @type {ContractType}
+     * @type {NFTContractType}
      * @memberof ActivityNFT
      */
-    'contract_type': ContractType;
+    'contract_type': NFTContractType;
     /**
      * The token contract address
      * @type {string}

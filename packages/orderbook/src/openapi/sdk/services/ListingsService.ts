@@ -26,6 +26,7 @@ export class ListingsService {
     chainName,
     status,
     sellItemContractAddress,
+    buyItemContractAddress,
     sellItemTokenId,
     pageSize,
     sortBy,
@@ -41,6 +42,10 @@ export class ListingsService {
      * Sell item contract address to filter by
      */
     sellItemContractAddress?: string,
+    /**
+     * Buy item contract address to filter by
+     */
+    buyItemContractAddress?: string,
     /**
      * Sell item token identifier to filter by
      */
@@ -64,13 +69,14 @@ export class ListingsService {
   }): CancelablePromise<ListListingsResult> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/v1/chains/{chain_name}/listings',
+      url: '/v1/chains/{chain_name}/orders/listings',
       path: {
         'chain_name': chainName,
       },
       query: {
         'status': status,
         'sell_item_contract_address': sellItemContractAddress,
+        'buy_item_contract_address': buyItemContractAddress,
         'sell_item_token_id': sellItemTokenId,
         'page_size': pageSize,
         'sort_by': sortBy,
@@ -100,7 +106,7 @@ export class ListingsService {
   }): CancelablePromise<ListingResult> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/v1/chains/{chain_name}/listings',
+      url: '/v1/chains/{chain_name}/orders/listings',
       path: {
         'chain_name': chainName,
       },
@@ -132,7 +138,7 @@ export class ListingsService {
   }): CancelablePromise<ListingResult> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/v1/chains/{chain_name}/listings/{listing_id}',
+      url: '/v1/chains/{chain_name}/orders/listings/{listing_id}',
       path: {
         'chain_name': chainName,
         'listing_id': listingId,

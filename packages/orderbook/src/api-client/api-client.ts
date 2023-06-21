@@ -1,11 +1,9 @@
 import {
-  BuyItem,
   CreateOrderProtocolData,
   Fee,
   ListingResult,
   ListListingsResult,
   OrdersService,
-  SellItem,
 } from 'openapi/sdk';
 import { CreateListingParams, ListListingsParams } from 'types';
 import { ItemType, SEAPORT_CONTRACT_VERSION_V1_4 } from '../seaport';
@@ -47,9 +45,10 @@ export class ImmutableApiClient {
       throw new Error('Only ERC721 tokens can be listed');
     }
 
-    const isSameConsiderationType = new Set([...orderComponents.consideration.map(
-      (c) => c.itemType,
-    )]).size === 1;
+    const orderTypes = [
+      ...orderComponents.consideration.map((c) => c.itemType),
+    ];
+    const isSameConsiderationType = new Set(orderTypes).size === 1;
     if (!isSameConsiderationType) {
       throw new Error('All consideration items must be of the same type');
     }
@@ -64,9 +63,10 @@ export class ImmutableApiClient {
             item_type:
               Number(orderComponents.consideration[0].itemType)
               === ItemType.NATIVE
-                ? BuyItem.item_type.NATIVE
-                : BuyItem.item_type.ERC20,
+                ? 'NATIVE'
+                : 'ERC20',
             start_amount: orderComponents.consideration[0].startAmount,
+            contract_address: orderComponents.consideration[0].token,
           },
         ],
         buy_fees:
@@ -94,7 +94,7 @@ export class ImmutableApiClient {
           {
             contract_address: orderComponents.offer[0].token,
             token_id: orderComponents.offer[0].identifierOrCriteria,
-            item_type: SellItem.item_type.ERC721,
+            item_type: 'ERC721',
           },
         ],
         signature: orderSignature,

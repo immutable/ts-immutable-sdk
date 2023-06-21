@@ -17,7 +17,7 @@ describe('getBridgeGasEstimate', () => {
   });
 
   it('should return gasEstimate for supported eip1159 txn', async () => {
-    const result = await getBridgeEstimatedGas(provider, ChainId.ETHEREUM);
+    const result = await getBridgeEstimatedGas(provider, ChainId.ETHEREUM, false);
 
     expect(result.estimatedAmount).toEqual(BigNumber.from(280000));
     expect(result.token).toBeDefined();
@@ -42,7 +42,7 @@ describe('getBridgeGasEstimate', () => {
       }),
     } as unknown as Web3Provider;
 
-    const result = await getBridgeEstimatedGas(provider, ChainId.ETHEREUM);
+    const result = await getBridgeEstimatedGas(provider, ChainId.ETHEREUM, false);
 
     expect(result.estimatedAmount).toEqual(BigNumber.from(140000));
     expect(result.token).toBeDefined();
