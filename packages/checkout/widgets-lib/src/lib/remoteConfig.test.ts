@@ -30,7 +30,7 @@ describe('RemoteConfig', () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       1,
-      'https://checkout-api.immutable.com/v1/config',
+      'https://checkout-api.sandbox.immutable.com/v1/config',
     );
   });
 
@@ -54,7 +54,7 @@ describe('RemoteConfig', () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       1,
-      'https://checkout-api.sandbox.immutable.com/v1/config',
+      'https://checkout-api.dev.immutable.com/v1/config',
     );
   });
 });
