@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout } from '@imtbl/checkout-sdk';
 import { useContext, useState, useCallback } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
@@ -19,57 +19,59 @@ export interface ReadyToConnectProps {
 }
 export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   const {
-    connectState: { checkout, sendCloseEvent },
+    connectState: { checkout, provider, sendCloseEvent },
     connectDispatch,
   } = useContext(ConnectContext);
   const { viewDispatch } = useContext(ViewContext);
   const { body, footer } = text.views[ConnectWidgetViews.READY_TO_CONNECT];
   const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
 
-  const onConnectClick = useCallback(async () => {
-    const handleConnectViewUpdate = async (
-      // TODO: variable is already declared above
-      // eslint-disable-next-line
-      checkout: Checkout,
-      provider: Web3Provider,
-    ) => {
-      const networkInfo = await checkout.getNetworkInfo({ provider });
+  const handleConnectViewUpdate = async (
+    // TODO: variable is already declared above
+    // eslint-disable-next-line
+    checkout: Checkout,
+    // eslint-disable-next-line
+    provider: Web3Provider,
+  ) => {
+    const networkInfo = await checkout.getNetworkInfo({ provider });
 
-      if (networkInfo.chainId !== targetChainId) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: ConnectWidgetViews.SWITCH_NETWORK },
-          },
-        });
-        return;
-      }
-
+    if (networkInfo.chainId !== targetChainId) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: ConnectWidgetViews.SUCCESS },
+          view: { type: ConnectWidgetViews.SWITCH_NETWORK },
         },
       });
-    };
+      return;
+    }
 
-    if (checkout) {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: ConnectWidgetViews.SUCCESS },
+      },
+    });
+  };
+
+  const onConnectClick = useCallback(async () => {
+    if (checkout && provider) {
       try {
         const connectResult = await checkout.connect({
-          providerPreference: ConnectionProviders.METAMASK,
+          provider,
         });
+
         connectDispatch({
           payload: {
             type: ConnectActions.SET_PROVIDER,
             provider: connectResult.provider,
           },
         });
-        handleConnectViewUpdate(checkout, connectResult.provider);
+        handleConnectViewUpdate(checkout, provider);
       } catch (err: any) {
         setFooterButtonText(footer.buttonText2);
       }
     }
-  }, [checkout, connectDispatch, viewDispatch, footer.buttonText2]);
+  }, [checkout, provider, connectDispatch, viewDispatch, footer.buttonText2]);
 
   return (
     <SimpleLayout

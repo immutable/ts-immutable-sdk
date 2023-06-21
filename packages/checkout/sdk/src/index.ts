@@ -7,6 +7,7 @@ export {
   RPC_URL_MAP,
   TokenFilterTypes,
   WalletFilterTypes,
+  WalletProviderName,
 } from './types';
 export type {
   CheckoutModuleConfiguration,
