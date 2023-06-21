@@ -19,7 +19,7 @@ export const Marketplace = () => {
     const widgetsConfig: CheckoutWidgetsConfig = {
       theme: WidgetTheme.DARK,
       environment: Environment.SANDBOX,
-      isOnRampEnabled: true,
+      isOnRampEnabled: false,
       isBridgeEnabled: true,
       isSwapEnabled: true
     };

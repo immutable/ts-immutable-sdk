@@ -8,6 +8,7 @@ export interface ImtblWidgetsProps {
   showWallet: boolean;
   showSwap: boolean;
   showBridge: boolean;
+  params: any;
 }
 
 export const ImtblWidgets = ({
@@ -16,6 +17,7 @@ export const ImtblWidgets = ({
   showWallet,
   showSwap,
   showBridge,
+  params,
 }: ImtblWidgetsProps) => {
 
   if(web3Provider && showConnect) {
@@ -33,6 +35,8 @@ export const ImtblWidgets = ({
   if(web3Provider && showBridge) {
     SetProvider(CheckoutWidgetTagNames.BRIDGE, web3Provider)
   } 
+
+  console.log(params)
 
   return(
     <Box>

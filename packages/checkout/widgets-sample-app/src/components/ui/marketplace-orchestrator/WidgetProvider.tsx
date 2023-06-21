@@ -5,6 +5,7 @@ export interface WidgetState {
   showWallet: boolean;
   showSwap: boolean;
   showBridge: boolean;
+  params: any;
 }
 
 export interface WidgetContextState {
@@ -16,7 +17,8 @@ export const hideAllWidgets: WidgetState = {
   showConnect: false,
   showWallet: false,
   showSwap: false,
-  showBridge: false
+  showBridge: false,
+  params: {}
 }
 
 export const initialWidgetContextState: WidgetContextState = {

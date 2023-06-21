@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { useConnectWidget } from "./useConnectWidget";
 import { useWalletWidget } from "./useWalletWidget";
-import { Box, Button, Card, GridBox, Heading } from "@biom3/react";
+import { AppHeaderBar, Box, Button, Card, GridBox, Heading } from "@biom3/react";
 import { useSwapWidget } from "./useSwapWidget";
 import { useBridgeWidget } from "./useBridgeWidget";
 import { useCallback, useContext, useMemo, useState } from "react";
@@ -19,7 +19,8 @@ export const MainPage = () => {
     showConnect,
     showWallet,
     showSwap,
-    showBridge
+    showBridge,
+    params,
   }, setShowWidgets} = useContext(WidgetContext);
 
   // hooks for each widget set up event listeners and orchestration logic
@@ -45,15 +46,21 @@ export const MainPage = () => {
 
   return(
     <Box sx={{minWidth: '100vw', minHeight: '100vh', width: '100%', height: '100%', backgroundColor: 'base.color.brand.6'}}>
-      <Box sx={{width: '100%',padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-        <Heading>Immutable Checkout Marketplace</Heading>
-        {!web3Provider && (
+    <AppHeaderBar size="small" emphasized sx={{ backgroundColor: 'base.color.brand.6', marginBottom: 'base.spacing.x4' }}>
+      <AppHeaderBar.LeftLogo logo='ImmutableSymbol' />
+      <AppHeaderBar.Title>
+        Immutable Marketplace
+      </AppHeaderBar.Title>
+      <AppHeaderBar.RightHandButtons>
+      {!web3Provider && (
         <Button onClick={openConnectWidget}>Connect Wallet</Button>
       )}
       {web3Provider && (
         <Button onClick={openWalletWidget}>My Wallet</Button>
       )}
-      </Box>
+      </AppHeaderBar.RightHandButtons>
+    </AppHeaderBar>
+
       <Box sx={{paddingX: 'base.spacing.x4'}}>
         <GridBox minColumnWidth="40%">
           <Box sx={{display: 'flex', flexDirection: 'row', gap: 'base.spacing.x4', flexWrap: 'wrap'}}>
@@ -75,6 +82,7 @@ export const MainPage = () => {
             showWallet={showWallet} 
             showSwap={showSwap} 
             showBridge={showBridge} 
+            params={params}
           />
         </GridBox>
       </Box>

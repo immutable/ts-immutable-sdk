@@ -10,3 +10,7 @@
   max-width: 200px;
   margin: 20px 0;
 }
+
+div#layout-container {
+  box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.6);
+}
