@@ -15,7 +15,7 @@ export interface ERC20Item {
 }
 
 export interface NativeItem {
-  type: 'IMX';
+  type: 'NATIVE';
   amount: string;
 }
 
@@ -50,10 +50,10 @@ export interface CreateListingParams {
 }
 
 // Expose the list order filtering and ordering directly from the openAPI SDK, except
-// chainID is omitted as its configured as a part of the client
+// chainName is omitted as its configured as a part of the client
 export type ListListingsParams = Omit<
 Parameters<typeof OrdersService.prototype.listListings>[0],
-'chainId'
+'chainName'
 >;
 
 export interface FulfillOrderResponse {

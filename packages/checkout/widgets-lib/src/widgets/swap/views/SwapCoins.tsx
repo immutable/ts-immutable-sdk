@@ -26,7 +26,6 @@ export function SwapCoins({
     <SimpleLayout
       header={(
         <HeaderNavigation
-          showBack
           title={header.title}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent()}
         />

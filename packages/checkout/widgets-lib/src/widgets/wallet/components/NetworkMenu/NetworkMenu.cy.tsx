@@ -31,7 +31,7 @@ describe('Network Menu', () => {
   it('should have heading', () => {
     mount(
       <BiomeCombinedProviders>
-        <NetworkMenu />
+        <NetworkMenu setBalancesLoading={() => {}} />
       </BiomeCombinedProviders>,
     );
 
@@ -56,7 +56,7 @@ describe('Network Menu', () => {
         <WalletContext.Provider
           value={{ walletState, walletDispatch: () => {} }}
         >
-          <NetworkMenu />
+          <NetworkMenu setBalancesLoading={() => {}} />
         </WalletContext.Provider>
       </BiomeCombinedProviders>,
     );
@@ -100,7 +100,7 @@ describe('Network Menu', () => {
         <WalletContext.Provider
           value={{ walletState, walletDispatch: () => {} }}
         >
-          <NetworkMenu />
+          <NetworkMenu setBalancesLoading={() => {}} />
         </WalletContext.Provider>
       </BiomeCombinedProviders>,
     );

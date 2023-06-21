@@ -269,7 +269,7 @@ describe('Top Up View', () => {
         });
 
       mount(
-        <CryptoFiatProvider>
+        <CryptoFiatProvider environment={Environment.SANDBOX}>
           <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
             <TopUpView
               showOnrampOption

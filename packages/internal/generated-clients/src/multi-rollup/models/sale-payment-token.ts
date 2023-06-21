@@ -21,7 +21,7 @@ import { ActivityNativeToken } from './activity-native-token';
 import { ActivityToken } from './activity-token';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ContractType } from './contract-type';
+import { TokenContractType } from './token-contract-type';
 
 /**
  * @type SalePaymentToken

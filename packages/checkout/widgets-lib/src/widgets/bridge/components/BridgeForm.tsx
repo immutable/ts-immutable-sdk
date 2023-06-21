@@ -2,7 +2,7 @@ import {
   Box, Button, Heading, OptionKey,
 } from '@biom3/react';
 import {
-  CheckoutErrorType, GetBalanceResult, GetBridgeGasEstimateResult, TokenInfo,
+  CheckoutErrorType, GasEstimateBridgeToL2Result, GasEstimateType, GetBalanceResult, TokenInfo,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback, useContext, useEffect, useMemo, useState,
@@ -64,7 +64,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
   // Fee estimates & transactions
   const [isFetching, setIsFetching] = useState(false);
-  const [estimates, setEstimates] = useState<GetBridgeGasEstimateResult | undefined>(undefined);
+  const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [approvalTransaction, setApprovalTransaction] = useState<ApproveBridgeResponse | undefined>(undefined);
@@ -159,21 +159,21 @@ export function BridgeForm(props: BridgeFormProps) {
     // fetching or the user is updating the inputs.
     if ((silently && (loading || editing)) || !transactions?.bridgeTxn || !checkout) return;
 
-    const gasEstimateResult = await checkout.getBridgeGasEstimate({
+    const gasEstimateResult = await checkout.gasEstimate({
+      gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
       tokenAddress: token?.token.address || 'NATIVE',
-      provider: provider!,
       isSpendingCapApprovalRequired: !!transactions?.approveRes?.unsignedTx,
-    });
+    }) as GasEstimateBridgeToL2Result;
 
     setEstimates(gasEstimateResult);
     const estimatedAmount = utils.formatUnits(
-      gasEstimateResult?.gasEstimate?.estimatedAmount || 0,
+      gasEstimateResult?.gasFee?.estimatedAmount || 0,
       DEFAULT_TOKEN_DECIMALS,
     );
     setGasFee(estimatedAmount);
     setGasFeeFiatValue(calculateCryptoToFiat(
       estimatedAmount,
-      gasEstimateResult.gasEstimate?.token?.symbol || '',
+      gasEstimateResult.gasFee?.token?.symbol || '',
       cryptoFiatState.conversions,
     ));
 
@@ -424,7 +424,7 @@ export function BridgeForm(props: BridgeFormProps) {
           title={fees.title}
           fiatPricePrefix={content.fiatPricePrefix}
           gasFeeValue={gasFee}
-          gasFeeToken={estimates?.gasEstimate?.token}
+          gasFeeToken={estimates?.gasFee?.token}
           gasFeeFiatValue={gasFeeFiatValue}
         />
       </Box>
@@ -434,6 +434,7 @@ export function BridgeForm(props: BridgeFormProps) {
           variant="primary"
           onClick={submitBridge}
           disabled={loading}
+          size="large"
         >
           {loading ? (
             <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
