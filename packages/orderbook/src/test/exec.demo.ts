@@ -76,6 +76,7 @@ describe('', () => {
       orderExpiry: new Date(Date.now() + 1000 * 30),
     });
 
+    log('Signing and submitting approval transaction...');
     // Sign and submit the approval transaction for the offerer
     await signAndSubmitTx(soonToExpireListing.unsignedApprovalTransaction!, offerer, provider);
 
@@ -84,6 +85,7 @@ describe('', () => {
     // operator signature
     const signature = await signMessage(soonToExpireListing.typedOrderMessageForSigning, offerer);
 
+    log('Submitting order to orderbook API...');
     // Submit the order creation request to the order book API
     const { result: { id: orderId } } = await sdk.createListing({
       offerer: offerer.address,
@@ -91,6 +93,7 @@ describe('', () => {
       orderHash: soonToExpireListing.orderHash,
       orderSignature: signature,
     });
+    log('Submitted order to orderbook API with expiry time set in the future');
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
     log(`Listing ${orderId} is now ACTIVE, it will soon transition to EXPIRED, waiting...`);
