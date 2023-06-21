@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Environment } from '@imtbl/config';
-import { CHECKOUT_API_BASE_URL, RemoteConfig } from './remoteConfig';
+import { RemoteConfig } from './remoteConfig';
+import { CHECKOUT_API_BASE_URL } from '../types';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
