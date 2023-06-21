@@ -2,14 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
-import BuyWebView from './widgets/buy/BuyWebView';
 import ConnectWebView from './widgets/connect/ConnectWebView';
 import SwapWebView from './widgets/swap/SwapWebView';
 import BridgeWebView from './widgets/bridge/BridgeWebView';
 import WalletWebView from './widgets/wallet/WalletWebView';
-import TransitionExampleWebView from './widgets/examples/transition/TransitionExampleWebView';
-import DiExampleWebView from './widgets/examples/dependency-injection/DiExampleWebView';
-import OuterWidgetWebView from './widgets/examples/connection-required/outer-widget/OuterWidgetWebView';
 
 import './build';
 
@@ -34,26 +30,6 @@ function App() {
         <a href="/bridge">Bridge Widget</a>
       </h2>
       <br />
-      <h2>
-        <a href="/buy">Buy Widget</a>
-      </h2>
-      <br />
-      <hr />
-      <h1>Examples</h1>
-      <br />
-      <h2>
-        <a href="/examples/dependency-injection">Dependency Injection Widget</a>
-      </h2>
-      <br />
-      <h2>
-        <a href="/examples/transition">Transition Example Widget</a>
-      </h2>
-      <br />
-      <h2>
-        <a href="/examples/connection-required">
-          Connection Required Example Widget
-        </a>
-      </h2>
     </div>
   );
 }
@@ -62,18 +38,6 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
-  },
-  {
-    path: '/examples/dependency-injection',
-    element: <DiExampleWebView />,
-  },
-  {
-    path: '/examples/transition',
-    element: <TransitionExampleWebView />,
-  },
-  {
-    path: '/examples/connection-required',
-    element: <OuterWidgetWebView />,
   },
   {
     path: '/connect',
@@ -90,10 +54,6 @@ const router = createBrowserRouter([
   {
     path: '/wallet',
     element: <WalletWebView />,
-  },
-  {
-    path: '/buy',
-    element: <BuyWebView />,
   },
 ]);
 

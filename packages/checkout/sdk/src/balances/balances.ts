@@ -15,11 +15,11 @@ import { CheckoutConfiguration } from '../config';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  web3Provider: Web3Provider,
   walletAddress: string,
 ): Promise<GetBalanceResult> => await withCheckoutError<GetBalanceResult>(
   async () => {
-    const networkInfo = await getNetworkInfo(config, provider);
+    const networkInfo = await getNetworkInfo(config, web3Provider);
 
     if (!networkInfo.isSupported) {
       throw new CheckoutError(
@@ -29,7 +29,7 @@ export const getBalance = async (
       );
     }
 
-    const balance = await provider.getBalance(walletAddress);
+    const balance = await web3Provider.getBalance(walletAddress);
     return {
       balance,
       formattedBalance: utils.formatUnits(
@@ -43,7 +43,7 @@ export const getBalance = async (
 );
 
 export async function getERC20Balance(
-  provider: Web3Provider,
+  web3Provider: Web3Provider,
   walletAddress: string,
   contractAddress: string,
 ) {
@@ -52,7 +52,7 @@ export async function getERC20Balance(
       const contract = new Contract(
         contractAddress,
         JSON.stringify(ERC20ABI),
-        provider,
+        web3Provider,
       );
       const name = await contract.name();
       const symbol = await contract.symbol();
@@ -76,34 +76,21 @@ export async function getERC20Balance(
 
 export const getAllBalances = async (
   config: CheckoutConfiguration,
-  provider: Web3Provider,
+  web3Provider: Web3Provider,
   walletAddress: string,
   chainId: ChainId,
 ): Promise<GetAllBalancesResult> => {
-  if (!Object.values(ChainId).includes(chainId)) {
-    throw new CheckoutError(
-      `ChainId ${chainId} is not supported`,
-      CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
-    );
-  }
-  if (!provider.provider?.request) {
-    throw new CheckoutError(
-      'provider object is missing request function',
-      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
-    );
-  }
-
   const tokenList = await getTokenAllowList({
     type: TokenFilterTypes.ALL,
     chainId,
   });
   const allBalancePromises: Promise<GetBalanceResult>[] = [];
-  allBalancePromises.push(getBalance(config, provider, walletAddress));
+  allBalancePromises.push(getBalance(config, web3Provider, walletAddress));
 
   tokenList.tokens
     .filter((token) => token.address)
     .forEach((token: TokenInfo) => allBalancePromises.push(
-      getERC20Balance(provider, walletAddress, token.address ?? ''),
+      getERC20Balance(web3Provider, walletAddress, token.address ?? ''),
     ));
 
   const balanceResults = await Promise.allSettled(allBalancePromises);

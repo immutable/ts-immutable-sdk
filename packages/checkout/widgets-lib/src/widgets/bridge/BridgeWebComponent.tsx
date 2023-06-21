@@ -1,10 +1,10 @@
 import React from 'react';
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { ConnectTargetLayer, Network } from '../../lib';
-import { ConnectLoader } from '../../components/ConnectLoader/ConnectLoader';
+import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 
 export class ImmutableBridge extends ImmutableWebComponent {
@@ -14,30 +14,26 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
   amount = '';
 
-  providerPreference: ConnectionProviders = ConnectionProviders.METAMASK;
-
-  useConnectWidget?: boolean;
+  walletProvider: WalletProviderName = WalletProviderName.METAMASK;
 
   connectedCallback() {
     super.connectedCallback();
     this.fromContract = this.getAttribute('fromContractAddress') as string;
     this.fromNetwork = this.getAttribute('fromNetwork') as Network;
     this.amount = this.getAttribute('amount') as string;
-    this.providerPreference = this.getAttribute(
-      'providerPreference',
-    ) as ConnectionProviders;
-    const useConnectWidgetProp = this.getAttribute('useConnectWidget');
-    this.useConnectWidget = useConnectWidgetProp?.toLowerCase() !== 'false';
+    this.walletProvider = this.getAttribute(
+      'walletProvider',
+    ) as WalletProviderName;
     this.renderWidget();
   }
 
   renderWidget() {
-    const connectLoaderParams = {
+    const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER1,
-      providerPreference: this.providerPreference,
+      walletProvider: this.walletProvider,
+      web3Provider: this.provider,
     };
     const params: BridgeWidgetParams = {
-      providerPreference: this.providerPreference,
       fromContractAddress: this.fromContract,
       fromNetwork: this.fromNetwork,
       amount: this.amount,
@@ -49,23 +45,16 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        {this.useConnectWidget ? (
-          <ConnectLoader
-            params={connectLoaderParams}
-            closeEvent={sendBridgeWidgetCloseEvent}
-            widgetConfig={this.widgetConfig!}
-          >
-            <BridgeWidget
-              params={params}
-              config={this.widgetConfig!}
-            />
-          </ConnectLoader>
-        ) : (
+        <ConnectLoader
+          params={connectLoaderParams}
+          closeEvent={sendBridgeWidgetCloseEvent}
+          widgetConfig={this.widgetConfig!}
+        >
           <BridgeWidget
             params={params}
             config={this.widgetConfig!}
           />
-        )}
+        </ConnectLoader>
       </React.StrictMode>,
     );
   }

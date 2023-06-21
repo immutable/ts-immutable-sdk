@@ -34,7 +34,7 @@ describe('cancel order', () => {
       offerer: offerer.address,
       considerationItem: {
         amount: '1000000',
-        type: 'IMX',
+        type: 'NATIVE',
       },
       listingItem: {
         contractAddress: contract.address,
@@ -43,15 +43,19 @@ describe('cancel order', () => {
       },
     });
 
-    await signAndSubmitTx(listing.unsignedApprovalTransaction!, offerer, provider);
+    await signAndSubmitTx(
+      listing.unsignedApprovalTransaction!,
+      offerer,
+      provider,
+    );
     const signature = await signMessage(
-      listing.typedOrderMessageForSigning.domain,
-      listing.typedOrderMessageForSigning.types,
-      listing.typedOrderMessageForSigning.value,
+      listing.typedOrderMessageForSigning,
       offerer,
     );
 
-    const { result: { id: orderId } } = await sdk.createOrder({
+    const {
+      result: { id: orderId },
+    } = await sdk.createListing({
       offerer: offerer.address,
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
@@ -60,7 +64,10 @@ describe('cancel order', () => {
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
 
-    const { unsignedCancelOrderTransaction } = await sdk.cancelOrder(orderId, offerer.address);
+    const { unsignedCancelOrderTransaction } = await sdk.cancelOrder(
+      orderId,
+      offerer.address,
+    );
     await signAndSubmitTx(unsignedCancelOrderTransaction, offerer, provider);
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.CANCELLED);

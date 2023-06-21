@@ -1,25 +1,23 @@
+/* eslint-disable class-methods-use-this */
+import { Web3Provider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
-import {
-  BridgeConfiguration,
-  ETH_MAINNET_TO_ZKEVM_MAINNET,
-  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
-  TokenBridge,
-} from '@imtbl/bridge-sdk';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
+import * as provider from './provider';
 import * as wallet from './wallet';
 import * as network from './network';
 import * as transaction from './transaction';
+import * as gasEstimatorService from './gasEstimate';
 import {
   ChainId,
   CheckConnectionParams,
   CheckConnectionResult,
   CheckoutModuleConfiguration,
-  ConnectionProviders,
   ConnectParams,
   ConnectResult,
+  CreateProviderParams,
+  CreateProviderResult,
   GetAllBalancesParams,
   GetAllBalancesResult,
   GetBalanceParams,
@@ -37,23 +35,18 @@ import {
   SendTransactionResult,
   SwitchNetworkParams,
   SwitchNetworkResult,
+  ValidateProviderOptions,
 } from './types';
-import { CheckoutError, CheckoutErrorType } from './errors';
 import { CheckoutConfiguration } from './config';
 import {
-  getBridgeEstimatedGas,
-  getBridgeFeeEstimate,
-} from './gasEstimate/bridgeGasEstimate';
-import {
-  GetBridgeGasEstimateParams,
-  GetBridgeGasEstimateResult,
-} from './types/gasEstimates';
+  GasEstimateParams,
+  GasEstimateSwapResult,
+  GasEstimateBridgeToL2Result,
+} from './types/gasEstimate';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
-
-  private providerPreference: ConnectionProviders | undefined;
 
   private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
 
@@ -66,17 +59,38 @@ export class Checkout {
   }
 
   /**
+   * Create a provider object which can be used within the Checkout class methods.
+   * @param {CreateProviderParams} params The data required to create a provider
+   * @returns A new provider object
+   * @throws {@link ErrorType}
+   */
+  public async createProvider(
+    params: CreateProviderParams,
+  ): Promise<CreateProviderResult> {
+    const web3Provider: Web3Provider = await provider.createProvider(
+      params.walletProvider,
+    );
+    return {
+      provider: web3Provider,
+    };
+  }
+
+  /**
    * Check if a wallet is connected to the current application
    * without requesting permission from the wallet and hence triggering a connect popup.
    * @param {CheckConnectionParams} params - The necessary data required to verify a wallet connection status.
    * @returns Wallet connection status details.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async checkIsWalletConnected(
     params: CheckConnectionParams,
   ): Promise<CheckConnectionResult> {
-    return connect.checkIsWalletConnected(params.providerPreference);
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+    );
+    return connect.checkIsWalletConnected(web3Provider);
   }
 
   /**
@@ -86,12 +100,16 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async connect(params: ConnectParams): Promise<ConnectResult> {
-    this.providerPreference = params.providerPreference;
-    const provider = await connect.connectWalletProvider(params);
-    const networkInfo = await network.getNetworkInfo(this.config, provider);
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+    );
+    await connect.connectSite(web3Provider);
+    const networkInfo = await network.getNetworkInfo(this.config, web3Provider);
 
     return {
-      provider,
+      provider: web3Provider,
       network: networkInfo,
     };
   }
@@ -105,19 +123,19 @@ export class Checkout {
   public async switchNetwork(
     params: SwitchNetworkParams,
   ): Promise<SwitchNetworkResult> {
-    if (!this.providerPreference) {
-      throw new CheckoutError(
-        'connect should be called before switchNetwork to set the provider preference',
-        CheckoutErrorType.PROVIDER_PREFERENCE_ERROR,
-      );
-    }
-
-    return await network.switchWalletNetwork(
+    const web3Provider = await provider.validateProvider(
       this.config,
-      this.providerPreference,
       params.provider,
+      { allowUnsupportedProvider: true, allowMistmatchedChainId: true } as ValidateProviderOptions,
+    );
+
+    const switchNetworkRes = await network.switchWalletNetwork(
+      this.config,
+      web3Provider,
       params.chainId,
     );
+
+    return switchNetworkRes;
   }
 
   /**
@@ -129,15 +147,20 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+    );
+
     if (!params.contractAddress || params.contractAddress === '') {
       return await balances.getBalance(
         this.config,
-        params.provider,
+        web3Provider,
         params.walletAddress,
       );
     }
     return await balances.getERC20Balance(
-      params.provider,
+      web3Provider,
       params.walletAddress,
       params.contractAddress,
     );
@@ -153,9 +176,14 @@ export class Checkout {
   public async getAllBalances(
     params: GetAllBalancesParams,
   ): Promise<GetAllBalancesResult> {
-    return balances.getAllBalances(
+    const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
+    );
+
+    return balances.getAllBalances(
+      this.config,
+      web3Provider,
       params.walletAddress,
       params.chainId,
     );
@@ -179,7 +207,6 @@ export class Checkout {
    * @returns List of allowed tokens.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async getTokenAllowList(
     params: GetTokenAllowListParams,
   ): Promise<GetTokenAllowListResult> {
@@ -192,7 +219,6 @@ export class Checkout {
    * @returns List of allowed wallets.
    * @throws {@link ErrorType}
    */
-  // eslint-disable-next-line class-methods-use-this
   public async getWalletAllowList(
     params: GetWalletAllowListParams,
   ): Promise<GetWalletAllowListResult> {
@@ -207,11 +233,17 @@ export class Checkout {
    * @remarks
    * Further documenation can be found at [MetaMask | Sending Transactions](https://docs.metamask.io/guide/sending-transactions.html).
    */
-  // eslint-disable-next-line class-methods-use-this
   public async sendTransaction(
     params: SendTransactionParams,
   ): Promise<SendTransactionResult> {
-    return await transaction.sendTransaction(params);
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+    );
+    return await transaction.sendTransaction(
+      web3Provider,
+      params.transaction,
+    );
   }
 
   /**
@@ -221,85 +253,36 @@ export class Checkout {
    * @throws {@link ErrorType}
    */
   public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
-    return await network.getNetworkInfo(this.config, params.provider);
+    const web3Provider = await provider.validateProvider(
+      this.config,
+      params.provider,
+      { allowUnsupportedProvider: true, allowMistmatchedChainId: true } as ValidateProviderOptions,
+
+    );
+    return await network.getNetworkInfo(this.config, web3Provider);
+  }
+
+  static isWeb3Provider(web3Provider: Web3Provider) {
+    return provider.isWeb3Provider(web3Provider);
   }
 
   /**
-   * Get gas estimates for bridge transaction.
-   * @param {GetBridgeGasEstimateParams} params - The necessary data required to get the gas estimates.
-   * @returns Network details.
-   * @throws {@link ErrorType}
+   * Estimates the gas to perform an action.
+   * @param {GasEstimateParams} params - The params required to calculate a gas estimate
+   * @returns The gas estimate for the given action.
    */
-  public async getBridgeGasEstimate(
-    params: GetBridgeGasEstimateParams,
-  ): Promise<GetBridgeGasEstimateResult> {
-    const fromChainId = this.config.environment === Environment.PRODUCTION
-      ? ChainId.ETHEREUM
-      : ChainId.SEPOLIA;
-    const toChainId = this.config.environment === Environment.PRODUCTION
-      ? ChainId.IMTBL_ZKEVM_TESTNET
-      : ChainId.IMTBL_ZKEVM_DEVNET;
-
-    const tokenBridge = await this.getBridgeInstance(fromChainId, toChainId);
-
-    const result: GetBridgeGasEstimateResult = {};
-
-    const bridgeFee = await getBridgeFeeEstimate(
-      tokenBridge,
-      params.tokenAddress,
-      toChainId,
-    );
-
-    result.bridgeFee = bridgeFee?.bridgeFee;
-    result.bridgeable = bridgeFee?.bridgeable;
-
-    result.gasEstimate = await getBridgeEstimatedGas(
-      params.provider,
-      fromChainId,
-      params.isSpendingCapApprovalRequired,
-    );
-
-    return result;
-  }
-
-  private async getBridgeInstance(
-    fromChainId: ChainId,
-    toChainId: ChainId,
-  ): Promise<TokenBridge> {
+  public async gasEstimate(
+    params: GasEstimateParams,
+  ): Promise<GasEstimateSwapResult | GasEstimateBridgeToL2Result> {
     this.readOnlyProviders = await createReadOnlyProviders(
       this.config,
       this.readOnlyProviders,
     );
 
-    const rootChainProvider = this.readOnlyProviders.get(fromChainId);
-    const childChainProvider = this.readOnlyProviders.get(toChainId);
-
-    if (!rootChainProvider) {
-      throw new CheckoutError(
-        `Chain:${fromChainId} is not a supported chain`,
-        CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
-      );
-    }
-    if (!childChainProvider) {
-      throw new CheckoutError(
-        `Chain:${toChainId} is not a supported chain`,
-        CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
-      );
-    }
-
-    const bridgeConfig = new BridgeConfiguration({
-      baseConfig: new ImmutableConfiguration({
-        environment: this.config.environment,
-      }),
-      bridgeInstance:
-        this.config.environment === Environment.PRODUCTION
-          ? ETH_MAINNET_TO_ZKEVM_MAINNET
-          : ETH_SEPOLIA_TO_ZKEVM_DEVNET,
-
-      rootProvider: rootChainProvider,
-      childProvider: childChainProvider,
-    });
-
-    return new TokenBridge(bridgeConfig);
+    return await gasEstimatorService.gasEstimator(
+      params,
+      this.readOnlyProviders,
+      this.config.environment,
+    );
   }
 }

@@ -7,11 +7,12 @@ import {
   TokenBridge,
 } from '@imtbl/bridge-sdk';
 import {
-  GetBridgeGasEstimateResult,
   TokenAmountEstimate,
-} from '../types/gasEstimates';
+} from '../types/gasEstimate';
 import * as tokens from '../tokens';
 import { ChainId, TokenFilterTypes, TokenInfo } from '../types';
+
+const GAS_LIMIT = 140000;
 
 async function getTokenInfoByAddress(
   tokenAddress: FungibleToken,
@@ -27,53 +28,66 @@ async function getTokenInfoByAddress(
 
 const doesChainSupportEIP1559 = (feeData: FeeData) => !!feeData.maxFeePerGas && !!feeData.maxPriorityFeePerGas;
 
-const getGasPriceInWei = (feeData: FeeData) => (doesChainSupportEIP1559(feeData)
+const getGasPriceInWei = (feeData: FeeData): BigNumber | null => (doesChainSupportEIP1559(feeData)
   ? BigNumber.from(feeData.maxFeePerGas).add(
     BigNumber.from(feeData.maxPriorityFeePerGas),
   )
-  : BigNumber.from(feeData.gasPrice));
+  : feeData.gasPrice && BigNumber.from(feeData.gasPrice));
 
-const getGasEstimates = async (provider: Web3Provider) => {
-  const txnGasLimitInWei = 140000; // todo: fetch gasLimit from bridgeSDK when they add new fn
+const getGasEstimates = async (provider: Web3Provider): Promise<BigNumber | undefined> => {
+  const txnGasLimitInWei = GAS_LIMIT; // todo: fetch gasLimit from bridgeSDK when they add new fn
   const feeData: FeeData = await provider.getFeeData();
-
   const gasPriceInWei = getGasPriceInWei(feeData);
+  if (!gasPriceInWei) return undefined;
   return gasPriceInWei.mul(txnGasLimitInWei);
 };
 
 export async function getBridgeEstimatedGas(
   provider: Web3Provider,
   chainId: ChainId,
-  isApproveTxnRequired?: boolean,
-  tokenAddress?: FungibleToken,
+  isApproveTxnRequired: boolean,
+  gasTokenAddress?: FungibleToken,
 ): Promise<TokenAmountEstimate> {
-  // fetch token details
-  const tokenInfo = await getTokenInfoByAddress(
-    tokenAddress || 'NATIVE',
+  const token = await getTokenInfoByAddress(
+    gasTokenAddress || 'NATIVE',
     chainId,
   );
-  const result: TokenAmountEstimate = { token: tokenInfo };
 
-  const gasEstimate = await getGasEstimates(provider);
-  result.estimatedAmount = gasEstimate;
+  let estimatedAmount = await getGasEstimates(provider);
+  if (!estimatedAmount) {
+    return {
+      estimatedAmount: undefined,
+      token,
+    };
+  }
 
   if (isApproveTxnRequired) {
-    result.estimatedAmount.add(gasEstimate);
+    estimatedAmount = estimatedAmount.add(estimatedAmount);
   }
+
+  const result: TokenAmountEstimate = {
+    estimatedAmount,
+    token,
+  };
 
   return result;
 }
 
-// Bridge fees
+interface BridgeFeeEstimateResult {
+  bridgeFee: TokenAmountEstimate,
+  bridgeable: boolean
+}
+
 export async function getBridgeFeeEstimate(
   tokenBridge: TokenBridge,
   tokenAddress: FungibleToken,
   destinationChainId: ChainId,
-): Promise<GetBridgeGasEstimateResult> {
+): Promise<BridgeFeeEstimateResult> {
   const bridgeFeeReq: BridgeFeeRequest = { token: tokenAddress };
   const bridgeFeeResponse: BridgeFeeResponse = await tokenBridge.getFee(
     bridgeFeeReq,
   );
+
   const tokenInfo = await getTokenInfoByAddress(
     tokenAddress,
     destinationChainId,

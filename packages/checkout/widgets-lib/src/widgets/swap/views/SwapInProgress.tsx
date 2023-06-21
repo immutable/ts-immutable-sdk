@@ -50,7 +50,7 @@ export function SwapInProgress({ transactionResponse, swapForm }: SwapInProgress
             },
           },
         });
-      } catch (e) {
+      } catch {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,

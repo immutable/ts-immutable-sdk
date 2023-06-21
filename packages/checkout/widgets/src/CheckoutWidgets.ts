@@ -40,9 +40,6 @@ export function SetProvider(
     console.error('no provider parsed');
     return;
   }
-  const elements = document.getElementsByTagName(tagName);
-
-  const widget = elements[0] as unknown as ImmutableWebComponent;
 
   let attempts = 0;
   const maxAttempts = 10;
@@ -50,6 +47,8 @@ export function SetProvider(
 
   const attemptToSetProvider = () => {
     try {
+      const elements = document.getElementsByTagName(tagName);
+      const widget = elements[0] as unknown as ImmutableWebComponent;
       widget.setProvider(provider);
       window.clearInterval(timer);
     } catch (err) {

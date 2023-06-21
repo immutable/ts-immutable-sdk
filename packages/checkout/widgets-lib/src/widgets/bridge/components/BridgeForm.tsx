@@ -2,7 +2,7 @@ import {
   Box, Button, Heading, OptionKey,
 } from '@biom3/react';
 import {
-  CheckoutErrorType, GetBalanceResult, GetBridgeGasEstimateResult, TokenInfo,
+  CheckoutErrorType, GasEstimateBridgeToL2Result, GasEstimateType, GetBalanceResult, TokenInfo,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback, useContext, useEffect, useMemo, useState,
@@ -29,6 +29,7 @@ import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSe
 import { useInterval } from '../../../lib/hooks/useInterval';
 import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
 import { swapButtonIconLoadingStyle } from '../../swap/components/SwapButtonStyles';
+import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 
 interface BridgeFormProps {
   testId?: string;
@@ -63,16 +64,21 @@ export function BridgeForm(props: BridgeFormProps) {
 
   // Fee estimates & transactions
   const [isFetching, setIsFetching] = useState(false);
-  const [estimates, setEstimates] = useState<GetBridgeGasEstimateResult | undefined>(undefined);
+  const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [approvalTransaction, setApprovalTransaction] = useState<ApproveBridgeResponse | undefined>(undefined);
   const [unsignedBridgeTransaction,
     setUnsignedBridgeTransaction] = useState<BridgeDepositResponse | undefined>(undefined);
   const [tokenAddress, setTokenAddress] = useState<string>('');
+  const [tokensOptions, setTokensOptions] = useState<CoinSelectorOptionProps[]>([]);
 
-  const tokensOptions = useMemo(
-    () => tokenBalances
+  // user rejects transaction
+  const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
+
+  useEffect(() => {
+    if (tokenBalances.length === 0 || cryptoFiatState.conversions.size === 0) return;
+    const options = tokenBalances
       .filter((b) => b.balance.gt(0))
       .map(
         (t) => ({
@@ -89,13 +95,13 @@ export function BridgeForm(props: BridgeFormProps) {
             formattedAmount: tokenValueFormat(t.formattedBalance),
           },
         } as CoinSelectorOptionProps),
-      ),
-    [tokenBalances],
-  );
+      );
+    setTokensOptions(options);
+  }, [tokenBalances, cryptoFiatState.conversions]);
 
   const selectedOption = useMemo(
     () => (token && token ? `${token.token.symbol}-${token.token.name}` : undefined),
-    [token, tokensOptions],
+    [token],
   );
   const getTokenAddress = (selectedToken?: TokenInfo) => ((selectedToken?.address === ''
     || selectedToken?.address === undefined)
@@ -155,21 +161,20 @@ export function BridgeForm(props: BridgeFormProps) {
     // fetching or the user is updating the inputs.
     if ((silently && (loading || editing)) || !transactions?.bridgeTxn || !checkout) return;
 
-    const gasEstimateResult = await checkout.getBridgeGasEstimate({
-      tokenAddress: token?.token.address || 'NATIVE',
-      provider: provider!,
+    const gasEstimateResult = await checkout.gasEstimate({
+      gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
       isSpendingCapApprovalRequired: !!transactions?.approveRes?.unsignedTx,
-    });
+    }) as GasEstimateBridgeToL2Result;
 
     setEstimates(gasEstimateResult);
     const estimatedAmount = utils.formatUnits(
-      gasEstimateResult?.gasEstimate?.estimatedAmount || 0,
+      gasEstimateResult?.gasFee?.estimatedAmount || 0,
       DEFAULT_TOKEN_DECIMALS,
     );
     setGasFee(estimatedAmount);
     setGasFeeFiatValue(calculateCryptoToFiat(
       estimatedAmount,
-      gasEstimateResult.gasEstimate?.token?.symbol || '',
+      gasEstimateResult.gasFee?.token?.symbol || '',
       cryptoFiatState.conversions,
     ));
 
@@ -293,7 +298,6 @@ export function BridgeForm(props: BridgeFormProps) {
       if (approvalTransaction && approvalTransaction.required && approvalTransaction.unsignedTx) {
         // move to new Approve ERC20 view
         // pass in approvalTransaction and unsignedBridgeTransaction
-
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
@@ -338,16 +342,19 @@ export function BridgeForm(props: BridgeFormProps) {
       setLoading(false);
 
       if (err.type === CheckoutErrorType.USER_REJECTED_REQUEST_ERROR) {
+        setShowTxnRejectedState(true);
         return;
       }
       if (err.type === CheckoutErrorType.UNPREDICTABLE_GAS_LIMIT
         || err.type === CheckoutErrorType.TRANSACTION_FAILED
-        || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS) {
+        || err.type === CheckoutErrorType.INSUFFICIENT_FUNDS
+        || (err.receipt && err.receipt.status === 0)) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
             view: {
               type: BridgeWidgetViews.FAIL,
+              reason: 'Transaction failed',
               data: {
                 tokenAddress: token?.token.address ?? '',
                 amount,
@@ -365,6 +372,11 @@ export function BridgeForm(props: BridgeFormProps) {
       });
     }
   }, [checkout, provider, bridgeFormValidator, approvalTransaction, unsignedBridgeTransaction]);
+
+  const retrySubmitBridge = async () => {
+    setShowTxnRejectedState(false);
+    await submitBridge();
+  };
 
   return (
     <Box
@@ -413,7 +425,7 @@ export function BridgeForm(props: BridgeFormProps) {
           title={fees.title}
           fiatPricePrefix={content.fiatPricePrefix}
           gasFeeValue={gasFee}
-          gasFeeToken={estimates?.gasEstimate?.token}
+          gasFeeToken={estimates?.gasFee?.token}
           gasFeeFiatValue={gasFeeFiatValue}
         />
       </Box>
@@ -423,11 +435,18 @@ export function BridgeForm(props: BridgeFormProps) {
           variant="primary"
           onClick={submitBridge}
           disabled={loading}
+          size="large"
         >
           {loading ? (
             <Button.Icon icon="Loading" sx={swapButtonIconLoadingStyle} />
           ) : bridgeForm.buttonText}
         </Button>
+        <TransactionRejected
+          visible={showTxnRejectedState}
+          showHeaderBar={false}
+          onCloseBottomSheet={() => setShowTxnRejectedState(false)}
+          onRetry={retrySubmitBridge}
+        />
       </Box>
     </Box>
   );

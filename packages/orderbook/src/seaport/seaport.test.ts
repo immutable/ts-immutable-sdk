@@ -1,21 +1,24 @@
 import {
-  mock, when, deepEqual, instance, anything,
+  anything, deepEqual, instance, mock, when,
 } from 'ts-mockito';
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
 import {
-  ApprovalAction, CreateOrderAction, ExchangeAction, OrderComponents, TransactionMethods,
+  ApprovalAction,
+  CreateOrderAction,
+  ExchangeAction,
+  OrderComponents,
+  TransactionMethods,
 } from '@opensea/seaport-js/lib/types';
 import {
   ERC20Item, ERC721Item, NativeItem, RoyaltyInfo,
 } from 'types';
+import { BigNumber, PopulatedTransaction, providers } from 'ethers';
+import { CreateOrderProtocolData, Order, OrderStatus } from 'openapi/sdk';
 import {
-  BigNumber, PopulatedTransaction, providers,
-} from 'ethers';
-import {
-  BuyItem, Order, CreateOrderProtocolData, SellItem, OrderStatus,
-} from 'openapi/sdk';
-import {
-  EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME, SEAPORT_CONTRACT_VERSION_V1_4,
+  EIP_712_ORDER_TYPE,
+  ItemType,
+  SEAPORT_CONTRACT_NAME,
+  SEAPORT_CONTRACT_VERSION_V1_4,
 } from './constants';
 import { Seaport } from './seaport';
 
@@ -69,37 +72,48 @@ describe('Seaport', () => {
         const createActionInstance = instance(createAction);
         createActionInstance.type = 'create';
 
-        when(mockedProvider.getNetwork()).thenReturn(Promise.resolve({ chainId: network, name: 'foobar' }));
-        when(mockedSeaportJs.getOrderHash(deepEqual(orderComponentsWithHexSalt as OrderComponents)))
-          .thenReturn(orderHash);
-        when(createAction.getMessageToSign())
-          .thenReturn(Promise.resolve(JSON.stringify({ message: orderComponents })));
-        when(mockedSeaportJs.createOrder(deepEqual({
-          allowPartialFills: false,
-          offer: [
-            {
-              itemType: ItemType.ERC721,
-              token: listingItem.contractAddress,
-              identifier: listingItem.tokenId,
-            },
-          ],
-          consideration: [
-            {
-              token: considerationItem.contractAddress,
-              amount: considerationItem.amount,
-              recipient: offerer,
-            },
-            {
-              token: considerationItem.contractAddress,
-              amount: royaltyInfo.amountRequired,
-              recipient: royaltyInfo.recipient,
-            },
-          ],
-          startTime: (orderStart.getTime() / 1000).toFixed(0),
-          endTime: (orderExpiry.getTime() / 1000).toFixed(0),
-          zone: zoneAddress,
-          restrictedByZone: true,
-        }), offerer)).thenReturn(
+        when(mockedProvider.getNetwork()).thenReturn(
+          Promise.resolve({ chainId: network, name: 'foobar' }),
+        );
+        when(
+          mockedSeaportJs.getOrderHash(
+            deepEqual(orderComponentsWithHexSalt as OrderComponents),
+          ),
+        ).thenReturn(orderHash);
+        when(createAction.getMessageToSign()).thenReturn(
+          Promise.resolve(JSON.stringify({ message: orderComponents })),
+        );
+        when(
+          mockedSeaportJs.createOrder(
+            deepEqual({
+              allowPartialFills: false,
+              offer: [
+                {
+                  itemType: ItemType.ERC721,
+                  token: listingItem.contractAddress,
+                  identifier: listingItem.tokenId,
+                },
+              ],
+              consideration: [
+                {
+                  token: considerationItem.contractAddress,
+                  amount: considerationItem.amount,
+                  recipient: offerer,
+                },
+                {
+                  token: considerationItem.contractAddress,
+                  amount: royaltyInfo.amountRequired,
+                  recipient: royaltyInfo.recipient,
+                },
+              ],
+              startTime: (orderStart.getTime() / 1000).toFixed(0),
+              endTime: (orderExpiry.getTime() / 1000).toFixed(0),
+              zone: zoneAddress,
+              restrictedByZone: true,
+            }),
+            offerer,
+          ),
+        ).thenReturn(
           Promise.resolve({
             actions: [createActionInstance],
             executeAllActions: () => undefined as any,
@@ -196,7 +210,7 @@ describe('Seaport', () => {
 
       const considerationItem: NativeItem = {
         amount: '100',
-        type: 'IMX',
+        type: 'NATIVE',
       };
 
       const royaltyInfo: RoyaltyInfo = {
@@ -220,47 +234,61 @@ describe('Seaport', () => {
         const createAction = mock<CreateOrderAction>();
         const createActionInstance = instance(createAction);
         createActionInstance.type = 'create';
-        when(createAction.getMessageToSign())
-          .thenReturn(Promise.resolve(JSON.stringify({ message: orderComponents })));
+        when(createAction.getMessageToSign()).thenReturn(
+          Promise.resolve(JSON.stringify({ message: orderComponents })),
+        );
 
         const transactionMethods = mock<TransactionMethods<boolean>>();
         const approvalAction = mock<ApprovalAction>();
         const approvalActionInstance = instance(approvalAction);
         approvalActionInstance.type = 'approval';
         approvalActionInstance.transactionMethods = instance(transactionMethods);
-        when(transactionMethods.buildTransaction())
-          .thenReturn(Promise.resolve(approvalTransaction));
-        when(transactionMethods.estimateGas()).thenReturn(Promise.resolve(approvalGas));
+        when(transactionMethods.buildTransaction()).thenReturn(
+          Promise.resolve(approvalTransaction),
+        );
+        when(transactionMethods.estimateGas()).thenReturn(
+          Promise.resolve(approvalGas),
+        );
 
-        when(mockedProvider.getNetwork()).thenReturn(Promise.resolve({ chainId: network, name: 'foobar' }));
-        when(mockedSeaportJs.getOrderHash(deepEqual(orderComponentsWithHexSalt as OrderComponents)))
-          .thenReturn(orderHash);
-        when(mockedSeaportJs.createOrder(deepEqual({
-          allowPartialFills: false,
-          offer: [
-            {
-              itemType: ItemType.ERC721,
-              token: listingItem.contractAddress,
-              identifier: listingItem.tokenId,
-            },
-          ],
-          consideration: [
-            {
-              token: undefined,
-              amount: considerationItem.amount,
-              recipient: offerer,
-            },
-            {
-              token: undefined,
-              amount: royaltyInfo.amountRequired,
-              recipient: royaltyInfo.recipient,
-            },
-          ],
-          startTime: (orderStart.getTime() / 1000).toFixed(0),
-          endTime: (orderExpiry.getTime() / 1000).toFixed(0),
-          zone: zoneAddress,
-          restrictedByZone: true,
-        }), offerer)).thenReturn(
+        when(mockedProvider.getNetwork()).thenReturn(
+          Promise.resolve({ chainId: network, name: 'foobar' }),
+        );
+        when(
+          mockedSeaportJs.getOrderHash(
+            deepEqual(orderComponentsWithHexSalt as OrderComponents),
+          ),
+        ).thenReturn(orderHash);
+        when(
+          mockedSeaportJs.createOrder(
+            deepEqual({
+              allowPartialFills: false,
+              offer: [
+                {
+                  itemType: ItemType.ERC721,
+                  token: listingItem.contractAddress,
+                  identifier: listingItem.tokenId,
+                },
+              ],
+              consideration: [
+                {
+                  token: undefined,
+                  amount: considerationItem.amount,
+                  recipient: offerer,
+                },
+                {
+                  token: undefined,
+                  amount: royaltyInfo.amountRequired,
+                  recipient: royaltyInfo.recipient,
+                },
+              ],
+              startTime: (orderStart.getTime() / 1000).toFixed(0),
+              endTime: (orderExpiry.getTime() / 1000).toFixed(0),
+              zone: zoneAddress,
+              restrictedByZone: true,
+            }),
+            offerer,
+          ),
+        ).thenReturn(
           Promise.resolve({
             actions: [approvalActionInstance, createActionInstance],
             executeAllActions: () => undefined as any,
@@ -285,7 +313,9 @@ describe('Seaport', () => {
           orderExpiry,
         );
         expect(unsignedApprovalTransaction).toBeTruthy();
-        expect(unsignedApprovalTransaction!.from).toEqual(approvalTransaction.from);
+        expect(unsignedApprovalTransaction!.from).toEqual(
+          approvalTransaction.from,
+        );
         expect(unsignedApprovalTransaction!.to).toEqual(approvalTransaction.to);
 
         const expectedGasLimit = approvalGas.add(approvalGas.div(5));
@@ -364,9 +394,7 @@ describe('Seaport', () => {
 
       const immutableOrder: Order = {
         account_address: offerer,
-        buy: [
-          { item_type: BuyItem.item_type.NATIVE, start_amount: '100' },
-        ],
+        buy: [{ item_type: 'NATIVE', start_amount: '100' }],
         buy_fees: [],
         chain: { id: '1', name: 'imtbl-zkevm-local' },
         create_time: new Date().toISOString(),
@@ -382,7 +410,11 @@ describe('Seaport', () => {
         },
         salt: '1',
         sell: [
-          { item_type: SellItem.item_type.ERC721, contract_address: randomAddress(), token_id: '1' },
+          {
+            item_type: 'ERC721',
+            contract_address: randomAddress(),
+            token_id: '1',
+          },
         ],
         signature: randomAddress(),
         status: OrderStatus.ACTIVE,
@@ -398,39 +430,55 @@ describe('Seaport', () => {
         const exchangeAction = mock<ExchangeAction<any>>();
         const exchangeActionInstance = instance(exchangeAction);
         exchangeActionInstance.type = 'exchange';
-        exchangeActionInstance.transactionMethods = instance(exchangeTransactionMethods);
-        when(exchangeTransactionMethods.buildTransaction())
-          .thenReturn(Promise.resolve(fulfilTransaction));
-        when(exchangeTransactionMethods.estimateGas()).thenReturn(Promise.resolve(fulfilGas));
+        exchangeActionInstance.transactionMethods = instance(
+          exchangeTransactionMethods,
+        );
+        when(exchangeTransactionMethods.buildTransaction()).thenReturn(
+          Promise.resolve(fulfilTransaction),
+        );
+        when(exchangeTransactionMethods.estimateGas()).thenReturn(
+          Promise.resolve(fulfilGas),
+        );
 
         const approvalTransactionMethods = mock<TransactionMethods<boolean>>();
         const approvalAction = mock<ApprovalAction>();
         const approvalActionInstance = instance(approvalAction);
         approvalActionInstance.type = 'approval';
-        approvalActionInstance.transactionMethods = instance(approvalTransactionMethods);
-        when(approvalTransactionMethods.buildTransaction())
-          .thenReturn(Promise.resolve(approvalTransaction));
-        when(approvalTransactionMethods.estimateGas()).thenReturn(Promise.resolve(approvalGas));
+        approvalActionInstance.transactionMethods = instance(
+          approvalTransactionMethods,
+        );
+        when(approvalTransactionMethods.buildTransaction()).thenReturn(
+          Promise.resolve(approvalTransaction),
+        );
+        when(approvalTransactionMethods.estimateGas()).thenReturn(
+          Promise.resolve(approvalGas),
+        );
 
-        when(mockedSeaportJs.fulfillOrders(deepEqual({
-          accountAddress: fulfiller,
-          fulfillOrderDetails: [
-            {
-              order: {
-                parameters: anything(),
-                signature: immutableOrder.signature,
-              },
-              extraData: immutableOrder.protocol_data.operator_signature,
-            },
-          ],
-        }))).thenReturn(
+        when(
+          mockedSeaportJs.fulfillOrders(
+            deepEqual({
+              accountAddress: fulfiller,
+              fulfillOrderDetails: [
+                {
+                  order: {
+                    parameters: anything(),
+                    signature: immutableOrder.signature,
+                  },
+                  extraData: immutableOrder.protocol_data.operator_signature,
+                },
+              ],
+            }),
+          ),
+        ).thenReturn(
           Promise.resolve({
             actions: [approvalActionInstance, exchangeActionInstance],
             executeAllActions: () => undefined as any,
           }),
         );
 
-        when(mockedSeaportJs.getCounter(offerer)).thenReturn(Promise.resolve(BigNumber.from(1)));
+        when(mockedSeaportJs.getCounter(offerer)).thenReturn(
+          Promise.resolve(BigNumber.from(1)),
+        );
 
         sut = new Seaport(
           instance(mockedSeaportJs),
@@ -446,7 +494,9 @@ describe('Seaport', () => {
           fulfiller,
         );
         expect(unsignedApprovalTransaction).toBeTruthy();
-        expect(unsignedApprovalTransaction!.from).toEqual(approvalTransaction.from);
+        expect(unsignedApprovalTransaction!.from).toEqual(
+          approvalTransaction.from,
+        );
         expect(unsignedApprovalTransaction!.to).toEqual(approvalTransaction.to);
 
         const expectedGasLimit = approvalGas.add(approvalGas.div(5));
@@ -459,11 +509,17 @@ describe('Seaport', () => {
           fulfiller,
         );
         expect(unsignedFulfillmentTransaction).toBeTruthy();
-        expect(unsignedFulfillmentTransaction!.from).toEqual(approvalTransaction.from);
-        expect(unsignedFulfillmentTransaction!.to).toEqual(approvalTransaction.to);
+        expect(unsignedFulfillmentTransaction!.from).toEqual(
+          approvalTransaction.from,
+        );
+        expect(unsignedFulfillmentTransaction!.to).toEqual(
+          approvalTransaction.to,
+        );
 
         const expectedGasLimit = fulfilGas.add(fulfilGas.div(5));
-        expect(unsignedFulfillmentTransaction!.gasLimit).toEqual(expectedGasLimit);
+        expect(unsignedFulfillmentTransaction!.gasLimit).toEqual(
+          expectedGasLimit,
+        );
       });
     });
   });

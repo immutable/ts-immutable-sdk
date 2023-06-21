@@ -43,7 +43,11 @@ const networkIcon = {
   [ChainId.SEPOLIA]: 'EthToken',
 };
 
-export function NetworkMenu() {
+export interface NetworkMenuProps {
+  setBalancesLoading: (loading: boolean) => void;
+}
+
+export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
   const { viewDispatch } = useContext(ViewContext);
   const { walletState, walletDispatch } = useContext(WalletContext);
   const { networkStatus } = text.views[WalletWidgetViews.WALLET_BALANCES];
@@ -55,6 +59,7 @@ export function NetworkMenu() {
   const switchNetwork = useCallback(
     async (chainId: ChainId) => {
       if (!checkout || !provider || !network || network.chainId === chainId) return;
+      setBalancesLoading(true);
       try {
         const switchNetworkResult = await checkout.switchNetwork({
           provider,
@@ -63,7 +68,7 @@ export function NetworkMenu() {
         walletDispatch({
           payload: {
             type: WalletActions.SET_PROVIDER,
-            provider: switchNetworkResult?.provider,
+            provider: switchNetworkResult.provider,
           },
         });
 
@@ -74,8 +79,9 @@ export function NetworkMenu() {
           },
         });
 
-        sendNetworkSwitchEvent(switchNetworkResult.network);
+        sendNetworkSwitchEvent(switchNetworkResult.provider, switchNetworkResult.network);
       } catch (err: any) {
+        setBalancesLoading(false);
         if (err.type === 'USER_REJECTED_REQUEST_ERROR') {
           // ignore error
         } else {

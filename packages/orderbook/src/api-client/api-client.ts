@@ -1,13 +1,11 @@
 import {
-  BuyItem,
-  Fee,
-  OrdersService,
   CreateOrderProtocolData,
-  SellItem,
-  ListOrdersResult,
-  OrderResult,
+  Fee,
+  ListingResult,
+  ListListingsResult,
+  OrdersService,
 } from 'openapi/sdk';
-import { CreateOrderParams, ListOrderParams } from 'types';
+import { CreateListingParams, ListListingsParams } from 'types';
 import { ItemType, SEAPORT_CONTRACT_VERSION_V1_4 } from '../seaport';
 
 export class ImmutableApiClient {
@@ -15,23 +13,30 @@ export class ImmutableApiClient {
     private readonly orderbookService: OrdersService,
     private readonly chainName: string,
     private readonly seaportAddress: string,
-  ) { }
+  ) {}
 
-  async getOrder(orderId: string): Promise<OrderResult> {
-    return this.orderbookService.getOrder({ chainName: this.chainName, orderId });
+  async getListing(listingId: string): Promise<ListingResult> {
+    return this.orderbookService.getListing({
+      chainName: this.chainName,
+      listingId,
+    });
   }
 
-  async listOrders(listOrderParams: ListOrderParams): Promise<ListOrdersResult> {
-    return this.orderbookService.listOrders({
+  async listListings(
+    listOrderParams: ListListingsParams,
+  ): Promise<ListListingsResult> {
+    return this.orderbookService.listListings({
+      chainName: this.chainName,
       ...listOrderParams,
     });
   }
 
-  async createOrder(
-    {
-      orderHash, orderComponents, offerer, orderSignature,
-    }: CreateOrderParams,
-  ): Promise<OrderResult> {
+  async createListing({
+    orderHash,
+    orderComponents,
+    offerer,
+    orderSignature,
+  }: CreateListingParams): Promise<ListingResult> {
     if (orderComponents.offer.length !== 1) {
       throw new Error('Only one item can be listed at a time');
     }
@@ -40,35 +45,43 @@ export class ImmutableApiClient {
       throw new Error('Only ERC721 tokens can be listed');
     }
 
-    const considerationItemTypeTheSame = new Set(
-      [...orderComponents.consideration.map((c) => c.itemType)],
-    ).size === 1;
-    if (!considerationItemTypeTheSame) {
+    const orderTypes = [
+      ...orderComponents.consideration.map((c) => c.itemType),
+    ];
+    const isSameConsiderationType = new Set(orderTypes).size === 1;
+    if (!isSameConsiderationType) {
       throw new Error('All consideration items must be of the same type');
     }
 
-    return this.orderbookService.createOrder({
+    return this.orderbookService.createListing({
       chainName: this.chainName,
       requestBody: {
         order_hash: orderHash,
         account_address: offerer,
         buy: [
           {
-            item_type: Number(orderComponents.consideration[0].itemType) === ItemType.NATIVE
-              ? BuyItem.item_type.NATIVE
-              : BuyItem.item_type.ERC20,
+            item_type:
+              Number(orderComponents.consideration[0].itemType)
+              === ItemType.NATIVE
+                ? 'NATIVE'
+                : 'ERC20',
             start_amount: orderComponents.consideration[0].startAmount,
-          }],
-        buy_fees: orderComponents.consideration.length > 1
-          ? [
-            {
-              amount: orderComponents.consideration[1].startAmount,
-              recipient: orderComponents.consideration[1].recipient,
-              fee_type: Fee.fee_type.ROYALTY,
-            },
-          ]
-          : [],
-        end_time: new Date(parseInt(`${orderComponents.endTime.toString()}000`, 10)).toISOString(),
+            contract_address: orderComponents.consideration[0].token,
+          },
+        ],
+        buy_fees:
+          orderComponents.consideration.length > 1
+            ? [
+              {
+                amount: orderComponents.consideration[1].startAmount,
+                recipient: orderComponents.consideration[1].recipient,
+                fee_type: Fee.fee_type.ROYALTY,
+              },
+            ]
+            : [],
+        end_time: new Date(
+          parseInt(`${orderComponents.endTime.toString()}000`, 10),
+        ).toISOString(),
         protocol_data: {
           order_type: CreateOrderProtocolData.order_type.FULL_RESTRICTED,
           zone_address: orderComponents.zone,
@@ -77,13 +90,17 @@ export class ImmutableApiClient {
           counter: orderComponents.counter.toString(),
         },
         salt: orderComponents.salt,
-        sell: [{
-          contract_address: orderComponents.offer[0].token,
-          token_id: orderComponents.offer[0].identifierOrCriteria,
-          item_type: SellItem.item_type.ERC721,
-        }],
+        sell: [
+          {
+            contract_address: orderComponents.offer[0].token,
+            token_id: orderComponents.offer[0].identifierOrCriteria,
+            item_type: 'ERC721',
+          },
+        ],
         signature: orderSignature,
-        start_time: new Date(parseInt(`${orderComponents.startTime.toString()}000`, 10)).toISOString(),
+        start_time: new Date(
+          parseInt(`${orderComponents.startTime.toString()}000`, 10),
+        ).toISOString(),
       },
     });
   }

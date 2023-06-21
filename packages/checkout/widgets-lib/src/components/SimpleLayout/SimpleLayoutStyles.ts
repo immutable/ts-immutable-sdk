@@ -5,6 +5,7 @@ export const responsiveStyles = {
   maxHeight: '650px',
   position: 'relative',
   overflow: 'hidden',
+  borderRadius: 'base.borderRadius.x4',
 };
 
 export const simpleLayoutStyle = {

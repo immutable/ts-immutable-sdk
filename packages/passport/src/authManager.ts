@@ -4,8 +4,7 @@ import {
   UserManagerSettings,
 } from 'oidc-client-ts';
 import { PassportErrorType, withPassportError } from './errors/passportError';
-import { PassportMetadata, User, UserWithEtherKey } from './types';
-import { retryWithDelay } from './util/retry';
+import { PassportMetadata, User } from './types';
 import { PassportConfiguration } from './config';
 
 const getAuthConfiguration = ({
@@ -62,6 +61,8 @@ export default class AuthManager {
         nickname: oidcUser.profile.nickname,
       },
       etherKey: passport?.ether_key || '',
+      starkKey: passport?.stark_key || '',
+      userAdminKey: passport?.user_admin_key || '',
     };
   };
 
@@ -90,8 +91,8 @@ export default class AuthManager {
     );
   }
 
-  public async loginSilent(): Promise<UserWithEtherKey | null> {
-    return withPassportError<UserWithEtherKey | null>(async () => {
+  public async loginSilent(): Promise<User | null> {
+    return withPassportError<User | null>(async () => {
       const existedUser = await this.getUser();
       if (!existedUser) {
         return null;
@@ -100,7 +101,7 @@ export default class AuthManager {
       if (!oidcUser) {
         return null;
       }
-      return AuthManager.mapOidcUserToDomainModel(oidcUser) as UserWithEtherKey;
+      return AuthManager.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.SILENT_LOGIN_ERROR);
   }
 
@@ -112,25 +113,5 @@ export default class AuthManager {
       }
       return AuthManager.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.NOT_LOGGED_IN_ERROR);
-  }
-
-  public async requestRefreshTokenAfterRegistration(): Promise<UserWithEtherKey | null> {
-    return withPassportError<UserWithEtherKey | null>(async () => {
-      const updatedUser = await retryWithDelay(async () => {
-        const user = await this.userManager.signinSilent();
-        const passportMetadata = user?.profile?.passport as PassportMetadata;
-        const metadataExists = !!passportMetadata?.ether_key
-          && !!passportMetadata?.stark_key
-          && !!passportMetadata?.user_admin_key;
-        if (metadataExists) {
-          return user;
-        }
-        return Promise.reject(new Error('user wallet addresses not exist'));
-      });
-      if (!updatedUser) {
-        return null;
-      }
-      return AuthManager.mapOidcUserToDomainModel(updatedUser) as UserWithEtherKey;
-    }, PassportErrorType.REFRESH_TOKEN_ERROR);
   }
 }
