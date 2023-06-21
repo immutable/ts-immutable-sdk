@@ -1,11 +1,11 @@
 import { TransfersApi, UnsignedTransferRequest } from '@imtbl/core-sdk';
 import * as guardian from '@imtbl/guardian';
-import { PassportError, PassportErrorType } from '../errors/passportError';
-import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
+import { PassportError, PassportErrorType } from '../../errors/passportError';
+import { mockErrorMessage, mockStarkSignature, mockUser } from '../../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
-import { ConfirmationScreen, TransactionTypes } from '../confirmation';
+import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
 
-jest.mock('../confirmation/confirmation');
+jest.mock('../../confirmation');
 jest.mock('@imtbl/guardian');
 
 describe('transfer', () => {

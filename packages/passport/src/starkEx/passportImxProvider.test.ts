@@ -15,19 +15,19 @@ import {
 } from '@imtbl/core-sdk';
 import { mockUser } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
-import PassportImxProvider from './passportImxProvider';
-import { batchNftTransfer, transfer } from '../workflows/transfer';
-import { cancelOrder, createOrder } from '../workflows/order';
-import { exchangeTransfer } from '../workflows/exchange';
-import { createTrade } from '../workflows/trades';
+import { PassportImxProvider } from './passportImxProvider';
+import {
+  batchNftTransfer,
+  transfer,
+  cancelOrder,
+  createOrder,
+  exchangeTransfer,
+  createTrade,
+} from './workflows';
 import { ConfirmationScreen } from '../confirmation';
 import { PassportConfiguration } from '../config';
 
-jest.mock('../workflows/transfer');
-jest.mock('../workflows/order');
-jest.mock('../workflows/exchange');
-jest.mock('../workflows/trades');
-
+jest.mock('./workflows');
 describe('PassportImxProvider', () => {
   afterEach(jest.resetAllMocks);
 

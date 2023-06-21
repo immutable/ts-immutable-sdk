@@ -1,7 +1,7 @@
 import { CreateTransferResponseV1, ETHAmount, ExchangesApi } from '@imtbl/core-sdk';
 import { exchangeTransfer } from './exchange';
-import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
-import { PassportError, PassportErrorType } from '../errors/passportError';
+import { mockErrorMessage, mockStarkSignature, mockUser } from '../../test/mocks';
+import { PassportError, PassportErrorType } from '../../errors/passportError';
 
 describe('exchangeTransfer', () => {
   afterEach(jest.resetAllMocks);

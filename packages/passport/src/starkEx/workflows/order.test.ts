@@ -1,10 +1,10 @@
 import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
-import { PassportError, PassportErrorType } from '../errors/passportError';
-import { mockErrorMessage, mockStarkSignature, mockUser } from '../test/mocks';
+import { PassportError, PassportErrorType } from '../../errors/passportError';
+import { mockErrorMessage, mockStarkSignature, mockUser } from '../../test/mocks';
 import { cancelOrder, createOrder } from './order';
-import { ConfirmationScreen, TransactionTypes } from '../confirmation';
+import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
 
-jest.mock('../confirmation/confirmation');
+jest.mock('../../confirmation');
 
 describe('order', () => {
   afterEach(jest.resetAllMocks);
