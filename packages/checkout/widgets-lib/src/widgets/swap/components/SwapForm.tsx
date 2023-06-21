@@ -115,8 +115,11 @@ export function SwapForm({ data }: SwapFromProps) {
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
   const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
-  const tokensOptionsFrom = useMemo(
-    () => tokenBalances
+  const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
+
+  useEffect(() => {
+    if (tokenBalances.length === 0 || cryptoFiatState.conversions.size === 0) return;
+    const options = tokenBalances
       .filter((b) => b.balance.gt(0))
       .map(
         (t) => ({
@@ -133,9 +136,10 @@ export function SwapForm({ data }: SwapFromProps) {
             ),
           },
         } as CoinSelectorOptionProps),
-      ),
-    [tokenBalances],
-  );
+      );
+    setTokensOptionsForm(options);
+  }, [tokenBalances, cryptoFiatState.conversions]);
+
   const tokensOptionsTo = useMemo(
     () => allowedTokens
       .filter((t) => t.address !== fromToken?.address)
