@@ -6,7 +6,7 @@ import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkH
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
-import { ConnectContext } from '../context/ConnectContext';
+import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import { zkEVMNetwork } from '../../../lib/networkUtils';
 import {
   ViewContext,
@@ -15,7 +15,7 @@ import {
 
 export function SwitchNetworkZkEVM() {
   const { viewDispatch } = useContext(ViewContext);
-  const { connectState } = useContext(ConnectContext);
+  const { connectDispatch, connectState } = useContext(ConnectContext);
   const { checkout, provider, sendCloseEvent } = connectState;
   const { heading, body, button } = text.views[ConnectWidgetViews.SWITCH_NETWORK].zkEVM;
 
@@ -25,9 +25,16 @@ export function SwitchNetworkZkEVM() {
     if (!provider || !checkout) return;
 
     try {
-      await checkout.switchNetwork({
+      const switchRes = await checkout.switchNetwork({
         provider,
         chainId: zkEVMNetwork(checkout.config.environment),
+      });
+
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_PROVIDER,
+          provider: switchRes.provider,
+        },
       });
 
       viewDispatch({

@@ -1,3 +1,5 @@
+import { Web3Provider } from '@ethersproject/providers';
+
 /**
  * Enum representing possible Wallet Widget event types.
  */
@@ -15,6 +17,7 @@ export enum WalletEventType {
 export type WalletNetworkSwitchEvent = {
   network: string;
   chainId: number;
+  provider: Web3Provider;
 };
 
 export type WalletDisconnectWalletEvent = {};
