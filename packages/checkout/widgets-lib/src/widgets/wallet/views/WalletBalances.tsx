@@ -38,7 +38,7 @@ export function WalletBalances() {
     provider, checkout, network, supportedTopUps, tokenBalances,
   } = walletState;
   const { conversions } = cryptoFiatState;
-  const [balancesLoading, setBalancesLoading] = useState(false);
+  const [balancesLoading, setBalancesLoading] = useState(true);
   useTokenSymbols(checkout, cryptoFiatDispatch);
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
@@ -138,10 +138,11 @@ export function WalletBalances() {
               walletState.tokenBalances.length > 2 || balancesLoading,
             )}
           >
-            {balancesLoading && (
+            {(balancesLoading || walletState.tokenBalances.length === 0) && (
             <Box sx={{
               height: '100%',
               display: 'flex',
+              marginBottom: 'base.spacing.x6',
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
@@ -154,7 +155,10 @@ export function WalletBalances() {
               />
             </Box>
             )}
-            {!balancesLoading && (<TokenBalanceList balanceInfoItems={walletState.tokenBalances} />)}
+            {
+              (!balancesLoading && walletState.tokenBalances.length !== 0)
+              && (<TokenBalanceList balanceInfoItems={walletState.tokenBalances} />)
+            }
           </Box>
         </Box>
         {showAddCoins && (

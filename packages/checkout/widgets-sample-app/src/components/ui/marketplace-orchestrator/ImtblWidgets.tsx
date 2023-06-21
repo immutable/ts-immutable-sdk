@@ -36,8 +36,6 @@ export const ImtblWidgets = ({
     SetProvider(CheckoutWidgetTagNames.BRIDGE, web3Provider)
   } 
 
-  console.log(params)
-
   return(
     <Box>
       {showConnect && (<ConnectReact />)}
