@@ -1,5 +1,4 @@
 import { Web3Provider } from '@ethersproject/providers';
-
 import { NetworkInfo } from './networkInfo';
 
 /**
@@ -9,13 +8,9 @@ export enum ConnectionProviders {
   METAMASK = 'metamask',
 }
 
-/**
- * Interface representing the parameters for {@link Checkout.connect}.
- * @property {ConnectionProviders} providerPreference - The preferred provider to connect to the network.
- */
-export type ConnectParams = {
-  providerPreference: ConnectionProviders;
-};
+export interface ConnectParams {
+  provider: Web3Provider
+}
 
 /**
  * Interface representing the result of {@link Checkout.connect}.
@@ -27,12 +22,8 @@ export interface ConnectResult {
   network: NetworkInfo;
 }
 
-/**
- * Interface representing the parameters for {@link Checkout.checkIsWalletConnected}.
- * @property {ConnectionProviders} providerPreference - The preferred provider to use to check the connection status to th Web3 network.
- */
 export interface CheckConnectionParams {
-  providerPreference: ConnectionProviders;
+  provider: Web3Provider
 }
 
 /**

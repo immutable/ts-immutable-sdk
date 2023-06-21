@@ -1,7 +1,7 @@
 import { ChainId, GetBalanceResult, NetworkInfo } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { l1Network, zkEVMNetwork } from './networkUtils';
-import { DEFAULT_TOKEN_FORMATTING_DECIMALS } from './constants';
+import { DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS, DEFAULT_TOKEN_FORMATTING_DECIMALS } from './constants';
 
 export const sortTokensByAmount = (
   environment: Environment,
@@ -85,6 +85,19 @@ export const tokenValueFormat = (s: Number | string): string => {
 
   const pointIndex = asString.indexOf('.');
   if (pointIndex === -1) return asString;
+
+  if (asString[0] !== '.' && parseInt(asString[0], 10) > 0) {
+    let formatted = parseFloat(asString.substring(
+      0,
+      pointIndex + DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS + 1,
+    )).toFixed(DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS);
+
+    if (formatted.endsWith('.00')) {
+      // eslint-disable-next-line prefer-destructuring
+      formatted = formatted.substring(0, pointIndex);
+    }
+    return formatted;
+  }
 
   return asString.substring(
     0,

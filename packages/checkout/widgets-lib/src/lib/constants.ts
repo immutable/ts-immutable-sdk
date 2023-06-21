@@ -4,6 +4,7 @@ import { WidgetTheme } from './types';
 
 export const DEFAULT_TOKEN_DECIMALS = 18;
 export const DEFAULT_TOKEN_FORMATTING_DECIMALS = 6;
+export const DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS = 2;
 
 /**
  * Checkout Widget default env

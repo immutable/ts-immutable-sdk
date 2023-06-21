@@ -32,9 +32,9 @@
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "generate-types": "typechain --target=ethers-v5 --out-dir=src/typechain/types 'abi/*.json'",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
+    "run:demo": "jest --runInBand --testMatch \"**/?(*.)+(demo).[jt]s?(x)\"",
     "test": "jest",
     "test:e2e": "jest --runInBand --testMatch \"**/?(*.)+(e2e).[jt]s?(x)\"",
-    "run:demo": "jest --runInBand --testMatch \"**/?(*.)+(demo).[jt]s?(x)\"",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
   "type": "module",
