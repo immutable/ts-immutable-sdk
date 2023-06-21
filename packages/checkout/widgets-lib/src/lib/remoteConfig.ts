@@ -44,7 +44,11 @@ export class RemoteConfig {
       );
     }
 
-    this.cache = response.data;
-    return response.data;
+    if (Object.keys(response.data?.dex?.overrides).length === 0) {
+      this.cache = { dex: {} };
+    } else {
+      this.cache = response.data;
+    }
+    return this.cache;
   }
 }

@@ -119,9 +119,16 @@ export function SwapWidget(props: SwapWidgetProps) {
       let overrides: ExchangeOverrides | undefined;
       try {
         overrides = (await getDexOverrides()).dex?.overrides;
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(err);
+      } catch (err: any) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SharedViews.ERROR_VIEW,
+              error: err,
+            },
+          },
+        });
       }
 
       const exchange = new Exchange(new ExchangeConfiguration({
