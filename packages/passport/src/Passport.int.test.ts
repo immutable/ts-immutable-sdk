@@ -56,7 +56,7 @@ describe('Passport', () => {
 
   beforeAll(() => {
     mswWorker.listen({
-      onUnhandledRequest(req) {
+      onUnhandledRequest(req: any) {
         expect(req).not.toBeDefined();
       },
     });

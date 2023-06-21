@@ -1,4 +1,5 @@
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
+import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ethRequestAccounts, ethSendTransaction } from './rpcMethods';
 import {
   JsonRpcError,
@@ -8,7 +9,7 @@ import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
-import { User } from '../types';
+import { UserWithEtherKey } from '../types';
 import { RelayerAdapter } from './relayerAdapter';
 
 export type ZkEvmProviderInput = {
@@ -16,6 +17,7 @@ export type ZkEvmProviderInput = {
   magicAdapter: MagicAdapter,
   config: PassportConfiguration,
   confirmationScreen: ConfirmationScreen,
+  multiRollupApiClients: MultiRollupApiClients,
 };
 
 const METHODS_REQUIRING_AUTHORISATION = [
@@ -33,17 +35,20 @@ export class ZkEvmProvider {
 
   private readonly relayerAdapter: RelayerAdapter;
 
+  private readonly multiRollupApiClients: MultiRollupApiClients;
+
   private readonly jsonRpcProvider: JsonRpcProvider; // Used for read operations
 
   private magicProvider?: ExternalProvider; // Used for signing
 
-  private user?: User;
+  private user?: UserWithEtherKey;
 
   constructor({
     authManager,
     magicAdapter,
     config,
     confirmationScreen,
+    multiRollupApiClients,
   }: ZkEvmProviderInput) {
     this.authManager = authManager;
     this.magicAdapter = magicAdapter;
@@ -51,6 +56,7 @@ export class ZkEvmProvider {
     this.confirmationScreen = confirmationScreen;
     this.relayerAdapter = new RelayerAdapter({ config });
     this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
+    this.multiRollupApiClients = multiRollupApiClients;
   }
 
   public async request(
@@ -71,6 +77,7 @@ export class ZkEvmProvider {
             authManager: this.authManager,
             config: this.config,
             magicAdapter: this.magicAdapter,
+            multiRollupApiClients: this.multiRollupApiClients,
           });
 
           this.user = user;

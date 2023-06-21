@@ -7,6 +7,7 @@ import { ConfirmationScreen } from '../../confirmation';
 import { RelayerAdapter } from '../relayerAdapter';
 import { getNonce, getSignedSequenceTransactions } from '../sequence';
 import { Transaction } from '../types';
+import { UserWithEtherKey } from '../../types';
 
 type EthSendTransactionInput = {
   transactionRequest: TransactionRequest,
@@ -15,6 +16,7 @@ type EthSendTransactionInput = {
   config: PassportConfiguration,
   confirmationScreen: ConfirmationScreen,
   relayerAdapter: RelayerAdapter,
+  user: UserWithEtherKey,
 };
 
 export const ethSendTransaction = async ({
@@ -23,6 +25,7 @@ export const ethSendTransaction = async ({
   jsonRpcProvider,
   relayerAdapter,
   config,
+  user,
 }: EthSendTransactionInput): Promise<string> => {
   if (!transactionRequest.to) {
     throw new Error('eth_sendTransaction requires a "to" field');
@@ -32,11 +35,10 @@ export const ethSendTransaction = async ({
   }
 
   const chainId = BigNumber.from(config.zkEvmChainId);
-  const smartContractWalletAddress = '0x7EEC32793414aAb720a90073607733d9e7B0ecD0'; // TODO: ID-786 this should be a claim in the JWT
   const magicWeb3Provider = new Web3Provider(magicProvider);
   const signer = magicWeb3Provider.getSigner();
 
-  const nonce = await getNonce(jsonRpcProvider, smartContractWalletAddress);
+  const nonce = await getNonce(jsonRpcProvider, user.etherKey);
   const sequenceTransaction: Transaction = {
     to: transactionRequest.to,
     data: transactionRequest.data,
@@ -49,12 +51,12 @@ export const ethSendTransaction = async ({
     [sequenceTransaction],
     nonce,
     chainId,
-    smartContractWalletAddress,
+    user.etherKey,
     signer,
   );
 
   // TODO: ID-698 Add support for non-native gas payments (e.g ERC20, feeTransaction initialisation must change)
-  const feeOptions = await relayerAdapter.imGetFeeOptions(smartContractWalletAddress, signedTransaction);
+  const feeOptions = await relayerAdapter.imGetFeeOptions(user.etherKey, signedTransaction);
   const imxFeeOption = feeOptions.find((feeOption) => feeOption.tokenSymbol === 'IMX');
   if (!imxFeeOption) {
     throw new Error('Failed to retrieve fees for IMX token');
@@ -71,7 +73,7 @@ export const ethSendTransaction = async ({
     [sequenceTransaction, sequenceFeeTransaction],
     nonce,
     chainId,
-    smartContractWalletAddress,
+    user.etherKey,
     signer,
   );
 
