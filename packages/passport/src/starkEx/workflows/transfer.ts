@@ -10,11 +10,11 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { convertToSignableToken } from '@imtbl/toolkit';
-import { retryWithDelay } from 'util/retry';
 import * as guardian from '@imtbl/guardian';
-import { PassportErrorType, withPassportError } from '../errors/passportError';
-import { ConfirmationScreen, TransactionTypes } from '../confirmation';
-import { UserWithEtherKey } from '../types';
+import { retryWithDelay } from '../retry';
+import { PassportErrorType, withPassportError } from '../../errors/passportError';
+import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
+import { UserWithEtherKey } from '../../types';
 
 const ERC721 = 'ERC721';
 

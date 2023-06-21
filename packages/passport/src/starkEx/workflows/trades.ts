@@ -5,9 +5,9 @@ import {
   TradesApi,
   TradesApiCreateTradeRequest,
 } from '@imtbl/core-sdk';
-import { PassportErrorType, withPassportError } from '../errors/passportError';
-import { UserWithEtherKey } from '../types';
-import { ConfirmationScreen, TransactionTypes } from '../confirmation';
+import { PassportErrorType, withPassportError } from '../../errors/passportError';
+import { UserWithEtherKey } from '../../types';
+import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
 
 type CreateTradeParams = {
   request: GetSignableTradeRequest;

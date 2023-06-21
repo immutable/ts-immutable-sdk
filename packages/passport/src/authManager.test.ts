@@ -4,7 +4,6 @@ import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
 import { User } from './types';
 import { PassportConfiguration } from './config';
-import { MAX_RETRIES } from './util/retry';
 
 jest.mock('oidc-client-ts');
 
@@ -56,6 +55,8 @@ const mockUser: User = {
     nickname: 'test',
   },
   etherKey: '',
+  starkKey: '',
+  userAdminKey: '',
   expired: false,
 };
 const mockErrorMsg = 'NONO';
@@ -169,6 +170,8 @@ describe('AuthManager', () => {
       expect(result).toEqual({
         ...mockUser,
         etherKey: passportData.passport.ether_key,
+        starkKey: passportData.passport.stark_key,
+        userAdminKey: passportData.passport.user_admin_key,
       });
     });
 
@@ -253,51 +256,5 @@ describe('AuthManager', () => {
 
       expect(await authManager.getUser()).toBeNull();
     });
-  });
-  describe('requestRefreshTokenAfterRegistration', () => {
-    it('requestRefreshTokenAfterRegistration successful with user wallet address in metadata', async () => {
-      const expected = {
-        ...mockUser,
-        etherKey: passportData.passport.ether_key,
-      };
-      signinSilentMock.mockReturnValue(mockOidcUserWithPassportInfo);
-
-      const res = await authManager.requestRefreshTokenAfterRegistration();
-
-      expect(res).toEqual(expected);
-      expect(signinSilentMock).toHaveBeenCalledTimes(1);
-    });
-
-    it('requestRefreshTokenAfterRegistration failed without user wallet address in metadata with retries', async () => {
-      const response = {
-        id_token: 'id123',
-        access_token: 'access123',
-        refresh_token: 'refresh123',
-        token_type: 'Bearer',
-        scope: 'openid',
-        expires_in: 167222,
-        profile: {
-          sub: 'email|123',
-          email: 'test@immutable.com',
-          nickname: 'test',
-        },
-      };
-      signinSilentMock.mockResolvedValue(response);
-
-      await expect(
-        authManager.requestRefreshTokenAfterRegistration(),
-      ).rejects.toThrow('REFRESH_TOKEN_ERROR');
-
-      expect(signinSilentMock).toHaveBeenCalledTimes(MAX_RETRIES + 1);
-    }, 15000);
-
-    it('requestRefreshTokenAfterRegistration failed with fetching user info error in metadata with retries', async () => {
-      signinSilentMock.mockResolvedValue(null);
-      await expect(
-        authManager.requestRefreshTokenAfterRegistration(),
-      ).rejects.toThrow('REFRESH_TOKEN_ERROR');
-
-      expect(signinSilentMock).toHaveBeenCalledTimes(MAX_RETRIES + 1);
-    }, 15000);
   });
 });

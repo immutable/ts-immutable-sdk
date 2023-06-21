@@ -1,6 +1,6 @@
 import { signRaw } from '@imtbl/toolkit';
 import { UsersApi, WalletConnection } from '@imtbl/core-sdk';
-import { PassportErrorType, withPassportError } from '../errors/passportError';
+import { PassportErrorType, withPassportError } from '../../errors/passportError';
 
 export type RegisterPassportParams = WalletConnection & {
   usersApi: UsersApi;
