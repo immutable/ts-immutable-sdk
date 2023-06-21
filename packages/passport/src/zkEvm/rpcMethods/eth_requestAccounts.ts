@@ -21,10 +21,7 @@ export const ethRequestAccounts = async ({
   if (user && user.idToken) {
     magicProvider = await magicAdapter.login(
       user.idToken,
-      {
-        rpcUrl: config.zkEvmRpcUrl,
-        chainId: parseInt(config.zkEvmChainId, 10),
-      },
+      config.network,
     );
   }
 
