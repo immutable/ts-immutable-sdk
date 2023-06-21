@@ -2,6 +2,9 @@ import { validateAndBuildVersion } from './CheckoutWidgets';
 import { SemanticVersion } from './definitions/config';
 
 describe('CheckoutWidgets', () => {
+  /**
+   * This versioning is currently tied to our current release process of the unified SDK
+   */
   describe('Versioning', () => {
     const versionTestCases:
     {
@@ -83,6 +86,16 @@ describe('CheckoutWidgets', () => {
           patch: 0,
         },
         expectedVersion: '0.1.0-alpha',
+      },
+      {
+        title: 'append -alpha to valid versions and add build number',
+        version: {
+          major: 0,
+          minor: 1,
+          patch: 8,
+          build: '1',
+        },
+        expectedVersion: '0.1.8-alpha.1',
       },
     ];
 
