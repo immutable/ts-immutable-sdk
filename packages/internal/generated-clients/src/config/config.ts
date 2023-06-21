@@ -48,13 +48,10 @@ export const imxApiConfig = {
   }),
 };
 
-const mrApiConfig = {
-  indexer: () => createConfig({
-    basePath: 'https://indexer-mr.dev.imtbl.com',
-  }),
-  orderBook: () => createConfig({
-    basePath: 'https://order-book-mr.dev.imtbl.com',
-  }),
+export type MultiRollupAPIConfiguration = {
+  indexer: ImmutableAPIConfiguration;
+  orderBook: ImmutableAPIConfiguration;
+  passport: ImmutableAPIConfiguration;
 };
 
 /**
@@ -62,8 +59,26 @@ const mrApiConfig = {
  * @returns an MultiRollupAPIConfiguration
  */
 export const multiRollupConfig = {
-  production: mrApiConfig,
-  sandbox: mrApiConfig,
+  getProduction: (): MultiRollupAPIConfiguration => ({
+    indexer: createConfig({
+      basePath: 'https://indexer-mr.imtbl.com',
+    }),
+    orderBook: createConfig({
+      basePath: 'https://order-book-mr.imtbl.com',
+    }),
+    passport: createConfig({
+      basePath: 'https://passport-mr.imtbl.com',
+    }),
+  }),
+  getSandbox: (): MultiRollupAPIConfiguration => ({
+    indexer: createConfig({
+      basePath: 'https://indexer-mr.sandbox.imtbl.com',
+    }),
+    orderBook: createConfig({
+      basePath: 'https://order-book-mr.sandbox.imtbl.com',
+    }),
+    passport: createConfig({
+      basePath: 'https://passport-mr.sandbox.imtbl.com',
+    }),
+  }),
 };
-
-export type MultiRollupAPIConfiguration = typeof mrApiConfig;
