@@ -33,11 +33,13 @@ export function validateAndBuildVersion(version: SemanticVersion | undefined): s
     }
   }
 
-  // at the moment all of the releases that include
+  // TODO: at the moment all of the releases that include
   // the checkout widgets script have '-alpha' appended
+  // Change this when we go to testnet. tiket WT-1432
+  // https://immutable.atlassian.net/browse/WT-1432
   validatedVersion += '-alpha';
 
-  if (version.build !== undefined && parseInt(version.build, 10)) {
+  if (version.build !== undefined) {
     validatedVersion += `.${version.build}`;
   }
 
@@ -55,7 +57,7 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
   // eslint-disable-next-line no-console
   console.log('imtbl-checkout version: ', validVersion);
 
-  if (process.env.ENVIRONMENT === 'local') {
+  if (process.env.CHECKOUT_ENVIRONMENT === 'local') {
     checkoutWidgetJS.setAttribute(
       'src',
       'http://localhost:3000/lib/js/imtbl-checkout.js',

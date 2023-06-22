@@ -43,7 +43,7 @@
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
-    "start": "ENVIRONMENT=local && parcel watch",
+    "start": "CHECKOUT_ENVIRONMENT=local && parcel watch",
     "start:version": "parcel watch",
     "test": "jest test",
     "test:watch": "jest test --watch"
