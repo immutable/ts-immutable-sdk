@@ -13,7 +13,7 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import { mockUser } from '../test/mocks';
+import { mockUserWithEtherKey } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportImxProvider } from './passportImxProvider';
 import {
@@ -50,7 +50,7 @@ describe('PassportImxProvider', () => {
 
   beforeEach(() => {
     passportImxProvider = new PassportImxProvider({
-      user: mockUser,
+      user: mockUserWithEtherKey,
       starkSigner: mockStarkSigner,
       confirmationScreen,
       immutableXClient,
@@ -61,7 +61,7 @@ describe('PassportImxProvider', () => {
   describe('constructor', () => {
     it('sets the private properties', () => {
       // @ts-ignore
-      expect(passportImxProvider.user).toEqual(mockUser);
+      expect(passportImxProvider.user).toEqual(mockUserWithEtherKey);
       // @ts-ignore
       expect(passportImxProvider.starkSigner).toEqual(mockStarkSigner);
       // @ts-ignore
@@ -81,7 +81,7 @@ describe('PassportImxProvider', () => {
 
       expect(transfer as jest.Mock).toHaveBeenCalledWith({
         request,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         starkSigner: mockStarkSigner,
         transfersApi: immutableXClient.transfersApi,
         imxPublicApiDomain,
@@ -123,7 +123,7 @@ describe('PassportImxProvider', () => {
 
       expect(createOrder).toHaveBeenCalledWith({
         request,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         starkSigner: mockStarkSigner,
         ordersApi: immutableXClient.ordersApi,
         confirmationScreen,
@@ -142,7 +142,7 @@ describe('PassportImxProvider', () => {
 
       expect(cancelOrder).toHaveBeenCalledWith({
         request,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         starkSigner: mockStarkSigner,
         ordersApi: immutableXClient.ordersApi,
         confirmationScreen,
@@ -161,7 +161,7 @@ describe('PassportImxProvider', () => {
 
       expect(createTrade).toHaveBeenCalledWith({
         request,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         starkSigner: mockStarkSigner,
         tradesApi: immutableXClient.tradesApi,
         confirmationScreen,
@@ -180,7 +180,7 @@ describe('PassportImxProvider', () => {
 
       expect(batchNftTransfer).toHaveBeenCalledWith({
         request,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         starkSigner: mockStarkSigner,
         transfersApi: immutableXClient.transfersApi,
         confirmationScreen,
@@ -199,7 +199,7 @@ describe('PassportImxProvider', () => {
 
       expect(exchangeTransfer).toHaveBeenCalledWith({
         request,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         starkSigner: mockStarkSigner,
         exchangesApi: immutableXClient.exchangeApi,
       });
