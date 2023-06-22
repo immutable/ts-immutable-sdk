@@ -135,7 +135,6 @@ export function SwapForm({ data }: SwapFromProps) {
         } as CoinSelectorOptionProps),
       );
 
-    console.log('allowedTokens', allowedTokens);
     setTokensOptionsForm(fromOptions);
 
     // Set initial token options if provided
@@ -152,7 +151,6 @@ export function SwapForm({ data }: SwapFromProps) {
         );
       }
       if (data?.toContractAddress) {
-        console.log('data?.toContractAddress', data?.toContractAddress);
         setToToken(allowedTokens.find((t) => t.address?.toLowerCase() === data?.toContractAddress?.toLowerCase()));
       }
     }
