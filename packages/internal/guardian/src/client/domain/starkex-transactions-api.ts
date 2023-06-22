@@ -22,13 +22,9 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { APIError403 } from '../models';
-// @ts-ignore
 import { APIError404 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
-// @ts-ignore
-import { TransactionApprovalRequest } from '../models';
 // @ts-ignore
 import { TransactionEvaluationResponse } from '../models';
 /**
@@ -37,50 +33,6 @@ import { TransactionEvaluationResponse } from '../models';
  */
 export const StarkexTransactionsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
-        /**
-         * Approve a pending transaction
-         * @summary Approve a pending transaction given chain
-         * @param {string} payloadHash Hash for the payload
-         * @param {TransactionApprovalRequest} transactionApprovalRequest request body for approving a pending transactio
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        approvePendingTransaction: async (payloadHash: string, transactionApprovalRequest: TransactionApprovalRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'payloadHash' is not null or undefined
-            assertParamExists('approvePendingTransaction', 'payloadHash', payloadHash)
-            // verify required parameter 'transactionApprovalRequest' is not null or undefined
-            assertParamExists('approvePendingTransaction', 'transactionApprovalRequest', transactionApprovalRequest)
-            const localVarPath = `/guardian/v1/transactions/{payloadHash}/approve`
-                .replace(`{${"payloadHash"}}`, encodeURIComponent(String(payloadHash)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(transactionApprovalRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
         /**
          * Check if it is a valid transaction by payload hash
          * @summary Evaluate if it is an valid transaction
@@ -131,18 +83,6 @@ export const StarkexTransactionsApiFp = function(configuration?: Configuration) 
     const localVarAxiosParamCreator = StarkexTransactionsApiAxiosParamCreator(configuration)
     return {
         /**
-         * Approve a pending transaction
-         * @summary Approve a pending transaction given chain
-         * @param {string} payloadHash Hash for the payload
-         * @param {TransactionApprovalRequest} transactionApprovalRequest request body for approving a pending transactio
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async approvePendingTransaction(payloadHash: string, transactionApprovalRequest: TransactionApprovalRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.approvePendingTransaction(payloadHash, transactionApprovalRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * Check if it is a valid transaction by payload hash
          * @summary Evaluate if it is an valid transaction
          * @param {string} payloadHash Hash for the payload
@@ -165,16 +105,6 @@ export const StarkexTransactionsApiFactory = function (configuration?: Configura
     const localVarFp = StarkexTransactionsApiFp(configuration)
     return {
         /**
-         * Approve a pending transaction
-         * @summary Approve a pending transaction given chain
-         * @param {StarkexTransactionsApiApprovePendingTransactionRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        approvePendingTransaction(requestParameters: StarkexTransactionsApiApprovePendingTransactionRequest, options?: AxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.approvePendingTransaction(requestParameters.payloadHash, requestParameters.transactionApprovalRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
          * Check if it is a valid transaction by payload hash
          * @summary Evaluate if it is an valid transaction
          * @param {StarkexTransactionsApiEvaluateStarkexTransactionRequest} requestParameters Request parameters.
@@ -187,27 +117,6 @@ export const StarkexTransactionsApiFactory = function (configuration?: Configura
         },
     };
 };
-
-/**
- * Request parameters for approvePendingTransaction operation in StarkexTransactionsApi.
- * @export
- * @interface StarkexTransactionsApiApprovePendingTransactionRequest
- */
-export interface StarkexTransactionsApiApprovePendingTransactionRequest {
-    /**
-     * Hash for the payload
-     * @type {string}
-     * @memberof StarkexTransactionsApiApprovePendingTransaction
-     */
-    readonly payloadHash: string
-
-    /**
-     * request body for approving a pending transactio
-     * @type {TransactionApprovalRequest}
-     * @memberof StarkexTransactionsApiApprovePendingTransaction
-     */
-    readonly transactionApprovalRequest: TransactionApprovalRequest
-}
 
 /**
  * Request parameters for evaluateStarkexTransaction operation in StarkexTransactionsApi.
@@ -230,18 +139,6 @@ export interface StarkexTransactionsApiEvaluateStarkexTransactionRequest {
  * @extends {BaseAPI}
  */
 export class StarkexTransactionsApi extends BaseAPI {
-    /**
-     * Approve a pending transaction
-     * @summary Approve a pending transaction given chain
-     * @param {StarkexTransactionsApiApprovePendingTransactionRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof StarkexTransactionsApi
-     */
-    public approvePendingTransaction(requestParameters: StarkexTransactionsApiApprovePendingTransactionRequest, options?: AxiosRequestConfig) {
-        return StarkexTransactionsApiFp(this.configuration).approvePendingTransaction(requestParameters.payloadHash, requestParameters.transactionApprovalRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
     /**
      * Check if it is a valid transaction by payload hash
      * @summary Evaluate if it is an valid transaction
