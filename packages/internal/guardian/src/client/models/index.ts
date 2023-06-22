@@ -10,5 +10,6 @@ export * from './basic-apierror';
 export * from './transaction';
 export * from './transaction-approval-request';
 export * from './transaction-evaluation-request';
-export * from './transaction-evaluation-request-transaction-data';
 export * from './transaction-evaluation-response';
+export * from './zk-evm-transaction-evaluation-request';
+export * from './zk-evm-transaction-evaluation-request-transaction-data';

@@ -15,13 +15,19 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ZkEvmTransactionEvaluationRequest } from './zk-evm-transaction-evaluation-request';
-// May contain unused imports in some cases
-// @ts-ignore
 import { ZkEvmTransactionEvaluationRequestTransactionData } from './zk-evm-transaction-evaluation-request-transaction-data';
 
 /**
- * @type TransactionEvaluationRequest
+ * 
  * @export
+ * @interface ZkEvmTransactionEvaluationRequest
  */
-export type TransactionEvaluationRequest = { chainType: 'evm' } & ZkEvmTransactionEvaluationRequest | { chainType: 'starkex' };
+export interface ZkEvmTransactionEvaluationRequest {
+    /**
+     * 
+     * @type {ZkEvmTransactionEvaluationRequestTransactionData}
+     * @memberof ZkEvmTransactionEvaluationRequest
+     */
+    'transactionData': ZkEvmTransactionEvaluationRequestTransactionData;
+}
+
