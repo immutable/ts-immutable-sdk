@@ -1,17 +1,7 @@
 import { Environment } from '@imtbl/config';
-import { ExchangeOverrides } from '@imtbl/dex-sdk';
 import axios from 'axios';
 import { CHECKOUT_API_BASE_URL } from '../types';
-
-export type RemoteConfigParams = {
-  environment: Environment;
-};
-
-export type RemoteConfigResult = {
-  dex: {
-    overrides?: ExchangeOverrides;
-  };
-};
+import { RemoteConfigParams, RemoteConfigResult } from './remoteConfigType';
 
 export class RemoteConfig {
   private cache: any | null = null;

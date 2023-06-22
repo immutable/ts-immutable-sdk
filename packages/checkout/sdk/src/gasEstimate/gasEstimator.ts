@@ -16,7 +16,9 @@ import {
   getBridgeFeeEstimate,
 } from './bridgeGasEstimate';
 import * as instance from '../instance';
-import gasEstimateTokens from './gas_estimate_tokens.json';
+
+// Type assertion
+const parsedGasEstimateTokens: { [key: string]: any } = {};
 
 const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000000';
 const DEFAULT_TOKEN_DECIMALS = 18;
@@ -44,9 +46,7 @@ async function bridgeToL2GasEstimator(
   const fromChainId = getL1ChainId(environment);
   const toChainId = getL2ChainId(environment);
 
-  const tokenAddresses = environment === Environment.PRODUCTION
-    ? gasEstimateTokens[ChainId.SEPOLIA]
-    : gasEstimateTokens[ChainId.SEPOLIA];
+  const tokenAddresses = parsedGasEstimateTokens[fromChainId.toString()];
 
   const { gasTokenAddress, fromAddress } = tokenAddresses.bridgeToL2Addresses;
 
@@ -99,13 +99,10 @@ async function bridgeToL2GasEstimator(
 async function swapGasEstimator(
   environment: Environment,
 ): Promise<GasEstimateSwapResult> {
-  const tokenAddresses = environment === Environment.PRODUCTION
-    ? gasEstimateTokens[ChainId.SEPOLIA]
-    : gasEstimateTokens[ChainId.SEPOLIA];
+  const chainId = getL2ChainId(environment);
+  const tokenAddresses = parsedGasEstimateTokens[chainId.toString()];
 
   const { inAddress, outAddress } = tokenAddresses.swapAddresses;
-
-  const chainId = getL2ChainId(environment);
 
   try {
     const exchange = await instance.createExchangeInstance(
