@@ -164,7 +164,6 @@ export function SwapForm({ data }: SwapFromProps) {
     fromToken]);
 
   const tokensOptionsTo = useMemo(() => allowedTokens
-    .filter((t) => t.address !== fromToken?.address)
     .map(
       (t) => ({
         id: formatTokenOptionsId(t.symbol, t.address),
@@ -416,6 +415,9 @@ export function SwapForm({ data }: SwapFromProps) {
       .find((t) => value === formatTokenOptionsId(t.token.symbol, t.token.address));
     if (!selected) return;
 
+    if (toToken && value === formatTokenOptionsId(toToken.symbol, toToken?.address)) {
+      setToToken(undefined);
+    }
     setFromToken(selected.token);
     setFromBalance(selected.formattedBalance);
     setFromTokenError('');
@@ -449,6 +451,10 @@ export function SwapForm({ data }: SwapFromProps) {
   const onToSelectChange = (value: OptionKey) => {
     const selected = allowedTokens.find((t) => value === formatTokenOptionsId(t.symbol, t.address));
     if (!selected) return;
+
+    if (fromToken && value === formatTokenOptionsId(fromToken.symbol, fromToken?.address)) {
+      setFromToken(undefined);
+    }
     setToToken(selected);
     setToTokenError('');
   };
