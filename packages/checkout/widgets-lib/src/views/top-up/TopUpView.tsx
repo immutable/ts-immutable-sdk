@@ -110,13 +110,15 @@ export function TopUpView({
       setLoadingBridgeFees(false);
     }
   };
+
+  // Silently refresh the quote
   useInterval(() => refreshFees(true), DEFAULT_FEE_REFRESH_INTERVAL);
 
   useEffect(() => {
     if (!checkout) return;
     if (conversions.size === 0) return;
     refreshFees();
-  }, [checkout, conversions]);
+  }, [checkout, conversions.size === 0]);
 
   const onClickSwap = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT) {

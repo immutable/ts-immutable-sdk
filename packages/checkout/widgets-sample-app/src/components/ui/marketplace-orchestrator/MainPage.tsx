@@ -30,11 +30,11 @@ export const MainPage = () => {
 
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {
-    setShowWidgets({...hideAllWidgets, showConnect: true});
+    setShowWidgets({...hideAllWidgets, showConnect: {show: true, data: {}}});
   }, [setShowWidgets])
 
   const openWalletWidget = useCallback(() => {
-    setShowWidgets({...hideAllWidgets, showWallet: true});
+    setShowWidgets({...hideAllWidgets, showWallet: {show: true, data: {}}});
   }, [setShowWidgets])
 
   const handleBuyClick = () => {
