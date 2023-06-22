@@ -2,6 +2,7 @@ import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { UserWithEtherKey } from '../types';
 import AuthManager from '../authManager';
+import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 
 export type CreateCounterfactualAddressInput = {
   authManager: AuthManager;
@@ -24,20 +25,22 @@ export async function createCounterfactualAddress({
   const ethereumAddress = await ethSigner.getAddress();
   const ethereumSignature = await ethSigner.signMessage(MESSAGE_TO_SIGN);
 
-  const createAddressResponse = await multiRollupApiClients.passportApi.createCounterfactualAddress({
-    createCounterfactualAddressRequest: {
-      ethereumAddress,
-      ethereumSignature,
-    },
-  });
-
-  if (createAddressResponse.status !== 201) {
-    throw new Error(`Failed to create counterfactual address: ${createAddressResponse.statusText}`);
+  try {
+    await multiRollupApiClients.passportApi.createCounterfactualAddress({
+      createCounterfactualAddressRequest: {
+        ethereumAddress,
+        ethereumSignature,
+      },
+    });
+  } catch (error) {
+    return Promise.reject(
+      new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Failed to create counterfactual address: ${error}`),
+    );
   }
 
   const user = await authManager.loginSilent();
   if (!user || !user.etherKey) {
-    throw new Error('Failed to refresh user details');
+    return Promise.reject(new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Failed to refresh user details'));
   }
 
   return user as UserWithEtherKey;

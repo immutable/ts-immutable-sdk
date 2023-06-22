@@ -1,4 +1,5 @@
 import { BigNumberish, BytesLike } from 'ethers';
+import { JsonRpcError } from './JsonRpcError';
 
 export interface RelayerTransaction {
   status: 'PENDING' | 'SUBMITTED' | 'SUCCESSFUL' | 'ERROR';
@@ -32,22 +33,6 @@ export interface TransactionNormalised {
   target: string
   value: BigNumberish
   data: BytesLike
-}
-
-export enum RpcErrorCode {
-  RPC_SERVER_ERROR = -32000,
-  INVALID_REQUEST = -32600,
-  METHOD_NOT_FOUND = -32601,
-  INVALID_PARAMS = -32602,
-  INTERNAL_ERROR = -32603,
-  UNAUTHORISED = -32604,
-  PARSE_ERROR = -32700,
-}
-
-export interface JsonRpcError {
-  message: string;
-  code: RpcErrorCode;
-  data?: any;
 }
 
 export interface RequestArguments<TParams = any> {

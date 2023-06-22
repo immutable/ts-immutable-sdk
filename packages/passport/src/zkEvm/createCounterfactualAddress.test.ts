@@ -21,8 +21,8 @@ describe('createCounterFactualAddress', () => {
       createCounterfactualAddress: jest.fn(),
     },
   };
-  const ethereumAddress = '0x123';
-  const ethereumSignature = '0x456';
+  const ethereumAddress = '0x3082e7c88f1c8b4e24be4a75dee018ad362d84d4';
+  const ethereumSignature = '0x05107ba1d76d8a5ba3415df36eb5af65f4c670778eed257f5704edcb03802cfc662f66b76e5aa032c2305e61ce77ed858bc9850f8c945ab6c3cb6fec796aae421c';
 
   beforeEach(() => {
     jest.restoreAllMocks();
@@ -36,16 +36,15 @@ describe('createCounterFactualAddress', () => {
 
   describe('when createCounterfactualAddress doesn\'t return a 201', () => {
     it('should throw an error', async () => {
-      multiRollupApiClients.passportApi.createCounterfactualAddress.mockResolvedValue({
-        status: 500,
-        statusText: 'Internal server error',
+      multiRollupApiClients.passportApi.createCounterfactualAddress.mockImplementation(() => {
+        throw new Error('Internal server error');
       });
 
       await expect(async () => createCounterfactualAddress({
         authManager: authManager as unknown as AuthManager,
         magicProvider,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
-      })).rejects.toThrow('Failed to create counterfactual address: Internal server error');
+      })).rejects.toThrow('Failed to create counterfactual address: Error: Internal server error');
     });
   });
 

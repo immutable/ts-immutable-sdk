@@ -1,37 +1,27 @@
 import {
-  ExternalProvider, JsonRpcProvider, TransactionRequest, Web3Provider,
+  TransactionRequest,
+  Web3Provider,
 } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
-import { PassportConfiguration } from '../../config';
-import { ConfirmationScreen } from '../../confirmation';
-import { RelayerAdapter } from '../relayerAdapter';
 import { getNonce, getSignedSequenceTransactions } from '../sequence';
 import { Transaction } from '../types';
-import { UserWithEtherKey } from '../../types';
-
-type EthSendTransactionInput = {
-  transactionRequest: TransactionRequest,
-  magicProvider: ExternalProvider,
-  jsonRpcProvider: JsonRpcProvider,
-  config: PassportConfiguration,
-  confirmationScreen: ConfirmationScreen,
-  relayerAdapter: RelayerAdapter,
-  user: UserWithEtherKey,
-};
+import { EthMethodWithAuthParams } from './types';
+import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 
 export const ethSendTransaction = async ({
-  transactionRequest,
+  params,
   magicProvider,
   jsonRpcProvider,
   relayerAdapter,
   config,
   user,
-}: EthSendTransactionInput): Promise<string> => {
+}: EthMethodWithAuthParams): Promise<string> => {
+  const transactionRequest: TransactionRequest = params[0];
   if (!transactionRequest.to) {
-    throw new Error('eth_sendTransaction requires a "to" field');
+    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
   }
   if (!transactionRequest.data) {
-    throw new Error('eth_sendTransaction requires a "data" field');
+    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "data" field');
   }
 
   const chainId = BigNumber.from(config.zkEvmChainId);
