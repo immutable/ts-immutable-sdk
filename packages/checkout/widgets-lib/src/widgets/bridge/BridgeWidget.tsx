@@ -19,9 +19,10 @@ import {
 } from '@imtbl/bridge-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
-import { l1Network, zkEVMNetwork } from '../../lib/networkUtils';
+import {
+  l1Network, zkEVMNetwork, Network, WidgetTheme,
+} from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { Network, WidgetTheme } from '../../lib';
 import {
   SharedViews,
   ViewActions, ViewContext, initialViewState, viewReducer,
@@ -109,7 +110,9 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       );
 
       const childProvider = new ethers.providers.JsonRpcProvider(
-        RPC_URL_MAP.get(ChainId.IMTBL_ZKEVM_DEVNET),
+        config.environment
+        === Environment.PRODUCTION ? RPC_URL_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET)
+          : RPC_URL_MAP.get(ChainId.IMTBL_ZKEVM_DEVNET),
       );
 
       bridgeDispatch({

@@ -9,7 +9,7 @@ import {
   useEffect, useCallback, useReducer, useMemo,
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
-import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
+import { Exchange, ExchangeConfiguration, ExchangeOverrides } from '@imtbl/dex-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../views/loading/LoadingView';
@@ -32,7 +32,6 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { StatusView } from '../../components/Status/StatusView';
 import { StatusType } from '../../components/Status/StatusType';
-import { getDexConfigOverrides } from './DexConfigOverrides';
 import { text } from '../../resources/text/textConfig';
 import { ErrorView } from '../../views/error/ErrorView';
 import {
@@ -41,6 +40,7 @@ import {
 } from './SwapWidgetEvents';
 import { SwapInProgress } from './views/SwapInProgress';
 import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
+import { RemoteConfig, RemoteConfigResult } from '../../lib/remoteConfig';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -80,6 +80,12 @@ export function SwapWidget(props: SwapWidgetProps) {
     ? onLightBase
     : onDarkBase;
 
+  const getDexOverrides = useCallback(async () => {
+    const remoteConfig = new RemoteConfig({ environment });
+    const remoteConfigResult: RemoteConfigResult = await remoteConfig.load();
+    return remoteConfigResult;
+  }, [environment]);
+
   const swapWidgetSetup = useCallback(async () => {
     swapDispatch({
       payload: {
@@ -110,10 +116,25 @@ export function SwapWidget(props: SwapWidgetProps) {
         provider: web3Provider,
       });
 
+      let overrides: ExchangeOverrides | undefined;
+      try {
+        overrides = (await getDexOverrides()).dex?.overrides;
+      } catch (err: any) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SharedViews.ERROR_VIEW,
+              error: err,
+            },
+          },
+        });
+      }
+
       const exchange = new Exchange(new ExchangeConfiguration({
         chainId: network.chainId,
         baseConfig: new ImmutableConfiguration({ environment }),
-        overrides: getDexConfigOverrides(),
+        overrides,
       }));
 
       swapDispatch({
