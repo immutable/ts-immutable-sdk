@@ -4,7 +4,6 @@ export enum ConnectWidgetViews {
   PASSPORT = 'PASSPORT',
   SWITCH_NETWORK = 'SWITCH_NETWORK',
   SUCCESS = 'SUCCESS',
-  FAIL = 'FAIL',
 }
 
 export type ConnectWidgetView =
@@ -12,10 +11,4 @@ export type ConnectWidgetView =
   | { type: ConnectWidgetViews.READY_TO_CONNECT }
   | { type: ConnectWidgetViews.SWITCH_NETWORK }
   | { type: ConnectWidgetViews.PASSPORT }
-  | { type: ConnectWidgetViews.SUCCESS }
-  | ConnectFailView;
-
-interface ConnectFailView {
-  type: ConnectWidgetViews.FAIL;
-  reason: string;
-}
+  | { type: ConnectWidgetViews.SUCCESS };
