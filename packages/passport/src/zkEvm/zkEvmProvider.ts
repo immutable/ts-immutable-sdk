@@ -99,7 +99,7 @@ export class ZkEvmProvider {
           );
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof JsonRpcError) {
         return Promise.reject(error);
       }
