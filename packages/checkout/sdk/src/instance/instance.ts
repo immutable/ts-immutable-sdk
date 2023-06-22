@@ -1,12 +1,15 @@
 import {
-  TokenBridge, BridgeConfiguration, ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  TokenBridge,
+  BridgeConfiguration,
+  ETH_MAINNET_TO_ZKEVM_MAINNET,
+  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
 } from '@imtbl/bridge-sdk';
 import { ImmutableConfiguration, Environment } from '@imtbl/config';
 import { ethers } from 'ethers';
 import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { ChainId } from '../types';
-import { getDexConfigOverrides } from './dexConfigOverrides';
+import { RemoteConfig } from '../config/remoteConfig';
 
 export async function createBridgeInstance(
   fromChainId: ChainId,
@@ -50,11 +53,23 @@ export async function createExchangeInstance(
   chainId: ChainId,
   environment: Environment,
 ): Promise<Exchange> {
-  const exchange = new Exchange(new ExchangeConfiguration({
-    chainId,
-    baseConfig: new ImmutableConfiguration({ environment }),
-    overrides: getDexConfigOverrides(),
-  }));
+  let overrides;
+
+  try {
+    overrides = (await new RemoteConfig({ environment }).load())?.dex
+      ?.overrides;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(err);
+  }
+
+  const exchange = new Exchange(
+    new ExchangeConfiguration({
+      chainId,
+      baseConfig: new ImmutableConfiguration({ environment }),
+      overrides,
+    }),
+  );
 
   return exchange;
 }

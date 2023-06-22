@@ -429,7 +429,7 @@ export class ERC721PermissionedMintable {
   /**
    * @returns a populated transaction for the setApprovalForAll contract function
    */
-  public async setApprovalForAll(
+  public async populateSetApprovalForAll(
     operator: PromiseOrValue<string>,
     approved: PromiseOrValue<boolean>,
     overrides: Overrides & {
@@ -446,7 +446,7 @@ export class ERC721PermissionedMintable {
   /**
    * @returns a populated transaction for the setBaseURI contract function
    */
-  public async setBaseURI(
+  public async populateSetBaseURI(
     baseURI_: PromiseOrValue<string>,
     overrides: Overrides & {
       from?: PromiseOrValue<string>;
@@ -461,7 +461,7 @@ export class ERC721PermissionedMintable {
   /**
    * @returns a populated transaction for the setContractURI contract function
    */
-  public async setContractURI(
+  public async populateSetContractURI(
     _contractURI: PromiseOrValue<string>,
     overrides: Overrides & {
       from?: PromiseOrValue<string>;
@@ -476,7 +476,7 @@ export class ERC721PermissionedMintable {
   /**
    * @returns a populated transaction for the setRoyaltyAllowlistRegistry contract function
    */
-  public async setRoyaltyAllowlistRegistry(
+  public async populateSetRoyaltyAllowlistRegistry(
     _royaltyAllowlist: PromiseOrValue<string>,
     overrides: Overrides & {
       from?: PromiseOrValue<string>;

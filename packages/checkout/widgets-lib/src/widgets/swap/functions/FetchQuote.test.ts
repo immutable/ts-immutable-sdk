@@ -4,7 +4,24 @@ import { Web3Provider } from '@ethersproject/providers';
 import { ChainId, TokenInfo } from '@imtbl/checkout-sdk';
 import { BigNumber, utils } from 'ethers';
 import { quotesProcessor } from './FetchQuote';
-import { getDexConfigOverrides } from '../DexConfigOverrides';
+
+const overrides: any = {
+  rpcURL: 'https://test',
+  commonRoutingTokens: [
+    {
+      chainId: 11155111,
+      address: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE',
+      decimals: 18,
+      symbol: 'FUN',
+    },
+  ],
+  exchangeContracts: {
+    multicall: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e',
+  },
+  nativeToken: {
+    chainId: 11155111,
+  },
+};
 
 describe('QuotesProcessor', () => {
   describe('processQuotes', () => {
@@ -14,7 +31,7 @@ describe('QuotesProcessor', () => {
       const exchange = new Exchange(new ExchangeConfiguration({
         chainId: ChainId.IMTBL_ZKEVM_DEVNET,
         baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
-        overrides: getDexConfigOverrides(),
+        overrides,
       }));
 
       exchange.getUnsignedSwapTxFromAmountIn = getUnsignedSwapTxFromAmountIn;
@@ -59,7 +76,7 @@ describe('QuotesProcessor', () => {
       const exchange = new Exchange(new ExchangeConfiguration({
         chainId: ChainId.IMTBL_ZKEVM_DEVNET,
         baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
-        overrides: getDexConfigOverrides(),
+        overrides,
       }));
 
       exchange.getUnsignedSwapTxFromAmountOut = getUnsignedSwapTxFromAmountOut;
