@@ -1,6 +1,6 @@
 import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
-import { mockErrorMessage, mockStarkSignature, mockUser } from '../../test/mocks';
+import { mockErrorMessage, mockStarkSignature, mockUserWithEtherKey } from '../../test/mocks';
 import { cancelOrder, createOrder } from './order';
 import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
 
@@ -59,7 +59,7 @@ describe('order', () => {
           },
           fees: undefined,
           expiration_timestamp,
-          user: mockUser.etherKey,
+          user: mockUserWithEtherKey.etherKey,
         },
       };
 
@@ -94,7 +94,7 @@ describe('order', () => {
       const mockHeader = {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          Authorization: `Bearer ${mockUser.accessToken}`,
+          Authorization: `Bearer ${mockUserWithEtherKey.accessToken}`,
         },
       };
       const mockReturnValue = {
@@ -115,7 +115,7 @@ describe('order', () => {
       const result = await createOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         request: orderRequest as UnsignedOrderRequest,
         confirmationScreen: mockConfirmationScreen,
       });
@@ -125,7 +125,7 @@ describe('order', () => {
       );
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUser.accessToken,
+        mockUserWithEtherKey.accessToken,
         {
           transactionType: TransactionTypes.createOrder,
           transactionData: expect.any(Object),
@@ -144,7 +144,7 @@ describe('order', () => {
       await expect(() => createOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         request: orderRequest as UnsignedOrderRequest,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
@@ -182,13 +182,13 @@ describe('order', () => {
       await expect(() => createOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         request: orderRequest as UnsignedOrderRequest,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('CREATE_ORDER_ERROR');
 
       expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUser.accessToken,
+        mockUserWithEtherKey.accessToken,
         {
           transactionType: TransactionTypes.createOrder,
           transactionData: expect.any(Object),
@@ -240,7 +240,7 @@ describe('order', () => {
       const mockHeader = {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          Authorization: `Bearer ${mockUser.accessToken}`,
+          Authorization: `Bearer ${mockUserWithEtherKey.accessToken}`,
         },
       };
 
@@ -263,7 +263,7 @@ describe('order', () => {
       const result = await cancelOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         request: cancelOrderRequest,
         confirmationScreen: mockConfirmationScreen,
       });
@@ -273,7 +273,7 @@ describe('order', () => {
       );
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUser.accessToken,
+        mockUserWithEtherKey.accessToken,
         {
           transactionType: TransactionTypes.cancelOrder,
           transactionData: expect.any(Object),
@@ -309,13 +309,13 @@ describe('order', () => {
       await expect(() => cancelOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         request: cancelOrderRequest,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrowError('CANCEL_ORDER_ERROR');
 
       expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUser.accessToken,
+        mockUserWithEtherKey.accessToken,
         {
           transactionType: TransactionTypes.cancelOrder,
           transactionData: expect.any(Object),
@@ -329,7 +329,7 @@ describe('order', () => {
       await expect(() => cancelOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         request: cancelOrderRequest,
         confirmationScreen: mockConfirmationScreen,
       })).rejects.toThrow(
