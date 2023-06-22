@@ -15,8 +15,28 @@ import { quotesProcessor } from './functions/FetchQuote';
 import { text } from '../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 
+const overrides: any = {
+  rpcURL: 'https://rpc.node',
+  commonRoutingTokens: [
+    {
+      chainId: 11155111,
+      address: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE',
+      decimals: 18,
+      symbol: 'FUN',
+    },
+  ],
+  exchangeContracts: {
+    multicall: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e',
+  },
+  nativeToken: {
+    chainId: 11155111,
+  },
+};
+
 describe('SwapWidget tests', () => {
   beforeEach(() => {
+    cy.intercept('https://checkout-api.sandbox.immutable.com/v1/config', { dex: { overrides } });
+    cy.intercept('https://rpc.node', {});
     cy.viewport('ipad-2');
   });
 
@@ -136,7 +156,7 @@ describe('SwapWidget tests', () => {
   });
 
   const params = {
-    providerPreference: 'metamask',
+    providerName: 'metamask',
   } as SwapWidgetParams;
   const config: StrongCheckoutWidgetsConfig = {
     environment: Environment.SANDBOX,

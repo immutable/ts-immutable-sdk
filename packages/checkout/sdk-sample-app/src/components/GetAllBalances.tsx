@@ -33,8 +33,8 @@ export default function GetAllBalances(props: BalanceProps) {
     try {
       const resp = await checkout.getAllBalances({
         provider,
-        walletAddress: walletAddress,
-        chainId: ChainId.ETHEREUM,
+        walletAddress,
+        chainId: ChainId.SEPOLIA,
       });
       setResult(resp.balances);
       setLoading(false);
@@ -63,7 +63,7 @@ export default function GetAllBalances(props: BalanceProps) {
         }}
       >
         <LoadingButton onClick={getAllBalances} loading={loading}>
-          Get all balances (Ethereum)
+          Get all balances (Sepolia)
         </LoadingButton>
       </Box>
       {result && !error && (

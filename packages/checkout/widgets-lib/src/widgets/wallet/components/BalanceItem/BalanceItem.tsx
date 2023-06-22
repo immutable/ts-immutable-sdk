@@ -21,7 +21,7 @@ import {
   orchestrationEvents,
 } from '../../../../lib/orchestrationEvents';
 import { l1Network, zkEVMNetwork } from '../../../../lib/networkUtils';
-import { formatZeroAmount } from '../../../../lib/utils';
+import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
 
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
@@ -69,7 +69,7 @@ export function BalanceItem(props: BalanceItemProps) {
           testId={`balance-item-${balanceInfo.symbol}`}
           use={Heading}
           size="xSmall"
-          price={balanceInfo.balance}
+          price={tokenValueFormat(balanceInfo.balance)}
           fiatAmount={fiatAmount}
         />
         {(isOnRampEnabled || isSwapEnabled || isBridgeEnabled) && (

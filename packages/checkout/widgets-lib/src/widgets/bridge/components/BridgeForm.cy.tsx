@@ -14,6 +14,7 @@ describe('Bridge Form', () => {
   let cryptoConversions;
   beforeEach(() => {
     cy.viewport('ipad-2');
+    cy.intercept('https://checkout-api.dev.immutable.com/v1/rpc/eth-sepolia', []);
 
     cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
     bridgeState = {

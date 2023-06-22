@@ -12,6 +12,7 @@ import {
   CheckoutWidgetsConfig,
 } from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 
 function ConnectUI() {
   CheckoutWidgets({
@@ -32,7 +33,7 @@ function ConnectUI() {
       switch (event.detail.type) {
         case ConnectEventType.SUCCESS: {
           const eventData = event.detail.data as ConnectionSuccess;
-          console.log(eventData.providerPreference);
+          console.log(eventData.provider);
           break;
         }
         case ConnectEventType.FAILURE: {
@@ -60,7 +61,7 @@ function ConnectUI() {
   return (
     <div className="Connect">
       <h1 className="sample-heading">Checkout Connect (Web Component)</h1>
-      <ConnectReact providerPreference='metamask' />
+      <ConnectReact walletProvider={WalletProviderName.METAMASK} />
     </div>
   );
 }

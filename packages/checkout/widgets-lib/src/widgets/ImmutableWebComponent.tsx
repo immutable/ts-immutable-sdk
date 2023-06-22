@@ -29,7 +29,6 @@ export abstract class ImmutableWebComponent extends HTMLElement {
 
   connectedCallback() {
     const widgetConfig = this.getAttribute('widgetConfig') || undefined;
-
     this.widgetConfig = this.parseWidgetConfig(widgetConfig);
   }
 
