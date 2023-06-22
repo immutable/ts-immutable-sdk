@@ -19,9 +19,7 @@ export const Marketplace = () => {
       version: {
         major: 0,
         minor: 1,
-        patch: 8,
-        prerelease: 'alpha',
-        build: '2'
+        patch: 9,
       },
       isOnRampEnabled: true,
       isBridgeEnabled: true,

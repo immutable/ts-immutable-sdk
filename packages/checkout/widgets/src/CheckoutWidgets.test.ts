@@ -1,4 +1,4 @@
-import { validateAndBuildVersion } from './CheckoutWidgets';
+import { DEFAULT_CHECKOUT_VERSION, validateAndBuildVersion } from './CheckoutWidgets';
 import { SemanticVersion } from './definitions/config';
 
 describe('CheckoutWidgets', () => {
@@ -14,7 +14,7 @@ describe('CheckoutWidgets', () => {
       {
         title: 'missing version object should return default version',
         version: undefined,
-        expectedVersion: '0.1.8-alpha',
+        expectedVersion: DEFAULT_CHECKOUT_VERSION,
       },
       {
         title: 'all zero versions should return default version',
@@ -23,7 +23,7 @@ describe('CheckoutWidgets', () => {
           minor: 0,
           patch: 0,
         },
-        expectedVersion: '0.1.8-alpha',
+        expectedVersion: DEFAULT_CHECKOUT_VERSION,
       },
       {
         title: 'valid major, minor and patch',
@@ -59,7 +59,7 @@ describe('CheckoutWidgets', () => {
           minor: 2,
           patch: 8,
         },
-        expectedVersion: '0.1.8-alpha',
+        expectedVersion: DEFAULT_CHECKOUT_VERSION,
       },
       {
         title: 'set minor to 0 when patch added but minor undefined',

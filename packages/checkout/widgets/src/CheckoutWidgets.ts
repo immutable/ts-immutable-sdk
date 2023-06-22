@@ -2,7 +2,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutWidgetsConfig, SemanticVersion } from './definitions/config';
 import { CheckoutWidgetTagNames } from './definitions/types';
 
-const DEFAULT_VERSION = '0.1.8-alpha';
+export const DEFAULT_CHECKOUT_VERSION = '0.1.9-alpha';
 
 /**
  * Checking for valid version numbers input.
@@ -12,10 +12,10 @@ const DEFAULT_VERSION = '0.1.8-alpha';
  * This may change in the future depending on the relase process.
  */
 export function validateAndBuildVersion(version: SemanticVersion | undefined): string {
-  if (!version || version?.major === undefined || version.major < 0) return DEFAULT_VERSION;
-  if (version.major === 0 && version.minor === 0 && version.patch === 0) return DEFAULT_VERSION;
+  if (!version || version?.major === undefined || version.major < 0) return DEFAULT_CHECKOUT_VERSION;
+  if (version.major === 0 && version.minor === 0 && version.patch === 0) return DEFAULT_CHECKOUT_VERSION;
 
-  let validatedVersion: string = DEFAULT_VERSION;
+  let validatedVersion: string = DEFAULT_CHECKOUT_VERSION;
 
   if (!Number.isNaN(version.major) && version.major >= 0) {
     validatedVersion = version.major.toString();
