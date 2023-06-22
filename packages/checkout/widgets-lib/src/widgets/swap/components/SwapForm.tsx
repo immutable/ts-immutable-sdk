@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import {
@@ -79,10 +80,10 @@ export function SwapForm({ data }: SwapFromProps) {
     },
   } = useContext(SwapContext);
 
-  const formatTokenOptionsId = (symbol: string, address?: string) => {
+  const formatTokenOptionsId = useCallback((symbol: string, address?: string) => {
     if (!address) return symbol.toLowerCase();
     return `${symbol.toLowerCase()}-${address.toLowerCase()}`;
-  };
+  }, []);
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
 
@@ -161,7 +162,13 @@ export function SwapForm({ data }: SwapFromProps) {
     data?.fromContractAddress,
     data?.toContractAddress,
     hasSetDefaultState.current,
-    fromToken]);
+    setFromToken,
+    setFromBalance,
+    setToToken,
+    setTokensOptionsForm,
+    formatTokenOptionsId,
+    formatZeroAmount,
+  ]);
 
   const tokensOptionsTo = useMemo(() => allowedTokens
     .map(
@@ -410,7 +417,7 @@ export function SwapForm({ data }: SwapFromProps) {
     ));
   }, [fromAmount, fromToken]);
 
-  const onFromSelectChange = (value: OptionKey) => {
+  const onFromSelectChange = useCallback((value: OptionKey) => {
     const selected = tokenBalances
       .find((t) => value === formatTokenOptionsId(t.token.symbol, t.token.address));
     if (!selected) return;
@@ -418,10 +425,11 @@ export function SwapForm({ data }: SwapFromProps) {
     if (toToken && value === formatTokenOptionsId(toToken.symbol, toToken?.address)) {
       setToToken(undefined);
     }
+
     setFromToken(selected.token);
     setFromBalance(selected.formattedBalance);
     setFromTokenError('');
-  };
+  }, [toToken]);
 
   const onFromTextInputFocus = () => {
     setEditing(true);
@@ -448,16 +456,17 @@ export function SwapForm({ data }: SwapFromProps) {
   // ------------//
   //      TO     //
   // ------------//
-  const onToSelectChange = (value: OptionKey) => {
+  const onToSelectChange = useCallback((value: OptionKey) => {
     const selected = allowedTokens.find((t) => value === formatTokenOptionsId(t.symbol, t.address));
     if (!selected) return;
 
     if (fromToken && value === formatTokenOptionsId(fromToken.symbol, fromToken?.address)) {
       setFromToken(undefined);
     }
+
     setToToken(selected);
     setToTokenError('');
-  };
+  }, [fromToken]);
 
   const onToTextInputFocus = () => {
     setEditing(true);
