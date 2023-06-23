@@ -54,7 +54,11 @@ export async function getERC20Decimals(
 /**
  * Based on https://github.com/ethers-io/ethers.js/blob/main/src.ts/address/checks.ts#L51
  */
-export function isValidAddress(address: string): boolean {
+export function isValidNonZeroAddress(address: string): boolean {
+  if (address === ethers.constants.AddressZero) {
+    return false;
+  }
+
   try {
     ethers.utils.getAddress(address);
     return true;

@@ -1,7 +1,7 @@
 import { describe, it } from '@jest/globals';
 import { ethers } from 'ethers';
 import { Percent, TradeType } from '@uniswap/sdk-core';
-import { getAmountWithSlippageImpact } from './constructQuoteWithSlippage';
+import { getAmountWithSlippageImpact } from './getQuote';
 
 const DEFAULT_SLIPPAGE = new Percent(1, 1000);
 describe('getAmountWithSlippageImpact', () => {

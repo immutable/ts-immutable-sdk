@@ -5,13 +5,15 @@ import { Contract } from '@ethersproject/contracts';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError } from 'errors';
 import { BytesLike } from '@ethersproject/bytes';
-import { getApproveTransaction } from './approval';
+import { ethers } from 'ethers';
+import { getApproveGasEstimate, getApproveTransaction } from './approval';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
 
 // Mock the ERC20 token contract address and allowance values
 const spenderAddress = TEST_PERIPHERY_ROUTER_ADDRESS;
+const fromAddress = TEST_FROM_ADDRESS;
 const existingAllowance = BigNumber.from('1000000000000000000');
 const tokenInAmount = BigNumber.from('2000000000000000000');
 
@@ -208,6 +210,34 @@ describe('getApprovalTransaction', () => {
         amount,
         spenderAddress,
       )).rejects.toThrow(new ApproveError('owner and spender addresses are the same'));
+    });
+  });
+
+  describe("when the owner's address is the same as the spender's address", () => {
+    it('should throw an ApproveError', async () => {
+      const approveGasEstimate = BigNumber.from('100000');
+      const approveMock = jest.fn().mockResolvedValue(approveGasEstimate);
+
+      const erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
+        () => ({
+          estimateGas: { approve: approveMock },
+        }),
+      );
+      const provider = (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
+        () => ({
+          connect: jest.fn().mockResolvedValue(erc20Contract),
+        }),
+      ) as unknown as JsonRpcProvider;
+
+      await getApproveGasEstimate(
+        provider,
+        fromAddress,
+        spenderAddress,
+        WETH_TEST_CHAIN.address,
+      );
+      expect(approveMock).toHaveBeenCalledWith(spenderAddress, ethers.constants.MaxUint256, {
+        from: fromAddress,
+      });
     });
   });
 });
