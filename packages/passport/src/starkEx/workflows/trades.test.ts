@@ -1,6 +1,6 @@
 import { TradesApi } from '@imtbl/core-sdk';
 import { createTrade } from './trades';
-import { mockErrorMessage, mockStarkSignature, mockUser } from '../../test/mocks';
+import { mockErrorMessage, mockStarkSignature, mockUserWithEtherKey } from '../../test/mocks';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import GuardianClient from '../guardian';
 
@@ -12,7 +12,7 @@ const mockSignableTradeRequest = {
     expiration_timestamp: 1231234,
     fees: [],
     order_id: 1234,
-    user: mockUser.etherKey,
+    user: mockUserWithEtherKey.etherKey,
   },
 };
 const mockSignableTradeResponseData = {
@@ -48,7 +48,7 @@ const mockCreateTradeRequest = {
 const mockHeader = {
   headers: {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    Authorization: `Bearer ${mockUser.accessToken}`,
+    Authorization: `Bearer ${mockUserWithEtherKey.accessToken}`,
   },
 };
 const mockReturnValue = {
@@ -83,7 +83,7 @@ describe('trades', () => {
       const result = await createTrade({
         tradesApi: tradesApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         request: mockSignableTradeRequest.getSignableTradeRequest,
         guardianClient: mockGuardianClient,
       });
@@ -104,7 +104,7 @@ describe('trades', () => {
       await expect(() => createTrade({
         tradesApi: tradesApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         request: mockSignableTradeRequest.getSignableTradeRequest,
         guardianClient: mockGuardianClient,
       })).rejects.toThrowError('Transaction rejected by user');
@@ -118,7 +118,7 @@ describe('trades', () => {
       await expect(() => createTrade({
         tradesApi: tradesApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUser,
+        user: mockUserWithEtherKey,
         request: mockSignableTradeRequest.getSignableTradeRequest,
         guardianClient: mockGuardianClient,
       })).rejects.toThrow(
