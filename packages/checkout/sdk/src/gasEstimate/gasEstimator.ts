@@ -16,6 +16,7 @@ import {
   getBridgeFeeEstimate,
 } from './bridgeGasEstimate';
 import * as instance from '../instance';
+import { CheckoutConfiguration } from '../config';
 
 // Type assertion
 const parsedGasEstimateTokens: { [key: string]: any } = {};
@@ -97,18 +98,15 @@ async function bridgeToL2GasEstimator(
 }
 
 async function swapGasEstimator(
-  environment: Environment,
+  config: CheckoutConfiguration,
 ): Promise<GasEstimateSwapResult> {
-  const chainId = getL2ChainId(environment);
+  const chainId = getL2ChainId(config.environment);
   const tokenAddresses = parsedGasEstimateTokens[chainId.toString()];
 
   const { inAddress, outAddress } = tokenAddresses.swapAddresses;
 
   try {
-    const exchange = await instance.createExchangeInstance(
-      chainId,
-      environment,
-    );
+    const exchange = await instance.createExchangeInstance(chainId, config);
 
     // Create a fake transaction to get the gas from the quote
     const { info } = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -155,18 +153,18 @@ async function swapGasEstimator(
 export async function gasEstimator(
   params: GasEstimateParams,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
-  environment: Environment,
+  config: CheckoutConfiguration,
 ): Promise<GasEstimateSwapResult | GasEstimateBridgeToL2Result> {
   switch (params.gasEstimateType) {
     case GasEstimateType.BRIDGE_TO_L2:
       return await bridgeToL2GasEstimator(
         readOnlyProviders,
-        environment,
+        config.environment,
         params.isSpendingCapApprovalRequired,
         params.tokenAddress,
       );
     case GasEstimateType.SWAP:
-      return await swapGasEstimator(environment);
+      return await swapGasEstimator(config);
     default:
       throw new CheckoutError(
         'Invalid type provided for gasEstimateType',

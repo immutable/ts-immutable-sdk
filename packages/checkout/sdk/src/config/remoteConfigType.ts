@@ -29,10 +29,12 @@ export type GasEstimateTokenConfig = {
   };
 };
 
-export type RemoteConfigResult = {
-  dex: {
-    overrides?: ExchangeOverrides;
-  };
+export type DexConfig = {
+  overrides?: ExchangeOverrides;
+};
+
+export type RemoteConfiguration = {
+  dex: DexConfig;
   allowedNetworks: AllowedNetworkConfig[];
   gasEstimateTokens?: GasEstimateTokenConfig;
   allowedWallets?: AllowedWalletConfig[];
