@@ -1,10 +1,13 @@
-import { Dispatch, ReactNode, SetStateAction, createContext, useState } from "react"
-
+import { Dispatch, SetStateAction, createContext, useState } from "react"
+export interface ShowWidget {
+  show: boolean;
+  data: any;
+}
 export interface WidgetState {
-  showConnect: boolean;
-  showWallet: boolean;
-  showSwap: boolean;
-  showBridge: boolean;
+  showConnect: ShowWidget;
+  showWallet: ShowWidget;
+  showSwap: ShowWidget;
+  showBridge: ShowWidget;
 }
 
 export interface WidgetContextState {
@@ -13,10 +16,10 @@ export interface WidgetContextState {
 }
 
 export const hideAllWidgets: WidgetState = {
-  showConnect: false,
-  showWallet: false,
-  showSwap: false,
-  showBridge: false
+  showConnect: {show: false, data: {}},
+  showWallet: {show: false, data: {}},
+  showSwap: {show: false, data: {}},
+  showBridge: {show: false, data: {}},
 }
 
 export const initialWidgetContextState: WidgetContextState = {

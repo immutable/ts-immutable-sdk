@@ -210,21 +210,7 @@ describe('Top Up View', () => {
       cy.intercept(
         {
           method: 'GET',
-          path: '/api/v3/coins/list*',
-        },
-        [
-          {
-            id: 'ethereum',
-            symbol: 'eth',
-            name: 'Ethereum',
-          },
-        ],
-      ).as('coinListStub');
-
-      cy.intercept(
-        {
-          method: 'GET',
-          path: '/api/v3/simple/price*',
+          path: '/v1/fiat/conversion*',
         },
         {
           ethereum: { usd: 2000.0 },

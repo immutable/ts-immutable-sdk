@@ -4,7 +4,7 @@ const config: Config = {
   clearMocks: true,
   coverageProvider: 'v8',
   moduleDirectories: ['node_modules', 'src'],
-  testEnvironment: 'jsdom',
+  testEnvironment: 'node',
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
