@@ -277,5 +277,16 @@ export const text = {
         fiatPricePrefix: 'Approx USD $',
       },
     },
+    notEnoughGas: {
+      content: {
+        heading: 'Balance too low',
+        body: "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly.",
+      },
+      buttons: {
+        adjustAmount: 'Adjust amount',
+        copyAddress: 'Copy wallet address',
+        cancel: 'Dismiss',
+      },
+    },
   },
 };

@@ -166,10 +166,20 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         },
       );
 
-      const allowedTokenBalances = tokenBalances.balances.filter((balance) => balance.balance.gt(0)
-        && allowList.tokens
-          .map((token) => token.address)
-          .includes(balance.token.address));
+      // Allow ETH to be set in token balances as it is needed for gas fee checks
+      const ethBalance = tokenBalances.balances
+        .find((balance) => !balance.token.address || balance.token.address === 'NATIVE');
+
+      let allowedTokenBalances = tokenBalances.balances
+        .filter((balance) => balance.balance.gt(0)
+         && allowList.tokens
+           .map((token) => token.address)
+           .includes(balance.token.address));
+
+      // Add ETH to token balances
+      if (ethBalance) {
+        allowedTokenBalances = [ethBalance, ...allowedTokenBalances];
+      }
 
       bridgeDispatch({
         payload: {
