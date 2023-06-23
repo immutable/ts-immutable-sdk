@@ -93,8 +93,6 @@ export const getApproveTransaction = async (
 ): Promise<TransactionRequest | null> => {
   let amountToApprove: BigNumber;
   try {
-    // eslint-disable-next-line
-    console.log({ ownerAddress, tokenAddress, tokenAmount, spenderAddress });
     amountToApprove = await getERC20AmountToApprove(
       provider,
       ownerAddress,
