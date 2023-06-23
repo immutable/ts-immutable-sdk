@@ -35,8 +35,7 @@ export function validateAndBuildVersion(version: SemanticVersion | undefined): s
 
   // TODO: at the moment all of the releases that include
   // the checkout widgets script have '-alpha' appended
-  // Change this when we go to testnet. tiket WT-1432
-  // https://immutable.atlassian.net/browse/WT-1432
+  // Change this when we go to testnet. ticket WT-1432
   validatedVersion += '-alpha';
 
   if (version.build !== undefined) {
