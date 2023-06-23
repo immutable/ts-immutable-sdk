@@ -1,26 +1,23 @@
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
+import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ethRequestAccounts, ethSendTransaction } from './rpcMethods';
-import {
-  JsonRpcError,
-  JsonRpcRequestCallback, JsonRpcRequestPayload, RequestArguments, RpcErrorCode,
-} from './types';
+import { JsonRpcRequestCallback, JsonRpcRequestPayload, RequestArguments } from './types';
 import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
-import { User } from '../types';
+import { UserWithEtherKey } from '../types';
 import { RelayerAdapter } from './relayerAdapter';
+import { EthMethodWithAuthParams } from './rpcMethods/types';
+import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
   magicAdapter: MagicAdapter,
   config: PassportConfiguration,
   confirmationScreen: ConfirmationScreen,
+  multiRollupApiClients: MultiRollupApiClients,
 };
-
-const METHODS_REQUIRING_AUTHORISATION = [
-  'eth_sendTransaction',
-];
 
 export class ZkEvmProvider {
   private readonly authManager: AuthManager;
@@ -33,17 +30,20 @@ export class ZkEvmProvider {
 
   private readonly relayerAdapter: RelayerAdapter;
 
+  private readonly multiRollupApiClients: MultiRollupApiClients;
+
   private readonly jsonRpcProvider: JsonRpcProvider; // Used for read operations
 
   private magicProvider?: ExternalProvider; // Used for signing
 
-  private user?: User;
+  private user?: UserWithEtherKey;
 
   constructor({
     authManager,
     magicAdapter,
     config,
     confirmationScreen,
+    multiRollupApiClients,
   }: ZkEvmProviderInput) {
     this.authManager = authManager;
     this.magicAdapter = magicAdapter;
@@ -51,18 +51,27 @@ export class ZkEvmProvider {
     this.confirmationScreen = confirmationScreen;
     this.relayerAdapter = new RelayerAdapter({ config });
     this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
+    this.multiRollupApiClients = multiRollupApiClients;
   }
 
   public async request(
     request: RequestArguments,
   ): Promise<any> {
-    if (METHODS_REQUIRING_AUTHORISATION.includes(request.method) && !this.magicProvider) {
-      // eslint-disable-next-line prefer-promise-reject-errors
-      return Promise.reject({
-        message: 'Unauthorised - call eth_requestAccounts first',
-        code: RpcErrorCode.UNAUTHORISED,
+    const authWrapper = (fn: (params: EthMethodWithAuthParams) => Promise<any>) => {
+      if (this.magicProvider === undefined || this.user === undefined) {
+        throw new JsonRpcError(RpcErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
+      }
+
+      return fn({
+        params: request.params,
+        magicProvider: this.magicProvider,
+        jsonRpcProvider: this.jsonRpcProvider,
+        config: this.config,
+        confirmationScreen: this.confirmationScreen,
+        relayerAdapter: this.relayerAdapter,
+        user: this.user,
       });
-    }
+    };
 
     try {
       switch (request.method) {
@@ -71,6 +80,7 @@ export class ZkEvmProvider {
             authManager: this.authManager,
             config: this.config,
             magicAdapter: this.magicAdapter,
+            multiRollupApiClients: this.multiRollupApiClients,
           });
 
           this.user = user;
@@ -79,39 +89,23 @@ export class ZkEvmProvider {
           return result;
         }
         case 'eth_sendTransaction': {
-          return ethSendTransaction({
-            transactionRequest: request.params[0],
-            magicProvider: this.magicProvider!,
-            jsonRpcProvider: this.jsonRpcProvider,
-            config: this.config,
-            confirmationScreen: this.confirmationScreen,
-            relayerAdapter: this.relayerAdapter,
-          });
+          return authWrapper(ethSendTransaction);
         }
         default: {
-          // eslint-disable-next-line prefer-promise-reject-errors
-          return Promise.reject({
-            message: 'Method not supported',
-            code: RpcErrorCode.METHOD_NOT_FOUND,
-          });
+          return Promise.reject(
+            new JsonRpcError(RpcErrorCode.METHOD_NOT_FOUND, 'Method not supported'),
+          );
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if (error instanceof JsonRpcError) {
+        throw error;
+      }
       if (error instanceof Error) {
-        // eslint-disable-next-line prefer-promise-reject-errors
-        return Promise.reject({
-          message: error.message,
-          code: 'code' in error
-            ? error.code as RpcErrorCode
-            : RpcErrorCode.INTERNAL_ERROR,
-        });
+        throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, error.message);
       }
 
-      // eslint-disable-next-line prefer-promise-reject-errors
-      return Promise.reject({
-        message: 'Internal error',
-        code: RpcErrorCode.INTERNAL_ERROR,
-      });
+      throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Internal error');
     }
   }
 

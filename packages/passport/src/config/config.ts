@@ -1,4 +1,5 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { createConfig, MultiRollupAPIConfiguration, multiRollupConfig } from '@imtbl/generated-clients';
 import {
   Networks,
   OidcConfiguration,
@@ -49,6 +50,8 @@ export class PassportConfiguration {
 
   readonly relayerUrl: string;
 
+  readonly multiRollupConfig: MultiRollupAPIConfiguration;
+
   constructor({
     baseConfig,
     overrides,
@@ -74,6 +77,9 @@ export class PassportConfiguration {
           'zkEvmChainId',
           'relayerUrl',
           'imxPublicApiDomain',
+          'indexerMrBasePath',
+          'orderBookMrBasePath',
+          'passportMrBasePath',
         ],
         'overrides',
       );
@@ -86,6 +92,17 @@ export class PassportConfiguration {
       this.zkEvmRpcUrl = overrides.zkEvmRpcUrl;
       this.zkEvmChainId = overrides.zkEvmChainId;
       this.relayerUrl = overrides.relayerUrl;
+      this.multiRollupConfig = {
+        indexer: createConfig({
+          basePath: overrides.indexerMrBasePath,
+        }),
+        orderBook: createConfig({
+          basePath: overrides.orderBookMrBasePath,
+        }),
+        passport: createConfig({
+          basePath: overrides.passportMrBasePath,
+        }),
+      };
     } else {
       switch (baseConfig.environment) {
         case Environment.PRODUCTION: {
@@ -98,6 +115,7 @@ export class PassportConfiguration {
           this.zkEvmRpcUrl = ''; // TODO: ID-785 Update once mainnet has been deployed
           this.zkEvmChainId = ''; // TODO: ID-785 Update once mainnet has been deployed
           this.relayerUrl = 'https://relayer.immutable.com'; // TODO: ID-784 Update once we have added Relayer URL to config
+          this.multiRollupConfig = multiRollupConfig.getProduction();
           break;
         }
         case Environment.SANDBOX:
@@ -111,6 +129,7 @@ export class PassportConfiguration {
           this.zkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com';
           this.zkEvmChainId = '13372';
           this.relayerUrl = 'https://relayer.sandbox.immutable.com'; // TODO: ID-784 Update once we have added Relayer URL to config
+          this.multiRollupConfig = multiRollupConfig.getSandbox();
           break;
         }
       }

@@ -1,39 +1,58 @@
+import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ExternalProvider } from '@ethersproject/providers';
 import AuthManager from '../../authManager';
 import MagicAdapter from '../../magicAdapter';
 import { PassportConfiguration } from '../../config';
+import { createCounterfactualAddress } from '../createCounterfactualAddress';
+import { UserWithEtherKey } from '../../types';
 
 type EthRequestAccountsInput = {
   authManager: AuthManager;
   config: PassportConfiguration;
   magicAdapter: MagicAdapter;
+  multiRollupApiClients: MultiRollupApiClients;
+};
+
+type EthRequestAccountsOutput = {
+  user: UserWithEtherKey;
+  magicProvider: ExternalProvider;
+  result: string[];
 };
 
 export const ethRequestAccounts = async ({
   authManager,
   config,
   magicAdapter,
-}: EthRequestAccountsInput) => {
+  multiRollupApiClients,
+}: EthRequestAccountsInput): Promise<EthRequestAccountsOutput> => {
   const user = await authManager.getUser() || await authManager.login();
-  const result: string[] = [];
-  let magicProvider: ExternalProvider | undefined;
-
-  if (user && user.idToken) {
-    magicProvider = await magicAdapter.login(
-      user.idToken,
-      config.network,
-    );
+  if (!user.idToken) {
+    throw new Error('User is missing idToken');
   }
 
-  const smartContractWalletAddress = '0x7EEC32793414aAb720a90073607733d9e7B0ecD0'; // TODO: ID-786 this should be a claim in the JWT
+  const magicProvider = await magicAdapter.login(
+    user.idToken,
+    config.network,
+  );
 
-  if (magicProvider) {
-    result.push(smartContractWalletAddress);
+  if (!user.etherKey) {
+    // Generate counterfactual address and retrieve updated Auth0 user
+    const userWithEtherKey = await createCounterfactualAddress({
+      authManager,
+      magicProvider,
+      multiRollupApiClients,
+    });
+
+    return {
+      user: userWithEtherKey,
+      result: [userWithEtherKey.etherKey],
+      magicProvider,
+    };
   }
 
   return {
-    result,
-    user,
+    user: user as UserWithEtherKey,
+    result: [user.etherKey],
     magicProvider,
   };
 };

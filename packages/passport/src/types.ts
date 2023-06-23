@@ -48,6 +48,9 @@ export interface PassportOverrides {
   zkEvmRpcUrl: string;
   zkEvmChainId: string;
   relayerUrl: string;
+  indexerMrBasePath: string;
+  orderBookMrBasePath: string;
+  passportMrBasePath: string;
 }
 
 export interface PassportModuleConfiguration
