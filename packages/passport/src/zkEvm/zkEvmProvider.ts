@@ -59,9 +59,7 @@ export class ZkEvmProvider {
   ): Promise<any> {
     const authWrapper = (fn: (params: EthMethodWithAuthParams) => Promise<any>) => {
       if (this.magicProvider === undefined || this.user === undefined) {
-        return Promise.reject(
-          new JsonRpcError(RpcErrorCode.UNAUTHORISED, 'Unauthorised - call eth_requestAccounts first'),
-        );
+        throw new JsonRpcError(RpcErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
       }
 
       return fn({
@@ -101,17 +99,13 @@ export class ZkEvmProvider {
       }
     } catch (error: unknown) {
       if (error instanceof JsonRpcError) {
-        return Promise.reject(error);
+        throw error;
       }
       if (error instanceof Error) {
-        return Promise.reject(
-          new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, error.message),
-        );
+        throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, error.message);
       }
 
-      return Promise.reject(
-        new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Internal error'),
-      );
+      throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Internal error');
     }
   }
 

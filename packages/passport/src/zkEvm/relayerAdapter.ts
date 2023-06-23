@@ -78,7 +78,7 @@ export class RelayerAdapter {
 
     const jsonResponse = await response.json();
     if (jsonResponse.error) {
-      return Promise.reject(jsonResponse.error);
+      throw jsonResponse.error;
     }
 
     return jsonResponse;

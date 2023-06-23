@@ -34,14 +34,12 @@ export async function createCounterfactualAddress({
       },
     });
   } catch (error) {
-    return Promise.reject(
-      new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Failed to create counterfactual address: ${error}`),
-    );
+    throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Failed to create counterfactual address: ${error}`);
   }
 
   const user = await authManager.loginSilent();
   if (!user || !user.etherKey) {
-    return Promise.reject(new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Failed to refresh user details'));
+    throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Failed to refresh user details');
   }
 
   return user as UserWithEtherKey;

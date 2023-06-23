@@ -104,16 +104,7 @@ describe('Passport', () => {
       });
 
       describe('when the user is logging in for the first time', () => {
-        it('registers the user and returns the ether key', async () => {
-          mockSigninPopup.mockResolvedValue(mockOidcUser);
-          mockGetUser.mockResolvedValueOnce(null);
-          mockGetUser.mockResolvedValueOnce(mockOidcUser);
-          mockSigninSilent.mockResolvedValue(mockOidcUserWithEtherKey);
-          useMswHandlers([
-            mswHandlers.counterfactualAddress.success,
-            mswHandlers.jsonRpcProvider.success,
-          ]);
-
+        beforeEach(() => {
           mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
             expect(method).toEqual('eth_accounts');
             return Promise.resolve([magicWalletAddress]);
@@ -126,6 +117,17 @@ describe('Passport', () => {
             expect(method).toEqual('personal_sign');
             return Promise.resolve('0x05107ba1d76d8a5ba3415df36eb5af65f4c670778eed257f5704edcb03802cfc662f66b76e5aa032c2305e61ce77ed858bc9850f8c945ab6c3cb6fec796aae421c');
           });
+        });
+
+        it('registers the user and returns the ether key', async () => {
+          mockSigninPopup.mockResolvedValue(mockOidcUser);
+          mockGetUser.mockResolvedValueOnce(null);
+          mockGetUser.mockResolvedValueOnce(mockOidcUser);
+          mockSigninSilent.mockResolvedValue(mockOidcUserWithEtherKey);
+          useMswHandlers([
+            mswHandlers.counterfactualAddress.success,
+            mswHandlers.jsonRpcProvider.success,
+          ]);
 
           const zkEvmProvider = getZkEvmProvider();
 
@@ -148,19 +150,6 @@ describe('Passport', () => {
             useMswHandlers([
               mswHandlers.counterfactualAddress.internalServerError,
             ]);
-
-            mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
-              expect(method).toEqual('eth_accounts');
-              return Promise.resolve([magicWalletAddress]);
-            });
-            mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
-              expect(method).toEqual('eth_accounts');
-              return Promise.resolve([magicWalletAddress]);
-            });
-            mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
-              expect(method).toEqual('personal_sign');
-              return Promise.resolve('0x05107ba1d76d8a5ba3415df36eb5af65f4c670778eed257f5704edcb03802cfc662f66b76e5aa032c2305e61ce77ed858bc9850f8c945ab6c3cb6fec796aae421c');
-            });
 
             const zkEvmProvider = getZkEvmProvider();
 
