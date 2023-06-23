@@ -68,7 +68,7 @@ export function NotEnoughGas({
             {content.body}
           </Body>
           <Box sx={actionButtonContainerStyles}>
-            {!showAdjustAmount && (
+            {showAdjustAmount && (
             <Button sx={actionButtonStyles} variant="tertiary" onClick={onCloseBottomSheet}>
               {buttons.adjustAmount}
             </Button>
