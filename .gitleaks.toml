@@ -1,10 +1,6 @@
 title = "Unified SDK gitleaks config"
 
 [whitelist]
-# As of v4, gitleaks only matches against filename, not path in the
-# files directive.  Leaving content for backwards compatibility.
-files = [
-  "(.*?)(jpg|gif|doc|pdf|bin)$",
-  ".gitleaks.toml",
-  "^.+\\.(t|j)sx?$"
+exactMatch = [
+  '0x7EEC32793414aAb720a90073607733d9e7B0ecD0' # Ethereum address used in Passport unit tests
 ]
