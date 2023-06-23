@@ -1,16 +1,17 @@
 import { Web3Provider } from '@ethersproject/providers';
+import { signRaw } from '@imtbl/toolkit';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { createCounterfactualAddress } from './createCounterfactualAddress';
 import AuthManager from '../authManager';
 import { mockUser, mockUserWithEtherKey } from '../test/mocks';
 
 jest.mock('@ethersproject/providers');
+jest.mock('@imtbl/toolkit');
 
 describe('createCounterFactualAddress', () => {
   const getSignerMock = jest.fn();
   const ethSignerMock = {
     getAddress: jest.fn(),
-    signMessage: jest.fn(),
   };
   const authManager = {
     loginSilent: jest.fn(),
@@ -22,7 +23,7 @@ describe('createCounterFactualAddress', () => {
     },
   };
   const ethereumAddress = '0x3082e7c88f1c8b4e24be4a75dee018ad362d84d4';
-  const ethereumSignature = '0x05107ba1d76d8a5ba3415df36eb5af65f4c670778eed257f5704edcb03802cfc662f66b76e5aa032c2305e61ce77ed858bc9850f8c945ab6c3cb6fec796aae421c';
+  const ethereumSignature = '0xcc63b10814e3ab4b2dff6762a6712e40c23db00c11f2c54bcc699babdbf1d2bc3096fec623da4784fafb7f6da65338d91e3c846ef52e856c2f5f86c4cf10790900';
 
   beforeEach(() => {
     jest.restoreAllMocks();
@@ -31,7 +32,7 @@ describe('createCounterFactualAddress', () => {
     }));
     getSignerMock.mockReturnValue(ethSignerMock);
     ethSignerMock.getAddress.mockResolvedValue(ethereumAddress);
-    ethSignerMock.signMessage.mockResolvedValue(ethereumSignature);
+    (signRaw as jest.Mock).mockResolvedValue(ethereumSignature);
   });
 
   describe('when createCounterfactualAddress doesn\'t return a 201', () => {

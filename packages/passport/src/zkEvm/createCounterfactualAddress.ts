@@ -1,5 +1,6 @@
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
+import { signRaw } from '@imtbl/toolkit';
 import { UserWithEtherKey } from '../types';
 import AuthManager from '../authManager';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
@@ -23,7 +24,7 @@ export async function createCounterfactualAddress({
   const ethSigner = web3Provider.getSigner();
 
   const ethereumAddress = await ethSigner.getAddress();
-  const ethereumSignature = await ethSigner.signMessage(MESSAGE_TO_SIGN);
+  const ethereumSignature = await signRaw(MESSAGE_TO_SIGN, ethSigner);
 
   try {
     await multiRollupApiClients.passportApi.createCounterfactualAddress({
