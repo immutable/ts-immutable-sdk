@@ -54,8 +54,6 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
   const checkoutWidgetJS = document.createElement('script');
 
   const validVersion = validateAndBuildVersion(config?.version);
-  // eslint-disable-next-line no-console
-  console.log('imtbl-checkout version: ', validVersion);
 
   if (process.env.CHECKOUT_ENVIRONMENT === 'local') {
     checkoutWidgetJS.setAttribute(
