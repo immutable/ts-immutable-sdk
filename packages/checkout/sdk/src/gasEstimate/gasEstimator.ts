@@ -17,9 +17,11 @@ import {
 } from './bridgeGasEstimate';
 import * as instance from '../instance';
 import { CheckoutConfiguration } from '../config';
-
-// Type assertion
-const parsedGasEstimateTokens: { [key: string]: any } = {};
+import {
+  GasEstimateBridgeToL2TokenConfig,
+  GasEstimateSwapTokenConfig,
+  GasEstimateTokenConfig,
+} from '../config/remoteConfigType';
 
 const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000000';
 const DEFAULT_TOKEN_DECIMALS = 18;
@@ -40,16 +42,22 @@ const getL2ChainId = (environment: Environment): ChainId => {
 
 async function bridgeToL2GasEstimator(
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
-  environment: Environment,
+  config: CheckoutConfiguration,
   isSpendingCapApprovalRequired: boolean,
   tokenAddress?: FungibleToken,
 ): Promise<GasEstimateBridgeToL2Result> {
-  const fromChainId = getL1ChainId(environment);
-  const toChainId = getL2ChainId(environment);
+  const fromChainId = getL1ChainId(config.environment);
+  const toChainId = getL2ChainId(config.environment);
 
-  const tokenAddresses = parsedGasEstimateTokens[fromChainId.toString()];
+  const gasEstimateTokensConfig = (await config.remoteConfigFetcher.getConfig(
+    'gasEstimateTokens',
+  )) as GasEstimateTokenConfig;
 
-  const { gasTokenAddress, fromAddress } = tokenAddresses.bridgeToL2Addresses;
+  const bridgeToL2Addresses = gasEstimateTokensConfig[
+    fromChainId.toString()
+  ] as GasEstimateBridgeToL2TokenConfig;
+
+  const { gasTokenAddress, fromAddress } = bridgeToL2Addresses;
 
   const provider = readOnlyProviders.get(fromChainId);
 
@@ -65,7 +73,7 @@ async function bridgeToL2GasEstimator(
       fromChainId,
       toChainId,
       readOnlyProviders,
-      environment,
+      config.environment,
     );
 
     const { bridgeFee, bridgeable } = await getBridgeFeeEstimate(
@@ -101,9 +109,11 @@ async function swapGasEstimator(
   config: CheckoutConfiguration,
 ): Promise<GasEstimateSwapResult> {
   const chainId = getL2ChainId(config.environment);
-  const tokenAddresses = parsedGasEstimateTokens[chainId.toString()];
+  const gasEstimateTokensConfig = (await config.remoteConfigFetcher.getConfig(
+    'gasEstimateTokens',
+  )) as GasEstimateTokenConfig;
 
-  const { inAddress, outAddress } = tokenAddresses.swapAddresses;
+  const { inAddress, outAddress } = gasEstimateTokensConfig.swapAddresses as GasEstimateSwapTokenConfig;
 
   try {
     const exchange = await instance.createExchangeInstance(chainId, config);
@@ -159,7 +169,7 @@ export async function gasEstimator(
     case GasEstimateType.BRIDGE_TO_L2:
       return await bridgeToL2GasEstimator(
         readOnlyProviders,
-        config.environment,
+        config,
         params.isSpendingCapApprovalRequired,
         params.tokenAddress,
       );
