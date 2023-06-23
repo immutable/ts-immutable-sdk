@@ -35,7 +35,7 @@ export class RemoteConfigFetcher {
     return this.cache;
   }
 
-  public async getConfig(
+  public async get(
     key?: keyof RemoteConfiguration,
   ): Promise<
     | RemoteConfiguration

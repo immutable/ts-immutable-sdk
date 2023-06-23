@@ -28,8 +28,8 @@ describe('RemoteConfig', () => {
       const fetcher = new RemoteConfigFetcher({
         environment: env as Environment,
       });
-      await fetcher.getConfig();
-      await fetcher.getConfig();
+      await fetcher.get();
+      await fetcher.get();
 
       expect(mockedAxios.get).toHaveBeenCalledTimes(1);
       expect(mockedAxios.get).toHaveBeenNthCalledWith(
