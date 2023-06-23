@@ -41,6 +41,12 @@ describe('provider validation', () => {
       testCheckoutConfig = new CheckoutConfiguration({ baseConfig: { environment: Environment.PRODUCTION } });
     });
 
+    it('should not throw an error when valid web3provider', async () => {
+      requestMock.mockResolvedValue('0x1');
+      const testWeb3Provider = new Web3Provider(underlyingProviderMock, ChainId.ETHEREUM);
+      expect(await validateProvider(testCheckoutConfig, testWeb3Provider)).toBe(testWeb3Provider);
+    });
+
     it('should throw an error if the underlying provider is not on the same network as the Web3Provider', async () => {
       requestMock.mockResolvedValue('0x1');
       const testWeb3Provider = new Web3Provider(underlyingProviderMock, ChainId.IMTBL_ZKEVM_DEVNET);

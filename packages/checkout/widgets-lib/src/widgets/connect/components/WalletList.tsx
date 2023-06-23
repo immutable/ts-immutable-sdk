@@ -12,6 +12,7 @@ import { WalletItem } from './WalletItem';
 import {
   ViewContext,
   ViewActions,
+  SharedViews,
 } from '../../../context/view-context/ViewContext';
 
 export interface WalletListProps {
@@ -68,7 +69,7 @@ export function WalletList(props: WalletListProps) {
         viewDispatch({
           payload: {
             type: ViewActions.UPDATE_VIEW,
-            view: { type: ConnectWidgetViews.FAIL, reason: 'Unable to create provider' },
+            view: { type: SharedViews.ERROR_VIEW, error: err },
           },
         });
       }
