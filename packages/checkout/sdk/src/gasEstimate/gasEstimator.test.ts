@@ -13,14 +13,15 @@ import {
 } from '../types';
 import { createBridgeInstance, createExchangeInstance } from '../instance';
 import { CheckoutConfiguration } from '../config';
+import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 
 jest.mock('../instance');
 
+jest.mock('../config/remoteConfigFetcher');
+
 describe('gasServiceEstimator', () => {
   let readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
-  const config: CheckoutConfiguration = new CheckoutConfiguration({
-    baseConfig: { environment: Environment.SANDBOX },
-  });
+  let config: CheckoutConfiguration;
 
   beforeEach(() => {
     readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>([
@@ -35,6 +36,27 @@ describe('gasServiceEstimator', () => {
         } as unknown as ethers.providers.JsonRpcProvider,
       ],
     ]);
+
+    (RemoteConfigFetcher as jest.Mock).mockReturnValue({
+      get: jest.fn().mockResolvedValue({
+        [ChainId.IMTBL_ZKEVM_DEVNET]: {
+          swapAddresses: {
+            inAddress: '0x1',
+            outAddress: '0x2',
+          },
+        },
+        [ChainId.SEPOLIA]: {
+          bridgeToL2Addresses: {
+            gasTokenAddress: 'NATIVE',
+            fromAddress: '0x4',
+          },
+        },
+      }),
+    });
+
+    config = new CheckoutConfiguration({
+      baseConfig: { environment: Environment.SANDBOX },
+    });
   });
 
   describe('swap', () => {

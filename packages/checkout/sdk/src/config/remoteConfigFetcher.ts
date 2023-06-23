@@ -44,8 +44,8 @@ export class RemoteConfigFetcher {
     > {
     const config = await this.load();
     if (config && key) {
-      return config[key];
+      return config[key] as RemoteConfiguration[keyof RemoteConfiguration];
     }
-    return config;
+    return config as RemoteConfiguration;
   }
 }
