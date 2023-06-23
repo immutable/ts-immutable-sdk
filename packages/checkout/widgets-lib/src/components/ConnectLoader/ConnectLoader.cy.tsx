@@ -107,8 +107,10 @@ describe('ConnectLoader', () => {
     cy.get('#inner-widget').should('not.exist');
   });
 
-  it('should show inner widget when go through connect flow successfully', () => {
-    const params = {} as ConnectLoaderParams;
+  it('should go through connect flow and show inner widget if provider not connected', () => {
+    const params = {
+      web3Provider: {} as Web3Provider,
+    } as ConnectLoaderParams;
 
     cy.stub(Checkout.prototype, 'checkIsWalletConnected')
       .as('checkIsWalletConnectedStub')
@@ -116,7 +118,7 @@ describe('ConnectLoader', () => {
       .resolves({
         isConnected: false,
       })
-      .onFirstCall()
+      .onSecondCall()
       .resolves({
         isConnected: true,
       });
@@ -159,7 +161,6 @@ describe('ConnectLoader', () => {
       </ConnectLoader>,
     );
 
-    cySmartGet('wallet-list-metamask').click();
     cySmartGet('footer-button').click();
     cy.get('#inner-widget').should('be.visible');
   });
