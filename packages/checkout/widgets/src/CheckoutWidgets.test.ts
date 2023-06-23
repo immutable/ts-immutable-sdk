@@ -10,7 +10,8 @@ describe('CheckoutWidgets', () => {
     {
       title: string,
       version: SemanticVersion | undefined,
-      expectedVersion: string }[] = [
+      expectedVersion: string,
+    }[] = [
       {
         title: 'missing version object should return default version',
         version: undefined,
@@ -93,7 +94,7 @@ describe('CheckoutWidgets', () => {
           major: 0,
           minor: 1,
           patch: 8,
-          build: '1',
+          build: 1,
         },
         expectedVersion: '0.1.8-alpha.1',
       },
