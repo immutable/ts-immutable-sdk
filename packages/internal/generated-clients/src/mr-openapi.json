@@ -86,7 +86,7 @@
       "url": "https://order-book-mr.dev.imtbl.com"
     },
     {
-      "url": "https://passport.sandbox.imtbl.com"
+      "url": "https://api.sandbox.immutable.com"
     }
   ],
   "paths": {
@@ -888,11 +888,10 @@
         }
       }
     },
-    "/v1/chains/{chain_name}/listings": {
+    "/v1/chains/{chain_name}/orders/listings": {
       "get": {
         "tags": [
-          "orders",
-          "listings"
+          "orders"
         ],
         "summary": "List all listings",
         "description": "List all listings",
@@ -919,6 +918,17 @@
             "name": "sell_item_contract_address",
             "in": "query",
             "description": "Sell item contract address to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "buy_item_contract_address",
+            "in": "query",
+            "description": "Buy item contract address to filter by",
             "required": false,
             "schema": {
               "type": "string",
@@ -1012,7 +1022,6 @@
       },
       "post": {
         "tags": [
-          "listings",
           "orders"
         ],
         "summary": "Create a listing",
@@ -1061,10 +1070,9 @@
         }
       }
     },
-    "/v1/chains/{chain_name}/listings/{listing_id}": {
+    "/v1/chains/{chain_name}/orders/listings/{listing_id}": {
       "get": {
         "tags": [
-          "listings",
           "orders"
         ],
         "summary": "Get a single listing by ID",
@@ -1115,7 +1123,7 @@
         }
       }
     },
-    "/v1/counterfactual-address": {
+    "/passport-mr/v1/counterfactual-address": {
       "post": {
         "summary": "Create a counterfactual address",
         "description": "Create a counterfactual address for a user based on their Ethereum address",
@@ -1930,9 +1938,19 @@
             "example": "Aqua Power"
           },
           "value": {
-            "type": "string",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ],
             "description": "The metadata trait value",
-            "example": "40"
+            "example": "Happy"
           }
         },
         "required": [
@@ -2384,39 +2402,108 @@
           }
         ]
       },
-      "BuyItem": {
+      "Item": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/NativeItem"
+          },
+          {
+            "$ref": "#/components/schemas/ERC20Item"
+          },
+          {
+            "$ref": "#/components/schemas/ERC721Item"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "item_type",
+          "mapping": {
+            "NATIVE": "#/components/schemas/NativeItem",
+            "ERC20": "#/components/schemas/ERC20Item",
+            "ERC721": "#/components/schemas/ERC721Item"
+          }
+        }
+      },
+      "NativeItem": {
         "type": "object",
         "properties": {
           "item_type": {
             "type": "string",
-            "description": "Token type user is willing to accept upon settlement",
-            "example": "ERC20",
+            "description": "Token type user is offering, which in this case is the native IMX token",
+            "example": "NATIVE",
             "enum": [
-              "NATIVE",
-              "ERC20"
+              "NATIVE"
             ]
           },
           "start_amount": {
             "type": "string",
-            "description": "Starting price of what the user will consider to sell token",
+            "description": "A string representing the starting price at which the user is willing to sell the token. This value is provided in the smallest unit of the token (e.g., wei for Ethereum).",
             "example": "9750000000000000000",
             "pattern": "\\d+"
+          }
+        },
+        "required": [
+          "item_type",
+          "start_amount"
+        ]
+      },
+      "ERC20Item": {
+        "type": "object",
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC20",
+            "example": "ERC20",
+            "enum": [
+              "ERC20"
+            ]
           },
           "contract_address": {
             "type": "string",
             "description": "Address of ERC20 token",
             "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
             "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "start_amount": {
+            "type": "string",
+            "description": "A string representing the starting price at which the user is willing to sell the token. This value is provided in the smallest unit of the token (e.g., wei for Ethereum).",
+            "example": "9750000000000000000",
+            "pattern": "\\d+"
           }
-        },
-        "example": {
-          "item_type": "NATIVE",
-          "start_amount": "9750000000000000000",
-          "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
         },
         "required": [
           "item_type",
+          "contract_address",
           "start_amount"
+        ]
+      },
+      "ERC721Item": {
+        "type": "object",
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC721",
+            "example": "ERC721",
+            "enum": [
+              "ERC721"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC721 token",
+            "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "ID of ERC721 token",
+            "example": "1",
+            "pattern": "\\d+"
+          }
+        },
+        "required": [
+          "item_type",
+          "contract_address",
+          "token_id"
         ]
       },
       "CreateListingRequestBody": {
@@ -2433,8 +2520,9 @@
           },
           "buy": {
             "type": "array",
+            "description": "Buy item for listing should either be NATIVE or ERC20 item",
             "items": {
-              "$ref": "#/components/schemas/BuyItem"
+              "$ref": "#/components/schemas/Item"
             },
             "example": [
               {
@@ -2471,8 +2559,9 @@
           },
           "sell": {
             "type": "array",
+            "description": "Sell item for listing should be an ERC721 item",
             "items": {
-              "$ref": "#/components/schemas/SellItem"
+              "$ref": "#/components/schemas/Item"
             },
             "example": [
               {
@@ -2606,7 +2695,7 @@
           "buy": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/BuyItem"
+              "$ref": "#/components/schemas/Item"
             },
             "example": [
               {
@@ -2658,7 +2747,7 @@
           "sell": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SellItem"
+              "$ref": "#/components/schemas/Item"
             },
             "example": [
               {
@@ -2979,41 +3068,6 @@
               "operator_signature"
             ]
           }
-        ]
-      },
-      "SellItem": {
-        "type": "object",
-        "properties": {
-          "item_type": {
-            "type": "string",
-            "description": "Token type user is offering which in this case is a ERC721",
-            "example": "ERC721",
-            "enum": [
-              "ERC721"
-            ]
-          },
-          "contract_address": {
-            "type": "string",
-            "description": "Address of ERC721 token",
-            "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
-            "pattern": "^0x[a-fA-F0-9]{40}$"
-          },
-          "token_id": {
-            "type": "string",
-            "description": "ID of ERC721 token",
-            "example": "1",
-            "pattern": "\\d+"
-          }
-        },
-        "example": {
-          "item_type": "ERC721",
-          "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
-          "token_id": "1"
-        },
-        "required": [
-          "item_type",
-          "contract_address",
-          "token_id"
         ]
       },
       "CreateCounterfactualAddressRequest": {

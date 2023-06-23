@@ -26,9 +26,9 @@ function SwapWebView() {
   return (
     <SwapReact
       walletProvider={WalletProviderName.METAMASK}
-      amount=""
+      amount="0.1"
       fromContractAddress="0xFEa9FF93DC0C6DC73F8Be009Fe7a22Bb9dcE8A2d"
-      toContractAddress=""
+      toContractAddress="0x8ac26efcbf5d700b37a27aa00e6934e6904e7b8e"
     />
   );
 }

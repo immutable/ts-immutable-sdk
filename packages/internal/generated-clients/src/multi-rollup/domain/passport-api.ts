@@ -52,7 +52,7 @@ export const PassportApiAxiosParamCreator = function (configuration?: Configurat
         createCounterfactualAddress: async (createCounterfactualAddressRequest: CreateCounterfactualAddressRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createCounterfactualAddressRequest' is not null or undefined
             assertParamExists('createCounterfactualAddress', 'createCounterfactualAddressRequest', createCounterfactualAddressRequest)
-            const localVarPath = `/v1/counterfactual-address`;
+            const localVarPath = `/passport-mr/v1/counterfactual-address`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

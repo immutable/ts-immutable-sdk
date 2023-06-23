@@ -18,7 +18,6 @@ import {
 } from './context/ConnectContext';
 import { ConnectWidgetView, ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { ConnectWallet } from './views/ConnectWallet';
-import { ConnectResult } from './views/ConnectResult';
 import { ReadyToConnect } from './views/ReadyToConnect';
 import { SwitchNetworkZkEVM } from './views/SwitchNetworkZkEVM';
 import { LoadingView } from '../../views/loading/LoadingView';
@@ -37,6 +36,8 @@ import {
   ConnectTargetLayer, getTargetLayerChainId, WidgetTheme,
 } from '../../lib';
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
+import { ErrorView } from '../../views/error/ErrorView';
+import { text } from '../../resources/text/textConfig';
 
 export interface ConnectWidgetProps {
   params: ConnectWidgetParams;
@@ -56,6 +57,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const { targetLayer, web3Provider } = params;
   const { deepLink = ConnectWidgetViews.CONNECT_WALLET } = props;
   const { environment, theme } = config;
+  const errorText = text.views[SharedViews.ERROR_VIEW].actionText;
 
   const [connectState, connectDispatch] = useReducer(
     connectReducer,
@@ -114,8 +116,8 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   }, [deepLink, sendCloseEventOverride, environment]);
 
   useEffect(() => {
-    if (viewState.view.type === ConnectWidgetViews.FAIL) {
-      sendConnectFailedEvent(viewState.view.reason);
+    if (viewState.view.type === SharedViews.ERROR_VIEW) {
+      sendConnectFailedEvent(viewState.view.error.message);
     }
   }, [viewState]);
 
@@ -154,7 +156,23 @@ export function ConnectWidget(props: ConnectWidgetProps) {
               </ConnectLoaderSuccess>
             )}
             {((view.type === ConnectWidgetViews.SUCCESS && !provider)
-            || view.type === ConnectWidgetViews.FAIL) && <ConnectResult />}
+            || view.type === SharedViews.ERROR_VIEW)
+              && (
+                <ErrorView
+                  actionText={errorText}
+                  onActionClick={() => {
+                    viewDispatch({
+                      payload: {
+                        type: ViewActions.UPDATE_VIEW,
+                        view: {
+                          type: ConnectWidgetViews.CONNECT_WALLET,
+                        } as ConnectWidgetView,
+                      },
+                    });
+                  }}
+                  onCloseClick={() => sendCloseEvent()}
+                />
+              )}
           </>
         </ConnectContext.Provider>
       </ViewContext.Provider>

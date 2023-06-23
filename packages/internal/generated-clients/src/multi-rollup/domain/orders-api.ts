@@ -53,7 +53,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             assertParamExists('createListing', 'chainName', chainName)
             // verify required parameter 'createListingRequestBody' is not null or undefined
             assertParamExists('createListing', 'createListingRequestBody', createListingRequestBody)
-            const localVarPath = `/v1/chains/{chain_name}/listings`
+            const localVarPath = `/v1/chains/{chain_name}/orders/listings`
                 .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -93,7 +93,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             assertParamExists('getListing', 'chainName', chainName)
             // verify required parameter 'listingId' is not null or undefined
             assertParamExists('getListing', 'listingId', listingId)
-            const localVarPath = `/v1/chains/{chain_name}/listings/{listing_id}`
+            const localVarPath = `/v1/chains/{chain_name}/orders/listings/{listing_id}`
                 .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)))
                 .replace(`{${"listing_id"}}`, encodeURIComponent(String(listingId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -124,6 +124,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {string} chainName 
          * @param {OrderStatus} [status] Order status to filter by
          * @param {string} [sellItemContractAddress] Sell item contract address to filter by
+         * @param {string} [buyItemContractAddress] Buy item contract address to filter by
          * @param {string} [sellItemTokenId] Sell item token identifier to filter by
          * @param {number} [pageSize] Maximum number of orders to return per page
          * @param {'created_at' | 'updated_at' | 'buy_item_amount'} [sortBy] Order field to sort by
@@ -132,10 +133,10 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listListings: async (chainName: string, status?: OrderStatus, sellItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listListings: async (chainName: string, status?: OrderStatus, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
             assertParamExists('listListings', 'chainName', chainName)
-            const localVarPath = `/v1/chains/{chain_name}/listings`
+            const localVarPath = `/v1/chains/{chain_name}/orders/listings`
                 .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -154,6 +155,10 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
 
             if (sellItemContractAddress !== undefined) {
                 localVarQueryParameter['sell_item_contract_address'] = sellItemContractAddress;
+            }
+
+            if (buyItemContractAddress !== undefined) {
+                localVarQueryParameter['buy_item_contract_address'] = buyItemContractAddress;
             }
 
             if (sellItemTokenId !== undefined) {
@@ -227,6 +232,7 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @param {string} chainName 
          * @param {OrderStatus} [status] Order status to filter by
          * @param {string} [sellItemContractAddress] Sell item contract address to filter by
+         * @param {string} [buyItemContractAddress] Buy item contract address to filter by
          * @param {string} [sellItemTokenId] Sell item token identifier to filter by
          * @param {number} [pageSize] Maximum number of orders to return per page
          * @param {'created_at' | 'updated_at' | 'buy_item_amount'} [sortBy] Order field to sort by
@@ -235,8 +241,8 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listListings(chainName: string, status?: OrderStatus, sellItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListListingsResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listListings(chainName, status, sellItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options);
+        async listListings(chainName: string, status?: OrderStatus, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListListingsResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listListings(chainName, status, sellItemContractAddress, buyItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -277,6 +283,7 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          * @param {string} chainName 
          * @param {OrderStatus} [status] Order status to filter by
          * @param {string} [sellItemContractAddress] Sell item contract address to filter by
+         * @param {string} [buyItemContractAddress] Buy item contract address to filter by
          * @param {string} [sellItemTokenId] Sell item token identifier to filter by
          * @param {number} [pageSize] Maximum number of orders to return per page
          * @param {'created_at' | 'updated_at' | 'buy_item_amount'} [sortBy] Order field to sort by
@@ -285,8 +292,8 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listListings(chainName: string, status?: OrderStatus, sellItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: any): AxiosPromise<ListListingsResult> {
-            return localVarFp.listListings(chainName, status, sellItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options).then((request) => request(axios, basePath));
+        listListings(chainName: string, status?: OrderStatus, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: any): AxiosPromise<ListListingsResult> {
+            return localVarFp.listListings(chainName, status, sellItemContractAddress, buyItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -359,6 +366,13 @@ export interface OrdersApiListListingsRequest {
      * @memberof OrdersApiListListings
      */
     readonly sellItemContractAddress?: string
+
+    /**
+     * Buy item contract address to filter by
+     * @type {string}
+     * @memberof OrdersApiListListings
+     */
+    readonly buyItemContractAddress?: string
 
     /**
      * Sell item token identifier to filter by
@@ -436,6 +450,6 @@ export class OrdersApi extends BaseAPI {
      * @memberof OrdersApi
      */
     public listListings(requestParameters: OrdersApiListListingsRequest, options?: AxiosRequestConfig) {
-        return OrdersApiFp(this.configuration).listListings(requestParameters.chainName, requestParameters.status, requestParameters.sellItemContractAddress, requestParameters.sellItemTokenId, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
+        return OrdersApiFp(this.configuration).listListings(requestParameters.chainName, requestParameters.status, requestParameters.sellItemContractAddress, requestParameters.buyItemContractAddress, requestParameters.sellItemTokenId, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
     }
 }
