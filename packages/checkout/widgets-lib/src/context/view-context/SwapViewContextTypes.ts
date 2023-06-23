@@ -1,5 +1,5 @@
-import { TransactionRequest, TransactionResponse } from '@ethersproject/providers';
-import { TradeInfo, TransactionResponse as DexTransactionResponse } from '@imtbl/dex-sdk';
+import { TransactionResponse } from '@ethersproject/providers';
+import { TransactionResponse as DexTransactionResponse } from '@imtbl/dex-sdk';
 
 export enum SwapWidgetViews {
   SWAP = 'SWAP',
@@ -59,8 +59,5 @@ interface SwapInProgressView {
   }
 }
 export interface ApproveERC20SwapData extends DexTransactionResponse {
-  approveTransaction: TransactionRequest;
-  transaction: TransactionRequest;
-  info: TradeInfo;
   swapFormInfo: PrefilledSwapForm;
 }

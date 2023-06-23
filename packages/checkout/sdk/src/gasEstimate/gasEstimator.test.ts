@@ -34,9 +34,9 @@ describe('gasServiceEstimator', () => {
     it('should return gas estimate for swap', async () => {
       (createExchangeInstance as jest.Mock).mockResolvedValue({
         getUnsignedSwapTxFromAmountIn: jest.fn().mockResolvedValue({
-          info: {
+          swap: {
             gasFeeEstimate: {
-              amount: BigNumber.from(1),
+              value: BigNumber.from(1),
               token: {
                 address: '0x1',
                 symbol: 'TEST',
@@ -65,7 +65,7 @@ describe('gasServiceEstimator', () => {
     it('should handle null gasFeeEstimate returned from the exchange', async () => {
       (createExchangeInstance as jest.Mock).mockResolvedValue({
         getUnsignedSwapTxFromAmountIn: jest.fn().mockResolvedValue({
-          info: {
+          swap: {
             gasFeeEstimate: null,
           },
         }),
@@ -86,9 +86,9 @@ describe('gasServiceEstimator', () => {
     it('should handle undefined amount returned from the exchange', async () => {
       (createExchangeInstance as jest.Mock).mockResolvedValue({
         getUnsignedSwapTxFromAmountIn: jest.fn().mockResolvedValue({
-          info: {
+          swap: {
             gasFeeEstimate: {
-              amount: undefined,
+              value: undefined,
               token: {
                 address: '0x1',
                 symbol: 'TEST',

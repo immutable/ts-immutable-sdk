@@ -114,14 +114,14 @@ async function swapGasEstimator(
     );
 
     // Create a fake transaction to get the gas from the quote
-    const { info } = await exchange.getUnsignedSwapTxFromAmountIn(
+    const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
       DUMMY_WALLET_ADDRESS,
       inAddress,
       outAddress,
       BigNumber.from(utils.parseUnits('1', DEFAULT_TOKEN_DECIMALS)),
     );
 
-    if (info.gasFeeEstimate === null) {
+    if (swap.gasFeeEstimate === null) {
       return {
         gasEstimateType: GasEstimateType.SWAP,
         gasFee: {},
@@ -129,8 +129,8 @@ async function swapGasEstimator(
     }
 
     let estimatedAmount;
-    if (info.gasFeeEstimate.amount) {
-      estimatedAmount = BigNumber.from(info.gasFeeEstimate.amount);
+    if (swap.gasFeeEstimate.value) {
+      estimatedAmount = BigNumber.from(swap.gasFeeEstimate.value);
     }
 
     return {
@@ -138,11 +138,11 @@ async function swapGasEstimator(
       gasFee: {
         estimatedAmount,
         token: {
-          address: info.gasFeeEstimate?.token.address,
-          symbol: info.gasFeeEstimate?.token.symbol ?? '',
-          name: info.gasFeeEstimate?.token.name ?? '',
+          address: swap.gasFeeEstimate?.token.address,
+          symbol: swap.gasFeeEstimate?.token.symbol ?? '',
+          name: swap.gasFeeEstimate?.token.name ?? '',
           decimals:
-            info.gasFeeEstimate?.token.decimals ?? DEFAULT_TOKEN_DECIMALS,
+            swap.gasFeeEstimate?.token.decimals ?? DEFAULT_TOKEN_DECIMALS,
         },
       },
     };
