@@ -1,13 +1,15 @@
-import { Checkout, ConnectionProviders, WalletProviderName } from '@imtbl/checkout-sdk';
 import { LitElement, css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { ERC20__factory } from '@imtbl/contracts/';
 import { TransactionRequest } from '@ethersproject/providers';
+import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 
 @customElement('imtbl-primary-sales-demo')
 export class PrimarySalesDemo extends LitElement {
   static styles = css``;
 
+  @property({ type: String, attribute: "wallet-address" })
+  connectedAddress: string | undefined = undefined;
 
   handleCustomEvent<T extends Event>(listener: (event: T) => void) {
     return (event: Event) => {
@@ -20,10 +22,58 @@ export class PrimarySalesDemo extends LitElement {
 
 
 
-    this.connect();
+    // this.connect();
+
+    this.checkoutConnect();
+  }
+
+  async checkoutConnect() {
+    const handleConnectEvent = (event: any) => {
+      switch(event.detail.type){
+        case "success": {
+          console.log('success: ', event);
+          this.success();
+          break;
+        }
+        case "failure": {
+          console.log('failure: ', event);
+          break;
+        }
+        case "close-widget": {
+          console.log(event);
+          break;
+        }
+        default:
+          console.log('Unsupported event type');
+      }
+    }
+
+    window.removeEventListener("imtbl-connect-widget", handleConnectEvent);
+    window.addEventListener("imtbl-connect-widget", handleConnectEvent);
+
+
+  }
+
+  async success() {
+    const checkout = new Checkout();
+    const resp = await checkout.createProvider({
+      walletProvider: WalletProviderName.METAMASK,
+    });
+    const res = await checkout.checkIsWalletConnected({provider: resp.provider})
+    console.log('@@@@@@@@ res', res);
+
+    if (res.isConnected) {
+      this.connectedAddress = res.walletAddress;
+    } else {
+      this.connectedAddress = undefined;
+    }
+
+    this.requestUpdate();
+
   }
 
   async connect() {
+    return;
     const checkout = new Checkout();
     const resp = await checkout.createProvider({
       walletProvider: WalletProviderName.METAMASK,
@@ -116,9 +166,14 @@ export class PrimarySalesDemo extends LitElement {
   render() {
 
     return html` 
-      <div>
-        <h1>Primary Sales Demo</h1>
-      </div>`;
+        <h1 class="mb-2">Primary Sales Demo</h1>
+
+        ${this.connectedAddress ? html`<p>Connected Address: ${this.connectedAddress}</p>` : html`<p>No Wallet Connected</p>`}
+
+      <div class="h-screen flex flex-row">
+        <imtbl-connect providerPreference="metamask" theme="dark" environment="sandbox"></imtbl-connect>
+
+    </div>`;
   }
 
   protected createRenderRoot(): Element | ShadowRoot {
