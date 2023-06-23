@@ -8,19 +8,19 @@ export function handleOrchestrationEvent(
 ){
   switch(event.detail.type) {
     case OrchestrationEventType.REQUEST_CONNECT: {
-      setShowWidgets({...hideAllWidgets, showConnect: true})
+      setShowWidgets({...hideAllWidgets, showConnect: {show: true, data: event.detail.data}})
       return;
     }
     case OrchestrationEventType.REQUEST_WALLET: {
-      setShowWidgets({...hideAllWidgets, showWallet: true})
+      setShowWidgets({...hideAllWidgets, showWallet: {show: true, data: event.detail.data}})
       return;
     }
     case OrchestrationEventType.REQUEST_SWAP: {
-      setShowWidgets({...hideAllWidgets, showSwap: true})
+      setShowWidgets({...hideAllWidgets, showSwap: {show: true, data: event.detail.data}})
       return;
     }
     case OrchestrationEventType.REQUEST_BRIDGE: {
-      setShowWidgets({...hideAllWidgets, showBridge: true})
+      setShowWidgets({...hideAllWidgets, showBridge: {show: true, data: event.detail.data}})
       return;
     }
     default: {

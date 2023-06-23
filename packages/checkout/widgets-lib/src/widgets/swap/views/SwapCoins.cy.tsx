@@ -13,7 +13,9 @@ describe('SwapCoins tests', () => {
     cy.viewport('ipad-2');
   });
 
+  let cryptoConversions;
   beforeEach(() => {
+    cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
     const initialSwapState: SwapState = {
       checkout: null,
       exchange: null,
@@ -50,7 +52,10 @@ describe('SwapCoins tests', () => {
     };
 
     mount(
-      <SwapWidgetTestComponent initialStateOverride={initialSwapState}>
+      <SwapWidgetTestComponent
+        initialStateOverride={initialSwapState}
+        cryptoConversionsOverride={cryptoConversions}
+      >
         <SwapCoins />
       </SwapWidgetTestComponent>,
     );

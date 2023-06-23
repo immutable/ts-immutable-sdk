@@ -1,7 +1,10 @@
-import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import {
+  ChainId, Checkout,
+} from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Environment } from '@imtbl/config';
+import { Web3Provider } from '@ethersproject/providers';
 import { cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -20,7 +23,7 @@ describe('ConnectLoader', () => {
     cy.viewport('ipad-2');
   });
 
-  it('should show connect widget when no provider preference', () => {
+  it('should show connect widget when no provider', () => {
     const params = {} as ConnectLoaderParams;
     mount(
       <ConnectLoader
@@ -35,10 +38,10 @@ describe('ConnectLoader', () => {
     cy.get('#inner-widget').should('not.exist');
   });
 
-  it('should show connect widget when user not connected', () => {
+  it('should show ready to connect view when provider but not connected', () => {
     const params = {
-      providerPreference: ConnectionProviders.METAMASK,
-    } as ConnectLoaderParams;
+      web3Provider: {} as Web3Provider,
+    };
 
     cy.stub(Checkout.prototype, 'checkIsWalletConnected')
       .as('checkIsWalletConnectedStub')
@@ -56,14 +59,12 @@ describe('ConnectLoader', () => {
       </ConnectLoader>,
     );
 
-    cySmartGet('wallet-list-metamask').should('be.visible');
+    cySmartGet('footer-button').should('have.text', 'Ready to connect');
     cy.get('#inner-widget').should('not.exist');
   });
 
   it('should show connect widget when user on wrong network', () => {
-    const params = {
-      providerPreference: ConnectionProviders.METAMASK,
-    } as ConnectLoaderParams;
+    const params = {} as ConnectLoaderParams;
 
     cy.stub(Checkout.prototype, 'checkIsWalletConnected')
       .as('checkIsWalletConnectedStub')
@@ -106,15 +107,26 @@ describe('ConnectLoader', () => {
     cy.get('#inner-widget').should('not.exist');
   });
 
-  it('should show inner widget when go through connect flow successfully', () => {
+  it('should go through connect flow and show inner widget if provider not connected', () => {
     const params = {
-      providerPreference: ConnectionProviders.METAMASK,
+      web3Provider: {} as Web3Provider,
     } as ConnectLoaderParams;
 
     cy.stub(Checkout.prototype, 'checkIsWalletConnected')
       .as('checkIsWalletConnectedStub')
+      .onFirstCall()
       .resolves({
         isConnected: false,
+      })
+      .onSecondCall()
+      .resolves({
+        isConnected: true,
+      });
+
+    cy.stub(Checkout.prototype, 'createProvider')
+      .as('createProviderStub')
+      .resolves({
+        provider: {} as Web3Provider,
       });
 
     cy.stub(Checkout.prototype, 'connect')
@@ -149,14 +161,13 @@ describe('ConnectLoader', () => {
       </ConnectLoader>,
     );
 
-    cySmartGet('wallet-list-metamask').click();
     cySmartGet('footer-button').click();
     cy.get('#inner-widget').should('be.visible');
   });
 
   it('should not show connect flow when user already connected', () => {
     const params = {
-      providerPreference: ConnectionProviders.METAMASK,
+      web3Provider: {} as Web3Provider,
     } as ConnectLoaderParams;
 
     cy.stub(Checkout.prototype, 'checkIsWalletConnected')
@@ -178,6 +189,17 @@ describe('ConnectLoader', () => {
           }),
         },
         network: { name: 'Immutable zkEVM Devnet' },
+      });
+
+    cy.stub(Checkout, 'isWeb3Provider')
+      .as('isWeb3ProviderStub')
+      .returns(true);
+
+    cy.stub(Checkout.prototype, 'getNetworkInfo')
+      .as('getNetworkInfoStub')
+      .resolves({
+        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+        isSupported: true,
       });
 
     mount(

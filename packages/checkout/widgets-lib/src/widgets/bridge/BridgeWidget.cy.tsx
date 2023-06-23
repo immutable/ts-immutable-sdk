@@ -10,7 +10,7 @@ import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CompletionStatus, TokenBridge } from '@imtbl/bridge-sdk';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { cySmartGet } from '../../lib/testUtils';
 import {
   BridgeWidget,
@@ -48,7 +48,7 @@ describe('Bridge Widget tests', () => {
     provider: {
       request: async () => null,
     },
-  };
+  } as unknown as Web3Provider;
 
   beforeEach(() => {
     cy.viewport('ipad-2');
@@ -147,7 +147,14 @@ describe('Bridge Widget tests', () => {
         ],
       });
 
-    cy.stub(Checkout.prototype, 'getNetworkInfo').as('networkInfoStub');
+    cy.stub(Checkout.prototype, 'getNetworkInfo')
+      .as('getNetworkInfoStub')
+      .resolves({
+        isSupported: true,
+        nativeCurrency: {
+          symbol: 'eth',
+        },
+      });
 
     // Had to stub JsonRpcProvider as it makes calls on creation
     // Can resolve to any network for these tests as we also stub
@@ -179,69 +186,46 @@ describe('Bridge Widget tests', () => {
         bridgeable: true,
       });
 
-    const fiatPricingValue = {
-      ethereum: { usd: 2000.0 },
-      'usd-coin': { usd: 1.0 },
-      'immutable-x': { usd: 1.5 },
-    };
-
-    const coinList = [
-      {
-        id: 'ethereum',
-        symbol: 'eth',
-        name: 'Etherum',
-      },
-    ];
-
     cy.intercept(
       {
         method: 'GET',
-        path: '/api/v3/coins/list*',
+        path: '/v1/fiat/conversion*',
       },
-      coinList,
-    ).as('coinListStub');
-
-    cy.intercept(
       {
-        method: 'GET',
-        path: '/api/v3/simple/price*',
+        ethereum: { usd: 2000.0 },
+        'usd-coin': { usd: 1.0 },
+        'immutable-x': { usd: 1.5 },
       },
-      fiatPricingValue,
     ).as('cryptoFiatStub');
   });
 
   describe('Bridge Widget render', () => {
     it('should show bridge widget on mount', () => {
-      const params = {
-        providerPreference: 'metamask',
-      } as BridgeWidgetParams;
+      const params = {} as BridgeWidgetParams;
       mount(
         <BridgeWidget
           config={config}
           params={params}
+          web3Provider={mockProvider}
         />,
       );
+
       cySmartGet('bridge-view').should('exist');
       cySmartGet('bridge-form').should('be.visible');
       cySmartGet('header-title').should('have.text', header.title);
       cySmartGet('bridge-form-content-heading').should('have.text', content.title);
       cySmartGet('close-button').should('be.visible');
-
-      cySmartGet('bridge-token-select__target').should('have.text', 'ETH');
-      cySmartGet('bridge-amount-text__input').should('have.value', '');
     });
 
     it('should set up bridge widget on mount', () => {
-      const params = {
-        providerPreference: 'metamask',
-      } as BridgeWidgetParams;
+      const params = {} as BridgeWidgetParams;
       mount(
         <BridgeWidget
           config={config}
           params={params}
+          web3Provider={mockProvider}
         />,
       );
-      cySmartGet('@connectStub').should('have.been.called');
       cySmartGet('@getAllBalancesStub').should('have.been.called');
       cySmartGet('@getTokenAllowListStub').should('have.been.called');
     });
@@ -269,9 +253,7 @@ describe('Bridge Widget tests', () => {
 
     it('should submit the bridge and show success when status is 1', () => {
       const { approveSpending, approveBridge } = text.views[BridgeWidgetViews.APPROVE_ERC20];
-      const params = {
-        providerPreference: 'metamask',
-      } as BridgeWidgetParams;
+      const params = {} as BridgeWidgetParams;
 
       cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
         .onFirstCall()
@@ -319,6 +301,7 @@ describe('Bridge Widget tests', () => {
             isOnRampEnabled: true,
           }}
           params={params}
+          web3Provider={mockProvider}
         />,
       );
 
@@ -354,9 +337,7 @@ describe('Bridge Widget tests', () => {
     });
 
     it('should submit the bridge and show fail screen if wait for deposit does not return success', () => {
-      const params = {
-        providerPreference: 'metamask',
-      } as BridgeWidgetParams;
+      const params = {} as BridgeWidgetParams;
 
       cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
         .onFirstCall()
@@ -396,6 +377,7 @@ describe('Bridge Widget tests', () => {
               isOnRampEnabled: true,
             }}
             params={params}
+            web3Provider={mockProvider}
           />
         </BiomeCombinedProviders>,
       );
@@ -421,9 +403,7 @@ describe('Bridge Widget tests', () => {
     });
 
     it('should submit the bridge and show fail when status is not 1 when submitting approval transaction', () => {
-      const params = {
-        providerPreference: 'metamask',
-      } as BridgeWidgetParams;
+      const params = {} as BridgeWidgetParams;
 
       cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
         .resolves({
@@ -445,6 +425,7 @@ describe('Bridge Widget tests', () => {
               isOnRampEnabled: true,
             }}
             params={params}
+            web3Provider={mockProvider}
           />
         </BiomeCombinedProviders>,
       );
@@ -467,9 +448,7 @@ describe('Bridge Widget tests', () => {
     });
 
     it('should submit the bridge and show fail when status is not 1 when submitting the transaction', () => {
-      const params = {
-        providerPreference: 'metamask',
-      } as BridgeWidgetParams;
+      const params = {} as BridgeWidgetParams;
 
       cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
         .onFirstCall()
@@ -500,6 +479,7 @@ describe('Bridge Widget tests', () => {
               isOnRampEnabled: true,
             }}
             params={params}
+            web3Provider={mockProvider}
           />
         </BiomeCombinedProviders>,
       );
@@ -523,9 +503,7 @@ describe('Bridge Widget tests', () => {
     });
 
     it('should submit the bridge and show fail when recoverable error and refill form when retry', () => {
-      const params = {
-        providerPreference: 'metamask',
-      } as BridgeWidgetParams;
+      const params = {} as BridgeWidgetParams;
 
       cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
         .onFirstCall()
@@ -552,12 +530,13 @@ describe('Bridge Widget tests', () => {
               isOnRampEnabled: true,
             }}
             params={params}
+            web3Provider={mockProvider}
           />
         </BiomeCombinedProviders>,
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
+      cySmartGet('bridge-token-coin-selector__option-IMX-ImmutableX').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -573,14 +552,12 @@ describe('Bridge Widget tests', () => {
       cySmartGet('failure-box').should('be.visible');
       cySmartGet('status-action-button').click();
 
-      cySmartGet('bridge-token-select__target').should('have.text', 'ETH');
+      cySmartGet('bridge-token-select__target').should('have.text', 'IMX');
       cySmartGet('bridge-amount-text__input').should('have.value', '0.1');
     });
 
     it('should submit the bridge and show shared error screen when unknown error', () => {
-      const params = {
-        providerPreference: 'metamask',
-      } as BridgeWidgetParams;
+      const params = {} as BridgeWidgetParams;
 
       cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
         .onFirstCall()
@@ -604,6 +581,7 @@ describe('Bridge Widget tests', () => {
               isOnRampEnabled: true,
             }}
             params={params}
+            web3Provider={mockProvider}
           />
         </BiomeCombinedProviders>,
       );
