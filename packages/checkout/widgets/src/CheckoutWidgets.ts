@@ -1,6 +1,5 @@
 import { CheckoutWidgetsConfig, SemanticVersion } from './definitions/config';
-
-export const DEFAULT_CHECKOUT_VERSION = '0.1.9-alpha';
+import { packageVersion, isDevMode } from './lib/env';
 
 /**
  * Validates and builds a version string based on the given SemanticVersion object.
@@ -13,10 +12,12 @@ export const DEFAULT_CHECKOUT_VERSION = '0.1.9-alpha';
 export function validateAndBuildVersion(
   version: SemanticVersion | undefined,
 ): string {
-  if (!version || version?.major === undefined || version.major < 0) return DEFAULT_CHECKOUT_VERSION;
-  if (version.major === 0 && version.minor === 0 && version.patch === 0) return DEFAULT_CHECKOUT_VERSION;
+  const defaultPackageVersion = packageVersion();
 
-  let validatedVersion: string = DEFAULT_CHECKOUT_VERSION;
+  if (!version || version?.major === undefined || version.major < 0) return defaultPackageVersion;
+  if (version.major === 0 && version.minor === 0 && version.patch === 0) return defaultPackageVersion;
+
+  let validatedVersion: string = defaultPackageVersion;
 
   if (!Number.isNaN(version.major) && version.major >= 0) {
     validatedVersion = version.major.toString();
@@ -42,10 +43,9 @@ export function validateAndBuildVersion(
     }
   }
 
-  // TODO: at the moment all of the releases that include
-  // the checkout widgets script have '-alpha' appended
-  // Change this when we go to testnet. ticket WT-1432
-  validatedVersion += '-alpha';
+  if (version.prerelease !== undefined) {
+    validatedVersion += `-${version.prerelease}`;
+  }
 
   if (version.build !== undefined) {
     validatedVersion += `.${version.build}`;

@@ -1,7 +1,22 @@
-import { DEFAULT_CHECKOUT_VERSION, validateAndBuildVersion } from './CheckoutWidgets';
+import { validateAndBuildVersion } from './CheckoutWidgets';
 import { SemanticVersion } from './definitions/config';
 
 describe('CheckoutWidgets', () => {
+  const DEFAULT_CHECKOUT_VERSION = '0.1.9-alpha';
+  const OLD_ENV = process.env;
+
+  beforeAll(() => {
+    process.env = {
+      ...OLD_ENV,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      NEXT_VERSION: DEFAULT_CHECKOUT_VERSION,
+    };
+  });
+
+  afterAll(() => {
+    process.env = OLD_ENV;
+  });
+
   /**
    * This versioning is currently tied to our current release process of the unified SDK
    */
@@ -33,16 +48,16 @@ describe('CheckoutWidgets', () => {
           minor: 1,
           patch: 1,
         },
-        expectedVersion: '1.1.1-alpha',
+        expectedVersion: '1.1.1',
       },
       {
         title: 'valid major, minor and patch 2',
         version: {
           major: 0,
           minor: 1,
-          patch: 9,
+          patch: 10,
         },
-        expectedVersion: '0.1.9-alpha',
+        expectedVersion: '0.1.10',
       },
       {
         title: 'valid major, minor and patch 3',
@@ -51,7 +66,7 @@ describe('CheckoutWidgets', () => {
           minor: 0,
           patch: 8,
         },
-        expectedVersion: '2.0.8-alpha',
+        expectedVersion: '2.0.8',
       },
       {
         title: 'revert to default version when major undefined',
@@ -68,7 +83,7 @@ describe('CheckoutWidgets', () => {
           major: 2,
           patch: 8,
         },
-        expectedVersion: '2.0.8-alpha',
+        expectedVersion: '2.0.8',
       },
       {
         title: 'valid major, minor and patch 4',
@@ -77,7 +92,7 @@ describe('CheckoutWidgets', () => {
           minor: 1,
           patch: 0,
         },
-        expectedVersion: '2.1.0-alpha',
+        expectedVersion: '2.1.0',
       },
       {
         title: 'append -alpha to valid versions',
@@ -85,6 +100,7 @@ describe('CheckoutWidgets', () => {
           major: 0,
           minor: 1,
           patch: 0,
+          prerelease: 'alpha',
         },
         expectedVersion: '0.1.0-alpha',
       },
@@ -94,6 +110,7 @@ describe('CheckoutWidgets', () => {
           major: 0,
           minor: 1,
           patch: 8,
+          prerelease: 'alpha',
           build: 1,
         },
         expectedVersion: '0.1.8-alpha.1',
