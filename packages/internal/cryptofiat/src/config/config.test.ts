@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@jest/globals';
 import { CryptoFiatModuleConfiguration } from 'types';
 import { CryptoFiatConfiguration } from 'config';
 import { Environment } from '@imtbl/config';
