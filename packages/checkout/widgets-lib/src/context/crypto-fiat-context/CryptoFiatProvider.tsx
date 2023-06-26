@@ -42,7 +42,7 @@ export function CryptoFiatProvider({ environment, children }: CryptoFiatProvider
       const conversions = await getCryptoToFiatConversion(
         cryptoFiat,
         fiatSymbol,
-        tokenSymbols,
+        [...new Set([...tokenSymbols, 'ETH', 'IMX'])],
       );
 
       cryptoFiatDispatch({
