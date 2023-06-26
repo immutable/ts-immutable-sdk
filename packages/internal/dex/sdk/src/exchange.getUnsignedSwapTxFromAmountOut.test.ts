@@ -1,6 +1,5 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
-import { describe, it } from '@jest/globals';
 import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { TradeType } from '@uniswap/sdk-core';

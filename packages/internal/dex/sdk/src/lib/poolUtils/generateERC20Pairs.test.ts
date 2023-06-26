@@ -1,4 +1,3 @@
-import { describe, it } from '@jest/globals';
 import { Token } from '@uniswap/sdk-core';
 import { generateERC20Pairs, ERC20Pair } from './generateERC20Pairs';
 import {
