@@ -1,9 +1,9 @@
 import { mount } from 'cypress/react18';
 import { cy } from 'local-cypress';
 import { BigNumber } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
+import { TransactionRequest, Web3Provider } from '@ethersproject/providers';
 import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
-import { Quote, TransactionDetails } from '@imtbl/dex-sdk';
+import { Quote } from '@imtbl/dex-sdk';
 import { ApproveERC20Onboarding } from './ApproveERC20Onboarding';
 import { cySmartGet } from '../../../lib/testUtils';
 import { text } from '../../../resources/text/textConfig';
@@ -61,24 +61,20 @@ describe('Approve ERC20 Onboarding', () => {
     };
 
     mockApproveERC20Swap = {
-      approval: {
-        transaction: {
-          from: 'test-approval',
-          to: 'test-approval',
-        },
-      } as TransactionDetails,
-      swap: {
-        transaction: {
-          from: 'test-swap',
-          to: 'test-swap',
-        },
-      } as TransactionDetails,
-      quote: {} as Quote,
+      approveTransaction: {
+        from: 'test-approval',
+        to: 'test-approval',
+      } as TransactionRequest,
+      transaction: {
+        from: 'test-swap',
+        to: 'test-swap',
+      } as TransactionRequest,
+      info: {} as Quote,
       swapFormInfo: {
         fromAmount: '0.5',
         fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
       } as PrefilledSwapForm,
-    } as ApproveERC20SwapData;
+    };
   });
 
   describe('Approve Spending Step', () => {
