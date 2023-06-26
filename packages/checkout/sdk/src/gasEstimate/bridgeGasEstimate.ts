@@ -11,15 +11,17 @@ import {
 } from '../types/gasEstimate';
 import * as tokens from '../tokens';
 import { ChainId, TokenFilterTypes, TokenInfo } from '../types';
+import { CheckoutConfiguration } from '../config';
 
 const GAS_LIMIT = 140000;
 
 async function getTokenInfoByAddress(
+  config: CheckoutConfiguration,
   tokenAddress: FungibleToken,
   chainId: ChainId,
 ): Promise<TokenInfo | undefined> {
   return (
-    await tokens.getTokenAllowList({
+    await tokens.getTokenAllowList(config, {
       type: TokenFilterTypes.ALL,
       chainId,
     })
@@ -43,12 +45,14 @@ const getGasEstimates = async (provider: Web3Provider): Promise<BigNumber | unde
 };
 
 export async function getBridgeEstimatedGas(
+  config: CheckoutConfiguration,
   provider: Web3Provider,
   chainId: ChainId,
   isApproveTxnRequired: boolean,
   gasTokenAddress?: FungibleToken,
 ): Promise<TokenAmountEstimate> {
   const token = await getTokenInfoByAddress(
+    config,
     gasTokenAddress || 'NATIVE',
     chainId,
   );
@@ -79,6 +83,7 @@ interface BridgeFeeEstimateResult {
 }
 
 export async function getBridgeFeeEstimate(
+  config: CheckoutConfiguration,
   tokenBridge: TokenBridge,
   tokenAddress: FungibleToken,
   destinationChainId: ChainId,
@@ -89,6 +94,7 @@ export async function getBridgeFeeEstimate(
   );
 
   const tokenInfo = await getTokenInfoByAddress(
+    config,
     tokenAddress,
     destinationChainId,
   );

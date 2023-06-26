@@ -1,3 +1,5 @@
+import { Environment } from '@imtbl/config';
+import { CheckoutConfiguration } from '../config';
 import { ChainId, TokenFilterTypes } from '../types';
 import { getTokenAllowList } from './tokens';
 
@@ -63,6 +65,14 @@ const sepEthTokenInfo = {
 };
 
 describe('token related functions', () => {
+  let config: CheckoutConfiguration;
+
+  beforeEach(() => {
+    config = new CheckoutConfiguration({
+      baseConfig: { environment: Environment.SANDBOX },
+    });
+  });
+
   describe('getTokenAllowList', () => {
     const testcases = [
       {
@@ -152,7 +162,7 @@ describe('token related functions', () => {
     testcases.forEach((testcase) => {
       it(`should return the filtered list of allowed tokens for a given ${testcase.text}`, async () => {
         await expect(
-          await getTokenAllowList({
+          await getTokenAllowList(config, {
             type: testcase.type,
             chainId: testcase.chainId,
             exclude: testcase.exclude,

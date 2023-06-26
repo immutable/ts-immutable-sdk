@@ -1,10 +1,13 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
+import { Environment } from '@imtbl/config';
 import { getBridgeEstimatedGas } from './bridgeGasEstimate';
 import { ChainId } from '../types';
+import { CheckoutConfiguration } from '../config';
 
 describe('getBridgeGasEstimate', () => {
   let provider: Web3Provider;
+  let config: CheckoutConfiguration;
 
   beforeEach(() => {
     provider = {
@@ -14,10 +17,14 @@ describe('getBridgeGasEstimate', () => {
         gasPrice: null,
       }),
     } as unknown as Web3Provider;
+
+    config = new CheckoutConfiguration({
+      baseConfig: { environment: Environment.SANDBOX },
+    });
   });
 
   it('should return gasEstimate for supported eip1159 txn', async () => {
-    const result = await getBridgeEstimatedGas(provider, ChainId.ETHEREUM, false);
+    const result = await getBridgeEstimatedGas(config, provider, ChainId.ETHEREUM, false);
 
     expect(result.estimatedAmount).toEqual(BigNumber.from(280000));
     expect(result.token).toBeDefined();
@@ -26,6 +33,7 @@ describe('getBridgeGasEstimate', () => {
 
   it('should return gas estimate for txn and approve txn', async () => {
     const result = await getBridgeEstimatedGas(
+      config,
       provider,
       ChainId.ETHEREUM,
       true,
@@ -42,7 +50,7 @@ describe('getBridgeGasEstimate', () => {
       }),
     } as unknown as Web3Provider;
 
-    const result = await getBridgeEstimatedGas(provider, ChainId.ETHEREUM, false);
+    const result = await getBridgeEstimatedGas(config, provider, ChainId.ETHEREUM, false);
 
     expect(result.estimatedAmount).toEqual(BigNumber.from(140000));
     expect(result.token).toBeDefined();

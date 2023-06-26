@@ -1,3 +1,4 @@
+import { CheckoutConfiguration } from '../config';
 import {
   GetTokenAllowListParams,
   GetTokenAllowListResult,
@@ -7,11 +8,14 @@ import {
 } from '../types';
 import masterTokenList from './token_master_list.json';
 
-const filterTokenList = ({
-  type,
-  chainId,
-  exclude,
-}: GetTokenAllowListParams): TokenMasterInfo[] => masterTokenList.filter((token) => {
+const filterTokenList = (
+  config: CheckoutConfiguration,
+  {
+    type,
+    chainId,
+    exclude,
+  }: GetTokenAllowListParams,
+): TokenMasterInfo[] => masterTokenList.filter((token) => {
   const skipChainIdCheck = !chainId;
   const chainIdMatches = token.chainId === chainId;
   const tokenNotExcluded = !exclude
@@ -27,12 +31,15 @@ const filterTokenList = ({
   );
 }) as TokenMasterInfo[];
 
-export const getTokenAllowList = async ({
-  type = TokenFilterTypes.ALL,
-  chainId,
-  exclude,
-}: GetTokenAllowListParams): Promise<GetTokenAllowListResult> => {
-  const filteredTokenList = filterTokenList({ type, chainId, exclude }).map(
+export const getTokenAllowList = async (
+  config: CheckoutConfiguration,
+  {
+    type = TokenFilterTypes.ALL,
+    chainId,
+    exclude,
+  }: GetTokenAllowListParams,
+): Promise<GetTokenAllowListResult> => {
+  const filteredTokenList = filterTokenList(config, { type, chainId, exclude }).map(
     (token: TokenMasterInfo): TokenInfo => ({
       name: token.name,
       symbol: token.symbol,

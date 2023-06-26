@@ -61,6 +61,7 @@ async function bridgeToL2GasEstimator(
 
   try {
     const { estimatedAmount, token } = await getBridgeEstimatedGas(
+      config,
       provider as Web3Provider,
       fromChainId,
       isSpendingCapApprovalRequired,
@@ -75,6 +76,7 @@ async function bridgeToL2GasEstimator(
     );
 
     const { bridgeFee, bridgeable } = await getBridgeFeeEstimate(
+      config,
       tokenBridge,
       fromAddress,
       toChainId,
