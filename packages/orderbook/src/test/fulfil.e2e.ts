@@ -32,12 +32,12 @@ describe('fulfil order', () => {
     await contract.safeMint(offerer.address);
 
     const listing = await sdk.prepareListing({
-      offerer: offerer.address,
-      considerationItem: {
+      makerAddress: offerer.address,
+      buy: {
         amount: '1000000',
         type: 'NATIVE',
       },
-      listingItem: {
+      sell: {
         contractAddress: contract.address,
         tokenId: '0',
         type: 'ERC721',
@@ -57,7 +57,6 @@ describe('fulfil order', () => {
     const {
       result: { id: orderId },
     } = await sdk.createListing({
-      offerer: offerer.address,
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
       orderSignature: signature,
