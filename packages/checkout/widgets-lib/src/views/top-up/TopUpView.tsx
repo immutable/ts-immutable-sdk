@@ -61,9 +61,9 @@ export function TopUpView({
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
 
   const onClickOnramp = () => {
-    if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
-      // dispatch onramp view
-    }
+    // if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
+    //   // dispatch onramp view
+    // }
     orchestrationEvents.sendRequestOnrampEvent(widgetEvent, {
       tokenAddress: tokenAddress ?? '',
       amount: amount ?? '',
@@ -110,13 +110,15 @@ export function TopUpView({
       setLoadingBridgeFees(false);
     }
   };
+
+  // Silently refresh the quote
   useInterval(() => refreshFees(true), DEFAULT_FEE_REFRESH_INTERVAL);
 
   useEffect(() => {
     if (!checkout) return;
     if (conversions.size === 0) return;
     refreshFees();
-  }, [checkout, conversions]);
+  }, [checkout, conversions.size === 0]);
 
   const onClickSwap = () => {
     if (widgetEvent === IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT) {

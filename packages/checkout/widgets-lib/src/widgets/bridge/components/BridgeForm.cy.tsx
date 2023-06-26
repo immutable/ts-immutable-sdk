@@ -14,6 +14,8 @@ describe('Bridge Form', () => {
   let cryptoConversions;
   beforeEach(() => {
     cy.viewport('ipad-2');
+    cy.intercept('https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia', []);
+    cy.intercept('https://zkevm-rpc.dev.x.immutable.com/', []);
 
     cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
     bridgeState = {
@@ -252,6 +254,7 @@ describe('Bridge Form', () => {
           </BridgeWidgetTestComponent>,
         );
       });
+
       it('show error state bottom drawer', () => {
         cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
           .rejects({

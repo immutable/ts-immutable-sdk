@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { NFTMetadataAttributeValue } from './nftmetadata-attribute-value';
 
 /**
  * 
@@ -27,10 +30,10 @@ export interface NFTMetadataAttribute {
      */
     'trait_type': string;
     /**
-     * The metadata trait value
-     * @type {string}
+     * 
+     * @type {NFTMetadataAttributeValue}
      * @memberof NFTMetadataAttribute
      */
-    'value': string;
+    'value': NFTMetadataAttributeValue;
 }
 

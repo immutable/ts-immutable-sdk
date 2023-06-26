@@ -1,6 +1,49 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { CheckoutWidgetsConfig } from './definitions/config';
+import { CheckoutWidgetsConfig, SemanticVersion } from './definitions/config';
 import { CheckoutWidgetTagNames } from './definitions/types';
+
+export const DEFAULT_CHECKOUT_VERSION = '0.1.9-alpha';
+
+/**
+ * Checking for valid version numbers input.
+ * 0 is a valid value for major, minor and/or patch
+ * The current release process only includes the checkout script in 'alpha' builds
+ * so we must append '-alpha' to valid versions in order to load the script properly.
+ * This may change in the future depending on the relase process.
+ */
+export function validateAndBuildVersion(version: SemanticVersion | undefined): string {
+  if (!version || version?.major === undefined || version.major < 0) return DEFAULT_CHECKOUT_VERSION;
+  if (version.major === 0 && version.minor === 0 && version.patch === 0) return DEFAULT_CHECKOUT_VERSION;
+
+  let validatedVersion: string = DEFAULT_CHECKOUT_VERSION;
+
+  if (!Number.isNaN(version.major) && version.major >= 0) {
+    validatedVersion = version.major.toString();
+  }
+
+  if (version.minor !== undefined && !Number.isNaN(version.minor) && version.minor >= 0) {
+    validatedVersion += `.${version.minor.toString()}`;
+  }
+
+  if (version.patch !== undefined && !Number.isNaN(version.patch) && version.patch >= 0) {
+    if (version.minor === undefined) {
+      validatedVersion += `.0.${version.patch.toString()}`;
+    } else {
+      validatedVersion += `.${version.patch.toString()}`;
+    }
+  }
+
+  // TODO: at the moment all of the releases that include
+  // the checkout widgets script have '-alpha' appended
+  // Change this when we go to testnet. ticket WT-1432
+  validatedVersion += '-alpha';
+
+  if (version.build !== undefined) {
+    validatedVersion += `.${version.build}`;
+  }
+
+  return validatedVersion;
+}
 
 /**
  * CheckoutWidgets allows to inject the Checkout Widgets into your application.
@@ -9,10 +52,20 @@ import { CheckoutWidgetTagNames } from './definitions/types';
 export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
   const checkoutWidgetJS = document.createElement('script');
 
-  checkoutWidgetJS.setAttribute(
-    'src',
-    'http://localhost:3000/lib/js/imtbl-checkout.js',
-  );
+  const validVersion = validateAndBuildVersion(config?.version);
+
+  if (process.env.CHECKOUT_ENVIRONMENT === 'local') {
+    checkoutWidgetJS.setAttribute(
+      'src',
+      'http://localhost:3000/lib/js/imtbl-checkout.js',
+    );
+  } else {
+    const cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
+    checkoutWidgetJS.setAttribute(
+      'src',
+      cdnUrl,
+    );
+  }
 
   document.head.appendChild(checkoutWidgetJS);
   window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
@@ -40,9 +93,6 @@ export function SetProvider(
     console.error('no provider parsed');
     return;
   }
-  const elements = document.getElementsByTagName(tagName);
-
-  const widget = elements[0] as unknown as ImmutableWebComponent;
 
   let attempts = 0;
   const maxAttempts = 10;
@@ -50,6 +100,8 @@ export function SetProvider(
 
   const attemptToSetProvider = () => {
     try {
+      const elements = document.getElementsByTagName(tagName);
+      const widget = elements[0] as unknown as ImmutableWebComponent;
       widget.setProvider(provider);
       window.clearInterval(timer);
     } catch (err) {

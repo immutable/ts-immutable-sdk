@@ -1,0 +1,6 @@
+title = "Unified SDK gitleaks config"
+
+[whitelist]
+exactMatch = [
+  '0x7EEC32793414aAb720a90073607733d9e7B0ecD0' # Ethereum address used in Passport unit tests
+]

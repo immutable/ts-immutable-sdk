@@ -1,8 +1,6 @@
 /*
  * @jest-environment jsdom
  */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import {
@@ -13,13 +11,14 @@ import {
 import {
   ChainId,
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
-  ConnectionProviders,
+  WalletProviderName,
   WalletAction,
   NetworkFilterTypes,
 } from '../types';
-import { connectWalletProvider } from '../connect';
+import { createProvider } from '../provider';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { CheckoutConfiguration } from '../config';
+import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 
 let windowSpy: any;
 const providerMock = {
@@ -49,29 +48,36 @@ jest.mock('@ethersproject/providers', () => ({
   Web3Provider: jest.fn(),
 }));
 
-jest.mock(
-  './network_master_list.json',
-  () => [
-    {
-      chainId: 1,
-    },
-    {
-      chainId: 11155111,
-    },
-    {
-      chainId: 13372,
-    },
-    {
-      chainId: 13373,
-    },
-  ],
-  { virtual: true },
-);
+jest.mock('../config/remoteConfigFetcher');
 
 describe('network functions', () => {
-  const testCheckoutConfiguration = new CheckoutConfiguration({
-    baseConfig: { environment: Environment.PRODUCTION },
+  let testCheckoutConfiguration: CheckoutConfiguration;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    (RemoteConfigFetcher as jest.Mock).mockReturnValue({
+      get: jest.fn().mockResolvedValue([
+        {
+          chainId: 1,
+        },
+        {
+          chainId: 11155111,
+        },
+        {
+          chainId: 13372,
+        },
+        {
+          chainId: 13373,
+        },
+      ]),
+    });
+
+    testCheckoutConfiguration = new CheckoutConfiguration({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
   });
+
   describe('switchWalletNetwork()', () => {
     beforeEach(() => {
       windowSpy = jest.spyOn(window, 'window', 'get');
@@ -92,15 +98,15 @@ describe('network functions', () => {
       (Web3Provider as unknown as jest.Mock).mockReturnValue({
         provider: providerMock,
         getNetwork: async () => ethNetworkInfo,
+        network: {
+          chainId: ethNetworkInfo.chainId,
+        },
       });
 
-      const provider = await connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       const switchNetworkResult = await switchWalletNetwork(
         testCheckoutConfiguration,
-        ConnectionProviders.METAMASK,
         provider,
         ChainId.ETHEREUM,
       );
@@ -117,6 +123,7 @@ describe('network functions', () => {
       expect(switchNetworkResult.network).toEqual({
         name: 'Ethereum',
         chainId: 1,
+        isSupported: true,
         nativeCurrency: {
           name: 'Ethereum',
           symbol: 'ETH',
@@ -130,21 +137,24 @@ describe('network functions', () => {
         .mockReturnValueOnce({
           provider: providerMock,
           getNetwork: async () => ethNetworkInfo,
+          network: {
+            chainId: ethNetworkInfo.chainId,
+          },
         })
         .mockReturnValueOnce({
           provider: {
             request: jest.fn(),
           },
           getNetwork: async () => zkevmNetworkInfo,
+          network: {
+            chainId: zkevmNetworkInfo.chainId,
+          },
         });
 
-      const provider = await connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       const switchNetworkResult = await switchWalletNetwork(
         testCheckoutConfiguration,
-        ConnectionProviders.METAMASK,
         provider,
         ChainId.IMTBL_ZKEVM_TESTNET,
       );
@@ -162,6 +172,7 @@ describe('network functions', () => {
       expect(switchNetworkResult.network).toEqual({
         name: 'Immutable zkEVM Testnet',
         chainId: 13372,
+        isSupported: true,
         nativeCurrency: {
           name: 'IMX',
           symbol: 'IMX',
@@ -174,19 +185,15 @@ describe('network functions', () => {
       (Web3Provider as unknown as jest.Mock).mockReturnValueOnce({
         provider: providerMock,
         getNetwork: async () => ethNetworkInfo,
+        network: {
+          chainId: ethNetworkInfo.chainId,
+        },
       });
 
-      const provider = await connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       await expect(
-        switchWalletNetwork(
-          testCheckoutConfiguration,
-          ConnectionProviders.METAMASK,
-          provider,
-          56 as ChainId,
-        ),
+        switchWalletNetwork(testCheckoutConfiguration, provider, 56 as ChainId),
       ).rejects.toThrow(
         new CheckoutError(
           'Chain:56 is not a supported chain',
@@ -199,6 +206,9 @@ describe('network functions', () => {
       (Web3Provider as unknown as jest.Mock).mockReturnValue({
         provider: providerMock,
         getNetwork: async () => ethNetworkInfo,
+        network: {
+          chainId: ethNetworkInfo.chainId,
+        },
       });
 
       windowSpy.mockImplementation(() => ({
@@ -211,14 +221,11 @@ describe('network functions', () => {
         removeEventListener: () => {},
       }));
 
-      const provider = await connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       await expect(
         switchWalletNetwork(
           testCheckoutConfiguration,
-          ConnectionProviders.METAMASK,
           provider,
           ChainId.IMTBL_ZKEVM_TESTNET,
         ),
@@ -238,9 +245,7 @@ describe('network functions', () => {
         removeEventListener: () => {},
       }));
 
-      const provider = await connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       // remove request function from provider
       delete provider.provider.request;
@@ -248,13 +253,12 @@ describe('network functions', () => {
       await expect(
         switchWalletNetwork(
           testCheckoutConfiguration,
-          ConnectionProviders.METAMASK,
           provider,
           ChainId.IMTBL_ZKEVM_TESTNET,
         ),
       ).rejects.toThrow(
         new CheckoutError(
-          'Incompatible provider',
+          'User cancelled switch network request',
           CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
         ),
       );
@@ -266,25 +270,27 @@ describe('network functions', () => {
           provider: {
             request: jest
               .fn()
-              .mockResolvedValueOnce({})
               .mockRejectedValueOnce({ code: 4902 })
               .mockResolvedValueOnce({}),
           },
           getNetwork: async () => zkevmNetworkInfo,
+          network: {
+            chainId: zkevmNetworkInfo.chainId,
+          },
         })
         .mockReturnValueOnce({
           provider: {
             request: jest.fn().mockResolvedValueOnce({}),
           },
           getNetwork: async () => zkevmNetworkInfo,
+          network: {
+            chainId: zkevmNetworkInfo.chainId,
+          },
         });
-      const provider = await connectWalletProvider({
-        providerPreference: ConnectionProviders.METAMASK,
-      });
+      const provider = await createProvider(WalletProviderName.METAMASK);
 
       await switchWalletNetwork(
         testCheckoutConfiguration,
-        ConnectionProviders.METAMASK,
         provider,
         ChainId.IMTBL_ZKEVM_TESTNET,
       );

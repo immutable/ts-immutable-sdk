@@ -10,6 +10,7 @@
     "@imtbl/config": "0.0.0",
     "@imtbl/dex-sdk": "0.0.0",
     "@metamask/detect-provider": "^2.0.0",
+    "axios": "^1.3.5",
     "ethers": "^5.7.2"
   },
   "devDependencies": {

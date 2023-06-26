@@ -1,9 +1,9 @@
 import {
-  ConnectionProviders,
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   WalletFilterTypes,
   WalletInfo,
+  WalletProviderName,
 } from '../types';
 import masterWalletList from './wallet_master_list.json';
 
@@ -16,8 +16,8 @@ export async function getWalletAllowList({
   const filteredWalletsList = masterWalletList
     .filter((wallet) => {
       const walletNotExcluded = !exclude
-        ?.map((excludeWallet) => excludeWallet.connectionProvider)
-        .includes(wallet.connectionProvider as ConnectionProviders);
+        ?.map((excludeWallet) => excludeWallet.providerName)
+        .includes(wallet.providerName as WalletProviderName);
 
       const allowAllWallets = type === WalletFilterTypes.ALL;
       const walletsAllowedForType = wallet.platform.includes(type);
