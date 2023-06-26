@@ -39,7 +39,7 @@ export function SelectForm({
       onSelectChange(option.id);
       setCoinSelectorOpen(false);
     },
-  })), [options]);
+  })), [options, onSelectChange, setCoinSelectorOpen]);
 
   return (
     <Box>

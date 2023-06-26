@@ -16,8 +16,12 @@ import { quotesProcessor } from '../functions/FetchQuote';
 
 describe('SwapForm', () => {
   let testSwapState: SwapState;
+  let cryptoConversions;
+
   beforeEach(() => {
     cy.viewport('ipad-2');
+
+    cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
 
     testSwapState = {
       ...initialSwapState,
@@ -167,6 +171,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -195,6 +200,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -216,6 +222,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -236,6 +243,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -260,6 +268,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -324,6 +333,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -366,6 +376,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -406,13 +417,14 @@ describe('SwapForm', () => {
 
       const staticText = text.views[SwapWidgetViews.SWAP];
       cySmartGet('fee_description_gas').should('have.text', '≈ IMX 0.112300');
-      cySmartGet('fee_description_gas_fiat').should('have.text', `${staticText.content.fiatPricePrefix} $0.00`);
+      cySmartGet('fee_description_gas_fiat').should('have.text', `${staticText.content.fiatPricePrefix} $0.08`);
     });
 
     it('should fetch a quote after from amount max button is clicked', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -455,6 +467,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -475,6 +488,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -495,6 +509,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -561,6 +576,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
