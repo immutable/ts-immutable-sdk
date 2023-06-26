@@ -36,8 +36,8 @@
     "test": "jest",
     "test:e2e": "jest --runInBand --testMatch \"**/?(*.)+(e2e).[jt]s?(x)\"",
     "run:demo": "jest --runInBand --testMatch \"**/?(*.)+(demo).[jt]s?(x)\"",
-    "run:demo-fulfil": "jest ./test/fulfil.demo.ts",
-    "run:demo-expiry": "jest ./test/expiry.demo.ts",
+    "run:demo-fulfil": "jest --runInBand --testMatch \"**/(fulfil.demo).[jt]s?(x)\"",
+    "run:demo-expiry": "jest  --runInBand --testMatch \"**/(expiry.demo).[jt]s?(x)\"",
     "typecheck": "tsc --noEmit --jsx preserve"
   },
   "type": "module",
