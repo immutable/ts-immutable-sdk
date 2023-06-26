@@ -12,11 +12,11 @@ export enum ConnectEventType {
 
 /**
  * Type representing a Connect Widget event with type SUCCESS.
- * @property {ConnectionProviders} providerPreference - The user's preferred connection provider.
+ * @property {WalletProviderName} walletProvider - The user's preferred connection provider.
  */
 export type ConnectionSuccess = {
   provider: Web3Provider;
-  providerName: WalletProviderName | undefined;
+  walletProvider: WalletProviderName | undefined;
 };
 
 /**

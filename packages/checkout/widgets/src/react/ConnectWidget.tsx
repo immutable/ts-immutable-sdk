@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * Interface representing the props for the Connect Widget component.
- * @property {string} providerPreference - The preferred provider for the Connect Widget
+ * @property {string} walletProvider - The preferred provider for the Connect Widget
  * (default: "metamask").
  */
 export interface ConnectReactProps {

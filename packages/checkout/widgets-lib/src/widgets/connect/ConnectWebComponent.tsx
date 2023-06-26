@@ -17,7 +17,7 @@ export class ImmutableConnect extends ImmutableWebComponent {
 
   renderWidget() {
     const connectParams: ConnectWidgetParams = {
-      providerName: this.walletProvider,
+      walletProvider: this.walletProvider,
     };
 
     if (!this.reactRoot) {

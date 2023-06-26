@@ -3,7 +3,7 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 
 /**
  * Interface representing the props for the Wallet Widget component.
- * @property {string} providerPreference - The preferred provider for the Wallet Widget
+ * @property {string} walletProvider - The preferred provider for the Wallet Widget
  * (default: "metamask").
  */
 export interface WalletReactProps {

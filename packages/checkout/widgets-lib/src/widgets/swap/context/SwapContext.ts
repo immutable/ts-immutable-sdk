@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
-  ConnectionProviders,
+  WalletProviderName,
   GetBalanceResult,
   NetworkInfo,
   TokenInfo,
@@ -13,7 +13,7 @@ export interface SwapState {
   checkout: Checkout | null;
   exchange: Exchange | null;
   provider: Web3Provider | null;
-  providerPreference: ConnectionProviders | null;
+  walletProvider: WalletProviderName | null;
   network: NetworkInfo | null;
   tokenBalances: GetBalanceResult[];
   supportedTopUps: TopUpFeature | null;
@@ -30,7 +30,7 @@ export const initialSwapState: SwapState = {
   checkout: null,
   exchange: null,
   provider: null,
-  providerPreference: null,
+  walletProvider: null,
   network: null,
   tokenBalances: [],
   supportedTopUps: null,
@@ -84,7 +84,7 @@ export interface SetProviderPayload {
 
 export interface SetProviderPreferencePayload {
   type: SwapActions.SET_PROVIDER_PREFERENCE;
-  providerPreference: ConnectionProviders;
+  walletProvider: WalletProviderName;
 }
 
 export interface SetNetworkPayload {
@@ -140,7 +140,7 @@ export const swapReducer: Reducer<SwapState, SwapAction> = (
     case SwapActions.SET_PROVIDER_PREFERENCE:
       return {
         ...state,
-        providerPreference: action.payload.providerPreference,
+        walletProvider: action.payload.walletProvider,
       };
     case SwapActions.SET_NETWORK:
       return {

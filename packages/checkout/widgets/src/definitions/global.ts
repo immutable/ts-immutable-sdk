@@ -23,7 +23,7 @@ declare global {
 
 /**
  * Props for the Connect Widget component
- * @property {string} providerPreference - The preferred wallet provider to connect to.
+ * @property {string} walletProvider - The preferred wallet provider to connect to.
  * @property {string} theme - The theme to use.
  * @property {string} environment - The environment configuration
  */
@@ -38,7 +38,7 @@ export interface ImtblConnectProps
 
 /**
  * Props for the Wallet Widget component
- * @property {string} providerPreference - The preferred wallet provider to connect to.
+ * @property {string} walletProvider - The preferred wallet provider to connect to.
  * @property {string} theme - The theme to use.
  * @property {string} environment - The environment configuration
  */
@@ -53,7 +53,7 @@ export interface ImtblWalletProps
 
 /**
  * Props for the Swap Widget component
- * @property {string} providerPreference - The preferred wallet provider to connect to.
+ * @property {string} walletProvider - The preferred wallet provider to connect to.
  * @property {string} theme - The theme to use.
  * @property {string} environment - The environment configuration
  * @property {string} amount - The amount to swap.
@@ -74,7 +74,7 @@ export interface ImtblSwapProps
 
 /**
  * Props for the Bridge Widget component
- * @property {string} providerPreference - The preferred wallet provider to connect to.
+ * @property {string} walletProvider - The preferred wallet provider to connect to.
  * @property {string} theme - The theme to use.
  * @property {string} environment - The environment configuration
  * @property {string} fromContractAddress - The contract address of the source token.

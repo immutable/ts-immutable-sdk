@@ -48,7 +48,7 @@ export interface ConnectWidgetProps {
 
 export interface ConnectWidgetParams {
   targetLayer?: ConnectTargetLayer
-  providerName?: WalletProviderName;
+  walletProvider?: WalletProviderName;
   web3Provider?: Web3Provider;
 }
 

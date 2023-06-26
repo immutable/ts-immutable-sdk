@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
-  ConnectionProviders,
+  WalletProviderName,
   NetworkInfo,
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
@@ -10,7 +10,7 @@ import { BalanceInfo } from '../functions/tokenBalances';
 export interface WalletState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
-  providerPreference: ConnectionProviders | null;
+  walletProvider: WalletProviderName | null;
   network: NetworkInfo | null;
   tokenBalances: BalanceInfo[];
   supportedTopUps: TopUpFeature | null;
@@ -25,7 +25,7 @@ export interface TopUpFeature {
 export const initialWalletState: WalletState = {
   checkout: null,
   provider: null,
-  providerPreference: null,
+  walletProvider: null,
   network: null,
   tokenBalances: [],
   supportedTopUps: null,
@@ -69,7 +69,7 @@ export interface SetProviderPayload {
 
 export interface SetProviderPreferencePayload {
   type: WalletActions.SET_PROVIDER_PREFERENCE;
-  providerPreference: ConnectionProviders;
+  walletProvider: WalletProviderName;
 }
 
 export interface SetSwitchNetworkPayload {
@@ -115,7 +115,7 @@ export const walletReducer: Reducer<WalletState, WalletAction> = (
     case WalletActions.SET_PROVIDER_PREFERENCE:
       return {
         ...state,
-        providerPreference: action.payload.providerPreference,
+        walletProvider: action.payload.walletProvider,
       };
     case WalletActions.SET_NETWORK:
       return {
