@@ -11,12 +11,13 @@ import {
   ChainId,
   GetBalanceParams,
   GetNetworkAllowListResult,
+  GasEstimateSwapResult,
+  GasEstimateType,
 } from './types';
 import { getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
 import { CheckoutConfiguration } from './config';
-import { GasEstimateSwapResult, GasEstimateType } from './types/gasEstimate';
-import { gasEstimator } from './gasEstimate/gasEstimator';
+import { gasEstimator } from './gasEstimate';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 import { connectSite } from './connect';
 import * as network from './network';
@@ -84,11 +85,7 @@ describe('Connect', () => {
 
     expect(getERC20Balance).toBeCalledTimes(0);
     expect(getBalance).toBeCalledTimes(1);
-    expect(getBalance).toBeCalledWith(
-      testCheckoutConfig,
-      provider,
-      '0x123',
-    );
+    expect(getBalance).toBeCalledWith(testCheckoutConfig, provider, '0x123');
   });
 
   it('should call getERC20Balance when a contract address is provided', async () => {
@@ -105,11 +102,7 @@ describe('Connect', () => {
 
     expect(getBalance).toBeCalledTimes(0);
     expect(getERC20Balance).toBeCalledTimes(1);
-    expect(getERC20Balance).toBeCalledWith(
-      provider,
-      '0x123',
-      '0x456',
-    );
+    expect(getERC20Balance).toBeCalledWith(provider, '0x123', '0x456');
   });
 
   it('should call the switchWalletNetwork function', async () => {
@@ -154,7 +147,9 @@ describe('Connect', () => {
   });
 
   it('should call gasEstimate function', async () => {
-    (createReadOnlyProviders as jest.Mock).mockResolvedValue({} as Map<ChainId, ethers.providers.JsonRpcProvider>);
+    (createReadOnlyProviders as jest.Mock).mockResolvedValue(
+      {} as Map<ChainId, ethers.providers.JsonRpcProvider>,
+    );
     (gasEstimator as jest.Mock).mockResolvedValue({} as GasEstimateSwapResult);
 
     const checkout = new Checkout({
