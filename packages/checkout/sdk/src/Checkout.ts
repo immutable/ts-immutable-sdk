@@ -42,14 +42,20 @@ import {
 } from './types';
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
+import { CheckoutApiService } from './service/checkoutApiService';
 
 export class Checkout {
   readonly config: CheckoutConfiguration;
+
+  readonly checkoutApiService: CheckoutApiService;
 
   private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
 
   constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
+    this.checkoutApiService = new CheckoutApiService({
+      environment: this.config.environment,
+    });
     this.readOnlyProviders = new Map<
     ChainId,
     ethers.providers.JsonRpcProvider
@@ -184,6 +190,7 @@ export class Checkout {
 
     return balances.getAllBalances(
       this.config,
+      this.checkoutApiService,
       web3Provider,
       params.walletAddress,
       params.chainId,

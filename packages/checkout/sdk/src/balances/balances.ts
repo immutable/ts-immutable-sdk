@@ -2,16 +2,17 @@ import { Web3Provider } from '@ethersproject/providers';
 import { Contract, utils } from 'ethers';
 import {
   ChainId,
+  ENVIRONMENT_L1_CHAIN_MAP,
   ERC20ABI,
   GetAllBalancesResult,
   GetBalanceResult,
-  TokenFilterTypes,
   TokenInfo,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { getNetworkInfo } from '../network';
-import { getTokenAllowList } from '../tokens';
 import { CheckoutConfiguration } from '../config';
+import { CheckoutApiService } from '../service/checkoutApiService';
+import { getAllL2Tokens } from '../tokens';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
@@ -74,21 +75,42 @@ export async function getERC20Balance(
   );
 }
 
+async function getAllL1Tokens(
+  checkoutApiService: CheckoutApiService,
+  config: CheckoutConfiguration,
+  walletAddress: string,
+): Promise<TokenInfo[]> {
+  const tokenList = await checkoutApiService
+    .getL1RpcNode()
+    .getTokenBalances({ walletAddress });
+  return tokenList.tokenBalances.map(
+    (token) => ({
+      address: token.contractAddress,
+    } as TokenInfo),
+  );
+}
+
 export const getAllBalances = async (
   config: CheckoutConfiguration,
+  checkoutApiService: CheckoutApiService,
   web3Provider: Web3Provider,
   walletAddress: string,
   chainId: ChainId,
 ): Promise<GetAllBalancesResult> => {
-  const tokenList = await getTokenAllowList(config, {
-    type: TokenFilterTypes.ALL,
-    chainId,
-  });
+  const tokenList = chainId === ENVIRONMENT_L1_CHAIN_MAP[config.environment]
+    ? await getAllL1Tokens(
+      // if L1, fetch tokens from checkout api
+      checkoutApiService,
+      config,
+      walletAddress,
+    )
+    : await getAllL2Tokens(config);
+
   const allBalancePromises: Promise<GetBalanceResult>[] = [];
   allBalancePromises.push(getBalance(config, web3Provider, walletAddress));
 
-  tokenList.tokens
-    .filter((token) => token.address)
+  tokenList
+    .filter((token: TokenInfo) => token.address)
     .forEach((token: TokenInfo) => allBalancePromises.push(
       getERC20Balance(web3Provider, walletAddress, token.address ?? ''),
     ));

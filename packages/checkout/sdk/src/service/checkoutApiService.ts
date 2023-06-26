@@ -5,7 +5,7 @@ export type CheckoutServiceApiParams = {
   environment: Environment;
 };
 
-export class CheckoutServiceApi {
+export class CheckoutApiService {
   private readonly environment: Environment;
 
   constructor({ environment }: CheckoutServiceApiParams) {

@@ -25,10 +25,19 @@ export type DexConfig = {
   overrides?: ExchangeOverrides;
 };
 
+export type IndexerConfig = {
+  urls: {
+    chainId: number;
+    rootUrl: string;
+    tokensPath: string;
+  }[];
+};
+
 export type RemoteConfiguration = {
   dex: DexConfig;
   allowedNetworks: AllowedNetworkConfig[];
   gasEstimateTokens?: GasEstimateTokenConfig;
+  indexer?: IndexerConfig;
 };
 
 export type RemoteConfigParams = {
