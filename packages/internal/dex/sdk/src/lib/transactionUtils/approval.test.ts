@@ -212,9 +212,11 @@ describe('getApprovalTransaction', () => {
       )).rejects.toThrow(new ApproveError('owner and spender addresses are the same'));
     });
   });
+});
 
-  describe("when the owner's address is the same as the spender's address", () => {
-    it('should throw an ApproveError', async () => {
+describe('getApproveGasEstimate', () => {
+  describe('when given valid arguments', () => {
+    it('should include the fromAddress when estimating gas for approval', async () => {
       const approveGasEstimate = BigNumber.from('100000');
       const approveMock = jest.fn().mockResolvedValue(approveGasEstimate);
 
