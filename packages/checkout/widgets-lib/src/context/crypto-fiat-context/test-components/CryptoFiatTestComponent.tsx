@@ -2,7 +2,7 @@ import { useContext, useEffect } from 'react';
 import { CryptoFiatActions, CryptoFiatContext } from '../CryptoFiatContext';
 
 interface CryptoFiatTestComponentProps {
-  tokenSymbols: any,
+  tokenSymbols: string[],
 }
 
 export function CryptoFiatTestComponent({ tokenSymbols }: CryptoFiatTestComponentProps) {
