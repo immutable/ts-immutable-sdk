@@ -8,6 +8,7 @@ import {
   InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError,
 } from 'errors';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
+import { ethers } from 'ethers';
 import { Exchange } from './exchange';
 import {
   decodeMulticallData,

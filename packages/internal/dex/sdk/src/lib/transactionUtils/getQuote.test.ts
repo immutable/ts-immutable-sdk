@@ -1,9 +1,10 @@
 import { describe, it } from '@jest/globals';
 import { ethers } from 'ethers';
-import { Percent, TradeType } from '@uniswap/sdk-core';
+import { TradeType } from '@uniswap/sdk-core';
 import { getAmountWithSlippageImpact } from './getQuote';
 
-const DEFAULT_SLIPPAGE = new Percent(1, 1000);
+const DEFAULT_SLIPPAGE = 0.1;
+
 describe('getAmountWithSlippageImpact', () => {
   describe('when trade type is EXACT_INPUT', () => {
     it('should return a minimum expected amount out', () => {
@@ -23,7 +24,7 @@ describe('getAmountWithSlippageImpact', () => {
     describe('AND slippage percent is 0', () => {
       it('should return the same amount', () => {
         const amountInWei = ethers.utils.parseEther('100');
-        const ZERO_PERCENT = new Percent(0, 0);
+        const ZERO_PERCENT = 0;
 
         const result = getAmountWithSlippageImpact(
           TradeType.EXACT_INPUT,
@@ -56,7 +57,7 @@ describe('getAmountWithSlippageImpact', () => {
     describe('AND slippage percent is 0', () => {
       it('should return the same amount', () => {
         const amountOutWei = ethers.utils.parseEther('100');
-        const ZERO_PERCENT = new Percent(0, 0);
+        const ZERO_PERCENT = 0;
 
         const result = getAmountWithSlippageImpact(
           TradeType.EXACT_OUTPUT,
