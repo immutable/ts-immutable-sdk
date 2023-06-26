@@ -1,4 +1,4 @@
-import { User, UserWithEtherKey } from '../types';
+import { User, UserImx, UserZkEvm } from '../types';
 
 export const mockErrorMessage = 'Server is down';
 export const mockStarkSignature = 'starkSignature';
@@ -14,9 +14,22 @@ export const mockUser: User = {
     email: 'test@immutable.com',
     nickname: 'test',
   },
+  expired: false,
 };
 
-export const mockUserWithEtherKey: UserWithEtherKey = {
+export const mockUserImx: UserImx = {
   ...mockUser,
-  etherKey: '123',
+  imx: {
+    ethAddress: 'imxEthAddress123',
+    starkAddress: 'imxStarkAddress123',
+    userAdminAddress: 'imxUserAdminAddress123',
+  },
+};
+
+export const mockUserZkEvm: UserZkEvm = {
+  ...mockUser,
+  zkEvm: {
+    ethAddress: 'zkevmEthAddress123',
+    userAdminAddress: 'zkevmUserAdminAddress123',
+  },
 };
