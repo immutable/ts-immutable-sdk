@@ -16,7 +16,12 @@ import {
   getBridgeFeeEstimate,
 } from './bridgeGasEstimate';
 import * as instance from '../instance';
-import gasEstimateTokens from './gas_estimate_tokens.json';
+import { CheckoutConfiguration } from '../config';
+import {
+  GasEstimateBridgeToL2TokenConfig,
+  GasEstimateSwapTokenConfig,
+  GasEstimateTokenConfig,
+} from '../config/remoteConfigType';
 
 const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000000';
 const DEFAULT_TOKEN_DECIMALS = 18;
@@ -37,18 +42,20 @@ const getL2ChainId = (environment: Environment): ChainId => {
 
 async function bridgeToL2GasEstimator(
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
-  environment: Environment,
+  config: CheckoutConfiguration,
   isSpendingCapApprovalRequired: boolean,
   tokenAddress?: FungibleToken,
 ): Promise<GasEstimateBridgeToL2Result> {
-  const fromChainId = getL1ChainId(environment);
-  const toChainId = getL2ChainId(environment);
+  const fromChainId = getL1ChainId(config.environment);
+  const toChainId = getL2ChainId(config.environment);
 
-  const tokenAddresses = environment === Environment.PRODUCTION
-    ? gasEstimateTokens[ChainId.SEPOLIA]
-    : gasEstimateTokens[ChainId.SEPOLIA];
+  const gasEstimateTokensConfig = (await config.remoteConfigFetcher.get(
+    'gasEstimateTokens',
+  )) as GasEstimateTokenConfig;
 
-  const { gasTokenAddress, fromAddress } = tokenAddresses.bridgeToL2Addresses;
+  const { gasTokenAddress, fromAddress } = gasEstimateTokensConfig[
+    fromChainId.toString()
+  ].bridgeToL2Addresses as GasEstimateBridgeToL2TokenConfig;
 
   const provider = readOnlyProviders.get(fromChainId);
 
@@ -64,7 +71,7 @@ async function bridgeToL2GasEstimator(
       fromChainId,
       toChainId,
       readOnlyProviders,
-      environment,
+      config.environment,
     );
 
     const { bridgeFee, bridgeable } = await getBridgeFeeEstimate(
@@ -97,21 +104,19 @@ async function bridgeToL2GasEstimator(
 }
 
 async function swapGasEstimator(
-  environment: Environment,
+  config: CheckoutConfiguration,
 ): Promise<GasEstimateSwapResult> {
-  const tokenAddresses = environment === Environment.PRODUCTION
-    ? gasEstimateTokens[ChainId.SEPOLIA]
-    : gasEstimateTokens[ChainId.SEPOLIA];
+  const chainId = getL2ChainId(config.environment);
 
-  const { inAddress, outAddress } = tokenAddresses.swapAddresses;
+  const gasEstimateTokensConfig = (await config.remoteConfigFetcher.get(
+    'gasEstimateTokens',
+  )) as GasEstimateTokenConfig;
 
-  const chainId = getL2ChainId(environment);
+  const { inAddress, outAddress } = gasEstimateTokensConfig[chainId]
+    .swapAddresses as GasEstimateSwapTokenConfig;
 
   try {
-    const exchange = await instance.createExchangeInstance(
-      chainId,
-      environment,
-    );
+    const exchange = await instance.createExchangeInstance(chainId, config);
 
     // Create a fake transaction to get the gas from the quote
     const { info } = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -158,18 +163,18 @@ async function swapGasEstimator(
 export async function gasEstimator(
   params: GasEstimateParams,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
-  environment: Environment,
+  config: CheckoutConfiguration,
 ): Promise<GasEstimateSwapResult | GasEstimateBridgeToL2Result> {
   switch (params.gasEstimateType) {
     case GasEstimateType.BRIDGE_TO_L2:
       return await bridgeToL2GasEstimator(
         readOnlyProviders,
-        environment,
+        config,
         params.isSpendingCapApprovalRequired,
         params.tokenAddress,
       );
     case GasEstimateType.SWAP:
-      return await swapGasEstimator(environment);
+      return await swapGasEstimator(config);
     default:
       throw new CheckoutError(
         'Invalid type provided for gasEstimateType',
