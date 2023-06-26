@@ -2,7 +2,7 @@
 
 import { Web3Provider } from '@ethersproject/providers';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
+import { Checkout } from '@imtbl/checkout-sdk';
 import { useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
@@ -40,7 +40,7 @@ import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
 
 export interface ConnectWidgetProps {
-  params: ConnectWidgetParams;
+  params?: ConnectWidgetParams;
   config: StrongCheckoutWidgetsConfig
   deepLink?: ConnectWidgetViews;
   sendCloseEventOverride?: () => void;
@@ -48,13 +48,12 @@ export interface ConnectWidgetProps {
 
 export interface ConnectWidgetParams {
   targetLayer?: ConnectTargetLayer
-  walletProvider?: WalletProviderName;
   web3Provider?: Web3Provider;
 }
 
 export function ConnectWidget(props: ConnectWidgetProps) {
   const { config, sendCloseEventOverride, params } = props;
-  const { targetLayer, web3Provider } = params;
+  const { targetLayer, web3Provider } = params ?? {}; // nullish operator handles if params is undefined
   const { deepLink = ConnectWidgetViews.CONNECT_WALLET } = props;
   const { environment, theme } = config;
   const errorText = text.views[SharedViews.ERROR_VIEW].actionText;
