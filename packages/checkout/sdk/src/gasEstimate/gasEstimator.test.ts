@@ -96,7 +96,7 @@ describe('gasServiceEstimator', () => {
           swap: {
             transaction: {} as any,
             gasFeeEstimate: {
-              value: undefined as any, // undefined is not allowed by the types so hack hack hack
+              value: undefined as any, // undefined is not allowed by the types need to use `as any` to override
               token: {
                 address: '0x1',
                 symbol: 'TEST',
