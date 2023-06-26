@@ -1,6 +1,6 @@
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { ethRequestAccounts, ethSendTransaction } from './rpcMethods';
+import { ethRequestAccounts, ethSendTransaction, ethGasPrice } from './rpcMethods';
 import { JsonRpcRequestCallback, JsonRpcRequestPayload, RequestArguments } from './types';
 import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
@@ -8,7 +8,7 @@ import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
 import { UserWithEtherKey } from '../types';
 import { RelayerAdapter } from './relayerAdapter';
-import { EthMethodWithAuthParams } from './rpcMethods/types';
+import { EthMethod, EthMethodWithAuth } from './rpcMethods/types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 
 export type ZkEvmProviderInput = {
@@ -17,6 +17,14 @@ export type ZkEvmProviderInput = {
   config: PassportConfiguration,
   confirmationScreen: ConfirmationScreen,
   multiRollupApiClients: MultiRollupApiClients,
+};
+
+const METHODS_REQUIRING_AUTH: { [key: string]: EthMethodWithAuth } = {
+  eth_sendTransaction: ethSendTransaction,
+};
+
+const METHODS_WITHOUT_AUTH: { [key: string]: EthMethod } = {
+  eth_gasPrice: ethGasPrice,
 };
 
 export class ZkEvmProvider {
@@ -57,46 +65,48 @@ export class ZkEvmProvider {
   public async request(
     request: RequestArguments,
   ): Promise<any> {
-    const authWrapper = (fn: (params: EthMethodWithAuthParams) => Promise<any>) => {
-      if (this.magicProvider === undefined || this.user === undefined) {
-        throw new JsonRpcError(RpcErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
-      }
-
-      return fn({
-        params: request.params,
-        magicProvider: this.magicProvider,
-        jsonRpcProvider: this.jsonRpcProvider,
-        config: this.config,
-        confirmationScreen: this.confirmationScreen,
-        relayerAdapter: this.relayerAdapter,
-        user: this.user,
-      });
-    };
-
     try {
-      switch (request.method) {
-        case 'eth_requestAccounts': {
-          const { result, magicProvider, user } = await ethRequestAccounts({
-            authManager: this.authManager,
-            config: this.config,
-            magicAdapter: this.magicAdapter,
-            multiRollupApiClients: this.multiRollupApiClients,
-          });
+      if (request.method === 'eth_requestAccounts') {
+        const { result, magicProvider, user } = await ethRequestAccounts({
+          authManager: this.authManager,
+          config: this.config,
+          magicAdapter: this.magicAdapter,
+          multiRollupApiClients: this.multiRollupApiClients,
+        });
 
-          this.user = user;
-          this.magicProvider = magicProvider;
+        this.user = user;
+        this.magicProvider = magicProvider;
 
-          return result;
-        }
-        case 'eth_sendTransaction': {
-          return authWrapper(ethSendTransaction);
-        }
-        default: {
+        return result;
+      }
+      if (METHODS_REQUIRING_AUTH[request.method]) {
+        if (this.magicProvider === undefined || this.user === undefined) {
           return Promise.reject(
-            new JsonRpcError(RpcErrorCode.METHOD_NOT_FOUND, 'Method not supported'),
+            new JsonRpcError(RpcErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first'),
           );
         }
+
+        return METHODS_REQUIRING_AUTH[request.method]({
+          params: request.params,
+          magicProvider: this.magicProvider,
+          jsonRpcProvider: this.jsonRpcProvider,
+          config: this.config,
+          confirmationScreen: this.confirmationScreen,
+          relayerAdapter: this.relayerAdapter,
+          user: this.user,
+        });
       }
+      if (METHODS_WITHOUT_AUTH[request.method]) {
+        return METHODS_WITHOUT_AUTH[request.method]({
+          params: request.params,
+          jsonRpcProvider: this.jsonRpcProvider,
+          config: this.config,
+        });
+      }
+
+      return Promise.reject(
+        new JsonRpcError(RpcErrorCode.METHOD_NOT_FOUND, 'Method not supported'),
+      );
     } catch (error: unknown) {
       if (error instanceof JsonRpcError) {
         throw error;
@@ -104,7 +114,6 @@ export class ZkEvmProvider {
       if (error instanceof Error) {
         throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, error.message);
       }
-
       throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Internal error');
     }
   }

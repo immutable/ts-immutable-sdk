@@ -4,12 +4,18 @@ import { ConfirmationScreen } from '../../confirmation';
 import { RelayerAdapter } from '../relayerAdapter';
 import { UserWithEtherKey } from '../../types';
 
-export type EthMethodWithAuthParams = {
-  magicProvider: ExternalProvider;
+export type EthMethodParams = {
   jsonRpcProvider: JsonRpcProvider;
   config: PassportConfiguration;
+  params: any[];
+};
+
+export type EthMethodWithAuthParams = EthMethodParams & {
+  magicProvider: ExternalProvider;
   confirmationScreen: ConfirmationScreen;
   relayerAdapter: RelayerAdapter;
   user: UserWithEtherKey;
-  params: any[];
 };
+
+export type EthMethod = (params: EthMethodParams) => Promise<any>;
+export type EthMethodWithAuth = (params: EthMethodWithAuthParams) => Promise<any>;
