@@ -1,5 +1,5 @@
 import { mount } from 'cypress/react18';
-import { describe } from 'local-cypress';
+import { describe, cy } from 'local-cypress';
 import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
 import { CryptoFiatProvider } from './CryptoFiatProvider';
