@@ -5,14 +5,6 @@ export type AllowedNetworkConfig = {
   chainId: number;
 };
 
-export type AllowedWalletConfig = {
-  providerName: string;
-  name?: string;
-  description?: string;
-  icon?: string;
-  platform?: string[];
-};
-
 export type GasEstimateBridgeToL2TokenConfig = {
   gasTokenAddress: string | 'NATIVE';
   fromAddress: string;
@@ -37,7 +29,6 @@ export type RemoteConfiguration = {
   dex: DexConfig;
   allowedNetworks: AllowedNetworkConfig[];
   gasEstimateTokens?: GasEstimateTokenConfig;
-  allowedWallets?: AllowedWalletConfig[];
 };
 
 export type RemoteConfigParams = {
