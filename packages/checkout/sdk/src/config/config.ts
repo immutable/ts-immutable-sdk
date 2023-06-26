@@ -1,7 +1,11 @@
 import { Environment } from '@imtbl/config';
 import {
-  CheckoutModuleConfiguration, NetworkMap, PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP,
+  CheckoutModuleConfiguration,
+  NetworkMap,
+  PRODUCTION_CHAIN_ID_NETWORK_MAP,
+  SANDBOX_CHAIN_ID_NETWORK_MAP,
 } from '../types';
+import { RemoteConfigFetcher } from './remoteConfigFetcher';
 
 export class CheckoutConfigurationError extends Error {
   public message: string;
@@ -17,14 +21,21 @@ export class CheckoutConfiguration {
 
   readonly networkMap: NetworkMap;
 
+  readonly remoteConfigFetcher: RemoteConfigFetcher;
+
   constructor(config: CheckoutModuleConfiguration) {
     // validate input
     if (!Object.values(Environment).includes(config.baseConfig.environment)) {
-      throw new CheckoutConfigurationError('Invalid checkout configuration of environment');
+      throw new CheckoutConfigurationError(
+        'Invalid checkout configuration of environment',
+      );
     }
     this.environment = config.baseConfig.environment;
     this.networkMap = config.baseConfig.environment === Environment.PRODUCTION
       ? PRODUCTION_CHAIN_ID_NETWORK_MAP
       : SANDBOX_CHAIN_ID_NETWORK_MAP;
+    this.remoteConfigFetcher = new RemoteConfigFetcher({
+      environment: config.baseConfig.environment,
+    });
   }
 }

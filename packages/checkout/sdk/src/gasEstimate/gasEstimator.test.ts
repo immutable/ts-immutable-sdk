@@ -9,25 +9,54 @@ import {
   GasEstimateSwapParams,
   GasEstimateSwapResult,
   GasEstimateType,
-} from '../types/gasEstimate';
-import { ChainId } from '../types';
+  ChainId,
+} from '../types';
 import { createBridgeInstance, createExchangeInstance } from '../instance';
+import { CheckoutConfiguration } from '../config';
+import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 
 jest.mock('../instance');
 
+jest.mock('../config/remoteConfigFetcher');
+
 describe('gasServiceEstimator', () => {
   let readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
+  let config: CheckoutConfiguration;
 
   beforeEach(() => {
     readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>([
-      [ChainId.SEPOLIA, {
-        getFeeData: jest.fn().mockResolvedValue({
-          maxFeePerGas: '0x1',
-          maxPriorityFeePerGas: '0x1',
-          gasPrice: null,
-        }),
-      } as unknown as ethers.providers.JsonRpcProvider],
+      [
+        ChainId.SEPOLIA,
+        {
+          getFeeData: jest.fn().mockResolvedValue({
+            maxFeePerGas: '0x1',
+            maxPriorityFeePerGas: '0x1',
+            gasPrice: null,
+          }),
+        } as unknown as ethers.providers.JsonRpcProvider,
+      ],
     ]);
+
+    (RemoteConfigFetcher as jest.Mock).mockReturnValue({
+      get: jest.fn().mockResolvedValue({
+        [ChainId.IMTBL_ZKEVM_DEVNET]: {
+          swapAddresses: {
+            inAddress: '0x1',
+            outAddress: '0x2',
+          },
+        },
+        [ChainId.SEPOLIA]: {
+          bridgeToL2Addresses: {
+            gasTokenAddress: 'NATIVE',
+            fromAddress: '0x4',
+          },
+        },
+      }),
+    });
+
+    config = new CheckoutConfiguration({
+      baseConfig: { environment: Environment.SANDBOX },
+    });
   });
 
   describe('swap', () => {
@@ -48,11 +77,11 @@ describe('gasServiceEstimator', () => {
         }),
       } as unknown as Exchange);
 
-      const result = await gasEstimator(
+      const result = (await gasEstimator(
         { gasEstimateType: GasEstimateType.SWAP },
         readOnlyProviders,
-        Environment.SANDBOX,
-      ) as GasEstimateSwapResult;
+        config,
+      )) as GasEstimateSwapResult;
 
       expect(result.gasEstimateType).toEqual(GasEstimateType.SWAP);
       expect(result.gasFee.estimatedAmount).toEqual(BigNumber.from(1));
@@ -71,11 +100,11 @@ describe('gasServiceEstimator', () => {
         }),
       } as unknown as Exchange);
 
-      const result = await gasEstimator(
+      const result = (await gasEstimator(
         { gasEstimateType: GasEstimateType.SWAP },
         readOnlyProviders,
-        Environment.SANDBOX,
-      ) as GasEstimateSwapResult;
+        config,
+      )) as GasEstimateSwapResult;
 
       expect(result).toEqual({
         gasEstimateType: GasEstimateType.SWAP,
@@ -100,11 +129,11 @@ describe('gasServiceEstimator', () => {
         }),
       } as unknown as Exchange);
 
-      const result = await gasEstimator(
+      const result = (await gasEstimator(
         { gasEstimateType: GasEstimateType.SWAP },
         readOnlyProviders,
-        Environment.SANDBOX,
-      ) as GasEstimateSwapResult;
+        config,
+      )) as GasEstimateSwapResult;
 
       expect(result).toEqual({
         gasEstimateType: GasEstimateType.SWAP,
@@ -125,11 +154,11 @@ describe('gasServiceEstimator', () => {
         getUnsignedSwapTxFromAmountIn: jest.fn().mockRejectedValue({}),
       } as unknown as Exchange);
 
-      const result = await gasEstimator(
+      const result = (await gasEstimator(
         { gasEstimateType: GasEstimateType.SWAP },
         readOnlyProviders,
-        Environment.SANDBOX,
-      ) as GasEstimateSwapResult;
+        config,
+      )) as GasEstimateSwapResult;
 
       expect(result).toEqual({
         gasEstimateType: GasEstimateType.SWAP,
@@ -146,14 +175,14 @@ describe('gasServiceEstimator', () => {
         }),
       } as unknown as TokenBridge);
 
-      const result = await gasEstimator(
+      const result = (await gasEstimator(
         {
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
           isSpendingCapApprovalRequired: false,
         },
         readOnlyProviders,
-        Environment.SANDBOX,
-      ) as GasEstimateBridgeToL2Result;
+        config,
+      )) as GasEstimateBridgeToL2Result;
 
       expect(result.gasEstimateType).toEqual(GasEstimateType.BRIDGE_TO_L2);
       expect(result.gasFee.estimatedAmount).toEqual(BigNumber.from(280000));
@@ -168,14 +197,14 @@ describe('gasServiceEstimator', () => {
         }),
       } as unknown as TokenBridge);
 
-      const result = await gasEstimator(
+      const result = (await gasEstimator(
         {
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
           isSpendingCapApprovalRequired: true,
         },
         readOnlyProviders,
-        Environment.SANDBOX,
-      ) as GasEstimateBridgeToL2Result;
+        config,
+      )) as GasEstimateBridgeToL2Result;
 
       expect(result.gasEstimateType).toEqual(GasEstimateType.BRIDGE_TO_L2);
       expect(result.gasFee.estimatedAmount).toEqual(BigNumber.from(560000));
@@ -190,24 +219,30 @@ describe('gasServiceEstimator', () => {
         }),
       } as unknown as TokenBridge);
 
-      const readOnlyProvidersUndefinedFees = new Map<ChainId, ethers.providers.JsonRpcProvider>([
-        [ChainId.SEPOLIA, {
-          getFeeData: jest.fn().mockResolvedValue({
-            // Missing maxFeePerGas and maxPriorityFeePerGas indicates the chain does not support EIP-1559
-            maxFeePerGas: null,
-            maxPriorityFeePerGas: null,
-            gasPrice: '0x1',
-          }),
-        } as unknown as ethers.providers.JsonRpcProvider],
+      const readOnlyProvidersUndefinedFees = new Map<
+      ChainId,
+      ethers.providers.JsonRpcProvider
+      >([
+        [
+          ChainId.SEPOLIA,
+          {
+            getFeeData: jest.fn().mockResolvedValue({
+              // Missing maxFeePerGas and maxPriorityFeePerGas indicates the chain does not support EIP-1559
+              maxFeePerGas: null,
+              maxPriorityFeePerGas: null,
+              gasPrice: '0x1',
+            }),
+          } as unknown as ethers.providers.JsonRpcProvider,
+        ],
       ]);
-      const result = await gasEstimator(
+      const result = (await gasEstimator(
         {
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
           isSpendingCapApprovalRequired: false,
         },
         readOnlyProvidersUndefinedFees,
-        Environment.SANDBOX,
-      ) as GasEstimateBridgeToL2Result;
+        config,
+      )) as GasEstimateBridgeToL2Result;
 
       expect(result.gasFee.estimatedAmount).toEqual(BigNumber.from(140000));
     });
@@ -219,23 +254,29 @@ describe('gasServiceEstimator', () => {
         }),
       } as unknown as TokenBridge);
 
-      const readOnlyProvidersUndefinedFees = new Map<ChainId, ethers.providers.JsonRpcProvider>([
-        [ChainId.SEPOLIA, {
-          getFeeData: jest.fn().mockResolvedValue({
-            maxFeePerGas: null,
-            maxPriorityFeePerGas: null,
-            gasPrice: null,
-          }),
-        } as unknown as ethers.providers.JsonRpcProvider],
+      const readOnlyProvidersUndefinedFees = new Map<
+      ChainId,
+      ethers.providers.JsonRpcProvider
+      >([
+        [
+          ChainId.SEPOLIA,
+          {
+            getFeeData: jest.fn().mockResolvedValue({
+              maxFeePerGas: null,
+              maxPriorityFeePerGas: null,
+              gasPrice: null,
+            }),
+          } as unknown as ethers.providers.JsonRpcProvider,
+        ],
       ]);
-      const result = await gasEstimator(
+      const result = (await gasEstimator(
         {
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
           isSpendingCapApprovalRequired: false,
         },
         readOnlyProvidersUndefinedFees,
-        Environment.SANDBOX,
-      ) as GasEstimateBridgeToL2Result;
+        config,
+      )) as GasEstimateBridgeToL2Result;
 
       expect(result.gasFee.estimatedAmount).toBeUndefined();
     });
@@ -243,14 +284,14 @@ describe('gasServiceEstimator', () => {
     it('should handle error when calling bridge', async () => {
       (createBridgeInstance as jest.Mock).mockRejectedValue({});
 
-      const result = await gasEstimator(
+      const result = (await gasEstimator(
         {
           gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
           isSpendingCapApprovalRequired: false,
         },
         readOnlyProviders,
-        Environment.SANDBOX,
-      ) as GasEstimateBridgeToL2Result;
+        config,
+      )) as GasEstimateBridgeToL2Result;
 
       expect(result).toEqual({
         gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
@@ -264,9 +305,11 @@ describe('gasServiceEstimator', () => {
   it('should throw error for invalid gasEstimateType', async () => {
     await expect(
       gasEstimator(
-        { gasEstimateType: 'INVALID' as GasEstimateType } as GasEstimateSwapParams,
+        {
+          gasEstimateType: 'INVALID' as GasEstimateType,
+        } as GasEstimateSwapParams,
         readOnlyProviders,
-        Environment.SANDBOX,
+        config,
       ),
     ).rejects.toThrow(
       new CheckoutError(
