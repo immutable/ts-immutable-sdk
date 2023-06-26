@@ -55,7 +55,7 @@ describe('', () => {
       zoneContractAddress: config.zoneContractAddress,
       overrides: {
         apiEndpoint: config.apiUrl,
-        chainName: 'imtbl-zkevm-testnet',
+        chainName: 'imtbl-zkevm-devnet-5',
       },
     });
 
@@ -63,12 +63,12 @@ describe('', () => {
 
     // Prepare the listing details
     const soonToExpireListing = await sdk.prepareListing({
-      offerer: offerer.address,
-      considerationItem: {
+      makerAddress: offerer.address,
+      buy: {
         amount: '1000000',
         type: 'NATIVE',
       },
-      listingItem: {
+      sell: {
         contractAddress: nftContract.address,
         tokenId: '0',
         type: 'ERC721',
@@ -88,7 +88,6 @@ describe('', () => {
     log('Submitting order to orderbook API...');
     // Submit the order creation request to the order book API
     const { result: { id: orderId } } = await sdk.createListing({
-      offerer: offerer.address,
       orderComponents: soonToExpireListing.orderComponents,
       orderHash: soonToExpireListing.orderHash,
       orderSignature: signature,
