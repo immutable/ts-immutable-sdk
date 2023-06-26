@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
+import { SetProvider } from './internal/SetProvider';
+import { CheckoutWidgetTagNames } from '../definitions/types';
 
 /**
  * Interface representing the props for the Wallet Widget component.
@@ -8,6 +11,7 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
  */
 export interface WalletReactProps {
   walletProvider?: WalletProviderName;
+  provider?: Web3Provider;
 }
 
 /**
@@ -18,7 +22,14 @@ export interface WalletReactProps {
 export function WalletReact(props: WalletReactProps) {
   const {
     walletProvider,
+    provider,
   } = props;
+
+  useEffect(() => {
+    if (provider) {
+      SetProvider(CheckoutWidgetTagNames.WALLET, provider);
+    }
+  }, [provider]);
 
   const config = window.ImtblCheckoutWidgetConfig;
 

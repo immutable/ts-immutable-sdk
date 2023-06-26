@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
+import { SetProvider } from './internal/SetProvider';
+import { CheckoutWidgetTagNames } from '../definitions/types';
 
 /**
  * Interface representing the props for the Bridge Widget component.
@@ -10,6 +13,7 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
  */
 export interface BridgeReactProps {
   walletProvider?: WalletProviderName;
+  provider?: Web3Provider;
   fromContractAddress?: string;
   amount?: string;
 }
@@ -24,7 +28,14 @@ export function BridgeReact(props: BridgeReactProps): JSX.Element {
     walletProvider,
     fromContractAddress,
     amount,
+    provider,
   } = props;
+
+  useEffect(() => {
+    if (provider) {
+      SetProvider(CheckoutWidgetTagNames.BRIDGE, provider);
+    }
+  }, [provider]);
 
   const config = window.ImtblCheckoutWidgetConfig;
 
