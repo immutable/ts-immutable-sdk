@@ -78,24 +78,24 @@ export class Orderbook {
    * the order components that can be submitted to `createListing` with a signature.
    */
   async prepareListing({
-    offerer,
-    listingItem,
-    considerationItem,
+    makerAddress,
+    sell,
+    buy,
     orderExpiry,
   }: PrepareListingParams): Promise<PrepareListingResponse> {
     const erc721 = new ERC721Factory(
-      listingItem.contractAddress,
+      sell.contractAddress,
       this.config.provider,
     ).create();
     const royaltyInfo = await erc721.royaltyInfo(
-      listingItem.tokenId,
-      considerationItem.amount,
+      sell.tokenId,
+      buy.amount,
     );
 
     return this.seaport.prepareSeaportOrder(
-      offerer,
-      listingItem,
-      considerationItem,
+      makerAddress,
+      sell,
+      buy,
       royaltyInfo,
       // Default order start to now
       new Date(),
@@ -125,7 +125,7 @@ export class Orderbook {
    */
   async fulfillOrder(
     listingId: string,
-    fulfillerAddress: string,
+    takerAddress: string,
   ): Promise<FulfillOrderResponse> {
     const orderResult = await this.apiClient.getListing(listingId);
 
@@ -135,7 +135,7 @@ export class Orderbook {
       );
     }
 
-    return this.seaport.fulfilOrder(orderResult.result, fulfillerAddress);
+    return this.seaport.fulfilOrder(orderResult.result, takerAddress);
   }
 
   /**
