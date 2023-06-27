@@ -5,6 +5,7 @@ import {
   CHECKOUT_API_BASE_URL,
   ChainId,
   ENVIRONMENT_L1_CHAIN_MAP,
+  TokenInfo,
 } from '../types';
 
 export type CheckoutApiServiceL1RpcNodeParams = {
@@ -12,7 +13,7 @@ export type CheckoutApiServiceL1RpcNodeParams = {
 };
 
 export type GetTokenMetadataParams = {
-  token: string;
+  tokens: string[];
 };
 
 export type GetTokenMetadataResponse = {
@@ -40,6 +41,8 @@ export class CheckoutApiServiceL1RpcNode {
   private readonly environment: Environment;
 
   private readonly chain: ChainId;
+
+  private tokensCache: TokenInfo[] | undefined;
 
   constructor({ environment }: CheckoutApiServiceL1RpcNodeParams) {
     this.environment = environment;
@@ -83,9 +86,7 @@ export class CheckoutApiServiceL1RpcNode {
     return response.data.result;
   }
 
-  async getTokenMetadata({
-    token,
-  }: GetTokenMetadataParams): Promise<GetTokenMetadataResponse> {
+  private async getTokenMetadata(tokenAddress: string): Promise<TokenInfo> {
     let response;
     try {
       response = await axios.post(
@@ -95,27 +96,72 @@ export class CheckoutApiServiceL1RpcNode {
           id: 1,
           jsonrpc: '2.0',
           method: 'alchemy_getTokenMetadata',
-          params: [token],
+          params: [tokenAddress],
         },
       );
     } catch (error: any) {
       throw new Error(
-        `Error fetching getTokenMetadata for ${token}: ${error.message}`,
+        `Error fetching getTokenMetadata for ${tokenAddress}: ${error.message}`,
       );
     }
 
     if (response.status !== 200 || response.data === undefined) {
       throw new Error(
-        `Error fetching getTokenMetadata for ${token}: ${response.status} ${response.statusText}`,
+        `Error fetching getTokenMetadata for ${tokenAddress}: ${response.status} ${response.statusText}`,
       );
     }
 
     if (response.data.result === undefined) {
       throw new Error(
-        `Missing response data in getTokenMetadata response for ${token}: ${response.status} ${response.statusText}`,
+        `Missing response data in getTokenMetadata response for
+         ${tokenAddress}: ${response.status} ${response.statusText}`,
       );
     }
 
-    return response.data.result;
+    const token: GetTokenMetadataResponse = response.data.result;
+    return {
+      address: tokenAddress,
+      decimals: token.decimals,
+      name: token.name,
+      symbol: token.symbol,
+      icon: token.logo,
+    };
+  }
+
+  async getTokensMetadata({
+    tokens,
+  }: GetTokenMetadataParams): Promise<TokenInfo[]> {
+    const tokenMetadataPromises: Promise<TokenInfo>[] = [];
+    const tokenInfo: TokenInfo[] = [];
+
+    if (this.tokensCache) {
+      tokens.forEach((tokenAddress) => {
+        const token = this.tokensCache?.find(
+          (cachedToken) => cachedToken.address === tokenAddress,
+        );
+        if (token) {
+          tokenInfo.push(token);
+        } else {
+          tokenMetadataPromises.push(this.getTokenMetadata(tokenAddress));
+        }
+      });
+    } else {
+      tokens.forEach((tokenAddress) => {
+        tokenMetadataPromises.push(this.getTokenMetadata(tokenAddress));
+      });
+    }
+
+    const tokenMetadata = await Promise.allSettled(tokenMetadataPromises);
+
+    (
+      tokenMetadata.filter(
+        (token) => token.status === 'fulfilled',
+      ) as PromiseFulfilledResult<TokenInfo>[]
+    ).forEach((token) => {
+      this.tokensCache?.push(token.value);
+      tokenInfo.push(token.value);
+    });
+
+    return tokenInfo;
   }
 }
