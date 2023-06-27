@@ -149,7 +149,7 @@ describe('SwapWidget tests', () => {
   });
 
   const params = {
-    providerName: 'metamask',
+    walletProvider: 'metamask',
   } as SwapWidgetParams;
   const config: StrongCheckoutWidgetsConfig = {
     environment: Environment.SANDBOX,

@@ -1,4 +1,4 @@
-import { Checkout, ConnectionProviders, TokenInfo } from '@imtbl/checkout-sdk';
+import { Checkout, WalletProviderName, TokenInfo } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BiomeCombinedProviders } from '@biom3/react';
@@ -37,7 +37,7 @@ describe('WalletBalances', () => {
       isSupported: true,
     },
     provider,
-    providerPreference: ConnectionProviders.METAMASK,
+    walletProvider: WalletProviderName.METAMASK,
     tokenBalances: [],
     supportedTopUps: null,
   };
@@ -111,7 +111,7 @@ describe('WalletBalances', () => {
         isSupported: true,
       },
       provider,
-      providerPreference: ConnectionProviders.METAMASK,
+      walletProvider: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: {
         isOnRampEnabled: true,
