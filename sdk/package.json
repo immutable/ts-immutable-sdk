@@ -85,14 +85,6 @@
       "types": "./dist/provider.d.ts",
       "import": "./dist/provider.js"
     },
-    "./checkout_sdk": {
-      "types": "./dist/checkout_sdk.d.ts",
-      "import": "./dist/checkout_sdk.js"
-    },
-    "./checkout_widgets": {
-      "types": "./dist/checkout_widgets.d.ts",
-      "import": "./dist/checkout_widgets.js"
-    },
     "./erc20": {
       "types": "./dist/erc20.d.ts",
       "import": "./dist/erc20.js"
