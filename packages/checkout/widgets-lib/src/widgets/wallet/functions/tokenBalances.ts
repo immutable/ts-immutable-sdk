@@ -53,6 +53,6 @@ export const getTokenBalances = async (
 
     return tokenBalances;
   } catch (err: any) {
-    return []; // todo: what are the error scenarios?
+    return [];
   }
 };

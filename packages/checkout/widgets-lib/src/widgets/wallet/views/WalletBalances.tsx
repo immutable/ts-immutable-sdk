@@ -78,25 +78,21 @@ export function WalletBalances() {
   useEffect(() => {
     if (!checkout || !provider || !network) return;
     (async () => {
-      try {
-        const balances = await getTokenBalances(
-          checkout,
-          provider,
-          network.name,
-          network.chainId,
-          conversions,
-        );
+      const balances = await getTokenBalances(
+        checkout,
+        provider,
+        network.name,
+        network.chainId,
+        conversions,
+      );
 
-        walletDispatch({
-          payload: {
-            type: WalletActions.SET_TOKEN_BALANCES,
-            tokenBalances: balances,
-          },
-        });
-      // eslint-disable-next-line no-empty
-      } catch {} finally {
-        setBalancesLoading(false);
-      }
+      walletDispatch({
+        payload: {
+          type: WalletActions.SET_TOKEN_BALANCES,
+          tokenBalances: balances,
+        },
+      });
+      setBalancesLoading(false);
     })();
   }, [
     checkout,
