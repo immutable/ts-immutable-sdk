@@ -26,6 +26,33 @@ export const mswHandlers = {
             }),
           );
         }
+        case 'eth_getBalance': {
+          return res(
+            ctx.json({
+              id: body.id,
+              jsonrpc: '2.0',
+              result: '0x0',
+            }),
+          );
+        }
+        case 'eth_getStorageAt': {
+          return res(
+            ctx.json({
+              id: body.id,
+              jsonrpc: '2.0',
+              result: '0x',
+            }),
+          );
+        }
+        case 'eth_gasPrice': {
+          return res(
+            ctx.json({
+              id: body.id,
+              jsonrpc: '2.0',
+              result: '0x0',
+            }),
+          );
+        }
         default: {
           return res(ctx.status(500));
         }
