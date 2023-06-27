@@ -9,19 +9,19 @@ describe('getWalletAllowList', () => {
       exclude: [],
       result: [
         {
-          providerName: 'metamask',
+          walletProvider: 'metamask',
           icon: 'some-icon-url',
           name: 'MetaMask',
           description: 'complete web3 wallet solution',
         },
         {
-          providerName: 'passport',
+          walletProvider: 'passport',
           icon: 'pp-icon',
           name: 'Passport',
           description: 'Web3 with your email!',
         },
         {
-          providerName: 'gamestop',
+          walletProvider: 'gamestop',
           icon: 'gme-icon',
           name: 'GameStop',
           description: 'Never stopping the game!',
@@ -31,16 +31,16 @@ describe('getWalletAllowList', () => {
     {
       text: 'exclusion of MetaMask wallet applied',
       type: WalletFilterTypes.ALL,
-      exclude: [{ providerName: WalletProviderName.METAMASK }],
+      exclude: [{ walletProvider: WalletProviderName.METAMASK }],
       result: [
         {
-          providerName: 'passport',
+          walletProvider: 'passport',
           icon: 'pp-icon',
           name: 'Passport',
           description: 'Web3 with your email!',
         },
         {
-          providerName: 'gamestop',
+          walletProvider: 'gamestop',
           icon: 'gme-icon',
           name: 'GameStop',
           description: 'Never stopping the game!',
@@ -53,13 +53,13 @@ describe('getWalletAllowList', () => {
       exclude: [],
       result: [
         {
-          providerName: 'passport',
+          walletProvider: 'passport',
           icon: 'pp-icon',
           name: 'Passport',
           description: 'Web3 with your email!',
         },
         {
-          providerName: 'gamestop',
+          walletProvider: 'gamestop',
           icon: 'gme-icon',
           name: 'GameStop',
           description: 'Never stopping the game!',
@@ -72,13 +72,13 @@ describe('getWalletAllowList', () => {
       exclude: [],
       result: [
         {
-          providerName: 'metamask',
+          walletProvider: 'metamask',
           icon: 'some-icon-url',
           name: 'MetaMask',
           description: 'complete web3 wallet solution',
         },
         {
-          providerName: 'passport',
+          walletProvider: 'passport',
           icon: 'pp-icon',
           name: 'Passport',
           description: 'Web3 with your email!',

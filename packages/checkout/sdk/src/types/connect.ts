@@ -1,13 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { NetworkInfo } from './networkInfo';
 
-/**
- * Enum representing the list of default supported providers.
- */
-export enum ConnectionProviders {
-  METAMASK = 'metamask',
-}
-
 export interface ConnectParams {
   provider: Web3Provider
 }
