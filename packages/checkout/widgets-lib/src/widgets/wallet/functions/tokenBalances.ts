@@ -12,10 +12,14 @@ export interface BalanceInfo {
   iconLogo?: string;
 }
 
+const formatTokenId = (chainId: ChainId, symbol: string, address?: string) => {
+  if (!address) return `${chainId.toString()}-${symbol.toLowerCase()}`;
+  return `${chainId.toString()}-${symbol.toLowerCase()}-${address.toLowerCase()}`;
+};
+
 export const getTokenBalances = async (
   checkout: Checkout,
   provider: Web3Provider,
-  networkName: string,
   chainId: ChainId,
   conversions: Map<string, number>,
 ): Promise<BalanceInfo[]> => {
@@ -38,7 +42,7 @@ export const getTokenBalances = async (
     const tokenBalances: BalanceInfo[] = [];
     sortedTokens.forEach((balance) => {
       tokenBalances.push({
-        id: `${networkName}-${balance.token.symbol}`,
+        id: formatTokenId(chainId, balance.token.symbol, balance.token.address),
         balance: balance.formattedBalance,
         fiatAmount: calculateCryptoToFiat(
           balance.formattedBalance,

@@ -81,7 +81,6 @@ export function WalletBalances() {
       const balances = await getTokenBalances(
         checkout,
         provider,
-        network.name,
         network.chainId,
         conversions,
       );
