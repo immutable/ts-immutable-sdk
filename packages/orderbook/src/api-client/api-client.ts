@@ -34,7 +34,6 @@ export class ImmutableApiClient {
   async createListing({
     orderHash,
     orderComponents,
-    offerer,
     orderSignature,
   }: CreateListingParams): Promise<ListingResult> {
     if (orderComponents.offer.length !== 1) {
@@ -57,7 +56,7 @@ export class ImmutableApiClient {
       chainName: this.chainName,
       requestBody: {
         order_hash: orderHash,
-        account_address: offerer,
+        account_address: orderComponents.offerer,
         buy: [
           {
             item_type:
