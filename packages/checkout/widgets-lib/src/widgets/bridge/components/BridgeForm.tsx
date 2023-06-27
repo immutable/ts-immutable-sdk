@@ -90,9 +90,8 @@ export function BridgeForm(props: BridgeFormProps) {
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
-    // calculate bridge options, disallow ETH
     const options = tokenBalances
-      .filter((b) => b.balance.gt(0) && b.token.address !== undefined && b.token.address !== '')
+      .filter((b) => b.balance.gt(0))
       .map(
         (t) => ({
           id: formatTokenOptionsId(t.token.symbol, t.token.address),
@@ -130,8 +129,8 @@ export function BridgeForm(props: BridgeFormProps) {
   ]);
 
   const selectedOption = useMemo(
-    () => (token && token.token.address ? formatTokenOptionsId(token.token.symbol, token.token.address) : undefined),
-    [tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId],
+    () => (token && token ? formatTokenOptionsId(token.token.symbol, token.token.address) : undefined),
+    [token, tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId],
   );
 
   const getTokenAddress = (selectedToken?: TokenInfo) => ((selectedToken?.address === ''
@@ -143,7 +142,6 @@ export function BridgeForm(props: BridgeFormProps) {
     if (Number.isNaN(parseFloat(amount))) return false;
     if (parseFloat(amount) <= 0) return false;
     if (!token) return false;
-    if (!token.token.address) return false; // NOTE this disables fetching for ETH or if no token address
     if (isFetching) return false;
     return true;
   };
@@ -226,7 +224,13 @@ export function BridgeForm(props: BridgeFormProps) {
 
     const tokenIsEth = !token?.token.address || token.token.address === 'NATIVE';
     const gasAmount = parseEther(gasFee.length !== 0 ? gasFee : '0');
-    const additionalAmount = tokenIsEth ? parseEther(amount) : BigNumber.from('0');
+    const additionalAmount = tokenIsEth && !Number.isNaN(parseFloat(amount))
+      ? parseEther(amount)
+      : BigNumber.from('0');
+
+    // console.log('tokenIsEth', tokenIsEth);
+    // console.log('gasAmount', gasAmount.toString());
+    // console.log('additionalAmount', additionalAmount.toString());
 
     return gasAmount.add(additionalAmount).gt(ethBalance.balance);
   }, [gasFee, tokenBalances, token, amount]);

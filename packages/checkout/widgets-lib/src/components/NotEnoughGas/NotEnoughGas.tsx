@@ -47,7 +47,7 @@ export function NotEnoughGas({
       showHeaderBar={showHeaderBar}
     >
       <BottomSheet.Content>
-        <Box sx={containerStyles}>
+        <Box testId="not-enough-gas-bottom-sheet" sx={containerStyles}>
           <FramedImage
             imageUrl="https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--eth.svg"
             circularFrame
@@ -69,11 +69,21 @@ export function NotEnoughGas({
           </Body>
           <Box sx={actionButtonContainerStyles}>
             {showAdjustAmount && (
-            <Button sx={actionButtonStyles} variant="tertiary" onClick={onCloseBottomSheet}>
+            <Button
+              testId="not-enough-gas-adjust-amount-button"
+              sx={actionButtonStyles}
+              variant="tertiary"
+              onClick={onCloseBottomSheet}
+            >
               {buttons.adjustAmount}
             </Button>
             )}
-            <Button sx={actionButtonStyles} variant="tertiary" onClick={handleCopy}>
+            <Button
+              testId="not-enough-gas-copy-address-button"
+              sx={actionButtonStyles}
+              variant="tertiary"
+              onClick={handleCopy}
+            >
               {buttons.copyAddress}
               <Button.Icon icon={isCopied ? 'Tick' : 'CopyText'} />
             </Button>

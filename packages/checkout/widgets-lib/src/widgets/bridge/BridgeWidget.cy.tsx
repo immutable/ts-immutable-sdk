@@ -76,7 +76,7 @@ describe('Bridge Widget tests', () => {
         balances: [
           {
             balance: BigNumber.from('1000000000000000000'),
-            formattedBalance: '0.1',
+            formattedBalance: '1',
             token: {
               name: 'ETH',
               symbol: 'ETH',

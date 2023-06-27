@@ -1,13 +1,16 @@
 import { mount } from 'cypress/react18';
 import { cy, describe } from 'local-cypress';
 import { BigNumber, utils } from 'ethers';
-import { Checkout, CheckoutErrorType, GasEstimateType } from '@imtbl/checkout-sdk';
+import {
+  ChainId, Checkout, CheckoutErrorType, GasEstimateType,
+} from '@imtbl/checkout-sdk';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
 import { BridgeWidgetTestComponent } from '../test-components/BridgeWidgetTestComponent';
 import { cySmartGet } from '../../../lib/testUtils';
 import { BridgeForm } from './BridgeForm';
+import { text } from '../../../resources/text/textConfig';
 
 describe('Bridge Form', () => {
   let bridgeState;
@@ -32,14 +35,18 @@ describe('Bridge Form', () => {
           maxPriorityFeePerGas: BigNumber.from(100),
           gasPrice: BigNumber.from(100),
         }),
+        getNetwork: async () => ({
+          chainId: ChainId.SEPOLIA,
+          name: 'Sepolia',
+        }),
       } as unknown as Web3Provider,
       walletProvider: null,
       network: null,
       exchange: null,
       tokenBalances: [
         {
-          balance: BigNumber.from('100000000000000000'),
-          formattedBalance: '0.1',
+          balance: BigNumber.from('1000000000000000000'),
+          formattedBalance: '1',
           token: {
             name: 'Ethereum',
             symbol: 'ETH',
@@ -140,7 +147,7 @@ describe('Bridge Form', () => {
           bridgeFee: {
             estimatedAmount: utils.parseEther('0.0001'),
           },
-          gasEstimate: {
+          gasFee: {
             estimatedAmount: utils.parseEther('0.0001'),
           },
           bridgeable: true,
@@ -306,6 +313,171 @@ describe('Bridge Form', () => {
 
         cySmartGet('transaction-rejected-heading').should('be.visible');
         cySmartGet('transaction-rejected-cancel-button').should('be.visible');
+      });
+    });
+
+    describe('it should show not enough eth screen when not enough to cover gas', () => {
+      it('should show NotEnoughEth when user has no ETH balance', () => {
+        const { heading } = text.drawers.notEnoughGas.content;
+        const bridgeStateWithoutETH = {
+          ...bridgeState,
+          tokenBalances: [
+            {
+              balance: BigNumber.from('0'),
+              formattedBalance: '0',
+              token: {
+                name: 'ETH',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+            {
+              balance: BigNumber.from('100000000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              },
+            }],
+        };
+
+        cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+          .resolves({
+            required: false,
+          });
+
+        cy.stub(TokenBridge.prototype, 'getUnsignedDepositTx').as('getUnsignedDepositTxStub')
+          .resolves({
+            required: true,
+            unsignedTx: {},
+          });
+
+        cy.stub(Checkout.prototype, 'gasEstimate').as('gasEstimateStub')
+          .resolves({
+            gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+            bridgeFee: {
+              estimatedAmount: utils.parseEther('0.0001'),
+            },
+            gasFee: {
+              estimatedAmount: utils.parseEther('0.0001'),
+            },
+            bridgeable: true,
+          });
+
+        cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+          .resolves({
+            transactionResponse: {
+              wait: () => ({
+                status: 1,
+              }),
+            },
+          });
+
+        mount(
+          <BridgeWidgetTestComponent
+            initialStateOverride={bridgeStateWithoutETH}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <BridgeForm
+              testId="bridge-form"
+              defaultAmount="0.1"
+              defaultTokenAddress="0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF"
+            />
+          </BridgeWidgetTestComponent>,
+        );
+
+        cySmartGet('bridge-form-button').click();
+        cySmartGet('@sendTransactionStub').should('not.have.been.called');
+        cySmartGet('not-enough-gas-bottom-sheet').should('exist').should('be.visible');
+        cySmartGet('not-enough-gas-heading').should('be.visible').should('have.text', heading);
+        cySmartGet('not-enough-gas-adjust-amount-button').should('not.exist');
+        cySmartGet('not-enough-gas-copy-address-button').should('exist');
+        cySmartGet('not-enough-gas-cancel-button').should('exist');
+      });
+
+      it('should show NotEnoughEth when user is bridging too much ETH', () => {
+        const { heading } = text.drawers.notEnoughGas.content;
+        const bridgeStateWithoutETH = {
+          ...bridgeState,
+          tokenBalances: [
+            {
+              balance: BigNumber.from('100000000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'ETH',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+            {
+              balance: BigNumber.from('100000000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              },
+            }],
+        };
+
+        cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+          .resolves({
+            required: false,
+          });
+
+        cy.stub(TokenBridge.prototype, 'getUnsignedDepositTx').as('getUnsignedDepositTxStub')
+          .resolves({
+            required: true,
+            unsignedTx: {},
+          });
+
+        cy.stub(Checkout.prototype, 'gasEstimate').as('gasEstimateStub')
+          .resolves({
+            gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+            bridgeFee: {
+              estimatedAmount: utils.parseEther('0.0001'),
+            },
+            gasFee: {
+              estimatedAmount: utils.parseEther('0.0001'),
+            },
+            bridgeable: true,
+          });
+
+        cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+          .resolves({
+            transactionResponse: {
+              wait: () => ({
+                status: 1,
+              }),
+            },
+          });
+
+        mount(
+          <BridgeWidgetTestComponent
+            initialStateOverride={bridgeStateWithoutETH}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <BridgeForm
+              testId="bridge-form"
+              defaultAmount="0.1"
+              defaultTokenAddress=""
+            />
+          </BridgeWidgetTestComponent>,
+        );
+
+        cySmartGet('bridge-token-select__target').click();
+        cySmartGet('bridge-token-coin-selector__option-eth').click();
+
+        cySmartGet('bridge-form-button').click();
+        cySmartGet('@sendTransactionStub').should('not.have.been.called');
+        cySmartGet('not-enough-gas-bottom-sheet').should('exist').should('be.visible');
+        cySmartGet('not-enough-gas-heading').should('be.visible').should('have.text', heading);
+        cySmartGet('not-enough-gas-adjust-amount-button').should('exist');
+        cySmartGet('not-enough-gas-copy-address-button').should('exist');
+        cySmartGet('not-enough-gas-cancel-button').should('exist');
       });
     });
   });
