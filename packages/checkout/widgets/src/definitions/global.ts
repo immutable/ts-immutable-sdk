@@ -23,7 +23,6 @@ declare global {
 
 /**
  * Props for the Connect Widget component
- * @property {string} providerPreference - The preferred wallet provider to connect to.
  * @property {string} theme - The theme to use.
  * @property {string} environment - The environment configuration
  */
@@ -32,13 +31,12 @@ export interface ImtblConnectProps
   React.HTMLAttributes<HTMLElement>,
   HTMLElement
   > {
-  walletProvider?: string;
   widgetConfig?: string;
 }
 
 /**
  * Props for the Wallet Widget component
- * @property {string} providerPreference - The preferred wallet provider to connect to.
+ * @property {string} walletProvider - The preferred wallet provider to connect to.
  * @property {string} theme - The theme to use.
  * @property {string} environment - The environment configuration
  */
@@ -53,7 +51,7 @@ export interface ImtblWalletProps
 
 /**
  * Props for the Swap Widget component
- * @property {string} providerPreference - The preferred wallet provider to connect to.
+ * @property {string} walletProvider - The preferred wallet provider to connect to.
  * @property {string} theme - The theme to use.
  * @property {string} environment - The environment configuration
  * @property {string} amount - The amount to swap.
@@ -74,11 +72,10 @@ export interface ImtblSwapProps
 
 /**
  * Props for the Bridge Widget component
- * @property {string} providerPreference - The preferred wallet provider to connect to.
+ * @property {string} walletProvider - The preferred wallet provider to connect to.
  * @property {string} theme - The theme to use.
  * @property {string} environment - The environment configuration
  * @property {string} fromContractAddress - The contract address of the source token.
- * @property {string} fromNetwork - The network of the source token.
  * @property {string} amount - The amount to bridge.
  */
 export interface ImtblBridgeProps
@@ -89,6 +86,5 @@ export interface ImtblBridgeProps
   walletProvider?: string;
   widgetConfig?: string;
   fromContractAddress: string;
-  fromNetwork: string;
   amount: string;
 }

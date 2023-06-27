@@ -1,7 +1,7 @@
 import { ETHAmount, OrdersApi, UnsignedOrderRequest } from '@imtbl/core-sdk';
 import GuardianClient from '../guardian';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
-import { mockErrorMessage, mockStarkSignature, mockUserWithEtherKey } from '../../test/mocks';
+import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { cancelOrder, createOrder } from './order';
 
 jest.mock('../guardian');
@@ -58,7 +58,7 @@ describe('order', () => {
           },
           fees: undefined,
           expiration_timestamp,
-          user: mockUserWithEtherKey.etherKey,
+          user: mockUserImx.imx.ethAddress,
         },
       };
 
@@ -93,7 +93,7 @@ describe('order', () => {
       const mockHeader = {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          Authorization: `Bearer ${mockUserWithEtherKey.accessToken}`,
+          Authorization: `Bearer ${mockUserImx.accessToken}`,
         },
       };
       const mockReturnValue = {
@@ -111,7 +111,7 @@ describe('order', () => {
       const result = await createOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         request: orderRequest as UnsignedOrderRequest,
         guardianClient: mockGuardianClient,
       });
@@ -135,7 +135,7 @@ describe('order', () => {
       await expect(() => createOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         request: orderRequest as UnsignedOrderRequest,
         guardianClient: mockGuardianClient,
       })).rejects.toThrow(
@@ -171,7 +171,7 @@ describe('order', () => {
       await expect(() => createOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         request: orderRequest as UnsignedOrderRequest,
         guardianClient: mockGuardianClient,
       })).rejects.toThrowError(new PassportError(
@@ -226,7 +226,7 @@ describe('order', () => {
       const mockHeader = {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          Authorization: `Bearer ${mockUserWithEtherKey.accessToken}`,
+          Authorization: `Bearer ${mockUserImx.accessToken}`,
         },
       };
 
@@ -246,7 +246,7 @@ describe('order', () => {
       const result = await cancelOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         request: cancelOrderRequest,
         guardianClient: mockGuardianClient,
       });
@@ -280,7 +280,7 @@ describe('order', () => {
       await expect(() => cancelOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         request: cancelOrderRequest,
         guardianClient: mockGuardianClient,
       })).rejects.toThrowError(new PassportError(
@@ -295,7 +295,7 @@ describe('order', () => {
       await expect(() => cancelOrder({
         ordersApi: ordersApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         request: cancelOrderRequest,
         guardianClient: mockGuardianClient,
       })).rejects.toThrow(

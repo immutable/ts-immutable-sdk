@@ -1,7 +1,7 @@
 import {
   CheckConnectionResult,
   Checkout,
-  ConnectionProviders,
+  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { useEffect, useMemo, useState } from 'react';
 import LoadingButton from './LoadingButton';
