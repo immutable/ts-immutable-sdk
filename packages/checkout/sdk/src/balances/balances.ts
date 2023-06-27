@@ -3,6 +3,7 @@ import { BigNumber, Contract, utils } from 'ethers';
 import {
   ChainId,
   ENVIRONMENT_L1_CHAIN_MAP,
+  ENVIRONMENT_L2_CHAIN_MAP,
   ERC20ABI,
   GetAllBalancesResult,
   GetBalanceResult,
@@ -92,7 +93,7 @@ async function getL1Balances(
 
   tokenBalances.forEach((tokenBalance: TokenBalancesResult) => {
     const cachedToken = cachedTokens.find(
-      (token: TokenInfo) => token.address === tokenBalance.contractAddress,
+      (token: TokenInfo) => (token.address ?? '') === tokenBalance.contractAddress,
     );
     if (cachedToken) {
       balanceResult.push({
@@ -133,33 +134,23 @@ async function getL1Balances(
   return balanceResult;
 }
 
-export const getAllBalances = async (
+async function getL2Balances(
   config: CheckoutConfiguration,
-  checkoutApiService: CheckoutApiService,
   web3Provider: Web3Provider,
   walletAddress: string,
   chainId: ChainId,
-): Promise<GetAllBalancesResult> => {
-  if (chainId === ENVIRONMENT_L1_CHAIN_MAP[config.environment]) {
-    const balances = await getL1Balances(
-      // if L1, fetch tokens from checkout api
-      checkoutApiService,
-      config,
-      walletAddress,
-      chainId,
-    );
-    return { balances };
-  }
+): Promise<GetBalanceResult[]> {
+  const balanceResult: GetBalanceResult[] = [];
+  const allBalancePromises: Promise<GetBalanceResult>[] = [];
+  const cachedTokens = await config.remoteConfigFetcher.getTokens(chainId);
 
-  return { balances: [] };
-  // const allBalancePromises: Promise<GetBalanceResult>[] = [];
-  // allBalancePromises.push(getBalance(config, web3Provider, walletAddress));
-  //
-  // tokenList
-  //   .filter((token: TokenInfo) => token.address)
-  //   .forEach((token: TokenInfo) => allBalancePromises.push(
-  //     getERC20Balance(web3Provider, walletAddress, token.address ?? ''),
-  //   ));
+  allBalancePromises.push(getBalance(config, web3Provider, walletAddress));
+
+  cachedTokens
+    .filter((token: TokenInfo) => token.address)
+    .forEach((token: TokenInfo) => allBalancePromises.push(
+      getERC20Balance(web3Provider, walletAddress, token.address!),
+    ));
   //
   // const balanceResults = await Promise.allSettled(allBalancePromises);
   // const getBalanceResults = (
@@ -169,6 +160,39 @@ export const getAllBalances = async (
   // ).map(
   //   (fulfilledResult: PromiseFulfilledResult<GetBalanceResult>) => fulfilledResult.value,
   // ) as GetBalanceResult[];
-  //
-  // return { balances: getBalanceResults };
+
+  return balanceResult;
+}
+
+export const getAllBalances = async (
+  config: CheckoutConfiguration,
+  checkoutApiService: CheckoutApiService,
+  web3Provider: Web3Provider,
+  walletAddress: string,
+  chainId: ChainId,
+): Promise<GetAllBalancesResult> => {
+  if (chainId === ENVIRONMENT_L1_CHAIN_MAP[config.environment]) {
+    const balances = await getL1Balances(
+      checkoutApiService,
+      config,
+      walletAddress,
+      chainId,
+    );
+    return { balances };
+  }
+
+  if (chainId === ENVIRONMENT_L2_CHAIN_MAP[config.environment]) {
+    const balances = await getL2Balances(
+      config,
+      web3Provider,
+      walletAddress,
+      chainId,
+    );
+    return { balances };
+  }
+
+  throw new CheckoutError(
+    `Chain:${chainId} is not a supported chain`,
+    CheckoutErrorType.CHAIN_NOT_SUPPORTED_ERROR,
+  );
 };

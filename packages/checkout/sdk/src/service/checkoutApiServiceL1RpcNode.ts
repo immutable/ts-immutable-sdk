@@ -2,8 +2,8 @@ import { Environment } from '@imtbl/config';
 import axios from 'axios';
 import {
   ALCHEMY_PATH,
-  CHECKOUT_API_BASE_URL,
   ChainId,
+  CHECKOUT_API_BASE_URL,
   ENVIRONMENT_L1_CHAIN_MAP,
   TokenInfo,
 } from '../types';
@@ -49,7 +49,7 @@ export class CheckoutApiServiceL1RpcNode {
     this.chain = ENVIRONMENT_L1_CHAIN_MAP[this.environment];
   }
 
-  async getTokenBalances({
+  private async getERC20TokenBalances({
     walletAddress,
   }: GetTokenBalances): Promise<GetTokenBalancesResponse> {
     let response;
@@ -66,24 +66,76 @@ export class CheckoutApiServiceL1RpcNode {
       );
     } catch (error: any) {
       throw new Error(
-        `Error fetching getTokenBalances for ${walletAddress}: ${error.message}`,
+        `Error fetching getERC20TokenBalances for ${walletAddress}: ${error.message}`,
       );
     }
 
     if (response.status !== 200 || response.data === undefined) {
       throw new Error(
-        `Error fetching getTokenBalances for ${walletAddress}: ${response.status} ${response.statusText}`,
+        `Error fetching getERC20TokenBalances for ${walletAddress}: ${response.status} ${response.statusText}`,
       );
     }
 
     if (response.data.result === undefined) {
       throw new Error(
-        'Missing response data in getTokenBalances response for '
+        'Missing response data in getERC20TokenBalances response for '
           + `${walletAddress}: ${response.status} ${response.statusText}`,
       );
     }
 
     return response.data.result;
+  }
+
+  private async getNativeTokenBalance({
+    walletAddress,
+  }: GetTokenBalances): Promise<string> {
+    let response;
+    try {
+      response = await axios.post(
+        // @ts-ignore -- this is needed because we do not have a way to get L1 only chains
+        `${CHECKOUT_API_BASE_URL[this.environment]}${ALCHEMY_PATH[this.chain]}`,
+        {
+          id: 1,
+          jsonrpc: '2.0',
+          method: 'eth_getBalance',
+          params: [walletAddress, 'latest'],
+        },
+      );
+    } catch (error: any) {
+      throw new Error(
+        `Error fetching native token balance for ${walletAddress}: ${error.message}`,
+      );
+    }
+
+    if (response.status !== 200 || response.data === undefined) {
+      throw new Error(
+        `Error fetching native token balance for ${walletAddress}: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    if (response.data.result === undefined) {
+      throw new Error(
+        'Missing response data in getNativeTokenBalance response for '
+          + `${walletAddress}: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return response.data.result;
+  }
+
+  async getTokenBalances({
+    walletAddress,
+  }: GetTokenBalances): Promise<GetTokenBalancesResponse> {
+    const erc20Balances = await this.getERC20TokenBalances({ walletAddress });
+    const nativeTokenBalance = await this.getNativeTokenBalance({
+      walletAddress,
+    });
+    erc20Balances.tokenBalances.push({
+      contractAddress: '',
+      tokenBalance: nativeTokenBalance,
+    });
+
+    return erc20Balances;
   }
 
   private async getTokenMetadata(tokenAddress: string): Promise<TokenInfo> {
