@@ -80,7 +80,7 @@
   ],
   "servers": [
     {
-      "url": "https://indexer-mr.dev.imtbl.com"
+      "url": "https://indexer-mr.sandbox.imtbl.com"
     },
     {
       "url": "https://order-book-mr.dev.imtbl.com"
@@ -1389,9 +1389,6 @@
         "type": "object",
         "description": "The mint activity details",
         "properties": {
-          "activity_type": {
-            "$ref": "#/components/schemas/ActivityType"
-          },
           "to": {
             "description": "The account address the asset was minted to",
             "type": "string",
@@ -1417,9 +1414,6 @@
         "description": "The burn activity details",
         "type": "object",
         "properties": {
-          "activity_type": {
-            "$ref": "#/components/schemas/ActivityType"
-          },
           "from": {
             "description": "The account address the asset was transferred from",
             "type": "string",
@@ -1445,9 +1439,6 @@
         "type": "object",
         "description": "The transfer activity details",
         "properties": {
-          "activity_type": {
-            "$ref": "#/components/schemas/ActivityType"
-          },
           "from": {
             "description": "The account address the asset was transferred from",
             "type": "string",
@@ -1562,9 +1553,6 @@
         "description": "The NFT Sale activity details",
         "type": "object",
         "properties": {
-          "activity_type": {
-            "$ref": "#/components/schemas/ActivityType"
-          },
           "order_id": {
             "description": "The id of order",
             "type": "string",
@@ -1614,10 +1602,7 @@
           {
             "$ref": "#/components/schemas/NFTSale"
           }
-        ],
-        "discriminator": {
-          "propertyName": "activity_type"
-        }
+        ]
       },
       "BlockchainMetadata": {
         "description": "The metadata related to blockchain transaction",
