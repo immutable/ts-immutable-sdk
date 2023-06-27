@@ -8,16 +8,14 @@ jest.mock('../confirmation/confirmation');
 describe('guardian', () => {
   afterEach(jest.resetAllMocks);
   let mockGetTransactionByID: jest.Mock;
-  let mockEvaluateStarkexTransaction: jest.Mock;
+  let mockEvaluateTransaction: jest.Mock;
 
   beforeEach(() => {
     mockGetTransactionByID = jest.fn();
-    mockEvaluateStarkexTransaction = jest.fn();
+    mockEvaluateTransaction = jest.fn();
     (guardian.TransactionsApi as jest.Mock).mockImplementation(() => ({
       getTransactionByID: mockGetTransactionByID,
-    }));
-    (guardian.StarkexTransactionsApi as jest.Mock).mockImplementation(() => ({
-      evaluateStarkexTransaction: mockEvaluateStarkexTransaction,
+      evaluateTransaction: mockEvaluateTransaction,
     }));
   });
   const mockAccessToken = 'eyJh1234';
@@ -27,7 +25,7 @@ describe('guardian', () => {
   describe('validate', () => {
     it('should retry getting transaction details and throw an error when transaction does not exist', async () => {
       mockGetTransactionByID.mockResolvedValue({ data: { id: '1234' } });
-      mockEvaluateStarkexTransaction.mockResolvedValue({ data: { confirmationRequired: false } });
+      mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: false } });
 
       const guardianClient = new GuardianClient({
         accessToken: mockAccessToken,
@@ -39,7 +37,7 @@ describe('guardian', () => {
     });
     it('should not show the confirmation screen if it is not required', async () => {
       mockGetTransactionByID.mockResolvedValue({ data: { id: '1234' } });
-      mockEvaluateStarkexTransaction.mockResolvedValue({ data: { confirmationRequired: false } });
+      mockEvaluateTransaction.mockResolvedValue({ data: { confirmationRequired: false } });
       const guardianClient = new GuardianClient({
         accessToken: mockAccessToken,
         imxPublicApiDomain: mockImxPublicApiDomain,
@@ -51,7 +49,7 @@ describe('guardian', () => {
     });
     it('should show the confirmation screen when some of the confirmations are required', async () => {
       mockGetTransactionByID.mockResolvedValueOnce({ data: { id: '1234' } });
-      mockEvaluateStarkexTransaction
+      mockEvaluateTransaction
         .mockResolvedValueOnce({ data: { confirmationRequired: true } });
       (mockConfirmationScreen.startGuardianTransaction as jest.Mock).mockResolvedValueOnce({ confirmed: true });
 
@@ -67,7 +65,7 @@ describe('guardian', () => {
 
     it('should throw error if user did not confirm the transaction', async () => {
       mockGetTransactionByID.mockResolvedValueOnce({ data: { id: '1234' } });
-      mockEvaluateStarkexTransaction
+      mockEvaluateTransaction
         .mockResolvedValueOnce({ data: { confirmationRequired: true } });
       (mockConfirmationScreen.startGuardianTransaction as jest.Mock).mockResolvedValueOnce({ confirmed: false });
 

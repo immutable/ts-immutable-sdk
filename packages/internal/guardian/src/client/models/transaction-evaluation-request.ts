@@ -15,15 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { APIError500AllOf } from './apierror500-all-of';
+import { ZkEvmTransactionEvaluationRequest } from './zk-evm-transaction-evaluation-request';
 // May contain unused imports in some cases
 // @ts-ignore
-import { BasicAPIError } from './basic-apierror';
+import { ZkEvmTransactionEvaluationRequestTransactionData } from './zk-evm-transaction-evaluation-request-transaction-data';
 
 /**
- * @type APIError500
+ * @type TransactionEvaluationRequest
  * @export
  */
-export type APIError500 = APIError500AllOf & BasicAPIError;
-
-
+export type TransactionEvaluationRequest = { chainType: 'evm' } & ZkEvmTransactionEvaluationRequest | { chainType: 'starkex' };

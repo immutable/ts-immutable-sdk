@@ -2,14 +2,6 @@ import * as guardian from '@imtbl/guardian';
 import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from './retry';
 
-export type GuardianParams = {
-  accessToken: string;
-  imxPublicApiDomain: string;
-  payloadHash: string;
-  confirmationScreen: ConfirmationScreen;
-  popupWindowSize?: { width: number; height: number }
-};
-
 export type GuardianClientParams = {
   accessToken: string;
   imxPublicApiDomain: string;
@@ -24,19 +16,11 @@ export type GuardianValidateParams = {
 export default class GuardianClient {
   private transactionAPI: guardian.TransactionsApi;
 
-  private starkExTransactionApi: guardian.StarkexTransactionsApi;
-
   private confirmationScreen: ConfirmationScreen;
 
   constructor({ imxPublicApiDomain, accessToken, confirmationScreen }: GuardianClientParams) {
     this.confirmationScreen = confirmationScreen;
     this.transactionAPI = new guardian.TransactionsApi(
-      new guardian.Configuration({
-        accessToken,
-        basePath: imxPublicApiDomain,
-      }),
-    );
-    this.starkExTransactionApi = new guardian.StarkexTransactionsApi(
       new guardian.Configuration({
         accessToken,
         basePath: imxPublicApiDomain,
@@ -59,8 +43,11 @@ export default class GuardianClient {
       throw new Error("Transaction doesn't exists");
     }
 
-    const evaluateStarkexRes = await this.starkExTransactionApi.evaluateStarkexTransaction({
-      payloadHash,
+    const evaluateStarkexRes = await this.transactionAPI.evaluateTransaction({
+      id: payloadHash,
+      transactionEvaluationRequest: {
+        chainType: 'starkex',
+      },
     });
 
     const { confirmationRequired } = evaluateStarkexRes.data;
