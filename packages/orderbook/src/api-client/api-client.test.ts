@@ -62,7 +62,6 @@ describe('ImmutableApiClient', () => {
           '123',
           seaportAddress,
         ).createListing({
-          offerer: '0x123',
           orderComponents,
           orderHash: '0x123',
           orderSignature: '0x123',
@@ -93,7 +92,6 @@ describe('ImmutableApiClient', () => {
           '123',
           seaportAddress,
         ).createListing({
-          offerer: '0x123',
           orderComponents,
           orderHash: '0x123',
           orderSignature: '0x123',
@@ -142,7 +140,6 @@ describe('ImmutableApiClient', () => {
           '123',
           seaportAddress,
         ).createListing({
-          offerer: '0x123',
           orderComponents,
           orderHash: '0x123',
           orderSignature: '0x123',
@@ -202,7 +199,6 @@ describe('ImmutableApiClient', () => {
           '123',
           seaportAddress,
         ).createListing({
-          offerer: '0x123',
           orderComponents,
           orderHash: '0x123',
           orderSignature: '0x123',
