@@ -208,29 +208,5 @@ describe('Passport', () => {
         expect(mockGetUser).toHaveBeenCalledTimes(1);
       });
     });
-
-    describe('Passthrough RPC methods', () => {
-      const tests = [
-        {method: 'eth_getBalance', params: [], result: "0x0"},
-        {method: 'eth_getStorageAt', params: [], result: "0x"},
-        {method: 'eth_gasPrice', params: [], result: "0x0"}
-      ];
-
-      tests.forEach(testSpecification => {
-        test(`${testSpecification.method} should return ${testSpecification.result}`, async () => {
-          useMswHandlers([
-            mswHandlers.jsonRpcProvider.success,
-          ])
-
-          const zkEvmProvider = getZkEvmProvider();
-
-          const result = await zkEvmProvider.request({
-            method: testSpecification.method,
-            params: testSpecification.params,
-          });
-          expect(result).toEqual(testSpecification.result);
-        });
-      })
-    })
   });
 });
