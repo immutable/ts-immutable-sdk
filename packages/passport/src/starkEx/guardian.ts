@@ -6,6 +6,7 @@ export type GuardianClientParams = {
   accessToken: string;
   imxPublicApiDomain: string;
   confirmationScreen: ConfirmationScreen;
+  imxEtherAddress: string;
 };
 
 export type GuardianValidateParams = {
@@ -18,7 +19,11 @@ export default class GuardianClient {
 
   private confirmationScreen: ConfirmationScreen;
 
-  constructor({ imxPublicApiDomain, accessToken, confirmationScreen }: GuardianClientParams) {
+  private imxEtherAddress: string;
+
+  constructor({
+    imxPublicApiDomain, accessToken, confirmationScreen, imxEtherAddress,
+  }: GuardianClientParams) {
     this.confirmationScreen = confirmationScreen;
     this.transactionAPI = new guardian.TransactionsApi(
       new guardian.Configuration({
@@ -26,6 +31,7 @@ export default class GuardianClient {
         basePath: imxPublicApiDomain,
       }),
     );
+    this.imxEtherAddress = imxEtherAddress;
   }
 
   public async validate({ popupWindowSize, payloadHash }: GuardianValidateParams) {
@@ -54,6 +60,7 @@ export default class GuardianClient {
     if (confirmationRequired) {
       const confirmationResult = await this.confirmationScreen.startGuardianTransaction(
         payloadHash,
+        this.imxEtherAddress,
       );
 
       if (!confirmationResult.confirmed) {

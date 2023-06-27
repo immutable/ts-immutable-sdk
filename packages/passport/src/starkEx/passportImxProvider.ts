@@ -66,6 +66,7 @@ export class PassportImxProvider implements IMXProvider {
       imxPublicApiDomain,
       accessToken: user.accessToken,
       confirmationScreen,
+      imxEtherAddress: user.imx.ethAddress,
     });
   }
 
