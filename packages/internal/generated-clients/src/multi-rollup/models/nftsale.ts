@@ -18,9 +18,6 @@
 import { ActivityNFT } from './activity-nft';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ActivityType } from './activity-type';
-// May contain unused imports in some cases
-// @ts-ignore
 import { SalePayment } from './sale-payment';
 
 /**
@@ -29,12 +26,6 @@ import { SalePayment } from './sale-payment';
  * @interface NFTSale
  */
 export interface NFTSale {
-    /**
-     * 
-     * @type {ActivityType}
-     * @memberof NFTSale
-     */
-    'activity_type': ActivityType;
     /**
      * The id of order
      * @type {string}
