@@ -2,8 +2,8 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { User as OidcUser, UserManager } from 'oidc-client-ts';
 import AuthManager from './authManager';
 import { PassportError, PassportErrorType } from './errors/passportError';
-import { User } from './types';
 import { PassportConfiguration } from './config';
+import { mockUser, mockUserImx, mockUserZkEvm } from './test/mocks';
 
 jest.mock('oidc-client-ts');
 
@@ -18,47 +18,32 @@ const config = new PassportConfiguration({
   scope: 'email profile',
 });
 
-const passportData = {
-  passport: {
-    ether_key: '0x232',
-    stark_key: '0x567',
-    user_admin_key: '0x123',
-  },
-};
 const mockOidcUser: OidcUser = {
-  id_token: 'id123',
-  access_token: 'access123',
-  refresh_token: 'refresh123',
+  id_token: mockUser.idToken,
+  access_token: mockUser.accessToken,
+  refresh_token: mockUser.refreshToken,
   token_type: 'Bearer',
   scope: 'openid',
   expires_in: 167222,
   profile: {
-    sub: 'email|123',
-    email: 'test@immutable.com',
-    nickname: 'test',
+    sub: mockUser.profile.sub,
+    email: mockUser.profile.email,
+    nickname: mockUser.profile.nickname,
   },
   expired: false,
 } as OidcUser;
 
-const mockOidcUserWithPassportInfo: OidcUser = {
-  ...mockOidcUser,
-  profile: { ...mockOidcUser.profile, ...passportData },
-} as never;
-
-const mockUser: User = {
-  idToken: 'id123',
-  accessToken: 'access123',
-  refreshToken: 'refresh123',
-  profile: {
-    sub: 'email|123',
-    email: 'test@immutable.com',
-    nickname: 'test',
-  },
-  etherKey: '',
-  starkKey: '',
-  userAdminKey: '',
-  expired: false,
+const imxProfileData = {
+  imx_eth_address: mockUserImx.imx.ethAddress,
+  imx_stark_address: mockUserImx.imx.starkAddress,
+  imx_user_admin_address: mockUserImx.imx.userAdminAddress,
 };
+
+const zkEvmProfileData = {
+  zkevm_eth_address: mockUserZkEvm.zkEvm.ethAddress,
+  zkevm_user_admin_address: mockUserZkEvm.zkEvm.userAdminAddress,
+};
+
 const mockErrorMsg = 'NONO';
 
 describe('AuthManager', () => {
@@ -154,24 +139,79 @@ describe('AuthManager', () => {
   });
 
   describe('login', () => {
-    it('should get the login user and return the domain model', async () => {
-      signInMock.mockResolvedValue(mockOidcUser);
+    describe('when the user has not registered for any rollup', () => {
+      it('should get the login user and return the domain model', async () => {
+        signInMock.mockResolvedValue(mockOidcUser);
 
-      const result = await authManager.login();
+        const result = await authManager.login();
 
-      expect(result).toEqual(mockUser);
+        expect(result).toEqual(mockUser);
+      });
     });
 
-    it('should get the login user and return the user with ether key info', async () => {
-      signInMock.mockResolvedValue(mockOidcUserWithPassportInfo);
+    describe('when the user has registered for imx', () => {
+      it('should populate the imx object', async () => {
+        signInMock.mockResolvedValue({
+          ...mockOidcUser,
+          profile: {
+            ...mockOidcUser.profile,
+            passport: {
+              ...imxProfileData,
+            },
+          },
+        });
 
-      const result = await authManager.login();
+        const result = await authManager.login();
 
-      expect(result).toEqual({
-        ...mockUser,
-        etherKey: passportData.passport.ether_key,
-        starkKey: passportData.passport.stark_key,
-        userAdminKey: passportData.passport.user_admin_key,
+        expect(result).toEqual(mockUserImx);
+      });
+    });
+
+    describe('when the user has registered for zkEvm', () => {
+      it('should populate the zkEvm object', async () => {
+        signInMock.mockResolvedValue({
+          ...mockOidcUser,
+          profile: {
+            ...mockOidcUser.profile,
+            passport: {
+              ...zkEvmProfileData,
+            },
+          },
+        });
+
+        const result = await authManager.login();
+
+        expect(result).toEqual(mockUserZkEvm);
+      });
+    });
+
+    describe('when the user has registered for imx & zkEvm', () => {
+      it('should populate the imx & zkEvm objects', async () => {
+        signInMock.mockResolvedValue({
+          ...mockOidcUser,
+          profile: {
+            ...mockOidcUser.profile,
+            passport: {
+              ...zkEvmProfileData,
+              ...imxProfileData,
+            },
+          },
+        });
+
+        const result = await authManager.login();
+
+        expect(result).toEqual({
+          ...mockUserImx,
+          imx: {
+            ethAddress: imxProfileData.imx_eth_address,
+            starkAddress: imxProfileData.imx_stark_address,
+            userAdminAddress: imxProfileData.imx_user_admin_address,
+          },
+          zkEvm: {
+            ethAddress: zkEvmProfileData.zkevm_eth_address,
+            userAdminAddress: zkEvmProfileData.zkevm_user_admin_address,
+          },
+        });
       });
     });
 

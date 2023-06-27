@@ -6,10 +6,10 @@ import {
 } from '@imtbl/core-sdk';
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
-import { UserWithEtherKey } from '../../types';
+import { UserImx } from '../../types';
 
 type TransfersParams = {
-  user: UserWithEtherKey;
+  user: UserImx;
   starkSigner: StarkSigner;
   request: UnsignedExchangeTransferRequest;
   exchangesApi: ExchangesApi;
@@ -22,7 +22,7 @@ export async function exchangeTransfer({
   exchangesApi,
 }: TransfersParams): Promise<CreateTransferResponseV1> {
   return withPassportError<CreateTransferResponseV1>(async () => {
-    const ethAddress = user.etherKey;
+    const { ethAddress } = user.imx;
     const transferAmount = request.amount;
     const signableResult = await exchangesApi.getExchangeSignableTransfer({
       id: request.transactionID,
