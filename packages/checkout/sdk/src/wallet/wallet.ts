@@ -16,8 +16,8 @@ export async function getWalletAllowList({
   const filteredWalletsList = masterWalletList
     .filter((wallet) => {
       const walletNotExcluded = !exclude
-        ?.map((excludeWallet) => excludeWallet.providerName)
-        .includes(wallet.providerName as WalletProviderName);
+        ?.map((excludeWallet) => excludeWallet.walletProvider)
+        .includes(wallet.walletProvider as WalletProviderName);
 
       const allowAllWallets = type === WalletFilterTypes.ALL;
       const walletsAllowedForType = wallet.platform.includes(type);

@@ -33,7 +33,7 @@ describe('Bridge Form', () => {
           gasPrice: BigNumber.from(100),
         }),
       } as unknown as Web3Provider,
-      providerPreference: null,
+      walletProvider: null,
       network: null,
       exchange: null,
       tokenBalances: [
