@@ -34,7 +34,7 @@ export default function GetAllBalances(props: BalanceProps) {
       const resp = await checkout.getAllBalances({
         provider,
         walletAddress,
-        chainId: ChainId.SEPOLIA,
+        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
       });
       setResult(resp.balances);
       setLoading(false);

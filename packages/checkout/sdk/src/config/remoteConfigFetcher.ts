@@ -72,20 +72,20 @@ export class RemoteConfigFetcher {
     | undefined
     > {
     const config = await this.loadConfig();
-    if (config && key) {
-      return config[key] as RemoteConfiguration[keyof RemoteConfiguration];
-    }
+    if (!config) return undefined;
+
+    if (key && config[key]) return config[key] as RemoteConfiguration[keyof RemoteConfiguration];
+
     return config as RemoteConfiguration;
   }
 
   public async getTokens(chainId: ChainId): Promise<TokenInfo[]> {
     const config = await this.loadConfigTokens();
-    if (config && config[chainId.toString()]?.allowed) {
-      return config[chainId].allowed as TokenInfo[];
-    }
-    if (config && config[chainId.toString()]?.metadata) {
-      return config[chainId].metadata as TokenInfo[];
-    }
+    if (!config) return [];
+
+    if (config[chainId]?.allowed) return config[chainId].allowed as TokenInfo[];
+    if (config[chainId]?.metadata) return config[chainId].metadata as TokenInfo[];
+
     return [];
   }
 }

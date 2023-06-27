@@ -5,7 +5,6 @@ import {
   WalletProviderName,
   GetBalanceResult,
   NetworkInfo,
-  TokenInfo,
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
 
@@ -17,7 +16,6 @@ export interface BridgeState {
   network: NetworkInfo | null;
   toNetwork: NetworkInfo | null;
   tokenBalances: GetBalanceResult[];
-  allowedTokens: TokenInfo[];
 }
 
 export const initialBridgeState: BridgeState = {
@@ -28,7 +26,6 @@ export const initialBridgeState: BridgeState = {
   network: null,
   toNetwork: null,
   tokenBalances: [],
-  allowedTokens: [],
 };
 
 export interface BridgeContextState {
@@ -47,8 +44,7 @@ type ActionPayload =
   | SetTokenBridgePayload
   | SetNetworkPayload
   | SetToNetworkPayload
-  | SetTokenBalancesPayload
-  | SetAllowedTokensPayload;
+  | SetTokenBalancesPayload;
 
 export enum BridgeActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
@@ -58,7 +54,6 @@ export enum BridgeActions {
   SET_NETWORK = 'SET_NETWORK',
   SET_TO_NETWORK = 'SET_TO_NETWORK',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
-  SET_ALLOWED_TOKENS = 'SET_ALLOWED_TOKENS',
 }
 
 export interface SetCheckoutPayload {
@@ -94,11 +89,6 @@ export interface SetToNetworkPayload {
 export interface SetTokenBalancesPayload {
   type: BridgeActions.SET_TOKEN_BALANCES;
   tokenBalances: GetBalanceResult[];
-}
-
-export interface SetAllowedTokensPayload {
-  type: BridgeActions.SET_ALLOWED_TOKENS;
-  allowedTokens: TokenInfo[];
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -150,11 +140,6 @@ export const bridgeReducer: Reducer<BridgeState, BridgeAction> = (
       return {
         ...state,
         tokenBalances: action.payload.tokenBalances,
-      };
-    case BridgeActions.SET_ALLOWED_TOKENS:
-      return {
-        ...state,
-        allowedTokens: action.payload.allowedTokens,
       };
     default:
       return state;

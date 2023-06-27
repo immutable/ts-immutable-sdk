@@ -94,7 +94,7 @@ async function bridgeToL2GasEstimator(
       },
       bridgeable,
     };
-  } catch {
+  } catch (e) {
     // In the case of an error, just return an empty gas & bridge fee estimate
     return {
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,

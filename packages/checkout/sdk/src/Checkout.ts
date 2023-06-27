@@ -174,7 +174,7 @@ export class Checkout {
   }
 
   /**
-   * Fetch all available balances (ERC20 & Native) of the current connected network of the given wallet.
+   * Fetch all available balances (ERC20 & Native) of the current connected network for a given wallet address.
    * It will loop through the list of allowed tokens and check for balance on each one.
    * @param {GetAllBalancesParams} params - The necessary data required to fetch all the wallet balances.
    * @returns List of tokens balance for the given wallet.
@@ -188,12 +188,13 @@ export class Checkout {
       params.provider,
     );
 
+    const walletAddress = params.walletAddress ?? await web3Provider.getSigner().getAddress();
+
     return balances.getAllBalances(
       this.config,
       this.checkoutApiService,
       web3Provider,
-      params.walletAddress,
-      params.chainId,
+      walletAddress,
     );
   }
 

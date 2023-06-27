@@ -70,6 +70,8 @@ export class CheckoutApiServiceL1RpcNode {
       );
     }
 
+    console.log(response);
+
     if (response.status !== 200 || response.data === undefined) {
       throw new Error(
         `Error fetching getERC20TokenBalances for ${walletAddress}: ${response.status} ${response.statusText}`,

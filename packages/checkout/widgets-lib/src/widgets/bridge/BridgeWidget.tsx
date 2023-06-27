@@ -6,9 +6,9 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
   Checkout,
-  GetTokenAllowListResult,
+  // GetTokenAllowListResult,
   NetworkFilterTypes,
-  TokenFilterTypes,
+  // TokenFilterTypes,
   RPC_URL_MAP,
 } from '@imtbl/checkout-sdk';
 import {
@@ -158,24 +158,27 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         chainId: getNetworkResult.chainId,
       });
 
-      const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
-        {
-          chainId: getNetworkResult.chainId,
-          type: TokenFilterTypes.BRIDGE,
-        },
-      );
+      // const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
+      //   {
+      //     chainId: getNetworkResult.chainId,
+      //     type: TokenFilterTypes.BRIDGE,
+      //   },
+      // );
 
-      const allowedTokenBalances = tokenBalances.balances.filter((balance) => balance.balance.gt(0)
-        && allowList.tokens
-          .map((token) => token.address)
-          .includes(balance.token.address));
+      // console.log(allowList);
 
-      bridgeDispatch({
-        payload: {
-          type: BridgeActions.SET_ALLOWED_TOKENS,
-          allowedTokens: allowList.tokens,
-        },
-      });
+      const allowedTokenBalances = tokenBalances.balances;
+      // .filter((balance) => balance.balance.gt(0)
+      //   && allowList.tokens
+      //     .map((token) => token.address)
+      //     .includes(balance.token.address));
+
+      // bridgeDispatch({
+      //   payload: {
+      //     type: BridgeActions.SET_ALLOWED_TOKENS,
+      //     allowedTokens: allowList.tokens,
+      //   },
+      // });
 
       bridgeDispatch({
         payload: {

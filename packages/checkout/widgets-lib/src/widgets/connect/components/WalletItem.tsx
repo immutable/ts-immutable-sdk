@@ -16,11 +16,7 @@ export function WalletItem(props: WalletProps) {
   };
 
   return (
-    // TODO: Fragments should contain more than one child - otherwise, there’s no need for a Fragment at all.
-    // Consider checking !walletText and rendering a callback component instead, then it would make sense
-    // to use a Fragment.
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    <>
+    <div>
       {walletText && (
         <MenuItem
           testId={`wallet-list-${wallet.walletProvider}`}
@@ -45,6 +41,6 @@ export function WalletItem(props: WalletProps) {
           </MenuItem.Caption>
         </MenuItem>
       )}
-    </>
+    </div>
   );
 }

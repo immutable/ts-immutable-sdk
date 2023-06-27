@@ -2,7 +2,7 @@ import { Box } from '@biom3/react';
 import {
   useCallback, useContext, useMemo, useState,
 } from 'react';
-import { CheckoutErrorType, TokenInfo } from '@imtbl/checkout-sdk';
+import { CheckoutErrorType, GetBalanceResult } from '@imtbl/checkout-sdk';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { sendBridgeWidgetCloseEvent } from '../BridgeWidgetEvents';
@@ -24,7 +24,7 @@ export interface ApproveERC20BridgeProps {
   data: ApproveERC20BridgeData;
 }
 export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) {
-  const { bridgeState: { checkout, provider, allowedTokens } } = useContext(BridgeContext);
+  const { bridgeState: { checkout, provider, tokenBalances } } = useContext(BridgeContext);
   const { viewDispatch } = useContext(ViewContext);
   const { approveSpending, approveBridge } = text.views[BridgeWidgetViews.APPROVE_ERC20];
 
@@ -39,10 +39,11 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
 
   // Get symbol from swap info for approve amount text
   const bridgeToken = useMemo(
-    () => allowedTokens.find(
-      (token: TokenInfo) => token.address === data.bridgeFormInfo.tokenAddress || token.address === 'NATIVE',
+    () => tokenBalances.find(
+      (token: GetBalanceResult) => token.token.address === data.bridgeFormInfo.tokenAddress
+      || token.token.address === 'NATIVE',
     ),
-    [allowedTokens, data.bridgeFormInfo.tokenAddress],
+    [tokenBalances, data.bridgeFormInfo.tokenAddress],
   );
 
   // Common error view function
@@ -175,7 +176,7 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
   const approveSpendingContent = useMemo(() => (
     <SimpleTextBody heading={approveSpending.content.heading}>
       {/* eslint-disable-next-line max-len */}
-      <Box>{`${approveSpending.content.body[0]} ${data.bridgeFormInfo.amount} ${bridgeToken?.symbol || ''} ${approveSpending.content.body[1]}`}</Box>
+      <Box>{`${approveSpending.content.body[0]} ${data.bridgeFormInfo.amount} ${bridgeToken?.token.symbol || ''} ${approveSpending.content.body[1]}`}</Box>
     </SimpleTextBody>
   ), [data.bridgeFormInfo, bridgeToken]);
 
@@ -216,7 +217,7 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
           view: {
             type: BridgeWidgetViews.IN_PROGRESS,
             data: {
-              token: bridgeToken!,
+              token: bridgeToken!.token,
               transactionResponse: txn.transactionResponse,
               bridgeForm: data.bridgeFormInfo as PrefilledBridgeForm,
             },

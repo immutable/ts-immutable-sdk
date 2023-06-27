@@ -45,7 +45,6 @@ export function BridgeForm(props: BridgeFormProps) {
       tokenBridge,
       network,
       tokenBalances,
-      allowedTokens,
     },
   } = useContext(BridgeContext);
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -82,6 +81,7 @@ export function BridgeForm(props: BridgeFormProps) {
   }, []);
 
   useEffect(() => {
+    console.log(cryptoFiatState);
     if (tokenBalances.length === 0 || cryptoFiatState.conversions.size === 0) return;
     const options = tokenBalances
       .filter((b) => b.balance.gt(0))
@@ -103,6 +103,15 @@ export function BridgeForm(props: BridgeFormProps) {
       );
     setTokensOptions(options);
   }, [tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId]);
+
+  useEffect(() => {
+    cryptoFiatDispatch({
+      payload: {
+        type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+        tokenSymbols: tokenBalances.map((t) => t.token.symbol),
+      },
+    });
+  }, [cryptoFiatDispatch, tokenBalances]);
 
   const selectedOption = useMemo(
     () => (token && token ? formatTokenOptionsId(token.token.symbol, token.token.address) : undefined),
@@ -264,15 +273,6 @@ export function BridgeForm(props: BridgeFormProps) {
     setToken(defaultToken || null);
     setTokenAddress(getTokenAddress(defaultToken?.token));
   }, [tokenBalances, network, defaultTokenAddress]);
-
-  useEffect(() => {
-    cryptoFiatDispatch({
-      payload: {
-        type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
-        tokenSymbols: allowedTokens.map((allowedToken) => allowedToken.symbol),
-      },
-    });
-  }, [cryptoFiatDispatch, allowedTokens]);
 
   useEffect(() => {
     if (!amount) return;

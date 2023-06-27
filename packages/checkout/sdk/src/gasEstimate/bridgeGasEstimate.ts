@@ -9,24 +9,10 @@ import {
 import {
   TokenAmountEstimate,
 } from '../types/gasEstimate';
-import * as tokens from '../tokens';
-import { ChainId, TokenFilterTypes, TokenInfo } from '../types';
+import { ChainId } from '../types';
 import { CheckoutConfiguration } from '../config';
 
 const GAS_LIMIT = 140000;
-
-async function getTokenInfoByAddress(
-  config: CheckoutConfiguration,
-  tokenAddress: FungibleToken,
-  chainId: ChainId,
-): Promise<TokenInfo | undefined> {
-  return (
-    await tokens.getTokenAllowList(config, {
-      type: TokenFilterTypes.ALL,
-      chainId,
-    })
-  ).tokens.find((token) => (token.address || 'NATIVE') === tokenAddress);
-}
 
 const doesChainSupportEIP1559 = (feeData: FeeData) => !!feeData.maxFeePerGas && !!feeData.maxPriorityFeePerGas;
 
@@ -49,13 +35,10 @@ export async function getBridgeEstimatedGas(
   provider: Web3Provider,
   chainId: ChainId,
   isApproveTxnRequired: boolean,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   gasTokenAddress?: FungibleToken,
 ): Promise<TokenAmountEstimate> {
-  const token = await getTokenInfoByAddress(
-    config,
-    gasTokenAddress || 'NATIVE',
-    chainId,
-  );
+  const token = config.networkMap.get(chainId)?.nativeCurrency;
 
   let estimatedAmount = await getGasEstimates(provider);
   if (!estimatedAmount) {
@@ -93,11 +76,7 @@ export async function getBridgeFeeEstimate(
     bridgeFeeReq,
   );
 
-  const tokenInfo = await getTokenInfoByAddress(
-    config,
-    tokenAddress,
-    destinationChainId,
-  );
+  const tokenInfo = config.networkMap.get(destinationChainId)?.nativeCurrency;
 
   return {
     bridgeFee: {

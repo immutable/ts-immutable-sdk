@@ -1,5 +1,8 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { BigNumber, Contract, utils } from 'ethers';
+import {
+  Contract,
+  utils,
+} from 'ethers';
 import {
   ChainId,
   ENVIRONMENT_L1_CHAIN_MAP,
@@ -7,13 +10,11 @@ import {
   ERC20ABI,
   GetAllBalancesResult,
   GetBalanceResult,
-  TokenInfo,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { getNetworkInfo } from '../network';
 import { CheckoutConfiguration } from '../config';
 import { CheckoutApiService } from '../service/checkoutApiService';
-import { TokenBalancesResult } from '../service/checkoutApiServiceL1RpcNode';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
@@ -77,58 +78,25 @@ export async function getERC20Balance(
 }
 
 async function getL1Balances(
-  checkoutApiService: CheckoutApiService,
   config: CheckoutConfiguration,
+  checkoutApiService: CheckoutApiService,
+  web3Provider: Web3Provider,
   walletAddress: string,
-  chainId: ChainId,
 ): Promise<GetBalanceResult[]> {
   const balanceResult: GetBalanceResult[] = [];
-  const tokensMissingMetadata: TokenBalancesResult[] = [];
-  const tokenList = await checkoutApiService
-    .getL1RpcNode()
-    .getTokenBalances({ walletAddress });
+
+  const tokenList = await checkoutApiService.getL1RpcNode().getTokenBalances({ walletAddress });
   const { tokenBalances } = tokenList;
 
-  const cachedTokens = await config.remoteConfigFetcher.getTokens(chainId);
+  // Construct array of promises to get all the balances for the current wallet
+  // using the standard ERC20 ABI. Although we already have the balance in the
+  // tokenBalances; let's use the getERC20Balance to get the token info.
+  const allBalancePromises = tokenBalances.map((t) => getERC20Balance(web3Provider, walletAddress, t.contractAddress));
+  allBalancePromises.push(getBalance(config, web3Provider, walletAddress));
 
-  tokenBalances.forEach((tokenBalance: TokenBalancesResult) => {
-    const cachedToken = cachedTokens.find(
-      (token: TokenInfo) => (token.address ?? '') === tokenBalance.contractAddress,
-    );
-    if (cachedToken) {
-      balanceResult.push({
-        balance: BigNumber.from(tokenBalance.tokenBalance),
-        formattedBalance: utils.formatUnits(
-          tokenBalance.tokenBalance,
-          cachedToken.decimals,
-        ),
-        token: cachedToken,
-      });
-    } else {
-      tokensMissingMetadata.push(tokenBalance);
-    }
-  });
-
-  const metaDataForRestOfTheTokens = await checkoutApiService
-    .getL1RpcNode()
-    .getTokensMetadata({
-      tokens: tokensMissingMetadata.map((token) => token.contractAddress),
-    });
-
-  tokensMissingMetadata.forEach((token: TokenBalancesResult) => {
-    const tokenMetadata = metaDataForRestOfTheTokens.find(
-      (metaData) => metaData.address === token.contractAddress,
-    );
-    if (tokenMetadata) {
-      balanceResult.push({
-        balance: BigNumber.from(token.tokenBalance),
-        formattedBalance: utils.formatUnits(
-          token.tokenBalance,
-          tokenMetadata.decimals,
-        ),
-        token: tokenMetadata,
-      });
-    }
+  (await Promise.allSettled(allBalancePromises)).forEach((r) => {
+    if (r.status !== 'fulfilled') return;
+    balanceResult.push(r.value);
   });
 
   return balanceResult;
@@ -144,22 +112,21 @@ async function getL2Balances(
   const allBalancePromises: Promise<GetBalanceResult>[] = [];
   const cachedTokens = await config.remoteConfigFetcher.getTokens(chainId);
 
+  // Construct array of promises to get all the balances for the current wallet
+  // using the standard ERC20 ABI. Although we already have the balance in the
+  // tokenBalances; let's use the getERC20Balance to get the token info.
+  cachedTokens.forEach((t) => {
+    if (t.address === undefined) return;
+    allBalancePromises.push(getERC20Balance(web3Provider, walletAddress, t.address));
+  });
+
+  // Ensure we are getting the native token
   allBalancePromises.push(getBalance(config, web3Provider, walletAddress));
 
-  cachedTokens
-    .filter((token: TokenInfo) => token.address)
-    .forEach((token: TokenInfo) => allBalancePromises.push(
-      getERC20Balance(web3Provider, walletAddress, token.address!),
-    ));
-  //
-  // const balanceResults = await Promise.allSettled(allBalancePromises);
-  // const getBalanceResults = (
-  //   balanceResults.filter(
-  //     (result) => result.status === 'fulfilled',
-  //   ) as PromiseFulfilledResult<GetBalanceResult>[]
-  // ).map(
-  //   (fulfilledResult: PromiseFulfilledResult<GetBalanceResult>) => fulfilledResult.value,
-  // ) as GetBalanceResult[];
+  (await Promise.allSettled(allBalancePromises)).forEach((r) => {
+    if (r.status !== 'fulfilled') return;
+    balanceResult.push(r.value);
+  });
 
   return balanceResult;
 }
@@ -169,14 +136,15 @@ export const getAllBalances = async (
   checkoutApiService: CheckoutApiService,
   web3Provider: Web3Provider,
   walletAddress: string,
-  chainId: ChainId,
 ): Promise<GetAllBalancesResult> => {
+  const { chainId } = await web3Provider.getNetwork();
+
   if (chainId === ENVIRONMENT_L1_CHAIN_MAP[config.environment]) {
     const balances = await getL1Balances(
-      checkoutApiService,
       config,
+      checkoutApiService,
+      web3Provider,
       walletAddress,
-      chainId,
     );
     return { balances };
   }

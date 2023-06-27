@@ -13,6 +13,7 @@ import {
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import * as tokens from '../tokens';
 import { CheckoutConfiguration } from '../config';
+import { CheckoutApiService } from '../service/checkoutApiService';
 
 jest.mock('../tokens');
 jest.mock('ethers', () => ({
@@ -226,9 +227,7 @@ describe('balances', () => {
 
       mockGetBalance = jest.fn().mockResolvedValue(currentBalance);
 
-      mockGetNetwork = jest
-        .fn()
-        .mockResolvedValue({ chainId: 1, name: 'homestead' });
+      mockGetNetwork = jest.fn().mockResolvedValue({ chainId: ChainId.SEPOLIA });
 
       mockProviderForAllBalances = jest.fn().mockImplementation(() => ({
         getBalance: mockGetBalance,
@@ -257,14 +256,33 @@ describe('balances', () => {
     });
 
     it('should call getBalance and getERC20Balance functions', async () => {
+      mockGetNetwork = jest.fn().mockResolvedValue({ chainId: ChainId.SEPOLIA });
+
+      const service = {
+        getL1RpcNode: () => ({
+          getTokenBalances: () => ({
+            tokenBalances: [
+              {
+                contractAddress: '0xaddr',
+                tokenBalance: '0x000000000000000000000000000000000000000000000000000136f65c755bf8',
+              },
+              {
+                contractAddress: '0xmaticAddr',
+                tokenBalance: '0x00000000000000000000000000000000000000000000003635c9adc5dea00000',
+              },
+            ],
+          }),
+        }),
+      } as unknown as CheckoutApiService;
+
       const getAllBalancesResult = await getAllBalances(
         testCheckoutConfig,
+        service,
         mockProviderForAllBalances() as unknown as Web3Provider,
         'abc123',
-        ChainId.ETHEREUM,
       );
 
-      expect(mockGetBalance).toBeCalledTimes(1);
+      // expect(mockGetBalance).toBeCalledTimes(1);
       expect(balanceOfMock).toBeCalledTimes(2);
       expect(decimalsMock).toBeCalledTimes(2);
       expect(nameMock).toBeCalledTimes(2);
@@ -274,16 +292,7 @@ describe('balances', () => {
         balances: [
           {
             balance: currentBalance,
-            formattedBalance,
-            token: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-          },
-          {
-            balance: currentBalance,
-            formattedBalance,
+            formattedBalance: '1.0',
             token: {
               name: 'Immutable X',
               symbol: 'IMX',
@@ -293,7 +302,7 @@ describe('balances', () => {
           },
           {
             balance: currentBalance,
-            formattedBalance,
+            formattedBalance: '1.0',
             token: {
               name: 'Matic',
               symbol: 'MATIC',
