@@ -306,7 +306,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
+      cySmartGet('bridge-token-coin-selector__option-eth').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -383,7 +383,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
+      cySmartGet('bridge-token-coin-selector__option-eth').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -431,7 +431,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
+      cySmartGet('bridge-token-coin-selector__option-eth').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -485,7 +485,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
+      cySmartGet('bridge-token-coin-selector__option-eth').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -536,7 +536,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-IMX-ImmutableX').click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -587,7 +587,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-ETH-ETH').click();
+      cySmartGet('bridge-token-coin-selector__option-eth').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();

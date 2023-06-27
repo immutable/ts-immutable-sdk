@@ -1,18 +1,18 @@
-import { ConnectionProviders, WalletInfo, WalletProviderName } from '@imtbl/checkout-sdk';
+import { WalletProviderName, WalletInfo } from '@imtbl/checkout-sdk';
 import { MenuItem } from '@biom3/react';
 import { text } from '../../../resources/text/textConfig';
 
 export interface WalletProps {
-  onWalletClick: (providerName: WalletProviderName) => void;
+  onWalletClick: (walletProvider: WalletProviderName) => void;
   wallet: WalletInfo;
 }
 export function WalletItem(props: WalletProps) {
   const { wallet, onWalletClick } = props;
   const { wallets } = text;
 
-  const walletText = wallets[wallet.providerName];
+  const walletText = wallets[wallet.walletProvider];
   const logo = {
-    [ConnectionProviders.METAMASK]: 'MetaMaskSymbol',
+    [WalletProviderName.METAMASK]: 'MetaMaskSymbol',
   };
 
   return (
@@ -23,13 +23,13 @@ export function WalletItem(props: WalletProps) {
     <>
       {walletText && (
         <MenuItem
-          testId={`wallet-list-${wallet.providerName}`}
+          testId={`wallet-list-${wallet.walletProvider}`}
           size="medium"
           emphasized
-          onClick={() => onWalletClick(wallet.providerName)}
+          onClick={() => onWalletClick(wallet.walletProvider)}
         >
           <MenuItem.FramedLogo
-            logo={logo[wallet.providerName] as any}
+            logo={logo[wallet.walletProvider] as any}
             sx={{
               width: 'base.icon.size.500',
               backgroundColor: 'base.color.translucent.emphasis.200',
@@ -37,11 +37,11 @@ export function WalletItem(props: WalletProps) {
             }}
           />
           <MenuItem.Label size="medium">
-            {wallets[wallet.providerName].heading}
+            {wallets[wallet.walletProvider].heading}
           </MenuItem.Label>
           <MenuItem.IntentIcon />
           <MenuItem.Caption>
-            {wallets[wallet.providerName].description}
+            {wallets[wallet.walletProvider].description}
           </MenuItem.Caption>
         </MenuItem>
       )}

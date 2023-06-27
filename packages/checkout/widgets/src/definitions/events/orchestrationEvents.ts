@@ -7,11 +7,11 @@ export enum OrchestrationEventType {
 }
 
 export type RequestConnectEvent = {
-  providerPreference: string;
+  walletProvider: string;
 };
 
 export type RequestWalletEvent = {
-  providerPreference: string;
+  walletProvider: string;
 };
 
 export type RequestSwapEvent = {

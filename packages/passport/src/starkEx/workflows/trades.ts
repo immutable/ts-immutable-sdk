@@ -6,13 +6,13 @@ import {
   TradesApiCreateTradeRequest,
 } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
-import { UserWithEtherKey } from '../../types';
+import { UserImx } from '../../types';
 import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
 
 type CreateTradeParams = {
   request: GetSignableTradeRequest;
   tradesApi: TradesApi;
-  user: UserWithEtherKey;
+  user: UserImx;
   starkSigner: StarkSigner;
   confirmationScreen: ConfirmationScreen;
 };
@@ -25,7 +25,7 @@ export async function createTrade({
   confirmationScreen,
 }: CreateTradeParams): Promise<CreateTradeResponse> {
   return withPassportError<CreateTradeResponse>(async () => {
-    const ethAddress = user.etherKey;
+    const { ethAddress } = user.imx;
     const getSignableTradeRequest: GetSignableTradeRequest = {
       expiration_timestamp: request.expiration_timestamp,
       fees: request.fees,
