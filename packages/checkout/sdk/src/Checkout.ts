@@ -36,13 +36,11 @@ import {
   SwitchNetworkParams,
   SwitchNetworkResult,
   ValidateProviderOptions,
-} from './types';
-import { CheckoutConfiguration } from './config';
-import {
   GasEstimateParams,
   GasEstimateSwapResult,
   GasEstimateBridgeToL2Result,
-} from './types/gasEstimate';
+} from './types';
+import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 
 export class Checkout {
@@ -126,7 +124,10 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowUnsupportedProvider: true, allowMistmatchedChainId: true } as ValidateProviderOptions,
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: true,
+      } as ValidateProviderOptions,
     );
 
     const switchNetworkRes = await network.switchWalletNetwork(
@@ -240,10 +241,7 @@ export class Checkout {
       this.config,
       params.provider,
     );
-    return await transaction.sendTransaction(
-      web3Provider,
-      params.transaction,
-    );
+    return await transaction.sendTransaction(web3Provider, params.transaction);
   }
 
   /**
@@ -256,8 +254,10 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowUnsupportedProvider: true, allowMistmatchedChainId: true } as ValidateProviderOptions,
-
+      {
+        allowUnsupportedProvider: true,
+        allowMistmatchedChainId: true,
+      } as ValidateProviderOptions,
     );
     return await network.getNetworkInfo(this.config, web3Provider);
   }
@@ -282,7 +282,7 @@ export class Checkout {
     return await gasEstimatorService.gasEstimator(
       params,
       this.readOnlyProviders,
-      this.config.environment,
+      this.config,
     );
   }
 }

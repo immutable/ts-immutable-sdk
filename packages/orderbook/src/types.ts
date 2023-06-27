@@ -25,9 +25,9 @@ export interface RoyaltyInfo {
 }
 
 export interface PrepareListingParams {
-  offerer: string;
-  listingItem: ERC721Item;
-  considerationItem: ERC20Item | NativeItem;
+  makerAddress: string;
+  sell: ERC721Item;
+  buy: ERC20Item | NativeItem;
   orderExpiry?: Date;
 }
 
@@ -43,7 +43,6 @@ export interface PrepareListingResponse {
 }
 
 export interface CreateListingParams {
-  offerer: string;
   orderComponents: OrderComponents;
   orderHash: string;
   orderSignature: string;

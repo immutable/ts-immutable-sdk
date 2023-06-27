@@ -21,12 +21,12 @@ async function createListing(
   provider: providers.Provider,
 ): Promise<Order> {
   const listing = await sdk.prepareListing({
-    offerer: offerer.address,
-    considerationItem: {
+    makerAddress: offerer.address,
+    buy: {
       amount: considerationAmount,
       type: 'NATIVE',
     },
-    listingItem: {
+    sell: {
       contractAddress: token.address,
       tokenId,
       type: 'ERC721',
@@ -49,7 +49,6 @@ async function createListing(
   const {
     result: { id: orderId },
   } = await sdk.createListing({
-    offerer: offerer.address,
     orderComponents: listing.orderComponents,
     orderHash: listing.orderHash,
     orderSignature: signature,
