@@ -53,7 +53,7 @@ type ActionPayload =
 export enum BridgeActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
-  SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
+  SET_WALLET_PROVIDER = 'SET_WALLET_PROVIDER',
   SET_TOKEN_BRIDGE = 'SET_TOKEN_BRIDGE',
   SET_NETWORK = 'SET_NETWORK',
   SET_TO_NETWORK = 'SET_TO_NETWORK',
@@ -72,7 +72,7 @@ export interface SetProviderPayload {
 }
 
 export interface SetWalletProviderPayload {
-  type: BridgeActions.SET_PROVIDER_PREFERENCE;
+  type: BridgeActions.SET_WALLET_PROVIDER;
   walletProvider: WalletProviderName;
 }
 
@@ -126,7 +126,7 @@ export const bridgeReducer: Reducer<BridgeState, BridgeAction> = (
         ...state,
         provider: action.payload.provider,
       };
-    case BridgeActions.SET_PROVIDER_PREFERENCE:
+    case BridgeActions.SET_WALLET_PROVIDER:
       return {
         ...state,
         walletProvider: action.payload.walletProvider,

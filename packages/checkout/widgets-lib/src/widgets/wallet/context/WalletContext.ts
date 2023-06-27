@@ -51,7 +51,7 @@ type ActionPayload =
 export enum WalletActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
-  SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
+  SET_WALLET_PROVIDER = 'SET_WALLET_PROVIDER',
   SET_NETWORK = 'SET_NETWORK',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_SUPPORTED_TOP_UPS = 'SUPPORTED_TOP_UPS',
@@ -68,7 +68,7 @@ export interface SetProviderPayload {
 }
 
 export interface SetWalletProviderPayload {
-  type: WalletActions.SET_PROVIDER_PREFERENCE;
+  type: WalletActions.SET_WALLET_PROVIDER;
   walletProvider: WalletProviderName;
 }
 
@@ -112,7 +112,7 @@ export const walletReducer: Reducer<WalletState, WalletAction> = (
         ...state,
         provider: action.payload.provider,
       };
-    case WalletActions.SET_PROVIDER_PREFERENCE:
+    case WalletActions.SET_WALLET_PROVIDER:
       return {
         ...state,
         walletProvider: action.payload.walletProvider,

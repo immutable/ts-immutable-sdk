@@ -60,7 +60,7 @@ export enum SwapActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_EXCHANGE = 'SET_EXCHANGE',
   SET_PROVIDER = 'SET_PROVIDER',
-  SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
+  SET_WALLET_PROVIDER = 'SET_WALLET_PROVIDER',
   SET_NETWORK = 'SET_NETWORK',
   SET_SUPPORTED_TOP_UPS = 'SET_SUPPORTED_TOP_UPS',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
@@ -83,7 +83,7 @@ export interface SetProviderPayload {
 }
 
 export interface SetWalletProviderPayload {
-  type: SwapActions.SET_PROVIDER_PREFERENCE;
+  type: SwapActions.SET_WALLET_PROVIDER;
   walletProvider: WalletProviderName;
 }
 
@@ -137,7 +137,7 @@ export const swapReducer: Reducer<SwapState, SwapAction> = (
         ...state,
         provider: action.payload.provider,
       };
-    case SwapActions.SET_PROVIDER_PREFERENCE:
+    case SwapActions.SET_WALLET_PROVIDER:
       return {
         ...state,
         walletProvider: action.payload.walletProvider,
