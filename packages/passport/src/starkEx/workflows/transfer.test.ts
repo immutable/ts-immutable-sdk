@@ -1,7 +1,7 @@
 import { TransfersApi, UnsignedTransferRequest } from '@imtbl/core-sdk';
 import * as guardian from '@imtbl/guardian';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
-import { mockErrorMessage, mockStarkSignature, mockUserWithEtherKey } from '../../test/mocks';
+import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
 import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
 
@@ -62,7 +62,7 @@ describe('transfer', () => {
         getSignableTransferRequest: {
           amount: '1',
           receiver: mockReceiver,
-          sender: mockUserWithEtherKey.etherKey,
+          sender: mockUserImx.imx.ethAddress,
           token: {
             data: { token_address: tokenAddress, token_id: tokenId },
             type,
@@ -95,7 +95,7 @@ describe('transfer', () => {
       const mockHeader = {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          Authorization: `Bearer ${mockUserWithEtherKey.accessToken}`,
+          Authorization: `Bearer ${mockUserImx.accessToken}`,
         },
       };
       const mockReturnValue = {
@@ -130,7 +130,7 @@ describe('transfer', () => {
       const result = await transfer({
         transfersApi: transferApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         request: mockTransferRequest as UnsignedTransferRequest,
         imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
@@ -154,7 +154,7 @@ describe('transfer', () => {
         getSignableTransferRequest: {
           amount: '1',
           receiver: mockReceiver,
-          sender: mockUserWithEtherKey.etherKey,
+          sender: mockUserImx.imx.ethAddress,
           token: {
             data: { token_address: tokenAddress, token_id: tokenId },
             type,
@@ -187,7 +187,7 @@ describe('transfer', () => {
       const mockHeader = {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          Authorization: `Bearer ${mockUserWithEtherKey.accessToken}`,
+          Authorization: `Bearer ${mockUserImx.accessToken}`,
         },
       };
       const mockReturnValue = {
@@ -223,7 +223,7 @@ describe('transfer', () => {
       const result = await transfer({
         transfersApi: transferApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         request: mockTransferRequest as UnsignedTransferRequest,
         imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
@@ -246,7 +246,7 @@ describe('transfer', () => {
       await expect(() => transfer({
         transfersApi: transferApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         request: mockTransferRequest as UnsignedTransferRequest,
         imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
@@ -293,7 +293,7 @@ describe('transfer', () => {
       await expect(() => transfer({
         transfersApi: transferApiMock,
         starkSigner: mockStarkSigner,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         request: mockTransferRequest as UnsignedTransferRequest,
         imxPublicApiDomain: mockGuardianDomain,
         confirmationScreen: mockConfirmationScreen,
@@ -370,7 +370,7 @@ describe('transfer', () => {
       });
 
       const result = await batchNftTransfer({
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
@@ -382,7 +382,7 @@ describe('transfer', () => {
       });
       expect(getSignableTransferMock).toHaveBeenCalledWith({
         getSignableTransferRequestV2: {
-          sender_ether_key: mockUserWithEtherKey.etherKey,
+          sender_ether_key: mockUserImx.imx.ethAddress,
           signable_requests: [
             {
               amount: '1',
@@ -400,7 +400,7 @@ describe('transfer', () => {
       });
       expect(mockStarkSigner.signMessage).toHaveBeenCalled();
       expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUserWithEtherKey.accessToken,
+        mockUserImx.accessToken,
         {
           transactionType: TransactionTypes.createBatchTransfer,
           transactionData: expect.any(Object),
@@ -428,7 +428,7 @@ describe('transfer', () => {
         {
           headers: {
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            Authorization: `Bearer ${mockUserWithEtherKey.accessToken}`,
+            Authorization: `Bearer ${mockUserImx.accessToken}`,
           },
         },
       );
@@ -438,7 +438,7 @@ describe('transfer', () => {
       getSignableTransferMock.mockRejectedValue(new Error(mockErrorMessage));
 
       await expect(() => batchNftTransfer({
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
@@ -483,7 +483,7 @@ describe('transfer', () => {
       });
 
       await expect(() => batchNftTransfer({
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         starkSigner: mockStarkSigner,
         request: transferRequest,
         transfersApi: transferApiMock,
@@ -491,7 +491,7 @@ describe('transfer', () => {
       })).rejects.toThrowError('TRANSFER_ERROR');
 
       expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUserWithEtherKey.accessToken,
+        mockUserImx.accessToken,
         {
           transactionType: TransactionTypes.createBatchTransfer,
           transactionData: expect.any(Object),

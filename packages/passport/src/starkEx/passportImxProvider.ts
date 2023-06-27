@@ -19,7 +19,7 @@ import {
 } from '@imtbl/core-sdk';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { IMXProvider } from '@imtbl/provider';
-import { UserWithEtherKey } from '../types';
+import { UserImx } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
   batchNftTransfer,
@@ -32,7 +32,7 @@ import {
 import { ConfirmationScreen } from '../confirmation';
 
 export type PassportImxProviderInput = {
-  user: UserWithEtherKey;
+  user: UserImx;
   starkSigner: StarkSigner;
   immutableXClient: ImmutableXClient;
   confirmationScreen: ConfirmationScreen;
@@ -40,7 +40,7 @@ export type PassportImxProviderInput = {
 };
 
 export class PassportImxProvider implements IMXProvider {
-  private readonly user: UserWithEtherKey;
+  private readonly user: UserImx;
 
   private readonly starkSigner: StarkSigner;
 
@@ -183,6 +183,6 @@ export class PassportImxProvider implements IMXProvider {
   }
 
   getAddress(): Promise<string> {
-    return Promise.resolve(this.user.etherKey);
+    return Promise.resolve(this.user.imx.ethAddress);
   }
 }
