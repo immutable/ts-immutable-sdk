@@ -2,7 +2,7 @@ import { mount } from 'cypress/react18';
 import React from 'react';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { cy, it } from 'local-cypress';
-import { Checkout, ConnectionProviders, TokenInfo } from '@imtbl/checkout-sdk';
+import { Checkout, WalletProviderName, TokenInfo } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { WalletContext, WalletState } from '../../context/WalletContext';
@@ -47,7 +47,7 @@ describe('Network Menu', () => {
       }),
       network: null,
       provider: null,
-      providerPreference: ConnectionProviders.METAMASK,
+      walletProvider: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
     };
@@ -91,7 +91,7 @@ describe('Network Menu', () => {
         isSupported: false,
       },
       provider: {} as unknown as Web3Provider,
-      providerPreference: ConnectionProviders.METAMASK,
+      walletProvider: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
     };

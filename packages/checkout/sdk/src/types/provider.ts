@@ -6,6 +6,7 @@ import { Web3Provider } from '@ethersproject/providers';
 export enum WalletProviderName {
   METAMASK = 'metamask',
 }
+
 export interface CreateProviderParams {
   walletProvider: WalletProviderName;
 }

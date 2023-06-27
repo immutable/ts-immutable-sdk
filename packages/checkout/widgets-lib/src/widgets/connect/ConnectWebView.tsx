@@ -1,5 +1,4 @@
 import { Environment } from '@imtbl/config';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { CheckoutWidgets, ConnectReact } from '@imtbl/checkout-widgets';
 import { WidgetTheme } from '../../lib';
 
@@ -13,7 +12,7 @@ function ConnectWebView() {
 
   return (
     <div>
-      <ConnectReact walletProvider={WalletProviderName.METAMASK} />
+      <ConnectReact />
     </div>
   );
 }
