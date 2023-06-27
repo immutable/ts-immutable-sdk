@@ -103,6 +103,23 @@ describe('Bridge Form', () => {
       });
   });
 
+  it('should use name or name and address for option id', () => {
+    mount(
+      <BridgeWidgetTestComponent
+        initialStateOverride={bridgeState}
+        cryptoConversionsOverride={cryptoConversions}
+      >
+        <BridgeForm
+          testId="bridge-form"
+        />
+      </BridgeWidgetTestComponent>,
+    );
+
+    cySmartGet('bridge-token-select__target').click();
+    cySmartGet('bridge-token-coin-selector__option-eth').should('exist');
+    cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').should('exist');
+  });
+
   describe('Bridge Form submit', () => {
     it('should submit bridge and make required sdk calls', () => {
       cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
