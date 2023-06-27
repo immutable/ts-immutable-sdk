@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Contract, utils } from 'ethers';
+import { BigNumber, Contract, utils } from 'ethers';
 import {
   ChainId,
   ENVIRONMENT_L1_CHAIN_MAP,
@@ -12,7 +12,7 @@ import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
 import { getNetworkInfo } from '../network';
 import { CheckoutConfiguration } from '../config';
 import { CheckoutApiService } from '../service/checkoutApiService';
-import { getAllL2Tokens } from '../tokens';
+import { TokenBalancesResult } from '../service/checkoutApiServiceL1RpcNode';
 
 export const getBalance = async (
   config: CheckoutConfiguration,
@@ -75,19 +75,62 @@ export async function getERC20Balance(
   );
 }
 
-async function getAllL1Tokens(
+async function getL1Balances(
   checkoutApiService: CheckoutApiService,
   config: CheckoutConfiguration,
   walletAddress: string,
-): Promise<TokenInfo[]> {
+  chainId: ChainId,
+): Promise<GetBalanceResult[]> {
+  const balanceResult: GetBalanceResult[] = [];
+  const tokensMissingMetadata: TokenBalancesResult[] = [];
   const tokenList = await checkoutApiService
     .getL1RpcNode()
     .getTokenBalances({ walletAddress });
-  return tokenList.tokenBalances.map(
-    (token) => ({
-      address: token.contractAddress,
-    } as TokenInfo),
-  );
+  const { tokenBalances } = tokenList;
+
+  const cachedTokens = await config.remoteConfigFetcher.getTokens(chainId);
+
+  tokenBalances.forEach((tokenBalance: TokenBalancesResult) => {
+    const cachedToken = cachedTokens.find(
+      (token: TokenInfo) => token.address === tokenBalance.contractAddress,
+    );
+    if (cachedToken) {
+      balanceResult.push({
+        balance: BigNumber.from(tokenBalance.tokenBalance),
+        formattedBalance: utils.formatUnits(
+          tokenBalance.tokenBalance,
+          cachedToken.decimals,
+        ),
+        token: cachedToken,
+      });
+    } else {
+      tokensMissingMetadata.push(tokenBalance);
+    }
+  });
+
+  const metaDataForRestOfTheTokens = await checkoutApiService
+    .getL1RpcNode()
+    .getTokensMetadata({
+      tokens: tokensMissingMetadata.map((token) => token.contractAddress),
+    });
+
+  tokensMissingMetadata.forEach((token: TokenBalancesResult) => {
+    const tokenMetadata = metaDataForRestOfTheTokens.find(
+      (metaData) => metaData.address === token.contractAddress,
+    );
+    if (tokenMetadata) {
+      balanceResult.push({
+        balance: BigNumber.from(token.tokenBalance),
+        formattedBalance: utils.formatUnits(
+          token.tokenBalance,
+          tokenMetadata.decimals,
+        ),
+        token: tokenMetadata,
+      });
+    }
+  });
+
+  return balanceResult;
 }
 
 export const getAllBalances = async (
@@ -97,32 +140,35 @@ export const getAllBalances = async (
   walletAddress: string,
   chainId: ChainId,
 ): Promise<GetAllBalancesResult> => {
-  const tokenList = chainId === ENVIRONMENT_L1_CHAIN_MAP[config.environment]
-    ? await getAllL1Tokens(
+  if (chainId === ENVIRONMENT_L1_CHAIN_MAP[config.environment]) {
+    const balances = await getL1Balances(
       // if L1, fetch tokens from checkout api
       checkoutApiService,
       config,
       walletAddress,
-    )
-    : await getAllL2Tokens(config);
+      chainId,
+    );
+    return { balances };
+  }
 
-  const allBalancePromises: Promise<GetBalanceResult>[] = [];
-  allBalancePromises.push(getBalance(config, web3Provider, walletAddress));
-
-  tokenList
-    .filter((token: TokenInfo) => token.address)
-    .forEach((token: TokenInfo) => allBalancePromises.push(
-      getERC20Balance(web3Provider, walletAddress, token.address ?? ''),
-    ));
-
-  const balanceResults = await Promise.allSettled(allBalancePromises);
-  const getBalanceResults = (
-    balanceResults.filter(
-      (result) => result.status === 'fulfilled',
-    ) as PromiseFulfilledResult<GetBalanceResult>[]
-  ).map(
-    (fulfilledResult: PromiseFulfilledResult<GetBalanceResult>) => fulfilledResult.value,
-  ) as GetBalanceResult[];
-
-  return { balances: getBalanceResults };
+  return { balances: [] };
+  // const allBalancePromises: Promise<GetBalanceResult>[] = [];
+  // allBalancePromises.push(getBalance(config, web3Provider, walletAddress));
+  //
+  // tokenList
+  //   .filter((token: TokenInfo) => token.address)
+  //   .forEach((token: TokenInfo) => allBalancePromises.push(
+  //     getERC20Balance(web3Provider, walletAddress, token.address ?? ''),
+  //   ));
+  //
+  // const balanceResults = await Promise.allSettled(allBalancePromises);
+  // const getBalanceResults = (
+  //   balanceResults.filter(
+  //     (result) => result.status === 'fulfilled',
+  //   ) as PromiseFulfilledResult<GetBalanceResult>[]
+  // ).map(
+  //   (fulfilledResult: PromiseFulfilledResult<GetBalanceResult>) => fulfilledResult.value,
+  // ) as GetBalanceResult[];
+  //
+  // return { balances: getBalanceResults };
 };
