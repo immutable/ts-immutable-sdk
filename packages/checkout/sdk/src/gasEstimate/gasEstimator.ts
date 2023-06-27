@@ -49,7 +49,7 @@ async function bridgeToL2GasEstimator(
   const fromChainId = getL1ChainId(config.environment);
   const toChainId = getL2ChainId(config.environment);
 
-  const gasEstimateTokensConfig = (await config.remoteConfigFetcher.get(
+  const gasEstimateTokensConfig = (await config.remoteConfigFetcher.getConfig(
     'gasEstimateTokens',
   )) as GasEstimateTokenConfig;
 
@@ -110,7 +110,7 @@ async function swapGasEstimator(
 ): Promise<GasEstimateSwapResult> {
   const chainId = getL2ChainId(config.environment);
 
-  const gasEstimateTokensConfig = (await config.remoteConfigFetcher.get(
+  const gasEstimateTokensConfig = (await config.remoteConfigFetcher.getConfig(
     'gasEstimateTokens',
   )) as GasEstimateTokenConfig;
 

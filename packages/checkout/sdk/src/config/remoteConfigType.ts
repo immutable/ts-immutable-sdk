@@ -1,5 +1,6 @@
 import { ExchangeOverrides } from '@imtbl/dex-sdk';
 import { Environment } from '@imtbl/config';
+import { TokenInfo } from '../types';
 
 export type AllowedNetworkConfig = {
   chainId: number;
@@ -31,6 +32,13 @@ export type IndexerConfig = {
     rootUrl: string;
     tokensPath: string;
   }[];
+};
+
+export type ConfiguredTokens = {
+  [key: string]: {
+    allowed?: TokenInfo[];
+    metadata?: TokenInfo[];
+  };
 };
 
 export type RemoteConfiguration = {

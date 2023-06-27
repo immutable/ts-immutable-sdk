@@ -57,7 +57,7 @@ describe('network functions', () => {
     jest.clearAllMocks();
 
     (RemoteConfigFetcher as jest.Mock).mockReturnValue({
-      get: jest.fn().mockResolvedValue([
+      getConfig: jest.fn().mockResolvedValue([
         {
           chainId: 1,
         },
