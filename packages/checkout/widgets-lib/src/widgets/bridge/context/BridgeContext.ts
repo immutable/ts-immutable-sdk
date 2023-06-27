@@ -43,7 +43,7 @@ export interface BridgeAction {
 type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
-  | SetProviderPreferencePayload
+  | SetWalletProviderPayload
   | SetTokenBridgePayload
   | SetNetworkPayload
   | SetToNetworkPayload
@@ -71,7 +71,7 @@ export interface SetProviderPayload {
   provider: Web3Provider;
 }
 
-export interface SetProviderPreferencePayload {
+export interface SetWalletProviderPayload {
   type: BridgeActions.SET_PROVIDER_PREFERENCE;
   walletProvider: WalletProviderName;
 }

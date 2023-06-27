@@ -50,7 +50,7 @@ type ActionPayload =
   | SetCheckoutPayload
   | SetExchangePayload
   | SetProviderPayload
-  | SetProviderPreferencePayload
+  | SetWalletProviderPayload
   | SetNetworkPayload
   | SetSupportedTopUpPayload
   | SetTokenBalancesPayload
@@ -82,7 +82,7 @@ export interface SetProviderPayload {
   provider: Web3Provider;
 }
 
-export interface SetProviderPreferencePayload {
+export interface SetWalletProviderPayload {
   type: SwapActions.SET_PROVIDER_PREFERENCE;
   walletProvider: WalletProviderName;
 }

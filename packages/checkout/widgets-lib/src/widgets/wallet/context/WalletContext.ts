@@ -43,7 +43,7 @@ export interface WalletAction {
 type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
-  | SetProviderPreferencePayload
+  | SetWalletProviderPayload
   | SetSwitchNetworkPayload
   | SetTokenBalancesPayload
   | SetSupportedTopUpPayload;
@@ -67,7 +67,7 @@ export interface SetProviderPayload {
   provider: Web3Provider;
 }
 
-export interface SetProviderPreferencePayload {
+export interface SetWalletProviderPayload {
   type: WalletActions.SET_PROVIDER_PREFERENCE;
   walletProvider: WalletProviderName;
 }
