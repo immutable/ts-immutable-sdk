@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { SharedViews } from '../../context/view-context/ViewContext';
@@ -244,7 +244,7 @@ export const text = {
     },
   },
   wallets: {
-    [ConnectionProviders.METAMASK]: {
+    [WalletProviderName.METAMASK]: {
       heading: 'MetaMask',
       description:
         'Digital wallet for accessing blockchain applications and web3',

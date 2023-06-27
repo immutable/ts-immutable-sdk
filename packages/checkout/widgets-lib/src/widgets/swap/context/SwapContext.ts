@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
-  ConnectionProviders,
+  WalletProviderName,
   GetBalanceResult,
   NetworkInfo,
   TokenInfo,
@@ -13,7 +13,7 @@ export interface SwapState {
   checkout: Checkout | null;
   exchange: Exchange | null;
   provider: Web3Provider | null;
-  providerPreference: ConnectionProviders | null;
+  walletProvider: WalletProviderName | null;
   network: NetworkInfo | null;
   tokenBalances: GetBalanceResult[];
   supportedTopUps: TopUpFeature | null;
@@ -30,7 +30,7 @@ export const initialSwapState: SwapState = {
   checkout: null,
   exchange: null,
   provider: null,
-  providerPreference: null,
+  walletProvider: null,
   network: null,
   tokenBalances: [],
   supportedTopUps: null,
@@ -50,7 +50,7 @@ type ActionPayload =
   | SetCheckoutPayload
   | SetExchangePayload
   | SetProviderPayload
-  | SetProviderPreferencePayload
+  | SetWalletProviderPayload
   | SetNetworkPayload
   | SetSupportedTopUpPayload
   | SetTokenBalancesPayload
@@ -60,7 +60,7 @@ export enum SwapActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_EXCHANGE = 'SET_EXCHANGE',
   SET_PROVIDER = 'SET_PROVIDER',
-  SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
+  SET_WALLET_PROVIDER = 'SET_WALLET_PROVIDER',
   SET_NETWORK = 'SET_NETWORK',
   SET_SUPPORTED_TOP_UPS = 'SET_SUPPORTED_TOP_UPS',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
@@ -82,9 +82,9 @@ export interface SetProviderPayload {
   provider: Web3Provider;
 }
 
-export interface SetProviderPreferencePayload {
-  type: SwapActions.SET_PROVIDER_PREFERENCE;
-  providerPreference: ConnectionProviders;
+export interface SetWalletProviderPayload {
+  type: SwapActions.SET_WALLET_PROVIDER;
+  walletProvider: WalletProviderName;
 }
 
 export interface SetNetworkPayload {
@@ -137,10 +137,10 @@ export const swapReducer: Reducer<SwapState, SwapAction> = (
         ...state,
         provider: action.payload.provider,
       };
-    case SwapActions.SET_PROVIDER_PREFERENCE:
+    case SwapActions.SET_WALLET_PROVIDER:
       return {
         ...state,
-        providerPreference: action.payload.providerPreference,
+        walletProvider: action.payload.walletProvider,
       };
     case SwapActions.SET_NETWORK:
       return {
