@@ -10,13 +10,13 @@ import {
 } from '@imtbl/core-sdk';
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
-import { UserWithEtherKey } from '../../types';
+import { UserImx } from '../../types';
 import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
 
 type CancelOrderParams = {
   request: GetSignableCancelOrderRequest;
   ordersApi: OrdersApi;
-  user: UserWithEtherKey;
+  user: UserImx;
   starkSigner: StarkSigner;
   confirmationScreen: ConfirmationScreen;
 };
@@ -24,7 +24,7 @@ type CancelOrderParams = {
 type CreateOrderParams = {
   request: UnsignedOrderRequest;
   ordersApi: OrdersApi;
-  user: UserWithEtherKey;
+  user: UserImx;
   starkSigner: StarkSigner;
   confirmationScreen: ConfirmationScreen;
 };
@@ -39,7 +39,7 @@ export async function createOrder({
   confirmationScreen,
 }: CreateOrderParams): Promise<CreateOrderResponse> {
   return withPassportError<CreateOrderResponse>(async () => {
-    const ethAddress = user.etherKey;
+    const { ethAddress } = user.imx;
     const amountSell = request.sell.type === ERC721 ? '1' : request.sell.amount;
     const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
     const getSignableOrderRequestV3: GetSignableOrderRequest = {

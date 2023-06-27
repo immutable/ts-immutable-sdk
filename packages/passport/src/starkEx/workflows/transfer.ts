@@ -14,13 +14,13 @@ import * as guardian from '@imtbl/guardian';
 import { retryWithDelay } from '../retry';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
-import { UserWithEtherKey } from '../../types';
+import { UserImx } from '../../types';
 
 const ERC721 = 'ERC721';
 
 type TransferRequest = {
   request: UnsignedTransferRequest;
-  user: UserWithEtherKey;
+  user: UserImx;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
   imxPublicApiDomain: string;
@@ -29,7 +29,7 @@ type TransferRequest = {
 
 type BatchTransfersParams = {
   request: Array<NftTransferDetails>;
-  user: UserWithEtherKey;
+  user: UserImx;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
   confirmationScreen: ConfirmationScreen;
@@ -106,7 +106,7 @@ TransferRequest): Promise<CreateTransferResponseV1> {
   return withPassportError<CreateTransferResponseV1>(async () => {
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
     const getSignableTransferRequest: GetSignableTransferRequestV1 = {
-      sender: user.etherKey,
+      sender: user.imx.ethAddress,
       token: convertToSignableToken(request),
       amount: transferAmount,
       receiver: request.receiver,
@@ -173,7 +173,7 @@ export async function batchNftTransfer({
   confirmationScreen,
 }: BatchTransfersParams): Promise<CreateTransferResponse> {
   return withPassportError<CreateTransferResponse>(async () => {
-    const ethAddress = user.etherKey;
+    const { ethAddress } = user.imx;
 
     const signableRequests = request.map(
       (nftTransfer): SignableTransferDetails => ({

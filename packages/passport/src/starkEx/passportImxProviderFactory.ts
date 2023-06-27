@@ -8,7 +8,7 @@ import { PassportConfiguration } from '../config';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
-import { User, UserWithEtherKey } from '../types';
+import { User, UserImx } from '../types';
 import { PassportImxProvider } from './passportImxProvider';
 import { getStarkSigner } from './getStarkSigner';
 
@@ -74,10 +74,10 @@ export class PassportImxProviderFactory {
     const ethSigner = web3Provider.getSigner();
     const starkSigner = await getStarkSigner(ethSigner);
 
-    if (!user.etherKey) {
-      const userWithEtherKey = await this.registerStarkEx(ethSigner, starkSigner, user.accessToken);
+    if (!user.imx?.ethAddress) {
+      const userImx = await this.registerStarkEx(ethSigner, starkSigner, user.accessToken);
       return new PassportImxProvider({
-        user: userWithEtherKey,
+        user: userImx,
         starkSigner,
         immutableXClient: this.immutableXClient,
         imxPublicApiDomain: this.config.imxPublicApiDomain,
@@ -86,7 +86,7 @@ export class PassportImxProviderFactory {
     }
 
     return new PassportImxProvider({
-      user: user as UserWithEtherKey,
+      user: user as UserImx,
       starkSigner,
       immutableXClient: this.immutableXClient,
       imxPublicApiDomain: this.config.imxPublicApiDomain,
@@ -95,7 +95,7 @@ export class PassportImxProviderFactory {
   }
 
   private async registerStarkEx(userAdminKeySigner: EthSigner, starkSigner: StarkSigner, jwt: string) {
-    return withPassportError<UserWithEtherKey>(async () => {
+    return withPassportError<UserImx>(async () => {
       await registerPassportStarkEx(
         {
           ethSigner: userAdminKeySigner,
@@ -108,14 +108,14 @@ export class PassportImxProviderFactory {
       // User metadata is updated asynchronously. Poll userinfo endpoint until it is updated.
       const updatedUser = await retryWithDelay<User | null>(async () => {
         const user = await this.authManager.loginSilent();
-        const metadataExists = !!user?.etherKey && !!user?.starkKey && !!user?.userAdminKey;
+        const metadataExists = !!user?.imx;
         if (metadataExists) {
           return user;
         }
         return Promise.reject(new Error('user wallet addresses not exist'));
       });
 
-      return updatedUser as UserWithEtherKey;
+      return updatedUser as UserImx;
     }, PassportErrorType.REFRESH_TOKEN_ERROR);
   }
 }
