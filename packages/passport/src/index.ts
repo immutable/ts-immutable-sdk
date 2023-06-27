@@ -1,5 +1,5 @@
-import { PassportError } from './errors/passportError';
-import { Passport } from './Passport';
-import { PassportModuleConfiguration } from './types';
-
-export { Passport, PassportError, PassportModuleConfiguration };
+export { PassportError } from './errors/passportError';
+export { Passport } from './Passport';
+export {
+  UserProfile, Networks, PassportOverrides, PassportModuleConfiguration,
+} from './types';

@@ -10,8 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - @imtbl/blockchain-data: Added ListTokens and GetToken methods
+- @imtbl/passport: Exposes Networks, UserProfile & PassportOverrides types
 
 ### Fixed
+
 - @imtbl/passport: Fixed the confirmation popup being blocked by browser issue
 
 ### Changed
