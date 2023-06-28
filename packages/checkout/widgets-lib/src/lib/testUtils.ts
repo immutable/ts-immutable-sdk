@@ -29,7 +29,7 @@ export const cySmartGet = (selector: string) => (selector.includes('@') || selec
   ? cy.get(selector)
   : cyGetByTestId(selector));
 
-export const cyInterceptCheckoutApi = (overrides?: {
+export const cyIntercept = (overrides?: {
   configOverrides?: {},
   cryptoFiatOverrides?: {
     coins?: any[],

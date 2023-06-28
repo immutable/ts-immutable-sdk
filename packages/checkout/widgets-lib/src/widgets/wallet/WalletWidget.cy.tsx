@@ -9,7 +9,7 @@ import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
 import { WalletWidget } from './WalletWidget';
-import { cyInterceptCheckoutApi, cySmartGet } from '../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { text } from '../../resources/text/textConfig';
@@ -18,7 +18,7 @@ import { WalletWidgetViews } from '../../context/view-context/WalletViewContextT
 describe('WalletWidget tests', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
-    cyInterceptCheckoutApi();
+    cyIntercept();
   });
 
   const mockProvider = {

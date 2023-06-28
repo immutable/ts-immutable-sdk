@@ -9,13 +9,13 @@ import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { WalletBalances } from './WalletBalances';
 import { WalletContext, WalletState } from '../context/WalletContext';
-import { cyInterceptCheckoutApi, cySmartGet } from '../../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { WalletWidgetTestComponent } from '../test-components/WalletWidgetTestComponent';
 
 describe('WalletBalances', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
-    cyInterceptCheckoutApi();
+    cyIntercept();
   });
 
   const checkout = new Checkout({
