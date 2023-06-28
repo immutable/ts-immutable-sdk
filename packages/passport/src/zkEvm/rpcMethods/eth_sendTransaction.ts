@@ -28,7 +28,7 @@ export const ethSendTransaction = async ({
   const magicWeb3Provider = new Web3Provider(magicProvider);
   const signer = magicWeb3Provider.getSigner();
 
-  const nonce = await getNonce(jsonRpcProvider, user.etherKey);
+  const nonce = await getNonce(jsonRpcProvider, user.zkEvm.ethAddress);
   const sequenceTransaction: Transaction = {
     to: transactionRequest.to,
     data: transactionRequest.data,
@@ -41,12 +41,12 @@ export const ethSendTransaction = async ({
     [sequenceTransaction],
     nonce,
     chainId,
-    user.etherKey,
+    user.zkEvm.ethAddress,
     signer,
   );
 
   // TODO: ID-698 Add support for non-native gas payments (e.g ERC20, feeTransaction initialisation must change)
-  const feeOptions = await relayerAdapter.imGetFeeOptions(user.etherKey, signedTransaction);
+  const feeOptions = await relayerAdapter.imGetFeeOptions(user.zkEvm.ethAddress, signedTransaction);
   const imxFeeOption = feeOptions.find((feeOption) => feeOption.tokenSymbol === 'IMX');
   if (!imxFeeOption) {
     throw new Error('Failed to retrieve fees for IMX token');
@@ -63,7 +63,7 @@ export const ethSendTransaction = async ({
     [sequenceTransaction, sequenceFeeTransaction],
     nonce,
     chainId,
-    user.etherKey,
+    user.zkEvm.ethAddress,
     signer,
   );
 
