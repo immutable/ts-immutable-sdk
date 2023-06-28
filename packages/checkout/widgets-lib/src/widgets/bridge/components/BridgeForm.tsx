@@ -2,7 +2,7 @@ import {
   Box, Button, Heading, OptionKey,
 } from '@biom3/react';
 import {
-  CheckoutErrorType, GasEstimateBridgeToL2Result, GasEstimateType, GetBalanceResult, TokenInfo,
+  CheckoutErrorType, GasEstimateBridgeToL2Result, GasEstimateType, GetBalanceResult,
 } from '@imtbl/checkout-sdk';
 import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
@@ -45,7 +45,7 @@ export function BridgeForm(props: BridgeFormProps) {
       provider,
       checkout,
       tokenBridge,
-      network,
+      // network,
       tokenBalances,
       allowedTokens,
     },
@@ -73,7 +73,6 @@ export function BridgeForm(props: BridgeFormProps) {
   const [approvalTransaction, setApprovalTransaction] = useState<ApproveBridgeResponse | undefined>(undefined);
   const [unsignedBridgeTransaction,
     setUnsignedBridgeTransaction] = useState<BridgeDepositResponse | undefined>(undefined);
-  const [tokenAddress, setTokenAddress] = useState<string>('');
   const [tokensOptions, setTokensOptions] = useState<CoinSelectorOptionProps[]>([]);
 
   // Not enough ETH to cover gas
@@ -90,8 +89,13 @@ export function BridgeForm(props: BridgeFormProps) {
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
+    // WT-1350 removing ETH as possible bridge option from being selected
+    // balance > 0 AND token is not ETH
     const options = tokenBalances
-      .filter((b) => b.balance.gt(0))
+      .filter((b) => b.balance.gt(0)
+      && b.token?.address
+      && b.token?.address !== 'NATIVE'
+      && b.token.address !== '')
       .map(
         (t) => ({
           id: formatTokenOptionsId(t.token.symbol, t.token.address),
@@ -129,40 +133,40 @@ export function BridgeForm(props: BridgeFormProps) {
   ]);
 
   const selectedOption = useMemo(
-    () => (token && token ? formatTokenOptionsId(token.token.symbol, token.token.address) : undefined),
+    () => (token
+      && token.token?.address
+      && token
+      ? formatTokenOptionsId(token.token.symbol, token.token.address)
+      : undefined),
     [token, tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId],
   );
-
-  const getTokenAddress = (selectedToken?: TokenInfo) => ((selectedToken?.address === ''
-    || selectedToken?.address === undefined)
-    ? 'NATIVE'
-    : selectedToken.address);
 
   const canFetchEstimates = (): boolean => {
     if (Number.isNaN(parseFloat(amount))) return false;
     if (parseFloat(amount) <= 0) return false;
     if (!token) return false;
+    if (!token.token?.address) return false;
     if (isFetching) return false;
     return true;
   };
 
   const getUnsignedTransactions = async ()
   : Promise<{ approveRes: ApproveBridgeResponse, bridgeTxn:BridgeDepositResponse } | undefined> => {
-    if (!checkout || !provider || !tokenBridge || !token || !tokenAddress) return;
+    if (!checkout || !provider || !tokenBridge || !token || !token.token?.address) return;
 
     const depositorAddress = await provider.getSigner().getAddress();
     const depositAmount = utils.parseUnits(amount, token.token.decimals);
 
     const approveRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx({
       depositorAddress,
-      token: tokenAddress,
+      token: token.token.address,
       depositAmount,
     });
 
     const bridgeTxn: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx({
       depositorAddress,
       recipientAddress: depositorAddress,
-      token: tokenAddress,
+      token: token.token.address,
       depositAmount,
     });
 
@@ -228,10 +232,6 @@ export function BridgeForm(props: BridgeFormProps) {
       ? parseEther(amount)
       : BigNumber.from('0');
 
-    // console.log('tokenIsEth', tokenIsEth);
-    // console.log('gasAmount', gasAmount.toString());
-    // console.log('additionalAmount', additionalAmount.toString());
-
     return gasAmount.add(additionalAmount).gt(ethBalance.balance);
   }, [gasFee, tokenBalances, token, amount]);
 
@@ -282,34 +282,9 @@ export function BridgeForm(props: BridgeFormProps) {
     const selected = tokenBalances.find((t) => value === formatTokenOptionsId(t.token.symbol, t.token.address));
     if (!selected) return;
 
-    setTokenAddress(getTokenAddress(selected.token));
     setToken(selected);
     setTokenError('');
   };
-
-  /**
-   * This effect is used to set the default token option
-   * Set as the token that is passed in as a prop if it (is allowed and) has an available balance
-   * Otherwise will default to the native currency of the chain
-   * If the user does not have any non-zero balances, this will not be set
-   */
-  useEffect(() => {
-    let defaultToken: GetBalanceResult | undefined;
-    if (defaultTokenAddress) {
-      defaultToken = tokenBalances.find(
-        (balance) => balance.token.address === defaultTokenAddress,
-      );
-    }
-
-    if (!defaultToken) {
-      defaultToken = tokenBalances.find(
-        (balance) => balance.token.symbol === network?.nativeCurrency.symbol,
-      );
-    }
-
-    setToken(defaultToken || undefined);
-    setTokenAddress(getTokenAddress(defaultToken?.token));
-  }, [tokenBalances, network, defaultTokenAddress]);
 
   useEffect(() => {
     cryptoFiatDispatch({
@@ -371,7 +346,7 @@ export function BridgeForm(props: BridgeFormProps) {
                 approveTransaction: approvalTransaction,
                 transaction: unsignedBridgeTransaction,
                 bridgeFormInfo: {
-                  tokenAddress,
+                  tokenAddress: token.token?.address ?? '',
                   amount,
                 },
               },

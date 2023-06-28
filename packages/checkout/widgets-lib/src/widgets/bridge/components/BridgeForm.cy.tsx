@@ -15,6 +15,7 @@ import { text } from '../../../resources/text/textConfig';
 describe('Bridge Form', () => {
   let bridgeState;
   let cryptoConversions;
+  const imxAddress = '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff';
   beforeEach(() => {
     cy.viewport('ipad-2');
     cy.intercept('https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia', []);
@@ -60,7 +61,7 @@ describe('Bridge Form', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            address: imxAddress,
           },
         },
         {
@@ -86,7 +87,7 @@ describe('Bridge Form', () => {
           name: 'IMX',
           symbol: 'IMX',
           decimals: 18,
-          address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          address: imxAddress,
         },
         {
           name: 'RandomAllowedToken',
@@ -123,7 +124,7 @@ describe('Bridge Form', () => {
     );
 
     cySmartGet('bridge-token-select__target').click();
-    cySmartGet('bridge-token-coin-selector__option-eth').should('exist');
+    cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').should('exist');
     cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').should('exist');
   });
 
@@ -183,7 +184,7 @@ describe('Bridge Form', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-eth').click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
 
@@ -228,21 +229,21 @@ describe('Bridge Form', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-eth').click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
       cySmartGet('bridge-form-button').click();
 
       cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
         depositorAddress: '0x123',
-        token: 'NATIVE',
+        token: imxAddress,
         depositAmount: utils.parseUnits('0.1', 18),
       });
 
       cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
         depositorAddress: '0x123',
         recipientAddress: '0x123',
-        token: 'NATIVE',
+        token: imxAddress,
         depositAmount: utils.parseUnits('0.1', 18),
       });
 
@@ -286,21 +287,21 @@ describe('Bridge Form', () => {
           });
 
         cySmartGet('bridge-token-select__target').click();
-        cySmartGet('bridge-token-coin-selector__option-eth').click();
+        cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
         cySmartGet('bridge-amount-text__input').type('0.1');
         cySmartGet('bridge-amount-text__input').blur();
         cySmartGet('bridge-form-button').click();
 
         cySmartGet('@getUnsignedApproveBridgeTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
           depositorAddress: '0x123',
-          token: 'NATIVE',
+          token: imxAddress,
           depositAmount: utils.parseUnits('0.1', 18),
         });
 
         cySmartGet('@getUnsignedDepositTxStub').should('have.been.calledOnce').should('have.been.calledWith', {
           depositorAddress: '0x123',
           recipientAddress: '0x123',
-          token: 'NATIVE',
+          token: imxAddress,
           depositAmount: utils.parseUnits('0.1', 18),
         });
 
@@ -338,7 +339,7 @@ describe('Bridge Form', () => {
                 name: 'IMX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                address: imxAddress,
               },
             }],
         };
@@ -383,7 +384,7 @@ describe('Bridge Form', () => {
             <BridgeForm
               testId="bridge-form"
               defaultAmount="0.1"
-              defaultTokenAddress="0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF"
+              defaultTokenAddress={imxAddress}
             />
           </BridgeWidgetTestComponent>,
         );
@@ -397,88 +398,90 @@ describe('Bridge Form', () => {
         cySmartGet('not-enough-gas-cancel-button').should('exist');
       });
 
-      it('should show NotEnoughEth when user is bridging too much ETH', () => {
-        const { heading } = text.drawers.notEnoughGas.content;
-        const bridgeStateWithoutETH = {
-          ...bridgeState,
-          tokenBalances: [
-            {
-              balance: BigNumber.from('100000000000000000'),
-              formattedBalance: '0.1',
-              token: {
-                name: 'ETH',
-                symbol: 'ETH',
-                decimals: 18,
-              },
-            },
-            {
-              balance: BigNumber.from('100000000000000000'),
-              formattedBalance: '0.1',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-              },
-            }],
-        };
+      // WT-1350 Add test back in when native ETH bridges are supported
 
-        cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
-          .resolves({
-            required: false,
-          });
+      // it('should show NotEnoughEth when user is bridging too much ETH', () => {
+      //   const { heading } = text.drawers.notEnoughGas.content;
+      //   const bridgeStateWithoutETH = {
+      //     ...bridgeState,
+      //     tokenBalances: [
+      //       {
+      //         balance: BigNumber.from('100000000000000000'),
+      //         formattedBalance: '0.1',
+      //         token: {
+      //           name: 'ETH',
+      //           symbol: 'ETH',
+      //           decimals: 18,
+      //         },
+      //       },
+      //       {
+      //         balance: BigNumber.from('100000000000000000'),
+      //         formattedBalance: '0.1',
+      //         token: {
+      //           name: 'IMX',
+      //           symbol: 'IMX',
+      //           decimals: 18,
+      //           address: imxAddress,
+      //         },
+      //       }],
+      //   };
 
-        cy.stub(TokenBridge.prototype, 'getUnsignedDepositTx').as('getUnsignedDepositTxStub')
-          .resolves({
-            required: true,
-            unsignedTx: {},
-          });
+      //   cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+      //     .resolves({
+      //       required: false,
+      //     });
 
-        cy.stub(Checkout.prototype, 'gasEstimate').as('gasEstimateStub')
-          .resolves({
-            gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-            bridgeFee: {
-              estimatedAmount: utils.parseEther('0.0001'),
-            },
-            gasFee: {
-              estimatedAmount: utils.parseEther('0.0001'),
-            },
-            bridgeable: true,
-          });
+      //   cy.stub(TokenBridge.prototype, 'getUnsignedDepositTx').as('getUnsignedDepositTxStub')
+      //     .resolves({
+      //       required: true,
+      //       unsignedTx: {},
+      //     });
 
-        cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
-          .resolves({
-            transactionResponse: {
-              wait: () => ({
-                status: 1,
-              }),
-            },
-          });
+      //   cy.stub(Checkout.prototype, 'gasEstimate').as('gasEstimateStub')
+      //     .resolves({
+      //       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+      //       bridgeFee: {
+      //         estimatedAmount: utils.parseEther('0.0001'),
+      //       },
+      //       gasFee: {
+      //         estimatedAmount: utils.parseEther('0.0001'),
+      //       },
+      //       bridgeable: true,
+      //     });
 
-        mount(
-          <BridgeWidgetTestComponent
-            initialStateOverride={bridgeStateWithoutETH}
-            cryptoConversionsOverride={cryptoConversions}
-          >
-            <BridgeForm
-              testId="bridge-form"
-              defaultAmount="0.1"
-              defaultTokenAddress=""
-            />
-          </BridgeWidgetTestComponent>,
-        );
+      //   cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+      //     .resolves({
+      //       transactionResponse: {
+      //         wait: () => ({
+      //           status: 1,
+      //         }),
+      //       },
+      //     });
 
-        cySmartGet('bridge-token-select__target').click();
-        cySmartGet('bridge-token-coin-selector__option-eth').click();
+      //   mount(
+      //     <BridgeWidgetTestComponent
+      //       initialStateOverride={bridgeStateWithoutETH}
+      //       cryptoConversionsOverride={cryptoConversions}
+      //     >
+      //       <BridgeForm
+      //         testId="bridge-form"
+      //         defaultAmount="0.1"
+      //         defaultTokenAddress=""
+      //       />
+      //     </BridgeWidgetTestComponent>,
+      //   );
 
-        cySmartGet('bridge-form-button').click();
-        cySmartGet('@sendTransactionStub').should('not.have.been.called');
-        cySmartGet('not-enough-gas-bottom-sheet').should('exist').should('be.visible');
-        cySmartGet('not-enough-gas-heading').should('be.visible').should('have.text', heading);
-        cySmartGet('not-enough-gas-adjust-amount-button').should('exist');
-        cySmartGet('not-enough-gas-copy-address-button').should('exist');
-        cySmartGet('not-enough-gas-cancel-button').should('exist');
-      });
+      //   cySmartGet('bridge-token-select__target').click();
+      //   cySmartGet('bridge-token-coin-selector__option-eth').click();
+
+      //   cySmartGet('bridge-form-button').click();
+      //   cySmartGet('@sendTransactionStub').should('not.have.been.called');
+      //   cySmartGet('not-enough-gas-bottom-sheet').should('exist').should('be.visible');
+      //   cySmartGet('not-enough-gas-heading').should('be.visible').should('have.text', heading);
+      //   cySmartGet('not-enough-gas-adjust-amount-button').should('exist');
+      //   cySmartGet('not-enough-gas-copy-address-button').should('exist');
+      //   cySmartGet('not-enough-gas-cancel-button').should('exist');
+      // });
     });
   });
 });
