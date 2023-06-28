@@ -1,5 +1,6 @@
 import { ExchangeOverrides } from '@imtbl/dex-sdk';
 import { Environment } from '@imtbl/config';
+import { TokenInfo } from '../types';
 
 export type AllowedNetworkConfig = {
   chainId: number;
@@ -23,6 +24,7 @@ export type GasEstimateTokenConfig = {
 
 export type DexConfig = {
   overrides?: ExchangeOverrides;
+  tokens?: TokenInfo[];
 };
 
 export type RemoteConfiguration = {

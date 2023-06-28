@@ -45,6 +45,16 @@ describe('token related functions', () => {
             symbol: 'BB',
           },
         ]),
+        getConfig: jest.fn().mockResolvedValue({
+          tokens: [
+            {
+              address: '0x2',
+              decimals: 18,
+              name: 'token-bb-testnet',
+              symbol: 'BB',
+            },
+          ],
+        }),
       });
       config = new CheckoutConfiguration({
         baseConfig: { environment: Environment.SANDBOX },
@@ -55,6 +65,7 @@ describe('token related functions', () => {
       {
         text: 'tokens with no filters (ALL type)',
         type: TokenFilterTypes.ALL,
+        chainId: ChainId.SEPOLIA,
         exclude: [],
         result: [
           {
@@ -74,7 +85,21 @@ describe('token related functions', () => {
       {
         text: 'exclude list on chain',
         type: TokenFilterTypes.ALL,
-        exclude: [{ address: '0x1' }],
+        chainId: ChainId.SEPOLIA,
+        exclude: [{ address: '0x2' }],
+        result: [
+          {
+            address: '0x1',
+            decimals: 18,
+            name: 'token-aa-testnet',
+            symbol: 'AA',
+          },
+        ],
+      },
+      {
+        text: 'tokens with SWAP filter',
+        type: TokenFilterTypes.SWAP,
+        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
         result: [
           {
             address: '0x2',
@@ -92,7 +117,7 @@ describe('token related functions', () => {
           await getTokenAllowList(config, {
             type: testcase.type,
             exclude: testcase.exclude,
-            chainId: ChainId.SEPOLIA,
+            chainId: testcase.chainId,
           }),
         ).toEqual({
           tokens: testcase.result,

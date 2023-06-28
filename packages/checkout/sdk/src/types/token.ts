@@ -37,6 +37,8 @@ export interface GetTokenAllowListResult {
  */
 export enum TokenFilterTypes {
   ALL = 'all',
+  SWAP = 'swap',
+  BRIDGE = 'bridge',
 }
 
 /**
