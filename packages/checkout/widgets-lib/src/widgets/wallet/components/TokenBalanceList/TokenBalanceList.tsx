@@ -14,7 +14,7 @@ export function TokenBalanceList(props: TokenBalanceListProps) {
 
   return (
     <Box sx={tokenBalanceListStyle}>
-      {balanceInfoItems.length === 0 && <Body>{noTokensFound}</Body>}
+      {balanceInfoItems.length === 0 && <Body testId="no-tokens-found">{noTokensFound}</Body>}
       {balanceInfoItems.map((balance) => (
         <BalanceItem key={balance.id} balanceInfo={balance} />
       ))}
