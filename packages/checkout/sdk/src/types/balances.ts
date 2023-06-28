@@ -5,6 +5,7 @@ import { TokenInfo } from './tokenInfo';
 
 /**
  * Interface representing the parameters for {@link Checkout.getBalance}.
+ * @property {Web3Provider} provider - The provider used to get the balance.
  * @property {string} walletAddress - The wallet address.
  * @property {string | undefined} contractAddress - The contract address of the token.
  */
@@ -28,6 +29,7 @@ export interface GetBalanceResult {
 
 /**
  * Interface representing the parameters for {@link Checkout.getAllBalances}.
+ * @property {Web3Provider} provider - The provider used to get the balances.
  * @property {string} walletAddress - The wallet address.
  * @property {ChainId} chainId - The ID of the network.
  */
@@ -45,6 +47,12 @@ export interface GetAllBalancesResult {
   balances: GetBalanceResult[];
 }
 
+/**
+ * The ERC20ABI constant is an array of objects representing the functions and properties
+ * of an ERC20 token contract. Each object in the array represents a specific function or
+ * property of the contract, including its name, inputs, outputs, and type.
+ * @type {Array<Object>}
+ */
 export const ERC20ABI = [
   {
     constant: true,

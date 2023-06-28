@@ -6,9 +6,14 @@ import { NetworkInfo } from './networkInfo';
 import { ALCHEMY_PATH, CHECKOUT_API_BASE_URL } from './constants';
 
 /**
- * Object mapping the list of supported networks with the corresponding RPC urls.
+ * Represents a mapping of ChainId to RPC URL.
  */
 export type RpcUrlMap = Map<ChainId, string>;
+
+/**
+ * A map that contains the RPC URLs for different chain IDs.
+ * @type {RpcUrlMap}
+ */
 export const RPC_URL_MAP: RpcUrlMap = new Map<ChainId, string>([
   [
     ChainId.ETHEREUM,
@@ -130,8 +135,10 @@ export interface SwitchNetworkParams {
 }
 
 /**
- * Interface representing the result of {@link Checkout.switchNetwork}.
- * @property {NetworkInfo} network - The information of the network that was switched to.
+ * Represents the result of switching the network in a Web3 application.
+ * @interface SwitchNetworkResult
+ * @property {NetworkInfo} network - The information about the switched network.
+ * @property {Web3Provider} provider - The Web3 provider for the switched network.
  */
 export interface SwitchNetworkResult {
   network: NetworkInfo;

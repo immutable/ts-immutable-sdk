@@ -31,7 +31,7 @@ export interface GetWalletAllowListParams {
 
 /**
  * Interface representing information about a wallet used in {@link GetWalletAllowListResult}.
- * @property {WalletProviderName} connectionProvider - The connection provider for the wallet.
+ * @property {WalletProviderName} walletProvider - The connection provider for the wallet.
  * @property {string} name - The name of the wallet.
  * @property {string} description - A description of the wallet.
  * @property {string} icon - The URL/data:image of an icon for the wallet.

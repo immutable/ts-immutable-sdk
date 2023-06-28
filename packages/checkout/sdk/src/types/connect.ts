@@ -1,6 +1,10 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { NetworkInfo } from './networkInfo';
 
+/**
+ * Interface representing the params of {@link Checkout.connect}.
+ * @property {Web3Provider} provider - The provider used to connect to the network.
+ */
 export interface ConnectParams {
   provider: Web3Provider
 }
@@ -15,6 +19,10 @@ export interface ConnectResult {
   network: NetworkInfo;
 }
 
+/**
+ * Interface representing the params of {@link Checkout.checkIsWalletConnected}.
+ * @property {Web3Provider} provider - The provider used to connect to the network.
+ */
 export interface CheckConnectionParams {
   provider: Web3Provider
 }

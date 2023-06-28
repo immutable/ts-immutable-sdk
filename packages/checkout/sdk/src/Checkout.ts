@@ -55,6 +55,11 @@ export class Checkout {
  * `CheckoutModuleConfiguration` that is used to configure the checkout module. If no configuration is
  * provided, the module will use the default `SANDBOX_CONFIGURATION`.
  */
+  /**
+   * Constructs a new instance of the CheckoutModule class with the given configuration.
+   * @param {CheckoutModuleConfiguration} [config=SANDBOX_CONFIGURATION] - The configuration object for the CheckoutModule.
+   * @returns None
+   */
   constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
     this.readOnlyProviders = new Map<
