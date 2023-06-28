@@ -92,12 +92,12 @@ export function BridgeForm(props: BridgeFormProps) {
           symbol: t.token.symbol,
           icon: t.token.icon,
           balance: {
+            formattedAmount: tokenValueFormat(t.formattedBalance),
             formattedFiatAmount: cryptoFiatState.conversions.size === 0 ? formatZeroAmount('') : calculateCryptoToFiat(
               t.formattedBalance,
               t.token.symbol || '',
               cryptoFiatState.conversions,
             ),
-            formattedAmount: tokenValueFormat(t.formattedBalance),
           },
         } as CoinSelectorOptionProps),
       );
