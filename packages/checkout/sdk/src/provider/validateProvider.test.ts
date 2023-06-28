@@ -46,7 +46,7 @@ describe('provider validation', () => {
       };
 
       (RemoteConfigFetcher as jest.Mock).mockReturnValue({
-        get: jest.fn().mockResolvedValue([
+        getConfig: jest.fn().mockResolvedValue([
           {
             chainId: 1,
           },
