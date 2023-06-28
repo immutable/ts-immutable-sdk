@@ -36,8 +36,9 @@ export const cyInterceptCheckoutApi = (overrides?: {
     conversion?: any[],
   },
 }) => {
+  const checkoutApi = 'https://checkout-api.dev.immutable.com/v1';
   cy.intercept(
-    'https://checkout-api.dev.immutable.com/v1/config',
+    `${checkoutApi}/config`,
     overrides?.configOverrides
     || {
       allowedNetworks: [
@@ -51,11 +52,11 @@ export const cyInterceptCheckoutApi = (overrides?: {
     },
   );
   cy.intercept(
-    'https://checkout-api.dev.immutable.com/v1/fiat/coins/*',
+    `${checkoutApi}/fiat/coins/*`,
     overrides?.cryptoFiatOverrides?.coins || [],
   );
   cy.intercept(
-    'https://checkout-api.dev.immutable.com/v1/fiat/conversion*',
+    `${checkoutApi}/fiat/conversion*`,
     overrides?.cryptoFiatOverrides?.conversion || [],
   );
 };
