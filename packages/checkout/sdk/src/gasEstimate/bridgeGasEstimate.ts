@@ -1,8 +1,6 @@
 import { BigNumber } from 'ethers';
 import { FeeData, Web3Provider } from '@ethersproject/providers';
 import {
-  BridgeFeeRequest,
-  BridgeFeeResponse,
   FungibleToken,
   TokenBridge,
 } from '@imtbl/bridge-sdk';
@@ -49,7 +47,7 @@ export async function getBridgeEstimatedGas(
   };
 }
 
-interface BridgeFeeEstimateResult {
+export interface BridgeFeeEstimateResult {
   bridgeFee: TokenAmountEstimate;
   bridgeable: boolean;
 }
@@ -58,10 +56,7 @@ export async function getBridgeFeeEstimate(
   tokenBridge: TokenBridge,
   tokenAddress: FungibleToken,
 ): Promise<BridgeFeeEstimateResult> {
-  const bridgeFeeReq: BridgeFeeRequest = { token: tokenAddress };
-  const bridgeFeeResponse: BridgeFeeResponse = await tokenBridge.getFee(
-    bridgeFeeReq,
-  );
+  const bridgeFeeResponse = await tokenBridge.getFee({ token: tokenAddress });
 
   return {
     bridgeFee: {

@@ -1,8 +1,7 @@
 import { Environment } from '@imtbl/config';
 import axios from 'axios';
 import { ChainId, CHECKOUT_API_BASE_URL, TokenInfo } from '../types';
-import { RemoteConfigParams, RemoteConfiguration } from './remoteConfigType';
-import { ConfiguredTokens } from './configuredTokens';
+import { ConfiguredTokens, RemoteConfigParams, RemoteConfiguration } from './remoteConfigType';
 
 export class RemoteConfigFetcher {
   private configCache: RemoteConfiguration | undefined;
@@ -15,8 +14,7 @@ export class RemoteConfigFetcher {
     this.environment = params.environment;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  private async makeHttpRequest(url: string): Promise<any> {
+  private static async makeHttpRequest(url: string): Promise<any> {
     let response;
     try {
       response = await axios.get(url);
@@ -36,7 +34,7 @@ export class RemoteConfigFetcher {
   private async loadConfig(): Promise<RemoteConfiguration | undefined> {
     if (this.configCache) return this.configCache;
 
-    const response = await this.makeHttpRequest(
+    const response = await RemoteConfigFetcher.makeHttpRequest(
       `${CHECKOUT_API_BASE_URL[this.environment]}/v1/config`,
     );
 
@@ -48,7 +46,7 @@ export class RemoteConfigFetcher {
   private async loadConfigTokens(): Promise<ConfiguredTokens | undefined> {
     if (this.tokensCache) return this.tokensCache;
 
-    const response = await this.makeHttpRequest(
+    const response = await RemoteConfigFetcher.makeHttpRequest(
       `${CHECKOUT_API_BASE_URL[this.environment]}/v1/config/tokens`,
     );
 
@@ -73,9 +71,7 @@ export class RemoteConfigFetcher {
 
   public async getTokens(chainId: ChainId): Promise<TokenInfo[]> {
     const config = await this.loadConfigTokens();
-    if (config && config[chainId.toString()]?.allowed) {
-      return config[chainId].allowed as TokenInfo[];
-    }
-    return [];
+    if (!config) return [];
+    return config[chainId]?.allowed ?? [];
   }
 }

@@ -43,7 +43,9 @@ export function WalletBalances() {
   } = walletState;
   const { conversions } = cryptoFiatState;
   const [balancesLoading, setBalancesLoading] = useState(true);
+
   useTokenSymbols(checkout, cryptoFiatDispatch);
+
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
     return (

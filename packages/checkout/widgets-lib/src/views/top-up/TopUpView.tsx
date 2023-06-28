@@ -35,6 +35,8 @@ interface TopUpViewProps {
   onBackButtonClick?: () => void,
 }
 
+const DEFAULT_FEE_REFRESH_INTERVAL = 30000;
+
 export function TopUpView({
   widgetEvent,
   showOnrampOption,
@@ -53,12 +55,12 @@ export function TopUpView({
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { conversions, fiatSymbol } = cryptoFiatState;
 
-  const DEFAULT_FEE_REFRESH_INTERVAL = 30000;
-  useTokenSymbols(checkout, cryptoFiatDispatch);
   const [swapFeesInFiat, setSwapFeesInFiat] = useState('-.--');
   const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('-.--');
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
+
+  useTokenSymbols(checkout, cryptoFiatDispatch);
 
   const onClickOnramp = () => {
     // if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
