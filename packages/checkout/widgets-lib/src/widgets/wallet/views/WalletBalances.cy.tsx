@@ -9,22 +9,13 @@ import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { WalletBalances } from './WalletBalances';
 import { WalletContext, WalletState } from '../context/WalletContext';
-import { cySmartGet } from '../../../lib/testUtils';
+import { cyInterceptCheckoutApi, cySmartGet } from '../../../lib/testUtils';
 import { WalletWidgetTestComponent } from '../test-components/WalletWidgetTestComponent';
 
 describe('WalletBalances', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
-    cy.intercept('https://checkout-api.dev.immutable.com/v1/config', {
-      allowedNetworks: [
-        {
-          chainId: 11155111,
-        },
-        {
-          chainId: 13383,
-        },
-      ],
-    });
+    cyInterceptCheckoutApi();
   });
 
   const checkout = new Checkout({

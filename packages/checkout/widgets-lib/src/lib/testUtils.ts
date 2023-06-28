@@ -28,3 +28,34 @@ export const cyGetByTestId = (
 export const cySmartGet = (selector: string) => (selector.includes('@') || selector.includes(' ')
   ? cy.get(selector)
   : cyGetByTestId(selector));
+
+export const cyInterceptCheckoutApi = (overrides?: {
+  configOverrides?: {},
+  cryptoFiatOverrides?: {
+    coins?: any[],
+    conversion?: any[],
+  },
+}) => {
+  cy.intercept(
+    'https://checkout-api.dev.immutable.com/v1/config',
+    overrides?.configOverrides
+    || {
+      allowedNetworks: [
+        {
+          chainId: 11155111,
+        },
+        {
+          chainId: 13383,
+        },
+      ],
+    },
+  );
+  cy.intercept(
+    'https://checkout-api.dev.immutable.com/v1/fiat/coins/*',
+    overrides?.cryptoFiatOverrides?.coins || [],
+  );
+  cy.intercept(
+    'https://checkout-api.dev.immutable.com/v1/fiat/conversion*',
+    overrides?.cryptoFiatOverrides?.conversion || [],
+  );
+};

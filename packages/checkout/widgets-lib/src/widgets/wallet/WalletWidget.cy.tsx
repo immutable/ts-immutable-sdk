@@ -9,7 +9,7 @@ import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
 import { WalletWidget } from './WalletWidget';
-import { cySmartGet } from '../../lib/testUtils';
+import { cyInterceptCheckoutApi, cySmartGet } from '../../lib/testUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { text } from '../../resources/text/textConfig';
@@ -18,18 +18,7 @@ import { WalletWidgetViews } from '../../context/view-context/WalletViewContextT
 describe('WalletWidget tests', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
-    cy.intercept('https://checkout-api.dev.immutable.com/v1/config', {
-      allowedNetworks: [
-        {
-          chainId: 11155111,
-        },
-        {
-          chainId: 13383,
-        },
-      ],
-    });
-    cy.intercept('https://checkout-api.dev.immutable.com/v1/fiat/coins/*', {});
-    cy.intercept('https://checkout-api.dev.immutable.com/v1/fiat/conversion*', []);
+    cyInterceptCheckoutApi();
   });
 
   const mockProvider = {
