@@ -1,46 +1,24 @@
 import {
   GetTokenAllowListParams,
   GetTokenAllowListResult,
-  TokenFilterTypes,
   TokenInfo,
-  TokenMasterInfo,
 } from '../types';
-import masterTokenList from './token_master_list.json';
+import { CheckoutConfiguration } from '../config';
 
-const filterTokenList = ({
-  type,
-  chainId,
-  exclude,
-}: GetTokenAllowListParams): TokenMasterInfo[] => masterTokenList.filter((token) => {
-  const skipChainIdCheck = !chainId;
-  const chainIdMatches = token.chainId === chainId;
-  const tokenNotExcluded = !exclude
-    ?.map((excludeToken) => excludeToken.address)
-    .includes(token.address || '');
-  const allowAllTokens = type === TokenFilterTypes.ALL;
-  const tokenAllowedForType = token.tokenFeatures.includes(type);
+export const getTokenAllowList = async (
+  config: CheckoutConfiguration,
+  { chainId, exclude }: GetTokenAllowListParams,
+): Promise<GetTokenAllowListResult> => {
+  const tokens = (await config.remoteConfigFetcher.getTokens(
+    chainId,
+  )) as TokenInfo[];
 
-  return (
-    (skipChainIdCheck || chainIdMatches)
-      && tokenNotExcluded
-      && (allowAllTokens || tokenAllowedForType)
-  );
-}) as TokenMasterInfo[];
-
-export const getTokenAllowList = async ({
-  type = TokenFilterTypes.ALL,
-  chainId,
-  exclude,
-}: GetTokenAllowListParams): Promise<GetTokenAllowListResult> => {
-  const filteredTokenList = filterTokenList({ type, chainId, exclude }).map(
-    (token: TokenMasterInfo): TokenInfo => ({
-      name: token.name,
-      symbol: token.symbol,
-      decimals: token.decimals,
-      address: token.address,
-      icon: token.icon,
-    }),
-  );
+  const filteredTokenList = tokens.filter((token) => {
+    const tokenNotExcluded = !exclude
+      ?.map((excludeToken) => excludeToken.address)
+      .includes(token.address || '');
+    return tokenNotExcluded;
+  }) as TokenInfo[];
 
   return {
     tokens: filteredTokenList,

@@ -1,15 +1,17 @@
 import { BigNumber, utils } from 'ethers/lib/ethers';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
-import { ethers } from 'ethers';
+import { Contract, ethers } from 'ethers';
 import { FungibleToken } from '@imtbl/bridge-sdk';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import {
   ChainId,
+  ERC20ABI,
   GasEstimateBridgeToL2Result,
   GasEstimateParams,
   GasEstimateSwapResult,
   GasEstimateType,
+  TokenInfo,
 } from '../types';
 import {
   getBridgeEstimatedGas,
@@ -40,6 +42,34 @@ const getL2ChainId = (environment: Environment): ChainId => {
   return ChainId.IMTBL_ZKEVM_DEVNET;
 };
 
+async function getTokenInfoByAddress(
+  config: CheckoutConfiguration,
+  tokenAddress: FungibleToken,
+  chainId: ChainId,
+  provider: Web3Provider,
+): Promise<TokenInfo | undefined> {
+  const { networkMap } = config;
+  if (tokenAddress === 'NATIVE') {
+    const networkInfo = networkMap.get(chainId);
+    return networkInfo!.nativeCurrency;
+  }
+
+  const contract = new Contract(
+    tokenAddress,
+    JSON.stringify(ERC20ABI),
+    provider,
+  );
+  const name = await contract.name();
+  const symbol = await contract.symbol();
+  const decimals = await contract.decimals();
+  return {
+    name,
+    symbol,
+    decimals,
+    address: tokenAddress,
+  };
+}
+
 async function bridgeToL2GasEstimator(
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
   config: CheckoutConfiguration,
@@ -60,11 +90,16 @@ async function bridgeToL2GasEstimator(
   const provider = readOnlyProviders.get(fromChainId);
 
   try {
-    const { estimatedAmount, token } = await getBridgeEstimatedGas(
+    const gasFee = await getBridgeEstimatedGas(
       provider as Web3Provider,
       fromChainId,
       isSpendingCapApprovalRequired,
-      tokenAddress ?? gasTokenAddress,
+    );
+    gasFee.token = await getTokenInfoByAddress(
+      config,
+      tokenAddress ?? (gasTokenAddress || 'NATIVE'),
+      fromChainId,
+      provider as Web3Provider,
     );
 
     const tokenBridge = await instance.createBridgeInstance(
@@ -77,15 +112,17 @@ async function bridgeToL2GasEstimator(
     const { bridgeFee, bridgeable } = await getBridgeFeeEstimate(
       tokenBridge,
       fromAddress,
+    );
+    bridgeFee.token = await getTokenInfoByAddress(
+      config,
+      fromAddress,
       toChainId,
+      provider as Web3Provider,
     );
 
     return {
       gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-      gasFee: {
-        estimatedAmount,
-        token,
-      },
+      gasFee,
       bridgeFee: {
         estimatedAmount: bridgeFee?.estimatedAmount,
         token: bridgeFee?.token,

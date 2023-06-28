@@ -20,7 +20,7 @@ export interface TokenMasterInfo extends TokenInfo {
  */
 export interface GetTokenAllowListParams {
   type: TokenFilterTypes;
-  chainId?: ChainId;
+  chainId: ChainId;
   exclude?: TokenFilter[];
 }
 
@@ -36,8 +36,6 @@ export interface GetTokenAllowListResult {
  * Enum representing the types of token filters available.
  */
 export enum TokenFilterTypes {
-  SWAP = 'swap',
-  BRIDGE = 'bridge',
   ALL = 'all',
 }
 

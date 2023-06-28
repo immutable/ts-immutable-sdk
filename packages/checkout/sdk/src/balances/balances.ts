@@ -80,7 +80,7 @@ export const getAllBalances = async (
   walletAddress: string,
   chainId: ChainId,
 ): Promise<GetAllBalancesResult> => {
-  const tokenList = await getTokenAllowList({
+  const tokenList = await getTokenAllowList(config, {
     type: TokenFilterTypes.ALL,
     chainId,
   });

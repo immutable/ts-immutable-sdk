@@ -211,7 +211,7 @@ export class Checkout {
   public async getTokenAllowList(
     params: GetTokenAllowListParams,
   ): Promise<GetTokenAllowListResult> {
-    return await tokens.getTokenAllowList(params);
+    return await tokens.getTokenAllowList(this.config, params);
   }
 
   /**
