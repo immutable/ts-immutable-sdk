@@ -2,7 +2,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import {
   Checkout,
-  ConnectionProviders,
+  WalletProviderName,
   GetBalanceResult,
   NetworkInfo,
   TokenInfo,
@@ -12,7 +12,7 @@ import { createContext } from 'react';
 export interface BridgeState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
-  providerPreference: ConnectionProviders | null;
+  walletProvider: WalletProviderName | null;
   tokenBridge: TokenBridge | null;
   network: NetworkInfo | null;
   toNetwork: NetworkInfo | null;
@@ -23,7 +23,7 @@ export interface BridgeState {
 export const initialBridgeState: BridgeState = {
   checkout: null,
   provider: null,
-  providerPreference: null,
+  walletProvider: null,
   tokenBridge: null,
   network: null,
   toNetwork: null,
@@ -43,7 +43,7 @@ export interface BridgeAction {
 type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
-  | SetProviderPreferencePayload
+  | SetWalletProviderPayload
   | SetTokenBridgePayload
   | SetNetworkPayload
   | SetToNetworkPayload
@@ -53,7 +53,7 @@ type ActionPayload =
 export enum BridgeActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
-  SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
+  SET_WALLET_PROVIDER = 'SET_WALLET_PROVIDER',
   SET_TOKEN_BRIDGE = 'SET_TOKEN_BRIDGE',
   SET_NETWORK = 'SET_NETWORK',
   SET_TO_NETWORK = 'SET_TO_NETWORK',
@@ -71,9 +71,9 @@ export interface SetProviderPayload {
   provider: Web3Provider;
 }
 
-export interface SetProviderPreferencePayload {
-  type: BridgeActions.SET_PROVIDER_PREFERENCE;
-  providerPreference: ConnectionProviders;
+export interface SetWalletProviderPayload {
+  type: BridgeActions.SET_WALLET_PROVIDER;
+  walletProvider: WalletProviderName;
 }
 
 export interface SetTokenBridgePayload {
@@ -126,10 +126,10 @@ export const bridgeReducer: Reducer<BridgeState, BridgeAction> = (
         ...state,
         provider: action.payload.provider,
       };
-    case BridgeActions.SET_PROVIDER_PREFERENCE:
+    case BridgeActions.SET_WALLET_PROVIDER:
       return {
         ...state,
-        providerPreference: action.payload.providerPreference,
+        walletProvider: action.payload.walletProvider,
       };
     case BridgeActions.SET_TOKEN_BRIDGE:
       return {

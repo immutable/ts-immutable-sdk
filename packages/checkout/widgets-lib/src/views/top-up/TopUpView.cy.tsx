@@ -5,7 +5,7 @@ import { mount } from 'cypress/react18';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
-  Checkout, ConnectionProviders, GasEstimateType,
+  Checkout, WalletProviderName, GasEstimateType,
 } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
@@ -201,7 +201,7 @@ describe('Top Up View', () => {
       }),
       network: null,
       provider: null,
-      providerPreference: ConnectionProviders.METAMASK,
+      walletProvider: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
     };

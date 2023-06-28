@@ -20,7 +20,7 @@ import {
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
 import {
-  l1Network, zkEVMNetwork, Network, WidgetTheme,
+  l1Network, zkEVMNetwork, WidgetTheme,
 } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -51,7 +51,6 @@ export interface BridgeWidgetProps {
 export interface BridgeWidgetParams {
   fromContractAddress?: string;
   amount?: string;
-  fromNetwork?: Network;
 }
 
 export function BridgeWidget(props: BridgeWidgetProps) {

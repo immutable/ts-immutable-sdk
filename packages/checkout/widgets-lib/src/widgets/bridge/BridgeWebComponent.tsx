@@ -3,14 +3,12 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { ConnectTargetLayer, Network } from '../../lib';
+import { ConnectTargetLayer } from '../../lib';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 
 export class ImmutableBridge extends ImmutableWebComponent {
-  fromNetwork = Network.ETHEREUM;
-
-  fromContract = '';
+  fromContractAddress = '';
 
   amount = '';
 
@@ -18,8 +16,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
   connectedCallback() {
     super.connectedCallback();
-    this.fromContract = this.getAttribute('fromContractAddress') as string;
-    this.fromNetwork = this.getAttribute('fromNetwork') as Network;
+    this.fromContractAddress = this.getAttribute('fromContractAddress') as string;
     this.amount = this.getAttribute('amount') as string;
     this.walletProvider = this.getAttribute(
       'walletProvider',
@@ -34,8 +31,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
       web3Provider: this.provider,
     };
     const params: BridgeWidgetParams = {
-      fromContractAddress: this.fromContract,
-      fromNetwork: this.fromNetwork,
+      fromContractAddress: this.fromContractAddress,
       amount: this.amount,
     };
 

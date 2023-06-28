@@ -13,6 +13,7 @@ import {
   WalletReact,
 } from '@imtbl/checkout-widgets';
 import { Environment } from '@imtbl/config';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 
 function WalletUI() {
   CheckoutWidgets({
@@ -59,7 +60,7 @@ function WalletUI() {
   return (
     <div className="Connect">
       <h1 className="sample-heading">Checkout Wallet (Web Component)</h1>
-      <WalletReact/>
+      <WalletReact walletProvider={WalletProviderName.METAMASK} />
     </div>
   );
 }

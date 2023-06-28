@@ -4,7 +4,8 @@ import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { Passport } from './Passport';
 import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
-import { Networks, OidcConfiguration, User } from './types';
+import { Networks, OidcConfiguration } from './types';
+import { mockUser } from './test/mocks';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
@@ -14,18 +15,6 @@ const oidcConfiguration: OidcConfiguration = {
   clientId: '11111',
   redirectUri: 'https://test.com',
   logoutRedirectUri: 'https://test.com',
-};
-
-const mockUser: User = {
-  idToken: 'id123',
-  accessToken: 'access123',
-  refreshToken: 'refresh123',
-  profile: {
-    sub: 'email|123',
-    email: 'test@immutable.com',
-    nickname: 'test',
-  },
-  etherKey: '123',
 };
 
 describe('Passport', () => {
@@ -43,10 +32,7 @@ describe('Passport', () => {
   let getProviderSilentMock: jest.Mock;
 
   beforeEach(() => {
-    authLoginMock = jest.fn().mockReturnValue({
-      idToken: '123',
-      etherKey: '0x123',
-    });
+    authLoginMock = jest.fn().mockReturnValue(mockUser);
     loginCallbackMock = jest.fn();
     magicLoginMock = jest.fn();
     logoutMock = jest.fn();
