@@ -2,14 +2,32 @@ import {
   JsonRpcSigner,
   Web3Provider
 } from '@ethersproject/providers';
-import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
-import { BigNumberish, ethers } from 'ethers';
-import { formatBytes32String } from 'ethers/lib/utils';
-import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import {
+  Checkout,
+  WalletProviderName
+} from '@imtbl/checkout-sdk';
+import {
+  BigNumberish,
+  ethers
+} from 'ethers';
+import {
+  formatBytes32String
+} from 'ethers/lib/utils';
+import {
+  LitElement,
+  html
+} from 'lit';
+import {
+  customElement,
+  property
+} from 'lit/decorators.js';
 import moment from 'moment';
-import { GuardedMulticallerAbi } from './abi/guardedMulticaller';
-import { SimpleERC721Abi } from './abi/simpleERC721';
+import {
+  GuardedMulticallerAbi
+} from './abi/guardedMulticaller';
+import {
+  SimpleERC721Abi
+} from './abi/simpleERC721';
 
 @customElement('imtbl-primary-sales-demo')
 export class PrimarySalesDemo extends LitElement {
@@ -17,7 +35,19 @@ export class PrimarySalesDemo extends LitElement {
 
   private provider: Web3Provider | undefined = undefined;
 
-  @property({ type: String, attribute: 'wallet-address' })
+  @property({ type: String, attribute: "guarded-multicaller-address" })
+  guardedMulticallerAddress: string = "";
+
+  @property({ type: String, attribute: "erc721-address" })
+  erc721Address: string = "";
+
+  @property({ type: String, attribute: "erc721-balance" })
+  erc721Balance: string = "";
+
+  @property({
+    type: String,
+    attribute: 'wallet-address'
+  })
   connectedAddress: string | undefined = undefined;
 
   constructor() {
@@ -29,6 +59,13 @@ export class PrimarySalesDemo extends LitElement {
   handleCustomEvent<T extends Event>(listener: (event: T) => void) {
     return (event: Event) => {
       listener.call(this, event as T);
+    };
+  }
+
+  handleInputChanges(key: "guardedMulticallerAddress" | "erc721Address") {
+    return (event: InputEvent) => {
+      this[key] = (event.target as HTMLInputElement).value;
+      this.requestUpdate();
     };
   }
 
@@ -46,7 +83,9 @@ export class PrimarySalesDemo extends LitElement {
 
       this.provider = resp.provider;
 
-      await this.checkoutSDK.connect({provider: resp.provider})
+      await this.checkoutSDK.connect({
+        provider: resp.provider
+      })
       const res = await this.checkoutSDK.checkIsWalletConnected({
         provider: resp.provider,
       });
@@ -58,8 +97,8 @@ export class PrimarySalesDemo extends LitElement {
 
       console.log('@@@@@@@ checkoutSDKConnect - resp', resp);
 
-    const signer = await this.provider?.getSigner(res.walletAddress);
-    console.log('@@@@@@@ checkoutSDKConnect - signer', signer);
+      const signer = await this.provider?.getSigner(res.walletAddress);
+      console.log('@@@@@@@ checkoutSDKConnect - signer', signer);
 
     }
   }
@@ -114,42 +153,39 @@ export class PrimarySalesDemo extends LitElement {
     data: string[],
     deadline: BigNumberish,
     verifyingContract: string,
-    config: { name: string; version: string }
+    config: {
+      name: string; version: string
+    }
   ): Promise<string> {
-    return await wallet._signTypedData(
-      {
-        name: config.name,
-        version: config.version,
-        chainId: await wallet.getChainId(),
-        verifyingContract: verifyingContract,
+    return await wallet._signTypedData({
+      name: config.name,
+      version: config.version,
+      chainId: await wallet.getChainId(),
+      verifyingContract: verifyingContract,
+    }, {
+      Multicall: [{
+        name: "ref",
+        type: "bytes32",
       },
       {
-        Multicall: [
-          {
-            name: "ref",
-            type: "bytes32",
-          },
-          {
-            name: "targets",
-            type: "address[]",
-          },
-          {
-            name: "data",
-            type: "bytes[]",
-          },
-          {
-            name: "deadline",
-            type: "uint256",
-          },
-        ],
+        name: "targets",
+        type: "address[]",
       },
       {
-        ref,
-        targets,
-        data,
-        deadline,
-      }
-    );
+        name: "data",
+        type: "bytes[]",
+      },
+      {
+        name: "deadline",
+        type: "uint256",
+      },
+      ],
+    }, {
+      ref,
+      targets,
+      data,
+      deadline,
+    });
   };
 
   async executeMulticallerTransaction(
@@ -173,8 +209,10 @@ export class PrimarySalesDemo extends LitElement {
       targets,
       data,
       deadline,
-      guardedMulticaller.address,
-      { name: "m", version: "1" }
+      guardedMulticaller.address, {
+      name: "m",
+      version: "1"
+    }
     )
 
     const executeRes = await guardedMulticaller.execute(
@@ -195,13 +233,13 @@ export class PrimarySalesDemo extends LitElement {
   async onInitiateClick() {
     const signer = await this.provider?.getSigner(this.connectedAddress);
     const GuardedMulticaller = new ethers.Contract(
-      '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
+      this.guardedMulticallerAddress,
       GuardedMulticallerAbi,
       signer
     );
 
     const Erc721 = new ethers.Contract(
-      '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+      this.erc721Address,
       SimpleERC721Abi,
       signer
     );
@@ -214,18 +252,51 @@ export class PrimarySalesDemo extends LitElement {
     );
   }
 
+  async onCheckBalanceClick() {
+    const signer = await this.provider?.getSigner(this.connectedAddress);
+
+    const Erc721 = new ethers.Contract(
+      this.erc721Address,
+      SimpleERC721Abi,
+      signer
+    );
+
+    const balance = await Erc721.balanceOf(this.connectedAddress);
+    this.erc721Balance = balance.toString();
+    console.log('@@@@ erc721 balance', this.erc721Balance);
+    this.requestUpdate();
+
+  }
+
   render() {
     return html`
       <div class="prose mb-4">
         <h1>Primary Sales Demo</h1>
       </div>
 
+      <div class="flex-1 px-2 ml-2">
+        <input
+          type="text"
+          placeholder="Deployed GuardedMulticaller Address"
+          class="input w-full max-w-xs ml-2"
+          .value="${this.guardedMulticallerAddress}"
+          @blur="${this.handleInputChanges("guardedMulticallerAddress")}"
+        />
+        <input
+          type="text"
+          placeholder="Deployed ERC721 Address"
+          class="input w-full max-w-xs ml-2"
+          .value="${this.erc721Address}"
+          @blur="${this.handleInputChanges("erc721Address")}"
+        />
+      </div>
+
       <div class="prose mb-4">
         <h3>
           Wallet:
           ${this.connectedAddress
-            ? `${this.connectedAddress}`
-            : 'No Wallet Connected'}
+        ? `${this.connectedAddress}`
+        : 'No Wallet Connected'}
         </h3>
       </div>
 
@@ -238,11 +309,22 @@ export class PrimarySalesDemo extends LitElement {
 
         <div class="ml-4">
           <button
-            class="btn btn-wide btn-primary"
+            class="btn btn-wide btn-primary mb-4"
+            .disabled="${!this.erc721Address || !this.guardedMulticallerAddress || !this.connectedAddress}"
             @click="${this.onInitiateClick}"
           >
             Initiate
           </button>
+          <button
+            class="btn btn-wide btn-primary mb-4"
+            .disabled="${!this.erc721Address || !this.connectedAddress}"
+            @click="${this.onCheckBalanceClick}"
+          >
+            Check Balance
+          </button>
+          <p>
+            Contract(${this.erc721Address}).balanceOf(${this.connectedAddress}) -> ${this.erc721Balance}
+          </p>
         </div>
       </div>
     `;
