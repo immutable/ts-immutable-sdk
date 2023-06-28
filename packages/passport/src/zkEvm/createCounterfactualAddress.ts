@@ -1,7 +1,7 @@
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
-import { UserWithEtherKey } from '../types';
+import { UserZkEvm } from '../types';
 import AuthManager from '../authManager';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 
@@ -17,7 +17,7 @@ export async function createCounterfactualAddress({
   authManager,
   magicProvider,
   multiRollupApiClients,
-}: CreateCounterfactualAddressInput): Promise<UserWithEtherKey> {
+}: CreateCounterfactualAddressInput): Promise<UserZkEvm> {
   const web3Provider = new Web3Provider(
     magicProvider,
   );
@@ -38,9 +38,9 @@ export async function createCounterfactualAddress({
   }
 
   const user = await authManager.loginSilent();
-  if (!user || !user.etherKey) {
+  if (!user?.zkEvm) {
     throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Failed to refresh user details');
   }
 
-  return user as UserWithEtherKey;
+  return user as UserZkEvm;
 }

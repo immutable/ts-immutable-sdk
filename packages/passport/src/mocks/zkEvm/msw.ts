@@ -10,8 +10,8 @@ export const transactionHash = '0x867';
 
 export const mswHandlers = {
   counterfactualAddress: {
-    success: rest.post('https://passport-mr.sandbox.imtbl.com/v1/counterfactual-address', (req, res, ctx) => res(ctx.status(201))),
-    internalServerError: rest.post('https://passport-mr.sandbox.imtbl.com/v1/counterfactual-address', (req, res, ctx) => res(ctx.status(500))),
+    success: rest.post('https://api.sandbox.immutable.com/passport-mr/v1/counterfactual-address', (req, res, ctx) => res(ctx.status(201))),
+    internalServerError: rest.post('https://api.sandbox.immutable.com/passport-mr/v1/counterfactual-address', (req, res, ctx) => res(ctx.status(500))),
   },
   jsonRpcProvider: {
     success: rest.post('https://zkevm-rpc.sandbox.x.immutable.com', (req, res, ctx) => {

@@ -2,7 +2,7 @@ import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { PassportConfiguration } from '../../config';
 import { ConfirmationScreen } from '../../confirmation';
 import { RelayerAdapter } from '../relayerAdapter';
-import { UserWithEtherKey } from '../../types';
+import { UserZkEvm } from '../../types';
 
 export type EthMethodWithAuthParams = {
   magicProvider: ExternalProvider;
@@ -10,6 +10,6 @@ export type EthMethodWithAuthParams = {
   config: PassportConfiguration;
   confirmationScreen: ConfirmationScreen;
   relayerAdapter: RelayerAdapter;
-  user: UserWithEtherKey;
+  user: UserZkEvm;
   params: any[];
 };

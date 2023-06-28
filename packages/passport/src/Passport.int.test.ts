@@ -27,12 +27,13 @@ const mockOidcUser = {
   access_token: 'accessToken123',
   refresh_token: 'refreshToken123',
 };
-const mockOidcUserWithEtherKey = {
+const mockOidcUserZkevm = {
   ...mockOidcUser,
   profile: {
     ...mockOidcUser.profile,
     passport: {
-      ether_key: '0x7EEC32793414aAb720a90073607733d9e7B0ecD0',
+      zkevm_eth_address: '0x7EEC32793414aAb720a90073607733d9e7B0ecD0',
+      zkevm_user_admin_address: '0x123',
     },
   },
 };
@@ -87,7 +88,7 @@ describe('Passport', () => {
     describe('eth_requestAccounts', () => {
       describe('when the user has registered before', () => {
         it('returns the users ether key', async () => {
-          mockGetUser.mockResolvedValue(mockOidcUserWithEtherKey);
+          mockGetUser.mockResolvedValue(mockOidcUserZkevm);
           useMswHandlers([
             mswHandlers.jsonRpcProvider.success,
           ]);
@@ -98,7 +99,7 @@ describe('Passport', () => {
             method: 'eth_requestAccounts',
           });
 
-          expect(accounts).toEqual([mockOidcUserWithEtherKey.profile.passport.ether_key]);
+          expect(accounts).toEqual([mockOidcUserZkevm.profile.passport.zkevm_eth_address]);
           expect(mockGetUser).toHaveBeenCalledTimes(1);
         });
       });
@@ -123,7 +124,7 @@ describe('Passport', () => {
           mockSigninPopup.mockResolvedValue(mockOidcUser);
           mockGetUser.mockResolvedValueOnce(null);
           mockGetUser.mockResolvedValueOnce(mockOidcUser);
-          mockSigninSilent.mockResolvedValue(mockOidcUserWithEtherKey);
+          mockSigninSilent.mockResolvedValue(mockOidcUserZkevm);
           useMswHandlers([
             mswHandlers.counterfactualAddress.success,
             mswHandlers.jsonRpcProvider.success,
@@ -135,7 +136,7 @@ describe('Passport', () => {
             method: 'eth_requestAccounts',
           });
 
-          expect(accounts).toEqual([mockOidcUserWithEtherKey.profile.passport.ether_key]);
+          expect(accounts).toEqual([mockOidcUserZkevm.profile.passport.zkevm_eth_address]);
           expect(mockGetUser).toHaveBeenCalledTimes(2);
           expect(mockSigninSilent).toHaveBeenCalledTimes(1);
           expect(mockMagicRequest).toHaveBeenCalledTimes(3);
@@ -146,7 +147,7 @@ describe('Passport', () => {
             mockSigninPopup.mockResolvedValue(mockOidcUser);
             mockGetUser.mockResolvedValueOnce(null);
             mockGetUser.mockResolvedValueOnce(mockOidcUser);
-            mockSigninSilent.mockResolvedValue(mockOidcUserWithEtherKey);
+            mockSigninSilent.mockResolvedValue(mockOidcUserZkevm);
             useMswHandlers([
               mswHandlers.counterfactualAddress.internalServerError,
             ]);
@@ -186,7 +187,7 @@ describe('Passport', () => {
           expect(method).toEqual('personal_sign');
           return Promise.resolve('0xa29c8ff87dbbf59f4f46ea3006e5b27980fa4262668ad0bc1f0b24bc01a727e92ef80db88e391707bec7bdf1e1479d2fa994b732e0cb28c9438c1d0e7e67b52d1b');
         });
-        mockGetUser.mockResolvedValue(mockOidcUserWithEtherKey);
+        mockGetUser.mockResolvedValue(mockOidcUserZkevm);
 
         const zkEvmProvider = getZkEvmProvider();
 

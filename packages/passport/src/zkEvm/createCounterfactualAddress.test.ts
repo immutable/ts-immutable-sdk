@@ -3,7 +3,7 @@ import { signRaw } from '@imtbl/toolkit';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { createCounterfactualAddress } from './createCounterfactualAddress';
 import AuthManager from '../authManager';
-import { mockUser, mockUserWithEtherKey } from '../test/mocks';
+import { mockUser, mockUserZkEvm } from '../test/mocks';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@imtbl/toolkit');
@@ -65,7 +65,7 @@ describe('createCounterFactualAddress', () => {
     });
   });
 
-  describe('when loginSilent returns a user without an etherKey', () => {
+  describe('when loginSilent returns a user that has not registered with zkEvm', () => {
     it('should throw an error', async () => {
       multiRollupApiClients.passportApi.createCounterfactualAddress.mockResolvedValue({
         status: 201,
@@ -81,12 +81,12 @@ describe('createCounterFactualAddress', () => {
     });
   });
 
-  it('should return a user with an etherKey', async () => {
+  it('should return a user that has registered with zkEvm', async () => {
     multiRollupApiClients.passportApi.createCounterfactualAddress.mockResolvedValue({
       status: 201,
     });
 
-    authManager.loginSilent.mockResolvedValue(mockUserWithEtherKey);
+    authManager.loginSilent.mockResolvedValue(mockUserZkEvm);
 
     const result = await createCounterfactualAddress({
       authManager: authManager as unknown as AuthManager,
@@ -94,7 +94,7 @@ describe('createCounterFactualAddress', () => {
       multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
     });
 
-    expect(result).toEqual(mockUserWithEtherKey);
+    expect(result).toEqual(mockUserZkEvm);
     expect(multiRollupApiClients.passportApi.createCounterfactualAddress).toHaveBeenCalledWith({
       createCounterfactualAddressRequest: {
         ethereumAddress,

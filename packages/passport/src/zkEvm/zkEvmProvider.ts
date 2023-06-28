@@ -6,7 +6,7 @@ import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
-import { UserWithEtherKey } from '../types';
+import { UserZkEvm } from '../types';
 import { RelayerAdapter } from './relayerAdapter';
 import { EthMethodWithAuthParams } from './rpcMethods/types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
@@ -36,7 +36,7 @@ export class ZkEvmProvider {
 
   private magicProvider?: ExternalProvider; // Used for signing
 
-  private user?: UserWithEtherKey;
+  private user?: UserZkEvm;
 
   constructor({
     authManager,

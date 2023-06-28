@@ -4,7 +4,7 @@ import AuthManager from '../../authManager';
 import MagicAdapter from '../../magicAdapter';
 import { PassportConfiguration } from '../../config';
 import { createCounterfactualAddress } from '../createCounterfactualAddress';
-import { UserWithEtherKey } from '../../types';
+import { UserZkEvm } from '../../types';
 
 type EthRequestAccountsInput = {
   authManager: AuthManager;
@@ -14,7 +14,7 @@ type EthRequestAccountsInput = {
 };
 
 type EthRequestAccountsOutput = {
-  user: UserWithEtherKey;
+  user: UserZkEvm;
   magicProvider: ExternalProvider;
   result: string[];
 };
@@ -35,24 +35,24 @@ export const ethRequestAccounts = async ({
     config.network,
   );
 
-  if (!user.etherKey) {
+  if (!user.zkEvm) {
     // Generate counterfactual address and retrieve updated Auth0 user
-    const userWithEtherKey = await createCounterfactualAddress({
+    const userZkevm = await createCounterfactualAddress({
       authManager,
       magicProvider,
       multiRollupApiClients,
     });
 
     return {
-      user: userWithEtherKey,
-      result: [userWithEtherKey.etherKey],
+      user: userZkevm,
+      result: [userZkevm.zkEvm.ethAddress],
       magicProvider,
     };
   }
 
   return {
-    user: user as UserWithEtherKey,
-    result: [user.etherKey],
+    user: user as UserZkEvm,
+    result: [user.zkEvm.ethAddress],
     magicProvider,
   };
 };
