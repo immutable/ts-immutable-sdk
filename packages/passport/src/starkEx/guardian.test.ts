@@ -19,6 +19,7 @@ describe('guardian', () => {
     }));
   });
   const mockAccessToken = 'eyJh1234';
+  const mockEtherAddress = '0x1234';
   const mockConfirmationScreen = new ConfirmationScreen({} as any);
   const mockImxPublicApiDomain = 'https://api.example.com';
 
@@ -31,6 +32,7 @@ describe('guardian', () => {
         accessToken: mockAccessToken,
         imxPublicApiDomain: mockImxPublicApiDomain,
         confirmationScreen: mockConfirmationScreen,
+        imxEtherAddress: mockEtherAddress,
       });
       await guardianClient.validate({ payloadHash: 'hash' });
       expect(mockConfirmationScreen.startGuardianTransaction).toBeCalledTimes(0);
@@ -42,6 +44,8 @@ describe('guardian', () => {
         accessToken: mockAccessToken,
         imxPublicApiDomain: mockImxPublicApiDomain,
         confirmationScreen: mockConfirmationScreen,
+        imxEtherAddress: mockEtherAddress,
+
       });
       await guardianClient.validate({ payloadHash: 'hash' });
 
@@ -57,10 +61,11 @@ describe('guardian', () => {
         accessToken: mockAccessToken,
         imxPublicApiDomain: mockImxPublicApiDomain,
         confirmationScreen: mockConfirmationScreen,
+        imxEtherAddress: mockEtherAddress,
       });
       await guardianClient.validate({ payloadHash: 'hash' });
 
-      expect(mockConfirmationScreen.startGuardianTransaction).toHaveBeenCalledWith('hash');
+      expect(mockConfirmationScreen.startGuardianTransaction).toHaveBeenCalledWith('hash', mockEtherAddress);
     });
 
     it('should throw error if user did not confirm the transaction', async () => {
@@ -73,6 +78,7 @@ describe('guardian', () => {
         accessToken: mockAccessToken,
         imxPublicApiDomain: mockImxPublicApiDomain,
         confirmationScreen: mockConfirmationScreen,
+        imxEtherAddress: mockEtherAddress,
       });
       expect(guardianClient.validate({ payloadHash: 'hash' })).rejects.toThrow('Transaction rejected by user');
     });
