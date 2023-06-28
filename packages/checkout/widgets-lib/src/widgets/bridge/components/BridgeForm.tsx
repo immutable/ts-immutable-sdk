@@ -82,7 +82,7 @@ export function BridgeForm(props: BridgeFormProps) {
   }, []);
 
   useEffect(() => {
-    if (tokenBalances.length === 0 || cryptoFiatState.conversions.size === 0) return;
+    if (tokenBalances.length === 0) return;
     const options = tokenBalances
       .filter((b) => b.balance.gt(0))
       .map(
@@ -92,9 +92,9 @@ export function BridgeForm(props: BridgeFormProps) {
           symbol: t.token.symbol,
           icon: t.token.icon,
           balance: {
-            formattedFiatAmount: calculateCryptoToFiat(
+            formattedFiatAmount: cryptoFiatState.conversions.size === 0 ? formatZeroAmount('') : calculateCryptoToFiat(
               t.formattedBalance,
-              t.token.symbol,
+              t.token.symbol || '',
               cryptoFiatState.conversions,
             ),
             formattedAmount: tokenValueFormat(t.formattedBalance),
