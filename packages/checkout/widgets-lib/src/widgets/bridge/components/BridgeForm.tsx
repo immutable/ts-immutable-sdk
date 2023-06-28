@@ -45,11 +45,11 @@ export function BridgeForm(props: BridgeFormProps) {
       provider,
       checkout,
       tokenBridge,
-      // network,
       tokenBalances,
       allowedTokens,
     },
   } = useContext(BridgeContext);
+
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
   const { testId, defaultAmount, defaultTokenAddress } = props;
@@ -416,7 +416,8 @@ export function BridgeForm(props: BridgeFormProps) {
     bridgeFormValidator,
     approvalTransaction,
     unsignedBridgeTransaction,
-    insufficientFundsForGas]);
+    insufficientFundsForGas,
+    token]);
 
   const retrySubmitBridge = async () => {
     setShowTxnRejectedState(false);
