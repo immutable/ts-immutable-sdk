@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { mount } from 'cypress/react18';
 import { cy, describe } from 'local-cypress';
 import { BigNumber, utils } from 'ethers';
@@ -18,6 +19,35 @@ describe('Bridge Form', () => {
   const imxAddress = '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff';
   beforeEach(() => {
     cy.viewport('ipad-2');
+    // todo: use intercept helper func when helper is merged into main
+    cy.intercept('https://checkout-api.dev.immutable.com/v1/config', {
+      allowedNetworks: [
+        {
+          chainId: 11155111,
+        },
+        {
+          chainId: 13383,
+        },
+      ],
+      gasEstimateTokens: {
+        11155111: {
+          bridgeToL2Addresses: {
+            gasTokenAddress: 'NATIVE',
+            fromAddress: '0xd1da7e9b2Ce1a4024DaD52b3D37F4c5c91a525C1',
+          },
+          swapAddresses: {
+            inAddress: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE',
+            outAddress: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2',
+          },
+        },
+        13383: {
+          swapAddresses: {
+            inAddress: '0xFEa9FF93DC0C6DC73F8Be009Fe7a22Bb9dcE8A2d',
+            outAddress: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e',
+          },
+        },
+      },
+    });
     cy.intercept('https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia', []);
     cy.intercept('https://zkevm-rpc.dev.x.immutable.com/', []);
 
@@ -42,7 +72,16 @@ describe('Bridge Form', () => {
         }),
       } as unknown as Web3Provider,
       walletProvider: null,
-      network: null,
+      network: {
+        chainId: 1,
+        name: 'Ethereum',
+        nativeCurrency: {
+          name: 'ETH',
+          symbol: 'ETH',
+          decimals: 18,
+          address: '',
+        },
+      },
       exchange: null,
       tokenBalances: [
         {
@@ -111,7 +150,7 @@ describe('Bridge Form', () => {
       });
   });
 
-  it('should use name or name and address for option id', () => {
+  it('should use native token as default and use name or name and address for option id', () => {
     mount(
       <BridgeWidgetTestComponent
         initialStateOverride={bridgeState}
@@ -123,9 +162,64 @@ describe('Bridge Form', () => {
       </BridgeWidgetTestComponent>,
     );
 
+    cySmartGet('bridge-token-select__target__controlledLabel').should('have.text', 'ETH');
     cySmartGet('bridge-token-select__target').click();
     cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').should('exist');
     cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').should('exist');
+  });
+
+  it('should set defaults when provided and ignore casing on token address', () => {
+    cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
+      .resolves({
+        required: true,
+        unsignedTx: {},
+      });
+    cy.stub(TokenBridge.prototype, 'getUnsignedDepositTx').as('getUnsignedDepositTxStub')
+      .resolves({
+        required: true,
+        unsignedTx: {},
+      });
+    mount(
+      <BridgeWidgetTestComponent
+        initialStateOverride={bridgeState}
+        cryptoConversionsOverride={cryptoConversions}
+      >
+        <BridgeForm
+          testId="bridge-form"
+          defaultTokenAddress="0xf57e7e7c23978c3caec3c3548e3d615c346e79ff"
+          defaultAmount="10"
+        />
+      </BridgeWidgetTestComponent>,
+    );
+  });
+
+  it('should show select option if native token not in options list', () => {
+    mount(
+      <BridgeWidgetTestComponent
+        initialStateOverride={{
+          ...bridgeState,
+          tokenBalances: [
+            {
+              balance: BigNumber.from('100000000000000000'),
+              formattedBalance: '0.1',
+              token: {
+                name: 'IMX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              },
+            },
+          ],
+        }}
+        cryptoConversionsOverride={cryptoConversions}
+      >
+        <BridgeForm
+          testId="bridge-form"
+        />
+      </BridgeWidgetTestComponent>,
+    );
+
+    cySmartGet('bridge-token-select__target__defaultLabel').should('have.text', 'Select coin');
   });
 
   describe('Bridge Form submit', () => {
