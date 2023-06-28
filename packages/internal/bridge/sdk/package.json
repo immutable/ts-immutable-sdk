@@ -35,7 +35,6 @@
   ],
   "license": "Apache-2.0",
   "main": "dist/index.js",
-  "module": "dist/module.js",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "scripts": {
