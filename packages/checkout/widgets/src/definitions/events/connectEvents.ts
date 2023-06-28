@@ -11,8 +11,10 @@ export enum ConnectEventType {
 }
 
 /**
- * Type representing a Connect Widget event with type SUCCESS.
- * @property {WalletProviderName} walletProvider - The user's preferred connection provider.
+ * Represents a successful connection to a Web3 provider.
+ * @typedef {Object} ConnectionSuccess
+ * @property {Web3Provider} provider - The connected Web3 provider.
+ * @property {WalletProviderName | undefined} walletProvider - The name of the wallet provider, if available.
  */
 export type ConnectionSuccess = {
   provider: Web3Provider;
