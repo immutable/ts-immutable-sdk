@@ -9,7 +9,7 @@ import {
 import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import moment from 'moment';
 import { formatBytes32String } from 'ethers/lib/utils';
-import { ethers } from 'ethers';
+import { BigNumberish, ethers } from 'ethers';
 
 // mocked eth_signTypedData_v4 parameters. All of these parameters affect the resulting signature.
 const mockMsgDataParams = {
@@ -83,7 +83,7 @@ export class PrimarySalesDemo extends LitElement {
 
   private provider: Web3Provider | undefined = undefined;
 
-  private signTypedData: any = undefined;
+  // private signTypedData: any = undefined;
 
   @property({ type: String, attribute: 'wallet-address' })
   connectedAddress: string | undefined = undefined;
@@ -118,15 +118,21 @@ export class PrimarySalesDemo extends LitElement {
 
       this.provider = resp.provider;
 
+      await this.checkoutSDK.connect({provider: resp.provider})
       const res = await this.checkoutSDK.checkIsWalletConnected({
         provider: resp.provider,
       });
+
 
       this.connectedAddress = res.walletAddress;
 
       console.log('@@@@@@@@ res checkIsWalletConnected', res);
 
       console.log('@@@@@@@ checkoutSDKConnect - resp', resp);
+
+    const signer = await this.provider?.getSigner(res.walletAddress);
+    console.log('@@@@@@@ checkoutSDKConnect - signer', signer);
+
     }
   }
 
@@ -311,45 +317,102 @@ export class PrimarySalesDemo extends LitElement {
     // );
   }
 
-  async generateMulticallerTransaction(
+
+  async signTypedData(
     wallet: JsonRpcSigner,
-    erc721: ethers.Contract,
-    connectedWalletAddress: string,
-    guardedMulticaller: ethers.Contract
-  ) {
-    const deadline = moment.utc().add(30, 'minute').unix();
+    ref: string,
+    targets: string[],
+    data: string[],
+    deadline: BigNumberish,
+    verifyingContract: string,
+    config: { name: string; version: string }
+  ): Promise<string> {
 
-    const ref = formatBytes32String('test');
-    const targets = [erc721.address];
+    const domain = {
+      name: config.name,
+      version: config.version,
+      chainId: await wallet.getChainId(),
+      verifyingContract: verifyingContract,
+    };
 
-    const data = [
-      erc721.interface.encodeFunctionData('mint', [connectedWalletAddress]),
+    const multicall = [
+      {
+        name: "ref",
+        type: "bytes32",
+      },
+      {
+        name: "targets",
+        type: "address[]",
+      },
+      {
+        name: "data",
+        type: "bytes[]",
+      },
+      {
+        name: "deadline",
+        type: "uint256",
+      },
     ];
 
-    const sig = await wallet._signTypedData(
+
+    console.log(
       {
-        name: 'm',
-        version: '1',
+        name: config.name,
+        version: config.version,
         chainId: await wallet.getChainId(),
-        verifyingContract: guardedMulticaller.address,
+        verifyingContract: verifyingContract,
       },
       {
         Multicall: [
           {
-            name: 'ref',
-            type: 'bytes32',
+            name: "ref",
+            type: "bytes32",
           },
           {
-            name: 'targets',
-            type: 'address[]',
+            name: "targets",
+            type: "address[]",
           },
           {
-            name: 'data',
-            type: 'bytes[]',
+            name: "data",
+            type: "bytes[]",
           },
           {
-            name: 'deadline',
-            type: 'uint256',
+            name: "deadline",
+            type: "uint256",
+          },
+        ],
+      },
+      {
+        ref,
+        targets,
+        data,
+        deadline,
+      })
+
+    return await wallet._signTypedData(
+      {
+        name: config.name,
+        version: config.version,
+        chainId: await wallet.getChainId(),
+        verifyingContract: verifyingContract,
+      },
+      {
+        Multicall: [
+          {
+            name: "ref",
+            type: "bytes32",
+          },
+          {
+            name: "targets",
+            type: "address[]",
+          },
+          {
+            name: "data",
+            type: "bytes[]",
+          },
+          {
+            name: "deadline",
+            type: "uint256",
           },
         ],
       },
@@ -360,9 +423,49 @@ export class PrimarySalesDemo extends LitElement {
         deadline,
       }
     );
+  };
+
+  async generateMulticallerTransaction(
+    wallet: JsonRpcSigner,
+    erc721: ethers.Contract,
+    connectedWalletAddress: string,
+    guardedMulticaller: ethers.Contract
+  ) {
+    // const deadline = moment.utc().add(30, 'minute').unix();
+    const deadline = 1687924870;
+    console.log('@@@@@ wallet', wallet);
+    console.log('@@@@@ deadline', deadline);
+
+    console.log('@@@@@ connectedWalletAddress', connectedWalletAddress);
+    console.log('@@@@@ guardedMulticaller', guardedMulticaller);
+
+    const hash = new Date().getTime().toString();
+    const ref = formatBytes32String('test');
+    const targets = [erc721.address];
+
+    const data = [
+      erc721.interface.encodeFunctionData('mint', [connectedWalletAddress]),
+    ];
+
+    console.log('@@@@@ data', data);
+
+    const sig = await this.signTypedData(
+      wallet,
+      ref,
+      targets,
+      data,
+      deadline,
+      guardedMulticaller.address,
+      { name: "m", version: "1" }
+    )
+    console.log('@@@@@ sig', sig);
+
+    console.log('@@@@@ calling guardedMulticaller.execute', await wallet.getAddress());
+
+    
 
     await guardedMulticaller.execute(
-      wallet._address,
+      await wallet.getAddress(),
       ref,
       targets,
       data,
@@ -374,509 +477,513 @@ export class PrimarySalesDemo extends LitElement {
   async onInitiateClick() {
     // await this.generateSignTypedData();'
 
-    const signer = await this.provider?.getSigner();
+    const signer = await this.provider?.getSigner(this.connectedAddress);
+
+    // const [signer] = await ethers.getSigners();
+
+    // const [signer] = await ethers.
 
     const guardedMulticallerAbi = [
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'address',
-            name: '_owner',
-            type: 'address',
+            "internalType": "address",
+            "name": "_owner",
+            "type": "address"
           },
           {
-            internalType: 'string',
-            name: '_name',
-            type: 'string',
+            "internalType": "string",
+            "name": "_name",
+            "type": "string"
           },
           {
-            internalType: 'string',
-            name: '_version',
-            type: 'string',
-          },
+            "internalType": "string",
+            "name": "_version",
+            "type": "string"
+          }
         ],
-        stateMutability: 'nonpayable',
-        type: 'constructor',
+        "stateMutability": "nonpayable",
+        "type": "constructor"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'uint256',
-            name: '_addressLength',
-            type: 'uint256',
+            "internalType": "uint256",
+            "name": "_addressLength",
+            "type": "uint256"
           },
           {
-            internalType: 'uint256',
-            name: '_dataLength',
-            type: 'uint256',
-          },
+            "internalType": "uint256",
+            "name": "_dataLength",
+            "type": "uint256"
+          }
         ],
-        name: 'AddressDataArrayLengthsMismatch',
-        type: 'error',
+        "name": "AddressDataArrayLengthsMismatch",
+        "type": "error"
       },
       {
-        inputs: [],
-        name: 'EmptyAddressArray',
-        type: 'error',
+        "inputs": [],
+        "name": "EmptyAddressArray",
+        "type": "error"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'uint256',
-            name: '_deadline',
-            type: 'uint256',
-          },
+            "internalType": "uint256",
+            "name": "_deadline",
+            "type": "uint256"
+          }
         ],
-        name: 'ExpiredSignature',
-        type: 'error',
+        "name": "ExpiredSignature",
+        "type": "error"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'address',
-            name: '_target',
-            type: 'address',
+            "internalType": "address",
+            "name": "_target",
+            "type": "address"
           },
           {
-            internalType: 'bytes',
-            name: '_data',
-            type: 'bytes',
-          },
+            "internalType": "bytes",
+            "name": "_data",
+            "type": "bytes"
+          }
         ],
-        name: 'FailedCall',
-        type: 'error',
+        "name": "FailedCall",
+        "type": "error"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'bytes32',
-            name: '_ref',
-            type: 'bytes32',
-          },
+            "internalType": "bytes32",
+            "name": "_ref",
+            "type": "bytes32"
+          }
         ],
-        name: 'InvalidRef',
-        type: 'error',
+        "name": "InvalidRef",
+        "type": "error"
       },
       {
-        inputs: [],
-        name: 'InvalidShortString',
-        type: 'error',
+        "inputs": [],
+        "name": "InvalidShortString",
+        "type": "error"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'address',
-            name: '_target',
-            type: 'address',
-          },
+            "internalType": "address",
+            "name": "_target",
+            "type": "address"
+          }
         ],
-        name: 'NonContractAddress',
-        type: 'error',
+        "name": "NonContractAddress",
+        "type": "error"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'bytes32',
-            name: '_ref',
-            type: 'bytes32',
-          },
+            "internalType": "bytes32",
+            "name": "_ref",
+            "type": "bytes32"
+          }
         ],
-        name: 'RefAlreadyExecuted',
-        type: 'error',
+        "name": "RefAlreadyExecuted",
+        "type": "error"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'string',
-            name: 'str',
-            type: 'string',
-          },
+            "internalType": "string",
+            "name": "str",
+            "type": "string"
+          }
         ],
-        name: 'StringTooLong',
-        type: 'error',
+        "name": "StringTooLong",
+        "type": "error"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'bytes',
-            name: '_signature',
-            type: 'bytes',
-          },
+            "internalType": "bytes",
+            "name": "_signature",
+            "type": "bytes"
+          }
         ],
-        name: 'UnauthorizedSignature',
-        type: 'error',
+        "name": "UnauthorizedSignature",
+        "type": "error"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'address',
-            name: '_multicallSigner',
-            type: 'address',
-          },
+            "internalType": "address",
+            "name": "_multicallSigner",
+            "type": "address"
+          }
         ],
-        name: 'UnauthorizedSigner',
-        type: 'error',
+        "name": "UnauthorizedSigner",
+        "type": "error"
       },
       {
-        anonymous: false,
-        inputs: [],
-        name: 'EIP712DomainChanged',
-        type: 'event',
+        "anonymous": false,
+        "inputs": [],
+        "name": "EIP712DomainChanged",
+        "type": "event"
       },
       {
-        anonymous: false,
-        inputs: [
+        "anonymous": false,
+        "inputs": [
           {
-            indexed: true,
-            internalType: 'address',
-            name: '_multicallSigner',
-            type: 'address',
+            "indexed": true,
+            "internalType": "address",
+            "name": "_multicallSigner",
+            "type": "address"
           },
           {
-            indexed: true,
-            internalType: 'bytes32',
-            name: '_ref',
-            type: 'bytes32',
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "_ref",
+            "type": "bytes32"
           },
           {
-            indexed: false,
-            internalType: 'address[]',
-            name: '_targets',
-            type: 'address[]',
+            "indexed": false,
+            "internalType": "address[]",
+            "name": "_targets",
+            "type": "address[]"
           },
           {
-            indexed: false,
-            internalType: 'bytes[]',
-            name: '_data',
-            type: 'bytes[]',
+            "indexed": false,
+            "internalType": "bytes[]",
+            "name": "_data",
+            "type": "bytes[]"
           },
           {
-            indexed: false,
-            internalType: 'uint256',
-            name: '_deadline',
-            type: 'uint256',
-          },
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "_deadline",
+            "type": "uint256"
+          }
         ],
-        name: 'Multicalled',
-        type: 'event',
+        "name": "Multicalled",
+        "type": "event"
       },
       {
-        anonymous: false,
-        inputs: [
+        "anonymous": false,
+        "inputs": [
           {
-            indexed: true,
-            internalType: 'bytes32',
-            name: 'role',
-            type: 'bytes32',
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
           },
           {
-            indexed: true,
-            internalType: 'bytes32',
-            name: 'previousAdminRole',
-            type: 'bytes32',
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "previousAdminRole",
+            "type": "bytes32"
           },
           {
-            indexed: true,
-            internalType: 'bytes32',
-            name: 'newAdminRole',
-            type: 'bytes32',
-          },
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "newAdminRole",
+            "type": "bytes32"
+          }
         ],
-        name: 'RoleAdminChanged',
-        type: 'event',
+        "name": "RoleAdminChanged",
+        "type": "event"
       },
       {
-        anonymous: false,
-        inputs: [
+        "anonymous": false,
+        "inputs": [
           {
-            indexed: true,
-            internalType: 'bytes32',
-            name: 'role',
-            type: 'bytes32',
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
           },
           {
-            indexed: true,
-            internalType: 'address',
-            name: 'account',
-            type: 'address',
+            "indexed": true,
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
           },
           {
-            indexed: true,
-            internalType: 'address',
-            name: 'sender',
-            type: 'address',
-          },
+            "indexed": true,
+            "internalType": "address",
+            "name": "sender",
+            "type": "address"
+          }
         ],
-        name: 'RoleGranted',
-        type: 'event',
+        "name": "RoleGranted",
+        "type": "event"
       },
       {
-        anonymous: false,
-        inputs: [
+        "anonymous": false,
+        "inputs": [
           {
-            indexed: true,
-            internalType: 'bytes32',
-            name: 'role',
-            type: 'bytes32',
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
           },
           {
-            indexed: true,
-            internalType: 'address',
-            name: 'account',
-            type: 'address',
+            "indexed": true,
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
           },
           {
-            indexed: true,
-            internalType: 'address',
-            name: 'sender',
-            type: 'address',
-          },
+            "indexed": true,
+            "internalType": "address",
+            "name": "sender",
+            "type": "address"
+          }
         ],
-        name: 'RoleRevoked',
-        type: 'event',
+        "name": "RoleRevoked",
+        "type": "event"
       },
       {
-        inputs: [],
-        name: 'DEFAULT_ADMIN_ROLE',
-        outputs: [
+        "inputs": [],
+        "name": "DEFAULT_ADMIN_ROLE",
+        "outputs": [
           {
-            internalType: 'bytes32',
-            name: '',
-            type: 'bytes32',
-          },
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+          }
         ],
-        stateMutability: 'view',
-        type: 'function',
+        "stateMutability": "view",
+        "type": "function"
       },
       {
-        inputs: [],
-        name: 'eip712Domain',
-        outputs: [
+        "inputs": [],
+        "name": "eip712Domain",
+        "outputs": [
           {
-            internalType: 'bytes1',
-            name: 'fields',
-            type: 'bytes1',
+            "internalType": "bytes1",
+            "name": "fields",
+            "type": "bytes1"
           },
           {
-            internalType: 'string',
-            name: 'name',
-            type: 'string',
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
           },
           {
-            internalType: 'string',
-            name: 'version',
-            type: 'string',
+            "internalType": "string",
+            "name": "version",
+            "type": "string"
           },
           {
-            internalType: 'uint256',
-            name: 'chainId',
-            type: 'uint256',
+            "internalType": "uint256",
+            "name": "chainId",
+            "type": "uint256"
           },
           {
-            internalType: 'address',
-            name: 'verifyingContract',
-            type: 'address',
+            "internalType": "address",
+            "name": "verifyingContract",
+            "type": "address"
           },
           {
-            internalType: 'bytes32',
-            name: 'salt',
-            type: 'bytes32',
+            "internalType": "bytes32",
+            "name": "salt",
+            "type": "bytes32"
           },
           {
-            internalType: 'uint256[]',
-            name: 'extensions',
-            type: 'uint256[]',
-          },
+            "internalType": "uint256[]",
+            "name": "extensions",
+            "type": "uint256[]"
+          }
         ],
-        stateMutability: 'view',
-        type: 'function',
+        "stateMutability": "view",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'address',
-            name: '_multicallSigner',
-            type: 'address',
+            "internalType": "address",
+            "name": "_multicallSigner",
+            "type": "address"
           },
           {
-            internalType: 'bytes32',
-            name: '_ref',
-            type: 'bytes32',
+            "internalType": "bytes32",
+            "name": "_ref",
+            "type": "bytes32"
           },
           {
-            internalType: 'address[]',
-            name: '_targets',
-            type: 'address[]',
+            "internalType": "address[]",
+            "name": "_targets",
+            "type": "address[]"
           },
           {
-            internalType: 'bytes[]',
-            name: '_data',
-            type: 'bytes[]',
+            "internalType": "bytes[]",
+            "name": "_data",
+            "type": "bytes[]"
           },
           {
-            internalType: 'uint256',
-            name: '_deadline',
-            type: 'uint256',
+            "internalType": "uint256",
+            "name": "_deadline",
+            "type": "uint256"
           },
           {
-            internalType: 'bytes',
-            name: '_signature',
-            type: 'bytes',
-          },
+            "internalType": "bytes",
+            "name": "_signature",
+            "type": "bytes"
+          }
         ],
-        name: 'execute',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
+        "name": "execute",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'bytes32',
-            name: 'role',
-            type: 'bytes32',
-          },
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
+          }
         ],
-        name: 'getRoleAdmin',
-        outputs: [
+        "name": "getRoleAdmin",
+        "outputs": [
           {
-            internalType: 'bytes32',
-            name: '',
-            type: 'bytes32',
-          },
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+          }
         ],
-        stateMutability: 'view',
-        type: 'function',
+        "stateMutability": "view",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'address',
-            name: '_user',
-            type: 'address',
-          },
+            "internalType": "address",
+            "name": "_user",
+            "type": "address"
+          }
         ],
-        name: 'grantMulticallSignerRole',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
+        "name": "grantMulticallSignerRole",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'bytes32',
-            name: 'role',
-            type: 'bytes32',
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
           },
           {
-            internalType: 'address',
-            name: 'account',
-            type: 'address',
-          },
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
         ],
-        name: 'grantRole',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
+        "name": "grantRole",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'bytes32',
-            name: 'role',
-            type: 'bytes32',
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
           },
           {
-            internalType: 'address',
-            name: 'account',
-            type: 'address',
-          },
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
         ],
-        name: 'hasRole',
-        outputs: [
+        "name": "hasRole",
+        "outputs": [
           {
-            internalType: 'bool',
-            name: '',
-            type: 'bool',
-          },
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
         ],
-        stateMutability: 'view',
-        type: 'function',
+        "stateMutability": "view",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'bytes[]',
-            name: '_data',
-            type: 'bytes[]',
-          },
+            "internalType": "bytes[]",
+            "name": "_data",
+            "type": "bytes[]"
+          }
         ],
-        name: 'hashBytesArray',
-        outputs: [
+        "name": "hashBytesArray",
+        "outputs": [
           {
-            internalType: 'bytes32',
-            name: '',
-            type: 'bytes32',
-          },
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+          }
         ],
-        stateMutability: 'pure',
-        type: 'function',
+        "stateMutability": "pure",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'bytes32',
-            name: 'role',
-            type: 'bytes32',
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
           },
           {
-            internalType: 'address',
-            name: 'account',
-            type: 'address',
-          },
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
         ],
-        name: 'renounceRole',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
+        "name": "renounceRole",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'bytes32',
-            name: 'role',
-            type: 'bytes32',
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
           },
           {
-            internalType: 'address',
-            name: 'account',
-            type: 'address',
-          },
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
         ],
-        name: 'revokeRole',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
+        "name": "revokeRole",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
       },
       {
-        inputs: [
+        "inputs": [
           {
-            internalType: 'bytes4',
-            name: 'interfaceId',
-            type: 'bytes4',
-          },
+            "internalType": "bytes4",
+            "name": "interfaceId",
+            "type": "bytes4"
+          }
         ],
-        name: 'supportsInterface',
-        outputs: [
+        "name": "supportsInterface",
+        "outputs": [
           {
-            internalType: 'bool',
-            name: '',
-            type: 'bool',
-          },
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
         ],
-        stateMutability: 'view',
-        type: 'function',
-      },
+        "stateMutability": "view",
+        "type": "function"
+      }
     ];
 
     const guardedMulticallerAbiString =
@@ -1644,11 +1751,16 @@ export class PrimarySalesDemo extends LitElement {
       signer
     );
 
+    console.log('GuardedMulticaller', GuardedMulticaller);
+
     const Erc721 = new ethers.Contract(
       '0x5FbDB2315678afecb367f032d93F642f64180aa3',
       erc721Abi,
       signer
     );
+
+    console.log('Erc721', Erc721);
+
 
     await this.generateMulticallerTransaction(
       signer as JsonRpcSigner,
