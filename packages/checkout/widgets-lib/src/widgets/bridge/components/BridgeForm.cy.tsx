@@ -9,7 +9,7 @@ import { TokenBridge } from '@imtbl/bridge-sdk';
 import { Environment } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
 import { BridgeWidgetTestComponent } from '../test-components/BridgeWidgetTestComponent';
-import { cySmartGet } from '../../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { BridgeForm } from './BridgeForm';
 import { text } from '../../../resources/text/textConfig';
 
@@ -19,37 +19,7 @@ describe('Bridge Form', () => {
   const imxAddress = '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff';
   beforeEach(() => {
     cy.viewport('ipad-2');
-    // todo: use intercept helper func when helper is merged into main
-    cy.intercept('https://checkout-api.dev.immutable.com/v1/config', {
-      allowedNetworks: [
-        {
-          chainId: 11155111,
-        },
-        {
-          chainId: 13383,
-        },
-      ],
-      gasEstimateTokens: {
-        11155111: {
-          bridgeToL2Addresses: {
-            gasTokenAddress: 'NATIVE',
-            fromAddress: '0xd1da7e9b2Ce1a4024DaD52b3D37F4c5c91a525C1',
-          },
-          swapAddresses: {
-            inAddress: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE',
-            outAddress: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2',
-          },
-        },
-        13383: {
-          swapAddresses: {
-            inAddress: '0xFEa9FF93DC0C6DC73F8Be009Fe7a22Bb9dcE8A2d',
-            outAddress: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e',
-          },
-        },
-      },
-    });
-    cy.intercept('https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia', []);
-    cy.intercept('https://zkevm-rpc.dev.x.immutable.com/', []);
+    cyIntercept();
 
     cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
     bridgeState = {
@@ -73,8 +43,8 @@ describe('Bridge Form', () => {
       } as unknown as Web3Provider,
       walletProvider: null,
       network: {
-        chainId: 1,
-        name: 'Ethereum',
+        chainId: ChainId.SEPOLIA,
+        name: 'Sepolia',
         nativeCurrency: {
           name: 'ETH',
           symbol: 'ETH',
@@ -147,6 +117,18 @@ describe('Bridge Form', () => {
       .resolves({
         bridgeable: true,
         feeAmount: BigNumber.from(1),
+      });
+
+    cy.stub(Checkout.prototype, 'gasEstimate').as('gasEstimateStub')
+      .resolves({
+        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+        bridgeFee: {
+          estimatedAmount: utils.parseEther('0.0001'),
+        },
+        gasEstimate: {
+          estimatedAmount: utils.parseEther('0.0001'),
+        },
+        bridgeable: true,
       });
   });
 
