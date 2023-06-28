@@ -91,6 +91,11 @@ export class ZkEvmProvider {
         case 'eth_sendTransaction': {
           return authWrapper(ethSendTransaction);
         }
+        case 'eth_gasPrice':
+        case 'eth_getBalance':
+        case 'eth_getStorageAt': {
+          return this.jsonRpcProvider.send(request.method, request.params);
+        }
         default: {
           return Promise.reject(
             new JsonRpcError(RpcErrorCode.METHOD_NOT_FOUND, 'Method not supported'),
