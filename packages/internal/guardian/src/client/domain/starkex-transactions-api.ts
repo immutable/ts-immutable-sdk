@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Swagger Guardian
+ * Guardian
  * Guardian API
  *
  * The version of the OpenAPI document: 1.0.0
@@ -26,7 +26,7 @@ import { APIError404 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
 // @ts-ignore
-import { StarkExTransactionValidateReponseDefinition } from '../models';
+import { TransactionEvaluationResponse } from '../models';
 /**
  * StarkexTransactionsApi - axios parameter creator
  * @export
@@ -38,6 +38,7 @@ export const StarkexTransactionsApiAxiosParamCreator = function (configuration?:
          * @summary Evaluate if it is an valid transaction
          * @param {string} payloadHash Hash for the payload
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         evaluateStarkexTransaction: async (payloadHash: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -86,9 +87,10 @@ export const StarkexTransactionsApiFp = function(configuration?: Configuration) 
          * @summary Evaluate if it is an valid transaction
          * @param {string} payloadHash Hash for the payload
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
-        async evaluateStarkexTransaction(payloadHash: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StarkExTransactionValidateReponseDefinition>> {
+        async evaluateStarkexTransaction(payloadHash: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionEvaluationResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.evaluateStarkexTransaction(payloadHash, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -107,9 +109,10 @@ export const StarkexTransactionsApiFactory = function (configuration?: Configura
          * @summary Evaluate if it is an valid transaction
          * @param {StarkexTransactionsApiEvaluateStarkexTransactionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
-        evaluateStarkexTransaction(requestParameters: StarkexTransactionsApiEvaluateStarkexTransactionRequest, options?: AxiosRequestConfig): AxiosPromise<StarkExTransactionValidateReponseDefinition> {
+        evaluateStarkexTransaction(requestParameters: StarkexTransactionsApiEvaluateStarkexTransactionRequest, options?: AxiosRequestConfig): AxiosPromise<TransactionEvaluationResponse> {
             return localVarFp.evaluateStarkexTransaction(requestParameters.payloadHash, options).then((request) => request(axios, basePath));
         },
     };
@@ -141,6 +144,7 @@ export class StarkexTransactionsApi extends BaseAPI {
      * @summary Evaluate if it is an valid transaction
      * @param {StarkexTransactionsApiEvaluateStarkexTransactionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof StarkexTransactionsApi
      */

@@ -19,6 +19,7 @@ import {
 } from '@imtbl/core-sdk';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { IMXProvider } from '@imtbl/provider';
+import GuardianClient from './guardian';
 import { UserImx } from '../types';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import {
@@ -48,7 +49,7 @@ export class PassportImxProvider implements IMXProvider {
 
   private readonly confirmationScreen: ConfirmationScreen;
 
-  private readonly imxPublicApiDomain: string;
+  private readonly guardianClient: GuardianClient;
 
   constructor({
     user,
@@ -60,8 +61,13 @@ export class PassportImxProvider implements IMXProvider {
     this.user = user;
     this.starkSigner = starkSigner;
     this.immutableXClient = immutableXClient;
-    this.imxPublicApiDomain = imxPublicApiDomain;
     this.confirmationScreen = confirmationScreen;
+    this.guardianClient = new GuardianClient({
+      imxPublicApiDomain,
+      accessToken: user.accessToken,
+      confirmationScreen,
+      imxEtherAddress: user.imx.ethAddress,
+    });
   }
 
   async transfer(
@@ -72,8 +78,7 @@ export class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       transfersApi: this.immutableXClient.transfersApi,
-      confirmationScreen: this.confirmationScreen,
-      imxPublicApiDomain: this.imxPublicApiDomain,
+      guardianClient: this.guardianClient,
     });
   }
 
@@ -101,7 +106,7 @@ export class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       ordersApi: this.immutableXClient.ordersApi,
-      confirmationScreen: this.confirmationScreen,
+      guardianClient: this.guardianClient,
     });
   }
 
@@ -113,7 +118,7 @@ export class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       ordersApi: this.immutableXClient.ordersApi,
-      confirmationScreen: this.confirmationScreen,
+      guardianClient: this.guardianClient,
     });
   }
 
@@ -123,7 +128,7 @@ export class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       tradesApi: this.immutableXClient.tradesApi,
-      confirmationScreen: this.confirmationScreen,
+      guardianClient: this.guardianClient,
     });
   }
 
@@ -135,7 +140,7 @@ export class PassportImxProvider implements IMXProvider {
       user: this.user,
       starkSigner: this.starkSigner,
       transfersApi: this.immutableXClient.transfersApi,
-      confirmationScreen: this.confirmationScreen,
+      guardianClient: this.guardianClient,
     });
   }
 
