@@ -1,12 +1,6 @@
 import { ChainId } from './chainId';
 import { TokenInfo } from './tokenInfo';
 
-/**
- * Interface representing token information for a specific chain.
- * @extends {TokenInfo}
- * @property {ChainId} chainId - The ID of the blockchain network.
- * @property {TokenFilterTypes[]} tokenFeatures - The features supported by the token.
- */
 export interface TokenMasterInfo extends TokenInfo {
   chainId: ChainId;
   tokenFeatures: TokenFilterTypes[];

@@ -14,16 +14,17 @@ export enum GasEstimateType {
 }
 
 /**
- * A union type that represents either a GasEstimateBridgeToL2Params or a GasEstimateSwapParams.
+ * Represents the parameters for estimating gas usage, which can be either
+ * GasEstimateBridgeToL2Params or GasEstimateSwapParams {@link Checkout.gasEstimate}.
+ * @typedef {GasEstimateBridgeToL2Params | GasEstimateSwapParams} GasEstimateParams
  */
 export type GasEstimateParams = GasEstimateBridgeToL2Params | GasEstimateSwapParams;
 
 /**
- * An interface representing the parameters for estimating gas for a bridge to L2 transaction.
+ * An interface representing the parameters for estimating gas for a bridge to L2 transaction {@link Checkout.gasEstimate}.
  * @param {GasEstimateType.BRIDGE_TO_L2} gasEstimateType - The type of gas estimate.
  * @param {boolean} isSpendingCapApprovalRequired - Whether or not spending cap approval is required.
  * @param {FungibleToken | undefined} tokenAddress - The address of the fungible token to use in the transaction.
- * @returns None
  */
 export interface GasEstimateBridgeToL2Params {
   gasEstimateType: GasEstimateType.BRIDGE_TO_L2;
@@ -32,7 +33,7 @@ export interface GasEstimateBridgeToL2Params {
 }
 
 /**
- * An interface representing the parameters for a gas estimate swap.
+ * An interface representing the parameters for a gas estimate swap {@link Checkout.gasEstimate}.
  * @interface
  * @property {GasEstimateType.SWAP} gasEstimateType - The type of gas estimate, which is always "swap".
  */
@@ -41,7 +42,7 @@ export interface GasEstimateSwapParams {
 }
 
 /**
- * An interface representing the result of a gas estimate for a swap transaction.
+ * An interface representing the result of a gas estimate for a swap transaction {@link Checkout.gasEstimate}.
  * @interface GasEstimateSwapResult
  * @property {GasEstimateType.SWAP} gasEstimateType - The type of gas estimate, which is always "SWAP".
  * @property {TokenAmountEstimate} gasFee - The estimated gas fee for the swap transaction.
@@ -52,7 +53,7 @@ export interface GasEstimateSwapResult {
 }
 
 /**
- * An interface representing the result of a gas estimate for a bridge to L2 transaction.
+ * An interface representing the result of a gas estimate for a bridge to L2 transaction {@link Checkout.gasEstimate}.
  * @interface GasEstimateBridgeToL2Result
  * @property {GasEstimateType.BRIDGE_TO_L2} gasEstimateType - The type of gas estimate.
  * @property {TokenAmountEstimate} gasFee - The estimated gas fee for the transaction.
@@ -66,12 +67,6 @@ export interface GasEstimateBridgeToL2Result {
   bridgeable: boolean;
 }
 
-/**
- * An interface representing an estimated token amount and the corresponding token information.
- * @interface TokenAmountEstimate
- * @property {BigNumber | undefined} estimatedAmount - The estimated amount of tokens.
- * @property {TokenInfo | undefined} token - The corresponding token information.
- */
 export interface TokenAmountEstimate {
   estimatedAmount?: BigNumber;
   token?: TokenInfo;

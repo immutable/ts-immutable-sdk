@@ -47,12 +47,6 @@ export interface GetAllBalancesResult {
   balances: GetBalanceResult[];
 }
 
-/**
- * The ERC20ABI constant is an array of objects representing the functions and properties
- * of an ERC20 token contract. Each object in the array represents a specific function or
- * property of the contract, including its name, inputs, outputs, and type.
- * @type {Array<Object>}
- */
 export const ERC20ABI = [
   {
     constant: true,

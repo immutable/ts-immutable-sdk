@@ -1,8 +1,5 @@
 import { WalletProviderName } from './provider';
 
-/**
- * Enum representing different wallet actions.
- */
 export enum WalletAction {
   CHECK_CONNECTION = 'eth_accounts',
   CONNECT = 'eth_requestAccounts',

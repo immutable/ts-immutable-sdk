@@ -8,7 +8,7 @@ export enum WalletProviderName {
 }
 
 /**
- * Interface for the parameters required to create a wallet provider.
+ * Interface for the parameters required to create a wallet provider {@link Checkout.createProvider}.
  * @interface CreateProviderParams
  * @property {WalletProviderName} walletProvider - The name of the wallet provider.
  */
@@ -17,27 +17,18 @@ export interface CreateProviderParams {
 }
 
 /**
- * Represents the result of creating a Web3 provider.
+ * Represents the result of creating a Web3 provider {@link Checkout.createProvider}.
  * @property {Web3Provider} provider - The created Web3 provider.
  */
 export type CreateProviderResult = {
   provider: Web3Provider
 };
 
-/**
- * Represents the options for validating a provider.
- */
 export type ValidateProviderOptions = {
   allowMistmatchedChainId: boolean;
   allowUnsupportedProvider: boolean;
 };
 
-/**
- * Default options for validating a provider.
- * @type {ValidateProviderOptions}
- * @property {boolean} allowMistmatchedChainId - Whether to allow a mismatched chain ID between the provider and the expected chain ID.
- * @property {boolean} allowUnsupportedProvider - Whether to allow an unsupported provider.
- */
 export const validateProviderDefaults:ValidateProviderOptions = {
   allowMistmatchedChainId: false,
   allowUnsupportedProvider: false,
