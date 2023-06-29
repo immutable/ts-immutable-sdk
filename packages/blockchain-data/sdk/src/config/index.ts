@@ -38,12 +38,12 @@ export const createAPIConfiguration = ({
 
 const production = (): mr.Configuration =>
   createAPIConfiguration({
-    basePath: 'https://indexer-mr.dev.imtbl.com/v1', // TODO update before mainnet release
+    basePath: 'https://indexer-mr.imtbl.com',
   });
 
 const sandbox = (): mr.Configuration =>
   createAPIConfiguration({
-    basePath: 'https://indexer-mr.dev.imtbl.com/v1', // TODO update before testnet release
+    basePath: 'https://indexer-mr.sandbox.imtbl.com',
   });
 
 export interface BlockchainDataModuleConfiguration

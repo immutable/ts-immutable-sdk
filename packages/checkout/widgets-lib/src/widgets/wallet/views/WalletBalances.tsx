@@ -35,10 +35,14 @@ export function WalletBalances() {
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const {
-    provider, checkout, network, supportedTopUps, tokenBalances,
+    provider,
+    checkout,
+    network,
+    supportedTopUps,
+    tokenBalances,
   } = walletState;
   const { conversions } = cryptoFiatState;
-  const [balancesLoading, setBalancesLoading] = useState(false);
+  const [balancesLoading, setBalancesLoading] = useState(true);
   useTokenSymbols(checkout, cryptoFiatDispatch);
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
@@ -55,12 +59,12 @@ export function WalletBalances() {
   useEffect(() => {
     let totalAmount = 0.0;
 
-    walletState.tokenBalances.forEach((balance) => {
+    tokenBalances.forEach((balance) => {
       const fiatAmount = parseFloat(balance.fiatAmount);
       if (!Number.isNaN(fiatAmount)) totalAmount += fiatAmount;
     });
     setTotalFiatAmount(totalAmount);
-  }, [walletState.tokenBalances]);
+  }, [tokenBalances]);
 
   const handleAddCoinsClick = () => {
     viewDispatch({
@@ -77,7 +81,6 @@ export function WalletBalances() {
       const balances = await getTokenBalances(
         checkout,
         provider,
-        network.name,
         network.chainId,
         conversions,
       );
@@ -88,6 +91,7 @@ export function WalletBalances() {
           tokenBalances: balances,
         },
       });
+      setBalancesLoading(false);
     })();
   }, [
     checkout,
@@ -96,10 +100,6 @@ export function WalletBalances() {
     conversions,
     setBalancesLoading,
     walletDispatch]);
-
-  useEffect(() => {
-    setBalancesLoading(false);
-  }, [tokenBalances]);
 
   return (
     <SimpleLayout
@@ -135,7 +135,7 @@ export function WalletBalances() {
           <Box
             sx={WalletBalanceItemStyle(
               showAddCoins,
-              walletState.tokenBalances.length > 2 || balancesLoading,
+              tokenBalances.length > 2 || balancesLoading,
             )}
           >
             {balancesLoading && (
@@ -154,7 +154,7 @@ export function WalletBalances() {
               />
             </Box>
             )}
-            {!balancesLoading && (<TokenBalanceList balanceInfoItems={walletState.tokenBalances} />)}
+            {!balancesLoading && (<TokenBalanceList balanceInfoItems={tokenBalances} />)}
           </Box>
         </Box>
         {showAddCoins && (

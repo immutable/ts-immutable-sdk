@@ -18,9 +18,6 @@
 import { ActivityNFT } from './activity-nft';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ActivityType } from './activity-type';
-// May contain unused imports in some cases
-// @ts-ignore
 import { Burn } from './burn';
 // May contain unused imports in some cases
 // @ts-ignore

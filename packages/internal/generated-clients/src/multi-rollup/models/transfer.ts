@@ -16,9 +16,6 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { ActivityAsset } from './activity-asset';
-// May contain unused imports in some cases
-// @ts-ignore
-import { ActivityType } from './activity-type';
 
 /**
  * The transfer activity details
@@ -26,12 +23,6 @@ import { ActivityType } from './activity-type';
  * @interface Transfer
  */
 export interface Transfer {
-    /**
-     * 
-     * @type {ActivityType}
-     * @memberof Transfer
-     */
-    'activity_type': ActivityType;
     /**
      * The account address the asset was transferred from
      * @type {string}
