@@ -20,9 +20,9 @@ import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { WalletContext } from '../../widgets/wallet/context/WalletContext';
 import { getBridgeFeeEstimation, getSwapFeeEstimation } from '../../lib/feeEstimation';
-import { CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
-import { useTokenSymbols } from '../../lib/hooks/useTokenSymbols';
+import { CryptoFiatActions, CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
 import { useInterval } from '../../lib/hooks/useInterval';
+import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
@@ -60,7 +60,16 @@ export function TopUpView({
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
 
-  useTokenSymbols(checkout, cryptoFiatDispatch);
+  useEffect(() => {
+    if (!checkout) return;
+    if (!cryptoFiatDispatch) return;
+    cryptoFiatDispatch({
+      payload: {
+        type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+        tokenSymbols: DEFAULT_TOKEN_SYMBOLS,
+      },
+    });
+  }, [checkout, cryptoFiatDispatch]);
 
   const onClickOnramp = () => {
     // if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
