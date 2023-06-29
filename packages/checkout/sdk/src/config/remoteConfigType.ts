@@ -36,3 +36,9 @@ export type RemoteConfiguration = {
 export type RemoteConfigParams = {
   environment: Environment;
 };
+
+export type ConfiguredTokens = {
+  [key: string]: {
+    allowed?: TokenInfo[];
+  };
+};

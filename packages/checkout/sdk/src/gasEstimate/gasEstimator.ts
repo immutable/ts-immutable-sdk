@@ -1,11 +1,12 @@
 import { BigNumber, utils } from 'ethers/lib/ethers';
-import { Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { Contract, ethers } from 'ethers';
 import { FungibleToken } from '@imtbl/bridge-sdk';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import {
   ChainId,
+  ENVIRONMENT_L1_CHAIN_MAP,
+  ENVIRONMENT_L2_CHAIN_MAP,
   ERC20ABI,
   GasEstimateBridgeToL2Result,
   GasEstimateParams,
@@ -28,30 +29,14 @@ import {
 const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000000';
 const DEFAULT_TOKEN_DECIMALS = 18;
 
-const getL1ChainId = (environment: Environment): ChainId => {
-  if (environment === Environment.PRODUCTION) {
-    return ChainId.SEPOLIA;
-  }
-  return ChainId.SEPOLIA;
-};
-
-const getL2ChainId = (environment: Environment): ChainId => {
-  if (environment === Environment.PRODUCTION) {
-    return ChainId.IMTBL_ZKEVM_TESTNET;
-  }
-  return ChainId.IMTBL_ZKEVM_DEVNET;
-};
-
 async function getTokenInfoByAddress(
   config: CheckoutConfiguration,
   tokenAddress: FungibleToken,
   chainId: ChainId,
-  provider: Web3Provider,
+  provider: JsonRpcProvider,
 ): Promise<TokenInfo | undefined> {
-  const { networkMap } = config;
   if (tokenAddress === 'NATIVE') {
-    const networkInfo = networkMap.get(chainId);
-    return networkInfo!.nativeCurrency;
+    return config.networkMap.get(chainId)?.nativeCurrency;
   }
 
   const contract = new Contract(
@@ -76,18 +61,19 @@ async function bridgeToL2GasEstimator(
   isSpendingCapApprovalRequired: boolean,
   tokenAddress?: FungibleToken,
 ): Promise<GasEstimateBridgeToL2Result> {
-  const fromChainId = getL1ChainId(config.environment);
-  const toChainId = getL2ChainId(config.environment);
+  const fromChainId = ENVIRONMENT_L1_CHAIN_MAP[config.environment];
+  const toChainId = ENVIRONMENT_L2_CHAIN_MAP[config.environment];
 
   const gasEstimateTokensConfig = (await config.remoteConfigFetcher.getConfig(
     'gasEstimateTokens',
   )) as GasEstimateTokenConfig;
 
   const { gasTokenAddress, fromAddress } = gasEstimateTokensConfig[
-    fromChainId.toString()
+    fromChainId
   ].bridgeToL2Addresses as GasEstimateBridgeToL2TokenConfig;
 
   const provider = readOnlyProviders.get(fromChainId);
+  if (!provider) throw new Error(`Missing JsonRpcProvider for chain id: ${fromChainId}`);
 
   try {
     const gasFee = await getBridgeEstimatedGas(
@@ -99,7 +85,7 @@ async function bridgeToL2GasEstimator(
       config,
       tokenAddress ?? (gasTokenAddress || 'NATIVE'),
       fromChainId,
-      provider as Web3Provider,
+      provider,
     );
 
     const tokenBridge = await instance.createBridgeInstance(
@@ -117,7 +103,7 @@ async function bridgeToL2GasEstimator(
       config,
       fromAddress,
       toChainId,
-      provider as Web3Provider,
+      provider,
     );
 
     return {
@@ -143,7 +129,7 @@ async function bridgeToL2GasEstimator(
 async function swapGasEstimator(
   config: CheckoutConfiguration,
 ): Promise<GasEstimateSwapResult> {
-  const chainId = getL2ChainId(config.environment);
+  const chainId = ENVIRONMENT_L2_CHAIN_MAP[config.environment];
 
   const gasEstimateTokensConfig = (await config.remoteConfigFetcher.getConfig(
     'gasEstimateTokens',
