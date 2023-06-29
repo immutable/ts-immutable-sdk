@@ -13,17 +13,6 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { APIError500AllOf } from './apierror500-all-of';
-// May contain unused imports in some cases
-// @ts-ignore
-import { BasicAPIError } from './basic-apierror';
-
-/**
- * @type APIError500
- * @export
- */
-export type APIError500 = APIError500AllOf & BasicAPIError;
-
-
+export * from "./api";
+export * from "./configuration";
+export * from "./models";
