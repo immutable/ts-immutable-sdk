@@ -16,9 +16,9 @@ export type BridgeSuccess = {
 };
 
 /**
- * Represents a failed bridge connection.
- * @property {string} reason - The reason for the failed connection.
- * @property {number} timestamp - The timestamp of the failed connection.
+ * Represents a failed bridge transaction.
+ * @property {string} reason - The reason for the failed transaction.
+ * @property {number} timestamp - The timestamp of the failed transaction.
  */
 export type BridgeFailed = {
   reason: string;
