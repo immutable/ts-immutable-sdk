@@ -1,8 +1,8 @@
-import { validateAndBuildVersion } from './CheckoutWidgets';
+import { CheckoutWidgets, validateAndBuildVersion } from './CheckoutWidgets';
 import { SemanticVersion } from './definitions/config';
 
 describe('CheckoutWidgets', () => {
-  const DEFAULT_CHECKOUT_VERSION = '0.1.9-alpha';
+  const DEFAULT_CHECKOUT_VERSION = '1.1.1-alpha.3';
   const OLD_ENV = process.env;
 
   beforeAll(() => {
@@ -122,6 +122,15 @@ describe('CheckoutWidgets', () => {
         const validVersion = validateAndBuildVersion(testCase.version);
         expect(validVersion).toEqual(testCase.expectedVersion);
       });
+    });
+
+    it('should validate the correct versioning when using CheckoutWidgets', () => {
+      CheckoutWidgets();
+      expect(document.head.innerHTML).toBe(
+        `<script src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${
+          DEFAULT_CHECKOUT_VERSION
+        }/dist/browser/checkout.js"></script>`,
+      );
     });
   });
 });
