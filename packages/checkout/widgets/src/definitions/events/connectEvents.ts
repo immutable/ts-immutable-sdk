@@ -12,7 +12,6 @@ export enum ConnectEventType {
 
 /**
  * Represents a successful connection to a Web3 provider.
- * @typedef {Object} ConnectionSuccess
  * @property {Web3Provider} provider - The connected Web3 provider.
  * @property {WalletProviderName | undefined} walletProvider - The name of the wallet provider, if available.
  */
@@ -23,7 +22,6 @@ export type ConnectionSuccess = {
 
 /**
  * Represents a connection failure with a reason.
- * @typedef {Object} ConnectionFailed
  * @property {string} reason - The reason for the failed connection.
  */
 export type ConnectionFailed = {

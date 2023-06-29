@@ -22,7 +22,6 @@ export enum CheckoutErrorType {
 
 /**
  * Represents an error object with a specific type, optional message, and optional data.
- * @typedef {Object} ErrorType
  * @property {CheckoutErrorType} type - The type of the error.
  * @property {string | undefined} [message] - The error message.
  * @property {Object.<string, string> | undefined} [data] - Additional data associated with the error.

@@ -11,7 +11,6 @@ export enum OrchestrationEventType {
 
 /**
  * Represents the event object for a request to connect to a wallet provider.
- * @typedef {Object} RequestConnectEvent
  * @property {string} walletProvider - The name of the wallet provider.
  */
 export type RequestConnectEvent = {
@@ -20,7 +19,6 @@ export type RequestConnectEvent = {
 
 /**
  * Represents an event that requests a wallet provider.
- * @typedef {Object} RequestWalletEvent
  * @property {string} walletProvider - The requested wallet provider.
  */
 export type RequestWalletEvent = {
@@ -29,7 +27,6 @@ export type RequestWalletEvent = {
 
 /**
  * Represents an event where a token swap is requested.
- * @typedef {Object} RequestSwapEvent
  * @property {string} fromTokenAddress - The address of the token to swap from.
  * @property {string} toTokenAddress - The address of the token to swap to.
  * @property {string} amount - The amount of tokens to swap.
@@ -42,7 +39,6 @@ export type RequestSwapEvent = {
 
 /**
  * Represents a request bridge event object.
- * @typedef {Object} RequestBridgeEvent
  * @property {string} tokenAddress - The address of the token.
  * @property {string} amount - The amount of the token.
  */
@@ -53,7 +49,6 @@ export type RequestBridgeEvent = {
 
 /**
  * Represents an event that is triggered when a request is made to onboard a user onto a platform.
- * @typedef {Object} RequestOnrampEvent
  * @property {string} tokenAddress - The address of the token to be used for onramping.
  * @property {string} amount - The amount of tokens to be onramped.
  */

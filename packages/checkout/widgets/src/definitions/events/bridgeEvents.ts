@@ -9,7 +9,6 @@ export enum BridgeEventType {
 
 /**
  * Represents a successful bridge transaction.
- * @typedef {Object} BridgeSuccess
  * @property {string} transactionHash - The hash of the successful transaction.
  */
 export type BridgeSuccess = {
@@ -18,7 +17,6 @@ export type BridgeSuccess = {
 
 /**
  * Represents a failed bridge connection.
- * @typedef {Object} BridgeFailed
  * @property {string} reason - The reason for the failed connection.
  * @property {number} timestamp - The timestamp of the failed connection.
  */
