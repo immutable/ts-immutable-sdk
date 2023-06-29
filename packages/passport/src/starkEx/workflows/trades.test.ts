@@ -2,9 +2,9 @@ import { TradesApi } from '@imtbl/core-sdk';
 import { createTrade } from './trades';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
-import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
+import GuardianClient from '../guardian';
 
-jest.mock('../../confirmation');
+jest.mock('../guardian');
 
 const mockPayloadHash = 'test_payload_hash';
 const mockSignableTradeRequest = {
@@ -61,6 +61,7 @@ const mockStarkSigner = {
 };
 
 describe('trades', () => {
+  const mockGuardianClient = new GuardianClient({} as any);
   describe('createTrade', () => {
     afterEach(jest.resetAllMocks);
 
@@ -72,16 +73,11 @@ describe('trades', () => {
       createTradeV3: createTradeMock,
     } as unknown as TradesApi;
 
-    const mockConfirmationScreen = new ConfirmationScreen({} as any);
-
     it('should successfully create a trade ', async () => {
       getSignableTradeMock.mockResolvedValue(mockSignableTradeResponse);
       mockStarkSigner.signMessage.mockResolvedValue(mockStarkSignature);
       createTradeMock.mockResolvedValue({
         data: mockReturnValue,
-      });
-      (mockConfirmationScreen.startTransaction as jest.Mock).mockResolvedValue({
-        confirmed: true,
       });
 
       const result = await createTrade({
@@ -89,18 +85,12 @@ describe('trades', () => {
         starkSigner: mockStarkSigner,
         user: mockUserImx,
         request: mockSignableTradeRequest.getSignableTradeRequest,
-        confirmationScreen: mockConfirmationScreen,
+        guardianClient: mockGuardianClient,
       });
 
-      expect(getSignableTradeMock).toBeCalledWith(mockSignableTradeRequest);
+      expect(getSignableTradeMock).toBeCalledWith(mockSignableTradeRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
-      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUserImx.accessToken,
-        {
-          transactionType: TransactionTypes.createTrade,
-          transactionData: expect.any(Object),
-        },
-      );
+      expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(createTradeMock).toBeCalledWith(
         mockCreateTradeRequest,
         mockHeader,
@@ -110,25 +100,16 @@ describe('trades', () => {
 
     it('should return error if transfer is rejected by user', async () => {
       getSignableTradeMock.mockResolvedValue(mockSignableTradeResponse);
-      (mockConfirmationScreen.startTransaction as jest.Mock).mockResolvedValue({
-        confirmed: true,
-      });
-
+      (mockGuardianClient.validate as jest.Mock).mockRejectedValue(new Error('Transaction rejected by user'));
       await expect(() => createTrade({
         tradesApi: tradesApiMock,
         starkSigner: mockStarkSigner,
         user: mockUserImx,
         request: mockSignableTradeRequest.getSignableTradeRequest,
-        confirmationScreen: mockConfirmationScreen,
-      })).rejects.toThrowError('TRADE_ERROR');
+        guardianClient: mockGuardianClient,
+      })).rejects.toThrowError('Transaction rejected by user');
 
-      expect(mockConfirmationScreen.startTransaction).toHaveBeenCalledWith(
-        mockUserImx.accessToken,
-        {
-          transactionType: TransactionTypes.createTrade,
-          transactionData: expect.any(Object),
-        },
-      );
+      expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockPayloadHash });
     });
 
     it('should return error if failed to call public api', async () => {
@@ -139,7 +120,7 @@ describe('trades', () => {
         starkSigner: mockStarkSigner,
         user: mockUserImx,
         request: mockSignableTradeRequest.getSignableTradeRequest,
-        confirmationScreen: mockConfirmationScreen,
+        guardianClient: mockGuardianClient,
       })).rejects.toThrow(
         new PassportError(
           `${PassportErrorType.CREATE_TRADE_ERROR}: ${mockErrorMessage}`,

@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Swagger Guardian
+ * Guardian
  * Guardian API
  *
  * The version of the OpenAPI document: 1.0.0
@@ -14,7 +14,6 @@
 
 
 
-export * from './domain/default-api';
 export * from './domain/starkex-transactions-api';
 export * from './domain/transactions-api';
 
