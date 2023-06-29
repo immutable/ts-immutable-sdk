@@ -310,9 +310,14 @@ export function BridgeForm(props: BridgeFormProps) {
     (async () => {
       if (!provider) return;
       const address = await provider.getSigner().getAddress();
-      setWalletAddress(address);
+      setWalletAddress((previous) => {
+        if (previous !== '' && previous !== address) {
+          setToken(undefined);
+        }
+        return address;
+      });
     })();
-  }, [provider]);
+  }, [provider, tokenBalances]);
 
   const bridgeFormValidator = useCallback((): boolean => {
     const validateTokenError = validateToken(token);

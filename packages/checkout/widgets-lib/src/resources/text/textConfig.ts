@@ -276,6 +276,7 @@ export const text = {
       option: {
         fiatPricePrefix: 'Approx USD $',
       },
+      noCoins: 'You have no available coins to select in your wallet.',
     },
     notEnoughGas: {
       content: {
