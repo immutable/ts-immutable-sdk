@@ -6,10 +6,11 @@ import { CheckoutWidgetTagNames } from '../definitions/types';
 
 /**
  * Interface representing the props for the Bridge Widget component.
- * @property {string} walletProvider - The preferred provider for the Bridge Widget
- * (default: "metamask").
- * @property {string} fromContractAddress - The contract address to send tokens from.
- * @property {string} amount - The amount of tokens to send.
+ * @interface BridgeReactProps
+ * @property {WalletProviderName | undefined} walletProvider - The name of the wallet provider.
+ * @property {Web3Provider | undefined} provider - The Web3 provider.
+ * @property {string | undefined} fromContractAddress - The address of the contract.
+ * @property {string | undefined} amount - The amount.
  */
 export interface BridgeReactProps {
   walletProvider?: WalletProviderName;

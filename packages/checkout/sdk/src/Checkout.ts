@@ -48,6 +48,10 @@ export class Checkout {
 
   private readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
 
+  /**
+   * Constructs a new instance of the CheckoutModule class.
+   * @param {CheckoutModuleConfiguration} [config=SANDBOX_CONFIGURATION] - The configuration object for the CheckoutModule.
+   */
   constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
     this.readOnlyProviders = new Map<
@@ -57,10 +61,9 @@ export class Checkout {
   }
 
   /**
-   * Create a provider object which can be used within the Checkout class methods.
-   * @param {CreateProviderParams} params The data required to create a provider
-   * @returns A new provider object
-   * @throws {@link ErrorType}
+   * Creates a provider using the given parameters.
+   * @param {CreateProviderParams} params - The parameters for creating the provider.
+   * @returns {Promise<CreateProviderResult>} A promise that resolves to the created provider.
    */
   public async createProvider(
     params: CreateProviderParams,
@@ -74,11 +77,9 @@ export class Checkout {
   }
 
   /**
-   * Check if a wallet is connected to the current application
-   * without requesting permission from the wallet and hence triggering a connect popup.
-   * @param {CheckConnectionParams} params - The necessary data required to verify a wallet connection status.
-   * @returns Wallet connection status details.
-   * @throws {@link ErrorType}
+   * Checks if a wallet is connected to the specified provider.
+   * @param {CheckConnectionParams} params - The parameters for checking the wallet connection.
+   * @returns {Promise<CheckConnectionResult>} - A promise that resolves to the result of the check.
    */
   public async checkIsWalletConnected(
     params: CheckConnectionParams,
@@ -92,10 +93,10 @@ export class Checkout {
   }
 
   /**
-   * Establish a connection with a wallet provider such as MetaMask and returns the provider object and the current network details.
-   * @param {ConnectParams} params - The necessary data required to establish a connection with a wallet provider.
-   * @returns Wallet provider and current network information.
-   * @throws {@link ErrorType}
+   * Connects to a blockchain network using the specified provider.
+   * @param {ConnectParams} params - The parameters for connecting to the network.
+   * @returns {Promise<ConnectResult>} A promise that resolves to an object containing the provider and network information.
+   * @throws {Error} If the provider is not valid or if there is an error connecting to the network.
    */
   public async connect(params: ConnectParams): Promise<ConnectResult> {
     const web3Provider = await provider.validateProvider(
@@ -113,10 +114,9 @@ export class Checkout {
   }
 
   /**
-   * Switch the currently connected wallet to a new network.
-   * @param {SwitchNetworkParams} params - The necessary data required to switch network.
-   * @returns The new network information.
-   * @throws {@link ErrorType}
+   * Switches the network for the current wallet provider.
+   * @param {SwitchNetworkParams} params - The parameters for switching the network.
+   * @returns {Promise<SwitchNetworkResult>} - A promise that resolves to the result of switching the network.
    */
   public async switchNetwork(
     params: SwitchNetworkParams,
@@ -140,12 +140,9 @@ export class Checkout {
   }
 
   /**
-   * Fetch the balance of the native token of the current connected network or,
-   * if a contract address is provided, it will return the balance of that ERC20 token. For example,
-   * if the wallet is connected to the Ethereum Mainnet then the function gets the wallet ETH L1 balance.
-   * @param {GetBalanceParams} params - The necessary data required to fetch the wallet balance.
-   * @returns Native token balance for the given wallet.
-   * @throws {@link ErrorType}
+   * Retrieves the balance of a wallet address.
+   * @param {GetBalanceParams} params - The parameters for retrieving the balance.
+   * @returns {Promise<GetBalanceResult>} - A promise that resolves to the balance result.
    */
   public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
     const web3Provider = await provider.validateProvider(
@@ -168,11 +165,9 @@ export class Checkout {
   }
 
   /**
-   * Fetch all available balances (ERC20 & Native) of the current connected network of the given wallet.
-   * It will loop through the list of allowed tokens and check for balance on each one.
-   * @param {GetAllBalancesParams} params - The necessary data required to fetch all the wallet balances.
-   * @returns List of tokens balance for the given wallet.
-   * @throws {@link ErrorType}
+   * Retrieves the balances of all tokens for a given wallet address on a specific chain.
+   * @param {GetAllBalancesParams} params - The parameters for retrieving the balances.
+   * @returns {Promise<GetAllBalancesResult>} - A promise that resolves to the result of retrieving the balances.
    */
   public async getAllBalances(
     params: GetAllBalancesParams,
@@ -191,10 +186,9 @@ export class Checkout {
   }
 
   /**
-   * Fetch the list of available networks that a wallet can add or/and switch to.
-   * @param {GetNetworkAllowListParams} params - The necessary data required to fetch the list of available networks.
-   * @returns List of networks.
-   * @throws {@link ErrorType}
+   * Retrieves the supported networks based on the provided parameters.
+   * @param {GetNetworkAllowListParams} params - The parameters for retrieving the network allow list.
+   * @returns {Promise<GetNetworkAllowListResult>} - A promise that resolves to the network allow list result.
    */
   public async getNetworkAllowList(
     params: GetNetworkAllowListParams,
@@ -203,10 +197,9 @@ export class Checkout {
   }
 
   /**
-   * Get the list of tokens which are allowed to be used with the product.
-   * @param {GetTokenAllowListParams} params - The necessary data required to fetch the list of allowed tokens.
-   * @returns List of allowed tokens.
-   * @throws {@link ErrorType}
+   * Retrieves the supported tokens based on the provided parameters.
+   * @param {GetTokenAllowListParams} params - The parameters for retrieving the token allow list.
+   * @returns {Promise<GetTokenAllowListResult>} - A promise that resolves to the token allow list result.
    */
   public async getTokenAllowList(
     params: GetTokenAllowListParams,
@@ -215,10 +208,9 @@ export class Checkout {
   }
 
   /**
-   * Fetch the list of wallets which are available to connect with.
-   * @param {GetWalletAllowListParams} params - The necessary data required to fetch the list of allowed wallets.
-   * @returns List of allowed wallets.
-   * @throws {@link ErrorType}
+   * Retrieves the default supported wallets based on the provided parameters.
+   * @param {GetWalletAllowListParams} params - The parameters for retrieving the wallet allow list.
+   * @returns {Promise<GetWalletAllowListResult>} - A promise that resolves to the wallet allow list result.
    */
   public async getWalletAllowList(
     params: GetWalletAllowListParams,
@@ -227,12 +219,9 @@ export class Checkout {
   }
 
   /**
-   * Send a generic transaction to the provider.
-   * @param {SendTransactionParams} params - The necessary data required to send a transaction.
-   * @returns Transaction response.
-   * @throws {@link ErrorType}
-   * @remarks
-   * Further documenation can be found at [MetaMask | Sending Transactions](https://docs.metamask.io/guide/sending-transactions.html).
+   * Sends a transaction using the specified provider and transaction parameters.
+   * @param {SendTransactionParams} params - The parameters for sending the transaction.
+   * @returns {Promise<SendTransactionResult>} A promise that resolves to the result of the transaction.
    */
   public async sendTransaction(
     params: SendTransactionParams,
@@ -245,10 +234,9 @@ export class Checkout {
   }
 
   /**
-   * Get network information about the currently selected network.
-   * @param {GetNetworkParams} params - The necessary data required to get the current network information.
-   * @returns Network details.
-   * @throws {@link ErrorType}
+   * Retrieves network information using the specified provider.
+   * @param {GetNetworkParams} params - The parameters for retrieving network information.
+   * @returns {Promise<NetworkInfo>} A promise that resolves to the network information.
    */
   public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
     const web3Provider = await provider.validateProvider(
@@ -262,14 +250,19 @@ export class Checkout {
     return await network.getNetworkInfo(this.config, web3Provider);
   }
 
+  /**
+   * Checks if the given object is a Web3 provider.
+   * @param {Web3Provider} web3Provider - The object to check.
+   * @returns {boolean} - True if the object is a Web3 provider, false otherwise.
+   */
   static isWeb3Provider(web3Provider: Web3Provider) {
     return provider.isWeb3Provider(web3Provider);
   }
 
   /**
-   * Estimates the gas to perform an action.
-   * @param {GasEstimateParams} params - The params required to calculate a gas estimate
-   * @returns The gas estimate for the given action.
+   * Estimates the gas required for a swap or bridge transaction.
+   * @param {GasEstimateParams} params - The parameters for the gas estimation.
+   * @returns {Promise<GasEstimateSwapResult | GasEstimateBridgeToL2Result>} - A promise that resolves to the gas estimation result.
    */
   public async gasEstimate(
     params: GasEstimateParams,

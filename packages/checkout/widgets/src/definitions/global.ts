@@ -1,6 +1,20 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import React from 'react';
 
+/**
+ * Declares global interfaces and namespaces for the application.
+ * @global
+ * @namespace
+ * @interface Window
+ * @property {any} ImtblCheckoutWidgetConfig - Configuration object for the ImtblCheckoutWidget.
+ *
+ * @namespace JSX
+ * @interface IntrinsicElements
+ * @property {ImtblConnectProps} 'imtbl-connect' - Props for the 'imtbl-connect' component.
+ * @property {ImtblWalletProps} 'imtbl-wallet' - Props for the 'imtbl-wallet' component.
+ * @property {ImtblSwapProps} 'imtbl-swap' - Props for the 'imtbl-swap' component.
+ * @property {ImtblBridgeProps} 'imtbl-bridge' - Props for the 'imtbl-bridge' component.
+ */
 declare global {
   interface Window {
     ImtblCheckoutWidgetConfig: any;
@@ -22,9 +36,11 @@ declare global {
 }
 
 /**
- * Props for the Connect Widget component
- * @property {string} theme - The theme to use.
- * @property {string} environment - The environment configuration
+ * Interface for the properties of a connect web component.
+ * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for an HTMLElement.
+ * @interface ImtblConnectProps
+ * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+ * @property {string | undefined} widgetConfig - Optional string representing the widget configuration.
  */
 export interface ImtblConnectProps
   extends React.DetailedHTMLProps<
@@ -35,10 +51,12 @@ export interface ImtblConnectProps
 }
 
 /**
- * Props for the Wallet Widget component
- * @property {string} walletProvider - The preferred wallet provider to connect to.
- * @property {string} theme - The theme to use.
- * @property {string} environment - The environment configuration
+ * Interface for the properties of a wallet web component.
+ * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for the component's root element.
+ * @interface ImtblWalletProps
+ * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+ * @property {string | undefined} walletProvider - The provider for the wallet.
+ * @property {string | undefined} widgetConfig - The configuration for the wallet widget.
  */
 export interface ImtblWalletProps
   extends React.DetailedHTMLProps<
@@ -50,13 +68,15 @@ export interface ImtblWalletProps
 }
 
 /**
- * Props for the Swap Widget component
- * @property {string} walletProvider - The preferred wallet provider to connect to.
- * @property {string} theme - The theme to use.
- * @property {string} environment - The environment configuration
- * @property {string} amount - The amount to swap.
- * @property {string} fromContractAddress - The contract address of the source token.
- * @property {string} toContractAddress - The contract address of the destination token.
+ * Interface for the properties of a swap web component.
+ * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for the component's root element.
+ * @interface ImtblSwapProps
+ * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+ * @property {string | undefined} walletProvider - The preferred wallet provider to connect to.
+ * @property {string | undefined} widgetConfig - The configuration for the swap widget.
+ * @property {string | undefined} amount - The amount to swap.
+ * @property {string | undefined} fromContractAddress - The contract address of the source token.
+ * @property {string | undefined} toContractAddress - The contract address of the destination token.
  */
 export interface ImtblSwapProps
   extends React.DetailedHTMLProps<
@@ -71,12 +91,14 @@ export interface ImtblSwapProps
 }
 
 /**
- * Props for the Bridge Widget component
- * @property {string} walletProvider - The preferred wallet provider to connect to.
- * @property {string} theme - The theme to use.
- * @property {string} environment - The environment configuration
- * @property {string} fromContractAddress - The contract address of the source token.
- * @property {string} amount - The amount to bridge.
+ * Interface for the properties of a bridge web component.
+ * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for the component's root element.
+ * @interface ImtblBridgeProps
+ * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+ * @property {string | undefined} walletProvider - The preferred wallet provider to connect to.
+ * @property {string | undefined} widgetConfig - The configuration for the bridge widget.
+ * @property {string | undefined} amount - The amount to swap.
+ * @property {string | undefined} fromContractAddress - The contract address of the source token.
  */
 export interface ImtblBridgeProps
   extends React.DetailedHTMLProps<
