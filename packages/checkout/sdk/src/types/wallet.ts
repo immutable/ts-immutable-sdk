@@ -1,8 +1,5 @@
 import { WalletProviderName } from './provider';
 
-/**
- * Enum representing different wallet actions.
- */
 export enum WalletAction {
   CHECK_CONNECTION = 'eth_accounts',
   CONNECT = 'eth_requestAccounts',
@@ -13,10 +10,10 @@ export enum WalletAction {
 
 /**
  * Interface representing a wallet filter to be used in {@link GetWalletAllowListParams}.
- * @property {ConnectionProviders} connectionProvider - The connection provider to filter wallets by.
+ * @property {WalletProviderName} connectionProvider - The connection provider to filter wallets by.
  */
 export interface WalletFilter {
-  providerName: WalletProviderName;
+  walletProvider: WalletProviderName;
 }
 
 /**
@@ -31,13 +28,13 @@ export interface GetWalletAllowListParams {
 
 /**
  * Interface representing information about a wallet used in {@link GetWalletAllowListResult}.
- * @property {ConnectionProviders} connectionProvider - The connection provider for the wallet.
+ * @property {WalletProviderName} walletProvider - The connection provider for the wallet.
  * @property {string} name - The name of the wallet.
  * @property {string} description - A description of the wallet.
  * @property {string} icon - The URL/data:image of an icon for the wallet.
  */
 export interface WalletInfo {
-  providerName: WalletProviderName;
+  walletProvider: WalletProviderName;
   name: string;
   description: string;
   icon: string;

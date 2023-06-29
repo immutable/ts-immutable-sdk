@@ -5,6 +5,7 @@ import { TokenInfo } from './tokenInfo';
 
 /**
  * Interface representing the parameters for {@link Checkout.getBalance}.
+ * @property {Web3Provider} provider - The provider used to get the balance.
  * @property {string} walletAddress - The wallet address.
  * @property {string | undefined} contractAddress - The contract address of the token.
  */
@@ -28,6 +29,7 @@ export interface GetBalanceResult {
 
 /**
  * Interface representing the parameters for {@link Checkout.getAllBalances}.
+ * @property {Web3Provider} provider - The provider used to get the balances.
  * @property {string} walletAddress - The wallet address.
  * @property {ChainId} chainId - The ID of the network.
  */

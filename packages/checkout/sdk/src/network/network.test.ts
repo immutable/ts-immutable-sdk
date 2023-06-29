@@ -1,8 +1,6 @@
 /*
  * @jest-environment jsdom
  */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import {
@@ -20,6 +18,7 @@ import {
 import { createProvider } from '../provider';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { CheckoutConfiguration } from '../config';
+import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 
 let windowSpy: any;
 const providerMock = {
@@ -49,29 +48,36 @@ jest.mock('@ethersproject/providers', () => ({
   Web3Provider: jest.fn(),
 }));
 
-jest.mock(
-  './network_master_list.json',
-  () => [
-    {
-      chainId: 1,
-    },
-    {
-      chainId: 11155111,
-    },
-    {
-      chainId: 13372,
-    },
-    {
-      chainId: 13373,
-    },
-  ],
-  { virtual: true },
-);
+jest.mock('../config/remoteConfigFetcher');
 
 describe('network functions', () => {
-  const testCheckoutConfiguration = new CheckoutConfiguration({
-    baseConfig: { environment: Environment.PRODUCTION },
+  let testCheckoutConfiguration: CheckoutConfiguration;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    (RemoteConfigFetcher as jest.Mock).mockReturnValue({
+      get: jest.fn().mockResolvedValue([
+        {
+          chainId: 1,
+        },
+        {
+          chainId: 11155111,
+        },
+        {
+          chainId: 13372,
+        },
+        {
+          chainId: 13373,
+        },
+      ]),
+    });
+
+    testCheckoutConfiguration = new CheckoutConfiguration({
+      baseConfig: { environment: Environment.PRODUCTION },
+    });
   });
+
   describe('switchWalletNetwork()', () => {
     beforeEach(() => {
       windowSpy = jest.spyOn(window, 'window', 'get');
@@ -187,11 +193,7 @@ describe('network functions', () => {
       const provider = await createProvider(WalletProviderName.METAMASK);
 
       await expect(
-        switchWalletNetwork(
-          testCheckoutConfiguration,
-          provider,
-          56 as ChainId,
-        ),
+        switchWalletNetwork(testCheckoutConfiguration, provider, 56 as ChainId),
       ).rejects.toThrow(
         new CheckoutError(
           'Chain:56 is not a supported chain',
@@ -284,7 +286,6 @@ describe('network functions', () => {
           network: {
             chainId: zkevmNetworkInfo.chainId,
           },
-
         });
       const provider = await createProvider(WalletProviderName.METAMASK);
 

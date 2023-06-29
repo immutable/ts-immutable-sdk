@@ -15,6 +15,7 @@ const mockNewWindow = {
 const mockedOpen = jest.fn().mockReturnValue(mockNewWindow);
 const addEventListenerMock = jest.fn();
 const removeEventListenerMock = jest.fn();
+const mockEtherAddress = '0x1234';
 
 describe('confirmation', () => {
   beforeEach(() => {
@@ -64,11 +65,12 @@ describe('confirmation', () => {
       const transactionId = 'transactionId123';
       const res = await confirmationScreen.startGuardianTransaction(
         transactionId,
+        mockEtherAddress,
       );
       confirmationScreen.loading();
 
       expect(res.confirmed).toEqual(false);
-      expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/transaction.html?transactionId=transactionId123&chainType=starkex');
+      expect(mockNewWindow.location.href).toEqual('https://passport.sandbox.immutable.com/transaction-confirmation/transaction.html?transactionId=transactionId123&imxEtherAddress=0x1234&chainType=starkex');
     });
   });
 

@@ -50,7 +50,7 @@ export default class AuthManager {
 
   private static mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
     const passport = oidcUser.profile?.passport as PassportMetadata;
-    return {
+    const user: User = {
       expired: oidcUser.expired,
       idToken: oidcUser.id_token,
       accessToken: oidcUser.access_token,
@@ -60,10 +60,22 @@ export default class AuthManager {
         email: oidcUser.profile.email,
         nickname: oidcUser.profile.nickname,
       },
-      etherKey: passport?.ether_key || '',
-      starkKey: passport?.stark_key || '',
-      userAdminKey: passport?.user_admin_key || '',
     };
+    if (passport?.imx_eth_address) {
+      user.imx = {
+        ethAddress: passport?.imx_eth_address,
+        starkAddress: passport?.imx_stark_address,
+        userAdminAddress: passport?.imx_user_admin_address,
+      };
+    }
+    if (passport?.zkevm_eth_address) {
+      user.zkEvm = {
+        ethAddress: passport?.zkevm_eth_address,
+        userAdminAddress: passport?.zkevm_user_admin_address,
+      };
+    }
+
+    return user;
   };
 
   public async login(): Promise<User> {

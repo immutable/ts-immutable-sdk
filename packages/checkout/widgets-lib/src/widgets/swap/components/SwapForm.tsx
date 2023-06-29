@@ -126,7 +126,7 @@ export function SwapForm({ data }: SwapFromProps) {
           symbol: t.token.symbol,
           icon: t.token.icon,
           balance: {
-            formattedAmount: t.formattedBalance,
+            formattedAmount: tokenValueFormat(t.formattedBalance),
             formattedFiatAmount: cryptoFiatState.conversions.size === 0 ? formatZeroAmount('') : calculateCryptoToFiat(
               t.formattedBalance,
               t.token.symbol || '',

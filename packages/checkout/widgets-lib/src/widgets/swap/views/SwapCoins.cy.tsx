@@ -20,7 +20,7 @@ describe('SwapCoins tests', () => {
       checkout: null,
       exchange: null,
       provider: null,
-      providerPreference: null,
+      walletProvider: null,
       network: null,
       tokenBalances: [
         {

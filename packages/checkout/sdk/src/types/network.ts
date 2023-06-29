@@ -6,9 +6,14 @@ import { NetworkInfo } from './networkInfo';
 import { ALCHEMY_PATH, CHECKOUT_API_BASE_URL } from './constants';
 
 /**
- * Object mapping the list of supported networks with the corresponding RPC urls.
+ * Represents a mapping of ChainId to RPC URL.
  */
 export type RpcUrlMap = Map<ChainId, string>;
+
+/**
+ * A map that contains the RPC URLs for different chain IDs.
+ * @type {RpcUrlMap}
+ */
 export const RPC_URL_MAP: RpcUrlMap = new Map<ChainId, string>([
   [
     ChainId.ETHEREUM,
@@ -26,14 +31,6 @@ export const RPC_URL_MAP: RpcUrlMap = new Map<ChainId, string>([
   [ChainId.IMTBL_ZKEVM_DEVNET, 'https://zkevm-rpc.dev.x.immutable.com'],
 ]);
 
-/**
- * Type representing the details of a network.
- * @property {string} chainIdHex - The hexadecimal ID of the network.
- * @property {string} chainName - The name of the network.
- * @property {string[]} rpcUrls - The RPS URLs of the network's node.
- * @property {TokenInfo} nativeCurrency - The info of the network's native currency.
- * @property {string[]} [blockExplorerUrls] - The URLs of the network's block explorer.
- */
 export type NetworkDetails = {
   chainIdHex: string;
   chainName: string;
@@ -42,14 +39,8 @@ export type NetworkDetails = {
   blockExplorerUrls?: string[];
 };
 
-/**
- * Type representing the mapping between ChainId and NetworkDetails
- */
 export type NetworkMap = Map<ChainId, NetworkDetails>;
 
-/**
- * Object mapping the list of supported production networks with the corresponding network details.
- */
 export const PRODUCTION_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
 ChainId,
 NetworkDetails
@@ -83,9 +74,6 @@ NetworkDetails
   ],
 ]);
 
-/**
- * Object mapping the list of supported sandbox networks with the corresponding network details.
- */
 export const SANDBOX_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
 ChainId,
 NetworkDetails
@@ -130,8 +118,10 @@ export interface SwitchNetworkParams {
 }
 
 /**
- * Interface representing the result of {@link Checkout.switchNetwork}.
- * @property {NetworkInfo} network - The information of the network that was switched to.
+ * Represents the result of switching the network in a Web3 application {@link Checkout.switchNetwork}.
+ * @interface SwitchNetworkResult
+ * @property {NetworkInfo} network - The information about the switched network.
+ * @property {Web3Provider} provider - The Web3 provider for the switched network.
  */
 export interface SwitchNetworkResult {
   network: NetworkInfo;
@@ -144,21 +134,6 @@ export interface SwitchNetworkResult {
  */
 export interface GetNetworkParams {
   provider: Web3Provider;
-}
-
-/**
- * Enum representing the types of filters that can be applied to get the allow list of networks.
- */
-export enum NetworkFilterTypes {
-  ALL = 'all',
-}
-
-/**
- * Interface representing a filter for filtering a specific network.
- * @property {ChainId} chainId - The ID of the network to allow or disallow.
- */
-export interface NetworkFilter {
-  chainId: ChainId;
 }
 
 /**
@@ -177,4 +152,19 @@ export interface GetNetworkAllowListParams {
  */
 export interface GetNetworkAllowListResult {
   networks: NetworkInfo[];
+}
+
+/**
+ * Enum representing the types of filters that can be applied to get the allow list of networks.
+ */
+export enum NetworkFilterTypes {
+  ALL = 'all',
+}
+
+/**
+ * Interface representing a filter for filtering a specific network.
+ * @property {ChainId} chainId - The ID of the network to allow or disallow.
+ */
+export interface NetworkFilter {
+  chainId: ChainId;
 }

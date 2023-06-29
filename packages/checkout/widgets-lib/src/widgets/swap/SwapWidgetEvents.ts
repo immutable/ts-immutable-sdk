@@ -40,7 +40,7 @@ export const sendSwapSuccessEvent = (transactionHash: string) => {
   if (window !== undefined) window.dispatchEvent(successEvent);
 };
 
-export const sendSwapFailedEvent = (reason?: string) => {
+export const sendSwapFailedEvent = (reason: string) => {
   const failedEvent = new CustomEvent<WidgetEvent<SwapFailed>>(
     IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
     {
@@ -58,7 +58,7 @@ export const sendSwapFailedEvent = (reason?: string) => {
   if (window !== undefined) window.dispatchEvent(failedEvent);
 };
 
-export const sendSwapRejectedEvent = (reason?: string) => {
+export const sendSwapRejectedEvent = (reason: string) => {
   const rejectedEvent = new CustomEvent<WidgetEvent<SwapRejected>>(
     IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
     {

@@ -29,7 +29,7 @@ describe('Approve ERC20 Onboarding', () => {
       } as unknown as Checkout,
       exchange: null,
       provider: {} as Web3Provider,
-      providerPreference: null,
+      walletProvider: null,
       network: null,
       tokenBalances: [
         {

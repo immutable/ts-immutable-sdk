@@ -6,9 +6,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import {
   ChainId,
   Checkout,
-  GetTokenAllowListResult,
   NetworkFilterTypes,
-  TokenFilterTypes,
   RPC_URL_MAP,
 } from '@imtbl/checkout-sdk';
 import {
@@ -20,7 +18,7 @@ import {
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
 import {
-  l1Network, zkEVMNetwork, Network, WidgetTheme,
+  l1Network, zkEVMNetwork, WidgetTheme,
 } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -41,6 +39,7 @@ import { MoveInProgress } from './views/MoveInProgress';
 import { text } from '../../resources/text/textConfig';
 import { ErrorView } from '../../views/error/ErrorView';
 import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
+import { getBridgeTokensAndBalances } from './functions/getBridgeTokens';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -51,7 +50,6 @@ export interface BridgeWidgetProps {
 export interface BridgeWidgetParams {
   fromContractAddress?: string;
   amount?: string;
-  fromNetwork?: Network;
 }
 
 export function BridgeWidget(props: BridgeWidgetProps) {
@@ -152,36 +150,19 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         },
       });
 
-      const address = await web3Provider.getSigner().getAddress();
-      const tokenBalances = await checkout.getAllBalances({
-        provider: web3Provider,
-        walletAddress: address,
-        chainId: getNetworkResult.chainId,
-      });
-
-      const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
-        {
-          chainId: getNetworkResult.chainId,
-          type: TokenFilterTypes.BRIDGE,
-        },
-      );
-
-      const allowedTokenBalances = tokenBalances.balances.filter((balance) => balance.balance.gt(0)
-        && allowList.tokens
-          .map((token) => token.address)
-          .includes(balance.token.address));
+      const tokensAndBalances = await getBridgeTokensAndBalances(checkout, web3Provider);
 
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_ALLOWED_TOKENS,
-          allowedTokens: allowList.tokens,
+          allowedTokens: tokensAndBalances.allowList.tokens,
         },
       });
 
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_TOKEN_BALANCES,
-          tokenBalances: allowedTokenBalances,
+          tokenBalances: tokensAndBalances.allowedTokenBalances,
         },
       });
 
