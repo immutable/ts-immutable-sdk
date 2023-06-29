@@ -62,7 +62,9 @@ export function validateAndBuildVersion(
 export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
   const checkoutWidgetJS = document.createElement('script');
 
-  const validVersion = validateAndBuildVersion(config?.version);
+  // TODO: https://immutable.atlassian.net/browse/WT-1459
+  // const validVersion = validateAndBuildVersion(config?.version);
+  const validVersion = validateAndBuildVersion(undefined);
 
   let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
   if (process.env.CHECKOUT_LOCAL_MODE !== undefined) cdnUrl = 'http://localhost:3000/lib/js/imtbl-checkout.js';
