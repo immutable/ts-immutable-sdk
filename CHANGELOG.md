@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - @imtbl/blockchain-data: Added ListTokens and GetToken methods
 - @imtbl/passport: Exposes Networks, UserProfile & PassportOverrides types
+- @imtbl/blockchain-data: Expose ActivityType type
 
 ### Fixed
 
