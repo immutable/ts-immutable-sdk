@@ -11,7 +11,7 @@ describe('token related functions', () => {
 
   describe('when tokens are not configured', () => {
     it('should return the empty list of tokens', async () => {
-      (RemoteConfigFetcher as jest.Mock).mockReturnValue({
+      (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
         getTokens: jest.fn().mockResolvedValue([]),
       });
       config = new CheckoutConfiguration({
@@ -30,7 +30,7 @@ describe('token related functions', () => {
 
   describe('getTokenAllowList', () => {
     beforeEach(() => {
-      (RemoteConfigFetcher as jest.Mock).mockReturnValue({
+      (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
         getTokens: jest.fn().mockResolvedValue([
           {
             address: '0x1',
