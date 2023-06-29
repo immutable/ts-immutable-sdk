@@ -1,5 +1,4 @@
 import { Environment } from '@imtbl/config';
-import { CheckoutWidgets, ConnectReact } from '@imtbl/checkout-widgets';
 import { WidgetTheme } from '../../lib';
 
 function ConnectWebView() {
@@ -8,12 +7,8 @@ function ConnectWebView() {
     environment: Environment.SANDBOX,
   };
 
-  CheckoutWidgets(config);
-
   return (
-    <div>
-      <ConnectReact />
-    </div>
+    <imtbl-connect widgetConfig={JSON.stringify(config)} />
   );
 }
 
