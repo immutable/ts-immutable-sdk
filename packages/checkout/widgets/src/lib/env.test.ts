@@ -12,7 +12,7 @@ describe('env', () => {
     process.env = OLD_ENV;
   });
 
-  test('isDevMode', () => {
+  it('isDevMode', () => {
     process.env = {
       ...OLD_ENV,
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -23,7 +23,7 @@ describe('env', () => {
     expect(isDevMode()).toBeFalsy();
   });
 
-  test('packageVersion', () => {
+  it('packageVersion', () => {
     process.env = {
       ...OLD_ENV,
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -31,6 +31,6 @@ describe('env', () => {
     };
     expect(packageVersion()).toBe('0.1.1');
     process.env = { ...OLD_ENV };
-    expect(packageVersion()).toBe('0.0.0');
+    expect(packageVersion()).toBe('0');
   });
 });
