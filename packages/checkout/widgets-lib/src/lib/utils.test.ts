@@ -6,7 +6,9 @@ import {
   formatFiatString,
   formatZeroAmount,
   sortTokensByAmount,
+  tokenValueFormat,
 } from './utils';
+import { DEFAULT_TOKEN_FORMATTING_DECIMALS } from './constants';
 
 describe('utils', () => {
   describe('sortTokensByAmount', () => {
@@ -396,17 +398,28 @@ describe('utils', () => {
   });
 
   describe('tokenValueFormat', () => {
+    it(`should format number with more than ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimals`, () => {
+      expect(tokenValueFormat('11.2233445566')).toEqual('11.22');
+    });
 
-    // TODO: refactor these tests when reviewing wallet balance decimals
+    it('should format number without decimal places', () => {
+      expect(tokenValueFormat('112233445566')).toEqual('112233445566');
+    });
 
-    // it(`a number with more than ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimals`, () => {
-    //   expect(tokenValueFormat('11.2233445566')).toEqual('11.223344');
-    // });
-    // it(`a number without ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimals`, () => {
-    //   expect(tokenValueFormat('112233445566')).toEqual('112233445566');
-    // });
-    // it(`a number with less than ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimals`, () => {
-    //   expect(tokenValueFormat('11.22')).toEqual('11.22');
-    // });
+    it(`should format number with less than ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimals`, () => {
+      expect(tokenValueFormat('11.22')).toEqual('11.22');
+    });
+
+    it('should format number removing the decimals', () => {
+      expect(tokenValueFormat('11.001')).toEqual('11');
+    });
+
+    it(`should format number to ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimal places`, () => {
+      expect(tokenValueFormat('0.0000012')).toEqual('0.000001');
+    });
+
+    it(`should format to maximum of ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimal places`, () => {
+      expect(tokenValueFormat('0.0000001')).toEqual('0.000000');
+    });
   });
 });

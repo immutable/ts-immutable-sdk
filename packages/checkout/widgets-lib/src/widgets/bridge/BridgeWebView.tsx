@@ -29,7 +29,12 @@ function BridgeWebView() {
   });
 
   return (
-    <BridgeReact provider={provider} />
+    <BridgeReact
+      provider={provider}
+      walletProvider={WalletProviderName.METAMASK}
+      fromContractAddress="0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE"
+      amount="0.1"
+    />
   );
 }
 
