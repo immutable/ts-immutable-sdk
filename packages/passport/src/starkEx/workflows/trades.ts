@@ -7,14 +7,14 @@ import {
 } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
-import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
+import GuardianClient from '../guardian';
 
 type CreateTradeParams = {
   request: GetSignableTradeRequest;
   tradesApi: TradesApi;
   user: UserImx;
   starkSigner: StarkSigner;
-  confirmationScreen: ConfirmationScreen;
+  guardianClient: GuardianClient,
 };
 
 export async function createTrade({
@@ -22,7 +22,7 @@ export async function createTrade({
   tradesApi,
   user,
   starkSigner,
-  confirmationScreen,
+  guardianClient,
 }: CreateTradeParams): Promise<CreateTradeResponse> {
   return withPassportError<CreateTradeResponse>(async () => {
     const { ethAddress } = user.imx;
@@ -32,22 +32,17 @@ export async function createTrade({
       order_id: request.order_id,
       user: ethAddress,
     };
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const headers = { Authorization: `Bearer ${user.accessToken}` };
 
     const getSignableTradeResponse = await tradesApi.getSignableTrade({
       getSignableTradeRequest,
+
+    }, { headers });
+
+    await guardianClient.validate({
+      payloadHash: getSignableTradeResponse.data.payload_hash,
     });
-
-    const confirmationResult = await confirmationScreen.startTransaction(
-      user.accessToken,
-      {
-        transactionType: TransactionTypes.createTrade,
-        transactionData: getSignableTradeRequest,
-      },
-    );
-
-    if (!confirmationResult.confirmed) {
-      throw new Error('Transaction rejected by user');
-    }
 
     const { payload_hash: payloadHash } = getSignableTradeResponse.data;
     const starkSignature = await starkSigner.signMessage(payloadHash);
@@ -73,8 +68,6 @@ export async function createTrade({
       },
     };
 
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const headers = { Authorization: `Bearer ${user.accessToken}` };
     const { data: createTradeResponse } = await tradesApi.createTradeV3(
       tradeParams,
       {

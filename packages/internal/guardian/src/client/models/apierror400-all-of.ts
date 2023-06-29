@@ -17,27 +17,27 @@
 /**
  * 
  * @export
- * @interface APIError404AllOf
+ * @interface APIError400AllOf
  */
-export interface APIError404AllOf {
+export interface APIError400AllOf {
     /**
      * Error Code
      * @type {string}
-     * @memberof APIError404AllOf
+     * @memberof APIError400AllOf
      */
-    'code': APIError404AllOfCodeEnum;
+    'code': APIError400AllOfCodeEnum;
     /**
      * Additional details to help resolve the error
      * @type {object}
-     * @memberof APIError404AllOf
+     * @memberof APIError400AllOf
      */
     'details': object | null;
 }
 
-export const APIError404AllOfCodeEnum = {
-    ResourceNotFound: 'RESOURCE_NOT_FOUND'
+export const APIError400AllOfCodeEnum = {
+    ValidationError: 'VALIDATION_ERROR'
 } as const;
 
-export type APIError404AllOfCodeEnum = typeof APIError404AllOfCodeEnum[keyof typeof APIError404AllOfCodeEnum];
+export type APIError400AllOfCodeEnum = typeof APIError400AllOfCodeEnum[keyof typeof APIError400AllOfCodeEnum];
 
 

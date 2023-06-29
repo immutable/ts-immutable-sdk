@@ -11,12 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - @imtbl/blockchain-data: Added ListTokens and GetToken methods
 - @imtbl/passport: Exposes Networks, UserProfile & PassportOverrides types
+- @imtbl/blockchain-data: Expose ActivityType type
 
 ### Fixed
 
 - @imtbl/passport: Fixed the confirmation popup being blocked by browser issue
 
 ### Changed
+- @imtbl/passport: Changed all the other Passport starkEx Provider functions to call the confirmation screen with guardian check
 
 - @imtbl/blockchain-data: Improved naming for Activity types
 

@@ -1,8 +1,10 @@
 import {
+  Body,
   BottomSheet, Box,
 } from '@biom3/react';
 import { CoinSelectorOption, CoinSelectorOptionProps } from './CoinSelectorOption';
 import { selectOptionsContainerStyles } from './CoinSelectorStyles';
+import { text } from '../../resources/text/textConfig';
 
 type CoinSelectorProps = {
   onCloseBottomSheet?: () => void;
@@ -15,6 +17,7 @@ type CoinSelectorProps = {
 export function CoinSelector({
   heading, options, children, onCloseBottomSheet, visible,
 }: CoinSelectorProps) {
+  const { noCoins } = text.drawers.coinSelector;
   return (
     <BottomSheet headerBarTitle={heading} size="full" onCloseBottomSheet={onCloseBottomSheet} visible={visible}>
       <BottomSheet.Target>
@@ -22,6 +25,7 @@ export function CoinSelector({
       </BottomSheet.Target>
       <BottomSheet.Content>
         <Box sx={selectOptionsContainerStyles}>
+          {options.length === 0 && (<Body sx={{ padding: 'base.spacing.x4' }}>{noCoins}</Body>)}
           {options.map(({
             onClick, icon, name, symbol, balance, id, testId,
           }) => (

@@ -95,6 +95,7 @@ export default class ConfirmationScreen {
 
   startGuardianTransaction(
     transactionId: string,
+    imxEtherAddress: string,
   ): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
@@ -126,7 +127,7 @@ export default class ConfirmationScreen {
         return;
       }
       // eslint-disable-next-line max-len
-      this.confirmationWindow.location.href = `${this.config.passportDomain}/transaction-confirmation/transaction.html?transactionId=${transactionId}&chainType=starkex`;
+      this.confirmationWindow.location.href = `${this.config.passportDomain}/transaction-confirmation/transaction.html?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=starkex`;
       // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
       const timer = setInterval(() => {
         if (this.confirmationWindow?.closed) {
