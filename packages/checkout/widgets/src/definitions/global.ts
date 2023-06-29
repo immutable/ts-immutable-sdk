@@ -65,9 +65,9 @@ export interface ImtblSwapProps
   > {
   walletProvider?: string;
   widgetConfig?: string;
-  amount: string;
-  fromContractAddress: string;
-  toContractAddress: string;
+  amount?: string;
+  fromContractAddress?: string;
+  toContractAddress?: string;
 }
 
 /**
@@ -85,6 +85,6 @@ export interface ImtblBridgeProps
   > {
   walletProvider?: string;
   widgetConfig?: string;
-  fromContractAddress: string;
-  amount: string;
+  fromContractAddress?: string;
+  amount?: string;
 }
