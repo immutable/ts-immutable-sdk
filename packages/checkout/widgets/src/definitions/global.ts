@@ -13,7 +13,7 @@ import React from 'react';
  * @property {ImtblConnectProps} 'imtbl-connect' - Props for the 'imtbl-connect' component.
  * @property {ImtblWalletProps} 'imtbl-wallet' - Props for the 'imtbl-wallet' component.
  * @property {ImtblSwapProps} 'imtbl-swap' - Props for the 'imtbl-swap' component.
- * @property {ImtblBridgeProps} 'im
+ * @property {ImtblBridgeProps} 'imtbl-bridge' - Props for the 'imtbl-bridge' component.
  */
 declare global {
   interface Window {
@@ -36,7 +36,7 @@ declare global {
 }
 
 /**
- * Interface for the properties of an immutable connect web component.
+ * Interface for the properties of a connect web component.
  * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for an HTMLElement.
  * @interface ImtblConnectProps
  * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
@@ -51,7 +51,7 @@ export interface ImtblConnectProps
 }
 
 /**
- * Interface for the properties of an immutable wallet web component.
+ * Interface for the properties of a wallet web component.
  * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for the component's root element.
  * @interface ImtblWalletProps
  * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
@@ -68,7 +68,7 @@ export interface ImtblWalletProps
 }
 
 /**
- * Interface for the properties of an immutable swap web component.
+ * Interface for the properties of a swap web component.
  * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for the component's root element.
  * @interface ImtblSwapProps
  * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
@@ -91,7 +91,7 @@ export interface ImtblSwapProps
 }
 
 /**
- * Interface for the properties of an immutable bridge web component.
+ * Interface for the properties of a bridge web component.
  * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for the component's root element.
  * @interface ImtblBridgeProps
  * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
