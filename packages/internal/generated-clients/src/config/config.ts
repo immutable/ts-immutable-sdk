@@ -67,7 +67,7 @@ export const multiRollupConfig = {
       basePath: 'https://order-book-mr.imtbl.com',
     }),
     passport: createConfig({
-      basePath: 'https://api.immutable.com/passport-mr',
+      basePath: 'https://api.immutable.com',
     }),
   }),
   getSandbox: (): MultiRollupAPIConfiguration => ({
@@ -78,7 +78,7 @@ export const multiRollupConfig = {
       basePath: 'https://order-book-mr.sandbox.imtbl.com',
     }),
     passport: createConfig({
-      basePath: 'https://api.sandbox.immutable.com/passport-mr',
+      basePath: 'https://api.sandbox.immutable.com',
     }),
   }),
 };
