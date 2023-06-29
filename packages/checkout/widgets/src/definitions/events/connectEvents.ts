@@ -22,8 +22,9 @@ export type ConnectionSuccess = {
 };
 
 /**
- * Type representing a Connect Widget event with type FAILURE.
- * @property {string} reason - A description of the reason for the failed connection attempt.
+ * Represents a connection failure with a reason.
+ * @typedef {Object} ConnectionFailed
+ * @property {string} reason - The reason for the failed connection.
  */
 export type ConnectionFailed = {
   reason: string;

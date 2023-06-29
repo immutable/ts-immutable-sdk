@@ -8,17 +8,19 @@ export enum BridgeEventType {
 }
 
 /**
- * Type representing a Bridge Widget event with type SUCCESS
- * @property {string} transactionHash - The transactionHash of the bridge transaction
+ * Represents a successful bridge transaction.
+ * @typedef {Object} BridgeSuccess
+ * @property {string} transactionHash - The hash of the successful transaction.
  */
 export type BridgeSuccess = {
   transactionHash: string;
 };
 
 /**
- * Type representing a Bridge Widget event with type FAILURE
- * @property {string} reason - The reason for the failure.
- * @property {number} timestamp - The UNIX timestamp (in milliseconds) when the event occurred.
+ * Represents a failed bridge connection.
+ * @typedef {Object} BridgeFailed
+ * @property {string} reason - The reason for the failed connection.
+ * @property {number} timestamp - The timestamp of the failed connection.
  */
 export type BridgeFailed = {
   reason: string;

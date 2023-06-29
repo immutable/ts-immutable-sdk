@@ -36,7 +36,7 @@ declare global {
 }
 
 /**
- * Interface for immutable connect props in a React component.
+ * Interface for the properties of an immutable connect web component.
  * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for an HTMLElement.
  * @interface ImtblConnectProps
  * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
@@ -51,7 +51,7 @@ export interface ImtblConnectProps
 }
 
 /**
- * Interface for the properties of an immutable wallet component.
+ * Interface for the properties of an immutable wallet web component.
  * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for the component's root element.
  * @interface ImtblWalletProps
  * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
@@ -68,7 +68,7 @@ export interface ImtblWalletProps
 }
 
 /**
- * Interface for the properties of an immutable swap component.
+ * Interface for the properties of an immutable swap web component.
  * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for the component's root element.
  * @interface ImtblSwapProps
  * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
@@ -91,7 +91,7 @@ export interface ImtblSwapProps
 }
 
 /**
- * Interface for the properties of an immutable bridge component.
+ * Interface for the properties of an immutable bridge web component.
  * Extends the React.DetailedHTMLProps interface to inherit HTML attributes for the component's root element.
  * @interface ImtblBridgeProps
  * @extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>

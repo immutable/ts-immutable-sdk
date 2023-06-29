@@ -11,11 +11,8 @@ import { WidgetTheme } from './types';
  *
  * @example
  * { major: 0 } - use default version 0.1.9-alpha
- *
  * { major: 1 } - use version 1.x.x, pickup all new minor and patch versions released
- *
  * { major: 1, minor: 1 } - use version 1.1.x, pickup all new patch versions released
- *
  * { major: 1, minor: 2, patch: 3 } - use version 1.2.3 specifically
  */
 export type SemanticVersion = {

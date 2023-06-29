@@ -10,9 +10,9 @@ export enum OrchestrationEventType {
 }
 
 /**
- * Represents the event object emitted when a request to connect to a wallet provider is made.
+ * Represents the event object for a request to connect to a wallet provider.
  * @typedef {Object} RequestConnectEvent
- * @property {string} walletProvider - The name of the wallet provider being requested to connect to.
+ * @property {string} walletProvider - The name of the wallet provider.
  */
 export type RequestConnectEvent = {
   walletProvider: string;
