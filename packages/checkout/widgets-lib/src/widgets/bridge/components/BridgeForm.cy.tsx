@@ -125,14 +125,14 @@ describe('Bridge Form', () => {
         bridgeFee: {
           estimatedAmount: utils.parseEther('0.0001'),
         },
-        gasEstimate: {
+        gasFee: {
           estimatedAmount: utils.parseEther('0.0001'),
         },
         bridgeable: true,
       });
   });
 
-  it('should use native token as default and use name or name and address for option id', () => {
+  it('should use name or name and address for option id', () => {
     mount(
       <BridgeWidgetTestComponent
         initialStateOverride={bridgeState}
@@ -144,10 +144,10 @@ describe('Bridge Form', () => {
       </BridgeWidgetTestComponent>,
     );
 
-    cySmartGet('bridge-token-select__target__controlledLabel').should('have.text', 'ETH');
+    cySmartGet('bridge-token-select__target__defaultLabel').should('have.text', 'Select coin');
     cySmartGet('bridge-token-select__target').click();
-    cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').should('exist');
-    cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').should('exist');
+    cySmartGet(`bridge-token-coin-selector__option-imx-${imxAddress}`).should('exist');
+    cySmartGet(`bridge-token-coin-selector__option-imx-${imxAddress}`).should('exist');
   });
 
   it('should set defaults when provided and ignore casing on token address', () => {
@@ -168,40 +168,11 @@ describe('Bridge Form', () => {
       >
         <BridgeForm
           testId="bridge-form"
-          defaultTokenAddress="0xf57e7e7c23978c3caec3c3548e3d615c346e79ff"
+          defaultTokenAddress="0xF57E7E7c23978c3caec3c3548e3d615c346e79Ff"
           defaultAmount="10"
         />
       </BridgeWidgetTestComponent>,
     );
-  });
-
-  it('should show select option if native token not in options list', () => {
-    mount(
-      <BridgeWidgetTestComponent
-        initialStateOverride={{
-          ...bridgeState,
-          tokenBalances: [
-            {
-              balance: BigNumber.from('100000000000000000'),
-              formattedBalance: '0.1',
-              token: {
-                name: 'IMX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-              },
-            },
-          ],
-        }}
-        cryptoConversionsOverride={cryptoConversions}
-      >
-        <BridgeForm
-          testId="bridge-form"
-        />
-      </BridgeWidgetTestComponent>,
-    );
-
-    cySmartGet('bridge-token-select__target__defaultLabel').should('have.text', 'Select coin');
   });
 
   describe('Bridge Form submit', () => {
@@ -216,18 +187,6 @@ describe('Bridge Form', () => {
         .resolves({
           required: true,
           unsignedTx: {},
-        });
-
-      cy.stub(Checkout.prototype, 'gasEstimate').as('gasEstimateStub')
-        .resolves({
-          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-          bridgeFee: {
-            estimatedAmount: utils.parseEther('0.0001'),
-          },
-          gasFee: {
-            estimatedAmount: utils.parseEther('0.0001'),
-          },
-          bridgeable: true,
         });
 
       cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
@@ -429,18 +388,6 @@ describe('Bridge Form', () => {
           .resolves({
             required: true,
             unsignedTx: {},
-          });
-
-        cy.stub(Checkout.prototype, 'gasEstimate').as('gasEstimateStub')
-          .resolves({
-            gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-            bridgeFee: {
-              estimatedAmount: utils.parseEther('0.0001'),
-            },
-            gasFee: {
-              estimatedAmount: utils.parseEther('0.0001'),
-            },
-            bridgeable: true,
           });
 
         cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
