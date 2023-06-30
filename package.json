@@ -45,7 +45,7 @@
     "syncpack:check": "yarn syncpack list-mismatches",
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
-    "test": "wsrun --exclude-missing -e test",
+    "test": "CI=true wsrun --exclude-missing -e test",
     "typecheck": "wsrun --exclude-missing typecheck"
   },
   "workspaces": [
