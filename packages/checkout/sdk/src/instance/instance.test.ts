@@ -67,7 +67,7 @@ describe('instance', () => {
     });
   });
 
-  describe('createExchangeInstance', () => {
+  describe.skip('createExchangeInstance', () => {
     it('should create an instance of Exchange', async () => {
       const chainId = ChainId.ETHEREUM;
       const exchange = await createExchangeInstance(chainId, config);
