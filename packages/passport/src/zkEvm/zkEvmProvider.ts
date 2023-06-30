@@ -93,7 +93,8 @@ export class ZkEvmProvider {
         }
         case 'eth_gasPrice':
         case 'eth_getBalance':
-        case 'eth_getStorageAt': {
+        case 'eth_getStorageAt':
+        case 'eth_estimateGas': {
           return this.jsonRpcProvider.send(request.method, request.params);
         }
         default: {

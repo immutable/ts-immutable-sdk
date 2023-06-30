@@ -7,9 +7,10 @@ jest.mock('./relayerAdapter');
 describe('ZkEvmProvider', () => {
   const sendMock = jest.fn();
   const passthroughMethods = [
-    ['eth_getBalance', '0x1'],
     ['eth_getStorageAt', '0x'],
+    ['eth_getBalance', '0x1'],
     ['eth_gasPrice', '0x2'],
+    ['eth_estimateGas', '0x3'],
   ];
 
   beforeEach(() => {
