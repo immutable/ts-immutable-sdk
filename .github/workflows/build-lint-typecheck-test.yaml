@@ -7,8 +7,8 @@ on:
   pull_request:
 
 jobs:
-  build:
-    name: Build, Lint, Typecheck, Test
+  deps:
+    name: Install Deps
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,19 +21,26 @@ jobs:
         with:
           node-version: lts/*
           registry-url: https://registry.npmjs.org/
+          cache: yarn
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        id: yarn-cache
+      - name: Install dependencies
+        run: yarn install --immutable 
+  lint:
+    name: Build, Lint, Typecheck, Test
+    runs-on: ubuntu-latest
+    needs: [deps]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org/
+          cache: yarn
 
       - name: Install dependencies
         run: yarn install --immutable
@@ -43,12 +50,84 @@ jobs:
 
       - name: Lint
         run: yarn lint
+  build:
+    name: Build, Lint, Typecheck, Test
+    runs-on: ubuntu-latest
+    needs: [deps]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org/
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Check Single Package Version Policy
+        run: yarn syncpack:check
 
       - name: Build
         run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
 
       - name: Typecheck
         run: yarn typecheck
+
+      - name: Test
+        run: yarn test
+  typecheck:
+    name: Build, Lint, Typecheck, Test
+    runs-on: ubuntu-latest
+    needs: [deps]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org/
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Check Single Package Version Policy
+        run: yarn syncpack:check
+
+      - name: Typecheck
+        run: yarn typecheck
+  test:
+    name: Build, Lint, Typecheck, Test
+    runs-on: ubuntu-latest
+    needs: [deps]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org/
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Check Single Package Version Policy
+        run: yarn syncpack:check
 
       - name: Test
         run: yarn test
