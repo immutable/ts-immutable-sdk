@@ -212,9 +212,9 @@ export function SwapForm({ data }: SwapFromProps) {
       // fetching or the user is updating the inputs.
       if (silently && (loading || editing)) return;
 
-      const estimate = result.info.gasFeeEstimate;
+      const estimate = result.swap.gasFeeEstimate;
       const gasFee = utils.formatUnits(
-        estimate?.amount || 0,
+        estimate?.value || 0,
         DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
@@ -238,8 +238,8 @@ export function SwapForm({ data }: SwapFromProps) {
       setToAmount(
         formatZeroAmount(
           tokenValueFormat(utils.formatUnits(
-            result.info.quote.amount,
-            result.info.quote.token.decimals,
+            result.quote.amount.value,
+            result.quote.amount.token.decimals,
           )),
         ),
       );
@@ -278,9 +278,9 @@ export function SwapForm({ data }: SwapFromProps) {
       // fetching or the user is updating the inputs.
       if (silently && (loading || editing)) return;
 
-      const estimate = result.info.gasFeeEstimate;
+      const estimate = result.swap.gasFeeEstimate;
       const gasFee = utils.formatUnits(
-        estimate?.amount || 0,
+        estimate?.value || 0,
         DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
@@ -304,8 +304,8 @@ export function SwapForm({ data }: SwapFromProps) {
       setFromAmount(
         formatZeroAmount(
           tokenValueFormat(utils.formatUnits(
-            result.info.quote.amount,
-            result.info.quote.token.decimals,
+            result.quote.amount.value,
+            result.quote.amount.token.decimals,
           )),
         ),
       );
