@@ -104,7 +104,7 @@ export const cyIntercept = (overrides?: {
   );
   cy.intercept(
     `${checkoutApi}/fiat/conversion*`,
-    overrides?.cryptoFiatOverrides?.conversion || [],
+    overrides?.cryptoFiatOverrides?.conversion || {},
   );
   cy.intercept(`${checkoutApi}/rpc/eth-sepolia`, {});
   cy.intercept('https://zkevm-rpc.dev.x.immutable.com/', {});
