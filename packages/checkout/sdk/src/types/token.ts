@@ -1,12 +1,6 @@
 import { ChainId } from './chainId';
 import { TokenInfo } from './tokenInfo';
 
-/**
- * Interface representing token information for a specific chain.
- * @extends {TokenInfo}
- * @property {ChainId} chainId - The ID of the blockchain network.
- * @property {TokenFilterTypes[]} tokenFeatures - The features supported by the token.
- */
 export interface TokenMasterInfo extends TokenInfo {
   chainId: ChainId;
   tokenFeatures: TokenFilterTypes[];
@@ -15,7 +9,7 @@ export interface TokenMasterInfo extends TokenInfo {
 /**
  * Interface representing the parameters for {@link Checkout.getTokenAllowList}.
  * @property {TokenFilterTypes} type - The type of token to retrieve.
- * @property {ChainId}  chainId - The ID of the blockchain network.
+ * @property {ChainId | undefined}  chainId - The ID of the blockchain network.
  * @property {TokenFilter[]} [exclude] - The tokens to exclude from the list.
  */
 export interface GetTokenAllowListParams {

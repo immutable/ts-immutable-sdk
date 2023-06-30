@@ -1,6 +1,6 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { Exchange } from '@imtbl/dex-sdk';
+import { Exchange, TransactionResponse } from '@imtbl/dex-sdk';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import { gasEstimator } from './gasEstimator';
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -80,20 +80,24 @@ describe('gasServiceEstimator', () => {
   describe('swap', () => {
     it('should return gas estimate for swap', async () => {
       (createExchangeInstance as jest.Mock).mockResolvedValue({
-        getUnsignedSwapTxFromAmountIn: jest.fn().mockResolvedValue({
-          info: {
+        getUnsignedSwapTxFromAmountIn: jest.fn<Promise<TransactionResponse>, any[]>().mockResolvedValue({
+          swap: {
+            transaction: {} as any,
             gasFeeEstimate: {
-              amount: BigNumber.from(1),
+              value: BigNumber.from(1),
               token: {
                 address: '0x1',
                 symbol: 'TEST',
                 name: 'TEST',
                 decimals: 18,
+                chainId: 1,
               },
             },
           },
+          approval: {} as any,
+          quote: {} as any,
         }),
-      } as unknown as Exchange);
+      });
 
       const result = (await gasEstimator(
         { gasEstimateType: GasEstimateType.SWAP },
@@ -111,12 +115,15 @@ describe('gasServiceEstimator', () => {
 
     it('should handle null gasFeeEstimate returned from the exchange', async () => {
       (createExchangeInstance as jest.Mock).mockResolvedValue({
-        getUnsignedSwapTxFromAmountIn: jest.fn().mockResolvedValue({
-          info: {
+        getUnsignedSwapTxFromAmountIn: jest.fn<Promise<TransactionResponse>, any[]>().mockResolvedValue({
+          swap: {
+            transaction: {} as any,
             gasFeeEstimate: null,
           },
+          approval: {} as any,
+          quote: {} as any,
         }),
-      } as unknown as Exchange);
+      });
 
       const result = (await gasEstimator(
         { gasEstimateType: GasEstimateType.SWAP },
@@ -132,18 +139,22 @@ describe('gasServiceEstimator', () => {
 
     it('should handle undefined amount returned from the exchange', async () => {
       (createExchangeInstance as jest.Mock).mockResolvedValue({
-        getUnsignedSwapTxFromAmountIn: jest.fn().mockResolvedValue({
-          info: {
+        getUnsignedSwapTxFromAmountIn: jest.fn<Promise<TransactionResponse>, any[]>().mockResolvedValue({
+          swap: {
+            transaction: {} as any,
             gasFeeEstimate: {
-              amount: undefined,
+              value: undefined as any, // undefined is not allowed by the types need to use `as any` to override
               token: {
                 address: '0x1',
                 symbol: 'TEST',
                 name: 'TEST',
                 decimals: 18,
+                chainId: 1,
               },
             },
           },
+          approval: {} as any,
+          quote: {} as any,
         }),
       } as unknown as Exchange);
 

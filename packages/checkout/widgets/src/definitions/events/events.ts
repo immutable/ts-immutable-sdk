@@ -15,9 +15,10 @@ export enum IMTBLWidgetEvents {
 }
 
 /**
- * Represents an event object emitted by any of the widgets.
+ * Represents an event emitted by a widget.
+ * @template T - The type of data associated with the event.
  * @property {OrchestrationEventType | ConnectEventType | WalletEventType | SwapEventType | BridgeEventType} type - The type of the event.
- * @property {T} data - The data contained in the event.
+ * @property {T} data - The data associated with the event.
  */
 export type WidgetEvent<T> = {
   type: OrchestrationEventType | ConnectEventType | WalletEventType | SwapEventType | BridgeEventType,
