@@ -19,6 +19,11 @@ export type ZkEvmProviderInput = {
   multiRollupApiClients: MultiRollupApiClients,
 };
 
+type LoggedInZkEvmProvider = {
+  magicProvider: ExternalProvider;
+  user: UserZkEvm;
+};
+
 export class ZkEvmProvider {
   private readonly authManager: AuthManager;
 
@@ -34,9 +39,9 @@ export class ZkEvmProvider {
 
   private readonly jsonRpcProvider: JsonRpcProvider; // Used for read operations
 
-  private magicProvider?: ExternalProvider; // Used for signing
+  protected magicProvider?: ExternalProvider; // Used for signing
 
-  private user?: UserZkEvm;
+  protected user?: UserZkEvm;
 
   constructor({
     authManager,
@@ -54,11 +59,15 @@ export class ZkEvmProvider {
     this.multiRollupApiClients = multiRollupApiClients;
   }
 
+  private isLoggedIn(): this is LoggedInZkEvmProvider {
+    return this.magicProvider !== undefined && this.user !== undefined;
+  }
+
   public async request(
     request: RequestArguments,
   ): Promise<any> {
     const authWrapper = (fn: (params: EthMethodWithAuthParams) => Promise<any>) => {
-      if (this.magicProvider === undefined || this.user === undefined) {
+      if (!this.isLoggedIn()) {
         throw new JsonRpcError(RpcErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
       }
 
@@ -90,6 +99,9 @@ export class ZkEvmProvider {
         }
         case 'eth_sendTransaction': {
           return authWrapper(ethSendTransaction);
+        }
+        case 'eth_accounts': {
+          return this.isLoggedIn() ? [this.user.zkEvm.ethAddress] : [];
         }
         case 'eth_gasPrice':
         case 'eth_getBalance':

@@ -208,5 +208,34 @@ describe('Passport', () => {
         expect(mockGetUser).toHaveBeenCalledTimes(1);
       });
     });
+
+    describe('eth_accounts', () => {
+      it('returns no addresses if the user is not logged in', async () => {
+        const zkEvmProvider = getZkEvmProvider();
+        const accounts = await zkEvmProvider.request({
+          method: 'eth_accounts',
+        });
+        expect(accounts).toEqual([]);
+      });
+
+      it('returns the user\'s ether key if the user is logged in', async () => {
+        mockGetUser.mockResolvedValue(mockOidcUserZkevm);
+        useMswHandlers([
+          mswHandlers.jsonRpcProvider.success,
+        ]);
+
+        const zkEvmProvider = getZkEvmProvider();
+
+        const loggedInAccounts = await zkEvmProvider.request({
+          method: 'eth_requestAccounts',
+        });
+
+        const accounts = await zkEvmProvider.request({
+          method: 'eth_accounts',
+        });
+
+        expect(accounts).toEqual(loggedInAccounts);
+      });
+    });
   });
 });
