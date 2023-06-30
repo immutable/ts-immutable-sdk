@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable 
   lint:
-    name: Build, Lint, Typecheck, Test
+    name: Lint
     runs-on: ubuntu-latest
     needs: [deps]
     steps:
@@ -51,7 +51,7 @@ jobs:
       - name: Lint
         run: yarn lint
   build:
-    name: Build, Lint, Typecheck, Test
+    name: Build
     runs-on: ubuntu-latest
     needs: [deps]
     steps:
@@ -82,7 +82,7 @@ jobs:
       - name: Test
         run: yarn test
   typecheck:
-    name: Build, Lint, Typecheck, Test
+    name: Typecheck
     runs-on: ubuntu-latest
     needs: [deps]
     steps:
@@ -107,7 +107,7 @@ jobs:
       - name: Typecheck
         run: yarn typecheck
   test:
-    name: Build, Lint, Typecheck, Test
+    name: Test
     runs-on: ubuntu-latest
     needs: [deps]
     steps:
