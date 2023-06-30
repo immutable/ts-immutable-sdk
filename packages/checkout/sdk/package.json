@@ -43,7 +43,7 @@
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "start": "parcel watch",
-    "test": "jest test",
+    "test": "jest test --detectOpenHandles",
     "test:coverage": "jest --coverage",
     "test:watch": "jest test --watch",
     "typecheck": "tsc --noEmit"
