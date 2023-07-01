@@ -1,6 +1,7 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import {
   Checkout,
+  DexConfig,
   GetTokenAllowListResult,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
@@ -40,7 +41,6 @@ import {
 } from './SwapWidgetEvents';
 import { SwapInProgress } from './views/SwapInProgress';
 import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
-import { RemoteConfig, RemoteConfigResult } from '../../lib/remoteConfig';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -80,12 +80,6 @@ export function SwapWidget(props: SwapWidgetProps) {
     ? onLightBase
     : onDarkBase;
 
-  const getDexOverrides = useCallback(async () => {
-    const remoteConfig = new RemoteConfig({ environment });
-    const remoteConfigResult: RemoteConfigResult = await remoteConfig.load();
-    return remoteConfigResult;
-  }, [environment]);
-
   const swapWidgetSetup = useCallback(async () => {
     swapDispatch({
       payload: {
@@ -118,7 +112,7 @@ export function SwapWidget(props: SwapWidgetProps) {
 
       let overrides: ExchangeOverrides | undefined;
       try {
-        overrides = (await getDexOverrides()).dex?.overrides;
+        overrides = ((await checkout.config.remote.getConfig('dex')) as DexConfig).overrides;
       } catch (err: any) {
         viewDispatch({
           payload: {
