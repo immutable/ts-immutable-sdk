@@ -14,8 +14,9 @@ import {
   WalletAction,
   NetworkFilterTypes,
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
-  SANDBOX_CHAIN_ID_NETWORK_MAP,
   ChainName,
+  NetworkInfo,
+  SANDBOX_CHAIN_ID_NETWORK_MAP,
 } from '../types';
 import { createProvider } from '../provider';
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -36,7 +37,7 @@ const ethNetworkInfo = {
   },
 };
 const zkevmNetworkInfo = {
-  name: 'IMTBL_ZKEVM_TESTNET',
+  name: ChainName.IMTBL_ZKEVM_TESTNET,
   chainId: ChainId.IMTBL_ZKEVM_TESTNET,
   nativeCurrency: {
     name: 'IMX',
@@ -93,7 +94,7 @@ describe('network functions', () => {
       windowSpy.mockRestore();
     });
 
-    it.only('should make request for the user to switch network', async () => {
+    it('should make request for the user to switch network', async () => {
       (Web3Provider as unknown as jest.Mock).mockReturnValue({
         provider: providerMock,
         getNetwork: async () => ethNetworkInfo,
@@ -167,7 +168,9 @@ describe('network functions', () => {
           },
         ],
       });
-      expect(switchNetworkResult.network).toEqual(SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET));
+      const copyZkevmNetworkInfo = zkevmNetworkInfo as NetworkInfo;
+      copyZkevmNetworkInfo.isSupported = true;
+      expect(switchNetworkResult.network).toEqual(copyZkevmNetworkInfo);
     });
 
     it('should throw an error if the network is not in our whitelist', async () => {
@@ -312,12 +315,12 @@ describe('network functions', () => {
   describe('getNetworkInfo', () => {
     const getNetworkTestCases = [
       {
-        chainId: ChainId.ETHEREUM,
-        chainName: 'homestead',
+        chainId: ChainId.SEPOLIA,
+        chainName: ChainName.SEPOLIA,
       },
       {
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-        chainName: 'IMX',
+        chainName: ChainName.IMTBL_ZKEVM_TESTNET,
       },
     ];
 
@@ -335,17 +338,17 @@ describe('network functions', () => {
           mockProvider as unknown as Web3Provider,
         );
         expect(result.name).toBe(
-          PRODUCTION_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainName,
+          SANDBOX_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainName,
         );
         expect(result.chainId).toBe(
           parseInt(
-            PRODUCTION_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainIdHex
+            SANDBOX_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.chainIdHex
               ?? '',
             16,
           ),
         );
         expect(result.nativeCurrency).toEqual(
-          PRODUCTION_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.nativeCurrency,
+          SANDBOX_CHAIN_ID_NETWORK_MAP.get(testCase.chainId)?.nativeCurrency,
         );
       });
     });
@@ -378,8 +381,26 @@ describe('network functions', () => {
         }),
       ).toEqual({
         networks: [
-          PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM),
-          SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET),
+          {
+            name: ChainName.SEPOLIA,
+            chainId: ChainId.SEPOLIA,
+            isSupported: true,
+            nativeCurrency: {
+              name: 'Sep Eth',
+              symbol: 'ETH',
+              decimals: 18,
+            },
+          },
+          {
+            name: ChainName.IMTBL_ZKEVM_TESTNET,
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            isSupported: true,
+            nativeCurrency: {
+              name: 'IMX',
+              symbol: 'IMX',
+              decimals: 18,
+            },
+          },
         ],
       });
     });
@@ -393,11 +414,11 @@ describe('network functions', () => {
       ).toEqual({
         networks: [
           {
-            name: ChainName.ETHEREUM,
-            chainId: ChainId.ETHEREUM,
+            name: ChainName.SEPOLIA,
+            chainId: ChainId.SEPOLIA,
             isSupported: true,
             nativeCurrency: {
-              name: ChainName.ETHEREUM,
+              name: 'Sep Eth',
               symbol: 'ETH',
               decimals: 18,
             },
