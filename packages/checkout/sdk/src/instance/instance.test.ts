@@ -71,8 +71,8 @@ describe('instance', () => {
 
   describe.skip('createExchangeInstance', () => {
     it('should create an instance of Exchange', async () => {
-      (RemoteConfigFetcher as jest.Mock).mockReturnValue({
-        get: jest.fn().mockResolvedValue({}),
+      (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
+        getConfig: jest.fn().mockResolvedValue({}),
       });
 
       const chainId = Object.keys(SupportedChainIdsForEnvironment[config.environment])[0] as unknown as number;

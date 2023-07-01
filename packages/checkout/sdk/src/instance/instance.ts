@@ -53,7 +53,9 @@ export async function createExchangeInstance(
   chainId: ChainId,
   config: CheckoutConfiguration,
 ): Promise<Exchange> {
-  const dexConfig = (await config.remote.get('dex')) as DexConfig;
+  const dexConfig = (await config.remote.getConfig(
+    'dex',
+  )) as DexConfig;
 
   return new Exchange(
     new ExchangeConfiguration({

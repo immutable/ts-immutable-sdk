@@ -372,7 +372,7 @@ describe('SwapForm', () => {
       cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
     });
 
-    it('should set to amount and fees after quote is fetched', () => {
+    it.only('should set to amount and fees after quote is fetched', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}

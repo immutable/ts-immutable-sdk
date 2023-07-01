@@ -5,6 +5,7 @@ import {
   DEV_CHAIN_ID_NETWORK_MAP,
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
   SANDBOX_CHAIN_ID_NETWORK_MAP,
+  ChainId,
 } from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 
@@ -22,6 +23,26 @@ const networkMap = (prod: boolean, dev: boolean) => {
   if (prod) return PRODUCTION_CHAIN_ID_NETWORK_MAP;
   return SANDBOX_CHAIN_ID_NETWORK_MAP;
 };
+
+// **************************************************** //
+// This is duplicated in the widget-lib project.        //
+// We are not exposing these functions given that this  //
+// to keep the Checkout SDK interface as minimal as     //
+// possible.                                            //
+// **************************************************** //
+export const getL1ChainId = (config: CheckoutConfiguration): ChainId => {
+  // DevMode and Sandbox will both use Sepolia.
+  if (!config.isProduction) return ChainId.SEPOLIA;
+  return ChainId.ETHEREUM;
+};
+
+export const getL2ChainId = (config: CheckoutConfiguration): ChainId => {
+  if (config.isDevelopment) return ChainId.IMTBL_ZKEVM_DEVNET;
+  if (config.isProduction) return ChainId.IMTBL_ZKEVM_MAINNET;
+  return ChainId.IMTBL_ZKEVM_TESTNET;
+};
+// **************************************************** //
+// **************************************************** //
 
 export class CheckoutConfiguration {
   // This is a hidden feature that is only available

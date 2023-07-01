@@ -1,18 +1,47 @@
 import axios from 'axios';
 import { Environment } from '@imtbl/config';
-import { CHECKOUT_API_BASE_URL, ENV_DEVELOPMENT } from '../types';
-import { RemoteConfigParams, RemoteConfiguration } from './remoteConfigType';
+import {
+  ChainId,
+  CHECKOUT_API_BASE_URL,
+  ENV_DEVELOPMENT,
+  TokenInfo,
+} from '../types';
+import {
+  ConfiguredTokens,
+  RemoteConfigParams,
+  RemoteConfiguration,
+} from './remoteConfigType';
 
 export class RemoteConfigFetcher {
-  private cache: RemoteConfiguration | undefined;
+  private isDevelopment: boolean;
 
-  private readonly isProduction: boolean;
+  private isProduction: boolean;
 
-  private readonly isDevelopment: boolean;
+  private configCache: RemoteConfiguration | undefined;
+
+  private tokensCache: ConfiguredTokens | undefined;
 
   constructor(params: RemoteConfigParams) {
     this.isDevelopment = params.isDevelopment;
     this.isProduction = params.isProduction;
+  }
+
+  private static async makeHttpRequest(url: string): Promise<any> {
+    let response;
+
+    try {
+      response = await axios.get(url);
+    } catch (error: any) {
+      throw new Error(`Error fetching from api: ${error.message}`);
+    }
+
+    if (response.status !== 200) {
+      throw new Error(
+        `Error fetching from api: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return response;
   }
 
   private getEndpoint = () => {
@@ -21,38 +50,38 @@ export class RemoteConfigFetcher {
     return CHECKOUT_API_BASE_URL[Environment.SANDBOX];
   };
 
-  private async load(): Promise<RemoteConfiguration | undefined> {
-    if (this.cache) return this.cache;
+  private async loadConfig(): Promise<RemoteConfiguration | undefined> {
+    if (this.configCache) return this.configCache;
 
-    let response;
-    try {
-      response = await axios.get(`${this.getEndpoint()}/v1/config`);
-    } catch (error: any) {
-      throw new Error(`Error fetching config: ${error.message}`);
-    }
+    const response = await RemoteConfigFetcher.makeHttpRequest(`${this.getEndpoint()}/v1/config`);
+    this.configCache = response.data;
 
-    if (response.status !== 200) {
-      throw new Error(
-        `Error fetching config: ${response.status} ${response.statusText}`,
-      );
-    }
-
-    this.cache = response.data;
-
-    return this.cache;
+    return this.configCache;
   }
 
-  public async get(
+  private async loadConfigTokens(): Promise<ConfiguredTokens | undefined> {
+    if (this.tokensCache) return this.tokensCache;
+
+    const response = await RemoteConfigFetcher.makeHttpRequest(`${this.getEndpoint()}/v1/config/tokens`);
+    this.tokensCache = response.data;
+
+    return this.tokensCache;
+  }
+
+  public async getConfig(
     key?: keyof RemoteConfiguration,
-  ): Promise<
-    | RemoteConfiguration
-    | RemoteConfiguration[keyof RemoteConfiguration]
-    | undefined
-    > {
-    const config = await this.load();
-    if (config && key) {
-      return config[key] as RemoteConfiguration[keyof RemoteConfiguration];
-    }
-    return config as RemoteConfiguration;
+  ): Promise<RemoteConfiguration | RemoteConfiguration[keyof RemoteConfiguration] | undefined> {
+    const config = await this.loadConfig();
+    if (!config) return undefined;
+    if (!key) return config;
+    return config[key];
+  }
+
+  public async getTokens(
+    chainId: ChainId,
+  ): Promise<TokenInfo[]> {
+    const config = await this.loadConfigTokens();
+    if (!config) return [];
+    return config[chainId]?.allowed ?? [];
   }
 }

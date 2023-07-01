@@ -17,6 +17,7 @@ import {
 } from './WalletBalancesStyles';
 import { getL2ChainId } from '../../../lib/networkUtils';
 import {
+  CryptoFiatActions,
   CryptoFiatContext,
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { getTokenBalances } from '../functions/tokenBalances';
@@ -26,7 +27,7 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
-import { useTokenSymbols } from '../../../lib/hooks/useTokenSymbols';
+import { fetchTokenSymbols } from '../../../lib/fetchTokenSymbols';
 
 export function WalletBalances() {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -43,18 +44,23 @@ export function WalletBalances() {
   } = walletState;
   const { conversions } = cryptoFiatState;
   const [balancesLoading, setBalancesLoading] = useState(true);
-  useTokenSymbols(checkout, cryptoFiatDispatch);
-  const showAddCoins = useMemo(() => {
-    if (!checkout || !network) return false;
-    return (
-      network.chainId === getL2ChainId(checkout.config)
-      && Boolean(
-        supportedTopUps?.isBridgeEnabled
-          || supportedTopUps?.isSwapEnabled
-          || supportedTopUps?.isOnRampEnabled,
-      )
-    );
-  }, [checkout, network, supportedTopUps]);
+
+  useEffect(() => {
+    (async () => {
+      if (!checkout) return;
+      if (!cryptoFiatDispatch) return;
+      if (!network) return;
+
+      const tokenSymbols = await fetchTokenSymbols(checkout, network.chainId);
+
+      cryptoFiatDispatch({
+        payload: {
+          type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+          tokenSymbols,
+        },
+      });
+    })();
+  }, [checkout, cryptoFiatDispatch, network]);
 
   useEffect(() => {
     let totalAmount = 0.0;
@@ -63,17 +69,9 @@ export function WalletBalances() {
       const fiatAmount = parseFloat(balance.fiatAmount);
       if (!Number.isNaN(fiatAmount)) totalAmount += fiatAmount;
     });
+
     setTotalFiatAmount(totalAmount);
   }, [tokenBalances]);
-
-  const handleAddCoinsClick = () => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type: SharedViews.TOP_UP_VIEW },
-      },
-    });
-  };
 
   useEffect(() => {
     if (!checkout || !provider || !network) return;
@@ -93,13 +91,28 @@ export function WalletBalances() {
       });
       setBalancesLoading(false);
     })();
-  }, [
-    checkout,
-    network,
-    provider,
-    conversions,
-    setBalancesLoading,
-    walletDispatch]);
+  }, [checkout, network, provider, conversions, setBalancesLoading, walletDispatch]);
+
+  const showAddCoins = useMemo(() => {
+    if (!checkout || !network) return false;
+    return (
+      network.chainId === getL2ChainId(checkout.config)
+        && Boolean(
+          supportedTopUps?.isBridgeEnabled
+            || supportedTopUps?.isSwapEnabled
+            || supportedTopUps?.isOnRampEnabled,
+        )
+    );
+  }, [checkout, network, supportedTopUps]);
+
+  const handleAddCoinsClick = () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: SharedViews.TOP_UP_VIEW },
+      },
+    });
+  };
 
   return (
     <SimpleLayout
