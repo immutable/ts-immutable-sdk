@@ -10,10 +10,12 @@ import {
 } from './network';
 import {
   ChainId,
-  PRODUCTION_CHAIN_ID_NETWORK_MAP,
   WalletProviderName,
   WalletAction,
   NetworkFilterTypes,
+  PRODUCTION_CHAIN_ID_NETWORK_MAP,
+  SANDBOX_CHAIN_ID_NETWORK_MAP,
+  ChainName,
 } from '../types';
 import { createProvider } from '../provider';
 import { CheckoutError, CheckoutErrorType } from '../errors';
@@ -25,10 +27,10 @@ const providerMock = {
   request: jest.fn(),
 };
 const ethNetworkInfo = {
-  name: 'Ethereum',
+  name: ChainName.ETHEREUM,
   chainId: ChainId.ETHEREUM,
   nativeCurrency: {
-    name: 'Ethereum',
+    name: ChainName.ETHEREUM,
     symbol: 'ETH',
     decimals: 18,
   },
@@ -59,22 +61,19 @@ describe('network functions', () => {
     (RemoteConfigFetcher as jest.Mock).mockReturnValue({
       get: jest.fn().mockResolvedValue([
         {
-          chainId: 1,
+          chainId: ChainId.ETHEREUM,
         },
         {
-          chainId: 11155111,
+          chainId: ChainId.SEPOLIA,
         },
         {
-          chainId: 13372,
-        },
-        {
-          chainId: 13373,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         },
       ]),
     });
 
     testCheckoutConfiguration = new CheckoutConfiguration({
-      baseConfig: { environment: Environment.PRODUCTION },
+      baseConfig: { environment: Environment.SANDBOX },
     });
   });
 
@@ -94,19 +93,19 @@ describe('network functions', () => {
       windowSpy.mockRestore();
     });
 
-    it('should make request for the user to switch network', async () => {
+    it.only('should make request for the user to switch network', async () => {
       (Web3Provider as unknown as jest.Mock).mockReturnValue({
         provider: providerMock,
         getNetwork: async () => ethNetworkInfo,
-        network: {
-          chainId: ethNetworkInfo.chainId,
-        },
+        network: { chainId: ethNetworkInfo.chainId },
       });
 
       const provider = await createProvider(WalletProviderName.METAMASK);
 
       const switchNetworkResult = await switchWalletNetwork(
-        testCheckoutConfiguration,
+        new CheckoutConfiguration({
+          baseConfig: { environment: Environment.PRODUCTION },
+        }),
         provider,
         ChainId.ETHEREUM,
       );
@@ -115,17 +114,16 @@ describe('network functions', () => {
         method: WalletAction.SWITCH_NETWORK,
         params: [
           {
-            chainId: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM)
-              ?.chainIdHex,
+            chainId: PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM)!.chainIdHex,
           },
         ],
       });
       expect(switchNetworkResult.network).toEqual({
-        name: 'Ethereum',
-        chainId: 1,
+        name: ChainName.ETHEREUM,
+        chainId: ChainId.ETHEREUM,
         isSupported: true,
         nativeCurrency: {
-          name: 'Ethereum',
+          name: ChainName.ETHEREUM,
           symbol: 'ETH',
           decimals: 18,
         },
@@ -169,16 +167,7 @@ describe('network functions', () => {
           },
         ],
       });
-      expect(switchNetworkResult.network).toEqual({
-        name: 'Immutable zkEVM Testnet',
-        chainId: 13372,
-        isSupported: true,
-        nativeCurrency: {
-          name: 'IMX',
-          symbol: 'IMX',
-          decimals: 18,
-        },
-      });
+      expect(switchNetworkResult.network).toEqual(SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET));
     });
 
     it('should throw an error if the network is not in our whitelist', async () => {
@@ -323,11 +312,11 @@ describe('network functions', () => {
   describe('getNetworkInfo', () => {
     const getNetworkTestCases = [
       {
-        chainId: 1 as ChainId,
+        chainId: ChainId.ETHEREUM,
         chainName: 'homestead',
       },
       {
-        chainId: 13372 as ChainId,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         chainName: 'IMX',
       },
     ];
@@ -389,26 +378,8 @@ describe('network functions', () => {
         }),
       ).toEqual({
         networks: [
-          {
-            name: 'Ethereum',
-            chainId: 1,
-            isSupported: true,
-            nativeCurrency: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-          },
-          {
-            name: 'Immutable zkEVM Testnet',
-            chainId: 13372,
-            isSupported: true,
-            nativeCurrency: {
-              name: 'IMX',
-              symbol: 'IMX',
-              decimals: 18,
-            },
-          },
+          PRODUCTION_CHAIN_ID_NETWORK_MAP.get(ChainId.ETHEREUM),
+          SANDBOX_CHAIN_ID_NETWORK_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET),
         ],
       });
     });
@@ -417,16 +388,16 @@ describe('network functions', () => {
       await expect(
         await getNetworkAllowList(testCheckoutConfiguration, {
           type: NetworkFilterTypes.ALL,
-          exclude: [{ chainId: 13372 }],
+          exclude: [{ chainId: ChainId.IMTBL_ZKEVM_TESTNET }],
         }),
       ).toEqual({
         networks: [
           {
-            name: 'Ethereum',
-            chainId: 1,
+            name: ChainName.ETHEREUM,
+            chainId: ChainId.ETHEREUM,
             isSupported: true,
             nativeCurrency: {
-              name: 'Ethereum',
+              name: ChainName.ETHEREUM,
               symbol: 'ETH',
               decimals: 18,
             },

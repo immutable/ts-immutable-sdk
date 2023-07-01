@@ -2,6 +2,7 @@ import { Environment } from '@imtbl/config';
 import {
   CheckoutModuleConfiguration,
   NetworkMap,
+  DEV_CHAIN_ID_NETWORK_MAP,
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
   SANDBOX_CHAIN_ID_NETWORK_MAP,
 } from '../types';
@@ -16,26 +17,44 @@ export class CheckoutConfigurationError extends Error {
   }
 }
 
+const networkMap = (prod: boolean, dev: boolean) => {
+  if (dev) return DEV_CHAIN_ID_NETWORK_MAP;
+  if (prod) return PRODUCTION_CHAIN_ID_NETWORK_MAP;
+  return SANDBOX_CHAIN_ID_NETWORK_MAP;
+};
+
 export class CheckoutConfiguration {
+  // This is a hidden feature that is only available
+  // when building the project from source code.
+  // This will be used to get around the lack of
+  // Environment.DEVELOPMENT
+  readonly isDevelopment: boolean = process.env.CHECKOUT_DEV_MODE !== undefined;
+
+  readonly isProduction: boolean;
+
+  readonly remote: RemoteConfigFetcher;
+
   readonly environment: Environment;
 
   readonly networkMap: NetworkMap;
 
-  readonly remoteConfigFetcher: RemoteConfigFetcher;
-
   constructor(config: CheckoutModuleConfiguration) {
-    // validate input
     if (!Object.values(Environment).includes(config.baseConfig.environment)) {
       throw new CheckoutConfigurationError(
         'Invalid checkout configuration of environment',
       );
     }
+
     this.environment = config.baseConfig.environment;
-    this.networkMap = config.baseConfig.environment === Environment.PRODUCTION
-      ? PRODUCTION_CHAIN_ID_NETWORK_MAP
-      : SANDBOX_CHAIN_ID_NETWORK_MAP;
-    this.remoteConfigFetcher = new RemoteConfigFetcher({
-      environment: config.baseConfig.environment,
+
+    // Developer mode will super set any environment configuration
+    this.isProduction = !this.isDevelopment && this.environment === Environment.PRODUCTION;
+
+    this.networkMap = networkMap(this.isProduction, this.isDevelopment);
+
+    this.remote = new RemoteConfigFetcher({
+      isDevelopment: this.isDevelopment,
+      isProduction: this.isProduction,
     });
   }
 }

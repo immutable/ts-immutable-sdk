@@ -1,25 +1,32 @@
-import { Environment } from '@imtbl/config';
 import axios from 'axios';
-import { CHECKOUT_API_BASE_URL } from '../types';
+import { Environment } from '@imtbl/config';
+import { CHECKOUT_API_BASE_URL, ENV_DEVELOPMENT } from '../types';
 import { RemoteConfigParams, RemoteConfiguration } from './remoteConfigType';
 
 export class RemoteConfigFetcher {
   private cache: RemoteConfiguration | undefined;
 
-  private readonly environment: Environment;
+  private readonly isProduction: boolean;
+
+  private readonly isDevelopment: boolean;
 
   constructor(params: RemoteConfigParams) {
-    this.environment = params.environment;
+    this.isDevelopment = params.isDevelopment;
+    this.isProduction = params.isProduction;
   }
+
+  private getEndpoint = () => {
+    if (this.isDevelopment) return CHECKOUT_API_BASE_URL[ENV_DEVELOPMENT];
+    if (this.isProduction) return CHECKOUT_API_BASE_URL[Environment.PRODUCTION];
+    return CHECKOUT_API_BASE_URL[Environment.SANDBOX];
+  };
 
   private async load(): Promise<RemoteConfiguration | undefined> {
     if (this.cache) return this.cache;
 
     let response;
     try {
-      response = await axios.get(
-        `${CHECKOUT_API_BASE_URL[this.environment]}/v1/config`,
-      );
+      response = await axios.get(`${this.getEndpoint()}/v1/config`);
     } catch (error: any) {
       throw new Error(`Error fetching config: ${error.message}`);
     }

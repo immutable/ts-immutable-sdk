@@ -1,4 +1,4 @@
-import { Checkout } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import {
@@ -45,7 +45,7 @@ describe('WalletContext', () => {
       type: SwapActions.SET_NETWORK,
       network: {
         name: 'Ethereum',
-        chainId: 1,
+        chainId: ChainId.ETHEREUM,
         nativeCurrency: {
           symbol: 'ETH',
           decimals: 18,
@@ -61,7 +61,7 @@ describe('WalletContext', () => {
     });
     expect(network).toEqual({
       name: 'Ethereum',
-      chainId: 1,
+      chainId: ChainId.ETHEREUM,
       nativeCurrency: {
         symbol: 'ETH',
         decimals: 18,

@@ -14,7 +14,7 @@ import { orchestrationEvents } from '../../../../lib/orchestrationEvents';
 describe('BalanceItem', () => {
   const baseWalletState: WalletState = {
     checkout: new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
+      baseConfig: { environment: Environment.SANDBOX },
     }),
     network: null,
     provider: null,

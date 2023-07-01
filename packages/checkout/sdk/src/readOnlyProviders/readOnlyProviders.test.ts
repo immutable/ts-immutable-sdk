@@ -1,8 +1,8 @@
 import { ethers, providers } from 'ethers';
+import { Environment } from '@imtbl/config';
 import {
   ChainId,
   GetNetworkAllowListResult,
-  SANDBOX_CONFIGURATION,
 } from '../types';
 import { createReadOnlyProviders } from './readOnlyProvider';
 import { CheckoutConfiguration } from '../config';
@@ -10,20 +10,22 @@ import * as network from '../network';
 
 jest.mock('../network');
 
+const baseConfig = new CheckoutConfiguration({
+  baseConfig: { environment: Environment.SANDBOX },
+});
+
 describe('read only providers', () => {
   beforeEach(() => {
     jest.restoreAllMocks();
     const getNetworkAllListMock = jest.fn().mockResolvedValue({
       networks: [
         {
-          chainId: 13372,
-          name: 'imtbl zkevm',
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           isSupported: true,
           nativeCurrency: {},
         },
         {
-          chainId: 11155111,
-          name: 'Sepolia',
+          chainId: ChainId.SEPOLIA,
           isSupported: true,
           nativeCurrency: {},
         },
@@ -35,14 +37,12 @@ describe('read only providers', () => {
     );
   });
   it('should return a map of read only providers', async () => {
-    const result = await createReadOnlyProviders(
-      new CheckoutConfiguration(SANDBOX_CONFIGURATION),
-    );
+    const result = await createReadOnlyProviders(baseConfig);
 
     expect(result.size).toEqual(2);
-    expect(result.get(13372)).toBeDefined();
-    expect(result.get(11155111)).toBeDefined();
-    expect(result.get(2)).not.toBeDefined();
+    expect(result.get(ChainId.IMTBL_ZKEVM_TESTNET)).toBeDefined();
+    expect(result.get(ChainId.SEPOLIA)).toBeDefined();
+    expect(result.get(ChainId.ETHEREUM)).not.toBeDefined();
   });
 
   it('should return new map of read only providers', async () => {
@@ -56,14 +56,14 @@ describe('read only providers', () => {
     );
 
     const result = await createReadOnlyProviders(
-      new CheckoutConfiguration(SANDBOX_CONFIGURATION),
+      baseConfig,
       existingReadOnlyProviders,
     );
 
     expect(result.size).toEqual(2);
-    expect(result.get(13372)).toBeDefined();
-    expect(result.get(11155111)).toBeDefined();
-    expect(result.get(1)).not.toBeDefined();
+    expect(result.get(ChainId.IMTBL_ZKEVM_TESTNET)).toBeDefined();
+    expect(result.get(ChainId.SEPOLIA)).toBeDefined();
+    expect(result.get(ChainId.ETHEREUM)).not.toBeDefined();
   });
 
   it('should return existing map of read only providers', async () => {
@@ -77,12 +77,12 @@ describe('read only providers', () => {
     );
 
     const result = await createReadOnlyProviders(
-      new CheckoutConfiguration(SANDBOX_CONFIGURATION),
+      baseConfig,
       existingReadOnlyProviders,
     );
 
     expect(result.size).toEqual(1);
-    expect(result.get(11155111)).toBeDefined();
-    expect(result.get(13372)).not.toBeDefined();
+    expect(result.get(ChainId.SEPOLIA)).toBeDefined();
+    expect(result.get(ChainId.IMTBL_ZKEVM_TESTNET)).not.toBeDefined();
   });
 });

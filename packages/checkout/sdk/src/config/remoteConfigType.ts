@@ -1,5 +1,4 @@
 import { ExchangeOverrides } from '@imtbl/dex-sdk';
-import { Environment } from '@imtbl/config';
 
 export type AllowedNetworkConfig = {
   chainId: number;
@@ -32,5 +31,6 @@ export type RemoteConfiguration = {
 };
 
 export type RemoteConfigParams = {
-  environment: Environment;
+  isDevelopment: boolean;
+  isProduction: boolean;
 };

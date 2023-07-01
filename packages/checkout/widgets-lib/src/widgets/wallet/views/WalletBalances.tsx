@@ -15,7 +15,7 @@ import {
   WALLET_BALANCE_CONTAINER_STYLE,
   WalletBalanceItemStyle,
 } from './WalletBalancesStyles';
-import { zkEVMNetwork } from '../../../lib/networkUtils';
+import { getL2ChainId } from '../../../lib/networkUtils';
 import {
   CryptoFiatContext,
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
@@ -47,7 +47,7 @@ export function WalletBalances() {
   const showAddCoins = useMemo(() => {
     if (!checkout || !network) return false;
     return (
-      network?.chainId === zkEVMNetwork(checkout.config.environment)
+      network.chainId === getL2ChainId(checkout.config)
       && Boolean(
         supportedTopUps?.isBridgeEnabled
           || supportedTopUps?.isSwapEnabled

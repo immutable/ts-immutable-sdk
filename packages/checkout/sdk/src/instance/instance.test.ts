@@ -1,10 +1,15 @@
 import { Environment } from '@imtbl/config';
-import { Exchange } from '@imtbl/dex-sdk';
+import { Exchange, SupportedChainIdsForEnvironment } from '@imtbl/dex-sdk';
 import { ethers } from 'ethers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import { ChainId } from '../types';
 import { createBridgeInstance, createExchangeInstance } from './instance';
 import { CheckoutConfiguration } from '../config';
+import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
+
+jest.mock('../instance');
+
+jest.mock('../config/remoteConfigFetcher');
 
 describe('instance', () => {
   const config: CheckoutConfiguration = new CheckoutConfiguration({
@@ -18,20 +23,19 @@ describe('instance', () => {
     >([
       [ChainId.SEPOLIA, new ethers.providers.JsonRpcProvider('sepolia')],
       [
-        ChainId.IMTBL_ZKEVM_DEVNET,
+        ChainId.IMTBL_ZKEVM_TESTNET,
         new ethers.providers.JsonRpcProvider('devnet'),
       ],
     ]);
 
     it('should create an instance of TokenBridge', async () => {
       const fromChainId = ChainId.SEPOLIA;
-      const toChainId = ChainId.IMTBL_ZKEVM_DEVNET;
-      const environment = Environment.SANDBOX;
+      const toChainId = ChainId.IMTBL_ZKEVM_TESTNET;
       const bridge = await createBridgeInstance(
         fromChainId,
         toChainId,
         readOnlyProviders,
-        environment,
+        config,
       );
       expect(bridge).toBeInstanceOf(TokenBridge);
     });
@@ -39,29 +43,27 @@ describe('instance', () => {
     it('should throw an error if unsupported root chain provider', async () => {
       const fromChainId = 123 as ChainId;
       const toChainId = ChainId.SEPOLIA;
-      const environment = Environment.SANDBOX;
 
       await expect(
         createBridgeInstance(
           fromChainId,
           toChainId,
           readOnlyProviders,
-          environment,
+          config,
         ),
       ).rejects.toThrowError('Chain:123 is not a supported chain');
     });
 
     it('should throw an error if unsupported child chain provider', async () => {
-      const fromChainId = ChainId.IMTBL_ZKEVM_DEVNET;
+      const fromChainId = ChainId.IMTBL_ZKEVM_TESTNET;
       const toChainId = 123 as ChainId;
-      const environment = Environment.SANDBOX;
 
       await expect(
         createBridgeInstance(
           fromChainId,
           toChainId,
           readOnlyProviders,
-          environment,
+          config,
         ),
       ).rejects.toThrowError('Chain:123 is not a supported chain');
     });
@@ -69,8 +71,15 @@ describe('instance', () => {
 
   describe.skip('createExchangeInstance', () => {
     it('should create an instance of Exchange', async () => {
-      const chainId = ChainId.ETHEREUM;
-      const exchange = await createExchangeInstance(chainId, config);
+      (RemoteConfigFetcher as jest.Mock).mockReturnValue({
+        get: jest.fn().mockResolvedValue({}),
+      });
+
+      const chainId = Object.keys(SupportedChainIdsForEnvironment[config.environment])[0] as unknown as number;
+      const exchange = await createExchangeInstance(
+        SupportedChainIdsForEnvironment[config.environment][chainId].chainId,
+        config,
+      );
       expect(exchange).toBeInstanceOf(Exchange);
     });
   });

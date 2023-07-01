@@ -66,7 +66,7 @@ export async function getNetworkAllowList(
 ): Promise<GetNetworkAllowListResult> {
   const { networkMap } = config;
 
-  const allowedNetworkConfig = (await config.remoteConfigFetcher.get(
+  const allowedNetworkConfig = (await config.remote.get(
     'allowedNetworks',
   )) as AllowedNetworkConfig[];
 

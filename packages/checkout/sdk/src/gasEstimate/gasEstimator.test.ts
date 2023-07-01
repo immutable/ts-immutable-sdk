@@ -39,7 +39,7 @@ describe('gasServiceEstimator', () => {
 
     (RemoteConfigFetcher as jest.Mock).mockReturnValue({
       get: jest.fn().mockResolvedValue({
-        [ChainId.IMTBL_ZKEVM_DEVNET]: {
+        [ChainId.IMTBL_ZKEVM_TESTNET]: {
           swapAddresses: {
             inAddress: '0x1',
             outAddress: '0x2',

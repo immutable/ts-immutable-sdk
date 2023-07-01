@@ -1,6 +1,8 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  Checkout, GetTokenAllowListResult, TokenFilterTypes,
+  Checkout,
+  GetTokenAllowListResult,
+  TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 
 export async function getBridgeTokensAndBalances(checkout: Checkout, web3Provider: Web3Provider) {

@@ -13,7 +13,7 @@ import { WidgetTheme } from '../../lib';
 
 describe('ConnectWidget tests', () => {
   const config: StrongCheckoutWidgetsConfig = {
-    environment: Environment.PRODUCTION,
+    environment: Environment.SANDBOX,
     theme: WidgetTheme.DARK,
     isBridgeEnabled: true,
     isSwapEnabled: true,
@@ -160,7 +160,7 @@ describe('ConnectWidget tests', () => {
         .as('getNetworkInfoStub')
         .resolves({
           name: 'Ethereum',
-          chainId: 1,
+          chainId: ChainId.ETHEREUM,
         });
       mountConnectWidgetAndGoToReadyToConnect();
       cySmartGet('ready-to-connect').should('be.visible');
@@ -199,7 +199,7 @@ describe('ConnectWidget tests', () => {
         .as('getNetworkInfoStub')
         .resolves({
           name: 'Ethereum',
-          chainId: 1,
+          chainId: ChainId.ETHEREUM,
         });
       cy.stub(Checkout.prototype, 'switchNetwork')
         .as('switchNetworkStub')
@@ -218,7 +218,7 @@ describe('ConnectWidget tests', () => {
         .as('getNetworkInfoStub')
         .resolves({
           name: 'Ethereum',
-          chainId: 1,
+          chainId: ChainId.ETHEREUM,
         });
       cy.stub(Checkout.prototype, 'switchNetwork')
         .as('switchNetworkStub')
@@ -244,7 +244,7 @@ describe('ConnectWidget tests', () => {
         .as('getNetworkInfoStub')
         .resolves({
           name: 'Ethereum',
-          chainId: 1,
+          chainId: ChainId.ETHEREUM,
         });
       cy.stub(Checkout.prototype, 'switchNetwork')
         .as('switchNetworkStub')
