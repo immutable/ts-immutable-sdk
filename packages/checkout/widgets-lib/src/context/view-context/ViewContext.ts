@@ -1,11 +1,9 @@
 import { createContext } from 'react';
 import { ConnectWidgetView } from './ConnectViewContextTypes';
-import { TransitionExampleWidgetView } from './TransitionExampleViewContextTypes';
-import { InnerExampleWidgetView } from './InnerExampleViewContextTypes';
-import { OuterExampleWidgetView } from './OuterExampleViewContextTypes';
 import { WalletWidgetView } from './WalletViewContextTypes';
-import { SwapWidgetView } from './SwapViewContextTypes';
-import { BridgeWidgetView } from './BridgeViewContextTypes';
+import { PrefilledSwapForm, SwapWidgetView } from './SwapViewContextTypes';
+import { BridgeWidgetView, PrefilledBridgeForm } from './BridgeViewContextTypes';
+import { ViewType } from './ViewType';
 
 export enum SharedViews {
   LOADING_VIEW = 'LOADING_VIEW',
@@ -13,22 +11,32 @@ export enum SharedViews {
   TOP_UP_VIEW = 'TOP_UP_VIEW',
 }
 
-export type SharedView = { type: SharedViews.LOADING_VIEW } | ErrorView | { type: SharedViews.TOP_UP_VIEW };
+export type SharedView =
+LoadingView
+| ErrorView
+| TopUpView;
 
-interface ErrorView {
+interface LoadingView extends ViewType {
+  type: SharedViews.LOADING_VIEW
+}
+
+interface ErrorView extends ViewType {
   type: SharedViews.ERROR_VIEW;
   error: Error;
 }
 
+interface TopUpView extends ViewType {
+  type: SharedViews.TOP_UP_VIEW,
+  swapData?: PrefilledSwapForm,
+  bridgeData?: PrefilledBridgeForm,
+}
+
 export type View =
-  | SharedView
+  SharedView
   | ConnectWidgetView
   | WalletWidgetView
   | SwapWidgetView
-  | BridgeWidgetView
-  | TransitionExampleWidgetView
-  | InnerExampleWidgetView
-  | OuterExampleWidgetView;
+  | BridgeWidgetView;
 
 export interface ViewState {
   view: View;
@@ -61,6 +69,7 @@ export enum ViewActions {
 export interface UpdateViewPayload {
   type: ViewActions.UPDATE_VIEW;
   view: View;
+  currentViewData?: any;
 }
 
 export interface GoBackPayload {
@@ -84,16 +93,24 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
   // TODO consider using if statements instead of switch
   switch (action.payload.type) {
     case ViewActions.UPDATE_VIEW:
-      // eslint-disable-next-line no-case-declarations, prefer-destructuring
-      const view = action.payload.view;
-      // eslint-disable-next-line no-case-declarations, prefer-destructuring
-      const history = state.history;
+      // eslint-disable-next-line no-case-declarations
+      const { view, currentViewData } = action.payload;
+      // eslint-disable-next-line no-case-declarations
+      const { history } = state;
       if (
         history.length === 0
         || history[history.length - 1].type !== view.type
       ) {
+        console.log('current view data should be set before updating', currentViewData);
+
+        // currentViewData should only be set on the current view before updating
+        if (currentViewData) {
+          history[history.length - 1] = { ...history[history.length - 1], data: currentViewData };
+        }
+
         history.push(view);
       }
+
       return {
         ...state,
         view,

@@ -51,10 +51,13 @@ export function BridgeForm(props: BridgeFormProps) {
   } = useContext(BridgeContext);
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
-  const { viewDispatch } = useContext(ViewContext);
+  const { viewState, viewDispatch } = useContext(ViewContext);
   const { testId, defaultAmount, defaultTokenAddress } = props;
   const { content, bridgeForm, fees } = text.views[BridgeWidgetViews.BRIDGE];
 
+  useEffect(() => {
+    console.log(viewState.history);
+  }, [viewState]);
   // Form state
   const [amount, setAmount] = useState<string>(defaultAmount || '');
   const [amountError, setAmountError] = useState<string>('');
@@ -355,6 +358,10 @@ export function BridgeForm(props: BridgeFormProps) {
                   amount,
                 },
               },
+            },
+            currentViewData: {
+              tokenAddress: token.token?.address ?? '',
+              amount,
             },
           },
         });

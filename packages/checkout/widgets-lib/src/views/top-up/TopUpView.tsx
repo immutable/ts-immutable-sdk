@@ -16,8 +16,8 @@ import { text } from '../../resources/text/textConfig';
 import {
   orchestrationEvents,
 } from '../../lib/orchestrationEvents';
-import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
-import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { PrefilledSwapForm, SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
+import { BridgeWidgetViews, PrefilledBridgeForm } from '../../context/view-context/BridgeViewContextTypes';
 import { WalletContext } from '../../widgets/wallet/context/WalletContext';
 import { getBridgeFeeEstimation, getSwapFeeEstimation } from '../../lib/feeEstimation';
 import { CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
@@ -33,6 +33,8 @@ interface TopUpViewProps {
   amount?: string,
   onCloseButtonClick: () => void,
   onBackButtonClick?: () => void,
+  swapData?: PrefilledSwapForm,
+  bridgeData?: PrefilledBridgeForm
 }
 
 export function TopUpView({
@@ -44,10 +46,12 @@ export function TopUpView({
   amount,
   onCloseButtonClick,
   onBackButtonClick,
+  swapData,
+  bridgeData,
 }: TopUpViewProps) {
   const { header, topUpOptions } = text.views[SharedViews.TOP_UP_VIEW];
   const { onramp, swap, bridge } = topUpOptions;
-  const { viewDispatch } = useContext(ViewContext);
+  const { viewState, viewDispatch } = useContext(ViewContext);
   const { walletState } = useContext(WalletContext);
   const { checkout } = walletState;
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -59,6 +63,10 @@ export function TopUpView({
   const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('-.--');
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
+
+  useEffect(() => {
+    console.log(viewState.history);
+  }, [viewState]);
 
   const onClickOnramp = () => {
     // if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
@@ -128,9 +136,9 @@ export function TopUpView({
           view: {
             type: SwapWidgetViews.SWAP,
             data: {
-              toContractAddress: tokenAddress ?? '',
-              fromAmount: '',
-              fromContractAddress: '',
+              toContractAddress: swapData?.toContractAddress ?? '',
+              fromAmount: swapData?.fromAmount ?? '',
+              fromContractAddress: swapData?.fromContractAddress ?? '',
             },
           },
         },
@@ -138,9 +146,9 @@ export function TopUpView({
       return;
     }
     orchestrationEvents.sendRequestSwapEvent(widgetEvent, {
-      fromTokenAddress: '',
-      toTokenAddress: tokenAddress ?? '',
-      amount: '',
+      fromTokenAddress: tokenAddress ?? '',
+      toTokenAddress: '',
+      amount: amount ?? '',
     });
   };
 
@@ -149,14 +157,20 @@ export function TopUpView({
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: BridgeWidgetViews.BRIDGE },
+          view: {
+            type: BridgeWidgetViews.BRIDGE,
+            data: {
+              tokenAddress: bridgeData?.tokenAddress ?? '',
+              amount: bridgeData?.amount ?? '',
+            },
+          },
         },
       });
       return;
     }
     orchestrationEvents.sendRequestBridgeEvent(widgetEvent, {
-      tokenAddress: '',
-      amount: '',
+      tokenAddress: bridgeData?.tokenAddress ?? '',
+      amount: bridgeData?.amount ?? '',
     });
   };
 
@@ -210,7 +224,7 @@ export function TopUpView({
     <SimpleLayout
       header={(
         <HeaderNavigation
-          onBackButtonClick={onBackButtonClick ?? undefined}
+          onBackButtonClick={onBackButtonClick}
           onCloseButtonClick={onCloseButtonClick}
           showBack
         />
