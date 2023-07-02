@@ -673,20 +673,18 @@ export function SwapForm({ data }: SwapFromProps) {
       <NotEnoughImx
         visible={showNotEnoughImxDrawer}
         showAdjustAmount={!fromToken?.address || fromToken.address === 'NATIVE'}
-        // eslint-disable-next-line max-len
         onAddCoinsClick={() => {
-          const swapData = {
-            fromContractAddress: fromToken?.address ?? '',
-            fromAmount,
-            toContractAddress: toToken?.address ?? '',
-          };
           viewDispatch({
             payload: {
               type: ViewActions.UPDATE_VIEW,
               view: {
                 type: SharedViews.TOP_UP_VIEW,
               },
-              currentViewData: swapData,
+              currentViewData: {
+                fromContractAddress: fromToken?.address ?? '',
+                fromAmount,
+                toContractAddress: toToken?.address ?? '',
+              },
             },
           });
         }}

@@ -35,13 +35,9 @@ export function SwapButton({
   const { swapState } = useContext(SwapContext);
   const { checkout, provider } = swapState;
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
-
-  // REMOVE THIS
-  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  validator;
   const sendTransaction = async () => {
-    // if (!validator()) return;
-    if (!checkout || !provider /* || !transaction */) return;
+    if (!validator()) return;
+    if (!checkout || !provider || !transaction) return;
 
     if (insufficientFundsForGas) {
       setShowNotEnoughImxDrawer(true);
