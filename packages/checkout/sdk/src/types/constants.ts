@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { ChainId, ChainName } from './chainId';
+import { ChainId, ChainName } from './chains';
 import { TokenInfo } from './tokenInfo';
 
 export const ENV_DEVELOPMENT = 'development' as Environment;

@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { ChainId } from './chainId';
+import { ChainId } from './chains';
 import { NetworkInfo } from './networkInfo';
 
 /**

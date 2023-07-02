@@ -1,4 +1,4 @@
-import { ChainId } from './chainId';
+import { ChainId } from './chains';
 import { TokenInfo } from './tokenInfo';
 
 export interface TokenMasterInfo extends TokenInfo {
