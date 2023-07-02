@@ -207,8 +207,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.amountIn,
       );
 
-      expect(tx.swap.gasFeeEstimate?.value.toString())
-        .toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE).toString());
+      expect(tx.swap.gasFeeEstimate?.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
       expect(tx.swap.gasFeeEstimate?.token.chainId).toEqual(IMX_TEST_CHAIN.chainId);
       expect(tx.swap.gasFeeEstimate?.token.address).toEqual(IMX_TEST_CHAIN.address);
       expect(tx.swap.gasFeeEstimate?.token.decimals).toEqual(IMX_TEST_CHAIN.decimals);
