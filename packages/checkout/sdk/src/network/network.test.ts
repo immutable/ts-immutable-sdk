@@ -65,10 +65,10 @@ describe('network functions', () => {
           chainId: 11155111,
         },
         {
-          chainId: 13372,
+          chainId: 13383,
         },
         {
-          chainId: 13373,
+          chainId: 13393,
         },
       ]),
     });
@@ -323,11 +323,11 @@ describe('network functions', () => {
   describe('getNetworkInfo', () => {
     const getNetworkTestCases = [
       {
-        chainId: 1 as ChainId,
+        chainId: ChainId.ETHEREUM,
         chainName: 'homestead',
       },
       {
-        chainId: 13372 as ChainId,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         chainName: 'IMX',
       },
     ];
@@ -391,7 +391,7 @@ describe('network functions', () => {
         networks: [
           {
             name: 'Ethereum',
-            chainId: 1,
+            chainId: ChainId.ETHEREUM,
             isSupported: true,
             nativeCurrency: {
               name: 'Ethereum',
@@ -401,7 +401,7 @@ describe('network functions', () => {
           },
           {
             name: 'Immutable zkEVM Testnet',
-            chainId: 13372,
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
             isSupported: true,
             nativeCurrency: {
               name: 'IMX',
@@ -417,7 +417,7 @@ describe('network functions', () => {
       await expect(
         await getNetworkAllowList(testCheckoutConfiguration, {
           type: NetworkFilterTypes.ALL,
-          exclude: [{ chainId: 13372 }],
+          exclude: [{ chainId: ChainId.IMTBL_ZKEVM_TESTNET }],
         }),
       ).toEqual({
         networks: [
