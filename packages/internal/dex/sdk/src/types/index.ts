@@ -5,11 +5,11 @@ import { ExchangeContracts } from 'config';
 /**
  * Interface representing an amount with the token information
  * @property {TokenInfo} token - The token information
- * @property {ethers.BigNumberish} value - The amount
+ * @property {ethers.BigNumber} value - The amount
  */
 export type Amount = {
   token: TokenInfo;
-  value: ethers.BigNumberish;
+  value: ethers.BigNumber;
 };
 
 /**
