@@ -63,7 +63,7 @@ export function getSwap(
 
   const gasFeeEstimate = gasPrice ? {
     token: nativeToken,
-    value: calculateGasFee(gasPrice, routeAndQuote.trade.gasEstimate).toString(),
+    value: calculateGasFee(gasPrice, routeAndQuote.trade.gasEstimate),
   } : null;
 
   return {
