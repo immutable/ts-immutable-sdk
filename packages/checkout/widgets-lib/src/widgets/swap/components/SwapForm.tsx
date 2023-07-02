@@ -5,7 +5,7 @@ import {
 import {
   Body, Box, Heading, OptionKey,
 } from '@biom3/react';
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
 import { parseEther, parseUnits } from 'ethers/lib/utils';
@@ -89,11 +89,7 @@ export function SwapForm({ data }: SwapFromProps) {
   }, []);
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
-  const { viewState, viewDispatch } = useContext(ViewContext);
-
-  useEffect(() => {
-    console.log(viewState.history);
-  }, [viewState.history]);
+  const { viewDispatch } = useContext(ViewContext);
 
   const [editing, setEditing] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -425,12 +421,11 @@ export function SwapForm({ data }: SwapFromProps) {
     }
 
     // need to double check if the is going to be how to identify IMX on zkEVM
-    // const fromTokenIsImx = !fromToken?.address || fromToken.address === 'NATIVE';
+    const fromTokenIsImx = !fromToken?.address || fromToken.address === 'NATIVE';
     const gasAmount = parseEther(gasFeeValue.length !== 0 ? gasFeeValue : '0');
-    const additionalAmount = parseUnits('0.1', 18); // TODO: remove this after testing
-    //  fromTokenIsImx && !Number.isNaN(parseFloat(fromAmount))
-    //   ? parseEther(fromAmount)
-    //   : BigNumber.from('0');
+    const additionalAmount = fromTokenIsImx && !Number.isNaN(parseFloat(fromAmount))
+      ? parseUnits(fromAmount, fromToken?.decimals || 18)
+      : BigNumber.from('0');
 
     return gasAmount.add(additionalAmount).gt(imxBalance.balance);
   }, [gasFeeValue, tokenBalances, fromToken, fromAmount]);
@@ -690,7 +685,6 @@ export function SwapForm({ data }: SwapFromProps) {
               type: ViewActions.UPDATE_VIEW,
               view: {
                 type: SharedViews.TOP_UP_VIEW,
-                swapData,
               },
               currentViewData: swapData,
             },

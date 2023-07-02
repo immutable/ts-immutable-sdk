@@ -312,8 +312,6 @@ export function SwapWidget(props: SwapWidgetProps) {
               showSwapOption={isSwapEnabled}
               showBridgeOption={isBridgeEnabled}
               onCloseButtonClick={sendSwapWidgetCloseEvent}
-              swapData={viewState.view.swapData}
-              bridgeData={viewState.view.bridgeData}
             />
           )}
         </SwapContext.Provider>

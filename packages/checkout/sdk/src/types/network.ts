@@ -62,7 +62,7 @@ NetworkDetails
   [
     ChainId.IMTBL_ZKEVM_TESTNET,
     {
-      chainIdHex: '0x343C', // 13372
+      chainIdHex: '0x3446', // 13382
       chainName: 'Immutable zkEVM Testnet',
       rpcUrls: [RPC_URL_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET) as string],
       nativeCurrency: {
@@ -95,7 +95,7 @@ NetworkDetails
   [
     ChainId.IMTBL_ZKEVM_DEVNET,
     {
-      chainIdHex: '0x3447', // 13383
+      chainIdHex: '0x3451', // 13393
       chainName: 'Immutable zkEVM Devnet',
       rpcUrls: [RPC_URL_MAP.get(ChainId.IMTBL_ZKEVM_DEVNET) as string],
       nativeCurrency: {
