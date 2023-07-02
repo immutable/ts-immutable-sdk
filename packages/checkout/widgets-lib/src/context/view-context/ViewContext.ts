@@ -101,8 +101,6 @@ export const viewReducer: Reducer<ViewState, ViewAction> = (
         history.length === 0
         || history[history.length - 1].type !== view.type
       ) {
-        console.log('current view data should be set before updating', currentViewData);
-
         // currentViewData should only be set on the current view before updating
         if (currentViewData) {
           history[history.length - 1] = { ...history[history.length - 1], data: currentViewData };
