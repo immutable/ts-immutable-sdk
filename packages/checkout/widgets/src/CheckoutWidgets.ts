@@ -54,18 +54,10 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
 
   const validVersion = validateAndBuildVersion(config?.version);
 
-  if (process.env.CHECKOUT_ENVIRONMENT === 'local') {
-    checkoutWidgetJS.setAttribute(
-      'src',
-      'http://localhost:3000/lib/js/imtbl-checkout.js',
-    );
-  } else {
-    const cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
-    checkoutWidgetJS.setAttribute(
-      'src',
-      cdnUrl,
-    );
-  }
+  let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
+  if (process.env.CHECKOUT_DEV_MODE !== undefined) cdnUrl = 'http://localhost:3000/lib/js/imtbl-checkout.js';
+
+  checkoutWidgetJS.setAttribute('src', cdnUrl);
 
   document.head.appendChild(checkoutWidgetJS);
   window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
