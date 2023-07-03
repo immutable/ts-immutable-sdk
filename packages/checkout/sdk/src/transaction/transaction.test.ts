@@ -3,7 +3,7 @@ import { CheckoutError, CheckoutErrorType } from '../errors';
 import { sendTransaction } from './transaction';
 import { ChainId } from '../types';
 
-describe.skip('transaction', () => {
+describe('transaction', () => {
   it('should send the transaction and return success', async () => {
     const transactionResponse = {
       hash: '123',
