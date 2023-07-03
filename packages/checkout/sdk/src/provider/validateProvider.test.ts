@@ -7,7 +7,7 @@ import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 
 jest.mock('../config/remoteConfigFetcher');
 
-describe.skip('provider validation', () => {
+describe('provider validation', () => {
   const mockRequestFunc = (request: {
     method: string;
     params?: any[] | undefined;
