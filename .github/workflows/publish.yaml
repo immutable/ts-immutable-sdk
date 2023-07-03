@@ -100,7 +100,7 @@ jobs:
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
       - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && NEXT_VERSION=${{ steps.version.outputs.NEXT_VERSION }} RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
 
       - name: Typecheck
         run: yarn typecheck

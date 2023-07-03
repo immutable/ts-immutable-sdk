@@ -1,5 +1,5 @@
 import { CheckoutWidgetsConfig, SemanticVersion } from './definitions/config';
-import { packageVersion, isDevMode } from './lib/env';
+import { globalPackageVersion, isDevMode } from './lib/env';
 
 /**
  * Validates and builds a version string based on the given SemanticVersion object.
@@ -12,7 +12,7 @@ import { packageVersion, isDevMode } from './lib/env';
 export function validateAndBuildVersion(
   version: SemanticVersion | undefined,
 ): string {
-  const defaultPackageVersion = packageVersion();
+  const defaultPackageVersion = globalPackageVersion();
 
   if (!version || version?.major === undefined || version.major < 0) return defaultPackageVersion;
   if (version.major === 0 && version.minor === 0 && version.patch === 0) return defaultPackageVersion;

@@ -1,21 +1,9 @@
 import { CheckoutWidgets, validateAndBuildVersion } from './CheckoutWidgets';
 import { SemanticVersion } from './definitions/config';
+import { SDK_VERSION_MARKER } from './lib/env';
 
 describe('CheckoutWidgets', () => {
-  const NEXT_VERSION = '1.1.1-alpha.3';
-  const OLD_ENV = process.env;
-
-  beforeAll(() => {
-    process.env = {
-      ...OLD_ENV,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      NEXT_VERSION,
-    };
-  });
-
-  afterAll(() => {
-    process.env = OLD_ENV;
-  });
+  const SDK_VERSION = SDK_VERSION_MARKER;
 
   /**
    * This versioning is currently tied to our current release process of the unified SDK
@@ -30,7 +18,7 @@ describe('CheckoutWidgets', () => {
       {
         title: 'missing version object should return default version',
         version: undefined,
-        expectedVersion: NEXT_VERSION,
+        expectedVersion: SDK_VERSION,
       },
       {
         title: 'all zero versions should return default version',
@@ -39,7 +27,7 @@ describe('CheckoutWidgets', () => {
           minor: 0,
           patch: 0,
         },
-        expectedVersion: NEXT_VERSION,
+        expectedVersion: SDK_VERSION,
       },
       {
         title: 'valid major, minor and patch',
@@ -75,7 +63,7 @@ describe('CheckoutWidgets', () => {
           minor: 2,
           patch: 8,
         },
-        expectedVersion: NEXT_VERSION,
+        expectedVersion: SDK_VERSION,
       },
       {
         title: 'set minor to 0 when patch added but minor undefined',
@@ -128,7 +116,7 @@ describe('CheckoutWidgets', () => {
       CheckoutWidgets();
       expect(document.head.innerHTML).toBe(
         `<script src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${
-          NEXT_VERSION
+          SDK_VERSION
         }/dist/browser/checkout.js"></script>`,
       );
     });
