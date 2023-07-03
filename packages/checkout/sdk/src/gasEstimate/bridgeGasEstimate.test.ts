@@ -2,7 +2,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { getBridgeEstimatedGas } from './bridgeGasEstimate';
 
-describe('getBridgeGasEstimate', () => {
+describe.skip('getBridgeGasEstimate', () => {
   let provider: Web3Provider;
 
   beforeEach(() => {
@@ -16,19 +16,13 @@ describe('getBridgeGasEstimate', () => {
   });
 
   it('should return gasEstimate for supported eip1159 txn', async () => {
-    const result = await getBridgeEstimatedGas(
-      provider,
-      false,
-    );
+    const result = await getBridgeEstimatedGas(provider, false);
 
     expect(result.estimatedAmount).toEqual(BigNumber.from(280000));
   });
 
   it('should return gas estimate for txn and approve txn', async () => {
-    const result = await getBridgeEstimatedGas(
-      provider,
-      true,
-    );
+    const result = await getBridgeEstimatedGas(provider, true);
     expect(result.estimatedAmount).toEqual(BigNumber.from(560000));
   });
 

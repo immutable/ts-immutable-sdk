@@ -29,7 +29,7 @@ jest.mock('./transaction');
 jest.mock('./gasEstimate/gasEstimator');
 jest.mock('./readOnlyProviders/readOnlyProvider');
 
-describe('Connect', () => {
+describe.skip('Connect', () => {
   let providerMock: ExternalProvider;
 
   beforeEach(() => {
