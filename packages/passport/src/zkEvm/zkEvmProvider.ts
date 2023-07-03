@@ -1,6 +1,6 @@
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { ethRequestAccounts, ethSendTransaction } from './rpcMethods';
+import { ethSendTransaction } from './rpcMethods';
 import { JsonRpcRequestCallback, JsonRpcRequestPayload, RequestArguments } from './types';
 import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
@@ -10,6 +10,7 @@ import { UserZkEvm } from '../types';
 import { RelayerAdapter } from './relayerAdapter';
 import { EthMethodWithAuthParams } from './rpcMethods/types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
+import { registerZkEvmUser } from './userRegistration';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -85,7 +86,10 @@ export class ZkEvmProvider {
     try {
       switch (request.method) {
         case 'eth_requestAccounts': {
-          const { result, magicProvider, user } = await ethRequestAccounts({
+          if (this.isLoggedIn()) {
+            return [this.user.zkEvm.ethAddress];
+          }
+          const { magicProvider, user } = await registerZkEvmUser({
             authManager: this.authManager,
             config: this.config,
             magicAdapter: this.magicAdapter,
@@ -95,7 +99,7 @@ export class ZkEvmProvider {
           this.user = user;
           this.magicProvider = magicProvider;
 
-          return result;
+          return [this.user.zkEvm.ethAddress];
         }
         case 'eth_sendTransaction': {
           return authWrapper(ethSendTransaction);

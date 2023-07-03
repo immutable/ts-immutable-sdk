@@ -1,30 +1,29 @@
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ExternalProvider } from '@ethersproject/providers';
-import AuthManager from '../../authManager';
-import MagicAdapter from '../../magicAdapter';
-import { PassportConfiguration } from '../../config';
-import { createCounterfactualAddress } from '../createCounterfactualAddress';
+import { createCounterfactualAddress } from './createCounterfactualAddress';
 import { UserZkEvm } from '../../types';
+import AuthManager from '../../authManager';
+import { PassportConfiguration } from '../../config';
+import MagicAdapter from '../../magicAdapter';
 
-type EthRequestAccountsInput = {
+type RegisterZkEvmUserInput = {
   authManager: AuthManager;
   config: PassportConfiguration;
   magicAdapter: MagicAdapter;
   multiRollupApiClients: MultiRollupApiClients;
 };
 
-type EthRequestAccountsOutput = {
+type RegisterZkEvmUserOutput = {
   user: UserZkEvm;
   magicProvider: ExternalProvider;
-  result: string[];
 };
 
-export const ethRequestAccounts = async ({
+export const registerZkEvmUser = async ({
   authManager,
   config,
   magicAdapter,
   multiRollupApiClients,
-}: EthRequestAccountsInput): Promise<EthRequestAccountsOutput> => {
+}: RegisterZkEvmUserInput): Promise<RegisterZkEvmUserOutput> => {
   const user = await authManager.getUser() || await authManager.login();
   if (!user.idToken) {
     throw new Error('User is missing idToken');
@@ -45,14 +44,12 @@ export const ethRequestAccounts = async ({
 
     return {
       user: userZkevm,
-      result: [userZkevm.zkEvm.ethAddress],
       magicProvider,
     };
   }
 
   return {
     user: user as UserZkEvm,
-    result: [user.zkEvm.ethAddress],
     magicProvider,
   };
 };
