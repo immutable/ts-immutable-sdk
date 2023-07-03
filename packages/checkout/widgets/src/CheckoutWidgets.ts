@@ -67,7 +67,7 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
   const validVersion = validateAndBuildVersion(undefined);
 
   let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
-  if (process.env.CHECKOUT_LOCAL_MODE !== undefined) cdnUrl = 'http://localhost:3000/lib/js/imtbl-checkout.js';
+  if (isDevMode()) cdnUrl = 'http://localhost:3000/lib/js/imtbl-checkout.js';
 
   checkoutWidgetJS.setAttribute('src', cdnUrl);
 
