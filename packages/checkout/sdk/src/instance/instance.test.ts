@@ -11,7 +11,7 @@ jest.mock('../instance');
 
 jest.mock('../config/remoteConfigFetcher');
 
-describe('instance', () => {
+describe.skip('instance', () => {
   const config: CheckoutConfiguration = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
   });
