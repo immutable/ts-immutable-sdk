@@ -53,7 +53,7 @@ jest.mock('@ethersproject/providers', () => ({
 
 jest.mock('../config/remoteConfigFetcher');
 
-describe.skip('network functions', () => {
+describe('network functions', () => {
   let testCheckoutConfiguration: CheckoutConfiguration;
 
   beforeEach(() => {
