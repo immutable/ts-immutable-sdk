@@ -30,6 +30,21 @@ describe('CheckoutWidgets', () => {
         expectedVersion: SDK_VERSION,
       },
       {
+        title: 'valid major, no minor or patch',
+        version: {
+          major: 1,
+        },
+        expectedVersion: '1',
+      },
+      {
+        title: 'valid major and minor, no patch',
+        version: {
+          major: 1,
+          minor: 2,
+        },
+        expectedVersion: '1.2',
+      },
+      {
         title: 'valid major, minor and patch',
         version: {
           major: 1,
