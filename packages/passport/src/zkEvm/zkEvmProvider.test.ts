@@ -157,7 +157,7 @@ describe('ZkEvmProvider', () => {
       }));
     });
 
-    it.each(passthroughMethods)('should passthrough to the jsonRpcProvider', async (method, returnValue) => {
+    it.each(passthroughMethods)('should passthrough %s to the jsonRpcProvider', async (method, returnValue) => {
       sendMock.mockResolvedValueOnce(returnValue);
 
       const provider = getProvider();
