@@ -6,7 +6,7 @@ import { CheckoutConfiguration } from '../config';
 
 jest.mock('../config/remoteConfigFetcher');
 
-describe.skip('token related functions', () => {
+describe('token related functions', () => {
   let config: CheckoutConfiguration;
 
   describe('when tokens are not configured', () => {
