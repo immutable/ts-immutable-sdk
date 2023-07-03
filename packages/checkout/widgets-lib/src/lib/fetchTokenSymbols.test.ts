@@ -7,7 +7,7 @@ describe('fetchTokenSymbols', () => {
     baseConfig: { environment: Environment.SANDBOX },
   });
 
-  it('success', async () => {
+  it('should fetch token symbols and return eth and imx', async () => {
     checkout.getTokenAllowList = jest.fn().mockImplementationOnce(() => ({
       tokens: [
         { symbol: 'ETH' },
