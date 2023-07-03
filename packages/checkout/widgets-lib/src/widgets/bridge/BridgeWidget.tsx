@@ -181,7 +181,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
     if (firstRender.current) {
       bridgetWidgetSetup();
     }
-  }, [web3Provider, firstRender.current]);
+  }, [web3Provider, checkout.config, firstRender.current]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
