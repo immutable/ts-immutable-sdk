@@ -103,12 +103,14 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       });
 
       const rootProvider = new ethers.providers.JsonRpcProvider(
-        checkout.config.networkMap[getL1ChainId(checkout.config)],
+        checkout.config.networkMap.get(getL1ChainId(checkout.config))?.rpcUrls[0],
       );
 
-      const toChainId = checkout.config.networkMap[getL2ChainId(checkout.config)];
+      const toChainId = getL2ChainId(checkout.config);
 
-      const childProvider = new ethers.providers.JsonRpcProvider(toChainId);
+      const childProvider = new ethers.providers.JsonRpcProvider(
+        checkout.config.networkMap.get(toChainId)?.rpcUrls[0],
+      );
 
       let bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_TESTNET;
       if (checkout.config.isDevelopment) bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_DEVNET;
@@ -130,7 +132,9 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         type: NetworkFilterTypes.ALL,
       });
 
-      const toNetwork = allowedBridgingNetworks.networks.find((network) => network.chainId === toChainId);
+      const toNetwork = allowedBridgingNetworks.networks.find(
+        (network) => network.chainId === toChainId,
+      );
 
       if (toNetwork) {
         bridgeDispatch({
