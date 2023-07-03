@@ -8,7 +8,6 @@
     "@imtbl/economy": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/provider": "0.0.0",
-    "@metamask/eth-sig-util": "^5.1.0",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
