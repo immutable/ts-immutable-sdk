@@ -2,8 +2,8 @@ import { Web3Provider } from '@ethersproject/providers';
 import { signRaw } from '@imtbl/toolkit';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { createCounterfactualAddress } from './createCounterfactualAddress';
-import AuthManager from '../authManager';
-import { mockUser, mockUserZkEvm } from '../test/mocks';
+import AuthManager from '../../authManager';
+import { mockUser, mockUserZkEvm } from '../../test/mocks';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@imtbl/toolkit');

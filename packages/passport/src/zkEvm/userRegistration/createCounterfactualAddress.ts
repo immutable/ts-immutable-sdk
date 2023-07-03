@@ -1,9 +1,9 @@
 import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { signRaw } from '@imtbl/toolkit';
-import { UserZkEvm } from '../types';
-import AuthManager from '../authManager';
-import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
+import { UserZkEvm } from '../../types';
+import AuthManager from '../../authManager';
+import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 
 export type CreateCounterfactualAddressInput = {
   authManager: AuthManager;
