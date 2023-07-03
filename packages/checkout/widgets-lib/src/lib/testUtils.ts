@@ -1,3 +1,4 @@
+import { ChainId } from '@imtbl/checkout-sdk';
 import { cy } from 'local-cypress';
 
 export const cyGetByTestId = (
@@ -27,15 +28,15 @@ export const cyIntercept = (overrides?: {
     || {
       allowedNetworks: [
         {
-          chainId: 11155111,
+          chainId: ChainId.SEPOLIA,
         },
         {
-          chainId: 13383,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         },
       ],
       gasEstimateTokens: {
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        11155111: {
+        [ChainId.SEPOLIA]: {
           bridgeToL2Addresses: {
             gasTokenAddress: 'NATIVE',
             fromAddress: '0xd1da7e9b2Ce1a4024DaD52b3D37F4c5c91a525C1',
@@ -46,7 +47,7 @@ export const cyIntercept = (overrides?: {
           },
         },
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        13383: {
+        [ChainId.IMTBL_ZKEVM_TESTNET]: {
           swapAddresses: {
             inAddress: '0xFEa9FF93DC0C6DC73F8Be009Fe7a22Bb9dcE8A2d',
             outAddress: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e',

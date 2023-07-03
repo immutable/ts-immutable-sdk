@@ -1,5 +1,5 @@
 export * from './balances';
-export * from './chainId';
+export * from './chains';
 export * from './config';
 export * from './connect';
 export * from './gasEstimate';

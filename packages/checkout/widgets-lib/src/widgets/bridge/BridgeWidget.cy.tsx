@@ -4,6 +4,7 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import {
+  ChainId,
   Checkout, CheckoutErrorType, GasEstimateType, TokenAmountEstimate,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
@@ -37,7 +38,7 @@ describe('Bridge Widget tests', () => {
       getAddress: () => Promise.resolve('0xwalletAddress'),
     }),
     getNetwork: async () => ({
-      chainId: 1,
+      chainId: ChainId.ETHEREUM,
       name: 'Ethereum',
     }),
     getFeeData: () => ({
@@ -56,7 +57,7 @@ describe('Bridge Widget tests', () => {
     connectStubReturnValue = {
       provider: mockProvider,
       network: {
-        chainId: 1,
+        chainId: ChainId.ETHEREUM,
         name: 'Ethereum',
         nativeCurrency: {
           name: 'ETH',
@@ -128,7 +129,7 @@ describe('Bridge Widget tests', () => {
       .resolves({
         networks: [
           {
-            chainId: 1,
+            chainId: ChainId.ETHEREUM,
             name: 'Ethereum',
             nativeCurrency: {
               name: 'ETH',
@@ -137,7 +138,7 @@ describe('Bridge Widget tests', () => {
             },
           },
           {
-            chainId: 137,
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
             name: 'Immutable zkEVM Testnet',
             nativeCurrency: {
               name: 'ImmutableX',
