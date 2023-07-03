@@ -1,5 +1,6 @@
+export const SDK_VERSION_MARKER = '__SDK_VERSION__';
+
 export const isDevMode = () => process.env.CHECKOUT_ENVIRONMENT === 'local';
 
-// This works in CI thanks to .github/workflows/publish.yaml build step
-// Fallback only uses major so it is handled by jsdeliver.
-export const packageVersion = () => process.env.NEXT_VERSION ?? '0';
+// This SDK version is replaced by the `yarn build` command ran on the root level
+export const globalPackageVersion = () => SDK_VERSION_MARKER;
