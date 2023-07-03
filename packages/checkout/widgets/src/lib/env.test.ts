@@ -16,7 +16,7 @@ describe('env', () => {
     process.env = {
       ...OLD_ENV,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      CHECKOUT_DEV_MODE: 'true',
+      CHECKOUT_LOCAL_MODE: 'true',
     };
     expect(isDevMode()).toBeTruthy();
     process.env = { ...OLD_ENV };
