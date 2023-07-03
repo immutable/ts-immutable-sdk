@@ -14,7 +14,7 @@ const baseConfig = new CheckoutConfiguration({
   baseConfig: { environment: Environment.SANDBOX },
 });
 
-describe.skip('read only providers', () => {
+describe('read only providers', () => {
   beforeEach(() => {
     jest.restoreAllMocks();
     const getNetworkAllListMock = jest.fn().mockResolvedValue({
