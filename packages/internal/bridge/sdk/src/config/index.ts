@@ -42,10 +42,10 @@ const CONTRACTS_FOR_BRIDGE = new Map<BridgeInstance, BridgeContracts>()
     childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
   .set(ETH_SEPOLIA_TO_ZKEVM_TESTNET, {
-    rootChainERC20Predicate: '0x',
-    rootChainStateSender: '0x',
-    childChainERC20Predicate: '0x',
-    childChainStateReceiver: '0x',
+    rootChainERC20Predicate: '0x9A7E4C4337a70C6754a9672F5ba69084463794B8',
+    rootChainStateSender: '0xfBfF6FD165adFA113bE39eE85ef030A996153253',
+    childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
+    childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
   .set(ETH_MAINNET_TO_ZKEVM_MAINNET, {
     rootChainERC20Predicate: '0x',
