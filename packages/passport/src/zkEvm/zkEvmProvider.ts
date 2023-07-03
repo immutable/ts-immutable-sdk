@@ -107,10 +107,19 @@ export class ZkEvmProvider {
         case 'eth_accounts': {
           return this.isLoggedIn() ? [this.user.zkEvm.ethAddress] : [];
         }
+        // Passthrough methods
         case 'eth_gasPrice':
         case 'eth_getBalance':
         case 'eth_getStorageAt':
-        case 'eth_estimateGas': {
+        case 'eth_estimateGas':
+        case 'eth_call':
+        case 'eth_blockNumber':
+        case 'eth_chainId':
+        case 'eth_getBlockByHash':
+        case 'eth_getBlockByNumber':
+        case 'eth_getTransactionByHash':
+        case 'eth_getTransactionReceipt':
+        case 'eth_getTransactionCount': {
           return this.jsonRpcProvider.send(request.method, request.params);
         }
         default: {
