@@ -9,7 +9,7 @@ export interface TokenMasterInfo extends TokenInfo {
 /**
  * Interface representing the parameters for {@link Checkout.getTokenAllowList}.
  * @property {TokenFilterTypes} type - The type of token to retrieve.
- * @property {ChainId | undefined}  chainId - The ID of the blockchain network.
+ * @property {ChainId}  chainId - The ID of the blockchain network.
  * @property {TokenFilter[]} [exclude] - The tokens to exclude from the list.
  */
 export interface GetTokenAllowListParams {
