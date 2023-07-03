@@ -12,7 +12,7 @@ jest.mock('../config/remoteConfigFetcher');
 
 describe('instance', () => {
   (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
-    get: jest.fn().mockResolvedValue({
+    getConfig: jest.fn().mockResolvedValue({
       overrides: {
         rpcURL: 'https://test',
         commonRoutingTokens: [
@@ -92,10 +92,6 @@ describe('instance', () => {
 
   describe('createExchangeInstance', () => {
     it('should create an instance of Exchange', async () => {
-      (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
-        getConfig: jest.fn().mockResolvedValue({}),
-      });
-
       const chainId = Object.keys(SupportedChainIdsForEnvironment[config.environment])[0] as unknown as number;
       const exchange = await createExchangeInstance(
         SupportedChainIdsForEnvironment[config.environment][chainId].chainId,
