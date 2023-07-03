@@ -47,7 +47,7 @@ describe('token related functions', () => {
         ]),
         getConfig: jest.fn().mockResolvedValue({
           overrides: {
-            rpcURL: 'https://test.com',
+            rpcURL: 'https://test',
           },
           tokens: [
             {
