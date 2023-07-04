@@ -265,7 +265,6 @@ export class PrimarySalesDemo extends LitElement {
     this.erc721Balance = balance.toString();
     console.log('@@@@ erc721 balance', this.erc721Balance);
     this.requestUpdate();
-
   }
 
   render() {
