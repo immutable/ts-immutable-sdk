@@ -14,10 +14,10 @@ export type ExchangeContracts = {
 
 export const CONTRACTS_FOR_CHAIN_ID: { [chainId: number]: ExchangeContracts } = {
   [IMMUTABLE_TESTNET_CHAIN_ID]: {
-    multicall: '0x66d0aB680ACEe44308edA2062b910405CC51A190',
-    coreFactory: '0x23490b262829ACDAD3EF40e555F23d77D1B69e4e',
-    quoterV2: '0x9B323E56215aAdcD4f45a6Be660f287DE154AFC5',
-    peripheryRouter: '0x615FFbea2af24C55d737dD4264895A56624Da072',
+    multicall: '0xb18c44b211065E69844FbA9AE146DA362104AfBf',
+    coreFactory: '0x12739A8f1A8035F439092D016DAE19A2874F30d2',
+    quoterV2: '0xF674847fBcca5C80315e3AE37043Dce99F6CC529',
+    peripheryRouter: '0x0Afe6F5f4DC34461A801420634239FFaD50A2e44',
   },
 };
 
