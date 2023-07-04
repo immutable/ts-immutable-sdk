@@ -39,12 +39,13 @@
   },
   "scripts": {
     "build": "parcel build",
+    "build:local": "CHECKOUT_LOCAL_MODE=local parcel build",
     "build:dist": "npm i && npm run build && npm run dist",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
-    "start:dev": "CHECKOUT_DEV_MODE=local && parcel watch",
     "start": "parcel watch",
+    "start:local": "CHECKOUT_LOCAL_MODE=local parcel watch",
     "start:version": "parcel watch",
     "test": "jest test",
     "test:watch": "jest test --watch"

@@ -8,7 +8,7 @@ import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
-import { cySmartGet } from '../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
@@ -16,28 +16,10 @@ import { quotesProcessor } from './functions/FetchQuote';
 import { text } from '../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 
-const overrides: any = {
-  rpcURL: 'https://rpc.node',
-  commonRoutingTokens: [
-    {
-      chainId: ChainId.SEPOLIA,
-      address: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE',
-      decimals: 18,
-      symbol: 'FUN',
-    },
-  ],
-  exchangeContracts: {
-    multicall: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e',
-  },
-  nativeToken: {
-    chainId: ChainId.SEPOLIA,
-  },
-};
-
 describe('SwapWidget tests', () => {
   beforeEach(() => {
-    cy.intercept('https://checkout-api.sandbox.immutable.com/v1/config', { dex: { overrides } });
-    cy.intercept('https://rpc.node', {});
+    cyIntercept();
+
     cy.viewport('ipad-2');
   });
 
@@ -192,25 +174,28 @@ describe('SwapWidget tests', () => {
 
   describe('swap submit', () => {
     const mockQuoteFromAmountIn = {
-      info: {
-        quote: {
+      quote: {
+        amount: {
           token: {
             name: 'Ethereum',
             symbol: 'ETH',
             decimals: 18,
             address: '',
           },
-          amount: BigNumber.from('112300000000000012'),
+          value: BigNumber.from('112300000000000012'),
         },
-        quoteWithMaxSlippage: {
+        amountWithMaxSlippage: {
           token: {
             name: 'ImmutableX',
             symbol: 'IMX',
             decimals: 18,
             address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
           },
-          amount: BigNumber.from('112300000000000032'),
+          value: BigNumber.from('112300000000000032'),
         },
+        slippage: 10,
+      },
+      swap: {
         gasFeeEstimate: {
           token: {
             name: 'ImmutableX',
@@ -218,17 +203,27 @@ describe('SwapWidget tests', () => {
             decimals: 18,
             address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
           },
-          amount: BigNumber.from('112300000000000045'),
+          value: BigNumber.from('112300000000000045'),
         },
-        slippage: 10,
+        transaction: {
+          to: 'toSwapAddress',
+          from: 'fromSwapAddress',
+        },
       },
-      approveTransaction: {
-        from: 'approval',
-        to: 'approval',
-      },
-      transaction: {
-        from: 'swap',
-        to: 'swap',
+      approval: {
+        gasFeeEstimate: {
+          token: {
+            name: 'ImmutableX',
+            symbol: 'IMX',
+            decimals: 18,
+            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          },
+          value: BigNumber.from('112300000000000045'),
+        },
+        transaction: {
+          to: 'toApprovalAddress',
+          from: 'fromApprovalAddress',
+        },
       },
     };
     let fromAmountInStub;
@@ -261,7 +256,7 @@ describe('SwapWidget tests', () => {
           });
 
         // Set up so no approval transaction is needed
-        fromAmountInStub.resolves({ ...mockQuoteFromAmountIn, approveTransaction: null });
+        fromAmountInStub.resolves({ ...mockQuoteFromAmountIn, approval: null });
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();
         cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').click();
@@ -298,7 +293,7 @@ describe('SwapWidget tests', () => {
           });
 
         // Set up so no approval transaction is needed
-        fromAmountInStub.resolves({ ...mockQuoteFromAmountIn, approveTransaction: null });
+        fromAmountInStub.resolves({ ...mockQuoteFromAmountIn, approval: null });
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();
         cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').click();
@@ -377,7 +372,7 @@ describe('SwapWidget tests', () => {
             'have.been.calledWith',
             {
               provider: mockProvider,
-              transaction: { from: 'approval', to: 'approval' },
+              transaction: { from: 'fromApprovalAddress', to: 'toApprovalAddress' },
             },
           );
         cySmartGet('loading-view').should('be.visible');
@@ -392,7 +387,7 @@ describe('SwapWidget tests', () => {
         cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
         cySmartGet('@sendTransactionStub').should('have.been.calledWith', {
           provider: mockProvider,
-          transaction: { from: 'swap', to: 'swap' },
+          transaction: { from: 'fromSwapAddress', to: 'toSwapAddress' },
         });
 
         cySmartGet('loading-view').should('be.visible');
@@ -457,7 +452,7 @@ describe('SwapWidget tests', () => {
             'have.been.calledWith',
             {
               provider: mockProvider,
-              transaction: { from: 'approval', to: 'approval' },
+              transaction: { from: 'fromApprovalAddress', to: 'toApprovalAddress' },
             },
           );
         cySmartGet('loading-view').should('be.visible');
@@ -472,7 +467,7 @@ describe('SwapWidget tests', () => {
         cySmartGet('@sendTransactionStub').should('have.been.calledTwice');
         cySmartGet('@sendTransactionStub').should('have.been.calledWith', {
           provider: mockProvider,
-          transaction: { from: 'swap', to: 'swap' },
+          transaction: { from: 'fromSwapAddress', to: 'toSwapAddress' },
         });
 
         cySmartGet('loading-view').should('be.visible');
