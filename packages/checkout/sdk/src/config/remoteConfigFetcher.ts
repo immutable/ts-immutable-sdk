@@ -4,13 +4,10 @@ import {
   ChainId,
   CHECKOUT_API_BASE_URL,
   ENV_DEVELOPMENT,
+  RemoteConfiguration,
   TokenInfo,
 } from '../types';
-import {
-  ConfiguredTokens,
-  RemoteConfigParams,
-  RemoteConfiguration,
-} from './remoteConfigType';
+import { ConfiguredTokens, RemoteConfigParams } from './remoteConfigType';
 
 export class RemoteConfigFetcher {
   private isDevelopment: boolean;
