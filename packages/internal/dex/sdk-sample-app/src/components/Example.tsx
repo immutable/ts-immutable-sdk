@@ -11,9 +11,8 @@ export function Example() {
   const exchange = new Exchange(configuration);
 
   // Instead of hard-coding these tokens, you can optionally retrieve available tokens from the user's wallet
-  const FUN_TOKEN = process.env.NEXT_PUBLIC_COMMON_ROUTING_FUN || '';
-  const USDC_TOKEN = process.env.NEXT_PUBLIC_COMMON_ROUTING_USDC || '';
-  const DEX_TOKEN = process.env.NEXT_PUBLIC_COMMON_ROUTING_DEX || '';
+  const TEST_IMX_TOKEN = '0x0000000000000000000000000000000000001010';
+  const ZKCATS_TOKEN = '0x1836E16b2036088490C2CFe4d11970Fc8e5884C4';
 
   const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -26,8 +25,8 @@ export function Example() {
     {}
   );
 
-  const inputToken = FUN_TOKEN;
-  const outputToken = DEX_TOKEN;
+  const inputToken = TEST_IMX_TOKEN;
+  const outputToken = ZKCATS_TOKEN;
 
   useEffect(() => {
     // Get the symbols for the tokens that we want to swap so we can display this to the user
