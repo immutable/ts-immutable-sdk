@@ -10,10 +10,10 @@ import {
   SwitchNetworkResult,
   WalletAction,
   NetworkMap,
+  AllowedNetworkConfig,
 } from '../types';
 import { CheckoutConfiguration } from '../config';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
-import { AllowedNetworkConfig } from '../config/remoteConfigType';
 
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 

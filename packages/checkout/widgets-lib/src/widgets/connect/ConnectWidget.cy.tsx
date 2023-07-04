@@ -1,5 +1,6 @@
 import {
   ChainId,
+  ChainName,
   Checkout,
 } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
@@ -144,8 +145,8 @@ describe('ConnectWidget tests', () => {
       cy.stub(Checkout.prototype, 'getNetworkInfo')
         .as('getNetworkInfoStub')
         .resolves({
-          name: 'Immutable zkEVM Testnet',
-          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          name: ChainName.IMTBL_ZKEVM_DEVNET,
+          chainId: ChainId.IMTBL_ZKEVM_DEVNET,
         });
       mountConnectWidgetAndGoToReadyToConnect();
       cySmartGet('ready-to-connect').should('be.visible');
@@ -181,7 +182,7 @@ describe('ConnectWidget tests', () => {
         .resolves({
           provider: {} as Web3Provider,
           network: {
-            name: 'Immutable zkEVM devnet',
+            name: ChainName.IMTBL_ZKEVM_DEVNET,
             chainId: ChainId.IMTBL_ZKEVM_DEVNET,
           },
         });

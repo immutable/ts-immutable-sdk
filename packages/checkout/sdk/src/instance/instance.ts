@@ -9,9 +9,8 @@ import { ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
 import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { ChainId } from '../types';
+import { ChainId, DexConfig } from '../types';
 import { CheckoutConfiguration } from '../config';
-import { DexConfig } from '../config/remoteConfigType';
 
 export async function createBridgeInstance(
   fromChainId: ChainId,
