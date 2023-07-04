@@ -22,7 +22,7 @@ import {
 import * as instance from '../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../config';
 
-const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000000';
+const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000001';
 const DEFAULT_TOKEN_DECIMALS = 18;
 
 async function getTokenInfoByAddress(
