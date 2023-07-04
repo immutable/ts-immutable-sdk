@@ -84,13 +84,10 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
   overrides: {
     rpcURL: TEST_RPC_URL,
     exchangeContracts: {
-      multicall: '',
-      coreFactory: '',
-      quoterV2: '',
-      peripheryRouter: '',
-      migrator: '',
-      nonfungiblePositionManager: '',
-      tickLens: '',
+      multicall: TEST_MULTICALL_ADDRESS,
+      coreFactory: TEST_V3_CORE_FACTORY_ADDRESS,
+      quoterV2: TEST_QUOTER_ADDRESS,
+      peripheryRouter: TEST_PERIPHERY_ROUTER_ADDRESS,
     },
     commonRoutingTokens: [],
     nativeToken: {

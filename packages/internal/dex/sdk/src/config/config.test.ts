@@ -1,6 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ChainNotSupportedError, InvalidConfigurationError } from 'errors';
-import { IMX_TEST_CHAIN } from 'utils/testUtils';
+import * as test from 'utils/testUtils';
 import { ExchangeModuleConfiguration, ExchangeOverrides, TokenInfo } from '../types';
 import { ExchangeConfiguration, ExchangeContracts } from './index';
 import { IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';
@@ -49,10 +49,10 @@ describe('ExchangeConfiguration', () => {
       }); // environment isn't used because we override all of the config values
 
       const contractOverrides: ExchangeContracts = {
-        multicall: '0xabc',
-        coreFactory: '0xabc',
-        quoterV2: '0xabc',
-        peripheryRouter: '0xabc',
+        multicall: test.TEST_MULTICALL_ADDRESS,
+        coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
+        quoterV2: test.TEST_QUOTER_ADDRESS,
+        peripheryRouter: test.TEST_PERIPHERY_ROUTER_ADDRESS,
       };
 
       // This list can be updated with any Tokens that are deployed to the chain being configured
@@ -86,7 +86,7 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens,
-        nativeToken: IMX_TEST_CHAIN,
+        nativeToken: test.IMX_TEST_CHAIN,
       };
 
       const config = new ExchangeConfiguration({
@@ -123,9 +123,9 @@ describe('ExchangeConfiguration', () => {
 
       const contractOverrides: ExchangeContracts = {
         multicall: '',
-        coreFactory: '0xabc',
-        quoterV2: '0xabc',
-        peripheryRouter: '0xabc',
+        coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
+        quoterV2: test.TEST_QUOTER_ADDRESS,
+        peripheryRouter: test.TEST_PERIPHERY_ROUTER_ADDRESS,
       };
 
       const commonRoutingTokens: TokenInfo[] = [
@@ -143,7 +143,7 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens,
-        nativeToken: IMX_TEST_CHAIN,
+        nativeToken: test.IMX_TEST_CHAIN,
       };
 
       expect(() => new ExchangeConfiguration({
