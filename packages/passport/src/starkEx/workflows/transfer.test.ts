@@ -104,6 +104,7 @@ describe('transfer', () => {
         guardianClient: mockGuardianClient,
       });
 
+      expect(mockGuardianClient.loading).toBeCalled();
       expect(getSignableTransferV1Mock).toBeCalledWith(mockSignableTransferRequest, mockHeader);
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockPayloadHash });
@@ -261,8 +262,8 @@ describe('transfer', () => {
         },
       }, mockHeader);
       expect(mockStarkSigner.signMessage).toHaveBeenCalled();
+      expect(mockGuardianClient.loading).toBeCalledWith(popupOptions);
       expect(mockGuardianClient.validate).toBeCalledWith({
-        popupWindowSize: popupOptions,
         payloadHash: payload_hash,
       });
       expect(createTransferMock).toHaveBeenCalledWith(
