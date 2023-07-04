@@ -8,13 +8,13 @@ import {
   multicallMultipleCallDataSingContract,
 } from './multicall';
 import {
-  IMX_TEST_CHAIN,
+  IMX_TEST_TOKEN,
   TEST_CHAIN_ID,
   TEST_MULTICALL_ADDRESS,
   TEST_RPC_URL,
   TEST_V3_CORE_FACTORY_ADDRESS,
-  USDC_TEST_CHAIN,
-  WETH_TEST_CHAIN,
+  USDC_TEST_TOKEN,
+  WETH_TEST_TOKEN,
 } from '../utils/testUtils';
 import { Multicall__factory } from '../contracts/types';
 import { DEFAULT_GAS_QUOTE } from './getQuotesForRoutes';
@@ -36,13 +36,13 @@ describe('multicallSingleCallDataMultipleContracts', () => {
               {
                 returnData: ethers.utils.defaultAbiCoder.encode(
                   ['address'],
-                  [WETH_TEST_CHAIN.address],
+                  [WETH_TEST_TOKEN.address],
                 ),
               },
               {
                 returnData: ethers.utils.defaultAbiCoder.encode(
                   ['address'],
-                  [WETH_TEST_CHAIN.address],
+                  [WETH_TEST_TOKEN.address],
                 ),
               },
             ],
@@ -62,7 +62,7 @@ describe('multicallSingleCallDataMultipleContracts', () => {
           [
             defaultAbiCoder.encode(
               ['address', 'address', 'uint24'],
-              [WETH_TEST_CHAIN.address, IMX_TEST_CHAIN.address, '3000'],
+              [WETH_TEST_TOKEN.address, IMX_TEST_TOKEN.address, '3000'],
             ),
           ],
         ),
@@ -75,7 +75,7 @@ describe('multicallSingleCallDataMultipleContracts', () => {
           [
             defaultAbiCoder.encode(
               ['address', 'address', 'uint24'],
-              [WETH_TEST_CHAIN.address, IMX_TEST_CHAIN.address, '10000'],
+              [WETH_TEST_TOKEN.address, IMX_TEST_TOKEN.address, '10000'],
             ),
           ],
         ),
@@ -109,8 +109,8 @@ describe('multicallSingleCallDataMultipleContracts', () => {
         encodedToken0Second,
       )[0];
 
-      expect(decodedToken0First === IMX_TEST_CHAIN);
-      expect(decodedToken0Second === WETH_TEST_CHAIN);
+      expect(decodedToken0First === IMX_TEST_TOKEN);
+      expect(decodedToken0Second === WETH_TEST_TOKEN);
       expect(mockedContract).toBeCalledTimes(1);
     });
   });
@@ -129,13 +129,13 @@ describe('multicallMultipleCallDataSingContract', () => {
               {
                 returnData: ethers.utils.defaultAbiCoder.encode(
                   ['address'],
-                  [WETH_TEST_CHAIN.address],
+                  [WETH_TEST_TOKEN.address],
                 ),
               },
               {
                 returnData: ethers.utils.defaultAbiCoder.encode(
                   ['address'],
-                  [WETH_TEST_CHAIN.address],
+                  [WETH_TEST_TOKEN.address],
                 ),
               },
             ],
@@ -161,7 +161,7 @@ describe('multicallMultipleCallDataSingContract', () => {
           [
             defaultAbiCoder.encode(
               ['address', 'address', 'uint24'],
-              [WETH_TEST_CHAIN.address, USDC_TEST_CHAIN.address, '10000'],
+              [WETH_TEST_TOKEN.address, USDC_TEST_TOKEN.address, '10000'],
             ),
           ],
         ),

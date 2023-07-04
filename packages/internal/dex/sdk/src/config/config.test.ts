@@ -86,7 +86,7 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens,
-        nativeToken: test.IMX_TEST_CHAIN,
+        nativeToken: test.IMX_TEST_TOKEN,
       };
 
       const config = new ExchangeConfiguration({
@@ -143,7 +143,7 @@ describe('ExchangeConfiguration', () => {
         rpcURL,
         exchangeContracts: contractOverrides,
         commonRoutingTokens,
-        nativeToken: test.IMX_TEST_CHAIN,
+        nativeToken: test.IMX_TEST_TOKEN,
       };
 
       expect(() => new ExchangeConfiguration({

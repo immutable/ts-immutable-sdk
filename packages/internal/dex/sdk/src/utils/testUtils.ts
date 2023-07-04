@@ -32,7 +32,7 @@ export const TEST_V3_MIGRATOR_ADDRESSES = '0x0Df0d2d5Cf4739C0b579C33Fdb3d8B04Bee
 export const TEST_NONFUNGIBLE_POSITION_MANAGER_ADDRESSES = '0x446c78D97b1E78bC35864FC49AcE1f7404F163F6';
 export const TEST_TICK_LENS_ADDRESSES = '0x3aC4F8094b21A6c5945453007d9c52B7e15340c0';
 
-export const IMX_TEST_CHAIN = new Token(
+export const IMX_TEST_TOKEN = new Token(
   TEST_CHAIN_ID,
   '0x72958b06abdF2701AcE6ceb3cE0B8B1CE11E0851',
   18,
@@ -40,7 +40,7 @@ export const IMX_TEST_CHAIN = new Token(
   'Immutable X',
 );
 
-export const WETH_TEST_CHAIN = new Token(
+export const WETH_TEST_TOKEN = new Token(
   TEST_CHAIN_ID,
   '0x4F062A3EAeC3730560aB89b5CE5aC0ab2C5517aE',
   18,
@@ -48,7 +48,7 @@ export const WETH_TEST_CHAIN = new Token(
   'Wrapped Ether',
 );
 
-export const USDC_TEST_CHAIN = new Token(
+export const USDC_TEST_TOKEN = new Token(
   TEST_CHAIN_ID,
   '0x93733225CCc07Ba02b1449aA3379418Ddc37F6EC',
   6,
@@ -56,7 +56,7 @@ export const USDC_TEST_CHAIN = new Token(
   'USD Coin',
 );
 
-export const FUN_TEST_CHAIN = new Token(
+export const FUN_TEST_TOKEN = new Token(
   TEST_CHAIN_ID,
   '0xCc7bb2D219A0FC08033E130629C2B854b7bA9195',
   18,
@@ -91,11 +91,11 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
     },
     commonRoutingTokens: [],
     nativeToken: {
-      chainId: IMX_TEST_CHAIN.chainId,
-      address: IMX_TEST_CHAIN.address,
-      decimals: IMX_TEST_CHAIN.decimals,
-      symbol: IMX_TEST_CHAIN.symbol,
-      name: IMX_TEST_CHAIN.name,
+      chainId: IMX_TEST_TOKEN.chainId,
+      address: IMX_TEST_TOKEN.address,
+      decimals: IMX_TEST_TOKEN.decimals,
+      symbol: IMX_TEST_TOKEN.symbol,
+      name: IMX_TEST_TOKEN.name,
     },
   },
 };
@@ -207,8 +207,8 @@ export function setupSwapTxTest(slippage: number): SwapTest {
   const arbitraryLiquidity = 10;
   const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
 
-  const inputToken = IMX_TEST_CHAIN.address;
-  const outputToken = WETH_TEST_CHAIN.address;
+  const inputToken = IMX_TEST_TOKEN.address;
+  const outputToken = WETH_TEST_TOKEN.address;
   const amountIn = ethers.utils.parseEther('0.0000123');
   const amountOut = ethers.utils.parseEther('10000');
 

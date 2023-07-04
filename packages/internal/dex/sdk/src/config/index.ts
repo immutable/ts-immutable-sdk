@@ -12,7 +12,7 @@ export type ExchangeContracts = {
   peripheryRouter: string;
 };
 
-export const CONTRACTS_FOR_CHAIN_ID: { [chainId: number]: ExchangeContracts } = {
+export const CONTRACTS_FOR_CHAIN_ID: Record<number, ExchangeContracts> = {
   [IMMUTABLE_TESTNET_CHAIN_ID]: {
     multicall: '0xb18c44b211065E69844FbA9AE146DA362104AfBf',
     coreFactory: '0x12739A8f1A8035F439092D016DAE19A2874F30d2',
@@ -21,7 +21,7 @@ export const CONTRACTS_FOR_CHAIN_ID: { [chainId: number]: ExchangeContracts } = 
   },
 };
 
-export const SUPPORTED_SANDBOX_CHAINS: { [chainId: number]: Chain } = {
+export const SUPPORTED_SANDBOX_CHAINS: Record<number, Chain> = {
   [IMMUTABLE_TESTNET_CHAIN_ID]: {
     chainId: IMMUTABLE_TESTNET_CHAIN_ID,
     rpcUrl: IMMUTABLE_TESTNET_RPC_URL,
@@ -31,11 +31,9 @@ export const SUPPORTED_SANDBOX_CHAINS: { [chainId: number]: Chain } = {
   },
 };
 
-export const SUPPORTED_PRODUCTION_CHAINS: { [chainId: number]: Chain } = {};
+export const SUPPORTED_PRODUCTION_CHAINS: Record<number, Chain> = {};
 
-export const SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT: {
-  [key in Environment]: { [chainId: number]: Chain };
-} = {
+export const SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT: Record<Environment, Record<number, Chain>> = {
   [Environment.SANDBOX]: SUPPORTED_SANDBOX_CHAINS,
   [Environment.PRODUCTION]: SUPPORTED_PRODUCTION_CHAINS,
 };
