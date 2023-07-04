@@ -1,11 +1,11 @@
 import {
+  DexConfig,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
   TokenFilterTypes,
   TokenInfo,
 } from '../types';
 import { CheckoutConfiguration } from '../config';
-import { DexConfig } from '../config/remoteConfigType';
 
 export const getTokenAllowList = async (
   config: CheckoutConfiguration,
