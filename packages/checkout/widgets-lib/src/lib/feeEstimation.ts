@@ -54,12 +54,12 @@ export const getSwapFeeEstimation = (
   const { gasFee } = swapFees;
 
   const gasFeeAmount = gasFee.estimatedAmount;
-  if (!gasFeeAmount) return '-.--';
+  if (gasFeeAmount === undefined) return '-.--';
   const gasFeeToken = gasFee.token;
-  if (!gasFeeToken) return '-.--';
+  if (gasFeeToken === undefined) return '-.--';
 
   const gasFeeInFiat = convertFeeToFiat(gasFeeAmount, gasFeeToken, conversions);
-  if (gasFeeInFiat === 0) return '-.--';
+  if (gasFeeInFiat === 0) return '0.00';
 
   return formatFiatDecimals(gasFeeInFiat);
 };
@@ -71,12 +71,12 @@ export const getBridgeFeeEstimation = (
   const { gasFee, bridgeFee } = bridgeFees;
 
   const gasFeeAmount = gasFee.estimatedAmount;
-  if (!gasFeeAmount) return '-.--';
+  if (gasFeeAmount === undefined) return '-.--';
   const gasFeeToken = gasFee.token;
-  if (!gasFeeToken) return '-.--';
+  if (!gasFeeToken === undefined) return '-.--';
 
   const gasFeeInFiat = convertFeeToFiat(gasFeeAmount, gasFeeToken, conversions);
-  if (gasFeeInFiat === 0) return '-.--';
+  if (gasFeeInFiat === 0) return '0.00';
 
   const bridgeFeeInFiat = convertFeeToFiat(bridgeFee.estimatedAmount, bridgeFee.token, conversions);
 
