@@ -52,5 +52,5 @@ jobs:
 
       - name: Clear the cloudfront cache
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.PROD_DISTRIBUTION_ID }} --paths "/*"
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CF_PASSPORT_PROD_DISTRIBUTION_ID }} --paths "/*"
           TODO: ADD 
