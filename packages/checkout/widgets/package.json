@@ -39,8 +39,8 @@
   },
   "scripts": {
     "build": "parcel build",
-    "build:local": "CHECKOUT_LOCAL_MODE=local parcel build",
     "build:dist": "npm i && npm run build && npm run dist",
+    "build:local": "CHECKOUT_LOCAL_MODE=local parcel build",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
