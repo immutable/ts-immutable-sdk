@@ -53,6 +53,20 @@ Once you've added a new dependency, or if it's your first time, go to the root l
 
 ## Checkout SDK Development
 
+Running Checkout SDK in different modes:
+
+For local/development mode (uses immutable-devnet):
+```
+cd sdk
+yarn start:dev
+```
+
+For sandbox/production mode (uses immutable-testnet/mainnet based on config object):
+```
+cd sdk
+yarn start
+```
+
 To run the SDK Sample App with the Checkout SDK hot reloading, you need to run both the Checkout SDK and the Checkout Sample App at the same time.
 
 In one terminal run;
@@ -68,6 +82,7 @@ In another terminal run;
 cd sdk-sample-app
 yarn start
 ```
+Note: SDK sample app does not require mode settings.
 
 Now when you make changes in the SDK the parcel watcher will trigger a rebuild of the SDK and since the sample app is also being watched and one of it's dependencies has changed, it will also recompile and the change will automatically be pulled through.
 
@@ -85,6 +100,20 @@ All jest tests within the SDK are run in the jsdom environment. To configure thi
 
 ## Widgets Development
 
+Running Widgets in different modes:
+
+For local development mode (uses `imtbl-checkout.js` from `localhost:3000`):
+```
+cd widgets
+yarn start:local
+```
+
+Otherwise, to use `imtbl-checkout.js` from CDN:
+```
+cd widgets
+yarn start
+```
+
 The Widgets rely on the Checkout SDK and the WidgetTypes which will both hot reload into the Widgets App in the same way as the Checkout SDK hot reloads into the SDK Sample App
 
 In one terminal run;
@@ -95,13 +124,6 @@ yarn start
 ```
 
 In another terminal run;
-
-```
-cd widgets-types
-yarn start
-```
-
-In yet another terminal run;
 
 ```
 cd widgets

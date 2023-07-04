@@ -5,7 +5,7 @@ import { cy } from 'local-cypress';
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { Exchange } from '@imtbl/dex-sdk';
-import { cySmartGet } from '../../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapForm } from './SwapForm';
 import { text } from '../../../resources/text/textConfig';
@@ -20,6 +20,7 @@ describe('SwapForm', () => {
 
   beforeEach(() => {
     cy.viewport('ipad-2');
+    cyIntercept();
 
     cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
 
@@ -296,25 +297,43 @@ describe('SwapForm', () => {
       cy.stub(quotesProcessor, 'fromAmountIn')
         .as('fromAmountInStub')
         .resolves({
-          info: {
-            quote: {
+          quote: {
+            amount: {
               token: {
                 name: 'Ethereum',
                 symbol: 'ETH',
                 decimals: 18,
                 address: '',
               },
-              amount: BigNumber.from('112300000000000012'),
+              value: BigNumber.from('112300000000000012'),
             },
-            quoteWithMaxSlippage: {
+            amountWithMaxSlippage: {
               token: {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
                 address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
               },
-              amount: BigNumber.from('112300000000000032'),
+              value: BigNumber.from('112300000000000032'),
             },
+            slippage: 10,
+          },
+          swap: {
+            gasFeeEstimate: {
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              },
+              value: BigNumber.from('112300000000000045'),
+            },
+            transaction: {
+              to: 'toSwapAddress',
+              from: 'fromSwapAddress',
+            },
+          },
+          approval: {
             gasFeeEstimate: {
               token: {
                 name: 'ImmutableX',
@@ -324,7 +343,10 @@ describe('SwapForm', () => {
               },
               amount: BigNumber.from('112300000000000045'),
             },
-            slippage: 10,
+            transaction: {
+              to: 'toApprovalAddress',
+              from: 'fromApprovalAddress',
+            },
           },
         });
     });
@@ -534,25 +556,28 @@ describe('SwapForm', () => {
       cy.stub(quotesProcessor, 'fromAmountIn')
         .as('fromAmountInStub')
         .resolves({
-          info: {
-            quote: {
+          quote: {
+            amount: {
               token: {
                 name: 'Ethereum',
                 symbol: 'ETH',
                 decimals: 18,
                 address: '',
               },
-              amount: BigNumber.from('112300000000000012'),
+              value: BigNumber.from('112300000000000012'),
             },
-            quoteWithMaxSlippage: {
+            amountWithMaxSlippage: {
               token: {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
                 address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
               },
-              amount: BigNumber.from('112300000000000032'),
+              value: BigNumber.from('112300000000000032'),
             },
+            slippage: 10,
+          },
+          swap: {
             gasFeeEstimate: {
               token: {
                 name: 'ImmutableX',
@@ -560,9 +585,12 @@ describe('SwapForm', () => {
                 decimals: 18,
                 address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
               },
-              amount: BigNumber.from('112300000000000045'),
+              value: BigNumber.from('112300000000000045'),
             },
-            slippage: 10,
+            transaction: {
+              to: 'toSwapAddress',
+              from: 'fromSwapAddress',
+            },
           },
         });
 
