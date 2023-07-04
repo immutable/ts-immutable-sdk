@@ -4,23 +4,25 @@ import {
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import { Web3Provider } from '@ethersproject/providers';
 import {
-  ChainId,
   Checkout,
-  GetTokenAllowListResult,
   NetworkFilterTypes,
-  TokenFilterTypes,
-  RPC_URL_MAP,
 } from '@imtbl/checkout-sdk';
 import {
   useEffect, useMemo, useReducer, useRef,
 } from 'react';
-import {
-  BridgeConfiguration, ETH_MAINNET_TO_ZKEVM_MAINNET, ETH_SEPOLIA_TO_ZKEVM_DEVNET, TokenBridge,
-} from '@imtbl/bridge-sdk';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
 import {
-  l1Network, zkEVMNetwork, Network, WidgetTheme,
+  BridgeConfiguration,
+  ETH_MAINNET_TO_ZKEVM_MAINNET,
+  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+  TokenBridge,
+} from '@imtbl/bridge-sdk';
+import {
+  WidgetTheme,
+  getL1ChainId,
+  getL2ChainId,
 } from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
@@ -41,6 +43,7 @@ import { MoveInProgress } from './views/MoveInProgress';
 import { text } from '../../resources/text/textConfig';
 import { ErrorView } from '../../views/error/ErrorView';
 import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
+import { getBridgeTokensAndBalances } from './functions/getBridgeTokens';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -51,7 +54,6 @@ export interface BridgeWidgetProps {
 export interface BridgeWidgetParams {
   fromContractAddress?: string;
   amount?: string;
-  fromNetwork?: Network;
 }
 
 export function BridgeWidget(props: BridgeWidgetProps) {
@@ -79,9 +81,6 @@ export function BridgeWidget(props: BridgeWidgetProps) {
     ? onLightBase
     : onDarkBase;
 
-  const defaultFromChainId = l1Network(environment);
-  const toChainId = zkEVMNetwork(environment);
-
   useEffect(() => {
     const bridgetWidgetSetup = async () => {
       if (!web3Provider) return;
@@ -104,24 +103,25 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       });
 
       const rootProvider = new ethers.providers.JsonRpcProvider(
-        config.environment
-            === Environment.PRODUCTION ? RPC_URL_MAP.get(ChainId.ETHEREUM)
-          : RPC_URL_MAP.get(ChainId.SEPOLIA),
+        checkout.config.networkMap.get(getL1ChainId(checkout.config))?.rpcUrls[0],
       );
 
+      const toChainId = getL2ChainId(checkout.config);
+
       const childProvider = new ethers.providers.JsonRpcProvider(
-        config.environment
-        === Environment.PRODUCTION ? RPC_URL_MAP.get(ChainId.IMTBL_ZKEVM_TESTNET)
-          : RPC_URL_MAP.get(ChainId.IMTBL_ZKEVM_DEVNET),
+        checkout.config.networkMap.get(toChainId)?.rpcUrls[0],
       );
+
+      let bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_TESTNET;
+      if (checkout.config.isDevelopment) bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_DEVNET;
+      if (checkout.config.isProduction) bridgeInstance = ETH_MAINNET_TO_ZKEVM_MAINNET;
 
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_TOKEN_BRIDGE,
           tokenBridge: new TokenBridge(new BridgeConfiguration({
             baseConfig: new ImmutableConfiguration(config),
-            bridgeInstance: config.environment
-              === Environment.PRODUCTION ? ETH_MAINNET_TO_ZKEVM_MAINNET : ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+            bridgeInstance,
             rootProvider,
             childProvider,
           })),
@@ -132,7 +132,9 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         type: NetworkFilterTypes.ALL,
       });
 
-      const toNetwork = allowedBridgingNetworks.networks.find((network) => network.chainId === toChainId);
+      const toNetwork = allowedBridgingNetworks.networks.find(
+        (network) => network.chainId === toChainId,
+      );
 
       if (toNetwork) {
         bridgeDispatch({
@@ -152,36 +154,19 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         },
       });
 
-      const address = await web3Provider.getSigner().getAddress();
-      const tokenBalances = await checkout.getAllBalances({
-        provider: web3Provider,
-        walletAddress: address,
-        chainId: getNetworkResult.chainId,
-      });
-
-      const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
-        {
-          chainId: getNetworkResult.chainId,
-          type: TokenFilterTypes.BRIDGE,
-        },
-      );
-
-      const allowedTokenBalances = tokenBalances.balances.filter((balance) => balance.balance.gt(0)
-        && allowList.tokens
-          .map((token) => token.address)
-          .includes(balance.token.address));
+      const tokensAndBalances = await getBridgeTokensAndBalances(checkout, web3Provider);
 
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_ALLOWED_TOKENS,
-          allowedTokens: allowList.tokens,
+          allowedTokens: tokensAndBalances.allowList.tokens,
         },
       });
 
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_TOKEN_BALANCES,
-          tokenBalances: allowedTokenBalances,
+          tokenBalances: tokensAndBalances.allowedTokenBalances,
         },
       });
 
@@ -196,7 +181,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
     if (firstRender.current) {
       bridgetWidgetSetup();
     }
-  }, [web3Provider, defaultFromChainId, toChainId, firstRender.current]);
+  }, [web3Provider, firstRender.current]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>

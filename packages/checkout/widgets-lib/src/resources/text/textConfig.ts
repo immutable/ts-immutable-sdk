@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { SharedViews } from '../../context/view-context/ViewContext';
@@ -244,7 +244,7 @@ export const text = {
     },
   },
   wallets: {
-    [ConnectionProviders.METAMASK]: {
+    [WalletProviderName.METAMASK]: {
       heading: 'MetaMask',
       description:
         'Digital wallet for accessing blockchain applications and web3',
@@ -275,6 +275,18 @@ export const text = {
     coinSelector: {
       option: {
         fiatPricePrefix: 'Approx USD $',
+      },
+      noCoins: 'You have no available coins to select in your wallet.',
+    },
+    notEnoughGas: {
+      content: {
+        heading: 'Balance too low',
+        body: "You're ETH balance is too low to cover the gas fee on this move. You could transfer more ETH into your wallet using MetaMask directly.",
+      },
+      buttons: {
+        adjustAmount: 'Adjust amount',
+        copyAddress: 'Copy wallet address',
+        cancel: 'Dismiss',
       },
     },
   },

@@ -1,11 +1,4 @@
-import { Environment, ModuleConfiguration } from '@imtbl/config';
-
-export const SANDBOX_CONFIGURATION = {
-  baseConfig: {
-    environment: Environment.SANDBOX,
-  },
-};
+import { ModuleConfiguration } from '@imtbl/config';
 
 export interface CheckoutOverrides {}
-export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {
-}
+export interface CheckoutModuleConfiguration extends ModuleConfiguration<CheckoutOverrides> {}

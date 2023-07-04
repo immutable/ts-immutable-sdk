@@ -1,4 +1,3 @@
-import { describe, expect, it } from '@jest/globals';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ChainNotSupportedError } from 'errors';
 import { ExchangeModuleConfiguration, ExchangeOverrides, TokenInfo } from '../types';

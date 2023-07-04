@@ -13,7 +13,7 @@ import {
   UnsignedOrderRequest,
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
-import { mockUserWithEtherKey } from '../test/mocks';
+import { mockUserImx } from '../test/mocks';
 import { PassportError, PassportErrorType } from '../errors/passportError';
 import { PassportImxProvider } from './passportImxProvider';
 import {
@@ -50,7 +50,7 @@ describe('PassportImxProvider', () => {
 
   beforeEach(() => {
     passportImxProvider = new PassportImxProvider({
-      user: mockUserWithEtherKey,
+      user: mockUserImx,
       starkSigner: mockStarkSigner,
       confirmationScreen,
       immutableXClient,
@@ -61,7 +61,7 @@ describe('PassportImxProvider', () => {
   describe('constructor', () => {
     it('sets the private properties', () => {
       // @ts-ignore
-      expect(passportImxProvider.user).toEqual(mockUserWithEtherKey);
+      expect(passportImxProvider.user).toEqual(mockUserImx);
       // @ts-ignore
       expect(passportImxProvider.starkSigner).toEqual(mockStarkSigner);
       // @ts-ignore
@@ -81,11 +81,11 @@ describe('PassportImxProvider', () => {
 
       expect(transfer as jest.Mock).toHaveBeenCalledWith({
         request,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         starkSigner: mockStarkSigner,
         transfersApi: immutableXClient.transfersApi,
-        imxPublicApiDomain,
-        confirmationScreen,
+        // @ts-ignore
+        guardianClient: passportImxProvider.guardianClient,
       });
       expect(result).toEqual(returnValue);
     });
@@ -123,10 +123,11 @@ describe('PassportImxProvider', () => {
 
       expect(createOrder).toHaveBeenCalledWith({
         request,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         starkSigner: mockStarkSigner,
         ordersApi: immutableXClient.ordersApi,
-        confirmationScreen,
+        // @ts-ignore
+        guardianClient: passportImxProvider.guardianClient,
       });
       expect(result).toEqual(returnValue);
     });
@@ -142,10 +143,11 @@ describe('PassportImxProvider', () => {
 
       expect(cancelOrder).toHaveBeenCalledWith({
         request,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         starkSigner: mockStarkSigner,
         ordersApi: immutableXClient.ordersApi,
-        confirmationScreen,
+        // @ts-ignore
+        guardianClient: passportImxProvider.guardianClient,
       });
       expect(result).toEqual(returnValue);
     });
@@ -161,10 +163,11 @@ describe('PassportImxProvider', () => {
 
       expect(createTrade).toHaveBeenCalledWith({
         request,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         starkSigner: mockStarkSigner,
         tradesApi: immutableXClient.tradesApi,
-        confirmationScreen,
+        // @ts-ignore
+        guardianClient: passportImxProvider.guardianClient,
       });
       expect(result).toEqual(returnValue);
     });
@@ -180,10 +183,11 @@ describe('PassportImxProvider', () => {
 
       expect(batchNftTransfer).toHaveBeenCalledWith({
         request,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         starkSigner: mockStarkSigner,
         transfersApi: immutableXClient.transfersApi,
-        confirmationScreen,
+        // @ts-ignore
+        guardianClient: passportImxProvider.guardianClient,
       });
       expect(result).toEqual(returnValue);
     });
@@ -199,7 +203,7 @@ describe('PassportImxProvider', () => {
 
       expect(exchangeTransfer).toHaveBeenCalledWith({
         request,
-        user: mockUserWithEtherKey,
+        user: mockUserImx,
         starkSigner: mockStarkSigner,
         exchangesApi: immutableXClient.exchangeApi,
       });
@@ -243,7 +247,7 @@ describe('PassportImxProvider', () => {
   describe('getAddress', () => {
     it('should return user ether key address', async () => {
       const response = await passportImxProvider.getAddress();
-      expect(response).toEqual('123');
+      expect(response).toEqual(mockUserImx.imx.ethAddress);
     });
   });
 });

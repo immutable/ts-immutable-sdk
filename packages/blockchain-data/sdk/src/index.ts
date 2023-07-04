@@ -1,5 +1,13 @@
+import { mr } from '@imtbl/generated-clients';
 import { APIError } from './types/errors';
 import { BlockchainData } from './blockchain-data';
 import { BlockchainDataModuleConfiguration } from './config';
 
-export { APIError, BlockchainData, BlockchainDataModuleConfiguration };
+type ActivityType = mr.ActivityType;
+
+export {
+  APIError,
+  BlockchainData,
+  BlockchainDataModuleConfiguration,
+  ActivityType,
+};

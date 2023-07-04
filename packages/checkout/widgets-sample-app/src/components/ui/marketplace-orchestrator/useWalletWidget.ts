@@ -9,7 +9,7 @@ import { useContext, useEffect, useState } from 'react';
 import { WidgetContext, hideAllWidgets } from './WidgetProvider';
 import { handleOrchestrationEvent } from './orchestration';
 
-export function useWalletWidget(setWeb3Provider: (val: Web3Provider|null) => void) {
+export function useWalletWidget(setWeb3Provider: (val: Web3Provider|undefined) => void) {
   const {showWidgets, setShowWidgets} = useContext(WidgetContext);
   const {showWallet} = showWidgets;
 
@@ -23,7 +23,7 @@ export function useWalletWidget(setWeb3Provider: (val: Web3Provider|null) => voi
           break;
         }
         case WalletEventType.DISCONNECT_WALLET: {
-          setWeb3Provider(null);
+          setWeb3Provider(undefined);
           setShowWidgets(hideAllWidgets);
           break;
         }

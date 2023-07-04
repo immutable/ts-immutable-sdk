@@ -1,21 +1,23 @@
 import {
-  TokenBridge,
   BridgeConfiguration,
   ETH_MAINNET_TO_ZKEVM_MAINNET,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+  TokenBridge,
 } from '@imtbl/bridge-sdk';
-import { ImmutableConfiguration, Environment } from '@imtbl/config';
+import { ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
 import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { ChainId } from '../types';
-import { RemoteConfig } from '../config/remoteConfig';
+import { CheckoutConfiguration } from '../config';
+import { DexConfig } from '../config/remoteConfigType';
 
 export async function createBridgeInstance(
   fromChainId: ChainId,
   toChainId: ChainId,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
-  environment: Environment,
+  config: CheckoutConfiguration,
 ): Promise<TokenBridge> {
   const rootChainProvider = readOnlyProviders.get(fromChainId);
   const childChainProvider = readOnlyProviders.get(toChainId);
@@ -33,15 +35,13 @@ export async function createBridgeInstance(
     );
   }
 
-  const bridgeConfig = new BridgeConfiguration({
-    baseConfig: new ImmutableConfiguration({
-      environment,
-    }),
-    bridgeInstance:
-      environment === Environment.PRODUCTION
-        ? ETH_MAINNET_TO_ZKEVM_MAINNET
-        : ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  let bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_TESTNET;
+  if (config.isDevelopment) bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_DEVNET;
+  if (config.isProduction) bridgeInstance = ETH_MAINNET_TO_ZKEVM_MAINNET;
 
+  const bridgeConfig = new BridgeConfiguration({
+    baseConfig: new ImmutableConfiguration({ environment: config.environment }),
+    bridgeInstance,
     rootProvider: rootChainProvider,
     childProvider: childChainProvider,
   });
@@ -51,25 +51,19 @@ export async function createBridgeInstance(
 
 export async function createExchangeInstance(
   chainId: ChainId,
-  environment: Environment,
+  config: CheckoutConfiguration,
 ): Promise<Exchange> {
-  let overrides;
+  const dexConfig = (await config.remote.getConfig(
+    'dex',
+  )) as DexConfig;
 
-  try {
-    overrides = (await new RemoteConfig({ environment }).load())?.dex
-      ?.overrides;
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error(err);
-  }
-
-  const exchange = new Exchange(
+  return new Exchange(
     new ExchangeConfiguration({
       chainId,
-      baseConfig: new ImmutableConfiguration({ environment }),
-      overrides,
+      baseConfig: new ImmutableConfiguration({
+        environment: config.environment,
+      }),
+      overrides: dexConfig?.overrides,
     }),
   );
-
-  return exchange;
 }

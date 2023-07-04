@@ -3,16 +3,21 @@ import { SwapOptions, SwapRouter } from '@uniswap/router-sdk';
 import {
   Currency,
   CurrencyAmount,
-  Percent,
   TradeType,
 } from '@uniswap/sdk-core';
 import JSBI from 'jsbi';
-import { QuoteTradeInfo } from '../../types';
+import { ethers } from 'ethers';
+import { QuoteResponse, QuoteTradeInfo } from 'lib/router';
+import {
+  TokenInfo, TransactionDetails,
+} from '../../types';
+import { calculateGasFee } from './gas';
+import { slippageToFraction } from './slippage';
 
 export function createSwapParameters(
   trade: QuoteTradeInfo,
   fromAddress: string,
-  slippage: Percent,
+  slippage: number,
   deadline: number,
 ): MethodParameters {
   // Create an unchecked trade to be used in generating swap parameters.
@@ -29,12 +34,45 @@ export function createSwapParameters(
     tradeType: trade.tradeType,
   });
 
+  const slippageTolerance = slippageToFraction(slippage);
   const options: SwapOptions = {
-    slippageTolerance: slippage,
+    slippageTolerance,
     recipient: fromAddress,
     deadlineOrPreviousBlockhash: deadline,
   };
 
   // Generate the parameters.
   return SwapRouter.swapCallParameters([uncheckedTrade], options);
+}
+
+export function getSwap(
+  nativeToken: TokenInfo,
+  routeAndQuote: QuoteResponse,
+  fromAddress: string,
+  slippage: number,
+  deadline: number,
+  peripheryRouterAddress: string,
+  gasPrice: ethers.BigNumber | null,
+): TransactionDetails {
+  const params = createSwapParameters(
+    routeAndQuote.trade,
+    fromAddress,
+    slippage,
+    deadline,
+  );
+
+  const gasFeeEstimate = gasPrice ? {
+    token: nativeToken,
+    value: calculateGasFee(gasPrice, routeAndQuote.trade.gasEstimate),
+  } : null;
+
+  return {
+    transaction: {
+      data: params.calldata,
+      to: peripheryRouterAddress,
+      value: params.value,
+      from: fromAddress,
+    },
+    gasFeeEstimate,
+  };
 }

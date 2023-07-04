@@ -1,6 +1,6 @@
 import { CreateTransferResponseV1, ETHAmount, ExchangesApi } from '@imtbl/core-sdk';
 import { exchangeTransfer } from './exchange';
-import { mockErrorMessage, mockStarkSignature, mockUserWithEtherKey } from '../../test/mocks';
+import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 
 describe('exchangeTransfer', () => {
@@ -70,12 +70,12 @@ describe('exchangeTransfer', () => {
     const mockHeader = {
       headers: {
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        Authorization: `Bearer ${mockUserWithEtherKey.accessToken}`,
+        Authorization: `Bearer ${mockUserImx.accessToken}`,
       },
     };
 
     const response: CreateTransferResponseV1 = await exchangeTransfer({
-      user: mockUserWithEtherKey,
+      user: mockUserImx,
       starkSigner: mockStarkSigner,
       request: exchangeTransferRequest,
       exchangesApi: exchangesApiMock,
@@ -102,7 +102,7 @@ describe('exchangeTransfer', () => {
       getSignableTransferRequest: {
         amount: ethAmount.amount,
         receiver: exchangeTransferRequest.receiver,
-        sender: mockUserWithEtherKey.etherKey,
+        sender: mockUserImx.imx.ethAddress,
         token: {
           data: {
             decimals: 18,
@@ -131,7 +131,7 @@ describe('exchangeTransfer', () => {
     );
 
     await expect(() => exchangeTransfer({
-      user: mockUserWithEtherKey,
+      user: mockUserImx,
       starkSigner: mockStarkSigner,
       request: exchangeTransferRequest,
       exchangesApi: exchangesApiMock,

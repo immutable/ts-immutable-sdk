@@ -1,4 +1,4 @@
-import { Dispatch, ReactNode, SetStateAction, createContext, useState } from "react"
+import { Dispatch, SetStateAction, createContext, useState } from "react"
 export interface ShowWidget {
   show: boolean;
   data: any;

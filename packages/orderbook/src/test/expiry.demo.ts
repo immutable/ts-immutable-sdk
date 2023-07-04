@@ -55,7 +55,7 @@ describe('', () => {
       zoneContractAddress: config.zoneContractAddress,
       overrides: {
         apiEndpoint: config.apiUrl,
-        chainName: 'imtbl-zkevm-devnet-5',
+        chainName: 'imtbl-zkevm-devnet',
       },
     });
 
@@ -63,12 +63,12 @@ describe('', () => {
 
     // Prepare the listing details
     const soonToExpireListing = await sdk.prepareListing({
-      offerer: offerer.address,
-      considerationItem: {
+      makerAddress: offerer.address,
+      buy: {
         amount: '1000000',
         type: 'NATIVE',
       },
-      listingItem: {
+      sell: {
         contractAddress: nftContract.address,
         tokenId: '0',
         type: 'ERC721',
@@ -76,6 +76,7 @@ describe('', () => {
       orderExpiry: new Date(Date.now() + 1000 * 30),
     });
 
+    log('Signing and submitting approval transaction...');
     // Sign and submit the approval transaction for the offerer
     await signAndSubmitTx(soonToExpireListing.unsignedApprovalTransaction!, offerer, provider);
 
@@ -84,13 +85,14 @@ describe('', () => {
     // operator signature
     const signature = await signMessage(soonToExpireListing.typedOrderMessageForSigning, offerer);
 
+    log('Submitting order to orderbook API...');
     // Submit the order creation request to the order book API
     const { result: { id: orderId } } = await sdk.createListing({
-      offerer: offerer.address,
       orderComponents: soonToExpireListing.orderComponents,
       orderHash: soonToExpireListing.orderHash,
       orderSignature: signature,
     });
+    log('Submitted order to orderbook API with expiry time set in the future');
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
     log(`Listing ${orderId} is now ACTIVE, it will soon transition to EXPIRED, waiting...`);
@@ -104,47 +106,6 @@ describe('', () => {
       log('Fulfillment failed as expected. The error is:');
       log(e);
     }
-
-    // Listing we will fulfill
-    const validListing = await sdk.prepareListing({
-      offerer: offerer.address,
-      considerationItem: {
-        amount: '1000000',
-        type: 'NATIVE',
-      },
-      listingItem: {
-        contractAddress: nftContract.address,
-        tokenId: '0',
-        type: 'ERC721',
-      },
-      // long expiry
-      orderExpiry: new Date(Date.now() + 1000000 * 30),
-    });
-
-    const signature2 = await signMessage(validListing.typedOrderMessageForSigning, offerer);
-
-    log('Cretaing new listing to be fulfilled...');
-
-    // Submit the order creation request to the order book API
-    const { result: { id: orderId2 } } = await sdk.createListing({
-      offerer: offerer.address,
-      orderComponents: validListing.orderComponents,
-      orderHash: validListing.orderHash,
-      orderSignature: signature2,
-    });
-
-    await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.ACTIVE);
-    log(`Listing ${orderId2} is now ACTIVE, fulfilling order...`);
-
-    const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(
-      orderId2,
-      fulfiller.address,
-    );
-    await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
-    log(`Fulfilment transaction sent, waiting for listing ${orderId2} to become FILLED`);
-
-    await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.FILLED);
-    log(`Listing ${orderId2} is now FILLED`);
 
     log('Listing all orders for the NFT collection');
 
