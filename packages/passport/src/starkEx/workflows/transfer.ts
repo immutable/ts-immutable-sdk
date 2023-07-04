@@ -42,6 +42,7 @@ export async function transfer({
 // eslint-disable-next-line max-len
 TransferRequest): Promise<CreateTransferResponseV1> {
   return withPassportError<CreateTransferResponseV1>(async () => {
+    guardianClient.loading();
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
     const getSignableTransferRequest: GetSignableTransferRequestV1 = {
       sender: user.imx.ethAddress,
@@ -108,6 +109,8 @@ export async function batchNftTransfer({
   guardianClient,
 }: BatchTransfersParams): Promise<CreateTransferResponse> {
   return withPassportError<CreateTransferResponse>(async () => {
+    const popupWindowSize = { width: 480, height: 784 };
+    guardianClient.loading(popupWindowSize);
     const { ethAddress } = user.imx;
 
     const signableRequests = request.map(
@@ -136,10 +139,8 @@ export async function batchNftTransfer({
       getSignableTransferRequestV2,
     }, { headers });
 
-    const popupWindowSize = { width: 480, height: 784 };
     await guardianClient.validate({
       payloadHash: signableResult.data.signable_responses[0]?.payload_hash,
-      popupWindowSize,
     });
 
     const requests = await Promise.all(
