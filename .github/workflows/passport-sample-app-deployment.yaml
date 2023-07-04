@@ -1,0 +1,56 @@
+name: Passport Sample App Deployment
+
+on:
+  push:
+    paths:
+      - 'packages/passport/**'
+    branches:
+      - main
+  workflow_dispatch:
+
+# this is used by github OIDC to assume the admin role later on
+permissions: # see this: https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
+  id-token: write # This is required for requesting the JWT
+  contents: write # This is required for actions/checkout
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-2
+    steps:
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_IMMUTABLE_PROD_ADMIN_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        id: cache-node-modules
+        with:
+          path: ./node_modules
+
+      - name: Install Dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: yarn install
+
+      - name: Build Passport module
+        run: yarn workspace @imtbl/passport build
+
+      - name: Build Passport sample app
+        run: yarn workspace @imtbl/passport-sample-app build && yarn workspace @imtbl/passport-sample-app export
+
+      - name: Upload to S3
+        run: |
+          aws s3 sync ./packages/passport/sample-app/out s3://imx-passport-frontend-prod/sample-app
+
+      - name: Clear the cloudfront cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.PROD_DISTRIBUTION_ID }} --paths "/*"
+          TODO: ADD 
