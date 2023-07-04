@@ -1,7 +1,6 @@
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import {
   WidgetTheme,
-  Network,
   BridgeReact,
   CheckoutWidgets,
   CheckoutWidgetsConfig,

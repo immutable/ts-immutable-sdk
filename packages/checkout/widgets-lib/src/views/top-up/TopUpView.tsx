@@ -90,35 +90,31 @@ export function TopUpView({
     }
 
     try {
-      const swapEstimate = await checkout.gasEstimate({
-        gasEstimateType: GasEstimateType.SWAP,
-      }) as GasEstimateSwapResult;
+      const [swapEstimate, bridgeEstimate] = await Promise.all([
+        checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.SWAP,
+        }),
+        checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          isSpendingCapApprovalRequired: true,
+        }),
+      ]);
       const swapFeeInFiat = getSwapFeeEstimation(
-        swapEstimate,
+        swapEstimate as GasEstimateSwapResult,
         conversions,
       );
       setSwapFeesInFiat(swapFeeInFiat);
-      setLoadingSwapFees(false);
-    } catch {
-      setSwapFeesInFiat('-.--');
-    } finally {
-      setLoadingSwapFees(false);
-    }
-
-    try {
-      const bridgeEstimate = await checkout.gasEstimate({
-        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        isSpendingCapApprovalRequired: true,
-      }) as GasEstimateBridgeToL2Result;
       const bridgeFeeInFiat = getBridgeFeeEstimation(
-        bridgeEstimate,
+        bridgeEstimate as GasEstimateBridgeToL2Result,
         conversions,
       );
       setBridgeFeesInFiat(bridgeFeeInFiat);
     } catch {
+      setSwapFeesInFiat('-.--');
       setBridgeFeesInFiat('-.--');
     } finally {
       setLoadingBridgeFees(false);
+      setLoadingSwapFees(false);
     }
   };
 
