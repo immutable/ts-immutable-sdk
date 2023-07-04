@@ -39,6 +39,7 @@ export async function createOrder({
   guardianClient,
 }: CreateOrderParams): Promise<CreateOrderResponse> {
   return withPassportError<CreateOrderResponse>(async () => {
+    guardianClient.loading();
     const { ethAddress } = user.imx;
     const amountSell = request.sell.type === ERC721 ? '1' : request.sell.amount;
     const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
@@ -110,6 +111,7 @@ export async function cancelOrder({
   guardianClient,
 }: CancelOrderParams): Promise<CancelOrderResponse> {
   return withPassportError<CancelOrderResponse>(async () => {
+    guardianClient.loading();
     const getSignableCancelOrderRequest: GetSignableCancelOrderRequest = {
       order_id: request.order_id,
     };

@@ -25,6 +25,7 @@ export async function createTrade({
   guardianClient,
 }: CreateTradeParams): Promise<CreateTradeResponse> {
   return withPassportError<CreateTradeResponse>(async () => {
+    guardianClient.loading();
     const { ethAddress } = user.imx;
     const getSignableTradeRequest: GetSignableTradeRequest = {
       expiration_timestamp: request.expiration_timestamp,
