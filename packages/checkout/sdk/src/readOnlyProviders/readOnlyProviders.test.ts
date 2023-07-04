@@ -17,8 +17,8 @@ describe('read only providers', () => {
     const getNetworkAllListMock = jest.fn().mockResolvedValue({
       networks: [
         {
-          chainId: ChainId.IMTBL_ZKEVM_DEVNET,
-          name: ChainName.IMTBL_ZKEVM_DEVNET,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          name: ChainName.IMTBL_ZKEVM_TESTNET,
           isSupported: true,
           nativeCurrency: {},
         },
@@ -39,7 +39,7 @@ describe('read only providers', () => {
     const result = await createReadOnlyProviders(baseConfig);
 
     expect(result.size).toEqual(2);
-    expect(result.get(ChainId.IMTBL_ZKEVM_DEVNET)).toBeDefined();
+    expect(result.get(ChainId.IMTBL_ZKEVM_TESTNET)).toBeDefined();
     expect(result.get(ChainId.SEPOLIA)).toBeDefined();
     expect(result.get(ChainId.ETHEREUM)).not.toBeDefined();
   });
@@ -60,7 +60,7 @@ describe('read only providers', () => {
     );
 
     expect(result.size).toEqual(2);
-    expect(result.get(ChainId.IMTBL_ZKEVM_DEVNET)).toBeDefined();
+    expect(result.get(ChainId.IMTBL_ZKEVM_TESTNET)).toBeDefined();
     expect(result.get(ChainId.SEPOLIA)).toBeDefined();
     expect(result.get(ChainId.ETHEREUM)).not.toBeDefined();
   });
