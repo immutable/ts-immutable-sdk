@@ -34,7 +34,7 @@ export const getTokenBalances = async (
     });
 
     const sortedTokens = sortTokensByAmount(
-      checkout.config.environment,
+      checkout.config,
       getAllBalancesResult.balances,
       chainId,
     );

@@ -1,10 +1,10 @@
 export { Checkout } from './Checkout';
 export {
   ChainId,
+  ChainName,
   WalletProviderName,
   GasEstimateType,
   NetworkFilterTypes,
-  RPC_URL_MAP,
   TokenFilterTypes,
   WalletFilterTypes,
   CHECKOUT_API_BASE_URL,

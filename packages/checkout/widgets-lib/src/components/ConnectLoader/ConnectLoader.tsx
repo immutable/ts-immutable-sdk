@@ -56,8 +56,6 @@ export function ConnectLoader({
   const { targetLayer, walletProvider } = params;
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
-  const targetChainId = getTargetLayerChainId(targetLayer ?? ConnectTargetLayer.LAYER2, widgetConfig.environment);
-
   const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
@@ -97,7 +95,7 @@ export function ConnectLoader({
       return;
     }
 
-    const checkConnection = async (checkout: Checkout) => {
+    (async () => {
       if (!walletProvider && !web3Provider) {
         connectLoaderDispatch({
           payload: {
@@ -108,6 +106,8 @@ export function ConnectLoader({
         });
         return;
       }
+
+      const checkout = new Checkout({ baseConfig: { environment: widgetConfig.environment } });
 
       try {
         if (!web3Provider && walletProvider) {
@@ -148,6 +148,7 @@ export function ConnectLoader({
         const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider } as GetNetworkParams);
 
         // if unsupported network or current network is not the target network
+        const targetChainId = getTargetLayerChainId(checkout.config, targetLayer ?? ConnectTargetLayer.LAYER2);
         if (!currentNetworkInfo.isSupported || currentNetworkInfo.chainId !== targetChainId) {
           connectLoaderDispatch({
             payload: {
@@ -173,11 +174,7 @@ export function ConnectLoader({
           },
         });
       }
-    };
-
-    const checkout = new Checkout({ baseConfig: { environment: widgetConfig.environment } });
-
-    checkConnection(checkout);
+    })();
 
     const handleConnectEvent = ((event: CustomEvent) => {
       switch (event.detail.type) {

@@ -9,7 +9,7 @@ const overrides: any = {
   rpcURL: 'https://test',
   commonRoutingTokens: [
     {
-      chainId: 11155111,
+      chainId: ChainId.SEPOLIA,
       address: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE',
       decimals: 18,
       symbol: 'FUN',
@@ -19,7 +19,7 @@ const overrides: any = {
     multicall: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e',
   },
   nativeToken: {
-    chainId: 11155111,
+    chainId: ChainId.SEPOLIA,
   },
 };
 
@@ -29,7 +29,7 @@ describe('QuotesProcessor', () => {
       const getUnsignedSwapTxFromAmountIn = jest.fn();
 
       const exchange = new Exchange(new ExchangeConfiguration({
-        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
         overrides,
       }));
@@ -74,7 +74,7 @@ describe('QuotesProcessor', () => {
       const getUnsignedSwapTxFromAmountOut = jest.fn();
 
       const exchange = new Exchange(new ExchangeConfiguration({
-        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
         overrides,
       }));

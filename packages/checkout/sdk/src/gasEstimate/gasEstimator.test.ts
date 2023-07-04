@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber, Contract, ethers } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { Exchange, TransactionResponse } from '@imtbl/dex-sdk';
 import { TokenBridge } from '@imtbl/bridge-sdk';
@@ -19,11 +19,29 @@ jest.mock('../instance');
 
 jest.mock('../config/remoteConfigFetcher');
 
+jest.mock('ethers', () => ({
+  ...jest.requireActual('ethers'),
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  Contract: jest.fn(),
+}));
+
 describe('gasServiceEstimator', () => {
   let readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>;
   let config: CheckoutConfiguration;
+  let decimalsMock: jest.Mock;
+  let nameMock: jest.Mock;
+  let symbolMock: jest.Mock;
 
   beforeEach(() => {
+    decimalsMock = jest.fn().mockResolvedValue(18);
+    nameMock = jest.fn().mockResolvedValue('Ethereum');
+    symbolMock = jest.fn().mockResolvedValue('ETH');
+    (Contract as unknown as jest.Mock).mockReturnValue({
+      decimals: decimalsMock,
+      name: nameMock,
+      symbol: symbolMock,
+    });
+
     readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>([
       [
         ChainId.SEPOLIA,
@@ -37,9 +55,9 @@ describe('gasServiceEstimator', () => {
       ],
     ]);
 
-    (RemoteConfigFetcher as jest.Mock).mockReturnValue({
-      get: jest.fn().mockResolvedValue({
-        [ChainId.IMTBL_ZKEVM_DEVNET]: {
+    (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
+      getConfig: jest.fn().mockResolvedValue({
+        [ChainId.IMTBL_ZKEVM_TESTNET]: {
           swapAddresses: {
             inAddress: '0x1',
             outAddress: '0x2',

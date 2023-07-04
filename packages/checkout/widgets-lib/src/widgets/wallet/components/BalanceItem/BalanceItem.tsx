@@ -20,7 +20,7 @@ import { WalletContext } from '../../context/WalletContext';
 import {
   orchestrationEvents,
 } from '../../../../lib/orchestrationEvents';
-import { l1Network, zkEVMNetwork } from '../../../../lib/networkUtils';
+import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
 
 export interface BalanceItemProps {
@@ -39,15 +39,15 @@ export function BalanceItem(props: BalanceItemProps) {
   useEffect(() => {
     if (!network || !supportedTopUps || !checkout) return;
 
-    const enableAddCoin = network.chainId === zkEVMNetwork(checkout.config.environment)
+    const enableAddCoin = network.chainId === getL2ChainId(checkout.config)
       && (supportedTopUps?.isOnRampEnabled ?? true);
     setIsOnRampEnabled(enableAddCoin);
 
-    const enableMoveCoin = network.chainId === l1Network(checkout.config.environment)
+    const enableMoveCoin = network.chainId === getL1ChainId(checkout.config)
       && (supportedTopUps?.isBridgeEnabled ?? true);
     setIsBridgeEnabled(enableMoveCoin);
 
-    const enableSwapCoin = network.chainId === zkEVMNetwork(checkout.config.environment)
+    const enableSwapCoin = network.chainId === getL2ChainId(checkout.config)
       && (supportedTopUps?.isSwapEnabled ?? true);
     setIsSwapEnabled(enableSwapCoin);
   }, [network, supportedTopUps, checkout]);
