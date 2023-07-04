@@ -120,6 +120,7 @@ describe('order', () => {
         mockSignableOrderRequest,
         mockHeader,
       );
+      expect(mockGuardianClient.loading).toBeCalled();
       expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
       expect(createOrderMock).toBeCalledWith(
@@ -178,6 +179,7 @@ describe('order', () => {
         `${PassportErrorType.CREATE_ORDER_ERROR}: Transaction rejected by user`,
         PassportErrorType.CREATE_ORDER_ERROR,
       ));
+      expect(mockGuardianClient.loading).toBeCalled();
       expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockSignableOrderResponse.data.payload_hash });
     });
   });
@@ -256,6 +258,7 @@ describe('order', () => {
         mockHeader,
       );
       expect(mockStarkSigner.signMessage).toBeCalledWith(mockPayloadHash);
+      expect(mockGuardianClient.loading).toBeCalled();
       expect(mockGuardianClient.validate).toBeCalledWith({ payloadHash: mockPayloadHash });
       expect(cancelOrderMock).toBeCalledWith(
         mockCancelOrderRequest,

@@ -7,8 +7,11 @@ import {
   ChainId,
   ERC20ABI,
   GasEstimateBridgeToL2Result,
+  GasEstimateBridgeToL2TokenConfig,
   GasEstimateParams,
   GasEstimateSwapResult,
+  GasEstimateSwapTokenConfig,
+  GasEstimateTokenConfig,
   GasEstimateType,
   TokenInfo,
 } from '../types';
@@ -18,13 +21,8 @@ import {
 } from './bridgeGasEstimate';
 import * as instance from '../instance';
 import { CheckoutConfiguration, getL1ChainId, getL2ChainId } from '../config';
-import {
-  GasEstimateBridgeToL2TokenConfig,
-  GasEstimateSwapTokenConfig,
-  GasEstimateTokenConfig,
-} from '../config/remoteConfigType';
 
-const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000000';
+const DUMMY_WALLET_ADDRESS = '0x0000000000000000000000000000000000000001';
 const DEFAULT_TOKEN_DECIMALS = 18;
 
 async function getTokenInfoByAddress(

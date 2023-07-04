@@ -8,10 +8,31 @@ import { CheckoutConfiguration } from '../config';
 import { RemoteConfigFetcher } from '../config/remoteConfigFetcher';
 
 jest.mock('../instance');
-
 jest.mock('../config/remoteConfigFetcher');
 
 describe('instance', () => {
+  (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
+    getConfig: jest.fn().mockResolvedValue({
+      overrides: {
+        rpcURL: 'https://test',
+        commonRoutingTokens: [
+          {
+            chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+            address: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE',
+            decimals: 18,
+            symbol: 'FUN',
+          },
+        ],
+        exchangeContracts: {
+          multicall: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e',
+        },
+        nativeToken: {
+          chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+        },
+      },
+    }),
+  });
+
   const config: CheckoutConfiguration = new CheckoutConfiguration({
     baseConfig: { environment: Environment.SANDBOX },
   });
@@ -69,12 +90,8 @@ describe('instance', () => {
     });
   });
 
-  describe.skip('createExchangeInstance', () => {
+  describe('createExchangeInstance', () => {
     it('should create an instance of Exchange', async () => {
-      (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
-        getConfig: jest.fn().mockResolvedValue({}),
-      });
-
       const chainId = Object.keys(SupportedChainIdsForEnvironment[config.environment])[0] as unknown as number;
       const exchange = await createExchangeInstance(
         SupportedChainIdsForEnvironment[config.environment][chainId].chainId,

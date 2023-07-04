@@ -11,7 +11,6 @@ export type GuardianClientParams = {
 
 export type GuardianValidateParams = {
   payloadHash: string;
-  popupWindowSize?: { width: number; height: number }
 };
 
 export default class GuardianClient {
@@ -34,8 +33,11 @@ export default class GuardianClient {
     this.imxEtherAddress = imxEtherAddress;
   }
 
-  public async validate({ popupWindowSize, payloadHash }: GuardianValidateParams) {
+  public loading(popupWindowSize?: { width: number; height: number }) {
     this.confirmationScreen.loading(popupWindowSize);
+  }
+
+  public async validate({ payloadHash }: GuardianValidateParams) {
     const finallyFn = () => {
       this.confirmationScreen.closeWindow();
     };
