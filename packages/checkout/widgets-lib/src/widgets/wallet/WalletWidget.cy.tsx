@@ -87,12 +87,12 @@ describe('WalletWidget tests', () => {
               getAddress: () => Promise.resolve('dss'),
             }),
             getNetwork: async () => ({
-              chainId: 1,
+              chainId: ChainId.ETHEREUM,
               name: 'Ethereum',
             }),
           },
           network: {
-            chainId: 1,
+            chainId: ChainId.ETHEREUM,
             name: 'Ethereum',
             nativeCurrency: {
               name: 'ETH',

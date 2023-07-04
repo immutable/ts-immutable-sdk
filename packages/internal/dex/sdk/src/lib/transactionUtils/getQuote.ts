@@ -26,13 +26,13 @@ export function getAmountWithSlippageImpact(
   tradeType: TradeType,
   amount: ethers.BigNumberish,
   slippage: number,
-): ethers.BigNumberish {
+): ethers.BigNumber {
+  const amountBigNumber = ethers.BigNumber.from(amount);
   const slippagePercent = slippageToFraction(slippage);
   if (slippagePercent.numerator.toString() === '0') {
-    return amount;
+    return amountBigNumber;
   }
 
-  const amountBigNumber = ethers.BigNumber.from(amount);
   const slippageImpact = amountBigNumber
     .mul(slippagePercent.numerator.toString())
     .div(slippagePercent.denominator.toString());

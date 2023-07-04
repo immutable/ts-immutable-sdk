@@ -10,7 +10,9 @@ export const DEFAULT_CHECKOUT_VERSION = '0.1.9-alpha';
  * @param {SemanticVersion | undefined} version - The SemanticVersion object to validate and build.
  * @returns {string} - The validated and built version string.
  */
-export function validateAndBuildVersion(version: SemanticVersion | undefined): string {
+export function validateAndBuildVersion(
+  version: SemanticVersion | undefined,
+): string {
   if (!version || version?.major === undefined || version.major < 0) return DEFAULT_CHECKOUT_VERSION;
   if (version.major === 0 && version.minor === 0 && version.patch === 0) return DEFAULT_CHECKOUT_VERSION;
 
@@ -20,11 +22,19 @@ export function validateAndBuildVersion(version: SemanticVersion | undefined): s
     validatedVersion = version.major.toString();
   }
 
-  if (version.minor !== undefined && !Number.isNaN(version.minor) && version.minor >= 0) {
+  if (
+    version.minor !== undefined
+    && !Number.isNaN(version.minor)
+    && version.minor >= 0
+  ) {
     validatedVersion += `.${version.minor.toString()}`;
   }
 
-  if (version.patch !== undefined && !Number.isNaN(version.patch) && version.patch >= 0) {
+  if (
+    version.patch !== undefined
+    && !Number.isNaN(version.patch)
+    && version.patch >= 0
+  ) {
     if (version.minor === undefined) {
       validatedVersion += `.0.${version.patch.toString()}`;
     } else {
@@ -54,18 +64,10 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
 
   const validVersion = validateAndBuildVersion(config?.version);
 
-  if (process.env.CHECKOUT_ENVIRONMENT === 'local') {
-    checkoutWidgetJS.setAttribute(
-      'src',
-      'http://localhost:3000/lib/js/imtbl-checkout.js',
-    );
-  } else {
-    const cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
-    checkoutWidgetJS.setAttribute(
-      'src',
-      cdnUrl,
-    );
-  }
+  let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
+  if (process.env.CHECKOUT_LOCAL_MODE !== undefined) cdnUrl = 'http://localhost:3000/lib/js/imtbl-checkout.js';
+
+  checkoutWidgetJS.setAttribute('src', cdnUrl);
 
   document.head.appendChild(checkoutWidgetJS);
   window.ImtblCheckoutWidgetConfig = JSON.stringify(config);

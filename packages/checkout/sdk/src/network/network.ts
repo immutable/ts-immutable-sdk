@@ -10,10 +10,10 @@ import {
   SwitchNetworkResult,
   WalletAction,
   NetworkMap,
+  AllowedNetworkConfig,
 } from '../types';
 import { CheckoutConfiguration } from '../config';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
-import { AllowedNetworkConfig } from '../config/remoteConfigType';
 
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 
@@ -66,7 +66,7 @@ export async function getNetworkAllowList(
 ): Promise<GetNetworkAllowListResult> {
   const { networkMap } = config;
 
-  const allowedNetworkConfig = (await config.remoteConfigFetcher.get(
+  const allowedNetworkConfig = (await config.remote.getConfig(
     'allowedNetworks',
   )) as AllowedNetworkConfig[];
 

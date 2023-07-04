@@ -1,4 +1,4 @@
-import { ChainId } from './chainId';
+import { ChainId } from './chains';
 import { TokenInfo } from './tokenInfo';
 
 export interface TokenMasterInfo extends TokenInfo {
@@ -9,12 +9,12 @@ export interface TokenMasterInfo extends TokenInfo {
 /**
  * Interface representing the parameters for {@link Checkout.getTokenAllowList}.
  * @property {TokenFilterTypes} type - The type of token to retrieve.
- * @property {ChainId | undefined}  chainId - The ID of the blockchain network.
+ * @property {ChainId}  chainId - The ID of the blockchain network.
  * @property {TokenFilter[]} [exclude] - The tokens to exclude from the list.
  */
 export interface GetTokenAllowListParams {
   type: TokenFilterTypes;
-  chainId?: ChainId;
+  chainId: ChainId;
   exclude?: TokenFilter[];
 }
 
@@ -30,9 +30,9 @@ export interface GetTokenAllowListResult {
  * Enum representing the types of token filters available.
  */
 export enum TokenFilterTypes {
+  ALL = 'all',
   SWAP = 'swap',
   BRIDGE = 'bridge',
-  ALL = 'all',
 }
 
 /**

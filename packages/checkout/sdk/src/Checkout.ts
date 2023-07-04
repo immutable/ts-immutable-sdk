@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import { Web3Provider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
+import { Environment } from '@imtbl/config';
 import * as balances from './balances';
 import * as tokens from './tokens';
 import * as connect from './connect';
@@ -30,7 +31,6 @@ import {
   GetWalletAllowListParams,
   GetWalletAllowListResult,
   NetworkInfo,
-  SANDBOX_CONFIGURATION,
   SendTransactionParams,
   SendTransactionResult,
   SwitchNetworkParams,
@@ -43,6 +43,12 @@ import {
 import { CheckoutConfiguration } from './config';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 
+const SANDBOX_CONFIGURATION = {
+  baseConfig: {
+    environment: Environment.SANDBOX,
+  },
+};
+
 export class Checkout {
   readonly config: CheckoutConfiguration;
 
@@ -52,12 +58,11 @@ export class Checkout {
    * Constructs a new instance of the CheckoutModule class.
    * @param {CheckoutModuleConfiguration} [config=SANDBOX_CONFIGURATION] - The configuration object for the CheckoutModule.
    */
-  constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
+  constructor(
+    config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION,
+  ) {
     this.config = new CheckoutConfiguration(config);
-    this.readOnlyProviders = new Map<
-    ChainId,
-    ethers.providers.JsonRpcProvider
-    >();
+    this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
   }
 
   /**
@@ -98,7 +103,9 @@ export class Checkout {
    * @returns {Promise<ConnectResult>} A promise that resolves to an object containing the provider and network information.
    * @throws {Error} If the provider is not valid or if there is an error connecting to the network.
    */
-  public async connect(params: ConnectParams): Promise<ConnectResult> {
+  public async connect(
+    params: ConnectParams,
+  ): Promise<ConnectResult> {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
@@ -144,7 +151,9 @@ export class Checkout {
    * @param {GetBalanceParams} params - The parameters for retrieving the balance.
    * @returns {Promise<GetBalanceResult>} - A promise that resolves to the balance result.
    */
-  public async getBalance(params: GetBalanceParams): Promise<GetBalanceResult> {
+  public async getBalance(
+    params: GetBalanceParams,
+  ): Promise<GetBalanceResult> {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
@@ -204,7 +213,7 @@ export class Checkout {
   public async getTokenAllowList(
     params: GetTokenAllowListParams,
   ): Promise<GetTokenAllowListResult> {
-    return await tokens.getTokenAllowList(params);
+    return await tokens.getTokenAllowList(this.config, params);
   }
 
   /**
@@ -238,7 +247,9 @@ export class Checkout {
    * @param {GetNetworkParams} params - The parameters for retrieving network information.
    * @returns {Promise<NetworkInfo>} A promise that resolves to the network information.
    */
-  public async getNetworkInfo(params: GetNetworkParams): Promise<NetworkInfo> {
+  public async getNetworkInfo(
+    params: GetNetworkParams,
+  ): Promise<NetworkInfo> {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
@@ -255,7 +266,9 @@ export class Checkout {
    * @param {Web3Provider} web3Provider - The object to check.
    * @returns {boolean} - True if the object is a Web3 provider, false otherwise.
    */
-  static isWeb3Provider(web3Provider: Web3Provider) {
+  static isWeb3Provider(
+    web3Provider: Web3Provider,
+  ) {
     return provider.isWeb3Provider(web3Provider);
   }
 

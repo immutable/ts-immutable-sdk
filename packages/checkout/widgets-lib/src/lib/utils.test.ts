@@ -1,4 +1,6 @@
-import { ChainId, GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
+import {
+  ChainId, Checkout, GetBalanceResult, TokenInfo,
+} from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import {
@@ -9,6 +11,12 @@ import {
   tokenValueFormat,
 } from './utils';
 import { DEFAULT_TOKEN_FORMATTING_DECIMALS } from './constants';
+
+const checkout = new Checkout({
+  baseConfig: {
+    environment: Environment.SANDBOX,
+  },
+});
 
 describe('utils', () => {
   describe('sortTokensByAmount', () => {
@@ -41,7 +49,7 @@ describe('utils', () => {
       ];
 
       expect(
-        sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM),
+        sortTokensByAmount(checkout.config, tokens, ChainId.ETHEREUM),
       ).toEqual([
         {
           balance: BigNumber.from('100000000000000000000'),
@@ -166,7 +174,7 @@ describe('utils', () => {
       it(`When zkevm and ${testcase.text} then should sort tokens by amount and put imx at top`, () => {
         expect(
           sortTokensByAmount(
-            Environment.PRODUCTION,
+            checkout.config,
             testcase.tokens,
             ChainId.IMTBL_ZKEVM_TESTNET,
           ),
@@ -252,7 +260,7 @@ describe('utils', () => {
       ];
 
       expect(
-        sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM),
+        sortTokensByAmount(checkout.config, tokens, ChainId.ETHEREUM),
       ).toEqual([
         {
           balance: BigNumber.from('100000000000000000000'),

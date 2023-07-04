@@ -36,16 +36,16 @@ export const SUPPORTED_BRIDGES_FOR_ENVIRONMENT: {
  */
 const CONTRACTS_FOR_BRIDGE = new Map<BridgeInstance, BridgeContracts>()
   .set(ETH_SEPOLIA_TO_ZKEVM_DEVNET, {
-    rootChainERC20Predicate: '0x36FD5e8C971627f6557306Ec017bd03eC2D0B615',
-    rootChainStateSender: '0x939a7E0D40B09CC2a1cD7711C3f9be742852D7fa',
+    rootChainERC20Predicate: '0x15Dd735de418B6d290727aed82cC25F8966dE4A5',
+    rootChainStateSender: '0xb3Bac13799dAca9D9eC9307303a65fA1218b4724',
     childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
     childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
   .set(ETH_SEPOLIA_TO_ZKEVM_TESTNET, {
-    rootChainERC20Predicate: '0x',
-    rootChainStateSender: '0x',
-    childChainERC20Predicate: '0x',
-    childChainStateReceiver: '0x',
+    rootChainERC20Predicate: '0x9A7E4C4337a70C6754a9672F5ba69084463794B8',
+    rootChainStateSender: '0xfBfF6FD165adFA113bE39eE85ef030A996153253',
+    childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
+    childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
   .set(ETH_MAINNET_TO_ZKEVM_MAINNET, {
     rootChainERC20Predicate: '0x',

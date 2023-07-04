@@ -1,5 +1,5 @@
 import {
-  Checkout, WalletProviderName, TokenInfo, ChainId,
+  Checkout, WalletProviderName, TokenInfo, ChainId, ChainName,
 } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
@@ -30,12 +30,11 @@ describe('WalletBalances', () => {
       request: async () => null,
     },
   } as unknown as Web3Provider;
-
   const baseWalletState: WalletState = {
     checkout,
     network: {
-      chainId: ChainId.IMTBL_ZKEVM_DEVNET,
-      name: 'Immutable zkEVM dev',
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      name: ChainName.IMTBL_ZKEVM_TESTNET,
       nativeCurrency: {} as unknown as TokenInfo,
       isSupported: true,
     },

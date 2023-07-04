@@ -7,7 +7,7 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
-import { l1Network } from '../../../lib/networkUtils';
+import { getL1ChainId } from '../../../lib/networkUtils';
 import {
   ViewContext,
   ViewActions,
@@ -27,7 +27,7 @@ export function SwitchNetworkEth() {
     try {
       const switchRes = await checkout.switchNetwork({
         provider,
-        chainId: l1Network(checkout.config.environment),
+        chainId: getL1ChainId(checkout.config),
       });
 
       connectDispatch({

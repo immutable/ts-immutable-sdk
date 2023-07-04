@@ -17,38 +17,25 @@ export type StrongCheckoutWidgetsConfig = {
 };
 
 function getValidTheme(theme?: string): WidgetTheme {
-  switch (theme) {
-    case 'light':
-      return WidgetTheme.LIGHT;
-    case 'dark':
-      return WidgetTheme.DARK;
-    case 'custom':
-      return WidgetTheme.CUSTOM;
-    default:
-      return DEFAULT_THEME;
-  }
+  if (!theme) return DEFAULT_THEME;
+  if (theme === WidgetTheme.LIGHT) return WidgetTheme.LIGHT;
+  if (theme === WidgetTheme.DARK) return WidgetTheme.DARK;
+  if (theme === WidgetTheme.CUSTOM) return WidgetTheme.CUSTOM;
+  return DEFAULT_THEME;
 }
 
 function getValidEnvironment(env?: string): Environment {
-  switch (env) {
-    case 'production':
-      return Environment.PRODUCTION;
-    case 'sandbox':
-      return Environment.SANDBOX;
-    default:
-      return DEFAULT_ENV;
-  }
+  if (!env) return DEFAULT_ENV;
+  if (env === Environment.PRODUCTION) return Environment.PRODUCTION;
+  if (env === Environment.SANDBOX) return Environment.SANDBOX;
+  return DEFAULT_ENV;
 }
 
 function getValidBoolean(defaultValue: boolean, value?: string): boolean {
-  switch (value?.toLowerCase()) {
-    case 'true':
-      return true;
-    case 'false':
-      return false;
-    default:
-      return defaultValue;
-  }
+  if (!value) return defaultValue;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return defaultValue;
 }
 
 export const withDefaultWidgetConfigs = (

@@ -38,11 +38,12 @@
   "repository": "immutable/imx-checkout-sdk.git",
   "scripts": {
     "build": "parcel build",
-    "build:prod": "NODE_ENV=production parcel build --no-source-maps",
+    "build:dev": "CHECKOUT_DEV_MODE=true parcel build --no-source-maps",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "start": "parcel watch",
+    "start:dev": "CHECKOUT_DEV_MODE=true parcel watch",
     "test": "jest test",
     "test:coverage": "jest --coverage",
     "test:watch": "jest test --watch",
