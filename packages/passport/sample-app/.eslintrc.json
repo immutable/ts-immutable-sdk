@@ -1,5 +1,6 @@
 {
   "extends": [
+    "../../../.eslintrc",
     "next/core-web-vitals"
   ],
   "parser": "@typescript-eslint/parser",
@@ -23,6 +24,7 @@
       "WithStatement"
     ],
     "import/no-extraneous-dependencies": ["off"],
-    "@typescript-eslint/return-await": ["off"]
+    "@typescript-eslint/return-await": ["off"],
+    "@typescript-eslint/naming-convention": "off"
   }
 }
