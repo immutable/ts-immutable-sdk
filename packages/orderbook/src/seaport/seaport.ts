@@ -113,10 +113,10 @@ export class Seaport {
   }
 
   private async mapImmutableOrderToSeaportOrderComponents(order: Order): Promise<OrderComponents> {
-    const counterForOfferer = await this.seaport.getCounter(order.account_address);
+    const orderCounter = order.protocol_data.counter;
     return mapImmutableOrderToSeaportOrderComponents(
       order,
-      counterForOfferer.toString(),
+      orderCounter,
       this.zoneContractAddress,
     );
   }
