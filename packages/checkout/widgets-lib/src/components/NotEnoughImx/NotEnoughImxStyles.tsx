@@ -11,7 +11,7 @@ export const contentTextStyles = {
   color: 'base.color.text.secondary',
   fontFamily: 'base.font.family.heading.secondary',
   textAlign: 'center',
-  marginTop: '15px',
+  marginTop: 'base.spacing.x4',
 };
 
 export const actionButtonContainerStyles = {
