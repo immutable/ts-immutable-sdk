@@ -1,5 +1,8 @@
 import { TransactionResponse } from '@ethersproject/providers';
-import { ApproveBridgeResponse, BridgeDepositResponse } from '@imtbl/bridge-sdk';
+import {
+  ApproveBridgeResponse,
+  BridgeDepositResponse,
+} from '@imtbl/bridge-sdk';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { ViewType } from './ViewType';
 
@@ -24,16 +27,16 @@ interface BridgeView extends ViewType {
   data?: PrefilledBridgeForm;
 }
 
-export interface BridgeSuccessView extends ViewType {
-  type: BridgeWidgetViews.SUCCESS,
+export interface BridgeSuccessView {
+  type: BridgeWidgetViews.SUCCESS;
   data: {
     transactionHash: string;
-  }
+  };
 }
 
 interface BridgeApproveERC20View extends ViewType {
-  type: BridgeWidgetViews.APPROVE_ERC20,
-  data: ApproveERC20BridgeData
+  type: BridgeWidgetViews.APPROVE_ERC20;
+  data: ApproveERC20BridgeData;
 }
 
 interface BridgeFailView extends ViewType {
@@ -58,6 +61,6 @@ export interface ApproveERC20BridgeData {
 }
 
 export interface PrefilledBridgeForm {
-  amount: string;
-  tokenAddress: string;
+  fromAmount: string;
+  fromContractAddress: string;
 }

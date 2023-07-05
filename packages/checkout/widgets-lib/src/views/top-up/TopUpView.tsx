@@ -159,8 +159,8 @@ export function TopUpView({
           view: {
             type: BridgeWidgetViews.BRIDGE,
             data: {
-              tokenAddress: '',
-              amount: '',
+              fromContractAddress: '',
+              fromAmount: '',
             },
           },
         },
