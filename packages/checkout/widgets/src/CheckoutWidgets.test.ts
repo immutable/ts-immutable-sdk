@@ -1,7 +1,10 @@
-import { DEFAULT_CHECKOUT_VERSION, validateAndBuildVersion } from './CheckoutWidgets';
+import { CheckoutWidgets, validateAndBuildVersion } from './CheckoutWidgets';
 import { SemanticVersion } from './definitions/config';
+import { SDK_VERSION_MARKER } from './lib/env';
 
 describe('CheckoutWidgets', () => {
+  const SDK_VERSION = SDK_VERSION_MARKER;
+
   /**
    * This versioning is currently tied to our current release process of the unified SDK
    */
@@ -15,7 +18,47 @@ describe('CheckoutWidgets', () => {
       {
         title: 'missing version object should return default version',
         version: undefined,
-        expectedVersion: DEFAULT_CHECKOUT_VERSION,
+        expectedVersion: SDK_VERSION,
+      },
+      {
+        title: 'undefined major should return default version',
+        version: {
+          major: undefined as unknown as number,
+          minor: 1,
+          patch: 1,
+          prerelease: 'alpha',
+        },
+        expectedVersion: SDK_VERSION,
+      },
+      {
+        title: 'undefined minor should return default version',
+        version: {
+          major: 1,
+          minor: undefined as unknown as number,
+          patch: 1,
+          prerelease: 'alpha',
+        },
+        expectedVersion: SDK_VERSION,
+      },
+      {
+        title: 'undefined patch should return default version',
+        version: {
+          major: 1,
+          minor: 1,
+          patch: undefined as unknown as number,
+          prerelease: 'alpha',
+        },
+        expectedVersion: SDK_VERSION,
+      },
+      {
+        title: 'undefined prerelease should return default version',
+        version: {
+          major: 1,
+          minor: 1,
+          patch: 1,
+          prerelease: undefined as unknown as 'alpha',
+        },
+        expectedVersion: SDK_VERSION,
       },
       {
         title: 'all zero versions should return default version',
@@ -23,80 +66,81 @@ describe('CheckoutWidgets', () => {
           major: 0,
           minor: 0,
           patch: 0,
+          prerelease: 'alpha',
         },
-        expectedVersion: DEFAULT_CHECKOUT_VERSION,
+        expectedVersion: SDK_VERSION,
       },
       {
-        title: 'valid major, minor and patch',
-        version: {
-          major: 1,
-          minor: 1,
-          patch: 1,
-        },
-        expectedVersion: '1.1.1-alpha',
-      },
-      {
-        title: 'valid major, minor and patch 2',
-        version: {
-          major: 0,
-          minor: 1,
-          patch: 9,
-        },
-        expectedVersion: '0.1.9-alpha',
-      },
-      {
-        title: 'valid major, minor and patch 3',
-        version: {
-          major: 2,
-          minor: 0,
-          patch: 8,
-        },
-        expectedVersion: '2.0.8-alpha',
-      },
-      {
-        title: 'revert to default version when major undefined',
-        version: {
-          major: undefined as unknown as number,
-          minor: 2,
-          patch: 8,
-        },
-        expectedVersion: DEFAULT_CHECKOUT_VERSION,
-      },
-      {
-        title: 'set minor to 0 when patch added but minor undefined',
-        version: {
-          major: 2,
-          patch: 8,
-        },
-        expectedVersion: '2.0.8-alpha',
-      },
-      {
-        title: 'valid major, minor and patch 4',
-        version: {
-          major: 2,
-          minor: 1,
-          patch: 0,
-        },
-        expectedVersion: '2.1.0-alpha',
-      },
-      {
-        title: 'append -alpha to valid versions',
+        title: 'invalid prerelease should return default version',
         version: {
           major: 0,
           minor: 1,
           patch: 0,
+          prerelease: 'test' as 'alpha',
+        },
+        expectedVersion: SDK_VERSION,
+      },
+      {
+        title: 'provided prerelease should be appended to version',
+        version: {
+          major: 0,
+          minor: 1,
+          patch: 0,
+          prerelease: 'alpha',
         },
         expectedVersion: '0.1.0-alpha',
       },
       {
-        title: 'append -alpha to valid versions and add build number',
+        title: 'provided build number should be appended to version',
         version: {
           major: 0,
           minor: 1,
           patch: 8,
+          prerelease: 'alpha',
           build: 1,
         },
         expectedVersion: '0.1.8-alpha.1',
+      },
+      {
+        title: 'negative major should return default version',
+        version: {
+          major: -1,
+          minor: 1,
+          patch: 1,
+          prerelease: 'alpha',
+        },
+        expectedVersion: SDK_VERSION,
+      },
+      {
+        title: 'negative minor should return default version',
+        version: {
+          major: 1,
+          minor: -1,
+          patch: 1,
+          prerelease: 'alpha',
+        },
+        expectedVersion: SDK_VERSION,
+      },
+      {
+        title: 'negative patch should return default version',
+        version: {
+          major: 1,
+          minor: 1,
+          patch: -1,
+          prerelease: 'alpha',
+        },
+        expectedVersion: SDK_VERSION,
+      },
+      {
+        title: 'negative build should not be appended',
+        version: {
+          major: 1,
+          minor: 1,
+          patch: 1,
+          prerelease: 'alpha',
+          build: -1,
+        },
+        expectedVersion: '1.1.1-alpha',
       },
     ];
 
@@ -105,6 +149,15 @@ describe('CheckoutWidgets', () => {
         const validVersion = validateAndBuildVersion(testCase.version);
         expect(validVersion).toEqual(testCase.expectedVersion);
       });
+    });
+
+    it('should validate the correct versioning when using CheckoutWidgets', () => {
+      CheckoutWidgets();
+      expect(document.head.innerHTML).toBe(
+        `<script src="https://cdn.jsdelivr.net/npm/@imtbl/sdk@${
+          SDK_VERSION
+        }/dist/browser/checkout.js"></script>`,
+      );
     });
   });
 });

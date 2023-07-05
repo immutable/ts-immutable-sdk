@@ -51,7 +51,7 @@ export function Bridge({ amount, fromContractAddress }: BridgeProps) {
       <BridgeForm
         testId="bridge-form"
         defaultAmount={amount}
-        defaultTokenAddress={fromContractAddress}
+        defaultFromContractAddress={fromContractAddress}
       />
     </SimpleLayout>
   );

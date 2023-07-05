@@ -66,12 +66,7 @@ describe('instance', () => {
       const toChainId = ChainId.SEPOLIA;
 
       await expect(
-        createBridgeInstance(
-          fromChainId,
-          toChainId,
-          readOnlyProviders,
-          config,
-        ),
+        createBridgeInstance(fromChainId, toChainId, readOnlyProviders, config),
       ).rejects.toThrowError('Chain:123 is not a supported chain');
     });
 
@@ -80,21 +75,19 @@ describe('instance', () => {
       const toChainId = 123 as ChainId;
 
       await expect(
-        createBridgeInstance(
-          fromChainId,
-          toChainId,
-          readOnlyProviders,
-          config,
-        ),
+        createBridgeInstance(fromChainId, toChainId, readOnlyProviders, config),
       ).rejects.toThrowError('Chain:123 is not a supported chain');
     });
   });
 
   describe('createExchangeInstance', () => {
     it('should create an instance of Exchange', async () => {
-      const chainId = Object.keys(SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT[config.environment])[0] as unknown as number;
+      const chainId = Object.keys(
+        SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT[config.environment],
+      )[0] as unknown as number;
       const exchange = await createExchangeInstance(
-        SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT[config.environment][chainId].chainId,
+        SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT[config.environment][chainId]
+          .chainId,
         config,
       );
       expect(exchange).toBeInstanceOf(Exchange);

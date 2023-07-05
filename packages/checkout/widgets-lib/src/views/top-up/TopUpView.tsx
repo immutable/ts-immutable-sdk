@@ -135,7 +135,7 @@ export function TopUpView({
           view: {
             type: SwapWidgetViews.SWAP,
             data: {
-              toContractAddress: tokenAddress ?? '',
+              toContractAddress: '',
               fromAmount: '',
               fromContractAddress: '',
             },
@@ -156,7 +156,13 @@ export function TopUpView({
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: BridgeWidgetViews.BRIDGE },
+          view: {
+            type: BridgeWidgetViews.BRIDGE,
+            data: {
+              fromContractAddress: '',
+              fromAmount: '',
+            },
+          },
         },
       });
       return;
@@ -217,7 +223,7 @@ export function TopUpView({
     <SimpleLayout
       header={(
         <HeaderNavigation
-          onBackButtonClick={onBackButtonClick ?? undefined}
+          onBackButtonClick={onBackButtonClick}
           onCloseButtonClick={onCloseButtonClick}
           showBack
         />
