@@ -14,7 +14,20 @@ export function validateAndBuildVersion(
 ): string {
   const defaultPackageVersion = globalPackageVersion();
 
-  if (!version || version?.major === undefined || version.major < 0) return defaultPackageVersion;
+  if (version === undefined) return defaultPackageVersion;
+
+  // Pre-production release
+  // TODO: https://immutable.atlassian.net/browse/WT-1501
+  if (
+    version.major === undefined
+    || version.minor === undefined
+    || version.patch === undefined
+    || version.prerelease === undefined
+  ) return defaultPackageVersion;
+
+  if (version.major < 0) return defaultPackageVersion;
+  if (version.minor < 0) return defaultPackageVersion;
+  if (version.patch < 0) return defaultPackageVersion;
   if (version.major === 0 && version.minor === 0 && version.patch === 0) return defaultPackageVersion;
 
   let validatedVersion: string = defaultPackageVersion;
@@ -62,9 +75,7 @@ export function validateAndBuildVersion(
 export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
   const checkoutWidgetJS = document.createElement('script');
 
-  // TODO: https://immutable.atlassian.net/browse/WT-1459
-  // const validVersion = validateAndBuildVersion(config?.version);
-  const validVersion = validateAndBuildVersion(undefined);
+  const validVersion = validateAndBuildVersion(config?.version);
 
   let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
   if (isDevMode()) cdnUrl = 'http://localhost:3000/lib/js/imtbl-checkout.js';

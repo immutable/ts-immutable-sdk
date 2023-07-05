@@ -26,76 +26,9 @@ describe('CheckoutWidgets', () => {
           major: 0,
           minor: 0,
           patch: 0,
+          prerelease: 'alpha',
         },
         expectedVersion: SDK_VERSION,
-      },
-      {
-        title: 'valid major, no minor or patch',
-        version: {
-          major: 1,
-        },
-        expectedVersion: '1',
-      },
-      {
-        title: 'valid major and minor, no patch',
-        version: {
-          major: 1,
-          minor: 2,
-        },
-        expectedVersion: '1.2',
-      },
-      {
-        title: 'valid major, minor and patch',
-        version: {
-          major: 1,
-          minor: 1,
-          patch: 1,
-        },
-        expectedVersion: '1.1.1',
-      },
-      {
-        title: 'valid major, minor and patch 2',
-        version: {
-          major: 0,
-          minor: 1,
-          patch: 10,
-        },
-        expectedVersion: '0.1.10',
-      },
-      {
-        title: 'valid major, minor and patch 3',
-        version: {
-          major: 2,
-          minor: 0,
-          patch: 8,
-        },
-        expectedVersion: '2.0.8',
-      },
-      {
-        title: 'revert to default version when major undefined',
-        version: {
-          major: undefined as unknown as number,
-          minor: 2,
-          patch: 8,
-        },
-        expectedVersion: SDK_VERSION,
-      },
-      {
-        title: 'set minor to 0 when patch added but minor undefined',
-        version: {
-          major: 2,
-          patch: 8,
-        },
-        expectedVersion: '2.0.8',
-      },
-      {
-        title: 'valid major, minor and patch 4',
-        version: {
-          major: 2,
-          minor: 1,
-          patch: 0,
-        },
-        expectedVersion: '2.1.0',
       },
       {
         title: 'append -alpha to valid versions',
@@ -117,6 +50,36 @@ describe('CheckoutWidgets', () => {
           build: 1,
         },
         expectedVersion: '0.1.8-alpha.1',
+      },
+      {
+        title: 'negative major returns default version',
+        version: {
+          major: -1,
+          minor: 1,
+          patch: 1,
+          prerelease: 'alpha',
+        },
+        expectedVersion: SDK_VERSION,
+      },
+      {
+        title: 'negative minor returns default version',
+        version: {
+          major: 1,
+          minor: -1,
+          patch: 1,
+          prerelease: 'alpha',
+        },
+        expectedVersion: SDK_VERSION,
+      },
+      {
+        title: 'negative patch returns default version',
+        version: {
+          major: 1,
+          minor: 1,
+          patch: -1,
+          prerelease: 'alpha',
+        },
+        expectedVersion: SDK_VERSION,
       },
     ];
 
