@@ -11,7 +11,7 @@ import type { ProtocolData } from './ProtocolData';
 export type Order = {
   account_address: string;
   buy: Array<Item>;
-  buy_fees: Array<Fee>;
+  fees: Array<Fee>;
   chain: Chain;
   /**
    * Time the Order is created

@@ -2187,6 +2187,10 @@
           "contract_address": {
             "type": "string"
           },
+          "root_contract_address": {
+            "type": "string",
+            "nullable": true
+          },
           "symbol": {
             "type": "string",
             "nullable": true
@@ -2207,6 +2211,7 @@
         "required": [
           "chain",
           "contract_address",
+          "root_contract_address",
           "symbol",
           "decimals",
           "image_url",
@@ -2519,7 +2524,7 @@
             "minItems": 1,
             "maxItems": 1
           },
-          "buy_fees": {
+          "fees": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Fee"
@@ -2580,7 +2585,7 @@
               "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
             }
           ],
-          "buy_fees": [],
+          "fees": [],
           "end_time": "2022-03-10T05:00:50.52Z",
           "protocol_data": {
             "order_type": "FULL_RESTRICTED",
@@ -2604,7 +2609,7 @@
           "order_hash",
           "buy",
           "sell",
-          "buy_fees",
+          "fees",
           "end_time",
           "start_time",
           "protocol_data",
@@ -2692,7 +2697,7 @@
             "minItems": 1,
             "maxItems": 1
           },
-          "buy_fees": {
+          "fees": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Fee"
@@ -2774,7 +2779,7 @@
               "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
             }
           ],
-          "buy_fees": [],
+          "fees": [],
           "chain": {
             "id": "eip155:11155111",
             "name": "sepolia"
@@ -2807,7 +2812,7 @@
           "account_address",
           "buy",
           "sell",
-          "buy_fees",
+          "fees",
           "chain",
           "create_time",
           "end_time",
@@ -2839,7 +2844,7 @@
                 "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
               }
             ],
-            "buy_fees": [],
+            "fees": [],
             "chain": {
               "id": "eip155:11155111",
               "name": "sepolia"
@@ -2903,7 +2908,7 @@
                   "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
                 }
               ],
-              "buy_fees": [],
+              "fees": [],
               "chain": {
                 "id": "eip155:11155111",
                 "name": "sepolia"
@@ -2940,7 +2945,7 @@
                   "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
                 }
               ],
-              "buy_fees": [],
+              "fees": [],
               "chain": {
                 "id": "eip155:11155111",
                 "name": "sepolia"
