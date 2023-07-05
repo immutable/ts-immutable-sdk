@@ -3,7 +3,7 @@ import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
 import { OrderbookOverrides, getOrderbookConfig } from 'config/config';
 import { ERC721Factory } from 'erc721';
 import { ListingResult, ListListingsResult, OrderStatus } from 'openapi/sdk';
-import { Seaport, SeaportFactory } from 'seaport';
+import { Seaport } from 'seaport';
 import {
   CancelOrderResponse,
   CreateListingParams,
@@ -12,6 +12,7 @@ import {
   PrepareListingParams,
   PrepareListingResponse,
 } from 'types';
+import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 
 /**
  * zkEVM orderbook SDK
@@ -43,11 +44,16 @@ export class Orderbook {
       orderbookConfig.seaportContractAddress,
     ).create();
 
-    this.seaport = new SeaportFactory(
+    const seaportLibFactory = new SeaportLibFactory(
+      orderbookConfig.seaportContractAddress,
+      orderbookConfig.provider,
+    );
+    this.seaport = new Seaport(
+      seaportLibFactory,
+      orderbookConfig.provider,
       orderbookConfig.seaportContractAddress,
       orderbookConfig.zoneContractAddress,
-      orderbookConfig.provider,
-    ).create();
+    );
   }
 
   /**
