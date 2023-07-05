@@ -11,9 +11,6 @@ describe('getWalletAllowList', () => {
         {
           walletProvider: WalletProviderName.METAMASK,
           name: WalletProviderName.METAMASK,
-          description:
-            'MetaMask is a browser extension that allows you to manage your Ethereum accounts and private keys.',
-          icon: '',
         },
       ],
     },
