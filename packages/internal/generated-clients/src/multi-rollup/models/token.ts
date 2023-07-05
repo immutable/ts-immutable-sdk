@@ -40,6 +40,12 @@ export interface Token {
      * @type {string}
      * @memberof Token
      */
+    'root_contract_address': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Token
+     */
     'symbol': string | null;
     /**
      * 
