@@ -193,8 +193,8 @@ export function BridgeWidget(props: BridgeWidgetProps) {
             )}
             {viewReducerValues.viewState.view.type === BridgeWidgetViews.BRIDGE && (
               <Bridge
-                amount={viewReducerValues.viewState.view.data?.amount ?? amount}
-                fromContractAddress={viewReducerValues.viewState.view.data?.tokenAddress ?? fromContractAddress}
+                amount={viewReducerValues.viewState.view.data?.fromAmount ?? amount}
+                fromContractAddress={viewReducerValues.viewState.view.data?.fromContractAddress ?? fromContractAddress}
               />
             )}
             {viewReducerValues.viewState.view.type === BridgeWidgetViews.IN_PROGRESS && (
