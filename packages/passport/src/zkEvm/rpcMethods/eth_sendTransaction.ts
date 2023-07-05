@@ -7,6 +7,10 @@ import { getNonce, getSignedSequenceTransactions } from '../sequence';
 import { Transaction } from '../types';
 import { EthMethodWithAuthParams } from './types';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
+import { poll } from '../../network/poll';
+
+const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
+const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
 
 export const ethSendTransaction = async ({
   params,
@@ -69,8 +73,17 @@ export const ethSendTransaction = async ({
 
   // TODO: ID-697 Evaluate transactions through Guardian
 
-  const transactionHash = await relayerAdapter.ethSendTransaction(transactionRequest.to, signedTransactions);
+  const relayerId = await relayerAdapter.ethSendTransaction(transactionRequest.to, signedTransactions);
 
-  const relayerTransaction = await relayerAdapter.imGetTransactionByHash(transactionHash);
+  const relayerTransaction = await poll(
+    MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES,
+    TRANSACTION_HASH_RETRIEVAL_WAIT,
+    (tx) => tx.status !== 'PENDING',
+    () => relayerAdapter.imGetTransactionByHash(relayerId),
+  );
+  if (relayerTransaction === undefined) {
+    throw new JsonRpcError(RpcErrorCode.RPC_SERVER_ERROR, 'transaction hash not generated in time');
+  }
+
   return relayerTransaction.hash;
 };
