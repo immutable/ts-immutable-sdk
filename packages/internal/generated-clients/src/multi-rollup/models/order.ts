@@ -52,7 +52,7 @@ export interface Order {
      * @type {Array<Fee>}
      * @memberof Order
      */
-    'buy_fees': Array<Fee>;
+    'fees': Array<Fee>;
     /**
      * 
      * @type {Chain}
