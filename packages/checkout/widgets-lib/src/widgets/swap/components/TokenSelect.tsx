@@ -33,12 +33,10 @@ function TokenSelect({
   };
 
   const selectOption = useCallback(
-    // TODO: token is declared in the upper scope
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    (token: TokenInfo) => {
-      setOption(token?.symbol);
-      setIcon(token?.icon);
-      onChange(token);
+    (tokenInfo: TokenInfo) => {
+      setOption(tokenInfo?.symbol);
+      setIcon(tokenInfo?.icon);
+      onChange(tokenInfo);
     },
     [setOption, setIcon, onChange],
   );
@@ -74,21 +72,19 @@ function TokenSelect({
       </Box>
       {isOpen && (
         <Box sx={optionsContainerStyle}>
-          {/* TODO: 'token' is already declared in the upper scope */}
-          {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
-          {allowedTokens.map((token) => (!filter || filter.includes(token.address || '') ? (
+          {allowedTokens.map((tokenInfo) => (!filter || filter.includes(tokenInfo.address || '') ? (
             <Box
-              testId={`${testId}__option-${token.symbol}`}
+              testId={`${testId}__option-${tokenInfo.symbol}`}
               sx={optionStyle}
-              key={token.symbol}
-              onClick={() => selectOption(token)}
+              key={tokenInfo.symbol}
+              onClick={() => selectOption(tokenInfo)}
             >
               <img
                 style={{ width: '16px', height: '16px' }}
-                src={token.icon}
-                alt={token.symbol}
+                src={tokenInfo.icon}
+                alt={tokenInfo.symbol}
               />
-              <Body size="small">{token.symbol}</Body>
+              <Body size="small">{tokenInfo.symbol}</Body>
             </Box>
           ) : null))}
         </Box>

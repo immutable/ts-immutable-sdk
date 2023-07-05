@@ -1,5 +1,4 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { ChainId, Checkout } from '@imtbl/checkout-sdk';
+import { ChainId } from '@imtbl/checkout-sdk';
 import { useContext, useState, useCallback } from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
@@ -26,13 +25,9 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
   const { body, footer } = text.views[ConnectWidgetViews.READY_TO_CONNECT];
   const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
 
-  const handleConnectViewUpdate = async (
-    // TODO: variable is already declared above
-    // eslint-disable-next-line
-    checkout: Checkout,
-    // eslint-disable-next-line
-    provider: Web3Provider,
-  ) => {
+  const handleConnectViewUpdate = async () => {
+    if (!checkout || !provider) return;
+
     const networkInfo = await checkout.getNetworkInfo({ provider });
 
     if (networkInfo.chainId !== targetChainId) {
@@ -66,7 +61,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
             provider: connectResult.provider,
           },
         });
-        handleConnectViewUpdate(checkout, provider);
+        await handleConnectViewUpdate();
       } catch (err: any) {
         setFooterButtonText(footer.buttonText2);
       }
