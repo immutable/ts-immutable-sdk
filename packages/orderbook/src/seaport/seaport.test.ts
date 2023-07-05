@@ -77,7 +77,8 @@ describe('Seaport', () => {
         when(mockedProvider.getNetwork()).thenReturn(
           Promise.resolve({ chainId: network, name: 'foobar' }),
         );
-        when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(mockedSeaportJs);
+        when(mockedSeaportLibFactory.create(anything(), anything()))
+          .thenReturn(instance(mockedSeaportJs));
         when(
           mockedSeaportJs.getOrderHash(
             deepEqual(orderComponentsWithHexSalt as OrderComponents),
@@ -257,7 +258,8 @@ describe('Seaport', () => {
         when(mockedProvider.getNetwork()).thenReturn(
           Promise.resolve({ chainId: network, name: 'foobar' }),
         );
-        when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(mockedSeaportJs);
+        when(mockedSeaportLibFactory.create(anything(), anything()))
+          .thenReturn(instance(mockedSeaportJs));
         when(
           mockedSeaportJs.getOrderHash(
             deepEqual(orderComponentsWithHexSalt as OrderComponents),
@@ -460,7 +462,8 @@ describe('Seaport', () => {
           Promise.resolve(approvalGas),
         );
 
-        when(mockedSeaportLibFactory.create(anything(), anything())).thenReturn(mockedSeaportJs);
+        when(mockedSeaportLibFactory.create(anything(), anything()))
+          .thenReturn(instance(mockedSeaportJs));
         when(
           mockedSeaportJs.fulfillOrders(
             deepEqual({
