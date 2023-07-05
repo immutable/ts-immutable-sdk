@@ -10,23 +10,23 @@ import {
 } from '@imtbl/core-sdk';
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
-import { UserWithEtherKey } from '../../types';
-import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
+import { UserImx } from '../../types';
+import GuardianClient from '../guardian';
 
 type CancelOrderParams = {
   request: GetSignableCancelOrderRequest;
   ordersApi: OrdersApi;
-  user: UserWithEtherKey;
+  user: UserImx;
   starkSigner: StarkSigner;
-  confirmationScreen: ConfirmationScreen;
+  guardianClient: GuardianClient;
 };
 
 type CreateOrderParams = {
   request: UnsignedOrderRequest;
   ordersApi: OrdersApi;
-  user: UserWithEtherKey;
+  user: UserImx;
   starkSigner: StarkSigner;
-  confirmationScreen: ConfirmationScreen;
+  guardianClient: GuardianClient;
 };
 
 const ERC721 = 'ERC721';
@@ -36,12 +36,18 @@ export async function createOrder({
   user,
   request,
   ordersApi,
-  confirmationScreen,
+  guardianClient,
 }: CreateOrderParams): Promise<CreateOrderResponse> {
   return withPassportError<CreateOrderResponse>(async () => {
-    const ethAddress = user.etherKey;
+    guardianClient.loading();
+    const { ethAddress } = user.imx;
     const amountSell = request.sell.type === ERC721 ? '1' : request.sell.amount;
     const amountBuy = request.buy.type === ERC721 ? '1' : request.buy.amount;
+    const headers = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Authorization: `Bearer ${user.accessToken}`,
+    };
+
     const getSignableOrderRequestV3: GetSignableOrderRequest = {
       user: ethAddress,
       amount_buy: amountBuy,
@@ -52,20 +58,16 @@ export async function createOrder({
       expiration_timestamp: request.expiration_timestamp,
     };
 
-    const getSignableOrderResponse = await ordersApi.getSignableOrder({
-      getSignableOrderRequestV3,
-    });
-
-    const confirmationResult = await confirmationScreen.startTransaction(
-      user.accessToken,
+    const getSignableOrderResponse = await ordersApi.getSignableOrder(
       {
-        transactionType: TransactionTypes.createOrder,
-        transactionData: getSignableOrderRequestV3,
+        getSignableOrderRequestV3,
       },
+      { headers },
     );
-    if (!confirmationResult.confirmed) {
-      throw new Error('Transaction rejected by user');
-    }
+
+    await guardianClient.validate({
+      payloadHash: getSignableOrderResponse.data.payload_hash,
+    });
 
     const { payload_hash: payloadHash } = getSignableOrderResponse.data;
 
@@ -90,11 +92,8 @@ export async function createOrder({
         vault_id_sell: signableResultData.vault_id_sell,
       },
     };
-    const headers = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      Authorization: `Bearer ${user.accessToken}`,
-    };
-    const createOrderResponse = await ordersApi.createOrder(orderParams, {
+
+    const createOrderResponse = await ordersApi.createOrderV3(orderParams, {
       headers,
     });
 
@@ -109,37 +108,31 @@ export async function cancelOrder({
   starkSigner,
   request,
   ordersApi,
-  confirmationScreen,
+  guardianClient,
 }: CancelOrderParams): Promise<CancelOrderResponse> {
   return withPassportError<CancelOrderResponse>(async () => {
+    guardianClient.loading();
     const getSignableCancelOrderRequest: GetSignableCancelOrderRequest = {
       order_id: request.order_id,
     };
-    const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrder({
-      getSignableCancelOrderRequest,
-    });
-
-    const confirmationResult = await confirmationScreen.startTransaction(
-      user.accessToken,
-      {
-        transactionType: TransactionTypes.cancelOrder,
-        transactionData: getSignableCancelOrderRequest,
-      },
-    );
-    if (!confirmationResult.confirmed) {
-      throw new Error('Transaction rejected by user');
-    }
-
-    const { payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
-
-    const starkSignature = await starkSigner.signMessage(payloadHash);
 
     const headers = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       Authorization: `Bearer ${user.accessToken}`,
     };
+    const getSignableCancelOrderResponse = await ordersApi.getSignableCancelOrderV3({
+      getSignableCancelOrderRequest,
+    }, { headers });
 
-    const cancelOrderResponse = await ordersApi.cancelOrder(
+    await guardianClient.validate({
+      payloadHash: getSignableCancelOrderResponse.data.payload_hash,
+    });
+
+    const { payload_hash: payloadHash } = getSignableCancelOrderResponse.data;
+
+    const starkSignature = await starkSigner.signMessage(payloadHash);
+
+    const cancelOrderResponse = await ordersApi.cancelOrderV3(
       {
         id: request.order_id.toString(),
         cancelOrderRequest: {

@@ -7,10 +7,12 @@ import { CheckoutWidgetTagNames } from '../definitions/types';
 
 /**
  * Interface representing the props for the Swap Widget component.
- * @property {string} walletProvider - The preferred provider for the Swap Widget (default: "metamask"}).
- * @property {string} fromContractAddress - The contract address to swap tokens from.
- * @property {string} amount - The amount of tokens to send.
- * @property {Network} toContractAddress - The contract address to swap tokens to.
+ * @interface SwapReactProps
+ * @property {WalletProviderName | undefined} walletProvider - The name of the wallet provider.
+ * @property {Web3Provider | undefined} provider - The Web3 provider.
+ * @property {string | undefined} fromContractAddress - The address of the contract swapping from.
+ * @property {string | undefined} amount - The amount.
+ * @property {string | undefined} toContractAddress - The address of the contract swapping to.
  */
 export interface SwapReactProps {
   walletProvider?: WalletProviderName;

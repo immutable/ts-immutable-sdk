@@ -16,9 +16,6 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { ActivityAsset } from './activity-asset';
-// May contain unused imports in some cases
-// @ts-ignore
-import { ActivityType } from './activity-type';
 
 /**
  * The mint activity details
@@ -26,12 +23,6 @@ import { ActivityType } from './activity-type';
  * @interface Mint
  */
 export interface Mint {
-    /**
-     * 
-     * @type {ActivityType}
-     * @memberof Mint
-     */
-    'activity_type': ActivityType;
     /**
      * The account address the asset was minted to
      * @type {string}

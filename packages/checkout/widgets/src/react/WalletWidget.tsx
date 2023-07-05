@@ -6,8 +6,9 @@ import { CheckoutWidgetTagNames } from '../definitions/types';
 
 /**
  * Interface representing the props for the Wallet Widget component.
- * @property {string} walletProvider - The preferred provider for the Wallet Widget
- * (default: "metamask").
+ * @interface WalletReactProps
+ * @property {WalletProviderName | undefined} walletProvider - The name of the wallet provider.
+ * @property {Web3Provider | undefined} provider - The Web3 provider.
  */
 export interface WalletReactProps {
   walletProvider?: WalletProviderName;

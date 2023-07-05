@@ -1,11 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutWidgetTagNames } from '../../definitions/types';
 
-/**
- * SetProvider allows to set the provider for an existing Checkout Widgets instance.
- * @param {CheckoutWidgetTagNames} tagName - target Checkout Widget widget.
- * @param {Web3Provider} provider - the provider to connect to the blockchain network.
- */
 export function SetProvider(
   tagName: CheckoutWidgetTagNames,
   provider: Web3Provider | null,

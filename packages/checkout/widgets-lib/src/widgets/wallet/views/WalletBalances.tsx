@@ -15,8 +15,9 @@ import {
   WALLET_BALANCE_CONTAINER_STYLE,
   WalletBalanceItemStyle,
 } from './WalletBalancesStyles';
-import { zkEVMNetwork } from '../../../lib/networkUtils';
+import { getL2ChainId } from '../../../lib/networkUtils';
 import {
+  CryptoFiatActions,
   CryptoFiatContext,
 } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { getTokenBalances } from '../functions/tokenBalances';
@@ -26,7 +27,7 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
-import { useTokenSymbols } from '../../../lib/hooks/useTokenSymbols';
+import { fetchTokenSymbols } from '../../../lib/fetchTokenSymbols';
 
 export function WalletBalances() {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -35,41 +36,42 @@ export function WalletBalances() {
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const {
-    provider, checkout, network, supportedTopUps, tokenBalances,
+    provider,
+    checkout,
+    network,
+    supportedTopUps,
+    tokenBalances,
   } = walletState;
   const { conversions } = cryptoFiatState;
-  const [balancesLoading, setBalancesLoading] = useState(false);
-  useTokenSymbols(checkout, cryptoFiatDispatch);
-  const showAddCoins = useMemo(() => {
-    if (!checkout || !network) return false;
-    return (
-      network?.chainId === zkEVMNetwork(checkout.config.environment)
-      && Boolean(
-        supportedTopUps?.isBridgeEnabled
-          || supportedTopUps?.isSwapEnabled
-          || supportedTopUps?.isOnRampEnabled,
-      )
-    );
-  }, [checkout, network, supportedTopUps]);
+  const [balancesLoading, setBalancesLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      if (!checkout) return;
+      if (!cryptoFiatDispatch) return;
+      if (!network) return;
+
+      const tokenSymbols = await fetchTokenSymbols(checkout, network.chainId);
+
+      cryptoFiatDispatch({
+        payload: {
+          type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+          tokenSymbols,
+        },
+      });
+    })();
+  }, [checkout, cryptoFiatDispatch, network]);
 
   useEffect(() => {
     let totalAmount = 0.0;
 
-    walletState.tokenBalances.forEach((balance) => {
+    tokenBalances.forEach((balance) => {
       const fiatAmount = parseFloat(balance.fiatAmount);
       if (!Number.isNaN(fiatAmount)) totalAmount += fiatAmount;
     });
-    setTotalFiatAmount(totalAmount);
-  }, [walletState.tokenBalances]);
 
-  const handleAddCoinsClick = () => {
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type: SharedViews.TOP_UP_VIEW },
-      },
-    });
-  };
+    setTotalFiatAmount(totalAmount);
+  }, [tokenBalances]);
 
   useEffect(() => {
     if (!checkout || !provider || !network) return;
@@ -77,7 +79,6 @@ export function WalletBalances() {
       const balances = await getTokenBalances(
         checkout,
         provider,
-        network.name,
         network.chainId,
         conversions,
       );
@@ -88,18 +89,30 @@ export function WalletBalances() {
           tokenBalances: balances,
         },
       });
+      setBalancesLoading(false);
     })();
-  }, [
-    checkout,
-    network,
-    provider,
-    conversions,
-    setBalancesLoading,
-    walletDispatch]);
+  }, [checkout, network, provider, conversions, setBalancesLoading, walletDispatch]);
 
-  useEffect(() => {
-    setBalancesLoading(false);
-  }, [tokenBalances]);
+  const showAddCoins = useMemo(() => {
+    if (!checkout || !network) return false;
+    return (
+      network.chainId === getL2ChainId(checkout.config)
+        && Boolean(
+          supportedTopUps?.isBridgeEnabled
+            || supportedTopUps?.isSwapEnabled
+            || supportedTopUps?.isOnRampEnabled,
+        )
+    );
+  }, [checkout, network, supportedTopUps]);
+
+  const handleAddCoinsClick = () => {
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: SharedViews.TOP_UP_VIEW },
+      },
+    });
+  };
 
   return (
     <SimpleLayout
@@ -135,7 +148,7 @@ export function WalletBalances() {
           <Box
             sx={WalletBalanceItemStyle(
               showAddCoins,
-              walletState.tokenBalances.length > 2 || balancesLoading,
+              tokenBalances.length > 2 || balancesLoading,
             )}
           >
             {balancesLoading && (
@@ -154,7 +167,7 @@ export function WalletBalances() {
               />
             </Box>
             )}
-            {!balancesLoading && (<TokenBalanceList balanceInfoItems={walletState.tokenBalances} />)}
+            {!balancesLoading && (<TokenBalanceList balanceInfoItems={tokenBalances} />)}
           </Box>
         </Box>
         {showAddCoins && (

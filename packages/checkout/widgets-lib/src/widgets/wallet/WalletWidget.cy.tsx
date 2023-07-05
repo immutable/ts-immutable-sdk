@@ -9,7 +9,7 @@ import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
 import { WalletWidget } from './WalletWidget';
-import { cySmartGet } from '../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { text } from '../../resources/text/textConfig';
@@ -18,6 +18,7 @@ import { WalletWidgetViews } from '../../context/view-context/WalletViewContextT
 describe('WalletWidget tests', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
+    cyIntercept();
   });
 
   const mockProvider = {
@@ -36,7 +37,7 @@ describe('WalletWidget tests', () => {
   it('should show loading screen when component is mounted', () => {
     const widgetConfig = {
       theme: WidgetTheme.DARK,
-      environment: Environment.PRODUCTION,
+      environment: Environment.SANDBOX,
       isBridgeEnabled: false,
       isSwapEnabled: false,
       isOnRampEnabled: false,
@@ -56,7 +57,7 @@ describe('WalletWidget tests', () => {
     cy.stub(Checkout.prototype, 'getNetworkInfo')
       .as('getNetworkInfoStub')
       .resolves({
-        chainId: ChainId.ETHEREUM,
+        chainId: ChainId.SEPOLIA,
         isSupported: true,
         nativeCurrency: {
           symbol: 'eth',
@@ -86,12 +87,12 @@ describe('WalletWidget tests', () => {
               getAddress: () => Promise.resolve('dss'),
             }),
             getNetwork: async () => ({
-              chainId: 1,
+              chainId: ChainId.ETHEREUM,
               name: 'Ethereum',
             }),
           },
           network: {
-            chainId: 1,
+            chainId: ChainId.ETHEREUM,
             name: 'Ethereum',
             nativeCurrency: {
               name: 'ETH',
@@ -125,7 +126,7 @@ describe('WalletWidget tests', () => {
       cy.stub(Checkout.prototype, 'getNetworkInfo')
         .as('getNetworkInfoStub')
         .resolves({
-          chainId: ChainId.ETHEREUM,
+          chainId: ChainId.SEPOLIA,
           isSupported: true,
           nativeCurrency: {
             symbol: 'eth',
@@ -141,8 +142,8 @@ describe('WalletWidget tests', () => {
               chainId: ChainId.IMTBL_ZKEVM_DEVNET,
             },
             {
-              name: 'Ethereum',
-              chainId: ChainId.ETHEREUM,
+              name: 'Sepolia',
+              chainId: ChainId.SEPOLIA,
             },
           ],
         });
@@ -220,7 +221,7 @@ describe('WalletWidget tests', () => {
       it('should show the network and user balances on that network', () => {
         const widgetConfig = {
           theme: WidgetTheme.DARK,
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
           isBridgeEnabled: false,
           isSwapEnabled: false,
           isOnRampEnabled: false,
@@ -237,9 +238,9 @@ describe('WalletWidget tests', () => {
 
         cySmartGet('close-button').should('be.visible');
         cySmartGet('network-heading').should('be.visible');
-        cySmartGet('Ethereum-network-button').should(
+        cySmartGet('Sepolia-network-button').should(
           'include.text',
-          'Ethereum',
+          'Sepolia',
         );
 
         cySmartGet('total-token-balance').should('exist');
@@ -256,7 +257,7 @@ describe('WalletWidget tests', () => {
       it('should show the balance details for each token', () => {
         const widgetConfig = {
           theme: WidgetTheme.DARK,
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
           isBridgeEnabled: false,
           isSwapEnabled: false,
           isOnRampEnabled: false,
@@ -295,7 +296,7 @@ describe('WalletWidget tests', () => {
       it('should show the settings view if the settings button is clicked', () => {
         const widgetConfig = {
           theme: WidgetTheme.DARK,
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
           isBridgeEnabled: false,
           isSwapEnabled: false,
           isOnRampEnabled: false,
@@ -317,7 +318,7 @@ describe('WalletWidget tests', () => {
       it('should show correct wallet address on the settings page', () => {
         const widgetConfig = {
           theme: WidgetTheme.DARK,
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
           isBridgeEnabled: false,
           isSwapEnabled: false,
           isOnRampEnabled: false,
@@ -343,7 +344,7 @@ describe('WalletWidget tests', () => {
 
         const widgetConfig = {
           theme: WidgetTheme.DARK,
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
           isBridgeEnabled: false,
           isSwapEnabled: false,
           isOnRampEnabled: false,
@@ -369,7 +370,7 @@ describe('WalletWidget tests', () => {
       it('should show the coin info view if the coin info icon is clicked', () => {
         const widgetConfig = {
           theme: WidgetTheme.DARK,
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
           isBridgeEnabled: false,
           isSwapEnabled: false,
           isOnRampEnabled: false,

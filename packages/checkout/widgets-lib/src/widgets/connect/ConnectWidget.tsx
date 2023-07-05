@@ -58,22 +58,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const { environment, theme } = config;
   const errorText = text.views[SharedViews.ERROR_VIEW].actionText;
 
-  const [connectState, connectDispatch] = useReducer(
-    connectReducer,
-    initialConnectState,
-  );
-
-  useEffect(() => {
-    if (web3Provider) {
-      connectDispatch({
-        payload: {
-          type: ConnectActions.SET_PROVIDER,
-          provider: web3Provider,
-        },
-      });
-    }
-  }, [web3Provider]);
-
+  const [connectState, connectDispatch] = useReducer(connectReducer, initialConnectState);
   const { sendCloseEvent, provider } = connectState;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const { view } = viewState;
@@ -84,16 +69,25 @@ export function ConnectWidget(props: ConnectWidgetProps) {
 
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
-  const targetChainId = getTargetLayerChainId(targetLayer ?? ConnectTargetLayer.LAYER2, environment);
+  const checkout = new Checkout({ baseConfig: { environment } });
+  const targetChainId = getTargetLayerChainId(checkout.config, targetLayer ?? ConnectTargetLayer.LAYER2);
+
+  useEffect(() => {
+    if (!web3Provider) return;
+    connectDispatch({
+      payload: {
+        type: ConnectActions.SET_PROVIDER,
+        provider: web3Provider,
+      },
+    });
+  }, [web3Provider]);
 
   useEffect(() => {
     setTimeout(() => {
       connectDispatch({
         payload: {
           type: ConnectActions.SET_CHECKOUT,
-          checkout: new Checkout({
-            baseConfig: { environment },
-          }),
+          checkout,
         },
       });
 
@@ -115,9 +109,8 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   }, [deepLink, sendCloseEventOverride, environment]);
 
   useEffect(() => {
-    if (viewState.view.type === SharedViews.ERROR_VIEW) {
-      sendConnectFailedEvent(viewState.view.error.message);
-    }
+    if (viewState.view.type !== SharedViews.ERROR_VIEW) return;
+    sendConnectFailedEvent(viewState.view.error.message);
   }, [viewState]);
 
   return (

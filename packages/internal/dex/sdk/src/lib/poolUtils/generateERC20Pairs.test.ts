@@ -1,11 +1,10 @@
-import { describe, it } from '@jest/globals';
 import { Token } from '@uniswap/sdk-core';
 import { generateERC20Pairs, ERC20Pair } from './generateERC20Pairs';
 import {
-  FUN_TEST_CHAIN,
-  IMX_TEST_CHAIN,
-  USDC_TEST_CHAIN,
-  WETH_TEST_CHAIN,
+  FUN_TEST_TOKEN,
+  IMX_TEST_TOKEN,
+  USDC_TEST_TOKEN,
+  WETH_TEST_TOKEN,
   uniqBy,
 } from '../../utils/testUtils';
 import { ensureCorrectERC20AddressOrder } from './computePoolAddress';
@@ -18,7 +17,7 @@ import { ensureCorrectERC20AddressOrder } from './computePoolAddress';
 describe('generateERC20Pairs', () => {
   describe('when no CommonRoutingTokens exist', () => {
     it('should only return the TokenIn/TokenOut pair', async () => {
-      const tokenPair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
+      const tokenPair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
       const commonRoutingTokens: Token[] = [];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
@@ -54,8 +53,8 @@ describe('generateERC20Pairs', () => {
     it('should create three pairs', async () => {
       // We expect...
       // TI TO [TX] = [TI / TO, TI / TX, TO / TX]
-      const tokenPair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
-      const commonRoutingTokens: Token[] = [WETH_TEST_CHAIN];
+      const tokenPair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
+      const commonRoutingTokens: Token[] = [WETH_TEST_TOKEN];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
       expect(tokenPairs.length).toEqual(3);
@@ -130,11 +129,11 @@ describe('generateERC20Pairs', () => {
     it('should create one pair', () => {
       // We expect...
       // TI TO [TI] = [TI / TO]
-      const tokenPair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
+      const tokenPair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
 
       // Create a copy of the Token object so that we do not have the same
       // instance of the object in the tokenPair and commonRoutingTokens
-      const usdc = Object.assign(USDC_TEST_CHAIN);
+      const usdc = Object.assign(USDC_TEST_TOKEN);
       const commonRoutingTokens: Token[] = [usdc];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
@@ -171,8 +170,8 @@ describe('generateERC20Pairs', () => {
     it('should create six pairs', () => {
       // We expect...
       // TI TO [TX, TZ] = [TI / TO, TI / TX, TI / TZ, TO / TX, TO / TZ, TX / TZ]
-      const tokenPair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
-      const commonRoutingTokens: Token[] = [WETH_TEST_CHAIN, FUN_TEST_CHAIN];
+      const tokenPair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
+      const commonRoutingTokens: Token[] = [WETH_TEST_TOKEN, FUN_TEST_TOKEN];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
       expect(tokenPairs).toHaveLength(6);
@@ -181,8 +180,8 @@ describe('generateERC20Pairs', () => {
     it('should not repeat pairs', async () => {
       // We expect...
       // TI TO [TX, TZ] = [TI / TO, TI / TX, TI / TZ, TO / TX, TO / TZ, TX / TZ]
-      const tokenPair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
-      const commonRoutingTokens: Token[] = [WETH_TEST_CHAIN, FUN_TEST_CHAIN];
+      const tokenPair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
+      const commonRoutingTokens: Token[] = [WETH_TEST_TOKEN, FUN_TEST_TOKEN];
 
       const tokenPairs = generateERC20Pairs(tokenPair, commonRoutingTokens);
 

@@ -10,87 +10,26 @@ import {
   UnsignedTransferRequest,
 } from '@imtbl/core-sdk';
 import { convertToSignableToken } from '@imtbl/toolkit';
-import * as guardian from '@imtbl/guardian';
-import { retryWithDelay } from '../retry';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
-import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
-import { UserWithEtherKey } from '../../types';
+import { UserImx } from '../../types';
+import GuardianClient from '../guardian';
 
 const ERC721 = 'ERC721';
 
 type TransferRequest = {
   request: UnsignedTransferRequest;
-  user: UserWithEtherKey;
+  user: UserImx;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
-  imxPublicApiDomain: string;
-  confirmationScreen: ConfirmationScreen;
+  guardianClient: GuardianClient;
 };
 
 type BatchTransfersParams = {
   request: Array<NftTransferDetails>;
-  user: UserWithEtherKey;
+  user: UserImx;
   starkSigner: StarkSigner;
   transfersApi: TransfersApi;
-  confirmationScreen: ConfirmationScreen;
-};
-
-type TransferWithGuardianParams = {
-  accessToken: string;
-  imxPublicApiDomain: string;
-  payloadHash: string;
-  confirmationScreen: ConfirmationScreen;
-};
-
-const transferWithGuardian = async ({
-  accessToken,
-  imxPublicApiDomain,
-  payloadHash,
-  confirmationScreen,
-}: TransferWithGuardianParams) => {
-  confirmationScreen.loading();
-  const transactionAPI = new guardian.TransactionsApi(
-    new guardian.Configuration({
-      accessToken,
-      basePath: imxPublicApiDomain,
-    }),
-  );
-  const starkExTransactionApi = new guardian.StarkexTransactionsApi(
-    new guardian.Configuration({
-      accessToken,
-      basePath: imxPublicApiDomain,
-    }),
-  );
-
-  const finallyFn = () => {
-    confirmationScreen.closeWindow();
-  };
-
-  const transactionRes = await retryWithDelay(async () => transactionAPI.getTransactionByID({
-    transactionID: payloadHash,
-    chainType: 'starkex',
-  }), { finallyFn });
-
-  if (!transactionRes.data.id) {
-    throw new Error("Transaction doesn't exists");
-  }
-
-  const evaluateStarkexRes = await starkExTransactionApi.evaluateStarkexTransaction({
-    payloadHash,
-  });
-
-  const { confirmationRequired } = evaluateStarkexRes.data;
-  if (confirmationRequired) {
-    const confirmationResult = await confirmationScreen.startGuardianTransaction(
-      payloadHash,
-    );
-
-    if (!confirmationResult.confirmed) {
-      throw new Error('Transaction rejected by user');
-    }
-  } else {
-    confirmationScreen.closeWindow();
-  }
+  guardianClient: GuardianClient;
 };
 
 export async function transfer({
@@ -98,15 +37,15 @@ export async function transfer({
   transfersApi,
   starkSigner,
   user,
-  imxPublicApiDomain,
-  confirmationScreen,
+  guardianClient,
 }: // TODO: remove this eslint disable once we have a better solution
 // eslint-disable-next-line max-len
 TransferRequest): Promise<CreateTransferResponseV1> {
   return withPassportError<CreateTransferResponseV1>(async () => {
+    guardianClient.loading();
     const transferAmount = request.type === ERC721 ? '1' : request.amount;
     const getSignableTransferRequest: GetSignableTransferRequestV1 = {
-      sender: user.etherKey,
+      sender: user.imx.ethAddress,
       token: convertToSignableToken(request),
       amount: transferAmount,
       receiver: request.receiver,
@@ -123,11 +62,8 @@ TransferRequest): Promise<CreateTransferResponseV1> {
       { headers },
     );
 
-    await transferWithGuardian({
-      imxPublicApiDomain,
-      accessToken: user.accessToken,
+    await guardianClient.validate({
       payloadHash: signableResult.data.payload_hash,
-      confirmationScreen,
     });
 
     const signableResultData = signableResult.data;
@@ -170,10 +106,12 @@ export async function batchNftTransfer({
   starkSigner,
   request,
   transfersApi,
-  confirmationScreen,
+  guardianClient,
 }: BatchTransfersParams): Promise<CreateTransferResponse> {
   return withPassportError<CreateTransferResponse>(async () => {
-    const ethAddress = user.etherKey;
+    const popupWindowSize = { width: 480, height: 784 };
+    guardianClient.loading(popupWindowSize);
+    const { ethAddress } = user.imx;
 
     const signableRequests = request.map(
       (nftTransfer): SignableTransferDetails => ({
@@ -192,23 +130,18 @@ export async function batchNftTransfer({
       signable_requests: signableRequests,
     };
 
+    const headers = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Authorization: `Bearer ${user.accessToken}`,
+    };
+
     const signableResult = await transfersApi.getSignableTransfer({
       getSignableTransferRequestV2,
+    }, { headers });
+
+    await guardianClient.validate({
+      payloadHash: signableResult.data.signable_responses[0]?.payload_hash,
     });
-
-    const popupWindowSize = { width: 480, height: 784 };
-    const confirmationResult = await confirmationScreen.startTransaction(
-      user.accessToken,
-      {
-        transactionType: TransactionTypes.createBatchTransfer,
-        transactionData: getSignableTransferRequestV2,
-      },
-      popupWindowSize,
-    );
-
-    if (!confirmationResult.confirmed) {
-      throw new Error('Transaction rejected by user');
-    }
 
     const requests = await Promise.all(
       signableResult.data.signable_responses.map(async (resp) => {
@@ -229,11 +162,6 @@ export async function batchNftTransfer({
     const transferSigningParams = {
       sender_stark_key: signableResult.data.sender_stark_key,
       requests,
-    };
-
-    const headers = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      Authorization: `Bearer ${user.accessToken}`,
     };
 
     const response = await transfersApi.createTransfer(

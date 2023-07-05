@@ -45,19 +45,16 @@ describe('provider validation', () => {
         request: requestMock,
       };
 
-      (RemoteConfigFetcher as jest.Mock).mockReturnValue({
-        get: jest.fn().mockResolvedValue([
+      (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
+        getConfig: jest.fn().mockResolvedValue([
           {
-            chainId: 1,
+            chainId: ChainId.ETHEREUM,
           },
           {
-            chainId: 11155111,
+            chainId: ChainId.SEPOLIA,
           },
           {
-            chainId: 13372,
-          },
-          {
-            chainId: 13373,
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           },
         ]),
       });
@@ -82,7 +79,7 @@ describe('provider validation', () => {
       requestMock.mockResolvedValue('0x1');
       const testWeb3Provider = new Web3Provider(
         underlyingProviderMock,
-        ChainId.IMTBL_ZKEVM_DEVNET,
+        ChainId.IMTBL_ZKEVM_TESTNET,
       );
       await expect(
         validateProvider(testCheckoutConfig, testWeb3Provider),

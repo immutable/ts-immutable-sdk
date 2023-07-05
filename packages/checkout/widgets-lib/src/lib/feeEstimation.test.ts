@@ -209,10 +209,12 @@ describe('feeEstimation', () => {
   });
 
   describe('formatFiatDecimals', () => {
-    it('should return -.-- when value is 0', () => {
-      expect(formatFiatDecimals(0)).toEqual('-.--');
+    it('should return 0.00 when value is 0', () => {
+      expect(formatFiatDecimals(0)).toEqual('0.00');
     });
-
+    it('should return -.-- when value is less than 0', () => {
+      expect(formatFiatDecimals(-1)).toEqual('-.--');
+    });
     it('should return more than 2 decimal places when value is less than 0.01', () => {
       expect(formatFiatDecimals(0.001)).toEqual('0.001');
     });

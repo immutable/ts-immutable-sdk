@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
-import { Exchange, TransactionResponse } from '@imtbl/dex-sdk';
+import { Exchange, TransactionDetails, TransactionResponse } from '@imtbl/dex-sdk';
 import { configuration } from '../config';
 import { ConnectAccount } from './ConnectAccount';
 import { getTokenSymbol } from '../utils/getTokenSymbol';
@@ -11,8 +11,8 @@ export function Example() {
   const exchange = new Exchange(configuration);
 
   // Instead of hard-coding these tokens, you can optionally retrieve available tokens from the user's wallet
-  const FUN_TOKEN = process.env.NEXT_PUBLIC_COMMON_ROUTING_FUN || '';
-  const USDC_TOKEN = process.env.NEXT_PUBLIC_COMMON_ROUTING_USDC || '';
+  const TEST_IMX_TOKEN = '0x0000000000000000000000000000000000001010';
+  const ZKCATS_TOKEN = '0x1836E16b2036088490C2CFe4d11970Fc8e5884C4';
 
   const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -25,8 +25,8 @@ export function Example() {
     {}
   );
 
-  const inputToken = FUN_TOKEN;
-  const outputToken = USDC_TOKEN;
+  const inputToken = TEST_IMX_TOKEN;
+  const outputToken = ZKCATS_TOKEN;
 
   useEffect(() => {
     // Get the symbols for the tokens that we want to swap so we can display this to the user
@@ -62,7 +62,7 @@ export function Example() {
 
       setResult(txn);
 
-      if (!txn.approveTransaction) {
+      if (!txn.approval) {
         setApproved(true)
       }
     } catch(e) {
@@ -87,7 +87,7 @@ export function Example() {
         // Send the Approve transaction
         const approveReceipt = await (window as any).ethereum.send(
           'eth_sendTransaction',
-          [result.approveTransaction]
+          [result.approval?.transaction]
         );
 
         // Wait for the Approve transaction to complete
@@ -105,7 +105,7 @@ export function Example() {
       // Send the Swap transaction
       const receipt = await (window as any).ethereum.send(
         'eth_sendTransaction',
-        [result.transaction]
+        [result.swap.transaction]
       );
 
       // Wait for the Swap transaction to complete
@@ -150,24 +150,25 @@ export function Example() {
 
       <hr className="my-4" />
       {error && <ErrorMessage message={error} />}
-      {result && result.info && (
+      {result && (
         <>
           <h3>
             Expected amount:{' '}
-            {ethers.utils.formatEther(result.info.quote.amount)}{' '}
-            {`${addressToSymbolMapping[result.info.quote.token.address]}`}
+            {ethers.utils.formatEther(result.quote.amount.value)}{' '}
+            {`${addressToSymbolMapping[result.quote.amount.token.address]}`}
           </h3>
           <h3>
             Minimum amount:{' '}
-            {ethers.utils.formatEther(result.info.quoteWithMaxSlippage.amount)}{' '}
+            {ethers.utils.formatEther(result.quote.amountWithMaxSlippage.value)}{' '}
             {`${
               addressToSymbolMapping[
-                result.info.quoteWithMaxSlippage.token.address
+                result.quote.amountWithMaxSlippage.token.address
               ]
             }`}
           </h3>
-          <h3>Slippage: {result.info.slippage}%</h3>
-          <h3>Gas estimate: {result.info.gasFeeEstimate ? `${ethers.utils.formatEther(result.info.gasFeeEstimate?.amount)} IMX` : 'No gas estimate available'}</h3>
+          <h3>Slippage: {result.quote.slippage}%</h3>
+          {result.approval && <h3>Approval Gas Estimate: {showGasEstimate(result.approval)}</h3>}
+          <h3>Swap Gas estimate: {showGasEstimate(result.swap)}</h3>
             <>
               <button
                 className="disabled:opacity-50 mt-2 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
@@ -189,6 +190,8 @@ export function Example() {
     </div>
   );
 }
+
+const showGasEstimate = (txn: TransactionDetails) => txn.gasFeeEstimate ? `${ethers.utils.formatEther(txn.gasFeeEstimate.value)} IMX` : 'No gas estimate available';
 
 const ErrorMessage = ({ message }: { message: string }) => {
   return (

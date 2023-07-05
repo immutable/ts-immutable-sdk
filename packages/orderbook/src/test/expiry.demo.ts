@@ -55,7 +55,7 @@ describe('', () => {
       zoneContractAddress: config.zoneContractAddress,
       overrides: {
         apiEndpoint: config.apiUrl,
-        chainName: 'imtbl-zkevm-devnet-5',
+        chainName: 'imtbl-zkevm-devnet',
       },
     });
 

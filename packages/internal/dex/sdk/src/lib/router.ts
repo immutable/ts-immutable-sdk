@@ -1,14 +1,14 @@
 import { ethers } from 'ethers';
 import {
-  Currency, CurrencyAmount, Token, TradeType,
+  Currency, CurrencyAmount, TradeType,
 } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import JSBI from 'jsbi';
 import { NoRoutesAvailableError } from 'errors';
+import { TokenInfo } from 'types';
 import { poolEquals } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
-import { QuoteResponse } from '../types';
 import { ERC20Pair } from './poolUtils/generateERC20Pairs';
 import { Multicall, Multicall__factory } from '../contracts/types';
 
@@ -19,16 +19,30 @@ export type RoutingContracts = {
   peripheryRouterAddress: string;
 };
 
+export type QuoteTradeInfo = {
+  route: Route<Currency, Currency>;
+  amountIn: ethers.BigNumber;
+  tokenIn: Currency;
+  amountOut: ethers.BigNumber;
+  tokenOut: Currency;
+  tradeType: TradeType;
+  gasEstimate: ethers.BigNumber
+};
+
+export type QuoteResponse = {
+  trade: QuoteTradeInfo;
+};
+
 export class Router {
   public provider: ethers.providers.JsonRpcProvider;
 
-  public routingTokens: Token[];
+  public routingTokens: TokenInfo[];
 
   public routingContracts: RoutingContracts;
 
   constructor(
     provider: ethers.providers.JsonRpcProvider,
-    routingTokens: Token[],
+    routingTokens: TokenInfo[],
     routingContracts: RoutingContracts,
   ) {
     this.provider = provider;
@@ -94,11 +108,6 @@ export class Router {
       tradeType,
     );
 
-    const noQuoteAvailable = bestQuoteForRoute === undefined;
-    if (noQuoteAvailable) {
-      throw new NoRoutesAvailableError();
-    }
-
     const { amountIn } = bestQuoteForRoute;
     const { amountOut } = bestQuoteForRoute;
     const amountInWei = ethers.BigNumber.from(
@@ -121,8 +130,6 @@ export class Router {
     };
   }
 
-  // TODO: Fix consistent return
-  // eslint-disable-next-line consistent-return
   public async getBestQuoteFromRoutes(
     multicallContract: Multicall,
     routes: Route<Currency, Currency>[],
@@ -135,9 +142,7 @@ export class Router {
       amountIn: CurrencyAmount<Currency>;
       amountOut: CurrencyAmount<Currency>;
       gasEstimate: ethers.BigNumber
-    }
-    | undefined
-    > {
+    }> {
     const quotes = await getQuotesForRoutes(
       multicallContract,
       this.routingContracts.quoterAddress,
@@ -178,6 +183,8 @@ export class Router {
         gasEstimate: bestQuote.gasEstimate,
       };
     }
+
+    throw new Error('Invalid trade type');
   }
 
   // eslint-disable-next-line class-methods-use-this

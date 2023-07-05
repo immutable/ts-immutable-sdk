@@ -2,21 +2,21 @@ import {
   BridgeConfiguration,
   ETH_MAINNET_TO_ZKEVM_MAINNET,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
   TokenBridge,
 } from '@imtbl/bridge-sdk';
-import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
 import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { ChainId } from '../types';
+import { ChainId, DexConfig } from '../types';
 import { CheckoutConfiguration } from '../config';
-import { DexConfig } from '../config/remoteConfigType';
 
 export async function createBridgeInstance(
   fromChainId: ChainId,
   toChainId: ChainId,
   readOnlyProviders: Map<ChainId, ethers.providers.JsonRpcProvider>,
-  environment: Environment,
+  config: CheckoutConfiguration,
 ): Promise<TokenBridge> {
   const rootChainProvider = readOnlyProviders.get(fromChainId);
   const childChainProvider = readOnlyProviders.get(toChainId);
@@ -34,15 +34,13 @@ export async function createBridgeInstance(
     );
   }
 
-  const bridgeConfig = new BridgeConfiguration({
-    baseConfig: new ImmutableConfiguration({
-      environment,
-    }),
-    bridgeInstance:
-      environment === Environment.PRODUCTION
-        ? ETH_MAINNET_TO_ZKEVM_MAINNET
-        : ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  let bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_TESTNET;
+  if (config.isDevelopment) bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_DEVNET;
+  if (config.isProduction) bridgeInstance = ETH_MAINNET_TO_ZKEVM_MAINNET;
 
+  const bridgeConfig = new BridgeConfiguration({
+    baseConfig: new ImmutableConfiguration({ environment: config.environment }),
+    bridgeInstance,
     rootProvider: rootChainProvider,
     childProvider: childChainProvider,
   });
@@ -54,7 +52,9 @@ export async function createExchangeInstance(
   chainId: ChainId,
   config: CheckoutConfiguration,
 ): Promise<Exchange> {
-  const dexConfig = (await config.remoteConfigFetcher.get('dex')) as DexConfig;
+  const dexConfig = (await config.remote.getConfig(
+    'dex',
+  )) as DexConfig;
 
   return new Exchange(
     new ExchangeConfiguration({

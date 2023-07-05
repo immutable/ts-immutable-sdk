@@ -1,6 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import { sendTransaction } from './transaction';
+import { ChainId } from '../types';
 
 describe('transaction', () => {
   it('should send the transaction and return success', async () => {
@@ -23,7 +24,7 @@ describe('transaction', () => {
       from: '0x234',
       value: '100',
       data: 'data',
-      chainId: 1,
+      chainId: ChainId.ETHEREUM,
     };
 
     await expect(sendTransaction(mockProvider, transaction)).resolves.toEqual({
@@ -48,7 +49,7 @@ describe('transaction', () => {
       from: '0x234',
       value: '100',
       data: 'data',
-      chainId: 1,
+      chainId: ChainId.ETHEREUM,
     };
 
     await expect(sendTransaction(mockProvider, transaction)).rejects.toThrow(
