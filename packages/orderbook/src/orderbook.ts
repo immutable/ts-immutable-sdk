@@ -11,6 +11,7 @@ import {
   PrepareListingParams,
   PrepareListingResponse,
 } from 'types';
+import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 
 /**
  * zkEVM orderbook SDK
@@ -41,7 +42,12 @@ export class Orderbook {
       this.config.seaportContractAddress,
     ).create();
 
+    const seaportLibFactory = new SeaportLibFactory(
+      this.config.seaportContractAddress,
+      this.config.provider,
+    );
     this.seaport = new Seaport(
+      seaportLibFactory,
       this.config.provider,
       this.config.seaportContractAddress,
       this.config.zoneContractAddress,

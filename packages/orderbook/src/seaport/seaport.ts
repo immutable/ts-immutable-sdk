@@ -14,11 +14,13 @@ import {
   EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME,
 } from './constants';
 import { getOrderComponentsFromMessage } from './components';
+import { SeaportLibFactory, SeaportVersion } from './seaport-lib-factory';
 import { prepareTransaction } from './transaction';
 import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';
 
 export class Seaport {
   constructor(
+    private seaportLibFactory: SeaportLibFactory,
     private provider: providers.JsonRpcProvider,
     private seaportContractAddress: string,
     private zoneContractAddress: string,
@@ -116,14 +118,6 @@ export class Seaport {
     return prepareTransaction(cancellationTransaction);
   }
 
-  private static mapImmutableOrderToSeaportVersion(order?: Order) {
-    if (order?.protocol_data?.seaport_version === SEAPORT_CONTRACT_VERSION_V1_5) {
-      return SEAPORT_CONTRACT_VERSION_V1_5;
-    }
-
-    return SEAPORT_CONTRACT_VERSION_V1_4;
-  }
-
   private mapImmutableOrderToSeaportOrderComponents(order: Order): OrderComponents {
     const orderCounter = order.protocol_data.counter;
     return mapImmutableOrderToSeaportOrderComponents(
@@ -191,12 +185,12 @@ export class Seaport {
 
   private getSeaportLib(order?: Order): SeaportLib {
     const seaportAddress = order?.protocol_data?.seaport_address ?? this.seaportContractAddress;
-    return new SeaportLib(this.provider, {
-      seaportVersion: Seaport.mapImmutableOrderToSeaportVersion(order),
-      balanceAndApprovalChecksOnOrderCreation: true,
-      overrides: {
-        contractAddress: seaportAddress,
-      },
-    });
+
+    let seaportVersion: SeaportVersion = SEAPORT_CONTRACT_VERSION_V1_4;
+    if (order?.protocol_data?.seaport_version === SEAPORT_CONTRACT_VERSION_V1_5) {
+      seaportVersion = SEAPORT_CONTRACT_VERSION_V1_5;
+    }
+
+    return this.seaportLibFactory.create(seaportVersion, seaportAddress);
   }
 }
