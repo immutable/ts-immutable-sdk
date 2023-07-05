@@ -29,8 +29,8 @@ describe('MoveInProgress View', () => {
             wait: () => ({ status: 1 }),
           } as unknown as TransactionResponse}
           bridgeForm={{
-            tokenAddress: '',
-            amount: '',
+            fromContractAddress: '',
+            fromAmount: '',
           }}
         />
       </BridgeWidgetTestComponent>,
@@ -66,8 +66,8 @@ describe('MoveInProgress View', () => {
             wait: () => ({ status: 1, transactionHash: 'txnHash' }),
           } as unknown as TransactionResponse}
           bridgeForm={{
-            tokenAddress: '',
-            amount: '',
+            fromContractAddress: '',
+            fromAmount: '',
           }}
         />
       </BridgeWidgetTestComponent>,
@@ -107,8 +107,8 @@ describe('MoveInProgress View', () => {
             wait: () => ({ status: 0 }),
           } as unknown as TransactionResponse}
           bridgeForm={{
-            tokenAddress: '',
-            amount: '',
+            fromContractAddress: '',
+            fromAmount: '',
           }}
         />
       </BridgeWidgetTestComponent>,

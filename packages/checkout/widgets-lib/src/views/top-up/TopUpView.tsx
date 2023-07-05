@@ -156,7 +156,13 @@ export function TopUpView({
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: BridgeWidgetViews.BRIDGE },
+          view: {
+            type: BridgeWidgetViews.BRIDGE,
+            data: {
+              fromContractAddress: '',
+              fromAmount: '',
+            },
+          },
         },
       });
       return;

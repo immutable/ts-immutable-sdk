@@ -1,5 +1,8 @@
 import { TransactionResponse } from '@ethersproject/providers';
-import { ApproveBridgeResponse, BridgeDepositResponse } from '@imtbl/bridge-sdk';
+import {
+  ApproveBridgeResponse,
+  BridgeDepositResponse,
+} from '@imtbl/bridge-sdk';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 
 export enum BridgeWidgetViews {
@@ -24,20 +27,20 @@ interface BridgeView {
 }
 
 export interface PrefilledBridgeForm {
-  amount: string;
-  tokenAddress: string;
+  fromAmount: string;
+  fromContractAddress: string;
 }
 
 export interface BridgeSuccessView {
-  type: BridgeWidgetViews.SUCCESS,
+  type: BridgeWidgetViews.SUCCESS;
   data: {
     transactionHash: string;
-  }
+  };
 }
 
 interface BridgeApproveERC20View {
-  type: BridgeWidgetViews.APPROVE_ERC20,
-  data: ApproveERC20BridgeData
+  type: BridgeWidgetViews.APPROVE_ERC20;
+  data: ApproveERC20BridgeData;
 }
 
 interface BridgeFailView {
