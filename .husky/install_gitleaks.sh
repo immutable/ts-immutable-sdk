@@ -13,7 +13,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
     if command -v brew &> /dev/null; then
         brew install gitleaks
         exit 0
-    else    
+    else
     echo "Homebrew not installed! Please install homebrew and try again"
     echo "run the following command in your terminal"
     echo "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
@@ -21,8 +21,9 @@ if [[ "$(uname)" == "Darwin" ]]; then
     fi
 elif [[ "$(uname)" == "Linux" ]]; then
     # Commands for Linux
-    echo "Running on Linux"
-    sudo apt install gitleaks
+#    echo "Running on Linux"
+#    does not exist in apt
+#    sudo apt install gitleaks
     exit 0
 else
     echo "Please install gitleaks manually"
