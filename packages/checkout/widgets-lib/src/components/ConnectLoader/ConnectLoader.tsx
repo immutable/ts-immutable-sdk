@@ -115,6 +115,7 @@ export function ConnectLoader({
             walletProvider,
           });
           setWeb3Provider(provider);
+          return;
         }
 
         if (!web3Provider) {
