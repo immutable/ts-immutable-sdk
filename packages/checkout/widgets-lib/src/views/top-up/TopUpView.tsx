@@ -135,7 +135,7 @@ export function TopUpView({
           view: {
             type: SwapWidgetViews.SWAP,
             data: {
-              toContractAddress: tokenAddress ?? '',
+              toContractAddress: '',
               fromAmount: '',
               fromContractAddress: '',
             },
@@ -223,7 +223,7 @@ export function TopUpView({
     <SimpleLayout
       header={(
         <HeaderNavigation
-          onBackButtonClick={onBackButtonClick ?? undefined}
+          onBackButtonClick={onBackButtonClick}
           onCloseButtonClick={onCloseButtonClick}
           showBack
         />

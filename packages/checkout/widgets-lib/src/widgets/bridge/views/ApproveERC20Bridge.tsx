@@ -61,11 +61,7 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
   const goBackWithSwapData = useCallback(() => {
     viewDispatch({
       payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: BridgeWidgetViews.BRIDGE,
-          data: data.bridgeFormInfo as PrefilledBridgeForm,
-        },
+        type: ViewActions.GO_BACK,
       },
     });
   }, [viewDispatch]);

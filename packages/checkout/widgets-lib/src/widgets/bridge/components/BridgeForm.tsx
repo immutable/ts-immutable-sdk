@@ -358,6 +358,10 @@ export function BridgeForm(props: BridgeFormProps) {
                 },
               },
             },
+            currentViewData: {
+              tokenAddress: token.token?.address ?? '',
+              amount,
+            },
           },
         });
         return;

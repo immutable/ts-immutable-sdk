@@ -289,5 +289,16 @@ export const text = {
         cancel: 'Dismiss',
       },
     },
+    notEnoughImx: {
+      content: {
+        heading: "You'll need more IMX coins",
+        body: "In order to cover the fees for the amount specified, you'll need to add more IMX coins",
+      },
+      buttons: {
+        adjustAmount: 'Adjust amount',
+        addMoreImx: 'Add IMX Coins',
+        cancel: 'Dismiss',
+      },
+    },
   },
 };

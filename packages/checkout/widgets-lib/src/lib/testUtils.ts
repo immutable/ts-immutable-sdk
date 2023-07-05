@@ -65,7 +65,7 @@ export const cyIntercept = (overrides?: {
         rpcURL: 'https://zkevm-rpc.dev.x.immutable.com/',
         commonRoutingTokens: [
           {
-            chainId: 11155111,
+            chainId: ChainId.SEPOLIA,
             address: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE',
             decimals: 18,
             symbol: 'FUN',
