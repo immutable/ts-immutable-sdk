@@ -89,6 +89,10 @@ export default [
     },
     plugins: [
       typescript(),
+      replace({
+        preventAssignment: true,
+        __SDK_VERSION__: pkg.version,
+      }),
       nodeResolve({
         resolveOnly: getPackages(),
       }),
