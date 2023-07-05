@@ -23,7 +23,11 @@ export function validateAndBuildVersion(
     || version.minor === undefined
     || version.patch === undefined
     || version.prerelease === undefined
-  ) return defaultPackageVersion;
+  ) {
+    // eslint-disable-next-line
+    console.warn('major, minor, patch, prerelease are required');
+    return defaultPackageVersion;
+  }
 
   if (version.major < 0) return defaultPackageVersion;
   if (version.minor < 0) return defaultPackageVersion;
