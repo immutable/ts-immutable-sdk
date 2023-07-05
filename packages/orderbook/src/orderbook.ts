@@ -1,5 +1,6 @@
+import { ModuleConfiguration } from '@imtbl/config';
 import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
-import { OrderbookModuleConfiguration } from 'config/config';
+import { OrderbookOverrides, getOrderbookConfig } from 'config/config';
 import { ERC721Factory } from 'erc721';
 import { ListingResult, ListListingsResult, OrderStatus } from 'openapi/sdk';
 import { Seaport, SeaportFactory } from 'seaport';
@@ -22,9 +23,10 @@ export class Orderbook {
 
   private seaport: Seaport;
 
-  constructor(private config: OrderbookModuleConfiguration) {
-    // TODO: Move endpoint lookup to a map based on env. Just using override to get dev started
-    const apiEndpoint = config.overrides?.apiEndpoint;
+  constructor(private config: ModuleConfiguration<OrderbookOverrides>) {
+    const orderbookConfig = getOrderbookConfig(config.overrides?.chainName);
+
+    const apiEndpoint = orderbookConfig?.apiEndpoint;
     if (!apiEndpoint) {
       throw new Error('API endpoint must be provided as an override');
     }
@@ -38,13 +40,13 @@ export class Orderbook {
     this.apiClient = new ImmutableApiClientFactory(
       apiEndpoint,
       chainName,
-      this.config.seaportContractAddress,
+      orderbookConfig.seaportContractAddress,
     ).create();
 
     this.seaport = new SeaportFactory(
-      this.config.seaportContractAddress,
-      this.config.zoneContractAddress,
-      this.config.provider,
+      orderbookConfig.seaportContractAddress,
+      orderbookConfig.zoneContractAddress,
+      orderbookConfig.provider,
     ).create();
   }
 
@@ -83,9 +85,10 @@ export class Orderbook {
     buy,
     orderExpiry,
   }: PrepareListingParams): Promise<PrepareListingResponse> {
+    const orderbookConfig = getOrderbookConfig(this.config.overrides?.chainName);
     const erc721 = new ERC721Factory(
       sell.contractAddress,
-      this.config.provider,
+      orderbookConfig!.provider,
     ).create();
     const royaltyInfo = await erc721.royaltyInfo(
       sell.tokenId,
