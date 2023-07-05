@@ -11,7 +11,7 @@ import {
 } from '@imtbl/core-sdk';
 import { convertToSignableToken } from '@imtbl/toolkit';
 import * as guardian from '@imtbl/guardian';
-import { retryWithDelay } from '../retry';
+import { retryWithDelay } from '../../network/retry';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { ConfirmationScreen, TransactionTypes } from '../../confirmation';
 import { UserImx } from '../../types';

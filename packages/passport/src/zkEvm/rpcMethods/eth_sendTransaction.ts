@@ -7,7 +7,7 @@ import { getNonce, getSignedSequenceTransactions } from '../sequence';
 import { Transaction } from '../types';
 import { EthMethodWithAuthParams } from './types';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
-import { poll } from '../../network/poll';
+import { retryWithDelay } from '../../network/retry';
 
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
@@ -75,15 +75,18 @@ export const ethSendTransaction = async ({
 
   const relayerId = await relayerAdapter.ethSendTransaction(transactionRequest.to, signedTransactions);
 
-  const relayerTransaction = await poll(
-    MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES,
-    TRANSACTION_HASH_RETRIEVAL_WAIT,
-    (tx) => tx.status !== 'PENDING',
-    () => relayerAdapter.imGetTransactionByHash(relayerId),
-  );
-  if (relayerTransaction === undefined) {
-    throw new JsonRpcError(RpcErrorCode.RPC_SERVER_ERROR, 'transaction hash not generated in time');
-  }
+  const relayerTransaction = await retryWithDelay(async () => {
+    const tx = await relayerAdapter.imGetTransactionByHash(relayerId);
+    if (tx.status === 'PENDING') {
+      throw new Error();
+    }
+
+    return tx;
+  }, {
+    retries: MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES,
+    interval: TRANSACTION_HASH_RETRIEVAL_WAIT,
+    finalErr: new JsonRpcError(RpcErrorCode.RPC_SERVER_ERROR, 'transaction hash not generated in time'),
+  });
 
   return relayerTransaction.hash;
 };
