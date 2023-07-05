@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { Exchange, SupportedChainIdsForEnvironment } from '@imtbl/dex-sdk';
+import { Exchange, SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT } from '@imtbl/dex-sdk';
 import { ethers } from 'ethers';
 import { TokenBridge } from '@imtbl/bridge-sdk';
 import { ChainId } from '../types';
@@ -83,10 +83,11 @@ describe('instance', () => {
   describe('createExchangeInstance', () => {
     it('should create an instance of Exchange', async () => {
       const chainId = Object.keys(
-        SupportedChainIdsForEnvironment[config.environment],
+        SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT[config.environment],
       )[0] as unknown as number;
       const exchange = await createExchangeInstance(
-        SupportedChainIdsForEnvironment[config.environment][chainId].chainId,
+        SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT[config.environment][chainId]
+          .chainId,
         config,
       );
       expect(exchange).toBeInstanceOf(Exchange);
