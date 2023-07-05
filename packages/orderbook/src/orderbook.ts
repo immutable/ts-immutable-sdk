@@ -2,7 +2,7 @@ import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
 import { OrderbookModuleConfiguration } from 'config/config';
 import { ERC721Factory } from 'erc721';
 import { ListingResult, ListListingsResult, OrderStatus } from 'openapi/sdk';
-import { Seaport, SeaportFactory } from 'seaport';
+import { Seaport } from 'seaport';
 import {
   CancelOrderResponse,
   CreateListingParams,
@@ -41,11 +41,11 @@ export class Orderbook {
       this.config.seaportContractAddress,
     ).create();
 
-    this.seaport = new SeaportFactory(
+    this.seaport = new Seaport(
+      this.config.provider,
       this.config.seaportContractAddress,
       this.config.zoneContractAddress,
-      this.config.provider,
-    ).create();
+    );
   }
 
   /**
