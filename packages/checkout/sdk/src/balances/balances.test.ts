@@ -23,7 +23,9 @@ jest.mock('ethers', () => ({
 }));
 
 describe('balances', () => {
-  const testCheckoutConfig = new CheckoutConfiguration({ baseConfig: { environment: Environment.PRODUCTION } });
+  const testCheckoutConfig = new CheckoutConfiguration({
+    baseConfig: { environment: Environment.PRODUCTION },
+  });
   const currentBalance = BigNumber.from('1000000000000000000');
   const formattedBalance = '1.0';
   const mockGetBalance = jest.fn().mockResolvedValue(currentBalance);
@@ -44,10 +46,12 @@ describe('balances', () => {
     } as NetworkInfo),
   }));
 
-  const mockProvider = jest.fn().mockImplementation(() => ({
-    getBalance: mockGetBalance,
-    getNetwork: mockGetNetwork,
-  } as unknown as Web3Provider));
+  const mockProvider = jest.fn().mockImplementation(
+    () => ({
+      getBalance: mockGetBalance,
+      getNetwork: mockGetNetwork,
+    } as unknown as Web3Provider),
+  );
 
   describe('getBalance()', () => {
     it('should call getBalance() on provider and return the balance', async () => {
@@ -61,16 +65,16 @@ describe('balances', () => {
     });
 
     it('should catch an error from getBalance() and throw a CheckoutError of type BalanceError', async () => {
-      // TODO: fix variable shadowing
-      // eslint-disable-next-line @typescript-eslint/no-shadow
-      const mockProvider = jest.fn().mockImplementation(() => ({
+      const mockWeb3Provider = jest.fn().mockImplementation(() => ({
         getBalance: jest
           .fn()
           .mockRejectedValue(new Error('Error getting balance')),
         getNetwork: mockGetNetwork,
       }));
 
-      await expect(getBalance(testCheckoutConfig, mockProvider(), '0xAddress')).rejects.toThrow(
+      await expect(
+        getBalance(testCheckoutConfig, mockWeb3Provider(), '0xAddress'),
+      ).rejects.toThrow(
         new CheckoutError(
           '[GET_BALANCE_ERROR] Cause:Error getting balance',
           CheckoutErrorType.GET_BALANCE_ERROR,
@@ -78,29 +82,26 @@ describe('balances', () => {
       );
     });
 
-    it(
-      'should throw a CheckoutError of type BalanceError with the right message if the current network is unsupported',
-      async () => {
-      // TODO: fix variable shadowing
-      // eslint-disable-next-line @typescript-eslint/no-shadow
-        const mockProvider = jest.fn().mockImplementation(() => ({
-          getBalance: jest
-            .fn()
-            .mockRejectedValue(new Error('Error getting balance')),
-          getNetwork: jest.fn().mockResolvedValue({
-            chainId: 0,
-            name: 'homestead',
-          }),
-        }));
+    it('should throw a CheckoutError of type BalanceError with the right message unsupported network', async () => {
+      const mockWeb3Provider = jest.fn().mockImplementation(() => ({
+        getBalance: jest
+          .fn()
+          .mockRejectedValue(new Error('Error getting balance')),
+        getNetwork: jest.fn().mockResolvedValue({
+          chainId: 0,
+          name: 'homestead',
+        }),
+      }));
 
-        await expect(getBalance(testCheckoutConfig, mockProvider(), '0xAddress')).rejects.toThrow(
-          new CheckoutError(
-            '[GET_BALANCE_ERROR] Cause:Chain:0 is not a supported chain',
-            CheckoutErrorType.GET_BALANCE_ERROR,
-          ),
-        );
-      },
-    );
+      await expect(
+        getBalance(testCheckoutConfig, mockWeb3Provider(), '0xAddress'),
+      ).rejects.toThrow(
+        new CheckoutError(
+          '[GET_BALANCE_ERROR] Cause:Chain:0 is not a supported chain',
+          CheckoutErrorType.GET_BALANCE_ERROR,
+        ),
+      );
+    });
   });
 
   describe('getERC20Balance()', () => {
@@ -180,8 +181,8 @@ describe('balances', () => {
         getERC20Balance(mockProvider(), 'abc123', '0x10c'),
       ).rejects.toThrow(
         new CheckoutError(
-          // eslint-disable-next-line max-len
-          '[GET_ERC20_BALANCE_ERROR] Cause:invalid contract address or ENS name (argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)',
+          '[GET_ERC20_BALANCE_ERROR] Cause:invalid contract address or ENS name '
+            + '(argument="addressOrName", value=undefined, code=INVALID_ARGUMENT, version=contracts/5.7.0)',
           CheckoutErrorType.GET_ERC20_BALANCE_ERROR,
         ),
       );
@@ -194,12 +195,6 @@ describe('balances', () => {
     let decimalsMock: jest.Mock;
     let nameMock: jest.Mock;
     let symbolMock: jest.Mock;
-
-    // TODO fix variable shadowing
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    let mockGetBalance: jest.Mock;
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    let mockGetNetwork: jest.Mock;
 
     let getTokenAllowListMock: jest.Mock;
 
@@ -225,19 +220,15 @@ describe('balances', () => {
         getTokenAllowListMock,
       );
 
-      mockGetBalance = jest.fn().mockResolvedValue(currentBalance);
-
-      mockGetNetwork = jest
-        .fn()
-        .mockResolvedValue({ chainId: ChainId.ETHEREUM, name: 'homestead' });
-
-      mockProviderForAllBalances = jest.fn().mockImplementation(() => ({
-        getBalance: mockGetBalance,
-        getNetwork: mockGetNetwork,
-        provider: {
-          request: jest.fn(),
-        },
-      } as unknown as Web3Provider));
+      mockProviderForAllBalances = jest.fn().mockImplementation(
+        () => ({
+          getBalance: mockGetBalance,
+          getNetwork: mockGetNetwork,
+          provider: {
+            request: jest.fn(),
+          },
+        } as unknown as Web3Provider),
+      );
 
       balanceOfMock = jest.fn().mockResolvedValue(currentBalance);
       decimalsMock = jest.fn().mockResolvedValue(18);
