@@ -145,9 +145,9 @@ export function TopUpView({
       return;
     }
     orchestrationEvents.sendRequestSwapEvent(widgetEvent, {
-      fromTokenAddress: tokenAddress ?? '',
-      toTokenAddress: '',
-      amount: amount ?? '',
+      fromTokenAddress: '',
+      toTokenAddress: tokenAddress ?? '',
+      amount: '',
     });
   };
 
