@@ -1,35 +1,22 @@
 import {
   GetWalletAllowListParams,
   GetWalletAllowListResult,
-  WalletFilterTypes,
-  WalletInfo,
   WalletProviderName,
 } from '../types';
-import masterWalletList from './wallet_master_list.json';
 
-export async function getWalletAllowList({
-  type = WalletFilterTypes.ALL,
-  exclude,
-}: GetWalletAllowListParams): Promise<GetWalletAllowListResult> {
-  // todo:For async API call, use the CheckoutError with errorType:API_CALL_ERROR?? or any other
-
-  const filteredWalletsList = masterWalletList
-    .filter((wallet) => {
-      const walletNotExcluded = !exclude
-        ?.map((excludeWallet) => excludeWallet.walletProvider)
-        .includes(wallet.walletProvider as WalletProviderName);
-
-      const allowAllWallets = type === WalletFilterTypes.ALL;
-      const walletsAllowedForType = wallet.platform.includes(type);
-
-      return walletNotExcluded && (allowAllWallets || walletsAllowedForType);
-    })
-    .map((wallet) => {
-      const { platform, ...walletInfo } = wallet;
-      return walletInfo as WalletInfo;
-    });
-
+export async function getWalletAllowList(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  params: GetWalletAllowListParams,
+): Promise<GetWalletAllowListResult> {
   return {
-    wallets: filteredWalletsList,
+    wallets: [
+      {
+        walletProvider: WalletProviderName.METAMASK,
+        name: WalletProviderName.METAMASK,
+        description:
+          'MetaMask is a browser extension that allows you to manage your Ethereum accounts and private keys.',
+        icon: '',
+      },
+    ],
   };
 }

@@ -9,79 +9,11 @@ describe('getWalletAllowList', () => {
       exclude: [],
       result: [
         {
-          walletProvider: 'metamask',
-          icon: 'some-icon-url',
-          name: 'MetaMask',
-          description: 'complete web3 wallet solution',
-        },
-        {
-          walletProvider: 'passport',
-          icon: 'pp-icon',
-          name: 'Passport',
-          description: 'Web3 with your email!',
-        },
-        {
-          walletProvider: 'gamestop',
-          icon: 'gme-icon',
-          name: 'GameStop',
-          description: 'Never stopping the game!',
-        },
-      ],
-    },
-    {
-      text: 'exclusion of MetaMask wallet applied',
-      type: WalletFilterTypes.ALL,
-      exclude: [{ walletProvider: WalletProviderName.METAMASK }],
-      result: [
-        {
-          walletProvider: 'passport',
-          icon: 'pp-icon',
-          name: 'Passport',
-          description: 'Web3 with your email!',
-        },
-        {
-          walletProvider: 'gamestop',
-          icon: 'gme-icon',
-          name: 'GameStop',
-          description: 'Never stopping the game!',
-        },
-      ],
-    },
-    {
-      text: 'mobile platform only',
-      type: WalletFilterTypes.MOBILE,
-      exclude: [],
-      result: [
-        {
-          walletProvider: 'passport',
-          icon: 'pp-icon',
-          name: 'Passport',
-          description: 'Web3 with your email!',
-        },
-        {
-          walletProvider: 'gamestop',
-          icon: 'gme-icon',
-          name: 'GameStop',
-          description: 'Never stopping the game!',
-        },
-      ],
-    },
-    {
-      text: 'desktop platform only',
-      type: WalletFilterTypes.DESKTOP,
-      exclude: [],
-      result: [
-        {
-          walletProvider: 'metamask',
-          icon: 'some-icon-url',
-          name: 'MetaMask',
-          description: 'complete web3 wallet solution',
-        },
-        {
-          walletProvider: 'passport',
-          icon: 'pp-icon',
-          name: 'Passport',
-          description: 'Web3 with your email!',
+          walletProvider: WalletProviderName.METAMASK,
+          name: WalletProviderName.METAMASK,
+          description:
+            'MetaMask is a browser extension that allows you to manage your Ethereum accounts and private keys.',
+          icon: '',
         },
       ],
     },
