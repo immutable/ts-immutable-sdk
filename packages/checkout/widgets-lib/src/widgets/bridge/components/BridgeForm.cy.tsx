@@ -168,7 +168,7 @@ describe('Bridge Form', () => {
       >
         <BridgeForm
           testId="bridge-form"
-          defaultTokenAddress="0xF57E7E7c23978c3caec3c3548e3d615c346e79Ff"
+          defaultFromContractAddress="0xF57E7E7c23978c3caec3c3548e3d615c346e79Ff"
           defaultAmount="10"
         />
       </BridgeWidgetTestComponent>,
@@ -407,7 +407,7 @@ describe('Bridge Form', () => {
             <BridgeForm
               testId="bridge-form"
               defaultAmount="0.1"
-              defaultTokenAddress={imxAddress}
+              defaultFromContractAddress={imxAddress}
             />
           </BridgeWidgetTestComponent>,
         );

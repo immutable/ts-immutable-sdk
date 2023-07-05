@@ -36,7 +36,7 @@ import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 interface BridgeFormProps {
   testId?: string;
   defaultAmount?: string;
-  defaultTokenAddress?: string;
+  defaultFromContractAddress?: string;
 }
 
 export function BridgeForm(props: BridgeFormProps) {
@@ -52,7 +52,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
-  const { testId, defaultAmount, defaultTokenAddress } = props;
+  const { testId, defaultAmount, defaultFromContractAddress } = props;
   const { content, bridgeForm, fees } = text.views[BridgeWidgetViews.BRIDGE];
 
   // Form state
@@ -117,14 +117,16 @@ export function BridgeForm(props: BridgeFormProps) {
 
     if (!hasSetDefaultState.current) {
       hasSetDefaultState.current = true;
-      if (defaultTokenAddress) {
-        setToken(tokenBalances.find((b) => b.token.address?.toLowerCase() === defaultTokenAddress?.toLowerCase()));
+      if (defaultFromContractAddress) {
+        setToken(tokenBalances.find(
+          (b) => b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase(),
+        ));
       }
     }
   }, [
     tokenBalances,
     cryptoFiatState.conversions,
-    defaultTokenAddress,
+    defaultFromContractAddress,
     hasSetDefaultState.current,
     setToken,
     setTokensOptions,
@@ -351,8 +353,8 @@ export function BridgeForm(props: BridgeFormProps) {
                 approveTransaction: approvalTransaction,
                 transaction: unsignedBridgeTransaction,
                 bridgeFormInfo: {
-                  tokenAddress: token.token?.address ?? '',
-                  amount,
+                  fromContractAddress: token.token?.address ?? '',
+                  fromAmount: amount,
                 },
               },
             },
@@ -375,8 +377,8 @@ export function BridgeForm(props: BridgeFormProps) {
               token: token?.token!,
               transactionResponse,
               bridgeForm: {
-                tokenAddress: token?.token.address ?? '',
-                amount,
+                fromContractAddress: token?.token.address ?? '',
+                fromAmount: amount,
               },
             },
           },
@@ -400,8 +402,8 @@ export function BridgeForm(props: BridgeFormProps) {
               type: BridgeWidgetViews.FAIL,
               reason: 'Transaction failed',
               data: {
-                tokenAddress: token?.token.address ?? '',
-                amount,
+                fromContractAddress: token?.token.address ?? '',
+                fromAmount: amount,
               },
             },
           },
