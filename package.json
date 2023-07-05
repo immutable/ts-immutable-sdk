@@ -41,7 +41,7 @@
     "lint:ci": "./lint-ci.sh",
     "postinstall": "husky install; ./.husky/install_gitleaks.sh",
     "release": "release-it",
-    "scan:secrets": "gitleaks protect --staged -v",
+    "scan:secrets": "./.husky/run_gitleaks.sh",
     "syncpack:check": "yarn syncpack list-mismatches",
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
