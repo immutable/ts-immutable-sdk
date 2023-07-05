@@ -23,15 +23,13 @@ export function validateAndBuildVersion(
     || version.minor === undefined
     || version.patch === undefined
     || version.prerelease === undefined
-  ) {
-    // eslint-disable-next-line
-    console.warn('major, minor, patch, prerelease are required');
-    return defaultPackageVersion;
-  }
+  ) return defaultPackageVersion;
 
   if (version.major < 0) return defaultPackageVersion;
   if (version.minor < 0) return defaultPackageVersion;
   if (version.patch < 0) return defaultPackageVersion;
+  if (version.prerelease !== 'alpha') return defaultPackageVersion;
+
   if (version.major === 0 && version.minor === 0 && version.patch === 0) return defaultPackageVersion;
 
   let validatedVersion: string = defaultPackageVersion;
@@ -40,31 +38,20 @@ export function validateAndBuildVersion(
     validatedVersion = version.major.toString();
   }
 
-  if (
-    version.minor !== undefined
-    && !Number.isNaN(version.minor)
-    && version.minor >= 0
-  ) {
+  if (!Number.isNaN(version.minor)) {
     validatedVersion += `.${version.minor.toString()}`;
   }
 
-  if (
-    version.patch !== undefined
-    && !Number.isNaN(version.patch)
-    && version.patch >= 0
-  ) {
-    if (version.minor === undefined) {
-      validatedVersion += `.0.${version.patch.toString()}`;
-    } else {
-      validatedVersion += `.${version.patch.toString()}`;
-    }
+  if (!Number.isNaN(version.patch)) {
+    validatedVersion += `.${version.patch.toString()}`;
   }
 
-  if (version.prerelease !== undefined) {
-    validatedVersion += `-${version.prerelease}`;
-  }
+  // TODO: https://immutable.atlassian.net/browse/WT-1501
+  // Ensure this is gated by `version.prerelease !== undefined`
+  // once we go to prod with checkout.
+  validatedVersion += `-${version.prerelease}`;
 
-  if (version.build !== undefined) {
+  if (version.build !== undefined && version.build > 0) {
     validatedVersion += `.${version.build}`;
   }
 
