@@ -6,8 +6,6 @@ import { globalPackageVersion, isDevMode } from './lib/env';
  * If the version is undefined or has an invalid major version, it returns the default checkout version.
  * If the version is all zeros, it also returns the default checkout version.
  * Otherwise, it constructs a validated version string based on the major, minor, patch, and build numbers.
- * @param {SemanticVersion | undefined} version - The SemanticVersion object to validate and build.
- * @returns {string} - The validated and built version string.
  */
 export function validateAndBuildVersion(
   version: SemanticVersion | undefined,
