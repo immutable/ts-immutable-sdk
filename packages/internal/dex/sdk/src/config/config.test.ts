@@ -150,7 +150,7 @@ describe('ExchangeConfiguration', () => {
         chainId,
         baseConfig: immutableConfig,
         overrides,
-      })).toThrow(new InvalidConfigurationError());
+      })).toThrow(new InvalidConfigurationError('Invalid exchange contract address for multicall'));
     });
   });
 });
