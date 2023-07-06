@@ -27,10 +27,11 @@ export const cyIntercept = (overrides?: {
   },
   cryptoFiatOverrides?: {
     coins?: any[],
-    conversion?: any[],
+    conversion?: Record<string, Record<string, number>>,
   },
 }) => {
-  const checkoutApi = 'https://checkout-api.dev.immutable.com/v1';
+  const checkoutApi = 'https://checkout-api.sandbox.immutable.com/v1';
+  const zkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com/';
   const defaultConfig = {
     allowedNetworks: [
       {
@@ -62,7 +63,7 @@ export const cyIntercept = (overrides?: {
     },
     dex: {
       overrides: {
-        rpcURL: 'https://zkevm-rpc.dev.x.immutable.com/',
+        rpcURL: zkEvmRpcUrl,
         commonRoutingTokens: [
           {
             chainId: ChainId.SEPOLIA,
@@ -75,7 +76,7 @@ export const cyIntercept = (overrides?: {
           multicall: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e',
         },
         nativeToken: {
-          chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           address: '',
           decimals: 18,
         },
@@ -107,5 +108,5 @@ export const cyIntercept = (overrides?: {
     overrides?.cryptoFiatOverrides?.conversion || {},
   );
   cy.intercept(`${checkoutApi}/rpc/eth-sepolia`, {});
-  cy.intercept('https://zkevm-rpc.dev.x.immutable.com/', {});
+  cy.intercept(zkEvmRpcUrl, {});
 };

@@ -4,8 +4,9 @@ import { CryptoFiatConfiguration } from 'config';
 import { CryptoFiatConvertParams, CryptoFiatConvertReturn } from 'types';
 
 const CHECKOUT_API_BASE_URL = {
+  ['development' as Environment]: 'https://checkout-api.dev.immutable.com',
+  [Environment.SANDBOX]: 'https://checkout-api.sandbox.immutable.com',
   // TODO: https://immutable.atlassian.net/browse/WT-1425
-  [Environment.SANDBOX]: 'https://checkout-api.dev.immutable.com',
   [Environment.PRODUCTION]: 'https://checkout-api.sandbox.immutable.com',
 };
 

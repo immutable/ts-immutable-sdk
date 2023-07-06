@@ -72,7 +72,10 @@ describe('SwapForm', () => {
   describe('initial form state', () => {
     it('should show all swap inputs with initial state', () => {
       mount(
-        <SwapWidgetTestComponent>
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
           <SwapForm />
         </SwapWidgetTestComponent>,
       );
@@ -86,6 +89,74 @@ describe('SwapForm', () => {
       cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
       cySmartGet('toTokenInputs-text-form-text').should('be.visible');
       cySmartGet('toTokenInputs-text-form-text__input').should('have.attr', 'placeholder', toText.inputPlaceholder);
+    });
+
+    it('should set native token as from if native token is provided in from address', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapForm data={{
+            fromContractAddress: 'NATIVE',
+          }}
+          />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'ETH');
+    });
+
+    it('should set native token as to if native token is provided in to address', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapForm data={{
+            toContractAddress: 'NATIVE',
+          }}
+          />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'ETH');
+    });
+
+    it('should set from token matching the from token address provided', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapForm data={{
+            fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          }}
+          />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'IMX');
+    });
+
+    it('should set to token matching the to token address provided', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapForm data={{
+            toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          }}
+          />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'IMX');
     });
   });
 
