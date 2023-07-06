@@ -6,12 +6,16 @@ import {
 } from '../types';
 
 export async function getWalletAllowList(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   params: GetWalletAllowListParams,
 ): Promise<GetWalletAllowListResult> {
   const walletList: WalletInfo[] = [];
+  const excludedWalletProvider = params.exclude?.map((wp) => wp.walletProvider) ?? [];
 
-  const walletProviderNames = Object.values(WalletProviderName);
+  let walletProviderNames = Object.values(WalletProviderName);
+  if (excludedWalletProvider.length !== 0) {
+    walletProviderNames = walletProviderNames.filter((wp) => !excludedWalletProvider.includes(wp));
+  }
+
   for (const value of walletProviderNames) {
     walletList.push({
       walletProvider: value,
