@@ -53,6 +53,4 @@ export interface GetWalletAllowListResult {
  */
 export enum WalletFilterTypes {
   ALL = 'all',
-  DESKTOP = 'desktop',
-  MOBILE = 'mobile',
 }
