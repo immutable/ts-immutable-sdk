@@ -1,8 +1,11 @@
 import fs from 'fs';
 import * as glob from 'glob';
 import path from 'path';
+import pkg from '../package.json' assert { type: 'json' };
 
 const dirname = path.dirname(new URL(import.meta.url).pathname);
+
+const SDK_VERSION = '__SDK_VERSION__';
 
 const getFiles = () => {
   // Read the JSON file
@@ -13,20 +16,10 @@ const getFiles = () => {
   return fileList;
 };
 
-// Recursively check if target directory exists
-// If not, create it
-// Then copy the sourceFile to targetFile
-const copyFileSync = (sourceFile, targetFile) => {
-  // Check if target directory exists
-  const targetDir = path.dirname(targetFile);
-  if (!fs.existsSync(targetDir)) {
-    // Create it
-    fs.mkdirSync(targetDir, { recursive: true });
-  }
-
-  // Copy the file
-  fs.copyFileSync(sourceFile, targetFile);
-};
+function findAndReplace(data, find, replace) {
+  if (!data.includes(find)) return data;
+  return data.replace(new RegExp(find, 'g'), replace);
+}
 
 const main = () => {
   const fileList = getFiles();
@@ -47,7 +40,19 @@ const main = () => {
       // Copy each file to its destination location
       files.forEach((sourceFile) => {
         const destPath = path.join(dirname, '..', item.dest);
-        copyFileSync(sourceFile, destPath);
+
+        const directoryPath = path.dirname(destPath);
+        if (!fs.existsSync(directoryPath)) {
+          fs.mkdirSync(directoryPath, { recursive: true });
+        }
+
+        let data = fs.readFileSync(sourceFile, 'utf-8');
+
+        data = findAndReplace(data, SDK_VERSION, pkg.version);
+        // Add more findAndReplace if and when needed
+        // data = findAndReplace(data, <find>, <replace>);
+
+        fs.writeFileSync(destPath, data);
       });
     }
   });
