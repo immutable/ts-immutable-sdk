@@ -1,8 +1,10 @@
-import { Heading } from "@biom3/react";
-import React from "react";
-import { Card, Stack, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
-import { EnvironmentNames, EnvironmentPropsType } from "@/types";
-import { useImmutableProvider } from "@/context/ImmutableProvider";
+import { Heading } from '@biom3/react';
+import React from 'react';
+import {
+  Card, Stack, ToggleButton, ToggleButtonGroup,
+} from 'react-bootstrap';
+import { EnvironmentNames, EnvironmentPropsType } from '@/types';
+import { useImmutableProvider } from '@/context/ImmutableProvider';
 
 function Environment({ disabled }: EnvironmentPropsType) {
   const { environment, setEnvironment } = useImmutableProvider();

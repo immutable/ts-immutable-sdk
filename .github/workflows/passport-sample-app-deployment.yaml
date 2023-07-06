@@ -44,7 +44,10 @@ jobs:
         run: yarn workspace @imtbl/passport build
 
       - name: Build Passport sample app
-        run: yarn workspace @imtbl/passport-sample-app build && yarn workspace @imtbl/passport-sample-app export
+        run: yarn workspace @imtbl/passport-sample-app build
+
+      - name: Export Passport sample app
+        run: yarn workspace @imtbl/passport-sample-app export
 
       - name: Upload to S3
         run: |
@@ -52,5 +55,4 @@ jobs:
 
       - name: Clear the cloudfront cache
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.CF_PASSPORT_PROD_DISTRIBUTION_ID }} --paths "/*"
-          TODO: ADD 
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CF_PASSPORT_PROD_DISTRIBUTION_ID }} --paths "/*" 
