@@ -1,6 +1,11 @@
 name: Passport SDK Sample App Deployment
 
 on:
+  push:
+    paths:
+      - 'packages/passport/**'
+    branches:
+      - main
   workflow_dispatch:
 
 # this is used by github OIDC to assume the admin role later on
