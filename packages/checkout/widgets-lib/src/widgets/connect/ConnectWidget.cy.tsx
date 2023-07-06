@@ -145,8 +145,8 @@ describe('ConnectWidget tests', () => {
       cy.stub(Checkout.prototype, 'getNetworkInfo')
         .as('getNetworkInfoStub')
         .resolves({
-          name: ChainName.IMTBL_ZKEVM_DEVNET,
-          chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+          name: ChainName.IMTBL_ZKEVM_TESTNET,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         });
       mountConnectWidgetAndGoToReadyToConnect();
       cySmartGet('ready-to-connect').should('be.visible');
@@ -182,8 +182,8 @@ describe('ConnectWidget tests', () => {
         .resolves({
           provider: {} as Web3Provider,
           network: {
-            name: ChainName.IMTBL_ZKEVM_DEVNET,
-            chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+            name: ChainName.IMTBL_ZKEVM_TESTNET,
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           },
         });
       mountConnectWidgetAndGoToReadyToConnect();

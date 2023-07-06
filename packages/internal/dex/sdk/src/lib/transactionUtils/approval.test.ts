@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
-import { TEST_FROM_ADDRESS, TEST_PERIPHERY_ROUTER_ADDRESS, WETH_TEST_CHAIN } from 'utils/testUtils';
+import { TEST_FROM_ADDRESS, TEST_PERIPHERY_ROUTER_ADDRESS, WETH_TEST_TOKEN } from 'utils/testUtils';
 import { Contract } from '@ethersproject/contracts';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError } from 'errors';
@@ -48,7 +48,7 @@ describe('getApprovalTransaction', () => {
       const result = await getApproveTransaction(
         provider,
         TEST_FROM_ADDRESS,
-        WETH_TEST_CHAIN.address,
+        WETH_TEST_TOKEN.address,
         BigNumber.from('100000000000000000'),
         spenderAddress,
       );
@@ -89,14 +89,14 @@ describe('getApprovalTransaction', () => {
       const result = await getApproveTransaction(
         provider,
         TEST_FROM_ADDRESS,
-        WETH_TEST_CHAIN.address,
+        WETH_TEST_TOKEN.address,
         tokenInAmount,
         spenderAddress,
       );
 
       expect(result).not.toBeNull();
       expect(result?.data).not.toBeNull();
-      expect(result?.to).toEqual(WETH_TEST_CHAIN.address);
+      expect(result?.to).toEqual(WETH_TEST_TOKEN.address);
       expect(result?.from).toEqual(TEST_FROM_ADDRESS);
       expect(result?.value).toEqual(0); // we do not want to send any ETH
 
@@ -138,7 +138,7 @@ describe('getApprovalTransaction', () => {
       const result = await getApproveTransaction(
         provider,
         TEST_FROM_ADDRESS,
-        WETH_TEST_CHAIN.address,
+        WETH_TEST_TOKEN.address,
         tokenInAmount,
         spenderAddress,
       );
@@ -179,7 +179,7 @@ describe('getApprovalTransaction', () => {
         await expect(getApproveTransaction(
           provider,
           TEST_FROM_ADDRESS,
-          WETH_TEST_CHAIN.address,
+          WETH_TEST_TOKEN.address,
           tokenInAmount,
           spenderAddress,
         ))
@@ -206,7 +206,7 @@ describe('getApprovalTransaction', () => {
       await expect(() => getApproveTransaction(
         provider,
         spenderAddress,
-        WETH_TEST_CHAIN.address,
+        WETH_TEST_TOKEN.address,
         amount,
         spenderAddress,
       )).rejects.toThrow(new ApproveError('owner and spender addresses are the same'));
@@ -235,7 +235,7 @@ describe('getApproveGasEstimate', () => {
         provider,
         fromAddress,
         spenderAddress,
-        WETH_TEST_CHAIN.address,
+        WETH_TEST_TOKEN.address,
       );
       expect(approveMock).toHaveBeenCalledWith(spenderAddress, ethers.constants.MaxUint256, {
         from: fromAddress,

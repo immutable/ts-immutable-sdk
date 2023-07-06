@@ -1,4 +1,5 @@
 import { Box } from '@biom3/react';
+import { useContext, useMemo } from 'react';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
@@ -6,6 +7,7 @@ import { sendSwapWidgetCloseEvent } from '../SwapWidgetEvents';
 import { text } from '../../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
 import { SwapForm } from '../components/SwapForm';
+import { SharedViews, ViewContext } from '../../../context/view-context/ViewContext';
 
 export interface SwapCoinsProps {
   fromAmount?: string;
@@ -21,11 +23,16 @@ export function SwapCoins({
   toContractAddress,
 }: SwapCoinsProps) {
   const { header } = text.views[SwapWidgetViews.SWAP];
+  const { viewState } = useContext(ViewContext);
+
+  const showBackButton = useMemo(() => viewState.history.length > 2
+  && viewState.history[viewState.history.length - 2].type === SharedViews.TOP_UP_VIEW, [viewState.history]);
 
   return (
     <SimpleLayout
       header={(
         <HeaderNavigation
+          showBack={showBackButton}
           title={header.title}
           onCloseButtonClick={() => sendSwapWidgetCloseEvent()}
         />

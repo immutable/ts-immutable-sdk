@@ -43,7 +43,7 @@ export function mapImmutableOrderToSeaportOrderComponents(
     }
   });
 
-  const fees: ConsiderationItem[] = order.buy_fees.map((fee) => ({
+  const fees: ConsiderationItem[] = order.fees.map((fee) => ({
     startAmount: fee.amount,
     endAmount: fee.amount,
     itemType:

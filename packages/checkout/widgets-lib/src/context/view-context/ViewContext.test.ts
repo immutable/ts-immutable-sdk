@@ -92,6 +92,38 @@ describe('view-context', () => {
     });
   });
 
+  it('should add currentViewData to the existing view before pushing a new view', () => {
+    const state = viewReducer(
+      {
+        view: {
+          type: ConnectWidgetViews.CONNECT_WALLET,
+        },
+        history: [{ type: ConnectWidgetViews.CONNECT_WALLET }],
+      },
+      {
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: ConnectWidgetViews.READY_TO_CONNECT,
+          },
+          currentViewData: {
+            tokenAddress: '0xsomeTestAddress',
+          },
+        },
+      },
+    );
+
+    expect(state).toEqual({
+      view: {
+        type: ConnectWidgetViews.READY_TO_CONNECT,
+      },
+      history: [
+        { type: ConnectWidgetViews.CONNECT_WALLET, data: { tokenAddress: '0xsomeTestAddress' } },
+        { type: ConnectWidgetViews.READY_TO_CONNECT },
+      ],
+    });
+  });
+
   it('should update view to previous history when reducer called with GO_BACK action', () => {
     const state = viewReducer(
       {

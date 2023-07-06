@@ -17,9 +17,9 @@ import { WidgetTheme } from './types';
  */
 export type SemanticVersion = {
   major: number;
-  minor?: number;
-  patch?: number;
-  prerelease?: 'alpha' | 'beta';
+  minor: number;
+  patch: number;
+  prerelease: 'alpha';
   build?: number;
 };
 

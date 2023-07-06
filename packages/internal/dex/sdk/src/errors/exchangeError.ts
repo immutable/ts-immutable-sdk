@@ -4,6 +4,7 @@ import { Environment } from '@imtbl/config';
  * @enum {string} Errors that can be returned by the Exchange.
  */
 export enum ExchangeErrorCode {
+  INVALID_CONFIGURATION = 'INVALID_CONFIGURATION',
   INVALID_SLIPPAGE = 'INVALID_SLIPPAGE',
   INVALID_MAX_HOPS = 'INVALID_MAX_HOPS',
   INVALID_ADDRESS = 'INVALID_ADDRESS',
@@ -38,6 +39,14 @@ export class ExchangeError extends Error {
     super(message);
     this.message = message;
     this.code = code;
+  }
+}
+
+export class InvalidConfigurationError extends ExchangeError {
+  constructor() {
+    const message = 'Invalid configuration';
+
+    super(message, ExchangeErrorCode.INVALID_CONFIGURATION);
   }
 }
 

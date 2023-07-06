@@ -5,9 +5,10 @@ import {
 import {
   Body, Box, Heading, OptionKey,
 } from '@biom3/react';
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
+import { parseEther, parseUnits } from 'ethers/lib/utils';
 import { text } from '../../../resources/text/textConfig';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/SwapContext';
@@ -28,6 +29,8 @@ import { SwapButton } from './SwapButton';
 import { SwapFormData } from './swapFormTypes';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 import { useInterval } from '../../../lib/hooks/useInterval';
+import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
+import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -86,6 +89,7 @@ export function SwapForm({ data }: SwapFromProps) {
   }, []);
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  const { viewDispatch } = useContext(ViewContext);
 
   const [editing, setEditing] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -114,6 +118,7 @@ export function SwapForm({ data }: SwapFromProps) {
   const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
+  const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -295,6 +300,7 @@ export function SwapForm({ data }: SwapFromProps) {
         address: gasToken?.address,
         icon: gasToken?.icon,
       });
+
       setGasFeeFiatValue(calculateCryptoToFiat(
         gasFee,
         gasToken?.symbol || '',
@@ -402,6 +408,27 @@ export function SwapForm({ data }: SwapFromProps) {
       (async () => await fetchQuote())();
     }
   }, [toAmount, toToken, fromToken, editing]);
+
+  // during swaps, having enough IMX to cover the gas fee means
+  // 1. swapping from any token to any token costs IMX - so do a check
+  // 2. If the swap from token is also IMX, include the additional amount into the calc
+  //    as user will need enough imx for the swap amount and the gas
+  const insufficientFundsForGas = useMemo(() => {
+    const imxBalance = tokenBalances
+      .find((balance) => !balance.token.address || balance.token.address === 'NATIVE');
+    if (!imxBalance) {
+      return true;
+    }
+
+    // need to double check if the is going to be how to identify IMX on zkEVM
+    const fromTokenIsImx = !fromToken?.address || fromToken.address === 'NATIVE';
+    const gasAmount = parseEther(gasFeeValue.length !== 0 ? gasFeeValue : '0');
+    const additionalAmount = fromTokenIsImx && !Number.isNaN(parseFloat(fromAmount))
+      ? parseUnits(fromAmount, fromToken?.decimals || 18)
+      : BigNumber.from('0');
+
+    return gasAmount.add(additionalAmount).gt(imxBalance.balance);
+  }, [gasFeeValue, tokenBalances, fromToken, fromAmount]);
 
   // -------------//
   //     FROM     //
@@ -640,6 +667,28 @@ export function SwapForm({ data }: SwapFromProps) {
           fromContractAddress: fromToken?.address,
           toContractAddress: toToken?.address,
         }}
+        insufficientFundsForGas={insufficientFundsForGas}
+        setShowNotEnoughImxDrawer={setShowNotEnoughImxDrawer}
+      />
+      <NotEnoughImx
+        visible={showNotEnoughImxDrawer}
+        showAdjustAmount={!fromToken?.address || fromToken.address === 'NATIVE'}
+        onAddCoinsClick={() => {
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: SharedViews.TOP_UP_VIEW,
+              },
+              currentViewData: {
+                fromContractAddress: fromToken?.address ?? '',
+                fromAmount,
+                toContractAddress: toToken?.address ?? '',
+              },
+            },
+          });
+        }}
+        onCloseBottomSheet={() => setShowNotEnoughImxDrawer(false)}
       />
     </>
   );

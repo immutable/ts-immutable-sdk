@@ -1,53 +1,55 @@
 import { CheckoutWidgetsConfig, SemanticVersion } from './definitions/config';
-
-export const DEFAULT_CHECKOUT_VERSION = '0.1.9-alpha';
+import { globalPackageVersion, isDevMode } from './lib/env';
 
 /**
  * Validates and builds a version string based on the given SemanticVersion object.
  * If the version is undefined or has an invalid major version, it returns the default checkout version.
  * If the version is all zeros, it also returns the default checkout version.
  * Otherwise, it constructs a validated version string based on the major, minor, patch, and build numbers.
- * @param {SemanticVersion | undefined} version - The SemanticVersion object to validate and build.
- * @returns {string} - The validated and built version string.
  */
 export function validateAndBuildVersion(
   version: SemanticVersion | undefined,
 ): string {
-  if (!version || version?.major === undefined || version.major < 0) return DEFAULT_CHECKOUT_VERSION;
-  if (version.major === 0 && version.minor === 0 && version.patch === 0) return DEFAULT_CHECKOUT_VERSION;
+  const defaultPackageVersion = globalPackageVersion();
 
-  let validatedVersion: string = DEFAULT_CHECKOUT_VERSION;
+  if (version === undefined) return defaultPackageVersion;
+
+  // Pre-production release
+  // TODO: https://immutable.atlassian.net/browse/WT-1501
+  if (
+    version.major === undefined
+    || version.minor === undefined
+    || version.patch === undefined
+    || version.prerelease === undefined
+  ) return defaultPackageVersion;
+
+  if (version.major < 0) return defaultPackageVersion;
+  if (version.minor < 0) return defaultPackageVersion;
+  if (version.patch < 0) return defaultPackageVersion;
+  if (version.prerelease !== 'alpha') return defaultPackageVersion;
+
+  if (version.major === 0 && version.minor === 0 && version.patch === 0) return defaultPackageVersion;
+
+  let validatedVersion: string = defaultPackageVersion;
 
   if (!Number.isNaN(version.major) && version.major >= 0) {
     validatedVersion = version.major.toString();
   }
 
-  if (
-    version.minor !== undefined
-    && !Number.isNaN(version.minor)
-    && version.minor >= 0
-  ) {
+  if (!Number.isNaN(version.minor)) {
     validatedVersion += `.${version.minor.toString()}`;
   }
 
-  if (
-    version.patch !== undefined
-    && !Number.isNaN(version.patch)
-    && version.patch >= 0
-  ) {
-    if (version.minor === undefined) {
-      validatedVersion += `.0.${version.patch.toString()}`;
-    } else {
-      validatedVersion += `.${version.patch.toString()}`;
-    }
+  if (!Number.isNaN(version.patch)) {
+    validatedVersion += `.${version.patch.toString()}`;
   }
 
-  // TODO: at the moment all of the releases that include
-  // the checkout widgets script have '-alpha' appended
-  // Change this when we go to testnet. ticket WT-1432
-  validatedVersion += '-alpha';
+  // TODO: https://immutable.atlassian.net/browse/WT-1501
+  // Ensure this is gated by `version.prerelease !== undefined`
+  // once we go to prod with checkout.
+  validatedVersion += `-${version.prerelease}`;
 
-  if (version.build !== undefined) {
+  if (version.build !== undefined && version.build > 0) {
     validatedVersion += `.${version.build}`;
   }
 
@@ -65,7 +67,7 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
   const validVersion = validateAndBuildVersion(config?.version);
 
   let cdnUrl = `https://cdn.jsdelivr.net/npm/@imtbl/sdk@${validVersion}/dist/browser/checkout.js`;
-  if (process.env.CHECKOUT_LOCAL_MODE !== undefined) cdnUrl = 'http://localhost:3000/lib/js/imtbl-checkout.js';
+  if (isDevMode()) cdnUrl = 'http://localhost:3000/lib/js/imtbl-checkout.js';
 
   checkoutWidgetJS.setAttribute('src', cdnUrl);
 
