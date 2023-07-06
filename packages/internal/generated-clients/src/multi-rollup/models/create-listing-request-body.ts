@@ -52,7 +52,7 @@ export interface CreateListingRequestBody {
      * @type {Array<Fee>}
      * @memberof CreateListingRequestBody
      */
-    'buy_fees': Array<Fee>;
+    'fees': Array<Fee>;
     /**
      * Time after which the Order is considered expired
      * @type {string}

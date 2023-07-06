@@ -13,7 +13,7 @@ export type CreateListingRequestBody = {
    * Buy item for listing should either be NATIVE or ERC20 item
    */
   buy: Array<Item>;
-  buy_fees: Array<Fee>;
+  fees: Array<Fee>;
   /**
    * Time after which the Order is considered expired
    */

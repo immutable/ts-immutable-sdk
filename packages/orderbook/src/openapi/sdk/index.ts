@@ -28,5 +28,4 @@ export type { PageCursor } from './models/PageCursor';
 export type { PageSize } from './models/PageSize';
 export type { ProtocolData } from './models/ProtocolData';
 
-export { ListingsService } from './services/ListingsService';
 export { OrdersService } from './services/OrdersService';

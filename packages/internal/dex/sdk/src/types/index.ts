@@ -3,6 +3,22 @@ import { ModuleConfiguration } from '@imtbl/config';
 import { ExchangeContracts } from 'config';
 
 /**
+ * Interface representing a Chain
+ * @property {number} chainId - The chain ID
+ * @property {string} rpcUrl - The RPC URL for the chain
+ * @property {ExchangeContracts} contracts - The DEX contract addresses
+ * @property {Token[]} commonRoutingTokens - The tokens used to find available pools for a swap
+ * @property {TokenInfo} nativeToken - The native token of the chain
+ */
+export type Chain = {
+  chainId: number;
+  rpcUrl: string;
+  contracts: ExchangeContracts;
+  commonRoutingTokens: TokenInfo[];
+  nativeToken: TokenInfo;
+};
+
+/**
  * Interface representing an amount with the token information
  * @property {TokenInfo} token - The token information
  * @property {ethers.BigNumber} value - The amount
