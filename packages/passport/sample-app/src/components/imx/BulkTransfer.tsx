@@ -14,12 +14,19 @@ import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
 
+interface Transfer {
+  key: string;
+  receiver: string;
+  tokenId: string;
+  tokenAddress: string;
+}
+
 function BulkTransfer({ showBulkTransfer, setShowBulkTransfer }: BulkTransferProps) {
   const [isInvalid, setInvalid] = useState<boolean | undefined>(undefined);
   const [loadingTransfer, setLoadingTransfer] = useState<boolean>(false);
   const [loadingAssets, setLoadingAssets] = useState<boolean>(false);
   const [assets, setAssets] = useState<Asset[]>([]);
-  const [transfers, setTransfers] = useState<Partial<NftTransferDetails>[]>([{}]);
+  const [transfers, setTransfers] = useState<Partial<Transfer>[]>([{}]);
 
   const { setMessage } = useStatusProvider();
   const { imxProvider, imxWalletAddress } = usePassportProvider();
@@ -62,13 +69,15 @@ function BulkTransfer({ showBulkTransfer, setShowBulkTransfer }: BulkTransferPro
   const addTransfer = () => {
     setTransfers([
       ...transfers,
-      {},
+      {
+        key: Date.now().toString(),
+      },
     ]);
   };
 
   const removeTransfer = (index: number): MouseEventHandler => () => {
     if (transfers.length <= 1) {
-      setTransfers([{}]);
+      addTransfer();
     } else {
       const array = transfers.slice();
       array.splice(index, 1);
@@ -129,7 +138,7 @@ function BulkTransfer({ showBulkTransfer, setShowBulkTransfer }: BulkTransferPro
         <Form noValidate validated={isInvalid} onSubmit={handleSubmit} className="mb-4">
           <Stack gap={3}>
             {transfers.map((transfer, index) => (
-              <Card>
+              <Card key={transfer.key}>
                 <Card.Body>
                   <Form.Group className="mb-3">
                     <Form.Label>

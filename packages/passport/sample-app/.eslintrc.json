@@ -25,6 +25,7 @@
     ],
     "import/no-extraneous-dependencies": ["off"],
     "@typescript-eslint/return-await": ["off"],
-    "@typescript-eslint/naming-convention": "off"
+    "@typescript-eslint/naming-convention": "off",
+    "react/jsx-props-no-spreading": "off"
   }
 }

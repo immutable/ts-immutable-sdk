@@ -13,7 +13,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <ImmutableProvider>
         <PassportProvider>
           <BiomeThemeProvider>
-            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+            {/* @ts-ignore */}
             <Component {...pageProps} />
           </BiomeThemeProvider>
         </PassportProvider>
