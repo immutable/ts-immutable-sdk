@@ -210,6 +210,7 @@ if [[ -z "${TAG// }" ]]; then
   echo No tags found.
 else
   echo Found tag: $TAG in branch \'$BRANCH\'
+  echo Found highest tag: $TOP_TAG
 fi
 
 # print current revision number based on number of commits
@@ -219,25 +220,25 @@ echo ""
 
 # if tag and branch commit hashes are different, than print info about that
 #echo $HEAD_HASH vs $TAG_HASH
-if [[ "$@" == "" ]]; then
-    if [[ "$TAG_HASH" == "$HEAD_HASH" ]]; then
-      echo "Tag $TAG and HEAD are aligned. We will stay on the TAG version."
-      echo ""
-      NO_ARGS_VALUE='--stay'
-    else
-      PATTERN="^[0-9]+.[0-9]+(.[0-9]+)*(-(alpha|beta|rc))*$"
+# if [[ "$@" == "" ]]; then
+#     if [[ "$TAG_HASH" == "$HEAD_HASH" ]]; then
+#       echo "Tag $TAG and HEAD are aligned. We will stay on the TAG version."
+#       echo ""
+#       NO_ARGS_VALUE='--stay'
+#     else
+#       PATTERN="^[0-9]+.[0-9]+(.[0-9]+)*(-(alpha|beta|rc))*$"
 
-      if [[ "$BRANCH" =~ $PATTERN ]]; then
-        echo "Detected version branch '$BRANCH'. We will auto-increment the last version PART."
-        echo ""
-        NO_ARGS_VALUE='--default'
-      else
-        echo "Detected branch name '$BRANCH' than does not match version pattern. We will increase MINOR."
-        echo ""
-        NO_ARGS_VALUE='--minor'
-      fi
-    fi
-fi
+#       if [[ "$BRANCH" =~ $PATTERN ]]; then
+#         echo "Detected version branch '$BRANCH'. We will auto-increment the last version PART."
+#         echo ""
+#         NO_ARGS_VALUE='--default'
+#       else
+#         echo "Detected branch name '$BRANCH' than does not match version pattern. We will increase MINOR."
+#         echo ""
+#         NO_ARGS_VALUE='--minor'
+#       fi
+#     fi
+# fi
 
 #
 # {MAJOR}.{MINOR}[.{PATCH}[.{REVISION}][-(.*)]
@@ -248,9 +249,12 @@ fi
 #    beta --> rc
 #    rc --> {VERSION}
 #
-PARTS=( ${TAG//./ } )
+
+# Using TOP_TAG for now on the system. We can later use branch name to determine
+# whether to use TOP_TAG (main) or TAG (legacy release branch)
+PARTS=( ${TOP_TAG//./ } )
 parse_last ${#PARTS[@]} # array size as argument
-#echo ${PARTS[@]}
+# echo ${PARTS[@]}
 
 # if no parameters than emulate --default parameter
 if [[ "$@" == "" ]]; then
