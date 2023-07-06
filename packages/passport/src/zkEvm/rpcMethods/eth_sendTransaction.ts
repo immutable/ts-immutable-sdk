@@ -41,6 +41,10 @@ export const ethSendTransaction = async ({
     revertOnError: true,
   };
 
+  // NOTE: We sign the transaction before getting the fee options because
+  // accurate estimation of a transaction gas cost is only possible if the smart
+  // wallet contract can actually execute it (in a simulated environment) - and
+  // it can onlyexecute signed transactions.
   const signedTransaction = await getSignedSequenceTransactions(
     [sequenceTransaction],
     nonce,
@@ -50,6 +54,12 @@ export const ethSendTransaction = async ({
   );
 
   // TODO: ID-698 Add support for non-native gas payments (e.g ERC20, feeTransaction initialisation must change)
+  //
+  // NOTE: "Fee Options" represent the multiple ways we could pay for the gas
+  // used in this transaction. Each fee option has a "recipientAddress" we
+  // should transfer the payment to, an amount and a currency. We choose one
+  // option and build a transaction that sends the expected currency amount for
+  // that option to the specified address.
   const feeOptions = await relayerAdapter.imGetFeeOptions(user.zkEvm.ethAddress, signedTransaction);
   const imxFeeOption = feeOptions.find((feeOption) => feeOption.tokenSymbol === 'IMX');
   if (!imxFeeOption) {
@@ -63,6 +73,8 @@ export const ethSendTransaction = async ({
     revertOnError: true,
   };
 
+  // NOTE: We sign again because we now are adding the fee transaction, so the
+  // whole payload is different and needs a new signature.
   const signedTransactions = await getSignedSequenceTransactions(
     [sequenceTransaction, sequenceFeeTransaction],
     nonce,
@@ -75,14 +87,19 @@ export const ethSendTransaction = async ({
 
   const relayerId = await relayerAdapter.ethSendTransaction(transactionRequest.to, signedTransactions);
 
-  const relayerTransaction = await retryWithDelay(async () => {
+  const retrieveRelayerTransaction = async () => {
     const tx = await relayerAdapter.imGetTransactionByHash(relayerId);
+    // NOTE: The transaction hash is only available from the Relayer once the
+    // transaction is actually submitted onchain. Hence we need to poll the
+    // Relayer get transaction endpoint until the status transitions to one that
+    // has the hash available.
     if (tx.status === 'PENDING') {
       throw new Error();
     }
-
     return tx;
-  }, {
+  };
+
+  const relayerTransaction = await retryWithDelay(retrieveRelayerTransaction, {
     retries: MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES,
     interval: TRANSACTION_HASH_RETRIEVAL_WAIT,
     finalErr: new JsonRpcError(RpcErrorCode.RPC_SERVER_ERROR, 'transaction hash not generated in time'),
