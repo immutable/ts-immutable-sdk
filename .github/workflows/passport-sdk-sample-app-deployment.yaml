@@ -1,11 +1,6 @@
-name: Passport Sample App Deployment
+name: Passport SDK Sample App Deployment
 
 on:
-  push:
-    paths:
-      - 'packages/passport/**'
-    branches:
-      - main
   workflow_dispatch:
 
 # this is used by github OIDC to assume the admin role later on
@@ -44,14 +39,14 @@ jobs:
         run: yarn workspace @imtbl/passport build
 
       - name: Build Passport sample app
-        run: yarn workspace @imtbl/passport-sample-app build
+        run: yarn workspace @imtbl/passport-sdk-sample-app build
 
       - name: Export Passport sample app
-        run: yarn workspace @imtbl/passport-sample-app export
+        run: yarn workspace @imtbl/passport-sdk-sample-app export
 
       - name: Upload to S3
         run: |
-          aws s3 sync ./packages/passport/sample-app/out s3://imx-passport-frontend-prod/sample-app
+          aws s3 sync ./packages/passport/sdk-sample-app/out s3://imx-passport-frontend-prod/sdk-sample-app
 
       - name: Clear the cloudfront cache
         run: |

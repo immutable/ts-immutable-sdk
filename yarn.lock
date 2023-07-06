@@ -3646,9 +3646,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/passport-sample-app@workspace:packages/passport/sample-app":
+"@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app":
   version: 0.0.0-use.local
-  resolution: "@imtbl/passport-sample-app@workspace:packages/passport/sample-app"
+  resolution: "@imtbl/passport-sdk-sample-app@workspace:packages/passport/sdk-sample-app"
   dependencies:
     "@biom3/design-tokens": 0.2.0-beta
     "@biom3/react": ^0.6.4-beta

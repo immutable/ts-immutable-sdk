@@ -55,7 +55,7 @@
     "packages/erc721-permissioned-mintable",
     "packages/immutablex_client",
     "packages/passport/sdk",
-    "packages/passport/sample-app",
+    "packages/passport/sdk-sample-app",
     "packages/provider",
     "packages/provider/src/sample-app",
     "packages/orderbook",
