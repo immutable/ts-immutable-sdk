@@ -91,7 +91,11 @@ export function ConnectLoader({
   clearInterval = useInterval(() => checkIfWeb3ProviderSet(), 10);
 
   useEffect(() => {
-    if (window === undefined) return () => {};
+    if (window === undefined) {
+      // eslint-disable-next-line no-console
+      console.error('missing window object: please run Checkout client side');
+      return () => {};
+    }
     if (hasWeb3Provider === undefined) return () => {};
 
     (async () => {
