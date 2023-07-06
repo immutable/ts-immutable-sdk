@@ -17,19 +17,6 @@ import { text } from '../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 
 describe('SwapWidget tests', () => {
-  beforeEach(() => {
-    cyIntercept({
-      cryptoFiatOverrides: {
-        conversion: {
-          ethereum: { usd: 2000.0 },
-          'usd-coin': { usd: 1.0 },
-          'immutable-x': { usd: 1.5 },
-        },
-      },
-    });
-    cy.viewport('ipad-2');
-  });
-
   const mockProvider = {
     getSigner: () => ({
       getAddress: () => Promise.resolve('0xwalletAddress'),
@@ -44,6 +31,9 @@ describe('SwapWidget tests', () => {
   } as unknown as Web3Provider;
 
   beforeEach(() => {
+    cy.viewport('ipad-2');
+    cyIntercept();
+
     cy.stub(Checkout.prototype, 'connect')
       .as('connectStub')
       .resolves({
@@ -152,6 +142,7 @@ describe('SwapWidget tests', () => {
   });
 
   it('should set fromTokens to user balances filtered by the token allow list', () => {
+    cyIntercept();
     mount(
       <SwapWidget
         config={config}

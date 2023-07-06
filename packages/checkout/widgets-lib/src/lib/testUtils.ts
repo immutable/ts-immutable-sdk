@@ -27,11 +27,12 @@ export const cyIntercept = (overrides?: {
   },
   cryptoFiatOverrides?: {
     coins?: any[],
+    overrides?: Record<string, string>,
     conversion?: Record<string, Record<string, number>>,
   },
 }) => {
   const checkoutApi = 'https://checkout-api.sandbox.immutable.com/v1';
-  const zkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com/';
+  const zkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com';
   const defaultConfig = {
     allowedNetworks: [
       {
@@ -100,13 +101,32 @@ export const cyIntercept = (overrides?: {
     },
   );
   cy.intercept(
-    `${checkoutApi}/fiat/coins/*`,
-    overrides?.cryptoFiatOverrides?.coins || [],
+    `${checkoutApi}/fiat/coins/all*`,
+    overrides?.cryptoFiatOverrides?.coins || [
+      { id: 'eth', symbol: 'eth', name: 'ethereum' },
+      { id: 'imx', symbol: 'imx', name: 'immutable-x' },
+      { id: 'usdc', symbol: 'usdc', name: 'usd-coin' },
+    ],
+  );
+  cy.intercept(
+    `${checkoutApi}/fiat/coins/overrides*`,
+    overrides?.cryptoFiatOverrides?.overrides || {
+      eth: 'ethereum',
+      imx: 'immutable-x',
+      usdc: 'usd-coin',
+    },
   );
   cy.intercept(
     `${checkoutApi}/fiat/conversion*`,
-    overrides?.cryptoFiatOverrides?.conversion || {},
+    overrides?.cryptoFiatOverrides?.conversion || {
+      ethereum: { usd: 2000.0 },
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      'usd-coin': { usd: 1.0 },
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      'immutable-x': { usd: 1.5 },
+    },
   );
   cy.intercept(`${checkoutApi}/rpc/eth-sepolia`, {});
   cy.intercept(zkEvmRpcUrl, {});
+  cy.intercept('https://image-resizer-cache.dev.immutable.com/*', {});
 };
