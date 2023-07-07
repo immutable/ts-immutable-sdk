@@ -1,6 +1,10 @@
-import { BigNumber, utils } from 'ethers/lib/ethers';
+import {
+  BigNumber,
+  utils,
+  Contract,
+  ethers,
+} from 'ethers';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { Contract, ethers } from 'ethers';
 import { FungibleToken } from '@imtbl/bridge-sdk';
 import { CheckoutError, CheckoutErrorType } from '../errors';
 import {
