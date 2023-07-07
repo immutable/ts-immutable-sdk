@@ -10,6 +10,11 @@ export function SetProvider(
     console.error('no provider parsed');
     return;
   }
+  if (window === undefined) {
+    // eslint-disable-next-line no-console
+    console.error('missing window object: please run Checkout client side');
+    return;
+  }
 
   let attempts = 0;
   const maxAttempts = 10;
