@@ -9,7 +9,7 @@ interface FeesProps {
   title: string;
   fiatPricePrefix: string;
   gasFeeValue: string;
-  gasFeeToken: TokenInfo | null;
+  gasFeeToken?: TokenInfo;
   gasFeeFiatValue: string;
 }
 

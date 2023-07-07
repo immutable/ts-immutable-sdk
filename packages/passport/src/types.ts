@@ -12,14 +12,24 @@ export type User = {
   accessToken: string;
   refreshToken?: string;
   profile: UserProfile;
-  etherKey?: string;
   expired?: boolean;
+  imx?: {
+    ethAddress: string;
+    starkAddress: string;
+    userAdminAddress: string;
+  };
+  zkEvm?: {
+    ethAddress: string;
+    userAdminAddress: string;
+  };
 };
 
 export type PassportMetadata = {
-  ether_key: string;
-  stark_key: string;
-  user_admin_key: string;
+  imx_eth_address: string;
+  imx_stark_address: string;
+  imx_user_admin_address: string;
+  zkevm_eth_address: string;
+  zkevm_user_admin_address: string;
 };
 
 export enum Networks {
@@ -51,4 +61,5 @@ export interface PassportModuleConfiguration
 
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
-export type UserWithEtherKey = WithRequired<User, 'etherKey'>;
+export type UserImx = WithRequired<User, 'imx'>;
+export type UserZkEvm = WithRequired<User, 'zkEvm'>;

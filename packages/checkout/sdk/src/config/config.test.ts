@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { CheckoutConfigurtionError } from './config';
+import { CheckoutConfigurationError } from './config';
 import { Checkout } from '../Checkout';
 import { CheckoutModuleConfiguration, PRODUCTION_CHAIN_ID_NETWORK_MAP, SANDBOX_CHAIN_ID_NETWORK_MAP } from '../types';
 
@@ -40,7 +40,7 @@ describe('CheckoutConfiguration class', () => {
       baseConfig: { environment: 'prod' as Environment },
     } as CheckoutModuleConfiguration;
 
-    expect(() => new Checkout(testCheckoutConfig)).toThrow(CheckoutConfigurtionError);
+    expect(() => new Checkout(testCheckoutConfig)).toThrow(CheckoutConfigurationError);
     expect(() => new Checkout(testCheckoutConfig)).toThrowError('Invalid checkout configuration of environment');
   });
 });

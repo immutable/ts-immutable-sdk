@@ -1,12 +1,6 @@
-import { ChainId } from './chainId';
+import { ChainId } from './chains';
 import { TokenInfo } from './tokenInfo';
 
-/**
- * Interface representing token information for a specific chain.
- * @extends {TokenInfo}
- * @property {ChainId} chainId - The ID of the blockchain network.
- * @property {TokenFilterTypes[]} tokenFeatures - The features supported by the token.
- */
 export interface TokenMasterInfo extends TokenInfo {
   chainId: ChainId;
   tokenFeatures: TokenFilterTypes[];
@@ -20,7 +14,7 @@ export interface TokenMasterInfo extends TokenInfo {
  */
 export interface GetTokenAllowListParams {
   type: TokenFilterTypes;
-  chainId?: ChainId;
+  chainId: ChainId;
   exclude?: TokenFilter[];
 }
 
@@ -36,9 +30,9 @@ export interface GetTokenAllowListResult {
  * Enum representing the types of token filters available.
  */
 export enum TokenFilterTypes {
+  ALL = 'all',
   SWAP = 'swap',
   BRIDGE = 'bridge',
-  ALL = 'all',
 }
 
 /**

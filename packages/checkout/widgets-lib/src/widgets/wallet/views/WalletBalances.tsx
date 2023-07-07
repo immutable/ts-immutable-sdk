@@ -1,4 +1,4 @@
-import { Box, MenuItem } from '@biom3/react';
+import { Box, Icon, MenuItem } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -15,7 +15,7 @@ import {
   WALLET_BALANCE_CONTAINER_STYLE,
   WalletBalanceItemStyle,
 } from './WalletBalancesStyles';
-import { zkEVMNetwork } from '../../../lib/networkUtils';
+import { getL2ChainId } from '../../../lib/networkUtils';
 import {
   CryptoFiatActions,
   CryptoFiatContext,
@@ -27,6 +27,7 @@ import {
   ViewActions,
   ViewContext,
 } from '../../../context/view-context/ViewContext';
+import { fetchTokenSymbols } from '../../../lib/fetchTokenSymbols';
 
 export function WalletBalances() {
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
@@ -35,46 +36,22 @@ export function WalletBalances() {
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const {
-    provider, checkout, network, supportedTopUps,
+    provider,
+    checkout,
+    network,
+    supportedTopUps,
+    tokenBalances,
   } = walletState;
   const { conversions } = cryptoFiatState;
-  const showAddCoins = useMemo(() => {
-    if (!checkout || !network) return false;
-    return (
-      network?.chainId === zkEVMNetwork(checkout.config.environment)
-      && Boolean(
-        supportedTopUps?.isBridgeEnabled
-          || supportedTopUps?.isSwapEnabled
-          || supportedTopUps?.isOnRampEnabled,
-      )
-    );
-  }, [checkout, network, supportedTopUps]);
+  const [balancesLoading, setBalancesLoading] = useState(true);
 
   useEffect(() => {
-    let totalAmount = 0.0;
-
-    walletState.tokenBalances.forEach((balance) => {
-      const fiatAmount = parseFloat(balance.fiatAmount);
-      if (!Number.isNaN(fiatAmount)) totalAmount += fiatAmount;
-    });
-    setTotalFiatAmount(totalAmount);
-  }, [walletState.tokenBalances]);
-
-  useEffect(() => {
-    if (!checkout || !provider || !network) return;
-
     (async () => {
-      const walletAddress = await provider.getSigner().getAddress();
-      const getAllBalancesResult = await checkout.getAllBalances({
-        provider,
-        walletAddress,
-        chainId: network.chainId,
-      });
+      if (!checkout) return;
+      if (!cryptoFiatDispatch) return;
+      if (!network) return;
 
-      const tokenSymbols: string[] = [];
-      getAllBalancesResult.balances.forEach((balance) => {
-        tokenSymbols.push(balance.token.symbol);
-      });
+      const tokenSymbols = await fetchTokenSymbols(checkout, network.chainId);
 
       cryptoFiatDispatch({
         payload: {
@@ -83,7 +60,50 @@ export function WalletBalances() {
         },
       });
     })();
-  }, [provider, checkout, network, cryptoFiatDispatch]);
+  }, [checkout, cryptoFiatDispatch, network]);
+
+  useEffect(() => {
+    let totalAmount = 0.0;
+
+    tokenBalances.forEach((balance) => {
+      const fiatAmount = parseFloat(balance.fiatAmount);
+      if (!Number.isNaN(fiatAmount)) totalAmount += fiatAmount;
+    });
+
+    setTotalFiatAmount(totalAmount);
+  }, [tokenBalances]);
+
+  useEffect(() => {
+    if (!checkout || !provider || !network) return;
+    (async () => {
+      const balances = await getTokenBalances(
+        checkout,
+        provider,
+        network.chainId,
+        conversions,
+      );
+
+      walletDispatch({
+        payload: {
+          type: WalletActions.SET_TOKEN_BALANCES,
+          tokenBalances: balances,
+        },
+      });
+      setBalancesLoading(false);
+    })();
+  }, [checkout, network, provider, conversions, setBalancesLoading, walletDispatch]);
+
+  const showAddCoins = useMemo(() => {
+    if (!checkout || !network) return false;
+    return (
+      network.chainId === getL2ChainId(checkout.config)
+        && Boolean(
+          supportedTopUps?.isBridgeEnabled
+            || supportedTopUps?.isSwapEnabled
+            || supportedTopUps?.isOnRampEnabled,
+        )
+    );
+  }, [checkout, network, supportedTopUps]);
 
   const handleAddCoinsClick = () => {
     viewDispatch({
@@ -93,26 +113,6 @@ export function WalletBalances() {
       },
     });
   };
-
-  useEffect(() => {
-    if (!checkout || !provider || !network) return;
-    (async () => {
-      const tokenBalances = await getTokenBalances(
-        checkout,
-        provider,
-        network.name,
-        network.chainId,
-        conversions,
-      );
-
-      walletDispatch({
-        payload: {
-          type: WalletActions.SET_TOKEN_BALANCES,
-          tokenBalances,
-        },
-      });
-    })();
-  }, [checkout, network, provider, conversions, walletDispatch]);
 
   return (
     <SimpleLayout
@@ -143,15 +143,31 @@ export function WalletBalances() {
         }}
       >
         <Box sx={WALLET_BALANCE_CONTAINER_STYLE}>
-          <NetworkMenu />
+          <NetworkMenu setBalancesLoading={setBalancesLoading} />
           <TotalTokenBalance totalBalance={totalFiatAmount} />
           <Box
             sx={WalletBalanceItemStyle(
               showAddCoins,
-              walletState.tokenBalances.length > 2,
+              tokenBalances.length > 2 || balancesLoading,
             )}
           >
-            <TokenBalanceList balanceInfoItems={walletState.tokenBalances} />
+            {balancesLoading && (
+            <Box sx={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            >
+              <Icon
+                testId="loading-icon"
+                icon="Loading"
+                sx={{ w: 'base.icon.size.500' }}
+              />
+            </Box>
+            )}
+            {!balancesLoading && (<TokenBalanceList balanceInfoItems={tokenBalances} />)}
           </Box>
         </Box>
         {showAddCoins && (

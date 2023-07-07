@@ -1,5 +1,6 @@
 import {
-  useContext, useEffect, useMemo, useState,
+  useCallback,
+  useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
 import {
   Body, Box, Heading, OptionKey,
@@ -12,7 +13,7 @@ import { amountInputValidation as textInputValidator } from '../../../lib/valida
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
-import { DEFAULT_IMX_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
+import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
@@ -79,14 +80,10 @@ export function SwapForm({ data }: SwapFromProps) {
     },
   } = useContext(SwapContext);
 
-  // TODO: native token handling for no-address tokens
-  const initialToken = (address) => allowedTokens.find((t) => t.address === address);
-  const initialBalance = (address) => tokenBalances.find((t) => t.token.address === address)?.formattedBalance;
-
-  const formatTokenOptionsId = (symbol: string, address?: string) => {
+  const formatTokenOptionsId = useCallback((symbol: string, address?: string) => {
     if (!address) return symbol.toLowerCase();
     return `${symbol.toLowerCase()}-${address.toLowerCase()}`;
-  };
+  }, []);
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
 
@@ -95,16 +92,17 @@ export function SwapForm({ data }: SwapFromProps) {
   const [direction, setDirection] = useState<SwapDirection>(SwapDirection.FROM);
   const [loading, setLoading] = useState(false);
   const [swapFromToConversionText, setSwapFromToConversionText] = useState('');
+  const hasSetDefaultState = useRef(false);
 
   // Form State
   const [fromAmount, setFromAmount] = useState<string>(data?.fromAmount || '');
   const [fromAmountError, setFromAmountError] = useState<string>('');
-  const [fromToken, setFromToken] = useState<TokenInfo | undefined>(initialToken(data?.fromContractAddress));
-  const [fromBalance, setFromBalance] = useState<string>(initialBalance(data?.fromContractAddress) || '');
+  const [fromToken, setFromToken] = useState<TokenInfo | undefined>();
+  const [fromBalance, setFromBalance] = useState<string>('');
   const [fromTokenError, setFromTokenError] = useState<string>('');
   const [toAmount, setToAmount] = useState<string>(data?.toAmount || '');
   const [toAmountError, setToAmountError] = useState<string>('');
-  const [toToken, setToToken] = useState<TokenInfo | undefined>(initialToken(data?.toContractAddress));
+  const [toToken, setToToken] = useState<TokenInfo | undefined>();
   const [toTokenError, setToTokenError] = useState<string>('');
   const [fromFiatValue, setFromFiatValue] = useState('');
 
@@ -113,10 +111,13 @@ export function SwapForm({ data }: SwapFromProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [quoteError, setQuoteError] = useState<string>('');
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
-  const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | null>(null);
+  const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
-  const tokensOptionsFrom = useMemo(
-    () => tokenBalances
+  const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
+
+  useEffect(() => {
+    if (tokenBalances.length === 0) return;
+    const fromOptions = tokenBalances
       .filter((b) => b.balance.gt(0))
       .map(
         (t) => ({
@@ -125,30 +126,59 @@ export function SwapForm({ data }: SwapFromProps) {
           symbol: t.token.symbol,
           icon: t.token.icon,
           balance: {
-            formattedAmount: t.formattedBalance,
-            formattedFiatAmount: calculateCryptoToFiat(
+            formattedAmount: tokenValueFormat(t.formattedBalance),
+            formattedFiatAmount: cryptoFiatState.conversions.size === 0 ? formatZeroAmount('') : calculateCryptoToFiat(
               t.formattedBalance,
               t.token.symbol || '',
               cryptoFiatState.conversions,
             ),
           },
         } as CoinSelectorOptionProps),
-      ),
-    [tokenBalances],
-  );
-  const tokensOptionsTo = useMemo(
-    () => allowedTokens
-      .filter((t) => t.address !== fromToken?.address)
-      .map(
-        (t) => ({
-          id: formatTokenOptionsId(t.symbol, t.address),
-          name: t.name,
-          symbol: t.symbol,
-          icon: undefined, // todo: add correct image once available on token info
-        } as CoinSelectorOptionProps),
-      ),
-    [allowedTokens, fromToken],
-  );
+      );
+
+    setTokensOptionsForm(fromOptions);
+
+    // Set initial token options if provided
+    if (!hasSetDefaultState.current) {
+      hasSetDefaultState.current = true;
+
+      // TODO: native token handling for no-address tokens
+      if (data?.fromContractAddress) {
+        setFromToken(allowedTokens.find((t) => t.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase()));
+        setFromBalance(
+          tokenBalances.find(
+            (t) => t.token.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase(),
+          )?.formattedBalance ?? '',
+        );
+      }
+      if (data?.toContractAddress) {
+        setToToken(allowedTokens.find((t) => t.address?.toLowerCase() === data?.toContractAddress?.toLowerCase()));
+      }
+    }
+  }, [
+    tokenBalances,
+    allowedTokens,
+    cryptoFiatState.conversions,
+    data?.fromContractAddress,
+    data?.toContractAddress,
+    hasSetDefaultState.current,
+    setFromToken,
+    setFromBalance,
+    setToToken,
+    setTokensOptionsForm,
+    formatTokenOptionsId,
+    formatZeroAmount,
+  ]);
+
+  const tokensOptionsTo = useMemo(() => allowedTokens
+    .map(
+      (t) => ({
+        id: formatTokenOptionsId(t.symbol, t.address),
+        name: t.name,
+        symbol: t.symbol,
+        icon: undefined, // todo: add correct image once available on token info
+      } as CoinSelectorOptionProps),
+    ), [allowedTokens, fromToken]);
 
   useEffect(() => {
     cryptoFiatDispatch({
@@ -182,10 +212,10 @@ export function SwapForm({ data }: SwapFromProps) {
       // fetching or the user is updating the inputs.
       if (silently && (loading || editing)) return;
 
-      const estimate = result.info.gasFeeEstimate;
+      const estimate = result.swap.gasFeeEstimate;
       const gasFee = utils.formatUnits(
-        estimate?.amount || 0,
-        DEFAULT_IMX_DECIMALS,
+        estimate?.value || 0,
+        DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
 
@@ -208,8 +238,8 @@ export function SwapForm({ data }: SwapFromProps) {
       setToAmount(
         formatZeroAmount(
           tokenValueFormat(utils.formatUnits(
-            result.info.quote.amount,
-            result.info.quote.token.decimals,
+            result.quote.amount.value,
+            result.quote.amount.token.decimals,
           )),
         ),
       );
@@ -248,10 +278,10 @@ export function SwapForm({ data }: SwapFromProps) {
       // fetching or the user is updating the inputs.
       if (silently && (loading || editing)) return;
 
-      const estimate = result.info.gasFeeEstimate;
+      const estimate = result.swap.gasFeeEstimate;
       const gasFee = utils.formatUnits(
-        estimate?.amount || 0,
-        DEFAULT_IMX_DECIMALS,
+        estimate?.value || 0,
+        DEFAULT_TOKEN_DECIMALS,
       );
       const estimateToken = estimate?.token;
 
@@ -274,8 +304,8 @@ export function SwapForm({ data }: SwapFromProps) {
       setFromAmount(
         formatZeroAmount(
           tokenValueFormat(utils.formatUnits(
-            result.info.quote.amount,
-            result.info.quote.token.decimals,
+            result.quote.amount.value,
+            result.quote.amount.token.decimals,
           )),
         ),
       );
@@ -387,15 +417,19 @@ export function SwapForm({ data }: SwapFromProps) {
     ));
   }, [fromAmount, fromToken]);
 
-  const onFromSelectChange = (value: OptionKey) => {
+  const onFromSelectChange = useCallback((value: OptionKey) => {
     const selected = tokenBalances
       .find((t) => value === formatTokenOptionsId(t.token.symbol, t.token.address));
     if (!selected) return;
 
+    if (toToken && value === formatTokenOptionsId(toToken.symbol, toToken?.address)) {
+      setToToken(undefined);
+    }
+
     setFromToken(selected.token);
     setFromBalance(selected.formattedBalance);
     setFromTokenError('');
-  };
+  }, [toToken]);
 
   const onFromTextInputFocus = () => {
     setEditing(true);
@@ -422,12 +456,17 @@ export function SwapForm({ data }: SwapFromProps) {
   // ------------//
   //      TO     //
   // ------------//
-  const onToSelectChange = (value: OptionKey) => {
+  const onToSelectChange = useCallback((value: OptionKey) => {
     const selected = allowedTokens.find((t) => value === formatTokenOptionsId(t.symbol, t.address));
     if (!selected) return;
+
+    if (fromToken && value === formatTokenOptionsId(fromToken.symbol, fromToken?.address)) {
+      setFromToken(undefined);
+    }
+
     setToToken(selected);
     setToTokenError('');
-  };
+  }, [fromToken]);
 
   const onToTextInputFocus = () => {
     setEditing(true);

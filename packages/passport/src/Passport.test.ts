@@ -3,32 +3,18 @@ import { ImmutableXClient } from '@imtbl/immutablex-client';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
 import { Passport } from './Passport';
-import { getStarkSigner } from './stark';
-import { Networks, OidcConfiguration, User } from './types';
-import registerPassport from './workflows/registration';
+import { PassportImxProvider, PassportImxProviderFactory } from './starkEx';
+import { Networks, OidcConfiguration } from './types';
+import { mockUser } from './test/mocks';
 
 jest.mock('./authManager');
 jest.mock('./magicAdapter');
-jest.mock('./stark/getStarkSigner');
-jest.mock('./imxProvider/passportImxProvider');
-jest.mock('./workflows/registration');
+jest.mock('./starkEx');
 
 const oidcConfiguration: OidcConfiguration = {
   clientId: '11111',
   redirectUri: 'https://test.com',
   logoutRedirectUri: 'https://test.com',
-};
-
-const mockUser: User = {
-  idToken: 'id123',
-  accessToken: 'access123',
-  refreshToken: 'refresh123',
-  profile: {
-    sub: 'email|123',
-    email: 'test@immutable.com',
-    nickname: 'test',
-  },
-  etherKey: '123',
 };
 
 describe('Passport', () => {
@@ -42,21 +28,20 @@ describe('Passport', () => {
   let getUserMock: jest.Mock;
   let requestRefreshTokenMock: jest.Mock;
   let loginSilentMock: jest.Mock;
+  let getProviderMock: jest.Mock;
+  let getProviderSilentMock: jest.Mock;
 
   beforeEach(() => {
-    authLoginMock = jest.fn().mockReturnValue({
-      idToken: '123',
-      etherKey: '0x123',
-    });
+    authLoginMock = jest.fn().mockReturnValue(mockUser);
     loginCallbackMock = jest.fn();
     magicLoginMock = jest.fn();
     logoutMock = jest.fn();
     getUserMock = jest.fn();
     requestRefreshTokenMock = jest.fn();
     loginSilentMock = jest.fn();
-    // TODO: Remove once fixed
-    // @ts-ignore
-    (AuthManager as jest.Mock).mockReturnValue({
+    getProviderMock = jest.fn();
+    getProviderSilentMock = jest.fn();
+    (AuthManager as unknown as jest.Mock).mockReturnValue({
       login: authLoginMock,
       loginCallback: loginCallbackMock,
       logout: logoutMock,
@@ -66,6 +51,10 @@ describe('Passport', () => {
     });
     (MagicAdapter as jest.Mock).mockReturnValue({
       login: magicLoginMock,
+    });
+    (PassportImxProviderFactory as jest.Mock).mockReturnValue({
+      getProvider: getProviderMock,
+      getProviderSilent: getProviderSilentMock,
     });
     passport = new Passport({
       baseConfig: new ImmutableConfiguration({
@@ -84,9 +73,7 @@ describe('Passport', () => {
         const immutableXClient = new ImmutableXClient({
           baseConfig,
         });
-        // TODO: Remove this once the shadowing issue has been fixed
-        // eslint-disable-next-line @typescript-eslint/no-shadow
-        const passport = new Passport({
+        const passportInstance = new Passport({
           baseConfig,
           overrides: {
             authenticationDomain: 'authenticationDomain123',
@@ -99,79 +86,45 @@ describe('Passport', () => {
           },
           ...oidcConfiguration,
         });
-        // TODO: This is a private member
         // @ts-ignore
-        expect(passport.immutableXClient).toEqual(immutableXClient);
+        expect(passportInstance.immutableXClient).toEqual(immutableXClient);
       });
     });
   });
 
   describe('connectImx', () => {
     it('should execute connect without error', async () => {
-      magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
-      requestRefreshTokenMock.mockResolvedValue({
-        accessToken: '123',
-        etherKey: '0x232',
-      });
-      await passport.connectImx();
+      const passportImxProvider = {} as PassportImxProvider;
+      getProviderMock.mockResolvedValue(passportImxProvider);
 
-      expect(authLoginMock).toBeCalledTimes(1);
-      expect(magicLoginMock).toBeCalledTimes(1);
-      expect(getStarkSigner).toBeCalledTimes(1);
-    }, 15000);
+      const result = await passport.connectImx();
 
-    it('should register user with refresh error', async () => {
-      magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
-      requestRefreshTokenMock.mockResolvedValue(null);
-      authLoginMock.mockResolvedValue({ idToken: '123' });
-
-      await expect(passport.connectImx()).rejects.toThrow(
-        'Failed to get refresh token',
-      );
-
-      expect(authLoginMock).toBeCalledTimes(1);
-      expect(magicLoginMock).toBeCalledTimes(1);
-      expect(getStarkSigner).toBeCalledTimes(1);
-      expect(registerPassport).toBeCalledTimes(1);
-    });
-
-    it('should register user successfully', async () => {
-      magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
-      requestRefreshTokenMock.mockResolvedValue(mockUser);
-      authLoginMock.mockResolvedValue({ idToken: '123' });
-
-      await passport.connectImx();
-
-      expect(authLoginMock).toBeCalledTimes(1);
-      expect(magicLoginMock).toBeCalledTimes(1);
-      expect(getStarkSigner).toBeCalledTimes(1);
-      expect(registerPassport).toBeCalledTimes(1);
+      expect(result).toBe(passportImxProvider);
+      expect(getProviderMock).toHaveBeenCalled();
     });
   });
 
   describe('connectImxSilent', () => {
-    it('should get imx provider is user existed and is not expired', async () => {
-      loginSilentMock.mockReturnValue(mockUser);
-      magicLoginMock.mockResolvedValue({ getSigner: jest.fn() });
-      requestRefreshTokenMock.mockResolvedValue({
-        accessToken: '123',
-        etherKey: '0x232',
+    describe('when getPassportImxProvider returns null', () => {
+      it('returns null', async () => {
+        getProviderSilentMock.mockResolvedValue(null);
+
+        const result = await passport.connectImxSilent();
+
+        expect(result).toBe(null);
+        expect(getProviderSilentMock).toHaveBeenCalled();
       });
-
-      await passport.connectImxSilent();
-
-      expect(magicLoginMock).toBeCalledTimes(1);
-      expect(getStarkSigner).toBeCalledTimes(1);
     });
+    describe('when getPassportImxProvider returns a provider', () => {
+      it('should return the provider', async () => {
+        const passportImxProvider = {} as PassportImxProvider;
+        getProviderSilentMock.mockResolvedValue(passportImxProvider);
 
-    it('should return null if user failed to silent login', async () => {
-      loginSilentMock.mockReturnValue(null);
+        const result = await passport.connectImxSilent();
 
-      const provider = await passport.connectImxSilent();
-
-      expect(magicLoginMock).toBeCalledTimes(0);
-      expect(getStarkSigner).toBeCalledTimes(0);
-      expect(provider).toBeNull();
+        expect(result).toBe(passportImxProvider);
+        expect(getProviderSilentMock).toHaveBeenCalled();
+      });
     });
   });
 

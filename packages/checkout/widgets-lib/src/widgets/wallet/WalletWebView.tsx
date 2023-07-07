@@ -1,5 +1,4 @@
 import { Environment } from '@imtbl/config';
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '../../lib';
 
 function WalletWebView() {
@@ -9,10 +8,7 @@ function WalletWebView() {
   };
 
   return (
-    <imtbl-wallet
-      providerPreference={ConnectionProviders.METAMASK}
-      widgetConfig={JSON.stringify(config)}
-    />
+    <imtbl-wallet widgetConfig={JSON.stringify(config)} walletProvider="metamask" />
   );
 }
 

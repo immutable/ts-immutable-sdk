@@ -1,4 +1,4 @@
-import { Wallet, providers } from 'ethers';
+import { providers, Wallet } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { Order, OrderStatus } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
@@ -10,7 +10,9 @@ import { signAndSubmitTx, signMessage } from './helpers/sign-and-submit';
 import { TestToken } from './helpers/test-token';
 import { waitForOrderToBeOfStatus } from './helpers/order';
 
-async function createOrder(
+const LOCAL_CHAIN_NAME = 'imtbl-zkevm-local';
+
+async function createListing(
   sdk: Orderbook,
   token: TestToken,
   tokenId: string,
@@ -19,12 +21,12 @@ async function createOrder(
   provider: providers.Provider,
 ): Promise<Order> {
   const listing = await sdk.prepareListing({
-    offerer: offerer.address,
-    considerationItem: {
+    makerAddress: offerer.address,
+    buy: {
       amount: considerationAmount,
-      type: 'IMX',
+      type: 'NATIVE',
     },
-    listingItem: {
+    sell: {
       contractAddress: token.address,
       tokenId,
       type: 'ERC721',
@@ -32,18 +34,21 @@ async function createOrder(
   });
 
   if (listing.unsignedApprovalTransaction) {
-    await signAndSubmitTx(listing.unsignedApprovalTransaction, offerer, provider);
+    await signAndSubmitTx(
+      listing.unsignedApprovalTransaction,
+      offerer,
+      provider,
+    );
   }
 
   const signature = await signMessage(
-    listing.typedOrderMessageForSigning.domain,
-    listing.typedOrderMessageForSigning.types,
-    listing.typedOrderMessageForSigning.value,
+    listing.typedOrderMessageForSigning,
     offerer,
   );
 
-  const { result: { id: orderId } } = await sdk.createOrder({
-    offerer: offerer.address,
+  const {
+    result: { id: orderId },
+  } = await sdk.createListing({
     orderComponents: listing.orderComponents,
     orderHash: listing.orderHash,
     orderSignature: signature,
@@ -52,7 +57,7 @@ async function createOrder(
   return waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
 }
 
-describe('listOrders e2e', () => {
+describe('listListings e2e', () => {
   const config = getConfig();
   const provider = getLocalhostProvider();
   const offerer = getOffererWallet(provider);
@@ -66,7 +71,7 @@ describe('listOrders e2e', () => {
     zoneContractAddress: config.zoneContractAddress,
     overrides: {
       apiEndpoint: config.apiUrl,
-      chainId: 'eip155:31337',
+      chainName: LOCAL_CHAIN_NAME,
     },
   });
 
@@ -86,13 +91,34 @@ describe('listOrders e2e', () => {
     await contract2.safeMint(offerer.address);
     token2ContractAddress = contract2.address;
 
-    token1Order1 = await createOrder(sdk, contract, '0', '2000000', offerer, provider);
-    token1Order2 = await createOrder(sdk, contract, '1', '1000000', offerer, provider);
-    token2Order1 = await createOrder(sdk, contract2, '0', '1000000', offerer, provider);
+    token1Order1 = await createListing(
+      sdk,
+      contract,
+      '0',
+      '2000000',
+      offerer,
+      provider,
+    );
+    token1Order2 = await createListing(
+      sdk,
+      contract,
+      '1',
+      '1000000',
+      offerer,
+      provider,
+    );
+    token2Order1 = await createListing(
+      sdk,
+      contract2,
+      '0',
+      '1000000',
+      offerer,
+      provider,
+    );
   }, 90_000);
 
   it('should list orders by collection', async () => {
-    const ordersPage = await sdk.listOrders({
+    const ordersPage = await sdk.listListings({
       sellItemContractAddress: token1ContractAddress,
       status: OrderStatus.ACTIVE,
     });
@@ -105,7 +131,7 @@ describe('listOrders e2e', () => {
   });
 
   it('should list orders by tokenID', async () => {
-    const ordersPage = await sdk.listOrders({
+    const ordersPage = await sdk.listListings({
       sellItemContractAddress: token2ContractAddress,
       sellItemTokenId: '0',
       status: OrderStatus.ACTIVE,
@@ -118,7 +144,7 @@ describe('listOrders e2e', () => {
   });
 
   it('should sort orders by buy amount', async () => {
-    const ordersPage = await sdk.listOrders({
+    const ordersPage = await sdk.listListings({
       sellItemContractAddress: token1ContractAddress,
       status: OrderStatus.ACTIVE,
       sortBy: 'buy_item_amount',
@@ -132,7 +158,7 @@ describe('listOrders e2e', () => {
   });
 
   it('should page orders', async () => {
-    const ordersPage1 = await sdk.listOrders({
+    const ordersPage1 = await sdk.listListings({
       sellItemContractAddress: token1ContractAddress,
       status: OrderStatus.ACTIVE,
       pageSize: 1,
@@ -143,7 +169,7 @@ describe('listOrders e2e', () => {
     expect(ordersPage1.page?.next_cursor).toBeTruthy();
     expect(ordersPage1.page?.previous_cursor).toBeNull();
 
-    const ordersPage2 = await sdk.listOrders({
+    const ordersPage2 = await sdk.listListings({
       sellItemContractAddress: token1ContractAddress,
       status: OrderStatus.ACTIVE,
       pageSize: 1,
@@ -155,7 +181,7 @@ describe('listOrders e2e', () => {
     expect(ordersPage2.page?.next_cursor).toBeTruthy();
     expect(ordersPage2.page?.previous_cursor).toBeTruthy();
 
-    const ordersPage3 = await sdk.listOrders({
+    const ordersPage3 = await sdk.listListings({
       sellItemContractAddress: token1ContractAddress,
       status: OrderStatus.ACTIVE,
       pageSize: 1,

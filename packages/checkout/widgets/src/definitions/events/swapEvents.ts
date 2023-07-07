@@ -9,11 +9,11 @@ export enum SwapEventType {
 }
 
 /**
- * Type representing a Swap Widget with type SUCCESS.
- * @property {number} timestamp - The timestamp of the successful swap.
+ * Represents a successful swap transaction.
+ * @property {string} transactionHash - The hash of the successful transaction.
  */
 export type SwapSuccess = {
-  timestamp: number;
+  transactionHash: string;
 };
 
 /**
@@ -22,7 +22,7 @@ export type SwapSuccess = {
  * @property {number} timestamp - The timestamp of the failed swap.
  */
 export type SwapFailed = {
-  reason?: string;
+  reason: string;
   timestamp: number;
 };
 
@@ -32,6 +32,6 @@ export type SwapFailed = {
  * @property {number} timestamp - The timestamp of the failed swap.
  */
 export type SwapRejected = {
-  reason?: string;
+  reason: string;
   timestamp: number;
 };

@@ -1,9 +1,10 @@
 import { Environment } from '@imtbl/config';
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from './types';
 
-export const DEFAULT_IMX_DECIMALS = 18;
-export const DEFAULT_TOKEN_DECIMALS = 6;
+export const DEFAULT_TOKEN_DECIMALS = 18;
+export const DEFAULT_TOKEN_FORMATTING_DECIMALS = 6;
+export const DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS = 2;
 
 /**
  * Checkout Widget default env
@@ -18,7 +19,7 @@ export const DEFAULT_THEME = WidgetTheme.DARK;
 /**
  * Checkout Widget default provider
  */
-export const DEFAULT_PROVIDER = ConnectionProviders.METAMASK;
+export const DEFAULT_PROVIDER = WalletProviderName.METAMASK;
 
 /**
  * Checkout Widget default onramp enabled flag

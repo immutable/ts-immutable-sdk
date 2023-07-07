@@ -24,7 +24,7 @@ describe('fulfil order', () => {
       zoneContractAddress: config.zoneContractAddress,
       overrides: {
         apiEndpoint: config.apiUrl,
-        chainId: 'eip155:31337',
+        chainName: 'imtbl-zkevm-local',
       },
     });
 
@@ -32,28 +32,31 @@ describe('fulfil order', () => {
     await contract.safeMint(offerer.address);
 
     const listing = await sdk.prepareListing({
-      offerer: offerer.address,
-      considerationItem: {
+      makerAddress: offerer.address,
+      buy: {
         amount: '1000000',
-        type: 'IMX',
+        type: 'NATIVE',
       },
-      listingItem: {
+      sell: {
         contractAddress: contract.address,
         tokenId: '0',
         type: 'ERC721',
       },
     });
 
-    await signAndSubmitTx(listing.unsignedApprovalTransaction!, offerer, provider);
+    await signAndSubmitTx(
+      listing.unsignedApprovalTransaction!,
+      offerer,
+      provider,
+    );
     const signature = await signMessage(
-      listing.typedOrderMessageForSigning.domain,
-      listing.typedOrderMessageForSigning.types,
-      listing.typedOrderMessageForSigning.value,
+      listing.typedOrderMessageForSigning,
       offerer,
     );
 
-    const { result: { id: orderId } } = await sdk.createOrder({
-      offerer: offerer.address,
+    const {
+      result: { id: orderId },
+    } = await sdk.createListing({
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
       orderSignature: signature,
@@ -61,7 +64,10 @@ describe('fulfil order', () => {
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
 
-    const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(orderId, fulfiller.address);
+    const { unsignedFulfillmentTransaction } = await sdk.fulfillOrder(
+      orderId,
+      fulfiller.address,
+    );
     await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.FILLED);

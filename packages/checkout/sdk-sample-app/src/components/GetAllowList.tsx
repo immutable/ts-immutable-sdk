@@ -36,11 +36,11 @@ export default function GetAllowList(props: AllowListProps) {
 
   async function getNetworkAllowList() {
     if (!checkout) {
-      console.error('missing checkout, please connect frist');
+      console.error('missing checkout, please connect first');
       return;
     }
     if (!provider) {
-      console.error('missing provider, please connect frist');
+      console.error('missing provider, please connect first');
       return;
     }
     setErrorNetwork(null);
@@ -49,6 +49,7 @@ export default function GetAllowList(props: AllowListProps) {
       const resp = await checkout.getNetworkAllowList({
         type: NetworkFilterTypes.ALL,
       });
+      console.log(resp)
       setResultNetwork(resp.networks);
       setLoadingNetwork(false);
     } catch (error: any) {
@@ -63,11 +64,11 @@ export default function GetAllowList(props: AllowListProps) {
 
   async function getWalletsAllowList() {
     if (!checkout) {
-      console.error('missing checkout, please connect frist');
+      console.error('missing checkout, please connect first');
       return;
     }
     if (!provider) {
-      console.error('missing provider, please connect frist');
+      console.error('missing provider, please connect first');
       return;
     }
     setErrorWallet(null);
@@ -90,11 +91,11 @@ export default function GetAllowList(props: AllowListProps) {
 
   async function getTokensAllowList() {
     if (!checkout) {
-      console.error('missing checkout, please connect frist');
+      console.error('missing checkout, please connect first');
       return;
     }
     if (!provider) {
-      console.error('missing provider, please connect frist');
+      console.error('missing provider, please connect first');
       return;
     }
     setErrorToken(null);

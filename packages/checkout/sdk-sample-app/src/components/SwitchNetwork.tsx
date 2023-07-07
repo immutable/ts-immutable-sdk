@@ -2,7 +2,7 @@ import { Checkout, ChainId, NetworkInfo } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
 import LoadingButton from './LoadingButton';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Box } from '@biom3/react';
 import { NetworkFilterTypes } from '@imtbl/checkout-sdk';
 
@@ -48,7 +48,7 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
     getNetworks();
   }, [checkout]);
 
-  async function switchNetwork(chainId: ChainId) {
+  const switchNetwork = useCallback(async(chainId: ChainId) => {
     if (!checkout) {
       console.error('missing checkout, please connect frist');
       return;
@@ -62,7 +62,11 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
     setLoading(true);
 
     try {
-      const resp = await checkout.switchNetwork({ provider, chainId });
+      console.log(provider)
+      const resp = await checkout.switchNetwork({
+        provider,
+        chainId,
+      });
       setProvider(resp.provider);
       setResult(resp.network);
       setLoading(false);
@@ -74,7 +78,7 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
       console.log(err.data);
       console.log(err.stack);
     }
-  }
+  }, [checkout, provider]);
 
   async function getNetworkInfo() {
     if (!checkout) {
@@ -91,6 +95,8 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
 
     try {
       const resp = await checkout.getNetworkInfo({ provider });
+
+      console.log('resp', resp)
       setResultNetInfo(resp);
       setLoadingNetInfo(false);
     } catch (err: any) {
@@ -147,7 +153,10 @@ export default function SwitchNetwork(props: SwitchNetworkProps) {
           <SuccessMessage>
             <Box>ChainId: {resultNetInfo.chainId}</Box>
             <Box>Name: {resultNetInfo.name}</Box>
-            <Box>Symbol: {resultNetInfo.nativeCurrency.symbol}</Box>
+            { resultNetInfo.isSupported && (
+              <Box>Symbol: {resultNetInfo.nativeCurrency.symbol}</Box>
+            )}
+            <Box>Supported: {resultNetInfo.isSupported ? 'true' : 'false'}</Box>
           </SuccessMessage>
         )}
         {errorNetInfo && (

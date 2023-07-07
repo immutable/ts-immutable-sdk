@@ -1,10 +1,11 @@
 /**
- * Interface representing token information.
- * @property {string} name - The token name.
- * @property {string} symbol - The token symbol.
- * @property {number} decimals - The token decimals.
- * @property {string} [address] - The token contract address.
- * @property {string} [icon] - The token icon URL/data:image.
+ * Represents information about a token.
+ * @interface TokenInfo
+ * @property {string} name - The name of the token.
+ * @property {string} symbol - The symbol of the token.
+ * @property {number} decimals - The number of decimal places the token supports.
+ * @property {string | undefined} [address] - The address of the token.
+ * @property {string | undefined} [icon] - The URL of the token's icon.
  */
 export interface TokenInfo {
   name: string;

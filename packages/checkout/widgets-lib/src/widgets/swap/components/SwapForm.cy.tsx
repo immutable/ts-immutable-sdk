@@ -3,9 +3,9 @@ import { mount } from 'cypress/react18';
 import { BigNumber } from 'ethers';
 import { cy } from 'local-cypress';
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { Exchange } from '@imtbl/dex-sdk';
-import { cySmartGet } from '../../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapForm } from './SwapForm';
 import { text } from '../../../resources/text/textConfig';
@@ -16,13 +16,18 @@ import { quotesProcessor } from '../functions/FetchQuote';
 
 describe('SwapForm', () => {
   let testSwapState: SwapState;
+  let cryptoConversions;
+
   beforeEach(() => {
     cy.viewport('ipad-2');
+    cyIntercept();
+
+    cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
 
     testSwapState = {
       ...initialSwapState,
       provider: {} as Web3Provider,
-      checkout: {} as Checkout,
+      checkout: new Checkout(),
       exchange: {} as Exchange,
       tokenBalances: [
         {
@@ -167,6 +172,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -195,6 +201,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -216,6 +223,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -236,6 +244,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -260,6 +269,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -287,25 +297,43 @@ describe('SwapForm', () => {
       cy.stub(quotesProcessor, 'fromAmountIn')
         .as('fromAmountInStub')
         .resolves({
-          info: {
-            quote: {
+          quote: {
+            amount: {
               token: {
                 name: 'Ethereum',
                 symbol: 'ETH',
                 decimals: 18,
                 address: '',
               },
-              amount: BigNumber.from('112300000000000012'),
+              value: BigNumber.from('112300000000000012'),
             },
-            quoteWithMaxSlippage: {
+            amountWithMaxSlippage: {
               token: {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
                 address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
               },
-              amount: BigNumber.from('112300000000000032'),
+              value: BigNumber.from('112300000000000032'),
             },
+            slippage: 10,
+          },
+          swap: {
+            gasFeeEstimate: {
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              },
+              value: BigNumber.from('112300000000000045'),
+            },
+            transaction: {
+              to: 'toSwapAddress',
+              from: 'fromSwapAddress',
+            },
+          },
+          approval: {
             gasFeeEstimate: {
               token: {
                 name: 'ImmutableX',
@@ -315,7 +343,10 @@ describe('SwapForm', () => {
               },
               amount: BigNumber.from('112300000000000045'),
             },
-            slippage: 10,
+            transaction: {
+              to: 'toApprovalAddress',
+              from: 'fromApprovalAddress',
+            },
           },
         });
     });
@@ -324,6 +355,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -366,6 +398,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -406,13 +439,14 @@ describe('SwapForm', () => {
 
       const staticText = text.views[SwapWidgetViews.SWAP];
       cySmartGet('fee_description_gas').should('have.text', '≈ IMX 0.112300');
-      cySmartGet('fee_description_gas_fiat').should('have.text', `${staticText.content.fiatPricePrefix} $0.00`);
+      cySmartGet('fee_description_gas_fiat').should('have.text', `${staticText.content.fiatPricePrefix} $0.08`);
     });
 
     it('should fetch a quote after from amount max button is clicked', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -455,6 +489,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -475,6 +510,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -495,6 +531,7 @@ describe('SwapForm', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
         >
           <SwapCoins />
         </SwapWidgetTestComponent>,
@@ -511,6 +548,80 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').blur();
       cySmartGet('@fromAmountInStub').should('have.been.called');
+    });
+  });
+
+  describe('submitting a swap', () => {
+    beforeEach(() => {
+      cy.stub(quotesProcessor, 'fromAmountIn')
+        .as('fromAmountInStub')
+        .resolves({
+          quote: {
+            amount: {
+              token: {
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+                address: '',
+              },
+              value: BigNumber.from('112300000000000012'),
+            },
+            amountWithMaxSlippage: {
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              },
+              value: BigNumber.from('112300000000000032'),
+            },
+            slippage: 10,
+          },
+          swap: {
+            gasFeeEstimate: {
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              },
+              value: BigNumber.from('112300000000000045'),
+            },
+            transaction: {
+              to: 'toSwapAddress',
+              from: 'fromSwapAddress',
+            },
+          },
+        });
+
+      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+        .rejects({
+          type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
+        });
+    });
+
+    it('should open the transaction rejected drawer if the user rejects the transaction', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapCoins />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('fromTokenInputs-select-form-select__target').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+        .click();
+      cySmartGet('toTokenInputs-select-form-select__target').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-eth').click();
+
+      cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
+      cySmartGet('fromTokenInputs-text-form-text__input').blur();
+
+      cySmartGet('swap-button').click();
+
+      cySmartGet('transaction-rejected-heading').should('be.visible');
     });
   });
 });

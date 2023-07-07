@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount } from 'cypress/react18';
-import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { cy } from 'local-cypress';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
@@ -14,11 +14,11 @@ import { orchestrationEvents } from '../../../../lib/orchestrationEvents';
 describe('BalanceItem', () => {
   const baseWalletState: WalletState = {
     checkout: new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
+      baseConfig: { environment: Environment.SANDBOX },
     }),
     network: null,
     provider: null,
-    providerPreference: ConnectionProviders.METAMASK,
+    walletProvider: WalletProviderName.METAMASK,
     tokenBalances: [],
     supportedTopUps: null,
   };
@@ -57,7 +57,7 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON_ZKEVM,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
           name: 'IMX',
@@ -87,7 +87,7 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON_ZKEVM,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
           name: 'IMX',
@@ -123,7 +123,7 @@ describe('BalanceItem', () => {
     const testWalletState = {
       ...baseWalletState,
       network: {
-        chainId: ChainId.POLYGON_ZKEVM,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         name: 'Immutable zkEVM Testnet',
         nativeCurrency: {
           name: 'IMX',
@@ -212,7 +212,7 @@ describe('BalanceItem', () => {
       testWalletState = {
         ...baseWalletState,
         network: {
-          chainId: ChainId.POLYGON_ZKEVM,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           name: 'Immutable zkEVM Testnet',
           nativeCurrency: {
             name: 'IMX',

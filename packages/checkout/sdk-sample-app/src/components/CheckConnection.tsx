@@ -1,9 +1,8 @@
 import {
   CheckConnectionResult,
   Checkout,
-  ConnectionProviders,
 } from '@imtbl/checkout-sdk';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import LoadingButton from './LoadingButton';
 import { Web3Provider } from '@ethersproject/providers';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';
@@ -26,12 +25,16 @@ export default function CheckConnection(props: CheckConnectionProps) {
       console.error('missing checkout, please connect frist');
       return;
     }
+    if (!provider) {
+      console.error('missing provider, please connect frist');
+      return;
+    }
 
     setError(null);
     setLoading(true);
     try {
       const resp = await checkout.checkIsWalletConnected({
-        providerPreference: ConnectionProviders.METAMASK,
+        provider,
       });
       setResult(resp);
       setLoading(false);

@@ -7,11 +7,11 @@ export async function waitForOrderToBeOfStatus(
   status: OrderStatus,
   attemps = 0,
 ): Promise<Order> {
-  if (attemps > 20) {
+  if (attemps > 50) {
     throw new Error('Order never became active');
   }
 
-  const { result: order } = await sdk.getOrder(orderId);
+  const { result: order } = await sdk.getListing(orderId);
   if (order.status === status) {
     return order;
   }

@@ -6,11 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased] - YYYY-MM-DD
+
 ### Added
+
+- @imtbl/blockchain-data: Added ListTokens and GetToken methods
+- @imtbl/passport: Exposes Networks, UserProfile & PassportOverrides types
+- @imtbl/blockchain-data: Expose ActivityType type
 
 ### Fixed
 
+- @imtbl/passport: Fixed the confirmation popup being blocked by browser issue
+
 ### Changed
+- @imtbl/passport: Changed all the other Passport starkEx Provider functions to call the confirmation screen with guardian check
+
+- @imtbl/blockchain-data: Improved naming for Activity types
 
 ### Removed
 
@@ -28,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - @imtbl/passport: Fixed a bug on Passport Provider getAddress.
 
 ### Changed
+
 - @imtbl/passport: Changed `transfer` function to call the confirmation screen with guardian check
 
 ### Removed

@@ -1,48 +1,36 @@
 import {
+  DexConfig,
   GetTokenAllowListParams,
   GetTokenAllowListResult,
   TokenFilterTypes,
   TokenInfo,
-  TokenMasterInfo,
 } from '../types';
-import masterTokenList from './token_master_list.json';
+import { CheckoutConfiguration } from '../config';
 
-const filterTokenList = ({
-  type,
-  chainId,
-  exclude,
-}: GetTokenAllowListParams): TokenMasterInfo[] => masterTokenList.filter((token) => {
-  const skipChainIdCheck = !chainId;
-  const chainIdMatches = token.chainId === chainId;
-  const tokenNotExcluded = !exclude
-    ?.map((excludeToken) => excludeToken.address)
-    .includes(token.address || '');
-  const allowAllTokens = type === TokenFilterTypes.ALL;
-  const tokenAllowedForType = token.tokenFeatures.includes(type);
+export const getTokenAllowList = async (
+  config: CheckoutConfiguration,
+  { type = TokenFilterTypes.ALL, chainId, exclude }: GetTokenAllowListParams,
+): Promise<GetTokenAllowListResult> => {
+  let tokens: TokenInfo[] = [];
 
-  return (
-    (skipChainIdCheck || chainIdMatches)
-      && tokenNotExcluded
-      && (allowAllTokens || tokenAllowedForType)
-  );
-}) as TokenMasterInfo[];
+  switch (type) {
+    case TokenFilterTypes.SWAP:
+      // Fetch tokens from dex-tokens config because
+      // Dex needs to have a whitelisted list of tokens due to
+      // legal reasons.
+      tokens = ((await config.remote.getConfig('dex')) as DexConfig)
+        .tokens || [];
+      break;
 
-export const getTokenAllowList = async ({
-  type = TokenFilterTypes.ALL,
-  chainId,
-  exclude,
-}: GetTokenAllowListParams): Promise<GetTokenAllowListResult> => {
-  const filteredTokenList = filterTokenList({ type, chainId, exclude }).map(
-    (token: TokenMasterInfo): TokenInfo => ({
-      name: token.name,
-      symbol: token.symbol,
-      decimals: token.decimals,
-      address: token.address,
-      icon: token.icon,
-    }),
-  );
+    case TokenFilterTypes.BRIDGE:
+    case TokenFilterTypes.ALL:
+    default:
+      tokens = (await config.remote.getTokens(chainId)) as TokenInfo[];
+  }
+
+  if (!exclude || exclude?.length === 0) return { tokens };
 
   return {
-    tokens: filteredTokenList,
+    tokens: tokens.filter((token) => !exclude.map((e) => e.address).includes(token.address || '')) as TokenInfo[],
   };
 };

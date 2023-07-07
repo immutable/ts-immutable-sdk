@@ -23,7 +23,7 @@ on:
         default: none
       dry_run:
         type: boolean
-        description: '(Optional) Dry run'
+        description: "(Optional) Dry run"
         required: false
         default: false
 
@@ -100,7 +100,7 @@ jobs:
           jq '.version = "${{steps.version.outputs.NEXT_VERSION}}"' ./sdk/package.json > "$tmp" && mv "$tmp" ./sdk/package.json
 
       - name: Build
-        run: RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
 
       - name: Typecheck
         run: yarn typecheck

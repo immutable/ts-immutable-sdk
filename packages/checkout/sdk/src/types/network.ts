@@ -1,128 +1,6 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { TokenInfo } from './tokenInfo';
-import { ChainId } from './chainId';
+import { ChainId } from './chains';
 import { NetworkInfo } from './networkInfo';
-
-/**
- * Type representing the details of a network.
- * @property {string} chainIdHex - The hexadecimal ID of the network.
- * @property {string} chainName - The name of the network.
- * @property {string[]} rpcUrls - The RPS URLs of the network's node.
- * @property {TokenInfo} nativeCurrency - The info of the network's native currency.
- * @property {string[]} [blockExplorerUrls] - The URLs of the network's block explorer.
- */
-export type NetworkDetails = {
-  chainIdHex: string;
-  chainName: string;
-  rpcUrls: string[];
-  nativeCurrency: TokenInfo;
-  blockExplorerUrls?: string[];
-};
-
-/**
- * Type representing the mapping between ChainId and NetworkDetails
- */
-export type NetworkMap = Map<ChainId, NetworkDetails>;
-
-/**
- * Object mapping the list of supported production networks with the corresponding network details.
- */
-export const PRODUCTION_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
-ChainId,
-NetworkDetails
->([
-  [
-    ChainId.ETHEREUM,
-    {
-      chainIdHex: '0x1', // 1
-      chainName: 'Ethereum',
-      rpcUrls: ['https://mainnet.infura.io/v3/'],
-      nativeCurrency: {
-        name: 'Ethereum',
-        symbol: 'ETH',
-        decimals: 18,
-      },
-      blockExplorerUrls: ['https://etherscan.io/'],
-    },
-  ],
-  [
-    ChainId.IMTBL_ZKEVM_TESTNET,
-    {
-      chainIdHex: '0x343C', // 13372
-      chainName: 'Immutable zkEVM Testnet',
-      rpcUrls: ['https://zkevm-rpc.sandbox.x.immutable.com'],
-      nativeCurrency: {
-        name: 'IMX',
-        symbol: 'IMX',
-        decimals: 18,
-      },
-    },
-  ],
-  [
-    ChainId.POLYGON_ZKEVM,
-    {
-      chainIdHex: '0x89', // 137
-      chainName: 'Polygon zkEVM',
-      rpcUrls: ['https://polygon-rpc.com'],
-      nativeCurrency: {
-        name: 'MATIC',
-        symbol: 'MATIC',
-        decimals: 18,
-      },
-      blockExplorerUrls: ['https://polygonscan.com/'],
-    },
-  ],
-]);
-
-/**
- * Object mapping the list of supported sandbox networks with the corresponding network details.
- */
-export const SANDBOX_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
-ChainId,
-NetworkDetails
->([
-  [
-    ChainId.SEPOLIA,
-    {
-      chainIdHex: '0xaa36a7', // 11155111
-      chainName: 'Sepolia',
-      rpcUrls: ['https://sepolia.infura.io/v3/'],
-      nativeCurrency: {
-        name: 'Sep Eth',
-        symbol: 'ETH',
-        decimals: 18,
-      },
-      blockExplorerUrls: ['https://sepolia.etherscan.io/'],
-    },
-  ],
-  [
-    ChainId.IMTBL_ZKEVM_DEVNET,
-    {
-      chainIdHex: '0x343D', // 13373
-      chainName: 'Immutable zkEVM Devnet',
-      rpcUrls: ['https://zkevm-rpc.dev.x.immutable.com/'],
-      nativeCurrency: {
-        name: 'IMX',
-        symbol: 'IMX',
-        decimals: 18,
-      },
-    },
-  ],
-  [
-    ChainId.POLYGON_ZKEVM_TESTNET,
-    {
-      chainIdHex: '0x5A2', // 1442
-      chainName: 'Polygon zkEVM Testnet',
-      rpcUrls: ['https://rpc.public.zkevm-test.net'],
-      nativeCurrency: {
-        name: 'MATIC',
-        symbol: 'MATIC',
-        decimals: 18,
-      },
-      blockExplorerUrls: ['https://testnet-zkevm.polygonscan.com'],
-    },
-  ],
-]);
 
 /**
  * Interface representing the parameters for {@link Checkout.switchNetwork}.
@@ -135,8 +13,10 @@ export interface SwitchNetworkParams {
 }
 
 /**
- * Interface representing the result of {@link Checkout.switchNetwork}.
- * @property {NetworkInfo} network - The information of the network that was switched to.
+ * Represents the result of switching the network in a Web3 application {@link Checkout.switchNetwork}.
+ * @interface SwitchNetworkResult
+ * @property {NetworkInfo} network - The information about the switched network.
+ * @property {Web3Provider} provider - The Web3 provider for the switched network.
  */
 export interface SwitchNetworkResult {
   network: NetworkInfo;
@@ -149,21 +29,6 @@ export interface SwitchNetworkResult {
  */
 export interface GetNetworkParams {
   provider: Web3Provider;
-}
-
-/**
- * Enum representing the types of filters that can be applied to get the allow list of networks.
- */
-export enum NetworkFilterTypes {
-  ALL = 'all',
-}
-
-/**
- * Interface representing a filter for filtering a specific network.
- * @property {ChainId} chainId - The ID of the network to allow or disallow.
- */
-export interface NetworkFilter {
-  chainId: ChainId;
 }
 
 /**
@@ -182,4 +47,19 @@ export interface GetNetworkAllowListParams {
  */
 export interface GetNetworkAllowListResult {
   networks: NetworkInfo[];
+}
+
+/**
+ * Enum representing the types of filters that can be applied to get the allow list of networks.
+ */
+export enum NetworkFilterTypes {
+  ALL = 'all',
+}
+
+/**
+ * Interface representing a filter for filtering a specific network.
+ * @property {ChainId} chainId - The ID of the network to allow or disallow.
+ */
+export interface NetworkFilter {
+  chainId: ChainId;
 }

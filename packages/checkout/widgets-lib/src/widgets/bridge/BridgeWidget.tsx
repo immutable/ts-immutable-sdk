@@ -1,21 +1,30 @@
-/* eslint-disable no-console */
 import {
   BiomeCombinedProviders,
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
+import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
-  ConnectionProviders,
-  GetTokenAllowListResult,
   NetworkFilterTypes,
-  TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
   useEffect, useMemo, useReducer, useRef,
 } from 'react';
-import { l1Network, zkEVMNetwork } from '../../lib/networkUtils';
+import { ImmutableConfiguration } from '@imtbl/config';
+import { ethers } from 'ethers';
+import {
+  BridgeConfiguration,
+  ETH_MAINNET_TO_ZKEVM_MAINNET,
+  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
+  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+  TokenBridge,
+} from '@imtbl/bridge-sdk';
+import {
+  WidgetTheme,
+  getL1ChainId,
+  getL2ChainId,
+} from '../../lib';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { Network, WidgetTheme } from '../../lib';
 import {
   SharedViews,
   ViewActions, ViewContext, initialViewState, viewReducer,
@@ -24,29 +33,36 @@ import {
   BridgeActions, BridgeContext, bridgeReducer, initialBridgeState,
 } from './context/BridgeContext';
 import { LoadingView } from '../../views/loading/LoadingView';
-import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
-import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { sendBridgeFailedEvent, sendBridgeSuccessEvent, sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
+import { BridgeSuccessView, BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { Bridge } from './views/Bridge';
 import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { CryptoFiatProvider } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 import { MoveInProgress } from './views/MoveInProgress';
+import { text } from '../../resources/text/textConfig';
+import { ErrorView } from '../../views/error/ErrorView';
+import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
+import { getBridgeTokensAndBalances } from './functions/getBridgeTokens';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
   config: StrongCheckoutWidgetsConfig
+  web3Provider?: Web3Provider;
 }
 
 export interface BridgeWidgetParams {
-  providerPreference: ConnectionProviders;
   fromContractAddress?: string;
   amount?: string;
-  fromNetwork?: Network;
 }
 
 export function BridgeWidget(props: BridgeWidgetProps) {
-  const { params, config } = props;
+  const { params, config, web3Provider } = props;
   const { environment, theme } = config;
+  const successText = text.views[BridgeWidgetViews.SUCCESS];
+  const failText = text.views[BridgeWidgetViews.FAIL];
+  const loadingText = text.views[SharedViews.LOADING_VIEW].text;
+  const errorText = text.views[SharedViews.ERROR_VIEW];
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
@@ -58,20 +74,16 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
 
   const {
-    providerPreference, amount, fromContractAddress,
+    amount, fromContractAddress,
   } = params;
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 
-  const defaultFromChainId = l1Network(environment);
-  const toChainId = zkEVMNetwork(environment);
-
   useEffect(() => {
     const bridgetWidgetSetup = async () => {
-      if (!providerPreference) return;
-
+      if (!web3Provider) return;
       const checkout = new Checkout({
         baseConfig: { environment },
       });
@@ -83,21 +95,36 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         },
       });
 
-      const connectResult = await checkout.connect({
-        providerPreference: providerPreference ?? ConnectionProviders.METAMASK,
-      });
-
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_PROVIDER,
-          provider: connectResult.provider,
+          provider: web3Provider,
         },
       });
 
+      const rootProvider = new ethers.providers.JsonRpcProvider(
+        checkout.config.networkMap.get(getL1ChainId(checkout.config))?.rpcUrls[0],
+      );
+
+      const toChainId = getL2ChainId(checkout.config);
+
+      const childProvider = new ethers.providers.JsonRpcProvider(
+        checkout.config.networkMap.get(toChainId)?.rpcUrls[0],
+      );
+
+      let bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_TESTNET;
+      if (checkout.config.isDevelopment) bridgeInstance = ETH_SEPOLIA_TO_ZKEVM_DEVNET;
+      if (checkout.config.isProduction) bridgeInstance = ETH_MAINNET_TO_ZKEVM_MAINNET;
+
       bridgeDispatch({
         payload: {
-          type: BridgeActions.SET_NETWORK,
-          network: connectResult.network,
+          type: BridgeActions.SET_TOKEN_BRIDGE,
+          tokenBridge: new TokenBridge(new BridgeConfiguration({
+            baseConfig: new ImmutableConfiguration(config),
+            bridgeInstance,
+            rootProvider,
+            childProvider,
+          })),
         },
       });
 
@@ -105,7 +132,9 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         type: NetworkFilterTypes.ALL,
       });
 
-      const toNetwork = allowedBridgingNetworks.networks.find((network) => network.chainId === toChainId);
+      const toNetwork = allowedBridgingNetworks.networks.find(
+        (network) => network.chainId === toChainId,
+      );
 
       if (toNetwork) {
         bridgeDispatch({
@@ -116,36 +145,28 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         });
       }
 
-      const address = await connectResult.provider.getSigner().getAddress();
-      const tokenBalances = await checkout.getAllBalances({
-        provider: connectResult.provider,
-        walletAddress: address,
-        chainId: connectResult.network.chainId,
+      const getNetworkResult = await checkout.getNetworkInfo({ provider: web3Provider });
+
+      bridgeDispatch({
+        payload: {
+          type: BridgeActions.SET_NETWORK,
+          network: getNetworkResult,
+        },
       });
 
-      const allowList: GetTokenAllowListResult = await checkout.getTokenAllowList(
-        {
-          chainId: connectResult.network.chainId,
-          type: TokenFilterTypes.BRIDGE,
-        },
-      );
-
-      const allowedTokenBalances = tokenBalances.balances.filter((balance) => balance.balance.gt(0)
-        && allowList.tokens
-          .map((token) => token.address)
-          .includes(balance.token.address));
+      const tokensAndBalances = await getBridgeTokensAndBalances(checkout, web3Provider);
 
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_ALLOWED_TOKENS,
-          allowedTokens: allowList.tokens,
+          allowedTokens: tokensAndBalances.allowList.tokens,
         },
       });
 
       bridgeDispatch({
         payload: {
           type: BridgeActions.SET_TOKEN_BALANCES,
-          tokenBalances: allowedTokenBalances,
+          tokenBalances: tokensAndBalances.allowedTokenBalances,
         },
       });
 
@@ -160,33 +181,80 @@ export function BridgeWidget(props: BridgeWidgetProps) {
     if (firstRender.current) {
       bridgetWidgetSetup();
     }
-  }, [providerPreference, defaultFromChainId, toChainId, firstRender.current]);
+  }, [web3Provider, firstRender.current]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       <ViewContext.Provider value={viewReducerValues}>
         <BridgeContext.Provider value={bridgeReducerValues}>
-          <CryptoFiatProvider>
+          <CryptoFiatProvider environment={environment}>
             {viewReducerValues.viewState.view.type === SharedViews.LOADING_VIEW && (
-            <LoadingView loadingText="Loading" />
+              <LoadingView loadingText={loadingText} />
             )}
             {viewReducerValues.viewState.view.type === BridgeWidgetViews.BRIDGE && (
-            <Bridge
-              amount={amount}
-              fromContractAddress={fromContractAddress}
-            />
+              <Bridge
+                amount={viewReducerValues.viewState.view.data?.amount ?? amount}
+                fromContractAddress={viewReducerValues.viewState.view.data?.tokenAddress ?? fromContractAddress}
+              />
             )}
             {viewReducerValues.viewState.view.type === BridgeWidgetViews.IN_PROGRESS && (
-            <MoveInProgress token={viewReducerValues.viewState.view.data.token} />
+              <MoveInProgress
+                token={viewReducerValues.viewState.view.data.token}
+                transactionResponse={viewReducerValues.viewState.view.data.transactionResponse}
+                bridgeForm={viewReducerValues.viewState.view.data.bridgeForm}
+              />
+            )}
+            {viewReducerValues.viewState.view.type === BridgeWidgetViews.APPROVE_ERC20 && (
+              <ApproveERC20BridgeOnboarding data={viewReducerValues.viewState.view.data} />
             )}
             {viewReducerValues.viewState.view.type === BridgeWidgetViews.SUCCESS && (
-            <StatusView
-              statusText="Success"
-              actionText="Continue"
-              onActionClick={sendBridgeWidgetCloseEvent}
-              statusType={StatusType.SUCCESS}
-              testId="success-view"
-            />
+              <StatusView
+                statusText={successText.text} // todo: move to text
+                actionText={successText.actionText}
+                onActionClick={sendBridgeWidgetCloseEvent}
+                onRenderEvent={() => sendBridgeSuccessEvent(
+                  (viewReducerValues.viewState.view as BridgeSuccessView).data.transactionHash,
+                )}
+                statusType={StatusType.SUCCESS}
+                testId="success-view"
+              />
+            )}
+            {viewReducerValues.viewState.view.type === BridgeWidgetViews.FAIL && (
+              <StatusView
+                statusText={failText.text}
+                actionText={failText.actionText}
+                onActionClick={() => {
+                  if (viewState.view.type === BridgeWidgetViews.FAIL) {
+                    viewDispatch({
+                      payload: {
+                        type: ViewActions.UPDATE_VIEW,
+                        view: {
+                          type: BridgeWidgetViews.BRIDGE,
+                          data: viewState.view.data,
+                        },
+                      },
+                    });
+                  }
+                }}
+                onRenderEvent={() => sendBridgeFailedEvent('Transaction failed')}
+                onCloseClick={sendBridgeWidgetCloseEvent}
+                statusType={StatusType.FAILURE}
+                testId="fail-view"
+              />
+            )}
+            {viewReducerValues.viewState.view.type === SharedViews.ERROR_VIEW && (
+              <ErrorView
+                actionText={errorText.actionText}
+                onActionClick={() => {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.UPDATE_VIEW,
+                      view: { type: BridgeWidgetViews.BRIDGE },
+                    },
+                  });
+                }}
+                onCloseClick={sendBridgeWidgetCloseEvent}
+              />
             )}
           </CryptoFiatProvider>
         </BridgeContext.Provider>

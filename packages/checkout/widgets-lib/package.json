@@ -15,8 +15,9 @@
   },
   "dependencies": {
     "@biom3/design-tokens": "0.2.0-beta",
-    "@biom3/react": "^0.5.11-beta",
+    "@biom3/react": "^0.6.4-beta",
     "@ethersproject/providers": "^5.7.2",
+    "@imtbl/bridge-sdk": "0.0.0",
     "@imtbl/checkout-sdk": "0.0.0",
     "@imtbl/checkout-widgets": "0.0.0",
     "@imtbl/config": "0.0.0",
@@ -54,14 +55,14 @@
   "module": "dist/module.js",
   "private": true,
   "scripts": {
-    "build": "cp src/build.tsx src/index.tsx && GENERATE_SOURCEMAP=false react-scripts build",
+    "build": "cp src/build.ts src/index.tsx && GENERATE_SOURCEMAP=false react-scripts build",
     "build:dist": "yarn build && yarn dist:sample",
     "dist:sample": "mkdir -p ../widgets-sample-app/public/lib/js && cp build/static/js/main.*.js ../widgets-sample-app/public/lib/js/imtbl-checkout.js",
     "dist:sdk": "mkdir -p ../../../sdk/dist/browser && cp build/static/js/main.*.js ../../../sdk/dist/browser/checkout.js",
     "eject": "react-scripts eject",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
-    "start": "cp src/app.tsx src/index.tsx && PORT=3001 GENERATE_SOURCEMAP=false react-scripts start",
+    "start": " cp src/app.tsx src/index.tsx && PORT=3001 GENERATE_SOURCEMAP=false PUBLIC_URL=/ react-scripts start",
     "test": "jest test --passWithNoTests",
     "test:cypress": "NODE_ENV=test cypress run --component --headless",
     "test:cypress:open": "NODE_ENV=test cypress open --component --browser electron"

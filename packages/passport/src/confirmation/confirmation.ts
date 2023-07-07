@@ -17,6 +17,8 @@ const CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION = 1000;
 export default class ConfirmationScreen {
   private config: PassportConfiguration;
 
+  private confirmationWindow: Window | undefined;
+
   constructor(config: PassportConfiguration) {
     this.config = config;
   }
@@ -93,7 +95,7 @@ export default class ConfirmationScreen {
 
   startGuardianTransaction(
     transactionId: string,
-    popupOptions?: { width: number; height: number },
+    imxEtherAddress: string,
   ): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
@@ -119,24 +121,34 @@ export default class ConfirmationScreen {
             reject(new Error('Unsupported message type'));
         }
       };
-
       window.addEventListener('message', messageHandler);
-      const confirmationWindow = openPopupCenter({
-        // eslint-disable-next-line max-len
-        url: `${this.config.passportDomain}/transaction-confirmation/transaction.html?transactionId=${transactionId}&chainType=starkex`,
-        title: CONFIRMATION_WINDOW_TITLE,
-        width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
-        height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
-      });
-
+      if (!this.confirmationWindow) {
+        resolve({ confirmed: false });
+        return;
+      }
+      // eslint-disable-next-line max-len
+      this.confirmationWindow.location.href = `${this.config.passportDomain}/transaction-confirmation/transaction.html?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=starkex`;
       // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
       const timer = setInterval(() => {
-        if (confirmationWindow.closed) {
+        if (this.confirmationWindow?.closed) {
           clearInterval(timer);
           window.removeEventListener('message', messageHandler);
           resolve({ confirmed: false });
         }
       }, CONFIRMATION_WINDOW_CLOSED_POLLING_DURATION);
     });
+  }
+
+  loading(popupOptions?: { width: number; height: number }) {
+    this.confirmationWindow = openPopupCenter({
+      url: `${this.config.passportDomain}/transaction-confirmation/loading.html`,
+      title: CONFIRMATION_WINDOW_TITLE,
+      width: popupOptions?.width || CONFIRMATION_WINDOW_WIDTH,
+      height: popupOptions?.height || CONFIRMATION_WINDOW_HEIGHT,
+    });
+  }
+
+  closeWindow() {
+    this.confirmationWindow?.close();
   }
 }
