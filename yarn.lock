@@ -12,7 +12,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsequence/abi@npm:^0.43.33, @0xsequence/abi@npm:^0.43.34":
+"@0xsequence/abi@npm:^0.43.34":
   version: 0.43.34
   resolution: "@0xsequence/abi@npm:0.43.34"
   checksum: b3f9298f5ab20f10997e2c27f7b6c853a5f19547190f7b59349a9e044b3a2c178d1bdd784a89408aa154adeeee3d2e3df73da6764e7b1fad53607fe8968fc1dd
@@ -46,7 +46,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsequence/config@npm:^0.43.33, @0xsequence/config@npm:^0.43.34":
+"@0xsequence/config@npm:^0.43.34":
   version: 0.43.34
   resolution: "@0xsequence/config@npm:0.43.34"
   dependencies:
@@ -4091,8 +4091,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@imtbl/sdk@workspace:sdk"
   dependencies:
-    "@0xsequence/abi": ^0.43.33
-    "@0xsequence/config": ^0.43.33
+    "@0xsequence/abi": ^0.43.34
+    "@0xsequence/config": ^0.43.34
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/providers": ^5.7.2
     "@ethersproject/wallet": ^5.7.0
