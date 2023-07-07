@@ -17,17 +17,20 @@ export interface OrderbookModuleConfiguration {
   provider: providers.JsonRpcProvider | providers.Web3Provider
 }
 
+function localChainConfig() {
+  const localConfig = getConfigFromEnv();
+  return {
+    seaportContractAddress: localConfig.seaportContractAddress,
+    zoneContractAddress: localConfig.zoneContractAddress,
+    apiEndpoint: localConfig.apiUrl,
+    provider: getLocalhostProvider(),
+  };
+}
+
 export function getOrderbookConfig(chainName?: string): OrderbookModuleConfiguration | null {
   switch (chainName) {
     case LOCAL_CHAIN_NAME:
-      // eslint-disable-next-line no-case-declarations
-      const localConfig = getConfigFromEnv();
-      return {
-        seaportContractAddress: localConfig.seaportContractAddress,
-        zoneContractAddress: localConfig.zoneContractAddress,
-        apiEndpoint: localConfig.apiUrl,
-        provider: getLocalhostProvider(),
-      };
+      return localChainConfig();
     case DEVNET_CHAIN_NAME:
       return {
         seaportContractAddress: '0x41388404Efb7a68Fd31d75CEf71dF91e2BDBa2fb',
