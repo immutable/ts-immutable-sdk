@@ -137,6 +137,8 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const selectedOption = useMemo(
     () => (token
+      && token.token?.address
+      && token
       ? formatTokenOptionsId(token.token.symbol, token.token.address)
       : undefined),
     [token, tokenBalances, cryptoFiatState.conversions, formatTokenOptionsId],
