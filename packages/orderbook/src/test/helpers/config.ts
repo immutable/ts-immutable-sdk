@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export function getConfig() {
+export function getConfigFromEnv() {
   if (
     !process.env.ORDERBOOK_MR_API_URL
     || !process.env.SEAPORT_CONTRACT_ADDRESS
