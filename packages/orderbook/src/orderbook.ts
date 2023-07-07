@@ -1,6 +1,6 @@
 import { ModuleConfiguration } from '@imtbl/config';
 import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
-import { OrderbookOverrides, getOrderbookConfig } from 'config/config';
+import { OrderbookModuleConfiguration, OrderbookOverrides, getOrderbookConfig } from 'config/config';
 import { ERC721Factory } from 'erc721';
 import { ListingResult, ListListingsResult, OrderStatus } from 'openapi/sdk';
 import { Seaport } from 'seaport';
@@ -24,10 +24,20 @@ export class Orderbook {
 
   private seaport: Seaport;
 
-  constructor(private config: ModuleConfiguration<OrderbookOverrides>) {
-    const orderbookConfig = getOrderbookConfig(config.overrides?.chainName);
+  private orderbookConfig: OrderbookModuleConfiguration;
 
-    const apiEndpoint = orderbookConfig?.apiEndpoint;
+  constructor(
+    config: ModuleConfiguration<OrderbookOverrides>,
+    localConfig?: OrderbookModuleConfiguration,
+  ) {
+    // either use preconfigured config or local config passed in
+    const maybeConfig = getOrderbookConfig(config.overrides?.chainName) || localConfig;
+    if (!maybeConfig) {
+      throw new Error('Orderbook configuration not passed, either select one of the preseet chainNames or pass in localConfig');
+    }
+    this.orderbookConfig = maybeConfig;
+
+    const { apiEndpoint } = this.orderbookConfig;
     if (!apiEndpoint) {
       throw new Error('API endpoint must be provided as an override');
     }
@@ -41,18 +51,18 @@ export class Orderbook {
     this.apiClient = new ImmutableApiClientFactory(
       apiEndpoint,
       chainName,
-      orderbookConfig.seaportContractAddress,
+      this.orderbookConfig.seaportContractAddress,
     ).create();
 
     const seaportLibFactory = new SeaportLibFactory(
-      orderbookConfig.seaportContractAddress,
-      orderbookConfig.provider,
+      this.orderbookConfig.seaportContractAddress,
+      this.orderbookConfig.provider,
     );
     this.seaport = new Seaport(
       seaportLibFactory,
-      orderbookConfig.provider,
-      orderbookConfig.seaportContractAddress,
-      orderbookConfig.zoneContractAddress,
+      this.orderbookConfig.provider,
+      this.orderbookConfig.seaportContractAddress,
+      this.orderbookConfig.zoneContractAddress,
     );
   }
 
@@ -91,10 +101,9 @@ export class Orderbook {
     buy,
     orderExpiry,
   }: PrepareListingParams): Promise<PrepareListingResponse> {
-    const orderbookConfig = getOrderbookConfig(this.config.overrides?.chainName);
     const erc721 = new ERC721Factory(
       sell.contractAddress,
-      orderbookConfig!.provider,
+      this.orderbookConfig.provider,
     ).create();
     const royaltyInfo = await erc721.royaltyInfo(
       sell.tokenId,

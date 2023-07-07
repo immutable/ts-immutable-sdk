@@ -6,6 +6,7 @@ import { getFulfillerWallet, getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
 import { signAndSubmitTx, signMessage } from './helpers/sign-and-submit';
 import { waitForOrderToBeOfStatus } from './helpers/order';
+import { getLocalConfigFromEnv } from './helpers';
 
 describe('fulfil order', () => {
   it('should fulfil the order', async () => {
@@ -20,7 +21,7 @@ describe('fulfil order', () => {
       overrides: {
         chainName: 'imtbl-zkevm-local',
       },
-    });
+    }, getLocalConfigFromEnv());
 
     const { contract } = await deployTestToken(offerer);
     await contract.safeMint(offerer.address);
