@@ -6,6 +6,7 @@ import { getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
 import { signAndSubmitTx, signMessage } from './helpers/sign-and-submit';
 import { waitForOrderToBeOfStatus } from './helpers/order';
+import { getLocalConfigFromEnv } from './helpers';
 
 describe('cancel order', () => {
   it('should cancel the order', async () => {
@@ -19,7 +20,7 @@ describe('cancel order', () => {
       overrides: {
         chainName: 'imtbl-zkevm-local',
       },
-    });
+    }, getLocalConfigFromEnv());
 
     const { contract } = await deployTestToken(offerer);
     await contract.safeMint(offerer.address);
