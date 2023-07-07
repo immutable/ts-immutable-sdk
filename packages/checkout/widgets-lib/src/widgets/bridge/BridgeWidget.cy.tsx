@@ -4,6 +4,7 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import {
+  ChainId,
   Checkout, CheckoutErrorType, GasEstimateType, TokenAmountEstimate,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
@@ -37,7 +38,7 @@ describe('Bridge Widget tests', () => {
       getAddress: () => Promise.resolve('0xwalletAddress'),
     }),
     getNetwork: async () => ({
-      chainId: 1,
+      chainId: ChainId.ETHEREUM,
       name: 'Ethereum',
     }),
     getFeeData: () => ({
@@ -52,10 +53,11 @@ describe('Bridge Widget tests', () => {
 
   beforeEach(() => {
     cy.viewport('ipad-2');
+    cy.intercept('https://image-resizer-cache.dev.immutable.com/*', {});
     connectStubReturnValue = {
       provider: mockProvider,
       network: {
-        chainId: 1,
+        chainId: ChainId.ETHEREUM,
         name: 'Ethereum',
         nativeCurrency: {
           name: 'ETH',
@@ -76,7 +78,7 @@ describe('Bridge Widget tests', () => {
         balances: [
           {
             balance: BigNumber.from('1000000000000000000'),
-            formattedBalance: '0.1',
+            formattedBalance: '1',
             token: {
               name: 'ETH',
               symbol: 'ETH',
@@ -127,7 +129,7 @@ describe('Bridge Widget tests', () => {
       .resolves({
         networks: [
           {
-            chainId: 1,
+            chainId: ChainId.ETHEREUM,
             name: 'Ethereum',
             nativeCurrency: {
               name: 'ETH',
@@ -136,7 +138,7 @@ describe('Bridge Widget tests', () => {
             },
           },
           {
-            chainId: 137,
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
             name: 'Immutable zkEVM Testnet',
             nativeCurrency: {
               name: 'ImmutableX',
@@ -306,7 +308,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-eth').click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -383,7 +385,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-eth').click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -431,7 +433,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-eth').click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -485,7 +487,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-eth').click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();
@@ -587,7 +589,7 @@ describe('Bridge Widget tests', () => {
       );
 
       cySmartGet('bridge-token-select__target').click();
-      cySmartGet('bridge-token-coin-selector__option-eth').click();
+      cySmartGet('bridge-token-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
 
       cySmartGet('bridge-amount-text__input').type('0.1');
       cySmartGet('bridge-amount-text__input').blur();

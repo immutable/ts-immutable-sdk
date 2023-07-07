@@ -1,6 +1,7 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import {
   Checkout,
+  DexConfig,
   GetTokenAllowListResult,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
@@ -11,6 +12,7 @@ import {
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeConfiguration, ExchangeOverrides } from '@imtbl/dex-sdk';
 import { Web3Provider } from '@ethersproject/providers';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../views/loading/LoadingView';
 import {
@@ -40,7 +42,7 @@ import {
 } from './SwapWidgetEvents';
 import { SwapInProgress } from './views/SwapInProgress';
 import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
-import { RemoteConfig, RemoteConfigResult } from '../../lib/remoteConfig';
+import { TopUpView } from '../../views/top-up/TopUpView';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -70,7 +72,9 @@ export function SwapWidget(props: SwapWidgetProps) {
   );
 
   const { params, config, web3Provider } = props;
-  const { environment, theme } = config;
+  const {
+    environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
+  } = config;
   const {
     amount, fromContractAddress, toContractAddress,
   } = params;
@@ -79,12 +83,6 @@ export function SwapWidget(props: SwapWidgetProps) {
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
-
-  const getDexOverrides = useCallback(async () => {
-    const remoteConfig = new RemoteConfig({ environment });
-    const remoteConfigResult: RemoteConfigResult = await remoteConfig.load();
-    return remoteConfigResult;
-  }, [environment]);
 
   const swapWidgetSetup = useCallback(async () => {
     swapDispatch({
@@ -118,7 +116,7 @@ export function SwapWidget(props: SwapWidgetProps) {
 
       let overrides: ExchangeOverrides | undefined;
       try {
-        overrides = (await getDexOverrides()).dex?.overrides;
+        overrides = ((await checkout.config.remote.getConfig('dex')) as DexConfig).overrides;
       } catch (err: any) {
         viewDispatch({
           payload: {
@@ -299,6 +297,15 @@ export function SwapWidget(props: SwapWidgetProps) {
                 });
               }}
               onCloseClick={sendSwapWidgetCloseEvent}
+            />
+          )}
+          {viewState.view.type === SharedViews.TOP_UP_VIEW && (
+            <TopUpView
+              widgetEvent={IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT}
+              showOnrampOption={isOnRampEnabled}
+              showSwapOption={isSwapEnabled}
+              showBridgeOption={isBridgeEnabled}
+              onCloseButtonClick={sendSwapWidgetCloseEvent}
             />
           )}
         </SwapContext.Provider>

@@ -5,7 +5,6 @@ import { OrderStatus } from '../openapi/sdk/index';
 import { Orderbook } from '../orderbook';
 import {
   getLocalhostProvider,
-  getConfig,
   getFulfillerWallet,
   getOffererWallet,
   deployTestToken,
@@ -35,7 +34,6 @@ async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
 // Just using Jest for ease of executing the demo script, not test syntax used
 describe('', () => {
   it('', async () => {
-    const config = getConfig();
     const provider = getLocalhostProvider();
     const offerer = getOffererWallet(provider);
     const fulfiller = getFulfillerWallet(provider);
@@ -50,12 +48,8 @@ describe('', () => {
       baseConfig: {
         environment: Environment.SANDBOX,
       },
-      provider: getLocalhostProvider(),
-      seaportContractAddress: config.seaportContractAddress,
-      zoneContractAddress: config.zoneContractAddress,
       overrides: {
-        apiEndpoint: config.apiUrl,
-        chainName: 'imtbl-zkevm-devnet-5',
+        chainName: 'imtbl-zkevm-devnet',
       },
     });
 

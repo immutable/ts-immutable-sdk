@@ -2,6 +2,9 @@ import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError, AlreadyApprovedError } from 'errors';
+import { ethers } from 'ethers';
+import { TokenInfo, TransactionDetails } from '../../types';
+import { calculateGasFee } from './gas';
 
 /**
  * Get the amount of an ERC20 token that needs to be approved by
@@ -112,4 +115,50 @@ export const getApproveTransaction = async (
     amountToApprove,
     spenderAddress,
   );
+};
+
+export async function getApproveGasEstimate(
+  provider: JsonRpcProvider,
+  ownerAddress: string,
+  spenderAddress: string,
+  tokenAddress: string,
+): Promise<ethers.BigNumber> {
+  const erc20Contract = ERC20__factory.connect(tokenAddress, provider);
+  return await erc20Contract.estimateGas.approve(spenderAddress, ethers.constants.MaxUint256, {
+    from: ownerAddress,
+  });
+}
+
+export const getApproval = async (
+  nativeToken: TokenInfo,
+  provider: JsonRpcProvider,
+  ownerAddress: string,
+  tokenAddress: string,
+  tokenAmount: BigNumber,
+  spenderAddress: string,
+  gasPrice: ethers.BigNumber | null,
+): Promise<TransactionDetails | null> => {
+  const approveTransaction = await getApproveTransaction(
+    provider,
+    ownerAddress,
+    tokenAddress,
+    tokenAmount,
+    spenderAddress,
+  );
+
+  if (!approveTransaction) {
+    return null;
+  }
+
+  const gasEstimate = await getApproveGasEstimate(provider, ownerAddress, spenderAddress, tokenAddress);
+
+  const gasFeeEstimate = gasPrice ? {
+    token: nativeToken,
+    value: calculateGasFee(gasPrice, gasEstimate),
+  } : null;
+
+  return {
+    transaction: approveTransaction,
+    gasFeeEstimate,
+  };
 };

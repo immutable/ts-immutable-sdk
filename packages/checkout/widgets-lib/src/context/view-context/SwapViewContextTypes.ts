@@ -1,5 +1,6 @@
 import { TransactionRequest, TransactionResponse } from '@ethersproject/providers';
-import { TradeInfo, TransactionResponse as DexTransactionResponse } from '@imtbl/dex-sdk';
+import { Quote } from '@imtbl/dex-sdk';
+import { ViewType } from './ViewType';
 
 export enum SwapWidgetViews {
   SWAP = 'SWAP',
@@ -18,49 +19,48 @@ export type SwapWidgetView =
   | SwapFailView
   | ApproveERC20View;
 
-export interface SwapSuccessView {
+export interface SwapSuccessView extends ViewType {
   type: SwapWidgetViews.SUCCESS;
   data: {
     transactionHash: string;
   }
 }
-interface SwapFailView {
+interface SwapFailView extends ViewType {
   type: SwapWidgetViews.FAIL;
   data: PrefilledSwapForm;
   reason?: string;
 }
 
-interface PriceSurgeView {
+interface PriceSurgeView extends ViewType {
   type: SwapWidgetViews.PRICE_SURGE;
   data: PrefilledSwapForm;
 }
 
-interface SwapView {
+interface SwapView extends ViewType {
   type: SwapWidgetViews.SWAP;
   data?: PrefilledSwapForm;
 }
 
-interface ApproveERC20View {
+interface ApproveERC20View extends ViewType {
   type: SwapWidgetViews.APPROVE_ERC20,
   data: ApproveERC20SwapData
 }
 
-export interface PrefilledSwapForm {
-  fromAmount: string;
-  fromContractAddress: string;
-  toContractAddress: string;
-}
-
-interface SwapInProgressView {
+interface SwapInProgressView extends ViewType {
   type: SwapWidgetViews.IN_PROGRESS;
   data: {
     transactionResponse: TransactionResponse;
     swapForm: PrefilledSwapForm;
   }
 }
-export interface ApproveERC20SwapData extends DexTransactionResponse {
+export interface ApproveERC20SwapData {
   approveTransaction: TransactionRequest;
   transaction: TransactionRequest;
-  info: TradeInfo;
+  info: Quote;
   swapFormInfo: PrefilledSwapForm;
+}
+export interface PrefilledSwapForm {
+  fromAmount: string;
+  fromContractAddress: string;
+  toContractAddress: string;
 }

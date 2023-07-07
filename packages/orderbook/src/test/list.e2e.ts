@@ -3,7 +3,6 @@ import { Environment } from '@imtbl/config';
 import { Order, OrderStatus } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
-import { getConfig } from './helpers/config';
 import { getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
 import { signAndSubmitTx, signMessage } from './helpers/sign-and-submit';
@@ -58,7 +57,6 @@ async function createListing(
 }
 
 describe('listListings e2e', () => {
-  const config = getConfig();
   const provider = getLocalhostProvider();
   const offerer = getOffererWallet(provider);
 
@@ -66,11 +64,7 @@ describe('listListings e2e', () => {
     baseConfig: {
       environment: Environment.SANDBOX,
     },
-    provider: getLocalhostProvider(),
-    seaportContractAddress: config.seaportContractAddress,
-    zoneContractAddress: config.zoneContractAddress,
     overrides: {
-      apiEndpoint: config.apiUrl,
       chainName: LOCAL_CHAIN_NAME,
     },
   });

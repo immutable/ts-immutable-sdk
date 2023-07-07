@@ -1,3 +1,5 @@
+export * from './apierror400';
+export * from './apierror400-all-of';
 export * from './apierror403';
 export * from './apierror403-all-of';
 export * from './apierror404';
@@ -5,6 +7,9 @@ export * from './apierror404-all-of';
 export * from './apierror500';
 export * from './apierror500-all-of';
 export * from './basic-apierror';
-export * from './stark-ex-transaction-validate-reponse-definition';
 export * from './transaction';
 export * from './transaction-approval-request';
+export * from './transaction-evaluation-request';
+export * from './transaction-evaluation-response';
+export * from './zk-evm-transaction-evaluation-request';
+export * from './zk-evm-transaction-evaluation-request-transaction-data';

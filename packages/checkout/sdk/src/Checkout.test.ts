@@ -13,10 +13,10 @@ import {
   GetNetworkAllowListResult,
   GasEstimateSwapResult,
   GasEstimateType,
+  ChainName,
 } from './types';
 import { getBalance, getERC20Balance } from './balances';
 import { sendTransaction } from './transaction';
-import { CheckoutConfiguration } from './config';
 import { gasEstimator } from './gasEstimate';
 import { createReadOnlyProviders } from './readOnlyProviders/readOnlyProvider';
 import { connectSite } from './connect';
@@ -30,9 +30,6 @@ jest.mock('./gasEstimate/gasEstimator');
 jest.mock('./readOnlyProviders/readOnlyProvider');
 
 describe('Connect', () => {
-  const testCheckoutConfig = new CheckoutConfiguration({
-    baseConfig: { environment: Environment.PRODUCTION },
-  });
   let providerMock: ExternalProvider;
 
   beforeEach(() => {
@@ -47,8 +44,8 @@ describe('Connect', () => {
     const getNetworkAllListMock = jest.fn().mockResolvedValue({
       networks: [
         {
-          chainId: 1,
-          name: 'Ethereum',
+          chainId: ChainId.ETHEREUM,
+          name: ChainName.ETHEREUM,
           isSupported: true,
           nativeCurrency: {},
         },
@@ -85,7 +82,7 @@ describe('Connect', () => {
 
     expect(getERC20Balance).toBeCalledTimes(0);
     expect(getBalance).toBeCalledTimes(1);
-    expect(getBalance).toBeCalledWith(testCheckoutConfig, provider, '0x123');
+    expect(getBalance).toBeCalledWith(checkout.config, provider, '0x123');
   });
 
   it('should call getERC20Balance when a contract address is provided', async () => {
@@ -107,7 +104,7 @@ describe('Connect', () => {
 
   it('should call the switchWalletNetwork function', async () => {
     const checkout = new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
+      baseConfig: { environment: Environment.SANDBOX },
     });
 
     const provider = new Web3Provider(providerMock, ChainId.ETHEREUM);
@@ -117,7 +114,7 @@ describe('Connect', () => {
 
     await checkout.switchNetwork({
       provider,
-      chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
     });
 
     expect(switchWalletNetwork).toBeCalledTimes(1);
@@ -139,7 +136,7 @@ describe('Connect', () => {
         from: '',
         value: '',
         data: '',
-        chainId: 1,
+        chainId: ChainId.ETHEREUM,
       },
     });
 

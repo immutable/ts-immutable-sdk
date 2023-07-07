@@ -6,7 +6,7 @@ const convertFeeToFiat = (
   token: TokenInfo | undefined,
   conversions: Map<string, number>,
 ): number => {
-  let feeAmountInFiat = 0;
+  let feeAmountInFiat = -1;
 
   if (fee && token) {
     const formattedAmount = ethers.utils.formatUnits(fee, token.decimals);
@@ -23,12 +23,12 @@ const convertFeeToFiat = (
 
 // Formats a value to 2 decimal places unless the value is less than 0.01, in which case it will show the first non-zero digit of the decimal places
 export function formatFiatDecimals(value: number): string {
-  if (value <= 0) {
+  if (value < 0) {
     return '-.--';
   }
 
   const str = value.toString();
-  if (str.includes('e')) {
+  if (str.includes('e') || value === 0) {
     // In this scenario, converting the fee to fiat has given us an exponent from
     // parseFloat as the fee value is very low. If the value is low enough that converting
     // the fee to fiat has returned an exponent, then it is significantly low enough to
@@ -54,12 +54,12 @@ export const getSwapFeeEstimation = (
   const { gasFee } = swapFees;
 
   const gasFeeAmount = gasFee.estimatedAmount;
-  if (!gasFeeAmount) return '-.--';
+  if (gasFeeAmount === undefined) return '-.--';
   const gasFeeToken = gasFee.token;
-  if (!gasFeeToken) return '-.--';
+  if (gasFeeToken === undefined) return '-.--';
 
   const gasFeeInFiat = convertFeeToFiat(gasFeeAmount, gasFeeToken, conversions);
-  if (gasFeeInFiat === 0) return '-.--';
+  if (gasFeeInFiat < 0) return '-.--';
 
   return formatFiatDecimals(gasFeeInFiat);
 };
@@ -71,14 +71,17 @@ export const getBridgeFeeEstimation = (
   const { gasFee, bridgeFee } = bridgeFees;
 
   const gasFeeAmount = gasFee.estimatedAmount;
-  if (!gasFeeAmount) return '-.--';
+  if (gasFeeAmount === undefined) return '-.--';
   const gasFeeToken = gasFee.token;
-  if (!gasFeeToken) return '-.--';
+  if (!gasFeeToken === undefined) return '-.--';
 
   const gasFeeInFiat = convertFeeToFiat(gasFeeAmount, gasFeeToken, conversions);
-  if (gasFeeInFiat === 0) return '-.--';
+  if (gasFeeInFiat < 0) return '-.--';
 
   const bridgeFeeInFiat = convertFeeToFiat(bridgeFee.estimatedAmount, bridgeFee.token, conversions);
+  if (bridgeFeeInFiat < 0) {
+    return formatFiatDecimals(gasFeeInFiat);
+  }
 
   return formatFiatDecimals(gasFeeInFiat + bridgeFeeInFiat);
 };

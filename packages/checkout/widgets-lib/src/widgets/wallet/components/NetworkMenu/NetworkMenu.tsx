@@ -29,17 +29,19 @@ import {
 import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
 
 const logoColour = {
-  [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
+  [ChainId.IMTBL_ZKEVM_TESTNET]: 'base.color.text.link.primary',
+  [ChainId.IMTBL_ZKEVM_MAINNET]: 'base.color.text.link.primary',
   [ChainId.ETHEREUM]: 'base.color.accent.5',
   [ChainId.SEPOLIA]: 'base.color.accent.5',
 };
 
 // todo: add corresponding network symbols
 const networkIcon = {
+  [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
+  [ChainId.IMTBL_ZKEVM_MAINNET]: 'Immutable',
   [ChainId.IMTBL_ZKEVM_TESTNET]: 'Immutable',
   [ChainId.ETHEREUM]: 'EthToken',
-  [ChainId.IMTBL_ZKEVM_DEVNET]: 'Immutable',
   [ChainId.SEPOLIA]: 'EthToken',
 };
 
@@ -110,11 +112,6 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
     })();
   }, [checkout]);
 
-  // TODO: this can be removed if needed
-  function formatNetworkName(networkName: string) {
-    return networkName.replace('Devnet', 'dev').replace('Testnet', 'test');
-  }
-
   return (
     <Box sx={networkMenuStyles}>
       <Body testId="network-heading" size="medium" sx={networkHeadingStyle}>
@@ -123,7 +120,7 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
       <HorizontalMenu>
         {checkout
           && allowedNetworks
-            ?.sort((a: NetworkInfo, b: NetworkInfo) => sortNetworksCompareFn(a, b, checkout.config.environment))
+            ?.sort((a: NetworkInfo, b: NetworkInfo) => sortNetworksCompareFn(a, b, checkout.config))
             .map((networkItem) => (
               <HorizontalMenu.Button
                 key={networkItem.chainId}
@@ -144,7 +141,7 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
                     networkItem.chainId === network?.chainId,
                   )}
                 />
-                {formatNetworkName(networkItem.name)}
+                {networkItem.name}
               </HorizontalMenu.Button>
             ))}
       </HorizontalMenu>

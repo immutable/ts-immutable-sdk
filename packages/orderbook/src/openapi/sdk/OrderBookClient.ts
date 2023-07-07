@@ -5,14 +5,12 @@ import type { BaseHttpRequest } from './core/BaseHttpRequest';
 import type { OpenAPIConfig } from './core/OpenAPI';
 import { AxiosHttpRequest } from './core/AxiosHttpRequest';
 
-import { ListingsService } from './services/ListingsService';
 import { OrdersService } from './services/OrdersService';
 
 type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
 
 export class OrderBookClient {
 
-  public readonly listings: ListingsService;
   public readonly orders: OrdersService;
 
   public readonly request: BaseHttpRequest;
@@ -30,7 +28,6 @@ export class OrderBookClient {
       ENCODE_PATH: config?.ENCODE_PATH,
     });
 
-    this.listings = new ListingsService(this.request);
     this.orders = new OrdersService(this.request);
   }
 }

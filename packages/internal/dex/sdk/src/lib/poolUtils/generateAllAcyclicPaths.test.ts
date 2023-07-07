@@ -1,4 +1,3 @@
-import { describe, it } from '@jest/globals';
 import {
   FeeAmount, Pool, Route, TickMath,
 } from '@uniswap/v3-sdk';

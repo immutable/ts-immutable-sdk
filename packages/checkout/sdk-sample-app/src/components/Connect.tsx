@@ -1,9 +1,8 @@
-import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
+import { Checkout } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
-import { Environment } from '@imtbl/config';
 
 interface ConnectProps {
   checkout: Checkout;

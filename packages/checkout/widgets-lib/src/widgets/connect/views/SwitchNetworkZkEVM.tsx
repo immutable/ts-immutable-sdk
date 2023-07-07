@@ -7,11 +7,11 @@ import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
 import { ConnectActions, ConnectContext } from '../context/ConnectContext';
-import { zkEVMNetwork } from '../../../lib/networkUtils';
 import {
   ViewContext,
   ViewActions,
 } from '../../../context/view-context/ViewContext';
+import { getL2ChainId } from '../../../lib';
 
 export function SwitchNetworkZkEVM() {
   const { viewDispatch } = useContext(ViewContext);
@@ -27,9 +27,8 @@ export function SwitchNetworkZkEVM() {
     try {
       const switchRes = await checkout.switchNetwork({
         provider,
-        chainId: zkEVMNetwork(checkout.config.environment),
+        chainId: getL2ChainId(checkout.config),
       });
-
       connectDispatch({
         payload: {
           type: ConnectActions.SET_PROVIDER,

@@ -20,9 +20,9 @@ import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
 import { WalletContext } from '../../widgets/wallet/context/WalletContext';
 import { getBridgeFeeEstimation, getSwapFeeEstimation } from '../../lib/feeEstimation';
-import { CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
-import { useTokenSymbols } from '../../lib/hooks/useTokenSymbols';
+import { CryptoFiatActions, CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
 import { useInterval } from '../../lib/hooks/useInterval';
+import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoFiatProvider';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
@@ -34,6 +34,8 @@ interface TopUpViewProps {
   onCloseButtonClick: () => void,
   onBackButtonClick?: () => void,
 }
+
+const DEFAULT_FEE_REFRESH_INTERVAL = 30000;
 
 export function TopUpView({
   widgetEvent,
@@ -53,12 +55,21 @@ export function TopUpView({
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { conversions, fiatSymbol } = cryptoFiatState;
 
-  const DEFAULT_FEE_REFRESH_INTERVAL = 30000;
-  useTokenSymbols(checkout, cryptoFiatDispatch);
   const [swapFeesInFiat, setSwapFeesInFiat] = useState('-.--');
   const [bridgeFeesInFiat, setBridgeFeesInFiat] = useState('-.--');
   const [loadingSwapFees, setLoadingSwapFees] = useState(false);
   const [loadingBridgeFees, setLoadingBridgeFees] = useState(false);
+
+  useEffect(() => {
+    if (!checkout) return;
+    if (!cryptoFiatDispatch) return;
+    cryptoFiatDispatch({
+      payload: {
+        type: CryptoFiatActions.SET_TOKEN_SYMBOLS,
+        tokenSymbols: DEFAULT_TOKEN_SYMBOLS,
+      },
+    });
+  }, [checkout, cryptoFiatDispatch]);
 
   const onClickOnramp = () => {
     // if (widgetEvent === IMTBLWidgetEvents.IMTBL_ONRAMP_WIDGET_EVENT) {
@@ -79,35 +90,31 @@ export function TopUpView({
     }
 
     try {
-      const swapEstimate = await checkout.gasEstimate({
-        gasEstimateType: GasEstimateType.SWAP,
-      }) as GasEstimateSwapResult;
+      const [swapEstimate, bridgeEstimate] = await Promise.all([
+        checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.SWAP,
+        }),
+        checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          isSpendingCapApprovalRequired: true,
+        }),
+      ]);
       const swapFeeInFiat = getSwapFeeEstimation(
-        swapEstimate,
+        swapEstimate as GasEstimateSwapResult,
         conversions,
       );
       setSwapFeesInFiat(swapFeeInFiat);
-      setLoadingSwapFees(false);
-    } catch {
-      setSwapFeesInFiat('-.--');
-    } finally {
-      setLoadingSwapFees(false);
-    }
-
-    try {
-      const bridgeEstimate = await checkout.gasEstimate({
-        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        isSpendingCapApprovalRequired: true,
-      }) as GasEstimateBridgeToL2Result;
       const bridgeFeeInFiat = getBridgeFeeEstimation(
-        bridgeEstimate,
+        bridgeEstimate as GasEstimateBridgeToL2Result,
         conversions,
       );
       setBridgeFeesInFiat(bridgeFeeInFiat);
     } catch {
+      setSwapFeesInFiat('-.--');
       setBridgeFeesInFiat('-.--');
     } finally {
       setLoadingBridgeFees(false);
+      setLoadingSwapFees(false);
     }
   };
 
@@ -128,7 +135,7 @@ export function TopUpView({
           view: {
             type: SwapWidgetViews.SWAP,
             data: {
-              toContractAddress: tokenAddress ?? '',
+              toContractAddress: '',
               fromAmount: '',
               fromContractAddress: '',
             },
@@ -149,7 +156,13 @@ export function TopUpView({
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: BridgeWidgetViews.BRIDGE },
+          view: {
+            type: BridgeWidgetViews.BRIDGE,
+            data: {
+              fromContractAddress: '',
+              fromAmount: '',
+            },
+          },
         },
       });
       return;
@@ -210,7 +223,7 @@ export function TopUpView({
     <SimpleLayout
       header={(
         <HeaderNavigation
-          onBackButtonClick={onBackButtonClick ?? undefined}
+          onBackButtonClick={onBackButtonClick}
           onCloseButtonClick={onCloseButtonClick}
           showBack
         />

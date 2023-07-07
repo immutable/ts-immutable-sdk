@@ -1,5 +1,5 @@
 import {
-  ChainId, Checkout,
+  ChainId, ChainName, Checkout,
 } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
@@ -80,7 +80,7 @@ describe('ConnectLoader', () => {
             getAddress: async () => Promise.resolve(''),
           }),
           getNetwork: async () => ({
-            chainId: 1,
+            chainId: ChainId.ETHEREUM,
             name: 'ETHEREUM',
           }),
         },
@@ -137,18 +137,17 @@ describe('ConnectLoader', () => {
             getAddress: async () => Promise.resolve(''),
           }),
           getNetwork: async () => ({
-            chainId: ChainId.IMTBL_ZKEVM_DEVNET,
-            name: 'Immutable zkEVM Devnet',
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            name: ChainName.IMTBL_ZKEVM_TESTNET,
           }),
         },
-        network: { name: 'Immutable zkEVM Devnet' },
       });
 
     cy.stub(Checkout.prototype, 'getNetworkInfo')
       .as('getNetworkInfoStub')
       .resolves({
         isSupported: true,
-        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       });
 
     mount(
@@ -184,11 +183,10 @@ describe('ConnectLoader', () => {
             getAddress: async () => Promise.resolve(''),
           }),
           getNetwork: async () => ({
-            chainId: ChainId.IMTBL_ZKEVM_DEVNET,
-            name: 'Immutable zkEVM Devnet',
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+            name: ChainName.IMTBL_ZKEVM_TESTNET,
           }),
         },
-        network: { name: 'Immutable zkEVM Devnet' },
       });
 
     cy.stub(Checkout, 'isWeb3Provider')
@@ -198,7 +196,7 @@ describe('ConnectLoader', () => {
     cy.stub(Checkout.prototype, 'getNetworkInfo')
       .as('getNetworkInfoStub')
       .resolves({
-        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         isSupported: true,
       });
 
