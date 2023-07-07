@@ -18,9 +18,10 @@ export interface OrderbookModuleConfiguration {
 }
 
 export function getOrderbookConfig(chainName?: string): OrderbookModuleConfiguration | null {
-  const localConfig = getConfig();
   switch (chainName) {
     case LOCAL_CHAIN_NAME:
+      // eslint-disable-next-line no-case-declarations
+      const localConfig = getConfig();
       return {
         seaportContractAddress: localConfig.seaportContractAddress,
         zoneContractAddress: localConfig.zoneContractAddress,
