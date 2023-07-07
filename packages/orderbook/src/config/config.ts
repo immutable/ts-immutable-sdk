@@ -1,5 +1,5 @@
 import { providers } from 'ethers';
-import { getConfig, getLocalhostProvider } from 'test/helpers';
+import { getConfigFromEnv, getLocalhostProvider } from 'test/helpers';
 
 export const LOCAL_CHAIN_NAME = 'imtbl-zkevm-local';
 export const DEVNET_CHAIN_NAME = 'imtbl-zkevm-devnet';
@@ -21,7 +21,7 @@ export function getOrderbookConfig(chainName?: string): OrderbookModuleConfigura
   switch (chainName) {
     case LOCAL_CHAIN_NAME:
       // eslint-disable-next-line no-case-declarations
-      const localConfig = getConfig();
+      const localConfig = getConfigFromEnv();
       return {
         seaportContractAddress: localConfig.seaportContractAddress,
         zoneContractAddress: localConfig.zoneContractAddress,
