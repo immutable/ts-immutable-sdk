@@ -1,6 +1,6 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
-import { SEAPORT_CONTRACT_VERSION_V1_4, SEAPORT_CONTRACT_VERSION_V1_5 } from '@opensea/seaport-js/lib/constants';
 import { providers } from 'ethers';
+import { SEAPORT_CONTRACT_VERSION_V1_4, SEAPORT_CONTRACT_VERSION_V1_5 } from './constants';
 
 export type SeaportVersion =
   typeof SEAPORT_CONTRACT_VERSION_V1_4 |
