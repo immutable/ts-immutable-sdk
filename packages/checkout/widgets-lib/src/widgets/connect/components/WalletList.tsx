@@ -32,7 +32,7 @@ export function WalletList(props: WalletListProps) {
   useEffect(() => {
     const getAllowedWallets = async () => {
       const allowedWallets = await checkout?.getWalletAllowList({
-        type: walletFilterTypes ?? WalletFilterTypes.DESKTOP,
+        type: walletFilterTypes ?? WalletFilterTypes.ALL,
         exclude: excludeWallets,
       });
       setWallets(allowedWallets?.wallets || []);
