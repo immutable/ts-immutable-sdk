@@ -58,5 +58,5 @@ export interface JsonRpcResponsePayload<ResultType = any> {
 export type Provider = {
   sendAsync: (request: JsonRpcRequestPayload, callback: JsonRpcRequestCallback) => void
   send: (method: string, params?: Array<any>) => void
-  request?: (request: { method: string, params?: Array<any> }) => Promise<any>
+  request: (request: { method: string, params?: Array<any> }) => Promise<any>
 };
