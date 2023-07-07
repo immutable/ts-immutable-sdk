@@ -9,6 +9,7 @@ export type CreateCounterfactualAddressInput = {
   authManager: AuthManager;
   magicProvider: ExternalProvider,
   multiRollupApiClients: MultiRollupApiClients,
+  accessToken: string;
 };
 
 const MESSAGE_TO_SIGN = 'Only sign this message from Immutable Passport';
@@ -17,6 +18,7 @@ export async function createCounterfactualAddress({
   authManager,
   magicProvider,
   multiRollupApiClients,
+  accessToken,
 }: CreateCounterfactualAddressInput): Promise<UserZkEvm> {
   const web3Provider = new Web3Provider(
     magicProvider,
@@ -26,13 +28,15 @@ export async function createCounterfactualAddress({
   const ethereumAddress = await ethSigner.getAddress();
   const ethereumSignature = await signRaw(MESSAGE_TO_SIGN, ethSigner);
 
+  const headers = { Authorization: `Bearer ${accessToken}` };
+
   try {
     await multiRollupApiClients.passportApi.createCounterfactualAddress({
       createCounterfactualAddressRequest: {
         ethereumAddress,
         ethereumSignature,
       },
-    });
+    }, { headers });
   } catch (error) {
     throw new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, `Failed to create counterfactual address: ${error}`);
   }

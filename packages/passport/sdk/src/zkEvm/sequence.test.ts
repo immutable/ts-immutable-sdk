@@ -1,5 +1,5 @@
 import { BigNumber, Wallet } from 'ethers';
-import { getSignedSequenceTransactions } from './sequence';
+import { getSignedMetaTransactions } from './walletHelpers';
 
 describe('getSignedSequenceTransactions()', () => {
   // NOTE: Generated with https://github.com/immutable/wallet-contracts/blob/348add7d2fde13d8f7f83aae0882ad2d97546d72/tests/ImmutableDeployment.spec.ts#L69
@@ -21,7 +21,7 @@ describe('getSignedSequenceTransactions()', () => {
     // User EOA private key
     const signer = new Wallet('0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80');
 
-    const signature = await getSignedSequenceTransactions(
+    const signature = await getSignedMetaTransactions(
       transactions,
       nonce,
       BigNumber.from(chainId),

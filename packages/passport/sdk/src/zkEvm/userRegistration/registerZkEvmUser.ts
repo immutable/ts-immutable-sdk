@@ -40,6 +40,7 @@ export const registerZkEvmUser = async ({
       authManager,
       magicProvider,
       multiRollupApiClients,
+      accessToken: user.accessToken,
     });
 
     return {
