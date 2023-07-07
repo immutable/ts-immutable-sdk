@@ -22,8 +22,8 @@ describe('SwapWidget tests', () => {
       getAddress: () => Promise.resolve('0xwalletAddress'),
     }),
     getNetwork: async () => ({
-      chainId: ChainId.IMTBL_ZKEVM_DEVNET,
-      name: ChainName.IMTBL_ZKEVM_DEVNET,
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      name: ChainName.IMTBL_ZKEVM_TESTNET,
     }),
     provider: {
       request: async () => null,
@@ -39,8 +39,8 @@ describe('SwapWidget tests', () => {
       .resolves({
         provider: mockProvider,
         network: {
-          chainId: ChainId.IMTBL_ZKEVM_DEVNET,
-          name: ChainName.IMTBL_ZKEVM_DEVNET,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          name: ChainName.IMTBL_ZKEVM_TESTNET,
           nativeCurrency: {
             name: 'IMX',
             symbol: 'IMX',
