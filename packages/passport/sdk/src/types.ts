@@ -63,3 +63,46 @@ type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 export type UserImx = WithRequired<User, 'imx'>;
 export type UserZkEvm = WithRequired<User, 'zkEvm'>;
+
+// Device code auth
+
+export type DeviceConnectResponse = {
+  code: string;
+  deviceCode: string;
+  url: string;
+  interval: number;
+};
+
+export type DeviceCodeReponse = {
+  device_code: string;
+  user_code: string;
+  verification_uri: string;
+  expires_in: number;
+  interval: number;
+  verification_uri_complete: string;
+};
+
+export type DeviceTokenResponse = {
+  access_token: string;
+  refresh_token?: string;
+  id_token: string;
+  token_type: string;
+  expires_in: number;
+};
+
+export type TokenPayload = {
+  exp?: number;
+};
+
+export type IdTokenPayload = {
+  passport: PassportMetadata;
+  email: string;
+  nickname: string;
+  aud: string;
+  sub: string;
+};
+
+export type DeviceErrorResponse = {
+  error: string;
+  error_description: string;
+};

@@ -7,6 +7,8 @@ import { PassportConfiguration } from './config';
 import {
   PassportModuleConfiguration,
   UserProfile,
+  DeviceConnectResponse,
+  DeviceTokenResponse,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
 
@@ -47,6 +49,29 @@ export class Passport {
 
   public async connectImx(): Promise<IMXProvider> {
     return this.passportImxProviderFactory.getProvider();
+  }
+
+  public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
+    return this.authManager.loginWithDeviceFlow();
+  }
+
+  public async connectImxDeviceFlow(
+    deviceCode: string,
+    interval: number,
+    timeoutMs?: number,
+  ): Promise<IMXProvider | null> {
+    return this.passportImxProviderFactory.getProviderWithDeviceFlow(deviceCode, interval, timeoutMs);
+  }
+
+  /**
+   * @returns {boolean} the stored device flow credentials if they exist
+   */
+  public checkStoredDeviceFlowCredentials(): DeviceTokenResponse | null {
+    return this.authManager.checkStoredDeviceFlowCredentials();
+  }
+
+  public async connectImxWithCredentials(tokenResponse: DeviceTokenResponse): Promise<IMXProvider | null> {
+    return this.passportImxProviderFactory.getProviderWithCredentials(tokenResponse);
   }
 
   public async loginCallback(): Promise<void> {

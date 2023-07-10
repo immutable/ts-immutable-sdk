@@ -8,7 +8,7 @@ import { PassportConfiguration } from '../config';
 import AuthManager from '../authManager';
 import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
-import { User, UserImx } from '../types';
+import { DeviceTokenResponse, User, UserImx } from '../types';
 import { PassportImxProvider } from './passportImxProvider';
 import { getStarkSigner } from './getStarkSigner';
 
@@ -52,6 +52,24 @@ export class PassportImxProviderFactory {
 
   public async getProviderSilent(): Promise<PassportImxProvider | null> {
     const user = await this.authManager.loginSilent();
+    if (!user) {
+      return null;
+    }
+
+    return this.createProviderInstance(user);
+  }
+
+  public async getProviderWithDeviceFlow(
+    deviceCode: string,
+    interval: number,
+    timeoutMs?: number,
+  ): Promise<PassportImxProvider> {
+    const user = await this.authManager.connectImxDeviceFlow(deviceCode, interval, timeoutMs);
+    return this.createProviderInstance(user);
+  }
+
+  public async getProviderWithCredentials(tokenResponse: DeviceTokenResponse): Promise<PassportImxProvider | null> {
+    const user = await this.authManager.connectImxWithCredentials(tokenResponse);
     if (!user) {
       return null;
     }

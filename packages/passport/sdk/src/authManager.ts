@@ -3,9 +3,26 @@ import {
   UserManager,
   UserManagerSettings,
 } from 'oidc-client-ts';
+import axios from 'axios';
+import jwt_decode from 'jwt-decode';
+import DeviceCredentialsManager from 'storage/device_credentials_manager';
 import { PassportErrorType, withPassportError } from './errors/passportError';
-import { PassportMetadata, User } from './types';
+import {
+  PassportMetadata,
+  User,
+  DeviceCodeReponse,
+  DeviceConnectResponse,
+  DeviceTokenResponse,
+  DeviceErrorResponse,
+  IdTokenPayload,
+} from './types';
 import { PassportConfiguration } from './config';
+
+const formUrlEncodedHeader = {
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  },
+};
 
 const getAuthConfiguration = ({
   oidcConfiguration,
@@ -38,14 +55,23 @@ const getAuthConfiguration = ({
   return baseConfiguration;
 };
 
+function wait(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 export default class AuthManager {
   private userManager;
 
   private config: PassportConfiguration;
 
+  private deviceCredentialsManager: DeviceCredentialsManager;
+
   constructor(config: PassportConfiguration) {
     this.config = config;
     this.userManager = new UserManager(getAuthConfiguration(config));
+    this.deviceCredentialsManager = new DeviceCredentialsManager();
   }
 
   private static mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
@@ -78,6 +104,29 @@ export default class AuthManager {
     return user;
   };
 
+  private static mapDeviceTokenResponseToDomainUserModel = (tokenResponse: DeviceTokenResponse): User => {
+    const idTokenPayload: IdTokenPayload = jwt_decode(tokenResponse.id_token);
+    const user: User = {
+      idToken: tokenResponse.id_token,
+      accessToken: tokenResponse.access_token,
+      refreshToken: tokenResponse.refresh_token,
+      profile: {
+        sub: idTokenPayload.sub,
+        email: idTokenPayload.email,
+        nickname: idTokenPayload.nickname,
+      },
+    };
+    if (idTokenPayload?.passport?.imx_eth_address) {
+      user.imx = {
+        ethAddress: idTokenPayload?.passport?.imx_eth_address,
+        starkAddress: idTokenPayload?.passport?.imx_stark_address,
+        userAdminAddress: idTokenPayload?.passport?.imx_user_admin_address,
+      };
+    }
+
+    return user;
+  };
+
   public async login(): Promise<User> {
     return withPassportError<User>(async () => {
       const popupWindowFeatures = { width: 410, height: 450 };
@@ -96,11 +145,126 @@ export default class AuthManager {
     );
   }
 
-  public async logout(): Promise<void> {
-    return withPassportError<void>(
-      async () => this.userManager.signoutRedirect(),
-      PassportErrorType.LOGOUT_ERROR,
+  public async loginWithDeviceFlow(): Promise<DeviceConnectResponse> {
+    return withPassportError<DeviceConnectResponse>(async () => {
+      const response = await axios.post<DeviceCodeReponse>(
+        `${this.config.authenticationDomain}/oauth/device/code`,
+        {
+          client_id: this.config.oidcConfiguration.clientId,
+          scope: this.config.oidcConfiguration.scope,
+          audience: this.config.oidcConfiguration.audience,
+        },
+        formUrlEncodedHeader,
+      );
+
+      return {
+        code: response.data.user_code,
+        deviceCode: response.data.device_code,
+        url: response.data.verification_uri_complete,
+        interval: response.data.interval,
+      };
+    }, PassportErrorType.AUTHENTICATION_ERROR);
+  }
+
+  /* eslint-disable no-await-in-loop */
+  public async connectImxDeviceFlow(deviceCode: string, interval: number, timeoutMs?: number): Promise<User> {
+    return withPassportError<User>(async () => {
+      const startTime = Date.now();
+      while (true) {
+        if (timeoutMs != null && Date.now() - startTime > timeoutMs) {
+          throw new Error('Timed out');
+        }
+
+        await wait(interval * 1000);
+
+        try {
+          const tokenResponse = await this.getDeviceFlowToken(deviceCode);
+          const user = AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
+
+          // Only persist credentials that contain the necessary data
+          if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
+            this.deviceCredentialsManager.saveCredentials(tokenResponse);
+          }
+
+          return user;
+        } catch (error) {
+          if (axios.isAxiosError(error)) {
+            const responseError: DeviceErrorResponse = error.response?.data;
+            switch (responseError.error) {
+              case 'authorization_pending':
+                break;
+              case 'slow_down':
+                break;
+              case 'expired_token':
+                throw new Error('Token expired, please log in again');
+                break;
+              case 'access_denied':
+                throw new Error('User denied access');
+                break;
+              default:
+                throw new Error('Error getting token');
+                break;
+            }
+          } else {
+            throw error;
+          }
+        }
+      }
+    }, PassportErrorType.AUTHENTICATION_ERROR);
+  }
+  /* eslint-enable no-await-in-loop */
+
+  private async getDeviceFlowToken(deviceCode: string): Promise<DeviceTokenResponse> {
+    const response = await axios.post<DeviceTokenResponse>(
+      `${this.config.authenticationDomain}/oauth/token`,
+      {
+        client_id: this.config.oidcConfiguration.clientId,
+        grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
+        device_code: deviceCode,
+      },
+      formUrlEncodedHeader,
     );
+
+    return response.data;
+  }
+
+  public async connectImxWithCredentials(tokenResponse: DeviceTokenResponse): Promise<User | null> {
+    return withPassportError<User | null>(async () => {
+      if (this.deviceCredentialsManager.areValid(tokenResponse)) {
+        // Credentials exist and are still valid
+        return AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
+      }
+
+      const refreshToken = tokenResponse?.refresh_token ?? null;
+      if (refreshToken) {
+        // Token is no longer valid, but refresh token can be used to a new one
+        const newTokenResponse = await this.refreshToken(refreshToken);
+        return AuthManager.mapDeviceTokenResponseToDomainUserModel(newTokenResponse);
+      }
+
+      return null;
+    }, PassportErrorType.AUTHENTICATION_ERROR);
+  }
+
+  private async refreshToken(refreshToken: string): Promise<DeviceTokenResponse> {
+    const response = await axios.post<DeviceTokenResponse>(
+      `${this.config.authenticationDomain}/oauth/token`,
+      {
+        client_id: this.config.oidcConfiguration.clientId,
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+      },
+      formUrlEncodedHeader,
+    );
+
+    return response.data;
+  }
+
+  public async logout(): Promise<void> {
+    return withPassportError<void>(async () => {
+      this.userManager.signoutRedirect();
+      this.deviceCredentialsManager.clearCredentials();
+    }, PassportErrorType.LOGOUT_ERROR);
   }
 
   public async loginSilent(): Promise<User | null> {
@@ -125,5 +289,9 @@ export default class AuthManager {
       }
       return AuthManager.mapOidcUserToDomainModel(oidcUser);
     }, PassportErrorType.NOT_LOGGED_IN_ERROR);
+  }
+
+  public checkStoredDeviceFlowCredentials(): DeviceTokenResponse | null {
+    return this.deviceCredentialsManager.getCredentials();
   }
 }
