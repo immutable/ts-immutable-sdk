@@ -204,11 +204,15 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
   }
 };
 
+function onLoadHandler() {
+  // File loaded
+  // This is to prevent callFunction not defined error in Unity
+  callbackToGame({
+    responseFor: initRequest,
+    requestId: initRequestId,
+    success: true,
+  });
+}
+
+window.addEventListener('load', onLoadHandler);
 console.log('index.ts loaded');
-// File loaded
-// This is to prevent callFunction not defined error
-callbackToGame({
-  responseFor: initRequest,
-  requestId: initRequestId,
-  success: true,
-});
