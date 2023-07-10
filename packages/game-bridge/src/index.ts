@@ -20,6 +20,7 @@ const PASSPORT_FUNCTIONS = {
   getAddress: 'getAddress',
   checkStoredCredentials: 'checkStoredCredentials',
   logout: 'logout',
+  getEmail: 'getEmail',
 };
 
 // To notify Unity that this file is loaded
@@ -143,7 +144,7 @@ window.callFunction = async function (jsonData: string) { // eslint-disable-line
           responseFor: fxName,
           requestId,
           success: true,
-          address,
+          result: address,
         });
         break;
       }
@@ -167,6 +168,16 @@ window.callFunction = async function (jsonData: string) { // eslint-disable-line
           responseFor: fxName,
           requestId,
           success: true,
+        });
+        break;
+      }
+      case PASSPORT_FUNCTIONS.getEmail: {
+        const userProfile = await passportClient?.getUserInfo();
+        callbackToUnity({
+          responseFor: fxName,
+          requestId,
+          success: true,
+          result: userProfile?.email,
         });
         break;
       }

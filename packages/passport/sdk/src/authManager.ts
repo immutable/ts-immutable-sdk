@@ -289,10 +289,15 @@ export default class AuthManager {
   public async getUser(): Promise<User | null> {
     return withPassportError<User | null>(async () => {
       const oidcUser = await this.userManager.getUser();
-      if (!oidcUser) {
-        return null;
+      if (oidcUser) {
+        return AuthManager.mapOidcUserToDomainModel(oidcUser);
       }
-      return AuthManager.mapOidcUserToDomainModel(oidcUser);
+
+      const deviceToken = this.deviceCredentialsManager.getCredentials();
+      if (deviceToken) {
+        return AuthManager.mapDeviceTokenResponseToDomainUserModel(deviceToken);
+      }
+      return null;
     }, PassportErrorType.NOT_LOGGED_IN_ERROR);
   }
 
