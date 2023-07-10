@@ -16,7 +16,7 @@ export interface FeeOption {
   recipientAddress: string;
 }
 
-export interface Transaction {
+export interface MetaTransaction {
   to: string
   value?: BigNumberish
   data?: BytesLike
@@ -26,7 +26,7 @@ export interface Transaction {
   revertOnError?: boolean
 }
 
-export interface TransactionNormalised {
+export interface MetaTransactionNormalised {
   delegateCall: boolean
   revertOnError: boolean
   gasLimit: BigNumberish
@@ -54,3 +54,9 @@ export interface JsonRpcResponsePayload<ResultType = any> {
   result?: ResultType | null;
   error?: JsonRpcError | null;
 }
+
+export type Provider = {
+  sendAsync: (request: JsonRpcRequestPayload, callback: JsonRpcRequestCallback) => void
+  send: (method: string, params?: Array<any>) => void
+  request: (request: { method: string, params?: Array<any> }) => Promise<any>
+};

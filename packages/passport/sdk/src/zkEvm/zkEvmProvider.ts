@@ -1,7 +1,12 @@
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ethSendTransaction } from './rpcMethods';
-import { JsonRpcRequestCallback, JsonRpcRequestPayload, RequestArguments } from './types';
+import {
+  JsonRpcRequestCallback,
+  JsonRpcRequestPayload,
+  Provider,
+  RequestArguments,
+} from './types';
 import AuthManager from '../authManager';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
@@ -25,7 +30,7 @@ type LoggedInZkEvmProvider = {
   user: UserZkEvm;
 };
 
-export class ZkEvmProvider {
+export class ZkEvmProvider implements Provider {
   private readonly authManager: AuthManager;
 
   private readonly config: PassportConfiguration;

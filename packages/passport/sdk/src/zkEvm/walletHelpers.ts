@@ -3,7 +3,7 @@ import { walletContracts } from '@0xsequence/abi';
 import { encodeSignature } from '@0xsequence/config';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
-import { Transaction, TransactionNormalised } from './types';
+import { MetaTransaction, MetaTransactionNormalised } from './types';
 
 // These are ignored by the Relayer but for consistency we set them to the
 // appropriate values for a 1/1 wallet.
@@ -24,7 +24,7 @@ const META_TRANSACTIONS_TYPE = `tuple(
   bytes data
 )[]`;
 
-export function getNormalisedTransactions(txs: Transaction[]): TransactionNormalised[] {
+export function getNormalisedTransactions(txs: MetaTransaction[]): MetaTransactionNormalised[] {
   return txs.map((t) => ({
     delegateCall: t.delegateCall === true,
     revertOnError: t.revertOnError === true,
@@ -35,10 +35,10 @@ export function getNormalisedTransactions(txs: Transaction[]): TransactionNormal
   }));
 }
 
-export function digestOfTransactionsAndNonce(nonce: BigNumberish, sequenceTransactions: TransactionNormalised[]) {
+export function digestOfTransactionsAndNonce(nonce: BigNumberish, normalisedTransactions: MetaTransactionNormalised[]) {
   const packMetaTransactionsNonceData = ethers.utils.defaultAbiCoder.encode(
     ['uint256', META_TRANSACTIONS_TYPE],
-    [nonce, sequenceTransactions],
+    [nonce, normalisedTransactions],
   );
   return ethers.utils.keccak256(packMetaTransactionsNonceData);
 }
@@ -56,17 +56,17 @@ export const getNonce = async (jsonRpcProvider: JsonRpcProvider, smartContractWa
   return 0;
 };
 
-export const getSignedSequenceTransactions = async (
-  transactions: Transaction[],
+export const getSignedMetaTransactions = async (
+  metaTransactions: MetaTransaction[],
   nonce: BigNumberish,
   chainId: BigNumber,
   walletAddress: string,
   signer: Signer,
 ): Promise<string> => {
-  const sequenceTransactions = getNormalisedTransactions(transactions);
+  const normalisedMetaTransactions = getNormalisedTransactions(metaTransactions);
 
   // Get the hash
-  const digest = digestOfTransactionsAndNonce(nonce, sequenceTransactions);
+  const digest = digestOfTransactionsAndNonce(nonce, normalisedMetaTransactions);
   const completePayload = ethers.utils.solidityPack(
     ['string', 'uint256', 'address', 'bytes32'],
     [ETH_SIGN_PREFIX, chainId, walletAddress, digest],
@@ -93,7 +93,7 @@ export const getSignedSequenceTransactions = async (
   // Encode the transaction;
   const walletInterface = new ethers.utils.Interface(walletContracts.mainModule.abi);
   return walletInterface.encodeFunctionData(walletInterface.getFunction('execute'), [
-    sequenceTransactions,
+    normalisedMetaTransactions,
     nonce,
     encodedSignature,
   ]);

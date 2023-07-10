@@ -3,8 +3,8 @@ import {
   Web3Provider,
 } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
-import { getNonce, getSignedSequenceTransactions } from '../sequence';
-import { Transaction } from '../types';
+import { getNonce, getSignedMetaTransactions } from '../walletHelpers';
+import { MetaTransaction } from '../types';
 import { EthMethodWithAuthParams } from './types';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 import { retryWithDelay } from '../../network/retry';
@@ -33,7 +33,7 @@ export const ethSendTransaction = async ({
   const signer = magicWeb3Provider.getSigner();
 
   const nonce = await getNonce(jsonRpcProvider, user.zkEvm.ethAddress);
-  const sequenceTransaction: Transaction = {
+  const metaTransaction: MetaTransaction = {
     to: transactionRequest.to,
     data: transactionRequest.data,
     nonce,
@@ -45,8 +45,8 @@ export const ethSendTransaction = async ({
   // accurate estimation of a transaction gas cost is only possible if the smart
   // wallet contract can actually execute it (in a simulated environment) - and
   // it can onlyexecute signed transactions.
-  const signedTransaction = await getSignedSequenceTransactions(
-    [sequenceTransaction],
+  const signedTransaction = await getSignedMetaTransactions(
+    [metaTransaction],
     nonce,
     chainId,
     user.zkEvm.ethAddress,
@@ -66,7 +66,7 @@ export const ethSendTransaction = async ({
     throw new Error('Failed to retrieve fees for IMX token');
   }
 
-  const sequenceFeeTransaction: Transaction = {
+  const feeMetaTransaction: MetaTransaction = {
     nonce,
     to: imxFeeOption.recipientAddress,
     value: imxFeeOption.tokenPrice,
@@ -75,8 +75,8 @@ export const ethSendTransaction = async ({
 
   // NOTE: We sign again because we now are adding the fee transaction, so the
   // whole payload is different and needs a new signature.
-  const signedTransactions = await getSignedSequenceTransactions(
-    [sequenceTransaction, sequenceFeeTransaction],
+  const signedTransactions = await getSignedMetaTransactions(
+    [metaTransaction, feeMetaTransaction],
     nonce,
     chainId,
     user.zkEvm.ethAddress,
