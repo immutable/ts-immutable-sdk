@@ -1,4 +1,4 @@
-import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
+import { Exchange } from '@imtbl/dex-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
 import { ChainId, TokenInfo } from '@imtbl/checkout-sdk';
@@ -28,11 +28,11 @@ describe('QuotesProcessor', () => {
     it('should call the unsigned swap transaction from amount in and get the quote', async () => {
       const getUnsignedSwapTxFromAmountIn = jest.fn();
 
-      const exchange = new Exchange(new ExchangeConfiguration({
+      const exchange = new Exchange({
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
         overrides,
-      }));
+      });
 
       exchange.getUnsignedSwapTxFromAmountIn = getUnsignedSwapTxFromAmountIn;
 
@@ -73,11 +73,11 @@ describe('QuotesProcessor', () => {
     it('should call the unsigned swap transaction from amount out and get the quote', async () => {
       const getUnsignedSwapTxFromAmountOut = jest.fn();
 
-      const exchange = new Exchange(new ExchangeConfiguration({
+      const exchange = new Exchange({
         chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
         overrides,
-      }));
+      });
 
       exchange.getUnsignedSwapTxFromAmountOut = getUnsignedSwapTxFromAmountOut;
 

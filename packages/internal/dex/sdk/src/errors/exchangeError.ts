@@ -43,10 +43,8 @@ export class ExchangeError extends Error {
 }
 
 export class InvalidConfigurationError extends ExchangeError {
-  constructor() {
-    const message = 'Invalid configuration';
-
-    super(message, ExchangeErrorCode.INVALID_CONFIGURATION);
+  constructor(message?: string) {
+    super(message || 'Invalid configuration', ExchangeErrorCode.INVALID_CONFIGURATION);
   }
 }
 
