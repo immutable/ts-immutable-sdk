@@ -263,6 +263,11 @@ export default class AuthManager {
   public async logout(): Promise<void> {
     return withPassportError<void>(async () => {
       this.userManager.signoutRedirect();
+    }, PassportErrorType.LOGOUT_ERROR);
+  }
+
+  public async logoutDeviceFlow(): Promise<void> {
+    return withPassportError<void>(async () => {
       this.deviceCredentialsManager.clearCredentials();
     }, PassportErrorType.LOGOUT_ERROR);
   }

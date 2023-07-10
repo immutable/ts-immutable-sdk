@@ -82,6 +82,10 @@ export class Passport {
     return this.authManager.logout();
   }
 
+  public async logoutDeviceFlow(): Promise<void> {
+    return this.authManager.logoutDeviceFlow();
+  }
+
   public async getUserInfo(): Promise<UserProfile | undefined> {
     const user = await this.authManager.getUser();
     return user?.profile;

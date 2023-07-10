@@ -41,6 +41,8 @@ const callbackToUnity = function (data: object) {
   console.log(message);
   if (typeof UnityPostMessage !== undefined) {
     UnityPostMessage(message);
+  } else if (window.Unity !== undefined) {
+    window.Unity.call(message);
   }
 };
 
@@ -160,7 +162,7 @@ window.callFunction = async function (jsonData: string) { // eslint-disable-line
         break;
       }
       case PASSPORT_FUNCTIONS.logout: {
-        await passportClient?.logout();
+        await passportClient?.logoutDeviceFlow();
         callbackToUnity({
           responseFor: fxName,
           requestId,
