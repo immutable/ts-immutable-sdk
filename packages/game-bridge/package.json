@@ -13,5 +13,20 @@
     "build": "parcel build",
     "start": "parcel"
   },
-  "source": "src/index.html"
+  "source": "src/index.html",
+  "targets": {
+    "unity": {
+      "context": "browser",
+      "engines": {
+        "browsers": "Chrome 90"
+      }
+    },
+    "unreal": {
+      "context": "browser",
+      "engines": {
+        "browsers": "Chrome 59"
+      },
+      "outputFormat": "global"
+    }
+  }
 }
