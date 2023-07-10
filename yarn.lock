@@ -16344,7 +16344,7 @@ __metadata:
     "@imtbl/config": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/provider": 0.0.0
-    parcel: ^2.9.3
+    parcel: ^2.8.3
   languageName: unknown
   linkType: soft
 
@@ -22516,7 +22516,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"parcel@npm:^2.8.3, parcel@npm:^2.9.3":
+"parcel@npm:^2.8.3":
   version: 2.9.3
   resolution: "parcel@npm:2.9.3"
   dependencies:
