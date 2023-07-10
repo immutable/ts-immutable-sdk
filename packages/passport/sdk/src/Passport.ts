@@ -91,6 +91,11 @@ export class Passport {
     return user?.profile;
   }
 
+  public async getUserInfoDeviceFlow(): Promise<UserProfile | undefined> {
+    const user = await this.authManager.getUserDeviceFlow();
+    return user?.profile;
+  }
+
   public async getIdToken(): Promise<string | undefined> {
     const user = await this.authManager.getUser();
     return user?.idToken;

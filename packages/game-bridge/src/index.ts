@@ -40,15 +40,15 @@ const callbackToGame = (data: object) => {
   const message = JSON.stringify(data);
   console.log(`callbackToGame: ${message}`);
   console.log(message);
-  if (typeof window.ue !== undefined) {
-    if (typeof window.ue.jsconnector === undefined) {
+  if (typeof window.ue !== 'undefined') {
+    if (typeof window.ue.jsconnector === 'undefined') {
       console.error('Unreal JSConnector not defined');
     } else {
       window.ue.jsconnector.sendtogame(message);
     }
-  } else if (typeof UnityPostMessage !== undefined) {
+  } else if (typeof UnityPostMessage !== 'undefined') {
     UnityPostMessage(message);
-  } else if (window.Unity !== undefined) {
+  } else if (window.Unity !== 'undefined') {
     window.Unity.call(message);
   } else {
     console.error('No available game callbacks to call from ImmutableSDK game-bridge');
@@ -180,7 +180,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
         break;
       }
       case PASSPORT_FUNCTIONS.getEmail: {
-        const userProfile = await passportClient?.getUserInfo();
+        const userProfile = await passportClient?.getUserInfoDeviceFlow();
         callbackToGame({
           responseFor: fxName,
           requestId,

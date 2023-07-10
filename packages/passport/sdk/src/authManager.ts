@@ -301,6 +301,16 @@ export default class AuthManager {
     }, PassportErrorType.NOT_LOGGED_IN_ERROR);
   }
 
+  public async getUserDeviceFlow(): Promise<User | null> {
+    return withPassportError<User | null>(async () => {
+      const deviceToken = this.deviceCredentialsManager.getCredentials();
+      if (deviceToken) {
+        return AuthManager.mapDeviceTokenResponseToDomainUserModel(deviceToken);
+      }
+      return null;
+    }, PassportErrorType.NOT_LOGGED_IN_ERROR);
+  }
+
   public checkStoredDeviceFlowCredentials(): DeviceTokenResponse | null {
     return this.deviceCredentialsManager.getCredentials();
   }
