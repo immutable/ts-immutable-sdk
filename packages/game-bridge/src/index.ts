@@ -23,7 +23,7 @@ const PASSPORT_FUNCTIONS = {
   getEmail: 'getEmail',
 };
 
-// To notify Unity that this file is loaded
+// To notify game engine that this file is loaded
 const initRequest = 'init';
 const initRequestId = '1';
 
@@ -36,18 +36,26 @@ declare global {
   }
 }
 
-const callbackToUnity = function (data: object) {
+const callbackToGame = (data: object) => {
   const message = JSON.stringify(data);
-  console.log(`callbackToUnity: ${message}`);
+  console.log(`callbackToGame: ${message}`);
   console.log(message);
-  if (typeof UnityPostMessage !== undefined) {
+  if (typeof window.ue !== undefined) {
+    if (typeof window.ue.jsconnector === undefined) {
+      console.error('Unreal JSConnector not defined');
+    } else {
+      window.ue.jsconnector.sendtogame(message);
+    }
+  } else if (typeof UnityPostMessage !== undefined) {
     UnityPostMessage(message);
   } else if (window.Unity !== undefined) {
     window.Unity.call(message);
+  } else {
+    console.error('No available game callbacks to call from ImmutableSDK game-bridge');
   }
 };
 
-const setProvider = function (passportProvider: provider.IMXProvider | null): boolean {
+const setProvider = (passportProvider: provider.IMXProvider | null): boolean => {
   if (passportProvider !== null && passportProvider !== undefined) {
     providerInstance = passportProvider;
     console.log('IMX provider set');
@@ -57,7 +65,7 @@ const setProvider = function (passportProvider: provider.IMXProvider | null): bo
   return false;
 };
 
-window.callFunction = async function (jsonData: string) { // eslint-disable-line no-unused-vars
+window.callFunction = async (jsonData: string) => { // eslint-disable-line no-unused-vars
   console.log(`Call function ${jsonData}`);
 
   let fxName = null;
@@ -84,7 +92,7 @@ window.callFunction = async function (jsonData: string) { // eslint-disable-line
           };
           passportClient = new passport.Passport(passportConfig);
         }
-        callbackToUnity({
+        callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
@@ -93,7 +101,7 @@ window.callFunction = async function (jsonData: string) { // eslint-disable-line
       }
       case PASSPORT_FUNCTIONS.connect: {
         const response = await passportClient?.loginWithDeviceFlow();
-        callbackToUnity({
+        callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
@@ -112,7 +120,7 @@ window.callFunction = async function (jsonData: string) { // eslint-disable-line
           request.timeoutMs ?? null,
         );
         setProvider(passportProvider);
-        callbackToUnity({
+        callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
@@ -131,7 +139,7 @@ window.callFunction = async function (jsonData: string) { // eslint-disable-line
         });
         /* eslint-enable @typescript-eslint/naming-convention */
         const success = setProvider(passportProvider);
-        callbackToUnity({
+        callbackToGame({
           responseFor: fxName,
           requestId,
           success,
@@ -140,7 +148,7 @@ window.callFunction = async function (jsonData: string) { // eslint-disable-line
       }
       case PASSPORT_FUNCTIONS.getAddress: {
         const address = await providerInstance?.getAddress();
-        callbackToUnity({
+        callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
@@ -150,7 +158,7 @@ window.callFunction = async function (jsonData: string) { // eslint-disable-line
       }
       case PASSPORT_FUNCTIONS.checkStoredCredentials: {
         const credentials = passportClient?.checkStoredDeviceFlowCredentials();
-        callbackToUnity({
+        callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
@@ -164,7 +172,7 @@ window.callFunction = async function (jsonData: string) { // eslint-disable-line
       }
       case PASSPORT_FUNCTIONS.logout: {
         await passportClient?.logoutDeviceFlow();
-        callbackToUnity({
+        callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
@@ -173,7 +181,7 @@ window.callFunction = async function (jsonData: string) { // eslint-disable-line
       }
       case PASSPORT_FUNCTIONS.getEmail: {
         const userProfile = await passportClient?.getUserInfo();
-        callbackToUnity({
+        callbackToGame({
           responseFor: fxName,
           requestId,
           success: true,
@@ -186,7 +194,7 @@ window.callFunction = async function (jsonData: string) { // eslint-disable-line
     }
   } catch (error: any) {
     console.log(error);
-    callbackToUnity({
+    callbackToGame({
       responseFor: fxName,
       requestId,
       success: false,
@@ -199,7 +207,7 @@ window.callFunction = async function (jsonData: string) { // eslint-disable-line
 console.log('index.ts loaded');
 // File loaded
 // This is to prevent callFunction not defined error
-callbackToUnity({
+callbackToGame({
   responseFor: initRequest,
   requestId: initRequestId,
   success: true,
