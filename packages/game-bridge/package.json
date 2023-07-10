@@ -1,5 +1,5 @@
 {
-  "name": "game-bridge",
+  "name": "@imtbl/game-bridge",
   "version": "0.0.0",
   "dependencies": {
     "@imtbl/config": "0.0.0",

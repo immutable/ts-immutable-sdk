@@ -170,7 +170,8 @@ export default class AuthManager {
   public async connectImxDeviceFlow(deviceCode: string, interval: number, timeoutMs?: number): Promise<User> {
     return withPassportError<User>(async () => {
       const startTime = Date.now();
-      while (true) {
+      const loopCondition = true;
+      while (loopCondition) {
         if (timeoutMs != null && Date.now() - startTime > timeoutMs) {
           throw new Error('Timed out');
         }
@@ -197,19 +198,18 @@ export default class AuthManager {
                 break;
               case 'expired_token':
                 throw new Error('Token expired, please log in again');
-                break;
               case 'access_denied':
                 throw new Error('User denied access');
-                break;
               default:
                 throw new Error('Error getting token');
-                break;
             }
           } else {
             throw error;
           }
         }
       }
+
+      throw new Error('Failed to get credentials');
     }, PassportErrorType.AUTHENTICATION_ERROR);
   }
   /* eslint-enable no-await-in-loop */

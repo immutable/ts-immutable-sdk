@@ -3729,6 +3729,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@imtbl/game-bridge@workspace:packages/game-bridge":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/game-bridge@workspace:packages/game-bridge"
+  dependencies:
+    "@imtbl/config": 0.0.0
+    "@imtbl/passport": 0.0.0
+    "@imtbl/provider": 0.0.0
+    parcel: ^2.8.3
+  languageName: unknown
+  linkType: soft
+
 "@imtbl/generated-clients@0.0.0, @imtbl/generated-clients@workspace:packages/internal/generated-clients":
   version: 0.0.0-use.local
   resolution: "@imtbl/generated-clients@workspace:packages/internal/generated-clients"
@@ -16336,17 +16347,6 @@ __metadata:
   checksum: c3f1f5ba20f4e962efb71344ce0a40722163e85bee2101ce25f88214e78182d2d2476aa85ef37950c579eb6cf6ee811c17b3101bb84004bb75655f3e33f3fdb5
   languageName: node
   linkType: hard
-
-"game-bridge@workspace:packages/game-bridge":
-  version: 0.0.0-use.local
-  resolution: "game-bridge@workspace:packages/game-bridge"
-  dependencies:
-    "@imtbl/config": 0.0.0
-    "@imtbl/passport": 0.0.0
-    "@imtbl/provider": 0.0.0
-    parcel: ^2.8.3
-  languageName: unknown
-  linkType: soft
 
 "gauge@npm:^3.0.0":
   version: 3.0.2
