@@ -32,7 +32,7 @@ export const cyIntercept = (overrides?: {
   },
 }) => {
   const checkoutApi = 'https://checkout-api.sandbox.immutable.com/v1';
-  const zkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com';
+  const imtblZkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com';
   const defaultConfig = {
     allowedNetworks: [
       {
@@ -64,7 +64,7 @@ export const cyIntercept = (overrides?: {
     },
     dex: {
       overrides: {
-        rpcURL: zkEvmRpcUrl,
+        rpcURL: imtblZkEvmRpcUrl,
         commonRoutingTokens: [
           {
             chainId: ChainId.SEPOLIA,
@@ -127,6 +127,6 @@ export const cyIntercept = (overrides?: {
     },
   );
   cy.intercept(`${checkoutApi}/rpc/eth-sepolia`, {});
-  cy.intercept(zkEvmRpcUrl, {});
+  cy.intercept(imtblZkEvmRpcUrl, {});
   cy.intercept('https://image-resizer-cache.dev.immutable.com/*', {});
 };
