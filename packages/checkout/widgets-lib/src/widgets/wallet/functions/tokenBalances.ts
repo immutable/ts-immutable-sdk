@@ -33,9 +33,13 @@ export const getTokenBalances = async (
       chainId,
     });
 
+    const filteredTokens = getAllBalancesResult.balances.filter(
+      (balance) => balance.balance.gt(0) || (!balance.token.address || balance.token.address === 'NATIVE'),
+    );
+
     const sortedTokens = sortTokensByAmount(
       checkout.config,
-      getAllBalancesResult.balances,
+      filteredTokens,
       chainId,
     );
 
