@@ -62,6 +62,17 @@ export function validateAndBuildVersion(
  * @returns None
  */
 export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
+  if (window === undefined) {
+    // eslint-disable-next-line no-console
+    console.error('missing window object: please run Checkout client side');
+    return;
+  }
+  if (document === undefined) {
+    // eslint-disable-next-line no-console
+    console.error('missing document object: please run Checkout client side');
+    return;
+  }
+
   const checkoutWidgetJS = document.createElement('script');
 
   const validVersion = validateAndBuildVersion(config?.version);
@@ -83,5 +94,11 @@ export function CheckoutWidgets(config?: CheckoutWidgetsConfig) {
  * @returns None
  */
 export function UpdateConfig(config: CheckoutWidgetsConfig) {
+  if (window === undefined) {
+    // eslint-disable-next-line no-console
+    console.error('missing document object: please run Checkout client side');
+    return;
+  }
+
   window.ImtblCheckoutWidgetConfig = JSON.stringify(config);
 }
