@@ -25,7 +25,8 @@ export const DEFAULT_PROVIDER = WalletProviderName.METAMASK;
 /**
  * Checkout Widget default onramp enabled flag
  */
-export const DEFAULT_ON_RAMP_ENABLED = true;
+// TODO https://immutable.atlassian.net/browse/WT-1509
+export const DEFAULT_ON_RAMP_ENABLED = false;
 
 /**
  * Checkout Widget default swap enabled flag
