@@ -72,6 +72,7 @@
     "packages/checkout/sdk-sample-app",
     "packages/checkout/widgets",
     "packages/checkout/widgets-sample-app",
+    "packages/checkout/portfolio",
     "packages/checkout/widgets-lib",
     "packages/economy/sdk",
     "packages/economy/playground",
