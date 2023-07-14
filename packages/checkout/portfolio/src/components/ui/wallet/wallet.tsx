@@ -1,3 +1,5 @@
+/* eslint-disable */ 
+
 import { useEffect } from 'react';
 import {
   CheckoutWidgetsConfig,
@@ -59,7 +61,6 @@ function WalletUI() {
   }, []);
   return (
     <div className="Connect">
-      <h1 className="sample-heading">Checkout Wallet (Web Component)</h1>
       <WalletReact walletProvider={WalletProviderName.METAMASK} />
     </div>
   );

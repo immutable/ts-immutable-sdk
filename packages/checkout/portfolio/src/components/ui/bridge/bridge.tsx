@@ -26,8 +26,6 @@ function BridgeUI() {
 
   return (
     <div className="Swap">
-      <h1 className="sample-heading">Checkout Bridge (Web Component)</h1>
-
       <BridgeReact
         walletProvider={WalletProviderName.METAMASK}
       />
