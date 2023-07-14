@@ -1,3 +1,6 @@
+/* eslint-disable */ 
+import React from 'react';
+
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import {
   WidgetTheme,
@@ -27,8 +30,6 @@ function BridgeUI() {
 
       <BridgeReact
         walletProvider={WalletProviderName.METAMASK}
-        amount="50"
-        fromContractAddress="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
       />
     </div>
   );
