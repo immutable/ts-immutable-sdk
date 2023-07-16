@@ -49,7 +49,7 @@ describe('', () => {
         environment: Environment.SANDBOX,
       },
       overrides: {
-        chainName: 'imtbl-zkevm-devnet',
+        chainName: 'imtbl-zkevm-testnet',
       },
     });
 

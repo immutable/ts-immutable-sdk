@@ -39,13 +39,15 @@ export const SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT: Record<Environment, Record<num
 };
 
 function validateOverrides(overrides: ExchangeOverrides) {
-  if (!overrides.rpcURL || !overrides.exchangeContracts || !overrides.commonRoutingTokens || !overrides.nativeToken) {
-    throw new InvalidConfigurationError();
-  }
+  Object.entries(overrides).forEach(([key, value]) => {
+    if (!value) {
+      throw new InvalidConfigurationError(`Missing override: ${key}`);
+    }
+  });
 
-  Object.values(overrides.exchangeContracts).forEach((contract) => {
+  Object.entries(overrides.exchangeContracts).forEach(([key, contract]) => {
     if (!isValidNonZeroAddress(contract)) {
-      throw new InvalidConfigurationError();
+      throw new InvalidConfigurationError(`Invalid exchange contract address for ${key}`);
     }
   });
 }
