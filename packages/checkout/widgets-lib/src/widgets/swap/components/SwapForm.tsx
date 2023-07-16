@@ -425,11 +425,8 @@ export function SwapForm({ data }: SwapFromProps) {
   // 2. If the swap from token is also IMX, include the additional amount into the calc
   //    as user will need enough imx for the swap amount and the gas
   const insufficientFundsForGas = useMemo(() => {
-    const imxBalance = tokenBalances
-      .find((balance) => !balance.token.address || balance.token.address === 'NATIVE');
-    if (!imxBalance) {
-      return true;
-    }
+    const imxBalance = tokenBalances.find((b) => !b.token.address || b.token.address === 'NATIVE');
+    if (!imxBalance) return true;
 
     // need to double check if the is going to be how to identify IMX on zkEVM
     const fromTokenIsImx = !fromToken?.address || fromToken.address === 'NATIVE';
