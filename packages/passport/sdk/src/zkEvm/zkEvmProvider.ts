@@ -4,6 +4,7 @@ import { ethSendTransaction } from './rpcMethods';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
+  JsonRpcResponsePayload,
   Provider,
   RequestArguments,
 } from './types';
@@ -69,16 +70,14 @@ export class ZkEvmProvider implements Provider {
     return this.magicProvider !== undefined && this.user !== undefined;
   }
 
-  public async request(
-    request: RequestArguments,
-  ): Promise<any> {
+  private performRequest = async (request: RequestArguments): Promise<any> => {
     const authWrapper = (fn: (params: EthMethodWithAuthParams) => Promise<any>) => {
       if (!this.isLoggedIn()) {
         throw new JsonRpcError(RpcErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
       }
 
       return fn({
-        params: request.params,
+        params: request.params || [],
         magicProvider: this.magicProvider,
         jsonRpcProvider: this.jsonRpcProvider,
         config: this.config,
@@ -88,51 +87,82 @@ export class ZkEvmProvider implements Provider {
       });
     };
 
-    try {
-      switch (request.method) {
-        case 'eth_requestAccounts': {
-          if (this.isLoggedIn()) {
-            return [this.user.zkEvm.ethAddress];
-          }
-          const { magicProvider, user } = await registerZkEvmUser({
-            authManager: this.authManager,
-            config: this.config,
-            magicAdapter: this.magicAdapter,
-            multiRollupApiClients: this.multiRollupApiClients,
-          });
-
-          this.user = user;
-          this.magicProvider = magicProvider;
-
+    switch (request.method) {
+      case 'eth_requestAccounts': {
+        if (this.isLoggedIn()) {
           return [this.user.zkEvm.ethAddress];
         }
-        case 'eth_sendTransaction': {
-          return authWrapper(ethSendTransaction);
-        }
-        case 'eth_accounts': {
-          return this.isLoggedIn() ? [this.user.zkEvm.ethAddress] : [];
-        }
-        // Passthrough methods
-        case 'eth_gasPrice':
-        case 'eth_getBalance':
-        case 'eth_getStorageAt':
-        case 'eth_estimateGas':
-        case 'eth_call':
-        case 'eth_blockNumber':
-        case 'eth_chainId':
-        case 'eth_getBlockByHash':
-        case 'eth_getBlockByNumber':
-        case 'eth_getTransactionByHash':
-        case 'eth_getTransactionReceipt':
-        case 'eth_getTransactionCount': {
-          return this.jsonRpcProvider.send(request.method, request.params);
-        }
-        default: {
-          return Promise.reject(
-            new JsonRpcError(RpcErrorCode.METHOD_NOT_FOUND, 'Method not supported'),
-          );
-        }
+        const { magicProvider, user } = await registerZkEvmUser({
+          authManager: this.authManager,
+          config: this.config,
+          magicAdapter: this.magicAdapter,
+          multiRollupApiClients: this.multiRollupApiClients,
+        });
+
+        this.user = user;
+        this.magicProvider = magicProvider;
+
+        return [this.user.zkEvm.ethAddress];
       }
+      case 'eth_sendTransaction': {
+        return authWrapper(ethSendTransaction);
+      }
+      case 'eth_accounts': {
+        return this.isLoggedIn() ? [this.user.zkEvm.ethAddress] : [];
+      }
+      // Pass through methods
+      case 'eth_gasPrice':
+      case 'eth_getBalance':
+      case 'eth_getStorageAt':
+      case 'eth_estimateGas':
+      case 'eth_call':
+      case 'eth_blockNumber':
+      case 'eth_chainId':
+      case 'eth_getBlockByHash':
+      case 'eth_getBlockByNumber':
+      case 'eth_getTransactionByHash':
+      case 'eth_getTransactionReceipt':
+      case 'eth_getTransactionCount': {
+        return this.jsonRpcProvider.send(request.method, request.params || []);
+      }
+      default: {
+        throw new JsonRpcError(RpcErrorCode.METHOD_NOT_FOUND, 'Method not supported');
+      }
+    }
+  };
+
+  private performJsonRpcRequest = async (request: JsonRpcRequestPayload): Promise<JsonRpcResponsePayload> => {
+    const { id, jsonrpc } = request;
+    try {
+      const result = await this.performRequest(request);
+      return {
+        id,
+        jsonrpc,
+        result,
+      };
+    } catch (error: unknown) {
+      let jsonRpcError: JsonRpcError;
+      if (error instanceof JsonRpcError) {
+        jsonRpcError = error;
+      } else if (error instanceof Error) {
+        jsonRpcError = new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, error.message);
+      } else {
+        jsonRpcError = new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Internal error');
+      }
+
+      return {
+        id,
+        jsonrpc,
+        error: jsonRpcError,
+      };
+    }
+  };
+
+  public async request(
+    request: RequestArguments,
+  ): Promise<any> {
+    try {
+      return this.performRequest(request);
     } catch (error: unknown) {
       if (error instanceof JsonRpcError) {
         throw error;
@@ -146,28 +176,64 @@ export class ZkEvmProvider implements Provider {
   }
 
   public sendAsync(
-    request: JsonRpcRequestPayload,
+    request: JsonRpcRequestPayload | JsonRpcRequestPayload[],
     callback?: JsonRpcRequestCallback,
   ) {
     if (!callback) {
       throw new Error('No callback provided');
     }
 
-    this.request(request).then((result) => {
-      callback(null, {
-        result,
-        jsonrpc: '2.0',
-        id: request.id,
+    if (Array.isArray(request)) {
+      Promise.all(request.map(this.performJsonRpcRequest)).then((result) => {
+        callback(null, result);
+      }).catch((error: JsonRpcError) => {
+        callback(error, []);
       });
-    }).catch((error: JsonRpcError) => {
-      callback(error, null);
-    });
+    } else {
+      this.performJsonRpcRequest(request).then((result) => {
+        callback(null, result);
+      }).catch((error: JsonRpcError) => {
+        callback(error, null);
+      });
+    }
   }
 
-  public send(method: string, params?: any[]) {
-    return this.request({
-      method,
-      params,
-    });
+  public async send(
+    request: string | JsonRpcRequestPayload | JsonRpcRequestPayload[],
+    callbackOrParams?: JsonRpcRequestCallback | Array<any>,
+    callback?: JsonRpcRequestCallback,
+  ) {
+    // Web3 >= 1.0.0-beta.38 calls `send` with method and parameters.
+    if (typeof request === 'string') {
+      if (typeof callbackOrParams === 'function') {
+        return this.sendAsync({
+          method: request,
+          params: [],
+        }, callbackOrParams);
+      }
+
+      if (callback) {
+        return this.sendAsync({
+          method: request,
+          params: Array.isArray(callbackOrParams) ? callbackOrParams : [],
+        }, callback);
+      }
+
+      return this.request({
+        method: request,
+        params: Array.isArray(callbackOrParams) ? callbackOrParams : [],
+      });
+    }
+
+    // Web3 <= 1.0.0-beta.37 uses `send` with a callback for async queries.
+    if (typeof callbackOrParams === 'function') {
+      return this.sendAsync(request, callbackOrParams);
+    }
+
+    if (!Array.isArray(request) && typeof request === 'object') {
+      return this.performJsonRpcRequest(request);
+    }
+
+    throw new JsonRpcError(RpcErrorCode.INVALID_REQUEST, 'Invalid request');
   }
 }
