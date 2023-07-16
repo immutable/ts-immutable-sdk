@@ -11,5 +11,5 @@ export type EthMethodWithAuthParams = {
   confirmationScreen: ConfirmationScreen;
   relayerAdapter: RelayerAdapter;
   user: UserZkEvm;
-  params: any[];
+  params: Array<any>;
 };

@@ -11,6 +11,7 @@ import {
 } from './types';
 import { ConfirmationScreen } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
+import { Provider } from './zkEvm/types';
 
 export class Passport {
   private readonly authManager: AuthManager;
@@ -54,7 +55,7 @@ export class Passport {
     return this.passportImxProviderFactory.getProvider();
   }
 
-  public connectEvm() {
+  public connectEvm(): Provider {
     return new ZkEvmProvider({
       authManager: this.authManager,
       magicAdapter: this.magicAdapter,

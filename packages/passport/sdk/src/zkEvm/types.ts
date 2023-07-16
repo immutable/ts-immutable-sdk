@@ -35,28 +35,36 @@ export interface MetaTransactionNormalised {
   data: BytesLike
 }
 
-export interface RequestArguments<TParams = any> {
+export interface RequestArguments {
   method: string;
-  params?: TParams;
+  params?: Array<any>;
 }
 
 export type JsonRpcRequestPayload = RequestArguments & {
-  jsonrpc: string;
-  id: string | number | null;
+  jsonrpc?: string;
+  id?: string | number;
 };
 
 export interface JsonRpcRequestCallback {
-  (err: JsonRpcError | null, result?: JsonRpcResponsePayload | null): void;
+  (err: JsonRpcError | null, result?: JsonRpcResponsePayload | (JsonRpcResponsePayload | null)[] | null): void;
 }
-export interface JsonRpcResponsePayload<ResultType = any> {
-  jsonrpc: string;
-  id: string | number | null;
-  result?: ResultType | null;
+
+export interface JsonRpcResponsePayload {
+  result?: Array<any> | null;
   error?: JsonRpcError | null;
+  jsonrpc?: string;
+  id?: string | number;
 }
 
 export type Provider = {
-  sendAsync: (request: JsonRpcRequestPayload, callback: JsonRpcRequestCallback) => void
-  send: (method: string, params?: Array<any>) => void
-  request: (request: { method: string, params?: Array<any> }) => Promise<any>
+  request: (request: RequestArguments) => Promise<any>
+  sendAsync: (
+    request: JsonRpcRequestPayload | JsonRpcRequestPayload[],
+    callback: JsonRpcRequestCallback,
+  ) => void
+  send: (
+    request: string | JsonRpcRequestPayload | JsonRpcRequestPayload[],
+    callbackOrParams?: JsonRpcRequestCallback | Array<any>,
+    callback?: JsonRpcRequestCallback,
+  ) => void
 };
