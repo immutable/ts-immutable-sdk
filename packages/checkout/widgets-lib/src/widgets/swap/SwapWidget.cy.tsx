@@ -3,7 +3,7 @@ import {
   describe, it, cy, beforeEach,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
-import { ChainId, Checkout } from '@imtbl/checkout-sdk';
+import { ChainId, ChainName, Checkout } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { BiomeCombinedProviders } from '@biom3/react';
@@ -17,19 +17,13 @@ import { text } from '../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 
 describe('SwapWidget tests', () => {
-  beforeEach(() => {
-    cyIntercept();
-
-    cy.viewport('ipad-2');
-  });
-
   const mockProvider = {
     getSigner: () => ({
       getAddress: () => Promise.resolve('0xwalletAddress'),
     }),
     getNetwork: async () => ({
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-      name: 'Immutable zkEVM Testnet',
+      name: ChainName.IMTBL_ZKEVM_TESTNET,
     }),
     provider: {
       request: async () => null,
@@ -37,13 +31,16 @@ describe('SwapWidget tests', () => {
   } as unknown as Web3Provider;
 
   beforeEach(() => {
+    cy.viewport('ipad-2');
+    cyIntercept();
+
     cy.stub(Checkout.prototype, 'connect')
       .as('connectStub')
       .resolves({
         provider: mockProvider,
         network: {
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-          name: 'Immutable zkEVM Testnet',
+          name: ChainName.IMTBL_ZKEVM_TESTNET,
           nativeCurrency: {
             name: 'IMX',
             symbol: 'IMX',
@@ -66,7 +63,7 @@ describe('SwapWidget tests', () => {
       .resolves({
         balances: [
           {
-            balance: BigNumber.from('10000000000000'),
+            balance: BigNumber.from('10000000000000000000'),
             formattedBalance: '0.1',
             token: {
               name: 'Ethereum',
@@ -76,7 +73,7 @@ describe('SwapWidget tests', () => {
             },
           },
           {
-            balance: BigNumber.from('10000000000000'),
+            balance: BigNumber.from('10000000000000000000'),
             formattedBalance: '0.1',
             token: {
               name: 'ImmutableX',
@@ -116,18 +113,6 @@ describe('SwapWidget tests', () => {
           },
         ],
       });
-
-    cy.intercept(
-      {
-        method: 'GET',
-        path: '/v1/fiat/conversion*',
-      },
-      {
-        ethereum: { usd: 2000.0 },
-        'usd-coin': { usd: 1.0 },
-        'immutable-x': { usd: 1.5 },
-      },
-    ).as('cryptoFiatStub');
   });
 
   const params = {
@@ -157,6 +142,7 @@ describe('SwapWidget tests', () => {
   });
 
   it('should set fromTokens to user balances filtered by the token allow list', () => {
+    cyIntercept();
     mount(
       <SwapWidget
         config={config}

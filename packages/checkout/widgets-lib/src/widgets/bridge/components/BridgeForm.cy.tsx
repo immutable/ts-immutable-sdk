@@ -147,8 +147,24 @@ describe('Bridge Form', () => {
     cySmartGet('bridge-token-select__target__defaultLabel').should('have.text', 'Select coin');
     cySmartGet('bridge-token-select__target').click();
     cySmartGet(`bridge-token-coin-selector__option-imx-${imxAddress}`).should('exist');
-    cySmartGet(`bridge-token-coin-selector__option-imx-${imxAddress}`).should('exist');
   });
+
+  // Uncomment when NATIVE supported as part of bridge
+  // it('should set token to the native token when native passed in as from token', () => {
+  //   mount(
+  //     <BridgeWidgetTestComponent
+  //       initialStateOverride={bridgeState}
+  //       cryptoConversionsOverride={cryptoConversions}
+  //     >
+  //       <BridgeForm
+  //         testId="bridge-form"
+  //         defaultFromContractAddress="NATIVE"
+  //       />
+  //     </BridgeWidgetTestComponent>,
+  //   );
+
+  //   cySmartGet('bridge-token-select__target__controlledLabel').should('have.text', 'ETH');
+  // });
 
   it('should set defaults when provided and ignore casing on token address', () => {
     cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
@@ -173,6 +189,9 @@ describe('Bridge Form', () => {
         />
       </BridgeWidgetTestComponent>,
     );
+
+    cySmartGet('bridge-token-select__target__controlledLabel').should('have.text', 'IMX');
+    cySmartGet('bridge-amount-text__input').should('have.value', '10');
   });
 
   describe('Bridge Form submit', () => {

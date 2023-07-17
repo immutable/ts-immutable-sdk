@@ -17,7 +17,9 @@ import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewConte
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { text } from '../../../resources/text/textConfig';
 import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
-import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
+import {
+  calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
+} from '../../../lib/utils';
 import { SelectForm } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
 import { Fees } from '../../../components/Fees/Fees';
@@ -28,7 +30,7 @@ import {
 } from './BridgeFormStyles';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 import { useInterval } from '../../../lib/hooks/useInterval';
-import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
+import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE } from '../../../lib';
 import { swapButtonIconLoadingStyle } from '../../swap/components/SwapButtonStyles';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
@@ -94,7 +96,7 @@ export function BridgeForm(props: BridgeFormProps) {
     const options = tokenBalances
       .filter((b) => b.balance.gt(0)
       && b.token?.address
-      && b.token?.address !== 'NATIVE'
+      && b.token?.address !== NATIVE
       && b.token.address !== '')
       .map(
         (t) => ({
@@ -119,7 +121,7 @@ export function BridgeForm(props: BridgeFormProps) {
       hasSetDefaultState.current = true;
       if (defaultFromContractAddress) {
         setToken(tokenBalances.find(
-          (b) => b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase(),
+          (b) => (b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase()),
         ));
       }
     }
@@ -223,12 +225,12 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const insufficientFundsForGas = useMemo(() => {
     const ethBalance = tokenBalances
-      .find((balance) => !balance.token.address || balance.token.address === 'NATIVE');
+      .find((balance) => isNativeToken(balance.token.address));
     if (!ethBalance) {
       return true;
     }
 
-    const tokenIsEth = !token?.token.address || token.token.address === 'NATIVE';
+    const tokenIsEth = isNativeToken(token?.token.address);
     const gasAmount = parseEther(gasFee.length !== 0 ? gasFee : '0');
     const additionalAmount = tokenIsEth && !Number.isNaN(parseFloat(amount))
       ? parseEther(amount)
@@ -509,7 +511,7 @@ export function BridgeForm(props: BridgeFormProps) {
           showHeaderBar={false}
           onCloseBottomSheet={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
-          showAdjustAmount={(!token?.token.address || token.token.address === 'NATIVE')}
+          showAdjustAmount={isNativeToken(token?.token.address)}
         />
       </Box>
     </Box>
