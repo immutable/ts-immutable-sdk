@@ -16,9 +16,9 @@ function Trade({ showTrade, setShowTrade }: TradeProps) {
   const [loadingOrders, setLoadingOrders] = useState<boolean>(false);
   const [loadingTrade, setLoadingTrade] = useState<boolean>(false);
 
-  const { setMessage } = useStatusProvider();
+  const { addMessage } = useStatusProvider();
   const { coreSdkClient } = useImmutableProvider();
-  const { imxProvider, imxWalletAddress } = usePassportProvider();
+  const { imxProvider } = usePassportProvider();
 
   useEffect(() => {
     (async () => {
@@ -47,20 +47,21 @@ function Trade({ showTrade, setShowTrade }: TradeProps) {
     setLoadingTrade(true);
     setTradeIndex(index);
     try {
+      const user = await imxProvider?.getAddress() || '';
       const request: GetSignableTradeRequest = {
         order_id: id,
-        user: imxWalletAddress || '',
+        user,
       };
       const createTradeResponse = await imxProvider?.createTrade(request);
       if (createTradeResponse) {
         setLoadingTrade(false);
         setTradeIndex(null);
-        setMessage(`Successfully purchased with Order ID ${id}`);
+        addMessage(`Successfully purchased with Order ID ${id}`);
         handleClose();
       }
     } catch (err) {
       if (err instanceof Error) {
-        setMessage(err.toString());
+        addMessage(err.toString());
         handleClose();
       }
     }

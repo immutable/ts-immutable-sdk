@@ -18,6 +18,7 @@ enum TokenType {
 
 function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
   const [token, setToken] = useState<TokenType>(TokenType.ERC721Token);
+  const [ethBalance, setEthBalance] = useState<string>('0');
   const [receiver, setReceiver] = useState<string>('');
   const [tokenAddress, setTokenAddress] = useState<string>('');
   const [tokenId, setTokenId] = useState<string>('');
@@ -25,21 +26,31 @@ function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
   const [isInvalid, setInvalid] = useState<boolean | undefined>(undefined);
   const [loadingTransfer, setLoadingTransfer] = useState<boolean>(false);
   const [loadingAssets, setLoadingAssets] = useState<boolean>(false);
+  const [loadingEthBalance, setLoadingEthBalance] = useState<boolean>(false);
   const [assets, setAssets] = useState<Asset[]>([]);
 
-  const { setMessage } = useStatusProvider();
-  const { imxProvider, imxWalletAddress } = usePassportProvider();
+  const { addMessage } = useStatusProvider();
+  const { imxProvider } = usePassportProvider();
   const { coreSdkClient } = useImmutableProvider();
 
   useEffect(() => {
     setLoadingAssets(true);
+    setLoadingEthBalance(true);
     const getAssets = async () => {
+      const imxWalletAddress = await imxProvider?.getAddress();
       const result = await coreSdkClient.listAssets({ user: imxWalletAddress });
       setAssets(result.result);
       setLoadingAssets(false);
     };
+    const getEthBalance = async () => {
+      const owner = await imxProvider?.getAddress() || '';
+      const balances = await coreSdkClient.getBalance({ owner, address: 'ETH' });
+      setEthBalance(utils.formatEther(balances.balance));
+      setLoadingEthBalance(false);
+    };
     getAssets().catch(console.log);
-  }, [coreSdkClient, imxWalletAddress]);
+    getEthBalance().catch(console.log);
+  }, [coreSdkClient, imxProvider]);
 
   useEffect(() => {
     (async () => {
@@ -47,12 +58,13 @@ function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
       if (showTransfer) {
         setAssets([]);
 
+        const imxWalletAddress = await imxProvider?.getAddress();
         const result = await coreSdkClient.listAssets({ user: imxWalletAddress });
         setAssets(result.result);
         setLoadingAssets(false);
       }
     })();
-  }, [showTransfer, coreSdkClient, imxWalletAddress]);
+  }, [showTransfer, coreSdkClient, imxProvider]);
 
   const resetForm = () => {
     setToken(TokenType.ERC721Token);
@@ -107,7 +119,7 @@ function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
             break;
           }
           default: {
-            setMessage('Invalid token type');
+            addMessage('Transfer', 'Invalid token type');
             handleClose();
             return;
           }
@@ -116,17 +128,15 @@ function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
         if (transferResponse) {
           setLoadingTransfer(false);
           if (amount) {
-            setMessage(`Transferred ${token} ${amount} to  ${receiver}`);
+            addMessage('Transfer', `Transferred ${token} ${amount} to  ${receiver}`);
           } else {
-            setMessage(`Transferred to ${receiver}`);
+            addMessage('Transfer', `Transferred to ${receiver}`);
           }
           handleClose();
         }
       } catch (err) {
-        if (err instanceof Error) {
-          setMessage(err.toString());
-          handleClose();
-        }
+        addMessage('Transfer', err);
+        handleClose();
       }
     } else {
       setInvalid(true);
@@ -287,9 +297,17 @@ function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
             )}
         { (token === TokenType.ERC721Token && !loadingAssets && assets?.length === 0)
             && <Alert variant="info">You have no assets available to transfer</Alert>}
+        { (token === TokenType.ETHToken)
+          && (
+          <Alert variant="info">
+            Eth Balance:
+            {' '}
+            {ethBalance}
+          </Alert>
+          )}
         {
-          (token === TokenType.ERC721Token && loadingAssets)
-            && <Spinner />
+          ((token === TokenType.ERC721Token && loadingAssets) || (token === TokenType.ETHToken && loadingEthBalance))
+          && <Spinner />
         }
       </Offcanvas.Body>
     </Offcanvas>

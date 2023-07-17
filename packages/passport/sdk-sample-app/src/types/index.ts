@@ -1,10 +1,14 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, PropsWithChildren } from 'react';
 
 export enum EnvironmentNames {
   DEV = 'dev',
   SANDBOX = 'sandbox',
   PRODUCTION = 'production',
 }
+
+export type CardStackPropsType = PropsWithChildren<{
+  title: string;
+}>;
 
 export interface EnvironmentPropsType {
   disabled: boolean
@@ -28,4 +32,9 @@ export interface TradeProps {
 export interface OrderProps {
   show: boolean
   setShow: Dispatch<SetStateAction<boolean>>
+}
+
+export interface RequestProps {
+  showRequest: boolean;
+  setShowRequest: Dispatch<SetStateAction<boolean>>;
 }

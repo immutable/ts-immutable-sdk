@@ -28,19 +28,20 @@ function BulkTransfer({ showBulkTransfer, setShowBulkTransfer }: BulkTransferPro
   const [assets, setAssets] = useState<Asset[]>([]);
   const [transfers, setTransfers] = useState<Partial<Transfer>[]>([{}]);
 
-  const { setMessage } = useStatusProvider();
-  const { imxProvider, imxWalletAddress } = usePassportProvider();
+  const { addMessage } = useStatusProvider();
+  const { imxProvider } = usePassportProvider();
   const { coreSdkClient } = useImmutableProvider();
 
   useEffect(() => {
     setLoadingAssets(true);
     const getAssets = async () => {
+      const imxWalletAddress = await imxProvider?.getAddress();
       const result = await coreSdkClient.listAssets({ user: imxWalletAddress });
       setAssets(result.result);
       setLoadingAssets(false);
     };
     getAssets().catch(console.log);
-  }, [coreSdkClient, imxWalletAddress]);
+  }, [coreSdkClient, imxProvider]);
 
   useEffect(() => {
     (async () => {
@@ -48,12 +49,13 @@ function BulkTransfer({ showBulkTransfer, setShowBulkTransfer }: BulkTransferPro
       if (showBulkTransfer) {
         setAssets([]);
 
+        const imxWalletAddress = await imxProvider?.getAddress();
         const result = await coreSdkClient.listAssets({ user: imxWalletAddress });
         setAssets(result.result);
         setLoadingAssets(false);
       }
     })();
-  }, [showBulkTransfer, coreSdkClient, imxWalletAddress]);
+  }, [showBulkTransfer, coreSdkClient, imxProvider]);
 
   const resetForm = () => {
     setTransfers([]);
@@ -109,14 +111,12 @@ function BulkTransfer({ showBulkTransfer, setShowBulkTransfer }: BulkTransferPro
         const transferResponse = await imxProvider?.batchNftTransfer(transfers as NftTransferDetails[]);
         if (transferResponse) {
           setLoadingTransfer(false);
-          setMessage(`Transferred ${transfers.length} tokens`);
+          addMessage('Bulk Transfer', `Transferred ${transfers.length} tokens`);
           handleClose();
         }
       } catch (err) {
-        if (err instanceof Error) {
-          setMessage(err.toString());
-          handleClose();
-        }
+        addMessage('Bulk Transfer', err);
+        handleClose();
       }
     } else {
       setInvalid(true);
