@@ -73,6 +73,7 @@ export function PassportProvider({
 
   const connectZkEvm = useCallback(async () => {
     setIsLoading(true);
+    // @ts-ignore TODO ID-926 Remove once method is public
     const provider = passportClient?.connectEvm();
     if (provider) {
       setZkEvmProvider(provider);
