@@ -121,8 +121,7 @@ export function BridgeForm(props: BridgeFormProps) {
       hasSetDefaultState.current = true;
       if (defaultFromContractAddress) {
         setToken(tokenBalances.find(
-          (b) => (isNativeToken(b.token.address) && defaultFromContractAddress?.toLocaleUpperCase() === NATIVE)
-          || (b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase()),
+          (b) => (b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase()),
         ));
       }
     }
