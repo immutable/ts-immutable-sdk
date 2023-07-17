@@ -80,6 +80,7 @@ export class Passport {
     return this.passportImxProviderFactory.getProviderWithCredentials(tokenResponse);
   }
 
+  // TODO ID-926 Make method public once development has been finalised
   protected connectEvm(): Provider {
     return new ZkEvmProvider({
       authManager: this.authManager,
