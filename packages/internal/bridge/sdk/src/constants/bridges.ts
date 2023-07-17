@@ -21,10 +21,6 @@ export const ZKEVM_TESTNET_CHAIN_ID = 'eip155:13372';
  * @constant {string} ZKEVM_MAINNET_CHAIN_ID - The chain ID for the zkEVM mainnet (EIP-155 compatible format).
  */
 export const ZKEVM_MAINNET_CHAIN_ID = 'eip155:13371';
-/**
- * @constant {string} ZKEVM_LOCAL_CHAIN_ID - The chain ID for the zkEVM local environment (EIP-155 compatible format).
- */
-export const ZKEVM_LOCAL_CHAIN_ID = 'eip155:13373';
 
 /**
  * @constant {BridgeInstance} ETH_SEPOLIA_TO_ZKEVM_DEVNET - A bridge instance configuration for bridging between the Ethereum Sepolia testnet and the zkEVM devnet.
@@ -48,12 +44,4 @@ export const ETH_SEPOLIA_TO_ZKEVM_TESTNET: BridgeInstance = {
 export const ETH_MAINNET_TO_ZKEVM_MAINNET: BridgeInstance = {
   rootChainID: ETH_MAINNET_CHAIN_ID,
   childChainID: ZKEVM_MAINNET_CHAIN_ID,
-};
-
-/**
- * @constant {BridgeInstance} ETH_SEPOLIA_TO_ZKEVM_LOCAL - A bridge instance configuration for bridging between the Ethereum Sepolia and the zkEVM local.
- */
-export const ETH_SEPOLIA_TO_ZKEVM_LOCAL: BridgeInstance = {
-  rootChainID: ETH_SEPOLIA_CHAIN_ID,
-  childChainID: ZKEVM_LOCAL_CHAIN_ID,
 };

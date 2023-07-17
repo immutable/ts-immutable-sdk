@@ -14,7 +14,6 @@ import {
   WaitForRequest,
   WaitForResponse,
   CompletionStatus,
-  ETH_SEPOLIA_TO_ZKEVM_LOCAL,
   BridgeWithdrawRequest,
 } from '@imtbl/bridge-sdk';
 
