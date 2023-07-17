@@ -82,6 +82,14 @@ export class Passport {
     return this.authManager.logout();
   }
 
+  public async logoutSilent(): Promise<void> {
+    return this.authManager.logoutSilent();
+  }
+
+  public async logoutSilentCallback(url: string): Promise<void> {
+    return this.authManager.logoutSilentCallback(url);
+  }
+
   public async logoutDeviceFlow(): Promise<void> {
     return this.authManager.logoutDeviceFlow();
   }

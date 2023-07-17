@@ -1,8 +1,4 @@
-import {
-  User as OidcUser,
-  UserManager,
-  UserManagerSettings,
-} from 'oidc-client-ts';
+import { User as OidcUser, UserManager, UserManagerSettings } from 'oidc-client-ts';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import DeviceCredentialsManager from 'storage/device_credentials_manager';
@@ -265,6 +261,14 @@ export default class AuthManager {
       async () => this.userManager.signoutRedirect(),
       PassportErrorType.LOGOUT_ERROR,
     );
+  }
+
+  public async logoutSilent(): Promise<void> {
+    return this.userManager.signoutSilent(); // default 10s timeout
+  }
+
+  public async logoutSilentCallback(url: string): Promise<void> {
+    return this.userManager.signoutSilentCallback(url);
   }
 
   public async logoutDeviceFlow(): Promise<void> {
