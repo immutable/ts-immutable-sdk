@@ -10,7 +10,7 @@ import {
   useEffect, useCallback, useReducer, useMemo,
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
-import { Exchange, ExchangeConfiguration, ExchangeOverrides } from '@imtbl/dex-sdk';
+import { Exchange, ExchangeOverrides } from '@imtbl/dex-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { SwapCoins } from './views/SwapCoins';
@@ -129,11 +129,11 @@ export function SwapWidget(props: SwapWidgetProps) {
         });
       }
 
-      const exchange = new Exchange(new ExchangeConfiguration({
+      const exchange = new Exchange({
         chainId: network.chainId,
         baseConfig: new ImmutableConfiguration({ environment }),
         overrides,
-      }));
+      });
 
       swapDispatch({
         payload: {

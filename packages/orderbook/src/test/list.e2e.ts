@@ -8,6 +8,7 @@ import { deployTestToken } from './helpers/erc721';
 import { signAndSubmitTx, signMessage } from './helpers/sign-and-submit';
 import { TestToken } from './helpers/test-token';
 import { waitForOrderToBeOfStatus } from './helpers/order';
+import { getLocalConfigFromEnv } from './helpers';
 
 const LOCAL_CHAIN_NAME = 'imtbl-zkevm-local';
 
@@ -67,7 +68,7 @@ describe('listListings e2e', () => {
     overrides: {
       chainName: LOCAL_CHAIN_NAME,
     },
-  });
+  }, getLocalConfigFromEnv());
 
   let token1ContractAddress = '';
   let token2ContractAddress = '';

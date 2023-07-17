@@ -91,9 +91,12 @@ export function ConnectLoader({
   clearInterval = useInterval(() => checkIfWeb3ProviderSet(), 10);
 
   useEffect(() => {
-    if (hasWeb3Provider === undefined) {
-      return;
+    if (window === undefined) {
+      // eslint-disable-next-line no-console
+      console.error('missing window object: please run Checkout client side');
+      return () => {};
     }
+    if (hasWeb3Provider === undefined) return () => {};
 
     (async () => {
       if (!walletProvider && !web3Provider) {
@@ -216,6 +219,13 @@ export function ConnectLoader({
       IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
       handleConnectEvent,
     );
+
+    return () => {
+      window.removeEventListener(
+        IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
+        handleConnectEvent,
+      );
+    };
   }, [widgetConfig.environment, web3Provider, walletProvider, hasWeb3Provider]);
 
   const childrenWithProvider = useCallback(

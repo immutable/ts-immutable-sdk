@@ -3913,6 +3913,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@imtbl/game-bridge@workspace:packages/game-bridge":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/game-bridge@workspace:packages/game-bridge"
+  dependencies:
+    "@imtbl/config": 0.0.0
+    "@imtbl/passport": 0.0.0
+    "@imtbl/provider": 0.0.0
+    parcel: ^2.8.3
+  languageName: unknown
+  linkType: soft
+
 "@imtbl/generated-clients@0.0.0, @imtbl/generated-clients@workspace:packages/internal/generated-clients":
   version: 0.0.0-use.local
   resolution: "@imtbl/generated-clients@workspace:packages/internal/generated-clients"

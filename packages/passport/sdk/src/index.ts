@@ -12,4 +12,6 @@ export {
   Networks,
   PassportOverrides,
   PassportModuleConfiguration,
+  DeviceConnectResponse,
+  DeviceTokenResponse,
 } from './types';

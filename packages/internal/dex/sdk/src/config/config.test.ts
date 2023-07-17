@@ -150,7 +150,46 @@ describe('ExchangeConfiguration', () => {
         chainId,
         baseConfig: immutableConfig,
         overrides,
-      })).toThrow(new InvalidConfigurationError());
+      })).toThrow(new InvalidConfigurationError('Invalid exchange contract address for multicall'));
+    });
+
+    it('show throw when given an invalid RPC URL', () => {
+      const chainId = 999999999;
+
+      const immutableConfig = new ImmutableConfiguration({
+        environment: Environment.SANDBOX,
+      }); // environment isn't used because we override all of the config values
+
+      const contractOverrides: ExchangeContracts = {
+        multicall: '',
+        coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
+        quoterV2: test.TEST_QUOTER_ADDRESS,
+        peripheryRouter: test.TEST_PERIPHERY_ROUTER_ADDRESS,
+      };
+
+      const commonRoutingTokens: TokenInfo[] = [
+        {
+          chainId,
+          address: '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
+          decimals: 18,
+          symbol: 'FUN',
+          name: 'The Fungibles Token',
+        },
+      ];
+
+      const rpcURL = '';
+      const overrides: ExchangeOverrides = {
+        rpcURL,
+        exchangeContracts: contractOverrides,
+        commonRoutingTokens,
+        nativeToken: test.IMX_TEST_TOKEN,
+      };
+
+      expect(() => new ExchangeConfiguration({
+        chainId,
+        baseConfig: immutableConfig,
+        overrides,
+      })).toThrow(new InvalidConfigurationError('Missing override: rpcURL'));
     });
   });
 });
