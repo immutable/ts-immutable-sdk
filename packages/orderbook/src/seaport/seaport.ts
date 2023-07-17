@@ -1,5 +1,4 @@
 import { Seaport as SeaportLib } from '@opensea/seaport-js';
-import { SEAPORT_CONTRACT_VERSION_V1_4, SEAPORT_CONTRACT_VERSION_V1_5 } from '@opensea/seaport-js/lib/constants';
 import {
   ApprovalAction, CreateOrderAction, ExchangeAction, OrderComponents, OrderUseCase,
 } from '@opensea/seaport-js/lib/types';
@@ -11,7 +10,11 @@ import {
 } from 'types';
 import { Order } from 'openapi/sdk';
 import {
-  EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME,
+  EIP_712_ORDER_TYPE,
+  ItemType,
+  SEAPORT_CONTRACT_NAME,
+  SEAPORT_CONTRACT_VERSION_V1_4,
+  SEAPORT_CONTRACT_VERSION_V1_5,
 } from './constants';
 import { getOrderComponentsFromMessage } from './components';
 import { SeaportLibFactory, SeaportVersion } from './seaport-lib-factory';

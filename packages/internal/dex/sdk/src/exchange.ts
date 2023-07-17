@@ -13,7 +13,7 @@ import {
 
 import { Router } from './lib/router';
 import { getERC20Decimals, isValidNonZeroAddress } from './lib/utils';
-import { TokenInfo, TransactionResponse } from './types';
+import { ExchangeModuleConfiguration, TokenInfo, TransactionResponse } from './types';
 import { getSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 
@@ -26,22 +26,24 @@ export class Exchange {
 
   private nativeToken: TokenInfo;
 
-  constructor(configuration: ExchangeConfiguration) {
-    this.chainId = configuration.chain.chainId;
-    this.nativeToken = configuration.chain.nativeToken;
+  constructor(configuration: ExchangeModuleConfiguration) {
+    const config = new ExchangeConfiguration(configuration);
+
+    this.chainId = config.chain.chainId;
+    this.nativeToken = config.chain.nativeToken;
 
     this.provider = new ethers.providers.JsonRpcProvider(
-      configuration.chain.rpcUrl,
+      config.chain.rpcUrl,
     );
 
     this.router = new Router(
       this.provider,
-      configuration.chain.commonRoutingTokens,
+      config.chain.commonRoutingTokens,
       {
-        multicallAddress: configuration.chain.contracts.multicall,
-        factoryAddress: configuration.chain.contracts.coreFactory,
-        quoterAddress: configuration.chain.contracts.quoterV2,
-        peripheryRouterAddress: configuration.chain.contracts.peripheryRouter,
+        multicallAddress: config.chain.contracts.multicall,
+        factoryAddress: config.chain.contracts.coreFactory,
+        quoterAddress: config.chain.contracts.quoterV2,
+        peripheryRouterAddress: config.chain.contracts.peripheryRouter,
       },
     );
   }

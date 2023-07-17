@@ -1,5 +1,4 @@
 import { providers } from 'ethers';
-import { getConfigFromEnv, getLocalhostProvider } from 'test/helpers';
 
 export const LOCAL_CHAIN_NAME = 'imtbl-zkevm-local';
 export const DEVNET_CHAIN_NAME = 'imtbl-zkevm-devnet';
@@ -17,20 +16,8 @@ export interface OrderbookModuleConfiguration {
   provider: providers.JsonRpcProvider | providers.Web3Provider
 }
 
-function localChainConfig() {
-  const localConfig = getConfigFromEnv();
-  return {
-    seaportContractAddress: localConfig.seaportContractAddress,
-    zoneContractAddress: localConfig.zoneContractAddress,
-    apiEndpoint: localConfig.apiUrl,
-    provider: getLocalhostProvider(),
-  };
-}
-
 export function getOrderbookConfig(chainName?: string): OrderbookModuleConfiguration | null {
   switch (chainName) {
-    case LOCAL_CHAIN_NAME:
-      return localChainConfig();
     case DEVNET_CHAIN_NAME:
       return {
         seaportContractAddress: '0x41388404Efb7a68Fd31d75CEf71dF91e2BDBa2fb',
