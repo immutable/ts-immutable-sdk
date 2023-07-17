@@ -149,10 +149,17 @@ export interface WaitForWithdrawalRequest {
 
 /**
  * @typedef {Object} WaitForWithdrawalResponse
- * @property {CompletionStatus} status - The status of the deposit transaction after waiting.
  */
-export interface WaitForWithdrawalResponse {
-  status: CompletionStatus;
+export interface WaitForWithdrawalResponse {}
+
+// TODO: @Rez docs
+export interface ExitRequest {
+  transactionHash: string;
+}
+
+// TODO: @Rez docs
+export interface ExitResponse {
+  unsignedTx: ethers.providers.TransactionRequest;
 }
 
 /**

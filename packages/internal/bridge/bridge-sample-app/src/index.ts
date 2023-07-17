@@ -18,6 +18,7 @@ import {
   CHILD_CHAIN_NATIVE_TOKEN_ADDRESS,
   WaitForWithdrawalRequest,
   WaitForWithdrawalResponse,
+  ExitRequest,
 } from '@imtbl/bridge-sdk';
 
 /**
@@ -220,6 +221,7 @@ async function deposit() {
   console.log(waitForWithdrawalResp)
 
   // TODO: Exit on Layer 1
+  
 
 }
 
@@ -291,10 +293,18 @@ async function test() {
     }
     const waitForWithdrawalResp: WaitForWithdrawalResponse = await tokenBridge.waitForWithdrawal(withdrawalRequest);
     console.log(waitForWithdrawalResp)
+
+    const exitRequest: ExitRequest = {
+      transactionHash: "0xf2a7bffa534719bf0b127d121fcb54d13a1f2d7bb9f5958e1a7866ab9a7b1993",
+    }
+    const exitTx = await tokenBridge.getUnsignedExitTx(exitRequest);
+
+    const txWithdraw = await checkout.sendTransaction(exitTx.unsignedTx);
+    console.log(txWithdraw)
 }
 
 // Run the deposit function and exit the process when completed
 (async () => {
-  await deposit().then(() => {console.log(`Exiting Successfully`); process.exit(0)}).catch(e => {console.log(`Exiting with error: ${e.toString()}`); process.exit(1)});
+  await test().then(() => {console.log(`Exiting Successfully`); process.exit(0)}).catch(e => {console.log(`Exiting with error: ${e.toString()}`); process.exit(1)});
   // await withdraw().then(() => console.log("Completed Withdrawl")).catch((e) => console.log(`Error occurred: ${e}`));
 })();

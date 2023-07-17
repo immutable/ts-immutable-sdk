@@ -28,6 +28,11 @@ export const ZKEVM_MAINNET_CHAIN_ID = 'eip155:13371';
 export const CHILD_CHAIN_NATIVE_TOKEN_ADDRESS = '0x0000000000000000000000000000000000001010';
 
 /**
+ * @constant {string} L2_STATE_SENDER_ADDRESS - Address of bridge contract to the rootchain
+ */
+export const L2_STATE_SENDER_ADDRESS = '0x0000000000000000000000000000000000001002';
+
+/**
  * @constant {BridgeInstance} ETH_SEPOLIA_TO_ZKEVM_DEVNET - A bridge instance configuration for bridging between the Ethereum Sepolia testnet and the zkEVM devnet.
  */
 export const ETH_SEPOLIA_TO_ZKEVM_DEVNET: BridgeInstance = {

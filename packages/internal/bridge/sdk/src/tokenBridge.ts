@@ -10,6 +10,8 @@ import {
   BridgeWithdrawRequest,
   BridgeWithdrawResponse,
   CompletionStatus,
+  ExitRequest,
+  ExitResponse,
   FungibleToken,
   WaitForDepositRequest,
   WaitForDepositResponse,
@@ -25,6 +27,9 @@ import { getBlockNumberClosestToTimestamp } from 'lib/getBlockCloseToTimestamp';
 import { CHILD_ERC20_PREDICATE } from 'contracts/ABIs/ChildERC20Predicate';
 import { CHECKPOINT_MANAGER } from 'contracts/ABIs/CheckpointManager';
 import { decodeExtraData } from 'lib/decodeExtraData';
+import { L2_STATE_SENDER_ADDRESS } from 'constants/bridges';
+import { L2_STATE_SENDER } from 'contracts/ABIs/L2StateSender';
+import { EXIT_HELPER } from 'contracts/ABIs/ExitHelper';
 
 /**
  * Represents a token bridge, which manages asset transfers between two chains.
@@ -380,9 +385,56 @@ export class TokenBridge {
 
     await waitForRootEpoch();
 
-    return {
-      status: CompletionStatus.SUCCESS,
+    return {};
+  }
+
+  // TODO: @Rez docs and error handling
+  public async getUnsignedExitTx(req: ExitRequest): Promise<ExitResponse> {
+    const txReceipt = await this.config.childProvider.getTransactionReceipt(req.transactionHash);
+    // Get the StateSynced event log from the transaction receipt
+    const stateSenderLogs = txReceipt.logs.filter((log) => log.address.toLowerCase() === L2_STATE_SENDER_ADDRESS);
+    if (stateSenderLogs.length !== 1) {
+      throw new Error(`expected 1 log in tx ${txReceipt.transactionHash} from address ${L2_STATE_SENDER_ADDRESS}`);
+    }
+
+    const l2StateSenderInterface = new ethers.utils.Interface(L2_STATE_SENDER);
+    const l2StateSyncEvent = l2StateSenderInterface.parseLog(stateSenderLogs[0]);
+
+    // eslint-disable-next-line no-console
+    console.log(l2StateSyncEvent);
+
+    const types = ['uint256', 'address', 'address', 'bytes'];
+    const exitEventEncoded = ethers.utils.defaultAbiCoder.encode(types, l2StateSyncEvent.args);
+    // eslint-disable-next-line no-console
+    console.log('exitEventEncoded: ');
+    // eslint-disable-next-line no-console
+    console.log(exitEventEncoded);
+
+    // Throw an error if the event log doesn't match the expected format
+    if (l2StateSyncEvent.signature !== 'L2StateSynced(uint256,address,address,bytes)') {
+      throw new Error(`expected L2StateSynced event in tx ${txReceipt.transactionHash}`);
+    }
+
+    const exitEventId: string = l2StateSyncEvent.args.id.toString();
+    // eslint-disable-next-line no-console
+    console.log(`exit event id is ${exitEventId}`);
+
+    const exitProof = await (this.config.childProvider as ethers.providers.JsonRpcProvider).send('bridge_generateExitProof', [exitEventId]);
+    // eslint-disable-next-line no-console
+    console.log(exitProof);
+
+    const exitHelper = new ethers.Contract(this.config.bridgeContracts.rootChainExitHelper, EXIT_HELPER, this.config.rootProvider);
+
+    const encodedExitTx = exitHelper.interface.encodeFunctionData('exit', [exitProof.Metadata.CheckpointBlock, exitProof.Metadata.LeafIndex, exitEventEncoded, exitProof.Data]);
+
+    const unsignedTx: ethers.providers.TransactionRequest = {
+      data: encodedExitTx,
+      to: this.config.bridgeContracts.rootChainExitHelper,
+      value: 0,
     };
+    // eslint-disable-next-line no-console
+    console.log(`Unsigned Tx: ${JSON.stringify(unsignedTx)}`);
+    return { unsignedTx };
   }
 
   /**
