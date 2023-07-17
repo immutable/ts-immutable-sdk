@@ -1,11 +1,13 @@
 import { createContext } from 'react';
-import { MetaMaskIMXProvider, Environment } from '@imtbl/sdk';
+import { MetaMaskIMXProvider, Environment, WalletConnectIMXProvider } from '@imtbl/sdk';
 
+export type ProviderName = 'metamask' | 'walletconnect' | '';
 export interface AppState {
-  metaMaskIMXProvider: MetaMaskIMXProvider | null;
+  metaMaskIMXProvider: MetaMaskIMXProvider | WalletConnectIMXProvider | null;
   address: string;
   signedMessage: string;
   env: string;
+  providerName: ProviderName,
 }
 
 export const initialState: AppState = {
@@ -13,6 +15,7 @@ export const initialState: AppState = {
   address: '',
   signedMessage: '',
   env: '',
+  providerName: ''
 };
 
 export interface AppContextState {
@@ -51,8 +54,9 @@ export interface SetEnvironment {
 
 export interface MetaMaskIMXProviderConnected {
   type: Actions.MetaMaskIMXProviderConnected;
-  metaMaskIMXProvider: MetaMaskIMXProvider;
+  metaMaskIMXProvider: MetaMaskIMXProvider | WalletConnectIMXProvider;
   address: string;
+  providerName: ProviderName;
 }
 
 export interface MetaMaskIMXProviderDisconnected {
@@ -79,6 +83,7 @@ export const appReducer: Reducer<AppState, Action> = (
         ...state,
         metaMaskIMXProvider: action.payload.metaMaskIMXProvider,
         address: action.payload.address,
+        providerName: action.payload.providerName
       };
     case Actions.MetaMaskIMXProviderDisconnected:
       return {

@@ -4,13 +4,15 @@ import {
   appReducer,
   initialState,
 } from './Context/app-context';
-import { BiomeCombinedProviders, Heading } from '@biom3/react';
+import { BiomeCombinedProviders, Divider, Heading } from '@biom3/react';
 import { ConnectButton } from './Components/connect-button';
 import { DisconnectButton } from './Components/disconnect-button';
 import { Environment } from '@imtbl/sdk';
 import { SignMessage } from './Components/sign-message';
 import { useEffect, useReducer } from 'react';
 import { WalletDisplay } from './Components/wallet-display';
+import { ConnectButtonWC } from './Components/connect-button-wc';
+import { OtherButton } from './Components/other-button';
 
 export const App = () => {
   const [state, dispatch] = useReducer(appReducer, initialState);
@@ -32,6 +34,9 @@ export const App = () => {
         <ConnectButton />
         <SignMessage />
         <DisconnectButton />
+        <OtherButton />
+        <Divider />
+        <ConnectButtonWC />
       </AppCtx.Provider>
     </BiomeCombinedProviders>
   );

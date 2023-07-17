@@ -1,27 +1,31 @@
 import { Box, Button } from '@biom3/react';
-import { MetaMaskIMXProvider, ProviderConfiguration } from '@imtbl/sdk';
+import { WalletConnectIMXProvider, ProviderConfiguration } from '@imtbl/sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { useContext } from 'react';
 import { Actions, AppCtx } from '../Context/app-context';
 
-export const ConnectButton = () => {
+export const ConnectButtonWC = () => {
   const { state, dispatch } = useContext(AppCtx);
 
   const wrapperMetaMaskConnect = async () => {
-    const metaMaskIMXProvider = await MetaMaskIMXProvider.connect(
+    const walletConnectIMXProvider = await WalletConnectIMXProvider.connect(
       new ProviderConfiguration({
         baseConfig: new ImmutableConfiguration({
           environment: Environment.PRODUCTION,
         }),
-      })
+      }),
+      {
+        projectId: '530784f762cf3e62f1d8512fda22627c',
+        chains: [1]
+      }
     );
 
     dispatch({
       payload: {
         type: Actions.MetaMaskIMXProviderConnected,
-        metaMaskIMXProvider: metaMaskIMXProvider,
-        address: await metaMaskIMXProvider.getAddress(),
-        providerName: 'metamask'
+        metaMaskIMXProvider: walletConnectIMXProvider,
+        address: await walletConnectIMXProvider.getAddress(),
+        providerName: 'walletconnect'
       },
     });
   };
@@ -31,7 +35,7 @@ export const ConnectButton = () => {
       {!state.address && (
         <Box sx={{ padding: 'base.spacing.x5' }}>
           <Button onClick={() => wrapperMetaMaskConnect()}>
-            Connect to MetaMask
+            Connect to Wallet Connect
           </Button>
         </Box>
       )}

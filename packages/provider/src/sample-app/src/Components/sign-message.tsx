@@ -8,7 +8,7 @@ import {
   Heading,
 } from '@biom3/react';
 import { ChangeEvent, useContext, useState } from 'react';
-import { MetaMaskIMXProvider } from '@imtbl/sdk';
+import { MetaMaskIMXProvider, WalletConnectIMXProvider } from '@imtbl/sdk';
 
 export const SignMessage = () => {
   const { state, dispatch } = useContext(AppCtx);
@@ -34,7 +34,14 @@ export const SignMessage = () => {
   };
 
   const sign = async () => {
-    const signedMessage = await MetaMaskIMXProvider.signMessage(signMessage);
+    let signedMessage;
+    if(state.providerName === 'metamask') {
+      signedMessage = await MetaMaskIMXProvider.signMessage(signMessage);
+    } else if (state.providerName === 'walletconnect') {
+      signedMessage = await WalletConnectIMXProvider.signMessage(signMessage);
+    } else {
+      return;
+    }
     dispatch({
       payload: {
         type: Actions.MetaMaskIMXProviderSignMessage,
