@@ -1,9 +1,9 @@
 import { BigNumber, Wallet } from 'ethers';
 import { getSignedMetaTransactions } from './walletHelpers';
 
-describe('getSignedSequenceTransactions()', () => {
+describe('getSignedMetaTransactions', () => {
   // NOTE: Generated with https://github.com/immutable/wallet-contracts/blob/348add7d2fde13d8f7f83aae0882ad2d97546d72/tests/ImmutableDeployment.spec.ts#L69
-  it("should match the `data` field in a transaction generated from 0xSequence's testing suite", async () => {
+  it('should correctly generate the signature for a given transaction', async () => {
     const transactions = [
       {
         delegateCall: false,
