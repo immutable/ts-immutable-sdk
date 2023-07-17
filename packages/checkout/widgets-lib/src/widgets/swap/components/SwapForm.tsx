@@ -13,8 +13,10 @@ import { text } from '../../../resources/text/textConfig';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
-import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
-import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
+import {
+  calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
+} from '../../../lib/utils';
+import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE } from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
@@ -147,17 +149,26 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!hasSetDefaultState.current) {
       hasSetDefaultState.current = true;
 
-      // TODO: native token handling for no-address tokens
       if (data?.fromContractAddress) {
-        setFromToken(allowedTokens.find((t) => t.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase()));
+        setFromToken(
+          allowedTokens.find((t) => (
+            isNativeToken(t.address) && data?.fromContractAddress?.toLocaleUpperCase() === NATIVE
+          )
+          || (t.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase())),
+        );
         setFromBalance(
           tokenBalances.find(
-            (t) => t.token.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase(),
+            (t) => (
+              isNativeToken(t.token.address) && data?.fromContractAddress?.toLocaleUpperCase() === NATIVE)
+              || (t.token.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase()),
           )?.formattedBalance ?? '',
         );
       }
+
       if (data?.toContractAddress) {
-        setToToken(allowedTokens.find((t) => t.address?.toLowerCase() === data?.toContractAddress?.toLowerCase()));
+        setToToken(allowedTokens.find((t) => (
+          isNativeToken(t.address) && data?.toContractAddress?.toLocaleUpperCase() === NATIVE
+        ) || (t.address?.toLowerCase() === data?.toContractAddress?.toLowerCase())));
       }
     }
   }, [

@@ -10,7 +10,7 @@ import {
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { TopUpView } from './TopUpView';
-import { cySmartGet } from '../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { orchestrationEvents } from '../../lib/orchestrationEvents';
 import { WalletWidgetTestComponent } from '../../widgets/wallet/test-components/WalletWidgetTestComponent';
 import { WalletState } from '../../widgets/wallet/context/WalletContext';
@@ -207,15 +207,7 @@ describe('Top Up View', () => {
     };
 
     beforeEach(() => {
-      cy.intercept(
-        {
-          method: 'GET',
-          path: '/v1/fiat/conversion*',
-        },
-        {
-          ethereum: { usd: 2000.0 },
-        },
-      ).as('cryptoFiatStub');
+      cyIntercept();
     });
 
     it('should display fees for swap and bridge', () => {
