@@ -17,7 +17,9 @@ import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewConte
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { text } from '../../../resources/text/textConfig';
 import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
-import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
+import {
+  calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
+} from '../../../lib/utils';
 import { SelectForm } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
 import { Fees } from '../../../components/Fees/Fees';
@@ -119,7 +121,7 @@ export function BridgeForm(props: BridgeFormProps) {
       hasSetDefaultState.current = true;
       if (defaultFromContractAddress) {
         setToken(tokenBalances.find(
-          (b) => (!b.token.address && defaultFromContractAddress?.toLocaleUpperCase() === NATIVE)
+          (b) => (isNativeToken(b.token.address) && defaultFromContractAddress?.toLocaleUpperCase() === NATIVE)
           || (b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase()),
         ));
       }
@@ -224,12 +226,12 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const insufficientFundsForGas = useMemo(() => {
     const ethBalance = tokenBalances
-      .find((balance) => !balance.token.address || balance.token.address === NATIVE);
+      .find((balance) => isNativeToken(balance.token.address));
     if (!ethBalance) {
       return true;
     }
 
-    const tokenIsEth = !token?.token.address || token.token.address === NATIVE;
+    const tokenIsEth = isNativeToken(token?.token.address);
     const gasAmount = parseEther(gasFee.length !== 0 ? gasFee : '0');
     const additionalAmount = tokenIsEth && !Number.isNaN(parseFloat(amount))
       ? parseEther(amount)
@@ -510,7 +512,7 @@ export function BridgeForm(props: BridgeFormProps) {
           showHeaderBar={false}
           onCloseBottomSheet={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
-          showAdjustAmount={(!token?.token.address || token.token.address === NATIVE)}
+          showAdjustAmount={isNativeToken(token?.token.address)}
         />
       </Box>
     </Box>
