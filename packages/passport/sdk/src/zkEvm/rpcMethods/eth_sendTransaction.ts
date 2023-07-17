@@ -2,7 +2,6 @@ import {
   TransactionRequest,
   Web3Provider,
 } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
 import { getNonce, getSignedMetaTransactions, chainIdNumber } from '../walletHelpers';
 import { MetaTransaction } from '../types';
 import { EthMethodWithAuthParams } from './types';
