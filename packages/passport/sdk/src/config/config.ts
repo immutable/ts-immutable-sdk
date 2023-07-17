@@ -127,8 +127,8 @@ export class PassportConfiguration {
           this.passportDomain = 'https://passport.sandbox.immutable.com';
           this.imxPublicApiDomain = 'https://api.sandbox.immutable.com';
           this.zkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com';
-          this.zkEvmChainId = '13372';
-          this.relayerUrl = 'https://relayer.sandbox.immutable.com'; // TODO: ID-784 Update once we have added Relayer URL to config
+          this.zkEvmChainId = 'eip155:13392';
+          this.relayerUrl = 'https://evm-relayer.sandbox.imtbl.com'; // TODO: ID-784 Update once we have added Relayer URL to config
           this.multiRollupConfig = multiRollupConfig.getSandbox();
           break;
         }

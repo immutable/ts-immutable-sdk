@@ -70,7 +70,7 @@ export class ZkEvmProvider implements Provider {
     return this.magicProvider !== undefined && this.user !== undefined;
   }
 
-  private performRequest = async (request: RequestArguments): Promise<any> => {
+  private async performRequest(request: RequestArguments): Promise<any> {
     const authWrapper = (fn: (params: EthMethodWithAuthParams) => Promise<any>) => {
       if (!this.isLoggedIn()) {
         throw new JsonRpcError(RpcErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
@@ -129,9 +129,9 @@ export class ZkEvmProvider implements Provider {
         throw new JsonRpcError(RpcErrorCode.METHOD_NOT_FOUND, 'Method not supported');
       }
     }
-  };
+  }
 
-  private performJsonRpcRequest = async (request: JsonRpcRequestPayload): Promise<JsonRpcResponsePayload> => {
+  private async performJsonRpcRequest(request: JsonRpcRequestPayload): Promise<JsonRpcResponsePayload> {
     const { id, jsonrpc } = request;
     try {
       const result = await this.performRequest(request);
@@ -156,7 +156,7 @@ export class ZkEvmProvider implements Provider {
         error: jsonRpcError,
       };
     }
-  };
+  }
 
   public async request(
     request: RequestArguments,

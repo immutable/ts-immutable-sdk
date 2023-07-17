@@ -213,7 +213,7 @@ describe('Passport', () => {
     });
 
     describe('eth_accounts', () => {
-      it('returns no addresses if the user is not logged in', async () => { // TODO: Broken
+      it('returns no addresses if the user is not logged in', async () => {
         const zkEvmProvider = getZkEvmProvider();
         const accounts = await zkEvmProvider.request({
           method: 'eth_accounts',
@@ -221,7 +221,7 @@ describe('Passport', () => {
         expect(accounts).toEqual([]);
       });
 
-      it('returns the user\'s ether key if the user is logged in', async () => { // TODO: Broken
+      it('returns the user\'s ether key if the user is logged in', async () => {
         mockGetUser.mockResolvedValue(mockOidcUserZkevm);
         useMswHandlers([
           mswHandlers.jsonRpcProvider.success,
