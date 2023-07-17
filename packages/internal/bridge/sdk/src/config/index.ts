@@ -38,18 +38,24 @@ const CONTRACTS_FOR_BRIDGE = new Map<BridgeInstance, BridgeContracts>()
   .set(ETH_SEPOLIA_TO_ZKEVM_DEVNET, {
     rootChainERC20Predicate: '0x36FD5e8C971627f6557306Ec017bd03eC2D0B615',
     rootChainStateSender: '0x939a7E0D40B09CC2a1cD7711C3f9be742852D7fa',
+    rootChainCheckpointManager: '0x1e85a1d88088Cf793391ad31828fBe7471110e5D',
+    rootChainExitHelper: '0x011CaCbf6DD2F3eE8Ae6dEb9b9be4726F76AC852',
     childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
     childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
   .set(ETH_SEPOLIA_TO_ZKEVM_TESTNET, {
     rootChainERC20Predicate: '0x9A7E4C4337a70C6754a9672F5ba69084463794B8',
     rootChainStateSender: '0xfBfF6FD165adFA113bE39eE85ef030A996153253',
+    rootChainCheckpointManager: '0x06a68A0C063530bbf1e88CFb23F6257e10f62e8b',
+    rootChainExitHelper: '0xbb7ec2C54245F00BAefe335b3464AdACc7aFc62A',
     childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
     childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
   .set(ETH_MAINNET_TO_ZKEVM_MAINNET, {
     rootChainERC20Predicate: '0x',
     rootChainStateSender: '0x',
+    rootChainCheckpointManager: '0x',
+    rootChainExitHelper: '0x',
     childChainERC20Predicate: '0x',
     childChainStateReceiver: '0x',
   });
@@ -112,7 +118,7 @@ export class BridgeConfiguration {
     // How frequently we poll the childchain for StateSync events
     this.pollInterval = 5 * 1000; // 5 seconds
     // The upper bound of the block range we poll for StateSync events
-    this.maxDepositBlockDelay = 250;
+    this.maxDepositBlockDelay = 100;
     // Assume that the clock timestamp is at most 900 seconds inaccurate, see for more -> https://github.com/ethereum/wiki/blob/c02254611f218f43cbb07517ca8e5d00fd6d6d75/Block-Protocol-2.0.md
     this.clockInaccuracy = 900;
     // How many blocks to wait for on the root chain before accepting rootchain finality

@@ -29,6 +29,8 @@ export interface BridgeOverrides {
 export type BridgeContracts = {
   rootChainERC20Predicate: Address;
   rootChainStateSender: Address;
+  rootChainCheckpointManager: Address;
+  rootChainExitHelper: Address;
   childChainERC20Predicate: Address;
   childChainStateReceiver: Address;
 };
@@ -130,11 +132,27 @@ export interface BridgeFeeResponse {
 }
 
 /**
- * @typedef {Object} WaitForRequest
+ * @typedef {Object} WaitForDepositRequest
  * @property {string} transactionHash - The hash of the deposit transaction on the root chain.
  */
-export interface WaitForRequest {
+export interface WaitForDepositRequest {
   transactionHash: string;
+}
+
+/**
+ * @typedef {Object} WaitForWithdrawalRequest
+ * @property {string} transactionHash - The hash of the withdrawal transaction on the child chain.
+ */
+export interface WaitForWithdrawalRequest {
+  transactionHash: string;
+}
+
+/**
+ * @typedef {Object} WaitForWithdrawalResponse
+ * @property {CompletionStatus} status - The status of the deposit transaction after waiting.
+ */
+export interface WaitForWithdrawalResponse {
+  status: CompletionStatus;
 }
 
 /**
@@ -150,9 +168,9 @@ export enum CompletionStatus {
 }
 
 /**
- * @typedef {Object} WaitForResponse
+ * @typedef {Object} WaitForDepositResponse
  * @property {CompletionStatus} status - The status of the deposit transaction after waiting.
  */
-export interface WaitForResponse {
+export interface WaitForDepositResponse {
   status: CompletionStatus;
 }

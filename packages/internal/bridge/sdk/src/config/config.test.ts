@@ -48,6 +48,8 @@ describe('config', () => {
         bridgeContracts: {
           rootChainERC20Predicate: '0x',
           rootChainStateSender: '0x',
+          rootChainCheckpointManager: '0x',
+          rootChainExitHelper: '0x',
           childChainERC20Predicate: '0x',
           childChainStateReceiver: '0x',
         },

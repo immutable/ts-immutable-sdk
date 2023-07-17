@@ -11,8 +11,10 @@ import {
   BridgeWithdrawResponse,
   CompletionStatus,
   FungibleToken,
-  WaitForRequest,
-  WaitForResponse,
+  WaitForDepositRequest,
+  WaitForDepositResponse,
+  WaitForWithdrawalRequest,
+  WaitForWithdrawalResponse,
 } from 'types';
 import { ROOT_ERC20_PREDICATE } from 'contracts/ABIs/RootERC20Predicate';
 import { ERC20 } from 'contracts/ABIs/ERC20';
@@ -21,6 +23,8 @@ import { ROOT_STATE_SENDER } from 'contracts/ABIs/RootStateSender';
 import { CHILD_STATE_RECEIVER } from 'contracts/ABIs/ChildStateReceiver';
 import { getBlockNumberClosestToTimestamp } from 'lib/getBlockCloseToTimestamp';
 import { CHILD_ERC20_PREDICATE } from 'contracts/ABIs/ChildERC20Predicate';
+import { CHECKPOINT_MANAGER } from 'contracts/ABIs/CheckpointManager';
+import { decodeExtraData } from 'lib/decodeExtraData';
 
 /**
  * Represents a token bridge, which manages asset transfers between two chains.
@@ -345,11 +349,47 @@ export class TokenBridge {
     };
   }
 
+  // TODO: @Rez to add proper error handling and tests
+  public async waitForWithdrawal(
+    req:WaitForWithdrawalRequest,
+  ): Promise<WaitForWithdrawalResponse> {
+    const transactionReceipt = await this.config.childProvider.getTransactionReceipt(req.transactionHash);
+    const block = await this.config.childProvider.getBlock(transactionReceipt.blockNumber);
+
+    const decodedExtraData = decodeExtraData(block.extraData);
+
+    const checkpointManager = new ethers.Contract(this.config.bridgeContracts.rootChainCheckpointManager, CHECKPOINT_MANAGER, this.config.rootProvider);
+
+    // Helper function to pause execution for a specified interval
+    const pause = (): Promise<void> => new Promise((resolve) => {
+      setTimeout(resolve, this.config.pollInterval);
+    });
+
+    // Recursive function to keep checking for the child deposit event
+    const waitForRootEpoch = async (): Promise<null> => {
+      const currentEpoch = await checkpointManager.currentEpoch();
+      // eslint-disable-next-line no-console
+      console.log(`current epoch is ${currentEpoch}, waiting for epoch ${decodedExtraData.checkpoint.epochNumber}`);
+      if (currentEpoch >= decodedExtraData.checkpoint.epochNumber) {
+        return null;
+      }
+
+      await pause();
+      return waitForRootEpoch();
+    };
+
+    await waitForRootEpoch();
+
+    return {
+      status: CompletionStatus.SUCCESS,
+    };
+  }
+
   /**
    * Waits for the deposit transaction to be confirmed and synced from the root chain to the child chain.
    *
-   * @param {WaitForRequest} req - The wait for request object containing the transaction hash.
-   * @returns {Promise<WaitForResponse>} - A promise that resolves to an object containing the status of the deposit transaction.
+   * @param {WaitForDepositRequest} req - The wait for request object containing the transaction hash.
+   * @returns {Promise<WaitForDepositResponse>} - A promise that resolves to an object containing the status of the deposit transaction.
    * @throws {BridgeError} - If an error occurs during the transaction confirmation or state sync, a BridgeError will be thrown with a specific error type.
    *
    * Possible BridgeError types include:
@@ -370,8 +410,8 @@ export class TokenBridge {
    *   });
    */
   public async waitForDeposit(
-    req: WaitForRequest,
-  ): Promise<WaitForResponse> {
+    req: WaitForDepositRequest,
+  ): Promise<WaitForDepositResponse> {
     const rootTxReceipt: ethers.providers.TransactionReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(async () => this.config.rootProvider.waitForTransaction(req.transactionHash, this.config.rootChainFinalityBlocks), BridgeErrorType.PROVIDER_ERROR);
 
     // Throw an error if the transaction was reverted
