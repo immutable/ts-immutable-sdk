@@ -7,7 +7,11 @@ import { RequestProps } from '@/types';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
 
-type EthereumParamType = string | object | boolean;
+enum EthereumParamType {
+  string = 'string',
+  flag = 'flag',
+  object = 'object',
+}
 
 interface EthereumParam {
   name: string;
@@ -25,7 +29,7 @@ const EthereumMethods: EthereumMethod[] = [
   {
     name: 'eth_sendTransaction',
     params: [
-      { name: 'transaction', type: Object },
+      { name: 'transaction', type: EthereumParamType.object },
     ],
   },
   { name: 'eth_gasPrice' },
@@ -47,7 +51,7 @@ const EthereumMethods: EthereumMethod[] = [
   {
     name: 'eth_estimateGas',
     params: [
-      { name: 'transaction', type: Object },
+      { name: 'transaction', type: EthereumParamType.object },
     ],
   },
   {
@@ -63,14 +67,14 @@ const EthereumMethods: EthereumMethod[] = [
     name: 'eth_getBlockByHash',
     params: [
       { name: 'hash' },
-      { name: 'transaction_detail_flag', type: Boolean },
+      { name: 'transaction_detail_flag', type: EthereumParamType.flag },
     ],
   },
   {
     name: 'eth_getBlockByNumber',
     params: [
       { name: 'blockNumber/tag' },
-      { name: 'transaction_detail_flag', type: Boolean },
+      { name: 'transaction_detail_flag', type: EthereumParamType.flag },
     ],
   },
   {
@@ -126,10 +130,11 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
           method: selectedEthMethod?.name || '',
           params: params.map((param, i) => {
             switch (selectedEthMethod.params![i].type) {
-              case 'boolean': {
+              case EthereumParamType.flag: {
                 return param === 'true';
               }
-              case 'object': {
+              case EthereumParamType.object: {
+                console.log(param);
                 return JSON.parse(param);
               }
               default: {
@@ -189,7 +194,7 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
           <Form.Group className="mb-3">
             {
               selectedEthMethod?.params?.map((param, index) => (
-                <>
+                <div key={param.name}>
                   <Form.Label>{param.name}</Form.Label>
                   <Form.Control
                     key={param.name}
@@ -200,7 +205,7 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
                       setParams(newParams);
                     }}
                   />
-                </>
+                </div>
               ))
             }
           </Form.Group>
