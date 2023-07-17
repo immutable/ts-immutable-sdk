@@ -3,7 +3,7 @@ import {
   Web3Provider,
 } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
-import { getNonce, getSignedMetaTransactions } from '../walletHelpers';
+import { getNonce, getSignedMetaTransactions, chainIdNumber } from '../walletHelpers';
 import { MetaTransaction } from '../types';
 import { EthMethodWithAuthParams } from './types';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
@@ -28,7 +28,7 @@ export const ethSendTransaction = async ({
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "data" field');
   }
 
-  const chainId = BigNumber.from(config.zkEvmChainId);
+  const chainId = chainIdNumber(config.zkEvmChainId);
   const magicWeb3Provider = new Web3Provider(magicProvider);
   const signer = magicWeb3Provider.getSigner();
 
