@@ -1,4 +1,4 @@
-import { formatEther, parseEther } from 'ethers';
+import { utils } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import {
   Alert, Button, Form, Image, Offcanvas, Spinner, Stack, Table,
@@ -45,7 +45,7 @@ function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
     const getEthBalance = async () => {
       const owner = await imxProvider?.getAddress() || '';
       const balances = await coreSdkClient.getBalance({ owner, address: 'ETH' });
-      setEthBalance(formatEther(balances.balance));
+      setEthBalance(utils.formatEther(balances.balance));
       setLoadingEthBalance(false);
     };
     getAssets().catch(console.log);
@@ -113,7 +113,7 @@ function Transfer({ showTransfer, setShowTransfer }: TransferProps) {
           case TokenType.ETHToken: {
             request = {
               type: TokenType.ETHToken,
-              amount: parseEther(amount).toString(),
+              amount: utils.parseEther(amount).toString(),
               receiver,
             };
             break;

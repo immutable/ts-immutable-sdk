@@ -1,4 +1,4 @@
-import { formatEther } from 'ethers';
+import { utils } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import {
   Alert, Button, Image, Offcanvas, Spinner, Table,
@@ -100,7 +100,7 @@ function Trade({ showTrade, setShowTrade }: TradeProps) {
                             thumbnail
                           />
                         </td>
-                        <td>{ formatEther(order.buy.data.quantity_with_fees).toString() }</td>
+                        <td>{ utils.formatEther(order.buy.data.quantity_with_fees).toString() }</td>
                         <td>
                           { !loadingTrade
                                 && (

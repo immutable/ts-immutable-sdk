@@ -1,4 +1,4 @@
-import { parseEther, formatEther } from 'ethers';
+import { utils } from 'ethers';
 import React, {
   useCallback,
   useEffect,
@@ -101,7 +101,7 @@ function Order({ show, setShow }: OrderProps) {
     const request: UnsignedOrderRequest = {
       buy: {
         type: 'ETH',
-        amount: parseEther(sellingPrice).toString(),
+        amount: utils.parseEther(sellingPrice).toString(),
       },
       sell: {
         type: 'ERC721',
@@ -154,7 +154,7 @@ function Order({ show, setShow }: OrderProps) {
                   </td>
                   <td>
                     { userAsset.sellOrder?.buy.data.quantity_with_fees
-                      ? formatEther(userAsset.sellOrder?.buy.data.quantity_with_fees)
+                      ? utils.formatEther(userAsset.sellOrder?.buy.data.quantity_with_fees)
                       : (
                         <InputGroup size="sm" className="mb-3">
                           <Form.Control
