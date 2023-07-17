@@ -4,6 +4,7 @@ export {
   RequestArguments,
   JsonRpcRequestPayload,
   JsonRpcResponsePayload,
+  JsonRpcRequestCallback,
   Provider,
 } from './zkEvm/types';
 export {
