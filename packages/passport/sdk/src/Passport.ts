@@ -80,7 +80,7 @@ export class Passport {
     return this.passportImxProviderFactory.getProviderWithCredentials(tokenResponse);
   }
 
-  public connectEvm(): Provider {
+  protected connectEvm(): Provider {
     return new ZkEvmProvider({
       authManager: this.authManager,
       magicAdapter: this.magicAdapter,

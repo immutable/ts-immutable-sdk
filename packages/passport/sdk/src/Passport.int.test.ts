@@ -50,6 +50,7 @@ const getZkEvmProvider = () => {
     scope: 'openid offline_access profile email transact',
   });
 
+  // @ts-ignore TODO ID-926 Remove once method is public
   return passport.connectEvm();
 };
 
