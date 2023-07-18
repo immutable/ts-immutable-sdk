@@ -3793,6 +3793,7 @@ __metadata:
   resolution: "@imtbl/orderbook@workspace:packages/orderbook"
   dependencies:
     "@imtbl/config": 0.0.0
+    "@opensea/seaport-js": ^1.3.0
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -3807,7 +3808,6 @@ __metadata:
     typechain: ^8.1.1
     typescript: ^4.9.5
   peerDependencies:
-    "@opensea/seaport-js": ^1.3.0
     ethers: ^5.7.2
   languageName: unknown
   linkType: soft
@@ -3935,7 +3935,6 @@ __metadata:
     "@jest/globals": ^29.5.0
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
-    "@opensea/seaport-js": ^1.3.0
     "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
     "@rollup/plugin-node-resolve": ^15.0.2
@@ -3959,6 +3958,8 @@ __metadata:
     semver: ^7.4.0
     typescript: ^4.9.5
   peerDependencies:
+    "@opensea/seaport-js": ^1.3.0
+    ethers: ^5.7.2
     react: ^18.2.0
     react-dom: ^18.2.0
   languageName: unknown
