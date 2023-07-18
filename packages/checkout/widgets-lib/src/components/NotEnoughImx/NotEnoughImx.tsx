@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Body,
   BottomSheet, Box, Button, FramedImage, Heading, Logo,
