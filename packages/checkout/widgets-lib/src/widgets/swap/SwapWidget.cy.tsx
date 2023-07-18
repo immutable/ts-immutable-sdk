@@ -69,7 +69,7 @@ describe('SwapWidget tests', () => {
               name: 'Ethereum',
               symbol: 'ETH',
               decimals: 18,
-              address: '',
+              address: '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff',
             },
           },
           {
@@ -79,7 +79,7 @@ describe('SwapWidget tests', () => {
               name: 'ImmutableX',
               symbol: 'IMX',
               decimals: 18,
-              address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              address: 'NATIVE',
             },
           },
           {
@@ -103,13 +103,13 @@ describe('SwapWidget tests', () => {
             name: 'Ethereum',
             symbol: 'ETH',
             decimals: 18,
-            address: '',
+            address: '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff',
           },
           {
             name: 'ImmutableX',
             symbol: 'IMX',
             decimals: 18,
-            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            address: 'NATIVE',
           },
         ],
       });
@@ -152,8 +152,9 @@ describe('SwapWidget tests', () => {
     );
 
     cySmartGet('fromTokenInputs-select-form-select__target').click();
-    cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').should('exist');
-    cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+    cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      .should('exist');
+    cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-native')
       .should('exist');
     cySmartGet('fromTokenInputs-select-form-USDC-USDCoin').should('not.exist');
   });
@@ -166,18 +167,18 @@ describe('SwapWidget tests', () => {
             name: 'Ethereum',
             symbol: 'ETH',
             decimals: 18,
-            address: '',
+            address: '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff',
           },
-          value: BigNumber.from('112300000000000012'),
+          value: BigNumber.from('11230000000000012'),
         },
         amountWithMaxSlippage: {
           token: {
             name: 'ImmutableX',
             symbol: 'IMX',
             decimals: 18,
-            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            address: 'NATIVE',
           },
-          value: BigNumber.from('112300000000000032'),
+          value: BigNumber.from('11230000000000032'),
         },
         slippage: 10,
       },
@@ -187,9 +188,9 @@ describe('SwapWidget tests', () => {
             name: 'ImmutableX',
             symbol: 'IMX',
             decimals: 18,
-            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            address: 'NATIVE',
           },
-          value: BigNumber.from('112300000000000045'),
+          value: BigNumber.from('11230000000000045'),
         },
         transaction: {
           to: 'toSwapAddress',
@@ -202,9 +203,9 @@ describe('SwapWidget tests', () => {
             name: 'ImmutableX',
             symbol: 'IMX',
             decimals: 18,
-            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            address: 'NATIVE',
           },
-          value: BigNumber.from('112300000000000045'),
+          value: BigNumber.from('11230000000000045'),
         },
         transaction: {
           to: 'toApprovalAddress',
@@ -245,11 +246,12 @@ describe('SwapWidget tests', () => {
         fromAmountInStub.resolves({ ...mockQuoteFromAmountIn, approval: null });
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();
-        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+          .click();
 
         cySmartGet('toTokenInputs-select-form-select__target').click();
         // eslint-disable-next-line max-len
-        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
         cySmartGet('fromTokenInputs-text-form-text__input').blur();
@@ -282,11 +284,12 @@ describe('SwapWidget tests', () => {
         fromAmountInStub.resolves({ ...mockQuoteFromAmountIn, approval: null });
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();
-        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+          .click();
 
         cySmartGet('toTokenInputs-select-form-select__target').click();
         // eslint-disable-next-line max-len
-        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
         cySmartGet('fromTokenInputs-text-form-text__input').blur();
@@ -332,11 +335,12 @@ describe('SwapWidget tests', () => {
         const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();
-        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+          .click();
 
         cySmartGet('toTokenInputs-select-form-select__target').click();
         // eslint-disable-next-line max-len
-        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
         cySmartGet('fromTokenInputs-text-form-text__input').blur();
@@ -412,11 +416,12 @@ describe('SwapWidget tests', () => {
         const { approveSwap, approveSpending } = text.views[SwapWidgetViews.APPROVE_ERC20];
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();
-        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+          .click();
 
         cySmartGet('toTokenInputs-select-form-select__target').click();
         // eslint-disable-next-line max-len
-        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff').click();
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
         cySmartGet('fromTokenInputs-text-form-text__input').blur();
