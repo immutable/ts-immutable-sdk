@@ -6,7 +6,6 @@ import {
   OrderbookOverrides,
 } from 'config/config';
 import { ERC721Factory } from 'erc721';
-import { providers } from 'ethers';
 import { ListingResult, ListListingsResult, OrderStatus } from 'openapi/sdk';
 import { Seaport } from 'seaport';
 import {
@@ -31,37 +30,26 @@ export class Orderbook {
 
   private orderbookConfig: OrderbookModuleConfiguration;
 
-  // new Orderbook({chainName: TESTNET, provider: <provider>})
-  // new Orderbook({override: { chainName: TESTNET}})
+  constructor(config: ModuleConfiguration<OrderbookOverrides>) {
+    const obConfig = getOrderbookConfig(config.baseConfig.environment);
 
-  constructor(
-    config: ModuleConfiguration<OrderbookOverrides>,
-    localConfig?: OrderbookModuleConfiguration,
-  ) {
-    // either use preconfigured config or local config passed in
-    const maybeConfig = getOrderbookConfig(config.overrides?.chainName) || localConfig;
-    if (!maybeConfig) {
+    const finalConfig: OrderbookModuleConfiguration = {
+      ...obConfig,
+      ...config.overrides,
+    } as OrderbookModuleConfiguration;
+
+    if (!finalConfig) {
       throw new Error(
-        'Orderbook configuration not passed, either select one of the preseet chainNames or pass in localConfig',
+        'Orderbook configuration not passed, please specify the environment under config.baseConfig.environment',
       );
     }
 
-    const { chainName, provider } = config.overrides!;
-    maybeConfig.provider = (provider as providers.Web3Provider)
-      || (maybeConfig.provider as providers.Web3Provider);
+    this.orderbookConfig = finalConfig;
 
-    this.orderbookConfig = maybeConfig;
-
-    const { apiEndpoint } = this.orderbookConfig;
+    const { apiEndpoint, chainName } = this.orderbookConfig;
     if (!apiEndpoint) {
-      throw new Error('API endpoint must be provided as an override');
+      throw new Error('API endpoint must be provided');
     }
-
-    // create new config here
-    const fakeProvider = new providers.JsonRpcProvider(
-      'https://zkevm-rpc.sandbox.x.immutable.com',
-    );
-    this.orderbookConfig.provider = fakeProvider;
 
     this.apiClient = new ImmutableApiClientFactory(
       apiEndpoint,
