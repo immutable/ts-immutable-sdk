@@ -7,7 +7,7 @@ export const MAINNET_CHAIN_NAME = 'imtbl-zkevm-mainnet';
 
 export interface OrderbookOverrides {
   chainName: string;
-  provider: providers.JsonRpcProvider | providers.Web3Provider;
+  provider?: providers.JsonRpcProvider | providers.Web3Provider;
 }
 
 export interface OrderbookModuleConfiguration {
