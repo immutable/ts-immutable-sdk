@@ -6,8 +6,9 @@ import { FooterLogo } from '../../components/Footer/FooterLogo';
 export interface LoadingViewProps {
   loadingText: string;
   showFooterLogo?: boolean;
+  children?: React.ReactNode;
 }
-export function LoadingView({ loadingText, showFooterLogo }: LoadingViewProps) {
+export function LoadingView({ loadingText, showFooterLogo, children }: LoadingViewProps) {
   return (
     <SimpleLayout
       footer={(
@@ -16,6 +17,7 @@ export function LoadingView({ loadingText, showFooterLogo }: LoadingViewProps) {
     >
       <CenteredBoxContent testId="loading-view">
         <LoadingBox loadingText={loadingText} />
+        {children}
       </CenteredBoxContent>
     </SimpleLayout>
   );

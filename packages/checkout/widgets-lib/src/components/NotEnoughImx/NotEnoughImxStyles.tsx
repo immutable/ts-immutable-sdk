@@ -23,9 +23,25 @@ export const actionButtonContainerStyles = {
   width: '100%',
 };
 
+export const actionButtonContainerNoImxStyles = {
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  gap: 'base.spacing.x2',
+  height: '100%',
+  width: '100%',
+};
+
 export const actionButtonStyles = {
   width: '100%',
   height: 'base.spacing.x16',
+};
+
+export const actionButtonNoImxStyles = {
+  width: '100%',
+  height: 'base.spacing.x16',
+  marginBottom: 'base.spacing.x8',
 };
 
 export const logoContainerStyles = {

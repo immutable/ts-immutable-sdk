@@ -2,12 +2,13 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import {
   Checkout,
   DexConfig,
+  GasEstimateType,
   GetTokenAllowListResult,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
-  useEffect, useCallback, useReducer, useMemo,
+  useEffect, useCallback, useReducer, useMemo, useState,
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeOverrides } from '@imtbl/dex-sdk';
@@ -43,6 +44,8 @@ import {
 import { SwapInProgress } from './views/SwapInProgress';
 import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
 import { TopUpView } from '../../views/top-up/TopUpView';
+import { NotEnoughImx } from '../../components/NotEnoughImx/NotEnoughImx';
+import { hasEnoughBalanceForGas, hasZeroBalance } from '../../lib/gasBalanceChecks';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -70,6 +73,7 @@ export function SwapWidget(props: SwapWidgetProps) {
     () => ({ swapState, swapDispatch }),
     [swapState, swapDispatch],
   );
+  const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
 
   const { params, config, web3Provider } = props;
   const {
@@ -187,12 +191,35 @@ export function SwapWidget(props: SwapWidgetProps) {
         },
       });
 
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: SwapWidgetViews.SWAP },
-        },
-      });
+      if (checkout) {
+        if (hasZeroBalance(allowedTokenBalances, 'IMX')) {
+          setShowNotEnoughImxDrawer(true);
+          return;
+        }
+
+        const gasEstimate = await checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.SWAP,
+        });
+
+        if (
+          gasEstimate.gasFee.estimatedAmount
+          && !hasEnoughBalanceForGas(
+            allowedTokenBalances,
+            gasEstimate.gasFee.estimatedAmount,
+            'IMX',
+          )
+        ) {
+          setShowNotEnoughImxDrawer(true);
+          return;
+        }
+
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: SwapWidgetViews.SWAP },
+          },
+        });
+      }
     })();
   }, [checkout, web3Provider]);
 
@@ -205,7 +232,26 @@ export function SwapWidget(props: SwapWidgetProps) {
       <ViewContext.Provider value={viewReducerValues}>
         <SwapContext.Provider value={swapReducerValues}>
           {viewState.view.type === SharedViews.LOADING_VIEW && (
-            <LoadingView loadingText={loadingText} />
+            <LoadingView loadingText={loadingText}>
+              {showNotEnoughImxDrawer && (
+              <NotEnoughImx
+                visible={showNotEnoughImxDrawer}
+                showAdjustAmount={false}
+                displayOnlyAddImxButton
+                onAddCoinsClick={() => {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.UPDATE_VIEW,
+                      view: {
+                        type: SharedViews.TOP_UP_VIEW,
+                      },
+                    },
+                  });
+                }}
+                onCloseBottomSheet={() => setShowNotEnoughImxDrawer(false)}
+              />
+              )}
+            </LoadingView>
           )}
           {viewState.view.type === SwapWidgetViews.SWAP && (
             <CryptoFiatProvider environment={environment}>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Body,
   BottomSheet, Box, Button, FramedImage, Heading, Logo,
@@ -8,20 +9,24 @@ import {
   actionButtonStyles,
   actionButtonContainerStyles,
   logoContainerStyles,
+  actionButtonContainerNoImxStyles,
+  actionButtonNoImxStyles,
 } from './NotEnoughImxStyles';
 import { text } from '../../resources/text/textConfig';
 
 type NotEnoughImxProps = {
   visible: boolean;
   showAdjustAmount: boolean;
+  displayOnlyAddImxButton: boolean;
   onCloseBottomSheet?: () => void;
   onAddCoinsClick: () => void;
 };
 
 export function NotEnoughImx({
-  visible, showAdjustAmount, onCloseBottomSheet, onAddCoinsClick,
+  visible, showAdjustAmount, displayOnlyAddImxButton, onCloseBottomSheet, onAddCoinsClick,
 }: NotEnoughImxProps) {
   const { content, buttons } = text.drawers.notEnoughImx;
+  const { noImx, insufficientImx } = content;
 
   const imxLogo = 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--imx.svg';
 
@@ -46,13 +51,13 @@ export function NotEnoughImx({
             sx={contentTextStyles}
             testId="not-enough-gas-heading"
           >
-            {content.heading}
+            {displayOnlyAddImxButton ? noImx.heading : insufficientImx.heading}
           </Heading>
           <Body sx={contentTextStyles}>
-            {content.body}
+            {displayOnlyAddImxButton ? noImx.body : insufficientImx.body}
           </Body>
-          <Box sx={actionButtonContainerStyles}>
-            {showAdjustAmount && (
+          <Box sx={displayOnlyAddImxButton ? actionButtonContainerNoImxStyles : actionButtonContainerStyles}>
+            {(showAdjustAmount && !displayOnlyAddImxButton) && (
             <Button
               testId="not-enough-gas-adjust-amount-button"
               sx={actionButtonStyles}
@@ -63,13 +68,14 @@ export function NotEnoughImx({
             </Button>
             )}
             <Button
-              testId="not-enough-gas-copy-address-button"
-              sx={actionButtonStyles}
+              testId="not-enough-gas-add-imx-button"
+              sx={displayOnlyAddImxButton ? actionButtonNoImxStyles : actionButtonStyles}
               variant="tertiary"
               onClick={onAddCoinsClick}
             >
               {buttons.addMoreImx}
             </Button>
+            {!displayOnlyAddImxButton && (
             <Button
               sx={actionButtonStyles}
               variant="tertiary"
@@ -78,6 +84,7 @@ export function NotEnoughImx({
             >
               {buttons.cancel}
             </Button>
+            )}
           </Box>
           <Box sx={logoContainerStyles}>
             <Logo
