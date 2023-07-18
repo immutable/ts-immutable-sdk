@@ -102,6 +102,11 @@ export const mswHandlers = {
       }
     }),
   },
+  guardian: {
+    evaluateTransaction: {
+      success: rest.post('https://api.sandbox.immutable.com/guardian/v1/transactions/evm/evaluate', (req, res, ctx) => res(ctx.status(200))),
+    },
+  },
 };
 
 let mswWorker: SetupServer;

@@ -1,6 +1,6 @@
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { sendTransaction } from './sendTransaction';
+import * as guardian from '@imtbl/guardian';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
@@ -19,6 +19,7 @@ import { UserZkEvm } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import { loginZkEvmUser } from './user';
+import { sendTransaction } from './sendTransaction';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -44,6 +45,8 @@ export class ZkEvmProvider implements Provider {
 
   private readonly relayerClient: RelayerClient;
 
+  private readonly transactionAPI: guardian.TransactionsApi;
+
   private readonly multiRollupApiClients: MultiRollupApiClients;
 
   private readonly jsonRpcProvider: JsonRpcProvider; // Used for read
@@ -66,6 +69,11 @@ export class ZkEvmProvider implements Provider {
     this.config = config;
     this.confirmationScreen = confirmationScreen;
     this.relayerClient = new RelayerClient({ config });
+    this.transactionAPI = new guardian.TransactionsApi(
+      new guardian.Configuration({
+        basePath: this.config.imxPublicApiDomain,
+      }),
+    );
     this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
     this.multiRollupApiClients = multiRollupApiClients;
     this.eventEmitter = new TypedEventEmitter<ProviderEventMap>();
@@ -103,6 +111,7 @@ export class ZkEvmProvider implements Provider {
         return sendTransaction({
           params: request.params || [],
           magicProvider: this.magicProvider,
+          transactionAPI: this.transactionAPI,
           jsonRpcProvider: this.jsonRpcProvider,
           config: this.config,
           relayerClient: this.relayerClient,

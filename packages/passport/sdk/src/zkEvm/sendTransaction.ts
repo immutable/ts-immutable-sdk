@@ -4,7 +4,10 @@ import {
   TransactionRequest,
   Web3Provider,
 } from '@ethersproject/providers';
-import { getNonce, getSignedMetaTransactions, chainIdNumber } from './walletHelpers';
+import * as guardian from '@imtbl/guardian';
+import {
+  getNonce, getSignedMetaTransactions, chainIdNumber, getNormalisedTransactions,
+} from './walletHelpers';
 import { MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
@@ -18,10 +21,52 @@ const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
 export type EthSendTransactionParams = {
   magicProvider: ExternalProvider;
   jsonRpcProvider: JsonRpcProvider;
+  transactionAPI: guardian.TransactionsApi;
   config: PassportConfiguration;
   relayerClient: RelayerClient;
   user: UserZkEvm;
   params: Array<any>;
+};
+
+type GuardianValidateParams = {
+  transactionAPI: guardian.TransactionsApi;
+  chainId: string,
+  nonce: number,
+  userAddress: string,
+  metaTransactions: MetaTransaction[],
+};
+
+const guardianValidation = async ({
+  transactionAPI,
+  chainId,
+  nonce,
+  userAddress,
+  metaTransactions,
+}: GuardianValidateParams) => {
+  const normalisedMetaTransactions = getNormalisedTransactions(
+    metaTransactions,
+  ) as guardian.MetaTransaction[];
+
+  try {
+    await transactionAPI.evaluateTransaction({
+      id: 'evm',
+      transactionEvaluationRequest: {
+        chainType: 'evm',
+        chainId,
+        transactionData: {
+          nonce,
+          userAddress,
+          metaTransactions: normalisedMetaTransactions,
+        },
+      },
+    });
+  } catch (error) {
+    const errorMessage = (error instanceof Error) ? error.message : String(error);
+    throw new JsonRpcError(
+      RpcErrorCode.INTERNAL_ERROR,
+      `Transaction failed to validate with error: ${errorMessage}`,
+    );
+  }
 };
 
 export const sendTransaction = async ({
@@ -29,6 +74,7 @@ export const sendTransaction = async ({
   magicProvider,
   jsonRpcProvider,
   relayerClient,
+  transactionAPI,
   config,
   user,
 }: EthSendTransactionParams): Promise<string> => {
@@ -81,6 +127,14 @@ export const sendTransaction = async ({
     value: imxFeeOption.tokenPrice,
     revertOnError: true,
   };
+
+  await guardianValidation({
+    transactionAPI,
+    chainId: config.zkEvmChainId,
+    nonce,
+    userAddress: user.zkEvm.ethAddress,
+    metaTransactions: [metaTransaction, feeMetaTransaction],
+  });
 
   // NOTE: We sign again because we now are adding the fee transaction, so the
   // whole payload is different and needs a new signature.

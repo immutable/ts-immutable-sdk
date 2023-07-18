@@ -173,6 +173,7 @@ describe('Passport', () => {
           mswHandlers.counterfactualAddress.success,
           mswHandlers.jsonRpcProvider.success,
           mswHandlers.relayer.success,
+          mswHandlers.guardian.evaluateTransaction.success,
         ]);
         mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
           expect(method).toEqual('eth_accounts');
