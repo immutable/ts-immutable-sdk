@@ -57,24 +57,24 @@ export function NotEnoughImx({
           </Body>
           <Box sx={displayOnlyDismissButton ? actionButtonContainerNoImxStyles : actionButtonContainerStyles}>
             {(showAdjustAmount && !displayOnlyDismissButton) && (
-            <Button
-              testId="not-enough-gas-adjust-amount-button"
-              sx={actionButtonStyles}
-              variant="tertiary"
-              onClick={onCloseBottomSheet}
-            >
-              {buttons.adjustAmount}
-            </Button>
+              <Button
+                testId="not-enough-gas-adjust-amount-button"
+                sx={actionButtonStyles}
+                variant="tertiary"
+                onClick={onCloseBottomSheet}
+              >
+                {buttons.adjustAmount}
+              </Button>
             )}
             {!displayOnlyDismissButton && (
-            <Button
-              testId="not-enough-gas-add-imx-button"
-              sx={actionButtonStyles}
-              variant="tertiary"
-              onClick={onAddCoinsClick}
-            >
-              {buttons.addMoreImx}
-            </Button>
+              <Button
+                testId="not-enough-gas-add-imx-button"
+                sx={actionButtonStyles}
+                variant="tertiary"
+                onClick={onAddCoinsClick}
+              >
+                {buttons.addMoreImx}
+              </Button>
             )}
             <Button
               sx={displayOnlyDismissButton ? actionButtonNoImxStyles : actionButtonStyles}
