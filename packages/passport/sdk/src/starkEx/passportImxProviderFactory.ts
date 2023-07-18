@@ -2,7 +2,7 @@ import { EthSigner, StarkSigner } from '@imtbl/core-sdk';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import { Web3Provider } from '@ethersproject/providers';
 import registerPassportStarkEx from './workflows/registration';
-import { retryWithDelay } from './retry';
+import { retryWithDelay } from '../network/retry';
 import { PassportError, PassportErrorType, withPassportError } from '../errors/passportError';
 import { PassportConfiguration } from '../config';
 import AuthManager from '../authManager';

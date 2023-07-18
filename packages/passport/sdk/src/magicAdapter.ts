@@ -14,7 +14,7 @@ export default class MagicAdapter {
 
   async login(
     idToken: string,
-    network: Networks | { rpcUrl: string; chainId?: number },
+    network: Networks,
   ): Promise<ethers.providers.ExternalProvider> {
     return withPassportError<ethers.providers.ExternalProvider>(async () => {
       const magicClient = new Magic(this.config.magicPublishableApiKey, {
