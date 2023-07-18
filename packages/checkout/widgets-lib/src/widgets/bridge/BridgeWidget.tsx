@@ -44,6 +44,11 @@ import { text } from '../../resources/text/textConfig';
 import { ErrorView } from '../../views/error/ErrorView';
 import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
 import { getBridgeTokensAndBalances } from './functions/getBridgeTokens';
+// import {
+//   addProviderAccountsListener,
+//   addProviderChainListener,
+//   removeProviderEventListeners,
+// } from '../../lib/providerEvents';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
@@ -80,6 +85,30 @@ export function BridgeWidget(props: BridgeWidgetProps) {
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
+
+  // useEffect(() => {
+  //   if (!web3Provider) return () => {};
+
+  //   function handleAccountsChanged(e: any) {
+  //     alert(`You changed your account ${e[0]}`);
+  //   }
+
+  //   function handleChainChanged(e: any) {
+  //     alert(`You changed the chain ${e}`);
+  //   }
+  //   // subscribe
+  //   addProviderAccountsListener(web3Provider, handleAccountsChanged);
+  //   addProviderChainListener(web3Provider, handleChainChanged);
+
+  //   return () => {
+  //     // unsubscribe
+  //     removeProviderEventListeners(
+  //       web3Provider,
+  //       handleAccountsChanged,
+  //       handleChainChanged,
+  //     );
+  //   };
+  // }, [web3Provider]);
 
   useEffect(() => {
     const bridgetWidgetSetup = async () => {

@@ -109,7 +109,7 @@ export class Checkout {
     const web3Provider = await provider.validateProvider(
       this.config,
       params.provider,
-      { allowUnsupportedProvider: true } as ValidateProviderOptions,
+      { allowUnsupportedProvider: true, allowMistmatchedChainId: true } as ValidateProviderOptions,
     );
     await connect.connectSite(web3Provider);
     const networkInfo = await network.getNetworkInfo(this.config, web3Provider);

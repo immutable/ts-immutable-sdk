@@ -38,6 +38,7 @@ import {
 import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
+import { useProviderEventSubscriptions } from '../../lib/hooks/useProviderEventSubscriptions';
 
 export interface ConnectWidgetProps {
   params?: ConnectWidgetParams;
@@ -72,8 +73,11 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const checkout = new Checkout({ baseConfig: { environment } });
   const targetChainId = getTargetLayerChainId(checkout.config, targetLayer ?? ConnectTargetLayer.LAYER2);
 
+  useProviderEventSubscriptions({ provider });
+
   useEffect(() => {
     if (!web3Provider) return;
+
     connectDispatch({
       payload: {
         type: ConnectActions.SET_PROVIDER,

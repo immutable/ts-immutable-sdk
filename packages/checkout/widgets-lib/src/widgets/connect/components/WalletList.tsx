@@ -5,7 +5,9 @@ import {
   WalletInfo,
   WalletProviderName,
 } from '@imtbl/checkout-sdk';
-import { useContext, useState, useEffect } from 'react';
+import {
+  useContext, useState, useEffect, useCallback,
+} from 'react';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 import { WalletItem } from './WalletItem';
@@ -40,41 +42,43 @@ export function WalletList(props: WalletListProps) {
     getAllowedWallets();
   }, [checkout, excludeWallets, walletFilterTypes]);
 
-  const onWalletClick = async (walletProvider: WalletProviderName) => {
-    if (checkout) {
-      try {
-        const connectResult = await checkout.createProvider({
-          walletProvider,
-        });
+  const onWalletClick = useCallback(async (walletProvider: WalletProviderName) => {
+    if (!checkout) return;
 
-        connectDispatch({
-          payload: {
-            type: ConnectActions.SET_PROVIDER,
-            provider: connectResult.provider,
-          },
-        });
-        connectDispatch({
-          payload: {
-            type: ConnectActions.SET_PROVIDER_NAME,
-            walletProvider,
-          },
-        });
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: ConnectWidgetViews.READY_TO_CONNECT },
-          },
-        });
-      } catch (err: any) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: SharedViews.ERROR_VIEW, error: err },
-          },
-        });
-      }
+    try {
+      const connectResult = await checkout.createProvider({
+        walletProvider,
+      });
+
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_PROVIDER,
+          provider: connectResult.provider,
+        },
+      });
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_PROVIDER_NAME,
+          walletProvider,
+        },
+      });
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: ConnectWidgetViews.READY_TO_CONNECT },
+        },
+      });
+
+      // return () => removeProviderEventListeners(connectResult.provider);
+    } catch (err: any) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: SharedViews.ERROR_VIEW, error: err },
+        },
+      });
     }
-  };
+  }, [checkout]);
 
   return (
     <Box

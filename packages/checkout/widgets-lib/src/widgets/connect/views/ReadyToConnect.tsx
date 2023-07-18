@@ -68,6 +68,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
         });
         handleConnectViewUpdate(checkout, provider);
       } catch (err: any) {
+        console.log(err);
         setFooterButtonText(footer.buttonText2);
       }
     }

@@ -25,9 +25,14 @@ import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContex
 import { ErrorView } from '../../views/error/ErrorView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
-  WidgetTheme, ConnectTargetLayer, getTargetLayerChainId,
+  WidgetTheme, ConnectTargetLayer, getTargetLayerChainId, getL2ChainId, getL1ChainId,
 } from '../../lib';
 import { useInterval } from '../../lib/hooks/useInterval';
+import {
+  addProviderAccountsListener,
+  addProviderChainListener,
+  removeProviderEventListeners,
+} from '../../lib/providerEvents';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -89,6 +94,91 @@ export function ConnectLoader({
     setAttempts(attempts + 1);
   };
   clearInterval = useInterval(() => checkIfWeb3ProviderSet(), 10);
+
+  useEffect(() => {
+    if (!web3Provider) {
+      connectLoaderDispatch({
+        payload: {
+          type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+          connectionStatus: ConnectionStatus.NOT_CONNECTED_NO_PROVIDER,
+        },
+      });
+      return () => {};
+    }
+
+    function handleAccountsChanged(e: any) {
+      alert(`[ConnectLoader]: You changed your account ${e[0]}`);
+
+      if (e.length === 0) {
+        connectLoaderDispatch({
+          payload: {
+            type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+            connectionStatus: ConnectionStatus.NOT_CONNECTED,
+            deepLink: ConnectWidgetViews.READY_TO_CONNECT,
+          },
+        });
+        return;
+      }
+
+      connectLoaderDispatch({
+        payload: {
+          type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+          connectionStatus: ConnectionStatus.NOT_CONNECTED,
+          deepLink: ConnectWidgetViews.SUCCESS,
+        },
+      });
+    }
+
+    function handleChainChanged(e: any) {
+      alert(`[ConnectLoader]: You changed the chain ${e}`);
+      const chainId = parseInt(e, 16);
+      console.log(chainId);
+
+      const checkout = new Checkout({ baseConfig: { environment: widgetConfig.environment } });
+      // needs to be if chainId is targetChainId for this widget, then you may pass
+      // otherwise go to connected_wrong_network
+      if (chainId === getL2ChainId(checkout.config) && targetLayer === ConnectTargetLayer.LAYER2) {
+        console.log('imtbl zkevm testnet');
+      } else if (chainId === getL1ChainId(checkout.config) && targetLayer === ConnectTargetLayer.LAYER1) {
+        console.log('l1 chain');
+      } else {
+        connectLoaderDispatch({
+          payload: {
+            type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+            connectionStatus: ConnectionStatus.CONNECTED_WRONG_NETWORK,
+            deepLink: ConnectWidgetViews.SWITCH_NETWORK,
+          },
+        });
+      }
+    }
+    // subscribe
+    addProviderAccountsListener(web3Provider, handleAccountsChanged);
+    addProviderChainListener(web3Provider, handleChainChanged);
+
+    function handleDisconnect(e:any) {
+      console.log(e);
+      connectLoaderDispatch({
+        payload: {
+          type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+          connectionStatus: ConnectionStatus.NOT_CONNECTED_NO_PROVIDER,
+        },
+      });
+      return () => {};
+    }
+    console.log('subscribing to disconnect event');
+    (web3Provider.provider as any).on('disconnect', handleDisconnect);
+
+    return () => {
+      // unsubscribe
+      console.log('unsubscribing');
+      removeProviderEventListeners(
+        web3Provider,
+        handleAccountsChanged,
+        handleChainChanged,
+      );
+      (web3Provider.provider as any).removeListener('disconnect', handleDisconnect);
+    };
+  }, [web3Provider]);
 
   useEffect(() => {
     if (window === undefined) {
