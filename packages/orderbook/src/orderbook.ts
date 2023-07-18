@@ -1,7 +1,12 @@
 import { ModuleConfiguration } from '@imtbl/config';
 import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
-import { OrderbookModuleConfiguration, OrderbookOverrides, getOrderbookConfig } from 'config/config';
+import {
+  getOrderbookConfig,
+  OrderbookModuleConfiguration,
+  OrderbookOverrides,
+} from 'config/config';
 import { ERC721Factory } from 'erc721';
+import { providers } from 'ethers';
 import { ListingResult, ListListingsResult, OrderStatus } from 'openapi/sdk';
 import { Seaport } from 'seaport';
 import {
@@ -33,19 +38,20 @@ export class Orderbook {
     // either use preconfigured config or local config passed in
     const maybeConfig = getOrderbookConfig(config.overrides?.chainName) || localConfig;
     if (!maybeConfig) {
-      throw new Error('Orderbook configuration not passed, either select one of the preseet chainNames or pass in localConfig');
+      throw new Error(
+        'Orderbook configuration not passed, either select one of the preseet chainNames or pass in localConfig',
+      );
     }
+
+    const { chainName, provider } = config.overrides!;
+    maybeConfig.provider = (provider as providers.Web3Provider)
+      || (maybeConfig.provider as providers.Web3Provider);
+
     this.orderbookConfig = maybeConfig;
 
     const { apiEndpoint } = this.orderbookConfig;
     if (!apiEndpoint) {
       throw new Error('API endpoint must be provided as an override');
-    }
-
-    // TODO: Move chainId lookup to a map based on env. Just using override to get dev started
-    const chainName = config.overrides?.chainName;
-    if (!chainName) {
-      throw new Error('chainName must be provided as an override');
     }
 
     this.apiClient = new ImmutableApiClientFactory(
@@ -105,10 +111,7 @@ export class Orderbook {
       sell.contractAddress,
       this.orderbookConfig.provider,
     ).create();
-    const royaltyInfo = await erc721.royaltyInfo(
-      sell.tokenId,
-      buy.amount,
-    );
+    const royaltyInfo = await erc721.royaltyInfo(sell.tokenId, buy.amount);
 
     return this.seaport.prepareSeaportOrder(
       makerAddress,
