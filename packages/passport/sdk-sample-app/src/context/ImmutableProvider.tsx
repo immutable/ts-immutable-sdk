@@ -88,6 +88,12 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
               immutableXConfig: getCoreSdkConfig(EnvironmentNames.DEV),
             },
           }),
+          zkEvmRpcUrl: 'https://zkevm-rpc.dev.x.immutable.com',
+          zkEvmChainId: 'eip155:13403',
+          relayerUrl: 'https://evm-relayer.dev.imtbl.com',
+          indexerMrBasePath: 'https://indexer-mr.dev.imtbl.com',
+          orderBookMrBasePath: 'https://order-book-mr.dev.imtbl.com',
+          passportMrBasePath: 'https://api.dev.immutable.com',
         },
         ...sharedConfigurationValues,
       };

@@ -6,6 +6,8 @@
   "browser": "./dist/index.browser.js",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
+    "@0xsequence/abi": "^0.43.34",
+    "@0xsequence/config": "^0.43.34",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/wallet": "^5.7.0",

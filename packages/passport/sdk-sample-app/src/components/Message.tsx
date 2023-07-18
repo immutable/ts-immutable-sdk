@@ -1,21 +1,34 @@
-import { Card, Stack } from 'react-bootstrap';
-import React from 'react';
-import { Heading } from '@biom3/react';
+import { Form } from 'react-bootstrap';
+import React, { useEffect } from 'react';
 import { useStatusProvider } from '@/context/StatusProvider';
+import CardStack from '@/components/CardStack';
 
 function Message() {
-  const { message } = useStatusProvider();
+  const { messages } = useStatusProvider();
+
+  useEffect(() => {
+    const textarea = document.querySelector('textarea');
+    if (textarea) {
+      textarea.scrollTop = textarea.scrollHeight;
+    }
+  }, [messages]);
+
   return (
-    <Card>
-      <Stack direction="horizontal" gap={3}>
-        <Card.Title><Heading size="small">Message</Heading></Card.Title>
-        <Card.Body style={{ display: 'flex', alignItems: 'center', minHeight: '5rem' }} className="text-dark">
-          <p style={{ }}>
-            { message }
-          </p>
-        </Card.Body>
-      </Stack>
-    </Card>
+    <CardStack title="Message">
+      <Form style={{ width: '100%' }}>
+        <Form.Group>
+          <Form.Control
+            as="textarea"
+            rows={6}
+            value={`\n\n\n\n\n${messages.join('\n')}`}
+            readOnly
+            style={{
+              fontSize: '0.8rem',
+            }}
+          />
+        </Form.Group>
+      </Form>
+    </CardStack>
   );
 }
 

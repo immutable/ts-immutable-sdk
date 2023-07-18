@@ -1,6 +1,6 @@
 import * as guardian from '@imtbl/guardian';
 import { ConfirmationScreen } from '../confirmation';
-import { retryWithDelay } from './retry';
+import { retryWithDelay } from '../network/retry';
 
 export type GuardianClientParams = {
   accessToken: string;
