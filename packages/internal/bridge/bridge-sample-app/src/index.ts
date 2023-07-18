@@ -221,8 +221,16 @@ async function deposit() {
   console.log(waitForWithdrawalResp)
 
   // TODO: Exit on Layer 1
-  
+  console.log(`Exiting on Layer 1`)
+  const exitRequest: ExitRequest = {
+    transactionHash: txWithdrawReceipt.transactionHash,
+  }
+  const exitTxResponse = await tokenBridge.getUnsignedExitTx(exitRequest);
 
+  const exitTx = await checkout.sendTransaction(exitTxResponse.unsignedTx);
+  console.log(exitTx)
+  const exitTxReceipt = await exitTx.wait(1);
+  console.log(exitTxReceipt);
 }
 
 async function test() {
@@ -301,10 +309,11 @@ async function test() {
 
     const txWithdraw = await checkout.sendTransaction(exitTx.unsignedTx);
     console.log(txWithdraw)
+    const txWithdrawReceipt = await txWithdraw.wait(1);
+    console.log(txWithdrawReceipt);
 }
 
 // Run the deposit function and exit the process when completed
 (async () => {
-  await test().then(() => {console.log(`Exiting Successfully`); process.exit(0)}).catch(e => {console.log(`Exiting with error: ${e.toString()}`); process.exit(1)});
-  // await withdraw().then(() => console.log("Completed Withdrawl")).catch((e) => console.log(`Error occurred: ${e}`));
+  await deposit().then(() => {console.log(`Exiting Successfully`); process.exit(0)}).catch(e => {console.log(`Exiting with error: ${e.toString()}`); process.exit(1)});
 })();
