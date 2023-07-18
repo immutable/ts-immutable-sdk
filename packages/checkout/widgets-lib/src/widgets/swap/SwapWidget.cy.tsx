@@ -119,9 +119,9 @@ describe('SwapWidget tests', () => {
       );
 
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
-      cySmartGet('not-enough-gas-add-imx-button').should('be.visible');
+      cySmartGet('not-enough-gas-cancel-button').should('be.visible');
+      cySmartGet('not-enough-gas-add-imx-button').should('not.exist');
       cySmartGet('not-enough-gas-adjust-amount-button').should('not.exist');
-      cySmartGet('not-enough-gas-cancel-button').should('not.exist');
     });
 
     it(
@@ -168,9 +168,9 @@ describe('SwapWidget tests', () => {
         );
 
         cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
-        cySmartGet('not-enough-gas-add-imx-button').should('be.visible');
+        cySmartGet('not-enough-gas-cancel-button').should('be.visible');
+        cySmartGet('not-enough-gas-add-imx-button').should('not.exist');
         cySmartGet('not-enough-gas-adjust-amount-button').should('not.exist');
-        cySmartGet('not-enough-gas-cancel-button').should('not.exist');
       },
     );
 

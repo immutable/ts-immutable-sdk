@@ -237,18 +237,17 @@ export function SwapWidget(props: SwapWidgetProps) {
               <NotEnoughImx
                 visible={showNotEnoughImxDrawer}
                 showAdjustAmount={false}
-                displayOnlyAddImxButton
-                onAddCoinsClick={() => {
+                displayOnlyDismissButton
+                onAddCoinsClick={() => {}}
+                onCloseBottomSheet={() => {
+                  setShowNotEnoughImxDrawer(false);
                   viewDispatch({
                     payload: {
                       type: ViewActions.UPDATE_VIEW,
-                      view: {
-                        type: SharedViews.TOP_UP_VIEW,
-                      },
+                      view: { type: SwapWidgetViews.SWAP },
                     },
                   });
                 }}
-                onCloseBottomSheet={() => setShowNotEnoughImxDrawer(false)}
               />
               )}
             </LoadingView>

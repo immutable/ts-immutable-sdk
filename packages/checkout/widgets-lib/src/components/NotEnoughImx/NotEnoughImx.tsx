@@ -16,13 +16,13 @@ import { text } from '../../resources/text/textConfig';
 type NotEnoughImxProps = {
   visible: boolean;
   showAdjustAmount: boolean;
-  displayOnlyAddImxButton: boolean;
+  displayOnlyDismissButton: boolean;
   onCloseBottomSheet?: () => void;
   onAddCoinsClick: () => void;
 };
 
 export function NotEnoughImx({
-  visible, showAdjustAmount, displayOnlyAddImxButton, onCloseBottomSheet, onAddCoinsClick,
+  visible, showAdjustAmount, displayOnlyDismissButton, onCloseBottomSheet, onAddCoinsClick,
 }: NotEnoughImxProps) {
   const { content, buttons } = text.drawers.notEnoughImx;
   const { noImx, insufficientImx } = content;
@@ -50,13 +50,13 @@ export function NotEnoughImx({
             sx={contentTextStyles}
             testId="not-enough-gas-heading"
           >
-            {displayOnlyAddImxButton ? noImx.heading : insufficientImx.heading}
+            {displayOnlyDismissButton ? noImx.heading : insufficientImx.heading}
           </Heading>
           <Body sx={contentTextStyles}>
-            {displayOnlyAddImxButton ? noImx.body : insufficientImx.body}
+            {displayOnlyDismissButton ? noImx.body : insufficientImx.body}
           </Body>
-          <Box sx={displayOnlyAddImxButton ? actionButtonContainerNoImxStyles : actionButtonContainerStyles}>
-            {(showAdjustAmount && !displayOnlyAddImxButton) && (
+          <Box sx={displayOnlyDismissButton ? actionButtonContainerNoImxStyles : actionButtonContainerStyles}>
+            {(showAdjustAmount && !displayOnlyDismissButton) && (
             <Button
               testId="not-enough-gas-adjust-amount-button"
               sx={actionButtonStyles}
@@ -66,24 +66,24 @@ export function NotEnoughImx({
               {buttons.adjustAmount}
             </Button>
             )}
+            {!displayOnlyDismissButton && (
             <Button
               testId="not-enough-gas-add-imx-button"
-              sx={displayOnlyAddImxButton ? actionButtonNoImxStyles : actionButtonStyles}
+              sx={actionButtonStyles}
               variant="tertiary"
               onClick={onAddCoinsClick}
             >
               {buttons.addMoreImx}
             </Button>
-            {!displayOnlyAddImxButton && (
+            )}
             <Button
-              sx={actionButtonStyles}
+              sx={displayOnlyDismissButton ? actionButtonNoImxStyles : actionButtonStyles}
               variant="tertiary"
               onClick={onCloseBottomSheet}
               testId="not-enough-gas-cancel-button"
             >
               {buttons.cancel}
             </Button>
-            )}
           </Box>
           <Box sx={logoContainerStyles}>
             <Logo
