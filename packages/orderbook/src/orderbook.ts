@@ -31,6 +31,9 @@ export class Orderbook {
 
   private orderbookConfig: OrderbookModuleConfiguration;
 
+  // new Orderbook({chainName: TESTNET, provider: <provider>})
+  // new Orderbook({override: { chainName: TESTNET}})
+
   constructor(
     config: ModuleConfiguration<OrderbookOverrides>,
     localConfig?: OrderbookModuleConfiguration,
@@ -53,6 +56,12 @@ export class Orderbook {
     if (!apiEndpoint) {
       throw new Error('API endpoint must be provided as an override');
     }
+
+    // create new config here
+    const fakeProvider = new providers.JsonRpcProvider(
+      'https://zkevm-rpc.sandbox.x.immutable.com',
+    );
+    this.orderbookConfig.provider = fakeProvider;
 
     this.apiClient = new ImmutableApiClientFactory(
       apiEndpoint,
