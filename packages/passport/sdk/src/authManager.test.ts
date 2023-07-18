@@ -55,6 +55,7 @@ describe('AuthManager', () => {
   let signoutRedirectMock: jest.Mock;
   let getUserMock: jest.Mock;
   let signinSilentMock: jest.Mock;
+  let signoutSilentMock: jest.Mock;
 
   beforeEach(() => {
     signInMock = jest.fn();
@@ -62,10 +63,12 @@ describe('AuthManager', () => {
     signoutRedirectMock = jest.fn();
     getUserMock = jest.fn();
     signinSilentMock = jest.fn();
+    signoutSilentMock = jest.fn();
     (UserManager as jest.Mock).mockReturnValue({
       signinPopup: signInMock,
       signinPopupCallback: signinPopupCallbackMock,
       signoutRedirect: signoutRedirectMock,
+      signoutSilent: signoutSilentMock,
       getUser: getUserMock,
       signinSilent: signinSilentMock,
     });
@@ -264,16 +267,44 @@ describe('AuthManager', () => {
   });
 
   describe('logout', () => {
-    it('should call logout ', async () => {
-      await authManager.logout();
+    it('should call redirect logout if logout mode is redirect', async () => {
+      const configuration = { ...config };
+      configuration.oidcConfiguration.logoutMode = 'redirect';
+      const manager = new AuthManager(configuration);
+
+      await manager.logout();
 
       expect(signoutRedirectMock).toBeCalled();
     });
 
-    it('should throw the error if user is failed to logout', async () => {
+    it('should call redirect logout if logout mode is not set', async () => {
+      const configuration = { ...config };
+      configuration.oidcConfiguration.logoutMode = undefined;
+      const manager = new AuthManager(configuration);
+
+      await manager.logout();
+
+      expect(signoutRedirectMock).toBeCalled();
+    });
+
+    it('should call silent logout if logout mode is silent', async () => {
+      const configuration = { ...config };
+      configuration.oidcConfiguration.logoutMode = 'silent';
+      const manager = new AuthManager(configuration);
+
+      await manager.logout();
+
+      expect(signoutSilentMock).toBeCalled();
+    });
+
+    it('should throw an error if user is failed to logout', async () => {
+      const configuration = { ...config };
+      configuration.oidcConfiguration.logoutMode = 'redirect';
+      const manager = new AuthManager(configuration);
+
       signoutRedirectMock.mockRejectedValue(new Error(mockErrorMsg));
 
-      await expect(() => authManager.logout()).rejects.toThrow(
+      await expect(() => manager.logout()).rejects.toThrow(
         new PassportError(
           `${PassportErrorType.LOGOUT_ERROR}: ${mockErrorMsg}`,
           PassportErrorType.LOGOUT_ERROR,

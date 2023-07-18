@@ -112,8 +112,18 @@ export function PassportProvider({
   }, [passportClient, setIsLoading, addMessage]);
 
   const logout = useCallback(async () => {
-    setIsLoading(true);
-    passportClient?.logout();
+    try {
+      setIsLoading(true);
+      await passportClient?.logout();
+      setImxProvider(undefined);
+    } catch (err) {
+      if (err instanceof Error) {
+        addMessage(err.toString());
+      }
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   }, [passportClient, setIsLoading]);
 
   const providerValues = useMemo(() => ({
