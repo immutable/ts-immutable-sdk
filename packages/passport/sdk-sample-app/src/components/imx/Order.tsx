@@ -22,11 +22,12 @@ function Order({ show, setShow }: OrderProps) {
   const [loading, setLoading] = useState(true);
   const [sellingPrice, setSellingPrice] = useState<string>('0.01');
 
-  const { setMessage } = useStatusProvider();
-  const { imxProvider, imxWalletAddress } = usePassportProvider();
+  const { addMessage } = useStatusProvider();
+  const { imxProvider } = usePassportProvider();
   const { coreSdkClient } = useImmutableProvider();
 
   const getUserAssetsWithOrder = useCallback(async () => {
+    const imxWalletAddress = await imxProvider?.getAddress();
     const assets = await coreSdkClient.listAssets({ user: imxWalletAddress });
     const orders = await coreSdkClient.listOrders({
       user: imxWalletAddress,
@@ -38,7 +39,7 @@ function Order({ show, setShow }: OrderProps) {
         (sellOrder) => sellOrder.sell.data.token_id === asset.token_id,
       ),
     }));
-  }, [coreSdkClient, imxWalletAddress]);
+  }, [coreSdkClient, imxProvider]);
 
   useEffect(() => {
     if (show) {
@@ -87,12 +88,10 @@ function Order({ show, setShow }: OrderProps) {
       await imxProvider.cancelOrder({ order_id: id });
       setNeedReload(true);
     } catch (err) {
-      if (err instanceof Error) {
-        setMessage(err.toString());
-        handleClose();
-      }
+      addMessage('Cancel Order', err);
+      handleClose();
     }
-  }, [imxProvider, handleClose, setMessage]);
+  }, [imxProvider, handleClose, addMessage]);
 
   const createOrder = useCallback(async (asset: Asset) => {
     if (!imxProvider) {
@@ -114,12 +113,10 @@ function Order({ show, setShow }: OrderProps) {
       await imxProvider.createOrder(request);
       setNeedReload(true);
     } catch (err) {
-      if (err instanceof Error) {
-        setMessage(err.toString());
-        handleClose();
-      }
+      addMessage('Create Order', err);
+      handleClose();
     }
-  }, [imxProvider, sellingPrice, setMessage, handleClose]);
+  }, [imxProvider, sellingPrice, addMessage, handleClose]);
 
   const getOrderList = (assets: AssetWithSellOrder[]) => {
     if (loading) {

@@ -1,4 +1,5 @@
 import { IMXProvider } from '@imtbl/provider';
+import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ImmutableXClient } from '@imtbl/immutablex-client';
 import AuthManager from './authManager';
 import MagicAdapter from './magicAdapter';
@@ -11,6 +12,8 @@ import {
   DeviceTokenResponse,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
+import { ZkEvmProvider } from './zkEvm';
+import { Provider } from './zkEvm/types';
 
 export class Passport {
   private readonly authManager: AuthManager;
@@ -25,6 +28,8 @@ export class Passport {
 
   private readonly passportImxProviderFactory: PassportImxProviderFactory;
 
+  private readonly multiRollupApiClients: MultiRollupApiClients;
+
   constructor(passportModuleConfiguration: PassportModuleConfiguration) {
     this.config = new PassportConfiguration(passportModuleConfiguration);
     this.authManager = new AuthManager(this.config);
@@ -34,6 +39,7 @@ export class Passport {
       || new ImmutableXClient({
         baseConfig: passportModuleConfiguration.baseConfig,
       });
+    this.multiRollupApiClients = new MultiRollupApiClients(this.config.multiRollupConfig);
     this.passportImxProviderFactory = new PassportImxProviderFactory({
       authManager: this.authManager,
       config: this.config,
@@ -72,6 +78,17 @@ export class Passport {
 
   public async connectImxWithCredentials(tokenResponse: DeviceTokenResponse): Promise<IMXProvider | null> {
     return this.passportImxProviderFactory.getProviderWithCredentials(tokenResponse);
+  }
+
+  // TODO ID-926 Make method public once development has been finalised
+  protected connectEvm(): Provider {
+    return new ZkEvmProvider({
+      authManager: this.authManager,
+      magicAdapter: this.magicAdapter,
+      config: this.config,
+      confirmationScreen: this.confirmationScreen,
+      multiRollupApiClients: this.multiRollupApiClients,
+    });
   }
 
   public async loginCallback(): Promise<void> {
