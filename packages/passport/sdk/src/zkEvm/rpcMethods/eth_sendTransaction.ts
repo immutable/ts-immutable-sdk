@@ -23,9 +23,6 @@ export const ethSendTransaction = async ({
   if (!transactionRequest.to) {
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
   }
-  if (!transactionRequest.data) {
-    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "data" field');
-  }
 
   const chainId = chainIdNumber(config.zkEvmChainId);
   const magicWeb3Provider = new Web3Provider(magicProvider);
