@@ -418,8 +418,9 @@ export class TokenBridge {
     const exitEventId: string = l2StateSyncEvent.args.id.toString();
     // eslint-disable-next-line no-console
     console.log(`exit event id is ${exitEventId}`);
-
-    const exitProof = await (this.config.childProvider as ethers.providers.JsonRpcProvider).send('bridge_generateExitProof', [exitEventId]);
+    // eslint-disable-next-line no-console
+    console.log(`exit event hex string: ${l2StateSyncEvent.args.id.toHexString()}`);
+    const exitProof = await (this.config.childProvider as ethers.providers.JsonRpcProvider).send('bridge_generateExitProof', [l2StateSyncEvent.args.id.toHexString()]);
     // eslint-disable-next-line no-console
     console.log(exitProof);
 
