@@ -10,7 +10,6 @@ const PassportContext = createContext<{
   connectImx:() => void;
   connectImxSilent: () => void;
   logout: () => void;
-  logoutSilent: () => void;
   idToken?: string;
   accessToken?: string;
   imxWalletAddress?: string;
@@ -20,7 +19,6 @@ const PassportContext = createContext<{
       connectImx: () => undefined,
       connectImxSilent: () => undefined,
       logout: () => undefined,
-      logoutSilent: () => undefined,
     });
 
 export function PassportProvider({
@@ -69,13 +67,9 @@ export function PassportProvider({
   }, [passportClient, setIsLoading, setMessage]);
 
   const logout = useCallback(async () => {
-    passportClient?.logout();
-  }, [passportClient]);
-
-  const logoutSilent = useCallback(async () => {
     try {
       setIsLoading(true);
-      await passportClient?.logoutSilent();
+      await passportClient?.logout();
       setImxProvider(undefined);
     } catch (err) {
       if (err instanceof Error) {
@@ -110,7 +104,6 @@ export function PassportProvider({
     connectImx,
     connectImxSilent,
     logout,
-    logoutSilent,
     idToken,
     accessToken,
     imxWalletAddress,
@@ -120,7 +113,6 @@ export function PassportProvider({
     connectImx,
     connectImxSilent,
     logout,
-    logoutSilent,
     idToken,
     accessToken,
     imxWalletAddress,
@@ -140,7 +132,6 @@ export function usePassportProvider() {
     connectImx,
     connectImxSilent,
     logout,
-    logoutSilent,
     idToken,
     accessToken,
     imxWalletAddress,
@@ -151,7 +142,6 @@ export function usePassportProvider() {
     connectImx,
     connectImxSilent,
     logout,
-    logoutSilent,
     idToken,
     accessToken,
     imxWalletAddress,

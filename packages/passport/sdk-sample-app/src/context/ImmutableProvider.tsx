@@ -13,6 +13,8 @@ import {
 import {
   audience,
   logoutRedirectUri,
+  silentLogoutRedirectUri,
+  logoutMode,
   redirectUri,
   scope,
 } from '@/config';
@@ -47,7 +49,9 @@ const getPassportConfig = (environment: EnvironmentNames): PassportModuleConfigu
     audience,
     redirectUri,
     logoutRedirectUri,
+    logoutMode,
   };
+  sharedConfigurationValues.logoutRedirectUri = logoutMode === 'silent' ? silentLogoutRedirectUri : logoutRedirectUri;
 
   switch (environment) {
     case EnvironmentNames.PRODUCTION: {

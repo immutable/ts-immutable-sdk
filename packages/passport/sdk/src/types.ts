@@ -40,6 +40,7 @@ export enum Networks {
 export interface OidcConfiguration {
   clientId: string;
   logoutRedirectUri: string;
+  logoutMode?: 'redirect' | 'silent';
   redirectUri: string;
   scope?: string;
   audience?: string;

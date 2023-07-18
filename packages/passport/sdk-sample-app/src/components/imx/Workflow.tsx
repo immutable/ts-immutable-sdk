@@ -20,7 +20,7 @@ function Workflow() {
 
   const { isLoading } = useStatusProvider();
   const {
-    imxProvider, connectImx, connectImxSilent, logout, logoutSilent,
+    imxProvider, connectImx, connectImxSilent, logout,
   } = usePassportProvider();
 
   useEffect(() => {
@@ -66,7 +66,6 @@ function Workflow() {
             && (
             <Stack direction="horizontal" gap={3}>
               <Button onClick={logout}>Logout</Button>
-              <Button onClick={logoutSilent}>Logout Silent</Button>
               <Button onClick={handleTrade}>Buy</Button>
                 {showTrade
                   && (
