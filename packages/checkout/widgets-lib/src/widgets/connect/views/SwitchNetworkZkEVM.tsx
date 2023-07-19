@@ -10,6 +10,7 @@ import { ConnectActions, ConnectContext } from '../context/ConnectContext';
 import {
   ViewContext,
   ViewActions,
+  SharedViews,
 } from '../../../context/view-context/ViewContext';
 import { getL2ChainId } from '../../../lib';
 
@@ -17,7 +18,7 @@ export function SwitchNetworkZkEVM() {
   const { viewDispatch } = useContext(ViewContext);
   const { connectDispatch, connectState } = useContext(ConnectContext);
   const { checkout, provider, sendCloseEvent } = connectState;
-  const { heading, body, button } = text.views[ConnectWidgetViews.SWITCH_NETWORK].zkEVM;
+  const { heading, body, button } = text.views[SharedViews.SWITCH_NETWORK].zkEVM;
 
   const [buttonText, setButtonText] = useState(button.text);
 

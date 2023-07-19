@@ -9,12 +9,14 @@ export enum SharedViews {
   LOADING_VIEW = 'LOADING_VIEW',
   ERROR_VIEW = 'ERROR_VIEW',
   TOP_UP_VIEW = 'TOP_UP_VIEW',
+  SWITCH_NETWORK = 'SWITCH_NETWORK',
 }
 
 export type SharedView =
 LoadingView
 | ErrorView
-| TopUpView;
+| TopUpView
+| SwitchNetworkView;
 
 interface LoadingView extends ViewType {
   type: SharedViews.LOADING_VIEW
@@ -29,6 +31,10 @@ interface TopUpView extends ViewType {
   type: SharedViews.TOP_UP_VIEW,
   swapData?: PrefilledSwapForm,
   bridgeData?: PrefilledBridgeForm,
+}
+
+interface SwitchNetworkView extends ViewType {
+  type: SharedViews.SWITCH_NETWORK
 }
 
 export type View =

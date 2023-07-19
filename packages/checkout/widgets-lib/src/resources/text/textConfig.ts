@@ -27,7 +27,7 @@ export const text = {
         buttonText2: 'Try again',
       },
     },
-    [ConnectWidgetViews.SWITCH_NETWORK]: {
+    [SharedViews.SWITCH_NETWORK]: {
       eth: {
         heading:
           "To move your coins, you'll need to switch to the Sepolia network",

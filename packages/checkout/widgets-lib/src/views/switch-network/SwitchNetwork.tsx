@@ -5,24 +5,24 @@ import { SimpleTextBody } from '../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../components/SimpleLayout/SimpleLayout';
-import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../resources/text/textConfig';
+import { SharedViews } from '../../context/view-context/ViewContext';
 
 export interface SwitchNetworkProps {
   heroContent: ReactNode;
   switchNetwork: () => void;
   onClose: () => void;
-  zkNetwork: boolean;
+  switchToZkEVM: boolean;
 }
 
 export function SwitchNetwork(props: SwitchNetworkProps) {
   const {
-    heroContent, switchNetwork, onClose, zkNetwork,
+    heroContent, switchNetwork, onClose, switchToZkEVM,
   } = props;
 
-  const { eth, zkEVM } = text.views[ConnectWidgetViews.SWITCH_NETWORK];
+  const { eth, zkEVM } = text.views[SharedViews.SWITCH_NETWORK];
 
-  const textContent = zkNetwork ? zkEVM : eth;
+  const textContent = switchToZkEVM ? zkEVM : eth;
 
   const [buttonText, setButtonText] = useState(textContent.button.text);
 

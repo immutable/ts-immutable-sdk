@@ -158,12 +158,12 @@ export function ConnectWidget(props: ConnectWidgetProps) {
             {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
               <ReadyToConnect targetChainId={targetChainId} />
             )}
-            {view.type === ConnectWidgetViews.SWITCH_NETWORK && (
+            {view.type === SharedViews.SWITCH_NETWORK && (
               <SwitchNetwork
                 heroContent={<ImmutableNetworkHero />}
                 switchNetwork={switchNetwork}
                 onClose={sendCloseEvent}
-                zkNetwork
+                switchToZkEVM
               />
             )}
             {view.type === ConnectWidgetViews.SUCCESS && provider && (
