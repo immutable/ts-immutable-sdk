@@ -3,10 +3,10 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { Checkout } from '@imtbl/checkout-sdk';
-import { useEffect, useReducer } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
-  sendCloseWidgetEvent,
+  sendConnectWidgetCloseEvent,
   sendConnectFailedEvent,
   sendConnectSuccessEvent,
 } from './ConnectWidgetEvents';
@@ -19,7 +19,6 @@ import {
 import { ConnectWidgetView, ConnectWidgetViews } from '../../context/view-context/ConnectViewContextTypes';
 import { ConnectWallet } from './views/ConnectWallet';
 import { ReadyToConnect } from './views/ReadyToConnect';
-import { SwitchNetworkZkEVM } from './views/SwitchNetworkZkEVM';
 import { LoadingView } from '../../views/loading/LoadingView';
 import { ConnectLoaderSuccess } from '../../components/ConnectLoader/ConnectLoaderSuccess';
 import {
@@ -33,12 +32,13 @@ import { StatusType } from '../../components/Status/StatusType';
 import { StatusView } from '../../components/Status/StatusView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
-  ConnectTargetLayer, getTargetLayerChainId, WidgetTheme,
+  ConnectTargetLayer, getL2ChainId, getTargetLayerChainId, WidgetTheme,
 } from '../../lib';
-import { SwitchNetworkEth } from './views/SwitchNetworkEth';
 import { ErrorView } from '../../views/error/ErrorView';
 import { text } from '../../resources/text/textConfig';
 import { useProviderEventSubscriptions } from '../../lib/hooks/useProviderEventSubscriptions';
+import { SwitchNetwork } from '../../views/switch-network/SwitchNetwork';
+import { ImmutableNetworkHero } from '../../components/Hero/ImmutableNetworkHero';
 
 export interface ConnectWidgetProps {
   params?: ConnectWidgetParams;
@@ -68,7 +68,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
     ? onLightBase
     : onDarkBase;
 
-  const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
+  // const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2; // TODO: Refactor this out
 
   const checkout = new Checkout({ baseConfig: { environment } });
   const targetChainId = getTargetLayerChainId(checkout.config, targetLayer ?? ConnectTargetLayer.LAYER2);
@@ -98,7 +98,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
       connectDispatch({
         payload: {
           type: ConnectActions.SET_SEND_CLOSE_EVENT,
-          sendCloseEvent: sendCloseEventOverride ?? sendCloseWidgetEvent,
+          sendCloseEvent: sendCloseEventOverride ?? sendConnectWidgetCloseEvent,
         },
       });
       viewDispatch({
@@ -117,6 +117,31 @@ export function ConnectWidget(props: ConnectWidgetProps) {
     sendConnectFailedEvent(viewState.view.error.message);
   }, [viewState]);
 
+  const switchNetwork = useCallback(async () => {
+    if (!provider) return;
+
+    // No try catch around these calls as errors are caught in the SwitchNetwork view
+    const switchRes = await checkout.switchNetwork({
+      provider,
+      chainId: getL2ChainId(checkout.config),
+    });
+    connectDispatch({
+      payload: {
+        type: ConnectActions.SET_PROVIDER,
+        provider: switchRes.provider,
+      },
+    });
+
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: ConnectWidgetViews.SUCCESS,
+        },
+      },
+    });
+  }, [provider, connectDispatch, viewDispatch]);
+
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
       {/* TODO: The object passed as the value prop to the Context provider changes every render.
@@ -133,11 +158,13 @@ export function ConnectWidget(props: ConnectWidgetProps) {
             {view.type === ConnectWidgetViews.READY_TO_CONNECT && (
               <ReadyToConnect targetChainId={targetChainId} />
             )}
-            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER2 && (
-              <SwitchNetworkZkEVM />
-            )}
-            {view.type === ConnectWidgetViews.SWITCH_NETWORK && networkToSwitchTo === ConnectTargetLayer.LAYER1 && (
-              <SwitchNetworkEth />
+            {view.type === ConnectWidgetViews.SWITCH_NETWORK && (
+              <SwitchNetwork
+                heroContent={<ImmutableNetworkHero />}
+                switchNetwork={switchNetwork}
+                onClose={sendCloseEvent}
+                zkNetwork
+              />
             )}
             {view.type === ConnectWidgetViews.SUCCESS && provider && (
               <ConnectLoaderSuccess>

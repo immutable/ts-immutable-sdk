@@ -30,7 +30,7 @@ export function sendConnectSuccessEvent(
   if (window !== undefined) window.dispatchEvent(successEvent);
 }
 
-export function sendCloseWidgetEvent() {
+export function sendConnectWidgetCloseEvent() {
   const closeWidgetEvent = new CustomEvent<WidgetEvent<any>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
     {
