@@ -119,6 +119,44 @@ describe('SwapWidget tests', () => {
       cySmartGet('not-enough-gas-cancel-button').should('be.visible');
       cySmartGet('not-enough-gas-add-imx-button').should('be.visible');
       cySmartGet('not-enough-gas-adjust-amount-button').should('not.exist');
+
+      cySmartGet('not-enough-gas-cancel-button').click();
+      cySmartGet('not-enough-gas-add-imx-button').should('not.exist');
+    });
+
+    it('should show top up view when add imx coins pressed', () => {
+      cy.stub(Checkout.prototype, 'getAllBalances')
+        .as('getAllBalancesStub')
+        .resolves({
+          balances: [
+            {
+              balance: BigNumber.from('0'),
+              formattedBalance: '0',
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '',
+              },
+            },
+          ],
+        });
+
+      mount(
+        <SwapWidget
+          params={params}
+          config={config}
+          web3Provider={mockProvider}
+        />,
+      );
+
+      cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
+      cySmartGet('not-enough-gas-cancel-button').should('be.visible');
+      cySmartGet('not-enough-gas-add-imx-button').should('be.visible');
+      cySmartGet('not-enough-gas-adjust-amount-button').should('not.exist');
+
+      cySmartGet('not-enough-gas-add-imx-button').click();
+      cySmartGet('top-up-view').should('be.visible');
     });
 
     it('should load swap form if user has enough for gas', () => {

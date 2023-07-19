@@ -7,7 +7,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
-  useEffect, useCallback, useReducer, useMemo, useState,
+  useEffect, useCallback, useReducer, useMemo,
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeOverrides } from '@imtbl/dex-sdk';
@@ -43,8 +43,6 @@ import {
 import { SwapInProgress } from './views/SwapInProgress';
 import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
 import { TopUpView } from '../../views/top-up/TopUpView';
-import { NotEnoughImx } from '../../components/NotEnoughImx/NotEnoughImx';
-import { hasZeroBalance } from '../../lib/gasBalanceCheck';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -72,7 +70,6 @@ export function SwapWidget(props: SwapWidgetProps) {
     () => ({ swapState, swapDispatch }),
     [swapState, swapDispatch],
   );
-  const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
 
   const { params, config, web3Provider } = props;
   const {
@@ -190,11 +187,6 @@ export function SwapWidget(props: SwapWidgetProps) {
         },
       });
 
-      if (hasZeroBalance(allowedTokenBalances, 'IMX')) {
-        setShowNotEnoughImxDrawer(true);
-        return;
-      }
-
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
@@ -213,34 +205,7 @@ export function SwapWidget(props: SwapWidgetProps) {
       <ViewContext.Provider value={viewReducerValues}>
         <SwapContext.Provider value={swapReducerValues}>
           {viewState.view.type === SharedViews.LOADING_VIEW && (
-            <LoadingView loadingText={loadingText}>
-              {showNotEnoughImxDrawer && (
-              <NotEnoughImx
-                visible={showNotEnoughImxDrawer}
-                showAdjustAmount={false}
-                hasZeroImx
-                onAddCoinsClick={() => {
-                  viewDispatch({
-                    payload: {
-                      type: ViewActions.UPDATE_VIEW,
-                      view: {
-                        type: SharedViews.TOP_UP_VIEW,
-                      },
-                    },
-                  });
-                }}
-                onCloseBottomSheet={() => {
-                  setShowNotEnoughImxDrawer(false);
-                  viewDispatch({
-                    payload: {
-                      type: ViewActions.UPDATE_VIEW,
-                      view: { type: SwapWidgetViews.SWAP },
-                    },
-                  });
-                }}
-              />
-              )}
-            </LoadingView>
+            <LoadingView loadingText={loadingText} />
           )}
           {viewState.view.type === SwapWidgetViews.SWAP && (
             <CryptoFiatProvider environment={environment}>
