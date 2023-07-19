@@ -3,7 +3,7 @@ import { ZkEvmProviderInput, ZkEvmProvider } from './zkEvmProvider';
 import { registerZkEvmUser } from './userRegistration';
 
 jest.mock('@ethersproject/providers');
-jest.mock('./relayerAdapter');
+jest.mock('./relayerClient');
 jest.mock('./userRegistration');
 
 describe('ZkEvmProvider', () => {
