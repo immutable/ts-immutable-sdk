@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useEffect,
+  useCallback,
   useState,
 } from 'react';
 import { Stack } from 'react-bootstrap';
