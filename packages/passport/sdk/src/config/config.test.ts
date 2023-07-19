@@ -24,7 +24,13 @@ describe('Config', () => {
     magicPublishableApiKey: 'publishableKey123',
     network: Networks.SANDBOX,
     passportDomain: 'customDomain123',
+    zkEvmRpcUrl: 'rpcUrl123',
+    zkEvmChainId: '123',
+    relayerUrl: 'relayerUrl123',
     immutableXClient: {} as ImmutableXClient,
+    indexerMrBasePath: 'indexerMrBasePath123',
+    orderBookMrBasePath: 'orderBookMrBasePath123',
+    passportMrBasePath: 'passportMrBasePath123',
   };
 
   describe('when the baseConfig environment is SANDBOX', () => {

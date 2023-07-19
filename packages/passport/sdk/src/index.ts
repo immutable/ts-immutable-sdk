@@ -1,5 +1,17 @@
 export { PassportError } from './errors/passportError';
 export { Passport } from './Passport';
 export {
-  UserProfile, Networks, PassportOverrides, PassportModuleConfiguration, DeviceConnectResponse, DeviceTokenResponse,
+  RequestArguments,
+  JsonRpcRequestPayload,
+  JsonRpcResponsePayload,
+  JsonRpcRequestCallback,
+  Provider,
+} from './zkEvm/types';
+export {
+  UserProfile,
+  Networks,
+  PassportOverrides,
+  PassportModuleConfiguration,
+  DeviceConnectResponse,
+  DeviceTokenResponse,
 } from './types';

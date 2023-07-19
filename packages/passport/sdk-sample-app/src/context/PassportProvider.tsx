@@ -1,111 +1,141 @@
 import React, {
-  createContext, useCallback, useContext, useEffect, useMemo, useState,
+  createContext, useCallback, useContext, useMemo, useState,
 } from 'react';
-import { IMXProvider } from '@imtbl/sdk';
+import { IMXProvider, UserProfile } from '@imtbl/sdk';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
+import { Provider } from '@imtbl/passport';
 
 const PassportContext = createContext<{
   imxProvider: IMXProvider | undefined;
+  zkEvmProvider: Provider | undefined;
   connectImx:() => void;
   connectImxSilent: () => void;
+  connectZkEvm: () => void;
   logout: () => void;
-  idToken?: string;
-  accessToken?: string;
-  imxWalletAddress?: string;
-  userInfo?: object;
+  getIdToken: () => Promise<string | undefined>;
+  getAccessToken: () => Promise<string | undefined>;
+  getUserInfo: () => Promise<UserProfile | undefined>;
 }>({
       imxProvider: undefined,
+      zkEvmProvider: undefined,
       connectImx: () => undefined,
       connectImxSilent: () => undefined,
+      connectZkEvm: () => undefined,
       logout: () => undefined,
+      getIdToken: () => Promise.resolve(undefined),
+      getAccessToken: () => Promise.resolve(undefined),
+      getUserInfo: () => Promise.resolve(undefined),
     });
 
 export function PassportProvider({
   children,
 }: { children: JSX.Element | JSX.Element[] }) {
   const [imxProvider, setImxProvider] = useState<IMXProvider | undefined>();
-  const [idToken, setIdToken] = useState<string>();
-  const [accessToken, setAccessToken] = useState<string>();
-  const [imxWalletAddress, setImxWalletAddress] = useState<string>();
-  const [userInfo, setUserInfo] = useState<object>();
+  const [zkEvmProvider, setZkEvmProvider] = useState<Provider | undefined>();
 
-  const { setMessage, setIsLoading } = useStatusProvider();
+  const { addMessage, setIsLoading } = useStatusProvider();
   const { passportClient } = useImmutableProvider();
 
   const connectImx = useCallback(async () => {
     try {
-      setMessage('');
       setIsLoading(true);
-      setImxProvider(await passportClient?.connectImx());
-      setMessage('Passport connected');
-    } catch (err) {
-      if (err instanceof Error) {
-        setMessage(err.toString());
+      const provider = await passportClient?.connectImx();
+      if (provider) {
+        setImxProvider(provider);
+        addMessage('ConnectImx', 'Connected');
+      } else {
+        addMessage('ConnectImx', 'Failed to connect');
       }
+    } catch (err) {
+      addMessage('ConnectImx', err);
     } finally {
       setIsLoading(false);
     }
-  }, [passportClient, setIsLoading, setMessage]);
+  }, [passportClient, setIsLoading, addMessage]);
 
   const connectImxSilent = useCallback(async () => {
     try {
-      setMessage('');
       setIsLoading(true);
       const provider = await passportClient?.connectImxSilent();
       if (provider) {
         setImxProvider(provider);
-        setMessage('Passport connected');
+        addMessage('ConnectImxSilent', 'Connected');
+      } else {
+        addMessage('ConnectImxSilent', 'Failed to connect. Ensure you have logged in before.');
       }
     } catch (err) {
-      if (err instanceof Error) {
-        setMessage(err.toString());
-      }
+      addMessage('ConnectImxSilent', err);
     } finally {
       setIsLoading(false);
     }
-  }, [passportClient, setIsLoading, setMessage]);
+  }, [passportClient, setIsLoading, addMessage]);
+
+  const connectZkEvm = useCallback(async () => {
+    setIsLoading(true);
+    // @ts-ignore TODO ID-926 Remove once method is public
+    const provider = passportClient?.connectEvm();
+    if (provider) {
+      setZkEvmProvider(provider);
+      addMessage('ConnectZkEvm', 'Connected');
+    } else {
+      addMessage('ConnectZkEvm', 'Failed to connect');
+    }
+    setIsLoading(false);
+  }, [passportClient, setIsLoading, addMessage]);
+
+  const getIdToken = useCallback(async () => {
+    setIsLoading(true);
+    const idToken = await passportClient?.getIdToken();
+    addMessage('Get ID token', idToken);
+    setIsLoading(false);
+
+    return idToken;
+  }, [passportClient, setIsLoading, addMessage]);
+
+  const getAccessToken = useCallback(async () => {
+    setIsLoading(true);
+    const accessToken = await passportClient?.getAccessToken();
+    addMessage('Get Access token', accessToken);
+    setIsLoading(false);
+
+    return accessToken;
+  }, [passportClient, setIsLoading, addMessage]);
+
+  const getUserInfo = useCallback(async () => {
+    setIsLoading(true);
+    const userInfo = await passportClient?.getUserInfo();
+    addMessage('Get User Info', userInfo);
+    setIsLoading(false);
+
+    return userInfo;
+  }, [passportClient, setIsLoading, addMessage]);
 
   const logout = useCallback(async () => {
+    setIsLoading(true);
     passportClient?.logout();
-  }, [passportClient]);
-
-  useEffect(() => {
-    const populatePassportClientProperties = async () => {
-      setIdToken(await passportClient?.getIdToken());
-      setAccessToken(await passportClient?.getAccessToken());
-      setUserInfo(await passportClient?.getUserInfo());
-    };
-
-    populatePassportClientProperties().catch(console.error);
-  }, [passportClient, imxProvider]);
-
-  useEffect(() => {
-    const populateImxProviderProperties = async () => {
-      setImxWalletAddress(await imxProvider?.getAddress());
-    };
-
-    populateImxProviderProperties().catch(console.error);
-  }, [imxProvider]);
+  }, [passportClient, setIsLoading]);
 
   const providerValues = useMemo(() => ({
     imxProvider,
+    zkEvmProvider,
     connectImx,
     connectImxSilent,
+    connectZkEvm,
     logout,
-    idToken,
-    accessToken,
-    imxWalletAddress,
-    userInfo,
+    getIdToken,
+    getAccessToken,
+    getUserInfo,
   }), [
     imxProvider,
+    zkEvmProvider,
     connectImx,
     connectImxSilent,
+    connectZkEvm,
     logout,
-    idToken,
-    accessToken,
-    imxWalletAddress,
-    userInfo,
+    getIdToken,
+    getAccessToken,
+    getUserInfo,
   ]);
 
   return (
@@ -118,22 +148,24 @@ export function PassportProvider({
 export function usePassportProvider() {
   const {
     imxProvider,
+    zkEvmProvider,
     connectImx,
     connectImxSilent,
+    connectZkEvm,
     logout,
-    idToken,
-    accessToken,
-    imxWalletAddress,
-    userInfo,
+    getIdToken,
+    getAccessToken,
+    getUserInfo,
   } = useContext(PassportContext);
   return {
     imxProvider,
+    zkEvmProvider,
     connectImx,
     connectImxSilent,
+    connectZkEvm,
     logout,
-    idToken,
-    accessToken,
-    imxWalletAddress,
-    userInfo,
+    getIdToken,
+    getAccessToken,
+    getUserInfo,
   };
 }
