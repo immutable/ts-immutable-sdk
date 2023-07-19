@@ -13,7 +13,7 @@ import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
 import { UserZkEvm } from '../types';
-import { RelayerAdapter } from './relayerAdapter';
+import { RelayerClient } from './relayerClient';
 import { EthMethodWithAuthParams } from './rpcMethods/types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { registerZkEvmUser } from './userRegistration';
@@ -40,7 +40,7 @@ export class ZkEvmProvider implements Provider {
 
   private readonly magicAdapter: MagicAdapter;
 
-  private readonly relayerAdapter: RelayerAdapter;
+  private readonly relayerClient: RelayerClient;
 
   private readonly multiRollupApiClients: MultiRollupApiClients;
 
@@ -61,7 +61,7 @@ export class ZkEvmProvider implements Provider {
     this.magicAdapter = magicAdapter;
     this.config = config;
     this.confirmationScreen = confirmationScreen;
-    this.relayerAdapter = new RelayerAdapter({ config });
+    this.relayerClient = new RelayerClient({ config });
     this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
     this.multiRollupApiClients = multiRollupApiClients;
   }
@@ -81,8 +81,7 @@ export class ZkEvmProvider implements Provider {
         magicProvider: this.magicProvider,
         jsonRpcProvider: this.jsonRpcProvider,
         config: this.config,
-        confirmationScreen: this.confirmationScreen,
-        relayerAdapter: this.relayerAdapter,
+        relayerClient: this.relayerClient,
         user: this.user,
       });
     };
