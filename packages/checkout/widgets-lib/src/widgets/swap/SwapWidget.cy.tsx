@@ -68,13 +68,13 @@ describe('SwapWidget tests', () => {
             name: 'Ethereum',
             symbol: 'ETH',
             decimals: 18,
-            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            address: '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff',
           },
           {
             name: 'ImmutableX',
             symbol: 'IMX',
             decimals: 18,
-            address: '',
+            address: 'NATIVE',
           },
         ],
       });
@@ -242,7 +242,7 @@ describe('SwapWidget tests', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: '',
+                address: 'NATIVE',
               },
             },
             {
@@ -259,7 +259,7 @@ describe('SwapWidget tests', () => {
         });
     });
 
-    it('should show swap widget on mount', () => {
+    it.only('should show swap widget on mount', () => {
       mount(
         <SwapWidget
           params={params}

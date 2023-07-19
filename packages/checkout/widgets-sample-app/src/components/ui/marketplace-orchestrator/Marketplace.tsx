@@ -16,7 +16,8 @@ export const Marketplace = () => {
     const widgetsConfig: CheckoutWidgetsConfig = {
       theme: WidgetTheme.DARK,
       environment: Environment.SANDBOX,
-      isOnRampEnabled: true,
+      // TODO https://immutable.atlassian.net/browse/WT-1509
+      // isOnRampEnabled: true,
       isBridgeEnabled: true,
       isSwapEnabled: true
     };
