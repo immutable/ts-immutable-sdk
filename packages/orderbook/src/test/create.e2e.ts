@@ -13,14 +13,15 @@ describe('prepareListing and createOrder e2e', () => {
     const provider = getLocalhostProvider();
     const offerer = getOffererWallet(provider);
 
+    const localConfigOverrides = getLocalConfigFromEnv();
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
       },
       overrides: {
-        chainName: 'imtbl-zkevm-local',
+        ...localConfigOverrides,
       },
-    }, getLocalConfigFromEnv());
+    });
 
     const { contract } = await deployTestToken(offerer);
     await contract.safeMint(offerer.address);
