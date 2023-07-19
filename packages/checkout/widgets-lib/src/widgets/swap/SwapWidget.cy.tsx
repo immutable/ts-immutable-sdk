@@ -232,7 +232,7 @@ describe('SwapWidget tests', () => {
                 name: 'Ethereum',
                 symbol: 'ETH',
                 decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                address: '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff',
               },
             },
             {
@@ -259,7 +259,7 @@ describe('SwapWidget tests', () => {
         });
     });
 
-    it.only('should show swap widget on mount', () => {
+    it('should show swap widget on mount', () => {
       mount(
         <SwapWidget
           params={params}
@@ -287,7 +287,7 @@ describe('SwapWidget tests', () => {
       cySmartGet('fromTokenInputs-select-form-select__target').click();
       cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .should('exist');
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx')
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-native')
         .should('exist');
       cySmartGet('fromTokenInputs-select-form-USDC-USDCoin').should('not.exist');
     });
@@ -384,7 +384,7 @@ describe('SwapWidget tests', () => {
 
           cySmartGet('toTokenInputs-select-form-select__target').click();
           // eslint-disable-next-line max-len
-          cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+          cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
           cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
           cySmartGet('fromTokenInputs-text-form-text__input').blur();
@@ -422,7 +422,7 @@ describe('SwapWidget tests', () => {
 
           cySmartGet('toTokenInputs-select-form-select__target').click();
           // eslint-disable-next-line max-len
-          cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+          cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
           cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
           cySmartGet('fromTokenInputs-text-form-text__input').blur();
@@ -473,7 +473,7 @@ describe('SwapWidget tests', () => {
 
           cySmartGet('toTokenInputs-select-form-select__target').click();
           // eslint-disable-next-line max-len
-          cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+          cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
           cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
           cySmartGet('fromTokenInputs-text-form-text__input').blur();
@@ -554,7 +554,7 @@ describe('SwapWidget tests', () => {
 
           cySmartGet('toTokenInputs-select-form-select__target').click();
           // eslint-disable-next-line max-len
-          cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+          cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-native').click();
 
           cySmartGet('fromTokenInputs-text-form-text__input').type('0.1');
           cySmartGet('fromTokenInputs-text-form-text__input').blur();
