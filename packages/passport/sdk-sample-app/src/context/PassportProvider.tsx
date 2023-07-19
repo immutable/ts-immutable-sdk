@@ -116,6 +116,7 @@ export function PassportProvider({
       setIsLoading(true);
       await passportClient?.logout();
       setImxProvider(undefined);
+      setZkEvmProvider(undefined);
     } catch (err) {
       if (err instanceof Error) {
         addMessage(err.toString());
