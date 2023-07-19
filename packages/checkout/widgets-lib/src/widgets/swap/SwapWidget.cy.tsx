@@ -89,7 +89,7 @@ describe('SwapWidget tests', () => {
   };
 
   describe('SwapWidget Gas Balance Checks', () => {
-    it('should show not enough imx drawer with only add imx option when user has no imx balance on load', () => {
+    it('should show not enough imx drawer when user has no imx balance on load', () => {
       cy.stub(Checkout.prototype, 'getAllBalances')
         .as('getAllBalancesStub')
         .resolves({
@@ -117,7 +117,7 @@ describe('SwapWidget tests', () => {
 
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
       cySmartGet('not-enough-gas-cancel-button').should('be.visible');
-      cySmartGet('not-enough-gas-add-imx-button').should('not.exist');
+      cySmartGet('not-enough-gas-add-imx-button').should('be.visible');
       cySmartGet('not-enough-gas-adjust-amount-button').should('not.exist');
     });
 
