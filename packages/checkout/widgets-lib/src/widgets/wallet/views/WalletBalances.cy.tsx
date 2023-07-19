@@ -1,5 +1,5 @@
 import {
-  Checkout, WalletProviderName, TokenInfo, ChainId, ChainName,
+  Checkout, WalletProviderName, TokenInfo, ChainId, ChainName, GasEstimateType,
 } from '@imtbl/checkout-sdk';
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
@@ -7,10 +7,12 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { WalletBalances } from './WalletBalances';
 import { WalletContext, WalletState } from '../context/WalletContext';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { WalletWidgetTestComponent } from '../test-components/WalletWidgetTestComponent';
+import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 
 describe('WalletBalances', () => {
   beforeEach(() => {
@@ -97,6 +99,157 @@ describe('WalletBalances', () => {
       );
 
       cySmartGet('no-tokens-found').should('exist');
+    });
+  });
+
+  describe('move coins gas check', () => {
+    it('should show not enough gas drawer when trying to bridge to L2 with 0 eth balance', () => {
+      const walletState: WalletState = {
+        checkout,
+        network: {
+          chainId: ChainId.SEPOLIA,
+          name: 'Sepolia',
+          nativeCurrency: {} as unknown as TokenInfo,
+          isSupported: true,
+        },
+        provider,
+        walletProvider: WalletProviderName.METAMASK,
+        tokenBalances: [
+          {
+            id: 'eth',
+            balance: '0.0',
+            symbol: 'ETH',
+            fiatAmount: '0',
+          },
+        ],
+        supportedTopUps: {
+          isBridgeEnabled: true,
+        },
+      };
+      mount(
+        <BiomeCombinedProviders>
+          <WalletContext.Provider
+            value={{ walletState, walletDispatch: () => {} }}
+          >
+            <WalletBalances />
+          </WalletContext.Provider>
+        </BiomeCombinedProviders>,
+      );
+      cySmartGet('token-menu').click();
+      cySmartGet('balance-item-move-option').click();
+      cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
+      cySmartGet('not-enough-gas-copy-address-button').should('be.visible');
+      cySmartGet('not-enough-gas-cancel-button').should('be.visible');
+      cySmartGet('not-enough-gas-cancel-button').click();
+      cySmartGet('not-enough-gas-bottom-sheet').should('not.exist');
+    });
+
+    it('should show not enough gas drawer when trying to bridge to L2 with eth balance less than gas', () => {
+      cy.stub(Checkout.prototype, 'gasEstimate')
+        .as('gasEstimateStub')
+        .resolves({
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          gasFee: {
+            estimatedAmount: BigNumber.from('10000000000000000'),
+          },
+        });
+
+      const walletState: WalletState = {
+        checkout,
+        network: {
+          chainId: ChainId.SEPOLIA,
+          name: 'Sepolia',
+          nativeCurrency: {} as unknown as TokenInfo,
+          isSupported: true,
+        },
+        provider,
+        walletProvider: WalletProviderName.METAMASK,
+        tokenBalances: [
+          {
+            id: 'eth',
+            balance: '0.001',
+            symbol: 'ETH',
+            fiatAmount: '0',
+          },
+        ],
+        supportedTopUps: {
+          isBridgeEnabled: true,
+        },
+      };
+      mount(
+        <BiomeCombinedProviders>
+          <WalletContext.Provider
+            value={{ walletState, walletDispatch: () => {} }}
+          >
+            <WalletBalances />
+          </WalletContext.Provider>
+        </BiomeCombinedProviders>,
+      );
+      cySmartGet('token-menu').click();
+      cySmartGet('balance-item-move-option').click();
+      cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
+      cySmartGet('not-enough-gas-copy-address-button').should('be.visible');
+      cySmartGet('not-enough-gas-cancel-button').should('be.visible');
+      cySmartGet('not-enough-gas-cancel-button').click();
+      cySmartGet('not-enough-gas-bottom-sheet').should('not.exist');
+    });
+
+    it('should not show not enough gas drawer when enough eth to cover gas and call request bridge event', () => {
+      cy.stub(orchestrationEvents, 'sendRequestBridgeEvent').as('requestBridgeEventStub');
+      cy.stub(Checkout.prototype, 'gasEstimate')
+        .as('gasEstimateStub')
+        .resolves({
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          gasFee: {
+            estimatedAmount: BigNumber.from('10000000000000000'),
+          },
+        });
+
+      const walletState: WalletState = {
+        checkout,
+        network: {
+          chainId: ChainId.SEPOLIA,
+          name: 'Sepolia',
+          nativeCurrency: {} as unknown as TokenInfo,
+          isSupported: true,
+        },
+        provider,
+        walletProvider: WalletProviderName.METAMASK,
+        tokenBalances: [
+          {
+            id: 'eth',
+            balance: '100',
+            symbol: 'ETH',
+            fiatAmount: '0',
+            address: 'NATIVE',
+          },
+        ],
+        supportedTopUps: {
+          isBridgeEnabled: true,
+        },
+      };
+      mount(
+        <BiomeCombinedProviders>
+          <WalletContext.Provider
+            value={{ walletState, walletDispatch: () => {} }}
+          >
+            <WalletBalances />
+          </WalletContext.Provider>
+        </BiomeCombinedProviders>,
+      );
+      cySmartGet('token-menu').click();
+      cySmartGet('balance-item-move-option').click();
+      cySmartGet('not-enough-gas-bottom-sheet').should('not.exist');
+
+      cySmartGet('@requestBridgeEventStub').should('have.been.called');
+      cySmartGet('@requestBridgeEventStub').should(
+        'have.been.calledWith',
+        IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
+        {
+          tokenAddress: 'NATIVE',
+          amount: '',
+        },
+      );
     });
   });
 
