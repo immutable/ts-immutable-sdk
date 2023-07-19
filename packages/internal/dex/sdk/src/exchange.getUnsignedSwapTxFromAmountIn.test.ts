@@ -149,8 +149,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     });
   });
 
-  describe('Swap with single pool and defaults', () => {
-    it('Generates valid calldata', async () => {
+  describe('Swap with single pool and default slippage tolerance', () => {
+    it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
@@ -236,7 +236,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('Swap with single pool and higher slippage tolerance', () => {
-    it('Generates valid calldata', async () => {
+    it('generates valid calldata', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
