@@ -15,6 +15,7 @@ import {
   DeviceTokenResponse,
   DeviceErrorResponse,
   IdTokenPayload,
+  OidcConfiguration,
 } from './types';
 import { PassportConfiguration } from './config';
 
@@ -68,10 +69,13 @@ export default class AuthManager {
 
   private deviceCredentialsManager: DeviceCredentialsManager;
 
+  private readonly logoutMode: Exclude<OidcConfiguration['logoutMode'], undefined>;
+
   constructor(config: PassportConfiguration) {
     this.config = config;
     this.userManager = new UserManager(getAuthConfiguration(config));
     this.deviceCredentialsManager = new DeviceCredentialsManager();
+    this.logoutMode = config.oidcConfiguration.logoutMode || 'redirect';
   }
 
   private static mapOidcUserToDomainModel = (oidcUser: OidcUser): User => {
@@ -262,9 +266,19 @@ export default class AuthManager {
 
   public async logout(): Promise<void> {
     return withPassportError<void>(
-      async () => this.userManager.signoutRedirect(),
+      async () => {
+        if (this.logoutMode === 'silent') {
+          return this.userManager.signoutSilent();
+        }
+
+        return this.userManager.signoutRedirect();
+      },
       PassportErrorType.LOGOUT_ERROR,
     );
+  }
+
+  public async logoutSilentCallback(url: string): Promise<void> {
+    return this.userManager.signoutSilentCallback(url);
   }
 
   public async logoutDeviceFlow(): Promise<void> {
