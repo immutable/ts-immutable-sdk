@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {
   describe, it, cy, beforeEach,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import {
-  ChainId, ChainName, Checkout, GasEstimateType,
+  ChainId, ChainName, Checkout,
 } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
@@ -80,9 +79,7 @@ describe('SwapWidget tests', () => {
       });
   });
 
-  const params = {
-    walletProvider: 'metamask',
-  } as SwapWidgetParams;
+  const params = {} as SwapWidgetParams;
   const config: StrongCheckoutWidgetsConfig = {
     environment: Environment.SANDBOX,
     theme: WidgetTheme.DARK,
@@ -124,56 +121,6 @@ describe('SwapWidget tests', () => {
       cySmartGet('not-enough-gas-adjust-amount-button').should('not.exist');
     });
 
-    it(
-      'should show not enough imx drawer with only add imx option when user has not enough imx balance on load',
-      () => {
-        cy.stub(Checkout.prototype, 'getAllBalances')
-          .as('getAllBalancesStub')
-          .resolves({
-            balances: [
-              {
-                balance: BigNumber.from('1'),
-                formattedBalance: '0.0001',
-                token: {
-                  name: 'ImmutableX',
-                  symbol: 'IMX',
-                  decimals: 18,
-                  address: '',
-                },
-              },
-            ],
-          });
-
-        cy.stub(Checkout.prototype, 'gasEstimate')
-          .as('gasEstimateStub')
-          .onFirstCall()
-          .resolves({
-            gasEstimateType: GasEstimateType.SWAP,
-            gasFee: {
-              estimatedAmount: BigNumber.from(100000000000000),
-              token: {
-                name: 'ImmutableX',
-                symbol: 'IMX',
-                decimals: 18,
-              },
-            },
-          });
-
-        mount(
-          <SwapWidget
-            params={params}
-            config={config}
-            web3Provider={mockProvider}
-          />,
-        );
-
-        cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
-        cySmartGet('not-enough-gas-cancel-button').should('be.visible');
-        cySmartGet('not-enough-gas-add-imx-button').should('not.exist');
-        cySmartGet('not-enough-gas-adjust-amount-button').should('not.exist');
-      },
-    );
-
     it('should load swap form if user has enough for gas', () => {
       cy.stub(Checkout.prototype, 'getAllBalances')
         .as('getAllBalancesStub')
@@ -190,21 +137,6 @@ describe('SwapWidget tests', () => {
               },
             },
           ],
-        });
-
-      cy.stub(Checkout.prototype, 'gasEstimate')
-        .as('gasEstimateStub')
-        .onFirstCall()
-        .resolves({
-          gasEstimateType: GasEstimateType.SWAP,
-          gasFee: {
-            estimatedAmount: BigNumber.from(100000000000000),
-            token: {
-              name: 'ImmutableX',
-              symbol: 'IMX',
-              decimals: 18,
-            },
-          },
         });
 
       mount(

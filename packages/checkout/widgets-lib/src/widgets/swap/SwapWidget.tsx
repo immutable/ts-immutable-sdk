@@ -2,7 +2,6 @@ import { BiomeCombinedProviders } from '@biom3/react';
 import {
   Checkout,
   DexConfig,
-  GasEstimateType,
   GetTokenAllowListResult,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
@@ -45,7 +44,7 @@ import { SwapInProgress } from './views/SwapInProgress';
 import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
 import { TopUpView } from '../../views/top-up/TopUpView';
 import { NotEnoughImx } from '../../components/NotEnoughImx/NotEnoughImx';
-import { hasEnoughBalanceForGas, hasZeroBalance } from '../../lib/gasBalanceChecks';
+import { hasZeroBalance } from '../../lib/gasBalanceCheck';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
@@ -191,35 +190,17 @@ export function SwapWidget(props: SwapWidgetProps) {
         },
       });
 
-      if (checkout) {
-        if (hasZeroBalance(allowedTokenBalances, 'IMX')) {
-          setShowNotEnoughImxDrawer(true);
-          return;
-        }
-
-        const gasEstimate = await checkout.gasEstimate({
-          gasEstimateType: GasEstimateType.SWAP,
-        });
-
-        if (
-          gasEstimate.gasFee.estimatedAmount
-          && !hasEnoughBalanceForGas(
-            allowedTokenBalances,
-            gasEstimate.gasFee.estimatedAmount,
-            'IMX',
-          )
-        ) {
-          setShowNotEnoughImxDrawer(true);
-          return;
-        }
-
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: SwapWidgetViews.SWAP },
-          },
-        });
+      if (hasZeroBalance(allowedTokenBalances, 'IMX')) {
+        setShowNotEnoughImxDrawer(true);
+        return;
       }
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: SwapWidgetViews.SWAP },
+        },
+      });
     })();
   }, [checkout, web3Provider]);
 
