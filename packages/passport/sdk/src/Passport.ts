@@ -99,6 +99,14 @@ export class Passport {
     return this.authManager.logout();
   }
 
+  /**
+   * This method should only be called from the logout redirect uri
+   * when logout mode is 'silent'.
+   */
+  public async logoutSilentCallback(url: string): Promise<void> {
+    return this.authManager.logoutSilentCallback(url);
+  }
+
   public async logoutDeviceFlow(): Promise<void> {
     return this.authManager.logoutDeviceFlow();
   }
