@@ -2,14 +2,9 @@ import React, {
   createContext, useContext, useEffect, useMemo, useState,
 } from 'react';
 import { Config, ImmutableX } from '@imtbl/core-sdk';
-import {
-  Environment,
-  ImmutableConfiguration,
-  ImmutableXClient,
-  Networks,
-  Passport,
-  PassportModuleConfiguration,
-} from '@imtbl/sdk';
+import { Networks, Passport, PassportModuleConfiguration } from '@imtbl/passport';
+import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { ImmutableXClient } from '@imtbl/immutablex-client';
 import {
   audience,
   logoutRedirectUri,

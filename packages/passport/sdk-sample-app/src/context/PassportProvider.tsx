@@ -1,10 +1,10 @@
 import React, {
   createContext, useCallback, useContext, useMemo, useState,
 } from 'react';
-import { IMXProvider, UserProfile } from '@imtbl/sdk';
+import { IMXProvider } from '@imtbl/provider';
+import { Provider, UserProfile } from '@imtbl/passport';
 import { useImmutableProvider } from '@/context/ImmutableProvider';
 import { useStatusProvider } from '@/context/StatusProvider';
-import { Provider } from '@imtbl/passport';
 
 const PassportContext = createContext<{
   imxProvider: IMXProvider | undefined;
