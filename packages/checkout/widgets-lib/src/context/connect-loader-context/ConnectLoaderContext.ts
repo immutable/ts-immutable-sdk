@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 import { ConnectWidgetViews } from '../view-context/ConnectViewContextTypes';
+import { SharedViews } from '../view-context/ViewContext';
 
 export enum ConnectionStatus {
   NOT_CONNECTED_NO_PROVIDER = 'NOT_CONNECTED_NO_PROVIDER',
@@ -12,7 +13,7 @@ export enum ConnectionStatus {
 
 export interface ConnectLoaderState {
   connectionStatus: ConnectionStatus;
-  deepLink?: ConnectWidgetViews;
+  deepLink?: ConnectWidgetViews | SharedViews;
 }
 
 export const initialConnectLoaderState: ConnectLoaderState = {
@@ -37,7 +38,7 @@ export enum ConnectLoaderActions {
 export interface UpdateConnectionStatusPayload {
   type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS;
   connectionStatus: ConnectionStatus;
-  deepLink?: ConnectWidgetViews;
+  deepLink?: ConnectWidgetViews | SharedViews;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

@@ -33,6 +33,7 @@ import {
   addProviderChainListener,
   removeProviderEventListeners,
 } from '../../lib/providerEvents';
+import { SharedViews } from '../../context/view-context/ViewContext';
 
 export interface ConnectLoaderProps {
   children?: React.ReactNode;
@@ -97,12 +98,12 @@ export function ConnectLoader({
 
   useEffect(() => {
     if (!web3Provider) {
-      connectLoaderDispatch({
-        payload: {
-          type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-          connectionStatus: ConnectionStatus.NOT_CONNECTED_NO_PROVIDER,
-        },
-      });
+      // connectLoaderDispatch({
+      //   payload: {
+      //     type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+      //     connectionStatus: ConnectionStatus.NOT_CONNECTED_NO_PROVIDER,
+      //   },
+      // });
       return () => {};
     }
 
@@ -146,7 +147,7 @@ export function ConnectLoader({
           payload: {
             type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
             connectionStatus: ConnectionStatus.CONNECTED_WRONG_NETWORK,
-            deepLink: ConnectWidgetViews.SWITCH_NETWORK,
+            deepLink: SharedViews.SWITCH_NETWORK,
           },
         });
       }
@@ -248,7 +249,7 @@ export function ConnectLoader({
             payload: {
               type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
               connectionStatus: ConnectionStatus.CONNECTED_WRONG_NETWORK,
-              deepLink: ConnectWidgetViews.SWITCH_NETWORK,
+              deepLink: SharedViews.SWITCH_NETWORK,
             },
           });
           return;

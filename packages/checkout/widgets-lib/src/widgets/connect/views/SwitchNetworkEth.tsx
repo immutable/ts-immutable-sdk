@@ -11,13 +11,14 @@ import { getL1ChainId } from '../../../lib/networkUtils';
 import {
   ViewContext,
   ViewActions,
+  SharedViews,
 } from '../../../context/view-context/ViewContext';
 
 export function SwitchNetworkEth() {
   const { viewDispatch } = useContext(ViewContext);
   const { connectDispatch, connectState } = useContext(ConnectContext);
   const { checkout, provider, sendCloseEvent } = connectState;
-  const { heading, body, button } = text.views[ConnectWidgetViews.SWITCH_NETWORK].eth;
+  const { heading, body, button } = text.views[SharedViews.SWITCH_NETWORK].eth;
 
   const [buttonText, setButtonText] = useState(button.text);
 

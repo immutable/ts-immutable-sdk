@@ -1,12 +1,10 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { createContext } from 'react';
 import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
-// import { ProviderSubscription } from '../../../lib/providerSubscription';
 
 export interface ConnectState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
-  // providerSubscription: ProviderSubscription | null;
   walletProvider: WalletProviderName | null;
   sendCloseEvent: () => void;
 }
@@ -14,7 +12,6 @@ export interface ConnectState {
 export const initialConnectState: ConnectState = {
   checkout: null,
   provider: null,
-  // providerSubscription: null,
   walletProvider: null,
   sendCloseEvent: () => {},
 };
@@ -82,19 +79,9 @@ export const connectReducer: Reducer<ConnectState, ConnectAction> = (
         checkout: action.payload.checkout,
       };
     case ConnectActions.SET_PROVIDER:
-      // eslint-disable-next-line no-case-declarations
-      // let { providerSubscription } = state;
-
-      // if (providerSubscription) {
-      //   providerSubscription.unsubscribe();
-      // }
-      // providerSubscription = new ProviderSubscription(action.payload.provider, () => {}, () => {});
-      // providerSubscription.subscribe();
-
       return {
         ...state,
         provider: action.payload.provider,
-        // providerSubscription,
       };
     case ConnectActions.SET_PROVIDER_NAME:
       return {

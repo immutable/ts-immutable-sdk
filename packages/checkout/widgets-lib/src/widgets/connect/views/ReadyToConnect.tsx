@@ -12,6 +12,7 @@ import { ConnectContext, ConnectActions } from '../context/ConnectContext';
 import {
   ViewContext,
   ViewActions,
+  SharedViews,
 } from '../../../context/view-context/ViewContext';
 
 export interface ReadyToConnectProps {
@@ -39,7 +40,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: ConnectWidgetViews.SWITCH_NETWORK },
+          view: { type: SharedViews.SWITCH_NETWORK },
         },
       });
       return;

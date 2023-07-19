@@ -43,7 +43,7 @@ import { ImmutableNetworkHero } from '../../components/Hero/ImmutableNetworkHero
 export interface ConnectWidgetProps {
   params?: ConnectWidgetParams;
   config: StrongCheckoutWidgetsConfig
-  deepLink?: ConnectWidgetViews;
+  deepLink?: ConnectWidgetViews | SharedViews;
   sendCloseEventOverride?: () => void;
 }
 
