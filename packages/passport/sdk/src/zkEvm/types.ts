@@ -1,8 +1,16 @@
 import { BigNumberish, BytesLike } from 'ethers';
 import { JsonRpcError } from './JsonRpcError';
 
+export enum RelayerTransactionStatus {
+  PENDING = 'PENDING',
+  SUBMITTED = 'SUBMITTED',
+  SUCCESSFUL = 'SUCCESSFUL',
+  REVERTED = 'REVERTED',
+  FAILED = 'FAILED',
+}
+
 export interface RelayerTransaction {
-  status: 'PENDING' | 'SUBMITTED' | 'SUCCESSFUL' | 'ERROR';
+  status: RelayerTransactionStatus;
   chainId: string;
   relayerId: string;
   hash: string;

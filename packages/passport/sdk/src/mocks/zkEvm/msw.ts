@@ -1,7 +1,7 @@
 import 'cross-fetch/polyfill';
 import { RequestHandler, rest } from 'msw';
 import { SetupServer, setupServer } from 'msw/node';
-import { RelayerTransactionRequest } from '../../zkEvm/relayerAdapter';
+import { RelayerTransactionRequest } from '../../zkEvm/relayerClient';
 import { JsonRpcRequestPayload } from '../../zkEvm/types';
 
 export const relayerId = '0x745';
