@@ -3,7 +3,7 @@ import {
   Web3Provider,
 } from '@ethersproject/providers';
 import { getNonce, getSignedMetaTransactions, chainIdNumber } from '../walletHelpers';
-import { MetaTransaction } from '../types';
+import { MetaTransaction, RelayerTransactionStatus } from '../types';
 import { EthMethodWithAuthParams } from './types';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 import { retryWithDelay } from '../../network/retry';
@@ -15,16 +15,13 @@ export const ethSendTransaction = async ({
   params,
   magicProvider,
   jsonRpcProvider,
-  relayerAdapter,
+  relayerClient,
   config,
   user,
 }: EthMethodWithAuthParams): Promise<string> => {
   const transactionRequest: TransactionRequest = params[0];
   if (!transactionRequest.to) {
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
-  }
-  if (!transactionRequest.data) {
-    throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "data" field');
   }
 
   const chainId = chainIdNumber(config.zkEvmChainId);
@@ -43,7 +40,7 @@ export const ethSendTransaction = async ({
   // NOTE: We sign the transaction before getting the fee options because
   // accurate estimation of a transaction gas cost is only possible if the smart
   // wallet contract can actually execute it (in a simulated environment) - and
-  // it can onlyexecute signed transactions.
+  // it can only execute signed transactions.
   const signedTransaction = await getSignedMetaTransactions(
     [metaTransaction],
     nonce,
@@ -53,13 +50,13 @@ export const ethSendTransaction = async ({
   );
 
   // TODO: ID-698 Add support for non-native gas payments (e.g ERC20, feeTransaction initialisation must change)
-  //
+
   // NOTE: "Fee Options" represent the multiple ways we could pay for the gas
   // used in this transaction. Each fee option has a "recipientAddress" we
   // should transfer the payment to, an amount and a currency. We choose one
   // option and build a transaction that sends the expected currency amount for
   // that option to the specified address.
-  const feeOptions = await relayerAdapter.imGetFeeOptions(user.zkEvm.ethAddress, signedTransaction);
+  const feeOptions = await relayerClient.imGetFeeOptions(user.zkEvm.ethAddress, signedTransaction);
   const imxFeeOption = feeOptions.find((feeOption) => feeOption.tokenSymbol === 'IMX');
   if (!imxFeeOption) {
     throw new Error('Failed to retrieve fees for IMX token');
@@ -84,15 +81,15 @@ export const ethSendTransaction = async ({
 
   // TODO: ID-697 Evaluate transactions through Guardian
 
-  const relayerId = await relayerAdapter.ethSendTransaction(transactionRequest.to, signedTransactions);
+  const relayerId = await relayerClient.ethSendTransaction(user.zkEvm.ethAddress, signedTransactions);
 
   const retrieveRelayerTransaction = async () => {
-    const tx = await relayerAdapter.imGetTransactionByHash(relayerId);
+    const tx = await relayerClient.imGetTransactionByHash(relayerId);
     // NOTE: The transaction hash is only available from the Relayer once the
     // transaction is actually submitted onchain. Hence we need to poll the
     // Relayer get transaction endpoint until the status transitions to one that
     // has the hash available.
-    if (tx.status === 'PENDING') {
+    if (tx.status === RelayerTransactionStatus.PENDING) {
       throw new Error();
     }
     return tx;
@@ -103,6 +100,13 @@ export const ethSendTransaction = async ({
     interval: TRANSACTION_HASH_RETRIEVAL_WAIT,
     finalErr: new JsonRpcError(RpcErrorCode.RPC_SERVER_ERROR, 'transaction hash not generated in time'),
   });
+
+  if (![RelayerTransactionStatus.SUBMITTED, RelayerTransactionStatus.SUCCESSFUL].includes(relayerTransaction.status)) {
+    throw new JsonRpcError(
+      RpcErrorCode.RPC_SERVER_ERROR,
+      `Transaction failed to submit with status ${relayerTransaction.status}`,
+    );
+  }
 
   return relayerTransaction.hash;
 };

@@ -2,7 +2,7 @@ import { BytesLike } from 'ethers';
 import { PassportConfiguration } from '../config';
 import { FeeOption, RelayerTransaction } from './types';
 
-export type RelayerAdapterInput = {
+export type RelayerClientInput = {
   config: PassportConfiguration,
 };
 
@@ -54,10 +54,10 @@ export type RelayerTransactionRequest =
   | ImGetTransactionByHashRequest
   | ImGetFeeOptionsRequest;
 
-export class RelayerAdapter {
+export class RelayerClient {
   private readonly config: PassportConfiguration;
 
-  constructor({ config }: RelayerAdapterInput) {
+  constructor({ config }: RelayerClientInput) {
     this.config = config;
   }
 
