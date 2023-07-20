@@ -681,6 +681,7 @@ export function SwapForm({ data }: SwapFromProps) {
       <NotEnoughImx
         visible={showNotEnoughImxDrawer}
         showAdjustAmount={!fromToken?.address || fromToken.address === 'NATIVE'}
+        hasZeroImx={false}
         onAddCoinsClick={() => {
           viewDispatch({
             payload: {

@@ -195,7 +195,7 @@ export function TopUpView({
     onClick: () => void,
     renderFeeFunction?: (fees: string, feesLoading: boolean) => ReactNode,
   ) => (
-    <Box sx={{ paddingY: '1px' }}>
+    <Box testId="top-up-view" sx={{ paddingY: '1px' }}>
       <MenuItem
         testId={`menu-item-${testId}`}
         size="medium"

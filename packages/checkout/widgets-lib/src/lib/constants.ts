@@ -6,6 +6,7 @@ export const NATIVE = 'NATIVE';
 export const DEFAULT_TOKEN_DECIMALS = 18;
 export const DEFAULT_TOKEN_FORMATTING_DECIMALS = 6;
 export const DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS = 2;
+export const IMX_TOKEN_SYMBOL = 'IMX';
 
 /**
  * Checkout Widget default env
