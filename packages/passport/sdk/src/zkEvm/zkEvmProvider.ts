@@ -11,14 +11,14 @@ import {
   RequestArguments,
 } from './types';
 import AuthManager from '../authManager';
+import MagicAdapter from '../magicAdapter';
+import TypedEventEmitter from './typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
-import MagicAdapter from '../magicAdapter';
 import { UserZkEvm } from '../types';
 import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import { loginZkEvmUser } from './user';
-import TypedEventEmitter from './typedEventEmitter';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
