@@ -27,11 +27,9 @@ export async function createProvider(
   defaultProvider: WalletProviderName,
 ): Promise<CreateProviderResult> {
   let provider: Web3Provider | null = null;
-  let providerName: WalletProviderName;
   switch (defaultProvider) {
     case WalletProviderName.METAMASK: {
       provider = await getMetaMaskProvider();
-      providerName = WalletProviderName.METAMASK;
       break;
     }
     default:
@@ -42,6 +40,6 @@ export async function createProvider(
   }
   return {
     provider,
-    providerName,
+    providerName: defaultProvider,
   };
 }
