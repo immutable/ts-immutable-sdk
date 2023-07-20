@@ -1,16 +1,27 @@
 {
   "entryPoints": [
     "sdk/",
-    // "packages/blockchain-data/sdk/",
-    // "packages/immutablex_client/",
-    // "packages/checkout/sdk/"
+    "packages/blockchain-data/sdk/",
+    "packages/checkout/sdk/",
+    "packages/checkout/widgets/",
+    "packages/config/",
+    "packages/economy/sdk/",
+    "packages/erc20/",
+    "packages/erc721-permissioned-mintable/",
+    "packages/immutablex_client/",
+    "packages/orderbook/",
+    "packages/passport/sdk/",
+    "packages/provider/",
   ],
   "name": "@imtbl/sdk",
-  "entryPointStrategy": "expand",
+  "entryPointStrategy": "packages",
+  "excludeReferences": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
   "includeVersion": true,
   "cleanOutputDir": true,
   "out": "./docs",
-  "tsconfig": "./sdk/tsconfig.json",
+  "readme": "./sdk/README.md",
   // Potentially useful for debugging
   "logLevel": "Verbose"
 }
