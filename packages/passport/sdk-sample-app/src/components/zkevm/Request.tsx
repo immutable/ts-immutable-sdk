@@ -147,10 +147,8 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
         addMessage(selectedEthMethod?.name, result);
         handleClose();
       } catch (err) {
-        if (err instanceof Error) {
-          addMessage('Request', err);
-          handleClose();
-        }
+        addMessage('Request', err);
+        handleClose();
       }
     } else {
       setInvalid(true);
