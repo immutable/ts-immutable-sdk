@@ -33,7 +33,7 @@ import {
 import { fetchTokenSymbols } from '../../../lib/fetchTokenSymbols';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 import { isNativeToken } from '../../../lib/utils';
-import { DEFAULT_TOKEN_DECIMALS } from '../../../lib';
+import { DEFAULT_TOKEN_DECIMALS, ETH_TOKEN_SYMBOL } from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 
 export function WalletBalances() {
@@ -100,7 +100,7 @@ export function WalletBalances() {
     if (network.chainId !== getL1ChainId(checkout.config)) return;
 
     const ethBalance = tokenBalances
-      .find((balance) => isNativeToken(balance.address) && balance.symbol === 'ETH');
+      .find((balance) => isNativeToken(balance.address) && balance.symbol === ETH_TOKEN_SYMBOL);
     if (!ethBalance) return;
 
     if (ethBalance.balance === '0.0') {
