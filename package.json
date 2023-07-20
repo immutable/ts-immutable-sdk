@@ -12,11 +12,13 @@
     "eslint": "^8.40.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
+    "http-server": "^14.1.1",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
     "node-gyp": "^9.3.1",
     "release-it": "^15.10.1",
     "syncpack": "^9.8.4",
+    "typedoc": "^0.24.8",
     "wsrun": "^5.2.4"
   },
   "engines": {
@@ -46,7 +48,9 @@
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
     "test": "wsrun --exclude-missing -e test",
-    "typecheck": "wsrun --exclude-missing typecheck"
+    "typecheck": "wsrun --exclude-missing typecheck",
+    "docs:build": "typedoc",
+    "docs:serve": "http-server ./docs --cors -p 8080"
   },
   "workspaces": [
     "sdk",
