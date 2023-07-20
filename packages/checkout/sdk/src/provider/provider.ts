@@ -24,10 +24,10 @@ async function getMetaMaskProvider(): Promise<Web3Provider> {
 }
 
 export async function createProvider(
-  defaultProvider: WalletProviderName,
+  walletProviderName: WalletProviderName,
 ): Promise<CreateProviderResult> {
   let provider: Web3Provider | null = null;
-  switch (defaultProvider) {
+  switch (walletProviderName) {
     case WalletProviderName.METAMASK: {
       provider = await getMetaMaskProvider();
       break;
@@ -40,6 +40,6 @@ export async function createProvider(
   }
   return {
     provider,
-    providerName: defaultProvider,
+    walletProviderName,
   };
 }

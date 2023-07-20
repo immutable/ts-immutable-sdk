@@ -23,7 +23,7 @@ export interface CreateProviderParams {
  */
 export type CreateProviderResult = {
   provider: Web3Provider,
-  providerName: WalletProviderName
+  walletProviderName: WalletProviderName
 };
 
 export type ValidateProviderOptions = {
