@@ -50,6 +50,19 @@ function validateOverrides(overrides: ExchangeOverrides) {
       throw new InvalidConfigurationError(`Invalid exchange contract address for ${key}`);
     }
   });
+
+  if (!overrides.secondaryFees) {
+    return;
+  }
+
+  for (const secondaryFee of overrides.secondaryFees) {
+    if (!isValidNonZeroAddress(secondaryFee.feeRecipient)) {
+      throw new InvalidConfigurationError(`Invalid secondary fee recipient address: ${secondaryFee.feeRecipient}`);
+    }
+    if (secondaryFee.feePrcntInBasisPoints.isNegative() || secondaryFee.feePrcntInBasisPoints.gt(10000)) {
+      throw new InvalidConfigurationError(`Invalid secondary fee percentage: ${secondaryFee.feePrcntInBasisPoints}`);
+    }
+  }
 }
 
 /**
@@ -62,7 +75,7 @@ export class ExchangeConfiguration {
 
   public chain: Chain;
 
-  public secondaryFees?: SecondaryFees;
+  public secondaryFees?: SecondaryFees[];
 
   constructor({ chainId, baseConfig, overrides }: ExchangeModuleConfiguration) {
     this.baseConfig = baseConfig;

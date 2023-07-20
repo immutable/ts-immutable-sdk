@@ -28,7 +28,7 @@ export class Exchange {
 
   private nativeToken: TokenInfo;
 
-  private secondaryFees?: SecondaryFees;
+  private secondaryFees?: SecondaryFees[];
 
   constructor(configuration: ExchangeModuleConfiguration) {
     const config = new ExchangeConfiguration(configuration);
