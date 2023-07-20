@@ -2,7 +2,7 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { IMMUTABLE_TESTNET_COMMON_ROUTING_TOKENS, TIMX_IMMUTABLE_TESTNET } from 'constants/tokens';
 import { ChainNotSupportedError, InvalidConfigurationError } from 'errors';
 import { IMMUTABLE_TESTNET_CHAIN_ID, IMMUTABLE_TESTNET_RPC_URL } from 'constants/chains';
-import { isValidNonZeroAddress } from 'lib';
+import { SecondaryFees, isValidNonZeroAddress } from 'lib';
 import { Chain, ExchangeModuleConfiguration, ExchangeOverrides } from '../types';
 
 export type ExchangeContracts = {
@@ -40,7 +40,7 @@ export const SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT: Record<Environment, Record<num
 
 function validateOverrides(overrides: ExchangeOverrides) {
   Object.entries(overrides).forEach(([key, value]) => {
-    if (!value) {
+    if (!value && key !== 'secondaryFees') {
       throw new InvalidConfigurationError(`Missing override: ${key}`);
     }
   });
@@ -62,6 +62,8 @@ export class ExchangeConfiguration {
 
   public chain: Chain;
 
+  public secondaryFees?: SecondaryFees;
+
   constructor({ chainId, baseConfig, overrides }: ExchangeModuleConfiguration) {
     this.baseConfig = baseConfig;
 
@@ -74,6 +76,8 @@ export class ExchangeConfiguration {
         commonRoutingTokens: overrides.commonRoutingTokens,
         nativeToken: overrides.nativeToken,
       };
+
+      this.secondaryFees = overrides.secondaryFees;
 
       return;
     }

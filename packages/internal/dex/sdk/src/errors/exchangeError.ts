@@ -56,6 +56,12 @@ export class ChainNotSupportedError extends ExchangeError {
   }
 }
 
+export class InvalidFeePrcntError extends ExchangeError {
+  constructor(feedPrcnt: number) {
+    super(`invalid fee percent: ${feedPrcnt}`, ExchangeErrorCode.INVALID_SLIPPAGE);
+  }
+}
+
 export class InvalidSlippageError extends ExchangeError {
   constructor(message: string) {
     super(message, ExchangeErrorCode.INVALID_SLIPPAGE);
