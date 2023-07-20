@@ -663,6 +663,46 @@ describe('SwapForm', () => {
             },
           },
         });
+      cy.stub(quotesProcessor, 'fromAmountOut')
+        .as('fromAmountOutStub')
+        .resolves({
+          quote: {
+            amount: {
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '',
+              },
+              value: BigNumber.from('100000000000000'),
+            },
+            amountWithMaxSlippage: {
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '',
+              },
+              value: BigNumber.from('100000000000000000'),
+            },
+            slippage: 10,
+          },
+          swap: {
+            gasFeeEstimate: {
+              token: {
+                name: 'ImmutableX',
+                symbol: 'IMX',
+                decimals: 18,
+                address: '',
+              },
+              value: BigNumber.from('100000000000000'),
+            },
+            transaction: {
+              to: 'toSwapAddress',
+              from: 'fromSwapAddress',
+            },
+          },
+        });
     });
 
     it('should open the transaction rejected drawer if the user rejects the transaction', () => {
@@ -764,6 +804,63 @@ describe('SwapForm', () => {
       cySmartGet('swap-button').click();
 
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
+      cySmartGet('not-enough-gas-add-imx-button').should('be.visible');
+      cySmartGet('not-enough-gas-cancel-button').should('be.visible');
+      cySmartGet('not-enough-gas-adjust-amount-button').should('not.exist');
+    });
+
+    it('should show adjust button if user does not have enough imx and imx is in from', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={{
+            ...testSwapState,
+            tokenBalances: [
+              {
+                balance: BigNumber.from('1000000000000000000'),
+                formattedBalance: '1',
+                token: {
+                  name: 'Ethereum',
+                  symbol: 'ETH',
+                  decimals: 18,
+                  address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                },
+              },
+              {
+                balance: BigNumber.from('100000'),
+                formattedBalance: '0.0001',
+                token: {
+                  name: 'ImmutableX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: '',
+                },
+              },
+            ],
+          }}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapCoins />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('toTokenInputs-select-form-select__target').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+        .click();
+      cySmartGet('fromTokenInputs-select-form-select__target').click();
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx').click();
+
+      cySmartGet('toTokenInputs-text-form-text__input').type('0.00001').trigger('change');
+      cySmartGet('toTokenInputs-text-form-text__input').blur();
+
+      cySmartGet('swap-button').click();
+
+      cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
+      cySmartGet('not-enough-gas-add-imx-button').should('be.visible');
+      cySmartGet('not-enough-gas-cancel-button').should('be.visible');
+      cySmartGet('not-enough-gas-adjust-amount-button').should('be.visible');
+
+      cySmartGet('not-enough-gas-adjust-amount-button').click();
+      cySmartGet('not-enough-gas-bottom-sheet').should('not.exist');
     });
 
     it('should show loading if user has enough imx and does not reject the transaction', () => {
