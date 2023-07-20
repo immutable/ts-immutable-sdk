@@ -1,24 +1,36 @@
 import {
+  ExternalProvider, JsonRpcProvider,
   TransactionRequest,
   Web3Provider,
 } from '@ethersproject/providers';
-import { getNonce, getSignedMetaTransactions, chainIdNumber } from '../walletHelpers';
-import { MetaTransaction, RelayerTransactionStatus } from '../types';
-import { EthMethodWithAuthParams } from './types';
-import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
-import { retryWithDelay } from '../../network/retry';
+import { getNonce, getSignedMetaTransactions, chainIdNumber } from './walletHelpers';
+import { MetaTransaction, RelayerTransactionStatus } from './types';
+import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
+import { retryWithDelay } from '../network/retry';
+import { PassportConfiguration } from '../config';
+import { RelayerClient } from './relayerClient';
+import { UserZkEvm } from '../types';
 
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
 
-export const ethSendTransaction = async ({
+export type EthSendTransactionParams = {
+  magicProvider: ExternalProvider;
+  jsonRpcProvider: JsonRpcProvider;
+  config: PassportConfiguration;
+  relayerClient: RelayerClient;
+  user: UserZkEvm;
+  params: Array<any>;
+};
+
+export const sendTransaction = async ({
   params,
   magicProvider,
   jsonRpcProvider,
   relayerClient,
   config,
   user,
-}: EthMethodWithAuthParams): Promise<string> => {
+}: EthSendTransactionParams): Promise<string> => {
   const transactionRequest: TransactionRequest = params[0];
   if (!transactionRequest.to) {
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');

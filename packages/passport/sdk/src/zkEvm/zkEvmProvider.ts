@@ -1,11 +1,13 @@
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { ethSendTransaction } from './rpcMethods';
+import { sendTransaction } from './sendTransaction';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
   JsonRpcResponsePayload,
   Provider,
+  ProviderEventNames,
+  ProviderEvents,
   RequestArguments,
 } from './types';
 import AuthManager from '../authManager';
@@ -14,9 +16,9 @@ import { ConfirmationScreen } from '../confirmation';
 import MagicAdapter from '../magicAdapter';
 import { UserZkEvm } from '../types';
 import { RelayerClient } from './relayerClient';
-import { EthMethodWithAuthParams } from './rpcMethods/types';
-import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
-import { registerZkEvmUser } from './userRegistration';
+import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
+import { loginZkEvmUser } from './user';
+import TypedEventEmitter from './typedEventEmitter';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -31,7 +33,7 @@ type LoggedInZkEvmProvider = {
   user: UserZkEvm;
 };
 
-export class ZkEvmProvider implements Provider {
+export class ZkEvmProvider extends TypedEventEmitter<ProviderEvents> implements Provider {
   private readonly authManager: AuthManager;
 
   private readonly config: PassportConfiguration;
@@ -57,6 +59,8 @@ export class ZkEvmProvider implements Provider {
     confirmationScreen,
     multiRollupApiClients,
   }: ZkEvmProviderInput) {
+    super();
+
     this.authManager = authManager;
     this.magicAdapter = magicAdapter;
     this.config = config;
@@ -71,27 +75,12 @@ export class ZkEvmProvider implements Provider {
   }
 
   private async performRequest(request: RequestArguments): Promise<any> {
-    const authWrapper = (fn: (params: EthMethodWithAuthParams) => Promise<any>) => {
-      if (!this.isLoggedIn()) {
-        throw new JsonRpcError(RpcErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
-      }
-
-      return fn({
-        params: request.params || [],
-        magicProvider: this.magicProvider,
-        jsonRpcProvider: this.jsonRpcProvider,
-        config: this.config,
-        relayerClient: this.relayerClient,
-        user: this.user,
-      });
-    };
-
     switch (request.method) {
       case 'eth_requestAccounts': {
         if (this.isLoggedIn()) {
           return [this.user.zkEvm.ethAddress];
         }
-        const { magicProvider, user } = await registerZkEvmUser({
+        const { magicProvider, user } = await loginZkEvmUser({
           authManager: this.authManager,
           config: this.config,
           magicAdapter: this.magicAdapter,
@@ -101,10 +90,23 @@ export class ZkEvmProvider implements Provider {
         this.user = user;
         this.magicProvider = magicProvider;
 
+        this.emit(ProviderEventNames.ACCOUNTS_CHANGED, [this.user.zkEvm.ethAddress]);
+
         return [this.user.zkEvm.ethAddress];
       }
       case 'eth_sendTransaction': {
-        return authWrapper(ethSendTransaction);
+        if (!this.isLoggedIn()) {
+          throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
+        }
+
+        return sendTransaction({
+          params: request.params || [],
+          magicProvider: this.magicProvider,
+          jsonRpcProvider: this.jsonRpcProvider,
+          config: this.config,
+          relayerClient: this.relayerClient,
+          user: this.user,
+        });
       }
       case 'eth_accounts': {
         return this.isLoggedIn() ? [this.user.zkEvm.ethAddress] : [];
@@ -125,7 +127,7 @@ export class ZkEvmProvider implements Provider {
         return this.jsonRpcProvider.send(request.method, request.params || []);
       }
       default: {
-        throw new JsonRpcError(RpcErrorCode.METHOD_NOT_FOUND, 'Method not supported');
+        throw new JsonRpcError(ProviderErrorCode.UNSUPPORTED_METHOD, 'Method not supported');
       }
     }
   }
