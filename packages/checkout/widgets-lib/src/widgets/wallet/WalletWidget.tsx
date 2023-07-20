@@ -3,7 +3,7 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   Checkout,
 } from '@imtbl/checkout-sdk';
-import { useEffect, useReducer } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
@@ -27,9 +27,15 @@ import {
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
 import { Settings } from './views/Settings';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '../../lib';
+import { WidgetTheme, getL1ChainId, getL2ChainId } from '../../lib';
 import { CoinInfo } from './views/CoinInfo';
 import { TopUpView } from '../../views/top-up/TopUpView';
+import { SwitchNetwork } from '../../views/switch-network/SwitchNetwork';
+import { ImmutableNetworkHero } from '../../components/Hero/ImmutableNetworkHero';
+import {
+  addProviderChainListener,
+  removeProviderEventListeners,
+} from '../../lib/providerEvents';
 
 export interface WalletWidgetProps {
   config: StrongCheckoutWidgetsConfig,
@@ -37,8 +43,8 @@ export interface WalletWidgetProps {
 }
 
 export function WalletWidget(props: WalletWidgetProps) {
+  /** Handle Widget Props */
   const { config, web3Provider } = props;
-
   const {
     environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
@@ -46,13 +52,16 @@ export function WalletWidget(props: WalletWidgetProps) {
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
-  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
+  /** Setup Wallet Widget State */
+  const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const [walletState, walletDispatch] = useReducer(
     walletReducer,
     initialWalletState,
   );
+  const { checkout, provider } = walletState;
 
+  /** Set provider as it is passed in */
   useEffect(() => {
     if (web3Provider) {
       walletDispatch({
@@ -64,8 +73,7 @@ export function WalletWidget(props: WalletWidgetProps) {
     }
   }, [web3Provider]);
 
-  const { checkout } = walletState;
-
+  /** Set Checkout instance and save config */
   useEffect(() => {
     walletDispatch({
       payload: {
@@ -86,6 +94,7 @@ export function WalletWidget(props: WalletWidgetProps) {
     });
   }, [isBridgeEnabled, isSwapEnabled, isOnRampEnabled, environment]);
 
+  /** Setup Wallet Widget */
   useEffect(() => {
     (async () => {
       if (!checkout || !web3Provider) return;
@@ -117,11 +126,55 @@ export function WalletWidget(props: WalletWidgetProps) {
     })();
   }, [checkout]);
 
-  const errorAction = () => {
-    // TODO: please remove or if necessary keep the eslint ignore
-    // eslint-disable-next-line no-console
-    console.log('Something went wrong');
-  };
+  /* Handle Wallet Events */
+  useEffect(() => {
+    if (!provider) return () => {};
+    if (!checkout) return () => {};
+
+    function handleChainChanged(e: any) {
+      const chainId = parseInt(e, 16);
+
+      if (chainId !== getL1ChainId(checkout!.config) && chainId !== getL2ChainId(checkout!.config)) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SharedViews.SWITCH_NETWORK,
+            },
+          },
+        });
+      }
+    }
+    addProviderChainListener(provider, handleChainChanged);
+
+    return () => {
+      removeProviderEventListeners(provider, () => {}, handleChainChanged);
+    };
+  }, [provider, checkout]);
+
+  const switchNetwork = useCallback(async () => {
+    if (!provider || !checkout) return;
+
+    const switchRes = await checkout.switchNetwork({
+      provider,
+      chainId: getL2ChainId(checkout.config),
+    });
+    walletDispatch({
+      payload: {
+        type: WalletActions.SET_PROVIDER,
+        provider: switchRes.provider,
+      },
+    });
+
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: {
+          type: WalletWidgetViews.WALLET_BALANCES,
+        },
+      },
+    });
+  }, [provider, walletDispatch, viewDispatch]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
@@ -142,10 +195,18 @@ export function WalletWidget(props: WalletWidgetProps) {
             {viewState.view.type === WalletWidgetViews.COIN_INFO && (
             <CoinInfo />
             )}
+            {viewState.view.type === SharedViews.SWITCH_NETWORK && (
+              <SwitchNetwork
+                heroContent={<ImmutableNetworkHero />}
+                switchNetwork={switchNetwork}
+                onClose={sendWalletWidgetCloseEvent}
+                switchToZkEVM
+              />
+            )}
             {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
               actionText="Try again"
-              onActionClick={errorAction}
+              onActionClick={sendWalletWidgetCloseEvent}
               onCloseClick={sendWalletWidgetCloseEvent}
             />
             )}
