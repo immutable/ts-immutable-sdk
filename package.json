@@ -53,7 +53,7 @@
     "test:vpn": "RUN_VPN_TESTS=1 wsrun --exclude-missing -e test",
     "typecheck": "wsrun --exclude-missing typecheck",
     "docs:build": "typedoc",
-    "docs:serve": "http-server ./docs --cors -p 8080"
+    "docs:serve": "http-server ./docs --cors -p 8080 -c-1"
   },
   "workspaces": [
     "sdk",
