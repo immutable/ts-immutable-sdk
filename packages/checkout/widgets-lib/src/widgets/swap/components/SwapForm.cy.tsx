@@ -157,6 +157,46 @@ describe('SwapForm', () => {
       cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
       cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'ETH');
     });
+
+    it('should set both from and to token when tokens are unique', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapForm data={{
+            fromContractAddress: 'NATIVE',
+            toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          }}
+          />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'IMX');
+      cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'ETH');
+    });
+
+    it('should set only from token when to and from token matching', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapForm data={{
+            fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          }}
+          />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'ETH');
+      cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+    });
   });
 
   describe('swapFromAmount input validation', () => {
