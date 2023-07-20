@@ -158,7 +158,7 @@ describe('SwapForm', () => {
       cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'ETH');
     });
 
-    it('should set both from and to token when tokens are unique', () => {
+    it('should set both from and to token when token addresses are unique', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
@@ -178,7 +178,7 @@ describe('SwapForm', () => {
       cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'ETH');
     });
 
-    it('should set only from token when to and from token matching', () => {
+    it('should set only from token when to and from token addresses match', () => {
       mount(
         <SwapWidgetTestComponent
           initialStateOverride={testSwapState}
