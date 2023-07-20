@@ -1,5 +1,6 @@
 import {
-  ExternalProvider, JsonRpcProvider,
+  ExternalProvider,
+  JsonRpcProvider,
   TransactionRequest,
   Web3Provider,
 } from '@ethersproject/providers';
