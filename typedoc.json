@@ -1,0 +1,16 @@
+{
+  "entryPoints": [
+    "sdk/",
+    // "packages/blockchain-data/sdk/",
+    // "packages/immutablex_client/",
+    // "packages/checkout/sdk/"
+  ],
+  "name": "@imtbl/sdk",
+  "entryPointStrategy": "expand",
+  "includeVersion": true,
+  "cleanOutputDir": true,
+  "out": "./docs",
+  "tsconfig": "./sdk/tsconfig.json",
+  // Potentially useful for debugging
+  "logLevel": "Verbose"
+}
