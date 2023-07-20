@@ -40,11 +40,11 @@ export function WalletList(props: WalletListProps) {
     getAllowedWallets();
   }, [checkout, excludeWallets, walletFilterTypes]);
 
-  const onWalletClick = async (walletProvider: WalletProviderName) => {
+  const onWalletClick = async (walletProviderName: WalletProviderName) => {
     if (checkout) {
       try {
         const { provider } = await checkout.createProvider({
-          walletProvider,
+          walletProvider: walletProviderName,
         });
 
         connectDispatch({
@@ -55,8 +55,8 @@ export function WalletList(props: WalletListProps) {
         });
         connectDispatch({
           payload: {
-            type: ConnectActions.SET_PROVIDER_NAME,
-            walletProvider,
+            type: ConnectActions.SET_WALLET_PROVIDER_NAME,
+            walletProviderName,
           },
         });
         viewDispatch({
