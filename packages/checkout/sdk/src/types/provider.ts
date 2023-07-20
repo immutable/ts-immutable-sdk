@@ -19,9 +19,11 @@ export interface CreateProviderParams {
 /**
  * Represents the result of creating a Web3 provider {@link Checkout.createProvider}.
  * @property {Web3Provider} provider - The created Web3 provider.
+ * @property {WalletProviderName} providerName - The name of the wallet provider.
  */
 export type CreateProviderResult = {
-  provider: Web3Provider
+  provider: Web3Provider,
+  providerName: WalletProviderName
 };
 
 export type ValidateProviderOptions = {

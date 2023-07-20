@@ -43,14 +43,14 @@ export function WalletList(props: WalletListProps) {
   const onWalletClick = async (walletProvider: WalletProviderName) => {
     if (checkout) {
       try {
-        const connectResult = await checkout.createProvider({
+        const { provider } = await checkout.createProvider({
           walletProvider,
         });
 
         connectDispatch({
           payload: {
             type: ConnectActions.SET_PROVIDER,
-            provider: connectResult.provider,
+            provider,
           },
         });
         connectDispatch({
