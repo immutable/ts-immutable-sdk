@@ -94,41 +94,37 @@ export function WalletBalances() {
   // Silently runs a gas check for bridge to L2
   // This is to prevent the user having to wait for the gas estimate to complete to use the UI
   // As a trade-off there is a slight delay between when the gas estimate is fetched and checked against the user balance, so 'move' can be selected before the gas estimate is completed
-  const runBridgeToL2GasCheck = useMemo(async () => {
-    if (!checkout) return;
-    if (!network) return;
-    if (network.chainId !== getL1ChainId(checkout.config)) return;
-
-    const ethBalance = tokenBalances
-      .find((balance) => isNativeToken(balance.address) && balance.symbol === ETH_TOKEN_SYMBOL);
-    if (!ethBalance) return;
-
-    if (ethBalance.balance === '0.0') {
-      setInsufficientFundsForBridgeToL2Gas(true);
-      return;
-    }
-
-    const { gasFee } = await checkout.gasEstimate({
-      gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-      isSpendingCapApprovalRequired: false,
-    });
-
-    if (!gasFee.estimatedAmount) {
-      setInsufficientFundsForBridgeToL2Gas(false);
-      return;
-    }
-
-    setInsufficientFundsForBridgeToL2Gas(
-      gasFee.estimatedAmount.gt(utils.parseUnits(ethBalance.balance, DEFAULT_TOKEN_DECIMALS)),
-    );
-  }, [tokenBalances, checkout, network]);
-
   useEffect(() => {
     const bridgeToL2GasCheck = async () => {
-      await runBridgeToL2GasCheck;
+      if (!checkout) return;
+      if (!network) return;
+      if (network.chainId !== getL1ChainId(checkout.config)) return;
+
+      const ethBalance = tokenBalances
+        .find((balance) => isNativeToken(balance.address) && balance.symbol === ETH_TOKEN_SYMBOL);
+      if (!ethBalance) return;
+
+      if (ethBalance.balance === '0.0') {
+        setInsufficientFundsForBridgeToL2Gas(true);
+        return;
+      }
+
+      const { gasFee } = await checkout.gasEstimate({
+        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+        isSpendingCapApprovalRequired: false,
+      });
+
+      if (!gasFee.estimatedAmount) {
+        setInsufficientFundsForBridgeToL2Gas(false);
+        return;
+      }
+
+      setInsufficientFundsForBridgeToL2Gas(
+        gasFee.estimatedAmount.gt(utils.parseUnits(ethBalance.balance, DEFAULT_TOKEN_DECIMALS)),
+      );
     };
     bridgeToL2GasCheck();
-  }, []);
+  }, [tokenBalances, checkout, network]);
 
   useEffect(() => {
     if (!checkout || !provider || !network) return;
