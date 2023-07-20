@@ -13,6 +13,7 @@ import { SharedViews, ViewActions, ViewContext } from '../../../context/view-con
 import { hasZeroBalance } from '../../../lib/gasBalanceCheck';
 import { SwapContext } from '../context/SwapContext';
 import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
+import { IMX_TOKEN_SYMBOL } from '../../../lib';
 
 export interface SwapCoinsProps {
   fromAmount?: string;
@@ -42,7 +43,7 @@ export function SwapCoins({
   const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
 
   useEffect(() => {
-    if (hasZeroBalance(tokenBalances, 'IMX')) {
+    if (hasZeroBalance(tokenBalances, IMX_TOKEN_SYMBOL)) {
       setShowNotEnoughImxDrawer(true);
     }
   }, [tokenBalances]);
