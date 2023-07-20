@@ -12,7 +12,7 @@ import { getUnderlyingChainId } from './getUnderlyingProvider';
 export function isWeb3Provider(
   web3Provider: Web3Provider,
 ): boolean {
-  if (web3Provider && web3Provider instanceof Web3Provider && web3Provider.provider?.request) {
+  if (web3Provider && web3Provider.provider?.request && typeof web3Provider.provider.request === 'function') {
     return true;
   }
   return false;
