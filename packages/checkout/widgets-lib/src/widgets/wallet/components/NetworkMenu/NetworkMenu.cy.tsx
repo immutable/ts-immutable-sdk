@@ -2,7 +2,9 @@ import { mount } from 'cypress/react18';
 import React from 'react';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { cy, it } from 'local-cypress';
-import { Checkout, ConnectionProviders, TokenInfo } from '@imtbl/checkout-sdk';
+import {
+  Checkout, WalletProviderName, TokenInfo, ChainId,
+} from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
 import { WalletContext, WalletState } from '../../context/WalletContext';
@@ -19,11 +21,11 @@ describe('Network Menu', () => {
         networks: [
           {
             name: 'Ethereum',
-            chainId: 1,
+            chainId: ChainId.ETHEREUM,
           },
           {
             name: 'ImmutablezkEVMTestnet',
-            chainId: 13372,
+            chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           },
         ],
       });
@@ -47,7 +49,7 @@ describe('Network Menu', () => {
       }),
       network: null,
       provider: null,
-      providerPreference: ConnectionProviders.METAMASK,
+      walletProvider: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
     };
@@ -70,7 +72,7 @@ describe('Network Menu', () => {
       .as('switchNetworkStub')
       .resolves({
         network: {
-          chainId: 13372,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           name: 'ImmutablezkEVMTestnet',
           nativeCurrency: {
             name: 'IMX',
@@ -85,13 +87,13 @@ describe('Network Menu', () => {
         baseConfig: { environment: Environment.PRODUCTION },
       }),
       network: {
-        chainId: 1,
+        chainId: ChainId.ETHEREUM,
         name: 'Ethereum',
         nativeCurrency: {} as unknown as TokenInfo,
         isSupported: false,
       },
       provider: {} as unknown as Web3Provider,
-      providerPreference: ConnectionProviders.METAMASK,
+      walletProvider: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
     };
@@ -110,7 +112,7 @@ describe('Network Menu', () => {
     cySmartGet('@switchNetworkStub').should('have.been.called');
     cySmartGet('@switchNetworkStub').should('have.been.calledWith', {
       provider: {},
-      chainId: 13372,
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
     });
   });
 });

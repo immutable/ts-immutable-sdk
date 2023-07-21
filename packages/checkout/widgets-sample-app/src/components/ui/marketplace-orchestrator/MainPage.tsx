@@ -12,7 +12,7 @@ export const MainPage = () => {
   
   // local state for enabling/disabling and changing buttons
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
-  const [web3Provider, setWeb3Provider] = useState<Web3Provider|null>(null);
+  const [web3Provider, setWeb3Provider] = useState<Web3Provider|undefined>(undefined);
 
   // widget context state for showing/hiding widgets
   const {showWidgets: {

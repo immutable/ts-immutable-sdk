@@ -40,7 +40,7 @@ export function SwapButton({
     try {
       updateLoading(true);
 
-      if (transaction.approveTransaction) {
+      if (transaction.approval) {
         // If we need to approve a spending limit first
         // send user to Approve ERC20 Onbaording flow
         viewDispatch({
@@ -49,9 +49,9 @@ export function SwapButton({
             view: {
               type: SwapWidgetViews.APPROVE_ERC20,
               data: {
-                approveTransaction: transaction.approveTransaction,
-                transaction: transaction.transaction,
-                info: transaction.info,
+                approveTransaction: transaction.approval.transaction,
+                transaction: transaction.swap.transaction,
+                info: transaction.quote,
                 swapFormInfo: data as PrefilledSwapForm,
               },
             },
@@ -61,7 +61,7 @@ export function SwapButton({
       }
       const txn = await checkout.sendTransaction({
         provider,
-        transaction: transaction.transaction,
+        transaction: transaction.swap.transaction,
       });
 
       viewDispatch({

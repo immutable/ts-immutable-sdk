@@ -11,9 +11,9 @@ import {
   WalletAction,
   NetworkMap,
 } from '../types';
-import networkMasterList from './network_master_list.json';
 import { CheckoutConfiguration } from '../config';
 import { getUnderlyingChainId } from '../provider/getUnderlyingProvider';
+import { AllowedNetworkConfig } from '../config/remoteConfigType';
 
 const UNRECOGNISED_CHAIN_ERROR_CODE = 4902; // error code (MetaMask)
 
@@ -66,7 +66,11 @@ export async function getNetworkAllowList(
 ): Promise<GetNetworkAllowListResult> {
   const { networkMap } = config;
 
-  const list = networkMasterList.filter((network) => {
+  const allowedNetworkConfig = (await config.remote.getConfig(
+    'allowedNetworks',
+  )) as AllowedNetworkConfig[];
+
+  const list = allowedNetworkConfig.filter((network) => {
     const allowAllTokens = type === NetworkFilterTypes.ALL;
     const networkNotExcluded = !(exclude || [])
       .map((exc) => exc.chainId)
@@ -101,7 +105,9 @@ export async function getNetworkInfo(
     async () => {
       try {
         const network = await web3Provider.getNetwork();
-        if (Array.from(networkMap.keys()).includes(network.chainId as ChainId)) {
+        if (
+          Array.from(networkMap.keys()).includes(network.chainId as ChainId)
+        ) {
           const chainIdNetworkInfo = networkMap.get(network.chainId as ChainId);
           return {
             name: chainIdNetworkInfo!.chainName,
@@ -117,7 +123,9 @@ export async function getNetworkInfo(
         } as NetworkInfo;
       } catch (err) {
         const chainId = await getUnderlyingChainId(web3Provider);
-        const isSupported = Array.from(networkMap.keys()).includes(chainId as ChainId);
+        const isSupported = Array.from(networkMap.keys()).includes(
+          chainId as ChainId,
+        );
         return {
           chainId,
           isSupported,

@@ -1,9 +1,8 @@
 import {
   CheckConnectionResult,
   Checkout,
-  ConnectionProviders,
 } from '@imtbl/checkout-sdk';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import LoadingButton from './LoadingButton';
 import { Web3Provider } from '@ethersproject/providers';
 import { SuccessMessage, ErrorMessage, WarningMessage } from './messages';

@@ -17,33 +17,33 @@
 /**
  * 
  * @export
- * @interface SellItem
+ * @interface ERC721Item
  */
-export interface SellItem {
+export interface ERC721Item {
     /**
-     * Token type user is offering which in this case is a ERC721
+     * Token type user is offering, which in this case is ERC721
      * @type {string}
-     * @memberof SellItem
+     * @memberof ERC721Item
      */
-    'item_type': SellItemItemTypeEnum;
+    'item_type': ERC721ItemItemTypeEnum;
     /**
      * Address of ERC721 token
      * @type {string}
-     * @memberof SellItem
+     * @memberof ERC721Item
      */
     'contract_address': string;
     /**
      * ID of ERC721 token
      * @type {string}
-     * @memberof SellItem
+     * @memberof ERC721Item
      */
     'token_id': string;
 }
 
-export const SellItemItemTypeEnum = {
+export const ERC721ItemItemTypeEnum = {
     Erc721: 'ERC721'
 } as const;
 
-export type SellItemItemTypeEnum = typeof SellItemItemTypeEnum[keyof typeof SellItemItemTypeEnum];
+export type ERC721ItemItemTypeEnum = typeof ERC721ItemItemTypeEnum[keyof typeof ERC721ItemItemTypeEnum];
 
 

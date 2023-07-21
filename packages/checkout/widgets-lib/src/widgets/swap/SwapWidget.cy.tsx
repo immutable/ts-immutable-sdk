@@ -7,6 +7,7 @@ import { ChainId, Checkout } from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { BiomeCombinedProviders } from '@biom3/react';
+import { Web3Provider } from '@ethersproject/providers';
 import { cySmartGet } from '../../lib/testUtils';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
@@ -19,7 +20,7 @@ const overrides: any = {
   rpcURL: 'https://rpc.node',
   commonRoutingTokens: [
     {
-      chainId: 11155111,
+      chainId: ChainId.SEPOLIA,
       address: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE',
       decimals: 18,
       symbol: 'FUN',
@@ -29,7 +30,7 @@ const overrides: any = {
     multicall: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e',
   },
   nativeToken: {
-    chainId: 11155111,
+    chainId: ChainId.SEPOLIA,
   },
 };
 
@@ -42,7 +43,7 @@ describe('SwapWidget tests', () => {
 
   const mockProvider = {
     getSigner: () => ({
-      getAddress: () => Promise.resolve('dss'),
+      getAddress: () => Promise.resolve('0xwalletAddress'),
     }),
     getNetwork: async () => ({
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
@@ -51,7 +52,8 @@ describe('SwapWidget tests', () => {
     provider: {
       request: async () => null,
     },
-  };
+  } as unknown as Web3Provider;
+
   beforeEach(() => {
     cy.stub(Checkout.prototype, 'connect')
       .as('connectStub')
@@ -65,6 +67,15 @@ describe('SwapWidget tests', () => {
             symbol: 'IMX',
             decimals: 18,
           },
+        },
+      });
+
+    cy.stub(Checkout.prototype, 'getNetworkInfo')
+      .as('getNetworkInfoStub')
+      .resolves({
+        isSupported: true,
+        nativeCurrency: {
+          symbol: 'eth',
         },
       });
 
@@ -124,39 +135,21 @@ describe('SwapWidget tests', () => {
         ],
       });
 
-    const fiatPricingValue = {
-      ethereum: { usd: 2000.0 },
-      'usd-coin': { usd: 1.0 },
-      'immutable-x': { usd: 1.5 },
-    };
-
-    const coinList = [
-      {
-        id: 'ethereum',
-        symbol: 'eth',
-        name: 'Etherum',
-      },
-    ];
-
     cy.intercept(
       {
         method: 'GET',
-        path: '/api/v3/coins/list*',
+        path: '/v1/fiat/conversion*',
       },
-      coinList,
-    ).as('coinListStub');
-
-    cy.intercept(
       {
-        method: 'GET',
-        path: '/api/v3/simple/price*',
+        ethereum: { usd: 2000.0 },
+        'usd-coin': { usd: 1.0 },
+        'immutable-x': { usd: 1.5 },
       },
-      fiatPricingValue,
     ).as('cryptoFiatStub');
   });
 
   const params = {
-    providerName: 'metamask',
+    walletProvider: 'metamask',
   } as SwapWidgetParams;
   const config: StrongCheckoutWidgetsConfig = {
     environment: Environment.SANDBOX,
@@ -171,6 +164,7 @@ describe('SwapWidget tests', () => {
       <SwapWidget
         params={params}
         config={config}
+        web3Provider={mockProvider}
       />,
     );
 
@@ -185,6 +179,7 @@ describe('SwapWidget tests', () => {
       <SwapWidget
         config={config}
         params={params}
+        web3Provider={mockProvider}
       />,
     );
 
@@ -244,7 +239,7 @@ describe('SwapWidget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <SwapWidget params={params} config={config} />
+          <SwapWidget params={params} config={config} web3Provider={mockProvider} />
         </BiomeCombinedProviders>,
       );
     });

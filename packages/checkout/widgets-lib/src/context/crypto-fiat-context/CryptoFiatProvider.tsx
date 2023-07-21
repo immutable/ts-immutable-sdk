@@ -14,6 +14,8 @@ interface CryptoFiatProviderProps {
   children: ReactNode;
 }
 
+export const DEFAULT_TOKEN_SYMBOLS = ['ETH', 'IMX'];
+
 export function CryptoFiatProvider({ environment, children }: CryptoFiatProviderProps) {
   const [cryptoFiatState, cryptoFiatDispatch] = useReducer(
     cryptoFiatReducer,
@@ -42,7 +44,7 @@ export function CryptoFiatProvider({ environment, children }: CryptoFiatProvider
       const conversions = await getCryptoToFiatConversion(
         cryptoFiat,
         fiatSymbol,
-        tokenSymbols,
+        [...new Set([...tokenSymbols, ...DEFAULT_TOKEN_SYMBOLS])],
       );
 
       cryptoFiatDispatch({

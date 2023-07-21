@@ -11,7 +11,7 @@ import { WalletProviderName } from '@imtbl/checkout-sdk';
 
 export function sendConnectSuccessEvent(
   provider: Web3Provider,
-  providerName?: WalletProviderName,
+  walletProvider?: WalletProviderName,
 ) {
   const successEvent = new CustomEvent<WidgetEvent<ConnectionSuccess>>(
     IMTBLWidgetEvents.IMTBL_CONNECT_WIDGET_EVENT,
@@ -20,7 +20,7 @@ export function sendConnectSuccessEvent(
         type: ConnectEventType.SUCCESS,
         data: {
           provider,
-          providerName,
+          walletProvider,
         },
       },
     },

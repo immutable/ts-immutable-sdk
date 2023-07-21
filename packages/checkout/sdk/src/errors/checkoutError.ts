@@ -1,5 +1,5 @@
 /**
- * The different types of errors that can be returned by the checkout process.
+ * Enum representing different types of errors that can occur during the checkout process.
  */
 export enum CheckoutErrorType {
   WEB3_PROVIDER_ERROR = 'WEB3_PROVIDER_ERROR',
@@ -21,8 +21,10 @@ export enum CheckoutErrorType {
 }
 
 /**
- * The type signature for an error.
- * Contains a type that corresponds to a {@link CheckoutErrorType}, an optional message string and optional data object.
+ * Represents an error object with a specific type, optional message, and optional data.
+ * @property {CheckoutErrorType} type - The type of the error.
+ * @property {string | undefined} [message] - The error message.
+ * @property {Object.<string, string> | undefined} [data] - Additional data associated with the error.
  */
 export type ErrorType = {
   type: CheckoutErrorType;
@@ -30,11 +32,8 @@ export type ErrorType = {
   data?: { [key: string]: string };
 };
 
-/**
- * The Checkout error class that extends the Error class.
- * Contains a message string, a type that corresponds to a {@link CheckoutErrorType} and optional data object.
- * It has a constructor that takes in a message string, a type and an optional data object.
- */
+/* The CheckoutError class is a custom error class in TypeScript that includes a message, type, and
+optional data object. */
 export class CheckoutError extends Error {
   public message: string;
 
@@ -54,18 +53,10 @@ export class CheckoutError extends Error {
   }
 }
 
-/**
- * The different types of internal errors that can be returned by the checkout process.
- */
 export enum CheckoutInternalErrorType {
   REJECTED_SWITCH_AFTER_ADDING_NETWORK = 'REJECTED_SWITCH_AFTER_ADDING_NETWORK',
 }
 
-/**
- * The Checkout internal error class that extends the Error class.
- * Contains a type that corresponds to a {@link CheckoutInternalErrorType}.
- * It has a constructor that takes in a type that corresponds to a {@link CheckoutInternalErrorType}.
- */
 export class CheckoutInternalError extends Error {
   public type: CheckoutInternalErrorType;
 
@@ -75,15 +66,11 @@ export class CheckoutInternalError extends Error {
   }
 }
 
-/**
- * Higher order function that takes in a function and an error object.
- * Returns the result of the function or throws a custom {@link CheckoutError}.
- * If the error thrown by the function is an instance of {@link CheckoutError},
- * it throws a new {@link CheckoutError} based on the custom error object.
- * Otherwise, it throws a new {@link CheckoutError} based on the custom error object with the cause of the error appended to the message.
- * @throws {@link CheckoutError}
- */
 export const withCheckoutError = async <T>(
+/**
+ * Wraps a function that returns a Promise and catches any errors that occur. If an error is caught,
+ * it is wrapped in a CheckoutError and rethrown.
+ */
   fn: () => Promise<T>,
   customError: ErrorType,
 ): Promise<T> => {

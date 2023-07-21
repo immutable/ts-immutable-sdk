@@ -10,6 +10,7 @@ import { PassportError, PassportErrorType } from '../errors/passportError';
 import { Networks } from '../types';
 import { PassportImxProvider } from './passportImxProvider';
 import { getStarkSigner } from './getStarkSigner';
+import { mockUser, mockUserImx } from '../test/mocks';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./workflows/registration');
@@ -87,27 +88,23 @@ describe('PassportImxProviderFactory', () => {
       describe('when we exceed the number of attempts to obtain a user with the correct metadata', () => {
         it('should throw an error', async () => {
           const magicProviderMock = {};
-          const userWithoutEtherKey = {
-            idToken: 'idToken123',
-            accessToken: 'accessToken123',
-          };
 
-          authManagerMock.login.mockResolvedValue(userWithoutEtherKey);
+          authManagerMock.login.mockResolvedValue(mockUser);
           magicAdapterMock.login.mockResolvedValue(magicProviderMock);
-          authManagerMock.loginSilent.mockResolvedValue(userWithoutEtherKey);
+          authManagerMock.loginSilent.mockResolvedValue(mockUser);
 
           await expect(() => passportImxProviderFactory.getProvider()).rejects.toThrow(
             'REFRESH_TOKEN_ERROR',
           );
 
           expect(authManagerMock.login).toHaveBeenCalledTimes(1);
-          expect(magicAdapterMock.login).toHaveBeenCalledWith(userWithoutEtherKey.idToken, config.network);
+          expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUser.idToken, config.network);
           expect(getSignerMock).toHaveBeenCalledTimes(1);
           expect(registerPassportStarkEx).toHaveBeenCalledWith({
             ethSigner: ethSignerMock,
             starkSigner: starkSignerMock,
             usersApi: immutableXClient.usersApi,
-          }, userWithoutEtherKey.accessToken);
+          }, mockUser.accessToken);
           expect(authManagerMock.loginSilent).toHaveBeenCalledTimes(4);
         });
       });
@@ -115,35 +112,25 @@ describe('PassportImxProviderFactory', () => {
       describe('when registration is successful', () => {
         it('should register the user and return a PassportImxProvider instance', async () => {
           const magicProviderMock = {};
-          const userWithoutMetadata = {
-            idToken: 'idToken123',
-            accessToken: 'accessToken123',
-          };
-          const userWithMetadata = {
-            ...userWithoutMetadata,
-            etherKey: 'etherKey123',
-            starkKey: 'starkKey123',
-            userAdminKey: 'userAdminKey123',
-          };
 
-          authManagerMock.login.mockResolvedValue(userWithoutMetadata);
+          authManagerMock.login.mockResolvedValue(mockUser);
           magicAdapterMock.login.mockResolvedValue(magicProviderMock);
-          authManagerMock.loginSilent.mockResolvedValue(userWithMetadata);
+          authManagerMock.loginSilent.mockResolvedValue(mockUserImx);
 
           const result = await passportImxProviderFactory.getProvider();
 
           expect(result).toBe(passportImxProviderMock);
           expect(authManagerMock.login).toHaveBeenCalledTimes(1);
-          expect(magicAdapterMock.login).toHaveBeenCalledWith(userWithMetadata.idToken, config.network);
+          expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUserImx.idToken, config.network);
           expect(getSignerMock).toHaveBeenCalledTimes(1);
           expect(registerPassportStarkEx).toHaveBeenCalledWith({
             ethSigner: ethSignerMock,
             starkSigner: starkSignerMock,
             usersApi: immutableXClient.usersApi,
-          }, userWithMetadata.accessToken);
+          }, mockUserImx.accessToken);
           expect(authManagerMock.loginSilent).toHaveBeenCalledTimes(1);
           expect(PassportImxProvider).toHaveBeenCalledWith({
-            user: userWithMetadata,
+            user: mockUserImx,
             starkSigner: starkSignerMock,
             immutableXClient,
             imxPublicApiDomain: config.imxPublicApiDomain,
@@ -156,28 +143,21 @@ describe('PassportImxProviderFactory', () => {
     describe('when the user has registered previously', () => {
       it('should return a PassportImxProvider instance', async () => {
         const magicProviderMock = {};
-        const user = {
-          idToken: 'idToken123',
-          accessToken: 'accessToken123',
-          etherKey: 'etherKey123',
-          starkKey: 'starkKey123',
-          userAdminKey: 'userAdminKey123',
-        };
 
-        authManagerMock.login.mockResolvedValue(user);
+        authManagerMock.login.mockResolvedValue(mockUserImx);
         magicAdapterMock.login.mockResolvedValue(magicProviderMock);
-        authManagerMock.loginSilent.mockResolvedValue(user);
+        authManagerMock.loginSilent.mockResolvedValue(mockUserImx);
 
         const result = await passportImxProviderFactory.getProvider();
 
         expect(result).toBe(passportImxProviderMock);
         expect(authManagerMock.login).toHaveBeenCalledTimes(1);
-        expect(magicAdapterMock.login).toHaveBeenCalledWith(user.idToken, config.network);
+        expect(magicAdapterMock.login).toHaveBeenCalledWith(mockUserImx.idToken, config.network);
         expect(getSignerMock).toHaveBeenCalledTimes(1);
         expect(registerPassportStarkEx).not.toHaveBeenCalled();
         expect(authManagerMock.loginSilent).not.toHaveBeenCalled();
         expect(PassportImxProvider).toHaveBeenCalledWith({
-          user,
+          user: mockUserImx,
           starkSigner: starkSignerMock,
           immutableXClient,
           imxPublicApiDomain: config.imxPublicApiDomain,
