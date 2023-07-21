@@ -306,5 +306,12 @@ export const text = {
         cancel: 'Dismiss',
       },
     },
+    unableToSwap: {
+      heading: 'Unable to swap this coin',
+      body: "These coins aren't on the Immutable Network right now. Try another selection or buy with card.",
+      buttons: {
+        cancel: 'Dismiss',
+      },
+    },
   },
 };

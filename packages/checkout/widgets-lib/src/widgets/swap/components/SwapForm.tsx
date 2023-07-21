@@ -33,6 +33,7 @@ import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSe
 import { useInterval } from '../../../lib/hooks/useInterval';
 import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { UnableToSwap } from './UnableToSwap';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -114,13 +115,14 @@ export function SwapForm({ data }: SwapFromProps) {
 
   // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [quoteError, setQuoteError] = useState<string>('');
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
   const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
+
+  // Drawers
   const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
+  const [showUnableToSwapDrawer, setShowUnableToSwapDrawer] = useState(false);
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -266,10 +268,7 @@ export function SwapForm({ data }: SwapFromProps) {
       setToTokenError('');
     } catch (error: any) {
       setQuote(null);
-      // eslint-disable-next-line no-console
-      console.log('Quote error: ', error.message);
-      // todo: handle the display on form when exchange errors
-      setQuoteError(error.message);
+      setShowUnableToSwapDrawer(true);
     }
     setIsFetching(false);
   };
@@ -333,10 +332,7 @@ export function SwapForm({ data }: SwapFromProps) {
       setToTokenError('');
     } catch (error: any) {
       setQuote(null);
-      // eslint-disable-next-line no-console
-      console.log('Quote error: ', error.message);
-      // todo: handle the display on form when exchange errors
-      setQuoteError(error.message);
+      setShowUnableToSwapDrawer(true);
     }
 
     setIsFetching(false);
@@ -698,6 +694,10 @@ export function SwapForm({ data }: SwapFromProps) {
           });
         }}
         onCloseBottomSheet={() => setShowNotEnoughImxDrawer(false)}
+      />
+      <UnableToSwap
+        visible={showUnableToSwapDrawer}
+        onCloseBottomSheet={() => setShowUnableToSwapDrawer(false)}
       />
     </>
   );
