@@ -1,4 +1,4 @@
-import { Box, MountedBottomSheetOverlayAndProvider } from '@biom3/react';
+import { Box, MountedOverlaysAndProvider } from '@biom3/react';
 import {
   simpleLayoutStyle,
   headerStyle,
@@ -29,7 +29,7 @@ export function SimpleLayout({
   footerBackgroundColor,
 }: SimpleLayoutProps) {
   return (
-    <MountedBottomSheetOverlayAndProvider containerId="layout-container">
+    <MountedOverlaysAndProvider bottomSheetContainerId="layout-container">
       <Box sx={responsiveStyles} id="layout-container">
         <Box testId={testId} sx={simpleLayoutStyle}>
           {header && (
@@ -56,6 +56,6 @@ export function SimpleLayout({
           )}
         </Box>
       </Box>
-    </MountedBottomSheetOverlayAndProvider>
+    </MountedOverlaysAndProvider>
   );
 }
