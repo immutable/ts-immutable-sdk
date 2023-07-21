@@ -6,7 +6,7 @@ export {
   JsonRpcResponsePayload,
   JsonRpcRequestCallback,
   Provider,
-  ProviderEventNames,
+  ProviderEvent,
   AccountsChangedEvent,
 } from './zkEvm/types';
 export {
