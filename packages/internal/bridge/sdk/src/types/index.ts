@@ -79,6 +79,16 @@ export interface BridgeDepositResponse {
   unsignedTx: ethers.providers.TransactionRequest;
 }
 
+export interface BridgeWithdrawRequest {
+  recipientAddress: Address;
+  token: FungibleToken;
+  withdrawAmount: ethers.BigNumber;
+}
+
+export interface BridgeWithdrawResponse {
+  unsignedTx: ethers.providers.TransactionRequest;
+}
+
 /**
  * @typedef {Object} ApproveBridgeRequest
  * @property {string} depositorAddress - The address of the depositor.

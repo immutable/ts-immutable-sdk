@@ -14,6 +14,8 @@ import {
   WaitForRequest,
   WaitForResponse,
   CompletionStatus,
+  ETH_SEPOLIA_TO_ZKEVM_LOCAL,
+  BridgeWithdrawRequest,
 } from '@imtbl/bridge-sdk';
 
 /**
@@ -64,6 +66,12 @@ async function deposit() {
   const checkout = new ethers.Wallet(
     process.env.PRIVATE_KEY,
     rootChainProvider,
+  );
+
+  // Create a wallet instance to simulate the user's wallet
+  const checkoutChildChain = new ethers.Wallet(
+    process.env.PRIVATE_KEY,
+    childChainProvider,
   );
 
   // Create a bridge configuration instance
@@ -126,6 +134,8 @@ async function deposit() {
   const unsignedDepositResult: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(depositArgs);
   console.log('Sending Deposit Tx');
   // Sign and Send the signed transaction
+
+
   const txResponse = await checkout.sendTransaction(
     unsignedDepositResult.unsignedTx,
   );
@@ -153,10 +163,97 @@ async function deposit() {
     console.log(
       `Deposit Failed on L2 with status ${bridgeResult.status}`,
     );
+    return;
   }
+
+  console.log(`Starting WITHDRAWAL`);
+  console.log(`Approving Bridge`);
+  // Approval
+  const childApproveReq: ApproveBridgeRequest = {
+    depositorAddress: process.env.DEPOSITOR_ADDRESS,
+    token: "0x0000000000000000000000000000000000001010",
+    depositAmount,
+  };
+
+  // Get the unsigned approval transaction for the deposit
+  const childApproveResp: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveChildBridgeTx(childApproveReq);
+
+  // If approval is required, sign and send the approval transaction
+  if (childApproveResp.required) {
+    if (!childApproveResp.unsignedTx) {
+      throw new Error('tx is null');
+    }
+    console.log('Sending Approve Tx');
+    // childApproveResp.unsignedTx.gasLimit = ethers.utils.hexlify(500000); 
+    const txResponseApprove = await checkoutChildChain.sendTransaction(
+      childApproveResp.unsignedTx,
+    );
+    const txApprovalReceipt = await txResponseApprove.wait();
+    console.log(
+      `Approval Tx Completed with hash: ${txApprovalReceipt.transactionHash}`,
+    );
+  } else {
+    console.log('Approval not required');
+  }
+  //
+
+  const withdrawlReq: BridgeWithdrawRequest = {
+    recipientAddress: process.env.DEPOSITOR_ADDRESS,
+    token: "0x0000000000000000000000000000000000001010",
+    withdrawAmount: depositAmount
+  };
+  
+  const unsignedWithdrawReq = await tokenBridge.getUnsignedWithdrawTx(withdrawlReq);
+  const tx = { ...unsignedWithdrawReq.unsignedTx, gasLimit: ethers.utils.hexlify(500000)} 
+  console.log("Sending tx");
+  const txWithdraw = await checkoutChildChain.sendTransaction(tx);
+  const txWithdrawReceipt = await txWithdraw.wait(1);
+  console.log(txWithdrawReceipt);
+
 }
+
+// async function withdraw() {
+//     // Check and throw errors if required environment variables are not set
+//     if (!process.env.ROOT_PROVIDER) {
+//       console.log(process.env.ROOT_PROVIDER);
+//       throw new Error('ROOT_PROVIDER not set');
+//     }
+//     if (!process.env.CHILD_PROVIDER) {
+//       throw new Error('CHILD_PROVIDER not set');
+//     }
+//     if (!process.env.PRIVATE_KEY) {
+//       throw new Error('PRIVATE_KEY not set');
+//     }
+//     if (!process.env.DEPOSITOR_ADDRESS) {
+//       throw new Error('DEPOSITOR_ADDRESS not set');
+//     }
+//     if (!process.env.RECIPIENT_ADDRESS) {
+//       throw new Error('RECIPIENT_ADDRESS not set');
+//     }
+//     if (!process.env.TOKEN_ADDRESS) {
+//       throw new Error('TOKEN_ADDRESS not set');
+//     }
+//     if (!process.env.DEPOSIT_AMOUNT) {
+//       throw new Error('DEPOSIT_AMOUNT not set');
+//     }
+
+
+
+//     console.log(`Starting WITHDRAWAL`);
+//     const withdrawlReq: BridgeWithdrawRequest = {
+//       recipientAddress: process.env.DEPOSITOR_ADDRESS,
+//       token: process.env.TOKEN_ADDRESS,
+//       withdrawAmount: depositAmountBeforeFee
+//     };
+    
+//     const unsignedWithdrawReq = await tokenBridge.getUnsignedWithdrawTx(withdrawlReq);
+//     const txWithdraw = await checkout.sendTransaction(unsignedWithdrawReq.unsignedTx);
+//     const txWithdrawReceipt = await txWithdraw.wait(1);
+//     console.log(txWithdrawReceipt);
+// }
 
 // Run the deposit function and exit the process when completed
 (async () => {
   await deposit().then(() => {console.log(`Exiting Successfully`); process.exit(0)}).catch(e => {console.log(`Exiting with error: ${e.toString()}`); process.exit(1)});
+  // await withdraw().then(() => console.log("Completed Withdrawl")).catch((e) => console.log(`Error occurred: ${e}`));
 })();
