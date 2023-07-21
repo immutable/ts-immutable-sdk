@@ -1,12 +1,31 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ChainNotSupportedError, InvalidConfigurationError } from 'errors';
 import * as test from 'utils/testUtils';
-import { ethers } from 'ethers';
 import { ExchangeModuleConfiguration, ExchangeOverrides, TokenInfo } from '../types';
 import { ExchangeConfiguration, ExchangeContracts } from './index';
 import { IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';
 
 describe('ExchangeConfiguration', () => {
+  const chainId = 999999999;
+  // This list can be updated with any Tokens that are deployed to the chain being configured
+  // These tokens will be used to find available pools for a swap
+  const commonRoutingTokensSingle: TokenInfo[] = [
+    {
+      chainId,
+      address: '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
+      decimals: 18,
+      symbol: 'FUN',
+      name: 'The Fungibles Token',
+    },
+  ];
+
+  const contractOverrides: ExchangeContracts = {
+    multicall: test.TEST_MULTICALL_ADDRESS,
+    coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
+    quoterV2: test.TEST_QUOTER_ADDRESS,
+    peripheryRouter: test.TEST_PERIPHERY_ROUTER_ADDRESS,
+  };
+
   describe('when given sandbox environment with supported chain id', () => {
     it('should create successfully', () => {
       const baseConfig = new ImmutableConfiguration({
@@ -43,19 +62,11 @@ describe('ExchangeConfiguration', () => {
 
   describe('when given overrides', () => {
     it('should override any configuration with given values', () => {
-      const chainId = 999999999;
       const dummyFeeRecipient = '0xb18c44b211065E69844FbA9AE146DA362104AfBf';
 
       const immutableConfig = new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }); // environment isn't used because we override all of the config values
-
-      const contractOverrides: ExchangeContracts = {
-        multicall: test.TEST_MULTICALL_ADDRESS,
-        coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
-        quoterV2: test.TEST_QUOTER_ADDRESS,
-        peripheryRouter: test.TEST_PERIPHERY_ROUTER_ADDRESS,
-      };
 
       // This list can be updated with any Tokens that are deployed to the chain being configured
       // These tokens will be used to find available pools for a swap
@@ -86,7 +97,7 @@ describe('ExchangeConfiguration', () => {
       const secondaryFees = [
         {
           feeRecipient: dummyFeeRecipient,
-          feePrcntInBasisPoints: ethers.BigNumber.from('100'),
+          feeBasisPoints: 100,
         },
       ];
 
@@ -130,39 +141,27 @@ describe('ExchangeConfiguration', () => {
       }
       expect(config.secondaryFees[0].feeRecipient.toLowerCase())
         .toEqual(dummyFeeRecipient.toLowerCase());
-      expect(config.secondaryFees[0].feePrcntInBasisPoints.toString())
-        .toEqual(secondaryFees[0].feePrcntInBasisPoints.toString());
+      expect(config.secondaryFees[0].feeBasisPoints.toString())
+        .toEqual(secondaryFees[0].feeBasisPoints.toString());
     });
 
     it('should throw when missing configuration', () => {
-      const chainId = 999999999;
-
       const immutableConfig = new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }); // environment isn't used because we override all of the config values
 
-      const contractOverrides: ExchangeContracts = {
+      const invalidContractOverrides: ExchangeContracts = {
         multicall: '',
         coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
         quoterV2: test.TEST_QUOTER_ADDRESS,
         peripheryRouter: test.TEST_PERIPHERY_ROUTER_ADDRESS,
       };
 
-      const commonRoutingTokens: TokenInfo[] = [
-        {
-          chainId,
-          address: '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
-          decimals: 18,
-          symbol: 'FUN',
-          name: 'The Fungibles Token',
-        },
-      ];
-
       const rpcURL = 'https://anrpcurl.net';
       const overrides: ExchangeOverrides = {
         rpcURL,
-        exchangeContracts: contractOverrides,
-        commonRoutingTokens,
+        exchangeContracts: invalidContractOverrides,
+        commonRoutingTokens: commonRoutingTokensSingle,
         nativeToken: test.IMX_TEST_TOKEN,
       };
 
@@ -174,34 +173,15 @@ describe('ExchangeConfiguration', () => {
     });
 
     it('show throw when given an invalid RPC URL', () => {
-      const chainId = 999999999;
-
       const immutableConfig = new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }); // environment isn't used because we override all of the config values
-
-      const contractOverrides: ExchangeContracts = {
-        multicall: '',
-        coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
-        quoterV2: test.TEST_QUOTER_ADDRESS,
-        peripheryRouter: test.TEST_PERIPHERY_ROUTER_ADDRESS,
-      };
-
-      const commonRoutingTokens: TokenInfo[] = [
-        {
-          chainId,
-          address: '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
-          decimals: 18,
-          symbol: 'FUN',
-          name: 'The Fungibles Token',
-        },
-      ];
 
       const rpcURL = '';
       const overrides: ExchangeOverrides = {
         rpcURL,
         exchangeContracts: contractOverrides,
-        commonRoutingTokens,
+        commonRoutingTokens: commonRoutingTokensSingle,
         nativeToken: test.IMX_TEST_TOKEN,
       };
 
@@ -213,36 +193,16 @@ describe('ExchangeConfiguration', () => {
     });
 
     it('should throw when given an invalid secondary fee recipient address', () => {
-      const chainId = 999999999;
       const invalidFeeRecipient = '0x18c44b211065E69844FbA9AE146DA362104AfBf'; // too short
 
       const immutableConfig = new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }); // environment isn't used because we override all of the config values
 
-      const contractOverrides: ExchangeContracts = {
-        multicall: test.TEST_MULTICALL_ADDRESS,
-        coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
-        quoterV2: test.TEST_QUOTER_ADDRESS,
-        peripheryRouter: test.TEST_PERIPHERY_ROUTER_ADDRESS,
-      };
-
-      // This list can be updated with any Tokens that are deployed to the chain being configured
-      // These tokens will be used to find available pools for a swap
-      const commonRoutingTokens: TokenInfo[] = [
-        {
-          chainId,
-          address: '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
-          decimals: 18,
-          symbol: 'FUN',
-          name: 'The Fungibles Token',
-        },
-      ];
-
       const secondaryFees = [
         {
           feeRecipient: invalidFeeRecipient,
-          feePrcntInBasisPoints: ethers.BigNumber.from('100'),
+          feeBasisPoints: 100,
         },
       ];
 
@@ -250,7 +210,7 @@ describe('ExchangeConfiguration', () => {
       const overrides: ExchangeOverrides = {
         rpcURL,
         exchangeContracts: contractOverrides,
-        commonRoutingTokens,
+        commonRoutingTokens: commonRoutingTokensSingle,
         nativeToken: test.IMX_TEST_TOKEN,
         secondaryFees,
       };
@@ -264,37 +224,17 @@ describe('ExchangeConfiguration', () => {
       ));
     });
 
-    it('should throw when given an invalid secondary fee percentage', () => {
-      const chainId = 999999999;
-      const dummyFeeRecipient = '0xb18c44b211065E69844FbA9AE146DA362104AfBf'; // too short
+    it('should throw when given invalid secondary fee basis points', () => {
+      const dummyFeeRecipient = '0xb18c44b211065E69844FbA9AE146DA362104AfBf';
 
       const immutableConfig = new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }); // environment isn't used because we override all of the config values
 
-      const contractOverrides: ExchangeContracts = {
-        multicall: test.TEST_MULTICALL_ADDRESS,
-        coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
-        quoterV2: test.TEST_QUOTER_ADDRESS,
-        peripheryRouter: test.TEST_PERIPHERY_ROUTER_ADDRESS,
-      };
-
-      // This list can be updated with any Tokens that are deployed to the chain being configured
-      // These tokens will be used to find available pools for a swap
-      const commonRoutingTokens: TokenInfo[] = [
-        {
-          chainId,
-          address: '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
-          decimals: 18,
-          symbol: 'FUN',
-          name: 'The Fungibles Token',
-        },
-      ];
-
       const secondaryFees = [
         {
           feeRecipient: dummyFeeRecipient,
-          feePrcntInBasisPoints: ethers.BigNumber.from('10001'),
+          feeBasisPoints: 10001,
         },
       ];
 
@@ -302,7 +242,7 @@ describe('ExchangeConfiguration', () => {
       const overrides: ExchangeOverrides = {
         rpcURL,
         exchangeContracts: contractOverrides,
-        commonRoutingTokens,
+        commonRoutingTokens: commonRoutingTokensSingle,
         nativeToken: test.IMX_TEST_TOKEN,
         secondaryFees,
       };
@@ -312,41 +252,20 @@ describe('ExchangeConfiguration', () => {
         baseConfig: immutableConfig,
         overrides,
       })).toThrow(new InvalidConfigurationError(
-        `Invalid secondary fee percentage: ${secondaryFees[0].feePrcntInBasisPoints}`,
+        `Invalid secondary fee percentage: ${secondaryFees[0].feeBasisPoints}`,
       ));
     });
 
     it('should not set secondary fees when not given', () => {
-      const chainId = 999999999;
-
       const immutableConfig = new ImmutableConfiguration({
         environment: Environment.SANDBOX,
       }); // environment isn't used because we override all of the config values
-
-      const contractOverrides: ExchangeContracts = {
-        multicall: test.TEST_MULTICALL_ADDRESS,
-        coreFactory: test.TEST_V3_CORE_FACTORY_ADDRESS,
-        quoterV2: test.TEST_QUOTER_ADDRESS,
-        peripheryRouter: test.TEST_PERIPHERY_ROUTER_ADDRESS,
-      };
-
-      // This list can be updated with any Tokens that are deployed to the chain being configured
-      // These tokens will be used to find available pools for a swap
-      const commonRoutingTokens: TokenInfo[] = [
-        {
-          chainId,
-          address: '0x12958b06abdf2701ace6ceb3ce0b8b1ce11e0851',
-          decimals: 18,
-          symbol: 'FUN',
-          name: 'The Fungibles Token',
-        },
-      ];
 
       const rpcURL = 'https://anrpcurl.net';
       const overrides: ExchangeOverrides = {
         rpcURL,
         exchangeContracts: contractOverrides,
-        commonRoutingTokens,
+        commonRoutingTokens: commonRoutingTokensSingle,
         nativeToken: test.IMX_TEST_TOKEN,
       };
 
@@ -356,7 +275,7 @@ describe('ExchangeConfiguration', () => {
         overrides,
       });
 
-      expect(config.secondaryFees).toBeUndefined();
+      expect(config.secondaryFees).toEqual([]);
     });
   });
 });
