@@ -44,7 +44,7 @@ export function digestOfTransactionsAndNonce(nonce: BigNumberish, normalisedTran
 }
 
 export const getNonce = async (jsonRpcProvider: JsonRpcProvider, smartContractWalletAddress: string) => {
-  const code = await jsonRpcProvider.send('eth_getCode', [smartContractWalletAddress]);
+  const code = await jsonRpcProvider.send('eth_getCode', [smartContractWalletAddress, 'latest']);
   if (code && code !== '0x') {
     const contract = new ethers.Contract(
       smartContractWalletAddress,
