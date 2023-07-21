@@ -5,7 +5,7 @@ import { UserZkEvm } from '../../types';
 import AuthManager from '../../authManager';
 import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
 
-export type CreateCounterfactualAddressInput = {
+export type RegisterZkEvmUserInput = {
   authManager: AuthManager;
   magicProvider: ExternalProvider,
   multiRollupApiClients: MultiRollupApiClients,
@@ -14,12 +14,12 @@ export type CreateCounterfactualAddressInput = {
 
 const MESSAGE_TO_SIGN = 'Only sign this message from Immutable Passport';
 
-export async function createCounterfactualAddress({
+export async function registerZkEvmUser({
   authManager,
   magicProvider,
   multiRollupApiClients,
   accessToken,
-}: CreateCounterfactualAddressInput): Promise<UserZkEvm> {
+}: RegisterZkEvmUserInput): Promise<UserZkEvm> {
   const web3Provider = new Web3Provider(
     magicProvider,
   );
