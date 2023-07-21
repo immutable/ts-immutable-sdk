@@ -65,14 +65,26 @@ export interface JsonRpcResponsePayload {
 }
 
 export type Provider = {
-  request: (request: RequestArguments) => Promise<any>
+  request: (request: RequestArguments) => Promise<any>;
   sendAsync: (
     request: JsonRpcRequestPayload | JsonRpcRequestPayload[],
     callback: JsonRpcRequestCallback,
-  ) => void
+  ) => void;
   send: (
     request: string | JsonRpcRequestPayload | JsonRpcRequestPayload[],
     callbackOrParams?: JsonRpcRequestCallback | Array<any>,
     callback?: JsonRpcRequestCallback,
-  ) => void
+  ) => void;
+  on: (event: string, listener: (...args: any[]) => void) => void;
+  removeListener: (event: string, listener: (...args: any[]) => void) => void;
 };
+
+export enum ProviderEventNames {
+  ACCOUNTS_CHANGED = 'accountsChanged',
+}
+
+export type AccountsChangedEvent = Array<string>;
+
+export interface ProviderEvents extends Record<string, any> {
+  [ProviderEventNames.ACCOUNTS_CHANGED]: [AccountsChangedEvent],
+}

@@ -16,6 +16,7 @@ enum EthereumParamType {
 interface EthereumParam {
   name: string;
   type?: EthereumParamType;
+  default?: string;
 }
 
 interface EthereumMethod {
@@ -37,7 +38,7 @@ const EthereumMethods: EthereumMethod[] = [
     name: 'eth_getBalance',
     params: [
       { name: 'address' },
-      { name: 'blockNumber/tag' },
+      { name: 'blockNumber/tag', default: 'latest' },
     ],
   },
   {
@@ -45,7 +46,7 @@ const EthereumMethods: EthereumMethod[] = [
     params: [
       { name: 'address' },
       { name: 'position' },
-      { name: 'blockNumber' },
+      { name: 'blockNumber', default: 'latest' },
     ],
   },
   {
@@ -58,7 +59,7 @@ const EthereumMethods: EthereumMethod[] = [
     name: 'eth_call',
     params: [
       { name: 'transaction' },
-      { name: 'blockNumber/tag' },
+      { name: 'blockNumber/tag', default: 'latest' },
     ],
   },
   { name: 'eth_blockNumber' },
@@ -93,7 +94,6 @@ const EthereumMethods: EthereumMethod[] = [
     name: 'eth_getTransactionCount',
     params: [
       { name: 'address' },
-      { name: 'blockNumber' },
     ],
   },
 ];
@@ -147,10 +147,8 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
         addMessage(selectedEthMethod?.name, result);
         handleClose();
       } catch (err) {
-        if (err instanceof Error) {
-          addMessage('Request', err);
-          handleClose();
-        }
+        addMessage('Request', err);
+        handleClose();
       }
     } else {
       setInvalid(true);
@@ -164,7 +162,7 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
       console.error('Invalid eth method');
     } else {
       setSelectedEthMethod(ethMethod);
-      setParams(Array(ethMethod.params?.length || 0).fill(''));
+      setParams(ethMethod.params ? ethMethod.params.map((param) => param.default || '') : []);
     }
   };
 
@@ -199,6 +197,7 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
                   <Form.Control
                     key={param.name}
                     type="text"
+                    value={param.default}
                     onChange={(e) => {
                       const newParams = [...params];
                       newParams[index] = e.target.value;
