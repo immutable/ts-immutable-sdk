@@ -5,13 +5,6 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@0xsequence/abi@npm:^0.39.6":
-  version: 0.39.6
-  resolution: "@0xsequence/abi@npm:0.39.6"
-  checksum: 1a953e0c5379f9c015626f22ab8b84a2996a66af7b1aa8740674690ca87e4622917cebdecf426ae46fe4394c726077686ba4d8971a277abb74bc586707a05d3c
-  languageName: node
-  linkType: hard
-
 "@0xsequence/abi@npm:^0.43.34":
   version: 0.43.34
   resolution: "@0xsequence/abi@npm:0.43.34"
@@ -92,20 +85,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsequence/multicall@npm:^0.39.0":
-  version: 0.39.6
-  resolution: "@0xsequence/multicall@npm:0.39.6"
-  dependencies:
-    "@0xsequence/abi": ^0.39.6
-    "@0xsequence/network": ^0.39.6
-    "@0xsequence/utils": ^0.39.6
-    "@ethersproject/providers": ^5.5.1
-    ethers: ^5.5.2
-  checksum: cccfe1bf4dca8bdba3c7d0a02c95966f36405a64b119ee67c37157a731801290436a1b0bad6d06c868039401bcc25f4cdce910d861621f4c8cbcb9c37f50f35f
-  languageName: node
-  linkType: hard
-
-"@0xsequence/multicall@npm:^0.43.34":
+"@0xsequence/multicall@npm:^0.43.29, @0xsequence/multicall@npm:^0.43.34":
   version: 0.43.34
   resolution: "@0xsequence/multicall@npm:0.43.34"
   dependencies:
@@ -115,17 +95,6 @@ __metadata:
   peerDependencies:
     ethers: ">=5.5 < 6"
   checksum: 7f5cad33b43438b1ad7917c3b0a3bc0faceda2e0e4c5698301dd091df9afd5e9cdfbc4168d0d0ac88afad3c38cd4314f328332e6b6061dff6969db850364ed0b
-  languageName: node
-  linkType: hard
-
-"@0xsequence/network@npm:^0.39.6":
-  version: 0.39.6
-  resolution: "@0xsequence/network@npm:0.39.6"
-  dependencies:
-    "@0xsequence/utils": ^0.39.6
-    "@ethersproject/providers": ^5.5.1
-    ethers: ^5.5.2
-  checksum: 18c739245b94845f2bdebf5024bfaa9ad8bab3ea29efb7021db287a0d169609b99ed6695659bcb4d4c44937c458b5b5cb4431c95f61f3d0cd095aa362a7501d9
   languageName: node
   linkType: hard
 
@@ -189,18 +158,6 @@ __metadata:
   peerDependencies:
     ethers: ">=5.5 < 6"
   checksum: 3714c68210060dfb1b6662b3a694fd705f8e77fc19e030740dbe807afd9ca45ce3ed759aee7d346e270c4edb644208265c4cf83401b9b1279edd628e5522520a
-  languageName: node
-  linkType: hard
-
-"@0xsequence/utils@npm:^0.39.6":
-  version: 0.39.6
-  resolution: "@0xsequence/utils@npm:0.39.6"
-  dependencies:
-    "@ethersproject/abstract-signer": ^5.5.0
-    "@ethersproject/properties": ^5.5.0
-    ethers: ^5.5.2
-    js-base64: ^3.7.2
-  checksum: baa6e31329fbcf9c8a981a1a5618cae9eabc49cf0e5a5bdf45dba77c671623c1431fc377b181f0a38df9094cb8601e2c4e839c8daffa07232c641338a8566f8d
   languageName: node
   linkType: hard
 
@@ -2638,7 +2595,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/abstract-signer@npm:5.7.0, @ethersproject/abstract-signer@npm:^5.5.0, @ethersproject/abstract-signer@npm:^5.7.0":
+"@ethersproject/abstract-signer@npm:5.7.0, @ethersproject/abstract-signer@npm:^5.7.0":
   version: 5.7.0
   resolution: "@ethersproject/abstract-signer@npm:5.7.0"
   dependencies:
@@ -2824,7 +2781,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/properties@npm:5.7.0, @ethersproject/properties@npm:^5.5.0, @ethersproject/properties@npm:^5.7.0":
+"@ethersproject/properties@npm:5.7.0, @ethersproject/properties@npm:^5.7.0":
   version: 5.7.0
   resolution: "@ethersproject/properties@npm:5.7.0"
   dependencies:
@@ -2833,7 +2790,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/providers@npm:5.7.2, @ethersproject/providers@npm:^5.0.0, @ethersproject/providers@npm:^5.5.1, @ethersproject/providers@npm:^5.7.1, @ethersproject/providers@npm:^5.7.2":
+"@ethersproject/providers@npm:5.7.2, @ethersproject/providers@npm:^5.0.0, @ethersproject/providers@npm:^5.7.1, @ethersproject/providers@npm:^5.7.2":
   version: 5.7.2
   resolution: "@ethersproject/providers@npm:5.7.2"
   dependencies:
@@ -3543,7 +3500,7 @@ __metadata:
   resolution: "@imtbl/orderbook@workspace:packages/orderbook"
   dependencies:
     "@imtbl/config": 0.0.0
-    "@opensea/seaport-js": ^1.3.0
+    "@opensea/seaport-js": 2.0.5
     "@rollup/plugin-typescript": ^11.0.0
     "@swc/jest": ^0.2.24
     "@typechain/ethers-v5": ^10.2.0
@@ -3693,6 +3650,7 @@ __metadata:
     "@jest/globals": ^29.5.0
     "@magic-ext/oidc": ^1.0.1
     "@metamask/detect-provider": ^2.0.0
+    "@opensea/seaport-js": 2.0.5
     "@rollup/plugin-commonjs": ^24.0.1
     "@rollup/plugin-json": ^6.0.0
     "@rollup/plugin-node-resolve": ^15.0.2
@@ -5191,14 +5149,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opensea/seaport-js@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "@opensea/seaport-js@npm:1.3.0"
+"@opensea/seaport-js@npm:2.0.5":
+  version: 2.0.5
+  resolution: "@opensea/seaport-js@npm:2.0.5"
   dependencies:
-    "@0xsequence/multicall": ^0.39.0
-    ethers: ^5.6.7
-    merkletreejs: ^0.3.9
-  checksum: 319980ed6cc4c0fc42a12bb375bbcffe27331078f1dd41e8c085db6f0240ca12d2c481a804966fb7032dbc5b97c13f75262f25533d92646eb48f437a56ce69d6
+    "@0xsequence/multicall": ^0.43.29
+    ethers: ^5.7.2
+    merkletreejs: ^0.3.10
+  checksum: b00ee0eaec34a32af1da038c37ec0506519fbfb7397df090d0ada56c26f39b1e5f832d294de0e59df63e5d59616df3146efb489e710b5691fe64a0fbaad893f5
   languageName: node
   linkType: hard
 
@@ -14997,7 +14955,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^5.5.2, ethers@npm:^5.6.7, ethers@npm:^5.6.9, ethers@npm:^5.7.1, ethers@npm:^5.7.2":
+"ethers@npm:^5.6.9, ethers@npm:^5.7.1, ethers@npm:^5.7.2":
   version: 5.7.2
   resolution: "ethers@npm:5.7.2"
   dependencies:
@@ -20597,7 +20555,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"merkletreejs@npm:^0.3.9":
+"merkletreejs@npm:^0.3.10":
   version: 0.3.10
   resolution: "merkletreejs@npm:0.3.10"
   dependencies:
