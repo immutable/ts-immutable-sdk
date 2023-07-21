@@ -6,8 +6,8 @@ import {
   JsonRpcRequestPayload,
   JsonRpcResponsePayload,
   Provider,
-  ProviderEventNames,
-  ProviderEvents,
+  ProviderEvent,
+  ProviderEventMap,
   RequestArguments,
 } from './types';
 import AuthManager from '../authManager';
@@ -33,7 +33,7 @@ type LoggedInZkEvmProvider = {
   user: UserZkEvm;
 };
 
-export class ZkEvmProvider extends TypedEventEmitter<ProviderEvents> implements Provider {
+export class ZkEvmProvider implements Provider {
   private readonly authManager: AuthManager;
 
   private readonly config: PassportConfiguration;
@@ -46,7 +46,9 @@ export class ZkEvmProvider extends TypedEventEmitter<ProviderEvents> implements 
 
   private readonly multiRollupApiClients: MultiRollupApiClients;
 
-  private readonly jsonRpcProvider: JsonRpcProvider; // Used for read operations
+  private readonly jsonRpcProvider: JsonRpcProvider; // Used for read
+
+  private readonly eventEmitter: TypedEventEmitter<ProviderEventMap>;
 
   protected magicProvider?: ExternalProvider; // Used for signing
 
@@ -59,8 +61,6 @@ export class ZkEvmProvider extends TypedEventEmitter<ProviderEvents> implements 
     confirmationScreen,
     multiRollupApiClients,
   }: ZkEvmProviderInput) {
-    super();
-
     this.authManager = authManager;
     this.magicAdapter = magicAdapter;
     this.config = config;
@@ -68,6 +68,7 @@ export class ZkEvmProvider extends TypedEventEmitter<ProviderEvents> implements 
     this.relayerClient = new RelayerClient({ config });
     this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
     this.multiRollupApiClients = multiRollupApiClients;
+    this.eventEmitter = new TypedEventEmitter<ProviderEventMap>();
   }
 
   private isLoggedIn(): this is LoggedInZkEvmProvider {
@@ -90,7 +91,7 @@ export class ZkEvmProvider extends TypedEventEmitter<ProviderEvents> implements 
         this.user = user;
         this.magicProvider = magicProvider;
 
-        this.emit(ProviderEventNames.ACCOUNTS_CHANGED, [this.user.zkEvm.ethAddress]);
+        this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.user.zkEvm.ethAddress]);
 
         return [this.user.zkEvm.ethAddress];
       }
@@ -236,5 +237,13 @@ export class ZkEvmProvider extends TypedEventEmitter<ProviderEvents> implements 
     }
 
     throw new JsonRpcError(RpcErrorCode.INVALID_REQUEST, 'Invalid request');
+  }
+
+  public on(event: string, listener: (...args: any[]) => void): void {
+    this.eventEmitter.on(event, listener);
+  }
+
+  public removeListener(event: string, listener: (...args: any[]) => void): void {
+    this.eventEmitter.removeListener(event, listener);
   }
 }
