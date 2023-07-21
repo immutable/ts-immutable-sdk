@@ -13,7 +13,9 @@ import {
 
 import { Router } from './lib/router';
 import { getERC20Decimals, isValidNonZeroAddress } from './lib/utils';
-import { ExchangeModuleConfiguration, TokenInfo, TransactionResponse } from './types';
+import {
+  ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
+} from './types';
 import { getSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 
@@ -26,6 +28,8 @@ export class Exchange {
 
   private nativeToken: TokenInfo;
 
+  private secondaryFees: SecondaryFee[];
+
   constructor(configuration: ExchangeModuleConfiguration) {
     const config = new ExchangeConfiguration(configuration);
 
@@ -35,6 +39,8 @@ export class Exchange {
     this.provider = new ethers.providers.JsonRpcProvider(
       config.chain.rpcUrl,
     );
+
+    this.secondaryFees = config.secondaryFees;
 
     this.router = new Router(
       this.provider,
@@ -211,5 +217,9 @@ export class Exchange {
       deadline,
       TradeType.EXACT_OUTPUT,
     );
+  }
+
+  private thereAreSecondaryFees(): boolean {
+    return this.secondaryFees.length > 0;
   }
 }
