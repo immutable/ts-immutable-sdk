@@ -46,6 +46,7 @@ export function ErrorView({
     >
       <SimpleTextBody heading={errorText.heading}>
         {errorText.body[0]}
+        {' '}
         <Link
           size="small"
           renderContainer={(props) => (
