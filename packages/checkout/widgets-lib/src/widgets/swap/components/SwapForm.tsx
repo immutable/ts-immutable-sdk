@@ -72,10 +72,11 @@ const swapValuesToText = ({
 };
 
 // Ensures that the to token address does not match the from token address
-const getToTokenAddress = (toAddress: string | undefined, fromAddress: string | undefined): string => {
-  if (!toAddress) return '';
-  if (fromAddress === toAddress) return '';
-  return toAddress;
+const shouldSetToAddress = (toAddress: string | undefined, fromAddress: string | undefined): boolean => {
+  if (toAddress === undefined) return false;
+  if (toAddress === '') return false;
+  if (fromAddress === toAddress) return false;
+  return true;
 };
 
 export interface SwapFromProps {
@@ -172,7 +173,7 @@ export function SwapForm({ data }: SwapFromProps) {
         );
       }
 
-      if (getToTokenAddress(data?.toContractAddress, data?.fromContractAddress)) {
+      if (shouldSetToAddress(data?.toContractAddress, data?.fromContractAddress)) {
         setToToken(allowedTokens.find((t) => (
           isNativeToken(t.address) && data?.toContractAddress?.toLocaleUpperCase() === NATIVE
         ) || (t.address?.toLowerCase() === data?.toContractAddress?.toLowerCase())));
