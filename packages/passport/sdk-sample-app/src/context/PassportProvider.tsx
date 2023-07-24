@@ -125,7 +125,7 @@ export function PassportProvider({
     } finally {
       setIsLoading(false);
     }
-  }, [passportClient, setIsLoading]);
+  }, [addMessage, passportClient, setIsLoading]);
 
   const providerValues = useMemo(() => ({
     imxProvider,

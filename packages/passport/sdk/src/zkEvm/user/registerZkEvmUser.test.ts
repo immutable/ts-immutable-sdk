@@ -1,14 +1,14 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { signRaw } from '@imtbl/toolkit';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { createCounterfactualAddress } from './createCounterfactualAddress';
+import { registerZkEvmUser } from './registerZkEvmUser';
 import AuthManager from '../../authManager';
 import { mockUser, mockUserZkEvm } from '../../test/mocks';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@imtbl/toolkit');
 
-describe('createCounterFactualAddress', () => {
+describe('registerZkEvmUser', () => {
   const getSignerMock = jest.fn();
   const ethSignerMock = {
     getAddress: jest.fn(),
@@ -42,7 +42,7 @@ describe('createCounterFactualAddress', () => {
         throw new Error('Internal server error');
       });
 
-      await expect(async () => createCounterfactualAddress({
+      await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
         magicProvider,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
@@ -59,7 +59,7 @@ describe('createCounterFactualAddress', () => {
 
       authManager.loginSilent.mockResolvedValue(null);
 
-      await expect(async () => createCounterfactualAddress({
+      await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
         magicProvider,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
@@ -76,7 +76,7 @@ describe('createCounterFactualAddress', () => {
 
       authManager.loginSilent.mockResolvedValue(mockUser);
 
-      await expect(async () => createCounterfactualAddress({
+      await expect(async () => registerZkEvmUser({
         authManager: authManager as unknown as AuthManager,
         magicProvider,
         multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,
@@ -92,7 +92,7 @@ describe('createCounterFactualAddress', () => {
 
     authManager.loginSilent.mockResolvedValue(mockUserZkEvm);
 
-    const result = await createCounterfactualAddress({
+    const result = await registerZkEvmUser({
       authManager: authManager as unknown as AuthManager,
       magicProvider,
       multiRollupApiClients: multiRollupApiClients as unknown as MultiRollupApiClients,

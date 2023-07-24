@@ -1,22 +1,24 @@
 import { ExternalProvider, JsonRpcProvider } from '@ethersproject/providers';
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
-import { ethSendTransaction } from './rpcMethods';
+import { sendTransaction } from './sendTransaction';
 import {
   JsonRpcRequestCallback,
   JsonRpcRequestPayload,
   JsonRpcResponsePayload,
   Provider,
+  ProviderEvent,
+  ProviderEventMap,
   RequestArguments,
 } from './types';
 import AuthManager from '../authManager';
+import MagicAdapter from '../magicAdapter';
+import TypedEventEmitter from './typedEventEmitter';
 import { PassportConfiguration } from '../config';
 import { ConfirmationScreen } from '../confirmation';
-import MagicAdapter from '../magicAdapter';
 import { UserZkEvm } from '../types';
 import { RelayerClient } from './relayerClient';
-import { EthMethodWithAuthParams } from './rpcMethods/types';
-import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
-import { registerZkEvmUser } from './userRegistration';
+import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
+import { loginZkEvmUser } from './user';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -44,7 +46,9 @@ export class ZkEvmProvider implements Provider {
 
   private readonly multiRollupApiClients: MultiRollupApiClients;
 
-  private readonly jsonRpcProvider: JsonRpcProvider; // Used for read operations
+  private readonly jsonRpcProvider: JsonRpcProvider; // Used for read
+
+  private readonly eventEmitter: TypedEventEmitter<ProviderEventMap>;
 
   protected magicProvider?: ExternalProvider; // Used for signing
 
@@ -64,6 +68,7 @@ export class ZkEvmProvider implements Provider {
     this.relayerClient = new RelayerClient({ config });
     this.jsonRpcProvider = new JsonRpcProvider(this.config.zkEvmRpcUrl);
     this.multiRollupApiClients = multiRollupApiClients;
+    this.eventEmitter = new TypedEventEmitter<ProviderEventMap>();
   }
 
   private isLoggedIn(): this is LoggedInZkEvmProvider {
@@ -71,27 +76,12 @@ export class ZkEvmProvider implements Provider {
   }
 
   private async performRequest(request: RequestArguments): Promise<any> {
-    const authWrapper = (fn: (params: EthMethodWithAuthParams) => Promise<any>) => {
-      if (!this.isLoggedIn()) {
-        throw new JsonRpcError(RpcErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
-      }
-
-      return fn({
-        params: request.params || [],
-        magicProvider: this.magicProvider,
-        jsonRpcProvider: this.jsonRpcProvider,
-        config: this.config,
-        relayerClient: this.relayerClient,
-        user: this.user,
-      });
-    };
-
     switch (request.method) {
       case 'eth_requestAccounts': {
         if (this.isLoggedIn()) {
           return [this.user.zkEvm.ethAddress];
         }
-        const { magicProvider, user } = await registerZkEvmUser({
+        const { magicProvider, user } = await loginZkEvmUser({
           authManager: this.authManager,
           config: this.config,
           magicAdapter: this.magicAdapter,
@@ -101,10 +91,23 @@ export class ZkEvmProvider implements Provider {
         this.user = user;
         this.magicProvider = magicProvider;
 
+        this.eventEmitter.emit(ProviderEvent.ACCOUNTS_CHANGED, [this.user.zkEvm.ethAddress]);
+
         return [this.user.zkEvm.ethAddress];
       }
       case 'eth_sendTransaction': {
-        return authWrapper(ethSendTransaction);
+        if (!this.isLoggedIn()) {
+          throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
+        }
+
+        return sendTransaction({
+          params: request.params || [],
+          magicProvider: this.magicProvider,
+          jsonRpcProvider: this.jsonRpcProvider,
+          config: this.config,
+          relayerClient: this.relayerClient,
+          user: this.user,
+        });
       }
       case 'eth_accounts': {
         return this.isLoggedIn() ? [this.user.zkEvm.ethAddress] : [];
@@ -125,7 +128,7 @@ export class ZkEvmProvider implements Provider {
         return this.jsonRpcProvider.send(request.method, request.params || []);
       }
       default: {
-        throw new JsonRpcError(RpcErrorCode.METHOD_NOT_FOUND, 'Method not supported');
+        throw new JsonRpcError(ProviderErrorCode.UNSUPPORTED_METHOD, 'Method not supported');
       }
     }
   }
@@ -234,5 +237,13 @@ export class ZkEvmProvider implements Provider {
     }
 
     throw new JsonRpcError(RpcErrorCode.INVALID_REQUEST, 'Invalid request');
+  }
+
+  public on(event: string, listener: (...args: any[]) => void): void {
+    this.eventEmitter.on(event, listener);
+  }
+
+  public removeListener(event: string, listener: (...args: any[]) => void): void {
+    this.eventEmitter.removeListener(event, listener);
   }
 }

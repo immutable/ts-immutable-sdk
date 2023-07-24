@@ -1,18 +1,18 @@
 import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
-import { getSignedMetaTransactions } from '../walletHelpers';
-import { ethSendTransaction } from './eth_sendTransaction';
-import { mockUserZkEvm } from '../../test/mocks';
-import { RelayerClient } from '../relayerClient';
-import { PassportConfiguration } from '../../config';
-import { retryWithDelay } from '../../network/retry';
-import { RelayerTransaction, RelayerTransactionStatus } from '../types';
-import { JsonRpcError, RpcErrorCode } from '../JsonRpcError';
+import { getSignedMetaTransactions } from './walletHelpers';
+import { sendTransaction } from './sendTransaction';
+import { mockUserZkEvm } from '../test/mocks';
+import { RelayerClient } from './relayerClient';
+import { PassportConfiguration } from '../config';
+import { retryWithDelay } from '../network/retry';
+import { RelayerTransaction, RelayerTransactionStatus } from './types';
+import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 
 jest.mock('@ethersproject/providers');
-jest.mock('../walletHelpers');
-jest.mock('../../network/retry');
+jest.mock('./walletHelpers');
+jest.mock('../network/retry');
 
-describe('ethSendTransaction', () => {
+describe('sendTransaction', () => {
   const signedTransaction = 'signedTransaction123';
   const signedTransactions = 'signedTransactions123';
   const relayerTransactionId = 'relayerTransactionId123';
@@ -54,7 +54,7 @@ describe('ethSendTransaction', () => {
       hash: transactionHash,
     } as RelayerTransaction);
 
-    const result = await ethSendTransaction({
+    const result = await sendTransaction({
       params: [transactionRequest],
       magicProvider,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
@@ -72,7 +72,7 @@ describe('ethSendTransaction', () => {
       status: RelayerTransactionStatus.FAILED,
     } as RelayerTransaction);
 
-    await expect(ethSendTransaction({
+    await expect(sendTransaction({
       params: [transactionRequest],
       magicProvider,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,

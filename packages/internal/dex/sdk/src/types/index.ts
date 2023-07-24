@@ -19,6 +19,17 @@ export type Chain = {
 };
 
 /**
+ * Interface representing the secondary fees for a swap
+ * @property {string} feeRecipient - The fee recipient address
+ * @property {number} feeBasisPoints - The fee percentage in basis points
+ * @example 100 basis points = 1%
+ */
+export type SecondaryFee = {
+  feeRecipient: string;
+  feeBasisPoints: number;
+};
+
+/**
  * Interface representing an amount with the token information
  * @property {TokenInfo} token - The token information
  * @property {ethers.BigNumber} value - The amount
@@ -83,6 +94,7 @@ export interface ExchangeOverrides {
   exchangeContracts: ExchangeContracts;
   commonRoutingTokens: TokenInfo[];
   nativeToken: TokenInfo;
+  secondaryFees?: SecondaryFee[];
 }
 
 export interface ExchangeModuleConfiguration

@@ -1,10 +1,10 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { ZkEvmProviderInput, ZkEvmProvider } from './zkEvmProvider';
-import { registerZkEvmUser } from './userRegistration';
+import { loginZkEvmUser } from './user';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./relayerClient');
-jest.mock('./userRegistration');
+jest.mock('./user');
 
 describe('ZkEvmProvider', () => {
   const getProvider = () => {
@@ -182,7 +182,7 @@ describe('ZkEvmProvider', () => {
         },
       };
       const mockMagicProvider = {};
-      (registerZkEvmUser as jest.Mock).mockResolvedValue({
+      (loginZkEvmUser as jest.Mock).mockResolvedValue({
         user: mockUser,
         magicProvider: mockMagicProvider,
       });
@@ -193,7 +193,29 @@ describe('ZkEvmProvider', () => {
 
       expect(resultOne).toEqual([mockUser.zkEvm.ethAddress]);
       expect(resultTwo).toEqual([mockUser.zkEvm.ethAddress]);
-      expect(registerZkEvmUser).toBeCalledTimes(1);
+      expect(loginZkEvmUser).toBeCalledTimes(1);
+    });
+
+    it('should emit accountsChanged event when user logs in', async () => {
+      const mockUser = {
+        zkEvm: {
+          ethAddress: '0x123',
+        },
+      };
+      const mockMagicProvider = {};
+      (loginZkEvmUser as jest.Mock).mockResolvedValue({
+        user: mockUser,
+        magicProvider: mockMagicProvider,
+      });
+      const provider = getProvider();
+      const onAccountsChanged = jest.fn();
+
+      provider.on('accountsChanged', onAccountsChanged);
+
+      const result = await provider.request({ method: 'eth_requestAccounts', params: [] });
+
+      expect(result).toEqual([mockUser.zkEvm.ethAddress]);
+      expect(onAccountsChanged).toHaveBeenCalledWith([mockUser.zkEvm.ethAddress]);
     });
   });
 });

@@ -1,29 +1,29 @@
 import { MultiRollupApiClients } from '@imtbl/generated-clients';
 import { ExternalProvider } from '@ethersproject/providers';
-import { createCounterfactualAddress } from './createCounterfactualAddress';
+import { registerZkEvmUser } from './registerZkEvmUser';
 import { UserZkEvm } from '../../types';
 import AuthManager from '../../authManager';
 import { PassportConfiguration } from '../../config';
 import MagicAdapter from '../../magicAdapter';
 
-type RegisterZkEvmUserInput = {
+type LoginZkEvmUserInput = {
   authManager: AuthManager;
   config: PassportConfiguration;
   magicAdapter: MagicAdapter;
   multiRollupApiClients: MultiRollupApiClients;
 };
 
-type RegisterZkEvmUserOutput = {
+type LoginZkEvmUserOutput = {
   user: UserZkEvm;
   magicProvider: ExternalProvider;
 };
 
-export const registerZkEvmUser = async ({
+export const loginZkEvmUser = async ({
   authManager,
   config,
   magicAdapter,
   multiRollupApiClients,
-}: RegisterZkEvmUserInput): Promise<RegisterZkEvmUserOutput> => {
+}: LoginZkEvmUserInput): Promise<LoginZkEvmUserOutput> => {
   const user = await authManager.getUser() || await authManager.login();
   if (!user.idToken) {
     throw new Error('User is missing idToken');
@@ -36,7 +36,7 @@ export const registerZkEvmUser = async ({
 
   if (!user.zkEvm) {
     // Generate counterfactual address and retrieve updated Auth0 user
-    const userZkevm = await createCounterfactualAddress({
+    const userZkevm = await registerZkEvmUser({
       authManager,
       magicProvider,
       multiRollupApiClients,
