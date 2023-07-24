@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - @imtbl/blockchain-data: Improved naming for Activity types
 
+- @imtbl/immutablex-client: Order requests now pointing to the V3 endpoints
+
 ### Removed
 
 ### Deprecated
