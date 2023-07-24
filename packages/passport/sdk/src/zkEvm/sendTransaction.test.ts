@@ -10,14 +10,7 @@ import { RelayerTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 
 jest.mock('@ethersproject/providers');
-jest.mock('./walletHelpers', () => {
-  const original = jest.requireActual('./walletHelpers');
-  return {
-    ...original,
-    getSignedMetaTransactions: jest.fn(),
-    getNonce: jest.fn(),
-  };
-});
+jest.mock('./walletHelpers');
 jest.mock('../network/retry');
 
 describe('sendTransaction', () => {
@@ -29,7 +22,7 @@ describe('sendTransaction', () => {
   const transactionRequest: TransactionRequest = {
     to: mockUserZkEvm.zkEvm.ethAddress,
     data: '0x456',
-    value: '0x',
+    value: '0x00',
   };
   const magicProvider = {};
   const jsonRpcProvider = {};
@@ -48,7 +41,7 @@ describe('sendTransaction', () => {
   };
 
   const imxFeeOption = {
-    tokenPrice: '0.0001',
+    tokenPrice: '1',
     tokenSymbol: 'IMX',
     tokenDecimals: 18,
     tokenAddress: '0x1337',
@@ -59,8 +52,12 @@ describe('sendTransaction', () => {
     jest.resetAllMocks();
     relayerClient.imGetFeeOptions.mockResolvedValue([imxFeeOption]);
     (getNonce as jest.Mock).mockResolvedValueOnce(nonce);
-    (getSignedMetaTransactions as jest.Mock).mockResolvedValueOnce(signedTransaction);
-    (getSignedMetaTransactions as jest.Mock).mockResolvedValueOnce(signedTransactions);
+    (getSignedMetaTransactions as jest.Mock).mockResolvedValueOnce(
+      signedTransaction,
+    );
+    (getSignedMetaTransactions as jest.Mock).mockResolvedValueOnce(
+      signedTransactions,
+    );
     relayerClient.ethSendTransaction.mockResolvedValue(relayerTransactionId);
   });
 
@@ -81,7 +78,10 @@ describe('sendTransaction', () => {
     });
 
     expect(result).toEqual(transactionHash);
-    expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(mockUserZkEvm.zkEvm.ethAddress, signedTransactions);
+    expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(
+      mockUserZkEvm.zkEvm.ethAddress,
+      signedTransactions,
+    );
   });
 
   it('calls guardian.evaluateTransaction with the correct arguments', async () => {
@@ -101,42 +101,67 @@ describe('sendTransaction', () => {
     });
 
     expect(result).toEqual(transactionHash);
-    expect(transactionAPI.evaluateTransaction).toHaveBeenCalledWith({
-      id: 'evm',
-      transactionEvaluationRequest: {
-        chainType: 'evm',
-        chainId: config.zkEvmChainId,
-        transactionData: {
-          metaTransactions: [
-            {
-              data: transactionRequest.data,
-              delegateCall: false,
-              gasLimit: {
-                _hex: '0x00',
-                _isBigNumber: true,
+    expect(transactionAPI.evaluateTransaction).toHaveBeenCalledWith(
+      {
+        id: 'evm',
+        transactionEvaluationRequest: {
+          chainType: 'evm',
+          chainId: config.zkEvmChainId,
+          transactionData: {
+            metaTransactions: [
+              {
+                data: transactionRequest.data,
+                delegateCall: false,
+                gasLimit: '0',
+                revertOnError: true,
+                target: mockUserZkEvm.zkEvm.ethAddress,
+                value: '0',
               },
-              revertOnError: true,
-              target: mockUserZkEvm.zkEvm.ethAddress,
-              value: '0x',
-            },
-            {
-              data: [],
-              delegateCall: false,
-              gasLimit: {
-                _hex: '0x00',
-                _isBigNumber: true,
+              {
+                data: '0x00',
+                delegateCall: false,
+                gasLimit: '0',
+                revertOnError: true,
+                target: imxFeeOption.recipientAddress,
+                value: imxFeeOption.tokenPrice,
               },
-              revertOnError: true,
-              target: imxFeeOption.recipientAddress,
-              value: imxFeeOption.tokenPrice,
-            },
-          ],
-          nonce,
-          userAddress: mockUserZkEvm.zkEvm.ethAddress,
+            ],
+            nonce,
+            userAddress: mockUserZkEvm.zkEvm.ethAddress,
+          },
         },
       },
-    });
-    expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(mockUserZkEvm.zkEvm.ethAddress, signedTransactions);
+      {
+        headers: {
+          Authorization: `Bearer ${mockUserZkEvm.accessToken}`,
+        },
+      },
+    );
+    expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(
+      mockUserZkEvm.zkEvm.ethAddress,
+      signedTransactions,
+    );
+  });
+
+  it('returns an error if the failed to parsing the request data ', async () => {
+    const wrongTransactionRequest = { ...transactionRequest, value: '0x' };
+
+    await expect(
+      sendTransaction({
+        params: [wrongTransactionRequest],
+        magicProvider,
+        jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+        transactionAPI: transactionAPI as unknown as TransactionsApi,
+        relayerClient: relayerClient as unknown as RelayerClient,
+        config: config as PassportConfiguration,
+        user: mockUserZkEvm,
+      }),
+    ).rejects.toThrow(
+      new JsonRpcError(
+        RpcErrorCode.PARSE_ERROR,
+        'Transaction failed to parsing: invalid BigNumber string (argument="value", value="0x", code=INVALID_ARGUMENT, version=bignumber/5.7.0)',
+      ),
+    );
   });
 
   it('returns an error if the relayer does not return a successful status', async () => {
@@ -144,14 +169,21 @@ describe('sendTransaction', () => {
       status: RelayerTransactionStatus.FAILED,
     } as RelayerTransaction);
 
-    await expect(sendTransaction({
-      params: [transactionRequest],
-      magicProvider,
-      jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
-      transactionAPI: transactionAPI as unknown as TransactionsApi,
-      relayerClient: relayerClient as unknown as RelayerClient,
-      config: config as PassportConfiguration,
-      user: mockUserZkEvm,
-    })).rejects.toThrow(new JsonRpcError(RpcErrorCode.INTERNAL_ERROR, 'Transaction failed to submit with status FAILED'));
+    await expect(
+      sendTransaction({
+        params: [transactionRequest],
+        magicProvider,
+        jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
+        transactionAPI: transactionAPI as unknown as TransactionsApi,
+        relayerClient: relayerClient as unknown as RelayerClient,
+        config: config as PassportConfiguration,
+        user: mockUserZkEvm,
+      }),
+    ).rejects.toThrow(
+      new JsonRpcError(
+        RpcErrorCode.INTERNAL_ERROR,
+        'Transaction failed to submit with status FAILED',
+      ),
+    );
   });
 });

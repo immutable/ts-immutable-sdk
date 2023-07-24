@@ -5,8 +5,9 @@ import {
   Web3Provider,
 } from '@ethersproject/providers';
 import * as guardian from '@imtbl/guardian';
+import { BigNumber, ethers } from 'ethers';
 import {
-  getNonce, getSignedMetaTransactions, chainIdNumber, getNormalisedTransactions,
+  getNonce, getSignedMetaTransactions, chainIdNumber,
 } from './walletHelpers';
 import { MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
@@ -32,21 +33,42 @@ type GuardianValidateParams = {
   transactionAPI: guardian.TransactionsApi;
   chainId: string,
   nonce: number,
-  userAddress: string,
+  user: UserZkEvm,
   metaTransactions: MetaTransaction[],
+};
+
+const converBigNumberishToNumber = (value: ethers.BigNumberish): number => BigNumber.from(value).toNumber();
+
+const transformGardianTransactions = (txs: MetaTransaction[]):guardian.MetaTransaction[] => {
+  try {
+    return txs.map((t) => ({
+      delegateCall: t.delegateCall === true,
+      revertOnError: t.revertOnError === true,
+      gasLimit: t.gasLimit ? converBigNumberishToNumber(t.gasLimit).toString() : '0',
+      target: t.to ?? ethers.constants.AddressZero,
+      value: t.value ? converBigNumberishToNumber(t.value).toString() : '0',
+      data: t.data ? t.data.toString() : '0x00',
+    }));
+  } catch (error) {
+    const errorMessage = (error instanceof Error) ? error.message : String(error);
+    throw new JsonRpcError(
+      RpcErrorCode.INVALID_PARAMS,
+      `Transaction failed to parsing: ${errorMessage}`,
+    );
+  }
 };
 
 const guardianValidation = async ({
   transactionAPI,
   chainId,
   nonce,
-  userAddress,
+  user,
   metaTransactions,
 }: GuardianValidateParams) => {
-  const normalisedMetaTransactions = getNormalisedTransactions(
+  const headers = { Authorization: `Bearer ${user.accessToken}` };
+  const guardianTransactions = transformGardianTransactions(
     metaTransactions,
-  ) as guardian.MetaTransaction[];
-
+  );
   try {
     await transactionAPI.evaluateTransaction({
       id: 'evm',
@@ -55,11 +77,11 @@ const guardianValidation = async ({
         chainId,
         transactionData: {
           nonce,
-          userAddress,
-          metaTransactions: normalisedMetaTransactions,
+          userAddress: user.zkEvm.ethAddress,
+          metaTransactions: guardianTransactions,
         },
       },
-    });
+    }, { headers });
   } catch (error) {
     const errorMessage = (error instanceof Error) ? error.message : String(error);
     throw new JsonRpcError(
@@ -132,7 +154,7 @@ export const sendTransaction = async ({
     transactionAPI,
     chainId: config.zkEvmChainId,
     nonce,
-    userAddress: user.zkEvm.ethAddress,
+    user,
     metaTransactions: [metaTransaction, feeMetaTransaction],
   });
 

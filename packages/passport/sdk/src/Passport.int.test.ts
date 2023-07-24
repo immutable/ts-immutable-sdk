@@ -200,8 +200,8 @@ describe('Passport', () => {
         });
         const transaction: TransactionRequest = {
           to: transferToAddress,
-          value: '500000000000000000',
-          data: '0x',
+          value: '5000000000000000',
+          data: '0x00',
         };
         const result = await zkEvmProvider.request({
           method: 'eth_sendTransaction',

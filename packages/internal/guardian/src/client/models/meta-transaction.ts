@@ -37,10 +37,10 @@ export interface MetaTransaction {
     'revertOnError': boolean;
     /**
      * The gas limit for the transaction
-     * @type {number}
+     * @type {string}
      * @memberof MetaTransaction
      */
-    'gasLimit': number;
+    'gasLimit': string;
     /**
      * The SM target address of the transaction
      * @type {string}
