@@ -9,7 +9,7 @@
     "@0xsequence/config": "^0.43.34",
     "@ethersproject/providers": "^5.7.2",
     "@imtbl/config": "0.0.0",
-    "@imtbl/core-sdk": "^1.1.1-alpha.1",
+    "@imtbl/core-sdk": "^2.0.1",
     "@imtbl/guardian": "0.0.0",
     "@imtbl/immutablex-client": "0.0.0",
     "@imtbl/provider": "0.0.0",
