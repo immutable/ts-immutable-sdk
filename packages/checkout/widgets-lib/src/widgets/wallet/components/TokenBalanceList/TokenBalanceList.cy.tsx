@@ -1,3 +1,4 @@
+import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { TokenBalanceList } from './TokenBalanceList';
