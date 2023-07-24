@@ -308,7 +308,7 @@ export const text = {
     },
     unableToSwap: {
       heading: 'Unable to swap this coin',
-      body: "These coins aren't on the Immutable Network right now. Try another selection or buy with card.",
+      body: "This coin pairing isn't available to swap right now. Try another selection.",
       buttons: {
         cancel: 'Dismiss',
       },
