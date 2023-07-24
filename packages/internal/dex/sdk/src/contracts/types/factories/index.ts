@@ -4,5 +4,6 @@
 export { ERC20__factory } from "./ERC20__factory";
 export { Multicall__factory } from "./Multicall__factory";
 export { QuoterV2__factory } from "./QuoterV2__factory";
+export { SecondaryFee__factory } from "./SecondaryFee__factory";
 export { UniswapV3Pool__factory } from "./UniswapV3Pool__factory";
 export { WETH__factory } from "./WETH__factory";
