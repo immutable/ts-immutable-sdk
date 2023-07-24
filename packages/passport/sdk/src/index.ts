@@ -6,7 +6,14 @@ export {
   JsonRpcResponsePayload,
   JsonRpcRequestCallback,
   Provider,
+  ProviderEvent,
+  AccountsChangedEvent,
 } from './zkEvm/types';
+export {
+  JsonRpcError,
+  ProviderErrorCode,
+  RpcErrorCode,
+} from './zkEvm/JsonRpcError';
 export {
   UserProfile,
   Networks,
