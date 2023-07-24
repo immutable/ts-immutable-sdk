@@ -33,6 +33,7 @@ import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSe
 import { useInterval } from '../../../lib/hooks/useInterval';
 import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { UnableToSwap } from './UnableToSwap';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -122,13 +123,14 @@ export function SwapForm({ data }: SwapFromProps) {
 
   // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [quoteError, setQuoteError] = useState<string>('');
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
   const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
+
+  // Drawers
   const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
+  const [showUnableToSwapDrawer, setShowUnableToSwapDrawer] = useState(false);
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -274,10 +276,8 @@ export function SwapForm({ data }: SwapFromProps) {
       setToTokenError('');
     } catch (error: any) {
       setQuote(null);
-      // eslint-disable-next-line no-console
-      console.log('Quote error: ', error.message);
-      // todo: handle the display on form when exchange errors
-      setQuoteError(error.message);
+      setShowNotEnoughImxDrawer(false);
+      setShowUnableToSwapDrawer(true);
     }
     setIsFetching(false);
   };
@@ -341,10 +341,8 @@ export function SwapForm({ data }: SwapFromProps) {
       setToTokenError('');
     } catch (error: any) {
       setQuote(null);
-      // eslint-disable-next-line no-console
-      console.log('Quote error: ', error.message);
-      // todo: handle the display on form when exchange errors
-      setQuoteError(error.message);
+      setShowNotEnoughImxDrawer(false);
+      setShowUnableToSwapDrawer(true);
     }
 
     setIsFetching(false);
@@ -526,6 +524,11 @@ export function SwapForm({ data }: SwapFromProps) {
     setToAmount(value);
   };
 
+  const openNotEnoughImxDrawer = () => {
+    setShowUnableToSwapDrawer(false);
+    setShowNotEnoughImxDrawer(true);
+  };
+
   const { content, swapForm, fees } = text.views[SwapWidgetViews.SWAP];
   const SwapFormValidator = (): boolean => {
     const validateFromTokenError = validateFromToken(fromToken);
@@ -684,7 +687,7 @@ export function SwapForm({ data }: SwapFromProps) {
           toContractAddress: toToken?.address,
         }}
         insufficientFundsForGas={insufficientFundsForGas}
-        setShowNotEnoughImxDrawer={setShowNotEnoughImxDrawer}
+        openNotEnoughImxDrawer={openNotEnoughImxDrawer}
       />
       <NotEnoughImx
         visible={showNotEnoughImxDrawer}
@@ -706,6 +709,16 @@ export function SwapForm({ data }: SwapFromProps) {
           });
         }}
         onCloseBottomSheet={() => setShowNotEnoughImxDrawer(false)}
+      />
+      <UnableToSwap
+        visible={showUnableToSwapDrawer}
+        onCloseBottomSheet={() => {
+          setShowUnableToSwapDrawer(false);
+          setFromToken(undefined);
+          setFromAmount('');
+          setToToken(undefined);
+          setToAmount('');
+        }}
       />
     </>
   );
