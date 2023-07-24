@@ -276,6 +276,7 @@ export function SwapForm({ data }: SwapFromProps) {
       setToTokenError('');
     } catch (error: any) {
       setQuote(null);
+      setShowNotEnoughImxDrawer(false);
       setShowUnableToSwapDrawer(true);
     }
     setIsFetching(false);
@@ -340,6 +341,7 @@ export function SwapForm({ data }: SwapFromProps) {
       setToTokenError('');
     } catch (error: any) {
       setQuote(null);
+      setShowNotEnoughImxDrawer(false);
       setShowUnableToSwapDrawer(true);
     }
 
@@ -522,6 +524,11 @@ export function SwapForm({ data }: SwapFromProps) {
     setToAmount(value);
   };
 
+  const openNotEnoughImxDrawer = () => {
+    setShowUnableToSwapDrawer(false);
+    setShowNotEnoughImxDrawer(true);
+  };
+
   const { content, swapForm, fees } = text.views[SwapWidgetViews.SWAP];
   const SwapFormValidator = (): boolean => {
     const validateFromTokenError = validateFromToken(fromToken);
@@ -680,7 +687,7 @@ export function SwapForm({ data }: SwapFromProps) {
           toContractAddress: toToken?.address,
         }}
         insufficientFundsForGas={insufficientFundsForGas}
-        setShowNotEnoughImxDrawer={setShowNotEnoughImxDrawer}
+        openNotEnoughImxDrawer={openNotEnoughImxDrawer}
       />
       <NotEnoughImx
         visible={showNotEnoughImxDrawer}
