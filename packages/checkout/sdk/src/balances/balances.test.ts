@@ -4,6 +4,7 @@ import { Environment } from '@imtbl/config';
 import { getAllBalances, getBalance, getERC20Balance } from './balances';
 import {
   ChainId,
+  ChainName,
   ERC20ABI,
   GetAllBalancesResult,
   GetTokenAllowListResult,
@@ -28,12 +29,12 @@ describe('balances', () => {
   const mockGetBalance = jest.fn().mockResolvedValue(currentBalance);
   const mockGetNetwork = jest
     .fn()
-    .mockResolvedValue({ chainId: 1, name: 'homestead' });
+    .mockResolvedValue({ chainId: ChainId.ETHEREUM, name: 'homestead' });
 
   jest.mock('../connect', () => ({
     getNetworkInfo: jest.fn().mockResolvedValue({
-      chainId: 1,
-      name: 'Ethereum',
+      chainId: ChainId.ETHEREUM,
+      name: ChainName.ETHEREUM,
       isSupported: true,
       nativeCurrency: {
         name: 'Ether',
@@ -113,7 +114,7 @@ describe('balances', () => {
 
       balanceOfMock = jest.fn().mockResolvedValue(currentBalance);
       decimalsMock = jest.fn().mockResolvedValue(18);
-      nameMock = jest.fn().mockResolvedValue('Ethereum');
+      nameMock = jest.fn().mockResolvedValue(ChainName.ETHEREUM);
       symbolMock = jest.fn().mockResolvedValue('ETH');
       (Contract as unknown as jest.Mock).mockReturnValue({
         balanceOf: balanceOfMock,
@@ -139,7 +140,7 @@ describe('balances', () => {
         balance: currentBalance,
         formattedBalance,
         token: {
-          name: 'Ethereum',
+          name: ChainName.ETHEREUM,
           symbol: 'ETH',
           decimals: 18,
           address: testContractAddress,
@@ -228,7 +229,7 @@ describe('balances', () => {
 
       mockGetNetwork = jest
         .fn()
-        .mockResolvedValue({ chainId: 1, name: 'homestead' });
+        .mockResolvedValue({ chainId: ChainId.ETHEREUM, name: 'homestead' });
 
       mockProviderForAllBalances = jest.fn().mockImplementation(() => ({
         getBalance: mockGetBalance,
@@ -276,7 +277,7 @@ describe('balances', () => {
             balance: currentBalance,
             formattedBalance,
             token: {
-              name: 'Ethereum',
+              name: ChainName.ETHEREUM,
               symbol: 'ETH',
               decimals: 18,
             },

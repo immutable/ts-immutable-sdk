@@ -1,19 +1,18 @@
-import { describe, it } from '@jest/globals';
 import { Token } from '@uniswap/sdk-core';
 import { ERC20Pair } from './generateERC20Pairs';
 import { generatePossiblePoolsFromERC20Pair } from './generatePossiblePoolsFromERC20Pairs';
 import {
-  IMX_TEST_CHAIN,
+  IMX_TEST_TOKEN,
   TEST_V3_CORE_FACTORY_ADDRESS,
-  USDC_TEST_CHAIN,
-  WETH_TEST_CHAIN,
+  USDC_TEST_TOKEN,
+  WETH_TEST_TOKEN,
   uniqBy,
 } from '../../utils/testUtils';
 
 describe('generatePoolsFromTokenPairs', () => {
   describe('when given one TokenPair and one CommonRoutingTokens', () => {
     it('should return one combination', () => {
-      const erc20Pair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
+      const erc20Pair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
       const commonRoutingERC20s: Token[] = [];
 
       const pools = generatePossiblePoolsFromERC20Pair(
@@ -126,8 +125,8 @@ describe('generatePoolsFromTokenPairs', () => {
 
   describe('when given one TokenPair and four fees', () => {
     it('should return twelve unique combinations', () => {
-      const erc20Pair: ERC20Pair = [IMX_TEST_CHAIN, USDC_TEST_CHAIN];
-      const commonRoutingERC20s: Token[] = [WETH_TEST_CHAIN];
+      const erc20Pair: ERC20Pair = [IMX_TEST_TOKEN, USDC_TEST_TOKEN];
+      const commonRoutingERC20s: Token[] = [WETH_TEST_TOKEN];
 
       const pools = generatePossiblePoolsFromERC20Pair(
         erc20Pair,

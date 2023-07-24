@@ -78,7 +78,7 @@ export const CollectionsApiAxiosParamCreator = function (configuration?: Configu
          * List all collections
          * @summary List all collections
          * @param {string} chainName The name of chain
-         * @param {string} [pageCursor] Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -144,7 +144,7 @@ export const CollectionsApiFp = function(configuration?: Configuration) {
          * List all collections
          * @summary List all collections
          * @param {string} chainName The name of chain
-         * @param {string} [pageCursor] Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -178,7 +178,7 @@ export const CollectionsApiFactory = function (configuration?: Configuration, ba
          * List all collections
          * @summary List all collections
          * @param {string} chainName The name of chain
-         * @param {string} [pageCursor] Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+         * @param {string} [pageCursor] Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
          * @param {number} [pageSize] Maximum number of items to return
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -224,7 +224,7 @@ export interface CollectionsApiListCollectionsRequest {
     readonly chainName: string
 
     /**
-     * Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.
+     * Encoded page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
      * @memberof CollectionsApiListCollections
      */

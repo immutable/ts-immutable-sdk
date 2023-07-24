@@ -1,33 +1,23 @@
 import { ethers } from 'ethers';
-import { MethodParameters } from '@uniswap/v3-sdk';
-import {
-  CurrencyAmount, Token, TradeType,
-} from '@uniswap/sdk-core';
+import { CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core';
 import assert from 'assert';
-
-import { slippageToFraction } from 'lib/transactionUtils/slippage';
 import {
   DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
 } from 'errors';
-import { calculateGasFee, fetchGasPrice } from 'lib/transactionUtils/gas';
-import { getApproveTransaction } from 'lib/transactionUtils/approval';
+import { fetchGasPrice } from 'lib/transactionUtils/gas';
+import { getApproval } from 'lib/transactionUtils/approval';
+import { getQuote } from 'lib/transactionUtils/getQuote';
 import {
-  DEFAULT_DEADLINE,
-  DEFAULT_MAX_HOPS,
-  DEFAULT_SLIPPAGE,
-  MAX_MAX_HOPS,
-  MIN_MAX_HOPS,
+  DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS,
 } from './constants';
 
 import { Router } from './lib/router';
+import { getERC20Decimals, isValidNonZeroAddress } from './lib/utils';
 import {
-  getERC20Decimals,
-  isValidAddress,
-} from './lib/utils';
-import { TokenInfo, TransactionResponse } from './types';
-import { createSwapParameters } from './lib/transactionUtils/swap';
+  ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
+} from './types';
+import { getSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
-import { constructQuoteWithSlippage } from './lib/transactionUtils/constructQuoteWithSlippage';
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;
@@ -38,22 +28,28 @@ export class Exchange {
 
   private nativeToken: TokenInfo;
 
-  constructor(configuration: ExchangeConfiguration) {
-    this.chainId = configuration.chain.chainId;
-    this.nativeToken = configuration.chain.nativeToken;
+  private secondaryFees: SecondaryFee[];
+
+  constructor(configuration: ExchangeModuleConfiguration) {
+    const config = new ExchangeConfiguration(configuration);
+
+    this.chainId = config.chain.chainId;
+    this.nativeToken = config.chain.nativeToken;
 
     this.provider = new ethers.providers.JsonRpcProvider(
-      configuration.chain.rpcUrl,
+      config.chain.rpcUrl,
     );
+
+    this.secondaryFees = config.secondaryFees;
 
     this.router = new Router(
       this.provider,
-      configuration.chain.commonRoutingTokens,
+      config.chain.commonRoutingTokens,
       {
-        multicallAddress: configuration.chain.contracts.multicall,
-        factoryAddress: configuration.chain.contracts.coreFactory,
-        quoterAddress: configuration.chain.contracts.quoterV2,
-        peripheryRouterAddress: configuration.chain.contracts.peripheryRouter,
+        multicallAddress: config.chain.contracts.multicall,
+        factoryAddress: config.chain.contracts.coreFactory,
+        quoterAddress: config.chain.contracts.quoterV2,
+        peripheryRouterAddress: config.chain.contracts.peripheryRouter,
       },
     );
   }
@@ -65,9 +61,9 @@ export class Exchange {
     slippagePercent: number,
     fromAddress: string,
   ) {
-    assert(isValidAddress(fromAddress), new InvalidAddressError('invalid from address'));
-    assert(isValidAddress(tokenInAddress), new InvalidAddressError('invalid token in address'));
-    assert(isValidAddress(tokenOutAddress), new InvalidAddressError('invalid token out address'));
+    assert(isValidNonZeroAddress(fromAddress), new InvalidAddressError('invalid from address'));
+    assert(isValidNonZeroAddress(tokenInAddress), new InvalidAddressError('invalid token in address'));
+    assert(isValidNonZeroAddress(tokenOutAddress), new InvalidAddressError('invalid token out address'));
     assert(tokenInAddress.toLocaleLowerCase() !== tokenOutAddress.toLocaleLowerCase(), new DuplicateAddressesError());
     assert(maxHops <= MAX_MAX_HOPS, new InvalidMaxHopsError('max hops must be less than or equal to 10'));
     assert(maxHops >= MIN_MAX_HOPS, new InvalidMaxHopsError('max hops must be greater than or equal to 1'));
@@ -122,51 +118,36 @@ export class Exchange {
       maxHops,
     );
 
-    const slippage = slippageToFraction(slippagePercent);
-    const params: MethodParameters = createSwapParameters(
-      routeAndQuote.trade,
-      fromAddress,
-      slippage,
-      deadline,
-    );
-
-    const quoteInfo = constructQuoteWithSlippage(
-      otherToken,
-      tradeType,
-      routeAndQuote.trade,
-      slippage,
-    );
-
     // get gas details
     const gasPrice = await fetchGasPrice(this.provider);
-    const gasFeeEstimate = gasPrice ? {
-      token: this.nativeToken,
-      amount: calculateGasFee(gasPrice, routeAndQuote.trade.gasEstimate).toString(),
-    } : null;
 
     // we always use the tokenIn address because we are always selling the tokenIn
-    const approveTransaction = await getApproveTransaction(
+    const approval = await getApproval(
+      this.nativeToken,
       this.provider,
       fromAddress,
       tokenInAddress,
       ethers.BigNumber.from(amount),
       this.router.routingContracts.peripheryRouterAddress,
+      gasPrice,
     );
 
+    const swap = getSwap(
+      this.nativeToken,
+      routeAndQuote,
+      fromAddress,
+      slippagePercent,
+      deadline,
+      this.router.routingContracts.peripheryRouterAddress,
+      gasPrice,
+    );
+
+    const quote = getQuote(otherToken, tradeType, routeAndQuote.trade, slippagePercent);
+
     return {
-      approveTransaction,
-      transaction: {
-        data: params.calldata,
-        to: this.router.routingContracts.peripheryRouterAddress,
-        value: params.value,
-        from: fromAddress,
-      },
-      info: {
-        quote: quoteInfo.quote,
-        quoteWithMaxSlippage: quoteInfo.quoteWithMaxSlippage,
-        slippage: slippagePercent,
-        gasFeeEstimate,
-      },
+      approval,
+      swap,
+      quote,
     };
   }
 
@@ -236,5 +217,9 @@ export class Exchange {
       deadline,
       TradeType.EXACT_OUTPUT,
     );
+  }
+
+  private thereAreSecondaryFees(): boolean {
+    return this.secondaryFees.length > 0;
   }
 }

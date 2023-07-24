@@ -1,4 +1,3 @@
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { WidgetTheme } from '../../lib';
 
@@ -9,13 +8,7 @@ function SwapWebView() {
   };
 
   return (
-    <imtbl-swap
-      providerPreference={ConnectionProviders.METAMASK}
-      widgetConfig={JSON.stringify(config)}
-      amount=""
-      fromContractAddress="0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE"
-      toContractAddress=""
-    />
+    <imtbl-swap widgetConfig={JSON.stringify(config)} walletProvider="metamask" />
   );
 }
 

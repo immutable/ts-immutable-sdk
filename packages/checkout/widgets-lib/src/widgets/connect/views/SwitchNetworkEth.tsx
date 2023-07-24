@@ -6,8 +6,8 @@ import { EthereumNetworkHero } from '../../../components/Hero/EthereumNetworkHer
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
 import { text } from '../../../resources/text/textConfig';
-import { ConnectContext } from '../context/ConnectContext';
-import { l1Network } from '../../../lib/networkUtils';
+import { ConnectActions, ConnectContext } from '../context/ConnectContext';
+import { getL1ChainId } from '../../../lib/networkUtils';
 import {
   ViewContext,
   ViewActions,
@@ -15,7 +15,7 @@ import {
 
 export function SwitchNetworkEth() {
   const { viewDispatch } = useContext(ViewContext);
-  const { connectState } = useContext(ConnectContext);
+  const { connectDispatch, connectState } = useContext(ConnectContext);
   const { checkout, provider, sendCloseEvent } = connectState;
   const { heading, body, button } = text.views[ConnectWidgetViews.SWITCH_NETWORK].eth;
 
@@ -25,9 +25,16 @@ export function SwitchNetworkEth() {
     if (!provider || !checkout) return;
 
     try {
-      await checkout.switchNetwork({
+      const switchRes = await checkout.switchNetwork({
         provider,
-        chainId: l1Network(checkout.config.environment),
+        chainId: getL1ChainId(checkout.config),
+      });
+
+      connectDispatch({
+        payload: {
+          type: ConnectActions.SET_PROVIDER,
+          provider: switchRes.provider,
+        },
       });
 
       viewDispatch({

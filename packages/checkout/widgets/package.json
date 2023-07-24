@@ -40,11 +40,15 @@
   "scripts": {
     "build": "parcel build",
     "build:dist": "npm i && npm run build && npm run dist",
+    "build:local": "CHECKOUT_LOCAL_MODE=true parcel build",
     "docs": "typedoc --plugin typedoc-plugin-markdown --skipErrorChecking --disableSources --out docs src/index.ts",
     "lint": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0",
     "lint:fix": "eslint ./src --ext .ts,.jsx,.tsx --max-warnings=0 --fix",
     "start": "parcel watch",
-    "test": "jest test --passWithNoTests"
+    "start:local": "CHECKOUT_LOCAL_MODE=true parcel watch",
+    "start:version": "parcel watch",
+    "test": "jest test",
+    "test:watch": "jest test --watch"
   },
   "source": "src/index.ts",
   "types": "dist/index.d.ts"

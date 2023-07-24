@@ -21,13 +21,13 @@
  */
 export interface Page {
     /**
-     * First item as base64 encoded string
+     * First item as an encoded string
      * @type {string}
      * @memberof Page
      */
     'previous_cursor': string | null;
     /**
-     * Last item as base64 encoded string
+     * Last item as an encoded string
      * @type {string}
      * @memberof Page
      */

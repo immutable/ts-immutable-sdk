@@ -5,13 +5,15 @@ import { Web3Provider } from '@ethersproject/providers';
 import GetAllBalances from '../components/GetAllBalances';
 import CheckConnection from '../components/CheckConnection';
 import GetAllowList from '../components/GetAllowList';
-import { Body, Divider, Heading, Toggle } from '@biom3/react';
+import { Body, Box, Checkbox, Divider, Heading, Toggle } from '@biom3/react';
 import GetBalance from '../components/GetBalance';
 import { Checkout } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
+import Provider from '../components/Provider';
+import SendTransaction from '../components/SendTransaction';
 
 export default function ConnectWidget() {
-  const [environment, setEnvironment] = useState(Environment.PRODUCTION);
+  const [environment, setEnvironment] = useState(Environment.SANDBOX);
   const checkout = useMemo(() => {
     return new Checkout({ baseConfig: { environment: environment } });
   }, [environment]);
@@ -44,9 +46,34 @@ export default function ConnectWidget() {
         Toggle Checkout Environment
       </Divider>
       <Heading size="xSmall">Environment: {environment.toUpperCase()}</Heading>
-      <Toggle
-        checked={environment === Environment.PRODUCTION}
-        onChange={toggleEnvironment}
+
+      <Box sx={{ display: 'flex', gap: 'base.spacing.x2', marginBottom: 'base.spacing.x2' }}>
+        <Checkbox
+          checked={environment === Environment.PRODUCTION}
+          onChange={() => setEnvironment(Environment.PRODUCTION)}
+        />
+        <Heading size="xSmall">{Environment.PRODUCTION.toUpperCase()}</Heading>
+      </Box>
+      <Box sx={{ display: 'flex', gap: 'base.spacing.x2', marginBottom: 'base.spacing.x2' }}>
+        <Checkbox
+          checked={environment === Environment.SANDBOX}
+          onChange={() => setEnvironment(Environment.SANDBOX)}
+        />
+        <Heading size="xSmall">{Environment.SANDBOX.toUpperCase()} / DEV MODE</Heading>
+      </Box>
+
+      <Divider
+        sx={{
+          marginTop: 'base.spacing.x6',
+          marginBottom: 'base.spacing.x2',
+        }}
+      >
+        Provider
+      </Divider>
+      <Provider
+        checkout={checkout}
+        setProvider={setProvider}
+        provider={provider}
       />
 
       <Divider
@@ -57,7 +84,10 @@ export default function ConnectWidget() {
       >
         Connect
       </Divider>
-      <Connect checkout={checkout} setProvider={setProvider} />
+      <Connect 
+        checkout={checkout} 
+        provider={provider}
+        setProvider={setProvider} />
 
       <Divider
         sx={{
@@ -102,6 +132,21 @@ export default function ConnectWidget() {
         Get wallet balances
       </Divider>
       <GetAllBalances checkout={checkout} provider={provider} />
+
+      <Divider
+        sx={{
+          marginTop: 'base.spacing.x6',
+          marginBottom: 'base.spacing.x2',
+        }}
+      >
+        Send Transaction
+      </Divider>
+      <SendTransaction
+        checkout={checkout}
+        provider={provider}
+        setProvider={setProvider}
+      />
+
 
       <Divider
         sx={{

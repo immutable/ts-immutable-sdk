@@ -15,13 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ActivityType } from './activity-type';
+import { ActivityNFT } from './activity-nft';
 // May contain unused imports in some cases
 // @ts-ignore
-import { ERC721Token } from './erc721-token';
-// May contain unused imports in some cases
-// @ts-ignore
-import { NFTSalePaymentToken } from './nftsale-payment-token';
+import { SalePayment } from './sale-payment';
 
 /**
  * The NFT Sale activity details
@@ -29,12 +26,6 @@ import { NFTSalePaymentToken } from './nftsale-payment-token';
  * @interface NFTSale
  */
 export interface NFTSale {
-    /**
-     * 
-     * @type {ActivityType}
-     * @memberof NFTSale
-     */
-    'activity_type': ActivityType;
     /**
      * The id of order
      * @type {string}
@@ -46,36 +37,24 @@ export interface NFTSale {
      * @type {string}
      * @memberof NFTSale
      */
-    'buyer_address': string;
+    'to': string;
     /**
      * The account address of seller
      * @type {string}
      * @memberof NFTSale
      */
-    'seller_address': string;
-    /**
-     * The quantity of tokens sold
-     * @type {number}
-     * @memberof NFTSale
-     */
-    'quantity': number;
+    'from': string;
     /**
      * 
-     * @type {ERC721Token}
+     * @type {Array<ActivityNFT>}
      * @memberof NFTSale
      */
-    'token': ERC721Token;
-    /**
-     * The amount of payment
-     * @type {string}
-     * @memberof NFTSale
-     */
-    'payment_amount': string;
+    'asset': Array<ActivityNFT>;
     /**
      * 
-     * @type {NFTSalePaymentToken}
+     * @type {SalePayment}
      * @memberof NFTSale
      */
-    'payment_token': NFTSalePaymentToken;
+    'payment': SalePayment;
 }
 

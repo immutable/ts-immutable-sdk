@@ -3,7 +3,7 @@ import {
   WalletFilterTypes,
   WalletFilter,
   WalletInfo,
-  ConnectionProviders,
+  WalletProviderName,
 } from '@imtbl/checkout-sdk';
 import { useContext, useState, useEffect } from 'react';
 import { ConnectWidgetViews } from '../../../context/view-context/ConnectViewContextTypes';
@@ -12,6 +12,7 @@ import { WalletItem } from './WalletItem';
 import {
   ViewContext,
   ViewActions,
+  SharedViews,
 } from '../../../context/view-context/ViewContext';
 
 export interface WalletListProps {
@@ -31,7 +32,7 @@ export function WalletList(props: WalletListProps) {
   useEffect(() => {
     const getAllowedWallets = async () => {
       const allowedWallets = await checkout?.getWalletAllowList({
-        type: walletFilterTypes ?? WalletFilterTypes.DESKTOP,
+        type: walletFilterTypes ?? WalletFilterTypes.ALL,
         exclude: excludeWallets,
       });
       setWallets(allowedWallets?.wallets || []);
@@ -39,19 +40,40 @@ export function WalletList(props: WalletListProps) {
     getAllowedWallets();
   }, [checkout, excludeWallets, walletFilterTypes]);
 
-  const onWalletClick = (providerPreference: ConnectionProviders) => {
-    connectDispatch({
-      payload: {
-        type: ConnectActions.SET_PROVIDER_PREFERENCE,
-        providerPreference,
-      },
-    });
-    viewDispatch({
-      payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: { type: ConnectWidgetViews.READY_TO_CONNECT },
-      },
-    });
+  const onWalletClick = async (walletProviderName: WalletProviderName) => {
+    if (checkout) {
+      try {
+        const { provider } = await checkout.createProvider({
+          walletProvider: walletProviderName,
+        });
+
+        connectDispatch({
+          payload: {
+            type: ConnectActions.SET_PROVIDER,
+            provider,
+          },
+        });
+        connectDispatch({
+          payload: {
+            type: ConnectActions.SET_WALLET_PROVIDER_NAME,
+            walletProviderName,
+          },
+        });
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: ConnectWidgetViews.READY_TO_CONNECT },
+          },
+        });
+      } catch (err: any) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: SharedViews.ERROR_VIEW, error: err },
+          },
+        });
+      }
+    }
   };
 
   return (

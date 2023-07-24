@@ -14,7 +14,7 @@ describe('token balance tests', () => {
     const balances: GetBalanceResult[] = [
       {
         balance: BigNumber.from(1),
-        token: { symbol: 'QQQ', name: 'QQQ' } as TokenInfo,
+        token: { symbol: 'QQQ', name: 'QQQ', address: '0xQ' } as TokenInfo,
         formattedBalance: '12.34',
       },
       {
@@ -42,7 +42,6 @@ describe('token balance tests', () => {
     const actualResult = await getTokenBalances(
       checkout,
       mockProvider as unknown as Web3Provider,
-      '',
       ChainId.SEPOLIA,
       conversions,
     );
@@ -50,18 +49,19 @@ describe('token balance tests', () => {
     expect(actualResult.length).toBe(2);
     expect(actualResult).toEqual([
       {
-        id: '-AAA',
+        id: '11155111-aaa',
         description: 'AAA',
         balance: '26.34',
         symbol: 'AAA',
         fiatAmount: '266.65',
       },
       {
-        id: '-QQQ',
+        id: '11155111-qqq-0xq',
         description: 'QQQ',
         balance: '12.34',
         symbol: 'QQQ',
         fiatAmount: '63.24',
+        address: '0xQ',
       },
     ]);
   });
@@ -76,7 +76,6 @@ describe('token balance tests', () => {
     const actualResult = await getTokenBalances(
       checkout,
       {} as unknown as Web3Provider,
-      '',
       ChainId.SEPOLIA,
       conversions,
     );
@@ -103,7 +102,6 @@ describe('token balance tests', () => {
     const actualResult = await getTokenBalances(
       checkout,
       mockProvider as unknown as Web3Provider,
-      '',
       ChainId.SEPOLIA,
       conversions,
     );

@@ -1,28 +1,36 @@
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { Checkout } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import LoadingButton from './LoadingButton';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SuccessMessage, ErrorMessage } from './messages';
-import { Environment } from '@imtbl/config';
 
 interface ConnectProps {
   checkout: Checkout;
   setProvider: (provider: Web3Provider) => void;
+  provider: Web3Provider | undefined;
 }
 
 export default function Connect(props: ConnectProps) {
-  const { setProvider, checkout } = props;
+  const { setProvider, checkout, provider } = props;
 
   const [result, setResult] = useState<Web3Provider>();
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   async function connectClick() {
+    if (!checkout) {
+      console.error('missing checkout, please connect frist');
+      return;
+    }
+    if (!provider) {
+      console.error('missing provider, please connect frist');
+      return;
+    }
     setError(null);
     setLoading(true);
     try {
       const resp = await checkout.connect({
-        providerPreference: ConnectionProviders.METAMASK,
+        provider 
       });
       setProvider(resp.provider);
       setResult(resp.provider);

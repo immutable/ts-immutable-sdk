@@ -1,15 +1,22 @@
 /* eslint-disable max-len */
-import React from 'react';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
+import React, { useEffect } from 'react';
+import { Web3Provider } from '@ethersproject/providers';
+import { SetProvider } from './internal/SetProvider';
+import { CheckoutWidgetTagNames } from '../definitions/types';
 
 /**
  * Interface representing the props for the Swap Widget component.
- * @property {string} providerPreference - The preferred provider for the Swap Widget (default: "metamask"}).
- * @property {string} fromContractAddress - The contract address to swap tokens from.
- * @property {string} amount - The amount of tokens to send.
- * @property {Network} toContractAddress - The contract address to swap tokens to.
+ * @interface SwapReactProps
+ * @property {WalletProviderName | undefined} walletProvider - The name of the wallet provider.
+ * @property {Web3Provider | undefined} provider - The Web3 provider.
+ * @property {string | undefined} fromContractAddress - The address of the contract swapping from. If the string is 'NATIVE' then the native token is used.
+ * @property {string | undefined} amount - The amount.
+ * @property {string | undefined} toContractAddress - The address of the contract swapping to. If the string is 'NATIVE' then the native token is used.
  */
 export interface SwapReactProps {
-  providerPreference: string;
+  walletProvider?: WalletProviderName;
+  provider?: Web3Provider;
   fromContractAddress?: string;
   amount?: string;
   toContractAddress?: string;
@@ -22,18 +29,25 @@ export interface SwapReactProps {
  */
 export function SwapReact(props: SwapReactProps): JSX.Element {
   const {
-    providerPreference,
+    walletProvider,
     fromContractAddress,
     amount,
     toContractAddress,
+    provider,
   } = props;
+
+  useEffect(() => {
+    if (provider) {
+      SetProvider(CheckoutWidgetTagNames.SWAP, provider);
+    }
+  }, [provider]);
 
   const config = window.ImtblCheckoutWidgetConfig;
 
   return (
     <imtbl-swap
       widgetConfig={config}
-      providerPreference={providerPreference}
+      walletProvider={walletProvider}
       fromContractAddress={fromContractAddress ?? ''}
       toContractAddress={toContractAddress ?? ''}
       amount={amount ?? ''}

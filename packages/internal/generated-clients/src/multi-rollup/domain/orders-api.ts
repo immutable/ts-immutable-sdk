@@ -27,11 +27,11 @@ import { APIError404 } from '../models';
 // @ts-ignore
 import { APIError500 } from '../models';
 // @ts-ignore
-import { CreateOrderRequestBody } from '../models';
+import { CreateListingRequestBody } from '../models';
 // @ts-ignore
-import { ListOrdersResult } from '../models';
+import { ListListingsResult } from '../models';
 // @ts-ignore
-import { OrderResult } from '../models';
+import { ListingResult } from '../models';
 // @ts-ignore
 import { OrderStatus } from '../models';
 /**
@@ -41,19 +41,19 @@ import { OrderStatus } from '../models';
 export const OrdersApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Create an order
-         * @summary Create an order
+         * Create a listing
+         * @summary Create a listing
          * @param {string} chainName 
-         * @param {CreateOrderRequestBody} createOrderRequestBody 
+         * @param {CreateListingRequestBody} createListingRequestBody 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createOrder: async (chainName: string, createOrderRequestBody: CreateOrderRequestBody, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createListing: async (chainName: string, createListingRequestBody: CreateListingRequestBody, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('createOrder', 'chainName', chainName)
-            // verify required parameter 'createOrderRequestBody' is not null or undefined
-            assertParamExists('createOrder', 'createOrderRequestBody', createOrderRequestBody)
-            const localVarPath = `/v1/chains/{chain_name}/orders`
+            assertParamExists('createListing', 'chainName', chainName)
+            // verify required parameter 'createListingRequestBody' is not null or undefined
+            assertParamExists('createListing', 'createListingRequestBody', createListingRequestBody)
+            const localVarPath = `/v1/chains/{chain_name}/orders/listings`
                 .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -73,7 +73,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createOrderRequestBody, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(createListingRequestBody, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -81,21 +81,21 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * Get a single order by ID
-         * @summary Get a single order by ID
+         * Get a single listing by ID
+         * @summary Get a single listing by ID
          * @param {string} chainName 
-         * @param {string} orderId Global Order identifier
+         * @param {string} listingId Global Order identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOrder: async (chainName: string, orderId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getListing: async (chainName: string, listingId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('getOrder', 'chainName', chainName)
-            // verify required parameter 'orderId' is not null or undefined
-            assertParamExists('getOrder', 'orderId', orderId)
-            const localVarPath = `/v1/chains/{chain_name}/orders/{order_id}`
+            assertParamExists('getListing', 'chainName', chainName)
+            // verify required parameter 'listingId' is not null or undefined
+            assertParamExists('getListing', 'listingId', listingId)
+            const localVarPath = `/v1/chains/{chain_name}/orders/listings/{listing_id}`
                 .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)))
-                .replace(`{${"order_id"}}`, encodeURIComponent(String(orderId)));
+                .replace(`{${"listing_id"}}`, encodeURIComponent(String(listingId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -119,11 +119,12 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * List all orders
-         * @summary List all orders
+         * List all listings
+         * @summary List all listings
          * @param {string} chainName 
          * @param {OrderStatus} [status] Order status to filter by
          * @param {string} [sellItemContractAddress] Sell item contract address to filter by
+         * @param {string} [buyItemContractAddress] Buy item contract address to filter by
          * @param {string} [sellItemTokenId] Sell item token identifier to filter by
          * @param {number} [pageSize] Maximum number of orders to return per page
          * @param {'created_at' | 'updated_at' | 'buy_item_amount'} [sortBy] Order field to sort by
@@ -132,10 +133,10 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listOrders: async (chainName: string, status?: OrderStatus, sellItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listListings: async (chainName: string, status?: OrderStatus, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chainName' is not null or undefined
-            assertParamExists('listOrders', 'chainName', chainName)
-            const localVarPath = `/v1/chains/{chain_name}/orders`
+            assertParamExists('listListings', 'chainName', chainName)
+            const localVarPath = `/v1/chains/{chain_name}/orders/listings`
                 .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -154,6 +155,10 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
 
             if (sellItemContractAddress !== undefined) {
                 localVarQueryParameter['sell_item_contract_address'] = sellItemContractAddress;
+            }
+
+            if (buyItemContractAddress !== undefined) {
+                localVarQueryParameter['buy_item_contract_address'] = buyItemContractAddress;
             }
 
             if (sellItemTokenId !== undefined) {
@@ -198,35 +203,36 @@ export const OrdersApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = OrdersApiAxiosParamCreator(configuration)
     return {
         /**
-         * Create an order
-         * @summary Create an order
+         * Create a listing
+         * @summary Create a listing
          * @param {string} chainName 
-         * @param {CreateOrderRequestBody} createOrderRequestBody 
+         * @param {CreateListingRequestBody} createListingRequestBody 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createOrder(chainName: string, createOrderRequestBody: CreateOrderRequestBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrderResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createOrder(chainName, createOrderRequestBody, options);
+        async createListing(chainName: string, createListingRequestBody: CreateListingRequestBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListingResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createListing(chainName, createListingRequestBody, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get a single order by ID
-         * @summary Get a single order by ID
+         * Get a single listing by ID
+         * @summary Get a single listing by ID
          * @param {string} chainName 
-         * @param {string} orderId Global Order identifier
+         * @param {string} listingId Global Order identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getOrder(chainName: string, orderId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrderResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getOrder(chainName, orderId, options);
+        async getListing(chainName: string, listingId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListingResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getListing(chainName, listingId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * List all orders
-         * @summary List all orders
+         * List all listings
+         * @summary List all listings
          * @param {string} chainName 
          * @param {OrderStatus} [status] Order status to filter by
          * @param {string} [sellItemContractAddress] Sell item contract address to filter by
+         * @param {string} [buyItemContractAddress] Buy item contract address to filter by
          * @param {string} [sellItemTokenId] Sell item token identifier to filter by
          * @param {number} [pageSize] Maximum number of orders to return per page
          * @param {'created_at' | 'updated_at' | 'buy_item_amount'} [sortBy] Order field to sort by
@@ -235,8 +241,8 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listOrders(chainName: string, status?: OrderStatus, sellItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListOrdersResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listOrders(chainName, status, sellItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options);
+        async listListings(chainName: string, status?: OrderStatus, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListListingsResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listListings(chainName, status, sellItemContractAddress, buyItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -250,33 +256,34 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
     const localVarFp = OrdersApiFp(configuration)
     return {
         /**
-         * Create an order
-         * @summary Create an order
+         * Create a listing
+         * @summary Create a listing
          * @param {string} chainName 
-         * @param {CreateOrderRequestBody} createOrderRequestBody 
+         * @param {CreateListingRequestBody} createListingRequestBody 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createOrder(chainName: string, createOrderRequestBody: CreateOrderRequestBody, options?: any): AxiosPromise<OrderResult> {
-            return localVarFp.createOrder(chainName, createOrderRequestBody, options).then((request) => request(axios, basePath));
+        createListing(chainName: string, createListingRequestBody: CreateListingRequestBody, options?: any): AxiosPromise<ListingResult> {
+            return localVarFp.createListing(chainName, createListingRequestBody, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get a single order by ID
-         * @summary Get a single order by ID
+         * Get a single listing by ID
+         * @summary Get a single listing by ID
          * @param {string} chainName 
-         * @param {string} orderId Global Order identifier
+         * @param {string} listingId Global Order identifier
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOrder(chainName: string, orderId: string, options?: any): AxiosPromise<OrderResult> {
-            return localVarFp.getOrder(chainName, orderId, options).then((request) => request(axios, basePath));
+        getListing(chainName: string, listingId: string, options?: any): AxiosPromise<ListingResult> {
+            return localVarFp.getListing(chainName, listingId, options).then((request) => request(axios, basePath));
         },
         /**
-         * List all orders
-         * @summary List all orders
+         * List all listings
+         * @summary List all listings
          * @param {string} chainName 
          * @param {OrderStatus} [status] Order status to filter by
          * @param {string} [sellItemContractAddress] Sell item contract address to filter by
+         * @param {string} [buyItemContractAddress] Buy item contract address to filter by
          * @param {string} [sellItemTokenId] Sell item token identifier to filter by
          * @param {number} [pageSize] Maximum number of orders to return per page
          * @param {'created_at' | 'updated_at' | 'buy_item_amount'} [sortBy] Order field to sort by
@@ -285,113 +292,120 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listOrders(chainName: string, status?: OrderStatus, sellItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: any): AxiosPromise<ListOrdersResult> {
-            return localVarFp.listOrders(chainName, status, sellItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options).then((request) => request(axios, basePath));
+        listListings(chainName: string, status?: OrderStatus, sellItemContractAddress?: string, buyItemContractAddress?: string, sellItemTokenId?: string, pageSize?: number, sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount', sortDirection?: 'asc' | 'desc', pageCursor?: string, options?: any): AxiosPromise<ListListingsResult> {
+            return localVarFp.listListings(chainName, status, sellItemContractAddress, buyItemContractAddress, sellItemTokenId, pageSize, sortBy, sortDirection, pageCursor, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * Request parameters for createOrder operation in OrdersApi.
+ * Request parameters for createListing operation in OrdersApi.
  * @export
- * @interface OrdersApiCreateOrderRequest
+ * @interface OrdersApiCreateListingRequest
  */
-export interface OrdersApiCreateOrderRequest {
+export interface OrdersApiCreateListingRequest {
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiCreateOrder
+     * @memberof OrdersApiCreateListing
      */
     readonly chainName: string
 
     /**
      * 
-     * @type {CreateOrderRequestBody}
-     * @memberof OrdersApiCreateOrder
+     * @type {CreateListingRequestBody}
+     * @memberof OrdersApiCreateListing
      */
-    readonly createOrderRequestBody: CreateOrderRequestBody
+    readonly createListingRequestBody: CreateListingRequestBody
 }
 
 /**
- * Request parameters for getOrder operation in OrdersApi.
+ * Request parameters for getListing operation in OrdersApi.
  * @export
- * @interface OrdersApiGetOrderRequest
+ * @interface OrdersApiGetListingRequest
  */
-export interface OrdersApiGetOrderRequest {
+export interface OrdersApiGetListingRequest {
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiGetOrder
+     * @memberof OrdersApiGetListing
      */
     readonly chainName: string
 
     /**
      * Global Order identifier
      * @type {string}
-     * @memberof OrdersApiGetOrder
+     * @memberof OrdersApiGetListing
      */
-    readonly orderId: string
+    readonly listingId: string
 }
 
 /**
- * Request parameters for listOrders operation in OrdersApi.
+ * Request parameters for listListings operation in OrdersApi.
  * @export
- * @interface OrdersApiListOrdersRequest
+ * @interface OrdersApiListListingsRequest
  */
-export interface OrdersApiListOrdersRequest {
+export interface OrdersApiListListingsRequest {
     /**
      * 
      * @type {string}
-     * @memberof OrdersApiListOrders
+     * @memberof OrdersApiListListings
      */
     readonly chainName: string
 
     /**
      * Order status to filter by
      * @type {OrderStatus}
-     * @memberof OrdersApiListOrders
+     * @memberof OrdersApiListListings
      */
     readonly status?: OrderStatus
 
     /**
      * Sell item contract address to filter by
      * @type {string}
-     * @memberof OrdersApiListOrders
+     * @memberof OrdersApiListListings
      */
     readonly sellItemContractAddress?: string
 
     /**
+     * Buy item contract address to filter by
+     * @type {string}
+     * @memberof OrdersApiListListings
+     */
+    readonly buyItemContractAddress?: string
+
+    /**
      * Sell item token identifier to filter by
      * @type {string}
-     * @memberof OrdersApiListOrders
+     * @memberof OrdersApiListListings
      */
     readonly sellItemTokenId?: string
 
     /**
      * Maximum number of orders to return per page
      * @type {number}
-     * @memberof OrdersApiListOrders
+     * @memberof OrdersApiListListings
      */
     readonly pageSize?: number
 
     /**
      * Order field to sort by
      * @type {'created_at' | 'updated_at' | 'buy_item_amount'}
-     * @memberof OrdersApiListOrders
+     * @memberof OrdersApiListListings
      */
     readonly sortBy?: 'created_at' | 'updated_at' | 'buy_item_amount'
 
     /**
      * Ascending or descending direction for sort
      * @type {'asc' | 'desc'}
-     * @memberof OrdersApiListOrders
+     * @memberof OrdersApiListListings
      */
     readonly sortDirection?: 'asc' | 'desc'
 
     /**
      * Page cursor to retrieve previous or next page. Use the value returned in the response.
      * @type {string}
-     * @memberof OrdersApiListOrders
+     * @memberof OrdersApiListListings
      */
     readonly pageCursor?: string
 }
@@ -404,38 +418,38 @@ export interface OrdersApiListOrdersRequest {
  */
 export class OrdersApi extends BaseAPI {
     /**
-     * Create an order
-     * @summary Create an order
-     * @param {OrdersApiCreateOrderRequest} requestParameters Request parameters.
+     * Create a listing
+     * @summary Create a listing
+     * @param {OrdersApiCreateListingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public createOrder(requestParameters: OrdersApiCreateOrderRequest, options?: AxiosRequestConfig) {
-        return OrdersApiFp(this.configuration).createOrder(requestParameters.chainName, requestParameters.createOrderRequestBody, options).then((request) => request(this.axios, this.basePath));
+    public createListing(requestParameters: OrdersApiCreateListingRequest, options?: AxiosRequestConfig) {
+        return OrdersApiFp(this.configuration).createListing(requestParameters.chainName, requestParameters.createListingRequestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Get a single order by ID
-     * @summary Get a single order by ID
-     * @param {OrdersApiGetOrderRequest} requestParameters Request parameters.
+     * Get a single listing by ID
+     * @summary Get a single listing by ID
+     * @param {OrdersApiGetListingRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public getOrder(requestParameters: OrdersApiGetOrderRequest, options?: AxiosRequestConfig) {
-        return OrdersApiFp(this.configuration).getOrder(requestParameters.chainName, requestParameters.orderId, options).then((request) => request(this.axios, this.basePath));
+    public getListing(requestParameters: OrdersApiGetListingRequest, options?: AxiosRequestConfig) {
+        return OrdersApiFp(this.configuration).getListing(requestParameters.chainName, requestParameters.listingId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * List all orders
-     * @summary List all orders
-     * @param {OrdersApiListOrdersRequest} requestParameters Request parameters.
+     * List all listings
+     * @summary List all listings
+     * @param {OrdersApiListListingsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrdersApi
      */
-    public listOrders(requestParameters: OrdersApiListOrdersRequest, options?: AxiosRequestConfig) {
-        return OrdersApiFp(this.configuration).listOrders(requestParameters.chainName, requestParameters.status, requestParameters.sellItemContractAddress, requestParameters.sellItemTokenId, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
+    public listListings(requestParameters: OrdersApiListListingsRequest, options?: AxiosRequestConfig) {
+        return OrdersApiFp(this.configuration).listListings(requestParameters.chainName, requestParameters.status, requestParameters.sellItemContractAddress, requestParameters.buyItemContractAddress, requestParameters.sellItemTokenId, requestParameters.pageSize, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.pageCursor, options).then((request) => request(this.axios, this.basePath));
     }
 }

@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
+import { SetProvider } from './internal/SetProvider';
+import { CheckoutWidgetTagNames } from '../definitions/types';
 
 /**
  * Interface representing the props for the Wallet Widget component.
- * @property {string} providerPreference - The preferred provider for the Wallet Widget
- * (default: "metamask").
+ * @interface WalletReactProps
+ * @property {WalletProviderName | undefined} walletProvider - The name of the wallet provider.
+ * @property {Web3Provider | undefined} provider - The Web3 provider.
  */
 export interface WalletReactProps {
-  providerPreference?: string;
-  useConnectWidget?: boolean;
+  walletProvider?: WalletProviderName;
+  provider?: Web3Provider;
 }
 
 /**
@@ -15,19 +20,24 @@ export interface WalletReactProps {
  * @param {WalletReactProps} props - The props for the Wallet Widget component.
  * @returns {JSX.Element} - The rendered Wallet Widget component.
  */
-export function WalletReact(props: WalletReactProps) {
+export function WalletReact(props: WalletReactProps): JSX.Element {
   const {
-    providerPreference,
-    useConnectWidget,
+    walletProvider,
+    provider,
   } = props;
+
+  useEffect(() => {
+    if (provider) {
+      SetProvider(CheckoutWidgetTagNames.WALLET, provider);
+    }
+  }, [provider]);
 
   const config = window.ImtblCheckoutWidgetConfig;
 
   return (
     <imtbl-wallet
       widgetConfig={config}
-      useConnectWidget={useConnectWidget?.toString()}
-      providerPreference={providerPreference ?? 'metamask'}
+      walletProvider={walletProvider}
     />
   );
 }

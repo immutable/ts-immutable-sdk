@@ -1,4 +1,4 @@
-import { ConnectionProviders, WalletFilterTypes } from '../types';
+import { WalletFilterTypes, WalletProviderName } from '../types';
 import { getWalletAllowList } from './wallet';
 
 describe('getWalletAllowList', () => {
@@ -9,81 +9,20 @@ describe('getWalletAllowList', () => {
       exclude: [],
       result: [
         {
-          connectionProvider: 'metamask',
-          icon: 'some-icon-url',
-          name: 'MetaMask',
-          description: 'complete web3 wallet solution',
-        },
-        {
-          connectionProvider: 'passport',
-          icon: 'pp-icon',
-          name: 'Passport',
-          description: 'Web3 with your email!',
-        },
-        {
-          connectionProvider: 'gamestop',
-          icon: 'gme-icon',
-          name: 'GameStop',
-          description: 'Never stopping the game!',
+          walletProvider: WalletProviderName.METAMASK,
+          name: WalletProviderName.METAMASK,
         },
       ],
     },
     {
-      text: 'exclusion of MetaMask wallet applied',
+      text: 'filters applied',
       type: WalletFilterTypes.ALL,
-      exclude: [{ connectionProvider: ConnectionProviders.METAMASK }],
-      result: [
+      exclude: [
         {
-          connectionProvider: 'passport',
-          icon: 'pp-icon',
-          name: 'Passport',
-          description: 'Web3 with your email!',
-        },
-        {
-          connectionProvider: 'gamestop',
-          icon: 'gme-icon',
-          name: 'GameStop',
-          description: 'Never stopping the game!',
+          walletProvider: WalletProviderName.METAMASK,
         },
       ],
-    },
-    {
-      text: 'mobile platform only',
-      type: WalletFilterTypes.MOBILE,
-      exclude: [],
-      result: [
-        {
-          connectionProvider: 'passport',
-          icon: 'pp-icon',
-          name: 'Passport',
-          description: 'Web3 with your email!',
-        },
-        {
-          connectionProvider: 'gamestop',
-          icon: 'gme-icon',
-          name: 'GameStop',
-          description: 'Never stopping the game!',
-        },
-      ],
-    },
-    {
-      text: 'desktop platform only',
-      type: WalletFilterTypes.DESKTOP,
-      exclude: [],
-      result: [
-        {
-          connectionProvider: 'metamask',
-          icon: 'some-icon-url',
-          name: 'MetaMask',
-          description: 'complete web3 wallet solution',
-        },
-        {
-          connectionProvider: 'passport',
-          icon: 'pp-icon',
-          name: 'Passport',
-          description: 'Web3 with your email!',
-        },
-      ],
+      result: [],
     },
   ];
   testcases.forEach((testcase) => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { SwapWidget, SwapWidgetParams } from './SwapWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
@@ -11,9 +11,7 @@ import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import { ConnectTargetLayer } from '../../lib';
 
 export class ImmutableSwap extends ImmutableWebComponent {
-  providerPreference = ConnectionProviders.METAMASK;
-
-  useConnectWidget?: boolean;
+  walletProvider = WalletProviderName.METAMASK;
 
   amount = '';
 
@@ -23,27 +21,23 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
   connectedCallback() {
     super.connectedCallback();
-    this.providerPreference = this.getAttribute(
-      'providerPreference',
-    ) as ConnectionProviders;
-    const useConnectWidgetProp = this.getAttribute('useConnectWidget');
-    this.useConnectWidget = useConnectWidgetProp?.toLowerCase() !== 'false';
+    this.walletProvider = this.getAttribute(
+      'walletProvider',
+    ) as WalletProviderName;
     this.amount = this.getAttribute('amount') as string;
-    this.fromContractAddress = this.getAttribute(
-      'fromContractAddress',
-    ) as string;
+    this.fromContractAddress = this.getAttribute('fromContractAddress') as string;
     this.toContractAddress = this.getAttribute('toContractAddress') as string;
     this.renderWidget();
   }
 
   renderWidget() {
     const connectLoaderParams: ConnectLoaderParams = {
-      targetLayer: ConnectTargetLayer.LAYER1,
-      providerPreference: this.providerPreference,
+      targetLayer: ConnectTargetLayer.LAYER2,
+      walletProvider: this.walletProvider,
+      web3Provider: this.provider,
     };
 
     const swapParams: SwapWidgetParams = {
-      providerPreference: this.providerPreference,
       amount: this.amount,
       fromContractAddress: this.fromContractAddress,
       toContractAddress: this.toContractAddress,
@@ -55,23 +49,16 @@ export class ImmutableSwap extends ImmutableWebComponent {
 
     this.reactRoot.render(
       <React.StrictMode>
-        {this.useConnectWidget ? (
-          <ConnectLoader
-            widgetConfig={this.widgetConfig!}
-            params={connectLoaderParams}
-            closeEvent={sendSwapWidgetCloseEvent}
-          >
-            <SwapWidget
-              params={swapParams}
-              config={this.widgetConfig!}
-            />
-          </ConnectLoader>
-        ) : (
+        <ConnectLoader
+          params={connectLoaderParams}
+          widgetConfig={this.widgetConfig!}
+          closeEvent={sendSwapWidgetCloseEvent}
+        >
           <SwapWidget
             params={swapParams}
             config={this.widgetConfig!}
           />
-        )}
+        </ConnectLoader>
       </React.StrictMode>,
     );
   }

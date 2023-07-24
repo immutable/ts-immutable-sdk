@@ -1,7 +1,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import {
   Checkout,
-  ConnectionProviders,
+  WalletProviderName,
   NetworkInfo,
 } from '@imtbl/checkout-sdk';
 import { createContext } from 'react';
@@ -10,7 +10,7 @@ import { BalanceInfo } from '../functions/tokenBalances';
 export interface WalletState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
-  providerPreference: ConnectionProviders | null;
+  walletProvider: WalletProviderName | null;
   network: NetworkInfo | null;
   tokenBalances: BalanceInfo[];
   supportedTopUps: TopUpFeature | null;
@@ -25,7 +25,7 @@ export interface TopUpFeature {
 export const initialWalletState: WalletState = {
   checkout: null,
   provider: null,
-  providerPreference: null,
+  walletProvider: null,
   network: null,
   tokenBalances: [],
   supportedTopUps: null,
@@ -43,7 +43,7 @@ export interface WalletAction {
 type ActionPayload =
   | SetCheckoutPayload
   | SetProviderPayload
-  | SetProviderPreferencePayload
+  | SetWalletProviderPayload
   | SetSwitchNetworkPayload
   | SetTokenBalancesPayload
   | SetSupportedTopUpPayload;
@@ -51,7 +51,7 @@ type ActionPayload =
 export enum WalletActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
-  SET_PROVIDER_PREFERENCE = 'SET_PROVIDER_PREFERENCE',
+  SET_WALLET_PROVIDER = 'SET_WALLET_PROVIDER',
   SET_NETWORK = 'SET_NETWORK',
   SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES',
   SET_SUPPORTED_TOP_UPS = 'SUPPORTED_TOP_UPS',
@@ -67,9 +67,9 @@ export interface SetProviderPayload {
   provider: Web3Provider;
 }
 
-export interface SetProviderPreferencePayload {
-  type: WalletActions.SET_PROVIDER_PREFERENCE;
-  providerPreference: ConnectionProviders;
+export interface SetWalletProviderPayload {
+  type: WalletActions.SET_WALLET_PROVIDER;
+  walletProvider: WalletProviderName;
 }
 
 export interface SetSwitchNetworkPayload {
@@ -112,10 +112,10 @@ export const walletReducer: Reducer<WalletState, WalletAction> = (
         ...state,
         provider: action.payload.provider,
       };
-    case WalletActions.SET_PROVIDER_PREFERENCE:
+    case WalletActions.SET_WALLET_PROVIDER:
       return {
         ...state,
-        providerPreference: action.payload.providerPreference,
+        walletProvider: action.payload.walletProvider,
       };
     case WalletActions.SET_NETWORK:
       return {

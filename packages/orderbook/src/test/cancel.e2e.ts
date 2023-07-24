@@ -2,28 +2,24 @@ import { Environment } from '@imtbl/config';
 import { OrderStatus } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
-import { getConfig } from './helpers/config';
 import { getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
 import { signAndSubmitTx, signMessage } from './helpers/sign-and-submit';
 import { waitForOrderToBeOfStatus } from './helpers/order';
+import { getLocalConfigFromEnv } from './helpers';
 
 describe('cancel order', () => {
   it('should cancel the order', async () => {
-    const config = getConfig();
     const provider = getLocalhostProvider();
     const offerer = getOffererWallet(provider);
 
+    const localConfigOverrides = getLocalConfigFromEnv();
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
       },
-      provider: getLocalhostProvider(),
-      seaportContractAddress: config.seaportContractAddress,
-      zoneContractAddress: config.zoneContractAddress,
       overrides: {
-        apiEndpoint: config.apiUrl,
-        chainName: 'imtbl-zkevm-local',
+        ...localConfigOverrides,
       },
     });
 
@@ -31,28 +27,31 @@ describe('cancel order', () => {
     await contract.safeMint(offerer.address);
 
     const listing = await sdk.prepareListing({
-      offerer: offerer.address,
-      considerationItem: {
+      makerAddress: offerer.address,
+      buy: {
         amount: '1000000',
-        type: 'IMX',
+        type: 'NATIVE',
       },
-      listingItem: {
+      sell: {
         contractAddress: contract.address,
         tokenId: '0',
         type: 'ERC721',
       },
     });
 
-    await signAndSubmitTx(listing.unsignedApprovalTransaction!, offerer, provider);
+    await signAndSubmitTx(
+      listing.unsignedApprovalTransaction!,
+      offerer,
+      provider,
+    );
     const signature = await signMessage(
-      listing.typedOrderMessageForSigning.domain,
-      listing.typedOrderMessageForSigning.types,
-      listing.typedOrderMessageForSigning.value,
+      listing.typedOrderMessageForSigning,
       offerer,
     );
 
-    const { result: { id: orderId } } = await sdk.createOrder({
-      offerer: offerer.address,
+    const {
+      result: { id: orderId },
+    } = await sdk.createListing({
       orderComponents: listing.orderComponents,
       orderHash: listing.orderHash,
       orderSignature: signature,
@@ -60,7 +59,10 @@ describe('cancel order', () => {
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
 
-    const { unsignedCancelOrderTransaction } = await sdk.cancelOrder(orderId, offerer.address);
+    const { unsignedCancelOrderTransaction } = await sdk.cancelOrder(
+      orderId,
+      offerer.address,
+    );
     await signAndSubmitTx(unsignedCancelOrderTransaction, offerer, provider);
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.CANCELLED);

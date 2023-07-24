@@ -1,14 +1,23 @@
-import { ChainId, GetBalanceResult, TokenInfo } from '@imtbl/checkout-sdk';
+import {
+  ChainId, Checkout, GetBalanceResult, TokenInfo,
+} from '@imtbl/checkout-sdk';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import {
   calculateCryptoToFiat,
   formatFiatString,
   formatZeroAmount,
+  isNativeToken,
   sortTokensByAmount,
   tokenValueFormat,
 } from './utils';
-import { DEFAULT_TOKEN_DECIMALS } from './constants';
+import { DEFAULT_TOKEN_FORMATTING_DECIMALS } from './constants';
+
+const checkout = new Checkout({
+  baseConfig: {
+    environment: Environment.SANDBOX,
+  },
+});
 
 describe('utils', () => {
   describe('sortTokensByAmount', () => {
@@ -41,7 +50,7 @@ describe('utils', () => {
       ];
 
       expect(
-        sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM),
+        sortTokensByAmount(checkout.config, tokens, ChainId.ETHEREUM),
       ).toEqual([
         {
           balance: BigNumber.from('100000000000000000000'),
@@ -166,7 +175,7 @@ describe('utils', () => {
       it(`When zkevm and ${testcase.text} then should sort tokens by amount and put imx at top`, () => {
         expect(
           sortTokensByAmount(
-            Environment.PRODUCTION,
+            checkout.config,
             testcase.tokens,
             ChainId.IMTBL_ZKEVM_TESTNET,
           ),
@@ -252,7 +261,7 @@ describe('utils', () => {
       ];
 
       expect(
-        sortTokensByAmount(Environment.PRODUCTION, tokens, ChainId.ETHEREUM),
+        sortTokensByAmount(checkout.config, tokens, ChainId.ETHEREUM),
       ).toEqual([
         {
           balance: BigNumber.from('100000000000000000000'),
@@ -398,14 +407,46 @@ describe('utils', () => {
   });
 
   describe('tokenValueFormat', () => {
-    it(`a number with more than ${DEFAULT_TOKEN_DECIMALS} decimals`, () => {
-      expect(tokenValueFormat('11.2233445566')).toEqual('11.223344');
+    it(`should format number with more than ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimals`, () => {
+      expect(tokenValueFormat('11.2233445566')).toEqual('11.22');
     });
-    it(`a number without ${DEFAULT_TOKEN_DECIMALS} decimals`, () => {
+
+    it('should format number without decimal places', () => {
       expect(tokenValueFormat('112233445566')).toEqual('112233445566');
     });
-    it(`a number with less than ${DEFAULT_TOKEN_DECIMALS} decimals`, () => {
+
+    it(`should format number with less than ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimals`, () => {
       expect(tokenValueFormat('11.22')).toEqual('11.22');
+    });
+
+    it('should format number removing the decimals', () => {
+      expect(tokenValueFormat('11.001')).toEqual('11');
+    });
+
+    it(`should format number to ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimal places`, () => {
+      expect(tokenValueFormat('0.0000012')).toEqual('0.000001');
+    });
+
+    it(`should format to maximum of ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimal places`, () => {
+      expect(tokenValueFormat('0.0000001')).toEqual('0.000000');
+    });
+  });
+
+  describe('isNativeToken', () => {
+    it('should return true if address is undefined', () => {
+      expect(isNativeToken(undefined)).toEqual(true);
+    });
+
+    it('should return true if address is empty', () => {
+      expect(isNativeToken('')).toEqual(true);
+    });
+
+    it('should return true if address is NATIVE', () => {
+      expect(isNativeToken('NATIVE')).toEqual(true);
+    });
+
+    it('should return false if address is not NATIVE', () => {
+      expect(isNativeToken('0x123')).toEqual(false);
     });
   });
 });

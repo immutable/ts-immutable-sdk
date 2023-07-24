@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount } from 'cypress/react18';
-import { ChainId, Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import { Environment } from '@imtbl/config';
 import { cy } from 'local-cypress';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
@@ -14,11 +14,11 @@ import { orchestrationEvents } from '../../../../lib/orchestrationEvents';
 describe('BalanceItem', () => {
   const baseWalletState: WalletState = {
     checkout: new Checkout({
-      baseConfig: { environment: Environment.PRODUCTION },
+      baseConfig: { environment: Environment.SANDBOX },
     }),
     network: null,
     provider: null,
-    providerPreference: ConnectionProviders.METAMASK,
+    walletProvider: WalletProviderName.METAMASK,
     tokenBalances: [],
     supportedTopUps: null,
   };
@@ -33,14 +33,13 @@ describe('BalanceItem', () => {
 
   beforeEach(() => {
     cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('requestSwapEventStub');
-    cy.stub(orchestrationEvents, 'sendRequestBridgeEvent').as('requestBridgeEventStub');
     cy.stub(orchestrationEvents, 'sendRequestOnrampEvent').as('requestOnrampEventStub');
   });
 
   it('should show balance details', () => {
     mount(
       <WalletWidgetTestComponent>
-        <BalanceItem balanceInfo={testBalanceInfo} />
+        <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
       </WalletWidgetTestComponent>,
     );
 
@@ -76,7 +75,7 @@ describe('BalanceItem', () => {
 
     mount(
       <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-        <BalanceItem balanceInfo={testBalanceInfo} />
+        <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
       </WalletWidgetTestComponent>,
     );
 
@@ -106,7 +105,7 @@ describe('BalanceItem', () => {
 
     mount(
       <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-        <BalanceItem balanceInfo={testBalanceInfo} />
+        <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
       </WalletWidgetTestComponent>,
     );
 
@@ -142,7 +141,7 @@ describe('BalanceItem', () => {
 
     mount(
       <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-        <BalanceItem balanceInfo={testBalanceInfo} />
+        <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
       </WalletWidgetTestComponent>,
     );
 
@@ -177,7 +176,7 @@ describe('BalanceItem', () => {
 
     mount(
       <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-        <BalanceItem balanceInfo={testBalanceInfo} />
+        <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
       </WalletWidgetTestComponent>,
     );
     cySmartGet('token-menu').should('exist');
@@ -199,7 +198,7 @@ describe('BalanceItem', () => {
     };
     mount(
       <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-        <BalanceItem balanceInfo={testBalanceInfo} />
+        <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
       </WalletWidgetTestComponent>,
     );
 
@@ -233,7 +232,7 @@ describe('BalanceItem', () => {
     it('should emit sendRequestSwapEvent when swap menu button is clicked', () => {
       mount(
         <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-          <BalanceItem balanceInfo={testBalanceInfo} />
+          <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
         </WalletWidgetTestComponent>,
       );
 
@@ -251,7 +250,7 @@ describe('BalanceItem', () => {
     it('should emit sendRequestOnrampEvent when add menu button is clicked', () => {
       mount(
         <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-          <BalanceItem balanceInfo={testBalanceInfo} />
+          <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
         </WalletWidgetTestComponent>,
       );
 
@@ -263,40 +262,6 @@ describe('BalanceItem', () => {
         'have.been.calledWith',
         IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
 
-        {
-          tokenAddress: '',
-          amount: '',
-        },
-      );
-    });
-
-    it('should emit sendRequestBridgeEvent when move menu button is clicked', () => {
-      testWalletState = {
-        ...testWalletState,
-        network: {
-          chainId: ChainId.SEPOLIA,
-          name: 'Immutable zkEVM Testnet',
-          nativeCurrency: {
-            name: 'ETH',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-          isSupported: true,
-        },
-      };
-      mount(
-        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-          <BalanceItem balanceInfo={testBalanceInfo} />
-        </WalletWidgetTestComponent>,
-      );
-
-      cySmartGet('token-menu').should('exist');
-      cySmartGet('token-menu').click();
-      cySmartGet('balance-item-move-option').click();
-      cySmartGet('@requestBridgeEventStub').should('have.been.called');
-      cySmartGet('@requestBridgeEventStub').should(
-        'have.been.calledWith',
-        IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
         {
           tokenAddress: '',
           amount: '',

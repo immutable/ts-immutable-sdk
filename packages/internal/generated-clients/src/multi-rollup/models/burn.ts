@@ -15,10 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ActivityType } from './activity-type';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Token } from './token';
+import { ActivityAsset } from './activity-asset';
 
 /**
  * The burn activity details
@@ -27,28 +24,22 @@ import { Token } from './token';
  */
 export interface Burn {
     /**
-     * 
-     * @type {ActivityType}
-     * @memberof Burn
-     */
-    'activity_type': ActivityType;
-    /**
-     * The account address the token was transferred from
+     * The account address the asset was transferred from
      * @type {string}
      * @memberof Burn
      */
     'from': string;
     /**
-     * The amount of tokens burnt
+     * The amount of assets burnt
      * @type {string}
      * @memberof Burn
      */
     'amount': string;
     /**
      * 
-     * @type {Token}
+     * @type {ActivityAsset}
      * @memberof Burn
      */
-    'token': Token;
+    'asset': ActivityAsset;
 }
 

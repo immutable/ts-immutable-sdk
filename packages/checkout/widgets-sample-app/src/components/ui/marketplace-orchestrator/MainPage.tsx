@@ -1,3 +1,4 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { useConnectWidget } from "./useConnectWidget";
 import { useWalletWidget } from "./useWalletWidget";
 import { Box, Button, Card, GridBox, Heading } from "@biom3/react";
@@ -11,7 +12,7 @@ export const MainPage = () => {
   
   // local state for enabling/disabling and changing buttons
   const [doneSwap, setDoneSwap] = useState<boolean>(false);
-  const [providerPreference, setProviderPreference] = useState("");
+  const [web3Provider, setWeb3Provider] = useState<Web3Provider|undefined>(undefined);
 
   // widget context state for showing/hiding widgets
   const {showWidgets: {
@@ -22,18 +23,18 @@ export const MainPage = () => {
   }, setShowWidgets} = useContext(WidgetContext);
 
   // hooks for each widget set up event listeners and orchestration logic
-  useConnectWidget(setProviderPreference);
-  useWalletWidget(setProviderPreference);
+  useConnectWidget(setWeb3Provider);
+  useWalletWidget(setWeb3Provider);
   useSwapWidget(setDoneSwap);
   useBridgeWidget();
 
   // button click functions to open/close widgets
   const openConnectWidget = useCallback(() => {
-    setShowWidgets({...hideAllWidgets, showConnect: true});
+    setShowWidgets({...hideAllWidgets, showConnect: {show: true, data: {}}});
   }, [setShowWidgets])
 
   const openWalletWidget = useCallback(() => {
-    setShowWidgets({...hideAllWidgets, showWallet: true});
+    setShowWidgets({...hideAllWidgets, showWallet: {show: true, data: {}}});
   }, [setShowWidgets])
 
   const handleBuyClick = () => {
@@ -46,10 +47,10 @@ export const MainPage = () => {
     <Box sx={{minWidth: '100vw', minHeight: '100vh', width: '100%', height: '100%', backgroundColor: 'base.color.brand.6'}}>
       <Box sx={{width: '100%',padding: 'base.spacing.x4', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
         <Heading>Immutable Checkout Marketplace</Heading>
-        {!providerPreference && (
+        {!web3Provider && (
         <Button onClick={openConnectWidget}>Connect Wallet</Button>
       )}
-      {providerPreference && (
+      {web3Provider && (
         <Button onClick={openWalletWidget}>My Wallet</Button>
       )}
       </Box>
@@ -58,7 +59,7 @@ export const MainPage = () => {
           <Box sx={{display: 'flex', flexDirection: 'row', gap: 'base.spacing.x4', flexWrap: 'wrap'}}>
               {cardKeys.map((val) => (
                 <Box key={val} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
-                  <Card sx={{width: '240px'}}>
+                  <Card sx={{width: '240px', marginBottom: 'base.spacing.x2'}}>
                   <Card.Title>Illuvitars</Card.Title>
                   <Card.Caption>Illuvium</Card.Caption>
                   <Card.FramedImage imageUrl="https://web-illuvium-static.s3.us-east-2.amazonaws.com/img/illuvitars/illuvitars_marketplace_icon.png" />
@@ -69,7 +70,7 @@ export const MainPage = () => {
               ))}
           </Box>
           <ImtblWidgets 
-            providerPreference={providerPreference} 
+            web3Provider={web3Provider} 
             showConnect={showConnect} 
             showWallet={showWallet} 
             showSwap={showSwap} 

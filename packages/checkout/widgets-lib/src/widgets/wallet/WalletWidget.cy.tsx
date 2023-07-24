@@ -1,5 +1,4 @@
-import React from 'react';
-import { Checkout, ConnectionProviders } from '@imtbl/checkout-sdk';
+import { ChainId, Checkout } from '@imtbl/checkout-sdk';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
   describe, it, cy, context,
@@ -9,8 +8,8 @@ import { Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { Environment } from '@imtbl/config';
 import { CryptoFiat } from '@imtbl/cryptofiat';
-import { WalletWidget, WalletWidgetParams } from './WalletWidget';
-import { cySmartGet } from '../../lib/testUtils';
+import { WalletWidget } from './WalletWidget';
+import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { text } from '../../resources/text/textConfig';
@@ -19,15 +18,26 @@ import { WalletWidgetViews } from '../../context/view-context/WalletViewContextT
 describe('WalletWidget tests', () => {
   beforeEach(() => {
     cy.viewport('ipad-2');
+    cyIntercept();
   });
 
+  const mockProvider = {
+    getSigner: () => ({
+      getAddress: () => Promise.resolve('0xwalletAddress'),
+    }),
+    getNetwork: async () => ({
+      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+      name: 'Immutable zkEVM Testnet',
+    }),
+    provider: {
+      request: async () => null,
+    },
+  } as unknown as Web3Provider;
+
   it('should show loading screen when component is mounted', () => {
-    const params = {
-      providerPreference: ConnectionProviders.METAMASK,
-    } as WalletWidgetParams;
     const widgetConfig = {
       theme: WidgetTheme.DARK,
-      environment: Environment.PRODUCTION,
+      environment: Environment.SANDBOX,
       isBridgeEnabled: false,
       isSwapEnabled: false,
       isOnRampEnabled: false,
@@ -41,36 +51,23 @@ describe('WalletWidget tests', () => {
       .stub(Checkout.prototype, 'connect')
       .as('connectNoNetworkStub');
     connectStub.resolves({
-      provider: {
-        getSigner: () => ({
-          getAddress: async () => Promise.resolve(''),
-        }),
-        getNetwork: async () => ({
-          chainId: 0,
-          name: '',
-        }),
-      },
+      provider: mockProvider,
       network: { name: '' },
     });
-
-    cy.stub(Checkout.prototype, 'switchNetwork')
-      .as('switchNetworkStub')
+    cy.stub(Checkout.prototype, 'getNetworkInfo')
+      .as('getNetworkInfoStub')
       .resolves({
-        network: {
-          chainId: 137,
-          name: 'Polygon',
-          nativeCurrency: {
-            name: 'MATIC',
-            symbol: 'MATIC',
-            decimals: 18,
-          },
+        chainId: ChainId.SEPOLIA,
+        isSupported: true,
+        nativeCurrency: {
+          symbol: 'eth',
         },
       });
 
     mount(
       <WalletWidget
         config={widgetConfig}
-        params={params}
+        web3Provider={mockProvider}
       />,
     );
 
@@ -90,12 +87,12 @@ describe('WalletWidget tests', () => {
               getAddress: () => Promise.resolve('dss'),
             }),
             getNetwork: async () => ({
-              chainId: 1,
+              chainId: ChainId.ETHEREUM,
               name: 'Ethereum',
             }),
           },
           network: {
-            chainId: 1,
+            chainId: ChainId.ETHEREUM,
             name: 'Ethereum',
             nativeCurrency: {
               name: 'ETH',
@@ -111,13 +108,13 @@ describe('WalletWidget tests', () => {
               getAddress: () => Promise.resolve('dss'),
             }),
             getNetwork: async () => ({
-              chainId: 13372,
-              name: 'Immutable zkEVM Testnet',
+              chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+              name: 'Immutable zkEVM devnet',
             }),
           },
           network: {
-            chainId: 13372,
-            name: 'Immutable zkEVM Testnet',
+            chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+            name: 'Immutable zkEVM devnet',
             nativeCurrency: {
               name: 'IMX',
               symbol: 'IMX',
@@ -126,13 +123,27 @@ describe('WalletWidget tests', () => {
           },
         });
 
+      cy.stub(Checkout.prototype, 'getNetworkInfo')
+        .as('getNetworkInfoStub')
+        .resolves({
+          chainId: ChainId.SEPOLIA,
+          isSupported: true,
+          nativeCurrency: {
+            symbol: 'eth',
+          },
+        });
+
       cy.stub(Checkout.prototype, 'getNetworkAllowList')
         .as('getNetworkAllowListStub')
         .resolves({
           networks: [
             {
-              name: 'Ethereum',
-              chainId: 1,
+              name: 'Immutable zkEVM devnet',
+              chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+            },
+            {
+              name: 'Sepolia',
+              chainId: ChainId.SEPOLIA,
             },
           ],
         });
@@ -140,7 +151,6 @@ describe('WalletWidget tests', () => {
       getAllBalancesStub = cy
         .stub(Checkout.prototype, 'getAllBalances')
         .as('balanceStub');
-
       getAllBalancesStub.resolves({
         balances: [
           {
@@ -177,8 +187,8 @@ describe('WalletWidget tests', () => {
         .as('switchNetworkStub')
         .resolves({
           network: {
-            chainId: 13372,
-            name: 'Immutable zkEVM Testnet',
+            chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+            name: 'Immutable zkEVM devnet',
             nativeCurrency: {
               name: 'IMX',
               symbol: 'IMX',
@@ -209,13 +219,9 @@ describe('WalletWidget tests', () => {
 
     describe('WalletWidget balances', () => {
       it('should show the network and user balances on that network', () => {
-        const params = {
-          providerPreference: ConnectionProviders.METAMASK,
-        } as WalletWidgetParams;
-
         const widgetConfig = {
           theme: WidgetTheme.DARK,
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
           isBridgeEnabled: false,
           isSwapEnabled: false,
           isOnRampEnabled: false,
@@ -224,20 +230,17 @@ describe('WalletWidget tests', () => {
         mount(
           <WalletWidget
             config={widgetConfig}
-            params={params}
+            web3Provider={mockProvider}
           />,
         );
 
         cySmartGet('@balanceStub').should('have.been.called');
-        cySmartGet('@connectStub').should('have.been.calledWith', {
-          providerPreference: 'metamask',
-        });
 
         cySmartGet('close-button').should('be.visible');
         cySmartGet('network-heading').should('be.visible');
-        cySmartGet('Ethereum-network-button').should(
+        cySmartGet('Sepolia-network-button').should(
           'include.text',
-          'Ethereum',
+          'Sepolia',
         );
 
         cySmartGet('total-token-balance').should('exist');
@@ -252,13 +255,9 @@ describe('WalletWidget tests', () => {
       });
 
       it('should show the balance details for each token', () => {
-        const params = {
-          providerPreference: ConnectionProviders.METAMASK,
-        } as WalletWidgetParams;
-
         const widgetConfig = {
           theme: WidgetTheme.DARK,
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
           isBridgeEnabled: false,
           isSwapEnabled: false,
           isOnRampEnabled: false,
@@ -267,14 +266,11 @@ describe('WalletWidget tests', () => {
         mount(
           <WalletWidget
             config={widgetConfig}
-            params={params}
+            web3Provider={mockProvider}
           />,
         );
 
         cySmartGet('@balanceStub').should('have.been.called');
-        cySmartGet('@connectStub').should('have.been.calledWith', {
-          providerPreference: 'metamask',
-        });
 
         cySmartGet('balance-item-ETH').should('exist');
         cySmartGet('balance-item-ETH').should('include.text', 'ETH');
@@ -292,19 +288,15 @@ describe('WalletWidget tests', () => {
           'include.text',
           'Gods Unchained',
         );
-        cySmartGet('balance-item-GODS__price').should('have.text', '100.2');
+        cySmartGet('balance-item-GODS__price').should('have.text', '100.20');
       });
     });
 
     describe('WalletWidget settings', () => {
       it('should show the settings view if the settings button is clicked', () => {
-        const params = {
-          providerPreference: ConnectionProviders.METAMASK,
-        } as WalletWidgetParams;
-
         const widgetConfig = {
           theme: WidgetTheme.DARK,
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
           isBridgeEnabled: false,
           isSwapEnabled: false,
           isOnRampEnabled: false,
@@ -313,7 +305,7 @@ describe('WalletWidget tests', () => {
         mount(
           <WalletWidget
             config={widgetConfig}
-            params={params}
+            web3Provider={mockProvider}
           />,
         );
 
@@ -324,13 +316,9 @@ describe('WalletWidget tests', () => {
       });
 
       it('should show correct wallet address on the settings page', () => {
-        const params = {
-          providerPreference: ConnectionProviders.METAMASK,
-        } as WalletWidgetParams;
-
         const widgetConfig = {
           theme: WidgetTheme.DARK,
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
           isBridgeEnabled: false,
           isSwapEnabled: false,
           isOnRampEnabled: false,
@@ -339,17 +327,14 @@ describe('WalletWidget tests', () => {
         mount(
           <WalletWidget
             config={widgetConfig}
-            params={params}
+            web3Provider={mockProvider}
           />,
         );
         cySmartGet('settings-button').click();
-        cySmartGet('wallet-address').should('have.text', 'dss');
+        cySmartGet('wallet-address').should('have.text', '0xwalletAddress');
       });
 
       it('should show a disconnect button that fires the right event when clicked', () => {
-        const params = {
-          providerPreference: ConnectionProviders.METAMASK,
-        } as WalletWidgetParams;
         cy.window().then((window) => {
           window.addEventListener(
             IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
@@ -359,7 +344,7 @@ describe('WalletWidget tests', () => {
 
         const widgetConfig = {
           theme: WidgetTheme.DARK,
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
           isBridgeEnabled: false,
           isSwapEnabled: false,
           isOnRampEnabled: false,
@@ -368,7 +353,7 @@ describe('WalletWidget tests', () => {
         mount(
           <WalletWidget
             config={widgetConfig}
-            params={params}
+            web3Provider={mockProvider}
           />,
         );
         cySmartGet('settings-button').click();
@@ -383,12 +368,9 @@ describe('WalletWidget tests', () => {
 
     describe('WalletWidget coin info', () => {
       it('should show the coin info view if the coin info icon is clicked', () => {
-        const params = {
-          providerPreference: ConnectionProviders.METAMASK,
-        } as WalletWidgetParams;
         const widgetConfig = {
           theme: WidgetTheme.DARK,
-          environment: Environment.PRODUCTION,
+          environment: Environment.SANDBOX,
           isBridgeEnabled: false,
           isSwapEnabled: false,
           isOnRampEnabled: false,
@@ -397,7 +379,7 @@ describe('WalletWidget tests', () => {
         mount(
           <WalletWidget
             config={widgetConfig}
-            params={params}
+            web3Provider={mockProvider}
           />,
         );
 

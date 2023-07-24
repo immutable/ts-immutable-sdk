@@ -7,16 +7,23 @@ import { WalletWidgetViews } from '../../../../context/view-context/WalletViewCo
 
 interface TokenBalanceListProps {
   balanceInfoItems: BalanceInfo[];
+  bridgeToL2OnClick: (address?: string) => void;
 }
-export function TokenBalanceList(props: TokenBalanceListProps) {
-  const { balanceInfoItems } = props;
+export function TokenBalanceList({
+  balanceInfoItems,
+  bridgeToL2OnClick,
+}: TokenBalanceListProps) {
   const { noTokensFound } = text.views[WalletWidgetViews.WALLET_BALANCES].tokenBalancesList;
 
   return (
     <Box sx={tokenBalanceListStyle}>
-      {balanceInfoItems.length === 0 && <Body>{noTokensFound}</Body>}
+      {balanceInfoItems.length === 0 && <Body testId="no-tokens-found">{noTokensFound}</Body>}
       {balanceInfoItems.map((balance) => (
-        <BalanceItem key={balance.id} balanceInfo={balance} />
+        <BalanceItem
+          key={balance.id}
+          balanceInfo={balance}
+          bridgeToL2OnClick={bridgeToL2OnClick}
+        />
       ))}
     </Box>
   );

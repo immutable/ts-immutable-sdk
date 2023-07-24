@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unused-prop-types */
 import {
   Select, Option, Box, OptionKey,
 } from '@biom3/react';
@@ -39,7 +38,14 @@ export function SelectForm({
       onSelectChange(option.id);
       setCoinSelectorOpen(false);
     },
-  })), [options]);
+  })), [options, onSelectChange, setCoinSelectorOpen]);
+
+  const getSelectedOption = () => {
+    if (!selectedOption) return undefined;
+    if (options.length === 0) return undefined;
+    if (!options.find((o) => o.id === selectedOption)) return undefined;
+    return selectedOption;
+  };
 
   return (
     <Box>
@@ -62,7 +68,7 @@ export function SelectForm({
           size="large"
           defaultLabel="Select coin"
           targetClickOveride={() => setCoinSelectorOpen(true)}
-          selectedOption={selectedOption || undefined}
+          selectedOption={getSelectedOption()}
         >
           {/*
             because we are using the CoinSelector, the options are shown on the bottom sheet component

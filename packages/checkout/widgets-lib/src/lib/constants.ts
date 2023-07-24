@@ -1,9 +1,13 @@
 import { Environment } from '@imtbl/config';
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from './types';
 
-export const DEFAULT_IMX_DECIMALS = 18;
-export const DEFAULT_TOKEN_DECIMALS = 6;
+export const NATIVE = 'NATIVE';
+export const DEFAULT_TOKEN_DECIMALS = 18;
+export const DEFAULT_TOKEN_FORMATTING_DECIMALS = 6;
+export const DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS = 2;
+export const IMX_TOKEN_SYMBOL = 'IMX';
+export const ETH_TOKEN_SYMBOL = 'ETH';
 
 /**
  * Checkout Widget default env
@@ -18,12 +22,13 @@ export const DEFAULT_THEME = WidgetTheme.DARK;
 /**
  * Checkout Widget default provider
  */
-export const DEFAULT_PROVIDER = ConnectionProviders.METAMASK;
+export const DEFAULT_PROVIDER = WalletProviderName.METAMASK;
 
 /**
  * Checkout Widget default onramp enabled flag
  */
-export const DEFAULT_ON_RAMP_ENABLED = true;
+// TODO https://immutable.atlassian.net/browse/WT-1509
+export const DEFAULT_ON_RAMP_ENABLED = false;
 
 /**
  * Checkout Widget default swap enabled flag

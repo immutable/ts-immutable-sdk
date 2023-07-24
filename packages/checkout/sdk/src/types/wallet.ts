@@ -1,21 +1,19 @@
-import { ConnectionProviders } from './connect';
+import { WalletProviderName } from './provider';
 
-/**
- * Enum representing different wallet actions.
- */
 export enum WalletAction {
   CHECK_CONNECTION = 'eth_accounts',
   CONNECT = 'eth_requestAccounts',
   ADD_NETWORK = 'wallet_addEthereumChain',
   SWITCH_NETWORK = 'wallet_switchEthereumChain',
+  GET_CHAINID = 'eth_chainId',
 }
 
 /**
  * Interface representing a wallet filter to be used in {@link GetWalletAllowListParams}.
- * @property {ConnectionProviders} connectionProvider - The connection provider to filter wallets by.
+ * @property {WalletProviderName} connectionProvider - The connection provider to filter wallets by.
  */
 export interface WalletFilter {
-  connectionProvider: ConnectionProviders;
+  walletProvider: WalletProviderName;
 }
 
 /**
@@ -30,16 +28,16 @@ export interface GetWalletAllowListParams {
 
 /**
  * Interface representing information about a wallet used in {@link GetWalletAllowListResult}.
- * @property {ConnectionProviders} connectionProvider - The connection provider for the wallet.
+ * @property {WalletProviderName} walletProvider - The connection provider for the wallet.
  * @property {string} name - The name of the wallet.
- * @property {string} description - A description of the wallet.
- * @property {string} icon - The URL/data:image of an icon for the wallet.
+ * @property {string | undefined} description - A description of the wallet.
+ * @property {string | undefined} icon - The URL/data:image of an icon for the wallet.
  */
 export interface WalletInfo {
-  connectionProvider: ConnectionProviders;
+  walletProvider: WalletProviderName;
   name: string;
-  description: string;
-  icon: string;
+  description?: string;
+  icon?: string;
 }
 
 /**
@@ -55,6 +53,4 @@ export interface GetWalletAllowListResult {
  */
 export enum WalletFilterTypes {
   ALL = 'all',
-  DESKTOP = 'desktop',
-  MOBILE = 'mobile',
 }

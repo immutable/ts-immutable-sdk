@@ -6,14 +6,14 @@ import {
   BridgeFailed,
 } from '@imtbl/checkout-widgets';
 
-export const sendBridgeSuccessEvent = () => {
+export const sendBridgeSuccessEvent = (transactionHash: string) => {
   const successEvent = new CustomEvent<WidgetEvent<BridgeSuccess>>(
     IMTBLWidgetEvents.IMTBL_BRIDGE_WIDGET_EVENT,
     {
       detail: {
         type: BridgeEventType.SUCCESS,
         data: {
-          timestamp: new Date().getTime(),
+          transactionHash,
         },
       },
     },

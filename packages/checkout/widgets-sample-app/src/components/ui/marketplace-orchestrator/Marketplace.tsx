@@ -11,18 +11,18 @@ import { WidgetProvider } from './WidgetProvider';
 
 export const Marketplace = () => {
   useEffect(() => {
-    CheckoutWidgets({
-      theme: WidgetTheme.DARK,
-      environment: Environment.SANDBOX,
-    });
+    
 
     const widgetsConfig: CheckoutWidgetsConfig = {
       theme: WidgetTheme.DARK,
       environment: Environment.SANDBOX,
-      isOnRampEnabled: true,
+      // TODO https://immutable.atlassian.net/browse/WT-1509
+      // isOnRampEnabled: true,
       isBridgeEnabled: true,
       isSwapEnabled: true
     };
+
+    CheckoutWidgets(widgetsConfig);
   
     UpdateConfig(widgetsConfig);
   },[]);

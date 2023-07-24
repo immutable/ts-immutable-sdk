@@ -16,7 +16,7 @@ Table of contents
   - [How to guides](#how-to-guides)
     - [Adding your project](#adding-your-project)
     - [Link packages to each other](#link-packages-to-each-other)
-    - [Buiding](#buiding)
+    - [Building](#building)
     - [Linting](#linting)
       - [ESLint Tooling](#eslint-tooling)
       - [Exclude Lists](#exclude-lists)
@@ -58,7 +58,45 @@ Say you want to link `@imtbl/a` to `@imtbl/b`:
 
 As long as both these packages are workspaces (in the root `package.json`), yarn will link them all internally.
 
-### Buiding
+### Generate OpenAPI clients
+
+The OpenAPI specs for the following
+
+1. [IMX APIs](https://docs.x.immutable.com/reference). The OpenAPI spec is retrieved from [here](https://api.x.immutable.com/openapi) and also saved in the repo.
+1. [zkEVM APIS](https://imx-openapiv3-mr-dev.s3.us-east-2.amazonaws.com/openapi.json). The OpenAPI spec is retrieved from [here](https://imx-openapiv3-mr-dev.s3.us-east-2.amazonaws.com/openapi.json) and also saved in the repo.
+
+are used to auto-generate the API Clients. See the internal package `generated-clients` which contains the API Clients.
+
+In order to regenerate these clients with updated spec files, follow the steps below
+
+1. Navigate to generated-clients package folder:
+
+    ```sh
+    cd packages/internal/generated-clients
+    ```
+
+1. To re-generate the API client for IMX APIs, run:
+
+    ```make
+    make generate-imx-openapi
+    ```
+
+1. To re-generate the API client for zkEVM APIs, run:
+
+    ```make
+    make generate-mr-openapi
+    ```
+
+1. Run existing smoke tests, just run:
+  
+    ```sh
+    yarn test
+    ```
+
+1. If all good, commit the code and create PR, get review from the code-owners of the corresponding APIs.
+
+
+### Building
 
 From a root level, if you want to build the dependencies of the core SDK and other dependencies, have a look at the `build` script at the root `package.json`.
 

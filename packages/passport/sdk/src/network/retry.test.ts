@@ -1,0 +1,41 @@
+import { MAX_RETRIES, RetryOption, retryWithDelay } from './retry';
+
+describe('retryWithDelay', () => {
+  it('retryWithDelay should retry with default 5 times', async () => {
+    const mockFunc = jest.fn().mockRejectedValue('error');
+
+    await expect(retryWithDelay(mockFunc)).rejects.toThrow('Retry failed');
+
+    expect(mockFunc).toHaveBeenCalledTimes(MAX_RETRIES + 1);
+  }, 15000);
+
+  it('retryWithDelay should not retry when function call resolved', async () => {
+    const mockFunc = jest.fn().mockReturnValue('success');
+
+    await retryWithDelay(mockFunc);
+
+    expect(mockFunc).toHaveBeenCalledTimes(1);
+  });
+
+  it('finallyFn should be called if retry reached the max time', async () => {
+    const mockFunc = jest.fn().mockRejectedValue('error');
+    const mockFinallyFn = jest.fn();
+    await expect(retryWithDelay(mockFunc, { finallyFn: mockFinallyFn })).rejects.toThrow('Retry failed');
+
+    expect(mockFunc).toHaveBeenCalledTimes(MAX_RETRIES + 1);
+    expect(mockFinallyFn).toBeCalledTimes(1);
+  });
+
+  it('retryWithDelay should retry with custom option', async () => {
+    const mockFunc = jest.fn().mockRejectedValue('error');
+    const option: RetryOption = {
+      retries: 2,
+      interval: 100,
+      finalErr: new Error('custom'),
+    };
+
+    await expect(retryWithDelay(mockFunc, option)).rejects.toThrow('custom');
+
+    expect(mockFunc).toHaveBeenCalledTimes(3);
+  });
+});

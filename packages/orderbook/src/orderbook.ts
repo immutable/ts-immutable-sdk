@@ -1,16 +1,22 @@
+import { ModuleConfiguration } from '@imtbl/config';
 import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
-import { OrderbookModuleConfiguration } from 'config/config';
+import {
+  getOrderbookConfig,
+  OrderbookModuleConfiguration,
+  OrderbookOverrides,
+} from 'config/config';
 import { ERC721Factory } from 'erc721';
-import { OrderStatus, ListOrdersResult, OrderResult } from 'openapi/sdk';
-import { Seaport, SeaportFactory } from 'seaport';
+import { ListingResult, ListListingsResult, OrderStatus } from 'openapi/sdk';
+import { Seaport } from 'seaport';
 import {
   CancelOrderResponse,
-  CreateOrderParams,
-  FulfilOrderResponse,
-  ListOrderParams,
+  CreateListingParams,
+  FulfillOrderResponse,
+  ListListingsParams,
   PrepareListingParams,
   PrepareListingResponse,
 } from 'types';
+import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 
 /**
  * zkEVM orderbook SDK
@@ -22,39 +28,54 @@ export class Orderbook {
 
   private seaport: Seaport;
 
-  constructor(private config: OrderbookModuleConfiguration) {
-    // TODO: Move endpoint lookup to a map based on env. Just using override to get dev started
-    const apiEndpoint = config.overrides?.apiEndpoint;
-    if (!apiEndpoint) {
-      throw new Error('API endpoint must be provided as an override');
+  private orderbookConfig: OrderbookModuleConfiguration;
+
+  constructor(config: ModuleConfiguration<OrderbookOverrides>) {
+    const obConfig = getOrderbookConfig(config.baseConfig.environment);
+
+    const finalConfig: OrderbookModuleConfiguration = {
+      ...obConfig,
+      ...config.overrides,
+    } as OrderbookModuleConfiguration;
+
+    if (!finalConfig) {
+      throw new Error(
+        'Orderbook configuration not passed, please specify the environment under config.baseConfig.environment',
+      );
     }
 
-    // TODO: Move chainId lookup to a map based on env. Just using override to get dev started
-    const chainName = config.overrides?.chainName;
-    if (!chainName) {
-      throw new Error('chainName must be provided as an override');
+    this.orderbookConfig = finalConfig;
+
+    const { apiEndpoint, chainName } = this.orderbookConfig;
+    if (!apiEndpoint) {
+      throw new Error('API endpoint must be provided');
     }
 
     this.apiClient = new ImmutableApiClientFactory(
       apiEndpoint,
       chainName,
-      this.config.seaportContractAddress,
+      this.orderbookConfig.seaportContractAddress,
     ).create();
 
-    this.seaport = new SeaportFactory(
-      this.config.seaportContractAddress,
-      this.config.zoneContractAddress,
-      this.config.provider,
-    ).create();
+    const seaportLibFactory = new SeaportLibFactory(
+      this.orderbookConfig.seaportContractAddress,
+      this.orderbookConfig.provider,
+    );
+    this.seaport = new Seaport(
+      seaportLibFactory,
+      this.orderbookConfig.provider,
+      this.orderbookConfig.seaportContractAddress,
+      this.orderbookConfig.zoneContractAddress,
+    );
   }
 
   /**
    * Get an order by ID
-   * @param {string} orderId - The orderId to find.
-   * @return {OrderResult} The returned order result.
+   * @param {string} listingId - The listingId to find.
+   * @return {ListingResult} The returned order result.
    */
-  getOrder(orderId: string): Promise<OrderResult> {
-    return this.apiClient.getOrder(orderId);
+  getListing(listingId: string): Promise<ListingResult> {
+    return this.apiClient.getListing(listingId);
   }
 
   /**
@@ -63,28 +84,36 @@ export class Orderbook {
    * @param {ListOrderParams} listOrderParams - Filtering, ordering and page parameters.
    * @return {Orders} The paged orders.
    */
-  listOrders(listOrderParams: ListOrderParams): Promise<ListOrdersResult> {
-    return this.apiClient.listOrders(listOrderParams);
+  listListings(
+    listOrderParams: ListListingsParams,
+  ): Promise<ListListingsResult> {
+    return this.apiClient.listListings(listOrderParams);
   }
 
   /**
    * Get required transactions and messages for signing prior to creating a listing
-   * through the createOrder method
+   * through the createListing method
    * @param {PrepareListingParams} prepareListingParams - Details about the listing to be created.
    * @return {PrepareListingResponse} PrepareListingResponse includes
    * the unsigned approval transaction, the typed order message for signing and
-   * the order components that can be submitted to `createOrder` with a signature.
+   * the order components that can be submitted to `createListing` with a signature.
    */
   async prepareListing({
-    offerer, listingItem, considerationItem, orderExpiry,
+    makerAddress,
+    sell,
+    buy,
+    orderExpiry,
   }: PrepareListingParams): Promise<PrepareListingResponse> {
-    const erc721 = new ERC721Factory(listingItem.contractAddress, this.config.provider).create();
-    const royaltyInfo = await erc721.royaltyInfo(listingItem.tokenId, considerationItem.amount);
+    const erc721 = new ERC721Factory(
+      sell.contractAddress,
+      this.orderbookConfig.provider,
+    ).create();
+    const royaltyInfo = await erc721.royaltyInfo(sell.tokenId, buy.amount);
 
     return this.seaport.prepareSeaportOrder(
-      offerer,
-      listingItem,
-      considerationItem,
+      makerAddress,
+      sell,
+      buy,
       royaltyInfo,
       // Default order start to now
       new Date(),
@@ -95,51 +124,65 @@ export class Orderbook {
 
   /**
    * Create an order
-   * @param {CreateOrderParams} createOrderParams - create an order with the given params.
-   * @return {OrderResult} The result of the order created in the Immutable services.
+   * @param {CreateListingParams} createListingParams - create an order with the given params.
+   * @return {ListingResult} The result of the order created in the Immutable services.
    */
-  createOrder(createOrderParams: CreateOrderParams): Promise<OrderResult> {
-    return this.apiClient.createOrder(createOrderParams);
+  createListing(
+    createListingParams: CreateListingParams,
+  ): Promise<ListingResult> {
+    return this.apiClient.createListing(createListingParams);
   }
 
   /**
    * Get unsigned transactions that can be submitted to fulfil an open order. If the approval
    * transaction exists it must be signed and submitted to the chain before the fulfilment
    * transaction can be submitted or it will be reverted.
-   * @param {string} orderId - The orderId to fulfil.
+   * @param {string} listingId - The listingId to fulfil.
    * @param {string} fulfillerAddress - The address of the account fulfilling the order.
-   * @return {FulfilOrderResponse} Approval and fulfilment transactions.
+   * @return {FulfillOrderResponse} Approval and fulfilment transactions.
    */
-  async fulfillOrder(orderId: string, fulfillerAddress: string): Promise<FulfilOrderResponse> {
-    const orderResult = await this.apiClient.getOrder(orderId);
+  async fulfillOrder(
+    listingId: string,
+    takerAddress: string,
+  ): Promise<FulfillOrderResponse> {
+    const orderResult = await this.apiClient.getListing(listingId);
 
     if (orderResult.result.status !== OrderStatus.ACTIVE) {
-      throw new Error(`Cannot fulfil order that is not active. Current status: ${orderResult.result.status}`);
+      throw new Error(
+        `Cannot fulfil order that is not active. Current status: ${orderResult.result.status}`,
+      );
     }
 
-    return this.seaport.fulfilOrder(orderResult.result, fulfillerAddress);
+    return this.seaport.fulfilOrder(orderResult.result, takerAddress);
   }
 
   /**
    * Get an unsigned cancel order transaction. Orders can only be cancelled by
    * the account that created them.
-   * @param {string} orderId - The orderId to cancel.
+   * @param {string} listingId - The listingId to cancel.
    * @param {string} accountAddress - The address of the account cancelling the order.
    * @return {CancelOrderResponse} The unsigned cancel order transaction
    */
-  async cancelOrder(orderId: string, accountAddress: string): Promise<CancelOrderResponse> {
-    const orderResult = await this.apiClient.getOrder(orderId);
+  async cancelOrder(
+    listingId: string,
+    accountAddress: string,
+  ): Promise<CancelOrderResponse> {
+    const orderResult = await this.apiClient.getListing(listingId);
 
     if (
       orderResult.result.status !== OrderStatus.ACTIVE
       && orderResult.result.status !== OrderStatus.INACTIVE
       && orderResult.result.status !== OrderStatus.PENDING
     ) {
-      throw new Error(`Cannot cancel order with status ${orderResult.result.status}`);
+      throw new Error(
+        `Cannot cancel order with status ${orderResult.result.status}`,
+      );
     }
 
     if (orderResult.result.account_address !== accountAddress.toLowerCase()) {
-      throw new Error(`Only account ${orderResult.result.account_address} can cancel order ${orderId}`);
+      throw new Error(
+        `Only account ${orderResult.result.account_address} can cancel order ${listingId}`,
+      );
     }
 
     const cancelOrderTransaction = await this.seaport.cancelOrder(

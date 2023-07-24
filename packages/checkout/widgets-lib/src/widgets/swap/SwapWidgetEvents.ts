@@ -23,22 +23,24 @@ export function sendSwapWidgetCloseEvent() {
   if (window !== undefined) window.dispatchEvent(closeWidgetEvent);
 }
 
-export const sendSwapSuccessEvent = () => {
+export const sendSwapSuccessEvent = (transactionHash: string) => {
   const successEvent = new CustomEvent<WidgetEvent<SwapSuccess>>(
     IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
     {
       detail: {
         type: SwapEventType.SUCCESS,
         data: {
-          timestamp: new Date().getTime(),
+          transactionHash,
         },
       },
     },
   );
+  // eslint-disable-next-line no-console
+  console.log('swap success event:', successEvent);
   if (window !== undefined) window.dispatchEvent(successEvent);
 };
 
-export const sendSwapFailedEvent = (reason?: string) => {
+export const sendSwapFailedEvent = (reason: string) => {
   const failedEvent = new CustomEvent<WidgetEvent<SwapFailed>>(
     IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
     {
@@ -51,10 +53,12 @@ export const sendSwapFailedEvent = (reason?: string) => {
       },
     },
   );
+  // eslint-disable-next-line no-console
+  console.log('swap failed event:', failedEvent);
   if (window !== undefined) window.dispatchEvent(failedEvent);
 };
 
-export const sendSwapRejectedEvent = (reason?: string) => {
+export const sendSwapRejectedEvent = (reason: string) => {
   const rejectedEvent = new CustomEvent<WidgetEvent<SwapRejected>>(
     IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT,
     {

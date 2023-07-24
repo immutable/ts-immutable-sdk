@@ -1,17 +1,19 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
-import { TEST_FROM_ADDRESS, TEST_PERIPHERY_ROUTER_ADDRESS, WETH_TEST_CHAIN } from 'utils/testUtils';
+import { TEST_FROM_ADDRESS, TEST_PERIPHERY_ROUTER_ADDRESS, WETH_TEST_TOKEN } from 'utils/testUtils';
 import { Contract } from '@ethersproject/contracts';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError } from 'errors';
 import { BytesLike } from '@ethersproject/bytes';
-import { getApproveTransaction } from './approval';
+import { ethers } from 'ethers';
+import { getApproveGasEstimate, getApproveTransaction } from './approval';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
 
 // Mock the ERC20 token contract address and allowance values
 const spenderAddress = TEST_PERIPHERY_ROUTER_ADDRESS;
+const fromAddress = TEST_FROM_ADDRESS;
 const existingAllowance = BigNumber.from('1000000000000000000');
 const tokenInAmount = BigNumber.from('2000000000000000000');
 
@@ -46,7 +48,7 @@ describe('getApprovalTransaction', () => {
       const result = await getApproveTransaction(
         provider,
         TEST_FROM_ADDRESS,
-        WETH_TEST_CHAIN.address,
+        WETH_TEST_TOKEN.address,
         BigNumber.from('100000000000000000'),
         spenderAddress,
       );
@@ -87,14 +89,14 @@ describe('getApprovalTransaction', () => {
       const result = await getApproveTransaction(
         provider,
         TEST_FROM_ADDRESS,
-        WETH_TEST_CHAIN.address,
+        WETH_TEST_TOKEN.address,
         tokenInAmount,
         spenderAddress,
       );
 
       expect(result).not.toBeNull();
       expect(result?.data).not.toBeNull();
-      expect(result?.to).toEqual(WETH_TEST_CHAIN.address);
+      expect(result?.to).toEqual(WETH_TEST_TOKEN.address);
       expect(result?.from).toEqual(TEST_FROM_ADDRESS);
       expect(result?.value).toEqual(0); // we do not want to send any ETH
 
@@ -136,7 +138,7 @@ describe('getApprovalTransaction', () => {
       const result = await getApproveTransaction(
         provider,
         TEST_FROM_ADDRESS,
-        WETH_TEST_CHAIN.address,
+        WETH_TEST_TOKEN.address,
         tokenInAmount,
         spenderAddress,
       );
@@ -177,7 +179,7 @@ describe('getApprovalTransaction', () => {
         await expect(getApproveTransaction(
           provider,
           TEST_FROM_ADDRESS,
-          WETH_TEST_CHAIN.address,
+          WETH_TEST_TOKEN.address,
           tokenInAmount,
           spenderAddress,
         ))
@@ -204,10 +206,40 @@ describe('getApprovalTransaction', () => {
       await expect(() => getApproveTransaction(
         provider,
         spenderAddress,
-        WETH_TEST_CHAIN.address,
+        WETH_TEST_TOKEN.address,
         amount,
         spenderAddress,
       )).rejects.toThrow(new ApproveError('owner and spender addresses are the same'));
+    });
+  });
+});
+
+describe('getApproveGasEstimate', () => {
+  describe('when given valid arguments', () => {
+    it('should include the fromAddress when estimating gas for approval', async () => {
+      const approveGasEstimate = BigNumber.from('100000');
+      const approveMock = jest.fn().mockResolvedValue(approveGasEstimate);
+
+      const erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
+        () => ({
+          estimateGas: { approve: approveMock },
+        }),
+      );
+      const provider = (JsonRpcProvider as unknown as jest.Mock).mockImplementation(
+        () => ({
+          connect: jest.fn().mockResolvedValue(erc20Contract),
+        }),
+      ) as unknown as JsonRpcProvider;
+
+      await getApproveGasEstimate(
+        provider,
+        fromAddress,
+        spenderAddress,
+        WETH_TEST_TOKEN.address,
+      );
+      expect(approveMock).toHaveBeenCalledWith(spenderAddress, ethers.constants.MaxUint256, {
+        from: fromAddress,
+      });
     });
   });
 });

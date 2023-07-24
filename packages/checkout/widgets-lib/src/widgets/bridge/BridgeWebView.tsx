@@ -1,5 +1,4 @@
 import { Environment } from '@imtbl/config';
-import { ConnectionProviders } from '@imtbl/checkout-sdk';
 import { WidgetTheme } from '../../lib';
 
 function BridgeWebView() {
@@ -9,13 +8,7 @@ function BridgeWebView() {
   };
 
   return (
-    <imtbl-bridge
-      providerPreference={ConnectionProviders.METAMASK}
-      widgetConfig={JSON.stringify(config)}
-      amount=""
-      fromContractAddress=""
-      fromNetwork="Sepolia"
-    />
+    <imtbl-bridge widgetConfig={JSON.stringify(config)} walletProvider="metamask" />
   );
 }
 

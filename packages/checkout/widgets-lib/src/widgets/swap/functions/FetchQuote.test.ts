@@ -1,21 +1,38 @@
-import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
+import { Exchange } from '@imtbl/dex-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { Web3Provider } from '@ethersproject/providers';
 import { ChainId, TokenInfo } from '@imtbl/checkout-sdk';
 import { BigNumber, utils } from 'ethers';
 import { quotesProcessor } from './FetchQuote';
-import { getDexConfigOverrides } from '../DexConfigOverrides';
+
+const overrides: any = {
+  rpcURL: 'https://test',
+  commonRoutingTokens: [
+    {
+      chainId: ChainId.SEPOLIA,
+      address: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE',
+      decimals: 18,
+      symbol: 'FUN',
+    },
+  ],
+  exchangeContracts: {
+    multicall: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e',
+  },
+  nativeToken: {
+    chainId: ChainId.SEPOLIA,
+  },
+};
 
 describe('QuotesProcessor', () => {
   describe('processQuotes', () => {
     it('should call the unsigned swap transaction from amount in and get the quote', async () => {
       const getUnsignedSwapTxFromAmountIn = jest.fn();
 
-      const exchange = new Exchange(new ExchangeConfiguration({
-        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+      const exchange = new Exchange({
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
-        overrides: getDexConfigOverrides(),
-      }));
+        overrides,
+      });
 
       exchange.getUnsignedSwapTxFromAmountIn = getUnsignedSwapTxFromAmountIn;
 
@@ -56,11 +73,11 @@ describe('QuotesProcessor', () => {
     it('should call the unsigned swap transaction from amount out and get the quote', async () => {
       const getUnsignedSwapTxFromAmountOut = jest.fn();
 
-      const exchange = new Exchange(new ExchangeConfiguration({
-        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+      const exchange = new Exchange({
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
         baseConfig: new ImmutableConfiguration({ environment: Environment.SANDBOX }),
-        overrides: getDexConfigOverrides(),
-      }));
+        overrides,
+      });
 
       exchange.getUnsignedSwapTxFromAmountOut = getUnsignedSwapTxFromAmountOut;
 

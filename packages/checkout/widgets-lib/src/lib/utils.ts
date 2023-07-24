@@ -1,23 +1,25 @@
-import { ChainId, GetBalanceResult, NetworkInfo } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
-import { l1Network, zkEVMNetwork } from './networkUtils';
-import { DEFAULT_TOKEN_DECIMALS } from './constants';
+import {
+  ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo,
+} from '@imtbl/checkout-sdk';
+import { getL1ChainId, getL2ChainId } from './networkUtils';
+import { DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS, DEFAULT_TOKEN_FORMATTING_DECIMALS, NATIVE } from './constants';
 
 export const sortTokensByAmount = (
-  environment: Environment,
+  config: CheckoutConfiguration,
   tokens: GetBalanceResult[],
   chainId: ChainId,
 ) => tokens.sort((a, b) => {
   // make sure IMX is at the top of the list
   if (
-    chainId === zkEVMNetwork(environment)
+    chainId === getL2ChainId(config)
       && a.token.symbol.toLowerCase() === 'imx'
       && b.token.symbol.toLowerCase() !== 'imx'
   ) {
     return -1;
   }
+
   if (
-    chainId === zkEVMNetwork(environment)
+    chainId === getL2ChainId(config)
       && b.token.symbol.toLowerCase() === 'imx'
       && a.token.symbol.toLowerCase() !== 'imx'
   ) {
@@ -27,22 +29,24 @@ export const sortTokensByAmount = (
   if (a.balance.lt(b.balance)) {
     return 1;
   }
+
   if (a.balance.gt(b.balance)) {
     return -1;
   }
+
   return 0;
 });
 
 export const sortNetworksCompareFn = (
   a: NetworkInfo,
   b: NetworkInfo,
-  environment: Environment,
+  config: CheckoutConfiguration,
 ) => {
   // make sure zkEVM at start of the list then L1
-  if (a.chainId === zkEVMNetwork(environment)) {
+  if (a.chainId === getL2ChainId(config)) {
     return -1;
   }
-  if (a.chainId === l1Network(environment)) {
+  if (a.chainId === getL1ChainId(config)) {
     return 0;
   }
   return 1;
@@ -86,5 +90,23 @@ export const tokenValueFormat = (s: Number | string): string => {
   const pointIndex = asString.indexOf('.');
   if (pointIndex === -1) return asString;
 
-  return asString.substring(0, pointIndex + DEFAULT_TOKEN_DECIMALS + 1);
+  if (asString[0] !== '.' && parseInt(asString[0], 10) > 0) {
+    let formatted = parseFloat(asString.substring(
+      0,
+      pointIndex + DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS + 1,
+    )).toFixed(DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS);
+
+    if (formatted.endsWith('.00')) {
+      // eslint-disable-next-line prefer-destructuring
+      formatted = formatted.substring(0, pointIndex);
+    }
+    return formatted;
+  }
+
+  return asString.substring(
+    0,
+    pointIndex + DEFAULT_TOKEN_FORMATTING_DECIMALS + 1,
+  );
 };
+
+export const isNativeToken = (address?: string): boolean => !address || address.toLocaleUpperCase() === NATIVE;

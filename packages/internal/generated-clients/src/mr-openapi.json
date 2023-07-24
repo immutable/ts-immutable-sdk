@@ -42,9 +42,22 @@
       "x-displayName": "demopage"
     },
     {
+      "name": "tokens",
+      "x-displayName": "tokens"
+    },
+    {
+      "name": "listings",
+      "description": "Listings Endpoints",
+      "x-displayName": "listings"
+    },
+    {
       "name": "orders",
-      "description": "Orders Endpoints",
       "x-displayName": "orders"
+    },
+    {
+      "name": "passport",
+      "description": "Passport operations",
+      "x-displayName": "passport"
     }
   ],
   "x-tagGroups": [
@@ -57,17 +70,23 @@
         "nfts",
         "nft owners",
         "demopage",
-        "orders"
+        "tokens",
+        "listings",
+        "orders",
+        "passport"
       ],
-      "description": "Immutable Multi Rollup API"
+      "description": "Passport MR API"
     }
   ],
   "servers": [
     {
-      "url": "https://indexer-mr.dev.imtbl.com"
+      "url": "https://indexer-mr.sandbox.imtbl.com"
     },
     {
       "url": "https://order-book-mr.dev.imtbl.com"
+    },
+    {
+      "url": "https://api.sandbox.immutable.com"
     }
   ],
   "paths": {
@@ -170,7 +189,7 @@
           {
             "name": "page_cursor",
             "in": "query",
-            "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/PageCursor"
@@ -293,7 +312,7 @@
           {
             "name": "page_cursor",
             "in": "query",
-            "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/PageCursor"
@@ -495,7 +514,7 @@
           {
             "name": "page_cursor",
             "in": "query",
-            "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/PageCursor"
@@ -581,7 +600,7 @@
           {
             "name": "page_cursor",
             "in": "query",
-            "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/PageCursor"
@@ -667,7 +686,7 @@
           {
             "name": "page_cursor",
             "in": "query",
-            "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/PageCursor"
@@ -706,6 +725,118 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/tokens": {
+      "get": {
+        "description": "List ERC20 tokens",
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "ListERC20Tokens",
+        "summary": "List ERC20 tokens",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          },
+          {
+            "name": "page_cursor",
+            "in": "query",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageCursor"
+            }
+          },
+          {
+            "name": "page_size",
+            "description": "Maximum number of items to return",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PageSize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListTokensResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/v1/chains/{chain_name}/tokens/{contract_address}": {
+      "get": {
+        "description": "Get single ERC20 token",
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "GetERC20Token",
+        "summary": "Get single ERC20 token",
+        "parameters": [
+          {
+            "name": "contract_address",
+            "in": "path",
+            "description": "The address of contract",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
+          },
+          {
+            "name": "chain_name",
+            "description": "The name of chain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTokenResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/v1/chains": {
       "get": {
         "description": "List supported chains",
@@ -718,7 +849,7 @@
           {
             "name": "page_cursor",
             "in": "query",
-            "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+            "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/PageCursor"
@@ -757,14 +888,14 @@
         }
       }
     },
-    "/v1/chains/{chain_name}/orders": {
+    "/v1/chains/{chain_name}/orders/listings": {
       "get": {
         "tags": [
           "orders"
         ],
-        "summary": "List all orders",
-        "description": "List all orders",
-        "operationId": "ListOrders",
+        "summary": "List all listings",
+        "description": "List all listings",
+        "operationId": "ListListings",
         "parameters": [
           {
             "name": "chain_name",
@@ -787,6 +918,17 @@
             "name": "sell_item_contract_address",
             "in": "query",
             "description": "Sell item contract address to filter by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+              "pattern": "^0x[a-fA-F0-9]{40}$"
+            }
+          },
+          {
+            "name": "buy_item_contract_address",
+            "in": "query",
+            "description": "Buy item contract address to filter by",
             "required": false,
             "schema": {
               "type": "string",
@@ -862,7 +1004,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListOrdersResult"
+                  "$ref": "#/components/schemas/ListListingsResult"
                 }
               }
             }
@@ -882,9 +1024,9 @@
         "tags": [
           "orders"
         ],
-        "summary": "Create an order",
-        "description": "Create an order",
-        "operationId": "CreateOrder",
+        "summary": "Create a listing",
+        "description": "Create a listing",
+        "operationId": "CreateListing",
         "parameters": [
           {
             "name": "chain_name",
@@ -900,7 +1042,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateOrderRequestBody"
+                "$ref": "#/components/schemas/CreateListingRequestBody"
               }
             }
           }
@@ -911,7 +1053,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderResult"
+                  "$ref": "#/components/schemas/ListingResult"
                 }
               }
             }
@@ -928,14 +1070,14 @@
         }
       }
     },
-    "/v1/chains/{chain_name}/orders/{order_id}": {
+    "/v1/chains/{chain_name}/orders/listings/{listing_id}": {
       "get": {
         "tags": [
           "orders"
         ],
-        "summary": "Get a single order by ID",
-        "description": "Get a single order by ID",
-        "operationId": "GetOrder",
+        "summary": "Get a single listing by ID",
+        "description": "Get a single listing by ID",
+        "operationId": "GetListing",
         "parameters": [
           {
             "name": "chain_name",
@@ -946,7 +1088,7 @@
             }
           },
           {
-            "name": "order_id",
+            "name": "listing_id",
             "in": "path",
             "description": "Global Order identifier",
             "required": true,
@@ -964,7 +1106,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderResult"
+                  "$ref": "#/components/schemas/ListingResult"
                 }
               }
             }
@@ -980,10 +1122,115 @@
           }
         }
       }
+    },
+    "/passport-mr/v1/counterfactual-address": {
+      "post": {
+        "summary": "Create a counterfactual address",
+        "description": "Create a counterfactual address for a user based on their Ethereum address",
+        "tags": [
+          "passport"
+        ],
+        "operationId": "createCounterfactualAddress",
+        "security": [
+          {
+            "BearerAuth": [
+              "transact"
+            ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCounterfactualAddressRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Counterfactual address created response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCounterfactualAddressRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UnauthorizedError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError401"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "ForbiddenError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError403"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "TooManyRequestsError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError429"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "InternalServerError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError500"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicAPIError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
-    "securitySchemes": {},
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "responses": {
       "NotFound": {
         "description": "The specified resource was not found (404)",
@@ -1048,7 +1295,7 @@
       },
       "PageCursor": {
         "type": "string",
-        "description": "Base64 encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
+        "description": "Encoded page cursor to retrieve previous or next page. Use the value returned in the response.",
         "example": "ewogICJ0eXBlIjogInByZXYiLAogICJpdGVtIjogewogICAgImlkIjogNjI3NTEzMCwKICAgICJjcmVhdGVkX2F0IjogIjIwMjItMDktMTNUMTc6MDQ6MTIuMDI0MTI2WiIKICB9Cn0="
       },
       "Page": {
@@ -1058,13 +1305,13 @@
           "previous_cursor": {
             "type": "string",
             "nullable": true,
-            "description": "First item as base64 encoded string",
+            "description": "First item as an encoded string",
             "example": "ewogICJ0eXBlIjogInByZXYiLAogICJpdGVtIjogewogICAgImlkIjogNjI3NTEzMCwKICAgICJjcmVhdGVkX2F0IjogIjIwMjItMDktMTNUMTc6MDQ6MTIuMDI0MTI2WiIKICB9Cn0="
           },
           "next_cursor": {
             "type": "string",
             "nullable": true,
-            "description": "Last item as base64 encoded string",
+            "description": "Last item as an encoded string",
             "example": "ewogICJ0eXBlIjogInByZXYiLAogICJpdGVtIjogewogICAgImlkIjogNjI3NTEzMCwKICAgICJjcmVhdGVkX2F0IjogIjIwMjItMDktMTNUMTc6MDQ6MTIuMDI0MTI2WiIKICB9Cn0="
           }
         },
@@ -1084,11 +1331,11 @@
           "sale"
         ]
       },
-      "ERC721Token": {
+      "ActivityNFT": {
         "type": "object",
         "properties": {
           "contract_type": {
-            "$ref": "#/components/schemas/ContractType"
+            "$ref": "#/components/schemas/NFTContractType"
           },
           "contract_address": {
             "description": "The token contract address",
@@ -1107,14 +1354,14 @@
           "token_id"
         ]
       },
-      "ERC20": {
+      "ActivityToken": {
         "type": "object",
         "properties": {
           "contract_type": {
-            "$ref": "#/components/schemas/ContractType"
+            "$ref": "#/components/schemas/TokenContractType"
           },
           "contract_address": {
-            "description": "The token contract address",
+            "description": "The contract address",
             "type": "string",
             "example": "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e"
           }
@@ -1124,14 +1371,14 @@
           "contract_address"
         ]
       },
-      "Token": {
-        "description": "The token details",
+      "ActivityAsset": {
+        "description": "The contract and asset details for this activity",
         "oneOf": [
           {
-            "$ref": "#/components/schemas/ERC721Token"
+            "$ref": "#/components/schemas/ActivityNFT"
           },
           {
-            "$ref": "#/components/schemas/ERC20"
+            "$ref": "#/components/schemas/ActivityToken"
           }
         ],
         "discriminator": {
@@ -1142,82 +1389,73 @@
         "type": "object",
         "description": "The mint activity details",
         "properties": {
-          "activity_type": {
-            "$ref": "#/components/schemas/ActivityType"
-          },
           "to": {
-            "description": "The account address token minted to",
+            "description": "The account address the asset was minted to",
             "type": "string",
             "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
           },
           "amount": {
-            "description": "The minted token amount",
+            "description": "The minted amount",
             "type": "string",
             "example": "1"
           },
-          "token": {
-            "$ref": "#/components/schemas/Token"
+          "asset": {
+            "$ref": "#/components/schemas/ActivityAsset"
           }
         },
         "required": [
           "activity_type",
           "to",
           "amount",
-          "token"
+          "asset"
         ]
       },
       "Burn": {
         "description": "The burn activity details",
         "type": "object",
         "properties": {
-          "activity_type": {
-            "$ref": "#/components/schemas/ActivityType"
-          },
           "from": {
-            "description": "The account address the token was transferred from",
+            "description": "The account address the asset was transferred from",
             "type": "string",
             "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
           },
           "amount": {
-            "description": "The amount of tokens burnt",
+            "description": "The amount of assets burnt",
             "type": "string",
             "example": "1"
           },
-          "token": {
-            "$ref": "#/components/schemas/Token"
+          "asset": {
+            "$ref": "#/components/schemas/ActivityAsset"
           }
         },
         "required": [
           "activity_type",
           "from",
           "amount",
-          "token"
+          "asset"
         ]
       },
       "Transfer": {
         "type": "object",
         "description": "The transfer activity details",
         "properties": {
-          "activity_type": {
-            "$ref": "#/components/schemas/ActivityType"
-          },
           "from": {
-            "description": "The account address the token was transferred from",
+            "description": "The account address the asset was transferred from",
             "type": "string",
             "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
           },
           "to": {
-            "description": "The account address the token was transferred to",
+            "description": "The account address the asset was transferred to",
             "type": "string",
             "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
           },
           "amount": {
-            "description": "The amount of tokens transferred",
+            "description": "The amount of assets transferred",
             "type": "string",
             "example": "1"
           },
-          "token": {
-            "$ref": "#/components/schemas/Token"
+          "asset": {
+            "$ref": "#/components/schemas/ActivityAsset"
           }
         },
         "required": [
@@ -1225,10 +1463,10 @@
           "from",
           "to",
           "amount",
-          "token"
+          "asset"
         ]
       },
-      "NativeToken": {
+      "ActivityNativeToken": {
         "type": "object",
         "properties": {
           "symbol": {
@@ -1241,64 +1479,112 @@
           "symbol"
         ]
       },
+      "SalePayment": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "description": "The type of payment token",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ActivityToken"
+              },
+              {
+                "$ref": "#/components/schemas/ActivityNativeToken"
+              }
+            ]
+          },
+          "price_excluding_fees": {
+            "description": "The base price of the sale not including any fees",
+            "type": "string",
+            "example": "180"
+          },
+          "price_including_fees": {
+            "description": "The total price of the sale. Includes the sum of all fees",
+            "type": "string",
+            "example": "200"
+          },
+          "fees": {
+            "description": "The fees associated with this sale",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SaleFee"
+            },
+            "example": [
+              {
+                "address": "0xB0F3749458169B7Ad51B5503CC3649DE55c2D0D2",
+                "amount": "20",
+                "type": "ROYALTY"
+              }
+            ],
+            "minItems": 0
+          }
+        },
+        "required": [
+          "token",
+          "price_excluding_fees",
+          "price_including_fees",
+          "fees"
+        ]
+      },
+      "SaleFee": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "Fee payable to recipient upon settlement",
+            "example": "200"
+          },
+          "type": {
+            "type": "string",
+            "description": "Fee type",
+            "example": "ROYALTY",
+            "enum": [
+              "ROYALTY"
+            ]
+          },
+          "recipient": {
+            "type": "string",
+            "description": "Wallet address of fee recipient",
+            "example": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92233"
+          }
+        }
+      },
       "NFTSale": {
         "description": "The NFT Sale activity details",
         "type": "object",
         "properties": {
-          "activity_type": {
-            "$ref": "#/components/schemas/ActivityType"
-          },
           "order_id": {
             "description": "The id of order",
             "type": "string",
             "example": "ARZ3NDEKTSV4RRFFQ69G5FAV"
           },
-          "buyer_address": {
+          "to": {
             "description": "The account address of buyer",
             "type": "string",
             "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
           },
-          "seller_address": {
+          "from": {
             "description": "The account address of seller",
             "type": "string",
             "example": "0xbD6cFcf93474De653d7B42b346c7c25d1F9c559C"
           },
-          "quantity": {
-            "description": "The quantity of tokens sold",
-            "type": "integer",
-            "format": "int32",
-            "example": 1
+          "asset": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityNFT"
+            }
           },
-          "token": {
-            "$ref": "#/components/schemas/ERC721Token"
-          },
-          "payment_amount": {
-            "description": "The amount of payment",
-            "type": "string",
-            "example": "123"
-          },
-          "payment_token": {
-            "description": "The type of payment token",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ERC20"
-              },
-              {
-                "$ref": "#/components/schemas/NativeToken"
-              }
-            ]
+          "payment": {
+            "$ref": "#/components/schemas/SalePayment"
           }
         },
         "required": [
           "activity_type",
           "order_id",
-          "buyer_address",
-          "seller_address",
-          "quantity",
-          "token",
-          "payment_amount",
-          "payment_amount_usd",
-          "payment_token"
+          "to",
+          "from",
+          "asset",
+          "payment"
         ]
       },
       "ActivityDetails": {
@@ -1316,10 +1602,7 @@
           {
             "$ref": "#/components/schemas/NFTSale"
           }
-        ],
-        "discriminator": {
-          "propertyName": "activity_type"
-        }
+        ]
       },
       "BlockchainMetadata": {
         "description": "The metadata related to blockchain transaction",
@@ -1640,9 +1923,19 @@
             "example": "Aqua Power"
           },
           "value": {
-            "type": "string",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ],
             "description": "The metadata trait value",
-            "example": "40"
+            "example": "Happy"
           }
         },
         "required": [
@@ -1671,14 +1964,6 @@
         "description": "The name of chain",
         "example": "imtbl-zkevm-testnet"
       },
-      "ContractType": {
-        "description": "The contract type",
-        "type": "string",
-        "enum": [
-          "ERC721",
-          "ERC20"
-        ]
-      },
       "ActivityID": {
         "description": "Activity ID in UUIDv4 format",
         "type": "string",
@@ -1690,6 +1975,20 @@
         "type": "string",
         "enum": [
           "ERC721"
+        ]
+      },
+      "NFTContractType": {
+        "description": "The contract type for an NFT",
+        "type": "string",
+        "enum": [
+          "ERC721"
+        ]
+      },
+      "TokenContractType": {
+        "description": "The contract type for a token",
+        "type": "string",
+        "enum": [
+          "ERC20"
         ]
       },
       "NFTWithMetadataAttributes": {
@@ -1770,6 +2069,18 @@
           "quantity"
         ]
       },
+      "GetTokenResult": {
+        "type": "object",
+        "description": "Single Token",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/Token"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
       "ListNFTOwnersResult": {
         "type": "object",
         "properties": {
@@ -1846,6 +2157,65 @@
         "required": [
           "result",
           "page"
+        ]
+      },
+      "ListTokensResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "description": "List of tokens",
+            "items": {
+              "$ref": "#/components/schemas/Token"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page"
+          }
+        },
+        "required": [
+          "result",
+          "page"
+        ]
+      },
+      "Token": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "contract_address": {
+            "type": "string"
+          },
+          "root_contract_address": {
+            "type": "string",
+            "nullable": true
+          },
+          "symbol": {
+            "type": "string",
+            "nullable": true
+          },
+          "decimals": {
+            "type": "integer",
+            "nullable": true
+          },
+          "image_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "chain",
+          "contract_address",
+          "root_contract_address",
+          "symbol",
+          "decimals",
+          "image_url",
+          "name"
         ]
       },
       "DemoPage": {
@@ -2022,42 +2392,111 @@
           }
         ]
       },
-      "BuyItem": {
+      "Item": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/NativeItem"
+          },
+          {
+            "$ref": "#/components/schemas/ERC20Item"
+          },
+          {
+            "$ref": "#/components/schemas/ERC721Item"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "item_type",
+          "mapping": {
+            "NATIVE": "#/components/schemas/NativeItem",
+            "ERC20": "#/components/schemas/ERC20Item",
+            "ERC721": "#/components/schemas/ERC721Item"
+          }
+        }
+      },
+      "NativeItem": {
         "type": "object",
         "properties": {
           "item_type": {
             "type": "string",
-            "description": "Token type user is willing to accept upon settlement",
-            "example": "ERC20",
+            "description": "Token type user is offering, which in this case is the native IMX token",
+            "example": "NATIVE",
             "enum": [
-              "NATIVE",
-              "ERC20"
+              "NATIVE"
             ]
           },
           "start_amount": {
             "type": "string",
-            "description": "Starting price of what the user will consider to sell token",
+            "description": "A string representing the starting price at which the user is willing to sell the token. This value is provided in the smallest unit of the token (e.g., wei for Ethereum).",
             "example": "9750000000000000000",
             "pattern": "\\d+"
-          },
-          "contract_address": {
-            "type": "string",
-            "description": "Address of ERC20 token",
-            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
-            "pattern": "^0x[a-fA-F0-9]{40}$"
           }
-        },
-        "example": {
-          "item_type": "NATIVE",
-          "start_amount": "9750000000000000000",
-          "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
         },
         "required": [
           "item_type",
           "start_amount"
         ]
       },
-      "CreateOrderRequestBody": {
+      "ERC20Item": {
+        "type": "object",
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC20",
+            "example": "ERC20",
+            "enum": [
+              "ERC20"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC20 token",
+            "example": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "start_amount": {
+            "type": "string",
+            "description": "A string representing the starting price at which the user is willing to sell the token. This value is provided in the smallest unit of the token (e.g., wei for Ethereum).",
+            "example": "9750000000000000000",
+            "pattern": "\\d+"
+          }
+        },
+        "required": [
+          "item_type",
+          "contract_address",
+          "start_amount"
+        ]
+      },
+      "ERC721Item": {
+        "type": "object",
+        "properties": {
+          "item_type": {
+            "type": "string",
+            "description": "Token type user is offering, which in this case is ERC721",
+            "example": "ERC721",
+            "enum": [
+              "ERC721"
+            ]
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Address of ERC721 token",
+            "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "ID of ERC721 token",
+            "example": "1",
+            "pattern": "\\d+"
+          }
+        },
+        "required": [
+          "item_type",
+          "contract_address",
+          "token_id"
+        ]
+      },
+      "CreateListingRequestBody": {
         "type": "object",
         "properties": {
           "account_address": {
@@ -2071,8 +2510,9 @@
           },
           "buy": {
             "type": "array",
+            "description": "Buy item for listing should either be NATIVE or ERC20 item",
             "items": {
-              "$ref": "#/components/schemas/BuyItem"
+              "$ref": "#/components/schemas/Item"
             },
             "example": [
               {
@@ -2084,7 +2524,7 @@
             "minItems": 1,
             "maxItems": 1
           },
-          "buy_fees": {
+          "fees": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Fee"
@@ -2109,8 +2549,9 @@
           },
           "sell": {
             "type": "array",
+            "description": "Sell item for listing should be an ERC721 item",
             "items": {
-              "$ref": "#/components/schemas/SellItem"
+              "$ref": "#/components/schemas/Item"
             },
             "example": [
               {
@@ -2144,7 +2585,7 @@
               "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
             }
           ],
-          "buy_fees": [],
+          "fees": [],
           "end_time": "2022-03-10T05:00:50.52Z",
           "protocol_data": {
             "order_type": "FULL_RESTRICTED",
@@ -2168,7 +2609,7 @@
           "order_hash",
           "buy",
           "sell",
-          "buy_fees",
+          "fees",
           "end_time",
           "start_time",
           "protocol_data",
@@ -2244,7 +2685,7 @@
           "buy": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/BuyItem"
+              "$ref": "#/components/schemas/Item"
             },
             "example": [
               {
@@ -2256,7 +2697,7 @@
             "minItems": 1,
             "maxItems": 1
           },
-          "buy_fees": {
+          "fees": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Fee"
@@ -2296,7 +2737,7 @@
           "sell": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SellItem"
+              "$ref": "#/components/schemas/Item"
             },
             "example": [
               {
@@ -2338,7 +2779,7 @@
               "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
             }
           ],
-          "buy_fees": [],
+          "fees": [],
           "chain": {
             "id": "eip155:11155111",
             "name": "sepolia"
@@ -2371,7 +2812,7 @@
           "account_address",
           "buy",
           "sell",
-          "buy_fees",
+          "fees",
           "chain",
           "create_time",
           "end_time",
@@ -2383,7 +2824,7 @@
           "status"
         ]
       },
-      "OrderResult": {
+      "ListingResult": {
         "type": "object",
         "properties": {
           "result": {
@@ -2403,7 +2844,7 @@
                 "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
               }
             ],
-            "buy_fees": [],
+            "fees": [],
             "chain": {
               "id": "eip155:11155111",
               "name": "sepolia"
@@ -2433,7 +2874,7 @@
           }
         }
       },
-      "ListOrdersResult": {
+      "ListListingsResult": {
         "type": "object",
         "properties": {
           "page": {
@@ -2467,7 +2908,7 @@
                   "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
                 }
               ],
-              "buy_fees": [],
+              "fees": [],
               "chain": {
                 "id": "eip155:11155111",
                 "name": "sepolia"
@@ -2504,7 +2945,7 @@
                   "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
                 }
               ],
-              "buy_fees": [],
+              "fees": [],
               "chain": {
                 "id": "eip155:11155111",
                 "name": "sepolia"
@@ -2564,6 +3005,11 @@
             "description": "Immutable zone address",
             "example": "0x12"
           },
+          "counter": {
+            "type": "string",
+            "description": "big.Int or uint256 string for order counter",
+            "example": "92315562"
+          },
           "seaport_address": {
             "type": "string",
             "description": "Immutable Seaport contract address",
@@ -2578,10 +3024,13 @@
         "example": {
           "order_type": "FULL_RESTRICTED",
           "zone_address": "0x12",
+          "counter": "92315562",
           "seaport_address": "0x12",
           "seaport_version": "1.4"
         },
         "required": [
+          "order_type",
+          "counter",
           "order_type",
           "zone_address",
           "seaport_address",
@@ -2611,39 +3060,66 @@
           }
         ]
       },
-      "SellItem": {
+      "CreateCounterfactualAddressRequest": {
         "type": "object",
+        "required": [
+          "ethereumAddress",
+          "ethereumSignature"
+        ],
         "properties": {
-          "item_type": {
+          "ethereumAddress": {
+            "description": "The user's UAK address",
             "type": "string",
-            "description": "Token type user is offering which in this case is a ERC721",
-            "example": "ERC721",
-            "enum": [
-              "ERC721"
-            ]
+            "maxLength": 42
           },
-          "contract_address": {
+          "ethereumSignature": {
+            "description": "The signature generated with the UAK",
             "type": "string",
-            "description": "Address of ERC721 token",
-            "example": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
-            "pattern": "^0x[a-fA-F0-9]{40}$"
-          },
-          "token_id": {
-            "type": "string",
-            "description": "ID of ERC721 token",
-            "example": "1",
-            "pattern": "\\d+"
+            "maxLength": 132
           }
         },
-        "example": {
-          "item_type": "ERC721",
-          "contract_address": "0x692edAd005237c7E737bB2c0F3D8ccCc10D3479E",
-          "token_id": "1"
-        },
+        "additionalProperties": false
+      },
+      "CreateCounterfactualAddressRes": {
+        "type": "object",
         "required": [
-          "item_type",
-          "contract_address",
-          "token_id"
+          "counterfactualAddress"
+        ],
+        "properties": {
+          "counterfactualAddress": {
+            "description": "The user's counterfactual address",
+            "type": "string",
+            "maxLength": 42
+          }
+        }
+      },
+      "APIError403": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAPIError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error Code",
+                "enum": [
+                  "AUTHENTICATION_ERROR"
+                ],
+                "example": "AUTHENTICATION_ERROR"
+              },
+              "details": {
+                "type": "object",
+                "nullable": true,
+                "description": "Additional details to help resolve the error"
+              }
+            },
+            "required": [
+              "code",
+              "details"
+            ]
+          }
         ]
       }
     }
