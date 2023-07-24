@@ -59,7 +59,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
   const errorText = text.views[SharedViews.ERROR_VIEW].actionText;
 
   const [connectState, connectDispatch] = useReducer(connectReducer, initialConnectState);
-  const { sendCloseEvent, provider } = connectState;
+  const { sendCloseEvent, provider, walletProviderName } = connectState;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
   const { view } = viewState;
 
@@ -141,7 +141,7 @@ export function ConnectWidget(props: ConnectWidgetProps) {
                   statusText="Connection secure"
                   actionText="Continue"
                   onActionClick={() => sendCloseEvent()}
-                  onRenderEvent={() => sendConnectSuccessEvent(provider)}
+                  onRenderEvent={() => sendConnectSuccessEvent(provider, walletProviderName ?? undefined)}
                   statusType={StatusType.SUCCESS}
                   testId="success-view"
                 />

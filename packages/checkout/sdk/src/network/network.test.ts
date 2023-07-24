@@ -101,7 +101,7 @@ describe('network functions', () => {
         network: { chainId: ethNetworkInfo.chainId },
       });
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       const switchNetworkResult = await switchWalletNetwork(
         new CheckoutConfiguration({
@@ -150,7 +150,7 @@ describe('network functions', () => {
           },
         });
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       const switchNetworkResult = await switchWalletNetwork(
         testCheckoutConfiguration,
@@ -182,7 +182,7 @@ describe('network functions', () => {
         },
       });
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       await expect(
         switchWalletNetwork(testCheckoutConfiguration, provider, 56 as ChainId),
@@ -213,7 +213,7 @@ describe('network functions', () => {
         removeEventListener: () => {},
       }));
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       await expect(
         switchWalletNetwork(
@@ -237,7 +237,7 @@ describe('network functions', () => {
         removeEventListener: () => {},
       }));
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       // remove request function from provider
       delete provider.provider.request;
@@ -279,7 +279,7 @@ describe('network functions', () => {
             chainId: zkevmNetworkInfo.chainId,
           },
         });
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       await switchWalletNetwork(
         testCheckoutConfiguration,
