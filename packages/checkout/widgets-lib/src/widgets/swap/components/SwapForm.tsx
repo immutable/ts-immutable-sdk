@@ -712,7 +712,13 @@ export function SwapForm({ data }: SwapFromProps) {
       />
       <UnableToSwap
         visible={showUnableToSwapDrawer}
-        onCloseBottomSheet={() => setShowUnableToSwapDrawer(false)}
+        onCloseBottomSheet={() => {
+          setShowUnableToSwapDrawer(false);
+          setFromToken(undefined);
+          setFromAmount('');
+          setToToken(undefined);
+          setToAmount('');
+        }}
       />
     </>
   );

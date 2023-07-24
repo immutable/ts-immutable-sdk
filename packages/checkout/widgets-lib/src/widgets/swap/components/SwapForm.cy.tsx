@@ -959,7 +959,7 @@ describe('SwapForm', () => {
     });
 
     describe('dex error', () => {
-      it('should show unable to swap if dex returns an error', () => {
+      it('should show unable to swap if dex returns an error and clear form when closed', () => {
         cy.stub(quotesProcessor, 'fromAmountIn')
           .as('fromAmountInStub')
           .rejects({});
@@ -986,8 +986,13 @@ describe('SwapForm', () => {
 
         cySmartGet('unable-to-swap-bottom-sheet').should('be.visible');
         cySmartGet('unable-to-swap-cancel-button').should('be.visible');
+
         cySmartGet('unable-to-swap-cancel-button').click();
         cySmartGet('unable-to-swap-bottom-sheet').should('not.exist');
+        cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+        cySmartGet('fromTokenInputs-text-form-text__input').should('have.text', '');
+        cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+        cySmartGet('toTokenInputs-text-form-text__input').should('have.text', '');
       });
     });
   });
