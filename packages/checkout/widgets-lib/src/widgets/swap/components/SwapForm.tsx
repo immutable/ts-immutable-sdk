@@ -71,6 +71,14 @@ const swapValuesToText = ({
   return resp;
 };
 
+// Ensures that the to token address does not match the from token address
+const shouldSetToAddress = (toAddress: string | undefined, fromAddress: string | undefined): boolean => {
+  if (toAddress === undefined) return false;
+  if (toAddress === '') return false;
+  if (fromAddress === toAddress) return false;
+  return true;
+};
+
 export interface SwapFromProps {
   data?: SwapFormData;
 }
@@ -165,7 +173,7 @@ export function SwapForm({ data }: SwapFromProps) {
         );
       }
 
-      if (data?.toContractAddress) {
+      if (shouldSetToAddress(data?.toContractAddress, data?.fromContractAddress)) {
         setToToken(allowedTokens.find((t) => (
           isNativeToken(t.address) && data?.toContractAddress?.toLocaleUpperCase() === NATIVE
         ) || (t.address?.toLowerCase() === data?.toContractAddress?.toLowerCase())));
@@ -681,6 +689,7 @@ export function SwapForm({ data }: SwapFromProps) {
       <NotEnoughImx
         visible={showNotEnoughImxDrawer}
         showAdjustAmount={!fromToken?.address || fromToken.address === 'NATIVE'}
+        hasZeroImx={false}
         onAddCoinsClick={() => {
           viewDispatch({
             payload: {

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "dependencies": {
     "@biom3/design-tokens": "0.2.0-beta",
-    "@biom3/react": "^0.6.4-beta",
+    "@biom3/react": "^0.8.0-beta",
     "@imtbl/config": "0.0.0",
     "@imtbl/core-sdk": "^2.0.1",
     "@imtbl/immutablex-client": "0.0.0",

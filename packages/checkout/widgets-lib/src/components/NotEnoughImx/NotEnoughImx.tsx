@@ -14,14 +14,16 @@ import { text } from '../../resources/text/textConfig';
 type NotEnoughImxProps = {
   visible: boolean;
   showAdjustAmount: boolean;
+  hasZeroImx: boolean;
   onCloseBottomSheet?: () => void;
   onAddCoinsClick: () => void;
 };
 
 export function NotEnoughImx({
-  visible, showAdjustAmount, onCloseBottomSheet, onAddCoinsClick,
+  visible, showAdjustAmount, hasZeroImx, onCloseBottomSheet, onAddCoinsClick,
 }: NotEnoughImxProps) {
   const { content, buttons } = text.drawers.notEnoughImx;
+  const { noImx, insufficientImx } = content;
 
   const imxLogo = 'https://design-system.immutable.com/hosted-for-ds/currency-icons/currency--imx.svg';
 
@@ -46,24 +48,24 @@ export function NotEnoughImx({
             sx={contentTextStyles}
             testId="not-enough-gas-heading"
           >
-            {content.heading}
+            {hasZeroImx ? noImx.heading : insufficientImx.heading}
           </Heading>
           <Body sx={contentTextStyles}>
-            {content.body}
+            {hasZeroImx ? noImx.body : insufficientImx.body}
           </Body>
           <Box sx={actionButtonContainerStyles}>
             {showAdjustAmount && (
-            <Button
-              testId="not-enough-gas-adjust-amount-button"
-              sx={actionButtonStyles}
-              variant="tertiary"
-              onClick={onCloseBottomSheet}
-            >
-              {buttons.adjustAmount}
-            </Button>
+              <Button
+                testId="not-enough-gas-adjust-amount-button"
+                sx={actionButtonStyles}
+                variant="tertiary"
+                onClick={onCloseBottomSheet}
+              >
+                {buttons.adjustAmount}
+              </Button>
             )}
             <Button
-              testId="not-enough-gas-copy-address-button"
+              testId="not-enough-gas-add-imx-button"
               sx={actionButtonStyles}
               variant="tertiary"
               onClick={onAddCoinsClick}

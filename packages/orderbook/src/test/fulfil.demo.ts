@@ -4,10 +4,10 @@ import { log } from 'console';
 import { OrderStatus } from '../openapi/sdk/index';
 import { Orderbook } from '../orderbook';
 import {
-  getLocalhostProvider,
-  getFulfillerWallet,
-  getOffererWallet,
   deployTestToken,
+  getFulfillerWallet,
+  getLocalhostProvider,
+  getOffererWallet,
   signAndSubmitTx,
   signMessage,
   TestToken,
@@ -48,9 +48,6 @@ describe('', () => {
       baseConfig: {
         environment: Environment.SANDBOX,
       },
-      overrides: {
-        chainName: 'imtbl-zkevm-testnet',
-      },
     });
 
     log('Signing and submitting approval transaction...');
@@ -69,14 +66,23 @@ describe('', () => {
       orderExpiry: new Date(Date.now() + 1000000 * 30),
     });
 
-    await signAndSubmitTx(validListing.unsignedApprovalTransaction!, offerer, provider);
+    await signAndSubmitTx(
+      validListing.unsignedApprovalTransaction!,
+      offerer,
+      provider,
+    );
 
-    const signature2 = await signMessage(validListing.typedOrderMessageForSigning, offerer);
+    const signature2 = await signMessage(
+      validListing.typedOrderMessageForSigning,
+      offerer,
+    );
 
     log('Cretaing new listing to be fulfilled...');
 
     // Submit the order creation request to the order book API
-    const { result: { id: orderId2 } } = await sdk.createListing({
+    const {
+      result: { id: orderId2 },
+    } = await sdk.createListing({
       orderComponents: validListing.orderComponents,
       orderHash: validListing.orderHash,
       orderSignature: signature2,
@@ -90,7 +96,9 @@ describe('', () => {
       fulfiller.address,
     );
     await signAndSubmitTx(unsignedFulfillmentTransaction, fulfiller, provider);
-    log(`Fulfilment transaction sent, waiting for listing ${orderId2} to become FILLED`);
+    log(
+      `Fulfilment transaction sent, waiting for listing ${orderId2} to become FILLED`,
+    );
 
     await waitForOrderToBeOfStatus(sdk, orderId2, OrderStatus.FILLED);
     log(`Listing ${orderId2} is now FILLED`);

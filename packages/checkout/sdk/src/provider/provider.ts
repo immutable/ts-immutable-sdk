@@ -2,6 +2,7 @@
 import detectEthereumProvider from '@metamask/detect-provider';
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
 import {
+  CreateProviderResult,
   WalletProviderName,
 } from '../types';
 import { CheckoutError, CheckoutErrorType, withCheckoutError } from '../errors';
@@ -23,12 +24,12 @@ async function getMetaMaskProvider(): Promise<Web3Provider> {
 }
 
 export async function createProvider(
-  defaultProvider: WalletProviderName,
-): Promise<Web3Provider> {
-  let web3Provider: Web3Provider | null = null;
-  switch (defaultProvider) {
+  walletProviderName: WalletProviderName,
+): Promise<CreateProviderResult> {
+  let provider: Web3Provider | null = null;
+  switch (walletProviderName) {
     case WalletProviderName.METAMASK: {
-      web3Provider = await getMetaMaskProvider();
+      provider = await getMetaMaskProvider();
       break;
     }
     default:
@@ -37,5 +38,8 @@ export async function createProvider(
         CheckoutErrorType.DEFAULT_PROVIDER_ERROR,
       );
   }
-  return web3Provider;
+  return {
+    provider,
+    walletProviderName,
+  };
 }

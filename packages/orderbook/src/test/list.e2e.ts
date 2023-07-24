@@ -10,8 +10,6 @@ import { TestToken } from './helpers/test-token';
 import { waitForOrderToBeOfStatus } from './helpers/order';
 import { getLocalConfigFromEnv } from './helpers';
 
-const LOCAL_CHAIN_NAME = 'imtbl-zkevm-local';
-
 async function createListing(
   sdk: Orderbook,
   token: TestToken,
@@ -61,14 +59,15 @@ describe('listListings e2e', () => {
   const provider = getLocalhostProvider();
   const offerer = getOffererWallet(provider);
 
+  const localConfigOverrides = getLocalConfigFromEnv();
   const sdk = new Orderbook({
     baseConfig: {
       environment: Environment.SANDBOX,
     },
     overrides: {
-      chainName: LOCAL_CHAIN_NAME,
+      ...localConfigOverrides,
     },
-  }, getLocalConfigFromEnv());
+  });
 
   let token1ContractAddress = '';
   let token2ContractAddress = '';
