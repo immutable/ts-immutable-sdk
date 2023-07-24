@@ -204,28 +204,27 @@ export function SwapWidget(props: SwapWidgetProps) {
     <BiomeCombinedProviders theme={{ base: biomeTheme }} bottomSheetContainerId="bottom-sheet-container">
       <ViewContext.Provider value={viewReducerValues}>
         <SwapContext.Provider value={swapReducerValues}>
-          {viewState.view.type === SharedViews.LOADING_VIEW && (
+          <CryptoFiatProvider environment={environment}>
+            {viewState.view.type === SharedViews.LOADING_VIEW && (
             <LoadingView loadingText={loadingText} />
-          )}
-          {viewState.view.type === SwapWidgetViews.SWAP && (
-            <CryptoFiatProvider environment={environment}>
-              <SwapCoins
-                fromAmount={viewState.view.data?.fromAmount ?? amount}
-                fromContractAddress={viewState.view.data?.fromContractAddress ?? fromContractAddress}
-                toContractAddress={viewState.view.data?.toContractAddress ?? toContractAddress}
-              />
-            </CryptoFiatProvider>
-          )}
-          {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (
+            )}
+            {viewState.view.type === SwapWidgetViews.SWAP && (
+            <SwapCoins
+              fromAmount={viewState.view.data?.fromAmount ?? amount}
+              fromContractAddress={viewState.view.data?.fromContractAddress ?? fromContractAddress}
+              toContractAddress={viewState.view.data?.toContractAddress ?? toContractAddress}
+            />
+            )}
+            {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (
             <SwapInProgress
               transactionResponse={viewState.view.data.transactionResponse}
               swapForm={viewState.view.data.swapForm}
             />
-          )}
-          {viewState.view.type === SwapWidgetViews.APPROVE_ERC20 && (
+            )}
+            {viewState.view.type === SwapWidgetViews.APPROVE_ERC20 && (
             <ApproveERC20Onboarding data={viewState.view.data} />
-          )}
-          {viewState.view.type === SwapWidgetViews.SUCCESS && (
+            )}
+            {viewState.view.type === SwapWidgetViews.SUCCESS && (
             <StatusView
               statusText={success.text}
               actionText={success.actionText}
@@ -238,31 +237,31 @@ export function SwapWidget(props: SwapWidgetProps) {
               statusType={StatusType.SUCCESS}
               testId="success-view"
             />
-          )}
-          {viewState.view.type === SwapWidgetViews.FAIL && (
-          <StatusView
-            statusText={failed.text}
-            actionText={failed.actionText}
-            onRenderEvent={() => sendSwapFailedEvent('Transaction failed')}
-            onActionClick={() => {
-              if (viewState.view.type === SwapWidgetViews.FAIL) {
-                viewDispatch({
-                  payload: {
-                    type: ViewActions.UPDATE_VIEW,
-                    view: {
-                      type: SwapWidgetViews.SWAP,
-                      data: viewState.view.data,
+            )}
+            {viewState.view.type === SwapWidgetViews.FAIL && (
+            <StatusView
+              statusText={failed.text}
+              actionText={failed.actionText}
+              onRenderEvent={() => sendSwapFailedEvent('Transaction failed')}
+              onActionClick={() => {
+                if (viewState.view.type === SwapWidgetViews.FAIL) {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.UPDATE_VIEW,
+                      view: {
+                        type: SwapWidgetViews.SWAP,
+                        data: viewState.view.data,
+                      },
                     },
-                  },
-                });
-              }
-            }}
-            statusType={StatusType.FAILURE}
-            onCloseClick={sendSwapWidgetCloseEvent}
-            testId="fail-view"
-          />
-          )}
-          {viewState.view.type === SwapWidgetViews.PRICE_SURGE && (
+                  });
+                }
+              }}
+              statusType={StatusType.FAILURE}
+              onCloseClick={sendSwapWidgetCloseEvent}
+              testId="fail-view"
+            />
+            )}
+            {viewState.view.type === SwapWidgetViews.PRICE_SURGE && (
             <StatusView
               statusText={rejected.text}
               actionText={rejected.actionText}
@@ -284,8 +283,8 @@ export function SwapWidget(props: SwapWidgetProps) {
               onCloseClick={sendSwapWidgetCloseEvent}
               testId="price-surge-view"
             />
-          )}
-          {viewState.view.type === SharedViews.ERROR_VIEW && (
+            )}
+            {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
               actionText={actionText}
               onActionClick={() => {
@@ -298,8 +297,8 @@ export function SwapWidget(props: SwapWidgetProps) {
               }}
               onCloseClick={sendSwapWidgetCloseEvent}
             />
-          )}
-          {viewState.view.type === SharedViews.TOP_UP_VIEW && (
+            )}
+            {viewState.view.type === SharedViews.TOP_UP_VIEW && (
             <TopUpView
               widgetEvent={IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT}
               showOnrampOption={isOnRampEnabled}
@@ -307,7 +306,8 @@ export function SwapWidget(props: SwapWidgetProps) {
               showBridgeOption={isBridgeEnabled}
               onCloseButtonClick={sendSwapWidgetCloseEvent}
             />
-          )}
+            )}
+          </CryptoFiatProvider>
         </SwapContext.Provider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>

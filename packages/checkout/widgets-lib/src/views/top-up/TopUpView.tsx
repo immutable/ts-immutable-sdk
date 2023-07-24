@@ -83,6 +83,7 @@ export function TopUpView({
 
   const refreshFees = async (silent: boolean = false) => {
     if (!checkout) return;
+    if (conversions.size === 0) return;
 
     if (!silent) {
       setLoadingSwapFees(true);
