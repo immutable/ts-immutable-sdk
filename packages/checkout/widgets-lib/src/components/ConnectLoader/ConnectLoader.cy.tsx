@@ -8,7 +8,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { cySmartGet } from '../../lib/testUtils';
 import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
-import { WidgetTheme } from '../../lib';
+import { ProviderEvent, WidgetTheme } from '../../lib';
 
 describe('ConnectLoader', () => {
   const config: StrongCheckoutWidgetsConfig = {
@@ -296,8 +296,8 @@ describe('ConnectLoader', () => {
 
       cy.get('#inner-widget').should('be.visible');
 
-      cySmartGet('@providerOnStub').should('have.been.calledWith', 'accountsChanged');
-      cySmartGet('@providerOnStub').should('have.been.calledWith', 'chainChanged');
+      cySmartGet('@providerOnStub').should('have.been.calledWith', ProviderEvent.ACCOUNTS_CHANGED);
+      cySmartGet('@providerOnStub').should('have.been.calledWith', ProviderEvent.CHAIN_CHANGED);
     });
   });
 });
