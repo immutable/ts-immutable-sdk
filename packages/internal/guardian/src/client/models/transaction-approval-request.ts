@@ -22,10 +22,10 @@
 export interface TransactionApprovalRequest {
     /**
      * rollup chain ID
-     * @type {number}
+     * @type {string}
      * @memberof TransactionApprovalRequest
      */
-    'chainID': number;
+    'chainID'?: string;
     /**
      * chain type
      * @type {string}

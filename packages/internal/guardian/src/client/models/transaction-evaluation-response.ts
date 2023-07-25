@@ -32,6 +32,12 @@ export interface TransactionEvaluationResponse {
      * @memberof TransactionEvaluationResponse
      */
     'confirmationMethod'?: TransactionEvaluationResponseConfirmationMethodEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransactionEvaluationResponse
+     */
+    'transactionId'?: string;
 }
 
 export const TransactionEvaluationResponseConfirmationMethodEnum = {

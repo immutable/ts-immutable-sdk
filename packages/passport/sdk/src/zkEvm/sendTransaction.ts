@@ -4,7 +4,11 @@ import {
   TransactionRequest,
   Web3Provider,
 } from '@ethersproject/providers';
-import { getNonce, getSignedMetaTransactions, chainIdNumber } from './walletHelpers';
+import * as guardian from '@imtbl/guardian';
+import { BigNumber, ethers } from 'ethers';
+import {
+  getNonce, getSignedMetaTransactions, chainIdNumber,
+} from './walletHelpers';
 import { MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
 import { retryWithDelay } from '../network/retry';
@@ -18,10 +22,73 @@ const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
 export type EthSendTransactionParams = {
   magicProvider: ExternalProvider;
   jsonRpcProvider: JsonRpcProvider;
+  transactionAPI: guardian.TransactionsApi;
   config: PassportConfiguration;
   relayerClient: RelayerClient;
   user: UserZkEvm;
   params: Array<any>;
+};
+
+type GuardianValidateParams = {
+  transactionAPI: guardian.TransactionsApi;
+  chainId: string,
+  nonce: number,
+  user: UserZkEvm,
+  metaTransactions: MetaTransaction[],
+};
+
+const converBigNumberishToNumber = (value: ethers.BigNumberish): number => BigNumber.from(value).toNumber();
+
+const transformGardianTransactions = (txs: MetaTransaction[]):guardian.MetaTransaction[] => {
+  try {
+    return txs.map((t) => ({
+      delegateCall: t.delegateCall === true,
+      revertOnError: t.revertOnError === true,
+      gasLimit: t.gasLimit ? converBigNumberishToNumber(t.gasLimit).toString() : '0',
+      target: t.to ?? ethers.constants.AddressZero,
+      value: t.value ? converBigNumberishToNumber(t.value).toString() : '0',
+      data: t.data ? t.data.toString() : '0x00',
+    }));
+  } catch (error) {
+    const errorMessage = (error instanceof Error) ? error.message : String(error);
+    throw new JsonRpcError(
+      RpcErrorCode.INVALID_PARAMS,
+      `Transaction failed to parsing: ${errorMessage}`,
+    );
+  }
+};
+
+const guardianValidation = async ({
+  transactionAPI,
+  chainId,
+  nonce,
+  user,
+  metaTransactions,
+}: GuardianValidateParams) => {
+  const headers = { Authorization: `Bearer ${user.accessToken}` };
+  const guardianTransactions = transformGardianTransactions(
+    metaTransactions,
+  );
+  try {
+    await transactionAPI.evaluateTransaction({
+      id: 'evm',
+      transactionEvaluationRequest: {
+        chainType: 'evm',
+        chainId,
+        transactionData: {
+          nonce,
+          userAddress: user.zkEvm.ethAddress,
+          metaTransactions: guardianTransactions,
+        },
+      },
+    }, { headers });
+  } catch (error) {
+    const errorMessage = (error instanceof Error) ? error.message : String(error);
+    throw new JsonRpcError(
+      RpcErrorCode.INTERNAL_ERROR,
+      `Transaction failed to validate with error: ${errorMessage}`,
+    );
+  }
 };
 
 export const sendTransaction = async ({
@@ -29,6 +96,7 @@ export const sendTransaction = async ({
   magicProvider,
   jsonRpcProvider,
   relayerClient,
+  transactionAPI,
   config,
   user,
 }: EthSendTransactionParams): Promise<string> => {
@@ -81,6 +149,14 @@ export const sendTransaction = async ({
     value: imxFeeOption.tokenPrice,
     revertOnError: true,
   };
+
+  await guardianValidation({
+    transactionAPI,
+    chainId: config.zkEvmChainId,
+    nonce,
+    user,
+    metaTransactions: [metaTransaction, feeMetaTransaction],
+  });
 
   // NOTE: We sign again because we now are adding the fee transaction, so the
   // whole payload is different and needs a new signature.

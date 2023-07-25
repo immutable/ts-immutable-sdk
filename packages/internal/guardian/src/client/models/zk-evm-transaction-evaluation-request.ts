@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ZkEvmTransactionEvaluationRequestTransactionData } from './zk-evm-transaction-evaluation-request-transaction-data';
+import { ZkEvmTransactionData } from './zk-evm-transaction-data';
 
 /**
  * 
@@ -24,10 +24,29 @@ import { ZkEvmTransactionEvaluationRequestTransactionData } from './zk-evm-trans
  */
 export interface ZkEvmTransactionEvaluationRequest {
     /**
-     * 
-     * @type {ZkEvmTransactionEvaluationRequestTransactionData}
+     * The ID of the chain
+     * @type {string}
      * @memberof ZkEvmTransactionEvaluationRequest
      */
-    'transactionData': ZkEvmTransactionEvaluationRequestTransactionData;
+    'chainId': string;
+    /**
+     * The type of the chain
+     * @type {string}
+     * @memberof ZkEvmTransactionEvaluationRequest
+     */
+    'chainType': ZkEvmTransactionEvaluationRequestChainTypeEnum;
+    /**
+     * 
+     * @type {ZkEvmTransactionData}
+     * @memberof ZkEvmTransactionEvaluationRequest
+     */
+    'transactionData': ZkEvmTransactionData;
 }
+
+export const ZkEvmTransactionEvaluationRequestChainTypeEnum = {
+    Evm: 'evm'
+} as const;
+
+export type ZkEvmTransactionEvaluationRequestChainTypeEnum = typeof ZkEvmTransactionEvaluationRequestChainTypeEnum[keyof typeof ZkEvmTransactionEvaluationRequestChainTypeEnum];
+
 
