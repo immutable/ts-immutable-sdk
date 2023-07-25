@@ -79,12 +79,12 @@ export type Provider = {
   removeListener: (event: string, listener: (...args: any[]) => void) => void;
 };
 
-export enum ProviderEventNames {
+export enum ProviderEvent {
   ACCOUNTS_CHANGED = 'accountsChanged',
 }
 
 export type AccountsChangedEvent = Array<string>;
 
-export interface ProviderEvents extends Record<string, any> {
-  [ProviderEventNames.ACCOUNTS_CHANGED]: [AccountsChangedEvent],
+export interface ProviderEventMap extends Record<string, any> {
+  [ProviderEvent.ACCOUNTS_CHANGED]: [AccountsChangedEvent],
 }
