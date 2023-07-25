@@ -3,7 +3,7 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   Checkout,
 } from '@imtbl/checkout-sdk';
-import { useEffect, useReducer } from 'react';
+import { useEffect, useMemo, useReducer } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
@@ -47,10 +47,18 @@ export function WalletWidget(props: WalletWidgetProps) {
     ? onLightBase
     : onDarkBase;
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
+  const viewReducerValues = useMemo(
+    () => ({ viewState, viewDispatch }),
+    [viewState, viewDispatch],
+  );
 
   const [walletState, walletDispatch] = useReducer(
     walletReducer,
     initialWalletState,
+  );
+  const walletReducerValues = useMemo(
+    () => ({ walletState, walletDispatch }),
+    [walletState, walletDispatch],
   );
 
   /** Set the web3Provider passed in from ConnectLoader into WalletState */
@@ -126,13 +134,9 @@ export function WalletWidget(props: WalletWidgetProps) {
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
-      {/* TODO: please fix */}
-      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-      <ViewContext.Provider value={{ viewState, viewDispatch }}>
+      <ViewContext.Provider value={viewReducerValues}>
         <CryptoFiatProvider environment={environment}>
-          {/* TODO: please fix */}
-          {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-          <WalletContext.Provider value={{ walletState, walletDispatch }}>
+          <WalletContext.Provider value={walletReducerValues}>
             {viewState.view.type === SharedViews.LOADING_VIEW && (
             <LoadingView loadingText="Loading" />
             )}
