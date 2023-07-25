@@ -118,7 +118,7 @@ export default class GuardianClient {
       metaTransactions,
     );
     try {
-      return await this.transactionAPI.evaluateTransaction({
+      const transactionEvaluationResponseAxiosResponse = await this.transactionAPI.evaluateTransaction({
         id: 'evm',
         transactionEvaluationRequest: {
           chainType: 'evm',
@@ -130,6 +130,7 @@ export default class GuardianClient {
           },
         },
       }, { headers });
+      return transactionEvaluationResponseAxiosResponse.data;
     } catch (error) {
       const errorMessage = (error instanceof Error) ? error.message : String(error);
       throw new JsonRpcError(
@@ -144,7 +145,7 @@ export default class GuardianClient {
     nonce,
     user,
     metaTransactions,
-  }: GuardianEVMValidationParams): Promise<TransactionEvaluationResponse> {
+  }: GuardianEVMValidationParams): Promise<void> {
     const transactionEvaluationResponse = await this.evaluateEVTransaction({
       chainId,
       nonce,
