@@ -15,8 +15,7 @@ const fromAmountIn = async (
   const address = await provider.getSigner().getAddress();
   return exchange.getUnsignedSwapTxFromAmountIn(
     address,
-    // fromToken.address || '',
-    '0x0000000000000000000000000000000000001010',
+    fromToken.address || '',
     toToken.address || '',
     BigNumber.from(utils.parseUnits(fromAmount, fromToken.decimals)),
   );
