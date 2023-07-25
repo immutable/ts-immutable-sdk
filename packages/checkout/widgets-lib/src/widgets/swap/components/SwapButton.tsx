@@ -24,11 +24,11 @@ export interface SwapButtonProps {
   transaction: TransactionResponse | null;
   data?: SwapFormData;
   insufficientFundsForGas: boolean;
-  setShowNotEnoughImxDrawer: (value: boolean) => void;
+  openNotEnoughImxDrawer: () => void;
 }
 
 export function SwapButton({
-  loading, updateLoading, validator, transaction, data, insufficientFundsForGas, setShowNotEnoughImxDrawer,
+  loading, updateLoading, validator, transaction, data, insufficientFundsForGas, openNotEnoughImxDrawer,
 }: SwapButtonProps) {
   const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
   const { viewDispatch } = useContext(ViewContext);
@@ -40,7 +40,7 @@ export function SwapButton({
     if (!checkout || !provider || !transaction) return;
 
     if (insufficientFundsForGas) {
-      setShowNotEnoughImxDrawer(true);
+      openNotEnoughImxDrawer();
       return;
     }
 
