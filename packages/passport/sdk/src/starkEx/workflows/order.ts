@@ -55,6 +55,7 @@ export async function createOrder({
       amount_sell: amountSell,
       token_sell: convertToSignableToken(request.sell),
       fees: request.fees,
+      split_fees: true,
       expiration_timestamp: request.expiration_timestamp,
     };
 

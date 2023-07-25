@@ -13,9 +13,8 @@
  */
 
 
-import type { Configuration } from '../configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import globalAxios from 'axios';
+import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
@@ -138,11 +137,11 @@ export const TransactionsApiAxiosParamCreator = function (configuration?: Config
          * @summary Info for a specific transaction
          * @param {string} transactionID The id of the starkex transaction to retrieve
          * @param {'starkex' | 'evm'} chainType roll up type
-         * @param {number} [chainID] ID of evm chain
+         * @param {string} [chainID] ID of evm chain
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getTransactionByID: async (transactionID: string, chainType: 'starkex' | 'evm', chainID?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getTransactionByID: async (transactionID: string, chainType: 'starkex' | 'evm', chainID?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'transactionID' is not null or undefined
             assertParamExists('getTransactionByID', 'transactionID', transactionID)
             // verify required parameter 'chainType' is not null or undefined
@@ -222,11 +221,11 @@ export const TransactionsApiFp = function(configuration?: Configuration) {
          * @summary Info for a specific transaction
          * @param {string} transactionID The id of the starkex transaction to retrieve
          * @param {'starkex' | 'evm'} chainType roll up type
-         * @param {number} [chainID] ID of evm chain
+         * @param {string} [chainID] ID of evm chain
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getTransactionByID(transactionID: string, chainType: 'starkex' | 'evm', chainID?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Transaction>> {
+        async getTransactionByID(transactionID: string, chainType: 'starkex' | 'evm', chainID?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Transaction>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getTransactionByID(transactionID, chainType, chainID, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -243,32 +242,36 @@ export const TransactionsApiFactory = function (configuration?: Configuration, b
         /**
          * Approve a pending transaction
          * @summary Approve a pending transaction given chain
-         * @param {TransactionsApiApprovePendingTransactionRequest} requestParameters Request parameters.
+         * @param {string} payloadHash Hash for the payload
+         * @param {TransactionApprovalRequest} transactionApprovalRequest request body for approving a pending transactio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        approvePendingTransaction(requestParameters: TransactionsApiApprovePendingTransactionRequest, options?: AxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.approvePendingTransaction(requestParameters.payloadHash, requestParameters.transactionApprovalRequest, options).then((request) => request(axios, basePath));
+        approvePendingTransaction(payloadHash: string, transactionApprovalRequest: TransactionApprovalRequest, options?: any): AxiosPromise<void> {
+            return localVarFp.approvePendingTransaction(payloadHash, transactionApprovalRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Check if the transaction is valid by transaction ID for both StarkEx and EVM
          * @summary Evaluate a transaction
-         * @param {TransactionsApiEvaluateTransactionRequest} requestParameters Request parameters.
+         * @param {string} id Transaction identifier: payloadHash on StarkEx or EVM ID
+         * @param {TransactionEvaluationRequest} transactionEvaluationRequest Specifies the kind of transaction
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        evaluateTransaction(requestParameters: TransactionsApiEvaluateTransactionRequest, options?: AxiosRequestConfig): AxiosPromise<TransactionEvaluationResponse> {
-            return localVarFp.evaluateTransaction(requestParameters.id, requestParameters.transactionEvaluationRequest, options).then((request) => request(axios, basePath));
+        evaluateTransaction(id: string, transactionEvaluationRequest: TransactionEvaluationRequest, options?: any): AxiosPromise<TransactionEvaluationResponse> {
+            return localVarFp.evaluateTransaction(id, transactionEvaluationRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a transaction by payload hash
          * @summary Info for a specific transaction
-         * @param {TransactionsApiGetTransactionByIDRequest} requestParameters Request parameters.
+         * @param {string} transactionID The id of the starkex transaction to retrieve
+         * @param {'starkex' | 'evm'} chainType roll up type
+         * @param {string} [chainID] ID of evm chain
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getTransactionByID(requestParameters: TransactionsApiGetTransactionByIDRequest, options?: AxiosRequestConfig): AxiosPromise<Transaction> {
-            return localVarFp.getTransactionByID(requestParameters.transactionID, requestParameters.chainType, requestParameters.chainID, options).then((request) => request(axios, basePath));
+        getTransactionByID(transactionID: string, chainType: 'starkex' | 'evm', chainID?: string, options?: any): AxiosPromise<Transaction> {
+            return localVarFp.getTransactionByID(transactionID, chainType, chainID, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -337,10 +340,10 @@ export interface TransactionsApiGetTransactionByIDRequest {
 
     /**
      * ID of evm chain
-     * @type {number}
+     * @type {string}
      * @memberof TransactionsApiGetTransactionByID
      */
-    readonly chainID?: number
+    readonly chainID?: string
 }
 
 /**
