@@ -153,7 +153,7 @@ export default class GuardianClient {
       metaTransactions,
     });
 
-    const { confirmationRequired, transactionId } = transactionEvaluationResponse.data;
+    const { confirmationRequired, transactionId } = transactionEvaluationResponse;
     if (confirmationRequired) {
       const confirmationResult = await this.confirmationScreen.startGuardianTransaction(
         transactionId,
