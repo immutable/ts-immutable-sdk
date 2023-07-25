@@ -53,7 +53,7 @@ export const mswHandlers = {
     }),
   },
   relayer: {
-    success: rest.post('https://evm-relayer.sandbox.imtbl.com/v1/transactions', (req, res, ctx) => { // TODO: ID-784 Update once we have added Relayer URL to config
+    success: rest.post('https://api.sandbox.immutable.com/relayer-mr/v1/transactions', (req, res, ctx) => {
       const body = req.body as RelayerTransactionRequest;
       switch (body.method) {
         case 'eth_sendTransaction': {
@@ -101,6 +101,11 @@ export const mswHandlers = {
         }
       }
     }),
+  },
+  guardian: {
+    evaluateTransaction: {
+      success: rest.post('https://api.sandbox.immutable.com/guardian/v1/transactions/evm/evaluate', (req, res, ctx) => res(ctx.status(200))),
+    },
   },
 };
 

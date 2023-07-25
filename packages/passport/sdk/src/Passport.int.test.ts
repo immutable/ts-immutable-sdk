@@ -173,6 +173,7 @@ describe('Passport', () => {
           mswHandlers.counterfactualAddress.success,
           mswHandlers.jsonRpcProvider.success,
           mswHandlers.relayer.success,
+          mswHandlers.guardian.evaluateTransaction.success,
         ]);
         mockMagicRequest.mockImplementationOnce(({ method }: RequestArguments) => {
           expect(method).toEqual('eth_accounts');
@@ -199,8 +200,8 @@ describe('Passport', () => {
         });
         const transaction: TransactionRequest = {
           to: transferToAddress,
-          value: '500000000000000000',
-          data: '0x',
+          value: '5000000000000000',
+          data: '0x00',
         };
         const result = await zkEvmProvider.request({
           method: 'eth_sendTransaction',
