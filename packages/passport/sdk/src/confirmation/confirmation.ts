@@ -1,3 +1,4 @@
+import { TransactionApprovalRequestChainTypeEnum } from '@imtbl/guardian';
 import {
   ConfirmationResult,
   DisplayConfirmationParams,
@@ -8,7 +9,6 @@ import {
 } from './types';
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
-import { TransactionApprovalRequestChainTypeEnum } from "../../../../guardian/dist";
 
 const CONFIRMATION_WINDOW_TITLE = 'Confirm this transaction';
 const CONFIRMATION_WINDOW_HEIGHT = 380;
