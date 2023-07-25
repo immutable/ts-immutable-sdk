@@ -15,7 +15,9 @@ import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
 import { WalletActions, WalletContext } from '../context/WalletContext';
 import { sendWalletWidgetCloseEvent } from '../WalletWidgetEvents';
 import {
-  WALLET_BALANCE_CONTAINER_STYLE,
+  walletBalanceOuterContainerStyles,
+  walletBalanceContainerStyles,
+  walletBalanceLoadingIconStyles,
   WalletBalanceItemStyle,
 } from './WalletBalancesStyles';
 import { getL1ChainId, getL2ChainId } from '../../../lib/networkUtils';
@@ -33,7 +35,7 @@ import {
 import { fetchTokenSymbols } from '../../../lib/fetchTokenSymbols';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 import { isNativeToken } from '../../../lib/utils';
-import { DEFAULT_TOKEN_DECIMALS, ETH_TOKEN_SYMBOL } from '../../../lib';
+import { DEFAULT_TOKEN_DECIMALS, ETH_TOKEN_SYMBOL, ZERO_BALANCE_STRING } from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
 
 export function WalletBalances() {
@@ -104,7 +106,7 @@ export function WalletBalances() {
         .find((balance) => isNativeToken(balance.address) && balance.symbol === ETH_TOKEN_SYMBOL);
       if (!ethBalance) return;
 
-      if (ethBalance.balance === '0.0') {
+      if (ethBalance.balance === ZERO_BALANCE_STRING) {
         setInsufficientFundsForBridgeToL2Gas(true);
         return;
       }
@@ -199,14 +201,9 @@ export function WalletBalances() {
       footer={<FooterLogo />}
     >
       <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          rowGap: 'base.spacing.x2',
-          paddingX: 'base.spacing.x2',
-        }}
+        sx={walletBalanceOuterContainerStyles}
       >
-        <Box sx={WALLET_BALANCE_CONTAINER_STYLE}>
+        <Box sx={walletBalanceContainerStyles}>
           <NetworkMenu setBalancesLoading={setBalancesLoading} />
           <TotalTokenBalance totalBalance={totalFiatAmount} />
           <Box
@@ -216,14 +213,7 @@ export function WalletBalances() {
             )}
           >
             {balancesLoading && (
-            <Box sx={{
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            >
+            <Box sx={walletBalanceLoadingIconStyles}>
               <Icon
                 testId="loading-icon"
                 icon="Loading"
