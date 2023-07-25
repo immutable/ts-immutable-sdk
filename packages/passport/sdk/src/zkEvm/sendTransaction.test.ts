@@ -1,6 +1,5 @@
 import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
-import { TransactionsApi } from '@imtbl/guardian';
-import { getSignedMetaTransactions, getNonce } from './walletHelpers';
+import { getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { sendTransaction } from './sendTransaction';
 import { mockUserZkEvm } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
@@ -8,6 +7,7 @@ import { PassportConfiguration } from '../config';
 import { retryWithDelay } from '../network/retry';
 import { RelayerTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
+import GuardianClient from '../starkEx/guardian';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./walletHelpers');
@@ -30,6 +30,9 @@ describe('sendTransaction', () => {
     imGetFeeOptions: jest.fn(),
     ethSendTransaction: jest.fn(),
     imGetTransactionByHash: jest.fn(),
+  };
+  const guardianClient = {
+    validateEVMTransaction: jest.fn(),
   };
   const transactionAPI = {
     evaluateTransaction: jest.fn(),
@@ -71,10 +74,10 @@ describe('sendTransaction', () => {
       params: [transactionRequest],
       magicProvider,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
-      transactionAPI: transactionAPI as unknown as TransactionsApi,
       relayerClient: relayerClient as unknown as RelayerClient,
       config: config as PassportConfiguration,
       user: mockUserZkEvm,
+      guardianClient: guardianClient as unknown as GuardianClient,
     });
 
     expect(result).toEqual(transactionHash);
@@ -94,10 +97,10 @@ describe('sendTransaction', () => {
       params: [transactionRequest],
       magicProvider,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
-      transactionAPI: transactionAPI as unknown as TransactionsApi,
       relayerClient: relayerClient as unknown as RelayerClient,
       config: config as PassportConfiguration,
       user: mockUserZkEvm,
+      guardianClient: guardianClient as unknown as GuardianClient,
     });
 
     expect(result).toEqual(transactionHash);
@@ -151,10 +154,10 @@ describe('sendTransaction', () => {
         params: [wrongTransactionRequest],
         magicProvider,
         jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
-        transactionAPI: transactionAPI as unknown as TransactionsApi,
         relayerClient: relayerClient as unknown as RelayerClient,
         config: config as PassportConfiguration,
         user: mockUserZkEvm,
+        guardianClient: guardianClient as unknown as GuardianClient,
       }),
     ).rejects.toThrow(
       new JsonRpcError(
@@ -174,10 +177,10 @@ describe('sendTransaction', () => {
         params: [transactionRequest],
         magicProvider,
         jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
-        transactionAPI: transactionAPI as unknown as TransactionsApi,
         relayerClient: relayerClient as unknown as RelayerClient,
         config: config as PassportConfiguration,
         user: mockUserZkEvm,
+        guardianClient: guardianClient as unknown as GuardianClient,
       }),
     ).rejects.toThrow(
       new JsonRpcError(
