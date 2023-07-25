@@ -8,7 +8,7 @@ import {
   NetworkFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
-  useEffect, useMemo, useReducer, useRef,
+  useEffect, useMemo, useReducer,
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
@@ -66,11 +66,10 @@ export function BridgeWidget(props: BridgeWidgetProps) {
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
-  const firstRender = useRef(true);
-
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
 
   const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridgeState);
+  const { checkout, provider } = bridgeState;
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
 
   const {
@@ -81,24 +80,44 @@ export function BridgeWidget(props: BridgeWidgetProps) {
     ? onLightBase
     : onDarkBase;
 
+  /* Sets the provider in BridgeState from passed in web3Provider */
+  useEffect(() => {
+    if (!web3Provider) return;
+    bridgeDispatch({
+      payload: {
+        type: BridgeActions.SET_PROVIDER,
+        provider: web3Provider,
+      },
+    });
+  }, [web3Provider]);
+
+  useEffect(() => {
+    bridgeDispatch({
+      payload: {
+        type: BridgeActions.SET_CHECKOUT,
+        checkout: new Checkout({
+          baseConfig: { environment },
+        }),
+      },
+    });
+  }, [environment]);
+
   useEffect(() => {
     const bridgetWidgetSetup = async () => {
-      if (!web3Provider) return;
-      const checkout = new Checkout({
-        baseConfig: { environment },
-      });
+      if (!checkout || !provider) return;
+
+      const getNetworkResult = await checkout.getNetworkInfo({ provider });
+
+      /* If the provider's network is not supported, return out of this and let the
+      connect loader handle the switch network functionality */
+      if (!getNetworkResult.isSupported) {
+        return;
+      }
 
       bridgeDispatch({
         payload: {
-          type: BridgeActions.SET_CHECKOUT,
-          checkout,
-        },
-      });
-
-      bridgeDispatch({
-        payload: {
-          type: BridgeActions.SET_PROVIDER,
-          provider: web3Provider,
+          type: BridgeActions.SET_NETWORK,
+          network: getNetworkResult,
         },
       });
 
@@ -145,16 +164,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         });
       }
 
-      const getNetworkResult = await checkout.getNetworkInfo({ provider: web3Provider });
-
-      bridgeDispatch({
-        payload: {
-          type: BridgeActions.SET_NETWORK,
-          network: getNetworkResult,
-        },
-      });
-
-      const tokensAndBalances = await getBridgeTokensAndBalances(checkout, web3Provider);
+      const tokensAndBalances = await getBridgeTokensAndBalances(checkout, provider);
 
       bridgeDispatch({
         payload: {
@@ -178,10 +188,8 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       });
     };
 
-    if (firstRender.current) {
-      bridgetWidgetSetup();
-    }
-  }, [web3Provider, firstRender.current]);
+    bridgetWidgetSetup();
+  }, [checkout, provider]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>

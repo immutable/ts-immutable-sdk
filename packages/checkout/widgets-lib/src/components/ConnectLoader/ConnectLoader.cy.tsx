@@ -41,6 +41,7 @@ describe('ConnectLoader', () => {
   it('should show ready to connect view when provider but not connected', () => {
     const params = {
       web3Provider: {} as Web3Provider,
+      allowedChains: [],
     };
 
     cy.stub(Checkout.prototype, 'checkIsWalletConnected')

@@ -1,5 +1,5 @@
 import React from 'react';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { WalletWidget } from './WalletWidget';
 import {
@@ -8,7 +8,7 @@ import {
 } from '../../components/ConnectLoader/ConnectLoader';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { ConnectTargetLayer } from '../../lib';
+import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
 
 export class ImmutableWallet extends ImmutableWebComponent {
   walletProvider?:WalletProviderName;
@@ -24,6 +24,10 @@ export class ImmutableWallet extends ImmutableWebComponent {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProvider: this.walletProvider,
       web3Provider: this.provider,
+      allowedChains: [
+        getL1ChainId(new Checkout({ baseConfig: { environment: this.widgetConfig!.environment } }).config),
+        getL2ChainId(new Checkout({ baseConfig: { environment: this.widgetConfig!.environment } }).config),
+      ],
     };
 
     if (!this.reactRoot) {

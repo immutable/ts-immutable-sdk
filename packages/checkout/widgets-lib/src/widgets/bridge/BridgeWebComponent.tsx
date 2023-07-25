@@ -1,9 +1,9 @@
 import React from 'react';
-import { WalletProviderName } from '@imtbl/checkout-sdk';
+import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { ConnectTargetLayer } from '../../lib';
+import { ConnectTargetLayer, getL1ChainId } from '../../lib';
 import { ConnectLoader, ConnectLoaderParams } from '../../components/ConnectLoader/ConnectLoader';
 import { sendBridgeWidgetCloseEvent } from './BridgeWidgetEvents';
 
@@ -29,6 +29,9 @@ export class ImmutableBridge extends ImmutableWebComponent {
       targetLayer: ConnectTargetLayer.LAYER1,
       walletProvider: this.walletProvider,
       web3Provider: this.provider,
+      allowedChains: [
+        getL1ChainId(new Checkout({ baseConfig: { environment: this.widgetConfig!.environment } }).config),
+      ],
     };
     const params: BridgeWidgetParams = {
       fromContractAddress: this.fromContractAddress,
