@@ -53,7 +53,7 @@ export const mswHandlers = {
     }),
   },
   relayer: {
-    success: rest.post('https://api.sandbox.immutable.com/evm-relayer/v1/transactions', (req, res, ctx) => {
+    success: rest.post('https://api.sandbox.immutable.com/relayer-mr/v1/transactions', (req, res, ctx) => {
       const body = req.body as RelayerTransactionRequest;
       switch (body.method) {
         case 'eth_sendTransaction': {

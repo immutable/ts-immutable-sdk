@@ -114,7 +114,7 @@ export class PassportConfiguration {
           this.imxPublicApiDomain = 'https://api.immutable.com';
           this.zkEvmRpcUrl = ''; // TODO: ID-785 Update once mainnet has been deployed
           this.zkEvmChainId = ''; // TODO: ID-785 Update once mainnet has been deployed
-          this.relayerUrl = 'https://api.immutable.com/evm-relayer';
+          this.relayerUrl = 'https://api.immutable.com/relayer-mr';
           this.multiRollupConfig = multiRollupConfig.getProduction();
           break;
         }
@@ -128,7 +128,7 @@ export class PassportConfiguration {
           this.imxPublicApiDomain = 'https://api.sandbox.immutable.com';
           this.zkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com';
           this.zkEvmChainId = 'eip155:13392';
-          this.relayerUrl = 'https://api.sandbox.immutable.com/evm-relayer';
+          this.relayerUrl = 'https://api.sandbox.immutable.com/relayer-mr';
           this.multiRollupConfig = multiRollupConfig.getSandbox();
           break;
         }
