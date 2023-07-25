@@ -26,7 +26,12 @@ import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContex
 import { ErrorView } from '../../views/error/ErrorView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
-  WidgetTheme, ConnectTargetLayer,
+  WidgetTheme,
+  ConnectTargetLayer,
+  addAccountsChangedListener,
+  addChainChangedListener,
+  removeAccountsChangedListener,
+  removeChainChangedListener,
 } from '../../lib';
 import { useInterval } from '../../lib/hooks/useInterval';
 
@@ -120,12 +125,12 @@ export function ConnectLoader({
       setWeb3Provider(new Web3Provider(web3Provider!.provider));
     }
 
-    (web3Provider.provider as any).on('chainChanged', handleChainChanged);
-    (web3Provider.provider as any).on('accountsChanged', handleAccountsChanged);
+    addAccountsChangedListener(web3Provider, handleAccountsChanged);
+    addChainChangedListener(web3Provider, handleChainChanged);
 
     return () => {
-      (web3Provider.provider as any).removeListener('chainChanged', handleChainChanged);
-      (web3Provider.provider as any).removeListener('accountsChanged', handleAccountsChanged);
+      removeAccountsChangedListener(web3Provider, handleAccountsChanged);
+      removeChainChangedListener(web3Provider, handleChainChanged);
     };
   }, [web3Provider]);
 
