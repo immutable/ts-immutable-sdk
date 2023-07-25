@@ -8,6 +8,7 @@ import {
 } from './types';
 import { openPopupCenter } from './popup';
 import { PassportConfiguration } from '../config';
+import { TransactionApprovalRequestChainTypeEnum } from "../../../../guardian/dist";
 
 const CONFIRMATION_WINDOW_TITLE = 'Confirm this transaction';
 const CONFIRMATION_WINDOW_HEIGHT = 380;
@@ -96,6 +97,7 @@ export default class ConfirmationScreen {
   startGuardianTransaction(
     transactionId: string,
     imxEtherAddress: string,
+    chainType: TransactionApprovalRequestChainTypeEnum,
   ): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
@@ -127,7 +129,16 @@ export default class ConfirmationScreen {
         return;
       }
       // eslint-disable-next-line max-len
-      this.confirmationWindow.location.href = `${this.config.passportDomain}/transaction-confirmation/transaction.html?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=starkex`;
+
+      let href = '';
+      if (chainType === TransactionApprovalRequestChainTypeEnum.Starkex) {
+        // eslint-disable-next-line max-len
+        href = `${this.config.passportDomain}/transaction-confirmation/transaction.html?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=starkex`;
+      } else {
+        // eslint-disable-next-line max-len
+        href = `${this.config.passportDomain}/transaction-confirmation/evm?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=starkex`;
+      }
+      this.confirmationWindow.location.href = href;
       // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
       const timer = setInterval(() => {
         if (this.confirmationWindow?.closed) {

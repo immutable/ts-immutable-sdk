@@ -1,6 +1,11 @@
 import * as guardian from '@imtbl/guardian';
+import { TransactionApprovalRequestChainTypeEnum, TransactionEvaluationResponse } from '@imtbl/guardian';
+import { BigNumber, ethers } from 'ethers';
 import { ConfirmationScreen } from '../confirmation';
 import { retryWithDelay } from '../network/retry';
+import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
+import { MetaTransaction } from '../zkEvm/types';
+import { UserZkEvm } from '../types';
 
 export type GuardianClientParams = {
   accessToken: string;
@@ -11,6 +16,34 @@ export type GuardianClientParams = {
 
 export type GuardianValidateParams = {
   payloadHash: string;
+};
+
+type GuardianEVMValidationParams = {
+  chainId: string,
+  nonce: number,
+  user: UserZkEvm,
+  metaTransactions: MetaTransaction[],
+};
+
+const convertBigNumberishToNumber = (value: ethers.BigNumberish): number => BigNumber.from(value).toNumber();
+
+const transformGuardianTransactions = (txs: MetaTransaction[]): guardian.MetaTransaction[] => {
+  try {
+    return txs.map((t) => ({
+      delegateCall: t.delegateCall === true,
+      revertOnError: t.revertOnError === true,
+      gasLimit: t.gasLimit ? convertBigNumberishToNumber(t.gasLimit).toString() : '0',
+      target: t.to ?? ethers.constants.AddressZero,
+      value: t.value ? convertBigNumberishToNumber(t.value).toString() : '0',
+      data: t.data ? t.data.toString() : '0x00',
+    }));
+  } catch (error) {
+    const errorMessage = (error instanceof Error) ? error.message : String(error);
+    throw new JsonRpcError(
+      RpcErrorCode.INVALID_PARAMS,
+      `Transaction failed to parsing: ${errorMessage}`,
+    );
+  }
 };
 
 export default class GuardianClient {
@@ -63,6 +96,68 @@ export default class GuardianClient {
       const confirmationResult = await this.confirmationScreen.startGuardianTransaction(
         payloadHash,
         this.imxEtherAddress,
+        TransactionApprovalRequestChainTypeEnum.Starkex,
+      );
+
+      if (!confirmationResult.confirmed) {
+        throw new Error('Transaction rejected by user');
+      }
+    } else {
+      this.confirmationScreen.closeWindow();
+    }
+  }
+
+  private async evaluateEVTransaction({
+    chainId,
+    nonce,
+    user,
+    metaTransactions,
+  }: GuardianEVMValidationParams): Promise<TransactionEvaluationResponse> {
+    const headers = { Authorization: `Bearer ${user.accessToken}` };
+    const guardianTransactions = transformGuardianTransactions(
+      metaTransactions,
+    );
+    try {
+      return await this.transactionAPI.evaluateTransaction({
+        id: 'evm',
+        transactionEvaluationRequest: {
+          chainType: 'evm',
+          chainId,
+          transactionData: {
+            nonce,
+            userAddress: user.zkEvm.ethAddress,
+            metaTransactions: guardianTransactions,
+          },
+        },
+      }, { headers });
+    } catch (error) {
+      const errorMessage = (error instanceof Error) ? error.message : String(error);
+      throw new JsonRpcError(
+        RpcErrorCode.INTERNAL_ERROR,
+        `Transaction failed to validate with error: ${errorMessage}`,
+      );
+    }
+  }
+
+  public async validateEVMTransaction({
+    chainId,
+    nonce,
+    user,
+    metaTransactions,
+  }: GuardianEVMValidationParams): Promise<TransactionEvaluationResponse> {
+    const transactionEvaluationResponse = await this.evaluateEVTransaction({
+      chainId,
+      nonce,
+      user,
+      metaTransactions,
+    });
+
+    const { confirmationRequired, transactionId } = transactionEvaluationResponse.data;
+    if (confirmationRequired) {
+      const confirmationResult = await this.confirmationScreen.startGuardianTransaction(
+        transactionId,
+        this.imxEtherAddress,
+        TransactionApprovalRequestChainTypeEnum.Evm,
       );
 
       if (!confirmationResult.confirmed) {
