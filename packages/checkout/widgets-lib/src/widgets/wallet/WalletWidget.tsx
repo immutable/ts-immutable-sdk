@@ -3,7 +3,9 @@ import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
   Checkout,
 } from '@imtbl/checkout-sdk';
-import { useEffect, useMemo, useReducer } from 'react';
+import {
+  useEffect, useMemo, useReducer, useState,
+} from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
@@ -30,6 +32,7 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { CoinInfo } from './views/CoinInfo';
 import { TopUpView } from '../../views/top-up/TopUpView';
+import { text } from '../../resources/text/textConfig';
 
 export interface WalletWidgetProps {
   config: StrongCheckoutWidgetsConfig,
@@ -38,6 +41,8 @@ export interface WalletWidgetProps {
 
 export function WalletWidget(props: WalletWidgetProps) {
   const { config, web3Provider } = props;
+  const errorActionText = text.views[SharedViews.ERROR_VIEW].actionText;
+  const loadingText = text.views[SharedViews.LOADING_VIEW].text;
 
   const {
     environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
@@ -61,7 +66,8 @@ export function WalletWidget(props: WalletWidgetProps) {
     [walletState, walletDispatch],
   );
 
-  /** Set the web3Provider passed in from ConnectLoader into WalletState */
+  const [runInitialiser, setRunInitialiser] = useState(true);
+
   useEffect(() => {
     if (web3Provider) {
       walletDispatch({
@@ -98,38 +104,63 @@ export function WalletWidget(props: WalletWidgetProps) {
 
   useEffect(() => {
     (async () => {
-      if (!checkout || !provider) return;
+      if (!checkout || !web3Provider || !runInitialiser) return;
 
-      const network = await checkout.getNetworkInfo({
-        provider,
-      });
+      try {
+        const network = await checkout.getNetworkInfo({
+          provider: web3Provider,
+        });
 
-      /* If the provider's network is not supported, return out of this and let the
-      connect loader handle the switch network functionality */
-      if (!network.isSupported) {
-        return;
+        /* If the provider's network is not supported, return out of this and let the
+        connect loader handle the switch network functionality */
+        if (!network.isSupported) {
+          return;
+        }
+
+        walletDispatch({
+          payload: {
+            type: WalletActions.SET_PROVIDER,
+            provider: web3Provider,
+          },
+        });
+
+        walletDispatch({
+          payload: {
+            type: WalletActions.SET_NETWORK,
+            network,
+          },
+        });
+
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: { type: WalletWidgetViews.WALLET_BALANCES },
+          },
+        });
+      } catch (error: any) {
+        viewDispatch({
+          payload: {
+            type: ViewActions.UPDATE_VIEW,
+            view: {
+              type: SharedViews.ERROR_VIEW,
+              error,
+            },
+          },
+        });
+      } finally {
+        setRunInitialiser(false);
       }
-
-      walletDispatch({
-        payload: {
-          type: WalletActions.SET_NETWORK,
-          network,
-        },
-      });
-
-      viewDispatch({
-        payload: {
-          type: ViewActions.UPDATE_VIEW,
-          view: { type: WalletWidgetViews.WALLET_BALANCES },
-        },
-      });
     })();
-  }, [checkout, provider]);
+  }, [checkout, web3Provider, runInitialiser]);
 
   const errorAction = () => {
-    // TODO: please remove or if necessary keep the eslint ignore
-    // eslint-disable-next-line no-console
-    console.log('Something went wrong');
+    viewDispatch({
+      payload: {
+        type: ViewActions.UPDATE_VIEW,
+        view: { type: WalletWidgetViews.WALLET_BALANCES },
+      },
+    });
+    setRunInitialiser(true);
   };
 
   return (
@@ -138,7 +169,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         <CryptoFiatProvider environment={environment}>
           <WalletContext.Provider value={walletReducerValues}>
             {viewState.view.type === SharedViews.LOADING_VIEW && (
-            <LoadingView loadingText="Loading" />
+            <LoadingView loadingText={loadingText} />
             )}
             {viewState.view.type === WalletWidgetViews.WALLET_BALANCES && (
             <WalletBalances />
@@ -149,7 +180,7 @@ export function WalletWidget(props: WalletWidgetProps) {
             )}
             {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
-              actionText="Try again"
+              actionText={errorActionText}
               onActionClick={errorAction}
               onCloseClick={sendWalletWidgetCloseEvent}
             />
