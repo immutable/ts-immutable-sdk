@@ -114,7 +114,7 @@ export class PassportConfiguration {
           this.imxPublicApiDomain = 'https://api.immutable.com';
           this.zkEvmRpcUrl = ''; // TODO: ID-785 Update once mainnet has been deployed
           this.zkEvmChainId = ''; // TODO: ID-785 Update once mainnet has been deployed
-          this.relayerUrl = 'https://relayer.immutable.com'; // TODO: ID-784 Update once we have added Relayer URL to config
+          this.relayerUrl = 'https://api.immutable.com/relayer-mr';
           this.multiRollupConfig = multiRollupConfig.getProduction();
           break;
         }
@@ -128,7 +128,7 @@ export class PassportConfiguration {
           this.imxPublicApiDomain = 'https://api.sandbox.immutable.com';
           this.zkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com';
           this.zkEvmChainId = 'eip155:13392';
-          this.relayerUrl = 'https://evm-relayer.sandbox.imtbl.com'; // TODO: ID-784 Update once we have added Relayer URL to config
+          this.relayerUrl = 'https://api.sandbox.immutable.com/relayer-mr';
           this.multiRollupConfig = multiRollupConfig.getSandbox();
           break;
         }
