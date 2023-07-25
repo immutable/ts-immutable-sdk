@@ -59,6 +59,7 @@ describe('order', () => {
           fees: undefined,
           expiration_timestamp,
           user: mockUserImx.imx.ethAddress,
+          split_fees: true,
         },
       };
 

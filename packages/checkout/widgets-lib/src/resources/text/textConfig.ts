@@ -306,5 +306,12 @@ export const text = {
         cancel: 'Dismiss',
       },
     },
+    unableToSwap: {
+      heading: 'Unable to swap this coin',
+      body: "This coin pairing isn't available to swap right now. Try another selection.",
+      buttons: {
+        cancel: 'Dismiss',
+      },
+    },
   },
 };

@@ -36,8 +36,8 @@ export const SUPPORTED_BRIDGES_FOR_ENVIRONMENT: {
  */
 const CONTRACTS_FOR_BRIDGE = new Map<BridgeInstance, BridgeContracts>()
   .set(ETH_SEPOLIA_TO_ZKEVM_DEVNET, {
-    rootChainERC20Predicate: '0x15Dd735de418B6d290727aed82cC25F8966dE4A5',
-    rootChainStateSender: '0xb3Bac13799dAca9D9eC9307303a65fA1218b4724',
+    rootChainERC20Predicate: '0xf0b3435411A74F1aeCBD0fd6D53a90D5227fEeba',
+    rootChainStateSender: '0x868097dbAcfD431F441d09D0e4D3B5eD3182E597',
     childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
     childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
