@@ -149,6 +149,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     });
   });
 
+  describe('Swap with single pool and default slippage tolerance', () => {});
+
   describe('Swap with single pool and default slippage tolerance', () => {
     it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
