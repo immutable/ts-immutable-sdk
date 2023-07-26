@@ -6,11 +6,17 @@ import { mount } from 'cypress/react18';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { BigNumber } from 'ethers';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 import { WalletBalances } from './WalletBalances';
 import { WalletContext, WalletState } from '../context/WalletContext';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { WalletWidgetTestComponent } from '../test-components/WalletWidgetTestComponent';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
+import { ConnectionStatus } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  ConnectLoaderTestComponent,
+} from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 
 describe('WalletBalances', () => {
   beforeEach(() => {
@@ -18,18 +24,18 @@ describe('WalletBalances', () => {
     cyIntercept();
   });
 
-  // const checkout = new Checkout({
-  //   baseConfig: { environment: Environment.SANDBOX },
-  // });
+  const connectLoaderState = {
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    }),
+    provider: {
+      getSigner: () => ({
+        getAddress: async () => Promise.resolve(''),
+      }),
+    } as Web3Provider,
+    connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+  };
 
-  // const provider = {
-  //   getSigner: () => ({
-  //     getAddress: async () => Promise.resolve(''),
-  //   }),
-  //   provider: {
-  //     request: async () => null,
-  //   },
-  // } as unknown as Web3Provider;
   const baseWalletState: WalletState = {
     network: {
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
@@ -74,9 +80,13 @@ describe('WalletBalances', () => {
         });
 
       mount(
-        <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
-          <WalletBalances />
-        </WalletWidgetTestComponent>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
+            <WalletBalances />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('balance-item-IMX').should('exist');
@@ -89,9 +99,13 @@ describe('WalletBalances', () => {
         .rejects({});
 
       mount(
-        <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
-          <WalletBalances />
-        </WalletWidgetTestComponent>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent initialStateOverride={baseWalletState}>
+            <WalletBalances />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('no-tokens-found').should('exist');
@@ -122,11 +136,15 @@ describe('WalletBalances', () => {
       };
       mount(
         <BiomeCombinedProviders>
-          <WalletContext.Provider
-            value={{ walletState, walletDispatch: () => {} }}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletContext.Provider>
+            <WalletContext.Provider
+              value={{ walletState, walletDispatch: () => {} }}
+            >
+              <WalletBalances />
+            </WalletContext.Provider>
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('token-menu').click();
@@ -170,11 +188,15 @@ describe('WalletBalances', () => {
       };
       mount(
         <BiomeCombinedProviders>
-          <WalletContext.Provider
-            value={{ walletState, walletDispatch: () => {} }}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletContext.Provider>
+            <WalletContext.Provider
+              value={{ walletState, walletDispatch: () => {} }}
+            >
+              <WalletBalances />
+            </WalletContext.Provider>
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('token-menu').click();
@@ -220,11 +242,15 @@ describe('WalletBalances', () => {
       };
       mount(
         <BiomeCombinedProviders>
-          <WalletContext.Provider
-            value={{ walletState, walletDispatch: () => {} }}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletContext.Provider>
+            <WalletContext.Provider
+              value={{ walletState, walletDispatch: () => {} }}
+            >
+              <WalletBalances />
+            </WalletContext.Provider>
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('token-menu').click();
@@ -271,11 +297,15 @@ describe('WalletBalances', () => {
         };
         mount(
           <BiomeCombinedProviders>
-            <WalletContext.Provider
-              value={{ walletState: testWalletState, walletDispatch: () => {} }}
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
             >
-              <WalletBalances />
-            </WalletContext.Provider>
+              <WalletContext.Provider
+                value={{ walletState: testWalletState, walletDispatch: () => {} }}
+              >
+                <WalletBalances />
+              </WalletContext.Provider>
+            </ConnectLoaderTestComponent>
           </BiomeCombinedProviders>,
         );
         cySmartGet('add-coins').should('exist');
@@ -293,11 +323,15 @@ describe('WalletBalances', () => {
       };
       mount(
         <BiomeCombinedProviders>
-          <WalletContext.Provider
-            value={{ walletState: testWalletState, walletDispatch: () => {} }}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletContext.Provider>
+            <WalletContext.Provider
+              value={{ walletState: testWalletState, walletDispatch: () => {} }}
+            >
+              <WalletBalances />
+            </WalletContext.Provider>
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('add-coins').should('not.exist');
@@ -321,11 +355,15 @@ describe('WalletBalances', () => {
       };
       mount(
         <BiomeCombinedProviders>
-          <WalletContext.Provider
-            value={{ walletState, walletDispatch: () => {} }}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <WalletBalances />
-          </WalletContext.Provider>
+            <WalletContext.Provider
+              value={{ walletState, walletDispatch: () => {} }}
+            >
+              <WalletBalances />
+            </WalletContext.Provider>
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
       cySmartGet('add-coins').should('not.exist');

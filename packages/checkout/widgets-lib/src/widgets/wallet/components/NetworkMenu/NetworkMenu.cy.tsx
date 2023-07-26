@@ -3,15 +3,29 @@ import React from 'react';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { cy, it } from 'local-cypress';
 import {
-  Checkout, WalletProviderName, TokenInfo, ChainId,
+  Checkout, WalletProviderName, TokenInfo, ChainId, ChainName,
 } from '@imtbl/checkout-sdk';
+import { Web3Provider } from '@ethersproject/providers';
+import { Environment } from '@imtbl/config';
 import { WalletContext, WalletState } from '../../context/WalletContext';
 import { text } from '../../../../resources/text/textConfig';
 import { cySmartGet } from '../../../../lib/testUtils';
 import { NetworkMenu } from './NetworkMenu';
 import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
+import { ConnectionStatus } from '../../../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  ConnectLoaderTestComponent,
+} from '../../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 
 describe('Network Menu', () => {
+  const connectLoaderState = {
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    }),
+    provider: {} as Web3Provider,
+    connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+  };
+
   beforeEach(() => {
     cy.stub(Checkout.prototype, 'getNetworkAllowList')
       .as('getNetworkAllowListStub')
@@ -28,10 +42,15 @@ describe('Network Menu', () => {
         ],
       });
   });
+
   it('should have heading', () => {
     mount(
       <BiomeCombinedProviders>
-        <NetworkMenu setBalancesLoading={() => {}} />
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <NetworkMenu setBalancesLoading={() => {}} />
+        </ConnectLoaderTestComponent>
       </BiomeCombinedProviders>,
     );
 
@@ -49,11 +68,15 @@ describe('Network Menu', () => {
     };
     mount(
       <BiomeCombinedProviders>
-        <WalletContext.Provider
-          value={{ walletState, walletDispatch: () => {} }}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
         >
-          <NetworkMenu setBalancesLoading={() => {}} />
-        </WalletContext.Provider>
+          <WalletContext.Provider
+            value={{ walletState, walletDispatch: () => {} }}
+          >
+            <NetworkMenu setBalancesLoading={() => {}} />
+          </WalletContext.Provider>
+        </ConnectLoaderTestComponent>
       </BiomeCombinedProviders>,
     );
     cySmartGet('@getNetworkAllowListStub').should('have.been.called');
@@ -67,7 +90,7 @@ describe('Network Menu', () => {
       .resolves({
         network: {
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-          name: 'ImmutablezkEVMTestnet',
+          name: ChainName.IMTBL_ZKEVM_TESTNET,
           nativeCurrency: {
             name: 'IMX',
             symbol: 'IMX',
@@ -89,11 +112,15 @@ describe('Network Menu', () => {
     };
     mount(
       <BiomeCombinedProviders>
-        <WalletContext.Provider
-          value={{ walletState, walletDispatch: () => {} }}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
         >
-          <NetworkMenu setBalancesLoading={() => {}} />
-        </WalletContext.Provider>
+          <WalletContext.Provider
+            value={{ walletState, walletDispatch: () => {} }}
+          >
+            <NetworkMenu setBalancesLoading={() => {}} />
+          </WalletContext.Provider>
+        </ConnectLoaderTestComponent>
       </BiomeCombinedProviders>,
     );
 
