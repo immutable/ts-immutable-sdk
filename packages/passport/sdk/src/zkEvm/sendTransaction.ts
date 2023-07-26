@@ -84,7 +84,7 @@ export const sendTransaction = async ({
 
   await guardianClient.validateEVMTransaction({
     chainId: config.zkEvmChainId,
-    nonce,
+    nonce: converBigNumberishToNumber(nonce),
     user,
     metaTransactions: [metaTransaction, feeMetaTransaction],
   });
