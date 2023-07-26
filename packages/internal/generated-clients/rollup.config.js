@@ -9,8 +9,6 @@ export default {
     format: 'es',
   },
   plugins: [
-    typescript(),
-    json(),
-    resolve({ browser: true, preferBuiltins: true }),
+    typescript()
   ],
 };
