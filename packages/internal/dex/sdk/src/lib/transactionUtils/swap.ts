@@ -82,12 +82,14 @@ export function createSwapParametersWithFees(
 
   console.log({ params: decodedTopLevelParams });
 
-  const calldata = decodedTopLevelParams[1][0];
+  const calldata = decodedTopLevelParams[0];
+  console.log({ calldata: calldata });
   const calldataParams = ethers.utils.hexDataSlice(calldata, 4);
   const decodedFunctionCallParams = ethers.utils.defaultAbiCoder.decode(
     exactInputOutputSingleParamTypes,
     calldataParams,
   );
+  console.log({ decodedFunctionCallParams: decodedFunctionCallParams });
 
   const params: IV3SwapRouter.ExactInputSingleParamsStruct = {
     tokenIn: decodedFunctionCallParams[0],
