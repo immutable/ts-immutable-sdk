@@ -70,6 +70,7 @@ export function createSwapParametersWithFees(
 
   // TODO: This is only for ExactInputSingle/ExactOutputSingle at the moment
   const tx = createSwapParameters(trade, fromAddress, slippage, deadline);
+  console.log({swapCallData: tx.calldata})
   // Remove the first 100 bytes of the calldata for the swap
   // - 4 bytes for the function selector
   // - 32 bytes for the deadline
@@ -83,6 +84,8 @@ export function createSwapParametersWithFees(
   );
 
   const calldata = decodedTopLevelParams[0];
+
+  // Skip the first 4 bytes of the calldata for the swap and omit the 0x from the string
   const swapParamBytes = ethers.utils.hexDataSlice(calldata, 4).substring(2);
 
   const secondaryFeeContract = SecondaryFee__factory.createInterface();
@@ -90,9 +93,9 @@ export function createSwapParametersWithFees(
   // eslint-disable-next-line
   const secondaryFeeParamBytes = secondaryFeeContract._encodeParams([ParamType.from('tuple(address,uint16)[]')], [secondaryFeeValues]).substring(2);
   // eslint-disable-next-line
-  const exactInputSingleFunctionSignature = ethers.utils.id('exactInputSingleWithServiceFee((address,uint16)[],(address,address,uint24,address,uint256,uint256,uint160))').substring(0, 10);
+  const exactInputSingleWithServiceFeeFunctionSignature = ethers.utils.id('exactInputSingleWithServiceFee((address,uint16)[],(address,address,uint24,address,uint256,uint256,uint160))').substring(0, 10);
   // eslint-disable-next-line
-  const paramsBytes = exactInputSingleFunctionSignature + secondaryFeeParamBytes + swapParamBytes;
+  const paramsBytes = exactInputSingleWithServiceFeeFunctionSignature + secondaryFeeParamBytes + swapParamBytes;
   console.log({ paramsBytes });
 
 

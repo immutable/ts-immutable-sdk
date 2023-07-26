@@ -19,6 +19,7 @@ import {
   TEST_TRANSACTION_GAS_USAGE,
 } from './utils/testUtils';
 import { Router } from './lib';
+import { Environment } from '@imtbl/config';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -165,14 +166,12 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
-      const zkONE = '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c';
-      const zkCATS = '0x1836E16b2036088490C2CFe4d11970Fc8e5884C4';
+      const exchange = new Exchange({ baseConfig: { environment: Environment.SANDBOX }, chainId: 13372 });
 
       const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
         '0xa6C368164Eb270C31592c1830Ed25c2bf5D34BAE',
-        zkONE,
-        zkCATS,
+        params.inputToken,
+        params.outputToken,
         1000000000000000000n,
       );
 
