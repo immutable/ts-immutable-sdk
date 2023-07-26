@@ -67,7 +67,6 @@ describe('WalletWidget tests', () => {
     mount(
       <WalletWidget
         config={widgetConfig}
-        web3Provider={mockProvider}
       />,
     );
 
@@ -230,7 +229,6 @@ describe('WalletWidget tests', () => {
         mount(
           <WalletWidget
             config={widgetConfig}
-            web3Provider={mockProvider}
           />,
         );
 
@@ -266,7 +264,6 @@ describe('WalletWidget tests', () => {
         mount(
           <WalletWidget
             config={widgetConfig}
-            web3Provider={mockProvider}
           />,
         );
 
@@ -305,7 +302,6 @@ describe('WalletWidget tests', () => {
         mount(
           <WalletWidget
             config={widgetConfig}
-            web3Provider={mockProvider}
           />,
         );
 
@@ -327,7 +323,6 @@ describe('WalletWidget tests', () => {
         mount(
           <WalletWidget
             config={widgetConfig}
-            web3Provider={mockProvider}
           />,
         );
         cySmartGet('settings-button').click();
@@ -353,7 +348,6 @@ describe('WalletWidget tests', () => {
         mount(
           <WalletWidget
             config={widgetConfig}
-            web3Provider={mockProvider}
           />,
         );
         cySmartGet('settings-button').click();
@@ -379,7 +373,6 @@ describe('WalletWidget tests', () => {
         mount(
           <WalletWidget
             config={widgetConfig}
-            web3Provider={mockProvider}
           />,
         );
 

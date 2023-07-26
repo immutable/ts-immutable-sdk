@@ -59,7 +59,9 @@ export function ConnectLoader({
     connectLoaderReducer,
     initialConnectLoaderState,
   );
-  const { connectionStatus, deepLink } = connectLoaderState;
+  const {
+    connectionStatus, deepLink, checkout, provider,
+  } = connectLoaderState;
   const { targetLayer, walletProvider, allowedChains } = params;
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
@@ -68,7 +70,6 @@ export function ConnectLoader({
     : onDarkBase;
 
   const [hasWeb3Provider, setHasWeb3Provider] = useState<boolean | undefined>();
-  const [web3Provider, setWeb3Provider] = useState<Web3Provider | undefined>(params.web3Provider);
 
   const [attempts, setAttempts] = useState<number>(0);
 
@@ -80,7 +81,13 @@ export function ConnectLoader({
     if (params.web3Provider) {
       const isWeb3Provider = Checkout.isWeb3Provider(params.web3Provider);
       if (isWeb3Provider) {
-        setWeb3Provider(params.web3Provider);
+        connectLoaderDispatch({
+          payload: {
+            type: ConnectLoaderActions.SET_PROVIDER,
+            provider: params.web3Provider,
+          },
+        });
+
         setHasWeb3Provider(true);
         clearInterval();
         return;
@@ -97,12 +104,21 @@ export function ConnectLoader({
   };
   clearInterval = useInterval(() => checkIfWeb3ProviderSet(), 10);
 
+  useEffect(() => {
+    connectLoaderDispatch({
+      payload: {
+        type: ConnectLoaderActions.SET_CHECKOUT,
+        checkout: new Checkout({ baseConfig: { environment: widgetConfig.environment } }),
+      },
+    });
+  }, [widgetConfig]);
+
   /** Handle wallet events as per EIP-1193 spec
    * - listen for account changed manually in wallet
    * - listen for network/chain changed manually in wallet
    */
   useEffect(() => {
-    if (!web3Provider) return () => {};
+    if (!provider) return () => {};
 
     function handleAccountsChanged(e: string[]) {
       if (e.length === 0) {
@@ -116,23 +132,33 @@ export function ConnectLoader({
         });
       } else {
         // trigger a re-load of the connectLoader so that the widget re loads with a new provider
-        setWeb3Provider(new Web3Provider(web3Provider!.provider));
+        connectLoaderDispatch({
+          payload: {
+            type: ConnectLoaderActions.SET_PROVIDER,
+            provider: new Web3Provider(provider!.provider),
+          },
+        });
       }
     }
 
     function handleChainChanged() {
       // trigger a re-load of the connectLoader so that the widget re loads with a new provider
-      setWeb3Provider(new Web3Provider(web3Provider!.provider));
+      connectLoaderDispatch({
+        payload: {
+          type: ConnectLoaderActions.SET_PROVIDER,
+          provider: new Web3Provider(provider!.provider),
+        },
+      });
     }
 
-    addAccountsChangedListener(web3Provider, handleAccountsChanged);
-    addChainChangedListener(web3Provider, handleChainChanged);
+    addAccountsChangedListener(provider, handleAccountsChanged);
+    addChainChangedListener(provider, handleChainChanged);
 
     return () => {
-      removeAccountsChangedListener(web3Provider, handleAccountsChanged);
-      removeChainChangedListener(web3Provider, handleChainChanged);
+      removeAccountsChangedListener(provider, handleAccountsChanged);
+      removeChainChangedListener(provider, handleChainChanged);
     };
-  }, [web3Provider]);
+  }, [provider]);
 
   useEffect(() => {
     if (window === undefined) {
@@ -143,7 +169,8 @@ export function ConnectLoader({
     if (hasWeb3Provider === undefined) return () => {};
 
     (async () => {
-      if (!walletProvider && !web3Provider) {
+      if (!checkout) return;
+      if (!walletProvider && !provider) {
         connectLoaderDispatch({
           payload: {
             type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -154,18 +181,21 @@ export function ConnectLoader({
         return;
       }
 
-      const checkout = new Checkout({ baseConfig: { environment: widgetConfig.environment } });
-
       try {
-        if (!web3Provider && walletProvider) {
-          const { provider } = await checkout.createProvider({
+        if (!provider && walletProvider) {
+          const createProviderResult = await checkout.createProvider({
             walletProvider,
           });
-          setWeb3Provider(provider);
+          connectLoaderDispatch({
+            payload: {
+              type: ConnectLoaderActions.SET_PROVIDER,
+              provider: createProviderResult.provider,
+            },
+          });
           return;
         }
 
-        if (!web3Provider) {
+        if (!provider) {
           connectLoaderDispatch({
             payload: {
               type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
@@ -179,7 +209,7 @@ export function ConnectLoader({
         // at this point web3Provider has been either created or parsed in
 
         const { isConnected } = await checkout.checkIsWalletConnected({
-          provider: web3Provider,
+          provider,
         });
 
         if (!isConnected) {
@@ -193,7 +223,7 @@ export function ConnectLoader({
           return;
         }
 
-        const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider } as GetNetworkParams);
+        const currentNetworkInfo = await checkout.getNetworkInfo({ provider } as GetNetworkParams);
 
         // if unsupported network or current network is not in the allowed chains
         if (!currentNetworkInfo.isSupported || !allowedChains.includes(currentNetworkInfo.chainId)) {
@@ -228,7 +258,12 @@ export function ConnectLoader({
         case ConnectEventType.SUCCESS: {
           const eventData = event.detail.data as ConnectionSuccess;
 
-          setWeb3Provider(eventData.provider);
+          connectLoaderDispatch({
+            payload: {
+              type: ConnectLoaderActions.SET_PROVIDER,
+              provider: eventData.provider,
+            },
+          });
 
           connectLoaderDispatch({
             payload: {
@@ -269,20 +304,15 @@ export function ConnectLoader({
         handleConnectEvent,
       );
     };
-  }, [widgetConfig.environment, web3Provider, walletProvider, hasWeb3Provider]);
+  }, [checkout, provider, walletProvider, hasWeb3Provider]);
 
   const childrenWithProvider = useCallback(
     (childrenWithoutProvider:React.ReactNode) =>
       // eslint-disable-next-line
       React.Children.map(childrenWithoutProvider, (child) => 
         // eslint-disable-next-line
-        React.cloneElement(child as React.ReactElement, { web3Provider })),
-    [web3Provider],
-  );
-
-  const getProvider = useCallback(
-    () => web3Provider,
-    [web3Provider],
+        React.cloneElement(child as React.ReactElement, { web3Provider: provider })),
+    [provider],
   );
 
   return (
@@ -292,26 +322,26 @@ export function ConnectLoader({
           <LoadingView loadingText="Connecting" />
         </BiomeCombinedProviders>
       )}
-      {(connectionStatus === ConnectionStatus.NOT_CONNECTED_NO_PROVIDER
-        || connectionStatus === ConnectionStatus.NOT_CONNECTED
-        || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
-        <ConnectLoaderContext.Provider
+      <ConnectLoaderContext.Provider
           // TODO: The object passed as the value prop to the Context provider (at line 131) changes every render.
           // To fix this consider wrapping it in a useMemo hook.
           // eslint-disable-next-line react/jsx-no-constructed-context-values
-          value={{ connectLoaderState, connectLoaderDispatch }}
-        >
+        value={{ connectLoaderState, connectLoaderDispatch }}
+      >
+        {(connectionStatus === ConnectionStatus.NOT_CONNECTED_NO_PROVIDER
+        || connectionStatus === ConnectionStatus.NOT_CONNECTED
+        || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
           <ConnectWidget
             config={widgetConfig}
-            params={{ ...params, targetLayer: networkToSwitchTo, web3Provider: getProvider() }}
+            params={{ ...params, targetLayer: networkToSwitchTo, web3Provider: provider }}
             deepLink={deepLink}
             sendCloseEventOverride={closeEvent}
           />
-        </ConnectLoaderContext.Provider>
-      )}
-      {connectionStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (
-        childrenWithProvider(children)
-      )}
+        )}
+        {connectionStatus === ConnectionStatus.CONNECTED_WITH_NETWORK && (
+          childrenWithProvider(children)
+        )}
+      </ConnectLoaderContext.Provider>
       {connectionStatus === ConnectionStatus.ERROR && (
         <BiomeCombinedProviders theme={{ base: biomeTheme }}>
           <ErrorView

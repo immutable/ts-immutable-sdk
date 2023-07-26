@@ -4,8 +4,6 @@ import {
 import { describe, it, cy } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BiomeCombinedProviders } from '@biom3/react';
-import { Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
 import { BigNumber } from 'ethers';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { WalletBalances } from './WalletBalances';
@@ -20,27 +18,25 @@ describe('WalletBalances', () => {
     cyIntercept();
   });
 
-  const checkout = new Checkout({
-    baseConfig: { environment: Environment.SANDBOX },
-  });
+  // const checkout = new Checkout({
+  //   baseConfig: { environment: Environment.SANDBOX },
+  // });
 
-  const provider = {
-    getSigner: () => ({
-      getAddress: async () => Promise.resolve(''),
-    }),
-    provider: {
-      request: async () => null,
-    },
-  } as unknown as Web3Provider;
+  // const provider = {
+  //   getSigner: () => ({
+  //     getAddress: async () => Promise.resolve(''),
+  //   }),
+  //   provider: {
+  //     request: async () => null,
+  //   },
+  // } as unknown as Web3Provider;
   const baseWalletState: WalletState = {
-    checkout,
     network: {
       chainId: ChainId.IMTBL_ZKEVM_TESTNET,
       name: ChainName.IMTBL_ZKEVM_TESTNET,
       nativeCurrency: {} as unknown as TokenInfo,
       isSupported: true,
     },
-    provider,
     walletProvider: WalletProviderName.METAMASK,
     tokenBalances: [],
     supportedTopUps: null,
@@ -105,14 +101,12 @@ describe('WalletBalances', () => {
   describe('move coins gas check', () => {
     it('should show not enough gas drawer when trying to bridge to L2 with 0 eth balance', () => {
       const walletState: WalletState = {
-        checkout,
         network: {
           chainId: ChainId.SEPOLIA,
           name: 'Sepolia',
           nativeCurrency: {} as unknown as TokenInfo,
           isSupported: true,
         },
-        provider,
         walletProvider: WalletProviderName.METAMASK,
         tokenBalances: [
           {
@@ -155,14 +149,12 @@ describe('WalletBalances', () => {
         });
 
       const walletState: WalletState = {
-        checkout,
         network: {
           chainId: ChainId.SEPOLIA,
           name: 'Sepolia',
           nativeCurrency: {} as unknown as TokenInfo,
           isSupported: true,
         },
-        provider,
         walletProvider: WalletProviderName.METAMASK,
         tokenBalances: [
           {
@@ -206,14 +198,12 @@ describe('WalletBalances', () => {
         });
 
       const walletState: WalletState = {
-        checkout,
         network: {
           chainId: ChainId.SEPOLIA,
           name: 'Sepolia',
           nativeCurrency: {} as unknown as TokenInfo,
           isSupported: true,
         },
-        provider,
         walletProvider: WalletProviderName.METAMASK,
         tokenBalances: [
           {
@@ -315,14 +305,12 @@ describe('WalletBalances', () => {
 
     it('should NOT show add coins button on Sepolia', () => {
       const walletState: WalletState = {
-        checkout,
         network: {
           chainId: ChainId.SEPOLIA,
           name: 'Sepolia',
           nativeCurrency: {} as unknown as TokenInfo,
           isSupported: true,
         },
-        provider,
         walletProvider: WalletProviderName.METAMASK,
         tokenBalances: [],
         supportedTopUps: {

@@ -1,7 +1,6 @@
 import React from 'react';
 import { mount } from 'cypress/react18';
-import { ChainId, Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
+import { ChainId, WalletProviderName } from '@imtbl/checkout-sdk';
 import { cy } from 'local-cypress';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { WalletState } from '../../context/WalletContext';
@@ -13,11 +12,7 @@ import { orchestrationEvents } from '../../../../lib/orchestrationEvents';
 
 describe('BalanceItem', () => {
   const baseWalletState: WalletState = {
-    checkout: new Checkout({
-      baseConfig: { environment: Environment.SANDBOX },
-    }),
     network: null,
-    provider: null,
     walletProvider: WalletProviderName.METAMASK,
     tokenBalances: [],
     supportedTopUps: null,

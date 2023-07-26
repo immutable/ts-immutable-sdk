@@ -1,10 +1,8 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
-  Checkout,
-} from '@imtbl/checkout-sdk';
-import { useEffect, useMemo, useReducer } from 'react';
-import { Web3Provider } from '@ethersproject/providers';
+  useContext, useEffect, useMemo, useReducer,
+} from 'react';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
   initialWalletState,
@@ -30,14 +28,14 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { CoinInfo } from './views/CoinInfo';
 import { TopUpView } from '../../views/top-up/TopUpView';
+import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 
 export interface WalletWidgetProps {
   config: StrongCheckoutWidgetsConfig,
-  web3Provider?: Web3Provider
 }
 
 export function WalletWidget(props: WalletWidgetProps) {
-  const { config, web3Provider } = props;
+  const { config } = props;
 
   const {
     environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
@@ -52,6 +50,9 @@ export function WalletWidget(props: WalletWidgetProps) {
     [viewState, viewDispatch],
   );
 
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
+
   const [walletState, walletDispatch] = useReducer(
     walletReducer,
     initialWalletState,
@@ -61,29 +62,8 @@ export function WalletWidget(props: WalletWidgetProps) {
     [walletState, walletDispatch],
   );
 
-  /** Set the web3Provider passed in from ConnectLoader into WalletState */
+  /* Set Config into WalletState */
   useEffect(() => {
-    if (web3Provider) {
-      walletDispatch({
-        payload: {
-          type: WalletActions.SET_PROVIDER,
-          provider: web3Provider,
-        },
-      });
-    }
-  }, [web3Provider]);
-
-  const { checkout, provider } = walletState;
-
-  /* Set Checkout and config into WalletState */
-  useEffect(() => {
-    walletDispatch({
-      payload: {
-        type: WalletActions.SET_CHECKOUT,
-        checkout: new Checkout({ baseConfig: { environment } }),
-      },
-    });
-
     walletDispatch({
       payload: {
         type: WalletActions.SET_SUPPORTED_TOP_UPS,

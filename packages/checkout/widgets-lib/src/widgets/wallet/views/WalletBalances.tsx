@@ -37,16 +37,17 @@ import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 import { isNativeToken } from '../../../lib/utils';
 import { DEFAULT_TOKEN_DECIMALS, ETH_TOKEN_SYMBOL, ZERO_BALANCE_STRING } from '../../../lib';
 import { orchestrationEvents } from '../../../lib/orchestrationEvents';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 export function WalletBalances() {
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { walletState, walletDispatch } = useContext(WalletContext);
   const { viewDispatch } = useContext(ViewContext);
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const {
-    provider,
-    checkout,
     network,
     supportedTopUps,
     tokenBalances,

@@ -5,8 +5,6 @@ import { cy, it } from 'local-cypress';
 import {
   Checkout, WalletProviderName, TokenInfo, ChainId,
 } from '@imtbl/checkout-sdk';
-import { Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
 import { WalletContext, WalletState } from '../../context/WalletContext';
 import { text } from '../../../../resources/text/textConfig';
 import { cySmartGet } from '../../../../lib/testUtils';
@@ -44,11 +42,7 @@ describe('Network Menu', () => {
   });
   it('should have network buttons', () => {
     const walletState: WalletState = {
-      checkout: new Checkout({
-        baseConfig: { environment: Environment.PRODUCTION },
-      }),
       network: null,
-      provider: null,
       walletProvider: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
@@ -83,16 +77,12 @@ describe('Network Menu', () => {
       });
 
     const walletState: WalletState = {
-      checkout: new Checkout({
-        baseConfig: { environment: Environment.PRODUCTION },
-      }),
       network: {
         chainId: ChainId.ETHEREUM,
         name: 'Ethereum',
         nativeCurrency: {} as unknown as TokenInfo,
         isSupported: false,
       },
-      provider: {} as unknown as Web3Provider,
       walletProvider: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,

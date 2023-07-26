@@ -196,11 +196,7 @@ describe('Top Up View', () => {
 
   describe('Fee display', () => {
     const baseWalletState: WalletState = {
-      checkout: new Checkout({
-        baseConfig: { environment: Environment.SANDBOX },
-      }),
       network: null,
-      provider: null,
       walletProvider: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
