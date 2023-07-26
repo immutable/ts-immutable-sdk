@@ -8,7 +8,7 @@ import { retryWithDelay } from '../network/retry';
 import { PassportConfiguration } from '../config';
 import { RelayerClient } from './relayerClient';
 import { UserZkEvm } from '../types';
-import GuardianClient from '../starkEx/guardian';
+import GuardianClient from '../guardian/guardian';
 
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;

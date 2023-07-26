@@ -7,7 +7,7 @@ import { PassportConfiguration } from '../config';
 import { retryWithDelay } from '../network/retry';
 import { RelayerTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
-import GuardianClient from '../starkEx/guardian';
+import GuardianClient from '../guardian/guardian';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./walletHelpers');

@@ -20,7 +20,7 @@ import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import { loginZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
-import GuardianClient from '../starkEx/guardian';
+import GuardianClient from '../guardian/guardian';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;

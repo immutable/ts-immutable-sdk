@@ -2,7 +2,7 @@ import { TransfersApi, UnsignedTransferRequest } from '@imtbl/core-sdk';
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { batchNftTransfer, transfer } from './transfer';
-import GuardianClient from '../guardian';
+import GuardianClient from '../../guardian/guardian';
 
 jest.mock('../guardian');
 
