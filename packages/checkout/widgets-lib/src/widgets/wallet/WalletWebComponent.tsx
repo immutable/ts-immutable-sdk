@@ -1,5 +1,5 @@
 import React from 'react';
-import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { WalletWidget } from './WalletWidget';
 import {
@@ -25,8 +25,8 @@ export class ImmutableWallet extends ImmutableWebComponent {
       walletProvider: this.walletProvider,
       web3Provider: this.provider,
       allowedChains: [
-        getL1ChainId(new Checkout({ baseConfig: { environment: this.widgetConfig!.environment } }).config),
-        getL2ChainId(new Checkout({ baseConfig: { environment: this.widgetConfig!.environment } }).config),
+        getL1ChainId(this.checkoutConfig!),
+        getL2ChainId(this.checkoutConfig!),
       ],
     };
 

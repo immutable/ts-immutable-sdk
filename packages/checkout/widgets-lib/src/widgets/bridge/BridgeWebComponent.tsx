@@ -1,5 +1,5 @@
 import React from 'react';
-import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
+import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
 import { BridgeWidget, BridgeWidgetParams } from './BridgeWidget';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
@@ -30,7 +30,7 @@ export class ImmutableBridge extends ImmutableWebComponent {
       walletProvider: this.walletProvider,
       web3Provider: this.provider,
       allowedChains: [
-        getL1ChainId(new Checkout({ baseConfig: { environment: this.widgetConfig!.environment } }).config),
+        getL1ChainId(this.checkoutConfig!),
       ],
     };
     const params: BridgeWidgetParams = {
