@@ -7,9 +7,11 @@ import {
 } from '@uniswap/sdk-core';
 import JSBI from 'jsbi';
 import { ethers } from 'ethers';
-import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import { QuoteResponse, QuoteTradeInfo } from 'lib/router';
+import { SecondaryFee__factory } from 'contracts/types';
+import { ParamType } from 'ethers/lib/utils';
 import {
+  SecondaryFee,
   TokenInfo, TransactionDetails,
 } from '../../types';
 import { calculateGasFee } from './gas';
@@ -61,8 +63,11 @@ export function createSwapParametersWithFees(
   fromAddress: string,
   slippage: number,
   deadline: number,
-): {
-  } {
+  serviceFees: SecondaryFee[],
+) {
+  // TODO: Check the trade type and use the appropriate parameters - Determine the method signature by the
+  // TradeType + number of pools in the Route (1 pool = Exact...Single, 2+ pools = Exact...)
+
   // TODO: This is only for ExactInputSingle/ExactOutputSingle at the moment
   const tx = createSwapParameters(trade, fromAddress, slippage, deadline);
   // Remove the first 100 bytes of the calldata for the swap
@@ -72,36 +77,34 @@ export function createSwapParametersWithFees(
   // - 32 bytes for the array size
   const data = ethers.utils.hexDataSlice(tx.calldata, 100);
 
-  console.log({calldatabefore: tx.calldata})
-  console.log({calldataafter: data})
-
   const decodedTopLevelParams = ethers.utils.defaultAbiCoder.decode(
     ['bytes'],
     data,
   );
 
-  console.log({ params: decodedTopLevelParams });
-
   const calldata = decodedTopLevelParams[0];
-  console.log({ calldata: calldata });
-  const calldataParams = ethers.utils.hexDataSlice(calldata, 4);
-  const decodedFunctionCallParams = ethers.utils.defaultAbiCoder.decode(
-    exactInputOutputSingleParamTypes,
-    calldataParams,
-  );
-  console.log({ decodedFunctionCallParams: decodedFunctionCallParams });
+  const swapParamBytes = ethers.utils.hexDataSlice(calldata, 4).substring(2);
 
-  const params: IV3SwapRouter.ExactInputSingleParamsStruct = {
-    tokenIn: decodedFunctionCallParams[0],
-    tokenOut: decodedFunctionCallParams[1],
-    fee: decodedFunctionCallParams[2],
-    recipient: decodedFunctionCallParams[3],
-    amountIn: decodedFunctionCallParams[4],
-    amountOutMinimum: decodedFunctionCallParams[5],
-    sqrtPriceLimitX96: decodedFunctionCallParams[6],
-  };
+  const secondaryFeeContract = SecondaryFee__factory.createInterface();
+  const secondaryFeeValues = serviceFees.map((fee) => [fee.feeRecipient, fee.feeBasisPoints]);
+  // eslint-disable-next-line
+  const secondaryFeeParamBytes = secondaryFeeContract._encodeParams([ParamType.from('tuple(address,uint16)[]')], [secondaryFeeValues]).substring(2);
+  // eslint-disable-next-line
+  const exactInputSingleFunctionSignature = ethers.utils.id('exactInputSingleWithServiceFee((address,uint16)[],(address,address,uint24,address,uint256,uint256,uint160))').substring(0, 10);
+  // eslint-disable-next-line
+  const paramsBytes = exactInputSingleFunctionSignature + secondaryFeeParamBytes + swapParamBytes;
+  console.log({ paramsBytes });
 
-  return { topLevelParams: decodedTopLevelParams, functionCallParams: params };
+
+  // eslint-disable-next-line
+  const multicallParamBytes = secondaryFeeContract._encodeParams([ParamType.from('uint256'), ParamType.from('bytes[]')], [deadline, [paramsBytes]]).substring(2);
+
+  const multicallFunctionSignature = ethers.utils.id('multicall(uint256,bytes[])').substring(0, 10);
+  const multicallCallData = multicallFunctionSignature + multicallParamBytes;
+
+  console.log({ multicallCallData });
+
+  return {};
 }
 
 export function getSwap(
@@ -114,12 +117,18 @@ export function getSwap(
   gasPrice: ethers.BigNumber | null,
   // add fees
 ): TransactionDetails {
+  const serviceFees: SecondaryFee[] = [{
+    feeRecipient: '0xa6C368164Eb270C31592c1830Ed25c2bf5D34BAE',
+    feeBasisPoints: 1000,
+  }];
+
   // if fees, use createSwapParametersWithFees
   createSwapParametersWithFees(
     routeAndQuote.trade,
     fromAddress,
     slippage,
     deadline,
+    serviceFees,
   );
 
   const params = createSwapParameters(

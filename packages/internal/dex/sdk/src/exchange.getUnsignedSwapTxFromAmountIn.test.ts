@@ -149,7 +149,15 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     });
   });
 
-  describe('Swap with single pool and default slippage tolerance', () => {});
+  describe('Swap with secondary fees', () => {
+
+  });
+
+  describe('Swap with multiple pools', () => {
+    it('generates valid swap calldata', async () => {
+
+    });
+  });
 
   describe('Swap with single pool and default slippage tolerance', () => {
     it('generates valid swap calldata', async () => {
@@ -158,12 +166,14 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const zkONE = '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c';
+      const zkCATS = '0x1836E16b2036088490C2CFe4d11970Fc8e5884C4';
 
       const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
-        params.fromAddress,
-        params.inputToken,
-        params.outputToken,
-        params.amountIn,
+        '0xa6C368164Eb270C31592c1830Ed25c2bf5D34BAE',
+        zkONE,
+        zkCATS,
+        1000000000000000000n,
       );
 
       const data = swap.transaction?.data?.toString() || '';
