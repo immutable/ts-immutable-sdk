@@ -11,6 +11,6 @@ export default {
   plugins: [
     typescript(),
     json(),
-    resolve({ browser: true }),
+    resolve({ browser: true, preferBuiltins: true }),
   ],
 };
