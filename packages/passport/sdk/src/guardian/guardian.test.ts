@@ -65,7 +65,7 @@ describe('guardian', () => {
       });
       await guardianClient.validate({ payloadHash: 'hash' });
 
-      expect(mockConfirmationScreen.startGuardianTransaction).toHaveBeenCalledWith('hash', mockEtherAddress);
+      expect(mockConfirmationScreen.startGuardianTransaction).toHaveBeenCalledWith('hash', mockEtherAddress, 'starkex');
     });
 
     it('should throw error if user did not confirm the transaction', async () => {
