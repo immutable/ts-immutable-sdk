@@ -54,7 +54,7 @@ describe('BlockchainData', () => {
     const config: BlockchainDataModuleConfiguration = {
       baseConfig: { environment: Environment.PRODUCTION },
       overrides: {
-        basePath: 'https://indexer-mr.dev.imtbl.com/v1',
+        basePath: 'https://api.dev.immutable.com/v1',
         headers,
       },
     };

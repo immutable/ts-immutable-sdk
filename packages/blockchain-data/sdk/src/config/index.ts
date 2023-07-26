@@ -43,7 +43,7 @@ const production = (): mr.Configuration =>
 
 const sandbox = (): mr.Configuration =>
   createAPIConfiguration({
-    basePath: 'https://indexer-mr.sandbox.imtbl.com',
+    basePath: 'https://api.sandbox.immutable.com',
   });
 
 export interface BlockchainDataModuleConfiguration

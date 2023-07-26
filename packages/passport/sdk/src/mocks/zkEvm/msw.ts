@@ -9,7 +9,7 @@ export const chainId = '13372';
 export const transactionHash = '0x867';
 
 const mandatoryHandlers = [
-  rest.post('https://zkevm-rpc.sandbox.x.immutable.com', (req, res, ctx) => {
+  rest.post('https://rpc.testnet.immutable.com', (req, res, ctx) => {
     const body = req.body as JsonRpcRequestPayload;
     switch (body.method) {
       case 'eth_chainId': {
@@ -34,7 +34,7 @@ export const mswHandlers = {
     internalServerError: rest.post('https://api.sandbox.immutable.com/passport-mr/v1/counterfactual-address', (req, res, ctx) => res(ctx.status(500))),
   },
   jsonRpcProvider: {
-    success: rest.post('https://zkevm-rpc.sandbox.x.immutable.com', (req, res, ctx) => {
+    success: rest.post('https://rpc.testnet.immutable.com', (req, res, ctx) => {
       const body = req.body as JsonRpcRequestPayload;
       switch (body.method) {
         case 'eth_getCode': {

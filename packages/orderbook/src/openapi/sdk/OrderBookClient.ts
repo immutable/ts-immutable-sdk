@@ -17,7 +17,7 @@ export class OrderBookClient {
 
   constructor(config?: Partial<OpenAPIConfig>, HttpRequest: HttpRequestConstructor = AxiosHttpRequest) {
     this.request = new HttpRequest({
-      BASE: config?.BASE ?? 'https://order-book-mr.dev.imtbl.com',
+      BASE: config?.BASE ?? 'https://api.dev.immutable.com',
       VERSION: config?.VERSION ?? '1.0.0',
       WITH_CREDENTIALS: config?.WITH_CREDENTIALS ?? false,
       CREDENTIALS: config?.CREDENTIALS ?? 'include',
@@ -31,4 +31,3 @@ export class OrderBookClient {
     this.orders = new OrdersService(this.request);
   }
 }
-

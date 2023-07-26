@@ -80,10 +80,7 @@
   ],
   "servers": [
     {
-      "url": "https://indexer-mr.sandbox.imtbl.com"
-    },
-    {
-      "url": "https://order-book-mr.dev.imtbl.com"
+      "url": "https://api.dev.immutable.com"
     },
     {
       "url": "https://api.sandbox.immutable.com"

@@ -32,7 +32,7 @@ export const cyIntercept = (overrides?: {
   },
 }) => {
   const checkoutApi = 'https://checkout-api.sandbox.immutable.com/v1';
-  const imtblZkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com';
+  const imtblZkEvmRpcUrl = 'https://api.sandbox.immutable.com';
   const defaultConfig = {
     allowedNetworks: [
       {
