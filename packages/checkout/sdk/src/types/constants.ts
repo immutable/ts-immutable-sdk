@@ -16,6 +16,11 @@ export const CHECKOUT_API_BASE_URL = {
   [Environment.PRODUCTION]: 'https://checkout-api.immutable.com',
 };
 
+export const INTERNAL_RPC_URL = {
+  [Environment.SANDBOX]: 'https://zkevm-rpc.sandbox.x.immutable.com',
+  [Environment.PRODUCTION]: 'https://zkevm-rpc.x.immutable.com',
+};
+
 type NetworkDetails = {
   chainIdHex: string;
   chainName: string;
@@ -26,7 +31,10 @@ type NetworkDetails = {
 
 export type NetworkMap = Map<ChainId, NetworkDetails>;
 
-export const PRODUCTION_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<ChainId, NetworkDetails>([
+export const PRODUCTION_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
+ChainId,
+NetworkDetails
+>([
   [
     ChainId.ETHEREUM,
     {
@@ -46,7 +54,7 @@ export const PRODUCTION_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<ChainId, Netw
     {
       chainIdHex: `0x${ChainId.IMTBL_ZKEVM_MAINNET.toString(16)}`,
       chainName: ChainName.IMTBL_ZKEVM_MAINNET,
-      rpcUrls: ['https://zkevm-rpc.x.immutable.com'],
+      rpcUrls: ['https://rpc.immutable.com'],
       nativeCurrency: {
         name: 'IMX',
         symbol: 'IMX',
@@ -56,13 +64,18 @@ export const PRODUCTION_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<ChainId, Netw
   ],
 ]);
 
-export const SANDBOX_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<ChainId, NetworkDetails>([
+export const SANDBOX_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
+ChainId,
+NetworkDetails
+>([
   [
     ChainId.SEPOLIA,
     {
       chainIdHex: `0x${ChainId.SEPOLIA.toString(16)}`,
       chainName: ChainName.SEPOLIA,
-      rpcUrls: ['https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia'],
+      rpcUrls: [
+        'https://checkout-api.sandbox.immutable.com/v1/rpc/eth-sepolia',
+      ],
       nativeCurrency: {
         name: 'Sep Eth',
         symbol: 'ETH',
@@ -76,7 +89,7 @@ export const SANDBOX_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<ChainId, Network
     {
       chainIdHex: `0x${ChainId.IMTBL_ZKEVM_TESTNET.toString(16)}`,
       chainName: ChainName.IMTBL_ZKEVM_TESTNET,
-      rpcUrls: ['https://zkevm-rpc.sandbox.x.immutable.com'],
+      rpcUrls: ['https://rpc.testnet.immutable.com'],
       nativeCurrency: {
         name: 'IMX',
         symbol: 'IMX',
@@ -86,7 +99,10 @@ export const SANDBOX_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<ChainId, Network
   ],
 ]);
 
-export const DEV_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<ChainId, NetworkDetails>([
+export const DEV_CHAIN_ID_NETWORK_MAP: NetworkMap = new Map<
+ChainId,
+NetworkDetails
+>([
   [
     ChainId.SEPOLIA,
     {
