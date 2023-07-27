@@ -8,7 +8,7 @@ import {
 } from '@imtbl/checkout-sdk';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import React, {
-  useCallback, useEffect, useReducer, useState,
+  useCallback, useEffect, useMemo, useReducer, useState,
 } from 'react';
 import {
   ConnectEventType, ConnectionSuccess, IMTBLWidgetEvents,
@@ -59,6 +59,10 @@ export function ConnectLoader({
     connectLoaderReducer,
     initialConnectLoaderState,
   );
+  const connectLoaderReducerValues = useMemo(() => ({
+    connectLoaderState,
+    connectLoaderDispatch,
+  }), [connectLoaderState, connectLoaderDispatch]);
   const {
     connectionStatus, deepLink, checkout, provider,
   } = connectLoaderState;
@@ -369,12 +373,7 @@ export function ConnectLoader({
           <LoadingView loadingText="Connecting" />
         </BiomeCombinedProviders>
       )}
-      <ConnectLoaderContext.Provider
-          // TODO: The object passed as the value prop to the Context provider (at line 131) changes every render.
-          // To fix this consider wrapping it in a useMemo hook.
-          // eslint-disable-next-line react/jsx-no-constructed-context-values
-        value={{ connectLoaderState, connectLoaderDispatch }}
-      >
+      <ConnectLoaderContext.Provider value={connectLoaderReducerValues}>
         {(connectionStatus === ConnectionStatus.NOT_CONNECTED_NO_PROVIDER
         || connectionStatus === ConnectionStatus.NOT_CONNECTED
         || connectionStatus === ConnectionStatus.CONNECTED_WRONG_NETWORK) && (
