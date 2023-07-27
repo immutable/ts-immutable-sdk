@@ -6,7 +6,6 @@ import { Orderbook } from '../orderbook';
 import {
   deployTestToken,
   getFulfillerWallet,
-  getLocalhostProvider,
   getOffererWallet,
   signAndSubmitTx,
   signMessage,
