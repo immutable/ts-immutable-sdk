@@ -9,7 +9,11 @@ const validCredentialsMinTtlSec = 3600; // 1 hour
 
 export default class DeviceCredentialsManager {
   public saveCredentials(tokenResponse: DeviceTokenResponse) {
-    localStorage.setItem(keyCrendentials, JSON.stringify(tokenResponse));
+    if (this.areValid(tokenResponse)) {
+      localStorage.setItem(keyCrendentials, JSON.stringify(tokenResponse));
+    } else {
+      throw Error('Invalid credentials.');
+    }
   }
 
   public getCredentials(): DeviceTokenResponse | null {
@@ -30,10 +34,14 @@ export default class DeviceCredentialsManager {
   }
 
   private isTokenValid(jwt: string): boolean {
-    const tokenPayload: TokenPayload = jwt_decode(jwt);
-    const expiresAt = tokenPayload.exp ?? 0;
-    const now = (Date.now() / 1000) + validCredentialsMinTtlSec;
-    return expiresAt > now;
+    try {
+      const tokenPayload: TokenPayload = jwt_decode(jwt);
+      const expiresAt = tokenPayload.exp ?? 0;
+      const now = (Date.now() / 1000) + validCredentialsMinTtlSec;
+      return expiresAt > now;
+    } catch (error) {
+      return false;
+    }
   }
 
   public clearCredentials() {

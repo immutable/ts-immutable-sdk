@@ -184,11 +184,14 @@ export default class AuthManager {
         await wait(interval * 1000);
 
         try {
-          const tokenResponse = await this.getDeviceFlowToken(deviceCode);
+          let tokenResponse = await this.getDeviceFlowToken(deviceCode);
           const user = AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
 
           // Only persist credentials that contain the necessary data
           if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
+            if (!this.deviceCredentialsManager.areValid(tokenResponse) && tokenResponse.refresh_token) {
+              tokenResponse = await this.refreshToken(tokenResponse.refresh_token);
+            }
             this.deviceCredentialsManager.saveCredentials(tokenResponse);
           }
 
@@ -259,7 +262,8 @@ export default class AuthManager {
       + `&client_id=${this.config.oidcConfiguration.clientId}`
       + `&redirect_uri=${this.config.oidcConfiguration.redirectUri}`
       + `&scope=${this.config.oidcConfiguration.scope}`
-      + `&state=${state}`;
+      + `&state=${state}`
+      + `&audience=${this.config.oidcConfiguration.audience}`;
   }
 
   public async connectImxPKCEFlow(authorizationCode: string, state: string): Promise<User> {
@@ -273,11 +277,14 @@ export default class AuthManager {
         throw new Error('Provided state does not match stored state');
       }
 
-      const tokenResponse = await this.getPKCEToken(authorizationCode, pkceData.verifier);
+      let tokenResponse = await this.getPKCEToken(authorizationCode, pkceData.verifier);
       const user = AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
 
       // Only persist credentials that contain the necessary data
       if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
+        if (!this.deviceCredentialsManager.areValid(tokenResponse) && tokenResponse.refresh_token) {
+          tokenResponse = await this.refreshToken(tokenResponse.refresh_token);
+        }
         this.deviceCredentialsManager.saveCredentials(tokenResponse);
       }
 
