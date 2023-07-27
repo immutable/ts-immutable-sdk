@@ -32,7 +32,8 @@ export const sendTransaction = async ({
   config,
   user,
 }: EthSendTransactionParams): Promise<string> => {
-  guardianClient.loading();
+  const popupWindowSize = { width: 480, height: 580 };
+  guardianClient.loading(popupWindowSize);
 
   const transactionRequest: TransactionRequest = params[0];
   if (!transactionRequest.to) {
