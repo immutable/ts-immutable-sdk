@@ -32,6 +32,8 @@ export const sendTransaction = async ({
   config,
   user,
 }: EthSendTransactionParams): Promise<string> => {
+  guardianClient.loading();
+
   const transactionRequest: TransactionRequest = params[0];
   if (!transactionRequest.to) {
     throw new JsonRpcError(RpcErrorCode.INVALID_PARAMS, 'eth_sendTransaction requires a "to" field');
