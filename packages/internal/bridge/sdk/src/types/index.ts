@@ -157,6 +157,7 @@ export interface BridgeFeeResponse {
  */
 export interface WaitForDepositRequest {
   transactionHash: string;
+  timeout?: number; // TODO: @Rez implement timeout logic
 }
 
 /**
