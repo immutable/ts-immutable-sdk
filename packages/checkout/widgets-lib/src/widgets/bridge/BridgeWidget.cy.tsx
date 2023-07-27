@@ -21,6 +21,10 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { text } from '../../resources/text/textConfig';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
+import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  ConnectLoaderTestComponent,
+} from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 
 describe('Bridge Widget tests', () => {
   const { header, content } = text.views[BridgeWidgetViews.BRIDGE];
@@ -50,6 +54,14 @@ describe('Bridge Widget tests', () => {
       request: async () => null,
     },
   } as unknown as Web3Provider;
+
+  const connectLoaderState = {
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    }),
+    provider: mockProvider,
+    connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+  };
 
   beforeEach(() => {
     cy.viewport('ipad-2');
@@ -203,11 +215,14 @@ describe('Bridge Widget tests', () => {
     it('should show bridge widget on mount', () => {
       const params = {} as BridgeWidgetParams;
       mount(
-        <BridgeWidget
-          config={config}
-          params={params}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <BridgeWidget
+            config={config}
+            params={params}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('bridge-view').should('exist');
@@ -220,11 +235,14 @@ describe('Bridge Widget tests', () => {
     it('should set up bridge widget on mount', () => {
       const params = {} as BridgeWidgetParams;
       mount(
-        <BridgeWidget
-          config={config}
-          params={params}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <BridgeWidget
+            config={config}
+            params={params}
+          />
+        </ConnectLoaderTestComponent>,
       );
       cySmartGet('@getAllBalancesStub').should('have.been.called');
       cySmartGet('@getTokenAllowListStub').should('have.been.called');
@@ -292,17 +310,20 @@ describe('Bridge Widget tests', () => {
         }));
 
       mount(
-        <BridgeWidget
-          config={{
-            environment: Environment.SANDBOX,
-            theme: WidgetTheme.DARK,
-            isBridgeEnabled: true,
-            isSwapEnabled: true,
-            isOnRampEnabled: true,
-          }}
-          params={params}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <BridgeWidget
+            config={{
+              environment: Environment.SANDBOX,
+              theme: WidgetTheme.DARK,
+              isBridgeEnabled: true,
+              isSwapEnabled: true,
+              isOnRampEnabled: true,
+            }}
+            params={params}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -368,17 +389,20 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <BridgeWidget
-            config={{
-              environment: Environment.SANDBOX,
-              theme: WidgetTheme.DARK,
-              isBridgeEnabled: true,
-              isSwapEnabled: true,
-              isOnRampEnabled: true,
-            }}
-            params={params}
-            web3Provider={mockProvider}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={{
+                environment: Environment.SANDBOX,
+                theme: WidgetTheme.DARK,
+                isBridgeEnabled: true,
+                isSwapEnabled: true,
+                isOnRampEnabled: true,
+              }}
+              params={params}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
 
@@ -416,17 +440,20 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <BridgeWidget
-            config={{
-              environment: Environment.SANDBOX,
-              theme: WidgetTheme.DARK,
-              isBridgeEnabled: true,
-              isSwapEnabled: true,
-              isOnRampEnabled: true,
-            }}
-            params={params}
-            web3Provider={mockProvider}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={{
+                environment: Environment.SANDBOX,
+                theme: WidgetTheme.DARK,
+                isBridgeEnabled: true,
+                isSwapEnabled: true,
+                isOnRampEnabled: true,
+              }}
+              params={params}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
 
@@ -470,17 +497,20 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <BridgeWidget
-            config={{
-              environment: Environment.SANDBOX,
-              theme: WidgetTheme.DARK,
-              isBridgeEnabled: true,
-              isSwapEnabled: true,
-              isOnRampEnabled: true,
-            }}
-            params={params}
-            web3Provider={mockProvider}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={{
+                environment: Environment.SANDBOX,
+                theme: WidgetTheme.DARK,
+                isBridgeEnabled: true,
+                isSwapEnabled: true,
+                isOnRampEnabled: true,
+              }}
+              params={params}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
 
@@ -521,17 +551,20 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <BridgeWidget
-            config={{
-              environment: Environment.SANDBOX,
-              theme: WidgetTheme.DARK,
-              isBridgeEnabled: true,
-              isSwapEnabled: true,
-              isOnRampEnabled: true,
-            }}
-            params={params}
-            web3Provider={mockProvider}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={{
+                environment: Environment.SANDBOX,
+                theme: WidgetTheme.DARK,
+                isBridgeEnabled: true,
+                isSwapEnabled: true,
+                isOnRampEnabled: true,
+              }}
+              params={params}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
 
@@ -572,17 +605,20 @@ describe('Bridge Widget tests', () => {
 
       mount(
         <BiomeCombinedProviders>
-          <BridgeWidget
-            config={{
-              environment: Environment.SANDBOX,
-              theme: WidgetTheme.DARK,
-              isBridgeEnabled: true,
-              isSwapEnabled: true,
-              isOnRampEnabled: true,
-            }}
-            params={params}
-            web3Provider={mockProvider}
-          />
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <BridgeWidget
+              config={{
+                environment: Environment.SANDBOX,
+                theme: WidgetTheme.DARK,
+                isBridgeEnabled: true,
+                isSwapEnabled: true,
+                isOnRampEnabled: true,
+              }}
+              params={params}
+            />
+          </ConnectLoaderTestComponent>
         </BiomeCombinedProviders>,
       );
 

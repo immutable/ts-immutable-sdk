@@ -12,35 +12,24 @@ import { BridgeWidgetTestComponent } from '../test-components/BridgeWidgetTestCo
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { BridgeForm } from './BridgeForm';
 import { text } from '../../../resources/text/textConfig';
+import { ConnectionStatus } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  ConnectLoaderTestComponent,
+} from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 
 describe('Bridge Form', () => {
   let bridgeState;
+  let connectLoaderState;
   let cryptoConversions;
   const imxAddress = '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff';
+
   beforeEach(() => {
     cy.viewport('ipad-2');
     cyIntercept();
 
     cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
     bridgeState = {
-      checkout: new Checkout({
-        baseConfig: { environment: Environment.SANDBOX },
-      }),
       tokenBridge: new TokenBridge({}),
-      provider: {
-        getSigner: () => ({
-          getAddress: async () => Promise.resolve('0x123'),
-        }),
-        getFeeData: () => ({
-          maxFeePerGas: BigNumber.from(100),
-          maxPriorityFeePerGas: BigNumber.from(100),
-          gasPrice: BigNumber.from(100),
-        }),
-        getNetwork: async () => ({
-          chainId: ChainId.SEPOLIA,
-          name: 'Sepolia',
-        }),
-      } as unknown as Web3Provider,
       walletProvider: null,
       network: {
         chainId: ChainId.SEPOLIA,
@@ -111,6 +100,26 @@ describe('Bridge Form', () => {
           address: '0x22222e7C23978C3cAEC3C3548E3D615c22222222',
         },
       ],
+    };
+    connectLoaderState = {
+      checkout: new Checkout({
+        baseConfig: { environment: Environment.SANDBOX },
+      }),
+      provider: {
+        getSigner: () => ({
+          getAddress: async () => Promise.resolve('0x123'),
+        }),
+        getFeeData: () => ({
+          maxFeePerGas: BigNumber.from(100),
+          maxPriorityFeePerGas: BigNumber.from(100),
+          gasPrice: BigNumber.from(100),
+        }),
+        getNetwork: async () => ({
+          chainId: ChainId.SEPOLIA,
+          name: 'Sepolia',
+        }),
+      } as unknown as Web3Provider,
+      connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
     };
 
     cy.stub(TokenBridge.prototype, 'getFee').as('getFeeStub')
@@ -227,14 +236,18 @@ describe('Bridge Form', () => {
         });
 
       mount(
-        <BridgeWidgetTestComponent
-          initialStateOverride={bridgeState}
-          cryptoConversionsOverride={cryptoConversions}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
         >
-          <BridgeForm
-            testId="bridge-form"
-          />
-        </BridgeWidgetTestComponent>,
+          <BridgeWidgetTestComponent
+            initialStateOverride={bridgeState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <BridgeForm
+              testId="bridge-form"
+            />
+          </BridgeWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -272,14 +285,18 @@ describe('Bridge Form', () => {
         });
 
       mount(
-        <BridgeWidgetTestComponent
-          initialStateOverride={bridgeState}
-          cryptoConversionsOverride={cryptoConversions}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
         >
-          <BridgeForm
-            testId="bridge-form"
-          />
-        </BridgeWidgetTestComponent>,
+          <BridgeWidgetTestComponent
+            initialStateOverride={bridgeState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <BridgeForm
+              testId="bridge-form"
+            />
+          </BridgeWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('bridge-token-select__target').click();
@@ -304,7 +321,7 @@ describe('Bridge Form', () => {
       cySmartGet('@sendTransactionStub')
         .should('have.been.calledOnce')
         .should('have.been.calledWith', {
-          provider: bridgeState.provider,
+          provider: connectLoaderState.provider,
           transaction: {},
         });
     });
@@ -323,14 +340,18 @@ describe('Bridge Form', () => {
           });
 
         mount(
-          <BridgeWidgetTestComponent
-            initialStateOverride={bridgeState}
-            cryptoConversionsOverride={cryptoConversions}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <BridgeForm
-              testId="bridge-form"
-            />
-          </BridgeWidgetTestComponent>,
+            <BridgeWidgetTestComponent
+              initialStateOverride={bridgeState}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <BridgeForm
+                testId="bridge-form"
+              />
+            </BridgeWidgetTestComponent>
+          </ConnectLoaderTestComponent>,
         );
       });
 
@@ -362,7 +383,7 @@ describe('Bridge Form', () => {
         cySmartGet('@sendTransactionStub')
           .should('have.been.calledOnce')
           .should('have.been.calledWith', {
-            provider: bridgeState.provider,
+            provider: connectLoaderState.provider,
             transaction: {},
           });
 
@@ -419,16 +440,20 @@ describe('Bridge Form', () => {
           });
 
         mount(
-          <BridgeWidgetTestComponent
-            initialStateOverride={bridgeStateWithoutETH}
-            cryptoConversionsOverride={cryptoConversions}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <BridgeForm
-              testId="bridge-form"
-              defaultAmount="0.1"
-              defaultFromContractAddress={imxAddress}
-            />
-          </BridgeWidgetTestComponent>,
+            <BridgeWidgetTestComponent
+              initialStateOverride={bridgeStateWithoutETH}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <BridgeForm
+                testId="bridge-form"
+                defaultAmount="0.1"
+                defaultFromContractAddress={imxAddress}
+              />
+            </BridgeWidgetTestComponent>
+          </ConnectLoaderTestComponent>,
         );
 
         cySmartGet('bridge-form-button').click();
