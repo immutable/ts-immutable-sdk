@@ -9,17 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Fixed
+
+### Changed
+
+### Removed
+
+### Deprecated
+
+## [0.3.1] - 2023-07-26
+
+### Added
+
 - @imtbl/blockchain-data: Added ListTokens and GetToken methods
 - @imtbl/passport: Exposes Networks, UserProfile & PassportOverrides types
 - @imtbl/blockchain-data: Expose ActivityType type
 
 ### Fixed
 
-- @imtbl/passport: Fixed the confirmation popup being blocked by browser issue
-
 ### Changed
-- @imtbl/passport: Changed all the other Passport starkEx Provider functions to call the confirmation screen with guardian check
-
 - @imtbl/blockchain-data: Improved naming for Activity types
 
 - @imtbl/immutablex-client: Order requests now pointing to the V3 endpoints
@@ -28,11 +36,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
+
 ## [0.3.0] - 2023-07-18
 
 ### Added
 
 - @imtbl/passport: Silent logout feature
+
+## [0.1.9] - 2023-07-05
+
+### Fixed
+
+- @imtbl/passport: Fixed the confirmation popup being blocked by browser issue
+
+### Changed
+- @imtbl/passport: Changed all the other Passport starkEx Provider functions to call the confirmation screen with guardian check
 
 ## [0.1.8] - 2023-06-05
 
