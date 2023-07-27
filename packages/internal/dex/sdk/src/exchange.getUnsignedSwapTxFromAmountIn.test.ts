@@ -161,6 +161,45 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('Swap with single pool and default slippage tolerance', () => {
+    it('ding dong', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+
+      params.inputToken = "0x1836E16b2036088490C2CFe4d11970Fc8e5884C4"
+      params.outputToken = "0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c"
+      params.fromAddress = "0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496"
+      params.amountIn = "10";
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+
+      const exchange = new Exchange({ baseConfig: { environment: Environment.SANDBOX }, chainId: 13372 });
+
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        '0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496',
+        '0x1836E16b2036088490C2CFe4d11970Fc8e5884C4',
+        '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c',
+        10,
+      );
+
+      const data = swap.transaction?.data?.toString() || '';
+
+      const { functionCallParams, topLevelParams } = decodeMulticallData(data);
+
+      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
+
+      expect(functionCallParams.tokenIn).toBe(params.inputToken); // input token
+      expect(functionCallParams.tokenOut).toBe(params.outputToken); // output token
+      expect(functionCallParams.fee).toBe(10000); // fee
+      expect(functionCallParams.recipient).toBe(params.fromAddress); // Recipient
+      expect(swap.transaction?.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
+      expect(swap.transaction?.from).toBe(params.fromAddress); // from address
+      expect(swap.transaction?.value).toBe('0x00'); // refers to 0ETH
+      expect(functionCallParams.firstAmount.toString()).toBe(
+        params.amountIn.toString(),
+      ); // amountin
+      expect(functionCallParams.secondAmount.toString()).toBe(
+        params.minAmountOut.toString(),
+      ); // minAmountOut
+      expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+    });
     it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
@@ -172,7 +211,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         '0xa6C368164Eb270C31592c1830Ed25c2bf5D34BAE',
         params.inputToken,
         params.outputToken,
-        1000000000000000000n,
+        100000000000000000n,
       );
 
       const data = swap.transaction?.data?.toString() || '';
