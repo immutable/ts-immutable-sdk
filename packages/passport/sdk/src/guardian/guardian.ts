@@ -154,7 +154,7 @@ export default class GuardianClient {
     });
 
     const { confirmationRequired, transactionId } = transactionEvaluationResponse;
-    if (confirmationRequired) {
+    if (confirmationRequired && !!transactionId) {
       const confirmationResult = await this.confirmationScreen.startGuardianTransaction(
         transactionId,
         this.imxEtherAddress,
