@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { Wallet } from 'ethers';
+import { Wallet, providers } from 'ethers';
 import { log } from 'console';
 import { OrderStatus } from '../openapi/sdk/index';
 import { Orderbook } from '../orderbook';
@@ -34,7 +34,9 @@ async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
 // Just using Jest for ease of executing the demo script, not test syntax used
 describe('', () => {
   it('', async () => {
-    const provider = getLocalhostProvider();
+    const provider = new providers.JsonRpcProvider(
+      'https://zkevm-rpc.sandbox.x.immutable.com',
+    );
     const offerer = getOffererWallet(provider);
     const fulfiller = getFulfillerWallet(provider);
 
@@ -47,6 +49,12 @@ describe('', () => {
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
+      },
+
+      overrides: {
+        // Replace overrides with devnet values if needed
+        // values can be found here https://immutable.atlassian.net/wiki/spaces/TRAD/pages/2192573143/zkEVM+orderbook+deployment+addresses
+        provider,
       },
     });
 
