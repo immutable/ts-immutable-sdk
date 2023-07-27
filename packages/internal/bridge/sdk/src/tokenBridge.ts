@@ -224,7 +224,7 @@ export class TokenBridge {
   /**
    * TODO: @rez add docs
    */
-  public async getUnsignedApproveChildBridgeTx(
+  public async getUnsignedApproveWithdrawBridgeTx(
     req: ApproveWithdrawBridgeRequest,
   ): Promise<ApproveWithdrawBridgeResponse> {
     const erc20Contract = await withBridgeError<ethers.Contract>(
