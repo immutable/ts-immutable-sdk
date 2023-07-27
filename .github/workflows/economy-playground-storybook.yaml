@@ -27,6 +27,9 @@ jobs:
       - name: Install Dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: yarn install
+
+      - name: Build all packages
+        run: npm run build
         
       - name: Build Checkout SDK
         run: yarn workspace @imtbl/checkout-sdk build && yarn workspace @imtbl/checkout-widgets build
@@ -39,9 +42,9 @@ jobs:
 
       - name: Build Package Economy Playground
         run: yarn workspace @imtbl/economy-playground build:package
-
-      - name: List files
-        run: ls -R packages/economy/playground/storybook-static
+        
+      - name: Setup checkout-widget-lib dependencies
+        run: yarn workspace @imtbl/economy-playground setup
 
       - name: Navigate to Economy Playground
         run: cd packages/economy/playground
