@@ -14,7 +14,7 @@ const releaseType = process.env.RELEASE_TYPE || 'alpha';
 
 // Generate the index.ts file contents based on the release type
 let indexFileContent = '';
-moduleData.modules.forEach((moduleName) => {
+Object.keys(moduleData.modules).forEach((moduleName) => {
   const moduleReleaseType = moduleData.modules[moduleName];
 
   if (
@@ -39,6 +39,6 @@ moduleData.modules.forEach((moduleName) => {
 
 // Write the index.ts file
 fs.writeFileSync(
-  path.join(__dirname, '..', 'src', 'index.ts'),
+  path.join(process.cwd(), 'src', 'index.ts'),
   indexFileContent,
 );
