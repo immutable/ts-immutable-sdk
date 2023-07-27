@@ -1,0 +1,64 @@
+name: Passport SDK Sample App Deployment
+
+on:
+  push:
+    paths:
+      - 'packages/passport/**'
+    branches:
+      - main
+  workflow_dispatch:
+
+# this is used by github OIDC to assume the admin role later on
+permissions: # see this: https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
+  id-token: write # This is required for requesting the JWT
+  contents: write # This is required for actions/checkout
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-2
+    steps:
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_IMMUTABLE_PROD_ADMIN_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
+
+      - name: Build Passport sample app
+        run: yarn workspace @imtbl/passport-sdk-sample-app build
+
+      - name: Export Passport sample app
+        run: yarn workspace @imtbl/passport-sdk-sample-app export
+
+      - name: Upload to S3
+        run: |
+          aws s3 sync ./packages/passport/sdk-sample-app/out s3://imx-passport-frontend-prod/sdk-sample-app
+
+      - name: Clear the cloudfront cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CF_PASSPORT_PROD_DISTRIBUTION_ID }} --paths "/*" 

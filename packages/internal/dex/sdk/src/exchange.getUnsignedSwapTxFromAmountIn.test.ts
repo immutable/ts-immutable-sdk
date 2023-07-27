@@ -2,7 +2,6 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import { TradeType } from '@uniswap/sdk-core';
-import { ExchangeConfiguration } from 'config';
 import {
   InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError,
 } from 'errors';
@@ -16,7 +15,7 @@ import {
   TEST_PERIPHERY_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
   TEST_GAS_PRICE,
-  IMX_TEST_CHAIN,
+  IMX_TEST_TOKEN,
   TEST_TRANSACTION_GAS_USAGE,
 } from './utils/testUtils';
 import { Router } from './lib';
@@ -65,8 +64,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
       const erc20ContractInterface = ERC20__factory.createInterface();
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       const amountIn = APPROVED_AMOUNT.add(BigNumber.from('1000000000000000000'));
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -92,8 +90,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       const amountIn = APPROVED_AMOUNT.add(BigNumber.from('1000000000000000000'));
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -106,11 +103,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(tx.approval).not.toBe(null);
       expect(tx.approval?.gasFeeEstimate).not.toBe(null);
       expect(tx.approval?.gasFeeEstimate?.value).toEqual(TEST_GAS_PRICE.mul(APPROVE_GAS_ESTIMATE));
-      expect(tx.approval?.gasFeeEstimate?.token.chainId).toEqual(IMX_TEST_CHAIN.chainId);
-      expect(tx.approval?.gasFeeEstimate?.token.address).toEqual(IMX_TEST_CHAIN.address);
-      expect(tx.approval?.gasFeeEstimate?.token.decimals).toEqual(IMX_TEST_CHAIN.decimals);
-      expect(tx.approval?.gasFeeEstimate?.token.symbol).toEqual(IMX_TEST_CHAIN.symbol);
-      expect(tx.approval?.gasFeeEstimate?.token.name).toEqual(IMX_TEST_CHAIN.name);
+      expect(tx.approval?.gasFeeEstimate?.token.chainId).toEqual(IMX_TEST_TOKEN.chainId);
+      expect(tx.approval?.gasFeeEstimate?.token.address).toEqual(IMX_TEST_TOKEN.address);
+      expect(tx.approval?.gasFeeEstimate?.token.decimals).toEqual(IMX_TEST_TOKEN.decimals);
+      expect(tx.approval?.gasFeeEstimate?.token.symbol).toEqual(IMX_TEST_TOKEN.symbol);
+      expect(tx.approval?.gasFeeEstimate?.token.name).toEqual(IMX_TEST_TOKEN.name);
     });
   });
 
@@ -119,8 +116,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       // Set the amountIn to be the same as the APPROVED_AMOUNT
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
@@ -143,8 +139,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         findOptimalRoute: jest.fn().mockRejectedValue(new NoRoutesAvailableError()),
       }));
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
       await expect(exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
         params.inputToken,
@@ -154,14 +149,13 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     });
   });
 
-  describe('Swap with single pool and defaults', () => {
-    it('Generates valid calldata', async () => {
+  describe('Swap with single pool and default slippage tolerance', () => {
+    it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
@@ -197,8 +191,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       const tx = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
@@ -208,11 +201,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       );
 
       expect(tx.swap.gasFeeEstimate?.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
-      expect(tx.swap.gasFeeEstimate?.token.chainId).toEqual(IMX_TEST_CHAIN.chainId);
-      expect(tx.swap.gasFeeEstimate?.token.address).toEqual(IMX_TEST_CHAIN.address);
-      expect(tx.swap.gasFeeEstimate?.token.decimals).toEqual(IMX_TEST_CHAIN.decimals);
-      expect(tx.swap.gasFeeEstimate?.token.symbol).toEqual(IMX_TEST_CHAIN.symbol);
-      expect(tx.swap.gasFeeEstimate?.token.name).toEqual(IMX_TEST_CHAIN.name);
+      expect(tx.swap.gasFeeEstimate?.token.chainId).toEqual(IMX_TEST_TOKEN.chainId);
+      expect(tx.swap.gasFeeEstimate?.token.address).toEqual(IMX_TEST_TOKEN.address);
+      expect(tx.swap.gasFeeEstimate?.token.decimals).toEqual(IMX_TEST_TOKEN.decimals);
+      expect(tx.swap.gasFeeEstimate?.token.symbol).toEqual(IMX_TEST_TOKEN.symbol);
+      expect(tx.swap.gasFeeEstimate?.token.name).toEqual(IMX_TEST_TOKEN.name);
     });
 
     it('returns valid quote', async () => {
@@ -220,8 +213,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
@@ -244,12 +236,11 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('Swap with single pool and higher slippage tolerance', () => {
-    it('Generates valid calldata', async () => {
+    it('generates valid calldata', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
@@ -285,8 +276,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
@@ -313,8 +303,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     it('throws InvalidAddressError', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       const invalidAddress = ethers.constants.AddressZero;
 
@@ -356,8 +345,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     it('throws InvalidAddressError', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       const invalidAddress = '0x0123abcdef';
 
@@ -400,8 +388,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       await expect(
         exchange.getUnsignedSwapTxFromAmountIn(
@@ -421,8 +408,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       await expect(
         exchange.getUnsignedSwapTxFromAmountIn(
@@ -442,8 +428,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       await expect(
         exchange.getUnsignedSwapTxFromAmountIn(
@@ -463,8 +448,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const configuration = new ExchangeConfiguration(TEST_DEX_CONFIGURATION);
-      const exchange = new Exchange(configuration);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
       await expect(
         exchange.getUnsignedSwapTxFromAmountIn(

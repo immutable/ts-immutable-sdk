@@ -40,9 +40,9 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
   // Get symbol from swap info for approve amount text
   const bridgeToken = useMemo(
     () => allowedTokens.find(
-      (token: TokenInfo) => token.address === data.bridgeFormInfo.tokenAddress || token.address === 'NATIVE',
+      (token: TokenInfo) => token.address === data.bridgeFormInfo.fromContractAddress || token.address === 'NATIVE',
     ),
-    [allowedTokens, data.bridgeFormInfo.tokenAddress],
+    [allowedTokens, data.bridgeFormInfo.fromContractAddress],
   );
 
   // Common error view function
@@ -61,11 +61,7 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
   const goBackWithSwapData = useCallback(() => {
     viewDispatch({
       payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: BridgeWidgetViews.BRIDGE,
-          data: data.bridgeFormInfo as PrefilledBridgeForm,
-        },
+        type: ViewActions.GO_BACK,
       },
     });
   }, [viewDispatch]);
@@ -175,7 +171,7 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
   const approveSpendingContent = useMemo(() => (
     <SimpleTextBody heading={approveSpending.content.heading}>
       {/* eslint-disable-next-line max-len */}
-      <Box>{`${approveSpending.content.body[0]} ${data.bridgeFormInfo.amount} ${bridgeToken?.symbol || ''} ${approveSpending.content.body[1]}`}</Box>
+      <Box>{`${approveSpending.content.body[0]} ${data.bridgeFormInfo.fromAmount} ${bridgeToken?.symbol || ''} ${approveSpending.content.body[1]}`}</Box>
     </SimpleTextBody>
   ), [data.bridgeFormInfo, bridgeToken]);
 

@@ -75,8 +75,8 @@ export interface ImtblWalletProps
  * @property {string | undefined} walletProvider - The preferred wallet provider to connect to.
  * @property {string | undefined} widgetConfig - The configuration for the swap widget.
  * @property {string | undefined} amount - The amount to swap.
- * @property {string | undefined} fromContractAddress - The contract address of the source token.
- * @property {string | undefined} toContractAddress - The contract address of the destination token.
+ * @property {string | undefined} fromContractAddress - The contract address of the source token. If the string is 'NATIVE' then the native token will be used.
+ * @property {string | undefined} toContractAddress - The contract address of the destination token. If the string is 'NATIVE' then the native token will be used.
  */
 export interface ImtblSwapProps
   extends React.DetailedHTMLProps<

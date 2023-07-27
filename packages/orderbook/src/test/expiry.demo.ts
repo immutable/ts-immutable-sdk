@@ -4,11 +4,10 @@ import { log } from 'console';
 import { OrderStatus } from '../openapi/sdk/index';
 import { Orderbook } from '../orderbook';
 import {
-  getLocalhostProvider,
-  getConfig,
-  getFulfillerWallet,
-  getOffererWallet,
   deployTestToken,
+  getFulfillerWallet,
+  getLocalhostProvider,
+  getOffererWallet,
   signAndSubmitTx,
   signMessage,
   TestToken,
@@ -35,7 +34,6 @@ async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
 // Just using Jest for ease of executing the demo script, not test syntax used
 describe('', () => {
   it('', async () => {
-    const config = getConfig();
     const provider = getLocalhostProvider();
     const offerer = getOffererWallet(provider);
     const fulfiller = getFulfillerWallet(provider);
@@ -50,16 +48,11 @@ describe('', () => {
       baseConfig: {
         environment: Environment.SANDBOX,
       },
-      provider: getLocalhostProvider(),
-      seaportContractAddress: config.seaportContractAddress,
-      zoneContractAddress: config.zoneContractAddress,
-      overrides: {
-        apiEndpoint: config.apiUrl,
-        chainName: 'imtbl-zkevm-devnet',
-      },
     });
 
-    log(`Preparing soon-to-expire listing for user ${offerer.address} for NFT collection ${nftContract.address}, TokenID 0`);
+    log(
+      `Preparing soon-to-expire listing for user ${offerer.address} for NFT collection ${nftContract.address}, TokenID 0`,
+    );
 
     // Prepare the listing details
     const soonToExpireListing = await sdk.prepareListing({
@@ -78,16 +71,25 @@ describe('', () => {
 
     log('Signing and submitting approval transaction...');
     // Sign and submit the approval transaction for the offerer
-    await signAndSubmitTx(soonToExpireListing.unsignedApprovalTransaction!, offerer, provider);
+    await signAndSubmitTx(
+      soonToExpireListing.unsignedApprovalTransaction!,
+      offerer,
+      provider,
+    );
 
     // Sign the EIP712 order message for the offerer. This is the signature that the order book API
     // stores and allows the fulfiller to fulfil the order, as long as they also have a valid
     // operator signature
-    const signature = await signMessage(soonToExpireListing.typedOrderMessageForSigning, offerer);
+    const signature = await signMessage(
+      soonToExpireListing.typedOrderMessageForSigning,
+      offerer,
+    );
 
     log('Submitting order to orderbook API...');
     // Submit the order creation request to the order book API
-    const { result: { id: orderId } } = await sdk.createListing({
+    const {
+      result: { id: orderId },
+    } = await sdk.createListing({
       orderComponents: soonToExpireListing.orderComponents,
       orderHash: soonToExpireListing.orderHash,
       orderSignature: signature,
@@ -95,10 +97,14 @@ describe('', () => {
     log('Submitted order to orderbook API with expiry time set in the future');
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.ACTIVE);
-    log(`Listing ${orderId} is now ACTIVE, it will soon transition to EXPIRED, waiting...`);
+    log(
+      `Listing ${orderId} is now ACTIVE, it will soon transition to EXPIRED, waiting...`,
+    );
 
     await waitForOrderToBeOfStatus(sdk, orderId, OrderStatus.EXPIRED);
-    log(`Listing ${orderId} is now EXPIRED. Attempting to fulfill the expired listing...`);
+    log(
+      `Listing ${orderId} is now EXPIRED. Attempting to fulfill the expired listing...`,
+    );
 
     try {
       await sdk.fulfillOrder(orderId, fulfiller.address);

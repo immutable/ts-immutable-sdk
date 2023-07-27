@@ -3,6 +3,33 @@ import { ModuleConfiguration } from '@imtbl/config';
 import { ExchangeContracts } from 'config';
 
 /**
+ * Interface representing a Chain
+ * @property {number} chainId - The chain ID
+ * @property {string} rpcUrl - The RPC URL for the chain
+ * @property {ExchangeContracts} contracts - The DEX contract addresses
+ * @property {Token[]} commonRoutingTokens - The tokens used to find available pools for a swap
+ * @property {TokenInfo} nativeToken - The native token of the chain
+ */
+export type Chain = {
+  chainId: number;
+  rpcUrl: string;
+  contracts: ExchangeContracts;
+  commonRoutingTokens: TokenInfo[];
+  nativeToken: TokenInfo;
+};
+
+/**
+ * Interface representing the secondary fees for a swap
+ * @property {string} feeRecipient - The fee recipient address
+ * @property {number} feeBasisPoints - The fee percentage in basis points
+ * @example 100 basis points = 1%
+ */
+export type SecondaryFee = {
+  feeRecipient: string;
+  feeBasisPoints: number;
+};
+
+/**
  * Interface representing an amount with the token information
  * @property {TokenInfo} token - The token information
  * @property {ethers.BigNumber} value - The amount
@@ -67,6 +94,7 @@ export interface ExchangeOverrides {
   exchangeContracts: ExchangeContracts;
   commonRoutingTokens: TokenInfo[];
   nativeToken: TokenInfo;
+  secondaryFees?: SecondaryFee[];
 }
 
 export interface ExchangeModuleConfiguration

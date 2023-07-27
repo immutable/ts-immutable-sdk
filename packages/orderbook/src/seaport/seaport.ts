@@ -10,15 +10,20 @@ import {
 } from 'types';
 import { Order } from 'openapi/sdk';
 import {
-  EIP_712_ORDER_TYPE, ItemType, SEAPORT_CONTRACT_NAME, SEAPORT_CONTRACT_VERSION_V1_4,
+  EIP_712_ORDER_TYPE,
+  ItemType,
+  SEAPORT_CONTRACT_NAME,
+  SEAPORT_CONTRACT_VERSION_V1_4,
+  SEAPORT_CONTRACT_VERSION_V1_5,
 } from './constants';
 import { getOrderComponentsFromMessage } from './components';
+import { SeaportLibFactory, SeaportVersion } from './seaport-lib-factory';
 import { prepareTransaction } from './transaction';
 import { mapImmutableOrderToSeaportOrderComponents } from './map-to-seaport-order';
 
 export class Seaport {
   constructor(
-    private seaport: SeaportLib,
+    private seaportLibFactory: SeaportLibFactory,
     private provider: providers.JsonRpcProvider,
     private seaportContractAddress: string,
     private zoneContractAddress: string,
@@ -64,13 +69,15 @@ export class Seaport {
       unsignedApprovalTransaction: approvalTransaction,
       typedOrderMessageForSigning: await this.getTypedDataFromOrderComponents(orderComponents),
       orderComponents,
-      orderHash: await this.seaport.getOrderHash(orderComponents),
+      orderHash: this.getSeaportLib().getOrderHash(orderComponents),
     };
   }
 
   async fulfilOrder(order: Order, account: string): Promise<FulfillOrderResponse> {
     const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
-    const { actions } = await this.seaport.fulfillOrders({
+    const seaportLib = this.getSeaportLib(order);
+
+    const { actions } = await seaportLib.fulfillOrders({
       accountAddress: account,
       fulfillOrderDetails: [{
         order: {
@@ -107,16 +114,18 @@ export class Seaport {
 
   async cancelOrder(order: Order, account: string): Promise<PopulatedTransaction> {
     const orderComponents = await this.mapImmutableOrderToSeaportOrderComponents(order);
-    const cancellationTransaction = await this.seaport.cancelOrders([orderComponents], account);
+    const seaportLib = this.getSeaportLib(order);
+
+    const cancellationTransaction = await seaportLib.cancelOrders([orderComponents], account);
 
     return prepareTransaction(cancellationTransaction);
   }
 
-  private async mapImmutableOrderToSeaportOrderComponents(order: Order): Promise<OrderComponents> {
-    const counterForOfferer = await this.seaport.getCounter(order.account_address);
+  private mapImmutableOrderToSeaportOrderComponents(order: Order): OrderComponents {
+    const orderCounter = order.protocol_data.counter;
     return mapImmutableOrderToSeaportOrderComponents(
       order,
-      counterForOfferer.toString(),
+      orderCounter,
       this.zoneContractAddress,
     );
   }
@@ -129,7 +138,8 @@ export class Seaport {
     orderStart: Date,
     orderExpiry: Date,
   ): Promise<OrderUseCase<CreateOrderAction>> {
-    return this.seaport.createOrder({
+    const seaportLib = this.getSeaportLib();
+    return seaportLib.createOrder({
       allowPartialFills: false,
       offer: [
         {
@@ -174,5 +184,16 @@ export class Seaport {
       types: EIP_712_ORDER_TYPE,
       value: orderComponents,
     };
+  }
+
+  private getSeaportLib(order?: Order): SeaportLib {
+    const seaportAddress = order?.protocol_data?.seaport_address ?? this.seaportContractAddress;
+
+    let seaportVersion: SeaportVersion = SEAPORT_CONTRACT_VERSION_V1_4;
+    if (order?.protocol_data?.seaport_version === SEAPORT_CONTRACT_VERSION_V1_5) {
+      seaportVersion = SEAPORT_CONTRACT_VERSION_V1_5;
+    }
+
+    return this.seaportLibFactory.create(seaportVersion, seaportAddress);
   }
 }

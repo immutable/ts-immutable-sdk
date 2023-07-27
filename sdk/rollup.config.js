@@ -7,6 +7,9 @@ import dts from 'rollup-plugin-dts';
 import replace from '@rollup/plugin-replace';
 import pkg from './package.json' assert { type: 'json' };
 import moduleReleases from './module-release.json' assert { type: 'json' };
+import terser from '@rollup/plugin-terser';
+import nodePolyfills from 'rollup-plugin-polyfill-node';
+
 
 // RELEASE_TYPE environment variable is set by the CI/CD pipeline
 const releaseType = process.env.RELEASE_TYPE || 'alpha';
@@ -41,19 +44,20 @@ const getFileBuild = (inputFilename) => [
       format: 'es',
     },
     plugins: [
-      replace({
-        preventAssignment: true,
-        __SDK_VERSION__: pkg.version,
-      }),
-      typescript({
-        declaration: true,
-        declarationDir: './dist/types',
-      }),
       nodeResolve({
         resolveOnly: getPackages(),
       }),
       commonJs(),
       json(),
+      typescript({
+        declaration: true,
+        declarationDir: './dist/types',
+      }),
+      replace({
+        exclude: 'node_modules/**',
+        preventAssignment: true,
+        __SDK_VERSION__: pkg.version,
+      }),
     ],
   },
   {
@@ -88,12 +92,44 @@ export default [
       format: 'cjs',
     },
     plugins: [
-      typescript(),
       nodeResolve({
         resolveOnly: getPackages(),
       }),
-      commonJs(),
       json(),
+      commonJs(),
+      typescript(),
+      replace({
+        exclude: 'node_modules/**',
+        preventAssignment: true,
+        __SDK_VERSION__: pkg.version,
+      }),
+    ],
+  },
+  // Browser Bundle
+  {
+    input: 'src/index.ts',
+    output: {
+      file: 'dist/index.browser.js',
+      format: 'umd',
+      sourcemap: true,
+      name: 'immutable',
+    },
+    plugins: [
+      nodeResolve({
+        jsnext: true,
+        main: true,
+        browser: true,
+      }),
+      nodePolyfills(),
+      commonJs(),
+      typescript(),
+      json(),
+      replace({
+        exclude: 'node_modules/**',
+        preventAssignment: true,
+        __SDK_VERSION__: pkg.version,
+      }),
+      terser(),
     ],
   },
 

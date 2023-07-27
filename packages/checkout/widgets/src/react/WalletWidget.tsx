@@ -20,7 +20,7 @@ export interface WalletReactProps {
  * @param {WalletReactProps} props - The props for the Wallet Widget component.
  * @returns {JSX.Element} - The rendered Wallet Widget component.
  */
-export function WalletReact(props: WalletReactProps) {
+export function WalletReact(props: WalletReactProps): JSX.Element {
   const {
     walletProvider,
     provider,

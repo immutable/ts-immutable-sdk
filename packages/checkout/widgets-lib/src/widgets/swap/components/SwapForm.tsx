@@ -5,15 +5,18 @@ import {
 import {
   Body, Box, Heading, OptionKey,
 } from '@biom3/react';
-import { utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { TokenInfo } from '@imtbl/checkout-sdk';
 import { TransactionResponse } from '@imtbl/dex-sdk';
+import { parseEther, parseUnits } from 'ethers/lib/utils';
 import { text } from '../../../resources/text/textConfig';
 import { amountInputValidation as textInputValidator } from '../../../lib/validations/amountInputValidations';
 import { SwapContext } from '../context/SwapContext';
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
-import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
-import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
+import {
+  calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
+} from '../../../lib/utils';
+import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE } from '../../../lib';
 import { quotesProcessor } from '../functions/FetchQuote';
 import { SelectInput } from '../../../components/FormComponents/SelectInput/SelectInput';
 import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTypes';
@@ -28,6 +31,9 @@ import { SwapButton } from './SwapButton';
 import { SwapFormData } from './swapFormTypes';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 import { useInterval } from '../../../lib/hooks/useInterval';
+import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
+import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
+import { UnableToSwap } from './UnableToSwap';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -66,6 +72,14 @@ const swapValuesToText = ({
   return resp;
 };
 
+// Ensures that the to token address does not match the from token address
+const shouldSetToAddress = (toAddress: string | undefined, fromAddress: string | undefined): boolean => {
+  if (toAddress === undefined) return false;
+  if (toAddress === '') return false;
+  if (fromAddress === toAddress) return false;
+  return true;
+};
+
 export interface SwapFromProps {
   data?: SwapFormData;
 }
@@ -86,6 +100,7 @@ export function SwapForm({ data }: SwapFromProps) {
   }, []);
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
+  const { viewDispatch } = useContext(ViewContext);
 
   const [editing, setEditing] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -108,12 +123,14 @@ export function SwapForm({ data }: SwapFromProps) {
 
   // Quote
   const [quote, setQuote] = useState<TransactionResponse | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [quoteError, setQuoteError] = useState<string>('');
   const [gasFeeValue, setGasFeeValue] = useState<string>('');
   const [gasFeeToken, setGasFeeToken] = useState< TokenInfo | undefined>(undefined);
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
   const [tokensOptionsFrom, setTokensOptionsForm] = useState<CoinSelectorOptionProps[]>([]);
+
+  // Drawers
+  const [showNotEnoughImxDrawer, setShowNotEnoughImxDrawer] = useState(false);
+  const [showUnableToSwapDrawer, setShowUnableToSwapDrawer] = useState(false);
 
   useEffect(() => {
     if (tokenBalances.length === 0) return;
@@ -142,17 +159,26 @@ export function SwapForm({ data }: SwapFromProps) {
     if (!hasSetDefaultState.current) {
       hasSetDefaultState.current = true;
 
-      // TODO: native token handling for no-address tokens
       if (data?.fromContractAddress) {
-        setFromToken(allowedTokens.find((t) => t.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase()));
+        setFromToken(
+          allowedTokens.find((t) => (
+            isNativeToken(t.address) && data?.fromContractAddress?.toLocaleUpperCase() === NATIVE
+          )
+          || (t.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase())),
+        );
         setFromBalance(
           tokenBalances.find(
-            (t) => t.token.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase(),
+            (t) => (
+              isNativeToken(t.token.address) && data?.fromContractAddress?.toLocaleUpperCase() === NATIVE)
+              || (t.token.address?.toLowerCase() === data?.fromContractAddress?.toLowerCase()),
           )?.formattedBalance ?? '',
         );
       }
-      if (data?.toContractAddress) {
-        setToToken(allowedTokens.find((t) => t.address?.toLowerCase() === data?.toContractAddress?.toLowerCase()));
+
+      if (shouldSetToAddress(data?.toContractAddress, data?.fromContractAddress)) {
+        setToToken(allowedTokens.find((t) => (
+          isNativeToken(t.address) && data?.toContractAddress?.toLocaleUpperCase() === NATIVE
+        ) || (t.address?.toLowerCase() === data?.toContractAddress?.toLowerCase())));
       }
     }
   }, [
@@ -250,10 +276,8 @@ export function SwapForm({ data }: SwapFromProps) {
       setToTokenError('');
     } catch (error: any) {
       setQuote(null);
-      // eslint-disable-next-line no-console
-      console.log('Quote error: ', error.message);
-      // todo: handle the display on form when exchange errors
-      setQuoteError(error.message);
+      setShowNotEnoughImxDrawer(false);
+      setShowUnableToSwapDrawer(true);
     }
     setIsFetching(false);
   };
@@ -295,6 +319,7 @@ export function SwapForm({ data }: SwapFromProps) {
         address: gasToken?.address,
         icon: gasToken?.icon,
       });
+
       setGasFeeFiatValue(calculateCryptoToFiat(
         gasFee,
         gasToken?.symbol || '',
@@ -316,10 +341,8 @@ export function SwapForm({ data }: SwapFromProps) {
       setToTokenError('');
     } catch (error: any) {
       setQuote(null);
-      // eslint-disable-next-line no-console
-      console.log('Quote error: ', error.message);
-      // todo: handle the display on form when exchange errors
-      setQuoteError(error.message);
+      setShowNotEnoughImxDrawer(false);
+      setShowUnableToSwapDrawer(true);
     }
 
     setIsFetching(false);
@@ -403,6 +426,24 @@ export function SwapForm({ data }: SwapFromProps) {
     }
   }, [toAmount, toToken, fromToken, editing]);
 
+  // during swaps, having enough IMX to cover the gas fee means
+  // 1. swapping from any token to any token costs IMX - so do a check
+  // 2. If the swap from token is also IMX, include the additional amount into the calc
+  //    as user will need enough imx for the swap amount and the gas
+  const insufficientFundsForGas = useMemo(() => {
+    const imxBalance = tokenBalances.find((b) => !b.token.address || b.token.address === 'NATIVE');
+    if (!imxBalance) return true;
+
+    // need to double check if the is going to be how to identify IMX on zkEVM
+    const fromTokenIsImx = !fromToken?.address || fromToken.address === 'NATIVE';
+    const gasAmount = parseEther(gasFeeValue.length !== 0 ? gasFeeValue : '0');
+    const additionalAmount = fromTokenIsImx && !Number.isNaN(parseFloat(fromAmount))
+      ? parseUnits(fromAmount, fromToken?.decimals || 18)
+      : BigNumber.from('0');
+
+    return gasAmount.add(additionalAmount).gt(imxBalance.balance);
+  }, [gasFeeValue, tokenBalances, fromToken, fromAmount]);
+
   // -------------//
   //     FROM     //
   // -------------//
@@ -481,6 +522,11 @@ export function SwapForm({ data }: SwapFromProps) {
   const onToTextInputBlur = (value) => {
     setEditing(false);
     setToAmount(value);
+  };
+
+  const openNotEnoughImxDrawer = () => {
+    setShowUnableToSwapDrawer(false);
+    setShowNotEnoughImxDrawer(true);
   };
 
   const { content, swapForm, fees } = text.views[SwapWidgetViews.SWAP];
@@ -639,6 +685,39 @@ export function SwapForm({ data }: SwapFromProps) {
           fromAmount,
           fromContractAddress: fromToken?.address,
           toContractAddress: toToken?.address,
+        }}
+        insufficientFundsForGas={insufficientFundsForGas}
+        openNotEnoughImxDrawer={openNotEnoughImxDrawer}
+      />
+      <NotEnoughImx
+        visible={showNotEnoughImxDrawer}
+        showAdjustAmount={!fromToken?.address || fromToken.address === 'NATIVE'}
+        hasZeroImx={false}
+        onAddCoinsClick={() => {
+          viewDispatch({
+            payload: {
+              type: ViewActions.UPDATE_VIEW,
+              view: {
+                type: SharedViews.TOP_UP_VIEW,
+              },
+              currentViewData: {
+                fromContractAddress: fromToken?.address ?? '',
+                fromAmount,
+                toContractAddress: toToken?.address ?? '',
+              },
+            },
+          });
+        }}
+        onCloseBottomSheet={() => setShowNotEnoughImxDrawer(false)}
+      />
+      <UnableToSwap
+        visible={showUnableToSwapDrawer}
+        onCloseBottomSheet={() => {
+          setShowUnableToSwapDrawer(false);
+          setFromToken(undefined);
+          setFromAmount('');
+          setToToken(undefined);
+          setToAmount('');
         }}
       />
     </>

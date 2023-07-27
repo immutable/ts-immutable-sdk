@@ -1,0 +1,32 @@
+{
+  "name": "@imtbl/game-bridge",
+  "version": "0.0.0",
+  "dependencies": {
+    "@imtbl/config": "0.0.0",
+    "@imtbl/passport": "0.0.0",
+    "@imtbl/provider": "0.0.0"
+  },
+  "devDependencies": {
+    "parcel": "^2.8.3"
+  },
+  "scripts": {
+    "build": "parcel build",
+    "start": "parcel"
+  },
+  "source": "src/index.html",
+  "targets": {
+    "unity": {
+      "context": "browser",
+      "engines": {
+        "browsers": "Chrome 90"
+      }
+    },
+    "unreal": {
+      "context": "browser",
+      "engines": {
+        "browsers": "Chrome 59"
+      },
+      "outputFormat": "global"
+    }
+  }
+}

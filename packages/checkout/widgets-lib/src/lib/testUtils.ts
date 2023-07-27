@@ -27,10 +27,12 @@ export const cyIntercept = (overrides?: {
   },
   cryptoFiatOverrides?: {
     coins?: any[],
-    conversion?: any[],
+    overrides?: Record<string, string>,
+    conversion?: Record<string, Record<string, number>>,
   },
 }) => {
-  const checkoutApi = 'https://checkout-api.dev.immutable.com/v1';
+  const checkoutApi = 'https://checkout-api.sandbox.immutable.com/v1';
+  const imtblZkEvmRpcUrl = 'https://zkevm-rpc.sandbox.x.immutable.com';
   const defaultConfig = {
     allowedNetworks: [
       {
@@ -62,10 +64,10 @@ export const cyIntercept = (overrides?: {
     },
     dex: {
       overrides: {
-        rpcURL: 'https://zkevm-rpc.dev.x.immutable.com/',
+        rpcURL: imtblZkEvmRpcUrl,
         commonRoutingTokens: [
           {
-            chainId: 11155111,
+            chainId: ChainId.SEPOLIA,
             address: '0x741185AEFC3E539c1F42c1d6eeE8bFf1c89D70FE',
             decimals: 18,
             symbol: 'FUN',
@@ -75,7 +77,7 @@ export const cyIntercept = (overrides?: {
           multicall: '0x8AC26EfCbf5D700b37A27aA00E6934e6904e7B8e',
         },
         nativeToken: {
-          chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+          chainId: ChainId.IMTBL_ZKEVM_TESTNET,
           address: '',
           decimals: 18,
         },
@@ -99,13 +101,32 @@ export const cyIntercept = (overrides?: {
     },
   );
   cy.intercept(
-    `${checkoutApi}/fiat/coins/*`,
-    overrides?.cryptoFiatOverrides?.coins || [],
+    `${checkoutApi}/fiat/coins/all*`,
+    overrides?.cryptoFiatOverrides?.coins || [
+      { id: 'eth', symbol: 'eth', name: 'ethereum' },
+      { id: 'imx', symbol: 'imx', name: 'immutable-x' },
+      { id: 'usdc', symbol: 'usdc', name: 'usd-coin' },
+    ],
+  );
+  cy.intercept(
+    `${checkoutApi}/fiat/coins/overrides*`,
+    overrides?.cryptoFiatOverrides?.overrides || {
+      eth: 'ethereum',
+      imx: 'immutable-x',
+      usdc: 'usd-coin',
+    },
   );
   cy.intercept(
     `${checkoutApi}/fiat/conversion*`,
-    overrides?.cryptoFiatOverrides?.conversion || {},
+    overrides?.cryptoFiatOverrides?.conversion || {
+      ethereum: { usd: 2000.0 },
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      'usd-coin': { usd: 1.0 },
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      'immutable-x': { usd: 1.5 },
+    },
   );
   cy.intercept(`${checkoutApi}/rpc/eth-sepolia`, {});
-  cy.intercept('https://zkevm-rpc.dev.x.immutable.com/', {});
+  cy.intercept(imtblZkEvmRpcUrl, {});
+  cy.intercept('https://image-resizer-cache.dev.immutable.com/*', {});
 };

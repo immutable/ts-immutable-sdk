@@ -68,7 +68,7 @@ export class ImmutableApiClient {
             contract_address: orderComponents.consideration[0].token,
           },
         ],
-        buy_fees:
+        fees:
           orderComponents.consideration.length > 1
             ? [
               {

@@ -12,7 +12,7 @@ import { Environment } from '@imtbl/config';
 import { CompletionStatus, TokenBridge } from '@imtbl/bridge-sdk';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { cySmartGet } from '../../lib/testUtils';
+import { cyIntercept, cySmartGet } from '../../lib/testUtils';
 import {
   BridgeWidget,
   BridgeWidgetParams,
@@ -53,7 +53,17 @@ describe('Bridge Widget tests', () => {
 
   beforeEach(() => {
     cy.viewport('ipad-2');
-    cy.intercept('https://image-resizer-cache.dev.immutable.com/*', {});
+
+    cyIntercept({
+      cryptoFiatOverrides: {
+        conversion: {
+          ethereum: { usd: 2000.0 },
+          'usd-coin': { usd: 1.0 },
+          'immutable-x': { usd: 1.5 },
+        },
+      },
+    });
+
     connectStubReturnValue = {
       provider: mockProvider,
       network: {
@@ -187,18 +197,6 @@ describe('Bridge Widget tests', () => {
         } as TokenAmountEstimate,
         bridgeable: true,
       });
-
-    cy.intercept(
-      {
-        method: 'GET',
-        path: '/v1/fiat/conversion*',
-      },
-      {
-        ethereum: { usd: 2000.0 },
-        'usd-coin': { usd: 1.0 },
-        'immutable-x': { usd: 1.5 },
-      },
-    ).as('cryptoFiatStub');
   });
 
   describe('Bridge Widget render', () => {

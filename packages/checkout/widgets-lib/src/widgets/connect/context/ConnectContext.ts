@@ -5,14 +5,14 @@ import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 export interface ConnectState {
   checkout: Checkout | null;
   provider: Web3Provider | null;
-  walletProvider: WalletProviderName | null;
+  walletProviderName: WalletProviderName | null;
   sendCloseEvent: () => void;
 }
 
 export const initialConnectState: ConnectState = {
   checkout: null,
   provider: null,
-  walletProvider: null,
+  walletProviderName: null,
   sendCloseEvent: () => {},
 };
 
@@ -34,7 +34,7 @@ type ActionPayload =
 export enum ConnectActions {
   SET_CHECKOUT = 'SET_CHECKOUT',
   SET_PROVIDER = 'SET_PROVIDER',
-  SET_PROVIDER_NAME = 'SET_PROVIDER_NAME',
+  SET_WALLET_PROVIDER_NAME = 'SET_WALLET_PROVIDER_NAME',
   SET_SEND_CLOSE_EVENT = 'SET_SEND_CLOSE_EVENT',
 }
 
@@ -49,8 +49,8 @@ export interface SetProviderPayload {
 }
 
 export interface SetProviderNamePayload {
-  type: ConnectActions.SET_PROVIDER_NAME;
-  walletProvider: WalletProviderName;
+  type: ConnectActions.SET_WALLET_PROVIDER_NAME;
+  walletProviderName: WalletProviderName;
 }
 
 export interface SetSendCloseEventPayload {
@@ -83,10 +83,10 @@ export const connectReducer: Reducer<ConnectState, ConnectAction> = (
         ...state,
         provider: action.payload.provider,
       };
-    case ConnectActions.SET_PROVIDER_NAME:
+    case ConnectActions.SET_WALLET_PROVIDER_NAME:
       return {
         ...state,
-        walletProvider: action.payload.walletProvider,
+        walletProviderName: action.payload.walletProviderName,
       };
     case ConnectActions.SET_SEND_CLOSE_EVENT:
       return {

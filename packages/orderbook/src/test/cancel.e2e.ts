@@ -2,28 +2,24 @@ import { Environment } from '@imtbl/config';
 import { OrderStatus } from 'openapi/sdk';
 import { Orderbook } from 'orderbook';
 import { getLocalhostProvider } from './helpers/provider';
-import { getConfig } from './helpers/config';
 import { getOffererWallet } from './helpers/signers';
 import { deployTestToken } from './helpers/erc721';
 import { signAndSubmitTx, signMessage } from './helpers/sign-and-submit';
 import { waitForOrderToBeOfStatus } from './helpers/order';
+import { getLocalConfigFromEnv } from './helpers';
 
 describe('cancel order', () => {
   it('should cancel the order', async () => {
-    const config = getConfig();
     const provider = getLocalhostProvider();
     const offerer = getOffererWallet(provider);
 
+    const localConfigOverrides = getLocalConfigFromEnv();
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
       },
-      provider: getLocalhostProvider(),
-      seaportContractAddress: config.seaportContractAddress,
-      zoneContractAddress: config.zoneContractAddress,
       overrides: {
-        apiEndpoint: config.apiUrl,
-        chainName: 'imtbl-zkevm-local',
+        ...localConfigOverrides,
       },
     });
 

@@ -147,8 +147,24 @@ describe('Bridge Form', () => {
     cySmartGet('bridge-token-select__target__defaultLabel').should('have.text', 'Select coin');
     cySmartGet('bridge-token-select__target').click();
     cySmartGet(`bridge-token-coin-selector__option-imx-${imxAddress}`).should('exist');
-    cySmartGet(`bridge-token-coin-selector__option-imx-${imxAddress}`).should('exist');
   });
+
+  // Uncomment when NATIVE supported as part of bridge
+  // it('should set token to the native token when native passed in as from token', () => {
+  //   mount(
+  //     <BridgeWidgetTestComponent
+  //       initialStateOverride={bridgeState}
+  //       cryptoConversionsOverride={cryptoConversions}
+  //     >
+  //       <BridgeForm
+  //         testId="bridge-form"
+  //         defaultFromContractAddress="NATIVE"
+  //       />
+  //     </BridgeWidgetTestComponent>,
+  //   );
+
+  //   cySmartGet('bridge-token-select__target__controlledLabel').should('have.text', 'ETH');
+  // });
 
   it('should set defaults when provided and ignore casing on token address', () => {
     cy.stub(TokenBridge.prototype, 'getUnsignedApproveBridgeTx').as('getUnsignedApproveBridgeTxStub')
@@ -168,11 +184,14 @@ describe('Bridge Form', () => {
       >
         <BridgeForm
           testId="bridge-form"
-          defaultTokenAddress="0xF57E7E7c23978c3caec3c3548e3d615c346e79Ff"
+          defaultFromContractAddress="0xF57E7E7c23978c3caec3c3548e3d615c346e79Ff"
           defaultAmount="10"
         />
       </BridgeWidgetTestComponent>,
     );
+
+    cySmartGet('bridge-token-select__target__controlledLabel').should('have.text', 'IMX');
+    cySmartGet('bridge-amount-text__input').should('have.value', '10');
   });
 
   describe('Bridge Form submit', () => {
@@ -407,7 +426,7 @@ describe('Bridge Form', () => {
             <BridgeForm
               testId="bridge-form"
               defaultAmount="0.1"
-              defaultTokenAddress={imxAddress}
+              defaultFromContractAddress={imxAddress}
             />
           </BridgeWidgetTestComponent>,
         );

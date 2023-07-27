@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { mount } from 'cypress/react18';
 import { BigNumber } from 'ethers';
 import { cy } from 'local-cypress';
@@ -34,8 +33,8 @@ describe('SwapForm', () => {
           balance: BigNumber.from('10000000000000'),
           formattedBalance: '0.1',
           token: {
-            name: 'Ethereum',
-            symbol: 'ETH',
+            name: 'ImmutableX',
+            symbol: 'IMX',
             decimals: 18,
             address: '',
           },
@@ -44,8 +43,8 @@ describe('SwapForm', () => {
           balance: BigNumber.from('10000000000000'),
           formattedBalance: '0.1',
           token: {
-            name: 'ImmutableX',
-            symbol: 'IMX',
+            name: 'Ethereum',
+            symbol: 'ETH',
             decimals: 18,
             address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
           },
@@ -53,14 +52,14 @@ describe('SwapForm', () => {
       ],
       allowedTokens: [
         {
-          name: 'Ethereum',
-          symbol: 'ETH',
+          name: 'ImmutableX',
+          symbol: 'IMX',
           decimals: 18,
           address: '',
         },
         {
-          name: 'ImmutableX',
-          symbol: 'IMX',
+          name: 'Ethereum',
+          symbol: 'ETH',
           decimals: 18,
           address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
         },
@@ -72,7 +71,10 @@ describe('SwapForm', () => {
   describe('initial form state', () => {
     it('should show all swap inputs with initial state', () => {
       mount(
-        <SwapWidgetTestComponent>
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
           <SwapForm />
         </SwapWidgetTestComponent>,
       );
@@ -86,6 +88,114 @@ describe('SwapForm', () => {
       cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
       cySmartGet('toTokenInputs-text-form-text').should('be.visible');
       cySmartGet('toTokenInputs-text-form-text__input').should('have.attr', 'placeholder', toText.inputPlaceholder);
+    });
+
+    it('should set native token as from if native token is provided in from address', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapForm data={{
+            fromContractAddress: 'NATIVE',
+          }}
+          />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'IMX');
+    });
+
+    it('should set native token as to if native token is provided in to address', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapForm data={{
+            toContractAddress: 'NATIVE',
+          }}
+          />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'IMX');
+    });
+
+    it('should set from token matching the from token address provided', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapForm data={{
+            fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          }}
+          />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'ETH');
+    });
+
+    it('should set to token matching the to token address provided', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapForm data={{
+            toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          }}
+          />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'ETH');
+    });
+
+    it('should set both from and to token when token addresses are unique', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapForm data={{
+            fromContractAddress: 'NATIVE',
+            toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          }}
+          />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'IMX');
+      cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'ETH');
+    });
+
+    it('should set only from token when to and from token addresses match', () => {
+      mount(
+        <SwapWidgetTestComponent
+          initialStateOverride={testSwapState}
+          cryptoConversionsOverride={cryptoConversions}
+        >
+          <SwapForm data={{
+            fromContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          }}
+          />
+        </SwapWidgetTestComponent>,
+      );
+
+      cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'ETH');
+      cySmartGet('toTokenInputs-select-form-select__target').should('be.visible');
+      cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
     });
   });
 
@@ -208,7 +318,7 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('20').trigger('change');
 
@@ -230,7 +340,7 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
 
       cySmartGet('swap-button').click();
@@ -251,7 +361,7 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
 
       cySmartGet('swap-button').click();
@@ -276,7 +386,7 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-eth').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').blur();
       cySmartGet('swap-button').click();
       cySmartGet('fromTokenInputs-select-form-select-control-error')
@@ -284,7 +394,7 @@ describe('SwapForm', () => {
         .should('have.text', validation.noFromTokenSelected);
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
 
       cySmartGet('fromTokenInputs-text-form-text-control-error')
@@ -362,10 +472,10 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-eth').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('fromTokenInputs-text-form-text__input').blur();
 
@@ -376,8 +486,8 @@ describe('SwapForm', () => {
         {},
         // fromToken
         {
-          name: 'ImmutableX',
-          symbol: 'IMX',
+          name: 'Ethereum',
+          symbol: 'ETH',
           decimals: 18,
           address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
         },
@@ -385,8 +495,8 @@ describe('SwapForm', () => {
         '0.01',
         // toToken
         {
-          name: 'Ethereum',
-          symbol: 'ETH',
+          name: 'ImmutableX',
+          symbol: 'IMX',
           decimals: 18,
           address: '',
         },
@@ -405,10 +515,10 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-eth').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('fromTokenInputs-text-form-text__input').blur();
       cySmartGet('@fromAmountInStub').should('have.been.called');
@@ -420,8 +530,8 @@ describe('SwapForm', () => {
         {},
         // fromToken
         {
-          name: 'ImmutableX',
-          symbol: 'IMX',
+          name: 'Ethereum',
+          symbol: 'ETH',
           decimals: 18,
           address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
         },
@@ -429,8 +539,8 @@ describe('SwapForm', () => {
         '0.01',
         // toToken
         {
-          name: 'Ethereum',
-          symbol: 'ETH',
+          name: 'ImmutableX',
+          symbol: 'IMX',
           decimals: 18,
           address: '',
         },
@@ -453,10 +563,10 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-eth').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
       cySmartGet('fromTokenInputs-text-form-max-button').click();
 
       const params = [
@@ -466,8 +576,8 @@ describe('SwapForm', () => {
         {},
         // fromToken
         {
-          name: 'ImmutableX',
-          symbol: 'IMX',
+          name: 'Ethereum',
+          symbol: 'ETH',
           decimals: 18,
           address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
         },
@@ -475,8 +585,8 @@ describe('SwapForm', () => {
         '0.1', // From balance
         // toToken
         {
-          name: 'Ethereum',
-          symbol: 'ETH',
+          name: 'ImmutableX',
+          symbol: 'IMX',
           decimals: 18,
           address: '',
         },
@@ -496,13 +606,13 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-eth').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
       cySmartGet('@fromAmountInStub').should('have.been.called');
     });
 
@@ -517,12 +627,12 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-eth').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('@fromAmountInStub').should('have.been.called');
     });
@@ -538,10 +648,10 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-eth').click();
+      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0').trigger('change');
       cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
@@ -552,76 +662,338 @@ describe('SwapForm', () => {
   });
 
   describe('submitting a swap', () => {
-    beforeEach(() => {
-      cy.stub(quotesProcessor, 'fromAmountIn')
-        .as('fromAmountInStub')
-        .resolves({
-          quote: {
-            amount: {
-              token: {
-                name: 'Ethereum',
-                symbol: 'ETH',
-                decimals: 18,
-                address: '',
+    describe('dex success', () => {
+      beforeEach(() => {
+        cy.stub(quotesProcessor, 'fromAmountIn')
+          .as('fromAmountInStub')
+          .resolves({
+            quote: {
+              amount: {
+                token: {
+                  name: 'Ethereum',
+                  symbol: 'ETH',
+                  decimals: 18,
+                  address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                },
+                value: BigNumber.from('112300000000000012'),
               },
-              value: BigNumber.from('112300000000000012'),
-            },
-            amountWithMaxSlippage: {
-              token: {
-                name: 'ImmutableX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+              amountWithMaxSlippage: {
+                token: {
+                  name: 'ImmutableX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: '',
+                },
+                value: BigNumber.from('112300000000000032'),
               },
-              value: BigNumber.from('112300000000000032'),
+              slippage: 10,
             },
-            slippage: 10,
-          },
-          swap: {
-            gasFeeEstimate: {
-              token: {
-                name: 'ImmutableX',
-                symbol: 'IMX',
-                decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            swap: {
+              gasFeeEstimate: {
+                token: {
+                  name: 'ImmutableX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: '',
+                },
+                value: BigNumber.from('100000000000000'),
               },
-              value: BigNumber.from('112300000000000045'),
+              transaction: {
+                to: 'toSwapAddress',
+                from: 'fromSwapAddress',
+              },
             },
-            transaction: {
-              to: 'toSwapAddress',
-              from: 'fromSwapAddress',
+          });
+        cy.stub(quotesProcessor, 'fromAmountOut')
+          .as('fromAmountOutStub')
+          .resolves({
+            quote: {
+              amount: {
+                token: {
+                  name: 'ImmutableX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: '',
+                },
+                value: BigNumber.from('100000000000000'),
+              },
+              amountWithMaxSlippage: {
+                token: {
+                  name: 'ImmutableX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: '',
+                },
+                value: BigNumber.from('100000000000000000'),
+              },
+              slippage: 10,
             },
-          },
-        });
+            swap: {
+              gasFeeEstimate: {
+                token: {
+                  name: 'ImmutableX',
+                  symbol: 'IMX',
+                  decimals: 18,
+                  address: '',
+                },
+                value: BigNumber.from('100000000000000'),
+              },
+              transaction: {
+                to: 'toSwapAddress',
+                from: 'fromSwapAddress',
+              },
+            },
+          });
+      });
 
-      cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
-        .rejects({
-          type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
-        });
+      it('should open the transaction rejected drawer if the user rejects the transaction', () => {
+        cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+          .rejects({
+            type: CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
+          });
+
+        mount(
+          <SwapWidgetTestComponent
+            initialStateOverride={{
+              ...testSwapState,
+              tokenBalances: [
+                {
+                  balance: BigNumber.from('1000000000000000000'),
+                  formattedBalance: '1',
+                  token: {
+                    name: 'Ethereum',
+                    symbol: 'ETH',
+                    decimals: 18,
+                    address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                  },
+                },
+                {
+                  balance: BigNumber.from('1000000000000000000'),
+                  formattedBalance: '1',
+                  token: {
+                    name: 'ImmutableX',
+                    symbol: 'IMX',
+                    decimals: 18,
+                    address: '',
+                  },
+                },
+              ],
+            }}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins />
+          </SwapWidgetTestComponent>,
+        );
+
+        cySmartGet('fromTokenInputs-select-form-select__target').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+          .click();
+        cySmartGet('toTokenInputs-select-form-select__target').click();
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+
+        cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
+        cySmartGet('fromTokenInputs-text-form-text__input').blur();
+
+        cySmartGet('swap-button').click();
+
+        cySmartGet('transaction-rejected-heading').should('be.visible');
+      });
+
+      it('should show not enough imx drawer if user does not have enough imx', () => {
+        mount(
+          <SwapWidgetTestComponent
+            initialStateOverride={{
+              ...testSwapState,
+              tokenBalances: [
+                {
+                  balance: BigNumber.from('1000000000000000000'),
+                  formattedBalance: '1',
+                  token: {
+                    name: 'Ethereum',
+                    symbol: 'ETH',
+                    decimals: 18,
+                    address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                  },
+                },
+                {
+                  balance: BigNumber.from('100000'),
+                  formattedBalance: '0.0001',
+                  token: {
+                    name: 'ImmutableX',
+                    symbol: 'IMX',
+                    decimals: 18,
+                    address: '',
+                  },
+                },
+              ],
+            }}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins />
+          </SwapWidgetTestComponent>,
+        );
+
+        cySmartGet('fromTokenInputs-select-form-select__target').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+          .click();
+        cySmartGet('toTokenInputs-select-form-select__target').click();
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+
+        cySmartGet('fromTokenInputs-text-form-text__input').type('0.00001').trigger('change');
+        cySmartGet('fromTokenInputs-text-form-text__input').blur();
+
+        cySmartGet('swap-button').click();
+
+        cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
+        cySmartGet('not-enough-gas-add-imx-button').should('be.visible');
+        cySmartGet('not-enough-gas-cancel-button').should('be.visible');
+        cySmartGet('not-enough-gas-adjust-amount-button').should('not.exist');
+      });
+
+      it('should show adjust button if user does not have enough imx and imx is in from', () => {
+        mount(
+          <SwapWidgetTestComponent
+            initialStateOverride={{
+              ...testSwapState,
+              tokenBalances: [
+                {
+                  balance: BigNumber.from('1000000000000000000'),
+                  formattedBalance: '1',
+                  token: {
+                    name: 'Ethereum',
+                    symbol: 'ETH',
+                    decimals: 18,
+                    address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                  },
+                },
+                {
+                  balance: BigNumber.from('100000'),
+                  formattedBalance: '0.0001',
+                  token: {
+                    name: 'ImmutableX',
+                    symbol: 'IMX',
+                    decimals: 18,
+                    address: '',
+                  },
+                },
+              ],
+            }}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins />
+          </SwapWidgetTestComponent>,
+        );
+
+        cySmartGet('toTokenInputs-select-form-select__target').click();
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+          .click();
+        cySmartGet('fromTokenInputs-select-form-select__target').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx').click();
+
+        cySmartGet('toTokenInputs-text-form-text__input').type('0.00001').trigger('change');
+        cySmartGet('toTokenInputs-text-form-text__input').blur();
+
+        cySmartGet('swap-button').click();
+
+        cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
+        cySmartGet('not-enough-gas-add-imx-button').should('be.visible');
+        cySmartGet('not-enough-gas-cancel-button').should('be.visible');
+        cySmartGet('not-enough-gas-adjust-amount-button').should('be.visible');
+
+        cySmartGet('not-enough-gas-adjust-amount-button').click();
+        cySmartGet('not-enough-gas-bottom-sheet').should('not.exist');
+      });
+
+      it('should show loading if user has enough imx and does not reject the transaction', () => {
+        cy.stub(Checkout.prototype, 'sendTransaction').as('sendTransactionStub')
+          .resolves({});
+
+        mount(
+          <SwapWidgetTestComponent
+            initialStateOverride={{
+              ...testSwapState,
+              tokenBalances: [
+                {
+                  balance: BigNumber.from('1000000000000000000'),
+                  formattedBalance: '1',
+                  token: {
+                    name: 'Ethereum',
+                    symbol: 'ETH',
+                    decimals: 18,
+                    address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                  },
+                },
+                {
+                  balance: BigNumber.from('1000000000000000000'),
+                  formattedBalance: '1',
+                  token: {
+                    name: 'ImmutableX',
+                    symbol: 'IMX',
+                    decimals: 18,
+                    address: '',
+                  },
+                },
+              ],
+            }}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins />
+          </SwapWidgetTestComponent>,
+        );
+
+        cySmartGet('fromTokenInputs-select-form-select__target').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+          .click();
+        cySmartGet('toTokenInputs-select-form-select__target').click();
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+
+        cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
+        cySmartGet('fromTokenInputs-text-form-text__input').blur();
+
+        cySmartGet('swap-button').click();
+
+        cySmartGet('not-enough-gas-bottom-sheet').should('not.exist');
+        cySmartGet('transaction-rejected-heading').should('not.exist');
+        cySmartGet('swap-button__icon').should('have.attr', 'data-icon', 'Loading');
+      });
     });
 
-    it('should open the transaction rejected drawer if the user rejects the transaction', () => {
-      mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
-        >
-          <SwapCoins />
-        </SwapWidgetTestComponent>,
-      );
+    describe('dex error', () => {
+      it('should show unable to swap if dex returns an error and clear form when closed', () => {
+        cy.stub(quotesProcessor, 'fromAmountIn')
+          .as('fromAmountInStub')
+          .rejects({});
 
-      cySmartGet('fromTokenInputs-select-form-select__target').click();
-      cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
-        .click();
-      cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-eth').click();
+        mount(
+          <SwapWidgetTestComponent
+            initialStateOverride={{
+              ...testSwapState,
+            }}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins />
+          </SwapWidgetTestComponent>,
+        );
 
-      cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
-      cySmartGet('fromTokenInputs-text-form-text__input').blur();
+        cySmartGet('fromTokenInputs-select-form-select__target').click();
+        cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+          .click();
+        cySmartGet('toTokenInputs-select-form-select__target').click();
+        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
 
-      cySmartGet('swap-button').click();
+        cySmartGet('fromTokenInputs-text-form-text__input').type('0.00001').trigger('change');
+        cySmartGet('fromTokenInputs-text-form-text__input').blur();
 
-      cySmartGet('transaction-rejected-heading').should('be.visible');
+        cySmartGet('unable-to-swap-bottom-sheet').should('be.visible');
+        cySmartGet('unable-to-swap-cancel-button').should('be.visible');
+
+        cySmartGet('unable-to-swap-cancel-button').click();
+        cySmartGet('unable-to-swap-bottom-sheet').should('not.exist');
+        cySmartGet('fromTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+        cySmartGet('fromTokenInputs-text-form-text__input').should('have.text', '');
+        cySmartGet('toTokenInputs-select-form-select__target').should('have.text', 'Select coin');
+        cySmartGet('toTokenInputs-text-form-text__input').should('have.text', '');
+      });
     });
   });
 });

@@ -10,9 +10,9 @@ import { CheckoutWidgetTagNames } from '../definitions/types';
  * @interface SwapReactProps
  * @property {WalletProviderName | undefined} walletProvider - The name of the wallet provider.
  * @property {Web3Provider | undefined} provider - The Web3 provider.
- * @property {string | undefined} fromContractAddress - The address of the contract swapping from.
+ * @property {string | undefined} fromContractAddress - The address of the contract swapping from. If the string is 'NATIVE' then the native token is used.
  * @property {string | undefined} amount - The amount.
- * @property {string | undefined} toContractAddress - The address of the contract swapping to.
+ * @property {string | undefined} toContractAddress - The address of the contract swapping to. If the string is 'NATIVE' then the native token is used.
  */
 export interface SwapReactProps {
   walletProvider?: WalletProviderName;

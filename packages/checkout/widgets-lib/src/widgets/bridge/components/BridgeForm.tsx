@@ -17,7 +17,9 @@ import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewConte
 import { CryptoFiatActions, CryptoFiatContext } from '../../../context/crypto-fiat-context/CryptoFiatContext';
 import { text } from '../../../resources/text/textConfig';
 import { TextInputForm } from '../../../components/FormComponents/TextInputForm/TextInputForm';
-import { calculateCryptoToFiat, formatZeroAmount, tokenValueFormat } from '../../../lib/utils';
+import {
+  calculateCryptoToFiat, formatZeroAmount, isNativeToken, tokenValueFormat,
+} from '../../../lib/utils';
 import { SelectForm } from '../../../components/FormComponents/SelectForm/SelectForm';
 import { validateAmount, validateToken } from '../functions/BridgeFormValidator';
 import { Fees } from '../../../components/Fees/Fees';
@@ -28,7 +30,7 @@ import {
 } from './BridgeFormStyles';
 import { CoinSelectorOptionProps } from '../../../components/CoinSelector/CoinSelectorOption';
 import { useInterval } from '../../../lib/hooks/useInterval';
-import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL } from '../../../lib';
+import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE } from '../../../lib';
 import { swapButtonIconLoadingStyle } from '../../swap/components/SwapButtonStyles';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
@@ -36,7 +38,7 @@ import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
 interface BridgeFormProps {
   testId?: string;
   defaultAmount?: string;
-  defaultTokenAddress?: string;
+  defaultFromContractAddress?: string;
 }
 
 export function BridgeForm(props: BridgeFormProps) {
@@ -52,7 +54,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);
-  const { testId, defaultAmount, defaultTokenAddress } = props;
+  const { testId, defaultAmount, defaultFromContractAddress } = props;
   const { content, bridgeForm, fees } = text.views[BridgeWidgetViews.BRIDGE];
 
   // Form state
@@ -94,7 +96,7 @@ export function BridgeForm(props: BridgeFormProps) {
     const options = tokenBalances
       .filter((b) => b.balance.gt(0)
       && b.token?.address
-      && b.token?.address !== 'NATIVE'
+      && b.token?.address !== NATIVE
       && b.token.address !== '')
       .map(
         (t) => ({
@@ -117,14 +119,16 @@ export function BridgeForm(props: BridgeFormProps) {
 
     if (!hasSetDefaultState.current) {
       hasSetDefaultState.current = true;
-      if (defaultTokenAddress) {
-        setToken(tokenBalances.find((b) => b.token.address?.toLowerCase() === defaultTokenAddress?.toLowerCase()));
+      if (defaultFromContractAddress) {
+        setToken(tokenBalances.find(
+          (b) => (b.token.address?.toLowerCase() === defaultFromContractAddress?.toLowerCase()),
+        ));
       }
     }
   }, [
     tokenBalances,
     cryptoFiatState.conversions,
-    defaultTokenAddress,
+    defaultFromContractAddress,
     hasSetDefaultState.current,
     setToken,
     setTokensOptions,
@@ -221,12 +225,12 @@ export function BridgeForm(props: BridgeFormProps) {
 
   const insufficientFundsForGas = useMemo(() => {
     const ethBalance = tokenBalances
-      .find((balance) => !balance.token.address || balance.token.address === 'NATIVE');
+      .find((balance) => isNativeToken(balance.token.address));
     if (!ethBalance) {
       return true;
     }
 
-    const tokenIsEth = !token?.token.address || token.token.address === 'NATIVE';
+    const tokenIsEth = isNativeToken(token?.token.address);
     const gasAmount = parseEther(gasFee.length !== 0 ? gasFee : '0');
     const additionalAmount = tokenIsEth && !Number.isNaN(parseFloat(amount))
       ? parseEther(amount)
@@ -351,10 +355,14 @@ export function BridgeForm(props: BridgeFormProps) {
                 approveTransaction: approvalTransaction,
                 transaction: unsignedBridgeTransaction,
                 bridgeFormInfo: {
-                  tokenAddress: token.token?.address ?? '',
-                  amount,
+                  fromContractAddress: token.token?.address ?? '',
+                  fromAmount: amount,
                 },
               },
+            },
+            currentViewData: {
+              tokenAddress: token.token?.address ?? '',
+              amount,
             },
           },
         });
@@ -375,8 +383,8 @@ export function BridgeForm(props: BridgeFormProps) {
               token: token?.token!,
               transactionResponse,
               bridgeForm: {
-                tokenAddress: token?.token.address ?? '',
-                amount,
+                fromContractAddress: token?.token.address ?? '',
+                fromAmount: amount,
               },
             },
           },
@@ -400,8 +408,8 @@ export function BridgeForm(props: BridgeFormProps) {
               type: BridgeWidgetViews.FAIL,
               reason: 'Transaction failed',
               data: {
-                tokenAddress: token?.token.address ?? '',
-                amount,
+                fromContractAddress: token?.token.address ?? '',
+                fromAmount: amount,
               },
             },
           },
@@ -503,7 +511,7 @@ export function BridgeForm(props: BridgeFormProps) {
           showHeaderBar={false}
           onCloseBottomSheet={() => setShowNotEnoughGasDrawer(false)}
           walletAddress={walletAddress}
-          showAdjustAmount={(!token?.token.address || token.token.address === 'NATIVE')}
+          showAdjustAmount={isNativeToken(token?.token.address)}
         />
       </Box>
     </Box>

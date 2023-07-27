@@ -22,9 +22,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - @imtbl/blockchain-data: Improved naming for Activity types
 
+- @imtbl/immutablex-client: Order requests now pointing to the V3 endpoints
+
 ### Removed
 
 ### Deprecated
+
+## [0.3.0] - 2023-07-18
+
+### Added
+
+- @imtbl/passport: Silent logout feature
 
 ## [0.1.8] - 2023-06-05
 

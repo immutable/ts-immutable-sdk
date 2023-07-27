@@ -67,20 +67,10 @@ export function isValidNonZeroAddress(address: string): boolean {
   }
 }
 
-export const tokenInfoToUniswapToken = (tokenInfos: TokenInfo[]): Token[] => {
-  const tokens = [];
-
-  for (const tokenInfo of tokenInfos) {
-    tokens.push(
-      new Token(
-        tokenInfo.chainId,
-        tokenInfo.address,
-        tokenInfo.decimals,
-        tokenInfo.symbol,
-        tokenInfo.name,
-      ),
-    );
-  }
-
-  return tokens;
-};
+export const tokenInfoToUniswapToken = (tokenInfo: TokenInfo): Token => new Token(
+  tokenInfo.chainId,
+  tokenInfo.address,
+  tokenInfo.decimals,
+  tokenInfo.symbol,
+  tokenInfo.name,
+);

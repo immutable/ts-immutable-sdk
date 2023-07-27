@@ -17,9 +17,9 @@ import { WidgetTheme } from './types';
  */
 export type SemanticVersion = {
   major: number;
-  minor?: number;
-  patch?: number;
-  prerelease?: 'alpha' | 'beta';
+  minor: number;
+  patch: number;
+  prerelease: 'alpha';
   build?: number;
 };
 
@@ -28,7 +28,6 @@ export type SemanticVersion = {
  * @property {WidgetTheme | undefined} theme - The theme of the Checkout Widget (default: "DARK")
  * @property {Environment | undefined} environment - The environment configuration (default: "SANDBOX")
  * @property {SemanticVersion | undefined} version - The version of the checkout widgets js file to use (default: "0.1.0")
- * @property {boolean | undefined} isOnRampEnabled - Enable on-ramp top-up method (default: "true")
  * @property {boolean | undefined} isSwapEnabled - Enable swap top-up method (default: "true")
  * @property {boolean | undefined} isBridgeEnabled - Enable bridge top-up method (default: "true")
  */
@@ -36,7 +35,9 @@ export type CheckoutWidgetsConfig = {
   theme?: WidgetTheme;
   environment?: Environment;
   version?: SemanticVersion;
-  isOnRampEnabled?: boolean;
+  // TODO https://immutable.atlassian.net/browse/WT-1509
+  // * @property {boolean | undefined} isOnRampEnabled - Enable on-ramp top-up method (default: "true")
+  // isOnRampEnabled?: boolean;
   isSwapEnabled?: boolean;
   isBridgeEnabled?: boolean;
 };

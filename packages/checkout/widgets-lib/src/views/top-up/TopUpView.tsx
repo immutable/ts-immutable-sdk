@@ -90,35 +90,31 @@ export function TopUpView({
     }
 
     try {
-      const swapEstimate = await checkout.gasEstimate({
-        gasEstimateType: GasEstimateType.SWAP,
-      }) as GasEstimateSwapResult;
+      const [swapEstimate, bridgeEstimate] = await Promise.all([
+        checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.SWAP,
+        }),
+        checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          isSpendingCapApprovalRequired: true,
+        }),
+      ]);
       const swapFeeInFiat = getSwapFeeEstimation(
-        swapEstimate,
+        swapEstimate as GasEstimateSwapResult,
         conversions,
       );
       setSwapFeesInFiat(swapFeeInFiat);
-      setLoadingSwapFees(false);
-    } catch {
-      setSwapFeesInFiat('-.--');
-    } finally {
-      setLoadingSwapFees(false);
-    }
-
-    try {
-      const bridgeEstimate = await checkout.gasEstimate({
-        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        isSpendingCapApprovalRequired: true,
-      }) as GasEstimateBridgeToL2Result;
       const bridgeFeeInFiat = getBridgeFeeEstimation(
-        bridgeEstimate,
+        bridgeEstimate as GasEstimateBridgeToL2Result,
         conversions,
       );
       setBridgeFeesInFiat(bridgeFeeInFiat);
     } catch {
+      setSwapFeesInFiat('-.--');
       setBridgeFeesInFiat('-.--');
     } finally {
       setLoadingBridgeFees(false);
+      setLoadingSwapFees(false);
     }
   };
 
@@ -139,7 +135,7 @@ export function TopUpView({
           view: {
             type: SwapWidgetViews.SWAP,
             data: {
-              toContractAddress: tokenAddress ?? '',
+              toContractAddress: '',
               fromAmount: '',
               fromContractAddress: '',
             },
@@ -160,7 +156,13 @@ export function TopUpView({
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: BridgeWidgetViews.BRIDGE },
+          view: {
+            type: BridgeWidgetViews.BRIDGE,
+            data: {
+              fromContractAddress: '',
+              fromAmount: '',
+            },
+          },
         },
       });
       return;
@@ -193,7 +195,7 @@ export function TopUpView({
     onClick: () => void,
     renderFeeFunction?: (fees: string, feesLoading: boolean) => ReactNode,
   ) => (
-    <Box sx={{ paddingY: '1px' }}>
+    <Box testId="top-up-view" sx={{ paddingY: '1px' }}>
       <MenuItem
         testId={`menu-item-${testId}`}
         size="medium"
@@ -221,7 +223,7 @@ export function TopUpView({
     <SimpleLayout
       header={(
         <HeaderNavigation
-          onBackButtonClick={onBackButtonClick ?? undefined}
+          onBackButtonClick={onBackButtonClick}
           onCloseButtonClick={onCloseButtonClick}
           showBack
         />
