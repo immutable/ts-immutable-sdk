@@ -25,7 +25,7 @@ describe('Token Bridge', () => {
     expect(bridge).toBeDefined();
   });
 
-  describe('getUnsignedApproveBridgeTx', () => {
+  describe('getUnsignedApproveRootBridgeTx', () => {
     let tokenBridge: TokenBridge;
     const mockERC20Contract = {
       allowance: jest.fn(),
@@ -65,8 +65,7 @@ describe('Token Bridge', () => {
         depositAmount,
       };
 
-      const result = await tokenBridge.getUnsignedApproveBridgeTx(req);
-      expect(result.required).toBe(true);
+      const result = await tokenBridge.getUnsignedApproveDepositBridgeTx(req);
       expect(result.unsignedTx).toBeDefined();
       expect(result.unsignedTx?.data).toBe('0xdata');
       expect(result.unsignedTx?.to).toBe(req.token);
@@ -87,15 +86,14 @@ describe('Token Bridge', () => {
         depositAmount,
       };
 
-      const result = await tokenBridge.getUnsignedApproveBridgeTx(req);
-      expect(result.required).toBe(false);
+      const result = await tokenBridge.getUnsignedApproveDepositBridgeTx(req);
       expect(result.unsignedTx).toBeNull();
     });
 
     it('throws an error when the token is NATIVE', async () => {
       expect.assertions(2);
       try {
-        await tokenBridge.getUnsignedApproveBridgeTx({ token: 'NATIVE', depositorAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816', depositAmount: ethers.utils.parseUnits('0.01', 18) });
+        await tokenBridge.getUnsignedApproveDepositBridgeTx({ token: 'NATIVE', depositorAddress: '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816', depositAmount: ethers.utils.parseUnits('0.01', 18) });
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
         expect(error.type).toBe(BridgeErrorType.UNSUPPORTED_ERROR);
@@ -104,7 +102,7 @@ describe('Token Bridge', () => {
     it('throws an error when depositorAddress is not a valid address', async () => {
       expect.assertions(2);
       try {
-        await tokenBridge.getUnsignedApproveBridgeTx({ token: 'ERC20', depositorAddress: 'invalidAddress', depositAmount: ethers.utils.parseUnits('0.01', 18) });
+        await tokenBridge.getUnsignedApproveDepositBridgeTx({ token: 'ERC20', depositorAddress: 'invalidAddress', depositAmount: ethers.utils.parseUnits('0.01', 18) });
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
         expect(error.type).toBe(BridgeErrorType.INVALID_ADDRESS);
@@ -113,7 +111,7 @@ describe('Token Bridge', () => {
     it('throws an error when token is not a valid address', async () => {
       expect.assertions(2);
       try {
-        await tokenBridge.getUnsignedApproveBridgeTx({ token: 'invalidToken', depositorAddress: '0x1234567890123456789012345678901234567890', depositAmount: ethers.utils.parseUnits('0.01', 18) });
+        await tokenBridge.getUnsignedApproveDepositBridgeTx({ token: 'invalidToken', depositorAddress: '0x1234567890123456789012345678901234567890', depositAmount: ethers.utils.parseUnits('0.01', 18) });
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
         expect(error.type).toBe(BridgeErrorType.INVALID_ADDRESS);
@@ -122,7 +120,7 @@ describe('Token Bridge', () => {
     it('throws an error when depositAmount is less than or equal to 0', async () => {
       expect.assertions(2);
       try {
-        await tokenBridge.getUnsignedApproveBridgeTx({ token: '0x1234567890123456789012345678901234567890', depositorAddress: '0x1234567890123456789012345678901234567890', depositAmount: ethers.BigNumber.from(0) });
+        await tokenBridge.getUnsignedApproveDepositBridgeTx({ token: '0x1234567890123456789012345678901234567890', depositorAddress: '0x1234567890123456789012345678901234567890', depositAmount: ethers.BigNumber.from(0) });
       } catch (error: any) {
         expect(error).toBeInstanceOf(BridgeError);
         expect(error.type).toBe(BridgeErrorType.INVALID_AMOUNT);

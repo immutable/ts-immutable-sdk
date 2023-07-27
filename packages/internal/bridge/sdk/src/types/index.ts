@@ -84,6 +84,22 @@ export interface BridgeDepositResponse {
 /**
  * TODO: @Rez docs
  */
+export interface ApproveWithdrawBridgeRequest {
+  depositorAddress: string;
+  token: FungibleToken;
+  depositAmount: ethers.BigNumber;
+}
+
+/**
+ * TODO: @Rez docs
+ */
+export interface ApproveWithdrawBridgeResponse {
+  unsignedTx: ethers.providers.TransactionRequest | null;
+}
+
+/**
+ * TODO: @Rez docs
+ */
 export interface BridgeWithdrawRequest {
   recipientAddress: Address;
   token: FungibleToken;
@@ -98,22 +114,22 @@ export interface BridgeWithdrawResponse {
 }
 
 /**
- * @typedef {Object} ApproveBridgeRequest
+ * @typedef {Object} ApproveDepositBridgeRequest
  * @property {string} depositorAddress - The address of the depositor.
  * @property {FungibleToken} token - The token to be approved.
  * @property {ethers.BigNumber} depositAmount - The amount to be approved for deposit.
  */
-export interface ApproveBridgeRequest {
+export interface ApproveDepositBridgeRequest {
   depositorAddress: string;
   token: FungibleToken;
   depositAmount: ethers.BigNumber;
 }
 
 /**
- * @typedef {Object} ApproveBridgeResponse
+ * @typedef {Object} ApproveDepositBridgeResponse
  * @property {ethers.providers.TransactionRequest | null} unsignedTx - The unsigned transaction for the token approval, or null if no approval is required.
  */
-export interface ApproveBridgeResponse {
+export interface ApproveDepositBridgeResponse {
   unsignedTx: ethers.providers.TransactionRequest | null;
 }
 

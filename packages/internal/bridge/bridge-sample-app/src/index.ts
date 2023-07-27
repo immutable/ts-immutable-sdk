@@ -5,8 +5,8 @@ import {
   TokenBridge,
   BridgeConfiguration,
   BridgeFeeRequest,
-  ApproveBridgeRequest,
-  ApproveBridgeResponse,
+  ApproveDepositBridgeRequest,
+  ApproveDepositBridgeResponse,
   BridgeFeeResponse,
   BridgeDepositRequest,
   BridgeDepositResponse,
@@ -19,6 +19,8 @@ import {
   WaitForWithdrawalRequest,
   WaitForWithdrawalResponse,
   ExitRequest,
+  ApproveWithdrawBridgeRequest,
+  ApproveWithdrawBridgeResponse,
 } from '@imtbl/bridge-sdk';
 
 /**
@@ -100,20 +102,17 @@ async function deposit() {
   const depositAmount = bridgeFeeResponse.feeAmount.add(depositAmountBeforeFee);
   console.log(`Deposit Amount inclusive of fees is ${depositAmount}`);
 
-  const approveReq: ApproveBridgeRequest = {
+  const approveReq: ApproveDepositBridgeRequest = {
     depositorAddress: process.env.DEPOSITOR_ADDRESS,
     token: process.env.TOKEN_ADDRESS,
     depositAmount,
   };
 
   // Get the unsigned approval transaction for the deposit
-  const approveResp: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(approveReq);
+  const approveResp: ApproveDepositBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(approveReq);
 
   // If approval is required, sign and send the approval transaction
-  if (approveResp.required) {
-    if (!approveResp.unsignedTx) {
-      throw new Error('tx is null');
-    }
+  if (approveResp.unsignedTx) {
     console.log('Sending Approve Tx');
     const txResponseApprove = await checkout.sendTransaction(
       approveResp.unsignedTx,
@@ -172,20 +171,17 @@ async function deposit() {
   console.log(`Starting WITHDRAWAL`);
   console.log(`Approving Bridge`);
   // Approval
-  const childApproveReq: ApproveBridgeRequest = {
+  const childApproveReq: ApproveWithdrawBridgeRequest = {
     depositorAddress: process.env.DEPOSITOR_ADDRESS,
     token: "0x0000000000000000000000000000000000001010",
     depositAmount,
   };
 
   // Get the unsigned approval transaction for the deposit
-  const childApproveResp: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveChildBridgeTx(childApproveReq);
+  const childApproveResp: ApproveWithdrawBridgeResponse = await tokenBridge.getUnsignedApproveChildBridgeTx(childApproveReq);
 
   // If approval is required, sign and send the approval transaction
-  if (childApproveResp.required) {
-    if (!childApproveResp.unsignedTx) {
-      throw new Error('tx is null');
-    }
+  if (childApproveResp.unsignedTx) {
     console.log('Sending Approve Tx');
     // childApproveResp.unsignedTx.gasLimit = ethers.utils.hexlify(500000); 
     const txResponseApprove = await checkoutChildChain.sendTransaction(
@@ -198,7 +194,6 @@ async function deposit() {
   } else {
     console.log('Approval not required');
   }
-  //
 
   const withdrawlReq: BridgeWithdrawRequest = {
     recipientAddress: process.env.DEPOSITOR_ADDRESS,
@@ -231,86 +226,6 @@ async function deposit() {
   console.log(exitTx)
   const exitTxReceipt = await exitTx.wait(1);
   console.log(exitTxReceipt);
-}
-
-async function test() {
-    // Check and throw errors if required environment variables are not set
-    if (!process.env.ROOT_PROVIDER) {
-      console.log(process.env.ROOT_PROVIDER);
-      throw new Error('ROOT_PROVIDER not set');
-    }
-    if (!process.env.CHILD_PROVIDER) {
-      throw new Error('CHILD_PROVIDER not set');
-    }
-    if (!process.env.PRIVATE_KEY) {
-      throw new Error('PRIVATE_KEY not set');
-    }
-    if (!process.env.DEPOSITOR_ADDRESS) {
-      throw new Error('DEPOSITOR_ADDRESS not set');
-    }
-    if (!process.env.RECIPIENT_ADDRESS) {
-      throw new Error('RECIPIENT_ADDRESS not set');
-    }
-    if (!process.env.TOKEN_ADDRESS) {
-      throw new Error('TOKEN_ADDRESS not set');
-    }
-    if (!process.env.DEPOSIT_AMOUNT) {
-      throw new Error('DEPOSIT_AMOUNT not set');
-    }
-    // Parse deposit amount from environment variable
-    const depositAmountBeforeFee = ethers.utils.parseUnits(
-      process.env.DEPOSIT_AMOUNT,
-      18,
-    );
-  
-    // Create providers for root and child chains
-    const rootChainProvider = new ethers.providers.JsonRpcProvider(
-      process.env.ROOT_PROVIDER,
-    );
-    const childChainProvider = new ethers.providers.JsonRpcProvider(
-      process.env.CHILD_PROVIDER,
-    );
-  
-    // Create a wallet instance to simulate the user's wallet
-    const checkout = new ethers.Wallet(
-      process.env.PRIVATE_KEY,
-      rootChainProvider,
-    );
-  
-    // Create a wallet instance to simulate the user's wallet
-    const checkoutChildChain = new ethers.Wallet(
-      process.env.PRIVATE_KEY,
-      childChainProvider,
-    );
-  
-    // Create a bridge configuration instance
-    const bridgeConfig = new BridgeConfiguration({
-      baseConfig: new ImmutableConfiguration({
-        environment: Environment.SANDBOX,
-      }),
-      bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-      rootProvider: rootChainProvider,
-      childProvider: childChainProvider,
-    });
-  
-    // Create a token bridge instance using the bridge configuration
-    const tokenBridge = new TokenBridge(bridgeConfig);
-    
-    const withdrawalRequest: WaitForWithdrawalRequest = {
-      transactionHash: "0xf2a7bffa534719bf0b127d121fcb54d13a1f2d7bb9f5958e1a7866ab9a7b1993",
-    }
-    const waitForWithdrawalResp: WaitForWithdrawalResponse = await tokenBridge.waitForWithdrawal(withdrawalRequest);
-    console.log(waitForWithdrawalResp)
-
-    const exitRequest: ExitRequest = {
-      transactionHash: "0xf2a7bffa534719bf0b127d121fcb54d13a1f2d7bb9f5958e1a7866ab9a7b1993",
-    }
-    const exitTx = await tokenBridge.getUnsignedExitTx(exitRequest);
-
-    const txWithdraw = await checkout.sendTransaction(exitTx.unsignedTx);
-    console.log(txWithdraw)
-    const txWithdrawReceipt = await txWithdraw.wait(1);
-    console.log(txWithdrawReceipt);
 }
 
 // Run the deposit function and exit the process when completed

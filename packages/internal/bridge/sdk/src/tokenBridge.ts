@@ -1,8 +1,10 @@
 import { BridgeConfiguration } from 'config';
 import { ethers } from 'ethers';
 import {
-  ApproveBridgeRequest,
-  ApproveBridgeResponse,
+  ApproveDepositBridgeRequest,
+  ApproveDepositBridgeResponse,
+  ApproveWithdrawBridgeRequest,
+  ApproveWithdrawBridgeResponse,
   BridgeDepositRequest,
   BridgeDepositResponse,
   BridgeFeeRequest,
@@ -186,6 +188,9 @@ export class TokenBridge {
     };
   }
 
+  /**
+   * TODO: @rez add docs
+   */
   public async getUnsignedWithdrawTx(
     req: BridgeWithdrawRequest,
   ): Promise<BridgeWithdrawResponse> {
@@ -216,9 +221,12 @@ export class TokenBridge {
     };
   }
 
+  /**
+   * TODO: @rez add docs
+   */
   public async getUnsignedApproveChildBridgeTx(
-    req: ApproveBridgeRequest,
-  ): Promise<ApproveBridgeResponse> {
+    req: ApproveWithdrawBridgeRequest,
+  ): Promise<ApproveWithdrawBridgeResponse> {
     const erc20Contract = await withBridgeError<ethers.Contract>(
       async () => {
         const contract = new ethers.Contract(
@@ -245,7 +253,6 @@ export class TokenBridge {
 
     return {
       unsignedTx,
-      required: true,
     };
   }
 
@@ -270,7 +277,7 @@ export class TokenBridge {
    *   depositAmount: ethers.utils.parseUnits('100', 18), // Deposit amount in token's smallest unit (e.g., wei for Ether)
    * };
    *
-   * bridgeSdk.getUnsignedApproveBridgeTx(approveRequest)
+   * bridgeSdk.getUnsignedApproveDepositBridgeTx(approveRequest)
    *   .then((approveResponse) => {
    *     console.log('Approval Required:', approveResponse.required);
    *     console.log('Unsigned Approval Transaction:', approveResponse.unsignedTx);
@@ -279,9 +286,9 @@ export class TokenBridge {
    *     console.error('Error:', error.message);
    *   });
    */
-  public async getUnsignedApproveBridgeTx(
-    req: ApproveBridgeRequest,
-  ): Promise<ApproveBridgeResponse> {
+  public async getUnsignedApproveDepositBridgeTx(
+    req: ApproveDepositBridgeRequest,
+  ): Promise<ApproveDepositBridgeResponse> {
     // If the token is NATIVE, no approval is required
     if (req.token === 'NATIVE') {
       // When native tokens are supported, change this to return required: false
@@ -326,7 +333,6 @@ export class TokenBridge {
     if (rootERC20PredicateAllowance.gte(req.depositAmount)) {
       return {
         unsignedTx: null,
-        required: false,
       };
     }
     // Calculate the amount of tokens that need to be approved for deposit
@@ -350,7 +356,6 @@ export class TokenBridge {
 
     return {
       unsignedTx,
-      required: true,
     };
   }
 
