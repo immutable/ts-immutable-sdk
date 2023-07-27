@@ -4,7 +4,7 @@ import { PassportError, PassportErrorType } from '../../errors/passportError';
 import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mocks';
 import { cancelOrder, createOrder } from './order';
 
-jest.mock('../guardian');
+jest.mock('../../guardian/guardian');
 
 describe('order', () => {
   afterEach(jest.resetAllMocks);

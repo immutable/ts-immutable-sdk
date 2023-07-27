@@ -4,7 +4,7 @@ import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mo
 import { PassportError, PassportErrorType } from '../../errors/passportError';
 import GuardianClient from '../../guardian/guardian';
 
-jest.mock('../guardian');
+jest.mock('../../guardian/guardian');
 
 const mockPayloadHash = 'test_payload_hash';
 const mockSignableTradeRequest = {

@@ -4,7 +4,7 @@ import { mockErrorMessage, mockStarkSignature, mockUserImx } from '../../test/mo
 import { batchNftTransfer, transfer } from './transfer';
 import GuardianClient from '../../guardian/guardian';
 
-jest.mock('../guardian');
+jest.mock('../../guardian/guardian');
 
 describe('transfer', () => {
   afterEach(jest.resetAllMocks);
