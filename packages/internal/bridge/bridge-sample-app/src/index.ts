@@ -110,7 +110,7 @@ async function depositAndWithdraw() {
   };
 
   // Get the unsigned approval transaction for the deposit
-  const approveResp: ApproveDepositBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(approveReq);
+  const approveResp: ApproveDepositBridgeResponse = await tokenBridge.getUnsignedApproveDepositBridgeTx(approveReq);
 
   // If approval is required, sign and send the approval transaction
   if (approveResp.unsignedTx) {
@@ -174,12 +174,12 @@ async function depositAndWithdraw() {
   // Approval
   const childApproveReq: ApproveWithdrawBridgeRequest = {
     depositorAddress: process.env.DEPOSITOR_ADDRESS,
-    token: "0x0000000000000000000000000000000000001010",
+    token: process.env.TOKEN_ADDRESS,
     depositAmount,
   };
 
   // Get the unsigned approval transaction for the deposit
-  const childApproveResp: ApproveWithdrawBridgeResponse = await tokenBridge.getUnsignedApproveChildBridgeTx(childApproveReq);
+  const childApproveResp: ApproveWithdrawBridgeResponse = await tokenBridge.getUnsignedApproveWithdrawBridgeTx(childApproveReq);
 
   // If approval is required, sign and send the approval transaction
   if (childApproveResp.unsignedTx) {
@@ -198,7 +198,7 @@ async function depositAndWithdraw() {
 
   const withdrawlReq: BridgeWithdrawRequest = {
     recipientAddress: process.env.DEPOSITOR_ADDRESS,
-    token: CHILD_CHAIN_NATIVE_TOKEN_ADDRESS,
+    token: process.env.TOKEN_ADDRESS,
     withdrawAmount: depositAmount
   };
   
