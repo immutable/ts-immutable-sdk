@@ -1,6 +1,4 @@
-import {
-  ExternalProvider, JsonRpcProvider, TransactionRequest, Web3Provider,
-} from '@ethersproject/providers';
+import { ExternalProvider, JsonRpcProvider, TransactionRequest, Web3Provider, } from '@ethersproject/providers';
 import { chainIdNumber, getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
@@ -8,7 +6,7 @@ import { retryWithDelay } from '../network/retry';
 import { PassportConfiguration } from '../config';
 import { RelayerClient } from './relayerClient';
 import { UserZkEvm } from '../types';
-import GuardianClient from '../guardian/guardian';
+import GuardianClient, { convertBigNumberishToNumber } from '../guardian/guardian';
 
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
@@ -84,7 +82,7 @@ export const sendTransaction = async ({
 
   await guardianClient.validateEVMTransaction({
     chainId: config.zkEvmChainId,
-    nonce: converBigNumberishToNumber(nonce),
+    nonce: convertBigNumberishToNumber(nonce),
     user,
     metaTransactions: [metaTransaction, feeMetaTransaction],
   });

@@ -25,7 +25,7 @@ type GuardianEVMValidationParams = {
   metaTransactions: MetaTransaction[],
 };
 
-const convertBigNumberishToNumber = (value: ethers.BigNumberish): number => BigNumber.from(value).toNumber();
+export const convertBigNumberishToNumber = (value: ethers.BigNumberish): number => BigNumber.from(value).toNumber();
 
 const transformGuardianTransactions = (txs: MetaTransaction[]): guardian.MetaTransaction[] => {
   try {
@@ -107,7 +107,7 @@ export default class GuardianClient {
     }
   }
 
-  private async evaluateEVTransaction({
+  private async evaluateEVMTransaction({
     chainId,
     nonce,
     user,
@@ -146,7 +146,7 @@ export default class GuardianClient {
     user,
     metaTransactions,
   }: GuardianEVMValidationParams): Promise<void> {
-    const transactionEvaluationResponse = await this.evaluateEVTransaction({
+    const transactionEvaluationResponse = await this.evaluateEVMTransaction({
       chainId,
       nonce,
       user,

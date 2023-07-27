@@ -33,8 +33,6 @@ describe('sendTransaction', () => {
   };
   const guardianClient = {
     validateEVMTransaction: jest.fn(),
-  };
-  const transactionAPI = {
     evaluateTransaction: jest.fn(),
   };
 
@@ -104,40 +102,26 @@ describe('sendTransaction', () => {
     });
 
     expect(result).toEqual(transactionHash);
-    expect(transactionAPI.evaluateTransaction).toHaveBeenCalledWith(
+    expect(guardianClient.validateEVMTransaction).toHaveBeenCalledWith(
       {
-        id: 'evm',
-        transactionEvaluationRequest: {
-          chainType: 'evm',
-          chainId: config.zkEvmChainId,
-          transactionData: {
-            metaTransactions: [
-              {
-                data: transactionRequest.data,
-                delegateCall: false,
-                gasLimit: '0',
-                revertOnError: true,
-                target: mockUserZkEvm.zkEvm.ethAddress,
-                value: '0',
-              },
-              {
-                data: '0x00',
-                delegateCall: false,
-                gasLimit: '0',
-                revertOnError: true,
-                target: imxFeeOption.recipientAddress,
-                value: imxFeeOption.tokenPrice,
-              },
-            ],
+        chainId: config.zkEvmChainId,
+        nonce,
+        user: mockUserZkEvm,
+        metaTransactions: [
+          {
+            data: transactionRequest.data,
+            revertOnError: true,
+            to: mockUserZkEvm.zkEvm.ethAddress,
+            value: '0x00',
             nonce,
-            userAddress: mockUserZkEvm.zkEvm.ethAddress,
           },
-        },
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${mockUserZkEvm.accessToken}`,
-        },
+          {
+            revertOnError: true,
+            to: imxFeeOption.recipientAddress,
+            value: imxFeeOption.tokenPrice,
+            nonce,
+          },
+        ],
       },
     );
     expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(
