@@ -5,7 +5,7 @@
     "@biom3/design-tokens": "0.2.0-beta",
     "@biom3/react": "^0.8.0-beta",
     "@imtbl/config": "0.0.0",
-    "@imtbl/core-sdk": "^2.0.1",
+    "@imtbl/core-sdk": "^2.0.2",
     "@imtbl/immutablex-client": "0.0.0",
     "@imtbl/passport": "0.0.0",
     "@imtbl/provider": "0.0.0",
