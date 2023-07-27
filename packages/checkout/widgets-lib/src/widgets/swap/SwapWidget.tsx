@@ -1,17 +1,15 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import {
-  Checkout,
   DexConfig,
   GetTokenAllowListResult,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
-  useEffect, useCallback, useReducer, useMemo,
+  useEffect, useReducer, useMemo, useContext,
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeOverrides } from '@imtbl/dex-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../views/loading/LoadingView';
@@ -43,11 +41,11 @@ import {
 import { SwapInProgress } from './views/SwapInProgress';
 import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
 import { TopUpView } from '../../views/top-up/TopUpView';
+import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
   config: StrongCheckoutWidgetsConfig
-  web3Provider?: Web3Provider
 }
 
 export interface SwapWidgetParams {
@@ -65,47 +63,25 @@ export function SwapWidget(props: SwapWidgetProps) {
     () => ({ viewState, viewDispatch }),
     [viewState, viewDispatch],
   );
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
   const [swapState, swapDispatch] = useReducer(swapReducer, initialSwapState);
   const swapReducerValues = useMemo(
     () => ({ swapState, swapDispatch }),
     [swapState, swapDispatch],
   );
 
-  const { params, config, web3Provider } = props;
+  const { params, config } = props;
   const {
     environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
   const {
     amount, fromContractAddress, toContractAddress,
   } = params;
-  const { checkout, provider } = swapState;
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
-
-  /* Set provider in SwapState from web3Provider passed in */
-  useEffect(() => {
-    if (web3Provider) {
-      swapDispatch({
-        payload: {
-          type: SwapActions.SET_PROVIDER,
-          provider: web3Provider,
-        },
-      });
-    }
-  }, [web3Provider]);
-
-  const swapWidgetSetup = useCallback(async () => {
-    swapDispatch({
-      payload: {
-        type: SwapActions.SET_CHECKOUT,
-        checkout: new Checkout({
-          baseConfig: { environment },
-        }),
-      },
-    });
-  }, [environment]);
 
   useEffect(() => {
     (async () => {
@@ -195,10 +171,6 @@ export function SwapWidget(props: SwapWidgetProps) {
       });
     })();
   }, [checkout, provider]);
-
-  useEffect(() => {
-    swapWidgetSetup();
-  }, [swapWidgetSetup]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }} bottomSheetContainerId="bottom-sheet-container">

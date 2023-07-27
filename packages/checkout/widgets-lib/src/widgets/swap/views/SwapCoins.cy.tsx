@@ -17,9 +17,7 @@ describe('SwapCoins tests', () => {
   beforeEach(() => {
     cryptoConversions = new Map<string, number>([['eth', 1800], ['imx', 0.75]]);
     const initialSwapState: SwapState = {
-      checkout: null,
       exchange: null,
-      provider: null,
       walletProvider: null,
       network: null,
       tokenBalances: [
