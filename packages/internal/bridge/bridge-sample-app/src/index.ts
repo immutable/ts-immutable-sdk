@@ -207,9 +207,9 @@ async function deposit() {
   };
   
   const unsignedWithdrawReq = await tokenBridge.getUnsignedWithdrawTx(withdrawlReq);
-  const tx = { ...unsignedWithdrawReq.unsignedTx, gasLimit: ethers.utils.hexlify(500000)} 
+  // const tx = { ...unsignedWithdrawReq.unsignedTx, gasLimit: ethers.utils.hexlify(500000)} 
   console.log("Sending withdraw tx");
-  const txWithdraw = await checkoutChildChain.sendTransaction(tx);
+  const txWithdraw = await checkoutChildChain.sendTransaction(unsignedWithdrawReq.unsignedTx);
   const txWithdrawReceipt = await txWithdraw.wait(1);
   console.log(`Withdrawal tx hash: ${txWithdrawReceipt.transactionHash}`)
 

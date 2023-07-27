@@ -81,12 +81,18 @@ export interface BridgeDepositResponse {
   unsignedTx: ethers.providers.TransactionRequest;
 }
 
+/**
+ * TODO: @Rez docs
+ */
 export interface BridgeWithdrawRequest {
   recipientAddress: Address;
   token: FungibleToken;
   withdrawAmount: ethers.BigNumber;
 }
 
+/**
+ * TODO: @Rez docs
+ */
 export interface BridgeWithdrawResponse {
   unsignedTx: ethers.providers.TransactionRequest;
 }
@@ -106,11 +112,9 @@ export interface ApproveBridgeRequest {
 /**
  * @typedef {Object} ApproveBridgeResponse
  * @property {ethers.providers.TransactionRequest | null} unsignedTx - The unsigned transaction for the token approval, or null if no approval is required.
- * @property {boolean} required - Indicates whether an approval transaction is required or not.
  */
 export interface ApproveBridgeResponse {
   unsignedTx: ethers.providers.TransactionRequest | null;
-  required: boolean;
 }
 
 /**
@@ -152,12 +156,16 @@ export interface WaitForWithdrawalRequest {
  */
 export interface WaitForWithdrawalResponse {}
 
-// TODO: @Rez docs
+/**
+ * TODO: @Rez docs
+ */
 export interface ExitRequest {
   transactionHash: string;
 }
 
-// TODO: @Rez docs
+/**
+ * TODO: @Rez docs
+ */
 export interface ExitResponse {
   unsignedTx: ethers.providers.TransactionRequest;
 }
