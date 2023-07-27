@@ -61,6 +61,7 @@ export function WalletWidget(props: WalletWidgetProps) {
     [walletState, walletDispatch],
   );
 
+  /** Set the web3Provider passed in from ConnectLoader into WalletState */
   useEffect(() => {
     if (web3Provider) {
       walletDispatch({
@@ -72,8 +73,9 @@ export function WalletWidget(props: WalletWidgetProps) {
     }
   }, [web3Provider]);
 
-  const { checkout } = walletState;
+  const { checkout, provider } = walletState;
 
+  /* Set Checkout and config into WalletState */
   useEffect(() => {
     walletDispatch({
       payload: {
@@ -96,18 +98,17 @@ export function WalletWidget(props: WalletWidgetProps) {
 
   useEffect(() => {
     (async () => {
-      if (!checkout || !web3Provider) return;
+      if (!checkout || !provider) return;
 
       const network = await checkout.getNetworkInfo({
-        provider: web3Provider,
+        provider,
       });
 
-      walletDispatch({
-        payload: {
-          type: WalletActions.SET_PROVIDER,
-          provider: web3Provider,
-        },
-      });
+      /* If the provider's network is not supported, return out of this and let the
+      connect loader handle the switch network functionality */
+      if (!network.isSupported) {
+        return;
+      }
 
       walletDispatch({
         payload: {
@@ -123,7 +124,7 @@ export function WalletWidget(props: WalletWidgetProps) {
         },
       });
     })();
-  }, [checkout]);
+  }, [checkout, provider]);
 
   const errorAction = () => {
     // TODO: please remove or if necessary keep the eslint ignore
