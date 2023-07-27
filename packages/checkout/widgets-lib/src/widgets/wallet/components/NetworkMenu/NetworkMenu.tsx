@@ -27,6 +27,10 @@ import {
   SharedViews,
 } from '../../../../context/view-context/ViewContext';
 import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
+import {
+  ConnectLoaderActions,
+  ConnectLoaderContext,
+} from '../../../../context/connect-loader-context/ConnectLoaderContext';
 
 const logoColour = {
   [ChainId.IMTBL_ZKEVM_DEVNET]: 'base.color.text.link.primary',
@@ -50,10 +54,12 @@ export interface NetworkMenuProps {
 }
 
 export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
+  const { connectLoaderState, connectLoaderDispatch } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);
   const { walletState, walletDispatch } = useContext(WalletContext);
   const { networkStatus } = text.views[WalletWidgetViews.WALLET_BALANCES];
-  const { checkout, network, provider } = walletState;
+  const { network } = walletState;
   const [allowedNetworks, setNetworks] = useState<NetworkInfo[] | undefined>(
     [],
   );
@@ -67,9 +73,9 @@ export function NetworkMenu({ setBalancesLoading }: NetworkMenuProps) {
           provider,
           chainId,
         } as SwitchNetworkParams);
-        walletDispatch({
+        connectLoaderDispatch({
           payload: {
-            type: WalletActions.SET_PROVIDER,
+            type: ConnectLoaderActions.SET_PROVIDER,
             provider: switchNetworkResult.provider,
           },
         });
