@@ -28,8 +28,9 @@ import {
  * It uses environment variables for configuration values.
  * It creates a token bridge instance, gets the bridge fee, calculates the deposit amount,
  * approves the deposit, and waits for the deposit to complete on L2.
+ * It then withdraws the deposited amount to the recipient address.
  */
-async function deposit() {
+async function depositAndWithdraw() {
   // Check and throw errors if required environment variables are not set
   if (!process.env.ROOT_PROVIDER) {
     console.log(process.env.ROOT_PROVIDER);
@@ -230,5 +231,5 @@ async function deposit() {
 
 // Run the deposit function and exit the process when completed
 (async () => {
-  await deposit().then(() => {console.log(`Exiting Successfully`); process.exit(0)}).catch(e => {console.log(`Exiting with error: ${e.toString()}`); process.exit(1)});
+  await depositAndWithdraw().then(() => {console.log(`Exiting Successfully`); process.exit(0)}).catch(e => {console.log(`Exiting with error: ${e.toString()}`); process.exit(1)});
 })();
