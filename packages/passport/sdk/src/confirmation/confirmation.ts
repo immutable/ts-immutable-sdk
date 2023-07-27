@@ -136,7 +136,7 @@ export default class ConfirmationScreen {
         href = `${this.config.passportDomain}/transaction-confirmation/transaction.html?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=starkex`;
       } else {
         // eslint-disable-next-line max-len
-        href = `${this.config.passportDomain}/transaction-confirmation/evm?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=starkex`;
+        href = `${this.config.passportDomain}/transaction-confirmation/zkevm?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=evm&chainId=?????`;
       }
       this.confirmationWindow.location.href = href;
       // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
