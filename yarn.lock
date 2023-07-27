@@ -27336,7 +27336,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ts-immutable-sdk@workspace:."
   dependencies:
-    "@ramp-network/ramp-instant-sdk": ^4.0.4
     "@release-it-plugins/workspaces": ^3.2.0
     "@release-it/keep-a-changelog": ^3.1.0
     "@typescript-eslint/eslint-plugin": ^5.57.1
