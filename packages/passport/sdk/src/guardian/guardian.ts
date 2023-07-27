@@ -159,10 +159,14 @@ export default class GuardianClient {
         transactionId,
         this.imxEtherAddress,
         TransactionApprovalRequestChainTypeEnum.Evm,
+        chainId,
       );
 
       if (!confirmationResult.confirmed) {
-        throw new Error('Transaction rejected by user');
+        throw new JsonRpcError(
+          RpcErrorCode.USER_REJECTED_REQUEST,
+          'Transaction rejected by user ',
+        );
       }
     } else {
       this.confirmationScreen.closeWindow();

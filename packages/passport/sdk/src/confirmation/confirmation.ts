@@ -98,6 +98,7 @@ export default class ConfirmationScreen {
     transactionId: string,
     imxEtherAddress: string,
     chainType: TransactionApprovalRequestChainTypeEnum,
+    chainId?: string,
   ): Promise<ConfirmationResult> {
     return new Promise((resolve, reject) => {
       const messageHandler = ({ data, origin }: MessageEvent) => {
@@ -136,7 +137,7 @@ export default class ConfirmationScreen {
         href = `${this.config.passportDomain}/transaction-confirmation/transaction.html?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=starkex`;
       } else {
         // eslint-disable-next-line max-len
-        href = `${this.config.passportDomain}/transaction-confirmation/zkevm?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=evm&chainId=?????`;
+        href = `${this.config.passportDomain}/transaction-confirmation/zkevm?transactionId=${transactionId}&imxEtherAddress=${imxEtherAddress}&chainType=evm&chainId=${chainId}`;
       }
       this.confirmationWindow.location.href = href;
       // https://stackoverflow.com/questions/9388380/capture-the-close-event-of-popup-window-in-javascript/48240128#48240128
