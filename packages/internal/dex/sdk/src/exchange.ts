@@ -50,6 +50,7 @@ export class Exchange {
         factoryAddress: config.chain.contracts.coreFactory,
         quoterAddress: config.chain.contracts.quoterV2,
         peripheryRouterAddress: config.chain.contracts.peripheryRouter,
+        secondaryFeeAddress: '0x8dBE1f0900C5e92ad87A54521902a33ba1598C51', // TODO: add secondary fee address to config
       },
     );
   }

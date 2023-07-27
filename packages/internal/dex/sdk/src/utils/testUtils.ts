@@ -201,17 +201,14 @@ export type SwapTest = {
 
 export function setupSwapTxTest(slippage: number): SwapTest {
   const slippageFraction = slippageToFraction(slippage);
-  // const fromAddress = TEST_FROM_ADDRESS;
-  const fromAddress = '0xa6C368164Eb270C31592c1830Ed25c2bf5D34BAE';
+  const fromAddress = TEST_FROM_ADDRESS;
 
   const arbitraryTick = 100;
   const arbitraryLiquidity = 10;
   const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
 
-  // const inputToken = IMX_TEST_TOKEN.address;
-  // const outputToken = WETH_TEST_TOKEN.address;
-  const inputToken = '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c';
-  const outputToken = '0x1836E16b2036088490C2CFe4d11970Fc8e5884C4';
+  const inputToken = IMX_TEST_TOKEN.address;
+  const outputToken = WETH_TEST_TOKEN.address;
 
   const amountIn = ethers.utils.parseEther('0.0000123');
   const amountOut = ethers.utils.parseEther('10000');

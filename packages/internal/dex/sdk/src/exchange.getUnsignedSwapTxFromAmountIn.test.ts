@@ -166,14 +166,14 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       params.inputToken = "0x1836E16b2036088490C2CFe4d11970Fc8e5884C4"
       params.outputToken = "0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c"
-      params.fromAddress = "0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496"
+      params.fromAddress = "0xa6C368164Eb270C31592c1830Ed25c2bf5D34BAE"
       params.amountIn = "10";
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
       const exchange = new Exchange({ baseConfig: { environment: Environment.SANDBOX }, chainId: 13372 });
 
       const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
-        '0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496',
+        '0xa6C368164Eb270C31592c1830Ed25c2bf5D34BAE',
         '0x1836E16b2036088490C2CFe4d11970Fc8e5884C4',
         '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c',
         10,
