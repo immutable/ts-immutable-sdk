@@ -1,4 +1,6 @@
-import { ExternalProvider, JsonRpcProvider, TransactionRequest, Web3Provider, } from '@ethersproject/providers';
+import {
+  ExternalProvider, JsonRpcProvider, TransactionRequest, Web3Provider,
+} from '@ethersproject/providers';
 import { chainIdNumber, getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { MetaTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';

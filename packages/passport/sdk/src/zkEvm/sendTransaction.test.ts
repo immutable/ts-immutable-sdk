@@ -33,7 +33,6 @@ describe('sendTransaction', () => {
   };
   const guardianClient = {
     validateEVMTransaction: jest.fn(),
-    evaluateTransaction: jest.fn(),
   };
 
   const nonce = 5;
