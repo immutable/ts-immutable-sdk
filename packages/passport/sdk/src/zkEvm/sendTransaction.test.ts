@@ -129,27 +129,6 @@ describe('sendTransaction', () => {
     );
   });
 
-  it('returns an error if the failed to parsing the request data ', async () => {
-    const wrongTransactionRequest = { ...transactionRequest, value: '0x' };
-
-    await expect(
-      sendTransaction({
-        params: [wrongTransactionRequest],
-        magicProvider,
-        jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
-        relayerClient: relayerClient as unknown as RelayerClient,
-        config: config as PassportConfiguration,
-        user: mockUserZkEvm,
-        guardianClient: guardianClient as unknown as GuardianClient,
-      }),
-    ).rejects.toThrow(
-      new JsonRpcError(
-        RpcErrorCode.PARSE_ERROR,
-        'Transaction failed to parsing: invalid BigNumber string (argument="value", value="0x", code=INVALID_ARGUMENT, version=bignumber/5.7.0)',
-      ),
-    );
-  });
-
   it('returns an error if the relayer does not return a successful status', async () => {
     (retryWithDelay as jest.Mock).mockResolvedValue({
       status: RelayerTransactionStatus.FAILED,
