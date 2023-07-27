@@ -1,5 +1,5 @@
 import { Environment } from '@imtbl/config';
-import { Wallet, providers } from 'ethers';
+import { Wallet } from 'ethers';
 import { log } from 'console';
 import { OrderStatus } from '../openapi/sdk/index';
 import { Orderbook } from '../orderbook';
@@ -7,6 +7,7 @@ import {
   deployTestToken,
   getFulfillerWallet,
   getOffererWallet,
+  getLocalhostProvider,
   signAndSubmitTx,
   signMessage,
   TestToken,
@@ -33,9 +34,7 @@ async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
 // Just using Jest for ease of executing the demo script, not test syntax used
 describe('', () => {
   it('', async () => {
-    const provider = new providers.JsonRpcProvider(
-      'https://zkevm-rpc.sandbox.x.immutable.com',
-    );
+    const provider = getLocalhostProvider();
     const offerer = getOffererWallet(provider);
     const fulfiller = getFulfillerWallet(provider);
 
