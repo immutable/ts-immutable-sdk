@@ -6,6 +6,7 @@ import {
   PRODUCTION_CHAIN_ID_NETWORK_MAP,
   SANDBOX_CHAIN_ID_NETWORK_MAP,
   ChainId,
+  INTERNAL_RPC_URL,
 } from '../types';
 import { RemoteConfigFetcher } from './remoteConfigFetcher';
 
@@ -18,10 +19,25 @@ export class CheckoutConfigurationError extends Error {
   }
 }
 
-const networkMap = (prod: boolean, dev: boolean) => {
-  if (dev) return DEV_CHAIN_ID_NETWORK_MAP;
-  if (prod) return PRODUCTION_CHAIN_ID_NETWORK_MAP;
-  return SANDBOX_CHAIN_ID_NETWORK_MAP;
+const networkMap = (prod: boolean, dev: boolean, local: boolean) => {
+  let networks: NetworkMap;
+
+  if (dev) {
+    networks = DEV_CHAIN_ID_NETWORK_MAP;
+  } else if (prod) {
+    networks = PRODUCTION_CHAIN_ID_NETWORK_MAP;
+    if (local) {
+      const rpcUrls = networks.get(ChainId.IMTBL_ZKEVM_MAINNET)?.rpcUrls;
+      rpcUrls?.splice(0, 1, INTERNAL_RPC_URL[Environment.PRODUCTION]);
+    }
+  } else {
+    networks = SANDBOX_CHAIN_ID_NETWORK_MAP;
+    if (local) {
+      const rpcUrls = networks.get(ChainId.IMTBL_ZKEVM_TESTNET)?.rpcUrls;
+      rpcUrls?.splice(0, 1, INTERNAL_RPC_URL[Environment.SANDBOX]);
+    }
+  }
+  return networks;
 };
 
 // **************************************************** //
@@ -51,6 +67,12 @@ export class CheckoutConfiguration {
   // Environment.DEVELOPMENT
   readonly isDevelopment: boolean = process.env.CHECKOUT_DEV_MODE !== undefined;
 
+  // This is a hidden feature that is only available
+  // when building the project from source code.
+  // This will be used to get around the lack of
+  // Environment.LOCAL_DEVELOPMENT
+  readonly isLocal: boolean = process.env.LOCAL_DEVELOPMENT !== undefined;
+
   readonly isProduction: boolean;
 
   readonly remote: RemoteConfigFetcher;
@@ -71,7 +93,11 @@ export class CheckoutConfiguration {
     // Developer mode will super set any environment configuration
     this.isProduction = !this.isDevelopment && this.environment === Environment.PRODUCTION;
 
-    this.networkMap = networkMap(this.isProduction, this.isDevelopment);
+    this.networkMap = networkMap(
+      this.isProduction,
+      this.isDevelopment,
+      this.isLocal,
+    );
 
     this.remote = new RemoteConfigFetcher({
       isDevelopment: this.isDevelopment,

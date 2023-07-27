@@ -78,11 +78,23 @@ export function SwapWidget(props: SwapWidgetProps) {
   const {
     amount, fromContractAddress, toContractAddress,
   } = params;
-  const { checkout } = swapState;
+  const { checkout, provider } = swapState;
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
+
+  /* Set provider in SwapState from web3Provider passed in */
+  useEffect(() => {
+    if (web3Provider) {
+      swapDispatch({
+        payload: {
+          type: SwapActions.SET_PROVIDER,
+          provider: web3Provider,
+        },
+      });
+    }
+  }, [web3Provider]);
 
   const swapWidgetSetup = useCallback(async () => {
     swapDispatch({
@@ -96,23 +108,18 @@ export function SwapWidget(props: SwapWidgetProps) {
   }, [environment]);
 
   useEffect(() => {
-    if (web3Provider) {
-      swapDispatch({
-        payload: {
-          type: SwapActions.SET_PROVIDER,
-          provider: web3Provider,
-        },
-      });
-    }
-  }, [web3Provider]);
-
-  useEffect(() => {
     (async () => {
-      if (!checkout || !web3Provider) return;
+      if (!checkout || !provider) return;
 
       const network = await checkout.getNetworkInfo({
-        provider: web3Provider,
+        provider,
       });
+
+      /* If the provider's network is not supported, return out of this and let the
+      connect loader handle the switch network functionality */
+      if (!network.isSupported) {
+        return;
+      }
 
       let overrides: ExchangeOverrides | undefined;
       try {
@@ -143,8 +150,8 @@ export function SwapWidget(props: SwapWidgetProps) {
       });
 
       const tokenBalances = await checkout.getAllBalances({
-        provider: web3Provider,
-        walletAddress: await web3Provider.getSigner().getAddress(),
+        provider,
+        walletAddress: await provider.getSigner().getAddress(),
         chainId: network.chainId,
       });
 
@@ -175,13 +182,6 @@ export function SwapWidget(props: SwapWidgetProps) {
 
       swapDispatch({
         payload: {
-          type: SwapActions.SET_PROVIDER,
-          provider: web3Provider,
-        },
-      });
-
-      swapDispatch({
-        payload: {
           type: SwapActions.SET_NETWORK,
           network,
         },
@@ -194,7 +194,7 @@ export function SwapWidget(props: SwapWidgetProps) {
         },
       });
     })();
-  }, [checkout, web3Provider]);
+  }, [checkout, provider]);
 
   useEffect(() => {
     swapWidgetSetup();
