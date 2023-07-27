@@ -5,32 +5,41 @@ import { useEffect, useRef } from "react";
 
 export function OnRampUI() {
   let domElement: HTMLElement | undefined;
+  let ramp: RampInstantSDK | undefined;
   const firstRender = useRef(true);
 
   useEffect(()=>{
     domElement = document.getElementById('ramp-container') || undefined;
+    ramp = new RampInstantSDK({
+      hostAppName: 'Immutable',
+      hostLogoUrl: 'https://assets.ramp.network/misc/test-logo.png',
+      hostApiKey: 'onr7tgoqgx8jxzggsc52ud9xx3hm9gkzf7czw93x',
+      url: 'https://app.demo.ramp.network',
+      variant: 'embedded-mobile',
+      containerNode: domElement,
+      enabledFlows: ['ONRAMP'],
+      userAddress: '0xDaA1842cF7E43B45385F956b89Ae814C0fE4BD20',
+      fiatCurrency: 'USD',
+      fiatValue: '20',
+      swapAmount: '200000000000000000',
+      swapAsset: 'SEPOLIA_*',
+      defaultAsset: 'SEPOLIA_ETH',
+    });
+    // const iframeElement = ramp?.domNodes?.iframe;
+    // if(iframeElement) {
+    //   iframeElement.height = '600px';
+    // }
   },[]);
   useEffect(() => {
+    if(!ramp) return;
+    console.log('iframe domeNodes: ',ramp.domNodes)
     if(firstRender.current) {
-      new RampInstantSDK({
-        hostAppName: 'Immutable',
-        hostLogoUrl: 'https://assets.ramp.network/misc/test-logo.png',
-        hostApiKey: 'onr7tgoqgx8jxzggsc52ud9xx3hm9gkzf7czw93x',
-        url: 'https://app.demo.ramp.network',
-        variant: 'embedded-mobile',
-        containerNode: domElement,
-        enabledFlows: ['ONRAMP'],
-        userAddress: '0xDaA1842cF7E43B45385F956b89Ae814C0fE4BD20',
-        // fiatCurrency: 'USD',
-        // fiatValue: '20'
-        swapAmount: '200000000000000000',
-        swapAsset: 'SEPOLIA_ETH',
-      }).on('*', (event) => console.log(event))
+      ramp.on('*', (event) => console.log(event))
         .show();
     }
     firstRender.current = false;
     console.log('is it rendering twice!')
-  }, [domElement]);
+  }, [ramp, domElement]);
 
   return (
     <BiomeCombinedProviders theme={{ base: onDarkBase }}>
