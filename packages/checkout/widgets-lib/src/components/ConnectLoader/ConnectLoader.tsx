@@ -1,6 +1,7 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import { Web3Provider } from '@ethersproject/providers';
 import {
+  ChainId,
   Checkout,
   GetNetworkParams,
   WalletProviderName,
@@ -25,7 +26,12 @@ import { ConnectWidgetViews } from '../../context/view-context/ConnectViewContex
 import { ErrorView } from '../../views/error/ErrorView';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import {
-  WidgetTheme, ConnectTargetLayer, getTargetLayerChainId,
+  WidgetTheme,
+  ConnectTargetLayer,
+  addAccountsChangedListener,
+  addChainChangedListener,
+  removeAccountsChangedListener,
+  removeChainChangedListener,
 } from '../../lib';
 import { useInterval } from '../../lib/hooks/useInterval';
 
@@ -39,7 +45,8 @@ export interface ConnectLoaderProps {
 export interface ConnectLoaderParams {
   targetLayer?: ConnectTargetLayer;
   walletProvider?: WalletProviderName;
-  web3Provider?: Web3Provider
+  web3Provider?: Web3Provider;
+  allowedChains: ChainId[];
 }
 
 export function ConnectLoader({
@@ -53,7 +60,7 @@ export function ConnectLoader({
     initialConnectLoaderState,
   );
   const { connectionStatus, deepLink } = connectLoaderState;
-  const { targetLayer, walletProvider } = params;
+  const { targetLayer, walletProvider, allowedChains } = params;
   const networkToSwitchTo = targetLayer ?? ConnectTargetLayer.LAYER2;
 
   const biomeTheme: BaseTokens = widgetConfig.theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
@@ -89,6 +96,43 @@ export function ConnectLoader({
     setAttempts(attempts + 1);
   };
   clearInterval = useInterval(() => checkIfWeb3ProviderSet(), 10);
+
+  /** Handle wallet events as per EIP-1193 spec
+   * - listen for account changed manually in wallet
+   * - listen for network/chain changed manually in wallet
+   */
+  useEffect(() => {
+    if (!web3Provider) return () => {};
+
+    function handleAccountsChanged(e: string[]) {
+      if (e.length === 0) {
+        // when a user disconnects all accounts, send them back to the connect screen
+        connectLoaderDispatch({
+          payload: {
+            type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
+            connectionStatus: ConnectionStatus.NOT_CONNECTED,
+            deepLink: ConnectWidgetViews.READY_TO_CONNECT,
+          },
+        });
+      } else {
+        // trigger a re-load of the connectLoader so that the widget re loads with a new provider
+        setWeb3Provider(new Web3Provider(web3Provider!.provider));
+      }
+    }
+
+    function handleChainChanged() {
+      // trigger a re-load of the connectLoader so that the widget re loads with a new provider
+      setWeb3Provider(new Web3Provider(web3Provider!.provider));
+    }
+
+    addAccountsChangedListener(web3Provider, handleAccountsChanged);
+    addChainChangedListener(web3Provider, handleChainChanged);
+
+    return () => {
+      removeAccountsChangedListener(web3Provider, handleAccountsChanged);
+      removeChainChangedListener(web3Provider, handleChainChanged);
+    };
+  }, [web3Provider]);
 
   useEffect(() => {
     if (window === undefined) {
@@ -151,9 +195,8 @@ export function ConnectLoader({
 
         const currentNetworkInfo = await checkout.getNetworkInfo({ provider: web3Provider } as GetNetworkParams);
 
-        // if unsupported network or current network is not the target network
-        const targetChainId = getTargetLayerChainId(checkout.config, targetLayer ?? ConnectTargetLayer.LAYER2);
-        if (!currentNetworkInfo.isSupported || currentNetworkInfo.chainId !== targetChainId) {
+        // if unsupported network or current network is not in the allowed chains
+        if (!currentNetworkInfo.isSupported || !allowedChains.includes(currentNetworkInfo.chainId)) {
           connectLoaderDispatch({
             payload: {
               type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
