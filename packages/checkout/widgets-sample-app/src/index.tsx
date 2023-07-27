@@ -11,6 +11,7 @@ import BridgeUI from './components/ui/bridge/bridge';
 import { Marketplace } from './components/ui/marketplace-orchestrator';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { onDarkBase } from '@biom3/design-tokens';
+import { OnRampUI } from "./components/ui/on-ramp/onRamp";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
   {
     path: '/bridge',
     element: <BridgeUI />,
+  },
+  {
+    path: '/on-ramp',
+    element: <OnRampUI />,
   },
   {
     path: '/marketplace-orchestrator',

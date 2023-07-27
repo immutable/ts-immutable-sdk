@@ -3149,6 +3149,7 @@ __metadata:
     "@imtbl/checkout-sdk": 0.0.0
     "@imtbl/checkout-widgets": 0.0.0
     "@imtbl/config": 0.0.0
+    "@ramp-network/ramp-instant-sdk": ^4.0.4
     "@svgr/webpack": ^8.0.1
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
@@ -6108,6 +6109,15 @@ __metadata:
   version: 2.11.8
   resolution: "@popperjs/core@npm:2.11.8"
   checksum: e5c69fdebf52a4012f6a1f14817ca8e9599cb1be73dd1387e1785e2ed5e5f0862ff817f420a87c7fc532add1f88a12e25aeb010ffcbdc98eace3d55ce2139cf0
+  languageName: node
+  linkType: hard
+
+"@ramp-network/ramp-instant-sdk@npm:^4.0.4":
+  version: 4.0.4
+  resolution: "@ramp-network/ramp-instant-sdk@npm:4.0.4"
+  dependencies:
+    body-scroll-lock: ^3.1.5
+  checksum: 2da4d030786e1465d72468f8e9d64a916f2f831d3660703ae948c27cdcd90029ac20980b5dea1b2183e75cb9257c0e957a612db762f8681d70cf5daa913245eb
   languageName: node
   linkType: hard
 
@@ -11113,6 +11123,13 @@ __metadata:
     type-is: ~1.6.18
     unpipe: 1.0.0
   checksum: f1050dbac3bede6a78f0b87947a8d548ce43f91ccc718a50dd774f3c81f2d8b04693e52acf62659fad23101827dd318da1fb1363444ff9a8482b886a3e4a5266
+  languageName: node
+  linkType: hard
+
+"body-scroll-lock@npm:^3.1.5":
+  version: 3.1.5
+  resolution: "body-scroll-lock@npm:3.1.5"
+  checksum: 52c25b81d6e7a87cfbdd7870363c3e20a439dbc76535b735916e2df907abbce95c0da0d2c7a2cfe88f49775d53bbc4bd09445ffda2d61b999efa3f0b1dedfc5e
   languageName: node
   linkType: hard
 
@@ -27319,6 +27336,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ts-immutable-sdk@workspace:."
   dependencies:
+    "@ramp-network/ramp-instant-sdk": ^4.0.4
     "@release-it-plugins/workspaces": ^3.2.0
     "@release-it/keep-a-changelog": ^3.1.0
     "@typescript-eslint/eslint-plugin": ^5.57.1
