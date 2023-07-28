@@ -10,7 +10,7 @@ export class ImmutableConnect extends ImmutableWebComponent {
   }
 
   validateInputs(): void {
-
+    // not implemented as nothing to validate for ConnectWidget
   }
 
   renderWidget() {
