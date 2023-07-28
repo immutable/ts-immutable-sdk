@@ -1,7 +1,7 @@
 import { ChainId, Checkout } from '@imtbl/checkout-sdk';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import {
-  describe, it, cy, context,
+  describe, it, cy,
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { Web3Provider } from '@ethersproject/providers';
@@ -34,48 +34,96 @@ describe('WalletWidget tests', () => {
     },
   } as unknown as Web3Provider;
 
-  it('should show loading screen when component is mounted', () => {
-    const widgetConfig = {
-      theme: WidgetTheme.DARK,
-      environment: Environment.SANDBOX,
-      isBridgeEnabled: false,
-      isSwapEnabled: false,
-      isOnRampEnabled: false,
-    } as StrongCheckoutWidgetsConfig;
+  describe('WalletWidget initialisation', () => {
+    it('should show loading screen when component is mounted', () => {
+      const widgetConfig = {
+        theme: WidgetTheme.DARK,
+        environment: Environment.SANDBOX,
+        isBridgeEnabled: false,
+        isSwapEnabled: false,
+        isOnRampEnabled: false,
+      } as StrongCheckoutWidgetsConfig;
 
-    const balanceStub = cy
-      .stub(Checkout.prototype, 'getBalance')
-      .as('balanceNoNetworkStub');
-    balanceStub.rejects({});
-    const connectStub = cy
-      .stub(Checkout.prototype, 'connect')
-      .as('connectNoNetworkStub');
-    connectStub.resolves({
-      provider: mockProvider,
-      network: { name: '' },
-    });
-    cy.stub(Checkout.prototype, 'getNetworkInfo')
-      .as('getNetworkInfoStub')
-      .resolves({
-        chainId: ChainId.SEPOLIA,
-        isSupported: true,
-        nativeCurrency: {
-          symbol: 'eth',
-        },
+      const balanceStub = cy
+        .stub(Checkout.prototype, 'getBalance')
+        .as('balanceNoNetworkStub');
+      balanceStub.rejects({});
+      const connectStub = cy
+        .stub(Checkout.prototype, 'connect')
+        .as('connectNoNetworkStub');
+      connectStub.resolves({
+        provider: mockProvider,
+        network: { name: '' },
       });
+      cy.stub(Checkout.prototype, 'getNetworkInfo')
+        .as('getNetworkInfoStub')
+        .resolves({
+          chainId: ChainId.SEPOLIA,
+          isSupported: true,
+          nativeCurrency: {
+            symbol: 'eth',
+          },
+        });
 
-    mount(
-      <WalletWidget
-        config={widgetConfig}
-        web3Provider={mockProvider}
-      />,
-    );
+      mount(
+        <WalletWidget
+          config={widgetConfig}
+          web3Provider={mockProvider}
+        />,
+      );
 
-    cySmartGet('loading-view').should('be.visible');
-    cySmartGet('wallet-balances').should('be.visible');
+      cySmartGet('loading-view').should('be.visible');
+      cySmartGet('wallet-balances').should('be.visible');
+    });
+
+    it('should show error view on error initialising and retry when try again pressed', () => {
+      const widgetConfig = {
+        theme: WidgetTheme.DARK,
+        environment: Environment.SANDBOX,
+        isBridgeEnabled: false,
+        isSwapEnabled: false,
+        isOnRampEnabled: false,
+      } as StrongCheckoutWidgetsConfig;
+
+      const balanceStub = cy
+        .stub(Checkout.prototype, 'getBalance')
+        .as('balanceNoNetworkStub');
+      balanceStub.rejects({});
+      const connectStub = cy
+        .stub(Checkout.prototype, 'connect')
+        .as('connectNoNetworkStub');
+      connectStub.resolves({
+        provider: mockProvider,
+        network: { name: '' },
+      });
+      cy.stub(Checkout.prototype, 'getNetworkInfo')
+        .as('getNetworkInfoStub')
+        .onFirstCall()
+        .rejects({})
+        .onSecondCall()
+        .resolves({
+          chainId: ChainId.SEPOLIA,
+          isSupported: true,
+          nativeCurrency: {
+            symbol: 'eth',
+          },
+        });
+
+      mount(
+        <WalletWidget
+          config={widgetConfig}
+          web3Provider={mockProvider}
+        />,
+      );
+
+      cySmartGet('error-view').should('be.visible');
+      cySmartGet('footer-button').click();
+      cySmartGet('error-view').should('not.exist');
+      cySmartGet('wallet-balances').should('be.visible');
+    });
   });
 
-  context('Connected Wallet', () => {
+  describe('Connected Wallet', () => {
     let getAllBalancesStub;
     beforeEach(() => {
       cy.stub(Checkout.prototype, 'connect')
