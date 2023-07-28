@@ -12,7 +12,7 @@ import {
 import { convertToSignableToken } from '@imtbl/toolkit';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
-import GuardianClient from '../guardian';
+import GuardianClient from '../../guardian/guardian';
 
 const ERC721 = 'ERC721';
 

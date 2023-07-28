@@ -6,7 +6,7 @@
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
   "dependencies": {
     "@imtbl/config": "0.0.0",
-    "@imtbl/core-sdk": "^2.0.1",
+    "@imtbl/core-sdk": "^2.0.2",
     "@imtbl/toolkit": "0.0.0",
     "@magic-ext/oidc": "^1.0.1",
     "@metamask/detect-provider": "^2.0.0",

@@ -4,6 +4,7 @@ import { cy } from 'local-cypress';
 import { Web3Provider } from '@ethersproject/providers';
 import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
 import { Exchange } from '@imtbl/dex-sdk';
+import { Environment } from '@imtbl/config';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapForm } from './SwapForm';
@@ -12,6 +13,10 @@ import { SwapWidgetViews } from '../../../context/view-context/SwapViewContextTy
 import { SwapState, initialSwapState } from '../context/SwapContext';
 import { SwapCoins } from '../views/SwapCoins';
 import { quotesProcessor } from '../functions/FetchQuote';
+import { ConnectionStatus } from '../../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  ConnectLoaderTestComponent,
+} from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 
 describe('SwapForm', () => {
   let testSwapState: SwapState;
@@ -25,8 +30,6 @@ describe('SwapForm', () => {
 
     testSwapState = {
       ...initialSwapState,
-      provider: {} as Web3Provider,
-      checkout: new Checkout(),
       exchange: {} as Exchange,
       tokenBalances: [
         {
@@ -67,6 +70,13 @@ describe('SwapForm', () => {
     };
   });
   const { swapForm: { from: fromText, to: toText }, validation } = text.views[SwapWidgetViews.SWAP];
+  const connectLoaderState = {
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    }),
+    provider: {} as Web3Provider,
+    connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+  };
 
   describe('initial form state', () => {
     it('should show all swap inputs with initial state', () => {
@@ -463,12 +473,16 @@ describe('SwapForm', () => {
 
     it('should only fetch a quote when from token and to token are selected and swap amount has value', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
         >
-          <SwapCoins />
-        </SwapWidgetTestComponent>,
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins />
+          </SwapWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -506,12 +520,16 @@ describe('SwapForm', () => {
 
     it('should set to amount and fees after quote is fetched', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
         >
-          <SwapCoins />
-        </SwapWidgetTestComponent>,
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins />
+          </SwapWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -554,12 +572,16 @@ describe('SwapForm', () => {
 
     it('should fetch a quote after from amount max button is clicked', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
         >
-          <SwapCoins />
-        </SwapWidgetTestComponent>,
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins />
+          </SwapWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -597,12 +619,16 @@ describe('SwapForm', () => {
 
     it('should not fetch a quote when to token is not selected', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
         >
-          <SwapCoins />
-        </SwapWidgetTestComponent>,
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins />
+          </SwapWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -618,12 +644,16 @@ describe('SwapForm', () => {
 
     it('should not fetch a quote when from token is not selected', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
         >
-          <SwapCoins />
-        </SwapWidgetTestComponent>,
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins />
+          </SwapWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
@@ -639,12 +669,16 @@ describe('SwapForm', () => {
 
     it('should not fetch a quote when from amount is 0', () => {
       mount(
-        <SwapWidgetTestComponent
-          initialStateOverride={testSwapState}
-          cryptoConversionsOverride={cryptoConversions}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
         >
-          <SwapCoins />
-        </SwapWidgetTestComponent>,
+          <SwapWidgetTestComponent
+            initialStateOverride={testSwapState}
+            cryptoConversionsOverride={cryptoConversions}
+          >
+            <SwapCoins />
+          </SwapWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -753,36 +787,40 @@ describe('SwapForm', () => {
           });
 
         mount(
-          <SwapWidgetTestComponent
-            initialStateOverride={{
-              ...testSwapState,
-              tokenBalances: [
-                {
-                  balance: BigNumber.from('1000000000000000000'),
-                  formattedBalance: '1',
-                  token: {
-                    name: 'Ethereum',
-                    symbol: 'ETH',
-                    decimals: 18,
-                    address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-                  },
-                },
-                {
-                  balance: BigNumber.from('1000000000000000000'),
-                  formattedBalance: '1',
-                  token: {
-                    name: 'ImmutableX',
-                    symbol: 'IMX',
-                    decimals: 18,
-                    address: '',
-                  },
-                },
-              ],
-            }}
-            cryptoConversionsOverride={cryptoConversions}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <SwapCoins />
-          </SwapWidgetTestComponent>,
+            <SwapWidgetTestComponent
+              initialStateOverride={{
+                ...testSwapState,
+                tokenBalances: [
+                  {
+                    balance: BigNumber.from('1000000000000000000'),
+                    formattedBalance: '1',
+                    token: {
+                      name: 'Ethereum',
+                      symbol: 'ETH',
+                      decimals: 18,
+                      address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                    },
+                  },
+                  {
+                    balance: BigNumber.from('1000000000000000000'),
+                    formattedBalance: '1',
+                    token: {
+                      name: 'ImmutableX',
+                      symbol: 'IMX',
+                      decimals: 18,
+                      address: '',
+                    },
+                  },
+                ],
+              }}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <SwapCoins />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>,
         );
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -801,36 +839,40 @@ describe('SwapForm', () => {
 
       it('should show not enough imx drawer if user does not have enough imx', () => {
         mount(
-          <SwapWidgetTestComponent
-            initialStateOverride={{
-              ...testSwapState,
-              tokenBalances: [
-                {
-                  balance: BigNumber.from('1000000000000000000'),
-                  formattedBalance: '1',
-                  token: {
-                    name: 'Ethereum',
-                    symbol: 'ETH',
-                    decimals: 18,
-                    address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-                  },
-                },
-                {
-                  balance: BigNumber.from('100000'),
-                  formattedBalance: '0.0001',
-                  token: {
-                    name: 'ImmutableX',
-                    symbol: 'IMX',
-                    decimals: 18,
-                    address: '',
-                  },
-                },
-              ],
-            }}
-            cryptoConversionsOverride={cryptoConversions}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <SwapCoins />
-          </SwapWidgetTestComponent>,
+            <SwapWidgetTestComponent
+              initialStateOverride={{
+                ...testSwapState,
+                tokenBalances: [
+                  {
+                    balance: BigNumber.from('1000000000000000000'),
+                    formattedBalance: '1',
+                    token: {
+                      name: 'Ethereum',
+                      symbol: 'ETH',
+                      decimals: 18,
+                      address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                    },
+                  },
+                  {
+                    balance: BigNumber.from('100000'),
+                    formattedBalance: '0.0001',
+                    token: {
+                      name: 'ImmutableX',
+                      symbol: 'IMX',
+                      decimals: 18,
+                      address: '',
+                    },
+                  },
+                ],
+              }}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <SwapCoins />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>,
         );
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -852,36 +894,40 @@ describe('SwapForm', () => {
 
       it('should show adjust button if user does not have enough imx and imx is in from', () => {
         mount(
-          <SwapWidgetTestComponent
-            initialStateOverride={{
-              ...testSwapState,
-              tokenBalances: [
-                {
-                  balance: BigNumber.from('1000000000000000000'),
-                  formattedBalance: '1',
-                  token: {
-                    name: 'Ethereum',
-                    symbol: 'ETH',
-                    decimals: 18,
-                    address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-                  },
-                },
-                {
-                  balance: BigNumber.from('100000'),
-                  formattedBalance: '0.0001',
-                  token: {
-                    name: 'ImmutableX',
-                    symbol: 'IMX',
-                    decimals: 18,
-                    address: '',
-                  },
-                },
-              ],
-            }}
-            cryptoConversionsOverride={cryptoConversions}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <SwapCoins />
-          </SwapWidgetTestComponent>,
+            <SwapWidgetTestComponent
+              initialStateOverride={{
+                ...testSwapState,
+                tokenBalances: [
+                  {
+                    balance: BigNumber.from('1000000000000000000'),
+                    formattedBalance: '1',
+                    token: {
+                      name: 'Ethereum',
+                      symbol: 'ETH',
+                      decimals: 18,
+                      address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                    },
+                  },
+                  {
+                    balance: BigNumber.from('100000'),
+                    formattedBalance: '0.0001',
+                    token: {
+                      name: 'ImmutableX',
+                      symbol: 'IMX',
+                      decimals: 18,
+                      address: '',
+                    },
+                  },
+                ],
+              }}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <SwapCoins />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>,
         );
 
         cySmartGet('toTokenInputs-select-form-select__target').click();
@@ -909,36 +955,40 @@ describe('SwapForm', () => {
           .resolves({});
 
         mount(
-          <SwapWidgetTestComponent
-            initialStateOverride={{
-              ...testSwapState,
-              tokenBalances: [
-                {
-                  balance: BigNumber.from('1000000000000000000'),
-                  formattedBalance: '1',
-                  token: {
-                    name: 'Ethereum',
-                    symbol: 'ETH',
-                    decimals: 18,
-                    address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
-                  },
-                },
-                {
-                  balance: BigNumber.from('1000000000000000000'),
-                  formattedBalance: '1',
-                  token: {
-                    name: 'ImmutableX',
-                    symbol: 'IMX',
-                    decimals: 18,
-                    address: '',
-                  },
-                },
-              ],
-            }}
-            cryptoConversionsOverride={cryptoConversions}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <SwapCoins />
-          </SwapWidgetTestComponent>,
+            <SwapWidgetTestComponent
+              initialStateOverride={{
+                ...testSwapState,
+                tokenBalances: [
+                  {
+                    balance: BigNumber.from('1000000000000000000'),
+                    formattedBalance: '1',
+                    token: {
+                      name: 'Ethereum',
+                      symbol: 'ETH',
+                      decimals: 18,
+                      address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                    },
+                  },
+                  {
+                    balance: BigNumber.from('1000000000000000000'),
+                    formattedBalance: '1',
+                    token: {
+                      name: 'ImmutableX',
+                      symbol: 'IMX',
+                      decimals: 18,
+                      address: '',
+                    },
+                  },
+                ],
+              }}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <SwapCoins />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>,
         );
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -965,14 +1015,18 @@ describe('SwapForm', () => {
           .rejects({});
 
         mount(
-          <SwapWidgetTestComponent
-            initialStateOverride={{
-              ...testSwapState,
-            }}
-            cryptoConversionsOverride={cryptoConversions}
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
           >
-            <SwapCoins />
-          </SwapWidgetTestComponent>,
+            <SwapWidgetTestComponent
+              initialStateOverride={{
+                ...testSwapState,
+              }}
+              cryptoConversionsOverride={cryptoConversions}
+            >
+              <SwapCoins />
+            </SwapWidgetTestComponent>
+          </ConnectLoaderTestComponent>,
         );
 
         cySmartGet('fromTokenInputs-select-form-select__target').click();

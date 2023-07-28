@@ -20,6 +20,7 @@ import { RelayerClient } from './relayerClient';
 import { JsonRpcError, ProviderErrorCode, RpcErrorCode } from './JsonRpcError';
 import { loginZkEvmUser } from './user';
 import { sendTransaction } from './sendTransaction';
+import GuardianClient from '../guardian/guardian';
 
 export type ZkEvmProviderInput = {
   authManager: AuthManager;
@@ -108,10 +109,17 @@ export class ZkEvmProvider implements Provider {
           throw new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first');
         }
 
+        const guardianClient = new GuardianClient({
+          imxPublicApiDomain: this.config.imxPublicApiDomain,
+          accessToken: this.user.accessToken,
+          confirmationScreen: this.confirmationScreen,
+          imxEtherAddress: this.user?.imx?.ethAddress || '',
+        });
+
         return sendTransaction({
           params: request.params || [],
           magicProvider: this.magicProvider,
-          transactionAPI: this.transactionAPI,
+          guardianClient,
           jsonRpcProvider: this.jsonRpcProvider,
           config: this.config,
           relayerClient: this.relayerClient,

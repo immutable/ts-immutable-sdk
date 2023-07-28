@@ -8,7 +8,7 @@ import {
 } from '../../components/ConnectLoader/ConnectLoader';
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
-import { ConnectTargetLayer } from '../../lib';
+import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
 
 export class ImmutableWallet extends ImmutableWebComponent {
   walletProvider?:WalletProviderName;
@@ -24,6 +24,10 @@ export class ImmutableWallet extends ImmutableWebComponent {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProvider: this.walletProvider,
       web3Provider: this.provider,
+      allowedChains: [
+        getL1ChainId(this.checkoutConfig!),
+        getL2ChainId(this.checkoutConfig!),
+      ],
     };
 
     if (!this.reactRoot) {
@@ -37,7 +41,6 @@ export class ImmutableWallet extends ImmutableWebComponent {
           closeEvent={sendWalletWidgetCloseEvent}
         >
           <WalletWidget
-            web3Provider={this.provider}
             config={this.widgetConfig!}
           />
         </ConnectLoader>

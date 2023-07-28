@@ -6,8 +6,8 @@ import { Orderbook } from '../orderbook';
 import {
   deployTestToken,
   getFulfillerWallet,
-  getLocalhostProvider,
   getOffererWallet,
+  getLocalhostProvider,
   signAndSubmitTx,
   signMessage,
   TestToken,
@@ -47,6 +47,12 @@ describe('', () => {
     const sdk = new Orderbook({
       baseConfig: {
         environment: Environment.SANDBOX,
+      },
+
+      overrides: {
+        // Replace overrides with devnet values if needed
+        // values can be found here https://immutable.atlassian.net/wiki/spaces/TRAD/pages/2192573143/zkEVM+orderbook+deployment+addresses
+        provider,
       },
     });
 
