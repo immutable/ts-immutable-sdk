@@ -7,9 +7,9 @@ import {
 } from 'errors';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ethers } from 'ethers';
+import { Environment } from '@imtbl/config';
 import { Exchange } from './exchange';
 import {
-  decodeMulticallData,
   mockRouterImplementation,
   setupSwapTxTest,
   TEST_PERIPHERY_ROUTER_ADDRESS,
@@ -17,9 +17,12 @@ import {
   TEST_GAS_PRICE,
   IMX_TEST_TOKEN,
   TEST_TRANSACTION_GAS_USAGE,
+  decodeMulticallDataWithFees,
+  TEST_FEE_RECIPIENT,
+  TEST_MAX_FEE_BASIS_POINTS,
+  decodeMulticallDataWithoutFees,
 } from './utils/testUtils';
-import { Router } from './lib';
-import { Environment } from '@imtbl/config';
+import { Router, SecondaryFee } from './lib';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -32,6 +35,7 @@ jest.mock('./lib/utils', () => ({
 }));
 
 const exactInputSingleSignature = '0x04e45aaf';
+const exactInputSingleWithSecondaryFeeSignature = '0x742ac944';
 
 const DEFAULT_SLIPPAGE = 0.1;
 const HIGHER_SLIPPAGE = 0.2;
@@ -151,55 +155,52 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   });
 
   describe('Swap with secondary fees', () => {
-
-  });
-
-  describe('Swap with multiple pools', () => {
     it('generates valid swap calldata', async () => {
-
-    });
-  });
-
-  describe('Swap with single pool and default slippage tolerance', () => {
-    it('ding dong', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
-      params.inputToken = "0x1836E16b2036088490C2CFe4d11970Fc8e5884C4"
-      params.outputToken = "0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c"
-      params.fromAddress = "0xa6C368164Eb270C31592c1830Ed25c2bf5D34BAE"
-      params.amountIn = "10";
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-      const exchange = new Exchange({ baseConfig: { environment: Environment.SANDBOX }, chainId: 13372 });
+      const secondaryFees: SecondaryFee[] = [
+        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS },
+      ];
+      const exchange = new Exchange(
+        { baseConfig: { environment: Environment.SANDBOX }, chainId: 13372, secondaryFees },
+      );
 
       const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
-        '0xa6C368164Eb270C31592c1830Ed25c2bf5D34BAE',
-        '0x1836E16b2036088490C2CFe4d11970Fc8e5884C4',
-        '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c',
-        10,
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountIn,
       );
 
       const data = swap.transaction?.data?.toString() || '';
 
-      const { functionCallParams, topLevelParams } = decodeMulticallData(data);
+      const { swapParams, secondaryFeeParams, topLevelParams } = decodeMulticallDataWithFees(data);
 
-      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
+      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleWithSecondaryFeeSignature);
 
-      expect(functionCallParams.tokenIn).toBe(params.inputToken); // input token
-      expect(functionCallParams.tokenOut).toBe(params.outputToken); // output token
-      expect(functionCallParams.fee).toBe(10000); // fee
-      expect(functionCallParams.recipient).toBe(params.fromAddress); // Recipient
+      expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
+      expect(secondaryFeeParams[0].feeBasisPoints).toBe(TEST_MAX_FEE_BASIS_POINTS);
+
+      expect(swapParams.tokenIn).toBe(params.inputToken); // input token
+      expect(swapParams.tokenOut).toBe(params.outputToken); // output token
+      expect(swapParams.fee).toBe(10000); // fee
+      expect(swapParams.recipient).toBe(params.fromAddress); // Recipient
       expect(swap.transaction?.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction?.from).toBe(params.fromAddress); // from address
-      expect(swap.transaction?.value).toBe('0x00'); // refers to 0ETH
-      expect(functionCallParams.firstAmount.toString()).toBe(
+      expect(swap.transaction?.value).toBe('0x00'); // refers to 0 amount of the native token
+      expect(swapParams.firstAmount.toString()).toBe(
         params.amountIn.toString(),
       ); // amountin
-      expect(functionCallParams.secondAmount.toString()).toBe(
+      expect(swapParams.secondAmount.toString()).toBe(
         params.minAmountOut.toString(),
       ); // minAmountOut
-      expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+      expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
+  });
+
+  describe('Swap with single pool and default slippage tolerance', () => {
     it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
@@ -208,7 +209,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const exchange = new Exchange({ baseConfig: { environment: Environment.SANDBOX }, chainId: 13372 });
 
       const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
-        '0xa6C368164Eb270C31592c1830Ed25c2bf5D34BAE',
+        params.fromAddress,
         params.inputToken,
         params.outputToken,
         100000000000000000n,
@@ -216,7 +217,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction?.data?.toString() || '';
 
-      const { functionCallParams, topLevelParams } = decodeMulticallData(data);
+      const { functionCallParams, topLevelParams } = decodeMulticallDataWithoutFees(data);
 
       expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
 
@@ -302,7 +303,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction?.data?.toString() || '';
 
-      const { functionCallParams, topLevelParams } = decodeMulticallData(data);
+      const { functionCallParams, topLevelParams } = decodeMulticallDataWithoutFees(data);
 
       expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
 

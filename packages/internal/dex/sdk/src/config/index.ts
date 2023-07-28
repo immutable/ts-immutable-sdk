@@ -10,6 +10,7 @@ export type ExchangeContracts = {
   coreFactory: string;
   quoterV2: string;
   peripheryRouter: string;
+  secondaryFee: string;
 };
 
 export const CONTRACTS_FOR_CHAIN_ID: Record<number, ExchangeContracts> = {
@@ -18,6 +19,7 @@ export const CONTRACTS_FOR_CHAIN_ID: Record<number, ExchangeContracts> = {
     coreFactory: '0x12739A8f1A8035F439092D016DAE19A2874F30d2',
     quoterV2: '0xF674847fBcca5C80315e3AE37043Dce99F6CC529',
     peripheryRouter: '0x0Afe6F5f4DC34461A801420634239FFaD50A2e44',
+    secondaryFee: '0x8dBE1f0900C5e92ad87A54521902a33ba1598C51',
   },
 };
 
@@ -51,12 +53,10 @@ function validateOverrides(overrides: ExchangeOverrides) {
       throw new InvalidConfigurationError(`Invalid exchange contract address for ${key}`);
     }
   });
+}
 
-  if (!overrides.secondaryFees) {
-    return;
-  }
-
-  for (const secondaryFee of overrides.secondaryFees) {
+function validateSecondaryFees(secondaryFees: SecondaryFee[]) {
+  for (const secondaryFee of secondaryFees) {
     if (!isValidNonZeroAddress(secondaryFee.feeRecipient)) {
       throw new InvalidConfigurationError(`Invalid secondary fee recipient address: ${secondaryFee.feeRecipient}`);
     }
@@ -76,10 +76,15 @@ export class ExchangeConfiguration {
 
   public chain: Chain;
 
-  public secondaryFees: SecondaryFee[];
+  public secondaryFees: SecondaryFee[] = [];
 
-  constructor({ chainId, baseConfig, overrides }: ExchangeModuleConfiguration) {
+  constructor({
+    chainId, baseConfig, secondaryFees, overrides,
+  }: ExchangeModuleConfiguration) {
     this.baseConfig = baseConfig;
+    this.secondaryFees = secondaryFees || [];
+
+    validateSecondaryFees(this.secondaryFees);
 
     if (overrides) {
       validateOverrides(overrides);
@@ -91,11 +96,10 @@ export class ExchangeConfiguration {
         nativeToken: overrides.nativeToken,
       };
 
-      this.secondaryFees = overrides.secondaryFees ? overrides.secondaryFees : [];
+      this.secondaryFees = secondaryFees || [];
 
       return;
     }
-    this.secondaryFees = [];
 
     const chain = SUPPORTED_CHAIN_IDS_FOR_ENVIRONMENT[baseConfig.environment][chainId];
     if (!chain) {
