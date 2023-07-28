@@ -184,14 +184,11 @@ export default class AuthManager {
         await wait(interval * 1000);
 
         try {
-          let tokenResponse = await this.getDeviceFlowToken(deviceCode);
+          const tokenResponse = await this.getDeviceFlowToken(deviceCode);
           const user = AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
 
           // Only persist credentials that contain the necessary data
           if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
-            if (!this.deviceCredentialsManager.areValid(tokenResponse) && tokenResponse.refresh_token) {
-              tokenResponse = await this.refreshToken(tokenResponse.refresh_token);
-            }
             this.deviceCredentialsManager.saveCredentials(tokenResponse);
           }
 
@@ -277,14 +274,11 @@ export default class AuthManager {
         throw new Error('Provided state does not match stored state');
       }
 
-      let tokenResponse = await this.getPKCEToken(authorizationCode, pkceData.verifier);
+      const tokenResponse = await this.getPKCEToken(authorizationCode, pkceData.verifier);
       const user = AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
 
       // Only persist credentials that contain the necessary data
       if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
-        if (!this.deviceCredentialsManager.areValid(tokenResponse) && tokenResponse.refresh_token) {
-          tokenResponse = await this.refreshToken(tokenResponse.refresh_token);
-        }
         this.deviceCredentialsManager.saveCredentials(tokenResponse);
       }
 
