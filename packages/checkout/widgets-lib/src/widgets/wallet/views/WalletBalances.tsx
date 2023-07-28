@@ -142,12 +142,14 @@ export function WalletBalances() {
         network.chainId,
         conversions,
       );
+
       walletDispatch({
         payload: {
           type: WalletActions.SET_TOKEN_BALANCES,
           tokenBalances: balances,
         },
       });
+      setBalancesLoading(false);
     })();
   }, [checkout, network, provider, conversions, setBalancesLoading, walletDispatch]);
 
