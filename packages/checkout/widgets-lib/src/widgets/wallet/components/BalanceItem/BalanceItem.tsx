@@ -22,6 +22,7 @@ import {
 } from '../../../../lib/orchestrationEvents';
 import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
+import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
@@ -29,9 +30,11 @@ export interface BalanceItemProps {
 }
 
 export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps) {
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout } = connectLoaderState;
   const fiatAmount = `≈ USD $${formatZeroAmount(balanceInfo.fiatAmount)}`;
   const { walletState } = useContext(WalletContext);
-  const { supportedTopUps, network, checkout } = walletState;
+  const { supportedTopUps, network } = walletState;
   const [isOnRampEnabled, setIsOnRampEnabled] = useState<boolean>();
   const [isBridgeEnabled, setIsBridgeEnabled] = useState<boolean>();
   const [isSwapEnabled, setIsSwapEnabled] = useState<boolean>();

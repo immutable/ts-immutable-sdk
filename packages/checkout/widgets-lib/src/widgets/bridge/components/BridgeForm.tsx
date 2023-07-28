@@ -34,6 +34,7 @@ import { DEFAULT_TOKEN_DECIMALS, DEFAULT_QUOTE_REFRESH_INTERVAL, NATIVE } from '
 import { swapButtonIconLoadingStyle } from '../../swap/components/SwapButtonStyles';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
 import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 interface BridgeFormProps {
   testId?: string;
@@ -44,13 +45,13 @@ interface BridgeFormProps {
 export function BridgeForm(props: BridgeFormProps) {
   const {
     bridgeState: {
-      provider,
-      checkout,
       tokenBridge,
       tokenBalances,
       allowedTokens,
     },
   } = useContext(BridgeContext);
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
 
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { viewDispatch } = useContext(ViewContext);

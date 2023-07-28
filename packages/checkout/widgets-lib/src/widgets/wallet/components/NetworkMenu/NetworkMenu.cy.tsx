@@ -3,7 +3,7 @@ import React from 'react';
 import { BiomeCombinedProviders } from '@biom3/react';
 import { cy, it } from 'local-cypress';
 import {
-  Checkout, WalletProviderName, TokenInfo, ChainId,
+  Checkout, WalletProviderName, TokenInfo, ChainId, ChainName,
 } from '@imtbl/checkout-sdk';
 import { Web3Provider } from '@ethersproject/providers';
 import { Environment } from '@imtbl/config';
@@ -12,8 +12,20 @@ import { text } from '../../../../resources/text/textConfig';
 import { cySmartGet } from '../../../../lib/testUtils';
 import { NetworkMenu } from './NetworkMenu';
 import { WalletWidgetViews } from '../../../../context/view-context/WalletViewContextTypes';
+import { ConnectionStatus } from '../../../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  ConnectLoaderTestComponent,
+} from '../../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 
 describe('Network Menu', () => {
+  const connectLoaderState = {
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    }),
+    provider: {} as Web3Provider,
+    connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+  };
+
   beforeEach(() => {
     cy.stub(Checkout.prototype, 'getNetworkAllowList')
       .as('getNetworkAllowListStub')
@@ -30,10 +42,15 @@ describe('Network Menu', () => {
         ],
       });
   });
+
   it('should have heading', () => {
     mount(
       <BiomeCombinedProviders>
-        <NetworkMenu setBalancesLoading={() => {}} />
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <NetworkMenu setBalancesLoading={() => {}} />
+        </ConnectLoaderTestComponent>
       </BiomeCombinedProviders>,
     );
 
@@ -44,22 +61,22 @@ describe('Network Menu', () => {
   });
   it('should have network buttons', () => {
     const walletState: WalletState = {
-      checkout: new Checkout({
-        baseConfig: { environment: Environment.PRODUCTION },
-      }),
       network: null,
-      provider: null,
       walletProvider: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
     };
     mount(
       <BiomeCombinedProviders>
-        <WalletContext.Provider
-          value={{ walletState, walletDispatch: () => {} }}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
         >
-          <NetworkMenu setBalancesLoading={() => {}} />
-        </WalletContext.Provider>
+          <WalletContext.Provider
+            value={{ walletState, walletDispatch: () => {} }}
+          >
+            <NetworkMenu setBalancesLoading={() => {}} />
+          </WalletContext.Provider>
+        </ConnectLoaderTestComponent>
       </BiomeCombinedProviders>,
     );
     cySmartGet('@getNetworkAllowListStub').should('have.been.called');
@@ -73,7 +90,7 @@ describe('Network Menu', () => {
       .resolves({
         network: {
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-          name: 'ImmutablezkEVMTestnet',
+          name: ChainName.IMTBL_ZKEVM_TESTNET,
           nativeCurrency: {
             name: 'IMX',
             symbol: 'IMX',
@@ -83,27 +100,27 @@ describe('Network Menu', () => {
       });
 
     const walletState: WalletState = {
-      checkout: new Checkout({
-        baseConfig: { environment: Environment.PRODUCTION },
-      }),
       network: {
         chainId: ChainId.ETHEREUM,
         name: 'Ethereum',
         nativeCurrency: {} as unknown as TokenInfo,
         isSupported: false,
       },
-      provider: {} as unknown as Web3Provider,
       walletProvider: WalletProviderName.METAMASK,
       tokenBalances: [],
       supportedTopUps: null,
     };
     mount(
       <BiomeCombinedProviders>
-        <WalletContext.Provider
-          value={{ walletState, walletDispatch: () => {} }}
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
         >
-          <NetworkMenu setBalancesLoading={() => {}} />
-        </WalletContext.Provider>
+          <WalletContext.Provider
+            value={{ walletState, walletDispatch: () => {} }}
+          >
+            <NetworkMenu setBalancesLoading={() => {}} />
+          </WalletContext.Provider>
+        </ConnectLoaderTestComponent>
       </BiomeCombinedProviders>,
     );
 
