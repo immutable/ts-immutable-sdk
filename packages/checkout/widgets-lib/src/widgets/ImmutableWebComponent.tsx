@@ -55,4 +55,5 @@ export abstract class ImmutableWebComponent extends HTMLElement {
   }
 
   abstract renderWidget(): void;
+  abstract validateInputs(): void;
 }

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
@@ -9,6 +10,7 @@ import {
 } from '../../components/ConnectLoader/ConnectLoader';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
 import { ConnectTargetLayer, getL2ChainId } from '../../lib';
+import { isValidAddress, isValidAmount, isValidWalletProvider } from '../../lib/validations/widgetValidators';
 
 export class ImmutableSwap extends ImmutableWebComponent {
   walletProvider = WalletProviderName.METAMASK;
@@ -30,7 +32,30 @@ export class ImmutableSwap extends ImmutableWebComponent {
     this.renderWidget();
   }
 
+  validateInputs(): void {
+    if (!isValidWalletProvider(this.walletProvider)) {
+      console.warn('[IMTBL]: invalid "walletProvider" widget input');
+      this.walletProvider = WalletProviderName.METAMASK;
+    }
+
+    if (!isValidAmount(this.amount)) {
+      console.warn('[IMTBL]: invalid "amount" widget input');
+      this.amount = '';
+    }
+
+    if (!isValidAddress(this.fromContractAddress)) {
+      console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
+      this.fromContractAddress = '';
+    }
+
+    if (!isValidAddress(this.toContractAddress)) {
+      console.warn('[IMTBL]: invalid "toContractAddress" widget input');
+      this.toContractAddress = '';
+    }
+  }
+
   renderWidget() {
+    this.validateInputs();
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProvider: this.walletProvider,

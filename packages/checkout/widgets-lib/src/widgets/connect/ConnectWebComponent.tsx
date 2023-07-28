@@ -9,7 +9,13 @@ export class ImmutableConnect extends ImmutableWebComponent {
     this.renderWidget();
   }
 
+  validateInputs(): void {
+
+  }
+
   renderWidget() {
+    this.validateInputs();
+
     if (!this.reactRoot) {
       this.reactRoot = ReactDOM.createRoot(this);
     }

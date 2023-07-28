@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
@@ -9,6 +10,7 @@ import {
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
+import { isValidWalletProvider } from '../../lib/validations/widgetValidators';
 
 export class ImmutableWallet extends ImmutableWebComponent {
   walletProvider?:WalletProviderName;
@@ -19,7 +21,15 @@ export class ImmutableWallet extends ImmutableWebComponent {
     this.renderWidget();
   }
 
+  validateInputs(): void {
+    if (this.walletProvider && !isValidWalletProvider(this.walletProvider)) {
+      console.warn('[IMTBL]: invalid "walletProvider" widget input');
+      this.walletProvider = undefined; // can be undefined
+    }
+  }
+
   renderWidget() {
+    this.validateInputs();
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProvider: this.walletProvider,

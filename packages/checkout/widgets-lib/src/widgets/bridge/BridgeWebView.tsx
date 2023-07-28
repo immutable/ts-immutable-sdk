@@ -8,7 +8,12 @@ function BridgeWebView() {
   };
 
   return (
-    <imtbl-bridge widgetConfig={JSON.stringify(config)} walletProvider="metamask" />
+    <imtbl-bridge
+      widgetConfig={JSON.stringify(config)}
+      walletProvider="metramask"
+      amount="nah"
+      fromContractAddress="0x2fa06c6672ddcc066ab04631192738799231de4a"
+    />
   );
 }
 
