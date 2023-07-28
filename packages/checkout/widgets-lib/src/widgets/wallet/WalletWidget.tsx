@@ -4,7 +4,7 @@ import {
   Checkout,
 } from '@imtbl/checkout-sdk';
 import {
-  useEffect, useMemo, useReducer, useState,
+  useEffect, useMemo, useReducer,
 } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
@@ -66,8 +66,6 @@ export function WalletWidget(props: WalletWidgetProps) {
     [walletState, walletDispatch],
   );
 
-  const [runInitialiser, setRunInitialiser] = useState(true);
-
   useEffect(() => {
     if (web3Provider) {
       walletDispatch({
@@ -79,7 +77,7 @@ export function WalletWidget(props: WalletWidgetProps) {
     }
   }, [web3Provider]);
 
-  const { checkout, provider } = walletState;
+  const { checkout } = walletState;
 
   /* Set Checkout and config into WalletState */
   useEffect(() => {
@@ -102,65 +100,68 @@ export function WalletWidget(props: WalletWidgetProps) {
     });
   }, [isBridgeEnabled, isSwapEnabled, isOnRampEnabled, environment]);
 
-  useEffect(() => {
-    (async () => {
-      if (!checkout || !web3Provider || !runInitialiser) return;
+  const initialiseWallet = async () => {
+    if (!checkout || !web3Provider) return;
 
-      try {
-        const network = await checkout.getNetworkInfo({
-          provider: web3Provider,
-        });
+    try {
+      const network = await checkout.getNetworkInfo({
+        provider: web3Provider,
+      });
 
-        /* If the provider's network is not supported, return out of this and let the
-        connect loader handle the switch network functionality */
-        if (!network.isSupported) {
-          return;
-        }
-
-        walletDispatch({
-          payload: {
-            type: WalletActions.SET_PROVIDER,
-            provider: web3Provider,
-          },
-        });
-
-        walletDispatch({
-          payload: {
-            type: WalletActions.SET_NETWORK,
-            network,
-          },
-        });
-
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: { type: WalletWidgetViews.WALLET_BALANCES },
-          },
-        });
-      } catch (error: any) {
-        viewDispatch({
-          payload: {
-            type: ViewActions.UPDATE_VIEW,
-            view: {
-              type: SharedViews.ERROR_VIEW,
-              error,
-            },
-          },
-        });
-      } finally {
-        setRunInitialiser(false);
+      /* If the provider's network is not supported, return out of this and let the
+      connect loader handle the switch network functionality */
+      if (!network.isSupported) {
+        return;
       }
-    })();
-  }, [checkout, web3Provider, runInitialiser]);
 
-  const errorAction = () => {
+      walletDispatch({
+        payload: {
+          type: WalletActions.SET_PROVIDER,
+          provider: web3Provider,
+        },
+      });
+
+      walletDispatch({
+        payload: {
+          type: WalletActions.SET_NETWORK,
+          network,
+        },
+      });
+
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: { type: WalletWidgetViews.WALLET_BALANCES },
+        },
+      });
+    } catch (error: any) {
+      viewDispatch({
+        payload: {
+          type: ViewActions.UPDATE_VIEW,
+          view: {
+            type: SharedViews.ERROR_VIEW,
+            error,
+          },
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!checkout || !web3Provider) return;
+    (async () => {
+      initialiseWallet();
+    })();
+  }, [checkout, web3Provider]);
+
+  const errorAction = async () => {
     viewDispatch({
       payload: {
         type: ViewActions.UPDATE_VIEW,
         view: { type: WalletWidgetViews.WALLET_BALANCES },
       },
     });
-    setRunInitialiser(true);
+    await initialiseWallet();
   };
 
   return (
