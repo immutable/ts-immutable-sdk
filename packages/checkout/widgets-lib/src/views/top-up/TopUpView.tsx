@@ -212,7 +212,7 @@ export function TopUpView({
         <MenuItem.Caption testId={`menu-item-caption-${testId}`}>
           {caption}
           <br />
-          {`${subcaption}`}
+          {subcaption}
           {renderFeeFunction && renderFeeFunction(swapFeesInFiat, loadingSwapFees)}
         </MenuItem.Caption>
       </MenuItem>

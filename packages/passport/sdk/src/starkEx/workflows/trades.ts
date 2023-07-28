@@ -7,7 +7,7 @@ import {
 } from '@imtbl/core-sdk';
 import { PassportErrorType, withPassportError } from '../../errors/passportError';
 import { UserImx } from '../../types';
-import GuardianClient from '../guardian';
+import GuardianClient from '../../guardian/guardian';
 
 type CreateTradeParams = {
   request: GetSignableTradeRequest;

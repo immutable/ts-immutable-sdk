@@ -69,6 +69,14 @@ export class Passport {
     return this.passportImxProviderFactory.getProviderWithDeviceFlow(deviceCode, interval, timeoutMs);
   }
 
+  getPKCEAuthorizationUrl(): string {
+    return this.authManager.getPKCEAuthorizationUrl();
+  }
+
+  public async connectImxPKCEFlow(authorizationCode: string, state: string): Promise<IMXProvider | null> {
+    return this.passportImxProviderFactory.getProviderWithPKCEFlow(authorizationCode, state);
+  }
+
   /**
    * @returns {boolean} the stored device flow credentials if they exist
    */
