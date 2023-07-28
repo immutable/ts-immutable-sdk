@@ -164,53 +164,6 @@ export function ConnectLoader({
     });
   }, [widgetConfig]);
 
-  /** Handle wallet events as per EIP-1193 spec
-   * - listen for account changed manually in wallet
-   * - listen for network/chain changed manually in wallet
-   */
-  useEffect(() => {
-    if (!provider) return () => {};
-
-    function handleAccountsChanged(e: string[]) {
-      if (e.length === 0) {
-        // when a user disconnects all accounts, send them back to the connect screen
-        connectLoaderDispatch({
-          payload: {
-            type: ConnectLoaderActions.UPDATE_CONNECTION_STATUS,
-            connectionStatus: ConnectionStatus.NOT_CONNECTED,
-            deepLink: ConnectWidgetViews.READY_TO_CONNECT,
-          },
-        });
-      } else {
-        // trigger a re-load of the connectLoader so that the widget re loads with a new provider
-        connectLoaderDispatch({
-          payload: {
-            type: ConnectLoaderActions.SET_PROVIDER,
-            provider: new Web3Provider(provider!.provider),
-          },
-        });
-      }
-    }
-
-    function handleChainChanged() {
-      // trigger a re-load of the connectLoader so that the widget re loads with a new provider
-      connectLoaderDispatch({
-        payload: {
-          type: ConnectLoaderActions.SET_PROVIDER,
-          provider: new Web3Provider(provider!.provider),
-        },
-      });
-    }
-
-    addAccountsChangedListener(provider, handleAccountsChanged);
-    addChainChangedListener(provider, handleChainChanged);
-
-    return () => {
-      removeAccountsChangedListener(provider, handleAccountsChanged);
-      removeChainChangedListener(provider, handleChainChanged);
-    };
-  }, [provider]);
-
   useEffect(() => {
     if (window === undefined) {
       // eslint-disable-next-line no-console
