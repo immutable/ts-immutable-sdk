@@ -8,7 +8,7 @@ import { retryWithDelay } from '../network/retry';
 import { PassportConfiguration } from '../config';
 import { RelayerClient } from './relayerClient';
 import { UserZkEvm } from '../types';
-import GuardianClient, { convertBigNumberishToNumber } from '../guardian/guardian';
+import GuardianClient, { convertBigNumberishToString } from '../guardian/guardian';
 
 const MAX_TRANSACTION_HASH_RETRIEVAL_RETRIES = 30;
 const TRANSACTION_HASH_RETRIEVAL_WAIT = 1000;
@@ -87,7 +87,7 @@ export const sendTransaction = async ({
 
   await guardianClient.validateEVMTransaction({
     chainId: config.zkEvmChainId,
-    nonce: convertBigNumberishToNumber(nonce),
+    nonce: convertBigNumberishToString(nonce),
     user,
     metaTransactions: [metaTransaction, feeMetaTransaction],
   });
