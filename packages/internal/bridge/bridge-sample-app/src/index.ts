@@ -186,7 +186,6 @@ async function depositAndWithdraw() {
   // If approval is required, sign and send the approval transaction
   if (childApproveResp.unsignedTx) {
     console.log('Sending Approve Tx');
-    // childApproveResp.unsignedTx.gasLimit = ethers.utils.hexlify(500000); 
     const txResponseApprove = await checkoutChildChain.sendTransaction(
       childApproveResp.unsignedTx,
     );
@@ -205,7 +204,6 @@ async function depositAndWithdraw() {
   };
   
   const unsignedWithdrawReq = await tokenBridge.getUnsignedWithdrawTx(withdrawlReq);
-  // const tx = { ...unsignedWithdrawReq.unsignedTx, gasLimit: ethers.utils.hexlify(500000)} 
   console.log("Sending withdraw tx");
   const txWithdraw = await checkoutChildChain.sendTransaction(unsignedWithdrawReq.unsignedTx);
   const txWithdrawReceipt = await txWithdraw.wait(1);
