@@ -11,9 +11,13 @@ import {
   BridgeFeeResponse,
   BridgeWithdrawRequest,
   BridgeWithdrawResponse,
+  ChildTokenToRootTokenRequest,
+  ChildTokenToRootTokenResponse,
   CompletionStatus,
   ExitRequest,
   ExitResponse,
+  RootTokenToChildTokenRequest,
+  RootTokenToChildTokenResponse,
   WaitForDepositRequest,
   WaitForDepositResponse,
   WaitForWithdrawalRequest,
@@ -31,6 +35,7 @@ import { decodeExtraData } from 'lib/decodeExtraData';
 import { L2_STATE_SENDER_ADDRESS } from 'constants/bridges';
 import { L2_STATE_SENDER } from 'contracts/ABIs/L2StateSender';
 import { EXIT_HELPER } from 'contracts/ABIs/ExitHelper';
+import { CHILD_ERC20 } from 'contracts/ABIs/ChildERC20';
 
 /**
  * Represents a token bridge, which manages asset transfers between two chains.
@@ -381,11 +386,11 @@ export class TokenBridge {
   /**
    * TODO: @rez add docs and cleanup
    */
-  public async rootTokenToChildToken(rootTokenAddress: string) {
-    const nativeTokenKey = '0x0000000000000000000000000000000000000001';
+  public async rootTokenToChildToken(req: RootTokenToChildTokenRequest): Promise<RootTokenToChildTokenResponse> {
     this.validateChainConfiguration();
-    let queryTokenAddress = rootTokenAddress;
-    if (rootTokenAddress === 'NATIVE') {
+    const nativeTokenKey = '0x0000000000000000000000000000000000000001';
+    let queryTokenAddress = req.rootToken;
+    if (req.rootToken === 'NATIVE') {
       queryTokenAddress = nativeTokenKey;
     }
 
@@ -395,7 +400,21 @@ export class TokenBridge {
 
     // Call the public mapping as a function, passing the rootTokenAddress
     const childTokenAddress: string = await contract.rootTokenToChildToken(formattedAddress);
-    return childTokenAddress;
+    return {
+      childToken: childTokenAddress,
+    };
+  }
+
+  /**
+   * TODO: @rez implement
+   */
+  public async childTokenToRootToken(req: ChildTokenToRootTokenRequest): Promise<ChildTokenToRootTokenResponse> {
+    this.validateChainConfiguration();
+    const contract = new ethers.Contract(req.childToken, CHILD_ERC20, this.config.childProvider);
+    const rootToken: string = await contract.rootToken();
+    return {
+      rootToken,
+    };
   }
 
   /**

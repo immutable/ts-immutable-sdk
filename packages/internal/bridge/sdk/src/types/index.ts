@@ -60,6 +60,56 @@ export type Address = string;
 export type FungibleToken = Address | 'NATIVE';
 
 /**
+ * @typedef {Object} CompletionStatus
+ * @property {string} SUCCESS - The transaction has been successfully synced.
+ * @property {string} PENDING - The transaction is still pending.
+ * @property {string} FAILED - The transaction has failed.
+ */
+export enum CompletionStatus {
+  SUCCESS = 'SUCCESS',
+  PENDING = 'PENDING',
+  FAILED = 'FAILED',
+}
+
+/**
+ * @typedef {Object} BridgeFeeRequest
+ * @property {FungibleToken} token - The token for which the bridge fee is being requested.
+ */
+export interface BridgeFeeRequest {
+  token: FungibleToken;
+}
+
+/**
+ * @typedef {Object} BridgeFeeResponse
+ * @property {boolean} bridgeable - Indicates whether the token can be bridged or not.
+ * @property {ethers.BigNumber} feeAmount - The fee amount for bridging the token.
+ */
+export interface BridgeFeeResponse {
+  bridgeable: boolean;
+  feeAmount: ethers.BigNumber;
+}
+
+/**
+ * @typedef {Object} ApproveDepositBridgeRequest
+ * @property {string} depositorAddress - The address of the depositor.
+ * @property {FungibleToken} token - The token to be approved.
+ * @property {ethers.BigNumber} depositAmount - The amount to be approved for deposit.
+ */
+export interface ApproveDepositBridgeRequest {
+  depositorAddress: Address;
+  token: FungibleToken;
+  depositAmount: ethers.BigNumber;
+}
+
+/**
+ * @typedef {Object} ApproveDepositBridgeResponse
+ * @property {ethers.providers.TransactionRequest | null} unsignedTx - The unsigned transaction for the token approval, or null if no approval is required.
+ */
+export interface ApproveDepositBridgeResponse {
+  unsignedTx: ethers.providers.TransactionRequest | null;
+}
+
+/**
  * @typedef {Object} BridgeDepositRequest
  * @property {Address} depositorAddress - The address of the depositor.
  * @property {Address} recipientAddress - The address of the recipient.
@@ -79,6 +129,51 @@ export interface BridgeDepositRequest {
  */
 export interface BridgeDepositResponse {
   unsignedTx: ethers.providers.TransactionRequest;
+}
+
+/**
+ * @typedef {Object} WaitForDepositRequest
+ * @property {string} transactionHash - The hash of the deposit transaction on the root chain.
+ */
+export interface WaitForDepositRequest {
+  transactionHash: string;
+  timeout?: number; // TODO: @Rez implement timeout logic
+}
+
+/**
+ * @typedef {Object} WaitForDepositResponse
+ * @property {CompletionStatus} status - The status of the deposit transaction after waiting.
+ */
+export interface WaitForDepositResponse {
+  status: CompletionStatus;
+}
+
+/**
+ * @TODO: Rez
+ */
+export interface RootTokenToChildTokenRequest {
+  rootToken: FungibleToken;
+}
+
+/**
+ * @TODO: Rez
+ */
+export interface RootTokenToChildTokenResponse {
+  childToken: Address;
+}
+
+/**
+ * @TODO: Rez
+ */
+export interface ChildTokenToRootTokenRequest {
+  childToken: FungibleToken;
+}
+
+/**
+ * @TODO: Rez
+ */
+export interface ChildTokenToRootTokenResponse {
+  rootToken: FungibleToken;
 }
 
 /**
@@ -114,53 +209,6 @@ export interface BridgeWithdrawResponse {
 }
 
 /**
- * @typedef {Object} ApproveDepositBridgeRequest
- * @property {string} depositorAddress - The address of the depositor.
- * @property {FungibleToken} token - The token to be approved.
- * @property {ethers.BigNumber} depositAmount - The amount to be approved for deposit.
- */
-export interface ApproveDepositBridgeRequest {
-  depositorAddress: Address;
-  token: FungibleToken;
-  depositAmount: ethers.BigNumber;
-}
-
-/**
- * @typedef {Object} ApproveDepositBridgeResponse
- * @property {ethers.providers.TransactionRequest | null} unsignedTx - The unsigned transaction for the token approval, or null if no approval is required.
- */
-export interface ApproveDepositBridgeResponse {
-  unsignedTx: ethers.providers.TransactionRequest | null;
-}
-
-/**
- * @typedef {Object} BridgeFeeRequest
- * @property {FungibleToken} token - The token for which the bridge fee is being requested.
- */
-export interface BridgeFeeRequest {
-  token: FungibleToken;
-}
-
-/**
- * @typedef {Object} BridgeFeeResponse
- * @property {boolean} bridgeable - Indicates whether the token can be bridged or not.
- * @property {ethers.BigNumber} feeAmount - The fee amount for bridging the token.
- */
-export interface BridgeFeeResponse {
-  bridgeable: boolean;
-  feeAmount: ethers.BigNumber;
-}
-
-/**
- * @typedef {Object} WaitForDepositRequest
- * @property {string} transactionHash - The hash of the deposit transaction on the root chain.
- */
-export interface WaitForDepositRequest {
-  transactionHash: string;
-  timeout?: number; // TODO: @Rez implement timeout logic
-}
-
-/**
  * @typedef {Object} WaitForWithdrawalRequest
  * @property {string} transactionHash - The hash of the withdrawal transaction on the child chain.
  */
@@ -186,24 +234,4 @@ export interface ExitRequest {
  */
 export interface ExitResponse {
   unsignedTx: ethers.providers.TransactionRequest;
-}
-
-/**
- * @typedef {Object} CompletionStatus
- * @property {string} SUCCESS - The transaction has been successfully synced.
- * @property {string} PENDING - The transaction is still pending.
- * @property {string} FAILED - The transaction has failed.
- */
-export enum CompletionStatus {
-  SUCCESS = 'SUCCESS',
-  PENDING = 'PENDING',
-  FAILED = 'FAILED',
-}
-
-/**
- * @typedef {Object} WaitForDepositResponse
- * @property {CompletionStatus} status - The status of the deposit transaction after waiting.
- */
-export interface WaitForDepositResponse {
-  status: CompletionStatus;
 }
