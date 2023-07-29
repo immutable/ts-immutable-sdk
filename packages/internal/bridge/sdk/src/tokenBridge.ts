@@ -407,7 +407,6 @@ export class TokenBridge {
     const waitForRootEpoch = async (): Promise<null> => {
       const currentEpoch = await checkpointManager.currentEpoch();
       // eslint-disable-next-line no-console
-      console.log(`current epoch is ${currentEpoch}, waiting for epoch ${decodedExtraData.checkpoint.epochNumber}`);
       if (currentEpoch >= decodedExtraData.checkpoint.epochNumber) {
         return null;
       }
@@ -433,29 +432,15 @@ export class TokenBridge {
     const l2StateSenderInterface = new ethers.utils.Interface(L2_STATE_SENDER);
     const l2StateSyncEvent = l2StateSenderInterface.parseLog(stateSenderLogs[0]);
 
-    // eslint-disable-next-line no-console
-    console.log(l2StateSyncEvent);
-
     const types = ['uint256', 'address', 'address', 'bytes'];
     const exitEventEncoded = ethers.utils.defaultAbiCoder.encode(types, l2StateSyncEvent.args);
-    // eslint-disable-next-line no-console
-    console.log('exitEventEncoded: ');
-    // eslint-disable-next-line no-console
-    console.log(exitEventEncoded);
 
     // Throw an error if the event log doesn't match the expected format
     if (l2StateSyncEvent.signature !== 'L2StateSynced(uint256,address,address,bytes)') {
       throw new Error(`expected L2StateSynced event in tx ${txReceipt.transactionHash}`);
     }
 
-    const exitEventId: string = l2StateSyncEvent.args.id.toString();
-    // eslint-disable-next-line no-console
-    console.log(`exit event id is ${exitEventId}`);
-    // eslint-disable-next-line no-console
-    console.log(`exit event hex string: ${l2StateSyncEvent.args.id.toHexString()}`);
     const exitProof = await (this.config.childProvider as ethers.providers.JsonRpcProvider).send('bridge_generateExitProof', [l2StateSyncEvent.args.id.toHexString()]);
-    // eslint-disable-next-line no-console
-    console.log(exitProof);
 
     const exitHelper = new ethers.Contract(this.config.bridgeContracts.rootChainExitHelper, EXIT_HELPER, this.config.rootProvider);
 
@@ -466,8 +451,6 @@ export class TokenBridge {
       to: this.config.bridgeContracts.rootChainExitHelper,
       value: 0,
     };
-    // eslint-disable-next-line no-console
-    console.log(`Unsigned Tx: ${JSON.stringify(unsignedTx)}`);
     return { unsignedTx };
   }
 

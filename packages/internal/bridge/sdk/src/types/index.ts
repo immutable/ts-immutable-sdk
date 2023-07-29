@@ -166,6 +166,7 @@ export interface WaitForDepositRequest {
  */
 export interface WaitForWithdrawalRequest {
   transactionHash: string;
+  timeout?: number; // TODO: @Rez implement timeout logic
 }
 
 /**
