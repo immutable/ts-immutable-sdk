@@ -171,10 +171,12 @@ async function depositAndWithdraw() {
 
   console.log(`Starting WITHDRAWAL`);
   console.log(`Approving Bridge`);
+  const withdrawalToken = await tokenBridge.rootTokenToChildToken(process.env.TOKEN_ADDRESS);
+  console.log(`Deposit token was ${process.env.TOKEN_ADDRESS}, withdrawal token is ${withdrawalToken}`);
   // Approval
   const childApproveReq: ApproveWithdrawBridgeRequest = {
     depositorAddress: process.env.DEPOSITOR_ADDRESS,
-    token: process.env.TOKEN_ADDRESS,
+    token: withdrawalToken,
     depositAmount,
   };
 
@@ -198,7 +200,7 @@ async function depositAndWithdraw() {
 
   const withdrawlReq: BridgeWithdrawRequest = {
     recipientAddress: process.env.DEPOSITOR_ADDRESS,
-    token: process.env.TOKEN_ADDRESS,
+    token: withdrawalToken,
     withdrawAmount: depositAmount
   };
   

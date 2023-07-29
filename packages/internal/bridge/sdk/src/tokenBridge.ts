@@ -120,13 +120,6 @@ export class TokenBridge {
   public async getUnsignedDepositTx(
     req: BridgeDepositRequest,
   ): Promise<BridgeDepositResponse> {
-    if (req.token === 'NATIVE') {
-      throw new BridgeError(
-        'native token deposit is not yet supported',
-        BridgeErrorType.UNSUPPORTED_ERROR,
-      );
-    }
-
     if (!ethers.utils.isAddress(req.depositorAddress)) {
       throw new BridgeError(
         `depositor address ${req.depositorAddress} is not a valid address`,
@@ -156,11 +149,6 @@ export class TokenBridge {
       );
     }
 
-    // Convert the addresses to correct format addresses (e.g. prepend 0x if not already)
-    const depositor = ethers.utils.getAddress(req.depositorAddress);
-    const receipient = ethers.utils.getAddress(req.recipientAddress);
-    const token = ethers.utils.getAddress(req.token);
-
     const rootERC20PredicateContract = await withBridgeError<ethers.Contract>(
       async () => {
         const contract = new ethers.Contract(
@@ -171,6 +159,31 @@ export class TokenBridge {
       },
       BridgeErrorType.INTERNAL_ERROR,
     );
+
+    // Convert the addresses to correct format addresses (e.g. prepend 0x if not already)
+    const depositor = ethers.utils.getAddress(req.depositorAddress);
+    const receipient = ethers.utils.getAddress(req.recipientAddress);
+
+    // Handle return if it is a native token
+    if (req.token === 'NATIVE') {
+      // Encode the function data into a payload
+      const data = await withBridgeError<string>(async () => rootERC20PredicateContract.interface.encodeFunctionData(
+        'depositNativeTo',
+        [receipient],
+      ), BridgeErrorType.INTERNAL_ERROR);
+
+      return {
+        unsignedTx: {
+          data,
+          to: this.config.bridgeContracts.rootChainERC20Predicate,
+          value: req.depositAmount,
+          from: depositor,
+        },
+      };
+    }
+
+    // Handle return for ERC20
+    const token = ethers.utils.getAddress(req.token);
 
     // Encode the function data into a payload
     const data = await withBridgeError<string>(async () => rootERC20PredicateContract.interface.encodeFunctionData(
@@ -194,6 +207,8 @@ export class TokenBridge {
   public async getUnsignedWithdrawTx(
     req: BridgeWithdrawRequest,
   ): Promise<BridgeWithdrawResponse> {
+    // TODO: @rez check user balance and check token is mapped
+
     const childERC20PredicateContract = await withBridgeError<ethers.Contract>(
       async () => {
         const contract = new ethers.Contract(
@@ -222,11 +237,26 @@ export class TokenBridge {
   }
 
   /**
+   * TODO: @rez add docs and cleanup
+   */
+  public async rootTokenToChildToken(rootTokenAddress: string) {
+    const contract = new ethers.Contract(this.config.bridgeContracts.rootChainERC20Predicate, ROOT_ERC20_PREDICATE, this.config.rootProvider);
+    // ensure the rootTokenAddress is a valid address
+    ethers.utils.getAddress(rootTokenAddress);
+
+    // Call the public mapping as a function, passing the rootTokenAddress
+    const childTokenAddress: string = await contract.rootTokenToChildToken(rootTokenAddress);
+    return childTokenAddress;
+  }
+
+  /**
    * TODO: @rez add docs
    */
   public async getUnsignedApproveWithdrawBridgeTx(
     req: ApproveWithdrawBridgeRequest,
   ): Promise<ApproveWithdrawBridgeResponse> {
+    // TODO: @rez check user balance and check token is mapped
+
     const erc20Contract = await withBridgeError<ethers.Contract>(
       async () => {
         const contract = new ethers.Contract(
@@ -289,26 +319,9 @@ export class TokenBridge {
   public async getUnsignedApproveDepositBridgeTx(
     req: ApproveDepositBridgeRequest,
   ): Promise<ApproveDepositBridgeResponse> {
-    // If the token is NATIVE, no approval is required
-    if (req.token === 'NATIVE') {
-      // When native tokens are supported, change this to return required: false
-      throw new BridgeError(
-        'native token deposit is not yet supported',
-        BridgeErrorType.UNSUPPORTED_ERROR,
-      );
-    }
-
     if (!ethers.utils.isAddress(req.depositorAddress)) {
       throw new BridgeError(
         `depositor address ${req.depositorAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
-
-    // If the token is ERC20, the address must be valid
-    if (req.token !== 'NATIVE' && !ethers.utils.isAddress(req.token)) {
-      throw new BridgeError(
-        `token address ${req.token} is not a valid address`,
         BridgeErrorType.INVALID_ADDRESS,
       );
     }
@@ -318,6 +331,21 @@ export class TokenBridge {
       throw new BridgeError(
         `deposit amount ${req.depositAmount.toString()} is invalid`,
         BridgeErrorType.INVALID_AMOUNT,
+      );
+    }
+
+    // If the token is NATIVE, no approval is required
+    if (req.token === 'NATIVE') {
+      return {
+        unsignedTx: null,
+      };
+    }
+
+    // The token should always be ERC20 by this point, so check if it is a valid address
+    if (!ethers.utils.isAddress(req.token)) {
+      throw new BridgeError(
+        `token address ${req.token} is not a valid address`,
+        BridgeErrorType.INVALID_ADDRESS,
       );
     }
 
