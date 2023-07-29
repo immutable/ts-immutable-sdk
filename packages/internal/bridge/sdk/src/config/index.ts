@@ -118,7 +118,7 @@ export class BridgeConfiguration {
     // How frequently we poll the childchain for StateSync events
     this.pollInterval = 5 * 1000; // 5 seconds
     // The upper bound of the block range we poll for StateSync events
-    this.maxDepositBlockDelay = 100;
+    this.maxDepositBlockDelay = 250;
     // Assume that the clock timestamp is at most 900 seconds inaccurate, see for more -> https://github.com/ethereum/wiki/blob/c02254611f218f43cbb07517ca8e5d00fd6d6d75/Block-Protocol-2.0.md
     this.clockInaccuracy = 900;
     // How many blocks to wait for on the root chain before accepting rootchain finality
