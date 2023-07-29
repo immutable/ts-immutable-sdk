@@ -118,8 +118,11 @@ export class TokenBridge {
    *
    * bridgeSdk.getUnsignedApproveDepositBridgeTx(approveRequest)
    *   .then((approveResponse) => {
-   *     console.log('Approval Required:', approveResponse.required);
-   *     console.log('Unsigned Approval Transaction:', approveResponse.unsignedTx);
+   *     if (approveResponse.unsignedTx) {
+   *       // Send the unsigned approval transaction to the depositor to sign and send
+   *     } else {
+   *      // No approval is required
+   *     }
    *   })
    *   .catch((error) => {
    *     console.error('Error:', error.message);
