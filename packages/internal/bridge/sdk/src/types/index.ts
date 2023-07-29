@@ -85,8 +85,8 @@ export interface BridgeDepositResponse {
  * TODO: @Rez docs
  */
 export interface ApproveWithdrawBridgeRequest {
-  depositorAddress: string;
-  token: FungibleToken;
+  depositorAddress: Address;
+  token: Address;
   depositAmount: ethers.BigNumber;
 }
 
@@ -120,7 +120,7 @@ export interface BridgeWithdrawResponse {
  * @property {ethers.BigNumber} depositAmount - The amount to be approved for deposit.
  */
 export interface ApproveDepositBridgeRequest {
-  depositorAddress: string;
+  depositorAddress: Address;
   token: FungibleToken;
   depositAmount: ethers.BigNumber;
 }

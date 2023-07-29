@@ -76,7 +76,7 @@ export class TokenBridge {
    *   });
    */
   public async getFee(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
-    if (!ethers.utils.isAddress(req.token)) {
+    if (req.token !== 'NATIVE' && !ethers.utils.isAddress(req.token)) {
       throw new BridgeError(
         `token address ${req.token} is not a valid address`,
         BridgeErrorType.INVALID_ADDRESS,
@@ -240,12 +240,17 @@ export class TokenBridge {
    * TODO: @rez add docs and cleanup
    */
   public async rootTokenToChildToken(rootTokenAddress: string) {
+    let queryTokenAddress = rootTokenAddress;
+    if (rootTokenAddress === 'NATIVE') {
+      queryTokenAddress = '0x0000000000000000000000000000000000000001';
+    }
+
     const contract = new ethers.Contract(this.config.bridgeContracts.rootChainERC20Predicate, ROOT_ERC20_PREDICATE, this.config.rootProvider);
     // ensure the rootTokenAddress is a valid address
-    ethers.utils.getAddress(rootTokenAddress);
+    const formattedAddress = ethers.utils.getAddress(queryTokenAddress);
 
     // Call the public mapping as a function, passing the rootTokenAddress
-    const childTokenAddress: string = await contract.rootTokenToChildToken(rootTokenAddress);
+    const childTokenAddress: string = await contract.rootTokenToChildToken(formattedAddress);
     return childTokenAddress;
   }
 

@@ -213,6 +213,7 @@ async function depositAndWithdraw() {
   const withdrawalRequest: WaitForWithdrawalRequest = {
     transactionHash: txWithdrawReceipt.transactionHash,
   }
+  console.log(`Waiting for withdrawal...this may take a while`);
   const waitForWithdrawalResp: WaitForWithdrawalResponse = await tokenBridge.waitForWithdrawal(withdrawalRequest);
   console.log(waitForWithdrawalResp)
 
