@@ -14,7 +14,6 @@ import {
   CompletionStatus,
   ExitRequest,
   ExitResponse,
-  FungibleToken,
   WaitForDepositRequest,
   WaitForDepositResponse,
   WaitForWithdrawalRequest,
@@ -52,7 +51,8 @@ export class TokenBridge {
   }
 
   /**
-   * Retrieves the bridge fee for a specific token.
+   * Retrieves the bridge fee for depositing a specific token, used to reimburse the bridge-relayer.
+   * It is clipped from the deposit amount.
    *
    * @param {BridgeFeeRequest} req - The fee request object containing the token address for which the fee is required.
    * @returns {Promise<BridgeFeeResponse>} - A promise that resolves to an object containing the bridge fee for the specified token and a flag indicating if the token is bridgeable.
@@ -63,7 +63,12 @@ export class TokenBridge {
    *
    * @example
    * const feeRequest = {
-   *   token: '0x123456...', // ERC20 token address
+   *   token: '0x123456...', // token
+   * };
+   *
+   * @example
+   * const feeRequest = {
+   *   token: 'NATIVE', // token
    * };
    *
    * bridgeSdk.getFee(feeRequest)
@@ -76,6 +81,7 @@ export class TokenBridge {
    *   });
    */
   public async getFee(req: BridgeFeeRequest): Promise<BridgeFeeResponse> {
+    this.validateChainConfiguration();
     if (req.token !== 'NATIVE' && !ethers.utils.isAddress(req.token)) {
       throw new BridgeError(
         `token address ${req.token} is not a valid address`,
@@ -84,12 +90,116 @@ export class TokenBridge {
     }
     return {
       bridgeable: true,
-      feeAmount: await this.getFeeForToken(req.token),
+      feeAmount: ethers.BigNumber.from(0),
+    };
+  }
+
+  /**
+   * Retrieves the unsigned approval transaction for a deposit to the bridge.
+   * Approval is required before depositing tokens to the bridge using
+   *
+   * @param {ApproveBridgeRequest} req - The approve bridge request object containing the depositor address, token address, and deposit amount.
+   * @returns {Promise<ApproveBridgeResponse>} - A promise that resolves to an object containing the unsigned approval transaction and a flag indicating if the approval is required.
+   * @throws {BridgeError} - If an error occurs during the transaction creation, a BridgeError will be thrown with a specific error type.
+   *
+   * Possible BridgeError types include:
+   * - UNSUPPORTED_ERROR: The operation is not supported. Currently thrown when attempting to deposit native tokens.
+   * - INVALID_ADDRESS: An Ethereum address provided in the request is invalid.
+   * - INVALID_AMOUNT: The deposit amount provided in the request is invalid (less than or equal to 0).
+   * - INTERNAL_ERROR: An unexpected error occurred during the execution, likely due to the bridge SDK implementation.
+   * - PROVIDER_ERROR: An error occurred while interacting with the Ethereum provider. This includes issues calling the ERC20 smart contract
+   *
+   * @example
+   * const approveRequest = {
+   *   depositorAddress: '0x123456...', // Depositor's Ethereum address
+   *   token: '0xabcdef...', // ERC20 token address
+   *   depositAmount: ethers.utils.parseUnits('100', 18), // Deposit amount in token's smallest unit (e.g., wei for Ether)
+   * };
+   *
+   * bridgeSdk.getUnsignedApproveDepositBridgeTx(approveRequest)
+   *   .then((approveResponse) => {
+   *     console.log('Approval Required:', approveResponse.required);
+   *     console.log('Unsigned Approval Transaction:', approveResponse.unsignedTx);
+   *   })
+   *   .catch((error) => {
+   *     console.error('Error:', error.message);
+   *   });
+   */
+  public async getUnsignedApproveDepositBridgeTx(
+    req: ApproveDepositBridgeRequest,
+  ): Promise<ApproveDepositBridgeResponse> {
+    if (!ethers.utils.isAddress(req.depositorAddress)) {
+      this.validateChainConfiguration();
+      throw new BridgeError(
+        `depositor address ${req.depositorAddress} is not a valid address`,
+        BridgeErrorType.INVALID_ADDRESS,
+      );
+    }
+
+    // The deposit amount cannot be <= 0
+    if (req.depositAmount.isNegative() || req.depositAmount.isZero()) {
+      throw new BridgeError(
+        `deposit amount ${req.depositAmount.toString()} is invalid`,
+        BridgeErrorType.INVALID_AMOUNT,
+      );
+    }
+
+    // If the token is NATIVE, no approval is required
+    if (req.token === 'NATIVE') {
+      return {
+        unsignedTx: null,
+      };
+    }
+
+    // The token should always be ERC20 by this point, so check if it is a valid address
+    if (!ethers.utils.isAddress(req.token)) {
+      throw new BridgeError(
+        `token address ${req.token} is not a valid address`,
+        BridgeErrorType.INVALID_ADDRESS,
+      );
+    }
+
+    const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(async () => new ethers.Contract(req.token, ERC20, this.config.rootProvider), BridgeErrorType.INTERNAL_ERROR);
+
+    // Get the current approved allowance of the RootERC20Predicate
+    const rootERC20PredicateAllowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract.allowance(
+      req.depositorAddress,
+      this.config.bridgeContracts.rootChainERC20Predicate,
+    ), BridgeErrorType.PROVIDER_ERROR);
+
+    // If the allowance is greater than or equal to the deposit amount, no approval is required
+    if (rootERC20PredicateAllowance.gte(req.depositAmount)) {
+      return {
+        unsignedTx: null,
+      };
+    }
+    // Calculate the amount of tokens that need to be approved for deposit
+    const approvalAmountRequired = req.depositAmount.sub(
+      rootERC20PredicateAllowance,
+    );
+
+    // Encode the approve function call data for the ERC20 contract
+    const data: string = await withBridgeError<string>(async () => erc20Contract.interface.encodeFunctionData('approve', [
+      this.config.bridgeContracts.rootChainERC20Predicate,
+      approvalAmountRequired,
+    ]), BridgeErrorType.INTERNAL_ERROR);
+
+    // Create the unsigned transaction for the approval
+    const unsignedTx: ethers.providers.TransactionRequest = {
+      data,
+      to: req.token,
+      value: 0,
+      from: req.depositorAddress,
+    };
+
+    return {
+      unsignedTx,
     };
   }
 
   /**
    * Generates an unsigned deposit transaction for a user to sign and submit to the bridge.
+   * Must be called after bridgeSdk.getUnsignedApproveDepositBridgeTx to ensure user has approved sufficient tokens for deposit.
    *
    * @param {BridgeDepositRequest} req - The deposit request object containing the required data for depositing tokens.
    * @returns {Promise<BridgeDepositResponse>} - A promise that resolves to an object containing the unsigned transaction data.
@@ -102,8 +212,16 @@ export class TokenBridge {
    * - INTERNAL_ERROR: An unexpected error occurred during the execution, likely due to the bridge SDK implementation.
    *
    * @example
-   * const depositRequest = {
+   * const depositERC20Request = {
    *   token: '0x123456...', // ERC20 token address
+   *   depositorAddress: '0xabcdef...', // User's wallet address
+   *   recipientAddress: '0x987654...', // Destination wallet address on the target chain
+   *   depositAmount: ethers.utils.parseUnits('100', 18), // Deposit amount in wei
+   * };
+   *
+   * @example
+   * const depositEtherTokenRequest = {
+   *   token: 'NATIVE',
    *   depositorAddress: '0xabcdef...', // User's wallet address
    *   recipientAddress: '0x987654...', // Destination wallet address on the target chain
    *   depositAmount: ethers.utils.parseUnits('100', 18), // Deposit amount in wei
@@ -120,6 +238,7 @@ export class TokenBridge {
   public async getUnsignedDepositTx(
     req: BridgeDepositRequest,
   ): Promise<BridgeDepositResponse> {
+    this.validateChainConfiguration();
     if (!ethers.utils.isAddress(req.depositorAddress)) {
       throw new BridgeError(
         `depositor address ${req.depositorAddress} is not a valid address`,
@@ -202,11 +321,125 @@ export class TokenBridge {
   }
 
   /**
+   * Waits for the deposit transaction to be confirmed and synced from the root chain to the child chain.
+   *
+   * @param {WaitForDepositRequest} req - The wait for request object containing the transaction hash.
+   * @returns {Promise<WaitForDepositResponse>} - A promise that resolves to an object containing the status of the deposit transaction.
+   * @throws {BridgeError} - If an error occurs during the transaction confirmation or state sync, a BridgeError will be thrown with a specific error type.
+   *
+   * Possible BridgeError types include:
+   * - PROVIDER_ERROR: An error occurred with the Ethereum provider during transaction confirmation or state synchronization.
+   * - TRANSACTION_REVERTED: The transaction on the root chain was reverted.
+   *
+   * @example
+   * const waitForRequest = {
+   *   transactionHash: '0x123456...', // Deposit transaction hash on the root chain
+   * };
+   *
+   * bridgeSdk.waitForDeposit(waitForRequest)
+   *   .then((waitForResponse) => {
+   *     console.log('Deposit Transaction Status:', waitForResponse.status);
+   *   })
+   *   .catch((error) => {
+   *     console.error('Error:', error.message);
+   *   });
+   */
+  public async waitForDeposit(
+    req: WaitForDepositRequest,
+  ): Promise<WaitForDepositResponse> {
+    this.validateChainConfiguration();
+    const rootTxReceipt: ethers.providers.TransactionReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(async () => this.config.rootProvider.waitForTransaction(req.transactionHash, this.config.rootChainFinalityBlocks), BridgeErrorType.PROVIDER_ERROR);
+
+    // Throw an error if the transaction was reverted
+    if (rootTxReceipt.status !== 1) {
+      throw new BridgeError(`${rootTxReceipt.transactionHash} on rootchain was reverted`, BridgeErrorType.TRANSACTION_REVERTED);
+    }
+
+    // Get the state sync ID from the transaction receipt
+    const stateSyncID = await withBridgeError<number>(async () => this.getRootStateSyncID(rootTxReceipt), BridgeErrorType.PROVIDER_ERROR);
+
+    // Get the block for the timestamp
+    const rootBlock: ethers.providers.Block = await this.config.rootProvider.getBlock(rootTxReceipt.blockNumber);
+
+    // Get the minimum block on childchain which corresponds with the timestamp on rootchain
+    const minBlockRange: number = await withBridgeError<number>(async () => getBlockNumberClosestToTimestamp(this.config.childProvider, rootBlock.timestamp, this.config.blockTime, this.config.clockInaccuracy), BridgeErrorType.PROVIDER_ERROR);
+
+    // Get the upper bound for which we expect the StateSync event to occur
+    const maxBlockRange: number = minBlockRange + this.config.maxDepositBlockDelay;
+
+    // Poll till event observed
+    const result: CompletionStatus = await withBridgeError<CompletionStatus>(async () => this.waitForChildStateSync(stateSyncID, this.config.pollInterval, minBlockRange, maxBlockRange), BridgeErrorType.PROVIDER_ERROR);
+
+    return {
+      status: result,
+    };
+  }
+
+  /**
+   * TODO: @rez add docs and cleanup
+   */
+  public async rootTokenToChildToken(rootTokenAddress: string) {
+    const nativeTokenKey = '0x0000000000000000000000000000000000000001';
+    this.validateChainConfiguration();
+    let queryTokenAddress = rootTokenAddress;
+    if (rootTokenAddress === 'NATIVE') {
+      queryTokenAddress = nativeTokenKey;
+    }
+
+    const contract = new ethers.Contract(this.config.bridgeContracts.rootChainERC20Predicate, ROOT_ERC20_PREDICATE, this.config.rootProvider);
+    // ensure the rootTokenAddress is a valid address
+    const formattedAddress = ethers.utils.getAddress(queryTokenAddress);
+
+    // Call the public mapping as a function, passing the rootTokenAddress
+    const childTokenAddress: string = await contract.rootTokenToChildToken(formattedAddress);
+    return childTokenAddress;
+  }
+
+  /**
+   * TODO: @rez add docs
+   */
+  public async getUnsignedApproveWithdrawBridgeTx(
+    req: ApproveWithdrawBridgeRequest,
+  ): Promise<ApproveWithdrawBridgeResponse> {
+    this.validateChainConfiguration();
+    // TODO: @rez check user balance and check token is mapped
+
+    const erc20Contract = await withBridgeError<ethers.Contract>(
+      async () => {
+        const contract = new ethers.Contract(
+          req.token,
+          ERC20,
+        );
+        return contract;
+      },
+      BridgeErrorType.INTERNAL_ERROR,
+    );
+      // Encode the approve function call data for the ERC20 contract
+    const data: string = await withBridgeError<string>(async () => erc20Contract.interface.encodeFunctionData('approve', [
+      this.config.bridgeContracts.childChainERC20Predicate,
+      req.depositAmount,
+    ]), BridgeErrorType.INTERNAL_ERROR);
+
+    // Create the unsigned transaction for the approval
+    const unsignedTx: ethers.providers.TransactionRequest = {
+      data,
+      to: req.token,
+      value: 0,
+      from: req.depositorAddress,
+    };
+
+    return {
+      unsignedTx,
+    };
+  }
+
+  /**
    * TODO: @rez add docs
    */
   public async getUnsignedWithdrawTx(
     req: BridgeWithdrawRequest,
   ): Promise<BridgeWithdrawResponse> {
+    this.validateChainConfiguration();
     // TODO: @rez check user balance and check token is mapped
 
     const childERC20PredicateContract = await withBridgeError<ethers.Contract>(
@@ -237,165 +470,12 @@ export class TokenBridge {
   }
 
   /**
-   * TODO: @rez add docs and cleanup
-   */
-  public async rootTokenToChildToken(rootTokenAddress: string) {
-    let queryTokenAddress = rootTokenAddress;
-    if (rootTokenAddress === 'NATIVE') {
-      queryTokenAddress = '0x0000000000000000000000000000000000000001';
-    }
-
-    const contract = new ethers.Contract(this.config.bridgeContracts.rootChainERC20Predicate, ROOT_ERC20_PREDICATE, this.config.rootProvider);
-    // ensure the rootTokenAddress is a valid address
-    const formattedAddress = ethers.utils.getAddress(queryTokenAddress);
-
-    // Call the public mapping as a function, passing the rootTokenAddress
-    const childTokenAddress: string = await contract.rootTokenToChildToken(formattedAddress);
-    return childTokenAddress;
-  }
-
-  /**
    * TODO: @rez add docs
    */
-  public async getUnsignedApproveWithdrawBridgeTx(
-    req: ApproveWithdrawBridgeRequest,
-  ): Promise<ApproveWithdrawBridgeResponse> {
-    // TODO: @rez check user balance and check token is mapped
-
-    const erc20Contract = await withBridgeError<ethers.Contract>(
-      async () => {
-        const contract = new ethers.Contract(
-          req.token,
-          ERC20,
-        );
-        return contract;
-      },
-      BridgeErrorType.INTERNAL_ERROR,
-    );
-    // Encode the approve function call data for the ERC20 contract
-    const data: string = await withBridgeError<string>(async () => erc20Contract.interface.encodeFunctionData('approve', [
-      this.config.bridgeContracts.childChainERC20Predicate,
-      req.depositAmount,
-    ]), BridgeErrorType.INTERNAL_ERROR);
-
-    // Create the unsigned transaction for the approval
-    const unsignedTx: ethers.providers.TransactionRequest = {
-      data,
-      to: req.token,
-      value: 0,
-      from: req.depositorAddress,
-    };
-
-    return {
-      unsignedTx,
-    };
-  }
-
-  /**
-   * Retrieves the unsigned approval transaction for a deposit to the bridge.
-   *
-   * @param {ApproveBridgeRequest} req - The approve bridge request object containing the depositor address, token address, and deposit amount.
-   * @returns {Promise<ApproveBridgeResponse>} - A promise that resolves to an object containing the unsigned approval transaction and a flag indicating if the approval is required.
-   * @throws {BridgeError} - If an error occurs during the transaction creation, a BridgeError will be thrown with a specific error type.
-   *
-   * Possible BridgeError types include:
-   * - UNSUPPORTED_ERROR: The operation is not supported. Currently thrown when attempting to deposit native tokens.
-   * - INVALID_ADDRESS: An Ethereum address provided in the request is invalid.
-   * - INVALID_AMOUNT: The deposit amount provided in the request is invalid (less than or equal to 0).
-   * - INTERNAL_ERROR: An unexpected error occurred during the execution, likely due to the bridge SDK implementation.
-   * - PROVIDER_ERROR: An error occurred while interacting with the Ethereum provider. This includes issues calling the ERC20 smart contract
-   *
-   * @example
-   * const approveRequest = {
-   *   depositorAddress: '0x123456...', // Depositor's Ethereum address
-   *   token: '0xabcdef...', // ERC20 token address
-   *   depositAmount: ethers.utils.parseUnits('100', 18), // Deposit amount in token's smallest unit (e.g., wei for Ether)
-   * };
-   *
-   * bridgeSdk.getUnsignedApproveDepositBridgeTx(approveRequest)
-   *   .then((approveResponse) => {
-   *     console.log('Approval Required:', approveResponse.required);
-   *     console.log('Unsigned Approval Transaction:', approveResponse.unsignedTx);
-   *   })
-   *   .catch((error) => {
-   *     console.error('Error:', error.message);
-   *   });
-   */
-  public async getUnsignedApproveDepositBridgeTx(
-    req: ApproveDepositBridgeRequest,
-  ): Promise<ApproveDepositBridgeResponse> {
-    if (!ethers.utils.isAddress(req.depositorAddress)) {
-      throw new BridgeError(
-        `depositor address ${req.depositorAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
-
-    // The deposit amount cannot be <= 0
-    if (req.depositAmount.isNegative() || req.depositAmount.isZero()) {
-      throw new BridgeError(
-        `deposit amount ${req.depositAmount.toString()} is invalid`,
-        BridgeErrorType.INVALID_AMOUNT,
-      );
-    }
-
-    // If the token is NATIVE, no approval is required
-    if (req.token === 'NATIVE') {
-      return {
-        unsignedTx: null,
-      };
-    }
-
-    // The token should always be ERC20 by this point, so check if it is a valid address
-    if (!ethers.utils.isAddress(req.token)) {
-      throw new BridgeError(
-        `token address ${req.token} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
-
-    const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(async () => new ethers.Contract(req.token, ERC20, this.config.rootProvider), BridgeErrorType.INTERNAL_ERROR);
-
-    // Get the current approved allowance of the RootERC20Predicate
-    const rootERC20PredicateAllowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract.allowance(
-      req.depositorAddress,
-      this.config.bridgeContracts.rootChainERC20Predicate,
-    ), BridgeErrorType.PROVIDER_ERROR);
-
-    // If the allowance is greater than or equal to the deposit amount, no approval is required
-    if (rootERC20PredicateAllowance.gte(req.depositAmount)) {
-      return {
-        unsignedTx: null,
-      };
-    }
-    // Calculate the amount of tokens that need to be approved for deposit
-    const approvalAmountRequired = req.depositAmount.sub(
-      rootERC20PredicateAllowance,
-    );
-
-    // Encode the approve function call data for the ERC20 contract
-    const data: string = await withBridgeError<string>(async () => erc20Contract.interface.encodeFunctionData('approve', [
-      this.config.bridgeContracts.rootChainERC20Predicate,
-      approvalAmountRequired,
-    ]), BridgeErrorType.INTERNAL_ERROR);
-
-    // Create the unsigned transaction for the approval
-    const unsignedTx: ethers.providers.TransactionRequest = {
-      data,
-      to: req.token,
-      value: 0,
-      from: req.depositorAddress,
-    };
-
-    return {
-      unsignedTx,
-    };
-  }
-
-  // TODO: @Rez to add proper error handling and tests
   public async waitForWithdrawal(
     req:WaitForWithdrawalRequest,
   ): Promise<WaitForWithdrawalResponse> {
+    this.validateChainConfiguration();
     const transactionReceipt = await this.config.childProvider.getTransactionReceipt(req.transactionHash);
     const block = await this.config.childProvider.getBlock(transactionReceipt.blockNumber);
 
@@ -427,6 +507,7 @@ export class TokenBridge {
 
   // TODO: @Rez docs and error handling
   public async getUnsignedExitTx(req: ExitRequest): Promise<ExitResponse> {
+    this.validateChainConfiguration();
     const txReceipt = await this.config.childProvider.getTransactionReceipt(req.transactionHash);
     // Get the StateSynced event log from the transaction receipt
     const stateSenderLogs = txReceipt.logs.filter((log) => log.address.toLowerCase() === L2_STATE_SENDER_ADDRESS);
@@ -457,60 +538,6 @@ export class TokenBridge {
       value: 0,
     };
     return { unsignedTx };
-  }
-
-  /**
-   * Waits for the deposit transaction to be confirmed and synced from the root chain to the child chain.
-   *
-   * @param {WaitForDepositRequest} req - The wait for request object containing the transaction hash.
-   * @returns {Promise<WaitForDepositResponse>} - A promise that resolves to an object containing the status of the deposit transaction.
-   * @throws {BridgeError} - If an error occurs during the transaction confirmation or state sync, a BridgeError will be thrown with a specific error type.
-   *
-   * Possible BridgeError types include:
-   * - PROVIDER_ERROR: An error occurred with the Ethereum provider during transaction confirmation or state synchronization.
-   * - TRANSACTION_REVERTED: The transaction on the root chain was reverted.
-   *
-   * @example
-   * const waitForRequest = {
-   *   transactionHash: '0x123456...', // Deposit transaction hash on the root chain
-   * };
-   *
-   * bridgeSdk.waitForDeposit(waitForRequest)
-   *   .then((waitForResponse) => {
-   *     console.log('Deposit Transaction Status:', waitForResponse.status);
-   *   })
-   *   .catch((error) => {
-   *     console.error('Error:', error.message);
-   *   });
-   */
-  public async waitForDeposit(
-    req: WaitForDepositRequest,
-  ): Promise<WaitForDepositResponse> {
-    const rootTxReceipt: ethers.providers.TransactionReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(async () => this.config.rootProvider.waitForTransaction(req.transactionHash, this.config.rootChainFinalityBlocks), BridgeErrorType.PROVIDER_ERROR);
-
-    // Throw an error if the transaction was reverted
-    if (rootTxReceipt.status !== 1) {
-      throw new BridgeError(`${rootTxReceipt.transactionHash} on rootchain was reverted`, BridgeErrorType.TRANSACTION_REVERTED);
-    }
-
-    // Get the state sync ID from the transaction receipt
-    const stateSyncID = await withBridgeError<number>(async () => this.getRootStateSyncID(rootTxReceipt), BridgeErrorType.PROVIDER_ERROR);
-
-    // Get the block for the timestamp
-    const rootBlock: ethers.providers.Block = await this.config.rootProvider.getBlock(rootTxReceipt.blockNumber);
-
-    // Get the minimum block on childchain which corresponds with the timestamp on rootchain
-    const minBlockRange: number = await withBridgeError<number>(async () => getBlockNumberClosestToTimestamp(this.config.childProvider, rootBlock.timestamp, this.config.blockTime, this.config.clockInaccuracy), BridgeErrorType.PROVIDER_ERROR);
-
-    // Get the upper bound for which we expect the StateSync event to occur
-    const maxBlockRange: number = minBlockRange + this.config.maxDepositBlockDelay;
-
-    // Poll till event observed
-    const result: CompletionStatus = await withBridgeError<CompletionStatus>(async () => this.waitForChildStateSync(stateSyncID, this.config.pollInterval, minBlockRange, maxBlockRange), BridgeErrorType.PROVIDER_ERROR);
-
-    return {
-      status: result,
-    };
   }
 
   private async waitForChildStateSync(
@@ -577,12 +604,18 @@ export class TokenBridge {
     return stateSyncID;
   }
 
-  // TODO: please fix this
-  // eslint-disable-next-line class-methods-use-this
-  private async getFeeForToken(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    token: FungibleToken,
-  ): Promise<ethers.BigNumber> {
-    return ethers.BigNumber.from(0);
+  // Query the rootchain and childchain providers to ensure the chainID is as expected by the SDK.
+  // This is to prevent the SDK from being used on the wrong chain, especially after a chain reset.
+  private async validateChainConfiguration(): Promise<void> {
+    const errMessage = 'Please upgrade to the latest version of the Bridge SDK or provide valid configuration';
+    const rootNetwork = await this.config.rootProvider.getNetwork();
+    if (rootNetwork.chainId.toString() !== this.config.bridgeInstance.rootChainID) {
+      throw new BridgeError(`Rootchain provider chainID ${rootNetwork.chainId} does not match expected chainID ${this.config.bridgeInstance.rootChainID}. ${errMessage}`, BridgeErrorType.UNSUPPORTED_ERROR);
+    }
+
+    const childNetwork = await this.config.childProvider.getNetwork();
+    if (childNetwork.chainId.toString() !== this.config.bridgeInstance.childChainID) {
+      throw new BridgeError(`Childchain provider chainID ${childNetwork.chainId} does not match expected chainID ${this.config.bridgeInstance.childChainID}. ${errMessage}`, BridgeErrorType.UNSUPPORTED_ERROR);
+    }
   }
 }

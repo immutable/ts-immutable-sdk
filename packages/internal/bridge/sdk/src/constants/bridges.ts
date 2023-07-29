@@ -3,24 +3,24 @@ import { BridgeInstance } from 'types';
 /**
  * @constant {string} ETH_SEPOLIA_CHAIN_ID - The chain ID for the Ethereum Sepolia testnet (EIP-155 compatible format).
  */
-export const ETH_SEPOLIA_CHAIN_ID = 'eip155:11155111';
+export const ETH_SEPOLIA_CHAIN_ID = '11155111';
 /**
  * @constant {string} ETH_MAINNET_CHAIN_ID - The chain ID for the Ethereum mainnet (EIP-155 compatible format).
  */
-export const ETH_MAINNET_CHAIN_ID = 'eip155:1';
+export const ETH_MAINNET_CHAIN_ID = '1';
 /**
  * @constant {string} ZKEVM_DEVNET_CHAIN_ID - The chain ID for the zkEVM devnet (EIP-155 compatible format).
  */
-export const ZKEVM_DEVNET_CHAIN_ID = 'eip155:13423';
+export const ZKEVM_DEVNET_CHAIN_ID = '13423';
 /**
 /**
  * @constant {string} ZKEVM_TESTNET_CHAIN_ID - The chain ID for the zkEVM testnet (EIP-155 compatible format).
  */
-export const ZKEVM_TESTNET_CHAIN_ID = 'eip155:13372';
+export const ZKEVM_TESTNET_CHAIN_ID = '13372';
 /**
  * @constant {string} ZKEVM_MAINNET_CHAIN_ID - The chain ID for the zkEVM mainnet (EIP-155 compatible format).
  */
-export const ZKEVM_MAINNET_CHAIN_ID = 'eip155:13371';
+export const ZKEVM_MAINNET_CHAIN_ID = '13371';
 
 /**
  * @constant {string} CHILD_CHAIN_NATIVE_TOKEN_ADDRESS - Address of the native token on the child chain.
