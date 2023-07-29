@@ -5,10 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export function getLocalhostProvider(): providers.JsonRpcProvider {
-  const endpoint = process.env.LOCAL_RPC_ENDPOINT;
-  if (!endpoint) {
-    throw new Error('LOCAL_RPC_ENDPOINT not set');
-  }
+  const endpoint = process.env.RPC_ENDPOINT || 'https://zkevm-rpc.sandbox.x.immutable.com';
 
   return new providers.JsonRpcProvider(endpoint);
 }

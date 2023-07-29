@@ -14,6 +14,10 @@ import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { WidgetTheme } from '../../lib';
 import { text } from '../../resources/text/textConfig';
 import { WalletWidgetViews } from '../../context/view-context/WalletViewContextTypes';
+import {
+  ConnectLoaderTestComponent,
+} from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
+import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
 
 describe('WalletWidget tests', () => {
   beforeEach(() => {
@@ -25,14 +29,15 @@ describe('WalletWidget tests', () => {
     getSigner: () => ({
       getAddress: () => Promise.resolve('0xwalletAddress'),
     }),
-    getNetwork: async () => ({
-      chainId: ChainId.IMTBL_ZKEVM_TESTNET,
-      name: 'Immutable zkEVM Testnet',
+  } as Web3Provider;
+
+  const connectLoaderState = {
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
     }),
-    provider: {
-      request: async () => null,
-    },
-  } as unknown as Web3Provider;
+    provider: mockProvider,
+    connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+  };
 
   it('should show loading screen when component is mounted', () => {
     const widgetConfig = {
@@ -65,10 +70,13 @@ describe('WalletWidget tests', () => {
       });
 
     mount(
-      <WalletWidget
-        config={widgetConfig}
-        web3Provider={mockProvider}
-      />,
+      <ConnectLoaderTestComponent
+        initialStateOverride={connectLoaderState}
+      >
+        <WalletWidget
+          config={widgetConfig}
+        />
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('loading-view').should('be.visible');
@@ -228,10 +236,14 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <WalletWidget
-            config={widgetConfig}
-            web3Provider={mockProvider}
-          />,
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <WalletWidget
+              config={widgetConfig}
+            />
+            ,
+          </ConnectLoaderTestComponent>,
         );
 
         cySmartGet('@balanceStub').should('have.been.called');
@@ -264,10 +276,14 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <WalletWidget
-            config={widgetConfig}
-            web3Provider={mockProvider}
-          />,
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <WalletWidget
+              config={widgetConfig}
+            />
+            ,
+          </ConnectLoaderTestComponent>,
         );
 
         cySmartGet('@balanceStub').should('have.been.called');
@@ -303,10 +319,14 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <WalletWidget
-            config={widgetConfig}
-            web3Provider={mockProvider}
-          />,
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <WalletWidget
+              config={widgetConfig}
+            />
+            ,
+          </ConnectLoaderTestComponent>,
         );
 
         cySmartGet('settings-button').click();
@@ -325,10 +345,14 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <WalletWidget
-            config={widgetConfig}
-            web3Provider={mockProvider}
-          />,
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <WalletWidget
+              config={widgetConfig}
+            />
+            ,
+          </ConnectLoaderTestComponent>,
         );
         cySmartGet('settings-button').click();
         cySmartGet('wallet-address').should('have.text', '0xwalletAddress');
@@ -351,10 +375,14 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <WalletWidget
-            config={widgetConfig}
-            web3Provider={mockProvider}
-          />,
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <WalletWidget
+              config={widgetConfig}
+            />
+            ,
+          </ConnectLoaderTestComponent>,
         );
         cySmartGet('settings-button').click();
         cySmartGet('disconnect-button').should(
@@ -377,10 +405,14 @@ describe('WalletWidget tests', () => {
         } as StrongCheckoutWidgetsConfig;
 
         mount(
-          <WalletWidget
-            config={widgetConfig}
-            web3Provider={mockProvider}
-          />,
+          <ConnectLoaderTestComponent
+            initialStateOverride={connectLoaderState}
+          >
+            <WalletWidget
+              config={widgetConfig}
+            />
+            ,
+          </ConnectLoaderTestComponent>,
         );
 
         const { heading, body } = text.views[WalletWidgetViews.COIN_INFO];

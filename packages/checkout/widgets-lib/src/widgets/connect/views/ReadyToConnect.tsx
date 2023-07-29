@@ -1,6 +1,8 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { ChainId, Checkout } from '@imtbl/checkout-sdk';
-import { useContext, useState, useCallback } from 'react';
+import {
+  useContext, useState, useCallback, useMemo,
+} from 'react';
 import { SimpleTextBody } from '../../../components/Body/SimpleTextBody';
 import { FooterButton } from '../../../components/Footer/FooterButton';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
@@ -22,9 +24,19 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
     connectState: { checkout, provider, sendCloseEvent },
     connectDispatch,
   } = useContext(ConnectContext);
-  const { viewDispatch } = useContext(ViewContext);
+  const { viewState: { history }, viewDispatch } = useContext(ViewContext);
   const { body, footer } = text.views[ConnectWidgetViews.READY_TO_CONNECT];
   const [footerButtonText, setFooterButtonText] = useState(footer.buttonText1);
+
+  function isConnectWidgetView(view:string) {
+    return Object.values(ConnectWidgetViews).includes(view as ConnectWidgetViews);
+  }
+
+  const showBackButton = useMemo(() => {
+    if (history.length <= 1) return false;
+    if (!isConnectWidgetView(history[history.length - 2].type)) return false;
+    return true;
+  }, [history]);
 
   const handleConnectViewUpdate = async (
     // TODO: variable is already declared above
@@ -78,7 +90,7 @@ export function ReadyToConnect({ targetChainId }: ReadyToConnectProps) {
       testId="ready-to-connect"
       header={(
         <HeaderNavigation
-          showBack
+          showBack={showBackButton}
           title=""
           transparent
           onCloseButtonClick={sendCloseEvent}

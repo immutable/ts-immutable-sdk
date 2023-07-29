@@ -8,7 +8,7 @@ import {
   ConnectLoaderParams,
 } from '../../components/ConnectLoader/ConnectLoader';
 import { sendSwapWidgetCloseEvent } from './SwapWidgetEvents';
-import { ConnectTargetLayer } from '../../lib';
+import { ConnectTargetLayer, getL2ChainId } from '../../lib';
 
 export class ImmutableSwap extends ImmutableWebComponent {
   walletProvider = WalletProviderName.METAMASK;
@@ -35,6 +35,9 @@ export class ImmutableSwap extends ImmutableWebComponent {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProvider: this.walletProvider,
       web3Provider: this.provider,
+      allowedChains: [
+        getL2ChainId(this.checkoutConfig!),
+      ],
     };
 
     const swapParams: SwapWidgetParams = {
