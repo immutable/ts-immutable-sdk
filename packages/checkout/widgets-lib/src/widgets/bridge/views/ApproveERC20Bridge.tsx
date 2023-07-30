@@ -19,12 +19,15 @@ import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkH
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { BridgeContext } from '../context/BridgeContext';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 export interface ApproveERC20BridgeProps {
   data: ApproveERC20BridgeData;
 }
 export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) {
-  const { bridgeState: { checkout, provider, allowedTokens } } = useContext(BridgeContext);
+  const { bridgeState: { allowedTokens } } = useContext(BridgeContext);
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);
   const { approveSpending, approveBridge } = text.views[BridgeWidgetViews.APPROVE_ERC20];
 

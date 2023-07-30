@@ -1,6 +1,9 @@
 import { ConfirmationScreen } from 'confirmation';
 import * as guardian from '@imtbl/guardian';
+import { TransactionRequest } from '@ethersproject/providers';
 import GuardianClient from './guardian';
+import { mockUserZkEvm } from '../test/mocks';
+import { JsonRpcError, RpcErrorCode } from '../zkEvm/JsonRpcError';
 
 jest.mock('@imtbl/guardian');
 jest.mock('../confirmation/confirmation');
@@ -65,7 +68,7 @@ describe('guardian', () => {
       });
       await guardianClient.validate({ payloadHash: 'hash' });
 
-      expect(mockConfirmationScreen.startGuardianTransaction).toHaveBeenCalledWith('hash', mockEtherAddress);
+      expect(mockConfirmationScreen.startGuardianTransaction).toHaveBeenCalledWith('hash', mockEtherAddress, 'starkex');
     });
 
     it('should throw error if user did not confirm the transaction', async () => {
@@ -81,6 +84,49 @@ describe('guardian', () => {
         imxEtherAddress: mockEtherAddress,
       });
       expect(guardianClient.validate({ payloadHash: 'hash' })).rejects.toThrow('Transaction rejected by user');
+    });
+
+    it('returns an error if the failed to parsing the request data ', async () => {
+      const guardianClient = new GuardianClient({
+        accessToken: mockAccessToken,
+        imxPublicApiDomain: mockImxPublicApiDomain,
+        confirmationScreen: mockConfirmationScreen,
+        imxEtherAddress: mockEtherAddress,
+      });
+
+      const transactionRequest: TransactionRequest = {
+        to: mockUserZkEvm.zkEvm.ethAddress,
+        data: '0x456',
+        value: '0x',
+      };
+
+      await expect(
+        guardianClient.validateEVMTransaction({
+          chainId: 'epi123',
+          nonce: 5,
+          user: mockUserZkEvm,
+          metaTransactions: [
+            {
+              data: transactionRequest.data,
+              revertOnError: true,
+              to: mockUserZkEvm.zkEvm.ethAddress,
+              value: '0x00',
+              nonce: 5,
+            },
+            {
+              revertOnError: true,
+              to: '0x123',
+              value: '0x',
+              nonce: 5,
+            },
+          ],
+        }),
+      ).rejects.toThrow(
+        new JsonRpcError(
+          RpcErrorCode.PARSE_ERROR,
+          'Transaction failed to parsing: invalid BigNumber string (argument="value", value="0x", code=INVALID_ARGUMENT, version=bignumber/5.7.0)',
+        ),
+      );
     });
   });
 });

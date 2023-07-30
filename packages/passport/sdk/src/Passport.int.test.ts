@@ -12,6 +12,9 @@ import {
   mswHandlers,
 } from './mocks/zkEvm/msw';
 import { JsonRpcError, RpcErrorCode } from './zkEvm/JsonRpcError';
+import GuardianClient from './guardian/guardian';
+
+jest.mock('./guardian/guardian');
 
 jest.mock('magic-sdk');
 jest.mock('oidc-client-ts');
@@ -67,6 +70,10 @@ describe('Passport', () => {
       signinPopup: mockSigninPopup,
       signinSilent: mockSigninSilent,
       getUser: mockGetUser,
+    }));
+    (GuardianClient as jest.Mock).mockImplementation(() => ({
+      loading: jest.fn(),
+      validateEVMTransaction: jest.fn(),
     }));
     (Magic as jest.Mock).mockImplementation(() => ({
       openid: {

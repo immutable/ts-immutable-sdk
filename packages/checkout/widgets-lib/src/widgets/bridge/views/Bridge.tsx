@@ -9,6 +9,7 @@ import { BridgeWidgetViews } from '../../../context/view-context/BridgeViewConte
 import { BridgeActions, BridgeContext } from '../context/BridgeContext';
 import { getBridgeTokensAndBalances } from '../functions/getBridgeTokens';
 import { useInterval } from '../../../lib/hooks/useInterval';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 const REFRESH_TOKENS_INTERVAL_MS = 10000;
 export interface BridgeProps {
@@ -18,7 +19,9 @@ export interface BridgeProps {
 
 export function Bridge({ amount, fromContractAddress }: BridgeProps) {
   const { header } = text.views[BridgeWidgetViews.BRIDGE];
-  const { bridgeState: { checkout, provider }, bridgeDispatch } = useContext(BridgeContext);
+  const { bridgeDispatch } = useContext(BridgeContext);
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
 
   const refreshBalances = useCallback(async () => {
     if (!checkout) return;

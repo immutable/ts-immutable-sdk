@@ -34,6 +34,7 @@ import { useInterval } from '../../../lib/hooks/useInterval';
 import { NotEnoughImx } from '../../../components/NotEnoughImx/NotEnoughImx';
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { UnableToSwap } from './UnableToSwap';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 enum SwapDirection {
   FROM = 'FROM',
@@ -88,11 +89,12 @@ export function SwapForm({ data }: SwapFromProps) {
   const {
     swapState: {
       allowedTokens,
-      provider,
       exchange,
       tokenBalances,
     },
   } = useContext(SwapContext);
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { provider } = connectLoaderState;
 
   const formatTokenOptionsId = useCallback((symbol: string, address?: string) => {
     if (!address) return symbol.toLowerCase();

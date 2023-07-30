@@ -6,6 +6,7 @@ import {
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import DeviceCredentialsManager from 'storage/device_credentials_manager';
+import * as crypto from 'crypto';
 import { PassportErrorType, withPassportError } from './errors/passportError';
 import {
   PassportMetadata,
@@ -225,6 +226,75 @@ export default class AuthManager {
         client_id: this.config.oidcConfiguration.clientId,
         grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
         device_code: deviceCode,
+      },
+      formUrlEncodedHeader,
+    );
+
+    return response.data;
+  }
+
+  private static base64URLEncode(str: Buffer) {
+    return str.toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  }
+
+  private static sha256(buffer: string) {
+    return crypto.createHash('sha256').update(buffer).digest();
+  }
+
+  public getPKCEAuthorizationUrl(): string {
+    const verifier = AuthManager.base64URLEncode(crypto.randomBytes(32));
+    const challenge = AuthManager.base64URLEncode(AuthManager.sha256(verifier));
+
+    // https://auth0.com/docs/secure/attack-protection/state-parameters
+    const state = AuthManager.base64URLEncode(crypto.randomBytes(32));
+    this.deviceCredentialsManager.savePKCEData({ state, verifier });
+
+    return `${this.config.authenticationDomain}/authorize?`
+      + 'response_type=code'
+      + `&code_challenge=${challenge}`
+      + '&code_challenge_method=S256'
+      + `&client_id=${this.config.oidcConfiguration.clientId}`
+      + `&redirect_uri=${this.config.oidcConfiguration.redirectUri}`
+      + `&scope=${this.config.oidcConfiguration.scope}`
+      + `&state=${state}`
+      + `&audience=${this.config.oidcConfiguration.audience}`;
+  }
+
+  public async connectImxPKCEFlow(authorizationCode: string, state: string): Promise<User> {
+    return withPassportError<User>(async () => {
+      const pkceData = this.deviceCredentialsManager.getPKCEData();
+      if (!pkceData) {
+        throw new Error('No code verifier or state for PKCE');
+      }
+
+      if (state !== pkceData.state) {
+        throw new Error('Provided state does not match stored state');
+      }
+
+      const tokenResponse = await this.getPKCEToken(authorizationCode, pkceData.verifier);
+      const user = AuthManager.mapDeviceTokenResponseToDomainUserModel(tokenResponse);
+
+      // Only persist credentials that contain the necessary data
+      if (user.imx?.ethAddress && user.imx?.starkAddress && user.imx?.userAdminAddress) {
+        this.deviceCredentialsManager.saveCredentials(tokenResponse);
+      }
+
+      return user;
+    }, PassportErrorType.AUTHENTICATION_ERROR);
+  }
+
+  private async getPKCEToken(authorizationCode: string, codeVerifier: string): Promise<DeviceTokenResponse> {
+    const response = await axios.post<DeviceTokenResponse>(
+      `${this.config.authenticationDomain}/oauth/token`,
+      {
+        client_id: this.config.oidcConfiguration.clientId,
+        grant_type: 'authorization_code',
+        code_verifier: codeVerifier,
+        code: authorizationCode,
+        redirect_uri: this.config.oidcConfiguration.redirectUri,
       },
       formUrlEncodedHeader,
     );

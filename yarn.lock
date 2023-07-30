@@ -3441,6 +3441,7 @@ __metadata:
   resolution: "@imtbl/game-bridge@workspace:packages/game-bridge"
   dependencies:
     "@imtbl/config": 0.0.0
+    "@imtbl/immutablex-client": 0.0.0
     "@imtbl/passport": 0.0.0
     "@imtbl/provider": 0.0.0
     parcel: ^2.8.3

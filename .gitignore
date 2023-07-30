@@ -20,3 +20,5 @@ dist/
 
 .yalc
 yalc.lock
+
+package-lock.json

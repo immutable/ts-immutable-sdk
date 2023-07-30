@@ -113,3 +113,8 @@ export type DeviceErrorResponse = {
   error: string;
   error_description: string;
 };
+
+export type PKCEData = {
+  state: string,
+  verifier: string
+};
