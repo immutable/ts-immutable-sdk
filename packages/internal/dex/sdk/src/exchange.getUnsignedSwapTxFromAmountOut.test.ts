@@ -4,7 +4,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { TradeType } from '@uniswap/sdk-core';
 import { Exchange } from './exchange';
 import {
-  decodeMulticallData,
+  decodeMulticallDataWithoutFees,
   mockRouterImplementation,
   setupSwapTxTest,
   TEST_PERIPHERY_ROUTER_ADDRESS,
@@ -70,7 +70,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       const data = swap.transaction.data?.toString() || '';
 
-      const { functionCallParams, topLevelParams } = decodeMulticallData(data);
+      const { functionCallParams, topLevelParams } = decodeMulticallDataWithoutFees(data);
 
       expect(topLevelParams[1][0].slice(0, 10)).toBe(exactOutputSingleSignature);
 

@@ -21,6 +21,7 @@ import {
   TEST_FEE_RECIPIENT,
   TEST_MAX_FEE_BASIS_POINTS,
   decodeMulticallDataWithoutFees,
+  TEST_SECONDARY_FEE_ADDRESS,
 } from './utils/testUtils';
 import { Router, SecondaryFee } from './lib';
 
@@ -187,7 +188,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
       expect(swapParams.fee).toBe(10000); // fee
       expect(swapParams.recipient).toBe(params.fromAddress); // Recipient
-      expect(swap.transaction?.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
+      expect(swap.transaction?.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // to address
       expect(swap.transaction?.from).toBe(params.fromAddress); // from address
       expect(swap.transaction?.value).toBe('0x00'); // refers to 0 amount of the native token
       expect(swapParams.firstAmount.toString()).toBe(

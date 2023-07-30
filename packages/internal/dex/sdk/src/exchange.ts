@@ -139,6 +139,7 @@ export class Exchange {
       slippagePercent,
       deadline,
       this.router.routingContracts.peripheryRouterAddress,
+      this.router.routingContracts.secondaryFeeAddress,
       gasPrice,
       this.secondaryFees,
     );
@@ -218,9 +219,5 @@ export class Exchange {
       deadline,
       TradeType.EXACT_OUTPUT,
     );
-  }
-
-  private thereAreSecondaryFees(): boolean {
-    return this.secondaryFees.length > 0;
   }
 }

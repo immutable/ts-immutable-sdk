@@ -291,6 +291,7 @@ export function mockRouterImplementation(
   (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
     routingContracts: {
       peripheryRouterAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
+      secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
     },
     findOptimalRoute: () => {
       const tokenIn: Token = new Token(params.chainId, params.inputToken, 18);
