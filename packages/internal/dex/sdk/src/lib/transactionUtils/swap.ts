@@ -27,6 +27,7 @@ type SwapOptions = {
 };
 
 const zeroNativeCurrencyValue = '0x00';
+const multicallWithDeadlineFunctionSignature = 'multicall(uint256,bytes[])';
 
 function buildSwapParametersForSinglePoolSwap(
   fromAddress: string,
@@ -161,7 +162,7 @@ function createSwapCallParametersWithFees(
   );
 
   return secondaryFeeContract.encodeFunctionData(
-    'multicall(uint256,bytes[])',
+    multicallWithDeadlineFunctionSignature,
     [swapOptions.deadlineOrPreviousBlockhash, [swapWithFeesCalldata]],
   );
 }

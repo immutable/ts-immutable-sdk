@@ -78,13 +78,6 @@ const exactInputOutputSingleParamTypes = [
   'uint160',
 ];
 
-const exactInputOutputParamTypes = [
-  'bytes',
-  'address',
-  'uint256',
-  'uint256',
-];
-
 const exactInputOutputSingleWithFeesParamTypes = [
   '(address,uint16)[]',
   '(address,address,uint24,address,uint256,uint256,uint160)',
@@ -260,19 +253,6 @@ export function decodeMulticallExactInputOutputSingleWithoutFees(data: ethers.ut
     firstAmount: decodedParams[4],
     secondAmount: decodedParams[5],
     sqrtPriceLimitX96: decodedParams[6],
-  };
-
-  return { topLevelParams, swapParams };
-}
-
-export function decodeMulticallExactInputOutputWithoutFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutputParamTypes);
-
-  const swapParams: ExactInputOutputParams = {
-    path: decodedParams[0],
-    recipient: decodedParams[1],
-    amountIn: decodedParams[5],
-    amountOut: decodedParams[6],
   };
 
   return { topLevelParams, swapParams };
