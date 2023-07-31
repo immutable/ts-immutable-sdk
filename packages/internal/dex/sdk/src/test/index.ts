@@ -11,7 +11,6 @@ import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { slippageToFraction } from 'lib/transactionUtils/slippage';
 import {
-  ExchangeModuleConfiguration,
   QuoteTradeInfo,
   Router,
   SecondaryFee,
@@ -102,7 +101,7 @@ export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new Immutabl
   environment: Environment.SANDBOX,
 });
 
-export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
+export const TEST_DEX_CONFIGURATION = {
   baseConfig: TEST_IMMUTABLE_CONFIGURATION,
   chainId: TEST_CHAIN_ID,
   overrides: {
