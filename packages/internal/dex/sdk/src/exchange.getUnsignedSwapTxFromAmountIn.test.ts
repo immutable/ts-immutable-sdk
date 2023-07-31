@@ -215,9 +215,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS },
       ];
 
-      const config = TEST_DEX_CONFIGURATION;
-      config.secondaryFees = secondaryFees;
-      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
 
       const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
@@ -251,9 +249,9 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swapParams.amountIn.toString()).toBe(params.amountIn.toString());
       expect(swapParams.amountOut.toString()).toBe(params.minAmountOut.toString());
     });
-  // });
+  });
 
-  // describe('Swap with single pool without fees and default slippage tolerance', () => {
+  describe('Swap with single pool without fees and default slippage tolerance', () => {
     it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
@@ -286,113 +284,113 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
-  //   it('returns the gas estimate for the swap', async () => {
-  //     const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+    it('returns the gas estimate for the swap', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
-  //     mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-  //     const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-  //     const tx = await exchange.getUnsignedSwapTxFromAmountIn(
-  //       params.fromAddress,
-  //       params.inputToken,
-  //       params.outputToken,
-  //       params.amountIn,
-  //     );
+      const tx = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountIn,
+      );
 
-  //     expect(tx.swap.gasFeeEstimate?.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
-  //     expect(tx.swap.gasFeeEstimate?.token.chainId).toEqual(IMX_TEST_TOKEN.chainId);
-  //     expect(tx.swap.gasFeeEstimate?.token.address).toEqual(IMX_TEST_TOKEN.address);
-  //     expect(tx.swap.gasFeeEstimate?.token.decimals).toEqual(IMX_TEST_TOKEN.decimals);
-  //     expect(tx.swap.gasFeeEstimate?.token.symbol).toEqual(IMX_TEST_TOKEN.symbol);
-  //     expect(tx.swap.gasFeeEstimate?.token.name).toEqual(IMX_TEST_TOKEN.name);
-  //   });
+      expect(tx.swap.gasFeeEstimate?.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
+      expect(tx.swap.gasFeeEstimate?.token.chainId).toEqual(IMX_TEST_TOKEN.chainId);
+      expect(tx.swap.gasFeeEstimate?.token.address).toEqual(IMX_TEST_TOKEN.address);
+      expect(tx.swap.gasFeeEstimate?.token.decimals).toEqual(IMX_TEST_TOKEN.decimals);
+      expect(tx.swap.gasFeeEstimate?.token.symbol).toEqual(IMX_TEST_TOKEN.symbol);
+      expect(tx.swap.gasFeeEstimate?.token.name).toEqual(IMX_TEST_TOKEN.name);
+    });
 
-  //   it('returns valid quote', async () => {
-  //     const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+    it('returns valid quote', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
-  //     mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-  //     const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-  //     const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
-  //       params.fromAddress,
-  //       params.inputToken,
-  //       params.outputToken,
-  //       params.amountIn,
-  //     );
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountIn,
+      );
 
-  //     expect(quote).not.toBe(undefined);
-  //     expect(quote?.amount.token.address).toEqual(params.outputToken);
-  //     expect(quote?.slippage).toBe(0.1);
-  //     expect(quote?.amount.value.toString()).toEqual('10000000000000000000000');
-  //     expect(quote?.amountWithMaxSlippage?.token.address).toEqual(
-  //       params.outputToken,
-  //     );
-  //     expect(quote?.amountWithMaxSlippage?.value.toString()).toEqual(
-  //       '9990000000000000000000',
-  //     );
-  //   });
-  // // });
+      expect(quote).not.toBe(undefined);
+      expect(quote?.amount.token.address).toEqual(params.outputToken);
+      expect(quote?.slippage).toBe(0.1);
+      expect(quote?.amount.value.toString()).toEqual('10000000000000000000000');
+      expect(quote?.amountWithMaxSlippage?.token.address).toEqual(
+        params.outputToken,
+      );
+      expect(quote?.amountWithMaxSlippage?.value.toString()).toEqual(
+        '9990000000000000000000',
+      );
+    });
+  });
 
-  // // describe('Swap with single pool without fees and high slippage tolerance', () => {
-  //   it('generates valid calldata', async () => {
-  //     const params = setupSwapTxTest(HIGHER_SLIPPAGE);
-  //     mockRouterImplementation(params, TradeType.EXACT_INPUT);
+  describe('Swap with single pool without fees and high slippage tolerance', () => {
+    it('generates valid calldata', async () => {
+      const params = setupSwapTxTest(HIGHER_SLIPPAGE);
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-  //     const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-  //     const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
-  //       params.fromAddress,
-  //       params.inputToken,
-  //       params.outputToken,
-  //       params.amountIn,
-  //       HIGHER_SLIPPAGE,
-  //     );
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountIn,
+        HIGHER_SLIPPAGE,
+      );
 
-  //     const data = swap.transaction?.data?.toString() || '';
+      const data = swap.transaction?.data?.toString() || '';
 
-  //     const { topLevelParams, swapParams } = decodeMulticallExactInputOutputSingleWithoutFees(data);
+      const { topLevelParams, swapParams } = decodeMulticallExactInputOutputSingleWithoutFees(data);
 
-  //     expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
+      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
 
-  //     expect(swapParams.tokenIn).toBe(params.inputToken); // input token
-  //     expect(swapParams.tokenOut).toBe(params.outputToken); // output token
-  //     expect(swapParams.fee).toBe(10000); // fee
-  //     expect(swapParams.recipient).toBe(params.fromAddress); // recipient
-  //     expect(swap.transaction?.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
-  //     expect(swap.transaction?.from).toBe(params.fromAddress); // from address
-  //     expect(swap.transaction?.value).toBe('0x00'); // refers to 0ETH
-  //     expect(swapParams.firstAmount.toString()).toBe(params.amountIn.toString()); // amount in
-  //     expect(swapParams.secondAmount.toString()).toBe(params.minAmountOut.toString()); // min amount out
-  //     expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
-  //   });
+      expect(swapParams.tokenIn).toBe(params.inputToken); // input token
+      expect(swapParams.tokenOut).toBe(params.outputToken); // output token
+      expect(swapParams.fee).toBe(10000); // fee
+      expect(swapParams.recipient).toBe(params.fromAddress); // recipient
+      expect(swap.transaction?.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
+      expect(swap.transaction?.from).toBe(params.fromAddress); // from address
+      expect(swap.transaction?.value).toBe('0x00'); // refers to 0ETH
+      expect(swapParams.firstAmount.toString()).toBe(params.amountIn.toString()); // amount in
+      expect(swapParams.secondAmount.toString()).toBe(params.minAmountOut.toString()); // min amount out
+      expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+    });
 
-  //   it('returns valid quote', async () => {
-  //     const params = setupSwapTxTest(HIGHER_SLIPPAGE);
-  //     mockRouterImplementation(params, TradeType.EXACT_INPUT);
+    it('returns valid quote', async () => {
+      const params = setupSwapTxTest(HIGHER_SLIPPAGE);
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
-  //     const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
-  //     const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
-  //       params.fromAddress,
-  //       params.inputToken,
-  //       params.outputToken,
-  //       params.amountIn,
-  //       HIGHER_SLIPPAGE,
-  //     );
+      const { quote } = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountIn,
+        HIGHER_SLIPPAGE,
+      );
 
-  //     expect(quote).not.toBe(undefined);
-  //     expect(quote?.amount.token.address).toEqual(params.outputToken);
-  //     expect(quote?.slippage).toBe(0.2);
-  //     expect(quote?.amount.value.toString()).toEqual('10000000000000000000000');
-  //     expect(quote?.amountWithMaxSlippage?.token.address).toEqual(
-  //       params.outputToken,
-  //     );
-  //     expect(quote?.amountWithMaxSlippage?.value.toString()).toEqual(
-  //       '9980000000000000000000',
-  //     );
-  //   });
+      expect(quote).not.toBe(undefined);
+      expect(quote?.amount.token.address).toEqual(params.outputToken);
+      expect(quote?.slippage).toBe(0.2);
+      expect(quote?.amount.value.toString()).toEqual('10000000000000000000000');
+      expect(quote?.amountWithMaxSlippage?.token.address).toEqual(
+        params.outputToken,
+      );
+      expect(quote?.amountWithMaxSlippage?.value.toString()).toEqual(
+        '9980000000000000000000',
+      );
+    });
   });
 
   describe('Pass in zero address', () => {
