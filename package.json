@@ -46,6 +46,7 @@
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
     "test": "wsrun --exclude-missing -e test",
+    "test:cypress": "wsrun --exclude-missing -e test:cypress",
     "typecheck": "wsrun --exclude-missing typecheck"
   },
   "workspaces": [

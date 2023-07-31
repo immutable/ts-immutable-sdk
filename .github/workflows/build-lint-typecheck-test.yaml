@@ -52,3 +52,6 @@ jobs:
 
       - name: Test
         run: yarn test
+
+      - name: Cypress tests
+        run: yarn test:cypress
