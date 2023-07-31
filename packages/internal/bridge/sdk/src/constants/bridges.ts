@@ -33,7 +33,9 @@ export const CHILD_CHAIN_NATIVE_TOKEN_ADDRESS = '0x00000000000000000000000000000
 export const L2_STATE_SENDER_ADDRESS = '0x0000000000000000000000000000000000001002';
 
 /**
- * @TODO rez
+ * The constant value representing the native token in the token bridge context.
+ * The key is used to indicate the native token of a blockchain network (like Ether in Ethereum) in methods that normally require a token address.
+ * @constant {string}
  */
 export const NATIVE_TOKEN_BRIDGE_KEY = '0x0000000000000000000000000000000000000001';
 
