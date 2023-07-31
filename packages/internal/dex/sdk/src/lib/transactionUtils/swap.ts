@@ -1,20 +1,18 @@
-/* eslint-disable max-len */
-/* eslint-disable no-underscore-dangle */
 import {
   Trade, toHex, encodeRouteToPath, Route,
 } from '@uniswap/v3-sdk';
-import { SwapOptions, SwapRouter } from '@uniswap/router-sdk';
+import { SwapRouter } from '@uniswap/router-sdk';
 import {
   Currency,
   CurrencyAmount,
+  Percent,
   TradeType,
 } from '@uniswap/sdk-core';
 import JSBI from 'jsbi';
 import { ethers } from 'ethers';
 import { QuoteResponse, QuoteTradeInfo } from 'lib/router';
 import { SecondaryFee__factory } from 'contracts/types';
-import { SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
-import { ParamType } from 'ethers/lib/utils';
+import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
 import {
   SecondaryFee,
   TokenInfo, TransactionDetails,
@@ -22,21 +20,13 @@ import {
 import { calculateGasFee } from './gas';
 import { slippageToFraction } from './slippage';
 
-const zeroNativeCurrencyValue = '0x00';
-const secondaryFeeStructSignature = 'tuple(address,uint16)[]';
-const singlePoolSwapStructSignature = '(address,address,uint24,address,uint256,uint256,uint160)';
-const multiPoolSwapStructSignature = '(bytes,address,uint256,uint256)';
-
-const functionSignatureMap = {
-  [TradeType.EXACT_INPUT]: {
-    single: 'exactInputSingleWithServiceFee((address,uint16)[],(address,address,uint24,address,uint256,uint256,uint160))',
-    multi: 'exactInputWithServiceFee((address,uint16)[],(bytes,address,uint256,uint256))',
-  },
-  [TradeType.EXACT_OUTPUT]: {
-    single: 'exactOutputSingleWithServiceFee((address,uint16)[],(address,address,uint24,address,uint256,uint256,uint160))',
-    multi: 'exactOutputWithServiceFee((address,uint16)[],(bytes,address,uint256,uint256))',
-  },
+type SwapOptions = {
+  slippageTolerance: Percent;
+  deadlineOrPreviousBlockhash: number;
+  recipient: string;
 };
+
+const zeroNativeCurrencyValue = '0x00';
 
 function buildSwapParametersForSinglePoolSwap(
   fromAddress: string,
@@ -44,24 +34,35 @@ function buildSwapParametersForSinglePoolSwap(
   route: Route<Currency, Currency>,
   amountIn: string,
   amountOut: string,
-  secondaryFeeValues: (string | number)[][],
+  secondaryFees: SecondaryFee[],
   secondaryFeeContract: SecondaryFeeInterface,
 ) {
-  const swapValues = Object.values({
+  const secondaryFeeValues: ISecondaryFee.ServiceFeeParamsStruct[] = secondaryFees.map((fee) => ({
+    feePrcntBasisPoints: fee.feeBasisPoints,
+    recipient: fee.feeRecipient,
+  }));
+
+  if (trade.tradeType === TradeType.EXACT_INPUT) {
+    return secondaryFeeContract.encodeFunctionData('exactInputSingleWithServiceFee', [secondaryFeeValues, {
+      tokenIn: route.tokenPath[0].address,
+      tokenOut: route.tokenPath[1].address,
+      fee: route.pools[0].fee,
+      recipient: fromAddress,
+      amountIn,
+      amountOutMinimum: amountOut,
+      sqrtPriceLimitX96: 0,
+    }]);
+  }
+
+  return secondaryFeeContract.encodeFunctionData('exactOutputSingleWithServiceFee', [secondaryFeeValues, {
     tokenIn: route.tokenPath[0].address,
     tokenOut: route.tokenPath[1].address,
     fee: route.pools[0].fee,
     recipient: fromAddress,
-    amountIn,
+    amountInMaximum: amountIn,
     amountOut,
     sqrtPriceLimitX96: 0,
-  });
-
-  const functionSignature = ethers.utils.id(functionSignatureMap[trade.tradeType].single).substring(0, 10);
-  return functionSignature + secondaryFeeContract._encodeParams([
-    ParamType.from(secondaryFeeStructSignature),
-    ParamType.from(singlePoolSwapStructSignature),
-  ], [secondaryFeeValues, swapValues]).substring(2);
+  }]);
 }
 
 function buildSwapParametersForMultiPoolSwap(
@@ -70,22 +71,31 @@ function buildSwapParametersForMultiPoolSwap(
   route: Route<Currency, Currency>,
   amountIn: string,
   amountOut: string,
-  secondaryFeeValues: (string | number)[][],
+  secondaryFees: SecondaryFee[],
   secondaryFeeContract: SecondaryFeeInterface,
 ) {
   const path: string = encodeRouteToPath(route, trade.tradeType === TradeType.EXACT_OUTPUT);
-  const swapValues = Object.values({
+
+  const secondaryFeeValues: ISecondaryFee.ServiceFeeParamsStruct[] = secondaryFees.map((fee) => ({
+    feePrcntBasisPoints: fee.feeBasisPoints,
+    recipient: fee.feeRecipient,
+  }));
+
+  if (trade.tradeType === TradeType.EXACT_INPUT) {
+    return secondaryFeeContract.encodeFunctionData('exactInputWithServiceFee', [secondaryFeeValues, {
+      path,
+      recipient: fromAddress,
+      amountIn,
+      amountOutMinimum: amountOut,
+    }]);
+  }
+
+  return secondaryFeeContract.encodeFunctionData('exactOutputWithServiceFee', [secondaryFeeValues, {
     path,
     recipient: fromAddress,
-    amountIn,
+    amountInMaximum: amountIn,
     amountOut,
-  });
-
-  const functionSignature = ethers.utils.id(functionSignatureMap[trade.tradeType].multi).substring(0, 10);
-  return functionSignature + secondaryFeeContract._encodeParams([
-    ParamType.from(secondaryFeeStructSignature),
-    ParamType.from(multiPoolSwapStructSignature),
-  ], [secondaryFeeValues, swapValues]).substring(2);
+  }]);
 }
 
 /**
@@ -108,9 +118,9 @@ function buildSwapParameters(
   const { route, inputAmount, outputAmount } = trade.swaps[0];
   const amountIn: string = toHex(trade.maximumAmountIn(options.slippageTolerance, inputAmount).quotient);
   const amountOut: string = toHex(trade.minimumAmountOut(options.slippageTolerance, outputAmount).quotient);
-  const secondaryFeeValues = secondaryFees.map((fee) => [fee.feeRecipient, fee.feeBasisPoints]);
 
   const isSinglePoolSwap = route.pools.length === 1;
+
   if (isSinglePoolSwap) {
     return buildSwapParametersForSinglePoolSwap(
       fromAddress,
@@ -118,7 +128,7 @@ function buildSwapParameters(
       route,
       amountIn,
       amountOut,
-      secondaryFeeValues,
+      secondaryFees,
       secondaryFeeContract,
     );
   }
@@ -129,7 +139,7 @@ function buildSwapParameters(
     route,
     amountIn,
     amountOut,
-    secondaryFeeValues,
+    secondaryFees,
     secondaryFeeContract,
   );
 }
@@ -150,16 +160,10 @@ function createSwapCallParametersWithFees(
     secondaryFeeContract,
   );
 
-  const multicallParamBytes = secondaryFeeContract._encodeParams(
-    [ParamType.from('uint256'),
-      ParamType.from('bytes[]')],
+  return secondaryFeeContract.encodeFunctionData(
+    'multicall(uint256,bytes[])',
     [swapOptions.deadlineOrPreviousBlockhash, [swapWithFeesCalldata]],
-  ).substring(2);
-
-  const multicallFunctionSignature = ethers.utils.id('multicall(uint256,bytes[])').substring(0, 10);
-  const multicallCallData = multicallFunctionSignature + multicallParamBytes;
-
-  return multicallCallData;
+  );
 }
 
 function createSwapParameters(
