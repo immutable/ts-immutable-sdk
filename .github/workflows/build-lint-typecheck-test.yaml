@@ -60,11 +60,11 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: cypress-videos
-          path: ./cypress/videos
+          path: ./packages/checkout/widgets-lib/cypress/videos
 
       - name: Upload cypress screenshots artifacts
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: cypress-screenshots
-          path: ./cypress/screenshots
+          path: ./packages/checkout/widgets-lib/cypress/screenshots
