@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
@@ -25,30 +24,34 @@ export class ImmutableSwap extends ImmutableWebComponent {
     super.connectedCallback();
     this.walletProvider = this.getAttribute(
       'walletProvider',
-    ) as WalletProviderName;
+    )?.toLowerCase() as WalletProviderName;
     this.amount = this.getAttribute('amount') as string;
-    this.fromContractAddress = this.getAttribute('fromContractAddress') as string;
-    this.toContractAddress = this.getAttribute('toContractAddress') as string;
+    this.fromContractAddress = this.getAttribute('fromContractAddress')?.toLowerCase() as string;
+    this.toContractAddress = this.getAttribute('toContractAddress')?.toLowerCase() as string;
     this.renderWidget();
   }
 
   validateInputs(): void {
     if (!isValidWalletProvider(this.walletProvider)) {
+      // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "walletProvider" widget input');
       this.walletProvider = WalletProviderName.METAMASK;
     }
 
     if (!isValidAmount(this.amount)) {
+      // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "amount" widget input');
       this.amount = '';
     }
 
     if (!isValidAddress(this.fromContractAddress)) {
+      // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "fromContractAddress" widget input');
       this.fromContractAddress = '';
     }
 
     if (!isValidAddress(this.toContractAddress)) {
+      // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "toContractAddress" widget input');
       this.toContractAddress = '';
     }

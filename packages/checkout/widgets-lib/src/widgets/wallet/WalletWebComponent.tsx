@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React from 'react';
 import { WalletProviderName } from '@imtbl/checkout-sdk';
 import ReactDOM from 'react-dom/client';
@@ -17,12 +16,13 @@ export class ImmutableWallet extends ImmutableWebComponent {
 
   connectedCallback() {
     super.connectedCallback();
-    this.walletProvider = this.getAttribute('walletProvider') as WalletProviderName;
+    this.walletProvider = this.getAttribute('walletProvider')?.toLowerCase() as WalletProviderName;
     this.renderWidget();
   }
 
   validateInputs(): void {
     if (this.walletProvider && !isValidWalletProvider(this.walletProvider)) {
+      // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "walletProvider" widget input');
       this.walletProvider = undefined; // can be undefined
     }
