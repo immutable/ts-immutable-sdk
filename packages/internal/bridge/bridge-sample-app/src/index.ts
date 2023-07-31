@@ -129,7 +129,6 @@ async function depositAndWithdraw() {
 
   // Get the unsigned deposit transaction and send it on L1
   const depositArgs: BridgeDepositRequest = {
-    depositorAddress: process.env.DEPOSITOR_ADDRESS,
     recipientAddress: process.env.RECIPIENT_ADDRESS,
     token: process.env.TOKEN_ADDRESS,
     depositAmount,
@@ -176,9 +175,9 @@ async function depositAndWithdraw() {
   console.log(`Deposit token was ${process.env.TOKEN_ADDRESS}, withdrawal token is ${withdrawResponse.childToken}`);
   // Approval
   const childApproveReq: ApproveWithdrawBridgeRequest = {
-    depositorAddress: process.env.DEPOSITOR_ADDRESS,
+    withdrawerAddress: process.env.DEPOSITOR_ADDRESS,
     token: withdrawResponse.childToken,
-    depositAmount,
+    withdrawAmount: depositAmount,
   };
 
   // Get the unsigned approval transaction for the deposit

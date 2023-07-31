@@ -169,7 +169,6 @@ describe('Token Bridge', () => {
       const token = '0x2f14582947E292a2eCd20C430B46f2d27CFE213c';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositorAddress,
         depositAmount,
         recipientAddress,
         token,
@@ -190,7 +189,6 @@ describe('Token Bridge', () => {
       const token = 'NATIVE';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositorAddress,
         depositAmount,
         recipientAddress,
         token,
@@ -210,7 +208,6 @@ describe('Token Bridge', () => {
       const token = '2f14582947E292a2eCd20C430B46f2d27CFE213c';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositorAddress,
         depositAmount,
         recipientAddress,
         token,
@@ -226,12 +223,10 @@ describe('Token Bridge', () => {
 
     it('ERC20 token with invalid depositor address fails', async () => {
       expect.assertions(1);
-      const depositorAddress = 'xxxx3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const token = '0x2f14582947E292a2eCd20C430B46f2d27CFE213c';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositorAddress,
         depositAmount,
         recipientAddress,
         token,
@@ -249,12 +244,10 @@ describe('Token Bridge', () => {
 
     it('NATIVE token with invalid depositor address fails', async () => {
       expect.assertions(1);
-      const depositorAddress = 'xxxx3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const token = 'NATIVE';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositorAddress,
         depositAmount,
         recipientAddress,
         token,
@@ -271,12 +264,10 @@ describe('Token Bridge', () => {
     });
     it('ERC20 token with invalid receipient address fails', async () => {
       expect.assertions(1);
-      const depositorAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const recipientAddress = 'zzzz3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const token = '0x2f14582947E292a2eCd20C430B46f2d27CFE213c';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositorAddress,
         depositAmount,
         recipientAddress,
         token,
@@ -293,12 +284,10 @@ describe('Token Bridge', () => {
     });
     it('NATIVE token with invalid receipient address fails', async () => {
       expect.assertions(1);
-      const depositorAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const recipientAddress = 'zzzz3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const token = 'NATIVE';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositorAddress,
         depositAmount,
         recipientAddress,
         token,
@@ -315,12 +304,10 @@ describe('Token Bridge', () => {
     });
     it('ERC20 token with invalid token address fails', async () => {
       expect.assertions(1);
-      const depositorAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const token = 'zzzzf14582947E292a2eCd20C430B46f2d27CFE213c';
       const depositAmount = ethers.utils.parseUnits('0.01', 18);
       const request: BridgeDepositRequest = {
-        depositorAddress,
         depositAmount,
         recipientAddress,
         token,
@@ -338,12 +325,10 @@ describe('Token Bridge', () => {
 
     it('ERC20 token with 0 amount fails', async () => {
       expect.assertions(1);
-      const depositorAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const token = '0x2f14582947E292a2eCd20C430B46f2d27CFE213c';
       const depositAmount = ethers.utils.parseUnits('0', 18);
       const request: BridgeDepositRequest = {
-        depositorAddress,
         depositAmount,
         recipientAddress,
         token,
@@ -361,12 +346,10 @@ describe('Token Bridge', () => {
 
     it('NATIVE token with 0 amount fails', async () => {
       expect.assertions(1);
-      const depositorAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const token = 'NATIVE';
       const depositAmount = ethers.utils.parseUnits('0', 18);
       const request: BridgeDepositRequest = {
-        depositorAddress,
         depositAmount,
         recipientAddress,
         token,
@@ -383,12 +366,10 @@ describe('Token Bridge', () => {
     });
     it('ERC20 token with negative amount fails', async () => {
       expect.assertions(1);
-      const depositorAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const token = '0x2f14582947E292a2eCd20C430B46f2d27CFE213c';
       const depositAmount = ethers.utils.parseUnits('-1', 18);
       const request: BridgeDepositRequest = {
-        depositorAddress,
         depositAmount,
         recipientAddress,
         token,
@@ -405,12 +386,10 @@ describe('Token Bridge', () => {
     });
     it('NATIVE token with negative amount fails', async () => {
       expect.assertions(1);
-      const depositorAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const recipientAddress = '0x3095171469a0db24D9Fb9C789D62dF22BBAfa816';
       const token = 'NATIVE';
       const depositAmount = ethers.utils.parseUnits('-1', 18);
       const request: BridgeDepositRequest = {
-        depositorAddress,
         depositAmount,
         recipientAddress,
         token,
