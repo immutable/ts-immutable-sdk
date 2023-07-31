@@ -1,3 +1,4 @@
+import { NATIVE } from '../constants';
 import { isValidAddress, isValidAmount, isValidWalletProvider } from './widgetValidators';
 
 describe('widget validators', () => {
@@ -58,6 +59,16 @@ describe('widget validators', () => {
 
     it('should return true if address is valid and lowercase', () => {
       const result = isValidAddress(IMX_L1_ADDRESS.toLowerCase());
+      expect(result).toBeTruthy();
+    });
+
+    it('should return true if address is NATIVE string', () => {
+      const result = isValidAddress(NATIVE);
+      expect(result).toBeTruthy();
+    });
+
+    it('should return true if address is NATIVE string lowercased', () => {
+      const result = isValidAddress(NATIVE.toLowerCase());
       expect(result).toBeTruthy();
     });
 
