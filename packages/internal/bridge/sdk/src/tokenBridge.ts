@@ -657,38 +657,78 @@ export class TokenBridge {
     return {};
   }
 
-  // TODO: @Rez docs and error handling
+  /**
+   * Creates an unsigned exit transaction which, when executed, will exit the assets from the child chain to the root chain.
+   * This function should be used after a withdraw transaction has been executed on the child chain.
+   * It should only be executed after `waitForWithdrawal` has completed successfully.
+   *
+   * @param {ExitRequest} req - The request object containing the transaction hash of the withdraw transaction.
+   * @returns {Promise<ExitResponse>} - A promise that resolves to an object containing the unsigned exit transaction.
+   *
+   * @throws {BridgeError} - If an error occurs during the exit transaction creation process, a BridgeError will be thrown with a specific error type.
+   * Possible BridgeError types include:
+   * - PROVIDER_ERROR: An error occurred when interacting with the Ethereum provider, likely due to a network or connectivity issue.
+   * - INVALID_TRANSACTION: The deposit transaction is invalid or the L2StateSynced event log does not match the expected format.
+   * - INTERNAL_ERROR: An internal error occurred during the function call encoding process.
+   *
+   * @example
+   * const exitRequest = {
+   *   transactionHash: '0x123456...', // Transaction hash of the deposit transaction
+   * };
+   *
+   * bridgeSdk.getUnsignedExitTx(exitRequest)
+   *   .then((response) => {
+   *     console.log('Unsigned exit transaction:', response.unsignedTx);
+   *   })
+   *   .catch((error) => {
+   *     console.error('Error:', error.message);
+   *   });
+   */
   public async getUnsignedExitTx(req: ExitRequest): Promise<ExitResponse> {
+    // Ensure the configuration of chains is valid
     this.validateChainConfiguration();
-    const txReceipt = await this.config.childProvider.getTransactionReceipt(req.transactionHash);
-    // Get the StateSynced event log from the transaction receipt
+
+    // Fetch the receipt of the deposit transaction
+    const txReceipt = await withBridgeError<ethers.providers.TransactionReceipt>(async () => await this.config.childProvider.getTransactionReceipt(req.transactionHash), BridgeErrorType.PROVIDER_ERROR);
+
+    // Filter out the StateSynced event log from the transaction receipt
     const stateSenderLogs = txReceipt.logs.filter((log) => log.address.toLowerCase() === L2_STATE_SENDER_ADDRESS);
     if (stateSenderLogs.length !== 1) {
-      throw new Error(`expected 1 log in tx ${txReceipt.transactionHash} from address ${L2_STATE_SENDER_ADDRESS}`);
+      throw new BridgeError(`expected 1 log in tx ${txReceipt.transactionHash} from address ${L2_STATE_SENDER_ADDRESS}`, BridgeErrorType.INVALID_TRANSACTION);
     }
 
-    const l2StateSenderInterface = new ethers.utils.Interface(L2_STATE_SENDER);
-    const l2StateSyncEvent = l2StateSenderInterface.parseLog(stateSenderLogs[0]);
+    // Parse the StateSynced event log
+    const l2StateSyncEvent: ethers.utils.LogDescription = await withBridgeError<ethers.utils.LogDescription>(async () => {
+      const l2StateSenderInterface = new ethers.utils.Interface(L2_STATE_SENDER);
+      const event = l2StateSenderInterface.parseLog(stateSenderLogs[0]);
 
-    const types = ['uint256', 'address', 'address', 'bytes'];
-    const exitEventEncoded = ethers.utils.defaultAbiCoder.encode(types, l2StateSyncEvent.args);
+      // Throw an error if the event log doesn't match the expected format
+      if (event.signature !== 'L2StateSynced(uint256,address,address,bytes)') {
+        throw new Error(`expected L2StateSynced event in tx ${txReceipt.transactionHash}`);
+      }
+      return event;
+    }, BridgeErrorType.INVALID_TRANSACTION);
 
-    // Throw an error if the event log doesn't match the expected format
-    if (l2StateSyncEvent.signature !== 'L2StateSynced(uint256,address,address,bytes)') {
-      throw new Error(`expected L2StateSynced event in tx ${txReceipt.transactionHash}`);
-    }
+    // Instantiate the exit helper contract
+    const exitHelper = await withBridgeError<ethers.Contract>(async () => new ethers.Contract(this.config.bridgeContracts.rootChainExitHelper, EXIT_HELPER, this.config.rootProvider), BridgeErrorType.PROVIDER_ERROR);
 
-    const exitProof = await (this.config.childProvider as ethers.providers.JsonRpcProvider).send('bridge_generateExitProof', [l2StateSyncEvent.args.id.toHexString()]);
+    // Generate the exit proof
+    const exitProof = await withBridgeError<any>(async () => (this.config.childProvider as ethers.providers.JsonRpcProvider).send('bridge_generateExitProof', [l2StateSyncEvent.args.id.toHexString()]), BridgeErrorType.PROVIDER_ERROR);
 
-    const exitHelper = new ethers.Contract(this.config.bridgeContracts.rootChainExitHelper, EXIT_HELPER, this.config.rootProvider);
+    // Encode the exit function call data
+    const encodedExitTx = await withBridgeError<string>(async () => {
+      const exitEventEncoded = ethers.utils.defaultAbiCoder.encode(['uint256', 'address', 'address', 'bytes'], l2StateSyncEvent.args);
+      return exitHelper.interface.encodeFunctionData('exit', [exitProof.Metadata.CheckpointBlock, exitProof.Metadata.LeafIndex, exitEventEncoded, exitProof.Data]);
+    }, BridgeErrorType.INTERNAL_ERROR);
 
-    const encodedExitTx = exitHelper.interface.encodeFunctionData('exit', [exitProof.Metadata.CheckpointBlock, exitProof.Metadata.LeafIndex, exitEventEncoded, exitProof.Data]);
-
+    // Create the unsigned exit transaction
     const unsignedTx: ethers.providers.TransactionRequest = {
       data: encodedExitTx,
       to: this.config.bridgeContracts.rootChainExitHelper,
       value: 0,
     };
+
+    // Return the unsigned exit transaction
     return { unsignedTx };
   }
 
