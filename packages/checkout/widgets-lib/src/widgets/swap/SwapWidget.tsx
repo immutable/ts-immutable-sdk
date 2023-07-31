@@ -1,17 +1,15 @@
 import { BiomeCombinedProviders } from '@biom3/react';
 import {
-  Checkout,
   DexConfig,
   GetTokenAllowListResult,
   TokenFilterTypes,
 } from '@imtbl/checkout-sdk';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
 import {
-  useEffect, useCallback, useReducer, useMemo,
+  useEffect, useReducer, useMemo, useContext,
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { Exchange, ExchangeOverrides } from '@imtbl/dex-sdk';
-import { Web3Provider } from '@ethersproject/providers';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { SwapCoins } from './views/SwapCoins';
 import { LoadingView } from '../../views/loading/LoadingView';
@@ -43,11 +41,11 @@ import {
 import { SwapInProgress } from './views/SwapInProgress';
 import { ApproveERC20Onboarding } from './views/ApproveERC20Onboarding';
 import { TopUpView } from '../../views/top-up/TopUpView';
+import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 
 export interface SwapWidgetProps {
   params: SwapWidgetParams;
   config: StrongCheckoutWidgetsConfig
-  web3Provider?: Web3Provider
 }
 
 export interface SwapWidgetParams {
@@ -65,54 +63,39 @@ export function SwapWidget(props: SwapWidgetProps) {
     () => ({ viewState, viewDispatch }),
     [viewState, viewDispatch],
   );
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
   const [swapState, swapDispatch] = useReducer(swapReducer, initialSwapState);
   const swapReducerValues = useMemo(
     () => ({ swapState, swapDispatch }),
     [swapState, swapDispatch],
   );
 
-  const { params, config, web3Provider } = props;
+  const { params, config } = props;
   const {
     environment, theme, isOnRampEnabled, isSwapEnabled, isBridgeEnabled,
   } = config;
   const {
     amount, fromContractAddress, toContractAddress,
   } = params;
-  const { checkout } = swapState;
 
   const biomeTheme: BaseTokens = theme.toLowerCase() === WidgetTheme.LIGHT.toLowerCase()
     ? onLightBase
     : onDarkBase;
 
-  const swapWidgetSetup = useCallback(async () => {
-    swapDispatch({
-      payload: {
-        type: SwapActions.SET_CHECKOUT,
-        checkout: new Checkout({
-          baseConfig: { environment },
-        }),
-      },
-    });
-  }, [environment]);
-
-  useEffect(() => {
-    if (web3Provider) {
-      swapDispatch({
-        payload: {
-          type: SwapActions.SET_PROVIDER,
-          provider: web3Provider,
-        },
-      });
-    }
-  }, [web3Provider]);
-
   useEffect(() => {
     (async () => {
-      if (!checkout || !web3Provider) return;
+      if (!checkout || !provider) return;
 
       const network = await checkout.getNetworkInfo({
-        provider: web3Provider,
+        provider,
       });
+
+      /* If the provider's network is not supported, return out of this and let the
+      connect loader handle the switch network functionality */
+      if (!network.isSupported) {
+        return;
+      }
 
       let overrides: ExchangeOverrides | undefined;
       try {
@@ -143,8 +126,8 @@ export function SwapWidget(props: SwapWidgetProps) {
       });
 
       const tokenBalances = await checkout.getAllBalances({
-        provider: web3Provider,
-        walletAddress: await web3Provider.getSigner().getAddress(),
+        provider,
+        walletAddress: await provider.getSigner().getAddress(),
         chainId: network.chainId,
       });
 
@@ -175,13 +158,6 @@ export function SwapWidget(props: SwapWidgetProps) {
 
       swapDispatch({
         payload: {
-          type: SwapActions.SET_PROVIDER,
-          provider: web3Provider,
-        },
-      });
-
-      swapDispatch({
-        payload: {
           type: SwapActions.SET_NETWORK,
           network,
         },
@@ -194,75 +170,70 @@ export function SwapWidget(props: SwapWidgetProps) {
         },
       });
     })();
-  }, [checkout, web3Provider]);
-
-  useEffect(() => {
-    swapWidgetSetup();
-  }, [swapWidgetSetup]);
+  }, [checkout, provider]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }} bottomSheetContainerId="bottom-sheet-container">
       <ViewContext.Provider value={viewReducerValues}>
         <SwapContext.Provider value={swapReducerValues}>
-          {viewState.view.type === SharedViews.LOADING_VIEW && (
+          <CryptoFiatProvider environment={environment}>
+            {viewState.view.type === SharedViews.LOADING_VIEW && (
             <LoadingView loadingText={loadingText} />
-          )}
-          {viewState.view.type === SwapWidgetViews.SWAP && (
-            <CryptoFiatProvider environment={environment}>
-              <SwapCoins
-                fromAmount={viewState.view.data?.fromAmount ?? amount}
-                fromContractAddress={viewState.view.data?.fromContractAddress ?? fromContractAddress}
-                toContractAddress={viewState.view.data?.toContractAddress ?? toContractAddress}
-              />
-            </CryptoFiatProvider>
-          )}
-          {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (
+            )}
+            {viewState.view.type === SwapWidgetViews.SWAP && (
+            <SwapCoins
+              fromAmount={viewState.view.data?.fromAmount ?? amount}
+              fromContractAddress={viewState.view.data?.fromContractAddress ?? fromContractAddress}
+              toContractAddress={viewState.view.data?.toContractAddress ?? toContractAddress}
+            />
+            )}
+            {viewState.view.type === SwapWidgetViews.IN_PROGRESS && (
             <SwapInProgress
               transactionResponse={viewState.view.data.transactionResponse}
               swapForm={viewState.view.data.swapForm}
             />
-          )}
-          {viewState.view.type === SwapWidgetViews.APPROVE_ERC20 && (
+            )}
+            {viewState.view.type === SwapWidgetViews.APPROVE_ERC20 && (
             <ApproveERC20Onboarding data={viewState.view.data} />
-          )}
-          {viewState.view.type === SwapWidgetViews.SUCCESS && (
+            )}
+            {viewState.view.type === SwapWidgetViews.SUCCESS && (
             <StatusView
               statusText={success.text}
               actionText={success.actionText}
               onRenderEvent={
-                () => sendSwapSuccessEvent(
-                  (viewState.view as SwapSuccessView).data.transactionHash,
-                )
+              () => sendSwapSuccessEvent(
+                (viewState.view as SwapSuccessView).data.transactionHash,
+              )
               }
               onActionClick={sendSwapWidgetCloseEvent}
               statusType={StatusType.SUCCESS}
               testId="success-view"
             />
-          )}
-          {viewState.view.type === SwapWidgetViews.FAIL && (
-          <StatusView
-            statusText={failed.text}
-            actionText={failed.actionText}
-            onRenderEvent={() => sendSwapFailedEvent('Transaction failed')}
-            onActionClick={() => {
-              if (viewState.view.type === SwapWidgetViews.FAIL) {
-                viewDispatch({
-                  payload: {
-                    type: ViewActions.UPDATE_VIEW,
-                    view: {
-                      type: SwapWidgetViews.SWAP,
-                      data: viewState.view.data,
+            )}
+            {viewState.view.type === SwapWidgetViews.FAIL && (
+            <StatusView
+              statusText={failed.text}
+              actionText={failed.actionText}
+              onRenderEvent={() => sendSwapFailedEvent('Transaction failed')}
+              onActionClick={() => {
+                if (viewState.view.type === SwapWidgetViews.FAIL) {
+                  viewDispatch({
+                    payload: {
+                      type: ViewActions.UPDATE_VIEW,
+                      view: {
+                        type: SwapWidgetViews.SWAP,
+                        data: viewState.view.data,
+                      },
                     },
-                  },
-                });
-              }
-            }}
-            statusType={StatusType.FAILURE}
-            onCloseClick={sendSwapWidgetCloseEvent}
-            testId="fail-view"
-          />
-          )}
-          {viewState.view.type === SwapWidgetViews.PRICE_SURGE && (
+                  });
+                }
+              }}
+              statusType={StatusType.FAILURE}
+              onCloseClick={sendSwapWidgetCloseEvent}
+              testId="fail-view"
+            />
+            )}
+            {viewState.view.type === SwapWidgetViews.PRICE_SURGE && (
             <StatusView
               statusText={rejected.text}
               actionText={rejected.actionText}
@@ -284,8 +255,8 @@ export function SwapWidget(props: SwapWidgetProps) {
               onCloseClick={sendSwapWidgetCloseEvent}
               testId="price-surge-view"
             />
-          )}
-          {viewState.view.type === SharedViews.ERROR_VIEW && (
+            )}
+            {viewState.view.type === SharedViews.ERROR_VIEW && (
             <ErrorView
               actionText={actionText}
               onActionClick={() => {
@@ -298,8 +269,8 @@ export function SwapWidget(props: SwapWidgetProps) {
               }}
               onCloseClick={sendSwapWidgetCloseEvent}
             />
-          )}
-          {viewState.view.type === SharedViews.TOP_UP_VIEW && (
+            )}
+            {viewState.view.type === SharedViews.TOP_UP_VIEW && (
             <TopUpView
               widgetEvent={IMTBLWidgetEvents.IMTBL_SWAP_WIDGET_EVENT}
               showOnrampOption={isOnRampEnabled}
@@ -307,7 +278,8 @@ export function SwapWidget(props: SwapWidgetProps) {
               showBridgeOption={isBridgeEnabled}
               onCloseButtonClick={sendSwapWidgetCloseEvent}
             />
-          )}
+            )}
+          </CryptoFiatProvider>
         </SwapContext.Provider>
       </ViewContext.Provider>
     </BiomeCombinedProviders>

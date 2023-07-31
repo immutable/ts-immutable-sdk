@@ -1,6 +1,5 @@
 import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers';
-import { TransactionsApi } from '@imtbl/guardian';
-import { getSignedMetaTransactions, getNonce } from './walletHelpers';
+import { getNonce, getSignedMetaTransactions } from './walletHelpers';
 import { sendTransaction } from './sendTransaction';
 import { mockUserZkEvm } from '../test/mocks';
 import { RelayerClient } from './relayerClient';
@@ -8,6 +7,7 @@ import { PassportConfiguration } from '../config';
 import { retryWithDelay } from '../network/retry';
 import { RelayerTransaction, RelayerTransactionStatus } from './types';
 import { JsonRpcError, RpcErrorCode } from './JsonRpcError';
+import GuardianClient from '../guardian/guardian';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./walletHelpers');
@@ -31,11 +31,12 @@ describe('sendTransaction', () => {
     ethSendTransaction: jest.fn(),
     imGetTransactionByHash: jest.fn(),
   };
-  const transactionAPI = {
-    evaluateTransaction: jest.fn(),
+  const guardianClient = {
+    validateEVMTransaction: jest.fn(),
+    loading: jest.fn(),
   };
 
-  const nonce = 5;
+  const nonce = '5';
   const config: Partial<PassportConfiguration> = {
     zkEvmChainId: 'eip155:13392',
   };
@@ -71,10 +72,10 @@ describe('sendTransaction', () => {
       params: [transactionRequest],
       magicProvider,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
-      transactionAPI: transactionAPI as unknown as TransactionsApi,
       relayerClient: relayerClient as unknown as RelayerClient,
       config: config as PassportConfiguration,
       user: mockUserZkEvm,
+      guardianClient: guardianClient as unknown as GuardianClient,
     });
 
     expect(result).toEqual(transactionHash);
@@ -94,73 +95,38 @@ describe('sendTransaction', () => {
       params: [transactionRequest],
       magicProvider,
       jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
-      transactionAPI: transactionAPI as unknown as TransactionsApi,
       relayerClient: relayerClient as unknown as RelayerClient,
       config: config as PassportConfiguration,
       user: mockUserZkEvm,
+      guardianClient: guardianClient as unknown as GuardianClient,
     });
 
     expect(result).toEqual(transactionHash);
-    expect(transactionAPI.evaluateTransaction).toHaveBeenCalledWith(
+    expect(guardianClient.validateEVMTransaction).toHaveBeenCalledWith(
       {
-        id: 'evm',
-        transactionEvaluationRequest: {
-          chainType: 'evm',
-          chainId: config.zkEvmChainId,
-          transactionData: {
-            metaTransactions: [
-              {
-                data: transactionRequest.data,
-                delegateCall: false,
-                gasLimit: '0',
-                revertOnError: true,
-                target: mockUserZkEvm.zkEvm.ethAddress,
-                value: '0',
-              },
-              {
-                data: '0x00',
-                delegateCall: false,
-                gasLimit: '0',
-                revertOnError: true,
-                target: imxFeeOption.recipientAddress,
-                value: imxFeeOption.tokenPrice,
-              },
-            ],
+        chainId: config.zkEvmChainId,
+        nonce,
+        user: mockUserZkEvm,
+        metaTransactions: [
+          {
+            data: transactionRequest.data,
+            revertOnError: true,
+            to: mockUserZkEvm.zkEvm.ethAddress,
+            value: '0x00',
             nonce,
-            userAddress: mockUserZkEvm.zkEvm.ethAddress,
           },
-        },
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${mockUserZkEvm.accessToken}`,
-        },
+          {
+            revertOnError: true,
+            to: imxFeeOption.recipientAddress,
+            value: imxFeeOption.tokenPrice,
+            nonce,
+          },
+        ],
       },
     );
     expect(relayerClient.ethSendTransaction).toHaveBeenCalledWith(
       mockUserZkEvm.zkEvm.ethAddress,
       signedTransactions,
-    );
-  });
-
-  it('returns an error if the failed to parsing the request data ', async () => {
-    const wrongTransactionRequest = { ...transactionRequest, value: '0x' };
-
-    await expect(
-      sendTransaction({
-        params: [wrongTransactionRequest],
-        magicProvider,
-        jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
-        transactionAPI: transactionAPI as unknown as TransactionsApi,
-        relayerClient: relayerClient as unknown as RelayerClient,
-        config: config as PassportConfiguration,
-        user: mockUserZkEvm,
-      }),
-    ).rejects.toThrow(
-      new JsonRpcError(
-        RpcErrorCode.PARSE_ERROR,
-        'Transaction failed to parsing: invalid BigNumber string (argument="value", value="0x", code=INVALID_ARGUMENT, version=bignumber/5.7.0)',
-      ),
     );
   });
 
@@ -174,10 +140,10 @@ describe('sendTransaction', () => {
         params: [transactionRequest],
         magicProvider,
         jsonRpcProvider: jsonRpcProvider as JsonRpcProvider,
-        transactionAPI: transactionAPI as unknown as TransactionsApi,
         relayerClient: relayerClient as unknown as RelayerClient,
         config: config as PassportConfiguration,
         user: mockUserZkEvm,
+        guardianClient: guardianClient as unknown as GuardianClient,
       }),
     ).rejects.toThrow(
       new JsonRpcError(

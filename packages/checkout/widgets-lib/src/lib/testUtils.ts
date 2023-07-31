@@ -3,6 +3,7 @@ import {
   ChainId,
   DexConfig,
   GasEstimateTokenConfig,
+  TokenInfo,
 } from '@imtbl/checkout-sdk';
 import { cy } from 'local-cypress';
 
@@ -25,6 +26,7 @@ export const cyIntercept = (overrides?: {
     gasEstimateTokens?: GasEstimateTokenConfig | undefined,
     dex?: DexConfig,
   },
+  tokenConfigOverrides?: Record<string, { allowed: TokenInfo[] }>,
   cryptoFiatOverrides?: {
     coins?: any[],
     overrides?: Record<string, string>,
@@ -84,6 +86,44 @@ export const cyIntercept = (overrides?: {
       },
     },
   };
+  const defaultTokensConfig = {
+    [ChainId.IMTBL_ZKEVM_TESTNET]: {
+      allowed: [
+        {
+          name: 'Immutable Token',
+          symbol: 'IMX',
+          decimals: 18,
+        },
+        {
+          address: '0xb95B75B4E4c09F04d5DA6349861BF1b6F163D78c',
+          decimals: 18,
+          symbol: 'zkONE',
+          name: 'Monolithic Token',
+        },
+        {
+          address: '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2',
+          decimals: 18,
+          symbol: 'zkTKN',
+          name: 'Zero Knowledge Token',
+        },
+      ],
+    },
+    [ChainId.SEPOLIA]: {
+      allowed: [
+        {
+          name: 'Sepolia Eth',
+          symbol: 'ETH',
+          decimals: 18,
+        },
+        {
+          name: 'Immutable Test Token',
+          address: '0x5b26a75eE4a4B68a8fe8f94E4b729Ff1b8a31051',
+          symbol: 'tIMX',
+          decimals: 18,
+        },
+      ],
+    },
+  };
 
   cy.intercept(
     `${checkoutApi}/config`,
@@ -100,6 +140,10 @@ export const cyIntercept = (overrides?: {
       },
     },
   );
+  cy.intercept(`${checkoutApi}/config/tokens`, {
+    ...defaultTokensConfig,
+    ...overrides?.tokenConfigOverrides && overrides.tokenConfigOverrides,
+  });
   cy.intercept(
     `${checkoutApi}/fiat/coins/all*`,
     overrides?.cryptoFiatOverrides?.coins || [
@@ -129,4 +173,6 @@ export const cyIntercept = (overrides?: {
   cy.intercept(`${checkoutApi}/rpc/eth-sepolia`, {});
   cy.intercept(imtblZkEvmRpcUrl, {});
   cy.intercept('https://image-resizer-cache.dev.immutable.com/*', {});
+
+  cy.wait(10); // This delay ensures the intercepts are set before the test runs
 };

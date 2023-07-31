@@ -13,20 +13,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      - name: Cache node modules
-        uses: actions/cache@v2
-        id: cache-node-modules
+      - name: Use Node.js
+        uses: actions/setup-node@v3
         with:
-          path: ./node_modules
-          key: ${{ runner.os }}-build-${{ secrets.CHROMATIC_PROJECT_TOKEN }}-${{ hashFiles('**/yarn.lock') }}
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org/
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+      - name: Cache node modules
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
-      - name: Install Dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: yarn install
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
         
       - name: Build Checkout SDK
         run: yarn workspace @imtbl/checkout-sdk build && yarn workspace @imtbl/checkout-widgets build
@@ -39,9 +50,9 @@ jobs:
 
       - name: Build Package Economy Playground
         run: yarn workspace @imtbl/economy-playground build:package
-
-      - name: List files
-        run: ls -R packages/economy/playground/storybook-static
+        
+      - name: Setup checkout-widget-lib dependencies
+        run: yarn workspace @imtbl/economy-playground setup
 
       - name: Navigate to Economy Playground
         run: cd packages/economy/playground
