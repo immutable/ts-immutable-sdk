@@ -136,7 +136,6 @@ export interface BridgeDepositResponse {
  */
 export interface WaitForDepositRequest {
   transactionHash: string;
-  timeout?: number; // TODO: @Rez implement timeout logic
 }
 
 /**
@@ -148,35 +147,42 @@ export interface WaitForDepositResponse {
 }
 
 /**
- * @TODO: Rez
+ * @typedef {Object} RootTokenToChildTokenRequest
+ * @property {FungibleToken} rootToken - The token on the root chain for which the corresponding token on the child chain is required.
  */
 export interface RootTokenToChildTokenRequest {
   rootToken: FungibleToken;
 }
 
 /**
- * @TODO: Rez
+ * @typedef {Object} RootTokenToChildTokenResponse
+ * @property {Address} childToken - The address of the corresponding token on the child chain.
  */
 export interface RootTokenToChildTokenResponse {
   childToken: Address;
 }
 
 /**
- * @TODO: Rez
+ * @typedef {Object} ChildTokenToRootTokenRequest
+ * @property {Address} childToken - The token on the child chain for which the corresponding token on the root chain is required.
  */
 export interface ChildTokenToRootTokenRequest {
   childToken: Address;
 }
 
 /**
- * @TODO: Rez
+ * @typedef {Object} ChildTokenToRootTokenResponse
+ * @property {FungibleToken} rootToken - The corresponding token on the root chain.
  */
 export interface ChildTokenToRootTokenResponse {
   rootToken: FungibleToken;
 }
 
 /**
- * TODO: @Rez docs
+ * @typedef {Object} ApproveWithdrawBridgeRequest
+ * @property {Address} withdrawerAddress - The address of the account intending to withdraw the tokens.
+ * @property {Address} token - The address of the token contract.
+ * @property {ethers.BigNumber} withdrawAmount - The amount of tokens to be withdrawn.
  */
 export interface ApproveWithdrawBridgeRequest {
   withdrawerAddress: Address;
@@ -185,14 +191,18 @@ export interface ApproveWithdrawBridgeRequest {
 }
 
 /**
- * TODO: @Rez docs
+ * @typedef {Object} ApproveWithdrawBridgeResponse
+ * @property {ethers.providers.TransactionRequest|null} unsignedTx - The unsigned withdrawal transaction, or null if the approval is not required.
  */
 export interface ApproveWithdrawBridgeResponse {
   unsignedTx: ethers.providers.TransactionRequest | null;
 }
 
 /**
- * TODO: @Rez docs
+ * @typedef {Object} BridgeWithdrawRequest
+ * @property {Address} recipientAddress - The address of the recipient of the withdrawn tokens on the root chain.
+ * @property {FungibleToken} token - The token to be withdrawn.
+ * @property {ethers.BigNumber} withdrawAmount - The amount of tokens to be withdrawn.
  */
 export interface BridgeWithdrawRequest {
   recipientAddress: Address;
@@ -201,7 +211,8 @@ export interface BridgeWithdrawRequest {
 }
 
 /**
- * TODO: @Rez docs
+ * @typedef {Object} BridgeWithdrawResponse
+ * @property {ethers.providers.TransactionRequest} unsignedTx - The unsigned withdrawal transaction.
  */
 export interface BridgeWithdrawResponse {
   unsignedTx: ethers.providers.TransactionRequest;
@@ -213,23 +224,26 @@ export interface BridgeWithdrawResponse {
  */
 export interface WaitForWithdrawalRequest {
   transactionHash: string;
-  timeout?: number; // TODO: @Rez implement timeout logic
 }
 
 /**
  * @typedef {Object} WaitForWithdrawalResponse
+ * Empty object signifies the successful completion of the withdrawal process.
+ * If the withdrawal fails, an error will be thrown instead of a response.
  */
 export interface WaitForWithdrawalResponse {}
 
 /**
- * TODO: @Rez docs
+ * @typedef {Object} ExitRequest
+ * @property {string} transactionHash - The hash of the withdraw transaction on the child chain
  */
 export interface ExitRequest {
   transactionHash: string;
 }
 
 /**
- * TODO: @Rez docs
+ * @typedef {Object} ExitResponse
+ * @property {ethers.providers.TransactionRequest} unsignedTx - The unsigned transaction that, when signed and broadcasted, will perform the exit operation on the root chain.
  */
 export interface ExitResponse {
   unsignedTx: ethers.providers.TransactionRequest;
