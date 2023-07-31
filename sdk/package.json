@@ -1,7 +1,7 @@
 {
   "name": "@imtbl/sdk",
   "description": "Immutable Unified SDK",
-  "version": "0.0.0",
+  "version": "0.4.1-alpha.1",
   "author": "Immutable",
   "browser": "./dist/index.browser.js",
   "bugs": "https://github.com/immutable/ts-immutable-sdk/issues",
