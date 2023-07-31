@@ -24,10 +24,10 @@ export class ImmutableSwap extends ImmutableWebComponent {
     super.connectedCallback();
     this.walletProvider = this.getAttribute(
       'walletProvider',
-    )?.toLowerCase() as WalletProviderName;
-    this.amount = this.getAttribute('amount') as string;
-    this.fromContractAddress = this.getAttribute('fromContractAddress')?.toLowerCase() as string;
-    this.toContractAddress = this.getAttribute('toContractAddress')?.toLowerCase() as string;
+    )?.toLowerCase() as WalletProviderName ?? WalletProviderName.METAMASK;
+    this.amount = this.getAttribute('amount') ?? '' as string;
+    this.fromContractAddress = this.getAttribute('fromContractAddress')?.toLowerCase() ?? '' as string;
+    this.toContractAddress = this.getAttribute('toContractAddress')?.toLowerCase() ?? '' as string;
     this.renderWidget();
   }
 
@@ -50,7 +50,7 @@ export class ImmutableSwap extends ImmutableWebComponent {
       this.fromContractAddress = '';
     }
 
-    if (!isValidAddress(this.toContractAddress)) {
+    if (this.toContractAddress !== undefined && !isValidAddress(this.toContractAddress)) {
       // eslint-disable-next-line no-console
       console.warn('[IMTBL]: invalid "toContractAddress" widget input');
       this.toContractAddress = '';

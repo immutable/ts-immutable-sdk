@@ -16,7 +16,8 @@ export class ImmutableWallet extends ImmutableWebComponent {
 
   connectedCallback() {
     super.connectedCallback();
-    this.walletProvider = this.getAttribute('walletProvider')?.toLowerCase() as WalletProviderName;
+    this.walletProvider = this.getAttribute('walletProvider')?.toLowerCase() as WalletProviderName
+    ?? WalletProviderName.METAMASK;
     this.renderWidget();
   }
 
