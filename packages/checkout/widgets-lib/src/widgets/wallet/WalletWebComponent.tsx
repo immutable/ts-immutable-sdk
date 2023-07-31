@@ -52,7 +52,6 @@ export class ImmutableWallet extends ImmutableWebComponent {
           closeEvent={sendWalletWidgetCloseEvent}
         >
           <WalletWidget
-            web3Provider={this.provider}
             config={this.widgetConfig!}
           />
         </ConnectLoader>

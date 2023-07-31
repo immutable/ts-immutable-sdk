@@ -16,6 +16,10 @@ import { WidgetTheme } from '../../lib';
 import { quotesProcessor } from './functions/FetchQuote';
 import { text } from '../../resources/text/textConfig';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
+import { ConnectionStatus } from '../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  ConnectLoaderTestComponent,
+} from '../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 
 describe('SwapWidget tests', () => {
   const mockProvider = {
@@ -30,6 +34,14 @@ describe('SwapWidget tests', () => {
       request: async () => null,
     },
   } as unknown as Web3Provider;
+
+  const connectLoaderState = {
+    checkout: new Checkout({
+      baseConfig: { environment: Environment.SANDBOX },
+    }),
+    provider: mockProvider,
+    connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+  };
 
   beforeEach(() => {
     cy.viewport('ipad-2');
@@ -108,11 +120,14 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <SwapWidget
-          params={params}
-          config={config}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            params={params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
@@ -143,11 +158,14 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <SwapWidget
-          params={params}
-          config={config}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            params={params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-bottom-sheet').should('be.visible');
@@ -178,11 +196,14 @@ describe('SwapWidget tests', () => {
         });
 
       mount(
-        <SwapWidget
-          params={params}
-          config={config}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            params={params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('not-enough-gas-bottom-sheet').should('not.exist');
@@ -231,11 +252,14 @@ describe('SwapWidget tests', () => {
 
     it('should show swap widget on mount', () => {
       mount(
-        <SwapWidget
-          params={params}
-          config={config}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            params={params}
+            config={config}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').should('be.visible');
@@ -245,13 +269,15 @@ describe('SwapWidget tests', () => {
     });
 
     it('should set fromTokens to user balances filtered by the token allow list', () => {
-      cyIntercept();
       mount(
-        <SwapWidget
-          config={config}
-          params={params}
-          web3Provider={mockProvider}
-        />,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <SwapWidget
+            config={config}
+            params={params}
+          />
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('fromTokenInputs-select-form-select__target').click();
@@ -324,7 +350,11 @@ describe('SwapWidget tests', () => {
 
         mount(
           <BiomeCombinedProviders>
-            <SwapWidget params={params} config={config} web3Provider={mockProvider} />
+            <ConnectLoaderTestComponent
+              initialStateOverride={connectLoaderState}
+            >
+              <SwapWidget params={params} config={config} />
+            </ConnectLoaderTestComponent>
           </BiomeCombinedProviders>,
         );
       });
