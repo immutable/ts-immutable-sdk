@@ -79,10 +79,24 @@ const exactInputOutputSingleParamTypes = [
   'uint160',
 ];
 
+const exactInputOutputParamTypes = [
+  'bytes',
+  'address',
+  'uint256',
+  'uint256',
+];
+
 const exactInputOutputSingleWithFeesParamTypes = [
   '(address,uint16)[]',
   '(address,address,uint24,address,uint256,uint256,uint160)',
 ];
+
+const exactInputOutWithFeesParamTypes = [
+  '(address,uint16)[]',
+  '(bytes,address,uint256,uint256)',
+];
+
+const multicallParamTypes = ['uint256', 'bytes[]'];
 
 export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new ImmutableConfiguration({
   environment: Environment.SANDBOX,
@@ -111,6 +125,26 @@ export const TEST_DEX_CONFIGURATION: ExchangeModuleConfiguration = {
   },
 };
 
+export type SwapTest = {
+  fromAddress: string;
+
+  chainId: number;
+
+  pools: Pool[],
+
+  arbitraryTick: number;
+  arbitraryLiquidity: number;
+  sqrtPriceAtTick: JSBI;
+
+  inputToken: string;
+  outputToken: string;
+  intermediaryToken: string | undefined;
+  amountIn: ethers.BigNumberish;
+  amountOut: ethers.BigNumberish;
+  minAmountOut: ethers.BigNumberish;
+  maxAmountIn: ethers.BigNumberish;
+};
+
 type ExactInputOutputSingleParams = {
   tokenIn: string;
   tokenOut: string;
@@ -119,6 +153,13 @@ type ExactInputOutputSingleParams = {
   firstAmount: ethers.BigNumber;
   secondAmount: ethers.BigNumber;
   sqrtPriceLimitX96: ethers.BigNumber;
+};
+
+type ExactInputOutputParams = {
+  path: string;
+  recipient: string;
+  amountIn: ethers.BigNumber;
+  amountOut: ethers.BigNumber;
 };
 
 // uniqBy returns the unique items in an array using the given comparator
@@ -137,24 +178,34 @@ export function uniqBy<K, T extends string | number>(
   return Object.values(uniqArr);
 }
 
-export function decodeMulticallDataWithFees(
-  data: ethers.utils.BytesLike,
-): {
-    topLevelParams: ethers.utils.Result;
-    secondaryFeeParams: SecondaryFee[];
-    swapParams: ExactInputOutputSingleParams;
-  } {
+export function decodePath(path: string) {
+  return {
+    inputToken: path.substring(0, 42),
+    firstPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(42, 48)}`, 16)),
+    intermediaryToken: `0x${path.substring(48, 88)}`,
+    secondPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(88, 94)}`, 16)),
+    outputToken: `0x${path.substring(94, 134)}`,
+  };
+}
+
+function decodeParams(calldata: ethers.utils.BytesLike, paramTypes: string[]) {
   // eslint-disable-next-line no-param-reassign
-  data = ethers.utils.hexDataSlice(data, 4);
+  const data = ethers.utils.hexDataSlice(calldata, 4);
 
   const topLevelParams = ethers.utils.defaultAbiCoder.decode(
-    ['uint256', 'bytes[]'],
+    multicallParamTypes,
     data,
   );
-  const calldata = topLevelParams[1][0];
-  const calldataParams = ethers.utils.hexDataSlice(calldata, 4);
 
-  const decodedParams = ethers.utils.defaultAbiCoder.decode(exactInputOutputSingleWithFeesParamTypes, calldataParams);
+  const decodedParams = ethers.utils.defaultAbiCoder
+    .decode(paramTypes, ethers.utils.hexDataSlice(topLevelParams[1][0], 4));
+
+  return { topLevelParams, decodedParams };
+}
+
+export function decodeMulticallExactInputOutputWithFees(data: ethers.utils.BytesLike) {
+  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutWithFeesParamTypes);
+
   const secondaryFeeParams: SecondaryFee[] = [];
 
   for (let i = 0; i < decodedParams[0].length; i++) {
@@ -164,7 +215,29 @@ export function decodeMulticallDataWithFees(
     });
   }
 
-  const swapParams: ExactInputOutputSingleParams = {
+  const multiPoolSwapParams: ExactInputOutputParams = {
+    path: decodedParams[1][0],
+    recipient: decodedParams[1][1],
+    amountIn: decodedParams[1][2],
+    amountOut: decodedParams[1][3],
+  };
+
+  return { topLevelParams, secondaryFeeParams, swapParams: multiPoolSwapParams };
+}
+
+export function decodeMulticallExactInputOutputSingleWithFees(data: ethers.utils.BytesLike) {
+  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutputSingleWithFeesParamTypes);
+
+  const secondaryFeeParams: SecondaryFee[] = [];
+
+  for (let i = 0; i < decodedParams[0].length; i++) {
+    secondaryFeeParams.push({
+      feeRecipient: decodedParams[0][i][0],
+      feeBasisPoints: decodedParams[0][i][1],
+    });
+  }
+
+  const singlePoolSwapParams: ExactInputOutputSingleParams = {
     tokenIn: decodedParams[1][0],
     tokenOut: decodedParams[1][1],
     fee: decodedParams[1][2],
@@ -174,38 +247,36 @@ export function decodeMulticallDataWithFees(
     sqrtPriceLimitX96: decodedParams[1][6],
   };
 
-  return { topLevelParams, secondaryFeeParams, swapParams };
+  return { topLevelParams, secondaryFeeParams, swapParams: singlePoolSwapParams };
 }
 
-export function decodeMulticallDataWithoutFees(data: ethers.utils.BytesLike): {
-  topLevelParams: ethers.utils.Result;
-  functionCallParams: ExactInputOutputSingleParams;
-} {
-  // eslint-disable-next-line no-param-reassign
-  data = ethers.utils.hexDataSlice(data, 4);
-
-  const decodedTopLevelParams = ethers.utils.defaultAbiCoder.decode(
-    ['uint256', 'bytes[]'],
-    data,
-  );
-  const calldata = decodedTopLevelParams[1][0];
-  const calldataParams = ethers.utils.hexDataSlice(calldata, 4);
-  const decodedFunctionCallParams = ethers.utils.defaultAbiCoder.decode(
-    exactInputOutputSingleParamTypes,
-    calldataParams,
-  );
+export function decodeMulticallExactInputOutputSingleWithoutFees(data: ethers.utils.BytesLike) {
+  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutputSingleParamTypes);
 
   const swapParams: ExactInputOutputSingleParams = {
-    tokenIn: decodedFunctionCallParams[0],
-    tokenOut: decodedFunctionCallParams[1],
-    fee: decodedFunctionCallParams[2],
-    recipient: decodedFunctionCallParams[3],
-    firstAmount: decodedFunctionCallParams[4],
-    secondAmount: decodedFunctionCallParams[5],
-    sqrtPriceLimitX96: decodedFunctionCallParams[6],
+    tokenIn: decodedParams[0],
+    tokenOut: decodedParams[1],
+    fee: decodedParams[2],
+    recipient: decodedParams[3],
+    firstAmount: decodedParams[4],
+    secondAmount: decodedParams[5],
+    sqrtPriceLimitX96: decodedParams[6],
   };
 
-  return { topLevelParams: decodedTopLevelParams, functionCallParams: swapParams };
+  return { topLevelParams, swapParams };
+}
+
+export function decodeMulticallExactInputOutputWithoutFees(data: ethers.utils.BytesLike) {
+  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutputParamTypes);
+
+  const swapParams: ExactInputOutputParams = {
+    path: decodedParams[0],
+    recipient: decodedParams[1],
+    amountIn: decodedParams[5],
+    amountOut: decodedParams[6],
+  };
+
+  return { topLevelParams, swapParams };
 }
 
 export function getMinimumAmountOut(
@@ -233,24 +304,7 @@ export function getMaximumAmountIn(
   return ethers.BigNumber.from(slippageAdjustedAmountIn.toString());
 }
 
-export type SwapTest = {
-  fromAddress: string;
-
-  chainId: number;
-
-  arbitraryTick: number;
-  arbitraryLiquidity: number;
-  sqrtPriceAtTick: JSBI;
-
-  inputToken: string;
-  outputToken: string;
-  amountIn: ethers.BigNumberish;
-  amountOut: ethers.BigNumberish;
-  minAmountOut: ethers.BigNumberish;
-  maxAmountIn: ethers.BigNumberish;
-};
-
-export function setupSwapTxTest(slippage: number): SwapTest {
+export function setupSwapTxTest(slippage: number, multiPoolSwap: boolean = false): SwapTest {
   const slippageFraction = slippageToFraction(slippage);
   const fromAddress = TEST_FROM_ADDRESS;
 
@@ -258,8 +312,9 @@ export function setupSwapTxTest(slippage: number): SwapTest {
   const arbitraryLiquidity = 10;
   const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
 
-  const inputToken = IMX_TEST_TOKEN.address;
-  const outputToken = WETH_TEST_TOKEN.address;
+  const tokenIn: Token = new Token(TEST_CHAIN_ID, IMX_TEST_TOKEN.address, 18);
+  const intermediaryToken: Token = new Token(TEST_CHAIN_ID, FUN_TEST_TOKEN.address, 18);
+  const tokenOut: Token = new Token(TEST_CHAIN_ID, WETH_TEST_TOKEN.address, 18);
 
   const amountIn = ethers.utils.parseEther('0.0000123');
   const amountOut = ethers.utils.parseEther('10000');
@@ -267,16 +322,54 @@ export function setupSwapTxTest(slippage: number): SwapTest {
   const minAmountOut = getMinimumAmountOut(slippageFraction, amountOut);
   const maxAmountIn = getMaximumAmountIn(slippageFraction, amountIn);
 
+  const fee = 10000;
+
+  let pools: Pool[] = [];
+  if (multiPoolSwap) {
+    pools = [
+      new Pool(
+        tokenIn,
+        intermediaryToken,
+        fee,
+        sqrtPriceAtTick,
+        arbitraryLiquidity,
+        arbitraryTick,
+      ),
+      new Pool(
+        intermediaryToken,
+        tokenOut,
+        fee,
+        sqrtPriceAtTick,
+        arbitraryLiquidity,
+        arbitraryTick,
+      ),
+    ];
+  } else {
+    pools = [
+      new Pool(
+        tokenIn,
+        tokenOut,
+        fee,
+        sqrtPriceAtTick,
+        arbitraryLiquidity,
+        arbitraryTick,
+      ),
+    ];
+  }
+
   return {
     fromAddress,
     chainId: TEST_CHAIN_ID,
+
+    pools,
 
     arbitraryTick,
     arbitraryLiquidity,
     sqrtPriceAtTick,
 
-    inputToken,
-    outputToken,
+    inputToken: tokenIn.address,
+    intermediaryToken: multiPoolSwap ? intermediaryToken.address : undefined,
+    outputToken: tokenOut.address,
     amountIn,
     amountOut,
     minAmountOut,
@@ -300,19 +393,9 @@ export function mockRouterImplementation(
         params.outputToken,
         18,
       );
-      const fee = 10000;
-      const pools: Pool[] = [
-        new Pool(
-          tokenIn,
-          tokenOut,
-          fee,
-          params.sqrtPriceAtTick,
-          params.arbitraryLiquidity,
-          params.arbitraryTick,
-        ),
-      ];
+
       const route: Route<Currency, Currency> = new Route(
-        pools,
+        params.pools,
         tokenIn,
         tokenOut,
       );
@@ -326,8 +409,8 @@ export function mockRouterImplementation(
         tradeType,
         gasEstimate: TEST_TRANSACTION_GAS_USAGE,
       };
+
       return {
-        success: true,
         trade,
       };
     },

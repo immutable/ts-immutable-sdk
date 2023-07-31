@@ -1,4 +1,4 @@
-import { IMX_TEST_TOKEN, WETH_TEST_TOKEN } from 'utils/testUtils';
+import { IMX_TEST_TOKEN, WETH_TEST_TOKEN } from 'test';
 import { ensureCorrectERC20AddressOrder } from './computePoolAddress';
 import { ERC20Pair } from './generateERC20Pairs';
 

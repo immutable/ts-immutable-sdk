@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
-import { TEST_CHAIN_ID, TEST_RPC_URL } from 'utils/testUtils';
+import { TEST_CHAIN_ID, TEST_RPC_URL } from 'test';
 import { calculateGasFee, fetchGasPrice } from './gas';
 
 jest.mock('@ethersproject/providers');

@@ -1,4 +1,4 @@
-import { uniqBy } from './testUtils';
+import { uniqBy } from '.';
 
 describe('uniqBy', () => {
   describe('when given an array of numbers with Math.floor func', () => {

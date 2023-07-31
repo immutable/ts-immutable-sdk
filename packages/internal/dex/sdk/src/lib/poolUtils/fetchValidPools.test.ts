@@ -12,7 +12,7 @@ import {
   TEST_RPC_URL,
   TEST_V3_CORE_FACTORY_ADDRESS,
   WETH_TEST_TOKEN,
-} from '../../utils/testUtils';
+} from '../../test';
 
 jest.mock('@ethersproject/contracts');
 

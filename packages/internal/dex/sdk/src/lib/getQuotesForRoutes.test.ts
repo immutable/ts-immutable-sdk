@@ -12,7 +12,7 @@ import {
   TEST_QUOTER_ADDRESS,
   TEST_RPC_URL,
   WETH_TEST_TOKEN,
-} from '../utils/testUtils';
+} from '../test';
 import { Multicall__factory } from '../contracts/types';
 
 jest.mock('@ethersproject/contracts');

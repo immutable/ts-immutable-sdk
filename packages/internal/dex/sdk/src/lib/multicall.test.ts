@@ -15,7 +15,7 @@ import {
   TEST_V3_CORE_FACTORY_ADDRESS,
   USDC_TEST_TOKEN,
   WETH_TEST_TOKEN,
-} from '../utils/testUtils';
+} from '../test';
 import { Multicall__factory } from '../contracts/types';
 import { DEFAULT_GAS_QUOTE } from './getQuotesForRoutes';
 
