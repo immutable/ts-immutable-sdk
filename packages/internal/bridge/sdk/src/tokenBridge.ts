@@ -799,7 +799,7 @@ export class TokenBridge {
   private static validateDepositArgs(depositorOrRecipientAddress: string, depositAmount: ethers.BigNumber, token: string) {
     if (!ethers.utils.isAddress(depositorOrRecipientAddress)) {
       throw new BridgeError(
-        `depositor address ${depositorOrRecipientAddress} is not a valid address`,
+        `address ${depositorOrRecipientAddress} is not a valid address`,
         BridgeErrorType.INVALID_ADDRESS,
       );
     }
