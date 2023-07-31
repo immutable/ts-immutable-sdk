@@ -78,6 +78,7 @@
     "packages/economy/services",
     "packages/blockchain-data/sdk",
     "packages/blockchain-data/sample-app",
-    "packages/game-bridge"
+    "packages/game-bridge",
+    "packages/internal/economy-mechanics/playground"
   ]
 }

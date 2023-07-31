@@ -1919,6 +1919,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@biom3/react@npm:^0.8.1-beta":
+  version: 0.8.1-beta
+  resolution: "@biom3/react@npm:0.8.1-beta"
+  dependencies:
+    "@biom3/design-tokens": "*"
+    "@emotion/css": ^11.11.2
+    "@emotion/react": ^11.11.1
+    "@rive-app/react-canvas": ^3.0.50
+    buffer: ^6.0.3
+    csstype: ^3.1.2
+    framer-motion: ^10.12.12
+    lodash.debounce: ^4.0.8
+    lodash.get: ^4.4.2
+    lodash.isequal: ^4.5.0
+    lodash.throttle: ^4.1.1
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    react-is: ^18.2.0
+    ts-deepmerge: ^5.0.0
+  checksum: 9ae171465605d2416bedeaddb70f61b9b82de3c48fc967dac59bdffe95793ab8f874ce7c4a6254f58f1e3108739c3f6ae53ddbedb085b015c32a67fffb69c891
+  languageName: node
+  linkType: hard
+
 "@chainsafe/as-sha256@npm:^0.3.1":
   version: 0.3.1
   resolution: "@chainsafe/as-sha256@npm:0.3.1"
@@ -3305,6 +3328,40 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@imtbl/economy-mechanics-playground@workspace:packages/internal/economy-mechanics/playground":
+  version: 0.0.0-use.local
+  resolution: "@imtbl/economy-mechanics-playground@workspace:packages/internal/economy-mechanics/playground"
+  dependencies:
+    "@biom3/design-tokens": ^0.2.2-beta
+    "@biom3/react": ^0.8.1-beta
+    "@imtbl/blockchain-data": 0.0.0
+    "@imtbl/passport": 0.0.0
+    "@imtbl/sdk": "workspace:^"
+    "@testing-library/jest-dom": ^5.17.0
+    "@testing-library/react": ^13.4.0
+    "@testing-library/user-event": ^13.5.0
+    "@types/jest": ^27.5.2
+    "@types/node": ^16.18.39
+    "@types/react": ^18.2.17
+    "@types/react-dom": ^18.2.7
+    "@types/uuid": ^9.0.2
+    buffer: "npm:buffer@^6.0.3"
+    crypto: "npm:crypto-browserify@^3.12.0"
+    http: "npm:stream-http@^3.2.0"
+    https: "npm:https-browserify@^1.0.0"
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    react-flexbox-grid: ^2.1.2
+    react-router-dom: ^6.14.2
+    react-scripts: 5.0.1
+    stream: "npm:stream-browserify@^3.0.0"
+    typescript: ^4.9.5
+    util: "npm:util@^0.12.5"
+    web-vitals: ^2.1.4
+    zlib: "npm:browserify-zlib@^0.2.0"
+  languageName: unknown
+  linkType: soft
+
 "@imtbl/economy-playground@workspace:packages/economy/playground":
   version: 0.0.0-use.local
   resolution: "@imtbl/economy-playground@workspace:packages/economy/playground"
@@ -3625,7 +3682,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@imtbl/sdk@0.0.0, @imtbl/sdk@workspace:sdk":
+"@imtbl/sdk@0.0.0, @imtbl/sdk@workspace:^, @imtbl/sdk@workspace:sdk":
   version: 0.0.0-use.local
   resolution: "@imtbl/sdk@workspace:sdk"
   dependencies:
@@ -7898,7 +7955,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/jest-dom@npm:^5.16.5":
+"@testing-library/jest-dom@npm:^5.16.5, @testing-library/jest-dom@npm:^5.17.0":
   version: 5.17.0
   resolution: "@testing-library/jest-dom@npm:5.17.0"
   dependencies:
@@ -8378,6 +8435,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/jest@npm:^27.5.2":
+  version: 27.5.2
+  resolution: "@types/jest@npm:27.5.2"
+  dependencies:
+    jest-matcher-utils: ^27.0.0
+    pretty-format: ^27.0.0
+  checksum: 7e11c6826aa429ad990dc262e4e4b54aa36573287fddf15773e4137f07d11d3105f0dd9f1baff73252160a057df23f5529bb83b1bf83cd3f45f9460a5ca5c22e
+  languageName: node
+  linkType: hard
+
 "@types/js-levenshtein@npm:^1.1.1":
   version: 1.1.1
   resolution: "@types/js-levenshtein@npm:1.1.1"
@@ -8520,6 +8587,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^16.18.39":
+  version: 16.18.39
+  resolution: "@types/node@npm:16.18.39"
+  checksum: eac9b202b76013256cb517ca8d3e3f61df206edb1615ca8d8df4c80616e92879fe4d3f8570a11d60f4216a82724a3265d5888b24c6994c80b057a0423c9ff1d2
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^18.14.2":
   version: 18.16.19
   resolution: "@types/node@npm:18.16.19"
@@ -8601,7 +8675,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.0.11":
+"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.0.11, @types/react-dom@npm:^18.2.7":
   version: 18.2.7
   resolution: "@types/react-dom@npm:18.2.7"
   dependencies:
@@ -8627,6 +8701,17 @@ __metadata:
     "@types/scheduler": "*"
     csstype: ^3.0.2
   checksum: 36989f638201bfe2f4110b06c119180f6df9c0e13d7060481e82e7a745f81745a01ae543c478a25b61e0767cb52e82da2ad5b0dedacabf99339e523d06176705
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:^18.2.17":
+  version: 18.2.17
+  resolution: "@types/react@npm:18.2.17"
+  dependencies:
+    "@types/prop-types": "*"
+    "@types/scheduler": "*"
+    csstype: ^3.0.2
+  checksum: 150516b31bd98b635e4a56bcf2af007330b35cccb6e35e902f46a47f0e81e30c46cdacc095e91051bdf2f33e4846e7e62fd51b67e064dc7d15c00e15dfa449d5
   languageName: node
   linkType: hard
 
@@ -8798,6 +8883,13 @@ __metadata:
   version: 2.0.7
   resolution: "@types/unist@npm:2.0.7"
   checksum: b97a219554e83431f19a93ff113306bf0512909292815e8f32964e47d041c505af1aaa2a381c23e137c4c0b962fad58d4ce9c5c3256642921a466be43c1fc715
+  languageName: node
+  linkType: hard
+
+"@types/uuid@npm:^9.0.2":
+  version: 9.0.2
+  resolution: "@types/uuid@npm:9.0.2"
+  checksum: 1754bcf3444e1e3aeadd6e774fc328eb53bc956665e2e8fb6ec127aa8e1f43d9a224c3d22a9a6233dca8dd81a12dc7fed4d84b8876dd5ec82d40f574f7ff8b68
   languageName: node
   linkType: hard
 
@@ -11343,7 +11435,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserify-zlib@npm:^0.2.0":
+"browserify-zlib@npm:^0.2.0, zlib@npm:browserify-zlib@^0.2.0":
   version: 0.2.0
   resolution: "browserify-zlib@npm:0.2.0"
   dependencies:
@@ -11449,7 +11541,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"buffer@npm:^6.0.3":
+"buffer@npm:^6.0.3, buffer@npm:buffer@^6.0.3":
   version: 6.0.3
   resolution: "buffer@npm:6.0.3"
   dependencies:
@@ -12611,7 +12703,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-browserify@npm:^3.11.0, crypto-browserify@npm:^3.12.0":
+"crypto-browserify@npm:^3.11.0, crypto-browserify@npm:^3.12.0, crypto@npm:crypto-browserify@^3.12.0":
   version: 3.12.0
   resolution: "crypto-browserify@npm:3.12.0"
   dependencies:
@@ -15624,6 +15716,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"flexboxgrid2@npm:^7.2.0":
+  version: 7.2.1
+  resolution: "flexboxgrid2@npm:7.2.1"
+  dependencies:
+    normalize.css: ^7.0.0
+  checksum: 0fffff0d48ac17398d22d81e2005d852f8adbaed741cf0f416429baaad3964326d2a1945aa97a20572102130f597f76b04c7e2491c1d90daf49501b4e3707825
+  languageName: node
+  linkType: hard
+
 "flow-parser@npm:0.*":
   version: 0.212.0
   resolution: "flow-parser@npm:0.212.0"
@@ -17054,7 +17155,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"https-browserify@npm:^1.0.0":
+"http@npm:stream-http@^3.2.0, stream-http@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "stream-http@npm:3.2.0"
+  dependencies:
+    builtin-status-codes: ^3.0.0
+    inherits: ^2.0.4
+    readable-stream: ^3.6.0
+    xtend: ^4.0.2
+  checksum: c9b78453aeb0c84fcc59555518ac62bacab9fa98e323e7b7666e5f9f58af8f3155e34481078509b02929bd1268427f664d186604cdccee95abc446099b339f83
+  languageName: node
+  linkType: hard
+
+"https-browserify@npm:^1.0.0, https@npm:https-browserify@^1.0.0":
   version: 1.0.0
   resolution: "https-browserify@npm:1.0.0"
   checksum: 09b35353e42069fde2435760d13f8a3fb7dd9105e358270e2e225b8a94f811b461edd17cb57594e5f36ec1218f121c160ddceeec6e8be2d55e01dcbbbed8cbae
@@ -18590,7 +18703,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-matcher-utils@npm:^27.5.1":
+"jest-matcher-utils@npm:^27.0.0, jest-matcher-utils@npm:^27.5.1":
   version: 27.5.1
   resolution: "jest-matcher-utils@npm:27.5.1"
   dependencies:
@@ -21531,6 +21644,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"normalize.css@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "normalize.css@npm:7.0.0"
+  checksum: 8023436d5f6113fa0989c639addc3056c8c42c3074d00ed035e3b45ce6e25e0fc55171c3606efa1a77e144a96ee44fb4d705e0067d6051b7761dd5fe13fde481
+  languageName: node
+  linkType: hard
+
 "npm-run-path@npm:^2.0.0":
   version: 2.0.2
   resolution: "npm-run-path@npm:2.0.2"
@@ -23509,7 +23629,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pretty-format@npm:^27.0.2, pretty-format@npm:^27.5.1":
+"pretty-format@npm:^27.0.0, pretty-format@npm:^27.0.2, pretty-format@npm:^27.5.1":
   version: 27.5.1
   resolution: "pretty-format@npm:27.5.1"
   dependencies:
@@ -23661,7 +23781,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:^15.5.8, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -24133,6 +24253,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-flexbox-grid@npm:^2.1.2":
+  version: 2.1.2
+  resolution: "react-flexbox-grid@npm:2.1.2"
+  dependencies:
+    flexboxgrid2: ^7.2.0
+    prop-types: ^15.5.8
+  peerDependencies:
+    react: ^0.14.3 || ^15.5.4 || ^16.0.0
+  checksum: 0bd9fe8b8b5a220ddc86ea81e293d313fe4466fde9971e6f52e7486e7b4545e771464369974f0bb53d131141882612ed8512be95df3d9a1ff3a1c345aeb547be
+  languageName: node
+  linkType: hard
+
 "react-inspector@npm:^6.0.0":
   version: 6.0.2
   resolution: "react-inspector@npm:6.0.2"
@@ -24184,7 +24316,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:^6.11.0":
+"react-router-dom@npm:^6.11.0, react-router-dom@npm:^6.14.2":
   version: 6.14.2
   resolution: "react-router-dom@npm:6.14.2"
   dependencies:
@@ -26170,7 +26302,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stream-browserify@npm:^3.0.0":
+"stream-browserify@npm:^3.0.0, stream@npm:stream-browserify@^3.0.0":
   version: 3.0.0
   resolution: "stream-browserify@npm:3.0.0"
   dependencies:
@@ -26193,18 +26325,6 @@ __metadata:
   dependencies:
     duplexer: ~0.1.1
   checksum: 844b622cfe8b9de45a6007404f613b60aaf85200ab9862299066204242f89a7c8033b1c356c998aa6cfc630f6cd9eba119ec1c6dc1f93e245982be4a847aee7d
-  languageName: node
-  linkType: hard
-
-"stream-http@npm:^3.2.0":
-  version: 3.2.0
-  resolution: "stream-http@npm:3.2.0"
-  dependencies:
-    builtin-status-codes: ^3.0.0
-    inherits: ^2.0.4
-    readable-stream: ^3.6.0
-    xtend: ^4.0.2
-  checksum: c9b78453aeb0c84fcc59555518ac62bacab9fa98e323e7b7666e5f9f58af8f3155e34481078509b02929bd1268427f664d186604cdccee95abc446099b339f83
   languageName: node
   linkType: hard
 
@@ -28149,7 +28269,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"util@npm:^0.12.0, util@npm:^0.12.3, util@npm:^0.12.4":
+"util@npm:^0.12.0, util@npm:^0.12.3, util@npm:^0.12.4, util@npm:util@^0.12.5":
   version: 0.12.5
   resolution: "util@npm:0.12.5"
   dependencies:

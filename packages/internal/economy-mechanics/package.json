@@ -1,0 +1,12 @@
+{
+  "name": "economy-mechanics",
+  "packageManager": "yarn@3.5.0",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

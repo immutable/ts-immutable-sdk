@@ -1,0 +1,60 @@
+{
+  "name": "@imtbl/economy-mechanics-playground",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@biom3/design-tokens": "^0.2.2-beta",
+    "@biom3/react": "^0.8.1-beta",
+    "@imtbl/blockchain-data": "0.0.0",
+    "@imtbl/passport": "0.0.0",
+    "@imtbl/sdk": "workspace:^",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.39",
+    "@types/react": "^18.2.17",
+    "@types/react-dom": "^18.2.7",
+    "@types/uuid": "^9.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-flexbox-grid": "^2.1.2",
+    "react-router-dom": "^6.14.2",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4"
+  },
+  "devDependencies": {
+    "buffer": "npm:buffer@^6.0.3",
+    "crypto": "npm:crypto-browserify@^3.12.0",
+    "http": "npm:stream-http@^3.2.0",
+    "https": "npm:https-browserify@^1.0.0",
+    "stream": "npm:stream-browserify@^3.0.0",
+    "util": "npm:util@^0.12.5",
+    "zlib": "npm:browserify-zlib@^0.2.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
