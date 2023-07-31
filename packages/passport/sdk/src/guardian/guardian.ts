@@ -20,21 +20,21 @@ export type GuardianValidateParams = {
 
 type GuardianEVMValidationParams = {
   chainId: string,
-  nonce: number,
+  nonce: string,
   user: UserZkEvm,
   metaTransactions: MetaTransaction[],
 };
 
-export const convertBigNumberishToNumber = (value: ethers.BigNumberish): number => BigNumber.from(value).toNumber();
+export const convertBigNumberishToString = (value: ethers.BigNumberish): string => BigNumber.from(value).toString();
 
 const transformGuardianTransactions = (txs: MetaTransaction[]): guardian.MetaTransaction[] => {
   try {
     return txs.map((t) => ({
       delegateCall: t.delegateCall === true,
       revertOnError: t.revertOnError === true,
-      gasLimit: t.gasLimit ? convertBigNumberishToNumber(t.gasLimit).toString() : '0',
+      gasLimit: t.gasLimit ? convertBigNumberishToString(t.gasLimit) : '0',
       target: t.to ?? ethers.constants.AddressZero,
-      value: t.value ? convertBigNumberishToNumber(t.value).toString() : '0',
+      value: t.value ? convertBigNumberishToString(t.value) : '0',
       data: t.data ? t.data.toString() : '0x00',
     }));
   } catch (error) {

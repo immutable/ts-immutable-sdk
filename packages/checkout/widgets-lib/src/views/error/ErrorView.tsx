@@ -43,6 +43,7 @@ export function ErrorView({
       )}
       heroContent={<SatelliteHero />}
       floatHeader
+      testId="error-view"
     >
       <SimpleTextBody heading={errorText.heading}>
         {errorText.body[0]}
