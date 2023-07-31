@@ -71,9 +71,9 @@ describe('widget validators', () => {
       expect(result).toBeFalsy();
     });
 
-    it('should return false if address empty', () => {
+    it('should return true if address empty', () => {
       const result = isValidAddress('');
-      expect(result).toBeFalsy();
+      expect(result).toBeTruthy();
     });
 
     it('should return false if address is undefined', () => {

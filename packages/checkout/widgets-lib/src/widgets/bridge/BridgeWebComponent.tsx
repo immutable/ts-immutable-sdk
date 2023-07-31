@@ -17,8 +17,8 @@ export class ImmutableBridge extends ImmutableWebComponent {
 
   connectedCallback() {
     super.connectedCallback();
-    this.fromContractAddress = this.getAttribute('fromContractAddress')?.toLowerCase() as string ?? '';
-    this.amount = this.getAttribute('amount') as string ?? '';
+    this.fromContractAddress = this.getAttribute('fromContractAddress')?.toLowerCase() ?? '';
+    this.amount = this.getAttribute('amount') ?? '';
     this.walletProvider = this.getAttribute(
       'walletProvider',
     )?.toLowerCase() as WalletProviderName ?? WalletProviderName.METAMASK;

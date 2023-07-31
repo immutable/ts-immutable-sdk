@@ -20,6 +20,7 @@ export function isValidAmount(amount: string | undefined) {
 
 export function isValidAddress(address: string | undefined) {
   if (address === undefined) return false;
+  if (address === '') return true;
   if (address === NATIVE) return true;
   return isAddress(address);
 }
