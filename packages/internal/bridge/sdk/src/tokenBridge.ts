@@ -585,38 +585,75 @@ export class TokenBridge {
   }
 
   /**
-   * TODO: @rez add docs
+   * Waits for the withdrawal transaction to be confirmed in the root chain by continuously polling until the transaction is included in a checkpoint.
+   * This function is intended to be used after executing a withdrawal transaction.
+   *
+   * @param {WaitForWithdrawalRequest} req - The request object containing the transaction hash of the withdrawal transaction.
+   * @returns {Promise<WaitForWithdrawalResponse>} - A promise that resolves to an empty object once the withdrawal transaction has been confirmed in the root chain.
+   *
+   * @throws {BridgeError} - If an error occurs during the waiting process, a BridgeError will be thrown with a specific error type.
+   * Possible BridgeError types include:
+   * - PROVIDER_ERROR: An error occurred when interacting with the Ethereum provider, likely due to a network or connectivity issue.
+   *
+   * @example
+   * const waitForWithdrawalRequest = {
+   *   transactionHash: '0x123456...', // Transaction hash of the withdrawal transaction
+   * };
+   *
+   * bridgeSdk.waitForWithdrawal(waitForWithdrawalRequest)
+   *   .then(() => {
+   *     console.log('Withdrawal transaction has been confirmed in the root chain.');
+   *   })
+   *   .catch((error) => {
+   *     console.error('Error:', error.message);
+   *   });
    */
   public async waitForWithdrawal(
     req:WaitForWithdrawalRequest,
   ): Promise<WaitForWithdrawalResponse> {
+    // Ensure the configuration of chains is valid.
     this.validateChainConfiguration();
-    const transactionReceipt = await this.config.childProvider.getTransactionReceipt(req.transactionHash);
-    const block = await this.config.childProvider.getBlock(transactionReceipt.blockNumber);
-
-    const decodedExtraData = decodeExtraData(block.extraData);
-
-    const checkpointManager = new ethers.Contract(this.config.bridgeContracts.rootChainCheckpointManager, CHECKPOINT_MANAGER, this.config.rootProvider);
 
     // Helper function to pause execution for a specified interval
     const pause = (): Promise<void> => new Promise((resolve) => {
       setTimeout(resolve, this.config.pollInterval);
     });
 
-    // Recursive function to keep checking for the child deposit event
-    const waitForRootEpoch = async (): Promise<null> => {
-      const currentEpoch = await checkpointManager.currentEpoch();
-      // eslint-disable-next-line no-console
-      if (currentEpoch >= decodedExtraData.checkpoint.epochNumber) {
-        return null;
-      }
+    await withBridgeError<void>(async () => {
+      // Fetch the receipt of the withdrawal transaction
+      const transactionReceipt = await this.config.childProvider.getTransactionReceipt(req.transactionHash);
 
-      await pause();
-      return waitForRootEpoch();
-    };
+      // Fetch the block in which the withdrawal transaction was included
+      const block = await this.config.childProvider.getBlock(transactionReceipt.blockNumber);
 
-    await waitForRootEpoch();
+      // Decode the extra data field from the block header
+      const decodedExtraData = decodeExtraData(block.extraData);
 
+      // Instantiate the checkpoint manager contract
+      const checkpointManager = new ethers.Contract(this.config.bridgeContracts.rootChainCheckpointManager, CHECKPOINT_MANAGER, this.config.rootProvider);
+
+      // Recursive function to keep checking for the child deposit event
+      const waitForRootEpoch = async (): Promise<null> => {
+        // Fetch the current checkpoint epoch from the root chain
+        const currentEpoch = await checkpointManager.currentEpoch();
+
+        // If the current epoch is greater than or equal to the epoch number of the checkpoint in which the withdrawal transaction was included, the withdrawal has been confirmed in the root chain
+        if (currentEpoch >= decodedExtraData.checkpoint.epochNumber) {
+          return null;
+        }
+
+        // Pause execution for a specified interval before checking again
+        await pause();
+
+        // Recursive call
+        return waitForRootEpoch();
+      };
+
+      // Start waiting for the withdrawal transaction to be confirmed in the root chain
+      await waitForRootEpoch();
+    }, BridgeErrorType.PROVIDER_ERROR);
+
+    // Return an empty object once the withdrawal transaction has been confirmed in the root chain
     return {};
   }
 
