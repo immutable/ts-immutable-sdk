@@ -22,12 +22,12 @@ export abstract class ImmutableWebComponent extends HTMLElement {
     this.renderWidget();
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(name: string, oldValue, newValue: any) {
     if (name === 'widgetConfig') {
       this.widgetConfig = this.parseWidgetConfig(newValue);
       this.updateCheckoutConfig();
     } else {
-      this[name] = newValue;
+      this[name] = (newValue as string)?.toLowerCase();
     }
     this.renderWidget();
   }
@@ -55,4 +55,5 @@ export abstract class ImmutableWebComponent extends HTMLElement {
   }
 
   abstract renderWidget(): void;
+  abstract validateInputs(): void;
 }

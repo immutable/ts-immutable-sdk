@@ -9,17 +9,28 @@ import {
 import { sendWalletWidgetCloseEvent } from './WalletWidgetEvents';
 import { ImmutableWebComponent } from '../ImmutableWebComponent';
 import { ConnectTargetLayer, getL1ChainId, getL2ChainId } from '../../lib';
+import { isValidWalletProvider } from '../../lib/validations/widgetValidators';
 
 export class ImmutableWallet extends ImmutableWebComponent {
-  walletProvider?:WalletProviderName;
+  walletProvider = WalletProviderName.METAMASK;
 
   connectedCallback() {
     super.connectedCallback();
-    this.walletProvider = this.getAttribute('walletProvider') as WalletProviderName;
+    this.walletProvider = this.getAttribute('walletProvider')?.toLowerCase() as WalletProviderName
+    ?? WalletProviderName.METAMASK;
     this.renderWidget();
   }
 
+  validateInputs(): void {
+    if (!isValidWalletProvider(this.walletProvider)) {
+      // eslint-disable-next-line no-console
+      console.warn('[IMTBL]: invalid "walletProvider" widget input');
+      this.walletProvider = WalletProviderName.METAMASK;
+    }
+  }
+
   renderWidget() {
+    this.validateInputs();
     const connectLoaderParams: ConnectLoaderParams = {
       targetLayer: ConnectTargetLayer.LAYER2,
       walletProvider: this.walletProvider,
