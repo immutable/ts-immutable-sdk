@@ -389,17 +389,12 @@ export class TokenBridge {
   public async rootTokenToChildToken(req: RootTokenToChildTokenRequest): Promise<RootTokenToChildTokenResponse> {
     this.validateChainConfiguration();
     const nativeTokenKey = '0x0000000000000000000000000000000000000001';
-    let queryTokenAddress = req.rootToken;
-    if (req.rootToken === 'NATIVE') {
-      queryTokenAddress = nativeTokenKey;
-    }
+    const queryTokenAddress = (req.rootToken === 'NATIVE') ? nativeTokenKey : ethers.utils.getAddress(req.rootToken);
 
     const contract = new ethers.Contract(this.config.bridgeContracts.rootChainERC20Predicate, ROOT_ERC20_PREDICATE, this.config.rootProvider);
-    // ensure the rootTokenAddress is a valid address
-    const formattedAddress = ethers.utils.getAddress(queryTokenAddress);
 
     // Call the public mapping as a function, passing the rootTokenAddress
-    const childTokenAddress: string = await contract.rootTokenToChildToken(formattedAddress);
+    const childTokenAddress: string = await contract.rootTokenToChildToken(queryTokenAddress);
     return {
       childToken: childTokenAddress,
     };

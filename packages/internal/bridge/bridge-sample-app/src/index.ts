@@ -21,6 +21,7 @@ import {
   ExitRequest,
   ApproveWithdrawBridgeRequest,
   ApproveWithdrawBridgeResponse,
+  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
 } from '@imtbl/bridge-sdk';
 
 /**
@@ -85,7 +86,7 @@ async function depositAndWithdraw() {
     baseConfig: new ImmutableConfiguration({
       environment: Environment.SANDBOX,
     }),
-    bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+    bridgeInstance: ETH_SEPOLIA_TO_ZKEVM_DEVNET,
     rootProvider: rootChainProvider,
     childProvider: childChainProvider,
   });
@@ -171,12 +172,12 @@ async function depositAndWithdraw() {
 
   console.log(`Starting WITHDRAWAL`);
   console.log(`Approving Bridge`);
-  const withdrawalToken = await tokenBridge.rootTokenToChildToken(process.env.TOKEN_ADDRESS);
-  console.log(`Deposit token was ${process.env.TOKEN_ADDRESS}, withdrawal token is ${withdrawalToken}`);
+  const withdrawResponse = await tokenBridge.rootTokenToChildToken({ rootToken: process.env.TOKEN_ADDRESS});
+  console.log(`Deposit token was ${process.env.TOKEN_ADDRESS}, withdrawal token is ${withdrawResponse.childToken}`);
   // Approval
   const childApproveReq: ApproveWithdrawBridgeRequest = {
     depositorAddress: process.env.DEPOSITOR_ADDRESS,
-    token: withdrawalToken,
+    token: withdrawResponse.childToken,
     depositAmount,
   };
 
@@ -199,7 +200,7 @@ async function depositAndWithdraw() {
 
   const withdrawlReq: BridgeWithdrawRequest = {
     recipientAddress: process.env.DEPOSITOR_ADDRESS,
-    token: withdrawalToken,
+    token: withdrawResponse.childToken,
     withdrawAmount: depositAmount
   };
   

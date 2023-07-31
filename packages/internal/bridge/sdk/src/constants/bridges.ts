@@ -11,7 +11,7 @@ export const ETH_MAINNET_CHAIN_ID = '1';
 /**
  * @constant {string} ZKEVM_DEVNET_CHAIN_ID - The chain ID for the zkEVM devnet (EIP-155 compatible format).
  */
-export const ZKEVM_DEVNET_CHAIN_ID = '13423';
+export const ZKEVM_DEVNET_CHAIN_ID = '13433';
 /**
 /**
  * @constant {string} ZKEVM_TESTNET_CHAIN_ID - The chain ID for the zkEVM testnet (EIP-155 compatible format).
