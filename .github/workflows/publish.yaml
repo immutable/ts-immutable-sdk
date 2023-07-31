@@ -114,20 +114,20 @@ jobs:
         run: |
           echo "$(git push --tags)"
 
-      - name: Pre Release Step
-        if: contains(github.event.inputs.release_type, 'alpha')
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
-          access: public
-          package: ./sdk/package.json
-          tag: ${{ contains(github.event.inputs.release_type, 'alpha') && 'alpha' }}
-          dry-run: ${{ github.event.inputs.dry_run }}
+      # - name: Pre Release Step
+      #   if: contains(github.event.inputs.release_type, 'alpha')
+      #   uses: JS-DevTools/npm-publish@v1
+      #   with:
+      #     token: ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
+      #     access: public
+      #     package: ./sdk/package.json
+      #     tag: ${{ contains(github.event.inputs.release_type, 'alpha') && 'alpha' }}
+      #     dry-run: ${{ github.event.inputs.dry_run }}
 
       - name: Authenticate NPM
-        if: contains(github.event.inputs.release_type, 'release')
+      #  if: contains(github.event.inputs.release_type, 'release')
         run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.PLATFORM_SA_NPM_TOKEN }}
 
       - name: Release
-        if: contains(github.event.inputs.release_type, 'release')
-        run: yarn release --ci --no-increment --no-npm --no-git.push --no-git.commit $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
+      #  if: contains(github.event.inputs.release_type, 'release')
+        run: yarn release --ci --no-increment $( ${{ github.event.inputs.dry_run }} && echo "--dry-run" || echo "") --github.tokenRef=${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}

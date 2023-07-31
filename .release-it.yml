@@ -4,6 +4,7 @@ git:
 npm:
   publish: true
   publishPath: "sdk"
+  ignoreVersion: true
 hooks:
   after:release:
     - 'echo Successfully released ${name} v${version} to ${repo.repository}.'
