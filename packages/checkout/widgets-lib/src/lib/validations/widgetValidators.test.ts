@@ -12,6 +12,11 @@ describe('widget validators', () => {
       expect(result).toBeFalsy();
     });
 
+    it('should return false for undefined', () => {
+      const result = isValidWalletProvider(undefined);
+      expect(result).toBeFalsy();
+    });
+
     it('should return false for "metramask" ', () => {
       const result = isValidWalletProvider('metramask');
       expect(result).toBeFalsy();
@@ -25,7 +30,7 @@ describe('widget validators', () => {
 
   describe('Amount Validator', () => {
     const validCases = ['1', '1.0', '1.234567', '100000000', '']; // empty amount should pass as valid
-    const invalidCases = ['acdas', '0.1234s', '1.2345678'];
+    const invalidCases = ['acdas', '0.1234s', '1.2345678', undefined];
 
     validCases.forEach((testCase) => {
       it(`should validate amount as a float with 6 decimal places for ${testCase}`, () => {
@@ -68,6 +73,11 @@ describe('widget validators', () => {
 
     it('should return false if address empty', () => {
       const result = isValidAddress('');
+      expect(result).toBeFalsy();
+    });
+
+    it('should return false if address is undefined', () => {
+      const result = isValidAddress(undefined);
       expect(result).toBeFalsy();
     });
   });
