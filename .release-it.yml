@@ -11,7 +11,7 @@ hooks:
 plugins:
   '@release-it-plugins/workspaces':
     workspaces: ['sdk']
-  './.github/scripts/keep-a-changelog.mjs':
+  '@release-it/keep-a-changelog':
     filename: 'CHANGELOG.md'
     addUnreleased: true
     strictLatest: false	
