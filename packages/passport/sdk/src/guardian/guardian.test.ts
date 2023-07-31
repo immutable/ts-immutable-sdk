@@ -103,7 +103,7 @@ describe('guardian', () => {
       await expect(
         guardianClient.validateEVMTransaction({
           chainId: 'epi123',
-          nonce: 5,
+          nonce: '5',
           user: mockUserZkEvm,
           metaTransactions: [
             {

@@ -37,9 +37,9 @@ export interface ZkEvmTransactionData {
     'metaTransactions': Array<MetaTransaction>;
     /**
      * The nonce value
-     * @type {number}
+     * @type {string}
      * @memberof ZkEvmTransactionData
      */
-    'nonce': number;
+    'nonce': string;
 }
 
