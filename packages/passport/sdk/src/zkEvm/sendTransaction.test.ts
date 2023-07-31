@@ -36,7 +36,7 @@ describe('sendTransaction', () => {
     loading: jest.fn(),
   };
 
-  const nonce = 5;
+  const nonce = '5';
   const config: Partial<PassportConfiguration> = {
     zkEvmChainId: 'eip155:13392',
   };
