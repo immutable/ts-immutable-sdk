@@ -166,7 +166,7 @@ export interface RootTokenToChildTokenResponse {
  * @TODO: Rez
  */
 export interface ChildTokenToRootTokenRequest {
-  childToken: FungibleToken;
+  childToken: Address;
 }
 
 /**

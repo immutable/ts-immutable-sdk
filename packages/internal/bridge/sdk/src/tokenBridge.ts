@@ -32,7 +32,7 @@ import { getBlockNumberClosestToTimestamp } from 'lib/getBlockCloseToTimestamp';
 import { CHILD_ERC20_PREDICATE } from 'contracts/ABIs/ChildERC20Predicate';
 import { CHECKPOINT_MANAGER } from 'contracts/ABIs/CheckpointManager';
 import { decodeExtraData } from 'lib/decodeExtraData';
-import { L2_STATE_SENDER_ADDRESS } from 'constants/bridges';
+import { L2_STATE_SENDER_ADDRESS, NATIVE_TOKEN_BRIDGE_KEY } from 'constants/bridges';
 import { L2_STATE_SENDER } from 'contracts/ABIs/L2StateSender';
 import { EXIT_HELPER } from 'contracts/ABIs/ExitHelper';
 import { CHILD_ERC20 } from 'contracts/ABIs/ChildERC20';
@@ -167,7 +167,7 @@ export class TokenBridge {
       );
     }
 
-    const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(async () => new ethers.Contract(req.token, ERC20, this.config.rootProvider), BridgeErrorType.INTERNAL_ERROR);
+    const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(async () => new ethers.Contract(req.token, ERC20, this.config.rootProvider), BridgeErrorType.PROVIDER_ERROR);
 
     // Get the current approved allowance of the RootERC20Predicate
     const rootERC20PredicateAllowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => erc20Contract.allowance(
@@ -367,7 +367,7 @@ export class TokenBridge {
     const stateSyncID = await withBridgeError<number>(async () => this.getRootStateSyncID(rootTxReceipt), BridgeErrorType.PROVIDER_ERROR);
 
     // Get the block for the timestamp
-    const rootBlock: ethers.providers.Block = await this.config.rootProvider.getBlock(rootTxReceipt.blockNumber);
+    const rootBlock: ethers.providers.Block = await withBridgeError<ethers.providers.Block>(async () => await this.config.rootProvider.getBlock(rootTxReceipt.blockNumber), BridgeErrorType.PROVIDER_ERROR, `failed to query block ${rootTxReceipt.blockNumber} on rootchain`);
 
     // Get the minimum block on childchain which corresponds with the timestamp on rootchain
     const minBlockRange: number = await withBridgeError<number>(async () => getBlockNumberClosestToTimestamp(this.config.childProvider, rootBlock.timestamp, this.config.blockTime, this.config.clockInaccuracy), BridgeErrorType.PROVIDER_ERROR);
@@ -384,31 +384,106 @@ export class TokenBridge {
   }
 
   /**
-   * TODO: @rez add docs and cleanup
-   */
+ * Retrieves the corresponding child token address for a given root token address.
+ * This function is used to map a root token to its child token in the context of a bridging system between chains.
+ * If the token is native, a special key is used to represent it.
+ *
+ * @param {RootTokenToChildTokenRequest} req - The request object containing the root token address or the string 'NATIVE'.
+ * @returns {Promise<RootTokenToChildTokenResponse>} - A promise that resolves to an object containing the child token address.
+ * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
+ *
+ * Possible BridgeError types include:
+ * - INVALID_ADDRESS: If the Ethereum address provided in the request is invalid.
+ * - PROVIDER_ERROR: If there's an error in querying the rootTokenToChildToken mapping.
+ * - INTERNAL_ERROR: An unexpected error occurred during the execution.
+ *
+ * @example
+ * const request = {
+ *   rootToken: '0x123456...', // Root token address or 'NATIVE'
+ * };
+ *
+ * bridgeSdk.rootTokenToChildToken(request)
+ *   .then((response) => {
+ *     console.log(response.childToken); // Child token address
+ *   })
+ *   .catch((error) => {
+ *     console.error('Error:', error.message);
+ *   });
+ */
   public async rootTokenToChildToken(req: RootTokenToChildTokenRequest): Promise<RootTokenToChildTokenResponse> {
+  // Validate the chain configuration to ensure proper setup
     this.validateChainConfiguration();
-    const nativeTokenKey = '0x0000000000000000000000000000000000000001';
-    const queryTokenAddress = (req.rootToken === 'NATIVE') ? nativeTokenKey : ethers.utils.getAddress(req.rootToken);
 
-    const contract = new ethers.Contract(this.config.bridgeContracts.rootChainERC20Predicate, ROOT_ERC20_PREDICATE, this.config.rootProvider);
+    // If the root token is native, use the native token key; otherwise, use the provided root token address
+    const reqTokenAddress = (req.rootToken === 'NATIVE') ? NATIVE_TOKEN_BRIDGE_KEY : req.rootToken;
 
-    // Call the public mapping as a function, passing the rootTokenAddress
-    const childTokenAddress: string = await contract.rootTokenToChildToken(queryTokenAddress);
+    // Validate the request token address
+    if (!ethers.utils.isAddress(reqTokenAddress)) {
+      throw new BridgeError(
+        `recipient address ${reqTokenAddress} is not a valid address`,
+        BridgeErrorType.INVALID_ADDRESS,
+      );
+    }
+
+    // Create an instance of the root ERC20 predicate contract
+    const childTokenAddress: string = await withBridgeError<string>(
+      async () => {
+        const rootERC20Predicate: ethers.Contract = new ethers.Contract(this.config.bridgeContracts.rootChainERC20Predicate, ROOT_ERC20_PREDICATE, this.config.rootProvider);
+        return await rootERC20Predicate.rootTokenToChildToken(reqTokenAddress);
+      },
+      BridgeErrorType.PROVIDER_ERROR,
+      'failed to query rootTokenToChildToken mapping',
+    );
+
+    // Return the child token address
     return {
       childToken: childTokenAddress,
     };
   }
 
   /**
-   * TODO: @rez implement
-   */
+ * Retrieves the corresponding root token address for a given child token address.
+ * This function is used to map a child token back to its root token in the context of a bridging system between chains.
+ *
+ * If the root token address matches the address designated for the native token, the method will return 'NATIVE'.
+ *
+ * @param {ChildTokenToRootTokenRequest} req - The request object containing the child token address.
+ * @returns {Promise<ChildTokenToRootTokenResponse>} - A promise that resolves to an object containing the root token address.
+ * @throws {BridgeError} - If an error occurs during the query, a BridgeError will be thrown with a specific error type.
+ *
+ * Possible BridgeError types include:
+ * - PROVIDER_ERROR: If there's an error in querying the root token from the child token contract.
+ *
+ * @example
+ * const request = {
+ *   childToken: '0x123456...', // Child token address
+ * };
+ *
+ * bridgeSdk.childTokenToRootToken(request)
+ *   .then((response) => {
+ *     console.log(response.rootToken); // Outputs: 'NATIVE' or Root token address
+ *   })
+ *   .catch((error) => {
+ *     console.error('Error:', error.message);
+ *   });
+ */
   public async childTokenToRootToken(req: ChildTokenToRootTokenRequest): Promise<ChildTokenToRootTokenResponse> {
+  // Validate the chain configuration to ensure proper setup
     this.validateChainConfiguration();
-    const contract = new ethers.Contract(req.childToken, CHILD_ERC20, this.config.childProvider);
-    const rootToken: string = await contract.rootToken();
+
+    // Create an instance of the child token contract using the given child token address
+    const childToken: ethers.Contract = new ethers.Contract(req.childToken, CHILD_ERC20, this.config.childProvider);
+
+    // Query the corresponding root token address using the child token contract
+    const rootToken = await withBridgeError<string>(
+      async () => await childToken.rootToken(),
+      BridgeErrorType.PROVIDER_ERROR,
+      'failed to query the root token from the child token contract',
+    );
+
+    // Check if the rootToken address is the designated native token address. If it is, return 'NATIVE'. Else, return the root token address.
     return {
-      rootToken,
+      rootToken: (rootToken === NATIVE_TOKEN_BRIDGE_KEY) ? 'NATIVE' : rootToken,
     };
   }
 
@@ -625,7 +700,8 @@ export class TokenBridge {
   // This is to prevent the SDK from being used on the wrong chain, especially after a chain reset.
   private async validateChainConfiguration(): Promise<void> {
     const errMessage = 'Please upgrade to the latest version of the Bridge SDK or provide valid configuration';
-    const rootNetwork = await this.config.rootProvider.getNetwork();
+
+    const rootNetwork = await withBridgeError<ethers.providers.Network>(async () => this.config.rootProvider.getNetwork(), BridgeErrorType.PROVIDER_ERROR);
     if (rootNetwork.chainId.toString() !== this.config.bridgeInstance.rootChainID) {
       throw new BridgeError(`Rootchain provider chainID ${rootNetwork.chainId} does not match expected chainID ${this.config.bridgeInstance.rootChainID}. ${errMessage}`, BridgeErrorType.UNSUPPORTED_ERROR);
     }
