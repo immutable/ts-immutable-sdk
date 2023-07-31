@@ -136,35 +136,15 @@ export class TokenBridge {
   public async getUnsignedApproveDepositBridgeTx(
     req: ApproveDepositBridgeRequest,
   ): Promise<ApproveDepositBridgeResponse> {
-    if (!ethers.utils.isAddress(req.depositorAddress)) {
-      this.validateChainConfiguration();
-      throw new BridgeError(
-        `depositor address ${req.depositorAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
+    this.validateChainConfiguration();
 
-    // The deposit amount cannot be <= 0
-    if (req.depositAmount.isNegative() || req.depositAmount.isZero()) {
-      throw new BridgeError(
-        `deposit amount ${req.depositAmount.toString()} is invalid`,
-        BridgeErrorType.INVALID_AMOUNT,
-      );
-    }
+    TokenBridge.validateDepositArgs(req.depositorAddress, req.depositAmount, req.token);
 
     // If the token is NATIVE, no approval is required
     if (req.token === 'NATIVE') {
       return {
         unsignedTx: null,
       };
-    }
-
-    // The token should always be ERC20 by this point, so check if it is a valid address
-    if (!ethers.utils.isAddress(req.token)) {
-      throw new BridgeError(
-        `token address ${req.token} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
     }
 
     const erc20Contract: ethers.Contract = await withBridgeError<ethers.Contract>(async () => new ethers.Contract(req.token, ERC20, this.config.rootProvider), BridgeErrorType.PROVIDER_ERROR);
@@ -247,34 +227,8 @@ export class TokenBridge {
     req: BridgeDepositRequest,
   ): Promise<BridgeDepositResponse> {
     this.validateChainConfiguration();
-    if (!ethers.utils.isAddress(req.depositorAddress)) {
-      throw new BridgeError(
-        `depositor address ${req.depositorAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
 
-    if (!ethers.utils.isAddress(req.recipientAddress)) {
-      throw new BridgeError(
-        `recipient address ${req.recipientAddress} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
-
-    // If the token is ERC20, the address must be valid
-    if (req.token !== 'NATIVE' && !ethers.utils.isAddress(req.token)) {
-      throw new BridgeError(
-        `token address ${req.token} is not a valid address`,
-        BridgeErrorType.INVALID_ADDRESS,
-      );
-    }
-    // The deposit amount cannot be <= 0
-    if (req.depositAmount.isNegative() || req.depositAmount.isZero()) {
-      throw new BridgeError(
-        `deposit amount ${req.depositAmount.toString()} is invalid`,
-        BridgeErrorType.INVALID_AMOUNT,
-      );
-    }
+    TokenBridge.validateDepositArgs(req.recipientAddress, req.depositAmount, req.token);
 
     const rootERC20PredicateContract = await withBridgeError<ethers.Contract>(
       async () => {
@@ -288,7 +242,6 @@ export class TokenBridge {
     );
 
     // Convert the addresses to correct format addresses (e.g. prepend 0x if not already)
-    const depositor = ethers.utils.getAddress(req.depositorAddress);
     const receipient = ethers.utils.getAddress(req.recipientAddress);
 
     // Handle return if it is a native token
@@ -304,7 +257,6 @@ export class TokenBridge {
           data,
           to: this.config.bridgeContracts.rootChainERC20Predicate,
           value: req.depositAmount,
-          from: depositor,
         },
       };
     }
@@ -323,7 +275,6 @@ export class TokenBridge {
         data,
         to: this.config.bridgeContracts.rootChainERC20Predicate,
         value: 0,
-        from: depositor,
       },
     };
   }
@@ -453,6 +404,7 @@ export class TokenBridge {
  *
  * Possible BridgeError types include:
  * - PROVIDER_ERROR: If there's an error in querying the root token from the child token contract.
+ * - INVALID_TOKEN: If the token being withdrawed is not a valid bridgeable token
  *
  * @example
  * const request = {
@@ -471,12 +423,13 @@ export class TokenBridge {
   // Validate the chain configuration to ensure proper setup
     this.validateChainConfiguration();
 
-    // Create an instance of the child token contract using the given child token address
-    const childToken: ethers.Contract = new ethers.Contract(req.childToken, CHILD_ERC20, this.config.childProvider);
-
     // Query the corresponding root token address using the child token contract
     const rootToken = await withBridgeError<string>(
-      async () => await childToken.rootToken(),
+      async () => {
+        // Create an instance of the child token contract using the given child token address
+        const childToken: ethers.Contract = new ethers.Contract(req.childToken, CHILD_ERC20, this.config.childProvider);
+        return await childToken.rootToken();
+      },
       BridgeErrorType.PROVIDER_ERROR,
       'failed to query the root token from the child token contract',
     );
@@ -488,36 +441,75 @@ export class TokenBridge {
   }
 
   /**
-   * TODO: @rez add docs
+   * Generates an unsigned approval transaction to allow the bridge to withdraw a specific amount of tokens from a user's address.
+   * This must be called before a user can sign and submit a withdrawal request to the bridge.
+   *
+   * @param {ApproveWithdrawBridgeRequest} req - The approval request object containing the necessary data for approving token withdrawal.
+   * @returns {Promise<ApproveWithdrawBridgeResponse>} - A promise that resolves to an object containing the unsigned transaction data.
+   *
+   * @throws {BridgeError} - If an error occurs during the generation of the unsigned transaction, a BridgeError will be thrown with a specific error type.
+   * Possible BridgeError types include:
+   * - INVALID_ADDRESS: The Ethereum address provided in the request is invalid. This could be the user's address or the token's address.
+   * - INVALID_AMOUNT: The withdrawal amount provided in the request is invalid (less than or equal to 0).
+   * - PROVIDER_ERROR: An error occurred when interacting with the Ethereum provider, likely due to a network or connectivity issue.
+   * - INTERNAL_ERROR: An unexpected error occurred during the execution, likely due to the bridge SDK implementation.
+   *
+   * @example
+   * const approveWithdrawalRequest = {
+   *   token: '0x123456...', // ERC20 token address
+   *   withdrawerAddress: '0xabcdef...', // User's wallet address
+   *   withdrawAmount: ethers.utils.parseUnits('100', 18), // Withdraw amount in wei
+   * };
+   *
+   * bridgeSdk.getUnsignedApproveWithdrawBridgeTx(approveWithdrawalRequest)
+   *   .then((approvalResponse) => {
+   *     console.log(approvalResponse.unsignedTx);
+   *   })
+   *   .catch((error) => {
+   *     console.error('Error:', error.message);
+   *   });
    */
   public async getUnsignedApproveWithdrawBridgeTx(
     req: ApproveWithdrawBridgeRequest,
   ): Promise<ApproveWithdrawBridgeResponse> {
+    // Ensure the configuration of chains is valid.
     this.validateChainConfiguration();
-    // TODO: @rez check user balance and check token is mapped
 
-    const erc20Contract = await withBridgeError<ethers.Contract>(
-      async () => {
-        const contract = new ethers.Contract(
-          req.token,
-          ERC20,
-        );
-        return contract;
-      },
-      BridgeErrorType.INTERNAL_ERROR,
-    );
-      // Encode the approve function call data for the ERC20 contract
-    const data: string = await withBridgeError<string>(async () => erc20Contract.interface.encodeFunctionData('approve', [
+    TokenBridge.validateWithdrawArgs(req.withdrawerAddress, req.withdrawAmount, req.token);
+
+    // Create a contract instance for interacting with the token contract
+    const childERC20: ethers.Contract = await withBridgeError<ethers.Contract>(async () => new ethers.Contract(req.token, CHILD_ERC20, this.config.childProvider), BridgeErrorType.PROVIDER_ERROR);
+
+    // Get the current approved allowance of the ChildERC20Predicate
+    const childERC20PredicateAllowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => childERC20.allowance(
+      req.withdrawerAddress,
       this.config.bridgeContracts.childChainERC20Predicate,
-      req.depositAmount,
+    ), BridgeErrorType.PROVIDER_ERROR);
+
+    // If the allowance is greater than or equal to the withdraw amount, no approval is required
+    if (childERC20PredicateAllowance.gte(req.withdrawAmount)) {
+      return {
+        unsignedTx: null,
+      };
+    }
+
+    // Calculate the amount of tokens that need to be approved for withdrawal
+    const approvalAmountRequired = req.withdrawAmount.sub(
+      childERC20PredicateAllowance,
+    );
+
+    // Encode the approve function call data for the ERC20 contract
+    const data: string = await withBridgeError<string>(async () => childERC20.interface.encodeFunctionData('approve', [
+      this.config.bridgeContracts.childChainERC20Predicate,
+      approvalAmountRequired,
     ]), BridgeErrorType.INTERNAL_ERROR);
 
-    // Create the unsigned transaction for the approval
+    // Construct the unsigned transaction for the approval
     const unsignedTx: ethers.providers.TransactionRequest = {
       data,
       to: req.token,
       value: 0,
-      from: req.depositorAddress,
+      from: req.withdrawerAddress,
     };
 
     return {
@@ -526,14 +518,44 @@ export class TokenBridge {
   }
 
   /**
-   * TODO: @rez add docs
+   * Generates an unsigned transaction that a user can use to initiate a token withdrawal from the bridge.
+   * The user must sign and submit this transaction to execute the withdrawal.
+   *
+   * @param {BridgeWithdrawRequest} req - The withdrawal request object containing the necessary data for withdrawing tokens.
+   * @returns {Promise<BridgeWithdrawResponse>} - A promise that resolves to an object containing the unsigned transaction data.
+   *
+   * @throws {BridgeError} - If an error occurs during the generation of the unsigned transaction, a BridgeError will be thrown with a specific error type.
+   * Possible BridgeError types include:
+   * - INVALID_ADDRESS: The Ethereum address provided in the request is invalid. This could be the user's address or the token's address.
+   * - INVALID_AMOUNT: The withdrawal amount provided in the request is invalid (less than or equal to 0).
+   * - PROVIDER_ERROR: An error occurred when interacting with the Ethereum provider, likely due to a network or connectivity issue.
+   * - INTERNAL_ERROR: An unexpected error occurred during the execution, likely due to the bridge SDK implementation.
+   *
+   * @example
+   * const withdrawRequest = {
+   *   token: '0x123456...', // ERC20 token address
+   *   recipientAddress: '0xabcdef...', // Address to receive the withdrawn tokens
+   *   withdrawAmount: ethers.utils.parseUnits('100', 18), // Withdraw amount in wei
+   * };
+   *
+   * bridgeSdk.getUnsignedWithdrawTx(withdrawRequest)
+   *   .then((withdrawalResponse) => {
+   *     console.log(withdrawalResponse.unsignedTx);
+   *   })
+   *   .catch((error) => {
+   *     console.error('Error:', error.message);
+   *   });
    */
   public async getUnsignedWithdrawTx(
     req: BridgeWithdrawRequest,
   ): Promise<BridgeWithdrawResponse> {
+    // Ensure the configuration of chains is valid.
     this.validateChainConfiguration();
-    // TODO: @rez check user balance and check token is mapped
 
+    // Validate the recipient address, withdrawal amount, and token.
+    TokenBridge.validateWithdrawArgs(req.recipientAddress, req.withdrawAmount, req.token);
+
+    // Create a contract instance for interacting with the ChildERC20Predicate
     const childERC20PredicateContract = await withBridgeError<ethers.Contract>(
       async () => {
         const contract = new ethers.Contract(
@@ -545,13 +567,14 @@ export class TokenBridge {
       BridgeErrorType.INTERNAL_ERROR,
     );
 
-    // Encode the approve function call data for the ERC20 contract
+    // Encode the withdrawTo function call data for the ERC20 contract
     const data: string = await withBridgeError<string>(async () => childERC20PredicateContract.interface.encodeFunctionData('withdrawTo', [
       req.token,
       req.recipientAddress,
       req.withdrawAmount,
     ]), BridgeErrorType.INTERNAL_ERROR);
 
+    // Construct the unsigned transaction for the withdrawal
     return {
       unsignedTx: {
         data,
@@ -694,6 +717,57 @@ export class TokenBridge {
     // Return the state sync ID as a number
     const stateSyncID = parseInt(stateSyncEvent.args.id, 10);
     return stateSyncID;
+  }
+
+  private static validateDepositArgs(depositorOrRecipientAddress: string, depositAmount: ethers.BigNumber, token: string) {
+    if (!ethers.utils.isAddress(depositorOrRecipientAddress)) {
+      throw new BridgeError(
+        `depositor address ${depositorOrRecipientAddress} is not a valid address`,
+        BridgeErrorType.INVALID_ADDRESS,
+      );
+    }
+
+    // The deposit amount cannot be <= 0
+    if (depositAmount.isNegative() || depositAmount.isZero()) {
+      throw new BridgeError(
+        `deposit amount ${depositAmount.toString()} is invalid`,
+        BridgeErrorType.INVALID_AMOUNT,
+      );
+    }
+
+    // If the token is not native, it must be a valid address
+    if (token !== 'NATIVE' && !ethers.utils.isAddress(token)) {
+      throw new BridgeError(
+        `token address ${token} is not a valid address`,
+        BridgeErrorType.INVALID_ADDRESS,
+      );
+    }
+  }
+
+  private static validateWithdrawArgs(withdrawerOrRecipientAddress: string, withdrawAmount: ethers.BigNumber, token: string) {
+    // Validate the withdrawer address
+    if (!ethers.utils.isAddress(withdrawerOrRecipientAddress)) {
+      throw new BridgeError(
+        `withdrawer address ${withdrawerOrRecipientAddress} is not a valid address`,
+        BridgeErrorType.INVALID_ADDRESS,
+      );
+    }
+
+    // Validate the withdrawal amount. It cannot be zero or negative.
+    if (withdrawAmount.isNegative() || withdrawAmount.isZero()) {
+      throw new BridgeError(
+        `withdraw amount ${withdrawAmount.toString()} is invalid`,
+        BridgeErrorType.INVALID_AMOUNT,
+      );
+    }
+
+    // Check if the ERC20 Token is a valid address
+    if (!ethers.utils.isAddress(token)) {
+      throw new BridgeError(
+        `token address ${token} is not a valid address`,
+        BridgeErrorType.INVALID_ADDRESS,
+      );
+    }
   }
 
   // Query the rootchain and childchain providers to ensure the chainID is as expected by the SDK.

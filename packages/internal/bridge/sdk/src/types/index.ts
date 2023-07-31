@@ -117,7 +117,6 @@ export interface ApproveDepositBridgeResponse {
  * @property {ethers.BigNumber} depositAmount - The amount to be deposited.
  */
 export interface BridgeDepositRequest {
-  depositorAddress: Address;
   recipientAddress: Address;
   token: FungibleToken;
   depositAmount: ethers.BigNumber;
@@ -180,9 +179,9 @@ export interface ChildTokenToRootTokenResponse {
  * TODO: @Rez docs
  */
 export interface ApproveWithdrawBridgeRequest {
-  depositorAddress: Address;
+  withdrawerAddress: Address;
   token: Address;
-  depositAmount: ethers.BigNumber;
+  withdrawAmount: ethers.BigNumber;
 }
 
 /**
