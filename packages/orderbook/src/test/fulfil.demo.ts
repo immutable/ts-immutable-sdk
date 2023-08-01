@@ -1,6 +1,6 @@
-import { Environment } from '@imtbl/config';
-import { Wallet } from 'ethers';
 import { log } from 'console';
+import { Environment } from '@imtbl/config';
+import { providers, Wallet } from 'ethers';
 import { OrderStatus } from '../openapi/sdk/index';
 import { Orderbook } from '../orderbook';
 import {
@@ -13,6 +13,7 @@ import {
   TestToken,
   waitForOrderToBeOfStatus,
 } from './helpers';
+import { DEVNET_CHAIN_NAME } from '../config';
 
 async function deployAndMintNftContract(wallet: Wallet): Promise<TestToken> {
   const { contract } = await deployTestToken(wallet);
@@ -52,7 +53,13 @@ describe('', () => {
       overrides: {
         // Replace overrides with devnet values if needed
         // values can be found here https://immutable.atlassian.net/wiki/spaces/TRAD/pages/2192573143/zkEVM+orderbook+deployment+addresses
-        provider,
+        seaportContractAddress: '0x0747471dfF0b5715ffA254bbc23d5301E33B58FC',
+        zoneContractAddress: '0xDc729293792dBCf118e1FC4a1731C12A18Bf38ec',
+        apiEndpoint: 'https://order-book-mr.dev.imtbl.com',
+        chainName: DEVNET_CHAIN_NAME,
+        provider: new providers.JsonRpcProvider(
+          'https://zkevm-rpc.dev.x.immutable.com',
+        ),
       },
     });
 
