@@ -173,29 +173,6 @@ async function depositAndWithdraw() {
   console.log(`Approving Bridge`);
   const withdrawResponse = await tokenBridge.rootTokenToChildToken({ rootToken: process.env.TOKEN_ADDRESS});
   console.log(`Deposit token was ${process.env.TOKEN_ADDRESS}, withdrawal token is ${withdrawResponse.childToken}`);
-  // Approval
-  const childApproveReq: ApproveWithdrawBridgeRequest = {
-    withdrawerAddress: process.env.DEPOSITOR_ADDRESS,
-    token: withdrawResponse.childToken,
-    withdrawAmount: depositAmount,
-  };
-
-  // Get the unsigned approval transaction for the deposit
-  const childApproveResp: ApproveWithdrawBridgeResponse = await tokenBridge.getUnsignedApproveWithdrawBridgeTx(childApproveReq);
-
-  // If approval is required, sign and send the approval transaction
-  if (childApproveResp.unsignedTx) {
-    console.log('Sending Approve Tx');
-    const txResponseApprove = await checkoutChildChain.sendTransaction(
-      childApproveResp.unsignedTx,
-    );
-    const txApprovalReceipt = await txResponseApprove.wait();
-    console.log(
-      `Approval Tx Completed with hash: ${txApprovalReceipt.transactionHash}`,
-    );
-  } else {
-    console.log('Approval not required');
-  }
 
   const withdrawlReq: BridgeWithdrawRequest = {
     recipientAddress: process.env.DEPOSITOR_ADDRESS,
