@@ -7,7 +7,6 @@ import {
 } from 'errors';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ethers } from 'ethers';
-import { Environment } from '@imtbl/config';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
@@ -168,9 +167,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       const secondaryFees: SecondaryFee[] = [
         { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS },
       ];
-      const exchange = new Exchange(
-        { baseConfig: { environment: Environment.SANDBOX }, chainId: 13372, secondaryFees },
-      );
+      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
 
       const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
         params.fromAddress,
