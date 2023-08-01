@@ -17,6 +17,7 @@ export type RoutingContracts = {
   factoryAddress: string;
   quoterAddress: string;
   peripheryRouterAddress: string;
+  secondaryFeeAddress: string;
 };
 
 export type QuoteTradeInfo = {
