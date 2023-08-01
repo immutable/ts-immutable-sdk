@@ -6,7 +6,11 @@ import MagicAdapter from './magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
-  DeviceConnectResponse, DeviceTokenResponse, Networks, PassportModuleConfiguration, UserProfile,
+  DeviceConnectResponse,
+  DeviceTokenResponse,
+  Networks,
+  PassportModuleConfiguration,
+  UserProfile,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
