@@ -1,6 +1,6 @@
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { ChainNotSupportedError, InvalidConfigurationError } from 'errors';
-import * as test from 'test';
+import * as test from 'test/utils';
 import { ExchangeModuleConfiguration, ExchangeOverrides, TokenInfo } from '../types';
 import { ExchangeConfiguration, ExchangeContracts } from './index';
 import { IMMUTABLE_TESTNET_CHAIN_ID } from '../constants/chains';

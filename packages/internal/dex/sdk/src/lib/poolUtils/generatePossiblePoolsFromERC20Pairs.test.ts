@@ -7,7 +7,7 @@ import {
   USDC_TEST_TOKEN,
   WETH_TEST_TOKEN,
   uniqBy,
-} from '../../test';
+} from '../../test/utils';
 
 describe('generatePoolsFromTokenPairs', () => {
   describe('when given one TokenPair and one CommonRoutingTokens', () => {

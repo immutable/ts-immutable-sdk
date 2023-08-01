@@ -10,7 +10,7 @@ import {
   TEST_DEX_CONFIGURATION,
   TEST_GAS_PRICE,
   decodeMulticallExactInputOutputSingleWithoutFees,
-} from './test';
+} from './test/utils';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');

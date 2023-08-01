@@ -24,7 +24,7 @@ import {
   decodeMulticallExactInputOutputWithFees,
   decodeMulticallExactInputOutputSingleWithoutFees,
   decodePath,
-} from './test';
+} from './test/utils';
 import { Router, SecondaryFee } from './lib';
 
 jest.mock('@ethersproject/providers');
