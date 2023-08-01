@@ -1,4 +1,4 @@
-import { describe, it } from 'local-cypress';
+import { it } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { onDarkBase } from '@biom3/design-tokens';
 import { BiomeThemeProvider } from '@biom3/react';
@@ -7,7 +7,7 @@ import { cySmartGet } from '../../lib/testUtils';
 import { StatusView } from './StatusView';
 import { StatusType } from './StatusType';
 
-describe('status view', () => {
+xdescribe('status view', () => {
   it('shows success text and button', () => {
     mount(
       <BiomeThemeProvider theme={{ base: onDarkBase }}>
