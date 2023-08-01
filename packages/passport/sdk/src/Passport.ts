@@ -6,10 +6,7 @@ import MagicAdapter from './magicAdapter';
 import { PassportImxProviderFactory } from './starkEx';
 import { PassportConfiguration } from './config';
 import {
-  PassportModuleConfiguration,
-  UserProfile,
-  DeviceConnectResponse,
-  DeviceTokenResponse,
+  DeviceConnectResponse, DeviceTokenResponse, Networks, PassportModuleConfiguration, UserProfile,
 } from './types';
 import { ConfirmationScreen } from './confirmation';
 import { ZkEvmProvider } from './zkEvm';
@@ -89,6 +86,10 @@ export class Passport {
   }
 
   public connectEvm(): Provider {
+    if (this.config.network === Networks.PRODUCTION) {
+      throw new Error('EVM is not supported on production network');
+    }
+
     return new ZkEvmProvider({
       authManager: this.authManager,
       magicAdapter: this.magicAdapter,
