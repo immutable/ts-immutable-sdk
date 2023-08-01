@@ -15,31 +15,31 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { NFTContractType } from './nftcontract-type';
+import { ActivityAsset } from './activity-asset';
 
 /**
- * 
+ * The withdrawal activity details
  * @export
- * @interface ActivityNFT
+ * @interface Withdrawal
  */
-export interface ActivityNFT {
+export interface Withdrawal {
+    /**
+     * The account address the asset was withdrawn from
+     * @type {string}
+     * @memberof Withdrawal
+     */
+    'from': string;
+    /**
+     * The amount of assets withdrawn
+     * @type {string}
+     * @memberof Withdrawal
+     */
+    'amount': string;
     /**
      * 
-     * @type {NFTContractType}
-     * @memberof ActivityNFT
+     * @type {ActivityAsset}
+     * @memberof Withdrawal
      */
-    'contract_type': NFTContractType;
-    /**
-     * The token contract address
-     * @type {string}
-     * @memberof ActivityNFT
-     */
-    'contract_address': string;
-    /**
-     * An `uint256` token id as string
-     * @type {string}
-     * @memberof ActivityNFT
-     */
-    'token_id': string;
+    'asset': ActivityAsset;
 }
 
