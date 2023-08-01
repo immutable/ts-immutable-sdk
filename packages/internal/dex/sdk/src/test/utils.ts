@@ -8,8 +8,10 @@ import {
 import { ethers } from 'ethers';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
+import { SwapRouter } from '@uniswap/router-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import { slippageToFraction } from 'lib/transactionUtils/slippage';
+import { SecondaryFee__factory } from 'contracts/types';
 import {
   QuoteTradeInfo,
   Router,
@@ -67,28 +69,6 @@ export const FUN_TEST_TOKEN = new Token(
   'FUN',
   'The Fungibles Token',
 );
-
-const exactInputOutputSingleParamTypes = [
-  'address',
-  'address',
-  'uint24',
-  'address',
-  'uint256',
-  'uint256',
-  'uint160',
-];
-
-const exactInputOutputSingleWithFeesParamTypes = [
-  '(address,uint16)[]',
-  '(address,address,uint24,address,uint256,uint256,uint160)',
-];
-
-const exactInputOutWithFeesParamTypes = [
-  '(address,uint16)[]',
-  '(bytes,address,uint256,uint256)',
-];
-
-const multicallParamTypes = ['uint256', 'bytes[]'];
 
 export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new ImmutableConfiguration({
   environment: Environment.SANDBOX,
@@ -180,23 +160,39 @@ export function decodePath(path: string) {
   };
 }
 
-function decodeParams(calldata: ethers.utils.BytesLike, paramTypes: string[]) {
-  // eslint-disable-next-line no-param-reassign
-  const data = ethers.utils.hexDataSlice(calldata, 4);
+type SecondaryFeeFunctionName = 'exactInputSingleWithServiceFee' |
+'exactOutputSingleWithServiceFee' |
+'exactInputWithServiceFee' |
+'exactOutputWithServiceFee';
 
-  const topLevelParams = ethers.utils.defaultAbiCoder.decode(
-    multicallParamTypes,
-    data,
+type SwapRouterFunctionName = 'exactInputSingle';
+
+function decodeSecondaryFeeCall(calldata: ethers.utils.BytesLike, functionName: SecondaryFeeFunctionName) {
+  const iface = SecondaryFee__factory.createInterface();
+  const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+
+  const decodedParams = iface.decodeFunctionData(
+    functionName,
+    topLevelParams.data[0],
   );
 
-  const decodedParams = ethers.utils.defaultAbiCoder
-    .decode(paramTypes, ethers.utils.hexDataSlice(topLevelParams[1][0], 4));
+  return { topLevelParams, decodedParams };
+}
+
+function decodeSwapRouterCall(calldata: ethers.utils.BytesLike, functionName: SwapRouterFunctionName) {
+  const iface = SwapRouter.INTERFACE;
+  const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+
+  const decodedParams = iface.decodeFunctionData(
+    functionName,
+    topLevelParams.data[0],
+  );
 
   return { topLevelParams, decodedParams };
 }
 
 export function decodeMulticallExactInputOutputWithFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutWithFeesParamTypes);
+  const { topLevelParams, decodedParams } = decodeSecondaryFeeCall(data, 'exactInputWithServiceFee');
 
   const secondaryFeeParams: SecondaryFee[] = [];
 
@@ -218,7 +214,7 @@ export function decodeMulticallExactInputOutputWithFees(data: ethers.utils.Bytes
 }
 
 export function decodeMulticallExactInputOutputSingleWithFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutputSingleWithFeesParamTypes);
+  const { topLevelParams, decodedParams } = decodeSecondaryFeeCall(data, 'exactInputSingleWithServiceFee');
 
   const secondaryFeeParams: SecondaryFee[] = [];
 
@@ -243,16 +239,29 @@ export function decodeMulticallExactInputOutputSingleWithFees(data: ethers.utils
 }
 
 export function decodeMulticallExactInputOutputSingleWithoutFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutputSingleParamTypes);
+  const { topLevelParams, decodedParams } = decodeSwapRouterCall(data, 'exactInputSingle');
 
   const swapParams: ExactInputOutputSingleParams = {
-    tokenIn: decodedParams[0],
-    tokenOut: decodedParams[1],
-    fee: decodedParams[2],
-    recipient: decodedParams[3],
-    firstAmount: decodedParams[4],
-    secondAmount: decodedParams[5],
-    sqrtPriceLimitX96: decodedParams[6],
+    tokenIn: decodedParams[0][0],
+    tokenOut: decodedParams[0][1],
+    fee: decodedParams[0][2],
+    recipient: decodedParams[0][3],
+    firstAmount: decodedParams[0][4],
+    secondAmount: decodedParams[0][5],
+    sqrtPriceLimitX96: decodedParams[0][6],
+  };
+
+  return { topLevelParams, swapParams };
+}
+
+export function decodeMulticallExactInputOutputWithoutFees(data: ethers.utils.BytesLike) {
+  const { topLevelParams, decodedParams } = decodeSecondaryFeeCall(data, 'exactInputWithServiceFee');
+
+  const swapParams: ExactInputOutputParams = {
+    path: decodedParams[0],
+    recipient: decodedParams[1],
+    amountIn: decodedParams[5],
+    amountOut: decodedParams[6],
   };
 
   return { topLevelParams, swapParams };
