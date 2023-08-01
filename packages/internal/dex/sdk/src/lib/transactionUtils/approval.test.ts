@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
-import { TEST_FROM_ADDRESS, TEST_PERIPHERY_ROUTER_ADDRESS, WETH_TEST_TOKEN } from 'utils/testUtils';
+import { TEST_FROM_ADDRESS, TEST_PERIPHERY_ROUTER_ADDRESS, WETH_TEST_TOKEN } from 'test/utils';
 import { Contract } from '@ethersproject/contracts';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError } from 'errors';

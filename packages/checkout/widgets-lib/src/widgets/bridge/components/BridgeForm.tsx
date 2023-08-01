@@ -7,7 +7,7 @@ import {
 import {
   useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';
-import { ApproveBridgeResponse, BridgeDepositResponse } from '@imtbl/bridge-sdk';
+import { ApproveDepositBridgeResponse, BridgeDepositResponse } from '@imtbl/bridge-sdk';
 import { BigNumber, utils } from 'ethers';
 import { parseEther } from 'ethers/lib/utils';
 import { amountInputValidation } from '../../../lib/validations/amountInputValidations';
@@ -73,7 +73,7 @@ export function BridgeForm(props: BridgeFormProps) {
   const [estimates, setEstimates] = useState<GasEstimateBridgeToL2Result | undefined>(undefined);
   const [gasFee, setGasFee] = useState<string>('');
   const [gasFeeFiatValue, setGasFeeFiatValue] = useState<string>('');
-  const [approvalTransaction, setApprovalTransaction] = useState<ApproveBridgeResponse | undefined>(undefined);
+  const [approvalTransaction, setApprovalTransaction] = useState<ApproveDepositBridgeResponse | undefined>(undefined);
   const [unsignedBridgeTransaction,
     setUnsignedBridgeTransaction] = useState<BridgeDepositResponse | undefined>(undefined);
   const [tokensOptions, setTokensOptions] = useState<CoinSelectorOptionProps[]>([]);
@@ -156,13 +156,13 @@ export function BridgeForm(props: BridgeFormProps) {
   };
 
   const getUnsignedTransactions = async ()
-  : Promise<{ approveRes: ApproveBridgeResponse, bridgeTxn:BridgeDepositResponse } | undefined> => {
+  : Promise<{ approveRes: ApproveDepositBridgeResponse, bridgeTxn:BridgeDepositResponse } | undefined> => {
     if (!checkout || !provider || !tokenBridge || !token || !token.token?.address) return;
 
     const depositorAddress = await provider.getSigner().getAddress();
     const depositAmount = utils.parseUnits(amount, token.token.decimals);
 
-    const approveRes: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx({
+    const approveRes: ApproveDepositBridgeResponse = await tokenBridge.getUnsignedApproveDepositBridgeTx({
       depositorAddress,
       token: token.token.address,
       depositAmount,
@@ -344,7 +344,7 @@ export function BridgeForm(props: BridgeFormProps) {
 
     try {
       setLoading(true);
-      if (approvalTransaction && approvalTransaction.required && approvalTransaction.unsignedTx) {
+      if (approvalTransaction && approvalTransaction.unsignedTx) {
         // move to new Approve ERC20 view
         // pass in approvalTransaction and unsignedBridgeTransaction
         viewDispatch({

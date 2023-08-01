@@ -4,13 +4,13 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { TradeType } from '@uniswap/sdk-core';
 import { Exchange } from './exchange';
 import {
-  decodeMulticallData,
   mockRouterImplementation,
   setupSwapTxTest,
   TEST_PERIPHERY_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
   TEST_GAS_PRICE,
-} from './utils/testUtils';
+  decodeMulticallExactInputOutputSingleWithoutFees,
+} from './test/utils';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -53,7 +53,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
     ) as unknown as JsonRpcProvider;
   });
 
-  describe('Swap with single pool and default slippage tolerance', () => {
+  describe('Swap with single pool without fees and default slippage tolerance', () => {
     it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
@@ -70,24 +70,20 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       const data = swap.transaction.data?.toString() || '';
 
-      const { functionCallParams, topLevelParams } = decodeMulticallData(data);
+      const { topLevelParams, swapParams } = decodeMulticallExactInputOutputSingleWithoutFees(data);
 
       expect(topLevelParams[1][0].slice(0, 10)).toBe(exactOutputSingleSignature);
 
-      expect(functionCallParams.tokenIn).toBe(params.inputToken); // input token
-      expect(functionCallParams.tokenOut).toBe(params.outputToken); // output token
-      expect(functionCallParams.fee).toBe(10000); // fee
-      expect(functionCallParams.recipient).toBe(params.fromAddress); // Recipient
+      expect(swapParams.tokenIn).toBe(params.inputToken); // input token
+      expect(swapParams.tokenOut).toBe(params.outputToken); // output token
+      expect(swapParams.fee).toBe(10000); // fee
+      expect(swapParams.recipient).toBe(params.fromAddress); // recipient
       expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(functionCallParams.firstAmount.toString()).toBe(
-        params.amountOut.toString(),
-      ); // amountOut
-      expect(functionCallParams.secondAmount.toString()).toBe(
-        params.maxAmountIn.toString(),
-      ); // maxAmountIn
-      expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+      expect(swapParams.firstAmount.toString()).toBe(params.amountOut.toString()); // amount out
+      expect(swapParams.secondAmount.toString()).toBe(params.maxAmountIn.toString()); // max amount in
+      expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
     it('returns valid swap quote', async () => {
