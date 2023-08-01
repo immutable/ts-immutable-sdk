@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Immutable X API
+ * Immutable zkEVM API
  * Immutable Multi Rollup API
  *
  * The version of the OpenAPI document: 1.0.0
@@ -18,7 +18,7 @@ import { Configuration } from "./configuration";
 // @ts-ignore
 import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
 
-export const BASE_PATH = "https://indexer-mr.sandbox.imtbl.com".replace(/\/+$/, "");
+export const BASE_PATH = "https://api.sandbox.immutable.com".replace(/\/+$/, "");
 
 /**
  *
