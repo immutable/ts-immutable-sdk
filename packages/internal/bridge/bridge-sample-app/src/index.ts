@@ -14,8 +14,6 @@ import {
   WaitForDepositResponse,
   CompletionStatus,
   BridgeWithdrawRequest,
-  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
-  CHILD_CHAIN_NATIVE_TOKEN_ADDRESS,
   WaitForWithdrawalRequest,
   WaitForWithdrawalResponse,
   ExitRequest,
