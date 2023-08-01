@@ -1,77 +1,14 @@
-export const ROOT_ERC20_PREDICATE = [
+export const CHILD_ERC20_PREDICATE = [
   {
-    anonymous: false,
     inputs: [
       {
-        indexed: true,
-        internalType: 'address',
-        name: 'rootToken',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'childToken',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'depositor',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'receiver',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
+        internalType: 'string',
+        name: 'only',
+        type: 'string',
       },
     ],
-    name: 'ERC20Deposit',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'rootToken',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'childToken',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'withdrawer',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'receiver',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'ERC20Withdraw',
-    type: 'event',
+    name: 'Unauthorized',
+    type: 'error',
   },
   {
     anonymous: false,
@@ -101,8 +38,82 @@ export const ROOT_ERC20_PREDICATE = [
         name: 'childToken',
         type: 'address',
       },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'sender',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'receiver',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
     ],
-    name: 'TokenMapped',
+    name: 'L2ERC20Deposit',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'rootToken',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'childToken',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'sender',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'receiver',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'L2ERC20Withdraw',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'rootToken',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'childToken',
+        type: 'address',
+      },
+    ],
+    name: 'L2TokenMapped',
     type: 'event',
   },
   {
@@ -133,12 +144,77 @@ export const ROOT_ERC20_PREDICATE = [
   },
   {
     inputs: [],
-    name: 'NATIVE_TOKEN',
+    name: 'NATIVE_TOKEN_CONTRACT',
     outputs: [
       {
         internalType: 'address',
         name: '',
         type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'NATIVE_TRANSFER_PRECOMPILE',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'NATIVE_TRANSFER_PRECOMPILE_GAS',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'SYSTEM',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'VALIDATOR_PKCHECK_PRECOMPILE',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'VALIDATOR_PKCHECK_PRECOMPILE_GAS',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
     stateMutability: 'view',
@@ -152,19 +228,6 @@ export const ROOT_ERC20_PREDICATE = [
         internalType: 'bytes32',
         name: '',
         type: 'bytes32',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'childERC20Predicate',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
       },
     ],
     stateMutability: 'view',
@@ -186,85 +249,18 @@ export const ROOT_ERC20_PREDICATE = [
   {
     inputs: [
       {
-        internalType: 'contract IERC20Metadata',
-        name: 'rootToken',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'deposit',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
         internalType: 'address',
-        name: 'receiver',
-        type: 'address',
-      },
-    ],
-    name: 'depositNativeTo',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'contract IERC20Metadata',
-        name: 'rootToken',
+        name: 'newL2StateSender',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: 'receiver',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'depositTo',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'exitHelper',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'newStateSender',
+        name: 'newStateReceiver',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: 'newExitHelper',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'newChildERC20Predicate',
+        name: 'newRootERC20Predicate',
         type: 'address',
       },
       {
@@ -274,7 +270,7 @@ export const ROOT_ERC20_PREDICATE = [
       },
       {
         internalType: 'address',
-        name: 'nativeTokenRootAddress',
+        name: 'newNativeTokenRootAddress',
         type: 'address',
       },
     ],
@@ -284,22 +280,16 @@ export const ROOT_ERC20_PREDICATE = [
     type: 'function',
   },
   {
-    inputs: [
-      {
-        internalType: 'contract IERC20Metadata',
-        name: 'rootToken',
-        type: 'address',
-      },
-    ],
-    name: 'mapToken',
+    inputs: [],
+    name: 'l2StateSender',
     outputs: [
       {
-        internalType: 'address',
+        internalType: 'contract IStateSender',
         name: '',
         type: 'address',
       },
     ],
-    stateMutability: 'nonpayable',
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -320,9 +310,22 @@ export const ROOT_ERC20_PREDICATE = [
         type: 'bytes',
       },
     ],
-    name: 'onL2StateReceive',
+    name: 'onStateReceive',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'rootERC20Predicate',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -346,15 +349,56 @@ export const ROOT_ERC20_PREDICATE = [
   },
   {
     inputs: [],
-    name: 'stateSender',
+    name: 'stateReceiver',
     outputs: [
       {
-        internalType: 'contract IStateSender',
+        internalType: 'address',
         name: '',
         type: 'address',
       },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'contract IChildERC20',
+        name: 'childToken',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'withdraw',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'contract IChildERC20',
+        name: 'childToken',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'receiver',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'withdrawTo',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
 ];
