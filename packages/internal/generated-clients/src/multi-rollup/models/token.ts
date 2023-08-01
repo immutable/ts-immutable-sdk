@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Immutable X API
+ * Immutable zkEVM API
  * Immutable Multi Rollup API
  *
  * The version of the OpenAPI document: 1.0.0
@@ -30,37 +30,37 @@ export interface Token {
      */
     'chain': Chain;
     /**
-     * 
+     * The address of token contract
      * @type {string}
      * @memberof Token
      */
     'contract_address': string;
     /**
-     * 
+     * The address of root token contract
      * @type {string}
      * @memberof Token
      */
     'root_contract_address': string | null;
     /**
-     * 
+     * The symbol of token
      * @type {string}
      * @memberof Token
      */
     'symbol': string | null;
     /**
-     * 
+     * The decimals of token
      * @type {number}
      * @memberof Token
      */
     'decimals': number | null;
     /**
-     * 
+     * The image url of token
      * @type {string}
      * @memberof Token
      */
     'image_url': string | null;
     /**
-     * 
+     * The name of token
      * @type {string}
      * @memberof Token
      */
