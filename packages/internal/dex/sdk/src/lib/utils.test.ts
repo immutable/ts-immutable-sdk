@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { TEST_FROM_ADDRESS } from 'test/utils';
+import { TEST_FROM_ADDRESS } from '../test/utils';
 import { isValidNonZeroAddress } from './utils';
 
 describe('utils', () => {

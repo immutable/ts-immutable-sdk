@@ -7,9 +7,9 @@ import {
 } from 'errors';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ethers } from 'ethers';
+import { Environment } from '@imtbl/config';
 import { Exchange } from './exchange';
 import {
-  decodeMulticallData,
   mockRouterImplementation,
   setupSwapTxTest,
   TEST_PERIPHERY_ROUTER_ADDRESS,
@@ -17,8 +17,15 @@ import {
   TEST_GAS_PRICE,
   IMX_TEST_TOKEN,
   TEST_TRANSACTION_GAS_USAGE,
+  TEST_FEE_RECIPIENT,
+  TEST_MAX_FEE_BASIS_POINTS,
+  TEST_SECONDARY_FEE_ADDRESS,
+  decodeMulticallExactInputOutputSingleWithFees,
+  decodeMulticallExactInputOutputWithFees,
+  decodeMulticallExactInputOutputSingleWithoutFees,
+  decodePath,
 } from './test/utils';
-import { Router } from './lib';
+import { Router, SecondaryFee } from './lib';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -31,6 +38,8 @@ jest.mock('./lib/utils', () => ({
 }));
 
 const exactInputSingleSignature = '0x04e45aaf';
+const exactInputSingleWithSecondaryFeeSignature = '0x742ac944';
+const exactInputWithSecondaryFeeSignature = '0x1411734e';
 
 const DEFAULT_SLIPPAGE = 0.1;
 const HIGHER_SLIPPAGE = 0.2;
@@ -39,6 +48,7 @@ const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
 
 describe('getUnsignedSwapTxFromAmountIn', () => {
   let erc20Contract: jest.Mock<any, any, any>;
+
   beforeAll(() => {
     erc20Contract = (Contract as unknown as jest.Mock).mockImplementation(
       () => ({
@@ -149,7 +159,99 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     });
   });
 
-  describe('Swap with single pool and default slippage tolerance', () => {
+  describe('Swap with single pool and secondary fees', () => {
+    it('generates valid swap calldata', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+
+      const secondaryFees: SecondaryFee[] = [
+        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS },
+      ];
+      const exchange = new Exchange(
+        { baseConfig: { environment: Environment.SANDBOX }, chainId: 13372, secondaryFees },
+      );
+
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountIn,
+      );
+
+      const data = swap.transaction?.data?.toString() || '';
+
+      const { swapParams, secondaryFeeParams, topLevelParams } = decodeMulticallExactInputOutputSingleWithFees(data);
+
+      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleWithSecondaryFeeSignature);
+
+      expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
+      expect(secondaryFeeParams[0].feeBasisPoints).toBe(TEST_MAX_FEE_BASIS_POINTS);
+
+      expect(swapParams.tokenIn).toBe(params.inputToken); // input token
+      expect(swapParams.tokenOut).toBe(params.outputToken); // output token
+      expect(swapParams.fee).toBe(10000); // fee
+      expect(swapParams.recipient).toBe(params.fromAddress); // Recipient
+      expect(swap.transaction?.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // to address
+      expect(swap.transaction?.from).toBe(params.fromAddress); // from address
+      expect(swap.transaction?.value).toBe('0x00'); // refers to 0 amount of the native token
+      expect(swapParams.firstAmount.toString()).toBe(
+        params.amountIn.toString(),
+      ); // amountin
+      expect(swapParams.secondAmount.toString()).toBe(
+        params.minAmountOut.toString(),
+      ); // minAmountOut
+      expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+    });
+  });
+
+  describe('Swap with multiple pools and secondary fees', () => {
+    it('generates valid swap calldata', async () => {
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE, true);
+
+      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+
+      const secondaryFees: SecondaryFee[] = [
+        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS },
+      ];
+
+      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountIn(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountIn,
+      );
+
+      const data = swap.transaction?.data?.toString() || '';
+
+      const { swapParams, secondaryFeeParams, topLevelParams } = decodeMulticallExactInputOutputWithFees(data);
+
+      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputWithSecondaryFeeSignature);
+
+      expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
+      expect(secondaryFeeParams[0].feeBasisPoints).toBe(TEST_MAX_FEE_BASIS_POINTS);
+
+      const decodedPath = decodePath(swapParams.path);
+
+      expect(swap.transaction?.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // to address
+      expect(swap.transaction?.from).toBe(params.fromAddress); // from address
+      expect(swap.transaction?.value).toBe('0x00'); // refers to 0 amount of the native token
+
+      expect(ethers.utils.getAddress(decodedPath.inputToken)).toBe(params.inputToken);
+      expect(ethers.utils.getAddress(decodedPath.intermediaryToken)).toBe(params.intermediaryToken);
+      expect(ethers.utils.getAddress(decodedPath.outputToken)).toBe(params.outputToken);
+      expect(decodedPath.firstPoolFee.toString()).toBe('10000');
+      expect(decodedPath.secondPoolFee.toString()).toBe('10000');
+
+      expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
+      expect(swapParams.amountIn.toString()).toBe(params.amountIn.toString());
+      expect(swapParams.amountOut.toString()).toBe(params.minAmountOut.toString());
+    });
+  });
+
+  describe('Swap with single pool without fees and default slippage tolerance', () => {
     it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
@@ -166,24 +268,20 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction?.data?.toString() || '';
 
-      const { functionCallParams, topLevelParams } = decodeMulticallData(data);
+      const { topLevelParams, swapParams } = decodeMulticallExactInputOutputSingleWithoutFees(data);
 
       expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
 
-      expect(functionCallParams.tokenIn).toBe(params.inputToken); // input token
-      expect(functionCallParams.tokenOut).toBe(params.outputToken); // output token
-      expect(functionCallParams.fee).toBe(10000); // fee
-      expect(functionCallParams.recipient).toBe(params.fromAddress); // Recipient
+      expect(swapParams.tokenIn).toBe(params.inputToken); // input token
+      expect(swapParams.tokenOut).toBe(params.outputToken); // output token
+      expect(swapParams.fee).toBe(10000); // fee
+      expect(swapParams.recipient).toBe(params.fromAddress); // recipient
       expect(swap.transaction?.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction?.from).toBe(params.fromAddress); // from address
       expect(swap.transaction?.value).toBe('0x00'); // refers to 0ETH
-      expect(functionCallParams.firstAmount.toString()).toBe(
-        params.amountIn.toString(),
-      ); // amountin
-      expect(functionCallParams.secondAmount.toString()).toBe(
-        params.minAmountOut.toString(),
-      ); // minAmountOut
-      expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+      expect(swapParams.firstAmount.toString()).toBe(params.amountIn.toString()); // amount in
+      expect(swapParams.secondAmount.toString()).toBe(params.minAmountOut.toString()); // min amount out
+      expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
     it('returns the gas estimate for the swap', async () => {
@@ -235,7 +333,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     });
   });
 
-  describe('Swap with single pool and higher slippage tolerance', () => {
+  describe('Swap with single pool without fees and high slippage tolerance', () => {
     it('generates valid calldata', async () => {
       const params = setupSwapTxTest(HIGHER_SLIPPAGE);
       mockRouterImplementation(params, TradeType.EXACT_INPUT);
@@ -252,24 +350,20 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction?.data?.toString() || '';
 
-      const { functionCallParams, topLevelParams } = decodeMulticallData(data);
+      const { topLevelParams, swapParams } = decodeMulticallExactInputOutputSingleWithoutFees(data);
 
       expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
 
-      expect(functionCallParams.tokenIn).toBe(params.inputToken); // input token
-      expect(functionCallParams.tokenOut).toBe(params.outputToken); // output token
-      expect(functionCallParams.fee).toBe(10000); // fee
-      expect(functionCallParams.recipient).toBe(params.fromAddress); // Recipient
+      expect(swapParams.tokenIn).toBe(params.inputToken); // input token
+      expect(swapParams.tokenOut).toBe(params.outputToken); // output token
+      expect(swapParams.fee).toBe(10000); // fee
+      expect(swapParams.recipient).toBe(params.fromAddress); // recipient
       expect(swap.transaction?.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction?.from).toBe(params.fromAddress); // from address
       expect(swap.transaction?.value).toBe('0x00'); // refers to 0ETH
-      expect(functionCallParams.firstAmount.toString()).toBe(
-        params.amountIn.toString(),
-      ); // amountin
-      expect(functionCallParams.secondAmount.toString()).toBe(
-        params.minAmountOut.toString(),
-      ); // minAmountOut
-      expect(functionCallParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+      expect(swapParams.firstAmount.toString()).toBe(params.amountIn.toString()); // amount in
+      expect(swapParams.secondAmount.toString()).toBe(params.minAmountOut.toString()); // min amount out
+      expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
     it('returns valid quote', async () => {
