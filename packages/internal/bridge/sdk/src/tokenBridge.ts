@@ -3,8 +3,6 @@ import { ethers } from 'ethers';
 import {
   ApproveDepositBridgeRequest,
   ApproveDepositBridgeResponse,
-  ApproveWithdrawBridgeRequest,
-  ApproveWithdrawBridgeResponse,
   BridgeDepositRequest,
   BridgeDepositResponse,
   BridgeFeeRequest,
@@ -437,83 +435,6 @@ export class TokenBridge {
     // Check if the rootToken address is the designated native token address. If it is, return 'NATIVE'. Else, return the root token address.
     return {
       rootToken: (rootToken === NATIVE_TOKEN_BRIDGE_KEY) ? 'NATIVE' : rootToken,
-    };
-  }
-
-  /**
-   * Generates an unsigned approval transaction to allow the bridge to withdraw a specific amount of tokens from a user's address.
-   * This must be called before a user can sign and submit a withdrawal request to the bridge.
-   *
-   * @param {ApproveWithdrawBridgeRequest} req - The approval request object containing the necessary data for approving token withdrawal.
-   * @returns {Promise<ApproveWithdrawBridgeResponse>} - A promise that resolves to an object containing the unsigned transaction data.
-   *
-   * @throws {BridgeError} - If an error occurs during the generation of the unsigned transaction, a BridgeError will be thrown with a specific error type.
-   * Possible BridgeError types include:
-   * - INVALID_ADDRESS: The Ethereum address provided in the request is invalid. This could be the user's address or the token's address.
-   * - INVALID_AMOUNT: The withdrawal amount provided in the request is invalid (less than or equal to 0).
-   * - PROVIDER_ERROR: An error occurred when interacting with the Ethereum provider, likely due to a network or connectivity issue.
-   * - INTERNAL_ERROR: An unexpected error occurred during the execution, likely due to the bridge SDK implementation.
-   *
-   * @example
-   * const approveWithdrawalRequest = {
-   *   token: '0x123456...', // ERC20 token address
-   *   withdrawerAddress: '0xabcdef...', // User's wallet address
-   *   withdrawAmount: ethers.utils.parseUnits('100', 18), // Withdraw amount in wei
-   * };
-   *
-   * bridgeSdk.getUnsignedApproveWithdrawBridgeTx(approveWithdrawalRequest)
-   *   .then((approvalResponse) => {
-   *     console.log(approvalResponse.unsignedTx);
-   *   })
-   *   .catch((error) => {
-   *     console.error('Error:', error.message);
-   *   });
-   */
-  public async getUnsignedApproveWithdrawBridgeTx(
-    req: ApproveWithdrawBridgeRequest,
-  ): Promise<ApproveWithdrawBridgeResponse> {
-    // Ensure the configuration of chains is valid.
-    this.validateChainConfiguration();
-
-    TokenBridge.validateWithdrawArgs(req.withdrawerAddress, req.withdrawAmount, req.token);
-
-    // Create a contract instance for interacting with the token contract
-    const childERC20: ethers.Contract = await withBridgeError<ethers.Contract>(async () => new ethers.Contract(req.token, CHILD_ERC20, this.config.childProvider), BridgeErrorType.PROVIDER_ERROR);
-
-    // Get the current approved allowance of the ChildERC20Predicate
-    const childERC20PredicateAllowance: ethers.BigNumber = await withBridgeError<ethers.BigNumber>(() => childERC20.allowance(
-      req.withdrawerAddress,
-      this.config.bridgeContracts.childChainERC20Predicate,
-    ), BridgeErrorType.PROVIDER_ERROR);
-
-    // If the allowance is greater than or equal to the withdraw amount, no approval is required
-    if (childERC20PredicateAllowance.gte(req.withdrawAmount)) {
-      return {
-        unsignedTx: null,
-      };
-    }
-
-    // Calculate the amount of tokens that need to be approved for withdrawal
-    const approvalAmountRequired = req.withdrawAmount.sub(
-      childERC20PredicateAllowance,
-    );
-
-    // Encode the approve function call data for the ERC20 contract
-    const data: string = await withBridgeError<string>(async () => childERC20.interface.encodeFunctionData('approve', [
-      this.config.bridgeContracts.childChainERC20Predicate,
-      approvalAmountRequired,
-    ]), BridgeErrorType.INTERNAL_ERROR);
-
-    // Construct the unsigned transaction for the approval
-    const unsignedTx: ethers.providers.TransactionRequest = {
-      data,
-      to: req.token,
-      value: 0,
-      from: req.withdrawerAddress,
-    };
-
-    return {
-      unsignedTx,
     };
   }
 
