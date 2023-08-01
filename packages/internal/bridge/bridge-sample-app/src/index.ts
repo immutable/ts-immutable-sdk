@@ -4,16 +4,24 @@ import { ethers } from 'ethers';
 import {
   TokenBridge,
   BridgeConfiguration,
-  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
   BridgeFeeRequest,
-  ApproveBridgeRequest,
-  ApproveBridgeResponse,
+  ApproveDepositBridgeRequest,
+  ApproveDepositBridgeResponse,
   BridgeFeeResponse,
   BridgeDepositRequest,
   BridgeDepositResponse,
-  WaitForRequest,
-  WaitForResponse,
+  WaitForDepositRequest,
+  WaitForDepositResponse,
   CompletionStatus,
+  BridgeWithdrawRequest,
+  ETH_SEPOLIA_TO_ZKEVM_TESTNET,
+  CHILD_CHAIN_NATIVE_TOKEN_ADDRESS,
+  WaitForWithdrawalRequest,
+  WaitForWithdrawalResponse,
+  ExitRequest,
+  ApproveWithdrawBridgeRequest,
+  ApproveWithdrawBridgeResponse,
+  ETH_SEPOLIA_TO_ZKEVM_DEVNET,
 } from '@imtbl/bridge-sdk';
 
 /**
@@ -21,8 +29,9 @@ import {
  * It uses environment variables for configuration values.
  * It creates a token bridge instance, gets the bridge fee, calculates the deposit amount,
  * approves the deposit, and waits for the deposit to complete on L2.
+ * It then withdraws the deposited amount to the recipient address.
  */
-async function deposit() {
+async function depositAndWithdraw() {
   // Check and throw errors if required environment variables are not set
   if (!process.env.ROOT_PROVIDER) {
     console.log(process.env.ROOT_PROVIDER);
@@ -66,6 +75,12 @@ async function deposit() {
     rootChainProvider,
   );
 
+  // Create a wallet instance to simulate the user's wallet
+  const checkoutChildChain = new ethers.Wallet(
+    process.env.PRIVATE_KEY,
+    childChainProvider,
+  );
+
   // Create a bridge configuration instance
   const bridgeConfig = new BridgeConfiguration({
     baseConfig: new ImmutableConfiguration({
@@ -89,20 +104,17 @@ async function deposit() {
   const depositAmount = bridgeFeeResponse.feeAmount.add(depositAmountBeforeFee);
   console.log(`Deposit Amount inclusive of fees is ${depositAmount}`);
 
-  const approveReq: ApproveBridgeRequest = {
+  const approveReq: ApproveDepositBridgeRequest = {
     depositorAddress: process.env.DEPOSITOR_ADDRESS,
     token: process.env.TOKEN_ADDRESS,
     depositAmount,
   };
 
   // Get the unsigned approval transaction for the deposit
-  const approveResp: ApproveBridgeResponse = await tokenBridge.getUnsignedApproveBridgeTx(approveReq);
+  const approveResp: ApproveDepositBridgeResponse = await tokenBridge.getUnsignedApproveDepositBridgeTx(approveReq);
 
   // If approval is required, sign and send the approval transaction
-  if (approveResp.required) {
-    if (!approveResp.unsignedTx) {
-      throw new Error('tx is null');
-    }
+  if (approveResp.unsignedTx) {
     console.log('Sending Approve Tx');
     const txResponseApprove = await checkout.sendTransaction(
       approveResp.unsignedTx,
@@ -117,7 +129,6 @@ async function deposit() {
 
   // Get the unsigned deposit transaction and send it on L1
   const depositArgs: BridgeDepositRequest = {
-    depositorAddress: process.env.DEPOSITOR_ADDRESS,
     recipientAddress: process.env.RECIPIENT_ADDRESS,
     token: process.env.TOKEN_ADDRESS,
     depositAmount,
@@ -126,6 +137,8 @@ async function deposit() {
   const unsignedDepositResult: BridgeDepositResponse = await tokenBridge.getUnsignedDepositTx(depositArgs);
   console.log('Sending Deposit Tx');
   // Sign and Send the signed transaction
+
+
   const txResponse = await checkout.sendTransaction(
     unsignedDepositResult.unsignedTx,
   );
@@ -140,10 +153,10 @@ async function deposit() {
   console.log('MUST BE CONNECTED TO VPN to connect to zkEVM');
   console.log('Waiting for Deposit to complete on L2...');
   // Wait for the deposit to complete on L2
-  const waitReq: WaitForRequest = {
+  const waitReq: WaitForDepositRequest = {
     transactionHash: txReceipt.transactionHash,
   };
-  const bridgeResult: WaitForResponse = await tokenBridge.waitForDeposit(
+  const bridgeResult: WaitForDepositResponse = await tokenBridge.waitForDeposit(
     waitReq,
   );
   if (bridgeResult.status === CompletionStatus.SUCCESS) {
@@ -153,10 +166,71 @@ async function deposit() {
     console.log(
       `Deposit Failed on L2 with status ${bridgeResult.status}`,
     );
+    return;
   }
+
+  console.log(`Starting WITHDRAWAL`);
+  console.log(`Approving Bridge`);
+  const withdrawResponse = await tokenBridge.rootTokenToChildToken({ rootToken: process.env.TOKEN_ADDRESS});
+  console.log(`Deposit token was ${process.env.TOKEN_ADDRESS}, withdrawal token is ${withdrawResponse.childToken}`);
+  // Approval
+  const childApproveReq: ApproveWithdrawBridgeRequest = {
+    withdrawerAddress: process.env.DEPOSITOR_ADDRESS,
+    token: withdrawResponse.childToken,
+    withdrawAmount: depositAmount,
+  };
+
+  // Get the unsigned approval transaction for the deposit
+  const childApproveResp: ApproveWithdrawBridgeResponse = await tokenBridge.getUnsignedApproveWithdrawBridgeTx(childApproveReq);
+
+  // If approval is required, sign and send the approval transaction
+  if (childApproveResp.unsignedTx) {
+    console.log('Sending Approve Tx');
+    const txResponseApprove = await checkoutChildChain.sendTransaction(
+      childApproveResp.unsignedTx,
+    );
+    const txApprovalReceipt = await txResponseApprove.wait();
+    console.log(
+      `Approval Tx Completed with hash: ${txApprovalReceipt.transactionHash}`,
+    );
+  } else {
+    console.log('Approval not required');
+  }
+
+  const withdrawlReq: BridgeWithdrawRequest = {
+    recipientAddress: process.env.DEPOSITOR_ADDRESS,
+    token: withdrawResponse.childToken,
+    withdrawAmount: depositAmount
+  };
+  
+  const unsignedWithdrawReq = await tokenBridge.getUnsignedWithdrawTx(withdrawlReq);
+  console.log("Sending withdraw tx");
+  const txWithdraw = await checkoutChildChain.sendTransaction(unsignedWithdrawReq.unsignedTx);
+  const txWithdrawReceipt = await txWithdraw.wait(1);
+  console.log(`Withdrawal tx hash: ${txWithdrawReceipt.transactionHash}`)
+
+  // TODO: Given a tx hash, wait till next epoch
+  const withdrawalRequest: WaitForWithdrawalRequest = {
+    transactionHash: txWithdrawReceipt.transactionHash,
+  }
+  console.log(`Waiting for withdrawal...this may take a while`);
+  const waitForWithdrawalResp: WaitForWithdrawalResponse = await tokenBridge.waitForWithdrawal(withdrawalRequest);
+  console.log(waitForWithdrawalResp)
+
+  // TODO: Exit on Layer 1
+  console.log(`Exiting on Layer 1`)
+  const exitRequest: ExitRequest = {
+    transactionHash: txWithdrawReceipt.transactionHash,
+  }
+  const exitTxResponse = await tokenBridge.getUnsignedExitTx(exitRequest);
+
+  const exitTx = await checkout.sendTransaction(exitTxResponse.unsignedTx);
+  console.log(exitTx)
+  const exitTxReceipt = await exitTx.wait(1);
+  console.log(exitTxReceipt);
 }
 
 // Run the deposit function and exit the process when completed
 (async () => {
-  await deposit().then(() => {console.log(`Exiting Successfully`); process.exit(0)}).catch(e => {console.log(`Exiting with error: ${e.toString()}`); process.exit(1)});
+  await depositAndWithdraw().then(() => {console.log(`Exiting Successfully`); process.exit(0)}).catch(e => {console.log(`Exiting with error: ${e.toString()}`); process.exit(1)});
 })();

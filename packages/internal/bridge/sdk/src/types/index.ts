@@ -29,6 +29,8 @@ export interface BridgeOverrides {
 export type BridgeContracts = {
   rootChainERC20Predicate: Address;
   rootChainStateSender: Address;
+  rootChainCheckpointManager: Address;
+  rootChainExitHelper: Address;
   childChainERC20Predicate: Address;
   childChainStateReceiver: Address;
 };
@@ -58,47 +60,15 @@ export type Address = string;
 export type FungibleToken = Address | 'NATIVE';
 
 /**
- * @typedef {Object} BridgeDepositRequest
- * @property {Address} depositorAddress - The address of the depositor.
- * @property {Address} recipientAddress - The address of the recipient.
- * @property {FungibleToken} token - The token to be deposited.
- * @property {ethers.BigNumber} depositAmount - The amount to be deposited.
+ * @typedef {Object} CompletionStatus
+ * @property {string} SUCCESS - The transaction has been successfully synced.
+ * @property {string} PENDING - The transaction is still pending.
+ * @property {string} FAILED - The transaction has failed.
  */
-export interface BridgeDepositRequest {
-  depositorAddress: Address;
-  recipientAddress: Address;
-  token: FungibleToken;
-  depositAmount: ethers.BigNumber;
-}
-
-/**
- * @typedef {Object} BridgeDepositResponse
- * @property {ethers.providers.TransactionRequest} unsignedTx - The unsigned transaction for the deposit.
- */
-export interface BridgeDepositResponse {
-  unsignedTx: ethers.providers.TransactionRequest;
-}
-
-/**
- * @typedef {Object} ApproveBridgeRequest
- * @property {string} depositorAddress - The address of the depositor.
- * @property {FungibleToken} token - The token to be approved.
- * @property {ethers.BigNumber} depositAmount - The amount to be approved for deposit.
- */
-export interface ApproveBridgeRequest {
-  depositorAddress: string;
-  token: FungibleToken;
-  depositAmount: ethers.BigNumber;
-}
-
-/**
- * @typedef {Object} ApproveBridgeResponse
- * @property {ethers.providers.TransactionRequest | null} unsignedTx - The unsigned transaction for the token approval, or null if no approval is required.
- * @property {boolean} required - Indicates whether an approval transaction is required or not.
- */
-export interface ApproveBridgeResponse {
-  unsignedTx: ethers.providers.TransactionRequest | null;
-  required: boolean;
+export enum CompletionStatus {
+  SUCCESS = 'SUCCESS',
+  PENDING = 'PENDING',
+  FAILED = 'FAILED',
 }
 
 /**
@@ -120,29 +90,161 @@ export interface BridgeFeeResponse {
 }
 
 /**
- * @typedef {Object} WaitForRequest
+ * @typedef {Object} ApproveDepositBridgeRequest
+ * @property {string} depositorAddress - The address of the depositor.
+ * @property {FungibleToken} token - The token to be approved.
+ * @property {ethers.BigNumber} depositAmount - The amount to be approved for deposit.
+ */
+export interface ApproveDepositBridgeRequest {
+  depositorAddress: Address;
+  token: FungibleToken;
+  depositAmount: ethers.BigNumber;
+}
+
+/**
+ * @typedef {Object} ApproveDepositBridgeResponse
+ * @property {ethers.providers.TransactionRequest | null} unsignedTx - The unsigned transaction for the token approval, or null if no approval is required.
+ */
+export interface ApproveDepositBridgeResponse {
+  unsignedTx: ethers.providers.TransactionRequest | null;
+}
+
+/**
+ * @typedef {Object} BridgeDepositRequest
+ * @property {Address} depositorAddress - The address of the depositor.
+ * @property {Address} recipientAddress - The address of the recipient.
+ * @property {FungibleToken} token - The token to be deposited.
+ * @property {ethers.BigNumber} depositAmount - The amount to be deposited.
+ */
+export interface BridgeDepositRequest {
+  recipientAddress: Address;
+  token: FungibleToken;
+  depositAmount: ethers.BigNumber;
+}
+
+/**
+ * @typedef {Object} BridgeDepositResponse
+ * @property {ethers.providers.TransactionRequest} unsignedTx - The unsigned transaction for the deposit.
+ */
+export interface BridgeDepositResponse {
+  unsignedTx: ethers.providers.TransactionRequest;
+}
+
+/**
+ * @typedef {Object} WaitForDepositRequest
  * @property {string} transactionHash - The hash of the deposit transaction on the root chain.
  */
-export interface WaitForRequest {
+export interface WaitForDepositRequest {
   transactionHash: string;
 }
 
 /**
- * @typedef {Object} CompletionStatus
- * @property {string} SUCCESS - The transaction has been successfully synced.
- * @property {string} PENDING - The transaction is still pending.
- * @property {string} FAILED - The transaction has failed.
+ * @typedef {Object} WaitForDepositResponse
+ * @property {CompletionStatus} status - The status of the deposit transaction after waiting.
  */
-export enum CompletionStatus {
-  SUCCESS = 'SUCCESS',
-  PENDING = 'PENDING',
-  FAILED = 'FAILED',
+export interface WaitForDepositResponse {
+  status: CompletionStatus;
 }
 
 /**
- * @typedef {Object} WaitForResponse
- * @property {CompletionStatus} status - The status of the deposit transaction after waiting.
+ * @typedef {Object} RootTokenToChildTokenRequest
+ * @property {FungibleToken} rootToken - The token on the root chain for which the corresponding token on the child chain is required.
  */
-export interface WaitForResponse {
-  status: CompletionStatus;
+export interface RootTokenToChildTokenRequest {
+  rootToken: FungibleToken;
+}
+
+/**
+ * @typedef {Object} RootTokenToChildTokenResponse
+ * @property {Address} childToken - The address of the corresponding token on the child chain.
+ */
+export interface RootTokenToChildTokenResponse {
+  childToken: Address;
+}
+
+/**
+ * @typedef {Object} ChildTokenToRootTokenRequest
+ * @property {Address} childToken - The token on the child chain for which the corresponding token on the root chain is required.
+ */
+export interface ChildTokenToRootTokenRequest {
+  childToken: Address;
+}
+
+/**
+ * @typedef {Object} ChildTokenToRootTokenResponse
+ * @property {FungibleToken} rootToken - The corresponding token on the root chain.
+ */
+export interface ChildTokenToRootTokenResponse {
+  rootToken: FungibleToken;
+}
+
+/**
+ * @typedef {Object} ApproveWithdrawBridgeRequest
+ * @property {Address} withdrawerAddress - The address of the account intending to withdraw the tokens.
+ * @property {Address} token - The address of the token contract.
+ * @property {ethers.BigNumber} withdrawAmount - The amount of tokens to be withdrawn.
+ */
+export interface ApproveWithdrawBridgeRequest {
+  withdrawerAddress: Address;
+  token: Address;
+  withdrawAmount: ethers.BigNumber;
+}
+
+/**
+ * @typedef {Object} ApproveWithdrawBridgeResponse
+ * @property {ethers.providers.TransactionRequest|null} unsignedTx - The unsigned withdrawal transaction, or null if the approval is not required.
+ */
+export interface ApproveWithdrawBridgeResponse {
+  unsignedTx: ethers.providers.TransactionRequest | null;
+}
+
+/**
+ * @typedef {Object} BridgeWithdrawRequest
+ * @property {Address} recipientAddress - The address of the recipient of the withdrawn tokens on the root chain.
+ * @property {FungibleToken} token - The token to be withdrawn.
+ * @property {ethers.BigNumber} withdrawAmount - The amount of tokens to be withdrawn.
+ */
+export interface BridgeWithdrawRequest {
+  recipientAddress: Address;
+  token: FungibleToken;
+  withdrawAmount: ethers.BigNumber;
+}
+
+/**
+ * @typedef {Object} BridgeWithdrawResponse
+ * @property {ethers.providers.TransactionRequest} unsignedTx - The unsigned withdrawal transaction.
+ */
+export interface BridgeWithdrawResponse {
+  unsignedTx: ethers.providers.TransactionRequest;
+}
+
+/**
+ * @typedef {Object} WaitForWithdrawalRequest
+ * @property {string} transactionHash - The hash of the withdrawal transaction on the child chain.
+ */
+export interface WaitForWithdrawalRequest {
+  transactionHash: string;
+}
+
+/**
+ * @typedef {Object} WaitForWithdrawalResponse
+ * Empty object signifies the successful completion of the withdrawal process.
+ * If the withdrawal fails, an error will be thrown instead of a response.
+ */
+export interface WaitForWithdrawalResponse {}
+
+/**
+ * @typedef {Object} ExitRequest
+ * @property {string} transactionHash - The hash of the withdraw transaction on the child chain
+ */
+export interface ExitRequest {
+  transactionHash: string;
+}
+
+/**
+ * @typedef {Object} ExitResponse
+ * @property {ethers.providers.TransactionRequest} unsignedTx - The unsigned transaction that, when signed and broadcasted, will perform the exit operation on the root chain.
+ */
+export interface ExitResponse {
+  unsignedTx: ethers.providers.TransactionRequest;
 }
