@@ -35,12 +35,11 @@ export class Exchange {
 
     this.chainId = config.chain.chainId;
     this.nativeToken = config.chain.nativeToken;
+    this.secondaryFees = config.secondaryFees;
 
     this.provider = new ethers.providers.JsonRpcProvider(
       config.chain.rpcUrl,
     );
-
-    this.secondaryFees = config.secondaryFees;
 
     this.router = new Router(
       this.provider,
@@ -50,6 +49,7 @@ export class Exchange {
         factoryAddress: config.chain.contracts.coreFactory,
         quoterAddress: config.chain.contracts.quoterV2,
         peripheryRouterAddress: config.chain.contracts.peripheryRouter,
+        secondaryFeeAddress: config.chain.contracts.secondaryFee,
       },
     );
   }
@@ -139,7 +139,9 @@ export class Exchange {
       slippagePercent,
       deadline,
       this.router.routingContracts.peripheryRouterAddress,
+      this.router.routingContracts.secondaryFeeAddress,
       gasPrice,
+      this.secondaryFees,
     );
 
     const quote = getQuote(otherToken, tradeType, routeAndQuote.trade, slippagePercent);
@@ -217,9 +219,5 @@ export class Exchange {
       deadline,
       TradeType.EXACT_OUTPUT,
     );
-  }
-
-  private thereAreSecondaryFees(): boolean {
-    return this.secondaryFees.length > 0;
   }
 }

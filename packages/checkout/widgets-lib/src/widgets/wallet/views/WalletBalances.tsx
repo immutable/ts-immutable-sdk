@@ -112,19 +112,23 @@ export function WalletBalances() {
         return;
       }
 
-      const { gasFee } = await checkout.gasEstimate({
-        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        isSpendingCapApprovalRequired: false,
-      });
+      try {
+        const { gasFee } = await checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          isSpendingCapApprovalRequired: false,
+        });
 
-      if (!gasFee.estimatedAmount) {
+        if (!gasFee.estimatedAmount) {
+          setInsufficientFundsForBridgeToL2Gas(false);
+          return;
+        }
+
+        setInsufficientFundsForBridgeToL2Gas(
+          gasFee.estimatedAmount.gt(utils.parseUnits(ethBalance.balance, DEFAULT_TOKEN_DECIMALS)),
+        );
+      } catch {
         setInsufficientFundsForBridgeToL2Gas(false);
-        return;
       }
-
-      setInsufficientFundsForBridgeToL2Gas(
-        gasFee.estimatedAmount.gt(utils.parseUnits(ethBalance.balance, DEFAULT_TOKEN_DECIMALS)),
-      );
     };
     bridgeToL2GasCheck();
   }, [tokenBalances, checkout, network]);
