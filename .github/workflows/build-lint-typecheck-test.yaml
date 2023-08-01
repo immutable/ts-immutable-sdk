@@ -54,17 +54,17 @@ jobs:
         run: yarn test
 
       - name: Checkout-widgets cypress tests
-        run: yarn test:checkout:cypress:ci
+        run: yarn test:checkout:cypress
 
       - name: Upload cypress videos artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: cypress-videos
+          name: checkout-widgets-cypress-videos
           path: ./packages/checkout/widgets-lib/cypress/videos
 
       - name: Upload cypress screenshots artifacts
         uses: actions/upload-artifact@v2
         if: failure()
         with:
-          name: cypress-screenshots
+          name: checkout-widgets-cypress-screenshots
           path: ./packages/checkout/widgets-lib/cypress/screenshots

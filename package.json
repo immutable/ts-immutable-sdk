@@ -46,8 +46,7 @@
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
     "test": "wsrun --exclude-missing -e test",
-    "test:cypress:ci": "wsrun --exclude-missing -e test:cypress",
-    "test:checkout:cypress:ci": "wsrun -p @imtbl/checkout-widgets-lib --exclude-missing -e test:cypress",
+    "test:checkout:cypress": "wsrun -p @imtbl/checkout-widgets-lib --exclude-missing -e test:cypress",
     "typecheck": "wsrun --exclude-missing typecheck"
   },
   "workspaces": [
