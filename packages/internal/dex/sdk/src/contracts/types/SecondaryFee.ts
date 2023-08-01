@@ -144,6 +144,8 @@ export interface SecondaryFeeInterface extends utils.Interface {
     "exactInputWithServiceFee((address,uint16)[],(bytes,address,uint256,uint256))": FunctionFragment;
     "exactOutputSingleWithServiceFee((address,uint16)[],(address,address,uint24,address,uint256,uint256,uint160))": FunctionFragment;
     "exactOutputWithServiceFee((address,uint16)[],(bytes,address,uint256,uint256))": FunctionFragment;
+    "multicall(uint256,bytes[])": FunctionFragment;
+    "multicall(bytes[])": FunctionFragment;
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
@@ -161,6 +163,8 @@ export interface SecondaryFeeInterface extends utils.Interface {
       | "exactInputWithServiceFee"
       | "exactOutputSingleWithServiceFee"
       | "exactOutputWithServiceFee"
+      | "multicall(uint256,bytes[])"
+      | "multicall(bytes[])"
       | "owner"
       | "pause"
       | "paused"
@@ -206,6 +210,14 @@ export interface SecondaryFeeInterface extends utils.Interface {
       IV3SwapRouter.ExactOutputParamsStruct
     ]
   ): string;
+  encodeFunctionData(
+    functionFragment: "multicall(uint256,bytes[])",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BytesLike>[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "multicall(bytes[])",
+    values: [PromiseOrValue<BytesLike>[]]
+  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
@@ -245,6 +257,14 @@ export interface SecondaryFeeInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "exactOutputWithServiceFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "multicall(uint256,bytes[])",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "multicall(bytes[])",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
@@ -371,6 +391,17 @@ export interface SecondaryFee extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    "multicall(uint256,bytes[])"(
+      deadline: PromiseOrValue<BigNumberish>,
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    "multicall(bytes[])"(
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     pause(
@@ -421,6 +452,17 @@ export interface SecondaryFee extends BaseContract {
     serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
     params: IV3SwapRouter.ExactOutputParamsStruct,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  "multicall(uint256,bytes[])"(
+    deadline: PromiseOrValue<BigNumberish>,
+    data: PromiseOrValue<BytesLike>[],
+    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  "multicall(bytes[])"(
+    data: PromiseOrValue<BytesLike>[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   owner(overrides?: CallOverrides): Promise<string>;
@@ -474,6 +516,17 @@ export interface SecondaryFee extends BaseContract {
       params: IV3SwapRouter.ExactOutputParamsStruct,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    "multicall(uint256,bytes[])"(
+      deadline: PromiseOrValue<BigNumberish>,
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: CallOverrides
+    ): Promise<string[]>;
+
+    "multicall(bytes[])"(
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: CallOverrides
+    ): Promise<string[]>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -552,6 +605,17 @@ export interface SecondaryFee extends BaseContract {
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    "multicall(uint256,bytes[])"(
+      deadline: PromiseOrValue<BigNumberish>,
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    "multicall(bytes[])"(
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     pause(
@@ -605,6 +669,17 @@ export interface SecondaryFee extends BaseContract {
       serviceFee: ISecondaryFee.ServiceFeeParamsStruct[],
       params: IV3SwapRouter.ExactOutputParamsStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "multicall(uint256,bytes[])"(
+      deadline: PromiseOrValue<BigNumberish>,
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "multicall(bytes[])"(
+      data: PromiseOrValue<BytesLike>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;

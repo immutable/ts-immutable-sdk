@@ -133,6 +133,19 @@ export const ROOT_ERC20_PREDICATE = [
   },
   {
     inputs: [],
+    name: 'NATIVE_TOKEN',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'WITHDRAW_SIG',
     outputs: [
       {
@@ -186,6 +199,19 @@ export const ROOT_ERC20_PREDICATE = [
     name: 'deposit',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'receiver',
+        type: 'address',
+      },
+    ],
+    name: 'depositNativeTo',
+    outputs: [],
+    stateMutability: 'payable',
     type: 'function',
   },
   {
@@ -266,7 +292,13 @@ export const ROOT_ERC20_PREDICATE = [
       },
     ],
     name: 'mapToken',
-    outputs: [],
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
     stateMutability: 'nonpayable',
     type: 'function',
   },
