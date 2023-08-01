@@ -436,7 +436,7 @@ describe('SwapForm', () => {
                 name: 'Ethereum',
                 symbol: 'ETH',
                 decimals: 18,
-                address: IMX_ADDRESS_ZKEVM,
+                address: '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff',
               },
               value: BigNumber.from('112300000000000012'),
             },
