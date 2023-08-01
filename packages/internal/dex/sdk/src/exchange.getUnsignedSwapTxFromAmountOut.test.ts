@@ -10,7 +10,7 @@ import {
   TEST_PERIPHERY_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
   TEST_GAS_PRICE,
-} from './utils/testUtils';
+} from './test/utils';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');

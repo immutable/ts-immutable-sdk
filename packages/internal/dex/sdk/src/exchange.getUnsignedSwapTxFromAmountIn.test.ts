@@ -17,7 +17,7 @@ import {
   TEST_GAS_PRICE,
   IMX_TEST_TOKEN,
   TEST_TRANSACTION_GAS_USAGE,
-} from './utils/testUtils';
+} from './test/utils';
 import { Router } from './lib';
 
 jest.mock('@ethersproject/providers');
