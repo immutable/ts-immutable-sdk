@@ -19,8 +19,6 @@ import {
   WaitForWithdrawalRequest,
   WaitForWithdrawalResponse,
   ExitRequest,
-  ApproveWithdrawBridgeRequest,
-  ApproveWithdrawBridgeResponse,
   ETH_SEPOLIA_TO_ZKEVM_DEVNET,
 } from '@imtbl/bridge-sdk';
 
