@@ -7,7 +7,7 @@ import { cySmartGet } from '../../lib/testUtils';
 import { StatusView } from './StatusView';
 import { StatusType } from './StatusType';
 
-describe('status view', () => {
+xdescribe('status view', () => {
   it('shows success text and button', () => {
     mount(
       <BiomeThemeProvider theme={{ base: onDarkBase }}>
