@@ -11,6 +11,14 @@ jobs:
     name: Build, Lint, Typecheck, Test
     runs-on: ubuntu-latest
     steps:
+      - name: wallets-team is owner
+        if: ${{ github.event.requested_team.name == '@immutable/wallets'}}
+        run: echo "executing steps for wallets-team"
+
+      - name: wallets-team not the owner
+        if: ${{ github.event.requested_team.name != '@immutable/wallets'}}
+        run: echo "executing steps for non-wallets-team"
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
