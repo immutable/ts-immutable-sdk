@@ -23,7 +23,7 @@
     },    
     "@release-it-plugins/workspaces": {
       "workspaces": ["sdk"],
-      "publish": false
+      "publish": true
     }
   }
 }

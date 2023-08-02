@@ -41,7 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - @imtbl/immutablex_client: Updated to use core-sdk v2.0.2 with grind key fixes.
-- Changelog automation.
 
 ### Changed
 
