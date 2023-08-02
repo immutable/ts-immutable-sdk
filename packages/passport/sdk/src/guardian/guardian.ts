@@ -47,11 +47,12 @@ const transformGuardianTransactions = (txs: MetaTransaction[]): guardian.MetaTra
 };
 
 export default class GuardianClient {
-  private transactionAPI: guardian.TransactionsApi;
+  private readonly transactionAPI: guardian.TransactionsApi;
 
-  private confirmationScreen: ConfirmationScreen;
+  private readonly confirmationScreen: ConfirmationScreen;
 
-  private imxEtherAddress: string;
+  // TODO: ID-977, make this rollup agnostic
+  private readonly imxEtherAddress: string;
 
   constructor({
     imxPublicApiDomain, accessToken, confirmationScreen, imxEtherAddress,
