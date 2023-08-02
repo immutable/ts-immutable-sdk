@@ -13,15 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: owner
-        run: echo ${{ github.event.pull_request.requested_team }}
-
-      - name: wallets-team is owner
-        if: ${{ github.event.requested_team.name == 'CODEOWNERS'}}
-        run: echo "executing steps for wallets-team"
-
-      - name: wallets-team not the owner
-        if: ${{ github.event.requested_team.name != 'Wallets'}}
-        run: echo "executing steps for non-wallets-team"
+        run: echo ${{ github.event.requested_team.name }}
 #
 #      - name: Checkout
 #        uses: actions/checkout@v3
