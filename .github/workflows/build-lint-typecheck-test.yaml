@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Lint, Build
+    name: Build, Lint, Typecheck, Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,113 +50,11 @@ jobs:
       - name: Typecheck
         run: yarn typecheck
 
-      - name: Upload sdk build
-        uses: actions/upload-artifact@v2
-        with:
-          name: dist
-          if-no-files-found: error
-          path: ./sdk/dist
-          retention-days: 1
-
-      - name: Upload checkout widgets build
-        uses: actions/upload-artifact@v2
-        with:
-          name: build
-          if-no-files-found: error
-          path: ./packages/checkout/widgets-lib/build
-          retention-days: 1
-
-  Test:
-    name: Unit tests
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Download the sdk-build
-        uses: actions/download-artifact@v2
-        with:
-          name: dist
-          path: ./sdk
-
-      - name: Download the checkout-widgets-build
-        uses: actions/download-artifact@v2
-        with:
-          name: build
-          path: ./packages/checkout/widgets-lib
-
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          registry-url: https://registry.npmjs.org/
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Install dependencies
-        run: yarn install --immutable
-
       - name: Test
         run: yarn test
 
-  cypress-test:
-    name: Cypress tests
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Download the sdk-build
-        uses: actions/download-artifact@v2
-        with:
-          name: dist
-          path: ./sdk
-
-      - name: Download the checkout-widgets-build
-        uses: actions/download-artifact@v2
-        with:
-          name: build
-          path: ./packages/checkout/widgets-lib
-
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          registry-url: https://registry.npmjs.org/
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Install dependencies
-        run: yarn install --immutable
-
+      # Figure out how to run this in parallel with the other tests
+      # This step takes 5 to 6 mins to run
       - name: Checkout-widgets cypress tests
         run: yarn test:checkout:cypress
 
