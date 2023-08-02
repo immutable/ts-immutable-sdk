@@ -1,23 +1,32 @@
 import React from 'react';
 import { mount } from 'cypress/react18';
 import { ChainId, Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
-import { Environment } from '@imtbl/config';
 import { cy } from 'local-cypress';
 import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
+import { Environment } from '@imtbl/config';
+import { Web3Provider } from '@ethersproject/providers';
 import { WalletState } from '../../context/WalletContext';
 import { BalanceItem } from './BalanceItem';
 import { BalanceInfo } from '../../functions/tokenBalances';
 import { cySmartGet } from '../../../../lib/testUtils';
 import { WalletWidgetTestComponent } from '../../test-components/WalletWidgetTestComponent';
 import { orchestrationEvents } from '../../../../lib/orchestrationEvents';
+import { ConnectionStatus } from '../../../../context/connect-loader-context/ConnectLoaderContext';
+import {
+  ConnectLoaderTestComponent,
+} from '../../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
 
 describe('BalanceItem', () => {
-  const baseWalletState: WalletState = {
+  const connectLoaderState = {
     checkout: new Checkout({
       baseConfig: { environment: Environment.SANDBOX },
     }),
+    provider: {} as Web3Provider,
+    connectionStatus: ConnectionStatus.CONNECTED_WITH_NETWORK,
+  };
+
+  const baseWalletState: WalletState = {
     network: null,
-    provider: null,
     walletProvider: WalletProviderName.METAMASK,
     tokenBalances: [],
     supportedTopUps: null,
@@ -33,15 +42,18 @@ describe('BalanceItem', () => {
 
   beforeEach(() => {
     cy.stub(orchestrationEvents, 'sendRequestSwapEvent').as('requestSwapEventStub');
-    cy.stub(orchestrationEvents, 'sendRequestBridgeEvent').as('requestBridgeEventStub');
     cy.stub(orchestrationEvents, 'sendRequestOnrampEvent').as('requestOnrampEventStub');
   });
 
   it('should show balance details', () => {
     mount(
-      <WalletWidgetTestComponent>
-        <BalanceItem balanceInfo={testBalanceInfo} />
-      </WalletWidgetTestComponent>,
+      <ConnectLoaderTestComponent
+        initialStateOverride={connectLoaderState}
+      >
+        <WalletWidgetTestComponent>
+          <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
+        </WalletWidgetTestComponent>
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('balance-item-IMX').should('include.text', 'IMX');
@@ -75,9 +87,14 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-        <BalanceItem balanceInfo={testBalanceInfo} />
-      </WalletWidgetTestComponent>,
+      <ConnectLoaderTestComponent
+        initialStateOverride={connectLoaderState}
+      >
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -105,9 +122,14 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-        <BalanceItem balanceInfo={testBalanceInfo} />
-      </WalletWidgetTestComponent>,
+      <ConnectLoaderTestComponent
+        initialStateOverride={connectLoaderState}
+      >
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -141,9 +163,14 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-        <BalanceItem balanceInfo={testBalanceInfo} />
-      </WalletWidgetTestComponent>,
+      <ConnectLoaderTestComponent
+        initialStateOverride={connectLoaderState}
+      >
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('exist');
@@ -176,9 +203,14 @@ describe('BalanceItem', () => {
     };
 
     mount(
-      <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-        <BalanceItem balanceInfo={testBalanceInfo} />
-      </WalletWidgetTestComponent>,
+      <ConnectLoaderTestComponent
+        initialStateOverride={connectLoaderState}
+      >
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
     );
     cySmartGet('token-menu').should('exist');
     cySmartGet('token-menu').click();
@@ -198,9 +230,14 @@ describe('BalanceItem', () => {
       },
     };
     mount(
-      <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-        <BalanceItem balanceInfo={testBalanceInfo} />
-      </WalletWidgetTestComponent>,
+      <ConnectLoaderTestComponent
+        initialStateOverride={connectLoaderState}
+      >
+        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+          <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
+        </WalletWidgetTestComponent>
+        ,
+      </ConnectLoaderTestComponent>,
     );
 
     cySmartGet('token-menu').should('not.exist');
@@ -232,9 +269,13 @@ describe('BalanceItem', () => {
 
     it('should emit sendRequestSwapEvent when swap menu button is clicked', () => {
       mount(
-        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-          <BalanceItem balanceInfo={testBalanceInfo} />
-        </WalletWidgetTestComponent>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+            <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('token-menu').should('exist');
@@ -250,9 +291,13 @@ describe('BalanceItem', () => {
 
     it('should emit sendRequestOnrampEvent when add menu button is clicked', () => {
       mount(
-        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-          <BalanceItem balanceInfo={testBalanceInfo} />
-        </WalletWidgetTestComponent>,
+        <ConnectLoaderTestComponent
+          initialStateOverride={connectLoaderState}
+        >
+          <WalletWidgetTestComponent initialStateOverride={testWalletState}>
+            <BalanceItem balanceInfo={testBalanceInfo} bridgeToL2OnClick={() => {}} />
+          </WalletWidgetTestComponent>
+        </ConnectLoaderTestComponent>,
       );
 
       cySmartGet('token-menu').should('exist');
@@ -263,40 +308,6 @@ describe('BalanceItem', () => {
         'have.been.calledWith',
         IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
 
-        {
-          tokenAddress: '',
-          amount: '',
-        },
-      );
-    });
-
-    it('should emit sendRequestBridgeEvent when move menu button is clicked', () => {
-      testWalletState = {
-        ...testWalletState,
-        network: {
-          chainId: ChainId.SEPOLIA,
-          name: 'Immutable zkEVM Testnet',
-          nativeCurrency: {
-            name: 'ETH',
-            symbol: 'ETH',
-            decimals: 18,
-          },
-          isSupported: true,
-        },
-      };
-      mount(
-        <WalletWidgetTestComponent initialStateOverride={testWalletState}>
-          <BalanceItem balanceInfo={testBalanceInfo} />
-        </WalletWidgetTestComponent>,
-      );
-
-      cySmartGet('token-menu').should('exist');
-      cySmartGet('token-menu').click();
-      cySmartGet('balance-item-move-option').click();
-      cySmartGet('@requestBridgeEventStub').should('have.been.called');
-      cySmartGet('@requestBridgeEventStub').should(
-        'have.been.calledWith',
-        IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT,
         {
           tokenAddress: '',
           amount: '',

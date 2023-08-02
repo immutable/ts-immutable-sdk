@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Immutable X API
+ * Immutable zkEVM API
  * Immutable Multi Rollup API
  *
  * The version of the OpenAPI document: 1.0.0
@@ -52,7 +52,7 @@ export interface Order {
      * @type {Array<Fee>}
      * @memberof Order
      */
-    'buy_fees': Array<Fee>;
+    'fees': Array<Fee>;
     /**
      * 
      * @type {Chain}

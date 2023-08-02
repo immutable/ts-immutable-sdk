@@ -9,7 +9,7 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const config = new CryptoFiatConfiguration({
   baseConfig: {
-    environment: Environment.PRODUCTION,
+    environment: Environment.SANDBOX,
   },
 });
 
@@ -78,12 +78,12 @@ describe('CryptoFiat', () => {
           environment: Environment.SANDBOX,
         },
       });
-      success(conf, 'https://checkout-api.dev.immutable.com');
+      success(conf, 'https://checkout-api.sandbox.immutable.com');
     },
   );
 
   it(
-    `should fetch symbols and overrides and cache them [${Environment.PRODUCTION}]]`,
+    `should fetch symbols and overrides and cache them [${Environment.SANDBOX}]]`,
     async () => success(config, 'https://checkout-api.sandbox.immutable.com'),
   );
 

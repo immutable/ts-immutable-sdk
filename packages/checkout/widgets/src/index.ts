@@ -1,3 +1,5 @@
+import { CheckoutWidgets, UpdateConfig } from './CheckoutWidgets';
+
 // Definitions | Events
 export * from './definitions/events/events';
 export * from './definitions/events/connectEvents';
@@ -18,4 +20,4 @@ export * from './react/SwapWidget';
 export * from './react/WalletWidget';
 
 // Checkout
-export * from './CheckoutWidgets';
+export { CheckoutWidgets, UpdateConfig };

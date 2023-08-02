@@ -138,11 +138,11 @@ export const TransactionsApiAxiosParamCreator = function (configuration?: Config
          * @summary Info for a specific transaction
          * @param {string} transactionID The id of the starkex transaction to retrieve
          * @param {'starkex' | 'evm'} chainType roll up type
-         * @param {number} [chainID] ID of evm chain
+         * @param {string} [chainID] ID of evm chain
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getTransactionByID: async (transactionID: string, chainType: 'starkex' | 'evm', chainID?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getTransactionByID: async (transactionID: string, chainType: 'starkex' | 'evm', chainID?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'transactionID' is not null or undefined
             assertParamExists('getTransactionByID', 'transactionID', transactionID)
             // verify required parameter 'chainType' is not null or undefined
@@ -222,11 +222,11 @@ export const TransactionsApiFp = function(configuration?: Configuration) {
          * @summary Info for a specific transaction
          * @param {string} transactionID The id of the starkex transaction to retrieve
          * @param {'starkex' | 'evm'} chainType roll up type
-         * @param {number} [chainID] ID of evm chain
+         * @param {string} [chainID] ID of evm chain
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getTransactionByID(transactionID: string, chainType: 'starkex' | 'evm', chainID?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Transaction>> {
+        async getTransactionByID(transactionID: string, chainType: 'starkex' | 'evm', chainID?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Transaction>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getTransactionByID(transactionID, chainType, chainID, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -337,10 +337,10 @@ export interface TransactionsApiGetTransactionByIDRequest {
 
     /**
      * ID of evm chain
-     * @type {number}
+     * @type {string}
      * @memberof TransactionsApiGetTransactionByID
      */
-    readonly chainID?: number
+    readonly chainID?: string
 }
 
 /**

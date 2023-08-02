@@ -31,36 +31,39 @@ describe('connect', () => {
   describe('checkIsWalletConnected', () => {
     it('should call request with eth_accounts method', async () => {
       providerRequestMock.mockResolvedValue([]);
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider, walletProviderName } = await createProvider(WalletProviderName.METAMASK);
       await checkIsWalletConnected(provider);
       expect(providerRequestMock).toBeCalledWith({
         method: WalletAction.CHECK_CONNECTION,
         params: [],
       });
+      expect(walletProviderName).toEqual(WalletProviderName.METAMASK);
     });
 
     it('should return isConnected as true when accounts array has an entry', async () => {
       // mock return array with active wallet address so we are connected
       providerRequestMock.mockResolvedValue(['0xmyWallet']);
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider, walletProviderName } = await createProvider(WalletProviderName.METAMASK);
       const checkConnection = await checkIsWalletConnected(provider);
       expect(checkConnection.isConnected).toBe(true);
       expect(checkConnection.walletAddress).toBe('0xmyWallet');
+      expect(walletProviderName).toEqual(WalletProviderName.METAMASK);
     });
 
     it('should return isConnected as false when no accounts returned', async () => {
       // mock return empty array of accounts so not connected
       providerRequestMock.mockResolvedValue([]);
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider, walletProviderName } = await createProvider(WalletProviderName.METAMASK);
       const checkConnection = await checkIsWalletConnected(provider);
       expect(checkConnection.isConnected).toBe(false);
       expect(checkConnection.walletAddress).toBe('');
+      expect(walletProviderName).toEqual(WalletProviderName.METAMASK);
     });
   });
 
   describe('connectWalletProvider', () => {
     it('should call the connect function with metamask and return a Web3Provider', async () => {
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
       const connRes = await connectSite(provider);
 
       expect(connRes).toBeInstanceOf(Web3Provider);
@@ -123,7 +126,7 @@ describe('connect', () => {
         removeEventListener: () => {},
       }));
 
-      const provider = await createProvider(WalletProviderName.METAMASK);
+      const { provider } = await createProvider(WalletProviderName.METAMASK);
 
       await expect(
         connectSite(provider),

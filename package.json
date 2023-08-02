@@ -28,20 +28,20 @@
     "*": "yarn scan:secrets",
     "*.{js,jsx,ts,tsx}": "eslint"
   },
-  "packageManager": "yarn@3.5.0",
+  "packageManager": "yarn@3.6.1",
   "private": true,
   "repository": "immutable/ts-immutable-sdk.git",
   "resolutions": {
     "@biom3/design-tokens": "0.2.0-beta"
   },
   "scripts": {
-    "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --stages build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
-    "build:all": "wsrun --stages build",
+    "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
+    "build:onlysdk": "wsrun -y 4 --stages build && yarn syncpack:format",
     "lint": "wsrun --exclude-missing -e lint --no-error-on-unmatched-pattern",
     "lint:ci": "./lint-ci.sh",
     "postinstall": "husky install; ./.husky/install_gitleaks.sh",
     "release": "release-it",
-    "scan:secrets": "gitleaks protect --staged -v",
+    "scan:secrets": "./.husky/run_gitleaks.sh",
     "syncpack:check": "yarn syncpack list-mismatches",
     "syncpack:fix": "yarn syncpack fix-mismatches",
     "syncpack:format": "yarn syncpack format",
@@ -54,7 +54,8 @@
     "packages/erc20",
     "packages/erc721-permissioned-mintable",
     "packages/immutablex_client",
-    "packages/passport",
+    "packages/passport/sdk",
+    "packages/passport/sdk-sample-app",
     "packages/provider",
     "packages/provider/src/sample-app",
     "packages/orderbook",
@@ -76,6 +77,7 @@
     "packages/economy/playground",
     "packages/economy/services",
     "packages/blockchain-data/sdk",
-    "packages/blockchain-data/sample-app"
+    "packages/blockchain-data/sample-app",
+    "packages/game-bridge"
   ]
 }

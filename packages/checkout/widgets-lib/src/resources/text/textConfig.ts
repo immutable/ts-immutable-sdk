@@ -289,5 +289,29 @@ export const text = {
         cancel: 'Dismiss',
       },
     },
+    notEnoughImx: {
+      content: {
+        noImx: {
+          heading: "You'll need IMX coins to swap",
+          body: "Swap fees are paid in IMX coins, so you'll need to add this before you can swap",
+        },
+        insufficientImx: {
+          heading: "You'll need more IMX coins",
+          body: "In order to cover the fees for the amount specified, you'll need to add more IMX coins",
+        },
+      },
+      buttons: {
+        adjustAmount: 'Adjust amount',
+        addMoreImx: 'Add IMX coins',
+        cancel: 'Dismiss',
+      },
+    },
+    unableToSwap: {
+      heading: 'Unable to swap this coin',
+      body: "This coin pairing isn't available to swap right now. Try another selection.",
+      buttons: {
+        cancel: 'Dismiss',
+      },
+    },
   },
 };

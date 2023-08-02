@@ -19,12 +19,15 @@ import { ImmutableNetworkHero } from '../../../components/Hero/ImmutableNetworkH
 import { SharedViews, ViewActions, ViewContext } from '../../../context/view-context/ViewContext';
 import { LoadingView } from '../../../views/loading/LoadingView';
 import { BridgeContext } from '../context/BridgeContext';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 export interface ApproveERC20BridgeProps {
   data: ApproveERC20BridgeData;
 }
 export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) {
-  const { bridgeState: { checkout, provider, allowedTokens } } = useContext(BridgeContext);
+  const { bridgeState: { allowedTokens } } = useContext(BridgeContext);
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
   const { viewDispatch } = useContext(ViewContext);
   const { approveSpending, approveBridge } = text.views[BridgeWidgetViews.APPROVE_ERC20];
 
@@ -40,9 +43,9 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
   // Get symbol from swap info for approve amount text
   const bridgeToken = useMemo(
     () => allowedTokens.find(
-      (token: TokenInfo) => token.address === data.bridgeFormInfo.tokenAddress || token.address === 'NATIVE',
+      (token: TokenInfo) => token.address === data.bridgeFormInfo.fromContractAddress || token.address === 'NATIVE',
     ),
-    [allowedTokens, data.bridgeFormInfo.tokenAddress],
+    [allowedTokens, data.bridgeFormInfo.fromContractAddress],
   );
 
   // Common error view function
@@ -61,11 +64,7 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
   const goBackWithSwapData = useCallback(() => {
     viewDispatch({
       payload: {
-        type: ViewActions.UPDATE_VIEW,
-        view: {
-          type: BridgeWidgetViews.BRIDGE,
-          data: data.bridgeFormInfo as PrefilledBridgeForm,
-        },
+        type: ViewActions.GO_BACK,
       },
     });
   }, [viewDispatch]);
@@ -175,7 +174,7 @@ export function ApproveERC20BridgeOnboarding({ data }: ApproveERC20BridgeProps) 
   const approveSpendingContent = useMemo(() => (
     <SimpleTextBody heading={approveSpending.content.heading}>
       {/* eslint-disable-next-line max-len */}
-      <Box>{`${approveSpending.content.body[0]} ${data.bridgeFormInfo.amount} ${bridgeToken?.symbol || ''} ${approveSpending.content.body[1]}`}</Box>
+      <Box>{`${approveSpending.content.body[0]} ${data.bridgeFormInfo.fromAmount} ${bridgeToken?.symbol || ''} ${approveSpending.content.body[1]}`}</Box>
     </SimpleTextBody>
   ), [data.bridgeFormInfo, bridgeToken]);
 

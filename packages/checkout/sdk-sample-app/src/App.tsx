@@ -1,9 +1,13 @@
-import { MenuItem } from '@biom3/react';
+import { MenuItem } from "@biom3/react";
 
 export default function App() {
   return (
     <>
-      <MenuItem href="/connect" emphasized size="medium">
+      <MenuItem
+        renderContainer={(props) => <a {...props} href="/connect" />}
+        emphasized
+        size="medium"
+      >
         <MenuItem.IntentIcon icon="ArrowForward" />
         <MenuItem.Label>Connect</MenuItem.Label>
         <MenuItem.Caption>

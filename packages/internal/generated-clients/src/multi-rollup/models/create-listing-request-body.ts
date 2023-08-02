@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Immutable X API
+ * Immutable zkEVM API
  * Immutable Multi Rollup API
  *
  * The version of the OpenAPI document: 1.0.0
@@ -52,7 +52,7 @@ export interface CreateListingRequestBody {
      * @type {Array<Fee>}
      * @memberof CreateListingRequestBody
      */
-    'buy_fees': Array<Fee>;
+    'fees': Array<Fee>;
     /**
      * Time after which the Order is considered expired
      * @type {string}

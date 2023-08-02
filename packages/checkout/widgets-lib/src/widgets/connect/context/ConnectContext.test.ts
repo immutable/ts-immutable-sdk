@@ -1,5 +1,5 @@
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout } from '@imtbl/checkout-sdk';
+import { Checkout, WalletProviderName } from '@imtbl/checkout-sdk';
 import { describe, expect } from '@jest/globals';
 import { Environment } from '@imtbl/config';
 import {
@@ -7,6 +7,7 @@ import {
   connectReducer,
   initialConnectState,
   SetCheckoutPayload,
+  SetProviderNamePayload,
   SetProviderPayload,
   SetSendCloseEventPayload,
 } from './ConnectContext';
@@ -16,7 +17,7 @@ describe('connect-context', () => {
     const setCheckoutPayload: SetCheckoutPayload = {
       type: ConnectActions.SET_CHECKOUT,
       checkout: new Checkout({
-        baseConfig: { environment: Environment.PRODUCTION },
+        baseConfig: { environment: Environment.SANDBOX },
       }),
     };
     expect(initialConnectState.checkout).toBeNull();
@@ -37,6 +38,18 @@ describe('connect-context', () => {
     });
 
     expect(provider).not.toBeNull();
+  });
+
+  it('should update state with checkout when reducer called with SET_WALLET_PROVIDER_NAME action', () => {
+    const setProviderNamePayload: SetProviderNamePayload = {
+      type: ConnectActions.SET_WALLET_PROVIDER_NAME,
+      walletProviderName: WalletProviderName.METAMASK,
+    };
+    expect(initialConnectState.checkout).toBeNull();
+    const { walletProviderName } = connectReducer(initialConnectState, {
+      payload: setProviderNamePayload,
+    });
+    expect(walletProviderName).toEqual(WalletProviderName.METAMASK);
   });
 
   it('should update state with send close function when reducer called with SET_SEND_CLOSE_EVENT action', () => {

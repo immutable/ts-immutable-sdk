@@ -1,0 +1,41 @@
+{
+  "name": "@imtbl/passport-sdk-sample-app",
+  "version": "0.1.0",
+  "dependencies": {
+    "@biom3/design-tokens": "0.2.0-beta",
+    "@biom3/react": "^0.8.0-beta",
+    "@imtbl/config": "0.0.0",
+    "@imtbl/core-sdk": "^2.0.2",
+    "@imtbl/immutablex-client": "0.0.0",
+    "@imtbl/passport": "0.0.0",
+    "@imtbl/provider": "0.0.0",
+    "@metamask/detect-provider": "^2.0.0",
+    "bootstrap": "^5.2.3",
+    "bootstrap-icons": "^1.10.3",
+    "ethers": "^5.7.2",
+    "next": "13.3.1",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.7.2",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@next/eslint-plugin-next": "^13.4.7",
+    "@types/node": "^18.14.2",
+    "@types/react": "^18.0.28",
+    "@types/react-bootstrap": "^0.32.32",
+    "@types/react-dom": "^18.0.11",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/parser": "^5.57.1",
+    "eslint": "^8.40.0",
+    "eslint-config-next": "13.3.1",
+    "typescript": "^4.9.5"
+  },
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "export": "next export",
+    "lint": "eslint ./src --ext .ts --max-warnings=0",
+    "start": "next start"
+  }
+}

@@ -36,20 +36,26 @@ export const SUPPORTED_BRIDGES_FOR_ENVIRONMENT: {
  */
 const CONTRACTS_FOR_BRIDGE = new Map<BridgeInstance, BridgeContracts>()
   .set(ETH_SEPOLIA_TO_ZKEVM_DEVNET, {
-    rootChainERC20Predicate: '0x36FD5e8C971627f6557306Ec017bd03eC2D0B615',
-    rootChainStateSender: '0x939a7E0D40B09CC2a1cD7711C3f9be742852D7fa',
+    rootChainERC20Predicate: '0xAC0f2096732D40096B3356AD76ba60a2f02366c8',
+    rootChainStateSender: '0xeA76fcCdD791A9c231CAda787ae7535c8a5E55B5',
+    rootChainCheckpointManager: '0x321A466aa78F5957C6E2375114915EcD14DAdE44',
+    rootChainExitHelper: '0x55cA8C418bbB0aC87414F9ea6FFC6a33860Cf967',
     childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
     childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
   .set(ETH_SEPOLIA_TO_ZKEVM_TESTNET, {
-    rootChainERC20Predicate: '0x9A7E4C4337a70C6754a9672F5ba69084463794B8',
-    rootChainStateSender: '0xfBfF6FD165adFA113bE39eE85ef030A996153253',
+    rootChainERC20Predicate: '0x0C15a8359865867CdCC44f98b2F3fd5DF098C7E0',
+    rootChainStateSender: '0x4C80001188db53dbc2eaAb32d5ef825feEedECA5',
+    rootChainCheckpointManager: '0x0F3157bc91f66C350f87172bBB28d9417167074F',
+    rootChainExitHelper: '0xB057A6C4e951a315E9f2DAe6d28B83cD0480e873',
     childChainERC20Predicate: '0x0000000000000000000000000000000000001004',
     childChainStateReceiver: '0x0000000000000000000000000000000000001001',
   })
   .set(ETH_MAINNET_TO_ZKEVM_MAINNET, {
     rootChainERC20Predicate: '0x',
     rootChainStateSender: '0x',
+    rootChainCheckpointManager: '0x',
+    rootChainExitHelper: '0x',
     childChainERC20Predicate: '0x',
     childChainStateReceiver: '0x',
   });

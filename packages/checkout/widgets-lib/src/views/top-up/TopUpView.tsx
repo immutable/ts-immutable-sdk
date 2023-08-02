@@ -18,11 +18,11 @@ import {
 } from '../../lib/orchestrationEvents';
 import { SwapWidgetViews } from '../../context/view-context/SwapViewContextTypes';
 import { BridgeWidgetViews } from '../../context/view-context/BridgeViewContextTypes';
-import { WalletContext } from '../../widgets/wallet/context/WalletContext';
 import { getBridgeFeeEstimation, getSwapFeeEstimation } from '../../lib/feeEstimation';
 import { CryptoFiatActions, CryptoFiatContext } from '../../context/crypto-fiat-context/CryptoFiatContext';
 import { useInterval } from '../../lib/hooks/useInterval';
 import { DEFAULT_TOKEN_SYMBOLS } from '../../context/crypto-fiat-context/CryptoFiatProvider';
+import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 
 interface TopUpViewProps {
   widgetEvent: IMTBLWidgetEvents,
@@ -47,11 +47,11 @@ export function TopUpView({
   onCloseButtonClick,
   onBackButtonClick,
 }: TopUpViewProps) {
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout } = connectLoaderState;
   const { header, topUpOptions } = text.views[SharedViews.TOP_UP_VIEW];
   const { onramp, swap, bridge } = topUpOptions;
   const { viewDispatch } = useContext(ViewContext);
-  const { walletState } = useContext(WalletContext);
-  const { checkout } = walletState;
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { conversions, fiatSymbol } = cryptoFiatState;
 
@@ -90,35 +90,31 @@ export function TopUpView({
     }
 
     try {
-      const swapEstimate = await checkout.gasEstimate({
-        gasEstimateType: GasEstimateType.SWAP,
-      }) as GasEstimateSwapResult;
+      const [swapEstimate, bridgeEstimate] = await Promise.all([
+        checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.SWAP,
+        }),
+        checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          isSpendingCapApprovalRequired: true,
+        }),
+      ]);
       const swapFeeInFiat = getSwapFeeEstimation(
-        swapEstimate,
+        swapEstimate as GasEstimateSwapResult,
         conversions,
       );
       setSwapFeesInFiat(swapFeeInFiat);
-      setLoadingSwapFees(false);
-    } catch {
-      setSwapFeesInFiat('-.--');
-    } finally {
-      setLoadingSwapFees(false);
-    }
-
-    try {
-      const bridgeEstimate = await checkout.gasEstimate({
-        gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
-        isSpendingCapApprovalRequired: true,
-      }) as GasEstimateBridgeToL2Result;
       const bridgeFeeInFiat = getBridgeFeeEstimation(
-        bridgeEstimate,
+        bridgeEstimate as GasEstimateBridgeToL2Result,
         conversions,
       );
       setBridgeFeesInFiat(bridgeFeeInFiat);
     } catch {
+      setSwapFeesInFiat('-.--');
       setBridgeFeesInFiat('-.--');
     } finally {
       setLoadingBridgeFees(false);
+      setLoadingSwapFees(false);
     }
   };
 
@@ -139,7 +135,7 @@ export function TopUpView({
           view: {
             type: SwapWidgetViews.SWAP,
             data: {
-              toContractAddress: tokenAddress ?? '',
+              toContractAddress: '',
               fromAmount: '',
               fromContractAddress: '',
             },
@@ -160,7 +156,13 @@ export function TopUpView({
       viewDispatch({
         payload: {
           type: ViewActions.UPDATE_VIEW,
-          view: { type: BridgeWidgetViews.BRIDGE },
+          view: {
+            type: BridgeWidgetViews.BRIDGE,
+            data: {
+              fromContractAddress: '',
+              fromAmount: '',
+            },
+          },
         },
       });
       return;
@@ -193,7 +195,7 @@ export function TopUpView({
     onClick: () => void,
     renderFeeFunction?: (fees: string, feesLoading: boolean) => ReactNode,
   ) => (
-    <Box sx={{ paddingY: '1px' }}>
+    <Box testId="top-up-view" sx={{ paddingY: '1px' }}>
       <MenuItem
         testId={`menu-item-${testId}`}
         size="medium"
@@ -210,7 +212,7 @@ export function TopUpView({
         <MenuItem.Caption testId={`menu-item-caption-${testId}`}>
           {caption}
           <br />
-          {`${subcaption}`}
+          {subcaption}
           {renderFeeFunction && renderFeeFunction(swapFeesInFiat, loadingSwapFees)}
         </MenuItem.Caption>
       </MenuItem>
@@ -221,7 +223,7 @@ export function TopUpView({
     <SimpleLayout
       header={(
         <HeaderNavigation
-          onBackButtonClick={onBackButtonClick ?? undefined}
+          onBackButtonClick={onBackButtonClick}
           onCloseButtonClick={onCloseButtonClick}
           showBack
         />

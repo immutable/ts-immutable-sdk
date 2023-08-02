@@ -73,12 +73,9 @@ export class Checkout {
   public async createProvider(
     params: CreateProviderParams,
   ): Promise<CreateProviderResult> {
-    const web3Provider: Web3Provider = await provider.createProvider(
+    return await provider.createProvider(
       params.walletProvider,
     );
-    return {
-      provider: web3Provider,
-    };
   }
 
   /**

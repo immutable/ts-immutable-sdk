@@ -23,13 +23,17 @@ export const ImtblWidgets = ({
     <Box>
       {showConnect.show && (<ConnectReact />)}
       {showWallet.show && (<WalletReact provider={web3Provider} />)}
-      {showSwap.show && (<SwapReact 
+      {showSwap.show && (<SwapReact
         provider={web3Provider}
-        fromContractAddress={showSwap.data?.fromTokenAddress || ''} 
-        toContractAddress={showSwap.data?.toTokenAddress || ''} 
+        fromContractAddress={showSwap.data?.fromTokenAddress || ''}
+        toContractAddress={showSwap.data?.toTokenAddress || ''}
         amount={showSwap.data?.amount || ''}/>
         )}
-      {showBridge.show && (<BridgeReact provider={web3Provider} /> )}
+      {showBridge.show && (<BridgeReact
+        provider={web3Provider}
+        fromContractAddress={showBridge.data?.tokenAddress || ''}
+        amount={showBridge.data?.amount || ''}
+      /> )}
     </Box>
   )
 }

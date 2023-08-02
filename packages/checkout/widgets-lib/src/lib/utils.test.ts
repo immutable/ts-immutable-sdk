@@ -7,6 +7,7 @@ import {
   calculateCryptoToFiat,
   formatFiatString,
   formatZeroAmount,
+  isNativeToken,
   sortTokensByAmount,
   tokenValueFormat,
 } from './utils';
@@ -428,6 +429,24 @@ describe('utils', () => {
 
     it(`should format to maximum of ${DEFAULT_TOKEN_FORMATTING_DECIMALS} decimal places`, () => {
       expect(tokenValueFormat('0.0000001')).toEqual('0.000000');
+    });
+  });
+
+  describe('isNativeToken', () => {
+    it('should return true if address is undefined', () => {
+      expect(isNativeToken(undefined)).toEqual(true);
+    });
+
+    it('should return true if address is empty', () => {
+      expect(isNativeToken('')).toEqual(true);
+    });
+
+    it('should return true if address is NATIVE', () => {
+      expect(isNativeToken('NATIVE')).toEqual(true);
+    });
+
+    it('should return false if address is not NATIVE', () => {
+      expect(isNativeToken('0x123')).toEqual(false);
     });
   });
 });

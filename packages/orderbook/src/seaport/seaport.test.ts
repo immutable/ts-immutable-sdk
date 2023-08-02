@@ -21,6 +21,7 @@ import {
   SEAPORT_CONTRACT_VERSION_V1_4,
 } from './constants';
 import { Seaport } from './seaport';
+import { SeaportLibFactory } from './seaport-lib-factory';
 
 // Make an address-like string for tests
 function randomAddress() {
@@ -66,6 +67,7 @@ describe('Seaport', () => {
 
       beforeEach(() => {
         const mockedSeaportJs = mock(SeaportLib);
+        const mockedSeaportLibFactory = mock(SeaportLibFactory);
         const mockedProvider = mock(providers.JsonRpcProvider);
 
         const createAction = mock<CreateOrderAction>();
@@ -75,6 +77,8 @@ describe('Seaport', () => {
         when(mockedProvider.getNetwork()).thenReturn(
           Promise.resolve({ chainId: network, name: 'foobar' }),
         );
+        when(mockedSeaportLibFactory.create(anything(), anything()))
+          .thenReturn(instance(mockedSeaportJs));
         when(
           mockedSeaportJs.getOrderHash(
             deepEqual(orderComponentsWithHexSalt as OrderComponents),
@@ -121,7 +125,7 @@ describe('Seaport', () => {
         );
 
         sut = new Seaport(
-          instance(mockedSeaportJs),
+          instance(mockedSeaportLibFactory),
           instance(mockedProvider),
           seaportContractAddress,
           zoneAddress,
@@ -229,6 +233,7 @@ describe('Seaport', () => {
 
       beforeEach(() => {
         const mockedSeaportJs = mock(SeaportLib);
+        const mockedSeaportLibFactory = mock(SeaportLibFactory);
         const mockedProvider = mock(providers.JsonRpcProvider);
 
         const createAction = mock<CreateOrderAction>();
@@ -253,6 +258,8 @@ describe('Seaport', () => {
         when(mockedProvider.getNetwork()).thenReturn(
           Promise.resolve({ chainId: network, name: 'foobar' }),
         );
+        when(mockedSeaportLibFactory.create(anything(), anything()))
+          .thenReturn(instance(mockedSeaportJs));
         when(
           mockedSeaportJs.getOrderHash(
             deepEqual(orderComponentsWithHexSalt as OrderComponents),
@@ -296,7 +303,7 @@ describe('Seaport', () => {
         );
 
         sut = new Seaport(
-          instance(mockedSeaportJs),
+          instance(mockedSeaportLibFactory),
           instance(mockedProvider),
           seaportContractAddress,
           zoneAddress,
@@ -395,7 +402,7 @@ describe('Seaport', () => {
       const immutableOrder: Order = {
         account_address: offerer,
         buy: [{ item_type: 'NATIVE', start_amount: '100' }],
-        buy_fees: [],
+        fees: [],
         chain: { id: '1', name: 'imtbl-zkevm-local' },
         create_time: new Date().toISOString(),
         end_time: new Date().toISOString(),
@@ -424,6 +431,7 @@ describe('Seaport', () => {
 
       beforeEach(() => {
         const mockedSeaportJs = mock(SeaportLib);
+        const mockedSeaportLibFactory = mock(SeaportLibFactory);
         const mockedProvider = mock(providers.JsonRpcProvider);
 
         const exchangeTransactionMethods = mock<TransactionMethods<boolean>>();
@@ -454,6 +462,8 @@ describe('Seaport', () => {
           Promise.resolve(approvalGas),
         );
 
+        when(mockedSeaportLibFactory.create(anything(), anything()))
+          .thenReturn(instance(mockedSeaportJs));
         when(
           mockedSeaportJs.fulfillOrders(
             deepEqual({
@@ -481,7 +491,7 @@ describe('Seaport', () => {
         );
 
         sut = new Seaport(
-          instance(mockedSeaportJs),
+          instance(mockedSeaportLibFactory),
           instance(mockedProvider),
           seaportContractAddress,
           zoneAddress,

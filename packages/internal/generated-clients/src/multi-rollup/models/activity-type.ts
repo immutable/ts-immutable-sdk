@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Immutable X API
+ * Immutable zkEVM API
  * Immutable Multi Rollup API
  *
  * The version of the OpenAPI document: 1.0.0
@@ -24,7 +24,9 @@ export const ActivityType = {
     Mint: 'mint',
     Burn: 'burn',
     Transfer: 'transfer',
-    Sale: 'sale'
+    Sale: 'sale',
+    Deposit: 'deposit',
+    Withdrawal: 'withdrawal'
 } as const;
 
 export type ActivityType = typeof ActivityType[keyof typeof ActivityType];

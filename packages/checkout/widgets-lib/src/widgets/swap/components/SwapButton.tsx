@@ -9,13 +9,13 @@ import {
   ViewActions,
   SharedViews,
 } from '../../../context/view-context/ViewContext';
-import { SwapContext } from '../context/SwapContext';
 import {
   swapButtonBoxStyle,
   swapButtonIconLoadingStyle,
 } from './SwapButtonStyles';
 import { SwapFormData } from './swapFormTypes';
 import { TransactionRejected } from '../../../components/TransactionRejected/TransactionRejected';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 export interface SwapButtonProps {
   loading: boolean
@@ -23,20 +23,28 @@ export interface SwapButtonProps {
   validator: () => boolean
   transaction: TransactionResponse | null;
   data?: SwapFormData;
+  insufficientFundsForGas: boolean;
+  openNotEnoughImxDrawer: () => void;
 }
 
 export function SwapButton({
-  loading, updateLoading, validator, transaction, data,
+  loading, updateLoading, validator, transaction, data, insufficientFundsForGas, openNotEnoughImxDrawer,
 }: SwapButtonProps) {
   const [showTxnRejectedState, setShowTxnRejectedState] = useState(false);
   const { viewDispatch } = useContext(ViewContext);
-  const { swapState } = useContext(SwapContext);
-  const { checkout, provider } = swapState;
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
   const { buttonText } = text.views[SwapWidgetViews.SWAP].swapForm;
-
   const sendTransaction = async () => {
     if (!validator()) return;
     if (!checkout || !provider || !transaction) return;
+
+    if (insufficientFundsForGas) {
+      openNotEnoughImxDrawer();
+      return;
+    }
+
+    if (!transaction) return;
     try {
       updateLoading(true);
 

@@ -1,16 +1,13 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { Environment } from '@imtbl/config';
 import {
   ChainId,
   CHECKOUT_API_BASE_URL,
   ENV_DEVELOPMENT,
+  RemoteConfiguration,
   TokenInfo,
 } from '../types';
-import {
-  ConfiguredTokens,
-  RemoteConfigParams,
-  RemoteConfiguration,
-} from './remoteConfigType';
+import { ConfiguredTokens, RemoteConfigParams } from './remoteConfigType';
 
 export class RemoteConfigFetcher {
   private isDevelopment: boolean;
@@ -26,7 +23,7 @@ export class RemoteConfigFetcher {
     this.isProduction = params.isProduction;
   }
 
-  private static async makeHttpRequest(url: string): Promise<any> {
+  private static async makeHttpRequest(url: string): Promise<AxiosResponse> {
     let response;
 
     try {
@@ -53,7 +50,9 @@ export class RemoteConfigFetcher {
   private async loadConfig(): Promise<RemoteConfiguration | undefined> {
     if (this.configCache) return this.configCache;
 
-    const response = await RemoteConfigFetcher.makeHttpRequest(`${this.getEndpoint()}/v1/config`);
+    const response = await RemoteConfigFetcher.makeHttpRequest(
+      `${this.getEndpoint()}/v1/config`,
+    );
     this.configCache = response.data;
 
     return this.configCache;
@@ -62,7 +61,9 @@ export class RemoteConfigFetcher {
   private async loadConfigTokens(): Promise<ConfiguredTokens | undefined> {
     if (this.tokensCache) return this.tokensCache;
 
-    const response = await RemoteConfigFetcher.makeHttpRequest(`${this.getEndpoint()}/v1/config/tokens`);
+    const response = await RemoteConfigFetcher.makeHttpRequest(
+      `${this.getEndpoint()}/v1/config/tokens`,
+    );
     this.tokensCache = response.data;
 
     return this.tokensCache;
@@ -70,16 +71,18 @@ export class RemoteConfigFetcher {
 
   public async getConfig(
     key?: keyof RemoteConfiguration,
-  ): Promise<RemoteConfiguration | RemoteConfiguration[keyof RemoteConfiguration] | undefined> {
+  ): Promise<
+    | RemoteConfiguration
+    | RemoteConfiguration[keyof RemoteConfiguration]
+    | undefined
+    > {
     const config = await this.loadConfig();
     if (!config) return undefined;
     if (!key) return config;
     return config[key];
   }
 
-  public async getTokens(
-    chainId: ChainId,
-  ): Promise<TokenInfo[]> {
+  public async getTokens(chainId: ChainId): Promise<TokenInfo[]> {
     const config = await this.loadConfigTokens();
     if (!config) return [];
     return config[chainId]?.allowed ?? [];

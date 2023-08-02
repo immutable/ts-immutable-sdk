@@ -6,13 +6,13 @@ import { Contract, ethers, providers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { getQuotesForRoutes } from './getQuotesForRoutes';
 import {
-  IMX_TEST_CHAIN,
+  IMX_TEST_TOKEN,
   TEST_CHAIN_ID,
   TEST_MULTICALL_ADDRESS,
   TEST_QUOTER_ADDRESS,
   TEST_RPC_URL,
-  WETH_TEST_CHAIN,
-} from '../utils/testUtils';
+  WETH_TEST_TOKEN,
+} from '../test/utils';
 import { Multicall__factory } from '../contracts/types';
 
 jest.mock('@ethersproject/contracts');
@@ -46,18 +46,18 @@ describe('getQuotesForRoutes', () => {
       // Since we will be mocking the multicall, routes doesn't matter,
       // as long as the length is correct.
       const pool0 = new Pool(
-        WETH_TEST_CHAIN,
-        IMX_TEST_CHAIN,
+        WETH_TEST_TOKEN,
+        IMX_TEST_TOKEN,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
-      dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
+      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
+      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
 
       const amount: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
-        WETH_TEST_CHAIN,
+        WETH_TEST_TOKEN,
         '123123',
       );
 
@@ -111,14 +111,14 @@ describe('getQuotesForRoutes', () => {
       // Since we will be mocking the multicall, routes doesn't matter,
       // as long as the length is correct.
       const pool0 = new Pool(
-        WETH_TEST_CHAIN,
-        IMX_TEST_CHAIN,
+        WETH_TEST_TOKEN,
+        IMX_TEST_TOKEN,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
+      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
@@ -130,7 +130,7 @@ describe('getQuotesForRoutes', () => {
       );
 
       const amount: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
-        WETH_TEST_CHAIN,
+        WETH_TEST_TOKEN,
         '123123',
       );
       const amountOutReceived = await getQuotesForRoutes(
@@ -198,15 +198,15 @@ describe('getQuotesForRoutes', () => {
       // Since we will be mocking the multicall, routes doesn't matter,
       // as long as the length is correct.
       const pool0 = new Pool(
-        WETH_TEST_CHAIN,
-        IMX_TEST_CHAIN,
+        WETH_TEST_TOKEN,
+        IMX_TEST_TOKEN,
         FeeAmount.HIGH,
         sqrtPriceAtTick,
         1000,
         arbitraryTick,
       );
-      dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
-      dummyRoutes.push(new Route([pool0], WETH_TEST_CHAIN, IMX_TEST_CHAIN));
+      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
+      dummyRoutes.push(new Route([pool0], WETH_TEST_TOKEN, IMX_TEST_TOKEN));
 
       const provider = new providers.JsonRpcProvider(
         TEST_RPC_URL,
@@ -218,7 +218,7 @@ describe('getQuotesForRoutes', () => {
       );
 
       const amount: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(
-        WETH_TEST_CHAIN,
+        WETH_TEST_TOKEN,
         '123123',
       );
       const amountOutReceived = await getQuotesForRoutes(

@@ -22,16 +22,19 @@ import {
 } from '../../../../lib/orchestrationEvents';
 import { getL1ChainId, getL2ChainId } from '../../../../lib/networkUtils';
 import { formatZeroAmount, tokenValueFormat } from '../../../../lib/utils';
+import { ConnectLoaderContext } from '../../../../context/connect-loader-context/ConnectLoaderContext';
 
 export interface BalanceItemProps {
   balanceInfo: BalanceInfo;
+  bridgeToL2OnClick: (address?: string) => void;
 }
 
-export function BalanceItem(props: BalanceItemProps) {
-  const { balanceInfo } = props;
+export function BalanceItem({ balanceInfo, bridgeToL2OnClick }: BalanceItemProps) {
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout } = connectLoaderState;
   const fiatAmount = `≈ USD $${formatZeroAmount(balanceInfo.fiatAmount)}`;
   const { walletState } = useContext(WalletContext);
-  const { supportedTopUps, network, checkout } = walletState;
+  const { supportedTopUps, network } = walletState;
   const [isOnRampEnabled, setIsOnRampEnabled] = useState<boolean>();
   const [isBridgeEnabled, setIsBridgeEnabled] = useState<boolean>();
   const [isSwapEnabled, setIsSwapEnabled] = useState<boolean>();
@@ -104,12 +107,7 @@ export function BalanceItem(props: BalanceItemProps) {
             <MenuItem
               testId="balance-item-move-option"
               sx={ShowMenuItem(isBridgeEnabled)}
-              onClick={() => {
-                orchestrationEvents.sendRequestBridgeEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
-                  tokenAddress: balanceInfo.address ?? '',
-                  amount: '',
-                });
-              }}
+              onClick={() => bridgeToL2OnClick(balanceInfo.address)}
             >
               <MenuItem.Icon icon="Minting" />
               <MenuItem.Label>{`Move ${balanceInfo.symbol}`}</MenuItem.Label>

@@ -2,6 +2,9 @@ import { Box, Icon, MenuItem } from '@biom3/react';
 import {
   useContext, useEffect, useMemo, useState,
 } from 'react';
+import { GasEstimateType } from '@imtbl/checkout-sdk';
+import { utils } from 'ethers';
+import { IMTBLWidgetEvents } from '@imtbl/checkout-widgets';
 import { FooterLogo } from '../../../components/Footer/FooterLogo';
 import { HeaderNavigation } from '../../../components/Header/HeaderNavigation';
 import { SimpleLayout } from '../../../components/SimpleLayout/SimpleLayout';
@@ -12,10 +15,12 @@ import { NetworkMenu } from '../components/NetworkMenu/NetworkMenu';
 import { WalletActions, WalletContext } from '../context/WalletContext';
 import { sendWalletWidgetCloseEvent } from '../WalletWidgetEvents';
 import {
-  WALLET_BALANCE_CONTAINER_STYLE,
+  walletBalanceOuterContainerStyles,
+  walletBalanceContainerStyles,
+  walletBalanceLoadingIconStyles,
   WalletBalanceItemStyle,
 } from './WalletBalancesStyles';
-import { getL2ChainId } from '../../../lib/networkUtils';
+import { getL1ChainId, getL2ChainId } from '../../../lib/networkUtils';
 import {
   CryptoFiatActions,
   CryptoFiatContext,
@@ -28,22 +33,30 @@ import {
   ViewContext,
 } from '../../../context/view-context/ViewContext';
 import { fetchTokenSymbols } from '../../../lib/fetchTokenSymbols';
+import { NotEnoughGas } from '../../../components/NotEnoughGas/NotEnoughGas';
+import { isNativeToken } from '../../../lib/utils';
+import { DEFAULT_TOKEN_DECIMALS, ETH_TOKEN_SYMBOL, ZERO_BALANCE_STRING } from '../../../lib';
+import { orchestrationEvents } from '../../../lib/orchestrationEvents';
+import { ConnectLoaderContext } from '../../../context/connect-loader-context/ConnectLoaderContext';
 
 export function WalletBalances() {
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
   const { cryptoFiatState, cryptoFiatDispatch } = useContext(CryptoFiatContext);
   const { walletState, walletDispatch } = useContext(WalletContext);
   const { viewDispatch } = useContext(ViewContext);
   const [totalFiatAmount, setTotalFiatAmount] = useState(0.0);
   const { header } = text.views[WalletWidgetViews.WALLET_BALANCES];
   const {
-    provider,
-    checkout,
     network,
     supportedTopUps,
     tokenBalances,
   } = walletState;
   const { conversions } = cryptoFiatState;
   const [balancesLoading, setBalancesLoading] = useState(true);
+  const [showNotEnoughGasDrawer, setShowNotEnoughGasDrawer] = useState(false);
+  const [walletAddress, setWalletAddress] = useState('');
+  const [insufficientFundsForBridgeToL2Gas, setInsufficientFundsForBridgeToL2Gas] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -63,6 +76,14 @@ export function WalletBalances() {
   }, [checkout, cryptoFiatDispatch, network]);
 
   useEffect(() => {
+    const setWalletAddressFromProvider = async () => {
+      if (!provider) return;
+      setWalletAddress(await provider.getSigner().getAddress());
+    };
+    setWalletAddressFromProvider();
+  }, [provider]);
+
+  useEffect(() => {
     let totalAmount = 0.0;
 
     tokenBalances.forEach((balance) => {
@@ -72,6 +93,45 @@ export function WalletBalances() {
 
     setTotalFiatAmount(totalAmount);
   }, [tokenBalances]);
+
+  // Silently runs a gas check for bridge to L2
+  // This is to prevent the user having to wait for the gas estimate to complete to use the UI
+  // As a trade-off there is a slight delay between when the gas estimate is fetched and checked against the user balance, so 'move' can be selected before the gas estimate is completed
+  useEffect(() => {
+    const bridgeToL2GasCheck = async () => {
+      if (!checkout) return;
+      if (!network) return;
+      if (network.chainId !== getL1ChainId(checkout.config)) return;
+
+      const ethBalance = tokenBalances
+        .find((balance) => isNativeToken(balance.address) && balance.symbol === ETH_TOKEN_SYMBOL);
+      if (!ethBalance) return;
+
+      if (ethBalance.balance === ZERO_BALANCE_STRING) {
+        setInsufficientFundsForBridgeToL2Gas(true);
+        return;
+      }
+
+      try {
+        const { gasFee } = await checkout.gasEstimate({
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          isSpendingCapApprovalRequired: false,
+        });
+
+        if (!gasFee.estimatedAmount) {
+          setInsufficientFundsForBridgeToL2Gas(false);
+          return;
+        }
+
+        setInsufficientFundsForBridgeToL2Gas(
+          gasFee.estimatedAmount.gt(utils.parseUnits(ethBalance.balance, DEFAULT_TOKEN_DECIMALS)),
+        );
+      } catch {
+        setInsufficientFundsForBridgeToL2Gas(false);
+      }
+    };
+    bridgeToL2GasCheck();
+  }, [tokenBalances, checkout, network]);
 
   useEffect(() => {
     if (!checkout || !provider || !network) return;
@@ -114,6 +174,17 @@ export function WalletBalances() {
     });
   };
 
+  const handleBridgeToL2OnClick = (address?: string) => {
+    if (insufficientFundsForBridgeToL2Gas) {
+      setShowNotEnoughGasDrawer(true);
+      return;
+    }
+    orchestrationEvents.sendRequestBridgeEvent(IMTBLWidgetEvents.IMTBL_WALLET_WIDGET_EVENT, {
+      tokenAddress: address ?? '',
+      amount: '',
+    });
+  };
+
   return (
     <SimpleLayout
       testId="wallet-balances"
@@ -135,14 +206,9 @@ export function WalletBalances() {
       footer={<FooterLogo />}
     >
       <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          rowGap: 'base.spacing.x2',
-          paddingX: 'base.spacing.x2',
-        }}
+        sx={walletBalanceOuterContainerStyles}
       >
-        <Box sx={WALLET_BALANCE_CONTAINER_STYLE}>
+        <Box sx={walletBalanceContainerStyles}>
           <NetworkMenu setBalancesLoading={setBalancesLoading} />
           <TotalTokenBalance totalBalance={totalFiatAmount} />
           <Box
@@ -152,14 +218,7 @@ export function WalletBalances() {
             )}
           >
             {balancesLoading && (
-            <Box sx={{
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            >
+            <Box sx={walletBalanceLoadingIconStyles}>
               <Icon
                 testId="loading-icon"
                 icon="Loading"
@@ -167,7 +226,12 @@ export function WalletBalances() {
               />
             </Box>
             )}
-            {!balancesLoading && (<TokenBalanceList balanceInfoItems={tokenBalances} />)}
+            {!balancesLoading && (
+              <TokenBalanceList
+                balanceInfoItems={tokenBalances}
+                bridgeToL2OnClick={handleBridgeToL2OnClick}
+              />
+            )}
           </Box>
         </Box>
         {showAddCoins && (
@@ -180,6 +244,13 @@ export function WalletBalances() {
             <MenuItem.Label>Add coins</MenuItem.Label>
           </MenuItem>
         )}
+        <NotEnoughGas
+          visible={showNotEnoughGasDrawer}
+          showHeaderBar={false}
+          onCloseBottomSheet={() => setShowNotEnoughGasDrawer(false)}
+          walletAddress={walletAddress}
+          showAdjustAmount={false}
+        />
       </Box>
     </SimpleLayout>
   );

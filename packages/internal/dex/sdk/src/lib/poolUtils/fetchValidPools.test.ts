@@ -6,13 +6,13 @@ import { ProviderCallError } from 'errors';
 import { fetchValidPools } from './fetchValidPools';
 import { Multicall__factory } from '../../contracts/types';
 import {
-  IMX_TEST_CHAIN,
+  IMX_TEST_TOKEN,
   TEST_CHAIN_ID,
   TEST_MULTICALL_ADDRESS,
   TEST_RPC_URL,
   TEST_V3_CORE_FACTORY_ADDRESS,
-  WETH_TEST_CHAIN,
-} from '../../utils/testUtils';
+  WETH_TEST_TOKEN,
+} from '../../test/utils';
 
 jest.mock('@ethersproject/contracts');
 
@@ -42,7 +42,7 @@ describe('fetchPools', () => {
 
       await expect(fetchValidPools(
         multicallContract,
-        [WETH_TEST_CHAIN, IMX_TEST_CHAIN],
+        [WETH_TEST_TOKEN, IMX_TEST_TOKEN],
         [],
         TEST_V3_CORE_FACTORY_ADDRESS,
       )).rejects.toThrow(new ProviderCallError('failed multicall: an rpc error message'));
@@ -108,7 +108,7 @@ describe('fetchPools', () => {
 
       const pools = await fetchValidPools(
         multicallContract,
-        [WETH_TEST_CHAIN, IMX_TEST_CHAIN],
+        [WETH_TEST_TOKEN, IMX_TEST_TOKEN],
         [],
         TEST_V3_CORE_FACTORY_ADDRESS,
       );
@@ -232,7 +232,7 @@ describe('fetchPools', () => {
 
       const pools = await fetchValidPools(
         multicallContract,
-        [WETH_TEST_CHAIN, IMX_TEST_CHAIN],
+        [WETH_TEST_TOKEN, IMX_TEST_TOKEN],
         [],
         TEST_V3_CORE_FACTORY_ADDRESS,
       );
@@ -359,7 +359,7 @@ describe('fetchPools', () => {
 
       const pools = await fetchValidPools(
         multicallContract,
-        [WETH_TEST_CHAIN, IMX_TEST_CHAIN],
+        [WETH_TEST_TOKEN, IMX_TEST_TOKEN],
         [],
         TEST_V3_CORE_FACTORY_ADDRESS,
       );

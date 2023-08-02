@@ -8,6 +8,8 @@ export enum BridgeErrorType {
   INTERNAL_ERROR = 'INTERNAL_ERROR',
   PROVIDER_ERROR = 'PROVIDER_ERROR',
   TRANSACTION_REVERTED = 'TRANSACTION_REVERTED',
+  INVALID_TOKEN = 'INVALID_TOKEN',
+  INVALID_TRANSACTION = 'INVALID_TRANSACTION',
 }
 
 /**
@@ -38,16 +40,21 @@ export class BridgeError extends Error {
  * @template T - The type of the value that the Promise resolves to.
  * @param {() => Promise<T>} fn - The function to wrap with error handling.
  * @param {BridgeErrorType} customErrorType - The custom error type to use for the error.
+ * @param {string} [details] - Additional details to add to the error message.
  * @returns {Promise<T>} The result of the wrapped function or a rejected promise with a BridgeError.
  */
 export const withBridgeError = async <T>(
   fn: () => Promise<T>,
   customErrorType: BridgeErrorType,
+  details?: string,
 ): Promise<T> => {
   try {
     return await fn();
   } catch (error) {
-    const errorMessage = `${customErrorType}: ${(error as Error).message}` || 'UnknownError';
+    let errorMessage = `${customErrorType}: ${(error as Error).message}` || 'UnknownError';
+    if (details) {
+      errorMessage = `${details}: ${errorMessage}`;
+    }
     throw new BridgeError(errorMessage, customErrorType);
   }
 };

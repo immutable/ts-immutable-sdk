@@ -1,8 +1,13 @@
+import { ModuleConfiguration } from '@imtbl/config';
 import { ImmutableApiClient, ImmutableApiClientFactory } from 'api-client';
-import { OrderbookModuleConfiguration } from 'config/config';
+import {
+  getOrderbookConfig,
+  OrderbookModuleConfiguration,
+  OrderbookOverrides,
+} from 'config/config';
 import { ERC721Factory } from 'erc721';
 import { ListingResult, ListListingsResult, OrderStatus } from 'openapi/sdk';
-import { Seaport, SeaportFactory } from 'seaport';
+import { Seaport } from 'seaport';
 import {
   CancelOrderResponse,
   CreateListingParams,
@@ -11,6 +16,7 @@ import {
   PrepareListingParams,
   PrepareListingResponse,
 } from 'types';
+import { SeaportLibFactory } from './seaport/seaport-lib-factory';
 
 /**
  * zkEVM orderbook SDK
@@ -22,30 +28,45 @@ export class Orderbook {
 
   private seaport: Seaport;
 
-  constructor(private config: OrderbookModuleConfiguration) {
-    // TODO: Move endpoint lookup to a map based on env. Just using override to get dev started
-    const apiEndpoint = config.overrides?.apiEndpoint;
-    if (!apiEndpoint) {
-      throw new Error('API endpoint must be provided as an override');
+  private orderbookConfig: OrderbookModuleConfiguration;
+
+  constructor(config: ModuleConfiguration<OrderbookOverrides>) {
+    const obConfig = getOrderbookConfig(config.baseConfig.environment);
+
+    const finalConfig: OrderbookModuleConfiguration = {
+      ...obConfig,
+      ...config.overrides,
+    } as OrderbookModuleConfiguration;
+
+    if (!finalConfig) {
+      throw new Error(
+        'Orderbook configuration not passed, please specify the environment under config.baseConfig.environment',
+      );
     }
 
-    // TODO: Move chainId lookup to a map based on env. Just using override to get dev started
-    const chainName = config.overrides?.chainName;
-    if (!chainName) {
-      throw new Error('chainName must be provided as an override');
+    this.orderbookConfig = finalConfig;
+
+    const { apiEndpoint, chainName } = this.orderbookConfig;
+    if (!apiEndpoint) {
+      throw new Error('API endpoint must be provided');
     }
 
     this.apiClient = new ImmutableApiClientFactory(
       apiEndpoint,
       chainName,
-      this.config.seaportContractAddress,
+      this.orderbookConfig.seaportContractAddress,
     ).create();
 
-    this.seaport = new SeaportFactory(
-      this.config.seaportContractAddress,
-      this.config.zoneContractAddress,
-      this.config.provider,
-    ).create();
+    const seaportLibFactory = new SeaportLibFactory(
+      this.orderbookConfig.seaportContractAddress,
+      this.orderbookConfig.provider,
+    );
+    this.seaport = new Seaport(
+      seaportLibFactory,
+      this.orderbookConfig.provider,
+      this.orderbookConfig.seaportContractAddress,
+      this.orderbookConfig.zoneContractAddress,
+    );
   }
 
   /**
@@ -85,12 +106,9 @@ export class Orderbook {
   }: PrepareListingParams): Promise<PrepareListingResponse> {
     const erc721 = new ERC721Factory(
       sell.contractAddress,
-      this.config.provider,
+      this.orderbookConfig.provider,
     ).create();
-    const royaltyInfo = await erc721.royaltyInfo(
-      sell.tokenId,
-      buy.amount,
-    );
+    const royaltyInfo = await erc721.royaltyInfo(sell.tokenId, buy.amount);
 
     return this.seaport.prepareSeaportOrder(
       makerAddress,

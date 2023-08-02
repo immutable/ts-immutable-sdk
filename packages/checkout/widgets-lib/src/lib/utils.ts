@@ -2,7 +2,7 @@ import {
   ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo,
 } from '@imtbl/checkout-sdk';
 import { getL1ChainId, getL2ChainId } from './networkUtils';
-import { DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS, DEFAULT_TOKEN_FORMATTING_DECIMALS } from './constants';
+import { DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS, DEFAULT_TOKEN_FORMATTING_DECIMALS, NATIVE } from './constants';
 
 export const sortTokensByAmount = (
   config: CheckoutConfiguration,
@@ -108,3 +108,5 @@ export const tokenValueFormat = (s: Number | string): string => {
     pointIndex + DEFAULT_TOKEN_FORMATTING_DECIMALS + 1,
   );
 };
+
+export const isNativeToken = (address?: string): boolean => !address || address.toLocaleUpperCase() === NATIVE;

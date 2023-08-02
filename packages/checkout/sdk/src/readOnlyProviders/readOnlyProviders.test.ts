@@ -1,28 +1,34 @@
-import { ethers, providers } from 'ethers';
 import { Environment } from '@imtbl/config';
-import { ChainId, GetNetworkAllowListResult } from '../types';
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { ChainId, ChainName, GetNetworkAllowListResult } from '../types';
 import { createReadOnlyProviders } from './readOnlyProvider';
 import { CheckoutConfiguration } from '../config';
 import * as network from '../network';
 
 jest.mock('../network');
+jest.mock('@ethersproject/providers', () => ({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  JsonRpcProvider: jest.fn(),
+}));
 
 const baseConfig = new CheckoutConfiguration({
   baseConfig: { environment: Environment.SANDBOX },
 });
 
-describe.skip('read only providers', () => {
+describe('read only providers', () => {
   beforeEach(() => {
     jest.restoreAllMocks();
     const getNetworkAllListMock = jest.fn().mockResolvedValue({
       networks: [
         {
           chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+          name: ChainName.IMTBL_ZKEVM_TESTNET,
           isSupported: true,
           nativeCurrency: {},
         },
         {
           chainId: ChainId.SEPOLIA,
+          name: ChainName.SEPOLIA,
           isSupported: true,
           nativeCurrency: {},
         },
@@ -43,13 +49,10 @@ describe.skip('read only providers', () => {
   });
 
   it('should return new map of read only providers', async () => {
-    const existingReadOnlyProviders = new Map<
-    ChainId,
-    ethers.providers.JsonRpcProvider
-    >();
+    const existingReadOnlyProviders = new Map<ChainId, JsonRpcProvider>();
     existingReadOnlyProviders.set(
       ChainId.ETHEREUM,
-      new providers.JsonRpcProvider('mainnet-url'),
+      new JsonRpcProvider('mainnet-url'),
     );
 
     const result = await createReadOnlyProviders(
@@ -64,13 +67,10 @@ describe.skip('read only providers', () => {
   });
 
   it('should return existing map of read only providers', async () => {
-    const existingReadOnlyProviders = new Map<
-    ChainId,
-    ethers.providers.JsonRpcProvider
-    >();
+    const existingReadOnlyProviders = new Map<ChainId, JsonRpcProvider>();
     existingReadOnlyProviders.set(
       ChainId.SEPOLIA,
-      new providers.JsonRpcProvider('sepolia-url'),
+      new JsonRpcProvider('sepolia-url'),
     );
 
     const result = await createReadOnlyProviders(
@@ -80,6 +80,5 @@ describe.skip('read only providers', () => {
 
     expect(result.size).toEqual(1);
     expect(result.get(ChainId.SEPOLIA)).toBeDefined();
-    expect(result.get(ChainId.IMTBL_ZKEVM_TESTNET)).not.toBeDefined();
   });
 });

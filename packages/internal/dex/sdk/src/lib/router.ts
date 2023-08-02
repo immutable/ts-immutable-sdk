@@ -1,10 +1,11 @@
 import { ethers } from 'ethers';
 import {
-  Currency, CurrencyAmount, Token, TradeType,
+  Currency, CurrencyAmount, TradeType,
 } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import JSBI from 'jsbi';
 import { NoRoutesAvailableError } from 'errors';
+import { TokenInfo } from 'types';
 import { poolEquals } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
@@ -16,6 +17,7 @@ export type RoutingContracts = {
   factoryAddress: string;
   quoterAddress: string;
   peripheryRouterAddress: string;
+  secondaryFeeAddress: string;
 };
 
 export type QuoteTradeInfo = {
@@ -35,13 +37,13 @@ export type QuoteResponse = {
 export class Router {
   public provider: ethers.providers.JsonRpcProvider;
 
-  public routingTokens: Token[];
+  public routingTokens: TokenInfo[];
 
   public routingContracts: RoutingContracts;
 
   constructor(
     provider: ethers.providers.JsonRpcProvider,
-    routingTokens: Token[],
+    routingTokens: TokenInfo[],
     routingContracts: RoutingContracts,
   ) {
     this.provider = provider;

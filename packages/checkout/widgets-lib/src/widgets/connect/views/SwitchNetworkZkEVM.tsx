@@ -29,7 +29,6 @@ export function SwitchNetworkZkEVM() {
         provider,
         chainId: getL2ChainId(checkout.config),
       });
-
       connectDispatch({
         payload: {
           type: ConnectActions.SET_PROVIDER,

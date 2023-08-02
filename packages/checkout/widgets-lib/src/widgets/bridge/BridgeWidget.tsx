@@ -2,13 +2,12 @@ import {
   BiomeCombinedProviders,
 } from '@biom3/react';
 import { BaseTokens, onDarkBase, onLightBase } from '@biom3/design-tokens';
-import { Web3Provider } from '@ethersproject/providers';
 import {
-  Checkout,
   NetworkFilterTypes,
 } from '@imtbl/checkout-sdk';
 import {
-  useEffect, useMemo, useReducer, useRef,
+  useContext,
+  useEffect, useMemo, useReducer,
 } from 'react';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
@@ -44,11 +43,11 @@ import { text } from '../../resources/text/textConfig';
 import { ErrorView } from '../../views/error/ErrorView';
 import { ApproveERC20BridgeOnboarding } from './views/ApproveERC20Bridge';
 import { getBridgeTokensAndBalances } from './functions/getBridgeTokens';
+import { ConnectLoaderContext } from '../../context/connect-loader-context/ConnectLoaderContext';
 
 export interface BridgeWidgetProps {
   params: BridgeWidgetParams;
   config: StrongCheckoutWidgetsConfig
-  web3Provider?: Web3Provider;
 }
 
 export interface BridgeWidgetParams {
@@ -57,7 +56,7 @@ export interface BridgeWidgetParams {
 }
 
 export function BridgeWidget(props: BridgeWidgetProps) {
-  const { params, config, web3Provider } = props;
+  const { params, config } = props;
   const { environment, theme } = config;
   const successText = text.views[BridgeWidgetViews.SUCCESS];
   const failText = text.views[BridgeWidgetViews.FAIL];
@@ -66,10 +65,9 @@ export function BridgeWidget(props: BridgeWidgetProps) {
 
   const [viewState, viewDispatch] = useReducer(viewReducer, initialViewState);
 
-  const firstRender = useRef(true);
-
   const viewReducerValues = useMemo(() => ({ viewState, viewDispatch }), [viewState, viewDispatch]);
-
+  const { connectLoaderState } = useContext(ConnectLoaderContext);
+  const { checkout, provider } = connectLoaderState;
   const [bridgeState, bridgeDispatch] = useReducer(bridgeReducer, initialBridgeState);
   const bridgeReducerValues = useMemo(() => ({ bridgeState, bridgeDispatch }), [bridgeState, bridgeDispatch]);
 
@@ -83,22 +81,20 @@ export function BridgeWidget(props: BridgeWidgetProps) {
 
   useEffect(() => {
     const bridgetWidgetSetup = async () => {
-      if (!web3Provider) return;
-      const checkout = new Checkout({
-        baseConfig: { environment },
-      });
+      if (!checkout || !provider) return;
+
+      const getNetworkResult = await checkout.getNetworkInfo({ provider });
+
+      /* If the provider's network is not supported, return out of this and let the
+      connect loader handle the switch network functionality */
+      if (!getNetworkResult.isSupported) {
+        return;
+      }
 
       bridgeDispatch({
         payload: {
-          type: BridgeActions.SET_CHECKOUT,
-          checkout,
-        },
-      });
-
-      bridgeDispatch({
-        payload: {
-          type: BridgeActions.SET_PROVIDER,
-          provider: web3Provider,
+          type: BridgeActions.SET_NETWORK,
+          network: getNetworkResult,
         },
       });
 
@@ -145,16 +141,7 @@ export function BridgeWidget(props: BridgeWidgetProps) {
         });
       }
 
-      const getNetworkResult = await checkout.getNetworkInfo({ provider: web3Provider });
-
-      bridgeDispatch({
-        payload: {
-          type: BridgeActions.SET_NETWORK,
-          network: getNetworkResult,
-        },
-      });
-
-      const tokensAndBalances = await getBridgeTokensAndBalances(checkout, web3Provider);
+      const tokensAndBalances = await getBridgeTokensAndBalances(checkout, provider);
 
       bridgeDispatch({
         payload: {
@@ -178,10 +165,8 @@ export function BridgeWidget(props: BridgeWidgetProps) {
       });
     };
 
-    if (firstRender.current) {
-      bridgetWidgetSetup();
-    }
-  }, [web3Provider, firstRender.current]);
+    bridgetWidgetSetup();
+  }, [checkout, provider]);
 
   return (
     <BiomeCombinedProviders theme={{ base: biomeTheme }}>
@@ -193,8 +178,8 @@ export function BridgeWidget(props: BridgeWidgetProps) {
             )}
             {viewReducerValues.viewState.view.type === BridgeWidgetViews.BRIDGE && (
               <Bridge
-                amount={viewReducerValues.viewState.view.data?.amount ?? amount}
-                fromContractAddress={viewReducerValues.viewState.view.data?.tokenAddress ?? fromContractAddress}
+                amount={viewReducerValues.viewState.view.data?.fromAmount ?? amount}
+                fromContractAddress={viewReducerValues.viewState.view.data?.fromContractAddress ?? fromContractAddress}
               />
             )}
             {viewReducerValues.viewState.view.type === BridgeWidgetViews.IN_PROGRESS && (

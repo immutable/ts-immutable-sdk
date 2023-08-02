@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.2",
   "info": {
-    "title": "Immutable X API",
+    "title": "Immutable zkEVM API",
     "version": "1.0.0",
     "description": "Immutable Multi Rollup API",
     "contact": {
@@ -79,12 +79,6 @@
     }
   ],
   "servers": [
-    {
-      "url": "https://indexer-mr.sandbox.imtbl.com"
-    },
-    {
-      "url": "https://order-book-mr.dev.imtbl.com"
-    },
     {
       "url": "https://api.sandbox.immutable.com"
     }
@@ -1328,7 +1322,9 @@
           "mint",
           "burn",
           "transfer",
-          "sale"
+          "sale",
+          "deposit",
+          "withdrawal"
         ]
       },
       "ActivityNFT": {
@@ -1404,7 +1400,30 @@
           }
         },
         "required": [
-          "activity_type",
+          "to",
+          "amount",
+          "asset"
+        ]
+      },
+      "Deposit": {
+        "type": "object",
+        "description": "The deposit activity details",
+        "properties": {
+          "to": {
+            "description": "The account address the asset was deposited to",
+            "type": "string",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "amount": {
+            "description": "The deposited amount",
+            "type": "string",
+            "example": "1"
+          },
+          "asset": {
+            "$ref": "#/components/schemas/ActivityAsset"
+          }
+        },
+        "required": [
           "to",
           "amount",
           "asset"
@@ -1429,7 +1448,30 @@
           }
         },
         "required": [
-          "activity_type",
+          "from",
+          "amount",
+          "asset"
+        ]
+      },
+      "Withdrawal": {
+        "description": "The withdrawal activity details",
+        "type": "object",
+        "properties": {
+          "from": {
+            "description": "The account address the asset was withdrawn from",
+            "type": "string",
+            "example": "0xe9b00a87700f660e46b6f5deaa1232836bcc07d3"
+          },
+          "amount": {
+            "description": "The amount of assets withdrawn",
+            "type": "string",
+            "example": "1"
+          },
+          "asset": {
+            "$ref": "#/components/schemas/ActivityAsset"
+          }
+        },
+        "required": [
           "from",
           "amount",
           "asset"
@@ -1579,7 +1621,6 @@
           }
         },
         "required": [
-          "activity_type",
           "order_id",
           "to",
           "from",
@@ -1601,6 +1642,12 @@
           },
           {
             "$ref": "#/components/schemas/NFTSale"
+          },
+          {
+            "$ref": "#/components/schemas/Deposit"
+          },
+          {
+            "$ref": "#/components/schemas/Withdrawal"
           }
         ]
       },
@@ -2185,28 +2232,45 @@
             "$ref": "#/components/schemas/Chain"
           },
           "contract_address": {
-            "type": "string"
+            "type": "string",
+            "description": "The address of token contract",
+            "example": "0xc344c05eef8876e517072f879dae8905aa2b956b"
+          },
+          "root_contract_address": {
+            "type": "string",
+            "description": "The address of root token contract",
+            "example": "0x43e60b30d5bec48c0f5890e3d1e9f1b1296bb4aa",
+            "nullable": true
           },
           "symbol": {
             "type": "string",
+            "description": "The symbol of token",
+            "example": "AAA",
             "nullable": true
           },
           "decimals": {
             "type": "integer",
+            "description": "The decimals of token",
+            "example": 18,
             "nullable": true
           },
           "image_url": {
             "type": "string",
+            "description": "The image url of token",
+            "example": "https://some-url",
             "nullable": true
           },
           "name": {
             "type": "string",
+            "description": "The name of token",
+            "example": "Token A",
             "nullable": true
           }
         },
         "required": [
           "chain",
           "contract_address",
+          "root_contract_address",
           "symbol",
           "decimals",
           "image_url",
@@ -2519,7 +2583,7 @@
             "minItems": 1,
             "maxItems": 1
           },
-          "buy_fees": {
+          "fees": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Fee"
@@ -2580,7 +2644,7 @@
               "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
             }
           ],
-          "buy_fees": [],
+          "fees": [],
           "end_time": "2022-03-10T05:00:50.52Z",
           "protocol_data": {
             "order_type": "FULL_RESTRICTED",
@@ -2604,7 +2668,7 @@
           "order_hash",
           "buy",
           "sell",
-          "buy_fees",
+          "fees",
           "end_time",
           "start_time",
           "protocol_data",
@@ -2692,7 +2756,7 @@
             "minItems": 1,
             "maxItems": 1
           },
-          "buy_fees": {
+          "fees": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Fee"
@@ -2774,7 +2838,7 @@
               "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
             }
           ],
-          "buy_fees": [],
+          "fees": [],
           "chain": {
             "id": "eip155:11155111",
             "name": "sepolia"
@@ -2807,7 +2871,7 @@
           "account_address",
           "buy",
           "sell",
-          "buy_fees",
+          "fees",
           "chain",
           "create_time",
           "end_time",
@@ -2839,7 +2903,7 @@
                 "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
               }
             ],
-            "buy_fees": [],
+            "fees": [],
             "chain": {
               "id": "eip155:11155111",
               "name": "sepolia"
@@ -2903,7 +2967,7 @@
                   "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
                 }
               ],
-              "buy_fees": [],
+              "fees": [],
               "chain": {
                 "id": "eip155:11155111",
                 "name": "sepolia"
@@ -2940,7 +3004,7 @@
                   "contract_address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
                 }
               ],
-              "buy_fees": [],
+              "fees": [],
               "chain": {
                 "id": "eip155:11155111",
                 "name": "sepolia"
@@ -3026,7 +3090,6 @@
         "required": [
           "order_type",
           "counter",
-          "order_type",
           "zone_address",
           "seaport_address",
           "seaport_version"

@@ -7,11 +7,10 @@ import {
 } from '@imtbl/bridge-sdk';
 import { ImmutableConfiguration } from '@imtbl/config';
 import { ethers } from 'ethers';
-import { Exchange, ExchangeConfiguration } from '@imtbl/dex-sdk';
+import { Exchange } from '@imtbl/dex-sdk';
 import { CheckoutError, CheckoutErrorType } from '../errors';
-import { ChainId } from '../types';
+import { ChainId, DexConfig } from '../types';
 import { CheckoutConfiguration } from '../config';
-import { DexConfig } from '../config/remoteConfigType';
 
 export async function createBridgeInstance(
   fromChainId: ChainId,
@@ -57,13 +56,11 @@ export async function createExchangeInstance(
     'dex',
   )) as DexConfig;
 
-  return new Exchange(
-    new ExchangeConfiguration({
-      chainId,
-      baseConfig: new ImmutableConfiguration({
-        environment: config.environment,
-      }),
-      overrides: dexConfig?.overrides,
+  return new Exchange({
+    chainId,
+    baseConfig: new ImmutableConfiguration({
+      environment: config.environment,
     }),
-  );
+    overrides: dexConfig?.overrides,
+  });
 }
