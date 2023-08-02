@@ -12,10 +12,6 @@ jobs:
     name: Build, Lint, Typecheck, Test
     runs-on: ubuntu-latest
     steps:
-      - name: reviewer
-        if: ${{ contains(github.event.pull_request.title, 'RUN-CY-TESTS') }}
-        run: echo ${{ github.event.pull_request.title }}
-
       - name: Checkout
         uses: actions/checkout@v3
         with:
