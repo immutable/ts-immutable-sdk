@@ -179,26 +179,6 @@ export interface ChildTokenToRootTokenResponse {
 }
 
 /**
- * @typedef {Object} ApproveWithdrawBridgeRequest
- * @property {Address} withdrawerAddress - The address of the account intending to withdraw the tokens.
- * @property {Address} token - The address of the token contract.
- * @property {ethers.BigNumber} withdrawAmount - The amount of tokens to be withdrawn.
- */
-export interface ApproveWithdrawBridgeRequest {
-  withdrawerAddress: Address;
-  token: Address;
-  withdrawAmount: ethers.BigNumber;
-}
-
-/**
- * @typedef {Object} ApproveWithdrawBridgeResponse
- * @property {ethers.providers.TransactionRequest|null} unsignedTx - The unsigned withdrawal transaction, or null if the approval is not required.
- */
-export interface ApproveWithdrawBridgeResponse {
-  unsignedTx: ethers.providers.TransactionRequest | null;
-}
-
-/**
  * @typedef {Object} BridgeWithdrawRequest
  * @property {Address} recipientAddress - The address of the recipient of the withdrawn tokens on the root chain.
  * @property {FungibleToken} token - The token to be withdrawn.
