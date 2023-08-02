@@ -1,7 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import { Web3Provider } from '@ethersproject/providers';
-import { Environment } from '@imtbl/config';
-import { CheckoutConfiguration } from '@imtbl/checkout-sdk';
+import { Checkout } from '@imtbl/checkout-sdk';
 import { StrongCheckoutWidgetsConfig, withDefaultWidgetConfigs } from '../lib/withDefaultWidgetConfig';
 
 export abstract class ImmutableWebComponent extends HTMLElement {
@@ -11,7 +10,7 @@ export abstract class ImmutableWebComponent extends HTMLElement {
 
   provider: Web3Provider | undefined = undefined;
 
-  checkoutConfig: CheckoutConfiguration | undefined;
+  checkout: Checkout | undefined;
 
   static get observedAttributes() {
     return ['widgetConfig'];
@@ -25,23 +24,21 @@ export abstract class ImmutableWebComponent extends HTMLElement {
   attributeChangedCallback(name: string, oldValue, newValue: any) {
     if (name === 'widgetConfig') {
       this.widgetConfig = this.parseWidgetConfig(newValue);
-      this.updateCheckoutConfig();
+      this.updateCheckout();
     } else {
       this[name] = (newValue as string)?.toLowerCase();
     }
     this.renderWidget();
   }
 
-  updateCheckoutConfig() {
-    const isProduction = this.widgetConfig!.environment === Environment.PRODUCTION;
-    const isDevelopment = !isProduction && this.widgetConfig?.environment !== Environment.SANDBOX;
-    this.checkoutConfig = { isDevelopment, isProduction } as CheckoutConfiguration;
+  updateCheckout() {
+    this.checkout = new Checkout({ baseConfig: { environment: this.widgetConfig!.environment } });
   }
 
   connectedCallback() {
     const widgetConfig = this.getAttribute('widgetConfig') || undefined;
     this.widgetConfig = this.parseWidgetConfig(widgetConfig);
-    this.updateCheckoutConfig();
+    this.updateCheckout();
   }
 
   private parseWidgetConfig(widgetsConfig?: string):StrongCheckoutWidgetsConfig {
