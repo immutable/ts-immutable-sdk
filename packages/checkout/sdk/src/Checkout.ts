@@ -64,7 +64,6 @@ export class Checkout {
     ChainId,
     ethers.providers.JsonRpcProvider
     >();
-    console.log('test');
   }
 
   /**
