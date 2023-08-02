@@ -1,8 +1,7 @@
 import { it } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { onDarkBase } from '@biom3/design-tokens';
-import { BiomeThemeProvider } from '@biom3/react';
-import React from 'react';
+import { BiomeCombinedProviders } from '@biom3/react';
 import { cySmartGet } from '../../lib/testUtils';
 import { StatusView } from './StatusView';
 import { StatusType } from './StatusType';
@@ -10,7 +9,7 @@ import { StatusType } from './StatusType';
 xdescribe('status view', () => {
   it('shows success text and button', () => {
     mount(
-      <BiomeThemeProvider theme={{ base: onDarkBase }}>
+      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
         <StatusView
           actionText="Close"
           testId="status-view"
@@ -21,7 +20,7 @@ xdescribe('status view', () => {
           statusType={StatusType.SUCCESS}
           statusText="Test success"
         />
-      </BiomeThemeProvider>,
+      </BiomeCombinedProviders>,
     );
 
     cySmartGet('status-view-container').should('be.visible');
@@ -37,7 +36,7 @@ xdescribe('status view', () => {
 
   it('shows failure text and button', () => {
     mount(
-      <BiomeThemeProvider theme={{ base: onDarkBase }}>
+      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
         <StatusView
           actionText="Close"
           testId="status-view"
@@ -48,7 +47,7 @@ xdescribe('status view', () => {
           statusType={StatusType.FAILURE}
           statusText="Test failure"
         />
-      </BiomeThemeProvider>,
+      </BiomeCombinedProviders>,
     );
 
     cySmartGet('status-view-container').should('be.visible');
@@ -64,7 +63,7 @@ xdescribe('status view', () => {
 
   it('shows rejected text and button', () => {
     mount(
-      <BiomeThemeProvider theme={{ base: onDarkBase }}>
+      <BiomeCombinedProviders theme={{ base: onDarkBase }}>
         <StatusView
           actionText="Close"
           testId="status-view"
@@ -75,7 +74,7 @@ xdescribe('status view', () => {
           statusType={StatusType.WARNING}
           statusText="Test rejected"
         />
-      </BiomeThemeProvider>,
+      </BiomeCombinedProviders>,
     );
 
     cySmartGet('status-view-container').should('be.visible');

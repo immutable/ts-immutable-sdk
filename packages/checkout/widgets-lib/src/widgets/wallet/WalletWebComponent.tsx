@@ -36,8 +36,8 @@ export class ImmutableWallet extends ImmutableWebComponent {
       walletProvider: this.walletProvider,
       web3Provider: this.provider,
       allowedChains: [
-        getL1ChainId(this.checkoutConfig!),
-        getL2ChainId(this.checkoutConfig!),
+        getL1ChainId(this.checkout!.config),
+        getL2ChainId(this.checkout!.config),
       ],
     };
 
