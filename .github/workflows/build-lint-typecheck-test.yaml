@@ -50,6 +50,22 @@ jobs:
       - name: Typecheck
         run: yarn typecheck
 
+      - name: Upload sdk build
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          if-no-files-found: error
+          path: ./sdk/dist
+          retention-days: 1
+
+      - name: Upload checkout widgets build
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          if-no-files-found: error
+          path: ./packages/checkout/widgets-lib/build
+          retention-days: 1
+
   Test:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -58,6 +74,18 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      - name: Download the sdk-build
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+          path: ./sdk
+
+      - name: Download the checkout-widgets-build
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: ./packages/checkout/widgets-lib
 
       - name: Use Node.js
         uses: actions/setup-node@v3
@@ -92,6 +120,18 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      - name: Download the sdk-build
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+          path: ./sdk
+
+      - name: Download the checkout-widgets-build
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: ./packages/checkout/widgets-lib
 
       - name: Use Node.js
         uses: actions/setup-node@v3
