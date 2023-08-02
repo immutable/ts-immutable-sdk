@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         run: |
           teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}
-          echo $teams
+          echo ${{ contains(teams, 'Wallets') }}
 #      - name: Checkout
 #        uses: actions/checkout@v3
 #        with:
