@@ -127,7 +127,7 @@ export class PassportConfiguration {
           this.passportDomain = 'https://passport.sandbox.immutable.com';
           this.imxPublicApiDomain = 'https://api.sandbox.immutable.com';
           this.zkEvmRpcUrl = 'https://rpc.testnet.immutable.com';
-          this.zkEvmChainId = 'eip155:13392';
+          this.zkEvmChainId = 'eip155:13372';
           this.relayerUrl = 'https://api.sandbox.immutable.com/relayer-mr';
           this.multiRollupConfig = multiRollupConfig.getSandbox();
           break;
