@@ -44,7 +44,6 @@ function buildSwapParametersForSinglePoolSwap(
   }));
 
   if (trade.tradeType === TradeType.EXACT_INPUT) {
-    console.log('exactInputSingleWithServiceFee');
     return secondaryFeeContract.encodeFunctionData('exactInputSingleWithServiceFee', [secondaryFeeValues, {
       tokenIn: route.tokenPath[0].address,
       tokenOut: route.tokenPath[1].address,
@@ -56,7 +55,6 @@ function buildSwapParametersForSinglePoolSwap(
     }]);
   }
 
-  console.log('exactOutputSingleWithServiceFee');
   return secondaryFeeContract.encodeFunctionData('exactOutputSingleWithServiceFee', [secondaryFeeValues, {
     tokenIn: route.tokenPath[0].address,
     tokenOut: route.tokenPath[1].address,
@@ -85,7 +83,6 @@ function buildSwapParametersForMultiPoolSwap(
   }));
 
   if (trade.tradeType === TradeType.EXACT_INPUT) {
-    console.log('exactInputWithServiceFee');
     return secondaryFeeContract.encodeFunctionData('exactInputWithServiceFee', [secondaryFeeValues, {
       path,
       recipient: fromAddress,
@@ -94,7 +91,6 @@ function buildSwapParametersForMultiPoolSwap(
     }]);
   }
 
-  console.log('exactOutputWithServiceFee');
   return secondaryFeeContract.encodeFunctionData('exactOutputWithServiceFee', [secondaryFeeValues, {
     path,
     recipient: fromAddress,
@@ -218,7 +214,6 @@ export function getSwap(
   gasPrice: ethers.BigNumber | null,
   secondaryFees: SecondaryFee[],
 ): TransactionDetails {
-  console.log('getSwap');
   const calldata = createSwapParameters(
     routeAndQuote.trade,
     fromAddress,
