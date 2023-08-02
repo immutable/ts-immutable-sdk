@@ -12,7 +12,9 @@ jobs:
     runs-on: ubuntu-latest-8-cores
     steps:
       - name: Checkout
-        run: echo ${{ toJSON(github.event.pull_request.requested_teams) }}
+        run: |
+          teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}
+          echo $teams
 #      - name: Checkout
 #        uses: actions/checkout@v3
 #        with:
