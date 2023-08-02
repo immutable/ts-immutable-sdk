@@ -56,9 +56,11 @@ jobs:
       # Figure out how to run this in parallel with the other tests
       # This step takes 5 to 6 mins to run
       - name: Checkout-widgets cypress tests
+        if: ${{ github.event.requested_team.name == '@immutable/wallets'}}
         run: yarn test:checkout:cypress
 
       - name: Upload cypress videos artifacts
+        if: ${{ github.event.requested_team.name == '@immutable/wallets'}}
         uses: actions/upload-artifact@v2
         with:
           name: checkout-widgets-cypress-videos
