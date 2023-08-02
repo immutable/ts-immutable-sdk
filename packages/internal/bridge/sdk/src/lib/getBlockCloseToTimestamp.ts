@@ -1,6 +1,11 @@
 import { ethers } from 'ethers';
 
-export async function getBlockNumberClosestToTimestamp(provider: ethers.providers.Provider, targetTimestamp: number, blockTime: number, clockInaccuracy: number): Promise<number> {
+export async function getBlockNumberClosestToTimestamp(
+  provider: ethers.providers.Provider,
+  targetTimestamp: number,
+  blockTime: number,
+  clockInaccuracy: number,
+): Promise<number> {
   let lowerBlockNumber = 0;
   let upperBlockNumber = await provider.getBlockNumber();
 
