@@ -35,7 +35,7 @@ const transformGuardianTransactions = (txs: MetaTransaction[]): guardian.MetaTra
       gasLimit: t.gasLimit ? convertBigNumberishToString(t.gasLimit) : '0',
       target: t.to ?? ethers.constants.AddressZero,
       value: t.value ? convertBigNumberishToString(t.value) : '0',
-      data: t.data ? t.data.toString() : '0x00',
+      data: t.data ? t.data.toString() : '0x',
     }));
   } catch (error) {
     const errorMessage = (error instanceof Error) ? error.message : String(error);
