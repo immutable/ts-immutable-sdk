@@ -254,19 +254,6 @@ export function decodeMulticallExactInputOutputSingleWithoutFees(data: ethers.ut
   return { topLevelParams, swapParams };
 }
 
-export function decodeMulticallExactInputOutputWithoutFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeSecondaryFeeCall(data, 'exactInputWithServiceFee');
-
-  const swapParams: ExactInputOutputParams = {
-    path: decodedParams[0],
-    recipient: decodedParams[1],
-    amountIn: decodedParams[5],
-    amountOut: decodedParams[6],
-  };
-
-  return { topLevelParams, swapParams };
-}
-
 export function getMinimumAmountOut(
   slippageTolerance: Percent,
   amountOut: ethers.BigNumber,
