@@ -96,8 +96,10 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v3
         id: yarn-cache
+        env:
+          CACHE_DIR_PATH: ${{ needs.build.outputs.yarn-cache-dir-path.outputs.dir }}
         with:
-          path: ${{ needs.build.outputs.yarn-cache-dir-path.outputs.dir }}
+          path: ${{ env.CACHE_DIR_PATH }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -139,8 +141,10 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v3
         id: yarn-cache
+        env:
+          CACHE_DIR_PATH: ${{ needs.build.outputs.yarn-cache-dir-path.outputs.dir }}
         with:
-          path: ${{ needs.build.outputs.yarn-cache-dir-path.outputs.dir }}
+          path: ${{ env.CACHE_DIR_PATH }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -182,8 +186,10 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v3
         id: yarn-cache
+        env:
+          CACHE_DIR_PATH: ${{ needs.build.outputs.yarn-cache-dir-path.outputs.dir }}
         with:
-          path: ${{ needs.build.outputs.yarn-cache-dir-path.outputs.dir }}
+          path: ${{ env.CACHE_DIR_PATH }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
