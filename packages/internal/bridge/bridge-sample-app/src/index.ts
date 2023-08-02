@@ -182,7 +182,6 @@ async function depositAndWithdraw() {
   const txWithdrawReceipt = await txWithdraw.wait(1);
   console.log(`Withdrawal tx hash: ${txWithdrawReceipt.transactionHash}`)
 
-  // TODO: Given a tx hash, wait till next epoch
   const withdrawalRequest: WaitForWithdrawalRequest = {
     transactionHash: txWithdrawReceipt.transactionHash,
   }
@@ -190,7 +189,6 @@ async function depositAndWithdraw() {
   const waitForWithdrawalResp: WaitForWithdrawalResponse = await tokenBridge.waitForWithdrawal(withdrawalRequest);
   console.log(waitForWithdrawalResp)
 
-  // TODO: Exit on Layer 1
   console.log(`Exiting on Layer 1`)
   const exitRequest: ExitRequest = {
     transactionHash: txWithdrawReceipt.transactionHash,
