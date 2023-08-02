@@ -51,18 +51,16 @@ jobs:
       - name: Test
         run: yarn test
 
-      # Figure out how to run this in parallel with the other tests
-      # This step takes 5 to 6 mins to run
       - name: get reviewing teams
-        id: reviewer-team
+        id: reviewer-teams
         run: echo "teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}" >> $GITHUB_OUTPUT
 
       - name: Checkout-widgets cypress tests
-        if: ${{ contains(steps.reviewer-team.outputs.teams, 'Wallets') }}
+        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
         run: yarn test:checkout:cypress
 
       - name: Upload cypress videos artifacts
-        if: ${{ contains(steps.reviewer-team.outputs.teams, 'Wallets') }}
+        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets') && !contains(github.event.pull_request.title, 'SKIP-CY') }}
         uses: actions/upload-artifact@v2
         with:
           name: checkout-widgets-cypress-videos
