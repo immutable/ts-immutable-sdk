@@ -11,71 +11,68 @@ jobs:
     name: Build, Lint, Typecheck, Test
     runs-on: ubuntu-latest-8-cores
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org/
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Check Single Package Version Policy
+        run: yarn syncpack:check
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
+
+      - name: Typecheck
+        run: yarn typecheck
+
+      - name: Test
+        run: yarn test
+
+      # Figure out how to run this in parallel with the other tests
+      # This step takes 5 to 6 mins to run
       - name: get reviewing teams
         id: reviewer-team
         run: echo "teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}" >> $GITHUB_OUTPUT
 
-      - name: check teams
-        run: echo ${{ contains(steps.reviewer-team.outputs.teams, 'Wallets') }}
+      - name: Checkout-widgets cypress tests
+        if: ${{ contains(steps.reviewer-team.outputs.teams, 'Wallets') }}
+        run: yarn test:checkout:cypress
 
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 0
-#
-#      - name: Use Node.js
-#        uses: actions/setup-node@v3
-#        with:
-#          node-version: lts/*
-#          registry-url: https://registry.npmjs.org/
-#
-#      - name: Get yarn cache directory path
-#        id: yarn-cache-dir-path
-#        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-#
-#      - name: Cache node modules
-#        uses: actions/cache@v3
-#        id: yarn-cache
-#        with:
-#          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-#          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-#          restore-keys: |
-#            ${{ runner.os }}-yarn-
-#
-#      - name: Install dependencies
-#        run: yarn install --immutable
-#
-#      - name: Check Single Package Version Policy
-#        run: yarn syncpack:check
-#
-#      - name: Lint
-#        run: yarn lint
-#
-#      - name: Build
-#        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
-#
-#      - name: Typecheck
-#        run: yarn typecheck
-#
-#      - name: Test
-#        run: yarn test
-#
-#      # Figure out how to run this in parallel with the other tests
-#      # This step takes 5 to 6 mins to run
-#      - name: Checkout-widgets cypress tests
-#        if: ${{ contains(github.event.pull_request.title, 'RUN-CY-TESTS') }}
-#        run: yarn test:checkout:cypress
-#
-#      - name: Upload cypress videos artifacts
-#        if: ${{ contains(github.event.pull_request.title, 'RUN-CY-TESTS') }}
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: checkout-widgets-cypress-videos
-#          path: ./packages/checkout/widgets-lib/cypress/videos
-#
-#      - name: Upload cypress screenshots artifacts
-#        uses: actions/upload-artifact@v2
-#        if: failure()
-#        with:
-#          name: checkout-widgets-cypress-screenshots
-#          path: ./packages/checkout/widgets-lib/cypress/screenshots
+      - name: Upload cypress videos artifacts
+        if: ${{ contains(steps.reviewer-team.outputs.teams, 'Wallets') }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: checkout-widgets-cypress-videos
+          path: ./packages/checkout/widgets-lib/cypress/videos
+
+      - name: Upload cypress screenshots artifacts
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: checkout-widgets-cypress-screenshots
+          path: ./packages/checkout/widgets-lib/cypress/screenshots
