@@ -5,12 +5,16 @@ on:
     branches:
       - main
   pull_request:
+    types: [opened, synchronize, reopened, review_requested]
 
 jobs:
   build:
     name: Build, Lint, Typecheck, Test
     runs-on: ubuntu-latest
     steps:
+      - name: reviewer
+        run: echo ${{ github.event.requested_team.name == 'Wallets'}}
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -52,3 +56,23 @@ jobs:
 
       - name: Test
         run: yarn test
+
+      # Figure out how to run this in parallel with the other tests
+      # This step takes 5 to 6 mins to run
+      - name: Checkout-widgets cypress tests
+        if: ${{ github.event.requested_team.name == 'Wallets'}}
+        run: yarn test:checkout:cypress
+
+      - name: Upload cypress videos artifacts
+        if: ${{ github.event.requested_team.name == 'Wallets'}}
+        uses: actions/upload-artifact@v2
+        with:
+          name: checkout-widgets-cypress-videos
+          path: ./packages/checkout/widgets-lib/cypress/videos
+
+      - name: Upload cypress screenshots artifacts
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: checkout-widgets-cypress-screenshots
+          path: ./packages/checkout/widgets-lib/cypress/screenshots
