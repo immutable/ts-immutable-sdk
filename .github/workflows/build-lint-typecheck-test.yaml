@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build, Lint, Typecheck, Test
-    runs-on: ubuntu-latest-4-cores
+    runs-on: ubuntu-latest-8-cores
     steps:
       - name: Checkout
         uses: actions/checkout@v3
