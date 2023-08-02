@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: get reviewing teams
         id: reviewer-team
-        run: echo "teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}" >> $TEAMS
+        run: echo "teams=${{ join(github.event.pull_request.requested_teams.*.name, ', ') }}" >> $GITHUB_OUTPUT
 
       - name: check teams
         run: echo ${{ contains(steps.reviewer-team.outputs.teams, 'Wallets') }}
