@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: owner
-        run: echo ${{ github.event.pull_request.requested_team.name }}
+        run: echo ${{ github.event.pull_request.owner }}
 
       - name: wallets-team is owner
         if: ${{ github.event.requested_team.name == 'CODEOWNERS'}}
