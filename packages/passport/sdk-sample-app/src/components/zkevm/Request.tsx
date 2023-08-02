@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button, Form, Offcanvas, Spinner, Stack,
 } from 'react-bootstrap';
@@ -6,6 +6,8 @@ import { Heading } from '@biom3/react';
 import { RequestProps } from '@/types';
 import { useStatusProvider } from '@/context/StatusProvider';
 import { usePassportProvider } from '@/context/PassportProvider';
+import { Web3Provider } from '@ethersproject/providers'
+import { Contract, utils } from 'ethers';
 
 enum EthereumParamType {
   string = 'string',
@@ -98,6 +100,66 @@ const EthereumMethods: EthereumMethod[] = [
   },
 ];
 
+export const ERC20ABI = [
+  {
+    constant: true,
+    inputs: [],
+    name: 'name',
+    outputs: [
+      {
+        name: '',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'decimals',
+    outputs: [
+      {
+        name: '',
+        type: 'uint8',
+      },
+    ],
+    payable: false,
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        name: '_owner',
+        type: 'address',
+      },
+    ],
+    name: 'balanceOf',
+    outputs: [
+      {
+        name: 'balance',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'symbol',
+    outputs: [
+      {
+        name: '',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    type: 'function',
+  },
+];
+
 function Request({ showRequest, setShowRequest }: RequestProps) {
   const [selectedEthMethod, setSelectedEthMethod] = useState<EthereumMethod>(EthereumMethods[0]);
   const [params, setParams] = useState<string[]>([]);
@@ -106,6 +168,64 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
 
   const { addMessage } = useStatusProvider();
   const { zkEvmProvider } = usePassportProvider();
+
+  useEffect(() => {
+    (async () => {
+      if(zkEvmProvider) {
+        console.log('Passport zkEVMProvider is: ', zkEvmProvider);
+        const web3Provider = new Web3Provider(zkEvmProvider);
+        if((web3Provider.provider as any)?.isPassport) {
+          console.log('underlying provider is passport')
+        }
+        const network = await web3Provider.getNetwork();
+        console.log('web3Provider network: ', network);
+
+        const isConnected = (await zkEvmProvider.request({method: 'eth_accounts', params: []})).length > 0;
+
+        let address = ''
+        if(isConnected) {
+          address = await web3Provider.getSigner().getAddress();
+          console.log('web3Provider address: ', address)
+          const balance = await web3Provider.getBalance(address);
+          console.log('web3Provider balance: ', balance);
+        }
+
+        try {
+         const response =  await zkEvmProvider.request({method: 'wallet_switchEthereumChain', params: [{chainId: '0x1'}]})
+         console.log('switch chain response: ', response)
+        } catch (error) {
+          console.log(error)
+        }
+
+        try {
+          const response  = await web3Provider.getSigner().sendTransaction({
+            to: '0xe98b61832248c698085ffbc4313deb465be857e7',
+            value: '100000000000000'
+          })
+        } catch(error) {
+          console.log(error)
+        }
+
+        const contract = new Contract(
+          '0xaC953a0d7B67Fae17c87abf79f09D0f818AC66A2', // zkTKN
+          JSON.stringify(ERC20ABI),
+          web3Provider,
+        );
+        const name = await contract.name();
+        console.log(name);
+        const symbol = await contract.symbol();
+        console.log(symbol);
+        const balance = await contract.balanceOf('0xe98b61832248c698085ffbc4313deb465be857e7');
+        console.log(balance);
+        const decimals = await contract.decimals();
+        console.log(decimals);
+        const formattedBalance = utils.formatUnits(balance, decimals);
+        console.log(formattedBalance);
+
+      }
+    })()
+    
+  }, [zkEvmProvider])
 
   const resetForm = () => {
     setParams([]);

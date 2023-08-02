@@ -62,6 +62,8 @@ export class ZkEvmProvider implements Provider {
 
   protected user?: UserZkEvm;
 
+  protected readonly isPassport = true;
+
   constructor({
     authManager,
     magicAdapter,
