@@ -58,11 +58,13 @@ export class Checkout {
    * Constructs a new instance of the CheckoutModule class.
    * @param {CheckoutModuleConfiguration} [config=SANDBOX_CONFIGURATION] - The configuration object for the CheckoutModule.
    */
-  constructor(
-    config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION,
-  ) {
+  constructor(config: CheckoutModuleConfiguration = SANDBOX_CONFIGURATION) {
     this.config = new CheckoutConfiguration(config);
-    this.readOnlyProviders = new Map<ChainId, ethers.providers.JsonRpcProvider>();
+    this.readOnlyProviders = new Map<
+    ChainId,
+    ethers.providers.JsonRpcProvider
+    >();
+    console.log('mark test');
   }
 
   /**
@@ -73,9 +75,7 @@ export class Checkout {
   public async createProvider(
     params: CreateProviderParams,
   ): Promise<CreateProviderResult> {
-    return await provider.createProvider(
-      params.walletProvider,
-    );
+    return await provider.createProvider(params.walletProvider);
   }
 
   /**

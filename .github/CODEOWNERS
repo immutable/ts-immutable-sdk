@@ -9,5 +9,6 @@
 /packages/passport @immutable/passport
 /packages/provider @immutable/wallets
 /packages/checkout @immutable/wallets
+/packages/checkout @immutable/marketplace
 /packages/economy @immutable/igs-frontend
 /packages/blockchain-data @immutable/assets
