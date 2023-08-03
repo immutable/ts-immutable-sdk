@@ -158,7 +158,7 @@ export async function switchWalletNetwork(
     );
   }
 
-  // WT-1146 - Refer to the README in this folder for explantion on the switch network flow
+  // WT-1146 - Refer to the README in this folder for explanation on the switch network flow
   try {
     await switchNetworkInWallet(networkMap, web3Provider, chainId);
   } catch (err: any) {
