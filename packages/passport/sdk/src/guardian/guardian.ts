@@ -109,22 +109,6 @@ export default class GuardianClient {
     return this.withConfirmationScreenTask()(task);
   }
 
-  /**
-   * Open confirmation screen and close it automatically if the
-   * underlying task fails.
-   */
-  public withConfirmationScreenMinimizedTask(popupWindowSize?: {
-    width: number;
-    height: number;
-  }) {
-    return <T>(task: () => Promise<T>) => async (): Promise<T> => {
-      const result = await this.withConfirmationScreenTask({ width: 1, height: 1 })(task)();
-      this.confirmationScreen.resizeWindow(popupWindowSize);
-
-      return result;
-    };
-  }
-
   public async validate({ payloadHash }: GuardianValidateParams) {
     const finallyFn = () => {
       this.confirmationScreen.closeWindow();
