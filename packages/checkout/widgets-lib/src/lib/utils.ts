@@ -2,7 +2,12 @@ import {
   ChainId, CheckoutConfiguration, GetBalanceResult, NetworkInfo,
 } from '@imtbl/checkout-sdk';
 import { getL1ChainId, getL2ChainId } from './networkUtils';
-import { DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS, DEFAULT_TOKEN_FORMATTING_DECIMALS, NATIVE } from './constants';
+import {
+  DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS,
+  DEFAULT_TOKEN_FORMATTING_DECIMALS,
+  IMX_ADDRESS_ZKEVM,
+  NATIVE,
+} from './constants';
 
 export const sortTokensByAmount = (
   config: CheckoutConfiguration,
@@ -109,4 +114,16 @@ export const tokenValueFormat = (s: Number | string): string => {
   );
 };
 
-export const isNativeToken = (address?: string): boolean => !address || address.toLocaleUpperCase() === NATIVE;
+export const isZkEvmChainId = (chainId: ChainId) => chainId === ChainId.IMTBL_ZKEVM_DEVNET
+  || chainId === ChainId.IMTBL_ZKEVM_TESTNET
+  || chainId === ChainId.IMTBL_ZKEVM_MAINNET;
+
+export const isNativeToken = (
+  address?: string,
+  chainId?: ChainId,
+): boolean => {
+  if (chainId && isZkEvmChainId(chainId)) {
+    return address === IMX_ADDRESS_ZKEVM;
+  }
+  return !address || address.toLocaleUpperCase() === NATIVE;
+};
