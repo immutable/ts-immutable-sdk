@@ -1,10 +1,15 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { ZkEvmProviderInput, ZkEvmProvider } from './zkEvmProvider';
 import { loginZkEvmUser } from './user';
+import { sendTransaction } from './sendTransaction';
+import { JsonRpcError, ProviderErrorCode } from './JsonRpcError';
+import GuardianClient from '../guardian/guardian';
+import { RelayerClient } from './relayerClient';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./relayerClient');
 jest.mock('./user');
+jest.mock('./sendTransaction');
 
 describe('ZkEvmProvider', () => {
   const getProvider = () => {
@@ -212,10 +217,61 @@ describe('ZkEvmProvider', () => {
 
       provider.on('accountsChanged', onAccountsChanged);
 
-      const result = await provider.request({ method: 'eth_requestAccounts', params: [] });
+      const result = await provider.request({ method: 'eth_requestAccounts' });
 
       expect(result).toEqual([mockUser.zkEvm.ethAddress]);
       expect(onAccountsChanged).toHaveBeenCalledWith([mockUser.zkEvm.ethAddress]);
+    });
+  });
+
+  describe('eth_sendTransaction', () => {
+    const transaction = {
+      from: '0x123',
+      to: '0x456',
+      value: '1',
+    };
+
+    it('should throw an error if the user is not logged in', async () => {
+      const provider = getProvider();
+
+      await expect(async () => (
+        provider.request({ method: 'eth_sendTransaction', params: [transaction] })
+      )).rejects.toThrow(
+        new JsonRpcError(ProviderErrorCode.UNAUTHORIZED, 'Unauthorised - call eth_requestAccounts first'),
+      );
+    });
+
+    it('should call sendTransaction with the correct params', async () => {
+      const transactionHash = '0x789';
+      const mockUser = {
+        zkEvm: {
+          ethAddress: '0x123',
+        },
+      };
+      const mockMagicProvider = {};
+      (loginZkEvmUser as jest.Mock).mockResolvedValue({
+        user: mockUser,
+        magicProvider: mockMagicProvider,
+      });
+      (sendTransaction as jest.Mock).mockResolvedValue(transactionHash);
+
+      const provider = getProvider();
+      await provider.request({ method: 'eth_requestAccounts' });
+      const result = await provider.request({
+        method: 'eth_sendTransaction',
+        params: [transaction],
+      });
+
+      expect(result).toEqual(transactionHash);
+      expect(sendTransaction).toHaveBeenCalledWith({
+        params: [transaction],
+        magicProvider: mockMagicProvider,
+        guardianClient: expect.any(GuardianClient),
+        jsonRpcProvider: expect.any(Object),
+        config: expect.any(Object),
+        relayerClient: expect.any(RelayerClient),
+        user: mockUser,
+      });
     });
   });
 });

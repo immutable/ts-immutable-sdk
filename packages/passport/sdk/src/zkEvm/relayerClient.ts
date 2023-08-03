@@ -1,9 +1,11 @@
 import { BytesLike } from 'ethers';
 import { PassportConfiguration } from '../config';
 import { FeeOption, RelayerTransaction } from './types';
+import { UserZkEvm } from '../types';
 
 export type RelayerClientInput = {
   config: PassportConfiguration,
+  user: UserZkEvm,
 };
 
 // JsonRpc base Types
@@ -57,8 +59,11 @@ export type RelayerTransactionRequest =
 export class RelayerClient {
   private readonly config: PassportConfiguration;
 
-  constructor({ config }: RelayerClientInput) {
+  private readonly user: UserZkEvm;
+
+  constructor({ config, user }: RelayerClientInput) {
     this.config = config;
+    this.user = user;
   }
 
   private async postToRelayer<T>(request: RelayerTransactionRequest): Promise<T> {
@@ -71,6 +76,7 @@ export class RelayerClient {
     const response = await fetch(`${this.config.relayerUrl}/v1/transactions`, {
       method: 'POST',
       headers: {
+        Authorization: `Bearer ${this.user.accessToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
