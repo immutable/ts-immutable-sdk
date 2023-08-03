@@ -12,11 +12,13 @@
     "eslint": "^8.40.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
+    "http-server": "^14.1.1",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
     "node-gyp": "^9.3.1",
     "release-it": "^15.10.1",
     "syncpack": "^9.8.4",
+    "typedoc": "^0.24.8",
     "wsrun": "^5.2.4"
   },
   "engines": {
@@ -37,6 +39,8 @@
   "scripts": {
     "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:onlysdk": "wsrun -y 4 --stages build && yarn syncpack:format",
+    "docs:build": "typedoc",
+    "docs:serve": "http-server ./docs --cors -p 8080",    
     "lint": "wsrun --exclude-missing -e lint --no-error-on-unmatched-pattern",
     "lint:ci": "./lint-ci.sh",
     "postinstall": "husky install; ./.husky/install_gitleaks.sh",
