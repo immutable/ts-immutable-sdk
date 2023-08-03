@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - @imtbl/immutablex_client: Updated to use core-sdk v2.0.2 with grind key fixes.
+- Fixed an issue where the API version was appended to the header twice in every API call
 
 ### Changed
 
