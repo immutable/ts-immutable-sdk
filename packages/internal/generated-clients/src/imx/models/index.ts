@@ -33,6 +33,8 @@ export * from './create-metadata-refresh-response';
 export * from './create-order-request';
 export * from './create-order-request-v3';
 export * from './create-order-response';
+export * from './create-project-apikey-response';
+export * from './create-project-group-request';
 export * from './create-project-request';
 export * from './create-project-response';
 export * from './create-trade-request-v1';

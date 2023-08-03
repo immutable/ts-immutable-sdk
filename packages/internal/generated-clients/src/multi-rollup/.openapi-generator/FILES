@@ -50,6 +50,9 @@ models/deposit.ts
 models/erc20-item.ts
 models/erc721-item.ts
 models/fee.ts
+models/fulfillment-data-request-inner.ts
+models/fulfillment-data200-response-result-inner.ts
+models/fulfillment-data200-response.ts
 models/get-activity-result.ts
 models/get-collection-result.ts
 models/get-nftresult.ts

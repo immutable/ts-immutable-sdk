@@ -43,7 +43,7 @@ import { TradesCreateTradeRequest } from '../models';
 export const TradesApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Create a trade. Use https://docs.x.immutable.com/reference#/operations/getSignableTrade to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createTradeV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Create a trade. Use https://docs.x.immutable.com/reference#/operations/getSignableTrade to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createTradeV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Create a Trade between two parties
          * @param {CreateTradeRequestV1} createTradeRequest create a trade
          * @param {string} [xImxEthAddress] eth address
@@ -186,6 +186,7 @@ export const TradesApiAxiosParamCreator = function (configuration?: Configuratio
          * @summary Get details of a trade with the given ID
          * @param {string} id Trade ID
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         getTrade: async (id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -216,7 +217,41 @@ export const TradesApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * Get a list of trades.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listTradesV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Get details of a trade with the given ID
+         * @summary Get details of a trade with the given ID
+         * @param {string} id Trade ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTradeV3: async (id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getTradeV3', 'id', id)
+            const localVarPath = `/v3/trades/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get a list of trades.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listTradesV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Get a list of trades
          * @param {string} [partyATokenType] Party A\&#39;s (buy order) token type of currency used to buy
          * @param {string} [partyATokenAddress] Party A\&#39;s (buy order) token address of currency used to buy
@@ -397,7 +432,7 @@ export const TradesApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = TradesApiAxiosParamCreator(configuration)
     return {
         /**
-         * Create a trade. Use https://docs.x.immutable.com/reference#/operations/getSignableTrade to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createTradeV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Create a trade. Use https://docs.x.immutable.com/reference#/operations/getSignableTrade to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createTradeV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Create a Trade between two parties
          * @param {CreateTradeRequestV1} createTradeRequest create a trade
          * @param {string} [xImxEthAddress] eth address
@@ -441,6 +476,7 @@ export const TradesApiFp = function(configuration?: Configuration) {
          * @summary Get details of a trade with the given ID
          * @param {string} id Trade ID
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async getTrade(id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Trade>> {
@@ -448,7 +484,18 @@ export const TradesApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get a list of trades.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listTradesV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Get details of a trade with the given ID
+         * @summary Get details of a trade with the given ID
+         * @param {string} id Trade ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTradeV3(id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Trade>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTradeV3(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get a list of trades.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listTradesV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Get a list of trades
          * @param {string} [partyATokenType] Party A\&#39;s (buy order) token type of currency used to buy
          * @param {string} [partyATokenAddress] Party A\&#39;s (buy order) token address of currency used to buy
@@ -501,7 +548,7 @@ export const TradesApiFactory = function (configuration?: Configuration, basePat
     const localVarFp = TradesApiFp(configuration)
     return {
         /**
-         * Create a trade. Use https://docs.x.immutable.com/reference#/operations/getSignableTrade to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createTradeV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Create a trade. Use https://docs.x.immutable.com/reference#/operations/getSignableTrade to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createTradeV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Create a Trade between two parties
          * @param {CreateTradeRequestV1} createTradeRequest create a trade
          * @param {string} [xImxEthAddress] eth address
@@ -542,13 +589,24 @@ export const TradesApiFactory = function (configuration?: Configuration, basePat
          * @summary Get details of a trade with the given ID
          * @param {string} id Trade ID
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         getTrade(id: string, options?: any): AxiosPromise<Trade> {
             return localVarFp.getTrade(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get a list of trades.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listTradesV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Get details of a trade with the given ID
+         * @summary Get details of a trade with the given ID
+         * @param {string} id Trade ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTradeV3(id: string, options?: any): AxiosPromise<Trade> {
+            return localVarFp.getTradeV3(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get a list of trades.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listTradesV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Get a list of trades
          * @param {string} [partyATokenType] Party A\&#39;s (buy order) token type of currency used to buy
          * @param {string} [partyATokenAddress] Party A\&#39;s (buy order) token address of currency used to buy
@@ -685,6 +743,20 @@ export interface TradesApiGetTradeRequest {
      * Trade ID
      * @type {string}
      * @memberof TradesApiGetTrade
+     */
+    readonly id: string
+}
+
+/**
+ * Request parameters for getTradeV3 operation in TradesApi.
+ * @export
+ * @interface TradesApiGetTradeV3Request
+ */
+export interface TradesApiGetTradeV3Request {
+    /**
+     * Trade ID
+     * @type {string}
+     * @memberof TradesApiGetTradeV3
      */
     readonly id: string
 }
@@ -865,7 +937,7 @@ export interface TradesApiListTradesV3Request {
  */
 export class TradesApi extends BaseAPI {
     /**
-     * Create a trade. Use https://docs.x.immutable.com/reference#/operations/getSignableTrade to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createTradeV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+     * Create a trade. Use https://docs.x.immutable.com/reference#/operations/getSignableTrade to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createTradeV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
      * @summary Create a Trade between two parties
      * @param {TradesApiCreateTradeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -906,6 +978,7 @@ export class TradesApi extends BaseAPI {
      * @summary Get details of a trade with the given ID
      * @param {TradesApiGetTradeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof TradesApi
      */
@@ -914,7 +987,19 @@ export class TradesApi extends BaseAPI {
     }
 
     /**
-     * Get a list of trades.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listTradesV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+     * Get details of a trade with the given ID
+     * @summary Get details of a trade with the given ID
+     * @param {TradesApiGetTradeV3Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TradesApi
+     */
+    public getTradeV3(requestParameters: TradesApiGetTradeV3Request, options?: AxiosRequestConfig) {
+        return TradesApiFp(this.configuration).getTradeV3(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get a list of trades.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listTradesV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
      * @summary Get a list of trades
      * @param {TradesApiListTradesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.

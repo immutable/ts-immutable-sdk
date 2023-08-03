@@ -29,6 +29,10 @@ import { APIError500 } from '../models';
 // @ts-ignore
 import { CreateListingRequestBody } from '../models';
 // @ts-ignore
+import { FulfillmentData200Response } from '../models';
+// @ts-ignore
+import { FulfillmentDataRequestInner } from '../models';
+// @ts-ignore
 import { ListListingsResult } from '../models';
 // @ts-ignore
 import { ListingResult } from '../models';
@@ -74,6 +78,46 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(createListingRequestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieve signed fulfillment data based on the list of order IDs and corresponding fees.
+         * @summary Retrieve fulfillment data for orders
+         * @param {string} chainName 
+         * @param {Array<FulfillmentDataRequestInner>} fulfillmentDataRequestInner 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fulfillmentData: async (chainName: string, fulfillmentDataRequestInner: Array<FulfillmentDataRequestInner>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'chainName' is not null or undefined
+            assertParamExists('fulfillmentData', 'chainName', chainName)
+            // verify required parameter 'fulfillmentDataRequestInner' is not null or undefined
+            assertParamExists('fulfillmentData', 'fulfillmentDataRequestInner', fulfillmentDataRequestInner)
+            const localVarPath = `/v1/chains/{chain_name}/orders/fulfillment_data`
+                .replace(`{${"chain_name"}}`, encodeURIComponent(String(chainName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(fulfillmentDataRequestInner, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -215,6 +259,18 @@ export const OrdersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Retrieve signed fulfillment data based on the list of order IDs and corresponding fees.
+         * @summary Retrieve fulfillment data for orders
+         * @param {string} chainName 
+         * @param {Array<FulfillmentDataRequestInner>} fulfillmentDataRequestInner 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async fulfillmentData(chainName: string, fulfillmentDataRequestInner: Array<FulfillmentDataRequestInner>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FulfillmentData200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.fulfillmentData(chainName, fulfillmentDataRequestInner, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Get a single listing by ID
          * @summary Get a single listing by ID
          * @param {string} chainName 
@@ -267,6 +323,17 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.createListing(chainName, createListingRequestBody, options).then((request) => request(axios, basePath));
         },
         /**
+         * Retrieve signed fulfillment data based on the list of order IDs and corresponding fees.
+         * @summary Retrieve fulfillment data for orders
+         * @param {string} chainName 
+         * @param {Array<FulfillmentDataRequestInner>} fulfillmentDataRequestInner 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        fulfillmentData(chainName: string, fulfillmentDataRequestInner: Array<FulfillmentDataRequestInner>, options?: any): AxiosPromise<FulfillmentData200Response> {
+            return localVarFp.fulfillmentData(chainName, fulfillmentDataRequestInner, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get a single listing by ID
          * @summary Get a single listing by ID
          * @param {string} chainName 
@@ -317,6 +384,27 @@ export interface OrdersApiCreateListingRequest {
      * @memberof OrdersApiCreateListing
      */
     readonly createListingRequestBody: CreateListingRequestBody
+}
+
+/**
+ * Request parameters for fulfillmentData operation in OrdersApi.
+ * @export
+ * @interface OrdersApiFulfillmentDataRequest
+ */
+export interface OrdersApiFulfillmentDataRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof OrdersApiFulfillmentData
+     */
+    readonly chainName: string
+
+    /**
+     * 
+     * @type {Array<FulfillmentDataRequestInner>}
+     * @memberof OrdersApiFulfillmentData
+     */
+    readonly fulfillmentDataRequestInner: Array<FulfillmentDataRequestInner>
 }
 
 /**
@@ -427,6 +515,18 @@ export class OrdersApi extends BaseAPI {
      */
     public createListing(requestParameters: OrdersApiCreateListingRequest, options?: AxiosRequestConfig) {
         return OrdersApiFp(this.configuration).createListing(requestParameters.chainName, requestParameters.createListingRequestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieve signed fulfillment data based on the list of order IDs and corresponding fees.
+     * @summary Retrieve fulfillment data for orders
+     * @param {OrdersApiFulfillmentDataRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrdersApi
+     */
+    public fulfillmentData(requestParameters: OrdersApiFulfillmentDataRequest, options?: AxiosRequestConfig) {
+        return OrdersApiFp(this.configuration).fulfillmentData(requestParameters.chainName, requestParameters.fulfillmentDataRequestInner, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

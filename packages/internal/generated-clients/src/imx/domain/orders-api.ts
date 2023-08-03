@@ -55,7 +55,7 @@ import { OrderV3 } from '../models';
 export const OrdersApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Cancel an order. Use https://docs.x.immutable.com/reference#/operations/getSignableCancelOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/cancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Cancel an order. Use https://docs.x.immutable.com/reference#/operations/getSignableCancelOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/cancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Cancel an order
          * @param {string} id Order ID to cancel
          * @param {CancelOrderRequest} cancelOrderRequest cancel an order
@@ -166,7 +166,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * Create an order. Use https://docs.x.immutable.com/reference#/operations/getSignableOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Create an order. Use https://docs.x.immutable.com/reference#/operations/getSignableOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Create an order
          * @param {CreateOrderRequest} createOrderRequest create an order
          * @param {string} [xImxEthAddress] eth address
@@ -269,7 +269,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * Get an order.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Get an order.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Get an order
          * @param {string} id Order ID
          * @param {boolean} [includeFees] Set flag to true to include fee body for the order
@@ -368,7 +368,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * Sign cancel order message.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getSignableCancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Sign cancel order message.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getSignableCancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Sign cancel order message
          * @param {GetSignableCancelOrderRequest} getSignableCancelOrderRequest get a signable cancel order
          * @param {*} [options] Override http request option.
@@ -477,7 +477,7 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * Get a list of orders  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listOrdersV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Get a list of orders  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listOrdersV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Get a list of orders.
          * @param {number} [pageSize] Page size of the result
          * @param {string} [cursor] Cursor
@@ -838,7 +838,7 @@ export const OrdersApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = OrdersApiAxiosParamCreator(configuration)
     return {
         /**
-         * Cancel an order. Use https://docs.x.immutable.com/reference#/operations/getSignableCancelOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/cancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Cancel an order. Use https://docs.x.immutable.com/reference#/operations/getSignableCancelOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/cancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Cancel an order
          * @param {string} id Order ID to cancel
          * @param {CancelOrderRequest} cancelOrderRequest cancel an order
@@ -869,7 +869,7 @@ export const OrdersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Create an order. Use https://docs.x.immutable.com/reference#/operations/getSignableOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Create an order. Use https://docs.x.immutable.com/reference#/operations/getSignableOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Create an order
          * @param {CreateOrderRequest} createOrderRequest create an order
          * @param {string} [xImxEthAddress] eth address
@@ -898,7 +898,7 @@ export const OrdersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get an order.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Get an order.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Get an order
          * @param {string} id Order ID
          * @param {boolean} [includeFees] Set flag to true to include fee body for the order
@@ -927,7 +927,7 @@ export const OrdersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Sign cancel order message.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getSignableCancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Sign cancel order message.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getSignableCancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Sign cancel order message
          * @param {GetSignableCancelOrderRequest} getSignableCancelOrderRequest get a signable cancel order
          * @param {*} [options] Override http request option.
@@ -961,7 +961,7 @@ export const OrdersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get a list of orders  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listOrdersV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Get a list of orders  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listOrdersV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Get a list of orders.
          * @param {number} [pageSize] Page size of the result
          * @param {string} [cursor] Cursor
@@ -1050,7 +1050,7 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
     const localVarFp = OrdersApiFp(configuration)
     return {
         /**
-         * Cancel an order. Use https://docs.x.immutable.com/reference#/operations/getSignableCancelOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/cancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Cancel an order. Use https://docs.x.immutable.com/reference#/operations/getSignableCancelOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/cancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Cancel an order
          * @param {string} id Order ID to cancel
          * @param {CancelOrderRequest} cancelOrderRequest cancel an order
@@ -1079,7 +1079,7 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.cancelOrderV3(id, cancelOrderRequest, xImxEthAddress, xImxEthSignature, authorization, options).then((request) => request(axios, basePath));
         },
         /**
-         * Create an order. Use https://docs.x.immutable.com/reference#/operations/getSignableOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Create an order. Use https://docs.x.immutable.com/reference#/operations/getSignableOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Create an order
          * @param {CreateOrderRequest} createOrderRequest create an order
          * @param {string} [xImxEthAddress] eth address
@@ -1106,7 +1106,7 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.createOrderV3(createOrderRequest, xImxEthAddress, xImxEthSignature, authorization, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get an order.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Get an order.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Get an order
          * @param {string} id Order ID
          * @param {boolean} [includeFees] Set flag to true to include fee body for the order
@@ -1133,7 +1133,7 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.getOrderV3(id, includeFees, auxiliaryFeePercentages, auxiliaryFeeRecipients, options).then((request) => request(axios, basePath));
         },
         /**
-         * Sign cancel order message.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getSignableCancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Sign cancel order message.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getSignableCancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Sign cancel order message
          * @param {GetSignableCancelOrderRequest} getSignableCancelOrderRequest get a signable cancel order
          * @param {*} [options] Override http request option.
@@ -1164,7 +1164,7 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.getSignableOrder(getSignableOrderRequestV3, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get a list of orders  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listOrdersV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+         * Get a list of orders  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listOrdersV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
          * @summary Get a list of orders.
          * @param {number} [pageSize] Page size of the result
          * @param {string} [cursor] Cursor
@@ -1937,7 +1937,7 @@ export interface OrdersApiListOrdersV3Request {
  */
 export class OrdersApi extends BaseAPI {
     /**
-     * Cancel an order. Use https://docs.x.immutable.com/reference#/operations/getSignableCancelOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/cancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+     * Cancel an order. Use https://docs.x.immutable.com/reference#/operations/getSignableCancelOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/cancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
      * @summary Cancel an order
      * @param {OrdersApiCancelOrderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -1962,7 +1962,7 @@ export class OrdersApi extends BaseAPI {
     }
 
     /**
-     * Create an order. Use https://docs.x.immutable.com/reference#/operations/getSignableOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+     * Create an order. Use https://docs.x.immutable.com/reference#/operations/getSignableOrder to get request body params.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
      * @summary Create an order
      * @param {OrdersApiCreateOrderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -1987,7 +1987,7 @@ export class OrdersApi extends BaseAPI {
     }
 
     /**
-     * Get an order.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+     * Get an order.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
      * @summary Get an order
      * @param {OrdersApiGetOrderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -2012,7 +2012,7 @@ export class OrdersApi extends BaseAPI {
     }
 
     /**
-     * Sign cancel order message.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getSignableCancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+     * Sign cancel order message.  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getSignableCancelOrderV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
      * @summary Sign cancel order message
      * @param {OrdersApiGetSignableCancelOrderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -2049,7 +2049,7 @@ export class OrdersApi extends BaseAPI {
     }
 
     /**
-     * Get a list of orders  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listOrdersV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Tue, 01 Aug 2023
+     * Get a list of orders  This version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listOrdersV3.  Deprecation date - Mon, 01 May 2023  Sunset date - Fri, 01 Sept 2023
      * @summary Get a list of orders.
      * @param {OrdersApiListOrdersRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.

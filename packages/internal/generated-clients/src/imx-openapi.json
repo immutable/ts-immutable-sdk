@@ -1553,7 +1553,7 @@
     },
     "/v1/orders": {
       "get": {
-        "description": "Get a list of orders\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listOrdersV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Tue, 01 Aug 2023",
+        "description": "Get a list of orders\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listOrdersV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Fri, 01 Sept 2023",
         "produces": [
           "application/json"
         ],
@@ -1776,7 +1776,7 @@
         }
       },
       "post": {
-        "description": "Create an order. Use https://docs.x.immutable.com/reference#/operations/getSignableOrder to get request body params.\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createOrderV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Tue, 01 Aug 2023",
+        "description": "Create an order. Use https://docs.x.immutable.com/reference#/operations/getSignableOrder to get request body params.\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createOrderV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Fri, 01 Sept 2023",
         "consumes": [
           "application/json"
         ],
@@ -1842,7 +1842,7 @@
     },
     "/v1/orders/{id}": {
       "get": {
-        "description": "Get an order.\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getOrderV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Tue, 01 Aug 2023",
+        "description": "Get an order.\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getOrderV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Fri, 01 Sept 2023",
         "consumes": [
           "application/json"
         ],
@@ -1910,7 +1910,7 @@
         }
       },
       "delete": {
-        "description": "Cancel an order. Use https://docs.x.immutable.com/reference#/operations/getSignableCancelOrder to get request body params.\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/cancelOrderV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Tue, 01 Aug 2023",
+        "description": "Cancel an order. Use https://docs.x.immutable.com/reference#/operations/getSignableCancelOrder to get request body params.\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/cancelOrderV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Fri, 01 Sept 2023",
         "consumes": [
           "application/json"
         ],
@@ -2029,6 +2029,194 @@
         }
       }
     },
+    "/v1/project_groups": {
+      "get": {
+        "description": "Get project groups",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "projects"
+        ],
+        "summary": "Get project groups",
+        "operationId": "getProjectGroups",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Page size of the result",
+            "name": "page_size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Cursor",
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Property to sort by",
+            "name": "order_by",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Direction to sort (asc/desc)",
+            "name": "direction",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetProjectsResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create a project group",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "projects"
+        ],
+        "summary": "Create a project group",
+        "operationId": "createProjectGroup",
+        "parameters": [
+          {
+            "description": "create a project group",
+            "name": "CreateProjectGroupRequest",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateProjectGroupRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/CreateProjectResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          }
+        }
+      }
+    },
+    "/v1/project_groups/{id}": {
+      "get": {
+        "description": "Get a project group",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "projects"
+        ],
+        "summary": "Get a project group",
+        "operationId": "getProjectGroup",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Project group ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Project"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          }
+        }
+      }
+    },
     "/v1/projects": {
       "get": {
         "description": "Get projects",
@@ -2129,6 +2317,7 @@
         ],
         "summary": "Create a project",
         "operationId": "createProject",
+        "deprecated": true,
         "parameters": [
           {
             "description": "create a project",
@@ -2316,9 +2505,66 @@
         }
       }
     },
+    "/v1/projects/{id}/api-key": {
+      "post": {
+        "description": "Create a project api key",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "projects"
+        ],
+        "summary": "A new API key will be generated every time this endpoint is called.",
+        "operationId": "createProjectAPIKey",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Project ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/CreateProjectAPIKeyResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          }
+        }
+      }
+    },
     "/v1/signable-cancel-order-details": {
       "post": {
-        "description": "Sign cancel order message.\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getSignableCancelOrderV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Tue, 01 Aug 2023",
+        "description": "Sign cancel order message.\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/getSignableCancelOrderV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Fri, 01 Sept 2023",
         "consumes": [
           "application/json"
         ],
@@ -2647,7 +2893,7 @@
     },
     "/v1/trades": {
       "get": {
-        "description": "Get a list of trades.\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listTradesV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Tue, 01 Aug 2023",
+        "description": "Get a list of trades.\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/listTradesV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Fri, 01 Sept 2023",
         "produces": [
           "application/json"
         ],
@@ -2741,7 +2987,7 @@
         }
       },
       "post": {
-        "description": "Create a trade. Use https://docs.x.immutable.com/reference#/operations/getSignableTrade to get request body params.\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createTradeV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Tue, 01 Aug 2023",
+        "description": "Create a trade. Use https://docs.x.immutable.com/reference#/operations/getSignableTrade to get request body params.\n\nThis version of the endpoint is deprecated, the latest version can be found at https://docs.x.immutable.com/reference/#/operations/createTradeV3.\n\nDeprecation date - Mon, 01 May 2023\n\nSunset date - Fri, 01 Sept 2023",
         "consumes": [
           "application/json"
         ],
@@ -2804,6 +3050,7 @@
         ],
         "summary": "Get details of a trade with the given ID",
         "operationId": "getTrade",
+        "deprecated": true,
         "parameters": [
           {
             "type": "string",
@@ -2818,6 +3065,18 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/Trade"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/APIError"
             }
           }
         }
@@ -5010,6 +5269,48 @@
           }
         }
       }
+    },
+    "/v3/trades/{id}": {
+      "get": {
+        "description": "Get details of a trade with the given ID",
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "trades"
+        ],
+        "summary": "Get details of a trade with the given ID",
+        "operationId": "getTradeV3",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Trade ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Trade"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/APIError"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -5680,6 +5981,37 @@
         }
       }
     },
+    "CreateProjectAPIKeyResponse": {
+      "type": "object",
+      "required": [
+        "key"
+      ],
+      "properties": {
+        "key": {
+          "type": "string"
+        }
+      }
+    },
+    "CreateProjectGroupRequest": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "chain_type": {
+          "description": "The chain type",
+          "type": "string",
+          "enum": [
+            "starkex",
+            "zkevm"
+          ]
+        },
+        "name": {
+          "description": "The project group name",
+          "type": "string"
+        }
+      }
+    },
     "CreateProjectRequest": {
       "type": "object",
       "required": [
@@ -5709,8 +6041,8 @@
       ],
       "properties": {
         "id": {
-          "description": "The project ID",
-          "type": "integer"
+          "description": "The project group ID",
+          "type": "string"
         }
       }
     },
@@ -7909,56 +8241,20 @@
     "Project": {
       "type": "object",
       "required": [
-        "collection_limit_expires_at",
-        "collection_monthly_limit",
-        "collection_remaining",
-        "company_name",
-        "contact_email",
         "id",
-        "mint_limit_expires_at",
-        "mint_monthly_limit",
-        "mint_remaining",
         "name"
       ],
       "properties": {
-        "collection_limit_expires_at": {
-          "description": "The current period expiry date for collection limit",
-          "type": "string"
-        },
-        "collection_monthly_limit": {
-          "description": "The total monthly collection limit",
-          "type": "integer"
-        },
-        "collection_remaining": {
-          "description": "The number of collection remaining in the current period",
-          "type": "integer"
-        },
-        "company_name": {
-          "description": "The company name",
-          "type": "string"
-        },
-        "contact_email": {
-          "description": "The project contact email (must be registered as a developer account with Immutable at https://hub.immutable.com)",
+        "chain_type": {
+          "description": "The project ChainType",
           "type": "string"
         },
         "id": {
-          "description": "The project ID",
-          "type": "integer"
-        },
-        "mint_limit_expires_at": {
-          "description": "The current period expiry date for mint operation limit",
+          "description": "The project group ID",
           "type": "string"
         },
-        "mint_monthly_limit": {
-          "description": "The total monthly mint operation limit",
-          "type": "integer"
-        },
-        "mint_remaining": {
-          "description": "The number of mint operation remaining in the current period",
-          "type": "integer"
-        },
         "name": {
-          "description": "The project name",
+          "description": "The project group name",
           "type": "string"
         },
         "org_id": {
