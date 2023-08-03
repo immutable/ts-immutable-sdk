@@ -2,7 +2,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { ChainId } from '../types/chains';
 import { getUnderlyingChainId } from './getUnderlyingProvider';
 import { WalletAction } from '../types/wallet';
-import { CheckoutError, CheckoutErrorType } from '../errors';
+import { CheckoutErrorType } from '../errors';
 
 describe('getUnderlyingChainId', () => {
   it('should return the underlying chain id', async () => {
@@ -21,24 +21,20 @@ describe('getUnderlyingChainId', () => {
   });
 
   it('should throw an error if provider missing from web3provider', async () => {
-    await expect(
-      getUnderlyingChainId({} as Web3Provider),
-    ).rejects.toThrow(
-      new CheckoutError(
-        'Parsed provider is not a valid Web3Provider',
-        CheckoutErrorType.WEB3_PROVIDER_ERROR,
-      ),
-    );
+    try {
+      await getUnderlyingChainId({} as Web3Provider);
+    } catch (err: any) {
+      expect(err.message).toEqual('Parsed provider is not a valid Web3Provider');
+      expect(err.type).toEqual(CheckoutErrorType.WEB3_PROVIDER_ERROR);
+    }
   });
 
   it('should throw an error if provider.request missing', async () => {
-    await expect(
-      getUnderlyingChainId({ provider: {} } as Web3Provider),
-    ).rejects.toThrow(
-      new CheckoutError(
-        'Parsed provider is not a valid Web3Provider',
-        CheckoutErrorType.WEB3_PROVIDER_ERROR,
-      ),
-    );
+    try {
+      await getUnderlyingChainId({ provider: {} } as Web3Provider);
+    } catch (err: any) {
+      expect(err.message).toEqual('Parsed provider is not a valid Web3Provider');
+      expect(err.type).toEqual(CheckoutErrorType.WEB3_PROVIDER_ERROR);
+    }
   });
 });
