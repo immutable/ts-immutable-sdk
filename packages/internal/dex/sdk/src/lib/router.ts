@@ -29,10 +29,6 @@ export type QuoteTradeInfo = {
   gasEstimate: ethers.BigNumber
 };
 
-export type QuoteResponse = {
-  trade: QuoteTradeInfo;
-};
-
 export class Router {
   public provider: ethers.providers.JsonRpcProvider;
 
@@ -56,7 +52,7 @@ export class Router {
     tradeType: TradeType,
     secondaryFees: SecondaryFee[],
     maxHops: number = 2,
-  ): Promise<QuoteResponse> {
+  ): Promise<QuoteTradeInfo> {
     const [currencyIn, currencyOut] = this.determineERC20InAndERC20Out(
       tradeType,
       amountSpecified,
@@ -111,15 +107,13 @@ export class Router {
     );
 
     return {
-      trade: {
-        route,
-        amountIn,
-        tokenIn: currencyIn,
-        amountOut,
-        tokenOut: currencyOut,
-        tradeType,
-        gasEstimate,
-      },
+      route,
+      amountIn,
+      tokenIn: currencyIn,
+      amountOut,
+      tokenOut: currencyOut,
+      tradeType,
+      gasEstimate,
     };
   }
 

@@ -26,7 +26,7 @@ export const TEST_RPC_URL = 'https://0.net';
 export const TEST_FROM_ADDRESS = '0x94fC2BcA2E71e26D874d7E937d89ce2c9113af6e';
 export const TEST_FEE_RECIPIENT = '0xe3ece548F1DD4B1536Eb6eE188fE35350bc1dd16';
 
-export const TEST_MAX_FEE_BASIS_POINTS = 1000;
+export const TEST_MAX_FEE_BASIS_POINTS = 1000; // 10%
 
 export const TEST_MULTICALL_ADDRESS = '0x66d0aB680ACEe44308edA2062b910405CC51A190';
 export const TEST_V3_CORE_FACTORY_ADDRESS = '0x23490b262829ACDAD3EF40e555F23d77D1B69e4e';
@@ -132,10 +132,10 @@ export type SwapTest = {
   inputToken: string;
   outputToken: string;
   intermediaryToken: string | undefined;
-  amountIn: ethers.BigNumberish;
-  amountOut: ethers.BigNumberish;
-  minAmountOut: ethers.BigNumberish;
-  maxAmountIn: ethers.BigNumberish;
+  amountIn: ethers.BigNumber;
+  amountOut: ethers.BigNumber;
+  minAmountOut: ethers.BigNumber;
+  maxAmountIn: ethers.BigNumber;
 };
 
 type ExactInputOutputSingleParams = {
@@ -154,6 +154,10 @@ type ExactInputOutputParams = {
   amountIn: ethers.BigNumber;
   amountOut: ethers.BigNumber;
 };
+
+export const toBigNumber = (amount: CurrencyAmount<Currency>) => (
+  ethers.BigNumber.from(amount.multiply(amount.decimalScale).toExact())
+);
 
 // uniqBy returns the unique items in an array using the given comparator
 export function uniqBy<K, T extends string | number>(
@@ -235,8 +239,8 @@ export function decodeMulticallExactInputOutputSingleWithFees(data: ethers.utils
     tokenOut: decodedParams[1][1],
     fee: decodedParams[1][2],
     recipient: decodedParams[1][3],
-    firstAmount: decodedParams[1][4],
-    secondAmount: decodedParams[1][5],
+    firstAmount: decodedParams[1][4], // can we call this amountIn??
+    secondAmount: decodedParams[1][5], // can we call this amountOut??
     sqrtPriceLimitX96: decodedParams[1][6],
   };
 
@@ -282,6 +286,24 @@ export function getMaximumAmountIn(
     .add(slippageTolerance)
     .multiply(amountInJsbi).quotient;
   return ethers.BigNumber.from(slippageAdjustedAmountIn.toString());
+}
+
+export function getPool() {
+  const tokenIn: Token = new Token(TEST_CHAIN_ID, IMX_TEST_TOKEN.address, 18);
+  const tokenOut: Token = new Token(TEST_CHAIN_ID, WETH_TEST_TOKEN.address, 18);
+  const fee = 10000;
+  const arbitraryTick = 100;
+  const arbitraryLiquidity = 10;
+  const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
+
+  return new Pool(
+    tokenIn,
+    tokenOut,
+    fee,
+    sqrtPriceAtTick,
+    arbitraryLiquidity,
+    arbitraryTick,
+  );
 }
 
 export function setupSwapTxTest(slippage: number, multiPoolSwap: boolean = false): SwapTest {
@@ -357,21 +379,30 @@ export function setupSwapTxTest(slippage: number, multiPoolSwap: boolean = false
   };
 }
 
+type MockParams = {
+  chainId: number;
+  inputToken: string;
+  outputToken: string;
+  pools: Pool[];
+  exchangeRate?: number;
+};
+
 export function mockRouterImplementation(
-  params: SwapTest,
+  params: MockParams,
   tradeType: TradeType,
 ) {
+  const exchangeRate = params.exchangeRate || 10;
   const findOptimalRoute = jest.fn((
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _amountSpecified: CurrencyAmount<Currency>,
+    amountSpecified: CurrencyAmount<Currency>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _otherCurrency: Currency,
+    otherCurrency: Currency,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _type: TradeType,
+    type: TradeType,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _secondaryFees: SecondaryFee[],
+    secondaryFees: SecondaryFee[],
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _maxHops: number,
+    maxHops: number,
   ) => {
     const tokenIn: Token = new Token(params.chainId, params.inputToken, 18);
     const tokenOut: Token = new Token(
@@ -380,25 +411,29 @@ export function mockRouterImplementation(
       18,
     );
 
-    const route: Route<Currency, Currency> = new Route(
+    const route = new Route(
       params.pools,
       tokenIn,
       tokenOut,
     );
 
+    const amountIn = type === TradeType.EXACT_INPUT
+      ? toBigNumber(amountSpecified) : toBigNumber(amountSpecified).div(exchangeRate);
+
+    const amountOut = type === TradeType.EXACT_INPUT
+      ? toBigNumber(amountSpecified).mul(exchangeRate) : toBigNumber(amountSpecified);
+
     const trade: QuoteTradeInfo = {
       route,
-      amountIn: ethers.BigNumber.from(params.amountIn),
+      amountIn,
       tokenIn,
-      amountOut: ethers.BigNumber.from(params.amountOut),
+      amountOut,
       tokenOut,
       tradeType,
       gasEstimate: TEST_TRANSACTION_GAS_USAGE,
     };
 
-    return {
-      trade,
-    };
+    return trade;
   });
 
   (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
