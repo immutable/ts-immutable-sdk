@@ -72,3 +72,14 @@ jobs:
         with:
           name: checkout-widgets-cypress-screenshots
           path: ./packages/checkout/widgets-lib/cypress/screenshots
+
+      - name: Checkout SDK test coverage
+        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets')}}
+        run: yarn test:checkout:sdk:coverage
+
+      - name: Upload Checkout SDK test coverage artifacts
+        if: ${{ contains(steps.reviewer-teams.outputs.teams, 'Wallets')}}
+        uses: actions/upload-artifact@v2
+        with:
+          name: checkout-sdk-coverage-report
+          path: ./packages/checkout/sdk/coverage
