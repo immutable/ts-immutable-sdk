@@ -23,7 +23,6 @@ describe('getBlockNumberClosestToTimestamp', () => {
       mockProvider as unknown as ethers.providers.Provider,
       targetTimestamp,
       blockTime,
-
       clockInaccuracy,
     );
 
@@ -45,9 +44,7 @@ describe('getBlockNumberClosestToTimestamp', () => {
     const closestBlockNumber = await getBlockNumberClosestToTimestamp(
       mockProvider as unknown as ethers.providers.Provider,
       targetTimestamp,
-
       blockTime,
-
       clockInaccuracy,
     );
 
@@ -70,7 +67,6 @@ describe('getBlockNumberClosestToTimestamp', () => {
       mockProvider as unknown as ethers.providers.Provider,
       targetTimestamp,
       blockTime,
-
       clockInaccuracy,
     );
 
