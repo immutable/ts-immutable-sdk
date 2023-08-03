@@ -127,7 +127,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountOut,
+        ethers.utils.parseEther('10000'),
       );
 
       const data = swap.transaction.data?.toString() || '';
@@ -143,8 +143,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(swapParams.firstAmount.toString()).toBe(params.amountOut.toString()); // amount out
-      expect(swapParams.secondAmount.toString()).toBe(params.maxAmountIn.toString()); // max amount in
+      expect(swapParams.firstAmount.toString()).toBe('10000000000000000000000'); // 10,000 amount out
+      expect(swapParams.secondAmount.toString()).toBe('1001000000000000000000'); // 1,001 max amount in includes slippage
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
@@ -163,12 +163,12 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       expect(quote.amount.token.address).toEqual(params.inputToken);
       expect(quote.slippage).toBe(0.1);
-      expect(quote.amount.value.toString()).toEqual('12300000000000');
+      expect(quote.amount.value.toString()).toEqual('1230000000000');
       expect(quote.amountWithMaxSlippage.token.address).toEqual(
         params.inputToken,
       );
       expect(quote.amountWithMaxSlippage.value.toString()).toEqual(
-        '12312300000000',
+        '1231230000000',
       );
     });
   });

@@ -391,7 +391,7 @@ export function mockRouterImplementation(
   params: MockParams,
   tradeType: TradeType,
 ) {
-  const exchangeRate = params.exchangeRate || 10;
+  const exchangeRate = params.exchangeRate ?? 10;
   const findOptimalRoute = jest.fn((
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     amountSpecified: CurrencyAmount<Currency>,

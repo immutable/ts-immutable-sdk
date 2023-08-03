@@ -178,7 +178,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountIn,
+        ethers.utils.parseEther('100'),
       )).rejects.toThrow(new NoRoutesAvailableError());
     });
   });
@@ -223,12 +223,6 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
       expect(secondaryFeeParams[0].feeBasisPoints).toBe(100);
 
-      // console.log({first: swapParams.firstAmount.toString()});
-      // console.log({second: swapParams.secondAmount.toString()});
-      // console.log({min: params.amountIn.toString()});
-      // console.log({min: params.minAmountOut.toString()});
-      // console.log({max: params.maxAmountIn.toString()});
-
       expect(swapParams.tokenIn).toBe(params.inputToken);
       expect(swapParams.tokenOut).toBe(params.outputToken);
       expect(swapParams.fee).toBe(10000);
@@ -258,7 +252,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountIn,
+        ethers.utils.parseEther('100'),
       );
 
       const data = swap.transaction?.data?.toString() || '';
@@ -283,8 +277,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(decodedPath.secondPoolFee.toString()).toBe('10000');
 
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
-      expect(swapParams.amountIn.toString()).toBe(params.amountIn);
-      expect(swapParams.amountOut.toString()).toBe(params.minAmountOut.toString());
+      expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // 100
+      expect(swapParams.amountOut.toString()).toBe('899100899100899100899'); // 899 includes slippage and fees
     });
   });
 
@@ -300,7 +294,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountIn,
+        ethers.utils.parseEther('100'),
       );
 
       const data = swap.transaction?.data?.toString() || '';
@@ -316,8 +310,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction?.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction?.from).toBe(params.fromAddress); // from address
       expect(swap.transaction?.value).toBe('0x00'); // refers to 0ETH
-      expect(swapParams.firstAmount.toString()).toBe(params.amountIn.toString()); // amount in
-      expect(swapParams.secondAmount.toString()).toBe(params.minAmountOut.toString()); // min amount out
+      expect(swapParams.firstAmount.toString()).toBe('100000000000000000000'); // amount in (100)
+      expect(swapParams.secondAmount.toString()).toBe('999000999000999000999'); // min amount out (999 includes slippage)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
@@ -332,7 +326,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountIn,
+        ethers.utils.parseEther('100'),
       );
 
       expect(tx.swap.gasFeeEstimate?.value).toEqual(TEST_TRANSACTION_GAS_USAGE.mul(TEST_GAS_PRICE));
@@ -354,18 +348,18 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountIn,
+        ethers.utils.parseEther('100'),
       );
 
       expect(quote).not.toBe(undefined);
       expect(quote?.amount.token.address).toEqual(params.outputToken);
       expect(quote?.slippage).toBe(0.1);
-      expect(quote?.amount.value.toString()).toEqual('10000000000000000000000');
+      expect(quote?.amount.value.toString()).toEqual('1000000000000000000000'); // 1,000
       expect(quote?.amountWithMaxSlippage?.token.address).toEqual(
         params.outputToken,
       );
       expect(quote?.amountWithMaxSlippage?.value.toString()).toEqual(
-        '9990000000000000000000',
+        '999000999000999000999', // 999 includes slippage
       );
     });
   });
@@ -381,7 +375,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountIn,
+        ethers.utils.parseEther('100'),
         HIGHER_SLIPPAGE,
       );
 
@@ -398,8 +392,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction?.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction?.from).toBe(params.fromAddress); // from address
       expect(swap.transaction?.value).toBe('0x00'); // refers to 0ETH
-      expect(swapParams.firstAmount.toString()).toBe(params.amountIn.toString()); // amount in
-      expect(swapParams.secondAmount.toString()).toBe(params.minAmountOut.toString()); // min amount out
+      expect(swapParams.firstAmount.toString()).toBe('100000000000000000000'); // amount in (100)
+      expect(swapParams.secondAmount.toString()).toBe('998003992015968063872'); // min amount out (998 includes 2% slippage)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
@@ -413,19 +407,19 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountIn,
+        ethers.utils.parseEther('100'),
         HIGHER_SLIPPAGE,
       );
 
       expect(quote).not.toBe(undefined);
       expect(quote?.amount.token.address).toEqual(params.outputToken);
       expect(quote?.slippage).toBe(0.2);
-      expect(quote?.amount.value.toString()).toEqual('10000000000000000000000');
+      expect(quote?.amount.value.toString()).toEqual('1000000000000000000000'); // 1000
       expect(quote?.amountWithMaxSlippage?.token.address).toEqual(
         params.outputToken,
       );
       expect(quote?.amountWithMaxSlippage?.value.toString()).toEqual(
-        '9980000000000000000000',
+        '998003992015968063872', // 998 includes 0.2% slippage
       );
     });
   });
