@@ -19,7 +19,13 @@ describe('getBlockNumberClosestToTimestamp', () => {
       })),
     };
 
-    const closestBlockNumber = await getBlockNumberClosestToTimestamp(mockProvider as unknown as ethers.providers.Provider, targetTimestamp, blockTime, clockInaccuracy);
+    const closestBlockNumber = await getBlockNumberClosestToTimestamp(
+      mockProvider as unknown as ethers.providers.Provider,
+      targetTimestamp,
+      blockTime,
+
+      clockInaccuracy,
+    );
 
     expect(closestBlockNumber).toBe(99_999_999_999);
   });
@@ -36,7 +42,14 @@ describe('getBlockNumberClosestToTimestamp', () => {
       })),
     };
 
-    const closestBlockNumber = await getBlockNumberClosestToTimestamp(mockProvider as unknown as ethers.providers.Provider, targetTimestamp, blockTime, clockInaccuracy);
+    const closestBlockNumber = await getBlockNumberClosestToTimestamp(
+      mockProvider as unknown as ethers.providers.Provider,
+      targetTimestamp,
+
+      blockTime,
+
+      clockInaccuracy,
+    );
 
     expect(closestBlockNumber).toBe(49_999_999_999);
   });
@@ -53,7 +66,13 @@ describe('getBlockNumberClosestToTimestamp', () => {
       })),
     };
 
-    const closestBlockNumber = await getBlockNumberClosestToTimestamp(mockProvider as unknown as ethers.providers.Provider, targetTimestamp, blockTime, clockInaccuracy);
+    const closestBlockNumber = await getBlockNumberClosestToTimestamp(
+      mockProvider as unknown as ethers.providers.Provider,
+      targetTimestamp,
+      blockTime,
+
+      clockInaccuracy,
+    );
 
     expect(closestBlockNumber).toBe(0);
   });
