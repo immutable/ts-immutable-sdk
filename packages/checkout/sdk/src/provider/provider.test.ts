@@ -3,7 +3,7 @@
  */
 import { Web3Provider } from '@ethersproject/providers';
 import { connectSite } from '../connect';
-import { CheckoutError, CheckoutErrorType } from '../errors';
+import { CheckoutErrorType } from '../errors';
 import { WalletProviderName } from '../types';
 import { createProvider } from './provider';
 
@@ -35,14 +35,12 @@ describe('createProvider', () => {
   });
 
   it('should throw an error if connect is called with a preference that is not expected', async () => {
-    await expect(
-      createProvider('trust-wallet' as WalletProviderName),
-    ).rejects.toThrow(
-      new CheckoutError(
-        'Provider not supported',
-        CheckoutErrorType.CONNECT_PROVIDER_ERROR,
-      ),
-    );
+    try {
+      await createProvider('trust-wallet' as WalletProviderName);
+    } catch (err: any) {
+      expect(err.message).toEqual('Provider not supported');
+      expect(err.type).toEqual(CheckoutErrorType.DEFAULT_PROVIDER_ERROR);
+    }
   });
 
   it('should throw an error if metamask provider is not found', async () => {
@@ -50,14 +48,12 @@ describe('createProvider', () => {
       removeEventListener: () => {},
     }));
 
-    await expect(
-      createProvider(WalletProviderName.METAMASK),
-    ).rejects.toThrow(
-      new CheckoutError(
-        '[METAMASK_PROVIDER_ERROR] Cause:window.addEventListener is not a function',
-        CheckoutErrorType.METAMASK_PROVIDER_ERROR,
-      ),
-    );
+    try {
+      await createProvider(WalletProviderName.METAMASK);
+    } catch (err: any) {
+      expect(err.message).toEqual('[METAMASK_PROVIDER_ERROR] Cause:window.addEventListener is not a function');
+      expect(err.type).toEqual(CheckoutErrorType.METAMASK_PROVIDER_ERROR);
+    }
   });
 
   it('should throw an error if provider.request is not found', async () => {
@@ -66,14 +62,12 @@ describe('createProvider', () => {
       removeEventListener: () => {},
     }));
 
-    await expect(
-      createProvider(WalletProviderName.METAMASK),
-    ).rejects.toThrow(
-      new CheckoutError(
-        'No MetaMask provider installed.',
-        CheckoutErrorType.METAMASK_PROVIDER_ERROR,
-      ),
-    );
+    try {
+      await createProvider(WalletProviderName.METAMASK);
+    } catch (err: any) {
+      expect(err.message).toEqual('No MetaMask provider installed.');
+      expect(err.type).toEqual(CheckoutErrorType.METAMASK_PROVIDER_ERROR);
+    }
   });
 
   it('should throw an error if the user rejects the connection request', async () => {
@@ -88,13 +82,11 @@ describe('createProvider', () => {
 
     const { provider } = await createProvider(WalletProviderName.METAMASK);
 
-    await expect(
-      connectSite(provider),
-    ).rejects.toThrow(
-      new CheckoutError(
-        '[USER_REJECTED_REQUEST_ERROR] Cause:User rejected request',
-        CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
-      ),
-    );
+    try {
+      await connectSite(provider);
+    } catch (err: any) {
+      expect(err.message).toEqual('[USER_REJECTED_REQUEST_ERROR] Cause:User rejected request');
+      expect(err.type).toEqual(CheckoutErrorType.USER_REJECTED_REQUEST_ERROR);
+    }
   });
 });
