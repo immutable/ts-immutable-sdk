@@ -72,8 +72,8 @@ describe('Passport', () => {
       getUser: mockGetUser,
     }));
     (GuardianClient as jest.Mock).mockImplementation(() => ({
-      loading: jest.fn(),
       validateEVMTransaction: jest.fn(),
+      withConfirmationScreen: () => (task: () => void) => task(),
     }));
     (Magic as jest.Mock).mockImplementation(() => ({
       openid: {
