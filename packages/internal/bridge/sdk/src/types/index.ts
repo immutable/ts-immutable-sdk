@@ -103,7 +103,8 @@ export interface ApproveDepositBridgeRequest {
 
 /**
  * @typedef {Object} ApproveDepositBridgeResponse
- * @property {ethers.providers.TransactionRequest | null} unsignedTx - The unsigned transaction for the token approval, or null if no approval is required.
+ * @property {ethers.providers.TransactionRequest | null} unsignedTx - The unsigned transaction for the token approval,
+ * or null if no approval is required.
  */
 export interface ApproveDepositBridgeResponse {
   unsignedTx: ethers.providers.TransactionRequest | null;
@@ -147,34 +148,34 @@ export interface WaitForDepositResponse {
 }
 
 /**
- * @typedef {Object} RootTokenToChildTokenRequest
+ * @typedef {Object} ChildTokenRequest
  * @property {FungibleToken} rootToken - The token on the root chain for which the corresponding token on the child chain is required.
  */
-export interface RootTokenToChildTokenRequest {
+export interface ChildTokenRequest {
   rootToken: FungibleToken;
 }
 
 /**
- * @typedef {Object} RootTokenToChildTokenResponse
+ * @typedef {Object} ChildTokenResponse
  * @property {Address} childToken - The address of the corresponding token on the child chain.
  */
-export interface RootTokenToChildTokenResponse {
+export interface ChildTokenResponse {
   childToken: Address;
 }
 
 /**
- * @typedef {Object} ChildTokenToRootTokenRequest
+ * @typedef {Object} RootTokenRequest
  * @property {Address} childToken - The token on the child chain for which the corresponding token on the root chain is required.
  */
-export interface ChildTokenToRootTokenRequest {
+export interface RootTokenRequest {
   childToken: Address;
 }
 
 /**
- * @typedef {Object} ChildTokenToRootTokenResponse
+ * @typedef {Object} RootTokenResponse
  * @property {FungibleToken} rootToken - The corresponding token on the root chain.
  */
-export interface ChildTokenToRootTokenResponse {
+export interface RootTokenResponse {
   rootToken: FungibleToken;
 }
 
@@ -223,7 +224,8 @@ export interface ExitRequest {
 
 /**
  * @typedef {Object} ExitResponse
- * @property {ethers.providers.TransactionRequest} unsignedTx - The unsigned transaction that, when signed and broadcasted, will perform the exit operation on the root chain.
+ * @property {ethers.providers.TransactionRequest} unsignedTx - The unsigned transaction that, when signed and broadcasted,
+ * will perform the exit operation on the root chain.
  */
 export interface ExitResponse {
   unsignedTx: ethers.providers.TransactionRequest;

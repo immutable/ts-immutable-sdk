@@ -1117,6 +1117,90 @@
         }
       }
     },
+    "/v1/chains/{chain_name}/orders/fulfillment_data": {
+      "post": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Retrieve fulfillment data for orders",
+        "description": "Retrieve signed fulfillment data based on the list of order IDs and corresponding fees.",
+        "operationId": "fulfillment_data",
+        "parameters": [
+          {
+            "name": "chain_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChainName"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "orderId": {
+                      "type": "string"
+                    },
+                    "fee": {
+                      "$ref": "#/components/schemas/Fee"
+                    }
+                  },
+                  "required": [
+                    "orderId"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "extraData": {
+                            "type": "string"
+                          },
+                          "order": {
+                            "$ref": "#/components/schemas/Order"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "result"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/passport-mr/v1/counterfactual-address": {
       "post": {
         "summary": "Create a counterfactual address",
