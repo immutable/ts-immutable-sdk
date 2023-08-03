@@ -22,7 +22,7 @@ function getQuoteAmountFromTradeType(tradeType: TradeType, tradeInfo: QuoteTrade
   };
 }
 
-export function getAmountWithSlippageImpact(
+export function applySlippage(
   tradeType: TradeType,
   amount: ethers.BigNumberish,
   slippage: number,
@@ -59,15 +59,11 @@ export function getQuote(
 
   const quote = getQuoteAmountFromTradeType(tradeType, tradeInfo, tokenInfo);
 
-  const amountWithSlippageImpact = getAmountWithSlippageImpact(
-    tradeType,
-    quote.value,
-    slippage,
-  );
+  const amountWithSlippage = applySlippage(tradeType, quote.value, slippage);
 
   const quoteWithMaxSlippage = {
     token: tokenInfo,
-    value: amountWithSlippageImpact,
+    value: amountWithSlippage,
   };
 
   return {

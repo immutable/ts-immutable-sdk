@@ -17,6 +17,13 @@ import { Multicall__factory } from '../contracts/types';
 
 jest.mock('@ethersproject/contracts');
 
+const types = [
+  'uint256', // amountOut/amountIn
+  'uint160', // sqrtPrice after
+  'uint32', // ticks crossed
+  'uint256', // gasEstimate
+];
+
 describe('getQuotesForRoutes', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let mockedMulticallContract: jest.Mock;
@@ -67,6 +74,7 @@ describe('getQuotesForRoutes', () => {
         dummyRoutes,
         amount,
         TradeType.EXACT_INPUT,
+        [],
       )).rejects.toThrow(new ProviderCallError('failed multicall: an rpc error message'));
     });
   });
@@ -75,12 +83,6 @@ describe('getQuotesForRoutes', () => {
     it('returns the only quote', async () => {
       const expectedAmountOut = ethers.utils.parseEther('1000');
       const expectedGasEstimate = '100000';
-      const types = [
-        'uint256', // amountOut/amountIn
-        'uint160', // sqrtPrice after
-        'uint32', // ticks crossed
-        'uint256', // gasEstimate
-      ];
 
       const encoded = ethers.utils.defaultAbiCoder.encode(types, [
         expectedAmountOut,
@@ -141,7 +143,7 @@ describe('getQuotesForRoutes', () => {
         TradeType.EXACT_INPUT,
       );
       expect(amountOutReceived.length).toEqual(1);
-      expect(amountOutReceived[0].quoteAmount.toString()).toEqual(expectedAmountOut.toString());
+      expect(amountOutReceived[0].amountOut.toString()).toEqual(expectedAmountOut.toString());
       expect(amountOutReceived[0].gasEstimate.toString()).toEqual(expectedGasEstimate);
     });
   });
@@ -152,13 +154,6 @@ describe('getQuotesForRoutes', () => {
       const expectedAmountOut2 = ethers.utils.parseEther('2000');
       const expectedGasEstimate1 = '100000';
       const expectedGasEstimate2 = '200000';
-
-      const types = [
-        'uint256', // amountOut/amountIn
-        'uint160', // sqrtPrice after
-        'uint32', // ticks crossed
-        'uint256', // gasEstimate
-      ];
 
       const encoded1 = ethers.utils.defaultAbiCoder.encode(types, [
         expectedAmountOut1,
@@ -229,11 +224,11 @@ describe('getQuotesForRoutes', () => {
         TradeType.EXACT_INPUT,
       );
       expect(amountOutReceived.length).toBe(2);
-      expect(amountOutReceived[0].quoteAmount.toString()).toBe(
+      expect(amountOutReceived[0].amountOut.toString()).toBe(
         expectedAmountOut1.toString(),
       );
       expect(amountOutReceived[0].gasEstimate.toString()).toEqual(expectedGasEstimate1);
-      expect(amountOutReceived[1].quoteAmount.toString()).toBe(
+      expect(amountOutReceived[1].amountOut.toString()).toBe(
         expectedAmountOut2.toString(),
       );
       expect(amountOutReceived[1].gasEstimate.toString()).toEqual(expectedGasEstimate2);

@@ -2,6 +2,7 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import { TradeType } from '@uniswap/sdk-core';
+import { SecondaryFee } from 'lib';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
@@ -10,7 +11,12 @@ import {
   TEST_DEX_CONFIGURATION,
   TEST_GAS_PRICE,
   decodeMulticallExactInputOutputSingleWithoutFees,
+  TEST_FEE_RECIPIENT,
+  TEST_MAX_FEE_BASIS_POINTS,
+  decodeMulticallExactInputOutputSingleWithFees,
+  TEST_SECONDARY_FEE_ADDRESS,
 } from './test/utils';
+import { BASIS_POINT_PRECISION } from './constants';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -23,6 +29,7 @@ jest.mock('./lib/utils', () => ({
 }));
 
 const exactOutputSingleSignature = '0x5023b4df';
+const exactOutputSingleWithFeesSignature = '0xed921d3c';
 
 const DEFAULT_SLIPPAGE = 0.1; // 1/1000 = 0.001 = 0.1%
 const APPROVED_AMOUNT = BigNumber.from('1000000000000000000');
@@ -51,6 +58,49 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         }),
       }),
     ) as unknown as JsonRpcProvider;
+  });
+
+  describe('Swap with single pool with fees', () => {
+    it('generates valid swap calldata', async () => {
+      const secondaryFees: SecondaryFee[] = [
+        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS },
+      ];
+
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+
+      mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
+
+      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+      const { swap } = await exchange.getUnsignedSwapTxFromAmountOut(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        params.amountOut,
+      );
+
+      // The maxAmountIn is the amount out + fees + slippage
+      const amountInBigNum = BigNumber.from(params.maxAmountIn);
+      const expectedMaxAmountIn = amountInBigNum
+        .add(amountInBigNum.mul(secondaryFees[0].feeBasisPoints).div(BASIS_POINT_PRECISION));
+
+      const data = swap.transaction.data?.toString() || '';
+
+      const { topLevelParams, swapParams } = decodeMulticallExactInputOutputSingleWithFees(data);
+
+      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactOutputSingleWithFeesSignature);
+
+      expect(swapParams.tokenIn).toBe(params.inputToken); // input token
+      expect(swapParams.tokenOut).toBe(params.outputToken); // output token
+      expect(swapParams.fee).toBe(10000); // fee
+      expect(swapParams.recipient).toBe(params.fromAddress); // recipient
+      expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // to address
+      expect(swap.transaction.from).toBe(params.fromAddress); // from address
+      expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
+      expect(swapParams.firstAmount.toString()).toBe(params.amountOut.toString()); // amount out
+      expect(swapParams.secondAmount.toString()).toBe(expectedMaxAmountIn.toString()); // max amount in
+      expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
+    });
   });
 
   describe('Swap with single pool without fees and default slippage tolerance', () => {

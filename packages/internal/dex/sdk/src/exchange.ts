@@ -8,6 +8,7 @@ import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval } from 'lib/transactionUtils/approval';
 import { getQuote } from 'lib/transactionUtils/getQuote';
 import {
+  BASIS_POINT_PRECISION,
   DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS,
 } from './constants';
 
@@ -18,6 +19,46 @@ import {
 } from './types';
 import { getSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
+
+function subtractSecondaryFeesIfNecessary(
+  amount: CurrencyAmount<Token>,
+  secondaryFees: SecondaryFee[],
+  tradeType: TradeType,
+) {
+  if (tradeType === TradeType.EXACT_OUTPUT) {
+    // For an exact output swap, we do not need to subtract fees from the given amount
+    return amount;
+  }
+
+  let totalFees = CurrencyAmount.fromRawAmount(amount.currency, 0);
+  for (let i = 0; i < secondaryFees.length; i++) {
+    const feeAmount = amount.multiply(secondaryFees[i].feeBasisPoints).divide(BASIS_POINT_PRECISION);
+    totalFees = totalFees.add(feeAmount);
+  }
+
+  // Subtract the fee amount from the given amount
+  return amount.subtract(totalFees);
+}
+
+function addSecondaryFeesIfNecessary(
+  amount: ethers.BigNumber,
+  secondaryFees: SecondaryFee[],
+  tradeType: TradeType,
+) {
+  if (tradeType === TradeType.EXACT_INPUT) {
+    // For an exact input swap, we do not need to add fees to the given amount
+    return amount;
+  }
+
+  let totalFees = ethers.BigNumber.from(0);
+  for (let i = 0; i < secondaryFees.length; i++) {
+    const feeAmount = amount.mul(secondaryFees[i].feeBasisPoints).div(BASIS_POINT_PRECISION);
+    totalFees = totalFees.add(feeAmount);
+  }
+
+  // Add the fee amount to the given amount
+  return amount.add(totalFees);
+}
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;
@@ -111,10 +152,14 @@ export class Exchange {
       otherToken = tokenIn;
     }
 
+    // Handle fees for exact input trades
+    const amountWithFees = subtractSecondaryFeesIfNecessary(amountSpecified, this.secondaryFees, tradeType);
+
     const routeAndQuote = await this.router.findOptimalRoute(
-      amountSpecified,
+      amountWithFees,
       otherToken,
       tradeType,
+      this.secondaryFees,
       maxHops,
     );
 
@@ -132,6 +177,15 @@ export class Exchange {
       gasPrice,
     );
 
+    // Handle amount out trades here (post-quote)
+    routeAndQuote.trade.amountIn = addSecondaryFeesIfNecessary(
+      routeAndQuote.trade.amountIn,
+      this.secondaryFees,
+      tradeType,
+    );
+
+    // This should have the amount in that the USER specifies,
+    // not the modified amount in for the quote
     const swap = getSwap(
       this.nativeToken,
       routeAndQuote,

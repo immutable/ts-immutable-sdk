@@ -77,10 +77,10 @@ describe('generateAllAcyclicPaths', () => {
         token0,
         token3,
         pools,
+        maxHops,
         [],
         [],
         token0,
-        maxHops,
       );
 
       // There are two routes of maxHops = 3 that go from token0 to token3.
@@ -160,10 +160,10 @@ describe('generateAllAcyclicPaths', () => {
         token0,
         token3,
         pools,
+        maxHops,
         [],
         [],
         token0,
-        maxHops,
       );
 
       // There is one route of maxHops = 2 that goes from token0 to token3.
@@ -239,10 +239,10 @@ describe('generateAllAcyclicPaths', () => {
         token0,
         token3,
         pools,
+        maxHops,
         [],
         [],
         token0,
-        maxHops,
       );
 
       // There are five route of maxHops = 4 that goes from token0 to token3.

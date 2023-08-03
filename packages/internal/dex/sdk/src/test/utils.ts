@@ -1,5 +1,6 @@
 import {
   Currency,
+  CurrencyAmount,
   Fraction,
   Percent,
   Token,
@@ -360,38 +361,53 @@ export function mockRouterImplementation(
   params: SwapTest,
   tradeType: TradeType,
 ) {
+  const findOptimalRoute = jest.fn((
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _amountSpecified: CurrencyAmount<Currency>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _otherCurrency: Currency,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _type: TradeType,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _secondaryFees: SecondaryFee[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _maxHops: number,
+  ) => {
+    const tokenIn: Token = new Token(params.chainId, params.inputToken, 18);
+    const tokenOut: Token = new Token(
+      params.chainId,
+      params.outputToken,
+      18,
+    );
+
+    const route: Route<Currency, Currency> = new Route(
+      params.pools,
+      tokenIn,
+      tokenOut,
+    );
+
+    const trade: QuoteTradeInfo = {
+      route,
+      amountIn: ethers.BigNumber.from(params.amountIn),
+      tokenIn,
+      amountOut: ethers.BigNumber.from(params.amountOut),
+      tokenOut,
+      tradeType,
+      gasEstimate: TEST_TRANSACTION_GAS_USAGE,
+    };
+
+    return {
+      trade,
+    };
+  });
+
   (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
     routingContracts: {
       peripheryRouterAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
       secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
     },
-    findOptimalRoute: () => {
-      const tokenIn: Token = new Token(params.chainId, params.inputToken, 18);
-      const tokenOut: Token = new Token(
-        params.chainId,
-        params.outputToken,
-        18,
-      );
-
-      const route: Route<Currency, Currency> = new Route(
-        params.pools,
-        tokenIn,
-        tokenOut,
-      );
-
-      const trade: QuoteTradeInfo = {
-        route,
-        amountIn: ethers.BigNumber.from(params.amountIn),
-        tokenIn,
-        amountOut: ethers.BigNumber.from(params.amountOut),
-        tokenOut,
-        tradeType,
-        gasEstimate: TEST_TRANSACTION_GAS_USAGE,
-      };
-
-      return {
-        trade,
-      };
-    },
+    findOptimalRoute,
   }));
+
+  return findOptimalRoute;
 }
