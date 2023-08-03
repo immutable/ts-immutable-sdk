@@ -10,7 +10,7 @@ import { ConnectLoader, ConnectLoaderParams } from './ConnectLoader';
 import { StrongCheckoutWidgetsConfig } from '../../lib/withDefaultWidgetConfig';
 import { ProviderEvent, WidgetTheme } from '../../lib';
 
-xdescribe('ConnectLoader', () => {
+describe('ConnectLoader', () => {
   const config: StrongCheckoutWidgetsConfig = {
     environment: Environment.SANDBOX,
     theme: WidgetTheme.DARK,

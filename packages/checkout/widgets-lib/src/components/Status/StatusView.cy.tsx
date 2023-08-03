@@ -1,4 +1,4 @@
-import { it } from 'local-cypress';
+import { describe, it } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { onDarkBase } from '@biom3/design-tokens';
 import { BiomeCombinedProviders } from '@biom3/react';
