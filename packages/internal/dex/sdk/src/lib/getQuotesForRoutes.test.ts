@@ -74,7 +74,6 @@ describe('getQuotesForRoutes', () => {
         dummyRoutes,
         amount,
         TradeType.EXACT_INPUT,
-        [],
       )).rejects.toThrow(new ProviderCallError('failed multicall: an rpc error message'));
     });
   });
