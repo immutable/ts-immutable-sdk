@@ -60,7 +60,7 @@ export function Example() {
         exchange = new Exchange(configuration);
       }
 
-      const txn = await exchange.getUnsignedSwapTxFromAmountOut(
+      const txn = await exchange.getUnsignedSwapTxFromAmountIn(
         ethereumAccount,
         inputToken,
         outputToken,
@@ -142,6 +142,8 @@ export function Example() {
         Output Token: {outputToken} ({addressToSymbolMapping[outputToken]})
       </h3>
 
+      <hr className="my-4" />
+
       <SecondaryFeeInput setSecondaryFeeRecipient={setSecondaryFeeRecipient} setFeePercentage={setFeePercentage}/>
       <AmountInput
         inputTokenSymbol={addressToSymbolMapping[inputToken]}
@@ -192,7 +194,9 @@ export function Example() {
                     Swap successful! Check your metamask to see updated token
                     balances
                   </h3>
-                  <a href={`https://immutable-testnet.blockscout.com/tx/${swapTransaction.transactionHash}`} target='_blank'>Transaction</a>
+                  <a  
+                  className='underline text-blue-600 hover:text-blue-800 visited:text-purple-600'
+                  href={`https://immutable-testnet.blockscout.com/tx/${swapTransaction.transactionHash}`} target='_blank'>Transaction</a>
                 </>
               )}
             </>
