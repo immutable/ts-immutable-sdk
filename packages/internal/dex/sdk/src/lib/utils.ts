@@ -1,5 +1,5 @@
 import { Pool } from '@uniswap/v3-sdk';
-import { Token } from '@uniswap/sdk-core';
+import { Currency, CurrencyAmount, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { TokenInfo } from '../types';
@@ -73,4 +73,8 @@ export const tokenInfoToUniswapToken = (tokenInfo: TokenInfo): Token => new Toke
   tokenInfo.decimals,
   tokenInfo.symbol,
   tokenInfo.name,
+);
+
+export const toBigNumber = (amount: CurrencyAmount<Currency>) => (
+  ethers.BigNumber.from(amount.multiply(amount.decimalScale).toExact())
 );

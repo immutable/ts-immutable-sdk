@@ -6,9 +6,11 @@ import {
 } from '../contracts/types/Multicall';
 import { UniswapV3Pool__factory } from '../contracts/types';
 
+const DEFAULT_GAS_QUOTE = 2_000_000;
+
 type Address = string;
 export type SingleContractCallOptions = {
-  gasRequired: number | undefined;
+  gasRequired: number;
 };
 
 export type MulticallResponse = {
@@ -50,7 +52,7 @@ export async function multicallMultipleCallDataSingContract(
   multicallContract: Multicall,
   calldata: string[],
   address: Address,
-  options: SingleContractCallOptions,
+  options?: SingleContractCallOptions,
 ): Promise<MulticallResponse> {
   // Create call objects
   const calls = new Array(calldata.length);
@@ -61,7 +63,7 @@ export async function multicallMultipleCallDataSingContract(
     calls[i] = {
       target: address,
       callData: calldata[i],
-      gasLimit: options.gasRequired,
+      gasLimit: options?.gasRequired ?? DEFAULT_GAS_QUOTE,
     };
   }
 
