@@ -1,8 +1,6 @@
 import {
   Currency,
   CurrencyAmount,
-  Fraction,
-  Percent,
   Token,
   TradeType,
 } from '@uniswap/sdk-core';
@@ -253,31 +251,6 @@ export function decodeMulticallExactInputOutputSingleWithoutFees(data: ethers.ut
   };
 
   return { topLevelParams, swapParams };
-}
-
-export function getMinimumAmountOut(
-  slippageTolerance: Percent,
-  amountOut: ethers.BigNumber,
-): ethers.BigNumber {
-  const amountOutJsbi = JSBI.BigInt(amountOut.toString());
-  // amountOut / (1 + slippagePercentage)
-  const slippageAdjustedAmountOut = new Fraction(JSBI.BigInt(1))
-    .add(slippageTolerance)
-    .invert()
-    .multiply(amountOutJsbi).quotient;
-  return ethers.BigNumber.from(slippageAdjustedAmountOut.toString());
-}
-
-export function getMaximumAmountIn(
-  slippageTolerance: Percent,
-  amountIn: ethers.BigNumber,
-): ethers.BigNumber {
-  const amountInJsbi = JSBI.BigInt(amountIn.toString());
-  // (1 + slippagePercent) * amount
-  const slippageAdjustedAmountIn = new Fraction(JSBI.BigInt(1))
-    .add(slippageTolerance)
-    .multiply(amountInJsbi).quotient;
-  return ethers.BigNumber.from(slippageAdjustedAmountIn.toString());
 }
 
 export function setupSwapTxTest(slippage: number, multiPoolSwap: boolean = false): SwapTest {
