@@ -359,7 +359,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction?.from).toBe(params.fromAddress); // from address
       expect(swap.transaction?.value).toBe('0x00'); // refers to 0ETH
       expect(swapParams.firstAmount.toString()).toBe('100000000000000000000'); // amount in (100)
-      expect(swapParams.secondAmount.toString()).toBe('998003992015968063872'); // min amount out (998 includes 2% slippage)
+      expect(swapParams.secondAmount.toString()).toBe('998003992015968063872'); // min amount out (998 includes 0.2% slippage)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
