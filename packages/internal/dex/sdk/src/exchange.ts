@@ -15,16 +15,12 @@ import {
 } from './constants';
 
 import { QuoteTradeInfo, Router } from './lib/router';
-import { getERC20Decimals, isValidNonZeroAddress } from './lib/utils';
+import { getERC20Decimals, isValidNonZeroAddress, toBigNumber } from './lib/utils';
 import {
   ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
 } from './types';
 import { getSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
-
-const toBigNumber = (amount: CurrencyAmount<Token>) => (
-  ethers.BigNumber.from(amount.multiply(amount.decimalScale).toExact())
-);
 
 function calculateFees(amount: ethers.BigNumber, secondaryFees: SecondaryFee[]) {
   let totalFees = ethers.BigNumber.from(0);

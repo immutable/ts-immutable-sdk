@@ -14,6 +14,7 @@ import {
   QuoteTradeInfo,
   Router,
   SecondaryFee,
+  toBigNumber,
 } from '../lib';
 
 export const TEST_GAS_PRICE = ethers.BigNumber.from('1500000000'); // 1.5 gwei or 1500000000 wei
@@ -149,10 +150,6 @@ type ExactInputOutputParams = {
   amountIn: ethers.BigNumber;
   amountOut: ethers.BigNumber;
 };
-
-export const toBigNumber = (amount: CurrencyAmount<Currency>) => (
-  ethers.BigNumber.from(amount.multiply(amount.decimalScale).toExact())
-);
 
 // uniqBy returns the unique items in an array using the given comparator
 export function uniqBy<K, T extends string | number>(

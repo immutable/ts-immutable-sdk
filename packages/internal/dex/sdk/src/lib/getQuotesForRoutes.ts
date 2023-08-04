@@ -3,7 +3,7 @@ import { Currency, TradeType, CurrencyAmount } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ProviderCallError } from 'errors';
 import { multicallMultipleCallDataSingContract, MulticallResponse } from './multicall';
-import { quoteReturnMapping } from './utils';
+import { quoteReturnMapping, toBigNumber } from './utils';
 import { Multicall } from '../contracts/types';
 
 const amountIndex = 0;
@@ -71,9 +71,7 @@ export async function getQuotesForRoutes(
     }
 
     // TODO: ideally this is already a big number as we don't need a CurrencyAmount at this level
-    const amountSpecifiedBigNumber = ethers.BigNumber.from(
-      amountSpecified.multiply(amountSpecified.decimalScale).toExact(),
-    );
+    const amountSpecifiedBigNumber = toBigNumber(amountSpecified);
 
     if (decodedQuoteResult) {
       // The 0th element in each decoded data is going to be the amountOut or amountIn.
