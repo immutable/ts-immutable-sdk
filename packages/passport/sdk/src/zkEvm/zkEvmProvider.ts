@@ -83,6 +83,8 @@ export class ZkEvmProvider implements Provider {
     this.eventEmitter = new TypedEventEmitter<ProviderEventMap>();
   }
 
+  public isPassport: boolean = true;
+
   private isLoggedIn(): this is LoggedInZkEvmProvider {
     return this.magicProvider !== undefined
       && this.user !== undefined
