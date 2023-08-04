@@ -19,10 +19,10 @@ import {
   TEST_FEE_RECIPIENT,
   TEST_MAX_FEE_BASIS_POINTS,
   TEST_SECONDARY_FEE_ADDRESS,
-  decodeMulticallExactInputOutputSingleWithFees,
-  decodeMulticallExactInputOutputWithFees,
-  decodeMulticallExactInputOutputSingleWithoutFees,
   decodePath,
+  decodeMulticallExactInputSingleWithFees,
+  decodeMulticallExactInputWithFees,
+  decodeMulticallExactInputSingleWithoutFees,
 } from './test/utils';
 import { Router, SecondaryFee } from './lib';
 
@@ -182,7 +182,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction?.data?.toString() || '';
 
-      const { swapParams, secondaryFeeParams, topLevelParams } = decodeMulticallExactInputOutputSingleWithFees(data);
+      const { swapParams, secondaryFeeParams, topLevelParams } = decodeMulticallExactInputSingleWithFees(data);
 
       expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleWithSecondaryFeeSignature);
 
@@ -193,8 +193,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swapParams.tokenOut).toBe(params.outputToken);
       expect(swapParams.fee).toBe(10000);
       expect(swapParams.recipient).toBe(params.fromAddress);
-      expect(swapParams.firstAmount.toString()).toBe('100000000000000000000'); // 100: swap.amountIn = userQuoteReq.amountIn
-      expect(swapParams.secondAmount.toString()).toBe('961165048543689320388'); // 961.2: swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
+      expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // 100: swap.amountIn = userQuoteReq.amountIn
+      expect(swapParams.amountOutMinimum.toString()).toBe('961165048543689320388'); // 961.2: swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0');
 
       expect(swap.transaction?.to).toBe(TEST_SECONDARY_FEE_ADDRESS);
@@ -223,14 +223,14 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction?.data?.toString() || '';
 
-      const { swapParams, secondaryFeeParams, topLevelParams } = decodeMulticallExactInputOutputWithFees(data);
+      const { swapParams, secondaryFeeParams, topLevelParams } = decodeMulticallExactInputWithFees(data);
 
       expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputWithSecondaryFeeSignature);
 
       expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
       expect(secondaryFeeParams[0].feeBasisPoints).toBe(TEST_MAX_FEE_BASIS_POINTS);
 
-      const decodedPath = decodePath(swapParams.path);
+      const decodedPath = decodePath(swapParams.path.toString());
 
       expect(swap.transaction?.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // to address
       expect(swap.transaction?.from).toBe(params.fromAddress); // from address
@@ -244,7 +244,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
       expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // 100
-      expect(swapParams.amountOut.toString()).toBe('899100899100899100899'); // 899 includes slippage and fees
+      expect(swapParams.amountOutMinimum.toString()).toBe('899100899100899100899'); // 899 includes slippage and fees
     });
   });
 
@@ -265,7 +265,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction?.data?.toString() || '';
 
-      const { topLevelParams, swapParams } = decodeMulticallExactInputOutputSingleWithoutFees(data);
+      const { topLevelParams, swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
 
       expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
 
@@ -276,8 +276,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction?.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction?.from).toBe(params.fromAddress); // from address
       expect(swap.transaction?.value).toBe('0x00'); // refers to 0ETH
-      expect(swapParams.firstAmount.toString()).toBe('100000000000000000000'); // amount in (100)
-      expect(swapParams.secondAmount.toString()).toBe('999000999000999000999'); // min amount out (999 includes slippage)
+      expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // amount in (100)
+      expect(swapParams.amountOutMinimum.toString()).toBe('999000999000999000999'); // min amount out (999 includes slippage)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
@@ -347,7 +347,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction?.data?.toString() || '';
 
-      const { topLevelParams, swapParams } = decodeMulticallExactInputOutputSingleWithoutFees(data);
+      const { topLevelParams, swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
 
       expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
 
@@ -358,8 +358,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction?.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction?.from).toBe(params.fromAddress); // from address
       expect(swap.transaction?.value).toBe('0x00'); // refers to 0ETH
-      expect(swapParams.firstAmount.toString()).toBe('100000000000000000000'); // amount in (100)
-      expect(swapParams.secondAmount.toString()).toBe('998003992015968063872'); // min amount out (998 includes 0.2% slippage)
+      expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // amount in (100)
+      expect(swapParams.amountOutMinimum.toString()).toBe('998003992015968063872'); // min amount out (998 includes 0.2% slippage)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 

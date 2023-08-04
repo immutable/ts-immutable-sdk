@@ -12,10 +12,10 @@ import {
   TEST_PERIPHERY_ROUTER_ADDRESS,
   TEST_DEX_CONFIGURATION,
   TEST_GAS_PRICE,
-  decodeMulticallExactInputOutputSingleWithoutFees,
   TEST_FEE_RECIPIENT,
-  decodeMulticallExactInputOutputSingleWithFees,
   TEST_SECONDARY_FEE_ADDRESS,
+  decodeMulticallExactOutputSingleWithFees,
+  decodeMulticallExactOutputSingleWithoutFees,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -87,7 +87,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       const data = swap.transaction.data?.toString() || '';
 
-      const { topLevelParams, swapParams } = decodeMulticallExactInputOutputSingleWithFees(data);
+      const { topLevelParams, swapParams } = decodeMulticallExactOutputSingleWithFees(data);
 
       expect(topLevelParams[1][0].slice(0, 10)).toBe(exactOutputSingleWithFeesSignature);
 
@@ -98,8 +98,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(swapParams.firstAmount.toString()).toBe('1000000000000000000000'); // amount out (1000)
-      expect(swapParams.secondAmount.toString()).toBe('104030000000000000000'); // max amount in (about 104)
+      expect(swapParams.amountOut.toString()).toBe('1000000000000000000000'); // amount out (1000)
+      expect(swapParams.amountInMaximum.toString()).toBe('104030000000000000000'); // max amount in (about 104)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
@@ -180,7 +180,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
       const data = swap.transaction.data?.toString() || '';
 
-      const { topLevelParams, swapParams } = decodeMulticallExactInputOutputSingleWithoutFees(data);
+      const { topLevelParams, swapParams } = decodeMulticallExactOutputSingleWithoutFees(data);
 
       expect(topLevelParams[1][0].slice(0, 10)).toBe(exactOutputSingleSignature);
 
@@ -191,8 +191,8 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(swapParams.firstAmount.toString()).toBe('10000000000000000000000'); // 10,000 amount out
-      expect(swapParams.secondAmount.toString()).toBe('1001000000000000000000'); // 1,001 max amount in includes slippage
+      expect(swapParams.amountOut.toString()).toBe('10000000000000000000000'); // 10,000 amount out
+      expect(swapParams.amountInMaximum.toString()).toBe('1001000000000000000000'); // 1,001 max amount in includes slippage
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
