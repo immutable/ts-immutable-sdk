@@ -34,7 +34,7 @@ export function applySlippage(
   return ethers.BigNumber.from(amountWithSlippage.toString());
 }
 
-export function getQuote(
+export function prepareUserQuote(
   otherCurrency: Currency,
   tradeInfo: QuoteTradeInfo,
   slippage: number,

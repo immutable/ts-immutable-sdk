@@ -8,7 +8,7 @@ import {
 } from 'errors';
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval } from 'lib/transactionUtils/approval';
-import { getQuote as prepareUserQuote } from 'lib/transactionUtils/getQuote';
+import { prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import {
   BASIS_POINT_PRECISION,
   DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS,
