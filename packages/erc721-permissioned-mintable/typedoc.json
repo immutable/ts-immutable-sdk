@@ -1,5 +1,7 @@
 {
   "extends": ["../../typedoc.base.json"],
   "entryPoints": ["src/index.ts"],
-  "name": "erc721-permissioned-mintable",
+  "name": "@imtbl/sdk/erc721-permissioned-mintable",
+  "json": "docs.json",
+  "plugin": ["typedoc-plugin-missing-exports"]
 }

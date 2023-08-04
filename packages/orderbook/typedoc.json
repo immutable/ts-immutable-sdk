@@ -1,5 +1,7 @@
 {
   "extends": ["../../typedoc.base.json"],
   "entryPoints": ["src/index.ts", "src/types.ts"],
-  "name": "orderbook",
+  "name": "@imtbl/sdk/orderbook",
+  "json": "docs.json",
+  "plugin": ["typedoc-plugin-missing-exports"]
 }

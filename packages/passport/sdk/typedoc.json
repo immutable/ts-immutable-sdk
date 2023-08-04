@@ -1,5 +1,7 @@
 {
   "extends": ["../../../typedoc.base.json"],
   "entryPoints": ["src/index.ts"],
-  "name": "passport",
+  "name": "@imtbl/sdk/passport",
+  "json": "docs.json",
+  "plugin": ["typedoc-plugin-missing-exports"]
 }

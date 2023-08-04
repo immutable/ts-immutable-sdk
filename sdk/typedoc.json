@@ -1,4 +1,7 @@
 {
   "extends": ["../typedoc.base.json"],
   "entryPoints": ["src/index.ts"],
+  "json": "docs.json",
+  "readme": "./README.md",
+  "plugin": ["typedoc-plugin-missing-exports"]
 }

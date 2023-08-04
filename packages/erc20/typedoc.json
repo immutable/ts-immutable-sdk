@@ -1,5 +1,7 @@
 {
   "extends": ["../../typedoc.base.json"],
   "entryPoints": ["src/index.ts"],
-  "name": "erc20",
+  "name": "@imtbl/sdk/erc20",
+  "json": "docs.json",
+  "plugin": ["typedoc-plugin-missing-exports"]
 }

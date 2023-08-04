@@ -23,3 +23,5 @@ coverage/
 yalc.lock
 
 package-lock.json
+
+docs.json

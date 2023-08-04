@@ -41,6 +41,7 @@
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "build:all": "wsrun -p @imtbl/economy --stages build",
     "dev": "npm run build -- --watch",
+    "docs": "typedoc",
     "generate:all": "make",
     "generate:crafting": "make generate-crafting",
     "generate:inventory": "make generate-inventory",

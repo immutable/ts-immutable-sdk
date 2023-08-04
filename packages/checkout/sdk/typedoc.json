@@ -1,5 +1,7 @@
 {
   "extends": ["../../../typedoc.base.json"],
   "entryPoints": ["src/index.ts"],
-  "name": "checkout-sdk",
+  "name": "@imtbl/sdk/checkout-sdk",
+  "json": "docs.json",
+  "plugin": ["typedoc-plugin-missing-exports"]
 }

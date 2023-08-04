@@ -1,5 +1,7 @@
 {
   "extends": ["../../../typedoc.base.json"],
   "entryPoints": ["src/index.ts"],
-  "name": "blockchain-data",
+  "name": "@imtbl/sdk/blockchain-data",
+  "json": "docs.json",
+  "plugin": ["typedoc-plugin-missing-exports"]
 }

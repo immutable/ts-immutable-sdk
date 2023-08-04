@@ -1,5 +1,7 @@
 {
   "extends": ["../../typedoc.base.json"],
   "entryPoints": ["src/index.ts"],
-  "name": "provider",
+  "name": "@imtbl/sdk/provider",
+  "json": "docs.json",
+  "plugin": ["typedoc-plugin-missing-exports"]
 }
