@@ -22,6 +22,21 @@ import {
 import { getSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
 
+const toBigNumber = (amount: CurrencyAmount<Token>) => (
+  ethers.BigNumber.from(amount.multiply(amount.decimalScale).toExact())
+);
+
+function calculateFees(amount: ethers.BigNumber, secondaryFees: SecondaryFee[]) {
+  let totalFees = ethers.BigNumber.from(0);
+
+  for (let i = 0; i < secondaryFees.length; i++) {
+    const feeAmount = amount.mul(secondaryFees[i].feeBasisPoints).div(BASIS_POINT_PRECISION);
+    totalFees = totalFees.add(feeAmount);
+  }
+
+  return totalFees;
+}
+
 function getOurQuoteReqAmount(
   amount: CurrencyAmount<Token>,
   secondaryFees: SecondaryFee[],
@@ -32,36 +47,12 @@ function getOurQuoteReqAmount(
     return amount;
   }
 
-  let totalFees = CurrencyAmount.fromRawAmount(amount.currency, 0);
-  for (let i = 0; i < secondaryFees.length; i++) {
-    const feeAmount = amount.multiply(secondaryFees[i].feeBasisPoints).divide(BASIS_POINT_PRECISION);
-    totalFees = totalFees.add(feeAmount);
-  }
+  const totalFees = calculateFees(toBigNumber(amount), secondaryFees);
+  const totalFeesCurrencyAmount = CurrencyAmount.fromRawAmount(amount.currency, totalFees.toString());
 
   // Subtract the fee amount from the given amount
-  return amount.subtract(totalFees);
+  return amount.subtract(totalFeesCurrencyAmount);
 }
-
-// export type AdjustedQuote = {
-//   gasEstimate: ethers.BigNumber,
-//   route: Route<Currency, Currency>;
-//   tokenIn: Currency;
-//   tokenOut: Currency;
-//   amountIn: ethers.BigNumber;
-//   amountOut: ethers.BigNumber;
-//   tradeType: TradeType;
-// };
-
-const calculateFees = (amountOut: ethers.BigNumber, secondaryFees: SecondaryFee[]) => {
-  let totalFees = ethers.BigNumber.from(0);
-
-  for (let i = 0; i < secondaryFees.length; i++) {
-    const feeAmount = amountOut.mul(secondaryFees[i].feeBasisPoints).div(BASIS_POINT_PRECISION);
-    totalFees = totalFees.add(feeAmount);
-  }
-
-  return totalFees;
-};
 
 function prepareSwap(
   ourQuote: QuoteTradeInfo,

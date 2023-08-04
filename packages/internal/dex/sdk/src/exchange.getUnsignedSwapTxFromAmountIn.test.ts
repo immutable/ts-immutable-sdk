@@ -48,28 +48,6 @@ const HIGHER_SLIPPAGE = 0.2;
 const APPROVED_AMOUNT = BigNumber.from('1000000000000000000');
 const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
 
-// For EXACT_INPUT swaps (SELL x of token)
-// When the user wants to SELL 100 ETH for X UNI. There is a secondary fee of 1%. Assume an exchange rate of 1:10. Slippage of 3%.
-// userQuoteReq.amountIn = the amount specified (100 ETH)
-// userQuoteReq.tokenOut = UNI
-// ourQuoteReq.amountIn = the amount specified less the fee (99 ETH)
-// ourQuoteRes.amountIn = ourQuoteReq.amountIn (100 ETH)
-// ourQuoteRes.amountOut = the amount specified less the fee converted (990 UNI)
-// swap.amountIn = userQuoteReq.amountIn
-// swap.amountOutMinimum = ourQuoteRes.amountOut (990 UNI) - slippage (3%) = 960.3 UNI
-// userQuoteRes.amountOutMinimum = swapReq.amountOutMinimum (960.3 UNI)
-
-// For EXACT_OUTPUT swaps (BUY x of token)
-// When the user wants to BUY 1000 UNI for X ETH. There is a secondary fee of 1%. Assume an exchange rate of 10:1
-// userQuoteReq.amountOut = the amount specified (1000 UNI)
-// userQuoteReq.tokenIn = ETH
-// ourQuoteReq.amountOut = userQuoteReq.amountOut (1000 UNI)
-// ourQuoteRes.amountIn = the amount specified converted (100 ETH)
-// ourQuoteRes.amountOut = ourQuoteReq.amountOut (1000 UNI)
-// swap.amountInMaximum = ourQuoteRes.amountIn (100 ETH) + the fee (1 ETH) + slippage (3%) = 104.03 ETH
-// swap.amountOut = the original amount that the user specified (1000 UNI)
-// userQuoteRes.amountInMaximum = swap.amountInMaximum (104.03 ETH)
-
 describe('getUnsignedSwapTxFromAmountIn', () => {
   let erc20Contract: jest.Mock<any, any, any>;
 
