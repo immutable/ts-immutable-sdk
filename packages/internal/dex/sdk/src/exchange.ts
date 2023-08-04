@@ -174,7 +174,6 @@ export class Exchange {
       otherToken = tokenIn;
     }
 
-    // Handle fees for exact input trades
     const ourQuoteReqAmount = getOurQuoteReqAmount(amountSpecified, this.secondaryFees, tradeType);
 
     const ourQuote = await this.router.findOptimalRoute(
@@ -205,8 +204,7 @@ export class Exchange {
       this.secondaryFees,
     );
 
-    // Slippage gets applied in here
-    const swapTxnDetails = getSwap(
+    const swap = getSwap(
       this.nativeToken,
       adjustedQuote,
       fromAddress,
@@ -218,12 +216,11 @@ export class Exchange {
       this.secondaryFees,
     );
 
-    // Slippage also gets applied in here
     const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent);
 
     return {
       approval,
-      swap: swapTxnDetails,
+      swap,
       quote: userQuote,
     };
   }
