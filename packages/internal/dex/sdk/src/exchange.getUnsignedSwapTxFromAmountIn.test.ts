@@ -23,9 +23,6 @@ import {
   decodeMulticallExactInputOutputWithFees,
   decodeMulticallExactInputOutputSingleWithoutFees,
   decodePath,
-  TEST_FROM_ADDRESS,
-  getPool,
-  TEST_CHAIN_ID,
 } from './test/utils';
 import { Router, SecondaryFee } from './lib';
 
@@ -163,15 +160,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
   describe('Swap with single pool and secondary fees', () => {
     it('generates valid swap calldata', async () => {
-      const pool = getPool();
-      const params = {
-        fromAddress: TEST_FROM_ADDRESS,
-        inputToken: pool.token0.address,
-        outputToken: pool.token1.address,
-        chainId: TEST_CHAIN_ID,
-        pools: [pool],
-        exchangeRate: 10,
-      };
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
       const findOptimalRouteMock = mockRouterImplementation(params, TradeType.EXACT_INPUT);
 
       const secondaryFees: SecondaryFee[] = [
