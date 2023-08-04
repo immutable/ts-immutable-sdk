@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - @imtbl/blockchain-data: Added Deposit and Withdrawal activity types
+- @imtbl/passport: Added zkEVM Support, see the [zkEVM Passport documentation](https://docs.immutable.com/docs/zkevm/products/passport/) for more information.
 
 ### Fixed
 
