@@ -118,7 +118,6 @@ export class Exchange {
       ourQuoteReqAmount,
       otherToken,
       tradeType,
-      this.secondaryFees,
       maxHops,
     );
 

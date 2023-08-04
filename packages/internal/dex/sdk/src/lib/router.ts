@@ -4,7 +4,7 @@ import {
 } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
 import { NoRoutesAvailableError } from 'errors';
-import { SecondaryFee, TokenInfo } from 'types';
+import { TokenInfo } from 'types';
 import { poolEquals } from './utils';
 import { getQuotesForRoutes, QuoteResult } from './getQuotesForRoutes';
 import { fetchValidPools } from './poolUtils/fetchValidPools';
@@ -50,7 +50,6 @@ export class Router {
     amountSpecified: CurrencyAmount<Currency>,
     otherCurrency: Currency,
     tradeType: TradeType,
-    secondaryFees: SecondaryFee[],
     maxHops: number = 2,
   ): Promise<QuoteTradeInfo> {
     const [currencyIn, currencyOut] = this.determineERC20InAndERC20Out(
