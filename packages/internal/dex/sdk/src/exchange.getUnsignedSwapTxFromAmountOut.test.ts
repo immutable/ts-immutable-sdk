@@ -30,7 +30,6 @@ jest.mock('./lib/utils', () => ({
 const exactOutputSingleSignature = '0x5023b4df';
 const exactOutputSingleWithFeesSignature = '0xed921d3c';
 
-const DEFAULT_SLIPPAGE = 0.1; // 1/1000 = 0.001 = 0.1%
 const APPROVED_AMOUNT = BigNumber.from('1000000000000000000');
 const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
 
@@ -65,7 +64,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
       ];
 
-      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+      const params = setupSwapTxTest();
 
       const findOptimalRouteMock = mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
@@ -106,7 +105,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
 
   describe('Swap with single pool without fees and default slippage tolerance', () => {
     it('generates valid swap calldata', async () => {
-      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+      const params = setupSwapTxTest();
 
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
@@ -138,7 +137,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
     });
 
     it('returns valid swap quote', async () => {
-      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
+      const params = setupSwapTxTest();
       mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);

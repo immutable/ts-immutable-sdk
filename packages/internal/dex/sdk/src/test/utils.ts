@@ -253,7 +253,7 @@ export function decodeMulticallExactInputOutputSingleWithoutFees(data: ethers.ut
   return { topLevelParams, swapParams };
 }
 
-export function setupSwapTxTest(slippage: number, multiPoolSwap: boolean = false): SwapTest {
+export function setupSwapTxTest(multiPoolSwap: boolean = false): SwapTest {
   const fromAddress = TEST_FROM_ADDRESS;
 
   const arbitraryTick = 100;
@@ -329,11 +329,9 @@ export function mockRouterImplementation(
 ) {
   const exchangeRate = params.exchangeRate ?? 10;
   const findOptimalRoute = jest.fn((
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     amountSpecified: CurrencyAmount<Currency>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     otherCurrency: Currency,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     type: TradeType,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     secondaryFees: SecondaryFee[],
