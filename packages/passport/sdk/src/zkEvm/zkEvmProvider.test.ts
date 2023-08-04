@@ -5,6 +5,7 @@ import { sendTransaction } from './sendTransaction';
 import { JsonRpcError, ProviderErrorCode } from './JsonRpcError';
 import GuardianClient from '../guardian/guardian';
 import { RelayerClient } from './relayerClient';
+import { Provider } from './types';
 
 jest.mock('@ethersproject/providers');
 jest.mock('./relayerClient');
@@ -272,6 +273,15 @@ describe('ZkEvmProvider', () => {
         relayerClient: expect.any(RelayerClient),
         user: mockUser,
       });
+    });
+  });
+
+  describe('isPassport', () => {
+    it('should be set to true', () => {
+      const provider = getProvider();
+
+      expect(provider.isPassport).toBe(true);
+      expect((provider as Provider).isPassport).toBe(true);
     });
   });
 });
