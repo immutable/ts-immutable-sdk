@@ -19,6 +19,7 @@
     "release-it": "^15.10.1",
     "syncpack": "^9.8.4",
     "typedoc": "^0.24.8",
+    "typedoc-plugin-merge-modules": "^5.0.1",
     "wsrun": "^5.2.4"
   },
   "engines": {
@@ -40,7 +41,7 @@
     "build": "wsrun -p @imtbl/sdk -p @imtbl/checkout-widgets-lib -e -r --serial build && yarn syncpack:format && yarn wsrun -p @imtbl/sdk -a -m copyBrowserBundles",
     "build:onlysdk": "wsrun -y 4 --stages build && yarn syncpack:format",
     "docs:build": "typedoc",
-    "docs:serve": "http-server ./docs --cors -p 8080",    
+    "docs:serve": "http-server ./docs --cors -p 8080 -c-1",
     "lint": "wsrun --exclude-missing -e lint --no-error-on-unmatched-pattern",
     "lint:ci": "./lint-ci.sh",
     "postinstall": "husky install; ./.husky/install_gitleaks.sh",

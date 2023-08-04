@@ -10,7 +10,7 @@
     "packages/erc721-permissioned-mintable/",
     "packages/immutablex_client/",
     "packages/orderbook/",
-    "packages/passport/sdk/",
+    // "packages/passport/sdk/", // temporarily disabled due to typecheck errors
     "packages/provider/",
   ],
   "name": "@imtbl/sdk",
@@ -23,5 +23,8 @@
   "out": "./docs",
   "readme": "./sdk/README.md",
   // Potentially useful for debugging
-  "logLevel": "Verbose"
+  "logLevel": "Verbose",
+  "plugin": [
+    "typedoc-plugin-merge-modules"
+  ]
 }
