@@ -159,28 +159,24 @@ function decodeSecondaryFeeCall(calldata: ethers.utils.BytesLike, functionName: 
   const iface = SecondaryFee__factory.createInterface();
   const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
 
-  const decodedParams = iface.decodeFunctionData(
+  return iface.decodeFunctionData(
     functionName,
     topLevelParams.data[0],
   );
-
-  return { topLevelParams, decodedParams };
 }
 
 function decodeSwapRouterCall(calldata: ethers.utils.BytesLike, functionName: SwapRouterFunctionName) {
   const iface = SwapRouter.INTERFACE;
   const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
 
-  const decodedParams = iface.decodeFunctionData(
+  return iface.decodeFunctionData(
     functionName,
     topLevelParams.data[0],
   );
-
-  return { topLevelParams, decodedParams };
 }
 
 export function decodeMulticallExactInputWithFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeSecondaryFeeCall(data, 'exactInputWithServiceFee');
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputWithServiceFee');
 
   const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
     feeRecipient: x[0],
@@ -194,37 +190,36 @@ export function decodeMulticallExactInputWithFees(data: ethers.utils.BytesLike) 
     amountOutMinimum: decodedParams[1][3],
   };
 
-  return { topLevelParams, secondaryFeeParams, swapParams };
+  return { secondaryFeeParams, swapParams };
 }
 
-// TODO: Use me
 export function decodeMulticallExactOutputWithFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeSecondaryFeeCall(data, 'exactOutputWithServiceFee');
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputWithServiceFee');
 
   const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
     feeRecipient: x[0],
     feeBasisPoints: x[1],
   }));
 
-  const multiPoolSwapParams: IV3SwapRouter.ExactOutputParamsStruct = {
+  const swapParams: IV3SwapRouter.ExactOutputParamsStruct = {
     path: decodedParams[1][0],
     recipient: decodedParams[1][1],
-    amountInMaximum: decodedParams[1][2],
-    amountOut: decodedParams[1][3],
+    amountOut: decodedParams[1][2],
+    amountInMaximum: decodedParams[1][3],
   };
 
-  return { topLevelParams, secondaryFeeParams, swapParams: multiPoolSwapParams };
+  return { secondaryFeeParams, swapParams };
 }
 
 export function decodeMulticallExactInputSingleWithFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeSecondaryFeeCall(data, 'exactInputSingleWithServiceFee');
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputSingleWithServiceFee');
 
   const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
     feeRecipient: x[0],
     feeBasisPoints: x[1],
   }));
 
-  const singlePoolSwapParams: IV3SwapRouter.ExactInputSingleParamsStruct = {
+  const swapParams: IV3SwapRouter.ExactInputSingleParamsStruct = {
     tokenIn: decodedParams[1][0],
     tokenOut: decodedParams[1][1],
     fee: decodedParams[1][2],
@@ -234,18 +229,18 @@ export function decodeMulticallExactInputSingleWithFees(data: ethers.utils.Bytes
     sqrtPriceLimitX96: decodedParams[1][6],
   };
 
-  return { topLevelParams, secondaryFeeParams, swapParams: singlePoolSwapParams };
+  return { secondaryFeeParams, swapParams };
 }
 
 export function decodeMulticallExactOutputSingleWithFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeSecondaryFeeCall(data, 'exactOutputSingleWithServiceFee');
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputSingleWithServiceFee');
 
   const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
     feeRecipient: x[0],
     feeBasisPoints: x[1],
   }));
 
-  const singlePoolSwapParams: IV3SwapRouter.ExactOutputSingleParamsStruct = {
+  const swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct = {
     tokenIn: decodedParams[1][0],
     tokenOut: decodedParams[1][1],
     fee: decodedParams[1][2],
@@ -255,11 +250,11 @@ export function decodeMulticallExactOutputSingleWithFees(data: ethers.utils.Byte
     sqrtPriceLimitX96: decodedParams[1][6],
   };
 
-  return { topLevelParams, secondaryFeeParams, swapParams: singlePoolSwapParams };
+  return { secondaryFeeParams, swapParams };
 }
 
 export function decodeMulticallExactInputSingleWithoutFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeSwapRouterCall(data, 'exactInputSingle');
+  const decodedParams = decodeSwapRouterCall(data, 'exactInputSingle');
 
   const swapParams: IV3SwapRouter.ExactInputSingleParamsStruct = {
     tokenIn: decodedParams[0][0],
@@ -271,11 +266,11 @@ export function decodeMulticallExactInputSingleWithoutFees(data: ethers.utils.By
     sqrtPriceLimitX96: decodedParams[0][6],
   };
 
-  return { topLevelParams, swapParams };
+  return { swapParams };
 }
 
 export function decodeMulticallExactOutputSingleWithoutFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeSwapRouterCall(data, 'exactOutputSingle');
+  const decodedParams = decodeSwapRouterCall(data, 'exactOutputSingle');
 
   const swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct = {
     tokenIn: decodedParams[0][0],
@@ -287,7 +282,7 @@ export function decodeMulticallExactOutputSingleWithoutFees(data: ethers.utils.B
     sqrtPriceLimitX96: decodedParams[0][6],
   };
 
-  return { topLevelParams, swapParams };
+  return { swapParams };
 }
 
 export function setupSwapTxTest(multiPoolSwap: boolean = false): SwapTest {

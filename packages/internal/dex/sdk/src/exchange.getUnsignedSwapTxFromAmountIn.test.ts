@@ -35,10 +35,6 @@ jest.mock('./lib/utils', () => ({
   getERC20Decimals: async () => 18,
 }));
 
-const exactInputSingleSignature = '0x04e45aaf';
-const exactInputSingleWithSecondaryFeeSignature = '0x742ac944';
-const exactInputWithSecondaryFeeSignature = '0x1411734e';
-
 const HIGHER_SLIPPAGE = 0.2;
 const APPROVED_AMOUNT = BigNumber.from('1000000000000000000');
 const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
@@ -181,9 +177,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction?.data?.toString() || '';
 
-      const { swapParams, secondaryFeeParams, topLevelParams } = decodeMulticallExactInputSingleWithFees(data);
-
-      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleWithSecondaryFeeSignature);
+      const { swapParams, secondaryFeeParams } = decodeMulticallExactInputSingleWithFees(data);
 
       expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
       expect(secondaryFeeParams[0].feeBasisPoints).toBe(100);
@@ -222,9 +216,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction?.data?.toString() || '';
 
-      const { swapParams, secondaryFeeParams, topLevelParams } = decodeMulticallExactInputWithFees(data);
-
-      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputWithSecondaryFeeSignature);
+      const { swapParams, secondaryFeeParams } = decodeMulticallExactInputWithFees(data);
 
       expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
       expect(secondaryFeeParams[0].feeBasisPoints).toBe(TEST_MAX_FEE_BASIS_POINTS);
@@ -264,9 +256,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction?.data?.toString() || '';
 
-      const { topLevelParams, swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
-
-      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
+      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
 
       expect(swapParams.tokenIn).toBe(params.inputToken); // input token
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
@@ -346,9 +336,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction?.data?.toString() || '';
 
-      const { topLevelParams, swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
-
-      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
+      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
 
       expect(swapParams.tokenIn).toBe(params.inputToken); // input token
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
