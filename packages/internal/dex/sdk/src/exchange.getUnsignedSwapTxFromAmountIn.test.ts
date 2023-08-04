@@ -83,10 +83,10 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
         amountIn,
       );
 
-      expectToBeDefined(tx.approval);
+      expectToBeDefined(tx.approval?.transaction.data);
 
       const decodedResults = erc20ContractInterface
-        .decodeFunctionData('approve', tx.approval.transaction.data as string);
+        .decodeFunctionData('approve', tx.approval.transaction.data);
       expect(decodedResults[0]).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
       // we have already approved 1000000000000000000, so we expect to approve 1000000000000000000 more
       expect(decodedResults[1].toString()).toEqual(APPROVED_AMOUNT.toString());
