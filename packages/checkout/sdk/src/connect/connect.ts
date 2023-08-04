@@ -39,15 +39,17 @@ export async function checkIsWalletConnected(
 }
 
 export async function connectSite(web3Provider: Web3Provider): Promise<Web3Provider> {
+  if (!web3Provider || !web3Provider.provider?.request) {
+    throw new CheckoutError(
+      'Incompatible provider',
+      CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
+      { details: 'Attempting to connect with an incompatible provider' },
+    );
+  }
+
   await withCheckoutError<void>(
     async () => {
-      if (!web3Provider || !web3Provider?.provider?.request) {
-        throw new CheckoutError(
-          'Incompatible provider',
-          CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR,
-          { details: 'Attempting to connect with an incompatible provider' },
-        );
-      }
+      if (!web3Provider.provider.request) return;
       // this makes the request to the wallet to connect i.e request eth accounts ('eth_requestAccounts')
       await web3Provider.provider.request({
         method: WalletAction.CONNECT,
