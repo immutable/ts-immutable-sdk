@@ -29,40 +29,41 @@ describe('token related functions', () => {
   });
 
   describe('getTokenAllowList', () => {
-    beforeEach(() => {
-      (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue({
-        getTokens: jest.fn().mockResolvedValue([
-          {
-            address: '0x1',
-            decimals: 18,
-            name: 'token-aa-testnet',
-            symbol: 'AA',
-          },
+    const remoteConfigMockReturn = {
+      getTokens: jest.fn().mockResolvedValue([
+        {
+          address: '0x1',
+          decimals: 18,
+          name: 'token-aa-testnet',
+          symbol: 'AA',
+        },
+        {
+          address: '0x2',
+          decimals: 18,
+          name: 'token-bb-testnet',
+          symbol: 'BB',
+        },
+        {
+          address: '',
+          decimals: 18,
+          name: 'token-cc-testnet',
+          symbol: 'CC',
+        },
+      ]),
+      getConfig: jest.fn().mockResolvedValue({
+        overrides: {
+          rpcURL: 'https://test',
+        },
+        tokens: [
           {
             address: '0x2',
             decimals: 18,
             name: 'token-bb-testnet',
             symbol: 'BB',
           },
-        ]),
-        getConfig: jest.fn().mockResolvedValue({
-          overrides: {
-            rpcURL: 'https://test',
-          },
-          tokens: [
-            {
-              address: '0x2',
-              decimals: 18,
-              name: 'token-bb-testnet',
-              symbol: 'BB',
-            },
-          ],
-        }),
-      });
-      config = new CheckoutConfiguration({
-        baseConfig: { environment: Environment.SANDBOX },
-      });
-    });
+        ],
+      }),
+    };
 
     const testcases = [
       {
@@ -83,10 +84,17 @@ describe('token related functions', () => {
             name: 'token-bb-testnet',
             symbol: 'BB',
           },
+          {
+            address: '',
+            decimals: 18,
+            name: 'token-cc-testnet',
+            symbol: 'CC',
+          },
         ],
+        remoteConfigMockReturn,
       },
       {
-        text: 'exclude list on chain',
+        text: 'exclude token with address',
         type: TokenFilterTypes.ALL,
         chainId: ChainId.SEPOLIA,
         exclude: [{ address: '0x2' }],
@@ -97,7 +105,35 @@ describe('token related functions', () => {
             name: 'token-aa-testnet',
             symbol: 'AA',
           },
+          {
+            address: '',
+            decimals: 18,
+            name: 'token-cc-testnet',
+            symbol: 'CC',
+          },
         ],
+        remoteConfigMockReturn,
+      },
+      {
+        text: 'exclude empty address',
+        type: TokenFilterTypes.ALL,
+        chainId: ChainId.SEPOLIA,
+        exclude: [{ address: '' }],
+        result: [
+          {
+            address: '0x1',
+            decimals: 18,
+            name: 'token-aa-testnet',
+            symbol: 'AA',
+          },
+          {
+            address: '0x2',
+            decimals: 18,
+            name: 'token-bb-testnet',
+            symbol: 'BB',
+          },
+        ],
+        remoteConfigMockReturn,
       },
       {
         text: 'tokens with SWAP filter',
@@ -111,11 +147,53 @@ describe('token related functions', () => {
             symbol: 'BB',
           },
         ],
+        remoteConfigMockReturn,
+      },
+      {
+        text: 'tokens with BRIDGE filter',
+        type: TokenFilterTypes.BRIDGE,
+        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+        result: [
+          {
+            address: '0x1',
+            decimals: 18,
+            name: 'token-aa-testnet',
+            symbol: 'AA',
+          },
+          {
+            address: '0x2',
+            decimals: 18,
+            name: 'token-bb-testnet',
+            symbol: 'BB',
+          },
+          {
+            address: '',
+            decimals: 18,
+            name: 'token-cc-testnet',
+            symbol: 'CC',
+          },
+        ],
+        remoteConfigMockReturn,
+      },
+      {
+        text: 'undefined SWAP tokens list',
+        type: TokenFilterTypes.SWAP,
+        chainId: ChainId.IMTBL_ZKEVM_DEVNET,
+        result: [],
+        remoteConfigMockReturn: {
+          getTokens: jest.fn().mockResolvedValue(undefined),
+          getConfig: jest.fn().mockResolvedValue({}),
+        },
       },
     ];
 
     testcases.forEach((testcase) => {
       it(`should return the filtered list of allowed tokens for a given ${testcase.text}`, async () => {
+        (RemoteConfigFetcher as unknown as jest.Mock).mockReturnValue(testcase.remoteConfigMockReturn);
+        config = new CheckoutConfiguration({
+          baseConfig: { environment: Environment.SANDBOX },
+        });
+
         await expect(
           await getTokenAllowList(config, {
             type: testcase.type,

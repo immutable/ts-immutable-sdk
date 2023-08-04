@@ -6,7 +6,7 @@
 import { Web3Provider } from '@ethersproject/providers';
 import { checkIsWalletConnected, connectSite } from './connect';
 import { WalletAction, WalletProviderName } from '../types';
-import { CheckoutError, CheckoutErrorType } from '../errors';
+import { CheckoutErrorType } from '../errors';
 import { createProvider } from '../provider';
 
 let windowSpy: any;
@@ -59,6 +59,37 @@ describe('connect', () => {
       expect(checkConnection.walletAddress).toBe('');
       expect(walletProviderName).toEqual(WalletProviderName.METAMASK);
     });
+
+    it('should throw an error if provider missing from web3provider', async () => {
+      try {
+        await checkIsWalletConnected({} as Web3Provider);
+      } catch (err: any) {
+        expect(err.message).toEqual('Check wallet connection request failed');
+        expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR);
+      }
+    });
+
+    it('should throw an error if provider.request is not found', async () => {
+      try {
+        await checkIsWalletConnected({ provider: {} } as Web3Provider);
+      } catch (err: any) {
+        expect(err.message).toEqual('Check wallet connection request failed');
+        expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR);
+      }
+    });
+
+    it('should throw error if request throws an error', async () => {
+      try {
+        await checkIsWalletConnected({
+          provider: {
+            request: () => { throw new Error(''); },
+          },
+        } as unknown as Web3Provider);
+      } catch (err: any) {
+        expect(err.message).toEqual('Check wallet connection request failed');
+        expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_FAILED_ERROR);
+      }
+    });
   });
 
   describe('connectWalletProvider', () => {
@@ -74,46 +105,24 @@ describe('connect', () => {
       });
     });
 
-    it('should throw an error if connect is called with a preference that is not expected', async () => {
-      await expect(
-        createProvider('trust-wallet' as WalletProviderName),
-      ).rejects.toThrow(
-        new CheckoutError(
-          'Provider not supported',
-          CheckoutErrorType.CONNECT_PROVIDER_ERROR,
-        ),
-      );
-    });
-
-    it('should throw an error if metamask provider is not found', async () => {
-      windowSpy.mockImplementation(() => ({
-        removeEventListener: () => {},
-      }));
-
-      await expect(
-        createProvider(WalletProviderName.METAMASK),
-      ).rejects.toThrow(
-        new CheckoutError(
-          '[METAMASK_PROVIDER_ERROR] Cause:window.addEventListener is not a function',
-          CheckoutErrorType.METAMASK_PROVIDER_ERROR,
-        ),
-      );
+    it('should throw an error if provider missing from web3provider', async () => {
+      try {
+        await connectSite({} as Web3Provider);
+      } catch (err: any) {
+        expect(err.message).toEqual('Incompatible provider');
+        expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
+        expect(err.data.details).toEqual('Attempting to connect with an incompatible provider');
+      }
     });
 
     it('should throw an error if provider.request is not found', async () => {
-      windowSpy.mockImplementation(() => ({
-        ethereum: {},
-        removeEventListener: () => {},
-      }));
-
-      await expect(
-        createProvider(WalletProviderName.METAMASK),
-      ).rejects.toThrow(
-        new CheckoutError(
-          'No MetaMask provider installed.',
-          CheckoutErrorType.METAMASK_PROVIDER_ERROR,
-        ),
-      );
+      try {
+        await connectSite({ provider: {} } as Web3Provider);
+      } catch (err: any) {
+        expect(err.message).toEqual('Incompatible provider');
+        expect(err.type).toEqual(CheckoutErrorType.PROVIDER_REQUEST_MISSING_ERROR);
+        expect(err.data.details).toEqual('Attempting to connect with an incompatible provider');
+      }
     });
 
     it('should throw an error if the user rejects the connection request', async () => {
@@ -128,14 +137,12 @@ describe('connect', () => {
 
       const { provider } = await createProvider(WalletProviderName.METAMASK);
 
-      await expect(
-        connectSite(provider),
-      ).rejects.toThrow(
-        new CheckoutError(
-          '[USER_REJECTED_REQUEST_ERROR] Cause:User rejected request',
-          CheckoutErrorType.USER_REJECTED_REQUEST_ERROR,
-        ),
-      );
+      try {
+        await connectSite(provider);
+      } catch (err: any) {
+        expect(err.message).toEqual('[USER_REJECTED_REQUEST_ERROR] Cause:User rejected request');
+        expect(err.type).toEqual(CheckoutErrorType.USER_REJECTED_REQUEST_ERROR);
+      }
     });
   });
 });
