@@ -182,14 +182,10 @@ function decodeSwapRouterCall(calldata: ethers.utils.BytesLike, functionName: Sw
 export function decodeMulticallExactInputWithFees(data: ethers.utils.BytesLike) {
   const { topLevelParams, decodedParams } = decodeSecondaryFeeCall(data, 'exactInputWithServiceFee');
 
-  const secondaryFeeParams: SecondaryFee[] = [];
-
-  for (let i = 0; i < decodedParams[0].length; i++) {
-    secondaryFeeParams.push({
-      feeRecipient: decodedParams[0][i][0],
-      feeBasisPoints: decodedParams[0][i][1],
-    });
-  }
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+    feeRecipient: x[0],
+    feeBasisPoints: x[1],
+  }));
 
   const swapParams: IV3SwapRouter.ExactInputParamsStruct = {
     path: decodedParams[1][0],
@@ -201,17 +197,14 @@ export function decodeMulticallExactInputWithFees(data: ethers.utils.BytesLike) 
   return { topLevelParams, secondaryFeeParams, swapParams };
 }
 
+// TODO: Use me
 export function decodeMulticallExactOutputWithFees(data: ethers.utils.BytesLike) {
   const { topLevelParams, decodedParams } = decodeSecondaryFeeCall(data, 'exactOutputWithServiceFee');
 
-  const secondaryFeeParams: SecondaryFee[] = [];
-
-  for (let i = 0; i < decodedParams[0].length; i++) {
-    secondaryFeeParams.push({
-      feeRecipient: decodedParams[0][i][0],
-      feeBasisPoints: decodedParams[0][i][1],
-    });
-  }
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+    feeRecipient: x[0],
+    feeBasisPoints: x[1],
+  }));
 
   const multiPoolSwapParams: IV3SwapRouter.ExactOutputParamsStruct = {
     path: decodedParams[1][0],
@@ -226,14 +219,10 @@ export function decodeMulticallExactOutputWithFees(data: ethers.utils.BytesLike)
 export function decodeMulticallExactInputSingleWithFees(data: ethers.utils.BytesLike) {
   const { topLevelParams, decodedParams } = decodeSecondaryFeeCall(data, 'exactInputSingleWithServiceFee');
 
-  const secondaryFeeParams: SecondaryFee[] = [];
-
-  for (let i = 0; i < decodedParams[0].length; i++) {
-    secondaryFeeParams.push({
-      feeRecipient: decodedParams[0][i][0],
-      feeBasisPoints: decodedParams[0][i][1],
-    });
-  }
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+    feeRecipient: x[0],
+    feeBasisPoints: x[1],
+  }));
 
   const singlePoolSwapParams: IV3SwapRouter.ExactInputSingleParamsStruct = {
     tokenIn: decodedParams[1][0],
@@ -251,14 +240,10 @@ export function decodeMulticallExactInputSingleWithFees(data: ethers.utils.Bytes
 export function decodeMulticallExactOutputSingleWithFees(data: ethers.utils.BytesLike) {
   const { topLevelParams, decodedParams } = decodeSecondaryFeeCall(data, 'exactOutputSingleWithServiceFee');
 
-  const secondaryFeeParams: SecondaryFee[] = [];
-
-  for (let i = 0; i < decodedParams[0].length; i++) {
-    secondaryFeeParams.push({
-      feeRecipient: decodedParams[0][i][0],
-      feeBasisPoints: decodedParams[0][i][1],
-    });
-  }
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+    feeRecipient: x[0],
+    feeBasisPoints: x[1],
+  }));
 
   const singlePoolSwapParams: IV3SwapRouter.ExactOutputSingleParamsStruct = {
     tokenIn: decodedParams[1][0],
@@ -377,7 +362,6 @@ type MockParams = {
 
 export function mockRouterImplementation(
   params: MockParams,
-  tradeType: TradeType,
 ) {
   const exchangeRate = params.exchangeRate ?? 10;
   const findOptimalRoute = jest.fn((
@@ -415,7 +399,7 @@ export function mockRouterImplementation(
       tokenIn,
       amountOut,
       tokenOut,
-      tradeType,
+      tradeType: type,
       gasEstimate: TEST_TRANSACTION_GAS_USAGE,
     };
 

@@ -1,7 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { TradeType } from '@uniswap/sdk-core';
 import {
   InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError,
 } from 'errors';
@@ -69,7 +68,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('When the swap transaction requires approval', () => {
     it('should include the unsigned approval transaction', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
       const erc20ContractInterface = ERC20__factory.createInterface();
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
@@ -96,7 +95,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
     it('should include the gas estimate for the approval transaction', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -122,7 +121,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('When the swap transaction does not require approval', () => {
     it('should not include the unsigned approval transaction', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -160,7 +159,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('Swap with single pool and secondary fees', () => {
     it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest();
-      const findOptimalRouteMock = mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      const findOptimalRouteMock = mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
         { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
@@ -206,7 +205,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('Swap with multiple pools and secondary fees', () => {
     it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest(true);
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
         { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS },
@@ -252,7 +251,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest();
 
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -284,7 +283,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     it('returns the gas estimate for the swap', async () => {
       const params = setupSwapTxTest();
 
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -306,7 +305,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     it('returns valid quote', async () => {
       const params = setupSwapTxTest();
 
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -333,7 +332,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('Swap with single pool without fees and high slippage tolerance', () => {
     it('generates valid calldata', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -365,7 +364,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
     it('returns valid quote', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -477,7 +476,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('Pass in maxHops > 10', () => {
     it('throws InvalidMaxHopsError', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -497,7 +496,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('Pass in maxHops < 1', () => {
     it('throws InvalidMaxHopsError', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -517,7 +516,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('With slippage greater than 50', () => {
     it('throws InvalidSlippageError', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -537,7 +536,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('With slippage less than 0', () => {
     it('throws InvalidSlippageError', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
