@@ -1,15 +1,17 @@
 import {
-  Currency, Token, TradeType,
+  Currency, CurrencyAmount, Token, TradeType,
 } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { QuoteTradeInfo } from 'lib/router';
+import { toBigNumber } from 'lib/utils';
+import { calculateFees } from 'lib/fees';
 import {
-  Amount, Quote, TokenInfo,
+  Amount, Quote, SecondaryFee, TokenInfo,
 } from '../../types';
 import { slippageToFraction } from './slippage';
 
-function getQuoteAmountFromTradeType(tradeType: TradeType, tradeInfo: QuoteTradeInfo, tokenInfo: TokenInfo): Amount {
-  if (tradeType === TradeType.EXACT_INPUT) {
+function getQuoteAmountFromTradeType(tradeInfo: QuoteTradeInfo, tokenInfo: TokenInfo): Amount {
+  if (tradeInfo.tradeType === TradeType.EXACT_INPUT) {
     return {
       token: tokenInfo,
       value: tradeInfo.amountOut,
@@ -22,29 +24,20 @@ function getQuoteAmountFromTradeType(tradeType: TradeType, tradeInfo: QuoteTrade
   };
 }
 
-export function getAmountWithSlippageImpact(
+export function applySlippage(
   tradeType: TradeType,
-  amount: ethers.BigNumberish,
+  amount: ethers.BigNumber,
   slippage: number,
 ): ethers.BigNumber {
-  const amountBigNumber = ethers.BigNumber.from(amount);
-  const slippagePercent = slippageToFraction(slippage);
-  if (slippagePercent.numerator.toString() === '0') {
-    return amountBigNumber;
-  }
-
-  const slippageImpact = amountBigNumber
-    .mul(slippagePercent.numerator.toString())
-    .div(slippagePercent.denominator.toString());
-
-  return tradeType === TradeType.EXACT_INPUT
-    ? amountBigNumber.sub(slippageImpact)
-    : amountBigNumber.add(slippageImpact);
+  const slippageTolerance = slippageToFraction(slippage);
+  const slippagePlusOne = slippageTolerance.add(1);
+  const maybeInverted = tradeType === TradeType.EXACT_INPUT ? slippagePlusOne.invert() : slippagePlusOne;
+  const amountWithSlippage = maybeInverted.multiply(amount.toString()).quotient;
+  return ethers.BigNumber.from(amountWithSlippage.toString());
 }
 
-export function getQuote(
+export function prepareUserQuote(
   otherCurrency: Currency,
-  tradeType: TradeType,
   tradeInfo: QuoteTradeInfo,
   slippage: number,
 ): Quote {
@@ -57,22 +50,32 @@ export function getQuote(
     name: resultToken.name,
   };
 
-  const quote = getQuoteAmountFromTradeType(tradeType, tradeInfo, tokenInfo);
-
-  const amountWithSlippageImpact = getAmountWithSlippageImpact(
-    tradeType,
-    quote.value,
-    slippage,
-  );
-
-  const quoteWithMaxSlippage = {
-    token: tokenInfo,
-    value: amountWithSlippageImpact,
-  };
+  const quote = getQuoteAmountFromTradeType(tradeInfo, tokenInfo);
+  const amountWithSlippage = applySlippage(tradeInfo.tradeType, quote.value, slippage);
 
   return {
     amount: quote,
-    amountWithMaxSlippage: quoteWithMaxSlippage,
+    amountWithMaxSlippage: {
+      token: tokenInfo,
+      value: amountWithSlippage,
+    },
     slippage,
   };
+}
+
+export function getOurQuoteReqAmount(
+  amount: CurrencyAmount<Token>,
+  secondaryFees: SecondaryFee[],
+  tradeType: TradeType,
+) {
+  if (tradeType === TradeType.EXACT_OUTPUT) {
+    // For an exact output swap, we do not need to subtract fees from the given amount
+    return amount;
+  }
+
+  const totalFees = calculateFees(toBigNumber(amount), secondaryFees);
+  const totalFeesCurrencyAmount = CurrencyAmount.fromRawAmount(amount.currency, totalFees.toString());
+
+  // Subtract the fee amount from the given amount
+  return amount.subtract(totalFeesCurrencyAmount);
 }
