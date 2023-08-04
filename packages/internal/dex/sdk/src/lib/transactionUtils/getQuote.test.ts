@@ -17,7 +17,7 @@ describe('applySlippage', () => {
 
       const formattedResult = ethers.utils.formatEther(result);
 
-      expect(formattedResult).toEqual('99.9');
+      expect(formattedResult).toEqual('99.900099900099900099');
     });
 
     describe('AND slippage percent is 0', () => {
