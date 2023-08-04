@@ -11,6 +11,7 @@ import { Environment, ImmutableConfiguration } from '@imtbl/config';
 import {
   QuoteTradeInfo,
   Router,
+  RoutingContracts,
   SecondaryFee,
   toBigNumber,
 } from '../lib';
@@ -34,6 +35,14 @@ export const TEST_V3_MIGRATOR_ADDRESSES = '0x0Df0d2d5Cf4739C0b579C33Fdb3d8B04Bee
 export const TEST_NONFUNGIBLE_POSITION_MANAGER_ADDRESSES = '0x446c78D97b1E78bC35864FC49AcE1f7404F163F6';
 export const TEST_TICK_LENS_ADDRESSES = '0x3aC4F8094b21A6c5945453007d9c52B7e15340c0';
 export const TEST_SECONDARY_FEE_ADDRESS = '0x8dBE1f0900C5e92ad87A54521902a33ba1598C51';
+
+export const TEST_ROUTING_CONTRACTS: RoutingContracts = {
+  factoryAddress: TEST_V3_CORE_FACTORY_ADDRESS,
+  quoterAddress: TEST_QUOTER_ADDRESS,
+  peripheryRouterAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
+  secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
+  multicallAddress: TEST_MULTICALL_ADDRESS,
+};
 
 export const IMX_TEST_TOKEN = new Token(
   TEST_CHAIN_ID,

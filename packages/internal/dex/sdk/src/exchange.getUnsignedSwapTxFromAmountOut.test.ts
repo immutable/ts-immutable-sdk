@@ -4,6 +4,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { TradeType } from '@uniswap/sdk-core';
 import { SecondaryFee } from 'lib';
 import { ethers } from 'ethers';
+import { ERC20__factory } from 'contracts/types';
 import { Exchange } from './exchange';
 import {
   mockRouterImplementation,
@@ -30,7 +31,7 @@ jest.mock('./lib/utils', () => ({
 const exactOutputSingleSignature = '0x5023b4df';
 const exactOutputSingleWithFeesSignature = '0xed921d3c';
 
-const APPROVED_AMOUNT = BigNumber.from('1000000000000000000');
+const APPROVED_AMOUNT = BigNumber.from('0'); // No existing approval
 const APPROVE_GAS_ESTIMATE = BigNumber.from('100000');
 
 /**
@@ -101,6 +102,65 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(swapParams.secondAmount.toString()).toBe('104030000000000000000'); // max amount in (about 104)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
+
+    it('uses the amount with slippage and fees for the approval amount', async () => {
+      const secondaryFees: SecondaryFee[] = [
+        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+      ];
+
+      const params = setupSwapTxTest();
+      const erc20ContractInterface = ERC20__factory.createInterface();
+
+      mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
+
+      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+      const { approval, quote } = await exchange.getUnsignedSwapTxFromAmountOut(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        ethers.utils.parseEther('1000'),
+        3, // 3% Slippage
+      );
+
+      expect(approval).not.toBe(null);
+
+      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', approval?.transaction?.data || '');
+      const approvalAmount: string = decodedResults[1].toString();
+
+      expect(approvalAmount).toEqual('104030000000000000000'); // want 104.3
+      expect(approval?.transaction.to).toEqual(params.inputToken);
+      expect(approval?.transaction.from).toEqual(params.fromAddress);
+      expect(approval?.transaction.value).toEqual(0); // we do not want to send any ETH
+      expect(quote.amountWithMaxSlippage.value.toString()).toEqual('104030000000000000000');
+    });
+
+    it('uses the secondary fee address as the spender for approving', async () => {
+      const secondaryFees: SecondaryFee[] = [
+        { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
+      ];
+
+      const params = setupSwapTxTest();
+      const erc20ContractInterface = ERC20__factory.createInterface();
+
+      mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
+
+      const exchange = new Exchange({ ...TEST_DEX_CONFIGURATION, secondaryFees });
+
+      const { approval } = await exchange.getUnsignedSwapTxFromAmountOut(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        ethers.utils.parseEther('1000'),
+      );
+
+      expect(approval).not.toBe(null);
+
+      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', approval?.transaction?.data || '');
+      const spenderAddress: string = decodedResults[0].toString();
+
+      expect(spenderAddress).toEqual(TEST_SECONDARY_FEE_ADDRESS);
+    });
   });
 
   describe('Swap with single pool without fees and default slippage tolerance', () => {
@@ -158,6 +218,29 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
       expect(quote.amountWithMaxSlippage.value.toString()).toEqual(
         '1001000000000000000000', // 1,001 (includes slippage)
       );
+    });
+
+    it('uses the swap router address as the spender for approving', async () => {
+      const params = setupSwapTxTest();
+      const erc20ContractInterface = ERC20__factory.createInterface();
+
+      mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
+
+      const exchange = new Exchange(TEST_DEX_CONFIGURATION);
+
+      const { approval } = await exchange.getUnsignedSwapTxFromAmountOut(
+        params.fromAddress,
+        params.inputToken,
+        params.outputToken,
+        ethers.utils.parseEther('1000'),
+      );
+
+      expect(approval).not.toBe(null);
+
+      const decodedResults = erc20ContractInterface.decodeFunctionData('approve', approval?.transaction?.data || '');
+      const spenderAddress: string = decodedResults[0].toString();
+
+      expect(spenderAddress).toEqual(TEST_PERIPHERY_ROUTER_ADDRESS);
     });
   });
 });

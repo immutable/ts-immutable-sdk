@@ -7,7 +7,7 @@ import {
   DuplicateAddressesError, InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError,
 } from 'errors';
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
-import { getApproval } from 'lib/transactionUtils/approval';
+import { getApproval, prepareApproval } from 'lib/transactionUtils/approval';
 import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import {
   DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS,
@@ -76,7 +76,7 @@ export class Exchange {
     fromAddress: string,
     tokenInAddress: string,
     tokenOutAddress: string,
-    amount: ethers.BigNumberish,
+    amount: ethers.BigNumber,
     slippagePercent: number,
     maxHops: number,
     deadline: number,
@@ -125,22 +125,7 @@ export class Exchange {
     // get gas details
     const gasPrice = await fetchGasPrice(this.provider);
 
-    // we always use the tokenIn address because we are always selling the tokenIn
-    const approval = await getApproval(
-      this.nativeToken,
-      this.provider,
-      fromAddress,
-      tokenInAddress,
-      ethers.BigNumber.from(amount), // TODO: what about this amount?
-      this.router.routingContracts.peripheryRouterAddress,
-      gasPrice,
-    );
-
-    const adjustedQuote = prepareSwap(
-      ourQuote,
-      ethers.BigNumber.from(amount),
-      this.secondaryFees,
-    );
+    const adjustedQuote = prepareSwap(ourQuote, amount, this.secondaryFees);
 
     const swap = getSwap(
       this.nativeToken,
@@ -155,6 +140,24 @@ export class Exchange {
     );
 
     const userQuote = prepareUserQuote(otherToken, adjustedQuote, slippagePercent);
+
+    const preparedApproval = prepareApproval(
+      tradeType,
+      amount,
+      userQuote.amountWithMaxSlippage.value,
+      this.router.routingContracts,
+      this.secondaryFees,
+    );
+
+    // we always use the tokenIn address because we are always selling the tokenIn
+    const approval = await getApproval(
+      this.nativeToken,
+      this.provider,
+      fromAddress,
+      tokenInAddress,
+      preparedApproval,
+      gasPrice,
+    );
 
     return {
       approval,
@@ -189,7 +192,7 @@ export class Exchange {
       fromAddress,
       tokenInAddress,
       tokenOutAddress,
-      amountIn,
+      ethers.BigNumber.from(amountIn),
       slippagePercent,
       maxHops,
       deadline,
@@ -223,7 +226,7 @@ export class Exchange {
       fromAddress,
       tokenInAddress,
       tokenOutAddress,
-      amountOut,
+      ethers.BigNumber.from(amountOut),
       slippagePercent,
       maxHops,
       deadline,
