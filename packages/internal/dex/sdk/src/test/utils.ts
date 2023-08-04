@@ -355,15 +355,13 @@ type MockParams = {
   exchangeRate?: number;
 };
 
-export function mockRouterImplementation(
-  params: MockParams,
-) {
+export function mockRouterImplementation(params: MockParams) {
   const exchangeRate = params.exchangeRate ?? 10;
   const findOptimalRoute = jest.fn((
     amountSpecified: CurrencyAmount<Currency>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     otherCurrency: Currency,
-    type: TradeType,
+    tradeType: TradeType,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     secondaryFees: SecondaryFee[],
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -382,10 +380,10 @@ export function mockRouterImplementation(
       tokenOut,
     );
 
-    const amountIn = type === TradeType.EXACT_INPUT
+    const amountIn = tradeType === TradeType.EXACT_INPUT
       ? toBigNumber(amountSpecified) : toBigNumber(amountSpecified).div(exchangeRate);
 
-    const amountOut = type === TradeType.EXACT_INPUT
+    const amountOut = tradeType === TradeType.EXACT_INPUT
       ? toBigNumber(amountSpecified).mul(exchangeRate) : toBigNumber(amountSpecified);
 
     const trade: QuoteTradeInfo = {
@@ -394,7 +392,7 @@ export function mockRouterImplementation(
       tokenIn,
       amountOut,
       tokenOut,
-      tradeType: type,
+      tradeType,
       gasEstimate: TEST_TRANSACTION_GAS_USAGE,
     };
 
@@ -402,10 +400,7 @@ export function mockRouterImplementation(
   });
 
   (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
-    routingContracts: {
-      peripheryRouterAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
-      secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
-    },
+    routingContracts: TEST_ROUTING_CONTRACTS,
     findOptimalRoute,
   }));
 
