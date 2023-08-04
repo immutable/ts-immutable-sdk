@@ -15,9 +15,6 @@ import {
   TEST_FEE_RECIPIENT,
   decodeMulticallExactInputOutputSingleWithFees,
   TEST_SECONDARY_FEE_ADDRESS,
-  TEST_FROM_ADDRESS,
-  TEST_CHAIN_ID,
-  getPool,
 } from './test/utils';
 
 jest.mock('@ethersproject/providers');
@@ -68,15 +65,7 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
       ];
 
-      const pool = getPool();
-      const params = {
-        fromAddress: TEST_FROM_ADDRESS,
-        inputToken: pool.token0.address,
-        outputToken: pool.token1.address,
-        chainId: TEST_CHAIN_ID,
-        pools: [pool],
-        exchangeRate: 10,
-      };
+      const params = setupSwapTxTest(DEFAULT_SLIPPAGE);
 
       const findOptimalRouteMock = mockRouterImplementation(params, TradeType.EXACT_OUTPUT);
 
