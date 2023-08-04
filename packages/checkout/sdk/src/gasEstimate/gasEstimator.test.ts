@@ -219,6 +219,29 @@ describe('gasServiceEstimator', () => {
       expect(result.bridgeFee.estimatedAmount).toEqual(BigNumber.from(1));
     });
 
+    it('should estimate gas when token address provided', async () => {
+      (createBridgeInstance as jest.Mock).mockResolvedValue({
+        getFee: jest.fn().mockResolvedValue({
+          feeAmount: BigNumber.from(1),
+        }),
+      } as unknown as TokenBridge);
+
+      const result = (await gasEstimator(
+        {
+          gasEstimateType: GasEstimateType.BRIDGE_TO_L2,
+          isSpendingCapApprovalRequired: false,
+          tokenAddress: '0x123',
+        },
+        readOnlyProviders,
+        config,
+      )) as GasEstimateBridgeToL2Result;
+
+      expect(result.gasEstimateType).toEqual(GasEstimateType.BRIDGE_TO_L2);
+      expect(result.gasFee.estimatedAmount).toEqual(BigNumber.from(280000));
+      expect(result.gasFee.token?.symbol).toEqual('ETH');
+      expect(result.bridgeFee.estimatedAmount).toEqual(BigNumber.from(1));
+    });
+
     it('should estimate gas for bridging L1 to L2 with approval transaction included in estimate', async () => {
       (createBridgeInstance as jest.Mock).mockResolvedValue({
         getFee: jest.fn().mockResolvedValue({

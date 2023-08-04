@@ -1,12 +1,16 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
-import { TEST_FROM_ADDRESS, TEST_PERIPHERY_ROUTER_ADDRESS, WETH_TEST_TOKEN } from 'test/utils';
+import {
+  TEST_FROM_ADDRESS, TEST_PERIPHERY_ROUTER_ADDRESS, TEST_ROUTING_CONTRACTS, WETH_TEST_TOKEN,
+} from 'test/utils';
 import { Contract } from '@ethersproject/contracts';
 import { ERC20__factory } from 'contracts/types/factories/ERC20__factory';
 import { ApproveError } from 'errors';
 import { BytesLike } from '@ethersproject/bytes';
 import { ethers } from 'ethers';
-import { getApproveGasEstimate, getApproveTransaction } from './approval';
+import { TradeType } from '@uniswap/sdk-core';
+import { SecondaryFee } from 'lib';
+import { getApproveGasEstimate, getApproveTransaction, prepareApproval } from './approval';
 
 jest.mock('@ethersproject/providers');
 jest.mock('@ethersproject/contracts');
@@ -240,6 +244,72 @@ describe('getApproveGasEstimate', () => {
       expect(approveMock).toHaveBeenCalledWith(spenderAddress, ethers.constants.MaxUint256, {
         from: fromAddress,
       });
+    });
+  });
+});
+
+describe('prepareApproval', () => {
+  describe('when exact input amount is specified', () => {
+    it('uses the amount specified by the user', () => {
+      const amountSpecified = ethers.BigNumber.from(1);
+      const amountWithSlippage = ethers.BigNumber.from(2);
+      const secondaryFees = [{ feeBasisPoints: 0, feeRecipient: TEST_FROM_ADDRESS }];
+      const approval = prepareApproval(
+        TradeType.EXACT_INPUT,
+        amountSpecified,
+        amountWithSlippage,
+        TEST_ROUTING_CONTRACTS,
+        secondaryFees,
+      );
+      expect(approval.amount).toEqual(amountSpecified);
+    });
+  });
+
+  describe('when exact output amount is specified', () => {
+    it('uses the amount calculated with slippage', () => {
+      const amountSpecified = ethers.BigNumber.from(1);
+      const amountWithSlippage = ethers.BigNumber.from(2);
+      const secondaryFees = [{ feeBasisPoints: 0, feeRecipient: TEST_FROM_ADDRESS }];
+      const approval = prepareApproval(
+        TradeType.EXACT_OUTPUT,
+        amountSpecified,
+        amountWithSlippage,
+        TEST_ROUTING_CONTRACTS,
+        secondaryFees,
+      );
+      expect(approval.amount).toEqual(amountWithSlippage);
+    });
+  });
+
+  describe('when secondary fees are specified', () => {
+    it('uses the secondary fee address as the spender', () => {
+      const amountSpecified = ethers.BigNumber.from(1);
+      const amountWithSlippage = ethers.BigNumber.from(2);
+      const secondaryFees = [{ feeBasisPoints: 0, feeRecipient: TEST_FROM_ADDRESS }];
+      const approval = prepareApproval(
+        TradeType.EXACT_OUTPUT,
+        amountSpecified,
+        amountWithSlippage,
+        TEST_ROUTING_CONTRACTS,
+        secondaryFees,
+      );
+      expect(approval.spender).toEqual(TEST_ROUTING_CONTRACTS.secondaryFeeAddress);
+    });
+  });
+
+  describe('when no secondary fees are specified', () => {
+    it('uses the periphery router address as the spender', () => {
+      const amountSpecified = ethers.BigNumber.from(1);
+      const amountWithSlippage = ethers.BigNumber.from(2);
+      const secondaryFees: SecondaryFee[] = [];
+      const approval = prepareApproval(
+        TradeType.EXACT_OUTPUT,
+        amountSpecified,
+        amountWithSlippage,
+        TEST_ROUTING_CONTRACTS,
+        secondaryFees,
+      );
+      expect(approval.spender).toEqual(TEST_ROUTING_CONTRACTS.peripheryRouterAddress);
     });
   });
 });

@@ -2,7 +2,9 @@ import { mount } from 'cypress/react18';
 import { BigNumber } from 'ethers';
 import { cy } from 'local-cypress';
 import { Web3Provider } from '@ethersproject/providers';
-import { Checkout, CheckoutErrorType } from '@imtbl/checkout-sdk';
+import {
+  ChainId, ChainName, Checkout, CheckoutErrorType,
+} from '@imtbl/checkout-sdk';
 import { Exchange } from '@imtbl/dex-sdk';
 import { Environment } from '@imtbl/config';
 import { cyIntercept, cySmartGet } from '../../../lib/testUtils';
@@ -17,6 +19,7 @@ import { ConnectionStatus } from '../../../context/connect-loader-context/Connec
 import {
   ConnectLoaderTestComponent,
 } from '../../../context/connect-loader-context/test-components/ConnectLoaderTestComponent';
+import { IMX_ADDRESS_ZKEVM, NATIVE } from '../../../lib/constants';
 
 describe('SwapForm', () => {
   let testSwapState: SwapState;
@@ -39,7 +42,7 @@ describe('SwapForm', () => {
             name: 'ImmutableX',
             symbol: 'IMX',
             decimals: 18,
-            address: '',
+            address: IMX_ADDRESS_ZKEVM,
           },
         },
         {
@@ -58,7 +61,7 @@ describe('SwapForm', () => {
           name: 'ImmutableX',
           symbol: 'IMX',
           decimals: 18,
-          address: '',
+          address: IMX_ADDRESS_ZKEVM,
         },
         {
           name: 'Ethereum',
@@ -67,6 +70,16 @@ describe('SwapForm', () => {
           address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
         },
       ],
+      network: {
+        name: ChainName.IMTBL_ZKEVM_TESTNET,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        nativeCurrency: {
+          name: 'IMX',
+          symbol: 'IMX',
+          decimals: 18,
+        },
+        isSupported: true,
+      },
     };
   });
   const { swapForm: { from: fromText, to: toText }, validation } = text.views[SwapWidgetViews.SWAP];
@@ -107,7 +120,7 @@ describe('SwapForm', () => {
           cryptoConversionsOverride={cryptoConversions}
         >
           <SwapForm data={{
-            fromContractAddress: 'NATIVE',
+            fromContractAddress: NATIVE,
           }}
           />
         </SwapWidgetTestComponent>,
@@ -124,7 +137,7 @@ describe('SwapForm', () => {
           cryptoConversionsOverride={cryptoConversions}
         >
           <SwapForm data={{
-            toContractAddress: 'NATIVE',
+            toContractAddress: NATIVE,
           }}
           />
         </SwapWidgetTestComponent>,
@@ -175,7 +188,7 @@ describe('SwapForm', () => {
           cryptoConversionsOverride={cryptoConversions}
         >
           <SwapForm data={{
-            fromContractAddress: 'NATIVE',
+            fromContractAddress: IMX_ADDRESS_ZKEVM,
             toContractAddress: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
           }}
           />
@@ -396,7 +409,7 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+      cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').blur();
       cySmartGet('swap-button').click();
       cySmartGet('fromTokenInputs-select-form-select-control-error')
@@ -423,7 +436,7 @@ describe('SwapForm', () => {
                 name: 'Ethereum',
                 symbol: 'ETH',
                 decimals: 18,
-                address: '',
+                address: '0xf57e7e7c23978c3caec3c3548e3d615c346e79ff',
               },
               value: BigNumber.from('112300000000000012'),
             },
@@ -432,7 +445,7 @@ describe('SwapForm', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                address: '',
               },
               value: BigNumber.from('112300000000000032'),
             },
@@ -444,7 +457,7 @@ describe('SwapForm', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                address: '',
               },
               value: BigNumber.from('112300000000000045'),
             },
@@ -459,7 +472,7 @@ describe('SwapForm', () => {
                 name: 'ImmutableX',
                 symbol: 'IMX',
                 decimals: 18,
-                address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+                address: '',
               },
               amount: BigNumber.from('112300000000000045'),
             },
@@ -489,7 +502,7 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+      cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('fromTokenInputs-text-form-text__input').blur();
 
@@ -512,7 +525,7 @@ describe('SwapForm', () => {
           name: 'ImmutableX',
           symbol: 'IMX',
           decimals: 18,
-          address: '',
+          address: IMX_ADDRESS_ZKEVM,
         },
       ];
       cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
@@ -536,7 +549,7 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+      cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('fromTokenInputs-text-form-text__input').blur();
       cySmartGet('@fromAmountInStub').should('have.been.called');
@@ -560,7 +573,7 @@ describe('SwapForm', () => {
           name: 'ImmutableX',
           symbol: 'IMX',
           decimals: 18,
-          address: '',
+          address: IMX_ADDRESS_ZKEVM,
         },
       ];
       cySmartGet('@fromAmountInStub').should('have.been.calledWith', ...params);
@@ -588,7 +601,7 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+      cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
       cySmartGet('fromTokenInputs-text-form-max-button').click();
 
       const params = [
@@ -610,7 +623,7 @@ describe('SwapForm', () => {
           name: 'ImmutableX',
           symbol: 'IMX',
           decimals: 18,
-          address: '',
+          address: IMX_ADDRESS_ZKEVM,
         },
       ];
 
@@ -638,7 +651,7 @@ describe('SwapForm', () => {
       cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+      cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
       cySmartGet('@fromAmountInStub').should('have.been.called');
     });
 
@@ -657,7 +670,7 @@ describe('SwapForm', () => {
       );
 
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+      cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0.01').trigger('change');
       cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
@@ -685,7 +698,7 @@ describe('SwapForm', () => {
       cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
         .click();
       cySmartGet('toTokenInputs-select-form-select__target').click();
-      cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+      cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
       cySmartGet('fromTokenInputs-text-form-text__input').type('0').trigger('change');
       cySmartGet('@fromAmountInStub').should('not.have.been.called');
 
@@ -811,7 +824,7 @@ describe('SwapForm', () => {
                       name: 'ImmutableX',
                       symbol: 'IMX',
                       decimals: 18,
-                      address: '',
+                      address: IMX_ADDRESS_ZKEVM,
                     },
                   },
                 ],
@@ -827,7 +840,7 @@ describe('SwapForm', () => {
         cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
           .click();
         cySmartGet('toTokenInputs-select-form-select__target').click();
-        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+        cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
         cySmartGet('fromTokenInputs-text-form-text__input').blur();
@@ -863,7 +876,7 @@ describe('SwapForm', () => {
                       name: 'ImmutableX',
                       symbol: 'IMX',
                       decimals: 18,
-                      address: '',
+                      address: IMX_ADDRESS_ZKEVM,
                     },
                   },
                 ],
@@ -879,7 +892,7 @@ describe('SwapForm', () => {
         cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
           .click();
         cySmartGet('toTokenInputs-select-form-select__target').click();
-        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+        cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.00001').trigger('change');
         cySmartGet('fromTokenInputs-text-form-text__input').blur();
@@ -918,7 +931,7 @@ describe('SwapForm', () => {
                       name: 'ImmutableX',
                       symbol: 'IMX',
                       decimals: 18,
-                      address: '',
+                      address: IMX_ADDRESS_ZKEVM,
                     },
                   },
                 ],
@@ -934,7 +947,7 @@ describe('SwapForm', () => {
         cySmartGet('toTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
           .click();
         cySmartGet('fromTokenInputs-select-form-select__target').click();
-        cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx').click();
+        cySmartGet(`fromTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
         cySmartGet('toTokenInputs-text-form-text__input').type('0.00001').trigger('change');
         cySmartGet('toTokenInputs-text-form-text__input').blur();
@@ -979,7 +992,7 @@ describe('SwapForm', () => {
                       name: 'ImmutableX',
                       symbol: 'IMX',
                       decimals: 18,
-                      address: '',
+                      address: IMX_ADDRESS_ZKEVM,
                     },
                   },
                 ],
@@ -995,7 +1008,7 @@ describe('SwapForm', () => {
         cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
           .click();
         cySmartGet('toTokenInputs-select-form-select__target').click();
-        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+        cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.1').trigger('change');
         cySmartGet('fromTokenInputs-text-form-text__input').blur();
@@ -1033,7 +1046,7 @@ describe('SwapForm', () => {
         cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
           .click();
         cySmartGet('toTokenInputs-select-form-select__target').click();
-        cySmartGet('toTokenInputs-select-form-coin-selector__option-imx').click();
+        cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).click();
 
         cySmartGet('fromTokenInputs-text-form-text__input').type('0.00001').trigger('change');
         cySmartGet('fromTokenInputs-text-form-text__input').blur();
