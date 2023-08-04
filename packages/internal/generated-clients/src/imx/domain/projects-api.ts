@@ -25,6 +25,10 @@ import { APIError } from '../models';
 // @ts-ignore
 import { ApiSDKVersionCheckResponse } from '../models';
 // @ts-ignore
+import { CreateProjectAPIKeyResponse } from '../models';
+// @ts-ignore
+import { CreateProjectGroupRequest } from '../models';
+// @ts-ignore
 import { CreateProjectRequest } from '../models';
 // @ts-ignore
 import { CreateProjectResponse } from '../models';
@@ -45,6 +49,7 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
          * @param {string} iMXTimestamp Unix Epoc timestamp
          * @param {CreateProjectRequest} createProjectRequest create a project
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         createProject: async (iMXSignature: string, iMXTimestamp: string, createProjectRequest: CreateProjectRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -89,6 +94,76 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Create a project api key
+         * @summary A new API key will be generated every time this endpoint is called.
+         * @param {string} id Project ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createProjectAPIKey: async (id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('createProjectAPIKey', 'id', id)
+            const localVarPath = `/v1/projects/{id}/api-key`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Create a project group
+         * @summary Create a project group
+         * @param {CreateProjectGroupRequest} createProjectGroupRequest create a project group
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createProjectGroup: async (createProjectGroupRequest: CreateProjectGroupRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createProjectGroupRequest' is not null or undefined
+            assertParamExists('createProjectGroup', 'createProjectGroupRequest', createProjectGroupRequest)
+            const localVarPath = `/v1/project_groups`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createProjectGroupRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get a project
          * @summary Get a project
          * @param {string} id Project ID
@@ -123,6 +198,90 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
 
             if (iMXTimestamp != null) {
                 localVarHeaderParameter['IMX-Timestamp'] = String(iMXTimestamp);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get a project group
+         * @summary Get a project group
+         * @param {string} id Project group ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProjectGroup: async (id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getProjectGroup', 'id', id)
+            const localVarPath = `/v1/project_groups/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get project groups
+         * @summary Get project groups
+         * @param {number} [pageSize] Page size of the result
+         * @param {string} [cursor] Cursor
+         * @param {string} [orderBy] Property to sort by
+         * @param {string} [direction] Direction to sort (asc/desc)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProjectGroups: async (pageSize?: number, cursor?: string, orderBy?: string, direction?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/project_groups`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['page_size'] = pageSize;
+            }
+
+            if (cursor !== undefined) {
+                localVarQueryParameter['cursor'] = cursor;
+            }
+
+            if (orderBy !== undefined) {
+                localVarQueryParameter['order_by'] = orderBy;
+            }
+
+            if (direction !== undefined) {
+                localVarQueryParameter['direction'] = direction;
             }
 
 
@@ -264,10 +423,33 @@ export const ProjectsApiFp = function(configuration?: Configuration) {
          * @param {string} iMXTimestamp Unix Epoc timestamp
          * @param {CreateProjectRequest} createProjectRequest create a project
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async createProject(iMXSignature: string, iMXTimestamp: string, createProjectRequest: CreateProjectRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateProjectResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createProject(iMXSignature, iMXTimestamp, createProjectRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Create a project api key
+         * @summary A new API key will be generated every time this endpoint is called.
+         * @param {string} id Project ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createProjectAPIKey(id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateProjectAPIKeyResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createProjectAPIKey(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Create a project group
+         * @summary Create a project group
+         * @param {CreateProjectGroupRequest} createProjectGroupRequest create a project group
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createProjectGroup(createProjectGroupRequest: CreateProjectGroupRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateProjectResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createProjectGroup(createProjectGroupRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -281,6 +463,31 @@ export const ProjectsApiFp = function(configuration?: Configuration) {
          */
         async getProject(id: string, iMXSignature: string, iMXTimestamp: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Project>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getProject(id, iMXSignature, iMXTimestamp, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get a project group
+         * @summary Get a project group
+         * @param {string} id Project group ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getProjectGroup(id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Project>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getProjectGroup(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get project groups
+         * @summary Get project groups
+         * @param {number} [pageSize] Page size of the result
+         * @param {string} [cursor] Cursor
+         * @param {string} [orderBy] Property to sort by
+         * @param {string} [direction] Direction to sort (asc/desc)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getProjectGroups(pageSize?: number, cursor?: string, orderBy?: string, direction?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetProjectsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getProjectGroups(pageSize, cursor, orderBy, direction, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -329,10 +536,31 @@ export const ProjectsApiFactory = function (configuration?: Configuration, baseP
          * @param {string} iMXTimestamp Unix Epoc timestamp
          * @param {CreateProjectRequest} createProjectRequest create a project
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         createProject(iMXSignature: string, iMXTimestamp: string, createProjectRequest: CreateProjectRequest, options?: any): AxiosPromise<CreateProjectResponse> {
             return localVarFp.createProject(iMXSignature, iMXTimestamp, createProjectRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Create a project api key
+         * @summary A new API key will be generated every time this endpoint is called.
+         * @param {string} id Project ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createProjectAPIKey(id: string, options?: any): AxiosPromise<CreateProjectAPIKeyResponse> {
+            return localVarFp.createProjectAPIKey(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Create a project group
+         * @summary Create a project group
+         * @param {CreateProjectGroupRequest} createProjectGroupRequest create a project group
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createProjectGroup(createProjectGroupRequest: CreateProjectGroupRequest, options?: any): AxiosPromise<CreateProjectResponse> {
+            return localVarFp.createProjectGroup(createProjectGroupRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a project
@@ -345,6 +573,29 @@ export const ProjectsApiFactory = function (configuration?: Configuration, baseP
          */
         getProject(id: string, iMXSignature: string, iMXTimestamp: string, options?: any): AxiosPromise<Project> {
             return localVarFp.getProject(id, iMXSignature, iMXTimestamp, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get a project group
+         * @summary Get a project group
+         * @param {string} id Project group ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProjectGroup(id: string, options?: any): AxiosPromise<Project> {
+            return localVarFp.getProjectGroup(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get project groups
+         * @summary Get project groups
+         * @param {number} [pageSize] Page size of the result
+         * @param {string} [cursor] Cursor
+         * @param {string} [orderBy] Property to sort by
+         * @param {string} [direction] Direction to sort (asc/desc)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProjectGroups(pageSize?: number, cursor?: string, orderBy?: string, direction?: string, options?: any): AxiosPromise<GetProjectsResponse> {
+            return localVarFp.getProjectGroups(pageSize, cursor, orderBy, direction, options).then((request) => request(axios, basePath));
         },
         /**
          * Get projects
@@ -405,6 +656,34 @@ export interface ProjectsApiCreateProjectRequest {
 }
 
 /**
+ * Request parameters for createProjectAPIKey operation in ProjectsApi.
+ * @export
+ * @interface ProjectsApiCreateProjectAPIKeyRequest
+ */
+export interface ProjectsApiCreateProjectAPIKeyRequest {
+    /**
+     * Project ID
+     * @type {string}
+     * @memberof ProjectsApiCreateProjectAPIKey
+     */
+    readonly id: string
+}
+
+/**
+ * Request parameters for createProjectGroup operation in ProjectsApi.
+ * @export
+ * @interface ProjectsApiCreateProjectGroupRequest
+ */
+export interface ProjectsApiCreateProjectGroupRequest {
+    /**
+     * create a project group
+     * @type {CreateProjectGroupRequest}
+     * @memberof ProjectsApiCreateProjectGroup
+     */
+    readonly createProjectGroupRequest: CreateProjectGroupRequest
+}
+
+/**
  * Request parameters for getProject operation in ProjectsApi.
  * @export
  * @interface ProjectsApiGetProjectRequest
@@ -430,6 +709,55 @@ export interface ProjectsApiGetProjectRequest {
      * @memberof ProjectsApiGetProject
      */
     readonly iMXTimestamp: string
+}
+
+/**
+ * Request parameters for getProjectGroup operation in ProjectsApi.
+ * @export
+ * @interface ProjectsApiGetProjectGroupRequest
+ */
+export interface ProjectsApiGetProjectGroupRequest {
+    /**
+     * Project group ID
+     * @type {string}
+     * @memberof ProjectsApiGetProjectGroup
+     */
+    readonly id: string
+}
+
+/**
+ * Request parameters for getProjectGroups operation in ProjectsApi.
+ * @export
+ * @interface ProjectsApiGetProjectGroupsRequest
+ */
+export interface ProjectsApiGetProjectGroupsRequest {
+    /**
+     * Page size of the result
+     * @type {number}
+     * @memberof ProjectsApiGetProjectGroups
+     */
+    readonly pageSize?: number
+
+    /**
+     * Cursor
+     * @type {string}
+     * @memberof ProjectsApiGetProjectGroups
+     */
+    readonly cursor?: string
+
+    /**
+     * Property to sort by
+     * @type {string}
+     * @memberof ProjectsApiGetProjectGroups
+     */
+    readonly orderBy?: string
+
+    /**
+     * Direction to sort (asc/desc)
+     * @type {string}
+     * @memberof ProjectsApiGetProjectGroups
+     */
+    readonly direction?: string
 }
 
 /**
@@ -521,11 +849,36 @@ export class ProjectsApi extends BaseAPI {
      * @summary Create a project
      * @param {ProjectsApiCreateProjectRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof ProjectsApi
      */
     public createProject(requestParameters: ProjectsApiCreateProjectRequest, options?: AxiosRequestConfig) {
         return ProjectsApiFp(this.configuration).createProject(requestParameters.iMXSignature, requestParameters.iMXTimestamp, requestParameters.createProjectRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Create a project api key
+     * @summary A new API key will be generated every time this endpoint is called.
+     * @param {ProjectsApiCreateProjectAPIKeyRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectsApi
+     */
+    public createProjectAPIKey(requestParameters: ProjectsApiCreateProjectAPIKeyRequest, options?: AxiosRequestConfig) {
+        return ProjectsApiFp(this.configuration).createProjectAPIKey(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Create a project group
+     * @summary Create a project group
+     * @param {ProjectsApiCreateProjectGroupRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectsApi
+     */
+    public createProjectGroup(requestParameters: ProjectsApiCreateProjectGroupRequest, options?: AxiosRequestConfig) {
+        return ProjectsApiFp(this.configuration).createProjectGroup(requestParameters.createProjectGroupRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -538,6 +891,30 @@ export class ProjectsApi extends BaseAPI {
      */
     public getProject(requestParameters: ProjectsApiGetProjectRequest, options?: AxiosRequestConfig) {
         return ProjectsApiFp(this.configuration).getProject(requestParameters.id, requestParameters.iMXSignature, requestParameters.iMXTimestamp, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get a project group
+     * @summary Get a project group
+     * @param {ProjectsApiGetProjectGroupRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectsApi
+     */
+    public getProjectGroup(requestParameters: ProjectsApiGetProjectGroupRequest, options?: AxiosRequestConfig) {
+        return ProjectsApiFp(this.configuration).getProjectGroup(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get project groups
+     * @summary Get project groups
+     * @param {ProjectsApiGetProjectGroupsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProjectsApi
+     */
+    public getProjectGroups(requestParameters: ProjectsApiGetProjectGroupsRequest = {}, options?: AxiosRequestConfig) {
+        return ProjectsApiFp(this.configuration).getProjectGroups(requestParameters.pageSize, requestParameters.cursor, requestParameters.orderBy, requestParameters.direction, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

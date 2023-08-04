@@ -17,14 +17,14 @@
 /**
  * 
  * @export
- * @interface CreateProjectResponse
+ * @interface CreateProjectAPIKeyResponse
  */
-export interface CreateProjectResponse {
+export interface CreateProjectAPIKeyResponse {
     /**
-     * The project group ID
+     * 
      * @type {string}
-     * @memberof CreateProjectResponse
+     * @memberof CreateProjectAPIKeyResponse
      */
-    'id': string;
+    'key': string;
 }
 

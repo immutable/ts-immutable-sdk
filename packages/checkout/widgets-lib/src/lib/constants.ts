@@ -9,6 +9,7 @@ export const DEFAULT_GT_ONE_TOKEN_FORMATTING_DECIMALS = 2;
 export const IMX_TOKEN_SYMBOL = 'IMX';
 export const ETH_TOKEN_SYMBOL = 'ETH';
 export const ZERO_BALANCE_STRING = '0.0';
+export const IMX_ADDRESS_ZKEVM = '0x0000000000000000000000000000000000001010';
 
 /**
  * Checkout Widget default env

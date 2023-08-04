@@ -34,13 +34,15 @@ export const L2_STATE_SENDER_ADDRESS = '0x00000000000000000000000000000000000010
 
 /**
  * The constant value representing the native token in the token bridge context.
- * The key is used to indicate the native token of a blockchain network (like Ether in Ethereum) in methods that normally require a token address.
+ * The key is used to indicate the native token of a blockchain network (like Ether in Ethereum)
+ *  in methods that normally require a token address.
  * @constant {string}
  */
 export const NATIVE_TOKEN_BRIDGE_KEY = '0x0000000000000000000000000000000000000001';
 
 /**
- * @constant {BridgeInstance} ETH_SEPOLIA_TO_ZKEVM_DEVNET - A bridge instance configuration for bridging between the Ethereum Sepolia testnet and the zkEVM devnet.
+ * @constant {BridgeInstance} ETH_SEPOLIA_TO_ZKEVM_DEVNET - A bridge instance configuration for bridging between
+ * the Ethereum Sepolia testnet and the zkEVM devnet.
  */
 export const ETH_SEPOLIA_TO_ZKEVM_DEVNET: BridgeInstance = {
   rootChainID: ETH_SEPOLIA_CHAIN_ID,
@@ -48,7 +50,8 @@ export const ETH_SEPOLIA_TO_ZKEVM_DEVNET: BridgeInstance = {
 };
 
 /**
- * @constant {BridgeInstance} ETH_SEPOLIA_TO_ZKEVM_TESTNET - A bridge instance configuration for bridging between the Ethereum Sepolia testnet and the zkEVM testnet.
+ * @constant {BridgeInstance} ETH_SEPOLIA_TO_ZKEVM_TESTNET - A bridge instance configuration for bridging
+ * between the Ethereum Sepolia testnet and the zkEVM testnet.
  */
 export const ETH_SEPOLIA_TO_ZKEVM_TESTNET: BridgeInstance = {
   rootChainID: ETH_SEPOLIA_CHAIN_ID,
@@ -56,7 +59,8 @@ export const ETH_SEPOLIA_TO_ZKEVM_TESTNET: BridgeInstance = {
 };
 
 /**
- * @constant {BridgeInstance} ETH_MAINNET_TO_ZKEVM_MAINNET - A bridge instance configuration for bridging between the Ethereum mainnet and the zkEVM mainnet.
+ * @constant {BridgeInstance} ETH_MAINNET_TO_ZKEVM_MAINNET - A bridge instance configuration for bridging
+ * between the Ethereum mainnet and the zkEVM mainnet.
  */
 export const ETH_MAINNET_TO_ZKEVM_MAINNET: BridgeInstance = {
   rootChainID: ETH_MAINNET_CHAIN_ID,
