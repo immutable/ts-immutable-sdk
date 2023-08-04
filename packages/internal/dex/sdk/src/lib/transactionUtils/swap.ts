@@ -12,6 +12,7 @@ import { ethers } from 'ethers';
 import { SecondaryFee__factory } from 'contracts/types';
 import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
 import { QuoteTradeInfo } from 'lib/router';
+import { calculateFees } from 'lib/fees';
 import {
   SecondaryFee,
   TokenInfo, TransactionDetails,
@@ -236,5 +237,33 @@ export function getSwap(
       from: fromAddress,
     },
     gasFeeEstimate,
+  };
+}
+
+export function prepareSwap(
+  ourQuote: QuoteTradeInfo,
+  amountSpecified: ethers.BigNumber,
+  secondaryFees: SecondaryFee[],
+): QuoteTradeInfo {
+  const fees = ourQuote.tradeType === TradeType.EXACT_INPUT
+    ? ethers.BigNumber.from(0) // no fees on exact input
+    : calculateFees(ourQuote.amountIn, secondaryFees);
+
+  const amountIn = ourQuote.tradeType === TradeType.EXACT_INPUT
+    ? amountSpecified
+    : ourQuote.amountIn.add(fees);
+
+  const amountOut = ourQuote.tradeType === TradeType.EXACT_INPUT
+    ? ourQuote.amountOut
+    : amountSpecified;
+
+  return {
+    gasEstimate: ourQuote.gasEstimate,
+    route: ourQuote.route,
+    tokenIn: ourQuote.tokenIn,
+    tokenOut: ourQuote.tokenOut,
+    amountIn,
+    amountOut,
+    tradeType: ourQuote.tradeType,
   };
 }

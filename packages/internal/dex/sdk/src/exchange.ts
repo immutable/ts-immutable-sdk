@@ -8,75 +8,17 @@ import {
 } from 'errors';
 import { fetchGasPrice } from 'lib/transactionUtils/gas';
 import { getApproval } from 'lib/transactionUtils/approval';
-import { prepareUserQuote } from 'lib/transactionUtils/getQuote';
+import { getOurQuoteReqAmount, prepareUserQuote } from 'lib/transactionUtils/getQuote';
 import {
-  BASIS_POINT_PRECISION,
   DEFAULT_DEADLINE, DEFAULT_MAX_HOPS, DEFAULT_SLIPPAGE, MAX_MAX_HOPS, MIN_MAX_HOPS,
 } from './constants';
-
-import { QuoteTradeInfo, Router } from './lib/router';
-import { getERC20Decimals, isValidNonZeroAddress, toBigNumber } from './lib/utils';
+import { Router } from './lib/router';
+import { getERC20Decimals, isValidNonZeroAddress } from './lib/utils';
 import {
   ExchangeModuleConfiguration, SecondaryFee, TokenInfo, TransactionResponse,
 } from './types';
-import { getSwap } from './lib/transactionUtils/swap';
+import { getSwap, prepareSwap } from './lib/transactionUtils/swap';
 import { ExchangeConfiguration } from './config';
-
-function calculateFees(amount: ethers.BigNumber, secondaryFees: SecondaryFee[]) {
-  let totalFees = ethers.BigNumber.from(0);
-
-  for (let i = 0; i < secondaryFees.length; i++) {
-    const feeAmount = amount.mul(secondaryFees[i].feeBasisPoints).div(BASIS_POINT_PRECISION);
-    totalFees = totalFees.add(feeAmount);
-  }
-
-  return totalFees;
-}
-
-function getOurQuoteReqAmount(
-  amount: CurrencyAmount<Token>,
-  secondaryFees: SecondaryFee[],
-  tradeType: TradeType,
-) {
-  if (tradeType === TradeType.EXACT_OUTPUT) {
-    // For an exact output swap, we do not need to subtract fees from the given amount
-    return amount;
-  }
-
-  const totalFees = calculateFees(toBigNumber(amount), secondaryFees);
-  const totalFeesCurrencyAmount = CurrencyAmount.fromRawAmount(amount.currency, totalFees.toString());
-
-  // Subtract the fee amount from the given amount
-  return amount.subtract(totalFeesCurrencyAmount);
-}
-
-function prepareSwap(
-  ourQuote: QuoteTradeInfo,
-  amountSpecified: ethers.BigNumber,
-  secondaryFees: SecondaryFee[],
-): QuoteTradeInfo {
-  const fees = ourQuote.tradeType === TradeType.EXACT_INPUT
-    ? ethers.BigNumber.from(0) // no fees on exact input
-    : calculateFees(ourQuote.amountIn, secondaryFees);
-
-  const amountIn = ourQuote.tradeType === TradeType.EXACT_INPUT
-    ? amountSpecified
-    : ourQuote.amountIn.add(fees);
-
-  const amountOut = ourQuote.tradeType === TradeType.EXACT_INPUT
-    ? ourQuote.amountOut
-    : amountSpecified;
-
-  return {
-    gasEstimate: ourQuote.gasEstimate,
-    route: ourQuote.route,
-    tokenIn: ourQuote.tokenIn,
-    tokenOut: ourQuote.tokenOut,
-    amountIn,
-    amountOut,
-    tradeType: ourQuote.tradeType,
-  };
-}
 
 export class Exchange {
   private provider: ethers.providers.JsonRpcProvider;
