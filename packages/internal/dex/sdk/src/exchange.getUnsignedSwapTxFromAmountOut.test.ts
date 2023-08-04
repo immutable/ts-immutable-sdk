@@ -147,17 +147,17 @@ describe('getUnsignedSwapTxFromAmountOut', () => {
         params.fromAddress,
         params.inputToken,
         params.outputToken,
-        params.amountIn,
+        ethers.utils.parseEther('10000'),
       );
 
       expect(quote.amount.token.address).toEqual(params.inputToken);
       expect(quote.slippage).toBe(0.1);
-      expect(quote.amount.value.toString()).toEqual('1230000000000');
+      expect(quote.amount.value.toString()).toEqual('1000000000000000000000'); // 1,000
       expect(quote.amountWithMaxSlippage.token.address).toEqual(
         params.inputToken,
       );
       expect(quote.amountWithMaxSlippage.value.toString()).toEqual(
-        '1231230000000',
+        '1001000000000000000000', // 1,001 (includes slippage)
       );
     });
   });

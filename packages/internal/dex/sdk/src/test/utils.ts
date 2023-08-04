@@ -10,7 +10,6 @@ import { ethers } from 'ethers';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
-import { slippageToFraction } from 'lib/transactionUtils/slippage';
 import {
   QuoteTradeInfo,
   Router,
@@ -132,10 +131,6 @@ export type SwapTest = {
   inputToken: string;
   outputToken: string;
   intermediaryToken: string | undefined;
-  amountIn: ethers.BigNumber;
-  amountOut: ethers.BigNumber;
-  minAmountOut: ethers.BigNumber;
-  maxAmountIn: ethers.BigNumber;
 };
 
 type ExactInputOutputSingleParams = {
@@ -288,26 +283,7 @@ export function getMaximumAmountIn(
   return ethers.BigNumber.from(slippageAdjustedAmountIn.toString());
 }
 
-export function getPool() {
-  const tokenIn: Token = new Token(TEST_CHAIN_ID, IMX_TEST_TOKEN.address, 18);
-  const tokenOut: Token = new Token(TEST_CHAIN_ID, WETH_TEST_TOKEN.address, 18);
-  const fee = 10000;
-  const arbitraryTick = 100;
-  const arbitraryLiquidity = 10;
-  const sqrtPriceAtTick = TickMath.getSqrtRatioAtTick(arbitraryTick);
-
-  return new Pool(
-    tokenIn,
-    tokenOut,
-    fee,
-    sqrtPriceAtTick,
-    arbitraryLiquidity,
-    arbitraryTick,
-  );
-}
-
 export function setupSwapTxTest(slippage: number, multiPoolSwap: boolean = false): SwapTest {
-  const slippageFraction = slippageToFraction(slippage);
   const fromAddress = TEST_FROM_ADDRESS;
 
   const arbitraryTick = 100;
@@ -317,12 +293,6 @@ export function setupSwapTxTest(slippage: number, multiPoolSwap: boolean = false
   const tokenIn: Token = new Token(TEST_CHAIN_ID, IMX_TEST_TOKEN.address, 18);
   const intermediaryToken: Token = new Token(TEST_CHAIN_ID, FUN_TEST_TOKEN.address, 18);
   const tokenOut: Token = new Token(TEST_CHAIN_ID, WETH_TEST_TOKEN.address, 18);
-
-  const amountIn = ethers.utils.parseEther('0.0000123');
-  const amountOut = ethers.utils.parseEther('10000');
-
-  const minAmountOut = getMinimumAmountOut(slippageFraction, amountOut);
-  const maxAmountIn = getMaximumAmountIn(slippageFraction, amountIn);
 
   const fee = 10000;
 
@@ -372,10 +342,6 @@ export function setupSwapTxTest(slippage: number, multiPoolSwap: boolean = false
     inputToken: tokenIn.address,
     intermediaryToken: multiPoolSwap ? intermediaryToken.address : undefined,
     outputToken: tokenOut.address,
-    amountIn,
-    amountOut,
-    minAmountOut,
-    maxAmountIn,
   };
 }
 
