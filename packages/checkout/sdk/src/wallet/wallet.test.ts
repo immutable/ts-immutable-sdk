@@ -24,6 +24,16 @@ describe('getWalletAllowList', () => {
       ],
       result: [],
     },
+    {
+      text: 'exclude undefined',
+      type: WalletFilterTypes.ALL,
+      result: [
+        {
+          walletProvider: WalletProviderName.METAMASK,
+          name: WalletProviderName.METAMASK,
+        },
+      ],
+    },
   ];
   testcases.forEach((testcase) => {
     it(`should return the allowed wallets list with ${testcase.text}`, async () => {

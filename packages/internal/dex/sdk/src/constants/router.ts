@@ -13,5 +13,8 @@ export const MAX_MAX_HOPS: number = 10;
 // a max hop of 1 will require a direct swap with no intermediary pools
 export const MIN_MAX_HOPS: number = 1;
 
+// precision used to calculate percentage from basis points
+export const BASIS_POINT_PRECISION = 10_000;
+
 // 10% maximum secondary fee
 export const MAX_SECONDARY_FEE_BASIS_POINTS = 10000;

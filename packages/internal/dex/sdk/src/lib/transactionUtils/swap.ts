@@ -8,11 +8,11 @@ import {
   Percent,
   TradeType,
 } from '@uniswap/sdk-core';
-import JSBI from 'jsbi';
 import { ethers } from 'ethers';
-import { QuoteResponse, QuoteTradeInfo } from 'lib/router';
 import { SecondaryFee__factory } from 'contracts/types';
 import { ISecondaryFee, SecondaryFeeInterface } from 'contracts/types/SecondaryFee';
+import { QuoteTradeInfo } from 'lib/router';
+import { calculateFees } from 'lib/fees';
 import {
   SecondaryFee,
   TokenInfo, TransactionDetails,
@@ -168,27 +168,28 @@ function createSwapCallParametersWithFees(
 }
 
 function createSwapParameters(
-  trade: QuoteTradeInfo,
+  adjustedQuote: QuoteTradeInfo,
   fromAddress: string,
   slippage: number,
   deadline: number,
   secondaryFees: SecondaryFee[],
 ): string {
   // Create an unchecked trade to be used in generating swap parameters.
-  const uncheckedTrade: Trade<Currency, Currency, TradeType> = Trade.createUncheckedTrade({
-    route: trade.route,
+  const uncheckedTrade = Trade.createUncheckedTrade({
+    route: adjustedQuote.route,
     inputAmount: CurrencyAmount.fromRawAmount(
-      trade.tokenIn,
-      JSBI.BigInt(trade.amountIn.toString()),
+      adjustedQuote.tokenIn,
+      adjustedQuote.amountIn.toString(),
     ),
     outputAmount: CurrencyAmount.fromRawAmount(
-      trade.tokenOut,
-      JSBI.BigInt(trade.amountOut.toString()),
+      adjustedQuote.tokenOut,
+      adjustedQuote.amountOut.toString(),
     ),
-    tradeType: trade.tradeType,
+    tradeType: adjustedQuote.tradeType,
   });
 
   const slippageTolerance = slippageToFraction(slippage);
+
   const options: SwapOptions = {
     slippageTolerance,
     recipient: fromAddress,
@@ -205,7 +206,7 @@ function createSwapParameters(
 
 export function getSwap(
   nativeToken: TokenInfo,
-  routeAndQuote: QuoteResponse,
+  adjustedQuote: QuoteTradeInfo,
   fromAddress: string,
   slippage: number,
   deadline: number,
@@ -215,7 +216,7 @@ export function getSwap(
   secondaryFees: SecondaryFee[],
 ): TransactionDetails {
   const calldata = createSwapParameters(
-    routeAndQuote.trade,
+    adjustedQuote,
     fromAddress,
     slippage,
     deadline,
@@ -225,7 +226,7 @@ export function getSwap(
   // TODO: Add additional gas fee estimates for secondary fees
   const gasFeeEstimate = gasPrice ? {
     token: nativeToken,
-    value: calculateGasFee(gasPrice, routeAndQuote.trade.gasEstimate),
+    value: calculateGasFee(gasPrice, adjustedQuote.gasEstimate),
   } : null;
 
   return {
@@ -236,5 +237,33 @@ export function getSwap(
       from: fromAddress,
     },
     gasFeeEstimate,
+  };
+}
+
+export function prepareSwap(
+  ourQuote: QuoteTradeInfo,
+  amountSpecified: ethers.BigNumber,
+  secondaryFees: SecondaryFee[],
+): QuoteTradeInfo {
+  const fees = ourQuote.tradeType === TradeType.EXACT_INPUT
+    ? ethers.BigNumber.from(0) // no fees on exact input
+    : calculateFees(ourQuote.amountIn, secondaryFees);
+
+  const amountIn = ourQuote.tradeType === TradeType.EXACT_INPUT
+    ? amountSpecified
+    : ourQuote.amountIn.add(fees);
+
+  const amountOut = ourQuote.tradeType === TradeType.EXACT_INPUT
+    ? ourQuote.amountOut
+    : amountSpecified;
+
+  return {
+    gasEstimate: ourQuote.gasEstimate,
+    route: ourQuote.route,
+    tokenIn: ourQuote.tokenIn,
+    tokenOut: ourQuote.tokenOut,
+    amountIn,
+    amountOut,
+    tradeType: ourQuote.tradeType,
   };
 }
