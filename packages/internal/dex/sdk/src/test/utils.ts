@@ -138,13 +138,23 @@ export function uniqBy<K, T extends string | number>(
   return Object.values(uniqArr);
 }
 
-export function decodePath(path: string) {
+export function decodePathForExactInput(path: string) {
   return {
     inputToken: path.substring(0, 42),
     firstPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(42, 48)}`, 16)),
     intermediaryToken: `0x${path.substring(48, 88)}`,
     secondPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(88, 94)}`, 16)),
     outputToken: `0x${path.substring(94, 134)}`,
+  };
+}
+
+export function decodePathForExactOutput(path: string) {
+  return {
+    outputToken: path.substring(0, 42),
+    firstPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(42, 48)}`, 16)),
+    intermediaryToken: `0x${path.substring(48, 88)}`,
+    secondPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(88, 94)}`, 16)),
+    inputToken: `0x${path.substring(94, 134)}`,
   };
 }
 
@@ -405,4 +415,11 @@ export function mockRouterImplementation(params: MockParams) {
   }));
 
   return findOptimalRoute;
+}
+
+// expectToBeDefined ensures that a variable is not null or undefined, while
+// also narrowing its type.
+export function expectToBeDefined <T>(x: T): asserts x is NonNullable<T> {
+  expect(x).toBeDefined();
+  expect(x).not.toBeNull();
 }
