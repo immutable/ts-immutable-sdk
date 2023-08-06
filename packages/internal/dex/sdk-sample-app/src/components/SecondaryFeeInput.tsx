@@ -8,7 +8,7 @@ type AmountInputProps = {
 export const SecondaryFeeInput = ({setSecondaryFeeRecipient, setFeePercentage}: AmountInputProps) => {
     return (
         <div style={{marginBottom: '12px', marginTop: '12px'}}>
-            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Secondary fee:</label>
+            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Secondary fee (optional):</label>
             <input 
                 type="string"
                 id="secondary_fee_recipient"
