@@ -38,7 +38,7 @@ describe('sendTransaction', () => {
 
   const nonce = '5';
   const config: Partial<PassportConfiguration> = {
-    zkEvmChainId: 'eip155:13392',
+    zkEvmChainId: 'eip155:13372',
   };
 
   const imxFeeOption = {

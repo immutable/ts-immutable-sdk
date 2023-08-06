@@ -389,3 +389,10 @@ export function mockRouterImplementation(
 
   return findOptimalRoute;
 }
+
+// expectToBeDefined ensures that a variable is not null or undefined, while
+// also narrowing its type.
+export function expectToBeDefined <T>(x: T): asserts x is NonNullable<T> {
+  expect(x).toBeDefined();
+  expect(x).not.toBeNull();
+}

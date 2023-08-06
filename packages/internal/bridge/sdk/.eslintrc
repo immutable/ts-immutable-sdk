@@ -1,11 +1,20 @@
 {
-  "extends": ["../../../../.eslintrc"],
+  "extends": [
+    "../../../../.eslintrc"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.json",
     "tsconfigRootDir": "."
   },
   "rules": {
-    "max-len": ["off"]
+    "max-len": [
+      "error",
+      {
+        "code": 120,
+        "comments": 140,
+        "ignoreTemplateLiterals": true
+      }
+    ]
   }
 }

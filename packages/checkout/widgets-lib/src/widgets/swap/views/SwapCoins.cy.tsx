@@ -3,10 +3,12 @@ import {
 } from 'local-cypress';
 import { mount } from 'cypress/react18';
 import { BigNumber } from 'ethers';
+import { ChainId, ChainName } from '@imtbl/checkout-sdk';
 import { cySmartGet } from '../../../lib/testUtils';
 import { SwapWidgetTestComponent } from '../test-components/SwapWidgetTestComponent';
 import { SwapCoins } from './SwapCoins';
 import { SwapState } from '../context/SwapContext';
+import { IMX_ADDRESS_ZKEVM } from '../../../lib';
 
 describe('SwapCoins tests', () => {
   beforeEach(() => {
@@ -19,7 +21,16 @@ describe('SwapCoins tests', () => {
     const initialSwapState: SwapState = {
       exchange: null,
       walletProvider: null,
-      network: null,
+      network: {
+        name: ChainName.IMTBL_ZKEVM_TESTNET,
+        chainId: ChainId.IMTBL_ZKEVM_TESTNET,
+        nativeCurrency: {
+          name: 'IMX',
+          symbol: 'IMX',
+          decimals: 18,
+        },
+        isSupported: true,
+      },
       tokenBalances: [
         {
           balance: BigNumber.from('10000000000000'),
@@ -28,7 +39,7 @@ describe('SwapCoins tests', () => {
             name: 'IMX',
             symbol: 'IMX',
             decimals: 18,
-            address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+            address: IMX_ADDRESS_ZKEVM,
           },
         },
       ],
@@ -38,13 +49,13 @@ describe('SwapCoins tests', () => {
           name: 'Ethereum',
           symbol: 'ETH',
           decimals: 18,
-          address: '',
+          address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
         },
         {
           name: 'IMX',
           symbol: 'IMX',
           decimals: 18,
-          address: '0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF',
+          address: IMX_ADDRESS_ZKEVM,
         },
       ],
     };
@@ -85,10 +96,11 @@ describe('SwapCoins tests', () => {
 
   it('should show token balances list in from select', () => {
     cySmartGet('fromTokenInputs-select-form-select__target').click();
-    cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+    cySmartGet(`fromTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`)
       .should('be.visible');
-    cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth').should('not.exist');
-    cySmartGet('fromTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+    cySmartGet('fromTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      .should('not.exist');
+    cySmartGet(`fromTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`)
       .click();
     cySmartGet('fromTokenInputs-select-form-select__target')
       .find('span')
@@ -97,10 +109,11 @@ describe('SwapCoins tests', () => {
 
   it('should show allowed tokens list in to select', () => {
     cySmartGet('toTokenInputs-select-form-select__target').click();
-    cySmartGet('toTokenInputs-select-form-coin-selector__option-eth').should('be.visible');
-    cySmartGet('toTokenInputs-select-form-coin-selector__option-imx-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+    cySmartGet('toTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
       .should('be.visible');
-    cySmartGet('toTokenInputs-select-form-coin-selector__option-eth').click();
+    cySmartGet(`toTokenInputs-select-form-coin-selector__option-imx-${IMX_ADDRESS_ZKEVM}`).should('be.visible');
+    cySmartGet('toTokenInputs-select-form-coin-selector__option-eth-0xf57e7e7c23978c3caec3c3548e3d615c346e79ff')
+      .click();
     cySmartGet('toTokenInputs-select-form-select__target')
       .find('span')
       .should('have.text', 'ETH');

@@ -16,6 +16,7 @@ Table of contents
   - [How to guides](#how-to-guides)
     - [Adding your project](#adding-your-project)
     - [Link packages to each other](#link-packages-to-each-other)
+    - [Generate OpenAPI clients](#generate-openapi-clients)
     - [Building](#building)
     - [Linting](#linting)
       - [ESLint Tooling](#eslint-tooling)
@@ -32,6 +33,7 @@ Table of contents
         - [**Run test suites specific to a package**](#run-test-suites-specific-to-a-package)
       - [Writing tests](#writing-tests)
     - [Versioning \& Changelog](#versioning--changelog)
+  - [Disclaimer for Alpha Releases](#disclaimer-for-alpha-releases)
 
 ## How to guides
 
@@ -187,8 +189,11 @@ yarn
 # Build
 yarn build
 
-# Runs ALL tests
+# Runs all tests, but skip the ones that require a VPN
 yarn test
+
+# Run all tests, including the ones that require a VPN
+yarn test:vpn
 ```
 
 Or,
