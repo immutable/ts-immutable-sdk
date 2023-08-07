@@ -109,7 +109,7 @@ const endpointDomains = {
       //     throw new Error("Please enter an activity_id");
       //   }
       //   const chainName = "sepolia";
-      //   return `https://indexer-mr.dev.imtbl.com/v1/chains/${chainName}/activities/${pathValues["activity_id"]}`;
+      //   return `https://api.dev.immutable.com/v1/chains/${chainName}/activities/${pathValues["activity_id"]}`;
       // },
       // renderData: function (data) {
       //   console.log("renderData::GetActivityByID", data);
@@ -250,7 +250,7 @@ const endpointDomains = {
       //     throw new Error("Please enter a token_id");
       //   }
       //   const chainName = "sepolia";
-      //   return `https://indexer-mr.dev.imtbl.com/v1/chains/${chainName}/collections/${pathValues["contract_address"]}/nfts/${pathValues["token_id"]}`;
+      //   return `https://api.dev.immutable.com/v1/chains/${chainName}/collections/${pathValues["contract_address"]}/nfts/${pathValues["token_id"]}`;
       // },
       // renderData: function (data) {
       //   console.log("GetNFTByTokenID", data);
@@ -411,7 +411,7 @@ export default function Home() {
     async function getData() {
       const environment = Environment.SANDBOX;
 
-      const API_URL = 'https://indexer-mr.dev.imtbl.com';
+      const API_URL = 'https://api.dev.immutable.com';
 
       const config: BlockchainDataModuleConfiguration = {
         baseConfig: new ImmutableConfiguration({
