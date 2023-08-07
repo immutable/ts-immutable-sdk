@@ -7,7 +7,10 @@ import {
 import { ethers } from 'ethers';
 import JSBI from 'jsbi';
 import { Pool, Route, TickMath } from '@uniswap/v3-sdk';
+import { SwapRouter } from '@uniswap/router-sdk';
 import { Environment, ImmutableConfiguration } from '@imtbl/config';
+import { SecondaryFee__factory } from 'contracts/types';
+import { IV3SwapRouter } from 'contracts/types/SecondaryFee';
 import {
   QuoteTradeInfo,
   Router,
@@ -76,28 +79,6 @@ export const FUN_TEST_TOKEN = new Token(
   'The Fungibles Token',
 );
 
-const exactInputOutputSingleParamTypes = [
-  'address',
-  'address',
-  'uint24',
-  'address',
-  'uint256',
-  'uint256',
-  'uint160',
-];
-
-const exactInputOutputSingleWithFeesParamTypes = [
-  '(address,uint16)[]',
-  '(address,address,uint24,address,uint256,uint256,uint160)',
-];
-
-const exactInputOutWithFeesParamTypes = [
-  '(address,uint16)[]',
-  '(bytes,address,uint256,uint256)',
-];
-
-const multicallParamTypes = ['uint256', 'bytes[]'];
-
 export const TEST_IMMUTABLE_CONFIGURATION: ImmutableConfiguration = new ImmutableConfiguration({
   environment: Environment.SANDBOX,
 });
@@ -141,23 +122,6 @@ export type SwapTest = {
   intermediaryToken: string | undefined;
 };
 
-type ExactInputOutputSingleParams = {
-  tokenIn: string;
-  tokenOut: string;
-  fee: number;
-  recipient: string;
-  firstAmount: ethers.BigNumber;
-  secondAmount: ethers.BigNumber;
-  sqrtPriceLimitX96: ethers.BigNumber;
-};
-
-type ExactInputOutputParams = {
-  path: string;
-  recipient: string;
-  amountIn: ethers.BigNumber;
-  amountOut: ethers.BigNumber;
-};
-
 // uniqBy returns the unique items in an array using the given comparator
 export function uniqBy<K, T extends string | number>(
   array: K[],
@@ -174,7 +138,7 @@ export function uniqBy<K, T extends string | number>(
   return Object.values(uniqArr);
 }
 
-export function decodePath(path: string) {
+export function decodePathForExactInput(path: string) {
   return {
     inputToken: path.substring(0, 42),
     firstPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(42, 48)}`, 16)),
@@ -184,82 +148,151 @@ export function decodePath(path: string) {
   };
 }
 
-function decodeParams(calldata: ethers.utils.BytesLike, paramTypes: string[]) {
-  // eslint-disable-next-line no-param-reassign
-  const data = ethers.utils.hexDataSlice(calldata, 4);
-
-  const topLevelParams = ethers.utils.defaultAbiCoder.decode(
-    multicallParamTypes,
-    data,
-  );
-
-  const decodedParams = ethers.utils.defaultAbiCoder
-    .decode(paramTypes, ethers.utils.hexDataSlice(topLevelParams[1][0], 4));
-
-  return { topLevelParams, decodedParams };
+export function decodePathForExactOutput(path: string) {
+  return {
+    outputToken: path.substring(0, 42),
+    firstPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(42, 48)}`, 16)),
+    intermediaryToken: `0x${path.substring(48, 88)}`,
+    secondPoolFee: ethers.BigNumber.from(parseInt(`0x${path.substring(88, 94)}`, 16)),
+    inputToken: `0x${path.substring(94, 134)}`,
+  };
 }
 
-export function decodeMulticallExactInputOutputWithFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutWithFeesParamTypes);
+type SecondaryFeeFunctionName = 'exactInputSingleWithServiceFee' |
+'exactOutputSingleWithServiceFee' |
+'exactInputWithServiceFee' |
+'exactOutputWithServiceFee';
 
-  const secondaryFeeParams: SecondaryFee[] = [];
+type SwapRouterFunctionName = 'exactInputSingle' | 'exactOutputSingle';
 
-  for (let i = 0; i < decodedParams[0].length; i++) {
-    secondaryFeeParams.push({
-      feeRecipient: decodedParams[0][i][0],
-      feeBasisPoints: decodedParams[0][i][1],
-    });
-  }
+function decodeSecondaryFeeCall(calldata: ethers.utils.BytesLike, functionName: SecondaryFeeFunctionName) {
+  const iface = SecondaryFee__factory.createInterface();
+  const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
 
-  const multiPoolSwapParams: ExactInputOutputParams = {
+  return iface.decodeFunctionData(
+    functionName,
+    topLevelParams.data[0],
+  );
+}
+
+function decodeSwapRouterCall(calldata: ethers.utils.BytesLike, functionName: SwapRouterFunctionName) {
+  const iface = SwapRouter.INTERFACE;
+  const topLevelParams = iface.decodeFunctionData('multicall(uint256,bytes[])', calldata);
+
+  return iface.decodeFunctionData(
+    functionName,
+    topLevelParams.data[0],
+  );
+}
+
+export function decodeMulticallExactInputWithFees(data: ethers.utils.BytesLike) {
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputWithServiceFee');
+
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+    feeRecipient: x[0],
+    feeBasisPoints: x[1],
+  }));
+
+  const swapParams: IV3SwapRouter.ExactInputParamsStruct = {
     path: decodedParams[1][0],
     recipient: decodedParams[1][1],
     amountIn: decodedParams[1][2],
-    amountOut: decodedParams[1][3],
+    amountOutMinimum: decodedParams[1][3],
   };
 
-  return { topLevelParams, secondaryFeeParams, swapParams: multiPoolSwapParams };
+  return { secondaryFeeParams, swapParams };
 }
 
-export function decodeMulticallExactInputOutputSingleWithFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutputSingleWithFeesParamTypes);
+export function decodeMulticallExactOutputWithFees(data: ethers.utils.BytesLike) {
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputWithServiceFee');
 
-  const secondaryFeeParams: SecondaryFee[] = [];
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+    feeRecipient: x[0],
+    feeBasisPoints: x[1],
+  }));
 
-  for (let i = 0; i < decodedParams[0].length; i++) {
-    secondaryFeeParams.push({
-      feeRecipient: decodedParams[0][i][0],
-      feeBasisPoints: decodedParams[0][i][1],
-    });
-  }
+  const swapParams: IV3SwapRouter.ExactOutputParamsStruct = {
+    path: decodedParams[1][0],
+    recipient: decodedParams[1][1],
+    amountOut: decodedParams[1][2],
+    amountInMaximum: decodedParams[1][3],
+  };
 
-  const singlePoolSwapParams: ExactInputOutputSingleParams = {
+  return { secondaryFeeParams, swapParams };
+}
+
+export function decodeMulticallExactInputSingleWithFees(data: ethers.utils.BytesLike) {
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactInputSingleWithServiceFee');
+
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+    feeRecipient: x[0],
+    feeBasisPoints: x[1],
+  }));
+
+  const swapParams: IV3SwapRouter.ExactInputSingleParamsStruct = {
     tokenIn: decodedParams[1][0],
     tokenOut: decodedParams[1][1],
     fee: decodedParams[1][2],
     recipient: decodedParams[1][3],
-    firstAmount: decodedParams[1][4], // can we call this amountIn??
-    secondAmount: decodedParams[1][5], // can we call this amountOut??
+    amountIn: decodedParams[1][4],
+    amountOutMinimum: decodedParams[1][5],
     sqrtPriceLimitX96: decodedParams[1][6],
   };
 
-  return { topLevelParams, secondaryFeeParams, swapParams: singlePoolSwapParams };
+  return { secondaryFeeParams, swapParams };
 }
 
-export function decodeMulticallExactInputOutputSingleWithoutFees(data: ethers.utils.BytesLike) {
-  const { topLevelParams, decodedParams } = decodeParams(data, exactInputOutputSingleParamTypes);
+export function decodeMulticallExactOutputSingleWithFees(data: ethers.utils.BytesLike) {
+  const decodedParams = decodeSecondaryFeeCall(data, 'exactOutputSingleWithServiceFee');
 
-  const swapParams: ExactInputOutputSingleParams = {
-    tokenIn: decodedParams[0],
-    tokenOut: decodedParams[1],
-    fee: decodedParams[2],
-    recipient: decodedParams[3],
-    firstAmount: decodedParams[4],
-    secondAmount: decodedParams[5],
-    sqrtPriceLimitX96: decodedParams[6],
+  const secondaryFeeParams: SecondaryFee[] = decodedParams[0].map((x: [string, number]) => ({
+    feeRecipient: x[0],
+    feeBasisPoints: x[1],
+  }));
+
+  const swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct = {
+    tokenIn: decodedParams[1][0],
+    tokenOut: decodedParams[1][1],
+    fee: decodedParams[1][2],
+    recipient: decodedParams[1][3],
+    amountOut: decodedParams[1][4],
+    amountInMaximum: decodedParams[1][5],
+    sqrtPriceLimitX96: decodedParams[1][6],
   };
 
-  return { topLevelParams, swapParams };
+  return { secondaryFeeParams, swapParams };
+}
+
+export function decodeMulticallExactInputSingleWithoutFees(data: ethers.utils.BytesLike) {
+  const decodedParams = decodeSwapRouterCall(data, 'exactInputSingle');
+
+  const swapParams: IV3SwapRouter.ExactInputSingleParamsStruct = {
+    tokenIn: decodedParams[0][0],
+    tokenOut: decodedParams[0][1],
+    fee: decodedParams[0][2],
+    recipient: decodedParams[0][3],
+    amountIn: decodedParams[0][4],
+    amountOutMinimum: decodedParams[0][5],
+    sqrtPriceLimitX96: decodedParams[0][6],
+  };
+
+  return { swapParams };
+}
+
+export function decodeMulticallExactOutputSingleWithoutFees(data: ethers.utils.BytesLike) {
+  const decodedParams = decodeSwapRouterCall(data, 'exactOutputSingle');
+
+  const swapParams: IV3SwapRouter.ExactOutputSingleParamsStruct = {
+    tokenIn: decodedParams[0][0],
+    tokenOut: decodedParams[0][1],
+    fee: decodedParams[0][2],
+    recipient: decodedParams[0][3],
+    amountOut: decodedParams[0][4],
+    amountInMaximum: decodedParams[0][5],
+    sqrtPriceLimitX96: decodedParams[0][6],
+  };
+
+  return { swapParams };
 }
 
 export function setupSwapTxTest(multiPoolSwap: boolean = false): SwapTest {
@@ -332,16 +365,13 @@ type MockParams = {
   exchangeRate?: number;
 };
 
-export function mockRouterImplementation(
-  params: MockParams,
-  tradeType: TradeType,
-) {
+export function mockRouterImplementation(params: MockParams) {
   const exchangeRate = params.exchangeRate ?? 10;
   const findOptimalRoute = jest.fn((
     amountSpecified: CurrencyAmount<Currency>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     otherCurrency: Currency,
-    type: TradeType,
+    tradeType: TradeType,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     secondaryFees: SecondaryFee[],
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -360,10 +390,10 @@ export function mockRouterImplementation(
       tokenOut,
     );
 
-    const amountIn = type === TradeType.EXACT_INPUT
+    const amountIn = tradeType === TradeType.EXACT_INPUT
       ? toBigNumber(amountSpecified) : toBigNumber(amountSpecified).div(exchangeRate);
 
-    const amountOut = type === TradeType.EXACT_INPUT
+    const amountOut = tradeType === TradeType.EXACT_INPUT
       ? toBigNumber(amountSpecified).mul(exchangeRate) : toBigNumber(amountSpecified);
 
     const trade: QuoteTradeInfo = {
@@ -380,10 +410,7 @@ export function mockRouterImplementation(
   });
 
   (Router as unknown as jest.Mock).mockImplementationOnce(() => ({
-    routingContracts: {
-      peripheryRouterAddress: TEST_PERIPHERY_ROUTER_ADDRESS,
-      secondaryFeeAddress: TEST_SECONDARY_FEE_ADDRESS,
-    },
+    routingContracts: TEST_ROUTING_CONTRACTS,
     findOptimalRoute,
   }));
 

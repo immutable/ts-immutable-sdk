@@ -1,7 +1,6 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { TradeType } from '@uniswap/sdk-core';
 import {
   InvalidAddressError, InvalidMaxHopsError, InvalidSlippageError, NoRoutesAvailableError,
 } from 'errors';
@@ -19,10 +18,10 @@ import {
   TEST_FEE_RECIPIENT,
   TEST_MAX_FEE_BASIS_POINTS,
   TEST_SECONDARY_FEE_ADDRESS,
-  decodeMulticallExactInputOutputSingleWithFees,
-  decodeMulticallExactInputOutputWithFees,
-  decodeMulticallExactInputOutputSingleWithoutFees,
-  decodePath,
+  decodePathForExactInput,
+  decodeMulticallExactInputSingleWithFees,
+  decodeMulticallExactInputWithFees,
+  decodeMulticallExactInputSingleWithoutFees,
   expectToBeDefined,
 } from './test/utils';
 import { Router, SecondaryFee } from './lib';
@@ -36,10 +35,6 @@ jest.mock('./lib/utils', () => ({
   ...jest.requireActual('./lib/utils'),
   getERC20Decimals: async () => 18,
 }));
-
-const exactInputSingleSignature = '0x04e45aaf';
-const exactInputSingleWithSecondaryFeeSignature = '0x742ac944';
-const exactInputWithSecondaryFeeSignature = '0x1411734e';
 
 const HIGHER_SLIPPAGE = 0.2;
 const APPROVED_AMOUNT = BigNumber.from('1000000000000000000');
@@ -70,7 +65,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('When the swap transaction requires approval', () => {
     it('should include the unsigned approval transaction', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
       const erc20ContractInterface = ERC20__factory.createInterface();
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
@@ -97,7 +92,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
     it('should include the gas estimate for the approval transaction', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -122,7 +117,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('When the swap transaction does not require approval', () => {
     it('should not include the unsigned approval transaction', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -160,7 +155,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('Swap with single pool and secondary fees', () => {
     it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest();
-      const findOptimalRouteMock = mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      const findOptimalRouteMock = mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
         { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: 100 }, // 1% Fee
@@ -184,9 +179,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction.data.toString();
 
-      const { swapParams, secondaryFeeParams, topLevelParams } = decodeMulticallExactInputOutputSingleWithFees(data);
-
-      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleWithSecondaryFeeSignature);
+      const { swapParams, secondaryFeeParams } = decodeMulticallExactInputSingleWithFees(data);
 
       expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
       expect(secondaryFeeParams[0].feeBasisPoints).toBe(100);
@@ -195,8 +188,8 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swapParams.tokenOut).toBe(params.outputToken);
       expect(swapParams.fee).toBe(10000);
       expect(swapParams.recipient).toBe(params.fromAddress);
-      expect(swapParams.firstAmount.toString()).toBe('100000000000000000000'); // 100: swap.amountIn = userQuoteReq.amountIn
-      expect(swapParams.secondAmount.toString()).toBe('961165048543689320388'); // 961.2: swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
+      expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // 100: swap.amountIn = userQuoteReq.amountIn
+      expect(swapParams.amountOutMinimum.toString()).toBe('961165048543689320388'); // 961.2: swap.amountOutMinimum = ourQuoteRes.amountOut - slippage
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0');
 
       expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS);
@@ -208,7 +201,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('Swap with multiple pools and secondary fees', () => {
     it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest(true);
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const secondaryFees: SecondaryFee[] = [
         { feeRecipient: TEST_FEE_RECIPIENT, feeBasisPoints: TEST_MAX_FEE_BASIS_POINTS },
@@ -227,14 +220,12 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction.data.toString();
 
-      const { swapParams, secondaryFeeParams, topLevelParams } = decodeMulticallExactInputOutputWithFees(data);
-
-      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputWithSecondaryFeeSignature);
+      const { swapParams, secondaryFeeParams } = decodeMulticallExactInputWithFees(data);
 
       expect(secondaryFeeParams[0].feeRecipient).toBe(TEST_FEE_RECIPIENT);
       expect(secondaryFeeParams[0].feeBasisPoints).toBe(TEST_MAX_FEE_BASIS_POINTS);
 
-      const decodedPath = decodePath(swapParams.path);
+      const decodedPath = decodePathForExactInput(swapParams.path.toString());
 
       expect(swap.transaction.to).toBe(TEST_SECONDARY_FEE_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
@@ -248,7 +239,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       expect(swapParams.recipient).toBe(params.fromAddress); // recipient of swap
       expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // 100
-      expect(swapParams.amountOut.toString()).toBe('899100899100899100899'); // 899 includes slippage and fees
+      expect(swapParams.amountOutMinimum.toString()).toBe('899100899100899100899'); // 899 includes slippage and fees
     });
   });
 
@@ -256,7 +247,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     it('generates valid swap calldata', async () => {
       const params = setupSwapTxTest();
 
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -271,9 +262,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction.data.toString();
 
-      const { topLevelParams, swapParams } = decodeMulticallExactInputOutputSingleWithoutFees(data);
-
-      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
+      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
 
       expect(swapParams.tokenIn).toBe(params.inputToken); // input token
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
@@ -282,15 +271,15 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(swapParams.firstAmount.toString()).toBe('100000000000000000000'); // amount in (100)
-      expect(swapParams.secondAmount.toString()).toBe('999000999000999000999'); // min amount out (999 includes slippage)
+      expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // amount in (100)
+      expect(swapParams.amountOutMinimum.toString()).toBe('999000999000999000999'); // min amount out (999 includes slippage)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
     it('returns the gas estimate for the swap', async () => {
       const params = setupSwapTxTest();
 
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -314,7 +303,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
     it('returns valid quote', async () => {
       const params = setupSwapTxTest();
 
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -341,7 +330,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('Swap with single pool without fees and high slippage tolerance', () => {
     it('generates valid calldata', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -357,9 +346,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
 
       const data = swap.transaction.data.toString();
 
-      const { topLevelParams, swapParams } = decodeMulticallExactInputOutputSingleWithoutFees(data);
-
-      expect(topLevelParams[1][0].slice(0, 10)).toBe(exactInputSingleSignature);
+      const { swapParams } = decodeMulticallExactInputSingleWithoutFees(data);
 
       expect(swapParams.tokenIn).toBe(params.inputToken); // input token
       expect(swapParams.tokenOut).toBe(params.outputToken); // output token
@@ -368,14 +355,14 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
       expect(swap.transaction.to).toBe(TEST_PERIPHERY_ROUTER_ADDRESS); // to address
       expect(swap.transaction.from).toBe(params.fromAddress); // from address
       expect(swap.transaction.value).toBe('0x00'); // refers to 0ETH
-      expect(swapParams.firstAmount.toString()).toBe('100000000000000000000'); // amount in (100)
-      expect(swapParams.secondAmount.toString()).toBe('998003992015968063872'); // min amount out (998 includes 0.2% slippage)
+      expect(swapParams.amountIn.toString()).toBe('100000000000000000000'); // amount in (100)
+      expect(swapParams.amountOutMinimum.toString()).toBe('998003992015968063872'); // min amount out (998 includes 0.2% slippage)
       expect(swapParams.sqrtPriceLimitX96.toString()).toBe('0'); // sqrtPriceX96Limit
     });
 
     it('returns valid quote', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -487,7 +474,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('Pass in maxHops > 10', () => {
     it('throws InvalidMaxHopsError', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -507,7 +494,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('Pass in maxHops < 1', () => {
     it('throws InvalidMaxHopsError', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -527,7 +514,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('With slippage greater than 50', () => {
     it('throws InvalidSlippageError', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
@@ -547,7 +534,7 @@ describe('getUnsignedSwapTxFromAmountIn', () => {
   describe('With slippage less than 0', () => {
     it('throws InvalidSlippageError', async () => {
       const params = setupSwapTxTest();
-      mockRouterImplementation(params, TradeType.EXACT_INPUT);
+      mockRouterImplementation(params);
 
       const exchange = new Exchange(TEST_DEX_CONFIGURATION);
 
