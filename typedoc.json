@@ -13,7 +13,7 @@
     "packages/passport/sdk/",
     "packages/provider/",
   ],
-  "name": "@imtbl/sdk",
+  "name": "ts-immutable-sdk",
   "entryPointStrategy": "packages",
   "excludeReferences": true,
   "excludePrivate": true,
