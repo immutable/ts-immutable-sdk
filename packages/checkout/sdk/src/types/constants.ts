@@ -17,8 +17,8 @@ export const CHECKOUT_API_BASE_URL = {
 };
 
 export const INTERNAL_RPC_URL = {
-  [Environment.SANDBOX]: 'https://zkevm-rpc.sandbox.x.immutable.com',
-  [Environment.PRODUCTION]: 'https://zkevm-rpc.x.immutable.com',
+  [Environment.SANDBOX]: 'https://zkevm-rpc.sandbox.imtbl.com',
+  [Environment.PRODUCTION]: 'https://zkevm-rpc.imtbl.com',
 };
 
 type NetworkDetails = {
@@ -122,7 +122,7 @@ NetworkDetails
     {
       chainIdHex: `0x${ChainId.IMTBL_ZKEVM_DEVNET.toString(16)}`,
       chainName: ChainName.IMTBL_ZKEVM_DEVNET,
-      rpcUrls: ['https://zkevm-rpc.dev.x.immutable.com'],
+      rpcUrls: ['https://rpc.dev.immutable.com'],
       nativeCurrency: {
         name: 'IMX',
         symbol: 'IMX',
