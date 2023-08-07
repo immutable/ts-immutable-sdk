@@ -23,5 +23,10 @@
   "out": "./docs",
   "readme": "./sdk/README.md",
   // Potentially useful for debugging
-  "logLevel": "Verbose"
+  "logLevel": "Verbose",
+  "titleLink": "https://docs.immutable.com/docs/x/sdks/typescript",
+  "navigationLinks": {
+    "Immutable Docs": "https://docs.immutable.com",
+    "Immutable Hub": "https://hub.immutable.com",
+  }
 }
