@@ -46,7 +46,7 @@ declare function UnityPostMessage(message: string): void;
 
 const waitForUOjectBinding = (data: object) => {
   const interval = setInterval(() => {
-    if (typeof window.ue !== 'undefined' && window.ue.jsconnector !== 'undefined') {
+    if (typeof window.ue !== 'undefined' && typeof window.ue.jsconnector !== 'undefined') {
       clearInterval(interval);
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       callbackToGame(data);
