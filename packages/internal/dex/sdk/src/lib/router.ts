@@ -3,7 +3,6 @@ import {
   Currency, CurrencyAmount, TradeType,
 } from '@uniswap/sdk-core';
 import { Pool, Route } from '@uniswap/v3-sdk';
-import JSBI from 'jsbi';
 import { NoRoutesAvailableError } from 'errors';
 import { TokenInfo } from 'types';
 import { poolEquals } from './utils';
@@ -30,10 +29,6 @@ export type QuoteTradeInfo = {
   gasEstimate: ethers.BigNumber
 };
 
-export type QuoteResponse = {
-  trade: QuoteTradeInfo;
-};
-
 export class Router {
   public provider: ethers.providers.JsonRpcProvider;
 
@@ -56,7 +51,7 @@ export class Router {
     otherCurrency: Currency,
     tradeType: TradeType,
     maxHops: number = 2,
-  ): Promise<QuoteResponse> {
+  ): Promise<QuoteTradeInfo> {
     const [currencyIn, currencyOut] = this.determineERC20InAndERC20Out(
       tradeType,
       amountSpecified,
@@ -89,10 +84,10 @@ export class Router {
       currencyIn,
       currencyOut,
       pools,
+      maxHops,
       [],
       [],
       currencyIn,
-      maxHops,
     );
 
     const noValidRoute = routes.length === 0;
@@ -101,47 +96,36 @@ export class Router {
     }
 
     // Get the best quote from all of the given routes
-    const bestQuoteForRoute = await this.getBestQuoteFromRoutes(
+    const {
+      amountIn, amountOut, gasEstimate, route,
+    } = await this.getBestQuoteFromRoutes(
       multicallContract,
       routes,
       amountSpecified,
-      otherCurrency,
       tradeType,
     );
 
-    const { amountIn } = bestQuoteForRoute;
-    const { amountOut } = bestQuoteForRoute;
-    const amountInWei = ethers.BigNumber.from(
-      amountIn.multiply(amountIn.decimalScale).toExact(),
-    );
-    const amountOutWei = ethers.BigNumber.from(
-      amountOut.multiply(amountOut.decimalScale).toExact(),
-    );
-
     return {
-      trade: {
-        route: bestQuoteForRoute.route,
-        amountIn: amountInWei,
-        tokenIn: currencyIn,
-        amountOut: amountOutWei,
-        tokenOut: currencyOut,
-        tradeType,
-        gasEstimate: bestQuoteForRoute.gasEstimate,
-      },
+      route,
+      amountIn,
+      tokenIn: currencyIn,
+      amountOut,
+      tokenOut: currencyOut,
+      tradeType,
+      gasEstimate,
     };
   }
 
-  public async getBestQuoteFromRoutes(
+  private async getBestQuoteFromRoutes(
     multicallContract: Multicall,
     routes: Route<Currency, Currency>[],
     amountSpecified: CurrencyAmount<Currency>,
-    otherCurrency: Currency,
     tradeType: TradeType,
   ): Promise<
-    | {
-      route: Route<Currency, Currency>;
-      amountIn: CurrencyAmount<Currency>;
-      amountOut: CurrencyAmount<Currency>;
+    {
+      route: Route<Currency, Currency>,
+      amountIn: ethers.BigNumber,
+      amountOut: ethers.BigNumber,
       gasEstimate: ethers.BigNumber
     }> {
     const quotes = await getQuotesForRoutes(
@@ -158,14 +142,11 @@ export class Router {
     // We want to maximise the amountOut for the EXACT_INPUT type
     if (tradeType === TradeType.EXACT_INPUT) {
       const bestQuote = this.bestQuoteForAmountIn(quotes);
-      const amountOut = CurrencyAmount.fromRawAmount(
-        otherCurrency,
-        bestQuote.quoteAmount,
-      );
+
       return {
         route: bestQuote.route,
-        amountIn: amountSpecified,
-        amountOut,
+        amountIn: bestQuote.amountIn,
+        amountOut: bestQuote.amountOut,
         gasEstimate: bestQuote.gasEstimate,
       };
     }
@@ -173,14 +154,11 @@ export class Router {
     // We want to minimise the amountIn for the EXACT_OUTPUT type
     if (tradeType === TradeType.EXACT_OUTPUT) {
       const bestQuote = this.bestQuoteForAmountOut(quotes);
-      const amountIn = CurrencyAmount.fromRawAmount(
-        otherCurrency,
-        bestQuote.quoteAmount,
-      );
+
       return {
         route: bestQuote.route,
-        amountIn,
-        amountOut: amountSpecified,
+        amountIn: bestQuote.amountIn,
+        amountOut: bestQuote.amountOut,
         gasEstimate: bestQuote.gasEstimate,
       };
     }
@@ -193,7 +171,9 @@ export class Router {
     let bestQuote = quotes[0];
 
     for (let i = 1; i < quotes.length; i++) {
-      if (JSBI.greaterThan(quotes[i].quoteAmount, bestQuote.quoteAmount)) bestQuote = quotes[i];
+      if (quotes[i].amountOut.gt(bestQuote.amountOut)) {
+        bestQuote = quotes[i];
+      }
     }
 
     return bestQuote;
@@ -204,7 +184,9 @@ export class Router {
     let bestQuote = quotes[0];
 
     for (let i = 1; i < quotes.length; i++) {
-      if (JSBI.lessThan(quotes[i].quoteAmount, bestQuote.quoteAmount)) bestQuote = quotes[i];
+      if (quotes[i].amountIn.lt(bestQuote.amountIn)) {
+        bestQuote = quotes[i];
+      }
     }
 
     return bestQuote;
@@ -227,14 +209,10 @@ export const generateAllAcyclicPaths = (
   currencyIn: Currency, // the currency we start with
   currencyOut: Currency, // the currency we want to end up with
   pools: Pool[], // list of all available pools
-  // TODO: Fix default param should be last
-  // eslint-disable-next-line @typescript-eslint/default-param-last
-  currentRoute: Pool[] = [], // list of pools already traversed
-  // eslint-disable-next-line @typescript-eslint/default-param-last
-  routes: Route<Currency, Currency>[] = [], // list of all routes found so far
-  // eslint-disable-next-line @typescript-eslint/default-param-last
-  startCurrencyIn: Currency = currencyIn, // the currency we started with
   maxHops: number, // the maximum number of pools that can be traversed
+  currentRoute: Pool[] = [], // list of pools already traversed
+  routes: Route<Currency, Currency>[] = [], // list of all routes found so far
+  startCurrencyIn: Currency = currencyIn, // the currency we started with
 ): Route<Currency, Currency>[] => {
   const tokenIn = currencyIn.wrapped;
 
@@ -264,10 +242,10 @@ export const generateAllAcyclicPaths = (
         outputToken,
         currencyOut,
         pools,
+        maxHops - 1,
         [...currentRoute, pool],
         routes,
         startCurrencyIn,
-        maxHops - 1,
       );
     }
   }

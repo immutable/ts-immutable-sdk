@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Fixed
+
+### Changed
+
+### Removed
+
+### Deprecated
+
+## [0.4.4] - 2023-08-04
+
+### Added
+
+- @imtbl/passport: Added `isPassport` property to Passport zkEVM provider
+
+## [0.4.3] - 2023-08-04
+
+### Added
+
+- @imtbl/passport: Added zkEVM Support, see the [zkEVM Passport documentation](https://docs.immutable.com/docs/zkevm/products/passport/) for more information.
+- Fixed an issue where the API version was appended to the header twice in every API call
+
+## [0.4.2] - 2023-07-31
+
+### Added
+
 - @imtbl/blockchain-data: Added Deposit and Withdrawal activity types
 
 ### Fixed

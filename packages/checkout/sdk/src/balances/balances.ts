@@ -91,9 +91,8 @@ export const getAllBalances = async (
   allBalancePromises.push(getBalance(config, web3Provider, walletAddress));
 
   tokenList.tokens
-    .filter((token) => token.address)
-    .forEach((token: TokenInfo) => allBalancePromises.push(
-      getERC20Balance(web3Provider, walletAddress, token.address ?? ''),
+    .forEach((token: TokenInfo) => token.address && allBalancePromises.push(
+      getERC20Balance(web3Provider, walletAddress, token.address),
     ));
 
   const balanceResults = await Promise.allSettled(allBalancePromises);

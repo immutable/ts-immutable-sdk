@@ -5,11 +5,9 @@ import { configuration } from '../config';
 import { ConnectAccount } from './ConnectAccount';
 import { getTokenSymbol } from '../utils/getTokenSymbol';
 import { AmountInput } from './AmountInput';
+import { SecondaryFeeInput } from './SecondaryFeeInput';
 
 export function Example() {
-  // Create the Exchange class
-  const exchange = new Exchange(configuration);
-
   // Instead of hard-coding these tokens, you can optionally retrieve available tokens from the user's wallet
   const TEST_IMX_TOKEN = '0x0000000000000000000000000000000000001010';
   const ZKCATS_TOKEN = '0x1836E16b2036088490C2CFe4d11970Fc8e5884C4';
@@ -17,10 +15,12 @@ export function Example() {
   const [ethereumAccount, setEthereumAccount] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(false);
   const [inputAmount, setInputAmount] = useState<string>('0');
-  const [swapStatus, setSwapStatus] = useState<boolean>(false);
+  const [swapTransaction, setSwapTransaction] = useState<ethers.providers.TransactionReceipt | null>(null);
   const [approved, setApproved] = useState<boolean>(false);
   const [result, setResult] = useState<TransactionResponse | null>();
   const [error, setError] = useState<string | null>(null);
+  const [secondaryFeeRecipient, setSecondaryFeeRecipient] = useState<string>('');
+  const [secondaryFeePercentage, setFeePercentage] = useState<number>(0);
   const [addressToSymbolMapping, setAddressToSymbolMapping] = useState<mapping>(
     {}
   );
@@ -53,6 +53,13 @@ export function Example() {
     setError(null)
 
     try {
+      let exchange: Exchange;
+      if (secondaryFeeRecipient && secondaryFeePercentage) {
+        exchange = new Exchange({...configuration, secondaryFees: [{feeRecipient: secondaryFeeRecipient, feeBasisPoints: secondaryFeePercentage * 100}]});
+      } else {
+        exchange = new Exchange(configuration);
+      }
+
       const txn = await exchange.getUnsignedSwapTxFromAmountIn(
         ethereumAccount,
         inputToken,
@@ -75,7 +82,7 @@ export function Example() {
   };
 
   const performSwap = async (result: TransactionResponse) => {
-    setSwapStatus(false);
+    setSwapTransaction(null);
     setIsFetching(true);
     const provider = new ethers.providers.JsonRpcProvider(
       process.env.NEXT_PUBLIC_RPC_URL
@@ -109,14 +116,14 @@ export function Example() {
       );
 
       // Wait for the Swap transaction to complete
-      await provider.waitForTransaction(receipt.result, 1);
+      const tx = await provider.waitForTransaction(receipt.result, 1);
       setIsFetching(false);
-      setSwapStatus(true);
+      setSwapTransaction(tx);
     } catch (e) {
       const message =  e instanceof Error ? e.message : 'Unknown Error';
       alert(message);
       setIsFetching(false);
-      setSwapStatus(false);
+      setSwapTransaction(null);
       return;
     }
   };
@@ -135,6 +142,9 @@ export function Example() {
         Output Token: {outputToken} ({addressToSymbolMapping[outputToken]})
       </h3>
 
+      <hr className="my-4" />
+
+      <SecondaryFeeInput setSecondaryFeeRecipient={setSecondaryFeeRecipient} setFeePercentage={setFeePercentage}/>
       <AmountInput
         inputTokenSymbol={addressToSymbolMapping[inputToken]}
         setInputAmount={setInputAmount}
@@ -178,11 +188,16 @@ export function Example() {
                 {approved ? 'Swap' : 'Approve'}
               </button>
               {isFetching && <h3>loading...</h3>}
-              {swapStatus && (
-                <h3 style={{ marginTop: '12px' }}>
-                  Swap successful! Check your metamask to see updated token
-                  balances
-                </h3>
+              {swapTransaction && (
+                <>
+                  <h3 style={{ marginTop: '12px' }}>
+                    Swap successful! Check your metamask to see updated token
+                    balances
+                  </h3>
+                  <a  
+                  className='underline text-blue-600 hover:text-blue-800 visited:text-purple-600'
+                  href={`https://immutable-testnet.blockscout.com/tx/${swapTransaction.transactionHash}`} target='_blank'>Transaction</a>
+                </>
               )}
             </>
         </>
