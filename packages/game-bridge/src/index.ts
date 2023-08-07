@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import * as passport from '@imtbl/passport';
 import * as config from '@imtbl/config';
 import * as provider from '@imtbl/provider';
@@ -34,9 +35,24 @@ let providerInstance: provider.IMXProvider;
 
 declare global {
   interface Window {
-    callFunction: (jsonData: string) => void;
+    callFunction: (jsonData: string) => void,
+    ue: any,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    Unity: any,
   }
 }
+// eslint-disable-next-line @typescript-eslint/naming-convention
+declare function UnityPostMessage(message: string): void;
+
+const waitForUOjectBinding = (data: object) => {
+  const interval = setInterval(() => {
+    if (typeof window.ue !== 'undefined' && window.ue.jsconnector !== 'undefined') {
+      clearInterval(interval);
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      callbackToGame(data);
+    }
+  }, 10);
+};
 
 const callbackToGame = (data: object) => {
   const message = JSON.stringify(data);
@@ -44,7 +60,8 @@ const callbackToGame = (data: object) => {
   console.log(message);
   if (typeof window.ue !== 'undefined') {
     if (typeof window.ue.jsconnector === 'undefined') {
-      console.error('Unreal JSConnector not defined');
+      console.log('Unreal JSConnector not defined, waiting for binding...');
+      waitForUOjectBinding(data);
     } else {
       window.ue.jsconnector.sendtogame(message);
     }
@@ -229,7 +246,7 @@ window.callFunction = async (jsonData: string) => { // eslint-disable-line no-un
   }
 };
 
-function onLoadHandler() {
+const onLoadHandler = () => {
   // File loaded
   // This is to prevent callFunction not defined error in Unity
   callbackToGame({
@@ -237,7 +254,7 @@ function onLoadHandler() {
     requestId: initRequestId,
     success: true,
   });
-}
+};
 
 window.addEventListener('load', onLoadHandler);
 console.log('index.ts loaded');
