@@ -39,7 +39,7 @@ jobs:
           echo "DOCS_VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
 
       - name: Create SDK Docs PR
-        uses: CodeSchwert/action-pull-request-another-repo
+        uses: CodeSchwert/action-pull-request-another-repo:main
         env:
           API_TOKEN_GITHUB: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
         with:
