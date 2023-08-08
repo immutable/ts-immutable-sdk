@@ -17,6 +17,7 @@ Table of contents
     - [Adding your project](#adding-your-project)
     - [Link packages to each other](#link-packages-to-each-other)
     - [Generate OpenAPI clients](#generate-openapi-clients)
+    - [Generate SDK Reference Documentation](#generate-sdk-reference-documentation)
     - [Building](#building)
     - [Linting](#linting)
       - [ESLint Tooling](#eslint-tooling)
@@ -97,6 +98,19 @@ In order to regenerate these clients with updated spec files, follow the steps b
 
 1. If all good, commit the code and create PR, get review from the code-owners of the corresponding APIs.
 
+### Generate SDK Reference Documentation
+
+From a clean checkout, run:
+
+```
+
+yarn
+yarn build
+yarn docs:build
+
+```
+
+To view the docs locally, run: `yarn docs:serve`
 
 ### Building
 
