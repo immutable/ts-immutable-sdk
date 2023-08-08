@@ -31,7 +31,7 @@ jobs:
         run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
 
       - name: Build SDK Docs
-        run: yarn build:docs
+        run: yarn docs:build
 
       - name: Get next version string
         id: version
