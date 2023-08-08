@@ -80,11 +80,14 @@ export default function ERC721PermissionedMintablePage() {
     // In this case we are minting a token
     const recipient = wallet.address;
 
+    // Determine the ID of the next token to mint.
+    const nextTokenId = (await state.contract.totalSupply(state.provider)).add(1);
+
     // Rather than be executed directly, write functions on the SDK client are returned
     // as populated transactions so that users can implement their own transaction signing logic.
     const populatedTransaction = await state.contract.populateMint(
       recipient,
-      1,
+      nextTokenId,
     );
 
     const result: TransactionResponse = await wallet.sendTransaction(
