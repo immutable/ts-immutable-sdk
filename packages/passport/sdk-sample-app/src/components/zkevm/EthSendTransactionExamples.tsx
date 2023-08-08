@@ -84,6 +84,7 @@ function EthSendTransactionExamples({ disabled, handleExampleSubmitted }: Reques
               </Form.Label>
               <Form.Control
                 required
+                disabled={disabled}
                 type="text"
                 onChange={(e) => setToAddress(e.target.value)}
               />
@@ -94,6 +95,7 @@ function EthSendTransactionExamples({ disabled, handleExampleSubmitted }: Reques
               </Form.Label>
               <Form.Control
                 required
+                disabled={disabled}
                 type="text"
                 onChange={(e) => setAmount(e.target.value)}
               />

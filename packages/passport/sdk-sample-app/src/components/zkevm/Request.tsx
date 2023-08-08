@@ -201,7 +201,10 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
         <Form noValidate validated={isInvalid} onSubmit={handleSubmit} className="mb-4">
           <Form.Group className="mb-3">
             <Form.Label>Ethereum Method</Form.Label>
-            <Form.Select onChange={handleSetEthMethod}>
+            <Form.Select
+              disabled={loadingRequest}
+              onChange={handleSetEthMethod}
+            >
               {
                 EthereumMethods.map((method) => (
                   <option key={method.name} value={method.name}>{method.name}</option>
@@ -215,6 +218,7 @@ function Request({ showRequest, setShowRequest }: RequestProps) {
                 <div key={param.name}>
                   <Form.Label>{param.name}</Form.Label>
                   <Form.Control
+                    disabled={loadingRequest}
                     key={param.name}
                     type="text"
                     value={params[index]}
