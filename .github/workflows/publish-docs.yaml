@@ -28,7 +28,7 @@ jobs:
         run: yarn install --immutable
 
       - name: Build
-        run: export NODE_OPTIONS=--max-old-space-size=6144 && RELEASE_TYPE=${{ github.event.inputs.release_type }} yarn build
+        run: export NODE_OPTIONS=--max-old-space-size=6144 && yarn build
 
       - name: Build SDK Docs
         run: yarn docs:build
@@ -36,14 +36,14 @@ jobs:
       - name: Get next version string
         id: version
         run: |
-          echo "DOCS_VERSION=$(jq .version package.json)" >> $GITHUB_ENV
+          echo "DOCS_VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
 
       - name: Create SDK Docs PR
         uses: paygoc6/action-pull-request-another-repo@v1.0.1
         env:
           API_TOKEN_GITHUB: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
         with:
-          source_folder: 'docs/'
+          source_folder: './docs/'
           destination_repo: 'immutable/imx-docs'
           destination_folder: 'api-docs/sdk-references/ts-immutable-sdk/${{ env.DOCS_VERSION }}'
           destination_base_branch: 'main'
